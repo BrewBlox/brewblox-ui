@@ -1,8 +1,8 @@
 {
-  "name": "quasar-app",
+  "name": "brewblox-ui",
   "version": "0.0.1",
-  "description": "A Quasar App",
-  "author": "Your Name",
+  "description": "UI for the BrewBlox brewing controller",
+  "author": "Elco Jacobs / BrewPi B.V.",
   "scripts": {
     "clean": "node build/script.clean.js",
     "dev": "node build/script.dev.js",
@@ -19,7 +19,9 @@
     "quasar-extras": "0.x",
     "quasar-framework": "git+https://git@github.com/quasarframework/quasar-edge.git",
     "vue": "^2.3.0",
-    "vue-router": "^2.0.0"
+    "vue-router": "^2.0.0",
+    "vue-types": "^1.0.1",
+    "vuex": "^2.3.1"
   },
   "devDependencies": {
     "autoprefixer": "^6.4.0",
