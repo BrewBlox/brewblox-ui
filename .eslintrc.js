@@ -7,8 +7,7 @@ module.exports = {
   env: {
     browser: true,
   },
-  // https://github.com/feross/standard/blob/master/RULES.md#javascript-standard-style
-  extends: 'standard',
+  extends: 'airbnb-base',
   // required to lint *.vue files
   plugins: [
     'html'
@@ -17,7 +16,7 @@ module.exports = {
     'cordova': true,
     'DEV': true,
     'PROD': true,
-    '__THEME': true
+    '__THEME': true,
   },
   // add your custom rules here
   'rules': {

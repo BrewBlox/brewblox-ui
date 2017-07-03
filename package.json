@@ -7,10 +7,15 @@
     "clean": "node build/script.clean.js",
     "dev": "node build/script.dev.js",
     "build": "node build/script.build.js",
-    "lint": "eslint --ext .js,.vue src"
+    "lint": "eslint --ext .js,.vue src",
+    "lint-fix": "eslint --fix --ext .js,.vue src"
   },
   "dependencies": {
     "babel-runtime": "^6.0.0",
+    "eslint-config-airbnb-base": "^11.2.0",
+    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-vue": "^2.1.0",
+    "quasar": "0.0.18",
     "quasar-extras": "0.x",
     "quasar-framework": "git+https://git@github.com/quasarframework/quasar-edge.git",
     "vue": "^2.3.0",
@@ -36,7 +41,6 @@
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-node": "^4.2.2",
     "eslint-plugin-promise": "^3.3.0",
-    "eslint-plugin-standard": "^3.0.1",
     "eventsource-polyfill": "^0.9.6",
     "express": "^4.13.3",
     "extract-text-webpack-plugin": "^2.0.0-beta.4",

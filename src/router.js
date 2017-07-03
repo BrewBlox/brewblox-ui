@@ -1,11 +1,11 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import Vue from 'vue';
+import VueRouter from 'vue-router';
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
-function load (component) {
+function load(component) {
   // '@' is aliased to src/components
-  return () => System.import(`@/${component}.vue`)
+  return () => System.import(`@/${component}.vue`);
 }
 
 export default new VueRouter({
@@ -25,6 +25,6 @@ export default new VueRouter({
     { path: '/', component: load('Hello') },
 
     // Always leave this last one
-    { path: '*', component: load('Error404') } // Not found
-  ]
-})
+    { path: '*', component: load('Error404') }, // Not found
+  ],
+});
