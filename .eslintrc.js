@@ -24,6 +24,12 @@ module.exports = {
     'arrow-parens': 0,
     'one-var': 0,
     'import/first': 0,
+    'no-unused-vars': 1,
+    'arrow-body-style': 1,
+    // allow setting properties in state parameter of function
+    'no-param-reassign': [2, { 'props': true, 'ignorePropertyModificationsFor': ['state'] }],
+    // allow longer line length
+    'max-len': [1, 120, 2, {ignoreComments: true}],
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
     'brace-style': [2, 'stroustrup', { 'allowSingleLine': true }]
