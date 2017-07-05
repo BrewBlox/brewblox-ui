@@ -37,7 +37,10 @@
             <q-item-side icon="timeline" /> 
             <q-item-main label="Charts" sublabel="Your brewing data" />
           </q-side-link>
-          
+          <q-side-link item to="/flows">
+            <q-item-side icon="grid on" /> 
+            <q-item-main label="Flows" sublabel="Flow visualization" />
+          </q-side-link>
           <q-list-header>Admin</q-list-header>
           <q-side-link item to="/admin">
             <q-item-side icon="settings" />

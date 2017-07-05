@@ -37,6 +37,11 @@ export default new VueRouter({
       component: load('Charts'),
     },
     {
+      path: '/flows',
+      name: 'Flows',
+      component: load('Flows'),
+    },
+    {
       path: '/admin',
       name: 'Admin',
       component: load('Admin'),
