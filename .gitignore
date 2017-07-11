@@ -5,3 +5,5 @@ dist/
 npm-debug.log*
 cordova/platforms
 cordova/plugins
+
+\.vscode/

@@ -17,6 +17,7 @@
     "eslint-config-airbnb-base": "^11.2.0",
     "eslint-plugin-jsx-a11y": "^6.0.2",
     "eslint-plugin-vue": "beta",
+    "plotly.js": "^1.28.3",
     "quasar": "0.0.18",
     "quasar-extras": "0.x",
     "quasar-framework": "git+https://git@github.com/quasarframework/quasar-edge.git",
