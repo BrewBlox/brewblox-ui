@@ -1,0 +1,166 @@
+{
+  "id": 3,
+  "name": "Fill hot liquor tun",
+  "notes": [
+    "The hot liquor tun (HLT) is filled with cold water or hot water if available."
+  ],
+  "settings": [
+    {
+      "id": "v1",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v2",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v3",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v4",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v5",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v6",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v7",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v8",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v9",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v10",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v11",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v12",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v13",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m1",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m2",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m3",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m4",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m5",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m6",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m7",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m8",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hlt",
+      "settings": {
+        "volume": 50.0,
+        "liquid": "water"
+      }
+    },
+    {
+      "id": "in1",
+      "settings": {
+        "liquid": "water"
+      }
+    },
+    {
+      "id": "sphlt",
+      "settings": {
+        "val": 15
+      }
+    },
+    {
+      "id": "spmt",
+      "settings": {
+        "val": 20
+      }
+    },
+    {
+      "id": "spbk",
+      "settings": {
+        "val": 20
+      }
+    }
+  ]
+}

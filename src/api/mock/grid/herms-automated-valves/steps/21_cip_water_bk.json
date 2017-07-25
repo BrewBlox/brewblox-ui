@@ -1,0 +1,204 @@
+{
+  "id": 21,
+  "name": "CIP: flush boil kettle with water",
+  "notes": [
+  "While flushing the boil kettle with water, we can clean it with soft cloth."
+  ],
+  "settings": [
+    {
+      "id": "v1",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v2",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v3",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v4",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v5",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v6",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v7",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v8",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v9",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v10",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v11",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v12",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v13",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m1",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m2",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m3",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m4",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m5",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m6",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m7",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m8",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hlt",
+      "settings": {
+        "volume": 30.0,
+        "liquid": "hotwater"
+      }
+    },
+    {
+      "id": "bk",
+      "settings": {
+        "volume": 15,
+        "liquid": "water"
+      }
+    },
+    {
+      "id": "mt",
+      "settings": {
+      }
+    },
+    {
+      "id": "in1",
+      "settings": {
+        "liquid": "water"
+      }
+    },
+    {
+      "id": "heat_hlt",
+      "settings": {
+        "duty": 10
+      }
+    },
+    {
+      "id": "heat_bk",
+      "settings": {
+        "duty": 0
+      }
+    },
+    {
+      "id": "p1",
+      "settings":{
+        "power": false
+      }
+    },
+    {
+      "id": "p2",
+      "settings":{
+        "power": true,
+        "speed": 100
+      }
+    },
+    {
+      "id": "sphlt",
+      "settings": {
+        "val": 60,
+        "set": 60
+      }
+    },
+    {
+      "id": "spmt",
+      "settings": {
+        "val": 20
+      }
+    },
+    {
+      "id": "spbk",
+      "settings": {
+        "val": 15
+      }
+    }
+  ]
+}

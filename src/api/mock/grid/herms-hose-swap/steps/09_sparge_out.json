@@ -1,0 +1,123 @@
+{
+  "id": 9,
+  "name": "Sparge out",
+  "layout": 5,
+  "settings": [
+    {
+      "id": "sphlt",
+      "settings": {
+        "val": 75.2,
+        "set": 60
+      }
+    },
+    {
+      "id": "spmt",
+      "settings": {
+        "val": 72.8
+      }
+    },
+    {
+      "id": "spbk",
+      "settings": {
+        "val": 82.9,
+        "set": 100
+      }
+    },
+    {
+      "id": "mt",
+      "settings": {
+        "grain": 15,
+        "volume": 8,
+        "liquid": "wort"
+      }
+    },
+    {
+      "id": "heat_bk",
+      "settings": {
+        "duty": 100
+      }
+    },
+    {
+      "id": "hlt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hlt-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+        {
+      "id": "coil-top",
+      "settings": {
+        "pos": "open"
+      }
+    },
+        {
+      "id": "coil-bottom",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mt-out",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "p1",
+      "settings": {
+        "power": true,
+        "speed": 100
+      }
+    },
+    {
+      "id": "p2",
+      "settings": {
+        "power": false,
+        "speed": 100
+      }
+    },
+    {
+      "id": "bk-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "bk-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hlt",
+      "settings": {
+        "volume": 30.0,
+        "liquid": "hotwater"
+      }
+    },
+    {
+      "id": "bk",
+      "settings": {
+        "volume": 42,
+        "liquid": "wort"
+      }
+    },
+    {
+      "id": "in1",
+      "settings": {
+        "liquid": "water"
+      }
+    }
+  ]
+}

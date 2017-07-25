@@ -1,0 +1,122 @@
+{
+  "id": 8,
+  "name": "Fly sparge",
+  "layout": 5,
+  "settings": [
+    {
+      "id": "sphlt",
+      "settings": {
+        "val": 76,
+        "set": 75.5
+      }
+    },
+    {
+      "id": "spmt",
+      "settings": {
+        "val": 74.9
+      }
+    },
+    {
+      "id": "spbk",
+      "settings": {
+        "val": 73.3
+      }
+    },
+    {
+      "id": "mt",
+      "settings": {
+        "grain": 15,
+        "volume": 10,
+        "liquid": "wort"
+      }
+    },
+    {
+      "id": "heat_hlt",
+      "settings": {
+        "duty": 10
+      }
+    },
+    {
+      "id": "hlt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hlt-out",
+      "settings": {
+        "pos": "open"
+      }
+    },
+        {
+      "id": "coil-top",
+      "settings": {
+        "pos": "open"
+      }
+    },
+        {
+      "id": "coil-bottom",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mt-out",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "p1",
+      "settings": {
+        "power": true,
+        "speed": 100
+      }
+    },
+    {
+      "id": "p2",
+      "settings": {
+        "power": true,
+        "speed": 100
+      }
+    },
+    {
+      "id": "bk-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "bk-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hlt",
+      "settings": {
+        "volume": 45.0,
+        "liquid": "hotwater"
+      }
+    },
+    {
+      "id": "bk",
+      "settings": {
+        "volume": 25,
+        "liquid": "wort"
+      }
+    },
+    {
+      "id": "in1",
+      "settings": {
+        "liquid": "water"
+      }
+    }
+  ]
+}

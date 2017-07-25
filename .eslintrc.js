@@ -26,8 +26,11 @@ module.exports = {
     'import/first': 0,
     'no-unused-vars': 1,
     'arrow-body-style': 1,
+    'indent': 1,
     // allow setting properties in state parameter of function
     'no-param-reassign': [2, { 'props': true, 'ignorePropertyModificationsFor': ['state'] }],
+    // set devDependencies to true to prevent linting errors from them
+    'import/no-extraneous-dependencies': [2, { devDependencies: true }],
     // allow longer line length
     'max-len': [1, 120, 2, {ignoreComments: true}],
     // allow debugger during development

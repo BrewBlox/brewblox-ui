@@ -1,0 +1,212 @@
+{
+  "id": 10,
+  "name": "Mash recirculation",
+  "notes": [
+    "To control the temperature of the mash, the wort is pumped through the coil in the HLT. The water in the HLT will heat up the wort.",
+    "This heat exchange is what gives the HERMS its name: heat excange recirculating mash system",
+    "By heating the mash indirectly, the wort will never get hotter than the HLT temperature. This prevents overheating and scorching.",
+    "The setpoint of the HLT is dynamic and controlled by BrewPi, based on the temperature error in the mash tun.",
+    "The mash can go through multiple temperature steps."
+  ],
+  "settings": [
+    {
+      "id": "v1",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v2",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v3",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v4",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v5",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v6",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v7",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v8",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v9",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v10",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v11",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v12",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v13",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m1",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m2",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m3",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m4",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m5",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m6",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m7",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m8",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hlt",
+      "settings": {
+        "volume": 50.0,
+        "liquid": "hotwater"
+      }
+    },
+    {
+      "id": "bk",
+      "settings": {
+        "volume": 0
+      }
+    },
+    {
+      "id": "mt",
+      "settings": {
+        "grain": 15,
+        "volume": 30,
+        "liquid": "wort"
+      }
+    },
+    {
+      "id": "in1",
+      "settings": {
+        "liquid": "water"
+      }
+    },
+    {
+      "id": "heat_hlt",
+      "settings": {
+        "duty": 10
+      }
+    },
+    {
+      "id": "heat_bk",
+      "settings": {
+        "duty": 0
+      }
+    },
+    {
+      "id": "p1",
+      "settings":{
+        "power": true,
+        "speed": 100
+      }
+    },
+    {
+      "id": "p2",
+      "settings":{
+        "power": true,
+        "speed": 100
+      }
+    },
+    {
+      "id": "sphlt",
+      "settings": {
+        "val": 68.3,
+        "set": 69.2
+      }
+    },
+    {
+      "id": "spmt",
+      "settings": {
+        "val": 67.6,
+        "set": 67.7
+      }
+    },
+    {
+      "id": "spbk",
+      "settings": {
+        "val": 20
+      }
+    }
+  ]
+}

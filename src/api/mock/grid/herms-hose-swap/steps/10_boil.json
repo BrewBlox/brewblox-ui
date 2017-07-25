@@ -1,0 +1,102 @@
+{
+  "id": 10,
+  "name": "Boil",
+  "layout": 0,
+  "settings": [
+    {
+      "id": "sphlt",
+      "settings": {
+        "val": 66.2,
+        "set": 60
+      }
+    },
+    {
+      "id": "spmt",
+      "settings": {
+        "val": 20
+      }
+    },
+    {
+      "id": "spbk",
+      "settings": {
+        "val": 100,
+        "set": 100
+      }
+    },
+    {
+      "id": "hlt",
+      "settings": {
+        "volume": 30.0,
+        "liquid": "hotwater"
+      }
+    },
+    {
+      "id": "mt",
+      "settings": {
+        "grain": 15,
+        "liquid": "wort"
+      }
+    },
+    {
+      "id": "bk",
+      "settings": {
+        "volume": 50,
+        "liquid": "wort"
+      }
+    },
+    {
+      "id": "heat_bk",
+      "settings": {
+        "duty": 100
+      }
+    },
+    {
+      "id": "hlt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hlt-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "coil-top",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "coil-bottom",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "mt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mt-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "bk-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "bk-out",
+      "settings": {
+        "pos": "closed"
+      }
+    }
+  ]
+}

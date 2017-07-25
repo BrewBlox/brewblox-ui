@@ -1,0 +1,127 @@
+{
+  "id": 11,
+  "name": "Cool & whirlpool",
+  "layout": 6,
+  "settings": [
+     {
+      "id": "sphlt",
+      "settings": {
+        "val": 60,
+        "set": 60
+      }
+    },
+    {
+      "id": "spmt",
+      "settings": {
+        "val": 20
+      }
+    },
+    {
+      "id": "spbk",
+      "settings": {
+        "val": 47,
+        "set": 20
+      }
+    },
+    {
+      "id": "hlt",
+      "settings": {
+        "volume": 30.0,
+        "liquid": "hotwater"
+      }
+    },
+    {
+      "id": "mt",
+      "settings": {
+        "grain": 15,
+        "liquid": "wort"
+      }
+    },
+    {
+      "id": "bk",
+      "settings": {
+        "volume": 50,
+        "liquid": "wort"
+      }
+    },
+    {
+      "id": "heat_bk",
+      "settings": {
+        "duty": 0
+      }
+    },
+     {
+      "id": "heat_hlt",
+      "settings": {
+        "duty": 10
+      }
+    },
+    {
+      "id": "hlt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hlt-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "coil-top",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "coil-bottom",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "mt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mt-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "bk-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "bk-out",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "p1",
+      "settings": {
+        "power": true,
+        "speed": 100
+      }
+    },
+     {
+      "id": "in1",
+      "settings": {
+        "liquid": "water"
+      }
+    },
+     {
+      "id": "out1",
+      "settings": {
+        "liquid": "water"
+      }
+    }
+  ]
+}

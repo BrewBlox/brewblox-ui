@@ -1,0 +1,110 @@
+{
+  "id": 7,
+  "name": "Mash recirculation",
+  "layout": 4,
+  "settings": [
+    {
+      "id": "mt",
+      "settings": {
+        "grain": 15,
+        "volume": 30,
+        "liquid": "wort"
+      }
+    },
+       {
+      "id": "sphlt",
+      "settings": {
+        "val": 68.3,
+        "set": 69.2
+      }
+    },
+    {
+      "id": "spmt",
+      "settings": {
+        "val": 67.6,
+        "set": 67.7
+      }
+    },
+    {
+      "id": "heat_hlt",
+      "settings": {
+        "duty": 10
+      }
+    },
+     {
+      "id": "hlt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hlt-out",
+      "settings": {
+        "pos": "open"
+      }
+    },
+        {
+      "id": "coil-top",
+      "settings": {
+        "pos": "open"
+      }
+    },
+        {
+      "id": "coil-bottom",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mt-out",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "p1",
+      "settings":{
+        "power": true,
+        "speed": 100
+      }
+    },
+        {
+      "id": "p2",
+      "settings":{
+        "power": true,
+        "speed": 100
+      }
+    },
+    {
+      "id": "bk-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "bk-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hlt",
+      "settings": {
+        "volume": 50.0,
+        "liquid": "hotwater"
+      }
+    },
+    {
+      "id": "in1",
+      "settings": {
+        "liquid": "water"
+      }
+    }
+  ]
+}

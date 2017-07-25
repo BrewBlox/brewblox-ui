@@ -43,7 +43,11 @@ export default {
     ...mapGetters({
       brews: 'brews/data',
       names: 'brews/names',
+      brew: 'brews/getByName',
     }),
+    fetchSeries() {
+      return this.brew(this.dataset);
+    },
   },
   methods: {
     fetch() {

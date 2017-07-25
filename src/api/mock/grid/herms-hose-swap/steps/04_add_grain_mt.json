@@ -1,0 +1,113 @@
+{
+  "id": 4,
+  "name": "Add grain to mash tun",
+  "layout": 0,
+  "settings": [
+       {
+      "id": "mt",
+      "settings": {
+        "grain": 15
+      }
+    },
+       {
+      "id": "sphlt",
+      "settings": {
+        "val": 67,
+        "set": 67
+      }
+    },
+    {
+      "id": "spmt",
+      "settings": {
+        "val": 20
+      }
+    },
+    {
+      "id": "spbk",
+      "settings": {
+        "val": 73,
+        "set": 73
+      }
+    },
+    {
+      "id": "heat_hlt",
+      "settings": {
+        "duty": 100
+      }
+    },
+        {
+      "id": "heat_bk",
+      "settings": {
+        "duty": 100
+      }
+    },
+     {
+      "id": "hlt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hlt-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+        {
+      "id": "coil-top",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+        {
+      "id": "coil-bottom",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "mt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mt-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "bk-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "bk-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hlt",
+      "settings": {
+        "volume": 50.0,
+        "liquid": "hotwater"
+      }
+    },
+        {
+      "id": "bk",
+      "settings": {
+        "volume": 24.5,
+        "liquid": "hotwater"
+      }
+    },
+    {
+      "id": "in1",
+      "settings": {
+        "liquid": "water"
+      }
+    }
+  ]
+}

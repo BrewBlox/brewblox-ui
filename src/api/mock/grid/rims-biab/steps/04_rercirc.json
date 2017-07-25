@@ -1,0 +1,54 @@
+{
+  "id": 5,
+  "name": "Mash recirculation",
+  "layout": 2,
+  "settings": [
+              {
+      "id": "temp",
+      "settings": {
+        "val": 67,
+        "set": 67
+      }
+    },
+       {
+      "id": "kettle",
+      "settings": {
+        "volume": 40.0,
+        "liquid": "wort"
+      }
+    },    
+    {
+      "id": "bag",
+      "settings": {
+        "grain": 25
+      }
+    },
+    {
+      "id": "rims",
+      "settings": {
+        "volume": 2,
+        "liquid": "hotwater"
+      }
+    },
+        
+    {
+      "id": "m1",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "heater",
+      "settings": {
+        "duty": 10
+      }
+    },
+    {
+      "id": "p1",
+      "settings":{
+        "power": true,
+        "speed": 50
+      }
+    }
+  ]
+}

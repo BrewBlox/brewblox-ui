@@ -1,0 +1,68 @@
+{
+  "id": 7,
+  "name": "Fermentor out",
+  "parts": [
+    {
+      "part": {
+        "type": "SETPOINT",
+        "id": "temp"
+      },
+      "x": 6,
+      "y": 0
+    },
+    {
+      "part": {
+        "type": "KETTLE",
+        "options": {
+          "height": 6,
+          "volume": 70,
+          "width": 4
+        },
+        "id": "kettle"
+      },
+      "x": 2,
+      "y": 3
+    },
+    {
+      "part": {
+        "rotate": 90,
+        "type": "TUBE_OUTPUT",
+        "id": "out1"
+      },
+      "x": 0,
+      "y": 10
+    },
+    {
+      "part": {
+        "type": "VALVE_MANUAL",
+        "id": "m1"
+      },
+      "x": 1,
+      "y": 8
+    },
+    {
+      "part": {
+        "rotate": 90,
+        "type": "TUBE_ELBOW"
+      },
+      "x": 0,
+      "y": 8
+    },
+    {
+      "part": {
+        "type": "PUMP",
+        "rotate": 90,
+        "id": "p1"
+      },
+      "x": 0,
+      "y": 9
+    },
+    {
+      "part": {
+        "type": "FILTER_BOTTOM"
+      },
+      "x": 2,
+      "y": 8
+    }
+  ]
+}

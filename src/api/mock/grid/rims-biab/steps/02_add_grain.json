@@ -1,0 +1,33 @@
+{
+  "id": 3,
+  "name": "Add grain bag",
+  "layout": 3,
+  "settings": [
+          {
+      "id": "temp",
+      "settings": {
+        "val": 67,
+        "set": 67
+      }
+    },
+       {
+      "id": "kettle",
+      "settings": {
+        "volume": 50.0,
+        "liquid": "hotwater"
+      }
+    },    
+    {
+      "id": "bag",
+      "settings": {
+        "grain": 25
+      }
+    },
+    {
+      "id": "m1",
+      "settings": {
+        "pos": "closed"
+      }
+    }
+  ]
+}

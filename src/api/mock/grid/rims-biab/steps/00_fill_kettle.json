@@ -1,0 +1,38 @@
+{
+  "id": 0,
+  "name": "Fill kettle",
+  "layout": 0,
+  "settings": [
+      {
+      "id": "temp",
+      "settings": {
+        "val": 15
+      }
+    },
+     {
+      "id": "in1",
+      "settings": {
+        "liquid": "water"
+      }
+    },
+    {
+      "id": "kettle",
+      "settings": {
+        "volume": 20,
+        "liquid": "water"
+      }
+    },    
+    {
+      "id": "filter",
+      "settings": {
+        "grain": 0
+      }
+    },
+     {
+      "id": "m1",
+      "settings": {
+        "pos": "closed"
+      }
+    }
+  ]
+}

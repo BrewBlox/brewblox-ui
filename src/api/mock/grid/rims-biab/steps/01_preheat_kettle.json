@@ -1,0 +1,54 @@
+{
+  "id": 1,
+  "name": "Preheat kettle",
+  "layout": 1,
+  "settings": [
+    {
+      "id": "temp",
+      "settings": {
+        "val": 45,
+        "set": 67
+      }
+    },
+    {
+      "id": "kettle",
+      "settings": {
+        "volume": 50.0,
+        "liquid": "hotwater"
+      }
+    },
+    {
+      "id": "rims",
+      "settings": {
+        "volume": 2,
+        "liquid": "hotwater"
+      }
+    },
+    {
+      "id": "m1",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "heater",
+      "settings": {
+        "duty": 100
+      }
+    },
+    {
+      "id": "b1",
+      "settings": {
+        "power": true,
+        "intensity": 100
+      }
+    },
+    {
+      "id": "p1",
+      "settings": {
+        "power": true,
+        "speed": 100
+      }
+    }
+  ]
+}

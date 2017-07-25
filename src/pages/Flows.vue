@@ -1,10 +1,14 @@
 <template>
-      <span>Flows</span>
+  <div>
+    <span>Flows</span>
+    <div><pre>{{text}}</pre></div>
+  </div>
 </template>
 
 <script>
 import {
 } from 'quasar';
+import api from '../api';
 
 export default {
   name: 'index',
@@ -12,6 +16,7 @@ export default {
   },
   data() {
     return {
+      text: 'loading',
     };
   },
   computed: {
@@ -19,6 +24,13 @@ export default {
   methods: {
   },
   mounted() {
+    api.get('/grids/herms-automated-valves')
+      .then((response) => {
+        this.text = JSON.stringify(response.data, null, 2);
+      })
+      .catch((error) => {
+        this.text = error;
+      });
   },
   beforeDestroy() {
   },
