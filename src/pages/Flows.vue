@@ -1,18 +1,19 @@
 <template>
   <div>
-    <span>Flows</span>
-    <div><pre>{{text}}</pre></div>
+    <span>Flows</span>   
+    <Grid></Grid>
   </div>
 </template>
-
 <script>
 import {
 } from 'quasar';
 import api from '../api';
+import Grid from '../components/Grid.vue';
 
 export default {
   name: 'index',
   components: {
+    Grid,
   },
   data() {
     return {

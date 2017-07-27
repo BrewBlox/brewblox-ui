@@ -8,9 +8,7 @@ const mockAxios = axios.create();
 const mock = new MockAdapter(mockAxios);
 
 // Mock GET request to /grids
-mock.onGet('/grids').reply((config) => {
-  return [200, Object.keys(views)];
-});
+mock.onGet('/grids').reply((config) => [200, Object.keys(views)]);
 
 // Mock GET request to /grids/name
 const gridNameRegex = /\/grids\/([^/]+)/;

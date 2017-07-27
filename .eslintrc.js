@@ -27,6 +27,8 @@ module.exports = {
     'no-unused-vars': 1,
     'arrow-body-style': 1,
     'indent': 1,
+    'no-trailing-spaces': 1,
+    'comma-dangle': 1,
     // allow setting properties in state parameter of function
     'no-param-reassign': [2, { 'props': true, 'ignorePropertyModificationsFor': ['state'] }],
     // set devDependencies to true to prevent linting errors from them
