@@ -7,7 +7,7 @@ const initialState = {
 
 /**
  * Converts BrewPi data to BrewBlox data format
- **/
+ * */
 const convertLegacyJson = (data) => {
   const typeConvert = (name, type) => {
     if (name === 'State') {
@@ -47,12 +47,12 @@ const mutations = {
 const actions = {
   FETCH_DATA: ({ commit }, payload) => {
     axios.get(`statics/${payload.name}.json`)
-    .then((response) => {
-      commit('DATA_RECEIVED', { name: payload.name, data: response.data });
-    })
-    .catch((e) => {
+      .then((response) => {
+        commit('DATA_RECEIVED', { name: payload.name, data: response.data });
+      })
+      .catch((e) => {
       console.error(e); // eslint-disable-line
-    });
+      });
   },
 };
 const getters = {
@@ -72,7 +72,7 @@ const getters = {
       return series.filter((s) => s.type !== undefined);
     }
     return [[0], [0]];
-  },*/
+  }, */
 };
 
 const module = {

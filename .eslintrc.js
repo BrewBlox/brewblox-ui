@@ -10,13 +10,17 @@ module.exports = {
   extends: 'airbnb-base',
   // required to lint *.vue files
   plugins: [
-    'html'
+    'html',
+    'import',
   ],
   globals: {
     'cordova': true,
     'DEV': true,
     'PROD': true,
     '__THEME': true,
+  },
+  settings: {
+    'import/core-modules': [ 'quasar' ],
   },
   // add your custom rules here
   'rules': {
