@@ -19,7 +19,6 @@
     "eslint-plugin-standard": "^3.0.1",
     "eslint-plugin-vue": "beta",
     "plotly.js": "^1.28.3",
-    "quasar": "0.0.18",
     "quasar-extras": "0.x",
     "quasar-framework": "git+https://git@github.com/quasarframework/quasar-edge.git",
     "vue": "^2.3.0",
