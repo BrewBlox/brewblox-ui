@@ -1,0 +1,6 @@
+<svg viewBox="0 0 50 50" width="50" height="50">
+  <rect fill="white" y="12.5" width="8" height="8"/>
+  <rect fill="white" y="30" width="8" height="8"/>
+  <line y1="21" x2="25" y2="21"/>
+  <line y1="29" x2="25" y2="29"/>
+</svg>

@@ -63,11 +63,15 @@ module.exports = {
         }
       },
       {
+        test: /\.svg$/,
+        loader: 'vue-svg-loader',
+      },
+      {
         test: /\.json$/,
         loader: 'json-loader'
       },
       {
-        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+        test: /\.(png|jpe?g|gif)(\?.*)?$/,
         loader: 'url-loader',
         options: {
           limit: 10000,

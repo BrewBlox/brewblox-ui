@@ -1,0 +1,26 @@
+[
+  {
+    "type": "header",
+    "label": "Mashing"
+  },
+  {
+    "type": "link",
+    "label": "Dashboard",
+    "link": "/dashboard",
+    "icon": "dashboard"
+  },
+  {
+    "type": "link",
+    "label": "Sample beer chart",
+    "sublabel": "chart",
+    "link": "/chart/sample-beer",
+    "icon": "timeline"
+  },
+  {
+    "type": "link",
+    "label": "Flows",
+    "link": "/processgrid/test/1",
+    "icon": "grid on",
+    "sublabel": "process grid"
+  }
+]

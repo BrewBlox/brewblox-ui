@@ -38,17 +38,17 @@ const convertLegacyJson = (data) => {
 };
 
 const mutations = {
-  DATA_RECEIVED: (state, payload) => {
+  FETCH_BREW_SUCCESS: (state, payload) => {
     state.data[payload.name] = convertLegacyJson(payload.data);
     state.names.push(payload.name);
   },
 };
 
 const actions = {
-  FETCH_DATA: ({ commit }, payload) => {
-    axios.get(`statics/${payload.name}.json`)
+  FETCH_BREW: ({ commit }, payload) => {
+    axios.get(`api/brews/${payload.name}`)
       .then((response) => {
-        commit('DATA_RECEIVED', { name: payload.name, data: response.data });
+        commit('FETCH_BREW_SUCCESS', { name: payload.name, data: response.data });
       })
       .catch((e) => {
       console.error(e); // eslint-disable-line

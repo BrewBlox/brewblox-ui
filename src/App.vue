@@ -21,32 +21,7 @@
       </q-toolbar>
 
       <div slot="left">
-        <!--
-          Use <q-side-link> component 
-          instead of <q-item> for 
-          internal vue-router navigation
-        -->
-
-        <q-list no-border link inset-delimiter>
-          <q-list-header>Brewing</q-list-header>
-          <q-side-link item to="/dashboard">
-            <q-item-side icon="dashboard" /> 
-            <q-item-main label="Dashboard" sublabel="Dashboard" />
-          </q-side-link>
-          <q-side-link item to="/charts">
-            <q-item-side icon="timeline" /> 
-            <q-item-main label="Charts" sublabel="Your brewing data" />
-          </q-side-link>
-          <q-side-link item to="/flows">
-            <q-item-side icon="grid on" /> 
-            <q-item-main label="Flows" sublabel="Flow visualization" />
-          </q-side-link>
-          <q-list-header>Admin</q-list-header>
-          <q-side-link item to="/admin">
-            <q-item-side icon="settings" />
-            <q-item-main label="Settings" sublabel="global settings" />
-          </q-side-link>
-        </q-list>
+        <MainMenu />
       </div>
       <div>
         <router-view />
@@ -73,6 +48,8 @@ import {
   QSideLink,
 } from 'quasar';
 
+import MainMenu from './MainMenu.vue';
+
 export default {
   name: 'index',
   components: {
@@ -87,6 +64,12 @@ export default {
     QItemSide,
     QItemMain,
     QSideLink,
+    MainMenu,
+  },
+  data() {
+    return {};
+  },
+  mounted() {
   },
 };
 </script>

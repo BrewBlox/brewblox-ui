@@ -4,8 +4,7 @@ import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 
 function load(component) {
-  // 'pages' is aliased to src/pages
-  return () => System.import(`pages/${component}.vue`);
+  return () => System.import(`./components/pages/${component}.vue`);
 }
 
 export default new VueRouter({
@@ -27,24 +26,14 @@ export default new VueRouter({
       component: load('Index'),
     },
     {
-      path: '/dashboard',
-      name: 'Dashboard',
-      component: load('Dashboard'),
-    },
-    {
-      path: '/charts',
-      name: 'Charts',
-      component: load('Charts'),
-    },
-    {
-      path: '/flows',
-      name: 'Flows',
-      component: load('Flows'),
-    },
-    {
       path: '/admin',
       name: 'Admin',
       component: load('Admin'),
+    },
+    {
+      path: '/:template/:slug*',
+      component: load('UiPage'),
+      props: true,
     },
     // Always leave this last one
     { path: '*', component: load('Error404') }, // Not found

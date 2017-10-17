@@ -9,6 +9,7 @@ var
   env = require('./env-utils'),
   config = require('../config'),
   opn = require('opn'),
+  apiMocker = require('connect-api-mocker'),
   proxyMiddleware = require('http-proxy-middleware'),
   webpackConfig = require('./webpack.dev.conf'),
   app = express(),
@@ -43,6 +44,9 @@ compiler.plugin('compilation', function (compilation) {
     cb()
   })
 })
+
+// use connect-api-mocker to run mock api from directory mocks/api
+app.use(apiMocker('/api', 'src/mocks/api'))
 
 // proxy requests like API. See /config/index.js -> dev.proxyTable
 // https://github.com/chimurai/http-proxy-middleware
