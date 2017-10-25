@@ -50,7 +50,6 @@ export default {
   },
   data: () => ({
     name: 'heater1pid',
-    enabled: true,
     input: {
       value: 20,
       setPoint: 21.0859,
@@ -58,14 +57,20 @@ export default {
     output: {
       value: 45.6758,
     },
-    inputError: -1.0781,
-    Kp: 10,
-    Ti: 600,
-    Td: 60,
-    p: 10.7813,
-    i: 34.8164,
-    d: 0.0781,
-    actuatorIsNegative: false,
+    settings: {
+      Kp: 10,
+      Ti: 600,
+      Td: 60,
+      inputFilter: 3,
+      derivativeFilter: 4,
+      enabled: true,
+    },
+    state: {
+      inputError: -1.0781,
+      p: 10.7813,
+      i: 34.8164,
+      d: 0.0781,
+    }
   }),
   created() {
   },
