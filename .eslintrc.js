@@ -18,6 +18,7 @@ module.exports = {
     'DEV': true,
     'PROD': true,
     '__THEME': true,
+    System: true,
   },
   settings: {
     'import/core-modules': [ 'quasar' ],
