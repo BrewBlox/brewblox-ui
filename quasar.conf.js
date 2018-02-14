@@ -1,6 +1,6 @@
 // Configuration for your app
 
-module.exports = function(ctx) {
+module.exports = function (ctx) {
   return {
     plugins: [
       'i18n',
