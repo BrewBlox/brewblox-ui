@@ -1,14 +1,14 @@
 export default [
   {
     path: '/',
-    component: () => import('layouts/default'),
+    component: () => import('layouts/default.vue'),
     children: [
-      { path: '', component: () => import('pages/index') },
+      { path: '', component: () => import('pages/index.vue') },
     ],
   },
 
   { // Always leave this as last one
     path: '*',
-    component: () => import('pages/404'),
+    component: () => import('pages/404.vue'),
   },
 ];

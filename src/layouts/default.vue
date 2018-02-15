@@ -15,7 +15,7 @@
         </q-btn>
 
         <q-toolbar-title>
-          Quasar App
+          BrewBlox UI
           <div slot="subtitle">Running on Quasar v{{ $q.version }}</div>
         </q-toolbar-title>
       </q-toolbar>
