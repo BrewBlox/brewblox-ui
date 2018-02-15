@@ -28,11 +28,23 @@ module.exports = function (ctx) {
       // extractCSS: false,
       // useNotifier: false,
       extendWebpack(cfg) {
+        // replace entry point
+        cfg.entry.app[cfg.entry.app.length - 1] = './src/main.ts';
+
+        cfg.resolve.extensions.push('.ts');
+
         cfg.module.rules.push({
           enforce: 'pre',
           test: /\.(js|vue)$/,
           loader: 'eslint-loader',
           exclude: /(node_modules|quasar)/,
+        }, {
+          test: /\.tsx?$/,
+          loader: 'ts-loader',
+          exclude: /node_modules/,
+          options: {
+            appendTsSuffixTo: [/\.vue$/],
+          },
         });
       },
     },
