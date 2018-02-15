@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   parserOptions: {
-    parser: 'babel-eslint',
+    parser: 'typescript-eslint-parser',
     sourceType: 'module'
   },
   env: {
@@ -10,7 +10,8 @@ module.exports = {
   extends: ['plugin:vue/strongly-recommended', 'airbnb-base'],
   // required to lint *.vue files
   plugins: [
-    'vue'
+    'vue',
+    'typescript',
   ],
   globals: {
     'ga': true, // Google Analytics
