@@ -1,12 +1,13 @@
+/* eslint-disable */
 // standard declarations for *.vue files
-declare module "*.vue" {
-  import Vue from "vue";
+declare module '*.vue' {
+  import Vue from 'vue';
   export default Vue;
 }
 
 // Quasar specific declarations
-declare module "quasar";
-declare const __THEME: string;
+declare module 'quasar';
+declare const __THEME: string; // eslint-disable-line
 
 // process.env declaration
 declare var process: {
