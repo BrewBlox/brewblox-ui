@@ -1,6 +1,6 @@
-# BrewBlox UI
+# Quasar App
 
-> UI representation of the BrewBlox project
+> A Quasar project
 
 ## Build Setup
 
@@ -10,4 +10,10 @@ $ npm install
 
 # serve with hot reload at localhost:8080
 $ quasar dev
+
+# build for production with minification
+$ quasar build
+
+# lint code
+$ quasar lint
 ```

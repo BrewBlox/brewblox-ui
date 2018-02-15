@@ -1,23 +1,14 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import brews from './modules/brews';
-import processgrids from './modules/processgrids';
-import menu from './modules/menu';
+import example from './module-example';
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
-  state: {
-  },
-  mutations: {
-  },
-  actions: {
-  },
+const store = new Vuex.Store({
   modules: {
-    brews,
-    processgrids,
-    menu,
+    example,
   },
-  strict: process.env.NODE_ENV !== 'production',
 });
+
+export default store;

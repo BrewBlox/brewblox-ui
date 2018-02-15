@@ -1,47 +1,36 @@
 module.exports = {
   root: true,
-  parser: 'babel-eslint',
   parserOptions: {
+    parser: 'babel-eslint',
     sourceType: 'module'
   },
   env: {
-    browser: true,
+    browser: true
   },
-  extends: 'airbnb-base',
+  extends: ['plugin:vue/strongly-recommended', 'airbnb-base'],
   // required to lint *.vue files
   plugins: [
-    'html',
-    'import',
+    'vue'
   ],
   globals: {
+    'ga': true, // Google Analytics
     'cordova': true,
-    'DEV': true,
-    'PROD': true,
-    '__THEME': true,
-    System: true,
-  },
-  settings: {
-    'import/core-modules': [ 'quasar' ],
+    '__statics': true
   },
   // add your custom rules here
   'rules': {
-    // allow paren-less arrow functions
-    'arrow-parens': 0,
-    'one-var': 0,
+    'no-param-reassign': 0,
+
     'import/first': 0,
-    'no-unused-vars': 1,
-    'arrow-body-style': 1,
-    'indent': 1,
-    'no-trailing-spaces': 1,
-    'comma-dangle': 1,
-    // allow setting properties in state parameter of function
-    'no-param-reassign': [2, { 'props': true, 'ignorePropertyModificationsFor': ['state'] }],
-    // set devDependencies to true to prevent linting errors from them
-    'import/no-extraneous-dependencies': [2, { devDependencies: true }],
-    // allow longer line length
-    'max-len': [1, 120, 2, {ignoreComments: true}],
+    'import/named': 2,
+    'import/namespace': 2,
+    'import/default': 2,
+    'import/export': 2,
+    'import/extensions': 0,
+    'import/no-unresolved': 0,
+    'import/no-extraneous-dependencies': 0,
+
     // allow debugger during development
-    'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
-    'brace-style': [2, 'stroustrup', { 'allowSingleLine': true }]
+    'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
   }
 }
