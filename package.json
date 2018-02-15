@@ -21,7 +21,9 @@
     "eslint-loader": "1.7.1",
     "eslint-plugin-import": "2.7.0",
     "eslint-plugin-vue": "4.0.0",
-    "quasar-cli": "^0.15.0-beta.36"
+    "quasar-cli": "^0.15.0-beta.36",
+    "ts-loader": "^3.5.0",
+    "typescript": "^2.7.1"
   },
   "engines": {
     "node": ">= 8.9.0",
