@@ -1,4 +1,4 @@
-import { BlocksState } from './blocks/blocksState';
+import { BlocksState } from './blocks/state';
 
 export interface State {
   blocks: BlocksState;
