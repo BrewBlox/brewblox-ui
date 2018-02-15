@@ -16,6 +16,7 @@ export const blocks = {
   namespaced: true,
   state: {
     blocks: [],
+    byId: {},
   },
   mutations: {
     addBlock: (state: BlocksState, block: Block) => {

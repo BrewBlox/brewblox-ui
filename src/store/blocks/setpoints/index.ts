@@ -1,22 +1,11 @@
 import { BlocksContext } from '../';
-import { SetPoint, SetPointsState } from './state';
 
-interface SetPointAction extends SetPoint {
-  type: 'setpoint',
-}
+import { addBlock } from '../mutations';
 
 export const setpoints = {
-  state: {},
-  mutations: {
-    addBlock(state: SetPointsState, { id, type, value }: SetPointAction) {
-      if (type === 'setpoint') {
-        state[id] = { id, value };
-      }
-    },
-  },
   actions: {
-    addSetpoint({ commit }: BlocksContext, { id, value }: any) {
-      commit('addBlock', { id, type: 'setpoint', value });
+    addSetpoint(context: BlocksContext, { id, value }: any) {
+      addBlock(this, { id, type: 'setpoint', value });
     },
   },
 };
