@@ -8,19 +8,3 @@ declare module '*.vue' {
 // Quasar specific declarations
 declare module 'quasar';
 declare const __THEME: string; // eslint-disable-line
-
-// process.env declaration
-declare var process: {
-  env: {
-    VUE_ROUTER_MODE: 'hash' | 'history',
-    VUE_ROUTER_BASE: string,
-  }
-};
-
-// interface for plugin arguments
-interface PluginArguments {
-  app: any;
-  store: any;
-  Vue: any;
-  router: any;
-}
