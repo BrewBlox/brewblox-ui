@@ -28,7 +28,8 @@ module.exports = function (ctx) {
       // extractCSS: false,
       // useNotifier: false,
       extendWebpack(cfg) {
-        cfg.entry.app = './src/main.ts';
+        // replace entry point
+        cfg.entry.app[cfg.entry.app.length - 1] = './src/main.ts';
 
         cfg.resolve.extensions.push('.ts');
 
