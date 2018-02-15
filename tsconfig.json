@@ -2,7 +2,8 @@
   "compilerOptions": {
     "target": "es5",
     "strict": true,
-    "module": "es2015",
+    "module": "esnext",
+    "lib": ["es2015"],
     "moduleResolution": "node",
     "sourceMap": true
   }
