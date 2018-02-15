@@ -11,12 +11,13 @@
 <script lang="ts">
 import Vue from 'vue';
 import { addBlock, removeBlock } from '../store/blocks/mutations';
+import { addSetpoint } from '../store/blocks/setpoints/actions';
 
 export default Vue.extend({
   name: 'PageIndex',
   methods: {
     addNewBlock() {
-      addBlock(this.$store, { id: '1', type: 'test' });
+      addSetpoint(this.$store, { id: '1', value: 666 });
     },
     removeNewBlock() {
       removeBlock(this.$store, '1');
