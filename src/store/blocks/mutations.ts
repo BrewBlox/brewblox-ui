@@ -1,4 +1,4 @@
 import { blocks, commit } from './';
 
-export const addBlock = commit(blocks.mutations.addBlock);
-export const removeBlock = commit(blocks.mutations.removeBlock);
+export const commitAddBlock = commit(blocks.mutations.addBlock);
+export const commitRemoveBlock = commit(blocks.mutations.removeBlock);

@@ -2,6 +2,8 @@ import Vue from 'vue';
 import { ActionContext } from 'vuex';
 import { getStoreAccessors } from 'vuex-typescript';
 
+import { fetchBlock } from './api';
+
 import { State as RootState } from '../state';
 import { BlocksState, Block } from './state';
 
@@ -17,6 +19,12 @@ export const blocks = {
     byId: {},
   },
   getters: {},
+  actions: {
+    async findBlock(context: BlocksContext, id: string) {
+      // will fetch a block from the server
+      const block = await fetchBlock(id);
+    },
+  },
   mutations: {
     addBlock: (state: BlocksState, block: Block) => {
       // add block to blocks list
