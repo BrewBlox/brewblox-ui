@@ -1,11 +1,10 @@
-/* eslint-disable */
 // process.env declaration
-declare var process: {
-  env: {
-    VUE_ROUTER_MODE: 'hash' | 'history',
-    VUE_ROUTER_BASE: string,
-  }
+type env = {
+  VUE_ROUTER_MODE: 'hash' | 'history',
+  VUE_ROUTER_BASE: string,
 };
+
+declare const process: { env: env };
 
 // interface for plugin arguments
 interface PluginArguments {

@@ -30,8 +30,14 @@ module.exports = {
     'import/extensions': 0,
     'import/no-unresolved': 0,
     'import/no-extraneous-dependencies': 0,
+    'import/prefer-default-export': 0,
 
     // allow debugger during development
-    'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
-  }
-}
+    'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
+
+    // for eslint + typescript to work:
+    'no-undef': 0,
+    'no-unused-vars': 0,
+    'typescript/no-unused-vars': 1,
+  },
+};

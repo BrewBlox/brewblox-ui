@@ -1,14 +1,24 @@
 <template>
   <q-page class="flex flex-center">
-    <img src="~assets/quasar-logo-full.svg">
+    <q-btn @click="addNewBlock">Add</q-btn>
+    <q-btn @click="removeNewBlock">Remove</q-btn>
   </q-page>
 </template>
 
 <style>
 </style>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue';
+import { addSetPoint } from '../store/blocks/setpoint/actions';
+
+export default Vue.extend({
   name: 'PageIndex',
-};
+  methods: {
+    addNewBlock() {
+      addSetPoint({ id: (+new Date()).toString(), value: 666, setting: 600 });
+    },
+    removeNewBlock() { },
+  },
+});
 </script>
