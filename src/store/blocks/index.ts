@@ -23,6 +23,9 @@ export const blocks = {
     async findBlock(context: BlocksContext, id: string) {
       // will fetch a block from the server
       const block = await fetchBlock(id);
+
+      // find block and then commit to store
+      context.commit('addBlock', block);
     },
   },
   mutations: {
