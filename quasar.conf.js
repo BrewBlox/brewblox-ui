@@ -55,6 +55,7 @@ module.exports = ctx => ({
     // port: 8080,
     open: true, // opens browser window automatically
     before(app) {
+      // use api mocker
       app.use('/api', apiMocker('mocks/api'));
     },
   },

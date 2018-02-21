@@ -1,7 +1,6 @@
 <template>
   <q-page class="flex flex-center">
-    <q-btn @click="findBlock">Add</q-btn>
-    <q-btn @click="removeNewBlock">Remove</q-btn>
+    <q-btn @click="findBlock">FIND BLOCK</q-btn>
   </q-page>
 </template>
 
@@ -18,7 +17,6 @@ export default Vue.extend({
     findBlock() {
       findBlock('1');
     },
-    removeNewBlock() { },
   },
 });
 </script>
