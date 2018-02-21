@@ -7,6 +7,7 @@ import { BlocksState, Block } from './state';
 
 // modules
 import { setpoints } from './setpoints';
+import { SetPoint } from './setpoints/state';
 
 export type BlocksContext = ActionContext<BlocksState, RootState>;
 
@@ -18,9 +19,11 @@ export const blocks = {
     blocks: [],
     byId: {},
   },
+  getters: {},
   mutations: {
-    addBlock: (state: BlocksState, block: Block) => {
+    addBlock: (state: BlocksState, { block, data }: { block: Block, data: SetPoint }) => {
       state.blocks.push(block);
+      state.byId[block.id] = { id: block.id, ...data };
     },
     removeBlock: (state: BlocksState, id: string) => {
       Vue.delete(state.blocks, state.blocks.findIndex(block => block.id === id));
@@ -31,3 +34,5 @@ export const blocks = {
   },
 };
 
+export const addBlock = commit(blocks.mutations.addBlock);
+export const removeBlock = commit(blocks.mutations.removeBlock);

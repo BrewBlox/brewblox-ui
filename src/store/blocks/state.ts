@@ -11,6 +11,6 @@ export interface Block extends BlockBase {
 export type BlocksState = {
   blocks: BlockBase[],
   byId: {
-    [id: string]: SetPoint
+    [id: string]: SetPoint & BlockBase;
   },
 };

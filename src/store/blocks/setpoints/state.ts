@@ -1,5 +1,3 @@
-import { BlockBase } from '../state';
-
-export interface SetPoint extends BlockBase {
+export interface SetPoint {
   value: number;
 }

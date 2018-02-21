@@ -1,11 +1,14 @@
-import { BlocksContext } from '../';
+import store from '../../';
 
-import { addBlock } from '../mutations';
+import { BlocksContext, addBlock } from '../';
 
 export const setpoints = {
   actions: {
     addSetpoint(context: BlocksContext, { id, value }: any) {
-      addBlock(this, { id, type: 'setpoint', value });
+      addBlock(store, {
+        block: { id, type: 'setpoint' },
+        data: { value },
+      });
     },
   },
 };
