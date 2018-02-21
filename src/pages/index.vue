@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { addSetPoint } from '../store/blocks/setpoints/actions';
+import { addSetPoint } from '../store/blocks/setpoint/actions';
 
 export default Vue.extend({
   name: 'PageIndex',
