@@ -1,5 +1,5 @@
 // Configuration for your app
-import apiMocker from 'connect-api-mocker';
+const apiMocker = require('connect-api-mocker');
 
 module.exports = ctx => ({
   plugins: [
