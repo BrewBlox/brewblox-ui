@@ -10,13 +10,13 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { addSetpoint } from '../store/blocks/setpoints/actions';
+import { addSetPoint } from '../store/blocks/setpoints/actions';
 
 export default Vue.extend({
   name: 'PageIndex',
   methods: {
     addNewBlock() {
-      addSetpoint({ id: +new Date(), value: 666 });
+      addSetPoint({ id: +new Date(), value: 666 });
     },
     removeNewBlock() { },
   },
