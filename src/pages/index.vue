@@ -16,7 +16,7 @@ export default Vue.extend({
   name: 'PageIndex',
   methods: {
     addNewBlock() {
-      addSetpoint(this.$store, { id: +new Date(), value: 666 });
+      addSetpoint({ id: +new Date(), value: 666 });
     },
     removeNewBlock() { },
   },

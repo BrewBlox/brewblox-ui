@@ -1,4 +1,10 @@
-import { dispatch } from '../';
-import { setpoints } from './';
+import store from '../../';
 
-export const addSetpoint = dispatch(setpoints.actions.addSetpoint);
+import { addBlock } from '../mutations';
+
+export const addSetpoint = ({ id, value }: any) => {
+  addBlock(store, {
+    block: { id, type: 'setpoint' },
+    data: { value },
+  });
+};

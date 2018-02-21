@@ -5,8 +5,7 @@ import { getStoreAccessors } from 'vuex-typescript';
 import { State as RootState } from '../state';
 import { BlocksState, Block } from './state';
 
-// modules
-import { setpoints } from './setpoints';
+// BlockTypes
 import { SetPoint } from './setpoints/state';
 
 export type BlocksContext = ActionContext<BlocksState, RootState>;
@@ -15,6 +14,7 @@ export const { commit, read, dispatch } = getStoreAccessors<BlocksState, RootSta
 
 export const blocks = {
   namespaced: true,
+  strict: true,
   state: {
     blocks: [],
     byId: {},
@@ -29,10 +29,4 @@ export const blocks = {
       Vue.delete(state.blocks, state.blocks.findIndex(block => block.id === id));
     },
   },
-  modules: {
-    setpoints,
-  },
 };
-
-export const addBlock = commit(blocks.mutations.addBlock);
-export const removeBlock = commit(blocks.mutations.removeBlock);
