@@ -1,4 +1,5 @@
 // Configuration for your app
+import apiMocker from 'connect-api-mocker';
 
 module.exports = ctx => ({
   plugins: [
@@ -53,6 +54,9 @@ module.exports = ctx => ({
     // https: true,
     // port: 8080,
     open: true, // opens browser window automatically
+    before(app) {
+      app.use('/api', apiMocker('mocks/api'));
+    },
   },
   // framework: 'all' --- includes everything; for dev only!
   framework: {
