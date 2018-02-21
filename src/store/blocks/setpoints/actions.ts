@@ -1,10 +1,8 @@
 import store from '../../';
 
 import { addBlock } from '../mutations';
+import { SetPoint } from './setpoint';
 
-export const addSetPoint = ({ id, value }: any) => {
-  addBlock(store, {
-    block: { id, type: 'setpoint' },
-    data: { value },
-  });
+export const addSetPoint = ({ id, value }: SetPoint) => {
+  addBlock(store, { id, value, type: 'setpoint' });
 };

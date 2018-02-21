@@ -5,9 +5,6 @@ import { getStoreAccessors } from 'vuex-typescript';
 import { State as RootState } from '../state';
 import { BlocksState, Block } from './state';
 
-// BlockTypes
-import { SetPoint } from './setpoints/state';
-
 export type BlocksContext = ActionContext<BlocksState, RootState>;
 
 export const { commit, read, dispatch } = getStoreAccessors<BlocksState, RootState>('blocks');
@@ -21,12 +18,19 @@ export const blocks = {
   },
   getters: {},
   mutations: {
-    addBlock: (state: BlocksState, { block, data }: { block: Block, data: SetPoint }) => {
-      state.blocks.push(block);
-      state.byId[block.id] = { id: block.id, ...data };
+    addBlock: (state: BlocksState, block: Block) => {
+      // add block to blocks list
+      state.blocks.push(block.id);
+
+      // insert data into blocks object
+      state.byId[block.id] = block;
     },
     removeBlock: (state: BlocksState, id: string) => {
-      Vue.delete(state.blocks, state.blocks.findIndex(block => block.id === id));
+      // delete from blocks listing
+      Vue.delete(state.blocks, state.blocks.findIndex(block => block === id));
+
+      // delete from data
+      delete state.byId[id];
     },
   },
 };

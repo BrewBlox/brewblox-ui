@@ -1,16 +1,14 @@
-import { SetPoint } from './setpoints/state';
+import { SetPointBlock } from './setpoints/setpoint';
 
 export interface BlockBase {
   id: string,
 }
 
-export interface Block extends BlockBase {
-  type: 'setpoint' | 'pid' | 'sensor',
-}
+export type Block = SetPointBlock;
 
 export type BlocksState = {
-  blocks: BlockBase[],
+  blocks: string[],
   byId: {
-    [id: string]: SetPoint & BlockBase;
+    [id: string]: SetPointBlock;
   },
 };
