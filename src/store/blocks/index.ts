@@ -29,14 +29,17 @@ export const blocks = {
     },
   },
   mutations: {
-    addBlock: (state: BlocksState, block: Block) => {
+    addBlock(state: BlocksState, block: Block) {
       // add block to blocks list
       state.blocks.push(block.id);
 
       // insert data into blocks object
       state.byId[block.id] = block;
     },
-    removeBlock: (state: BlocksState, id: string) => {
+    updateBlock(state: BlocksState, block: any) {
+      state.byId[block.id] = { ...state.byId[block.id], ...block };
+    },
+    removeBlock(state: BlocksState, id: string) {
       // delete from blocks listing
       Vue.delete(state.blocks, state.blocks.findIndex(block => block === id));
 
