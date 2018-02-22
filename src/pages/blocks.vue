@@ -19,10 +19,10 @@ import { isFetching } from '../store/blocks/getters';
 
 export default Vue.extend({
   name: 'PageIndex',
-  data() {
-    return {
-      fetching: isFetching(),
-    };
+  computed: {
+    fetching() {
+      return isFetching();
+    },
   },
   methods: {},
 });
