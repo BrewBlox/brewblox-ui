@@ -20,7 +20,7 @@ export default Vue.extend({
     },
     updateBlock() {
       updateBlock({
-        id: 'setpoint-1',
+        id: 'controller-1/setpoint-1',
         setting: 20,
       });
     },
