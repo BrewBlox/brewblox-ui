@@ -1,8 +1,8 @@
 import store from '../../';
 
-import { addBlock } from '../mutations';
+import { commitAddBlock } from '../mutations';
 import { Sensor } from './sensor';
 
-export const addSensor = ({ id, value }: Sensor) => {
-  addBlock(store, { id, value, type: 'sensor' });
+export const addSensor = ({ id, controllerId, value }: Sensor) => {
+  commitAddBlock(store, { id, controllerId, value, type: 'sensor' });
 };

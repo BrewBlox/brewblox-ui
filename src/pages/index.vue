@@ -1,7 +1,7 @@
 <template>
   <q-page class="flex flex-center">
-    <q-btn @click="addNewBlock">Add</q-btn>
-    <q-btn @click="removeNewBlock">Remove</q-btn>
+    <q-btn @click="findBlock">FIND BLOCK</q-btn>
+    <q-btn @click="updateBlock">UPDATE BLOCK</q-btn>
   </q-page>
 </template>
 
@@ -10,15 +10,20 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { addSetPoint } from '../store/blocks/setpoint/actions';
+import { findBlock, updateBlock } from '../store/blocks/actions';
 
 export default Vue.extend({
   name: 'PageIndex',
   methods: {
-    addNewBlock() {
-      addSetPoint({ id: (+new Date()).toString(), value: 666, setting: 600 });
+    findBlock() {
+      findBlock('1');
     },
-    removeNewBlock() { },
+    updateBlock() {
+      updateBlock({
+        id: 'controller-1/setpoint-1',
+        setting: 20,
+      });
+    },
   },
 });
 </script>
