@@ -7,11 +7,11 @@
       />
     </q-inner-loading>
 
-    <template v-if="!fetching && blocks.length > 0">
+    <template v-if="blocks.length > 0">
       <block
         v-for="block in blocks"
         :key="block.id"
-        :block="block"
+        :block-data="block"
       />
     </template>
   </q-page>

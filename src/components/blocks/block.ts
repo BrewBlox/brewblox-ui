@@ -5,11 +5,11 @@ import OneWireTempSensor from './OneWireTempSensor.vue';
 
 export default Vue.extend({
   name: 'block',
-  props: ['block'],
+  props: ['block-data'],
   render(createElement) {
-    const { type } = this.$props.block;
+    const { type } = this.$props.blockData;
     const options = {
-      props: this.$props.block,
+      props: this.$props.blockData,
     };
 
     switch (type) {
