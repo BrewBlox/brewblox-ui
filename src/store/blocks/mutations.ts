@@ -10,7 +10,7 @@ const { commit } = getStoreAccessors<BlocksState, RootState>('blocks');
 const mutations = {
   addBlock(state: BlocksState, block: Block) {
     // add block to blocks list
-    state.blocks.push(block.id);
+    state.allIds.push(block.id);
 
     // insert data into blocks object
     state.byId[block.id] = block;
@@ -24,7 +24,7 @@ const mutations = {
   },
   removeBlock(state: BlocksState, id: string) {
     // delete from blocks listing
-    Vue.delete(state.blocks, state.blocks.findIndex(block => block === id));
+    Vue.delete(state.allIds, state.allIds.findIndex(block => block === id));
 
     // delete from data
     delete state.byId[id];

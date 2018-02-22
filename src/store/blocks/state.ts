@@ -13,7 +13,7 @@ export type Block = SetPointBlock | SensorBlock;
 export type BlockUpdate = SetPoint | Sensor;
 
 export type BlocksState = {
-  blocks: string[],
+  allIds: string[],
   byId: {
     [id: string]: Block;
   },

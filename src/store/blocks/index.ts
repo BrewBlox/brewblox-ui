@@ -5,7 +5,7 @@ export const blocks = {
   namespaced: true,
   strict: true,
   state: {
-    blocks: [],
+    allIds: [],
     byId: {},
   },
   getters: {},
