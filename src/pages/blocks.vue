@@ -6,13 +6,28 @@
       @click="openDiscoverModal"
     />
 
-    <q-modal v-model="discoverModalOpened">
-      <h4>Basic Modal</h4>
-      <q-btn
-        color="primary"
-        @click="closeDiscoverModal"
-        label="Close"
-      />
+    <q-modal
+      v-model="discoverModalOpened"
+      maximized
+    >
+      <q-modal-layout>
+        <q-toolbar slot="header">
+          <q-btn
+            flat
+            round
+            dense
+            @click="closeDiscoverModal"
+            icon="keyboard_arrow_left"
+          />
+          <q-toolbar-title>
+            Discover blocks
+          </q-toolbar-title>
+        </q-toolbar>
+
+        <div class="layout-padding">
+          <p>Super awesome content here</p>
+        </div>
+      </q-modal-layout>
     </q-modal>
   </q-page>
 </template>
