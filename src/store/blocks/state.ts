@@ -1,11 +1,13 @@
-import { SetPointBlock } from './setpoint/setpoint';
-import { SensorBlock } from './sensor/sensor';
+import { SetPointBlock, SetPoint } from './setpoint/setpoint';
+import { SensorBlock, Sensor } from './sensor/sensor';
 
 export interface BlockBase {
   id: string,
 }
 
 export type Block = SetPointBlock | SensorBlock;
+
+export type BlockUpdate = Sensor | SetPoint;
 
 export type BlocksState = {
   blocks: string[],

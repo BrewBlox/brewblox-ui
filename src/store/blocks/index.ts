@@ -5,7 +5,7 @@ import { getStoreAccessors } from 'vuex-typescript';
 import { fetchBlock } from './api';
 
 import { State as RootState } from '../state';
-import { BlocksState, Block } from './state';
+import {BlocksState, Block, BlockUpdate} from './state';
 
 export type BlocksContext = ActionContext<BlocksState, RootState>;
 

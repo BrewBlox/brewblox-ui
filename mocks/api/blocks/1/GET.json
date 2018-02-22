@@ -1,6 +1,6 @@
 {
-  "id": "asdfg",
+  "id": "setpoint-1",
+  "controllerId": "aFeIvN",
   "type": "setpoint",
-  "value": 60,
   "setting": 70
 }
