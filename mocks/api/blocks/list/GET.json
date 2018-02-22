@@ -15,7 +15,7 @@
   },
   {
     "id": "controller-1/sensor-1",
-    "type": "sensor",
+    "type": "OneWireTempSensor",
     "settings": {
       "address": "0x1001001000000000",
       "offset": 0

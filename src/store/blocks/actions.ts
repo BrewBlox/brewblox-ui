@@ -9,14 +9,14 @@ import { State as RootState } from '../state';
 import { updateBlock, updateFetching } from './mutations';
 
 import { addSetPoint } from './setpoint/actions';
-import { addSensor } from './sensor/actions';
+import { addOneWireTempSensor } from './OneWireTempSensor/actions';
 
 const { dispatch } = getStoreAccessors<BlocksState, RootState>('blocks');
 
 function addBlock(block: Block) {
   switch (block.type) {
-    case 'sensor':
-      addSensor(block);
+    case 'OneWireTempSensor':
+      addOneWireTempSensor(block);
       break;
     case 'setpoint':
       addSetPoint(block);
