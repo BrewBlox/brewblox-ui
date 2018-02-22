@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { findBlock, updateBlock } from '../store/blocks/actions';
+import { updateBlock } from '../store/blocks/actions';
 
 export default Vue.extend({
   name: 'PageIndex',

@@ -18,7 +18,7 @@ function addBlock(block: Block) {
     case 'OneWireTempSensor':
       addOneWireTempSensor(block);
       break;
-    case 'setpoint':
+    case 'SetPointSimple':
       addSetPoint(block);
       break;
     default:

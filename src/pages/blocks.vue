@@ -6,6 +6,14 @@
         color="primary"
       />
     </q-inner-loading>
+
+    <template v-if="!fetching && blocks.length > 0">
+      <block
+        v-for="block in blocks"
+        :key="block.id"
+        :block="block"
+      />
+    </template>
   </q-page>
 </template>
 
@@ -15,14 +23,16 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { isFetching } from '../store/blocks/getters';
+import Block from '../components/blocks/block';
+
+import { isFetching, allBlocks } from '../store/blocks/getters';
 
 export default Vue.extend({
   name: 'PageIndex',
+  components: { Block },
   computed: {
-    fetching() {
-      return isFetching();
-    },
+    blocks: () => allBlocks(),
+    fetching: () => isFetching(),
   },
   methods: {},
 });

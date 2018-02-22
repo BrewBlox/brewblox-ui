@@ -7,5 +7,5 @@ export interface SetPointSimple extends BlockBase {
 }
 
 export interface SetPointSimpleBlock extends SetPointSimple {
-  type: 'setpoint';
+  type: 'SetPointSimple';
 }

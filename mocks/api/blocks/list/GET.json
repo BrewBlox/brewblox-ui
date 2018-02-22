@@ -1,14 +1,14 @@
 [
   {
     "id": "controller-1/setpoint-1",
-    "type": "setpoint",
+    "type": "SetPointSimple",
     "settings": {
       "value": 1
     }
   },
   {
     "id": "controller-1/setpoint-2",
-    "type": "setpoint",
+    "type": "SetPointSimple",
     "settings": {
       "value": 1
     }
