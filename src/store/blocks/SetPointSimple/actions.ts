@@ -1,8 +1,8 @@
 import store from '../../';
 
 import { commitAddBlock } from '../mutations';
-import { SetPoint } from './setpoint';
+import { SetPointSimple } from './SetPointSimple';
 
-export const addSetPoint = ({ id, setting }: SetPoint) => {
+export const addSetPoint = ({ id, setting }: SetPointSimple) => {
   commitAddBlock(store, { id, setting, type: 'setpoint' });
 };

@@ -8,7 +8,7 @@ import { State as RootState } from '../state';
 
 import { updateBlock, updateFetching } from './mutations';
 
-import { addSetPoint } from './setpoint/actions';
+import { addSetPoint } from './SetPointSimple/actions';
 import { addOneWireTempSensor } from './OneWireTempSensor/actions';
 
 const { dispatch } = getStoreAccessors<BlocksState, RootState>('blocks');
