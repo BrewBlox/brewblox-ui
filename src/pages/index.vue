@@ -1,6 +1,5 @@
 <template>
   <q-page class="flex flex-center">
-    <q-btn @click="findBlock">FIND BLOCK</q-btn>
     <q-btn @click="updateBlock">UPDATE BLOCK</q-btn>
   </q-page>
 </template>
@@ -10,18 +9,17 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { findBlock, updateBlock } from '../store/blocks/actions';
+import { updateBlock } from '../store/blocks/actions';
 
 export default Vue.extend({
   name: 'PageIndex',
   methods: {
-    findBlock() {
-      findBlock('1');
-    },
     updateBlock() {
       updateBlock({
         id: 'controller-1/setpoint-1',
-        setting: 20,
+        settings: {
+          value: 20,
+        },
       });
     },
   },

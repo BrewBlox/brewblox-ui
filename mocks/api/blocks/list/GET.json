@@ -1,0 +1,28 @@
+[
+  {
+    "id": "controller-1/setpoint-1",
+    "type": "SetPointSimple",
+    "settings": {
+      "value": 1
+    }
+  },
+  {
+    "id": "controller-1/setpoint-2",
+    "type": "SetPointSimple",
+    "settings": {
+      "value": 1
+    }
+  },
+  {
+    "id": "controller-1/sensor-1",
+    "type": "OneWireTempSensor",
+    "settings": {
+      "address": "0x1001001000000000",
+      "offset": 0
+    },
+    "state": {
+      "value": 20,
+      "connected": true
+    }
+  }
+]

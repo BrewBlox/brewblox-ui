@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 
 import { State } from './state';
 
-import { blocks } from './blocks';
+import blocks from './blocks';
 
 Vue.use(Vuex);
 

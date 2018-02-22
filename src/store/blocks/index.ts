@@ -1,14 +1,18 @@
 import actions from './actions';
+import getters from './getters';
 import mutations from './mutations';
 
-export const blocks = {
+const blocks = {
   namespaced: true,
   strict: true,
   state: {
-    blocks: [],
+    allIds: [],
     byId: {},
+    fetching: false,
   },
-  getters: {},
+  getters,
   actions,
   mutations,
 };
+
+export default blocks;

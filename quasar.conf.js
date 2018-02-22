@@ -53,7 +53,7 @@ module.exports = ctx => ({
   devServer: {
     // https: true,
     // port: 8080,
-    open: true, // opens browser window automatically
+    open: false, // opens browser window automatically
     before(app) {
       // use api mocker
       app.use('/api', apiMocker('mocks/api'));
@@ -76,6 +76,7 @@ module.exports = ctx => ({
       'QItem',
       'QItemMain',
       'QItemSide',
+      'QModal',
     ],
     directives: [
       'Ripple',

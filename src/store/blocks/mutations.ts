@@ -4,13 +4,14 @@ import { getStoreAccessors } from 'vuex-typescript';
 // import { commit } from './';
 import { Block, BlocksState, BlockUpdate } from './state';
 import { State as RootState } from '../state';
+import store from '../index';
 
 const { commit } = getStoreAccessors<BlocksState, RootState>('blocks');
 
 const mutations = {
   addBlock(state: BlocksState, block: Block) {
     // add block to blocks list
-    state.blocks.push(block.id);
+    state.allIds.push(block.id);
 
     // insert data into blocks object
     state.byId[block.id] = block;
@@ -24,14 +25,26 @@ const mutations = {
   },
   removeBlock(state: BlocksState, id: string) {
     // delete from blocks listing
-    Vue.delete(state.blocks, state.blocks.findIndex(block => block === id));
+    Vue.delete(state.allIds, state.allIds.findIndex(block => block === id));
 
     // delete from data
     delete state.byId[id];
+  },
+  updateFetching(state: BlocksState, fetching: boolean) {
+    state.fetching = fetching;
   },
 };
 
 export const commitAddBlock = commit(mutations.addBlock);
 export const commitUpdateBlock = commit(mutations.updateBlock);
+export const commitUpdateFetching = commit(mutations.updateFetching);
+
+export const updateBlock = (block: BlockUpdate) => {
+  commitUpdateBlock(store, block);
+};
+
+export const updateFetching = (fetching: boolean) => {
+  commitUpdateFetching(store, fetching);
+};
 
 export default mutations;

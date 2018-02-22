@@ -1,22 +1,22 @@
 import { ActionContext } from 'vuex';
 
-import { SetPointBlock, SetPoint } from './setpoint/setpoint';
-import { SensorBlock, Sensor } from './sensor/sensor';
-import {State as RootState} from '../state';
+import { SetPointSimpleBlock, SetPointSimple } from './SetPointSimple/SetPointSimple';
+import { OneWireTempSensorBlock, OneWireTempSensor } from './OneWireTempSensor/OneWireTempSensor';
+import { State as RootState } from '../state';
 
 export interface BlockBase {
   id: string,
-  controllerId?: string,
 }
 
-export type Block = SetPointBlock | SensorBlock;
-export type BlockUpdate = SetPoint | Sensor;
+export type Block = SetPointSimpleBlock | OneWireTempSensorBlock;
+export type BlockUpdate = SetPointSimple | OneWireTempSensor;
 
 export type BlocksState = {
-  blocks: string[],
+  allIds: string[],
   byId: {
     [id: string]: Block;
   },
+  fetching: boolean,
 };
 
 export type BlocksContext = ActionContext<BlocksState, RootState>;
