@@ -1,7 +1,14 @@
 import { BlockBase } from '../state';
 
 export interface OneWireTempSensor extends BlockBase {
-  value: number;
+  settings: {
+    address: string,
+    offset: number,
+  },
+  state: {
+    value: number,
+    connected: boolean,
+  },
 }
 
 export interface OneWireTempSensorBlock extends OneWireTempSensor {

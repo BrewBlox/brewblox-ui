@@ -6,7 +6,6 @@ import { State as RootState } from '../state';
 
 export interface BlockBase {
   id: string,
-  controllerId?: string,
 }
 
 export type Block = SetPointBlock | OneWireTempSensorBlock;
