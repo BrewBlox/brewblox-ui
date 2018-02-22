@@ -1,0 +1,86 @@
+{
+  "id": 1,
+  "name": "Fill hot liquor tun",
+  "layout": 1,
+  "settings": [
+           {
+      "id": "sphlt",
+      "settings": {
+        "val": 15
+      }
+    },
+    {
+      "id": "spmt",
+      "settings": {
+        "val": 20
+      }
+    },
+    {
+      "id": "spbk",
+      "settings": {
+        "val": 20
+      }
+    },
+    {
+      "id": "hlt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hlt-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "coil-top",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+        {
+      "id": "coil-bottom",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "mt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mt-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "bk-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "bk-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hlt",
+      "settings": {
+        "volume": 50.0,
+        "liquid": "water"
+      }
+    },
+    {
+      "id": "in1",
+      "settings": {
+        "liquid": "water"
+      }
+    }
+  ]
+}

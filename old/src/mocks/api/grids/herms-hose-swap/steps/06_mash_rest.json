@@ -1,0 +1,96 @@
+{
+  "id": 6,
+  "name": "Mash rest 10 min",
+  "layout": 0,
+  "settings": [
+    {
+      "id": "mt",
+      "settings": {
+        "grain": 15,
+        "volume": 30,
+        "liquid": "wort"
+      }
+    },
+       {
+      "id": "sphlt",
+      "settings": {
+        "val": 67,
+        "set": 67
+      }
+    },
+    {
+      "id": "spmt",
+      "settings": {
+        "val": 67.5,
+        "set": 67.7
+      }
+    },
+    {
+      "id": "heat_hlt",
+      "settings": {
+        "duty": 10
+      }
+    },
+     {
+      "id": "hlt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hlt-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+        {
+      "id": "coil-top",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+        {
+      "id": "coil-bottom",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "mt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mt-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "bk-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "bk-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hlt",
+      "settings": {
+        "volume": 50.0,
+        "liquid": "hotwater"
+      }
+    },
+    {
+      "id": "in1",
+      "settings": {
+        "liquid": "water"
+      }
+    }
+  ]
+}

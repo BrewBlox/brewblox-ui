@@ -1,0 +1,70 @@
+{
+  "name": "View 4",
+  "width": 3,
+  "height": 3,
+  "showCoordinates": true,
+  "layouts": [
+    {
+      "id": 0,
+      "name": "Layout 1",
+      "parts": [
+        {
+          "x": 0,
+          "y": 0,
+          "part": {
+            "type": "TUBE_INPUT",
+            "id": "in1"          
+          }
+        },
+        {
+          "x": 1,
+          "y": 0,
+          "part": {
+            "type": "TUBE_STRAIGHT",
+            "rotate": 0
+          }
+        },
+        {
+          "x": 2,
+          "y": 0,
+          "part": {
+            "type": "TUBE_ELBOW",
+            "rotate": 180
+          }
+        },
+        {
+          "x": 2,
+          "y": 1,
+          "part": {
+            "type": "TUBE_TEE",
+            "rotate": 270
+          }
+        },
+        {
+          "x": 2,
+          "y": 2,
+          "part": {
+            "type": "TUBE_OUTPUT",
+            "rotate": 90
+          }
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "part": {
+            "type": "TUBE_OUTPUT",
+            "rotate": 180
+          }
+        }
+      ]
+    }
+  ],
+  "partSettings": [
+      {
+        "id": "in1",
+        "settings": {
+          "liquid": "water"
+        }
+      }
+  ]
+}

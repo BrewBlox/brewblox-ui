@@ -1,0 +1,144 @@
+{
+  "id": 1,
+  "name": "All valves closed",
+  "settings": [
+    {
+      "id": "m1",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m2",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m3",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m5",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m6",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "a1",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "a2",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "cfc_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hlt_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hlti",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hltx",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hlt_out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "mt_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "mti",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "mtx",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "mt_out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "coil_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "coil_out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "bk_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "bki",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "bk_out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "bkx",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "cfc_in",
+      "settings": {
+        "pos": "closed"
+      }
+    }
+  ]
+}

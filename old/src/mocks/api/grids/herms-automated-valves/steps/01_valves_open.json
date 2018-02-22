@@ -1,0 +1,154 @@
+{
+  "id": 1,
+  "name": "All valves open",
+  "notes": [
+    "This layout uses 13 motorized valves and 7 manual valves.", "Manual valves on the kettles remain open during the brew.",
+    "Manual valves are also used for inputs and outputs of the system as a whole, so we can make sure a hose is connected before opening."
+  ],
+  "settings": [
+    {
+      "id": "v1",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v2",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v3",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v4",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v5",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v6",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v7",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v8",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v9",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v10",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v11",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v12",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v13",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m1",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m2",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m3",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m4",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m5",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m6",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m7",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m8",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "sphlt",
+      "settings": {
+        "val": 20
+      }
+    },
+    {
+      "id": "spmt",
+      "settings": {
+        "val": 20
+      }
+    },
+    {
+      "id": "spbk",
+      "settings": {
+        "val": 20
+      }
+    }
+  ]
+}

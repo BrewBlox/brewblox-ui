@@ -1,0 +1,33 @@
+{
+  "id": 4,
+  "name": "Mash rest 10 mins, connect RIMS",
+  "layout": 2,
+  "settings": [
+              {
+      "id": "temp",
+      "settings": {
+        "val": 67,
+        "set": 67
+      }
+    },
+       {
+      "id": "kettle",
+      "settings": {
+        "volume": 50.0,
+        "liquid": "wort"
+      }
+    },    
+    {
+      "id": "bag",
+      "settings": {
+        "grain": 25
+      }
+    },
+    {
+      "id": "m1",
+      "settings": {
+        "pos": "closed"
+      }
+    }
+  ]
+}

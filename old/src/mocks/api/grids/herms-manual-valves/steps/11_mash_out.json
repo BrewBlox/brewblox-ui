@@ -1,0 +1,208 @@
+{
+  "id": 11,
+  "name": "Mash out",
+  "settings": [
+    {
+      "id": "m1",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m2",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m3",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m5",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m6",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "a1",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "a2",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "cfc_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hlt_in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hlti",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hltx",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hlt_out",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mt_in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mti",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mtx",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mt_out",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "coil_in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "coil_out",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "bk_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "bki",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "bk_out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "bkx",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "cfc_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "p2",
+      "settings":{
+        "power": true,
+        "speed": 80
+      }
+    },
+    {
+      "id": "p1",
+      "settings":{
+        "power": true,
+        "speed": 80
+      }
+    },
+    {
+      "id": "hlt",
+      "settings": {
+        "volume": 50.0,
+        "liquid": "hotwater"
+      }
+    },
+    {
+      "id": "bk",
+      "settings": {
+        "volume": 0
+      }
+    },
+    {
+      "id": "mt",
+      "settings": {
+        "grain": 15,
+        "volume": 30,
+        "liquid": "wort"
+      }
+    },
+    {
+      "id": "in1",
+      "settings": {
+      }
+    },
+    {
+      "id": "heat_hlt",
+      "settings": {
+        "duty": 10
+      }
+    },
+    {
+      "id": "heat_bk",
+      "settings": {
+        "duty": 0
+      }
+    },
+    {
+      "id": "p1",
+      "settings":{
+        "powered": "fast"
+      }
+    },
+    {
+      "id": "p2",
+      "settings":{
+        "powered": "fast"
+      }
+    }
+  ]
+}

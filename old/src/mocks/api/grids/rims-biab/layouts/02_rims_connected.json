@@ -1,0 +1,213 @@
+{
+  "id": 2,
+  "name": "RIMS connected",
+  "parts": [
+   {
+      "part": {
+        "type": "SETPOINT",
+        "id": "temp"
+      },
+      "x": 6,
+      "y": 0
+    },
+     {
+      "part": {
+        "rotate": 90,
+        "type": "TUBE_INLET_STRAIGHT"
+      },
+      "x": 4,
+      "y": 3
+    },
+    {
+      "part": {
+        "type": "KETTLE",
+        "options": {
+          "height": 6,
+          "volume": 70,
+          "width": 4
+        },
+        "id": "kettle"
+      },
+      "x": 2,
+      "y": 3
+    },  {
+      "part": {
+        "type": "BIAB_FILTER",
+        "options": {
+          "height": 5,
+          "width": 4,
+          "volume": 60
+        },
+        "id": "bag"
+      },
+      "x": 2,
+      "y": 4
+    },
+     {
+      "part": {
+        "rotate": 90,
+        "type": "TUBE_ELBOW"
+      },
+      "x": 4,
+      "y": 2
+    },
+    {
+      "part": {
+        "rotate": 0,
+        "type": "TUBE_STRAIGHT"
+      },
+      "x": [
+        6,
+        5
+      ],
+      "y": 2
+    },
+    {
+      "part": {
+        "rotate": 180,
+        "type": "TUBE_ELBOW"
+      },
+      "x": 7,
+      "y": 2
+    },
+    {
+      "part": {
+        "rotate": 90,
+        "type": "TUBE_STRAIGHT"
+      },
+      "x": 7,
+      "y": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "part": {
+        "rotate": 270,
+        "type": "TUBE_ELBOW"
+      },
+      "x": 7,
+      "y": 9
+    },
+    {
+      "part": {
+        "rotate": 0,
+        "type": "TUBE_STRAIGHT"
+      },
+      "x": 6,
+      "y": 9
+    },
+    {
+      "part": {
+        "rotate": 90,
+        "type": "TUBE_ELBOW"
+      },
+      "x": 5,
+      "y": 9
+    },
+    {
+      "part": {
+        "rotate": 90,
+        "type": "FITTING",
+        "settings": {
+          "dir": "out"
+        }
+      },
+      "x": 5,
+      "y": 10
+    },
+    {
+      "part": {
+        "rotate": 90,
+        "type": "FITTING",
+        "settings": {
+          "dir": "in"
+        }
+      },
+      "x": 2,
+      "y": 10
+    },
+    {
+      "part": {
+        "type": "FILTER_BOTTOM"
+      },
+      "x": 2,
+      "y": 8
+    },
+       {
+      "part": {
+        "type": "KETTLE",
+        "id": "rims",
+        "options": {
+          "height": 1,
+          "volume": 2,
+          "width": 4,
+          "hideVolume": true,
+          "useAsTube": true
+        }
+      },
+      "x": 2,
+      "y": 10
+    },
+    {
+      "part": {
+        "type": "PUMP",
+        "id": "p1"
+      },
+      "x": 1,
+      "y": 9
+    },
+    {
+      "part": {
+        "type": "HEATING_ELEMENT",
+        "id": "heater"
+      },
+      "x": 1,
+      "y": 10
+    },
+    {
+      "part": {
+        "rotate": 180,
+        "type": "TUBE_ELBOW"
+      },
+      "x": 2,
+      "y": 9
+    },
+     {
+      "part": {
+        "rotate": 0,
+        "type": "TUBE_ELBOW"
+      },
+      "x": 0,
+      "y": 9
+    },
+    {
+      "part": {
+        "rotate": 90,
+        "type": "TUBE_ELBOW"
+      },
+      "x": 0,
+      "y": 8
+    },
+    {
+      "part": {
+        "type": "Burner",
+        "id": "b1"
+      },
+      "x": 3,
+      "y": 9
+    },
+    {
+      "part": {
+        "type": "VALVE_MANUAL",
+        "id": "m1"
+      },
+      "x": 1,
+      "y": 8
+    }
+  ]
+}

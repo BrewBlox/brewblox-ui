@@ -1,0 +1,192 @@
+{
+  "id": 23,
+  "name": "CIP: recirc cleaner through mash tun and coil",
+  "settings": [
+    {
+      "id": "m1",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m2",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m3",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m5",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m6",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "a1",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "a2",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "cfc_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hlt_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hlti",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hltx",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hlt_out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "mt_in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mti",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mtx",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mt_out",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "coil_in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "coil_out",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "bk_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "bki",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "bk_out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "bkx",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "cfc_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hlt",
+      "settings": {
+      }
+    },
+    {
+      "id": "bk",
+      "settings": {
+      }
+    },
+    {
+      "id": "mt",
+      "settings": {
+        "volume": 20,
+        "liquid": "cleaner"
+      }
+    },
+    {
+      "id": "in1",
+      "settings": {
+        "liquid": "water"
+      }
+    },
+    {
+      "id": "heat_hlt",
+      "settings": {
+        "duty": 0
+      }
+    },
+    {
+      "id": "heat_bk",
+      "settings": {
+        "duty": 0
+      }
+    },
+    {
+      "id": "p1",
+      "settings":{
+        "powered": "off"
+      }
+    },
+    {
+      "id": "p2",
+      "settings":{
+        "power": true,
+        "speed": 100
+      }
+    }
+  ]
+}

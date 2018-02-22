@@ -1,0 +1,210 @@
+{
+  "id": 13,
+  "name": "Sparge Out",
+  "notes": [
+    "The water pump is stopped and all wort is pumped to the boil kettle.",
+    "As soon as the boil kettle element is under water, the element can be turned on to start bringing the wort to boil.",
+    "Don't forget to still apply the next step (boil) to close v9 and prevent wort from leaking back into the mash tun (communicating vessels)."
+  ],
+  "settings": [
+    {
+      "id": "v1",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v2",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v3",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v4",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v5",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v6",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v7",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v8",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v9",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v10",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v11",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v12",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v13",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m1",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m2",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m3",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m4",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m5",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m6",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m7",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m8",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hlt",
+      "settings": {
+        "volume": 30.0,
+        "liquid": "hotwater"
+      }
+    },
+    {
+      "id": "bk",
+      "settings": {
+        "volume": 42,
+        "liquid": "wort"
+      }
+    },
+    {
+      "id": "mt",
+      "settings": {
+        "grain": 15,
+        "volume": 8,
+        "liquid": "runoff"
+      }
+    },
+    {
+      "id": "in1",
+      "settings": {
+        "liquid": "water"
+      }
+    },
+    {
+      "id": "heat_hlt",
+      "settings": {
+        "duty": 0
+      }
+    },
+    {
+      "id": "heat_bk",
+      "settings": {
+        "duty": 100
+      }
+    },
+    {
+      "id": "p1",
+      "settings":{
+        "power": false
+      }
+    },
+    {
+      "id": "p2",
+      "settings":{
+        "power": true,
+        "speed": 40
+      }
+    },
+    {
+      "id": "sphlt",
+      "settings": {
+        "val": 75.2,
+        "set": 60
+      }
+    },
+    {
+      "id": "spmt",
+      "settings": {
+        "val": 72.8
+      }
+    },
+    {
+      "id": "spbk",
+      "settings": {
+        "val": 82.9,
+        "set": 100
+      }
+    }
+  ]
+}

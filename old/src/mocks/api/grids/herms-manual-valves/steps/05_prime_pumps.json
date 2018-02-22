@@ -1,0 +1,163 @@
+{
+  "id": 5,
+  "name": "Prime pumps",
+    "settings": [
+    {
+      "id": "m1",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m2",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m3",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m5",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m6",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "a1",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "a2",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "cfc_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hlt_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hlti",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hltx",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hlt_out",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mt_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "mti",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "mtx",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "mt_out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "coil_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "coil_out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "bk_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "bki",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "bk_out",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "bkx",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "cfc_in",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "hlt",
+      "settings": {
+        "volume": 50.0,
+        "liquid": "water"
+      }
+    },
+    {
+      "id": "bk",
+      "settings": {
+        "volume": 24.5,
+        "liquid": "water"
+      }
+    },
+    {
+      "id": "in1",
+      "settings": {
+      }
+    }    
+  ]
+}

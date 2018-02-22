@@ -1,0 +1,30 @@
+{
+  "name": "view 2",
+  "width": 5,
+  "height": 3,
+  "showCoordinates": true,
+  "layouts": [
+    {
+      "id": 0,
+      "name": "Layout 1",
+      "parts": [
+        {
+          "x": 2,
+          "y": 1,
+          "part": {
+            "type": "TUBE_STRAIGHT",
+            "rotate": 90
+          }
+        },
+        {
+          "x": 2,
+          "y": 1,
+          "part": {
+            "type": "TUBE_BRIDGE",
+            "rotate": 0
+          }
+        }
+      ]
+    }
+  ]
+}

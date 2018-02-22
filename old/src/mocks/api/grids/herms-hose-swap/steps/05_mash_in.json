@@ -1,0 +1,122 @@
+{
+  "id": 5,
+  "name": "Mash in from boil kettle",
+  "layout": 3,
+  "settings": [
+         {
+      "id": "mt",
+      "settings": {
+        "grain": 15,
+        "volume": 20,
+        "liquid": "hotwater"
+      }
+    },
+       {
+      "id": "sphlt",
+      "settings": {
+        "val": 67,
+        "set": 67
+      }
+    },
+    {
+      "id": "spmt",
+      "settings": {
+        "val": 52.7,
+        "set": 67.5
+      }
+    },
+    {
+      "id": "spbk",
+      "settings": {
+        "val": 72.5
+      }
+    },
+    {
+      "id": "heat_hlt",
+      "settings": {
+        "duty": 10
+      }
+    },
+        {
+      "id": "heat_bk",
+      "settings": {
+        "duty": 0
+      }
+    },
+     {
+      "id": "hlt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hlt-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+        {
+      "id": "coil-top",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+        {
+      "id": "coil-bottom",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "mt-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "mt-out",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "bk-in",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "bk-out",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "p1",
+      "settings":{
+        "power": true,
+        "speed": 100
+      }
+    },
+    {
+      "id": "hlt",
+      "settings": {
+        "volume": 50.0,
+        "liquid": "hotwater"
+      }
+    },
+        {
+      "id": "bk",
+      "settings": {
+        "volume": 10,
+        "liquid": "hotwater"
+      }
+    },
+    {
+      "id": "in1",
+      "settings": {
+        "liquid": "water"
+      }
+    }
+  ]
+}

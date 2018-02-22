@@ -1,0 +1,98 @@
+{
+  "name": "view 5",
+  "width": 3,
+  "height": 2,
+  "showCoordinates": true,
+  "layouts": [
+    {
+      "id": 0,
+      "name": "Layout 1",
+      "parts": [
+        {
+          "x": 0,
+          "y": 0,
+          "part": {
+            "type": "TUBE_INPUT",
+            "id": "in1"
+          }
+        },
+        {
+          "x": 1,
+          "y": 0,
+          "part": {
+            "type": "TUBE_TEE",
+            "rotate": 180            
+          }
+        },
+        {
+          "x": 2,
+          "y": 0,
+          "part": {
+            "type": "VALVE_MANUAL",
+            "id": "v1"
+          }
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "part": {
+            "type": "VALVE_MANUAL",
+            "id": "v2",
+            "rotate": 90
+          }
+        }
+      ]
+    }
+  ],
+   "steps": [
+    {
+      "id": 1,
+      "name": "Water OFF",
+      "layout": 0,
+      "settings": [
+        {
+          "id": "in1",
+          "settings": {
+          }
+        },
+        {
+          "id": "v1",
+          "settings": {
+            "pos": "closed"
+          }
+        },
+        {
+          "id": "v2",
+          "settings": {
+            "pos": "closed"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Water ON",
+      "layout": 0,
+      "settings": [
+        {
+          "id": "in1",
+          "settings": {
+            "liquid": "water" 
+          }
+        },
+        {
+          "id": "v1",
+          "settings": {
+            "pos": "closed"
+          }
+        },
+        {
+          "id": "v2",
+          "settings": {
+            "pos": "closed"
+          }
+        }
+      ]
+    }
+  ]
+}

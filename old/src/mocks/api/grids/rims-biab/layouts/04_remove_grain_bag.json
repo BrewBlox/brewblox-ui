@@ -1,0 +1,55 @@
+{
+  "id": 4,
+  "name": "Remove bag",
+  "parts": [
+    {
+      "part": {
+        "type": "SETPOINT",
+        "id": "temp"
+      },
+      "x": 6,
+      "y": 0
+    },
+    {
+      "part": {
+        "type": "KETTLE",
+        "options": {
+          "height": 6,
+          "volume": 70,
+          "width": 4
+        },
+        "id": "kettle"
+      },
+      "x": 2,
+      "y": 3
+    },
+    {
+      "part": {
+        "type": "BIAB_FILTER",
+        "options": {
+          "height": 5,
+          "width": 4,
+          "volume": 60
+        },
+        "id": "bag"
+      },
+      "x": 2,
+      "y": 0
+    },
+    {
+      "part": {
+        "type": "VALVE_MANUAL",
+        "id": "m1"
+      },
+      "x": 1,
+      "y": 8
+    },
+    {
+      "part": {
+        "type": "FILTER_BOTTOM"
+      },
+      "x": 2,
+      "y": 8
+    }
+  ]
+}

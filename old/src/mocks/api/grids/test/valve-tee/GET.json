@@ -1,0 +1,326 @@
+{
+  "name": "T- Valve test view",
+  "width": 3,
+  "height": 2,
+  "showCoordinates": true,
+  "layouts": [
+    {
+      "id": 0,
+      "name": "Layout type 1",
+      "parts": [
+        {
+          "x": 1,
+          "y": 0,
+          "part": {
+            "type": "VALVE_MANUAL_TEE",
+            "id": "v1",
+            "options": {
+              "variant": "v1"
+            }
+          }
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "part": {
+            "type": "TUBE_INPUT",
+            "rotate": 0,
+            "id": "in"
+          }
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "part": {
+            "type": "TUBE_OUTPUT",
+            "rotate": 90
+          }
+        },
+        {
+          "x": 2,
+          "y": 0,
+          "part": {
+            "type": "TUBE_OUTPUT"
+          }
+        }
+      ]
+    },
+        {
+      "id": 1,
+      "name": "Layout type 2",
+      "parts": [
+        {
+          "x": 1,
+          "y": 0,
+          "part": {
+            "type": "VALVE_MANUAL_TEE",
+            "id": "v1",
+            "options": {
+              "variant": "v2"
+            }
+          }
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "part": {
+            "type": "TUBE_INPUT",
+            "rotate": 0,
+            "id": "in"
+          }
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "part": {
+            "type": "TUBE_OUTPUT",
+            "rotate": 90
+          }
+        },
+        {
+          "x": 2,
+          "y": 0,
+          "part": {
+            "type": "TUBE_OUTPUT"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Layout type 3",
+      "parts": [
+        {
+          "x": 1,
+          "y": 0,
+          "part": {
+            "type": "VALVE_MANUAL_TEE",
+            "id": "v1",
+            "options": {
+              "variant": "v3"
+            }
+          }
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "part": {
+            "type": "TUBE_INPUT",
+            "rotate": 0,
+            "id": "in"
+          }
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "part": {
+            "type": "TUBE_OUTPUT",
+            "rotate": 90
+          }
+        },
+        {
+          "x": 2,
+          "y": 0,
+          "part": {
+            "type": "TUBE_OUTPUT"
+          }
+        }
+      ]
+    },
+        {
+      "id": 3,
+      "name": "Layout type 4",
+      "parts": [
+        {
+          "x": 1,
+          "y": 0,
+          "part": {
+            "type": "VALVE_MANUAL_TEE",
+            "id": "v1",
+            "options": {
+              "variant": "v4"
+            }
+          }
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "part": {
+            "type": "TUBE_INPUT",
+            "rotate": 0,
+            "id": "in"
+          }
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "part": {
+            "type": "TUBE_OUTPUT",
+            "rotate": 90
+          }
+        },
+        {
+          "x": 2,
+          "y": 0,
+          "part": {
+            "type": "TUBE_OUTPUT"
+          }
+        }
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": 1,
+      "name": "Type 1: open",
+      "layout": 0,
+      "settings": [
+        {
+          "id": "in",
+          "settings": {
+            "liquid": "water"
+          }
+        },
+        {
+          "id": "v1",
+          "settings": {
+            "pos": "open"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Type 1: closed",
+      "layout": 0,
+      "settings": [
+        {
+          "id": "in",
+          "settings": {
+            "liquid": "water"
+          }
+        },
+        {
+          "id": "v1",
+          "settings": {
+            "pos": "closed"
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Type 2: open",
+      "layout": 1,
+      "settings": [
+        {
+          "id": "in",
+          "settings": {
+            "liquid": "water"
+          }
+        },
+        {
+          "id": "v1",
+          "settings": {
+            "pos": "open"
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Type 2: closed",
+      "layout": 1,
+      "settings": [
+        {
+          "id": "in",
+          "settings": {
+            "liquid": "water"
+          }
+        },
+        {
+          "id": "v1",
+          "settings": {
+            "pos": "closed"
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Type 3: open",
+      "layout": 2,
+      "settings": [
+        {
+          "id": "in",
+          "settings": {
+            "liquid": "water"
+          }
+        },
+        {
+          "id": "v1",
+          "settings": {
+            "pos": "open"
+          }
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Type 3 closed",
+      "layout": 2,
+      "settings": [
+        {
+          "id": "in",
+          "settings": {
+            "liquid": "water"
+          }
+        },
+        {
+          "id": "v1",
+          "settings": {
+            "pos": "closed"
+          }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Type 4: open",
+      "layout": 3,
+      "settings": [
+        {
+          "id": "in",
+          "settings": {
+            "liquid": "water"
+          }
+        },
+        {
+          "id": "v1",
+          "settings": {
+            "pos": "open"
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Type 4: closed",
+      "layout": 3,
+      "settings": [
+        {
+          "id": "in",
+          "settings": {
+            "liquid": "water"
+          }
+        },
+        {
+          "id": "v1",
+          "settings": {
+            "pos": "closed"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,210 @@
+{
+  "id": 16,
+  "name": "Cool",
+  "notes": [
+    "DMS (Dimethyl Sulfide) is created in wort whenever it is heated. It is an off-flavor that has the aroma of cooked corn.",
+    "When the wort is still boiling, DMS is boiled off and will not be a problem.",
+    "When boiling is stopped, DMS is no longer boiled off, but it is still created until the beer is cooled. Therefore, we want to cross this temperature range as quickly as possible. This is done with a counter-flow wort chiller (CFC).",
+    "Do not cool for the first 3 minutes to pump hot wort through the CFC to sanitize it. After 3 minutes, open m3.",
+    "You do not have to wait for the boil kettle temperature to reach the desired fermenation temperature. You can stop whirlpooling as soon as the output of the CFC reaches fermetation temperature. There can be a 20 degree difference between CFC in- and output temperature."
+  ],
+  "settings": [
+    {
+      "id": "v1",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v2",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v3",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v4",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v5",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v6",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v7",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v8",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v9",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v10",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v11",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "v12",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "v13",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m1",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m2",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m3",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m4",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m5",
+      "settings": {
+        "pos": "closed"
+      }
+    },
+    {
+      "id": "m6",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m7",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "m8",
+      "settings": {
+        "pos": "open"
+      }
+    },
+    {
+      "id": "hlt",
+      "settings": {
+        "volume": 30.0,
+        "liquid": "hotwater"
+      }
+    },
+    {
+      "id": "bk",
+      "settings": {
+        "volume": 50,
+        "liquid": "wort"
+      }
+    },
+    {
+      "id": "mt",
+      "settings": {
+        "grain": 15
+      }
+    },
+    {
+      "id": "in1",
+      "settings": {
+        "liquid": "water"
+      }
+    },
+    {
+      "id": "heat_hlt",
+      "settings": {
+        "duty": 10
+      }
+    },
+    {
+      "id": "heat_bk",
+      "settings": {
+        "duty": 0
+      }
+    },
+    {
+      "id": "p1",
+      "settings":{
+        "power": false
+      }
+    },
+    {
+      "id": "p2",
+      "settings":{
+        "power": true,
+        "speed": 100
+      }
+    },
+    {
+      "id": "sphlt",
+      "settings": {
+        "val": 60,
+        "set": 60
+      }
+    },
+    {
+      "id": "spmt",
+      "settings": {
+        "val": 20
+      }
+    },
+    {
+      "id": "spbk",
+      "settings": {
+        "val": 47,
+        "set": 20
+      }
+    }
+  ]
+}
