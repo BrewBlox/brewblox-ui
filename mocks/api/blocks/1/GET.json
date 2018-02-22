@@ -1,6 +1,7 @@
 {
   "id": "controller-1/setpoint-1",
-  "controllerId": "1.1.3",
   "type": "setpoint",
-  "setting": 70
+  "settings": {
+    "value": 1
+  }
 }
