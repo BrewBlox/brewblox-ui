@@ -76,6 +76,7 @@ module.exports = ctx => ({
       'QItem',
       'QItemMain',
       'QItemSide',
+      'QModal',
     ],
     directives: [
       'Ripple',

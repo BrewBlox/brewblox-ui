@@ -14,6 +14,7 @@ import Quasar, {
   QItem,
   QItemMain,
   QItemSide,
+  QModal,
   Ripple,
   Notify,
 } from 'quasar';
@@ -49,6 +50,7 @@ Vue.use(Quasar, {
     QItem,
     QItemMain,
     QItemSide,
+    QModal,
   },
   directives: { Ripple },
   plugins: { Notify },

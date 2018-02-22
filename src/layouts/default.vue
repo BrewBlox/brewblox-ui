@@ -15,8 +15,7 @@
         </q-btn>
 
         <q-toolbar-title>
-          BrewBlox UI
-          <div slot="subtitle">Running on Quasar v{{ $q.version }}</div>
+          BrewBlox
         </q-toolbar-title>
       </q-toolbar>
     </q-layout-header>
@@ -31,40 +30,9 @@
         inset-delimiter
       >
         <q-list-header>Essential Links</q-list-header>
-        <q-item @click.native="openURL('http://quasar-framework.org')">
-          <q-item-side icon="school" />
-          <q-item-main
-            label="Docs"
-            sublabel="quasar-framework.org"
-          />
-        </q-item>
-        <q-item @click.native="openURL('https://github.com/quasarframework/')">
-          <q-item-side icon="code" />
-          <q-item-main
-            label="GitHub"
-            sublabel="github.com/quasarframework"
-          />
-        </q-item>
-        <q-item @click.native="openURL('http://forum.quasar-framework.org')">
-          <q-item-side icon="record_voice_over" />
-          <q-item-main
-            label="Forum"
-            sublabel="forum.quasar-framework.org"
-          />
-        </q-item>
-        <q-item @click.native="openURL('https://gitter.im/quasarframework/Lobby')">
-          <q-item-side icon="chat" />
-          <q-item-main
-            label="Gitter Channel"
-            sublabel="Quasar Lobby"
-          />
-        </q-item>
-        <q-item @click.native="openURL('https://twitter.com/quasarframework')">
-          <q-item-side icon="rss feed" />
-          <q-item-main
-            label="Twitter"
-            sublabel="@quasarframework"
-          />
+        <q-item>
+          <q-item-side icon="settings" />
+          <router-link to="/blocks">Blocks</router-link>
         </q-item>
       </q-list>
     </q-layout-drawer>
@@ -76,17 +44,12 @@
 </template>
 
 <script>
-import { openURL } from 'quasar';
-
 export default {
   name: 'LayoutDefault',
   data() {
     return {
       leftDrawerOpen: false,
     };
-  },
-  methods: {
-    openURL,
   },
 };
 </script>
