@@ -2,7 +2,7 @@ import { ActionContext } from 'vuex';
 
 import { SetPointBlock, SetPoint } from './setpoint/setpoint';
 import { SensorBlock, Sensor } from './sensor/sensor';
-import {State as RootState} from '../state';
+import { State as RootState } from '../state';
 
 export interface BlockBase {
   id: string,
@@ -17,6 +17,7 @@ export type BlocksState = {
   byId: {
     [id: string]: Block;
   },
+  fetching: boolean,
 };
 
 export type BlocksContext = ActionContext<BlocksState, RootState>;

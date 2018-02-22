@@ -1,34 +1,11 @@
 <template>
   <q-page padding>
-    <q-btn
-      icon="search"
-      label="Discover blocks"
-      @click="openDiscoverModal"
-    />
-
-    <q-modal
-      v-model="discoverModalOpened"
-      maximized
-    >
-      <q-modal-layout>
-        <q-toolbar slot="header">
-          <q-btn
-            flat
-            round
-            dense
-            @click="closeDiscoverModal"
-            icon="keyboard_arrow_left"
-          />
-          <q-toolbar-title>
-            Discover blocks
-          </q-toolbar-title>
-        </q-toolbar>
-
-        <div class="layout-padding">
-          <p>Super awesome content here</p>
-        </div>
-      </q-modal-layout>
-    </q-modal>
+    <q-inner-loading :visible="fetching">
+      <q-spinner
+        size="50px"
+        color="primary"
+      />
+    </q-inner-loading>
   </q-page>
 </template>
 
@@ -38,20 +15,15 @@
 <script lang="ts">
 import Vue from 'vue';
 
+import { isFetching } from '../store/blocks/getters';
+
 export default Vue.extend({
   name: 'PageIndex',
   data() {
     return {
-      discoverModalOpened: false,
+      fetching: isFetching(),
     };
   },
-  methods: {
-    openDiscoverModal() {
-      this.discoverModalOpened = true;
-    },
-    closeDiscoverModal() {
-      this.discoverModalOpened = false;
-    },
-  },
+  methods: {},
 });
 </script>

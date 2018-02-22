@@ -1,7 +1,6 @@
 [
   {
     "id": "controller-1/setpoint-1",
-    "cId": "1.1.1",
     "type": "setpoint",
     "settings": {
       "value": 1
@@ -9,7 +8,6 @@
   },
   {
     "id": "controller-1/setpoint-2",
-    "cId": "1.1.2",
     "type": "setpoint",
     "settings": {
       "value": 1
@@ -17,10 +15,9 @@
   },
   {
     "id": "controller-1/sensor-1",
-    "cId": "1.1.3",
     "type": "sensor",
     "settings": {
-      "address": "0x10010010",
+      "address": "0x1001001000000000",
       "offset": 0
     },
     "state": {

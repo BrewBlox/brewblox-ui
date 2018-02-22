@@ -16,6 +16,8 @@ import Quasar, {
   QItemSide,
   QModal,
   QModalLayout,
+  QInnerLoading,
+  QSpinner,
   Ripple,
   Notify,
 } from 'quasar';
@@ -53,6 +55,8 @@ Vue.use(Quasar, {
     QItemSide,
     QModal,
     QModalLayout,
+    QInnerLoading,
+    QSpinner,
   },
   directives: { Ripple },
   plugins: { Notify },
