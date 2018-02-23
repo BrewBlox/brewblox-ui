@@ -6,10 +6,20 @@
       <p class="text-weight-medium">Settings</p>
       <div>
         <span>address</span><span>{{ settings.address }}</span>
+        <q-btn
+        label="Example button" />
       </div>
       <div>
         <span>offset</span><span>{{ settings.offset }}</span>
+        <q-btn
+          size="sm"
+          label="Small" />
       </div>
+      <q-field
+      label="slider">
+        <q-slider
+        label/>
+      </q-field>
     </q-card-main>
 
     <q-card-separator />
