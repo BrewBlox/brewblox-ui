@@ -1,5 +1,13 @@
 [
   {
+    "id": "controller-1/sensor-setpoint-pair-1",
+    "type": "SensorSetPointPair",
+    "links": {
+      "sensor": "controller-1/sensor-1",
+      "setpoint": "controller-1/setpoint-1"
+    }
+  },
+  {
     "id": "controller-1/setpoint-1",
     "type": "SetPointSimple",
     "settings": {
