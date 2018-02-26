@@ -7,7 +7,7 @@
   "author": "BrewPi B.V.",
   "private": true,
   "scripts": {
-    "eslint": "eslint --ext .js src",
+    "eslint": "eslint --ext .js,.vue src",
     "tslint": "tslint -c tslint.json 'src/**/*.ts'",
     "lint": "npm run eslint && npm run tslint",
     "test": "echo \"No test specified\" && exit 0"
