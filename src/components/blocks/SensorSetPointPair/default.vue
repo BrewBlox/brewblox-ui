@@ -3,13 +3,21 @@
     <q-card-title>SensorSetPointPair ({{ id }})</q-card-title>
 
     <q-card-main>
-      <p class="text-weight-medium">Links</p>
-      <div>
-        <span>sensor</span><span>{{ links.sensor }}</span>
-      </div>
-      <div>
-        <span>setpoint</span><span>{{ links.setpoint }}</span>
-      </div>
+      <q-list>
+        <q-list-header>Links</q-list-header>
+        <q-item>
+          <q-item-main>
+            <q-item-tile label>Sensor</q-item-tile>
+            <q-item-tile sublabel>{{ sensor.id }}</q-item-tile>
+          </q-item-main>
+        </q-item>
+        <q-item>
+          <q-item-main>
+            <q-item-tile label>SetPoint</q-item-tile>
+            <q-item-tile sublabel>{{ setpoint.id }}</q-item-tile>
+          </q-item-main>
+        </q-item>
+      </q-list>
     </q-card-main>
   </q-card>
 </template>
