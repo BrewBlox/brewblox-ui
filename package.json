@@ -7,7 +7,9 @@
   "author": "BrewPi B.V.",
   "private": true,
   "scripts": {
-    "lint": "eslint --ext .js,.vue,.ts src",
+    "eslint": "eslint --ext .js src",
+    "tslint": "tslint -c tslint.json 'src/**/*.ts'",
+    "lint": "npm run eslint && npm run tslint",
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
@@ -29,6 +31,8 @@
     "eslint-plugin-vue": "4.0.0",
     "quasar-cli": "^0.15.0-beta.36",
     "ts-loader": "^3.5.0",
+    "tslint": "^5.9.1",
+    "tslint-config-airbnb": "^5.7.0",
     "typescript": "^2.7.1",
     "typescript-eslint-parser": "^13.0.0"
   },
