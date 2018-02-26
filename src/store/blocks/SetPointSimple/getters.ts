@@ -1,5 +1,14 @@
-import { Block } from '../state';
-
 import { blockById } from '../getters';
 
-export const getById = (id: string): Block => blockById(id);
+import { SetPointSimpleBlock } from './SetPointSimple';
+
+export function getById(id: string): SetPointSimpleBlock {
+  const block = blockById(id);
+
+  // force block type
+  if (block.type !== 'SetPointSimple') {
+    throw new Error('Block is not a valid SetPointSimple');
+  }
+
+  return block;
+}

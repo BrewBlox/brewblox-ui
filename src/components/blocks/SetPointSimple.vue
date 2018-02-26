@@ -25,9 +25,12 @@ export default Vue.extend({
     },
   },
   computed: {
-    settings() {
+    blockData() {
       const block = getById(this.$props.id);
-      return block.settings;
+      return block;
+    },
+    settings() {
+      return this.blockData.settings;
     },
   },
 });
