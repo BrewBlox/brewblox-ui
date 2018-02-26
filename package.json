@@ -29,7 +29,7 @@
     "eslint-plugin-import": "2.7.0",
     "eslint-plugin-typescript": "^0.8.1",
     "eslint-plugin-vue": "4.0.0",
-    "quasar-cli": "^0.15.0-beta.36",
+    "quasar-cli": "^0.15.3",
     "ts-loader": "^3.5.0",
     "tslint": "^5.9.1",
     "tslint-config-airbnb": "^5.7.0",
