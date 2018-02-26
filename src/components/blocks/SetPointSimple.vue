@@ -16,6 +16,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 
 import { getById } from '../../store/blocks/SetPointSimple/getters';
+import { SetPointSimpleBlock } from '../../store/blocks/SetPointSimple/SetPointSimple';
 
 /* eslint-disable indent */
 @Component({
@@ -28,7 +29,7 @@ import { getById } from '../../store/blocks/SetPointSimple/getters';
 })
 /* eslint-enable */
 export default class SetPointSimple extends Vue {
-  get blockData() {
+  get blockData(): SetPointSimpleBlock {
     const block = getById(this.$props.id);
     return block;
   }
@@ -38,7 +39,3 @@ export default class SetPointSimple extends Vue {
   }
 }
 </script>
-
-<style scoped>
-
-</style>
