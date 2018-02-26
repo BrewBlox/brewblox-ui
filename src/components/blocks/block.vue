@@ -11,7 +11,7 @@ import Vue from 'vue';
 import { blockById } from '../../store/blocks/getters';
 
 const blockTypes = {
-  OneWireTempSensor: () => import('./OneWireTempSensor.vue'),
+  OneWireTempSensor: () => import('./OneWireTempSensor/default.vue'),
   SetPointSimple: () => import('./SetPointSimple/default.vue'),
 };
 

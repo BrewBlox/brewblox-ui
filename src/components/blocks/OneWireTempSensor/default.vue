@@ -26,33 +26,7 @@
   </q-card>
 </template>
 
-<script>
-import Vue from 'vue';
-
-export default Vue.extend({
-  name: 'one-wire-temp-sensor',
-  props: {
-    id: {
-      default: '',
-      type: String,
-    },
-    settings: {
-      type: Object,
-      default: () => ({
-        address: '',
-        offset: 0,
-      }),
-    },
-    state: {
-      type: Object,
-      default: () => ({
-        value: 0,
-        connected: false,
-      }),
-    },
-  },
-});
-</script>
+<script lang="ts" src="./OneWireTempSensor.ts" />
 
 <style scoped>
 
