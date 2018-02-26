@@ -32,14 +32,23 @@ import Vue from 'vue';
 export default Vue.extend({
   name: 'one-wire-temp-sensor',
   props: {
-    id: String,
+    id: {
+      default: '',
+      type: String,
+    },
     settings: {
-      address: String,
-      offset: Number,
+      type: Object,
+      default: () => ({
+        address: '',
+        offset: 0,
+      }),
     },
     state: {
-      value: Number,
-      connected: Boolean,
+      type: Object,
+      default: () => ({
+        value: 0,
+        connected: false,
+      }),
     },
   },
 });

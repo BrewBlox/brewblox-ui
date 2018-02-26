@@ -14,12 +14,20 @@
 <script lang="ts">
 import Vue from 'vue';
 
+import { getById } from '../../store/blocks/SetPointSimple/getters';
+
 export default Vue.extend({
   name: 'set-point-simple',
   props: {
-    id: String,
-    settings: {
-      value: Number,
+    id: {
+      default: '',
+      type: String,
+    },
+  },
+  computed: {
+    settings() {
+      const block = getById(this.$props.id);
+      return block.settings;
     },
   },
 });

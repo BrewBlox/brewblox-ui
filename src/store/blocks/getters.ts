@@ -26,7 +26,7 @@ const readBlockById = read(getters.blockById);
 
 export const allBlocks = () => readAllBlocks(store);
 export const blockIds = () => readBlockIds(store);
-export const blockById = () => readBlockById(store);
+export const blockById = (id: string) => readBlockById(store)(id);
 export const isFetching = () => readIsFetching(store);
 
 export default getters;
