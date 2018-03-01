@@ -7,10 +7,15 @@ import { State as RootState } from '../state';
 
 export interface BlockBase {
   id: string;
+  isLoading: boolean;
 }
 
 export type Block = SetPointSimpleBlock | OneWireTempSensorBlock | SensorSetPointPairBlock;
-export type BlockUpdate = SetPointSimple | OneWireTempSensor | SensorSetPointPair;
+export type BlockUpdateBase = SetPointSimple | OneWireTempSensor | SensorSetPointPair;
+
+export type BlockUpdate = BlockUpdateBase & {
+  isLoading: boolean,
+};
 
 export type BlocksState = {
   allIds: string[],
