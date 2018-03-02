@@ -2,7 +2,7 @@
   <q-layout view="lHh Lpr lFf">
     <q-layout-header>
       <q-toolbar
-        color="primary"
+        color="dark"
         glossy
       >
         <q-btn
@@ -22,14 +22,13 @@
 
     <q-layout-drawer
       v-model="leftDrawerOpen"
-      content-class="bg-grey-2"
     >
       <q-list
         no-border
         link
         inset-delimiter
       >
-        <q-list-header>Essential Links</q-list-header>
+        <q-list-header class="dark">Essential Links</q-list-header>
         <q-item>
           <q-item-side icon="settings" />
           <router-link to="/blocks">Blocks</router-link>
@@ -54,5 +53,6 @@ export default {
 };
 </script>
 
-<style>
+<style lang="stylus">
+@import "..\css\app.styl"
 </style>
