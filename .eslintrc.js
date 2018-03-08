@@ -20,6 +20,7 @@ module.exports = {
   },
   // add your custom rules here
   'rules': {
+    'strict': 0,
     'no-param-reassign': 0,
 
     'import/first': 0,
