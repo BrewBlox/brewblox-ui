@@ -9,13 +9,13 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { updateBlock } from '../store/blocks/actions';
+import { persistSensorSetPointPair } from '../store/blocks/SensorSetPointPair/actions';
 
 export default Vue.extend({
   name: 'PageIndex',
   methods: {
     updateBlock() {
-      updateBlock({
+      persistSensorSetPointPair({
         id: 'controller-1/setpoint-1',
         settings: {
           value: 20,

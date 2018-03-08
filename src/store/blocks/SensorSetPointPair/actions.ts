@@ -7,7 +7,7 @@ export const addSensorSetPointPair = ({ id, links }: SensorSetPointPair) => {
   commitAddBlock(store, { id, links, type: 'SensorSetPointPair' });
 };
 
-export const persistSensorSetPointPair = (sensorSetPointPair) => {
+export const persistSensorSetPointPair = (sensorSetPointPair: any) => {
   // send request to backend
 
   // set SensorSetPointPair to loading

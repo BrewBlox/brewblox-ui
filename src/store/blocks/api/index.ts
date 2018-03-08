@@ -10,6 +10,6 @@ export function fetchBlocks(): Promise<Block[]> {
   return get('/blocks/list');
 }
 
-export function persistBlock(block: BlockUpdate): Promise<Block> {
+export function persistBlock(block: BlockUpdate): Promise<BlockUpdate> {
   return post(`/blocks/${block.id}`, block);
 }
