@@ -41,7 +41,8 @@ const mutations = {
 };
 
 // exported commit accessors
-export const commitAddBlock = commit(mutations.addBlock);
+export const addBlock =
+  (block: Block) => commit(mutations.addBlock)(store, block);
 
 export const updateBlock =
   (block: BlockUpdate) => commit(mutations.updateBlock)(store, block);
