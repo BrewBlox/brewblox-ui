@@ -6,5 +6,7 @@ module.exports = (request, response) => {
   const id = decodeURIComponent(request.params.block_id);
   const base = getBlock(id);
 
-  response.send(JSON.stringify(merge(base, request.body)));
+  setTimeout(() => {
+    response.send(JSON.stringify(merge(base, request.body)));
+  }, 1000);
 };
