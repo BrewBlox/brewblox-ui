@@ -9,7 +9,5 @@ export const addSensorSetPointPair = ({ id, links }: SensorSetPointPair) => {
 };
 
 export const persistSensorSetPointPair = (sensorSetPointPair: SensorSetPointPair) => {
-  // validate input
-
   persistBlock(sensorSetPointPair);
 };
