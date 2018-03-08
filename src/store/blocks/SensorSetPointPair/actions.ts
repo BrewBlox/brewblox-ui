@@ -1,3 +1,4 @@
+import { persistBlock } from '../actions';
 import store from '../../';
 
 import { commitAddBlock } from '../mutations';
@@ -7,8 +8,8 @@ export const addSensorSetPointPair = ({ id, links }: SensorSetPointPair) => {
   commitAddBlock(store, { id, links, type: 'SensorSetPointPair' });
 };
 
-export const persistSensorSetPointPair = (sensorSetPointPair: any) => {
-  // send request to backend
+export const persistSensorSetPointPair = (sensorSetPointPair: SensorSetPointPair) => {
+  // validate input
 
-  // set SensorSetPointPair to loading
-}
+  persistBlock(sensorSetPointPair);
+};

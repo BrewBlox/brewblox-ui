@@ -16,9 +16,10 @@ export default Vue.extend({
   methods: {
     updateBlock() {
       persistSensorSetPointPair({
-        id: 'controller-1/setpoint-1',
-        settings: {
-          value: 20,
+        id: 'controller-1/sensor-setpoint-pair-1',
+        links: {
+          sensor: 'sensor',
+          setpoint: 'setpoint',
         },
       });
     },

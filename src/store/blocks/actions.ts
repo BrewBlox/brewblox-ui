@@ -1,9 +1,9 @@
 import { getStoreAccessors } from 'vuex-typescript';
 
-import { fetchBlock, fetchBlocks, persistBlock } from './api';
+import { fetchBlock, fetchBlocks, persistBlock as persistBlockToApi } from './api';
 
 import store from '../';
-import { BlocksState, BlocksContext, Block, BlockUpdate } from './state';
+import {BlocksState, BlocksContext, Block, BlockUpdate, BlockUpdateBase} from './state';
 import { State as RootState } from '../state';
 
 import { updateBlock, updateFetching } from './mutations';
@@ -46,17 +46,18 @@ const actions = {
     // update isFetching
     updateFetching(false);
   },
-  async persistBlock(context: BlocksContext, block: BlockUpdate) {
+  async persistBlock(context: BlocksContext, block: BlockUpdateBase) {
     // update isLoading
     updateBlock({ ...block, isLoading: true });
 
     // persist block on api
-    updateBlock({ ...await persistBlock(block), isLoading: false });
+    updateBlock({ ...await persistBlockToApi(block), isLoading: false });
   },
 };
 
 export const dispatchFindBlock = dispatch(actions.findBlock);
 export const dispatchListBlocks = dispatch(actions.listBlocks);
+export const dispatchPersistBlock = dispatch(actions.persistBlock);
 
 // actions
 export const findBlock = (id: string) => {
@@ -65,6 +66,10 @@ export const findBlock = (id: string) => {
 
 export const listBlocks = () => {
   dispatchListBlocks(store);
+};
+
+export const persistBlock = (block: BlockUpdateBase) => {
+  dispatchPersistBlock(store, block);
 };
 
 // mutations
