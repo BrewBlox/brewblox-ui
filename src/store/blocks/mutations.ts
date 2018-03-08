@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { getStoreAccessors } from 'vuex-typescript';
 import { merge } from 'lodash';
 
-import { Block, BlocksState, BlockUpdate } from './state';
+import { Block, BlocksState, BlockSave } from './state';
 import { State as RootState } from '../state';
 import store from '../index';
 
@@ -16,7 +16,7 @@ const mutations = {
     // insert data into blocks object
     state.byId[block.id] = { ...block, isLoading: false };
   },
-  updateBlock(state: BlocksState, block: BlockUpdate) {
+  updateBlock(state: BlocksState, block: BlockSave) {
     if (!state.byId[block.id]) {
       throw new Error(`Block with id '${block.id}' does not exist`);
     }
@@ -44,7 +44,7 @@ export const addBlock =
   (block: Block) => commit(mutations.addBlock)(store, block);
 
 export const updateBlock =
-  (block: BlockUpdate) => commit(mutations.updateBlock)(store, block);
+  (block: BlockSave) => commit(mutations.updateBlock)(store, block);
 
 export const updateFetching =
   (fetching: boolean) => commit(mutations.updateFetching)(store, fetching);

@@ -23,9 +23,9 @@ export interface BlockBase {
 }
 
 export type Block = SetPointSimpleBlock | OneWireTempSensorBlock | SensorSetPointPairBlock;
-export type BlockUpdateBase = SetPointSimple | OneWireTempSensorUpdate | SensorSetPointPairUpdate;
+export type BlockSaveBase = SetPointSimple | OneWireTempSensorUpdate | SensorSetPointPairUpdate;
 
-export type BlockUpdate = BlockUpdateBase & {
+export type BlockSave = BlockSaveBase & {
   isLoading: boolean,
 };
 

@@ -3,7 +3,7 @@ import { getStoreAccessors } from 'vuex-typescript';
 import { fetchBlock, fetchBlocks, persistBlock as persistBlockToApi } from './api';
 
 import store from '../';
-import { BlocksState, BlocksContext, Block, BlockUpdateBase } from './state';
+import { BlocksState, BlocksContext, Block, BlockSaveBase } from './state';
 import { State as RootState } from '../state';
 
 import { updateBlock, updateFetching } from './mutations';
@@ -46,7 +46,7 @@ const actions = {
     // update isFetching
     updateFetching(false);
   },
-  async saveBlock(context: BlocksContext, block: BlockUpdateBase) {
+  async saveBlock(context: BlocksContext, block: BlockSaveBase) {
     // update isLoading and block values
     updateBlock({ ...block, isLoading: true });
 
@@ -66,6 +66,6 @@ export const listBlocks =
   () => dispatch(actions.listBlocks)(store);
 
 export const saveBlock =
-  (block: BlockUpdateBase) => dispatch(actions.saveBlock)(store, block);
+  (block: BlockSaveBase) => dispatch(actions.saveBlock)(store, block);
 
 export default actions;
