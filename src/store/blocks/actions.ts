@@ -46,14 +46,14 @@ const actions = {
     // update isFetching
     updateFetching(false);
   },
-  async persistBlock(context: BlocksContext, block: BlockUpdateBase) {
-    // update isLoading
+  async saveBlock(context: BlocksContext, block: BlockUpdateBase) {
+    // update isLoading and block values
     updateBlock({ ...block, isLoading: true });
 
     // persist block to API and wait for result
     const savedBlock = await persistBlockToApi(block);
 
-    // persist block on api
+    // update isLoading and apply block data from API
     updateBlock({ ...savedBlock, isLoading: false });
   },
 };
@@ -65,7 +65,7 @@ export const findBlock =
 export const listBlocks =
   () => dispatch(actions.listBlocks)(store);
 
-export const persistBlock =
-  (block: BlockUpdateBase) => dispatch(actions.persistBlock)(store, block);
+export const saveBlock =
+  (block: BlockUpdateBase) => dispatch(actions.saveBlock)(store, block);
 
 export default actions;

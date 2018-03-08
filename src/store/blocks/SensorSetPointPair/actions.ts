@@ -1,4 +1,4 @@
-import { persistBlock } from '../actions';
+import { saveBlock } from '../actions';
 
 import { addBlock } from '../mutations';
 import { SensorSetPointPair, SensorSetPointPairUpdate } from './SensorSetPointPair';
@@ -9,7 +9,7 @@ export const addSensorSetPointPair = ({ id, links }: SensorSetPointPair) => {
 
 export const persist = async (sensorSetPointPair: SensorSetPointPairUpdate) => {
   try {
-    await persistBlock(sensorSetPointPair);
+    await saveBlock(sensorSetPointPair);
   } catch (e) {
     throw new Error(e);
   }

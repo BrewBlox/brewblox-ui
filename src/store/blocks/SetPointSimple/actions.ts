@@ -1,6 +1,6 @@
 import { addBlock } from '../mutations';
 import { SetPointSimple } from './SetPointSimple';
-import { persistBlock } from '../actions';
+import { saveBlock } from '../actions';
 
 export const addSetPoint = ({ id, settings }: SetPointSimple) => {
   addBlock({ id, settings, type: 'SetPointSimple' });
@@ -8,7 +8,7 @@ export const addSetPoint = ({ id, settings }: SetPointSimple) => {
 
 export const persist = async (setPointSimple: SetPointSimple) => {
   try {
-    await persistBlock(setPointSimple);
+    await saveBlock(setPointSimple);
   } catch (e) {
     throw new Error(e);
   }
