@@ -5,11 +5,11 @@ import routes from './routes';
 
 Vue.use(VueRouter);
 
-const Router = new VueRouter({
+const router = new VueRouter({
+  routes,
   // Leave as is and change from quasar.conf.js instead!
   mode: process.env.VUE_ROUTER_MODE || 'history',
   base: process.env.VUE_ROUTER_BASE || '',
-  routes,
 });
 
 /*
@@ -23,4 +23,4 @@ Router.beforeEach((to, from, next) => {
 })
 */
 
-export default Router;
+export default router;

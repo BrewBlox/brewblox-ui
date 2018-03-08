@@ -36,17 +36,17 @@ module.exports = ctx => ({
 
       // add custom loaders
       cfg.module.rules.push({
-        enforce: 'pre',
-        test: /\.(js|vue)$/,
-        loader: 'eslint-loader',
-        exclude: /(node_modules|quasar)/,
-      }, {
         test: /\.tsx?$/,
         loader: 'ts-loader',
         exclude: /node_modules/,
         options: {
           appendTsSuffixTo: [/\.vue$/],
         },
+      }, {
+        enforce: 'pre',
+        test: /\.(js|vue)$/,
+        loader: 'eslint-loader',
+        exclude: /(node_modules|quasar)/,
       });
     },
   },

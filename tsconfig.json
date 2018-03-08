@@ -4,6 +4,7 @@
     "strict": true,
     "lib": ["ESNext", "DOM"],
     "moduleResolution": "node",
-    "sourceMap": true
+    "sourceMap": true,
+    "experimentalDecorators": true
   }
 }

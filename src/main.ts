@@ -71,9 +71,9 @@ Vue.use(Quasar, {
 });
 
 const app = new Vue({
-  el: '#q-app',
   router,
   store,
+  el: '#q-app',
   render: h => h(App),
 });
 

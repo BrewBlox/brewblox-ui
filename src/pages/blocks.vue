@@ -10,8 +10,8 @@
     <template v-if="blocks.length > 0">
       <block
         v-for="block in blocks"
-        :key="block.id"
-        :block-data="block"
+        :key="block"
+        :block-id="block"
       />
     </template>
   </q-page>
@@ -25,13 +25,13 @@ import Vue from 'vue';
 
 import Block from '../components/blocks/block';
 
-import { isFetching, allBlocks } from '../store/blocks/getters';
+import { isFetching, blockIds } from '../store/blocks/getters';
 
 export default Vue.extend({
   name: 'PageIndex',
   components: { Block },
   computed: {
-    blocks: () => allBlocks(),
+    blocks: () => blockIds(),
     fetching: () => isFetching(),
   },
   methods: {},

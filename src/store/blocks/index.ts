@@ -3,6 +3,9 @@ import getters from './getters';
 import mutations from './mutations';
 
 const blocks = {
+  getters,
+  actions,
+  mutations,
   namespaced: true,
   strict: true,
   state: {
@@ -10,9 +13,6 @@ const blocks = {
     byId: {},
     fetching: false,
   },
-  getters,
-  actions,
-  mutations,
 };
 
 export default blocks;

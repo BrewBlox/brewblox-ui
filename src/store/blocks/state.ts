@@ -5,7 +5,7 @@ import { OneWireTempSensorBlock, OneWireTempSensor } from './OneWireTempSensor/O
 import { State as RootState } from '../state';
 
 export interface BlockBase {
-  id: string,
+  id: string;
 }
 
 export type Block = SetPointSimpleBlock | OneWireTempSensorBlock;
