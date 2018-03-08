@@ -4,17 +4,35 @@
 
     <q-card-main>
       <q-list>
+        <q-btn
+          :loading="loading"
+          icon="check"
+          :color="changed ? 'primary' : 'light'"
+          :disable="!changed"
+          @click="update"
+          style="float: right; margin-top: -8px"
+        >
+          Save
+        </q-btn>
+
         <q-list-header>Settings</q-list-header>
         <q-item>
           <q-item-main>
-            <q-item-tile label>Address</q-item-tile>
-            <q-item-tile sublabel>{{ settings.address }}</q-item-tile>
+            <q-input
+              v-model="addressInput"
+              stack-label="Address"
+              placeholder="Address location of sensor"
+            />
           </q-item-main>
         </q-item>
         <q-item>
           <q-item-main>
-            <q-item-tile label>Offset</q-item-tile>
-            <q-item-tile sublabel>{{ settings.offset }}</q-item-tile>
+            <q-input
+              v-model="offsetInput"
+              stack-label="Offset"
+              placeholder="Offset of sensor"
+              type="number"
+            />
           </q-item-main>
         </q-item>
       </q-list>

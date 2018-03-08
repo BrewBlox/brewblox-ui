@@ -4,6 +4,17 @@
 
     <q-card-main>
       <q-list>
+        <q-btn
+          :loading="loading"
+          icon="check"
+          :color="changed ? 'primary' : 'light'"
+          :disable="!changed"
+          @click="update"
+          style="float: right; margin-top: -8px"
+        >
+          Save
+        </q-btn>
+
         <q-list-header>Settings</q-list-header>
         <q-item>
           <q-item-main>
@@ -17,16 +28,6 @@
         </q-item>
       </q-list>
     </q-card-main>
-
-    <q-btn
-      :loading="loading"
-      icon="check"
-      :color="changed ? 'primary' : 'light'"
-      :disable="!changed"
-      @click="update"
-    >
-      Save
-    </q-btn>
   </q-card>
 </template>
 

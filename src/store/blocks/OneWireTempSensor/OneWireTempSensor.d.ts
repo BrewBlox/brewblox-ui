@@ -11,6 +11,13 @@ export interface OneWireTempSensor extends BlockBase {
   };
 }
 
+export interface OneWireTempSensorUpdate extends BlockBase {
+  settings: {
+    address?: string,
+    offset?: number,
+  };
+}
+
 export interface OneWireTempSensorBlock extends OneWireTempSensor {
   type: 'OneWireTempSensor';
 }

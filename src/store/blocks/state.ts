@@ -1,7 +1,8 @@
 import { ActionContext } from 'vuex';
 
 import { SetPointSimpleBlock, SetPointSimple } from './SetPointSimple/SetPointSimple';
-import { OneWireTempSensorBlock, OneWireTempSensor } from './OneWireTempSensor/OneWireTempSensor';
+import { OneWireTempSensorBlock, OneWireTempSensorUpdate }
+  from './OneWireTempSensor/OneWireTempSensor';
 import {
   SensorSetPointPairBlock,
   SensorSetPointPairUpdate,
@@ -14,7 +15,7 @@ export interface BlockBase {
 }
 
 export type Block = SetPointSimpleBlock | OneWireTempSensorBlock | SensorSetPointPairBlock;
-export type BlockUpdateBase = SetPointSimple | OneWireTempSensor | SensorSetPointPairUpdate;
+export type BlockUpdateBase = SetPointSimple | OneWireTempSensorUpdate | SensorSetPointPairUpdate;
 
 export type BlockUpdate = BlockUpdateBase & {
   isLoading: boolean,
