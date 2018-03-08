@@ -2,10 +2,14 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 
 import { getById } from '../../../store/blocks/SensorSetPointPair/getters';
-import { getById as getSetPointSimpleById }
-  from '../../../store/blocks/SetPointSimple/getters';
-import { getById as getOneWireTempSensorById }
-  from '../../../store/blocks/OneWireTempSensor/getters';
+import {
+  getById as getSetPointSimpleById,
+  getAll as getAllSetPointSimple,
+} from '../../../store/blocks/SetPointSimple/getters';
+import {
+  getById as getOneWireTempSensorById,
+  getAll as getAllOneWireTempSensor,
+} from '../../../store/blocks/OneWireTempSensor/getters';
 import { persist } from '../../../store/blocks/SensorSetPointPair/actions';
 
 @Component({
@@ -34,6 +38,18 @@ export default class SensorSetPointPair extends Vue {
 
   get setpoint() {
     return getSetPointSimpleById(this.links.setpoint);
+  }
+
+  get allSetPoints() {
+    return getAllSetPointSimple().map(setpoint => ({ label: setpoint.id, value: setpoint.id }));
+  }
+
+  get allSensors() {
+    return getAllOneWireTempSensor().map(sensor => ({ label: sensor.id, value: sensor.id }));
+  }
+
+  get loading() {
+    return !!this.blockData.isLoading;
   }
 
   get changed() {

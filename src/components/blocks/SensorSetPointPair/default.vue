@@ -7,19 +7,21 @@
         <q-list-header>Links</q-list-header>
         <q-item>
           <q-item-main>
-            <q-input
+            <q-select
               v-model="sensorInput"
               stack-label="Sensor"
               placeholder="Sensor ID"
+              :options="allSensors"
             />
           </q-item-main>
         </q-item>
         <q-item>
           <q-item-main>
-            <q-input
+            <q-select
               v-model="setpointInput"
               stack-label="SetPoint"
               placeholder="SetPoint ID"
+              :options="allSetPoints"
             />
           </q-item-main>
         </q-item>
@@ -27,6 +29,7 @@
     </q-card-main>
 
     <q-btn
+      :loading="loading"
       icon="check"
       :color="changed ? 'primary' : 'light'"
       :disable="!changed"
