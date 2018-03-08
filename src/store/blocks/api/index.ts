@@ -3,7 +3,7 @@ import { Block, BlockUpdateBase } from '../state';
 import { get, post } from './fetch';
 
 export function fetchBlock(id: string): Promise<Block> {
-  return get(`/blocks/${id}`);
+  return get(`/blocks/${encodeURIComponent(id)}`);
 }
 
 export function fetchBlocks(): Promise<Block[]> {
@@ -11,5 +11,5 @@ export function fetchBlocks(): Promise<Block[]> {
 }
 
 export function persistBlock(block: BlockUpdateBase): Promise<BlockUpdateBase> {
-  return post(`/blocks/${block.id}`, block);
+  return post(`/blocks/${encodeURIComponent(block.id)}`, block);
 }
