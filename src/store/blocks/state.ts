@@ -4,7 +4,7 @@ import { SetPointSimpleBlock, SetPointSimple } from './SetPointSimple/SetPointSi
 import { OneWireTempSensorBlock, OneWireTempSensor } from './OneWireTempSensor/OneWireTempSensor';
 import {
   SensorSetPointPairBlock,
-  SensorSetPointPair,
+  SensorSetPointPairUpdate,
 } from './SensorSetPointPair/SensorSetPointPair';
 import { State as RootState } from '../state';
 
@@ -14,7 +14,7 @@ export interface BlockBase {
 }
 
 export type Block = SetPointSimpleBlock | OneWireTempSensorBlock | SensorSetPointPairBlock;
-export type BlockUpdateBase = SetPointSimple | OneWireTempSensor | SensorSetPointPair;
+export type BlockUpdateBase = SetPointSimple | OneWireTempSensor | SensorSetPointPairUpdate;
 
 export type BlockUpdate = BlockUpdateBase & {
   isLoading: boolean,
