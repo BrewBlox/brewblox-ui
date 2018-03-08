@@ -1,7 +1,0 @@
-{
-  "id": "controller-1/setpoint-1",
-  "type": "setpoint",
-  "settings": {
-    "value": 1
-  }
-}

@@ -23,6 +23,8 @@ import Quasar, {
   QCardTitle,
   QCardSeparator,
   QCardMain,
+  QInput,
+  QSelect,
   Ripple,
   Notify,
 } from 'quasar';
@@ -67,6 +69,8 @@ Vue.use(Quasar, {
     QCardTitle,
     QCardSeparator,
     QCardMain,
+    QInput,
+    QSelect,
   },
   directives: { Ripple },
   plugins: { Notify },

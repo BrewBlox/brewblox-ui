@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import { getStoreAccessors } from 'vuex-typescript';
+import { merge } from 'lodash';
 
 // import { commit } from './';
 import { Block, BlocksState, BlockUpdate } from './state';
@@ -21,7 +22,11 @@ const mutations = {
       throw new Error(`Block with id '${block.id}' does not exist`);
     }
 
-    state.byId[block.id] = Object.assign(state.byId[block.id], block);
+    Vue.set(state, 'byId', Object.assign(
+      {},
+      state.byId,
+      { [block.id]: merge(state.byId[block.id], block) },
+    ));
   },
   removeBlock(state: BlocksState, id: string) {
     // delete from blocks listing
