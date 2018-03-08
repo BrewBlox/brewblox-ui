@@ -2,7 +2,6 @@ import Vue from 'vue';
 import { getStoreAccessors } from 'vuex-typescript';
 import { merge } from 'lodash';
 
-// import { commit } from './';
 import { Block, BlocksState, BlockUpdate } from './state';
 import { State as RootState } from '../state';
 import store from '../index';

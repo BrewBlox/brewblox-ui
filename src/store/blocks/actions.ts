@@ -50,6 +50,7 @@ const actions = {
     // update isLoading
     updateBlock({ ...block, isLoading: true });
 
+    // persist block to API and wait for result
     const savedBlock = await persistBlockToApi(block);
 
     // persist block on api
