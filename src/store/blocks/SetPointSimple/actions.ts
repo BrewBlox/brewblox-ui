@@ -8,6 +8,6 @@ export const addSetPoint = ({ id, settings }: SetPointSimple) => {
   commitAddBlock(store, { id, settings, type: 'SetPointSimple' });
 };
 
-export const persistSetPointSimple = (setPointSimple: SetPointSimple) => {
+export const persist = (setPointSimple: SetPointSimple) => {
   persistBlock(setPointSimple);
 };

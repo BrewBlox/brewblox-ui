@@ -8,6 +8,6 @@ export const addOneWireTempSensor = ({ id, settings, state }: OneWireTempSensor)
   commitAddBlock(store, { id, settings, state, type: 'OneWireTempSensor', isLoading: false });
 };
 
-export const persistOneWireTempSensor = (oneWireTempSensor: OneWireTempSensor) => {
+export const persist = (oneWireTempSensor: OneWireTempSensor) => {
   persistBlock(oneWireTempSensor);
 };

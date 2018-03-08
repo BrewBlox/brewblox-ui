@@ -8,6 +8,6 @@ export const addSensorSetPointPair = ({ id, links }: SensorSetPointPair) => {
   commitAddBlock(store, { id, links, type: 'SensorSetPointPair' });
 };
 
-export const persistSensorSetPointPair = (sensorSetPointPair: SensorSetPointPair) => {
+export const persist = (sensorSetPointPair: SensorSetPointPair) => {
   persistBlock(sensorSetPointPair);
 };

@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { persistSensorSetPointPair } from '../store/blocks/SensorSetPointPair/actions';
+import { persist as persistSensorSetPointPair } from '../store/blocks/SensorSetPointPair/actions';
 
 export default Vue.extend({
   name: 'PageIndex',
