@@ -6,7 +6,10 @@ import store from '../';
 import { BlocksState, BlocksContext, Block, BlockSaveBase } from './state';
 import { State as RootState } from '../state';
 
-import { updateBlock, updateFetching } from './mutations';
+import {
+  mutateBlock as mutateBlockInStore,
+  mutateFetching as mutateFetchingInStore,
+} from './mutations';
 
 import { addSetPoint } from './SetPointSimple/actions';
 import { addOneWireTempSensor } from './OneWireTempSensor/actions';
@@ -37,24 +40,24 @@ const actions = {
   },
   async listBlocks() {
     // update isFetching
-    updateFetching(true);
+    mutateFetchingInStore(true);
 
     // will fetch blocks from the server
     const blocks = await fetchBlocks();
     blocks.forEach(addBlock);
 
     // update isFetching
-    updateFetching(false);
+    mutateFetchingInStore(false);
   },
   async saveBlock(context: BlocksContext, block: BlockSaveBase) {
     // update isLoading and block values
-    updateBlock({ ...block, isLoading: true });
+    mutateBlockInStore({ ...block, isLoading: true });
 
     // persist block to API and wait for result
     const savedBlock = await persistBlockToApi(block);
 
     // update isLoading and apply block data from API
-    updateBlock({ ...savedBlock, isLoading: false });
+    mutateBlockInStore({ ...savedBlock, isLoading: false });
   },
 };
 
