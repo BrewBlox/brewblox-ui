@@ -3,7 +3,7 @@ import { getStoreAccessors } from 'vuex-typescript';
 import { fetchBlock, fetchBlocks, persistBlock as persistBlockToApi } from './api';
 
 import store from '../';
-import {BlocksState, BlocksContext, Block, BlockUpdate, BlockUpdateBase} from './state';
+import {BlocksState, BlocksContext, Block, BlockUpdateBase} from './state';
 import { State as RootState } from '../state';
 
 import { updateBlock, updateFetching } from './mutations';

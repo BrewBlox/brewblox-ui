@@ -22,6 +22,9 @@ export function post(url: string, data: any): Promise<any> {
     {
       body: JSON.stringify(data),
       method: 'POST',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
     },
   ));
 }
