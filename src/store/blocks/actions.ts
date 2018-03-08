@@ -50,8 +50,10 @@ const actions = {
     // update isLoading
     updateBlock({ ...block, isLoading: true });
 
+    const savedBlock = await persistBlockToApi(block);
+
     // persist block on api
-    updateBlock({ ...await persistBlockToApi(block), isLoading: false });
+    updateBlock({ ...savedBlock, isLoading: false });
   },
 };
 
