@@ -3,7 +3,7 @@ import { getStoreAccessors } from 'vuex-typescript';
 import { fetchBlock, fetchBlocks, persistBlock as persistBlockToApi } from './api';
 
 import store from '../';
-import {BlocksState, BlocksContext, Block, BlockUpdateBase} from './state';
+import { BlocksState, BlocksContext, Block, BlockUpdateBase } from './state';
 import { State as RootState } from '../state';
 
 import { updateBlock, updateFetching } from './mutations';
@@ -57,24 +57,14 @@ const actions = {
   },
 };
 
-export const dispatchFindBlock = dispatch(actions.findBlock);
-export const dispatchListBlocks = dispatch(actions.listBlocks);
-export const dispatchPersistBlock = dispatch(actions.persistBlock);
+// exported action accessors
+export const findBlock =
+  (id: string) => dispatch(actions.findBlock)(store, id);
 
-// actions
-export const findBlock = (id: string) => {
-  dispatchFindBlock(store, id);
-};
+export const listBlocks =
+  () => dispatch(actions.listBlocks)(store);
 
-export const listBlocks = () => {
-  dispatchListBlocks(store);
-};
-
-export const persistBlock = (block: BlockUpdateBase) => {
-  dispatchPersistBlock(store, block);
-};
-
-// mutations
-export { updateBlock };
+export const persistBlock =
+  (block: BlockUpdateBase) => dispatch(actions.persistBlock)(store, block);
 
 export default actions;

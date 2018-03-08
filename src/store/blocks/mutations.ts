@@ -40,16 +40,13 @@ const mutations = {
   },
 };
 
+// exported commit accessors
 export const commitAddBlock = commit(mutations.addBlock);
-export const commitUpdateBlock = commit(mutations.updateBlock);
-export const commitUpdateFetching = commit(mutations.updateFetching);
 
-export const updateBlock = (block: BlockUpdate) => {
-  commitUpdateBlock(store, block);
-};
+export const updateBlock =
+  (block: BlockUpdate) => commit(mutations.updateBlock)(store, block);
 
-export const updateFetching = (fetching: boolean) => {
-  commitUpdateFetching(store, fetching);
-};
+export const updateFetching =
+  (fetching: boolean) => commit(mutations.updateFetching)(store, fetching);
 
 export default mutations;
