@@ -14,7 +14,7 @@ const mutations = {
     state.allIds.push(block.id);
 
     // insert data into blocks object
-    state.byId[block.id] = block;
+    state.byId[block.id] = { ...block, isLoading: false };
   },
   updateBlock(state: BlocksState, block: BlockUpdate) {
     if (!state.byId[block.id]) {
