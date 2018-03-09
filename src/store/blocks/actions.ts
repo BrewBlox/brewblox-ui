@@ -5,7 +5,7 @@ import { fetchBlock, fetchBlocks, persistBlock as persistBlockToApi } from './ap
 import store from '../';
 import { BlocksState, BlocksContext, BlockSaveBase } from './state';
 import { State as RootState } from '../state';
-import addBlock from './add-block';
+import addBlockToStore from './add-block';
 
 import {
   mutateBlock as mutateBlockInStore,
@@ -20,7 +20,7 @@ const actions = {
     const block = await fetchBlock(id);
 
     // add block to store
-    addBlock(block);
+    addBlockToStore(block);
   },
   async listBlocks() {
     // update isFetching
@@ -28,7 +28,7 @@ const actions = {
 
     // will fetch blocks from the server
     const blocks = await fetchBlocks();
-    blocks.forEach(addBlock);
+    blocks.forEach(addBlockToStore);
 
     // update isFetching
     mutateFetchingInStore(false);
