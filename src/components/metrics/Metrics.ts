@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { getMetricsById } from '../../store/blocks/OneWireTempSensor/getters';
+
+import { getById } from '../../store/blocks/OneWireTempSensor/getters';
+import { findBlockWithMetrics } from '../../store/blocks/actions';
 
 @Component({
   props: {
@@ -12,7 +14,21 @@ import { getMetricsById } from '../../store/blocks/OneWireTempSensor/getters';
   },
 })
 export default class Metrics extends Vue {
-  get metrics() {
-    return getMetricsById(this.$props.id);
+  get blockData() {
+    return getById(this.$props.id);
   }
-};
+
+  get metrics() {
+    return this.blockData.metrics;
+  }
+
+  get loading() {
+    return this.blockData.isLoading;
+  }
+
+  created() {
+    if (this.metrics.length === 0) {
+      findBlockWithMetrics(this.$props.id);
+    }
+  }
+}

@@ -1,6 +1,5 @@
 import { allBlocks, blockById } from '../getters';
 
-import { Series } from '../state';
 import { OneWireTempSensorBlock } from './OneWireTempSensor';
 
 export function getById(id: string): OneWireTempSensorBlock {
@@ -12,12 +11,6 @@ export function getById(id: string): OneWireTempSensorBlock {
   }
 
   return block;
-}
-
-export function getMetricsById(id: string): Series[] {
-  const block = getById(id);
-
-  return block.metrics;
 }
 
 export function getAll(): OneWireTempSensorBlock[] {

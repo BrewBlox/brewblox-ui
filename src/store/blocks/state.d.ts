@@ -34,8 +34,14 @@ export interface MetricsBase {
   metrics: Series[];
 }
 
+export interface MetricsResult {
+  id: string;
+  results: Series[];
+}
+
 export type Block = SetPointSimpleBlock | OneWireTempSensorBlock | SensorSetPointPairBlock;
-export type BlockSaveBase = SetPointSimple | OneWireTempSensorUpdate | SensorSetPointPairUpdate;
+export type BlockSaveBase =
+  (BlockBase & MetricsBase) | SetPointSimple | OneWireTempSensorUpdate | SensorSetPointPairUpdate;
 
 export type BlockSave = BlockSaveBase & {
   isLoading: boolean,

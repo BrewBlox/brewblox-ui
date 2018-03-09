@@ -1,10 +1,12 @@
-import { addBlock } from '../mutations';
 import { OneWireTempSensor, OneWireTempSensorUpdate } from './OneWireTempSensor';
+import { addBlock } from '../mutations';
 import { saveBlock } from '../actions';
+import { Series } from '../state';
 
-export const addOneWireTempSensor = ({ id, settings, state }: OneWireTempSensor) => {
-  addBlock({ id, settings, state, metrics: [], type: 'OneWireTempSensor' });
-};
+export const addOneWireTempSensor =
+  ({ id, settings, state }: OneWireTempSensor, metrics: Series[] ) => {
+    addBlock({ id, settings, state, metrics, type: 'OneWireTempSensor' });
+  };
 
 export const persist = async (oneWireTempSensor: OneWireTempSensorUpdate) => {
   try {

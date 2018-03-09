@@ -27,6 +27,13 @@ const mutations = {
       { [block.id]: merge(state.byId[block.id], block) },
     ));
   },
+  blockLoading(state: BlocksState, id: string) {
+    Vue.set(state, 'byId', Object.assign(
+      {},
+      state.byId,
+      { [id]: merge(state.byId[id], { isLoading: true }) },
+    ));
+  },
   mutateFetching(state: BlocksState, fetching: boolean) {
     state.fetching = fetching;
   },
@@ -45,6 +52,9 @@ export const addBlock =
 
 export const mutateBlock =
   (block: BlockSave) => commit(mutations.mutateBlock)(store, block);
+
+export const blockLoading =
+  (id: string) => commit(mutations.blockLoading)(store, id);
 
 export const mutateFetching =
   (fetching: boolean) => commit(mutations.mutateFetching)(store, fetching);
