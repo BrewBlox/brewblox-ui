@@ -1,26 +1,17 @@
-import Vue from 'vue';
-import Component from 'vue-class-component';
+import BlockComponent from '../BlockComponent';
 
 import { getById } from '../../../store/blocks/SensorSetPointPair/getters';
 import {
-  getById as getSetPointSimpleById,
-  getAll as getAllSetPointSimple,
+getById as getSetPointSimpleById,
+getAll as getAllSetPointSimple,
 } from '../../../store/blocks/SetPointSimple/getters';
 import {
-  getById as getOneWireTempSensorById,
-  getAll as getAllOneWireTempSensor,
+getById as getOneWireTempSensorById,
+getAll as getAllOneWireTempSensor,
 } from '../../../store/blocks/OneWireTempSensor/getters';
 import { persist } from '../../../store/blocks/SensorSetPointPair/actions';
 
-@Component({
-  props: {
-    id: {
-      default: '',
-      type: String,
-    },
-  },
-})
-export default class SensorSetPointPair extends Vue {
+export default class SensorSetPointPair extends BlockComponent {
   sensorInput = '';
   setpointInput = '';
 
