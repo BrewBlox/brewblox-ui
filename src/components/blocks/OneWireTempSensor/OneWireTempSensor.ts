@@ -1,8 +1,18 @@
+import Component from 'vue-class-component';
+
 import BlockComponent from '../BlockComponent';
 
 import { getById } from '../../../store/blocks/OneWireTempSensor/getters';
 import { persist } from '../../../store/blocks/OneWireTempSensor/actions';
 
+@Component({
+  props: {
+    id: {
+      default: '',
+      type: String,
+    },
+  },
+})
 export default class OneWireTempSensor extends BlockComponent {
   addressInput = '';
   offsetInput = 0;

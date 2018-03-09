@@ -1,22 +1,11 @@
 import Vue from 'vue';
-import Component from 'vue-class-component';
 
 import { Block } from '../../store/blocks/state';
 
-@Component({
-  props: {
-    id: {
-      default: '',
-      type: String,
-    },
-  },
-})
-export default class BlockComponent extends Vue {
-  get blockData(): Block {
-    throw new Error('Provide own blockData');
-  }
+export default abstract class BlockComponent extends Vue {
+  abstract get blockData(): Block;
 
   get loading(): boolean {
-    return !!this.blockData.isLoading;
+    return Boolean(this.blockData.isLoading);
   }
 }
