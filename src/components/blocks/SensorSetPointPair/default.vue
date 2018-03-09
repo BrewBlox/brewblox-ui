@@ -9,7 +9,7 @@
           icon="check"
           :color="changed ? 'primary' : 'light'"
           :disable="!changed"
-          @click="update"
+          @click="save"
           style="float: right; margin-top: -8px"
         >
           Save

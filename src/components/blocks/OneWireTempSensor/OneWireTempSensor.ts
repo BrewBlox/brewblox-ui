@@ -1,5 +1,6 @@
-import Vue from 'vue';
 import Component from 'vue-class-component';
+
+import BlockComponent from '../BlockComponent';
 
 import { getById } from '../../../store/blocks/OneWireTempSensor/getters';
 import { persist } from '../../../store/blocks/OneWireTempSensor/actions';
@@ -12,7 +13,7 @@ import { persist } from '../../../store/blocks/OneWireTempSensor/actions';
     },
   },
 })
-export default class OneWireTempSensor extends Vue {
+export default class OneWireTempSensor extends BlockComponent {
   addressInput = '';
   offsetInput = 0;
 
@@ -42,7 +43,7 @@ export default class OneWireTempSensor extends Vue {
     this.offsetInput = this.settings.offset;
   }
 
-  update() {
+  save() {
     const settings: { address?: string, offset?: number } = {};
 
     if (this.addressInput !== this.settings.address) {

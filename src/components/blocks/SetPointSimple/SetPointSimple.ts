@@ -1,5 +1,6 @@
-import Vue from 'vue';
 import Component from 'vue-class-component';
+
+import BlockComponent from '../BlockComponent';
 
 import { getById } from '../../../store/blocks/SetPointSimple/getters';
 import { persist } from '../../../store/blocks/SetPointSimple/actions';
@@ -12,7 +13,7 @@ import { persist } from '../../../store/blocks/SetPointSimple/actions';
     },
   },
 })
-export default class SetPointSimple extends Vue {
+export default class SetPointSimple extends BlockComponent {
   valueInput = 0;
 
   get blockData() {
@@ -23,10 +24,6 @@ export default class SetPointSimple extends Vue {
     return this.blockData.settings;
   }
 
-  get loading() {
-    return !!this.blockData.isLoading;
-  }
-
   get changed() {
     return this.settings.value !== this.valueInput;
   }
@@ -35,7 +32,7 @@ export default class SetPointSimple extends Vue {
     this.valueInput = this.settings.value;
   }
 
-  update() {
+  save() {
     persist({
       id: this.$props.id,
       settings: {
