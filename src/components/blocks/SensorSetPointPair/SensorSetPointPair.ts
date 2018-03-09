@@ -63,7 +63,7 @@ export default class SensorSetPointPair extends BlockComponent {
     this.setpointInput = this.setpoint.id;
   }
 
-  update() {
+  save() {
     const links: { sensor?: string, setpoint?: string } = {};
 
     if (this.sensorInput !== this.sensor.id) {

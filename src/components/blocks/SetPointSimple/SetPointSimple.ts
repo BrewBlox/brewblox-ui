@@ -32,7 +32,7 @@ export default class SetPointSimple extends BlockComponent {
     this.valueInput = this.settings.value;
   }
 
-  update() {
+  save() {
     persist({
       id: this.$props.id,
       settings: {
