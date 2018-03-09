@@ -3,7 +3,7 @@
     <q-card-title>OneWireTempSensor ({{ id }})</q-card-title>
 
     <q-card-main>
-      <q-list>
+      <q-list dark>
         <q-btn
           :loading="loading"
           icon="check"
@@ -22,6 +22,7 @@
               v-model="addressInput"
               stack-label="Address"
               placeholder="Address location of sensor"
+              dark
             />
           </q-item-main>
         </q-item>
@@ -32,6 +33,7 @@
               stack-label="Offset"
               placeholder="Offset of sensor"
               type="number"
+              dark
             />
           </q-item-main>
         </q-item>
@@ -41,7 +43,7 @@
     <q-card-separator />
 
     <q-card-main>
-      <q-list>
+      <q-list dark>
         <q-list-header>State</q-list-header>
         <q-item>
           <q-item-main>

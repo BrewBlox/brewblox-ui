@@ -1,0 +1,21 @@
+// This stylesheet contains the dark variablesused for the dark theme
+// It overrides the variables in common.variables.styl
+
+$primary = #1a8aab
+$secondary = #027be3
+$dark = #24333d
+text-color = #fffafa
+
+$body-background = #121a1f
+$body-color = text-color
+
+$layout-aside-background = $dark
+$toolbar-background = $dark
+$item-side-color = text-color
+$item-label-color = text-color
+
+.q-layout-page > *
+  background-color $dark
+
+.router-link-active
+  color $info

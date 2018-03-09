@@ -1,4 +1,4 @@
-const host = '//localhost:8080/api';
+const host = 'api';
 
 function toJson(result: Promise<any>) {
   return result

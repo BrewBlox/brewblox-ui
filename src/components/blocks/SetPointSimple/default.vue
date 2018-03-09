@@ -3,7 +3,7 @@
     <q-card-title>SetPointSimple ({{ id }})</q-card-title>
 
     <q-card-main>
-      <q-list>
+      <q-list dark>
         <q-btn
           :loading="loading"
           icon="check"
@@ -23,6 +23,7 @@
               stack-label="Value"
               placeholder="Value of SetPoint"
               type="number"
+              dark
             />
           </q-item-main>
         </q-item>

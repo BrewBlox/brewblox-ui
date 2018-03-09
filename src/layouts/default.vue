@@ -2,7 +2,6 @@
   <q-layout view="lHh Lpr lFf">
     <q-layout-header>
       <q-toolbar
-        color="primary"
         glossy
       >
         <q-btn
@@ -22,7 +21,6 @@
 
     <q-layout-drawer
       v-model="leftDrawerOpen"
-      content-class="bg-grey-2"
     >
       <q-list
         no-border
