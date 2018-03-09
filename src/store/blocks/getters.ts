@@ -26,8 +26,11 @@ export const allBlocks =
 export const blockIds =
   () => read(getters.blockIds)(store);
 
+const blocksById =
+  () => read(getters.blocksById)(store);
+
 export const blockById =
-  (id: string) => read(getters.blocksById)(store)[id];
+  (id: string) => blocksById()[id];
 
 export const isFetching =
   () => read(getters.isFetching)(store);

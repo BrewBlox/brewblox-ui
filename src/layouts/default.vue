@@ -29,10 +29,13 @@
         link
         inset-delimiter
       >
-        <q-list-header>Essential Links</q-list-header>
         <q-item>
           <q-item-side icon="settings" />
           <router-link to="/blocks">Blocks</router-link>
+        </q-item>
+        <q-item>
+          <q-item-side icon="show chart" />
+          <router-link to="/metrics">Metrics</router-link>
         </q-item>
       </q-list>
     </q-layout-drawer>

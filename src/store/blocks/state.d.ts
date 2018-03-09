@@ -22,6 +22,18 @@ export interface BlockBase {
   isLoading?: boolean;
 }
 
+type Value = string|number[];
+
+interface Series {
+  name: string;
+  columns: string[];
+  values: Value[];
+}
+
+export interface MetricsBase {
+  metrics: Series[];
+}
+
 export type Block = SetPointSimpleBlock | OneWireTempSensorBlock | SensorSetPointPairBlock;
 export type BlockSaveBase = SetPointSimple | OneWireTempSensorUpdate | SensorSetPointPairUpdate;
 
