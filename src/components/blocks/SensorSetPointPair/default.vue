@@ -3,7 +3,7 @@
     <q-card-title>SensorSetPointPair ({{ id }})</q-card-title>
 
     <q-card-main>
-      <q-list dark>
+      <q-list>
         <q-btn
           :loading="loading"
           icon="check"
@@ -23,7 +23,6 @@
               stack-label="Sensor"
               placeholder="Sensor ID"
               :options="allSensors"
-              dark
             />
           </q-item-main>
         </q-item>
@@ -34,7 +33,6 @@
               stack-label="SetPoint"
               placeholder="SetPoint ID"
               :options="allSetPoints"
-              dark
             />
           </q-item-main>
         </q-item>
