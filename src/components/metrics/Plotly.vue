@@ -36,6 +36,14 @@ const eventNames = [
   'Unhover',
 ];
 
+const updateEvents = [
+  'plotly_restyle',
+  'plotly_redraw',
+  'plotly_relayout',
+  'plotly_doubleclick',
+  'plotly_animated',
+];
+
 const isBrowser = typeof window !== 'undefined';
 
 function isNumber(n) {
@@ -78,6 +86,10 @@ export default {
       type: Function,
       default: () => {},
     },
+    onUpdate: {
+      type: Function,
+      default: () => {},
+    },
   },
 
   beforeCreate() {
@@ -95,15 +107,31 @@ export default {
     })
       .then(() => this.syncWindowResize(null, false))
       .then(() => this.syncEventHandlers())
-      // .then(this.attachUpdateEvents)
+      .then(() => this.attachUpdateEvents())
       .then(() => this.$props.onInitialized(this.$refs.plotly))
       .catch((e) => {
-        console.error('Error while plotting:', e);
+        console.error('Error while plotting:', e); // eslint-disable-line no-console
         return this.$props.onError();
       });
   },
 
   methods: {
+    attachUpdateEvents() {
+      if (!this.$refs.plotly || !this.$refs.plotly.removeListener) return;
+
+      updateEvents.forEach((eventName) => {
+        this.$refs.plotly.on(eventName, this.handleUpdate.bind(this));
+      });
+    },
+
+    handleUpdate() {
+      this.handleUpdateWithProps(this.$props);
+    },
+
+    handleUpdateWithProps(props) {
+      props.onUpdate(this.$refs.plotly);
+    },
+
     // Attach and remove event handlers as they're added or removed from props:
     syncEventHandlers(propsIn) {
       // Allow use of nextProps if passed explicitly:
