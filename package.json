@@ -5,7 +5,7 @@
   "productName": "BrewBlox",
   "cordovaId": "org.cordova.quasar.app",
   "author": "BrewPi B.V.",
-  "private": true,
+  "private": false,
   "scripts": {
     "eslint": "eslint --ext .js,.vue src",
     "tslint": "tslint -c tslint.json 'src/**/*.ts'",
@@ -13,8 +13,6 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
-    "@types/lodash": "^4.14.104",
-    "@types/plotly.js": "^1.28.12",
     "lodash": "^4.17.5",
     "plotly.js": "^1.35.1",
     "vue-class-component": "^6.2.0",
@@ -23,6 +21,8 @@
   },
   "devDependencies": {
     "@types/core-js": "^0.9.46",
+    "@types/lodash": "^4.14.104",
+    "@types/plotly.js": "^1.28.12",
     "babel-eslint": "8.2.1",
     "babel-plugin-transform-decorators": "^6.24.1",
     "connect-api-mocker": "^1.3.6",
