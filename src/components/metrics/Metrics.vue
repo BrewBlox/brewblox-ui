@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 600px; height: 400px">
+  <div style="width: 50%; height: 400px">
     <q-inner-loading :visible="loading">
       <q-spinner
         size="50px"
