@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import Plotly from 'vue-plotly.js';
+import VuePlotly from 'vue-plotly.js';
 
 import { getById } from '../../store/blocks/OneWireTempSensor/getters';
 import { findBlockWithMetrics } from '../../store/blocks/actions';
@@ -13,7 +13,7 @@ import { findBlockWithMetrics } from '../../store/blocks/actions';
     },
   },
   components: {
-    Plotly,
+    Plotly: VuePlotly,
   },
 })
 export default class Metrics extends Vue {
