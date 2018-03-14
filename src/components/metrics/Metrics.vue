@@ -7,9 +7,9 @@
       />
     </q-inner-loading>
 
-    <div id="plotly">&nbsp;</div>
 
     <template v-if="!loading">
+      <Plotly />
       {{ metrics[0].series[0].columns }}
     </template>
   </div>

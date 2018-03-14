@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import * as Plotly from 'plotly.js';
+
+import Plotly from './plotly.vue';
 
 import { getById } from '../../store/blocks/OneWireTempSensor/getters';
 import { findBlockWithMetrics } from '../../store/blocks/actions';
@@ -12,10 +13,11 @@ import { findBlockWithMetrics } from '../../store/blocks/actions';
       type: String,
     },
   },
+  components: {
+    Plotly,
+  },
 })
 export default class Metrics extends Vue {
-  plotly: any;
-
   get blockData() {
     return getById(this.$props.id);
   }
@@ -32,16 +34,5 @@ export default class Metrics extends Vue {
     if (this.metrics.length === 0) {
       findBlockWithMetrics(this.$props.id);
     }
-  }
-
-  mounted() {
-    const layout = {
-      width: 500,
-      height: 500,
-    };
-
-    const data = [];
-
-    this.plotly = Plotly.newPlot('plotly', [], layout);
   }
 }
