@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
-
-import Plotly from './plotly.vue';
+import Plotly from 'vue-plotly.js';
 
 import { getById } from '../../store/blocks/OneWireTempSensor/getters';
 import { findBlockWithMetrics } from '../../store/blocks/actions';
@@ -50,12 +49,17 @@ export default class Metrics extends Vue {
   }
 
   updateData() {
-    this.$set(this.plotly, 'data', [
-      {
-        type: 'bar',
-        x: [1, 2, 3],
-        y: [3, 3, 7],
+    setInterval(
+      () => {
+        this.$set(this.plotly, 'data', [
+          {
+            type: 'bar',
+            x: [...this.plotly.data[0].x, this.plotly.data[0].x.length + 1],
+            y: [...this.plotly.data[0].y, Math.floor(Math.random() * Math.floor(10))],
+          },
+        ]);
       },
-    ]);
+      10,
+    );
   }
 }

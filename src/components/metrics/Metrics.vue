@@ -15,7 +15,7 @@
         fit
       />
 
-      <button @click="updateData">Update data</button>
+      <button @click="updateData">auto update</button>
     </template>
   </div>
 </template>
