@@ -5,6 +5,37 @@
 <script>
 const Plotly = require('plotly.js');
 
+// The naming convention is:
+//   - events are attached as `'plotly_' + eventName.toLowerCase()`
+//   - vue props are `'on' + eventName`
+const eventNames = [
+  'AfterExport',
+  'AfterPlot',
+  'Animated',
+  'AnimatingFrame',
+  'AnimationInterrupted',
+  'AutoSize',
+  'BeforeExport',
+  'ButtonClicked',
+  'Click',
+  'ClickAnnotation',
+  'Deselect',
+  'DoubleClick',
+  'Framework',
+  'Hover',
+  'Relayout',
+  'Restyle',
+  'Redraw',
+  'Selected',
+  'Selecting',
+  'SliderChange',
+  'SliderEnd',
+  'SliderStart',
+  'Transitioning',
+  'TransitionInterrupted',
+  'Unhover',
+];
+
 const isBrowser = typeof window !== 'undefined';
 
 function isNumber(n) {
@@ -15,6 +46,7 @@ export default {
   name: 'Plotly',
   fitHandler: null,
   resizeHandler: null,
+  handlers: {},
 
   props: {
     fit: {
@@ -59,7 +91,7 @@ export default {
       frames: this.frames,
     })
       .then(() => this.syncWindowResize(null, false))
-      // .then(this.syncEventHandlers)
+      .then(() => this.syncEventHandlers())
       // .then(this.attachUpdateEvents)
       .then(() => this.$props.onInitialized(this.$refs.plotly))
       .catch((e) => {
@@ -69,6 +101,32 @@ export default {
   },
 
   methods: {
+    // Attach and remove event handlers as they're added or removed from props:
+    syncEventHandlers(propsIn) {
+      // Allow use of nextProps if passed explicitly:
+      const props = propsIn || this.$props;
+
+      eventNames.forEach((eventName) => {
+        const prop = props[`on${eventName}`];
+        const hasHandler = !!this.handlers[eventName];
+
+        if (prop && !hasHandler) {
+          this.handlers[eventName] = prop;
+          this.$refs.plotly.on(
+            `plotly_${eventName.toLowerCase()}`,
+            this.handlers[eventName],
+          );
+        } else if (!prop && hasHandler) {
+          // Needs to be removed:
+          this.$refs.plotly.removeListener(
+            `plotly_${eventName.toLowerCase()}`,
+            this.handlers[eventName],
+          );
+          delete this.handlers[eventName];
+        }
+      });
+    },
+
     syncWindowResize(propsIn, invoke) {
       const props = propsIn || this.$props;
       if (!isBrowser) return;
