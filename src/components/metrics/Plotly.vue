@@ -78,6 +78,10 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    revision: {
+      type: Number,
+      default: () => undefined,
+    },
     onError: {
       type: Function,
       default: () => {},
@@ -94,6 +98,14 @@ export default {
       type: Function,
       default: () => {},
     },
+  },
+
+  watch: {
+    revision() { this.handlePropsUpdate(); },
+    data() { this.handlePropsUpdate(); },
+    layout() { this.handlePropsUpdate(); },
+    config() { this.handlePropsUpdate(); },
+    frames() { this.handlePropsUpdate(); },
   },
 
   beforeCreate() {
@@ -123,6 +135,14 @@ export default {
       });
   },
 
+  beforeUpdate() {
+    debugger;
+  },
+
+  updated() {
+    debugger;
+  },
+
   beforeDestroy() {
     this.$props.onPurge(this.$refs.plotly);
 
@@ -141,6 +161,25 @@ export default {
   },
 
   methods: {
+    handlePropsUpdate() {
+      this.handlers = {};
+
+      Plotly.newPlot(this.$refs.plotly, {
+        data: this.data,
+        layout: this.resizedLayoutIfFit(this.layout),
+        config: this.config,
+        frames: this.frames,
+      })
+        .then(() => this.syncEventHandlers())
+        .then(() => this.syncWindowResize())
+        .then(() => this.attachUpdateEvents())
+        .then(() => this.handleUpdateWithProps(this.$props))
+        .catch((e) => {
+          console.error('Error while plotting:', e); // eslint-disable-line no-console
+          return this.$props.onError();
+        });
+    },
+
     removeUpdateEvents() {
       if (!this.$refs.plotly || !this.$refs.plotly.removeListener) return;
 

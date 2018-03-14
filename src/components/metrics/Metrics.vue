@@ -14,6 +14,8 @@
         :layout="plotly.layout"
         fit
       />
+
+      <button @click="updateData">Update data</button>
     </template>
   </div>
 </template>

@@ -21,13 +21,6 @@ export default class Metrics extends Vue {
   plotly = {
     data: [
       {
-        type: 'scatter',
-        mode: 'lines+points',
-        x: [1, 2, 3],
-        y: [2, 6, 3],
-        marker: { color: 'red' },
-      },
-      {
         type: 'bar',
         x: [1, 2, 3],
         y: [2, 5, 3],
@@ -54,5 +47,15 @@ export default class Metrics extends Vue {
     if (this.metrics.length === 0) {
       findBlockWithMetrics(this.$props.id);
     }
+  }
+
+  updateData() {
+    this.$set(this.plotly, 'data', [
+      {
+        type: 'bar',
+        x: [1, 2, 3],
+        y: [3, 3, 7],
+      },
+    ]);
   }
 }
