@@ -34,8 +34,6 @@ export default class Metrics extends Vue {
       },
     ],
     layout: {
-      width: 320,
-      height: 240,
       title: 'A Fancy Plot',
     },
   };
