@@ -90,12 +90,20 @@ export default {
       type: Function,
       default: () => {},
     },
+    onPurge: {
+      type: Function,
+      default: () => {},
+    },
   },
 
   beforeCreate() {
     this.fitHandler = null;
     this.resizeHandler = null;
     this.handlers = {};
+  },
+
+  created() {
+    this.handleUpdate = this.handleUpdate.bind(this);
   },
 
   mounted() {
@@ -115,12 +123,37 @@ export default {
       });
   },
 
+  beforeDestroy() {
+    this.$props.onPurge(this.$refs.plotly);
+
+    if (this.fitHandler && isBrowser) {
+      window.removeEventListener('resize', this.fitHandler);
+      this.fitHandler = null;
+    }
+    if (this.resizeHandler && isBrowser) {
+      window.removeEventListener('resize', this.resizeHandler);
+      this.resizeHandler = null;
+    }
+
+    this.removeUpdateEvents();
+
+    Plotly.purge(this.$refs.plotly);
+  },
+
   methods: {
+    removeUpdateEvents() {
+      if (!this.$refs.plotly || !this.$refs.plotly.removeListener) return;
+
+      updateEvents.forEach((eventName) => {
+        this.$refs.plotly.removeListener(eventName, this.handleUpdate);
+      });
+    },
+
     attachUpdateEvents() {
       if (!this.$refs.plotly || !this.$refs.plotly.removeListener) return;
 
       updateEvents.forEach((eventName) => {
-        this.$refs.plotly.on(eventName, this.handleUpdate.bind(this));
+        this.$refs.plotly.on(eventName, this.handleUpdate);
       });
     },
 
