@@ -41,6 +41,14 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    onError: {
+      type: Function,
+      default: () => {},
+    },
+    onInitialized: {
+      type: Function,
+      default: () => {},
+    },
   },
 
   mounted() {
@@ -53,10 +61,10 @@ export default {
       .then(() => this.syncWindowResize(null, false))
       // .then(this.syncEventHandlers)
       // .then(this.attachUpdateEvents)
-      // .then(() => this.props.onInitialized && this.props.onInitialized(this.el))
+      .then(() => this.$props.onInitialized(this.$refs.plotly))
       .catch((e) => {
         console.error('Error while plotting:', e);
-        return this.props.onError && this.props.onError();
+        return this.$props.onError();
       });
   },
 
