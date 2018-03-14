@@ -44,9 +44,6 @@ function isNumber(n) {
 
 export default {
   name: 'Plotly',
-  fitHandler: null,
-  resizeHandler: null,
-  handlers: {},
 
   props: {
     fit: {
@@ -81,6 +78,12 @@ export default {
       type: Function,
       default: () => {},
     },
+  },
+
+  beforeCreate() {
+    this.fitHandler = null;
+    this.resizeHandler = null;
+    this.handlers = {};
   },
 
   mounted() {
