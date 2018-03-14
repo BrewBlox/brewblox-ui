@@ -9,7 +9,10 @@
 
 
     <template v-if="!loading">
-      <Plotly />
+      <Plotly
+        :data="plotly.data"
+        :layout="plotly.layout"
+      />
     </template>
   </div>
 </template>

@@ -1,30 +1,30 @@
 <template>
-  <div :id="plotlyId">&nbsp;</div>
+  <div ref="plotly" />
 </template>
 
 <script>
 const Plotly = require('plotly.js');
-const shortid = require('shortid');
 
 export default {
   name: 'Plotly',
   plotly: null,
 
-  data() {
-    return {
-      plotlyId: shortid.generate(),
-    };
+  props: {
+    data: {
+      type: Array,
+      default: () => [],
+    },
+    layout: {
+      type: Object,
+      default: () => ({}),
+    },
   },
 
   mounted() {
-    const layout = {
-      width: 500,
-      height: 500,
-    };
-
-    const data = [];
-
-    this.plotly = Plotly.newPlot(this.plotlyId, [], layout);
+    this.plotly = Plotly.newPlot(this.$refs.plotly, {
+      data: this.data,
+      layout: this.layout,
+    });
   },
 };
 </script>
