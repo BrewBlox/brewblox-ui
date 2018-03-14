@@ -1,5 +1,9 @@
 <template>
-  <div ref="plotly" />
+  <div
+    :id="id"
+    :class="className"
+    ref="plotly"
+  />
 </template>
 
 <script>
@@ -82,6 +86,14 @@ export default {
       type: Number,
       default: () => undefined,
     },
+    className: {
+      type: String,
+      default: () => undefined,
+    },
+    id: {
+      type: String,
+      default: () => undefined,
+    },
     onError: {
       type: Function,
       default: () => {},
@@ -101,11 +113,11 @@ export default {
   },
 
   watch: {
-    revision() { this.handlePropsUpdate(); },
-    data() { this.handlePropsUpdate(); },
-    layout() { this.handlePropsUpdate(); },
     config() { this.handlePropsUpdate(); },
+    data() { this.handlePropsUpdate(); },
     frames() { this.handlePropsUpdate(); },
+    layout() { this.handlePropsUpdate(); },
+    revision() { this.handlePropsUpdate(); },
   },
 
   beforeCreate() {
@@ -133,14 +145,6 @@ export default {
         console.error('Error while plotting:', e); // eslint-disable-line no-console
         return this.$props.onError();
       });
-  },
-
-  beforeUpdate() {
-    debugger;
-  },
-
-  updated() {
-    debugger;
   },
 
   beforeDestroy() {
@@ -287,7 +291,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-
-</style>
