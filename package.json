@@ -15,7 +15,6 @@
   "dependencies": {
     "lodash": "^4.17.5",
     "plotly.js": "^1.35.1",
-    "shortid": "^2.2.8",
     "vue-class-component": "^6.2.0",
     "vue-i18n": "^7.3.3",
     "vuex-typescript": "^3.0.2"
