@@ -1,13 +1,20 @@
 <template>
-  <div id="plotly">&nbsp;</div>
+  <div :id="plotlyId">&nbsp;</div>
 </template>
 
 <script>
-import * as Plotly from 'plotly.js';
+const Plotly = require('plotly.js');
+const shortid = require('shortid');
 
 export default {
   name: 'Plotly',
   plotly: null,
+
+  data() {
+    return {
+      plotlyId: shortid.generate(),
+    };
+  },
 
   mounted() {
     const layout = {
@@ -17,7 +24,7 @@ export default {
 
     const data = [];
 
-    this.plotly = Plotly.newPlot('plotly', [], layout);
+    this.plotly = Plotly.newPlot(this.plotlyId, [], layout);
   },
 };
 </script>
