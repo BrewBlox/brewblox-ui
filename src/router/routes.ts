@@ -6,6 +6,7 @@ export default [
       { path: '', component: () => import('pages/index.vue') },
       { path: '/blocks', component: () => import('pages/blocks.vue') },
       { path: '/metrics', component: () => import('pages/metrics.vue') },
+      { path: '/grid', component: () => import('pages/grid.vue') },
     ],
   },
 

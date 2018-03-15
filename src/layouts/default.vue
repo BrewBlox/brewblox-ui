@@ -41,6 +41,14 @@
           <q-item-side icon="show chart" />
           Metrics
         </q-item>
+
+        <q-item
+          link
+          to="/grid"
+        >
+          <q-item-side icon="grid on" />
+          Grid
+        </q-item>
       </q-list>
     </q-layout-drawer>
 
