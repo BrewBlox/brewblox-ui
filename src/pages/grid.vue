@@ -54,7 +54,7 @@ export default {
 </script>
 
 <style scoped lang="stylus">
-@import '../css/themes/dark.variables.styl';
+@import '../css/app.styl';
 
 .item {
   background: $block-background;
