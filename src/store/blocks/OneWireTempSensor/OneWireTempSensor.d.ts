@@ -1,6 +1,6 @@
-import { BlockBase } from '../state';
+import { BlockBase, MetricsBase } from '../state';
 
-export interface OneWireTempSensor extends BlockBase {
+export interface OneWireTempSensor extends BlockBase, MetricsBase {
   settings: {
     address: string,
     offset: number,
