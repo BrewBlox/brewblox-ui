@@ -19,14 +19,17 @@ const getters = {
   },
 };
 
-const readIsFetching = read(getters.isFetching);
-const readAllBlocks = read(getters.allBlocks);
-const readBlockIds = read(getters.blockIds);
-const readBlocksById = read(getters.blocksById);
+// exported getter accessors
+export const allBlocks =
+  () => read(getters.allBlocks)(store);
 
-export const allBlocks = () => readAllBlocks(store);
-export const blockIds = () => readBlockIds(store);
-export const blockById = (id: string) => readBlocksById(store)[id];
-export const isFetching = () => readIsFetching(store);
+export const blockIds =
+  () => read(getters.blockIds)(store);
+
+export const blockById =
+  (id: string) => read(getters.blocksById)(store)[id];
+
+export const isFetching =
+  () => read(getters.isFetching)(store);
 
 export default getters;

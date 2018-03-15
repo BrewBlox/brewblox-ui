@@ -1,13 +1,16 @@
-import { persistBlock } from '../actions';
-import store from '../../';
+import { saveBlock } from '../actions';
 
-import { commitAddBlock } from '../mutations';
+import { addBlock } from '../mutations';
 import { SensorSetPointPair, SensorSetPointPairUpdate } from './SensorSetPointPair';
 
 export const addSensorSetPointPair = ({ id, links }: SensorSetPointPair) => {
-  commitAddBlock(store, { id, links, type: 'SensorSetPointPair' });
+  addBlock({ id, links, type: 'SensorSetPointPair' });
 };
 
-export const persist = (sensorSetPointPair: SensorSetPointPairUpdate) => {
-  persistBlock(sensorSetPointPair);
+export const persist = async (sensorSetPointPair: SensorSetPointPairUpdate) => {
+  try {
+    await saveBlock(sensorSetPointPair);
+  } catch (e) {
+    throw new Error(e);
+  }
 };

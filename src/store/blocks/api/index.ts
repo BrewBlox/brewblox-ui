@@ -1,4 +1,4 @@
-import { Block, BlockUpdateBase } from '../state';
+import { Block, BlockSaveBase } from '../state';
 
 import { get, post } from './fetch';
 
@@ -10,6 +10,6 @@ export function fetchBlocks(): Promise<Block[]> {
   return get('/blocks/list');
 }
 
-export function persistBlock(block: BlockUpdateBase): Promise<BlockUpdateBase> {
+export function persistBlock(block: BlockSaveBase): Promise<BlockSaveBase> {
   return post(`/blocks/${encodeURIComponent(block.id)}`, block);
 }

@@ -2,8 +2,7 @@ import Vue from 'vue';
 import { getStoreAccessors } from 'vuex-typescript';
 import { merge } from 'lodash';
 
-// import { commit } from './';
-import { Block, BlocksState, BlockUpdate } from './state';
+import { Block, BlocksState, BlockSave } from './state';
 import { State as RootState } from '../state';
 import store from '../index';
 
@@ -15,9 +14,9 @@ const mutations = {
     state.allIds.push(block.id);
 
     // insert data into blocks object
-    state.byId[block.id] = block;
+    state.byId[block.id] = { ...block, isLoading: false };
   },
-  updateBlock(state: BlocksState, block: BlockUpdate) {
+  mutateBlock(state: BlocksState, block: BlockSave) {
     if (!state.byId[block.id]) {
       throw new Error(`Block with id '${block.id}' does not exist`);
     }
@@ -28,6 +27,9 @@ const mutations = {
       { [block.id]: merge(state.byId[block.id], block) },
     ));
   },
+  mutateFetching(state: BlocksState, fetching: boolean) {
+    state.fetching = fetching;
+  },
   removeBlock(state: BlocksState, id: string) {
     // delete from blocks listing
     Vue.delete(state.allIds, state.allIds.findIndex(block => block === id));
@@ -35,21 +37,16 @@ const mutations = {
     // delete from data
     delete state.byId[id];
   },
-  updateFetching(state: BlocksState, fetching: boolean) {
-    state.fetching = fetching;
-  },
 };
 
-export const commitAddBlock = commit(mutations.addBlock);
-export const commitUpdateBlock = commit(mutations.updateBlock);
-export const commitUpdateFetching = commit(mutations.updateFetching);
+// exported commit accessors
+export const addBlock =
+  (block: Block) => commit(mutations.addBlock)(store, block);
 
-export const updateBlock = (block: BlockUpdate) => {
-  commitUpdateBlock(store, block);
-};
+export const mutateBlock =
+  (block: BlockSave) => commit(mutations.mutateBlock)(store, block);
 
-export const updateFetching = (fetching: boolean) => {
-  commitUpdateFetching(store, fetching);
-};
+export const mutateFetching =
+  (fetching: boolean) => commit(mutations.mutateFetching)(store, fetching);
 
 export default mutations;

@@ -1,5 +1,6 @@
-import Vue from 'vue';
 import Component from 'vue-class-component';
+
+import BlockComponent from '../BlockComponent';
 
 import { getById } from '../../../store/blocks/SensorSetPointPair/getters';
 import {
@@ -20,7 +21,7 @@ import { persist } from '../../../store/blocks/SensorSetPointPair/actions';
     },
   },
 })
-export default class SensorSetPointPair extends Vue {
+export default class SensorSetPointPair extends BlockComponent {
   sensorInput = '';
   setpointInput = '';
 
@@ -62,7 +63,7 @@ export default class SensorSetPointPair extends Vue {
     this.setpointInput = this.setpoint.id;
   }
 
-  update() {
+  save() {
     const links: { sensor?: string, setpoint?: string } = {};
 
     if (this.sensorInput !== this.sensor.id) {

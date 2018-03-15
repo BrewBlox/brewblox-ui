@@ -1,13 +1,15 @@
-import store from '../../';
-
-import { commitAddBlock } from '../mutations';
+import { addBlock } from '../mutations';
 import { OneWireTempSensor, OneWireTempSensorUpdate } from './OneWireTempSensor';
-import { persistBlock } from '../actions';
+import { saveBlock } from '../actions';
 
 export const addOneWireTempSensor = ({ id, settings, state }: OneWireTempSensor) => {
-  commitAddBlock(store, { id, settings, state, type: 'OneWireTempSensor', isLoading: false });
+  addBlock({ id, settings, state, type: 'OneWireTempSensor' });
 };
 
-export const persist = (oneWireTempSensor: OneWireTempSensorUpdate) => {
-  persistBlock(oneWireTempSensor);
+export const persist = async (oneWireTempSensor: OneWireTempSensorUpdate) => {
+  try {
+    await saveBlock(oneWireTempSensor);
+  } catch (e) {
+    throw new Error(e);
+  }
 };
