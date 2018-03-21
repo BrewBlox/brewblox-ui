@@ -10,10 +10,18 @@
       class="grid-item-drag-overlay"
       :style="dragStyle"
       ref="dragOverlay"
-    />
+    >
+      <div class="grid-item-handle">
+        <q-icon
+          name="drag handle"
+          size="18px"
+        />
+      </div>
+    </div>
     <button
       class="grid-item-handle"
       @mousedown="startResize"
+      v-if="!dragging"
     >
       <q-icon
         name="drag handle"
@@ -50,7 +58,7 @@
 }
 
 .grid-item-drag-overlay {
-  background: rgba(255, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.2);
   top: 0;
   bottom: 0;
   position: absolute;

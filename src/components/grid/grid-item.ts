@@ -1,6 +1,9 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
+const GRID_SIZE = 100;
+const GAP_SIZE = 20;
+
 @Component({
   props: {
     cols: {
@@ -19,13 +22,23 @@ export default class GridItem extends Vue {
   startY: number = 0;
   dragWidth: number = 0;
   dragHeight: number = 0;
+  dragStartWidth: number = 0;
+  dragStartHeight: number = 0;
+  currentCols: number = 0;
+  currentRows: number = 0;
+
+  data() {
+    // update initial values
+    return {
+      currentCols: parseInt(this.$props.cols, 10),
+      currentRows: parseInt(this.$props.rows, 10),
+    };
+  }
 
   get style(): string {
-    const { cols, rows } = this.$props;
-
     return `
-      grid-column-end: span ${parseInt(cols, 10)};
-      grid-row-end: span ${parseInt(rows, 10)};
+      grid-column-end: span ${this.currentCols};
+      grid-row-end: span ${this.currentRows};
     `;
   }
 
@@ -38,13 +51,28 @@ export default class GridItem extends Vue {
 
   onMove(e: MouseEvent) {
     if (this.$refs.container instanceof Element) {
-      const delta = { x: e.screenX - this.startX, y: e.screenY - this.startY };
+      const delta = { x: e.pageX - this.startX, y: e.pageY - this.startY };
 
-      const { width, height } = this.$refs.container.getBoundingClientRect();
+      this.dragWidth = this.dragStartWidth + delta.x;
+      this.dragHeight = this.dragStartHeight + delta.y;
 
-      this.dragWidth = width + delta.x;
-      this.dragHeight = height + delta.y;
+      this.updateSize();
     }
+  }
+
+  updateSize() {
+    const gridWidth = Math.round((this.dragWidth + GAP_SIZE) / (GRID_SIZE + GAP_SIZE));
+    const gridHeight = Math.round((this.dragHeight + GAP_SIZE) / (GRID_SIZE + GAP_SIZE));
+
+    if (gridWidth !== this.currentCols) {
+      this.currentCols = gridWidth;
+    }
+
+    if (gridHeight !== this.currentRows) {
+      this.currentRows = gridHeight;
+    }
+
+    // @TODO: if changed: communicate to grid container
   }
 
   startResize(e: MouseEvent) {
@@ -54,14 +82,17 @@ export default class GridItem extends Vue {
 
     this.dragging = true;
 
-    this.startX = e.screenX;
-    this.startY = e.screenY;
+    this.startX = e.pageX;
+    this.startY = e.pageY;
 
     if (this.$refs.container instanceof Element) {
       const { width, height } = this.$refs.container.getBoundingClientRect();
 
       this.dragWidth = width;
       this.dragHeight = height;
+
+      this.dragStartWidth = width;
+      this.dragStartHeight = height;
     }
   }
 
