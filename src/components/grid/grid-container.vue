@@ -4,7 +4,7 @@
       <slot />
     </div>
     <div
-      v-if="false"
+      v-if="interaction"
       class="grid-container-overlay"
     >
       <div class="grid-container-overlay-grid" />
@@ -12,11 +12,7 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'GridContainer',
-};
-</script>
+<script lang="ts" src="./grid-container.ts" />
 
 <style scoped>
 .grid-container {
@@ -51,7 +47,7 @@ export default {
   grid-column-start: 1;
   grid-column-end: -1;
   grid-row-start: 1;
-  grid-row-end: -1;
+  grid-row-end: -1 span;
   opacity: 0.03;
 }
 </style>

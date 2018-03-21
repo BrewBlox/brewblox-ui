@@ -26,6 +26,7 @@ export default class GridItem extends Vue {
   dragStartHeight: number = 0;
   currentCols: number = 0;
   currentRows: number = 0;
+  $parent: any;
 
   data() {
     // update initial values
@@ -47,6 +48,18 @@ export default class GridItem extends Vue {
       width: ${this.dragWidth}px;
       height: ${this.dragHeight}px;
     `;
+  }
+
+  startInteraction() {
+    if (this.$parent.startInteraction) {
+      this.$parent.startInteraction();
+    }
+  }
+
+  stopInteraction() {
+    if (this.$parent.stopInteraction) {
+      this.$parent.stopInteraction();
+    }
   }
 
   onMove(e: MouseEvent) {
@@ -94,6 +107,8 @@ export default class GridItem extends Vue {
       this.dragStartWidth = width;
       this.dragStartHeight = height;
     }
+
+    this.startInteraction();
   }
 
   stopResize() {
@@ -102,5 +117,7 @@ export default class GridItem extends Vue {
     window.removeEventListener('mousemove', this.onMove);
 
     this.dragging = false;
+
+    this.stopInteraction();
   }
 }
