@@ -6,35 +6,35 @@
         cols=4
         rows=3
       >
-        1
+        <strong>1</strong>
       </grid-item>
       <grid-item
         class="item"
         cols=3
         rows=3
       >
-        2
+        <strong>2</strong>
       </grid-item>
       <grid-item
         class="item"
         cols=2
         rows=4
       >
-        3
+        <strong>3</strong>
       </grid-item>
       <grid-item
         class="item"
         cols=2
         rows=2
       >
-        4
+        <strong>4</strong>
       </grid-item>
       <grid-item
         class="item"
         cols=4
         rows=2
       >
-        5
+        <strong>5</strong>
       </grid-item>
     </grid-container>
   </q-page>
@@ -58,5 +58,14 @@ export default {
 
 .item {
   background: $block-background;
+}
+
+strong {
+  display: flex;
+  align-items center;
+  justify-content center;
+  height: 100%;
+  width: 100%;
+  font-size: 30pt;
 }
 </style>

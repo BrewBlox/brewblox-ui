@@ -6,12 +6,15 @@
   >
     <slot />
     <div
-      v-if="dragging"
+      v-if="dragging || moving"
       class="grid-item-drag-overlay"
       :style="dragStyle"
       ref="dragOverlay"
     >
-      <div class="grid-item-resize-handle">
+      <div
+        v-if="!moving"
+        class="grid-item-resize-handle"
+      >
         <q-icon
           name="drag handle"
           size="18px"
@@ -21,7 +24,7 @@
     <button
       class="grid-item-resize-handle"
       @mousedown="startResize"
-      v-if="!dragging"
+      v-if="!dragging && !moving"
     >
       <q-icon
         name="drag handle"
@@ -54,7 +57,6 @@
   height: 20px;
   background: transparent;
   position: absolute;
-  right: 0;
   padding: 0;
   display: flex;
   align-items: center;
@@ -62,16 +64,17 @@
   color: #fff;
   outline: none;
   z-index: 2;
+  bottom: 0;
 }
 
 .grid-item-resize-handle {
   transform: rotate(-45deg);
   cursor: nwse-resize;
-  bottom: 0;
+  right: 0;
 }
 
 .grid-item-move-handle {
-  top: 0;
+  left: 0;
   cursor: move;
 }
 

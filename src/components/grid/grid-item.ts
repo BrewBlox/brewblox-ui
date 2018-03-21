@@ -223,6 +223,8 @@ export default class GridItem extends Vue {
 
     this.moving = false;
 
+    // @TODO calc new order of items
+
     this.currentStartCols = null;
     this.currentStartRows = null;
 
