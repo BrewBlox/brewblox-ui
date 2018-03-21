@@ -1,55 +1,31 @@
 <template>
   <q-page padding>
     <grid-container>
-      <grid-item
+      <strong
         class="item"
-        cols=4
-        rows=3
+        cols="3"
+        rows="2"
       >
-        <strong>1</strong>
-      </grid-item>
-      <grid-item
+        1
+      </strong>
+
+      <strong
         class="item"
-        cols=3
-        rows=3
+        cols="2"
+        rows="5"
       >
-        <strong>2</strong>
-      </grid-item>
-      <grid-item
-        class="item"
-        cols=2
-        rows=4
-      >
-        <strong>3</strong>
-      </grid-item>
-      <grid-item
-        class="item"
-        cols=2
-        rows=2
-      >
-        <strong>4</strong>
-      </grid-item>
-      <grid-item
-        class="item"
-        cols=4
-        rows=2
-      >
-        <strong>5</strong>
-      </grid-item>
+        2
+      </strong>
     </grid-container>
   </q-page>
 </template>
 
 <script>
 import GridContainer from '../components/grid/grid-container';
-import GridItem from '../components/grid/grid-item';
 
 export default {
   name: 'Grid',
-  components: {
-    GridContainer,
-    GridItem,
-  },
+  components: { GridContainer },
 };
 </script>
 

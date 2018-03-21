@@ -1,17 +1,3 @@
-<template>
-  <div class="grid-container">
-    <div class="grid-main-container">
-      <slot />
-    </div>
-    <div
-      v-if="interaction"
-      class="grid-container-overlay"
-    >
-      <div class="grid-container-overlay-grid" />
-    </div>
-  </div>
-</template>
-
 <script lang="ts" src="./grid-container.ts" />
 
 <style scoped>
