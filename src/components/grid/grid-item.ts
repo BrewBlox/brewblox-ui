@@ -69,7 +69,7 @@ export default class GridItem extends Vue {
     `;
   }
 
-  startInteraction(e: MouseEvent) {
+  startInteraction(e: MouseEvent | TouchEvent) {
     this.setMouseStartPosition(e);
 
     // set initial values of item
@@ -110,7 +110,7 @@ export default class GridItem extends Vue {
     }
   }
 
-  onResizeMove(e: MouseEvent) {
+  onResizeMove(e: MouseEvent | TouchEvent) {
     const delta = this.moveDelta(e);
 
     this.dragWidth = this.dragStartWidth + delta.x;
@@ -132,13 +132,28 @@ export default class GridItem extends Vue {
     }
   }
 
-  setMouseStartPosition(e: MouseEvent) {
-    this.startX = e.pageX;
-    this.startY = e.pageY;
+  setMouseStartPosition(e: MouseEvent | TouchEvent) {
+    if (e instanceof MouseEvent) {
+      this.startX = e.pageX;
+      this.startY = e.pageY;
+    }
+
+    if (e instanceof TouchEvent) {
+      this.startX = e.touches[0].pageX;
+      this.startY = e.touches[0].pageY;
+    }
   }
 
-  moveDelta(e: MouseEvent): Coordinates {
-    return { x: e.pageX - this.startX, y: e.pageY - this.startY };
+  moveDelta(e: MouseEvent | TouchEvent): Coordinates {
+    if (e instanceof MouseEvent) {
+      return { x: e.pageX - this.startX, y: e.pageY - this.startY };
+    }
+
+    if (e instanceof TouchEvent) {
+      return { x: e.touches[0].pageX, y: e.touches[0].pageY };
+    }
+
+    throw new Error('Not a valid event');
   }
 
   containerParentSize(): DOMRect {
@@ -174,7 +189,7 @@ export default class GridItem extends Vue {
     throw new Error('Container is not a valid Element');
   }
 
-  startResize(e: MouseEvent) {
+  startResize(e: MouseEvent | TouchEvent) {
     // bind mouseup on drag end
     window.addEventListener('mouseup', this.stopResize);
     window.addEventListener('mousemove', this.onResizeMove);
@@ -200,8 +215,6 @@ export default class GridItem extends Vue {
     this.stopInteraction();
   }
 
-
-
   gridPosition(delta: Coordinates = { x: 0, y: 0 }): { x: number, y: number } {
     if (!this.dragStartX || !this.dragStartY || !this.dragStartParentX || !this.dragStartParentY) {
       throw new Error('No starting drag positions know');
@@ -226,7 +239,7 @@ export default class GridItem extends Vue {
     this.currentStartRows = position.y;
   }
 
-  startDrag(e: MouseEvent) {
+  startDrag(e: MouseEvent | TouchEvent) {
     // bind mouseup on drag end
     window.addEventListener('mouseup', this.stopDrag);
     window.addEventListener('mousemove', this.onDragMove);

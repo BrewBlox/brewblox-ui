@@ -24,6 +24,9 @@
     <button
       class="grid-item-resize-handle"
       @mousedown="startResize"
+      @touchstart="startResize"
+      @touchmove="onResizeMove"
+      @touchend="stopResize"
       v-if="!dragging && !moving"
     >
       <q-icon
