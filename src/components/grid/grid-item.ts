@@ -142,9 +142,7 @@ export default class GridItem extends Vue {
     if (e instanceof MouseEvent) {
       this.startX = e.pageX;
       this.startY = e.pageY;
-    }
-
-    if (e instanceof TouchEvent) {
+    } else {
       this.startX = e.touches[0].pageX;
       this.startY = e.touches[0].pageY;
     }
@@ -155,11 +153,7 @@ export default class GridItem extends Vue {
       return { x: e.pageX - this.startX, y: e.pageY - this.startY };
     }
 
-    if (e instanceof TouchEvent) {
-      return { x: e.touches[0].pageX - this.startX, y: e.touches[0].pageY -this.startY };
-    }
-
-    throw new Error('Not a valid event');
+    return { x: e.touches[0].pageX - this.startX, y: e.touches[0].pageY - this.startY };
   }
 
   containerParentSize(): DOMRect {
