@@ -69,7 +69,9 @@ export default class GridItem extends Vue {
     `;
   }
 
-  startInteraction() {
+  startInteraction(e: MouseEvent) {
+    this.setMouseStartPosition(e);
+
     // set initial values of item
     const { width, height } = this.containerSize();
     const parent = this.containerParentSize();
@@ -179,9 +181,7 @@ export default class GridItem extends Vue {
 
     this.dragging = true;
 
-    this.setMouseStartPosition(e);
-
-    this.startInteraction();
+    this.startInteraction(e);
   }
 
   stopResize() {
@@ -200,6 +200,8 @@ export default class GridItem extends Vue {
     this.stopInteraction();
   }
 
+
+
   gridPosition(delta: Coordinates = { x: 0, y: 0 }): { x: number, y: number } {
     if (!this.dragStartX || !this.dragStartY || !this.dragStartParentX || !this.dragStartParentY) {
       throw new Error('No starting drag positions know');
@@ -207,10 +209,11 @@ export default class GridItem extends Vue {
 
     const x = ((this.dragStartX + delta.x) - this.dragStartParentX) / (GRID_SIZE + GAP_SIZE) + 1;
     const y = ((this.dragStartY + delta.y) - this.dragStartParentY) / (GRID_SIZE + GAP_SIZE) + 1;
+    const cols = (this.currentCols || this.$props.cols) - 1;
 
     return {
-      x: Math.round(x),
-      y: Math.round(y),
+      x: Math.min(Math.max(Math.round(x), 1), this.gridWidth - cols),
+      y: Math.max(Math.round(y < 1 ? 1 : y), 1),
     };
   }
 
@@ -230,7 +233,7 @@ export default class GridItem extends Vue {
 
     this.moving = true;
 
-    this.setMouseStartPosition(e);
+    this.startInteraction(e);
 
     const rects = this.containerSize();
     const firstChildRects = this.containerFirstChildSize();
@@ -245,8 +248,6 @@ export default class GridItem extends Vue {
 
     this.currentStartCols = position.x;
     this.currentStartRows = position.y;
-
-    this.startInteraction();
   }
 
   stopDrag() {
