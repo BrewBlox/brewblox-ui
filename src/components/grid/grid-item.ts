@@ -70,6 +70,9 @@ export default class GridItem extends Vue {
   }
 
   startInteraction(e: MouseEvent | TouchEvent) {
+    // prevent scrolling
+    e.preventDefault();
+
     this.setMouseStartPosition(e);
 
     // set initial values of item
@@ -111,6 +114,9 @@ export default class GridItem extends Vue {
   }
 
   onResizeMove(e: MouseEvent | TouchEvent) {
+    // prevent scrolling
+    e.preventDefault();
+
     const delta = this.moveDelta(e);
 
     this.dragWidth = this.dragStartWidth + delta.x;
@@ -150,7 +156,7 @@ export default class GridItem extends Vue {
     }
 
     if (e instanceof TouchEvent) {
-      return { x: e.touches[0].pageX, y: e.touches[0].pageY };
+      return { x: e.touches[0].pageX - this.startX, y: e.touches[0].pageY -this.startY };
     }
 
     throw new Error('Not a valid event');
