@@ -69,12 +69,33 @@ export default class GridItem extends Vue {
   }
 
   startInteraction() {
+    const { width, height } = this.containerSize();
+
+    this.dragWidth = width;
+    this.dragHeight = height;
+
+    this.dragStartWidth = width;
+    this.dragStartHeight = height;
+
+    // communicate start to parent
     if (this.$parent.startInteraction) {
       this.$parent.startInteraction();
     }
   }
 
   stopInteraction() {
+    this.currentCols = null;
+    this.currentRows = null;
+
+    this.currentStartCols = null;
+    this.currentStartRows = null;
+
+    this.dragStartX = 0;
+    this.dragStartY = 0;
+
+    this.dragStartParentX = 0;
+    this.dragStartParentY = 0;
+
     if (this.$parent.stopInteraction) {
       this.$parent.stopInteraction();
     }
@@ -111,11 +132,22 @@ export default class GridItem extends Vue {
     return { x: e.pageX - this.startX, y: e.pageY - this.startY };
   }
 
-  containerSize(): { width: number, height: number } {
-    if (this.$refs.container instanceof Element) {
-      const { width, height } = this.$refs.container.getBoundingClientRect();
+  containerParentSize(): DOMRect {
+    if (
+      this.$refs.container instanceof Element &&
+      this.$refs.container.parentNode &&
+      this.$refs.container.parentNode.firstChild &&
+      this.$refs.container.parentNode.firstChild instanceof Element
+    ) {
+      return <DOMRect>this.$refs.container.parentNode.firstChild.getBoundingClientRect();
+    }
 
-      return { width, height };
+    throw new Error('Container parent is not a valid Element');
+  }
+
+  containerSize(): DOMRect {
+    if (this.$refs.container instanceof Element) {
+      return <DOMRect>this.$refs.container.getBoundingClientRect();
     }
 
     throw new Error('Container is not a valid Element');
@@ -129,14 +161,6 @@ export default class GridItem extends Vue {
     this.dragging = true;
 
     this.setMouseStartPosition(e);
-
-    const { width, height } = this.containerSize();
-
-    this.dragWidth = width;
-    this.dragHeight = height;
-
-    this.dragStartWidth = width;
-    this.dragStartHeight = height;
 
     this.startInteraction();
   }
@@ -153,9 +177,6 @@ export default class GridItem extends Vue {
       this.currentCols || this.$props.cols,
       this.currentRows || this.$props.rows,
     );
-
-    this.currentCols = null;
-    this.currentRows = null;
 
     this.stopInteraction();
   }
@@ -192,30 +213,19 @@ export default class GridItem extends Vue {
 
     this.setMouseStartPosition(e);
 
-    if (
-      this.$refs.container instanceof Element &&
-      this.$refs.container.parentNode &&
-      this.$refs.container.parentNode.firstChild &&
-      this.$refs.container.parentNode.firstChild instanceof Element
-    ) {
-      const rects = <DOMRect>this.$refs.container.getBoundingClientRect();
-      const parentRects =
-        <DOMRect>this.$refs.container.parentNode.firstChild.getBoundingClientRect();
+    const rects = this.containerSize();
+    const parentRects = this.containerParentSize();
 
-      this.dragWidth = rects.width;
-      this.dragHeight = rects.height;
+    this.dragStartX = rects.x;
+    this.dragStartY = rects.y;
 
-      this.dragStartX = rects.x;
-      this.dragStartY = rects.y;
+    this.dragStartParentX = parentRects.x;
+    this.dragStartParentY = parentRects.y;
 
-      this.dragStartParentX = parentRects.x;
-      this.dragStartParentY = parentRects.y;
+    const position = this.gridPosition();
 
-      const position = this.gridPosition();
-
-      this.currentStartCols = position.x;
-      this.currentStartRows = position.y;
-    }
+    this.currentStartCols = position.x;
+    this.currentStartRows = position.y;
 
     this.startInteraction();
   }
@@ -228,15 +238,6 @@ export default class GridItem extends Vue {
     this.moving = false;
 
     this.$parent.newItemsOrder();
-
-    this.currentStartCols = null;
-    this.currentStartRows = null;
-
-    this.dragStartX = 0;
-    this.dragStartY = 0;
-
-    this.dragStartParentX = 0;
-    this.dragStartParentY = 0;
 
     this.stopInteraction();
   }
