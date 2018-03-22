@@ -20,7 +20,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  grid-template-rows: 1fr;
+  grid-template-rows: auto;
 }
 
 .grid-container-overlay-grid {
@@ -33,7 +33,7 @@
   grid-column-start: 1;
   grid-column-end: -1;
   grid-row-start: 1;
-  grid-row-end: -1 span;
+  grid-row-end: 1;
   opacity: 0.03;
 }
 </style>
