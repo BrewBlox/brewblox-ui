@@ -37,6 +37,9 @@
     <button
       class="grid-item-move-handle"
       @mousedown="startDrag"
+      @touchstart="startDrag"
+      @touchmove="onDragMove"
+      @touchend="stopDrag"
       v-if="!dragging"
     >
       <q-icon
