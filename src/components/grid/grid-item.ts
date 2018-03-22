@@ -148,7 +148,11 @@ export default class GridItem extends Vue {
 
     this.dragging = false;
 
-    this.$parent.updateItemSize(this.$props.id, this.currentCols, this.currentRows);
+    this.$parent.updateItemSize(
+      this.$props.id,
+      this.currentCols || this.$props.cols,
+      this.currentRows || this.$props.rows,
+    );
 
     this.currentCols = null;
     this.currentRows = null;
@@ -197,6 +201,9 @@ export default class GridItem extends Vue {
       const rects = <DOMRect>this.$refs.container.getBoundingClientRect();
       const parentRects =
         <DOMRect>this.$refs.container.parentNode.firstChild.getBoundingClientRect();
+
+      this.dragWidth = rects.width;
+      this.dragHeight = rects.height;
 
       this.dragStartX = rects.x;
       this.dragStartY = rects.y;
