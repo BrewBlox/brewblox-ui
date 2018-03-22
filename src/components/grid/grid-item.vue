@@ -17,7 +17,7 @@
       >
         <q-icon
           name="drag handle"
-          size="18px"
+          size="30px"
         />
       </div>
     </div>
@@ -31,7 +31,7 @@
     >
       <q-icon
         name="drag handle"
-        size="18px"
+        size="30px"
       />
     </button>
     <button
@@ -44,7 +44,7 @@
     >
       <q-icon
         name="drag handle"
-        size="18px"
+        size="30px"
       />
     </button>
   </div>
@@ -59,8 +59,8 @@
 
 .grid-item-resize-handle, .grid-item-move-handle {
   border: 0;
-  width: 20px;
-  height: 20px;
+  width: 34px;
+  height: 34px;
   background: transparent;
   position: absolute;
   padding: 0;

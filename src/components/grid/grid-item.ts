@@ -114,9 +114,6 @@ export default class GridItem extends Vue {
   }
 
   onResizeMove(e: MouseEvent | TouchEvent) {
-    // prevent scrolling
-    e.preventDefault();
-
     const delta = this.moveDelta(e);
 
     this.dragWidth = this.dragStartWidth + delta.x;
