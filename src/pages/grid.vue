@@ -32,7 +32,11 @@ export default {
   }),
   methods: {
     onChangeOrder(order) {
-      console.log(order);
+      this.$set(
+        this,
+        'items',
+        order.map(item => this.items.find(dataItem => dataItem.id === item.id)),
+      );
     },
   },
 };
