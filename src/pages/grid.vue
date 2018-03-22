@@ -2,6 +2,7 @@
   <q-page padding>
     <grid-container
       :on-change-order="onChangeOrder"
+      :on-change-size="onChangeSize"
     >
       <strong
         class="item"
@@ -36,6 +37,19 @@ export default {
         this,
         'items',
         order.map(item => this.items.find(dataItem => dataItem.id === item.id)),
+      );
+    },
+    onChangeSize(id, cols, rows) {
+      this.$set(
+        this,
+        'items',
+        this.items.map((item) => {
+          if (item.id === id) {
+            return { id, cols, rows };
+          }
+
+          return item;
+        }),
       );
     },
   },

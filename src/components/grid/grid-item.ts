@@ -44,14 +44,6 @@ export default class GridItem extends Vue {
 
   $parent: any;
 
-  beforeUpdate() {
-    console.log('beforeUpdate', this.$props.id, this.$props.cols);
-  }
-
-  updated() {
-    console.log('update', this.$props.id, this.$props.cols);
-  }
-
   get style(): string {
     const spans = `
       grid-column-end: span ${this.currentCols || this.$props.cols};
@@ -156,10 +148,10 @@ export default class GridItem extends Vue {
 
     this.dragging = false;
 
+    this.$parent.updateItemSize(this.$props.id, this.currentCols, this.currentRows);
+
     this.currentCols = null;
     this.currentRows = null;
-
-    // @TODO: if changed: communicate to grid container
 
     this.stopInteraction();
   }

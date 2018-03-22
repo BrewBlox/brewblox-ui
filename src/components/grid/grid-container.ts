@@ -9,6 +9,10 @@ import GridItem from './grid-item.vue';
       type: Function,
       default: () => {},
     },
+    onChangeSize: {
+      type: Function,
+      default: () => {},
+    },
   },
   components: { GridItem },
 })
@@ -51,6 +55,10 @@ export default class GridContainer extends Vue {
     });
 
     this.$props.onChangeOrder(sortedChildren);
+  }
+
+  updateItemSize(id: number, cols: number, rows: number) {
+    this.$props.onChangeSize(id, cols, rows);
   }
 
   render(createElement: Function) {
