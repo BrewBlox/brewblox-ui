@@ -10,6 +10,7 @@
   display: grid;
   grid-gap: 20px;
   grid-template-columns: repeat(auto-fill, 100px);
+  grid-auto-columns: 100px;
   grid-auto-rows: 100px;
   justify-content: center;
 }
