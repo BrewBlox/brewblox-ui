@@ -33,7 +33,7 @@
   grid-column-start: 1;
   grid-column-end: -1;
   grid-row-start: 1;
-  grid-row-end: 1;
+  grid-row-end: 1 span;
   opacity: 0.03;
 }
 </style>
