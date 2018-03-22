@@ -27,7 +27,7 @@
       @touchstart="startResize"
       @touchmove="onResizeMove"
       @touchend="stopResize"
-      v-if="!dragging && !moving"
+      v-if="!dragging && !moving && editable"
     >
       <q-icon
         name="drag handle"
@@ -40,13 +40,8 @@
       @touchstart="startDrag"
       @touchmove="onDragMove"
       @touchend="stopDrag"
-      v-if="!dragging"
-    >
-      <q-icon
-        name="drag handle"
-        size="30px"
-      />
-    </button>
+      v-if="!dragging && editable"
+    />
   </div>
 </template>
 
@@ -57,7 +52,7 @@
   position: relative;
 }
 
-.grid-item-resize-handle, .grid-item-move-handle {
+.grid-item-resize-handle {
   border: 0;
   width: 34px;
   height: 34px;
@@ -71,9 +66,6 @@
   outline: none;
   z-index: 2;
   bottom: 0;
-}
-
-.grid-item-resize-handle {
   transform: rotate(-45deg);
   cursor: nwse-resize;
   right: 0;
@@ -81,7 +73,14 @@
 
 .grid-item-move-handle {
   left: 0;
+  top: 0;
+  position: absolute;
+  background: transparent;
+  border: 0;
   cursor: move;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
 }
 
 .grid-item-drag-overlay {

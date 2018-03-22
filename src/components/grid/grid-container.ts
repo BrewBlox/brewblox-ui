@@ -5,6 +5,10 @@ import GridItem from './grid-item.vue';
 
 @Component({
   props: {
+    editable: {
+      type: Boolean,
+      default: false,
+    },
     onChangeOrder: {
       type: Function,
       default: () => {},
@@ -62,6 +66,8 @@ export default class GridContainer extends Vue {
   }
 
   render(createElement: Function) {
+    const { editable } = this.$props;
+
     return createElement(
       'div',
       {
@@ -78,7 +84,7 @@ export default class GridContainer extends Vue {
             .map((slot: any) => createElement(
               GridItem,
               {
-                props: slot.data.attrs || {},
+                props: { ...slot.data.attrs, editable } || { editable },
               },
               [slot],
             )),

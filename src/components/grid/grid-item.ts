@@ -20,6 +20,10 @@ type Coordinates = { x: number, y: number };
       type: Number,
       default: 1,
     },
+    editable: {
+      type: Boolean,
+      default: false,
+    },
   },
 })
 export default class GridItem extends Vue {
