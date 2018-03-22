@@ -26,6 +26,7 @@ export default class GridItem extends Vue {
   dragging: boolean = false;
   moving: boolean = false;
 
+  gridWidth: number = 0;
   startX: number = 0;
   startY: number = 0;
   dragWidth: number = 0;
@@ -69,7 +70,11 @@ export default class GridItem extends Vue {
   }
 
   startInteraction() {
+    // set initial values of item
     const { width, height } = this.containerSize();
+    const parent = this.containerParentSize();
+
+    this.gridWidth = Math.floor((parent.width + GAP_SIZE) / (GAP_SIZE + GRID_SIZE));
 
     this.dragWidth = width;
     this.dragHeight = height;
@@ -84,6 +89,7 @@ export default class GridItem extends Vue {
   }
 
   stopInteraction() {
+    // reset values of item
     this.currentCols = null;
     this.currentRows = null;
 
@@ -96,6 +102,7 @@ export default class GridItem extends Vue {
     this.dragStartParentX = 0;
     this.dragStartParentY = 0;
 
+    // communicate stop to parent
     if (this.$parent.stopInteraction) {
       this.$parent.stopInteraction();
     }
@@ -111,15 +118,15 @@ export default class GridItem extends Vue {
   }
 
   updateSize() {
-    const gridWidth = Math.round((this.dragWidth + GAP_SIZE) / (GRID_SIZE + GAP_SIZE));
-    const gridHeight = Math.round((this.dragHeight + GAP_SIZE) / (GRID_SIZE + GAP_SIZE));
+    const newCols = Math.round((this.dragWidth + GAP_SIZE) / (GRID_SIZE + GAP_SIZE));
+    const newRows = Math.round((this.dragHeight + GAP_SIZE) / (GRID_SIZE + GAP_SIZE));
 
-    if (gridWidth !== this.currentCols) {
-      this.currentCols = gridWidth;
+    if (newCols !== this.currentCols && newCols <= this.gridWidth) {
+      this.currentCols = newCols;
     }
 
-    if (gridHeight !== this.currentRows) {
-      this.currentRows = gridHeight;
+    if (newRows !== this.currentRows) {
+      this.currentRows = newRows;
     }
   }
 
@@ -133,6 +140,18 @@ export default class GridItem extends Vue {
   }
 
   containerParentSize(): DOMRect {
+    if (
+      this.$refs.container instanceof Element &&
+      this.$refs.container.parentNode &&
+      this.$refs.container.parentNode instanceof Element
+    ) {
+      return <DOMRect>this.$refs.container.parentNode.getBoundingClientRect();
+    }
+
+    throw new Error('Container parent is not a valid Element');
+  }
+
+  containerFirstChildSize(): DOMRect {
     if (
       this.$refs.container instanceof Element &&
       this.$refs.container.parentNode &&
@@ -214,13 +233,13 @@ export default class GridItem extends Vue {
     this.setMouseStartPosition(e);
 
     const rects = this.containerSize();
-    const parentRects = this.containerParentSize();
+    const firstChildRects = this.containerFirstChildSize();
 
     this.dragStartX = rects.x;
     this.dragStartY = rects.y;
 
-    this.dragStartParentX = parentRects.x;
-    this.dragStartParentY = parentRects.y;
+    this.dragStartParentX = firstChildRects.x;
+    this.dragStartParentY = firstChildRects.y;
 
     const position = this.gridPosition();
 
