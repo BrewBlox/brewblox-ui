@@ -37,25 +37,25 @@ export default class GridItem extends Vue {
   dragStartParentX: number = 0;
   dragStartParentY: number = 0;
 
-  currentCols: number = 0;
-  currentRows: number = 0;
+  currentCols: number | null = null;
+  currentRows: number | null = null;
   currentStartCols: number | null = null;
   currentStartRows: number | null = null;
 
   $parent: any;
 
-  data() {
-    // update initial values
-    return {
-      currentCols: parseInt(this.$props.cols, 10),
-      currentRows: parseInt(this.$props.rows, 10),
-    };
+  beforeUpdate() {
+    console.log('beforeUpdate', this.$props.id, this.$props.cols);
+  }
+
+  updated() {
+    console.log('update', this.$props.id, this.$props.cols);
   }
 
   get style(): string {
     const spans = `
-      grid-column-end: span ${this.currentCols};
-      grid-row-end: span ${this.currentRows};
+      grid-column-end: span ${this.currentCols || this.$props.cols};
+      grid-row-end: span ${this.currentRows || this.$props.rows};
     `;
 
     if (this.currentStartCols && this.currentStartRows) {
@@ -108,8 +108,6 @@ export default class GridItem extends Vue {
     if (gridHeight !== this.currentRows) {
       this.currentRows = gridHeight;
     }
-
-    // @TODO: if changed: communicate to grid container
   }
 
   setMouseStartPosition(e: MouseEvent) {
@@ -157,6 +155,11 @@ export default class GridItem extends Vue {
     window.removeEventListener('mousemove', this.onResizeMove);
 
     this.dragging = false;
+
+    this.currentCols = null;
+    this.currentRows = null;
+
+    // @TODO: if changed: communicate to grid container
 
     this.stopInteraction();
   }
