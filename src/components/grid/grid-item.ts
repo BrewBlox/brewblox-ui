@@ -171,26 +171,6 @@ export default class GridItem extends Vue {
     };
   }
 
-  itemOrder() {
-    if (
-      this.$refs.container instanceof Element &&
-      this.$refs.container.parentNode
-    ) {
-      // console.log(
-      //   Array.from(this.$refs.container.parentNode.querySelectorAll('.grid-item')).map((child) => {
-      //     if (child instanceof Element) {
-      //       const rects = <DOMRect>child.getBoundingClientRect();
-      //
-      //       return {
-      //         x: rects.x,
-      //         y: rects.y,
-      //       };
-      //     }
-      //   }),
-      // );
-    }
-  }
-
   onDragMove(e: MouseEvent) {
     const delta = this.moveDelta(e);
 
@@ -241,7 +221,7 @@ export default class GridItem extends Vue {
 
     this.moving = false;
 
-    this.itemOrder();
+    this.$parent.newItemsOrder();
 
     this.currentStartCols = null;
     this.currentStartRows = null;
