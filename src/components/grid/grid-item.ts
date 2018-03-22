@@ -8,13 +8,17 @@ type Coordinates = { x: number, y: number };
 
 @Component({
   props: {
+    id: {
+      type: Number,
+      default: 1,
+    },
     cols: {
-      type: String,
-      default: '1',
+      type: Number,
+      default: 1,
     },
     rows: {
-      type: String,
-      default: '1',
+      type: Number,
+      default: 1,
     },
   },
 })

@@ -5,25 +5,13 @@
     >
       <strong
         class="item"
-        cols="3"
-        rows="2"
+        v-for="item in items"
+        :key="item.id"
+        :id="item.id"
+        :cols="item.cols"
+        :rows="item.rows"
       >
-        1
-      </strong>
-
-      <strong
-        class="item"
-        cols="2"
-        rows="5"
-      >
-        2
-      </strong>
-      <strong
-        class="item"
-        cols="2"
-        rows="2"
-      >
-        3
+        {{ item.id }}
       </strong>
     </grid-container>
   </q-page>
@@ -35,6 +23,13 @@ import GridContainer from '../components/grid/grid-container';
 export default {
   name: 'Grid',
   components: { GridContainer },
+  data: () => ({
+    items: [
+      { id: 1, cols: 3, rows: 2 },
+      { id: 2, cols: 2, rows: 5 },
+      { id: 3, cols: 2, rows: 2 },
+    ],
+  }),
   methods: {
     onChangeOrder(order) {
       console.log(order);
