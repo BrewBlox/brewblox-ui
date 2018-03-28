@@ -37,10 +37,4 @@
   grid-row-end: 1 span;
   opacity: 0.03;
 }
-
-.grid-container-settings {
-  border: 1px solid #24333d;
-  padding: 12px;
-  margin: 0 0 24px 0;
-}
 </style>

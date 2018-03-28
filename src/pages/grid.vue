@@ -1,9 +1,22 @@
 <template>
   <q-page padding>
+    <div class="grid-settings">
+      <q-btn
+        color="secondary"
+        label="Add block"
+      />
+      <q-btn
+        :icon="editable ? 'check' : 'mode edit'"
+        :color="editable ? 'primary' : 'standard'"
+        @click="toggleEditable"
+        :label="editable ? 'Save changes' : 'Edit layout'"
+      />
+    </div>
+
     <grid-container
+      :editable="editable"
       :on-change-order="onChangeOrder"
       :on-change-size="onChangeSize"
-      :on-add-block="onAddBlock"
     >
       <strong
         class="item"
@@ -26,6 +39,7 @@ export default {
   name: 'Grid',
   components: { GridContainer },
   data: () => ({
+    editable: false,
     items: [
       { id: 1, cols: 3, rows: 2 },
       { id: 2, cols: 2, rows: 5 },
@@ -33,6 +47,9 @@ export default {
     ],
   }),
   methods: {
+    toggleEditable() {
+      this.editable = !this.editable;
+    },
     onChangeOrder(order) {
       this.$set(
         this,
@@ -57,11 +74,14 @@ export default {
       this.$set(
         this,
         'items',
-        [...this.items, {
-          id: this.items.length + 1,
-          cols: 1,
-          rows: 1,
-        }],
+        [
+          ...this.items,
+          {
+            id: this.items.length + 1,
+            cols: 1,
+            rows: 1,
+          },
+        ],
       );
     },
   },
@@ -82,5 +102,13 @@ strong {
   height: 100%;
   width: 100%;
   font-size: 30pt;
+}
+
+.grid-settings {
+  border: 1px solid #24333d;
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  margin: 0 0 24px 0;
 }
 </style>
