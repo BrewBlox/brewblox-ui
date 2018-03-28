@@ -5,10 +5,6 @@ import GridItem from './grid-item.vue';
 
 @Component({
   props: {
-    editable: {
-      type: Boolean,
-      default: false,
-    },
     onChangeOrder: {
       type: Function,
       default: () => {},
@@ -22,6 +18,7 @@ import GridItem from './grid-item.vue';
 })
 export default class GridContainer extends Vue {
   interaction: boolean = false;
+  editable: boolean = false;
 
   startInteraction() {
     this.interaction = true;
@@ -65,9 +62,11 @@ export default class GridContainer extends Vue {
     this.$props.onChangeSize(id, cols, rows);
   }
 
-  render(createElement: Function) {
-    const { editable } = this.$props;
+  toggleEditable() {
+    this.editable = !this.editable;
+  }
 
+  render(createElement: Function) {
     return createElement(
       'div',
       {
@@ -77,32 +76,55 @@ export default class GridContainer extends Vue {
         createElement(
           'div',
           {
-            class: 'grid-main-container',
-          },
-          this.$slots.default
-            .filter(slot => slot.tag)
-            .map((slot: any) => createElement(
-              GridItem,
-              {
-                props: { ...slot.data.attrs, editable } || { editable },
-              },
-              [slot],
-            )),
-        ),
-        this.interaction ? createElement(
-          'div',
-          {
-            class: 'grid-container-overlay',
+            class: 'grid-container-settings',
           },
           [
             createElement(
-              'div',
+              'button',
               {
-                class: 'grid-container-overlay-grid',
+                class: 'grid-edit-toggle',
+                on: {
+                  click: this.toggleEditable,
+                },
               },
+              this.editable ? 'Save changes' : 'Adjust grid',
             ),
           ],
-        ) : null,
+        ),
+        createElement(
+          'div',
+          {
+            class: 'grid-main-container',
+          },
+          [
+            // render the passed children
+            ...this.$slots.default
+              .filter(slot => slot.tag)
+              .map((slot: any) => createElement(
+                GridItem,
+                {
+                  props:
+                    { ...slot.data.attrs, editable: this.editable } || { editable: this.editable },
+                },
+                [slot],
+              )),
+            // show overlay grid if interaction is happening or in edit mode
+            (this.interaction || this.editable) && createElement(
+              'div',
+              {
+                class: 'grid-container-overlay',
+              },
+              [
+                createElement(
+                  'div',
+                  {
+                    class: 'grid-container-overlay-grid',
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ],
     );
   }
