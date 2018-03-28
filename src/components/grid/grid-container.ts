@@ -13,6 +13,10 @@ import GridItem from './grid-item.vue';
       type: Function,
       default: () => {},
     },
+    onAddBlock: {
+      type: Function,
+      default: () => {},
+    },
   },
   components: { GridItem },
 })
@@ -66,6 +70,10 @@ export default class GridContainer extends Vue {
     this.editable = !this.editable;
   }
 
+  addBlock() {
+    this.$props.onAddBlock();
+  }
+
   render(createElement: Function) {
     return createElement(
       'div',
@@ -88,6 +96,16 @@ export default class GridContainer extends Vue {
                 },
               },
               this.editable ? 'Save changes' : 'Adjust grid',
+            ),
+            createElement(
+              'button',
+              {
+                class: 'grid-edit-toggle',
+                on: {
+                  click: this.addBlock,
+                },
+              },
+              'Add block',
             ),
           ],
         ),

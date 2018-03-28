@@ -3,6 +3,7 @@
     <grid-container
       :on-change-order="onChangeOrder"
       :on-change-size="onChangeSize"
+      :on-add-block="onAddBlock"
     >
       <strong
         class="item"
@@ -50,6 +51,17 @@ export default {
 
           return item;
         }),
+      );
+    },
+    onAddBlock() {
+      this.$set(
+        this,
+        'items',
+        [...this.items, {
+          id: this.items.length + 1,
+          cols: 1,
+          rows: 1,
+        }],
       );
     },
   },
