@@ -1,6 +1,6 @@
 const getters = {};
-const actions = {};
-const mutations = {};
+import actions from './actions';
+import mutations from './mutations';
 
 const dashboards = {
   getters,
@@ -17,6 +17,7 @@ const dashboards = {
       allIds: [],
       byId: {},
     },
+    fetching: false,
   },
 };
 
