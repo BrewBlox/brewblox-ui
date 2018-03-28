@@ -1,0 +1,3 @@
+type WidgetType =
+  'UIImage' |
+  'GraphSensor';
