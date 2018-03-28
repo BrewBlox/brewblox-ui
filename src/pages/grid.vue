@@ -1,9 +1,32 @@
 <template>
   <q-page padding>
+    <q-modal
+      v-model="modalOpen"
+    >
+      <q-btn
+        label="1 x 1 Block"
+        @click="addBlock(1, 1)"
+      />
+      <q-btn
+        label="2 x 2 Block"
+        @click="addBlock(2, 2)"
+      />
+      <q-btn
+        label="3 x 3 Block"
+        @click="addBlock(3, 3)"
+      />
+      <q-btn
+        label="4 x 4 Block"
+        @click="addBlock(4, 4)"
+      />
+    </q-modal>
+
     <div class="grid-settings">
       <q-btn
+        v-if="editable"
         color="secondary"
         label="Add block"
+        @click="onOpenAddBlock"
       />
       <q-btn
         :icon="editable ? 'check' : 'mode edit'"
@@ -40,6 +63,7 @@ export default {
   components: { GridContainer },
   data: () => ({
     editable: false,
+    modalOpen: false,
     items: [
       { id: 1, cols: 3, rows: 2 },
       { id: 2, cols: 2, rows: 5 },
@@ -70,19 +94,21 @@ export default {
         }),
       );
     },
-    onAddBlock() {
+    onOpenAddBlock() {
+      this.modalOpen = true;
+    },
+    addBlock(cols, rows) {
       this.$set(
         this,
         'items',
         [
           ...this.items,
-          {
-            id: this.items.length + 1,
-            cols: 1,
-            rows: 1,
-          },
+          { id: this.items.length + 1, cols, rows },
         ],
       );
+
+      this.editable = true;
+      this.modalOpen = false;
     },
   },
 };
@@ -105,10 +131,12 @@ strong {
 }
 
 .grid-settings {
-  border: 1px solid #24333d;
   display: flex;
-  justify-content: space-between;
-  padding: 12px;
   margin: 0 0 24px 0;
+  justify-content: flex-end;
+}
+
+.grid-settings button {
+  margin-left: 12px;
 }
 </style>
