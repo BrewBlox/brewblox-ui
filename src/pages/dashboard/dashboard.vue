@@ -16,8 +16,8 @@
         <q-btn
           v-if="editable"
           color="primary"
-          label="Add block"
-          @click="onOpenAddBlock"
+          label="Add widget"
+          @click="onOpenAddWidget"
         />
         <q-btn
           :icon="editable ? 'check' : 'mode edit'"
@@ -27,25 +27,8 @@
         />
       </portal>
 
-      <q-modal
-        v-model="modalOpen"
-      >
-        <q-btn
-          label="1 x 1 Block"
-          @click="addBlock(1, 1)"
-        />
-        <q-btn
-          label="2 x 2 Block"
-          @click="addBlock(2, 2)"
-        />
-        <q-btn
-          label="3 x 3 Block"
-          @click="addBlock(3, 3)"
-        />
-        <q-btn
-          label="4 x 4 Block"
-          @click="addBlock(4, 4)"
-        />
+      <q-modal v-model="modalOpen">
+        Placeholder add widget modal
       </q-modal>
 
       <grid-container

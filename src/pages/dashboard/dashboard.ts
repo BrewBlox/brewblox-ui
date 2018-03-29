@@ -44,7 +44,7 @@ class DashboardPage extends Vue {
     this.editable = !this.editable;
   }
 
-  onOpenAddBlock() {
+  onOpenAddWidget() {
     this.modalOpen = true;
   }
 
@@ -60,20 +60,6 @@ class DashboardPage extends Vue {
 
   onChangeSize(id: string, cols: number, rows: number) {
     updateDashboardItemSize(id, cols, rows);
-  }
-
-  addBlock(cols: number, rows: number) {
-    // this.$set(
-    //   this,
-    //   'items',
-    //   [
-    //     ...this.items,
-    //     { id: this.items.length + 1, cols, rows },
-    //   ],
-    // );
-
-    this.editable = true;
-    this.modalOpen = false;
   }
 }
 

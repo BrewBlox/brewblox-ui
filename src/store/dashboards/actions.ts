@@ -1,6 +1,6 @@
 import { getStoreAccessors } from 'vuex-typescript';
 
-import { fetchDashboards } from './api';
+import { fetchDashboards, persistDashboardItem } from './api';
 
 import store from '../';
 import { DashboardState, DashboardItem, DashboardContext, Dashboard } from './state';
@@ -24,9 +24,11 @@ const actions = {
     addDashboardItemToStore(item);
   },
   updateDashboardItemOrder(context: DashboardContext, order: string[]) {
-    order.forEach((id, index) => setDashboardItemOrderInStore(id, index + 1));
+    order.forEach((id, index) => {
+      setDashboardItemOrderInStore(id, index + 1);
 
-    // @TODO communicate change to API
+      persistDashboardItem(id, { order: index + 1 });
+    });
   },
   updateDashboardItemSize(
     context: DashboardContext,
