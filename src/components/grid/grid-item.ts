@@ -24,6 +24,22 @@ type Coordinates = { x: number, y: number };
       type: Boolean,
       default: false,
     },
+    onStartInteraction: {
+      type: Function,
+      default: () => {},
+    },
+    onStopInteraction: {
+      type: Function,
+      default: () => {},
+    },
+    onUpdateItemSize: {
+      type: Function,
+      default: () => {},
+    },
+    onNewItemsOrder: {
+      type: Function,
+      default: () => {},
+    },
   },
 })
 export default class GridItem extends Vue {
@@ -46,8 +62,6 @@ export default class GridItem extends Vue {
   currentRows: number | null = null;
   currentStartCols: number | null = null;
   currentStartRows: number | null = null;
-
-  $parent: any;
 
   get style(): string {
     const spans = `
@@ -92,9 +106,7 @@ export default class GridItem extends Vue {
     this.dragStartHeight = height;
 
     // communicate start to parent
-    if (this.$parent.startInteraction) {
-      this.$parent.startInteraction();
-    }
+    this.$props.onStartInteraction();
   }
 
   stopInteraction() {
@@ -112,9 +124,7 @@ export default class GridItem extends Vue {
     this.dragStartParentY = 0;
 
     // communicate stop to parent
-    if (this.$parent.stopInteraction) {
-      this.$parent.stopInteraction();
-    }
+    this.$props.onStopInteraction();
   }
 
   onResizeMove(e: MouseEvent | TouchEvent) {
@@ -207,7 +217,7 @@ export default class GridItem extends Vue {
 
     this.dragging = false;
 
-    this.$parent.updateItemSize(
+    this.$props.onUpdateItemSize(
       this.$props.id,
       this.currentCols || this.$props.cols,
       this.currentRows || this.$props.rows,
@@ -271,7 +281,7 @@ export default class GridItem extends Vue {
 
     this.moving = false;
 
-    this.$parent.newItemsOrder();
+    this.$props.onNewItemsOrder();
 
     this.stopInteraction();
   }

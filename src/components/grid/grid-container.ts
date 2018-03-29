@@ -85,8 +85,14 @@ export default class GridContainer extends Vue {
               .map((slot: any) => createElement(
                 GridItem,
                 {
-                  props:
-                    { ...slot.data.attrs, editable: this.editable } || { editable: this.editable },
+                  props: {
+                    ...slot.data.attrs,
+                    editable: this.editable,
+                    onStartInteraction: this.startInteraction,
+                    onStopInteraction: this.stopInteraction,
+                    onUpdateItemSize: this.updateItemSize,
+                    onNewItemsOrder: this.newItemsOrder,
+                  },
                 },
                 [slot],
               )),
