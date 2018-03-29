@@ -16,7 +16,7 @@
         class="grid-item-resize-handle"
       >
         <q-icon
-          name="drag handle"
+          name="mdi-resize-bottom-right"
           size="30px"
         />
       </div>
@@ -30,7 +30,7 @@
       v-if="!dragging && !moving && editable"
     >
       <q-icon
-        name="drag handle"
+        name="mdi-resize-bottom-right"
         size="30px"
       />
     </button>
@@ -66,7 +66,6 @@
   outline: none;
   z-index: 2;
   bottom: 0;
-  transform: rotate(-45deg);
   cursor: nwse-resize;
   right: 0;
 }
