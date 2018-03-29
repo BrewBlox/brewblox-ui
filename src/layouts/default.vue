@@ -8,7 +8,7 @@
           flat
           dense
           round
-          @click="leftDrawerOpen = !leftDrawerOpen"
+          @click="toggleDrawer"
         >
           <q-icon name="menu" />
         </q-btn>
@@ -27,6 +27,7 @@
         link
         inset-delimiter
       >
+        <q-list-header>Main menu</q-list-header>
         <q-item
           link
           to="/blocks"
@@ -49,6 +50,19 @@
           <q-item-side icon="grid on" />
           Grid
         </q-item>
+
+        <q-item-separator />
+
+        <q-list-header v-if="!isFetching && dashboards.length > 0">Dashboards</q-list-header>
+
+        <q-item
+          v-for="dashboard in dashboards"
+          link
+          :to="`/dashboard/${ dashboard.id }`"
+          :key="dashboard.id"
+        >
+          {{ dashboard.title }}
+        </q-item>
       </q-list>
     </q-layout-drawer>
 
@@ -58,16 +72,7 @@
   </q-layout>
 </template>
 
-<script>
-export default {
-  name: 'LayoutDefault',
-  data() {
-    return {
-      leftDrawerOpen: false,
-    };
-  },
-};
-</script>
+<script lang="ts" src="./default.ts" />
 
 <style>
 </style>

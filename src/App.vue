@@ -10,9 +10,8 @@ import { listDashboards } from './store/dashboards/actions';
 
 export default {
   name: 'App',
-  created() {
-    listBlocks();
-    listDashboards();
+  async created() {
+    await Promise.all([listBlocks(), listDashboards()]);
   },
 };
 </script>
