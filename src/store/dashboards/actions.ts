@@ -36,7 +36,7 @@ const actions = {
   ) {
     setDashboardItemSizeInStore(id, cols, rows);
 
-    // @TODO communicate change to API
+    persistDashboardItem(id, { cols, rows });
   },
   async listDashboards() {
     // update isFetching
