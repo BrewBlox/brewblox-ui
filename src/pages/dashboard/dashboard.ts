@@ -3,8 +3,11 @@ import Component from 'vue-class-component';
 
 import GridContainer from '../../components/grid/grid-container.vue';
 
+import byOrder from '../../core/byOrder';
+
 import { isFetching, dashboardById, dashboardItemById } from '../../store/dashboards/getters';
 import { changeDashboardItemOrder } from '../../store/dashboards/actions';
+
 
 interface VueOrdered extends Vue {
   id: string;
@@ -28,7 +31,7 @@ class DashboardPage extends Vue {
   }
 
   get items() {
-    return this.dashboard.items.map(dashboardItemById);
+    return [...this.dashboard.items.map(dashboardItemById)].sort(byOrder);
   }
 
   get isFetching() {
