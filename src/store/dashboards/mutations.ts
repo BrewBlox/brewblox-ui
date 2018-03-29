@@ -1,4 +1,6 @@
+import Vue from 'vue';
 import { getStoreAccessors } from 'vuex-typescript';
+import { merge } from 'lodash';
 
 import { Dashboard, DashboardItem, DashboardState } from './state';
 import { State as RootState } from '../state';
@@ -18,6 +20,13 @@ const mutations = {
   mutateFetching(state: DashboardState, fetching: boolean) {
     state.fetching = fetching;
   },
+  setDashboardItemOrder(state: DashboardState, { id, order }: { id: string, order: number }) {
+    Vue.set(state.items, 'byId', Object.assign(
+      {},
+      state.items.byId,
+      { [id]: merge(state.items.byId[id], { order }) },
+    ));
+  },
 };
 
 // exported commit accessors
@@ -29,5 +38,8 @@ export const addDashboard =
 
 export const addDashboardItem =
   (item: DashboardItem) => commit(mutations.addDashboardItem)(store, item);
+
+export const setDashboardItemOrder =
+  (id: string, order: number) => commit(mutations.setDashboardItemOrder)(store, { id, order });
 
 export default mutations;

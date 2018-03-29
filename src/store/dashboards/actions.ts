@@ -10,6 +10,7 @@ import {
   mutateFetching as mutateFetchingInStore,
   addDashboard as addDashboardToStore,
   addDashboardItem as addDashboardItemToStore,
+  setDashboardItemOrder as setDashboardItemOrderInStore,
 } from './mutations';
 
 const { dispatch } = getStoreAccessors<DashboardState, RootState>('dashboards');
@@ -20,6 +21,9 @@ const actions = {
   },
   addDashboardItem(context: DashboardContext, item: DashboardItem) {
     addDashboardItemToStore(item);
+  },
+  changeDashboardItemOrder(context: DashboardContext, order: string[]) {
+    order.forEach((id, index) => setDashboardItemOrderInStore(id, index + 1));
   },
   async listDashboards() {
     // update isFetching
@@ -48,5 +52,8 @@ export const addDashboardItem =
 
 export const addDashboard =
   (dashboard: Dashboard) => dispatch(actions.addDashboard)(store, dashboard);
+
+export const changeDashboardItemOrder =
+  (order: string[]) => dispatch(actions.changeDashboardItemOrder)(store, order);
 
 export default actions;
