@@ -11,14 +11,31 @@
     {
       "id": "item-1",
       "order": 1,
-      "cols": 2,
-      "rows": 2
+      "cols": 4,
+      "rows": 4,
+      "widget": "PID",
+      "options": {
+        "settings": {
+          "kp": 10,
+          "ti": 600,
+          "td": 60
+        },
+        "links": {
+          "input": "controller-1/sensor-setpoint-pair-1",
+          "output": "controller-1/actuator-1"
+        },
+        "filtering": {
+          "input": 3,
+          "derivative": 4
+        }
+      }
     },
     {
       "id": "item-2",
       "order": 2,
       "cols": 3,
-      "rows": 3
+      "rows": 3,
+      "widget": "Empty"
     }
   ]
 }

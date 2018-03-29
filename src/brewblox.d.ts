@@ -16,5 +16,5 @@ interface PluginArguments {
 
 // Widget types
 type WidgetType =
-  'UIImage' |
-  'GraphSensor';
+  'Empty' |
+  'PID';
