@@ -33,6 +33,8 @@ const actions = {
     { id, cols, rows }: { id: string, cols: number, rows: number },
   ) {
     setDashboardItemSizeInStore(id, cols, rows);
+
+    // @TODO communicate change to API
   },
   async listDashboards() {
     // update isFetching
