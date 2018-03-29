@@ -9,7 +9,7 @@ type Coordinates = { x: number, y: number };
 @Component({
   props: {
     id: {
-      type: Number,
+      type: [String, Number],
       default: 1,
     },
     cols: {
