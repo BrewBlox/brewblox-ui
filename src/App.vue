@@ -5,13 +5,17 @@
 </template>
 
 <script lang="ts">
-import { listBlocks } from './store/blocks/actions';
-import { listDashboards } from './store/dashboards/actions';
+import { fetchBlocks } from './store/blocks/actions';
+import { fetchDashboards } from './store/dashboards/actions';
 
 export default {
   name: 'App',
   async created() {
-    await Promise.all([listBlocks(), listDashboards()]);
+    // fetch all block and dashboard on init
+    await Promise.all([
+      fetchBlocks(),
+      fetchDashboards(),
+    ]);
   },
 };
 </script>

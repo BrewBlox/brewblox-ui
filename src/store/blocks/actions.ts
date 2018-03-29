@@ -3,7 +3,7 @@ import { getStoreAccessors } from 'vuex-typescript';
 import {
   fetchBlock,
   fetchBlockMetrics,
-  fetchBlocks,
+  fetchBlocks as fetchBlocksFromApi,
   persistBlock as persistBlockToApi,
 } from './api';
 
@@ -42,12 +42,12 @@ const actions = {
       metrics: blockMetrics.results,
     });
   },
-  async listBlocks() {
+  async fetchBlocks() {
     // update isFetching
     mutateFetchingInStore(true);
 
     // will fetch blocks from the server
-    const blocks = await fetchBlocks();
+    const blocks = await fetchBlocksFromApi();
     blocks.forEach(block => addBlockToStore(block));
 
     // update isFetching
@@ -72,8 +72,8 @@ export const findBlock =
 export const findBlockWithMetrics =
   (id: string) => dispatch(actions.findBlockWithMetrics)(store, id);
 
-export const listBlocks =
-  () => dispatch(actions.listBlocks)(store);
+export const fetchBlocks =
+  () => dispatch(actions.fetchBlocks)(store);
 
 export const saveBlock =
   (block: BlockSaveBase) => dispatch(actions.saveBlock)(store, block);
