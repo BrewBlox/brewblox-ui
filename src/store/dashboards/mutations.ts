@@ -8,6 +8,14 @@ import store from '../index';
 
 const { commit } = getStoreAccessors<DashboardState, RootState>('dashboards');
 
+function updateDashboardItem(state: DashboardState, id: string, newData: any) {
+  Vue.set(state.items, 'byId', Object.assign(
+    {},
+    state.items.byId,
+    { [id]: merge(state.items.byId[id], newData) },
+  ));
+}
+
 const mutations = {
   addDashboard(state: DashboardState, dashboard: Dashboard) {
     state.dashboards.allIds.push(dashboard.id);
@@ -21,11 +29,13 @@ const mutations = {
     state.fetching = fetching;
   },
   setDashboardItemOrder(state: DashboardState, { id, order }: { id: string, order: number }) {
-    Vue.set(state.items, 'byId', Object.assign(
-      {},
-      state.items.byId,
-      { [id]: merge(state.items.byId[id], { order }) },
-    ));
+    updateDashboardItem(state, id, { order });
+  },
+  setDashboardItemSize(
+    state: DashboardState,
+    { id, cols, rows }: { id: string, cols: number, rows: number },
+  ) {
+    updateDashboardItem(state, id, { cols, rows });
   },
 };
 
@@ -41,5 +51,9 @@ export const addDashboardItem =
 
 export const setDashboardItemOrder =
   (id: string, order: number) => commit(mutations.setDashboardItemOrder)(store, { id, order });
+
+export const setDashboardItemSize =
+  (id: string, cols: number, rows: number) =>
+    commit(mutations.setDashboardItemSize)(store, { id, cols, rows });
 
 export default mutations;

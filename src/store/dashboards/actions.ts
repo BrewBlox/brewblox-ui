@@ -11,6 +11,7 @@ import {
   addDashboard as addDashboardToStore,
   addDashboardItem as addDashboardItemToStore,
   setDashboardItemOrder as setDashboardItemOrderInStore,
+  setDashboardItemSize as setDashboardItemSizeInStore,
 } from './mutations';
 
 const { dispatch } = getStoreAccessors<DashboardState, RootState>('dashboards');
@@ -22,8 +23,16 @@ const actions = {
   addDashboardItem(context: DashboardContext, item: DashboardItem) {
     addDashboardItemToStore(item);
   },
-  changeDashboardItemOrder(context: DashboardContext, order: string[]) {
+  updateDashboardItemOrder(context: DashboardContext, order: string[]) {
     order.forEach((id, index) => setDashboardItemOrderInStore(id, index + 1));
+
+    // @TODO communicate change to API
+  },
+  updateDashboardItemSize(
+    context: DashboardContext,
+    { id, cols, rows }: { id: string, cols: number, rows: number },
+  ) {
+    setDashboardItemSizeInStore(id, cols, rows);
   },
   async listDashboards() {
     // update isFetching
@@ -53,7 +62,11 @@ export const addDashboardItem =
 export const addDashboard =
   (dashboard: Dashboard) => dispatch(actions.addDashboard)(store, dashboard);
 
-export const changeDashboardItemOrder =
-  (order: string[]) => dispatch(actions.changeDashboardItemOrder)(store, order);
+export const updateDashboardItemOrder =
+  (order: string[]) => dispatch(actions.updateDashboardItemOrder)(store, order);
+
+export const updateDashboardItemSize =
+  (id: string, cols: number, rows: number) =>
+    dispatch(actions.updateDashboardItemSize)(store, { id, cols, rows });
 
 export default actions;

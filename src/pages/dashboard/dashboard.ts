@@ -6,8 +6,10 @@ import GridContainer from '../../components/grid/grid-container.vue';
 import byOrder from '../../core/byOrder';
 
 import { isFetching, dashboardById, dashboardItemById } from '../../store/dashboards/getters';
-import { changeDashboardItemOrder } from '../../store/dashboards/actions';
-
+import {
+  updateDashboardItemOrder,
+  updateDashboardItemSize,
+} from '../../store/dashboards/actions';
 
 interface VueOrdered extends Vue {
   id: string;
@@ -50,24 +52,14 @@ class DashboardPage extends Vue {
     const newOrder = order.map(item => item.id);
 
     try {
-      await changeDashboardItemOrder(newOrder);
+      await updateDashboardItemOrder(newOrder);
     } catch (e) {
       throw e;
     }
   }
 
-  onChangeSize(id: String, cols: number, rows: number) {
-    // this.$set(
-    //   this,
-    //   'items',
-    //   this.items.map((item) => {
-    //     if (item.id === id) {
-    //       return { id, cols, rows };
-    //     }
-    //
-    //     return item;
-    //   }),
-    // );
+  onChangeSize(id: string, cols: number, rows: number) {
+    updateDashboardItemSize(id, cols, rows);
   }
 
   addBlock(cols: number, rows: number) {
