@@ -8,22 +8,24 @@
     </q-inner-loading>
 
     <template v-if="!isFetching">
-      <q-toolbar>
-        <q-toolbar-title>{{ dashboard.title }}</q-toolbar-title>
+      <portal to="toolbar-title">
+        {{ dashboard.title }}
+      </portal>
 
+      <portal to="toolbar-buttons">
         <q-btn
           v-if="editable"
-          color="secondary"
+          color="primary"
           label="Add block"
           @click="onOpenAddBlock"
         />
         <q-btn
           :icon="editable ? 'check' : 'mode edit'"
-          :color="editable ? 'primary' : 'tertiary'"
+          :color="editable ? 'positive' : 'primary'"
           @click="toggleEditable"
           :label="editable ? 'Save changes' : 'Edit layout'"
         />
-      </q-toolbar>
+      </portal>
 
       <q-modal
         v-model="modalOpen"
@@ -79,13 +81,5 @@
   height: 100%;
   width: 100%;
   font-size: 30pt;
-}
-
-.q-toolbar {
-  margin-bottom: 24px;
-}
-
-.q-toolbar button {
-  margin-left: 12px;
 }
 </style>

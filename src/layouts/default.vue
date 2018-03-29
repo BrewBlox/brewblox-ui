@@ -14,8 +14,10 @@
         </q-btn>
 
         <q-toolbar-title>
-          BrewBlox
+          <portal-target name="toolbar-title">BrewBlox</portal-target>
         </q-toolbar-title>
+
+        <portal-target name="toolbar-buttons" />
       </q-toolbar>
     </q-layout-header>
 
