@@ -45,14 +45,6 @@
           Metrics
         </q-item>
 
-        <q-item
-          link
-          to="/grid"
-        >
-          <q-item-side icon="grid on" />
-          Grid
-        </q-item>
-
         <q-item-separator />
 
         <q-list-header v-if="!isFetching && dashboards.length > 0">Dashboards</q-list-header>
