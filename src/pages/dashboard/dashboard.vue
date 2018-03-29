@@ -39,11 +39,11 @@
         <component
           class="dashboard-item"
           v-for="item in items"
+          :is="item.component"
           :key="item.id"
           :id="item.id"
           :cols="item.cols"
           :rows="item.rows"
-          :is="item.component"
         />
       </grid-container>
     </template>

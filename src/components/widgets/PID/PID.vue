@@ -1,5 +1,7 @@
 <template>
-  <p>PID Widget {{ id }}</p>
+  <q-card>
+    {{ id }}
+  </q-card>
 </template>
 
 <script lang="ts" src="./PID.ts" />
