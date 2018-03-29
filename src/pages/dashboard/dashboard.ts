@@ -11,6 +11,8 @@ import {
   updateDashboardItemSize,
 } from '../../store/dashboards/actions';
 
+import { addComponentByType } from './widgets';
+
 interface VueOrdered extends Vue {
   id: string;
 }
@@ -33,7 +35,11 @@ class DashboardPage extends Vue {
   }
 
   get items() {
-    return [...this.dashboard.items.map(dashboardItemById)].sort(byOrder);
+    return [
+      ...this.dashboard.items
+        .map(dashboardItemById)
+        .map(addComponentByType),
+    ].sort(byOrder);
   }
 
   get isFetching() {

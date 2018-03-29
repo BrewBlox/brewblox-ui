@@ -36,16 +36,15 @@
         :on-change-order="onChangeOrder"
         :on-change-size="onChangeSize"
       >
-        <div
+        <component
           class="dashboard-item"
           v-for="item in items"
           :key="item.id"
           :id="item.id"
           :cols="item.cols"
           :rows="item.rows"
-        >
-          {{ item.id }}
-        </div>
+          :is="item.component"
+        />
       </grid-container>
     </template>
   </q-page>
@@ -53,16 +52,13 @@
 
 <script lang="ts" src="./dashboard.ts" />
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 @import '../../css/app.styl';
 
 .dashboard-item {
   background: $block-background;
   display: flex;
-  align-items center;
-  justify-content center;
   height: 100%;
   width: 100%;
-  font-size: 30pt;
 }
 </style>
