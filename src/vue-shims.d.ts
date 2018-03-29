@@ -7,3 +7,5 @@ declare module '*.vue' {
 // Quasar specific declarations
 declare module 'quasar';
 declare const __THEME: string;
+
+declare module 'portal-vue';
