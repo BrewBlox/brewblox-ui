@@ -37,7 +37,7 @@ class DashboardPage extends Vue {
   get items() {
     return [
       ...this.dashboard.items
-        .map(item => dashboardItemById(this.$store, item))
+        .map(id => dashboardItemById(this.$store, id))
         .map(addComponentByType),
     ].sort(byOrder);
   }

@@ -26,6 +26,7 @@ const actions = {
     order.forEach((id, index) => {
       const order = index + 1;
       setDashboardItemOrderInStore(context, { id, order });
+
       persistDashboardItem(id, { order });
     });
   },

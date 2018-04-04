@@ -10,7 +10,7 @@ type Coordinates = { x: number, y: number };
   props: {
     id: {
       type: [String, Number],
-      default: 1,
+      default: () => { throw new Error('Provide an id'); },
     },
     cols: {
       type: Number,

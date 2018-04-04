@@ -87,6 +87,7 @@ export default class GridContainer extends Vue {
                 {
                   props: {
                     ...slot.data.attrs,
+                    id: slot.data.key,
                     editable: this.editable,
                     onStartInteraction: this.startInteraction,
                     onStopInteraction: this.stopInteraction,

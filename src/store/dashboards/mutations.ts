@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import { getStoreAccessors } from 'vuex-typescript';
 import { merge } from 'lodash';
 
@@ -9,11 +8,11 @@ import { State as RootState } from '../state';
 const { commit } = getStoreAccessors<DashboardState, RootState>('dashboards');
 
 function updateDashboardItem(state: DashboardState, id: string, newData: any) {
-  Vue.set(state.items, 'byId', Object.assign(
+  state.items.byId = Object.assign(
     {},
     state.items.byId,
     { [id]: merge(state.items.byId[id], newData) },
-  ));
+  );
 }
 
 const mutations = {
