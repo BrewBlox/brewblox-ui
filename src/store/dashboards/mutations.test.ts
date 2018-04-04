@@ -1,10 +1,7 @@
 import { DashboardState } from './state';
-import mutations from './mutations.helpers';
+import mutations from './mutations';
 
-const {
-  mutateFetching,
-  addDashboard,
-} = mutations;
+const { mutateFetching, addDashboard } = mutations;
 
 const defaultStore: DashboardState = {
   dashboards: {
