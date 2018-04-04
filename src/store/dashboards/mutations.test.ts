@@ -1,7 +1,10 @@
 import { DashboardState } from './state';
 import mutations from './mutations.helpers';
 
-const { addDashboard } = mutations;
+const {
+  mutateFetching,
+  addDashboard,
+} = mutations;
 
 const defaultStore: DashboardState = {
   dashboards: {
@@ -14,6 +17,22 @@ const defaultStore: DashboardState = {
   },
   fetching: false,
 };
+
+describe('mutateFetching', () => {
+  const fetchingStore = { ...defaultStore };
+
+  it('Should correctly update fetching to true', () => {
+    mutateFetching(fetchingStore, true);
+
+    expect(fetchingStore.fetching).toBe(true);
+  });
+
+  it('Should correctly update fetching back to false', () => {
+    mutateFetching(fetchingStore, false);
+
+    expect(fetchingStore.fetching).toBe(false);
+  });
+});
 
 describe('addDashboard', () => {
   const dashboardStore = { ...defaultStore };
