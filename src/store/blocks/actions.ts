@@ -25,42 +25,42 @@ const actions = {
     const block = await fetchBlock(id);
 
     // add block to store
-    addBlockToStore(block);
+    addBlockToStore(context, block);
   },
   async findBlockWithMetrics(context: BlocksContext, id: string) {
     // add block to store which is loading
-    blockLoading(id);
+    blockLoading(context, id);
 
     // will fetch a block from the server
     const blockMetrics = await fetchBlockMetrics(id);
 
     // update metric in store and unset loading
-    mutateBlockInStore({
+    mutateBlockInStore(context, {
       id,
       isLoading: false,
       metrics: blockMetrics.results,
     });
   },
-  async fetchBlocks() {
+  async fetchBlocks(context: BlocksContext) {
     // update isFetching
-    mutateFetchingInStore(true);
+    mutateFetchingInStore(context, true);
 
     // will fetch blocks from the server
     const blocks = await fetchBlocksFromApi();
-    blocks.forEach(block => addBlockToStore(block));
+    blocks.forEach(block => addBlockToStore(context, block));
 
     // update isFetching
-    mutateFetchingInStore(false);
+    mutateFetchingInStore(context, false);
   },
   async saveBlock(context: BlocksContext, block: BlockSaveBase) {
     // update isLoading and block values
-    mutateBlockInStore({ ...block, isLoading: true });
+    mutateBlockInStore(context, { ...block, isLoading: true });
 
     // persist block to API and wait for result
     const savedBlock = await persistBlockToApi(block);
 
     // update isLoading and apply block data from API
-    mutateBlockInStore({ ...savedBlock, isLoading: false });
+    mutateBlockInStore(context, { ...savedBlock, isLoading: false });
   },
 };
 

@@ -3,12 +3,12 @@ import { Store } from 'vuex';
 import { OneWireTempSensor, OneWireTempSensorUpdate } from './OneWireTempSensor';
 import { addBlock } from '../mutations';
 import { saveBlock } from '../actions';
-import { Series } from '../state';
+import { Series, BlocksContext } from '../state';
 import { State } from '../../state';
 
 export const addOneWireTempSensor =
-  ({ id, settings, state }: OneWireTempSensor, metrics: Series[]) => {
-    addBlock({ id, settings, state, metrics, type: 'OneWireTempSensor' });
+  (context: BlocksContext, { id, settings, state }: OneWireTempSensor, metrics: Series[]) => {
+    addBlock(context, { id, settings, state, metrics, type: 'OneWireTempSensor' });
   };
 
 export const persist = async (store: Store<State>, oneWireTempSensor: OneWireTempSensorUpdate) => {

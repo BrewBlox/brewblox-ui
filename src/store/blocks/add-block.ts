@@ -1,19 +1,19 @@
-import { Block, Series } from './state';
+import { Block, Series, BlocksContext } from './state';
 
 import { addSensorSetPointPair } from './SensorSetPointPair/actions';
 import { addSetPoint } from './SetPointSimple/actions';
 import { addOneWireTempSensor } from './OneWireTempSensor/actions';
 
-export default function addBlock(block: Block, metrics: Series[] = []) {
+export default function addBlock(context: BlocksContext, block: Block, metrics: Series[] = []) {
   switch (block.type) {
     case 'SensorSetPointPair':
-      addSensorSetPointPair(block);
+      addSensorSetPointPair(context, block);
       break;
     case 'OneWireTempSensor':
-      addOneWireTempSensor(block, metrics);
+      addOneWireTempSensor(context, block, metrics);
       break;
     case 'SetPointSimple':
-      addSetPoint(block);
+      addSetPoint(context, block);
       break;
     default:
       throw new Error('Invalid block type');

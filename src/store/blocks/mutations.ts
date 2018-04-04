@@ -4,7 +4,6 @@ import { merge } from 'lodash';
 
 import { Block, BlocksState, BlockSave } from './state';
 import { State as RootState } from '../state';
-import store from '../index';
 
 const { commit } = getStoreAccessors<BlocksState, RootState>('blocks');
 
@@ -47,16 +46,9 @@ const mutations = {
 };
 
 // exported commit accessors
-export const addBlock =
-  (block: Block) => commit(mutations.addBlock)(store, block);
-
-export const mutateBlock =
-  (block: BlockSave) => commit(mutations.mutateBlock)(store, block);
-
-export const blockLoading =
-  (id: string) => commit(mutations.blockLoading)(store, id);
-
-export const mutateFetching =
-  (fetching: boolean) => commit(mutations.mutateFetching)(store, fetching);
+export const addBlock = commit(mutations.addBlock);
+export const mutateBlock = commit(mutations.mutateBlock);
+export const blockLoading = commit(mutations.blockLoading);
+export const mutateFetching = commit(mutations.mutateFetching);
 
 export default mutations;
