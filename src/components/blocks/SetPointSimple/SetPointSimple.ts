@@ -17,7 +17,7 @@ export default class SetPointSimple extends BlockComponent {
   valueInput = 0;
 
   get blockData() {
-    return getById(this.$props.id);
+    return getById(this.$store, this.$props.id);
   }
 
   get settings() {

@@ -18,7 +18,7 @@ export default class OneWireTempSensor extends BlockComponent {
   offsetInput = 0;
 
   get blockData() {
-    return getById(this.$props.id);
+    return getById(this.$store, this.$props.id);
   }
 
   get settings() {

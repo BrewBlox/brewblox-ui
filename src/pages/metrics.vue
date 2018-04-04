@@ -27,7 +27,9 @@ export default Vue.extend({
   name: 'PageIndex',
   components: { Metrics },
   computed: {
-    fetching: () => isFetching(),
+    fetching(): boolean {
+      return isFetching(this.$store);
+    },
   },
   methods: {},
 });

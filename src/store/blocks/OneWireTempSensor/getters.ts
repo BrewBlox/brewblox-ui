@@ -1,9 +1,13 @@
+import { Store } from 'vuex';
+
 import { allBlocks, blockById } from '../getters';
 
 import { OneWireTempSensorBlock } from './OneWireTempSensor';
 
-export function getById(id: string): OneWireTempSensorBlock {
-  const block = blockById(id);
+import { State } from '../../state';
+
+export function getById(store: Store<State>, id: string): OneWireTempSensorBlock {
+  const block = blockById(store, id);
 
   // force block type
   if (!block || block.type !== 'OneWireTempSensor') {
@@ -13,7 +17,7 @@ export function getById(id: string): OneWireTempSensorBlock {
   return block;
 }
 
-export function getAll(): OneWireTempSensorBlock[] {
-  return <OneWireTempSensorBlock[]>allBlocks()
+export function getAll(store: Store<State>): OneWireTempSensorBlock[] {
+  return <OneWireTempSensorBlock[]>allBlocks(store)
     .filter(block => block.type === 'OneWireTempSensor');
 }

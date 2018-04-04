@@ -31,8 +31,12 @@ export default Vue.extend({
   name: 'PageIndex',
   components: { Block },
   computed: {
-    blocks: () => blockIds(),
-    fetching: () => isFetching(),
+    blocks(): string[] {
+      return blockIds(this.$store);
+    },
+    fetching(): boolean {
+      return isFetching(this.$store);
+    },
   },
   methods: {},
 });

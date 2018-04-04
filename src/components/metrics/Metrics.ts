@@ -32,7 +32,7 @@ export default class Metrics extends Vue {
   };
 
   get blockData() {
-    return getById(this.$props.id);
+    return getById(this.$store, this.$props.id);
   }
 
   get metrics() {
