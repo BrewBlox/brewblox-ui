@@ -3,6 +3,7 @@
     <q-layout-header>
       <q-toolbar
         glossy
+        color="dark"
       >
         <q-btn
           flat
