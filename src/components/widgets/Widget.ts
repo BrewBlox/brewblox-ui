@@ -13,6 +13,6 @@ import { dashboardItemById } from '../../store/dashboards/getters';
 })
 export default class Widget extends Vue {
   get options() {
-    return dashboardItemById(this.$props.id).options;
+    return dashboardItemById(this.$store, this.$props.id).options;
   }
 }

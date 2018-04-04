@@ -10,11 +10,11 @@ class LayoutDefault extends Vue {
   leftDrawerOpen: boolean = false;
 
   get dashboards() {
-    return [...allDashboards()].sort(byOrder);
+    return [...allDashboards(this.$store)].sort(byOrder);
   }
 
   get isFetching() {
-    return isFetching();
+    return isFetching(this.$store);
   }
 
   toggleDrawer() {

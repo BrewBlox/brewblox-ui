@@ -2,7 +2,6 @@ import { getStoreAccessors } from 'vuex-typescript';
 
 import { fetchDashboards as fetchDashboardsFromApi, persistDashboardItem } from './api';
 
-import store from '../';
 import { DashboardState, DashboardItem, DashboardContext, Dashboard } from './state';
 import { State as RootState } from '../state';
 
@@ -18,59 +17,49 @@ const { dispatch } = getStoreAccessors<DashboardState, RootState>('dashboards');
 
 const actions = {
   addDashboard(context: DashboardContext, dashboard: Dashboard) {
-    addDashboardToStore(dashboard);
+    addDashboardToStore(context, dashboard);
   },
   addDashboardItem(context: DashboardContext, item: DashboardItem) {
-    addDashboardItemToStore(item);
+    addDashboardItemToStore(context, item);
   },
   updateDashboardItemOrder(context: DashboardContext, order: string[]) {
     order.forEach((id, index) => {
-      setDashboardItemOrderInStore(id, index + 1);
-
-      persistDashboardItem(id, { order: index + 1 });
+      const order = index + 1;
+      setDashboardItemOrderInStore(context, { id, order });
+      persistDashboardItem(id, { order });
     });
   },
   updateDashboardItemSize(
     context: DashboardContext,
     { id, cols, rows }: { id: string, cols: number, rows: number },
   ) {
-    setDashboardItemSizeInStore(id, cols, rows);
+    setDashboardItemSizeInStore(context, { id, cols, rows });
 
     persistDashboardItem(id, { cols, rows });
   },
-  async fetchDashboards() {
+  async fetchDashboards(context: DashboardContext) {
     // update isFetching
-    mutateFetchingInStore(true);
+    mutateFetchingInStore(context, true);
 
     // will fetch blocks from the server
     const { dashboards, items } = await fetchDashboardsFromApi();
 
     // first add items to store
-    items.forEach(item => addDashboardItem(item));
+    items.forEach(item => addDashboardItem(context, item));
 
     // then add the dashboards
-    dashboards.forEach(dashboard => addDashboard(dashboard));
+    dashboards.forEach(dashboard => addDashboard(context, dashboard));
 
     // update isFetching
-    mutateFetchingInStore(false);
+    mutateFetchingInStore(context, false);
   },
 };
 
 // exported action accessors
-export const fetchDashboards =
-  () => dispatch(actions.fetchDashboards)(store);
-
-export const addDashboardItem =
-  (item: DashboardItem) => dispatch(actions.addDashboardItem)(store, item);
-
-export const addDashboard =
-  (dashboard: Dashboard) => dispatch(actions.addDashboard)(store, dashboard);
-
-export const updateDashboardItemOrder =
-  (order: string[]) => dispatch(actions.updateDashboardItemOrder)(store, order);
-
-export const updateDashboardItemSize =
-  (id: string, cols: number, rows: number) =>
-    dispatch(actions.updateDashboardItemSize)(store, { id, cols, rows });
+export const fetchDashboards = dispatch(actions.fetchDashboards);
+export const addDashboardItem = dispatch(actions.addDashboardItem);
+export const addDashboard = dispatch(actions.addDashboard);
+export const updateDashboardItemOrder = dispatch(actions.updateDashboardItemOrder);
+export const updateDashboardItemSize = dispatch(actions.updateDashboardItemSize);
 
 export default actions;

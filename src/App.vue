@@ -14,7 +14,8 @@ export default {
     // fetch all block and dashboard on init
     await Promise.all([
       fetchBlocks(),
-      fetchDashboards(),
+      // @ts-ignore
+      fetchDashboards(this.$store),
     ]);
   },
 };

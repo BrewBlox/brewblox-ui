@@ -31,19 +31,19 @@ class DashboardPage extends Vue {
   }
 
   get dashboard() {
-    return dashboardById(this.dashboardId);
+    return dashboardById(this.$store, this.dashboardId);
   }
 
   get items() {
     return [
       ...this.dashboard.items
-        .map(dashboardItemById)
+        .map(item => dashboardItemById(this.$store, item))
         .map(addComponentByType),
     ].sort(byOrder);
   }
 
   get isFetching() {
-    return isFetching();
+    return isFetching(this.$store);
   }
 
   toggleEditable() {
@@ -58,14 +58,14 @@ class DashboardPage extends Vue {
     const newOrder = order.map(item => item.id);
 
     try {
-      await updateDashboardItemOrder(newOrder);
+      await updateDashboardItemOrder(this.$store, newOrder);
     } catch (e) {
       throw e;
     }
   }
 
   onChangeSize(id: string, cols: number, rows: number) {
-    updateDashboardItemSize(id, cols, rows);
+    updateDashboardItemSize(this.$store, { id, cols, rows });
   }
 }
 
