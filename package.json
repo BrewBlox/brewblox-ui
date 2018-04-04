@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@types/core-js": "^0.9.46",
+    "@types/jest": "^22.2.2",
     "@types/lodash": "^4.14.106",
     "@types/plotly.js": "^1.35.0",
     "babel-eslint": "8.2.1",
@@ -34,7 +35,9 @@
     "eslint-plugin-import": "2.7.0",
     "eslint-plugin-typescript": "^0.8.1",
     "eslint-plugin-vue": "4.0.0",
+    "jest": "^22.4.3",
     "quasar-cli": "^0.15.14",
+    "ts-jest": "^22.4.2",
     "ts-loader": "^3.5.0",
     "tslint": "^5.9.1",
     "tslint-config-airbnb": "^5.8.0",
@@ -49,5 +52,19 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 10"
-  ]
+  ],
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  }
 }
