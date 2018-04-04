@@ -33,4 +33,20 @@ describe('addDashboard', () => {
     // test if dashboard item is correct
     expect(dashboardStore.dashboards.byId['test']).toEqual(dashboard);
   });
+
+  it('Should add another dashboard to the store', () => {
+    const dashboard = {
+      id: 'testing',
+      title: 'Test Dashboard 2',
+      order: 2,
+      items: [],
+    };
+
+    addDashboard(dashboardStore, dashboard);
+
+    // test if dashboard is added to list
+    expect(dashboardStore.dashboards.allIds).toEqual(['test', 'testing']);
+    // test if dashboard item is correct
+    expect(dashboardStore.dashboards.byId['testing']).toEqual(dashboard);
+  });
 });
