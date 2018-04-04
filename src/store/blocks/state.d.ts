@@ -1,6 +1,11 @@
 import { ActionContext } from 'vuex';
 
 import {
+  PIDBlock,
+  PID,
+} from './PID/PID';
+
+import {
   SetPointSimpleBlock,
   SetPointSimple,
 } from './SetPointSimple/SetPointSimple';
@@ -39,9 +44,14 @@ export interface MetricsResult {
   results: Series[];
 }
 
-export type Block = SetPointSimpleBlock | OneWireTempSensorBlock | SensorSetPointPairBlock;
+export type Block =
+  SetPointSimpleBlock | OneWireTempSensorBlock | SensorSetPointPairBlock | PIDBlock;
 export type BlockSaveBase =
-  (BlockBase & MetricsBase) | SetPointSimple | OneWireTempSensorUpdate | SensorSetPointPairUpdate;
+  (BlockBase & MetricsBase) |
+  SetPointSimple |
+  OneWireTempSensorUpdate |
+  SensorSetPointPairUpdate |
+  PID;
 
 export type BlockSave = BlockSaveBase & {
   isLoading: boolean,
