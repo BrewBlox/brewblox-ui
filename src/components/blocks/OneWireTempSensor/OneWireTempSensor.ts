@@ -54,7 +54,7 @@ export default class OneWireTempSensor extends BlockComponent {
       settings.offset = this.offsetInput;
     }
 
-    persist({
+    persist(this.$store, {
       settings,
       id: this.$props.id,
     });

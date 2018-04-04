@@ -9,7 +9,7 @@ class App extends Vue {
   async created() {
     // fetch all block and dashboard on init
     await Promise.all([
-      fetchBlocks(),
+      fetchBlocks(this.$store),
       fetchDashboards(this.$store),
     ]);
   }

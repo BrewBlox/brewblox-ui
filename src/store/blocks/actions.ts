@@ -7,7 +7,6 @@ import {
   persistBlock as persistBlockToApi,
 } from './api';
 
-import store from '../';
 import { BlocksState, BlocksContext, BlockSaveBase } from './state';
 import { State as RootState } from '../state';
 import addBlockToStore from './add-block';
@@ -66,16 +65,9 @@ const actions = {
 };
 
 // exported action accessors
-export const findBlock =
-  (id: string) => dispatch(actions.findBlock)(store, id);
-
-export const findBlockWithMetrics =
-  (id: string) => dispatch(actions.findBlockWithMetrics)(store, id);
-
-export const fetchBlocks =
-  () => dispatch(actions.fetchBlocks)(store);
-
-export const saveBlock =
-  (block: BlockSaveBase) => dispatch(actions.saveBlock)(store, block);
+export const findBlock = dispatch(actions.findBlock);
+export const findBlockWithMetrics = dispatch(actions.findBlockWithMetrics);
+export const fetchBlocks = dispatch(actions.fetchBlocks);
+export const saveBlock = dispatch(actions.saveBlock);
 
 export default actions;

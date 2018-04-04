@@ -74,7 +74,7 @@ export default class SensorSetPointPair extends BlockComponent {
       links.setpoint = this.setpointInput;
     }
 
-    persist({
+    persist(this.$store, {
       links,
       id: this.$props.id,
     });

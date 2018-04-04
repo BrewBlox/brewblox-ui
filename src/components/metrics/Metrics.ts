@@ -45,7 +45,7 @@ export default class Metrics extends Vue {
 
   created() {
     if (this.metrics.length === 0) {
-      findBlockWithMetrics(this.$props.id);
+      findBlockWithMetrics(this.$store, this.$props.id);
     }
   }
 
