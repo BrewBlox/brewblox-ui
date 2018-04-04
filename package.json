@@ -54,6 +54,7 @@
     "not ie <= 10"
   ],
   "jest": {
+    "browser": true,
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
