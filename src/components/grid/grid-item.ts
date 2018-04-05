@@ -14,11 +14,11 @@ type Coordinates = { x: number, y: number };
     },
     cols: {
       type: Number,
-      default: 1,
+      default: () => { throw new Error('Provide cols'); },
     },
     rows: {
       type: Number,
-      default: 1,
+      default: () => { throw new Error('Provide rows'); },
     },
     editable: {
       type: Boolean,
