@@ -15,19 +15,7 @@
       "rows": 4,
       "widget": "PID",
       "options": {
-        "settings": {
-          "kp": 10,
-          "ti": 600,
-          "td": 60
-        },
-        "links": {
-          "input": "controller-1/sensor-setpoint-pair-1",
-          "output": "controller-1/actuator-1"
-        },
-        "filtering": {
-          "input": 3,
-          "derivative": 4
-        }
+        "block": "controller-1/PID-1"
       }
     },
     {

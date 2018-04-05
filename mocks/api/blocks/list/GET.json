@@ -1,5 +1,36 @@
 [
   {
+    "id": "controller-1/PID-1",
+    "type": "PID",
+    "settings": {
+      "kp": 10,
+      "ti": 600,
+      "td": 60
+    },
+    "links": {
+      "input": "controller-1/sensor-setpoint-pair-1",
+      "output": null
+    },
+    "filtering": {
+      "input": 3,
+      "derivative": 4
+    },
+    "state": {
+      "inputValue": 21.0859,
+      "inputSetting": 20,
+      "outputValue": 45.6758,
+      "outputSetting": null,
+
+      "p": 10.7813,
+      "i": 34.8164,
+      "d": 0.0781,
+
+      "derivative": 0.001301666667,
+      "integral": 20889.84,
+      "error": -1.0781
+    }
+  },
+  {
     "id": "controller-1/sensor-setpoint-pair-1",
     "type": "SensorSetPointPair",
     "links": {
