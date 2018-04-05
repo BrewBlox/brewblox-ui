@@ -91,6 +91,7 @@
                 v-model="kpInput"
                 stack-label="KP"
                 placeholder="KP of PID"
+                type="number"
               />
             </q-item-side>
             <q-item-side>
@@ -98,6 +99,7 @@
                 v-model="tiInput"
                 stack-label="TI"
                 placeholder="TI of PID"
+                type="number"
               />
             </q-item-side>
             <q-item-side>
@@ -105,6 +107,7 @@
                 v-model="tdInput"
                 stack-label="TD"
                 placeholder="TD of PID"
+                type="number"
               />
             </q-item-side>
           </q-item>
@@ -127,6 +130,26 @@
                 placeholder="Output of PID"
                 clearable
                 :options="allSensorSetPointPairs"
+              />
+            </q-item-main>
+          </q-item>
+          <q-item-separator />
+          <q-list-header>Filtering</q-list-header>
+          <q-item class="grid-items-2">
+            <q-item-main>
+              <q-input
+                v-model="inputFilteringInput"
+                stack-label="Input"
+                placeholder="Filtering input"
+                type="number"
+              />
+            </q-item-main>
+            <q-item-main>
+              <q-input
+                v-model="derivativeFilteringInput"
+                stack-label="Derivative"
+                placeholder="Filtering derivative"
+                type="number"
               />
             </q-item-main>
           </q-item>

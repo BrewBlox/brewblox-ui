@@ -26,13 +26,15 @@ export interface PIDLinks {
   output: string;
 }
 
+export interface PIDFiltering {
+  input: number;
+  derivative: number;
+}
+
 export interface PID extends BlockBase {
   settings: PIDSettings;
   links: PIDLinks;
-  filtering: {
-    input: number,
-    derivative: number,
-  };
+  filtering: PIDFiltering;
   state: PIDState;
 }
 
