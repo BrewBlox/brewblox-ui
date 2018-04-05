@@ -86,30 +86,30 @@
         <q-list>
           <q-list-header>Settings</q-list-header>
           <q-item class="grid-items-3">
-            <q-item-side>
+            <q-item-main>
               <q-input
                 v-model="kpInput"
                 stack-label="KP"
                 placeholder="KP of PID"
                 type="number"
               />
-            </q-item-side>
-            <q-item-side>
+            </q-item-main>
+            <q-item-main>
               <q-input
                 v-model="tiInput"
                 stack-label="TI"
                 placeholder="TI of PID"
                 type="number"
               />
-            </q-item-side>
-            <q-item-side>
+            </q-item-main>
+            <q-item-main>
               <q-input
                 v-model="tdInput"
                 stack-label="TD"
                 placeholder="TD of PID"
                 type="number"
               />
-            </q-item-side>
+            </q-item-main>
           </q-item>
           <q-item-separator />
           <q-list-header>Links</q-list-header>
@@ -169,7 +169,6 @@
 .q-item {
   display: grid;
   grid-gap: 10px;
-  /*justify-content: space-around;*/
 }
 
 .grid-items-2 {

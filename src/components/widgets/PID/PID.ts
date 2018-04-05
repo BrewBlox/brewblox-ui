@@ -11,7 +11,7 @@ import BlockWidget from '../BlockWidget';
 
 @Component
 export default class PIDWidget extends BlockWidget {
-  modalOpen: boolean = true;
+  modalOpen: boolean = false;
 
   kpInput: number = 0;
   tiInput: number = 0;
