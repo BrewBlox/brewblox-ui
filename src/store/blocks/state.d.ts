@@ -2,7 +2,7 @@ import { ActionContext } from 'vuex';
 
 import {
   PIDBlock,
-  PID,
+  PIDUpdate,
 } from './PID/PID';
 
 import {
@@ -51,7 +51,7 @@ export type BlockSaveBase =
   SetPointSimple |
   OneWireTempSensorUpdate |
   SensorSetPointPairUpdate |
-  PID;
+  PIDUpdate;
 
 export type BlockSave = BlockSaveBase & {
   isLoading: boolean,

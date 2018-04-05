@@ -44,18 +44,11 @@ export default class OneWireTempSensor extends BlockComponent {
   }
 
   save() {
-    const settings: { address?: string, offset?: number } = {};
-
-    if (this.addressInput !== this.settings.address) {
-      settings.address = this.addressInput;
-    }
-
-    if (this.offsetInput !== this.settings.offset) {
-      settings.offset = this.offsetInput;
-    }
-
     persist(this.$store, {
-      settings,
+      settings: {
+        offset: this.offsetInput,
+        address: this.addressInput,
+      },
       id: this.$props.id,
     });
   }

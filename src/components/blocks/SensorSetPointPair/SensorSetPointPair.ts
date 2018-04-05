@@ -66,18 +66,11 @@ export default class SensorSetPointPair extends BlockComponent {
   }
 
   save() {
-    const links: { sensor?: string, setpoint?: string } = {};
-
-    if (this.sensorInput !== this.sensor.id) {
-      links.sensor = this.sensorInput;
-    }
-
-    if (this.setpointInput !== this.setpoint.id) {
-      links.setpoint = this.setpointInput;
-    }
-
     persist(this.$store, {
-      links,
+      links: {
+        sensor: this.sensorInput,
+        setpoint: this.setpointInput,
+      },
       id: this.$props.id,
     });
   }

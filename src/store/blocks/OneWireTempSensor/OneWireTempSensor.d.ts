@@ -13,8 +13,8 @@ export interface OneWireTempSensor extends BlockBase, MetricsBase {
 
 export interface OneWireTempSensorUpdate extends BlockBase {
   settings: {
-    address?: string,
-    offset?: number,
+    address: string,
+    offset: number,
   };
 }
 

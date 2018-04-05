@@ -1,6 +1,6 @@
 const host = '/api';
 
-function toJson(result: Promise<any>) {
+function toJson(result: Promise<Response>): Promise<JSON> {
   return result
     .then((response) => {
       if (!response.ok) {
@@ -16,15 +16,23 @@ export function get(url: string): Promise<any> {
   return toJson(window.fetch(`${host}${url}`));
 }
 
-export function post(url: string, data: any): Promise<any> {
+export function post(url: string, data: any, method = 'POST'): Promise<any> {
   return toJson(window.fetch(
     `${host}${url}`,
     {
+      method,
       body: JSON.stringify(data),
-      method: 'POST',
       headers: new Headers({
         'Content-Type': 'application/json',
       }),
     },
   ));
+}
+
+export function put(url: string, data: any): Promise<any> {
+  return post(url, data, 'PUT');
+}
+
+export function patch(url: string, data: any): Promise<any> {
+  return post(url, data, 'PATCH');
 }

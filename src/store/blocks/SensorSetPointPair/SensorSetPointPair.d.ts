@@ -9,8 +9,8 @@ export interface SensorSetPointPair extends BlockBase {
 
 export interface SensorSetPointPairUpdate extends BlockBase {
   links: {
-    sensor?: string,
-    setpoint?: string,
+    sensor: string,
+    setpoint: string,
   };
 }
 

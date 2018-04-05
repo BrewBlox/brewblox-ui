@@ -7,8 +7,8 @@ import { saveBlock } from '../actions';
 import { State } from '../../state';
 import { BlocksContext } from '../state';
 
-export const addPID = (context: BlocksContext, { id, settings, links, filtering }: PID) => {
-  addBlock(context, { id, settings, links, filtering, type: 'PID' });
+export const addPID = (context: BlocksContext, { id, settings, links, filtering, state }: PID) => {
+  addBlock(context, { id, settings, links, filtering, state, type: 'PID' });
 };
 
 export const persist = async (store: Store<State>, pid: PID) => {
