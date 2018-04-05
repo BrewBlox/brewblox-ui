@@ -9,7 +9,8 @@
         flat
         round
         dense
-        icon="more vert"
+        icon="settings"
+        @click="openModal"
       />
     </q-toolbar>
 
@@ -64,6 +65,10 @@
         </q-item>
       </q-list>
     </q-card>
+
+    <q-modal v-model="modalOpen">
+      Modal for settings of PID component
+    </q-modal>
   </div>
 </template>
 
