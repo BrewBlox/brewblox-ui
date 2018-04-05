@@ -17,7 +17,13 @@
   </q-page>
 </template>
 
-<style>
+<style lang="stylus" scoped>
+@import '../css/themes/dark.variables.styl';
+
+.q-card {
+  background: $block-background;
+  margin-bottom: 20px;
+}
 </style>
 
 <script lang="ts">
