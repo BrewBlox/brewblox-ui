@@ -1,8 +1,8 @@
 import Component from 'vue-class-component';
 
-import Widget from '../Widget';
+import BlockWidget from '../BlockWidget';
 
 @Component
-export default class PIDWidget extends Widget {
+export default class PIDWidget extends BlockWidget {
 
 }

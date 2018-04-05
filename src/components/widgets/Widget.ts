@@ -9,10 +9,22 @@ import { dashboardItemById } from '../../store/dashboards/getters';
       type: String,
       default: '',
     },
+    cols: {
+      type: Number,
+      default: 1,
+    },
+    rows: {
+      type: Number,
+      default: 1,
+    },
   },
 })
 export default class Widget extends Vue {
+  get dashboardItem() {
+    return dashboardItemById(this.$store, this.$props.id);
+  }
+
   get options() {
-    return dashboardItemById(this.$store, this.$props.id).options;
+    return this.dashboardItem.options;
   }
 }
