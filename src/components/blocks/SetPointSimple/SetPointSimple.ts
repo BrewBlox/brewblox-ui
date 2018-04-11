@@ -7,12 +7,12 @@ import { persist } from '../../../store/blocks/SetPointSimple/actions';
 
 @Component({
   props: {
-    id: {
-      default: '',
-      type: String,
-    },
+  id: {
+  default: '',
+  type: String,
   },
-})
+  },
+  })
 export default class SetPointSimple extends BlockComponent {
   valueInput = 0;
 

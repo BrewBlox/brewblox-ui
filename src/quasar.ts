@@ -29,14 +29,14 @@ import Quasar, {
   QSelect,
   Ripple,
   Notify,
-} from 'quasar';
+} from 'quasar-framework/dist/quasar.mat.esm';
 
 import 'quasar-extras/roboto-font';
 import 'quasar-extras/material-icons';
 import 'quasar-extras/mdi';
 import 'quasar-extras/animate/bounceInLeft.css';
 import 'quasar-extras/animate/bounceOutRight.css';
-import 'quasar-app-styl';
+// import 'quasar-app-styl';
 
 import './css/app.styl';
 

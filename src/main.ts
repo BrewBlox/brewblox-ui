@@ -23,4 +23,6 @@ const plugins = [
   pluginI18n,
 ];
 
-plugins.forEach(plugin => plugin({ app, router, store, Vue }));
+plugins.forEach(plugin => plugin({
+  app, router, store, Vue,
+}));

@@ -17,9 +17,9 @@ interface VueOrdered extends Vue {
 
 @Component({
   components: {
-    GridContainer,
+  GridContainer,
   },
-})
+  })
 class DashboardPage extends Vue {
   editable: boolean = false;
   modalOpen: boolean = false;
