@@ -7,12 +7,12 @@ import { persist } from '../../../store/blocks/OneWireTempSensor/actions';
 
 @Component({
   props: {
-  id: {
-  default: '',
-  type: String,
+    id: {
+      default: '',
+      type: String,
+    },
   },
-  },
-  })
+})
 export default class OneWireTempSensor extends BlockComponent {
   addressInput = '';
   offsetInput = 0;

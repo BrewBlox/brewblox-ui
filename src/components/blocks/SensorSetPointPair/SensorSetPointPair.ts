@@ -15,12 +15,12 @@ import { persist } from '../../../store/blocks/SensorSetPointPair/actions';
 
 @Component({
   props: {
-  id: {
-  default: '',
-  type: String,
+    id: {
+      default: '',
+      type: String,
+    },
   },
-  },
-  })
+})
 export default class SensorSetPointPair extends BlockComponent {
   sensorInput = '';
   setpointInput = '';
