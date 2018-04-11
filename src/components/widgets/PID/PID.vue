@@ -15,6 +15,16 @@
     </q-toolbar>
 
     <q-card>
+      <q-card-actions>
+        <q-btn
+          flat
+          round
+          dense
+          icon="refresh"
+          @click="refreshState"
+        />
+      </q-card-actions>
+
       <q-list>
         <q-item class="grid-items-2">
           <q-item-side>

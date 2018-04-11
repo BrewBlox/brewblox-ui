@@ -57,6 +57,10 @@ export type BlockSave = BlockSaveBase & {
   isLoading: boolean,
 };
 
+export interface BlockStateUpdate extends BlockBase {
+  state: any;
+}
+
 export type BlocksState = {
   allIds: string[],
   byId: {

@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { getStoreAccessors } from 'vuex-typescript';
 import { merge } from 'lodash';
 
-import { Block, BlocksState, BlockSave } from './state';
+import { Block, BlocksState, BlockSave, BlockStateUpdate } from './state';
 import { State as RootState } from '../state';
 
 const { commit } = getStoreAccessors<BlocksState, RootState>('blocks');
@@ -15,7 +15,7 @@ const mutations = {
     // insert data into blocks object
     state.byId[block.id] = { ...block, isLoading: false };
   },
-  mutateBlock(state: BlocksState, block: BlockSave) {
+  updateBlockInStore(state: BlocksState, block: BlockStateUpdate | BlockSave) {
     if (!state.byId[block.id]) {
       throw new Error(`Block with id '${block.id}' does not exist`);
     }
@@ -25,6 +25,12 @@ const mutations = {
       state.byId,
       { [block.id]: merge(state.byId[block.id], block) },
     ));
+  },
+  updateBlockState(state: BlocksState, block: BlockStateUpdate) {
+    mutations.updateBlockInStore(state, block);
+  },
+  mutateBlock(state: BlocksState, block: BlockSave) {
+    mutations.updateBlockInStore(state, block);
   },
   blockLoading(state: BlocksState, id: string) {
     Vue.set(state, 'byId', Object.assign(
@@ -47,6 +53,7 @@ const mutations = {
 
 // exported commit accessors
 export const addBlock = commit(mutations.addBlock);
+export const updateBlockState = commit(mutations.updateBlockState);
 export const mutateBlock = commit(mutations.mutateBlock);
 export const blockLoading = commit(mutations.blockLoading);
 export const mutateFetching = commit(mutations.mutateFetching);

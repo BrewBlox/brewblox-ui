@@ -54,6 +54,10 @@ export interface PIDUpdate extends BlockBase {
   };
 }
 
+export interface PIDStateUpdate extends BlockBase {
+  state: PIDState;
+}
+
 export interface PIDBlock extends PID {
   type: 'PID';
 }

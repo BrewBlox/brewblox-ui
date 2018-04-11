@@ -6,6 +6,7 @@ import { PIDBlock, PIDSettings, PIDLinks, PIDFiltering, PIDState }
 import {
   getAll as getAllSensorSetPointPairs,
 } from '@/store/blocks/SensorSetPointPair/getters';
+import { refresh } from '@/store/blocks/PID/actions';
 
 import BlockWidget from '../BlockWidget';
 
@@ -67,5 +68,9 @@ export default class PIDWidget extends BlockWidget {
 
   openModal() {
     this.modalOpen = true;
+  }
+
+  refreshState() {
+    refresh(this.$store, this.block.id);
   }
 }
