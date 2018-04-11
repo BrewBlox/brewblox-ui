@@ -22,8 +22,8 @@ const actions = {
   addDashboardItem(context: DashboardContext, item: DashboardItem) {
     addDashboardItemToStore(context, item);
   },
-  updateDashboardItemOrder(context: DashboardContext, order: string[]) {
-    order.forEach((id, index) => {
+  updateDashboardItemOrder(context: DashboardContext, orders: string[]) {
+    orders.forEach((id, index) => {
       const order = index + 1;
       setDashboardItemOrderInStore(context, { id, order });
 
@@ -46,10 +46,10 @@ const actions = {
     const { dashboards, items } = await fetchDashboardsFromApi();
 
     // first add items to store
-    items.forEach(item => addDashboardItem(context, item));
+    items.forEach(item => actions.addDashboardItem(context, item));
 
     // then add the dashboards
-    dashboards.forEach(dashboard => addDashboard(context, dashboard));
+    dashboards.forEach(dashboard => actions.addDashboard(context, dashboard));
 
     // update isFetching
     mutateFetchingInStore(context, false);

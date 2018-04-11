@@ -1,11 +1,11 @@
 import Component from 'vue-class-component';
 
 import { PIDBlock, PIDSettings, PIDLinks, PIDFiltering, PIDState }
-  from '../../../store/blocks/PID/PID';
+  from '@/store/blocks/PID/PID';
 
 import {
   getAll as getAllSensorSetPointPairs,
-} from '../../../store/blocks/SensorSetPointPair/getters';
+} from '@/store/blocks/SensorSetPointPair/getters';
 
 import BlockWidget from '../BlockWidget';
 

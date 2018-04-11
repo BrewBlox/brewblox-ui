@@ -1,5 +1,5 @@
-import { blockById } from '../../store/blocks/getters';
-import { Block } from '../../store/blocks/state';
+import { blockById } from '@/store/blocks/getters';
+import { Block } from '@/store/blocks/state';
 
 import Widget from './Widget';
 

@@ -70,4 +70,7 @@
 <script lang="ts" src="./default.ts" />
 
 <style>
+.q-toolbar .vue-portal-target .q-btn {
+  margin-left: 10px;
+}
 </style>

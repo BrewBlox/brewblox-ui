@@ -1,6 +1,6 @@
 import { Block, BlockSaveBase, MetricsResult } from './state';
 
-import { get, put } from '../../core/fetch';
+import { get, put } from '@/core/fetch';
 
 export function fetchBlock(id: string): Promise<Block> {
   return get(`/blocks/${encodeURIComponent(id)}`);

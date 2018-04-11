@@ -1,15 +1,15 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import GridContainer from '../../components/grid/grid-container.vue';
+import GridContainer from '@/components/grid/grid-container.vue';
 
-import byOrder from '../../core/byOrder';
+import byOrder from '@/core/byOrder';
 
-import { isFetching, dashboardById, dashboardItemById } from '../../store/dashboards/getters';
+import { isFetching, dashboardById, dashboardItemById } from '@/store/dashboards/getters';
 import {
   updateDashboardItemOrder,
   updateDashboardItemSize,
-} from '../../store/dashboards/actions';
+} from '@/store/dashboards/actions';
 
 import { addComponentByType } from './widgets';
 

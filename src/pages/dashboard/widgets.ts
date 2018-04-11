@@ -1,7 +1,7 @@
-import { DashboardItem } from '../../store/dashboards/state';
+import { DashboardItem } from '@/store/dashboards/state';
 
-import PID from '../../components/widgets/PID/PID.vue';
-import Placeholder from '../../components/widgets/Placeholder.vue';
+import PID from '@/components/widgets/PID/PID.vue';
+import Placeholder from '@/components/widgets/Placeholder.vue';
 
 function componentByType(type: WidgetType) {
   switch (type) {

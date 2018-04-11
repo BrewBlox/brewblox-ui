@@ -29,9 +29,9 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import Block from '../components/blocks/block';
+import Block from '@/components/blocks/block';
 
-import { isFetching, blockIds } from '../store/blocks/getters';
+import { isFetching, blockIds } from '@/store/blocks/getters';
 
 export default Vue.extend({
   name: 'PageIndex',

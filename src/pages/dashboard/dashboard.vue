@@ -53,7 +53,7 @@
 <script lang="ts" src="./dashboard.ts" />
 
 <style lang="stylus" scoped>
-@import '../../css/app.styl';
+@import '@/css/app.styl';
 
 .dashboard-item {
   background: $block-background;

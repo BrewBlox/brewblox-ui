@@ -2,8 +2,8 @@ import Component from 'vue-class-component';
 
 import BlockComponent from '../BlockComponent';
 
-import { getById } from '../../../store/blocks/OneWireTempSensor/getters';
-import { persist } from '../../../store/blocks/OneWireTempSensor/actions';
+import { getById } from '@/store/blocks/OneWireTempSensor/getters';
+import { persist } from '@/store/blocks/OneWireTempSensor/actions';
 
 @Component({
   props: {

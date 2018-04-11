@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import byOrder from '../core/byOrder';
+import byOrder from '@/core/byOrder';
 
-import { allDashboards, isFetching } from '../store/dashboards/getters';
+import { allDashboards, isFetching } from '@/store/dashboards/getters';
 
 @Component
 class LayoutDefault extends Vue {

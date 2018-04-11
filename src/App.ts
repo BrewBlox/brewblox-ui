@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { fetchBlocks } from './store/blocks/actions';
-import { fetchDashboards } from './store/dashboards/actions';
+import { fetchBlocks } from '@/store/blocks/actions';
+import { fetchDashboards } from '@/store/dashboards/actions';
 
 @Component
 class App extends Vue {

@@ -8,7 +8,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { blockById } from '../../store/blocks/getters';
+import { blockById } from '@/store/blocks/getters';
 
 const blockTypes = {
   // Block type components

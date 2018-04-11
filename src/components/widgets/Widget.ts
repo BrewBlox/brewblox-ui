@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { dashboardItemById } from '../../store/dashboards/getters';
+import { dashboardItemById } from '@/store/dashboards/getters';
 
 @Component({
   props: {
