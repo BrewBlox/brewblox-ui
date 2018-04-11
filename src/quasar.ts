@@ -36,7 +36,6 @@ import 'quasar-extras/material-icons';
 import 'quasar-extras/mdi';
 import 'quasar-extras/animate/bounceInLeft.css';
 import 'quasar-extras/animate/bounceOutRight.css';
-import 'quasar-app-styl';
 
 import './css/app.styl';
 
