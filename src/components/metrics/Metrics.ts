@@ -8,15 +8,15 @@ import { findBlockWithMetrics } from '../../store/blocks/actions';
 
 @Component({
   props: {
-  id: {
-  default: '',
-  type: String,
-  },
+    id: {
+      default: '',
+      type: String,
+    },
   },
   components: {
-  Plotly: createPlotlyComponent(Plotly),
+    Plotly: createPlotlyComponent(Plotly),
   },
-  })
+})
 export default class Metrics extends Vue {
   plotly = {
     data: [

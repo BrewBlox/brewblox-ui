@@ -1,8 +1,34 @@
 {
   "root": true,
+  "parserOptions": {
+    "parser": "typescript-eslint-parser"
+  },
   "extends": [
     "plugin:vue/essential",
     "@vue/airbnb",
     "@vue/typescript"
-  ]
+  ],
+  "plugins": ["typescript"],
+  "rules": {
+    "strict": 0,
+    "no-param-reassign": 0,
+
+    "import/first": 0,
+    "import/named": 2,
+    "import/namespace": 2,
+    "import/default": 2,
+    "import/export": 2,
+    "import/extensions": 0,
+    "import/no-unresolved": 0,
+    "import/no-extraneous-dependencies": 0,
+    "import/prefer-default-export": 0,
+
+    // allow debugger during development
+    "no-debugger": 2,
+
+    // for eslint + typescript to work:
+    "no-undef": 0,
+    "no-unused-vars": 0,
+    "typescript/no-unused-vars": 1
+  }
 }
