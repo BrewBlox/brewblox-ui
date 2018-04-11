@@ -6,7 +6,7 @@ import { PIDBlock, PIDSettings, PIDLinks, PIDFiltering, PIDState }
 import {
   getAll as getAllSensorSetPointPairs,
 } from '@/store/blocks/SensorSetPointPair/getters';
-import { refresh } from '@/store/blocks/PID/actions';
+import { refresh, persist } from '@/store/blocks/PID/actions';
 
 import BlockWidget from '../BlockWidget';
 
@@ -62,6 +62,16 @@ export default class PIDWidget extends BlockWidget {
       .map(setpoint => ({ label: setpoint.id, value: setpoint.id }));
   }
 
+  get changed() {
+    return this.settings.kp !== this.kpInput
+      || this.settings.td !== this.tdInput
+      || this.settings.ti !== this.tiInput
+      || this.links.input !== this.inputLinkInput
+      || this.links.output !== this.outputLinkInput
+      || this.filtering.input !== this.inputFilteringInput
+      || this.filtering.derivative !== this.derivativeFilteringInput;
+  }
+
   closeModal() {
     this.modalOpen = false;
   }
@@ -72,5 +82,28 @@ export default class PIDWidget extends BlockWidget {
 
   refreshState() {
     refresh(this.$store, this.block.id);
+  }
+
+  update() {
+    throw new Error('Implement this');
+  }
+
+  save() {
+    persist(this.$store, {
+      id: this.block.id,
+      settings: {
+        kp: this.kpInput,
+        td: this.tdInput,
+        ti: this.tiInput,
+      },
+      links: {
+        input: this.inputLinkInput,
+        output: this.outputLinkInput,
+      },
+      filtering: {
+        input: this.inputFilteringInput,
+        derivative: this.derivativeFilteringInput,
+      },
+    });
   }
 }

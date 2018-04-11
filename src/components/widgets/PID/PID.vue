@@ -81,7 +81,7 @@
       :content-css="{ minWidth: '80vw', minHeight: '80vh' }"
     >
       <q-modal-layout>
-        <q-toolbar slot="header">
+        <q-toolbar slot="header" color="dark-bright">
           <q-toolbar-title>
             PID Settings
           </q-toolbar-title>
@@ -164,6 +164,27 @@
             </q-item-main>
           </q-item>
         </q-list>
+        <q-card-actions>
+          <q-card-actions>
+            <q-btn
+              icon="check"
+              :color="changed ? 'primary' : 'light'"
+              :disable="!changed"
+              @click="save"
+            >
+              Save
+            </q-btn>
+
+            <q-btn
+              icon="check"
+              :color="this.kpInput !== this.settings.kp ? 'primary' : 'light'"
+              :disable="this.kpInput === this.settings.kp"
+              @click="update"
+            >
+              Update KP
+            </q-btn>
+          </q-card-actions>
+        </q-card-actions>
       </q-modal-layout>
     </q-modal>
   </div>
