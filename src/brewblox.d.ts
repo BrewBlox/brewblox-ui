@@ -4,7 +4,7 @@ type env = {
   VUE_ROUTER_BASE: string,
 };
 
-declare const process: { env: env };
+// declare const process: { env: env };
 
 // interface for plugin arguments
 interface PluginArguments {
