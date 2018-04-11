@@ -4,7 +4,7 @@ import { saveBlock } from '../actions';
 import { Series } from '../state';
 
 export const addOneWireTempSensor =
-  ({ id, settings, state }: OneWireTempSensor, metrics: Series[] ) => {
+  ({ id, settings, state }: OneWireTempSensor, metrics: Series[]) => {
     addBlock({ id, settings, state, metrics, type: 'OneWireTempSensor' });
   };
 
