@@ -13,3 +13,8 @@ interface PluginArguments {
   Vue: any;
   router: any;
 }
+
+// Widget types
+type WidgetType =
+  'UIImage' |
+  'GraphSensor';

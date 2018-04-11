@@ -1,0 +1,24 @@
+{
+  "dashboards": [
+    {
+      "id": "dashboard-home",
+      "title": "Home Dashboard",
+      "order": 1,
+      "items": ["item-1", "item-2"]
+    }
+  ],
+  "items": [
+    {
+      "id": "item-1",
+      "order": 1,
+      "cols": 2,
+      "rows": 2
+    },
+    {
+      "id": "item-2",
+      "order": 2,
+      "cols": 3,
+      "rows": 3
+    }
+  ]
+}

@@ -3,19 +3,22 @@
     <q-layout-header>
       <q-toolbar
         glossy
+        color="dark"
       >
         <q-btn
           flat
           dense
           round
-          @click="leftDrawerOpen = !leftDrawerOpen"
+          @click="toggleDrawer"
         >
           <q-icon name="menu" />
         </q-btn>
 
         <q-toolbar-title>
-          BrewBlox
+          <portal-target name="toolbar-title">BrewBlox</portal-target>
         </q-toolbar-title>
+
+        <portal-target name="toolbar-buttons" />
       </q-toolbar>
     </q-layout-header>
 
@@ -27,13 +30,33 @@
         link
         inset-delimiter
       >
-        <q-item>
+        <q-list-header>Main menu</q-list-header>
+        <q-item
+          link
+          to="/blocks"
+        >
           <q-item-side icon="settings" />
-          <router-link to="/blocks">Blocks</router-link>
+          Blocks
         </q-item>
-        <q-item>
+        <q-item
+          link
+          to="/metrics"
+        >
           <q-item-side icon="show chart" />
-          <router-link to="/metrics">Metrics</router-link>
+          Metrics
+        </q-item>
+
+        <q-item-separator />
+
+        <q-list-header v-if="!isFetching && dashboards.length > 0">Dashboards</q-list-header>
+
+        <q-item
+          v-for="dashboard in dashboards"
+          link
+          :to="`/dashboard/${ dashboard.id }`"
+          :key="dashboard.id"
+        >
+          {{ dashboard.title }}
         </q-item>
       </q-list>
     </q-layout-drawer>
@@ -44,16 +67,7 @@
   </q-layout>
 </template>
 
-<script>
-export default {
-  name: 'LayoutDefault',
-  data() {
-    return {
-      leftDrawerOpen: false,
-    };
-  },
-};
-</script>
+<script lang="ts" src="./default.ts" />
 
 <style>
 </style>
