@@ -5,9 +5,7 @@ import { Series } from '../state';
 
 export const addOneWireTempSensor =
   ({ id, settings, state }: OneWireTempSensor, metrics: Series[]) => {
-    addBlock({
-      id, settings, state, metrics, type: 'OneWireTempSensor',
-    });
+    addBlock({ id, settings, state, metrics, type: 'OneWireTempSensor' });
   };
 
 export const persist = async (oneWireTempSensor: OneWireTempSensorUpdate) => {
