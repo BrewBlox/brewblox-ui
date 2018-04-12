@@ -1,3 +1,5 @@
+import { SetPointSimpleBlock } from '@/store/blocks/SetPointSimple/SetPointSimple';
+
 import BlockWidget from './BlockWidget';
 
 describe('inputsFromSource', () => {
@@ -61,5 +63,26 @@ describe('inputsFromSource', () => {
   });
 });
 
-// it('Should be flagged as changed when source and inputs do not match');
-// it('Should update when block updates');
+describe('changed', () => {
+  it('Should be flagged as changed when source and inputs do not match', () => {
+    class TestBlock extends BlockWidget {
+      testProperty = 2;
+      otherProperty = 4;
+    }
+
+    const blockWidget = new TestBlock();
+
+    blockWidget.inputMapping = {
+      test: { path: 'testProperty' },
+      other: { path: 'otherProperty' },
+    };
+
+    // update internal inputs values
+    blockWidget.onBlockUpdate();
+
+    // set input to different value
+    blockWidget.inputs.test = 'change';
+
+    expect(blockWidget.changed).toBe(true);
+  });
+});
