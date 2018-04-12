@@ -43,9 +43,9 @@ export function fetchBlockMetrics(id: string): Promise<MetricsResult> {
 }
 
 export function persistBlock(block: BlockSaveBase): Promise<BlockSaveBase> {
-  return put(`/blocks/${encodeURIComponent(block.id)}`, block);
+  return put(`/blocks/${encodeURIComponent(block.id)}`, unspreadData(block));
 }
 
 export function updateBlock(block: BlockBase & any): Promise<BlockSaveBase> {
-  return patch(`/blocks/${encodeURIComponent(block.id)}`, block);
+  return patch(`/blocks/${encodeURIComponent(block.id)}`, unspreadData(block));
 }
