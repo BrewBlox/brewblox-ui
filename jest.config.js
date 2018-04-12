@@ -11,6 +11,7 @@ module.exports = {
     '^.+\\.vue$': 'vue-jest',
     '^.+\\.tsx?$': 'ts-jest',
   },
+  testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(ts|jsx?)$',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
