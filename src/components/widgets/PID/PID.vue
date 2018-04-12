@@ -98,7 +98,7 @@
           <q-item class="grid-items-3">
             <q-item-main>
               <q-input
-                v-model="kpInput"
+                v-model="inputs.kp"
                 stack-label="KP"
                 placeholder="KP of PID"
                 type="number"
@@ -106,7 +106,7 @@
             </q-item-main>
             <q-item-main>
               <q-input
-                v-model="tiInput"
+                v-model="inputs.ti"
                 stack-label="TI"
                 placeholder="TI of PID"
                 type="number"
@@ -114,7 +114,7 @@
             </q-item-main>
             <q-item-main>
               <q-input
-                v-model="tdInput"
+                v-model="inputs.td"
                 stack-label="TD"
                 placeholder="TD of PID"
                 type="number"
@@ -126,7 +126,7 @@
           <q-item class="grid-items-2">
             <q-item-main>
               <q-select
-                v-model="inputLinkInput"
+                v-model="inputs.linkInput"
                 stack-label="Input"
                 placeholder="Input of PID"
                 clearable
@@ -135,7 +135,7 @@
             </q-item-main>
             <q-item-main>
               <q-select
-                v-model="outputLinkInput"
+                v-model="inputs.linkOutput"
                 stack-label="Output"
                 placeholder="Output of PID"
                 clearable
@@ -148,7 +148,7 @@
           <q-item class="grid-items-2">
             <q-item-main>
               <q-input
-                v-model="inputFilteringInput"
+                v-model="inputs.filteringInput"
                 stack-label="Input"
                 placeholder="Filtering input"
                 type="number"
@@ -156,7 +156,7 @@
             </q-item-main>
             <q-item-main>
               <q-input
-                v-model="derivativeFilteringInput"
+                v-model="inputs.filteringDerivative"
                 stack-label="Derivative"
                 placeholder="Filtering derivative"
                 type="number"

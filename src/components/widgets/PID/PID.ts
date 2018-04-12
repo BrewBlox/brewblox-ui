@@ -1,4 +1,4 @@
-import Component from 'vue-class-component';
+import Component, { mixins } from 'vue-class-component';
 
 import { PIDBlock, PIDSettings, PIDLinks, PIDFiltering, PIDState }
   from '@/store/blocks/PID/PID';
@@ -11,31 +11,18 @@ import { refresh, persist, update } from '@/store/blocks/PID/actions';
 import BlockWidget from '../BlockWidget';
 
 @Component
-export default class PIDWidget extends BlockWidget {
+export default class PIDWidget extends mixins(BlockWidget) {
+  inputMapping = {
+    kp: { path: 'settings.kp', default: 0 },
+    ti: { path: 'settings.ti', default: 0 },
+    td: { path: 'settings.td', default: 0 },
+    linkInput: { path: 'links.input', default: '' },
+    linkOutput: { path: 'links.output', default: '' },
+    filteringInput: { path: 'filtering.input', default: 0 },
+    filteringDerivative: { path: 'filtering.derivative', default: 0 },
+  };
+
   modalOpen: boolean = false;
-
-  kpInput: number = 0;
-  tiInput: number = 0;
-  tdInput: number = 0;
-
-  inputLinkInput: string = '';
-  outputLinkInput: string = '';
-
-  inputFilteringInput: number = 0;
-  derivativeFilteringInput: number = 0;
-
-  mounted() {
-    // set default values
-    this.kpInput = this.settings.kp;
-    this.tiInput = this.settings.ti;
-    this.tdInput = this.settings.td;
-
-    this.inputLinkInput = this.links.input;
-    this.outputLinkInput = this.links.output;
-
-    this.inputFilteringInput = this.filtering.input;
-    this.derivativeFilteringInput = this.filtering.derivative;
-  }
 
   get blockData(): PIDBlock {
     return <PIDBlock>this.block;
@@ -62,18 +49,8 @@ export default class PIDWidget extends BlockWidget {
       .map(setpoint => ({ label: setpoint.id, value: setpoint.id }));
   }
 
-  get changed() {
-    return this.settings.kp !== this.kpInput
-      || this.settings.td !== this.tdInput
-      || this.settings.ti !== this.tiInput
-      || this.links.input !== this.inputLinkInput
-      || this.links.output !== this.outputLinkInput
-      || this.filtering.input !== this.inputFilteringInput
-      || this.filtering.derivative !== this.derivativeFilteringInput;
-  }
-
   get kpChanged() {
-    return this.settings.kp !== this.kpInput;
+    return this.settings.kp !== this.inputs.kp;
   }
 
   closeModal() {
@@ -92,7 +69,7 @@ export default class PIDWidget extends BlockWidget {
     update(this.$store, {
       id: this.block.id,
       settings: {
-        kp: this.kpInput,
+        kp: this.inputs.kpInput,
       },
     });
   }
@@ -101,17 +78,17 @@ export default class PIDWidget extends BlockWidget {
     persist(this.$store, {
       id: this.block.id,
       settings: {
-        kp: this.kpInput,
-        td: this.tdInput,
-        ti: this.tiInput,
+        kp: this.inputs.kp,
+        td: this.inputs.td,
+        ti: this.inputs.ti,
       },
       links: {
-        input: this.inputLinkInput,
-        output: this.outputLinkInput,
+        input: this.inputs.linkInput,
+        output: this.inputs.linkOutput,
       },
       filtering: {
-        input: this.inputFilteringInput,
-        derivative: this.derivativeFilteringInput,
+        input: this.inputs.filteringInput,
+        derivative: this.inputs.filteringDerivative,
       },
     });
   }
