@@ -218,4 +218,8 @@
 .q-item-section {
   margin-left: 0;
 }
+
+.modal .q-list {
+  border: 0;
+}
 </style>
