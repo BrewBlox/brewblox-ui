@@ -177,9 +177,9 @@
 
             <q-btn
               icon="check"
-              :color="this.kpInput !== this.settings.kp ? 'primary' : 'light'"
-              :disable="this.kpInput === this.settings.kp"
-              @click="update"
+              :color="kpChanged ? 'primary' : 'light'"
+              :disable="!kpChanged"
+              @click="updateKP"
             >
               Update KP
             </q-btn>

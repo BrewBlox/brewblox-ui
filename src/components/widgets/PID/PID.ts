@@ -6,7 +6,7 @@ import { PIDBlock, PIDSettings, PIDLinks, PIDFiltering, PIDState }
 import {
   getAll as getAllSensorSetPointPairs,
 } from '@/store/blocks/SensorSetPointPair/getters';
-import { refresh, persist } from '@/store/blocks/PID/actions';
+import { refresh, persist, update } from '@/store/blocks/PID/actions';
 
 import BlockWidget from '../BlockWidget';
 
@@ -72,6 +72,10 @@ export default class PIDWidget extends BlockWidget {
       || this.filtering.derivative !== this.derivativeFilteringInput;
   }
 
+  get kpChanged() {
+    return this.settings.kp !== this.kpInput;
+  }
+
   closeModal() {
     this.modalOpen = false;
   }
@@ -84,8 +88,13 @@ export default class PIDWidget extends BlockWidget {
     refresh(this.$store, this.block.id);
   }
 
-  update() {
-    throw new Error('Implement this');
+  updateKP() {
+    update(this.$store, {
+      id: this.block.id,
+      settings: {
+        kp: this.kpInput,
+      },
+    });
   }
 
   save() {

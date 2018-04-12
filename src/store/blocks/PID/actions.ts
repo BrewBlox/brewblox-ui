@@ -2,7 +2,7 @@ import { Store } from 'vuex';
 
 import { updateBlockState, addBlock } from '../mutations';
 import { PID, PIDUpdate } from './PID';
-import { saveBlock } from '../actions';
+import { saveBlock, updateBlock } from '../actions';
 
 import { State } from '../../state';
 import { BlocksContext } from '../state';
@@ -11,12 +11,21 @@ export const addPID = (context: BlocksContext, { id, settings, links, filtering,
   addBlock(context, { id, settings, links, filtering, state, type: 'PID' });
 };
 
+export const update = (store: Store<State>, update: { id: string } & any) => {
+  try {
+    updateBlock(store, update);
+  } catch (e) {
+    throw new Error(e);
+  }
+};
+
 // example refresh action
 export const refresh = (store: Store<State>, id: string) => {
   function random() {
     return Math.round(Math.random() * 100);
   }
 
+  // assign new random state
   updateBlockState(store, {
     id,
     state: {
