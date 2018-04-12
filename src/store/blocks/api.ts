@@ -2,10 +2,10 @@ import { Block, BlockSaveBase, MetricsResult, BlockBase } from './state';
 
 import { get, put, patch } from '@/core/fetch';
 
-function spreadData(input: any) {
+export function spreadData(input: any) {
   const spreadInput = {
-    ...input,
     ...input.data,
+    ...input,
   };
 
   delete spreadInput.data;
@@ -21,12 +21,12 @@ export function fetchBlocks(): Promise<Block[]> {
   return get('/blocks/list').then(blocks => blocks.map(spreadData));
 }
 
-export function persistBlock(block: BlockSaveBase): Promise<BlockSaveBase> {
-  return put(`/blocks/${encodeURIComponent(block.id)}`, block);
-}
-
 export function fetchBlockMetrics(id: string): Promise<MetricsResult> {
   return get(`/blocks/${encodeURIComponent(id)}/metrics`);
+}
+
+export function persistBlock(block: BlockSaveBase): Promise<BlockSaveBase> {
+  return put(`/blocks/${encodeURIComponent(block.id)}`, block);
 }
 
 export function updateBlock(block: BlockBase & any): Promise<BlockSaveBase> {
