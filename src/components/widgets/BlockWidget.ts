@@ -17,7 +17,7 @@ class BlockWidget extends Widget {
 
   inputs: { [inputPropName: string]: any } = {};
 
-  inputsFromState() {
+  inputsFromState(): { [key: string]: any } {
     return Object.keys(this.inputMapping)
       .reduce(
         (total, key) => {
@@ -35,7 +35,9 @@ class BlockWidget extends Widget {
   }
 
   get changed() {
-    return false;
+    const state = this.inputsFromState();
+
+    return Object.keys(state).some(key => state[key] !== this.inputs[key]);
   }
 
   get block(): Block {
