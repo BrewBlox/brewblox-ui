@@ -1,4 +1,4 @@
-import { spreadData } from './api';
+import { spreadData, unspreadData } from './api';
 
 describe('spreadData', () => {
   it('Should spread data property on object and remove data property', () => {
@@ -28,5 +28,29 @@ describe('spreadData', () => {
     const input = { test: 1 };
 
     expect(spreadData(input)).toEqual({ test: 1 });
+  });
+});
+
+describe('unspreadData', () => {
+  it('Should convert objects to contain properties in data property', () => {
+    const input = { test: 1 };
+
+    expect(unspreadData(input)).toEqual({ data: { test: 1 } });
+  });
+
+  it('Should maintain id and type properties', () => {
+    const input = {
+      id: 'test',
+      type: 'SomeType',
+      test: 1,
+    };
+
+    expect(unspreadData(input)).toEqual({
+      id: 'test',
+      type: 'SomeType',
+      data: {
+        test: 1,
+      },
+    });
   });
 });
