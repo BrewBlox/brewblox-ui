@@ -4,6 +4,7 @@ export default [
     component: () => import('@/layouts/default.vue'),
     children: [
       { path: '', component: () => import('@/pages/index.vue') },
+      { path: '/settings', component: () => import('@/pages/settings/settings.vue') },
       { path: '/blocks', component: () => import('@/pages/blocks.vue') },
       { path: '/metrics', component: () => import('@/pages/metrics.vue') },
 
