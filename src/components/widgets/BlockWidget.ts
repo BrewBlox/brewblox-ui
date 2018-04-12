@@ -1,5 +1,6 @@
 import { get } from 'lodash';
 import Component from 'vue-class-component';
+import { Watch } from 'vue-property-decorator';
 
 import { blockById } from '@/store/blocks/getters';
 import { Block } from '@/store/blocks/state';
@@ -30,10 +31,6 @@ class BlockWidget extends Widget {
       );
   }
 
-  mounted() {
-    this.inputs = this.inputsFromState();
-  }
-
   get changed() {
     const state = this.inputsFromState();
 
@@ -42,6 +39,11 @@ class BlockWidget extends Widget {
 
   get block(): Block {
     return blockById(this.$store, this.options.block);
+  }
+
+  @Watch('block', { immediate: true, deep: true })
+  onBlockUpdate() {
+    this.inputs = this.inputsFromState();
   }
 }
 

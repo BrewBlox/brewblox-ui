@@ -183,6 +183,12 @@
             >
               Update KP
             </q-btn>
+            <q-btn
+              icon="check"
+              @click="randomKP"
+            >
+              Random KP from store
+            </q-btn>
           </q-card-actions>
         </q-card-actions>
       </q-modal-layout>

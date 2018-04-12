@@ -74,6 +74,15 @@ export default class PIDWidget extends mixins(BlockWidget) {
     });
   }
 
+  randomKP() {
+    update(this.$store, {
+      id: this.block.id,
+      settings: {
+        kp: Math.round(Math.random() * 15),
+      },
+    });
+  }
+
   save() {
     persist(this.$store, {
       id: this.block.id,
