@@ -1,12 +1,12 @@
 {
-    "defaultSeverity": "error",
-    "extends": [
-        "tslint-config-airbnb"
-    ],
-    "jsRules": {},
-    "rules": {
-      "import-name": false,
-      "no-boolean-literal-compare": false
-    },
-    "rulesDirectory": []
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint-config-airbnb"
+  ],
+  "jsRules": {},
+  "rules": {
+    "import-name": false,
+    "no-boolean-literal-compare": false
+  },
+  "rulesDirectory": []
 }
