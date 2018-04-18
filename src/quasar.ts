@@ -30,6 +30,7 @@ import Quasar, {
   QSelect,
   Ripple,
   Notify,
+  Dialog,
 } from 'quasar';
 
 import 'quasar-extras/roboto-font';
@@ -72,5 +73,5 @@ Vue.use(Quasar, {
     QSelect,
   },
   directives: { Ripple },
-  plugins: { Notify },
+  plugins: { Notify, Dialog },
 });
