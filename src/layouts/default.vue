@@ -58,6 +58,15 @@
         >
           {{ dashboard.title }}
         </q-item>
+
+        <div class="q-list-container">
+          <q-btn
+            icon="add"
+            color="dark-bright"
+          >
+            add new dashboard
+          </q-btn>
+        </div>
       </q-list>
     </q-layout-drawer>
 
@@ -72,5 +81,9 @@
 <style>
 .q-toolbar .vue-portal-target .q-btn {
   margin-left: 10px;
+}
+
+.q-list-container {
+  padding: 16px;
 }
 </style>
