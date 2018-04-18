@@ -25,13 +25,17 @@ class Controllers extends Vue {
   }
 
   removeController(controller: string) {
+    removeController(this.$store, controller);
+  }
+
+  remove(controller: string) {
     this.$q.dialog({
       title: 'Remove',
       message: `Do you want to remove controller '${controller}'?`,
       ok: 'Yes',
       cancel: 'Cancel',
     })
-      .then(() => removeController(this.$store, controller))
+      .then(() => this.removeController(controller))
       .catch(() => {});
   }
 }

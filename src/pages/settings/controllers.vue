@@ -30,7 +30,7 @@
             class="remove-btn"
             icon="remove circle"
             color="negative"
-            @click="removeController(controller)"
+            @click="remove(controller)"
           >
             Remove
           </q-btn>
