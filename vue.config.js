@@ -22,6 +22,7 @@ module.exports = {
         transpileOnly: false,
       }));
 
+    // disable fork-ts-checker
     config
       .plugins
       .delete('fork-ts-checker');
