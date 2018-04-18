@@ -1,8 +1,10 @@
 [
   {
     "id": "dashboard-home",
-    "title": "Home Dashboard",
-    "order": 1,
-    "items": ["item-1", "item-2"]
+    "data": {
+      "title": "Home Dashboard",
+      "order": 1,
+      "items": ["item-1", "item-2"]
+    }
   }
 ]
