@@ -8,7 +8,7 @@
     "build": "vue-cli-service build",
     "test": "vue-cli-service test",
     "e2e": "vue-cli-service e2e",
-    "lint": "eslint --ext .js,.ts,.vue src",
+    "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "e2e:open": "vue-cli-service e2e:open"
   },
   "dependencies": {
@@ -43,6 +43,7 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
     "ts-jest": "^22.0.1",
+    "tslint-config-airbnb": "^5.8.0",
     "vue-template-compiler": "^2.5.13"
   },
   "browserslist": [
