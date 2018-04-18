@@ -7,6 +7,7 @@ import { addController, removeController } from '@/store/settings/actions';
 @Component
 class Controllers extends Vue {
   controllerInput: string = '';
+  $q: any;
 
   get isFetching() {
     return isFetching(this.$store);
@@ -24,9 +25,14 @@ class Controllers extends Vue {
   }
 
   removeController(controller: string) {
-    if (confirm(`Do you want to remove controller '${controller}'?`)) {
-      removeController(this.$store, controller);
-    }
+    this.$q.dialog({
+      title: 'Remove',
+      message: `Do you want to remove controller '${controller}'?`,
+      ok: 'Yes',
+      cancel: 'Cancel',
+    })
+      .then(() => removeController(this.$store, controller))
+      .catch(() => {});
   }
 }
 
