@@ -11,8 +11,8 @@ export default {
   name: 'Settings',
   components: {
     Controllers,
-  }
-}
+  },
+};
 </script>
 
 <style scoped>

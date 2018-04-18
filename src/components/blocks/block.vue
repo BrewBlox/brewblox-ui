@@ -31,7 +31,7 @@ export default Vue.extend({
   },
   computed: {
     type(): string {
-      const type = blockById(this.$store, this.$props.blockId).type;
+      const { type } = blockById(this.$store, this.$props.blockId);
 
       if (Object.keys(blockTypes).indexOf(type) === -1) {
         return 'Unknown';
