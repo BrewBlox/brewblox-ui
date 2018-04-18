@@ -10,6 +10,7 @@ const settings = {
   strict: true,
   state: {
     fetching: false,
+    settings: {},
   },
 };
 

@@ -1,7 +1,7 @@
 const apiMocker = require('connect-api-mocker');
 
 module.exports = {
-  lintOnSave: false,
+  lintOnSave: true,
   devServer: {
     before(app) {
       // use api mocker
