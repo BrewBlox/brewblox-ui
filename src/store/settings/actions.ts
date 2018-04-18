@@ -8,11 +8,15 @@ import { fetchSettings as fetchSettingsFromApi } from './api';
 import {
   mutateFetching as mutateFetchingInStore,
   setSettings as setSettingsInStore,
+  addController as addControllerInStore,
 } from './mutations';
 
 const { dispatch } = getStoreAccessors<SettingsState, RootState>('settings');
 
 const actions = {
+  addController(context: SettingsContext, controller: string) {
+    addControllerInStore(context, controller);
+  },
   async fetchSettings(context: SettingsContext) {
     // update isFetching
     mutateFetchingInStore(context, true);
@@ -30,5 +34,6 @@ const actions = {
 
 // exported action accessors
 export const fetchSettings = dispatch(actions.fetchSettings);
+export const addController = dispatch(actions.addController);
 
 export default actions;

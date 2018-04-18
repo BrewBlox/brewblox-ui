@@ -7,6 +7,12 @@ import { State as RootState } from '../state';
 const { commit } = getStoreAccessors<SettingsState, RootState>('settings');
 
 const mutations = {
+  addController(state: SettingsState, controller: string) {
+    state.settings = {
+      ...state.settings,
+      controllers: [...state.settings.controllers, controller],
+    };
+  },
   setSettings(state: SettingsState, settings: Settings) {
     state.settings = settings;
   },
@@ -18,5 +24,6 @@ const mutations = {
 // exported commit accessors
 export const mutateFetching = commit(mutations.mutateFetching);
 export const setSettings = commit(mutations.setSettings);
+export const addController = commit(mutations.addController);
 
 export default mutations;

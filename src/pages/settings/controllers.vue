@@ -5,17 +5,19 @@
       <q-list>
         <q-item>
           <q-item-main>
-            <q-input
-              v-model="controllerInput"
-              stack-label="Add new controller"
-              placeholder="controller-id"
-            />
-            <q-btn
-              icon="add"
-              color="primary"
-            >
-              Add
-            </q-btn>
+            <form @submit.prevent="addController">
+              <q-input
+                v-model="controllerInput"
+                stack-label="Add new controller"
+                placeholder="controller-id"
+              />
+              <q-btn
+                icon="add"
+                color="primary"
+              >
+                Add
+              </q-btn>
+            </form>
           </q-item-main>
         </q-item>
         <q-item
@@ -32,7 +34,7 @@
 <script lang="ts" src="./controllers.ts" />
 
 <style scoped>
-.q-item-main {
+.q-item-main form {
   display: flex;
 }
 
