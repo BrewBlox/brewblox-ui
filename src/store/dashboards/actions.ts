@@ -4,6 +4,7 @@ import UrlSafeString from 'url-safe-string';
 import {
   fetchDashboards as fetchDashboardsFromApi,
   fetchDashboardItems as fetchDashboardItemsFromApi,
+  createDashboard as createDashboardOnApi,
   persistDashboardItem,
 } from './api';
 
@@ -24,12 +25,18 @@ const actions = {
   addNewDashboard(context: DashboardContext, title: string) {
     const id = new UrlSafeString().generate(title);
 
-    addDashboardToStore(context, {
+    const dashboard = {
       id,
       title,
       order: Object.keys(context.state.dashboards.byId).length + 1,
       items: [],
-    });
+    };
+
+    // add dashboard to store
+    addDashboardToStore(context, dashboard);
+
+    // add dashboard to API
+    createDashboardOnApi(dashboard);
   },
   addDashboard(context: DashboardContext, dashboard: Dashboard) {
     addDashboardToStore(context, dashboard);
