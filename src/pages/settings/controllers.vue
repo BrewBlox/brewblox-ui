@@ -25,6 +25,15 @@
           :key="controller"
         >
           {{ controller }}
+
+          <q-btn
+            class="remove-btn"
+            icon="remove circle"
+            color="negative"
+            @click="removeController(controller)"
+          >
+            Remove
+          </q-btn>
         </q-item>
       </q-list>
     </q-card-main>
@@ -45,5 +54,9 @@
 .q-item-main .q-btn {
   margin-left: 10px;
   flex-shrink: 0;
+}
+
+.remove-btn {
+  margin-left: auto;
 }
 </style>

@@ -13,6 +13,13 @@ const mutations = {
       controllers: [...state.settings.controllers, controller],
     };
   },
+  removeController(state: SettingsState, controller: string) {
+    state.settings = {
+      ...state.settings,
+      controllers:
+        [...state.settings.controllers].filter(stateController => controller !== stateController),
+    };
+  },
   setSettings(state: SettingsState, settings: Settings) {
     state.settings = settings;
   },
@@ -25,5 +32,6 @@ const mutations = {
 export const mutateFetching = commit(mutations.mutateFetching);
 export const setSettings = commit(mutations.setSettings);
 export const addController = commit(mutations.addController);
+export const removeController = commit(mutations.removeController);
 
 export default mutations;

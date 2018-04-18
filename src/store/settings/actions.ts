@@ -12,6 +12,7 @@ import {
   mutateFetching as mutateFetchingInStore,
   setSettings as setSettingsInStore,
   addController as addControllerInStore,
+  removeController as removeControllerFromStore,
 } from './mutations';
 
 const { dispatch } = getStoreAccessors<SettingsState, RootState>('settings');
@@ -26,6 +27,18 @@ const actions = {
 
     // add controller to store
     addControllerInStore(context, controller);
+  },
+  removeController(context: SettingsContext, controller: string) {
+    // persist new settings
+    persistSettingsOnApi({
+      ...context.state.settings,
+      controllers:
+        [...context.state.settings.controllers]
+          .filter(stateController => controller !== stateController),
+    });
+
+    // remove controller from store
+    removeControllerFromStore(context, controller);
   },
   async fetchSettings(context: SettingsContext) {
     // update isFetching
@@ -45,5 +58,6 @@ const actions = {
 // exported action accessors
 export const fetchSettings = dispatch(actions.fetchSettings);
 export const addController = dispatch(actions.addController);
+export const removeController = dispatch(actions.removeController);
 
 export default actions;

@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 
 import { controllers, isFetching } from '@/store/settings/getters';
-import { addController } from '@/store/settings/actions';
+import { addController, removeController } from '@/store/settings/actions';
 
 @Component
 class Controllers extends Vue {
@@ -21,6 +21,12 @@ class Controllers extends Vue {
 
     // reset input
     this.controllerInput = '';
+  }
+
+  removeController(controller: string) {
+    if (confirm(`Do you want to remove controller '${controller}'?`)) {
+      removeController(this.$store, controller);
+    }
   }
 }
 
