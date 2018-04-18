@@ -3,7 +3,10 @@ import { getStoreAccessors } from 'vuex-typescript';
 import { SettingsContext, SettingsState } from './state';
 import { State as RootState } from '../state';
 
-import { fetchSettings as fetchSettingsFromApi } from './api';
+import {
+  fetchSettings as fetchSettingsFromApi,
+  persistSettings as persistSettingsOnApi,
+} from './api';
 
 import {
   mutateFetching as mutateFetchingInStore,
@@ -15,6 +18,13 @@ const { dispatch } = getStoreAccessors<SettingsState, RootState>('settings');
 
 const actions = {
   addController(context: SettingsContext, controller: string) {
+    // persist new settings
+    persistSettingsOnApi({
+      ...context.state.settings,
+      controllers: [...context.state.settings.controllers, controller],
+    });
+
+    // add controller to store
     addControllerInStore(context, controller);
   },
   async fetchSettings(context: SettingsContext) {
