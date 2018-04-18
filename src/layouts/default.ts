@@ -4,6 +4,7 @@ import Component from 'vue-class-component';
 import byOrder from '@/core/byOrder';
 
 import { allDashboards, isFetching } from '@/store/dashboards/getters';
+import { addNewDashboard } from '@/store/dashboards/actions';
 
 @Component
 class LayoutDefault extends Vue {
@@ -31,6 +32,9 @@ class LayoutDefault extends Vue {
         model: '',
       },
     })
+      .then((dashboardName: string) => {
+        addNewDashboard(this.$store, dashboardName);
+      })
       .catch(() => {});
   }
 }

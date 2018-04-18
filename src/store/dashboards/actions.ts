@@ -1,4 +1,5 @@
 import { getStoreAccessors } from 'vuex-typescript';
+import UrlSafeString from 'url-safe-string';
 
 import {
   fetchDashboards as fetchDashboardsFromApi,
@@ -20,6 +21,16 @@ import {
 const { dispatch } = getStoreAccessors<DashboardState, RootState>('dashboards');
 
 const actions = {
+  addNewDashboard(context: DashboardContext, title: string) {
+    const id = new UrlSafeString().generate(title);
+
+    addDashboardToStore(context, {
+      id,
+      title,
+      order: Object.keys(context.state.dashboards.byId).length + 1,
+      items: [],
+    });
+  },
   addDashboard(context: DashboardContext, dashboard: Dashboard) {
     addDashboardToStore(context, dashboard);
   },
@@ -66,6 +77,7 @@ const actions = {
 // exported action accessors
 export const fetchDashboards = dispatch(actions.fetchDashboards);
 export const addDashboardItem = dispatch(actions.addDashboardItem);
+export const addNewDashboard = dispatch(actions.addNewDashboard);
 export const addDashboard = dispatch(actions.addDashboard);
 export const updateDashboardItemOrder = dispatch(actions.updateDashboardItemOrder);
 export const updateDashboardItemSize = dispatch(actions.updateDashboardItemSize);

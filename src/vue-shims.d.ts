@@ -11,3 +11,5 @@ declare module 'quasar';
 declare const __THEME: string;
 
 declare module 'portal-vue';
+
+declare module 'url-safe-string';
