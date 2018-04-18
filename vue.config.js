@@ -1,7 +1,7 @@
 const apiMocker = require('connect-api-mocker');
 
 module.exports = {
-  lintOnSave: false,
+  lintOnSave: true,
   devServer: {
     before(app) {
       // use api mocker
@@ -12,5 +12,19 @@ module.exports = {
     // add quasar alias
     config.resolve.alias
       .set('quasar', 'quasar-framework/dist/quasar.mat.esm');
+
+    // enable ts checking
+    config.module
+      .rule('ts')
+      .use('ts-loader')
+      .tap((options) => ({
+        ...options,
+        transpileOnly: false,
+      }));
+
+    // disable fork-ts-checker
+    config
+      .plugins
+      .delete('fork-ts-checker');
   },
 };
