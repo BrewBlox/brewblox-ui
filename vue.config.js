@@ -21,5 +21,9 @@ module.exports = {
         ...options,
         transpileOnly: false,
       }));
+
+    config
+      .plugins
+      .delete('fork-ts-checker');
   },
 };
