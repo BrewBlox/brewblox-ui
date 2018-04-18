@@ -63,6 +63,7 @@
           <q-btn
             icon="add"
             color="dark-bright"
+            @click="createDashboard"
           >
             add new dashboard
           </q-btn>

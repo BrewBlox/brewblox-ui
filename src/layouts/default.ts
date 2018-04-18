@@ -8,6 +8,7 @@ import { allDashboards, isFetching } from '@/store/dashboards/getters';
 @Component
 class LayoutDefault extends Vue {
   leftDrawerOpen: boolean = false;
+  $q: any;
 
   get dashboards() {
     return [...allDashboards(this.$store)].sort(byOrder);
@@ -19,6 +20,18 @@ class LayoutDefault extends Vue {
 
   toggleDrawer() {
     this.leftDrawerOpen = !this.leftDrawerOpen;
+  }
+
+  createDashboard() {
+    this.$q.dialog({
+      title: 'Add dashboard',
+      message: 'Enter name of the dashboard',
+      cancel: true,
+      prompt: {
+        model: '',
+      },
+    })
+      .catch(() => {});
   }
 }
 
