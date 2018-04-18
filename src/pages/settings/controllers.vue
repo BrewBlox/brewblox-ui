@@ -18,6 +18,12 @@
             </q-btn>
           </q-item-main>
         </q-item>
+        <q-item
+          v-for="controller in controllers"
+          :key="controller"
+        >
+          {{ controller }}
+        </q-item>
       </q-list>
     </q-card-main>
   </q-card>
