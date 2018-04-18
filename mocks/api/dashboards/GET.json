@@ -1,0 +1,8 @@
+[
+  {
+    "id": "dashboard-home",
+    "title": "Home Dashboard",
+    "order": 1,
+    "items": ["item-1", "item-2"]
+  }
+]

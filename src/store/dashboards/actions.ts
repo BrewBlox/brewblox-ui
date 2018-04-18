@@ -1,6 +1,10 @@
 import { getStoreAccessors } from 'vuex-typescript';
 
-import { fetchDashboards as fetchDashboardsFromApi, persistDashboardItem } from './api';
+import {
+  fetchDashboards as fetchDashboardsFromApi,
+  fetchDashboardItems as fetchDashboardItemsFromApi,
+  persistDashboardItem,
+} from './api';
 
 import { DashboardState, DashboardItem, DashboardContext, Dashboard } from './state';
 import { State as RootState } from '../state';
@@ -43,7 +47,10 @@ const actions = {
     mutateFetchingInStore(context, true);
 
     // will fetch blocks from the server
-    const { dashboards, items } = await fetchDashboardsFromApi();
+    const [dashboards, items] = await Promise.all([
+      fetchDashboardsFromApi(),
+      fetchDashboardItemsFromApi(),
+    ]);
 
     // first add items to store
     items.forEach(item => actions.addDashboardItem(context, item));

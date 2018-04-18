@@ -1,0 +1,19 @@
+[
+  {
+    "id": "item-1",
+    "order": 1,
+    "cols": 4,
+    "rows": 4,
+    "widget": "PID",
+    "options": {
+      "block": "controller-1/PID-1"
+    }
+  },
+  {
+    "id": "item-2",
+    "order": 2,
+    "cols": 3,
+    "rows": 3,
+    "widget": "Empty"
+  }
+]
