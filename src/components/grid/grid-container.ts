@@ -80,7 +80,7 @@ export default class GridContainer extends Vue {
           },
           [
             // render the passed children
-            ...this.$slots.default
+            ...(this.$slots.default || [])
               .filter(slot => slot.tag)
               .map((slot: any) => createElement(
                 GridItem,
