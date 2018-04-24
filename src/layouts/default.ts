@@ -5,7 +5,7 @@ import draggable from 'vuedraggable';
 import byOrder from '@/core/byOrder';
 
 import { allDashboards, isFetching } from '@/store/dashboards/getters';
-import { addNewDashboard } from '@/store/dashboards/actions';
+import { addNewDashboard, updateDashboardOrder } from '@/store/dashboards/actions';
 import { Dashboard } from '@/store/dashboards/state';
 
 @Component({
@@ -23,7 +23,7 @@ class LayoutDefault extends Vue {
   }
 
   set dashboards(dashboards: Dashboard[]) {
-    // reorder dashboards in store
+    updateDashboardOrder(this.$store, dashboards.map(dashboard => dashboard.id));
   }
 
   get isFetching() {

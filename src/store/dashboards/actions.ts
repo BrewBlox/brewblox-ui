@@ -5,6 +5,7 @@ import {
   fetchDashboards as fetchDashboardsFromApi,
   fetchDashboardItems as fetchDashboardItemsFromApi,
   createDashboard as createDashboardOnApi,
+  persistDashboard,
   persistDashboardItem,
 } from './api';
 
@@ -14,6 +15,7 @@ import { State as RootState } from '../state';
 import {
   mutateFetching as mutateFetchingInStore,
   addDashboard as addDashboardToStore,
+  setDashboardOrder as setDashboardOrderInStore,
   addDashboardItem as addDashboardItemToStore,
   setDashboardItemOrder as setDashboardItemOrderInStore,
   setDashboardItemSize as setDashboardItemSizeInStore,
@@ -37,6 +39,14 @@ const actions = {
 
     // add dashboard to API
     createDashboardOnApi(dashboard);
+  },
+  updateDashboardOrder(context: DashboardContext, orders: string[]) {
+    orders.forEach((id, index) => {
+      const order = index + 1;
+      setDashboardOrderInStore(context, { id, order });
+
+      persistDashboard(id, { order });
+    });
   },
   addDashboard(context: DashboardContext, dashboard: Dashboard) {
     addDashboardToStore(context, dashboard);
@@ -85,6 +95,7 @@ const actions = {
 export const fetchDashboards = dispatch(actions.fetchDashboards);
 export const addDashboardItem = dispatch(actions.addDashboardItem);
 export const addNewDashboard = dispatch(actions.addNewDashboard);
+export const updateDashboardOrder = dispatch(actions.updateDashboardOrder);
 export const addDashboard = dispatch(actions.addDashboard);
 export const updateDashboardItemOrder = dispatch(actions.updateDashboardItemOrder);
 export const updateDashboardItemSize = dispatch(actions.updateDashboardItemSize);
