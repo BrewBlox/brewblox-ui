@@ -1,5 +1,7 @@
 <template>
-  <div>Block type not found.</div>
+  <q-card>
+    <q-card-main>Block type not found.</q-card-main>
+  </q-card>
 </template>
 
 <script>

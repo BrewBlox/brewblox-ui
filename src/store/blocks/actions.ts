@@ -5,10 +5,10 @@ import {
   fetchBlockMetrics,
   fetchBlocks as fetchBlocksFromApi,
   persistBlock as persistBlockToApi,
+  updateBlock as updateBlockToApi,
 } from './api';
 
-import store from '../';
-import { BlocksState, BlocksContext, BlockSaveBase } from './state';
+import { BlocksState, BlocksContext, BlockSaveBase, BlockBase } from './state';
 import { State as RootState } from '../state';
 import addBlockToStore from './add-block';
 
@@ -26,56 +26,60 @@ const actions = {
     const block = await fetchBlock(id);
 
     // add block to store
-    addBlockToStore(block);
+    addBlockToStore(context, block);
   },
   async findBlockWithMetrics(context: BlocksContext, id: string) {
     // add block to store which is loading
-    blockLoading(id);
+    blockLoading(context, id);
 
     // will fetch a block from the server
     const blockMetrics = await fetchBlockMetrics(id);
 
     // update metric in store and unset loading
-    mutateBlockInStore({
+    mutateBlockInStore(context, {
       id,
       isLoading: false,
       metrics: blockMetrics.results,
     });
   },
-  async fetchBlocks() {
+  async fetchBlocks(context: BlocksContext) {
     // update isFetching
-    mutateFetchingInStore(true);
+    mutateFetchingInStore(context, true);
 
     // will fetch blocks from the server
     const blocks = await fetchBlocksFromApi();
-    blocks.forEach(block => addBlockToStore(block));
+    blocks.forEach(block => addBlockToStore(context, block));
 
     // update isFetching
-    mutateFetchingInStore(false);
+    mutateFetchingInStore(context, false);
   },
   async saveBlock(context: BlocksContext, block: BlockSaveBase) {
     // update isLoading and block values
-    mutateBlockInStore({ ...block, isLoading: true });
+    mutateBlockInStore(context, { ...block, isLoading: true });
 
     // persist block to API and wait for result
     const savedBlock = await persistBlockToApi(block);
 
     // update isLoading and apply block data from API
-    mutateBlockInStore({ ...savedBlock, isLoading: false });
+    mutateBlockInStore(context, { ...savedBlock, isLoading: false });
+  },
+  async updateBlock(context: BlocksContext, block: BlockBase & any) {
+    // update isLoading and block values
+    mutateBlockInStore(context, { ...block, isLoading: true });
+
+    // persist block to API and wait for result
+    const savedBlock = await updateBlockToApi(block);
+
+    // update isLoading and apply block data from API
+    mutateBlockInStore(context, { ...savedBlock, isLoading: false });
   },
 };
 
 // exported action accessors
-export const findBlock =
-  (id: string) => dispatch(actions.findBlock)(store, id);
-
-export const findBlockWithMetrics =
-  (id: string) => dispatch(actions.findBlockWithMetrics)(store, id);
-
-export const fetchBlocks =
-  () => dispatch(actions.fetchBlocks)(store);
-
-export const saveBlock =
-  (block: BlockSaveBase) => dispatch(actions.saveBlock)(store, block);
+export const findBlock = dispatch(actions.findBlock);
+export const findBlockWithMetrics = dispatch(actions.findBlockWithMetrics);
+export const fetchBlocks = dispatch(actions.fetchBlocks);
+export const saveBlock = dispatch(actions.saveBlock);
+export const updateBlock = dispatch(actions.updateBlock);
 
 export default actions;

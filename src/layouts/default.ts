@@ -1,20 +1,20 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import byOrder from '../core/byOrder';
+import byOrder from '@/core/byOrder';
 
-import { allDashboards, isFetching } from '../store/dashboards/getters';
+import { allDashboards, isFetching } from '@/store/dashboards/getters';
 
 @Component
 class LayoutDefault extends Vue {
   leftDrawerOpen: boolean = false;
 
   get dashboards() {
-    return [...allDashboards()].sort(byOrder);
+    return [...allDashboards(this.$store)].sort(byOrder);
   }
 
   get isFetching() {
-    return isFetching();
+    return isFetching(this.$store);
   }
 
   toggleDrawer() {

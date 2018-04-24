@@ -17,22 +17,32 @@
   </q-page>
 </template>
 
-<style>
+<style lang="stylus" scoped>
+@import '../css/themes/dark.variables.styl';
+
+.q-card {
+  background: $block-background;
+  margin-bottom: 20px;
+}
 </style>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import Block from '../components/blocks/block';
+import Block from '@/components/blocks/block';
 
-import { isFetching, blockIds } from '../store/blocks/getters';
+import { isFetching, blockIds } from '@/store/blocks/getters';
 
 export default Vue.extend({
   name: 'PageIndex',
   components: { Block },
   computed: {
-    blocks: () => blockIds(),
-    fetching: () => isFetching(),
+    blocks(): string[] {
+      return blockIds(this.$store);
+    },
+    fetching(): boolean {
+      return isFetching(this.$store);
+    },
   },
   methods: {},
 });

@@ -3,8 +3,8 @@ import Component from 'vue-class-component';
 import createPlotlyComponent from 'vue-plotly.js/factory';
 
 import Plotly from './plotly';
-import { getById } from '../../store/blocks/OneWireTempSensor/getters';
-import { findBlockWithMetrics } from '../../store/blocks/actions';
+import { getById } from '@/store/blocks/OneWireTempSensor/getters';
+import { findBlockWithMetrics } from '@/store/blocks/actions';
 
 @Component({
   props: {
@@ -32,7 +32,7 @@ export default class Metrics extends Vue {
   };
 
   get blockData() {
-    return getById(this.$props.id);
+    return getById(this.$store, this.$props.id);
   }
 
   get metrics() {
@@ -45,7 +45,7 @@ export default class Metrics extends Vue {
 
   created() {
     if (this.metrics.length === 0) {
-      findBlockWithMetrics(this.$props.id);
+      findBlockWithMetrics(this.$store, this.$props.id);
     }
   }
 

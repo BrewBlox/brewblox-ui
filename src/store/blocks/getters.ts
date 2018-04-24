@@ -1,6 +1,6 @@
+import { Store } from 'vuex';
 import { getStoreAccessors } from 'vuex-typescript';
 
-import store from '../';
 import { Block, BlocksState } from './state';
 import { State as RootState } from '../state';
 
@@ -20,19 +20,10 @@ const getters = {
 };
 
 // exported getter accessors
-export const allBlocks =
-  () => read(getters.allBlocks)(store);
-
-export const blockIds =
-  () => read(getters.blockIds)(store);
-
-const blocksById =
-  () => read(getters.blocksById)(store);
-
-export const blockById =
-  (id: string) => blocksById()[id];
-
-export const isFetching =
-  () => read(getters.isFetching)(store);
+export const allBlocks = read(getters.allBlocks);
+export const blockIds = read(getters.blockIds);
+const blocksById = read(getters.blocksById);
+export const blockById = (store: Store<RootState>, id: string) => blocksById(store)[id];
+export const isFetching = read(getters.isFetching);
 
 export default getters;

@@ -2,8 +2,8 @@ import Component from 'vue-class-component';
 
 import BlockComponent from '../BlockComponent';
 
-import { getById } from '../../../store/blocks/OneWireTempSensor/getters';
-import { persist } from '../../../store/blocks/OneWireTempSensor/actions';
+import { getById } from '@/store/blocks/OneWireTempSensor/getters';
+import { persist } from '@/store/blocks/OneWireTempSensor/actions';
 
 @Component({
   props: {
@@ -18,7 +18,7 @@ export default class OneWireTempSensor extends BlockComponent {
   offsetInput = 0;
 
   get blockData() {
-    return getById(this.$props.id);
+    return getById(this.$store, this.$props.id);
   }
 
   get settings() {
@@ -44,18 +44,11 @@ export default class OneWireTempSensor extends BlockComponent {
   }
 
   save() {
-    const settings: { address?: string, offset?: number } = {};
-
-    if (this.addressInput !== this.settings.address) {
-      settings.address = this.addressInput;
-    }
-
-    if (this.offsetInput !== this.settings.offset) {
-      settings.offset = this.offsetInput;
-    }
-
-    persist({
-      settings,
+    persist(this.$store, {
+      settings: {
+        offset: this.offsetInput,
+        address: this.addressInput,
+      },
       id: this.$props.id,
     });
   }

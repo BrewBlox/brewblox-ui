@@ -1,5 +1,5 @@
 <template>
-  <q-card style="margin-bottom: 20px">
+  <q-card>
     <q-card-title>OneWireTempSensor ({{ id }})</q-card-title>
 
     <q-card-main>

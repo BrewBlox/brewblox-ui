@@ -19,15 +19,17 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import Metrics from '../components/metrics/Metrics.vue';
+import Metrics from '@/components/metrics/Metrics.vue';
 
-import { isFetching } from '../store/blocks/getters';
+import { isFetching } from '@/store/blocks/getters';
 
 export default Vue.extend({
   name: 'PageIndex',
   components: { Metrics },
   computed: {
-    fetching: () => isFetching(),
+    fetching(): boolean {
+      return isFetching(this.$store);
+    },
   },
   methods: {},
 });

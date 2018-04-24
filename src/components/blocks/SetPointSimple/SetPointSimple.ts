@@ -2,8 +2,8 @@ import Component from 'vue-class-component';
 
 import BlockComponent from '../BlockComponent';
 
-import { getById } from '../../../store/blocks/SetPointSimple/getters';
-import { persist } from '../../../store/blocks/SetPointSimple/actions';
+import { getById } from '@/store/blocks/SetPointSimple/getters';
+import { persist } from '@/store/blocks/SetPointSimple/actions';
 
 @Component({
   props: {
@@ -17,7 +17,7 @@ export default class SetPointSimple extends BlockComponent {
   valueInput = 0;
 
   get blockData() {
-    return getById(this.$props.id);
+    return getById(this.$store, this.$props.id);
   }
 
   get settings() {
@@ -33,7 +33,7 @@ export default class SetPointSimple extends BlockComponent {
   }
 
   save() {
-    persist({
+    persist(this.$store, {
       id: this.$props.id,
       settings: {
         value: this.valueInput,

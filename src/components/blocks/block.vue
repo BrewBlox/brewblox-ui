@@ -8,7 +8,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { blockById } from '../../store/blocks/getters';
+import { blockById } from '@/store/blocks/getters';
 
 const blockTypes = {
   // Block type components
@@ -31,7 +31,7 @@ export default Vue.extend({
   },
   computed: {
     type(): string {
-      const type = blockById(this.$props.blockId).type;
+      const type = blockById(this.$store, this.$props.blockId).type;
 
       if (Object.keys(blockTypes).indexOf(type) === -1) {
         return 'Unknown';

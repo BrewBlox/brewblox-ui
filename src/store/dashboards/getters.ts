@@ -1,6 +1,6 @@
+import { Store } from 'vuex';
 import { getStoreAccessors } from 'vuex-typescript';
 
-import store from '../';
 import { Dashboard, DashboardItem, DashboardState } from './state';
 import { State as RootState } from '../state';
 
@@ -27,31 +27,18 @@ const getters = {
 };
 
 // exported getter accessors
-export const allDashboards =
-  () => read(getters.allDashboards)(store);
-
-export const dashboardIds =
-  () => read(getters.dashboardIds)(store);
-
-const dashboardsById =
-  () => read(getters.dashboardsById)(store);
+export const allDashboards = read(getters.allDashboards);
+export const dashboardIds = read(getters.dashboardIds);
+const dashboardsById = read(getters.dashboardsById);
+export const allDashboardItems = read(getters.allDashboardItems);
+export const dashboardItemIds = read(getters.dashboardItemIds);
+const dashboardItemsById = read(getters.dashboardItemsById);
 
 export const dashboardById =
-  (id: string): Dashboard => dashboardsById()[id];
-
-export const allDashboardItems =
-  () => read(getters.allDashboardItems)(store);
-
-export const dashboardItemIds =
-  () => read(getters.dashboardItemIds)(store);
-
-const dashboardItemsById =
-  () => read(getters.dashboardItemsById)(store);
-
+  (store: Store<RootState>, id: string): Dashboard => dashboardsById(store)[id];
 export const dashboardItemById =
-  (id: string): DashboardItem => dashboardItemsById()[id];
+  (store: Store<RootState>, id: string): DashboardItem => dashboardItemsById(store)[id];
 
-export const isFetching =
-  () => read(getters.isFetching)(store);
+export const isFetching = read(getters.isFetching);
 
 export default getters;
