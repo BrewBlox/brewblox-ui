@@ -1,12 +1,18 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import draggable from 'vuedraggable';
 
 import byOrder from '@/core/byOrder';
 
 import { allDashboards, isFetching } from '@/store/dashboards/getters';
 import { addNewDashboard } from '@/store/dashboards/actions';
+import { Dashboard } from '@/store/dashboards/state';
 
-@Component
+@Component({
+  components: {
+    draggable,
+  },
+})
 class LayoutDefault extends Vue {
   leftDrawerOpen: boolean = false;
   dashboardEditing: boolean = false;
@@ -14,6 +20,10 @@ class LayoutDefault extends Vue {
 
   get dashboards() {
     return [...allDashboards(this.$store)].sort(byOrder);
+  }
+
+  set dashboards(dashboards: Dashboard[]) {
+    // reorder dashboards in store
   }
 
   get isFetching() {

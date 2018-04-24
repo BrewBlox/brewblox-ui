@@ -74,14 +74,27 @@
           No dashboards yet
         </q-item>
 
-        <q-item
-          v-for="dashboard in dashboards"
-          link
-          :to="`/dashboard/${ dashboard.id }`"
-          :key="dashboard.id"
+        <draggable
+          :class="{ editing: dashboardEditing }"
+          :options="{ disabled: !dashboardEditing }"
+          v-model="dashboards"
         >
-          {{ dashboard.title }}
-        </q-item>
+          <q-item
+            v-for="dashboard in dashboards"
+            :link="!dashboardEditing"
+            :to="dashboardEditing ? undefined : `/dashboard/${ dashboard.id }`"
+            :key="dashboard.id"
+          >
+            <q-item-main :label="dashboard.title" />
+
+            <q-item-side
+              right
+              v-if="dashboardEditing"
+            >
+              <q-icon name="menu" />
+            </q-item-side>
+          </q-item>
+        </draggable>
 
         <div class="q-list-container">
           <q-btn
@@ -121,5 +134,9 @@
 .q-list-header .q-btn {
   margin-left: auto;
   margin-right: 16px;
+}
+
+.q-list .editing .q-item {
+  cursor: move;
 }
 </style>
