@@ -1,6 +1,6 @@
 const host = '/api';
 
-function toJson(result: Promise<Response>): Promise<JSON> {
+function toJson(result: Promise<Response>): Promise<any> {
   return result
     .then((response) => {
       if (!response.ok) {
