@@ -1,4 +1,4 @@
-import { spreadData, unspreadData } from './api';
+import { spreadData, unspreadData } from './api-spread';
 
 describe('spreadData', () => {
   it('Should spread data property on object and remove data property', () => {

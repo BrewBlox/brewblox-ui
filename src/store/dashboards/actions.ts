@@ -1,6 +1,13 @@
 import { getStoreAccessors } from 'vuex-typescript';
+import UrlSafeString from 'url-safe-string';
 
-import { fetchDashboards as fetchDashboardsFromApi, persistDashboardItem } from './api';
+import {
+  fetchDashboards as fetchDashboardsFromApi,
+  fetchDashboardItems as fetchDashboardItemsFromApi,
+  createDashboard as createDashboardOnApi,
+  persistDashboard,
+  persistDashboardItem,
+} from './api';
 
 import { DashboardState, DashboardItem, DashboardContext, Dashboard } from './state';
 import { State as RootState } from '../state';
@@ -8,6 +15,7 @@ import { State as RootState } from '../state';
 import {
   mutateFetching as mutateFetchingInStore,
   addDashboard as addDashboardToStore,
+  setDashboardOrder as setDashboardOrderInStore,
   addDashboardItem as addDashboardItemToStore,
   setDashboardItemOrder as setDashboardItemOrderInStore,
   setDashboardItemSize as setDashboardItemSizeInStore,
@@ -16,6 +24,30 @@ import {
 const { dispatch } = getStoreAccessors<DashboardState, RootState>('dashboards');
 
 const actions = {
+  addNewDashboard(context: DashboardContext, title: string) {
+    const id = new UrlSafeString().generate(title);
+
+    const dashboard = {
+      id,
+      title,
+      order: Object.keys(context.state.dashboards.byId).length + 1,
+      items: [],
+    };
+
+    // add dashboard to store
+    addDashboardToStore(context, dashboard);
+
+    // add dashboard to API
+    createDashboardOnApi(dashboard);
+  },
+  updateDashboardOrder(context: DashboardContext, orders: string[]) {
+    orders.forEach((id, index) => {
+      const order = index + 1;
+      setDashboardOrderInStore(context, { id, order });
+
+      persistDashboard(id, { order });
+    });
+  },
   addDashboard(context: DashboardContext, dashboard: Dashboard) {
     addDashboardToStore(context, dashboard);
   },
@@ -43,7 +75,10 @@ const actions = {
     mutateFetchingInStore(context, true);
 
     // will fetch blocks from the server
-    const { dashboards, items } = await fetchDashboardsFromApi();
+    const [dashboards, items] = await Promise.all([
+      fetchDashboardsFromApi(),
+      fetchDashboardItemsFromApi(),
+    ]);
 
     // first add items to store
     items.forEach(item => actions.addDashboardItem(context, item));
@@ -59,6 +94,8 @@ const actions = {
 // exported action accessors
 export const fetchDashboards = dispatch(actions.fetchDashboards);
 export const addDashboardItem = dispatch(actions.addDashboardItem);
+export const addNewDashboard = dispatch(actions.addNewDashboard);
+export const updateDashboardOrder = dispatch(actions.updateDashboardOrder);
 export const addDashboard = dispatch(actions.addDashboard);
 export const updateDashboardItemOrder = dispatch(actions.updateDashboardItemOrder);
 export const updateDashboardItemSize = dispatch(actions.updateDashboardItemSize);

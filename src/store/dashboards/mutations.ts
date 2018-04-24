@@ -7,6 +7,14 @@ import { State as RootState } from '../state';
 
 const { commit } = getStoreAccessors<DashboardState, RootState>('dashboards');
 
+function updateDashboard(state: DashboardState, id: string, newData: any) {
+  state.dashboards.byId = Object.assign(
+    {},
+    state.dashboards.byId,
+    { [id]: merge(state.dashboards.byId[id], newData) },
+  );
+}
+
 function updateDashboardItem(state: DashboardState, id: string, newData: any) {
   state.items.byId = Object.assign(
     {},
@@ -19,6 +27,9 @@ const mutations = {
   addDashboard(state: DashboardState, dashboard: Dashboard) {
     state.dashboards.allIds.push(dashboard.id);
     state.dashboards.byId[dashboard.id] = { ...dashboard };
+  },
+  setDashboardOrder(state: DashboardState, { id, order }: { id: string, order: number }) {
+    updateDashboard(state, id, { order });
   },
   addDashboardItem(state: DashboardState, item: DashboardItem) {
     state.items.allIds.push(item.id);
@@ -41,6 +52,7 @@ const mutations = {
 // exported commit accessors
 export const mutateFetching = commit(mutations.mutateFetching);
 export const addDashboard = commit(mutations.addDashboard);
+export const setDashboardOrder = commit(mutations.setDashboardOrder);
 export const addDashboardItem = commit(mutations.addDashboardItem);
 export const setDashboardItemOrder = commit(mutations.setDashboardItemOrder);
 export const setDashboardItemSize = commit(mutations.setDashboardItemSize);
