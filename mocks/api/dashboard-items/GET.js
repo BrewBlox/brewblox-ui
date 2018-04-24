@@ -6,7 +6,7 @@ const { storage } = require('./storage');
 module.exports = (request, response) => {
   response.send(JSON.stringify(
     [
-      ...Object.keys(storage).map(key => storage[key]),
+      ...Object.keys(storage).filter(key => !!storage[key].id).map(key => storage[key]),
       ...base.map(item => merge({}, item, storage[item.id])),
     ],
   ));

@@ -13,7 +13,7 @@ export function createDashboard(dashboard: Dashboard): Promise<boolean> {
 }
 
 export function persistDashboard(id: string, newData: any): Promise<Dashboard> {
-  return put(`/dashboard/${encodeURIComponent(id)}`, unspreadData(newData));
+  return put(`/dashboards/${encodeURIComponent(id)}`, unspreadData(newData));
 }
 
 export function fetchDashboardItems(): Promise<DashboardItem[]> {

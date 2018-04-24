@@ -6,5 +6,7 @@ module.exports = {
   storage,
   updateData(id, data) {
     storage[id] = merge({}, storage[id], data);
+
+    console.log(storage);
   },
 };
