@@ -48,7 +48,31 @@
 
         <q-item-separator />
 
-        <q-list-header v-if="!isFetching && dashboards.length > 0">Dashboards</q-list-header>
+        <q-list-header v-if="!isFetching">
+          Dashboards
+
+          <q-btn
+            round
+            flat
+            icon="mode edit"
+            size="sm"
+            v-if="!dashboardEditing"
+            @click="toggleDashboardEditing"
+          />
+
+          <q-btn
+            round
+            color="primary"
+            icon="check"
+            size="sm"
+            v-if="dashboardEditing"
+            @click="toggleDashboardEditing"
+          />
+        </q-list-header>
+
+        <q-item v-if="!isFetching && dashboards.length === 0">
+          No dashboards yet
+        </q-item>
 
         <q-item
           v-for="dashboard in dashboards"
@@ -63,9 +87,10 @@
           <q-btn
             icon="add"
             color="dark-bright"
+            v-if="dashboardEditing"
             @click="createDashboard"
           >
-            add new dashboard
+            add dashboard
           </q-btn>
         </div>
       </q-list>
@@ -79,12 +104,22 @@
 
 <script lang="ts" src="./default.ts" />
 
-<style>
+<style scoped>
 .q-toolbar .vue-portal-target .q-btn {
   margin-left: 10px;
 }
 
 .q-list-container {
   padding: 16px;
+}
+
+.q-list-header {
+  display: flex;
+  align-items: center;
+}
+
+.q-list-header .q-btn {
+  margin-left: auto;
+  margin-right: 16px;
 }
 </style>

@@ -9,6 +9,7 @@ import { addNewDashboard } from '@/store/dashboards/actions';
 @Component
 class LayoutDefault extends Vue {
   leftDrawerOpen: boolean = false;
+  dashboardEditing: boolean = false;
   $q: any;
 
   get dashboards() {
@@ -21,6 +22,10 @@ class LayoutDefault extends Vue {
 
   toggleDrawer() {
     this.leftDrawerOpen = !this.leftDrawerOpen;
+  }
+
+  toggleDashboardEditing() {
+    this.dashboardEditing = !this.dashboardEditing;
   }
 
   createDashboard() {
