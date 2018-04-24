@@ -13,7 +13,8 @@ export function createDashboard(dashboard: Dashboard): Promise<boolean> {
 }
 
 export function fetchDashboardItems(): Promise<DashboardItem[]> {
-  return get('/dashboard-items');
+  return get('/dashboard-items')
+    .then(dashboardItems => dashboardItems.map((item: any) => spreadData(item)));
 }
 
 export function persistDashboardItem(id: string, newData: any): Promise<DashboardItem> {
