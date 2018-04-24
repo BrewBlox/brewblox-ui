@@ -3,12 +3,12 @@ import { spreadData, unspreadData } from '@/core/api-spread';
 
 import { Block, BlockSaveBase, MetricsResult, BlockBase } from './state';
 
-export function fetchBlock(id: string): Promise<Block> {
-  return get(`/blocks/${encodeURIComponent(id)}`).then(block => spreadData(block));
+export function fetchBlocks(): Promise<Block[]> {
+  return get('/blocks/').then(blocks => blocks.map(spreadData));
 }
 
-export function fetchBlocks(): Promise<Block[]> {
-  return get('/blocks/list').then(blocks => blocks.map(spreadData));
+export function fetchBlock(id: string): Promise<Block> {
+  return get(`/blocks/${encodeURIComponent(id)}`).then(block => spreadData(block));
 }
 
 export function fetchBlockMetrics(id: string): Promise<MetricsResult> {
