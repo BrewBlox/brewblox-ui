@@ -1,8 +1,7 @@
-import { Block, BlockSaveBase, MetricsResult, BlockBase } from './state';
-
 import { get, put, patch } from '@/core/fetch';
 import { spreadData, unspreadData } from '@/core/api-spread';
 
+import { Block, BlockSaveBase, MetricsResult, BlockBase } from './state';
 
 export function fetchBlock(id: string): Promise<Block> {
   return get(`/blocks/${encodeURIComponent(id)}`).then(block => spreadData(block));

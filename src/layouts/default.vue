@@ -33,9 +33,16 @@
         <q-list-header>Main menu</q-list-header>
         <q-item
           link
-          to="/blocks"
+          to="/settings"
         >
           <q-item-side icon="settings" />
+          Settings
+        </q-item>
+        <q-item
+          link
+          to="/blocks"
+        >
+          <q-item-side icon="device hub" />
           Blocks
         </q-item>
         <q-item

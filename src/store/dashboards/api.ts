@@ -1,7 +1,7 @@
-import { Dashboard, DashboardItem, DashboardAPI } from './state';
-
 import { get, put, post } from '@/core/fetch';
 import { spreadData, unspreadData } from '@/core/api-spread';
+
+import { Dashboard, DashboardItem, DashboardAPI } from './state';
 
 export function fetchDashboards(): Promise<Dashboard[]> {
   return get('/dashboards')
