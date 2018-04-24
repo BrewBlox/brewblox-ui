@@ -1,6 +1,6 @@
-import { Block, BlockSaveBase, MetricsResult, BlockBase } from './state';
-
 import { get, put, patch } from '@/core/fetch';
+
+import { Block, BlockSaveBase, MetricsResult, BlockBase } from './state';
 
 export function spreadData(input: any) {
   const spreadInput = {

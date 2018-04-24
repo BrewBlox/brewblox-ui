@@ -3,15 +3,17 @@ import Component from 'vue-class-component';
 
 import { fetchBlocks } from '@/store/blocks/actions';
 import { fetchDashboards } from '@/store/dashboards/actions';
+import { fetchSettings } from '@/store/settings/actions';
 
 @Component
 class App extends Vue {
-  async created() {
+  created() {
     // fetch all block and dashboard on init
-    await Promise.all([
+    Promise.all([
       fetchBlocks(this.$store),
       fetchDashboards(this.$store),
-    ]);
+      fetchSettings(this.$store),
+    ]).catch((e) => { throw new Error(e); });
   }
 }
 

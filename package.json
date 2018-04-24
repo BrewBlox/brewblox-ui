@@ -5,6 +5,7 @@
   "author": "Elco Jacobs / BrewPi B.V.",
   "scripts": {
     "serve": "vue-cli-service serve --open",
+    "start": "npm run serve",
     "build": "vue-cli-service build",
     "test": "jest",
     "e2e": "vue-cli-service e2e",
