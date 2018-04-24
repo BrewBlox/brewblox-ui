@@ -18,5 +18,5 @@ export function fetchDashboardItems(): Promise<DashboardItem[]> {
 }
 
 export function persistDashboardItem(id: string, newData: any): Promise<DashboardItem> {
-  return put(`/dashboards-items/${encodeURIComponent(id)}`, unspreadData(newData));
+  return put(`/dashboard-items/${encodeURIComponent(id)}`, unspreadData(newData));
 }
