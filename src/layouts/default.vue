@@ -140,7 +140,7 @@
 
 .q-list-header .q-btn {
   margin-left: auto;
-  margin-right: 16px;
+  margin-right: 8px;
 }
 
 .q-list .editing .q-item {
