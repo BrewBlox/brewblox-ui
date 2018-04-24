@@ -4,7 +4,7 @@ import { spreadData, unspreadData } from '@/core/api-spread';
 import { Block, BlockSaveBase, MetricsResult, BlockBase } from './state';
 
 export function fetchBlocks(): Promise<Block[]> {
-  return get('/blocks/').then(blocks => blocks.map(spreadData));
+  return get('/blocks').then(blocks => blocks.map(spreadData));
 }
 
 export function fetchBlock(id: string): Promise<Block> {
