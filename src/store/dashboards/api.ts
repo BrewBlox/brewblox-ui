@@ -9,7 +9,7 @@ export function fetchDashboards(): Promise<Dashboard[]> {
 }
 
 export function createDashboard(dashboard: Dashboard): Promise<boolean> {
-  return post('/dashboards', dashboard);
+  return post('/dashboards', unspreadData(dashboard));
 }
 
 export function fetchDashboardItems(): Promise<DashboardItem[]> {
@@ -18,5 +18,5 @@ export function fetchDashboardItems(): Promise<DashboardItem[]> {
 }
 
 export function persistDashboardItem(id: string, newData: any): Promise<DashboardItem> {
-  return put(`/dashboards-items/${id}`, newData);
+  return put(`/dashboards-items/${encodeURIComponent(id)}`, unspreadData(newData));
 }
