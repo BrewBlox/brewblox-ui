@@ -1,9 +1,11 @@
-import { Dashboard, DashboardItem } from './state';
+import { Dashboard, DashboardItem, DashboardAPI } from './state';
 
 import { get, put, post } from '@/core/fetch';
+import { spreadData, unspreadData } from '@/core/api-spread';
 
 export function fetchDashboards(): Promise<Dashboard[]> {
-  return get('/dashboards');
+  return get('/dashboards')
+    .then(dashboards => dashboards.map((dashboard: DashboardAPI) => spreadData(dashboard)));
 }
 
 export function createDashboard(dashboard: Dashboard): Promise<boolean> {
