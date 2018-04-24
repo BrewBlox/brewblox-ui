@@ -1,5 +1,5 @@
-const list = require('../list/GET');
-const metrics = require('../list/metrics');
+const list = require('../GET.json');
+const metrics = require('../metrics.json');
 
 module.exports = {
   getBlock(id) {
