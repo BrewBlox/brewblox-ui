@@ -2,7 +2,7 @@
   <div>
     <q-toolbar color="dark-bright">
       <q-toolbar-title>
-        {{ block.id }}
+        {{ block.serviceId }}/{{ block.id }}
       </q-toolbar-title>
 
       <q-btn
