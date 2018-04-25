@@ -81,7 +81,10 @@
       :content-css="{ minWidth: '80vw', minHeight: '80vh' }"
     >
       <q-modal-layout>
-        <q-toolbar slot="header" color="dark-bright">
+        <q-toolbar
+          slot="header"
+          color="dark-bright"
+        >
           <q-toolbar-title>
             PID Settings
           </q-toolbar-title>

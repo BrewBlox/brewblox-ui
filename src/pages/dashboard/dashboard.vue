@@ -28,8 +28,11 @@
         />
       </portal>
 
-      <q-modal v-model="modalOpen">
-        Placeholder add widget modal
+      <q-modal
+        v-model="modalOpen"
+        :content-css="{ minWidth: '80vw', minHeight: '80vh' }"
+      >
+        <widget-modal />
       </q-modal>
 
       <grid-container

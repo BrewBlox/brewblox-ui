@@ -28,9 +28,13 @@ import Quasar, {
   QCardMain,
   QInput,
   QSelect,
+  QStepper,
+  QStep,
+  QStepperNavigation,
   Ripple,
   Notify,
   Dialog,
+  CloseOverlay,
 } from 'quasar';
 
 import 'quasar-extras/roboto-font';
@@ -71,7 +75,10 @@ Vue.use(Quasar, {
     QCardMain,
     QInput,
     QSelect,
+    QStepper,
+    QStep,
+    QStepperNavigation,
   },
-  directives: { Ripple },
+  directives: { Ripple, CloseOverlay },
   plugins: { Notify, Dialog },
 });
