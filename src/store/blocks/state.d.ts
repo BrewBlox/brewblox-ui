@@ -30,7 +30,7 @@ export interface BlockBase {
 type Value = string|number[];
 
 interface Series {
-  name: string;
+  name: string; // eslint-disable-line no-restricted-globals
   columns: string[];
   values: Value[];
 }

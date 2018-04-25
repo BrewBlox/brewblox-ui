@@ -7,13 +7,32 @@ import { saveBlock, updateBlock } from '../actions';
 import { State } from '../../state';
 import { BlocksContext } from '../state';
 
-export const addPID = (context: BlocksContext, { id, settings, links, filtering, state }: PID) => {
-  addBlock(context, { id, settings, links, filtering, state, type: 'PID' });
+export const addPID = (
+  context: BlocksContext,
+  {
+    id,
+    settings,
+    links,
+    filtering,
+    state,
+  }: PID,
+) => {
+  addBlock(
+    context,
+    {
+      id,
+      settings,
+      links,
+      filtering,
+      state,
+      type: 'PID',
+    },
+  );
 };
 
-export const update = (store: Store<State>, update: { id: string } & any) => {
+export const update = (store: Store<State>, pid: { id: string } & any) => {
   try {
-    updateBlock(store, update);
+    updateBlock(store, pid);
   } catch (e) {
     throw new Error(e);
   }

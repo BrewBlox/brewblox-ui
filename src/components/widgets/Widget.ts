@@ -3,6 +3,7 @@ import Component from 'vue-class-component';
 
 import { dashboardItemById } from '@/store/dashboards/getters';
 
+/* eslint-disable indent */
 @Component({
   props: {
     id: {
@@ -19,6 +20,7 @@ import { dashboardItemById } from '@/store/dashboards/getters';
     },
   },
 })
+/* eslint-enable */
 export default class Widget extends Vue {
   get dashboardItem() {
     return dashboardItemById(this.$store, this.$props.id);

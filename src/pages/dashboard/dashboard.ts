@@ -17,11 +17,13 @@ interface VueOrdered extends Vue {
   id: string;
 }
 
+/* eslint-disable indent */
 @Component({
   components: {
     GridContainer,
   },
 })
+/* eslint-enable */
 class DashboardPage extends Vue {
   editable: boolean = false;
   modalOpen: boolean = false;

@@ -3,6 +3,7 @@ import Component from 'vue-class-component';
 
 import GridItem from './grid-item.vue';
 
+/* eslint-disable indent */
 @Component({
   props: {
     editable: {
@@ -20,6 +21,7 @@ import GridItem from './grid-item.vue';
   },
   components: { GridItem },
 })
+/* eslint-enable */
 export default class GridContainer extends Vue {
   interaction: boolean = false;
   editable: boolean = false;
@@ -34,8 +36,8 @@ export default class GridContainer extends Vue {
 
   newItemsOrder() {
     const sortedChildren = [...this.$children].sort((a, b) => {
-      const rectA = <DOMRect>a.$el.getBoundingClientRect();
-      const rectB = <DOMRect>b.$el.getBoundingClientRect();
+      const rectA = a.$el.getBoundingClientRect() as DOMRect;
+      const rectB = b.$el.getBoundingClientRect() as DOMRect;
 
       // check y position
       if (rectA.y < rectB.y) {

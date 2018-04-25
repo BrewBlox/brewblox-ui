@@ -3,9 +3,7 @@ import Component, { mixins } from 'vue-class-component';
 import { PIDBlock, PIDSettings, PIDLinks, PIDFiltering, PIDState }
   from '@/store/blocks/PID/PID';
 
-import {
-  getAll as getAllSensorSetPointPairs,
-} from '@/store/blocks/SensorSetPointPair/getters';
+import { getAll as getAllSensorSetPointPairs } from '@/store/blocks/SensorSetPointPair/getters';
 import { refresh, persist, update } from '@/store/blocks/PID/actions';
 
 import BlockWidget from '../BlockWidget';
@@ -25,7 +23,7 @@ export default class PIDWidget extends mixins(BlockWidget) {
   modalOpen: boolean = false;
 
   get blockData(): PIDBlock {
-    return <PIDBlock>this.block;
+    return this.block as PIDBlock;
   }
 
   get settings(): PIDSettings {

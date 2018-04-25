@@ -6,6 +6,7 @@ import Plotly from './plotly';
 import { getById } from '@/store/blocks/OneWireTempSensor/getters';
 import { findBlockWithMetrics } from '@/store/blocks/actions';
 
+/* eslint-disable indent */
 @Component({
   props: {
     id: {
@@ -17,6 +18,7 @@ import { findBlockWithMetrics } from '@/store/blocks/actions';
     Plotly: createPlotlyComponent(Plotly),
   },
 })
+/* eslint-enable */
 export default class Metrics extends Vue {
   plotly = {
     data: [

@@ -5,6 +5,7 @@ import BlockComponent from '../BlockComponent';
 import { getById } from '@/store/blocks/OneWireTempSensor/getters';
 import { persist } from '@/store/blocks/OneWireTempSensor/actions';
 
+/* eslint-disable indent */
 @Component({
   props: {
     id: {
@@ -13,6 +14,7 @@ import { persist } from '@/store/blocks/OneWireTempSensor/actions';
     },
   },
 })
+/* eslint-enable */
 export default class OneWireTempSensor extends BlockComponent {
   addressInput = '';
   offsetInput = 0;

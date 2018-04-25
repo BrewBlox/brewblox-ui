@@ -13,6 +13,7 @@ import {
 } from '@/store/blocks/OneWireTempSensor/getters';
 import { persist } from '@/store/blocks/SensorSetPointPair/actions';
 
+/* eslint-disable indent */
 @Component({
   props: {
     id: {
@@ -21,6 +22,7 @@ import { persist } from '@/store/blocks/SensorSetPointPair/actions';
     },
   },
 })
+/* eslint-enable */
 export default class SensorSetPointPair extends BlockComponent {
   sensorInput = '';
   setpointInput = '';
