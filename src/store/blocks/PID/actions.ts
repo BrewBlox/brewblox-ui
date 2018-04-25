@@ -32,7 +32,7 @@ export const addPID = (
   );
 };
 
-export const update = (store: Store<State>, pid: { id: string } & any) => {
+export const update = (store: Store<State>, pid: { id: string, serviceId: string } & any) => {
   try {
     updateBlock(store, pid);
   } catch (e) {
