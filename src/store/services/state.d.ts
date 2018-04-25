@@ -4,7 +4,7 @@ import { State as RootState } from '../state';
 
 interface Service {
   id: string;
-  type: 'spark' | 'misc';
+  type: 'HistoryService' | 'DeviceService';
 }
 
 export type ServicesState = {
