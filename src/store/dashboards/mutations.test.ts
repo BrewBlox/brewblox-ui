@@ -1,6 +1,7 @@
 import { DashboardState } from './state';
 import mutations from './mutations';
 
+/* eslint-disable */
 const {
   mutateFetching,
   addDashboard,
@@ -8,6 +9,7 @@ const {
   setDashboardItemSize,
   setDashboardItemOrder,
 } = mutations;
+/* eslint-enable */
 
 const defaultStore: DashboardState = {
   dashboards: {
@@ -53,7 +55,7 @@ describe('addDashboard', () => {
     // test if dashboard is added to list
     expect(dashboardStore.dashboards.allIds).toEqual(['test']);
     // test if dashboard item is correct
-    expect(dashboardStore.dashboards.byId['test']).toEqual(dashboard);
+    expect(dashboardStore.dashboards.byId.test).toEqual(dashboard);
   });
 
   it('Should add another dashboard to the store', () => {
@@ -69,7 +71,7 @@ describe('addDashboard', () => {
     // test if dashboard is added to list
     expect(dashboardStore.dashboards.allIds).toEqual(['test', 'testing']);
     // test if dashboard item is correct
-    expect(dashboardStore.dashboards.byId['testing']).toEqual(dashboard);
+    expect(dashboardStore.dashboards.byId.testing).toEqual(dashboard);
   });
 });
 
@@ -82,7 +84,7 @@ describe('addDashboardItem', () => {
       order: 1,
       cols: 2,
       rows: 3,
-      widget: <WidgetType>'Empty',
+      widget: 'Empty' as WidgetType,
       options: {},
     };
 
@@ -100,7 +102,7 @@ describe('addDashboardItem', () => {
       order: 2,
       cols: 2,
       rows: 3,
-      widget: <WidgetType>'Empty',
+      widget: 'Empty' as WidgetType,
       options: {},
     };
 
@@ -121,7 +123,7 @@ describe('setDashboardItemSize', () => {
     order: 1,
     cols: 2,
     rows: 3,
-    widget: <WidgetType>'Empty',
+    widget: 'Empty' as WidgetType,
     options: {},
   };
 
@@ -143,7 +145,7 @@ describe('setDashboardItemOrder', () => {
     order: 1,
     cols: 2,
     rows: 3,
-    widget: <WidgetType>'Empty',
+    widget: 'Empty' as WidgetType,
     options: {},
   };
 
