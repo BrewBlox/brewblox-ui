@@ -5,7 +5,7 @@ import Component from 'vue-class-component';
 @Component
 /* eslint-enable */
 class WidgetModal extends Vue {
-
+  currentStep: string = 'widgets';
 }
 
-export default Vue;
+export default WidgetModal;
