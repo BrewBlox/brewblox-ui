@@ -18,6 +18,6 @@ export function getById(store: Store<State>, id: string): SetPointSimpleBlock {
 }
 
 export function getAll(store: Store<State>): SetPointSimpleBlock[] {
-  return <SetPointSimpleBlock[]>allBlocks(store)
-    .filter(block => block.type === 'SetPointSimple');
+  return allBlocks(store)
+    .filter(block => block.type === 'SetPointSimple') as SetPointSimpleBlock[];
 }
