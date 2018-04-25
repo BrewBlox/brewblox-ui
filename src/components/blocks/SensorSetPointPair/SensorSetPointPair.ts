@@ -36,21 +36,33 @@ export default class SensorSetPointPair extends BlockComponent {
   }
 
   get sensor() {
-    return getOneWireTempSensorById(this.$store, this.links.sensor);
+    return getOneWireTempSensorById(
+      this.$store,
+      `${this.blockData.serviceId}/${this.links.sensor}`,
+    );
   }
 
   get setpoint() {
-    return getSetPointSimpleById(this.$store, this.links.setpoint);
+    return getSetPointSimpleById(
+      this.$store,
+      `${this.blockData.serviceId}/${this.links.setpoint}`,
+    );
   }
 
   get allSetPoints() {
-    return getAllSetPointSimple(this.$store)
-      .map(setpoint => ({ label: setpoint.id, value: setpoint.id }));
+    return getAllSetPointSimple(this.$store, this.blockData.serviceId)
+      .map(setpoint => ({
+        label: `${setpoint.serviceId}/${setpoint.id}`,
+        value: setpoint.id,
+      }));
   }
 
   get allSensors() {
-    return getAllOneWireTempSensor(this.$store)
-      .map(sensor => ({ label: sensor.id, value: sensor.id }));
+    return getAllOneWireTempSensor(this.$store, this.blockData.serviceId)
+      .map(sensor => ({
+        label: `${sensor.serviceId}/${sensor.id}`,
+        value: sensor.id,
+      }));
   }
 
   get loading() {

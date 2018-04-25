@@ -17,7 +17,8 @@ export function getById(store: Store<State>, id: string): OneWireTempSensorBlock
   return block;
 }
 
-export function getAll(store: Store<State>): OneWireTempSensorBlock[] {
+export function getAll(store: Store<State>, serviceId: string): OneWireTempSensorBlock[] {
   return allBlocks(store)
-    .filter(block => block.type === 'OneWireTempSensor') as OneWireTempSensorBlock[];
+    .filter(block => block.type === 'OneWireTempSensor' &&
+      block.serviceId === serviceId) as OneWireTempSensorBlock[];
 }
