@@ -18,7 +18,10 @@
           <portal-target name="toolbar-title">BrewBlox</portal-target>
         </q-toolbar-title>
 
-        <portal-target name="toolbar-buttons" />
+        <portal-target
+          name="toolbar-buttons"
+          class="toolbar-buttons"
+        />
       </q-toolbar>
     </q-layout-header>
 
@@ -124,8 +127,8 @@
 
 <script lang="ts" src="./default.ts" />
 
-<style scoped>
-.q-toolbar .vue-portal-target .q-btn {
+<style>
+.toolbar-buttons .q-btn {
   margin-left: 10px;
 }
 

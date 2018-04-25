@@ -16,6 +16,7 @@
         <q-btn
           v-if="editable"
           color="primary"
+          icon="add"
           label="Add widget"
           @click="onOpenAddWidget"
         />
@@ -23,7 +24,7 @@
           :icon="editable ? 'check' : 'mode edit'"
           :color="editable ? 'positive' : 'primary'"
           @click="toggleEditable"
-          :label="editable ? 'Save changes' : 'Edit layout'"
+          :label="editable ? 'Save changes' : 'Edit dashboard'"
         />
       </portal>
 
