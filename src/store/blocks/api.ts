@@ -1,14 +1,16 @@
+import { flatten } from 'lodash';
+
 import { get, put, patch } from '@/core/fetch';
 import { spreadData, unspreadData } from '@/core/api-spread';
 
+import { Service } from '@/store/services/state';
 import { Block, BlockSaveBase, MetricsResult, BlockBase } from './state';
 
-export function fetchBlocks(): Promise<Block[]> {
-  return get('/objects').then(blocks => blocks.map(spreadData));
-}
-
-export function fetchBlock(id: string): Promise<Block> {
-  return get(`/objects/${encodeURIComponent(id)}`).then(block => spreadData(block));
+export function fetchBlocks(services: Service[]): Promise<Block[]> {
+  return Promise
+    .all(services.map(service => get(`/${service.id}/objects`)))
+    .then(responses => flatten(responses))
+    .then(blocks => blocks.map(spreadData));
 }
 
 export function fetchBlockMetrics(id: string): Promise<MetricsResult> {
