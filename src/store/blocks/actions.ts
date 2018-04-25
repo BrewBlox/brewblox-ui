@@ -3,7 +3,6 @@ import { getStoreAccessors } from 'vuex-typescript';
 import { Service } from '@/store/services/state';
 
 import {
-  fetchBlockMetrics,
   fetchBlocks as fetchBlocksFromApi,
   persistBlock as persistBlockToApi,
   updateBlock as updateBlockToApi,

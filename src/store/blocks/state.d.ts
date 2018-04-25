@@ -40,11 +40,6 @@ export interface MetricsBase {
   metrics: Series[];
 }
 
-export interface MetricsResult {
-  id: string;
-  results: Series[];
-}
-
 export type Block =
   SetPointSimpleBlock | OneWireTempSensorBlock | SensorSetPointPairBlock | PIDBlock;
 export type BlockSaveBase =
