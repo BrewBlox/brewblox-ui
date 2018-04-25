@@ -1,5 +1,7 @@
 import { getStoreAccessors } from 'vuex-typescript';
 
+import { Service } from '@/store/services/state';
+
 import {
   fetchBlock,
   fetchBlockMetrics,
@@ -42,7 +44,7 @@ const actions = {
       metrics: blockMetrics.results,
     });
   },
-  async fetchBlocks(context: BlocksContext) {
+  async fetchBlocks(context: BlocksContext, services: Service[]) {
     // update isFetching
     mutateFetchingInStore(context, true);
 

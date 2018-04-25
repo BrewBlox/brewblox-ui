@@ -1,9 +1,9 @@
-// import getters from './getters';
+import getters from './getters';
 import actions from './actions';
 import mutations from './mutations';
 
 const services = {
-  // getters,
+  getters,
   actions,
   mutations,
   namespaced: true,

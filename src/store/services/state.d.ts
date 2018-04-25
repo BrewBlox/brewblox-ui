@@ -2,9 +2,13 @@ import { ActionContext } from 'vuex';
 
 import { State as RootState } from '../state';
 
-interface Service {
+export interface Service {
   id: string;
   type: 'HistoryService' | 'DeviceService';
+}
+
+export interface DeviceService extends Service {
+  type: 'DeviceService';
 }
 
 export type ServicesState = {
