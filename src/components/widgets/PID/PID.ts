@@ -66,6 +66,7 @@ export default class PIDWidget extends mixins(BlockWidget) {
   updateKP() {
     update(this.$store, {
       id: this.block.id,
+      serviceId: this.block.serviceId,
       settings: {
         kp: this.inputs.kpInput,
       },
@@ -75,6 +76,7 @@ export default class PIDWidget extends mixins(BlockWidget) {
   randomKP() {
     update(this.$store, {
       id: this.block.id,
+      serviceId: this.block.serviceId,
       settings: {
         kp: Math.round(Math.random() * 15),
       },
