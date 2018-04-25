@@ -22,11 +22,23 @@
           name="widgets"
           title="Widget Type"
         >
-          Widget types
+          <q-field
+            label="Choose a widget type to add"
+            orientation="vertical"
+            dark
+          >
+            <q-option-group
+              dark
+              type="radio"
+              v-model="widgetType"
+              :options="widgetTypes"
+            />
+          </q-field>
 
           <q-stepper-navigation>
             <q-btn
-              color="primary"
+              :disabled="!widgetType"
+              :color="!widgetType ? 'dark-bright' : 'primary'"
               @click="currentStep = 'blocks'"
               label="Next"
             />
