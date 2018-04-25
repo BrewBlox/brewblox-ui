@@ -9,21 +9,25 @@ const { commit } = getStoreAccessors<BlocksState, RootState>('blocks');
 
 const mutations = {
   addBlock(state: BlocksState, block: Block) {
+    const id = `${block.serviceId}/${block.id}`;
+
     // add block to blocks list
-    state.allIds.push(block.id);
+    state.allIds.push(id);
 
     // insert data into blocks object
-    state.byId[block.id] = { ...block, isLoading: false };
+    state.byId[id] = { ...block, isLoading: false };
   },
   updateBlockInStore(state: BlocksState, block: BlockStateUpdate | BlockSave) {
-    if (!state.byId[block.id]) {
-      throw new Error(`Block with id '${block.id}' does not exist`);
+    const id = `${block.serviceId}/${block.id}`;
+
+    if (!state.byId[id]) {
+      throw new Error(`Block with id '${id}' does not exist`);
     }
 
     Vue.set(state, 'byId', Object.assign(
       {},
       state.byId,
-      { [block.id]: merge(state.byId[block.id], block) },
+      { [id]: merge(state.byId[id], block) },
     ));
   },
   updateBlockState(state: BlocksState, block: BlockStateUpdate) {

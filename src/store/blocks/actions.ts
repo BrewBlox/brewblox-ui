@@ -22,20 +22,6 @@ import {
 const { dispatch } = getStoreAccessors<BlocksState, RootState>('blocks');
 
 const actions = {
-  async findBlockWithMetrics(context: BlocksContext, id: string) {
-    // add block to store which is loading
-    blockLoading(context, id);
-
-    // will fetch a block from the server
-    const blockMetrics = await fetchBlockMetrics(id);
-
-    // update metric in store and unset loading
-    mutateBlockInStore(context, {
-      id,
-      isLoading: false,
-      metrics: blockMetrics.results,
-    });
-  },
   async fetchBlocks(context: BlocksContext, services: Service[]) {
     // update isFetching
     mutateFetchingInStore(context, true);
@@ -70,7 +56,6 @@ const actions = {
 };
 
 // exported action accessors
-export const findBlockWithMetrics = dispatch(actions.findBlockWithMetrics);
 export const fetchBlocks = dispatch(actions.fetchBlocks);
 export const saveBlock = dispatch(actions.saveBlock);
 export const updateBlock = dispatch(actions.updateBlock);

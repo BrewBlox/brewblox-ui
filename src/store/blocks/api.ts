@@ -8,7 +8,9 @@ import { Block, BlockSaveBase, MetricsResult, BlockBase } from './state';
 
 export function fetchBlocks(services: Service[]): Promise<Block[]> {
   return Promise
-    .all(services.map(service => get(`/${service.id}/objects`)))
+    .all(services.map(service =>
+      get(`/${service.id}/objects`)
+        .then(blocks => blocks.map((block: Block) => ({ ...block, serviceId: service.id })))))
     .then(responses => flatten(responses))
     .then(blocks => blocks.map(spreadData));
 }

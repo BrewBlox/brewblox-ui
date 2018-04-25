@@ -24,6 +24,7 @@ import { State as RootState } from '../state';
 
 export interface BlockBase {
   id: string;
+  serviceId: string;
   isLoading?: boolean;
 }
 

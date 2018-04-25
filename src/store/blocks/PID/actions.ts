@@ -11,6 +11,7 @@ export const addPID = (
   context: BlocksContext,
   {
     id,
+    serviceId,
     settings,
     links,
     filtering,
@@ -21,6 +22,7 @@ export const addPID = (
     context,
     {
       id,
+      serviceId,
       settings,
       links,
       filtering,
@@ -39,14 +41,15 @@ export const update = (store: Store<State>, pid: { id: string } & any) => {
 };
 
 // example refresh action
-export const refresh = (store: Store<State>, id: string) => {
+export const refresh = (store: Store<State>, pid: PID) => {
   function random() {
     return Math.round(Math.random() * 100);
   }
 
   // assign new random state
   updateBlockState(store, {
-    id,
+    id: pid.id,
+    serviceId: pid.serviceId,
     state: {
       inputValue: random(),
       inputSetting: random(),

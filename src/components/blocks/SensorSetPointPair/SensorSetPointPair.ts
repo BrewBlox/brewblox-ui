@@ -73,7 +73,8 @@ export default class SensorSetPointPair extends BlockComponent {
         sensor: this.sensorInput,
         setpoint: this.setpointInput,
       },
-      id: this.$props.id,
+      id: this.blockData.id,
+      serviceId: this.blockData.serviceId,
     });
   }
 }

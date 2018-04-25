@@ -60,7 +60,7 @@ export default class PIDWidget extends mixins(BlockWidget) {
   }
 
   refreshState() {
-    refresh(this.$store, this.block.id);
+    refresh(this.$store, this.blockData);
   }
 
   updateKP() {
@@ -84,6 +84,7 @@ export default class PIDWidget extends mixins(BlockWidget) {
   save() {
     persist(this.$store, {
       id: this.block.id,
+      serviceId: this.block.serviceId,
       settings: {
         kp: this.inputs.kp,
         td: this.inputs.td,
