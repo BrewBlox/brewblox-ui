@@ -25,11 +25,7 @@ class WidgetModal extends Vue {
 
   get availableBlocksForWidget() {
     if (this.widgetType) {
-      const availableBlocks = blocksByWidgetType(this.$store, this.widgetType);
-
-      if (availableBlocks.length > 0) {
-        return [];
-      }
+      return blocksByWidgetType(this.$store, this.widgetType);
     }
 
     return [];
@@ -37,7 +33,10 @@ class WidgetModal extends Vue {
 
   get blocksForWidget() {
     if (this.availableBlocksForWidget.length > 0) {
-      return [{ label: 'Widget here', value: 1 }];
+      return this.availableBlocksForWidget.map(block => ({
+        label: `${block.serviceId}/${block.id}`,
+        value: block,
+      }));
     }
 
     return [{ label: `No available blocks for '${this.widgetName}'`, value: null }];

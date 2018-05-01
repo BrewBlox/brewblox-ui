@@ -55,9 +55,13 @@
             icon="widgets"
             orientation="vertical"
           >
+            <p v-if="availableBlocksForWidget.length === 0">
+              No blocks available for {{ widgetName }}
+            </p>
             <q-select
+              v-else
               v-model="block"
-              :disabled="availableBlocksForWidget.length === 0"
+              placeholder="Choose a block to connect to widget"
               :options="blocksForWidget"
             />
           </q-field>
