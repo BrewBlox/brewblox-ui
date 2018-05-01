@@ -33,7 +33,7 @@
         :content-css="{ minWidth: '80vw', minHeight: '500px' }"
       >
         <widget-modal
-          onAddWidget="onAddWidget"
+          :onAddWidget="onAddWidget"
         />
       </q-modal>
 
@@ -70,6 +70,7 @@ import {
   updateDashboardItemOrder,
   updateDashboardItemSize,
 } from '@/store/dashboards/actions';
+import { Block } from '@/store/blocks/state';
 
 import { addComponentByType } from './widgets';
 
@@ -131,8 +132,10 @@ class DashboardPage extends Vue {
     updateDashboardItemSize(this.$store, { id, cols, rows });
   }
 
-  onAddWidget() {
-    console.log('Add widget');
+  onAddWidget(type: string, block: Block) {
+    this.modalOpen = false;
+
+    console.log('Add widget', type, block);
   }
 }
 

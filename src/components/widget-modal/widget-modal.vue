@@ -85,6 +85,7 @@
         <q-step
           name="blocks-setup"
           title="Setup"
+          :disable="!needsSetup"
         >
           Block Setup
 
@@ -140,7 +141,14 @@ import Component from 'vue-class-component';
 import { widgetTypes, blocksByWidgetType } from './widget-types';
 
 /* eslint-disable indent */
-@Component
+@Component({
+  props: {
+    onAddWidget: {
+      type: Function,
+      default: () => { throw new Error('Provide onAddWidget callback'); },
+    }
+  },
+})
 /* eslint-enable */
 class WidgetModal extends Vue {
   currentStep: string = 'widgets';
@@ -180,7 +188,7 @@ class WidgetModal extends Vue {
   }
 
   addToDashboard() {
-    console.log('Add the widget to the dashboard');
+    this.$props.onAddWidget(this.widgetType, this.block);
   }
 }
 
