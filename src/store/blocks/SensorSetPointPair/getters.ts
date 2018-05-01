@@ -15,7 +15,8 @@ export function getById(store: RootStore, id: string): SensorSetPointPairBlock {
   return block;
 }
 
-export function getAll(store: RootStore): SensorSetPointPairBlock[] {
+export function getAll(store: RootStore, serviceId: string): SensorSetPointPairBlock[] {
   return allBlocks(store)
-    .filter(block => block.type === 'SensorSetPointPair') as SensorSetPointPairBlock[];
+    .filter(block => block.type === 'SensorSetPointPair' &&
+      block.serviceId === serviceId) as SensorSetPointPairBlock[];
 }
