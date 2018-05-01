@@ -30,9 +30,11 @@
 
       <q-modal
         v-model="modalOpen"
-        :content-css="{ minWidth: '80vw', minHeight: '80vh' }"
+        :content-css="{ minWidth: '80vw', minHeight: '500px' }"
       >
-        <widget-modal />
+        <widget-modal
+          onAddWidget="onAddWidget"
+        />
       </q-modal>
 
       <grid-container
@@ -54,7 +56,88 @@
   </q-page>
 </template>
 
-<script lang="ts" src="./dashboard.ts" />
+<script lang="ts">
+import Vue from 'vue';
+import Component from 'vue-class-component';
+
+import GridContainer from '@/components/grid/grid-container.vue';
+import WidgetModal from '@/components/widget-modal/widget-modal.vue';
+
+import byOrder from '@/core/byOrder';
+
+import { isFetching, dashboardById, dashboardItemById } from '@/store/dashboards/getters';
+import {
+  updateDashboardItemOrder,
+  updateDashboardItemSize,
+} from '@/store/dashboards/actions';
+
+import { addComponentByType } from './widgets';
+
+interface VueOrdered extends Vue {
+  id: string;
+}
+
+/* eslint-disable indent */
+@Component({
+  components: {
+    GridContainer,
+    WidgetModal,
+  },
+})
+/* eslint-enable */
+class DashboardPage extends Vue {
+  editable: boolean = false;
+  modalOpen: boolean = false;
+
+  get dashboardId(): string {
+    return this.$route.params.id;
+  }
+
+  get dashboard() {
+    return dashboardById(this.$store, this.dashboardId);
+  }
+
+  get items() {
+    return [
+      ...this.dashboard.items
+        .map(id => dashboardItemById(this.$store, id))
+        .map(addComponentByType),
+    ].sort(byOrder);
+  }
+
+  get isFetching() {
+    return isFetching(this.$store);
+  }
+
+  toggleEditable() {
+    this.editable = !this.editable;
+  }
+
+  onOpenAddWidget() {
+    this.modalOpen = true;
+  }
+
+  async onChangeOrder(order: VueOrdered[]) {
+    const newOrder = order.map(item => item.id);
+
+    try {
+      await updateDashboardItemOrder(this.$store, newOrder);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  onChangeSize(id: string, cols: number, rows: number) {
+    updateDashboardItemSize(this.$store, { id, cols, rows });
+  }
+
+  onAddWidget() {
+    console.log('Add widget');
+  }
+}
+
+export default DashboardPage;
+</script>
 
 <style lang="stylus" scoped>
 @import '../../css/app.styl';

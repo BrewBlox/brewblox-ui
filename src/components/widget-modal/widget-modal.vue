@@ -76,7 +76,7 @@
             <q-btn
               :disabled="!block"
               :color="!block ? 'dark-bright' : 'primary'"
-              @click="currentStep = 'blocks-setup'"
+              @click="currentStep = needsSetup ? 'blocks-setup' : 'finished'"
               label="Next"
             />
           </q-stepper-navigation>
@@ -107,13 +107,24 @@
           name="finished"
           title="Finished"
         >
-          Done!
+          <q-alert
+            type="info"
+            icon="info"
+          >
+            Widget setup is done!
+          </q-alert>
 
           <q-stepper-navigation>
             <q-btn
-              @click="currentStep = 'blocks-setup'"
+              @click="currentStep = needsSetup ? 'blocks-setup' : 'blocks'"
               flat
               label="Go back"
+            />
+
+            <q-btn
+              color="primary"
+              @click="addToDashboard"
+              label="Add to dashboard"
             />
           </q-stepper-navigation>
         </q-step>
@@ -124,6 +135,8 @@
 
 <script lang="ts" src="./widget-modal.ts" />
 
-<style scoped>
-
+<style>
+.q-stepper-step-content {
+  overflow: hidden;
+}
 </style>

@@ -10,6 +10,7 @@ class WidgetModal extends Vue {
   currentStep: string = 'widgets';
   widgetType: string | null = null;
   block: string | null = null;
+  needsSetup: boolean = false;
 
   get widgetTypes(): { label: string, value: string }[] {
     return Object.keys(widgetTypes).map(value => ({ value, label: widgetTypes[value] }));
@@ -40,6 +41,10 @@ class WidgetModal extends Vue {
     }
 
     return [{ label: `No available blocks for '${this.widgetName}'`, value: null }];
+  }
+
+  addToDashboard() {
+    console.log('Add the widget to the dashboard');
   }
 }
 
