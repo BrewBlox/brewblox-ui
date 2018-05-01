@@ -33,6 +33,7 @@
         :content-css="{ minWidth: '80vw', minHeight: '500px' }"
       >
         <widget-modal
+          :isOpen="modalOpen"
           :onAddWidget="onAddWidget"
         />
       </q-modal>

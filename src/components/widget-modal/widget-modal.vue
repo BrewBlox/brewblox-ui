@@ -137,12 +137,17 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { Watch } from 'vue-property-decorator';
 
 import { widgetTypes, blocksByWidgetType } from './widget-types';
 
 /* eslint-disable indent */
 @Component({
   props: {
+    isOpen: {
+      type: Boolean,
+      default: false,
+    },
     onAddWidget: {
       type: Function,
       default: () => { throw new Error('Provide onAddWidget callback'); },
@@ -189,6 +194,16 @@ class WidgetModal extends Vue {
 
   addToDashboard() {
     this.$props.onAddWidget(this.widgetType, this.block);
+  }
+
+  @Watch('isOpen', { immediate: true, deep: true })
+  onOpenedChange() {
+    if (!this.$props.isOpen) {
+      // closed modal
+      this.currentStep = 'widgets';
+      this.widgetType = null;
+      this.block = null;
+    }
   }
 }
 
