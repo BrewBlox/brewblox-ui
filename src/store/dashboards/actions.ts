@@ -16,6 +16,7 @@ import { State as RootState } from '../state';
 import {
   mutateFetching as mutateFetchingInStore,
   addDashboard as addDashboardToStore,
+  setDashboard as setDashboardInStore,
   setDashboardOrder as setDashboardOrderInStore,
   addDashboardItem as addDashboardItemToStore,
   setDashboardItemOrder as setDashboardItemOrderInStore,
@@ -48,6 +49,11 @@ const actions = {
 
       persistDashboard(id, { order });
     });
+  },
+  updateDashboard(context: DashboardContext, dashboard: Dashboard) {
+    setDashboardInStore(context, dashboard);
+
+    persistDashboard(dashboard.id, dashboard);
   },
   addDashboard(context: DashboardContext, dashboard: Dashboard) {
     addDashboardToStore(context, dashboard);
@@ -101,10 +107,14 @@ const actions = {
   },
   addDashboardItemToDashboard(
     context: DashboardContext,
-    dashboard: Dashboard,
-    dashboardItem: DashboardItem,
+    payload: { dashboard: Dashboard, dashboardItem: DashboardItem },
   ) {
+    const { dashboard, dashboardItem } = payload;
 
+    actions.updateDashboard(context, {
+      ...dashboard,
+      items: [...dashboard.items, dashboardItem.id],
+    });
   },
 };
 
@@ -113,7 +123,9 @@ export const fetchDashboards = dispatch(actions.fetchDashboards);
 export const addDashboardItem = dispatch(actions.addDashboardItem);
 export const addNewDashboard = dispatch(actions.addNewDashboard);
 export const updateDashboardOrder = dispatch(actions.updateDashboardOrder);
+export const updateDashboard = dispatch(actions.updateDashboard);
 export const addDashboard = dispatch(actions.addDashboard);
+export const addDashboardItemToDashboard = dispatch(actions.addDashboardItemToDashboard);
 export const updateDashboardItemOrder = dispatch(actions.updateDashboardItemOrder);
 export const updateDashboardItemSize = dispatch(actions.updateDashboardItemSize);
 export const createDashboardItem = dispatch(actions.createDashboardItem);

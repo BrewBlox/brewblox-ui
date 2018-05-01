@@ -31,6 +31,9 @@ const mutations = {
   setDashboardOrder(state: DashboardState, { id, order }: { id: string, order: number }) {
     updateDashboard(state, id, { order });
   },
+  setDashboard(state: DashboardState, dashboard: Dashboard) {
+    updateDashboard(state, dashboard.id, dashboard);
+  },
   addDashboardItem(state: DashboardState, item: DashboardItem) {
     state.items.allIds.push(item.id);
     state.items.byId[item.id] = { ...item };
@@ -52,6 +55,7 @@ const mutations = {
 // exported commit accessors
 export const mutateFetching = commit(mutations.mutateFetching);
 export const addDashboard = commit(mutations.addDashboard);
+export const setDashboard = commit(mutations.setDashboard);
 export const setDashboardOrder = commit(mutations.setDashboardOrder);
 export const addDashboardItem = commit(mutations.addDashboardItem);
 export const setDashboardItemOrder = commit(mutations.setDashboardItemOrder);

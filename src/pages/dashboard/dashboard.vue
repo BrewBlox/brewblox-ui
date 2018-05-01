@@ -12,6 +12,7 @@ import {
   updateDashboardItemOrder,
   updateDashboardItemSize,
   createDashboardItem,
+  addDashboardItemToDashboard,
 } from '@/store/dashboards/actions';
 import { Block } from '@/store/blocks/state';
 
@@ -76,6 +77,7 @@ class DashboardPage extends Vue {
   }
 
   async onAddWidget(type: string, block: Block) {
+    // create dashboard item on api and wait
     const dashboardItem = await createDashboardItem(this.$store, {
       order: this.items.length + 1,
       cols: 4,
@@ -87,6 +89,7 @@ class DashboardPage extends Vue {
     });
 
     // add item to dashboard
+    addDashboardItemToDashboard(this.$store, { dashboard: this.dashboard, dashboardItem });
 
     this.modalOpen = false;
   }
