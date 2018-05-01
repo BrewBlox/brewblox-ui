@@ -11,6 +11,7 @@ export const widgetTypes: { [name: string]: string } = {
   pid: 'PID',
   sensor: 'Sensor value',
   setpoint: 'SetPoint',
+  setpointpair: 'SetPoint Pair',
 };
 
 function getBlocksFromServices(
