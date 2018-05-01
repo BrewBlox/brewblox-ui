@@ -51,7 +51,7 @@
           title="Pick Block"
         >
           <q-field
-            :label="`Pick block to associate with '${widgetName}'`"
+            :label="`Pick block to associate with '${widgetName}' widget`"
             icon="widgets"
             orientation="vertical"
           >
@@ -61,7 +61,7 @@
             <q-select
               v-else
               v-model="block"
-              placeholder="Choose a block to connect to widget"
+              placeholder="Choose a block"
               :options="blocksForWidget"
             />
           </q-field>
@@ -74,7 +74,8 @@
             />
 
             <q-btn
-              color="primary"
+              :disabled="!block"
+              :color="!block ? 'dark-bright' : 'primary'"
               @click="currentStep = 'blocks-setup'"
               label="Next"
             />
