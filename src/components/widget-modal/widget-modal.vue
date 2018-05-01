@@ -26,6 +26,7 @@
             label="Choose a widget type to add"
             orientation="vertical"
             dark
+            icon="dashboard"
           >
             <q-option-group
               dark
@@ -49,7 +50,17 @@
           name="blocks"
           title="Pick Block"
         >
-          Block
+          <q-field
+            :label="`Pick block to associate with '${widgetName}'`"
+            icon="widgets"
+            orientation="vertical"
+          >
+            <q-select
+              v-model="block"
+              :disabled="availableBlocksForWidget.length === 0"
+              :options="blocksForWidget"
+            />
+          </q-field>
 
           <q-stepper-navigation>
             <q-btn
