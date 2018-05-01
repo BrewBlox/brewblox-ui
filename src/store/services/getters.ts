@@ -1,8 +1,7 @@
-import { Store } from 'vuex';
 import { getStoreAccessors } from 'vuex-typescript';
 
 import { ServicesState, Service, DeviceService } from './state';
-import { State as RootState } from '../state';
+import { State as RootState, RootStore } from '../state';
 
 const { read } = getStoreAccessors<ServicesState, RootState>('services');
 
@@ -32,7 +31,7 @@ export const deviceServices = read(getters.deviceServices);
 export const serviceIds = read(getters.serviceIds);
 
 export const serviceById =
-  (store: Store<RootState>, id: string): Service => servicesById(store)[id];
+  (store: RootStore, id: string): Service => servicesById(store)[id];
 
 export const isFetching = read(getters.isFetching);
 

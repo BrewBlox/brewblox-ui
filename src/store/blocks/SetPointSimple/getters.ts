@@ -1,12 +1,10 @@
-import { Store } from 'vuex';
-
 import { allBlocks, blockById } from '../getters';
 
 import { SetPointSimpleBlock } from './SetPointSimple';
 
-import { State } from '../../state';
+import { RootStore } from '../../state';
 
-export function getById(store: Store<State>, id: string): SetPointSimpleBlock {
+export function getById(store: RootStore, id: string): SetPointSimpleBlock {
   const block = blockById(store, id);
 
   // force block type
@@ -17,7 +15,7 @@ export function getById(store: Store<State>, id: string): SetPointSimpleBlock {
   return block;
 }
 
-export function getAll(store: Store<State>, serviceId: string): SetPointSimpleBlock[] {
+export function getAll(store: RootStore, serviceId: string): SetPointSimpleBlock[] {
   return allBlocks(store)
     .filter(block =>
       block.type === 'SetPointSimple' && block.serviceId === serviceId) as SetPointSimpleBlock[];

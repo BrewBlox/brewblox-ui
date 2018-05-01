@@ -1,10 +1,8 @@
-import { Store } from 'vuex';
-
 import { saveBlock } from '../actions';
 
 import { addBlock } from '../mutations';
 import { SensorSetPointPair, SensorSetPointPairUpdate } from './SensorSetPointPair';
-import { State } from '../../state';
+import { RootStore } from '../../state';
 import { BlocksContext } from '../state';
 
 export const addSensorSetPointPair =
@@ -21,7 +19,7 @@ export const addSensorSetPointPair =
   };
 
 export const persist =
-  async (store: Store<State>, sensorSetPointPair: SensorSetPointPairUpdate) => {
+  async (store: RootStore, sensorSetPointPair: SensorSetPointPairUpdate) => {
     try {
       await saveBlock(store, sensorSetPointPair);
     } catch (e) {

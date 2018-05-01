@@ -1,12 +1,10 @@
-import { Store } from 'vuex';
-
 import { allBlocks, blockById } from '../getters';
 
 import { SensorSetPointPairBlock } from './SensorSetPointPair';
 
-import { State } from '../../state';
+import { RootStore } from '../../state';
 
-export function getById(store: Store<State>, id: string): SensorSetPointPairBlock {
+export function getById(store: RootStore, id: string): SensorSetPointPairBlock {
   const block = blockById(store, id);
 
   // force block type
@@ -17,7 +15,7 @@ export function getById(store: Store<State>, id: string): SensorSetPointPairBloc
   return block;
 }
 
-export function getAll(store: Store<State>): SensorSetPointPairBlock[] {
+export function getAll(store: RootStore): SensorSetPointPairBlock[] {
   return allBlocks(store)
     .filter(block => block.type === 'SensorSetPointPair') as SensorSetPointPairBlock[];
 }

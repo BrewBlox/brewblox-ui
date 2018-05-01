@@ -25,7 +25,7 @@ class WidgetModal extends Vue {
 
   get availableBlocksForWidget() {
     if (this.widgetType) {
-      const availableBlocks = blocksByWidgetType(this.widgetType);
+      const availableBlocks = blocksByWidgetType(this.$store, this.widgetType);
 
       if (availableBlocks.length > 0) {
         return [];
