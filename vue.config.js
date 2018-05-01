@@ -17,7 +17,7 @@ module.exports = {
     config.module
       .rule('ts')
       .use('ts-loader')
-      .tap((options) => ({
+      .tap(options => ({
         ...options,
         transpileOnly: false,
       }));
