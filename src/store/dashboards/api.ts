@@ -24,3 +24,7 @@ export function fetchDashboardItems(): Promise<DashboardItem[]> {
 export function persistDashboardItem(id: string, newData: any): Promise<DashboardItem> {
   return put(`/dashboard-items/${encodeURIComponent(id)}`, unspreadData(newData));
 }
+
+export function createDashboardItem(newData: any): Promise<DashboardItem> {
+  return post('/dashboard-items/', unspreadData(newData));
+}

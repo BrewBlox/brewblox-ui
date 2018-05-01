@@ -7,6 +7,7 @@ import {
   createDashboard as createDashboardOnApi,
   persistDashboard,
   persistDashboardItem,
+  createDashboardItem as createDashboardItemOnApi,
 } from './api';
 
 import { DashboardState, DashboardItem, DashboardContext, Dashboard } from './state';
@@ -89,6 +90,22 @@ const actions = {
     // update isFetching
     mutateFetchingInStore(context, false);
   },
+  async createDashboardItem(context: DashboardContext, data: any): Promise<DashboardItem> {
+    // create dashboard item on api
+    const dashboardItem = await createDashboardItemOnApi(data);
+
+    // add to store
+    actions.addDashboardItem(context, dashboardItem);
+
+    return dashboardItem;
+  },
+  addDashboardItemToDashboard(
+    context: DashboardContext,
+    dashboard: Dashboard,
+    dashboardItem: DashboardItem,
+  ) {
+
+  },
 };
 
 // exported action accessors
@@ -99,5 +116,6 @@ export const updateDashboardOrder = dispatch(actions.updateDashboardOrder);
 export const addDashboard = dispatch(actions.addDashboard);
 export const updateDashboardItemOrder = dispatch(actions.updateDashboardItemOrder);
 export const updateDashboardItemSize = dispatch(actions.updateDashboardItemSize);
+export const createDashboardItem = dispatch(actions.createDashboardItem);
 
 export default actions;
