@@ -16,7 +16,7 @@ import {
 } from '@/store/dashboards/actions';
 import { Block } from '@/store/blocks/state';
 
-import { addComponentByType } from './widgets';
+import { addComponentByType } from '@/components/widgets/resolveWidget';
 
 interface VueOrdered extends Vue {
   id: string;
