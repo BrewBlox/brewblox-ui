@@ -1,14 +1,5 @@
-const { merge } = require('lodash');
-
-const base = require('./GET.json');
-const { getData } = require('./storage');
+const { get } = require('../storage');
 
 module.exports = (request, response) => {
-  response.send(JSON.stringify(
-    merge(
-      {},
-      base,
-      getData(),
-    ),
-  ));
+  response.send(JSON.stringify(get('settings')));
 };
