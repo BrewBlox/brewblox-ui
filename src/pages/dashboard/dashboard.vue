@@ -133,11 +133,7 @@ export default DashboardPage;
             v-model="title"
             placeholder="Name of this dashboard"
             dark
-            :before="[
-              {
-                icon: 'edit',
-              }
-            ]"
+            :before="[{ icon: 'edit' }]"
           />
         </div>
       </portal>

@@ -69,6 +69,10 @@ class WidgetModal extends Vue {
     this.$props.onAddWidget(this.widgetType, this.block);
   }
 
+  cancelCreate() {
+    this.block = null;
+  }
+
   @Watch('isOpen', { immediate: true, deep: true })
   onOpenedChange() {
     if (!this.$props.isOpen) {
@@ -101,122 +105,132 @@ export default WidgetModal;
     </q-toolbar>
 
     <div class="layout-padding">
-      <q-stepper
-        v-model="currentStep"
-        v-if="block !== 'new'"
-      >
-        <q-step
-          default
-          name="widgets"
-          title="Widget Type"
+      <transition name="slide">
+        <q-stepper
+          v-model="currentStep"
+          v-if="block !== 'new'"
         >
-          <q-field
-            label="Choose a widget type to add"
-            orientation="vertical"
-            dark
-            icon="dashboard"
+          <q-step
+            default
+            name="widgets"
+            title="Widget Type"
           >
-            <q-option-group
+            <q-field
+              label="Choose a widget type to add"
+              orientation="vertical"
               dark
-              type="radio"
-              v-model="widgetType"
-              :options="widgetTypes"
-            />
-          </q-field>
+              icon="dashboard"
+            >
+              <q-option-group
+                dark
+                type="radio"
+                v-model="widgetType"
+                :options="widgetTypes"
+              />
+            </q-field>
 
-          <q-stepper-navigation>
-            <q-btn
-              :disabled="!widgetType"
-              :color="!widgetType ? 'dark-bright' : 'primary'"
-              @click="currentStep = 'blocks'"
-              label="Next"
-            />
-          </q-stepper-navigation>
-        </q-step>
+            <q-stepper-navigation>
+              <q-btn
+                :disabled="!widgetType"
+                :color="!widgetType ? 'dark-bright' : 'primary'"
+                @click="currentStep = 'blocks'"
+                label="Next"
+              />
+            </q-stepper-navigation>
+          </q-step>
 
-        <q-step
-          name="blocks"
-          title="Pick Block"
-        >
-          <q-field
-            :label="`Pick block to associate with '${widgetName}' widget`"
-            icon="widgets"
-            orientation="vertical"
+          <q-step
+            name="blocks"
+            title="Pick Block"
           >
-            <q-select
-              v-model="block"
-              placeholder="Choose a block"
-              :options="blocksForWidget"
-            />
-          </q-field>
+            <q-field
+              :label="`Pick block to associate with '${widgetName}' widget`"
+              icon="widgets"
+              orientation="vertical"
+            >
+              <q-select
+                v-model="block"
+                placeholder="Choose a block"
+                :options="blocksForWidget"
+              />
+            </q-field>
 
-          <q-stepper-navigation>
-            <q-btn
-              @click="currentStep = 'widgets'"
-              flat
-              label="Go back"
-            />
+            <q-stepper-navigation>
+              <q-btn
+                @click="currentStep = 'widgets'"
+                flat
+                label="Go back"
+              />
 
-            <q-btn
-              :disabled="!block"
-              :color="!block ? 'dark-bright' : 'primary'"
-              @click="currentStep = needsSetup ? 'blocks-setup' : 'finished'"
-              label="Next"
-            />
-          </q-stepper-navigation>
-        </q-step>
+              <q-btn
+                :disabled="!block"
+                :color="!block ? 'dark-bright' : 'primary'"
+                @click="currentStep = needsSetup ? 'blocks-setup' : 'finished'"
+                label="Next"
+              />
+            </q-stepper-navigation>
+          </q-step>
 
-        <q-step
-          name="blocks-setup"
-          title="Setup"
-          :disable="!needsSetup"
-        >
-          Block Setup
-
-          <q-stepper-navigation>
-            <q-btn
-              @click="currentStep = 'blocks'"
-              flat
-              label="Go back"
-            />
-
-            <q-btn
-              color="primary"
-              @click="currentStep = 'finished'"
-              label="Next"
-            />
-          </q-stepper-navigation>
-        </q-step>
-
-        <q-step
-          name="finished"
-          title="Finished"
-        >
-          <q-alert
-            type="info"
-            icon="info"
+          <q-step
+            name="blocks-setup"
+            title="Setup"
+            :disable="!needsSetup"
           >
-            Widget setup is done!
-          </q-alert>
+            Block Setup
 
-          <q-stepper-navigation>
+            <q-stepper-navigation>
+              <q-btn
+                @click="currentStep = 'blocks'"
+                flat
+                label="Go back"
+              />
+
+              <q-btn
+                color="primary"
+                @click="currentStep = 'finished'"
+                label="Next"
+              />
+            </q-stepper-navigation>
+          </q-step>
+
+          <q-step
+            name="finished"
+            title="Finished"
+          >
+            <q-alert
+              type="info"
+              icon="info"
+            >
+              Widget setup is done!
+            </q-alert>
+
+            <q-stepper-navigation>
+              <q-btn
+                @click="currentStep = needsSetup ? 'blocks-setup' : 'blocks'"
+                flat
+                label="Go back"
+              />
+
+              <q-btn
+                color="primary"
+                @click="addToDashboard"
+                label="Add to dashboard"
+              />
+            </q-stepper-navigation>
+          </q-step>
+        </q-stepper>
+        <div v-else>
+          <component :is="widgetType" />
+
+          <div class="create-nav">
             <q-btn
-              @click="currentStep = needsSetup ? 'blocks-setup' : 'blocks'"
               flat
-              label="Go back"
+              @click="cancelCreate"
+              label="Cancel"
             />
-
-            <q-btn
-              color="primary"
-              @click="addToDashboard"
-              label="Add to dashboard"
-            />
-          </q-stepper-navigation>
-        </q-step>
-      </q-stepper>
-      <div v-else>
-        <component :is="widgetType" />
-      </div>
+          </div>
+        </div>
+      </transition>
     </div>
   </q-modal-layout>
 </template>
@@ -224,5 +238,24 @@ export default WidgetModal;
 <style>
 .q-stepper-step-content {
   overflow: hidden;
+}
+
+.layout-padding {
+  position: relative;
+}
+
+.slide-enter-active, .slide-leave-active {
+  position: absolute;
+  width: calc(100% - 96px);
+  transition: opacity .2s, margin-top .2s;
+}
+
+.slide-enter, .slide-leave-to {
+  opacity: 0;
+  margin-top: -40px;
+}
+
+.create-nav {
+  margin-top: 16px;
 }
 </style>
