@@ -9,6 +9,7 @@ import byOrder from '@/core/byOrder';
 
 import { isFetching, dashboardById, dashboardItemById } from '@/store/dashboards/getters';
 import {
+  updateDashboard,
   updateDashboardItemOrder,
   updateDashboardItemSize,
   createDashboardItem,
@@ -33,6 +34,7 @@ interface VueOrdered extends Vue {
 class DashboardPage extends Vue {
   editable: boolean = false;
   modalOpen: boolean = false;
+  title: string = '';
 
   get dashboardId(): string {
     return this.$route.params.id;
@@ -55,7 +57,21 @@ class DashboardPage extends Vue {
   }
 
   toggleEditable() {
-    this.editable = !this.editable;
+    this.title = this.dashboard.title;
+
+    this.editable = true;
+  }
+
+  onSave() {
+    if (this.title !== this.dashboard.title) {
+      // update title of dashboard if changed
+      updateDashboard(this.$store, {
+        ...this.dashboard,
+        title: this.title,
+      });
+    }
+
+    this.editable = false;
   }
 
   onOpenAddWidget() {
@@ -109,7 +125,21 @@ export default DashboardPage;
 
     <template v-if="!isFetching">
       <portal to="toolbar-title">
-        {{ dashboard.title }}
+        <div v-if="!editable">
+          {{ dashboard.title }}
+        </div>
+        <div v-else>
+          <q-input
+            v-model="title"
+            placeholder="Name of this dashboard"
+            dark
+            :before="[
+              {
+                icon: 'edit',
+              }
+            ]"
+          />
+        </div>
       </portal>
 
       <portal to="toolbar-buttons">
@@ -123,7 +153,7 @@ export default DashboardPage;
         <q-btn
           :icon="editable ? 'check' : 'mode edit'"
           :color="editable ? 'positive' : 'primary'"
-          @click="toggleEditable"
+          @click="editable ? onSave() : toggleEditable()"
           :label="editable ? 'Save changes' : 'Edit dashboard'"
         />
       </portal>
