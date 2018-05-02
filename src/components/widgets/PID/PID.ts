@@ -68,7 +68,7 @@ export default class PIDWidget extends mixins(BlockWidget) {
       id: this.block.id,
       serviceId: this.block.serviceId,
       settings: {
-        kp: this.inputs.kpInput,
+        kp: this.inputs.kp,
       },
     });
   }
