@@ -1,13 +1,9 @@
-const { merge } = require('lodash');
-
-const { getBlock } = require('./helpers');
+const { updateById } = require('../../../storage');
 
 module.exports = (request, response) => {
-  const id = decodeURIComponent(request.params.block_id);
   const controllerId = decodeURIComponent(request.params.controller_id);
-  const base = getBlock(id, controllerId);
+  const blockId = decodeURIComponent(request.params.block_id);
 
-  setTimeout(() => {
-    response.send(JSON.stringify(merge(base, request.body)));
-  }, 1000);
+  response.send(JSON.stringify(updateById(`objects.${controllerId}`, blockId, request.body)));
 };
+
