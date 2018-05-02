@@ -1,7 +1,7 @@
-const { updateData } = require('./storage');
+const _ = require('lodash');
+
+const { updateById } = require('../storage');
 
 module.exports = (request, response) => {
-  updateData(request.body.id, request.body);
-
-  response.send(true);
+  response.send(JSON.stringify(updateById('dashboards', request.body.id, request.body)));
 };
