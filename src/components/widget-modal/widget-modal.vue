@@ -64,6 +64,18 @@ class WidgetModal extends Vue {
     ];
   }
 
+  get canContinue() {
+    if (this.currentStep === 'widgets' && this.widgetType) {
+      return true;
+    }
+
+    if (this.currentStep === 'blocks' && this.block) {
+      return true;
+    }
+
+    return false;
+  }
+
   addToDashboard() {
     this.$props.onAddWidget(this.widgetType, this.block);
   }
@@ -110,6 +122,7 @@ export default WidgetModal;
     <div class="layout-padding">
       <transition name="slide">
         <q-stepper
+          ref="stepper"
           v-model="currentStep"
           v-if="block !== 'new'"
         >
@@ -131,15 +144,6 @@ export default WidgetModal;
                 :options="widgetTypes"
               />
             </q-field>
-
-            <q-stepper-navigation>
-              <q-btn
-                :disabled="!widgetType"
-                :color="!widgetType ? 'dark-bright' : 'primary'"
-                @click="currentStep = 'blocks'"
-                label="Next"
-              />
-            </q-stepper-navigation>
           </q-step>
 
           <q-step
@@ -157,21 +161,6 @@ export default WidgetModal;
                 :options="blocksForWidget"
               />
             </q-field>
-
-            <q-stepper-navigation>
-              <q-btn
-                @click="currentStep = 'widgets'"
-                flat
-                label="Go back"
-              />
-
-              <q-btn
-                :disabled="!block"
-                :color="!block ? 'dark-bright' : 'primary'"
-                @click="currentStep = needsSetup ? 'blocks-setup' : 'finished'"
-                label="Next"
-              />
-            </q-stepper-navigation>
           </q-step>
 
           <q-step
@@ -180,20 +169,6 @@ export default WidgetModal;
             :disable="!needsSetup"
           >
             Block Setup
-
-            <q-stepper-navigation>
-              <q-btn
-                @click="currentStep = 'blocks'"
-                flat
-                label="Go back"
-              />
-
-              <q-btn
-                color="primary"
-                @click="currentStep = 'finished'"
-                label="Next"
-              />
-            </q-stepper-navigation>
           </q-step>
 
           <q-step
@@ -206,21 +181,23 @@ export default WidgetModal;
             >
               Widget setup is done!
             </q-alert>
-
-            <q-stepper-navigation>
-              <q-btn
-                @click="currentStep = needsSetup ? 'blocks-setup' : 'blocks'"
-                flat
-                label="Go back"
-              />
-
-              <q-btn
-                color="primary"
-                @click="addToDashboard"
-                label="Add to dashboard"
-              />
-            </q-stepper-navigation>
           </q-step>
+
+          <q-stepper-navigation>
+            <q-btn
+              v-if="currentStep !== 'widgets'"
+              @click="$refs.stepper.previous()"
+              flat
+              label="Go back"
+            />
+
+            <q-btn
+              :disabled="!canContinue"
+              :color="!canContinue ? 'dark-bright' : 'primary'"
+              @click="currentStep === 'finished' ? addToDashboard() : $refs.stepper.next()"
+              :label="currentStep === 'finished' ? 'Add to dashboard' : 'Next'"
+            />
+          </q-stepper-navigation>
         </q-stepper>
         <div v-else>
           <component
@@ -252,9 +229,5 @@ export default WidgetModal;
 .slide-enter, .slide-leave-to {
   opacity: 0;
   margin-top: -40px;
-}
-
-.q-stepper-horizontal .q-stepper-step .q-stepper-nav > div.col {
-  display: block;
 }
 </style>

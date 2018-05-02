@@ -37,6 +37,18 @@ class SensorSetPointPair extends Vue {
     }));
   }
 
+  get canContinue() {
+    if (this.currentStep === 'service' && this.service) {
+      return true;
+    }
+
+    if (this.currentStep === 'sensor-setpoint' && this.setpointInput && this.sensorInput) {
+      return true;
+    }
+
+    return false;
+  }
+
   get allSensors() {
     if (!this.service) {
       return [];
@@ -140,7 +152,8 @@ export default SensorSetPointPair;
         label="Back"
       />
       <q-btn
-        color="primary"
+        :color="!canContinue ? 'dark-bright' : 'primary'"
+        :disabled="!canContinue"
         @click="$refs.stepper.next()"
         label="Next"
       />
