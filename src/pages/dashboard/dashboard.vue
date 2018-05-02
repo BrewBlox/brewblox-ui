@@ -16,7 +16,7 @@ import {
 } from '@/store/dashboards/actions';
 import { Block } from '@/store/blocks/state';
 
-import { addComponentByType } from '@/components/widgets/resolveWidget';
+import addComponentByType from '@/components/widgets/componentByType';
 
 interface VueOrdered extends Vue {
   id: string;
@@ -82,7 +82,7 @@ class DashboardPage extends Vue {
       order: this.items.length + 1,
       cols: 4,
       rows: 4,
-      widget: block.type,
+      widget: type,
       options: {
         block: `${block.serviceId}/${block.id}`,
       },

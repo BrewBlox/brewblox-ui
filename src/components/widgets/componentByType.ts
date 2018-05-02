@@ -8,6 +8,8 @@ function componentByType(type: WidgetType) {
     case 'PID':
       return PID;
     case 'Empty':
+    case 'Sensor':
+    case 'SetPoint':
     case 'SensorSetPointPair':
       return Placeholder;
     default:
@@ -15,7 +17,7 @@ function componentByType(type: WidgetType) {
   }
 }
 
-export function addComponentByType(item: DashboardItem) {
+export default function addComponentByType(item: DashboardItem) {
   return {
     ...item,
     component: componentByType(item.widget),

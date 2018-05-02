@@ -9,10 +9,10 @@ import { getAll as getAllSensorSetpointPairs } from '@/store/blocks/SensorSetPoi
 import { deviceServices } from '@/store/services/getters';
 
 export const widgetTypes: { [name: string]: string } = {
-  pid: 'PID',
-  sensor: 'Sensor',
-  setpoint: 'SetPoint',
-  sensorsetpointpair: 'Sensor SetPoint Pair',
+  PID: 'PID',
+  Sensor: 'Sensor',
+  SetPoint: 'SetPoint',
+  SensorSetPointPair: 'Sensor SetPoint Pair',
 };
 
 function getBlocksFromServices(
@@ -29,13 +29,13 @@ export function blocksByWidgetType(store: RootStore, type: string): Block[] {
   const services = deviceServices(store);
 
   switch (type) {
-    case 'pid':
+    case 'PID':
       return getBlocksFromServices(services, store, getAllPIDs);
-    case 'sensor':
+    case 'Sensor':
       return getBlocksFromServices(services, store, getAllOneWireTempSensors);
-    case 'setpoint':
+    case 'SetPoint':
       return getBlocksFromServices(services, store, getAllSetPointSimples);
-    case 'sensorsetpointpair':
+    case 'SensorSetPointPair':
       return getBlocksFromServices(services, store, getAllSensorSetpointPairs);
     default:
       return [];
