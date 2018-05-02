@@ -8,7 +8,9 @@ module.exports = (request, response) => {
     data: request.body.data,
   };
 
-  response.send(JSON.stringify(updateById('dashboard-items', id, item)));
+  updateById('dashboard-items', id, item);
+
+  response.send(JSON.stringify(item));
 
   id += 1;
 };

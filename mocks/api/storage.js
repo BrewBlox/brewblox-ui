@@ -31,16 +31,16 @@ function updateById(path, id, data) {
   // not found? return with new item
   if (!objects.find(obj => obj.id === id)) {
     update(path, [...objects, { id, ...data }]);
+  } else {
+    // update the item in the array
+    update(path, objects.map((obj) => {
+      if (obj.id === id) {
+        return _.merge({}, obj, data);
+      }
+
+      return obj;
+    }));
   }
-
-  // update the item in the array
-  update(path, objects.map((obj) => {
-    if (obj.id === id) {
-      return _.merge({}, obj, data);
-    }
-
-    return obj;
-  }));
 
   return get(path).find(obj => obj.id === id);
 }
