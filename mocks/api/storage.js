@@ -30,7 +30,7 @@ function updateById(path, id, data) {
 
   // not found? return with new item
   if (!objects.find(obj => obj.id === id)) {
-    return update(path, [...objects, { id, ...data }]);
+    update(path, [...objects, { id, ...data }]);
   }
 
   // update the item in the array
@@ -42,7 +42,7 @@ function updateById(path, id, data) {
     return obj;
   }));
 
-  return get(path);
+  return get(path).find(obj => obj.id === id);
 }
 
 module.exports = {
