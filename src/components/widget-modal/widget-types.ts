@@ -1,3 +1,5 @@
+import Vue from 'vue';
+
 import { RootStore } from '@/store/state';
 import { Block } from '@/store/blocks/state';
 import { DeviceService } from '@/store/services/state';
@@ -8,7 +10,7 @@ import { getAll as getAllSetPointSimples } from '@/store/blocks/SetPointSimple/g
 import { getAll as getAllSensorSetpointPairs } from '@/store/blocks/SensorSetPointPair/getters';
 import { deviceServices } from '@/store/services/getters';
 
-export const widgetTypes: { [name: string]: string } = {
+export const widgetTypes: { [name in WidgetType]: string } = {
   PID: 'PID',
   Sensor: 'Sensor',
   SetPoint: 'SetPoint',
@@ -25,7 +27,7 @@ function getBlocksFromServices(
     .reduce((acc, sensors) => [...acc, ...sensors], []);
 }
 
-export function blocksByWidgetType(store: RootStore, type: string): Block[] {
+export function blocksByWidgetType(store: RootStore, type: WidgetType): Block[] {
   const services = deviceServices(store);
 
   switch (type) {
@@ -41,3 +43,10 @@ export function blocksByWidgetType(store: RootStore, type: string): Block[] {
       return [];
   }
 }
+
+export const widgetComponents: { [name in WidgetType]: () => Promise<any> } = {
+  PID: () => import('@/components/blocks/PID/Create.vue'),
+  Sensor: () => import('@/components/blocks/OneWireTempSensor/Create.vue'),
+  SetPoint: () => import('@/components/blocks/SetPointSimple/Create.vue'),
+  SensorSetPointPair: () => import('@/components/blocks/SensorSetPointPair/Create.vue'),
+};

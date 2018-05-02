@@ -132,7 +132,7 @@
         "order": 2,
         "cols": 3,
         "rows": 3,
-        "widget": "Empty"
+        "widget": "Sensor"
       }
     }
   ],

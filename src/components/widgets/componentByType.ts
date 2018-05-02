@@ -7,7 +7,6 @@ function componentByType(type: WidgetType) {
   switch (type) {
     case 'PID':
       return PID;
-    case 'Empty':
     case 'Sensor':
     case 'SetPoint':
     case 'SensorSetPointPair':

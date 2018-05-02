@@ -14,7 +14,6 @@ interface PluginArguments {
 
 // Widget types
 type WidgetType =
-  'Empty' |
   'PID' |
   'Sensor' |
   'SetPoint' |

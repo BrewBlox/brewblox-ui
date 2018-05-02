@@ -3,10 +3,16 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
 
-import { widgetTypes, blocksByWidgetType } from './widget-types';
+import {
+  widgetTypes,
+  blocksByWidgetType,
+  createBlockByWidgetType,
+  widgetComponents,
+} from './widget-types';
 
 /* eslint-disable indent */
 @Component({
+  components: widgetComponents,
   props: {
     isOpen: {
       type: Boolean,
@@ -39,21 +45,24 @@ class WidgetModal extends Vue {
 
   get availableBlocksForWidget() {
     if (this.widgetType) {
-      return blocksByWidgetType(this.$store, this.widgetType);
+      return blocksByWidgetType(this.$store, this.widgetType as WidgetType);
     }
 
     return [];
   }
 
   get blocksForWidget() {
-    if (this.availableBlocksForWidget.length > 0) {
-      return this.availableBlocksForWidget.map(block => ({
+    return [
+      ...this.availableBlocksForWidget.map(block => ({
         label: `${block.serviceId}/${block.id}`,
         value: block,
-      }));
-    }
-
-    return [{ label: `No available blocks for '${this.widgetName}'`, value: null }];
+      })),
+      {
+        label: `Create new block for '${this.widgetName}'`,
+        icon: 'add',
+        value: 'new',
+      },
+    ];
   }
 
   addToDashboard() {
@@ -92,7 +101,10 @@ export default WidgetModal;
     </q-toolbar>
 
     <div class="layout-padding">
-      <q-stepper v-model="currentStep">
+      <q-stepper
+        v-model="currentStep"
+        v-if="block !== 'new'"
+      >
         <q-step
           default
           name="widgets"
@@ -202,6 +214,9 @@ export default WidgetModal;
           </q-stepper-navigation>
         </q-step>
       </q-stepper>
+      <div v-else>
+        <component :is="widgetType" />
+      </div>
     </div>
   </q-modal-layout>
 </template>
