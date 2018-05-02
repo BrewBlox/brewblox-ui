@@ -1,4 +1,4 @@
-const { updateData } = require('./storage');
+const { updateById } = require('../storage');
 
 let id = 1;
 
@@ -8,9 +8,7 @@ module.exports = (request, response) => {
     data: request.body.data,
   };
 
-  response.send(JSON.stringify(item));
-
-  updateData(item.id, item);
+  response.send(JSON.stringify(updateById('dashboard-items', id, item)));
 
   id += 1;
 };

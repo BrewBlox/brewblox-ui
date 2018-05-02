@@ -1,5 +1,3 @@
-const _ = require('lodash');
-
 const { updateById } = require('../storage');
 
 module.exports = (request, response) => {
