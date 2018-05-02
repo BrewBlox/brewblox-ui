@@ -8,8 +8,6 @@ function get(path) {
   const baseObject = _.get(base, path);
   const storageObject = _.get(storage, path);
 
-  console.log(baseObject, storageObject);
-
   if (!storageObject) {
     return baseObject;
   }
@@ -31,7 +29,7 @@ function updateById(path, id, data) {
   const objects = get(path);
 
   // not found? return with new item
-  if (!objects.id) {
+  if (!objects.find(obj => obj.id === id)) {
     return update(path, [...objects, { id, ...data }]);
   }
 
