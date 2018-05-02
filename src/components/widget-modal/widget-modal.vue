@@ -6,7 +6,6 @@ import { Watch } from 'vue-property-decorator';
 import {
   widgetTypes,
   blocksByWidgetType,
-  createBlockByWidgetType,
   widgetComponents,
 } from './widget-types';
 
@@ -71,6 +70,10 @@ class WidgetModal extends Vue {
 
   cancelCreate() {
     this.block = null;
+  }
+
+  createBlock() {
+    console.log('create block');
   }
 
   @Watch('isOpen', { immediate: true, deep: true })
@@ -220,15 +223,11 @@ export default WidgetModal;
           </q-step>
         </q-stepper>
         <div v-else>
-          <component :is="widgetType" />
-
-          <div class="create-nav">
-            <q-btn
-              flat
-              @click="cancelCreate"
-              label="Cancel"
-            />
-          </div>
+          <component
+            :is="widgetType"
+            :onCancel="cancelCreate"
+            :onCreate="createBlock"
+          />
         </div>
       </transition>
     </div>
@@ -255,7 +254,7 @@ export default WidgetModal;
   margin-top: -40px;
 }
 
-.create-nav {
-  margin-top: 16px;
+.q-stepper-horizontal .q-stepper-step .q-stepper-nav > div.col {
+  display: block;
 }
 </style>
