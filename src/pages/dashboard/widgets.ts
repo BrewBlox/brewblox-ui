@@ -8,6 +8,7 @@ function componentByType(type: WidgetType) {
     case 'PID':
       return PID;
     case 'Empty':
+    case 'SensorSetPointPair':
       return Placeholder;
     default:
       throw new Error('Invalid widget type');
