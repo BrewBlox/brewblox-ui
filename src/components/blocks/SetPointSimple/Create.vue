@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: 'Test',
+  name: 'SetPointSimple',
 };
 </script>
 
