@@ -71,7 +71,10 @@
             "offset": 0
           },
           "state": {
-            "value": 20,
+            "value": {
+              "unit": "celsius",
+              "value": 20
+            },
             "connected": true
           }
         }
@@ -106,7 +109,10 @@
             "offset": 0
           },
           "state": {
-            "value": 20,
+            "value": {
+              "unit": "fahrenheit",
+              "value": 30
+            },
             "connected": true
           }
         }
