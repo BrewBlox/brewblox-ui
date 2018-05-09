@@ -7,8 +7,8 @@ function componentByType(type: WidgetType) {
   switch (type) {
     case 'PID':
       return PID;
-    case 'Sensor':
-    case 'SetPoint':
+    case 'OneWireTempSensor':
+    case 'SetPointSimple':
     case 'SensorSetPointPair':
       return Placeholder;
     default:
