@@ -72,6 +72,15 @@ class SensorSetPointPair extends Vue {
         value: setpoint,
       }));
   }
+
+  clearLinks() {
+    this.setpointInput = null;
+    this.sensorInput = null;
+  }
+
+  createBlock() {
+    
+  }
 }
 
 export default SensorSetPointPair;
@@ -97,6 +106,7 @@ export default SensorSetPointPair;
           dark
           type="radio"
           v-model="service"
+          @input="clearLinks"
           :options="services"
         />
       </q-field>
@@ -135,7 +145,10 @@ export default SensorSetPointPair;
       name="create"
       title="Create block"
     >
-      Hello with Ad.
+      <p class="q-title">Done!</p>
+      <p>
+        Sensor SetPoint Pair is ready to be created.
+      </p>
     </q-step>
 
     <q-stepper-navigation>
@@ -152,10 +165,17 @@ export default SensorSetPointPair;
         label="Back"
       />
       <q-btn
+        v-if="currentStep !== 'create'"
         :color="!canContinue ? 'dark-bright' : 'primary'"
         :disabled="!canContinue"
         @click="$refs.stepper.next()"
         label="Next"
+      />
+      <q-btn
+        v-if="currentStep === 'create'"
+        color="primary"
+        label="Create"
+        @click="createBlock"
       />
     </q-stepper-navigation>
   </q-stepper>
