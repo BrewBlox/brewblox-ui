@@ -79,7 +79,7 @@ class SensorSetPointPair extends Vue {
   }
 
   createBlock() {
-    
+    this.$props.onCreate();
   }
 }
 

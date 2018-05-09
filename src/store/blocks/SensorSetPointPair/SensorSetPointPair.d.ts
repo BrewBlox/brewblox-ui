@@ -7,12 +7,14 @@ export interface SensorSetPointPair extends BlockBase {
   };
 }
 
-export interface SensorSetPointPairUpdate extends BlockBase {
+export interface SensorSetPointPairPersist {
   links: {
     sensor: string,
     setpoint: string,
   };
 }
+
+export interface SensorSetPointPairUpdate extends BlockBase, SensorSetPointPairPersist {}
 
 export interface SensorSetPointPairBlock extends SensorSetPointPair {
   type: 'SensorSetPointPair';
