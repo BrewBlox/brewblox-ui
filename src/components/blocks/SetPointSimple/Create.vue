@@ -1,13 +1,26 @@
 <template>
   <div>
     Add setpoint simple
+
+    <q-btn @click="$props.onCancel">Go back</q-btn>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'SetPointSimple',
-};
+<script lang="ts">
+import Vue from 'vue';
+import Component from 'vue-class-component';
+
+/* eslint-disable indent */
+@Component({
+  props: {
+    onCancel: {
+      type: Function,
+      default: () => {},
+    }
+  }
+})
+/* eslint-enable */
+export default class SetPointSimple extends Vue {}
 </script>
 
 <style scoped>

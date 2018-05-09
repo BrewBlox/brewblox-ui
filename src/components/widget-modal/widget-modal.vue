@@ -75,6 +75,10 @@ class WidgetModal extends Vue {
       return true;
     }
 
+    if (this.currentStep === 'finished' && this.block) {
+      return true;
+    }
+
     return false;
   }
 
@@ -177,12 +181,8 @@ export default WidgetModal;
             name="finished"
             title="Finished"
           >
-            <q-alert
-              type="info"
-              icon="info"
-            >
-              Widget setup is done!
-            </q-alert>
+            <p class="q-title">Widget ready!</p>
+            <p>Widget setup is done, add the widget to your dashboard.</p>
           </q-step>
 
           <q-stepper-navigation>
