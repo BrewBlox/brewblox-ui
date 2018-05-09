@@ -18,14 +18,18 @@ import {
 import {
   SensorSetPointPairBlock,
   SensorSetPointPairUpdate,
+  SensorSetPointPairCreate,
 } from './SensorSetPointPair/SensorSetPointPair';
 
 import { State as RootState } from '../state';
 
-export interface BlockBase {
-  id: string;
+export interface NewBlockBase {
   serviceId: string;
   isLoading?: boolean;
+}
+
+export interface BlockBase extends NewBlockBase {
+  id: string;
 }
 
 type Value = string|number[];
@@ -48,6 +52,8 @@ export type BlockSaveBase =
   OneWireTempSensorUpdate |
   SensorSetPointPairUpdate |
   PIDUpdate;
+export type BlockCreate =
+  SensorSetPointPairCreate;
 
 export type BlockSave = BlockSaveBase & {
   isLoading: boolean,

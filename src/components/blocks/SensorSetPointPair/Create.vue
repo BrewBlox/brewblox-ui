@@ -9,6 +9,7 @@ import { OneWireTempSensor } from '@/store/blocks/OneWireTempSensor/OneWireTempS
 import { deviceServices } from '@/store/services/getters';
 import { getAll as getAllSetPointSimple } from '@/store/blocks/SetPointSimple/getters';
 import { getAll as getAllOneWireTempSensor } from '@/store/blocks/OneWireTempSensor/getters';
+import { createSensorSetPointPair } from '@/store/blocks/SensorSetPointPair/actions';
 
 /* eslint-disable indent */
 @Component({
@@ -26,6 +27,7 @@ import { getAll as getAllOneWireTempSensor } from '@/store/blocks/OneWireTempSen
 /* eslint-enable */
 class SensorSetPointPair extends Vue {
   currentStep: string = 'service';
+  creating: boolean = false;
   service: DeviceService | null = null;
   setpointInput: SetPointSimple | null = null;
   sensorInput: OneWireTempSensor | null = null;
@@ -78,8 +80,24 @@ class SensorSetPointPair extends Vue {
     this.sensorInput = null;
   }
 
-  createBlock() {
-    this.$props.onCreate();
+  async createBlock() {
+    try {
+      this.creating = true;
+
+      await createSensorSetPointPair(this.$store, {
+        serviceId: this.service.id,
+        links: {
+          sensor: this.sensorInput.id,
+          setpoint: this.setpointInput.id,
+        },
+      });
+
+      this.creating = false;
+
+      this.$props.onCreate();
+    } catch (e) {
+      throw new Error(e);
+    }
   }
 }
 
@@ -175,6 +193,7 @@ export default SensorSetPointPair;
         v-if="currentStep === 'create'"
         color="primary"
         label="Create"
+        :loading="creating"
         @click="createBlock"
       />
     </q-stepper-navigation>

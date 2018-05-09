@@ -1,4 +1,5 @@
 import { getStoreAccessors } from 'vuex-typescript';
+import shortid from 'shortid';
 
 import { Service } from '@/store/services/state';
 
@@ -6,15 +7,17 @@ import {
   fetchBlocks as fetchBlocksFromApi,
   persistBlock as persistBlockToApi,
   updateBlock as updateBlockToApi,
+  createBlock as createBlockOnApi,
 } from './api';
 
-import { BlocksState, BlocksContext, BlockSaveBase, BlockBase } from './state';
+import { BlocksState, BlocksContext, BlockSaveBase, BlockBase, BlockCreate } from './state';
 import { State as RootState } from '../state';
 import addBlockToStore from './add-block';
 
 import {
   mutateBlock as mutateBlockInStore,
   mutateFetching as mutateFetchingInStore,
+  mutateBlockId as mutateBlockIdInStore,
   blockLoading,
 } from './mutations';
 
@@ -31,6 +34,24 @@ const actions = {
 
     // update isFetching
     mutateFetchingInStore(context, false);
+  },
+  async createBlock(context: BlocksContext, block: BlockCreate) {
+    const id = shortid.generate();
+
+    const blockToAdd = {
+      id,
+      isLoading: true,
+      ...block,
+    };
+
+    addBlockToStore(context, blockToAdd);
+
+    const createdBlock = await createBlockOnApi(block);
+
+    mutateBlockIdInStore(context, { block: blockToAdd, id: createdBlock.id });
+    mutateBlockInStore(context, { ...createdBlock, isLoading: false });
+
+    return createdBlock;
   },
   async saveBlock(context: BlocksContext, block: BlockSaveBase) {
     // update isLoading and block values
@@ -56,6 +77,7 @@ const actions = {
 
 // exported action accessors
 export const fetchBlocks = dispatch(actions.fetchBlocks);
+export const createBlock = dispatch(actions.createBlock);
 export const saveBlock = dispatch(actions.saveBlock);
 export const updateBlock = dispatch(actions.updateBlock);
 
