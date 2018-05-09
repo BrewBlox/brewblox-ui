@@ -3,6 +3,8 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
 
+import { Block } from '@/store/blocks/state';
+
 import {
   widgetTypes,
   blocksByWidgetType,
@@ -54,7 +56,7 @@ class WidgetModal extends Vue {
     return [
       ...this.availableBlocksForWidget.map(block => ({
         label: `${block.serviceId}/${block.id}`,
-        value: block,
+        value: `${block.serviceId}/${block.id}`,
       })),
       {
         label: `Create new block for '${this.widgetName}'`,
@@ -84,8 +86,8 @@ class WidgetModal extends Vue {
     this.block = null;
   }
 
-  createBlock() {
-    console.log('create block');
+  createBlock(block: Block) {
+    this.block = `${block.serviceId}/${block.id}`;
   }
 
   @Watch('isOpen', { immediate: true, deep: true })

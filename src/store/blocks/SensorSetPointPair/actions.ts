@@ -7,8 +7,8 @@ import { RootStore } from '../../state';
 import { BlocksContext } from '../state';
 
 export const createSensorSetPointPair =
-  (context: BlocksContext, block: SensorSetPointPairCreate) =>
-    createBlock(context, {
+  (store: RootStore, block: SensorSetPointPairCreate) =>
+    createBlock(store, {
       type: 'SensorSetPointPair',
       ...block,
     });

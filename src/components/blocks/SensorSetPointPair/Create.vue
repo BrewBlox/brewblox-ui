@@ -84,7 +84,7 @@ class SensorSetPointPair extends Vue {
     try {
       this.creating = true;
 
-      await createSensorSetPointPair(this.$store, {
+      const block = await createSensorSetPointPair(this.$store, {
         serviceId: this.service.id,
         links: {
           sensor: this.sensorInput.id,
@@ -94,7 +94,7 @@ class SensorSetPointPair extends Vue {
 
       this.creating = false;
 
-      this.$props.onCreate();
+      this.$props.onCreate(block);
     } catch (e) {
       throw new Error(e);
     }
