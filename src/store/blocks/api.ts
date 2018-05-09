@@ -23,7 +23,10 @@ export function fetchBlocks(services: Service[]): Promise<Block[]> {
 }
 
 export function createBlock(block: BlockCreate): Promise<BlockSaveBase> {
-  return post(`/${encodeURIComponent(block.serviceId)}/objects`, block);
+  return post(
+    `/${encodeURIComponent(block.serviceId)}/objects`,
+    unspreadData(block),
+  ).then(savedBlock => addServiceId(savedBlock, block.serviceId));
 }
 
 export function persistBlock(block: BlockSaveBase): Promise<BlockSaveBase> {

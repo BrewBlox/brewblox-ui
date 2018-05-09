@@ -36,26 +36,6 @@ const mutations = {
   mutateBlock(state: BlocksState, block: BlockSave) {
     mutations.updateBlockInStore(state, block);
   },
-  mutateBlockId(state: BlocksState, { block, id }: { block: BlockSave, id: string }) {
-    const oldId = `${block.serviceId}/${block.id}`;
-    const targetId = `${block.serviceId}/${id}`;
-
-    if (!state.byId[oldId]) {
-      throw new Error(`Block with id '${oldId}' does not exist`);
-    }
-
-    // add block on new position
-    const newById = Object.assign(
-      {},
-      state.byId,
-      { [targetId]: merge(state.byId[oldId], block) },
-    );
-
-    // remove old entry
-    delete newById[oldId];
-
-    Vue.set(state, 'byId', newById);
-  },
   blockLoading(state: BlocksState, id: string) {
     Vue.set(state, 'byId', Object.assign(
       {},
@@ -81,6 +61,5 @@ export const updateBlockState = commit(mutations.updateBlockState);
 export const mutateBlock = commit(mutations.mutateBlock);
 export const blockLoading = commit(mutations.blockLoading);
 export const mutateFetching = commit(mutations.mutateFetching);
-export const mutateBlockId = commit(mutations.mutateBlockId);
 
 export default mutations;

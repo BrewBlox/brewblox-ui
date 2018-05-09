@@ -17,7 +17,6 @@ import addBlockToStore from './add-block';
 import {
   mutateBlock as mutateBlockInStore,
   mutateFetching as mutateFetchingInStore,
-  mutateBlockId as mutateBlockIdInStore,
   blockLoading,
 } from './mutations';
 
@@ -40,15 +39,13 @@ const actions = {
 
     const blockToAdd = {
       id,
-      isLoading: true,
       ...block,
     };
 
-    addBlockToStore(context, blockToAdd);
+    addBlockToStore(context, { ...blockToAdd, isLoading: true });
 
     const createdBlock = await createBlockOnApi(block);
 
-    mutateBlockIdInStore(context, { block: blockToAdd, id: createdBlock.id });
     mutateBlockInStore(context, { ...createdBlock, isLoading: false });
 
     return createdBlock;
