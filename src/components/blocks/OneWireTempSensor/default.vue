@@ -46,7 +46,7 @@
         <q-item>
           <q-item-main>
             <q-item-tile label>Value</q-item-tile>
-            <q-item-tile sublabel>{{ state.value }}</q-item-tile>
+            <q-item-tile sublabel>{{ state.value | unit }}</q-item-tile>
           </q-item-main>
         </q-item>
         <q-item>

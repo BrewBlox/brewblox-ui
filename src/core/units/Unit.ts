@@ -6,6 +6,10 @@ export default abstract class Unit {
     this.value = value;
   }
 
+  toString(): string {
+    return this.value.toString();
+  }
+
   toJSON() {
     return {
       value: this.value,
