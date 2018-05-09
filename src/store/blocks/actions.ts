@@ -35,7 +35,7 @@ const actions = {
     mutateFetchingInStore(context, false);
   },
   async createBlock(context: BlocksContext, block: BlockCreate) {
-    const id = shortid.generate();
+    const id = `${block.type}-${shortid.generate()}`;
 
     const blockToAdd = {
       id,
@@ -44,7 +44,7 @@ const actions = {
 
     addBlockToStore(context, { ...blockToAdd, isLoading: true });
 
-    const createdBlock = await createBlockOnApi(block);
+    const createdBlock = await createBlockOnApi(blockToAdd);
 
     mutateBlockInStore(context, { ...createdBlock, isLoading: false });
 
