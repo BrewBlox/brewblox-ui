@@ -1,8 +1,10 @@
+import fromObject from '@/core/units/fromObject';
+
 import { OneWireTempSensor, OneWireTempSensorUpdate } from './OneWireTempSensor';
 import { addBlock } from '../mutations';
 import { saveBlock } from '../actions';
 import { Series, BlocksContext } from '../state';
-import { State, RootStore } from '../../state';
+import { RootStore } from '../../state';
 
 export const addOneWireTempSensor = (
   context: BlocksContext,
@@ -20,8 +22,11 @@ export const addOneWireTempSensor = (
       id,
       serviceId,
       settings,
-      state,
       metrics,
+      state: {
+        ...state,
+        value: fromObject(state.value),
+      },
       type: 'OneWireTempSensor',
     },
   );
