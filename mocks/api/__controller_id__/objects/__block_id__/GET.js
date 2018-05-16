@@ -1,8 +1,8 @@
-const { getBlock } = require('./helpers');
+const { get } = require('../../../storage');
 
 module.exports = (request, response) => {
-  const id = decodeURIComponent(request.params.block_id);
   const controllerId = decodeURIComponent(request.params.controller_id);
-
-  response.send(JSON.stringify(getBlock(id, controllerId)));
+  const blockId = decodeURIComponent(request.params.block_id);
+  const objects = get(`objects.${controllerId}`);
+  response.send(JSON.stringify(objects.find(obj => obj.id === blockId)));
 };

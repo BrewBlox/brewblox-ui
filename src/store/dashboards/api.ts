@@ -9,11 +9,13 @@ export function fetchDashboards(): Promise<Dashboard[]> {
 }
 
 export function createDashboard(dashboard: Dashboard): Promise<boolean> {
-  return post('/dashboards', unspreadData(dashboard));
+  return post('/dashboards', unspreadData(dashboard))
+    .then(dashboards => dashboards.map((item: DashboardAPI) => spreadData(item)));
 }
 
 export function persistDashboard(id: string, newData: any): Promise<Dashboard> {
-  return put(`/dashboards/${encodeURIComponent(id)}`, unspreadData(newData));
+  return put(`/dashboards/${encodeURIComponent(id)}`, unspreadData(newData))
+    .then(item => spreadData(item));
 }
 
 export function fetchDashboardItems(): Promise<DashboardItem[]> {
@@ -22,5 +24,11 @@ export function fetchDashboardItems(): Promise<DashboardItem[]> {
 }
 
 export function persistDashboardItem(id: string, newData: any): Promise<DashboardItem> {
-  return put(`/dashboard-items/${encodeURIComponent(id)}`, unspreadData(newData));
+  return put(`/dashboard-items/${encodeURIComponent(id)}`, unspreadData(newData))
+    .then(item => spreadData(item));
+}
+
+export function createDashboardItem(newData: any): Promise<DashboardItem> {
+  return post('/dashboard-items/', unspreadData(newData))
+    .then(item => spreadData(item));
 }

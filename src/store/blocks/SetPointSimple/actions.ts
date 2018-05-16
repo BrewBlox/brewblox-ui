@@ -1,10 +1,8 @@
-import { Store } from 'vuex';
-
 import { addBlock } from '../mutations';
 import { SetPointSimple } from './SetPointSimple';
 import { saveBlock } from '../actions';
 
-import { State } from '../../state';
+import { RootStore } from '../../state';
 import { BlocksContext } from '../state';
 
 export const addSetPoint = (
@@ -22,7 +20,7 @@ export const addSetPoint = (
   );
 };
 
-export const persist = async (store: Store<State>, setPointSimple: SetPointSimple) => {
+export const persist = async (store: RootStore, setPointSimple: SetPointSimple) => {
   try {
     await saveBlock(store, setPointSimple);
   } catch (e) {

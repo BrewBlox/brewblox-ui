@@ -1,7 +1,5 @@
-const { updateData } = require('./storage');
+const { update } = require('../storage');
 
 module.exports = (request, response) => {
-  updateData(request.body);
-
-  response.send(true);
+  response.send(JSON.stringify(update('settings', request.body)));
 };

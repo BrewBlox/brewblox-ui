@@ -39,19 +39,9 @@ export interface PID extends BlockBase {
 }
 
 export interface PIDUpdate extends BlockBase {
-  settings: {
-    kp: number,
-    ti: number,
-    td: number,
-  };
-  links: {
-    input: string,
-    output: string,
-  };
-  filtering: {
-    input: number,
-    derivative: number,
-  };
+  settings: PIDSettings;
+  links: PIDLinks;
+  filtering: PIDFiltering;
 }
 
 export interface PIDStateUpdate extends BlockBase {

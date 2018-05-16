@@ -1,10 +1,8 @@
-import { Store } from 'vuex';
-
 import { updateBlockState, addBlock } from '../mutations';
 import { PID, PIDUpdate } from './PID';
 import { saveBlock, updateBlock } from '../actions';
 
-import { State } from '../../state';
+import { RootStore } from '../../state';
 import { BlocksContext } from '../state';
 
 export const addPID = (
@@ -32,7 +30,7 @@ export const addPID = (
   );
 };
 
-export const update = (store: Store<State>, pid: { id: string, serviceId: string } & any) => {
+export const update = (store: RootStore, pid: { id: string, serviceId: string } & any) => {
   try {
     updateBlock(store, pid);
   } catch (e) {
@@ -41,7 +39,7 @@ export const update = (store: Store<State>, pid: { id: string, serviceId: string
 };
 
 // example refresh action
-export const refresh = (store: Store<State>, pid: PID) => {
+export const refresh = (store: RootStore, pid: PID) => {
   function random() {
     return Math.round(Math.random() * 100);
   }
@@ -65,7 +63,7 @@ export const refresh = (store: Store<State>, pid: PID) => {
   });
 };
 
-export const persist = async (store: Store<State>, pid: PIDUpdate) => {
+export const persist = async (store: RootStore, pid: PIDUpdate) => {
   try {
     await saveBlock(store, pid);
   } catch (e) {

@@ -1,10 +1,8 @@
-import { Store } from 'vuex';
-
 import { OneWireTempSensor, OneWireTempSensorUpdate } from './OneWireTempSensor';
 import { addBlock } from '../mutations';
 import { saveBlock } from '../actions';
 import { Series, BlocksContext } from '../state';
-import { State } from '../../state';
+import { State, RootStore } from '../../state';
 
 export const addOneWireTempSensor = (
   context: BlocksContext,
@@ -29,7 +27,7 @@ export const addOneWireTempSensor = (
   );
 };
 
-export const persist = async (store: Store<State>, oneWireTempSensor: OneWireTempSensorUpdate) => {
+export const persist = async (store: RootStore, oneWireTempSensor: OneWireTempSensorUpdate) => {
   try {
     await saveBlock(store, oneWireTempSensor);
   } catch (e) {

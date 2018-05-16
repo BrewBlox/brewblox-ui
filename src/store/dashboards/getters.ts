@@ -1,8 +1,7 @@
-import { Store } from 'vuex';
 import { getStoreAccessors } from 'vuex-typescript';
 
 import { Dashboard, DashboardItem, DashboardState } from './state';
-import { State as RootState } from '../state';
+import { State as RootState, RootStore } from '../state';
 
 const { read } = getStoreAccessors<DashboardState, RootState>('dashboards');
 
@@ -35,9 +34,9 @@ export const dashboardItemIds = read(getters.dashboardItemIds);
 const dashboardItemsById = read(getters.dashboardItemsById);
 
 export const dashboardById =
-  (store: Store<RootState>, id: string): Dashboard => dashboardsById(store)[id];
+  (store: RootStore, id: string): Dashboard => dashboardsById(store)[id];
 export const dashboardItemById =
-  (store: Store<RootState>, id: string): DashboardItem => dashboardItemsById(store)[id];
+  (store: RootStore, id: string): DashboardItem => dashboardItemsById(store)[id];
 
 export const isFetching = read(getters.isFetching);
 

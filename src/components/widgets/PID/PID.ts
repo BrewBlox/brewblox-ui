@@ -43,7 +43,7 @@ export default class PIDWidget extends mixins(BlockWidget) {
   }
 
   get allSensorSetPointPairs(): { label: string, value: string }[] {
-    return getAllSensorSetPointPairs(this.$store)
+    return getAllSensorSetPointPairs(this.$store, this.blockData.serviceId)
       .map(setpoint => ({ label: setpoint.id, value: setpoint.id }));
   }
 
@@ -68,7 +68,7 @@ export default class PIDWidget extends mixins(BlockWidget) {
       id: this.block.id,
       serviceId: this.block.serviceId,
       settings: {
-        kp: this.inputs.kpInput,
+        kp: this.inputs.kp,
       },
     });
   }

@@ -1,10 +1,10 @@
 import { flatten } from 'lodash';
 
-import { get, put, patch } from '@/core/fetch';
+import { get, put, patch, post } from '@/core/fetch';
 import { spreadData, unspreadData } from '@/core/api-spread';
 
 import { Service } from '@/store/services/state';
-import { Block, BlockSaveBase, BlockBase } from './state';
+import { Block, BlockSaveBase, BlockBase, BlockCreate } from './state';
 
 function addServiceId(block: Block, serviceId: string): Block {
   return {
@@ -20,6 +20,13 @@ export function fetchBlocks(services: Service[]): Promise<Block[]> {
         .then(blocks => blocks.map((block: Block) => addServiceId(block, service.id)))))
     .then(responses => flatten(responses))
     .then(blocks => blocks.map(spreadData));
+}
+
+export function createBlock(block: BlockCreate): Promise<BlockSaveBase> {
+  return post(
+    `/${encodeURIComponent(block.serviceId)}/objects`,
+    unspreadData(block),
+  ).then(savedBlock => addServiceId(savedBlock, block.serviceId));
 }
 
 export function persistBlock(block: BlockSaveBase): Promise<BlockSaveBase> {
