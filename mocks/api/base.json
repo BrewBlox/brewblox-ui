@@ -145,8 +145,8 @@
       "id": "item-3",
       "data": {
         "order": 1,
-        "cols": 5,
-        "rows": 4,
+        "cols": 8,
+        "rows": 6,
         "widget": "Metrics",
         "options": {
           "blocks": ["controller-1/sensor-1"]

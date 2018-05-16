@@ -10,6 +10,7 @@ function componentByType(type: WidgetType) {
     case 'OneWireTempSensor':
     case 'SetPointSimple':
     case 'SensorSetPointPair':
+    case 'Metrics':
       return Placeholder;
     default:
       throw new Error('Invalid widget type');
