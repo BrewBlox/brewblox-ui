@@ -1,4 +1,4 @@
-import { allBlocks, blockById } from '../getters';
+import { allBlockFromService, blockById } from '../getters';
 
 import { OneWireTempSensorBlock } from './OneWireTempSensor';
 
@@ -16,7 +16,6 @@ export function getById(store: RootStore, id: string): OneWireTempSensorBlock {
 }
 
 export function getAll(store: RootStore, serviceId: string): OneWireTempSensorBlock[] {
-  return allBlocks(store)
-    .filter(block => block.type === 'OneWireTempSensor' &&
-      block.serviceId === serviceId) as OneWireTempSensorBlock[];
+  return allBlockFromService(store, serviceId)
+    .filter(block => block.type === 'OneWireTempSensor') as OneWireTempSensorBlock[];
 }
