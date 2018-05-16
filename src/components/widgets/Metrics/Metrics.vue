@@ -32,6 +32,10 @@ class MetricsWidget extends Widget {
     },
   };
 
+  get name(): string {
+    return this.options.name;
+  }
+
   get metrics(): MetricsOptions[] {
     return this.options.metrics;
   }
@@ -53,7 +57,13 @@ class MetricsWidget extends Widget {
     this.$set(this.plotly, 'data', data);
   }
 
+  setPlotName() {
+    this.$set(this.plotly.layout, 'title', this.name);
+  }
+
   mounted() {
+    this.setPlotName();
+
     this.fetchMetrics();
     this.interval = setInterval(() => this.fetchMetrics(), this.updateInterval);
   }

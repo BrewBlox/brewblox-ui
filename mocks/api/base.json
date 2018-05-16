@@ -152,14 +152,33 @@
       "id": "item-3",
       "data": {
         "order": 1,
-        "cols": 8,
+        "cols": 7,
         "rows": 6,
         "widget": "Metrics",
         "options": {
+          "name": "Pressure",
           "metrics": [
             {
               "id": "pressure/pressure",
               "fields": ["sensor1_1s", "sensor2_1s"]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "item-4",
+      "data": {
+        "order": 2,
+        "cols": 7,
+        "rows": 6,
+        "widget": "Metrics",
+        "options": {
+          "name": "Voltages",
+          "metrics": [
+            {
+              "id": "pressure/pressure",
+              "fields": ["voltage1_1s", "voltage2_1s"]
             }
           ]
         }
@@ -180,7 +199,7 @@
       "data": {
         "title": "Metrics Dashboard",
         "order": 2,
-        "items": ["item-3"]
+        "items": ["item-3", "item-4"]
       }
     }
   ],
