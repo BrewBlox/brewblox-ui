@@ -2,12 +2,16 @@
 import Component from 'vue-class-component';
 
 import Metrics from '@/components/metrics/Metrics.vue';
+import { blockById } from '@/store/blocks/getters';
+
+import { getMetric } from './fetchMetrics';
 
 import Widget from '../Widget';
 
-function toMicroSeconds(nanoseconds: number): number {
-  return Math.floor(nanoseconds / 1000000);
-}
+type MetricsOptions = {
+  id: string,
+  field: string,
+};
 
 /* eslint-disable */
 @Component({
@@ -17,19 +21,46 @@ function toMicroSeconds(nanoseconds: number): number {
 })
 /* eslint-enable */
 class MetricsWidget extends Widget {
-  plotly = {
-    data: [
-      {
-        type: 'scatter',
-        x: [1526471406456307000, 1526471411462286000, 1526471416486398000].map(toMicroSeconds),
-        y: [2, 5, 3],
-      },
-    ],
+  interval: number = 0;
+  updateInterval: number = 5000;
+  metricDuration: string = '5m';
+  plotly: PlotlyOptions = {
+    data: [],
     layout: {
-      title: 'A Fancy Plot',
+      title: 'Pressure plot',
       xaxis: { type: 'date' },
     },
   };
+
+  get metrics(): MetricsOptions[] {
+    return this.options.metrics;
+  }
+
+  async fetchMetrics() {
+    const metricData = await Promise.all(this.metrics.map(metric =>
+      getMetric(
+        blockById(this.$store, metric.id).serviceId,
+        metric.field,
+        {
+          duration: this.metricDuration,
+        },
+      )));
+
+    this.updateMetrics(metricData);
+  }
+
+  updateMetrics(data: PlotlyData[]) {
+    this.$set(this.plotly, 'data', data);
+  }
+
+  mounted() {
+    this.fetchMetrics();
+    this.interval = setInterval(() => this.fetchMetrics(), this.updateInterval);
+  }
+
+  destroyed() {
+    clearInterval(this.interval);
+  }
 }
 
 export default MetricsWidget;

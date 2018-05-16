@@ -19,3 +19,19 @@ type WidgetType =
   'OneWireTempSensor' |
   'SetPointSimple' |
   'SensorSetPointPair';
+
+type PlotlyData = {
+  type: string,
+  x: number[],
+  y: number[],
+};
+
+type PlotlyOptions = {
+  data: PlotlyData[],
+  layout: {
+    title: string,
+    xaxis: {
+      type: string,
+    },
+  },
+};

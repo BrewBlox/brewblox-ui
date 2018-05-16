@@ -46,7 +46,7 @@ export function blocksByWidgetType(store: RootStore, type: WidgetType): Block[] 
 }
 
 export const widgetComponents: { [name in WidgetType]: () => Promise<any> } = {
-  Metrics: () => import('@/components/widgets/metrics/Create.vue'),
+  Metrics: () => import('@/components/widgets/Metrics/Create.vue'),
   PID: () => import('@/components/blocks/PID/Create.vue'),
   OneWireTempSensor: () => import('@/components/blocks/OneWireTempSensor/Create.vue'),
   SetPointSimple: () => import('@/components/blocks/SetPointSimple/Create.vue'),

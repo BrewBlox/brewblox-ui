@@ -117,6 +117,13 @@
           }
         }
       }
+    ],
+    "pressure": [
+      {
+        "id": "pressure",
+        "type": "OneWireTempSensor",
+        "data": {}
+      }
     ]
   },
   "dashboard-items": [
@@ -149,7 +156,12 @@
         "rows": 6,
         "widget": "Metrics",
         "options": {
-          "blocks": ["controller-1/sensor-1"]
+          "metrics": [
+            {
+              "id": "pressure/pressure",
+              "field": "sensor1_1s"
+            }
+          ]
         }
       }
     }
@@ -179,6 +191,10 @@
     },
     {
       "id": "controller-2",
+      "type": "DeviceService"
+    },
+    {
+      "id": "pressure",
       "type": "DeviceService"
     },
     {
