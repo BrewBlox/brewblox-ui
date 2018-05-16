@@ -48,13 +48,6 @@
           <q-item-side icon="device hub" />
           Blocks
         </q-item>
-        <q-item
-          link
-          to="/metrics"
-        >
-          <q-item-side icon="show chart" />
-          Metrics
-        </q-item>
 
         <q-item-separator />
 
