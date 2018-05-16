@@ -7,27 +7,49 @@ import { saveBlock, updateBlock } from '../actions';
 import { State } from '../../state';
 import { BlocksContext } from '../state';
 
-export const addPID = (context: BlocksContext, { id, settings, links, filtering, state }: PID) => {
-  addBlock(context, { id, settings, links, filtering, state, type: 'PID' });
+export const addPID = (
+  context: BlocksContext,
+  {
+    id,
+    serviceId,
+    settings,
+    links,
+    filtering,
+    state,
+  }: PID,
+) => {
+  addBlock(
+    context,
+    {
+      id,
+      serviceId,
+      settings,
+      links,
+      filtering,
+      state,
+      type: 'PID',
+    },
+  );
 };
 
-export const update = (store: Store<State>, update: { id: string } & any) => {
+export const update = (store: Store<State>, pid: { id: string, serviceId: string } & any) => {
   try {
-    updateBlock(store, update);
+    updateBlock(store, pid);
   } catch (e) {
     throw new Error(e);
   }
 };
 
 // example refresh action
-export const refresh = (store: Store<State>, id: string) => {
+export const refresh = (store: Store<State>, pid: PID) => {
   function random() {
     return Math.round(Math.random() * 100);
   }
 
   // assign new random state
   updateBlockState(store, {
-    id,
+    id: pid.id,
+    serviceId: pid.serviceId,
     state: {
       inputValue: random(),
       inputSetting: random(),

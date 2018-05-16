@@ -8,8 +8,16 @@ import { State } from '../../state';
 import { BlocksContext } from '../state';
 
 export const addSensorSetPointPair =
-  (context: BlocksContext, { id, links }: SensorSetPointPair) => {
-    addBlock(context, { id, links, type: 'SensorSetPointPair' });
+  (context: BlocksContext, { id, serviceId, links }: SensorSetPointPair) => {
+    addBlock(
+      context,
+      {
+        id,
+        serviceId,
+        links,
+        type: 'SensorSetPointPair',
+      },
+    );
   };
 
 export const persist =

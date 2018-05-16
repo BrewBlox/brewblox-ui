@@ -3,9 +3,7 @@ import Component, { mixins } from 'vue-class-component';
 import { PIDBlock, PIDSettings, PIDLinks, PIDFiltering, PIDState }
   from '@/store/blocks/PID/PID';
 
-import {
-  getAll as getAllSensorSetPointPairs,
-} from '@/store/blocks/SensorSetPointPair/getters';
+import { getAll as getAllSensorSetPointPairs } from '@/store/blocks/SensorSetPointPair/getters';
 import { refresh, persist, update } from '@/store/blocks/PID/actions';
 
 import BlockWidget from '../BlockWidget';
@@ -25,7 +23,7 @@ export default class PIDWidget extends mixins(BlockWidget) {
   modalOpen: boolean = false;
 
   get blockData(): PIDBlock {
-    return <PIDBlock>this.block;
+    return this.block as PIDBlock;
   }
 
   get settings(): PIDSettings {
@@ -62,12 +60,13 @@ export default class PIDWidget extends mixins(BlockWidget) {
   }
 
   refreshState() {
-    refresh(this.$store, this.block.id);
+    refresh(this.$store, this.blockData);
   }
 
   updateKP() {
     update(this.$store, {
       id: this.block.id,
+      serviceId: this.block.serviceId,
       settings: {
         kp: this.inputs.kpInput,
       },
@@ -77,6 +76,7 @@ export default class PIDWidget extends mixins(BlockWidget) {
   randomKP() {
     update(this.$store, {
       id: this.block.id,
+      serviceId: this.block.serviceId,
       settings: {
         kp: Math.round(Math.random() * 15),
       },
@@ -86,6 +86,7 @@ export default class PIDWidget extends mixins(BlockWidget) {
   save() {
     persist(this.$store, {
       id: this.block.id,
+      serviceId: this.block.serviceId,
       settings: {
         kp: this.inputs.kp,
         td: this.inputs.td,

@@ -24,24 +24,20 @@ import { State as RootState } from '../state';
 
 export interface BlockBase {
   id: string;
+  serviceId: string;
   isLoading?: boolean;
 }
 
 type Value = string|number[];
 
 interface Series {
-  name: string;
+  name: string; // eslint-disable-line no-restricted-globals
   columns: string[];
   values: Value[];
 }
 
 export interface MetricsBase {
   metrics: Series[];
-}
-
-export interface MetricsResult {
-  id: string;
-  results: Series[];
 }
 
 export type Block =

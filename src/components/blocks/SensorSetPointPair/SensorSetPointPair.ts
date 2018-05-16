@@ -13,6 +13,7 @@ import {
 } from '@/store/blocks/OneWireTempSensor/getters';
 import { persist } from '@/store/blocks/SensorSetPointPair/actions';
 
+/* eslint-disable indent */
 @Component({
   props: {
     id: {
@@ -21,6 +22,7 @@ import { persist } from '@/store/blocks/SensorSetPointPair/actions';
     },
   },
 })
+/* eslint-enable */
 export default class SensorSetPointPair extends BlockComponent {
   sensorInput = '';
   setpointInput = '';
@@ -34,21 +36,33 @@ export default class SensorSetPointPair extends BlockComponent {
   }
 
   get sensor() {
-    return getOneWireTempSensorById(this.$store, this.links.sensor);
+    return getOneWireTempSensorById(
+      this.$store,
+      `${this.blockData.serviceId}/${this.links.sensor}`,
+    );
   }
 
   get setpoint() {
-    return getSetPointSimpleById(this.$store, this.links.setpoint);
+    return getSetPointSimpleById(
+      this.$store,
+      `${this.blockData.serviceId}/${this.links.setpoint}`,
+    );
   }
 
   get allSetPoints() {
-    return getAllSetPointSimple(this.$store)
-      .map(setpoint => ({ label: setpoint.id, value: setpoint.id }));
+    return getAllSetPointSimple(this.$store, this.blockData.serviceId)
+      .map(setpoint => ({
+        label: `${setpoint.serviceId}/${setpoint.id}`,
+        value: setpoint.id,
+      }));
   }
 
   get allSensors() {
-    return getAllOneWireTempSensor(this.$store)
-      .map(sensor => ({ label: sensor.id, value: sensor.id }));
+    return getAllOneWireTempSensor(this.$store, this.blockData.serviceId)
+      .map(sensor => ({
+        label: `${sensor.serviceId}/${sensor.id}`,
+        value: sensor.id,
+      }));
   }
 
   get loading() {
@@ -71,7 +85,8 @@ export default class SensorSetPointPair extends BlockComponent {
         sensor: this.sensorInput,
         setpoint: this.setpointInput,
       },
-      id: this.$props.id,
+      id: this.blockData.id,
+      serviceId: this.blockData.serviceId,
     });
   }
 }

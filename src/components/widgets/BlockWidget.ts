@@ -29,8 +29,8 @@ class BlockWidget extends Widget {
    */
   inputMapping: {
     [inputPropName: string]: {
-      path: string,   // path to value in object
-      default?: any,   // default value
+      path: string, // path to value in object
+      default?: any, // default value
     },
   } = {};
 
@@ -43,12 +43,10 @@ class BlockWidget extends Widget {
   inputsFromSource(): { [key: string]: any } {
     return Object.keys(this.inputMapping)
       .reduce(
-        (total, key) => {
-          return {
-            [key]: get(this, this.inputMapping[key].path) || this.inputMapping[key].default,
-            ...total,
-          };
-        },
+        (total, key) => ({
+          [key]: get(this, this.inputMapping[key].path) || this.inputMapping[key].default,
+          ...total,
+        }),
         {},
       );
   }

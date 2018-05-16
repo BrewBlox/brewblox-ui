@@ -9,7 +9,9 @@
     "build": "vue-cli-service build",
     "test": "jest",
     "e2e": "vue-cli-service e2e",
-    "lint": "tslint -c tslint.json 'src/**/*.ts'",
+    "tslint": "tslint -c tslint.json 'src/**/*.ts'",
+    "eslint": "eslint src --ext .js,.vue,.ts",
+    "lint": "npm run tslint && npm run eslint",
     "e2e:open": "vue-cli-service e2e:open"
   },
   "engines": {

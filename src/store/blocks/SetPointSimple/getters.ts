@@ -17,7 +17,8 @@ export function getById(store: Store<State>, id: string): SetPointSimpleBlock {
   return block;
 }
 
-export function getAll(store: Store<State>): SetPointSimpleBlock[] {
-  return <SetPointSimpleBlock[]>allBlocks(store)
-    .filter(block => block.type === 'SetPointSimple');
+export function getAll(store: Store<State>, serviceId: string): SetPointSimpleBlock[] {
+  return allBlocks(store)
+    .filter(block =>
+      block.type === 'SetPointSimple' && block.serviceId === serviceId) as SetPointSimpleBlock[];
 }

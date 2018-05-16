@@ -1,0 +1,35 @@
+[
+  {
+    "id": "sensor-setpoint-pair-1",
+    "type": "SensorSetPointPair",
+    "data": {
+      "links": {
+        "sensor": "sensor-1",
+        "setpoint": "setpoint-1"
+      }
+    }
+  },
+  {
+    "id": "setpoint-1",
+    "type": "SetPointSimple",
+    "data": {
+      "settings": {
+        "value": 1
+      }
+    }
+  },
+  {
+    "id": "sensor-1",
+    "type": "OneWireTempSensor",
+    "data": {
+      "settings": {
+        "address": "0x1001001000000000",
+        "offset": 0
+      },
+      "state": {
+        "value": 20,
+        "connected": true
+      }
+    }
+  }
+]

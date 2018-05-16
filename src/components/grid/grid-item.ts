@@ -6,6 +6,7 @@ const GAP_SIZE = 20;
 
 type Coordinates = { x: number, y: number };
 
+/* eslint-disable indent */
 @Component({
   props: {
     id: {
@@ -42,6 +43,7 @@ type Coordinates = { x: number, y: number };
     },
   },
 })
+/* eslint-enable */
 export default class GridItem extends Vue {
   dragging: boolean = false;
   moving: boolean = false;
@@ -173,7 +175,7 @@ export default class GridItem extends Vue {
       this.$refs.container.parentNode &&
       this.$refs.container.parentNode instanceof Element
     ) {
-      return <DOMRect>this.$refs.container.parentNode.getBoundingClientRect();
+      return this.$refs.container.parentNode.getBoundingClientRect() as DOMRect;
     }
 
     throw new Error('Container parent is not a valid Element');
@@ -186,7 +188,7 @@ export default class GridItem extends Vue {
       this.$refs.container.parentNode.firstChild &&
       this.$refs.container.parentNode.firstChild instanceof Element
     ) {
-      return <DOMRect>this.$refs.container.parentNode.firstChild.getBoundingClientRect();
+      return this.$refs.container.parentNode.firstChild.getBoundingClientRect() as DOMRect;
     }
 
     throw new Error('Container parent is not a valid Element');
@@ -194,7 +196,7 @@ export default class GridItem extends Vue {
 
   containerSize(): DOMRect {
     if (this.$refs.container instanceof Element) {
-      return <DOMRect>this.$refs.container.getBoundingClientRect();
+      return this.$refs.container.getBoundingClientRect() as DOMRect;
     }
 
     throw new Error('Container is not a valid Element');
@@ -231,8 +233,8 @@ export default class GridItem extends Vue {
       throw new Error('No starting drag positions know');
     }
 
-    const x = ((this.dragStartX + delta.x) - this.dragStartParentX) / (GRID_SIZE + GAP_SIZE) + 1;
-    const y = ((this.dragStartY + delta.y) - this.dragStartParentY) / (GRID_SIZE + GAP_SIZE) + 1;
+    const x = (((this.dragStartX + delta.x) - this.dragStartParentX) / (GRID_SIZE + GAP_SIZE)) + 1;
+    const y = (((this.dragStartY + delta.y) - this.dragStartParentY) / (GRID_SIZE + GAP_SIZE)) + 1;
     const cols = (this.currentCols || this.$props.cols) - 1;
 
     return {

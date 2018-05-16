@@ -1,8 +1,8 @@
 import { getStoreAccessors } from 'vuex-typescript';
 
+import { Service } from '@/store/services/state';
+
 import {
-  fetchBlock,
-  fetchBlockMetrics,
   fetchBlocks as fetchBlocksFromApi,
   persistBlock as persistBlockToApi,
   updateBlock as updateBlockToApi,
@@ -21,33 +21,12 @@ import {
 const { dispatch } = getStoreAccessors<BlocksState, RootState>('blocks');
 
 const actions = {
-  async findBlock(context: BlocksContext, id: string) {
-    // will fetch a block from the server
-    const block = await fetchBlock(id);
-
-    // add block to store
-    addBlockToStore(context, block);
-  },
-  async findBlockWithMetrics(context: BlocksContext, id: string) {
-    // add block to store which is loading
-    blockLoading(context, id);
-
-    // will fetch a block from the server
-    const blockMetrics = await fetchBlockMetrics(id);
-
-    // update metric in store and unset loading
-    mutateBlockInStore(context, {
-      id,
-      isLoading: false,
-      metrics: blockMetrics.results,
-    });
-  },
-  async fetchBlocks(context: BlocksContext) {
+  async fetchBlocks(context: BlocksContext, services: Service[]) {
     // update isFetching
     mutateFetchingInStore(context, true);
 
     // will fetch blocks from the server
-    const blocks = await fetchBlocksFromApi();
+    const blocks = await fetchBlocksFromApi(services);
     blocks.forEach(block => addBlockToStore(context, block));
 
     // update isFetching
@@ -76,8 +55,6 @@ const actions = {
 };
 
 // exported action accessors
-export const findBlock = dispatch(actions.findBlock);
-export const findBlockWithMetrics = dispatch(actions.findBlockWithMetrics);
 export const fetchBlocks = dispatch(actions.fetchBlocks);
 export const saveBlock = dispatch(actions.saveBlock);
 export const updateBlock = dispatch(actions.updateBlock);

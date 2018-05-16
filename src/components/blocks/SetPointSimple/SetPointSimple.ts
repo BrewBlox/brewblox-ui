@@ -5,6 +5,7 @@ import BlockComponent from '../BlockComponent';
 import { getById } from '@/store/blocks/SetPointSimple/getters';
 import { persist } from '@/store/blocks/SetPointSimple/actions';
 
+/* eslint-disable indent */
 @Component({
   props: {
     id: {
@@ -13,6 +14,7 @@ import { persist } from '@/store/blocks/SetPointSimple/actions';
     },
   },
 })
+/* eslint-enable */
 export default class SetPointSimple extends BlockComponent {
   valueInput = 0;
 
@@ -34,7 +36,8 @@ export default class SetPointSimple extends BlockComponent {
 
   save() {
     persist(this.$store, {
-      id: this.$props.id,
+      id: this.blockData.id,
+      serviceId: this.blockData.serviceId,
       settings: {
         value: this.valueInput,
       },

@@ -7,8 +7,19 @@ import { saveBlock } from '../actions';
 import { State } from '../../state';
 import { BlocksContext } from '../state';
 
-export const addSetPoint = (context: BlocksContext, { id, settings }: SetPointSimple) => {
-  addBlock(context, { id, settings, type: 'SetPointSimple' });
+export const addSetPoint = (
+  context: BlocksContext,
+  { id, serviceId, settings }: SetPointSimple,
+) => {
+  addBlock(
+    context,
+    {
+      id,
+      serviceId,
+      settings,
+      type: 'SetPointSimple',
+    },
+  );
 };
 
 export const persist = async (store: Store<State>, setPointSimple: SetPointSimple) => {

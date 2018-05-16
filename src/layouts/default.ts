@@ -8,11 +8,13 @@ import { allDashboards, isFetching } from '@/store/dashboards/getters';
 import { addNewDashboard, updateDashboardOrder } from '@/store/dashboards/actions';
 import { Dashboard } from '@/store/dashboards/state';
 
+/* eslint-disable indent */
 @Component({
   components: {
     draggable,
   },
 })
+/* eslint-enable */
 class LayoutDefault extends Vue {
   leftDrawerOpen: boolean = false;
   dashboardEditing: boolean = false;
