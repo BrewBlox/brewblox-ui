@@ -29,6 +29,7 @@ export function getMetric(
         x,
         type: 'scatter',
         y: response.values.map((item: number[]) => item[index + 1]),
+        name: key,
       }));
     });
 }
