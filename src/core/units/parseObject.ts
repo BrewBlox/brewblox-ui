@@ -1,7 +1,10 @@
 import fromObject from './fromObject';
 
 function parseProperty(input: any): any {
-  if (typeof input === 'object') {
+  if (
+    input !== null &&
+    typeof input === 'object'
+  ) {
     if (
       Object.keys(input).length === 2 &&
       'value' in input &&

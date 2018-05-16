@@ -54,4 +54,16 @@ describe('parseObject', () => {
     expect(output.data.evenDeeper.convert).toBeInstanceOf(Unit);
     expect(output.data.evenDeeper.convert).toBeInstanceOf(Fahrenheit);
   });
+
+  it('Should handle undefined and null properties', () => {
+    const input = {
+      normal: 'Okay',
+      undef: undefined,
+      nothing: null,
+    };
+
+    const output = parseObject(input);
+
+    expect(input).toEqual(output);
+  });
 });
