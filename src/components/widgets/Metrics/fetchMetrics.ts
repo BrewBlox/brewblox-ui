@@ -4,12 +4,12 @@ function toMicroSeconds(nanoseconds: number): number {
 
 export function getMetric(
   serviceId: string,
-  field: string,
+  keys: string[],
   options: any = {},
-): Promise<PlotlyData> {
+): Promise<PlotlyData[]> {
   const payload = {
+    keys,
     measurement: serviceId,
-    keys: [field],
     ...options,
   };
 
@@ -22,9 +22,13 @@ export function getMetric(
     }),
   })
     .then(response => response.json())
-    .then(response => ({
-      type: 'scatter',
-      x: response.values.map(([time]: number[]) => toMicroSeconds(time)),
-      y: response.values.map(([time, value]: number[]) => value),
-    }));
+    .then((response) => {
+      const x = response.values.map(([time]: number[]) => toMicroSeconds(time));
+
+      return keys.map((key, index) => ({
+        x,
+        type: 'scatter',
+        y: response.values.map((item: number[]) => item[index + 1]),
+      }));
+    });
 }

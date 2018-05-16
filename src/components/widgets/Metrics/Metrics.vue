@@ -10,7 +10,7 @@ import Widget from '../Widget';
 
 type MetricsOptions = {
   id: string,
-  field: string,
+  fields: string[],
 };
 
 /* eslint-disable */
@@ -40,13 +40,13 @@ class MetricsWidget extends Widget {
     const metricData = await Promise.all(this.metrics.map(metric =>
       getMetric(
         blockById(this.$store, metric.id).serviceId,
-        metric.field,
+        metric.fields,
         {
           duration: this.metricDuration,
         },
       )));
 
-    this.updateMetrics(metricData);
+    this.updateMetrics(metricData.reduce((acc, metrics) => [...acc, ...metrics], []));
   }
 
   updateMetrics(data: PlotlyData[]) {

@@ -159,7 +159,7 @@
           "metrics": [
             {
               "id": "pressure/pressure",
-              "field": "sensor1_1s"
+              "fields": ["sensor1_1s", "sensor2_1s"]
             }
           ]
         }
