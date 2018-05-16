@@ -11,6 +11,7 @@ import { getAll as getAllSensorSetpointPairs } from '@/store/blocks/SensorSetPoi
 import { deviceServices } from '@/store/services/getters';
 
 export const widgetTypes: { [name in WidgetType]: string } = {
+  Metrics: 'Metrics',
   PID: 'PID',
   OneWireTempSensor: 'Temperature Sensor',
   SetPointSimple: 'SetPoint',
@@ -45,6 +46,7 @@ export function blocksByWidgetType(store: RootStore, type: WidgetType): Block[] 
 }
 
 export const widgetComponents: { [name in WidgetType]: () => Promise<any> } = {
+  Metrics: () => import('@/components/widgets/metrics/Create.vue'),
   PID: () => import('@/components/blocks/PID/Create.vue'),
   OneWireTempSensor: () => import('@/components/blocks/OneWireTempSensor/Create.vue'),
   SetPointSimple: () => import('@/components/blocks/SetPointSimple/Create.vue'),
