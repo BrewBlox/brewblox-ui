@@ -140,6 +140,18 @@
         "rows": 3,
         "widget": "OneWireTempSensor"
       }
+    },
+    {
+      "id": "item-3",
+      "data": {
+        "order": 1,
+        "cols": 5,
+        "rows": 4,
+        "widget": "Metrics",
+        "options": {
+          "blocks": ["controller-1/sensor-1"]
+        }
+      }
     }
   ],
   "dashboards": [
@@ -149,6 +161,14 @@
         "title": "Home Dashboard",
         "order": 1,
         "items": ["item-1", "item-2"]
+      }
+    },
+    {
+      "id": "metrics",
+      "data": {
+        "title": "Metrics Dashboard",
+        "order": 2,
+        "items": ["item-3"]
       }
     }
   ],
