@@ -21,6 +21,7 @@ type MetricsOptions = {
 })
 /* eslint-enable */
 class MetricsWidget extends Widget {
+  error: Error | null;
   fetching: boolean = true;
   interval: number = 0;
   updateInterval: number = 5000;
@@ -41,16 +42,21 @@ class MetricsWidget extends Widget {
   }
 
   async fetchMetrics() {
-    const metricData = await Promise.all(this.metrics.map(metric =>
-      getMetric(
-        blockById(this.$store, metric.id).serviceId,
-        metric.fields,
-        {
-          duration: this.metricDuration,
-        },
-      )));
+    try {
+      const metricData = await Promise.all(this.metrics.map(metric =>
+        getMetric(
+          blockById(this.$store, metric.id).serviceId,
+          metric.fields,
+          {
+            duration: this.metricDuration,
+          },
+        )));
 
-    this.updateMetrics(metricData.reduce((acc, metrics) => [...acc, ...metrics], []));
+      this.updateMetrics(metricData.reduce((acc, metrics) => [...acc, ...metrics], []));
+    } catch (e) {
+      this.error = e;
+    }
+
     this.fetching = false;
   }
 
@@ -84,9 +90,28 @@ export default MetricsWidget;
       color="primary"
     />
   </q-inner-loading>
-
-  <Metrics
+  <div
+    class="metrics-container"
     v-else
-    :data="plotly"
-  />
+  >
+    <Metrics
+      v-if="!error"
+      :data="plotly"
+    />
+    <q-alert
+      v-if="error"
+      icon="warning"
+      color="negative"
+    >
+      {{ error.message }}
+    </q-alert>
+  </div>
 </template>
+
+<style>
+.metrics-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+</style>
