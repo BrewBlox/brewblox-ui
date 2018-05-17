@@ -21,6 +21,7 @@ type MetricsOptions = {
 })
 /* eslint-enable */
 class MetricsWidget extends Widget {
+  fetching: boolean = true;
   interval: number = 0;
   updateInterval: number = 5000;
   metricDuration: string = '5m';
@@ -50,6 +51,7 @@ class MetricsWidget extends Widget {
       )));
 
     this.updateMetrics(metricData.reduce((acc, metrics) => [...acc, ...metrics], []));
+    this.fetching = false;
   }
 
   updateMetrics(data: PlotlyData[]) {
@@ -76,5 +78,15 @@ export default MetricsWidget;
 </script>
 
 <template>
-  <Metrics :data="plotly" />
+  <q-inner-loading visible v-if="fetching">
+    <q-spinner
+      size="50px"
+      color="primary"
+    />
+  </q-inner-loading>
+
+  <Metrics
+    v-else
+    :data="plotly"
+  />
 </template>
