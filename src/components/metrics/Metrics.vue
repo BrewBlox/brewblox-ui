@@ -1,7 +1,7 @@
 <template>
   <Plotly
-    :data="$props.data.data"
-    :layout="$props.data.layout"
+    :data="plotlyData.data"
+    :layout="plotlyData.layout"
     fit
   />
 </template>

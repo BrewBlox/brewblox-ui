@@ -28,20 +28,6 @@ class MetricsWidget extends Widget {
     data: [],
     layout: {
       title: '',
-      font: {
-        color: '#fff',
-      },
-      xaxis: {
-        type: 'date',
-        gridcolor: '#666', // grid
-      },
-      yaxis: {
-        gridcolor: '#666', // grid
-        zerolinecolor: '#eee', // zero
-      },
-      autosize: true,
-      paper_bgcolor: '#1b1d21', // background
-      plot_bgcolor: '#1b1d21', // plot background
     },
   };
 

@@ -30,8 +30,8 @@ type PlotlyOptions = {
   data: PlotlyData[],
   layout: {
     title: string,
-    xaxis: {
-      type: string,
+    yaxis?: {
+      title?: string,
     },
   },
 };
