@@ -21,7 +21,7 @@ type MetricsOptions = {
 })
 /* eslint-enable */
 class MetricsWidget extends Widget {
-  error: Error | null;
+  error: Error | null = null;
   fetching: boolean = true;
   interval: number = 0;
   updateInterval: number = 5000;
@@ -95,7 +95,7 @@ export default MetricsWidget;
     v-else
   >
     <Metrics
-      v-if="!error"
+      v-if="error === null"
       :data="plotly"
     />
     <q-alert

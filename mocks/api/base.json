@@ -153,10 +153,11 @@
       "data": {
         "order": 1,
         "cols": 7,
-        "rows": 6,
+        "rows": 1,
         "widget": "Metrics",
         "options": {
           "name": "Pressure",
+          "duration": "1",
           "metrics": [
             {
               "id": "pressure/pressure",
@@ -171,10 +172,49 @@
       "data": {
         "order": 2,
         "cols": 7,
+        "rows": 1,
+        "widget": "Metrics",
+        "options": {
+          "name": "Voltages",
+          "duration": "1",
+          "metrics": [
+            {
+              "id": "pressure/pressure",
+              "fields": ["voltage1_1s", "voltage2_1s"]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "item-5",
+      "data": {
+        "order": 3,
+        "cols": 7,
+        "rows": 6,
+        "widget": "Metrics",
+        "options": {
+          "name": "Pressure",
+          "duration": "5m",
+          "metrics": [
+            {
+              "id": "pressure/pressure",
+              "fields": ["sensor1_1s", "sensor2_1s"]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "item-6",
+      "data": {
+        "order": 4,
+        "cols": 7,
         "rows": 6,
         "widget": "Metrics",
         "options": {
           "name": "Voltages",
+          "duration": "5m",
           "metrics": [
             {
               "id": "pressure/pressure",
@@ -199,7 +239,7 @@
       "data": {
         "title": "Metrics Dashboard",
         "order": 2,
-        "items": ["item-3", "item-4"]
+        "items": ["item-3", "item-4", "item-5", "item-6"]
       }
     }
   ],
