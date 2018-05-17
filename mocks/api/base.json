@@ -161,7 +161,12 @@
           "metrics": [
             {
               "id": "pressure/pressure",
-              "fields": ["sensor1_1s", "sensor2_1s", "voltage1_1s", "voltage2_1s"]
+              "fields": [
+                "lower_sensor/updated_1s/raw",
+                "lower_sensor/updated_1s/voltage",
+                "upper_sensor/updated_1s/raw",
+                "upper_sensor/updated_1s/voltage"
+              ]
             }
           ]
         }
@@ -172,14 +177,14 @@
       "data": {
         "order": 2,
         "cols": 6,
-        "rows": 6,
+        "rows": 3,
         "widget": "Metrics",
         "options": {
-          "name": "Pressure",
+          "name": "Upper Sensor Raw",
           "metrics": [
             {
               "id": "pressure/pressure",
-              "fields": ["sensor1_1s", "sensor2_1s"]
+              "fields": ["upper_sensor/updated_1s/raw"]
             }
           ]
         }
@@ -190,14 +195,50 @@
       "data": {
         "order": 3,
         "cols": 6,
-        "rows": 6,
+        "rows": 3,
         "widget": "Metrics",
         "options": {
-          "name": "Voltages",
+          "name": "Upper Sensor Voltage",
           "metrics": [
             {
               "id": "pressure/pressure",
-              "fields": ["voltage1_1s", "voltage2_1s"]
+              "fields": ["upper_sensor/updated_1s/voltage"]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "item-6",
+      "data": {
+        "order": 4,
+        "cols": 6,
+        "rows": 3,
+        "widget": "Metrics",
+        "options": {
+          "name": "Lower Sensor Raw",
+          "metrics": [
+            {
+              "id": "pressure/pressure",
+              "fields": ["lower_sensor/updated_1s/raw"]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "item-7",
+      "data": {
+        "order": 5,
+        "cols": 6,
+        "rows": 3,
+        "widget": "Metrics",
+        "options": {
+          "name": "Lower Sensor Voltage",
+          "metrics": [
+            {
+              "id": "pressure/pressure",
+              "fields": ["lower_sensor/updated_1s/voltage"]
             }
           ]
         }
@@ -218,7 +259,7 @@
       "data": {
         "title": "Metrics Dashboard",
         "order": 2,
-        "items": ["item-3", "item-4", "item-5"]
+        "items": ["item-3", "item-4", "item-5", "item-6", "item-7"]
       }
     }
   ],

@@ -49,7 +49,7 @@ class MetricsWidget extends Widget {
           metric.fields,
           {
             duration: this.options.limit ? undefined : this.metricDuration,
-            limit: this.options.limit || 10000,
+            limit: this.options.limit || undefined,
             order_by: this.options.limit === 1 ? 'time DESC' : undefined,
           },
         )));
