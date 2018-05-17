@@ -1,3 +1,58 @@
+<script lang="ts">
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import createPlotlyComponent from 'vue-plotly.js/factory';
+import { merge } from 'lodash';
+
+import Plotly from './plotly';
+
+/* eslint-disable indent */
+@Component({
+  props: {
+    data: {
+      default: {},
+      type: Object,
+    },
+  },
+  components: {
+    Plotly: createPlotlyComponent(Plotly),
+  },
+})
+/* eslint-enable */
+class Metrics extends Vue {
+  defaultLayout = {
+    title: '',
+    font: {
+      color: '#fff',
+    },
+    legend: { orientation: 'h' },
+    xaxis: {
+      type: 'date',
+      gridcolor: '#666',
+    },
+    yaxis: {
+      gridcolor: '#666',
+      zerolinecolor: '#eee',
+    },
+    paper_bgcolor: '#1b1d21',
+    plot_bgcolor: '#1b1d21',
+  };
+
+  config = {
+    displaylogo: false,
+  };
+
+  get plotlyData() {
+    return {
+      ...this.$props.data,
+      layout: merge(this.defaultLayout, this.$props.data.layout),
+    };
+  }
+}
+
+export default Metrics;
+</script>
+
 <template>
   <Plotly
     :data="plotlyData.data"
@@ -6,8 +61,6 @@
     fit
   />
 </template>
-
-<script lang="ts" src="./Metrics.ts"></script>
 
 <style>
 .js-plotly-plot .plotly .modebar {
