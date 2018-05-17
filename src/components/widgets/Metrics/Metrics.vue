@@ -48,8 +48,9 @@ class MetricsWidget extends Widget {
           blockById(this.$store, metric.id).serviceId,
           metric.fields,
           {
-            duration: this.options.limit ? '1m' : this.metricDuration,
+            duration: this.options.limit ? undefined : this.metricDuration,
             limit: this.options.limit || 10000,
+            order_by: this.options.limit === 1 ? 'time DESC' : undefined,
           },
         )));
 
@@ -97,7 +98,7 @@ export default MetricsWidget;
   >
     <q-list
       class="metric-values"
-      v-if="options.limit === 1"
+      v-if="error === null && options.limit === 1"
     >
       <q-item>
         <q-item-side

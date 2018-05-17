@@ -8,7 +8,7 @@ export function getMetric(
   options: any = {},
 ): Promise<PlotlyData[]> {
   const payload = {
-    keys,
+    keys: ['time', ...keys],
     measurement: serviceId,
     ...options,
   };
