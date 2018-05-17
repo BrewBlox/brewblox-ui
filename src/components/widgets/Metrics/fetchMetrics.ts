@@ -23,6 +23,10 @@ export function getMetric(
   })
     .then(response => response.json())
     .then((response) => {
+      if (!response.values) {
+        throw new Error('No results found');
+      }
+
       const x = response.values.map(([time]: number[]) => toMicroSeconds(time));
 
       return keys.map((key, index) => ({

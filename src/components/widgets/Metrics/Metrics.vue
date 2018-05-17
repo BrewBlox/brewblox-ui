@@ -48,7 +48,8 @@ class MetricsWidget extends Widget {
           blockById(this.$store, metric.id).serviceId,
           metric.fields,
           {
-            duration: this.metricDuration,
+            duration: this.options.limit ? '1m' : this.metricDuration,
+            limit: this.options.limit || 10000,
           },
         )));
 
@@ -94,8 +95,28 @@ export default MetricsWidget;
     class="metrics-container"
     v-else
   >
+    <q-list
+      class="metric-values"
+      v-if="options.limit === 1"
+    >
+      <q-item>
+        <q-item-side
+          class="metric-values-item"
+          v-for="metric in plotly.data"
+          :key="metric.uid"
+        >
+          <q-item-tile sublabel>{{ metric.name }}</q-item-tile>
+          <q-item-tile
+            label
+            class="q-display-2"
+          >
+            {{ metric.y[0] }}
+          </q-item-tile>
+        </q-item-side>
+      </q-item>
+    </q-list>
     <Metrics
-      v-if="error === null"
+      v-if="error === null && options.limit !== 1"
       :data="plotly"
     />
     <q-alert
@@ -109,9 +130,21 @@ export default MetricsWidget;
 </template>
 
 <style>
-.metrics-container {
+.dashboard-item.metrics-container {
+  background: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.metric-values {
+  border: 0;
+  width: 100%;
+}
+
+.metric-values-item {
+  flex-grow: 1;
+  flex-shrink: 0;
+  width: 25%;
 }
 </style>
