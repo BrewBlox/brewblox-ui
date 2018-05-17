@@ -24,6 +24,7 @@ export default class Metrics extends Vue {
     font: {
       color: '#fff',
     },
+    legend: { orientation: 'h' },
     xaxis: {
       type: 'date',
       gridcolor: '#666', // grid
@@ -34,6 +35,10 @@ export default class Metrics extends Vue {
     },
     paper_bgcolor: '#1b1d21', // background
     plot_bgcolor: '#1b1d21', // plot background
+  };
+
+  config = {
+    displaylogo: false,
   };
 
   get plotlyData() {
