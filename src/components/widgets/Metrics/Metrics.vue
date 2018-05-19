@@ -60,7 +60,8 @@ class MetricsWidget extends Widget {
           if (this.options.limit === 1 && metric.y[0] === null) {
             return {
               ...metric,
-              y: this.plotly.data[index].y,
+              y: this.plotly.data[index] && this.plotly.data[index].y ?
+                this.plotly.data[index].y : 0,
             };
           }
 
