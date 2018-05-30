@@ -1,3 +1,22 @@
+const historyService = 'http://192.168.0.106/history';
+
+function fetchData(endpoint: string, serviceId: string, payload: any): Promise<Response> {
+  return window.fetch(
+    `${historyService}${endpoint}`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        measurement: serviceId,
+        ...payload,
+      }),
+      headers: new Headers({
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      }),
+    },
+  );
+}
+
 function toMicroSeconds(nanoseconds: number): number {
   return Math.floor(nanoseconds / 1000000);
 }
@@ -9,18 +28,10 @@ export function getMetric(
 ): Promise<PlotlyData[]> {
   const payload = {
     keys: ['time', ...keys],
-    measurement: serviceId,
     ...options,
   };
 
-  return window.fetch('http://192.168.0.106/history/query/values', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    headers: new Headers({
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    }),
-  })
+  return fetchData('/query/values', serviceId, payload)
     .then(response => response.json())
     .then((response) => {
       if (!response.values) {
