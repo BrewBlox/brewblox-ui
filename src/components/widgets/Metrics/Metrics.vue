@@ -24,7 +24,7 @@ class MetricsWidget extends Widget {
   error: Error | null = null;
   fetching: boolean = true;
   interval: number = 0;
-  updateInterval: number = 5000;
+  updateTimeout: number = 5000;
   metricDuration: string = '5m';
   plotly: PlotlyOptions = {
     data: [],
@@ -61,7 +61,7 @@ class MetricsWidget extends Widget {
             return {
               ...metric,
               y: this.plotly.data[index] && this.plotly.data[index].y ?
-                this.plotly.data[index].y : 0,
+                this.plotly.data[index].y : [0],
             };
           }
 
@@ -72,6 +72,8 @@ class MetricsWidget extends Widget {
     }
 
     this.fetching = false;
+
+    setTimeout(() => this.fetchMetrics(), this.updateTimeout);
   }
 
   updateMetrics(data: PlotlyData[]) {
@@ -86,7 +88,6 @@ class MetricsWidget extends Widget {
     this.setPlotName();
 
     this.fetchMetrics();
-    this.interval = setInterval(() => this.fetchMetrics(), this.updateInterval);
   }
 
   destroyed() {
