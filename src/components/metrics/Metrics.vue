@@ -25,6 +25,13 @@ class Metrics extends Vue {
     font: {
       color: '#fff',
     },
+    margin: {
+      t: 50,
+      l: 80,
+      r: 40,
+      b: 80,
+      pad: 5,
+    },
     legend: { orientation: 'h' },
     xaxis: {
       type: 'date',
@@ -64,6 +71,7 @@ export default Metrics;
 
 <style>
 .js-plotly-plot .plotly .modebar {
+  top: 10px;
   background: transparent;
 }
 
