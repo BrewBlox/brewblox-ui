@@ -13,7 +13,7 @@ export function getMetric(
     ...options,
   };
 
-  return window.fetch('http://192.168.0.5/history/query/values', {
+  return window.fetch('http://192.168.0.106/history/query/values', {
     method: 'POST',
     body: JSON.stringify(payload),
     headers: new Headers({
