@@ -89,10 +89,8 @@ export default MetricsWidget;
       color="primary"
     />
   </q-inner-loading>
-  <div
-    class="metrics-container"
-    v-else
-  >
+
+  <div v-else class="metrics-container">
     <q-toolbar color="dark-bright">
       <q-toolbar-title>
         {{ name }}
@@ -109,18 +107,29 @@ export default MetricsWidget;
       v-if="error === null"
       :data="plotly"
     />
-    <q-alert
-      v-if="error"
-      icon="warning"
-      color="negative"
-    >
-      {{ error.message }}
-    </q-alert>
+    <div v-if="error" class="alert-container">
+      <q-alert
+        icon="warning"
+        color="negative"
+      >
+        {{ error.message }}
+      </q-alert>
+    </div>
   </div>
 </template>
 
 <style>
 .dashboard-item.metrics-container {
   background: transparent;
+  display: flex;
+  flex-direction: column;
+}
+
+.alert-container {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 </style>
