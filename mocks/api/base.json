@@ -157,12 +157,10 @@
         "widget": "Metrics",
         "options": {
           "name": "Lower Sensor Voltage",
-          "metrics": [
-            {
-              "id": "pressure/pressure",
-              "fields": ["lower_sensor/updated_1s/voltage"]
-            }
-          ]
+          "metrics": [{
+            "path": "pressure/lower_sensor/updated_1s/voltage",
+            "name": "voltage"
+          }]
         }
       }
     }

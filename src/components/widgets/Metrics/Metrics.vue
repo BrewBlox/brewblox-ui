@@ -2,15 +2,14 @@
 import Component from 'vue-class-component';
 
 import Metrics from '@/components/metrics/Metrics.vue';
-import { blockById } from '@/store/blocks/getters';
 
 import { getMetric, getAvailableMeasurements } from './fetchMetrics';
 
 import Widget from '../Widget';
 
 type MetricsOptions = {
-  id: string,
-  fields: string[],
+  name: string;
+  path: string;
 };
 
 /* eslint-disable */
@@ -41,14 +40,35 @@ class MetricsWidget extends Widget {
     return this.options.metrics;
   }
 
+  splitMeasurementKey(path: string): { measure: string, key: string } | null {
+    const result = path.match(/^([A-Za-z0-9_-]+)\/(.+)$/);
+
+    if (!result) {
+      return null;
+    }
+
+    return {
+      measure: result[1],
+      key: result[2],
+    };
+  }
+
   async fetchMetrics() {
     try {
-      const metricData = await Promise.all(this.metrics.map(metric =>
-        getMetric(
-          blockById(this.$store, metric.id).serviceId,
-          metric.fields,
+      const metricData = await Promise.all(this.metrics.map((metric) => {
+        const measurementKey = this.splitMeasurementKey(metric.path);
+
+        if (!measurementKey) {
+          return Promise.resolve([]);
+        }
+
+        return getMetric(
+          measurementKey.measure,
+          [measurementKey.key],
           { duration: this.metricDuration },
-        )));
+        );
+      }));
+
 
       this.updateMetrics(metricData.reduce((acc, metrics) => [...acc, ...metrics], []));
 
