@@ -1,4 +1,10 @@
+import convertToFlatPaths from './convertToFlatPaths';
+
 const historyService = 'http://192.168.0.106/history';
+
+function toMicroSeconds(nanoseconds: number): number {
+  return Math.floor(nanoseconds / 1000000);
+}
 
 function fetchData(endpoint: string, payload: any = {}): Promise<Response> {
   return window.fetch(
@@ -16,13 +22,10 @@ function fetchData(endpoint: string, payload: any = {}): Promise<Response> {
   );
 }
 
-function toMicroSeconds(nanoseconds: number): number {
-  return Math.floor(nanoseconds / 1000000);
-}
-
 export function getAvailableMeasurements(): Promise<string[]> {
   return fetchData('/query/objects')
-    .then(response => response.json());
+    .then(response => response.json())
+    .then(convertToFlatPaths);
 }
 
 export function getMetric(

@@ -22,6 +22,8 @@ type MetricsOptions = {
 class MetricsWidget extends Widget {
   error: Error | null = null;
   fetching: boolean = true;
+  fetchingAvailableMeasurements: boolean = true;
+  measurementsPaths: string[] = [];
   editing: boolean = false;
   timeout: number = 0;
   updateTimeout: number = 5000;
@@ -89,10 +91,15 @@ class MetricsWidget extends Widget {
     this.$set(this.plotly, 'data', data);
   }
 
+  async fetchAvailableMeasurements() {
+    this.measurementsPaths = await getAvailableMeasurements();
+
+    this.fetchingAvailableMeasurements = false;
+  }
+
   mounted() {
     this.fetchMetrics();
-
-    getAvailableMeasurements();
+    this.fetchAvailableMeasurements();
   }
 
   destroyed() {
