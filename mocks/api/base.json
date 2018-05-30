@@ -152,86 +152,8 @@
       "id": "item-3",
       "data": {
         "order": 1,
-        "cols": 12,
-        "rows": 1,
-        "widget": "Metrics",
-        "options": {
-          "name": "Pressure",
-          "limit": 1,
-          "metrics": [
-            {
-              "id": "pressure/pressure",
-              "fields": [
-                "lower_sensor/updated_1s/raw",
-                "lower_sensor/updated_1s/voltage",
-                "upper_sensor/updated_1s/raw",
-                "upper_sensor/updated_1s/voltage"
-              ]
-            }
-          ]
-        }
-      }
-    },
-    {
-      "id": "item-4",
-      "data": {
-        "order": 2,
-        "cols": 6,
-        "rows": 3,
-        "widget": "Metrics",
-        "options": {
-          "name": "Upper Sensor Raw",
-          "metrics": [
-            {
-              "id": "pressure/pressure",
-              "fields": ["upper_sensor/updated_1s/raw"]
-            }
-          ]
-        }
-      }
-    },
-    {
-      "id": "item-5",
-      "data": {
-        "order": 3,
-        "cols": 6,
-        "rows": 3,
-        "widget": "Metrics",
-        "options": {
-          "name": "Upper Sensor Voltage",
-          "metrics": [
-            {
-              "id": "pressure/pressure",
-              "fields": ["upper_sensor/updated_1s/voltage"]
-            }
-          ]
-        }
-      }
-    },
-    {
-      "id": "item-6",
-      "data": {
-        "order": 4,
-        "cols": 6,
-        "rows": 3,
-        "widget": "Metrics",
-        "options": {
-          "name": "Lower Sensor Raw",
-          "metrics": [
-            {
-              "id": "pressure/pressure",
-              "fields": ["lower_sensor/updated_1s/raw"]
-            }
-          ]
-        }
-      }
-    },
-    {
-      "id": "item-7",
-      "data": {
-        "order": 5,
-        "cols": 6,
-        "rows": 3,
+        "cols": 10,
+        "rows": 5,
         "widget": "Metrics",
         "options": {
           "name": "Lower Sensor Voltage",
@@ -259,7 +181,7 @@
       "data": {
         "title": "Metrics Dashboard",
         "order": 2,
-        "items": ["item-3", "item-4", "item-5", "item-6", "item-7"]
+        "items": ["item-3"]
       }
     }
   ],
