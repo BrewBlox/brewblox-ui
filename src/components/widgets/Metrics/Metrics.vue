@@ -22,6 +22,7 @@ type MetricsOptions = {
 class MetricsWidget extends Widget {
   error: Error | null = null;
   fetching: boolean = true;
+  editing: boolean = false;
   timeout: number = 0;
   updateTimeout: number = 5000;
   metricDuration: string = '5m';
@@ -117,10 +118,13 @@ export default MetricsWidget;
       </q-toolbar-title>
 
       <q-btn
-        flat
-        round
-        dense
-        icon="settings"
+        :flat="!editing"
+        :color="editing ? 'positive' : 'default'"
+        :round="!editing"
+        :dense="!editing"
+        :icon="editing ? 'check' : 'settings'"
+        @click="editing = !editing"
+        :label="editing ? 'Save changes' : 'Configure graph'"
       />
     </q-toolbar>
     <Metrics
@@ -134,6 +138,9 @@ export default MetricsWidget;
       >
         {{ error.message }}
       </q-alert>
+    </div>
+    <div v-if="editing" class="editing-container">
+      This is the editing container
     </div>
   </div>
 </template>
@@ -151,5 +158,24 @@ export default MetricsWidget;
   align-items: center;
   justify-content: center;
   flex-direction: column;
+}
+
+.metrics-container .q-toolbar {
+  position: absolute;
+  top: 0;
+  z-index: 2;
+}
+
+.metrics-container .js-plotly-plot {
+  position: absolute;
+  top: 0;
+  z-index: 1;
+}
+
+.editing-container {
+  height: 80px;
+  width: 100%;
+  position: absolute;
+  top: 100%;
 }
 </style>

@@ -26,7 +26,7 @@ class Metrics extends Vue {
       color: '#fff',
     },
     margin: {
-      t: 50,
+      t: 100,
       l: 80,
       r: 40,
       b: 80,
