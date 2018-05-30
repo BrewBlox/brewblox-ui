@@ -145,7 +145,9 @@ export default MetricsWidget;
   </div>
 </template>
 
-<style>
+<style lang="stylus">
+@import '../../../css/app.styl';
+
 .dashboard-item.metrics-container {
   background: transparent;
   display: flex;
@@ -173,9 +175,10 @@ export default MetricsWidget;
 }
 
 .editing-container {
-  height: 80px;
+  background: $dark;
   width: 100%;
   position: absolute;
   top: 100%;
+  padding: 20px;
 }
 </style>
