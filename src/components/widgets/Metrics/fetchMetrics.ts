@@ -1,12 +1,11 @@
 const historyService = 'http://192.168.0.106/history';
 
-function fetchData(endpoint: string, serviceId: string, payload: any): Promise<Response> {
+function fetchData(endpoint: string, payload: any = {}): Promise<Response> {
   return window.fetch(
     `${historyService}${endpoint}`,
     {
       method: 'POST',
       body: JSON.stringify({
-        measurement: serviceId,
         ...payload,
       }),
       headers: new Headers({
@@ -21,6 +20,11 @@ function toMicroSeconds(nanoseconds: number): number {
   return Math.floor(nanoseconds / 1000000);
 }
 
+export function getAvailableMeasurements(): Promise<string[]> {
+  return fetchData('/query/objects')
+    .then(response => response.json());
+}
+
 export function getMetric(
   serviceId: string,
   keys: string[],
@@ -28,10 +32,11 @@ export function getMetric(
 ): Promise<PlotlyData[]> {
   const payload = {
     keys: ['time', ...keys],
+    measurement: serviceId,
     ...options,
   };
 
-  return fetchData('/query/values', serviceId, payload)
+  return fetchData('/query/values', payload)
     .then(response => response.json())
     .then((response) => {
       if (!response.values) {

@@ -4,7 +4,7 @@ import Component from 'vue-class-component';
 import Metrics from '@/components/metrics/Metrics.vue';
 import { blockById } from '@/store/blocks/getters';
 
-import { getMetric } from './fetchMetrics';
+import { getMetric, getAvailableMeasurements } from './fetchMetrics';
 
 import Widget from '../Widget';
 
@@ -47,11 +47,7 @@ class MetricsWidget extends Widget {
         getMetric(
           blockById(this.$store, metric.id).serviceId,
           metric.fields,
-          {
-            duration: this.options.limit ? undefined : this.metricDuration,
-            limit: this.options.limit || undefined,
-            order_by: this.options.limit === 1 ? 'time DESC' : undefined,
-          },
+          { duration: this.metricDuration },
         )));
 
       this.updateMetrics(metricData.reduce((acc, metrics) => [...acc, ...metrics], []));
@@ -79,6 +75,8 @@ class MetricsWidget extends Widget {
   mounted() {
     this.setPlotName();
     this.fetchMetrics();
+
+    getAvailableMeasurements();
   }
 
   destroyed() {
