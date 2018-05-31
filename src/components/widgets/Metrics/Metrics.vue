@@ -62,21 +62,30 @@ class MetricsWidget extends Widget {
 
   async fetchMetrics() {
     try {
-      const metricData = await Promise.all(this.metrics
+      const measures = this.metrics
         .filter(metric => this.measurementsPaths.indexOf(metric.path) > -1)
-        .map((metric) => {
+        .reduce((acc, metric) => {
           const measurementKey = this.splitMeasurementKey(metric.path);
 
           if (!measurementKey) {
-            return Promise.resolve([]);
+            return acc;
           }
 
-          return getMetric(
-            measurementKey.measure,
-            [measurementKey.key],
-            { duration: this.metricDuration },
-          );
-        }));
+          if (!acc[measurementKey.measure]) {
+            acc[measurementKey.measure] = [];
+          }
+
+          acc[measurementKey.measure].push(measurementKey.key);
+
+          return acc;
+        }, {});
+
+      const metricData = await Promise.all(Object.keys(measures)
+        .map(measure => getMetric(
+          measure,
+          measures[measure],
+          { duration: this.metricDuration },
+        )));
 
 
       this.updateMetrics(metricData.reduce((acc, metrics) => [...acc, ...metrics], []));
