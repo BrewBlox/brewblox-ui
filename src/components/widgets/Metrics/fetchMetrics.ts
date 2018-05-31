@@ -1,4 +1,4 @@
-import convertToFlatPaths from './measurementHelpers';
+import { convertToFlatPaths } from './measurementHelpers';
 
 const historyService = 'http://192.168.0.106/history';
 
