@@ -62,19 +62,21 @@ class MetricsWidget extends Widget {
 
   async fetchMetrics() {
     try {
-      const metricData = await Promise.all(this.metrics.map((metric) => {
-        const measurementKey = this.splitMeasurementKey(metric.path);
+      const metricData = await Promise.all(this.metrics
+        .filter(metric => this.measurementsPaths.indexOf(metric.path) > -1)
+        .map((metric) => {
+          const measurementKey = this.splitMeasurementKey(metric.path);
 
-        if (!measurementKey) {
-          return Promise.resolve([]);
-        }
+          if (!measurementKey) {
+            return Promise.resolve([]);
+          }
 
-        return getMetric(
-          measurementKey.measure,
-          [measurementKey.key],
-          { duration: this.metricDuration },
-        );
-      }));
+          return getMetric(
+            measurementKey.measure,
+            [measurementKey.key],
+            { duration: this.metricDuration },
+          );
+        }));
 
 
       this.updateMetrics(metricData.reduce((acc, metrics) => [...acc, ...metrics], []));
@@ -158,8 +160,7 @@ class MetricsWidget extends Widget {
   }
 
   mounted() {
-    this.fetchMetrics();
-    this.fetchAvailableMeasurements();
+    this.fetchAvailableMeasurements().then(() => this.fetchMetrics());
   }
 
   destroyed() {
@@ -214,11 +215,20 @@ export default MetricsWidget;
       >
         <q-select
           v-for="(searchPath, index) in metricPaths(metric.path)"
-          v-if="measurementsPaths.indexOf(searchPath) === -1 && ((index !== 1 && searchPath === '') || searchPath !== '')"
+          v-if="
+            measurementsPaths.indexOf(searchPath) === -1 &&
+            ((index !== 1 && searchPath === '') || searchPath !== '')
+          "
           :key="searchPath"
           :options="measurementOptions(searchPath)"
           :value="metric.path.split('/')[index]"
           @change="val => onMetricPathChange(metric, index, val)"
+        />
+
+        <q-icon
+          name="check"
+          color="positive"
+          v-if="measurementsPaths.indexOf(metric.path) > -1"
         />
       </div>
       <div class="metrics-edit-container">
