@@ -3,6 +3,8 @@ import Component from 'vue-class-component';
 
 import Metrics from '@/components/metrics/Metrics.vue';
 
+import { updateDashboardItemOptions } from '@/store/dashboards/actions';
+
 import { getMetric, getAvailableMeasurements } from './fetchMetrics';
 import { getMetricsFromPath } from './measurementHelpers';
 
@@ -99,8 +101,27 @@ class MetricsWidget extends Widget {
     ), ['']);
   }
 
-  onMetricPathChange(metricId, pathIndex, value) {
-    console.log(metricId, pathIndex, value);
+  onMetricPathChange(metric: MetricsOptions, pathIndex, value) {
+    const newPath = pathIndex !== 0 ?
+      [this.metricPaths(metric.path)[pathIndex], value].join('/') :
+      value;
+
+    updateDashboardItemOptions(this.$store, {
+      id: this.dashboardItem.id,
+      options: {
+        ...this.options,
+        metrics: this.options.metrics.map((item) => {
+          if (item.id === metric.id) {
+            return {
+              ...item,
+              path: newPath,
+            };
+          }
+
+          return item;
+        }),
+      },
+    });
   }
 
   cancelFetch() {
@@ -177,7 +198,7 @@ export default MetricsWidget;
           :key="path"
           :options="measurementOptions(path)"
           :value="metric.path.split('/')[index]"
-          @change="val => onMetricPathChange(metric.id, index, val)"
+          @change="val => onMetricPathChange(metric, index, val)"
         />
       </div>
     </div>

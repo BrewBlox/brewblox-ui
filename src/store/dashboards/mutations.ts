@@ -50,6 +50,12 @@ const mutations = {
   ) {
     updateDashboardItem(state, id, { cols, rows });
   },
+  setDashboardItemOptions(
+    state: DashboardState,
+    { id, options }: { id: string, options: any },
+  ) {
+    updateDashboardItem(state, id, { options });
+  },
 };
 
 // exported commit accessors
@@ -60,5 +66,6 @@ export const setDashboardOrder = commit(mutations.setDashboardOrder);
 export const addDashboardItem = commit(mutations.addDashboardItem);
 export const setDashboardItemOrder = commit(mutations.setDashboardItemOrder);
 export const setDashboardItemSize = commit(mutations.setDashboardItemSize);
+export const setDashboardItemOptions = commit(mutations.setDashboardItemOptions);
 
 export default mutations;
