@@ -10,6 +10,8 @@ import { getMetricsFromPath } from './measurementHelpers';
 
 import Widget from '../Widget';
 
+const sortByOrder = (a, b) => a.order - b.order;
+
 type MetricsOptions = {
   id: number;
   order: number;
@@ -44,7 +46,7 @@ class MetricsWidget extends Widget {
   }
 
   get metrics(): MetricsOptions[] {
-    return [...this.options.metrics].sort((a, b) => a.order - b.order);
+    return [...this.options.metrics].sort(sortByOrder);
   }
 
   splitMeasurementKey(path: string): { measure: string, key: string } | null {
@@ -137,6 +139,21 @@ class MetricsWidget extends Widget {
     });
 
     this.fetchMetrics();
+  }
+
+  removeMetric(metricId) {
+    updateDashboardItemOptions(this.$store, {
+      id: this.dashboardItem.id,
+      options: {
+        ...this.options,
+        metrics: [...this.options.metrics.filter(item => item.id !== metricId)].sort(sortByOrder)
+          .map((item, index) => ({
+            id: `metric-${index + 1}`,
+            order: index + 1,
+            path: item.path,
+          })),
+      },
+    });
   }
 
   addNewMetric() {
@@ -241,6 +258,15 @@ export default MetricsWidget;
           color="positive"
           v-if="measurementsPaths.indexOf(metric.path) > -1"
         />
+
+        <q-btn
+          flat
+          round
+          dense
+          icon="delete"
+          label="Remove metric"
+          @click="removeMetric(metric.id)"
+        />
       </div>
       <div class="metrics-edit-container">
         <q-btn
@@ -299,5 +325,9 @@ export default MetricsWidget;
 .metrics-edit-container .q-select {
   width: 160px;
   margin-right: 15px;
+}
+
+.metrics-edit-container .q-btn.q-btn-flat {
+  margin-left: auto;
 }
 </style>
