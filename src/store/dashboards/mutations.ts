@@ -23,6 +23,14 @@ function updateDashboardItem(state: DashboardState, id: string, newData: any) {
   );
 }
 
+function updateDashboardItemOptions(state: DashboardState, id: string, options: any) {
+  state.items.byId = Object.assign(
+    {},
+    state.items.byId,
+    { [id]: { ...state.items.byId[id], options } },
+  );
+}
+
 const mutations = {
   addDashboard(state: DashboardState, dashboard: Dashboard) {
     state.dashboards.allIds.push(dashboard.id);
@@ -54,7 +62,7 @@ const mutations = {
     state: DashboardState,
     { id, options }: { id: string, options: any },
   ) {
-    updateDashboardItem(state, id, { options });
+    updateDashboardItemOptions(state, id, options);
   },
 };
 

@@ -10,7 +10,7 @@ import { getMetricsFromPath } from './measurementHelpers';
 
 import Widget from '../Widget';
 
-const sortByOrder = (a, b) => a.order - b.order;
+const sortByOrder = (a: MetricsOptions, b: MetricsOptions) => a.order - b.order;
 
 type MetricsOptions = {
   id: number;
@@ -154,6 +154,8 @@ class MetricsWidget extends Widget {
           })),
       },
     });
+
+    this.fetchMetrics();
   }
 
   addNewMetric() {
@@ -241,6 +243,7 @@ export default MetricsWidget;
         v-for="metric in metrics"
         :key="metric.id"
       >
+        <q-icon name="show_chart" />
         <q-select
           v-for="(searchPath, index) in metricPaths(metric.path)"
           v-if="
@@ -268,14 +271,13 @@ export default MetricsWidget;
           @click="removeMetric(metric.id)"
         />
       </div>
-      <div class="metrics-edit-container">
-        <q-btn
-          icon="add"
-          label="Add metric"
-          color="primary"
-          @click="addNewMetric"
-        />
-      </div>
+
+      <q-btn
+        icon="add"
+        label="Add metric"
+        color="primary"
+        @click="addNewMetric"
+      />
     </div>
   </div>
 </template>
@@ -313,6 +315,10 @@ export default MetricsWidget;
   width: 100%;
   position: absolute;
   top: 100%;
+}
+
+.metrics-edit-container > .q-icon {
+  margin: 0 15px 0 5px;
 }
 
 .metrics-edit-container {
