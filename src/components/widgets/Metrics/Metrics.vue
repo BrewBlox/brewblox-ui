@@ -61,6 +61,8 @@ class MetricsWidget extends Widget {
   }
 
   async fetchMetrics() {
+    this.cancelFetch();
+
     try {
       const measures = this.metrics
         .filter(metric => this.measurementsPaths.indexOf(metric.path) > -1)
@@ -134,7 +136,6 @@ class MetricsWidget extends Widget {
       },
     });
 
-    this.cancelFetch();
     this.fetchMetrics();
   }
 
