@@ -194,9 +194,10 @@ export default MetricsWidget;
         :key="metric.id"
       >
         <q-select
-          v-for="(path, index) in metricPaths(metric.path)"
-          :key="path"
-          :options="measurementOptions(path)"
+          v-for="(searchPath, index) in metricPaths(metric.path)"
+          v-if="measurementsPaths.indexOf(searchPath) === -1"
+          :key="searchPath"
+          :options="measurementOptions(searchPath)"
           :value="metric.path.split('/')[index]"
           @change="val => onMetricPathChange(metric, index, val)"
         />
