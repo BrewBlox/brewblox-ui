@@ -158,7 +158,8 @@
         "options": {
           "name": "Lower Sensor Voltage",
           "metrics": [{
-            "path": "pressure/lower_sensor/updated_1s/voltage",
+            "id": 1,
+            "path": "pressure/lower_sensor",
             "name": "voltage"
           }]
         }

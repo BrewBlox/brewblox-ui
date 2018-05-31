@@ -4,10 +4,12 @@ import Component from 'vue-class-component';
 import Metrics from '@/components/metrics/Metrics.vue';
 
 import { getMetric, getAvailableMeasurements } from './fetchMetrics';
+import { getMetricsFromPath } from './measurementHelpers';
 
 import Widget from '../Widget';
 
 type MetricsOptions = {
+  id: number;
   name: string;
   path: string;
 };
@@ -24,7 +26,7 @@ class MetricsWidget extends Widget {
   fetching: boolean = true;
   fetchingAvailableMeasurements: boolean = true;
   measurementsPaths: string[] = [];
-  editing: boolean = false;
+  editing: boolean = true;
   timeout: number = 0;
   updateTimeout: number = 5000;
   metricDuration: string = '5m';
@@ -81,6 +83,24 @@ class MetricsWidget extends Widget {
     }
 
     this.fetching = false;
+  }
+
+  measurementOptions(path: string) {
+    return getMetricsFromPath(this.measurementsPaths, path)
+      .map(item => ({ label: item, value: item }));
+  }
+
+  metricPaths(path: string) {
+    return path.split('/').reduce((acc, item, currentIndex) => (
+      [
+        ...acc,
+        currentIndex === 0 ? item : [acc[currentIndex], item].join('/'),
+      ]
+    ), ['']);
+  }
+
+  onMetricPathChange(metricId, pathIndex, value) {
+    console.log(metricId, pathIndex, value);
   }
 
   cancelFetch() {
@@ -146,8 +166,20 @@ export default MetricsWidget;
         {{ error.message }}
       </q-alert>
     </div>
-    <div v-if="editing" class="editing-container">
-      This is the editing container
+    <div v-if="editing && !fetchingAvailableMeasurements" class="editing-container">
+      <div
+        class="metrics-edit-container"
+        v-for="metric in metrics"
+        :key="metric.id"
+      >
+        <q-select
+          v-for="(path, index) in metricPaths(metric.path)"
+          :key="path"
+          :options="measurementOptions(path)"
+          :value="metric.path.split('/')[index]"
+          @change="val => onMetricPathChange(metric.id, index, val)"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -182,10 +214,19 @@ export default MetricsWidget;
 }
 
 .editing-container {
-  background: $dark;
   width: 100%;
   position: absolute;
   top: 100%;
+}
+
+.metrics-edit-container {
+  background: $dark;
   padding: 20px;
+  display: flex;
+}
+
+.metrics-edit-container .q-select {
+  width: 160px;
+  margin-right: 15px;
 }
 </style>
