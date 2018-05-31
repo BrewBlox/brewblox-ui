@@ -12,7 +12,7 @@ import Widget from '../Widget';
 
 type MetricsOptions = {
   id: number;
-  name: string;
+  order: number;
   path: string;
 };
 
@@ -44,7 +44,7 @@ class MetricsWidget extends Widget {
   }
 
   get metrics(): MetricsOptions[] {
-    return this.options.metrics;
+    return [...this.options.metrics].sort((a, b) => a.order - b.order);
   }
 
   splitMeasurementKey(path: string): { measure: string, key: string } | null {
@@ -122,6 +122,25 @@ class MetricsWidget extends Widget {
         }),
       },
     });
+
+    this.fetchMetrics();
+  }
+
+  addNewMetric() {
+    updateDashboardItemOptions(this.$store, {
+      id: this.dashboardItem.id,
+      options: {
+        ...this.options,
+        metrics: [
+          ...this.options.metrics.map((item, index) => ({ ...item, order: index + 1 })),
+          {
+            id: `metric-${this.options.metrics.length + 1}`,
+            order: this.options.metrics.length,
+            path: '',
+          },
+        ],
+      },
+    });
   }
 
   cancelFetch() {
@@ -195,11 +214,19 @@ export default MetricsWidget;
       >
         <q-select
           v-for="(searchPath, index) in metricPaths(metric.path)"
-          v-if="measurementsPaths.indexOf(searchPath) === -1"
+          v-if="measurementsPaths.indexOf(searchPath) === -1 && ((index !== 1 && searchPath === '') || searchPath !== '')"
           :key="searchPath"
           :options="measurementOptions(searchPath)"
           :value="metric.path.split('/')[index]"
           @change="val => onMetricPathChange(metric, index, val)"
+        />
+      </div>
+      <div class="metrics-edit-container">
+        <q-btn
+          icon="add"
+          label="Add metric"
+          color="primary"
+          @click="addNewMetric"
         />
       </div>
     </div>
@@ -243,8 +270,9 @@ export default MetricsWidget;
 
 .metrics-edit-container {
   background: $dark;
-  padding: 20px;
+  padding: 10px;
   display: flex;
+  margin-bottom: 10px;
 }
 
 .metrics-edit-container .q-select {
