@@ -134,6 +134,7 @@ class MetricsWidget extends Widget {
       },
     });
 
+    this.cancelFetch();
     this.fetchMetrics();
   }
 
