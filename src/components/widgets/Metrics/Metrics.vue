@@ -5,7 +5,7 @@ import Metrics from '@/components/metrics/Metrics.vue';
 
 import { updateDashboardItemOptions } from '@/store/dashboards/actions';
 
-import { getMetric, getAvailableMeasurements } from './fetchMetrics';
+import { getMetric, getAvailableMeasurements, subscribeToEvents } from './fetchMetrics';
 import { getMetricsFromPath } from './measurementHelpers';
 
 import Widget from '../Widget';
@@ -16,6 +16,10 @@ type MetricsOptions = {
   id: string;
   order: number;
   path: string;
+};
+
+type MeasuresType = {
+  [key: string]: string[];
 };
 
 /* eslint-disable */
@@ -41,6 +45,9 @@ class MetricsWidget extends Widget {
     },
   };
   nameInput: string = '';
+  eventSources: {
+    [key: string]: EventSource;
+  } = {};
 
   get name(): string {
     return this.options.name;
@@ -81,50 +88,71 @@ class MetricsWidget extends Widget {
     };
   }
 
+  getMeasures(): MeasuresType {
+    return this.metrics
+      .filter(metric => this.measurementsPaths.indexOf(metric.path) > -1)
+      .reduce((acc: MeasuresType, metric) => {
+        const measurementKey = this.splitMeasurementKey(metric.path);
+
+        if (!measurementKey) {
+          return acc;
+        }
+
+        if (!acc[measurementKey.measure]) {
+          acc[measurementKey.measure] = [];
+        }
+
+        acc[measurementKey.measure].push(measurementKey.key);
+
+        return acc;
+      }, {});
+  }
+
   async fetchMetrics() {
     this.cancelFetch();
 
     try {
-      type MeasuresType = {
-        [key: string]: string[];
-      };
-
-      const measures: MeasuresType = this.metrics
-        .filter(metric => this.measurementsPaths.indexOf(metric.path) > -1)
-        .reduce((acc: MeasuresType, metric) => {
-          const measurementKey = this.splitMeasurementKey(metric.path);
-
-          if (!measurementKey) {
-            return acc;
-          }
-
-          if (!acc[measurementKey.measure]) {
-            acc[measurementKey.measure] = [];
-          }
-
-          acc[measurementKey.measure].push(measurementKey.key);
-
-          return acc;
-        }, {});
+      const measures = this.getMeasures();
 
       const metricData = await Promise.all(Object.keys(measures)
         .map(measure => getMetric(
           measure,
           measures[measure],
-          {
-            duration: this.metricDuration,
-          },
+          { duration: this.metricDuration },
         )));
-
 
       this.updateMetrics(metricData.reduce((acc, metrics) => [...acc, ...metrics], []));
 
-      this.timeout = setTimeout(() => this.fetchMetrics(), this.updateTimeout);
+      this.subscribeSSE();
     } catch (e) {
       this.error = e;
     }
 
     this.fetching = false;
+  }
+
+  get eventSourcesList(): EventSource[] {
+    return Object.keys(this.eventSources).map(key => this.eventSources[key]);
+  }
+
+  subscribeSSE() {
+    this.closeSSEConnections();
+
+    const measures = this.getMeasures();
+
+    this.eventSources = Object.keys(measures)
+      .reduce((acc, measure) => ({
+        ...acc,
+        [measure]: subscribeToEvents(measure, measures[measure]),
+      }), {});
+
+    this.eventSourcesList.forEach((source) => {
+      source.onmessage = (event: MessageEvent) => console.log(JSON.parse(event.data));
+    });
+  }
+
+  closeSSEConnections() {
+    this.eventSourcesList.forEach(source => source.close());
   }
 
   measurementOptions(path: string) {

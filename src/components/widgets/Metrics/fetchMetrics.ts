@@ -1,3 +1,5 @@
+import queryString from 'query-string';
+
 import { convertToFlatPaths } from './measurementHelpers';
 
 const historyService = 'http://192.168.0.65/history';
@@ -59,4 +61,14 @@ export function getMetric(
         name: key,
       }));
     });
+}
+
+
+export function subscribeToEvents(serviceId: string, keys: string[]) {
+  const options = {
+    keys: ['time', ...keys],
+    measurement: serviceId,
+  };
+
+  return new EventSource(`${historyService}/sse/values?${queryString.stringify(options)}`);
 }
