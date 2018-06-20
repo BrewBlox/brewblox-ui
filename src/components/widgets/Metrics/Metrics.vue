@@ -40,6 +40,7 @@ class MetricsWidget extends Widget {
       title: '',
     },
   };
+  nameInput: string = '';
 
   get name(): string {
     return this.options.name;
@@ -47,6 +48,24 @@ class MetricsWidget extends Widget {
 
   get metrics(): MetricsOptions[] {
     return [...this.options.metrics].sort(sortByOrder);
+  }
+
+  toggleEditing() {
+    this.nameInput = this.name;
+
+    this.editing = true;
+  }
+
+  saveChanges() {
+    updateDashboardItemOptions(this.$store, {
+      id: this.dashboardItem.id,
+      options: {
+        ...this.options,
+        name: this.nameInput,
+      },
+    });
+
+    this.editing = false;
   }
 
   splitMeasurementKey(path: string): { measure: string, key: string } | null {
@@ -220,7 +239,17 @@ export default MetricsWidget;
   <div v-else class="metrics-container">
     <q-toolbar color="dark-bright">
       <q-toolbar-title>
-        {{ name }}
+        <div v-if="!editing">
+          {{ name }}
+        </div>
+        <div v-else>
+          <q-input
+            v-model="nameInput"
+            placeholder="Name of this plot"
+            dark
+            :before="[{ icon: 'edit' }]"
+          />
+        </div>
       </q-toolbar-title>
 
       <q-btn
@@ -229,7 +258,7 @@ export default MetricsWidget;
         :round="!editing"
         :dense="!editing"
         :icon="editing ? 'check' : 'settings'"
-        @click="editing = !editing"
+        @click="editing ? saveChanges() : toggleEditing()"
         :label="editing ? 'Save changes' : 'Configure graph'"
       />
     </q-toolbar>
