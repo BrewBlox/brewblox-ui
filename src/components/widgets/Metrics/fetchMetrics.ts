@@ -27,6 +27,13 @@ function fetchData(endpoint: string, payload: any = {}): Promise<Response> {
   );
 }
 
+function metricsKey(serviceId: string, keys: string[]) {
+  return queryString.stringify({
+    keys,
+    measurement: serviceId,
+  });
+}
+
 export function getAvailableMeasurements(): Promise<string[]> {
   return fetchData('/query/objects')
     .then(response => response.json())
@@ -44,9 +51,13 @@ export function getMetric(
     ...options,
   };
 
+  // const key = metricsKey(serviceId, keys);
+
   return fetchData('/query/values', payload)
     .then(response => response.json())
     .then((response) => {
+      // safe result in metrics
+
       if (!response.values) {
         throw new Error('No results found');
       }
@@ -69,5 +80,13 @@ export function subscribeToEvents(serviceId: string, keys: string[]) {
     measurement: serviceId,
   };
 
-  return new EventSource(`${historyService}/sse/values?${queryString.stringify(options)}`);
+  // const key = metricsKey(serviceId, keys);
+
+  const eventSource =
+    new EventSource(`${historyService}/sse/values?${queryString.stringify(options)}`);
+
+  // listen to updates from eventSource
+  // update data based on 'key'
+
+  return eventSource;
 }
