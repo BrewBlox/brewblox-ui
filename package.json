@@ -40,6 +40,7 @@
   },
   "devDependencies": {
     "@types/jest": "^22.0.1",
+    "@types/query-string": "^6.1.0",
     "@vue/cli-plugin-babel": "^3.0.0-rc.3",
     "@vue/cli-plugin-e2e-cypress": "^3.0.0-rc.3",
     "@vue/cli-plugin-eslint": "^3.0.0-rc.3",
