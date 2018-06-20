@@ -13,7 +13,7 @@ import Widget from '../Widget';
 const sortByOrder = (a: MetricsOptions, b: MetricsOptions) => a.order - b.order;
 
 type MetricsOptions = {
-  id: number;
+  id: string;
   order: number;
   path: string;
 };
@@ -30,7 +30,7 @@ class MetricsWidget extends Widget {
   fetching: boolean = true;
   fetchingAvailableMeasurements: boolean = true;
   measurementsPaths: string[] = [];
-  editing: boolean = true;
+  editing: boolean = false;
   timeout: number = 0;
   updateTimeout: number = 5000;
   metricDuration: string = '5m';
@@ -66,9 +66,13 @@ class MetricsWidget extends Widget {
     this.cancelFetch();
 
     try {
-      const measures = this.metrics
+      type MeasuresType = {
+        [key: string]: string[];
+      };
+
+      const measures: MeasuresType = this.metrics
         .filter(metric => this.measurementsPaths.indexOf(metric.path) > -1)
-        .reduce((acc, metric) => {
+        .reduce((acc: MeasuresType, metric) => {
           const measurementKey = this.splitMeasurementKey(metric.path);
 
           if (!measurementKey) {
@@ -88,7 +92,9 @@ class MetricsWidget extends Widget {
         .map(measure => getMetric(
           measure,
           measures[measure],
-          { duration: this.metricDuration },
+          {
+            duration: this.metricDuration,
+          },
         )));
 
 
@@ -116,7 +122,7 @@ class MetricsWidget extends Widget {
     ), ['']);
   }
 
-  onMetricPathChange(metric: MetricsOptions, pathIndex, value) {
+  onMetricPathChange(metric: MetricsOptions, pathIndex: number, value: string) {
     const newPath = pathIndex !== 0 ?
       [this.metricPaths(metric.path)[pathIndex], value].join('/') :
       value;
@@ -125,7 +131,7 @@ class MetricsWidget extends Widget {
       id: this.dashboardItem.id,
       options: {
         ...this.options,
-        metrics: this.options.metrics.map((item) => {
+        metrics: this.metrics.map((item) => {
           if (item.id === metric.id) {
             return {
               ...item,
@@ -141,12 +147,13 @@ class MetricsWidget extends Widget {
     this.fetchMetrics();
   }
 
-  removeMetric(metricId) {
+  removeMetric(metricId: string) {
     updateDashboardItemOptions(this.$store, {
       id: this.dashboardItem.id,
       options: {
         ...this.options,
-        metrics: [...this.options.metrics.filter(item => item.id !== metricId)].sort(sortByOrder)
+        metrics: [...this.metrics.filter(item => item.id !== metricId)]
+          .sort(sortByOrder)
           .map((item, index) => ({
             id: `metric-${index + 1}`,
             order: index + 1,
@@ -164,10 +171,11 @@ class MetricsWidget extends Widget {
       options: {
         ...this.options,
         metrics: [
-          ...this.options.metrics.map((item, index) => ({ ...item, order: index + 1 })),
+          ...this.metrics.map((item: MetricsOptions, index: number) =>
+            ({ ...item, order: index + 1 })),
           {
-            id: `metric-${this.options.metrics.length + 1}`,
-            order: this.options.metrics.length,
+            id: `metric-${this.metrics.length + 1}`,
+            order: this.metrics.length,
             path: '',
           },
         ],
