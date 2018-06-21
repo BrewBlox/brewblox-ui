@@ -33,6 +33,16 @@ function metricsKey(serviceId: string, keys: string[]) {
   });
 }
 
+function valuesFromCache(serviceId: string, keys: string[]) {
+  const cacheKey = metricsKey(serviceId, keys);
+
+  if (!metricsCache[cacheKey]) {
+    return undefined;
+  }
+
+  return metricsCache[cacheKey];
+}
+
 function addValuesToCache(serviceId: string, keys: string[], values: number[][]) {
   const cacheKey = metricsKey(serviceId, keys);
 
@@ -40,7 +50,13 @@ function addValuesToCache(serviceId: string, keys: string[], values: number[][])
     metricsCache[cacheKey] = [];
   }
 
-  metricsCache[cacheKey] = [...metricsCache[cacheKey], ...values];
+  const currentTimeStamps = [...metricsCache[cacheKey].map(item => item[0])];
+
+  metricsCache[cacheKey] = [
+    ...metricsCache[cacheKey],
+    // only add if timestamp is not found yet
+    ...values.filter(item => currentTimeStamps.indexOf(item[0]) === -1),
+  ];
 
   return metricsCache[cacheKey];
 }
@@ -72,6 +88,12 @@ export function getMetric(
     measurement: serviceId,
     ...options,
   };
+
+  const cached = valuesFromCache(serviceId, keys);
+
+  if (cached) {
+    return Promise.resolve(toPlotlyData(cached, keys));
+  }
 
   return fetchData('/query/values', payload)
     .then(response => response.json())
