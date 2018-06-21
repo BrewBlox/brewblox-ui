@@ -36,6 +36,9 @@ class Metrics extends Vue {
     xaxis: {
       type: 'date',
       gridcolor: '#666',
+      autorange: false,
+      range: [+new Date() - (60 * 5 * 1000), +new Date()],
+      rangeslider: {},
     },
     yaxis: {
       gridcolor: '#666',

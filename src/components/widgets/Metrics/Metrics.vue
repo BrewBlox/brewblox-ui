@@ -232,6 +232,14 @@ class MetricsWidget extends Widget {
 
   updateMetrics(data: PlotlyData[]) {
     this.$set(this.plotly, 'data', data);
+    this.$set(this.plotly, 'layout', {
+      ...this.plotly.layout,
+      ...{
+        xaxis: {
+          range: [+new Date() - (60 * 5 * 1000), +new Date()],
+        },
+      },
+    });
   }
 
   async fetchAvailableMeasurements() {
