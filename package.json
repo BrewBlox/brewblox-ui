@@ -56,7 +56,7 @@
     "connect-api-mocker": "^1.3.6",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
-    "ts-jest": "^22.0.1",
+    "ts-jest": "^22.4.6",
     "tslint-config-airbnb": "^5.8.0",
     "vue-template-compiler": "^2.5.13"
   },
