@@ -143,12 +143,8 @@ class MetricsWidget extends Widget {
     this.eventSources = Object.keys(measures)
       .reduce((acc, measure) => ({
         ...acc,
-        [measure]: subscribeToEvents(measure, measures[measure]),
+        [measure]: subscribeToEvents(measure, measures[measure], this.updateMetrics),
       }), {});
-
-    this.eventSourcesList.forEach((source) => {
-      source.onmessage = (event: MessageEvent) => console.log(JSON.parse(event.data));
-    });
   }
 
   closeSSEConnections() {

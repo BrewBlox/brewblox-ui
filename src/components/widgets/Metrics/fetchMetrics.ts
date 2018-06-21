@@ -4,8 +4,7 @@ import { convertToFlatPaths } from './measurementHelpers';
 
 const historyService = 'http://localhost/history';
 
-// docker run --rm -d --network=host brewblox/area51:replay --measurement=pressure
-// docker run --rm -d --network=host brewblox/area51:replay --measurement=glitter
+const metricsCache: { [key: string]: number[][]; } = {};
 
 function toMicroSeconds(nanoseconds: number): number {
   return Math.floor(nanoseconds / 1000000);
@@ -34,10 +33,33 @@ function metricsKey(serviceId: string, keys: string[]) {
   });
 }
 
+function addValuesToCache(serviceId: string, keys: string[], values: number[][]) {
+  const cacheKey = metricsKey(serviceId, keys);
+
+  if (!metricsCache[cacheKey]) {
+    metricsCache[cacheKey] = [];
+  }
+
+  metricsCache[cacheKey] = [...metricsCache[cacheKey], ...values];
+
+  return metricsCache[cacheKey];
+}
+
 export function getAvailableMeasurements(): Promise<string[]> {
   return fetchData('/query/objects')
     .then(response => response.json())
     .then(convertToFlatPaths);
+}
+
+function toPlotlyData(values: number[][], keys: string[]) {
+  const x = values.map(([time]: number[]) => toMicroSeconds(time));
+
+  return keys.map((key, index) => ({
+    x,
+    type: 'scatter',
+    y: values.map((item: number[]) => item[index + 1]),
+    name: key,
+  }));
 }
 
 export function getMetric(
@@ -51,42 +73,40 @@ export function getMetric(
     ...options,
   };
 
-  // const key = metricsKey(serviceId, keys);
-
   return fetchData('/query/values', payload)
     .then(response => response.json())
     .then((response) => {
-      // safe result in metrics
-
       if (!response.values) {
         throw new Error('No results found');
       }
 
-      const x = response.values.map(([time]: number[]) => toMicroSeconds(time));
-
-      return keys.map((key, index) => ({
-        x,
-        type: 'scatter',
-        y: response.values.map((item: number[]) => item[index + 1]),
-        name: key,
-      }));
+      const values = addValuesToCache(serviceId, keys, response.values);
+      return toPlotlyData(values, keys);
     });
 }
 
 
-export function subscribeToEvents(serviceId: string, keys: string[]) {
+export function subscribeToEvents(
+  serviceId: string,
+  keys: string[],
+  onUpdate: (data: PlotlyData[]) => void,
+): EventSource {
   const options = {
     keys: ['time', ...keys],
     measurement: serviceId,
   };
 
-  // const key = metricsKey(serviceId, keys);
-
   const eventSource =
     new EventSource(`${historyService}/sse/values?${queryString.stringify(options)}`);
 
-  // listen to updates from eventSource
-  // update data based on 'key'
+  eventSource.onmessage = (event: MessageEvent) => {
+    const data = JSON.parse(event.data);
+    const values = addValuesToCache(serviceId, keys, data.values);
+
+    if (onUpdate && typeof onUpdate === 'function') {
+      onUpdate(toPlotlyData(values, keys));
+    }
+  };
 
   return eventSource;
 }
