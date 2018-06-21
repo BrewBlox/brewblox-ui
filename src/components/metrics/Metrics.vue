@@ -3,7 +3,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import createPlotlyComponent from 'vue-plotly.js/factory';
 import { merge } from 'lodash';
-import { parse } from 'date-fns';
+import { differenceInMilliseconds, getTime } from 'date-fns';
 
 import Plotly from './plotly';
 
@@ -58,14 +58,38 @@ class Metrics extends Vue {
   };
 
   range = 0;
+  rangeTo = 0;
 
   created() {
     this.range = this.$props.initialRange;
   }
 
+  get lastTimeStamp(): number {
+    return Math.max(...this.$props.data.data.map((line: { x: number[] }) => Math.max(...line.x)));
+  }
+
+  relayout(changes: { 'xaxis.range'?: string[] }) {
+    if (changes['xaxis.range']) {
+      const newRange = changes['xaxis.range'] || [];
+
+      const range = differenceInMilliseconds(newRange[1], newRange[0]);
+
+      // update range if changed
+      if (this.range !== range) {
+        this.range = range;
+      }
+
+      // @TODO: safer way to check if needs to auto update
+      if (this.lastTimeStamp !== getTime(newRange[1])) {
+        this.rangeTo = getTime(newRange[1]);
+      } else {
+        this.rangeTo = 0;
+      }
+    }
+  }
+
   get plotlyData() {
-    const lastTimeStamp =
-      Math.max(...this.$props.data.data.map((line: any) => Math.max(...line.x)));
+    const to = this.rangeTo === 0 ? this.lastTimeStamp : this.rangeTo;
 
     return {
       ...this.$props.data,
@@ -74,7 +98,7 @@ class Metrics extends Vue {
         this.$props.data.layout,
         {
           xaxis: {
-            range: [lastTimeStamp - this.range, lastTimeStamp],
+            range: [to - this.range, to],
           },
         },
       ),
@@ -90,6 +114,7 @@ export default Metrics;
     :data="plotlyData.data"
     :layout="plotlyData.layout"
     :config="config"
+    :onRelayout="relayout"
     fit
   />
 </template>
