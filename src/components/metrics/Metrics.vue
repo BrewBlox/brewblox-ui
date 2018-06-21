@@ -3,6 +3,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import createPlotlyComponent from 'vue-plotly.js/factory';
 import { merge } from 'lodash';
+import { parse } from 'date-fns';
 
 import Plotly from './plotly';
 
@@ -12,6 +13,10 @@ import Plotly from './plotly';
     data: {
       default: {},
       type: Object,
+    },
+    initialRange: {
+      default: 5 * 60 * 1000,
+      type: Number,
     },
   },
   components: {
@@ -37,7 +42,7 @@ class Metrics extends Vue {
       type: 'date',
       gridcolor: '#666',
       autorange: false,
-      range: [+new Date() - (60 * 5 * 1000), +new Date()],
+      range: [],
       rangeslider: {},
     },
     yaxis: {
@@ -52,10 +57,27 @@ class Metrics extends Vue {
     displaylogo: false,
   };
 
+  range = 0;
+
+  created() {
+    this.range = this.$props.initialRange;
+  }
+
   get plotlyData() {
+    const lastTimeStamp =
+      Math.max(...this.$props.data.data.map((line: any) => Math.max(...line.x)));
+
     return {
       ...this.$props.data,
-      layout: merge(this.defaultLayout, this.$props.data.layout),
+      layout: merge(
+        this.defaultLayout,
+        this.$props.data.layout,
+        {
+          xaxis: {
+            range: [lastTimeStamp - this.range, lastTimeStamp],
+          },
+        },
+      ),
     };
   }
 }

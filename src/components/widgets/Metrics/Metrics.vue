@@ -36,8 +36,8 @@ class MetricsWidget extends Widget {
   measurementsPaths: string[] = [];
   editing: boolean = false;
   timeout: number = 0;
-  updateTimeout: number = 5000;
-  metricDuration: string = '5m';
+  metricDuration: string = '30m';
+  initialRange = 5 * 60 * 1000;
   plotly: PlotlyOptions = {
     data: [],
     layout: {
@@ -232,14 +232,6 @@ class MetricsWidget extends Widget {
 
   updateMetrics(data: PlotlyData[]) {
     this.$set(this.plotly, 'data', data);
-    this.$set(this.plotly, 'layout', {
-      ...this.plotly.layout,
-      ...{
-        xaxis: {
-          range: [+new Date() - (60 * 5 * 1000), +new Date()],
-        },
-      },
-    });
   }
 
   async fetchAvailableMeasurements() {
@@ -297,6 +289,7 @@ export default MetricsWidget;
     <Metrics
       v-if="error === null"
       :data="plotly"
+      :initialRange="initialRange"
     />
     <div v-if="error" class="alert-container">
       <q-alert
