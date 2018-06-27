@@ -49,7 +49,7 @@
         "type": "SetPointSimple",
         "data": {
           "settings": {
-            "value": 1
+            "value[celsius]": 21
           }
         }
       },
@@ -71,7 +71,7 @@
             "offset": 0
           },
           "state": {
-            "value[celsius]": 20,
+            "value[celsius]": 20.89789201,
             "connected": true
           }
         }
