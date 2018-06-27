@@ -8,7 +8,7 @@ import { getAll as getAllSetPointSimples } from '@/store/blocks/SetPointSimple/g
 import { getAll as getAllSensorSetpointPairs } from '@/store/blocks/SensorSetPointPair/getters';
 import { deviceServices } from '@/store/services/getters';
 
-export const widgetTypes: { [key: string]: string } = {
+export const widgetTypes: { [key in WidgetType]: string } = {
   Metrics: 'Metrics',
   PID: 'PID',
   OneWireTempSensor: 'Temperature Sensor',

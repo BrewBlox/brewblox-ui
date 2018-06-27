@@ -27,12 +27,13 @@ import {
 /* eslint-enable */
 class WidgetModal extends Vue {
   currentStep: string = 'widgets';
-  widgetType: string | null = null;
+  widgetType: WidgetType | null = null;
   block: string | null = null;
   needsSetup: boolean = false;
 
   get widgetTypes(): { label: string, value: string }[] {
-    return Object.keys(widgetTypes).map(value => ({ value, label: widgetTypes[value] }));
+    return Object.keys(widgetTypes).map(value =>
+      ({ value, label: widgetTypes[value as WidgetType] }));
   }
 
   get widgetName(): string {
