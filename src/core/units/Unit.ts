@@ -6,6 +6,10 @@ export default abstract class Unit {
     this.value = value;
   }
 
+  get roundedValue() {
+    return this.value.toFixed(2).replace(/\.?0+$/, '');
+  }
+
   toString(): string {
     return this.value.toString();
   }

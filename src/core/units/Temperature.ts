@@ -1,10 +1,6 @@
 import Unit from './Unit';
 
-export class Temperature extends Unit {
-  get roundedValue() {
-    return this.value.toFixed(2).replace(/\.?0+$/, '');
-  }
-}
+export class Temperature extends Unit {}
 
 export class Celsius extends Temperature {
   unit: string = 'celsius';
