@@ -7,17 +7,9 @@ describe('parseObject', () => {
   it('Should recognise properties structured as units', () => {
     const input = {
       test: 'Do not touch',
-      something: {
-        value: 1,
-      },
-      unknownUnit: {
-        value: 42,
-        unit: 'answers',
-      },
-      convert: {
-        value: 25,
-        unit: 'celsius',
-      },
+      something: 1,
+      'unknownUnit[answers]': 42,
+      'convert[celsius]': 25,
     };
 
     const output = parseObject(input);
@@ -33,15 +25,9 @@ describe('parseObject', () => {
     const input = {
       data: {
         test: 'Do not touch',
-        convert: {
-          value: 25,
-          unit: 'celsius',
-        },
+        'convert[celsius]': 25,
         evenDeeper: {
-          convert: {
-            value: 60,
-            unit: 'fahrenheit',
-          },
+          'convert[fahrenheit]': 60,
         },
       },
     };
