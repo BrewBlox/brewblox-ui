@@ -6,28 +6,43 @@
       </q-toolbar-title>
     </q-toolbar>
 
-    <q-list>
-      <q-item class="grid-items-2">
-        <q-item-main>
-          <q-item-tile sublabel>Sensor</q-item-tile>
-          <q-item-tile
-            label
-            class="q-headline"
-          >
-            {{ sensor.state.value | unit }}
-          </q-item-tile>
-        </q-item-main>
-        <q-item-main>
-          <q-item-tile sublabel>Setpoint</q-item-tile>
-          <q-input
-            v-model="inputs.setpoint"
-            type="number"
-            :suffix="sensor.state.value.unitNotation"
-            numeric-keyboard-toggle
-          />
-        </q-item-main>
-      </q-item>
-    </q-list>
+    <q-card>
+      <q-card-main>
+        <q-list>
+          <q-item class="grid-items-2">
+            <q-item-main>
+              <q-item-tile sublabel>Sensor</q-item-tile>
+              <q-item-tile
+                label
+                class="q-headline"
+              >
+                {{ sensor.state.value | unit }}
+              </q-item-tile>
+            </q-item-main>
+            <q-item-main>
+              <q-item-tile sublabel>Setpoint</q-item-tile>
+              <q-input
+                v-model="inputs.setpoint"
+                type="number"
+                :suffix="sensor.state.value.unitNotation"
+                numeric-keyboard-toggle
+              />
+            </q-item-main>
+          </q-item>
+        </q-list>
+      </q-card-main>
+      <q-card-separator />
+      <q-card-actions align="end">
+        <q-btn
+          icon="check"
+          :color="setpointChanged ? 'primary' : 'light'"
+          :disable="!setpointChanged"
+          @click="save"
+        >
+          Save changes
+        </q-btn>
+      </q-card-actions>
+    </q-card>
   </div>
 </template>
 

@@ -31,6 +31,10 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
     return getSetPointById(this.$store, `${serviceId}/${links.setpoint}`);
   }
 
+  get setpointChanged() {
+    return this.setPoint.settings.value !== this.inputs.setpoint;
+  }
+
   save() {
     // persist(this.$store, {
     //   id: this.block.id,
