@@ -1,6 +1,16 @@
 import fromObject from './fromObject';
 
-function parseProperty(input: any): any {
+const extractUnit = /^([a-zA-Z0-9_.\-[\]]+)\[([a-zA-Z]+)]$/;
+
+function propertyNameWithoutUnit(name: string): string {
+  const matched = name.match(extractUnit);
+
+  return matched ? matched[1] : name;
+}
+
+function parseProperty(key: string, inputObject: any): any {
+  const input = inputObject[key];
+
   if (
     input !== null &&
     typeof input === 'object'
@@ -28,7 +38,7 @@ export default function parseObject(input: any): any {
     .reduce(
       (acc, key) => ({
         ...acc,
-        [key]: parseProperty(input[key]),
+        [propertyNameWithoutUnit(key)]: parseProperty(key, input),
       }),
       {},
     );
