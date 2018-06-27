@@ -6,30 +6,32 @@
       </q-toolbar-title>
     </q-toolbar>
 
-    <q-card>
-      <q-list>
-        <q-item>
-          <q-item-tile sublabel>Sensor value</q-item-tile>
-          <q-item-tile
-            label
-            class="q-headline"
-          >
-            10 Co
-          </q-item-tile>
-        </q-item>
-        <q-item-separator />
-        <q-item>
-          <q-item-tile sublabel>Set point</q-item-tile>
-          <div>Input hier</div>
-        </q-item>
-      </q-list>
-    </q-card>
+    <q-list>
+      <q-item>
+        <q-item-tile sublabel>Sensor value</q-item-tile>
+        <q-item-tile
+          label
+          class="q-headline"
+        >
+          {{ sensor.state.value | unit }}
+        </q-item-tile>
+      </q-item>
+      <q-item-separator />
+      <q-item>
+        <q-item-tile sublabel>Setpoint</q-item-tile>
+        <div>Input hier</div>
+      </q-item>
+    </q-list>
   </div>
 </template>
 
 <script lang="ts" src="./SensorSetPointPair.ts" />
 
 <style scoped>
+.q-list {
+  border: 0;
+}
+
 .q-item {
   display: block;
 }
