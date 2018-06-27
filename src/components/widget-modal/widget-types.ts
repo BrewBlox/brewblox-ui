@@ -1,5 +1,3 @@
-import Vue from 'vue';
-
 import { RootStore } from '@/store/state';
 import { Block } from '@/store/blocks/state';
 import { DeviceService } from '@/store/services/state';

@@ -15,7 +15,9 @@ export interface SensorSetPointPairPersisted {
   };
 }
 
-export interface SensorSetPointPairCreate extends NewBlockBase, SensorSetPointPairPersisted {
+export interface SensorSetPointPairCreateNew extends NewBlockBase, SensorSetPointPairPersisted {}
+
+export interface SensorSetPointPairCreate extends SensorSetPointPairCreateNew {
   type: 'SensorSetPointPair';
 }
 
