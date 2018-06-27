@@ -139,7 +139,10 @@
         "order": 2,
         "cols": 3,
         "rows": 3,
-        "widget": "OneWireTempSensor"
+        "widget": "SensorSetPointPair",
+        "options": {
+          "block": "controller-1/sensor-setpoint-pair-1"
+        }
       }
     },
     {
