@@ -1,7 +1,7 @@
 import Unit from './Unit';
 import { Celsius, Fahrenheit } from './Temperature';
 
-export default function unitFromObject({ unit, value }: { unit: string, value: number }): Unit {
+export default function unitFromObject(value: number, unit: string): Unit {
   switch (unit) {
     // Temperatures
     case 'celsius':

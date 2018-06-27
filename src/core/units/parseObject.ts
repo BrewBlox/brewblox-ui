@@ -15,19 +15,17 @@ function parseProperty(key: string, inputObject: any): any {
     input !== null &&
     typeof input === 'object'
   ) {
-    if (
-      Object.keys(input).length === 2 &&
-      'value' in input &&
-      'unit' in input
-    ) {
-      try {
-        return fromObject(input);
-      } catch (e) {
-        return input;
-      }
-    }
-
     return parseObject(input); // eslint-disable-line
+  }
+
+  const matched = key.match(extractUnit);
+
+  if (matched) {
+    try {
+      return fromObject(input, matched[2]);
+    } catch (e) {
+      return input;
+    }
   }
 
   return input;
