@@ -11,6 +11,10 @@ import BlockWidget from '../BlockWidget';
 
 @Component
 export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
+  inputMapping = {
+    setpoint: { path: 'setPoint.settings.value', default: 0 },
+  };
+
   get blockData(): SensorSetPointPairBlock {
     return this.block as SensorSetPointPairBlock;
   }

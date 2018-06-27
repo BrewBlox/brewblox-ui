@@ -6,12 +6,16 @@ export default abstract class Unit {
     this.value = value;
   }
 
-  get roundedValue() {
-    return this.value.toFixed(2).replace(/\.?0+$/, '');
+  get unitNotation(): string {
+    return '';
+  }
+
+  get roundedValue(): string {
+    return this.value.toFixed(2);
   }
 
   toString(): string {
-    return this.value.toString();
+    return `${this.roundedValue} ${this.unitNotation}`;
   }
 
   toJSON() {

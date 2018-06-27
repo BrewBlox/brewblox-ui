@@ -7,19 +7,25 @@
     </q-toolbar>
 
     <q-list>
-      <q-item>
-        <q-item-tile sublabel>Sensor value</q-item-tile>
-        <q-item-tile
-          label
-          class="q-headline"
-        >
-          {{ sensor.state.value | unit }}
-        </q-item-tile>
-      </q-item>
-      <q-item-separator />
-      <q-item>
-        <q-item-tile sublabel>Setpoint</q-item-tile>
-        <div>Input hier</div>
+      <q-item class="grid-items-2">
+        <q-item-main>
+          <q-item-tile sublabel>Sensor</q-item-tile>
+          <q-item-tile
+            label
+            class="q-headline"
+          >
+            {{ sensor.state.value | unit }}
+          </q-item-tile>
+        </q-item-main>
+        <q-item-main>
+          <q-item-tile sublabel>Setpoint</q-item-tile>
+          <q-input
+            v-model="inputs.setpoint"
+            type="number"
+            :suffix="sensor.state.value.unitNotation"
+            numeric-keyboard-toggle
+          />
+        </q-item-main>
       </q-item>
     </q-list>
   </div>
@@ -33,6 +39,11 @@
 }
 
 .q-item {
-  display: block;
+  display: grid;
+  grid-gap: 10px;
+}
+
+.grid-items-2 {
+  grid-template-columns: 1fr 1fr;
 }
 </style>
