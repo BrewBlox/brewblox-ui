@@ -18,10 +18,7 @@ export default abstract class Unit {
     return `${this.roundedValue} ${this.unitNotation}`;
   }
 
-  toJSON() {
-    return {
-      value: this.value,
-      unit: this.unit,
-    };
+  toJSON(): number {
+    return this.value;
   }
 }

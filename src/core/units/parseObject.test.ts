@@ -1,9 +1,9 @@
 import Unit from './Unit';
 import { Celsius, Fahrenheit } from './Temperature';
 
-import parseObject from './parseObject';
+import { deserialize, serialize } from './parseObject';
 
-describe('parseObject', () => {
+describe('deserialize', () => {
   it('Should recognise properties structured as units', () => {
     const input = {
       test: 'Do not touch',
@@ -12,7 +12,7 @@ describe('parseObject', () => {
       'convert[celsius]': 25,
     };
 
-    const output = parseObject(input);
+    const output = deserialize(input);
 
     expect(output.test).toBe('Do not touch');
     expect(output.something).not.toBeInstanceOf(Unit);
@@ -32,7 +32,7 @@ describe('parseObject', () => {
       },
     };
 
-    const output = parseObject(input);
+    const output = deserialize(input);
 
     expect(output.data.test).toBe('Do not touch');
     expect(output.data.convert).toBeInstanceOf(Unit);
@@ -48,8 +48,30 @@ describe('parseObject', () => {
       nothing: null,
     };
 
-    const output = parseObject(input);
+    const output = deserialize(input);
 
     expect(input).toEqual(output);
+  });
+});
+
+describe('serialize', () => {
+  it('Converts unit properties for API saving', () => {
+    const input = {
+      temperature: new Celsius(21),
+      leaveThisBe: 666,
+      deeper: {
+        temperatureInUSA: new Fahrenheit(60),
+      },
+    };
+
+    const output = {
+      'temperature[celsius]': 21,
+      leaveThisBe: 666,
+      deeper: {
+        'temperatureInUSA[farhenheit]': 60,
+      },
+    };
+
+    expect(serialize(input)).toEqual(output);
   });
 });

@@ -7,13 +7,13 @@ function parseProperty(key: string, inputObject: any): any {
     input !== null &&
     typeof input === 'object'
   ) {
-    return parseObject(input); // eslint-disable-line
+    return deserialize(input); // eslint-disable-line
   }
 
   return convertToUnit(key, input);
 }
 
-export default function parseObject(input: any): any {
+export function deserialize(input: any): any {
   return Object.keys(input)
     .reduce(
       (acc, key) => ({
@@ -22,4 +22,8 @@ export default function parseObject(input: any): any {
       }),
       {},
     );
+}
+
+export function serialize(input: any): any {
+  return input;
 }
