@@ -34,23 +34,19 @@ export function convertToUnit(key: string, value: any): Unit {
 }
 
 function deserializeProperty(key: string, inputObject: any, input = inputObject[key]): any {
-  if (Array.isArray(input)) {
-    return input.map(item => convertToUnit(key, item)); // eslint-disable-line
-  }
-
   if (
     input !== null &&
     typeof input === 'object'
   ) {
-    return deserialize(input); // eslint-disable-line
+    return deserialize(input, key); // eslint-disable-line
   }
 
   return convertToUnit(key, input);
 }
 
-export function deserialize(input: any): any {
+export function deserialize(input: any, key: string = ''): any {
   if (Array.isArray(input)) {
-    return input.map(item => deserializeProperty('', null, item));
+    return input.map(item => deserializeProperty(key, null, item));
   }
 
   return Object.keys(input)
