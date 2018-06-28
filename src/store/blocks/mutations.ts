@@ -2,8 +2,6 @@ import Vue from 'vue';
 import { getStoreAccessors } from 'vuex-typescript';
 import { merge } from 'lodash';
 
-import { deserialize } from '@/core/units/parseObject';
-
 import { Block, BlocksState, BlockSave, BlockStateUpdate } from './state';
 import { State as RootState } from '../state';
 
@@ -17,7 +15,7 @@ const mutations = {
     state.allIds.push(id);
 
     // insert data into blocks object
-    state.byId[id] = { ...deserialize(block), isLoading: false };
+    state.byId[id] = { ...block, isLoading: false };
   },
   updateBlockInStore(state: BlocksState, block: BlockStateUpdate | BlockSave) {
     const id = `${block.serviceId}/${block.id}`;
