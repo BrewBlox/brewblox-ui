@@ -68,7 +68,7 @@ describe('serialize', () => {
       'temperature[celsius]': 21,
       leaveThisBe: 666,
       deeper: {
-        'temperatureInUSA[farhenheit]': 60,
+        'temperatureInUSA[fahrenheit]': 60,
       },
     };
 
