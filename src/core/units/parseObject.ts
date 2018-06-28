@@ -1,12 +1,4 @@
-import fromObject from './fromObject';
-
-const extractUnit = /^([a-zA-Z0-9_.\-[\]]+)\[([a-zA-Z]+)]$/;
-
-function propertyNameWithoutUnit(name: string): string {
-  const matched = name.match(extractUnit);
-
-  return matched ? matched[1] : name;
-}
+import { convertToUnit, propertyNameWithoutUnit } from './convertUnit';
 
 function parseProperty(key: string, inputObject: any): any {
   const input = inputObject[key];
@@ -18,17 +10,7 @@ function parseProperty(key: string, inputObject: any): any {
     return parseObject(input); // eslint-disable-line
   }
 
-  const matched = key.match(extractUnit);
-
-  if (matched) {
-    try {
-      return fromObject(input, matched[2]);
-    } catch (e) {
-      return input;
-    }
-  }
-
-  return input;
+  return convertToUnit(key, input);
 }
 
 export default function parseObject(input: any): any {
