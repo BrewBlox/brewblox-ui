@@ -101,4 +101,22 @@ describe('serialize', () => {
 
     expect(serialize(input)).toEqual(output);
   });
+
+  it('Handles root arrays correctly', () => {
+    const input = [
+      20,
+      {
+        test: new Celsius(23),
+      },
+    ];
+
+    const output = [
+      20,
+      {
+        'test[celsius]': 23,
+      },
+    ];
+
+    expect(serialize(input)).toEqual(output);
+  });
 });

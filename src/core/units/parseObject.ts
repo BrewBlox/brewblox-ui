@@ -12,6 +12,13 @@ export function propertyNameWithoutUnit(name: string): string {
 function propertyNameWithUnit(key: string, inputObject: any): string {
   const input = inputObject[key];
 
+  if (
+    Array.isArray(input) &&
+    input[0] instanceof Unit
+  ) {
+    return `${key}[${input[0].unit}]`;
+  }
+
   if (input instanceof Unit) {
     return `${key}[${input.unit}]`;
   }
@@ -44,9 +51,9 @@ function deserializeProperty(key: string, inputObject: any, input = inputObject[
   return convertToUnit(key, input);
 }
 
-export function deserialize(input: any, key: string = ''): any {
+export function deserialize(input: any, prevKey: string = ''): any {
   if (Array.isArray(input)) {
-    return input.map(item => deserializeProperty(key, null, item));
+    return input.map(item => deserializeProperty(prevKey, null, item));
   }
 
   return Object.keys(input)
@@ -59,21 +66,23 @@ export function deserialize(input: any, key: string = ''): any {
     );
 }
 
-function serializeProperty(key: string, inputObject: any): any {
-  const input = inputObject[key];
-
+function serializeProperty(key: string, inputObject: any, input = inputObject[key]): any {
   if (input instanceof Unit) {
     return input.value;
   }
 
   if (typeof input === 'object') {
-    return serialize(input); // eslint-disable-line
+    return serialize(input, key); // eslint-disable-line
   }
 
   return input;
 }
 
-export function serialize(input: any): any {
+export function serialize(input: any, prevKey: string = ''): any {
+  if (Array.isArray(input)) {
+    return input.map(item => serializeProperty(prevKey, null, item));
+  }
+
   return Object.keys(input)
     .reduce(
       (acc, key) => ({
