@@ -10,6 +10,8 @@ describe('deserialize', () => {
       something: 1,
       'unknownUnit[answers]': 42,
       'convert[celsius]': 25,
+      normal: [21, 22, 23],
+      'array[celsius]': [21, 22, 23],
     };
 
     const output = deserialize(input);
@@ -19,6 +21,8 @@ describe('deserialize', () => {
     expect(output.unknownUnit).not.toBeInstanceOf(Unit);
     expect(output.convert).toBeInstanceOf(Unit);
     expect(output.convert).toBeInstanceOf(Celsius);
+    expect(output.normal[0]).toBe(21);
+    expect(output.array[0]).toBeInstanceOf(Celsius);
   });
 
   it('Should recognise deep properties structured as units', () => {
@@ -59,6 +63,9 @@ describe('serialize', () => {
     const input = {
       temperature: new Celsius(21),
       leaveThisBe: 666,
+      handleArray: [new Celsius(22), new Celsius(23), new Celsius(24)],
+      normalArray: [22, 23, 24],
+      emptyArray: [],
       deeper: {
         temperatureInUSA: new Fahrenheit(60),
       },
@@ -67,6 +74,9 @@ describe('serialize', () => {
     const output = {
       'temperature[celsius]': 21,
       leaveThisBe: 666,
+      'handleArray[celsius]': [22, 23, 24],
+      normalArray: [22, 23, 24],
+      emptyArray: [],
       deeper: {
         'temperatureInUSA[fahrenheit]': 60,
       },
