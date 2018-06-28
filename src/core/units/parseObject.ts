@@ -33,9 +33,7 @@ export function convertToUnit(key: string, value: any): Unit {
   return value;
 }
 
-function deserializeProperty(key: string, inputObject: any): any {
-  const input = inputObject[key];
-
+function deserializeProperty(key: string, inputObject: any, input = inputObject[key]): any {
   if (Array.isArray(input)) {
     return input.map(item => convertToUnit(key, item)); // eslint-disable-line
   }
@@ -51,6 +49,10 @@ function deserializeProperty(key: string, inputObject: any): any {
 }
 
 export function deserialize(input: any): any {
+  if (Array.isArray(input)) {
+    return input.map(item => deserializeProperty('', null, item));
+  }
+
   return Object.keys(input)
     .reduce(
       (acc, key) => ({

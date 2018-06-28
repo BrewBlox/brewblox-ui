@@ -56,6 +56,23 @@ describe('deserialize', () => {
 
     expect(input).toEqual(output);
   });
+
+  it('Should handle when input is an array', () => {
+    const input = [
+      {
+        'convert[celsius]': 25,
+      },
+      25,
+      'do not touch',
+    ];
+
+    const output = deserialize(input);
+
+    expect(output).toBeInstanceOf(Array);
+    expect(output[0].convert).toBeInstanceOf(Celsius);
+    expect(output[1]).toBe(25);
+    expect(output[2]).toBe('do not touch');
+  });
 });
 
 describe('serialize', () => {

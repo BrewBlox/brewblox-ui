@@ -12,10 +12,7 @@ function toJson(result: Promise<Response>): Promise<any> {
       return response;
     })
     .then(response => response.json())
-    .then((data) => {
-      console.log(data);
-      deserialize(data);
-    });
+    .then(data => deserialize(data));
 }
 
 export function get(url: string): Promise<any> {
