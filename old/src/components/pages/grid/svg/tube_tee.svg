@@ -1,5 +1,0 @@
-<svg viewBox="0 0 50 50" width="50" height="50">
-  <path d="M50,21H30a1,1,0,0,1-1-1V0"/>
-  <path d="M21,0V20a1,1,0,0,1-1,1H0"/>
-  <line class="line" y1="29" x2="50" y2="29"/>
-</svg>
