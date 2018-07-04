@@ -1,5 +1,6 @@
 <template>
   <component
+    class="ProcessViewPart"
     :part="part"
     :is="component"
   />
@@ -15,7 +16,7 @@ import componentByType from './Parts/componentByType';
 @Component({
   props: {
     part: {
-      type: [Object],
+      type: Object,
       default: () => { throw new Error('Provide part information'); },
     },
   },
@@ -32,6 +33,18 @@ export default class ProcessViewItem extends Vue {
 }
 </script>
 
-<style scoped>
+<style>
+.ProcessViewPart {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
 
+.ProcessViewPart path {
+  stroke: #fff;
+  stroke-width: 2pt;
+  stroke-linecap: round;
+  fill: none;
+}
 </style>

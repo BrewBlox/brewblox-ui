@@ -1,37 +1,35 @@
-import Vue from 'vue';
-import Component from 'vue-class-component';
+import SVGStraight from './tube_straight.svg';
+import SVGInput from './tube_input.svg';
+import SVGOutput from './tube_output.svg';
+import SVGElbow from './tube_elbow.svg';
+import SVGTee from './tube_tee.svg';
 
-@Component
-export class Straight extends Vue {
-  render(createElement: Function) {
-    return createElement('span', 'Straight');
+import Part from '../Part';
+
+export class Straight extends Part {
+  partRender = (createElement: Function) => createElement(SVGStraight);
+}
+
+export class Input extends Part {
+  partRender = (createElement: Function) => {
+    return createElement(SVGInput);
   }
 }
 
-@Component
-export class Input extends Vue {
-  render(createElement: Function) {
-    return createElement('span', 'Input');
+export class Output extends Part {
+  partRender = (createElement: Function) => {
+    return createElement(SVGOutput);
   }
 }
 
-@Component
-export class Output extends Vue {
-  render(createElement: Function) {
-    return createElement('span', 'Output');
+export class Elbow extends Part {
+  partRender = (createElement: Function) => {
+    return createElement(SVGElbow);
   }
 }
 
-@Component
-export class Elbow extends Vue {
-  render(createElement: Function) {
-    return createElement('span', 'Elbow');
-  }
-}
-
-@Component
-export class Tee extends Vue {
-  render(createElement: Function) {
-    return createElement('span', 'Tee');
+export class Tee extends Part {
+  partRender = (createElement: Function) => {
+    return createElement(SVGTee);
   }
 }
