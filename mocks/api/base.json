@@ -161,6 +161,18 @@
           }]
         }
       }
+    },
+    {
+      "id": "item-4",
+      "data": {
+        "order": 1,
+        "cols": 2,
+        "rows": 3,
+        "widget": "ProcessView",
+        "options": {
+          "name": "Simple flow setup"
+        }
+      }
     }
   ],
   "dashboards": [
@@ -178,6 +190,14 @@
         "title": "Metrics Dashboard",
         "order": 2,
         "items": ["item-3"]
+      }
+    },
+    {
+      "id": "process-view",
+      "data": {
+        "title": "Process View Dashboard",
+        "order": 3,
+        "items": ["item-4"]
       }
     }
   ],

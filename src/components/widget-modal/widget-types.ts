@@ -10,6 +10,7 @@ import { deviceServices } from '@/store/services/getters';
 
 export const widgetTypes: { [key in WidgetType]: string } = {
   Metrics: 'Metrics',
+  ProcessView: 'Process View',
   PID: 'PID',
   OneWireTempSensor: 'Temperature Sensor',
   SetPointSimple: 'SetPoint',
@@ -45,6 +46,7 @@ export function blocksByWidgetType(store: RootStore, type: WidgetType): Block[] 
 
 export const widgetComponents: { [name in WidgetType]: () => Promise<any> } = {
   Metrics: () => import('@/components/widgets/Metrics/Create.vue'),
+  ProcessView: () => import('@/components/widgets/ProcessView/Create.vue'),
   PID: () => import('@/components/blocks/PID/Create.vue'),
   OneWireTempSensor: () => import('@/components/blocks/OneWireTempSensor/Create.vue'),
   SetPointSimple: () => import('@/components/blocks/SetPointSimple/Create.vue'),

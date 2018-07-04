@@ -2,6 +2,7 @@ import { DashboardItem } from '@/store/dashboards/state';
 
 import PID from './PID/PID.vue';
 import Metrics from './Metrics/Metrics.vue';
+import ProcessView from './ProcessView/ProcessView.vue';
 import SensorSetPointPair from './SensorSetPointPair/SensorSetPointPair.vue';
 import Placeholder from './Placeholder.vue';
 
@@ -11,6 +12,8 @@ function componentByType(type: WidgetType) {
       return PID;
     case 'Metrics':
       return Metrics;
+    case 'ProcessView':
+      return ProcessView;
     case 'SensorSetPointPair':
       return SensorSetPointPair;
     case 'OneWireTempSensor':
