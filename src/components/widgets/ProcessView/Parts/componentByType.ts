@@ -9,5 +9,9 @@ const parts: { [name in ProcessViewPartType]: any } = {
 };
 
 export default function componentByType(type: ProcessViewPartType) {
+  if (!parts[type]) {
+    throw new Error(`Cannot find ProcessView part '${type}'`);
+  }
+
   return parts[type];
 }
