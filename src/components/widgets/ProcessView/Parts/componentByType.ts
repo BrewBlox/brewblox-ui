@@ -1,4 +1,4 @@
-import { Straight, Input, Output, Elbow, Tee } from '@/components/widgets/ProcessView/Parts/Tubes';
+import { Straight, Input, Output, Elbow, Tee } from '@/components/widgets/ProcessView/Parts/Tubes/Tubes';
 
 const parts: { [name in ProcessViewPartType]: any } = {
   TUBE_STRAIGHT: Straight,
