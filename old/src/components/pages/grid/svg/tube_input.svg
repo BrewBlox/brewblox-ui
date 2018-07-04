@@ -1,7 +1,0 @@
-<svg viewBox="0 0 50 50" width="50" height="50">
-  <polyline points="1.25 17.5 8.75 25 1.25 32.5"/>
-  <polyline points="9.13 19.25 14.88 25 9.13 30.75"/>
-  <polyline points="17 21 21 25 17 29"/>
-  <line x1="30" y1="21" x2="50" y2="21"/>
-  <line x1="30" y1="29" x2="50" y2="29"/>
-</svg>
