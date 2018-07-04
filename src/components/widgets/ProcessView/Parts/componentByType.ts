@@ -1,11 +1,11 @@
-import { Straight } from '@/components/widgets/ProcessView/Parts/Tubes';
+import { Straight, Input, Output, Elbow, Tee } from '@/components/widgets/ProcessView/Parts/Tubes';
 
 const parts: { [name in ProcessViewPartType]: any } = {
   TUBE_STRAIGHT: Straight,
-  TUBE_INPUT: null,
-  TUBE_OUTPUT: null,
-  TUBE_ELBOW: null,
-  TUBE_TEE: null,
+  TUBE_INPUT: Input,
+  TUBE_OUTPUT: Output,
+  TUBE_ELBOW: Elbow,
+  TUBE_TEE: Tee,
 };
 
 export default function componentByType(type: ProcessViewPartType) {
