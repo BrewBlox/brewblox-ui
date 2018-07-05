@@ -12,7 +12,11 @@
       <path d="M25,0V20a5,5,0,0,0,5,5H50"/>
     </g>
     <g class="outline">
-      <FlowArrow />
+      <FlowArrow
+        :rotate="arrow(frame).rotate"
+        :x="arrow(frame).x"
+        :y="arrow(frame).y"
+      />
     </g>
   </SVGRoot>
 </template>
@@ -33,7 +37,15 @@ import FlowArrow from '../Flows/FlowArrow.vue';
   },
 })
 /* eslint-enable */
-class ElbowTube extends Part {}
+class ElbowTube extends Part {
+  arrow(frame: number) {
+    return {
+      rotate: 0,
+      x: 0,
+      y: 0,
+    };
+  }
+}
 
 export default ElbowTube;
 </script>

@@ -60,7 +60,7 @@ class StraightTube extends Part {
 
     return {
       x: this.direction === 90 ? 50 - x : x,
-      y: 21,
+      y: 23,
     };
   }
 }

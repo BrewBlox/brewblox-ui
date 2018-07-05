@@ -16,11 +16,13 @@
     </g>
     <g class="outline">
       <FlowArrow
+        :rotate="direction"
         :opacity="opacity(arrow.x)"
         :x="arrow.x"
         :y="arrow.y"
       />
       <FlowArrow
+        :rotate="direction"
         :opacity="opacity(arrow.x + 25)"
         :x="arrow.x + 25"
         :y="arrow.y"
@@ -46,6 +48,8 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 })
 /* eslint-enable */
 class InputTube extends Part {
+  direction: number = 270;
+
   opacity(xPosition: number): number {
     const opacity = (xPosition - 23) / 5;
 
@@ -63,7 +67,7 @@ class InputTube extends Part {
   get arrow() {
     return {
       x: this.frame * 50,
-      y: 21,
+      y: 23,
     };
   }
 }
