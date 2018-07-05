@@ -17,6 +17,24 @@
         :x="arrow(frame).x"
         :y="arrow(frame).y"
       />
+
+      <FlowArrow
+        :rotate="arrow(frame - 1).rotate"
+        :x="arrow(frame - 1).x"
+        :y="arrow(frame - 1).y"
+      />
+
+      <FlowArrow
+        :rotate="arrow(frame - 0.5).rotate"
+        :x="arrow(frame - 0.5).x"
+        :y="arrow(frame - 0.5).y"
+      />
+
+      <FlowArrow
+        :rotate="arrow(frame + 0.5).rotate"
+        :x="arrow(frame + 0.5).x"
+        :y="arrow(frame + 0.5).y"
+      />
     </g>
   </SVGRoot>
 </template>
@@ -38,11 +56,24 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 })
 /* eslint-enable */
 class ElbowTube extends Part {
+  direction: number = 0;
+
   arrow(frame: number) {
+    const pos = this.direction === 0 ? frame * 50 : 42 - (frame * 50);
+
+    const rotateFrame = this.direction === 0 ? 0.43 : 0.36;
+    const rotateDir = this.direction === 0 ? -90 : 90;
+
+    const rotate = frame > rotateFrame ?
+      (rotateDir < 0 ? Math.max : Math.min)(
+        this.direction + rotateDir,
+        this.direction + (rotateDir * ((frame - rotateFrame) / 0.15)),
+      ) : this.direction;
+
     return {
-      rotate: 0,
-      x: 0,
-      y: 0,
+      rotate,
+      x: pos > 21 ? pos : 21,
+      y: pos > 23 ? 23 : pos,
     };
   }
 }
