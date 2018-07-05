@@ -56,7 +56,7 @@ export default ProcessViewWidget;
 </script>
 
 <template>
-  <div>
+  <div class="ProcessView">
     <div
       class="grid-base"
       :style="style"
@@ -77,15 +77,19 @@ export default ProcessViewWidget;
 <style lang="stylus" scoped>
 @import '../../../css/app.styl';
 
+.ProcessView.dashboard-item {
+  background: none;
+}
+
 .grid-base {
   display: grid;
   grid-auto-columns: 50px;
   grid-auto-rows: 50px;
-  background-image: linear-gradient($white 1px, transparent 1px),
-    linear-gradient(90deg, $white 1px, transparent 1px);
+  background-image: linear-gradient($dark_bright 1px, transparent 1px),
+    linear-gradient(90deg, $dark_bright 1px, transparent 1px);
   background-size: 50px 50px, 50px 50px;
   background-position: 0 -1px, -1px 0;
-  border: 1px solid $white;
+  border: 1px solid $dark_bright;
 }
 
 .grid-item {
