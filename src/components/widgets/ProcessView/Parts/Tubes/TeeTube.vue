@@ -15,7 +15,11 @@
       <path d="M25,0V20a5,5,0,0,0,5,5H50"/>
     </g>
     <g class="outline">
-      <FlowArrow />
+      <FlowArrow
+        :rotate="arrow(frame).rotate"
+        :x="arrow(frame).x"
+        :y="arrow(frame).y"
+      />
     </g>
   </SVGRoot>
 </template>
@@ -36,7 +40,17 @@ import FlowArrow from '../Flows/FlowArrow.vue';
   },
 })
 /* eslint-enable */
-class TeeTube extends Part {}
+class TeeTube extends Part {
+  directionDefault: number = 270;
+
+  arrow(frame: number) {
+    return {
+      rotate: this.direction,
+      x: frame * 50,
+      y: 23,
+    };
+  }
+}
 
 export default TeeTube;
 </script>
