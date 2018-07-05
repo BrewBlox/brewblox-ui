@@ -12,7 +12,22 @@
       <line y1="25" x2="50" y2="25"/>
     </g>
     <g class="outline">
-      <FlowArrow />
+      <FlowArrow
+        :x="arrow.x"
+        :y="arrow.y"
+      />
+      <FlowArrow
+        :x="arrow.x - 50"
+        :y="arrow.y"
+      />
+      <FlowArrow
+        :x="arrow.x + 25"
+        :y="arrow.y"
+      />
+      <FlowArrow
+        :x="arrow.x - 25"
+        :y="arrow.y"
+      />
     </g>
   </SVGRoot>
 </template>
@@ -33,7 +48,15 @@ import FlowArrow from '../Flows/FlowArrow.vue';
   },
 })
 /* eslint-enable */
-class StraightTube extends Part {}
+class StraightTube extends Part {
+  get arrow() {
+    return {
+      rotate: this.frame * 360,
+      x: this.frame * 50,
+      y: 21,
+    };
+  }
+}
 
 export default StraightTube;
 </script>

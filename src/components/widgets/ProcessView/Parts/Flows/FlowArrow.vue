@@ -1,9 +1,47 @@
 <template>
-  <polyline points="10.5 21 14.5 25 10.5 29" />
+  <polyline
+    :transform="transform"
+    :points="points"
+  />
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue';
+import Component from 'vue-class-component';
 
+/* eslint-disable */
+@Component({
+  props: {
+    rotate: {
+      type: Number,
+      default: 0,
+    },
+    x: {
+      type: Number,
+      default: 0,
+    },
+    y: {
+      type: Number,
+      default: 0,
+    }
+  },
+})
+/* eslint-enable */
+class FlowArrow extends Vue {
+  get points() {
+    const { x, y } = this.$props;
+
+    return `${x},${y} ${x + 4},${y + 4} ${x},${y + 8}`;
+  }
+
+  get transform() {
+    const { rotate, x, y } = this.$props;
+
+    return `rotate(${rotate}, ${x + 2}, ${y + 4})`;
+  }
+}
+
+export default FlowArrow;
 </script>
 
 <style scoped>
