@@ -1,5 +1,6 @@
 <template>
   <polyline
+    :opacity="opacity"
     :transform="transform"
     :points="points"
   />
@@ -12,6 +13,10 @@ import Component from 'vue-class-component';
 /* eslint-disable */
 @Component({
   props: {
+    opacity: {
+      type: Number,
+      default: 1,
+    },
     rotate: {
       type: Number,
       default: 0,
@@ -37,7 +42,11 @@ class FlowArrow extends Vue {
   get transform() {
     const { rotate, x, y } = this.$props;
 
-    return `rotate(${rotate}, ${x + 2}, ${y + 4})`;
+    if (rotate) {
+      return `rotate(${rotate}, ${x + 2}, ${y + 4})`;
+    }
+
+    return '';
   }
 }
 

@@ -15,7 +15,16 @@
       <line x1="30" y1="25" x2="50" y2="25"/>
     </g>
     <g class="outline">
-      <FlowArrow />
+      <FlowArrow
+        :opacity="opacity(arrow.x)"
+        :x="arrow.x"
+        :y="arrow.y"
+      />
+      <FlowArrow
+        :opacity="opacity(arrow.x + 25)"
+        :x="arrow.x + 25"
+        :y="arrow.y"
+      />
     </g>
   </SVGRoot>
 </template>
@@ -36,7 +45,28 @@ import FlowArrow from '../Flows/FlowArrow.vue';
   },
 })
 /* eslint-enable */
-class InputTube extends Part {}
+class InputTube extends Part {
+  opacity(xPosition: number): number {
+    const opacity = (xPosition - 23) / 5;
+
+    if (opacity < 0) {
+      return 0;
+    }
+
+    if (opacity > 1) {
+      return 1;
+    }
+
+    return opacity;
+  }
+
+  get arrow() {
+    return {
+      x: this.frame * 50,
+      y: 21,
+    };
+  }
+}
 
 export default InputTube;
 </script>
