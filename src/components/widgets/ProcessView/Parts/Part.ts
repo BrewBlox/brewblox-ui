@@ -8,22 +8,32 @@ import Component from 'vue-class-component';
       type: Object,
       default: () => { throw new Error('Provide part information'); },
     },
+    liquid: {
+      type: Number,
+      default: null,
+    },
+    power: {
+      type: Boolean,
+      default: false,
+    },
   },
 })
 /* eslint-enable */
 export default class Part extends Vue {
+  get partData(): ProcessViewPart {
+    return this.$props.part;
+  }
+
   partRender = (createElement: Function): Vue => {
     throw new Error('Overwrite partRender method');
   }
 
   render(createElement: Function) {
-    const part = this.$props.part as ProcessViewPart;
-
     return createElement(
       'div',
       {
         style: {
-          transform: `rotate(${part.rotate}deg)`,
+          transform: `rotate(${this.partData.rotate}deg)`,
         },
       },
       [this.partRender(createElement)],

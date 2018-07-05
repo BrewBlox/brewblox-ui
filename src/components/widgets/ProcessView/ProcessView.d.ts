@@ -6,8 +6,9 @@ type ProcessViewPartType =
   'TUBE_ELBOW';
 
 type ProcessViewPart = {
+  type: ProcessViewPartType;
   x: number;
   y: number;
   rotate: number;
-  type: ProcessViewPartType;
+  flipped?: boolean;
 };
