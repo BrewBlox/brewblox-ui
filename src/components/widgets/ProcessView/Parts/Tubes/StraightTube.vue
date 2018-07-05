@@ -13,18 +13,22 @@
     </g>
     <g class="outline">
       <FlowArrow
+        :rotate="direction"
         :x="arrow.x"
         :y="arrow.y"
       />
       <FlowArrow
+        :rotate="direction"
         :x="arrow.x - 50"
         :y="arrow.y"
       />
       <FlowArrow
+        :rotate="direction"
         :x="arrow.x + 25"
         :y="arrow.y"
       />
       <FlowArrow
+        :rotate="direction"
         :x="arrow.x - 25"
         :y="arrow.y"
       />
@@ -49,9 +53,13 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 })
 /* eslint-enable */
 class StraightTube extends Part {
+  direction: number = 0;
+
   get arrow() {
+    const x = this.frame * 50;
+
     return {
-      x: this.frame * 50,
+      x: this.direction === 180 ? 50 - x : x,
       y: 21,
     };
   }
