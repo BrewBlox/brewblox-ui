@@ -12,6 +12,10 @@ import Component from 'vue-class-component';
       type: Number,
       default: null,
     },
+    flowing: {
+      type: Boolean,
+      default: false,
+    },
     power: {
       type: Boolean,
       default: false,
@@ -20,23 +24,7 @@ import Component from 'vue-class-component';
 })
 /* eslint-enable */
 export default class Part extends Vue {
-  get partData(): ProcessViewPart {
-    return this.$props.part;
-  }
-
-  partRender = (createElement: Function): Vue => {
-    throw new Error('Overwrite partRender method');
-  }
-
-  render(createElement: Function) {
-    return createElement(
-      'div',
-      {
-        style: {
-          transform: `rotate(${this.partData.rotate}deg)`,
-        },
-      },
-      [this.partRender(createElement)],
-    );
+  get flipped(): boolean {
+    return Boolean(this.$props.part && this.$props.part.flipped);
   }
 }

@@ -1,6 +1,7 @@
 <template>
   <component
     class="ProcessViewPart"
+    :style="style"
     :part="part"
     :is="component"
   />
@@ -23,6 +24,12 @@ import componentByType from './Parts/componentByType';
 })
 /* eslint-enable */
 export default class ProcessViewItem extends Vue {
+  get style() {
+    return {
+      transform: `rotate(${this.$props.part.rotate}deg)`,
+    };
+  }
+
   get partType(): ProcessViewPartType {
     return this.$props.part.type as ProcessViewPartType;
   }
@@ -44,10 +51,17 @@ export default class ProcessViewItem extends Vue {
   height: 100%;
 }
 
-.ProcessViewPart path {
-  stroke: #fff;
-  stroke-width: 2pt;
+.ProcessViewPart {
+  stroke-width: 2px;
   stroke-linecap: round;
   fill: none;
+}
+
+.ProcessViewPart .outline {
+  stroke: #fff;
+}
+
+.ProcessViewPart .liquid {
+  stroke-width: 6px;
 }
 </style>
