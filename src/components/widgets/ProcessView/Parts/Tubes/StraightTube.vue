@@ -53,13 +53,13 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 })
 /* eslint-enable */
 class StraightTube extends Part {
-  direction: number = 0;
+  direction: number = 270;
 
   get arrow() {
     const x = this.frame * 50;
 
     return {
-      x: this.direction === 180 ? 50 - x : x,
+      x: this.direction === 90 ? 50 - x : x,
       y: 21,
     };
   }
