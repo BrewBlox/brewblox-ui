@@ -51,7 +51,6 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 class StraightTube extends Part {
   get arrow() {
     return {
-      rotate: this.frame * 360,
       x: this.frame * 50,
       y: 21,
     };
