@@ -48,7 +48,7 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 })
 /* eslint-enable */
 class InputTube extends Part {
-  direction: number = 270;
+  directionDefault: number = 270;
 
   opacity(xPosition: number): number {
     const opacity = (xPosition - 23) / 5;

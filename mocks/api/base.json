@@ -190,7 +190,8 @@
               "x": 2,
               "y": 1,
               "type": "TUBE_ELBOW",
-              "rotate": 180
+              "rotate": 180,
+              "direction": 90
             },
             {
               "x": 2,
@@ -220,19 +221,22 @@
               "x": 3,
               "y": 2,
               "type": "TUBE_STRAIGHT",
-              "rotate": 90
+              "rotate": 90,
+              "direction": 90
             },
             {
               "x": 3,
               "y": 1,
               "type": "TUBE_STRAIGHT",
-              "rotate": 90
+              "rotate": 90,
+              "direction": 90
             },
             {
               "x": 3,
               "y": 0,
               "type": "TUBE_STRAIGHT",
-              "rotate": 90
+              "rotate": 90,
+              "direction": 90
             }
           ]
         }

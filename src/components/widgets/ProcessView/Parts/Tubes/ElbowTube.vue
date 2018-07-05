@@ -56,7 +56,7 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 })
 /* eslint-enable */
 class ElbowTube extends Part {
-  direction: number = 0;
+  directionDefault: number = 0;
 
   arrow(frame: number) {
     const pos = this.direction === 0 ? frame * 50 : 42 - (frame * 50);
