@@ -87,8 +87,9 @@ class TeeTube extends Part {
 
   static flows() {
     return {
-      0: [90],
-      90: [0],
+      0: [90, 270],
+      90: [0, 270],
+      270: [0, 90],
     };
   }
 

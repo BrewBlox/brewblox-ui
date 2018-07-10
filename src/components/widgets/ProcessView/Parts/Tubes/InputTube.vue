@@ -57,7 +57,7 @@ class InputTube extends Part {
 
   static flows() {
     return {
-      270: [0],
+      270: [90],
     };
   }
 

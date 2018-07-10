@@ -61,6 +61,13 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 class ElbowTube extends Part {
   directionDefault: number = 0;
 
+  static flows() {
+    return {
+      0: [90],
+      90: [0],
+    };
+  }
+
   arrow(frame: number) {
     const pos = this.direction === 0 ? frame * 50 : 42 - (frame * 50);
 
