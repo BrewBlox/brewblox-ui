@@ -11,7 +11,10 @@
     >
       <path d="M25,0V20a5,5,0,0,0,5,5H50"/>
     </g>
-    <g class="outline">
+    <g
+      v-if="flowing"
+      class="outline"
+    >
       <FlowArrow
         :rotate="arrow(frame).rotate"
         :x="arrow(frame).x"

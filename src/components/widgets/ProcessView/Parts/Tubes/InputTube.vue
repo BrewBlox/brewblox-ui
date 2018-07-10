@@ -14,7 +14,10 @@
     >
       <line x1="30" y1="25" x2="50" y2="25"/>
     </g>
-    <g class="outline">
+    <g
+      v-if="flowing"
+      class="outline"
+    >
       <FlowArrow
         :rotate="direction"
         :opacity="opacity(arrow.x)"
