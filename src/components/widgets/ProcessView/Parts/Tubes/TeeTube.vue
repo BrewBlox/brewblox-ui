@@ -85,14 +85,14 @@ class TeeTube extends Part {
   arrow(frame: number) {
     return {
       rotate: this.direction,
-      x: frame * 50,
+      x: this.direction === 90 ? (1 - frame) * 50 : frame * 50,
       y: 23,
     };
   }
 
   arrowUp(frame: number) {
     return {
-      rotate: this.direction - 90,
+      rotate: this.direction === 90 ? this.direction + 90 : this.direction - 90,
       x: 21,
       y: ((1 - frame) * 50) - 6,
       opacity: frame < 0.55 ? 0 : 1,
