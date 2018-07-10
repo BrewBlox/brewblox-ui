@@ -13,3 +13,15 @@ type ProcessViewPart = {
   direction?: number;
   flipped?: boolean;
 };
+
+type ProcessViewPartFlows = {
+  [angleIn: number]: number[];
+};
+
+type ProcessViewPartWithComponent = {
+  component: {
+    isSource?: boolean;
+    isSink?: boolean;
+    flows: () => ProcessViewPartFlows;
+  };
+} & ProcessViewPart;

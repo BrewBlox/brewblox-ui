@@ -4,6 +4,8 @@ import Component from 'vue-class-component';
 import Widget from '../Widget';
 
 import ProcessViewItem from './ProcessViewItem.vue';
+import componentByType from './Parts/componentByType';
+import { calculateFlows } from './calculateFlows';
 
 /* eslint-disable */
 @Component({
@@ -31,8 +33,11 @@ class ProcessViewWidget extends Widget {
     return this.options.parts;
   }
 
-  gridStyle(amount: number): string {
-    return Array(amount).fill('').map(() => `${this.size}px`).join(' ');
+  get partsWithComponent(): ProcessViewPartWithComponent[] {
+    return this.parts.map(part => ({
+      ...part,
+      component: componentByType(part.type),
+    }));
   }
 
   get style(): any {
@@ -42,6 +47,14 @@ class ProcessViewWidget extends Widget {
       gridTemplateColumns: this.gridStyle(this.width),
       gridTemplateRows: this.gridStyle(this.height),
     };
+  }
+
+  get possibleFlows() {
+    return calculateFlows(this.partsWithComponent);
+  }
+
+  gridStyle(amount: number): string {
+    return Array(amount).fill('').map(() => `${this.size}px`).join(' ');
   }
 
   partStyle(part: ProcessViewPart): any {
@@ -61,6 +74,7 @@ export default ProcessViewWidget;
       class="grid-base"
       :style="style"
     >
+      {{ possibleFlows }}
       <div
         class="grid-item"
         v-for="part in parts"

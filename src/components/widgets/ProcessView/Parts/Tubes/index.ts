@@ -11,10 +11,3 @@ export {
   ElbowTube,
   TeeTube,
 };
-
-// export class Elbow extends Part {
-//   partRender = (createElement: Function) => {
-//     return createElement(SVGElbow, { class: 'outline' });
-//   }
-// }
-

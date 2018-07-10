@@ -58,6 +58,13 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 class StraightTube extends Part {
   directionDefault: number = 270;
 
+  static flows() {
+    return {
+      270: [90],
+      90: [270],
+    };
+  }
+
   get arrow() {
     const x = this.frame * 50;
 

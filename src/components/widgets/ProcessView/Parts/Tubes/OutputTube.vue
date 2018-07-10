@@ -61,6 +61,14 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 class OutputTube extends Part {
   directionDefault: number = 270;
 
+  static isSink = true;
+
+  static flows() {
+    return {
+      270: [0],
+    };
+  }
+
   opacity(xPosition: number): number {
     const opacity = 1 - ((xPosition - 15) / 5);
 

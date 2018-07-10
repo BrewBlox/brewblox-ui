@@ -85,6 +85,13 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 class TeeTube extends Part {
   directionDefault: number = 270;
 
+  static flows() {
+    return {
+      0: [90],
+      90: [0],
+    };
+  }
+
   arrow(frame: number) {
     return {
       rotate: this.direction,
