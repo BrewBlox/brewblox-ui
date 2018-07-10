@@ -20,6 +20,45 @@
         :x="arrow(frame).x"
         :y="arrow(frame).y"
       />
+
+      <FlowArrow
+        :rotate="arrow(frame).rotate"
+        :x="arrow(frame + 0.5).x"
+        :y="arrow(frame).y"
+      />
+
+      <FlowArrow
+        :rotate="arrow(frame).rotate"
+        :x="arrow(frame - 0.5).x"
+        :y="arrow(frame).y"
+      />
+
+      <FlowArrow
+        :rotate="arrow(frame).rotate"
+        :x="arrow(frame - 1).x"
+        :y="arrow(frame).y"
+      />
+
+      <FlowArrow
+        :rotate="arrowUp(frame).rotate"
+        :x="arrowUp(frame).x"
+        :y="arrowUp(frame).y"
+        :opacity="arrowUp(frame).opacity"
+      />
+
+      <FlowArrow
+        :rotate="arrowUp(frame).rotate"
+        :x="arrowUp(frame).x"
+        :y="arrowUp(frame + 0.5).y"
+        :opacity="arrowUp(frame + 0.5).opacity"
+      />
+
+      <FlowArrow
+        :rotate="arrowUp(frame).rotate"
+        :x="arrowUp(frame).x"
+        :y="arrowUp(frame + 1).y"
+        :opacity="arrowUp(frame + 1).opacity"
+      />
     </g>
   </SVGRoot>
 </template>
@@ -48,6 +87,15 @@ class TeeTube extends Part {
       rotate: this.direction,
       x: frame * 50,
       y: 23,
+    };
+  }
+
+  arrowUp(frame: number) {
+    return {
+      rotate: this.direction - 90,
+      x: 21,
+      y: ((1 - frame) * 50) - 6,
+      opacity: frame < 0.55 ? 0 : 1,
     };
   }
 }

@@ -203,7 +203,7 @@
               "x": 2,
               "y": 3,
               "type": "TUBE_TEE",
-              "rotate": 0
+              "rotate": 90
             },
             {
               "x": 2,
