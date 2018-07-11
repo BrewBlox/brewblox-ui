@@ -5,7 +5,7 @@ import Widget from '../Widget';
 
 import ProcessViewItem from './ProcessViewItem.vue';
 import componentByType from './Parts/componentByType';
-import { calculateFlows } from './calculateFlows';
+import { calculateFlows, pathsFromSources } from './calculateFlows';
 
 /* eslint-disable */
 @Component({
@@ -33,11 +33,19 @@ class ProcessViewWidget extends Widget {
     return this.options.parts;
   }
 
+  get pathsFromSources(): any {
+    return pathsFromSources(this.partsWithComponent);
+  }
+
   get partsWithComponent(): ProcessViewPartWithComponent[] {
     return this.parts.map(part => ({
       ...part,
       component: componentByType(part.type),
     }));
+  }
+
+  get flows() {
+    return calculateFlows(this.pathsFromSources);
   }
 
   get style(): any {
@@ -47,10 +55,6 @@ class ProcessViewWidget extends Widget {
       gridTemplateColumns: this.gridStyle(this.width),
       gridTemplateRows: this.gridStyle(this.height),
     };
-  }
-
-  get flows() {
-    return calculateFlows(this.partsWithComponent);
   }
 
   gridStyle(amount: number): string {

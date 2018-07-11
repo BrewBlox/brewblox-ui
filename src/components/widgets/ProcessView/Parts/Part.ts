@@ -8,14 +8,6 @@ import Component from 'vue-class-component';
       type: Object,
       default: () => { throw new Error('Provide part information'); },
     },
-    liquid: {
-      type: Number,
-      default: null,
-    },
-    flowing: {
-      type: Boolean,
-      default: false,
-    },
     power: {
       type: Boolean,
       default: false,
@@ -24,12 +16,28 @@ import Component from 'vue-class-component';
 })
 /* eslint-enable */
 export default class Part extends Vue {
-  runFrames: boolean = true;
+  runFrames: boolean = false;
   frame: number = 0;
   directionDefault: number = 0;
 
   get direction(): number {
     return (this.$props.part && this.$props.part.direction) || this.directionDefault;
+  }
+
+  get flowing(): boolean {
+    return this.flowingFrom > -1 && this.flowingTo.length > 0;
+  }
+
+  get flowingFrom(): number {
+    return typeof this.$props.part.flowingFrom === 'number' ? this.$props.part.flowingFrom : -1;
+  }
+
+  get flowingTo(): number[] {
+    return (this.$props.part && this.$props.part.flowingTo) || [];
+  }
+
+  get liquid() {
+    return this.flowingFrom > -1;
   }
 
   get flipped(): boolean {

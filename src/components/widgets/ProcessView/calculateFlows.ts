@@ -95,18 +95,17 @@ function flow(
   };
 }
 
-function pathsFromSources(parts: ProcessViewPartWithComponent[]): partWithFlow[] {
+export function pathsFromSources(parts: ProcessViewPartWithComponent[]): partWithFlow[] {
   const sources = getSources(parts);
 
   return sources.map(source => flow(source, parts));
 }
 
-function determineFlows(paths: partWithFlow[]): any {
+function determineFlows(paths: partWithFlow[], fromAngle: number = 90): any {
   return paths.reduce((acc: any, item) => {
-    const angleItems = flatten(Object.keys(item.to).map(angle => item.to[parseInt(angle, 10)]));
-
     const part = {
       ...item,
+      flowingFrom: rotated(fromAngle, 180),
       flowingTo: Object.keys(item.to)
         .map((angle) => {
           if (item.to[parseInt(angle, 10)].length > 0) {
@@ -123,13 +122,12 @@ function determineFlows(paths: partWithFlow[]): any {
     return [
       ...acc,
       part,
-      ...determineFlows(angleItems),
+      ...flatten(Object.keys(item.to)
+        .map(angle => determineFlows(item.to[parseInt(angle, 10)], parseInt(angle, 10)))),
     ];
   }, []);
 }
 
-export function calculateFlows(parts: ProcessViewPartWithComponent[]): any {
-  const paths = pathsFromSources(parts);
-
+export function calculateFlows(paths: partWithFlow[]): any {
   return determineFlows(paths);
 }

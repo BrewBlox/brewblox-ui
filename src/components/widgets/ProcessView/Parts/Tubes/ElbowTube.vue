@@ -59,8 +59,6 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 })
 /* eslint-enable */
 class ElbowTube extends Part {
-  directionDefault: number = 0;
-
   static flows() {
     return {
       0: [90],

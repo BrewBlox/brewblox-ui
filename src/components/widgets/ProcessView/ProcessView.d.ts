@@ -10,6 +10,7 @@ type ProcessViewPart = {
   x: number;
   y: number;
   rotate: number;
+  flowingFrom?: number;
   flowingTo?: number[];
   flipped?: boolean;
 };
