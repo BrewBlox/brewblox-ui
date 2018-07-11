@@ -49,13 +49,22 @@ class ProcessViewWidget extends Widget {
     };
   }
 
-  get possibleFlows() {
-    console.log(calculateFlows(this.partsWithComponent));
-    return '';
+  get flows() {
+    return calculateFlows(this.partsWithComponent);
   }
 
   gridStyle(amount: number): string {
     return Array(amount).fill('').map(() => `${this.size}px`).join(' ');
+  }
+
+  combineFlow(part: ProcessViewPart) {
+    const enrichedPart = this.flows.find((flowPart: ProcessViewPart) =>
+      flowPart.x === part.x &&
+      flowPart.y === part.y &&
+      flowPart.type === part.type &&
+      flowPart.rotate === part.rotate);
+
+    return enrichedPart || part;
   }
 
   partStyle(part: ProcessViewPart): any {
@@ -75,7 +84,6 @@ export default ProcessViewWidget;
       class="grid-base"
       :style="style"
     >
-      {{ possibleFlows }}
       <div
         class="grid-item"
         v-for="part in parts"
@@ -83,7 +91,7 @@ export default ProcessViewWidget;
         :style="partStyle(part)"
       >
         <span class="grid-item-coordinates">{{ part.x }},{{ part.y }}</span>
-        <process-view-item :part="part" />
+        <process-view-item :part="combineFlow(part)" />
       </div>
     </div>
   </div>

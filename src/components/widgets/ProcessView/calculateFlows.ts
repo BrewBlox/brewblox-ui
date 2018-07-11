@@ -1,4 +1,4 @@
-import { flattenDeep } from 'lodash';
+import { flatten } from 'lodash';
 
 function rotated(original: number, rotation: number) {
   return (original + rotation) % 360;
@@ -65,11 +65,15 @@ function partsAtAngle(
   return allParts.filter(part => part.x === x && part.y === y);
 }
 
+/* eslint-disable */
+type partWithFlow = ProcessViewPartWithComponent & { to: { [angle: number]: partWithFlow[] } };
+/* eslint-enable */
+
 function flow(
   part: ProcessViewPartWithComponent,
   allParts: ProcessViewPartWithComponent[],
   inflow: number = 0,
-): any {
+): partWithFlow {
   const { rotate, component } = part;
 
   // rotate flows
@@ -78,21 +82,54 @@ function flow(
 
   const possibleOutputs = flows[flowFrom] || [];
 
-  return [
-    {
-      ...part,
-      possibleOutputs,
-    },
-    ...possibleOutputs
-      .map((angle) => {
+  return {
+    ...part,
+    to: possibleOutputs
+      .reduce((acc, angle) => {
         const nextParts = partsAtAngle(part, allParts, angle);
-        return nextParts.map(nextPart => flow(nextPart, allParts, rotated(angle, 180)));
-      }),
-  ];
+        return {
+          ...acc,
+          [angle]: nextParts.map(nextPart => flow(nextPart, allParts, rotated(angle, 180))),
+        };
+      }, {}),
+  };
+}
+
+function pathsFromSources(parts: ProcessViewPartWithComponent[]): partWithFlow[] {
+  const sources = getSources(parts);
+
+  return sources.map(source => flow(source, parts));
+}
+
+function determineFlows(paths: partWithFlow[]): any {
+  return paths.reduce((acc: any, item) => {
+    const angleItems = flatten(Object.keys(item.to).map(angle => item.to[parseInt(angle, 10)]));
+
+    const part = {
+      ...item,
+      flowingTo: Object.keys(item.to)
+        .map((angle) => {
+          if (item.to[parseInt(angle, 10)].length > 0) {
+            return parseInt(angle, 10);
+          }
+
+          return null;
+        })
+        .filter(angle => angle !== null),
+    };
+    delete part.to;
+    delete part.component;
+
+    return [
+      ...acc,
+      part,
+      ...determineFlows(angleItems),
+    ];
+  }, []);
 }
 
 export function calculateFlows(parts: ProcessViewPartWithComponent[]): any {
-  const sources = getSources(parts);
+  const paths = pathsFromSources(parts);
 
-  return sources.map(source => flattenDeep(flow(source, parts)));
+  return determineFlows(paths);
 }

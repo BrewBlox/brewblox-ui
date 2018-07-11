@@ -190,8 +190,7 @@
               "x": 2,
               "y": 1,
               "type": "TUBE_ELBOW",
-              "rotate": 180,
-              "direction": 90
+              "rotate": 180
             },
             {
               "x": 2,
@@ -214,8 +213,7 @@
             {
               "x": 3,
               "y": 3,
-              "type": "TUBE_STRAIGHT",
-              "direction": 270
+              "type": "TUBE_STRAIGHT"
             },
             {
               "x": 4,
@@ -227,22 +225,25 @@
               "x": 4,
               "y": 2,
               "type": "TUBE_STRAIGHT",
-              "rotate": 90,
-              "direction": 90
+              "rotate": 90
             },
             {
               "x": 4,
               "y": 1,
               "type": "TUBE_STRAIGHT",
-              "rotate": 90,
-              "direction": 90
+              "rotate": 90
             },
             {
               "x": 4,
               "y": 0,
               "type": "TUBE_STRAIGHT",
-              "rotate": 90,
-              "direction": 90
+              "rotate": 90
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "type": "TUBE_STRAIGHT",
+              "rotate": 0
             }
           ]
         }
