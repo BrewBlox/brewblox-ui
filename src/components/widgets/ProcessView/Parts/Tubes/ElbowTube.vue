@@ -66,6 +66,10 @@ class ElbowTube extends Part {
     };
   }
 
+  get direction() {
+    return this.flowingFrom;
+  }
+
   arrow(frame: number) {
     const pos = this.direction === 0 ? frame * 50 : 42 - (frame * 50);
 

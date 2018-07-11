@@ -16,13 +16,8 @@ import Component from 'vue-class-component';
 })
 /* eslint-enable */
 export default class Part extends Vue {
-  runFrames: boolean = false;
+  runFrames: boolean = true;
   frame: number = 0;
-  directionDefault: number = 0;
-
-  get direction(): number {
-    return (this.$props.part && this.$props.part.direction) || this.directionDefault;
-  }
 
   get flowing(): boolean {
     return this.flowingFrom > -1 && this.flowingTo.length > 0;

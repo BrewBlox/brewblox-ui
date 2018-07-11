@@ -103,13 +103,16 @@ export function pathsFromSources(parts: ProcessViewPartWithComponent[]): partWit
 
 function determineFlows(paths: partWithFlow[], fromAngle: number = 90): any {
   return paths.reduce((acc: any, item) => {
+    const rotate = item.rotate || 0;
+
     const part = {
       ...item,
-      flowingFrom: rotated(fromAngle, 180),
+      flowingFrom: rotated(fromAngle, (180 - rotate)),
       flowingTo: Object.keys(item.to)
         .map((angle) => {
-          if (item.to[parseInt(angle, 10)].length > 0) {
-            return parseInt(angle, 10);
+          const angleTo = parseInt(angle, 10);
+          if (item.to[angleTo].length > 0) {
+            return rotated(angleTo, 360 - rotate);
           }
 
           return null;

@@ -83,14 +83,16 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 })
 /* eslint-enable */
 class TeeTube extends Part {
-  directionDefault: number = 270;
-
   static flows() {
     return {
       0: [90, 270],
       90: [0, 270],
       270: [0, 90],
     };
+  }
+
+  get direction() {
+    return this.flowingFrom;
   }
 
   arrow(frame: number) {

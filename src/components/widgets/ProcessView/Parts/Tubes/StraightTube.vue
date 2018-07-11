@@ -56,13 +56,15 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 })
 /* eslint-enable */
 class StraightTube extends Part {
-  directionDefault: number = 270;
-
   static flows() {
     return {
       270: [90],
       90: [270],
     };
+  }
+
+  get direction() {
+    return this.flowingFrom;
   }
 
   get arrow() {

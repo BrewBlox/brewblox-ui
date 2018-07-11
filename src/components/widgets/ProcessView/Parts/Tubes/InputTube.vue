@@ -19,13 +19,13 @@
       class="outline"
     >
       <FlowArrow
-        :rotate="direction"
+        :rotate="270"
         :opacity="opacity(arrow.x)"
         :x="arrow.x"
         :y="arrow.y"
       />
       <FlowArrow
-        :rotate="direction"
+        :rotate="270"
         :opacity="opacity(arrow.x + 25)"
         :x="arrow.x + 25"
         :y="arrow.y"
@@ -51,8 +51,6 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 })
 /* eslint-enable */
 class InputTube extends Part {
-  directionDefault: number = 270;
-
   static isSource = true;
 
   static flows() {
