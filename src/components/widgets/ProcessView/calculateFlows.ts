@@ -1,8 +1,13 @@
+import { flattenDeep } from 'lodash';
+
 function rotated(original: number, rotation: number) {
   return (original + rotation) % 360;
 }
 
-export function rotatedFlows(flows: ProcessViewPartFlows, rotation: number): ProcessViewPartFlows {
+export function rotatedFlows(
+  flows: ProcessViewPartFlows,
+  rotation: number = 0,
+): ProcessViewPartFlows {
   return Object.keys(flows)
     .reduce((acc, angle) => ({
       ...acc,
@@ -73,22 +78,21 @@ function flow(
 
   const possibleOutputs = flows[flowFrom] || [];
 
-  return {
-    ...part,
-    out: possibleOutputs.map((angle) => {
-      const nextParts = partsAtAngle(part, allParts, angle);
-
-      if (nextParts.length === 0) {
-        return part;
-      }
-
-      return nextParts.map(nextPart => flow(nextPart, allParts, rotated(angle, 180)));
-    }),
-  };
+  return [
+    {
+      ...part,
+      possibleOutputs,
+    },
+    ...possibleOutputs
+      .map((angle) => {
+        const nextParts = partsAtAngle(part, allParts, angle);
+        return nextParts.map(nextPart => flow(nextPart, allParts, rotated(angle, 180)));
+      }),
+  ];
 }
 
 export function calculateFlows(parts: ProcessViewPartWithComponent[]): any {
   const sources = getSources(parts);
 
-  return sources.map(source => flow(source, parts));
+  return sources.map(source => flattenDeep(flow(source, parts)));
 }

@@ -50,7 +50,6 @@ class ProcessViewWidget extends Widget {
   }
 
   get possibleFlows() {
-    // TODO CHECK TUBE_STRAIGHT NAAR ELBOW OP 3,3
     console.log(calculateFlows(this.partsWithComponent));
     return '';
   }
