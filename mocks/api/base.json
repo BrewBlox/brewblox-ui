@@ -318,7 +318,7 @@
               "x": 4,
               "y": 1,
               "type": "TUBE_ELBOW",
-              "rotate": 0
+              "rotate": 180
             },
             {
               "x": 3,
@@ -353,7 +353,15 @@
       "data": {
         "title": "Process View Dashboard",
         "order": 3,
-        "items": ["item-4", "item-5"]
+        "items": ["item-4"]
+      }
+    },
+    {
+      "id": "process-view-2",
+      "data": {
+        "title": "Process View Dashboard 2",
+        "order": 4,
+        "items": ["item-5"]
       }
     }
   ],
