@@ -56,18 +56,29 @@ function xyAtAngle(part: ProcessViewPartWithComponent, angle: number): { x: numb
   };
 }
 
-function partsAtAngle(
+function partAtAngle(
   origin: ProcessViewPartWithComponent,
   allParts: ProcessViewPartWithComponent[],
   angle: number,
-): ProcessViewPartWithComponent[] {
+): ProcessViewPartWithComponent | undefined {
   const { x, y } = xyAtAngle(origin, angle);
-  return allParts.filter(part => part.x === x && part.y === y);
+  const partsOnPosition = allParts.filter(part => part.x === x && part.y === y);
+  return partsOnPosition.find((part) => {
+    const flows = rotatedFlows(part.component.flows(), part.rotate);
+    return !!flows[rotated(angle, 180)];
+  });
+}
+
+function isPart(original: ProcessViewPartWithComponent, compare: ProcessViewPartWithComponent) {
+  return original.x === compare.x &&
+    original.y === compare.y &&
+    original.type === compare.type &&
+    original.rotate === compare.rotate;
 }
 
 /* eslint-disable */
 type partWithFlow = ProcessViewPartWithComponent & {
-  to: { [angle: number]: partWithFlow[] },
+  to: { [angle: number]: partWithFlow },
 };
 /* eslint-enable */
 
@@ -75,6 +86,7 @@ function flow(
   part: ProcessViewPartWithComponent,
   allParts: ProcessViewPartWithComponent[],
   inflow: number = 0,
+  pressure: number = 0,
 ): partWithFlow {
   const { rotate, component } = part;
 
@@ -82,19 +94,37 @@ function flow(
   const flowFrom = liquidIn(part, inflow);
   const flows = rotatedFlows(component.flows(), rotate);
 
+  const enhancedParts = allParts.map((item) => {
+    if (isPart(part, item)) {
+      return { ...part, pressure };
+    }
+
+    return item;
+  });
   const possibleOutputs = flows[flowFrom] || [];
 
   const to = possibleOutputs
     .reduce((acc, angle) => {
-      const nextParts = partsAtAngle(part, allParts, angle);
+      const nextPart = partAtAngle(part, enhancedParts, angle);
+
+      if (!nextPart || typeof nextPart.pressure === 'number') {
+        return acc;
+      }
+
       return {
         ...acc,
-        [angle]: nextParts.map(nextPart => flow(nextPart, allParts, rotated(angle, 180))),
+        [angle]: flow(
+          nextPart,
+          enhancedParts,
+          rotated(angle, 180),
+          pressure - 1,
+        ),
       };
     }, {});
 
   return {
     ...part,
+    pressure,
     to,
   };
 }
@@ -112,7 +142,7 @@ function determineFlows(paths: partWithFlow[], fromAngle: number = 90): any {
     const flowingTo = Object.keys(item.to)
       .map((angle) => {
         const angleTo = parseInt(angle, 10);
-        if (item.to[angleTo].length > 0) {
+        if (item.to[angleTo]) {
           return rotated(angleTo, 360 - rotate);
         }
 
@@ -133,7 +163,7 @@ function determineFlows(paths: partWithFlow[], fromAngle: number = 90): any {
       ...acc,
       part,
       ...flatten(Object.keys(item.to)
-        .map(angle => determineFlows(item.to[parseInt(angle, 10)], parseInt(angle, 10)))),
+        .map(angle => determineFlows([item.to[parseInt(angle, 10)]], parseInt(angle, 10)))),
     ];
   }, []);
 }

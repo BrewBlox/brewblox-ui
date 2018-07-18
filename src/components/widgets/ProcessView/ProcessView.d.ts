@@ -25,4 +25,5 @@ type ProcessViewPartWithComponent = {
     isSink?: boolean;
     flows: () => ProcessViewPartFlows;
   };
+  pressure?: number;
 } & ProcessViewPart;
