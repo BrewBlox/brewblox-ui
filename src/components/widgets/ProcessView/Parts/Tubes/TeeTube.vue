@@ -8,7 +8,7 @@
     <g
       class="liquid"
       v-if="liquid"
-      stroke="#ff0000"
+      stroke="#4aa0ef"
     >
       <line y1="25" x2="50" y2="25"/>
       <path d="M0,25H20a5,5,0,0,0,5-5V0"/>

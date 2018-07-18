@@ -66,7 +66,10 @@ function partsAtAngle(
 }
 
 /* eslint-disable */
-type partWithFlow = ProcessViewPartWithComponent & { to: { [angle: number]: partWithFlow[] } };
+type partWithFlow = ProcessViewPartWithComponent & {
+  from?: number,
+  to: { [angle: number]: partWithFlow[] },
+};
 /* eslint-enable */
 
 function flow(
@@ -105,19 +108,21 @@ function determineFlows(paths: partWithFlow[], fromAngle: number = 90): any {
   return paths.reduce((acc: any, item) => {
     const rotate = item.rotate || 0;
 
+    const flowingTo = Object.keys(item.to)
+      .map((angle) => {
+        const angleTo = parseInt(angle, 10);
+        if (item.to[angleTo].length > 0) {
+          return rotated(angleTo, 360 - rotate);
+        }
+
+        return null;
+      })
+      .filter(angle => angle !== null);
+
     const part = {
       ...item,
-      flowingFrom: rotated(fromAngle, (180 - rotate)),
-      flowingTo: Object.keys(item.to)
-        .map((angle) => {
-          const angleTo = parseInt(angle, 10);
-          if (item.to[angleTo].length > 0) {
-            return rotated(angleTo, 360 - rotate);
-          }
-
-          return null;
-        })
-        .filter(angle => angle !== null),
+      flowingTo,
+      flowingFrom: flowingTo.length > 0 ? rotated(fromAngle, (180 - rotate)) : undefined,
     };
     delete part.to;
     delete part.component;

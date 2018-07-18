@@ -7,7 +7,7 @@
     <g
       class="liquid"
       v-if="liquid"
-      stroke="#ff0000"
+      stroke="#4aa0ef"
     >
       <path d="M25,0V20a5,5,0,0,0,5,5H50"/>
     </g>
@@ -85,7 +85,7 @@ class ElbowTube extends Part {
     return {
       rotate,
       x: pos > 21 ? pos : 21,
-      y: pos > 23 ? 23 : pos,
+      y: pos > 23 ? 23 : Math.min(23, pos + 2),
     };
   }
 }
