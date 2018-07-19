@@ -132,10 +132,49 @@ function flow(
   };
 }
 
+function isDeadEnd(part: partWithFlow): boolean {
+  const flowAngles = Object.keys(part.to);
+
+  if (flowAngles.length > 1 || part.component.isSink) {
+    return false;
+  }
+
+  if (flowAngles.length === 1) {
+    return isDeadEnd(part.to[parseInt(flowAngles[0], 10)]);
+  }
+
+  return true;
+}
+
+function filterDeadEnds(part: partWithFlow): partWithFlow {
+  const flowAngles = Object.keys(part.to);
+
+  if (flowAngles.length > 0) {
+    return {
+      ...part,
+      to: flowAngles.reduce((acc, angle) => {
+        const anglePart = part.to[parseInt(angle, 10)];
+
+        if (isDeadEnd(anglePart)) {
+          return acc;
+        }
+
+        return {
+          ...acc,
+          [angle]: filterDeadEnds(anglePart),
+        };
+      }, {}),
+    };
+  }
+
+  return part;
+}
+
 export function pathsFromSources(parts: ProcessViewPartWithComponent[]): partWithFlow[] {
   const sources = getSources(parts);
-
-  return sources.map(source => flow(source, parts));
+  const flows = sources.map(source => flow(source, parts));
+  const flowWithoutDeadEnds = flows.map(filterDeadEnds);
+  return flowWithoutDeadEnds;
 }
 
 function determineFlows(paths: partWithFlow[], fromAngle: number = 90): ProcessViewPartWithFlow[] {
