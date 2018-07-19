@@ -89,7 +89,7 @@ function flow(
   part: ProcessViewPartWithComponent,
   allParts: ProcessViewPartWithComponent[],
   inflow: number = 0,
-  pressure: number = 0,
+  friction: number = 0,
 ): partWithFlow {
   const { rotate, component } = part;
 
@@ -99,7 +99,7 @@ function flow(
 
   const enhancedParts = allParts.map((item) => {
     if (isPart(part, item)) {
-      return { ...part, pressure };
+      return { ...part, friction };
     }
 
     return item;
@@ -110,7 +110,7 @@ function flow(
     .reduce((acc, angle) => {
       const nextPart = partAtAngle(part, enhancedParts, angle);
 
-      if (!nextPart || typeof nextPart.pressure === 'number') {
+      if (!nextPart || typeof nextPart.friction === 'number') {
         return acc;
       }
 
@@ -120,14 +120,14 @@ function flow(
           nextPart,
           enhancedParts,
           rotated(angle, 180),
-          pressure - 1,
+          friction + 1,
         ),
       };
     }, {});
 
   return {
     ...part,
-    pressure,
+    friction,
     to,
   };
 }
@@ -178,7 +178,7 @@ export function calculateFlows(paths: partWithFlow[]): any {
     const prevPart = acc[partIndex] as ProcessViewPartWithFlow;
 
     if (partIndex > -1 && prevPart) {
-      if (part.pressure > prevPart.pressure) {
+      if (part.friction < prevPart.friction) {
         const newAcc = [...acc];
         newAcc.splice(partIndex, 1, part);
 

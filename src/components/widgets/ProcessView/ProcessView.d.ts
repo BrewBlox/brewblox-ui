@@ -25,11 +25,11 @@ type ProcessViewPartWithComponent = {
     isSink?: boolean;
     flows: () => ProcessViewPartFlows;
   };
-  pressure?: number;
+  friction?: number;
 } & ProcessViewPart;
 
 type ProcessViewPartWithFlow = {
   flowingFrom: number | number[];
   flowingTo: number[];
-  pressure: number;
+  friction: number;
 } & ProcessViewPart;
