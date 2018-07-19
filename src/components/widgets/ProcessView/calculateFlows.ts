@@ -69,7 +69,10 @@ function partAtAngle(
   });
 }
 
-function isPart(original: ProcessViewPartWithComponent, compare: ProcessViewPartWithComponent) {
+function isPart(
+  original: ProcessViewPartWithComponent | ProcessViewPartWithFlow,
+  compare: ProcessViewPartWithComponent | ProcessViewPartWithFlow,
+) {
   return original.x === compare.x &&
     original.y === compare.y &&
     original.type === compare.type &&
@@ -135,7 +138,7 @@ export function pathsFromSources(parts: ProcessViewPartWithComponent[]): partWit
   return sources.map(source => flow(source, parts));
 }
 
-function determineFlows(paths: partWithFlow[], fromAngle: number = 90): any {
+function determineFlows(paths: partWithFlow[], fromAngle: number = 90): ProcessViewPartWithFlow[] {
   return paths.reduce((acc: any, item) => {
     const rotate = item.rotate || 0;
 
@@ -169,5 +172,22 @@ function determineFlows(paths: partWithFlow[], fromAngle: number = 90): any {
 }
 
 export function calculateFlows(paths: partWithFlow[]): any {
-  return determineFlows(paths);
+  const allFlows = determineFlows(paths);
+  return allFlows.reduce((acc: ProcessViewPartWithFlow[], part: ProcessViewPartWithFlow) => {
+    const partIndex = acc.findIndex(item => isPart(part, item));
+    const prevPart = acc[partIndex] as ProcessViewPartWithFlow;
+
+    if (partIndex > -1 && prevPart) {
+      if (part.pressure > prevPart.pressure) {
+        const newAcc = [...acc];
+        newAcc.splice(partIndex, 1, part);
+
+        return newAcc;
+      }
+
+      return acc;
+    }
+
+    return [...acc, part];
+  }, []);
 }

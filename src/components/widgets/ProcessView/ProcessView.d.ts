@@ -27,3 +27,9 @@ type ProcessViewPartWithComponent = {
   };
   pressure?: number;
 } & ProcessViewPart;
+
+type ProcessViewPartWithFlow = {
+  flowingFrom: number | number[];
+  flowingTo: number[];
+  pressure: number;
+} & ProcessViewPart;
