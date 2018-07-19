@@ -135,8 +135,12 @@ function flow(
 function isDeadEnd(part: partWithFlow): boolean {
   const flowAngles = Object.keys(part.to);
 
-  if (flowAngles.length > 1 || part.component.isSink) {
+  if (part.component.isSink) {
     return false;
+  }
+
+  if (flowAngles.length > 1) {
+    return flowAngles.every(angle => isDeadEnd(part.to[parseInt(angle, 10)]));
   }
 
   if (flowAngles.length === 1) {
@@ -173,8 +177,7 @@ function filterDeadEnds(part: partWithFlow): partWithFlow {
 export function pathsFromSources(parts: ProcessViewPartWithComponent[]): partWithFlow[] {
   const sources = getSources(parts);
   const flows = sources.map(source => flow(source, parts));
-  const flowWithoutDeadEnds = flows.map(filterDeadEnds);
-  return flowWithoutDeadEnds;
+  return flows.map(filterDeadEnds);
 }
 
 function determineFlows(paths: partWithFlow[], fromAngle: number = 90): ProcessViewPartWithFlow[] {
