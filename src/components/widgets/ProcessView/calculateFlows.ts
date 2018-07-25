@@ -9,11 +9,14 @@ export function rotatedFlows(
   rotation: number = 0,
 ): ProcessViewPartFlows {
   return Object.keys(flows)
-    .reduce((acc, angle) => ({
-      ...acc,
-      [rotated(parseInt(angle, 10), rotation)]:
-        flows[parseInt(angle, 10)].map(flowAngle => rotated(flowAngle, rotation)),
-    }), {});
+    .reduce(
+      (acc, angle) => ({
+        ...acc,
+        [rotated(parseInt(angle, 10), rotation)]:
+          flows[parseInt(angle, 10)].map(flowAngle => rotated(flowAngle, rotation)),
+      }),
+      {},
+    );
 }
 
 function getSources(parts: ProcessViewPartWithComponent[]) {
@@ -107,23 +110,26 @@ function flow(
   const possibleOutputs = flows[flowFrom] || [];
 
   const to = possibleOutputs
-    .reduce((acc, angle) => {
-      const nextPart = partAtAngle(part, enhancedParts, angle);
+    .reduce(
+      (acc, angle) => {
+        const nextPart = partAtAngle(part, enhancedParts, angle);
 
-      if (!nextPart || typeof nextPart.friction === 'number') {
-        return acc;
-      }
+        if (!nextPart || typeof nextPart.friction === 'number') {
+          return acc;
+        }
 
-      return {
-        ...acc,
-        [angle]: flow(
-          nextPart,
-          enhancedParts,
-          rotated(angle, 180),
-          friction + 1,
-        ),
-      };
-    }, {});
+        return {
+          ...acc,
+          [angle]: flow(
+            nextPart,
+            enhancedParts,
+            rotated(angle, 180),
+            friction + 1,
+          ),
+        };
+      },
+      {},
+    );
 
   return {
     ...part,
@@ -156,18 +162,21 @@ function filterDeadEnds(part: partWithFlow): partWithFlow {
   if (flowAngles.length > 0) {
     return {
       ...part,
-      to: flowAngles.reduce((acc, angle) => {
-        const anglePart = part.to[parseInt(angle, 10)];
+      to: flowAngles.reduce(
+        (acc, angle) => {
+          const anglePart = part.to[parseInt(angle, 10)];
 
-        if (isDeadEnd(anglePart)) {
-          return acc;
-        }
+          if (isDeadEnd(anglePart)) {
+            return acc;
+          }
 
-        return {
-          ...acc,
-          [angle]: filterDeadEnds(anglePart),
-        };
-      }, {}),
+          return {
+            ...acc,
+            [angle]: filterDeadEnds(anglePart),
+          };
+        },
+        {},
+      ),
     };
   }
 
@@ -181,55 +190,61 @@ export function pathsFromSources(parts: ProcessViewPartWithComponent[]): partWit
 }
 
 function determineFlows(paths: partWithFlow[], fromAngle: number = 90): ProcessViewPartWithFlow[] {
-  return paths.reduce((acc: any, item) => {
-    const rotate = item.rotate || 0;
+  return paths.reduce(
+    (acc: any, item) => {
+      const rotate = item.rotate || 0;
 
-    const flowingTo = Object.keys(item.to)
-      .map((angle) => {
-        const angleTo = parseInt(angle, 10);
-        if (item.to[angleTo]) {
-          return rotated(angleTo, 360 - rotate);
-        }
+      const flowingTo = Object.keys(item.to)
+        .map((angle) => {
+          const angleTo = parseInt(angle, 10);
+          if (item.to[angleTo]) {
+            return rotated(angleTo, 360 - rotate);
+          }
 
-        return null;
-      })
-      .filter(angle => angle !== null);
+          return null;
+        })
+        .filter(angle => angle !== null);
 
-    const part = {
-      ...item,
-      flowingTo,
-      flowingFrom: flowingTo.length > 0 || item.component.isSink ?
-        rotated(fromAngle, (180 - rotate)) : undefined,
-    };
-    delete part.to;
-    delete part.component;
+      const part = {
+        ...item,
+        flowingTo,
+        flowingFrom: flowingTo.length > 0 || item.component.isSink ?
+          rotated(fromAngle, (180 - rotate)) : undefined,
+      };
+      delete part.to;
+      delete part.component;
 
-    return [
-      ...acc,
-      part,
-      ...flatten(Object.keys(item.to)
-        .map(angle => determineFlows([item.to[parseInt(angle, 10)]], parseInt(angle, 10)))),
-    ];
-  }, []);
+      return [
+        ...acc,
+        part,
+        ...flatten(Object.keys(item.to)
+          .map(angle => determineFlows([item.to[parseInt(angle, 10)]], parseInt(angle, 10)))),
+      ];
+    },
+    [],
+  );
 }
 
 export function calculateFlows(paths: partWithFlow[]): any {
   const allFlows = determineFlows(paths);
-  return allFlows.reduce((acc: ProcessViewPartWithFlow[], part: ProcessViewPartWithFlow) => {
-    const partIndex = acc.findIndex(item => isPart(part, item));
-    const prevPart = acc[partIndex] as ProcessViewPartWithFlow;
+  return allFlows.reduce(
+    (acc: ProcessViewPartWithFlow[], part: ProcessViewPartWithFlow) => {
+      const partIndex = acc.findIndex(item => isPart(part, item));
+      const prevPart = acc[partIndex] as ProcessViewPartWithFlow;
 
-    if (partIndex > -1 && prevPart) {
-      if (part.friction < prevPart.friction) {
-        const newAcc = [...acc];
-        newAcc.splice(partIndex, 1, part);
+      if (partIndex > -1 && prevPart) {
+        if (part.friction < prevPart.friction) {
+          const newAcc = [...acc];
+          newAcc.splice(partIndex, 1, part);
 
-        return newAcc;
+          return newAcc;
+        }
+
+        return acc;
       }
 
-      return acc;
-    }
-
-    return [...acc, part];
-  }, []);
+      return [...acc, part];
+    },
+    [],
+  );
 }
