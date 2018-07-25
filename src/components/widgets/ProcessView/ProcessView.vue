@@ -16,6 +16,8 @@ import { calculateFlows, pathsFromSources } from './calculateFlows';
 /* eslint-enable */
 class ProcessViewWidget extends Widget {
   size: number = 50;
+  frame: number = 0;
+  animationFrame: number = 0;
 
   get width(): number {
     return this.options.width;
@@ -77,6 +79,22 @@ class ProcessViewWidget extends Widget {
       gridRowStart: part.y + 1,
     };
   }
+
+  tickAnimation() {
+    this.animationFrame = window.requestAnimationFrame((timestamp) => {
+      this.frame = (timestamp % 2000) / 2000;
+
+      this.tickAnimation();
+    });
+  }
+
+  mounted() {
+    this.tickAnimation();
+  }
+
+  destroyed() {
+    window.cancelAnimationFrame(this.animationFrame);
+  }
 }
 
 export default ProcessViewWidget;
@@ -95,7 +113,7 @@ export default ProcessViewWidget;
         :style="partStyle(part)"
       >
         <span class="grid-item-coordinates">{{ part.x }},{{ part.y }}</span>
-        <process-view-item :part="combineFlow(part)" />
+        <process-view-item :part="combineFlow(part)" :frame="frame" />
       </div>
     </div>
   </div>

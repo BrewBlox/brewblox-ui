@@ -3,6 +3,7 @@
     class="ProcessViewPart"
     :style="style"
     :part="part"
+    :animationFrame="frame"
     :is="component"
   />
 </template>
@@ -19,6 +20,10 @@ import componentByType from './Parts/componentByType';
     part: {
       type: Object,
       default: () => { throw new Error('Provide part information'); },
+    },
+    frame: {
+      type: Number,
+      default: 0,
     },
   },
 })
