@@ -1,4 +1,4 @@
-import { allBlocks, blockById } from '../getters';
+import { allBlockFromService, blockById } from '../getters';
 
 import { SensorSetPointPairBlock } from './SensorSetPointPair';
 
@@ -16,7 +16,6 @@ export function getById(store: RootStore, id: string): SensorSetPointPairBlock {
 }
 
 export function getAll(store: RootStore, serviceId: string): SensorSetPointPairBlock[] {
-  return allBlocks(store)
-    .filter(block => block.type === 'SensorSetPointPair' &&
-      block.serviceId === serviceId) as SensorSetPointPairBlock[];
+  return allBlockFromService(store, serviceId)
+    .filter(block => block.type === 'SensorSetPointPair') as SensorSetPointPairBlock[];
 }

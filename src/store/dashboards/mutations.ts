@@ -23,6 +23,14 @@ function updateDashboardItem(state: DashboardState, id: string, newData: any) {
   );
 }
 
+function updateDashboardItemOptions(state: DashboardState, id: string, options: any) {
+  state.items.byId = Object.assign(
+    {},
+    state.items.byId,
+    { [id]: { ...state.items.byId[id], options } },
+  );
+}
+
 const mutations = {
   addDashboard(state: DashboardState, dashboard: Dashboard) {
     state.dashboards.allIds.push(dashboard.id);
@@ -50,6 +58,12 @@ const mutations = {
   ) {
     updateDashboardItem(state, id, { cols, rows });
   },
+  setDashboardItemOptions(
+    state: DashboardState,
+    { id, options }: { id: string, options: any },
+  ) {
+    updateDashboardItemOptions(state, id, options);
+  },
 };
 
 // exported commit accessors
@@ -60,5 +74,6 @@ export const setDashboardOrder = commit(mutations.setDashboardOrder);
 export const addDashboardItem = commit(mutations.addDashboardItem);
 export const setDashboardItemOrder = commit(mutations.setDashboardItemOrder);
 export const setDashboardItemSize = commit(mutations.setDashboardItemSize);
+export const setDashboardItemOptions = commit(mutations.setDashboardItemOptions);
 
 export default mutations;

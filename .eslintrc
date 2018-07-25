@@ -25,11 +25,13 @@
     "class-methods-use-this": 0,
     "strict": 0,
     "no-param-reassign": 0,
+    "no-restricted-globals": 0,
 
     // allow debugger during development
     "no-debugger": 2,
 
     // for eslint + typescript to work:
-    "typescript/no-unused-vars": 1
+    "typescript/no-unused-vars": 1,
+    "space-infix-ops": 0
   }
 }

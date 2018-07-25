@@ -1,13 +1,13 @@
 import { saveBlock, createBlock } from '../actions';
 
 import { addBlock } from '../mutations';
-import { SensorSetPointPair, SensorSetPointPairUpdate, SensorSetPointPairCreate }
+import { SensorSetPointPair, SensorSetPointPairUpdate, SensorSetPointPairCreateNew }
   from './SensorSetPointPair';
 import { RootStore } from '../../state';
 import { BlocksContext } from '../state';
 
 export const createSensorSetPointPair =
-  (store: RootStore, block: SensorSetPointPairCreate) =>
+  (store: RootStore, block: SensorSetPointPairCreateNew) =>
     createBlock(store, {
       type: 'SensorSetPointPair',
       ...block,

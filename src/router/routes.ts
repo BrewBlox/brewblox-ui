@@ -6,7 +6,6 @@ export default [
       { path: '', component: () => import('@/pages/index.vue') },
       { path: '/settings', component: () => import('@/pages/settings/settings.vue') },
       { path: '/blocks', component: () => import('@/pages/blocks.vue') },
-      { path: '/metrics', component: () => import('@/pages/metrics.vue') },
 
       // dynamic pages
       { path: '/dashboard/:id', component: () => import('@/pages/dashboard/dashboard.vue') },
