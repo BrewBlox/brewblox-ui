@@ -71,7 +71,7 @@
             "offset": 0
           },
           "state": {
-            "value": 20,
+            "value[celsius]": 20,
             "connected": true
           }
         }
@@ -106,7 +106,7 @@
             "offset": 0
           },
           "state": {
-            "value": 20,
+            "value[fahrenheit]": 30,
             "connected": true
           }
         }
