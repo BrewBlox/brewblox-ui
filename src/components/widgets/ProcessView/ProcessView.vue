@@ -18,6 +18,7 @@ class ProcessViewWidget extends Widget {
   size: number = 50;
   frame: number = 0;
   animationFrame: number = 0;
+  debugAnimation: boolean = true;
 
   get width(): number {
     return this.options.width;
@@ -82,7 +83,9 @@ class ProcessViewWidget extends Widget {
 
   tickAnimation() {
     this.animationFrame = window.requestAnimationFrame((timestamp) => {
-      this.frame = (timestamp % 2000) / 2000;
+      if (!this.debugAnimation) {
+        this.frame = (timestamp % 2000) / 2000;
+      }
 
       this.tickAnimation();
     });
@@ -102,6 +105,18 @@ export default ProcessViewWidget;
 
 <template>
   <div class="ProcessView">
+    <div>
+      <input
+        step="0.01"
+        type="range"
+        min="0"
+        max="1"
+        v-model.number="frame"
+      />
+      <div>
+        {{frame}}
+      </div>
+    </div>
     <div
       class="grid-base"
       :style="style"
