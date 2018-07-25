@@ -438,7 +438,7 @@
             {
               "x": 1,
               "y": 0,
-              "type": "TUBE_STRAIGHT",
+              "type": "VALVE",
               "rotate": 0
             },
             {
@@ -479,7 +479,7 @@
             {
               "x": 4,
               "y": 1,
-              "type": "TUBE_STRAIGHT",
+              "type": "VALVE",
               "rotate": 90
             },
             {

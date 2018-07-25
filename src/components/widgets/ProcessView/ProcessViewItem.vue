@@ -62,6 +62,10 @@ export default class ProcessViewItem extends Vue {
   fill: none;
 }
 
+.ProcessViewPart .fill {
+  fill: #fff;
+}
+
 .ProcessViewPart .outline {
   stroke: #fff;
 }

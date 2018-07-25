@@ -3,7 +3,8 @@ type ProcessViewPartType =
   'TUBE_INPUT' |
   'TUBE_OUTPUT' |
   'TUBE_TEE' |
-  'TUBE_ELBOW';
+  'TUBE_ELBOW' |
+  'VALVE';
 
 type ProcessViewPart = {
   type: ProcessViewPartType;

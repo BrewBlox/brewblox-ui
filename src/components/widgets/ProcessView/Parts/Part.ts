@@ -20,6 +20,10 @@ import Component from 'vue-class-component';
 })
 /* eslint-enable */
 export default class Part extends Vue {
+  get closed(): boolean {
+    return !!this.$props.closed;
+  }
+
   get frame(): number {
     return this.$props.animationFrame;
   }
