@@ -300,7 +300,7 @@
             {
               "x": 3,
               "y": 3,
-              "type": "TUBE_STRAIGHT"
+              "type": "TUBE_TEE"
             },
             {
               "x": 4,
@@ -323,8 +323,14 @@
             {
               "x": 3,
               "y": 1,
+              "type": "TUBE_TEE",
+              "rotate": 180
+            },
+            {
+              "x": 3,
+              "y": 2,
               "type": "TUBE_STRAIGHT",
-              "rotate": 0
+              "rotate": 90
             }
           ]
         }
