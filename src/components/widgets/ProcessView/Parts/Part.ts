@@ -16,7 +16,7 @@ import Component from 'vue-class-component';
 })
 /* eslint-enable */
 export default class Part extends Vue {
-  runFrames: boolean = false;
+  runFrames: boolean = true;
   frame: number = 0;
 
   get flowing(): boolean {

@@ -19,48 +19,24 @@
       class="outline"
     >
       <FlowArrow
-        :rotate="arrow(frame).rotate"
-        :x="arrow(frame).x"
-        :y="arrow(frame).y"
+        v-if="hasFlowOnAngle(270)"
+        :rotate="leftArrow(frame).rotate"
+        :x="leftArrow(frame).x"
+        :y="leftArrow(frame).y"
       />
 
       <FlowArrow
-        :rotate="arrow(frame).rotate"
-        :x="arrow(frame + 0.5).x"
-        :y="arrow(frame).y"
+        v-if="hasFlowOnAngle(0)"
+        :rotate="topArrow(frame).rotate"
+        :x="topArrow(frame).x"
+        :y="topArrow(frame).y"
       />
 
       <FlowArrow
-        :rotate="arrow(frame).rotate"
-        :x="arrow(frame - 0.5).x"
-        :y="arrow(frame).y"
-      />
-
-      <FlowArrow
-        :rotate="arrow(frame).rotate"
-        :x="arrow(frame - 1).x"
-        :y="arrow(frame).y"
-      />
-
-      <FlowArrow
-        :rotate="arrowUp(frame).rotate"
-        :x="arrowUp(frame).x"
-        :y="arrowUp(frame).y"
-        :opacity="arrowUp(frame).opacity"
-      />
-
-      <FlowArrow
-        :rotate="arrowUp(frame).rotate"
-        :x="arrowUp(frame).x"
-        :y="arrowUp(frame + 0.5).y"
-        :opacity="arrowUp(frame + 0.5).opacity"
-      />
-
-      <FlowArrow
-        :rotate="arrowUp(frame).rotate"
-        :x="arrowUp(frame).x"
-        :y="arrowUp(frame + 1).y"
-        :opacity="arrowUp(frame + 1).opacity"
+        v-if="hasFlowOnAngle(90)"
+        :rotate="rightArrow(frame).rotate"
+        :x="rightArrow(frame).x"
+        :y="rightArrow(frame).y"
       />
     </g>
   </SVGRoot>
@@ -91,24 +67,40 @@ class TeeTube extends Part {
     };
   }
 
-  get direction() {
-    return this.flowingFrom[0];
+  hasFlowOnAngle(angle: number) {
+    return this.flowingFrom.indexOf(angle) > -1 || this.flowingTo.indexOf(angle) > -1;
   }
 
-  arrow(frame: number) {
+  leftArrow(frame: number) {
+    const toRight = this.flowingFrom.indexOf(270) > -1;
+    const animationFrame = toRight ? frame : 1 - frame;
+
     return {
-      rotate: this.direction,
-      x: this.direction === 90 ? (1 - frame) * 50 : frame * 50,
+      rotate: toRight ? 270 : 90,
+      x: (animationFrame % 0.5) * 50,
       y: 23,
     };
   }
 
-  arrowUp(frame: number) {
+  topArrow(frame: number) {
+    const toBottom = this.flowingFrom.indexOf(0) > -1;
+    const animationFrame = toBottom ? frame : 1 - frame;
+
     return {
-      rotate: this.direction === 90 ? this.direction + 90 : this.direction - 90,
+      rotate: toBottom ? 0 : 180,
       x: 21,
-      y: ((1 - frame) * 50) - 6,
-      opacity: frame < 0.55 ? 0 : 1,
+      y: (animationFrame % 0.5) * 50,
+    };
+  }
+
+  rightArrow(frame: number) {
+    const toLeft = this.flowingFrom.indexOf(90) > -1;
+    const animationFrame = !toLeft ? frame : 1 - frame;
+
+    return {
+      rotate: !toLeft ? 270 : 90,
+      x: ((animationFrame % 0.5) + 0.5) * 50,
+      y: 23,
     };
   }
 }
