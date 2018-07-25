@@ -18,7 +18,7 @@ class ProcessViewWidget extends Widget {
   size: number = 50;
   frame: number = 0;
   animationFrame: number = 0;
-  debugAnimation: boolean = true;
+  debugAnimation: boolean = false;
 
   get width(): number {
     return this.options.width;
@@ -105,7 +105,14 @@ export default ProcessViewWidget;
 
 <template>
   <div class="ProcessView">
-    <div>
+    <div class="debug">
+      <label>
+        Debug
+        <input type="checkbox" v-model="debugAnimation" />
+      </label>
+    </div>
+    <div class="debug" v-if="debugAnimation">
+      Frame:
       <input
         step="0.01"
         type="range"
@@ -139,6 +146,10 @@ export default ProcessViewWidget;
 
 .ProcessView.dashboard-item {
   background: none;
+}
+
+.ProcessView .debug {
+  margin: 0 0 14px 0;
 }
 
 .grid-base {

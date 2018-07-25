@@ -18,19 +18,19 @@
       v-if="flowing"
       class="outline"
     >
-      <!--<FlowArrow-->
-        <!--v-if="hasFlowOnAngle(270)"-->
-        <!--:rotate="leftArrow(frame).rotate"-->
-        <!--:x="leftArrow(frame).x"-->
-        <!--:y="leftArrow(frame).y"-->
-      <!--/>-->
+      <FlowArrow
+        v-if="hasFlowOnAngle(270)"
+        :rotate="leftArrow(frame).rotate"
+        :x="leftArrow(frame).x"
+        :y="leftArrow(frame).y"
+      />
 
-      <!--<FlowArrow-->
-        <!--v-if="hasFlowOnAngle(0)"-->
-        <!--:rotate="topArrow(frame).rotate"-->
-        <!--:x="topArrow(frame).x"-->
-        <!--:y="topArrow(frame).y"-->
-      <!--/>-->
+      <FlowArrow
+        v-if="hasFlowOnAngle(0)"
+        :rotate="topArrow(frame).rotate"
+        :x="topArrow(frame).x"
+        :y="topArrow(frame).y"
+      />
 
       <FlowArrow
         v-if="hasFlowOnAngle(90)"
@@ -89,17 +89,17 @@ class TeeTube extends Part {
     return {
       rotate: toBottom ? 0 : 180,
       x: 21,
-      y: ((animationFrame % 0.5) * 50),
+      y: ((animationFrame % 0.5) * 50) - (toBottom ? 0 : 6),
     };
   }
 
   rightArrow(frame: number) {
     const toLeft = this.flowingFrom.indexOf(90) > -1;
-    const animationFrame = toLeft ? frame : 1 - frame;
+    const animationFrame = toLeft ? frame + 0.25 : 1 - frame;
 
     return {
       rotate: !toLeft ? 270 : 90,
-      x: 50 - ((animationFrame % 0.5) * 50),
+      x: (toLeft ? 54 : 50) - ((animationFrame % 0.5) * 50),
       y: 23,
     };
   }
