@@ -20,11 +20,11 @@ export default class Part extends Vue {
   frame: number = 0;
 
   get flowing(): boolean {
-    return this.flowingFrom > -1 && this.flowingTo.length > 0;
+    return this.flowingFrom.length > 0 && this.flowingTo.length > 0;
   }
 
-  get flowingFrom(): number {
-    return typeof this.$props.part.flowingFrom === 'number' ? this.$props.part.flowingFrom : -1;
+  get flowingFrom(): number[] {
+    return (this.$props.part && this.$props.part.flowingFrom) || [];
   }
 
   get flowingTo(): number[] {
@@ -32,7 +32,7 @@ export default class Part extends Vue {
   }
 
   get liquid() {
-    return this.flowingFrom > -1;
+    return this.flowingFrom.length > 0;
   }
 
   get flipped(): boolean {

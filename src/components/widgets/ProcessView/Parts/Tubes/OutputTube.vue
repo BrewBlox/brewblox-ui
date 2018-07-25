@@ -82,7 +82,7 @@ class OutputTube extends Part {
   }
 
   get flowing(): boolean {
-    return this.flowingFrom > -1;
+    return this.flowingFrom.length > 0;
   }
 
   get arrow() {
