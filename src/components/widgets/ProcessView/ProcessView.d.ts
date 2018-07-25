@@ -10,7 +10,7 @@ type ProcessViewPart = {
   x: number;
   y: number;
   rotate: number;
-  flowingFrom?: number;
+  flowingFrom?: number[];
   flowingTo?: number[];
   flipped?: boolean;
 };
@@ -29,7 +29,7 @@ type ProcessViewPartWithComponent = {
 } & ProcessViewPart;
 
 type ProcessViewPartWithFlow = {
-  flowingFrom: number | number[];
+  flowingFrom: number[];
   flowingTo: number[];
   friction: number;
-} & ProcessViewPart;
+} & ProcessViewPartWithComponent;

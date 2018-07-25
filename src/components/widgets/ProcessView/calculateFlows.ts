@@ -31,7 +31,10 @@ function liquidIn(part: ProcessViewPartWithComponent, provided: number): number 
   return provided;
 }
 
-function xyAtAngle(part: ProcessViewPartWithComponent, angle: number): { x: number, y: number } {
+function xyAtAngle(
+  part: ProcessViewPartWithComponent | ProcessViewPartWithFlow,
+  angle: number,
+): { x: number, y: number } {
   if (angle === 90) {
     return {
       x: part.x + 1,
@@ -66,13 +69,13 @@ function partAtAngle(
 ): ProcessViewPartWithComponent | undefined {
   const { x, y } = xyAtAngle(origin, angle);
   const partsOnPosition = allParts.filter(part => part.x === x && part.y === y);
-  return partsOnPosition.find((part) => {
+  return partsOnPosition.find((part: ProcessViewPartWithComponent | ProcessViewPartWithFlow) => {
     const flows = rotatedFlows(part.component.flows(), part.rotate);
     return !!flows[rotated(angle, 180)];
   });
 }
 
-function isPart(
+function isSamePart(
   original: ProcessViewPartWithComponent | ProcessViewPartWithFlow,
   compare: ProcessViewPartWithComponent | ProcessViewPartWithFlow,
 ) {
@@ -101,7 +104,7 @@ function flow(
   const flows = rotatedFlows(component.flows(), rotate);
 
   const enhancedParts = allParts.map((item) => {
-    if (isPart(part, item)) {
+    if (isSamePart(part, item)) {
       return { ...part, friction };
     }
 
@@ -189,7 +192,7 @@ export function pathsFromSources(parts: ProcessViewPartWithComponent[]): partWit
   return flows.map(filterDeadEnds);
 }
 
-function determineFlows(paths: partWithFlow[], fromAngle: number = 90): ProcessViewPartWithFlow[] {
+function determineFlows(paths: partWithFlow[]): ProcessViewPartWithFlow[] {
   return paths.reduce(
     (acc: any, item) => {
       const rotate = item.rotate || 0;
@@ -208,43 +211,65 @@ function determineFlows(paths: partWithFlow[], fromAngle: number = 90): ProcessV
       const part = {
         ...item,
         flowingTo,
-        flowingFrom: flowingTo.length > 0 || item.component.isSink ?
-          rotated(fromAngle, (180 - rotate)) : undefined,
       };
       delete part.to;
-      delete part.component;
 
       return [
         ...acc,
         part,
         ...flatten(Object.keys(item.to)
-          .map(angle => determineFlows([item.to[parseInt(angle, 10)]], parseInt(angle, 10)))),
+          .map(angle => determineFlows([item.to[parseInt(angle, 10)]]))),
       ];
     },
     [],
   );
 }
 
-export function calculateFlows(paths: partWithFlow[]): any {
+function pickStrongestFlows(
+  acc: ProcessViewPartWithFlow[],
+  part: ProcessViewPartWithFlow,
+): ProcessViewPartWithFlow[] {
+  const partIndex = acc.findIndex(item => isSamePart(part, item));
+  const prevPart = acc[partIndex] as ProcessViewPartWithFlow;
+
+  if (partIndex > -1 && prevPart) {
+    if (part.friction < prevPart.friction) {
+      const newAcc = [...acc];
+      newAcc.splice(partIndex, 1, part);
+
+      return newAcc;
+    }
+
+    return acc;
+  }
+
+  return [...acc, part];
+}
+
+function addFlowingFrom(part: ProcessViewPartWithFlow): ProcessViewPartWithFlow {
+  if (!part.component) {
+    return part;
+  }
+
+  if (part.component.isSource) {
+    return {
+      ...part,
+      flowingFrom: [rotated(part.flowingTo[0], 180)],
+    };
+  }
+
+  const flowingFrom = Object.keys(part.component.flows())
+    .map(key => parseInt(key, 10))
+    .filter(angle => part.flowingTo.indexOf(angle) === -1);
+
+  return {
+    ...part,
+    flowingFrom,
+  };
+}
+
+export function calculateFlows(paths: partWithFlow[]): ProcessViewPartWithFlow[] {
   const allFlows = determineFlows(paths);
-  return allFlows.reduce(
-    (acc: ProcessViewPartWithFlow[], part: ProcessViewPartWithFlow) => {
-      const partIndex = acc.findIndex(item => isPart(part, item));
-      const prevPart = acc[partIndex] as ProcessViewPartWithFlow;
-
-      if (partIndex > -1 && prevPart) {
-        if (part.friction < prevPart.friction) {
-          const newAcc = [...acc];
-          newAcc.splice(partIndex, 1, part);
-
-          return newAcc;
-        }
-
-        return acc;
-      }
-
-      return [...acc, part];
-    },
-    [],
-  );
+  const strongestFlows = allFlows.reduce(pickStrongestFlows, []);
+  return strongestFlows.map(addFlowingFrom);
 }
