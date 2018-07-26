@@ -13,15 +13,16 @@ type ProcessViewPart = {
   rotate: number;
   flowingFrom?: number[];
   flowingTo?: number[];
-  flipped?: boolean;
+};
+
+type ProcessViewPartFlow = {
+  out: number,
+  friction?: number,
+  pressure?: number,
 };
 
 type ProcessViewPartFlows = {
-  [angleIn: number]: {
-    out: number,
-    friction?: number,
-    pressure?: number,
-  }[];
+  [angleIn: number]: ProcessViewPartFlow[];
 };
 
 type ProcessViewPartWithComponent = {
@@ -30,6 +31,7 @@ type ProcessViewPartWithComponent = {
     isSink?: boolean;
     flows: () => ProcessViewPartFlows;
   };
+  flow?: { [angle: number]: number };
   visited?: boolean;
 } & ProcessViewPart;
 
