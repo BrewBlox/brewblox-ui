@@ -1,11 +1,14 @@
-const apiMocker = require('connect-api-mocker');
+const { exec } = require('child_process');
 
 module.exports = {
   lintOnSave: true,
   devServer: {
     before(app) {
-      // use api mocker
-      app.use('/api', apiMocker('mocks/api'));
+      exec('docker-compose down; docker-compose up -d',
+        (err, stdout, stderr) => {
+          console.log(`stdout: ${stdout}`);
+          console.log(`stderr: ${stderr}`);
+        });
     },
   },
   chainWebpack: (config) => {

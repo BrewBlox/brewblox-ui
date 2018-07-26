@@ -1,6 +1,6 @@
 import { serialize, deserialize } from '@/core/units/parseObject';
 
-const host = '/api';
+const host = process.env.VUE_APP_API_URI;
 
 function toJson(result: Promise<Response>): Promise<any> {
   return result
