@@ -13,7 +13,7 @@ export function rotatedFlows(
       (acc, angle) => ({
         ...acc,
         [rotated(parseInt(angle, 10), rotation)]:
-          flows[parseInt(angle, 10)].map(flowAngle => rotated(flowAngle, rotation)),
+          flows[parseInt(angle, 10)].map(flowAngle => rotated(flowAngle.out, rotation)),
       }),
       {},
     );
@@ -94,51 +94,58 @@ type partWithFlow = ProcessViewPartWithComponent & {
 function flow(
   part: ProcessViewPartWithComponent,
   allParts: ProcessViewPartWithComponent[],
-  inflow: number = 0,
-  friction: number = 0,
-): partWithFlow {
+  angleIn: number = 0,
+  accFriction: number = 0,
+  startPressure: number = 10,
+): number {
   const { rotate, component } = part;
 
   // rotate flows
-  const flowFrom = liquidIn(part, inflow);
+  const flowFrom = liquidIn(part, angleIn);
   const flows = rotatedFlows(component.flows(), rotate);
 
   const enhancedParts = allParts.map((item) => {
     if (isSamePart(part, item)) {
-      return { ...part, friction };
+      return { ...part, visited: true };
     }
 
     return item;
   });
   const possibleOutputs = flows[flowFrom] || [];
 
-  const to = possibleOutputs
+  const flowIn = possibleOutputs
     .reduce(
-      (acc, angle) => {
+      (acc, output) => {
+        const angle = output.out;
         const nextPart = partAtAngle(part, enhancedParts, angle);
 
-        if (!nextPart || typeof nextPart.friction === 'number') {
+        if (!nextPart || nextPart.visited) {
+          // no flow possible
           return acc;
         }
 
-        return {
-          ...acc,
-          [angle]: flow(
-            nextPart,
-            enhancedParts,
-            rotated(angle, 180),
-            friction + 1,
-          ),
-        };
+        const totalFriction = accFriction + (output.friction || 0);
+
+        if (output.pressure) {
+          if (output.pressure < startPressure) {
+            const pathFlow = (startPressure - output.pressure) / totalFriction;
+            return acc + pathFlow;
+          }
+
+          return acc;
+        }
+
+        return acc + flow(
+          nextPart,
+          enhancedParts,
+          rotated(angle, 180),
+          totalFriction,
+        );
       },
-      {},
+      0,
     );
 
-  return {
-    ...part,
-    friction,
-    to,
-  };
+  return flowIn;
 }
 
 function isDeadEnd(part: partWithFlow): boolean {
@@ -225,6 +232,10 @@ function determineFlows(paths: partWithFlow[]): ProcessViewPartWithFlow[] {
   );
 }
 
+function hasMorePower(a: ProcessViewPartWithFlow, b: ProcessViewPartWithFlow) {
+  return a.friction < b.friction;
+}
+
 function pickStrongestFlows(
   acc: ProcessViewPartWithFlow[],
   part: ProcessViewPartWithFlow,
@@ -233,7 +244,7 @@ function pickStrongestFlows(
   const prevPart = acc[partIndex] as ProcessViewPartWithFlow;
 
   if (partIndex > -1 && prevPart) {
-    if (part.friction < prevPart.friction) {
+    if (hasMorePower(part, prevPart)) {
       const newAcc = [...acc];
       newAcc.splice(partIndex, 1, part);
 
@@ -246,7 +257,11 @@ function pickStrongestFlows(
   return [...acc, part];
 }
 
-function addFlowingFrom(part: ProcessViewPartWithFlow): ProcessViewPartWithFlow {
+function addFlowingFrom(
+  part: ProcessViewPartWithFlow,
+  index: number,
+  allParts: ProcessViewPartWithFlow[],
+): ProcessViewPartWithFlow {
   if (!part.component) {
     return part;
   }
@@ -258,13 +273,25 @@ function addFlowingFrom(part: ProcessViewPartWithFlow): ProcessViewPartWithFlow 
     };
   }
 
+  // remove flowing to where next flow is stronger
+  const recalculatedFlowingTo = part.flowingTo.filter((angle: number) => {
+    const nextPart = partAtAngle(part, allParts, rotated(angle, part.rotate));
+
+    if (!nextPart || !nextPart.friction) {
+      return true;
+    }
+
+    return hasMorePower(part, nextPart as ProcessViewPartWithFlow);
+  });
+
   const flowingFrom = Object.keys(part.component.flows())
     .map(key => parseInt(key, 10))
-    .filter(angle => part.flowingTo.indexOf(angle) === -1);
+    .filter(angle => recalculatedFlowingTo.indexOf(angle) === -1);
 
   return {
     ...part,
     flowingFrom,
+    flowingTo: recalculatedFlowingTo,
   };
 }
 

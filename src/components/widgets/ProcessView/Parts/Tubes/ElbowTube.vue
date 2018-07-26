@@ -61,8 +61,8 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 class ElbowTube extends Part {
   static flows() {
     return {
-      0: [90],
-      90: [0],
+      0: [{ out: 90, friction: 1 }],
+      90: [{ out: 0, friction: 1 }],
     };
   }
 

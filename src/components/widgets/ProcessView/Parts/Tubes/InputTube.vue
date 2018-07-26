@@ -53,9 +53,9 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 class InputTube extends Part {
   static isSource = true;
 
-  static flows() {
+  static flows(): ProcessViewPartFlows {
     return {
-      270: [90],
+      270: [{ out: 90, friction: 1 }],
     };
   }
 

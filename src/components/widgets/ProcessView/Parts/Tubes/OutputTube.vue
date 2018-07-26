@@ -61,9 +61,9 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 class OutputTube extends Part {
   static isSink = true;
 
-  static flows() {
+  static flows(): ProcessViewPartFlows {
     return {
-      270: [90],
+      270: [{ pressure: 0, friction: 1 }],
     };
   }
 

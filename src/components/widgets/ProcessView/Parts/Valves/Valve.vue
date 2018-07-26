@@ -64,8 +64,8 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 class Valve extends Part {
   static flows() {
     return {
-      270: [90],
-      90: [270],
+      270: [{ out: 90, friction: 1 }],
+      90: [{ out: 270, friction: 1 }],
     };
   }
 

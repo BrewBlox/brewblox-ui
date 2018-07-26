@@ -59,11 +59,11 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 })
 /* eslint-enable */
 class TeeTube extends Part {
-  static flows() {
+  static flows(): ProcessViewPartFlows {
     return {
-      0: [90, 270],
-      90: [0, 270],
-      270: [0, 90],
+      0: [{ out: 90, friction: 1 }, { out: 270, friction: 1 }],
+      90: [{ out: 0, friction: 1 }, { out: 270, friction: 1 }],
+      270: [{ out: 0, friction: 1 }, { out: 90, friction: 1 }],
     };
   }
 

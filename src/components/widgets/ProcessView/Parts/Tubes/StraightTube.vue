@@ -56,10 +56,10 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 })
 /* eslint-enable */
 class StraightTube extends Part {
-  static flows() {
+  static flows(): ProcessViewPartFlows {
     return {
-      270: [90],
-      90: [270],
+      270: [{ out: 90, friction: 1 }],
+      90: [{ out: 270, friction: 1 }],
     };
   }
 
