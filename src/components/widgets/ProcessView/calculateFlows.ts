@@ -92,8 +92,7 @@ function flow(
   angleIn: number = 0,
   accFriction: number = 0,
   startPressure: number = 10,
-): { parts: ProcessViewPartWithComponent[], lastFlow: number } {
-  let lastFlow = 0;
+): ProcessViewPartWithComponent[] {
   const { rotate, component } = part;
 
   // rotate flows
@@ -121,8 +120,7 @@ function flow(
     if (typeof output.pressure === 'number') {
       if (output.pressure < startPressure) {
         const pathFlow = (startPressure - output.pressure) / totalFriction;
-        lastFlow = accFlow + pathFlow;
-        return { ...acc, [angle]: lastFlow };
+        return { ...acc, [angle]: accFlow + pathFlow };
       }
 
       return { ...acc, [angle]: accFlow };
@@ -142,7 +140,8 @@ function flow(
       startPressure,
     );
 
-    enhancedParts = nextFlows.parts.map((item) => {
+    enhancedParts = nextFlows.map((item) => {
+      // @todo place sum of part flows (next and current)
       if (isSamePart(nextPart, item)) {
         return {
           ...item,
@@ -158,23 +157,20 @@ function flow(
 
     return {
       ...acc,
-      [angle]: nextFlows.lastFlow,
+      [angle]: nextFlows,
     };
   }, {});
 
-  return {
-    lastFlow,
-    parts: enhancedParts.map((item) => {
-      if (isSamePart(part, item)) {
-        return {
-          ...part,
-          flow: calculatedOutputs,
-        };
-      }
+  return enhancedParts.map((item) => {
+    if (isSamePart(part, item)) {
+      return {
+        ...part,
+        flow: calculatedOutputs,
+      };
+    }
 
-      return item;
-    }),
-  };
+    return item;
+  });
 
   // const calculatedFlows = possibleOutputs
   //   .reduce(
