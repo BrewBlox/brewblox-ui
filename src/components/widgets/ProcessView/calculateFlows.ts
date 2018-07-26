@@ -92,15 +92,15 @@ function flow(
   angleIn: number = 0,
   accFriction: number = 0,
   startPressure: number = 10,
-  accFlow: number = 0,
-): ProcessViewPartWithComponent[] {
+): { parts: ProcessViewPartWithComponent[], lastFlow: number } {
+  let lastFlow = 0;
   const { rotate, component } = part;
 
   // rotate flows
   const flowFrom = liquidIn(part, angleIn);
   const flows = rotatedFlows(component.flows(), rotate);
 
-  const enhancedParts = allParts.map((item) => {
+  let enhancedParts = allParts.map((item) => {
     if (isSamePart(part, item)) {
       return {
         ...part,
@@ -112,39 +112,69 @@ function flow(
   });
 
   const possibleOutputs = flows[flowFrom] || [];
-  const calculatedOutputs = possibleOutputs.map((output) => {
+  const calculatedOutputs = possibleOutputs.reduce((acc, output) => {
     const angle = output.out;
-    const nextPart = partAtAngle(part, enhancedParts, angle);
-
-    if (!nextPart || nextPart.visited) {
-      // no flow possible
-      return accFlow;
-    }
+    const accFlow = ((part.flow && part.flow[angle]) || 0);
 
     const totalFriction = accFriction + (output.friction || 0);
 
-    if (output.pressure) {
+    if (typeof output.pressure === 'number') {
       if (output.pressure < startPressure) {
         const pathFlow = (startPressure - output.pressure) / totalFriction;
-        return accFlow + pathFlow;
+        lastFlow = accFlow + pathFlow;
+        return { ...acc, [angle]: lastFlow };
       }
 
-      return accFlow;
+      return { ...acc, [angle]: accFlow };
     }
 
-    return flow(
+    const nextPart = partAtAngle(part, enhancedParts, angle);
+    if (!nextPart || nextPart.visited) {
+      // no flow possible
+      return { ...acc, [angle]: accFlow };
+    }
+
+    const nextFlows = flow(
       nextPart,
       enhancedParts,
       rotated(output.out, 180),
       totalFriction,
       startPressure,
-      accFlow,
     );
-  });
 
-  debugger;
+    enhancedParts = nextFlows.parts.map((item) => {
+      if (isSamePart(nextPart, item)) {
+        return {
+          ...item,
+          flow: {
+            ...nextPart.flow,
+            ...item.flow,
+          },
+        };
+      }
 
-  return [];
+      return item;
+    });
+
+    return {
+      ...acc,
+      [angle]: nextFlows.lastFlow,
+    };
+  }, {});
+
+  return {
+    lastFlow,
+    parts: enhancedParts.map((item) => {
+      if (isSamePart(part, item)) {
+        return {
+          ...part,
+          flow: calculatedOutputs,
+        };
+      }
+
+      return item;
+    }),
+  };
 
   // const calculatedFlows = possibleOutputs
   //   .reduce(
@@ -190,7 +220,9 @@ export function pathsFromSources(parts: ProcessViewPartWithComponent[]):
   const sources = getSources(parts);
   const flowsFromSources = sources.map(source => flow(source, parts));
 
-  return flowsFromSources.flatten();
+  debugger;
+
+  return [];
 }
 
 // function determineFlows(paths: ProcessViewPartWithComponent[]): ProcessViewPartWithFlow[] {

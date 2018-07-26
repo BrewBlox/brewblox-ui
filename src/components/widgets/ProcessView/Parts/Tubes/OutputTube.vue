@@ -63,7 +63,7 @@ class OutputTube extends Part {
 
   static flows(): ProcessViewPartFlows {
     return {
-      270: [{ pressure: 0, friction: 1 }],
+      270: [{ out: 90, pressure: 0, friction: 1 }],
     };
   }
 
