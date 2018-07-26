@@ -6,14 +6,19 @@ export default abstract class Unit {
     this.value = value;
   }
 
-  toString(): string {
-    return this.value.toString();
+  get unitNotation(): string {
+    return '';
   }
 
-  toJSON() {
-    return {
-      value: this.value,
-      unit: this.unit,
-    };
+  get roundedValue(): string {
+    return this.value.toFixed(2);
+  }
+
+  toString(): string {
+    return `${this.roundedValue} ${this.unitNotation}`;
+  }
+
+  toJSON(): number {
+    return this.value;
   }
 }

@@ -1,3 +1,5 @@
+import { serialize, deserialize } from '@/core/units/parseObject';
+
 const host = '/api';
 
 function toJson(result: Promise<Response>): Promise<any> {
@@ -9,7 +11,8 @@ function toJson(result: Promise<Response>): Promise<any> {
 
       return response;
     })
-    .then(response => response.json());
+    .then(response => response.json())
+    .then(data => deserialize(data));
 }
 
 export function get(url: string): Promise<any> {
@@ -21,7 +24,7 @@ export function post(url: string, data: any, method = 'POST'): Promise<any> {
     `${host}${url}`,
     {
       method,
-      body: JSON.stringify(data),
+      body: JSON.stringify(serialize(data)),
       headers: new Headers({
         'Content-Type': 'application/json',
       }),

@@ -1,42 +1,93 @@
-import fromObject from './fromObject';
+import Unit from './Unit';
+import valueToUnit from './convertUnit';
 
 const extractUnit = /^([a-zA-Z0-9_.\-[\]]+)\[([a-zA-Z]+)]$/;
 
-function propertyNameWithoutUnit(name: string): string {
+export function propertyNameWithoutUnit(name: string): string {
   const matched = name.match(extractUnit);
 
   return matched ? matched[1] : name;
 }
 
-function parseProperty(key: string, inputObject: any): any {
+function propertyNameWithUnit(key: string, inputObject: any): string {
   const input = inputObject[key];
 
   if (
-    input !== null &&
-    typeof input === 'object'
+    Array.isArray(input) &&
+    input[0] instanceof Unit
   ) {
-    return parseObject(input); // eslint-disable-line
+    return `${key}[${input[0].unit}]`;
   }
 
+  if (input instanceof Unit) {
+    return `${key}[${input.unit}]`;
+  }
+
+  return key;
+}
+
+export function convertToUnit(key: string, value: any): Unit {
   const matched = key.match(extractUnit);
 
   if (matched) {
     try {
-      return fromObject(input, matched[2]);
+      return valueToUnit(value, matched[2]);
     } catch (e) {
-      return input;
+      return value;
     }
+  }
+
+  return value;
+}
+
+function deserializeProperty(key: string, inputObject: any, input = inputObject[key]): any {
+  if (
+    input !== null &&
+    typeof input === 'object'
+  ) {
+    return deserialize(input, key); // eslint-disable-line
+  }
+
+  return convertToUnit(key, input);
+}
+
+export function deserialize(input: any, prevKey: string = ''): any {
+  if (Array.isArray(input)) {
+    return input.map(item => deserializeProperty(prevKey, null, item));
+  }
+
+  return Object.keys(input)
+    .reduce(
+      (acc, key) => ({
+        ...acc,
+        [propertyNameWithoutUnit(key)]: deserializeProperty(key, input),
+      }),
+      {},
+    );
+}
+
+function serializeProperty(key: string, inputObject: any, input = inputObject[key]): any {
+  if (input instanceof Unit) {
+    return input.value;
+  }
+
+  if (typeof input === 'object') {
+    return serialize(input, key); // eslint-disable-line
   }
 
   return input;
 }
 
-export default function parseObject(input: any): any {
+export function serialize(input: any, prevKey: string = ''): any {
+  if (Array.isArray(input)) {
+    return input.map(item => serializeProperty(prevKey, null, item));
+  }
+
   return Object.keys(input)
     .reduce(
       (acc, key) => ({
         ...acc,
-        [propertyNameWithoutUnit(key)]: parseProperty(key, input),
+        [propertyNameWithUnit(key, input)]: serializeProperty(key, input),
       }),
       {},
     );

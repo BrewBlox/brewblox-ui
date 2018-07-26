@@ -49,7 +49,7 @@
         "type": "SetPointSimple",
         "data": {
           "settings": {
-            "value": 1
+            "value": 21
           }
         }
       },
@@ -71,7 +71,7 @@
             "offset": 0
           },
           "state": {
-            "value[celsius]": 20,
+            "value[celsius]": 20.89789201,
             "connected": true
           }
         }
@@ -139,7 +139,10 @@
         "order": 2,
         "cols": 3,
         "rows": 3,
-        "widget": "OneWireTempSensor"
+        "widget": "SensorSetPointPair",
+        "options": {
+          "block": "controller-1/sensor-setpoint-pair-1"
+        }
       }
     },
     {

@@ -168,31 +168,29 @@
           </q-item>
         </q-list>
         <q-card-actions>
-          <q-card-actions>
-            <q-btn
-              icon="check"
-              :color="changed ? 'primary' : 'light'"
-              :disable="!changed"
-              @click="save"
-            >
-              Save
-            </q-btn>
+          <q-btn
+            icon="check"
+            :color="changed ? 'primary' : 'light'"
+            :disable="!changed"
+            @click="save"
+          >
+            Save
+          </q-btn>
 
-            <q-btn
-              icon="check"
-              :color="kpChanged ? 'primary' : 'light'"
-              :disable="!kpChanged"
-              @click="updateKP"
-            >
-              Update KP
-            </q-btn>
-            <q-btn
-              icon="check"
-              @click="randomKP"
-            >
-              Random KP from store
-            </q-btn>
-          </q-card-actions>
+          <q-btn
+            icon="check"
+            :color="kpChanged ? 'primary' : 'light'"
+            :disable="!kpChanged"
+            @click="updateKP"
+          >
+            Update KP
+          </q-btn>
+          <q-btn
+            icon="check"
+            @click="randomKP"
+          >
+            Random KP from store
+          </q-btn>
         </q-card-actions>
       </q-modal-layout>
     </q-modal>
@@ -202,10 +200,6 @@
 <script lang="ts" src="./PID.ts" />
 
 <style scoped>
-.dashboard-item .q-card {
-  box-shadow: none;
-}
-
 .q-item {
   display: grid;
   grid-gap: 10px;
