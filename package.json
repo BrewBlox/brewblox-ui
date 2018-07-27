@@ -4,7 +4,10 @@
   "description": "UI for the BrewBlox brewing controller",
   "author": "Elco Jacobs / BrewPi B.V.",
   "scripts": {
-    "serve": "vue-cli-service serve --open",
+    "compose:down": "docker-compose down",
+    "compose:up": "docker-compose up -d",
+    "compose:new": "npm run compose:down && npm run compose:up",
+    "serve": "npm run compose:new && vue-cli-service serve --open",
     "start": "npm run serve",
     "build": "vue-cli-service build",
     "test": "jest",

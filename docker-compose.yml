@@ -29,11 +29,16 @@ services:
     command:
       - "--simulation"
 
-  api:
-    image: brewblox/brewblox-ui-api
+  datastore:
+    image: brewblox/brewblox-datastore:feature-json-server
     labels:
-      - "traefik.port=9090"
-      - "traefik.frontend.rule=PathPrefix: /api"
+      - "traefik.port=3000"
+      - "traefik.frontend.rule=PathPrefix: /datastore"
+    volumes:
+      - "./mocks/config/datastore.json:/app/datastore.json"
+    command:
+      - "--watch"
+      - "datastore.json"
 
   traefik:
     image: traefik
