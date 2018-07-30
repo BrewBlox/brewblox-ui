@@ -22,7 +22,9 @@ script:
   - npm run build
 
 before_deploy:
-  bbt-distcopy dist/ docker/dist/;
+  mkdir -p docker/dist/;
+  rm -rf docker/dist/*;
+  cp -r dist/* docker/dist/;
   docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD};
   docker run --rm --privileged multiarch/qemu-user-static:register --reset;
 
