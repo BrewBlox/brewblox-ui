@@ -1,0 +1,71 @@
+sudo: required
+language: node_js
+node_js:
+  - node
+python:
+  - "3.6"
+
+services:
+  - docker
+
+env:
+  global:
+    # Both docker and github repo names are case sensitive
+    - DOCKER_REPO=brewblox/brewblox-ui
+    - GITHUB_REPO=BrewBlox/brewblox-ui
+
+install:
+  - pip3 install brewblox-tools~=0.4.0
+  - npm install --dev
+
+script:
+  - npm run build
+
+before_deploy:
+  bbt-distcopy dist/ docker/dist/;
+  docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD};
+  docker run --rm --privileged multiarch/qemu-user-static:register --reset;
+
+deploy:
+  # Deploy "latest" and version tag to Docker Hub on tagged commits
+  - provider: script
+    script:
+      bbt-deploy-docker
+      --no-cache
+      --context docker
+      --file amd/Dockerfile
+      --name ${DOCKER_REPO}
+      --tags latest $(git describe --tags)
+      &&
+      bbt-deploy-docker
+      --no-cache
+      --context docker
+      --file arm/Dockerfile
+      --name ${DOCKER_REPO}
+      --tags rpi-latest rpi-$(git describe --tags)
+    skip_cleanup: true
+    on:
+      tags: true
+
+  # Deploy branch to Docker Hub on any push to an upstream development branch
+  - provider: script
+    script:
+      bbt-deploy-docker
+      --no-cache
+      --context docker
+      --file amd/Dockerfile
+      --name ${DOCKER_REPO}
+      --tags ${TRAVIS_BRANCH}
+      &&
+      bbt-deploy-docker
+      --no-cache
+      --context docker
+      --file arm/Dockerfile
+      --name ${DOCKER_REPO}
+      --tags rpi-${TRAVIS_BRANCH}
+    skip_cleanup: true
+    on:
+      tags: false
+      repo: ${GITHUB_REPO}
+      all_branches: true
+      condition: ${TRAVIS_BRANCH} != master
