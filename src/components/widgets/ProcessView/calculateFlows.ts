@@ -1,6 +1,6 @@
 import { flatten } from 'lodash';
 
-function rotated(original: number, rotation: number) {
+export function rotated(original: number = 0, rotation: number = 0) {
   return (original + rotation) % 360;
 }
 
