@@ -157,17 +157,13 @@ function flowAtExitsOfNextPart(
 }
 
 function flow(
-  origin: ProcessViewPartWithComponent,
+  part: ProcessViewPartWithComponent,
   allParts: ProcessViewPartWithComponent[],
   angleIn: number = 0,
   accFriction: number = 0,
   startPressure: number = 10,
 ): ProcessViewPartWithComponent[] {
   // mark part as visited to prevent loops
-  const part = {
-    ...origin,
-    flowingFrom: [...(origin.flowingFrom || []), angleIn],
-  };
   const visitedParts = addProperyToPart(part, { visited: true }, allParts);
 
   return possibleOutputs(part, angleIn).reduce(

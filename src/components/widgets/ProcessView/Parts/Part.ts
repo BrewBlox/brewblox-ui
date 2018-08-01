@@ -1,8 +1,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { rotated } from '@/components/widgets/ProcessView/calculateFlows';
-
 /* eslint-disable */
 @Component({
   props: {
@@ -22,11 +20,6 @@ import { rotated } from '@/components/widgets/ProcessView/calculateFlows';
 })
 /* eslint-enable */
 export default class Part extends Vue {
-  // rotated angles to their unrotated counter parts for correct rendering
-  fixFlow(angle: number) {
-    return rotated(angle, this.$props.part.rotate * -1 || 0);
-  }
-
   get closed(): boolean {
     return !!this.$props.closed;
   }
@@ -39,20 +32,12 @@ export default class Part extends Vue {
     return this.flowingFrom.length > 0 && this.flowingTo.length > 0;
   }
 
-  get flowTo(): number[] {
-    if (!this.$props.part || !this.$props.part.flow) {
-      return [];
-    }
-
-    return Object.keys(this.$props.part.flow).map(flow => parseInt(flow, 10));
-  }
-
   get flowingFrom(): number[] {
-    return ((this.$props.part && this.$props.part.flowingFrom) || []).map(this.fixFlow);
+    return [];
   }
 
   get flowingTo(): number[] {
-    return this.flowTo.filter(angle => this.$props.part.flow[angle] > 0).map(this.fixFlow);
+    return [];
   }
 
   get liquid() {
