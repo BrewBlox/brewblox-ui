@@ -5,7 +5,7 @@ import Widget from '../Widget';
 
 import ProcessViewItem from './ProcessViewItem.vue';
 import componentByType from './Parts/componentByType';
-import { calculateFlows, pathsFromSources } from './calculateFlows';
+import { pathsFromSources } from './calculateFlows';
 
 /* eslint-disable */
 @Component({
@@ -36,7 +36,7 @@ class ProcessViewWidget extends Widget {
     return this.options.parts;
   }
 
-  get pathsFromSources(): any {
+  get flows(): ProcessViewPartWithComponent[] {
     return pathsFromSources(this.partsWithComponent);
   }
 
@@ -45,10 +45,6 @@ class ProcessViewWidget extends Widget {
       ...part,
       component: componentByType(part.type),
     }));
-  }
-
-  get flows() {
-    return calculateFlows(this.pathsFromSources);
   }
 
   get style(): any {
@@ -62,16 +58,6 @@ class ProcessViewWidget extends Widget {
 
   gridStyle(amount: number): string {
     return Array(amount).fill('').map(() => `${this.size}px`).join(' ');
-  }
-
-  combineFlow(part: ProcessViewPart) {
-    const enrichedPart = this.flows.find((flowPart: ProcessViewPart) =>
-      flowPart.x === part.x &&
-      flowPart.y === part.y &&
-      flowPart.type === part.type &&
-      flowPart.rotate === part.rotate);
-
-    return enrichedPart || part;
   }
 
   partStyle(part: ProcessViewPart): any {
@@ -130,12 +116,12 @@ export default ProcessViewWidget;
     >
       <div
         class="grid-item"
-        v-for="part in parts"
+        v-for="part in flows"
         :key="`${part.x}_${part.y}`"
         :style="partStyle(part)"
       >
         <span class="grid-item-coordinates">{{ part.x }},{{ part.y }}</span>
-        <process-view-item :part="combineFlow(part)" :frame="frame" />
+        <process-view-item :part="part" :frame="frame" />
       </div>
     </div>
   </div>

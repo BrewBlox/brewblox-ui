@@ -526,6 +526,93 @@
           ]
         }
       }
+    },
+    {
+      "id": "item-8",
+      "data": {
+        "order": 1,
+        "cols": 3,
+        "rows": 3,
+        "widget": "ProcessView",
+        "options": {
+          "name": "Simple flow setup",
+          "width": 5,
+          "height": 5,
+          "parts": [
+            {
+              "x": 0,
+              "y": 1,
+              "type": "TUBE_INPUT",
+              "rotate": 0
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "type": "TUBE_STRAIGHT",
+              "rotate": 0
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "type": "TUBE_ELBOW",
+              "rotate": 180
+            },
+            {
+              "x": 2,
+              "y": 2,
+              "type": "TUBE_STRAIGHT",
+              "rotate": 90
+            },
+            {
+              "x": 2,
+              "y": 3,
+              "type": "TUBE_TEE",
+              "rotate": 90
+            },
+            {
+              "x": 2,
+              "y": 4,
+              "type": "TUBE_OUTPUT",
+              "rotate": 90
+            },
+            {
+              "x": 3,
+              "y": 3,
+              "type": "TUBE_STRAIGHT"
+            },
+            {
+              "x": 4,
+              "y": 3,
+              "type": "TUBE_ELBOW",
+              "rotate": 270
+            },
+            {
+              "x": 4,
+              "y": 2,
+              "type": "TUBE_STRAIGHT",
+              "rotate": 90
+            },
+            {
+              "x": 4,
+              "y": 1,
+              "type": "TUBE_STRAIGHT",
+              "rotate": 90
+            },
+            {
+              "x": 4,
+              "y": 0,
+              "type": "TUBE_OUTPUT",
+              "rotate": 270
+            },
+            {
+              "x": 3,
+              "y": 1,
+              "type": "TUBE_STRAIGHT",
+              "rotate": 0
+            }
+          ]
+        }
+      }
     }
   ],
   "dashboards": [
@@ -550,7 +637,7 @@
       "data": {
         "title": "Process View Dashboard",
         "order": 3,
-        "items": ["item-4"]
+        "items": ["item-4", "item-8"]
       }
     },
     {

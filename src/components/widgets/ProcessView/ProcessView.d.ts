@@ -36,9 +36,3 @@ type ProcessViewPartWithComponent = {
   flow?: ProcessViewPartCalculatedFlow;
   visited?: boolean;
 } & ProcessViewPart;
-
-type ProcessViewPartWithFlow = {
-  flowingFrom: number[];
-  flowingTo: number[];
-  friction: number;
-} & ProcessViewPartWithComponent;

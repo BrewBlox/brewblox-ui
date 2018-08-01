@@ -32,12 +32,20 @@ export default class Part extends Vue {
     return this.flowingFrom.length > 0 && this.flowingTo.length > 0;
   }
 
+  get flowTo(): number[] {
+    if (!this.$props.part || !this.$props.part.flow) {
+      return [];
+    }
+
+    return Object.keys(this.$props.part.flow).map(flow => parseInt(flow, 10));
+  }
+
   get flowingFrom(): number[] {
     return (this.$props.part && this.$props.part.flowingFrom) || [];
   }
 
   get flowingTo(): number[] {
-    return (this.$props.part && this.$props.part.flowingTo) || [];
+    return this.flowTo.filter(angle => this.$props.part.flow[angle] > 0);
   }
 
   get liquid() {
