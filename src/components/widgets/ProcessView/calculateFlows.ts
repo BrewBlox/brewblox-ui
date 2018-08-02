@@ -235,7 +235,7 @@ function flowingTo(part: ProcessViewPartWithComponent): ProcessViewPartWithCompo
   // add all angles from part.flow where flow > 0
   const flowing = flowsWithPower(part.flow)
     // rotate angle back to Vue component angles
-    .map(angle => rotated(angle, 360 - part.rotate));
+    .map(angle => rotated(angle, 360 - (part.rotate || 0)));
 
   return {
     ...part,
