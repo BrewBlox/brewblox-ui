@@ -2,7 +2,7 @@ import queryString from 'query-string';
 
 import { convertToFlatPaths } from './measurementHelpers';
 
-const historyService = 'http://localhost/history';
+const historyService = process.env.VUE_APP_HISTORY_URI;
 
 const metricsCache: { [key: string]: number[][]; } = {};
 
