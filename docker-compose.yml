@@ -30,7 +30,7 @@ services:
       - "--simulation"
 
   datastore:
-    image: brewblox/brewblox-datastore:feature-json-server
+    image: brewblox/brewblox-datastore:develop
     labels:
       - "traefik.port=3000"
       - "traefik.frontend.rule=PathPrefix: /datastore"
