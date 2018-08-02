@@ -15,7 +15,7 @@ env:
     - GITHUB_REPO=BrewBlox/brewblox-ui
 
 install:
-  - pip3 install brewblox-tools~=0.4.0
+  - pip install brewblox-tools~=0.4.0
   - npm install --dev
 
 script:
