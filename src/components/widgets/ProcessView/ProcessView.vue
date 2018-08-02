@@ -38,6 +38,7 @@ class ProcessViewWidget extends Widget {
 
   get flows(): ProcessViewPartWithComponent[] {
     return pathsFromSources(this.partsWithComponent);
+    // @TODO add direction of arrows for parts
   }
 
   get partsWithComponent(): ProcessViewPartWithComponent[] {
