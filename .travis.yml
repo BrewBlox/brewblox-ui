@@ -22,6 +22,8 @@ before_deploy:
   cp -r dist/ docker/;
   docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD};
   docker run --rm --privileged multiarch/qemu-user-static:register --reset;
+  export CLEAN_TRAVIS_BRANCH=$(echo "${TRAVIS_BRANCH}" | tr '/' '-' | tr '[:upper:]' '[:lower:]');
+  export TAG_VERSION=$(git describe --tags);
 
 deploy:
   # Deploy AMD "rpi-latest" and version tag to Docker Hub on tagged commits
@@ -30,8 +32,8 @@ deploy:
       docker build --no-cache -t ${DOCKER_REPO}:amd -f docker/amd/Dockerfile docker;
       docker tag ${DOCKER_REPO}:amd ${DOCKER_REPO}:latest;
       docker push ${DOCKER_REPO}:latest;
-      docker tag ${DOCKER_REPO}:amd ${DOCKER_REPO}:$(git describe --tags);
-      docker push ${DOCKER_REPO}:$(git describe --tags);
+      docker tag ${DOCKER_REPO}:amd ${DOCKER_REPO}:${TAG_VERSION};
+      docker push ${DOCKER_REPO}:${TAG_VERSION};
     skip_cleanup: true
     on:
       tags: true
@@ -42,8 +44,8 @@ deploy:
       docker build --no-cache -t ${DOCKER_REPO}:arm -f docker/arm/Dockerfile docker;
       docker tag ${DOCKER_REPO}:arm ${DOCKER_REPO}:rpi-latest;
       docker push ${DOCKER_REPO}:rpi-latest;
-      docker tag ${DOCKER_REPO}:arm ${DOCKER_REPO}:rpi-$(git describe --tags);
-      docker push ${DOCKER_REPO}:rpi-$(git describe --tags);
+      docker tag ${DOCKER_REPO}:arm ${DOCKER_REPO}:rpi-${TAG_VERSION};
+      docker push ${DOCKER_REPO}:rpi-${TAG_VERSION};
     skip_cleanup: true
     on:
       tags: true
@@ -52,8 +54,8 @@ deploy:
   - provider: script
     script:
       docker build --no-cache -t ${DOCKER_REPO}:amd -f docker/amd/Dockerfile docker;
-      docker tag ${DOCKER_REPO}:amd ${DOCKER_REPO}:${TRAVIS_BRANCH};
-      docker push ${DOCKER_REPO}:${TRAVIS_BRANCH};
+      docker tag ${DOCKER_REPO}:amd ${DOCKER_REPO}:${CLEAN_TRAVIS_BRANCH};
+      docker push ${DOCKER_REPO}:${CLEAN_TRAVIS_BRANCH};
     skip_cleanup: true
     on:
       tags: false
@@ -65,8 +67,8 @@ deploy:
   - provider: script
     script:
       docker build --no-cache -t ${DOCKER_REPO}:arm -f docker/arm/Dockerfile docker;
-      docker tag ${DOCKER_REPO}:arm ${DOCKER_REPO}:rpi-${TRAVIS_BRANCH};
-      docker push ${DOCKER_REPO}:rpi-${TRAVIS_BRANCH};
+      docker tag ${DOCKER_REPO}:arm ${DOCKER_REPO}:rpi-${CLEAN_TRAVIS_BRANCH};
+      docker push ${DOCKER_REPO}:rpi-${CLEAN_TRAVIS_BRANCH};
     skip_cleanup: true
     on:
       tags: false
