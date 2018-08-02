@@ -2,8 +2,6 @@ sudo: required
 language: node_js
 node_js:
   - node
-python:
-  - "3.6"
 
 services:
   - docker
@@ -15,16 +13,13 @@ env:
     - GITHUB_REPO=BrewBlox/brewblox-ui
 
 install:
-  - pip install brewblox-tools~=0.4.0
   - npm install --dev
 
 script:
   - npm run build
 
 before_deploy:
-  mkdir -p docker/dist/;
-  rm -rf docker/dist/*;
-  cp -r dist/* docker/dist/;
+  cp -r dist/ docker/;
   docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD};
   docker run --rm --privileged multiarch/qemu-user-static:register --reset;
 
@@ -32,19 +27,17 @@ deploy:
   # Deploy "latest" and version tag to Docker Hub on tagged commits
   - provider: script
     script:
-      bbt-deploy-docker
-      --no-cache
-      --context docker
-      --file amd/Dockerfile
-      --name ${DOCKER_REPO}
-      --tags latest $(git describe --tags)
+      docker build --no-cache -t ${DOCKER_REPO}:amd -f docker/amd/Dockerfile docker;
+      docker tag ${DOCKER_REPO}:amd ${DOCKER_REPO}:latest;
+      docker push ${DOCKER_REPO}:latest;
+      docker tag ${DOCKER_REPO}:amd ${DOCKER_REPO}:$(git describe --tags);
+      docker push ${DOCKER_REPO}:$(git describe --tags);
       &&
-      bbt-deploy-docker
-      --no-cache
-      --context docker
-      --file arm/Dockerfile
-      --name ${DOCKER_REPO}
-      --tags rpi-latest rpi-$(git describe --tags)
+      docker build --no-cache -t ${DOCKER_REPO}:arm -f docker/arm/Dockerfile docker;
+      docker tag ${DOCKER_REPO}:arm ${DOCKER_REPO}:rpi-latest;
+      docker push ${DOCKER_REPO}:rpi-latest;
+      docker tag ${DOCKER_REPO}:arm ${DOCKER_REPO}:rpi-$(git describe --tags);
+      docker push ${DOCKER_REPO}:rpi-$(git describe --tags);
     skip_cleanup: true
     on:
       tags: true
@@ -52,19 +45,13 @@ deploy:
   # Deploy branch to Docker Hub on any push to an upstream development branch
   - provider: script
     script:
-      bbt-deploy-docker
-      --no-cache
-      --context docker
-      --file amd/Dockerfile
-      --name ${DOCKER_REPO}
-      --tags ${TRAVIS_BRANCH}
+      docker build --no-cache -t ${DOCKER_REPO}:amd -f docker/amd/Dockerfile docker;
+      docker tag ${DOCKER_REPO}:amd ${DOCKER_REPO}:${TRAVIS_BRANCH};
+      docker push ${DOCKER_REPO}:${TRAVIS_BRANCH};
       &&
-      bbt-deploy-docker
-      --no-cache
-      --context docker
-      --file arm/Dockerfile
-      --name ${DOCKER_REPO}
-      --tags rpi-${TRAVIS_BRANCH}
+      docker build --no-cache -t ${DOCKER_REPO}:arm -f docker/arm/Dockerfile docker;
+      docker tag ${DOCKER_REPO}:arm ${DOCKER_REPO}:rpi-${TRAVIS_BRANCH};
+      docker push ${DOCKER_REPO}:rpi-${TRAVIS_BRANCH};
     skip_cleanup: true
     on:
       tags: false
