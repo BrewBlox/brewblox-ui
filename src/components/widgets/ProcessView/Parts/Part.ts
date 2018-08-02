@@ -33,10 +33,18 @@ export default class Part extends Vue {
   }
 
   get flowingFrom(): number[] {
+    if (this.$props.part.flowingFrom) {
+      return this.$props.part.flowingFrom;
+    }
+
     return [];
   }
 
   get flowingTo(): number[] {
+    if (this.$props.part.flowingTo) {
+      return this.$props.part.flowingTo;
+    }
+
     return [];
   }
 

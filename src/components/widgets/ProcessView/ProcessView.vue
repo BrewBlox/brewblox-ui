@@ -5,7 +5,7 @@ import Widget from '../Widget';
 
 import ProcessViewItem from './ProcessViewItem.vue';
 import componentByType from './Parts/componentByType';
-import { pathsFromSources } from './calculateFlows';
+import { pathsFromSources, addFlowingToComponents } from './calculateFlows';
 
 /* eslint-disable */
 @Component({
@@ -18,7 +18,7 @@ class ProcessViewWidget extends Widget {
   size: number = 50;
   frame: number = 0;
   animationFrame: number = 0;
-  debugAnimation: boolean = false;
+  debugAnimation: boolean = true;
 
   get width(): number {
     return this.options.width;
@@ -36,16 +36,17 @@ class ProcessViewWidget extends Widget {
     return this.options.parts;
   }
 
-  get flows(): ProcessViewPartWithComponent[] {
-    return pathsFromSources(this.partsWithComponent);
-    // @TODO add direction of arrows for parts
-  }
-
   get partsWithComponent(): ProcessViewPartWithComponent[] {
     return this.parts.map(part => ({
       ...part,
       component: componentByType(part.type),
+      flowingTo: [],
+      flowingFrom: [],
     }));
+  }
+
+  get partsWithFlows(): ProcessViewPartWithComponent[] {
+    return addFlowingToComponents(pathsFromSources(this.partsWithComponent));
   }
 
   get style(): any {
@@ -117,7 +118,7 @@ export default ProcessViewWidget;
     >
       <div
         class="grid-item"
-        v-for="part in flows"
+        v-for="part in partsWithFlows"
         :key="`${part.x}_${part.y}`"
         :style="partStyle(part)"
       >

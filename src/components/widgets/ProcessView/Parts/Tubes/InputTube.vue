@@ -73,6 +73,14 @@ class InputTube extends Part {
     return opacity;
   }
 
+  get flowingFrom(): number[] {
+    if (this.flowingTo.length > 0) {
+      return [270];
+    }
+
+    return [];
+  }
+
   get arrow() {
     return {
       x: this.frame * 50,
