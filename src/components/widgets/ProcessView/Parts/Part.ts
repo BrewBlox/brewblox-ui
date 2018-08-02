@@ -49,7 +49,11 @@ export default class Part extends Vue {
   }
 
   get liquid() {
-    return this.flowingFrom.length > 0;
+    if (!this.$props.part.flow) {
+      return false;
+    }
+
+    return Object.keys(this.$props.part.flow).length > 0;
   }
 
   get flipped(): boolean {
