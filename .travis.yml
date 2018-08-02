@@ -13,7 +13,7 @@ env:
     - GITHUB_REPO=BrewBlox/brewblox-ui
 
 install:
-  - npm install --dev
+  - npm install
 
 script:
   - npm run build
@@ -27,12 +27,13 @@ deploy:
   # Deploy "latest" and version tag to Docker Hub on tagged commits
   - provider: script
     script:
+      # AMD
       docker build --no-cache -t ${DOCKER_REPO}:amd -f docker/amd/Dockerfile docker;
       docker tag ${DOCKER_REPO}:amd ${DOCKER_REPO}:latest;
       docker push ${DOCKER_REPO}:latest;
       docker tag ${DOCKER_REPO}:amd ${DOCKER_REPO}:$(git describe --tags);
       docker push ${DOCKER_REPO}:$(git describe --tags);
-      &&
+      # ARM
       docker build --no-cache -t ${DOCKER_REPO}:arm -f docker/arm/Dockerfile docker;
       docker tag ${DOCKER_REPO}:arm ${DOCKER_REPO}:rpi-latest;
       docker push ${DOCKER_REPO}:rpi-latest;
@@ -45,10 +46,11 @@ deploy:
   # Deploy branch to Docker Hub on any push to an upstream development branch
   - provider: script
     script:
+      # AMD
       docker build --no-cache -t ${DOCKER_REPO}:amd -f docker/amd/Dockerfile docker;
       docker tag ${DOCKER_REPO}:amd ${DOCKER_REPO}:${TRAVIS_BRANCH};
       docker push ${DOCKER_REPO}:${TRAVIS_BRANCH};
-      &&
+      # ARM
       docker build --no-cache -t ${DOCKER_REPO}:arm -f docker/arm/Dockerfile docker;
       docker tag ${DOCKER_REPO}:arm ${DOCKER_REPO}:rpi-${TRAVIS_BRANCH};
       docker push ${DOCKER_REPO}:rpi-${TRAVIS_BRANCH};
