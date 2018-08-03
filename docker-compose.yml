@@ -26,8 +26,12 @@ services:
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /spark"
+    volumes:
+      - "./mocks/config/seed_objects.json:/app/seed_objects.json"
     command:
       - "--simulation"
+      - "--seed-profiles=0"
+      - "--seed-objects=seed_objects.json"
 
   datastore:
     image: brewblox/brewblox-datastore:develop

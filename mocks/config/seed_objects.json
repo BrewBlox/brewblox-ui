@@ -1,0 +1,82 @@
+[
+  {
+    "id": "setpoint-1",
+    "profiles": [
+      0
+    ],
+    "type": "SetPointSimple",
+    "data": {
+      "setting": 21
+    }
+  },
+  {
+    "id": "setpoint-2",
+    "profiles": [
+      0
+    ],
+    "type": "SetPointSimple",
+    "data": {
+      "setting": 1
+    }
+  },
+  {
+    "id": "sensor-1",
+    "profiles": [
+      0
+    ],
+    "type": "OneWireTempSensor",
+    "data": {
+      "settings": {
+        "address": "DEADBEEF",
+        "offset": 0
+      },
+      "state": {
+        "value[celsius]": 20.89789201,
+        "connected": true
+      }
+    }
+  },
+  {
+    "id": "sensor-setpoint-pair-1",
+    "profiles": [
+      0
+    ],
+    "type": "SensorSetPointPair",
+    "data": {
+      "sensor<>": "sensor-1",
+      "setpoint<>": "setpoint-1"
+    }
+  },
+  {
+    "id": "PID-1",
+    "profiles": [
+      0
+    ],
+    "type": "Pid",
+    "data": {
+      "settings": {
+        "kp": 10,
+        "ti": 600,
+        "td": 60
+      },
+      "links": {
+        "input<>": "sensor-setpoint-pair-1"
+      },
+      "filtering": {
+        "input": 3,
+        "derivative": 4
+      },
+      "state": {
+        "inputValue": 21.0859,
+        "inputSetting": 20,
+        "outputValue": 45.6758,
+        "p": 10.7813,
+        "i": 34.8164,
+        "d": 0.0781,
+        "derivative": 0.001301666667,
+        "integral": 20889.84,
+        "error": -1.0781
+      }
+    }
+  }
+]
