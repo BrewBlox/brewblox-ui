@@ -1,0 +1,77 @@
+sudo: required
+language: node_js
+node_js:
+  - node
+
+services:
+  - docker
+
+env:
+  global:
+    # Both docker and github repo names are case sensitive
+    - DOCKER_REPO=brewblox/brewblox-ui
+    - GITHUB_REPO=BrewBlox/brewblox-ui
+
+install:
+  - npm install
+
+script:
+  - npm run build
+
+before_deploy:
+  cp -r dist/ docker/;
+  docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD};
+  docker run --rm --privileged multiarch/qemu-user-static:register --reset;
+  export CLEAN_TRAVIS_BRANCH=$(echo "${TRAVIS_BRANCH}" | tr '/' '-' | tr '[:upper:]' '[:lower:]');
+  export TAG_VERSION=$(git describe --tags);
+
+deploy:
+  # Deploy AMD "rpi-latest" and version tag to Docker Hub on tagged commits
+  - provider: script
+    script:
+      docker build --no-cache -t ${DOCKER_REPO}:amd -f docker/amd/Dockerfile docker;
+      docker tag ${DOCKER_REPO}:amd ${DOCKER_REPO}:latest;
+      docker push ${DOCKER_REPO}:latest;
+      docker tag ${DOCKER_REPO}:amd ${DOCKER_REPO}:${TAG_VERSION};
+      docker push ${DOCKER_REPO}:${TAG_VERSION};
+    skip_cleanup: true
+    on:
+      tags: true
+
+  # Deploy ARM "rpi-latest" and version tag to Docker Hub on tagged commits
+  - provider: script
+    script:
+      docker build --no-cache -t ${DOCKER_REPO}:arm -f docker/arm/Dockerfile docker;
+      docker tag ${DOCKER_REPO}:arm ${DOCKER_REPO}:rpi-latest;
+      docker push ${DOCKER_REPO}:rpi-latest;
+      docker tag ${DOCKER_REPO}:arm ${DOCKER_REPO}:rpi-${TAG_VERSION};
+      docker push ${DOCKER_REPO}:rpi-${TAG_VERSION};
+    skip_cleanup: true
+    on:
+      tags: true
+
+  # Deploy AMD branch to Docker Hub on any push to an upstream development branch
+  - provider: script
+    script:
+      docker build --no-cache -t ${DOCKER_REPO}:amd -f docker/amd/Dockerfile docker;
+      docker tag ${DOCKER_REPO}:amd ${DOCKER_REPO}:${CLEAN_TRAVIS_BRANCH};
+      docker push ${DOCKER_REPO}:${CLEAN_TRAVIS_BRANCH};
+    skip_cleanup: true
+    on:
+      tags: false
+      repo: ${GITHUB_REPO}
+      all_branches: true
+      condition: ${TRAVIS_BRANCH} != master
+
+  # Deploy ARM branch to Docker Hub on any push to an upstream development branch
+  - provider: script
+    script:
+      docker build --no-cache -t ${DOCKER_REPO}:arm -f docker/arm/Dockerfile docker;
+      docker tag ${DOCKER_REPO}:arm ${DOCKER_REPO}:rpi-${CLEAN_TRAVIS_BRANCH};
+      docker push ${DOCKER_REPO}:rpi-${CLEAN_TRAVIS_BRANCH};
+    skip_cleanup: true
+    on:
+      tags: false
+      repo: ${GITHUB_REPO}
+      all_branches: true
+      condition: ${TRAVIS_BRANCH} != master
