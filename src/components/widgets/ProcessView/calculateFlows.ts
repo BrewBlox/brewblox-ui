@@ -254,10 +254,8 @@ function flowingFrom(
 
   const rotate = part.rotate || 0;
 
-  const outflows = flowsWithPower(part.flow);
   const flowing = Object.keys(rotatedFlows(part.component.flows(), rotate))
     .map(angle => parseInt(angle, 10))
-    .filter(angle => outflows.indexOf(angle) === -1)
     .filter((angle) => {
       const inflowPart = partAtAngle(part, allParts, angle);
 
@@ -267,10 +265,11 @@ function flowingFrom(
       }
 
       // get flow on exit of part next to current part
-      const outflowToAngle = inflowPart.flow[rotated(angle, 180)];
+      const inflowOnAngle = inflowPart.flow[rotated(angle, 180)] || 0;
+      const outflowOnAngle = part.flow && part.flow[angle] ? part.flow[angle] : 0;
 
-      // if outflow to part's angle is found, there is flow from that angle
-      return outflowToAngle && outflowToAngle > 0;
+      // if inflow to part's angle is more than what's flowing out
+      return inflowOnAngle > outflowOnAngle;
     })
     // rotate angle back to Vue component angles
     .map(angle => rotated(angle, 360 - rotate));
@@ -284,6 +283,6 @@ function flowingFrom(
 export function addFlowingToComponents(parts: ProcessViewPartWithComponent[]):
   ProcessViewPartWithComponent[] {
   return parts
-    .map(flowingTo)
-    .map(flowingFrom);
+    .map(flowingFrom)
+    .map(flowingTo);
 }
