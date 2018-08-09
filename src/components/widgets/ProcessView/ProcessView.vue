@@ -5,7 +5,7 @@ import Widget from '../Widget';
 
 import ProcessViewItem from './ProcessViewItem.vue';
 import componentByType from './Parts/componentByType';
-import { pathsFromSources, addFlowingToComponents } from './calculateFlows';
+import { pathsFromSources } from './calculateFlows';
 
 /* eslint-disable */
 @Component({
@@ -46,7 +46,7 @@ class ProcessViewWidget extends Widget {
   }
 
   get partsWithFlows(): ProcessViewPartWithComponent[] {
-    return addFlowingToComponents(pathsFromSources(this.partsWithComponent));
+    return pathsFromSources(this.partsWithComponent);
   }
 
   get style(): any {

@@ -204,13 +204,6 @@ function flow(
   );
 }
 
-export function pathsFromSources(parts: ProcessViewPartWithComponent[]):
-  ProcessViewPartWithComponent[] {
-  const sources = getSources(parts);
-  const flowsFromSources = sources.map(source => flow(source, parts));
-  return flatten(flowsFromSources);
-}
-
 function flowsWithPower(flows: ProcessViewPartCalculatedFlow) {
   return Object.keys(flows).reduce(
     (acc: number[], key: string) => {
@@ -287,4 +280,11 @@ export function addFlowingToComponents(parts: ProcessViewPartWithComponent[]):
   return parts
     .map(flowingFrom)
     .map(flowingTo);
+}
+
+export function pathsFromSources(parts: ProcessViewPartWithComponent[]):
+  ProcessViewPartWithComponent[] {
+  const sources = getSources(parts);
+  const flowsFromSources = sources.map(source => flow(source, parts));
+  return addFlowingToComponents(flatten(flowsFromSources));
 }
