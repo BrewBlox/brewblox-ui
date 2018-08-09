@@ -25,6 +25,13 @@ function propertyNameWithUnit(key: string, inputObject: any): string {
     return `${key}[${input.unit}]`;
   }
 
+  if (
+    (Array.isArray(input) && input[0] instanceof Link) ||
+    input instanceof Link
+  ) {
+    return `${key}<>`;
+  }
+
   return key;
 }
 
@@ -75,6 +82,10 @@ export function deserialize(input: any, prevKey: string = ''): any {
 function serializeProperty(key: string, inputObject: any, input = inputObject[key]): any {
   if (input instanceof Unit) {
     return input.value;
+  }
+
+  if (input instanceof Link) {
+    return input.id;
   }
 
   if (typeof input === 'object') {

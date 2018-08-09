@@ -136,4 +136,22 @@ describe('serialize', () => {
 
     expect(serialize(input)).toEqual(output);
   });
+
+  it('Converts link properties for API saving', () => {
+    const input = {
+      sensor: new Link('sensor-1'),
+      deeper: {
+        sensor: new Link('sensor-2'),
+      },
+    };
+
+    const output = {
+      'sensor<>': 'sensor-1',
+      deeper: {
+        'sensor<>': 'sensor-2',
+      },
+    };
+
+    expect(serialize(input)).toEqual(output);
+  });
 });
