@@ -5,6 +5,10 @@ export default class Link {
     this.id = id;
   }
 
+  toString(): string {
+    return this.id;
+  }
+
   toJSON(): string {
     return this.id;
   }

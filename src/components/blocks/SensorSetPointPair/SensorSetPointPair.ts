@@ -31,21 +31,17 @@ export default class SensorSetPointPair extends BlockComponent {
     return getById(this.$store, this.$props.id);
   }
 
-  get links() {
-    return this.blockData.links;
-  }
-
   get sensor() {
     return getOneWireTempSensorById(
       this.$store,
-      `${this.blockData.serviceId}/${this.links.sensor}`,
+      `${this.blockData.serviceId}/${this.blockData.sensor}`,
     );
   }
 
   get setpoint() {
     return getSetPointSimpleById(
       this.$store,
-      `${this.blockData.serviceId}/${this.links.setpoint}`,
+      `${this.blockData.serviceId}/${this.blockData.setpoint}`,
     );
   }
 
@@ -81,10 +77,8 @@ export default class SensorSetPointPair extends BlockComponent {
 
   save() {
     persist(this.$store, {
-      links: {
-        sensor: this.sensorInput,
-        setpoint: this.setpointInput,
-      },
+      sensor: this.sensorInput,
+      setpoint: this.setpointInput,
       id: this.blockData.id,
       serviceId: this.blockData.serviceId,
     });
