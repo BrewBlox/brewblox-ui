@@ -2,6 +2,8 @@ import Component from 'vue-class-component';
 
 import BlockComponent from '../BlockComponent';
 
+import Link from '@/core/units/Link';
+
 import { getById } from '@/store/blocks/SensorSetPointPair/getters';
 import {
   getById as getSetPointSimpleById,
@@ -77,8 +79,8 @@ export default class SensorSetPointPair extends BlockComponent {
 
   save() {
     persist(this.$store, {
-      sensor: this.sensorInput,
-      setpoint: this.setpointInput,
+      sensor: new Link(this.sensorInput),
+      setpoint: new Link(this.setpointInput),
       id: this.blockData.id,
       serviceId: this.blockData.serviceId,
     });

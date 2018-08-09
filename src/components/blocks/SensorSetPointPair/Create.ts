@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
+import Link from '@/core/units/Link';
+
 import { DeviceService } from '@/store/services/state';
 import { SetPointSimple } from '@/store/blocks/SetPointSimple/SetPointSimple';
 import { OneWireTempSensor } from '@/store/blocks/OneWireTempSensor/OneWireTempSensor';
@@ -89,8 +91,8 @@ class SensorSetPointPair extends Vue {
 
       const block = await createSensorSetPointPair(this.$store, {
         serviceId: this.service.id,
-        sensor: this.sensorInput.id,
-        setpoint: this.setpointInput.id,
+        sensor: new Link(this.sensorInput.id),
+        setpoint: new Link(this.setpointInput.id),
       });
 
       this.creating = false;
