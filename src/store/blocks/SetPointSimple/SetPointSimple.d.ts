@@ -1,7 +1,9 @@
+import Unit from '@/core/units/Unit';
+
 import { BlockBase } from '../state';
 
 export interface SetPointSimple extends BlockBase {
-  setting: number;
+  setting: Unit;
 }
 
 export interface SetPointSimpleBlock extends SetPointSimple {
