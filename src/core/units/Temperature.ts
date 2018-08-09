@@ -17,3 +17,11 @@ export class Fahrenheit extends Temperature {
     return '°F';
   }
 }
+
+export class Kelvin extends Temperature {
+  unit: string = 'kelvin';
+
+  get unitNotation() {
+    return '°K';
+  }
+}

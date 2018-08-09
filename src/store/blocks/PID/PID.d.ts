@@ -1,5 +1,7 @@
 import { BlockBase } from '../state';
 
+import Link from '@/core/units/Link';
+
 export interface PIDSettings {
   kp: number;
   ti: number;
@@ -22,8 +24,8 @@ export interface PIDState {
 }
 
 export interface PIDLinks {
-  input: string;
-  output: string;
+  input: Link;
+  output: Link;
 }
 
 export interface PIDFiltering {
