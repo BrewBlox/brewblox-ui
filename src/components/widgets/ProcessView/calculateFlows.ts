@@ -204,41 +204,7 @@ function flow(
   );
 }
 
-function flowsWithPower(flows: ProcessViewPartCalculatedFlow) {
-  return Object.keys(flows).reduce(
-    (acc: number[], key: string) => {
-      const angle = parseInt(key, 10);
-      const power = flows[angle] ? flows[angle] : 0;
-
-      if (power > 0) {
-        return [...acc, angle];
-      }
-
-      return acc;
-    },
-    [],
-  );
-}
-
-function flowingTo(part: ProcessViewPartWithComponent): ProcessViewPartWithComponent {
-  if (!part.flow) {
-    return part;
-  }
-
-  // add all angles from part.flow where flow > 0
-  const flowing = flowsWithPower(part.flow)
-    // rotate angle back to Vue component angles
-    .map(angle => rotated(angle, 360 - (part.rotate || 0)))
-    // filter out angles which are in flowing from
-    .filter(angle => part.flowingFrom.indexOf(angle) === -1);
-
-  return {
-    ...part,
-    flowingTo: flowing,
-  };
-}
-
-function flowingFrom(
+function calculateFlowValuesOnAngles(
   part: ProcessViewPartWithComponent,
   index: number,
   allParts: ProcessViewPartWithComponent[],
@@ -248,38 +214,49 @@ function flowingFrom(
   }
 
   const rotate = part.rotate || 0;
+  const flows = rotatedFlows(part.component.flows(), rotate);
 
-  const flowing = Object.keys(rotatedFlows(part.component.flows(), rotate))
+  const flowing = Object.keys(flows)
     .map(angle => parseInt(angle, 10))
-    .filter((angle) => {
+    .reduce(
+      (acc: number[], angle) => {
+        // make sure all _out_ angles are also calculated
+        const outAngles = flows[angle].map(flo => flo.out);
+        return [...(new Set([...acc, angle, ...outAngles]))];
+      },
+      [],
+    )
+    .map((angle: number) => {
       const inflowPart = partAtAngle(part, allParts, angle);
 
-      // no part, so no inflow possible at angle
-      if (!inflowPart || !inflowPart.flow) {
-        return false;
-      }
-
       // get flow on exit of part next to current part
-      const inflowOnAngle = inflowPart.flow[rotated(angle, 180)] || 0;
+      const inflowOnAngle =
+        (inflowPart && inflowPart.flow && inflowPart.flow[rotated(angle, 180)]) || 0;
       const outflowOnAngle = part.flow && part.flow[angle] ? part.flow[angle] : 0;
 
-      // if inflow to part's angle is more than what's flowing out
-      return inflowOnAngle > outflowOnAngle;
+      return {
+        angle,
+        flow: outflowOnAngle - inflowOnAngle,
+      };
     })
     // rotate angle back to Vue component angles
-    .map(angle => rotated(angle, 360 - rotate));
+    .reduce(
+      (acc, calculatedFlow) => ({
+        ...acc,
+        [rotated(calculatedFlow.angle, 360 - rotate)]: calculatedFlow.flow,
+      }),
+      {},
+    );
 
   return {
     ...part,
-    flowingFrom: flowing,
+    flow: flowing,
   };
 }
 
 export function addFlowingToComponents(parts: ProcessViewPartWithComponent[]):
   ProcessViewPartWithComponent[] {
-  return parts
-    .map(flowingFrom)
-    .map(flowingTo);
+  return parts.map(calculateFlowValuesOnAngles);
 }
 
 export function pathsFromSources(parts: ProcessViewPartWithComponent[]):

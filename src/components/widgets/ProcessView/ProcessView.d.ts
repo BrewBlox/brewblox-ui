@@ -31,8 +31,6 @@ type ProcessViewPartWithComponent = {
     isSink?: boolean;
     flows: () => ProcessViewPartFlows;
   };
-  flowingFrom: number[],
-  flowingTo: number[],
   flow?: ProcessViewPartCalculatedFlow;
   visited?: boolean;
 } & ProcessViewPart;
