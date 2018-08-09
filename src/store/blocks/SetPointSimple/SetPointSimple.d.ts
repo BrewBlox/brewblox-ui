@@ -1,9 +1,7 @@
 import { BlockBase } from '../state';
 
 export interface SetPointSimple extends BlockBase {
-  settings: {
-    value: number,
-  };
+  setting: number;
 }
 
 export interface SetPointSimpleBlock extends SetPointSimple {

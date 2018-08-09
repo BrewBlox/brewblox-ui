@@ -32,7 +32,7 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
   }
 
   get setpointChanged() {
-    return this.setPoint.settings.value !== this.inputs.setpoint;
+    return this.setPoint.setting !== this.inputs.setpoint;
   }
 
   save() {
