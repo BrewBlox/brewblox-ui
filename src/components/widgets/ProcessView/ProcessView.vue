@@ -40,8 +40,6 @@ class ProcessViewWidget extends Widget {
     return this.parts.map(part => ({
       ...part,
       component: componentByType(part.type),
-      flowingTo: [],
-      flowingFrom: [],
     }));
   }
 

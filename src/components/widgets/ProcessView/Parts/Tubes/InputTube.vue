@@ -15,7 +15,7 @@
       <line x1="30" y1="25" x2="50" y2="25"/>
     </g>
     <g
-      v-if="flowing"
+      v-if="flowOnAngle(90) > 0"
       class="outline"
     >
       <FlowArrow
@@ -71,14 +71,6 @@ class InputTube extends Part {
     }
 
     return opacity;
-  }
-
-  get flowingFrom(): number[] {
-    if (this.flowingTo.length > 0) {
-      return [270];
-    }
-
-    return [];
   }
 
   get arrow() {

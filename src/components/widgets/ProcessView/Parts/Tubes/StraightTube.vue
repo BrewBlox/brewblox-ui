@@ -64,7 +64,7 @@ class StraightTube extends Part {
   }
 
   get direction() {
-    return this.flowingFrom[0];
+    return this.flowOnAngle(90) > 0 ? 270 : 90;
   }
 
   get arrow() {

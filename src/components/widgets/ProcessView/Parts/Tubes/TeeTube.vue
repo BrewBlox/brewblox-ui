@@ -68,11 +68,11 @@ class TeeTube extends Part {
   }
 
   hasFlowOnAngle(angle: number) {
-    return this.flowingFrom.indexOf(angle) > -1 || this.flowingTo.indexOf(angle) > -1;
+    return this.flowOnAngle(angle) !== 0;
   }
 
   leftArrow(frame: number) {
-    const toRight = this.flowingFrom.indexOf(270) > -1;
+    const toRight = this.flowOnAngle(270) < 0;
     const animationFrame = toRight ? frame : 1 - frame;
 
     return {
@@ -83,7 +83,7 @@ class TeeTube extends Part {
   }
 
   topArrow(frame: number) {
-    const toBottom = this.flowingFrom.indexOf(0) > -1;
+    const toBottom = this.flowOnAngle(0) < 0;
     const animationFrame = toBottom ? frame : 1 - frame;
 
     return {
@@ -94,7 +94,7 @@ class TeeTube extends Part {
   }
 
   rightArrow(frame: number) {
-    const toLeft = this.flowingFrom.indexOf(90) > -1;
+    const toLeft = this.flowOnAngle(90) < 0;
     const animationFrame = toLeft ? frame + 0.25 : 1 - frame;
 
     return {

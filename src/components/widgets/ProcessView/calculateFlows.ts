@@ -221,7 +221,7 @@ function calculateFlowValuesOnAngles(
     .reduce(
       (acc: number[], angle) => {
         // make sure all _out_ angles are also calculated
-        const outAngles = flows[angle].map(flo => flo.out);
+        const outAngles = flows[angle].map(partFlow => partFlow.out);
         return [...(new Set([...acc, angle, ...outAngles]))];
       },
       [],

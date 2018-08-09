@@ -81,10 +81,6 @@ class OutputTube extends Part {
     return opacity;
   }
 
-  get flowing(): boolean {
-    return this.flowingFrom.length > 0;
-  }
-
   get arrow() {
     return {
       x: this.frame * 50,
