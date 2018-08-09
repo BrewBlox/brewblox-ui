@@ -16,10 +16,10 @@ export default function addBlock(context: BlocksContext, block: Block, metrics: 
     case 'SetPointSimple':
       addSetPoint(context, block);
       break;
-    case 'PID':
+    case 'Pid':
       addPID(context, block);
       break;
     default:
-      throw new Error('Invalid block type');
+      throw new Error(`Invalid block type "${(block as Block).type}"`);
   }
 }

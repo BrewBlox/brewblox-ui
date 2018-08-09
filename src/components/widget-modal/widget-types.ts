@@ -10,7 +10,7 @@ import { deviceServices } from '@/store/services/getters';
 
 export const widgetTypes: { [key in WidgetType]: string } = {
   Metrics: 'Metrics',
-  PID: 'PID',
+  Pid: 'PID',
   OneWireTempSensor: 'Temperature Sensor',
   SetPointSimple: 'SetPoint',
   SensorSetPointPair: 'Sensor SetPoint Pair',
@@ -30,7 +30,7 @@ export function blocksByWidgetType(store: RootStore, type: WidgetType): Block[] 
   const services = deviceServices(store);
 
   switch (type) {
-    case 'PID':
+    case 'Pid':
       return getBlocksFromServices(services, store, getAllPIDs);
     case 'OneWireTempSensor':
       return getBlocksFromServices(services, store, getAllOneWireTempSensors);
@@ -45,7 +45,7 @@ export function blocksByWidgetType(store: RootStore, type: WidgetType): Block[] 
 
 export const widgetComponents: { [name in WidgetType]: () => Promise<any> } = {
   Metrics: () => import('@/components/widgets/Metrics/Create.vue'),
-  PID: () => import('@/components/blocks/PID/Create.vue'),
+  Pid: () => import('@/components/blocks/PID/Create.vue'),
   OneWireTempSensor: () => import('@/components/blocks/OneWireTempSensor/Create.vue'),
   SetPointSimple: () => import('@/components/blocks/SetPointSimple/Create.vue'),
   SensorSetPointPair: () => import('@/components/blocks/SensorSetPointPair/Create.vue'),

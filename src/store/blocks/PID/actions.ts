@@ -25,7 +25,7 @@ export const addPID = (
       links,
       filtering,
       state,
-      type: 'PID',
+      type: 'Pid',
     },
   );
 };

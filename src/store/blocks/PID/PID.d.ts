@@ -49,5 +49,5 @@ export interface PIDStateUpdate extends BlockBase {
 }
 
 export interface PIDBlock extends PID {
-  type: 'PID';
+  type: 'Pid';
 }
