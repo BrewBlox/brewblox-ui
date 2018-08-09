@@ -1,4 +1,5 @@
 import Unit from './Unit';
+import Link from './Link';
 import { Celsius, Fahrenheit } from './Temperature';
 
 import { deserialize, serialize } from './parseObject';
@@ -72,6 +73,22 @@ describe('deserialize', () => {
     expect(output[0].convert).toBeInstanceOf(Celsius);
     expect(output[1]).toBe(25);
     expect(output[2]).toBe('do not touch');
+  });
+
+  it('Should recognise properties structured as links', () => {
+    const input = {
+      test: 'Do not touch',
+      something: 1,
+      'sensor<>': 'some-sensor-id',
+      'sensors<>': ['sensor-1', 'sensor-2'],
+    };
+
+    const output = deserialize(input);
+
+    expect(output.test).toBe('Do not touch');
+    expect(output.something).not.toBeInstanceOf(Link);
+    expect(output.sensor).toBeInstanceOf(Link);
+    expect(output.sensors[0]).toBeInstanceOf(Link);
   });
 });
 
