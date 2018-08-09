@@ -2,17 +2,13 @@ import { BlockBase } from '../state';
 import { NewBlockBase } from '@/store/blocks/state';
 
 export interface SensorSetPointPair extends BlockBase {
-  links: {
-    sensor: string,
-    setpoint: string,
-  };
+  sensor: string;
+  setpoint: string;
 }
 
 export interface SensorSetPointPairPersisted {
-  links: {
-    sensor: string,
-    setpoint: string,
-  };
+  sensor: string;
+  setpoint: string;
 }
 
 export interface SensorSetPointPairCreateNew extends NewBlockBase, SensorSetPointPairPersisted {}

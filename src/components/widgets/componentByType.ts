@@ -7,7 +7,7 @@ import Placeholder from './Placeholder.vue';
 
 function componentByType(type: WidgetType) {
   switch (type) {
-    case 'PID':
+    case 'Pid':
       return PID;
     case 'Metrics':
       return Metrics;

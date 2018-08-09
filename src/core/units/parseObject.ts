@@ -1,7 +1,9 @@
 import Unit from './Unit';
+import Link from './Link';
 import valueToUnit from './convertUnit';
 
-const extractUnit = /^([a-zA-Z0-9_.\-[\]]+)\[([a-zA-Z]+)]$/;
+// const extractUnit = /^([a-zA-Z0-9_.\-[\]]+)(\[([a-zA-Z_]+)]|<>)$/;
+const extractUnit = /^([^[<]+)([[<])([^\]>]*)[\]>]$/;
 
 export function propertyNameWithoutUnit(name: string): string {
   const matched = name.match(extractUnit);
@@ -23,15 +25,26 @@ function propertyNameWithUnit(key: string, inputObject: any): string {
     return `${key}[${input.unit}]`;
   }
 
+  if (
+    (Array.isArray(input) && input[0] instanceof Link) ||
+    input instanceof Link
+  ) {
+    return `${key}<>`;
+  }
+
   return key;
 }
 
-export function convertToUnit(key: string, value: any): Unit {
+export function convertToUnit(key: string, value: any): Unit | Link {
   const matched = key.match(extractUnit);
 
   if (matched) {
     try {
-      return valueToUnit(value, matched[2]);
+      if (matched[2] === '<') {
+        return new Link(value);
+      }
+
+      return valueToUnit(value, matched[3]);
     } catch (e) {
       return value;
     }
@@ -69,6 +82,10 @@ export function deserialize(input: any, prevKey: string = ''): any {
 function serializeProperty(key: string, inputObject: any, input = inputObject[key]): any {
   if (input instanceof Unit) {
     return input.value;
+  }
+
+  if (input instanceof Link) {
+    return input.id;
   }
 
   if (typeof input === 'object') {

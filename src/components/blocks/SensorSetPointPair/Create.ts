@@ -89,10 +89,8 @@ class SensorSetPointPair extends Vue {
 
       const block = await createSensorSetPointPair(this.$store, {
         serviceId: this.service.id,
-        links: {
-          sensor: this.sensorInput.id,
-          setpoint: this.setpointInput.id,
-        },
+        sensor: this.sensorInput.id,
+        setpoint: this.setpointInput.id,
       });
 
       this.creating = false;

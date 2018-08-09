@@ -22,25 +22,23 @@ export default class SetPointSimple extends BlockComponent {
     return getById(this.$store, this.$props.id);
   }
 
-  get settings() {
-    return this.blockData.settings;
+  get setting() {
+    return this.blockData.setting;
   }
 
   get changed() {
-    return this.settings.value !== this.valueInput;
+    return this.setting !== this.valueInput;
   }
 
   mounted() {
-    this.valueInput = this.settings.value;
+    this.valueInput = this.setting;
   }
 
   save() {
     persist(this.$store, {
       id: this.blockData.id,
       serviceId: this.blockData.serviceId,
-      settings: {
-        value: this.valueInput,
-      },
+      setting: this.valueInput,
     });
   }
 }

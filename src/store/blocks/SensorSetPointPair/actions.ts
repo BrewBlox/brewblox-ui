@@ -14,12 +14,21 @@ export const createSensorSetPointPair =
     });
 
 export const addSensorSetPointPair =
-  (context: BlocksContext, { id, serviceId, links }: SensorSetPointPair) => addBlock(
+  (
+    context: BlocksContext,
+    {
+      id,
+      serviceId,
+      sensor,
+      setpoint,
+    }: SensorSetPointPair,
+  ) => addBlock(
     context,
     {
       id,
       serviceId,
-      links,
+      sensor,
+      setpoint,
       type: 'SensorSetPointPair',
     },
   );
