@@ -37,6 +37,7 @@ export default class SetPointSimple extends BlockComponent {
   save() {
     persist(this.$store, {
       id: this.blockData.id,
+      profiles: this.blockData.profiles,
       serviceId: this.blockData.serviceId,
       setting: this.valueInput,
     });

@@ -26,6 +26,7 @@ export const addPID = (
       filtering,
       state,
       type: 'Pid',
+      profiles: [0], // Always use profile 0
     },
   );
 };
@@ -48,6 +49,7 @@ export const refresh = (store: RootStore, pid: PID) => {
   updateBlockState(store, {
     id: pid.id,
     serviceId: pid.serviceId,
+    profiles: pid.profiles,
     state: {
       inputValue: random(),
       inputSetting: random(),

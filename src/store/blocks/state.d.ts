@@ -30,9 +30,10 @@ export interface NewBlockBase {
 
 export interface BlockBase extends NewBlockBase {
   id: string;
+  profiles: number[];
 }
 
-type Value = string|number[];
+type Value = string | number[];
 
 interface Series {
   name: string; // eslint-disable-line no-restricted-globals

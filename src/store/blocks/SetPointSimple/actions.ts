@@ -16,6 +16,7 @@ export const addSetPoint = (
       serviceId,
       setting,
       type: 'SetPointSimple',
+      profiles: [0],
     },
   );
 };

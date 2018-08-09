@@ -87,6 +87,7 @@ export default class PIDWidget extends mixins(BlockWidget) {
     persist(this.$store, {
       id: this.block.id,
       serviceId: this.block.serviceId,
+      profiles: this.blockData.profiles,
       settings: {
         kp: this.inputs.kp,
         td: this.inputs.td,

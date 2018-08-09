@@ -53,6 +53,7 @@ export default class OneWireTempSensor extends BlockComponent {
       },
       id: this.blockData.id,
       serviceId: this.blockData.serviceId,
+      profiles: this.blockData.profiles,
     });
   }
 }

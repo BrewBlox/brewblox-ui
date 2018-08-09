@@ -23,6 +23,7 @@ export const addOneWireTempSensor = (
       metrics,
       state,
       type: 'OneWireTempSensor',
+      profiles: [0],
     },
   );
 };
