@@ -19,6 +19,7 @@ export const addSensorSetPointPair =
     {
       id,
       serviceId,
+      profiles,
       sensor,
       setpoint,
     }: SensorSetPointPair,
@@ -27,12 +28,12 @@ export const addSensorSetPointPair =
     {
       id,
       serviceId,
+      profiles,
       sensor,
       setpoint,
       type: 'SensorSetPointPair',
-      profiles: [0],
     },
-    );
+  );
 
 export const persist =
   async (store: RootStore, sensorSetPointPair: SensorSetPointPairUpdate) => {

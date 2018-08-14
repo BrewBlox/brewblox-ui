@@ -10,6 +10,7 @@ export const addPID = (
   {
     id,
     serviceId,
+    profiles,
     settings,
     links,
     filtering,
@@ -21,12 +22,12 @@ export const addPID = (
     {
       id,
       serviceId,
+      profiles,
       settings,
       links,
       filtering,
       state,
       type: 'Pid',
-      profiles: [0], // Always use profile 0
     },
   );
 };

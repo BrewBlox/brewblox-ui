@@ -25,6 +25,21 @@
     </q-step>
     <q-step
       default
+      name="block-id"
+      title="Which block ID?"
+    >
+      <q-field
+        label="Choose block ID"
+        dark
+        :count="100"
+      >
+        <q-input
+          v-model="blockId"
+        />
+      </q-field>
+    </q-step>
+    <q-step
+      default
       name="sensor-setpoint"
       title="Link sensor and setpoint"
     >
@@ -39,7 +54,6 @@
           :options="allSensors"
         />
       </q-field>
-
       <q-field
         label="Pick a set point"
         orientation="vertical"

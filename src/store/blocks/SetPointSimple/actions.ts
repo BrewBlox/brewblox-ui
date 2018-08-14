@@ -7,16 +7,16 @@ import { BlocksContext } from '../state';
 
 export const addSetPoint = (
   context: BlocksContext,
-  { id, serviceId, setting }: SetPointSimple,
+  { id, serviceId, profiles, setting }: SetPointSimple,
 ) => {
   addBlock(
     context,
     {
       id,
       serviceId,
+      profiles,
       setting,
       type: 'SetPointSimple',
-      profiles: [0],
     },
   );
 };

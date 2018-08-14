@@ -9,6 +9,7 @@ export const addOneWireTempSensor = (
   {
     id,
     serviceId,
+    profiles,
     settings,
     state,
   }: OneWireTempSensor,
@@ -19,11 +20,11 @@ export const addOneWireTempSensor = (
     {
       id,
       serviceId,
+      profiles,
       settings,
       metrics,
       state,
       type: 'OneWireTempSensor',
-      profiles: [0],
     },
   );
 };

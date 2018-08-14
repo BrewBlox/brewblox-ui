@@ -10,17 +10,19 @@ export function spreadData(input: any) {
 }
 
 export function unspreadData(input: any) {
-  const { id, type } = input;
+  const { id, type, profiles } = input;
   const data = { ...input };
 
-  // remove id and type from data
+  // remove top level properties from data
   delete data.id;
   delete data.type;
+  delete data.profiles;
 
   return {
-    // conditionally spread id and type
+    // conditionally spread top level properties
     ...(id ? { id } : {}),
     ...(type ? { type } : {}),
+    ...(profiles ? { profiles } : {}),
     // include the data object
     data,
   };

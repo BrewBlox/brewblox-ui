@@ -13,6 +13,12 @@ function addServiceId(block: Block, serviceId: string): Block {
   };
 }
 
+function removeServiceId(block: Block): Block {
+  const stripped = { ...block };
+  delete stripped.serviceId;
+  return stripped;
+}
+
 export function fetchBlocks(services: Service[]): Promise<Block[]> {
   return Promise
     .all(services.map(service =>
@@ -25,7 +31,7 @@ export function fetchBlocks(services: Service[]): Promise<Block[]> {
 export function createBlock(block: BlockCreate): Promise<BlockSaveBase> {
   return post(
     `/${encodeURIComponent(block.serviceId)}/objects`,
-    unspreadData(block),
+    unspreadData(removeServiceId(block)),
   ).then(savedBlock => addServiceId(savedBlock, block.serviceId));
 }
 

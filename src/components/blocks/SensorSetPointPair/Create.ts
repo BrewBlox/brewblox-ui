@@ -15,18 +15,19 @@ import { createSensorSetPointPair } from '@/store/blocks/SensorSetPointPair/acti
   props: {
     onCancel: {
       type: Function,
-      default: () => {},
+      default: () => { },
     },
     onCreate: {
       type: Function,
-      default: () => {},
+      default: () => { },
     },
   },
 })
-  /* eslint-enable */
+/* eslint-enable */
 class SensorSetPointPair extends Vue {
   currentStep: string = 'service';
   creating: boolean = false;
+  blockId: string = '';
   service: DeviceService | null = null;
   setpointInput: SetPointSimple | null = null;
   sensorInput: OneWireTempSensor | null = null;
@@ -40,6 +41,10 @@ class SensorSetPointPair extends Vue {
 
   get canContinue() {
     if (this.currentStep === 'service' && this.service) {
+      return true;
+    }
+
+    if (this.currentStep === 'block-id' && this.id) {
       return true;
     }
 
@@ -88,7 +93,9 @@ class SensorSetPointPair extends Vue {
       }
 
       const block = await createSensorSetPointPair(this.$store, {
+        id: this.blockId,
         serviceId: this.service.id,
+        profiles: [0],
         sensor: this.sensorInput.id,
         setpoint: this.setpointInput.id,
       });
