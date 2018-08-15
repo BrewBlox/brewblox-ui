@@ -21,7 +21,7 @@ import Component from 'vue-class-component';
 /* eslint-enable */
 export default class Part extends Vue {
   get closed(): boolean {
-    return !!this.$props.closed;
+    return !!this.$props.part.closed;
   }
 
   get frame(): number {
@@ -50,5 +50,9 @@ export default class Part extends Vue {
     }
 
     return this.flow[angle];
+  }
+
+  toggleClosed() {
+    this.$parent.$emit('toggle-closed', this.$props.part, !this.closed);
   }
 }

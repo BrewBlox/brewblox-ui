@@ -73,7 +73,10 @@ function partAtAngle(
   });
 }
 
-function isSamePart(original: ProcessViewPartWithComponent, compare: ProcessViewPartWithComponent) {
+export function isSamePart(
+  original: ProcessViewPartWithComponent | ProcessViewPart,
+  compare: ProcessViewPartWithComponent | ProcessViewPart,
+) {
   return original.x === compare.x &&
     original.y === compare.y &&
     original.type === compare.type &&

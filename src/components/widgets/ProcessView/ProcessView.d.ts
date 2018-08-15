@@ -11,6 +11,7 @@ type ProcessViewPart = {
   x: number;
   y: number;
   rotate: number;
+  closed?: boolean;
 };
 
 type ProcessViewPartFlow = {

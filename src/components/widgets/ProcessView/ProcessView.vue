@@ -1,11 +1,12 @@
 <script lang="ts">
+import Vue from 'vue';
 import Component from 'vue-class-component';
 
 import Widget from '../Widget';
 
 import ProcessViewItem from './ProcessViewItem.vue';
 import componentByType from './Parts/componentByType';
-import { pathsFromSources } from './calculateFlows';
+import { pathsFromSources, isSamePart } from './calculateFlows';
 
 /* eslint-disable */
 @Component({
@@ -19,6 +20,7 @@ class ProcessViewWidget extends Widget {
   frame: number = 0;
   animationFrame: number = 0;
   debugAnimation: boolean = true;
+  stateParts: ProcessViewPart[] = [];
 
   get width(): number {
     return this.options.width;
@@ -32,8 +34,23 @@ class ProcessViewWidget extends Widget {
     return this.options.name;
   }
 
-  get parts(): ProcessViewPart[] {
+  get partsFromStore(): ProcessViewPart[] {
     return this.options.parts;
+  }
+
+  get parts(): ProcessViewPart[] {
+    return [
+      ...this.partsFromStore.map((item) => {
+        const statePart = this.stateParts.find(part => isSamePart(item, part));
+
+        if (statePart) {
+          return statePart;
+        }
+
+        return item;
+      }),
+      ...this.stateParts.filter(item => !this.partsFromStore.find(part => isSamePart(item, part))),
+    ];
   }
 
   get partsWithComponent(): ProcessViewPartWithComponent[] {
@@ -75,6 +92,34 @@ class ProcessViewWidget extends Widget {
 
       this.tickAnimation();
     });
+  }
+
+  toggleClosed(part: ProcessViewPartWithComponent, closed: boolean) {
+    Vue.set(
+      this,
+      'stateParts',
+      this.stateParts.some(item => isSamePart(part, item))
+        ? this.stateParts.map((item) => {
+          if (isSamePart(part, item)) {
+            return {
+              ...item,
+              closed,
+            };
+          }
+
+          return item;
+        })
+        : [
+          ...this.stateParts,
+          {
+            x: part.x,
+            y: part.y,
+            rotate: part.rotate,
+            type: part.type,
+            closed,
+          },
+        ],
+    );
   }
 
   mounted() {
@@ -121,7 +166,11 @@ export default ProcessViewWidget;
         :style="partStyle(part)"
       >
         <span class="grid-item-coordinates">{{ part.x }},{{ part.y }}</span>
-        <process-view-item :part="part" :frame="frame" />
+        <process-view-item
+          :part="part"
+          :frame="frame"
+          v-on:toggle-closed="toggleClosed"
+        />
       </div>
     </div>
   </div>
