@@ -23,14 +23,16 @@ type ProcessViewPartFlows = {
   [angleIn: number]: ProcessViewPartFlow[];
 };
 
+type ProcessViewComponent = {
+  isSource?: boolean;
+  isSink?: boolean;
+  flows: () => ProcessViewPartFlows;
+};
+
 type ProcessViewPartCalculatedFlow = { [angle: number]: number };
 
 type ProcessViewPartWithComponent = {
-  component: {
-    isSource?: boolean;
-    isSink?: boolean;
-    flows: () => ProcessViewPartFlows;
-  };
+  component: ProcessViewComponent;
   flow?: ProcessViewPartCalculatedFlow;
   visited?: boolean;
 } & ProcessViewPart;

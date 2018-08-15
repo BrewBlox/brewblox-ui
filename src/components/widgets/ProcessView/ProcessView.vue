@@ -37,7 +37,7 @@ class ProcessViewWidget extends Widget {
   }
 
   get partsWithComponent(): ProcessViewPartWithComponent[] {
-    return this.parts.map(part => ({
+    return this.parts.map((part: ProcessViewPart) => ({
       ...part,
       component: componentByType(part.type),
     }));
