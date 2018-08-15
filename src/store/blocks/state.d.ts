@@ -1,38 +1,20 @@
 import { ActionContext } from 'vuex';
 
-import {
-  PIDBlock,
-  PIDUpdate,
-} from './PID/PID';
-
-import {
-  SetPointSimpleBlock,
-  SetPointSimple,
-} from './SetPointSimple/SetPointSimple';
-
-import {
-  OneWireTempSensorBlock,
-  OneWireTempSensorUpdate,
-} from './OneWireTempSensor/OneWireTempSensor';
-
-import {
-  SensorSetPointPairBlock,
-  SensorSetPointPairUpdate,
-  SensorSetPointPairCreate,
-} from './SensorSetPointPair/SensorSetPointPair';
-
 import { State as RootState } from '../state';
 
-export interface NewBlockBase {
+export interface DataBlock {
+  id: string;
+  type: string;
+  profiles: number[];
+  data: Object;
+}
+
+export interface Block extends DataBlock {
   serviceId: string;
   isLoading?: boolean;
 }
 
-export interface BlockBase extends NewBlockBase {
-  id: string;
-}
-
-type Value = string|number[];
+type Value = string | number[];
 
 interface Series {
   name: string; // eslint-disable-line no-restricted-globals
@@ -42,25 +24,6 @@ interface Series {
 
 export interface MetricsBase {
   metrics: Series[];
-}
-
-export type Block =
-  SetPointSimpleBlock | OneWireTempSensorBlock | SensorSetPointPairBlock | PIDBlock;
-export type BlockSaveBase =
-  (BlockBase & MetricsBase) |
-  SetPointSimple |
-  OneWireTempSensorUpdate |
-  SensorSetPointPairUpdate |
-  PIDUpdate;
-export type BlockCreate =
-  SensorSetPointPairCreate;
-
-export type BlockSave = BlockSaveBase & {
-  isLoading: boolean,
-};
-
-export interface BlockStateUpdate extends BlockBase {
-  state: any;
 }
 
 export type BlocksState = {

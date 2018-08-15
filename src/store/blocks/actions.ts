@@ -10,14 +10,13 @@ import {
   createBlock as createBlockOnApi,
 } from './api';
 
-import { BlocksState, BlocksContext, BlockSaveBase, BlockBase, BlockCreate } from './state';
+import { BlocksState, BlocksContext, Block } from './state';
 import { State as RootState } from '../state';
-import addBlockToStore from './add-block';
 
 import {
+  addBlock as addBlockInStore,
   mutateBlock as mutateBlockInStore,
   mutateFetching as mutateFetchingInStore,
-  blockLoading,
 } from './mutations';
 
 const { dispatch } = getStoreAccessors<BlocksState, RootState>('blocks');
@@ -29,28 +28,25 @@ const actions = {
 
     // will fetch blocks from the server
     const blocks = await fetchBlocksFromApi(services);
-    blocks.forEach(block => addBlockToStore(context, block));
+    blocks.forEach(block => addBlockInStore(context, block));
 
     // update isFetching
     mutateFetchingInStore(context, false);
   },
-  async createBlock(context: BlocksContext, block: BlockCreate) {
-    const id = `${block.type}-${shortid.generate()}`;
 
-    const blockToAdd = {
-      id,
-      ...block,
-    };
+  async createBlock(context: BlocksContext, block: Block) {
+    // const id = `${block.type}-${shortid.generate()}`;
 
-    addBlockToStore(context, { ...blockToAdd, isLoading: true });
+    addBlockInStore(context, { ...block, isLoading: true });
 
-    const createdBlock = await createBlockOnApi(blockToAdd);
+    const createdBlock = await createBlockOnApi(block);
 
     mutateBlockInStore(context, { ...createdBlock, isLoading: false });
 
     return createdBlock;
   },
-  async saveBlock(context: BlocksContext, block: BlockSaveBase) {
+
+  async saveBlock(context: BlocksContext, block: Block) {
     // update isLoading and block values
     mutateBlockInStore(context, { ...block, isLoading: true });
 
@@ -60,7 +56,8 @@ const actions = {
     // update isLoading and apply block data from API
     mutateBlockInStore(context, { ...savedBlock, isLoading: false });
   },
-  async updateBlock(context: BlocksContext, block: BlockBase & any) {
+
+  async updateBlock(context: BlocksContext, block: Block) {
     // update isLoading and block values
     mutateBlockInStore(context, { ...block, isLoading: true });
 

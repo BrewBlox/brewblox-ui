@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { getStoreAccessors } from 'vuex-typescript';
 import { merge } from 'lodash';
 
-import { Block, BlocksState, BlockSave, BlockStateUpdate } from './state';
+import { Block, BlocksState } from './state';
 import { State as RootState } from '../state';
 
 const { commit } = getStoreAccessors<BlocksState, RootState>('blocks');
@@ -17,7 +17,8 @@ const mutations = {
     // insert data into blocks object
     state.byId[id] = { ...block, isLoading: false };
   },
-  updateBlockInStore(state: BlocksState, block: BlockStateUpdate | BlockSave) {
+
+  updateBlockInStore(state: BlocksState, block: Block) {
     const id = `${block.serviceId}/${block.id}`;
 
     if (!state.byId[id]) {
@@ -30,12 +31,15 @@ const mutations = {
       { [id]: merge(state.byId[id], block) },
     ));
   },
-  updateBlockState(state: BlocksState, block: BlockStateUpdate) {
+
+  updateBlockState(state: BlocksState, block: Block) {
     mutations.updateBlockInStore(state, block);
   },
-  mutateBlock(state: BlocksState, block: BlockSave) {
+
+  mutateBlock(state: BlocksState, block: Block) {
     mutations.updateBlockInStore(state, block);
   },
+
   blockLoading(state: BlocksState, id: string) {
     Vue.set(state, 'byId', Object.assign(
       {},
@@ -43,9 +47,11 @@ const mutations = {
       { [id]: merge(state.byId[id], { isLoading: true }) },
     ));
   },
+
   mutateFetching(state: BlocksState, fetching: boolean) {
     state.fetching = fetching;
   },
+
   removeBlock(state: BlocksState, id: string) {
     // delete from blocks listing
     Vue.delete(state.allIds, state.allIds.findIndex(block => block === id));
