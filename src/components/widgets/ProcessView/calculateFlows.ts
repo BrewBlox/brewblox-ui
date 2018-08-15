@@ -26,7 +26,7 @@ function getSources(parts: ProcessViewPartWithComponent[]) {
 
 function liquidIn(part: ProcessViewPartWithComponent, provided: number): number {
   if (part.component.isSource) {
-    return parseInt(Object.keys(part.component.flows())[0], 10);
+    return parseInt(Object.keys(part.component.flows(part))[0], 10);
   }
 
   return provided;
@@ -68,7 +68,7 @@ function partAtAngle(
   const { x, y } = xyAtAngle(origin, angle);
   const partsOnPosition = allParts.filter(part => part.x === x && part.y === y);
   return partsOnPosition.find((part: ProcessViewPartWithComponent) => {
-    const flows = rotatedFlows(part.component.flows(), part.rotate);
+    const flows = rotatedFlows(part.component.flows(part), part.rotate);
     return !!flows[rotated(angle, part.component.isSource ? 0 : 180)];
   });
 }
@@ -136,7 +136,7 @@ function possibleOutputs(
   angleIn: number,
 ): ProcessViewPartFlow[] {
   const flowFrom = liquidIn(part, angleIn);
-  const flows = rotatedFlows(part.component.flows(), part.rotate);
+  const flows = rotatedFlows(part.component.flows(part), part.rotate);
   return flows[flowFrom] || [];
 }
 
@@ -217,7 +217,7 @@ function calculateFlowValuesOnAngles(
   }
 
   const rotate = part.rotate || 0;
-  const flows = rotatedFlows(part.component.flows(), rotate);
+  const flows = rotatedFlows(part.component.flows(part), rotate);
 
   const flowing = Object.keys(flows)
     .map(angle => parseInt(angle, 10))

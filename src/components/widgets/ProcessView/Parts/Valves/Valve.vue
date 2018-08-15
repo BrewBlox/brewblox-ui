@@ -17,10 +17,6 @@
         <line v-if="closed" y1="25" x2="19" y2="25"/>
         <line v-if="closed" x1="31" y1="25" x2="50" y2="25"/>
       </g>
-      <g :class="{ outline: true, fill: true, valve: true, closed }">
-        <path d="M39.4,21C37.2,13,29,8.3,21,10.5c-5.1,1.4-9.1,5.4-10.5,10.5H39.4z"/>
-        <path d="M10.5,29C12.7,37,21,41.6,29,39.4C34,38,38,34,39.4,29H10.5z"/>
-      </g>
       <g
         v-if="flowing && !closed"
         class="outline"
@@ -46,6 +42,10 @@
           :y="arrow.y"
         />
       </g>
+      <g :class="{ outline: true, fill: true, valve: true, closed }">
+        <path d="M39.4,21C37.2,13,29,8.3,21,10.5c-5.1,1.4-9.1,5.4-10.5,10.5H39.4z"/>
+        <path d="M10.5,29C12.7,37,21,41.6,29,39.4C34,38,38,34,39.4,29H10.5z"/>
+      </g>
     </SVGRoot>
   </button>
 </template>
@@ -67,7 +67,11 @@ import FlowArrow from '../Flows/FlowArrow.vue';
 })
 /* eslint-enable */
 class Valve extends Part {
-  static flows() {
+  static flows(part: ProcessViewPartWithComponent) {
+    if (part.closed) {
+      return {};
+    }
+
     return {
       270: [{ out: 90, friction: 1 }],
       90: [{ out: 270, friction: 1 }],
@@ -99,11 +103,13 @@ export default Valve;
 button {
   border: 0;
   background: none;
+  outline: none;
 }
 
 .valve {
   transform-origin: 50% 50%;
   transition: transform 0.5s ease;
+  transform: rotate(0deg);
 }
 
 .closed {
