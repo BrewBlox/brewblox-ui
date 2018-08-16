@@ -1,10 +1,12 @@
 import Component, { mixins } from 'vue-class-component';
 
-import { PIDBlock, PIDSettings, PIDLinks, PIDFiltering, PIDState }
+import { PidBlock, PIDSettings, PIDLinks, PIDFiltering, PIDState }
   from '@/store/blocks/PID/PID';
 
 import { getAll as getAllSensorSetPointPairs } from '@/store/blocks/SensorSetPointPair/getters';
-import { refresh, persist, update } from '@/store/blocks/PID/actions';
+import { refresh } from '@/store/blocks/PID/actions';
+import { saveBlock } from '@/store/blocks/actions';
+import { updateBlockState } from '@/store/blocks/mutations';
 
 import BlockWidget from '../BlockWidget';
 
@@ -22,28 +24,28 @@ export default class PIDWidget extends mixins(BlockWidget) {
 
   modalOpen: boolean = false;
 
-  get blockData(): PIDBlock {
-    return this.block as PIDBlock;
+  get block(): PidBlock {
+    return this.block as PidBlock;
   }
 
   get settings(): PIDSettings {
-    return this.blockData.settings;
+    return this.block.data.settings;
   }
 
   get links(): PIDLinks {
-    return this.blockData.links;
+    return this.block.data.links;
   }
 
   get filtering(): PIDFiltering {
-    return this.blockData.filtering;
+    return this.block.data.filtering;
   }
 
   get state(): PIDState {
-    return this.blockData.state;
+    return this.block.data.state;
   }
 
   get allSensorSetPointPairs(): { label: string, value: string }[] {
-    return getAllSensorSetPointPairs(this.$store, this.blockData.serviceId)
+    return getAllSensorSetPointPairs(this.$store, this.block.serviceId)
       .map(setpoint => ({ label: setpoint.id, value: setpoint.id }));
   }
 
@@ -60,33 +62,35 @@ export default class PIDWidget extends mixins(BlockWidget) {
   }
 
   refreshState() {
-    refresh(this.$store, this.blockData);
+    refresh(this.$store, this.block);
   }
 
   updateKP() {
-    update(this.$store, {
+    updateBlockState(this.$store, {
       id: this.block.id,
       serviceId: this.block.serviceId,
-      settings: {
-        kp: this.inputs.kp,
+      data: {
+        settings: {
+          kp: this.inputs.kp,
+        },
       },
     });
   }
 
   randomKP() {
-    update(this.$store, {
+    updateBlockState(this.$store, {
       id: this.block.id,
       serviceId: this.block.serviceId,
-      settings: {
-        kp: Math.round(Math.random() * 15),
+      data: {
+        settings: {
+          kp: Math.round(Math.random() * 15),
+        },
       },
     });
   }
 
   save() {
-    persist(this.$store, {
-      id: this.block.id,
-      serviceId: this.block.serviceId,
+    this.block.data = {
       settings: {
         kp: this.inputs.kp,
         td: this.inputs.td,
@@ -100,6 +104,9 @@ export default class PIDWidget extends mixins(BlockWidget) {
         input: this.inputs.filteringInput,
         derivative: this.inputs.filteringDerivative,
       },
-    });
+      state: this.block.data.state,
+    };
+
+    saveBlock(this.$store, this.block);
   }
 }

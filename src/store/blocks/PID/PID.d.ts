@@ -32,7 +32,6 @@ export interface PIDFiltering {
   input: number;
   derivative: number;
 }
-
 export interface PidBlock extends Block {
   type: 'Pid';
   data: {

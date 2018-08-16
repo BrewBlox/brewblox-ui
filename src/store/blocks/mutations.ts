@@ -18,7 +18,7 @@ const mutations = {
     state.byId[id] = { ...block, isLoading: false };
   },
 
-  updateBlockInStore(state: BlocksState, block: Block) {
+  updateBlockInStore(state: BlocksState, block: Partial<Block>) {
     const id = `${block.serviceId}/${block.id}`;
 
     if (!state.byId[id]) {
@@ -32,11 +32,11 @@ const mutations = {
     ));
   },
 
-  updateBlockState(state: BlocksState, block: Block) {
+  updateBlockState(state: BlocksState, block: Partial<Block>) {
     mutations.updateBlockInStore(state, block);
   },
 
-  mutateBlock(state: BlocksState, block: Block) {
+  mutateBlock(state: BlocksState, block: Partial<Block>) {
     mutations.updateBlockInStore(state, block);
   },
 

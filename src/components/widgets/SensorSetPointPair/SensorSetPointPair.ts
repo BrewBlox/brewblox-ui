@@ -15,24 +15,24 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
     setpoint: { path: 'setPoint.settings.value', default: 0 },
   };
 
-  get blockData(): SensorSetPointPairBlock {
+  get block(): SensorSetPointPairBlock {
     return this.block as SensorSetPointPairBlock;
   }
 
   get sensor(): OneWireTempSensorBlock {
-    const { sensor, serviceId } = this.blockData;
+    const { data, serviceId } = this.block;
 
-    return getSensorById(this.$store, `${serviceId}/${sensor}`);
+    return getSensorById(this.$store, `${serviceId}/${data.sensor}`);
   }
 
   get setPoint(): SetPointSimpleBlock {
-    const { setpoint, serviceId } = this.blockData;
+    const { data, serviceId } = this.block;
 
-    return getSetPointById(this.$store, `${serviceId}/${setpoint}`);
+    return getSetPointById(this.$store, `${serviceId}/${data.setpoint}`);
   }
 
   get setpointChanged() {
-    return this.setPoint.setting !== this.inputs.setpoint;
+    return this.setPoint.data.setting !== this.inputs.setpoint;
   }
 
   save() {

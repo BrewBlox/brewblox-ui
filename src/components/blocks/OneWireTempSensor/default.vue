@@ -1,44 +1,47 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import Component from "vue-class-component";
 
-import BlockComponent from '../BlockComponent';
+import BlockComponent from "../BlockComponent";
 
-import { getById } from '@/store/blocks/OneWireTempSensor/getters';
-import { persist } from '@/store/blocks/OneWireTempSensor/actions';
+import { getById } from "@/store/blocks/OneWireTempSensor/getters";
+import { saveBlock } from "@/store/blocks/actions";
+import { OneWireTempSensorBlock } from "@/store/blocks/OneWireTempSensor/OneWireTempSensor";
 
 /* eslint-disable indent */
 @Component({
   props: {
     id: {
-      default: '',
-      type: String,
-    },
-  },
+      default: "",
+      type: String
+    }
+  }
 })
 /* eslint-enable */
 export default class OneWireTempSensor extends BlockComponent {
-  addressInput = '';
+  addressInput = "";
   offsetInput = 0;
 
-  get blockData() {
+  get block(): OneWireTempSensorBlock {
     return getById(this.$store, this.$props.id);
   }
 
   get settings() {
-    return this.blockData.settings;
+    return this.block.data.settings;
   }
 
   get state() {
-    return this.blockData.state;
+    return this.block.data.state;
   }
 
   get loading() {
-    return !!this.blockData.isLoading;
+    return !!this.block.isLoading;
   }
 
   get changed() {
-    return this.settings.address !== this.addressInput ||
-      this.settings.offset.value !== this.offsetInput;
+    return (
+      this.settings.address !== this.addressInput ||
+      this.settings.offset.value !== this.offsetInput
+    );
   }
 
   mounted() {
@@ -48,17 +51,10 @@ export default class OneWireTempSensor extends BlockComponent {
   }
 
   save() {
-    // update offset's value
     this.settings.offset.value = this.offsetInput;
+    this.settings.address = this.addressInput;
 
-    persist(this.$store, {
-      settings: {
-        offset: this.settings.offset,
-        address: this.addressInput,
-      },
-      id: this.blockData.id,
-      serviceId: this.blockData.serviceId,
-    });
+    saveBlock(this.$store, this.block);
   }
 }
 </script>

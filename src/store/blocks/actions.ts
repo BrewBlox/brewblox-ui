@@ -1,5 +1,4 @@
 import { getStoreAccessors } from 'vuex-typescript';
-import shortid from 'shortid';
 
 import { Service } from '@/store/services/state';
 
@@ -35,8 +34,6 @@ const actions = {
   },
 
   async createBlock(context: BlocksContext, block: Block) {
-    // const id = `${block.type}-${shortid.generate()}`;
-
     addBlockInStore(context, { ...block, isLoading: true });
 
     const createdBlock = await createBlockOnApi(block);

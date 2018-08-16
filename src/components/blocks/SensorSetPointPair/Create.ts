@@ -1,37 +1,38 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import shortid from 'shortid';
 
 import Link from '@/core/units/Link';
 
 import { DeviceService } from '@/store/services/state';
-import { SetPointSimple } from '@/store/blocks/SetPointSimple/SetPointSimple';
-import { OneWireTempSensor } from '@/store/blocks/OneWireTempSensor/OneWireTempSensor';
+import { SetPointSimpleBlock } from '@/store/blocks/SetPointSimple/SetPointSimple';
+import { OneWireTempSensorBlock } from '@/store/blocks/OneWireTempSensor/OneWireTempSensor';
 
 import { deviceServices } from '@/store/services/getters';
 import { getAll as getAllSetPointSimple } from '@/store/blocks/SetPointSimple/getters';
 import { getAll as getAllOneWireTempSensor } from '@/store/blocks/OneWireTempSensor/getters';
-import { createSensorSetPointPair } from '@/store/blocks/SensorSetPointPair/actions';
+import { createBlock } from '@/store/blocks/actions';
 
 /* eslint-disable indent */
 @Component({
   props: {
     onCancel: {
       type: Function,
-      default: () => {},
+      default: () => { },
     },
     onCreate: {
       type: Function,
-      default: () => {},
+      default: () => { },
     },
   },
 })
-  /* eslint-enable */
+/* eslint-enable */
 class SensorSetPointPair extends Vue {
   currentStep: string = 'service';
   creating: boolean = false;
   service: DeviceService | null = null;
-  setpointInput: SetPointSimple | null = null;
-  sensorInput: OneWireTempSensor | null = null;
+  setpointInput: SetPointSimpleBlock | null = null;
+  sensorInput: OneWireTempSensorBlock | null = null;
 
   get services() {
     return deviceServices(this.$store).map(service => ({
@@ -89,10 +90,15 @@ class SensorSetPointPair extends Vue {
         throw new Error('Invalid values for inputs');
       }
 
-      const block = await createSensorSetPointPair(this.$store, {
+      const block = await createBlock(this.$store, {
+        id: `SensorSetPointPair-${shortid.generate()}`,
         serviceId: this.service.id,
-        sensor: new Link(this.sensorInput.id),
-        setpoint: new Link(this.setpointInput.id),
+        profiles: [0],
+        type: 'SensorSetPointPair',
+        data: {
+          sensor: new Link(this.sensorInput.id),
+          setpoint: new Link(this.setpointInput.id),
+        },
       });
 
       this.creating = false;

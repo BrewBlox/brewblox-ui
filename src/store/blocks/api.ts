@@ -12,7 +12,7 @@ function asDataBlock(block: Block): DataBlock {
     type: block.type,
     profiles: block.profiles,
     data: block.data,
-  }
+  };
 }
 
 

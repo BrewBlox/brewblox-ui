@@ -13,7 +13,8 @@ import {
   getById as getOneWireTempSensorById,
   getAll as getAllOneWireTempSensor,
 } from '@/store/blocks/OneWireTempSensor/getters';
-import { persist } from '@/store/blocks/SensorSetPointPair/actions';
+import { saveBlock } from '@/store/blocks/actions';
+import { OneWireTempSensorBlock } from '@/store/blocks/OneWireTempSensor/OneWireTempSensor';
 
 /* eslint-disable indent */
 @Component({
@@ -29,26 +30,26 @@ export default class SensorSetPointPair extends BlockComponent {
   sensorInput = '';
   setpointInput = '';
 
-  get blockData() {
+  get block() {
     return getById(this.$store, this.$props.id);
   }
 
-  get sensor() {
+  get sensor(): OneWireTempSensorBlock {
     return getOneWireTempSensorById(
       this.$store,
-      `${this.blockData.serviceId}/${this.blockData.sensor}`,
+      `${this.block.serviceId}/${this.block.data.sensor}`,
     );
   }
 
   get setpoint() {
     return getSetPointSimpleById(
       this.$store,
-      `${this.blockData.serviceId}/${this.blockData.setpoint}`,
+      `${this.block.serviceId}/${this.block.data.setpoint}`,
     );
   }
 
   get allSetPoints() {
-    return getAllSetPointSimple(this.$store, this.blockData.serviceId)
+    return getAllSetPointSimple(this.$store, this.block.serviceId)
       .map(setpoint => ({
         label: `${setpoint.serviceId}/${setpoint.id}`,
         value: setpoint.id,
@@ -56,15 +57,11 @@ export default class SensorSetPointPair extends BlockComponent {
   }
 
   get allSensors() {
-    return getAllOneWireTempSensor(this.$store, this.blockData.serviceId)
+    return getAllOneWireTempSensor(this.$store, this.block.serviceId)
       .map(sensor => ({
         label: `${sensor.serviceId}/${sensor.id}`,
         value: sensor.id,
       }));
-  }
-
-  get loading() {
-    return !!this.blockData.isLoading;
   }
 
   get changed() {
@@ -78,11 +75,9 @@ export default class SensorSetPointPair extends BlockComponent {
   }
 
   save() {
-    persist(this.$store, {
-      sensor: new Link(this.sensorInput),
-      setpoint: new Link(this.setpointInput),
-      id: this.blockData.id,
-      serviceId: this.blockData.serviceId,
-    });
+    this.block.data.sensor = new Link(this.sensorInput);
+    this.block.data.setpoint = new Link(this.setpointInput);
+
+    saveBlock(this.$store, this.block);
   }
 }

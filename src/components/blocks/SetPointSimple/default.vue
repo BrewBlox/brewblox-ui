@@ -1,30 +1,30 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import Component from "vue-class-component";
 
-import BlockComponent from '../BlockComponent';
+import BlockComponent from "../BlockComponent";
 
-import { getById } from '@/store/blocks/SetPointSimple/getters';
-import { persist } from '@/store/blocks/SetPointSimple/actions';
+import { getById } from "@/store/blocks/SetPointSimple/getters";
+import { saveBlock } from "@/store/blocks/actions";
 
 /* eslint-disable indent */
 @Component({
   props: {
     id: {
-      default: '',
-      type: String,
-    },
-  },
+      default: "",
+      type: String
+    }
+  }
 })
 /* eslint-enable */
 export default class SetPointSimple extends BlockComponent {
   valueInput = 0;
 
-  get blockData() {
+  get block() {
     return getById(this.$store, this.$props.id);
   }
 
   get setting() {
-    return this.blockData.setting;
+    return this.block.data.setting;
   }
 
   get changed() {
@@ -36,14 +36,9 @@ export default class SetPointSimple extends BlockComponent {
   }
 
   save() {
-    // update the value of the unit
     this.setting.value = this.valueInput;
 
-    persist(this.$store, {
-      id: this.blockData.id,
-      serviceId: this.blockData.serviceId,
-      setting: this.setting,
-    });
+    saveBlock(this.$store, this.block);
   }
 }
 </script>
