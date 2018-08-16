@@ -420,7 +420,7 @@
     {
       "id": "item-7",
       "data": {
-        "order": 1,
+        "order": 3,
         "cols": 6,
         "rows": 6,
         "widget": "ProcessView",
@@ -657,7 +657,7 @@
       "data": {
         "title": "Process View Dashboard 2",
         "order": 4,
-        "items": ["item-7"]
+        "items": ["item-6"]
       }
     }
   ],
