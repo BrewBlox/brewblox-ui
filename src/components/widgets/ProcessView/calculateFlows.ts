@@ -172,23 +172,37 @@ function flow(
   return possibleOutputs(part, angleIn).reduce(
     (parts, output) => {
       const angle = output.out;
-      const accFlow = ((part.flow && part.flow[angle]) || 0);
 
       const totalFriction = accFriction + (output.friction || 0);
 
       if (typeof output.pressure === 'number') {
         if (output.pressure < startPressure) {
           const pathFlow = (startPressure - output.pressure) / totalFriction;
-          return addFlowToPart(part, { [angle]: accFlow + pathFlow }, parts);
+
+          return addFlowToPart(
+            part,
+            {
+              [angle]: pathFlow,
+              [angleIn]: pathFlow * -1,
+            },
+            parts,
+          );
         }
 
-        return addFlowToPart(part, { [angle]: accFlow }, parts);
+        return parts;
       }
 
       const nextPart = partAtAngle(part, parts, angle);
       if (!nextPart || nextPart.visited) {
         // no flow possible
-        return addFlowToPart(part, { [angle]: accFlow }, parts);
+        return addFlowToPart(
+          part,
+          {
+            [angle]: 0,
+            [angleIn]: 0,
+          },
+          parts,
+        );
       }
 
       const nextFlows = flow(
@@ -199,72 +213,52 @@ function flow(
         startPressure,
       );
 
-      const sumOfFlows = flowAtExitsOfNextPart(part, nextFlows, angle);
+      const updatedNextPart = partAtAngle(part, nextFlows, angle);
+      let angleFlow = 0;
 
-      return addFlowToPart(part, { [angle]: sumOfFlows }, nextFlows);
+      if (updatedNextPart && updatedNextPart.flow) {
+        angleFlow = updatedNextPart.flow[rotated(angle, 180)];
+      }
+
+      return addFlowToPart(
+        part,
+        {
+          [angle]: angleFlow * -1,
+          [angleIn]: angleFlow,
+        },
+        nextFlows,
+      );
     },
     visitedParts,
   );
-}
-
-function calculateFlowValuesOnAngles(
-  part: ProcessViewPartWithComponent,
-  index: number,
-  allParts: ProcessViewPartWithComponent[],
-): ProcessViewPartWithComponent {
-  if (!part.flow) {
-    return part;
-  }
-
-  const rotate = part.rotate || 0;
-  const flows = rotatedFlows(part.component.flows(part), rotate);
-
-  const flowing = Object.keys(flows)
-    .map(angle => parseInt(angle, 10))
-    .reduce(
-      (acc: number[], angle) => {
-        // make sure all _out_ angles are also calculated
-        const outAngles = flows[angle].map(partFlow => partFlow.out);
-        return [...(new Set([...acc, angle, ...outAngles]))];
-      },
-      [],
-    )
-    .map((angle: number) => {
-      const inflowPart = partAtAngle(part, allParts, angle);
-
-      // get flow on exit of part next to current part
-      const inflowOnAngle =
-        (inflowPart && inflowPart.flow && inflowPart.flow[rotated(angle, 180)]) || 0;
-      const outflowOnAngle = part.flow && part.flow[angle] ? part.flow[angle] : 0;
-
-      return {
-        angle,
-        flow: outflowOnAngle - inflowOnAngle,
-      };
-    })
-    // rotate angle back to Vue component angles
-    .reduce(
-      (acc, calculatedFlow) => ({
-        ...acc,
-        [rotated(calculatedFlow.angle, 360 - rotate)]: calculatedFlow.flow,
-      }),
-      {},
-    );
-
-  return {
-    ...part,
-    flow: flowing,
-  };
-}
-
-export function addFlowingToComponents(parts: ProcessViewPartWithComponent[]):
-  ProcessViewPartWithComponent[] {
-  return parts.map(calculateFlowValuesOnAngles);
 }
 
 export function pathsFromSources(parts: ProcessViewPartWithComponent[]):
   ProcessViewPartWithComponent[] {
   const sources = getSources(parts);
   const flowsFromSources = sources.map(source => flow(source, parts));
-  return addFlowingToComponents(flatten(flowsFromSources));
+  return flatten(flowsFromSources).map((part) => {
+    if (!part.flow) {
+      return part;
+    }
+
+    return {
+      ...part,
+      flow: Object.keys(part.flow)
+        .map(angle => parseInt(angle, 10))
+        .reduce(
+          (acc, angle) => {
+            if (!part.flow) {
+              return acc;
+            }
+
+            return {
+              ...acc,
+              [rotated(angle, 360 - (part.rotate || 0))]: part.flow[angle],
+            };
+          },
+          {},
+        ),
+    };
+  });
 }
