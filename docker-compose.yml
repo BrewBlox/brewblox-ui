@@ -20,7 +20,7 @@ services:
       - "traefik.frontend.rule=PathPrefix: /history"
 
   spark:
-    image: brewblox/brewblox-devcon-spark:feature-improve-api-errors
+    image: brewblox/brewblox-devcon-spark:develop
     depends_on:
       - eventbus
     labels:

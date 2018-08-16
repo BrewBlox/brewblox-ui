@@ -12,7 +12,7 @@ export function getById(store: RootStore, id: string): SetPointSimpleBlock {
     throw new Error('Block is not a valid SetPointSimple');
   }
 
-  return block;
+  return block as SetPointSimpleBlock;
 }
 
 export function getAll(store: RootStore, serviceId: string): SetPointSimpleBlock[] {

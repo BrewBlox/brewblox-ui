@@ -1,4 +1,4 @@
-import { BlockBase } from '../state';
+import { Block } from '../state';
 
 import Link from '@/core/units/Link';
 
@@ -33,23 +33,12 @@ export interface PIDFiltering {
   derivative: number;
 }
 
-export interface PID extends BlockBase {
-  settings: PIDSettings;
-  links: PIDLinks;
-  filtering: PIDFiltering;
-  state: PIDState;
-}
-
-export interface PIDUpdate extends BlockBase {
-  settings: PIDSettings;
-  links: PIDLinks;
-  filtering: PIDFiltering;
-}
-
-export interface PIDStateUpdate extends BlockBase {
-  state: PIDState;
-}
-
-export interface PIDBlock extends PID {
+export interface PidBlock extends Block {
   type: 'Pid';
+  data: {
+    settings: PIDSettings;
+    links: PIDLinks;
+    filtering: PIDFiltering;
+    state: PIDState;
+  }
 }

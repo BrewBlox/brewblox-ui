@@ -12,7 +12,7 @@ export function getById(store: RootStore, id: string): SensorSetPointPairBlock {
     throw new Error('Block is not a valid SensorSetPointPair');
   }
 
-  return block;
+  return block as SensorSetPointPairBlock;
 }
 
 export function getAll(store: RootStore, serviceId: string): SensorSetPointPairBlock[] {

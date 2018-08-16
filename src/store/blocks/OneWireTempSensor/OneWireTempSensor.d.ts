@@ -1,13 +1,15 @@
 import { Block, MetricsBase } from '../state';
 import { Temperature } from '@/core/units';
 
-export interface OneWireTempSensor extends Block, MetricsBase {
-  settings: {
-    address: string,
-    offset: Temperature,
-  };
-  state: {
-    value: Temperature,
-    connected: boolean,
-  };
+export interface OneWireTempSensorBlock extends Block, MetricsBase {
+  data: {
+    settings: {
+      address: string,
+      offset: Temperature,
+    };
+    state: {
+      value: Temperature,
+      connected: boolean,
+    };
+  }
 }

@@ -12,7 +12,7 @@ export function getById(store: RootStore, id: string): OneWireTempSensorBlock {
     throw new Error('Block is not a valid OneWireTempSensor');
   }
 
-  return block;
+  return block as OneWireTempSensorBlock;
 }
 
 export function getAll(store: RootStore, serviceId: string): OneWireTempSensorBlock[] {
