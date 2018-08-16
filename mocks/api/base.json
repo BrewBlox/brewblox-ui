@@ -420,13 +420,13 @@
     {
       "id": "item-7",
       "data": {
-        "order": 3,
-        "cols": 3,
-        "rows": 3,
+        "order": 1,
+        "cols": 6,
+        "rows": 6,
         "widget": "ProcessView",
         "options": {
           "name": "Simple flow setup",
-          "width": 5,
+          "width": 7,
           "height": 6,
           "parts": [
             {
@@ -485,7 +485,19 @@
             {
               "x": 4,
               "y": 0,
-              "type": "TUBE_ELBOW",
+              "type": "TUBE_TEE",
+              "rotate": 180
+            },
+            {
+              "x": 5,
+              "y": 0,
+              "type": "TUBE_STRAIGHT",
+              "rotate": 0
+            },
+            {
+              "x": 6,
+              "y": 0,
+              "type": "TUBE_INPUT",
               "rotate": 180
             },
             {
@@ -645,7 +657,7 @@
       "data": {
         "title": "Process View Dashboard 2",
         "order": 4,
-        "items": ["item-5", "item-6", "item-7"]
+        "items": ["item-7"]
       }
     }
   ],
