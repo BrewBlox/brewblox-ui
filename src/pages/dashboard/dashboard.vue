@@ -92,9 +92,10 @@ class DashboardPage extends Vue {
     updateDashboardItemSize(this.$store, { id, cols, rows });
   }
 
-  async onAddWidget(type: string, block: Block) {
+  async onAddWidget(type: WidgetType, block: Block) {
     // create dashboard item on api and wait
     const dashboardItem = await createDashboardItem(this.$store, {
+      id: `item-${block.serviceId}/${block.id}`,
       order: this.items.length + 1,
       cols: 4,
       rows: 4,

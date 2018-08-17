@@ -1,34 +1,35 @@
 import { get, put, post } from '@/core/fetch';
-import { spreadData, unspreadData } from '@/core/api-spread';
 
-import { Dashboard, DashboardItem, DashboardAPI } from './state';
+import { Dashboard, DashboardItem } from './state';
 
 export function fetchDashboards(): Promise<Dashboard[]> {
-  return get('/datastore/dashboards')
-    .then(dashboards => dashboards.map((dashboard: DashboardAPI) => spreadData(dashboard)));
+  return get('/datastore/dashboards');
 }
 
-export function createDashboard(dashboard: Dashboard): Promise<boolean> {
-  return post('/datastore/dashboards', unspreadData(dashboard))
-    .then(dashboards => dashboards.map((item: DashboardAPI) => spreadData(item)));
+export function fetchDashboardById(id: string): Promise<Dashboard> {
+  return get(`/datastore/dashboards/${encodeURIComponent(id)}`);
 }
 
-export function persistDashboard(id: string, newData: any): Promise<Dashboard> {
-  return put(`/datastore/dashboards/${encodeURIComponent(id)}`, unspreadData(newData))
-    .then(item => spreadData(item));
+export function createDashboard(newData: Dashboard): Promise<boolean> {
+  return post('/datastore/dashboards', newData);
+}
+
+export function persistDashboard(dashboard: Dashboard): Promise<Dashboard> {
+  return put(`/datastore/dashboards/${encodeURIComponent(dashboard.id)}`, dashboard);
 }
 
 export function fetchDashboardItems(): Promise<DashboardItem[]> {
-  return get('/datastore/dashboard-items')
-    .then(dashboardItems => dashboardItems.map((item: any) => spreadData(item)));
+  return get('/datastore/dashboard-items');
 }
 
-export function persistDashboardItem(id: string, newData: any): Promise<DashboardItem> {
-  return put(`/datastore/dashboard-items/${encodeURIComponent(id)}`, unspreadData(newData))
-    .then(item => spreadData(item));
+export function fetchDashboardItemById(id: string): Promise<DashboardItem> {
+  return get(`/datastore/dashboard-items/${encodeURIComponent(id)}`);
 }
 
-export function createDashboardItem(newData: any): Promise<DashboardItem> {
-  return post('/datastore/dashboard-items/', unspreadData(newData))
-    .then(item => spreadData(item));
+export function persistDashboardItem(item: DashboardItem): Promise<DashboardItem> {
+  return put(`/datastore/dashboard-items/${encodeURIComponent(item.id)}`, item);
+}
+
+export function createDashboardItem(item: DashboardItem): Promise<DashboardItem> {
+  return post('/datastore/dashboard-items/', item);
 }

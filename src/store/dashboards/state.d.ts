@@ -2,19 +2,11 @@ import { ActionContext } from 'vuex';
 
 import { State as RootState } from '../state';
 
-interface DashboardProps {
+export interface Dashboard {
+  id: string;
   title: string;
   order: number;
   items: string[];
-}
-
-export interface Dashboard extends DashboardProps {
-  id: string;
-}
-
-export interface DashboardAPI {
-  id: string;
-  data: DashboardProps;
 }
 
 export interface DashboardItem {

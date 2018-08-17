@@ -1,22 +1,18 @@
 {
-  "objects": {},
+  "objects": [],
   "dashboard-items": [],
   "dashboards": [
     {
       "id": "dashboard-home",
-      "data": {
-        "title": "Home Dashboard",
-        "order": 1,
-        "items": []
-      }
+      "title": "Home Dashboard",
+      "order": 1,
+      "items": []
     },
     {
       "id": "metrics",
-      "data": {
-        "title": "Metrics Dashboard",
-        "order": 2,
-        "items": []
-      }
+      "title": "Metrics Dashboard",
+      "order": 2,
+      "items": []
     }
   ],
   "services": [

@@ -4,6 +4,7 @@ import { SensorSetPointPairBlock } from '@/store/blocks/SensorSetPointPair/Senso
 import { OneWireTempSensorBlock } from '@/store/blocks/OneWireTempSensor/OneWireTempSensor';
 import { SetPointSimpleBlock } from '@/store/blocks/SetPointSimple/SetPointSimple';
 
+import { getById } from '@/store/blocks/SensorSetPointPair/getters';
 import { getById as getSensorById } from '@/store/blocks/OneWireTempSensor/getters';
 import { getById as getSetPointById } from '@/store/blocks/SetPointSimple/getters';
 
@@ -16,7 +17,7 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
   };
 
   get block(): SensorSetPointPairBlock {
-    return this.block as SensorSetPointPairBlock;
+    return getById(this.$store, this.options.block);
   }
 
   get sensor(): OneWireTempSensorBlock {

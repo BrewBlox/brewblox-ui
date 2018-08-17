@@ -1,10 +1,10 @@
 <script lang="ts">
-import Component from "vue-class-component";
+import Component from 'vue-class-component';
 
-import BlockComponent from "../BlockComponent";
+import BlockComponent from '../BlockComponent';
 
-import { getById } from "@/store/blocks/SetPointSimple/getters";
-import { saveBlock } from "@/store/blocks/actions";
+import { getById } from '@/store/blocks/SetPointSimple/getters';
+import { saveBlock } from '@/store/blocks/actions';
 
 /* eslint-disable indent */
 @Component({

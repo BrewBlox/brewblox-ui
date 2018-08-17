@@ -1,3 +1,5 @@
+<script lang="ts" src="./SensorSetPointPair.ts" />
+
 <template>
   <div>
     <q-toolbar color="dark-bright">
@@ -45,8 +47,6 @@
     </q-card>
   </div>
 </template>
-
-<script lang="ts" src="./SensorSetPointPair.ts" />
 
 <style scoped>
 .q-list {

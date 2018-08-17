@@ -1,24 +1,24 @@
 <script lang="ts">
-import Component from "vue-class-component";
+import Component from 'vue-class-component';
 
-import BlockComponent from "../BlockComponent";
+import BlockComponent from '../BlockComponent';
 
-import { getById } from "@/store/blocks/OneWireTempSensor/getters";
-import { saveBlock } from "@/store/blocks/actions";
-import { OneWireTempSensorBlock } from "@/store/blocks/OneWireTempSensor/OneWireTempSensor";
+import { getById } from '@/store/blocks/OneWireTempSensor/getters';
+import { saveBlock } from '@/store/blocks/actions';
+import { OneWireTempSensorBlock } from '@/store/blocks/OneWireTempSensor/OneWireTempSensor';
 
 /* eslint-disable indent */
 @Component({
   props: {
     id: {
-      default: "",
+      default: '',
       type: String
     }
   }
 })
 /* eslint-enable */
 export default class OneWireTempSensor extends BlockComponent {
-  addressInput = "";
+  addressInput = '';
   offsetInput = 0;
 
   get block(): OneWireTempSensorBlock {

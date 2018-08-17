@@ -9,7 +9,7 @@ export function getById(store: RootStore, id: string): SensorSetPointPairBlock {
 
   // force block type
   if (!block || block.type !== 'SensorSetPointPair') {
-    throw new Error('Block is not a valid SensorSetPointPair');
+    throw new Error(`Invalid block: ${block.type} !== SensorSetPointPair`);
   }
 
   return block as SensorSetPointPairBlock;

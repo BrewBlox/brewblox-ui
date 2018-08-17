@@ -1,10 +1,3 @@
-<template>
-  <component
-    :is="type"
-    :id="blockId"
-  />
-</template>
-
 <script lang="ts">
 import Vue from 'vue';
 
@@ -42,3 +35,10 @@ export default Vue.extend({
   },
 });
 </script>
+
+<template>
+  <component
+    :is="type"
+    :id="blockId"
+  />
+</template>
