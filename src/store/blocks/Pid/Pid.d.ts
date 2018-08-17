@@ -2,6 +2,8 @@ import { Block } from '@/store/blocks/state';
 
 import Link from '@/core/units/Link';
 
+export const typeName = 'Pid';
+
 export interface PidSettings {
   kp: number;
   ti: number;
@@ -32,6 +34,7 @@ export interface PidFiltering {
   input: number;
   derivative: number;
 }
+
 export interface PidBlock extends Block {
   type: 'Pid';
   data: {

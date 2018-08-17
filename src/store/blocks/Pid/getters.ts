@@ -1,18 +1,11 @@
 import { allBlockFromService, blockById } from '../getters';
 
-import { PidBlock } from '@/store/blocks/Pid/Pid';
+import { PidBlock, typeName } from '@/store/blocks/Pid/Pid';
 
 import { RootStore } from '../../state';
 
 export function getById(store: RootStore, id: string): PidBlock {
-  const block = blockById(store, id);
-
-  // force block type
-  if (!block || block.type !== 'Pid') {
-    throw new Error('Block is not a valid Pid');
-  }
-
-  return block as PidBlock;
+  return blockById(store, id, typeName) as PidBlock;
 }
 
 export function getAll(store: RootStore, serviceId: string): PidBlock[] {

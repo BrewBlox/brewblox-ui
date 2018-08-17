@@ -1,21 +1,14 @@
 import { allBlockFromService, blockById } from '../getters';
 
-import { OneWireTempSensorBlock } from './OneWireTempSensor';
+import { OneWireTempSensorBlock, typeName } from './OneWireTempSensor';
 
 import { RootStore } from '../../state';
 
 export function getById(store: RootStore, id: string): OneWireTempSensorBlock {
-  const block = blockById(store, id);
-
-  // force block type
-  if (!block || block.type !== 'OneWireTempSensor') {
-    throw new Error('Block is not a valid OneWireTempSensor');
-  }
-
-  return block as OneWireTempSensorBlock;
+  return blockById(store, id, typeName) as OneWireTempSensorBlock;
 }
 
 export function getAll(store: RootStore, serviceId: string): OneWireTempSensorBlock[] {
   return allBlockFromService(store, serviceId)
-    .filter(block => block.type === 'OneWireTempSensor') as OneWireTempSensorBlock[];
+    .filter(block => block.type === typeName) as OneWireTempSensorBlock[];
 }

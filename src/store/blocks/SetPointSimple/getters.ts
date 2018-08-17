@@ -1,18 +1,11 @@
 import { allBlockFromService, blockById } from '../getters';
 
-import { SetPointSimpleBlock } from './SetPointSimple';
+import { SetPointSimpleBlock, typeName } from './SetPointSimple';
 
 import { RootStore } from '../../state';
 
 export function getById(store: RootStore, id: string): SetPointSimpleBlock {
-  const block = blockById(store, id);
-
-  // force block type
-  if (!block || block.type !== 'SetPointSimple') {
-    throw new Error('Block is not a valid SetPointSimple');
-  }
-
-  return block as SetPointSimpleBlock;
+  return blockById(store, id, typeName) as SetPointSimpleBlock;
 }
 
 export function getAll(store: RootStore, serviceId: string): SetPointSimpleBlock[] {
