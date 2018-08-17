@@ -1,18 +1,18 @@
 import Component, { mixins } from 'vue-class-component';
 
-import { PidBlock, PIDSettings, PIDLinks, PIDFiltering, PIDState }
-  from '@/store/blocks/PID/PID';
+import { PidBlock, PidSettings, PidLinks, PidFiltering, PidState }
+  from '@/store/blocks/Pid/Pid';
 
-import { getById } from '@/store/blocks/PID/getters';
+import { getById } from '@/store/blocks/Pid/getters';
 import { getAll as getAllSensorSetPointPairs } from '@/store/blocks/SensorSetPointPair/getters';
-import { refresh } from '@/store/blocks/PID/actions';
+import { refresh } from '@/store/blocks/Pid/actions';
 import { saveBlock } from '@/store/blocks/actions';
 import { updateBlockState } from '@/store/blocks/mutations';
 
-import BlockWidget from '../BlockWidget';
+import BlockWidget from '@/components/widgets/BlockWidget';
 
 @Component
-export default class PIDWidget extends mixins(BlockWidget) {
+export default class PidWidget extends mixins(BlockWidget) {
   inputMapping = {
     kp: { path: 'settings.kp', default: 0 },
     ti: { path: 'settings.ti', default: 0 },
@@ -29,19 +29,19 @@ export default class PIDWidget extends mixins(BlockWidget) {
     return getById(this.$store, this.options.block);
   }
 
-  get settings(): PIDSettings {
+  get settings(): PidSettings {
     return this.block.data.settings;
   }
 
-  get links(): PIDLinks {
+  get links(): PidLinks {
     return this.block.data.links;
   }
 
-  get filtering(): PIDFiltering {
+  get filtering(): PidFiltering {
     return this.block.data.filtering;
   }
 
-  get state(): PIDState {
+  get state(): PidState {
     return this.block.data.state;
   }
 

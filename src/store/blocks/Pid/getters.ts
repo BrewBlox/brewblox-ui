@@ -1,6 +1,6 @@
 import { allBlockFromService, blockById } from '../getters';
 
-import { PidBlock } from './PID';
+import { PidBlock } from '@/store/blocks/Pid/Pid';
 
 import { RootStore } from '../../state';
 

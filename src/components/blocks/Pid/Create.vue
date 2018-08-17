@@ -20,7 +20,7 @@ import Component from 'vue-class-component';
   }
 })
 /* eslint-enable */
-export default class PID extends Vue {}
+export default class Pid extends Vue {}
 </script>
 
 <style scoped>

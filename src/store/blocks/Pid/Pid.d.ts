@@ -1,14 +1,14 @@
-import { Block } from '../state';
+import { Block } from '@/store/blocks/state';
 
 import Link from '@/core/units/Link';
 
-export interface PIDSettings {
+export interface PidSettings {
   kp: number;
   ti: number;
   td: number;
 }
 
-export interface PIDState {
+export interface PidState {
   inputValue: number;
   inputSetting: number;
   outputValue: number;
@@ -23,21 +23,21 @@ export interface PIDState {
   error: number;
 }
 
-export interface PIDLinks {
+export interface PidLinks {
   input: Link;
   output: Link;
 }
 
-export interface PIDFiltering {
+export interface PidFiltering {
   input: number;
   derivative: number;
 }
 export interface PidBlock extends Block {
   type: 'Pid';
   data: {
-    settings: PIDSettings;
-    links: PIDLinks;
-    filtering: PIDFiltering;
-    state: PIDState;
+    settings: PidSettings;
+    links: PidLinks;
+    filtering: PidFiltering;
+    state: PidState;
   }
 }

@@ -1,3 +1,5 @@
+<script lang="ts" src="./Pid.ts" />
+
 <template>
   <div>
     <q-toolbar color="dark-bright">
@@ -86,7 +88,7 @@
           color="dark-bright"
         >
           <q-toolbar-title>
-            PID Settings
+            Pid Settings
           </q-toolbar-title>
           <q-btn
             flat
@@ -196,8 +198,6 @@
     </q-modal>
   </div>
 </template>
-
-<script lang="ts" src="./PID.ts" />
 
 <style scoped>
 .q-item {
