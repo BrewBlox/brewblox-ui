@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import Block from '@/components/blocks/block.vue';
+import Block from '@/components/blocks/Block.vue';
 
 import { isFetching, blockIds } from '@/store/blocks/getters';
 

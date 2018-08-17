@@ -2,8 +2,8 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import GridContainer from '@/components/grid/grid-container.vue';
-import WidgetModal from '@/components/widget-modal/widget-modal.vue';
+import GridContainer from '@/components/grid/GridContainer.vue';
+import WidgetModal from '@/components/widget-modal/WidgetModal.vue';
 
 import byOrder from '@/core/byOrder';
 
@@ -31,7 +31,7 @@ interface VueOrdered extends Vue {
   },
 })
 /* eslint-enable */
-class DashboardPage extends Vue {
+export default class DashboardPage extends Vue {
   editable: boolean = false;
   modalOpen: boolean = false;
   title: string = '';
@@ -111,8 +111,6 @@ class DashboardPage extends Vue {
     this.modalOpen = false;
   }
 }
-
-export default DashboardPage;
 </script>
 
 <template>

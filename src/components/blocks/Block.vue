@@ -5,9 +5,9 @@ import { blockById } from '@/store/blocks/getters';
 
 const blockTypes = {
   // Block type components
-  OneWireTempSensor: () => import('./OneWireTempSensor/default.vue'),
-  SetPointSimple: () => import('./SetPointSimple/default.vue'),
-  SensorSetPointPair: () => import('./SensorSetPointPair/default.vue'),
+  OneWireTempSensor: () => import('./OneWireTempSensor/OneWireTempSensor.vue'),
+  SetPointSimple: () => import('./SetPointSimple/SetPointSimple.vue'),
+  SensorSetPointPair: () => import('./SensorSetPointPair/SensorSetPointPair.vue'),
 
   // fallback component when type is not resolved
   Unknown: () => import('./Unknown.vue'),

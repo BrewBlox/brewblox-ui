@@ -2,11 +2,11 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { DeviceService } from '../../../store/services/state';
-import { Block } from '../../../store/blocks/state';
+import { DeviceService } from '@/store/services/state';
+import { Block } from '@/store/blocks/state';
 
-import { deviceServices } from '../../../store/services/getters';
-import { allBlockFromService } from '../../../store/blocks/getters';
+import { deviceServices } from '@/store/services/getters';
+import { allBlockFromService } from '@/store/blocks/getters';
 
 /* eslint-disable indent */
 @Component({
