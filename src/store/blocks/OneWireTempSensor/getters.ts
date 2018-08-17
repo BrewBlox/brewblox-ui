@@ -1,8 +1,10 @@
+import { RootStore } from '../../state';
+
 import { allBlockFromService, blockById } from '../getters';
 
-import { OneWireTempSensorBlock, typeName } from './OneWireTempSensor';
+import { OneWireTempSensorBlock } from './OneWireTempSensor';
 
-import { RootStore } from '../../state';
+export const typeName = 'OneWireTempSensor';
 
 export function getById(store: RootStore, id: string): OneWireTempSensorBlock {
   return blockById(store, id, typeName) as OneWireTempSensorBlock;

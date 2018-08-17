@@ -1,8 +1,10 @@
+import { RootStore } from '../../state';
+
 import { allBlockFromService, blockById } from '../getters';
 
-import { SetPointSimpleBlock, typeName } from './SetPointSimple';
+import { SetPointSimpleBlock } from './SetPointSimple';
 
-import { RootStore } from '../../state';
+export const typeName = 'SetPointSimple';
 
 export function getById(store: RootStore, id: string): SetPointSimpleBlock {
   return blockById(store, id, typeName) as SetPointSimpleBlock;
@@ -10,5 +12,5 @@ export function getById(store: RootStore, id: string): SetPointSimpleBlock {
 
 export function getAll(store: RootStore, serviceId: string): SetPointSimpleBlock[] {
   return allBlockFromService(store, serviceId)
-    .filter(block => block.type === 'SetPointSimple') as SetPointSimpleBlock[];
+    .filter(block => block.type === typeName) as SetPointSimpleBlock[];
 }

@@ -2,8 +2,6 @@ import Link from '@/core/units/Link';
 
 import { Block } from '@/store/blocks/state';
 
-export const typeName = 'SensorSetPointPair';
-
 export interface SensorSetPointPairBlock extends Block {
   type: 'SensorSetPointPair';
   data: {

@@ -38,6 +38,6 @@ export function blockById(store: RootStore, id: string, type?: string) {
     throw new Error(`Invalid block: ${block.type} !== ${type}`);
   }
   return block;
-};
+}
 
 export default getters;

@@ -1,8 +1,6 @@
 import { Block, MetricsBase } from '../state';
 import { Temperature } from '@/core/units';
 
-export const typeName = 'OneWireTempSensor';
-
 export interface OneWireTempSensorBlock extends Block, MetricsBase {
   data: {
     settings: {

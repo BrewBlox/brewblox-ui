@@ -1,8 +1,10 @@
+import { RootStore } from '../../state';
+
 import { allBlockFromService, blockById } from '../getters';
 
-import { PidBlock, typeName } from '@/store/blocks/Pid/Pid';
+import { PidBlock } from './Pid';
 
-import { RootStore } from '../../state';
+export const typeName = 'Pid';
 
 export function getById(store: RootStore, id: string): PidBlock {
   return blockById(store, id, typeName) as PidBlock;
@@ -10,5 +12,5 @@ export function getById(store: RootStore, id: string): PidBlock {
 
 export function getAll(store: RootStore, serviceId: string): PidBlock[] {
   return allBlockFromService(store, serviceId)
-    .filter(block => block.type === 'Pid') as PidBlock[];
+    .filter(block => block.type === typeName) as PidBlock[];
 }

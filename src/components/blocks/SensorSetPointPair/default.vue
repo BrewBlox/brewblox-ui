@@ -1,3 +1,5 @@
+<script lang="ts" src="./SensorSetPointPair.ts" />
+
 <template>
   <q-card>
     <q-card-title>SensorSetPointPair ({{ id }})</q-card-title>
@@ -40,5 +42,3 @@
     </q-card-main>
   </q-card>
 </template>
-
-<script lang="ts" src="./SensorSetPointPair.ts" />

@@ -1,3 +1,5 @@
+<script lang="ts" src="./Create.ts" />
+
 <template>
   <q-stepper
     ref="stepper"
@@ -93,5 +95,3 @@
     </q-stepper-navigation>
   </q-stepper>
 </template>
-
-<script lang="ts" src="./Create.ts" />
