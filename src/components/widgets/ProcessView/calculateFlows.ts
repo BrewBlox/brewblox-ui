@@ -136,13 +136,11 @@ function flow(
   return possibleOutputs(part, angleIn).reduce(
     (parts, output) => {
       const angle = output.out;
-
       const totalFriction = accFriction + (output.friction || 0);
 
       if (typeof output.pressure === 'number') {
         if (output.pressure < startPressure) {
           const pathFlow = (startPressure - output.pressure) / totalFriction;
-
           return addFlowToPart(
             part,
             {
@@ -157,6 +155,7 @@ function flow(
       }
 
       const nextPart = partAtAngle(part, candidateParts, angle);
+
       if (!nextPart) {
         // no flow possible
         return addFlowToPart(
@@ -169,6 +168,8 @@ function flow(
         );
       }
 
+      const notUpdatedNextPart = partAtAngle(part, parts, angle);
+
       const nextFlows = flow(
         nextPart,
         parts,
@@ -179,17 +180,20 @@ function flow(
       );
 
       const updatedNextPart = partAtAngle(part, nextFlows, angle);
-      let angleFlow = 0;
 
+      let additionalAngleFlow = 0;
       if (updatedNextPart && updatedNextPart.flow) {
-        angleFlow = updatedNextPart.flow[rotated(angle, 180)];
+        additionalAngleFlow += updatedNextPart.flow[rotated(angle, 180)];
+      }
+      if (notUpdatedNextPart && notUpdatedNextPart.flow) {
+        additionalAngleFlow -= notUpdatedNextPart.flow[rotated(angle, 180)];
       }
 
       return addFlowToPart(
         part,
         {
-          [angle]: angleFlow * -1,
-          [angleIn]: angleFlow,
+          [angle]: additionalAngleFlow * -1,
+          [angleIn]: additionalAngleFlow,
         },
         nextFlows,
       );
