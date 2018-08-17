@@ -10,6 +10,10 @@ export default abstract class BlockComponent extends Vue {
     return this.block.id;
   }
 
+  get type(): string {
+    return this.block.type;
+  }
+
   get profiles(): number[] {
     return this.block.profiles;
   }

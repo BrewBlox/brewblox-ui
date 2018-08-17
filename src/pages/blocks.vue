@@ -1,3 +1,25 @@
+<script lang="ts">
+import Vue from 'vue';
+
+import Block from '@/components/blocks/block.vue';
+
+import { isFetching, blockIds } from '@/store/blocks/getters';
+
+export default Vue.extend({
+  name: 'PageIndex',
+  components: { Block },
+  computed: {
+    blocks(): string[] {
+      return blockIds(this.$store);
+    },
+    fetching(): boolean {
+      return isFetching(this.$store);
+    },
+  },
+  methods: {},
+});
+</script>
+
 <template>
   <q-page padding>
     <q-inner-loading :visible="fetching">
@@ -25,25 +47,3 @@
   margin-bottom: 20px;
 }
 </style>
-
-<script lang="ts">
-import Vue from 'vue';
-
-import Block from '@/components/blocks/block';
-
-import { isFetching, blockIds } from '@/store/blocks/getters';
-
-export default Vue.extend({
-  name: 'PageIndex',
-  components: { Block },
-  computed: {
-    blocks(): string[] {
-      return blockIds(this.$store);
-    },
-    fetching(): boolean {
-      return isFetching(this.$store);
-    },
-  },
-  methods: {},
-});
-</script>
