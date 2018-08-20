@@ -1,7 +1,7 @@
 // https://docs.cypress.io/api/introduction/api.html
 
-describe('My First Test', () => {
-  it('Visits the Kitchen Sink', () => {
+describe('Wizard tests', () => {
+  it('Creates a new SensorSetPointPair', () => {
     cy.visit('/');
     // click hamburger menu
     cy.get('.q-toolbar > .q-btn > .q-btn-inner > .q-icon').click();
@@ -15,5 +15,16 @@ describe('My First Test', () => {
     cy.contains('Sensor SetPoint Pair').click();
     cy.get('.q-stepper-nav > .q-btn').click();
     cy.contains('Choose a block').click();
+    cy.contains('Create').click();
+
+    // Create new SensorSetPointPair
+    cy.contains('spark').click();
+    // Primary button should be "next"
+    cy.get('.q-stepper-nav > .bg-primary').click();
+
+    cy.get('.q-modal-layout-content').within(() => {
+      // open drop down menu
+      cy.get('.q-if').first().click();
+    })
   });
 });
