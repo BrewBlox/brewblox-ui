@@ -64,7 +64,7 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
                 label
                 class="q-headline"
               >
-                {{ sensor.state.value | unit }}
+                {{ sensor.data.state.value | unit }}
               </q-item-tile>
             </q-item-main>
             <q-item-main>
@@ -72,7 +72,7 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
               <q-input
                 v-model="inputs.setpoint"
                 type="number"
-                :suffix="sensor.state.value.unitNotation"
+                :suffix="sensor.data.state.value.unitNotation"
                 numeric-keyboard-toggle
               />
             </q-item-main>

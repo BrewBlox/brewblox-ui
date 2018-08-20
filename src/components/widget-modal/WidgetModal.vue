@@ -26,10 +26,10 @@ import {
   },
 })
 /* eslint-enable */
-class WidgetModal extends Vue {
+export default class WidgetModal extends Vue {
   currentStep: string = 'widgets';
   widgetType: WidgetType | null = null;
-  block: string | null = null;
+  blockId: string | null = null;
   needsSetup: boolean = false;
 
   get widgetTypes(): { label: string, value: string }[] {
@@ -72,11 +72,11 @@ class WidgetModal extends Vue {
       return true;
     }
 
-    if (this.currentStep === 'blocks' && this.block) {
+    if (this.currentStep === 'blocks' && this.blockId) {
       return true;
     }
 
-    if (this.currentStep === 'finished' && this.block) {
+    if (this.currentStep === 'finished' && this.blockId) {
       return true;
     }
 
@@ -84,15 +84,15 @@ class WidgetModal extends Vue {
   }
 
   addToDashboard() {
-    this.$props.onAddWidget(this.widgetType, this.block);
+    this.$props.onAddWidget(this.widgetType, this.blockId);
   }
 
   cancelCreate() {
-    this.block = null;
+    this.blockId = null;
   }
 
   createBlock(block: Block) {
-    this.block = `${block.serviceId}/${block.id}`;
+    this.blockId = `${block.serviceId}/${block.id}`;
   }
 
   @Watch('isOpen', { immediate: true, deep: true })
@@ -101,12 +101,10 @@ class WidgetModal extends Vue {
       // closed modal
       this.currentStep = 'widgets';
       this.widgetType = null;
-      this.block = null;
+      this.blockId = null;
     }
   }
 }
-
-export default WidgetModal;
 </script>
 
 <template>
@@ -131,7 +129,7 @@ export default WidgetModal;
         <q-stepper
           ref="stepper"
           v-model="currentStep"
-          v-if="block !== 'new'"
+          v-if="blockId !== 'new'"
         >
           <q-step
             default
@@ -163,7 +161,7 @@ export default WidgetModal;
               orientation="vertical"
             >
               <q-select
-                v-model="block"
+                v-model="blockId"
                 placeholder="Choose a block"
                 :options="blocksForWidget"
               />
@@ -223,13 +221,15 @@ export default WidgetModal;
   position: relative;
 }
 
-.slide-enter-active, .slide-leave-active {
+.slide-enter-active,
+.slide-leave-active {
   position: absolute;
   width: calc(100% - 96px);
-  transition: opacity .2s, margin-top .2s;
+  transition: opacity 0.2s, margin-top 0.2s;
 }
 
-.slide-enter, .slide-leave-to {
+.slide-enter,
+.slide-leave-to {
   opacity: 0;
   margin-top: -40px;
 }

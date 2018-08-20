@@ -92,20 +92,18 @@ export default class DashboardPage extends Vue {
     updateDashboardItemSize(this.$store, { id, cols, rows });
   }
 
-  async onAddWidget(type: WidgetType, block: Block) {
-    // create dashboard item on api and wait
+  async onAddWidget(type: WidgetType, blockId: string) {
     const dashboardItem = await createDashboardItem(this.$store, {
-      id: `item-${block.serviceId}/${block.id}`,
+      id: `item-${blockId}`,
       order: this.items.length + 1,
       cols: 4,
       rows: 4,
       widget: type,
       options: {
-        block: `${block.serviceId}/${block.id}`,
+        block: blockId,
       },
     });
 
-    // add item to dashboard
     addDashboardItemToDashboard(this.$store, { dashboard: this.dashboard, dashboardItem });
 
     this.modalOpen = false;

@@ -8,7 +8,7 @@ import { Block } from '@/store/blocks/state';
 import Widget from './Widget';
 
 @Component
-class BlockWidget extends Widget {
+export default class BlockWidget extends Widget {
   /**
    * Use inputMapping to bind sources of values to the inputs used in the component.
    *
@@ -77,5 +77,3 @@ class BlockWidget extends Widget {
     this.inputs = this.inputsFromSource();
   }
 }
-
-export default BlockWidget;
