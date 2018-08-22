@@ -26,14 +26,10 @@
     ],
     "type": "OneWireTempSensor",
     "data": {
-      "settings": {
-        "address": "DEADBEEF",
-        "offset": 0
-      },
-      "state": {
-        "value[celsius]": 20.89789201,
-        "connected": true
-      }
+      "address": "DEADBEEF",
+      "offset": 0,
+      "value[celsius]": 20.89789201,
+      "connected": true
     }
   },
   {

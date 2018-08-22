@@ -25,34 +25,22 @@ export default class OneWireTempSensor extends BlockComponent {
     return getById(this.$store, this.$props.id);
   }
 
-  get settings() {
-    return this.block.data.settings;
-  }
-
-  get state() {
-    return this.block.data.state;
-  }
-
-  get loading() {
-    return !!this.block.isLoading;
-  }
-
   get changed() {
     return (
-      this.settings.address !== this.addressInput ||
-      this.settings.offset.value !== this.offsetInput
+      this.block.data.address !== this.addressInput ||
+      this.block.data.offset.value !== this.offsetInput
     );
   }
 
   mounted() {
     // set default values
-    this.offsetInput = this.settings.offset.value;
-    this.addressInput = this.settings.address;
+    this.offsetInput = this.block.data.offset.value;
+    this.addressInput = this.block.data.address;
   }
 
   save() {
-    this.settings.offset.value = this.offsetInput;
-    this.settings.address = this.addressInput;
+    this.block.data.offset.value = this.offsetInput;
+    this.block.data.address = this.addressInput;
 
     saveBlock(this.$store, this.block);
   }
@@ -76,7 +64,23 @@ export default class OneWireTempSensor extends BlockComponent {
           Save
         </q-btn>
 
-        <q-list-header>Settings</q-list-header>
+        <q-item>
+          <q-item-main>
+            <q-item-tile label>Value</q-item-tile>
+            <q-item-tile sublabel>{{ block.data.value | unit }}</q-item-tile>
+          </q-item-main>
+        </q-item>
+        <q-item>
+          <q-item-main>
+            <q-input
+              v-model="offsetInput"
+              stack-label="Offset"
+              placeholder="Offset of sensor"
+              type="number"
+              :suffix="block.data.offset.unitNotation"
+            />
+          </q-item-main>
+        </q-item>
         <q-item>
           <q-item-main>
             <q-input
@@ -88,33 +92,8 @@ export default class OneWireTempSensor extends BlockComponent {
         </q-item>
         <q-item>
           <q-item-main>
-            <q-input
-              v-model="offsetInput"
-              stack-label="Offset"
-              placeholder="Offset of sensor"
-              type="number"
-              :suffix="settings.offset.unitNotation"
-            />
-          </q-item-main>
-        </q-item>
-      </q-list>
-    </q-card-main>
-
-    <q-card-separator />
-
-    <q-card-main>
-      <q-list>
-        <q-list-header>State</q-list-header>
-        <q-item>
-          <q-item-main>
-            <q-item-tile label>Value</q-item-tile>
-            <q-item-tile sublabel>{{ state.value | unit }}</q-item-tile>
-          </q-item-main>
-        </q-item>
-        <q-item>
-          <q-item-main>
             <q-item-tile label>Connected</q-item-tile>
-            <q-item-tile sublabel>{{ state.connected }}</q-item-tile>
+            <q-item-tile sublabel>{{ block.data.connected }}</q-item-tile>
           </q-item-main>
         </q-item>
       </q-list>
