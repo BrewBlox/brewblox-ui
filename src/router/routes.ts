@@ -4,11 +4,11 @@ export default [
     component: () => import('@/layouts/default.vue'),
     children: [
       { path: '', component: () => import('@/pages/index.vue') },
-      { path: '/settings', component: () => import('@/pages/settings/settings.vue') },
+      { path: '/settings', component: () => import('@/pages/settings.vue') },
       { path: '/blocks', component: () => import('@/pages/blocks.vue') },
 
       // dynamic pages
-      { path: '/dashboard/:id', component: () => import('@/pages/dashboard/dashboard.vue') },
+      { path: '/dashboard/:id', component: () => import('@/pages/dashboard/DashboardPage.vue') },
     ],
   },
 

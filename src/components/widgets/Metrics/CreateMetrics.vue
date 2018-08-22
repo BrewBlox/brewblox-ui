@@ -1,0 +1,168 @@
+<script lang="ts">
+import Vue from 'vue';
+import Component from 'vue-class-component';
+
+import { DeviceService } from '@/store/services/state';
+import { Block } from '@/store/blocks/state';
+
+import { deviceServices } from '@/store/services/getters';
+import { allBlockFromService } from '@/store/blocks/getters';
+
+/* eslint-disable indent */
+@Component({
+  props: {
+    onCancel: {
+      type: Function,
+      default: () => {},
+    },
+    onCreate: {
+      type: Function,
+      default: () => {},
+    },
+  },
+})
+/* eslint-enable */
+class Metrics extends Vue {
+  currentStep: string = 'service';
+  creating: boolean = false;
+  service: DeviceService | null = null;
+  blockInput: Block | null = null;
+
+  get services() {
+    return deviceServices(this.$store).map(service => ({
+      label: service.id,
+      value: service,
+    }));
+  }
+
+  get canContinue() {
+    if (this.currentStep === 'service' && this.service) {
+      return true;
+    }
+
+    if (this.currentStep === 'choose-block' && this.blockInput) {
+      return true;
+    }
+
+    return false;
+  }
+
+  get allBlocks() {
+    if (!this.service) {
+      return [];
+    }
+
+    return allBlockFromService(this.$store, this.service.id)
+      .map(block => ({
+        label: `${block.serviceId}/${block.id}`,
+        value: block,
+      }));
+  }
+
+  clearBlocks() {
+    this.blockInput = null;
+  }
+
+  async createBlock() {
+    try {
+      this.creating = true;
+
+      const block = {};
+
+      this.$props.onCreate(block);
+    } catch (e) {
+      throw new Error(e);
+    }
+  }
+}
+
+export default Metrics;
+</script>
+
+<template>
+  <q-stepper
+    ref="stepper"
+    v-model="currentStep"
+  >
+    <q-step
+      default
+      name="service"
+      title="Which controller service?"
+    >
+      <q-field
+        label="Choose controller service to create sensor set point pair on"
+        orientation="vertical"
+        dark
+        icon="settings system daydream"
+      >
+        <q-option-group
+          dark
+          type="radio"
+          v-model="service"
+          @input="clearBlocks"
+          :options="services"
+        />
+      </q-field>
+    </q-step>
+    <q-step
+      default
+      name="choose-block"
+      title="Choose block for metrics"
+    >
+      <q-field
+        label="Pick a block"
+        orientation="vertical"
+        dark
+        icon="widgets"
+      >
+        <q-select
+          v-model="blockInput"
+          :options="allBlocks"
+        />
+      </q-field>
+    </q-step>
+    <q-step
+      default
+      name="create"
+      title="Create block"
+    >
+      <p class="q-title">Done!</p>
+      <p>
+        Metrics block is ready to be created.
+      </p>
+    </q-step>
+
+    <q-stepper-navigation>
+      <q-btn
+        v-if="currentStep === 'service'"
+        flat
+        @click="$props.onCancel"
+        label="Cancel"
+      />
+      <q-btn
+        v-if="currentStep !== 'service'"
+        flat
+        @click="$refs.stepper.previous()"
+        label="Back"
+      />
+      <q-btn
+        v-if="currentStep !== 'create'"
+        :color="!canContinue ? 'dark-bright' : 'primary'"
+        :disabled="!canContinue"
+        @click="$refs.stepper.next()"
+        label="Next"
+      />
+      <q-btn
+        v-if="currentStep === 'create'"
+        color="primary"
+        label="Create"
+        :loading="creating"
+        @click="createBlock"
+      />
+    </q-stepper-navigation>
+  </q-stepper>
+</template>
+
+<style scoped>
+
+</style>

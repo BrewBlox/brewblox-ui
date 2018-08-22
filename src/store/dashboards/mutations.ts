@@ -36,34 +36,42 @@ const mutations = {
     state.dashboards.allIds.push(dashboard.id);
     state.dashboards.byId[dashboard.id] = { ...dashboard };
   },
+
   setDashboardOrder(state: DashboardState, { id, order }: { id: string, order: number }) {
     updateDashboard(state, id, { order });
   },
+
   setDashboard(state: DashboardState, dashboard: Dashboard) {
     updateDashboard(state, dashboard.id, dashboard);
   },
+
   addDashboardItem(state: DashboardState, item: DashboardItem) {
     state.items.allIds.push(item.id);
     state.items.byId[item.id] = { ...item };
   },
+
   mutateFetching(state: DashboardState, fetching: boolean) {
     state.fetching = fetching;
   },
+
   setDashboardItemOrder(state: DashboardState, { id, order }: { id: string, order: number }) {
     updateDashboardItem(state, id, { order });
   },
+
   setDashboardItemSize(
     state: DashboardState,
     { id, cols, rows }: { id: string, cols: number, rows: number },
   ) {
     updateDashboardItem(state, id, { cols, rows });
   },
+
   setDashboardItemOptions(
     state: DashboardState,
     { id, options }: { id: string, options: any },
   ) {
     updateDashboardItemOptions(state, id, options);
   },
+
 };
 
 // exported commit accessors

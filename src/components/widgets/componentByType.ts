@@ -1,6 +1,6 @@
 import { DashboardItem } from '@/store/dashboards/state';
 
-import PID from './PID/PID.vue';
+import Pid from './Pid/Pid.vue';
 import Metrics from './Metrics/Metrics.vue';
 import SensorSetPointPair from './SensorSetPointPair/SensorSetPointPair.vue';
 import Placeholder from './Placeholder.vue';
@@ -8,7 +8,7 @@ import Placeholder from './Placeholder.vue';
 function componentByType(type: WidgetType) {
   switch (type) {
     case 'Pid':
-      return PID;
+      return Pid;
     case 'Metrics':
       return Metrics;
     case 'SensorSetPointPair':

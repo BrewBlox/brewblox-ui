@@ -30,6 +30,7 @@ services:
       - "./mocks/config/seed_objects.json:/app/seed_objects.json"
     command:
       - "--simulation"
+      - "--debug"
       - "--seed-profiles=0"
       - "--seed-objects=seed_objects.json"
 
@@ -37,7 +38,7 @@ services:
     image: brewblox/brewblox-datastore:develop
     labels:
       - "traefik.port=3000"
-      - "traefik.frontend.rule=PathPrefix: /datastore"
+      - "traefik.frontend.rule=PathPrefixStrip: /datastore/"
     volumes:
       - "./mocks/config/datastore.json:/app/datastore.json"
     command:

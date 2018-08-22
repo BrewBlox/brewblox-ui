@@ -14,6 +14,10 @@ import { DashboardState, DashboardItem, DashboardContext, Dashboard } from './st
 import { State as RootState } from '../state';
 
 import {
+  dashboardItemById as getDashboardItemInStore,
+  dashboardById as getDashboardInStore,
+} from './getters';
+import {
   mutateFetching as mutateFetchingInStore,
   addDashboard as addDashboardToStore,
   setDashboard as setDashboardInStore,
@@ -37,55 +41,55 @@ const actions = {
       items: [],
     };
 
-    // add dashboard to store
     addDashboardToStore(context, dashboard);
-
-    // add dashboard to API
     createDashboardOnApi(dashboard);
   },
+
   updateDashboardOrder(context: DashboardContext, orders: string[]) {
     orders.forEach((id, index) => {
       const order = index + 1;
       setDashboardOrderInStore(context, { id, order });
-
-      persistDashboard(id, { order });
+      persistDashboard(getDashboardInStore(context, id));
     });
   },
+
   updateDashboard(context: DashboardContext, dashboard: Dashboard) {
     setDashboardInStore(context, dashboard);
-
-    persistDashboard(dashboard.id, dashboard);
+    persistDashboard(dashboard);
   },
+
   addDashboard(context: DashboardContext, dashboard: Dashboard) {
     addDashboardToStore(context, dashboard);
   },
+
   addDashboardItem(context: DashboardContext, item: DashboardItem) {
     addDashboardItemToStore(context, item);
   },
-  updateDashboardItemOrder(context: DashboardContext, orders: string[]) {
-    orders.forEach((id, index) => {
+
+  updateDashboardItemOrder(context: DashboardContext, itemIds: string[]) {
+    itemIds.forEach((id, index) => {
       const order = index + 1;
       setDashboardItemOrderInStore(context, { id, order });
-
-      persistDashboardItem(id, { order });
+      persistDashboardItem(getDashboardItemInStore(context, id));
     });
   },
+
   updateDashboardItemSize(
     context: DashboardContext,
     { id, cols, rows }: { id: string, cols: number, rows: number },
   ) {
     setDashboardItemSizeInStore(context, { id, cols, rows });
-
-    persistDashboardItem(id, { cols, rows });
+    persistDashboardItem(getDashboardItemInStore(context, id));
   },
+
   updateDashboardItemOptions(
     context: DashboardContext,
     { id, options }: { id: string, options: any },
   ) {
     setDashboardItemOptionsInStore(context, { id, options });
-
-    persistDashboardItem(id, { options });
+    persistDashboardItem(getDashboardItemInStore(context, id));
   },
+
   async fetchDashboards(context: DashboardContext) {
     // update isFetching
     mutateFetchingInStore(context, true);
@@ -105,15 +109,16 @@ const actions = {
     // update isFetching
     mutateFetchingInStore(context, false);
   },
-  async createDashboardItem(context: DashboardContext, data: any): Promise<DashboardItem> {
-    // create dashboard item on api
-    const dashboardItem = await createDashboardItemOnApi(data);
 
-    // add to store
+  async createDashboardItem(
+    context: DashboardContext,
+    item: DashboardItem,
+  ): Promise<DashboardItem> {
+    const dashboardItem = await createDashboardItemOnApi(item);
     actions.addDashboardItem(context, dashboardItem);
-
     return dashboardItem;
   },
+
   addDashboardItemToDashboard(
     context: DashboardContext,
     payload: { dashboard: Dashboard, dashboardItem: DashboardItem },
@@ -125,6 +130,7 @@ const actions = {
       items: [...dashboard.items, dashboardItem.id],
     });
   },
+
 };
 
 // exported action accessors

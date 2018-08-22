@@ -11,7 +11,7 @@
     "start": "npm run serve",
     "build": "vue-cli-service build",
     "test": "jest",
-    "e2e": "vue-cli-service e2e",
+    "e2e": "npm run compose:new && vue-cli-service test:e2e --mode development",
     "tslint": "tslint -c tslint.json 'src/**/*.ts'",
     "eslint": "eslint src --ext .js,.vue,.ts",
     "lint": "npm run tslint && npm run eslint",

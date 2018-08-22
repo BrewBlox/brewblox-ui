@@ -1,11 +1,10 @@
 import Unit from '@/core/units/Unit';
 
-import { BlockBase } from '../state';
+import { Block } from '../state';
 
-export interface SetPointSimple extends BlockBase {
-  setting: Unit;
-}
-
-export interface SetPointSimpleBlock extends SetPointSimple {
+export interface SetPointSimpleBlock extends Block {
   type: 'SetPointSimple';
+  data: {
+    setting: Unit;
+  }
 }
