@@ -6,18 +6,18 @@ import { DeviceService } from '@/store/services/state';
 import { Block } from '@/store/blocks/state';
 
 import { deviceServices } from '@/store/services/getters';
-import { allBlockFromService } from '@/store/blocks/getters';
+import { allBlocksFromService } from '@/store/blocks/getters';
 
 /* eslint-disable indent */
 @Component({
   props: {
     onCancel: {
       type: Function,
-      default: () => {},
+      default: () => { },
     },
     onCreate: {
       type: Function,
-      default: () => {},
+      default: () => { },
     },
   },
 })
@@ -52,7 +52,7 @@ class Metrics extends Vue {
       return [];
     }
 
-    return allBlockFromService(this.$store, this.service.id)
+    return allBlocksFromService(this.$store, this.service.id)
       .map(block => ({
         label: `${block.serviceId}/${block.id}`,
         value: block,
@@ -164,5 +164,4 @@ export default Metrics;
 </template>
 
 <style scoped>
-
 </style>

@@ -44,10 +44,3 @@ export function persistBlock(block: Block): Promise<Block> {
     asDataBlock(block),
   ).then(savedBlock => asBlock(savedBlock, block.serviceId));
 }
-
-export function updateBlock(block: Block): Promise<Block> {
-  return patch(
-    `/${encodeURIComponent(block.serviceId)}/objects/${encodeURIComponent(block.id)}`,
-    asDataBlock(block),
-  ).then(savedBlock => asBlock(savedBlock, block.serviceId));
-}
