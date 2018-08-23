@@ -39,3 +39,7 @@ export function put(url: string, data: any): Promise<any> {
 export function patch(url: string, data: any): Promise<any> {
   return post(url, data, 'PATCH');
 }
+
+export function del(url: string, data: any): Promise<any> {
+  return post(url, data, 'DELETE');
+}

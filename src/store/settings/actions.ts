@@ -28,6 +28,7 @@ const actions = {
     // add controller to store
     addControllerInStore(context, controller);
   },
+
   removeController(context: SettingsContext, controller: string) {
     // persist new settings
     persistSettingsOnApi({
@@ -40,6 +41,7 @@ const actions = {
     // remove controller from store
     removeControllerFromStore(context, controller);
   },
+
   async fetchSettings(context: SettingsContext) {
     // update isFetching
     mutateFetchingInStore(context, true);
@@ -53,6 +55,8 @@ const actions = {
     // update isFetching
     mutateFetchingInStore(context, false);
   },
+
+
 };
 
 // exported action accessors

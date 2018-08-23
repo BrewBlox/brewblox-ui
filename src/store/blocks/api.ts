@@ -1,6 +1,6 @@
 import { flatten } from 'lodash';
 
-import { get, put, patch, post } from '@/core/fetch';
+import { get, put, patch, post, del } from '@/core/fetch';
 
 import { Service } from '@/store/services/state';
 import { Block, DataBlock } from './state';
@@ -43,4 +43,11 @@ export function persistBlock(block: Block): Promise<Block> {
     `/${encodeURIComponent(block.serviceId)}/objects/${encodeURIComponent(block.id)}`,
     asDataBlock(block),
   ).then(savedBlock => asBlock(savedBlock, block.serviceId));
+}
+
+export function deleteBlock(block: Block): Promise<string> {
+  return del(
+    `/${encodeURIComponent(block.serviceId)}/objects/${encodeURIComponent(block.id)}`,
+    asDataBlock(block),
+  ).then(response => response.id);
 }

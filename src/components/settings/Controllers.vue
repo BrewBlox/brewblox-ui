@@ -37,7 +37,7 @@ class Controllers extends Vue {
       cancel: 'Cancel',
     })
       .then(() => this.removeController(controller))
-      .catch(() => {});
+      .catch(() => { });
   }
 }
 
@@ -72,14 +72,25 @@ export default Controllers;
         >
           {{ controller }}
 
-          <q-btn
-            class="remove-btn"
-            icon="remove circle"
-            color="negative"
-            @click="remove(controller)"
+          <div
+            class="controller-actions"
           >
-            Remove
-          </q-btn>
+            <q-btn
+            class="action-btn"
+            icon="clear"
+            color="negative"
+            >
+              Clear blocks
+            </q-btn>
+            <q-btn
+              class="action-btn"
+              icon="remove circle"
+              color="negative"
+              @click="remove(controller)"
+            >
+              Remove
+            </q-btn>
+          </div>
         </q-item>
       </q-list>
     </q-card-main>
@@ -100,7 +111,11 @@ export default Controllers;
   flex-shrink: 0;
 }
 
-.remove-btn {
+.controller-actions {
   margin-left: auto;
+}
+
+.action-btn {
+  margin-left: 10px;
 }
 </style>

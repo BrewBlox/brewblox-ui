@@ -67,5 +67,6 @@ export const updateBlockState = commit(mutations.updateBlockState);
 export const mutateBlock = commit(mutations.mutateBlock);
 export const blockLoading = commit(mutations.blockLoading);
 export const mutateFetching = commit(mutations.mutateFetching);
+export const removeBlock = commit(mutations.removeBlock);
 
 export default mutations;
