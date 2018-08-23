@@ -34,7 +34,6 @@ export interface PidFiltering {
 }
 
 export interface PidBlock extends Block {
-  type: 'Pid';
   data: {
     settings: PidSettings;
     links: PidLinks;

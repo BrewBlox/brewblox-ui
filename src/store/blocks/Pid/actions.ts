@@ -1,7 +1,7 @@
 import { updateBlockState } from '../mutations';
 import { PidBlock } from '@/store/blocks/Pid/Pid';
 
-import { RootStore } from '../../state';
+import { RootStore } from '@/store/state';
 
 // example refresh action
 export const refresh = (store: RootStore, pid: PidBlock) => {

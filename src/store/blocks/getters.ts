@@ -26,10 +26,8 @@ export const allBlocks = read(getters.allBlocks);
 export const blockIds = read(getters.blockIds);
 const blocksById = read(getters.blocksById);
 export const isFetching = read(getters.isFetching);
-export const allBlockFromService = (store: RootStore, serviceId: string): Block[] =>
-  allBlocks(store).filter(block => block.serviceId === serviceId);
 
-export function blockById(store: RootStore, id: string, type?: string) {
+export function blockById<T extends Block>(store: RootStore, id: string, type?: string): T {
   const block = blocksById(store)[id];
   if (!block) {
     throw new Error(`Block ${id} not found`);
@@ -37,7 +35,17 @@ export function blockById(store: RootStore, id: string, type?: string) {
   if (type && block.type !== type) {
     throw new Error(`Invalid block: ${block.type} !== ${type}`);
   }
-  return block;
+  return block as T;
+}
+
+export function allBlocksFromService<T extends Block>(
+  store: RootStore,
+  serviceId: string,
+  type?: string,
+): T[] {
+  return allBlocks(store)
+    .filter(block => block.serviceId === serviceId)
+    .filter(block => !type || block.type === type) as T[];
 }
 
 export default getters;

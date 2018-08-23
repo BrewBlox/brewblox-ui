@@ -5,7 +5,6 @@ import { Service } from '@/store/services/state';
 import {
   fetchBlocks as fetchBlocksFromApi,
   persistBlock as persistBlockToApi,
-  updateBlock as updateBlockToApi,
   createBlock as createBlockOnApi,
 } from './api';
 
@@ -53,23 +52,11 @@ const actions = {
     // update isLoading and apply block data from API
     mutateBlockInStore(context, { ...savedBlock, isLoading: false });
   },
-
-  async updateBlock(context: BlocksContext, block: Block) {
-    // update isLoading and block values
-    mutateBlockInStore(context, { ...block, isLoading: true });
-
-    // persist block to API and wait for result
-    const savedBlock = await updateBlockToApi(block);
-
-    // update isLoading and apply block data from API
-    mutateBlockInStore(context, { ...savedBlock, isLoading: false });
-  },
 };
 
 // exported action accessors
 export const fetchBlocks = dispatch(actions.fetchBlocks);
 export const createBlock = dispatch(actions.createBlock);
 export const saveBlock = dispatch(actions.saveBlock);
-export const updateBlock = dispatch(actions.updateBlock);
 
 export default actions;
