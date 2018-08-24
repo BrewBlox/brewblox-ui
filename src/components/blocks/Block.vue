@@ -8,6 +8,8 @@ const blockTypes = {
   OneWireTempSensor: () => import('./OneWireTempSensor/OneWireTempSensor.vue'),
   SetPointSimple: () => import('./SetPointSimple/SetPointSimple.vue'),
   SensorSetPointPair: () => import('./SensorSetPointPair/SensorSetPointPair.vue'),
+  OneWireBus: () => import('./OneWireBus/OneWireBus.vue'),
+  Profiles: () => import('./Profiles/Profiles.vue'),
 
   // fallback component when type is not resolved
   Unknown: () => import('./Unknown.vue'),
