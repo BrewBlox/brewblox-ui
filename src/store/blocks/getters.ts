@@ -1,6 +1,6 @@
 import { getStoreAccessors } from 'vuex-typescript';
 
-import { Block, BlocksState } from './state';
+import { Block, BlocksState, BlocksContext } from './state';
 import { State as RootState, RootStore } from '../state';
 
 const { read } = getStoreAccessors<BlocksState, RootState>('blocks');
@@ -39,7 +39,7 @@ export function blockById<T extends Block>(store: RootStore, id: string, type?: 
 }
 
 export function allBlocksFromService<T extends Block>(
-  store: RootStore,
+  store: RootStore | BlocksContext,
   serviceId: string,
   type?: string,
 ): T[] {

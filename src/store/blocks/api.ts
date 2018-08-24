@@ -23,12 +23,9 @@ function asBlock(block: DataBlock, serviceId: string): Block {
   };
 }
 
-export function fetchBlocks(services: Service[]): Promise<Block[]> {
-  return Promise
-    .all(services.map(service =>
-      get(`/${encodeURIComponent(service.id)}/objects`)
-        .then(blocks => blocks.map((block: DataBlock) => asBlock(block, service.id)))))
-    .then(responses => flatten(responses));
+export function fetchBlocks(service: Service): Promise<Block[]> {
+  return get(`/${encodeURIComponent(service.id)}/objects`)
+    .then(blocks => blocks.map((block: DataBlock) => asBlock(block, service.id)));
 }
 
 export function createBlock(block: Block): Promise<Block> {
@@ -50,4 +47,8 @@ export function deleteBlock(block: Block): Promise<string> {
     `/${encodeURIComponent(block.serviceId)}/objects/${encodeURIComponent(block.id)}`,
     asDataBlock(block),
   ).then(response => response.id);
+}
+
+export function clearBlocks(serviceId: string): Promise<any> {
+  return del(`/${encodeURIComponent(serviceId)}/objects`, {});
 }

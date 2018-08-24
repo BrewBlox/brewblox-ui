@@ -7,20 +7,25 @@ const { read } = getStoreAccessors<ServicesState, RootState>('services');
 
 const getters = {
   servicesById: (state: ServicesState): { [id: string]: Service } => state.byId,
+
   serviceIds(state: ServicesState): string[] {
     return state.allIds;
   },
+
   allServices(state: ServicesState): Service[] {
     return getters.serviceIds(state).map(id => state.byId[id]);
   },
+
   deviceServices(state: ServicesState): DeviceService[] {
     return getters
       .allServices(state)
       .filter(service => service.type === 'DeviceService') as DeviceService[];
   },
+
   isFetching(state: ServicesState): boolean {
     return state.fetching;
   },
+
 };
 
 // exported getter accessors

@@ -4,6 +4,9 @@ import Component from 'vue-class-component';
 
 import { controllers, isFetching } from '@/store/settings/getters';
 import { addController, removeController } from '@/store/settings/actions';
+import { clearBlocks } from '@/store/blocks/actions';
+import { serviceById } from '@/store/services/getters';
+
 
 @Component
 class Controllers extends Vue {
@@ -25,8 +28,15 @@ class Controllers extends Vue {
     this.controllerInput = '';
   }
 
-  removeController(controller: string) {
-    removeController(this.$store, controller);
+  clear(controller: string) {
+    this.$q.dialog({
+      title: 'Remove',
+      message: `Do you want to remove all blocks from '${controller}'?`,
+      ok: 'Yes',
+      cancel: 'Cancel',
+    })
+      .then(() => clearBlocks(this.$store, serviceById(this.$store, controller)))
+      .catch(() => { });
   }
 
   remove(controller: string) {
@@ -36,7 +46,7 @@ class Controllers extends Vue {
       ok: 'Yes',
       cancel: 'Cancel',
     })
-      .then(() => this.removeController(controller))
+      .then(() => removeController(this.$store, controller))
       .catch(() => { });
   }
 }
@@ -79,6 +89,7 @@ export default Controllers;
             class="action-btn"
             icon="clear"
             color="negative"
+            @click="clear(controller)"
             >
               Clear blocks
             </q-btn>
