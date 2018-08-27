@@ -4,7 +4,10 @@ import { Block } from '@/store/blocks/state';
 
 export default abstract class BlockComponent extends Vue {
   abstract get block(): Block;
-  abstract get changed(): boolean;
+
+  get changed(): boolean {
+    return false;
+  }
 
   get id(): string {
     return this.block.id;
