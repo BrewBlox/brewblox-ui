@@ -33,7 +33,7 @@ export default class InactiveObject extends BlockComponent {
         <q-item>
           <q-item-main>
             <q-item-tile label>Actual Type</q-item-tile>
-            <q-item-tile sublabel>{{ block.data.actual_type }}</q-item-tile>
+            <q-item-tile sublabel>{{ block.data.actualType }}</q-item-tile>
           </q-item-main>
         </q-item>
 
