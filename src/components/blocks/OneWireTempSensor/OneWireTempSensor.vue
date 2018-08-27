@@ -49,6 +49,7 @@ export default class OneWireTempSensor extends BlockComponent {
 
 <template>
   <q-card>
+
     <q-card-title>OneWireTempSensor ({{ id }})</q-card-title>
 
     <q-card-main>

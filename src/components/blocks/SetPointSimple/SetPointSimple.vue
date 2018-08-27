@@ -45,6 +45,7 @@ export default class SetPointSimple extends BlockComponent {
 
 <template>
   <q-card>
+
     <q-card-title>SetPointSimple ({{ id }})</q-card-title>
 
     <q-card-main>
@@ -61,6 +62,7 @@ export default class SetPointSimple extends BlockComponent {
         </q-btn>
 
         <q-list-header>Settings</q-list-header>
+
         <q-item>
           <q-item-main>
             <q-input
@@ -72,7 +74,9 @@ export default class SetPointSimple extends BlockComponent {
             />
           </q-item-main>
         </q-item>
+
       </q-list>
     </q-card-main>
+
   </q-card>
 </template>

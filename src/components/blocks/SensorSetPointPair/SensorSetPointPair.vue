@@ -86,10 +86,12 @@ export default class SensorSetPointPair extends BlockComponent {
 
 <template>
   <q-card>
+
     <q-card-title>SensorSetPointPair ({{ id }})</q-card-title>
 
     <q-card-main>
       <q-list>
+
         <q-btn
           :loading="loading"
           icon="check"
@@ -102,6 +104,7 @@ export default class SensorSetPointPair extends BlockComponent {
         </q-btn>
 
         <q-list-header>Links</q-list-header>
+
         <q-item>
           <q-item-main>
             <q-select
@@ -112,6 +115,7 @@ export default class SensorSetPointPair extends BlockComponent {
             />
           </q-item-main>
         </q-item>
+
         <q-item>
           <q-item-main>
             <q-select
@@ -121,7 +125,9 @@ export default class SensorSetPointPair extends BlockComponent {
               :options="allSetPoints"
             />
           </q-item-main>
+
         </q-item>
+
       </q-list>
     </q-card-main>
   </q-card>

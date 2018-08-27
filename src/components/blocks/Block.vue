@@ -10,6 +10,8 @@ const blockTypes = {
   SensorSetPointPair: () => import('./SensorSetPointPair/SensorSetPointPair.vue'),
   OneWireBus: () => import('./OneWireBus/OneWireBus.vue'),
   Profiles: () => import('./Profiles/Profiles.vue'),
+  SysInfo: () => import('./SysInfo/SysInfo.vue'),
+  Ticks: () => import('./Ticks/Ticks.vue'),
 
   // fallback component when type is not resolved
   Unknown: () => import('./Unknown.vue'),

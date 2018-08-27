@@ -31,6 +31,7 @@ export default class Profiles extends BlockComponent {
 
 <template>
   <q-card>
+
     <q-card-title>Profiles ({{ id }})</q-card-title>
 
     <q-card-main>
@@ -49,5 +50,6 @@ export default class Profiles extends BlockComponent {
 
       </q-list>
     </q-card-main>
+
   </q-card>
 </template>

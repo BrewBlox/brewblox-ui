@@ -35,10 +35,12 @@ export default class OneWireBus extends BlockComponent {
 
 <template>
   <q-card>
+
     <q-card-title>OneWireBus ({{ id }})</q-card-title>
 
     <q-card-main>
       <q-list>
+
         <q-list-header>Command</q-list-header>
 
         <q-item>
@@ -69,5 +71,6 @@ export default class OneWireBus extends BlockComponent {
 
       </q-list>
     </q-card-main>
+
   </q-card>
 </template>

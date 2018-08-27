@@ -24,17 +24,21 @@ export default class InactiveObject extends BlockComponent {
 
 <template>
   <q-card>
+
     <q-card-title>InactiveObject ({{ id }})</q-card-title>
 
     <q-card-main>
       <q-list>
+
         <q-item>
           <q-item-main>
             <q-item-tile label>Actual Type</q-item-tile>
             <q-item-tile sublabel>{{ block.data.actual_type }}</q-item-tile>
           </q-item-main>
         </q-item>
+
       </q-list>
     </q-card-main>
+
   </q-card>
 </template>

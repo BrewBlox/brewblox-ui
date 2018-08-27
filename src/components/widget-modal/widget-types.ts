@@ -9,8 +9,8 @@ export const widgetTypes: { [key in WidgetType]: string } = {
   Metrics: 'Metrics',
   Pid: 'Pid',
   OneWireTempSensor: 'Temperature Sensor',
-  SetPointSimple: 'SetPoint',
-  SensorSetPointPair: 'Sensor SetPoint Pair',
+  SetPointSimple: 'Setpoint',
+  SensorSetPointPair: 'Sensor/Setpoint Pair',
 };
 
 function getBlocksFromServices(
