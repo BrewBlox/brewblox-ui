@@ -18,7 +18,8 @@ export default class App extends Vue {
         fetchDashboards(this.$store),
         fetchSettings(this.$store),
       ])
-      .then(() => fetchBlocks(this.$store, deviceServices(this.$store)))
+      .then(() => deviceServices(this.$store)
+        .forEach(service => fetchBlocks(this.$store, service)))
       .catch((e) => { throw new Error(e); });
   }
 }

@@ -4,6 +4,9 @@ import Component from 'vue-class-component';
 
 import { controllers, isFetching } from '@/store/settings/getters';
 import { addController, removeController } from '@/store/settings/actions';
+import { clearBlocks } from '@/store/blocks/actions';
+import { serviceById } from '@/store/services/getters';
+
 
 @Component
 class Controllers extends Vue {
@@ -25,8 +28,15 @@ class Controllers extends Vue {
     this.controllerInput = '';
   }
 
-  removeController(controller: string) {
-    removeController(this.$store, controller);
+  clear(controller: string) {
+    this.$q.dialog({
+      title: 'Remove',
+      message: `Do you want to remove all blocks from '${controller}'?`,
+      ok: 'Yes',
+      cancel: 'Cancel',
+    })
+      .then(() => clearBlocks(this.$store, serviceById(this.$store, controller)))
+      .catch(() => { });
   }
 
   remove(controller: string) {
@@ -36,8 +46,8 @@ class Controllers extends Vue {
       ok: 'Yes',
       cancel: 'Cancel',
     })
-      .then(() => this.removeController(controller))
-      .catch(() => {});
+      .then(() => removeController(this.$store, controller))
+      .catch(() => { });
   }
 }
 
@@ -72,14 +82,26 @@ export default Controllers;
         >
           {{ controller }}
 
-          <q-btn
-            class="remove-btn"
-            icon="remove circle"
-            color="negative"
-            @click="remove(controller)"
+          <div
+            class="controller-actions"
           >
-            Remove
-          </q-btn>
+            <q-btn
+            class="action-btn"
+            icon="clear"
+            color="negative"
+            @click="clear(controller)"
+            >
+              Clear blocks
+            </q-btn>
+            <q-btn
+              class="action-btn"
+              icon="remove circle"
+              color="negative"
+              @click="remove(controller)"
+            >
+              Remove
+            </q-btn>
+          </div>
         </q-item>
       </q-list>
     </q-card-main>
@@ -100,7 +122,11 @@ export default Controllers;
   flex-shrink: 0;
 }
 
-.remove-btn {
+.controller-actions {
   margin-left: auto;
+}
+
+.action-btn {
+  margin-left: 10px;
 }
 </style>

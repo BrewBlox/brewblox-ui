@@ -7,10 +7,12 @@ import { State as RootState } from '../state';
 const { commit } = getStoreAccessors<ServicesState, RootState>('services');
 
 const mutations = {
+
   addService(state: ServicesState, service: Service) {
     state.allIds.push(service.id);
     state.byId[service.id] = { ...service };
   },
+
   mutateFetching(state: ServicesState, fetching: boolean) {
     state.fetching = fetching;
   },

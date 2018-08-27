@@ -16,16 +16,9 @@ const actions = {
     addServiceToStore(context, service);
   },
   async fetchServices(context: ServicesContext) {
-    // update isFetching
     mutateFetchingInStore(context, true);
-
-    // will fetch services from the server
     const services = await fetchServicesFromApi();
-
-    // add the services to the store
     services.forEach(service => actions.addService(context, service));
-
-    // update isFetching
     mutateFetchingInStore(context, false);
   },
 };
