@@ -1,6 +1,6 @@
 import { flatten } from 'lodash';
 
-import { get, put, patch, post, del } from '@/core/fetch';
+import { get, put, patch, post, del } from '@/helpers/fetch';
 
 import { Service } from '@/store/services/state';
 import { Block, DataBlock } from './state';

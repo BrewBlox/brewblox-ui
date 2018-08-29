@@ -1,4 +1,4 @@
-import { get } from '@/core/fetch';
+import { get } from '@/helpers/fetch';
 
 import { Service } from './state';
 

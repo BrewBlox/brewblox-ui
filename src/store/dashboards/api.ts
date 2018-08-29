@@ -1,4 +1,4 @@
-import { get, put, post } from '@/core/fetch';
+import { get, put, post } from '@/helpers/fetch';
 
 import { Dashboard, DashboardItem } from './state';
 

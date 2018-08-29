@@ -3,12 +3,12 @@ export default [
     path: '/',
     component: () => import('@/layouts/default.vue'),
     children: [
-      { path: '', component: () => import('@/pages/index.vue') },
-      { path: '/settings', component: () => import('@/pages/settings.vue') },
-      { path: '/blocks', component: () => import('@/pages/blocks.vue') },
+      { path: '', component: () => import('@/pages/IndexPage.vue') },
+      { path: '/settings', component: () => import('@/pages/SettingsPage.vue') },
+      { path: '/blocks', component: () => import('@/pages/BlocksPage.vue') },
 
       // dynamic pages
-      { path: '/dashboard/:id', component: () => import('@/pages/dashboard/DashboardPage.vue') },
+      { path: '/dashboard/:id', component: () => import('@/pages/DashboardPage.vue') },
     ],
   },
 
