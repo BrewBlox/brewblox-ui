@@ -39,6 +39,7 @@ import Quasar, {
   Notify,
   Dialog,
   CloseOverlay,
+  QToggle,
 } from 'quasar';
 
 import 'quasar-extras/roboto-font';
@@ -86,6 +87,7 @@ Vue.use(Quasar, {
     QRadio,
     QField,
     QOptionGroup,
+    QToggle,
   },
   directives: { Ripple, CloseOverlay },
   plugins: { Notify, Dialog },
