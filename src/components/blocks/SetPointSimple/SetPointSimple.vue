@@ -2,12 +2,16 @@
 import Component from 'vue-class-component';
 
 import BlockComponent from '../BlockComponent';
+import ProfilesBar from '../ProfilesBar/ProfilesBar.vue';
 
 import { getById } from '@/store/blocks/SetPointSimple/getters';
 import { saveBlock } from '@/store/blocks/actions';
 
 /* eslint-disable indent */
 @Component({
+  components: {
+    ProfilesBar
+  },
   props: {
     id: {
       default: "",
@@ -47,6 +51,7 @@ export default class SetPointSimple extends BlockComponent {
   <q-card>
 
     <q-card-title>SetPointSimple ({{ id }})</q-card-title>
+    <profiles-bar :id="id"/>
 
     <q-card-main>
       <q-list>

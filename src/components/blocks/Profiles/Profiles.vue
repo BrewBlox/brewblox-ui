@@ -5,6 +5,7 @@ import BlockComponent from '../BlockComponent';
 
 import { getById } from '@/store/blocks/Profiles/getters';
 import { saveBlock } from '@/store/blocks/actions';
+import { updateBlockState } from '@/store/blocks/mutations';
 
 /* eslint-disable indent */
 @Component({
@@ -26,6 +27,15 @@ export default class Profiles extends BlockComponent {
   get active() {
     return this.block.data.active;
   }
+
+  get sysProfiles(): string[] {
+    return this.block.data.active.map(v => v.toString());
+  }
+
+  set sysProfiles(p: string[]) {
+    this.block.data.active = p.map(v => parseInt(v, 10));
+    updateBlockState(this.$store, this.block);
+  }
 }
 </script>
 
@@ -39,12 +49,16 @@ export default class Profiles extends BlockComponent {
 
         <q-list-header>Active Profiles</q-list-header>
 
-        <q-item
-          v-for="profile in active"
-          :key="profile"
-        >
+        <q-item>
           <q-item-main>
-            <q-item-tile sublabel>{{ profile }}</q-item-tile>
+            <q-toggle class=rotate-270 v-model="sysProfiles" val=0 />
+            <q-toggle class=rotate-270 v-model="sysProfiles" val=1 />
+            <q-toggle class=rotate-270 v-model="sysProfiles" val=2 />
+            <q-toggle class=rotate-270 v-model="sysProfiles" val=3 />
+            <q-toggle class=rotate-270 v-model="sysProfiles" val=4 />
+            <q-toggle class=rotate-270 v-model="sysProfiles" val=5 />
+            <q-toggle class=rotate-270 v-model="sysProfiles" val=6 />
+            <q-toggle class=rotate-270 v-model="sysProfiles" val=7 />
           </q-item-main>
         </q-item>
 

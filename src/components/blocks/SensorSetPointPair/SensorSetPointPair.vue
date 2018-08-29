@@ -2,6 +2,7 @@
 import Component from 'vue-class-component';
 
 import BlockComponent from '../BlockComponent';
+import ProfilesBar from '../ProfilesBar/ProfilesBar.vue';
 
 import Link from '@/core/units/Link';
 
@@ -19,6 +20,9 @@ import { OneWireTempSensorBlock } from '@/store/blocks/OneWireTempSensor/OneWire
 
 /* eslint-disable indent */
 @Component({
+  components: {
+    ProfilesBar
+  },
   props: {
     id: {
       default: '',
@@ -88,6 +92,7 @@ export default class SensorSetPointPair extends BlockComponent {
   <q-card>
 
     <q-card-title>SensorSetPointPair ({{ id }})</q-card-title>
+    <profiles-bar :id="id"/>
 
     <q-card-main>
       <q-list>
