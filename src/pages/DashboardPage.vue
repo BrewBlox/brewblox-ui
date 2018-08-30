@@ -100,7 +100,7 @@ export default class DashboardPage extends Vue {
       rows: 4,
       widget: type,
       options: {
-        block: blockId,
+        blockId,
       },
     });
 

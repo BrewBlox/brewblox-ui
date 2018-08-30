@@ -38,7 +38,6 @@ export default class BlockWidget extends Widget {
 
   /**
    * Maps all the values found in the source to their respective input properties
-   * @returns {{[key: string]: any}}
    */
   inputsFromSource(): { [key: string]: any } {
     return Object.keys(this.inputMapping)
@@ -51,27 +50,15 @@ export default class BlockWidget extends Widget {
       );
   }
 
-  /**
-   * Checks for changes in the inputs compared to the source
-   * @returns {boolean}
-   */
-  get changed() {
+  get changed(): boolean {
     const state = this.inputsFromSource();
-
     return Object.keys(state).some(key => state[key] !== this.inputs[key]);
   }
 
-  /**
-   * Block data from the store
-   * @returns {Block}
-   */
   get block(): Block {
-    return blockById(this.$store, this.options.block);
+    return blockById(this.$store, this.options.blockId);
   }
 
-  /**
-   * Updates the inputs when the source changes
-   */
   @Watch('block', { immediate: true, deep: true })
   onBlockUpdate() {
     this.inputs = this.inputsFromSource();
