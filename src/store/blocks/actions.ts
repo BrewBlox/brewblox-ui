@@ -1,6 +1,7 @@
 import { getStoreAccessors } from 'vuex-typescript';
 
 import { Service } from '@/store/services/state';
+import { State as RootState } from '../state';
 
 import {
   fetchBlocks as fetchBlocksFromApi,
@@ -11,8 +12,6 @@ import {
 } from './api';
 
 import { BlocksState, BlocksContext, Block } from './state';
-import { State as RootState } from '../state';
-
 import { allBlocksFromService } from './getters';
 
 import {
