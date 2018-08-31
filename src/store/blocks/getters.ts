@@ -8,14 +8,14 @@ import { State as RootState, RootStore } from '../state';
 const { read } = getStoreAccessors<BlocksState, RootState>('blocks');
 
 const getters = {
-  blocksById: (state: BlocksState): { [id: string]: Block } => state.byId,
+  blocks: (state: BlocksState): { [id: string]: Block } => state.blocks,
 
   blockIds(state: BlocksState): string[] {
-    return map(state.byId, (_: Block, key: string) => key);
+    return map(state.blocks, (_: Block, key: string) => key);
   },
 
   allBlocks(state: BlocksState): Block[] {
-    return map(state.byId, (block: Block) => block);
+    return map(state.blocks, (block: Block) => block);
   },
 
   isFetching(state: BlocksState): boolean {
@@ -23,7 +23,7 @@ const getters = {
   },
 };
 
-const blocksById = read(getters.blocksById);
+const blocksById = read(getters.blocks);
 
 export const blockIds = read(getters.blockIds);
 export const allBlocks = read(getters.allBlocks);

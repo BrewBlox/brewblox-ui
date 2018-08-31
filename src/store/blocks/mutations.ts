@@ -10,16 +10,16 @@ const { commit } = getStoreAccessors<BlocksState, RootState>('blocks');
 const mutations = {
   addBlock(state: BlocksState, block: Block) {
     const id = `${block.serviceId}/${block.id}`;
-    Vue.set(state.byId, id, { ...block, isLoading: false });
+    Vue.set(state.blocks, id, { ...block, isLoading: false });
   },
 
   updateBlock(state: BlocksState, block: Partial<Block>) {
     const id = `${block.serviceId}/${block.id}`;
-    const existing = state.byId[id];
+    const existing = state.blocks[id];
     if (!existing) {
       throw new Error(`Block with id '${id}' does not exist`);
     }
-    Vue.set(state.byId, id, merge(existing, block));
+    Vue.set(state.blocks, id, merge(existing, block));
   },
 
   updateBlockState(state: BlocksState, block: Partial<Block>) {
@@ -31,7 +31,7 @@ const mutations = {
   },
 
   blockLoading(state: BlocksState, id: string) {
-    Vue.set(state.byId, id, merge(state.byId[id], { isLoading: true }));
+    Vue.set(state.blocks, id, merge(state.blocks[id], { isLoading: true }));
   },
 
   mutateFetching(state: BlocksState, fetching: boolean) {
@@ -39,7 +39,7 @@ const mutations = {
   },
 
   removeBlock(state: BlocksState, id: string) {
-    Vue.delete(state.byId, id);
+    Vue.delete(state.blocks, id);
   },
 };
 

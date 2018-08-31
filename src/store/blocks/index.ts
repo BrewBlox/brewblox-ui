@@ -9,7 +9,7 @@ const blocks = {
   namespaced: true,
   strict: true,
   state: {
-    byId: {},
+    blocks: {},
     fetching: false,
   },
 };
