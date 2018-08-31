@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import { getStoreAccessors } from 'vuex-typescript';
 
 import { ServicesState, Service } from './state';
@@ -9,8 +10,7 @@ const { commit } = getStoreAccessors<ServicesState, RootState>('services');
 const mutations = {
 
   addService(state: ServicesState, service: Service) {
-    state.allIds.push(service.id);
-    state.byId[service.id] = { ...service };
+    Vue.set(state.services, service.id, { ...service });
   },
 
   mutateFetching(state: ServicesState, fetching: boolean) {

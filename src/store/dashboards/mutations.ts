@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import { getStoreAccessors } from 'vuex-typescript';
 import { merge } from 'lodash';
 
@@ -8,33 +9,16 @@ import { State as RootState } from '../state';
 const { commit } = getStoreAccessors<DashboardState, RootState>('dashboards');
 
 function updateDashboard(state: DashboardState, id: string, newData: any) {
-  state.dashboards.byId = Object.assign(
-    {},
-    state.dashboards.byId,
-    { [id]: merge(state.dashboards.byId[id], newData) },
-  );
+  Vue.set(state.dashboards, id, { ...state.dashboards[id], ...newData });
 }
 
 function updateDashboardItem(state: DashboardState, id: string, newData: any) {
-  state.items.byId = Object.assign(
-    {},
-    state.items.byId,
-    { [id]: merge(state.items.byId[id], newData) },
-  );
-}
-
-function updateDashboardItemOptions(state: DashboardState, id: string, options: any) {
-  state.items.byId = Object.assign(
-    {},
-    state.items.byId,
-    { [id]: { ...state.items.byId[id], options } },
-  );
+  Vue.set(state.items, id, { ...state.items[id], ...newData });
 }
 
 const mutations = {
   addDashboard(state: DashboardState, dashboard: Dashboard) {
-    state.dashboards.allIds.push(dashboard.id);
-    state.dashboards.byId[dashboard.id] = { ...dashboard };
+    Vue.set(state.dashboards, dashboard.id, { ...dashboard });
   },
 
   setDashboardOrder(state: DashboardState, { id, order }: { id: string, order: number }) {
@@ -46,8 +30,7 @@ const mutations = {
   },
 
   addDashboardItem(state: DashboardState, item: DashboardItem) {
-    state.items.allIds.push(item.id);
-    state.items.byId[item.id] = { ...item };
+    Vue.set(state.items, item.id, { ...item });
   },
 
   mutateFetching(state: DashboardState, fetching: boolean) {
@@ -69,7 +52,7 @@ const mutations = {
     state: DashboardState,
     { id, options }: { id: string, options: any },
   ) {
-    updateDashboardItemOptions(state, id, options);
+    updateDashboardItem(state, id, { options: { ...options } });
   },
 
 };

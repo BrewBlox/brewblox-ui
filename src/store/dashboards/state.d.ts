@@ -20,16 +20,10 @@ export interface DashboardItem {
 
 export type DashboardState = {
   dashboards: {
-    allIds: string[],
-    byId: {
-      [id: string]: Dashboard;
-    },
+    [id: string]: Dashboard;
   },
   items: {
-    allIds: string[],
-    byId: {
-      [id: string]: DashboardItem;
-    },
+    [id: string]: DashboardItem;
   },
   fetching: boolean,
 };

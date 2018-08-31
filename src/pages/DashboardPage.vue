@@ -8,6 +8,7 @@ import WidgetModal from '@/components/WidgetModal/WidgetModal.vue';
 import byOrder from '@/helpers/byOrder';
 
 import { isFetching, dashboardById, dashboardItemById } from '@/store/dashboards/getters';
+import { isFetching as fetchingBlocks } from '@/store/blocks/getters';
 import {
   updateDashboard,
   updateDashboardItemOrder,
@@ -53,7 +54,7 @@ export default class DashboardPage extends Vue {
   }
 
   get isFetching() {
-    return isFetching(this.$store);
+    return isFetching(this.$store) || fetchingBlocks(this.$store);
   }
 
   toggleEditable() {

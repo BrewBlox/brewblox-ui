@@ -1,3 +1,5 @@
+import { map } from 'lodash';
+
 import { getStoreAccessors } from 'vuex-typescript';
 
 import { Block, BlocksState, BlocksContext } from './state';
@@ -9,11 +11,11 @@ const getters = {
   blocksById: (state: BlocksState): { [id: string]: Block } => state.byId,
 
   blockIds(state: BlocksState): string[] {
-    return state.allIds;
+    return map(state.byId, (_: Block, key: string) => key);
   },
 
   allBlocks(state: BlocksState): Block[] {
-    return state.allIds.map(id => state.byId[id]);
+    return map(state.byId, (block: Block) => block);
   },
 
   isFetching(state: BlocksState): boolean {
@@ -21,10 +23,10 @@ const getters = {
   },
 };
 
-// exported getter accessors
-export const allBlocks = read(getters.allBlocks);
-export const blockIds = read(getters.blockIds);
 const blocksById = read(getters.blocksById);
+
+export const blockIds = read(getters.blockIds);
+export const allBlocks = read(getters.allBlocks);
 export const isFetching = read(getters.isFetching);
 
 export function blockById<T extends Block>(store: RootStore, id: string, type?: string): T {

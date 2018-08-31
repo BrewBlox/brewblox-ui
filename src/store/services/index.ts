@@ -9,8 +9,7 @@ const services = {
   namespaced: true,
   strict: true,
   state: {
-    allIds: [],
-    byId: {},
+    services: {},
     fetching: false,
   },
 };

@@ -1,3 +1,5 @@
+import { map } from 'lodash';
+
 import { getStoreAccessors } from 'vuex-typescript';
 
 import { Dashboard, DashboardItem, DashboardState, DashboardContext } from './state';
@@ -6,24 +8,24 @@ import { State as RootState, RootStore } from '../state';
 const { read } = getStoreAccessors<DashboardState, RootState>('dashboards');
 
 const getters = {
-  dashboardsById: (state: DashboardState): { [id: string]: Dashboard } => state.dashboards.byId,
+  dashboardsById: (state: DashboardState): { [id: string]: Dashboard } => state.dashboards,
 
   dashboardIds(state: DashboardState): string[] {
-    return state.dashboards.allIds;
+    return map(state.dashboards, (_: Dashboard, key: string) => key);
   },
 
   allDashboards(state: DashboardState): Dashboard[] {
-    return state.dashboards.allIds.map(id => state.dashboards.byId[id]);
+    return map(state.dashboards, (dash: Dashboard) => dash);
   },
 
-  dashboardItemsById: (state: DashboardState): { [id: string]: DashboardItem } => state.items.byId,
+  dashboardItemsById: (state: DashboardState): { [id: string]: DashboardItem } => state.items,
 
   dashboardItemIds(state: DashboardState): string[] {
-    return state.items.allIds;
+    return map(state.items, (_: DashboardItem, key: string) => key);
   },
 
   allDashboardItems(state: DashboardState): DashboardItem[] {
-    return state.items.allIds.map(id => state.items.byId[id]);
+    return map(state.items, (item: DashboardItem) => item);
   },
 
   isFetching(state: DashboardState): boolean {
