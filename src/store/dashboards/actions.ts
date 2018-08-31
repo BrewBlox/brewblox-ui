@@ -37,7 +37,7 @@ const actions = {
     const dashboard = {
       id,
       title,
-      order: Object.keys(context.state.dashboards.byId).length + 1,
+      order: Object.keys(context.state.dashboards).length + 1,
       items: [],
     };
 

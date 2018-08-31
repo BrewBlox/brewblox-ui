@@ -52,8 +52,7 @@ export default class LayoutDefault extends Vue {
     })
       .then((dashboardName: string) => {
         addNewDashboard(this.$store, dashboardName);
-      })
-      .catch(() => {});
+      });
   }
 }
 </script>
