@@ -5,7 +5,7 @@ import PidWidget from '@/features/Pid/PidWidget.vue';
 import SensorSetPointPairWidget from '@/features/SensorSetPointPair/SensorSetPointPairWidget.vue';
 import DefaultWidget from '@/components/Defaults/DefaultWidget.vue';
 
-function widgetByType(type: WidgetType) {
+function widgetByType(type: String) {
   switch (type) {
     case 'Pid':
       return PidWidget;
@@ -15,9 +15,8 @@ function widgetByType(type: WidgetType) {
       return SensorSetPointPairWidget;
     case 'OneWireTempSensor':
     case 'SetPointSimple':
-      return DefaultWidget;
     default:
-      throw new Error('Invalid widget type');
+      return DefaultWidget;
   }
 }
 

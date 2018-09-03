@@ -7,16 +7,10 @@ import WidgetModal from '@/components/WidgetModal/WidgetModal.vue';
 
 import byOrder from '@/helpers/byOrder';
 
-import { isFetching, dashboardById, dashboardItemById } from '@/store/dashboards/getters';
-import { isFetching as fetchingBlocks } from '@/store/blocks/getters';
-import {
-  updateDashboard,
-  updateDashboardItemOrder,
-  updateDashboardItemSize,
-  createDashboardItem,
-  addDashboardItemToDashboard,
-} from '@/store/dashboards/actions';
+import { DashboardItem } from '@/store/dashboards/state';
+
 import { Block } from '@/store/blocks/state';
+import { isFetching, allBlocks } from '@/store/blocks/getters';
 
 import addWidgetByType from '@/components/widgetByType';
 
@@ -32,46 +26,40 @@ interface VueOrdered extends Vue {
   },
 })
 /* eslint-enable */
-export default class DashboardPage extends Vue {
+export default class BlocksDashboardPage extends Vue {
   editable: boolean = false;
   modalOpen: boolean = false;
-  title: string = '';
 
-  get dashboardId(): string {
-    return this.$route.params.id;
-  }
-
-  get dashboard() {
-    return dashboardById(this.$store, this.dashboardId);
+  defaultItem(block: Block): DashboardItem {
+    return {
+      id: `default-${block.serviceId}/${block.id}`,
+      order: 0,
+      cols: 4,
+      rows: 4,
+      widget: block.type,
+      options: {
+        blockId: `${block.serviceId}/${block.id}`,
+      },
+    };
   }
 
   get items() {
     return [
-      ...this.dashboard.items
-        .map(id => dashboardItemById(this.$store, id))
+      ...allBlocks(this.$store)
+        .map(this.defaultItem)
         .map(addWidgetByType),
-    ].sort(byOrder);
+    ];
   }
 
   get isFetching() {
-    return isFetching(this.$store) || fetchingBlocks(this.$store);
+    return isFetching(this.$store);
   }
 
   toggleEditable() {
-    this.title = this.dashboard.title;
-
     this.editable = true;
   }
 
   onSave() {
-    if (this.title !== this.dashboard.title) {
-      // update title of dashboard if changed
-      updateDashboard(this.$store, {
-        ...this.dashboard,
-        title: this.title,
-      });
-    }
-
     this.editable = false;
   }
 
@@ -79,35 +67,22 @@ export default class DashboardPage extends Vue {
     this.modalOpen = true;
   }
 
-  async onChangeOrder(order: VueOrdered[]) {
-    const newOrder = order.map(item => item.id);
+  async onAddWidget(type: WidgetType, blockId: string) {
+    throw new Error('Not supported here');
+  }
 
-    try {
-      await updateDashboardItemOrder(this.$store, newOrder);
-    } catch (e) {
-      throw e;
-    }
+  async onChangeOrder(order: VueOrdered[]) {
+    // const newOrder = order.map(item => item.id);
+
+    // try {
+    //   await updateDashboardItemOrder(this.$store, newOrder);
+    // } catch (e) {
+    //   throw e;
+    // }
   }
 
   onChangeSize(id: string, cols: number, rows: number) {
-    updateDashboardItemSize(this.$store, { id, cols, rows });
-  }
-
-  async onAddWidget(type: WidgetType, blockId: string) {
-    const dashboardItem = await createDashboardItem(this.$store, {
-      id: `item-${blockId}`,
-      order: this.items.length + 1,
-      cols: 4,
-      rows: 4,
-      widget: type,
-      options: {
-        blockId,
-      },
-    });
-
-    addDashboardItemToDashboard(this.$store, { dashboard: this.dashboard, dashboardItem });
-
-    this.modalOpen = false;
+    // updateDashboardItemSize(this.$store, { id, cols, rows });
   }
 }
 </script>
@@ -123,33 +98,18 @@ export default class DashboardPage extends Vue {
 
     <template v-if="!isFetching">
       <portal to="toolbar-title">
-        <div v-if="!editable">
-          {{ dashboard.title }}
-        </div>
-        <div v-else>
-          <q-input
-            v-model="title"
-            placeholder="Name of this dashboard"
-            dark
-            :before="[{ icon: 'edit' }]"
-          />
+        <div>
+          Blocks Overview
         </div>
       </portal>
 
       <portal to="toolbar-buttons">
-        <q-btn
-          v-if="editable"
-          color="primary"
-          icon="add"
-          label="Add widget"
-          @click="onOpenAddWidget"
-        />
-        <q-btn
+        <!-- <q-btn
           :icon="editable ? 'check' : 'mode edit'"
           :color="editable ? 'positive' : 'primary'"
           @click="editable ? onSave() : toggleEditable()"
           :label="editable ? 'Save changes' : 'Edit dashboard'"
-        />
+        /> -->
       </portal>
 
       <q-modal
@@ -172,6 +132,7 @@ export default class DashboardPage extends Vue {
           v-for="item in items"
           :is="item.component"
           :key="item.id"
+          :id="item.id"
           :cols="item.cols"
           :rows="item.rows"
           :widgetOptions="item.options"
