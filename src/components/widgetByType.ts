@@ -20,7 +20,7 @@ function widgetByType(type: String) {
   }
 }
 
-export default function addWidgetByType(item: DashboardItem) {
+export default function addWidgetByType(item: DashboardItem): any {
   return {
     ...item,
     component: widgetByType(item.widget),

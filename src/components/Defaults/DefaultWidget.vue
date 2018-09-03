@@ -13,14 +13,6 @@ import { blockById } from '@/store/blocks/getters';
 })
 /* eslint-enable */
 export default class DefaultWidget extends mixins(BlockWidget) {
-  get blockType() {
-    return this.block.type;
-  }
-
-  get blockData() {
-    return this.block.data;
-  }
-
   refreshState() {
     return undefined;
   }
@@ -34,46 +26,20 @@ export default class DefaultWidget extends mixins(BlockWidget) {
       <q-toolbar-title>
         {{ block.serviceId }}/{{ block.id }}
       </q-toolbar-title>
+      <q-btn
+        flat
+        round
+        dense
+        icon="refresh"
+        @click="refreshState"
+      />
     </q-toolbar>
 
     <q-card>
-
-      <q-card-actions>
-        <q-btn
-          flat
-          round
-          dense
-          icon="refresh"
-          @click="refreshState"
-        />
-      </q-card-actions>
-
-      <q-list>
-
-        <q-item>
-          <q-item-side>
-            <q-item-tile sublabel>
-              Type
-            </q-item-tile>
-            <q-item-tile label>
-              {{ blockType }}
-            </q-item-tile>
-          </q-item-side>
-        </q-item>
-
-        <q-item>
-          <q-item-side>
-            <q-item-tile sublabel>
-              Data
-            </q-item-tile>
-            <q-item-tile label>
-              {{ blockData | pretty }}
-            </q-item-tile>
-          </q-item-side>
-        </q-item>
-
-      </q-list>
-
+      <q-item>
+        <q-item-tile sublabel>{{ block.type }}</q-item-tile>
+        <pre>{{ block.data | pretty }}</pre>
+      </q-item>
     </q-card>
 
   </div>

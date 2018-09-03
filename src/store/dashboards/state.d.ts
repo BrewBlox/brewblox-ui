@@ -15,7 +15,7 @@ export interface DashboardItem {
   cols: number;
   rows: number;
   widget: string;
-  options: any;
+  config: any;
 }
 
 export type DashboardState = {

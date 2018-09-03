@@ -100,7 +100,7 @@ export default class DashboardPage extends Vue {
       cols: 4,
       rows: 4,
       widget: type,
-      options: {
+      config: {
         blockId,
       },
     });
@@ -172,9 +172,10 @@ export default class DashboardPage extends Vue {
           v-for="item in items"
           :is="item.component"
           :key="item.id"
+          :id="item.id"
           :cols="item.cols"
           :rows="item.rows"
-          :widgetOptions="item.options"
+          :config="item.options"
         />
       </grid-container>
     </template>

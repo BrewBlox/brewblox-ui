@@ -27,7 +27,7 @@ export default class PidWidget extends mixins(BlockWidget) {
   modalOpen: boolean = false;
 
   get block(): PidBlock {
-    return getById(this.$store, this.options.blockId);
+    return getById(this.$store, this.blockId);
   }
 
   get settings(): PidSettings {

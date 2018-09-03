@@ -19,7 +19,7 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
   };
 
   get block(): SensorSetPointPairBlock {
-    return getById(this.$store, this.options.blockId);
+    return getById(this.$store, this.blockId);
   }
 
   get sensor(): OneWireTempSensorBlock {

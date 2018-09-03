@@ -25,7 +25,7 @@ import {
   addDashboardItem as addDashboardItemToStore,
   setDashboardItemOrder as setDashboardItemOrderInStore,
   setDashboardItemSize as setDashboardItemSizeInStore,
-  setDashboardItemOptions as setDashboardItemOptionsInStore,
+  setDashboardItemConfig as setDashboardItemConfigInStore,
 } from './mutations';
 
 const { dispatch } = getStoreAccessors<DashboardState, RootState>('dashboards');
@@ -82,11 +82,11 @@ const actions = {
     persistDashboardItem(getDashboardItemInStore(context, id));
   },
 
-  updateDashboardItemOptions(
+  updateDashboardItemConfig(
     context: DashboardContext,
     { id, options }: { id: string, options: any },
   ) {
-    setDashboardItemOptionsInStore(context, { id, options });
+    setDashboardItemConfigInStore(context, { id, options });
     persistDashboardItem(getDashboardItemInStore(context, id));
   },
 
@@ -143,7 +143,7 @@ export const addDashboard = dispatch(actions.addDashboard);
 export const addDashboardItemToDashboard = dispatch(actions.addDashboardItemToDashboard);
 export const updateDashboardItemOrder = dispatch(actions.updateDashboardItemOrder);
 export const updateDashboardItemSize = dispatch(actions.updateDashboardItemSize);
-export const updateDashboardItemOptions = dispatch(actions.updateDashboardItemOptions);
+export const updateDashboardItemConfig = dispatch(actions.updateDashboardItemConfig);
 export const createDashboardItem = dispatch(actions.createDashboardItem);
 
 export default actions;

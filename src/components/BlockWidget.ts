@@ -55,8 +55,12 @@ export default class BlockWidget extends Widget {
     return Object.keys(state).some(key => state[key] !== this.inputs[key]);
   }
 
+  get blockId(): string {
+    return this.$props.config.blockId;
+  }
+
   get block(): Block {
-    return blockById(this.$store, this.options.blockId);
+    return blockById(this.$store, this.blockId);
   }
 
   @Watch('block', { immediate: true, deep: true })

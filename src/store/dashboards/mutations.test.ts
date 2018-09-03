@@ -79,7 +79,7 @@ describe('addDashboardItem', () => {
       cols: 2,
       rows: 3,
       widget: 'Empty' as WidgetType,
-      options: {},
+      config: {},
     };
 
     addDashboardItem(dashboardItemStore, dashboardItem);
@@ -97,7 +97,7 @@ describe('addDashboardItem', () => {
       cols: 2,
       rows: 3,
       widget: 'Empty' as WidgetType,
-      options: {},
+      config: {},
     };
 
     addDashboardItem(dashboardItemStore, dashboardItem);
@@ -118,7 +118,7 @@ describe('setDashboardItemSize', () => {
     cols: 2,
     rows: 3,
     widget: 'Empty' as WidgetType,
-    options: {},
+    config: {},
   };
 
   it('Should update an item\'s size', () => {
@@ -140,7 +140,7 @@ describe('setDashboardItemOrder', () => {
     cols: 2,
     rows: 3,
     widget: 'Empty' as WidgetType,
-    options: {},
+    config: {},
   };
 
   it('Should update an item\'s order', () => {

@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import { getStoreAccessors } from 'vuex-typescript';
-import { merge } from 'lodash';
 
 import { Dashboard, DashboardItem, DashboardState } from './state';
 
@@ -48,7 +47,7 @@ const mutations = {
     updateDashboardItem(state, id, { cols, rows });
   },
 
-  setDashboardItemOptions(
+  setDashboardItemConfig(
     state: DashboardState,
     { id, options }: { id: string, options: any },
   ) {
@@ -65,6 +64,6 @@ export const setDashboardOrder = commit(mutations.setDashboardOrder);
 export const addDashboardItem = commit(mutations.addDashboardItem);
 export const setDashboardItemOrder = commit(mutations.setDashboardItemOrder);
 export const setDashboardItemSize = commit(mutations.setDashboardItemSize);
-export const setDashboardItemOptions = commit(mutations.setDashboardItemOptions);
+export const setDashboardItemConfig = commit(mutations.setDashboardItemConfig);
 
 export default mutations;

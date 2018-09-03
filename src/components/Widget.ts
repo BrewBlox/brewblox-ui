@@ -4,23 +4,11 @@ import Component from 'vue-class-component';
 /* eslint-disable indent */
 @Component({
   props: {
-    cols: {
-      type: Number,
-      default: 1,
-    },
-    rows: {
-      type: Number,
-      default: 1,
-    },
-    widgetOptions: {
+    config: {
       type: Object,
-      default: {}
+      default: () => { throw new Error('Provide block config'); },
     },
   },
 })
 /* eslint-enable */
-export default class Widget extends Vue {
-  get options() {
-    return this.$props.widgetOptions;
-  }
-}
+export default class Widget extends Vue { }

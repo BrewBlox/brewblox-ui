@@ -28,19 +28,19 @@ type Coordinates = { x: number, y: number };
     },
     onStartInteraction: {
       type: Function,
-      default: () => {},
+      default: () => { },
     },
     onStopInteraction: {
       type: Function,
-      default: () => {},
+      default: () => { },
     },
     onUpdateItemSize: {
       type: Function,
-      default: () => {},
+      default: () => { },
     },
     onNewItemsOrder: {
       type: Function,
-      default: () => {},
+      default: () => { },
     },
   },
 })

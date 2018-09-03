@@ -1,49 +1,100 @@
 <script lang="ts">
 import Vue from 'vue';
+import Component from 'vue-class-component';
 
-import Block from '@/components/Block.vue';
+import GridContainer from '@/components/Grid/GridContainer.vue';
+import WidgetModal from '@/components/WidgetModal/WidgetModal.vue';
 
-import { isFetching, blockIds } from '@/store/blocks/getters';
+import byOrder from '@/helpers/byOrder';
 
-export default Vue.extend({
-  name: 'BlocksPage',
-  components: { Block },
-  computed: {
-    blocks(): string[] {
-      return blockIds(this.$store);
-    },
-    fetching(): boolean {
-      return isFetching(this.$store);
-    },
+import { DashboardItem } from '@/store/dashboards/state';
+
+import { Block } from '@/store/blocks/state';
+import { isFetching, allBlocks } from '@/store/blocks/getters';
+
+import addWidgetByType from '@/components/widgetByType';
+
+interface VueOrdered extends Vue {
+  id: string;
+}
+
+/* eslint-disable indent */
+@Component({
+  components: {
+    GridContainer,
+    WidgetModal,
   },
-  methods: {},
-});
+})
+/* eslint-enable */
+export default class BlocksPage extends Vue {
+  editable: boolean = false;
+  modalOpen: boolean = false;
+
+  defaultItem(block: Block): DashboardItem {
+    return {
+      id: `default-${block.serviceId}/${block.id}`,
+      order: 0,
+      cols: 4,
+      rows: 4,
+      widget: block.type,
+      config: {
+        blockId: `${block.serviceId}/${block.id}`,
+      },
+    };
+  }
+
+  get items() {
+    return [
+      ...allBlocks(this.$store)
+        .map(this.defaultItem)
+        .map(addWidgetByType),
+    ];
+  }
+
+  get isFetching() {
+    return isFetching(this.$store);
+  }
+}
 </script>
 
 <template>
   <q-page padding>
-    <q-inner-loading :visible="fetching">
+    <q-inner-loading :visible="isFetching">
       <q-spinner
         size="50px"
         color="primary"
       />
     </q-inner-loading>
 
-    <template v-if="blocks.length > 0">
-      <block
-        v-for="block in blocks"
-        :key="block"
-        :block-id="block"
-      />
+    <template v-if="!isFetching">
+      <portal to="toolbar-title">
+        <div>
+          Blocks
+        </div>
+      </portal>
+
+      <grid-container>
+        <component
+          class="dashboard-item"
+          v-for="item in items"
+          :is="item.component"
+          :key="item.id"
+          :id="item.id"
+          :cols="item.cols"
+          :rows="item.rows"
+          :config="item.config"
+        />
+      </grid-container>
     </template>
   </q-page>
 </template>
 
 <style lang="stylus" scoped>
-@import '../css/themes/dark.variables.styl';
+@import '../css/app.styl';
 
-.q-card {
+.dashboard-item {
   background: $block-background;
-  margin-bottom: 20px;
+  height: 100%;
+  width: 100%;
 }
 </style>
