@@ -2,24 +2,17 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import BlockComponent from '@/components/BlockComponent';
+import BlockWidget from '@/components/BlockWidget';
 
 import { blockById } from '@/store/blocks/getters';
 import { updateBlockState } from '@/store/blocks/mutations';
 
 /* eslint-disable indent */
-@Component({
-  props: {
-    id: {
-      default: "",
-      type: String
-    }
-  }
-})
+@Component
 /* eslint-enable */
-export default class ProfilesBar extends BlockComponent {
+export default class ProfilesBar extends BlockWidget {
   get block() {
-    return blockById(this.$store, this.$props.id);
+    return blockById(this.$store, this.blockId);
   }
 
   get barProfiles(): string[] {

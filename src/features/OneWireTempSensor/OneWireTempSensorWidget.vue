@@ -3,7 +3,7 @@ import Component from 'vue-class-component';
 
 import { saveBlock } from '@/store/blocks/actions';
 
-import BlockComponent from '@/components/BlockComponent';
+import BlockWidget from '@/components/BlockWidget';
 import ProfilesBar from '@/components/ProfilesBar/ProfilesBar.vue';
 
 import { OneWireTempSensorBlock } from './state';
@@ -13,47 +13,76 @@ import { getById } from './getters';
 @Component({
   components: {
     ProfilesBar
-  },
-  props: {
-    id: {
-      default: '',
-      type: String
-    }
   }
 })
 /* eslint-enable */
-export default class OneWireTempSensor extends BlockComponent {
-  addressInput = '';
-  offsetInput = 0;
-
+export default class OneWireTempSensor extends BlockWidget {
   get block(): OneWireTempSensorBlock {
-    return getById(this.$store, this.$props.id);
+    return getById(this.$store, this.blockId);
   }
 
-  get changed() {
-    return (
-      this.block.data.address !== this.addressInput ||
-      this.block.data.offset.value !== this.offsetInput
-    );
-  }
+  // get changed() {
+  //   return (
+  //     this.block.data.address !== this.addressInput ||
+  //     this.block.data.offset.value !== this.offsetInput
+  //   );
+  // }
 
-  mounted() {
-    // set default values
-    this.offsetInput = this.block.data.offset.value;
-    this.addressInput = this.block.data.address;
-  }
+  // mounted() {
+  //   // set default values
+  //   this.offsetInput = this.block.data.offset.value;
+  //   this.addressInput = this.block.data.address;
+  // }
 
-  save() {
-    this.block.data.offset.value = this.offsetInput;
-    this.block.data.address = this.addressInput;
+  // save() {
+  //   this.block.data.offset.value = this.offsetInput;
+  //   this.block.data.address = this.addressInput;
 
-    saveBlock(this.$store, this.block);
-  }
+  //   saveBlock(this.$store, this.block);
+  // }
 }
 </script>
 
 <template>
-  <q-card>
+  <div>
+    <q-toolbar color="dark-bright">
+      <q-toolbar-title>
+        {{ block.serviceId }}/{{ block.id }}
+        <q-item-tile sublabel>{{ block.type }}</q-item-tile>
+      </q-toolbar-title>
+    </q-toolbar>
+
+    TODO
+    <!-- <q-card>
+      <q-card-main>
+        <q-list>
+          <q-item class="grid-items-2">
+            <q-item-tile sublabel>Address</q-item-tile>
+            <q-item-tile
+              label
+              class="q-headline"
+            >
+              {{ block.data.address }}
+            </q-item-tile>
+          </q-item>
+
+          <q-item class="grid-items-2">
+            <q-item-main>
+              <q-item-tile sublabel>Value</q-item-tile>
+              <q-input
+                v-model="block.data.value"
+                type="number"
+                :suffix="block.data.value.unitNotation"
+                numeric-keyboard-toggle
+              />
+            </q-item-main>
+          </q-item>
+        </q-list>
+      </q-card-main>
+    </q-card> -->
+
+  </div>
+  <!-- <q-card>
 
     <q-card-title>OneWireTempSensor ({{ id }})</q-card-title>
     <profiles-bar :id="id"/>
@@ -105,5 +134,5 @@ export default class OneWireTempSensor extends BlockComponent {
         </q-item>
       </q-list>
     </q-card-main>
-  </q-card>
+  </q-card> -->
 </template>

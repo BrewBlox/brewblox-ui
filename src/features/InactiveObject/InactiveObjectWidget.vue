@@ -1,14 +1,18 @@
 <script lang="ts">
-import Component, { mixins } from 'vue-class-component';
+import Component from 'vue-class-component';
 
 import BlockWidget from '@/components/BlockWidget';
 
-import { blockById } from '@/store/blocks/getters';
+import { getById } from './getters';
 
 @Component
-export default class DefaultWidget extends mixins(BlockWidget) {
+export default class InactiveObjectWidget extends BlockWidget {
   refreshState() {
     return undefined;
+  }
+
+  get block() {
+    return getById(this.$store, this.blockId);
   }
 }
 </script>
@@ -32,7 +36,7 @@ export default class DefaultWidget extends mixins(BlockWidget) {
 
     <q-card>
       <q-item>
-        <pre>{{ block.data }}</pre>
+        <q-list-header>This block is not in any active profile</q-list-header>
       </q-item>
     </q-card>
 
