@@ -1,9 +1,10 @@
 import widget from './OneWireTempSensorWidget.vue';
-import create from './CreateOneWireTempSensor.vue';
+import wizard from '@/components/Defaults/DefaultWizard.vue';
 
 const feature = {
   widget,
-  create,
+  wizard,
+  description: 'Onewire Temperature Sensor'
 };
 
 export default feature;

@@ -1,9 +1,10 @@
 import widget from './SetPointSimpleWidget.vue';
-import create from './CreateSetPointSimple.vue';
+import wizard from '@/components/Defaults/DefaultWizard.vue';
 
 const feature = {
   widget,
-  create,
+  wizard,
+  description: 'Basic Setpoint',
 };
 
 export default feature;

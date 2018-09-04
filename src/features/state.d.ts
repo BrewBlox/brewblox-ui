@@ -2,6 +2,7 @@ import { VueConstructor } from 'vue';
 
 export interface Feature {
   widget?: VueConstructor,
-  create?: VueConstructor,
+  wizard?: VueConstructor,
+  form?: VueConstructor,
   description?: string,
 }

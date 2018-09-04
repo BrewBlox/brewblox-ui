@@ -14,30 +14,9 @@ export default class OneWireTempSensor extends BlockWidget {
     setting: { path: 'block.data.setting.value', default: 0 },
   }
 
-
   get block(): SetPointSimpleBlock {
     return getById(this.$store, this.blockId);
   }
-
-  // get changed() {
-  //   return (
-  //     this.block.data.address !== this.addressInput ||
-  //     this.block.data.offset.value !== this.offsetInput
-  //   );
-  // }
-
-  // mounted() {
-  //   // set default values
-  //   this.offsetInput = this.block.data.offset.value;
-  //   this.addressInput = this.block.data.address;
-  // }
-
-  // save() {
-  //   this.block.data.offset.value = this.offsetInput;
-  //   this.block.data.address = this.addressInput;
-
-  //   saveBlock(this.$store, this.block);
-  // }
 }
 </script>
 

@@ -6,12 +6,12 @@ import { map } from 'lodash';
 
 import { Block } from '@/store/blocks/state';
 
-import { widgetComponents, blocksByWidgetType, widgetDescriptions } from './widget-types';
-import { allTypes, descriptionByType, createByType } from '@/features/feature-by-type';
+import { blocksByWidgetType, widgetDescriptions, widgetWizards } from './widget-types';
+import { allTypes, descriptionByType, wizardByType } from '@/features/feature-by-type';
 
 /* eslint-disable indent */
 @Component({
-  components: widgetComponents,
+  components: widgetWizards,
   props: {
     isOpen: {
       type: Boolean,
@@ -58,9 +58,9 @@ export default class WidgetModal extends Vue {
     ];
   }
 
-  get createOptions() {
+  get wizardOptions() {
     return allTypes
-      .filter(createByType)
+      .filter(wizardByType)
       .map(type => ({
         value: type,
         label: descriptionByType(type),
@@ -146,7 +146,7 @@ export default class WidgetModal extends Vue {
                 dark
                 type="radio"
                 v-model="widgetType"
-                :options="createOptions"
+                :options="wizardOptions"
               />
             </q-field>
           </q-step>

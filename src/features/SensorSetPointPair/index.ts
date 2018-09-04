@@ -1,9 +1,9 @@
 import widget from './SensorSetPointPairWidget.vue';
-import create from './CreateSensorSetPointPair.vue';
+import wizard from './SensorSetPointPairWizard.vue';
 
 const feature = {
   widget,
-  create,
+  wizard,
   description: 'Sensor/SetPoint Pair',
 };
 

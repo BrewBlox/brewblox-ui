@@ -26,7 +26,7 @@ import { getAll as getAllOneWireTempSensor } from '../OneWireTempSensor/getters'
   },
 })
 /* eslint-enable */
-class SensorSetPointPair extends Vue {
+export default class SensorSetPointPairWizard extends Vue {
   currentStep: string = 'service';
   creating: boolean = false;
   service: DeviceService | null = null;
@@ -108,9 +108,6 @@ class SensorSetPointPair extends Vue {
     }
   }
 }
-
-export default SensorSetPointPair;
-
 </script>
 
 <template>

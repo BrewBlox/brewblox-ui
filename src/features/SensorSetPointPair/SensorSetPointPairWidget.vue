@@ -33,17 +33,6 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
 
     return getSetPointById(this.$store, `${serviceId}/${data.setpoint}`);
   }
-
-  get setpointChanged() {
-    return this.setPoint.data.setting !== this.inputs.setpoint;
-  }
-
-  save() {
-    // persist(this.$store, {
-    //   id: this.block.id,
-    //   serviceId: this.block.serviceId,
-    // });
-  }
 }
 </script>
 
@@ -86,18 +75,6 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
 
         </q-list>
       </q-card-main>
-
-      <q-card-separator />
-      <q-card-actions align="end">
-        <q-btn
-          icon="check"
-          :color="setpointChanged ? 'primary' : 'light'"
-          :disable="!setpointChanged"
-          @click="save"
-        >
-          Save changes
-        </q-btn>
-      </q-card-actions>
 
     </q-card>
   </div>

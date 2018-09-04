@@ -6,7 +6,7 @@ import { deviceServices } from '@/store/services/getters';
 import { allBlocksFromService } from '@/store/blocks/getters';
 import { VueConstructor } from 'vue';
 
-import { allTypes, createByType, descriptionByType } from '@/features/feature-by-type';
+import { allTypes, wizardByType, descriptionByType } from '@/features/feature-by-type';
 
 function getBlocksFromServices(
   services: DeviceService[],
@@ -23,10 +23,10 @@ export function blocksByWidgetType(store: RootStore, type: WidgetType): Block[] 
   return getBlocksFromServices(services, store, type);
 }
 
-export const widgetComponents: { [name: string]: VueConstructor } = allTypes
-  .filter(createByType)
+export const widgetWizards: { [name: string]: VueConstructor } = allTypes
+  .filter(wizardByType)
   .reduce((coll: any, type: string) => {
-    coll[type] = createByType(type);
+    coll[type] = wizardByType(type);
     return coll;
   }, {});
 

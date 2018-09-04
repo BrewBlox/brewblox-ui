@@ -1,11 +1,3 @@
-<template>
-  <div>
-    Add one wire temp sensor
-
-    <q-btn @click="$props.onCancel">Go back</q-btn>
-  </div>
-</template>
-
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
@@ -15,15 +7,19 @@ import Component from 'vue-class-component';
   props: {
     onCancel: {
       type: Function,
-      default: () => {},
+      default: () => { },
     }
   }
 })
 /* eslint-enable */
-
-export default class Sensor extends Vue {}
+export default class DefaultWizard extends Vue { }
 </script>
 
-<style scoped>
+<template>
+  <div>
+    <q-btn @click="$props.onCancel">Go back</q-btn>
+  </div>
+</template>
 
+<style scoped>
 </style>

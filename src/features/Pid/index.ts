@@ -1,9 +1,10 @@
 import widget from './PidWidget.vue';
-import create from './CreatePid.vue';
+import wizard from '@/components/Defaults/DefaultWizard.vue';
 
 const feature = {
   widget,
-  create,
+  wizard,
+  description: 'PID',
 };
 
 export default feature;
