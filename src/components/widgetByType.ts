@@ -7,6 +7,10 @@ import InactiveObjectWidget from '@/features/InactiveObject/InactiveObjectWidget
 import DefaultWidget from '@/components/Defaults/DefaultWidget.vue';
 import OneWireBusWidget from '@/features/OneWireBus/OneWireBusWidget.vue';
 import OneWireTempSensorWidget from '@/features/OneWireTempSensor/OneWireTempSensorWidget.vue';
+import ProfilesWidget from '@/features/Profiles/ProfilesWidget.vue';
+import SysInfoWidget from '@/features/SysInfo/SysInfoWidget.vue';
+import TicksWidget from '@/features/Ticks/TicksWidget.vue';
+import SetPointSimpleWidget from '@/features/SetPointSimple/SetPointSimpleWidget.vue';
 
 
 function widgetByType(type: String) {
@@ -23,7 +27,14 @@ function widgetByType(type: String) {
       return OneWireBusWidget;
     case 'OneWireTempSensor':
       return OneWireTempSensorWidget;
+    case 'Profiles':
+      return ProfilesWidget;
+    case 'SysInfo':
+      return SysInfoWidget;
+    case 'Ticks':
+      return TicksWidget;
     case 'SetPointSimple':
+      return SetPointSimpleWidget;
     default:
       return DefaultWidget;
   }

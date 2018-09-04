@@ -1,5 +1,5 @@
 <script lang="ts">
-import Component, { mixins } from 'vue-class-component';
+import Component from 'vue-class-component';
 
 import { saveBlock } from '@/store/blocks/actions';
 import { updateBlockState } from '@/store/blocks/mutations';
@@ -13,7 +13,7 @@ import { getById } from './getters';
 import { refresh } from './actions';
 
 @Component
-export default class PidWidget extends mixins(BlockWidget) {
+export default class PidWidget extends BlockWidget {
   inputMapping = {
     kp: { path: 'settings.kp', default: 0 },
     ti: { path: 'settings.ti', default: 0 },

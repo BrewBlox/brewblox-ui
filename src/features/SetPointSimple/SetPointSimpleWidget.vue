@@ -5,19 +5,39 @@ import { saveBlock } from '@/store/blocks/actions';
 
 import BlockWidget from '@/components/BlockWidget';
 
-import { OneWireTempSensorBlock } from './state';
+import { SetPointSimpleBlock } from './state';
 import { getById } from './getters';
 
 @Component
 export default class OneWireTempSensor extends BlockWidget {
   inputMapping = {
-    address: { path: 'block.data.address', default: '' },
-    offset: { path: 'block.data.offset.value', default: 0 },
+    setting: { path: 'block.data.setting.value', default: 0 },
   }
 
-  get block(): OneWireTempSensorBlock {
+
+  get block(): SetPointSimpleBlock {
     return getById(this.$store, this.blockId);
   }
+
+  // get changed() {
+  //   return (
+  //     this.block.data.address !== this.addressInput ||
+  //     this.block.data.offset.value !== this.offsetInput
+  //   );
+  // }
+
+  // mounted() {
+  //   // set default values
+  //   this.offsetInput = this.block.data.offset.value;
+  //   this.addressInput = this.block.data.address;
+  // }
+
+  // save() {
+  //   this.block.data.offset.value = this.offsetInput;
+  //   this.block.data.address = this.addressInput;
+
+  //   saveBlock(this.$store, this.block);
+  // }
 }
 </script>
 
@@ -37,39 +57,11 @@ export default class OneWireTempSensor extends BlockWidget {
           <q-item class="grid-items-2">
 
             <q-item-main>
-              <q-item-tile sublabel>Address</q-item-tile>
+              <q-item-tile sublabel>Setting</q-item-tile>
               <q-input
-                v-model="inputs.address"
-                type="text"
-              />
-            </q-item-main>
-
-            <q-item-main>
-              <q-item-tile sublabel>Connection status</q-item-tile>
-              <q-item-tile
-                :icon="block.data.connected ? 'link' : 'link_off'"
-              >
-              </q-item-tile>
-            </q-item-main>
-
-          </q-item>
-
-
-          <q-item class="grid-items-2">
-
-            <q-item-main>
-              <q-item-tile sublabel>Value</q-item-tile>
-              <q-item-tile label class="q-headline">
-                {{ block.data.value | unit }}
-              </q-item-tile>
-            </q-item-main>
-
-            <q-item-main>
-              <q-item-tile sublabel>Offset</q-item-tile>
-              <q-input
-                v-model="inputs.offset"
+                v-model="inputs.setting"
                 type="number"
-                :suffix="block.data.offset.unitNotation"
+                :suffix="block.data.setting.unitNotation"
                 numeric-keyboard-toggle
               />
             </q-item-main>
@@ -78,8 +70,8 @@ export default class OneWireTempSensor extends BlockWidget {
 
         </q-list>
       </q-card-main>
-
     </q-card>
+
   </div>
 </template>
 

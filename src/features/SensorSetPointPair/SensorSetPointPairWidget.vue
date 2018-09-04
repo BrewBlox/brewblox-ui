@@ -59,7 +59,9 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
     <q-card>
       <q-card-main>
         <q-list>
+
           <q-item class="grid-items-2">
+
             <q-item-main>
               <q-item-tile sublabel>Sensor</q-item-tile>
               <q-item-tile
@@ -69,6 +71,7 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
                 {{ sensor.data.value | unit }}
               </q-item-tile>
             </q-item-main>
+
             <q-item-main>
               <q-item-tile sublabel>Setpoint</q-item-tile>
               <q-input
@@ -78,9 +81,12 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
                 numeric-keyboard-toggle
               />
             </q-item-main>
+
           </q-item>
+
         </q-list>
       </q-card-main>
+
       <q-card-separator />
       <q-card-actions align="end">
         <q-btn
@@ -92,6 +98,7 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
           Save changes
         </q-btn>
       </q-card-actions>
+
     </q-card>
   </div>
 </template>

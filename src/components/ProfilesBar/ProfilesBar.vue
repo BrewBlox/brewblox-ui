@@ -2,41 +2,44 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import BlockWidget from '@/components/BlockWidget';
-
-import { blockById } from '@/store/blocks/getters';
-import { updateBlockState } from '@/store/blocks/mutations';
-
 /* eslint-disable indent */
-@Component
+@Component({
+  props: {
+    profiles: {
+      type: Array,
+      default: () => { throw new Error('Provide profiles'); },
+    },
+  }
+})
 /* eslint-enable */
-export default class ProfilesBar extends BlockWidget {
-  get block() {
-    return blockById(this.$store, this.blockId);
+export default class ProfilesBar extends Vue {
+  get displayNames() {
+    return [
+      'P1',
+      'P2',
+      'P3',
+      'P4',
+      'P5',
+      'P6',
+      'P7',
+      'P8',
+    ];
   }
 
-  get barProfiles(): string[] {
-    return this.block.profiles.map(v => v.toString());
-  }
-
-  set barProfiles(p: string[]) {
-    this.block.profiles = p.map(v => parseInt(v, 10));
-    updateBlockState(this.$store, this.block);
+  get selectOptions() {
+    return this.displayNames
+      .map((name: string, idx: number) => ({
+        label: name,
+        value: idx,
+      }));
   }
 }
 </script>
 
 <template>
-  <q-item>
-    <q-item-main>
-      <q-toggle class=rotate-270 v-model="barProfiles" val=0 />
-      <q-toggle class=rotate-270 v-model="barProfiles" val=1 />
-      <q-toggle class=rotate-270 v-model="barProfiles" val=2 />
-      <q-toggle class=rotate-270 v-model="barProfiles" val=3 />
-      <q-toggle class=rotate-270 v-model="barProfiles" val=4 />
-      <q-toggle class=rotate-270 v-model="barProfiles" val=5 />
-      <q-toggle class=rotate-270 v-model="barProfiles" val=6 />
-      <q-toggle class=rotate-270 v-model="barProfiles" val=7 />
-    </q-item-main>
-  </q-item>
+  <q-select
+    multiple
+    v-model="$props.profiles"
+    :options="selectOptions"
+  />
 </template>
