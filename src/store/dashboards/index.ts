@@ -11,7 +11,7 @@ const dashboards = {
   state: {
     dashboards: {},
     items: {},
-    fetching: false,
+    fetching: true,
   },
 };
 

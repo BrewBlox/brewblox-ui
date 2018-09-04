@@ -1,5 +1,5 @@
 <script lang="ts">
-import Vue from 'vue';
+import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
 
 import GridContainer from '@/components/Grid/GridContainer.vue';
@@ -12,7 +12,7 @@ import { DashboardItem } from '@/store/dashboards/state';
 import { Block } from '@/store/blocks/state';
 import { isFetching, allBlocks } from '@/store/blocks/getters';
 
-import addWidgetByType from '@/components/widgetByType';
+import { widgetByType } from '@/features/feature-by-type';
 
 interface VueOrdered extends Vue {
   id: string;
@@ -46,13 +46,16 @@ export default class BlocksPage extends Vue {
   get items() {
     return [
       ...allBlocks(this.$store)
-        .map(this.defaultItem)
-        .map(addWidgetByType),
+        .map(this.defaultItem),
     ];
   }
 
   get isFetching() {
     return isFetching(this.$store);
+  }
+
+  widgetComponent(type: string): VueConstructor {
+    return widgetByType(type);
   }
 }
 </script>
@@ -77,7 +80,7 @@ export default class BlocksPage extends Vue {
         <component
           class="dashboard-item"
           v-for="item in items"
-          :is="item.component"
+          :is="widgetComponent(item.widget)"
           :key="item.id"
           :id="item.id"
           :cols="item.cols"

@@ -10,7 +10,7 @@ const services = {
   strict: true,
   state: {
     services: {},
-    fetching: false,
+    fetching: true,
   },
 };
 

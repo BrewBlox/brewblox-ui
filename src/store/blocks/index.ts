@@ -10,7 +10,7 @@ const blocks = {
   strict: true,
   state: {
     blocks: {},
-    fetching: false,
+    fetching: true,
   },
 };
 

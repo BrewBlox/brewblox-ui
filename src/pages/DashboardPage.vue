@@ -1,5 +1,5 @@
 <script lang="ts">
-import Vue from 'vue';
+import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
 
 import GridContainer from '@/components/Grid/GridContainer.vue';
@@ -7,6 +7,7 @@ import WidgetModal from '@/components/WidgetModal/WidgetModal.vue';
 
 import byOrder from '@/helpers/byOrder';
 
+import { DashboardItem } from '@/store/dashboards/state';
 import { isFetching, dashboardById, dashboardItemById } from '@/store/dashboards/getters';
 import { isFetching as fetchingBlocks } from '@/store/blocks/getters';
 import {
@@ -18,7 +19,8 @@ import {
 } from '@/store/dashboards/actions';
 import { Block } from '@/store/blocks/state';
 
-import addWidgetByType from '@/components/widgetByType';
+import { widgetByType } from '@/features/feature-by-type';
+
 
 interface VueOrdered extends Vue {
   id: string;
@@ -48,13 +50,16 @@ export default class DashboardPage extends Vue {
   get items() {
     return [
       ...this.dashboard.items
-        .map(id => dashboardItemById(this.$store, id))
-        .map(addWidgetByType),
+        .map(id => dashboardItemById(this.$store, id)),
     ].sort(byOrder);
   }
 
   get isFetching() {
     return isFetching(this.$store) || fetchingBlocks(this.$store);
+  }
+
+  widgetComponent(type: string): VueConstructor {
+    return widgetByType(type);
   }
 
   toggleEditable() {
@@ -170,12 +175,12 @@ export default class DashboardPage extends Vue {
         <component
           class="dashboard-item"
           v-for="item in items"
-          :is="item.component"
+          :is="widgetComponent(item.widget)"
           :key="item.id"
           :id="item.id"
           :cols="item.cols"
           :rows="item.rows"
-          :config="item.options"
+          :config="item.config"
         />
       </grid-container>
     </template>

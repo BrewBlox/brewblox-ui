@@ -48,7 +48,7 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
 </script>
 
 <template>
-  <div>
+  <div v-if="!!block">
     <q-toolbar color="dark-bright">
       <q-toolbar-title>
         {{ block.serviceId }}/{{ block.id }}

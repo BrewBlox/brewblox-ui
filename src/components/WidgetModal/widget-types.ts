@@ -4,14 +4,9 @@ import { DeviceService } from '@/store/services/state';
 
 import { deviceServices } from '@/store/services/getters';
 import { allBlocksFromService } from '@/store/blocks/getters';
+import { VueConstructor } from 'vue';
 
-export const widgetTypes: { [key in WidgetType]: string } = {
-  Metrics: 'Metrics',
-  Pid: 'Pid',
-  OneWireTempSensor: 'Temperature Sensor',
-  SetPointSimple: 'Setpoint',
-  SensorSetPointPair: 'Sensor/Setpoint Pair',
-};
+import { allTypes, createByType, descriptionByType } from '@/features/feature-by-type';
 
 function getBlocksFromServices(
   services: DeviceService[],
@@ -28,10 +23,15 @@ export function blocksByWidgetType(store: RootStore, type: WidgetType): Block[] 
   return getBlocksFromServices(services, store, type);
 }
 
-export const widgetComponents: { [name in WidgetType]: () => Promise<any> } = {
-  Metrics: () => import('@/components/Metrics/CreateMetrics.vue'),
-  Pid: () => import('@/features/Pid/CreatePid.vue'),
-  OneWireTempSensor: () => import('@/features/OneWireTempSensor/CreateOneWireTempSensor.vue'),
-  SetPointSimple: () => import('@/features/SetPointSimple/CreateSetPointSimple.vue'),
-  SensorSetPointPair: () => import('@/features/SensorSetPointPair/CreateSensorSetPointPair.vue'),
-};
+export const widgetComponents: { [name: string]: VueConstructor } = allTypes
+  .filter(createByType)
+  .reduce((coll: any, type: string) => {
+    coll[type] = createByType(type);
+    return coll;
+  }, {});
+
+export const widgetDescriptions: { [name: string]: string } = allTypes
+  .reduce((coll: any, type: string) => {
+    coll[type] = descriptionByType(type);
+    return coll;
+  }, {});

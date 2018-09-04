@@ -2,14 +2,12 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
+import { map } from 'lodash';
 
 import { Block } from '@/store/blocks/state';
 
-import {
-  widgetTypes,
-  blocksByWidgetType,
-  widgetComponents,
-} from './widget-types';
+import { widgetComponents, blocksByWidgetType, widgetDescriptions } from './widget-types';
+import { allTypes, descriptionByType, createByType } from '@/features/feature-by-type';
 
 /* eslint-disable indent */
 @Component({
@@ -32,25 +30,18 @@ export default class WidgetModal extends Vue {
   blockId: string | null = null;
   needsSetup: boolean = false;
 
-  get widgetTypes(): { label: string, value: string }[] {
-    return Object.keys(widgetTypes).map(value =>
-      ({ value, label: widgetTypes[value as WidgetType] }));
-  }
-
   get widgetName(): string {
     if (!this.widgetType) {
       return '';
     }
-
-    return widgetTypes[this.widgetType];
+    return descriptionByType(this.widgetType);
   }
 
-  get availableBlocksForWidget() {
-    if (this.widgetType) {
-      return blocksByWidgetType(this.$store, this.widgetType as WidgetType);
+  get availableBlocksForWidget(): Block[] {
+    if (!this.widgetType) {
+      return [];
     }
-
-    return [];
+    return blocksByWidgetType(this.$store, this.widgetType as WidgetType);
   }
 
   get blocksForWidget() {
@@ -65,6 +56,15 @@ export default class WidgetModal extends Vue {
         value: 'new',
       },
     ];
+  }
+
+  get createOptions() {
+    return allTypes
+      .filter(createByType)
+      .map(type => ({
+        value: type,
+        label: descriptionByType(type),
+      }));
   }
 
   get canContinue() {
@@ -146,7 +146,7 @@ export default class WidgetModal extends Vue {
                 dark
                 type="radio"
                 v-model="widgetType"
-                :options="widgetTypes"
+                :options="createOptions"
               />
             </q-field>
           </q-step>

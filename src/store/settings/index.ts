@@ -9,8 +9,8 @@ const settings = {
   namespaced: true,
   strict: true,
   state: {
-    fetching: false,
     settings: {},
+    fetching: true,
   },
 };
 
