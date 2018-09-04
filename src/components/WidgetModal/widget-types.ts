@@ -6,7 +6,7 @@ import { deviceServices } from '@/store/services/getters';
 import { allBlocksFromService } from '@/store/blocks/getters';
 import { VueConstructor } from 'vue';
 
-import { allTypes, wizardByType, descriptionByType } from '@/features/feature-by-type';
+import { allTypes, wizardByType, displayNameByType } from '@/features/feature-by-type';
 
 function getBlocksFromServices(
   services: DeviceService[],
@@ -32,6 +32,6 @@ export const widgetWizards: { [name: string]: VueConstructor } = allTypes
 
 export const widgetDescriptions: { [name: string]: string } = allTypes
   .reduce((coll: any, type: string) => {
-    coll[type] = descriptionByType(type);
+    coll[type] = displayNameByType(type);
     return coll;
   }, {});

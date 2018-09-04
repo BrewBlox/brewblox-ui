@@ -5,6 +5,8 @@ import { Watch } from 'vue-property-decorator';
 import { blockById } from '@/store/blocks/getters';
 import { Block } from '@/store/blocks/state';
 
+import { displayNameByType } from '@/features/feature-by-type';
+
 import Widget from './Widget';
 
 @Component
@@ -61,6 +63,10 @@ export default class BlockWidget extends Widget {
 
   get block(): Block {
     return blockById(this.$store, this.blockId);
+  }
+
+  get displayName(): string {
+    return displayNameByType(this.block.type);
   }
 
   @Watch('block', { immediate: true, deep: true })

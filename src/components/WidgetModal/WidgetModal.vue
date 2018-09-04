@@ -7,7 +7,7 @@ import { map } from 'lodash';
 import { Block } from '@/store/blocks/state';
 
 import { blocksByWidgetType, widgetDescriptions, widgetWizards } from './widget-types';
-import { allTypes, descriptionByType, wizardByType } from '@/features/feature-by-type';
+import { allTypes, displayNameByType, wizardByType } from '@/features/feature-by-type';
 
 /* eslint-disable indent */
 @Component({
@@ -34,7 +34,7 @@ export default class WidgetModal extends Vue {
     if (!this.widgetType) {
       return '';
     }
-    return descriptionByType(this.widgetType);
+    return displayNameByType(this.widgetType);
   }
 
   get availableBlocksForWidget(): Block[] {
@@ -63,7 +63,7 @@ export default class WidgetModal extends Vue {
       .filter(wizardByType)
       .map(type => ({
         value: type,
-        label: descriptionByType(type),
+        label: displayNameByType(type),
       }));
   }
 

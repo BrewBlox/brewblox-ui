@@ -4,7 +4,7 @@ import wizard from '@/components/Defaults/DefaultWizard.vue';
 const feature = {
   widget,
   wizard,
-  description: 'Onewire Temperature Sensor'
+  displayName: 'Onewire Temperature Sensor',
 };
 
 export default feature;

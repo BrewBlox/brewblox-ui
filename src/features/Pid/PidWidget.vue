@@ -119,6 +119,7 @@ export default class PidWidget extends BlockWidget {
     <q-toolbar color="dark-bright">
       <q-toolbar-title>
         {{ block.serviceId }}/{{ block.id }}
+        <q-item-tile sublabel>{{ displayName }}</q-item-tile>
       </q-toolbar-title>
 
       <q-btn

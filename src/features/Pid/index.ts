@@ -4,7 +4,7 @@ import wizard from '@/components/Defaults/DefaultWizard.vue';
 const feature = {
   widget,
   wizard,
-  description: 'PID',
+  displayName: 'PID',
 };
 
 export default feature;

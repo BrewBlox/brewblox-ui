@@ -4,7 +4,7 @@ import wizard from './SensorSetPointPairWizard.vue';
 const feature = {
   widget,
   wizard,
-  description: 'Sensor/SetPoint Pair',
+  displayName: 'Sensor/Setpoint Pair',
 };
 
 export default feature;

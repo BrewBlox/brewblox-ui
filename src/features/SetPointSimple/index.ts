@@ -4,7 +4,7 @@ import wizard from '@/components/Defaults/DefaultWizard.vue';
 const feature = {
   widget,
   wizard,
-  description: 'Basic Setpoint',
+  displayName: 'Basic Setpoint',
 };
 
 export default feature;

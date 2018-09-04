@@ -25,7 +25,7 @@ export default class OneWireTempSensor extends BlockWidget {
     <q-toolbar color="dark-bright">
       <q-toolbar-title>
         {{ block.serviceId }}/{{ block.id }}
-        <q-item-tile sublabel>{{ block.type }}</q-item-tile>
+        <q-item-tile sublabel>{{ displayName }}</q-item-tile>
       </q-toolbar-title>
     </q-toolbar>
 

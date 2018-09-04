@@ -4,5 +4,5 @@ export interface Feature {
   widget?: VueConstructor,
   wizard?: VueConstructor,
   form?: VueConstructor,
-  description?: string,
+  displayName?: string,
 }
