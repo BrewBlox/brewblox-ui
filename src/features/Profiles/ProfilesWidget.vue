@@ -2,7 +2,8 @@
 import Component, { mixins } from 'vue-class-component';
 
 import BlockWidget from '@/components/BlockWidget';
-import ProfilesBar from '@/components/ProfilesBar/ProfilesBar.vue';
+import ProfilesBar from '@/components/WidgetGenerics/ProfilesBar.vue';
+import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
 
 import { ProfilesBlock } from './state';
 import { getById } from './getters';
@@ -11,7 +12,8 @@ import { getById } from './getters';
 /* eslint-disable indent */
 @Component({
   components: {
-    ProfilesBar
+    ProfilesBar,
+    BlockToolbar,
   }
 })
 /* eslint-enable */
@@ -28,12 +30,10 @@ export default class ProfilesWidget extends mixins(BlockWidget) {
 
 <template>
   <div>
-    <q-toolbar color="dark-bright">
-      <q-toolbar-title>
-        {{ block.serviceId }}/{{ block.id }}
-        <q-item-tile sublabel>{{ displayName }}</q-item-tile>
-      </q-toolbar-title>
-    </q-toolbar>
+
+    <block-toolbar
+      :config="$props.config"
+    />
 
     <q-card>
       <q-card-main>

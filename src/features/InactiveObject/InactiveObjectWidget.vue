@@ -2,10 +2,17 @@
 import Component from 'vue-class-component';
 
 import BlockWidget from '@/components/BlockWidget';
+import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
 
 import { getById } from './getters';
 
-@Component
+/* eslint-disable indent */
+@Component({
+  components: {
+    BlockToolbar,
+  }
+})
+/* eslint-enable */
 export default class InactiveObjectWidget extends BlockWidget {
   refreshState() {
     return undefined;
@@ -20,19 +27,9 @@ export default class InactiveObjectWidget extends BlockWidget {
 <template>
   <div>
 
-    <q-toolbar color="dark-bright">
-      <q-toolbar-title>
-        {{ block.serviceId }}/{{ block.id }}
-        <q-item-tile sublabel>{{ displayName }}</q-item-tile>
-      </q-toolbar-title>
-      <q-btn
-        flat
-        round
-        dense
-        icon="refresh"
-        @click="refreshState"
-      />
-    </q-toolbar>
+    <block-toolbar
+      :config="$props.config"
+    />
 
     <q-card>
       <q-item>

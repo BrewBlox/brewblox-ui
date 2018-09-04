@@ -2,6 +2,8 @@
 import Component, { mixins } from 'vue-class-component';
 
 import BlockWidget from '@/components/BlockWidget';
+import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
+
 import { OneWireTempSensorBlock } from '../OneWireTempSensor/state';
 import { SetPointSimpleBlock } from '../SetPointSimple/state';
 
@@ -12,7 +14,13 @@ import { SensorSetPointPairBlock } from './state';
 import { getById } from './getters';
 
 
-@Component
+/* eslint-disable indent */
+@Component({
+  components: {
+    BlockToolbar,
+  }
+})
+/* eslint-enable */
 export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
   inputMapping = {
     setpoint: { path: 'setPoint.settings.value', default: 0 },
@@ -37,13 +45,11 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
 </script>
 
 <template>
-  <div v-if="!!block">
-    <q-toolbar color="dark-bright">
-      <q-toolbar-title>
-        {{ block.serviceId }}/{{ block.id }}
-        <q-item-tile sublabel>{{ displayName }}</q-item-tile>
-      </q-toolbar-title>
-    </q-toolbar>
+  <div>
+
+    <block-toolbar
+      :config="$props.config"
+    />
 
     <q-card>
       <q-card-main>

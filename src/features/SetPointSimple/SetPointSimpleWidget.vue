@@ -4,11 +4,18 @@ import Component from 'vue-class-component';
 import { saveBlock } from '@/store/blocks/actions';
 
 import BlockWidget from '@/components/BlockWidget';
+import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
 
 import { SetPointSimpleBlock } from './state';
 import { getById } from './getters';
 
-@Component
+/* eslint-disable indent */
+@Component({
+  components: {
+    BlockToolbar,
+  }
+})
+/* eslint-enable */
 export default class OneWireTempSensor extends BlockWidget {
   inputMapping = {
     setting: { path: 'block.data.setting.value', default: 0 },
@@ -22,12 +29,10 @@ export default class OneWireTempSensor extends BlockWidget {
 
 <template>
   <div>
-    <q-toolbar color="dark-bright">
-      <q-toolbar-title>
-        {{ block.serviceId }}/{{ block.id }}
-        <q-item-tile sublabel>{{ displayName }}</q-item-tile>
-      </q-toolbar-title>
-    </q-toolbar>
+
+    <block-toolbar
+      :config="$props.config"
+    />
 
     <q-card>
       <q-card-main>

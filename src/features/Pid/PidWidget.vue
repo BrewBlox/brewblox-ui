@@ -4,6 +4,7 @@ import Component from 'vue-class-component';
 import { saveBlock } from '@/store/blocks/actions';
 import { updateBlockState } from '@/store/blocks/mutations';
 import BlockWidget from '@/components/BlockWidget';
+import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
 
 import { getAll as getAllSensorSetPointPairs } from '../SensorSetPointPair/getters';
 
@@ -12,7 +13,13 @@ import { PidBlock, PidSettings, PidLinks, PidFiltering, PidState }
 import { getById } from './getters';
 import { refresh } from './actions';
 
-@Component
+/* eslint-disable indent */
+@Component({
+  components: {
+    BlockToolbar,
+  }
+})
+/* eslint-enable */
 export default class PidWidget extends BlockWidget {
   inputMapping = {
     kp: { path: 'settings.kp', default: 0 },
@@ -116,32 +123,14 @@ export default class PidWidget extends BlockWidget {
 
 <template>
   <div>
-    <q-toolbar color="dark-bright">
-      <q-toolbar-title>
-        {{ block.serviceId }}/{{ block.id }}
-        <q-item-tile sublabel>{{ displayName }}</q-item-tile>
-      </q-toolbar-title>
 
-      <q-btn
-        flat
-        round
-        dense
-        icon="settings"
-        @click="openModal"
-      />
-    </q-toolbar>
+    <block-toolbar
+      :config="$props.config"
+      :on-refresh="refreshState"
+      :on-settings="openModal"
+    />
 
     <q-card>
-      <q-card-actions>
-        <q-btn
-          flat
-          round
-          dense
-          icon="refresh"
-          @click="refreshState"
-        />
-      </q-card-actions>
-
       <q-list>
         <q-item class="grid-items-2">
           <q-item-side>
