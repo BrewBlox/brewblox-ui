@@ -10,7 +10,7 @@ import { getById } from './getters';
 @Component({
   components: {
     BlockToolbar,
-  }
+  },
 })
 /* eslint-enable */
 export default class InactiveObjectWidget extends BlockWidget {
@@ -28,7 +28,7 @@ export default class InactiveObjectWidget extends BlockWidget {
   <div>
 
     <block-toolbar
-      :config="$props.config"
+      :block="block"
       :on-refresh="refreshBlock"
     />
 

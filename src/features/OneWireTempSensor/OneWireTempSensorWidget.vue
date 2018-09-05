@@ -13,14 +13,14 @@ import { getById } from './getters';
 @Component({
   components: {
     BlockToolbar,
-  }
+  },
 })
 /* eslint-enable */
 export default class OneWireTempSensor extends BlockWidget {
   inputMapping = {
     address: { path: 'block.data.address', default: '' },
     offset: { path: 'block.data.offset.value', default: 0 },
-  }
+  };
 
   get block(): OneWireTempSensorBlock {
     return getById(this.$store, this.blockId);
@@ -32,7 +32,7 @@ export default class OneWireTempSensor extends BlockWidget {
   <div>
 
     <block-toolbar
-      :config="$props.config"
+      :block="block"
       :on-refresh="refreshBlock"
     />
 

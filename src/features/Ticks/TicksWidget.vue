@@ -11,7 +11,7 @@ import { getById } from './getters';
 @Component({
   components: {
     BlockToolbar,
-  }
+  },
 })
 /* eslint-enable */
 export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
@@ -25,7 +25,7 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
   <div>
 
     <block-toolbar
-      :config="$props.config"
+      :block="block"
       :on-refresh="refreshBlock"
     />
 
