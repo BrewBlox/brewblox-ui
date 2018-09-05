@@ -14,7 +14,7 @@ import { getById } from './getters';
   components: {
     ProfilesBar,
     BlockToolbar,
-  }
+  },
 })
 /* eslint-enable */
 export default class ProfilesWidget extends mixins(BlockWidget) {
@@ -32,7 +32,7 @@ export default class ProfilesWidget extends mixins(BlockWidget) {
   <div>
 
     <block-toolbar
-      :config="$props.config"
+      :block="block"
       :on-refresh="refreshBlock"
     />
 

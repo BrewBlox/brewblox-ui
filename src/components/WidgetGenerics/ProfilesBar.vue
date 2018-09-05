@@ -9,7 +9,7 @@ import Component from 'vue-class-component';
       type: Array,
       default: () => { throw new Error('Provide profiles'); },
     },
-  }
+  },
 })
 /* eslint-enable */
 export default class ProfilesBar extends Vue {

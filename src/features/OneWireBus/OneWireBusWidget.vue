@@ -9,8 +9,8 @@ import { getById } from './getters';
 /* eslint-disable indent */
 @Component({
   components: {
-    BlockToolbar
-  }
+    BlockToolbar,
+  },
 })
 /* eslint-enable */
 export default class OneWireBusWidget extends BlockWidget {
@@ -32,7 +32,7 @@ export default class OneWireBusWidget extends BlockWidget {
   <div>
 
     <block-toolbar
-      :config="$props.config"
+      :block="block"
       :on-refresh="refreshBlock"
     />
 
