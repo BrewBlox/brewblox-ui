@@ -39,5 +39,5 @@ export interface PidBlock extends Block {
     links: PidLinks;
     filtering: PidFiltering;
     state: PidState;
-  }
+  };
 }

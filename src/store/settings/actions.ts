@@ -42,8 +42,6 @@ const actions = {
     setSettingsInStore(context, settings);
     mutateFetchingInStore(context, false);
   },
-
-
 };
 
 // exported action accessors

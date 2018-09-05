@@ -6,7 +6,8 @@
   "jsRules": {},
   "rules": {
     "import-name": false,
-    "no-boolean-literal-compare": false
+    "no-boolean-literal-compare": false,
+    "semicolon": [true, "always", "ignore-bound-class-methods"]
   },
   "rulesDirectory": []
 }

@@ -15,7 +15,8 @@ interface PluginArguments {
 // Widget types
 type WidgetType =
   'Metrics' |
-  'Pid' |
+  'PID' |
+  'ProcessView' |
   'OneWireTempSensor' |
   'SetPointSimple' |
   'SensorSetPointPair';

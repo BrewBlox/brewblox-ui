@@ -7,5 +7,5 @@ export interface OneWireTempSensorBlock extends Block, MetricsBase {
     offset: Temperature,
     value: Temperature,
     connected: boolean,
-  }
+  };
 }

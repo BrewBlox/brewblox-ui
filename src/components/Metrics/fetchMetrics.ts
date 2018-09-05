@@ -107,7 +107,6 @@ export function getMetric(
     });
 }
 
-
 export function subscribeToEvents(
   serviceId: string,
   keys: string[],
