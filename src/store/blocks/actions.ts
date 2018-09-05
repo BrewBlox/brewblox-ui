@@ -1,9 +1,11 @@
 import { getStoreAccessors } from 'vuex-typescript';
 
 import { Service } from '@/store/services/state';
+import { State as RootState } from '../state';
 
 import {
   fetchBlocks as fetchBlocksFromApi,
+  fetchBlock as fetchBlockFromApi,
   persistBlock as persistBlockToApi,
   createBlock as createBlockOnApi,
   deleteBlock as deleteBlockOnApi,
@@ -11,8 +13,6 @@ import {
 } from './api';
 
 import { BlocksState, BlocksContext, Block } from './state';
-import { State as RootState } from '../state';
-
 import { allBlocksFromService } from './getters';
 
 import {
@@ -37,11 +37,16 @@ const actions = {
     mutateFetchingInStore(context, false);
   },
 
+  async fetchBlock(context: BlocksContext, block: Block) {
+    mutateBlockInStore(context, { ...block, isLoading: true });
+    const fetchedBlock = await fetchBlockFromApi(block);
+    mutateBlockInStore(context, { ...fetchedBlock, isLoading: false });
+  },
+
   async createBlock(context: BlocksContext, block: Block) {
     addBlockInStore(context, { ...block, isLoading: true });
     const createdBlock = await createBlockOnApi(block);
     mutateBlockInStore(context, { ...createdBlock, isLoading: false });
-
     return createdBlock;
   },
 
@@ -63,8 +68,8 @@ const actions = {
   },
 };
 
-// exported action accessors
 export const fetchBlocks = dispatch(actions.fetchBlocks);
+export const fetchBlock = dispatch(actions.fetchBlock);
 export const createBlock = dispatch(actions.createBlock);
 export const saveBlock = dispatch(actions.saveBlock);
 export const removeBlock = dispatch(actions.removeBlock);

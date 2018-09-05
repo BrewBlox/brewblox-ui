@@ -12,14 +12,8 @@ const {
 /* eslint-enable */
 
 const defaultStore: DashboardState = {
-  dashboards: {
-    allIds: [],
-    byId: {},
-  },
-  items: {
-    allIds: [],
-    byId: {},
-  },
+  dashboards: {},
+  items: {},
   fetching: false,
 };
 
@@ -55,7 +49,7 @@ describe('addDashboard', () => {
     // test if dashboard is added to list
     expect(dashboardStore.dashboards.allIds).toEqual(['test']);
     // test if dashboard item is correct
-    expect(dashboardStore.dashboards.byId.test).toEqual(dashboard);
+    expect(dashboardStore.dashboards.test).toEqual(dashboard);
   });
 
   it('Should add another dashboard to the store', () => {
@@ -71,7 +65,7 @@ describe('addDashboard', () => {
     // test if dashboard is added to list
     expect(dashboardStore.dashboards.allIds).toEqual(['test', 'testing']);
     // test if dashboard item is correct
-    expect(dashboardStore.dashboards.byId.testing).toEqual(dashboard);
+    expect(dashboardStore.dashboards.testing).toEqual(dashboard);
   });
 });
 
@@ -85,7 +79,7 @@ describe('addDashboardItem', () => {
       cols: 2,
       rows: 3,
       widget: 'Empty' as WidgetType,
-      options: {},
+      config: {},
     };
 
     addDashboardItem(dashboardItemStore, dashboardItem);
@@ -93,7 +87,7 @@ describe('addDashboardItem', () => {
     // test if dashboard is added to list
     expect(dashboardItemStore.items.allIds).toEqual(['test-item']);
     // test if dashboard item is correct
-    expect(dashboardItemStore.items.byId['test-item']).toEqual(dashboardItem);
+    expect(dashboardItemStore.items['test-item']).toEqual(dashboardItem);
   });
 
   it('Should add another dashboard item', () => {
@@ -103,7 +97,7 @@ describe('addDashboardItem', () => {
       cols: 2,
       rows: 3,
       widget: 'Empty' as WidgetType,
-      options: {},
+      config: {},
     };
 
     addDashboardItem(dashboardItemStore, dashboardItem);
@@ -111,7 +105,7 @@ describe('addDashboardItem', () => {
     // test if dashboard is added to list
     expect(dashboardItemStore.items.allIds).toEqual(['test-item', 'test-item-2']);
     // test if dashboard item is correct
-    expect(dashboardItemStore.items.byId['test-item-2']).toEqual(dashboardItem);
+    expect(dashboardItemStore.items['test-item-2']).toEqual(dashboardItem);
   });
 });
 
@@ -124,7 +118,7 @@ describe('setDashboardItemSize', () => {
     cols: 2,
     rows: 3,
     widget: 'Empty' as WidgetType,
-    options: {},
+    config: {},
   };
 
   it('Should update an item\'s size', () => {
@@ -132,8 +126,8 @@ describe('setDashboardItemSize', () => {
 
     setDashboardItemSize(dashboardItemSizeStore, { id: 'test-item', cols: 5, rows: 5 });
 
-    expect(dashboardItemSizeStore.items.byId['test-item'].cols).toBe(5);
-    expect(dashboardItemSizeStore.items.byId['test-item'].rows).toBe(5);
+    expect(dashboardItemSizeStore.items['test-item'].cols).toBe(5);
+    expect(dashboardItemSizeStore.items['test-item'].rows).toBe(5);
   });
 });
 
@@ -146,7 +140,7 @@ describe('setDashboardItemOrder', () => {
     cols: 2,
     rows: 3,
     widget: 'Empty' as WidgetType,
-    options: {},
+    config: {},
   };
 
   it('Should update an item\'s order', () => {
@@ -154,6 +148,6 @@ describe('setDashboardItemOrder', () => {
 
     setDashboardItemOrder(dashboardItemOrderStore, { id: 'test-item', order: 2 });
 
-    expect(dashboardItemOrderStore.items.byId['test-item'].order).toBe(2);
+    expect(dashboardItemOrderStore.items['test-item'].order).toBe(2);
   });
 });

@@ -12,8 +12,7 @@ export interface DeviceService extends Service {
 }
 
 export type ServicesState = {
-  allIds: string[],
-  byId: {
+  services: {
     [id: string]: Service;
   },
   fetching: boolean,

@@ -27,8 +27,7 @@ export interface MetricsBase {
 }
 
 export type BlocksState = {
-  allIds: string[],
-  byId: {
+  blocks: {
     [id: string]: Block;
   },
   fetching: boolean,

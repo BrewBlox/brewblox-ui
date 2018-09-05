@@ -20,6 +20,14 @@
     }
   },
   {
+    "id": "setpoint-inactive",
+    "profiles": [],
+    "type": "SetPointSimple",
+    "data": {
+      "setting": 3
+    }
+  },
+  {
     "id": "sensor-1",
     "profiles": [
       0

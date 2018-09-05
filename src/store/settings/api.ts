@@ -1,4 +1,4 @@
-import { get, put } from '@/core/fetch';
+import { get, put } from '@/helpers/fetch';
 
 import { Settings } from './state';
 

@@ -1,6 +1,6 @@
 import { flatten } from 'lodash';
 
-import { get, put, patch, post, del } from '@/core/fetch';
+import { get, put, patch, post, del } from '@/helpers/fetch';
 
 import { Service } from '@/store/services/state';
 import { Block, DataBlock } from './state';
@@ -26,6 +26,12 @@ function asBlock(block: DataBlock, serviceId: string): Block {
 export function fetchBlocks(service: Service): Promise<Block[]> {
   return get(`/${encodeURIComponent(service.id)}/objects`)
     .then(blocks => blocks.map((block: DataBlock) => asBlock(block, service.id)));
+}
+
+export function fetchBlock(block: Block): Promise<Block> {
+  return get(
+    `/${encodeURIComponent(block.serviceId)}/objects/${encodeURIComponent(block.id)}`
+  ).then(fetched => asBlock(fetched, block.serviceId));
 }
 
 export function createBlock(block: Block): Promise<Block> {

@@ -9,15 +9,9 @@ const dashboards = {
   namespaced: true,
   strict: true,
   state: {
-    dashboards: {
-      allIds: [],
-      byId: {},
-    },
-    items: {
-      allIds: [],
-      byId: {},
-    },
-    fetching: false,
+    dashboards: {},
+    items: {},
+    fetching: true,
   },
 };
 

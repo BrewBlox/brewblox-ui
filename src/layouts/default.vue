@@ -3,7 +3,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import draggable from 'vuedraggable';
 
-import byOrder from '@/core/byOrder';
+import byOrder from '@/helpers/byOrder';
 
 import { allDashboards, isFetching } from '@/store/dashboards/getters';
 import { addNewDashboard, updateDashboardOrder } from '@/store/dashboards/actions';
@@ -52,8 +52,7 @@ export default class LayoutDefault extends Vue {
     })
       .then((dashboardName: string) => {
         addNewDashboard(this.$store, dashboardName);
-      })
-      .catch(() => {});
+      });
   }
 }
 </script>

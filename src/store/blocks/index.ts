@@ -9,9 +9,8 @@ const blocks = {
   namespaced: true,
   strict: true,
   state: {
-    allIds: [],
-    byId: {},
-    fetching: false,
+    blocks: {},
+    fetching: true,
   },
 };
 

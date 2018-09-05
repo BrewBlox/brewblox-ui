@@ -14,22 +14,16 @@ export interface DashboardItem {
   order: number;
   cols: number;
   rows: number;
-  widget: WidgetType;
-  options: any;
+  widget: string;
+  config: any;
 }
 
 export type DashboardState = {
   dashboards: {
-    allIds: string[],
-    byId: {
-      [id: string]: Dashboard;
-    },
+    [id: string]: Dashboard;
   },
   items: {
-    allIds: string[],
-    byId: {
-      [id: string]: DashboardItem;
-    },
+    [id: string]: DashboardItem;
   },
   fetching: boolean,
 };
