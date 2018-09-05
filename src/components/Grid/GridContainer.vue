@@ -13,11 +13,11 @@ import GridItem from './GridItem.vue';
     },
     onChangeOrder: {
       type: Function,
-      default: () => {},
+      default: () => { },
     },
     onChangeSize: {
       type: Function,
-      default: () => {},
+      default: () => { },
     },
   },
   components: { GridItem },
@@ -128,7 +128,8 @@ export default class GridContainer extends Vue {
   background-color: transparent;
 }
 
-.grid-main-container, .grid-container-overlay {
+.grid-main-container,
+.grid-container-overlay {
   position: relative;
   display: grid;
   grid-gap: 20px;
@@ -149,8 +150,7 @@ export default class GridContainer extends Vue {
 
 .grid-container-overlay-grid {
   background-size: 120px 120px;
-  background-image:
-    linear-gradient(#121a1f 20px, transparent 0px),
+  background-image: linear-gradient(#121a1f 20px, transparent 0px),
     linear-gradient(90deg, #121a1f 20px, transparent 0px),
     linear-gradient(#fff, #fff);
   background-position: 0 -20px, -20px, 0 0;

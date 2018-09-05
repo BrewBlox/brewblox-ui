@@ -17,7 +17,7 @@ import { refresh } from './actions';
 @Component({
   components: {
     BlockToolbar,
-  }
+  },
 })
 /* eslint-enable */
 export default class PidWidget extends BlockWidget {

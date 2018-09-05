@@ -18,11 +18,11 @@ import BlockWidget from '@/components/BlockWidget';
 })
 /* eslint-enable */
 export default class BlockToolbar extends BlockWidget {
-  onSettings() {
+  onSettingsClick() {
     this.$props.onSettings(this.block.id);
   }
 
-  onRefresh() {
+  onRefreshClick() {
     this.$props.onRefresh(this.block.id);
   }
 }
@@ -42,7 +42,7 @@ export default class BlockToolbar extends BlockWidget {
       round
       dense
       icon="settings"
-      @click="onSettings"
+      @click="onSettingsClick"
     />
 
     <q-btn
@@ -50,7 +50,7 @@ export default class BlockToolbar extends BlockWidget {
       round
       dense
       icon="refresh"
-      @click="onRefresh"
+      @click="onRefreshClick"
     />
   </q-toolbar>
 </template>
