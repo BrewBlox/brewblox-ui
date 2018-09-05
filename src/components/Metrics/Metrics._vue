@@ -1,11 +1,8 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 
-import { updateDashboardItemOptions } from '@/store/dashboards/actions';
-
 import Widget from '../Widget';
 
-import Metrics from './Metrics.vue';
 import { getMetric, getAvailableMeasurements, subscribeToEvents } from './fetchMetrics';
 import { getMetricsFromPath } from './measurementHelpers';
 
@@ -49,11 +46,11 @@ class MetricsWidget extends Widget {
   } = {};
 
   get name(): string {
-    return this.options.name;
+    return this.$props.config.name;
   }
 
   get metrics(): MetricsOptions[] {
-    return [...this.options.metrics].sort(sortByOrder);
+    return [...this.$props.config.metrics].sort(sortByOrder);
   }
 
   toggleEditing() {
@@ -63,12 +60,9 @@ class MetricsWidget extends Widget {
   }
 
   saveChanges() {
-    updateDashboardItemOptions(this.$store, {
-      id: this.dashboardItem.id,
-      options: {
-        ...this.options,
-        name: this.nameInput,
-      },
+    this.$props.onConfigChange({
+      ...this.$props.config,
+      name: this.nameInput,
     });
 
     this.editing = false;
@@ -88,23 +82,25 @@ class MetricsWidget extends Widget {
   }
 
   getMeasures(): MeasuresType {
+    const reducer = (acc: MeasuresType, metric: any) => {
+      const measurementKey = this.splitMeasurementKey(metric.path);
+
+      if (!measurementKey) {
+        return acc;
+      }
+
+      if (!acc[measurementKey.measure]) {
+        acc[measurementKey.measure] = [];
+      }
+
+      acc[measurementKey.measure].push(measurementKey.key);
+
+      return acc;
+    };
+
     return this.metrics
       .filter(metric => this.measurementsPaths.indexOf(metric.path) > -1)
-      .reduce((acc: MeasuresType, metric) => {
-        const measurementKey = this.splitMeasurementKey(metric.path);
-
-        if (!measurementKey) {
-          return acc;
-        }
-
-        if (!acc[measurementKey.measure]) {
-          acc[measurementKey.measure] = [];
-        }
-
-        acc[measurementKey.measure].push(measurementKey.key);
-
-        return acc;
-      }, {});
+      .reduce(reducer, {});
   }
 
   async fetchMetrics() {

@@ -84,9 +84,9 @@ const actions = {
 
   updateDashboardItemConfig(
     context: DashboardContext,
-    { id, options }: { id: string, options: any },
+    { id, config }: { id: string, config: any },
   ) {
-    setDashboardItemConfigInStore(context, { id, options });
+    setDashboardItemConfigInStore(context, { id, config });
     persistDashboardItem(getDashboardItemInStore(context, id));
   },
 

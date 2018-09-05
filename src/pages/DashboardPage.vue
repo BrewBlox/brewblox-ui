@@ -14,6 +14,7 @@ import {
   updateDashboard,
   updateDashboardItemOrder,
   updateDashboardItemSize,
+  updateDashboardItemConfig,
   createDashboardItem,
   addDashboardItemToDashboard,
 } from '@/store/dashboards/actions';
@@ -110,9 +111,13 @@ export default class DashboardPage extends Vue {
       },
     });
 
-    addDashboardItemToDashboard(this.$store, { dashboard: this.dashboard, dashboardItem });
+    addDashboardItemToDashboard(this.$store, { dashboardItem, dashboard: this.dashboard });
 
     this.modalOpen = false;
+  }
+
+  onChangeItemConfig(id: string, config: any) {
+    updateDashboardItemConfig(this.$store, { id, config });
   }
 }
 </script>
@@ -181,6 +186,7 @@ export default class DashboardPage extends Vue {
           :cols="item.cols"
           :rows="item.rows"
           :config="item.config"
+          :on-config-change="onChangeItemConfig"
         />
       </grid-container>
     </template>
