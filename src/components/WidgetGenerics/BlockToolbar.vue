@@ -1,11 +1,18 @@
 <script lang="ts">
+import Vue from 'vue';
 import Component from 'vue-class-component';
+
+import { displayNameByType } from '@/features/feature-by-type';
 
 import BlockWidget from '@/components/BlockWidget';
 
 /* eslint-disable indent */
 @Component({
   props: {
+    block: {
+      type: Object,
+      default: () => { throw new Error('Provide Block'); },
+    },
     onRefresh: {
       type: Function,
       default: (blockId: string) => { },
@@ -17,13 +24,9 @@ import BlockWidget from '@/components/BlockWidget';
   },
 })
 /* eslint-enable */
-export default class BlockToolbar extends BlockWidget {
-  onSettingsClick() {
-    this.$props.onSettings(this.block.id);
-  }
-
-  onRefreshClick() {
-    this.$props.onRefresh(this.block.id);
+export default class BlockToolbar extends Vue {
+  get displayName(): string {
+    return displayNameByType(this.$props.block.type);
   }
 }
 </script>
@@ -31,7 +34,7 @@ export default class BlockToolbar extends BlockWidget {
 <template>
   <q-toolbar color="dark-bright">
     <q-toolbar-title>
-      {{ block.serviceId }}/{{ block.id }}
+      {{ $props.block.serviceId }}/{{ $props.block.id }}
       <q-item-tile sublabel>{{ displayName }}</q-item-tile>
     </q-toolbar-title>
 
@@ -42,7 +45,7 @@ export default class BlockToolbar extends BlockWidget {
       round
       dense
       icon="settings"
-      @click="onSettingsClick"
+      @click="$props.onSettings"
     />
 
     <q-btn
@@ -50,7 +53,7 @@ export default class BlockToolbar extends BlockWidget {
       round
       dense
       icon="refresh"
-      @click="onRefreshClick"
+      @click="$props.onRefresh"
     />
   </q-toolbar>
 </template>
