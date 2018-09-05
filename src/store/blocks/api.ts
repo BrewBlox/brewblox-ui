@@ -28,6 +28,12 @@ export function fetchBlocks(service: Service): Promise<Block[]> {
     .then(blocks => blocks.map((block: DataBlock) => asBlock(block, service.id)));
 }
 
+export function fetchBlock(block: Block): Promise<Block> {
+  return get(
+    `/${encodeURIComponent(block.serviceId)}/objects/${encodeURIComponent(block.id)}`
+  ).then(fetched => asBlock(fetched, block.serviceId));
+}
+
 export function createBlock(block: Block): Promise<Block> {
   return post(
     `/${encodeURIComponent(block.serviceId)}/objects`,

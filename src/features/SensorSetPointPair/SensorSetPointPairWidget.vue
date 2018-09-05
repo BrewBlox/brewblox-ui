@@ -49,6 +49,7 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
 
     <block-toolbar
       :config="$props.config"
+      :on-refresh="refreshBlock"
     />
 
     <q-card>

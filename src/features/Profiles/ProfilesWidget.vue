@@ -33,6 +33,7 @@ export default class ProfilesWidget extends mixins(BlockWidget) {
 
     <block-toolbar
       :config="$props.config"
+      :on-refresh="refreshBlock"
     />
 
     <q-card>

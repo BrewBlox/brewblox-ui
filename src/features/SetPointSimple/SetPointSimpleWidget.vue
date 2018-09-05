@@ -32,6 +32,7 @@ export default class OneWireTempSensor extends BlockWidget {
 
     <block-toolbar
       :config="$props.config"
+      :on-refresh="refreshBlock"
     />
 
     <q-card>

@@ -33,6 +33,7 @@ export default class OneWireBusWidget extends BlockWidget {
 
     <block-toolbar
       :config="$props.config"
+      :on-refresh="refreshBlock"
     />
 
     <q-card>

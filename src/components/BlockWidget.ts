@@ -3,6 +3,7 @@ import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
 
 import { blockById } from '@/store/blocks/getters';
+import { fetchBlock } from '@/store/blocks/actions';
 import { Block } from '@/store/blocks/state';
 
 import { displayNameByType } from '@/features/feature-by-type';
@@ -72,5 +73,9 @@ export default class BlockWidget extends Widget {
   @Watch('block', { immediate: true, deep: true })
   onBlockUpdate() {
     this.inputs = this.inputsFromSource();
+  }
+
+  refreshBlock() {
+    fetchBlock(this.$store, this.block);
   }
 }
