@@ -7,5 +7,5 @@ export interface OneWireBusBlock extends Block {
       data: number,
     },
     address: string[],
-  }
+  };
 }

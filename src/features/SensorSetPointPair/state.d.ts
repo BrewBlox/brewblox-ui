@@ -6,5 +6,5 @@ export interface SensorSetPointPairBlock extends Block {
   data: {
     sensor: Link;
     setpoint: Link;
-  }
+  };
 }
