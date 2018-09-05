@@ -1,0 +1,6 @@
+<svg viewBox="0 0 50 50" width="50" height="50">
+  <path d="M0,25h25V0"/>
+  <path d="M25,0v25h25"/>
+  <path d="M25,50V25H0"/>
+  <path d="M50,25H25v25"/>
+</svg>
