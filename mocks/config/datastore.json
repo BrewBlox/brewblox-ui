@@ -90,23 +90,23 @@
       }
     },
     {
-      "id": "item-invalid-unknown",
-      "order": 2,
-      "cols": 3,
-      "rows": 3,
-      "widget": "Warbl",
-      "config": {
-        "blockId": "spark/BLORP"
-      }
-    },
-    {
-      "id": "item-unk-setpoint",
+      "id": "item-unknown",
       "order": 2,
       "cols": 3,
       "rows": 3,
       "widget": "UnknownType",
       "config": {
         "blockId": "spark/setpoint-1"
+      }
+    },
+    {
+      "id": "item-invalid-unknown",
+      "order": 3,
+      "cols": 3,
+      "rows": 3,
+      "widget": "Warbl",
+      "config": {
+        "blockId": "spark/BLORP"
       }
     }
   ],
@@ -137,8 +137,8 @@
       "order": 4,
       "items": [
         "item-invalid",
-        "item-invalid-unknown",
-        "item-unk-setpoint"
+        "item-unknown",
+        "item-invalid-unknown"
       ]
     }
   ],
