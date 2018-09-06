@@ -10,6 +10,7 @@ import SetPointSimple from './SetPointSimple';
 import SysInfo from './SysInfo';
 import Ticks from './Ticks';
 import ProcessView from './ProcessView';
+import Metrics from './Metrics';
 
 export const blockFeatures: { [key: string]: Feature } = {
   InactiveObject,
@@ -22,4 +23,5 @@ export const blockFeatures: { [key: string]: Feature } = {
   SysInfo,
   Ticks,
   ProcessView,
+  Metrics,
 };

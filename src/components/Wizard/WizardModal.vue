@@ -24,7 +24,7 @@ import { allTypes, displayNameByType, wizardByType } from '@/features/feature-by
   },
 })
 /* eslint-enable */
-export default class WidgetModal extends Vue {
+export default class WizardModal extends Vue {
   currentStep: string = 'widgets';
   widgetType: WidgetType | null = null;
   blockId: string | null = null;

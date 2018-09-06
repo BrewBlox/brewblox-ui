@@ -3,7 +3,7 @@ import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
 
 import GridContainer from '@/components/Grid/GridContainer.vue';
-import WidgetModal from '@/components/WidgetModal/WidgetModal.vue';
+import WizardModal from '@/components/Wizard/WizardModal.vue';
 import InvalidWidget from '@/components/WidgetGenerics/InvalidWidget.vue';
 
 import byOrder from '@/helpers/byOrder';
@@ -32,7 +32,7 @@ interface VueOrdered extends Vue {
 @Component({
   components: {
     GridContainer,
-    WidgetModal,
+    WizardModal,
   },
 })
 /* eslint-enable */
@@ -168,7 +168,7 @@ export default class DashboardPage extends Vue {
         v-model="modalOpen"
         :content-css="{ minWidth: '80vw', minHeight: '500px' }"
       >
-        <widget-modal
+        <wizard-modal
           :isOpen="modalOpen"
           :onAddWidget="onAddWidget"
         />

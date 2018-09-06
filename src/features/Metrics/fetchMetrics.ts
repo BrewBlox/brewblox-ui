@@ -1,5 +1,7 @@
 import queryString from 'query-string';
 
+import { post } from '@/helpers/fetch';
+
 import { convertToFlatPaths } from './measurementHelpers';
 
 const historyService = process.env.VUE_APP_HISTORY_URI;
@@ -10,20 +12,22 @@ function toMicroSeconds(nanoseconds: number): number {
   return Math.floor(nanoseconds / 1000000);
 }
 
-function fetchData(endpoint: string, payload: any = {}): Promise<Response> {
-  return window.fetch(
-    `${historyService}${endpoint}`,
-    {
-      method: 'POST',
-      body: JSON.stringify({
-        ...payload,
-      }),
-      headers: new Headers({
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      }),
-    },
-  );
+function fetchData(endpoint: string, payload: any = {}): Promise<any> {
+  return post(`${historyService}${endpoint}`, payload);
+
+  // return window.fetch(
+  //   `${historyService}${endpoint}`,
+  //   {
+  //     method: 'POST',
+  //     body: JSON.stringify({
+  //       ...payload,
+  //     }),
+  //     headers: new Headers({
+  //       'Content-Type': 'application/json',
+  //       Accept: 'application/json',
+  //     }),
+  //   },
+  // );
 }
 
 function metricsKey(serviceId: string, keys: string[]) {
@@ -63,7 +67,7 @@ function addValuesToCache(serviceId: string, keys: string[], values: number[][])
 
 export function getAvailableMeasurements(): Promise<string[]> {
   return fetchData('/query/objects')
-    .then(response => response.json())
+    // .then(response => response.json())
     .then(convertToFlatPaths);
 }
 
@@ -96,7 +100,7 @@ export function getMetric(
   }
 
   return fetchData('/query/values', payload)
-    .then(response => response.json())
+    // .then(response => response.json())
     .then((response) => {
       if (!response.values) {
         throw new Error('No results found');

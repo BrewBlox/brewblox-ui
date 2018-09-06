@@ -108,6 +108,14 @@
       "config": {
         "blockId": "spark/BLORP"
       }
+    },
+    {
+      "id": "item-metrics",
+      "order": 1,
+      "cols": 10,
+      "rows": 5,
+      "widget": "Metrics",
+      "config": {}
     }
   ],
   "dashboards": [
@@ -115,7 +123,9 @@
       "id": "dashboard-home",
       "title": "Home Dashboard",
       "order": 1,
-      "items": []
+      "items": [
+        "item-metrics"
+      ]
     },
     {
       "id": "metrics",

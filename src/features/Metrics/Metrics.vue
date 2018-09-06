@@ -11,12 +11,18 @@ import Plotly from './plotly';
 @Component({
   props: {
     data: {
-      default: {},
       type: Object,
+      default: () => ({
+        data: [],
+      }),
     },
     initialRange: {
-      default: 5 * 60 * 1000,
       type: Number,
+      default: 5 * 60 * 1000,
+    },
+    config: {
+      type: Object,
+      default: () => ({}),
     },
   },
   components: {
@@ -24,7 +30,7 @@ import Plotly from './plotly';
   },
 })
 /* eslint-enable */
-export default class MetricsWidget extends Vue {
+export default class Metrics extends Vue {
   defaultLayout = {
     title: '',
     font: {
@@ -53,7 +59,7 @@ export default class MetricsWidget extends Vue {
     plot_bgcolor: '#1b1d21',
   };
 
-  config = {
+  cfg = {
     displaylogo: false,
   };
 
@@ -111,7 +117,7 @@ export default class MetricsWidget extends Vue {
   <Plotly
     :data="plotlyData.data"
     :layout="plotlyData.layout"
-    :config="config"
+    :config="cfg"
     :onRelayout="relayout"
     fit
   />

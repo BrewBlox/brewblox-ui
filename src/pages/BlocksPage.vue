@@ -3,7 +3,6 @@ import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
 
 import GridContainer from '@/components/Grid/GridContainer.vue';
-import WidgetModal from '@/components/WidgetModal/WidgetModal.vue';
 
 import byOrder from '@/helpers/byOrder';
 
@@ -22,7 +21,6 @@ interface VueOrdered extends Vue {
 @Component({
   components: {
     GridContainer,
-    WidgetModal,
   },
 })
 /* eslint-enable */

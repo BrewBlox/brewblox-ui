@@ -1,10 +1,13 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 
-import Widget from '../Widget';
+import Widget from '@/components/Widget.ts';
 
 import { getMetric, getAvailableMeasurements, subscribeToEvents } from './fetchMetrics';
 import { getMetricsFromPath } from './measurementHelpers';
+
+import Metrics from './Metrics.vue';
+import { updateDashboardItemConfig } from '@/store/dashboards/actions';
 
 const sortByOrder = (a: MetricsOptions, b: MetricsOptions) => a.order - b.order;
 
@@ -55,7 +58,6 @@ class MetricsWidget extends Widget {
 
   toggleEditing() {
     this.nameInput = this.name;
-
     this.editing = true;
   }
 
@@ -64,7 +66,6 @@ class MetricsWidget extends Widget {
       ...this.$props.config,
       name: this.nameInput,
     });
-
     this.editing = false;
   }
 
@@ -135,11 +136,13 @@ class MetricsWidget extends Widget {
 
     const measures = this.getMeasures();
 
-    this.eventSources = Object.keys(measures)
-      .reduce((acc, measure) => ({
+    this.eventSources = Object.keys(measures).reduce(
+      (acc, measure) => ({
         ...acc,
         [measure]: subscribeToEvents(measure, measures[measure], this.updateMetrics),
-      }), {});
+      }),
+      {},
+    );
   }
 
   closeSSEConnections() {
@@ -152,12 +155,15 @@ class MetricsWidget extends Widget {
   }
 
   metricPaths(path: string) {
-    return path.split('/').reduce((acc, item, currentIndex) => (
-      [
-        ...acc,
-        currentIndex === 0 ? item : [acc[currentIndex], item].join('/'),
-      ]
-    ), ['']);
+    return path.split('/').reduce(
+      (acc, item, currentIndex) => (
+        [
+          ...acc,
+          currentIndex === 0 ? item : [acc[currentIndex], item].join('/'),
+        ]
+      ),
+      [''],
+    );
   }
 
   onMetricPathChange(metric: MetricsOptions, pathIndex: number, value: string) {
@@ -165,10 +171,10 @@ class MetricsWidget extends Widget {
       [this.metricPaths(metric.path)[pathIndex], value].join('/') :
       value;
 
-    updateDashboardItemOptions(this.$store, {
-      id: this.dashboardItem.id,
-      options: {
-        ...this.options,
+    updateDashboardItemConfig(this.$store, {
+      id: this.$props.id,
+      config: {
+        ...this.$props.config,
         metrics: this.metrics.map((item) => {
           if (item.id === metric.id) {
             return {
@@ -186,10 +192,10 @@ class MetricsWidget extends Widget {
   }
 
   removeMetric(metricId: string) {
-    updateDashboardItemOptions(this.$store, {
-      id: this.dashboardItem.id,
-      options: {
-        ...this.options,
+    updateDashboardItemConfig(this.$store, {
+      id: this.$props.id,
+      config: {
+        ...this.$props.config,
         metrics: [...this.metrics.filter(item => item.id !== metricId)]
           .sort(sortByOrder)
           .map((item, index) => ({
@@ -204,10 +210,10 @@ class MetricsWidget extends Widget {
   }
 
   addNewMetric() {
-    updateDashboardItemOptions(this.$store, {
-      id: this.dashboardItem.id,
-      options: {
-        ...this.options,
+    updateDashboardItemConfig(this.$store, {
+      id: this.$props.id,
+      config: {
+        ...this.$props.config,
         metrics: [
           ...this.metrics.map((item: MetricsOptions, index: number) =>
             ({ ...item, order: index + 1 })),
@@ -231,12 +237,12 @@ class MetricsWidget extends Widget {
 
   async fetchAvailableMeasurements() {
     this.measurementsPaths = await getAvailableMeasurements();
-
     this.fetchingAvailableMeasurements = false;
   }
 
   mounted() {
-    this.fetchAvailableMeasurements().then(() => this.fetchMetrics());
+    this.fetchAvailableMeasurements()
+      .then(() => this.fetchMetrics());
   }
 
   destroyed() {
@@ -340,7 +346,7 @@ export default MetricsWidget;
 </template>
 
 <style lang="stylus">
-@import '../../../css/app.styl';
+@import '../../css/app.styl';
 
 .dashboard-item.metrics-container {
   background: transparent;
