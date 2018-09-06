@@ -4,6 +4,7 @@ import Component from 'vue-class-component';
 
 import GridContainer from '@/components/Grid/GridContainer.vue';
 import WidgetModal from '@/components/WidgetModal/WidgetModal.vue';
+import InvalidWidget from '@/components/WidgetGenerics/InvalidWidget.vue';
 
 import byOrder from '@/helpers/byOrder';
 
@@ -20,7 +21,7 @@ import {
 } from '@/store/dashboards/actions';
 import { Block } from '@/store/blocks/state';
 
-import { widgetByType } from '@/features/feature-by-type';
+import { widgetByType, validatorByType } from '@/features/feature-by-type';
 
 
 interface VueOrdered extends Vue {
@@ -59,13 +60,14 @@ export default class DashboardPage extends Vue {
     return isFetching(this.$store) || fetchingBlocks(this.$store);
   }
 
-  widgetComponent(type: string): VueConstructor {
-    return widgetByType(type);
+  widgetComponent(type: string, config: any): VueConstructor {
+    return validatorByType(type)(this.$store, config)
+      ? widgetByType(type)
+      : InvalidWidget;
   }
 
   toggleEditable() {
     this.title = this.dashboard.title;
-
     this.editable = true;
   }
 
@@ -180,7 +182,7 @@ export default class DashboardPage extends Vue {
         <component
           class="dashboard-item"
           v-for="item in items"
-          :is="widgetComponent(item.widget)"
+          :is="widgetComponent(item.widget, item.config)"
           :key="item.id"
           :id="item.id"
           :cols="item.cols"

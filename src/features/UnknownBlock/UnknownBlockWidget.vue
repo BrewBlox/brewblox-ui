@@ -4,8 +4,6 @@ import Component from 'vue-class-component';
 import BlockWidget from '@/components/BlockWidget/BlockWidget';
 import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
 
-import { getById } from './getters';
-
 /* eslint-disable indent */
 @Component({
   components: {
@@ -13,14 +11,7 @@ import { getById } from './getters';
   },
 })
 /* eslint-enable */
-export default class InactiveObjectWidget extends BlockWidget {
-  refreshState() {
-    return undefined;
-  }
-
-  get block() {
-    return getById(this.$store, this.blockId);
-  }
+export default class UnknownBlockWidget extends BlockWidget {
 }
 </script>
 
@@ -34,7 +25,7 @@ export default class InactiveObjectWidget extends BlockWidget {
 
     <q-card>
       <q-item>
-        <q-list-header>This block is not in any active profile</q-list-header>
+        <pre>{{ block.data }}</pre>
       </q-item>
     </q-card>
 

@@ -1,0 +1,44 @@
+<script lang="ts">
+import Vue from 'vue';
+import Component from 'vue-class-component';
+
+import { Block } from '@/store/blocks/state';
+import BlockWidget from '@/components/BlockWidget/BlockWidget.ts';
+
+/* eslint-disable indent */
+@Component({
+  props: {
+    id: {
+      type: String,
+      default: () => { throw new Error('Provide item ID'); },
+    },
+    config: {
+      type: Object,
+      default: () => { throw new Error('Provide block config'); },
+    },
+  },
+})
+/* eslint-enable */
+export default class InvalidWidget extends Vue { }
+</script>
+
+<template>
+  <q-card>
+    <q-toolbar color="negative">
+      <q-toolbar-title>
+        {{ $props.id }}
+      </q-toolbar-title>
+      <q-item-tile icon="error" />
+    </q-toolbar>
+    <q-item>
+      <pre>{{ $props.config }}</pre>
+    </q-item>
+  </q-card>
+</template>
+
+<style scoped>
+.q-item {
+  display: grid;
+  grid-gap: 10px;
+}
+</style>

@@ -1,7 +1,7 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 
-import BlockWidget from '@/components/BlockWidget';
+import BlockWidget from '@/components/BlockWidget/BlockWidget';
 import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
 
 import { getById } from './getters';

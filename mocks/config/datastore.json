@@ -78,6 +78,36 @@
           }
         ]
       }
+    },
+    {
+      "id": "item-invalid",
+      "order": 1,
+      "cols": 3,
+      "rows": 3,
+      "widget": "SensorSetPointPair",
+      "config": {
+        "blockId": "spark/BLARGH"
+      }
+    },
+    {
+      "id": "item-invalid-unknown",
+      "order": 2,
+      "cols": 3,
+      "rows": 3,
+      "widget": "Warbl",
+      "config": {
+        "blockId": "spark/BLORP"
+      }
+    },
+    {
+      "id": "item-unk-setpoint",
+      "order": 2,
+      "cols": 3,
+      "rows": 3,
+      "widget": "UnknownType",
+      "config": {
+        "blockId": "spark/setpoint-1"
+      }
     }
   ],
   "dashboards": [
@@ -97,7 +127,19 @@
       "id": "process-view",
       "title": "ProcessView Dashboard",
       "order": 3,
-      "items": ["item-1"]
+      "items": [
+        "item-1"
+      ]
+    },
+    {
+      "id": "derp",
+      "title": "Derp Dashboard",
+      "order": 4,
+      "items": [
+        "item-invalid",
+        "item-invalid-unknown",
+        "item-unk-setpoint"
+      ]
     }
   ],
   "services": [

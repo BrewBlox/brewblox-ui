@@ -3,7 +3,7 @@ import Component from 'vue-class-component';
 
 import { saveBlock } from '@/store/blocks/actions';
 
-import BlockWidget from '@/components/BlockWidget';
+import BlockWidget from '@/components/BlockWidget/BlockWidget.ts';
 import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
 
 import { SetPointSimpleBlock } from './state';

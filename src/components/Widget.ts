@@ -6,7 +6,7 @@ import Component from 'vue-class-component';
   props: {
     id: {
       type: String,
-      default: () => { throw new Error('Provie item ID'); },
+      default: () => { throw new Error('Provide item ID'); },
     },
     config: {
       type: Object,

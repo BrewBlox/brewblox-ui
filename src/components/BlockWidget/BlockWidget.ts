@@ -6,7 +6,7 @@ import { blockById } from '@/store/blocks/getters';
 import { fetchBlock } from '@/store/blocks/actions';
 import { Block } from '@/store/blocks/state';
 
-import Widget from './Widget';
+import Widget from '@/components/Widget';
 
 @Component
 export default class BlockWidget extends Widget {

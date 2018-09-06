@@ -3,7 +3,7 @@ import Component from 'vue-class-component';
 
 import { saveBlock } from '@/store/blocks/actions';
 import { updateBlockState } from '@/store/blocks/mutations';
-import BlockWidget from '@/components/BlockWidget';
+import BlockWidget from '@/components/BlockWidget/BlockWidget';
 import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
 
 import { getAll as getAllSensorSetPointPairs } from '../SensorSetPointPair/getters';

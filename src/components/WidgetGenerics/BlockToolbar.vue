@@ -4,8 +4,6 @@ import Component from 'vue-class-component';
 
 import { displayNameByType } from '@/features/feature-by-type';
 
-import BlockWidget from '@/components/BlockWidget';
-
 /* eslint-disable indent */
 @Component({
   props: {
