@@ -4,12 +4,12 @@ import Component from 'vue-class-component';
 
 import GridContainer from '@/components/Grid/GridContainer.vue';
 import WidgetModal from '@/components/WidgetModal/WidgetModal.vue';
+import InvalidWidget from '@/components/WidgetGenerics/InvalidWidget.vue';
 
 import byOrder from '@/helpers/byOrder';
 
 import { DashboardItem } from '@/store/dashboards/state';
 import { isFetching, dashboardById, dashboardItemById } from '@/store/dashboards/getters';
-import { isFetching as fetchingBlocks } from '@/store/blocks/getters';
 import {
   updateDashboard,
   updateDashboardItemOrder,
@@ -20,7 +20,7 @@ import {
 } from '@/store/dashboards/actions';
 import { Block } from '@/store/blocks/state';
 
-import { widgetByType } from '@/features/feature-by-type';
+import { widgetByType, validatorByType } from '@/features/feature-by-type';
 
 
 interface VueOrdered extends Vue {
@@ -55,17 +55,32 @@ export default class DashboardPage extends Vue {
     ].sort(byOrder);
   }
 
-  get isFetching() {
-    return isFetching(this.$store) || fetchingBlocks(this.$store);
+  get validatedItems() {
+    return this.items.map((item) => {
+      try {
+        if (!validatorByType(item.widget)(this.$store, item.config)) {
+          throw new Error(`${item.widget} validation failed`);
+        }
+        return {
+          ...item,
+          component: widgetByType(item.widget),
+        };
+      } catch (e) {
+        return {
+          ...item,
+          component: InvalidWidget,
+          error: e.toString(),
+        };
+      }
+    });
   }
 
-  widgetComponent(type: string): VueConstructor {
-    return widgetByType(type);
+  get isFetching() {
+    return isFetching(this.$store);
   }
 
   toggleEditable() {
     this.title = this.dashboard.title;
-
     this.editable = true;
   }
 
@@ -179,8 +194,9 @@ export default class DashboardPage extends Vue {
       >
         <component
           class="dashboard-item"
-          v-for="item in items"
-          :is="widgetComponent(item.widget)"
+          v-for="item in validatedItems"
+          :is="item.component"
+          :error="item.error"
           :key="item.id"
           :id="item.id"
           :cols="item.cols"

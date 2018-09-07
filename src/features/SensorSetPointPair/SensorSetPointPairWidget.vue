@@ -1,7 +1,7 @@
 <script lang="ts">
-import Component, { mixins } from 'vue-class-component';
+import Component from 'vue-class-component';
 
-import BlockWidget from '@/components/BlockWidget';
+import BlockWidget from '@/components/BlockWidget/BlockWidget.ts';
 import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
 
 import { OneWireTempSensorBlock } from '../OneWireTempSensor/state';
@@ -21,7 +21,7 @@ import { getById } from './getters';
   },
 })
 /* eslint-enable */
-export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
+export default class SensorSetPointPairWidget extends BlockWidget {
   inputMapping = {
     setpoint: { path: 'setPoint.settings.value', default: 0 },
   };
@@ -32,13 +32,11 @@ export default class SensorSetPointPairWidget extends mixins(BlockWidget) {
 
   get sensor(): OneWireTempSensorBlock {
     const { data, serviceId } = this.block;
-
     return getSensorById(this.$store, `${serviceId}/${data.sensor}`);
   }
 
   get setPoint(): SetPointSimpleBlock {
     const { data, serviceId } = this.block;
-
     return getSetPointById(this.$store, `${serviceId}/${data.setpoint}`);
   }
 }

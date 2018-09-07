@@ -8,8 +8,8 @@ import Component from 'vue-class-component';
     onCancel: {
       type: Function,
       default: () => { },
-    }
-  }
+    },
+  },
 })
 /* eslint-enable */
 export default class DefaultWizard extends Vue { }
