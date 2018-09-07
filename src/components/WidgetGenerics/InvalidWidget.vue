@@ -16,6 +16,10 @@ import BlockWidget from '@/components/BlockWidget/BlockWidget.ts';
       type: Object,
       default: () => { throw new Error('Provide block config'); },
     },
+    error: {
+      type: String,
+      default: () => 'Unspecified error',
+    },
   },
 })
 /* eslint-enable */
@@ -31,7 +35,9 @@ export default class InvalidWidget extends Vue { }
       <q-item-tile icon="error" />
     </q-toolbar>
     <q-item>
-      <pre>{{ $props.config }}</pre>
+      <q-item-tile label>
+        {{ $props.error }}
+      </q-item-tile>
     </q-item>
   </q-card>
 </template>
