@@ -115,7 +115,10 @@
       "cols": 10,
       "rows": 5,
       "widget": "Metrics",
-      "config": {}
+      "config": {
+        "name": "Metrics View",
+        "metrics": []
+      }
     }
   ],
   "dashboards": [

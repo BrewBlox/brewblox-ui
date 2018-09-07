@@ -7,19 +7,10 @@ import { getMetric, getAvailableMeasurements, subscribeToEvents } from './fetchM
 import { getMetricsFromPath } from './measurementHelpers';
 
 import Metrics from './Metrics.vue';
-import { updateDashboardItemConfig } from '@/store/dashboards/actions';
+
+import { MetricsOptions, MeasuresType } from './state';
 
 const sortByOrder = (a: MetricsOptions, b: MetricsOptions) => a.order - b.order;
-
-type MetricsOptions = {
-  id: string;
-  order: number;
-  path: string;
-};
-
-type MeasuresType = {
-  [key: string]: string[];
-};
 
 /* eslint-disable */
 @Component({
@@ -72,30 +63,21 @@ class MetricsWidget extends Widget {
   splitMeasurementKey(path: string): { measure: string, key: string } | null {
     const result = path.match(/^([A-Za-z0-9_-]+)\/(.+)$/);
 
-    if (!result) {
-      return null;
-    }
-
-    return {
-      measure: result[1],
-      key: result[2],
-    };
+    return result
+      ? { measure: result[1], key: result[2] }
+      : null;
   }
 
   getMeasures(): MeasuresType {
     const reducer = (acc: MeasuresType, metric: any) => {
       const measurementKey = this.splitMeasurementKey(metric.path);
-
       if (!measurementKey) {
         return acc;
       }
-
       if (!acc[measurementKey.measure]) {
         acc[measurementKey.measure] = [];
       }
-
       acc[measurementKey.measure].push(measurementKey.key);
-
       return acc;
     };
 
@@ -107,22 +89,22 @@ class MetricsWidget extends Widget {
   async fetchMetrics() {
     this.cancelFetch();
 
-    try {
-      const measures = this.getMeasures();
+    // try {
+    const measures = this.getMeasures();
 
-      const metricData = await Promise.all(Object.keys(measures)
-        .map(measure => getMetric(
-          measure,
-          measures[measure],
-          { duration: this.metricDuration },
-        )));
+    const metricData = await Promise.all(Object.keys(measures)
+      .map(measure => getMetric(
+        measure,
+        measures[measure],
+        { duration: this.metricDuration },
+      )));
 
-      this.updateMetrics(metricData.reduce((acc, metrics) => [...acc, ...metrics], []));
+    this.updateMetrics(metricData.reduce((acc, metrics) => [...acc, ...metrics], []));
 
-      this.subscribeSSE();
-    } catch (e) {
-      this.error = e;
-    }
+    this.subscribeSSE();
+    // } catch (e) {
+    //   this.error = e;
+    // }
 
     this.fetching = false;
   }
@@ -167,64 +149,55 @@ class MetricsWidget extends Widget {
   }
 
   onMetricPathChange(metric: MetricsOptions, pathIndex: number, value: string) {
-    const newPath = pathIndex !== 0 ?
-      [this.metricPaths(metric.path)[pathIndex], value].join('/') :
-      value;
+    const newPath = (pathIndex !== 0)
+      ? [this.metricPaths(metric.path)[pathIndex], value].join('/')
+      : value;
 
-    updateDashboardItemConfig(this.$store, {
-      id: this.$props.id,
-      config: {
-        ...this.$props.config,
-        metrics: this.metrics.map((item) => {
-          if (item.id === metric.id) {
-            return {
-              ...item,
-              path: newPath,
-            };
-          }
-
-          return item;
+    const cfg = {
+      ...this.$props.config,
+      metrics: this.metrics.map(
+        (item) => {
+          item.id === metric.id
+            ? { ...item, path: newPath }
+            : item;
         }),
-      },
-    });
-
+    };
+    this.$props.onConfigChange(this.$props.id, cfg);
     this.fetchMetrics();
   }
 
   removeMetric(metricId: string) {
-    updateDashboardItemConfig(this.$store, {
-      id: this.$props.id,
-      config: {
-        ...this.$props.config,
-        metrics: [...this.metrics.filter(item => item.id !== metricId)]
-          .sort(sortByOrder)
-          .map((item, index) => ({
-            id: `metric-${index + 1}`,
-            order: index + 1,
-            path: item.path,
-          })),
-      },
-    });
-
+    const cfg = {
+      ...this.$props.config,
+      metrics: [...this.metrics.filter(item => item.id !== metricId)]
+        .sort(sortByOrder)
+        .map((item, index) => ({
+          id: `metric-${index + 1}`,
+          order: index + 1,
+          path: item.path,
+        })),
+    };
+    this.$props.onConfigChange(this.$props.id, cfg);
     this.fetchMetrics();
   }
 
   addNewMetric() {
-    updateDashboardItemConfig(this.$store, {
-      id: this.$props.id,
-      config: {
-        ...this.$props.config,
-        metrics: [
-          ...this.metrics.map((item: MetricsOptions, index: number) =>
+    const cfg = {
+      ...this.$props.config,
+      metrics: [
+        // existing
+        ...this.metrics.map(
+          (item: MetricsOptions, index: number) =>
             ({ ...item, order: index + 1 })),
-          {
-            id: `metric-${this.metrics.length + 1}`,
-            order: this.metrics.length,
-            path: '',
-          },
-        ],
-      },
-    });
+        // new
+        {
+          id: `metric-${this.metrics.length + 1}`,
+          order: this.metrics.length,
+          path: '',
+        },
+      ],
+    };
+    this.$props.onConfigChange(this.$props.id, cfg);
   }
 
   cancelFetch() {

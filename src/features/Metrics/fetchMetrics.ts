@@ -5,6 +5,7 @@ import { post } from '@/helpers/fetch';
 import { convertToFlatPaths } from './measurementHelpers';
 
 const historyService = process.env.VUE_APP_HISTORY_URI;
+const api = process.env.VUE_APP_API_URI;
 
 const metricsCache: { [key: string]: number[][]; } = {};
 
@@ -13,21 +14,7 @@ function toMicroSeconds(nanoseconds: number): number {
 }
 
 function fetchData(endpoint: string, payload: any = {}): Promise<any> {
-  return post(`${historyService}${endpoint}`, payload);
-
-  // return window.fetch(
-  //   `${historyService}${endpoint}`,
-  //   {
-  //     method: 'POST',
-  //     body: JSON.stringify({
-  //       ...payload,
-  //     }),
-  //     headers: new Headers({
-  //       'Content-Type': 'application/json',
-  //       Accept: 'application/json',
-  //     }),
-  //   },
-  // );
+  return post(`${historyService}${endpoint}`, { ...payload });
 }
 
 function metricsKey(serviceId: string, keys: string[]) {
@@ -67,7 +54,6 @@ function addValuesToCache(serviceId: string, keys: string[], values: number[][])
 
 export function getAvailableMeasurements(): Promise<string[]> {
   return fetchData('/query/objects')
-    // .then(response => response.json())
     .then(convertToFlatPaths);
 }
 
@@ -100,12 +86,10 @@ export function getMetric(
   }
 
   return fetchData('/query/values', payload)
-    // .then(response => response.json())
     .then((response) => {
       if (!response.values) {
         throw new Error('No results found');
       }
-
       const values = addValuesToCache(serviceId, keys, response.values);
       return toPlotlyData(values, keys);
     });
@@ -122,7 +106,7 @@ export function subscribeToEvents(
   };
 
   const eventSource =
-    new EventSource(`${historyService}/sse/values?${queryString.stringify(options)}`);
+    new EventSource(`${api}${historyService}/sse/values?${queryString.stringify(options)}`);
 
   eventSource.onmessage = (event: MessageEvent) => {
     const data = JSON.parse(event.data);
