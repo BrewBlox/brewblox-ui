@@ -2,18 +2,12 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
-import { map } from 'lodash';
 
-import { Block } from '@/store/blocks/state';
 import { allBlocks, blockById } from '@/store/blocks/getters';
 import { dashboardItemById } from '@/store/dashboards/getters';
 
-import { blocksByWidgetType, widgetDescriptions, widgetWizards } from './widget-types';
-import { allTypes, displayNameByType, wizardByType } from '@/features/feature-by-type';
-
 /* eslint-disable indent */
 @Component({
-  components: widgetWizards,
   props: {
     isOpen: {
       type: Boolean,
@@ -27,10 +21,9 @@ import { allTypes, displayNameByType, wizardByType } from '@/features/feature-by
 })
 /* eslint-enable */
 export default class ExistingBlockWizard extends Vue {
-  blockId: string | null = null;
-  widgetId: string | null = null;
-  currentStep: string | null = null;
-  failIdReason: string = '';
+  blockId: string = '';
+  widgetId: string = '';
+  currentStep: string = '';
 
   get blockOptions() {
     return allBlocks(this.$store)
@@ -40,21 +33,25 @@ export default class ExistingBlockWizard extends Vue {
       }));
   }
 
-  widgetIdAvailable() {
-    return this.widgetId && !dashboardItemById(this.$store, this.widgetId as string);
+  blockIdOk() {
+    return !!this.blockId;
+  }
+
+  widgetIdOk() {
+    return !!this.widgetId && !dashboardItemById(this.$store, this.widgetId as string);
   }
 
   onConfirm() {
-    const { type } = blockById(this.$store, this.blockId as string);
+    const { type } = blockById(this.$store, this.blockId);
     this.$props.onAddWidget(this.widgetId, type, { blockId: this.blockId });
   }
 
   @Watch('isOpen', { immediate: true, deep: true })
   onOpenedChange() {
     if (!this.$props.isOpen) {
-      this.currentStep = 'select_block';
-      this.blockId = null;
-      this.widgetId = null;
+      this.currentStep = '';
+      this.blockId = '';
+      this.widgetId = '';
     }
   }
 }
@@ -78,6 +75,7 @@ export default class ExistingBlockWizard extends Vue {
 
     <div class="layout-padding">
       <transition name="slide">
+
         <q-stepper
           ref="stepper"
           v-model="currentStep"
@@ -97,7 +95,7 @@ export default class ExistingBlockWizard extends Vue {
               <q-input
                 v-model="widgetId"
                 placeholder="Enter a widget ID"
-                :error="!widgetIdAvailable()"
+                :error="!widgetIdOk()"
               />
             </q-field>
 
@@ -120,7 +118,7 @@ export default class ExistingBlockWizard extends Vue {
                 color="primary"
                 flat
                 label="Add Widget"
-                :disabled="!blockId || !widgetIdAvailable()"
+                :disabled="!blockIdOk() || !widgetIdOk()"
                 @click="onConfirm"
               />
             </q-stepper-navigation>

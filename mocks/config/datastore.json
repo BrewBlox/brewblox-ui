@@ -1,7 +1,7 @@
 {
   "dashboard-items": [
     {
-      "id": "item-1",
+      "id": "item-process-view",
       "order": 1,
       "cols": 3,
       "rows": 3,
@@ -126,22 +126,22 @@
       "id": "dashboard-home",
       "title": "Home Dashboard",
       "order": 1,
-      "items": [
-        "item-metrics"
-      ]
+      "items": []
     },
     {
       "id": "metrics",
       "title": "Metrics Dashboard",
       "order": 2,
-      "items": []
+      "items": [
+        "item-metrics"
+      ]
     },
     {
       "id": "process-view",
       "title": "ProcessView Dashboard",
       "order": 3,
       "items": [
-        "item-1"
+        "item-process-view"
       ]
     },
     {
