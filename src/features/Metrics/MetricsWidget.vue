@@ -209,7 +209,7 @@ export default class MetricsWidget extends Widget {
   }
 
   updateMetrics(data: PlotlyData[]) {
-    this.$set(this.plotly, 'data', data);
+    this.$set(this.plotly, 'data', data || []);
   }
 
   async fetchAvailableMeasurements() {
@@ -265,7 +265,7 @@ export default class MetricsWidget extends Widget {
     </q-toolbar>
     <MetricsDisplay
       v-if="error === null"
-      :plotlyData="plotly"
+      :inputOptions="plotly"
       :initialRange="initialRange"
     />
     <div v-if="error" class="alert-container">

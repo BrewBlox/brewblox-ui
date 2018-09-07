@@ -11,7 +11,7 @@ import Plotly from './plotly';
 /* eslint-disable indent */
 @Component({
   props: {
-    inputData: {
+    inputOptions: {
       type: Object, // PlotlyOptions
       default: () => { throw new Error('Provide plotly options'); },
     },
@@ -67,7 +67,7 @@ export default class Metrics extends Vue {
 
   get lastTimeStamp(): number {
     return Math
-      .max(...this.$props.inputData.data
+      .max(...this.$props.inputOptions.data
         .map((line: { x: number[] }) => Math.max(...line.x)));
   }
 
@@ -91,14 +91,14 @@ export default class Metrics extends Vue {
     }
   }
 
-  get plotlyData() {
+  get plotlyOptions() {
     const to = this.rangeTo === 0 ? this.lastTimeStamp : this.rangeTo;
 
     return {
-      ...this.$props.inputData,
+      ...this.$props.inputOptions,
       layout: merge(
         this.defaultLayout,
-        this.$props.inputData.layout,
+        this.$props.inputOptions.layout,
         {
           xaxis: {
             range: [to - this.range, to],
@@ -112,8 +112,8 @@ export default class Metrics extends Vue {
 
 <template>
   <Plotly
-    :data="plotlyData.data"
-    :layout="plotlyData.layout"
+    :data="plotlyOptions.data"
+    :layout="plotlyOptions.layout"
     :config="cfg"
     :onRelayout="relayout"
     fit
