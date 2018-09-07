@@ -13,11 +13,11 @@ env:
     - GITHUB_REPO=BrewBlox/brewblox-ui
 
 install:
-  - npm install
+  - npm ci
 
 script:
-  - npm run build
   - npm run lint
+  - npm run build
 
 before_deploy:
   cp -r dist/ docker/;
