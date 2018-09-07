@@ -51,7 +51,7 @@ const mutations = {
     state: DashboardState,
     { id, config }: { id: string, config: any },
   ) {
-    updateDashboardItem(state, id, { config: { ...config } });
+    updateDashboardItem(state, id, { config });
   },
 
 };

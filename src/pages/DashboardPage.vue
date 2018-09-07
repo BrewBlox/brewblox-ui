@@ -114,7 +114,7 @@ export default class DashboardPage extends Vue {
     updateDashboardItemSize(this.$store, { id, cols, rows });
   }
 
-  async onAddWidget(type: WidgetType, blockId: string) {
+  async onAddWidget(type: string, blockId: string) {
     const dashboardItem = await createDashboardItem(this.$store, {
       id: `item-${blockId}`,
       order: this.items.length + 1,

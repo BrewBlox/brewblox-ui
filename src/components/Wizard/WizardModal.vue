@@ -26,7 +26,7 @@ import { allTypes, displayNameByType, wizardByType } from '@/features/feature-by
 /* eslint-enable */
 export default class WizardModal extends Vue {
   currentStep: string = 'widgets';
-  widgetType: WidgetType | null = null;
+  widgetType: string | null = null;
   blockId: string | null = null;
   needsSetup: boolean = false;
 
@@ -41,7 +41,7 @@ export default class WizardModal extends Vue {
     if (!this.widgetType) {
       return [];
     }
-    return blocksByWidgetType(this.$store, this.widgetType as WidgetType);
+    return blocksByWidgetType(this.$store, this.widgetType);
   }
 
   get blocksForWidget() {

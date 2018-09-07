@@ -6,35 +6,38 @@ import Widget from '@/components/Widget.ts';
 import { getMetric, getAvailableMeasurements, subscribeToEvents } from './fetchMetrics';
 import { getMetricsFromPath } from './measurementHelpers';
 
-import Metrics from './Metrics.vue';
+import MetricsDisplay from './MetricsDisplay.vue';
 
-import { MetricsOptions, MeasuresType } from './state';
+import { MetricsOptions, MeasuresType, PlotlyData, PlotlyOptions } from './state';
 
 const sortByOrder = (a: MetricsOptions, b: MetricsOptions) => a.order - b.order;
 
 /* eslint-disable */
 @Component({
   components: {
-    Metrics,
+    MetricsDisplay,
   },
 })
 /* eslint-enable */
-class MetricsWidget extends Widget {
-  error: Error | null = null;
+export default class MetricsWidget extends Widget {
   fetching: boolean = true;
-  fetchingAvailableMeasurements: boolean = true;
-  measurementsPaths: string[] = [];
   editing: boolean = false;
+  fetchingAvailableMeasurements: boolean = true;
+  error: Error | null = null;
+
+  initialRange = 5 * 60 * 1000;
   timeout: number = 0;
   metricDuration: string = '30m';
-  initialRange = 5 * 60 * 1000;
+
+  nameInput: string = '';
+
+  measurementsPaths: string[] = [];
   plotly: PlotlyOptions = {
     data: [],
     layout: {
       title: '',
     },
   };
-  nameInput: string = '';
   eventSources: {
     [key: string]: EventSource;
   } = {};
@@ -53,10 +56,13 @@ class MetricsWidget extends Widget {
   }
 
   saveChanges() {
-    this.$props.onConfigChange({
-      ...this.$props.config,
-      name: this.nameInput,
-    });
+    this.$props.onConfigChange(
+      this.$props.id,
+      {
+        ...this.$props.config,
+        name: this.nameInput,
+      },
+    );
     this.editing = false;
   }
 
@@ -89,22 +95,22 @@ class MetricsWidget extends Widget {
   async fetchMetrics() {
     this.cancelFetch();
 
-    // try {
-    const measures = this.getMeasures();
+    try {
+      const measures = this.getMeasures();
 
-    const metricData = await Promise.all(Object.keys(measures)
-      .map(measure => getMetric(
-        measure,
-        measures[measure],
-        { duration: this.metricDuration },
-      )));
+      const metricData = await Promise.all(Object.keys(measures)
+        .map(measure => getMetric(
+          measure,
+          measures[measure],
+          { duration: this.metricDuration },
+        )));
 
-    this.updateMetrics(metricData.reduce((acc, metrics) => [...acc, ...metrics], []));
+      this.updateMetrics(metricData.reduce((acc, metrics) => [...acc, ...metrics], []));
 
-    this.subscribeSSE();
-    // } catch (e) {
-    //   this.error = e;
-    // }
+      this.subscribeSSE();
+    } catch (e) {
+      this.error = e;
+    }
 
     this.fetching = false;
   }
@@ -157,7 +163,7 @@ class MetricsWidget extends Widget {
       ...this.$props.config,
       metrics: this.metrics.map(
         (item) => {
-          item.id === metric.id
+          return item.id === metric.id
             ? { ...item, path: newPath }
             : item;
         }),
@@ -220,10 +226,9 @@ class MetricsWidget extends Widget {
 
   destroyed() {
     this.cancelFetch();
+    this.closeSSEConnections();
   }
 }
-
-export default MetricsWidget;
 </script>
 
 <template>
@@ -260,9 +265,9 @@ export default MetricsWidget;
         :label="editing ? 'Save changes' : 'Configure graph'"
       />
     </q-toolbar>
-    <Metrics
+    <MetricsDisplay
       v-if="error === null"
-      :data="plotly"
+      :plotlyData="plotly"
       :initialRange="initialRange"
     />
     <div v-if="error" class="alert-container">

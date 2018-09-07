@@ -5,12 +5,13 @@ import createPlotlyComponent from 'vue-plotly.js/factory';
 import { merge } from 'lodash';
 import { differenceInMilliseconds, getTime } from 'date-fns';
 
+import { PlotlyData, PlotlyOptions } from './state';
 import Plotly from './plotly';
 
 /* eslint-disable indent */
 @Component({
   props: {
-    data: {
+    inputData: {
       type: Object,
       default: () => ({
         data: [],
@@ -19,10 +20,6 @@ import Plotly from './plotly';
     initialRange: {
       type: Number,
       default: 5 * 60 * 1000,
-    },
-    config: {
-      type: Object,
-      default: () => ({}),
     },
   },
   components: {
@@ -71,7 +68,9 @@ export default class Metrics extends Vue {
   }
 
   get lastTimeStamp(): number {
-    return Math.max(...this.$props.data.data.map((line: { x: number[] }) => Math.max(...line.x)));
+    return Math.max(
+      ...this.$props.inputData.data
+      .map((line: { x: number[] }) => Math.max(...line.x)));
   }
 
   relayout(changes: { 'xaxis.range'?: string[] }) {
@@ -98,10 +97,10 @@ export default class Metrics extends Vue {
     const to = this.rangeTo === 0 ? this.lastTimeStamp : this.rangeTo;
 
     return {
-      ...this.$props.data,
+      ...this.$props.inputData,
       layout: merge(
         this.defaultLayout,
-        this.$props.data.layout,
+        this.$props.inputData.layout,
         {
           xaxis: {
             range: [to - this.range, to],

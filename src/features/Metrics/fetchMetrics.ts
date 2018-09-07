@@ -3,6 +3,7 @@ import queryString from 'query-string';
 import { post } from '@/helpers/fetch';
 
 import { convertToFlatPaths } from './measurementHelpers';
+import { PlotlyData } from './state';
 
 const historyService = process.env.VUE_APP_HISTORY_URI;
 const api = process.env.VUE_APP_API_URI;
