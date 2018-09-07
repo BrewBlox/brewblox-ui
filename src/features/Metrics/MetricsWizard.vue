@@ -84,13 +84,14 @@ export default Metrics;
     ref="stepper"
     v-model="currentStep"
   >
+
     <q-step
       default
       name="service"
       title="Which controller service?"
     >
       <q-field
-        label="Choose controller service to create sensor set point pair on"
+        label="Choose your device service"
         orientation="vertical"
         dark
         icon="settings system daydream"
@@ -104,6 +105,7 @@ export default Metrics;
         />
       </q-field>
     </q-step>
+
     <q-step
       default
       name="choose-block"
@@ -121,6 +123,7 @@ export default Metrics;
         />
       </q-field>
     </q-step>
+
     <q-step
       default
       name="create"

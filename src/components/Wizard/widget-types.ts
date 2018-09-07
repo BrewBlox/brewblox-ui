@@ -18,7 +18,7 @@ function getBlocksFromServices(
     .reduce((acc, sensors) => [...acc, ...sensors], []);
 }
 
-export function blocksByWidgetType(store: RootStore, type: WidgetType): Block[] {
+export function blocksByWidgetType(store: RootStore, type: string): Block[] {
   const services = deviceServices(store);
   return getBlocksFromServices(services, store, type);
 }

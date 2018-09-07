@@ -1,46 +1,43 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 
-import Widget from '../Widget';
+import Widget from '@/components/Widget.ts';
 
 import { getMetric, getAvailableMeasurements, subscribeToEvents } from './fetchMetrics';
 import { getMetricsFromPath } from './measurementHelpers';
 
+import MetricsDisplay from './MetricsDisplay.vue';
+
+import { MetricsOptions, MeasuresType, PlotlyData, PlotlyOptions } from './state';
+
 const sortByOrder = (a: MetricsOptions, b: MetricsOptions) => a.order - b.order;
-
-type MetricsOptions = {
-  id: string;
-  order: number;
-  path: string;
-};
-
-type MeasuresType = {
-  [key: string]: string[];
-};
 
 /* eslint-disable */
 @Component({
   components: {
-    Metrics,
+    MetricsDisplay,
   },
 })
 /* eslint-enable */
-class MetricsWidget extends Widget {
-  error: Error | null = null;
+export default class MetricsWidget extends Widget {
   fetching: boolean = true;
-  fetchingAvailableMeasurements: boolean = true;
-  measurementsPaths: string[] = [];
   editing: boolean = false;
+  fetchingAvailableMeasurements: boolean = true;
+  error: Error | null = null;
+
+  initialRange = 5 * 60 * 1000;
   timeout: number = 0;
   metricDuration: string = '30m';
-  initialRange = 5 * 60 * 1000;
+
+  nameInput: string = '';
+
+  measurementsPaths: string[] = [];
   plotly: PlotlyOptions = {
     data: [],
     layout: {
       title: '',
     },
   };
-  nameInput: string = '';
   eventSources: {
     [key: string]: EventSource;
   } = {};
@@ -55,46 +52,38 @@ class MetricsWidget extends Widget {
 
   toggleEditing() {
     this.nameInput = this.name;
-
     this.editing = true;
   }
 
   saveChanges() {
-    this.$props.onConfigChange({
-      ...this.$props.config,
-      name: this.nameInput,
-    });
-
+    this.$props.onConfigChange(
+      this.$props.id,
+      {
+        ...this.$props.config,
+        name: this.nameInput,
+      },
+    );
     this.editing = false;
   }
 
   splitMeasurementKey(path: string): { measure: string, key: string } | null {
     const result = path.match(/^([A-Za-z0-9_-]+)\/(.+)$/);
 
-    if (!result) {
-      return null;
-    }
-
-    return {
-      measure: result[1],
-      key: result[2],
-    };
+    return result
+      ? { measure: result[1], key: result[2] }
+      : null;
   }
 
   getMeasures(): MeasuresType {
     const reducer = (acc: MeasuresType, metric: any) => {
       const measurementKey = this.splitMeasurementKey(metric.path);
-
       if (!measurementKey) {
         return acc;
       }
-
       if (!acc[measurementKey.measure]) {
         acc[measurementKey.measure] = [];
       }
-
       acc[measurementKey.measure].push(measurementKey.key);
-
       return acc;
     };
 
@@ -135,11 +124,13 @@ class MetricsWidget extends Widget {
 
     const measures = this.getMeasures();
 
-    this.eventSources = Object.keys(measures)
-      .reduce((acc, measure) => ({
+    this.eventSources = Object.keys(measures).reduce(
+      (acc, measure) => ({
         ...acc,
         [measure]: subscribeToEvents(measure, measures[measure], this.updateMetrics),
-      }), {});
+      }),
+      {},
+    );
   }
 
   closeSSEConnections() {
@@ -152,73 +143,65 @@ class MetricsWidget extends Widget {
   }
 
   metricPaths(path: string) {
-    return path.split('/').reduce((acc, item, currentIndex) => (
-      [
-        ...acc,
-        currentIndex === 0 ? item : [acc[currentIndex], item].join('/'),
-      ]
-    ), ['']);
+    return path.split('/').reduce(
+      (acc, item, currentIndex) => (
+        [
+          ...acc,
+          currentIndex === 0 ? item : [acc[currentIndex], item].join('/'),
+        ]
+      ),
+      [''],
+    );
   }
 
   onMetricPathChange(metric: MetricsOptions, pathIndex: number, value: string) {
-    const newPath = pathIndex !== 0 ?
-      [this.metricPaths(metric.path)[pathIndex], value].join('/') :
-      value;
+    const newPath = (pathIndex !== 0)
+      ? [this.metricPaths(metric.path)[pathIndex], value].join('/')
+      : value;
 
-    updateDashboardItemOptions(this.$store, {
-      id: this.dashboardItem.id,
-      options: {
-        ...this.options,
-        metrics: this.metrics.map((item) => {
-          if (item.id === metric.id) {
-            return {
-              ...item,
-              path: newPath,
-            };
-          }
-
-          return item;
-        }),
-      },
-    });
-
+    const cfg = {
+      ...this.$props.config,
+      metrics: this.metrics
+        .map(item => (item.id === metric.id
+          ? { ...item, path: newPath }
+          : item)),
+    };
+    this.$props.onConfigChange(this.$props.id, cfg);
     this.fetchMetrics();
   }
 
   removeMetric(metricId: string) {
-    updateDashboardItemOptions(this.$store, {
-      id: this.dashboardItem.id,
-      options: {
-        ...this.options,
-        metrics: [...this.metrics.filter(item => item.id !== metricId)]
-          .sort(sortByOrder)
-          .map((item, index) => ({
-            id: `metric-${index + 1}`,
-            order: index + 1,
-            path: item.path,
-          })),
-      },
-    });
-
+    const cfg = {
+      ...this.$props.config,
+      metrics: [...this.metrics.filter(item => item.id !== metricId)]
+        .sort(sortByOrder)
+        .map((item, index) => ({
+          id: `metric-${index + 1}`,
+          order: index + 1,
+          path: item.path,
+        })),
+    };
+    this.$props.onConfigChange(this.$props.id, cfg);
     this.fetchMetrics();
   }
 
   addNewMetric() {
-    updateDashboardItemOptions(this.$store, {
-      id: this.dashboardItem.id,
-      options: {
-        ...this.options,
-        metrics: [
-          ...this.metrics.map((item: MetricsOptions, index: number) =>
+    const cfg = {
+      ...this.$props.config,
+      metrics: [
+        // existing
+        ...this.metrics
+          .map((item: MetricsOptions, index: number) =>
             ({ ...item, order: index + 1 })),
-          {
-            id: `metric-${this.metrics.length + 1}`,
-            order: this.metrics.length,
-            path: '',
-          },
-        ],
-      },
-    });
+        // new
+        {
+          id: `metric-${this.metrics.length + 1}`,
+          order: this.metrics.length,
+          path: '',
+        },
+      ],
+    };
+    this.$props.onConfigChange(this.$props.id, cfg);
   }
 
   cancelFetch() {
@@ -226,25 +209,24 @@ class MetricsWidget extends Widget {
   }
 
   updateMetrics(data: PlotlyData[]) {
-    this.$set(this.plotly, 'data', data);
+    this.$set(this.plotly, 'data', data || []);
   }
 
   async fetchAvailableMeasurements() {
     this.measurementsPaths = await getAvailableMeasurements();
-
     this.fetchingAvailableMeasurements = false;
   }
 
   mounted() {
-    this.fetchAvailableMeasurements().then(() => this.fetchMetrics());
+    this.fetchAvailableMeasurements()
+      .then(() => this.fetchMetrics());
   }
 
   destroyed() {
     this.cancelFetch();
+    this.closeSSEConnections();
   }
 }
-
-export default MetricsWidget;
 </script>
 
 <template>
@@ -281,9 +263,9 @@ export default MetricsWidget;
         :label="editing ? 'Save changes' : 'Configure graph'"
       />
     </q-toolbar>
-    <Metrics
+    <MetricsDisplay
       v-if="error === null"
-      :data="plotly"
+      :inputOptions="plotly"
       :initialRange="initialRange"
     />
     <div v-if="error" class="alert-container">
@@ -340,7 +322,7 @@ export default MetricsWidget;
 </template>
 
 <style lang="stylus">
-@import '../../../css/app.styl';
+@import '../../css/app.styl';
 
 .dashboard-item.metrics-container {
   background: transparent;

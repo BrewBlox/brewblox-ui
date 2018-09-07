@@ -5,18 +5,19 @@ import createPlotlyComponent from 'vue-plotly.js/factory';
 import { merge } from 'lodash';
 import { differenceInMilliseconds, getTime } from 'date-fns';
 
+import { PlotlyData, PlotlyOptions } from './state';
 import Plotly from './plotly';
 
 /* eslint-disable indent */
 @Component({
   props: {
-    data: {
-      default: {},
-      type: Object,
+    inputOptions: {
+      type: Object, // PlotlyOptions
+      default: () => { throw new Error('Provide plotly options'); },
     },
     initialRange: {
-      default: 5 * 60 * 1000,
       type: Number,
+      default: 5 * 60 * 1000,
     },
   },
   components: {
@@ -24,7 +25,7 @@ import Plotly from './plotly';
   },
 })
 /* eslint-enable */
-export default class MetricsWidget extends Vue {
+export default class Metrics extends Vue {
   defaultLayout = {
     title: '',
     font: {
@@ -53,7 +54,7 @@ export default class MetricsWidget extends Vue {
     plot_bgcolor: '#1b1d21',
   };
 
-  config = {
+  cfg = {
     displaylogo: false,
   };
 
@@ -65,7 +66,9 @@ export default class MetricsWidget extends Vue {
   }
 
   get lastTimeStamp(): number {
-    return Math.max(...this.$props.data.data.map((line: { x: number[] }) => Math.max(...line.x)));
+    return Math
+      .max(...this.$props.inputOptions.data
+        .map((line: { x: number[] }) => Math.max(...line.x)));
   }
 
   relayout(changes: { 'xaxis.range'?: string[] }) {
@@ -88,14 +91,14 @@ export default class MetricsWidget extends Vue {
     }
   }
 
-  get plotlyData() {
+  get plotlyOptions() {
     const to = this.rangeTo === 0 ? this.lastTimeStamp : this.rangeTo;
 
     return {
-      ...this.$props.data,
+      ...this.$props.inputOptions,
       layout: merge(
         this.defaultLayout,
-        this.$props.data.layout,
+        this.$props.inputOptions.layout,
         {
           xaxis: {
             range: [to - this.range, to],
@@ -109,9 +112,9 @@ export default class MetricsWidget extends Vue {
 
 <template>
   <Plotly
-    :data="plotlyData.data"
-    :layout="plotlyData.layout"
-    :config="config"
+    :data="plotlyOptions.data"
+    :layout="plotlyOptions.layout"
+    :config="cfg"
     :onRelayout="relayout"
     fit
   />

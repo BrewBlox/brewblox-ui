@@ -11,28 +11,3 @@ interface PluginArguments {
   Vue: any;
   router: any;
 }
-
-// Widget types
-type WidgetType =
-  'Metrics' |
-  'PID' |
-  'ProcessView' |
-  'OneWireTempSensor' |
-  'SetPointSimple' |
-  'SensorSetPointPair';
-
-type PlotlyData = {
-  type: string,
-  x: number[],
-  y: number[],
-};
-
-type PlotlyOptions = {
-  data: PlotlyData[],
-  layout: {
-    title: string,
-    yaxis?: {
-      title?: string,
-    },
-  },
-};

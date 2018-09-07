@@ -78,7 +78,7 @@ describe('addDashboardItem', () => {
       order: 1,
       cols: 2,
       rows: 3,
-      widget: 'Empty' as WidgetType,
+      widget: 'Empty',
       config: {},
     };
 
@@ -96,7 +96,7 @@ describe('addDashboardItem', () => {
       order: 2,
       cols: 2,
       rows: 3,
-      widget: 'Empty' as WidgetType,
+      widget: 'Empty',
       config: {},
     };
 
@@ -117,7 +117,7 @@ describe('setDashboardItemSize', () => {
     order: 1,
     cols: 2,
     rows: 3,
-    widget: 'Empty' as WidgetType,
+    widget: 'Empty',
     config: {},
   };
 
@@ -139,7 +139,7 @@ describe('setDashboardItemOrder', () => {
     order: 1,
     cols: 2,
     rows: 3,
-    widget: 'Empty' as WidgetType,
+    widget: 'Empty',
     config: {},
   };
 
