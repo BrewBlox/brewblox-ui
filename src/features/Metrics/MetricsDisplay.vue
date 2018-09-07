@@ -66,9 +66,9 @@ export default class Metrics extends Vue {
   }
 
   get lastTimeStamp(): number {
-    return Math.max(
-      ...this.$props.inputData.data
-      .map((line: { x: number[] }) => Math.max(...line.x)));
+    return Math
+      .max(...this.$props.inputData.data
+        .map((line: { x: number[] }) => Math.max(...line.x)));
   }
 
   relayout(changes: { 'xaxis.range'?: string[] }) {

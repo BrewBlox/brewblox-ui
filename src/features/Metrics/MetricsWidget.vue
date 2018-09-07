@@ -161,12 +161,10 @@ export default class MetricsWidget extends Widget {
 
     const cfg = {
       ...this.$props.config,
-      metrics: this.metrics.map(
-        (item) => {
-          return item.id === metric.id
-            ? { ...item, path: newPath }
-            : item;
-        }),
+      metrics: this.metrics
+        .map(item => (item.id === metric.id
+          ? { ...item, path: newPath }
+          : item)),
     };
     this.$props.onConfigChange(this.$props.id, cfg);
     this.fetchMetrics();
@@ -192,8 +190,8 @@ export default class MetricsWidget extends Widget {
       ...this.$props.config,
       metrics: [
         // existing
-        ...this.metrics.map(
-          (item: MetricsOptions, index: number) =>
+        ...this.metrics
+          .map((item: MetricsOptions, index: number) =>
             ({ ...item, order: index + 1 })),
         // new
         {
