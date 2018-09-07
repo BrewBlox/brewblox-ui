@@ -1,15 +1,24 @@
 <script lang="ts">
 import Vue, { VueConstructor } from 'vue';
+import { Notify } from 'quasar';
 import Component from 'vue-class-component';
 
 import GridContainer from '@/components/Grid/GridContainer.vue';
 import WizardModal from '@/components/Wizard/WizardModal.vue';
 import InvalidWidget from '@/components/WidgetGenerics/InvalidWidget.vue';
+import ExistingBlockWizard from '@/components/Wizard/ExistingBlockWizard.vue';
 
 import byOrder from '@/helpers/byOrder';
 
+import { Block } from '@/store/blocks/state';
 import { DashboardItem } from '@/store/dashboards/state';
-import { isFetching, dashboardById, dashboardItemById } from '@/store/dashboards/getters';
+
+import {
+  isFetching,
+  dashboardById,
+  dashboardItemById,
+} from '@/store/dashboards/getters';
+
 import {
   updateDashboard,
   updateDashboardItemOrder,
@@ -18,9 +27,14 @@ import {
   createDashboardItem,
   addDashboardItemToDashboard,
 } from '@/store/dashboards/actions';
-import { Block } from '@/store/blocks/state';
 
-import { widgetByType, validatorByType } from '@/features/feature-by-type';
+import {
+  allTypes,
+  widgetByType,
+  validatorByType,
+  wizardByType,
+  displayNameByType,
+} from '@/features/feature-by-type';
 
 
 interface VueOrdered extends Vue {
@@ -32,11 +46,13 @@ interface VueOrdered extends Vue {
   components: {
     GridContainer,
     WizardModal,
+    ExistingBlockWizard,
   },
 })
 /* eslint-enable */
 export default class DashboardPage extends Vue {
   editable: boolean = false;
+  modalComponent: VueConstructor | null = null;
   modalOpen: boolean = false;
   title: string = '';
 
@@ -53,6 +69,25 @@ export default class DashboardPage extends Vue {
       ...this.dashboard.items
         .map(id => dashboardItemById(this.$store, id)),
     ].sort(byOrder);
+  }
+
+  get wizards() {
+    return [
+      {
+        label: 'Existing Block',
+        component: ExistingBlockWizard,
+      },
+      {
+        label: 'New Block',
+        component: ExistingBlockWizard,
+      },
+      ...allTypes
+        .filter(wizardByType)
+        .map(type => ({
+          label: displayNameByType(type),
+          component: wizardByType(type),
+        })),
+    ];
   }
 
   get validatedItems() {
@@ -114,21 +149,29 @@ export default class DashboardPage extends Vue {
     updateDashboardItemSize(this.$store, { id, cols, rows });
   }
 
-  async onAddWidget(type: string, blockId: string) {
-    const dashboardItem = await createDashboardItem(this.$store, {
-      id: `item-${blockId}`,
-      order: this.items.length + 1,
-      cols: 4,
-      rows: 4,
-      widget: type,
-      config: {
-        blockId,
-      },
-    });
+  startWizard(component: VueConstructor) {
+    this.modalComponent = component;
+    this.modalOpen = true;
+  }
 
-    addDashboardItemToDashboard(this.$store, { dashboardItem, dashboard: this.dashboard });
-
-    this.modalOpen = false;
+  async onAddWidget(id: string, widget: string, config: any) {
+    try {
+      const item = {
+        id,
+        widget,
+        config: { ...config },
+        order: this.items.length + 1,
+        cols: 4,
+        rows: 4,
+      };
+      await createDashboardItem(
+        this.$store,
+        { item, dashboard: this.dashboard },
+      );
+      this.modalOpen = false;
+    } catch (e) {
+      Notify.create(`Failed to add item: ${e.toString()}`);
+    }
   }
 
   onChangeItemConfig(id: string, config: any) {
@@ -162,6 +205,29 @@ export default class DashboardPage extends Vue {
       </portal>
 
       <portal to="toolbar-buttons">
+
+        <q-btn
+          v-if="editable"
+          color="primary"
+          icon="add"
+          label="Start Wizard"
+        >
+          <q-popover
+          >
+            <q-list link style="min-width: 100px">
+
+              <q-item
+                v-for="wizard in wizards"
+                :key="wizard.label"
+                v-close-overlay
+                @click.native="() => startWizard(wizard.component)"
+              >
+                <q-item-main :label="wizard.label" />
+              </q-item>
+            </q-list>
+          </q-popover>
+        </q-btn>
+
         <q-btn
           v-if="editable"
           color="primary"
@@ -181,7 +247,8 @@ export default class DashboardPage extends Vue {
         v-model="modalOpen"
         :content-css="{ minWidth: '80vw', minHeight: '500px' }"
       >
-        <wizard-modal
+        <component
+          :is="modalComponent"
           :isOpen="modalOpen"
           :onAddWidget="onAddWidget"
         />

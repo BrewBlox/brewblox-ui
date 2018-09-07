@@ -6,12 +6,14 @@ import { map } from 'lodash';
 
 import { Block } from '@/store/blocks/state';
 
+import ExistingBlockWizard from './ExistingBlockWizard.vue';
+
 import { blocksByWidgetType, widgetDescriptions, widgetWizards } from './widget-types';
 import { allTypes, displayNameByType, wizardByType } from '@/features/feature-by-type';
 
 /* eslint-disable indent */
 @Component({
-  components: widgetWizards,
+  components: { ...widgetWizards, ExistingBlockWizard },
   props: {
     isOpen: {
       type: Boolean,
@@ -59,12 +61,18 @@ export default class WizardModal extends Vue {
   }
 
   get wizardOptions() {
-    return allTypes
-      .filter(wizardByType)
-      .map(type => ({
-        value: type,
-        label: displayNameByType(type),
-      }));
+    // return allTypes
+    //   .filter(wizardByType)
+    //   .map(type => ({
+    //     value: type,
+    //     label: displayNameByType(type),
+    //   }));
+    return [
+      {
+        vaue: ExistingBlockWizard,
+        label: 'Existing Block',
+      },
+    ];
   }
 
   get canContinue() {
@@ -131,7 +139,56 @@ export default class WizardModal extends Vue {
           v-model="currentStep"
           v-if="blockId !== 'new'"
         >
+
           <q-step
+            default
+            name="select_wizards"
+            title="Select Widget Type"
+          >
+
+            <q-field
+              label="Choose a widget type to add"
+              orientation="vertical"
+              dark
+              icon="dashboard"
+            >
+              <q-option-group
+                dark
+                type="radio"
+                v-model="widgetType"
+                :options="wizardOptions"
+              />
+            </q-field>
+
+            <q-stepper-navigation>
+              <q-btn
+                :disabled="widgetType === null"
+                color="primary"
+                flat
+                label="Select Widget"
+                @click="$refs.stepper.goToStep('select_widget')"
+              />
+            </q-stepper-navigation>
+
+          </q-step>
+
+          <q-step
+            name="select_widget"
+            title="Select Widget"
+          >
+
+            <q-stepper-navigation>
+              <q-btn
+                color="primary"
+                flat
+                label="Select Widget"
+                @click="$refs.stepper.goToStep('select_widget')"
+              />
+            </q-stepper-navigation>
+
+          </q-step>
+
+          <!-- <q-step
             default
             name="widgets"
             title="Widget Type"
@@ -182,9 +239,9 @@ export default class WizardModal extends Vue {
           >
             <p class="q-title">Widget ready!</p>
             <p>Widget setup is done, add the widget to your dashboard.</p>
-          </q-step>
+          </q-step> -->
 
-          <q-stepper-navigation>
+          <!-- <q-stepper-navigation>
             <q-btn
               v-if="currentStep !== 'widgets'"
               @click="$refs.stepper.previous()"
@@ -198,7 +255,7 @@ export default class WizardModal extends Vue {
               @click="currentStep === 'finished' ? addToDashboard() : $refs.stepper.next()"
               :label="currentStep === 'finished' ? 'Add to dashboard' : 'Next'"
             />
-          </q-stepper-navigation>
+          </q-stepper-navigation> -->
         </q-stepper>
         <div v-else>
           <component

@@ -112,22 +112,23 @@ const actions = {
 
   async createDashboardItem(
     context: DashboardContext,
-    item: DashboardItem,
-  ): Promise<DashboardItem> {
+    payload: { dashboard: Dashboard, item: DashboardItem },
+  ) {
+    const { dashboard, item } = payload;
     const dashboardItem = await createDashboardItemOnApi(item);
     actions.addDashboardItem(context, dashboardItem);
-    return dashboardItem;
+    actions.addDashboardItemToDashboard(context, { dashboard, item });
   },
 
   addDashboardItemToDashboard(
     context: DashboardContext,
-    payload: { dashboard: Dashboard, dashboardItem: DashboardItem },
+    payload: { dashboard: Dashboard, item: DashboardItem },
   ) {
-    const { dashboard, dashboardItem } = payload;
+    const { dashboard, item } = payload;
 
     actions.updateDashboard(context, {
       ...dashboard,
-      items: [...dashboard.items, dashboardItem.id],
+      items: [...dashboard.items, item.id],
     });
   },
 
