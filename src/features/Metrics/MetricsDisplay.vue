@@ -12,10 +12,8 @@ import Plotly from './plotly';
 @Component({
   props: {
     inputData: {
-      type: Object,
-      default: () => ({
-        data: [],
-      }),
+      type: Object, // PlotlyOptions
+      default: () => { throw new Error('Provide plotly options'); },
     },
     initialRange: {
       type: Number,
