@@ -10,7 +10,6 @@ import byOrder from '@/helpers/byOrder';
 
 import { DashboardItem } from '@/store/dashboards/state';
 import { isFetching, dashboardById, dashboardItemById } from '@/store/dashboards/getters';
-import { isFetching as fetchingBlocks } from '@/store/blocks/getters';
 import {
   updateDashboard,
   updateDashboardItemOrder,
@@ -56,14 +55,28 @@ export default class DashboardPage extends Vue {
     ].sort(byOrder);
   }
 
-  get isFetching() {
-    return isFetching(this.$store) || fetchingBlocks(this.$store);
+  get validatedItems() {
+    return this.items.map((item) => {
+      try {
+        if (!validatorByType(item.widget)(this.$store, item.config)) {
+          throw new Error(`${item.widget} validation failed`);
+        }
+        return {
+          ...item,
+          component: widgetByType(item.widget),
+        };
+      } catch (e) {
+        return {
+          ...item,
+          component: InvalidWidget,
+          error: e.toString(),
+        };
+      }
+    });
   }
 
-  widgetComponent(type: string, config: any): VueConstructor {
-    return validatorByType(type)(this.$store, config)
-      ? widgetByType(type)
-      : InvalidWidget;
+  get isFetching() {
+    return isFetching(this.$store);
   }
 
   toggleEditable() {
@@ -181,8 +194,9 @@ export default class DashboardPage extends Vue {
       >
         <component
           class="dashboard-item"
-          v-for="item in items"
-          :is="widgetComponent(item.widget, item.config)"
+          v-for="item in validatedItems"
+          :is="item.component"
+          :error="item.error"
           :key="item.id"
           :id="item.id"
           :cols="item.cols"
