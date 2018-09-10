@@ -127,7 +127,8 @@ export default class PidWidget extends BlockWidget {
   <div>
 
     <block-toolbar
-      :block="block"
+      :name="$props.id"
+      :type="$props.type"
       :on-refresh="refreshBlock"
       :on-settings="openModal"
     />

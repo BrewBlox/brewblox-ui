@@ -46,7 +46,8 @@ export default class SensorSetPointPairWidget extends BlockWidget {
   <div>
 
     <block-toolbar
-      :block="block"
+      :name="$props.id"
+      :type="$props.type"
       :on-refresh="refreshBlock"
     />
 

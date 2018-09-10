@@ -260,6 +260,7 @@ export default class DashboardPage extends Vue {
           :error="item.error"
           :key="item.id"
           :id="item.id"
+          :type="item.widget"
           :cols="item.cols"
           :rows="item.rows"
           :config="item.config"

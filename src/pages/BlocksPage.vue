@@ -29,12 +29,13 @@ export default class BlocksPage extends Vue {
   modalOpen: boolean = false;
 
   defaultItem(block: Block): DashboardItem {
+    const id = `${block.serviceId}/${block.id}`;
     return {
-      id: `default-${block.serviceId}/${block.id}`,
+      id,
       ...widgetSizeByType(block.type),
       widget: block.type,
       config: {
-        blockId: `${block.serviceId}/${block.id}`,
+        blockId: id,
       },
       order: 0,
     };
@@ -80,6 +81,7 @@ export default class BlocksPage extends Vue {
           :is="widgetComponent(item.widget)"
           :key="item.id"
           :id="item.id"
+          :type="item.widget"
           :cols="item.cols"
           :rows="item.rows"
           :config="item.config"

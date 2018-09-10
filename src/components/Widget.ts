@@ -8,6 +8,10 @@ import Component from 'vue-class-component';
       type: String,
       default: () => { throw new Error('Provide item ID'); },
     },
+    type: {
+      type: String,
+      default: () => { throw new Error('Provide type'); },
+    },
     config: {
       type: Object,
       default: () => { throw new Error('Provide block config'); },

@@ -7,9 +7,13 @@ import { displayNameByType } from '@/features/feature-by-type';
 /* eslint-disable indent */
 @Component({
   props: {
-    block: {
-      type: Object,
-      default: () => { throw new Error('Provide Block'); },
+    name: {
+      type: String,
+      default: () => { throw new Error('Provide name'); },
+    },
+    type: {
+      type: String,
+      default: () => { throw new Error('Provide type'); },
     },
     onRefresh: {
       type: Function,
@@ -24,7 +28,7 @@ import { displayNameByType } from '@/features/feature-by-type';
 /* eslint-enable */
 export default class BlockToolbar extends Vue {
   get displayName(): string {
-    return displayNameByType(this.$props.block.type);
+    return displayNameByType(this.$props.type);
   }
 }
 </script>
@@ -32,7 +36,7 @@ export default class BlockToolbar extends Vue {
 <template>
   <q-toolbar color="dark-bright">
     <q-toolbar-title>
-      {{ $props.block.serviceId }}/{{ $props.block.id }}
+      {{ $props.name }}
       <q-item-tile sublabel>{{ displayName }}</q-item-tile>
     </q-toolbar-title>
 

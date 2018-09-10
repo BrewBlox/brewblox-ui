@@ -101,7 +101,7 @@ export default class NewWidgetWizard extends Vue {
     <q-item v-else>
       <q-field
         label="Widget ID"
-        icon="widgets"
+        icon="create"
         orientation="vertical"
       >
         <q-input

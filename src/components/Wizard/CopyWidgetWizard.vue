@@ -69,7 +69,7 @@ export default class CopyWidgetWizard extends Vue {
     <q-item>
       <q-field
         label="Widget ID"
-        icon="widgets"
+        icon="create"
         orientation="vertical"
       >
         <q-input
