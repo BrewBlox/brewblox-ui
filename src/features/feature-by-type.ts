@@ -16,3 +16,6 @@ export const displayNameByType = (type: string) =>
 
 export const validatorByType = (type: string) =>
   featureByName(type).validator || UnknownBlock.validator;
+
+export const widgetSizeByType = (type: string) =>
+  featureByName(type).widgetSize || UnknownBlock.widgetSize;

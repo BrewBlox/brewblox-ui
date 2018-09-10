@@ -1,15 +1,18 @@
 <script lang="ts">
-import Vue from 'vue';
+import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
 import { Notify } from 'quasar';
-import { DashboardItem } from '@/store/dashboards/state';
-import { allDashboardItems, dashboardItemById } from '@/store/dashboards/getters';
 
 import { allTypes, wizardByType, displayNameByType } from '@/features/feature-by-type';
+import { DashboardItem } from '@/store/dashboards/state';
+import { dashboardItemById } from '@/store/dashboards/getters';
+import { widgetWizards } from './widget-types.ts';
 
 /* eslint-disable indent */
 @Component({
-  components: { },
+  components: {
+    ...widgetWizards,
+  },
   props: {
     onCreateItem: {
       type: Function,
@@ -18,16 +21,18 @@ import { allTypes, wizardByType, displayNameByType } from '@/features/feature-by
   },
 })
 /* eslint-enable */
-export default class CopyWidgetWizard extends Vue {
+export default class NewWidgetWizard extends Vue {
   widgetId: string = '';
   searchModel: string = '';
+  featureWizard: VueConstructor | null = null;
 
-  get existingWidgetOptions() {
-    return allDashboardItems(this.$store)
-      .filter(item => item.id.match(this.searchModel))
-      .map(item => ({
-        id: item.id,
-        displayName: `${item.id} (${displayNameByType(item.widget)})`,
+  get wizardOptions() {
+    return allTypes
+      .filter(wizardByType)
+      .map(type => ({
+        type,
+        wizard: wizardByType(type),
+        displayName: displayNameByType(type),
       }));
   }
 
@@ -41,21 +46,42 @@ export default class CopyWidgetWizard extends Vue {
     return null;
   }
 
-  selectItem(id: string) {
+  get featureWizardActive() {
+    return this.featureWizard !== null;
+  }
+
+  get wizardComponent() {
+    return this.featureWizard;
+  }
+
+  set wizardComponent(component: VueConstructor | null) {
+    this.featureWizard = component;
+  }
+
+  selectFeature(wizard: VueConstructor) {
     if (this.widgetIdError !== null) {
-      Notify.create(`Unable to create item: ${this.widgetIdError}`);
+      Notify.create(this.widgetIdError);
       return;
     }
-    const item = dashboardItemById(this.$store, id);
+    this.wizardComponent = wizard;
+  }
+
+  onCreate(partial: Partial<DashboardItem>) {
     this.$props.onCreateItem({
-      ...item,
+      ...partial,
       id: this.widgetId,
     });
+    this.reset();
+  }
+
+  reset() {
+    this.widgetId = '';
+    this.searchModel = '';
+    this.wizardComponent = null;
   }
 
   mounted() {
-    this.widgetId = '';
-    this.searchModel = '';
+    this.reset();
   }
 }
 </script>
@@ -63,7 +89,16 @@ export default class CopyWidgetWizard extends Vue {
 <template>
   <div class="layout-padding">
 
-    <q-item>
+    <q-item v-if="featureWizardActive">
+      <component
+        v-if="featureWizardActive"
+        :is="featureWizard"
+        :onCreateItem="onCreate"
+        :onCancel="reset"
+      />
+    </q-item>
+    <!-- Select a wizard -->
+    <q-item v-else>
       <q-field
         label="Widget ID"
         icon="widgets"
@@ -76,27 +111,24 @@ export default class CopyWidgetWizard extends Vue {
           :suffix="widgetIdError"
         />
       </q-field>
-
       <q-field
-        label="Select a widget"
+        label="Select a widget type"
         icon="widgets"
         orientation="vertical"
       >
         <q-search
           v-model="searchModel"
-          placeholder="Search for a block"
+          placeholder="Search"
         />
-
         <q-list link style="min-width: 100px">
           <q-item
-            v-for="opt in existingWidgetOptions"
+            v-for="opt in wizardOptions"
             :key="opt.id"
-            @click.native="selectItem(opt.id)"
+            @click.native="selectFeature(opt.wizard)"
           >
             {{ opt.displayName}}
           </q-item>
         </q-list>
-
       </q-field>
     </q-item>
 

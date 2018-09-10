@@ -31,11 +31,6 @@ export default class WidgetModal extends Vue {
       this.$props.onClose();
     }
   }
-
-  // @Watch('isOpen', { immediate: true, deep: true })
-  // onOpenedChange() {
-  //   this.childOpen = this.$props.isOpen;
-  // }
 }
 </script>
 
@@ -67,24 +62,4 @@ export default class WidgetModal extends Vue {
 </template>
 
 <style>
-.layout-padding {
-  position: relative;
-}
-
-.slide-enter-active,
-.slide-leave-active {
-  position: absolute;
-  width: calc(100% - 96px);
-  transition: opacity 0.2s, margin-top 0.2s;
-}
-
-.slide-enter,
-.slide-leave-to {
-  opacity: 0;
-  margin-top: -40px;
-}
-
-.modal .q-list {
-  border: 0;
-}
 </style>

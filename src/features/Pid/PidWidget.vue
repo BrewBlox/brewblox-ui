@@ -186,6 +186,7 @@ export default class PidWidget extends BlockWidget {
 
     <widget-modal
       :isOpen="modalOpen"
+      :onClose="() => { this.modalOpen = false; }"
       title="PID Settings"
     >
 

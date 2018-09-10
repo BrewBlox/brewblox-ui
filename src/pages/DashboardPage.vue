@@ -2,11 +2,13 @@
 import Vue, { VueConstructor } from 'vue';
 import { Notify } from 'quasar';
 import Component from 'vue-class-component';
+import shortid from 'shortid';
 
 import GridContainer from '@/components/Grid/GridContainer.vue';
 import InvalidWidget from '@/components/WidgetGenerics/InvalidWidget.vue';
 import WidgetModal from '@/components/WidgetGenerics/WidgetModal.vue';
 import CopyWidgetWizard from '@/components/Wizard/CopyWidgetWizard.vue';
+import NewWidgetWizard from '@/components/Wizard/NewWidgetWizard.vue';
 
 import byOrder from '@/helpers/byOrder';
 
@@ -34,6 +36,7 @@ import {
   validatorByType,
   wizardByType,
   displayNameByType,
+  widgetSizeByType,
 } from '@/features/feature-by-type';
 
 
@@ -53,6 +56,7 @@ interface ModalConfig {
     GridContainer,
     WidgetModal,
     CopyWidgetWizard,
+    NewWidgetWizard,
   },
 })
 /* eslint-enable */
@@ -104,12 +108,12 @@ export default class DashboardPage extends Vue {
     return isFetching(this.$store);
   }
 
-  onEditable() {
+  onStartEdit() {
     this.title = this.dashboard.title;
     this.editable = true;
   }
 
-  onSave() {
+  onStopEdit() {
     if (this.title !== this.dashboard.title) {
       // update title of dashboard if changed
       updateDashboard(this.$store, {
@@ -118,10 +122,6 @@ export default class DashboardPage extends Vue {
       });
     }
     this.editable = false;
-  }
-
-  onOpenAddWidget() {
-    this.wizardModal.open = true;
   }
 
   async onChangeOrder(order: VueOrdered[]) {
@@ -137,7 +137,11 @@ export default class DashboardPage extends Vue {
     updateDashboardItemSize(this.$store, { id, cols, rows });
   }
 
-  onCopyWidgetStart() {
+  onChangeItemConfig(id: string, config: any) {
+    updateDashboardItemConfig(this.$store, { id, config });
+  }
+
+  onStartCopyWidget() {
     this.wizardModal = {
       open: true,
       component: CopyWidgetWizard,
@@ -145,15 +149,26 @@ export default class DashboardPage extends Vue {
     };
   }
 
-  async onAddWidget(id: string, widget: string, config: any) {
+  onStartNewWidget() {
+    this.wizardModal = {
+      open: true,
+      component: NewWidgetWizard,
+      title: 'Add New Widget',
+    };
+  }
+
+  async onCreateItem(partial: Partial<DashboardItem>) {
     try {
-      const item = {
-        id,
-        widget,
-        config: { ...config },
+      const item: DashboardItem = {
+        // Default settings
+        id: shortid.generate(),
+        widget: 'Unknown',
+        config: {},
+        ...widgetSizeByType('Unknown'),
+        // Actual settings
+        ...partial,
+        // Item order is set here
         order: this.items.length + 1,
-        cols: 4,
-        rows: 4,
       };
       await createDashboardItem(
         this.$store,
@@ -161,15 +176,11 @@ export default class DashboardPage extends Vue {
       );
       Notify.create({
         type: 'positive',
-        message: `Added widget "${id}"`,
+        message: `Added ${displayNameByType(item.widget)} "${item.id}"`,
       });
     } catch (e) {
       Notify.create(`Failed to add widget: ${e.toString()}`);
     }
-  }
-
-  onChangeItemConfig(id: string, config: any) {
-    updateDashboardItemConfig(this.$store, { id, config });
   }
 }
 </script>
@@ -205,44 +216,24 @@ export default class DashboardPage extends Vue {
           color="primary"
           icon="add"
           label="Copy Widget"
-          @click="onCopyWidgetStart"
+          @click="onStartCopyWidget"
         />
 
         <q-btn
           v-if="editable"
           color="primary"
           icon="add"
-          label="Start Wizard"
-        >
-          <q-popover
-          >
-            <q-list link style="min-width: 100px">
-
-              <q-item
-                v-for="wizard in wizards"
-                :key="wizard.label"
-                v-close-overlay
-                @click.native="() => startWizard(wizard.component)"
-              >
-                <q-item-main :label="wizard.label" />
-              </q-item>
-            </q-list>
-          </q-popover>
-        </q-btn>
-
-        <q-btn
-          v-if="editable"
-          color="primary"
-          icon="add"
-          label="Add widget"
-          @click="onOpenAddWidget"
+          label="New Widget"
+          @click="onStartNewWidget"
         />
+
         <q-btn
           :icon="editable ? 'check' : 'mode edit'"
           :color="editable ? 'positive' : 'primary'"
-          @click="editable ? onSave() : onEditable()"
+          @click="editable ? onStopEdit() : onStartEdit()"
           :label="editable ? 'Save changes' : 'Edit dashboard'"
         />
+
       </portal>
 
       <widget-modal
@@ -251,8 +242,9 @@ export default class DashboardPage extends Vue {
         :onClose="() => { this.wizardModal.open = false; }"
       >
         <component
+          v-if="wizardModal.open"
           :is="wizardModal.component"
-          :onAddWidget="onAddWidget"
+          :onCreateItem="onCreateItem"
         />
       </widget-modal>
 

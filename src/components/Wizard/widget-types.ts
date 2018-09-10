@@ -26,18 +26,18 @@ export function blocksByWidgetType(store: RootStore, type: string): Block[] {
 export const widgetWizards: { [name: string]: VueConstructor } = allTypes
   .filter(wizardByType)
   .reduce(
-    (coll: any, type: string) => {
-      coll[type] = wizardByType(type);
-      return coll;
+    (acc: any, type: string) => {
+      acc[type] = wizardByType(type);
+      return acc;
     },
     {},
   );
 
 export const widgetDescriptions: { [name: string]: string } = allTypes
   .reduce(
-    (coll: any, type: string) => {
-      coll[type] = displayNameByType(type);
-      return coll;
+    (acc: any, type: string) => {
+      acc[type] = displayNameByType(type);
+      return acc;
     },
     {},
   );

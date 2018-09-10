@@ -11,7 +11,7 @@ import { DashboardItem } from '@/store/dashboards/state';
 import { Block } from '@/store/blocks/state';
 import { isFetching, allBlocks } from '@/store/blocks/getters';
 
-import { widgetByType } from '@/features/feature-by-type';
+import { widgetByType, widgetSizeByType } from '@/features/feature-by-type';
 
 interface VueOrdered extends Vue {
   id: string;
@@ -31,13 +31,12 @@ export default class BlocksPage extends Vue {
   defaultItem(block: Block): DashboardItem {
     return {
       id: `default-${block.serviceId}/${block.id}`,
-      order: 0,
-      cols: 4,
-      rows: 4,
+      ...widgetSizeByType(block.type),
       widget: block.type,
       config: {
         blockId: `${block.serviceId}/${block.id}`,
       },
+      order: 0,
     };
   }
 
