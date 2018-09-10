@@ -2,6 +2,9 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Notify } from 'quasar';
+
+import { allBlocks } from '@/store/blocks/getters';
+
 import { DashboardItem } from '@/store/dashboards/state';
 import { allDashboardItems, dashboardItemById } from '@/store/dashboards/getters';
 
@@ -27,7 +30,7 @@ export default class CopyWidgetWizard extends Vue {
       .filter(item => item.id.match(this.searchModel))
       .map(item => ({
         id: item.id,
-        displayName: `${item.id} (${displayNameByType(item.widget)})`,
+        displayName: displayNameByType(item.widget),
       }));
   }
 
@@ -78,40 +81,48 @@ export default class CopyWidgetWizard extends Vue {
       </q-field>
 
       <q-field
-        label="Select a widget"
+        label="Select a widget to copy"
         icon="widgets"
         orientation="vertical"
       >
-        <q-search
-          v-model="searchModel"
-          placeholder="Search for a block"
-        />
-
-        <q-list link style="min-width: 100px">
+        <q-item>
+          <q-search
+            v-model="searchModel"
+            placeholder="Search"
+          />
+        </q-item>
+        <q-list link inset-separator>
           <q-item
+            icon="widgets"
             v-for="opt in existingWidgetOptions"
             :key="opt.id"
             @click.native="selectItem(opt.id)"
           >
-            {{ opt.displayName}}
+            <div class="row">
+              <q-item-main>
+                <q-item-tile label>{{ opt.id }}</q-item-tile>
+                <q-item-tile sublabel>{{ opt.displayName }}</q-item-tile>
+              </q-item-main>
+              <q-item-side right icon="chevron_right" />
+            </div>
           </q-item>
         </q-list>
-
       </q-field>
+
     </q-item>
 
   </div>
 </template>
 
 <style>
-.q-item {
+/* .q-item {
   display: grid;
   grid-gap: 10px;
-}
+} */
 
-.q-list {
-  border: 0;
-}
+/* .q-item {
+  margin-left: 0px;
+} */
 
 .layout-padding {
   position: relative;

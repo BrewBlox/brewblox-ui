@@ -29,10 +29,10 @@ export default class NewWidgetWizard extends Vue {
   get wizardOptions() {
     return allTypes
       .filter(wizardByType)
+      .filter(type => displayNameByType(type).match(this.searchModel))
       .map(type => ({
-        type,
-        wizard: wizardByType(type),
-        displayName: displayNameByType(type),
+        label: displayNameByType(type),
+        value: wizardByType(type),
       }));
   }
 
@@ -111,22 +111,31 @@ export default class NewWidgetWizard extends Vue {
           :suffix="widgetIdError"
         />
       </q-field>
+
       <q-field
         label="Select a widget type"
         icon="widgets"
         orientation="vertical"
       >
-        <q-search
-          v-model="searchModel"
-          placeholder="Search"
-        />
-        <q-list link style="min-width: 100px">
+        <q-item>
+          <q-search
+            v-model="searchModel"
+            placeholder="Search"
+          />
+        </q-item>
+        <q-list link inset-separator>
           <q-item
+            icon="widgets"
             v-for="opt in wizardOptions"
-            :key="opt.id"
-            @click.native="selectFeature(opt.wizard)"
+            :key="opt.label"
+            @click.native="selectFeature(opt.value)"
           >
-            {{ opt.displayName}}
+            <div class="row">
+              <q-item-main>
+                <q-item-tile label>{{ opt.label }}</q-item-tile>
+              </q-item-main>
+              <q-item-side right icon="chevron_right" />
+            </div>
           </q-item>
         </q-list>
       </q-field>
@@ -142,6 +151,10 @@ export default class NewWidgetWizard extends Vue {
 }
 
 .q-list {
+  border: 0;
+}
+
+.q-option-group {
   border: 0;
 }
 
