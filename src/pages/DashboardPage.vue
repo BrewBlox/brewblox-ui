@@ -4,9 +4,9 @@ import { Notify } from 'quasar';
 import Component from 'vue-class-component';
 
 import GridContainer from '@/components/Grid/GridContainer.vue';
-import WizardModal from '@/components/Wizard/WizardModal.vue';
 import InvalidWidget from '@/components/WidgetGenerics/InvalidWidget.vue';
-import ExistingBlockWizard from '@/components/Wizard/ExistingBlockWizard.vue';
+import WidgetModal from '@/components/WidgetGenerics/WidgetModal.vue';
+import CopyWidgetWizard from '@/components/Wizard/CopyWidgetWizard.vue';
 
 import byOrder from '@/helpers/byOrder';
 
@@ -41,20 +41,29 @@ interface VueOrdered extends Vue {
   id: string;
 }
 
+interface ModalConfig {
+  open: boolean;
+  title: string;
+  component?: VueConstructor;
+}
+
 /* eslint-disable indent */
 @Component({
   components: {
     GridContainer,
-    WizardModal,
-    ExistingBlockWizard,
+    WidgetModal,
+    CopyWidgetWizard,
   },
 })
 /* eslint-enable */
 export default class DashboardPage extends Vue {
   editable: boolean = false;
-  modalComponent: VueConstructor | null = null;
-  modalOpen: boolean = false;
   title: string = '';
+
+  wizardModal: ModalConfig = {
+    open: false,
+    title: '',
+  };
 
   get dashboardId(): string {
     return this.$route.params.id;
@@ -69,25 +78,6 @@ export default class DashboardPage extends Vue {
       ...this.dashboard.items
         .map(id => dashboardItemById(this.$store, id)),
     ].sort(byOrder);
-  }
-
-  get wizards() {
-    return [
-      {
-        label: 'Existing Block',
-        component: ExistingBlockWizard,
-      },
-      {
-        label: 'New Block',
-        component: ExistingBlockWizard,
-      },
-      ...allTypes
-        .filter(wizardByType)
-        .map(type => ({
-          label: displayNameByType(type),
-          component: wizardByType(type),
-        })),
-    ];
   }
 
   get validatedItems() {
@@ -114,7 +104,7 @@ export default class DashboardPage extends Vue {
     return isFetching(this.$store);
   }
 
-  toggleEditable() {
+  onEditable() {
     this.title = this.dashboard.title;
     this.editable = true;
   }
@@ -127,17 +117,15 @@ export default class DashboardPage extends Vue {
         title: this.title,
       });
     }
-
     this.editable = false;
   }
 
   onOpenAddWidget() {
-    this.modalOpen = true;
+    this.wizardModal.open = true;
   }
 
   async onChangeOrder(order: VueOrdered[]) {
     const newOrder = order.map(item => item.id);
-
     try {
       await updateDashboardItemOrder(this.$store, newOrder);
     } catch (e) {
@@ -149,9 +137,12 @@ export default class DashboardPage extends Vue {
     updateDashboardItemSize(this.$store, { id, cols, rows });
   }
 
-  startWizard(component: VueConstructor) {
-    this.modalComponent = component;
-    this.modalOpen = true;
+  onCopyWidgetStart() {
+    this.wizardModal = {
+      open: true,
+      component: CopyWidgetWizard,
+      title: 'Copy Existing Widget',
+    };
   }
 
   async onAddWidget(id: string, widget: string, config: any) {
@@ -168,9 +159,12 @@ export default class DashboardPage extends Vue {
         this.$store,
         { item, dashboard: this.dashboard },
       );
-      this.modalOpen = false;
+      Notify.create({
+        type: 'positive',
+        message: `Added widget "${id}"`,
+      });
     } catch (e) {
-      Notify.create(`Failed to add item: ${e.toString()}`);
+      Notify.create(`Failed to add widget: ${e.toString()}`);
     }
   }
 
@@ -210,6 +204,14 @@ export default class DashboardPage extends Vue {
           v-if="editable"
           color="primary"
           icon="add"
+          label="Copy Widget"
+          @click="onCopyWidgetStart"
+        />
+
+        <q-btn
+          v-if="editable"
+          color="primary"
+          icon="add"
           label="Start Wizard"
         >
           <q-popover
@@ -238,21 +240,21 @@ export default class DashboardPage extends Vue {
         <q-btn
           :icon="editable ? 'check' : 'mode edit'"
           :color="editable ? 'positive' : 'primary'"
-          @click="editable ? onSave() : toggleEditable()"
+          @click="editable ? onSave() : onEditable()"
           :label="editable ? 'Save changes' : 'Edit dashboard'"
         />
       </portal>
 
-      <q-modal
-        v-model="modalOpen"
-        :content-css="{ minWidth: '80vw', minHeight: '500px' }"
+      <widget-modal
+        :isOpen="wizardModal.open"
+        :title="wizardModal.title"
+        :onClose="() => { this.wizardModal.open = false; }"
       >
         <component
-          :is="modalComponent"
-          :isOpen="modalOpen"
+          :is="wizardModal.component"
           :onAddWidget="onAddWidget"
         />
-      </q-modal>
+      </widget-modal>
 
       <grid-container
         :editable="editable"

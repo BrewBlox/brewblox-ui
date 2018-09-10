@@ -41,6 +41,7 @@ import Quasar, {
   CloseOverlay,
   QToggle,
   QPopover,
+  QSearch,
 } from 'quasar';
 
 import 'quasar-extras/roboto-font';
@@ -90,6 +91,7 @@ Vue.use(Quasar, {
     QOptionGroup,
     QToggle,
     QPopover,
+    QSearch,
   },
   directives: { Ripple, CloseOverlay },
   plugins: { Notify, Dialog },
