@@ -11,7 +11,7 @@ export default {
 
 <template>
   <q-page padding>
-    <spark-service-view />
+    <spark-services-view />
   </q-page>
 </template>
 
