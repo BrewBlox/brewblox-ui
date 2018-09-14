@@ -12,7 +12,7 @@ import Ticks from './Ticks';
 import ProcessView from './ProcessView';
 import Metrics from './Metrics';
 
-export const blockFeatures: { [key: string]: Feature } = {
+export const features: { [key: string]: Feature } = {
   InactiveObject,
   OneWireBus,
   OneWireTempSensor,

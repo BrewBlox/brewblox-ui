@@ -92,14 +92,24 @@ export default class LayoutDefault extends Vue {
         link
         inset-delimiter
       >
-        <q-list-header>Main menu</q-list-header>
+
         <q-item
           link
-          to="/settings"
+          to="/"
+          active-class="q-item-no-link-highlighting"
         >
-          <q-item-side icon="settings" />
-          Settings
+          <q-item-side icon="home" />
+          Main menu
         </q-item>
+
+        <q-item
+          link
+          to="/services"
+        >
+          <q-item-side icon="cloud" />
+          Services
+        </q-item>
+
         <q-item
           link
           to="/blocks"
@@ -111,6 +121,7 @@ export default class LayoutDefault extends Vue {
         <q-item-separator />
 
         <q-list-header v-if="!isFetching">
+          <q-item-side icon="dashboard" />
           Dashboards
 
           <q-btn

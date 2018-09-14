@@ -158,12 +158,7 @@
   "services": [
     {
       "id": "spark",
-      "type": "DeviceService"
+      "type": "SparkService"
     }
-  ],
-  "settings": {
-    "controllers": [
-      "spark"
-    ]
-  }
+  ]
 }

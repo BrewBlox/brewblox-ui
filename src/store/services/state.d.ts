@@ -4,11 +4,9 @@ import { State as RootState } from '../state';
 
 export interface Service {
   id: string;
-  type: 'HistoryService' | 'DeviceService';
-}
-
-export interface DeviceService extends Service {
-  type: 'DeviceService';
+  type: string;
+  config: Object;
+  isLoading?: boolean;
 }
 
 export type ServicesState = {

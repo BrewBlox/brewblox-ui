@@ -4,8 +4,8 @@ import Component from 'vue-class-component';
 import shortid from 'shortid';
 
 import Link from '@/helpers/units/Link';
-import { DeviceService } from '@/store/services/state';
-import { deviceServices } from '@/store/services/getters';
+import { Service } from '@/store/services/state';
+import { allServices } from '@/store/services/getters';
 import { Block } from '@/store/blocks/state';
 import { createBlock } from '@/store/blocks/actions';
 
@@ -33,12 +33,12 @@ import { typeName } from './getters';
 export default class SensorSetPointPairWizard extends Vue {
   currentStep: string = 'service';
   creating: boolean = false;
-  service: DeviceService | null = null;
+  service: Service | null = null;
   setpointInput: Block | null = null;
   sensorInput: Block | null = null;
 
   get services() {
-    return deviceServices(this.$store).map(service => ({
+    return allServices(this.$store).map(service => ({
       label: service.id,
       value: service,
     }));

@@ -2,10 +2,10 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { DeviceService } from '@/store/services/state';
+import { Service } from '@/store/services/state';
 import { Block } from '@/store/blocks/state';
 
-import { deviceServices } from '@/store/services/getters';
+import { allServices } from '@/store/services/getters';
 import { allBlocksFromService } from '@/store/blocks/getters';
 
 /* eslint-disable indent */
@@ -25,11 +25,11 @@ import { allBlocksFromService } from '@/store/blocks/getters';
 class Metrics extends Vue {
   currentStep: string = 'service';
   creating: boolean = false;
-  service: DeviceService | null = null;
+  service: Service | null = null;
   blockInput: Block | null = null;
 
   get services() {
-    return deviceServices(this.$store).map(service => ({
+    return allServices(this.$store).map(service => ({
       label: service.id,
       value: service,
     }));
