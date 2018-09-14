@@ -158,7 +158,13 @@
   "services": [
     {
       "id": "spark",
-      "type": "SparkService"
+      "type": "SparkService",
+      "config": {
+        "profileNames": [
+          "testey1",
+          "testey2"
+        ]
+      }
     }
   ]
 }

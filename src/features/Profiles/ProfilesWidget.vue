@@ -1,9 +1,11 @@
 <script lang="ts">
-import Component, { mixins } from 'vue-class-component';
+import Component from 'vue-class-component';
 
 import BlockWidget from '@/components/BlockWidget/BlockWidget';
 import ProfilesBar from '@/components/WidgetGenerics/ProfilesBar.vue';
 import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
+
+import { profileNames } from '@/components/SparkService/getters';
 
 import { ProfilesBlock } from './state';
 import { getById } from './getters';
@@ -17,13 +19,17 @@ import { getById } from './getters';
   },
 })
 /* eslint-enable */
-export default class ProfilesWidget extends mixins(BlockWidget) {
+export default class ProfilesWidget extends BlockWidget {
   inputMapping = {
     active: { path: 'block.data.active', default: [] },
   };
 
   get block(): ProfilesBlock {
     return getById(this.$store, this.blockId);
+  }
+
+  get names(): string[] {
+    return profileNames(this.$store, this.block.serviceId);
   }
 }
 </script>
@@ -47,6 +53,7 @@ export default class ProfilesWidget extends mixins(BlockWidget) {
               <q-item-tile>
                 <profiles-bar
                   :profiles="inputs.active"
+                  :profileNames="names"
                 />
               </q-item-tile>
             </q-item-main>

@@ -9,7 +9,7 @@ import { clearBlocks } from '@/store/blocks/actions';
 
 
 @Component
-export default class SparkServices extends Vue {
+export default class SparkServicesView extends Vue {
   serviceInput: string = '';
   $q: any;
 
@@ -80,7 +80,7 @@ export default class SparkServices extends Vue {
         </q-item>
         <q-item
           v-for="service in services"
-          :key="service"
+          :key="service.id"
         >
           {{ service.id }}
 
