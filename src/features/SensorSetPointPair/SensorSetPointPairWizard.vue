@@ -21,11 +21,11 @@ import { typeName } from './getters';
   props: {
     onCreateItem: {
       type: Function,
-      default: () => { throw new Error('Provide onCreateItem callback'); },
+      required: true,
     },
     onCancel: {
       type: Function,
-      default: () => { throw new Error('Provide onCancel callback'); },
+      required: true,
     },
   },
 })

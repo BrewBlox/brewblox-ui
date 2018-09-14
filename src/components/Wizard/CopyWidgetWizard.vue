@@ -16,7 +16,7 @@ import { allTypes, wizardByType, displayNameByType } from '@/features/feature-by
   props: {
     onCreateItem: {
       type: Function,
-      default: () => { throw new Error('Provide onCreateItem callback'); },
+      required: true,
     },
   },
 })

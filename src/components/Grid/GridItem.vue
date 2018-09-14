@@ -12,15 +12,15 @@ type Coordinates = { x: number, y: number };
   props: {
     id: {
       type: [String, Number],
-      default: () => { throw new Error('Provide an id'); },
+      required: true,
     },
     cols: {
       type: Number,
-      default: () => { throw new Error('Provide cols'); },
+      required: true,
     },
     rows: {
       type: Number,
-      default: () => { throw new Error('Provide rows'); },
+      required: true,
     },
     editable: {
       type: Boolean,

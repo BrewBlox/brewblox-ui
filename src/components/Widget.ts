@@ -6,15 +6,15 @@ import Component from 'vue-class-component';
   props: {
     id: {
       type: String,
-      default: () => { throw new Error('Provide item ID'); },
+      required: true,
     },
     type: {
       type: String,
-      default: () => { throw new Error('Provide type'); },
+      required: true,
     },
     config: {
       type: Object,
-      default: () => { throw new Error('Provide block config'); },
+      required: true,
     },
     onConfigChange: {
       type: Function,

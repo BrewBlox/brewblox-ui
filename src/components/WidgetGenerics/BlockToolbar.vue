@@ -9,11 +9,11 @@ import { displayNameByType } from '@/features/feature-by-type';
   props: {
     name: {
       type: String,
-      default: () => { throw new Error('Provide name'); },
+      required: true,
     },
     type: {
       type: String,
-      default: () => { throw new Error('Provide type'); },
+      required: true,
     },
     onRefresh: {
       type: Function,

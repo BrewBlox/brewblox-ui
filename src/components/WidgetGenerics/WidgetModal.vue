@@ -16,7 +16,7 @@ import { Watch } from 'vue-property-decorator';
     },
     onClose: {
       type: Function,
-      default: () => { throw new Error('Provide onClose callback'); },
+      required: true,
     },
   },
 })

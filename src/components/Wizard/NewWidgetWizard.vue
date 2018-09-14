@@ -16,7 +16,7 @@ import { widgetWizards } from './widget-types.ts';
   props: {
     onCreateItem: {
       type: Function,
-      default: () => { throw new Error('Provide onCreateItem callback'); },
+      required: true,
     },
   },
 })

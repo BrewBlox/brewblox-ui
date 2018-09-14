@@ -19,7 +19,7 @@ import componentByType from './Parts/componentByType';
   props: {
     part: {
       type: Object,
-      default: () => { throw new Error('Provide part information'); },
+      required: true,
     },
     frame: {
       type: Number,
