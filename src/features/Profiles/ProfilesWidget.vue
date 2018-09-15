@@ -4,18 +4,23 @@ import Component from 'vue-class-component';
 import BlockWidget from '@/components/BlockWidget/BlockWidget';
 import ProfilesBar from '@/components/WidgetGenerics/ProfilesBar.vue';
 import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
+import WidgetModal from '@/components/WidgetGenerics/WidgetModal.vue';
+
+import ProfilesForm from './ProfilesForm.vue';
 
 import { profileNames } from '@/components/SparkService/getters';
+import { saveBlock } from '@/store/blocks/actions';
 
 import { ProfilesBlock } from './state';
 import { getById } from './getters';
-
 
 /* eslint-disable indent */
 @Component({
   components: {
     ProfilesBar,
     BlockToolbar,
+    WidgetModal,
+    ProfilesForm,
   },
 })
 /* eslint-enable */
@@ -23,6 +28,7 @@ export default class ProfilesWidget extends BlockWidget {
   inputMapping = {
     active: { path: 'block.data.active', default: [] },
   };
+  modalOpen: boolean = false;
 
   get block(): ProfilesBlock {
     return getById(this.$store, this.blockId);
@@ -31,16 +37,46 @@ export default class ProfilesWidget extends BlockWidget {
   get names(): string[] {
     return profileNames(this.$store, this.block.serviceId);
   }
+
+  get active(): number[] {
+    return this.block.data.active;
+  }
+
+  set active(vals: number[]) {
+    this.save({
+      ...this.block,
+      data: {
+        ...this.block.data,
+        active: vals,
+      },
+    });
+  }
+
+  save(block: ProfilesBlock) {
+    saveBlock(this.$store, block);
+  }
 }
 </script>
 
 <template>
   <div>
 
+    <widget-modal
+      :isOpen="modalOpen"
+      :onClose="() => { this.modalOpen = false; }"
+      title="Profiles Settings"
+    >
+      <profiles-form
+        :block="block"
+        :onBlockUpdate="save"
+      />
+    </widget-modal>
+
     <block-toolbar
       :name="$props.id"
       :type="$props.type"
       :on-refresh="refreshBlock"
+      :on-settings="() => { this.modalOpen = true; }"
     />
 
     <q-card>
@@ -52,7 +88,7 @@ export default class ProfilesWidget extends BlockWidget {
               <q-item-tile sublabel>Active Profiles</q-item-tile>
               <q-item-tile>
                 <profiles-bar
-                  :profiles="inputs.active"
+                  v-model="active"
                   :profileNames="names"
                 />
               </q-item-tile>

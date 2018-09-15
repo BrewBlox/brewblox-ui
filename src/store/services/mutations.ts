@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import { getStoreAccessors } from 'vuex-typescript';
-import { merge } from 'lodash';
 
 import { ServicesState, Service } from './state';
 
@@ -19,7 +18,7 @@ const mutations = {
     if (!existing) {
       throw new Error(`Block with id '${id}' does not exist`);
     }
-    Vue.set(state.services, id, merge(existing, service));
+    Vue.set(state.services, id, { ...existing, ...service });
   },
 
   mutateService(state: ServicesState, service: Partial<Service>) {

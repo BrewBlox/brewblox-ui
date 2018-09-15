@@ -5,7 +5,7 @@ import Component from 'vue-class-component';
 /* eslint-disable indent */
 @Component({
   props: {
-    profiles: {
+    value: {
       type: Array,
       required: true,
     },
@@ -24,13 +24,21 @@ export default class ProfilesBar extends Vue {
         value: idx,
       }));
   }
+
+  get profiles() {
+    return [...this.$props.value];
+  }
+
+  set profiles(values: number[]) {
+    this.$emit('input', [...values]);
+  }
 }
 </script>
 
 <template>
   <q-select
     multiple
-    v-model="$props.profiles"
+    v-model="profiles"
     :options="selectOptions"
   />
 </template>
