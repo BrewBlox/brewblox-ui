@@ -6,7 +6,7 @@ import Component from 'vue-class-component';
   props: {
     part: {
       type: Object,
-      default: () => { throw new Error('Provide part information'); },
+      required: true,
     },
     power: {
       type: Boolean,

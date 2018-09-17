@@ -13,7 +13,7 @@ import Plotly from './plotly';
   props: {
     inputOptions: {
       type: Object, // PlotlyOptions
-      default: () => { throw new Error('Provide plotly options'); },
+      required: true,
     },
     initialRange: {
       type: Number,

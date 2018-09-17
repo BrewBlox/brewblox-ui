@@ -6,7 +6,7 @@ import draggable from 'vuedraggable';
 import byOrder from '@/helpers/byOrder';
 
 import { allDashboards, isFetching } from '@/store/dashboards/getters';
-import { addNewDashboard, updateDashboardOrder } from '@/store/dashboards/actions';
+import { addNewDashboard, updateDashboardOrder, removeDashboard } from '@/store/dashboards/actions';
 import { Dashboard } from '@/store/dashboards/state';
 
 /* eslint-disable indent */
@@ -54,6 +54,20 @@ export default class LayoutDefault extends Vue {
         addNewDashboard(this.$store, dashboardName);
       });
   }
+
+  removeDashboard() {
+    this.$q.dialog({
+      title: 'Remove dashboard',
+      message: 'Select dashboard to remove',
+      cancel: true,
+      options: {
+        type: 'radio',
+        model: 'opt2',
+        items: allDashboards(this.$store)
+          .map(dashboard => ({ label: dashboard.title, value: dashboard })),
+      },
+    }).then((dashboard: Dashboard) => removeDashboard(this.$store, dashboard));
+  }
 }
 </script>
 
@@ -92,14 +106,24 @@ export default class LayoutDefault extends Vue {
         link
         inset-delimiter
       >
-        <q-list-header>Main menu</q-list-header>
+
         <q-item
           link
-          to="/settings"
+          to="/"
+          active-class="q-item-no-link-highlighting"
         >
-          <q-item-side icon="settings" />
-          Settings
+          <q-item-side icon="home" />
+          Main menu
         </q-item>
+
+        <q-item
+          link
+          to="/services"
+        >
+          <q-item-side icon="cloud" />
+          Services
+        </q-item>
+
         <q-item
           link
           to="/blocks"
@@ -111,6 +135,7 @@ export default class LayoutDefault extends Vue {
         <q-item-separator />
 
         <q-list-header v-if="!isFetching">
+          <q-item-side icon="dashboard" />
           Dashboards
 
           <q-btn
@@ -161,12 +186,18 @@ export default class LayoutDefault extends Vue {
         <div class="q-list-container">
           <q-btn
             icon="add"
+            label="Add dashboard"
             color="dark-bright"
             v-if="dashboardEditing"
             @click="createDashboard"
-          >
-            add dashboard
-          </q-btn>
+          />
+          <q-btn
+            icon="clear"
+            label="Remove dashboard"
+            color="error"
+            v-if="dashboardEditing"
+            @click="removeDashboard"
+          />
         </div>
       </q-list>
     </q-layout-drawer>

@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import { getStoreAccessors } from 'vuex-typescript';
-import { merge } from 'lodash';
 
 import { Block, BlocksState } from './state';
 import { State as RootState } from '../state';
@@ -19,7 +18,7 @@ const mutations = {
     if (!existing) {
       throw new Error(`Block with id '${id}' does not exist`);
     }
-    Vue.set(state.blocks, id, merge(existing, block));
+    Vue.set(state.blocks, id, { ...existing, ...block });
   },
 
   updateBlockState(state: BlocksState, block: Partial<Block>) {
@@ -31,7 +30,7 @@ const mutations = {
   },
 
   blockLoading(state: BlocksState, id: string) {
-    Vue.set(state.blocks, id, merge(state.blocks[id], { isLoading: true }));
+    Vue.set(state.blocks, id, { ...state.blocks[id], isLoading: true });
   },
 
   mutateFetching(state: BlocksState, fetching: boolean) {

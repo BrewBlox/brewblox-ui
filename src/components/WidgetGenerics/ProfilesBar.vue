@@ -5,33 +5,32 @@ import Component from 'vue-class-component';
 /* eslint-disable indent */
 @Component({
   props: {
-    profiles: {
+    value: {
       type: Array,
-      default: () => { throw new Error('Provide profiles'); },
+      required: true,
+    },
+    profileNames: {
+      type: Array,
+      required: true,
     },
   },
 })
 /* eslint-enable */
 export default class ProfilesBar extends Vue {
-  get displayNames() {
-    return [
-      'P1',
-      'P2',
-      'P3',
-      'P4',
-      'P5',
-      'P6',
-      'P7',
-      'P8',
-    ];
-  }
-
   get selectOptions() {
-    return this.displayNames
+    return this.$props.profileNames
       .map((name: string, idx: number) => ({
         label: name,
         value: idx,
       }));
+  }
+
+  get profiles() {
+    return [...this.$props.value];
+  }
+
+  set profiles(values: number[]) {
+    this.$emit('input', [...values]);
   }
 }
 </script>
@@ -39,7 +38,7 @@ export default class ProfilesBar extends Vue {
 <template>
   <q-select
     multiple
-    v-model="$props.profiles"
+    v-model="profiles"
     :options="selectOptions"
   />
 </template>

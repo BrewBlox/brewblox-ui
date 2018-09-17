@@ -6,8 +6,10 @@ import {
   fetchDashboardItems as fetchDashboardItemsFromApi,
   createDashboard as createDashboardOnApi,
   persistDashboard,
+  deleteDashboard as removeDashboardOnApi,
   persistDashboardItem,
   createDashboardItem as createDashboardItemOnApi,
+  deleteDashboardItem as removeDashboardItemOnApi,
 } from './api';
 
 import { DashboardState, DashboardItem, DashboardContext, Dashboard } from './state';
@@ -21,11 +23,13 @@ import {
   mutateFetching as mutateFetchingInStore,
   addDashboard as addDashboardToStore,
   setDashboard as setDashboardInStore,
+  removeDashboard as removeDashboardInStore,
   setDashboardOrder as setDashboardOrderInStore,
   addDashboardItem as addDashboardItemToStore,
   setDashboardItemOrder as setDashboardItemOrderInStore,
   setDashboardItemSize as setDashboardItemSizeInStore,
   setDashboardItemConfig as setDashboardItemConfigInStore,
+  removeDashboardItem as removeDashboardItemInStore,
 } from './mutations';
 
 const { dispatch } = getStoreAccessors<DashboardState, RootState>('dashboards');
@@ -62,6 +66,15 @@ const actions = {
     addDashboardToStore(context, dashboard);
   },
 
+  async removeDashboard(context: DashboardContext, dashboard: Dashboard) {
+    Promise.all(getDashboardInStore(context, dashboard.id)
+      .items
+      .map(itemId =>
+        actions.removeDashboardItem(context, getDashboardItemInStore(context, itemId))));
+    removeDashboardInStore(context, dashboard);
+    removeDashboardOnApi(dashboard);
+  },
+
   addDashboardItem(context: DashboardContext, item: DashboardItem) {
     addDashboardItemToStore(context, item);
   },
@@ -91,59 +104,56 @@ const actions = {
   },
 
   async fetchDashboards(context: DashboardContext) {
-    // update isFetching
     mutateFetchingInStore(context, true);
-
-    // will fetch blocks from the server
     const [dashboards, items] = await Promise.all([
       fetchDashboardsFromApi(),
       fetchDashboardItemsFromApi(),
     ]);
-
-    // first add items to store
     items.forEach(item => actions.addDashboardItem(context, item));
-
-    // then add the dashboards
     dashboards.forEach(dashboard => actions.addDashboard(context, dashboard));
-
-    // update isFetching
     mutateFetchingInStore(context, false);
   },
 
   async createDashboardItem(
     context: DashboardContext,
-    item: DashboardItem,
-  ): Promise<DashboardItem> {
+    payload: { dashboard: Dashboard, item: DashboardItem },
+  ) {
+    const { dashboard, item } = payload;
     const dashboardItem = await createDashboardItemOnApi(item);
     actions.addDashboardItem(context, dashboardItem);
-    return dashboardItem;
+    actions.addDashboardItemToDashboard(context, { dashboard, item });
   },
 
   addDashboardItemToDashboard(
     context: DashboardContext,
-    payload: { dashboard: Dashboard, dashboardItem: DashboardItem },
+    payload: { dashboard: Dashboard, item: DashboardItem },
   ) {
-    const { dashboard, dashboardItem } = payload;
+    const { dashboard, item } = payload;
 
     actions.updateDashboard(context, {
       ...dashboard,
-      items: [...dashboard.items, dashboardItem.id],
+      items: [...dashboard.items, item.id],
     });
   },
 
+  removeDashboardItem(context: DashboardContext, item: DashboardItem) {
+    removeDashboardItemOnApi(item);
+    removeDashboardItemInStore(context, item);
+  },
 };
 
-// exported action accessors
 export const fetchDashboards = dispatch(actions.fetchDashboards);
 export const addDashboardItem = dispatch(actions.addDashboardItem);
 export const addNewDashboard = dispatch(actions.addNewDashboard);
 export const updateDashboardOrder = dispatch(actions.updateDashboardOrder);
 export const updateDashboard = dispatch(actions.updateDashboard);
 export const addDashboard = dispatch(actions.addDashboard);
+export const removeDashboard = dispatch(actions.removeDashboard);
 export const addDashboardItemToDashboard = dispatch(actions.addDashboardItemToDashboard);
 export const updateDashboardItemOrder = dispatch(actions.updateDashboardItemOrder);
 export const updateDashboardItemSize = dispatch(actions.updateDashboardItemSize);
 export const updateDashboardItemConfig = dispatch(actions.updateDashboardItemConfig);
 export const createDashboardItem = dispatch(actions.createDashboardItem);
+export const removeDashboardItem = dispatch(actions.removeDashboardItem);
 
 export default actions;

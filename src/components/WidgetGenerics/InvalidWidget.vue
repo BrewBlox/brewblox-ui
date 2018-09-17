@@ -10,11 +10,11 @@ import BlockWidget from '@/components/BlockWidget/BlockWidget.ts';
   props: {
     id: {
       type: String,
-      default: () => { throw new Error('Provide item ID'); },
+      required: true,
     },
     config: {
       type: Object,
-      default: () => { throw new Error('Provide block config'); },
+      required: true,
     },
     error: {
       type: String,

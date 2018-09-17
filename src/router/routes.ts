@@ -4,7 +4,7 @@ export default [
     component: () => import('@/layouts/default.vue'),
     children: [
       { path: '', component: () => import('@/pages/IndexPage.vue') },
-      { path: '/settings', component: () => import('@/pages/SettingsPage.vue') },
+      { path: '/services', component: () => import('@/pages/ServicesPage.vue') },
       { path: '/blocks', component: () => import('@/pages/BlocksPage.vue') },
 
       // dynamic pages

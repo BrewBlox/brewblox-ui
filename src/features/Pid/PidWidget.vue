@@ -5,6 +5,7 @@ import { saveBlock } from '@/store/blocks/actions';
 import { updateBlockState } from '@/store/blocks/mutations';
 import BlockWidget from '@/components/BlockWidget/BlockWidget';
 import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
+import WidgetModal from '@/components/WidgetGenerics/WidgetModal.vue';
 
 import { getAll as getAllSensorSetPointPairs } from '../SensorSetPointPair/getters';
 
@@ -17,6 +18,7 @@ import { refresh } from './actions';
 @Component({
   components: {
     BlockToolbar,
+    WidgetModal,
   },
 })
 /* eslint-enable */
@@ -125,7 +127,8 @@ export default class PidWidget extends BlockWidget {
   <div>
 
     <block-toolbar
-      :block="block"
+      :name="$props.id"
+      :type="$props.type"
       :on-refresh="refreshBlock"
       :on-settings="openModal"
     />
@@ -182,124 +185,111 @@ export default class PidWidget extends BlockWidget {
       </q-list>
     </q-card>
 
-    <q-modal
-      v-model="modalOpen"
-      :content-css="{ minWidth: '80vw', minHeight: '80vh' }"
+    <widget-modal
+      :isOpen="modalOpen"
+      :onClose="() => { this.modalOpen = false; }"
+      title="PID Settings"
     >
-      <q-modal-layout>
-        <q-toolbar
-          slot="header"
-          color="dark-bright"
+
+      <q-list>
+        <q-list-header>Settings</q-list-header>
+        <q-item class="grid-items-3">
+          <q-item-main>
+            <q-input
+              v-model="inputs.kp"
+              stack-label="KP"
+              placeholder="KP of PID"
+              type="number"
+            />
+          </q-item-main>
+          <q-item-main>
+            <q-input
+              v-model="inputs.ti"
+              stack-label="TI"
+              placeholder="TI of PID"
+              type="number"
+            />
+          </q-item-main>
+          <q-item-main>
+            <q-input
+              v-model="inputs.td"
+              stack-label="TD"
+              placeholder="TD of PID"
+              type="number"
+            />
+          </q-item-main>
+        </q-item>
+        <q-item-separator />
+        <q-list-header>Links</q-list-header>
+        <q-item class="grid-items-2">
+          <q-item-main>
+            <q-select
+              v-model="inputs.linkInput"
+              stack-label="Input"
+              placeholder="Input of PID"
+              clearable
+              :options="allSensorSetPointPairs"
+            />
+          </q-item-main>
+          <q-item-main>
+            <q-select
+              v-model="inputs.linkOutput"
+              stack-label="Output"
+              placeholder="Output of PID"
+              clearable
+              :options="allSensorSetPointPairs"
+            />
+          </q-item-main>
+        </q-item>
+        <q-item-separator />
+        <q-list-header>Filtering</q-list-header>
+        <q-item class="grid-items-2">
+          <q-item-main>
+            <q-input
+              v-model="inputs.filteringInput"
+              stack-label="Input"
+              placeholder="Filtering input"
+              type="number"
+            />
+          </q-item-main>
+          <q-item-main>
+            <q-input
+              v-model="inputs.filteringDerivative"
+              stack-label="Derivative"
+              placeholder="Filtering derivative"
+              type="number"
+            />
+          </q-item-main>
+        </q-item>
+      </q-list>
+      <q-card-actions>
+        <q-btn
+          icon="check"
+          :color="changed ? 'primary' : 'light'"
+          :disable="!changed"
+          @click="save"
         >
-          <q-toolbar-title>
-            Pid Settings
-          </q-toolbar-title>
-          <q-btn
-            flat
-            @click="closeModal"
-          >
-            Close
-          </q-btn>
-        </q-toolbar>
+          Save
+        </q-btn>
 
-        <q-list>
-          <q-list-header>Settings</q-list-header>
-          <q-item class="grid-items-3">
-            <q-item-main>
-              <q-input
-                v-model="inputs.kp"
-                stack-label="KP"
-                placeholder="KP of PID"
-                type="number"
-              />
-            </q-item-main>
-            <q-item-main>
-              <q-input
-                v-model="inputs.ti"
-                stack-label="TI"
-                placeholder="TI of PID"
-                type="number"
-              />
-            </q-item-main>
-            <q-item-main>
-              <q-input
-                v-model="inputs.td"
-                stack-label="TD"
-                placeholder="TD of PID"
-                type="number"
-              />
-            </q-item-main>
-          </q-item>
-          <q-item-separator />
-          <q-list-header>Links</q-list-header>
-          <q-item class="grid-items-2">
-            <q-item-main>
-              <q-select
-                v-model="inputs.linkInput"
-                stack-label="Input"
-                placeholder="Input of PID"
-                clearable
-                :options="allSensorSetPointPairs"
-              />
-            </q-item-main>
-            <q-item-main>
-              <q-select
-                v-model="inputs.linkOutput"
-                stack-label="Output"
-                placeholder="Output of PID"
-                clearable
-                :options="allSensorSetPointPairs"
-              />
-            </q-item-main>
-          </q-item>
-          <q-item-separator />
-          <q-list-header>Filtering</q-list-header>
-          <q-item class="grid-items-2">
-            <q-item-main>
-              <q-input
-                v-model="inputs.filteringInput"
-                stack-label="Input"
-                placeholder="Filtering input"
-                type="number"
-              />
-            </q-item-main>
-            <q-item-main>
-              <q-input
-                v-model="inputs.filteringDerivative"
-                stack-label="Derivative"
-                placeholder="Filtering derivative"
-                type="number"
-              />
-            </q-item-main>
-          </q-item>
-        </q-list>
-        <q-card-actions>
-          <q-btn
-            icon="check"
-            :color="changed ? 'primary' : 'light'"
-            :disable="!changed"
-            @click="save"
-          >
-            Save
-          </q-btn>
+        <q-btn
+          icon="check"
+          :color="kpChanged ? 'primary' : 'light'"
+          :disable="!kpChanged"
+          @click="updateKP"
+        >
+          Update KP
+        </q-btn>
+        <q-btn
+          icon="check"
+          @click="randomKP"
+        >
+          Random KP from store
+        </q-btn>
+      </q-card-actions>
 
-          <q-btn
-            icon="check"
-            :color="kpChanged ? 'primary' : 'light'"
-            :disable="!kpChanged"
-            @click="updateKP"
-          >
-            Update KP
-          </q-btn>
-          <q-btn
-            icon="check"
-            @click="randomKP"
-          >
-            Random KP from store
-          </q-btn>
-        </q-card-actions>
-      </q-modal-layout>
-    </q-modal>
+    </widget-modal>
+
   </div>
 </template>
 

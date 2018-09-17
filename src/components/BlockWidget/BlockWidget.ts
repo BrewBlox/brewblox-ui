@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import { get } from 'lodash';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
@@ -53,7 +54,8 @@ export default class BlockWidget extends Widget {
 
   get changed(): boolean {
     const state = this.inputsFromSource();
-    return Object.keys(state).some(key => state[key] !== this.inputs[key]);
+    return Object.keys(state)
+      .some(key => state[key] !== this.inputs[key]);
   }
 
   get blockId(): string {
@@ -66,7 +68,9 @@ export default class BlockWidget extends Widget {
 
   @Watch('block', { immediate: true, deep: true })
   onBlockUpdate() {
-    this.inputs = this.inputsFromSource();
+    if (!this.block.isLoading) {
+      this.inputs = this.inputsFromSource();
+    }
   }
 
   refreshBlock() {

@@ -1,4 +1,4 @@
-import { get, put, post } from '@/helpers/fetch';
+import { get, put, post, del } from '@/helpers/fetch';
 
 import { Dashboard, DashboardItem } from './state';
 
@@ -18,6 +18,10 @@ export function persistDashboard(dashboard: Dashboard): Promise<Dashboard> {
   return put(`/datastore/dashboards/${encodeURIComponent(dashboard.id)}`, dashboard);
 }
 
+export function deleteDashboard(dashboard: Dashboard): Promise<Dashboard> {
+  return del(`/datastore/dashboards/${encodeURIComponent(dashboard.id)}`, dashboard);
+}
+
 export function fetchDashboardItems(): Promise<DashboardItem[]> {
   return get('/datastore/dashboard-items');
 }
@@ -32,4 +36,8 @@ export function persistDashboardItem(item: DashboardItem): Promise<DashboardItem
 
 export function createDashboardItem(item: DashboardItem): Promise<DashboardItem> {
   return post('/datastore/dashboard-items/', item);
+}
+
+export function deleteDashboardItem(item: DashboardItem): Promise<DashboardItem> {
+  return del(`/datastore/dashboard-items/${encodeURIComponent(item.id)}`, item);
 }

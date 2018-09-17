@@ -28,6 +28,10 @@ const mutations = {
     updateDashboard(state, dashboard.id, dashboard);
   },
 
+  removeDashboard(state: DashboardState, dashboard: Dashboard) {
+    Vue.delete(state.dashboards, dashboard.id);
+  },
+
   addDashboardItem(state: DashboardState, item: DashboardItem) {
     Vue.set(state.items, item.id, { ...item });
   },
@@ -54,16 +58,22 @@ const mutations = {
     updateDashboardItem(state, id, { config });
   },
 
+  removeDashboardItem(state: DashboardState, item: DashboardItem) {
+    Vue.delete(state.items, item.id);
+  },
+
 };
 
 // exported commit accessors
 export const mutateFetching = commit(mutations.mutateFetching);
 export const addDashboard = commit(mutations.addDashboard);
 export const setDashboard = commit(mutations.setDashboard);
+export const removeDashboard = commit(mutations.removeDashboard);
 export const setDashboardOrder = commit(mutations.setDashboardOrder);
 export const addDashboardItem = commit(mutations.addDashboardItem);
 export const setDashboardItemOrder = commit(mutations.setDashboardItemOrder);
 export const setDashboardItemSize = commit(mutations.setDashboardItemSize);
 export const setDashboardItemConfig = commit(mutations.setDashboardItemConfig);
+export const removeDashboardItem = commit(mutations.removeDashboardItem);
 
 export default mutations;

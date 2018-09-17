@@ -4,24 +4,28 @@ import Component from 'vue-class-component';
 import shortid from 'shortid';
 
 import Link from '@/helpers/units/Link';
-import { DeviceService } from '@/store/services/state';
-import { deviceServices } from '@/store/services/getters';
+import { Service } from '@/store/services/state';
+import { allServices } from '@/store/services/getters';
 import { Block } from '@/store/blocks/state';
 import { createBlock } from '@/store/blocks/actions';
+
+import { widgetSizeByType } from '../feature-by-type';
 
 import { getAll as getAllSetPointSimple } from '../SetPointSimple/getters';
 import { getAll as getAllOneWireTempSensor } from '../OneWireTempSensor/getters';
 
+import { typeName } from './getters';
+
 /* eslint-disable indent */
 @Component({
   props: {
+    onCreateItem: {
+      type: Function,
+      required: true,
+    },
     onCancel: {
       type: Function,
-      default: () => { },
-    },
-    onCreate: {
-      type: Function,
-      default: () => { },
+      required: true,
     },
   },
 })
@@ -29,12 +33,12 @@ import { getAll as getAllOneWireTempSensor } from '../OneWireTempSensor/getters'
 export default class SensorSetPointPairWizard extends Vue {
   currentStep: string = 'service';
   creating: boolean = false;
-  service: DeviceService | null = null;
+  service: Service | null = null;
   setpointInput: Block | null = null;
   sensorInput: Block | null = null;
 
   get services() {
-    return deviceServices(this.$store).map(service => ({
+    return allServices(this.$store).map(service => ({
       label: service.id,
       value: service,
     }));
@@ -81,7 +85,7 @@ export default class SensorSetPointPairWizard extends Vue {
     this.sensorInput = null;
   }
 
-  async createBlock() {
+  async createItem() {
     try {
       this.creating = true;
 
@@ -89,20 +93,28 @@ export default class SensorSetPointPairWizard extends Vue {
         throw new Error('Invalid values for inputs');
       }
 
+      const id = `${typeName}-${shortid.generate()}`;
       const block = await createBlock(this.$store, {
-        id: `SensorSetPointPair-${shortid.generate()}`,
+        id,
         serviceId: this.service.id,
         profiles: [0],
-        type: 'SensorSetPointPair',
+        type: typeName,
         data: {
           sensor: new Link(this.sensorInput.id),
           setpoint: new Link(this.setpointInput.id),
         },
       });
 
-      this.creating = false;
+      this.$props.onCreateItem({
+        type: typeName,
+        ...widgetSizeByType(typeName),
+        widget: typeName,
+        config: {
+          blockId: `${this.service.id}/${id}`,
+        },
+      });
 
-      this.$props.onCreate(block);
+      this.creating = false;
     } catch (e) {
       throw new Error(e);
     }
@@ -200,7 +212,7 @@ export default class SensorSetPointPairWizard extends Vue {
         color="primary"
         label="Create"
         :loading="creating"
-        @click="createBlock"
+        @click="createItem"
       />
     </q-stepper-navigation>
   </q-stepper>

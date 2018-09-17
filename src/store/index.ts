@@ -6,7 +6,6 @@ import { State } from './state';
 import blocks from './blocks';
 import dashboards from './dashboards';
 import services from './services';
-import settings from './settings';
 
 Vue.use(Vuex);
 
@@ -15,7 +14,6 @@ const store = new Vuex.Store<State>({
     blocks,
     dashboards,
     services,
-    settings,
   },
 });
 

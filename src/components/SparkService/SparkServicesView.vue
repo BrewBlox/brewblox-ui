@@ -2,51 +2,55 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { controllers, isFetching } from '@/store/settings/getters';
-import { addController, removeController } from '@/store/settings/actions';
+import { Service } from '@/store/services/state';
+import { allServices, isFetching, serviceById } from '@/store/services/getters';
+import { createService, removeService } from '@/store/services/actions';
 import { clearBlocks } from '@/store/blocks/actions';
-import { serviceById } from '@/store/services/getters';
 
 
 @Component
-export default class Controllers extends Vue {
-  controllerInput: string = '';
+export default class SparkServicesView extends Vue {
+  serviceInput: string = '';
   $q: any;
 
   get isFetching() {
     return isFetching(this.$store);
   }
 
-  get controllers() {
-    return controllers(this.$store);
+  get services() {
+    return allServices(this.$store);
   }
 
-  addController() {
-    addController(this.$store, this.controllerInput);
+  addService() {
+    createService(this.$store, {
+      id: this.serviceInput,
+      type: 'SparkService',
+      config: {},
+    });
 
     // reset input
-    this.controllerInput = '';
+    this.serviceInput = '';
   }
 
-  clear(controller: string) {
+  clear(service: Service) {
     this.$q.dialog({
       title: 'Remove',
-      message: `Do you want to remove all blocks from '${controller}'?`,
+      message: `Do you want to remove all blocks from '${service.id}'?`,
       ok: 'Yes',
       cancel: 'Cancel',
     })
-      .then(() => clearBlocks(this.$store, serviceById(this.$store, controller)))
+      .then(() => clearBlocks(this.$store, service))
       .catch(() => { });
   }
 
-  remove(controller: string) {
+  remove(service: Service) {
     this.$q.dialog({
       title: 'Remove',
-      message: `Do you want to remove controller '${controller}'?`,
+      message: `Do you want to remove the Spark '${service.id}'?`,
       ok: 'Yes',
       cancel: 'Cancel',
     })
-      .then(() => removeController(this.$store, controller))
+      .then(() => removeService(this.$store, service))
       .catch(() => { });
   }
 }
@@ -54,16 +58,16 @@ export default class Controllers extends Vue {
 
 <template>
   <q-card>
-    <q-card-title>Connected controllers</q-card-title>
+    <q-card-title>Connected Spark Controllers</q-card-title>
     <q-card-main>
       <q-list>
         <q-item>
           <q-item-main>
-            <form @submit.prevent="addController">
+            <form @submit.prevent="addService">
               <q-input
-                v-model="controllerInput"
-                stack-label="Add new controller"
-                placeholder="controller-id"
+                v-model="serviceInput"
+                stack-label="Add new Spark controller"
+                placeholder="controller ID"
               />
               <q-btn
                 icon="add"
@@ -75,19 +79,19 @@ export default class Controllers extends Vue {
           </q-item-main>
         </q-item>
         <q-item
-          v-for="controller in controllers"
-          :key="controller"
+          v-for="service in services"
+          :key="service.id"
         >
-          {{ controller }}
+          {{ service.id }}
 
           <div
-            class="controller-actions"
+            class="service-actions"
           >
             <q-btn
             class="action-btn"
             icon="clear"
             color="negative"
-            @click="clear(controller)"
+            @click="clear(service)"
             >
               Clear blocks
             </q-btn>
@@ -95,7 +99,7 @@ export default class Controllers extends Vue {
               class="action-btn"
               icon="remove circle"
               color="negative"
-              @click="remove(controller)"
+              @click="remove(service)"
             >
               Remove
             </q-btn>
@@ -120,7 +124,7 @@ export default class Controllers extends Vue {
   flex-shrink: 0;
 }
 
-.controller-actions {
+.service-actions {
   margin-left: auto;
 }
 

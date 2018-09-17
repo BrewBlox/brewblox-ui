@@ -1,15 +1,26 @@
 <script lang="ts">
 import Vue, { VueConstructor } from 'vue';
+import { Notify } from 'quasar';
 import Component from 'vue-class-component';
+import shortid from 'shortid';
 
 import GridContainer from '@/components/Grid/GridContainer.vue';
-import WizardModal from '@/components/Wizard/WizardModal.vue';
 import InvalidWidget from '@/components/WidgetGenerics/InvalidWidget.vue';
+import WidgetModal from '@/components/WidgetGenerics/WidgetModal.vue';
+import CopyWidgetWizard from '@/components/Wizard/CopyWidgetWizard.vue';
+import NewWidgetWizard from '@/components/Wizard/NewWidgetWizard.vue';
 
 import byOrder from '@/helpers/byOrder';
 
+import { Block } from '@/store/blocks/state';
 import { DashboardItem } from '@/store/dashboards/state';
-import { isFetching, dashboardById, dashboardItemById } from '@/store/dashboards/getters';
+
+import {
+  isFetching,
+  dashboardById,
+  dashboardItemById,
+} from '@/store/dashboards/getters';
+
 import {
   updateDashboard,
   updateDashboardItemOrder,
@@ -18,27 +29,44 @@ import {
   createDashboardItem,
   addDashboardItemToDashboard,
 } from '@/store/dashboards/actions';
-import { Block } from '@/store/blocks/state';
 
-import { widgetByType, validatorByType } from '@/features/feature-by-type';
-
+import {
+  allTypes,
+  widgetByType,
+  validatorByType,
+  wizardByType,
+  displayNameByType,
+  widgetSizeByType,
+} from '@/features/feature-by-type';
 
 interface VueOrdered extends Vue {
   id: string;
+}
+
+interface ModalConfig {
+  open: boolean;
+  title: string;
+  component?: VueConstructor;
 }
 
 /* eslint-disable indent */
 @Component({
   components: {
     GridContainer,
-    WizardModal,
+    WidgetModal,
+    CopyWidgetWizard,
+    NewWidgetWizard,
   },
 })
 /* eslint-enable */
 export default class DashboardPage extends Vue {
   editable: boolean = false;
-  modalOpen: boolean = false;
   title: string = '';
+
+  wizardModal: ModalConfig = {
+    open: false,
+    title: '',
+  };
 
   get dashboardId(): string {
     return this.$route.params.id;
@@ -79,12 +107,12 @@ export default class DashboardPage extends Vue {
     return isFetching(this.$store);
   }
 
-  toggleEditable() {
+  onStartEdit() {
     this.title = this.dashboard.title;
     this.editable = true;
   }
 
-  onSave() {
+  onStopEdit() {
     if (this.title !== this.dashboard.title) {
       // update title of dashboard if changed
       updateDashboard(this.$store, {
@@ -92,17 +120,11 @@ export default class DashboardPage extends Vue {
         title: this.title,
       });
     }
-
     this.editable = false;
-  }
-
-  onOpenAddWidget() {
-    this.modalOpen = true;
   }
 
   async onChangeOrder(order: VueOrdered[]) {
     const newOrder = order.map(item => item.id);
-
     try {
       await updateDashboardItemOrder(this.$store, newOrder);
     } catch (e) {
@@ -114,25 +136,50 @@ export default class DashboardPage extends Vue {
     updateDashboardItemSize(this.$store, { id, cols, rows });
   }
 
-  async onAddWidget(type: string, blockId: string) {
-    const dashboardItem = await createDashboardItem(this.$store, {
-      id: `item-${blockId}`,
-      order: this.items.length + 1,
-      cols: 4,
-      rows: 4,
-      widget: type,
-      config: {
-        blockId,
-      },
-    });
-
-    addDashboardItemToDashboard(this.$store, { dashboardItem, dashboard: this.dashboard });
-
-    this.modalOpen = false;
-  }
-
   onChangeItemConfig(id: string, config: any) {
     updateDashboardItemConfig(this.$store, { id, config });
+  }
+
+  onStartCopyWidget() {
+    this.wizardModal = {
+      open: true,
+      component: CopyWidgetWizard,
+      title: 'Copy Existing Widget',
+    };
+  }
+
+  onStartNewWidget() {
+    this.wizardModal = {
+      open: true,
+      component: NewWidgetWizard,
+      title: 'Add New Widget',
+    };
+  }
+
+  async onCreateItem(partial: Partial<DashboardItem>) {
+    try {
+      const item: DashboardItem = {
+        // Default settings
+        id: shortid.generate(),
+        widget: 'Unknown',
+        config: {},
+        ...widgetSizeByType('Unknown'),
+        // Actual settings
+        ...partial,
+        // Item order is set here
+        order: this.items.length + 1,
+      };
+      await createDashboardItem(
+        this.$store,
+        { item, dashboard: this.dashboard },
+      );
+      Notify.create({
+        type: 'positive',
+        message: `Added ${displayNameByType(item.widget)} "${item.id}"`,
+      });
+    } catch (e) {
+      Notify.create(`Failed to add widget: ${e.toString()}`);
+    }
   }
 }
 </script>
@@ -162,30 +209,43 @@ export default class DashboardPage extends Vue {
       </portal>
 
       <portal to="toolbar-buttons">
+
         <q-btn
           v-if="editable"
           color="primary"
           icon="add"
-          label="Add widget"
-          @click="onOpenAddWidget"
+          label="Copy Widget"
+          @click="onStartCopyWidget"
         />
+
+        <q-btn
+          v-if="editable"
+          color="primary"
+          icon="add"
+          label="New Widget"
+          @click="onStartNewWidget"
+        />
+
         <q-btn
           :icon="editable ? 'check' : 'mode edit'"
           :color="editable ? 'positive' : 'primary'"
-          @click="editable ? onSave() : toggleEditable()"
+          @click="editable ? onStopEdit() : onStartEdit()"
           :label="editable ? 'Save changes' : 'Edit dashboard'"
         />
+
       </portal>
 
-      <q-modal
-        v-model="modalOpen"
-        :content-css="{ minWidth: '80vw', minHeight: '500px' }"
+      <widget-modal
+        :isOpen="wizardModal.open"
+        :title="wizardModal.title"
+        :onClose="() => { this.wizardModal.open = false; }"
       >
-        <wizard-modal
-          :isOpen="modalOpen"
-          :onAddWidget="onAddWidget"
+        <component
+          v-if="wizardModal.open"
+          :is="wizardModal.component"
+          :onCreateItem="onCreateItem"
         />
-      </q-modal>
+      </widget-modal>
 
       <grid-container
         :editable="editable"
@@ -199,6 +259,7 @@ export default class DashboardPage extends Vue {
           :error="item.error"
           :key="item.id"
           :id="item.id"
+          :type="item.widget"
           :cols="item.cols"
           :rows="item.rows"
           :config="item.config"
