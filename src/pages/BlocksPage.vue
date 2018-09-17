@@ -11,7 +11,7 @@ import { DashboardItem } from '@/store/dashboards/state';
 import { Block } from '@/services/SparkService/state';
 import { isFetching, allBlocks } from '@/services/SparkService/store/getters';
 
-import { widgetByType, widgetSizeByType } from '@/services/feature-by-type';
+import { widgetByType, widgetSizeByType, allFeatureTypes } from '@/services/feature-by-type';
 
 interface VueOrdered extends Vue {
   id: string;
@@ -53,6 +53,7 @@ export default class BlocksPage extends Vue {
   }
 
   widgetComponent(type: string): VueConstructor {
+    console.log(allFeatureTypes());
     return widgetByType(type);
   }
 }

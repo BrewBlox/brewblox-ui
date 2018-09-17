@@ -1,11 +1,10 @@
+import { features } from './';
 import generic from './SparkService/features/GenericBlock';
 
-import { allFeatures } from './';
-
-export const allFeatureTypes: string[] = Object.keys(allFeatures);
+export const allFeatureTypes = () => Object.keys(features);
 
 export const featureByType = (type: string) =>
-  (allFeatures[type] || {});
+  (features[type] || {});
 
 export const widgetByType = (type: string) =>
   featureByType(type).widget || generic.widget;

@@ -1,9 +1,9 @@
-import { allServices } from './';
+import { services } from './';
 
-export const allServiceTypes = Object.keys(allServices);
+export const allServiceTypes = () => Object.keys(services);
 
 export const serviceByType = (type: string) =>
-  (allServices[type] || {});
+  (services[type] || {});
 
 export const fetchByType = (type: string) =>
   serviceByType(type).fetch || (() => { });

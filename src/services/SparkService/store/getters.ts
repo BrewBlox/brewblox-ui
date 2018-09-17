@@ -19,7 +19,7 @@ const defaultProfileNames = [
   'P8',
 ];
 
-export const typeName = 'SparkService';
+export const typeName: string = 'SparkService';
 
 const { read } = getStoreAccessors<BlocksState, RootState>(typeName);
 

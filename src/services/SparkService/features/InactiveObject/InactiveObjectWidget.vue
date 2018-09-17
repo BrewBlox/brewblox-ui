@@ -12,15 +12,7 @@ import { getById } from './getters';
   },
 })
 /* eslint-enable */
-export default class InactiveObjectWidget extends BlockWidget {
-  refreshState() {
-    return undefined;
-  }
-
-  get block() {
-    return getById(this.$store, this.blockId);
-  }
-}
+export default class InactiveObjectWidget extends BlockWidget {}
 </script>
 
 <template>

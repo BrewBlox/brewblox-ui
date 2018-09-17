@@ -1,4 +1,3 @@
-import { RootStore } from '@/store/state';
 import { Service } from '@/store/services/state';
 
 import actions, { fetchBlocks } from './actions';
@@ -17,7 +16,9 @@ const vuexModule = {
   },
 };
 
-export function startup(store: RootStore, service: Service) {
-  store.registerModule(typeName, vuexModule);
+export function startup(store: any, service: Service) {
+  if (!store[typeName]) {
+    store.registerModule(typeName, vuexModule);
+  }
   fetchBlocks(store, service);
 }

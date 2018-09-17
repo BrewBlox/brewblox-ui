@@ -23,7 +23,7 @@ export function blocksByWidgetType(store: RootStore, type: string): Block[] {
   return getBlocksFromServices(services, store, type);
 }
 
-export const widgetWizards: { [name: string]: VueConstructor } = allFeatureTypes
+export const widgetWizards: { [name: string]: VueConstructor } = allFeatureTypes()
   .filter(wizardByType)
   .reduce(
     (acc: any, type: string) => {
@@ -33,7 +33,7 @@ export const widgetWizards: { [name: string]: VueConstructor } = allFeatureTypes
     {},
   );
 
-export const widgetDescriptions: { [name: string]: string } = allFeatureTypes
+export const widgetDescriptions: { [name: string]: string } = allFeatureTypes()
   .reduce(
     (acc: any, type: string) => {
       acc[type] = displayNameByType(type);

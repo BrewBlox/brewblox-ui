@@ -27,7 +27,7 @@ export default class NewWidgetWizard extends Vue {
   featureWizard: VueConstructor | null = null;
 
   get wizardOptions() {
-    return allFeatureTypes
+    return allFeatureTypes()
       .filter(wizardByType)
       .filter(type => displayNameByType(type).match(this.searchModel))
       .map(type => ({
