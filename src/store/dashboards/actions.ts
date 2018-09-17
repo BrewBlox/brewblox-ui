@@ -66,10 +66,11 @@ const actions = {
     addDashboardToStore(context, dashboard);
   },
 
-  removeDashboard(context: DashboardContext, dashboard: Dashboard) {
-    getDashboardInStore(context, dashboard.id)
+  async removeDashboard(context: DashboardContext, dashboard: Dashboard) {
+    Promise.all(getDashboardInStore(context, dashboard.id)
       .items
-      .forEach(itemId => removeDashboardItem(context, getDashboardItemInStore(context, itemId)));
+      .map(itemId =>
+        actions.removeDashboardItem(context, getDashboardItemInStore(context, itemId))));
     removeDashboardInStore(context, dashboard);
     removeDashboardOnApi(dashboard);
   },
