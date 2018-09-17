@@ -6,7 +6,7 @@ import draggable from 'vuedraggable';
 import byOrder from '@/helpers/byOrder';
 
 import { allDashboards, isFetching } from '@/store/dashboards/getters';
-import { addNewDashboard, updateDashboardOrder } from '@/store/dashboards/actions';
+import { addNewDashboard, updateDashboardOrder, removeDashboard } from '@/store/dashboards/actions';
 import { Dashboard } from '@/store/dashboards/state';
 
 /* eslint-disable indent */
@@ -53,6 +53,20 @@ export default class LayoutDefault extends Vue {
       .then((dashboardName: string) => {
         addNewDashboard(this.$store, dashboardName);
       });
+  }
+
+  removeDashboard() {
+    this.$q.dialog({
+      title: 'Remove dashboard',
+      message: 'Select dashboard to remove',
+      cancel: true,
+      options: {
+        type: 'radio',
+        model: 'opt2',
+        items: allDashboards(this.$store)
+          .map(dashboard => ({ label: dashboard.title, value: dashboard })),
+      },
+    }).then((dashboard: Dashboard) => removeDashboard(this.$store, dashboard));
   }
 }
 </script>
@@ -172,12 +186,18 @@ export default class LayoutDefault extends Vue {
         <div class="q-list-container">
           <q-btn
             icon="add"
+            label="Add dashboard"
             color="dark-bright"
             v-if="dashboardEditing"
             @click="createDashboard"
-          >
-            add dashboard
-          </q-btn>
+          />
+          <q-btn
+            icon="clear"
+            label="Remove dashboard"
+            color="error"
+            v-if="dashboardEditing"
+            @click="removeDashboard"
+          />
         </div>
       </q-list>
     </q-layout-drawer>

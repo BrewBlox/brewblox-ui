@@ -39,7 +39,6 @@ import {
   widgetSizeByType,
 } from '@/features/feature-by-type';
 
-
 interface VueOrdered extends Vue {
   id: string;
 }
