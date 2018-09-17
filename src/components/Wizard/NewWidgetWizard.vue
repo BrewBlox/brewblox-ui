@@ -3,7 +3,7 @@ import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
 import { Notify } from 'quasar';
 
-import { allTypes, wizardByType, displayNameByType } from '@/features/feature-by-type';
+import { allFeatureTypes, wizardByType, displayNameByType } from '@/services/feature-by-type';
 import { DashboardItem } from '@/store/dashboards/state';
 import { dashboardItemById } from '@/store/dashboards/getters';
 import { widgetWizards } from './widget-types.ts';
@@ -27,7 +27,7 @@ export default class NewWidgetWizard extends Vue {
   featureWizard: VueConstructor | null = null;
 
   get wizardOptions() {
-    return allTypes
+    return allFeatureTypes
       .filter(wizardByType)
       .filter(type => displayNameByType(type).match(this.searchModel))
       .map(type => ({

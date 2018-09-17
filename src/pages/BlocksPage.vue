@@ -8,10 +8,10 @@ import byOrder from '@/helpers/byOrder';
 
 import { DashboardItem } from '@/store/dashboards/state';
 
-import { Block } from '@/store/blocks/state';
-import { isFetching, allBlocks } from '@/store/blocks/getters';
+import { Block } from '@/services/SparkService/state';
+import { isFetching, allBlocks } from '@/services/SparkService/store/getters';
 
-import { widgetByType, widgetSizeByType } from '@/features/feature-by-type';
+import { widgetByType, widgetSizeByType } from '@/services/feature-by-type';
 
 interface VueOrdered extends Vue {
   id: string;

@@ -3,12 +3,12 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Notify } from 'quasar';
 
-import { allBlocks } from '@/store/blocks/getters';
+import { allBlocks } from '@/services/SparkService/store/getters';
 
 import { DashboardItem } from '@/store/dashboards/state';
 import { allDashboardItems, dashboardItemById } from '@/store/dashboards/getters';
 
-import { allTypes, wizardByType, displayNameByType } from '@/features/feature-by-type';
+import { allFeatureTypes, wizardByType, displayNameByType } from '@/services/feature-by-type';
 
 /* eslint-disable indent */
 @Component({

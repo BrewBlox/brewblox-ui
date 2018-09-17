@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { displayNameByType } from '@/features/feature-by-type';
+import { displayNameByType } from '@/services/feature-by-type';
 
 /* eslint-disable indent */
 @Component({

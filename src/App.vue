@@ -4,8 +4,8 @@ import Component from 'vue-class-component';
 
 import { fetchServices } from '@/store/services/actions';
 import { allServices } from '@/store/services/getters';
-import { fetchBlocks } from '@/store/blocks/actions';
 import { fetchDashboards } from '@/store/dashboards/actions';
+import { fetchByType } from '@/services/service-by-type';
 
 @Component
 export default class App extends Vue {
@@ -17,7 +17,7 @@ export default class App extends Vue {
         fetchDashboards(this.$store),
       ])
       .then(() => allServices(this.$store)
-        .forEach(service => fetchBlocks(this.$store, service)))
+        .forEach(service => fetchByType(service.type)(this.$store, service)))
       .catch((e) => { throw new Error(e); });
   }
 }

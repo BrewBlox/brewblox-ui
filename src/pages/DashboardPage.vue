@@ -12,7 +12,7 @@ import NewWidgetWizard from '@/components/Wizard/NewWidgetWizard.vue';
 
 import byOrder from '@/helpers/byOrder';
 
-import { Block } from '@/store/blocks/state';
+import { Block } from '@/services/SparkService/state';
 import { DashboardItem } from '@/store/dashboards/state';
 
 import {
@@ -31,13 +31,12 @@ import {
 } from '@/store/dashboards/actions';
 
 import {
-  allTypes,
   widgetByType,
   validatorByType,
   wizardByType,
   displayNameByType,
   widgetSizeByType,
-} from '@/features/feature-by-type';
+} from '@/services/feature-by-type';
 
 interface VueOrdered extends Vue {
   id: string;

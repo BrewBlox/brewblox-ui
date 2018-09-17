@@ -1,12 +1,12 @@
 import { RootStore } from '@/store/state';
-import { Block } from '@/store/blocks/state';
+import { Block } from '@/services/SparkService/state';
 import { Service } from '@/store/services/state';
 
 import { allServices } from '@/store/services/getters';
-import { allBlocksFromService } from '@/store/blocks/getters';
+import { allBlocksFromService } from '@/services/SparkService/store/getters';
 import { VueConstructor } from 'vue';
 
-import { allTypes, wizardByType, displayNameByType } from '@/features/feature-by-type';
+import { allFeatureTypes, wizardByType, displayNameByType } from '@/services/feature-by-type';
 
 function getBlocksFromServices(
   services: Service[],
@@ -23,7 +23,7 @@ export function blocksByWidgetType(store: RootStore, type: string): Block[] {
   return getBlocksFromServices(services, store, type);
 }
 
-export const widgetWizards: { [name: string]: VueConstructor } = allTypes
+export const widgetWizards: { [name: string]: VueConstructor } = allFeatureTypes
   .filter(wizardByType)
   .reduce(
     (acc: any, type: string) => {
@@ -33,7 +33,7 @@ export const widgetWizards: { [name: string]: VueConstructor } = allTypes
     {},
   );
 
-export const widgetDescriptions: { [name: string]: string } = allTypes
+export const widgetDescriptions: { [name: string]: string } = allFeatureTypes
   .reduce(
     (acc: any, type: string) => {
       acc[type] = displayNameByType(type);

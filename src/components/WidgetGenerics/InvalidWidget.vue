@@ -2,9 +2,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { Block } from '@/store/blocks/state';
-import BlockWidget from '@/components/BlockWidget/BlockWidget.ts';
-
 /* eslint-disable indent */
 @Component({
   props: {
