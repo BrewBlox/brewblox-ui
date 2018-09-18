@@ -20,7 +20,7 @@ export default class OneWireTempSensor extends BlockWidget {
   };
 
   get block(): SetPointSimpleBlock {
-    return getById(this.$store, this.blockId);
+    return getById(this.$store, this.serviceId, this.blockId);
   }
 }
 </script>

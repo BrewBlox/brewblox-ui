@@ -15,7 +15,7 @@ import { getById } from './getters';
 /* eslint-enable */
 export default class SensorSetPointPairWidget extends BlockWidget {
   get block(): SysInfoBlock {
-    return getById(this.$store, this.blockId);
+    return getById(this.$store, this.serviceId, this.blockId);
   }
 }
 </script>

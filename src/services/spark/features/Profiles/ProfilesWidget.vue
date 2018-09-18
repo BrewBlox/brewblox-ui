@@ -28,7 +28,7 @@ export default class ProfilesWidget extends BlockWidget {
   modalOpen: boolean = false;
 
   get block(): ProfilesBlock {
-    return getById(this.$store, this.blockId);
+    return getById(this.$store, this.serviceId, this.blockId);
   }
 
   get names(): string[] {
@@ -50,7 +50,7 @@ export default class ProfilesWidget extends BlockWidget {
   }
 
   save(block: ProfilesBlock) {
-    saveBlock(this.$store, block);
+    saveBlock(this.$store, this.serviceId, block);
   }
 }
 </script>

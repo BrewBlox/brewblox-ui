@@ -55,12 +55,16 @@ export default class BlockWidget extends Widget {
       .some(key => state[key] !== this.inputs[key]);
   }
 
+  get serviceId(): string {
+    return this.$props.config.serviceId;
+  }
+
   get blockId(): string {
     return this.$props.config.blockId;
   }
 
   get block(): Block {
-    return blockById(this.$store, this.blockId);
+    return blockById(this.$store, this.serviceId, this.blockId);
   }
 
   @Watch('block', { immediate: true, deep: true })
@@ -71,6 +75,6 @@ export default class BlockWidget extends Widget {
   }
 
   refreshBlock() {
-    fetchBlock(this.$store, this.block);
+    fetchBlock(this.$store, this.serviceId, this.block);
   }
 }

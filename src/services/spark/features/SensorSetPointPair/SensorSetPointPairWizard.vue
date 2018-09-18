@@ -94,16 +94,20 @@ export default class SensorSetPointPairWizard extends Vue {
       }
 
       const id = `${typeName}-${shortid.generate()}`;
-      const block = await createBlock(this.$store, {
-        id,
-        serviceId: this.service.id,
-        profiles: [0],
-        type: typeName,
-        data: {
-          sensor: new Link(this.sensorInput.id),
-          setpoint: new Link(this.setpointInput.id),
+      const block = await createBlock(
+        this.$store,
+        this.service.id,
+        {
+          id,
+          serviceId: this.service.id,
+          profiles: [0],
+          type: typeName,
+          data: {
+            sensor: new Link(this.sensorInput.id),
+            setpoint: new Link(this.setpointInput.id),
+          },
         },
-      });
+      );
 
       this.$props.onCreateItem({
         type: typeName,

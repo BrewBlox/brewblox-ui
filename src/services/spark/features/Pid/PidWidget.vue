@@ -33,7 +33,7 @@ export default class PidWidget extends BlockWidget {
   modalOpen: boolean = false;
 
   get block(): PidBlock {
-    return getById(this.$store, this.blockId);
+    return getById(this.$store, this.serviceId, this.blockId);
   }
 
   get settings(): PidSettings {
@@ -70,11 +70,11 @@ export default class PidWidget extends BlockWidget {
   }
 
   refreshState() {
-    refresh(this.$store, this.block);
+    refresh(this.$store, this.serviceId, this.block);
   }
 
   updateKP() {
-    saveBlock(this.$store, {
+    saveBlock(this.$store, this.serviceId, {
       ...this.block,
       data: {
         ...this.block.data,
@@ -87,7 +87,7 @@ export default class PidWidget extends BlockWidget {
   }
 
   randomKP() {
-    saveBlock(this.$store, {
+    saveBlock(this.$store, this.serviceId, {
       ...this.block,
       data: {
         ...this.block.data,
@@ -117,7 +117,7 @@ export default class PidWidget extends BlockWidget {
       state: this.block.data.state,
     };
 
-    saveBlock(this.$store, this.block);
+    saveBlock(this.$store, this.serviceId, this.block);
   }
 }
 </script>

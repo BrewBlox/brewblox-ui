@@ -14,7 +14,7 @@ import { getById } from './getters';
 /* eslint-enable */
 export default class OneWireBusWidget extends BlockWidget {
   get block() {
-    return getById(this.$store, this.blockId);
+    return getById(this.$store, this.serviceId, this.blockId);
   }
 
   refreshState() {

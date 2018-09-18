@@ -3,30 +3,34 @@ import { updateBlockState } from '@/services/spark/store/mutations';
 import { PidBlock } from './state';
 
 // example refresh action
-export const refresh = (store: RootStore, pid: PidBlock) => {
+export const refresh = (store: RootStore, serviceId: string, pid: PidBlock) => {
   function random() {
     return Math.round(Math.random() * 100);
   }
 
   // assign new random state
-  updateBlockState(store, {
-    ...pid,
-    data: {
-      settings: pid.data.settings,
-      links: pid.data.links,
-      filtering: pid.data.filtering,
-      state: {
-        inputValue: random(),
-        inputSetting: random(),
-        outputValue: random(),
-        outputSetting: random(),
-        p: random(),
-        i: random(),
-        d: random(),
-        derivative: random(),
-        integral: random(),
-        error: random(),
+  updateBlockState(
+    store,
+    serviceId,
+    {
+      ...pid,
+      data: {
+        settings: pid.data.settings,
+        links: pid.data.links,
+        filtering: pid.data.filtering,
+        state: {
+          inputValue: random(),
+          inputSetting: random(),
+          outputValue: random(),
+          outputSetting: random(),
+          p: random(),
+          i: random(),
+          d: random(),
+          derivative: random(),
+          integral: random(),
+          error: random(),
+        },
       },
     },
-  });
+  );
 };

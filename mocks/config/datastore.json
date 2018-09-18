@@ -86,7 +86,8 @@
       "rows": 3,
       "widget": "SensorSetPointPair",
       "config": {
-        "blockId": "spark/BLARGH"
+        "serviceId": "spark",
+        "blockId": "BLARGH"
       }
     },
     {
@@ -96,7 +97,8 @@
       "rows": 3,
       "widget": "UnknownType",
       "config": {
-        "blockId": "spark/setpoint-1"
+        "serviceId": "spark",
+        "blockId": "setpoint-1"
       }
     },
     {
@@ -106,7 +108,8 @@
       "rows": 3,
       "widget": "Warbl",
       "config": {
-        "blockId": "spark/BLORP"
+        "serviceId": "spark",
+        "blockId": "BLORP"
       }
     },
     {
@@ -157,7 +160,7 @@
   ],
   "services": [
     {
-      "id": "spark",
+      "id": "sparkey",
       "type": "spark",
       "config": {
         "profileNames": [

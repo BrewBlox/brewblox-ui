@@ -16,6 +16,7 @@ export interface Feature {
 }
 
 export interface FeatureService {
+  register?: (store: RootStore, service: Service) => any;
   fetch?: (store: RootStore, service: Service) => any;
   validator?: (store: RootStore, config: any) => boolean;
   widget?: VueConstructor;

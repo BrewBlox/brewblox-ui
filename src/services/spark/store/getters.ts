@@ -1,6 +1,4 @@
-import { map } from 'lodash';
-
-import { getStoreAccessors } from 'vuex-typescript';
+import { getStoreAccessors, GetterHandler, GetAccessor } from 'vuex-typescript';
 
 import { State as RootState, RootStore } from '@/store/state';
 import { serviceById } from '@/store/services/getters';
@@ -21,32 +19,37 @@ const defaultProfileNames = [
 
 export const typeName: string = 'spark';
 
-const { read } = getStoreAccessors<BlocksState, RootState>(typeName);
+// Returns a function that wraps getting and returning the store accessor
+// Practical result: all getter calls must now supply store + serviceId
+// old = isFetching(this.$store)
+// new = isFetching(this.$store, this.serviceId)
+function read<TResult>(handler: GetterHandler<BlocksState, RootState, TResult>) {
+  return function (store: RootStore, serviceId: string): TResult {
+    return getStoreAccessors<BlocksState, RootState>(serviceId).read(handler)(store);
+  };
+}
 
 const getters = {
   blocks: (state: BlocksState): { [id: string]: Block } => state.blocks,
-
-  blockIds(state: BlocksState): string[] {
-    return map(state.blocks, (_: Block, key: string) => key);
-  },
-
-  allBlocks(state: BlocksState): Block[] {
-    return map(state.blocks, (block: Block) => block);
-  },
-
-  isFetching(state: BlocksState): boolean {
-    return state.fetching;
-  },
+  blockIds: (state: BlocksState): string[] => Object.keys(state.blocks),
+  blockValues: (state: BlocksState): Block[] => Object.values(state.blocks),
+  isFetching: (state: BlocksState): boolean => state.fetching,
 };
 
-const blocksById = read(getters.blocks);
+export default getters;
 
+export const blocks = read(getters.blocks);
 export const blockIds = read(getters.blockIds);
-export const allBlocks = read(getters.allBlocks);
+export const blockValues = read(getters.blockValues);
 export const isFetching = read(getters.isFetching);
 
-export function blockById<T extends Block>(store: RootStore, id: string, type?: string): T {
-  const block = blocksById(store)[id];
+export function blockById<T extends Block>(
+  store: RootStore,
+  serviceId: string,
+  id: string,
+  type?: string,
+): T {
+  const block = blocks(store, serviceId)[id];
   if (!block) {
     throw new Error(`Block ${id} not found`);
   }
@@ -56,26 +59,23 @@ export function blockById<T extends Block>(store: RootStore, id: string, type?: 
   return block as T;
 }
 
-export function allBlocksFromService<T extends Block>(
-  store: RootStore | BlocksContext,
+export function allBlocks<T extends Block>(
+  store: RootStore,
   serviceId: string,
   type?: string,
 ): T[] {
-  return allBlocks(store)
-    .filter(block => block.serviceId === serviceId)
+  return blockValues(store, serviceId)
     .filter(block => !type || block.type === type) as T[];
 }
 
-export default getters;
-
-export const getById = (store: RootStore, id: string) =>
+export const sparkServiceById = (store: RootStore, id: string) =>
   serviceById<spark>(store, id, typeName);
 
-export const getConfigById = (store: RootStore, id: string) =>
-  getById(store, id).config || {};
+export const sparkConfigById = (store: RootStore, id: string) =>
+  sparkServiceById(store, id).config || {};
 
 export const profileNames = (store: RootStore, id: string) => {
-  const configNames = getConfigById(store, id).profileNames || [];
+  const configNames = sparkConfigById(store, id).profileNames || [];
   return [
     ...configNames.slice(0, defaultProfileNames.length),
     ...defaultProfileNames.slice(configNames.length),

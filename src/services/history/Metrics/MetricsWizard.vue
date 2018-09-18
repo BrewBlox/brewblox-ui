@@ -6,7 +6,7 @@ import { Service } from '@/store/services/state';
 import { Block } from '@/services/spark/state';
 
 import { allServices } from '@/store/services/getters';
-import { allBlocksFromService } from '@/services/spark/store/getters';
+import { allBlocks } from '@/services/spark/store/getters';
 
 /* eslint-disable indent */
 @Component({
@@ -52,7 +52,7 @@ class Metrics extends Vue {
       return [];
     }
 
-    return allBlocksFromService(this.$store, this.service.id)
+    return allBlocks(this.$store, this.service.id)
       .map(block => ({
         label: `${block.serviceId}/${block.id}`,
         value: block,

@@ -1,10 +1,11 @@
+import { RootStore } from '@/store/state';
 import { Service } from '@/store/services/state';
 
-import actions, { fetchBlocks } from './actions';
-import getters, { typeName } from './getters';
+import actions from './actions';
+import getters from './getters';
 import mutations from './mutations';
 
-const vuexModule = {
+const vuexModule = () => ({
   actions,
   getters,
   mutations,
@@ -14,11 +15,10 @@ const vuexModule = {
     blocks: {},
     fetching: true,
   },
-};
+});
 
-export function startup(store: any, service: Service) {
-  if (!store[typeName]) {
-    store.registerModule(typeName, vuexModule);
+export const register = (store: RootStore, service: Service) => {
+  if (!(store as any).state[service.id]) {
+    store.registerModule(service.id, vuexModule());
   }
-  fetchBlocks(store, service);
-}
+};

@@ -29,13 +29,13 @@ export default class BlocksPage extends Vue {
   modalOpen: boolean = false;
 
   defaultItem(block: Block): DashboardItem {
-    const id = `${block.serviceId}/${block.id}`;
     return {
-      id,
       ...widgetSizeByType(block.type),
+      id: block.id,
       widget: block.type,
       config: {
-        blockId: id,
+        serviceId: block.serviceId,
+        blockId: block.id,
       },
       order: 0,
     };
@@ -43,13 +43,13 @@ export default class BlocksPage extends Vue {
 
   get items() {
     return [
-      ...allBlocks(this.$store)
+      ...allBlocks(this.$store, 'spark')
         .map(this.defaultItem),
     ];
   }
 
   get isFetching() {
-    return isFetching(this.$store);
+    return isFetching(this.$store, 'spark');
   }
 
   widgetComponent(type: string): VueConstructor {

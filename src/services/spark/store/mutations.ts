@@ -1,21 +1,23 @@
 import Vue from 'vue';
-import { getStoreAccessors } from 'vuex-typescript';
+import { getStoreAccessors, MutationHandlerWithPayload } from 'vuex-typescript';
 
-import { State as RootState } from '@/store/state';
-import { BlocksState } from './state';
-import { typeName } from './getters';
+import { State as RootState, RootStore } from '@/store/state';
+import { BlocksState, BlocksContext } from './state';
 import { Block } from '../state';
 
-const { commit } = getStoreAccessors<BlocksState, RootState>(typeName);
+function commit<TPayload>(handler: MutationHandlerWithPayload<BlocksState, TPayload>) {
+  return function (store: RootStore | BlocksContext, serviceId: string, payload: TPayload) {
+    return getStoreAccessors<BlocksState, RootState>(serviceId).commit(handler)(store, payload);
+  };
+}
 
 const mutations = {
   addBlock(state: BlocksState, block: Block) {
-    const id = `${block.serviceId}/${block.id}`;
-    Vue.set(state.blocks, id, { ...block, isLoading: false });
+    Vue.set(state.blocks, block.id, { ...block, isLoading: false });
   },
 
   updateBlock(state: BlocksState, block: Partial<Block>) {
-    const id = `${block.serviceId}/${block.id}`;
+    const id = block.id || '';
     const existing = state.blocks[id];
     if (!existing) {
       throw new Error(`Block with id '${id}' does not exist`);
@@ -44,7 +46,6 @@ const mutations = {
   },
 };
 
-// exported commit accessors
 export const addBlock = commit(mutations.addBlock);
 export const updateBlockState = commit(mutations.updateBlockState);
 export const mutateBlock = commit(mutations.mutateBlock);

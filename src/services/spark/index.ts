@@ -1,12 +1,14 @@
 import { FeatureService } from '../state';
-import { startup } from './store';
+import { register } from './store';
+import { fetchBlocks } from './store/actions';
 import features from './features';
 
 import SparkWidget from './components/SparkWidget.vue';
 
 const service: FeatureService = {
   features,
-  fetch: startup,
+  register,
+  fetch: fetchBlocks,
   widget: SparkWidget,
 };
 
