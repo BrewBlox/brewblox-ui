@@ -61,5 +61,5 @@ export default class WidgetModal extends Vue {
   </q-modal>
 </template>
 
-<style>
+<style scoped>
 </style>

@@ -29,5 +29,5 @@ export default class App extends Vue {
   </div>
 </template>
 
-<style>
+<style scoped>
 </style>

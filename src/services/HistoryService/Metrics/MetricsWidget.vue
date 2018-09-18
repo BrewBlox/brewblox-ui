@@ -1,7 +1,7 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 
-import Widget from '@/components/Widget.ts';
+import Widget from '@/components/Widget';
 
 import { getMetric, getAvailableMeasurements, subscribeToEvents } from './fetchMetrics';
 import { getMetricsFromPath } from './measurementHelpers';

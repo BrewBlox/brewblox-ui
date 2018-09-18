@@ -120,7 +120,7 @@ export default class Metrics extends Vue {
   />
 </template>
 
-<style>
+<style scoped>
 .js-plotly-plot .plotly .modebar {
   top: 10px;
   background: transparent;

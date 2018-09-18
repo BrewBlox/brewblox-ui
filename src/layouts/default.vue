@@ -209,6 +209,7 @@ export default class LayoutDefault extends Vue {
 </template>
 
 <style>
+/* not scoped */
 .toolbar-buttons .q-btn {
   margin-left: 10px;
 }

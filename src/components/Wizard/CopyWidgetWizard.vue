@@ -12,7 +12,7 @@ import { allFeatureTypes, wizardByType, displayNameByType } from '@/services/fea
 
 /* eslint-disable indent */
 @Component({
-  components: { },
+  components: {},
   props: {
     onCreateItem: {
       type: Function,
@@ -114,15 +114,11 @@ export default class CopyWidgetWizard extends Vue {
   </div>
 </template>
 
-<style>
-/* .q-item {
+<style scoped>
+.q-item {
   display: grid;
   grid-gap: 10px;
-} */
-
-/* .q-item {
-  margin-left: 0px;
-} */
+}
 
 .layout-padding {
   position: relative;

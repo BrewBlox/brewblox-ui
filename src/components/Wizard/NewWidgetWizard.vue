@@ -6,7 +6,7 @@ import { Notify } from 'quasar';
 import { allFeatureTypes, wizardByType, displayNameByType } from '@/services/feature-by-type';
 import { DashboardItem } from '@/store/dashboards/state';
 import { dashboardItemById } from '@/store/dashboards/getters';
-import { widgetWizards } from './widget-types.ts';
+import { widgetWizards } from './widget-types';
 
 /* eslint-disable indent */
 @Component({
@@ -144,7 +144,7 @@ export default class NewWidgetWizard extends Vue {
   </div>
 </template>
 
-<style>
+<style scoped>
 .q-item {
   display: grid;
   grid-gap: 10px;

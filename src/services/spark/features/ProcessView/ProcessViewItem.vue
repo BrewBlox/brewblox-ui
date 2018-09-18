@@ -49,6 +49,7 @@ export default class ProcessViewItem extends Vue {
 </template>
 
 <style>
+/* not scoped */
 .ProcessViewPart,
 .ProcessViewPart svg {
   display: block;
