@@ -3,7 +3,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Notify } from 'quasar';
 
-import { allBlocks } from '@/services/SparkService/store/getters';
+import { allBlocks } from '@/services/spark/store/getters';
 
 import { DashboardItem } from '@/store/dashboards/state';
 import { allDashboardItems, dashboardItemById } from '@/store/dashboards/getters';

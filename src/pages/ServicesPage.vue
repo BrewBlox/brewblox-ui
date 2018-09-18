@@ -1,5 +1,5 @@
 <script lang="ts">
-import SparkService from '@/services/SparkService/SparkService.vue';
+import SparkService from '@/services/spark/SparkService.vue';
 
 export default {
   name: 'ServicesPage',

@@ -12,7 +12,7 @@ import NewWidgetWizard from '@/components/Wizard/NewWidgetWizard.vue';
 
 import byOrder from '@/helpers/byOrder';
 
-import { Block } from '@/services/SparkService/state';
+import { Block } from '@/services/spark/state';
 import { DashboardItem } from '@/store/dashboards/state';
 
 import {

@@ -3,10 +3,10 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 
 import { Service } from '@/store/services/state';
-import { Block } from '@/services/SparkService/state';
+import { Block } from '@/services/spark/state';
 
 import { allServices } from '@/store/services/getters';
-import { allBlocksFromService } from '@/services/SparkService/store/getters';
+import { allBlocksFromService } from '@/services/spark/store/getters';
 
 /* eslint-disable indent */
 @Component({

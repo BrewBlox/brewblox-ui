@@ -1,9 +1,9 @@
 import { RootStore } from '@/store/state';
-import { Block } from '@/services/SparkService/state';
+import { Block } from '@/services/spark/state';
 import { Service } from '@/store/services/state';
 
 import { allServices } from '@/store/services/getters';
-import { allBlocksFromService } from '@/services/SparkService/store/getters';
+import { allBlocksFromService } from '@/services/spark/store/getters';
 import { VueConstructor } from 'vue';
 
 import { allFeatureTypes, wizardByType, displayNameByType } from '@/services/feature-by-type';

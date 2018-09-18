@@ -1,10 +1,10 @@
 import { FeatureService } from '@/services/state';
 
-import SparkService from './SparkService';
+import spark from './spark';
 import HistoryService from './HistoryService';
 
 export const services: { [id: string]: FeatureService } = {
-  SparkService,
+  spark,
   HistoryService,
 };
 
