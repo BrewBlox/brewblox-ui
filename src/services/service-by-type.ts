@@ -10,3 +10,9 @@ export const fetchByType = (type: string) =>
 
 export const validatorByType = (type: string) =>
   serviceByType(type).validator || (() => true);
+
+export const pageByType = (type: string) =>
+  serviceByType(type).page;
+
+export const widgetByType = (type: string) =>
+  serviceByType(type).widget;

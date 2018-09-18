@@ -5,7 +5,7 @@ export default [
     children: [
       { path: '', component: () => import('@/pages/IndexPage.vue') },
       { path: '/services', component: () => import('@/pages/ServicesPage.vue') },
-      { path: '/blocks', component: () => import('@/pages/BlocksPage.vue') },
+      { path: '/blocks', component: () => import('@/pages/SparkPage.vue') },
 
       // dynamic pages
       { path: '/dashboard/:id', component: () => import('@/pages/DashboardPage.vue') },

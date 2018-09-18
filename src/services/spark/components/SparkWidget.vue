@@ -5,10 +5,10 @@ import Component from 'vue-class-component';
 import { Service } from '@/store/services/state';
 import { allServices, isFetching, serviceById } from '@/store/services/getters';
 import { createService, removeService } from '@/store/services/actions';
-import { clearBlocks } from './store/actions';
+import { clearBlocks } from '@/services/spark/store/actions';
 
 @Component
-export default class SparkService extends Vue {
+export default class SparkWidget extends Vue {
   serviceInput: string = '';
   $q: any;
 

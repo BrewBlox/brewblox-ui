@@ -17,9 +17,6 @@
     "paths": {
       "@/*": [
         "src/*"
-      ],
-      "@spark/*": [
-        "src/services/spark/*"
       ]
     }
   },

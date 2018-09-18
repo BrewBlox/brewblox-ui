@@ -1,17 +1,17 @@
 <script lang="ts">
-import SparkService from '@/services/spark/SparkService.vue';
+import SparkWidget from '@/services/spark/components/SparkWidget.vue';
 
 export default {
   name: 'ServicesPage',
   components: {
-    SparkService,
+    SparkWidget,
   },
 };
 </script>
 
 <template>
   <q-page padding>
-    <spark-service />
+    <spark-widget />
   </q-page>
 </template>
 

@@ -3,7 +3,7 @@ import Component from 'vue-class-component';
 
 import { saveBlock } from '@/services/spark/store/actions';
 import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
-import BlockWidget from '../BlockWidget';
+import BlockWidget from '@/services/spark/components/BlockWidget';
 import { SetPointSimpleBlock } from './state';
 import { getById } from './getters';
 

@@ -5,7 +5,7 @@ import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 import WidgetModal from '@/components/Widget/WidgetModal.vue';
 import { saveBlock } from '@/services/spark/store/actions';
 import { getAll as getAllSensorSetPointPairs } from '../SensorSetPointPair/getters';
-import BlockWidget from '../BlockWidget';
+import BlockWidget from '@/services/spark/components/BlockWidget';
 import { PidBlock, PidSettings, PidLinks, PidFiltering, PidState }
   from './state';
 import { getById } from './getters';

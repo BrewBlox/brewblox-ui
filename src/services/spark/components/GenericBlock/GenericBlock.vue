@@ -8,7 +8,7 @@ import { blockById } from '@/services/spark/store/getters';
 import { fetchBlock } from '@/services/spark/store/actions';
 import { Block } from '@/services/spark/state';
 
-import BlockWidget from '../BlockWidget';
+import BlockWidget from '@/services/spark/components/BlockWidget';
 import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 
 /* eslint-disable indent */

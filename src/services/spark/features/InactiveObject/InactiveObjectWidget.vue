@@ -2,7 +2,7 @@
 import Component from 'vue-class-component';
 
 import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
-import BlockWidget from '../BlockWidget';
+import BlockWidget from '@/services/spark/components/BlockWidget';
 import { getById } from './getters';
 
 /* eslint-disable indent */

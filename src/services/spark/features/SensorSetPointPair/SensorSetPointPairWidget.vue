@@ -2,7 +2,7 @@
 import Component from 'vue-class-component';
 
 import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
-import BlockWidget from '../BlockWidget';
+import BlockWidget from '@/services/spark/components/BlockWidget';
 import { OneWireTempSensorBlock } from '../OneWireTempSensor/state';
 import { SetPointSimpleBlock } from '../SetPointSimple/state';
 import { getById as getSensorById } from '../OneWireTempSensor/getters';

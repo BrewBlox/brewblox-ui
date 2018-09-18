@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import Widget from '@/components/Widget';
+import Widget from '@/components/Widget/Widget';
 
 import ProcessViewItem from './ProcessViewItem.vue';
 import componentByType from './Parts/componentByType';

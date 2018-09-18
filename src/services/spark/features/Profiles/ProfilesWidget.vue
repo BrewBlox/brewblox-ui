@@ -3,10 +3,10 @@ import Component from 'vue-class-component';
 
 import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 import WidgetModal from '@/components/Widget/WidgetModal.vue';
-import ProfilesBar from '@/services/spark/components/ProfileBar.vue';
+import ProfilesBar from '@/services/spark/components/ProfilesBar.vue';
 import { saveBlock } from '@/services/spark/store/actions';
 import { profileNames } from '@/services/spark/store/getters';
-import BlockWidget from '../BlockWidget';
+import BlockWidget from '@/services/spark/components/BlockWidget';
 import ProfilesForm from './ProfilesForm.vue';
 import { ProfilesBlock } from './state';
 import { getById } from './getters';
