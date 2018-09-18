@@ -1,8 +1,8 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 
-import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
-import WidgetModal from '@/components/WidgetGenerics/WidgetModal.vue';
+import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
+import WidgetModal from '@/components/Widget/WidgetModal.vue';
 import { saveBlock } from '@/services/spark/store/actions';
 import { getAll as getAllSensorSetPointPairs } from '../SensorSetPointPair/getters';
 import BlockWidget from '../BlockWidget';
@@ -14,7 +14,7 @@ import { refresh } from './actions';
 /* eslint-disable indent */
 @Component({
   components: {
-    BlockToolbar,
+    WidgetToolbar,
     WidgetModal,
   },
 })
@@ -125,7 +125,7 @@ export default class PidWidget extends BlockWidget {
 <template>
   <div>
 
-    <block-toolbar
+    <widget-toolbar
       :name="$props.id"
       :type="$props.type"
       :on-refresh="refreshBlock"

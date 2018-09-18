@@ -1,14 +1,14 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 
-import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
+import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 import BlockWidget from '../BlockWidget';
 import { getById } from './getters';
 
 /* eslint-disable indent */
 @Component({
   components: {
-    BlockToolbar,
+    WidgetToolbar,
   },
 })
 /* eslint-enable */
@@ -30,7 +30,7 @@ export default class OneWireBusWidget extends BlockWidget {
 <template>
   <div>
 
-    <block-toolbar
+    <widget-toolbar
       :name="$props.id"
       :type="$props.type"
       :on-refresh="refreshBlock"

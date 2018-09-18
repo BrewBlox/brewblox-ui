@@ -9,12 +9,12 @@ import { fetchBlock } from '@/services/spark/store/actions';
 import { Block } from '@/services/spark/state';
 
 import BlockWidget from '../BlockWidget';
-import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
+import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 
 /* eslint-disable indent */
 @Component({
   components: {
-    BlockToolbar,
+    WidgetToolbar,
   },
 })
 /* eslint-enable */
@@ -24,7 +24,7 @@ export default class GenericBlock extends BlockWidget { }
 <template>
   <div>
 
-    <block-toolbar
+    <widget-toolbar
       :name="$props.id"
       :type="$props.type"
       :on-refresh="refreshBlock"

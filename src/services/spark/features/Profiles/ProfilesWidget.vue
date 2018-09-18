@@ -1,9 +1,9 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 
-import ProfilesBar from '@/components/WidgetGenerics/ProfilesBar.vue';
-import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
-import WidgetModal from '@/components/WidgetGenerics/WidgetModal.vue';
+import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
+import WidgetModal from '@/components/Widget/WidgetModal.vue';
+import ProfilesBar from '@/services/spark/components/ProfileBar.vue';
 import { saveBlock } from '@/services/spark/store/actions';
 import { profileNames } from '@/services/spark/store/getters';
 import BlockWidget from '../BlockWidget';
@@ -15,7 +15,7 @@ import { getById } from './getters';
 @Component({
   components: {
     ProfilesBar,
-    BlockToolbar,
+    WidgetToolbar,
     WidgetModal,
     ProfilesForm,
   },
@@ -69,7 +69,7 @@ export default class ProfilesWidget extends BlockWidget {
       />
     </widget-modal>
 
-    <block-toolbar
+    <widget-toolbar
       :name="$props.id"
       :type="$props.type"
       :on-refresh="refreshBlock"

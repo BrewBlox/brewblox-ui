@@ -1,4 +1,4 @@
-import GenericBlock from './GenericBlock.vue';
+import BlockWidget from './BlockWidget';
 
 describe('inputsFromSource', () => {
   it('Should find mapping on first level source', () => {
@@ -7,14 +7,14 @@ describe('inputsFromSource', () => {
       otherProperty = 4;
     }
 
-    const GenericBlock = new TestBlock();
+    const widget = new TestBlock();
 
-    GenericBlock.inputMapping = {
+    widget.inputMapping = {
       test: { path: 'testProperty' },
       other: { path: 'otherProperty' },
     };
 
-    const inputs = GenericBlock.inputsFromSource();
+    const inputs = widget.inputsFromSource();
 
     expect(inputs).toEqual({ test: 2, other: 4 });
   });
@@ -29,22 +29,22 @@ describe('inputsFromSource', () => {
       };
     }
 
-    const GenericBlock = new TestNestedBlock();
+    const widget = new TestNestedBlock();
 
-    GenericBlock.inputMapping = {
+    widget.inputMapping = {
       value: { path: 'settings.properties.value' },
       something: { path: 'settings.something' },
     };
 
-    const inputs = GenericBlock.inputsFromSource();
+    const inputs = widget.inputsFromSource();
 
     expect(inputs).toEqual({ value: 4, something: 'Test' });
   });
 
   it('Should fall back to defaults', () => {
-    const GenericBlock = new GenericBlock();
+    const widget = new BlockWidget();
 
-    GenericBlock.inputMapping = {
+    widget.inputMapping = {
       value: {
         path: 'value',
         default: 1,
@@ -55,7 +55,7 @@ describe('inputsFromSource', () => {
       },
     };
 
-    const inputs = GenericBlock.inputsFromSource();
+    const inputs = widget.inputsFromSource();
 
     expect(inputs).toEqual({ value: 1, something: 2 });
   });
@@ -68,19 +68,19 @@ describe('changed', () => {
       otherProperty = 4;
     }
 
-    const GenericBlock = new TestBlock();
+    const widget = new TestBlock();
 
-    GenericBlock.inputMapping = {
+    widget.inputMapping = {
       test: { path: 'testProperty' },
       other: { path: 'otherProperty' },
     };
 
     // update internal inputs values
-    GenericBlock.onBlockUpdate();
+    widget.onBlockUpdate();
 
     // set input to different value
-    GenericBlock.inputs.test = 'change';
+    widget.inputs.test = 'change';
 
-    expect(GenericBlock.changed).toBe(true);
+    expect(widget.changed).toBe(true);
   });
 });

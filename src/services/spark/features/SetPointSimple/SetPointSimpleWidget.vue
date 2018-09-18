@@ -2,7 +2,7 @@
 import Component from 'vue-class-component';
 
 import { saveBlock } from '@/services/spark/store/actions';
-import BlockToolbar from '@/components/WidgetGenerics/BlockToolbar.vue';
+import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 import BlockWidget from '../BlockWidget';
 import { SetPointSimpleBlock } from './state';
 import { getById } from './getters';
@@ -10,7 +10,7 @@ import { getById } from './getters';
 /* eslint-disable indent */
 @Component({
   components: {
-    BlockToolbar,
+    WidgetToolbar,
   },
 })
 /* eslint-enable */
@@ -28,7 +28,7 @@ export default class OneWireTempSensor extends BlockWidget {
 <template>
   <div>
 
-    <block-toolbar
+    <widget-toolbar
       :name="$props.id"
       :type="$props.type"
       :on-refresh="refreshBlock"

@@ -1,8 +1,7 @@
+import Widget from '@/components/Widget/Widget';
 import { get } from 'lodash';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
-
-import Widget from '@/components/Widget';
 import { Block } from '../state';
 import { fetchBlock } from '../store/actions';
 import { blockById } from '../store/getters';

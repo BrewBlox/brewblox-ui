@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import ProfilesBar from '@/components/WidgetGenerics/ProfilesBar.vue';
+import ProfilesBar from '@/services/spark/components/ProfileBar.vue';
 
 import { profileNames } from '@/services/spark/store/getters';
 import { updateProfileNames } from '@/services/spark/store/actions';

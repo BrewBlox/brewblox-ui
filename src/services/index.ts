@@ -1,11 +1,11 @@
 import { FeatureService } from '@/services/state';
 
 import spark from './spark';
-import HistoryService from './HistoryService';
+import history from './history';
 
 export const services: { [id: string]: FeatureService } = {
   spark,
-  HistoryService,
+  history,
 };
 
 export const features = Object.values(services)

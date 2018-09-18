@@ -1,18 +1,18 @@
-import { getStoreAccessors } from 'vuex-typescript';
-
-import { Service } from '@/store/services/state';
-import { State as RootState, RootStore } from '@/store/state';
-
 import { saveService } from '@/store/services/actions';
+import { Service } from '@/store/services/state';
+import { RootStore, State as RootState } from '@/store/state';
+import { getStoreAccessors } from 'vuex-typescript';
 import { Block } from '../state';
-import { BlocksState, BlocksContext } from './state';
+import { BlocksContext, BlocksState } from './state';
 
 import {
-  addBlock as addBlockInStore,
-  mutateBlock as mutateBlockInStore,
-  mutateFetching as mutateFetchingInStore,
-  removeBlock as removeBlockInStore,
-} from './mutations';
+  clearBlocks as clearBlocksInApi,
+  createBlock as createBlockInApi,
+  deleteBlock as deleteBlockInApi,
+  fetchBlock as fetchBlockInApi,
+  fetchBlocks as fetchBlocksInApi,
+  persistBlock as persistBlockInApi,
+} from './api';
 
 import {
   allBlocksFromService,
@@ -21,20 +21,18 @@ import {
 } from './getters';
 
 import {
-  fetchBlocks as fetchBlocksFromApi,
-  fetchBlock as fetchBlockFromApi,
-  persistBlock as persistBlockToApi,
-  createBlock as createBlockOnApi,
-  deleteBlock as deleteBlockOnApi,
-  clearBlocks as clearBlocksOnApi,
-} from './api';
+  addBlock as addBlockInStore,
+  mutateBlock as mutateBlockInStore,
+  mutateFetching as mutateFetchingInStore,
+  removeBlock as removeBlockInStore,
+} from './mutations';
 
 const { dispatch } = getStoreAccessors<BlocksState, RootState>(typeName);
 
 const actions = {
   async fetchBlocks(context: BlocksContext, service: Service) {
     mutateFetchingInStore(context, true);
-    const blocks = await fetchBlocksFromApi(service);
+    const blocks = await fetchBlocksInApi(service);
     blocks.forEach(block => addBlockInStore(context, block));
     // Remove all blocks not currently present on service
     const blockIds = blocks.map(block => block.id);
@@ -46,31 +44,31 @@ const actions = {
 
   async fetchBlock(context: BlocksContext, block: Block) {
     mutateBlockInStore(context, { ...block, isLoading: true });
-    const fetchedBlock = await fetchBlockFromApi(block);
+    const fetchedBlock = await fetchBlockInApi(block);
     mutateBlockInStore(context, { ...fetchedBlock, isLoading: false });
   },
 
   async createBlock(context: BlocksContext, block: Block) {
     addBlockInStore(context, { ...block, isLoading: true });
-    const createdBlock = await createBlockOnApi(block);
+    const createdBlock = await createBlockInApi(block);
     mutateBlockInStore(context, { ...createdBlock, isLoading: false });
     return createdBlock;
   },
 
   async saveBlock(context: BlocksContext, block: Block) {
     mutateBlockInStore(context, { ...block, isLoading: true });
-    const savedBlock = await persistBlockToApi(block);
+    const savedBlock = await persistBlockInApi(block);
     mutateBlockInStore(context, { ...savedBlock, isLoading: false });
   },
 
   async removeBlock(context: BlocksContext, block: Block) {
     mutateBlockInStore(context, { ...block, isLoading: true });
-    await deleteBlockOnApi(block);
+    await deleteBlockInApi(block);
     removeBlockInStore(context, block.id);
   },
 
   async clearBlocks(context: BlocksContext, service: Service) {
-    await clearBlocksOnApi(service.id);
+    await clearBlocksInApi(service.id);
     await actions.fetchBlocks(context, service);
   },
 };

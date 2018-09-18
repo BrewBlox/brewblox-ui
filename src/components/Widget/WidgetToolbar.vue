@@ -1,7 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-
 import { displayNameByType } from '@/services/feature-by-type';
 
 /* eslint-disable indent */
@@ -26,7 +25,7 @@ import { displayNameByType } from '@/services/feature-by-type';
   },
 })
 /* eslint-enable */
-export default class BlockToolbar extends Vue {
+export default class WidgetToolbar extends Vue {
   get displayName(): string {
     return displayNameByType(this.$props.type);
   }
