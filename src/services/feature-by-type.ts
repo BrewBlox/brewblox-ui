@@ -1,5 +1,4 @@
-import { features } from './';
-import generic from './spark/components/GenericBlock';
+import { features, generic } from './';
 
 export const allFeatureTypes = () => Object.keys(features);
 

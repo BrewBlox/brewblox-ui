@@ -2,7 +2,6 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 
 import { State } from './state';
-
 import dashboards from './dashboards';
 import services from './services';
 

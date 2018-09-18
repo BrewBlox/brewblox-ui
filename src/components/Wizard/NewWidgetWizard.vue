@@ -2,16 +2,23 @@
 import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
 import { Notify } from 'quasar';
-
-import { allFeatureTypes, wizardByType, displayNameByType } from '@/services/feature-by-type';
 import { DashboardItem } from '@/store/dashboards/state';
 import { dashboardItemById } from '@/store/dashboards/getters';
-import { widgetWizards } from './widget-types';
+
+import {
+  allFeatureTypes,
+  wizardByType,
+  displayNameByType,
+} from '@/services/feature-by-type';
+
+const allWidgetWizards = allFeatureTypes()
+  .filter(wizardByType)
+  .reduce((acc: any, type: string) => ({ ...acc, type: wizardByType(type) }), {});
 
 /* eslint-disable indent */
 @Component({
   components: {
-    ...widgetWizards,
+    ...allWidgetWizards,
   },
   props: {
     onCreateItem: {

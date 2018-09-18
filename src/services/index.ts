@@ -3,6 +3,8 @@ import { FeatureService } from '@/services/state';
 import spark from './spark';
 import history from './history';
 
+import GenericBlock from './spark/components/GenericBlock';
+
 export const services: { [id: string]: FeatureService } = {
   spark,
   history,
@@ -17,3 +19,5 @@ export const features = Object.values(services)
     }),
     {},
   );
+
+export const generic = GenericBlock;
