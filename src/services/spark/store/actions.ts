@@ -14,23 +14,22 @@ import {
   persistBlock as persistBlockInApi,
 } from './api';
 
-import {
-  allBlocks,
-  sparkServiceById,
-} from './getters';
+import { sparkServiceById } from './getters';
 
 import {
   addBlock as addBlockInStore,
   mutateBlock as mutateBlockInStore,
   mutateFetching as mutateFetchingInStore,
   removeBlock as removeBlockInStore,
+  clearBlocks as clearBlocksInStore,
 } from './mutations';
 
-function dispatch<TPayload, TResult>(
-  handler: ActionHandlerWithPayload<BlocksState, RootState, TPayload, TResult>) {
-  return function (store: RootStore, serviceId: string, payload: TPayload) {
-    return getStoreAccessors<BlocksState, RootState>(serviceId).dispatch(handler)(store, payload);
-  };
+declare type ActionHandler<TPayload, TResult> =
+  ActionHandlerWithPayload<BlocksState, RootState, TPayload, TResult>;
+
+function dispatch<TPayload, TResult>(handler: ActionHandler<TPayload, TResult>) {
+  return (store: RootStore, serviceId: string, payload: TPayload) =>
+    getStoreAccessors<BlocksState, RootState>(serviceId).dispatch(handler)(store, payload);
 }
 
 const actions = {
@@ -79,12 +78,8 @@ export const updateProfileNames = (store: RootStore, id: string, names: string[]
 export const fetchBlocks = async (store: RootStore, service: Service) => {
   mutateFetchingInStore(store, service.id, true);
   const fetched = await fetchBlocksInApi(service);
+  clearBlocksInStore(store, service.id);
   fetched.forEach(block => addBlockInStore(store, service.id, block));
-  // Remove all blocks not currently present on service
-  const blockIds = fetched.map(block => block.id);
-  allBlocks(store, service.id)
-    .filter((block: Block) => blockIds.includes(block.id))
-    .forEach((block: Block) => removeBlockInStore(store, service.id, block.id));
   mutateFetchingInStore(store, service.id, false);
 };
 

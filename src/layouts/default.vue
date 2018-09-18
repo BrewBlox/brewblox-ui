@@ -8,6 +8,7 @@ import byOrder from '@/helpers/byOrder';
 import { allDashboards, isFetching } from '@/store/dashboards/getters';
 import { addNewDashboard, updateDashboardOrder, removeDashboard } from '@/store/dashboards/actions';
 import { Dashboard } from '@/store/dashboards/state';
+import { allServices } from '@/store/services/getters';
 
 /* eslint-disable indent */
 @Component({
@@ -23,6 +24,10 @@ export default class LayoutDefault extends Vue {
 
   get dashboards() {
     return [...allDashboards(this.$store)].sort(byOrder);
+  }
+
+  get services() {
+    return allServices(this.$store);
   }
 
   set dashboards(dashboards: Dashboard[]) {
@@ -199,6 +204,23 @@ export default class LayoutDefault extends Vue {
             @click="removeDashboard"
           />
         </div>
+
+        <q-item-separator />
+
+        <q-list-header v-if="!isFetching">
+          <q-item-side icon="cloud" />
+          Services
+        </q-list-header>
+
+        <q-item
+          v-for="service in services"
+          :key="service.id"
+          :to="`/service/${service.id}`"
+          link
+        >
+          <q-item-main :label="service.id" />
+        </q-item>
+
       </q-list>
     </q-layout-drawer>
 

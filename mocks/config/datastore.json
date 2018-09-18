@@ -160,7 +160,7 @@
   ],
   "services": [
     {
-      "id": "sparkey",
+      "id": "spark",
       "type": "spark",
       "config": {
         "profileNames": [

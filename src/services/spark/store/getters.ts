@@ -24,9 +24,8 @@ export const typeName: string = 'spark';
 // old = isFetching(this.$store)
 // new = isFetching(this.$store, this.serviceId)
 function read<TResult>(handler: GetterHandler<BlocksState, RootState, TResult>) {
-  return function (store: RootStore, serviceId: string): TResult {
-    return getStoreAccessors<BlocksState, RootState>(serviceId).read(handler)(store);
-  };
+  return (store: RootStore, serviceId: string): TResult =>
+    getStoreAccessors<BlocksState, RootState>(serviceId).read(handler)(store);
 }
 
 const getters = {

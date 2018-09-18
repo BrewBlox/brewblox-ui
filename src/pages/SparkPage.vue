@@ -24,7 +24,7 @@ interface VueOrdered extends Vue {
   },
 })
 /* eslint-enable */
-export default class BlocksPage extends Vue {
+export default class SparkPage extends Vue {
   editable: boolean = false;
   modalOpen: boolean = false;
 

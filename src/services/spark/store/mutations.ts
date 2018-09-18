@@ -1,14 +1,22 @@
 import Vue from 'vue';
-import { getStoreAccessors, MutationHandlerWithPayload } from 'vuex-typescript';
+import {
+  getStoreAccessors,
+  MutationHandlerWithPayload,
+  MutationHandlerNoPayload,
+} from 'vuex-typescript';
 
 import { State as RootState, RootStore } from '@/store/state';
 import { BlocksState, BlocksContext } from './state';
 import { Block } from '../state';
 
 function commit<TPayload>(handler: MutationHandlerWithPayload<BlocksState, TPayload>) {
-  return function (store: RootStore | BlocksContext, serviceId: string, payload: TPayload) {
-    return getStoreAccessors<BlocksState, RootState>(serviceId).commit(handler)(store, payload);
-  };
+  return (store: RootStore | BlocksContext, serviceId: string, payload: TPayload) =>
+    getStoreAccessors<BlocksState, RootState>(serviceId).commit(handler)(store, payload);
+}
+
+function noArgCommit(handler: MutationHandlerNoPayload<BlocksState>) {
+  return (store: RootStore | BlocksContext, serviceId: string) =>
+    getStoreAccessors<BlocksState, RootState>(serviceId).commit(handler)(store);
 }
 
 const mutations = {
@@ -44,6 +52,10 @@ const mutations = {
   removeBlock(state: BlocksState, id: string) {
     Vue.delete(state.blocks, id);
   },
+
+  clearBlocks(state: BlocksState) {
+    Vue.set(state, 'blocks', {});
+  },
 };
 
 export const addBlock = commit(mutations.addBlock);
@@ -52,5 +64,6 @@ export const mutateBlock = commit(mutations.mutateBlock);
 export const blockLoading = commit(mutations.blockLoading);
 export const mutateFetching = commit(mutations.mutateFetching);
 export const removeBlock = commit(mutations.removeBlock);
+export const clearBlocks = noArgCommit(mutations.clearBlocks);
 
 export default mutations;
