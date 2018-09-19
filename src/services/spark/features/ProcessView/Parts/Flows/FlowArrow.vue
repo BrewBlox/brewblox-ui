@@ -10,7 +10,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-/* eslint-disable */
 @Component({
   props: {
     opacity: {
@@ -28,10 +27,9 @@ import Component from 'vue-class-component';
     y: {
       type: Number,
       default: 0,
-    }
+    },
   },
 })
-/* eslint-enable */
 class FlowArrow extends Vue {
   get points() {
     const { x, y } = this.$props;
@@ -54,5 +52,4 @@ export default FlowArrow;
 </script>
 
 <style scoped>
-
 </style>

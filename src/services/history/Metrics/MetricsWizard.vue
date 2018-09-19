@@ -8,7 +8,6 @@ import { Block } from '@/services/spark/state';
 import { allServices } from '@/store/services/getters';
 import { allBlocks } from '@/services/spark/store/getters';
 
-/* eslint-disable indent */
 @Component({
   props: {
     onCancel: {
@@ -21,7 +20,6 @@ import { allBlocks } from '@/services/spark/store/getters';
     },
   },
 })
-/* eslint-enable */
 class Metrics extends Vue {
   currentStep: string = 'service';
   creating: boolean = false;

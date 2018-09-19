@@ -18,7 +18,6 @@ interface VueOrdered extends Vue {
   id: string;
 }
 
-/* eslint-disable indent */
 @Component({
   components: {
     GridContainer,
@@ -30,7 +29,6 @@ interface VueOrdered extends Vue {
     },
   },
 })
-/* eslint-enable */
 export default class SparkPage extends Vue {
   editable: boolean = false;
   modalOpen: boolean = false;

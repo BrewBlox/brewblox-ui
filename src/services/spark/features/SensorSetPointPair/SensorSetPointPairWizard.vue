@@ -16,7 +16,6 @@ import { getAll as getAllOneWireTempSensor } from '../OneWireTempSensor/getters'
 
 import { typeName } from './getters';
 
-/* eslint-disable indent */
 @Component({
   props: {
     onCreateItem: {
@@ -29,7 +28,6 @@ import { typeName } from './getters';
     },
   },
 })
-/* eslint-enable */
 export default class SensorSetPointPairWizard extends Vue {
   currentStep: string = 'service';
   creating: boolean = false;

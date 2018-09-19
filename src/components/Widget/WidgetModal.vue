@@ -3,7 +3,6 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
 
-/* eslint-disable indent */
 @Component({
   props: {
     isOpen: {
@@ -20,7 +19,6 @@ import { Watch } from 'vue-property-decorator';
     },
   },
 })
-/* eslint-enable */
 export default class WidgetModal extends Vue {
   get childOpen() {
     return this.$props.isOpen;

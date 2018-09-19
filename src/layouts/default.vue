@@ -13,13 +13,11 @@ import { updateServiceOrder } from '@/store/services/actions';
 import { Service } from '@/store/services/state';
 import { allServices } from '@/store/services/getters';
 
-/* eslint-disable indent */
 @Component({
   components: {
     draggable,
   },
 })
-/* eslint-enable */
 export default class LayoutDefault extends Vue {
   leftDrawerOpen: boolean = false;
   dashboardEditing: boolean = false;

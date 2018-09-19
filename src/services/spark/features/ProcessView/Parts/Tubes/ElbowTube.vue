@@ -57,7 +57,7 @@ import FlowArrow from '../Flows/FlowArrow.vue';
     FlowArrow,
   },
 })
-/* eslint-enable */
+
 class ElbowTube extends Part {
   static flows() {
     return {

@@ -16,7 +16,7 @@ import componentByType from './Parts/componentByType';
     },
   },
 })
-/* eslint-enable */
+
 export default class ProcessViewItem extends Vue {
   get style() {
     if (!this.$props.part.rotate) {

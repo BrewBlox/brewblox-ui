@@ -6,13 +6,11 @@ import BlockWidget from '@/services/spark/components/BlockWidget';
 import { TicksBlock } from './state';
 import { getById } from './getters';
 
-/* eslint-disable indent */
 @Component({
   components: {
     WidgetToolbar,
   },
 })
-/* eslint-enable */
 export default class SensorSetPointPairWidget extends BlockWidget {
   get block(): TicksBlock {
     return getById(this.$store, this.serviceId, this.blockId);

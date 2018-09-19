@@ -49,7 +49,7 @@ import FlowArrow from '../Flows/FlowArrow.vue';
     FlowArrow,
   },
 })
-/* eslint-enable */
+
 class InputTube extends Part {
   static isSource = true;
 

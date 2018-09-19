@@ -4,7 +4,6 @@ import Component from 'vue-class-component';
 
 import GridItem from './GridItem.vue';
 
-/* eslint-disable indent */
 @Component({
   props: {
     editable: {
@@ -22,7 +21,6 @@ import GridItem from './GridItem.vue';
   },
   components: { GridItem },
 })
-/* eslint-enable */
 export default class GridContainer extends Vue {
   interaction: boolean = false;
   editable: boolean = false;

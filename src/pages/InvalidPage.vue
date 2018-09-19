@@ -2,7 +2,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-/* eslint-disable indent */
 @Component({
   props: {
     serviceId: {
@@ -11,7 +10,6 @@ import Component from 'vue-class-component';
     },
   },
 })
-/* eslint-enable */
 export default class InvalidPage extends Vue { }
 </script>
 

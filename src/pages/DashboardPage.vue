@@ -48,7 +48,6 @@ interface ModalConfig {
   component?: VueConstructor;
 }
 
-/* eslint-disable indent */
 @Component({
   components: {
     GridContainer,
@@ -57,7 +56,6 @@ interface ModalConfig {
     NewWidgetWizard,
   },
 })
-/* eslint-enable */
 export default class DashboardPage extends Vue {
   editable: boolean = false;
   title: string = '';

@@ -14,7 +14,7 @@ import { pathsFromSources, isSamePart } from './calculateFlows';
     ProcessViewItem,
   },
 })
-/* eslint-enable */
+
 class ProcessViewWidget extends Widget {
   size: number = 50;
   frame: number = 0;

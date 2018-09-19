@@ -2,7 +2,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-/* eslint-disable indent */
 @Component({
   props: {
     id: {
@@ -19,7 +18,6 @@ import Component from 'vue-class-component';
     },
   },
 })
-/* eslint-enable */
 export default class InvalidWidget extends Vue { }
 </script>
 

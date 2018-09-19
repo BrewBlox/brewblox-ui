@@ -5,13 +5,11 @@ import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 import BlockWidget from '@/services/spark/components/BlockWidget';
 import { getById } from './getters';
 
-/* eslint-disable indent */
 @Component({
   components: {
     WidgetToolbar,
   },
 })
-/* eslint-enable */
 export default class OneWireBusWidget extends BlockWidget {
   get block() {
     return getById(this.$store, this.serviceId, this.blockId);

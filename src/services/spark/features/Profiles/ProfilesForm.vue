@@ -9,7 +9,6 @@ import { updateProfileNames } from '@/services/spark/store/actions';
 
 import { ProfilesBlock } from './state';
 
-/* eslint-disable indent */
 @Component({
   components: {
     ProfilesBar,
@@ -25,7 +24,6 @@ import { ProfilesBlock } from './state';
     },
   },
 })
-/* eslint-enable */
 export default class ProfilesForm extends Vue {
   get myBlock(): ProfilesBlock {
     return this.$props.block as ProfilesBlock;

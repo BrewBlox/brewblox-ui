@@ -11,14 +11,12 @@ import { PidBlock, PidSettings, PidLinks, PidFiltering, PidState }
 import { getById } from './getters';
 import { refresh } from './actions';
 
-/* eslint-disable indent */
 @Component({
   components: {
     WidgetToolbar,
     WidgetModal,
   },
 })
-/* eslint-enable */
 export default class PidWidget extends BlockWidget {
   inputMapping = {
     kp: { path: 'settings.kp', default: 0 },

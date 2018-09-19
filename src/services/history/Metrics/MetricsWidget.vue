@@ -18,7 +18,7 @@ const sortByOrder = (a: MetricsOptions, b: MetricsOptions) => a.order - b.order;
     MetricsDisplay,
   },
 })
-/* eslint-enable */
+
 export default class MetricsWidget extends Widget {
   fetching: boolean = true;
   editing: boolean = false;

@@ -10,7 +10,6 @@ import { allDashboardItems, dashboardItemById } from '@/store/dashboards/getters
 
 import { allFeatureTypes, wizardByType, displayNameByType } from '@/services/feature-by-type';
 
-/* eslint-disable indent */
 @Component({
   components: {},
   props: {
@@ -20,7 +19,6 @@ import { allFeatureTypes, wizardByType, displayNameByType } from '@/services/fea
     },
   },
 })
-/* eslint-enable */
 export default class CopyWidgetWizard extends Vue {
   widgetId: string = '';
   searchModel: string = '';

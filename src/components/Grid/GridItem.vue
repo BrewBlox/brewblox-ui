@@ -7,7 +7,6 @@ const GAP_SIZE = 20;
 
 type Coordinates = { x: number, y: number };
 
-/* eslint-disable indent */
 @Component({
   props: {
     id: {
@@ -44,7 +43,6 @@ type Coordinates = { x: number, y: number };
     },
   },
 })
-/* eslint-enable */
 export default class GridItem extends Vue {
   dragging: boolean = false;
   moving: boolean = false;

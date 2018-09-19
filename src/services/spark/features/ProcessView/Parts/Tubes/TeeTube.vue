@@ -57,7 +57,7 @@ import FlowArrow from '../Flows/FlowArrow.vue';
     FlowArrow,
   },
 })
-/* eslint-enable */
+
 class TeeTube extends Part {
   static flows(): ProcessViewPartFlows {
     return {

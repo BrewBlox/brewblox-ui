@@ -2,7 +2,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-/* eslint-disable indent */
 @Component({
   props: {
     value: {
@@ -15,7 +14,6 @@ import Component from 'vue-class-component';
     },
   },
 })
-/* eslint-enable */
 export default class ProfilesBar extends Vue {
   get selectOptions() {
     return this.$props.profileNames

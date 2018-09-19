@@ -65,7 +65,7 @@ import FlowArrow from '../Flows/FlowArrow.vue';
     FlowArrow,
   },
 })
-/* eslint-enable */
+
 class Valve extends Part {
   static flows(part: ProcessViewPartWithComponent) {
     if (part.closed) {

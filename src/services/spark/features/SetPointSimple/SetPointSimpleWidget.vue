@@ -7,13 +7,11 @@ import BlockWidget from '@/services/spark/components/BlockWidget';
 import { SetPointSimpleBlock } from './state';
 import { getById } from './getters';
 
-/* eslint-disable indent */
 @Component({
   components: {
     WidgetToolbar,
   },
 })
-/* eslint-enable */
 export default class OneWireTempSensor extends BlockWidget {
   inputMapping = {
     setting: { path: 'block.data.setting.value', default: 0 },

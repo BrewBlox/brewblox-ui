@@ -10,13 +10,11 @@ const allPages = allServiceTypes()
   .filter(pageByType)
   .reduce((acc: any, type: string) => ({ ...acc, type: pageByType(type) }), {});
 
-/* eslint-disable indent */
 @Component({
   components: {
     ...allPages,
   },
 })
-/* eslint-enable */
 export default class ServicePage extends Vue {
   get serviceId(): string {
     return this.$route.params.id;

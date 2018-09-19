@@ -8,7 +8,6 @@ import { differenceInMilliseconds, getTime } from 'date-fns';
 import { PlotlyData, PlotlyOptions } from './state';
 import Plotly from './plotly';
 
-/* eslint-disable indent */
 @Component({
   props: {
     inputOptions: {
@@ -24,7 +23,6 @@ import Plotly from './plotly';
     Plotly: createPlotlyComponent(Plotly),
   },
 })
-/* eslint-enable */
 export default class Metrics extends Vue {
   defaultLayout = {
     title: '',

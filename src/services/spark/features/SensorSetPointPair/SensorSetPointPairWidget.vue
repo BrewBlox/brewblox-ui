@@ -10,13 +10,11 @@ import { getById as getSetPointById } from '../SetPointSimple/getters';
 import { SensorSetPointPairBlock } from './state';
 import { getById } from './getters';
 
-/* eslint-disable indent */
 @Component({
   components: {
     WidgetToolbar,
   },
 })
-/* eslint-enable */
 export default class SensorSetPointPairWidget extends BlockWidget {
   inputMapping = {
     setpoint: { path: 'setPoint.settings.value', default: 0 },

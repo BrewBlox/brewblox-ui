@@ -15,7 +15,6 @@ const allWidgetWizards = allFeatureTypes()
   .filter(wizardByType)
   .reduce((acc: any, type: string) => ({ ...acc, type: wizardByType(type) }), {});
 
-/* eslint-disable indent */
 @Component({
   components: {
     ...allWidgetWizards,
@@ -27,7 +26,6 @@ const allWidgetWizards = allFeatureTypes()
     },
   },
 })
-/* eslint-enable */
 export default class NewWidgetWizard extends Vue {
   widgetId: string = '';
   searchModel: string = '';

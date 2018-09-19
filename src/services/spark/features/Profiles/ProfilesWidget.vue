@@ -11,7 +11,6 @@ import ProfilesForm from './ProfilesForm.vue';
 import { ProfilesBlock } from './state';
 import { getById } from './getters';
 
-/* eslint-disable indent */
 @Component({
   components: {
     ProfilesBar,
@@ -20,7 +19,6 @@ import { getById } from './getters';
     ProfilesForm,
   },
 })
-/* eslint-enable */
 export default class ProfilesWidget extends BlockWidget {
   inputMapping = {
     active: { path: 'block.data.active', default: [] },

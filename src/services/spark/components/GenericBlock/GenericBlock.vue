@@ -11,13 +11,11 @@ import { Block } from '@/services/spark/state';
 import BlockWidget from '@/services/spark/components/BlockWidget';
 import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 
-/* eslint-disable indent */
 @Component({
   components: {
     WidgetToolbar,
   },
 })
-/* eslint-enable */
 export default class GenericBlock extends BlockWidget { }
 </script>
 
