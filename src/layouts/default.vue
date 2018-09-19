@@ -5,9 +5,12 @@ import draggable from 'vuedraggable';
 
 import byOrder from '@/helpers/byOrder';
 
+import { Dashboard } from '@/store/dashboards/state';
 import { allDashboards, isFetching } from '@/store/dashboards/getters';
 import { addNewDashboard, updateDashboardOrder, removeDashboard } from '@/store/dashboards/actions';
-import { Dashboard } from '@/store/dashboards/state';
+
+import { updateServiceOrder } from '@/store/services/actions';
+import { Service } from '@/store/services/state';
 import { allServices } from '@/store/services/getters';
 
 /* eslint-disable indent */
@@ -27,12 +30,16 @@ export default class LayoutDefault extends Vue {
     return [...allDashboards(this.$store)].sort(byOrder);
   }
 
-  get services() {
-    return allServices(this.$store);
-  }
-
   set dashboards(dashboards: Dashboard[]) {
     updateDashboardOrder(this.$store, dashboards.map(dashboard => dashboard.id));
+  }
+
+  get services() {
+    return [...allServices(this.$store)].sort(byOrder);
+  }
+
+  set services(services: Service[]) {
+    updateServiceOrder(this.$store, services.map(service => service.id));
   }
 
   get isFetching() {
@@ -163,11 +170,10 @@ export default class LayoutDefault extends Vue {
           <q-item
             v-for="dashboard in dashboards"
             :link="!dashboardEditing"
-            :to="dashboardEditing ? undefined : `/dashboard/${ dashboard.id }`"
             :key="dashboard.id"
+            :to="dashboardEditing ? undefined : `/dashboard/${ dashboard.id }`"
           >
             <q-item-main :label="dashboard.title" />
-
             <q-item-side
               right
               v-if="dashboardEditing"
@@ -229,7 +235,6 @@ export default class LayoutDefault extends Vue {
           :options="{ disabled: !serviceEditing }"
           v-model="services"
         >
-
           <q-item
             v-for="service in services"
             :link="!serviceEditing"
@@ -244,7 +249,6 @@ export default class LayoutDefault extends Vue {
               <q-icon name="menu" />
             </q-item-side>
           </q-item>
-
         </draggable>
 
         <div class="q-list-container">

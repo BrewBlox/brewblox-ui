@@ -1,3 +1,4 @@
+import { ActionContext } from 'vuex';
 import {
   ActionHandlerWithPayload,
   getStoreAccessors,
@@ -6,7 +7,6 @@ import {
   MutationHandlerWithPayload,
 } from 'vuex-typescript';
 import { RootStore, State as RootState } from '@/store/state';
-import { ActionContext } from 'vuex';
 
 /*
   These store accessors are for use by dynamically created store modules (services).
