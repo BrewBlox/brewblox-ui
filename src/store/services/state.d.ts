@@ -4,6 +4,8 @@ import { State as RootState } from '../state';
 
 export interface Service {
   id: string;
+  title: string;
+  order: number;
   type: string;
   config: Object;
   isLoading?: boolean;

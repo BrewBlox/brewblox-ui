@@ -9,7 +9,7 @@ import byOrder from '@/helpers/byOrder';
 import { DashboardItem } from '@/store/dashboards/state';
 
 import { Block } from '@/services/spark/state';
-import { isFetching, allBlocks } from '@/services/spark/store/getters';
+import { isFetching, allBlocks, serviceAvailable } from '@/services/spark/store/getters';
 
 import { widgetByType, widgetSizeByType, allFeatureTypes } from '@/services/feature-by-type';
 
@@ -21,6 +21,12 @@ interface VueOrdered extends Vue {
 @Component({
   components: {
     GridContainer,
+  },
+  props: {
+    serviceId: {
+      type: String,
+      required: true,
+    },
   },
 })
 /* eslint-enable */
@@ -41,15 +47,22 @@ export default class SparkPage extends Vue {
     };
   }
 
+  get isAvailable() {
+    return serviceAvailable(this.$store, this.$props.serviceId);
+  }
+
   get items() {
+    if (!this.isAvailable) {
+      return [];
+    }
     return [
-      ...allBlocks(this.$store, 'spark')
+      ...allBlocks(this.$store, this.$props.serviceId)
         .map(this.defaultItem),
     ];
   }
 
   get isFetching() {
-    return isFetching(this.$store, 'spark');
+    return !this.isAvailable || isFetching(this.$store, this.$props.serviceId);
   }
 
   widgetComponent(type: string): VueConstructor {
@@ -59,7 +72,7 @@ export default class SparkPage extends Vue {
 </script>
 
 <template>
-  <q-page padding>
+  <div>
     <q-inner-loading :visible="isFetching">
       <q-spinner
         size="50px"
@@ -88,11 +101,11 @@ export default class SparkPage extends Vue {
         />
       </grid-container>
     </template>
-  </q-page>
+  </div>
 </template>
 
 <style lang="stylus" scoped>
-@import '../css/app.styl';
+@import '../../../css/app.styl';
 
 .dashboard-item {
   background: $block-background;

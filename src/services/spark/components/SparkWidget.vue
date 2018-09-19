@@ -23,6 +23,8 @@ export default class SparkWidget extends Vue {
   addService() {
     createService(this.$store, {
       id: this.serviceInput,
+      title: this.serviceInput,
+      order: this.services.length + 1,
       type: 'spark',
       config: {},
     });

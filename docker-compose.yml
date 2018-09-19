@@ -19,16 +19,33 @@ services:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /history"
 
-  spark:
+  sparkey:
     image: brewblox/brewblox-devcon-spark:develop
     depends_on:
       - eventbus
     labels:
       - "traefik.port=5000"
-      - "traefik.frontend.rule=PathPrefix: /spark"
+      - "traefik.frontend.rule=PathPrefix: /sparkey"
     volumes:
       - "./mocks/config/seed_objects.json:/app/seed_objects.json"
     command:
+      - "--name=sparkey"
+      - "--simulation"
+      - "--debug"
+      - "--seed-profiles=0"
+      - "--seed-objects=seed_objects.json"
+
+  spockey:
+    image: brewblox/brewblox-devcon-spark:develop
+    depends_on:
+      - eventbus
+    labels:
+      - "traefik.port=5000"
+      - "traefik.frontend.rule=PathPrefix: /spockey"
+    volumes:
+      - "./mocks/config/seed_objects.json:/app/seed_objects.json"
+    command:
+      - "--name=spockey"
       - "--simulation"
       - "--debug"
       - "--seed-profiles=0"

@@ -19,6 +19,9 @@ const defaultProfileNames = [
 
 export const typeName: string = 'spark';
 
+export const serviceAvailable = (store: RootStore, serviceId: string) =>
+  !!(store as any).state[serviceId];
+
 // Returns a function that wraps getting and returning the store accessor
 // Practical result: all getter calls must now supply store + serviceId
 // old = isFetching(this.$store)

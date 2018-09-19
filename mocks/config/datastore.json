@@ -160,7 +160,9 @@
   ],
   "services": [
     {
-      "id": "spark",
+      "id": "sparkey",
+      "title": "Spark Controller 'sparkey'",
+      "order": 1,
       "type": "spark",
       "config": {
         "profileNames": [
@@ -168,6 +170,13 @@
           "testey2"
         ]
       }
+    },
+    {
+      "id": "spockey",
+      "title": "Spark Controller 'spockey'",
+      "order": 2,
+      "type": "spark",
+      "config": {}
     }
   ]
 }
