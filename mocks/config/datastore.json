@@ -164,7 +164,7 @@
       "id": "sparkey",
       "title": "Spark Controller 'sparkey'",
       "order": 1,
-      "type": "spark",
+      "type": "Spark",
       "config": {
         "profileNames": [
           "testey1",
@@ -176,14 +176,14 @@
       "id": "spockey",
       "title": "Spark Controller 'spockey'",
       "order": 2,
-      "type": "spark",
+      "type": "Spark",
       "config": {}
     },
     {
       "id": "history",
       "title": "The Librarian",
       "order": 3,
-      "type": "history",
+      "type": "History",
       "config": {}
     }
   ]

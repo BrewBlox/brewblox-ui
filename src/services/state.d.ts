@@ -23,5 +23,5 @@ export interface FeatureService {
   page?: VueConstructor;
   features: {
     [id: string]: Feature;
-  }
+  };
 }

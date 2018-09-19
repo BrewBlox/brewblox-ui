@@ -1,13 +1,13 @@
 import { FeatureService } from '@/services/state';
 
-import spark from './spark';
-import history from './history';
+import Spark from './Spark';
+import History from './History';
 
-import GenericBlock from './spark/components/GenericBlock';
+import GenericBlock from './Spark/components/GenericBlock';
 
 export const services: { [id: string]: FeatureService } = {
-  spark,
-  history,
+  Spark,
+  History,
 };
 
 export const features = Object.values(services)
