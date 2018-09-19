@@ -1,9 +1,10 @@
 import { saveService } from '@/store/services/actions';
 import { Service } from '@/store/services/state';
 import { RootStore, State as RootState } from '@/store/state';
-import { ActionHandlerWithPayload, getStoreAccessors } from 'vuex-typescript';
+
 import { Block } from '../state';
 import { BlocksContext, BlocksState } from './state';
+import { dispatch } from '@/helpers/store-accessors';
 
 import {
   clearBlocks as clearBlocksInApi,
@@ -23,14 +24,6 @@ import {
   removeBlock as removeBlockInStore,
   clearBlocks as clearBlocksInStore,
 } from './mutations';
-
-declare type ActionHandler<TPayload, TResult> =
-  ActionHandlerWithPayload<BlocksState, RootState, TPayload, TResult>;
-
-function dispatch<TPayload, TResult>(handler: ActionHandler<TPayload, TResult>) {
-  return (store: RootStore, serviceId: string, payload: TPayload) =>
-    getStoreAccessors<BlocksState, RootState>(serviceId).dispatch(handler)(store, payload);
-}
 
 const actions = {
   async fetchBlock(context: BlocksContext, block: Block) {

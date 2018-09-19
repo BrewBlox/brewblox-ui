@@ -1,9 +1,8 @@
-import { getStoreAccessors, GetterHandler, GetAccessor } from 'vuex-typescript';
-
-import { State as RootState, RootStore } from '@/store/state';
+import { read } from '@/helpers/store-accessors';
+import { RootStore } from '@/store/state';
 import { serviceById } from '@/store/services/getters';
 
-import { BlocksState, BlocksContext } from './state';
+import { BlocksState } from './state';
 import { spark, Block } from '../state';
 
 const defaultProfileNames = [
@@ -21,15 +20,6 @@ export const typeName: string = 'spark';
 
 export const serviceAvailable = (store: RootStore, serviceId: string) =>
   !!(store as any).state[serviceId];
-
-// Returns a function that wraps getting and returning the store accessor
-// Practical result: all getter calls must now supply store + serviceId
-// old = isFetching(this.$store)
-// new = isFetching(this.$store, this.serviceId)
-function read<TResult>(handler: GetterHandler<BlocksState, RootState, TResult>) {
-  return (store: RootStore, serviceId: string): TResult =>
-    getStoreAccessors<BlocksState, RootState>(serviceId).read(handler)(store);
-}
 
 const getters = {
   blocks: (state: BlocksState): { [id: string]: Block } => state.blocks,

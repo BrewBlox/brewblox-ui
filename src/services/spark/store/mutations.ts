@@ -1,23 +1,8 @@
 import Vue from 'vue';
-import {
-  getStoreAccessors,
-  MutationHandlerWithPayload,
-  MutationHandlerNoPayload,
-} from 'vuex-typescript';
 
-import { State as RootState, RootStore } from '@/store/state';
-import { BlocksState, BlocksContext } from './state';
+import { commit, noArgCommit } from '@/helpers/store-accessors';
+import { BlocksState } from './state';
 import { Block } from '../state';
-
-function commit<TPayload>(handler: MutationHandlerWithPayload<BlocksState, TPayload>) {
-  return (store: RootStore | BlocksContext, serviceId: string, payload: TPayload) =>
-    getStoreAccessors<BlocksState, RootState>(serviceId).commit(handler)(store, payload);
-}
-
-function noArgCommit(handler: MutationHandlerNoPayload<BlocksState>) {
-  return (store: RootStore | BlocksContext, serviceId: string) =>
-    getStoreAccessors<BlocksState, RootState>(serviceId).commit(handler)(store);
-}
 
 const mutations = {
   addBlock(state: BlocksState, block: Block) {
