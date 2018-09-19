@@ -42,14 +42,12 @@ import Part from '../Part';
 
 import FlowArrow from '../Flows/FlowArrow.vue';
 
-/* eslint-disable */
 @Component({
   components: {
     SVGRoot,
     FlowArrow,
   },
 })
-
 class InputTube extends Part {
   static isSource = true;
 
@@ -85,5 +83,4 @@ export default InputTube;
 </script>
 
 <style scoped>
-
 </style>

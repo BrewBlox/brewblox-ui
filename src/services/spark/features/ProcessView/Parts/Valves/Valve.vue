@@ -58,14 +58,12 @@ import Part from '../Part';
 
 import FlowArrow from '../Flows/FlowArrow.vue';
 
-/* eslint-disable */
 @Component({
   components: {
     SVGRoot,
     FlowArrow,
   },
 })
-
 class Valve extends Part {
   static flows(part: ProcessViewPartWithComponent) {
     if (part.closed) {

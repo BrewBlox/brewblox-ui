@@ -47,14 +47,12 @@ import Part from '../Part';
 
 import FlowArrow from '../Flows/FlowArrow.vue';
 
-/* eslint-disable */
 @Component({
   components: {
     SVGRoot,
     FlowArrow,
   },
 })
-
 class StraightTube extends Part {
   static flows(): ProcessViewPartFlows {
     return {
@@ -81,5 +79,4 @@ export default StraightTube;
 </script>
 
 <style scoped>
-
 </style>

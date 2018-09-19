@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-/* eslint-disable */
 @Component({
   props: {
     part: {
@@ -18,7 +17,6 @@ import Component from 'vue-class-component';
     },
   },
 })
-
 export default class Part extends Vue {
   get closed(): boolean {
     return !!this.$props.part.closed;

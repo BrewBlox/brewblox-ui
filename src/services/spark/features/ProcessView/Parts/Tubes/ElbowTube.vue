@@ -50,14 +50,12 @@ import Part from '../Part';
 
 import FlowArrow from '../Flows/FlowArrow.vue';
 
-/* eslint-disable */
 @Component({
   components: {
     SVGRoot,
     FlowArrow,
   },
 })
-
 class ElbowTube extends Part {
   static flows() {
     return {
@@ -94,5 +92,4 @@ export default ElbowTube;
 </script>
 
 <style scoped>
-
 </style>

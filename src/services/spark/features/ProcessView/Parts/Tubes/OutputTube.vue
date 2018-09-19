@@ -50,14 +50,12 @@ import Part from '../Part';
 
 import FlowArrow from '../Flows/FlowArrow.vue';
 
-/* eslint-disable */
 @Component({
   components: {
     SVGRoot,
     FlowArrow,
   },
 })
-
 class OutputTube extends Part {
   static isSink = true;
 
@@ -93,5 +91,4 @@ export default OutputTube;
 </script>
 
 <style scoped>
-
 </style>

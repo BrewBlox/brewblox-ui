@@ -3,7 +3,6 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import componentByType from './Parts/componentByType';
 
-/* eslint-disable */
 @Component({
   props: {
     part: {
@@ -16,7 +15,6 @@ import componentByType from './Parts/componentByType';
     },
   },
 })
-
 export default class ProcessViewItem extends Vue {
   get style() {
     if (!this.$props.part.rotate) {

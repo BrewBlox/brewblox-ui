@@ -12,13 +12,11 @@ import { MetricsOptions, MeasuresType, PlotlyData, PlotlyOptions } from './state
 
 const sortByOrder = (a: MetricsOptions, b: MetricsOptions) => a.order - b.order;
 
-/* eslint-disable */
 @Component({
   components: {
     MetricsDisplay,
   },
 })
-
 export default class MetricsWidget extends Widget {
   fetching: boolean = true;
   editing: boolean = false;

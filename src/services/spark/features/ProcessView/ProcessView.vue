@@ -8,13 +8,11 @@ import ProcessViewItem from './ProcessViewItem.vue';
 import componentByType from './Parts/componentByType';
 import { pathsFromSources, isSamePart } from './calculateFlows';
 
-/* eslint-disable */
 @Component({
   components: {
     ProcessViewItem,
   },
 })
-
 class ProcessViewWidget extends Widget {
   size: number = 50;
   frame: number = 0;
@@ -191,8 +189,14 @@ export default ProcessViewWidget;
   display: grid;
   grid-auto-columns: 50px;
   grid-auto-rows: 50px;
-  background-image: linear-gradient($dark_bright 1px, transparent 1px),
-    linear-gradient(90deg, $dark_bright 1px, transparent 1px);
+  background-image: linear-gradient(
+    $dark_bright 1px,
+    transparent 1px
+  ), linear-gradient(
+    90deg,
+    $dark_bright 1px,
+    transparent 1px
+  );
   background-size: 50px 50px, 50px 50px;
   background-position: 0 -1px, -1px 0;
   border: 1px solid $dark_bright;

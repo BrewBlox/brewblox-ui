@@ -50,14 +50,12 @@ import Part from '../Part';
 
 import FlowArrow from '../Flows/FlowArrow.vue';
 
-/* eslint-disable */
 @Component({
   components: {
     SVGRoot,
     FlowArrow,
   },
 })
-
 class TeeTube extends Part {
   static flows(): ProcessViewPartFlows {
     return {
@@ -109,5 +107,4 @@ export default TeeTube;
 </script>
 
 <style scoped>
-
 </style>
