@@ -86,7 +86,8 @@
       "rows": 3,
       "widget": "SensorSetPointPair",
       "config": {
-        "blockId": "spark/BLARGH"
+        "serviceId": "spark",
+        "blockId": "BLARGH"
       }
     },
     {
@@ -96,7 +97,8 @@
       "rows": 3,
       "widget": "UnknownType",
       "config": {
-        "blockId": "spark/setpoint-1"
+        "serviceId": "spark",
+        "blockId": "setpoint-1"
       }
     },
     {
@@ -106,7 +108,8 @@
       "rows": 3,
       "widget": "Warbl",
       "config": {
-        "blockId": "spark/BLORP"
+        "serviceId": "spark",
+        "blockId": "BLORP"
       }
     },
     {
@@ -117,6 +120,7 @@
       "widget": "Metrics",
       "config": {
         "name": "Metrics View",
+        "serviceId": "history",
         "metrics": []
       }
     }
@@ -157,14 +161,30 @@
   ],
   "services": [
     {
-      "id": "spark",
-      "type": "SparkService",
+      "id": "sparkey",
+      "title": "Spark Controller 'sparkey'",
+      "order": 1,
+      "type": "Spark",
       "config": {
         "profileNames": [
           "testey1",
           "testey2"
         ]
       }
+    },
+    {
+      "id": "spockey",
+      "title": "Spark Controller 'spockey'",
+      "order": 2,
+      "type": "Spark",
+      "config": {}
+    },
+    {
+      "id": "history",
+      "title": "The Librarian",
+      "order": 3,
+      "type": "History",
+      "config": {}
     }
   ]
 }

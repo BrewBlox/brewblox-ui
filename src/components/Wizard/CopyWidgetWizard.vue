@@ -3,16 +3,15 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Notify } from 'quasar';
 
-import { allBlocks } from '@/store/blocks/getters';
+import { allBlocks } from '@/services/Spark/store/getters';
 
 import { DashboardItem } from '@/store/dashboards/state';
 import { allDashboardItems, dashboardItemById } from '@/store/dashboards/getters';
 
-import { allTypes, wizardByType, displayNameByType } from '@/features/feature-by-type';
+import { allFeatureTypes, wizardByType, displayNameByType } from '@/services/feature-by-type';
 
-/* eslint-disable indent */
 @Component({
-  components: { },
+  components: {},
   props: {
     onCreateItem: {
       type: Function,
@@ -20,7 +19,6 @@ import { allTypes, wizardByType, displayNameByType } from '@/features/feature-by
     },
   },
 })
-/* eslint-enable */
 export default class CopyWidgetWizard extends Vue {
   widgetId: string = '';
   searchModel: string = '';
@@ -114,15 +112,11 @@ export default class CopyWidgetWizard extends Vue {
   </div>
 </template>
 
-<style>
-/* .q-item {
+<style scoped>
+.q-item {
   display: grid;
   grid-gap: 10px;
-} */
-
-/* .q-item {
-  margin-left: 0px;
-} */
+}
 
 .layout-padding {
   position: relative;

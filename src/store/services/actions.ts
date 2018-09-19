@@ -1,9 +1,7 @@
 import { getStoreAccessors } from 'vuex-typescript';
-
 import { State as RootState } from '../state';
-
 import { ServicesState, Service, ServicesContext } from './state';
-
+import { serviceById as getServiceInStore } from './getters';
 import {
   fetchServices as fetchServicesInApi,
   createService as createServiceInApi,
@@ -45,11 +43,20 @@ const actions = {
     await removeServiceInApi(service);
     removeServiceInStore(context, service.id);
   },
+
+  async updateServiceOrder(context: ServicesContext, ids: string[]) {
+    ids.forEach((id, idx) => {
+      const order = idx + 1;
+      mutateServiceInStore(context, { id, order });
+      persistServiceInApi(getServiceInStore(context, id));
+    });
+  },
 };
 
 export const fetchServices = dispatch(actions.fetchServices);
 export const createService = dispatch(actions.createService);
 export const saveService = dispatch(actions.saveService);
 export const removeService = dispatch(actions.removeService);
+export const updateServiceOrder = dispatch(actions.updateServiceOrder);
 
 export default actions;

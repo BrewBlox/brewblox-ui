@@ -2,16 +2,22 @@
 import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
 import { Notify } from 'quasar';
-
-import { allTypes, wizardByType, displayNameByType } from '@/features/feature-by-type';
 import { DashboardItem } from '@/store/dashboards/state';
 import { dashboardItemById } from '@/store/dashboards/getters';
-import { widgetWizards } from './widget-types.ts';
 
-/* eslint-disable indent */
+import {
+  allFeatureTypes,
+  wizardByType,
+  displayNameByType,
+} from '@/services/feature-by-type';
+
+const allWidgetWizards = allFeatureTypes()
+  .filter(wizardByType)
+  .reduce((acc: any, type: string) => ({ ...acc, type: wizardByType(type) }), {});
+
 @Component({
   components: {
-    ...widgetWizards,
+    ...allWidgetWizards,
   },
   props: {
     onCreateItem: {
@@ -20,14 +26,13 @@ import { widgetWizards } from './widget-types.ts';
     },
   },
 })
-/* eslint-enable */
 export default class NewWidgetWizard extends Vue {
   widgetId: string = '';
   searchModel: string = '';
   featureWizard: VueConstructor | null = null;
 
   get wizardOptions() {
-    return allTypes
+    return allFeatureTypes()
       .filter(wizardByType)
       .filter(type => displayNameByType(type).match(this.searchModel))
       .map(type => ({
@@ -144,7 +149,7 @@ export default class NewWidgetWizard extends Vue {
   </div>
 </template>
 
-<style>
+<style scoped>
 .q-item {
   display: grid;
   grid-gap: 10px;

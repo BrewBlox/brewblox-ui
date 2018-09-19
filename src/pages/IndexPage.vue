@@ -12,5 +12,5 @@ export default Vue.extend({
   </q-page>
 </template>
 
-<style>
+<style scoped>
 </style>

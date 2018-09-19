@@ -5,14 +5,14 @@ import Component from 'vue-class-component';
 import shortid from 'shortid';
 
 import GridContainer from '@/components/Grid/GridContainer.vue';
-import InvalidWidget from '@/components/WidgetGenerics/InvalidWidget.vue';
-import WidgetModal from '@/components/WidgetGenerics/WidgetModal.vue';
+import InvalidWidget from '@/components/Widget/InvalidWidget.vue';
+import WidgetModal from '@/components/Widget/WidgetModal.vue';
 import CopyWidgetWizard from '@/components/Wizard/CopyWidgetWizard.vue';
 import NewWidgetWizard from '@/components/Wizard/NewWidgetWizard.vue';
 
 import byOrder from '@/helpers/byOrder';
 
-import { Block } from '@/store/blocks/state';
+import { Block } from '@/services/Spark/state';
 import { DashboardItem } from '@/store/dashboards/state';
 
 import {
@@ -31,13 +31,12 @@ import {
 } from '@/store/dashboards/actions';
 
 import {
-  allTypes,
   widgetByType,
   validatorByType,
   wizardByType,
   displayNameByType,
   widgetSizeByType,
-} from '@/features/feature-by-type';
+} from '@/services/feature-by-type';
 
 interface VueOrdered extends Vue {
   id: string;
@@ -49,7 +48,6 @@ interface ModalConfig {
   component?: VueConstructor;
 }
 
-/* eslint-disable indent */
 @Component({
   components: {
     GridContainer,
@@ -58,7 +56,6 @@ interface ModalConfig {
     NewWidgetWizard,
   },
 })
-/* eslint-enable */
 export default class DashboardPage extends Vue {
   editable: boolean = false;
   title: string = '';

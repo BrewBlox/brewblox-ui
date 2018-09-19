@@ -8,7 +8,9 @@
     "@vue/airbnb",
     "@vue/typescript"
   ],
-  "plugins": ["typescript"],
+  "plugins": [
+    "typescript"
+  ],
   "rules": {
     "import/first": 0,
     "import/named": 2,
@@ -20,18 +22,16 @@
     "import/no-extraneous-dependencies": 0,
     "import/prefer-default-export": 0,
     "import/newline-after-import": 0,
-
     // vue specific rules
     "class-methods-use-this": 0,
     "strict": 0,
     "no-param-reassign": 0,
     "no-restricted-globals": 0,
-
     // allow debugger during development
     "no-debugger": 2,
-
     // for eslint + typescript to work:
     "typescript/no-unused-vars": 1,
-    "space-infix-ops": 0
+    "space-infix-ops": 0,
+    "indent": 0
   }
 }

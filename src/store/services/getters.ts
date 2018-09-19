@@ -3,7 +3,7 @@ import { map } from 'lodash';
 import { getStoreAccessors } from 'vuex-typescript';
 
 import { State as RootState, RootStore } from '../state';
-import { ServicesState, Service } from './state';
+import { ServicesState, Service, ServicesContext } from './state';
 
 const { read } = getStoreAccessors<ServicesState, RootState>('services');
 
@@ -30,7 +30,10 @@ export const serviceIds = read(getters.serviceIds);
 export const allServices = read(getters.allServices);
 export const isFetching = read(getters.isFetching);
 
-export function serviceById<T extends Service>(store: RootStore, id: string, type?: string): T {
+export function serviceById<T extends Service>(
+  store: RootStore | ServicesContext,
+  id: string, type?: string,
+): T {
   const service = servicesById(store)[id];
   if (!service) {
     throw new Error(`Service ${id} not found`);
