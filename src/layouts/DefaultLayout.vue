@@ -157,6 +157,7 @@ export default class DefaultLayout extends Vue {
           <q-btn
             round
             size="sm"
+            :flat="!dashboardEditing"
             :icon="dashboardEditing ? 'check' : 'mode edit'"
             :color="dashboardEditing ? 'primary': ''"
             @click="toggleDashboardEditing"
@@ -191,6 +192,7 @@ export default class DefaultLayout extends Vue {
             >
               <q-btn
                 round
+                flat
                 icon="delete"
                 @click="removeDashboard(dashboard)"
               />
@@ -217,6 +219,7 @@ export default class DefaultLayout extends Vue {
           <q-btn
             round
             size="sm"
+            :flat="!serviceEditing"
             :icon="serviceEditing ? 'check' : 'mode edit'"
             :color="serviceEditing ? 'primary': ''"
             @click="toggleServiceEditing"
@@ -252,6 +255,7 @@ export default class DefaultLayout extends Vue {
             >
               <q-btn
                 round
+                flat
                 icon="delete"
                 @click="removeService(service)"
               />
@@ -269,18 +273,18 @@ export default class DefaultLayout extends Vue {
           />
         </div>
 
-      <widget-modal
-        :isOpen="wizardModalOpen"
-        title="Service Wizard"
-        :onClose="() => { this.wizardModalOpen = false; }"
-      >
-        <new-service-wizard
-          v-if="wizardModalOpen"
-        />
-      </widget-modal>
-
       </q-list>
     </q-layout-drawer>
+
+    <widget-modal
+      title="Service Wizard"
+      :isOpen="wizardModalOpen"
+      :onClose="() => { this.wizardModalOpen = false; }"
+    >
+      <new-service-wizard
+        v-if="wizardModalOpen"
+      />
+    </widget-modal>
 
     <q-page-container>
       <router-view />

@@ -25,13 +25,13 @@ export default class SensorSetPointPairWidget extends BlockWidget {
   }
 
   get sensor(): OneWireTempSensorBlock {
-    const { data, serviceId } = this.block;
-    return getSensorById(this.$store, serviceId, data.sensor.id);
+    const { data } = this.block;
+    return getSensorById(this.$store, this.serviceId, data.sensor.id);
   }
 
   get setPoint(): SetPointSimpleBlock {
-    const { data, serviceId } = this.block;
-    return getSetPointById(this.$store, serviceId, data.setpoint.id);
+    const { data } = this.block;
+    return getSetPointById(this.$store, this.serviceId, data.setpoint.id);
   }
 }
 </script>
