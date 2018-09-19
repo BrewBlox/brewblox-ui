@@ -86,7 +86,7 @@
       "rows": 3,
       "widget": "SensorSetPointPair",
       "config": {
-        "serviceId": "spark",
+        "serviceId": "sparkey",
         "blockId": "BLARGH"
       }
     },
@@ -97,7 +97,7 @@
       "rows": 3,
       "widget": "UnknownType",
       "config": {
-        "serviceId": "spark",
+        "serviceId": "sparkey",
         "blockId": "setpoint-1"
       }
     },
@@ -108,7 +108,7 @@
       "rows": 3,
       "widget": "Warbl",
       "config": {
-        "serviceId": "spark",
+        "serviceId": "sparkey",
         "blockId": "BLORP"
       }
     },
@@ -173,8 +173,8 @@
       }
     },
     {
-      "id": "spockey",
-      "title": "Spark Controller 'spockey'",
+      "id": "spock",
+      "title": "Spark Controller 'spock'",
       "order": 2,
       "type": "Spark",
       "config": {}

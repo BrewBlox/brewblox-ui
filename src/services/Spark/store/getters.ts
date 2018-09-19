@@ -3,7 +3,7 @@ import { RootStore } from '@/store/state';
 import { serviceById } from '@/store/services/getters';
 
 import { BlocksState } from './state';
-import { spark, Block } from '../state';
+import { Spark, Block } from '../state';
 
 const defaultProfileNames = [
   'P1',
@@ -16,7 +16,7 @@ const defaultProfileNames = [
   'P8',
 ];
 
-export const typeName: string = 'spark';
+export const typeName: string = 'Spark';
 
 const getters = {
   blocks: (state: BlocksState): { [id: string]: Block } => state.blocks,
@@ -40,10 +40,10 @@ export function blockById<T extends Block>(
 ): T {
   const block = blocks(store, serviceId)[id];
   if (!block) {
-    throw new Error(`Block ${id} not found`);
+    throw new Error(`Block ${id} not found in service ${serviceId}`);
   }
   if (block && type && block.type !== type) {
-    throw new Error(`Invalid block: ${block.type} !== ${type}`);
+    throw new Error(`Invalid block ${id}: ${block.type} !== ${type}`);
   }
   return block as T;
 }
@@ -58,7 +58,7 @@ export function allBlocks<T extends Block>(
 }
 
 export const sparkServiceById = (store: RootStore, id: string) =>
-  serviceById<spark>(store, id, typeName);
+  serviceById<Spark>(store, id, typeName);
 
 export const sparkConfigById = (store: RootStore, id: string) =>
   sparkServiceById(store, id).config || {};

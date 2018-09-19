@@ -1,18 +1,18 @@
 import { FeatureService } from '../state';
-import { fetchBlocks } from './store/actions';
+import { fetchBlocks as fetch } from './store/actions';
 import features from './features';
-
-import SparkPage from './pages/SparkPage.vue';
-import SparkWidget from './components/SparkWidget.vue';
+import page from './components/SparkPage.vue';
+import wizard from './components/SparkWizard.vue';
 
 import { register } from './store';
 
 const service: FeatureService = {
   features,
   register,
-  fetch: fetchBlocks,
-  widget: SparkWidget,
-  page: SparkPage,
+  page,
+  wizard,
+  fetch,
+  displayName: 'Spark Controller',
 };
 
 export default service;

@@ -16,10 +16,11 @@ export interface Feature {
 }
 
 export interface FeatureService {
+  displayName?: string;
+  validator?: (store: RootStore, config: any) => boolean;
   register?: (store: RootStore, service: Service) => any;
   fetch?: (store: RootStore, service: Service) => any;
-  validator?: (store: RootStore, config: any) => boolean;
-  widget?: VueConstructor;
+  wizard?: VueConstructor;
   page?: VueConstructor;
   features: {
     [id: string]: Feature;

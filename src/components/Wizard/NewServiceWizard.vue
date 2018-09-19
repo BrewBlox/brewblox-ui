@@ -1,0 +1,191 @@
+<script lang="ts">
+import Vue, { VueConstructor } from 'vue';
+import Component from 'vue-class-component';
+import { Notify } from 'quasar';
+import { Service } from '@/store/services/state';
+import { serviceById, serviceIds } from '@/store/services/getters';
+import { createService } from '@/store/services/actions';
+
+import {
+  allServiceTypes,
+  wizardByType,
+  displayNameByType,
+} from '@/services/service-by-type';
+
+const allServiceWizards = allServiceTypes()
+  .filter(wizardByType)
+  .reduce((acc: any, type: string) => ({ ...acc, type: wizardByType(type) }), {});
+
+@Component({
+  components: {
+    ...allServiceWizards,
+  },
+})
+export default class NewServiceWizard extends Vue {
+  serviceId: string = '';
+  serviceTitle: string = '';
+  searchModel: string = '';
+  serviceWizard: VueConstructor | null = null;
+
+  get wizardOptions() {
+    return allServiceTypes()
+      .filter(wizardByType)
+      .filter(type => displayNameByType(type).match(this.searchModel))
+      .map(type => ({
+        label: displayNameByType(type),
+        value: wizardByType(type),
+      }));
+  }
+
+  get existingIds() {
+    return serviceIds(this.$store);
+  }
+
+  get serviceIdError() {
+    if (!this.serviceId) {
+      return 'ID must not be empty';
+    }
+    if (this.existingIds.includes(this.serviceId)) {
+      return 'ID must be unique';
+    }
+    return null;
+  }
+
+  get serviceWizardActive() {
+    return this.serviceWizard !== null;
+  }
+
+  get wizardComponent() {
+    return this.serviceWizard;
+  }
+
+  set wizardComponent(component: VueConstructor | null) {
+    this.serviceWizard = component;
+  }
+
+  selectFeature(wizard: VueConstructor) {
+    if (this.serviceIdError !== null) {
+      Notify.create(this.serviceIdError);
+      return;
+    }
+    this.wizardComponent = wizard;
+  }
+
+  onCreate(partial: Partial<Service>) {
+    const service: Service = {
+      id: this.serviceId,
+      title: this.serviceTitle,
+      order: this.existingIds.length + 1,
+      config: {},
+      type: 'Unknown',
+      ...partial,
+    };
+    createService(this.$store, service);
+    this.reset();
+    Notify.create({
+      type: 'positive',
+      position: 'top',
+      message: `Added ${displayNameByType(service.type)} "${service.title}"`,
+    });
+  }
+
+  reset() {
+    this.serviceId = '';
+    this.serviceTitle = '';
+    this.searchModel = '';
+    this.wizardComponent = null;
+  }
+
+  mounted() {
+    this.reset();
+  }
+}
+</script>
+
+<template>
+  <div class="layout-padding">
+
+    <q-item v-if="serviceWizardActive">
+      <component
+        v-if="serviceWizardActive"
+        :is="serviceWizard"
+        :onCreate="onCreate"
+        :onCancel="reset"
+      />
+    </q-item>
+    <!-- Select a wizard -->
+    <q-item v-else>
+      <q-field
+        label="Service ID"
+        icon="create"
+        orientation="vertical"
+      >
+        <q-input
+          v-model="serviceId"
+          placeholder="Choose an ID"
+          :error="serviceIdError !== null"
+          :suffix="serviceIdError"
+        />
+      </q-field>
+
+      <q-field
+        label="Service name"
+        icon="create"
+        orientation="vertical"
+      >
+        <q-input
+          v-model="serviceTitle"
+          placeholder="Choose a name"
+        />
+      </q-field>
+
+      <q-field
+        label="Service type"
+        icon="widgets"
+        orientation="vertical"
+      >
+        <q-item>
+          <q-search
+            v-model="searchModel"
+            placeholder="Search"
+          />
+        </q-item>
+        <q-list link inset-separator>
+          <q-item
+            icon="widgets"
+            v-for="opt in wizardOptions"
+            :key="opt.label"
+            @click.native="selectFeature(opt.value)"
+          >
+            <div class="row">
+              <q-item-main>
+                <q-item-tile label>{{ opt.label }}</q-item-tile>
+              </q-item-main>
+              <q-item-side right icon="chevron_right" />
+            </div>
+          </q-item>
+        </q-list>
+      </q-field>
+    </q-item>
+
+  </div>
+</template>
+
+<style scoped>
+.q-item {
+  display: grid;
+  grid-gap: 10px;
+}
+
+.q-list {
+  border: 0;
+}
+
+.q-option-group {
+  border: 0;
+}
+
+.layout-padding {
+  position: relative;
+}
+</style>
