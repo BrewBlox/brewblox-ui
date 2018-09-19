@@ -24,7 +24,7 @@ const getters = {
 
 };
 
-const servicesById = read(getters.services);
+const services = read(getters.services);
 
 export const serviceIds = read(getters.serviceIds);
 export const allServices = read(getters.allServices);
@@ -34,7 +34,7 @@ export function serviceById<T extends Service>(
   store: RootStore | ServicesContext,
   id: string, type?: string,
 ): T {
-  const service = servicesById(store)[id];
+  const service = services(store)[id];
   if (!service) {
     throw new Error(`Service ${id} not found`);
   }

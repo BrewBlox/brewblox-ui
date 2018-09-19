@@ -3,7 +3,7 @@ import { RootStore } from '@/store/state';
 import { serviceById } from '@/store/services/getters';
 
 import { BlocksState } from './state';
-import { spark, Block } from '../state';
+import { Spark, Block } from '../state';
 
 const defaultProfileNames = [
   'P1',
@@ -58,7 +58,7 @@ export function allBlocks<T extends Block>(
 }
 
 export const sparkServiceById = (store: RootStore, id: string) =>
-  serviceById<spark>(store, id, typeName);
+  serviceById<Spark>(store, id, typeName);
 
 export const sparkConfigById = (store: RootStore, id: string) =>
   sparkServiceById(store, id).config || {};

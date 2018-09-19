@@ -1,5 +1,5 @@
 <script lang="ts">
-import Vue from 'vue';
+import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
 import draggable from 'vuedraggable';
 
@@ -7,22 +7,38 @@ import byOrder from '@/helpers/byOrder';
 
 import { Dashboard } from '@/store/dashboards/state';
 import { allDashboards, isFetching } from '@/store/dashboards/getters';
-import { addNewDashboard, updateDashboardOrder, removeDashboard } from '@/store/dashboards/actions';
+import {
+  addNewDashboard,
+  updateDashboardOrder,
+  removeDashboard as removeDashboardInStore,
+} from '@/store/dashboards/actions';
 
-import { updateServiceOrder } from '@/store/services/actions';
+import {
+  updateServiceOrder,
+  removeService as removeServiceInStore,
+} from '@/store/services/actions';
 import { Service } from '@/store/services/state';
 import { allServices } from '@/store/services/getters';
+import WidgetModal from '@/components/Widget/WidgetModal.vue';
+import NewServiceWizard from '@/components/Wizard/NewServiceWizard.vue';
 
 @Component({
   components: {
     draggable,
+    NewServiceWizard,
+    WidgetModal,
   },
 })
-export default class LayoutDefault extends Vue {
+export default class DefaultLayout extends Vue {
   leftDrawerOpen: boolean = false;
   dashboardEditing: boolean = false;
   serviceEditing: boolean = false;
+  wizardModalOpen: boolean = false;
   $q: any;
+
+  get isFetching() {
+    return isFetching(this.$store);
+  }
 
   get dashboards() {
     return [...allDashboards(this.$store)].sort(byOrder);
@@ -38,10 +54,6 @@ export default class LayoutDefault extends Vue {
 
   set services(services: Service[]) {
     updateServiceOrder(this.$store, services.map(service => service.id));
-  }
-
-  get isFetching() {
-    return isFetching(this.$store);
   }
 
   toggleDrawer() {
@@ -64,24 +76,29 @@ export default class LayoutDefault extends Vue {
       prompt: {
         model: '',
       },
-    })
-      .then((dashboardName: string) => {
-        addNewDashboard(this.$store, dashboardName);
-      });
+    }).then((name: string) => addNewDashboard(this.$store, name));
   }
 
-  removeDashboard() {
+  removeDashboard(dashboard: Dashboard) {
     this.$q.dialog({
       title: 'Remove dashboard',
-      message: 'Select dashboard to remove',
-      cancel: true,
-      options: {
-        type: 'radio',
-        model: 'opt2',
-        items: allDashboards(this.$store)
-          .map(dashboard => ({ label: dashboard.title, value: dashboard })),
-      },
-    }).then((dashboard: Dashboard) => removeDashboard(this.$store, dashboard));
+      message: `Are you sure you want to remove ${dashboard.title}?`,
+      ok: 'Confirm',
+      cancel: 'Cancel',
+    }).then(() => removeDashboardInStore(this.$store, dashboard));
+  }
+
+  createService() {
+    this.wizardModalOpen = true;
+  }
+
+  removeService(service: Service) {
+    this.$q.dialog({
+      title: 'Remove service',
+      message: `Are you sure you want to remove ${service.title}?`,
+      ok: 'Confirm',
+      cancel: 'Cancel',
+    }).then(() => removeServiceInStore(this.$store, service));
   }
 }
 </script>
@@ -132,6 +149,7 @@ export default class LayoutDefault extends Vue {
         </q-item>
 
         <q-item-separator />
+        <!-- dashboards -->
 
         <q-list-header v-if="!isFetching">
           <q-item-side icon="dashboard" />
@@ -178,6 +196,16 @@ export default class LayoutDefault extends Vue {
             >
               <q-icon name="menu" />
             </q-item-side>
+            <q-item-side
+              right
+              v-if="dashboardEditing"
+            >
+              <q-btn
+                round
+                icon="delete"
+                @click="removeDashboard(dashboard)"
+              />
+            </q-item-side>
           </q-item>
         </draggable>
 
@@ -189,16 +217,10 @@ export default class LayoutDefault extends Vue {
             v-if="dashboardEditing"
             @click="createDashboard"
           />
-          <q-btn
-            icon="delete"
-            label="Remove dashboard"
-            color="error"
-            v-if="dashboardEditing"
-            @click="removeDashboard"
-          />
         </div>
 
         <q-item-separator />
+        <!-- services -->
 
         <q-list-header v-if="!isFetching">
           <q-item-side icon="cloud" />
@@ -240,11 +262,22 @@ export default class LayoutDefault extends Vue {
             :to="serviceEditing ? undefined : `/service/${service.id}`"
           >
             <q-item-main :label="service.title" />
+
             <q-item-side
               right
               v-if="serviceEditing"
             >
               <q-icon name="menu" />
+            </q-item-side>
+            <q-item-side
+              right
+              v-if="serviceEditing"
+            >
+              <q-btn
+                round
+                icon="delete"
+                @click="removeService(service)"
+              />
             </q-item-side>
           </q-item>
         </draggable>
@@ -255,16 +288,19 @@ export default class LayoutDefault extends Vue {
             label="Add service"
             color="dark-bright"
             v-if="serviceEditing"
-            @click="createDashboard"
-          />
-          <q-btn
-            icon="delete"
-            label="Remove service"
-            color="error"
-            v-if="serviceEditing"
-            @click="removeDashboard"
+            @click="createService"
           />
         </div>
+
+      <widget-modal
+        :isOpen="wizardModalOpen"
+        title="Service Wizard"
+        :onClose="() => { this.wizardModalOpen = false; }"
+      >
+        <new-service-wizard
+          v-if="wizardModalOpen"
+        />
+      </widget-modal>
 
       </q-list>
     </q-layout-drawer>
