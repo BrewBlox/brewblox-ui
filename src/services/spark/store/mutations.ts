@@ -1,6 +1,5 @@
 import Vue from 'vue';
-
-import { commit, noArgCommit } from '@/helpers/store-accessors';
+import { commit, noArgCommit } from '@/helpers/dynamic-store';
 import { BlocksState } from './state';
 import { Block } from '../state';
 

@@ -8,6 +8,15 @@ import {
 } from 'vuex-typescript';
 import { RootStore, State as RootState } from '@/store/state';
 
+export const serviceAvailable = (store: RootStore, serviceId: string) =>
+  !!(store as any).state[serviceId];
+
+export const registerService = (store: RootStore, serviceId: string, module: any) => {
+  if (!serviceAvailable(store, serviceId)) {
+    store.registerModule(serviceId, module);
+  }
+};
+
 /*
   These store accessors are for use by dynamically created store modules (services).
   They add a 'serviceId' argument to all store accessors: read, commit, and dispatch.

@@ -177,6 +177,13 @@
       "order": 2,
       "type": "spark",
       "config": {}
+    },
+    {
+      "id": "history",
+      "title": "The Librarian",
+      "order": 3,
+      "type": "history",
+      "config": {}
     }
   ]
 }

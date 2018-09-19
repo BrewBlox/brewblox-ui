@@ -1,10 +1,10 @@
 import { saveService } from '@/store/services/actions';
 import { Service } from '@/store/services/state';
-import { RootStore, State as RootState } from '@/store/state';
+import { RootStore } from '@/store/state';
 
 import { Block } from '../state';
-import { BlocksContext, BlocksState } from './state';
-import { dispatch } from '@/helpers/store-accessors';
+import { BlocksContext } from './state';
+import { dispatch } from '@/helpers/dynamic-store';
 
 import {
   clearBlocks as clearBlocksInApi,

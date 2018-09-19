@@ -25,7 +25,7 @@ export default class ServicePage extends Vue {
   get pageComponent(): VueConstructor {
     try {
       const service = serviceById(this.$store, this.serviceId);
-      return pageByType(service.type) as VueConstructor;
+      return pageByType(service.type) || InvalidPage;
     } catch (e) {
       return InvalidPage;
     }

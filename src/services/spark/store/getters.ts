@@ -1,4 +1,4 @@
-import { read } from '@/helpers/store-accessors';
+import { read } from '@/helpers/dynamic-store';
 import { RootStore } from '@/store/state';
 import { serviceById } from '@/store/services/getters';
 
@@ -17,9 +17,6 @@ const defaultProfileNames = [
 ];
 
 export const typeName: string = 'spark';
-
-export const serviceAvailable = (store: RootStore, serviceId: string) =>
-  !!(store as any).state[serviceId];
 
 const getters = {
   blocks: (state: BlocksState): { [id: string]: Block } => state.blocks,

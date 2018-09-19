@@ -5,11 +5,12 @@ import Component from 'vue-class-component';
 import GridContainer from '@/components/Grid/GridContainer.vue';
 
 import byOrder from '@/helpers/byOrder';
+import { serviceAvailable } from '@/helpers/dynamic-store';
 
 import { DashboardItem } from '@/store/dashboards/state';
 
 import { Block } from '@/services/spark/state';
-import { isFetching, allBlocks, serviceAvailable } from '@/services/spark/store/getters';
+import { isFetching, allBlocks } from '@/services/spark/store/getters';
 
 import { widgetByType, widgetSizeByType, allFeatureTypes } from '@/services/feature-by-type';
 
