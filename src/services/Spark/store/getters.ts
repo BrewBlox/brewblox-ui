@@ -16,7 +16,7 @@ const defaultProfileNames = [
   'P8',
 ];
 
-export const typeName: string = 'spark';
+export const typeName: string = 'Spark';
 
 const getters = {
   blocks: (state: BlocksState): { [id: string]: Block } => state.blocks,
@@ -40,10 +40,10 @@ export function blockById<T extends Block>(
 ): T {
   const block = blocks(store, serviceId)[id];
   if (!block) {
-    throw new Error(`Block ${id} not found`);
+    throw new Error(`Block ${id} not found in service ${serviceId}`);
   }
   if (block && type && block.type !== type) {
-    throw new Error(`Invalid block: ${block.type} !== ${type}`);
+    throw new Error(`Invalid block ${id}: ${block.type} !== ${type}`);
   }
   return block as T;
 }

@@ -35,17 +35,17 @@ services:
       - "--seed-profiles=0"
       - "--seed-objects=seed_objects.json"
 
-  spockey:
+  spock:
     image: brewblox/brewblox-devcon-spark:develop
     depends_on:
       - eventbus
     labels:
       - "traefik.port=5000"
-      - "traefik.frontend.rule=PathPrefix: /spockey"
+      - "traefik.frontend.rule=PathPrefix: /spock"
     volumes:
       - "./mocks/config/seed_objects.json:/app/seed_objects.json"
     command:
-      - "--name=spockey"
+      - "--name=spock"
       - "--simulation"
       - "--debug"
       - "--seed-profiles=0"

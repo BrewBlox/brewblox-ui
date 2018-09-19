@@ -154,22 +154,11 @@ export default class DefaultLayout extends Vue {
         <q-list-header v-if="!isFetching">
           <q-item-side icon="dashboard" />
           Dashboards
-
           <q-btn
             round
-            flat
-            icon="mode edit"
             size="sm"
-            v-if="!dashboardEditing"
-            @click="toggleDashboardEditing"
-          />
-
-          <q-btn
-            round
-            color="primary"
-            icon="check"
-            size="sm"
-            v-if="dashboardEditing"
+            :icon="dashboardEditing ? 'check' : 'mode edit'"
+            :color="dashboardEditing ? 'primary': ''"
             @click="toggleDashboardEditing"
           />
         </q-list-header>
@@ -187,7 +176,7 @@ export default class DefaultLayout extends Vue {
             v-for="dashboard in dashboards"
             :link="!dashboardEditing"
             :key="dashboard.id"
-            :to="dashboardEditing ? undefined : `/dashboard/${ dashboard.id }`"
+            :to="dashboardEditing ? undefined : `/dashboard/${dashboard.id}`"
           >
             <q-item-main :label="dashboard.title" />
             <q-item-side
@@ -225,25 +214,13 @@ export default class DefaultLayout extends Vue {
         <q-list-header v-if="!isFetching">
           <q-item-side icon="cloud" />
           Services
-
           <q-btn
             round
-            flat
-            icon="mode edit"
             size="sm"
-            v-if="!serviceEditing"
+            :icon="serviceEditing ? 'check' : 'mode edit'"
+            :color="serviceEditing ? 'primary': ''"
             @click="toggleServiceEditing"
           />
-
-          <q-btn
-            round
-            color="primary"
-            icon="check"
-            size="sm"
-            v-if="serviceEditing"
-            @click="toggleServiceEditing"
-          />
-
         </q-list-header>
 
         <q-item v-if="!isFetching && services.length === 0">
