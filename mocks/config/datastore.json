@@ -120,6 +120,7 @@
       "widget": "Metrics",
       "config": {
         "name": "Metrics View",
+        "serviceId": "history",
         "metrics": []
       }
     }

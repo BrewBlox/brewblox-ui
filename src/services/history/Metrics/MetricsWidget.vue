@@ -213,7 +213,7 @@ export default class MetricsWidget extends Widget {
   }
 
   async fetchAvailableMeasurements() {
-    this.measurementsPaths = await getAvailableMeasurements();
+    this.measurementsPaths = await getAvailableMeasurements(this.$props.config.serviceId);
     this.fetchingAvailableMeasurements = false;
   }
 

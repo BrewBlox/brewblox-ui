@@ -5,7 +5,6 @@ import { post } from '@/helpers/fetch';
 import { convertToFlatPaths } from './measurementHelpers';
 import { PlotlyData } from './state';
 
-const historyService = process.env.VUE_APP_HISTORY_URI;
 const api = process.env.VUE_APP_API_URI;
 
 const metricsCache: { [key: string]: number[][]; } = {};
@@ -14,8 +13,8 @@ function toMicroSeconds(nanoseconds: number): number {
   return Math.floor(nanoseconds / 1000000);
 }
 
-function fetchData(endpoint: string, payload: any = {}): Promise<any> {
-  return post(`${historyService}${endpoint}`, { ...payload });
+function fetchData(serviceId: string, endpoint: string, payload: any = {}): Promise<any> {
+  return post(`/${serviceId}${endpoint}`, { ...payload });
 }
 
 function metricsKey(serviceId: string, keys: string[]) {
@@ -53,8 +52,8 @@ function addValuesToCache(serviceId: string, keys: string[], values: number[][])
   return metricsCache[cacheKey];
 }
 
-export function getAvailableMeasurements(): Promise<string[]> {
-  return fetchData('/query/objects')
+export function getAvailableMeasurements(serviceId: string): Promise<string[]> {
+  return fetchData(serviceId, '/query/objects')
     .then(convertToFlatPaths);
 }
 
@@ -107,7 +106,7 @@ export function subscribeToEvents(
   };
 
   const eventSource =
-    new EventSource(`${api}${historyService}/sse/values?${queryString.stringify(options)}`);
+    new EventSource(`${api}/${serviceId}/sse/values?${queryString.stringify(options)}`);
 
   eventSource.onmessage = (event: MessageEvent) => {
     const data = JSON.parse(event.data);
