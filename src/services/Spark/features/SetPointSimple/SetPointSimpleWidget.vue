@@ -33,24 +33,17 @@ export default class OneWireTempSensor extends BlockWidget {
     />
 
     <q-card>
-      <q-card-main>
-        <q-list>
+      <q-card-main class="row">
 
-          <q-item class="grid-items-2">
+        <q-field
+          dark
+          label="Setting"
+          icon="devices"
+          orientation="vertical"
+        >
+          <big>{{ inputs.setting }}</big> {{ block.data.setting.unitNotation }}
+        </q-field>
 
-            <q-item-main>
-              <q-item-tile sublabel>Setting</q-item-tile>
-              <q-input
-                v-model="inputs.setting"
-                type="number"
-                :suffix="block.data.setting.unitNotation"
-                numeric-keyboard-toggle
-              />
-            </q-item-main>
-
-          </q-item>
-
-        </q-list>
       </q-card-main>
     </q-card>
 
@@ -58,16 +51,15 @@ export default class OneWireTempSensor extends BlockWidget {
 </template>
 
 <style scoped>
-.q-list {
-  border: 0;
+.q-card {
+  display: flex;
 }
 
-.q-item {
-  display: grid;
-  grid-gap: 10px;
+.q-card-main {
+  margin: auto;
 }
 
-.grid-items-2 {
+/* .grid-items-2 {
   grid-template-columns: 1fr 1fr;
 }
 
@@ -86,5 +78,5 @@ export default class OneWireTempSensor extends BlockWidget {
 
 .modal .q-list {
   border: 0;
-}
+} */
 </style>

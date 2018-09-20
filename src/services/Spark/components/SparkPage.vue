@@ -1,18 +1,18 @@
 <script lang="ts">
 import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
-
 import GridContainer from '@/components/Grid/GridContainer.vue';
-
+import SparkWidget from '@/services/Spark/components/SparkWidget.vue';
 import byOrder from '@/helpers/byOrder';
 import { serviceAvailable } from '@/helpers/dynamic-store';
-
 import { DashboardItem } from '@/store/dashboards/state';
-
 import { Block } from '@/services/Spark/state';
 import { isFetching, allBlocks } from '@/services/Spark/store/getters';
-
-import { widgetByType, widgetSizeByType, allFeatureTypes } from '@/services/feature-by-type';
+import {
+  widgetByType,
+  widgetSizeByType,
+  allFeatureTypes,
+} from '@/services/feature-by-type';
 
 interface VueOrdered extends Vue {
   id: string;
@@ -21,6 +21,7 @@ interface VueOrdered extends Vue {
 @Component({
   components: {
     GridContainer,
+    SparkWidget,
   },
   props: {
     serviceId: {
@@ -56,6 +57,7 @@ export default class SparkPage extends Vue {
     }
     return [
       ...allBlocks(this.$store, this.$props.serviceId)
+        .filter(block => !block.id.startsWith('__'))
         .map(this.defaultItem),
     ];
   }
@@ -87,6 +89,13 @@ export default class SparkPage extends Vue {
       </portal>
 
       <grid-container>
+        <spark-widget
+          class="dashboard-item"
+          :id="$props.serviceId"
+          :serviceId="$props.serviceId"
+          :cols="6"
+          :rows="3"
+        />
         <component
           class="dashboard-item"
           v-for="item in items"
