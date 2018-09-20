@@ -92,12 +92,11 @@ export default class SparkWidget extends Vue {
     />
 
     <q-card>
-      <q-card-main class="row justify-end">
+      <q-card-main class="row">
 
         <q-field
           dark
           label="Device ID"
-          inset="icon"
           icon="devices"
           orientation="vertical"
         >
@@ -143,10 +142,7 @@ export default class SparkWidget extends Vue {
 }
 
 .q-field {
-  border: solid;
-}
-
-.q-card-main {
-  margin: auto;
+  margin-top: 2pt;
+  margin-bottom: 10pt;
 }
 </style>

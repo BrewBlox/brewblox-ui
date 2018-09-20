@@ -13,12 +13,12 @@ import { getById } from './getters';
   },
 })
 export default class OneWireTempSensor extends BlockWidget {
-  inputMapping = {
-    setting: { path: 'block.data.setting.value', default: 0 },
-  };
-
   get block(): SetPointSimpleBlock {
     return getById(this.$store, this.serviceId, this.blockId);
+  }
+
+  get setting() {
+    return this.block.data.setting;
   }
 }
 </script>
@@ -41,7 +41,7 @@ export default class OneWireTempSensor extends BlockWidget {
           icon="devices"
           orientation="vertical"
         >
-          <big>{{ inputs.setting }}</big> {{ block.data.setting.unitNotation }}
+          <big>{{ setting.value }}</big> {{ setting.unitNotation }}
         </q-field>
 
       </q-card-main>
@@ -55,28 +55,8 @@ export default class OneWireTempSensor extends BlockWidget {
   display: flex;
 }
 
-.q-card-main {
-  margin: auto;
+.q-field {
+  margin-top: 2pt;
+  margin-bottom: 10pt;
 }
-
-/* .grid-items-2 {
-  grid-template-columns: 1fr 1fr;
-}
-
-.grid-items-3 {
-  grid-template-columns: 1fr 1fr 1fr;
-}
-
-.q-item-side {
-  text-align: center;
-  margin-left: 0;
-}
-
-.q-item-section {
-  margin-left: 0;
-}
-
-.modal .q-list {
-  border: 0;
-} */
 </style>

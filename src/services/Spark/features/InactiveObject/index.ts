@@ -1,6 +1,8 @@
+import GenericBlock from '@/services/Spark/components/GenericBlock';
 import widget from './InactiveObjectWidget.vue';
 
 const feature = {
+  ...GenericBlock,
   widget,
   displayName: 'Inactive Object',
   widgetSize: {

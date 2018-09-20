@@ -88,7 +88,7 @@ export default class DashboardPage extends Vue {
         }
         return {
           ...item,
-          component: widgetByType(item.widget),
+          component: widgetByType(item.widget) || InvalidWidget,
         };
       } catch (e) {
         return {

@@ -1,17 +1,17 @@
 import { FeatureService } from '../state';
 import { fetchBlocks as fetch } from './store/actions';
 import features from './features';
-import page from './components/SparkPage.vue';
-import wizard from './components/SparkWizard.vue';
+import page from './service/SparkPage.vue';
+import wizard from './service/SparkWizard.vue';
 
 import { register } from './store';
 
 const service: FeatureService = {
   features,
   register,
-  page,
   wizard,
   fetch,
+  page,
   displayName: 'Spark Controller',
 };
 

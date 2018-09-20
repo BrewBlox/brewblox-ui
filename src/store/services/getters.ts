@@ -9,25 +9,15 @@ const { read } = getStoreAccessors<ServicesState, RootState>('services');
 
 const getters = {
   services: (state: ServicesState): { [id: string]: Service } => state.services,
-
-  serviceIds(state: ServicesState): string[] {
-    return map(state.services, (_: Service, key: string) => key);
-  },
-
-  allServices(state: ServicesState): Service[] {
-    return map(state.services, (svc: Service) => svc);
-  },
-
-  isFetching(state: ServicesState): boolean {
-    return state.fetching;
-  },
-
+  serviceIds: (state: ServicesState): string[] => Object.keys(state.services),
+  serviceValues: (state: ServicesState): Service[] => Object.values(state.services),
+  isFetching: (state: ServicesState): boolean => state.fetching,
 };
 
 const services = read(getters.services);
 
 export const serviceIds = read(getters.serviceIds);
-export const allServices = read(getters.allServices);
+export const allServices = read(getters.serviceValues);
 export const isFetching = read(getters.isFetching);
 
 export function serviceById<T extends Service>(
@@ -43,5 +33,8 @@ export function serviceById<T extends Service>(
   }
   return service as T;
 }
+
+export const serviceExists = (store: RootStore | ServicesContext, id: string) =>
+  !!services(store)[id];
 
 export default getters;
