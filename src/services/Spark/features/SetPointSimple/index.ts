@@ -1,6 +1,8 @@
+import GenericBlock from '@/services/Spark/components/GenericBlock';
 import widget from './SetPointSimpleWidget.vue';
 
 const feature = {
+  ...GenericBlock,
   widget,
   displayName: 'Basic Setpoint',
   widgetSize: {

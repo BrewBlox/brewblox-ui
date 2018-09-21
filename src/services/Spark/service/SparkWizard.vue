@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { typeName } from '../store/getters';
+import { typeName } from '@/services/Spark/store/getters';
 
 @Component({
   props: {

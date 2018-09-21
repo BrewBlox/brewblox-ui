@@ -1,18 +1,19 @@
 <script lang="ts">
 import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
-
 import GridContainer from '@/components/Grid/GridContainer.vue';
-
+import SparkWidget from '@/services/Spark/service/SparkWidget.vue';
 import byOrder from '@/helpers/byOrder';
 import { serviceAvailable } from '@/helpers/dynamic-store';
-
 import { DashboardItem } from '@/store/dashboards/state';
-
 import { Block } from '@/services/Spark/state';
 import { isFetching, allBlocks } from '@/services/Spark/store/getters';
-
-import { widgetByType, widgetSizeByType, allFeatureTypes } from '@/services/feature-by-type';
+import {
+  widgetByType,
+  widgetSizeByType,
+  allFeatureTypes,
+} from '@/services/feature-by-type';
+import { widgetSize, isSystemBlock } from './getters';
 
 interface VueOrdered extends Vue {
   id: string;
@@ -21,6 +22,7 @@ interface VueOrdered extends Vue {
 @Component({
   components: {
     GridContainer,
+    SparkWidget,
   },
   props: {
     serviceId: {
@@ -56,12 +58,17 @@ export default class SparkPage extends Vue {
     }
     return [
       ...allBlocks(this.$store, this.$props.serviceId)
+        .filter(block => !isSystemBlock(block))
         .map(this.defaultItem),
     ];
   }
 
   get isFetching() {
     return !this.isAvailable || isFetching(this.$store, this.$props.serviceId);
+  }
+
+  get widgetSize() {
+    return widgetSize;
   }
 
   widgetComponent(type: string): VueConstructor {
@@ -87,6 +94,13 @@ export default class SparkPage extends Vue {
       </portal>
 
       <grid-container>
+        <spark-widget
+          class="dashboard-item"
+          :id="$props.serviceId"
+          :serviceId="$props.serviceId"
+          :cols="widgetSize.cols"
+          :rows="widgetSize.rows"
+        />
         <component
           class="dashboard-item"
           v-for="item in items"

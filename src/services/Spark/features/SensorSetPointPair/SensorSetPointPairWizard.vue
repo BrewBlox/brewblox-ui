@@ -91,28 +91,25 @@ export default class SensorSetPointPairWizard extends Vue {
         throw new Error('Invalid values for inputs');
       }
 
-      const id = `${typeName}-${shortid.generate()}`;
-      const block = await createBlock(
-        this.$store,
-        this.service.id,
-        {
-          id,
-          serviceId: this.service.id,
-          profiles: [0],
-          type: typeName,
-          data: {
-            sensor: new Link(this.sensorInput.id),
-            setpoint: new Link(this.setpointInput.id),
-          },
-        },
-      );
-
-      this.$props.onCreateItem({
+      const blockId = `${typeName}-${shortid.generate()}`;
+      const serviceId = this.service.id;
+      await createBlock(this.$store, serviceId, {
+        serviceId,
+        id: blockId,
+        profiles: [0],
         type: typeName,
+        data: {
+          sensor: new Link(this.sensorInput.id),
+          setpoint: new Link(this.setpointInput.id),
+        },
+      });
+      this.$props.onCreateItem({
         ...widgetSizeByType(typeName),
+        type: typeName,
         widget: typeName,
         config: {
-          blockId: `${this.service.id}/${id}`,
+          serviceId,
+          blockId,
         },
       });
 

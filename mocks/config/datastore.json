@@ -123,6 +123,17 @@
         "serviceId": "history",
         "metrics": []
       }
+    },
+    {
+      "id": "setpoint-widget",
+      "order": 1,
+      "cols": 4,
+      "rows": 2,
+      "widget": "SetPointSimple",
+      "config": {
+        "serviceId": "sparkey",
+        "blockId": "setpoint-1"
+      }
     }
   ],
   "dashboards": [
@@ -130,7 +141,9 @@
       "id": "dashboard-home",
       "title": "Home Dashboard",
       "order": 1,
-      "items": []
+      "items": [
+        "setpoint-widget"
+      ]
     },
     {
       "id": "metrics",
