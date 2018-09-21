@@ -2,28 +2,30 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
-import WidgetModal from '@/components/Widget/WidgetModal.vue';
+import ProfilesBar from '@/services/Spark/components/ProfilesBar.vue';
 import WidgetField from '@/components/Widget/WidgetField.vue';
-import BlockWidget from '@/services/Spark/components/BlockWidget';
-import SparkForm from './SparkForm.vue';
 
 import { Block } from '@/services/Spark/state';
+import { blockById, profileNames as serviceProfiles } from '@/services/Spark/store/getters';
+import { updateProfileNames, saveBlock } from '@/services/Spark/store/actions';
+
 import {
   SysInfoBlock,
   ProfilesBlock,
   OneWireBusBlock,
   TicksBlock,
 } from './state';
-import { blockById, profileNames as serviceProfiles } from '@/services/Spark/store/getters';
-import { fetchBlock } from '@/services/Spark/store/actions';
+import {
+  sysInfoId,
+  profilesId,
+  oneWireBusId,
+  ticksId,
+} from './getters';
 
 @Component({
   components: {
-    WidgetToolbar,
-    WidgetModal,
+    ProfilesBar,
     WidgetField,
-    SparkForm,
   },
   props: {
     serviceId: {
@@ -32,27 +34,25 @@ import { fetchBlock } from '@/services/Spark/store/actions';
     },
   },
 })
-export default class SparkWidget extends Vue {
-  modalOpen: boolean = false;
-
+export default class SparkForm extends Vue {
   sysBlock<T extends Block>(blockId: string) {
     return blockById<T>(this.$store, this.$props.serviceId, blockId);
   }
 
   get sysInfo() {
-    return this.sysBlock<SysInfoBlock>('__sysinfo');
+    return this.sysBlock<SysInfoBlock>(sysInfoId);
   }
 
   get profiles() {
-    return this.sysBlock<ProfilesBlock>('__profiles');
+    return this.sysBlock<ProfilesBlock>(profilesId);
   }
 
   get oneWireBus() {
-    return this.sysBlock<OneWireBusBlock>('__onewirebus');
+    return this.sysBlock<OneWireBusBlock>(oneWireBusId);
   }
 
   get ticks() {
-    return this.sysBlock<TicksBlock>('__time');
+    return this.sysBlock<TicksBlock>(ticksId);
   }
 
   get profileNames(): string[] {
@@ -69,40 +69,34 @@ export default class SparkWidget extends Vue {
     return new Date(this.ticks.data.secondsSinceEpoch * 1000).toString();
   }
 
-  fetch() {
-    [
-      this.sysInfo,
-      this.profiles,
-      this.oneWireBus,
-      this.ticks,
-    ]
-      .forEach(block => fetchBlock(this.$store, this.$props.serviceId, block));
+  get activeProfiles(): number[] {
+    return [...this.profiles.data.active];
+  }
+
+  set activeProfiles(values: number[]) {
+    saveBlock(
+      this.$store,
+      this.$props.serviceId,
+      {
+        ...this.profiles,
+        data: {
+          ...this.profiles.data,
+          active: values,
+        },
+      },
+    );
+  }
+
+  updateNames() {
+    updateProfileNames(this.$store, this.$props.serviceId, [...this.profileNames]);
   }
 }
 </script>
 
 <template>
   <div>
-
-    <widget-modal
-      :isOpen="modalOpen"
-      :onClose="() => { this.modalOpen = false; }"
-      :title="$props.serviceId"
-    >
-      <spark-form
-        :serviceId="$props.serviceId"
-      />
-    </widget-modal>
-
-    <widget-toolbar
-      :name="$props.serviceId"
-      type="Spark Service Configuration"
-      :on-refresh="fetch"
-      :on-settings="() => { this.modalOpen = true; }"
-    />
-
     <q-card>
-      <q-card-main class="row">
+      <q-card-main class="column">
 
         <widget-field
           label="Device ID"
@@ -115,10 +109,26 @@ export default class SparkWidget extends Vue {
           label="Active profiles"
           icon="settings_input_component"
         >
-          <big>{{ activeNames }}</big>
+          <profiles-bar
+            v-model="activeProfiles"
+            :profileNames="profileNames"
+          />
         </widget-field>
 
-       <widget-field
+        <widget-field
+          label="Profile names"
+          icon="edit"
+        >
+          <q-input
+            v-for="(name, idx) in profileNames"
+            :key="idx"
+            v-model="profileNames[idx]"
+            @change="updateNames"
+            :suffix="`Profile ${idx + 1}`"
+          />
+        </widget-field>
+
+        <widget-field
           label="Time since boot"
           icon="timelapse"
         >
@@ -134,7 +144,6 @@ export default class SparkWidget extends Vue {
 
       </q-card-main>
     </q-card>
-
   </div>
 </template>
 

@@ -1,4 +1,3 @@
-import InvalidWidget from '@/components/Widget/InvalidWidget.vue';
 import { features } from './';
 
 export const allFeatureTypes = () => Object.keys(features);
@@ -7,7 +6,7 @@ export const featureByType = (type: string) =>
   (features[type] || {});
 
 export const widgetByType = (type: string) =>
-  featureByType(type).widget || InvalidWidget;
+  featureByType(type).widget;
 
 export const wizardByType = (type: string) =>
   featureByType(type).wizard; // No automatic default

@@ -13,7 +13,7 @@ import {
   widgetSizeByType,
   allFeatureTypes,
 } from '@/services/feature-by-type';
-import { widgetSize } from './getters';
+import { widgetSize, isSystemBlock } from './getters';
 
 interface VueOrdered extends Vue {
   id: string;
@@ -58,7 +58,7 @@ export default class SparkPage extends Vue {
     }
     return [
       ...allBlocks(this.$store, this.$props.serviceId)
-        .filter(block => !block.id.startsWith('__'))
+        .filter(block => !isSystemBlock(block))
         .map(this.defaultItem),
     ];
   }

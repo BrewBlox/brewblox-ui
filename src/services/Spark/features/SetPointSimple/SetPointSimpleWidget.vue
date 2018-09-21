@@ -41,7 +41,7 @@ export default class OneWireTempSensor extends BlockWidget {
           icon="devices"
           orientation="vertical"
         >
-          <big>{{ setting.value }}</big> {{ setting.unitNotation }}
+          <big>{{ setting | unit }}</big>
         </q-field>
 
       </q-card-main>
