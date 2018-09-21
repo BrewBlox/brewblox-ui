@@ -11,8 +11,8 @@ import { createBlock } from '@/services/Spark/store/actions';
 
 import { widgetSizeByType } from '@/services/feature-by-type';
 
-import { getAll as getAllSetPointSimple } from '../SetPointSimple/getters';
-import { getAll as getAllOneWireTempSensor } from '../OneWireTempSensor/getters';
+import { getAll as getAllSetpointSimple } from '../SetpointSimple/getters';
+import { getAll as getAllTempSensorOneWire } from '../TempSensorOneWire/getters';
 
 import { typeName } from './getters';
 
@@ -28,7 +28,7 @@ import { typeName } from './getters';
     },
   },
 })
-export default class SensorSetPointPairWizard extends Vue {
+export default class SetpointSensorPairWizard extends Vue {
   currentStep: string = 'service';
   creating: boolean = false;
   service: Service | null = null;
@@ -59,7 +59,7 @@ export default class SensorSetPointPairWizard extends Vue {
       return [];
     }
 
-    return getAllOneWireTempSensor(this.$store, this.service.id)
+    return getAllTempSensorOneWire(this.$store, this.service.id)
       .map(sensor => ({
         label: `${sensor.serviceId}/${sensor.id}`,
         value: sensor,
@@ -71,7 +71,7 @@ export default class SensorSetPointPairWizard extends Vue {
       return [];
     }
 
-    return getAllSetPointSimple(this.$store, this.service.id)
+    return getAllSetpointSimple(this.$store, this.service.id)
       .map(setpoint => ({
         label: `${setpoint.serviceId}/${setpoint.id}`,
         value: setpoint,

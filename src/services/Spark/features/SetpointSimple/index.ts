@@ -1,12 +1,10 @@
 import GenericBlock from '@/services/Spark/components/GenericBlock';
-import widget from './SensorSetPointPairWidget.vue';
-import wizard from './SensorSetPointPairWizard.vue';
+import widget from './SetpointSimpleWidget.vue';
 
 const feature = {
   ...GenericBlock,
   widget,
-  wizard,
-  displayName: 'Sensor/Setpoint Pair',
+  displayName: 'Basic Setpoint',
   widgetSize: {
     cols: 4,
     rows: 2,

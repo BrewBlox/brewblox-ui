@@ -1,9 +1,11 @@
 import Unit from './Unit';
 
-export class Temperature extends Unit {}
+export class Temperature extends Unit { }
 
 export class Celsius extends Temperature {
-  unit: string = 'celsius';
+  constructor(value: number) {
+    super(value, 'celsius');
+  }
 
   get unitNotation() {
     return '°C';
@@ -11,7 +13,9 @@ export class Celsius extends Temperature {
 }
 
 export class Fahrenheit extends Temperature {
-  unit: string = 'fahrenheit';
+  constructor(value: number) {
+    super(value, 'fahrenheit');
+  }
 
   get unitNotation() {
     return '°F';
@@ -19,7 +23,9 @@ export class Fahrenheit extends Temperature {
 }
 
 export class Kelvin extends Temperature {
-  unit: string = 'kelvin';
+  constructor(value: number) {
+    super(value, 'kelvin');
+  }
 
   get unitNotation() {
     return '°K';

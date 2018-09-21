@@ -1,43 +1,37 @@
 import { Block } from '@/services/Spark/state';
-
 import Link from '@/helpers/units/Link';
+import { Unit } from '@/helpers/units';
 
-export interface PidSettings {
-  kp: number;
-  ti: number;
-  td: number;
-}
-
-export interface PidState {
-  inputValue: number;
-  inputSetting: number;
-  outputValue: number;
-  outputSetting: number;
-
-  p: number;
-  i: number;
-  d: number;
-
-  derivative: number;
-  integral: number;
-  error: number;
-}
-
-export interface PidLinks {
-  input: Link;
-  output: Link;
-}
-
-export interface PidFiltering {
-  input: number;
-  derivative: number;
-}
 
 export interface PidBlock extends Block {
   data: {
-    settings: PidSettings;
-    links: PidLinks;
-    filtering: PidFiltering;
-    state: PidState;
+    inputId: Link;
+    outputId: Link;
+
+    inputValid: boolean;
+    outputValid: boolean;
+
+    inputValue: Unit;
+    inputSetting: Unit;
+    outputValue: number;
+    outputSetting: number;
+
+    filter: string;
+    filterTreshold: Unit;
+
+    enabled: boolean;
+    active: boolean;
+
+    kp: Unit;
+    ti: Unit;
+    td: Unit;
+
+    p: number;
+    i: number;
+    d: number;
+
+    error: Unit;
+    integral: Unit;
+    derivative: Unit;
   };
 }

@@ -11,6 +11,6 @@ export default function valueToUnit(value: number, unit: string): Unit {
     case 'kelvin':
       return new Kelvin(value);
     default:
-      throw new Error(`No suitable unit found for '${unit}'`);
+      return new Unit(value, unit);
   }
 }

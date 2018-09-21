@@ -4,7 +4,7 @@ import Component from 'vue-class-component';
 import { saveBlock } from '@/services/Spark/store/actions';
 import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 import BlockWidget from '@/services/Spark/components/BlockWidget';
-import { SetPointSimpleBlock } from './state';
+import { SetpointSimpleBlock } from './state';
 import { getById } from './getters';
 
 @Component({
@@ -12,8 +12,8 @@ import { getById } from './getters';
     WidgetToolbar,
   },
 })
-export default class OneWireTempSensor extends BlockWidget {
-  get block(): SetPointSimpleBlock {
+export default class SetpointSimpleWidget extends BlockWidget {
+  get block(): SetpointSimpleBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
 

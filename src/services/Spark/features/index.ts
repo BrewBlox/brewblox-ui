@@ -1,15 +1,15 @@
 import InactiveObject from './InactiveObject';
-import OneWireTempSensor from './OneWireTempSensor';
+import TempSensorOneWire from './TempSensorOneWire';
 import Pid from './Pid';
-import SensorSetPointPair from './SensorSetPointPair';
-import SetPointSimple from './SetPointSimple';
+import SetpointSensorPair from './SetpointSensorPair';
+import SetpointSimple from './SetpointSimple';
 import ProcessView from './ProcessView';
 
 export default {
   InactiveObject,
-  OneWireTempSensor,
+  TempSensorOneWire,
   Pid,
-  SensorSetPointPair,
-  SetPointSimple,
+  SetpointSensorPair,
+  SetpointSimple,
   ProcessView,
 };

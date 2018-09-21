@@ -84,7 +84,7 @@
       "order": 1,
       "cols": 3,
       "rows": 3,
-      "widget": "SensorSetPointPair",
+      "widget": "SetpointSensorPair",
       "config": {
         "serviceId": "sparkey",
         "blockId": "BLARGH"
@@ -129,7 +129,7 @@
       "order": 1,
       "cols": 4,
       "rows": 2,
-      "widget": "SetPointSimple",
+      "widget": "SetpointSimple",
       "config": {
         "serviceId": "sparkey",
         "blockId": "setpoint-1"

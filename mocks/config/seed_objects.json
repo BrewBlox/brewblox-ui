@@ -4,7 +4,7 @@
     "profiles": [
       0
     ],
-    "type": "SetPointSimple",
+    "type": "SetpointSimple",
     "data": {
       "setting": 21
     }
@@ -14,7 +14,7 @@
     "profiles": [
       0
     ],
-    "type": "SetPointSimple",
+    "type": "SetpointSimple",
     "data": {
       "setting": 1
     }
@@ -22,7 +22,7 @@
   {
     "id": "setpoint-inactive",
     "profiles": [],
-    "type": "SetPointSimple",
+    "type": "SetpointSimple",
     "data": {
       "setting": 3
     }
@@ -32,12 +32,10 @@
     "profiles": [
       0
     ],
-    "type": "OneWireTempSensor",
+    "type": "TempSensorMock",
     "data": {
-      "address": "DEADBEEF",
-      "offset": 0,
       "value[celsius]": 20.89789201,
-      "connected": true
+      "valid": true
     }
   },
   {
@@ -45,42 +43,14 @@
     "profiles": [
       0
     ],
-    "type": "SensorSetPointPair",
+    "type": "SetpointSensorPair",
     "data": {
-      "sensor<>": "sensor-1",
-      "setpoint<>": "setpoint-1"
-    }
-  },
-  {
-    "id": "PID-1",
-    "profiles": [
-      0
-    ],
-    "type": "Pid",
-    "data": {
-      "settings": {
-        "kp": 10,
-        "ti": 600,
-        "td": 60
-      },
-      "links": {
-        "input<>": "sensor-setpoint-pair-1"
-      },
-      "filtering": {
-        "input": 3,
-        "derivative": 4
-      },
-      "state": {
-        "inputValue": 21.0859,
-        "inputSetting": 20,
-        "outputValue": 45.6758,
-        "p": 10.7813,
-        "i": 34.8164,
-        "d": 0.0781,
-        "derivative": 0.001301666667,
-        "integral": 20889.84,
-        "error": -1.0781
-      }
+      "sensorId<>": "sensor-1",
+      "setpointId<>": "setpoint-1",
+      "setpointValid": true,
+      "sensorValid": true,
+      "setpointValue": 0,
+      "sensorValue": 0
     }
   }
 ]

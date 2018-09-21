@@ -1,13 +1,15 @@
 import GenericBlock from '@/services/Spark/components/GenericBlock';
-import widget from './OneWireTempSensorWidget.vue';
+import widget from './SetpointSensorPairWidget.vue';
+import wizard from './SetpointSensorPairWizard.vue';
 
 const feature = {
   ...GenericBlock,
   widget,
-  displayName: 'Onewire Temperature Sensor',
+  wizard,
+  displayName: 'Sensor/Setpoint Pair',
   widgetSize: {
     cols: 4,
-    rows: 3,
+    rows: 2,
   },
 };
 

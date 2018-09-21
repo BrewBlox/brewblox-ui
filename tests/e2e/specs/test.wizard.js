@@ -5,7 +5,7 @@ describe('Wizard tests', () => {
   //   cy.exec('npm run compose:new');
   // });
 
-  it('Creates a new SensorSetPointPair', () => {
+  it('Creates a new SetpointSensorPair', () => {
     cy.visit('/');
     cy.contains('menu').click();
 
@@ -42,9 +42,9 @@ describe('Wizard tests', () => {
     cy.contains(/CREATE$/i).click();
     cy.contains(/NEXT$/i).click();
 
-    cy.contains('spark/SensorSetPointPair-');
+    cy.contains('spark/SetpointSensorPair-');
     cy.contains(/ADD TO DASHBOARD/i).click();
 
-    cy.contains('spark/SensorSetPointPair');
+    cy.contains('spark/SetpointSensorPair');
   });
 });

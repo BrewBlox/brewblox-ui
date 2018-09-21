@@ -1,21 +1,22 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 
-import { saveBlock } from '@/services/Spark/store/actions';
-import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
-import WidgetField from '@/components/Widget/WidgetField.vue';
 import BlockWidget from '@/services/Spark/components/BlockWidget';
-import { OneWireTempSensorBlock } from './state';
+import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
+import WidgetModal from '@/components/Widget/WidgetModal.vue';
+import WidgetField from '@/components/Widget/WidgetField.vue';
+import { TempSensorOneWireBlock } from './state';
 import { getById } from './getters';
 
 @Component({
   components: {
     WidgetToolbar,
+    WidgetModal,
     WidgetField,
   },
 })
-export default class OneWireTempSensor extends BlockWidget {
-  get block(): OneWireTempSensorBlock {
+export default class TempSensorOneWireWidget extends BlockWidget {
+  get block(): TempSensorOneWireBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
 }
@@ -24,10 +25,19 @@ export default class OneWireTempSensor extends BlockWidget {
 <template>
   <div>
 
+    <widget-modal
+      :isOpen="modalOpen"
+      :onClose="() => { this.modalOpen = false; }"
+      :title="$props.id"
+    >
+      TODO
+    </widget-modal>
+
     <widget-toolbar
       :name="$props.id"
       :type="$props.type"
       :on-refresh="refreshBlock"
+      :on-setting="() => { this.modalOpen = true }"
     />
 
     <q-card>
@@ -41,10 +51,10 @@ export default class OneWireTempSensor extends BlockWidget {
         </widget-field>
 
         <widget-field
-          label="Connection status"
+          label="Valid"
           icon=""
         >
-          <big>{{ block.data.connected }}</big>
+          <big>{{ block.data.valid }}</big>
         </widget-field>
 
         <widget-field
@@ -62,8 +72,8 @@ export default class OneWireTempSensor extends BlockWidget {
         </widget-field>
 
       </q-card-main>
-
     </q-card>
+
   </div>
 </template>
 
@@ -72,3 +82,4 @@ export default class OneWireTempSensor extends BlockWidget {
   display: flex;
 }
 </style>
+

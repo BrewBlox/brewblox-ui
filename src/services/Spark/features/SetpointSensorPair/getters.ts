@@ -2,12 +2,12 @@ import { RootStore } from '@/store/state';
 
 import { allBlocks, blockById } from '@/services/Spark/store/getters';
 
-import { OneWireTempSensorBlock } from './state';
+import { SetpointSensorPairBlock } from './state';
 
-export const typeName = 'OneWireTempSensor';
+export const typeName = 'SetpointSensorPair';
 
 export const getById = (store: RootStore, serviceId: string, id: string) =>
-  blockById<OneWireTempSensorBlock>(store, serviceId, id, typeName);
+  blockById<SetpointSensorPairBlock>(store, serviceId, id, typeName);
 
 export const getAll = (store: RootStore, serviceId: string) =>
-  allBlocks<OneWireTempSensorBlock>(store, serviceId, typeName);
+  allBlocks<SetpointSensorPairBlock>(store, serviceId, typeName);
