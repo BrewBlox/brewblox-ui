@@ -23,5 +23,5 @@ export interface DashboardBlock extends DashboardItem {
   config: {
     serviceId: string;
     blockId: string;
-  }
+  };
 }
