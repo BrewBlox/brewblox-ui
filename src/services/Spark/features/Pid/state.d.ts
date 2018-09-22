@@ -2,7 +2,6 @@ import { Block } from '@/services/Spark/state';
 import Link from '@/helpers/units/Link';
 import { Unit } from '@/helpers/units';
 
-
 export interface PidBlock extends Block {
   data: {
     inputId: Link;
