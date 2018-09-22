@@ -8,7 +8,7 @@ const feature = {
   wizard,
   displayName: 'Sensor/Setpoint Pair',
   widgetSize: {
-    cols: 4,
+    cols: 3,
     rows: 2,
   },
 };

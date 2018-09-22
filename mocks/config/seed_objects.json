@@ -16,7 +16,7 @@
     ],
     "type": "SetpointSimple",
     "data": {
-      "setting": 1
+      "setting": 50
     }
   },
   {
@@ -51,6 +51,52 @@
       "sensorValid": true,
       "setpointValue": 0,
       "sensorValue": 0
+    }
+  },
+  {
+    "id": "actuator-1",
+    "profiles": [
+      0
+    ],
+    "type": "ActuatorAnalogMock",
+    "data": {
+      "valid": true,
+      "setting": 20,
+      "minSetting": 10,
+      "maxSetting": 30,
+      "value": 50,
+      "minValue": 40,
+      "maxValue": 60
+    }
+  },
+  {
+    "id": "pid-1",
+    "profiles": [
+      0
+    ],
+    "type": "Pid",
+    "data": {
+      "inputId<>": "sensor-1",
+      "outputId<>": "actuator-1",
+      "inputValid": true,
+      "outputValid": true,
+      "inputValue": 0,
+      "inputSetting": 10,
+      "outputValue": 20,
+      "outputSetting": 30,
+      "filter": "FILT_30s",
+      "filterThreshold": 50,
+      "enabled": true,
+      "active": true,
+      "kp": 60,
+      "ti": 70,
+      "td": 80,
+      "p": 90,
+      "i": 100,
+      "d": 110,
+      "error": 120,
+      "integral": 130,
+      "derivative": 140
     }
   }
 ]

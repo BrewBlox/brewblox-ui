@@ -94,57 +94,55 @@ export default class SparkForm extends Vue {
 </script>
 
 <template>
-  <div>
-    <q-card>
-      <q-card-main class="column">
+  <q-card>
+    <q-card-main class="column">
 
-        <widget-field
-          label="Device ID"
-          icon="devices"
-        >
-          <big>{{ sysInfo.data.deviceId }}</big>
-        </widget-field>
+      <widget-field
+        label="Device ID"
+        icon="devices"
+      >
+        <big>{{ sysInfo.data.deviceId }}</big>
+      </widget-field>
 
-        <widget-field
-          label="Active profiles"
-          icon="settings_input_component"
-        >
-          <profiles-bar
-            v-model="activeProfiles"
-            :profileNames="profileNames"
-          />
-        </widget-field>
+      <widget-field
+        label="Active profiles"
+        icon="settings_input_component"
+      >
+        <profiles-bar
+          v-model="activeProfiles"
+          :profileNames="profileNames"
+        />
+      </widget-field>
 
-        <widget-field
-          label="Profile names"
-          icon="edit"
-        >
-          <q-input
-            v-for="(name, idx) in profileNames"
-            :key="idx"
-            v-model="profileNames[idx]"
-            @change="updateNames"
-            :suffix="`Profile ${idx + 1}`"
-          />
-        </widget-field>
+      <widget-field
+        label="Profile names"
+        icon="edit"
+      >
+        <q-input
+          v-for="(name, idx) in profileNames"
+          :key="idx"
+          v-model="profileNames[idx]"
+          @change="updateNames"
+          :suffix="`Profile ${idx + 1}`"
+        />
+      </widget-field>
 
-        <widget-field
-          label="Time since boot"
-          icon="timelapse"
-        >
-          <big>{{ ticks.data.millisSinceBoot }}</big> ms
-        </widget-field>
+      <widget-field
+        label="Time since boot"
+        icon="timelapse"
+      >
+        <big>{{ ticks.data.millisSinceBoot }}</big> ms
+      </widget-field>
 
-        <widget-field
-          label="Date"
-          icon="schedule"
-        >
-          <big>{{ sysDate }}</big>
-        </widget-field>
+      <widget-field
+        label="Date"
+        icon="schedule"
+      >
+        <big>{{ sysDate }}</big>
+      </widget-field>
 
-      </q-card-main>
-    </q-card>
-  </div>
+    </q-card-main>
+  </q-card>
 </template>
 
 <style scoped>

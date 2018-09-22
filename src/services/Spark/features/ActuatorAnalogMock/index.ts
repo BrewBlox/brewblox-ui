@@ -1,12 +1,12 @@
 import GenericBlock from '@/services/Spark/components/GenericBlock';
-import widget from './InactiveObjectWidget.vue';
+import widget from './ActuatorAnalogMockWidget.vue';
 
 const feature = {
   ...GenericBlock,
   widget,
-  displayName: 'Inactive Object',
+  displayName: 'Analog Actuator (Mock)',
   widgetSize: {
-    cols: 3,
+    cols: 4,
     rows: 2,
   },
 };

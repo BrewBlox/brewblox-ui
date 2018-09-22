@@ -134,6 +134,17 @@
         "serviceId": "sparkey",
         "blockId": "setpoint-1"
       }
+    },
+    {
+      "id": "pid-widget",
+      "order": 2,
+      "cols": 4,
+      "rows": 4,
+      "widget": "Pid",
+      "config": {
+        "serviceId": "sparkey",
+        "blockId": "pid-1"
+      }
     }
   ],
   "dashboards": [
@@ -142,7 +153,8 @@
       "title": "Home Dashboard",
       "order": 1,
       "items": [
-        "setpoint-widget"
+        "setpoint-widget",
+        "pid-widget"
       ]
     },
     {

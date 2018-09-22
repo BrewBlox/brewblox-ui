@@ -8,7 +8,7 @@ export default class Unit {
   }
 
   get unitNotation(): string {
-    return '';
+    return this.unit;
   }
 
   get roundedValue(): string {

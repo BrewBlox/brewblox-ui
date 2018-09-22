@@ -16,6 +16,8 @@ import { getById } from './getters';
   },
 })
 export default class TempSensorOneWireWidget extends BlockWidget {
+  modalOpen: boolean = false;
+
   get block(): TempSensorOneWireBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
@@ -23,7 +25,7 @@ export default class TempSensorOneWireWidget extends BlockWidget {
 </script>
 
 <template>
-  <div>
+  <q-scroll-area>
 
     <widget-modal
       :isOpen="modalOpen"
@@ -37,7 +39,7 @@ export default class TempSensorOneWireWidget extends BlockWidget {
       :name="$props.id"
       :type="$props.type"
       :on-refresh="refreshBlock"
-      :on-setting="() => { this.modalOpen = true }"
+      :on-settings="() => { this.modalOpen = true }"
     />
 
     <q-card>
@@ -74,7 +76,7 @@ export default class TempSensorOneWireWidget extends BlockWidget {
       </q-card-main>
     </q-card>
 
-  </div>
+  </q-scroll-area>
 </template>
 
 <style scoped>

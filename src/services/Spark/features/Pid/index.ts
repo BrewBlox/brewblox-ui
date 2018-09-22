@@ -6,8 +6,8 @@ const feature = {
   widget,
   displayName: 'PID',
   widgetSize: {
-    cols: 4,
-    rows: 3,
+    cols: 5,
+    rows: 6,
   },
 };
 

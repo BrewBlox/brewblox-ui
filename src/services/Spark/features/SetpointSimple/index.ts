@@ -6,7 +6,7 @@ const feature = {
   widget,
   displayName: 'Basic Setpoint',
   widgetSize: {
-    cols: 4,
+    cols: 3,
     rows: 2,
   },
 };

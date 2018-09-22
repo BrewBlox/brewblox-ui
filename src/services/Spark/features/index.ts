@@ -1,3 +1,4 @@
+import ActuatorAnalogMock from './ActuatorAnalogMock';
 import InactiveObject from './InactiveObject';
 import TempSensorOneWire from './TempSensorOneWire';
 import Pid from './Pid';
@@ -6,6 +7,7 @@ import SetpointSimple from './SetpointSimple';
 import ProcessView from './ProcessView';
 
 export default {
+  ActuatorAnalogMock,
   InactiveObject,
   TempSensorOneWire,
   Pid,

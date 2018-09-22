@@ -5,7 +5,7 @@ import BlockWidget from '@/services/Spark/components/BlockWidget';
 import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 import WidgetModal from '@/components/Widget/WidgetModal.vue';
 import WidgetField from '@/components/Widget/WidgetField.vue';
-import { SetpointSensorPairBlock } from './state';
+import { ActuatorAnalogMockBlock } from './state';
 import { getById } from './getters';
 
 @Component({
@@ -15,10 +15,10 @@ import { getById } from './getters';
     WidgetField,
   },
 })
-export default class SetpointSensorPairWidget extends BlockWidget {
+export default class ActuatorAnalogMockWidget extends BlockWidget {
   modalOpen: boolean = false;
 
-  get block(): SetpointSensorPairBlock {
+  get block(): ActuatorAnalogMockBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
 }
@@ -46,17 +46,17 @@ export default class SetpointSensorPairWidget extends BlockWidget {
       <q-card-main class="row">
 
         <widget-field
-          :label="`Setpoint (${block.data.setpointId.id})`"
-          :icon="block.data.setpointValid ? 'link' : 'link_off'"
+          label="Setting"
+          icon=""
         >
-          <big>{{ block.data.setpointValue | unit }}</big>
+          <big>{{ block.data.setting }}</big>
         </widget-field>
 
         <widget-field
-          :label="`Sensor (${block.data.sensorId.id})`"
-          :icon="block.data.sensorValid ? 'link' : 'link_off'"
+          label="Value"
+          icon=""
         >
-          <big>{{ block.data.sensorValue | unit }}</big>
+          <big>{{ block.data.value }}</big>
         </widget-field>
 
       </q-card-main>

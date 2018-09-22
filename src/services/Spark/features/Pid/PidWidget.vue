@@ -26,7 +26,7 @@ export default class PidWidget extends BlockWidget {
 </script>
 
 <template>
-  <div>
+  <q-scroll-area>
 
     <widget-modal
       :isOpen="modalOpen"
@@ -40,12 +40,11 @@ export default class PidWidget extends BlockWidget {
       :name="$props.id"
       :type="$props.type"
       :on-refresh="refreshBlock"
-      :on-setting="() => { this.modalOpen = true }"
+      :on-settings="() => { this.modalOpen = true }"
     />
 
     <q-card>
       <q-card-main class="row">
-
         <!-- Input/output -->
 
         <widget-field
@@ -82,7 +81,7 @@ export default class PidWidget extends BlockWidget {
           label="Filter / treshold"
           icon=""
         >
-          <big>{{ block.data.filter }} / {{ block.data.filterTreshold | unit }}</big>
+          <big>{{ block.data.filter }} / {{ block.data.filterThreshold | unit }}</big>
         </widget-field>
 
         <!-- Enabled / active -->
@@ -172,12 +171,17 @@ export default class PidWidget extends BlockWidget {
 
       </q-card-main>
     </q-card>
-
-  </div>
+  </q-scroll-area>
 </template>
 
 <style scoped>
 .q-card {
   display: flex;
+}
+
+.filler {
+  height: 100%;
+  width: 100%;
+  direction: vertical;
 }
 </style>

@@ -4,15 +4,19 @@ import Component from 'vue-class-component';
 import { saveBlock } from '@/services/Spark/store/actions';
 import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 import BlockWidget from '@/services/Spark/components/BlockWidget';
+import WidgetModal from '@/components/Widget/WidgetModal.vue';
 import { SetpointSimpleBlock } from './state';
 import { getById } from './getters';
 
 @Component({
   components: {
     WidgetToolbar,
+    WidgetModal,
   },
 })
 export default class SetpointSimpleWidget extends BlockWidget {
+  modalOpen: boolean = false;
+
   get block(): SetpointSimpleBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
@@ -24,12 +28,21 @@ export default class SetpointSimpleWidget extends BlockWidget {
 </script>
 
 <template>
-  <div>
+  <q-scroll-area>
+
+    <widget-modal
+      :isOpen="modalOpen"
+      :onClose="() => { this.modalOpen = false; }"
+      :title="$props.id"
+    >
+      TODO
+    </widget-modal>
 
     <widget-toolbar
       :name="$props.id"
       :type="$props.type"
       :on-refresh="refreshBlock"
+      :on-settings="() => { this.modalOpen = true; }"
     />
 
     <q-card>
@@ -47,7 +60,7 @@ export default class SetpointSimpleWidget extends BlockWidget {
       </q-card-main>
     </q-card>
 
-  </div>
+  </q-scroll-area>
 </template>
 
 <style scoped>
