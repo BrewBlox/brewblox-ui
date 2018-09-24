@@ -1,5 +1,6 @@
+import Vue from 'vue';
 import Unit from '@/helpers/units/Unit';
 
-export default ({ app, store, Vue }: PluginArguments) => {
+export default (_: PluginArguments) => {
   Vue.filter('unit', (value: Unit) => value.toString());
 };

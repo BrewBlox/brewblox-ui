@@ -3,17 +3,13 @@ import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
 
 import { serviceAvailable } from '@/helpers/dynamic-store';
-import { pageByType, allServiceTypes } from '@/services/service-by-type';
+import { pageById } from '@/store/providers/getters';
 import { serviceById, serviceExists } from '@/store/services/getters';
 import InvalidPage from './InvalidPage.vue';
 
-const allPages = allServiceTypes()
-  .filter(pageByType)
-  .reduce((acc: any, type: string) => ({ ...acc, type: pageByType(type) }), {});
-
 @Component({
   components: {
-    ...allPages,
+    InvalidPage,
   },
 })
 export default class ServicePage extends Vue {
@@ -26,10 +22,10 @@ export default class ServicePage extends Vue {
       && serviceAvailable(this.$store, this.serviceId);
   }
 
-  pageComponent(): VueConstructor {
+  pageComponent(): string | VueConstructor {
     try {
       const service = serviceById(this.$store, this.serviceId);
-      return pageByType(service.type) || InvalidPage;
+      return pageById(this.$store, service.type) || InvalidPage;
     } catch (e) {
       return InvalidPage;
     }

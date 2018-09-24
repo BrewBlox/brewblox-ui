@@ -1,6 +1,6 @@
 import { getStoreAccessors } from 'vuex-typescript';
-import { State as RootState } from '../state';
-import { ServicesState, Service, ServicesContext } from './state';
+import { RootState } from '../state';
+import { ServiceState, Service, ServicesContext } from './state';
 import { serviceById as getServiceInStore } from './getters';
 import {
   fetchServices as fetchServicesInApi,
@@ -15,7 +15,7 @@ import {
   removeService as removeServiceInStore,
 } from './mutations';
 
-const { dispatch } = getStoreAccessors<ServicesState, RootState>('services');
+const { dispatch } = getStoreAccessors<ServiceState, RootState>('services');
 
 const actions = {
   async fetchServices(context: ServicesContext) {

@@ -6,19 +6,12 @@ import { DashboardItem } from '@/store/dashboards/state';
 import { dashboardItemById } from '@/store/dashboards/getters';
 
 import {
-  allFeatureTypes,
-  wizardByType,
-  displayNameByType,
-} from '@/services/feature-by-type';
-
-const allWidgetWizards = allFeatureTypes()
-  .filter(wizardByType)
-  .reduce((acc: any, type: string) => ({ ...acc, type: wizardByType(type) }), {});
+  featureIds,
+  wizardById,
+  displayNameById,
+} from '@/store/features/getters';
 
 @Component({
-  components: {
-    ...allWidgetWizards,
-  },
   props: {
     onCreateItem: {
       type: Function,
@@ -32,13 +25,12 @@ export default class NewWidgetWizard extends Vue {
   featureWizard: VueConstructor | null = null;
 
   get wizardOptions() {
-    return allFeatureTypes()
-      .filter(wizardByType)
-      .filter(type => displayNameByType(type).match(this.searchModel))
-      .map(type => ({
-        label: displayNameByType(type),
-        value: wizardByType(type),
-      }));
+    return featureIds(this.$store)
+      .map(id => ({
+        label: displayNameById(this.$store, id),
+        value: wizardById(this.$store, id),
+      }))
+      .filter(opt => opt.value && opt.label.match(this.searchModel));
   }
 
   get widgetIdError() {

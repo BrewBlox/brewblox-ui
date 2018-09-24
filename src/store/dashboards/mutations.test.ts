@@ -75,7 +75,6 @@ describe('addDashboardItem', () => {
   it('Should add a new dashboard item', () => {
     const dashboardItem = {
       id: 'test-item',
-      order: 1,
       cols: 2,
       rows: 3,
       widget: 'Empty',
@@ -93,7 +92,6 @@ describe('addDashboardItem', () => {
   it('Should add another dashboard item', () => {
     const dashboardItem = {
       id: 'test-item-2',
-      order: 2,
       cols: 2,
       rows: 3,
       widget: 'Empty',
@@ -114,7 +112,6 @@ describe('setDashboardItemSize', () => {
 
   const dashboardItem = {
     id: 'test-item',
-    order: 1,
     cols: 2,
     rows: 3,
     widget: 'Empty',
@@ -128,26 +125,5 @@ describe('setDashboardItemSize', () => {
 
     expect(dashboardItemSizeStore.items['test-item'].cols).toBe(5);
     expect(dashboardItemSizeStore.items['test-item'].rows).toBe(5);
-  });
-});
-
-describe('setDashboardItemOrder', () => {
-  const dashboardItemOrderStore = { ...defaultStore };
-
-  const dashboardItem = {
-    id: 'test-item',
-    order: 1,
-    cols: 2,
-    rows: 3,
-    widget: 'Empty',
-    config: {},
-  };
-
-  it('Should update an item\'s order', () => {
-    addDashboardItem(dashboardItemOrderStore, dashboardItem);
-
-    setDashboardItemOrder(dashboardItemOrderStore, { id: 'test-item', order: 2 });
-
-    expect(dashboardItemOrderStore.items['test-item'].order).toBe(2);
   });
 });

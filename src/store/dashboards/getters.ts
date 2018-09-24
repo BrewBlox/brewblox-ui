@@ -1,7 +1,7 @@
 import { getStoreAccessors } from 'vuex-typescript';
 
 import { Dashboard, DashboardItem, DashboardState, DashboardContext } from './state';
-import { State as RootState, RootStore } from '../state';
+import { RootState, RootStore } from '../state';
 
 const { read } = getStoreAccessors<DashboardState, RootState>('dashboards');
 

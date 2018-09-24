@@ -1,18 +1,18 @@
 import Vue from 'vue';
 import { getStoreAccessors } from 'vuex-typescript';
 
-import { ServicesState, Service } from './state';
+import { ServiceState, Service } from './state';
 
-import { State as RootState } from '../state';
+import { RootState } from '../state';
 
-const { commit } = getStoreAccessors<ServicesState, RootState>('services');
+const { commit } = getStoreAccessors<ServiceState, RootState>('services');
 
 const mutations = {
-  addService(state: ServicesState, service: Service) {
+  addService(state: ServiceState, service: Service) {
     Vue.set(state.services, service.id, { ...service });
   },
 
-  updateService(state: ServicesState, service: Partial<Service>) {
+  updateService(state: ServiceState, service: Partial<Service>) {
     const id = service.id || '';
     const existing = state.services[id];
     if (!existing) {
@@ -21,15 +21,15 @@ const mutations = {
     Vue.set(state.services, id, { ...existing, ...service });
   },
 
-  mutateService(state: ServicesState, service: Partial<Service>) {
+  mutateService(state: ServiceState, service: Partial<Service>) {
     mutations.updateService(state, service);
   },
 
-  removeService(state: ServicesState, id: string) {
+  removeService(state: ServiceState, id: string) {
     Vue.delete(state.services, id);
   },
 
-  mutateFetching(state: ServicesState, fetching: boolean) {
+  mutateFetching(state: ServiceState, fetching: boolean) {
     state.fetching = fetching;
   },
 };

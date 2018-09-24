@@ -13,7 +13,7 @@ import {
 } from './api';
 
 import { DashboardState, DashboardItem, DashboardContext, Dashboard } from './state';
-import { State as RootState } from '../state';
+import { RootState } from '../state';
 
 import {
   dashboardItemById as getDashboardItemInStore,
