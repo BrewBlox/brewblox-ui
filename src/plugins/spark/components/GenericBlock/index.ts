@@ -1,17 +1,15 @@
-import Vue from 'vue';
+import { ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features/state';
 import widget from './GenericBlock.vue';
 
-import { blockById } from '../../store/getters';
-
-Vue.component(widget.name, widget);
+import { blockById } from '@/plugins/spark/store/getters';
 
 const validator = (store: any, config: any) =>
   blockById(store, config.serviceId, config.blockId) !== undefined;
 
 const feature: Partial<Feature> = {
-  widget: widget.name,
   validator,
+  widget: ref(widget),
   widgetSize: {
     cols: 4,
     rows: 4,
