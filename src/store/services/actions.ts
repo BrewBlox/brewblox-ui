@@ -5,7 +5,7 @@ import { serviceById as getServiceInStore } from './getters';
 import {
   fetchServices as fetchServicesInApi,
   createService as createServiceInApi,
-  persistService as persistServiceInApi,
+  updateService as updateServiceInApi,
   deleteService as removeServiceInApi,
 } from './api';
 import {
@@ -34,7 +34,7 @@ const actions = {
 
   async saveService(context: ServicesContext, service: Service) {
     mutateServiceInStore(context, { ...service, isLoading: true });
-    const savedService = await persistServiceInApi(service);
+    const savedService = await updateServiceInApi(service);
     mutateServiceInStore(context, { ...savedService, isLoading: false });
   },
 
@@ -48,7 +48,7 @@ const actions = {
     ids.forEach((id, idx) => {
       const order = idx + 1;
       mutateServiceInStore(context, { id, order });
-      persistServiceInApi(getServiceInStore(context, id));
+      updateServiceInApi(getServiceInStore(context, id));
     });
   },
 };

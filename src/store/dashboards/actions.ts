@@ -37,14 +37,12 @@ const { dispatch } = getStoreAccessors<DashboardState, RootState>('dashboards');
 const actions = {
   addNewDashboard(context: DashboardContext, title: string) {
     const id = new UrlSafeString().generate(title);
-
     const dashboard = {
       id,
       title,
       order: Object.keys(context.state.dashboards).length + 1,
       items: [],
     };
-
     addDashboardToStore(context, dashboard);
     createDashboardOnApi(dashboard);
   },

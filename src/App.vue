@@ -3,7 +3,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 
 import { fetchServices } from '@/store/services/actions';
-import { allServices } from '@/store/services/getters';
+import { serviceValues } from '@/store/services/getters';
 import { fetchDashboards } from '@/store/dashboards/actions';
 import { initializerById, fetcherById } from '@/store/providers/getters';
 
@@ -15,12 +15,13 @@ export default class App extends Vue {
       fetchDashboards(this.$store),
     ]);
 
-    const initPromises = allServices(this.$store)
+    // Initialize each service
+    const initPromises = serviceValues(this.$store)
       .map(service =>
         initializerById(this.$store, service.type)(this.$store, service));
     await Promise.all(initPromises);
 
-    const fetchPromises = allServices(this.$store)
+    const fetchPromises = serviceValues(this.$store)
       .map(service =>
         fetcherById(this.$store, service.type)(this.$store, service));
     await Promise.all(fetchPromises);
@@ -29,10 +30,7 @@ export default class App extends Vue {
 </script>
 
 <template>
-  <div
-  id="q-app"
-
-  >
+  <div id="q-app">
     <router-view />
   </div>
 </template>

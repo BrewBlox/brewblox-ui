@@ -53,6 +53,7 @@ interface ModalConfig {
     WidgetModal,
     CopyWidgetWizard,
     NewWidgetWizard,
+    InvalidWidget,
   },
 })
 export default class DashboardPage extends Vue {
@@ -83,12 +84,17 @@ export default class DashboardPage extends Vue {
     return this.items
       .map((item) => {
         try {
-          if (!validatorById(this.$store, item.widget)(this.$store, item.config)) {
+          const component = widgetById(this.$store, item.widget);
+          if (!component) {
+            throw new Error(`No widget found for ${item.widget}`);
+          }
+          const validator = validatorById(this.$store, item.widget);
+          if (!validator(this.$store, item.config)) {
             throw new Error(`${item.widget} validation failed`);
           }
           return {
             ...item,
-            component: widgetById(this.$store, item.widget) || InvalidWidget,
+            component,
           };
         } catch (e) {
           return {

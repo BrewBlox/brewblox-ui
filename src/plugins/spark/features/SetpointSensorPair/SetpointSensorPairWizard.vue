@@ -5,7 +5,7 @@ import shortid from 'shortid';
 
 import Link from '@/helpers/units/Link';
 import { Service } from '@/store/services/state';
-import { allServices } from '@/store/services/getters';
+import { serviceValues } from '@/store/services/getters';
 import { Block } from '@/plugins/spark/state';
 import { createBlock } from '@/plugins/spark/store/actions';
 import { widgetSizeById } from '@/store/features/getters';
@@ -35,7 +35,7 @@ export default class SetpointSensorPairWizard extends Vue {
   sensorInput: Block | null = null;
 
   get services() {
-    return allServices(this.$store).map(service => ({
+    return serviceValues(this.$store).map(service => ({
       label: service.id,
       value: service,
     }));

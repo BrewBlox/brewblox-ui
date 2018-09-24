@@ -5,11 +5,12 @@ import { Notify } from 'quasar';
 import { Service } from '@/store/services/state';
 import { serviceById, serviceIds } from '@/store/services/getters';
 import { createService } from '@/store/services/actions';
-
 import {
   providerIds,
   wizardById,
   displayNameById,
+  initializerById,
+  fetcherById,
 } from '@/store/providers/getters';
 
 @Component
@@ -62,7 +63,7 @@ export default class NewServiceWizard extends Vue {
     this.wizardComponent = wizard;
   }
 
-  onCreate(partial: Partial<Service>) {
+  async onCreate(partial: Partial<Service>) {
     const service: Service = {
       id: this.serviceId,
       title: this.serviceTitle,
@@ -75,9 +76,11 @@ export default class NewServiceWizard extends Vue {
     this.reset();
     Notify.create({
       type: 'positive',
-      position: 'top',
+      position: 'center',
       message: `Added ${displayNameById(this.$store, service.type)} "${service.title}"`,
     });
+    await initializerById(this.$store, service.type)(this.$store, service);
+    await fetcherById(this.$store, service.type)(this.$store, service);
   }
 
   reset() {

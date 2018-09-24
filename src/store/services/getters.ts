@@ -15,7 +15,7 @@ const getters = {
 const services = read(getters.services);
 
 export const serviceIds = read(getters.serviceIds);
-export const allServices = read(getters.serviceValues);
+export const serviceValues = read(getters.serviceValues);
 export const isFetching = read(getters.isFetching);
 
 export function serviceById<T extends Service>(

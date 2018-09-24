@@ -5,7 +5,7 @@ import Component from 'vue-class-component';
 import { Service } from '@/store/services/state';
 import { Block } from '@/plugins/spark/state';
 
-import { allServices } from '@/store/services/getters';
+import { serviceValues } from '@/store/services/getters';
 import { allBlocks } from '@/plugins/spark/store/getters';
 
 @Component({
@@ -27,7 +27,7 @@ class Metrics extends Vue {
   blockInput: Block | null = null;
 
   get services() {
-    return allServices(this.$store).map(service => ({
+    return serviceValues(this.$store).map(service => ({
       label: service.id,
       value: service,
     }));
