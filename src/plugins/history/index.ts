@@ -12,9 +12,7 @@ const features: { [id: string]: Feature } = {
 export default ({ store }: PluginArguments) => {
   Object
     .values(features)
-    .forEach((feature: Feature) => {
-      createFeature(store, feature);
-    });
+    .forEach(feature => createFeature(store, feature));
 
   createProvider(store, {
     id: 'History',
