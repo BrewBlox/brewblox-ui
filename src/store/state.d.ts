@@ -8,7 +8,7 @@ export interface RootState {
   dashboards: DashboardState;
   services: ServiceState;
   providers: ProviderState;
-  features: FeatureState
+  features: FeatureState;
 }
 
 export type RootStore = Store<RootState>;
