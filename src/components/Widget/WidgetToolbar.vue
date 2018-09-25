@@ -58,8 +58,4 @@ export default class WidgetToolbar extends Vue {
 </template>
 
 <style scoped>
-.q-item {
-  display: grid;
-  grid-gap: 10px;
-}
 </style>

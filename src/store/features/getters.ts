@@ -35,3 +35,6 @@ export const widgetById = (store: RootStore, id: string) =>
 
 export const widgetSizeById = (store: RootStore, id: string) =>
   (featureById(store, id).widgetSize || { ...{ cols: 3, rows: 2 } });
+
+export const formById = (store: RootStore, id: string) =>
+  featureById(store, id).form;

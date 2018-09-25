@@ -2,14 +2,16 @@
 import Component from 'vue-class-component';
 
 import { saveBlock } from '@/plugins/spark/store/actions';
-import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
+import WidgetField from '@/components/Widget/WidgetField.vue';
 import WidgetModal from '@/components/Widget/WidgetModal.vue';
 import { SetpointSimpleBlock } from './state';
 import { getById } from './getters';
 
 @Component({
   components: {
+    WidgetField,
     WidgetToolbar,
     WidgetModal,
   },
@@ -28,7 +30,7 @@ export default class SetpointSimpleWidget extends BlockWidget {
 </script>
 
 <template>
-  <q-scroll-area>
+  <div>
 
     <widget-modal
       :isOpen="modalOpen"
@@ -45,31 +47,30 @@ export default class SetpointSimpleWidget extends BlockWidget {
       :on-settings="() => { this.modalOpen = true; }"
     />
 
-    <q-card>
-      <q-card-main class="row">
+    <q-scroll-area class="widget-body">
+      <q-card>
+        <q-card-main class="row">
 
-        <q-field
-          dark
-          label="Setting"
-          icon="devices"
-          orientation="vertical"
-        >
-          <big>{{ setting | unit }}</big>
-        </q-field>
+          <widget-field
+            label="Setting"
+            icon="devices"
+          >
+            <big>{{ setting | unit }}</big>
+          </widget-field>
 
-      </q-card-main>
-    </q-card>
+        </q-card-main>
+      </q-card>
+    </q-scroll-area>
 
-  </q-scroll-area>
+  </div>
 </template>
 
 <style scoped>
 .q-card {
   display: flex;
 }
-
-.q-field {
-  margin-top: 2pt;
-  margin-bottom: 10pt;
+.widget-body {
+  flex: 1;
+  overflow: auto;
 }
 </style>

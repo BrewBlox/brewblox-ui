@@ -282,5 +282,7 @@ export default class DashboardPage extends Vue {
   background: $block-background;
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 </style>

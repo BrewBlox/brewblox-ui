@@ -11,5 +11,3 @@ export const getById = (store: RootStore, serviceId: string, id: string) =>
 
 export const getAll = (store: RootStore, serviceId: string) =>
   allBlocks<InactiveObjectBlock>(store, serviceId, typeName);
-
-export const testey = () => { };

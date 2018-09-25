@@ -36,7 +36,6 @@ const actions = {
     addBlockInStore(context, block.serviceId, { ...block, isLoading: true });
     const createdBlock = await createBlockInApi(block);
     mutateBlockInStore(context, block.serviceId, { ...createdBlock, isLoading: false });
-    return createdBlock;
   },
 
   async saveBlock(context: BlocksContext, block: Block) {

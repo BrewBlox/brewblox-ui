@@ -2,10 +2,11 @@ import { ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features/state';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import widget from './SetpointSimpleWidget.vue';
+import { typeName } from './getters';
 
 const feature: Feature = {
   ...GenericBlock,
-  id: 'SetpointSimple',
+  id: typeName,
   displayName: 'Basic Setpoint',
   widget: ref(widget),
   widgetSize: {

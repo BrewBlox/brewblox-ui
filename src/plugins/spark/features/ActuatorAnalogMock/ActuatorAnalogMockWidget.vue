@@ -25,7 +25,7 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
 </script>
 
 <template>
-  <q-scroll-area>
+  <div>
 
     <widget-modal
       :isOpen="modalOpen"
@@ -42,32 +42,38 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
       :on-settings="() => { this.modalOpen = true }"
     />
 
-    <q-card>
-      <q-card-main class="row">
+    <q-scroll-area class="widget-body">
+      <q-card>
+        <q-card-main class="row">
 
-        <widget-field
-          label="Setting"
-          icon=""
-        >
-          <big>{{ block.data.setting }}</big>
-        </widget-field>
+          <widget-field
+            label="Setting"
+            icon=""
+          >
+            <big>{{ block.data.setting }}</big>
+          </widget-field>
 
-        <widget-field
-          label="Value"
-          icon=""
-        >
-          <big>{{ block.data.value }}</big>
-        </widget-field>
+          <widget-field
+            label="Value"
+            icon=""
+          >
+            <big>{{ block.data.value }}</big>
+          </widget-field>
 
-      </q-card-main>
-    </q-card>
+        </q-card-main>
+      </q-card>
+    </q-scroll-area>
 
-  </q-scroll-area>
+  </div>
 </template>
 
 <style scoped>
 .q-card {
   display: flex;
+}
+.widget-body {
+  flex: 1;
+  overflow: auto;
 }
 </style>
 

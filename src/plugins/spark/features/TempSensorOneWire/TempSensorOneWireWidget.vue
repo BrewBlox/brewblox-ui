@@ -25,7 +25,7 @@ export default class TempSensorOneWireWidget extends BlockWidget {
 </script>
 
 <template>
-  <q-scroll-area>
+  <div>
 
     <widget-modal
       :isOpen="modalOpen"
@@ -42,46 +42,51 @@ export default class TempSensorOneWireWidget extends BlockWidget {
       :on-settings="() => { this.modalOpen = true }"
     />
 
-    <q-card>
-      <q-card-main class="row">
+    <q-scroll-area>
+      <q-card>
+        <q-card-main class="row">
 
-        <widget-field
-          label="Address"
-          icon=""
-        >
-          <big>{{ block.data.address }}</big>
-        </widget-field>
+          <widget-field
+            label="Address"
+            icon=""
+          >
+            <big>{{ block.data.address }}</big>
+          </widget-field>
 
-        <widget-field
-          label="Valid"
-          icon=""
-        >
-          <big>{{ block.data.valid }}</big>
-        </widget-field>
+          <widget-field
+            label="Valid"
+            icon=""
+          >
+            <big>{{ block.data.valid }}</big>
+          </widget-field>
 
-        <widget-field
-          label="Value"
-          icon=""
-        >
-          <big>{{ block.data.value | unit }}</big>
-        </widget-field>
+          <widget-field
+            label="Value"
+            icon=""
+          >
+            <big>{{ block.data.value | unit }}</big>
+          </widget-field>
 
-        <widget-field
-          label="Offset"
-          icon=""
-        >
-          <big>{{ block.data.offset | unit }}</big>
-        </widget-field>
+          <widget-field
+            label="Offset"
+            icon=""
+          >
+            <big>{{ block.data.offset | unit }}</big>
+          </widget-field>
 
-      </q-card-main>
-    </q-card>
+        </q-card-main>
+      </q-card>
+    </q-scroll-area>
 
-  </q-scroll-area>
+  </div>
 </template>
 
 <style scoped>
 .q-card {
   display: flex;
 }
+.widget-body {
+  flex: 1;
+  overflow: auto;
+}
 </style>
-
