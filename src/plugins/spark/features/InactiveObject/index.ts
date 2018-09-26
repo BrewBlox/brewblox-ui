@@ -11,6 +11,7 @@ const feature: Feature = {
   displayName: 'Inactive Object',
   widget: ref(widget),
   form: ref(form),
+  wizard: undefined,
   widgetSize: {
     cols: 3,
     rows: 2,
