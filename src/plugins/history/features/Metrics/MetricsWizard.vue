@@ -1,80 +1,105 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-
-import { Service } from '@/store/services/state';
-import { Block } from '@/plugins/spark/state';
-
+import { dashboardItemById } from '@/store/dashboards/getters';
 import { serviceValues } from '@/store/services/getters';
-import { allBlocks } from '@/plugins/spark/store/getters';
+import { Service } from '@/store/services/state';
+import { DashboardItem } from '@/store/dashboards/state';
+import {
+  widgetSizeById,
+  formById,
+  displayNameById as featureNameById,
+} from '@/store/features/getters';
+import { displayNameById } from '@/store/providers/getters';
+
+interface NavAction {
+  label: string;
+  click: Function;
+  enabled: Function;
+}
 
 @Component({
   props: {
+    featureId: {
+      type: String,
+      required: true,
+    },
+    onCreateItem: {
+      type: Function,
+      required: true,
+    },
     onCancel: {
       type: Function,
-      default: () => { },
-    },
-    onCreate: {
-      type: Function,
-      default: () => { },
+      required: true,
     },
   },
 })
-class Metrics extends Vue {
-  currentStep: string = 'service';
-  creating: boolean = false;
+export default class MetricsWizard extends Vue {
+  currentStep: string = '';
+  widgetId: string = '';
   service: Service | null = null;
-  blockInput: Block | null = null;
 
-  get services() {
-    return serviceValues(this.$store).map(service => ({
-      label: service.id,
-      value: service,
-    }));
+  get navigation(): { [id: string]: NavAction[] } {
+    return {
+      start: [
+        {
+          label: 'Cancel',
+          click: () => this.$props.onCancel(),
+          enabled: () => true,
+        },
+        {
+          label: 'Finish',
+          click: () => this.createWidget(),
+          enabled: () => !this.widgetIdError && this.service !== null,
+        },
+      ],
+    };
   }
 
-  get canContinue() {
-    if (this.currentStep === 'service' && this.service) {
-      return true;
-    }
-
-    if (this.currentStep === 'choose-block' && this.blockInput) {
-      return true;
-    }
-
-    return false;
+  get stepper(): any {
+    return this.$refs.stepper;
   }
 
-  get allBlocks() {
-    if (!this.service) {
-      return [];
-    }
-
-    return allBlocks(this.$store, this.service.id)
-      .map(block => ({
-        label: `${block.serviceId}/${block.id}`,
-        value: block,
+  get serviceOpts() {
+    return serviceValues(this.$store)
+      .filter(service => service.type === 'History')
+      .map(service => ({
+        label: service.title,
+        value: service,
       }));
   }
 
-  clearBlocks() {
-    this.blockInput = null;
+  get widgetIdError() {
+    if (!this.widgetId) {
+      return 'Name must not be empty';
+    }
+    if (dashboardItemById(this.$store, this.widgetId)) {
+      return 'Name must be unique';
+    }
+    return null;
   }
 
-  async createBlock() {
-    try {
-      this.creating = true;
+  createWidget() {
+    const service = this.service as Service;
+    const item: DashboardItem = {
+      id: this.widgetId,
+      widget: this.$props.featureId,
+      config: {
+        name: featureNameById(this.$store, this.$props.featureId),
+        serviceId: service.id,
+        metrics: [],
+      },
+      ...widgetSizeById(this.$store, this.$props.featureId),
+    };
+    this.$props.onCreateItem(item);
+  }
 
-      const block = {};
-
-      this.$props.onCreate(block);
-    } catch (e) {
-      throw new Error(e);
-    }
+  mounted() {
+    this.widgetId = '';
+    this.service = null;
+    this.stepper.reset();
   }
 }
-
-export default Metrics;
 </script>
 
 <template>
@@ -82,87 +107,50 @@ export default Metrics;
     ref="stepper"
     v-model="currentStep"
   >
-
     <q-step
       default
-      name="service"
-      title="Which controller service?"
+      name="start"
+      title="Widget info"
     >
       <q-field
-        label="Choose your device service"
+        label="Widget name"
+        icon="create"
         orientation="vertical"
-        dark
-        icon="settings system daydream"
+      >
+        <q-input
+          v-model="widgetId"
+          placeholder="Enter a widget Name"
+          :error="widgetIdError !== null"
+          :suffix="widgetIdError"
+        />
+      </q-field>
+
+      <q-field
+        label="Service"
+        icon="create"
+        orientation="vertical"
       >
         <q-option-group
           dark
           type="radio"
           v-model="service"
-          @input="clearBlocks"
-          :options="services"
+          :options="serviceOpts"
+          @input="() => { block = null; }"
         />
       </q-field>
-    </q-step>
 
-    <q-step
-      default
-      name="choose-block"
-      title="Choose block for metrics"
-    >
-      <q-field
-        label="Pick a block"
-        orientation="vertical"
-        dark
-        icon="widgets"
-      >
-        <q-select
-          v-model="blockInput"
-          :options="allBlocks"
-        />
-      </q-field>
-    </q-step>
-
-    <q-step
-      default
-      name="create"
-      title="Create block"
-    >
-      <p class="q-title">Done!</p>
-      <p>
-        Metrics block is ready to be created.
-      </p>
     </q-step>
 
     <q-stepper-navigation>
       <q-btn
-        v-if="currentStep === 'service'"
         flat
-        @click="$props.onCancel"
-        label="Cancel"
-      />
-      <q-btn
-        v-if="currentStep !== 'service'"
-        flat
-        @click="$refs.stepper.previous()"
-        label="Back"
-      />
-      <q-btn
-        v-if="currentStep !== 'create'"
-        :color="!canContinue ? 'dark-bright' : 'primary'"
-        :disabled="!canContinue"
-        @click="$refs.stepper.next()"
-        label="Next"
-      />
-      <q-btn
-        v-if="currentStep === 'create'"
-        color="primary"
-        label="Create"
-        :loading="creating"
-        @click="createBlock"
+        v-for="action in navigation[currentStep]"
+        :key="action.label"
+        :label="action.label"
+        :disabled="!action.enabled()"
+        @click="action.click"
       />
     </q-stepper-navigation>
+
   </q-stepper>
 </template>
-
-<style scoped>
-</style>
