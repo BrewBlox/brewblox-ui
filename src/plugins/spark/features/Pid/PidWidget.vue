@@ -22,11 +22,15 @@ export default class PidWidget extends BlockWidget {
   get block(): PidBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
+
+  set block(block: PidBlock) {
+    this.saveBlock(block);
+  }
 }
 </script>
 
 <template>
-  <div>
+  <div class="widget-container">
 
     <widget-toolbar
       :name="$props.id"
@@ -40,7 +44,9 @@ export default class PidWidget extends BlockWidget {
       :onClose="() => { this.modalOpen = false; }"
       :title="$props.id"
     >
-      TODO
+      <pid-form
+        v-model="block"
+      />
     </widget-modal>
 
     <q-scroll-area class="widget-body">
@@ -178,11 +184,4 @@ export default class PidWidget extends BlockWidget {
 </template>
 
 <style scoped>
-.q-card {
-  display: flex;
-}
-.widget-body {
-  flex: 1;
-  overflow: auto;
-}
 </style>

@@ -21,18 +21,24 @@ export default class TempSensorOneWireWidget extends BlockWidget {
   get block(): TempSensorOneWireBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
+
+  set block(block: TempSensorOneWireBlock) {
+    this.saveBlock(block);
+  }
 }
 </script>
 
 <template>
-  <div>
+  <div class="widget-container">
 
     <widget-modal
       :isOpen="modalOpen"
       :onClose="() => { this.modalOpen = false; }"
       :title="$props.id"
     >
-      TODO
+      <temp-sensor-one-wire-form
+        v-model="block"
+      />
     </widget-modal>
 
     <widget-toolbar
@@ -42,7 +48,7 @@ export default class TempSensorOneWireWidget extends BlockWidget {
       :on-settings="() => { this.modalOpen = true }"
     />
 
-    <q-scroll-area>
+    <q-scroll-area class="widget-body">
       <q-card>
         <q-card-main class="row">
 
@@ -82,11 +88,4 @@ export default class TempSensorOneWireWidget extends BlockWidget {
 </template>
 
 <style scoped>
-.q-card {
-  display: flex;
-}
-.widget-body {
-  flex: 1;
-  overflow: auto;
-}
 </style>

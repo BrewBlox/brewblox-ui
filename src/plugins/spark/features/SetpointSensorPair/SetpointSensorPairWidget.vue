@@ -21,18 +21,24 @@ export default class SetpointSensorPairWidget extends BlockWidget {
   get block(): SetpointSensorPairBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
+
+  set block(block: SetpointSensorPairBlock) {
+    this.saveBlock(block);
+  }
 }
 </script>
 
 <template>
-  <div>
+  <div class="widget-container">
 
     <widget-modal
       :isOpen="modalOpen"
       :onClose="() => { this.modalOpen = false; }"
       :title="$props.id"
     >
-      TODO
+      <setpoint-sensor-pair-form
+        v-model="block"
+      />
     </widget-modal>
 
     <widget-toolbar
@@ -68,12 +74,5 @@ export default class SetpointSensorPairWidget extends BlockWidget {
 </template>
 
 <style scoped>
-.q-card {
-  display: flex;
-}
-.widget-body {
-  flex: 1;
-  overflow: auto;
-}
 </style>
 

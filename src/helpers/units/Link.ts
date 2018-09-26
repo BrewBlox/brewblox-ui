@@ -1,15 +1,15 @@
 export default class Link {
-  id: string;
+  id: string | null;
 
-  constructor(id: string) {
+  constructor(id: string | null) {
     this.id = id;
   }
 
   toString(): string {
-    return this.id;
+    return this.id || '<not set>';
   }
 
-  toJSON(): string {
+  toJSON(): string | null {
     return this.id;
   }
 }
