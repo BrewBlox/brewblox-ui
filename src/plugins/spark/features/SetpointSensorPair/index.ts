@@ -2,7 +2,7 @@ import { ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features/state';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import widget from './SetpointSensorPairWidget.vue';
-import wizard from './SetpointSensorPairWizard.vue';
+import form from './SetpointSensorPairForm.vue';
 import { typeName } from './getters';
 
 const feature: Feature = {
@@ -10,7 +10,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'Sensor/Setpoint Pair',
   widget: ref(widget),
-  wizard: ref(wizard),
+  form: ref(form),
   widgetSize: {
     cols: 3,
     rows: 2,

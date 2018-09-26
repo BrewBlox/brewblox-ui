@@ -21,18 +21,24 @@ export default class TempSensorMockWidget extends BlockWidget {
   get block(): TempSensorMockBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
+
+  set block(block: TempSensorMockBlock) {
+    this.saveBlock(block);
+  }
 }
 </script>
 
 <template>
-  <div>
+  <div class="widget-container">
 
     <widget-modal
       :isOpen="modalOpen"
       :onClose="() => { this.modalOpen = false; }"
       :title="$props.id"
     >
-      TODO
+      <temp-sensor-mock-form
+        v-model="block"
+      />
     </widget-modal>
 
     <widget-toolbar
@@ -68,11 +74,4 @@ export default class TempSensorMockWidget extends BlockWidget {
 </template>
 
 <style scoped>
-.q-card {
-  display: flex;
-}
-.widget-body {
-  flex: 1;
-  overflow: auto;
-}
 </style>

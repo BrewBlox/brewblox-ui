@@ -3,6 +3,8 @@ import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import WidgetField from '@/components/Widget/WidgetField.vue';
 import ProfilesBar from '@/plugins/spark/components/ProfilesBar.vue';
+import Link from '@/helpers/units/Link';
+import { blockIds } from '@/plugins/spark/store/getters';
 
 @Component({
   components: {
@@ -10,16 +12,25 @@ import ProfilesBar from '@/plugins/spark/components/ProfilesBar.vue';
     ProfilesBar,
   },
 })
-export default class ActuatorAnalogMockForm extends BlockForm {
+export default class SetpointSensorPairForm extends BlockForm {
   get inputMapping() {
     return {
       profiles: { path: 'profiles', default: [] },
-      setting: { path: 'data.setting', default: 0 },
-      minSetting: { path: 'data.minSetting', default: 0 },
-      maxSetting: { path: 'data.maxSetting', default: 0 },
-      minValue: { path: 'data.minValue', default: 0 },
-      maxValue: { path: 'data.maxValue', default: 0 },
+      setpointId: { path: 'data.setpointId', default: new Link(null) },
+      sensorId: { path: 'data.sensorId', default: new Link(null) },
     };
+  }
+
+  get linkOpts() {
+    const unset = new Link(null);
+    return [
+      { label: unset.toString(), value: unset.id },
+      ...blockIds(this.$store, this.block.serviceId)
+        .map(id => ({
+          label: id,
+          value: id,
+        })),
+    ];
   }
 }
 </script>
@@ -39,44 +50,22 @@ export default class ActuatorAnalogMockForm extends BlockForm {
       </widget-field>
 
       <widget-field
-        label="Setting"
+        label="Setpoint"
         icon="edit"
       >
-        <q-input
-          v-model="inputValues.setting"
-          stack-label="Setting"
-          type="number"
-        />
-        <q-input
-          v-model="inputValues.minSetting"
-          stack-label="Minimum"
-          type="number"
-        />
-        <q-input
-          v-model="inputValues.maxSetting"
-          stack-label="Maximum"
-          type="number"
+        <q-select
+          v-model="inputValues.setpointId.id"
+          :options="linkOpts"
         />
       </widget-field>
 
       <widget-field
-        label="Value"
+        label="Sensor"
         icon="edit"
       >
-        <q-input
-          v-model="inputValues.value"
-          stack-label="Value"
-          type="number"
-        />
-        <q-input
-          v-model="inputValues.minValue"
-          stack-label="Minimum"
-          type="number"
-        />
-        <q-input
-          v-model="inputValues.maxValue"
-          stack-label="Maximum"
-          type="number"
+        <q-select
+          v-model="inputValues.sensorId.id"
+          :options="linkOpts"
         />
       </widget-field>
 

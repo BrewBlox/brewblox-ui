@@ -3,6 +3,7 @@ import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
 import { Block } from '@/plugins/spark/state';
 import { toShadow, fromShadow, ShadowMapping } from '@/helpers/shadow-copy';
+import { profileNames as serviceProfiles } from '@/plugins/spark/store/getters';
 
 @Component({
   props: {
@@ -13,8 +14,19 @@ import { toShadow, fromShadow, ShadowMapping } from '@/helpers/shadow-copy';
   },
 })
 export default class BlockForm extends Vue {
-  inputMapping: ShadowMapping = {};
-  inputValues: { [key: string]: any; } = {};
+  vals: { [key: string]: any; } = {};
+
+  get inputMapping(): ShadowMapping {
+    return {};
+  }
+
+  get inputValues(): { [key: string]: any; } {
+    return this.vals;
+  }
+
+  set inputValues(values: { [key: string]: any; }) {
+    this.vals = values;
+  }
 
   get block(): Block {
     return this.$props.value as Block;
@@ -22,6 +34,10 @@ export default class BlockForm extends Vue {
 
   set block(block: Block) {
     this.$emit('input', block);
+  }
+
+  get profileNames(): string[] {
+    return serviceProfiles(this.$store, this.block.serviceId);
   }
 
   get changed(): boolean {

@@ -23,6 +23,10 @@ export default class SetpointSimpleWidget extends BlockWidget {
     return getById(this.$store, this.serviceId, this.blockId);
   }
 
+  set block(block: SetpointSimpleBlock) {
+    this.saveBlock(block);
+  }
+
   get setting() {
     return this.block.data.setting;
   }
@@ -30,14 +34,16 @@ export default class SetpointSimpleWidget extends BlockWidget {
 </script>
 
 <template>
-  <div>
+  <div class="widget-container">
 
     <widget-modal
       :isOpen="modalOpen"
       :onClose="() => { this.modalOpen = false; }"
       :title="$props.id"
     >
-      TODO
+      <setpoint-simple-form
+        v-model="block"
+      />
     </widget-modal>
 
     <widget-toolbar
@@ -66,11 +72,4 @@ export default class SetpointSimpleWidget extends BlockWidget {
 </template>
 
 <style scoped>
-.q-card {
-  display: flex;
-}
-.widget-body {
-  flex: 1;
-  overflow: auto;
-}
 </style>

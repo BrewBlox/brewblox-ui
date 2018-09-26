@@ -1,6 +1,5 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 import WidgetModal from '@/components/Widget/WidgetModal.vue';
@@ -21,11 +20,15 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
   get block(): ActuatorAnalogMockBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
+
+  set block(block: ActuatorAnalogMockBlock) {
+    this.saveBlock(block);
+  }
 }
 </script>
 
 <template>
-  <div>
+  <div class="widget-container">
 
     <widget-modal
       :isOpen="modalOpen"
@@ -70,12 +73,5 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
 </template>
 
 <style scoped>
-.q-card {
-  display: flex;
-}
-.widget-body {
-  flex: 1;
-  overflow: auto;
-}
 </style>
 

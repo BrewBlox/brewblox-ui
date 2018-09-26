@@ -1,7 +1,7 @@
 import Widget from '@/components/Widget/Widget';
 import Component from 'vue-class-component';
 import { Block } from '../state';
-import { fetchBlock } from '../store/actions';
+import { fetchBlock, saveBlock } from '../store/actions';
 import { blockById } from '../store/getters';
 
 @Component
@@ -18,7 +18,15 @@ export default class BlockWidget extends Widget {
     return blockById(this.$store, this.serviceId, this.blockId);
   }
 
+  set block(block: Block) {
+    this.saveBlock(block);
+  }
+
   refreshBlock() {
     fetchBlock(this.$store, this.serviceId, this.block);
+  }
+
+  saveBlock(block: Block) {
+    saveBlock(this.$store, this.serviceId, block);
   }
 }

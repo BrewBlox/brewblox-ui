@@ -39,6 +39,19 @@
     }
   },
   {
+    "id": "sensor-onewire-1",
+    "profiles": [
+      0
+    ],
+    "type": "TempSensorOneWire",
+    "data": {
+      "value[celsius]": 20.89789201,
+      "valid": true,
+      "offset[delta_degC]": 9,
+      "address": "DEADBEEF"
+    }
+  },
+  {
     "id": "sensor-setpoint-pair-1",
     "profiles": [
       0

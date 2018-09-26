@@ -316,4 +316,20 @@ export default class DefaultLayout extends Vue {
 .q-list .editing .q-item {
   cursor: move;
 }
+
+.widget-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.widget-body {
+  flex: 1;
+  overflow: auto;
+}
+
+.centered {
+  margin: auto;
+}
 </style>
