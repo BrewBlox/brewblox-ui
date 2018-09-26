@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { displayNameByType } from '@/services/feature-by-type';
+import { displayNameById } from '@/store/features/getters';
 
 @Component({
   props: {
@@ -25,7 +25,7 @@ import { displayNameByType } from '@/services/feature-by-type';
 })
 export default class WidgetToolbar extends Vue {
   get displayName(): string {
-    return displayNameByType(this.$props.type);
+    return displayNameById(this.$store, this.$props.type);
   }
 }
 </script>
@@ -58,8 +58,4 @@ export default class WidgetToolbar extends Vue {
 </template>
 
 <style scoped>
-.q-item {
-  display: grid;
-  grid-gap: 10px;
-}
 </style>

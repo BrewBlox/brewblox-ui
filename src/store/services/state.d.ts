@@ -1,6 +1,6 @@
 import { ActionContext } from 'vuex';
 
-import { State as RootState } from '../state';
+import { RootState } from '../state';
 
 export interface Service {
   id: string;
@@ -11,11 +11,11 @@ export interface Service {
   isLoading?: boolean;
 }
 
-export type ServicesState = {
+export type ServiceState = {
   services: {
     [id: string]: Service;
   },
   fetching: boolean,
 };
 
-export type ServicesContext = ActionContext<ServicesState, RootState>;
+export type ServicesContext = ActionContext<ServiceState, RootState>;

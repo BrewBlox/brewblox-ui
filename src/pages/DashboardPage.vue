@@ -12,7 +12,7 @@ import NewWidgetWizard from '@/components/Wizard/NewWidgetWizard.vue';
 
 import byOrder from '@/helpers/byOrder';
 
-import { Block } from '@/services/Spark/state';
+import { Block } from '@/plugins/spark/state';
 import { DashboardItem } from '@/store/dashboards/state';
 
 import {
@@ -31,12 +31,11 @@ import {
 } from '@/store/dashboards/actions';
 
 import {
-  widgetByType,
-  validatorByType,
-  wizardByType,
-  displayNameByType,
-  widgetSizeByType,
-} from '@/services/feature-by-type';
+  validatorById,
+  widgetById,
+  displayNameById,
+  widgetSizeById,
+} from '@/store/features/getters';
 
 interface VueOrdered extends Vue {
   id: string;
@@ -54,6 +53,7 @@ interface ModalConfig {
     WidgetModal,
     CopyWidgetWizard,
     NewWidgetWizard,
+    InvalidWidget,
   },
 })
 export default class DashboardPage extends Vue {
@@ -77,27 +77,33 @@ export default class DashboardPage extends Vue {
     return [
       ...this.dashboard.items
         .map(id => dashboardItemById(this.$store, id)),
-    ].sort(byOrder);
+    ];
   }
 
   get validatedItems() {
-    return this.items.map((item) => {
-      try {
-        if (!validatorByType(item.widget)(this.$store, item.config)) {
-          throw new Error(`${item.widget} validation failed`);
+    return this.items
+      .map((item) => {
+        try {
+          const component = widgetById(this.$store, item.widget);
+          if (!component) {
+            throw new Error(`No widget found for ${item.widget}`);
+          }
+          const validator = validatorById(this.$store, item.widget);
+          if (!validator(this.$store, item.config)) {
+            throw new Error(`${item.widget} validation failed`);
+          }
+          return {
+            ...item,
+            component,
+          };
+        } catch (e) {
+          return {
+            ...item,
+            component: InvalidWidget,
+            error: e.toString(),
+          };
         }
-        return {
-          ...item,
-          component: widgetByType(item.widget) || InvalidWidget,
-        };
-      } catch (e) {
-        return {
-          ...item,
-          component: InvalidWidget,
-          error: e.toString(),
-        };
-      }
-    });
+      });
   }
 
   get isFetching() {
@@ -153,18 +159,20 @@ export default class DashboardPage extends Vue {
     };
   }
 
+  defaultItem(): DashboardItem {
+    return {
+      id: shortid.generate(),
+      widget: 'Unknown',
+      config: {},
+      ...widgetSizeById(this.$store, 'Unknown'),
+    };
+  }
+
   async onCreateItem(partial: Partial<DashboardItem>) {
     try {
       const item: DashboardItem = {
-        // Default settings
-        id: shortid.generate(),
-        widget: 'Unknown',
-        config: {},
-        ...widgetSizeByType('Unknown'),
-        // Actual settings
+        ...this.defaultItem(),
         ...partial,
-        // Item order is set here
-        order: this.items.length + 1,
       };
       await createDashboardItem(
         this.$store,
@@ -172,7 +180,7 @@ export default class DashboardPage extends Vue {
       );
       Notify.create({
         type: 'positive',
-        message: `Added ${displayNameByType(item.widget)} "${item.id}"`,
+        message: `Added ${displayNameById(this.$store, item.widget)} "${item.id}"`,
       });
     } catch (e) {
       Notify.create(`Failed to add widget: ${e.toString()}`);
@@ -274,5 +282,7 @@ export default class DashboardPage extends Vue {
   background: $block-background;
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 </style>

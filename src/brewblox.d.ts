@@ -6,8 +6,6 @@ type env = {
 
 // interface for plugin arguments
 interface PluginArguments {
-  app: any;
   store: any;
-  Vue: any;
   router: any;
 }

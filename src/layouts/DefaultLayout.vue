@@ -18,7 +18,7 @@ import {
   removeService as removeServiceInStore,
 } from '@/store/services/actions';
 import { Service } from '@/store/services/state';
-import { allServices } from '@/store/services/getters';
+import { serviceValues } from '@/store/services/getters';
 import WidgetModal from '@/components/Widget/WidgetModal.vue';
 import NewServiceWizard from '@/components/Wizard/NewServiceWizard.vue';
 
@@ -49,7 +49,7 @@ export default class DefaultLayout extends Vue {
   }
 
   get services() {
-    return [...allServices(this.$store)].sort(byOrder);
+    return [...serviceValues(this.$store)].sort(byOrder);
   }
 
   set services(services: Service[]) {

@@ -2,13 +2,10 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Notify } from 'quasar';
-
-import { allBlocks } from '@/services/Spark/store/getters';
-
+import { allBlocks } from '@/plugins/spark/store/getters';
 import { DashboardItem } from '@/store/dashboards/state';
 import { allDashboardItems, dashboardItemById } from '@/store/dashboards/getters';
-
-import { allFeatureTypes, wizardByType, displayNameByType } from '@/services/feature-by-type';
+import { displayNameById } from '@/store/features/getters';
 
 @Component({
   components: {},
@@ -28,7 +25,7 @@ export default class CopyWidgetWizard extends Vue {
       .filter(item => item.id.match(this.searchModel))
       .map(item => ({
         id: item.id,
-        displayName: displayNameByType(item.widget),
+        displayName: displayNameById(this.$store, item.widget),
       }));
   }
 

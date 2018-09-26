@@ -6,19 +6,12 @@ import { DashboardItem } from '@/store/dashboards/state';
 import { dashboardItemById } from '@/store/dashboards/getters';
 
 import {
-  allFeatureTypes,
-  wizardByType,
-  displayNameByType,
-} from '@/services/feature-by-type';
-
-const allWidgetWizards = allFeatureTypes()
-  .filter(wizardByType)
-  .reduce((acc: any, type: string) => ({ ...acc, type: wizardByType(type) }), {});
+  featureIds,
+  wizardById,
+  displayNameById,
+} from '@/store/features/getters';
 
 @Component({
-  components: {
-    ...allWidgetWizards,
-  },
   props: {
     onCreateItem: {
       type: Function,
@@ -27,62 +20,36 @@ const allWidgetWizards = allFeatureTypes()
   },
 })
 export default class NewWidgetWizard extends Vue {
-  widgetId: string = '';
+  featureId: string = '';
   searchModel: string = '';
-  featureWizard: VueConstructor | null = null;
 
   get wizardOptions() {
-    return allFeatureTypes()
-      .filter(wizardByType)
-      .filter(type => displayNameByType(type).match(this.searchModel))
-      .map(type => ({
-        label: displayNameByType(type),
-        value: wizardByType(type),
-      }));
-  }
-
-  get widgetIdError() {
-    if (!this.widgetId) {
-      return 'ID must not be empty';
-    }
-    if (dashboardItemById(this.$store, this.widgetId)) {
-      return 'ID must be unique';
-    }
-    return null;
-  }
-
-  get featureWizardActive() {
-    return this.featureWizard !== null;
+    return featureIds(this.$store)
+      .map(id => ({
+        label: displayNameById(this.$store, id),
+        value: id,
+      }))
+      .filter(opt =>
+        wizardById(this.$store, opt.value)
+        && opt.label.match(this.searchModel));
   }
 
   get wizardComponent() {
-    return this.featureWizard;
+    return wizardById(this.$store, this.featureId);
   }
 
-  set wizardComponent(component: VueConstructor | null) {
-    this.featureWizard = component;
-  }
-
-  selectFeature(wizard: VueConstructor) {
-    if (this.widgetIdError !== null) {
-      Notify.create(this.widgetIdError);
-      return;
-    }
-    this.wizardComponent = wizard;
+  selectFeature(id: string) {
+    this.featureId = id;
   }
 
   onCreate(partial: Partial<DashboardItem>) {
-    this.$props.onCreateItem({
-      ...partial,
-      id: this.widgetId,
-    });
+    this.$props.onCreateItem(partial);
     this.reset();
   }
 
   reset() {
-    this.widgetId = '';
+    this.featureId = '';
     this.searchModel = '';
-    this.wizardComponent = null;
   }
 
   mounted() {
@@ -94,28 +61,19 @@ export default class NewWidgetWizard extends Vue {
 <template>
   <div class="layout-padding">
 
-    <q-item v-if="featureWizardActive">
+    <!-- display wizard -->
+    <q-item v-if="wizardComponent">
       <component
-        v-if="featureWizardActive"
-        :is="featureWizard"
+        v-if="wizardComponent"
+        :is="wizardComponent"
+        :featureId="featureId"
         :onCreateItem="onCreate"
         :onCancel="reset"
       />
     </q-item>
+
     <!-- Select a wizard -->
     <q-item v-else>
-      <q-field
-        label="Widget ID"
-        icon="create"
-        orientation="vertical"
-      >
-        <q-input
-          v-model="widgetId"
-          placeholder="Enter a widget ID"
-          :error="widgetIdError !== null"
-          :suffix="widgetIdError"
-        />
-      </q-field>
 
       <q-field
         label="Select a widget type"
@@ -133,7 +91,7 @@ export default class NewWidgetWizard extends Vue {
             icon="widgets"
             v-for="opt in wizardOptions"
             :key="opt.label"
-            @click.native="selectFeature(opt.value)"
+            @click.native="() => { featureId = opt.value; }"
           >
             <div class="row">
               <q-item-main>

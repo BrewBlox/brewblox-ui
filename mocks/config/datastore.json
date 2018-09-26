@@ -84,7 +84,7 @@
       "order": 1,
       "cols": 3,
       "rows": 3,
-      "widget": "SensorSetPointPair",
+      "widget": "SetpointSensorPair",
       "config": {
         "serviceId": "sparkey",
         "blockId": "BLARGH"
@@ -129,10 +129,21 @@
       "order": 1,
       "cols": 4,
       "rows": 2,
-      "widget": "SetPointSimple",
+      "widget": "SetpointSimple",
       "config": {
         "serviceId": "sparkey",
         "blockId": "setpoint-1"
+      }
+    },
+    {
+      "id": "pid-widget",
+      "order": 2,
+      "cols": 4,
+      "rows": 4,
+      "widget": "Pid",
+      "config": {
+        "serviceId": "sparkey",
+        "blockId": "pid-1"
       }
     }
   ],
@@ -142,7 +153,8 @@
       "title": "Home Dashboard",
       "order": 1,
       "items": [
-        "setpoint-widget"
+        "setpoint-widget",
+        "pid-widget"
       ]
     },
     {

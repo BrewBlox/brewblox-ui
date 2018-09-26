@@ -1,13 +1,14 @@
-export default abstract class Unit {
+export default class Unit {
   value: number;
-  unit: string = '';
+  unit: string;
 
-  constructor(value: number) {
+  constructor(value: number, unit: string) {
     this.value = value;
+    this.unit = unit;
   }
 
   get unitNotation(): string {
-    return '';
+    return this.unit;
   }
 
   get roundedValue(): string {

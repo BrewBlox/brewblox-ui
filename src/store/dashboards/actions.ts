@@ -13,7 +13,7 @@ import {
 } from './api';
 
 import { DashboardState, DashboardItem, DashboardContext, Dashboard } from './state';
-import { State as RootState } from '../state';
+import { RootState } from '../state';
 
 import {
   dashboardItemById as getDashboardItemInStore,
@@ -37,14 +37,12 @@ const { dispatch } = getStoreAccessors<DashboardState, RootState>('dashboards');
 const actions = {
   addNewDashboard(context: DashboardContext, title: string) {
     const id = new UrlSafeString().generate(title);
-
     const dashboard = {
       id,
       title,
       order: Object.keys(context.state.dashboards).length + 1,
       items: [],
     };
-
     addDashboardToStore(context, dashboard);
     createDashboardOnApi(dashboard);
   },

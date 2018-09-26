@@ -1,23 +1,21 @@
-import { map } from 'lodash';
-
 import { getStoreAccessors } from 'vuex-typescript';
 
-import { State as RootState, RootStore } from '../state';
-import { ServicesState, Service, ServicesContext } from './state';
+import { RootState, RootStore } from '../state';
+import { ServiceState, Service, ServicesContext } from './state';
 
-const { read } = getStoreAccessors<ServicesState, RootState>('services');
+const { read } = getStoreAccessors<ServiceState, RootState>('services');
 
 const getters = {
-  services: (state: ServicesState): { [id: string]: Service } => state.services,
-  serviceIds: (state: ServicesState): string[] => Object.keys(state.services),
-  serviceValues: (state: ServicesState): Service[] => Object.values(state.services),
-  isFetching: (state: ServicesState): boolean => state.fetching,
+  services: (state: ServiceState): { [id: string]: Service } => state.services,
+  serviceIds: (state: ServiceState): string[] => Object.keys(state.services),
+  serviceValues: (state: ServiceState): Service[] => Object.values(state.services),
+  isFetching: (state: ServiceState): boolean => state.fetching,
 };
 
 const services = read(getters.services);
 
 export const serviceIds = read(getters.serviceIds);
-export const allServices = read(getters.serviceValues);
+export const serviceValues = read(getters.serviceValues);
 export const isFetching = read(getters.isFetching);
 
 export function serviceById<T extends Service>(

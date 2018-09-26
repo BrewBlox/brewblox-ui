@@ -1,6 +1,6 @@
 import { ActionContext } from 'vuex';
 
-import { State as RootState } from '../state';
+import { RootState } from '../state';
 
 export interface Dashboard {
   id: string;
@@ -11,7 +11,6 @@ export interface Dashboard {
 
 export interface DashboardItem {
   id: string;
-  order: number;
   cols: number;
   rows: number;
   widget: string;

@@ -4,7 +4,7 @@
     "profiles": [
       0
     ],
-    "type": "SetPointSimple",
+    "type": "SetpointSimple",
     "data": {
       "setting": 21
     }
@@ -14,15 +14,15 @@
     "profiles": [
       0
     ],
-    "type": "SetPointSimple",
+    "type": "SetpointSimple",
     "data": {
-      "setting": 1
+      "setting": 50
     }
   },
   {
     "id": "setpoint-inactive",
     "profiles": [],
-    "type": "SetPointSimple",
+    "type": "SetpointSimple",
     "data": {
       "setting": 3
     }
@@ -32,12 +32,10 @@
     "profiles": [
       0
     ],
-    "type": "OneWireTempSensor",
+    "type": "TempSensorMock",
     "data": {
-      "address": "DEADBEEF",
-      "offset": 0,
       "value[celsius]": 20.89789201,
-      "connected": true
+      "valid": true
     }
   },
   {
@@ -45,42 +43,60 @@
     "profiles": [
       0
     ],
-    "type": "SensorSetPointPair",
+    "type": "SetpointSensorPair",
     "data": {
-      "sensor<>": "sensor-1",
-      "setpoint<>": "setpoint-1"
+      "sensorId<>": "sensor-1",
+      "setpointId<>": "setpoint-1",
+      "setpointValid": true,
+      "sensorValid": true,
+      "setpointValue": 0,
+      "sensorValue": 0
     }
   },
   {
-    "id": "PID-1",
+    "id": "actuator-1",
+    "profiles": [
+      0
+    ],
+    "type": "ActuatorAnalogMock",
+    "data": {
+      "valid": true,
+      "setting": 20,
+      "minSetting": 10,
+      "maxSetting": 30,
+      "value": 50,
+      "minValue": 40,
+      "maxValue": 60
+    }
+  },
+  {
+    "id": "pid-1",
     "profiles": [
       0
     ],
     "type": "Pid",
     "data": {
-      "settings": {
-        "kp": 10,
-        "ti": 600,
-        "td": 60
-      },
-      "links": {
-        "input<>": "sensor-setpoint-pair-1"
-      },
-      "filtering": {
-        "input": 3,
-        "derivative": 4
-      },
-      "state": {
-        "inputValue": 21.0859,
-        "inputSetting": 20,
-        "outputValue": 45.6758,
-        "p": 10.7813,
-        "i": 34.8164,
-        "d": 0.0781,
-        "derivative": 0.001301666667,
-        "integral": 20889.84,
-        "error": -1.0781
-      }
+      "inputId<>": "sensor-1",
+      "outputId<>": "actuator-1",
+      "inputValid": true,
+      "outputValid": true,
+      "inputValue": 0,
+      "inputSetting": 10,
+      "outputValue": 20,
+      "outputSetting": 30,
+      "filter": "FILT_30s",
+      "filterThreshold": 50,
+      "enabled": true,
+      "active": true,
+      "kp": 60,
+      "ti": 70,
+      "td": 80,
+      "p": 90,
+      "i": 100,
+      "d": 110,
+      "error": 120,
+      "integral": 130,
+      "derivative": 140
     }
   }
 ]

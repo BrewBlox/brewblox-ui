@@ -5,22 +5,15 @@ import { Notify } from 'quasar';
 import { Service } from '@/store/services/state';
 import { serviceById, serviceIds } from '@/store/services/getters';
 import { createService } from '@/store/services/actions';
-
 import {
-  allServiceTypes,
-  wizardByType,
-  displayNameByType,
-} from '@/services/service-by-type';
+  providerIds,
+  wizardById,
+  displayNameById,
+  initializerById,
+  fetcherById,
+} from '@/store/providers/getters';
 
-const allServiceWizards = allServiceTypes()
-  .filter(wizardByType)
-  .reduce((acc: any, type: string) => ({ ...acc, type: wizardByType(type) }), {});
-
-@Component({
-  components: {
-    ...allServiceWizards,
-  },
-})
+@Component
 export default class NewServiceWizard extends Vue {
   serviceId: string = '';
   serviceTitle: string = '';
@@ -28,13 +21,12 @@ export default class NewServiceWizard extends Vue {
   serviceWizard: VueConstructor | null = null;
 
   get wizardOptions() {
-    return allServiceTypes()
-      .filter(wizardByType)
-      .filter(type => displayNameByType(type).match(this.searchModel))
-      .map(type => ({
-        label: displayNameByType(type),
-        value: wizardByType(type),
-      }));
+    return providerIds(this.$store)
+      .map(id => ({
+        label: displayNameById(this.$store, id),
+        value: wizardById(this.$store, id),
+      }))
+      .filter(opt => opt.value && opt.label.match(this.searchModel));
   }
 
   get existingIds() {
@@ -71,7 +63,7 @@ export default class NewServiceWizard extends Vue {
     this.wizardComponent = wizard;
   }
 
-  onCreate(partial: Partial<Service>) {
+  async onCreate(partial: Partial<Service>) {
     const service: Service = {
       id: this.serviceId,
       title: this.serviceTitle,
@@ -84,9 +76,11 @@ export default class NewServiceWizard extends Vue {
     this.reset();
     Notify.create({
       type: 'positive',
-      position: 'top',
-      message: `Added ${displayNameByType(service.type)} "${service.title}"`,
+      position: 'center',
+      message: `Added ${displayNameById(this.$store, service.type)} "${service.title}"`,
     });
+    await initializerById(this.$store, service.type)(this.$store, service);
+    await fetcherById(this.$store, service.type)(this.$store, service);
   }
 
   reset() {

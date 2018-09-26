@@ -6,7 +6,7 @@ import {
   MutationHandlerNoPayload,
   MutationHandlerWithPayload,
 } from 'vuex-typescript';
-import { RootStore, State as RootState } from '@/store/state';
+import { RootStore, RootState } from '@/store/state';
 
 export const serviceAvailable = (store: RootStore, serviceId: string) =>
   !!(store as any).state[serviceId];
