@@ -32,14 +32,16 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
       :onClose="() => { this.modalOpen = false; }"
       :title="$props.id"
     >
-      TODO
+      <actuator-analog-mock-form
+        v-model="block"
+      />
     </widget-modal>
 
     <widget-toolbar
       :name="$props.id"
       :type="$props.type"
       :on-refresh="refreshBlock"
-      :on-settings="() => { this.modalOpen = true }"
+      :on-settings="() => { this.modalOpen = true; }"
     />
 
     <q-scroll-area class="widget-body">

@@ -1,6 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { get } from 'lodash';
 import { Notify } from 'quasar';
 import { dashboardItemById } from '@/store/dashboards/getters';
 import { serviceValues } from '@/store/services/getters';
@@ -35,7 +36,8 @@ interface NavAction {
 })
 export default class BlockWizard extends Vue {
   $q: any;
-  currentStep: string = 'start';
+  currentStep: string = '';
+  blockAction: 'create' | 'existing' | null = null;
 
   widgetId: string = '';
   blockId: string = '';
@@ -44,12 +46,6 @@ export default class BlockWizard extends Vue {
 
   get stepper(): any {
     return this.$refs.stepper;
-  }
-
-  notifyError(error: string | null) {
-    if (error) {
-      Notify.create(error);
-    }
   }
 
   get navigation(): { [id: string]: NavAction[] } {
@@ -62,25 +58,31 @@ export default class BlockWizard extends Vue {
         },
         {
           label: 'Create new block',
-          click: () => this.stepper.goToStep('create'),
+          click: () => {
+            this.blockAction = 'create';
+            this.stepper.goToStep('create');
+          },
           enabled: () => !this.widgetIdError && this.service !== null,
         },
         {
           label: 'Use existing block',
-          click: () => this.stepper.goToStep('existing'),
+          click: () => {
+            this.blockAction = 'existing';
+            this.stepper.goToStep('existing');
+          },
           enabled: () => !this.widgetIdError && this.service !== null,
         },
       ],
       create: [
         {
           label: 'Back',
-          click: () => this.stepper.reset(),
+          click: () => this.resetStepper(),
           enabled: () => true,
         },
         {
           label: 'Configure block',
           click: () => {
-            // this.block = defaultBlock()
+            this.block = this.placeholderBlock();
             this.stepper.goToStep('config');
           },
           enabled: () => !this.blockIdError,
@@ -89,7 +91,7 @@ export default class BlockWizard extends Vue {
       existing: [
         {
           label: 'Back',
-          click: () => this.stepper.reset(),
+          click: () => this.resetStepper(),
           enabled: () => true,
         },
         {
@@ -101,13 +103,13 @@ export default class BlockWizard extends Vue {
       config: [
         {
           label: 'Back',
-          click: () => this.stepper.reset(),
+          click: () => this.stepper.previous(),
           enabled: () => true,
         },
         {
           label: 'Finish',
-          click: () => this.create(),
-          enabled: () => true,
+          click: () => this.createWidget(),
+          enabled: () => Object.keys(get(this, 'block.data', {})).length > 0,
         },
       ],
     };
@@ -156,10 +158,22 @@ export default class BlockWizard extends Vue {
   }
 
   get blockFormComponent() {
-    return this.block ? formById(this.$store, this.block.type) : '';
+    return this.block
+      ? formById(this.$store, this.block.type)
+      : '';
   }
 
-  async create() {
+  placeholderBlock(): Block {
+    return {
+      id: this.blockId,
+      serviceId: (this.service as Service).id,
+      type: this.$props.featureId,
+      profiles: [0],
+      data: {},
+    };
+  }
+
+  async createWidget() {
     const service = this.service as Service;
     const block = this.block as Block;
 
@@ -179,8 +193,17 @@ export default class BlockWizard extends Vue {
     this.$props.onCreateItem(item);
   }
 
-  mounted() {
+  resetStepper() {
     this.stepper.reset();
+    this.blockAction = null;
+  }
+
+  mounted() {
+    this.widgetId = '';
+    this.blockId = '';
+    this.service = null;
+    this.block = null;
+    this.resetStepper();
   }
 }
 </script>
@@ -195,11 +218,11 @@ export default class BlockWizard extends Vue {
     <q-step
       default
       name="start"
-      title="Widget Info"
+      title="Widget info"
     >
 
       <q-field
-        label="Widget Name"
+        label="Widget name"
         icon="create"
         orientation="vertical"
       >
@@ -230,7 +253,8 @@ export default class BlockWizard extends Vue {
     <!-- create -->
     <q-step
       name="create"
-      title="Create Block"
+      title="Create block"
+      v-if="blockAction === 'create'"
     >
       <q-field
         label="Block name"
@@ -250,6 +274,7 @@ export default class BlockWizard extends Vue {
     <q-step
       name="existing"
       title="Select block"
+      v-else-if="blockAction === 'existing'"
     >
       <q-field
         label="Service"
@@ -264,6 +289,13 @@ export default class BlockWizard extends Vue {
         />
       </q-field>
     </q-step>
+
+    <!-- placeholder -->
+    <q-step
+      name="placeholder"
+      title="Create or select block"
+      v-else
+    />
 
     <!-- configure -->
     <q-step
