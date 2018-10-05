@@ -4,6 +4,7 @@ import { RootStore } from '@/store/state';
 import { Feature } from '@/store/features/state';
 import widget from './GraphWidget.vue';
 import wizard from './GraphWizard.vue';
+import form from './GraphForm.vue';
 import { GraphConfig } from '@/plugins/history/state';
 
 const validator = (store: RootStore, config: GraphConfig) =>
@@ -15,6 +16,7 @@ const feature: Feature = {
   displayName: 'History graph',
   widget: ref(widget),
   wizard: ref(wizard),
+  form: ref(form),
   widgetSize: {
     cols: 10,
     rows: 5,

@@ -5,7 +5,7 @@ import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 import WidgetModal from '@/components/Widget/WidgetModal.vue';
 import GraphDisplay from './GraphDisplay.vue';
 import { metricById, tryMetricById } from '@/plugins/history/store/getters';
-import { Metric, GraphConfig } from '@/plugins/history/state';
+import { Metric, GraphConfig, HistoryOptions } from '@/plugins/history/state';
 import { addPlotlyMetric, removeMetric } from './actions';
 import { PlotData, Layout } from 'plotly.js';
 
@@ -29,8 +29,12 @@ export default class GraphWidget extends Widget {
     return this.graphCfg.title;
   }
 
-  get options() {
+  get options(): HistoryOptions {
     return this.graphCfg.options;
+  }
+
+  set options(opts: HistoryOptions) {
+    this.$props.onConfigChange(this.$props.id, { ...this.graphCfg, options: opts });
   }
 
   get serviceId(): string {
@@ -88,7 +92,9 @@ export default class GraphWidget extends Widget {
       :onClose="() => { this.modalOpen = false; }"
       :title="$props.id"
     >
-      TODO
+      <GraphForm
+        v-model="options"
+      />
     </widget-modal>
 
     <widget-toolbar
@@ -99,7 +105,7 @@ export default class GraphWidget extends Widget {
     />
 
     <GraphDisplay
-      class="widget-body row"
+      class="widget-body"
       v-if="ready"
       :data="metricData"
       :layout="metricLayout"
