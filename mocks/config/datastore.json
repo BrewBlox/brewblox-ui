@@ -117,11 +117,16 @@
       "order": 1,
       "cols": 10,
       "rows": 5,
-      "widget": "Metrics",
+      "widget": "Graph",
       "config": {
-        "name": "Metrics View",
+        "title": "Graph View",
         "serviceId": "history",
-        "metrics": []
+        "options": {
+          "measurement": "sparkey",
+          "keys": [
+            "__time/millisSinceBoot"
+          ]
+        }
       }
     },
     {

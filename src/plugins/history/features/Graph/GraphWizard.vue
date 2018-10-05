@@ -11,6 +11,7 @@ import {
   displayNameById as featureNameById,
 } from '@/store/features/getters';
 import { displayNameById } from '@/store/providers/getters';
+import { typeName } from '@/plugins/history/store/getters';
 
 interface NavAction {
   label: string;
@@ -34,7 +35,7 @@ interface NavAction {
     },
   },
 })
-export default class MetricsWizard extends Vue {
+export default class GraphWizard extends Vue {
   currentStep: string = '';
   widgetId: string = '';
   service: Service | null = null;
@@ -62,7 +63,7 @@ export default class MetricsWizard extends Vue {
 
   get serviceOpts() {
     return serviceValues(this.$store)
-      .filter(service => service.type === 'History')
+      .filter(service => service.type === typeName)
       .map(service => ({
         label: service.title,
         value: service,
