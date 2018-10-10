@@ -19,22 +19,17 @@ export interface HistoryOptions {
 
 export type Slice = number[];
 
+export interface QueryResult {
+  name: string;
+  columns: string[];
+  values: Slice[];
+}
+
 export interface Metric {
   id: string;
   serviceId: string;
+  transformer: (metric: Metric, result: QueryResult) => Metric;
   options: HistoryOptions;
-  transformer: (metric: Metric, slices: Slice[]) => Metric;
   source?: EventSource;
-  config?: any;
   values?: any;
-}
-
-export interface GraphConfig {
-  title: string;
-  serviceId: string;
-  options: HistoryOptions;
-}
-
-export interface HistoryItem extends DashboardItem {
-  config: GraphConfig;
 }

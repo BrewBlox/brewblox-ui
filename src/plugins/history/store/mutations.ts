@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { commit } from '@/helpers/dynamic-store';
 import { HistoryState } from './state';
-import { Metric, Slice } from '@/plugins/history/state';
+import { Metric, QueryResult } from '@/plugins/history/state';
 
 const mutations = {
   add: (state: HistoryState, metric: Metric) =>
@@ -19,21 +19,21 @@ const mutations = {
     Vue.set(state.metrics, id, { ...existing, ...metric });
   },
 
-  transform: (state: HistoryState, { id, slices }: { id: string, slices: Slice[] }) => {
+  transform: (state: HistoryState, { id, result }: { id: string, result: QueryResult }) => {
     const metric: Metric = state.metrics[id];
     if (metric !== undefined) {
-      Vue.set(state.metrics, id, { ...metric.transformer(metric, slices) });
+      Vue.set(state.metrics, id, { ...metric.transformer(metric, result) });
     }
   },
 
-  setAvailableKeys: (state: HistoryState, keys: string[]) =>
-    Vue.set(state, 'availableKeys', [...keys]),
+  setAvailableFields: (state: HistoryState, fields: { [id: string]: string[] }) =>
+    Vue.set(state, 'availableFields', { ...fields }),
 };
 
 export const addMetric = commit(mutations.add);
 export const removeMetric = commit(mutations.remove);
 export const updateMetric = commit(mutations.update);
 export const transformMetric = commit(mutations.transform);
-export const mutateAvailableKeys = commit(mutations.setAvailableKeys);
+export const mutateAvailableKeys = commit(mutations.setAvailableFields);
 
 export default mutations;

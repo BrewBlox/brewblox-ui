@@ -12,7 +12,7 @@ const vuexModule = () => ({
   namespaced: true,
   strict: true,
   state: {
-    availableKeys: [],
+    availableFields: {},
     metrics: {},
   },
 });

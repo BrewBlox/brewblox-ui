@@ -1,6 +1,6 @@
 import { RootStore } from '@/store/state';
 import { addMetric } from '@/plugins/history/store/actions';
-import { HistoryOptions, Slice, Metric } from '@/plugins/history/state';
+import { HistoryOptions, Metric, QueryResult } from '@/plugins/history/state';
 
 export { removeMetric } from '@/plugins/history/store/actions';
 
@@ -25,17 +25,27 @@ const boundedConcat = (
 
 const transformer = (
   metric: Metric,
-  slices: Slice[],
+  result: QueryResult,
 ) => {
-  if (slices && slices.length > 0) {
-    const columns = transpose(slices);
-    const time = columns[0].map(toMicroSeconds);
-    metric.options.keys
-      .forEach((key: string, idx: number) => {
-        const value = metric.values[key] || { type: 'scatter', x: [], y: [] };
-        value.x = boundedConcat(value.x, time);
-        value.y = boundedConcat(value.y, columns[idx + 1]);
-        metric.values[key] = value;
+  if (result.values && result.values.length > 0) {
+    const resultCols = transpose(result.values);
+    const time = resultCols[0].map(toMicroSeconds);
+
+    result
+      .columns
+      .forEach((col: string, idx: number) => {
+        if (idx === 0) {
+          return; // skip time
+        }
+        const key = `${result.name}/${col}`;
+        const value = metric.values[key] || {};
+        metric.values[key] = {
+          type: 'scatter',
+          ...value,
+          name: key,
+          x: boundedConcat(value.x, time),
+          y: boundedConcat(value.y, resultCols[idx]),
+        };
       });
   }
   return metric;
@@ -46,13 +56,11 @@ export const addPlotlyMetric = async (
   id: string,
   serviceId: string,
   options: HistoryOptions,
-  config: any,
 ) =>
   addMetric(store, serviceId, {
     id,
     serviceId,
-    options,
-    config,
     transformer,
+    options,
     values: {},
   });

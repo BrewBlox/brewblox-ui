@@ -3,7 +3,9 @@ import { RootState } from '@/store/state';
 import { Metric } from '@/plugins/history/state';
 
 export type HistoryState = {
-  availableKeys: string[];
+  availableFields: {
+    [measurement: string]: string[];
+  };
   metrics: {
     [id: string]: Metric;
   };

@@ -1,6 +1,7 @@
 import queryString from 'query-string';
 import { post, sse } from '@/helpers/fetch';
 import { Slice, HistoryOptions } from '@/plugins/history/state';
+import { defaultMaxPoints } from './getters';
 
 const snakeCased = (obj: any) =>
   Object.keys(obj)
@@ -29,8 +30,8 @@ const fetchData = async (serviceId: string, endpoint: string, payload: any = {})
 
 export const fetchValueSource = async (serviceId: string, options: HistoryOptions) =>
   sse(`/${serviceId}/sse/values?${queryString.stringify({
-    measurement: options.measurement,
-    keys: options.keys,
+    approx_points: defaultMaxPoints,
+    ...options,
   })}`);
 
 export const fetchValues = async (
@@ -41,5 +42,4 @@ export const fetchValues = async (
     .then(response => (response.values || []));
 
 export const fetchKnownKeys = async (serviceId: string) =>
-  fetchData(serviceId, '/query/objects')
-    .then(convertToFlatPaths);
+  fetchData(serviceId, '/query/objects');
