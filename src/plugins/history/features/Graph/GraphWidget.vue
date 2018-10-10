@@ -30,10 +30,6 @@ export default class GraphWidget extends Widget {
     this.$props.onConfigChange(this.$props.id, { ...cfg });
   }
 
-  get title() {
-    return this.graphCfg.title;
-  }
-
   get options(): HistoryOptions[] {
     return this.graphCfg.options;
   }

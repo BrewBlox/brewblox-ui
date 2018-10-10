@@ -12,6 +12,7 @@ import {
 } from '@/store/features/getters';
 import { displayNameById } from '@/store/providers/getters';
 import { typeName } from '@/plugins/history/store/getters';
+import { GraphConfig } from '@/plugins/history/features/Graph/state';
 
 interface NavAction {
   label: string;
@@ -39,6 +40,7 @@ export default class GraphWizard extends Vue {
   currentStep: string = '';
   widgetId: string = '';
   service: Service | null = null;
+  graphCfg: GraphConfig | null = null;
 
   get navigation(): { [id: string]: NavAction[] } {
     return {
@@ -49,9 +51,24 @@ export default class GraphWizard extends Vue {
           enabled: () => true,
         },
         {
+          label: 'Configure graph',
+          click: () => {
+            this.graphCfg = this.placeholderConfig();
+            this.stepper.goToStep('config');
+          },
+          enabled: () => !this.widgetIdError && this.service !== null,
+        },
+      ],
+      config: [
+        {
+          label: 'Back',
+          click: () => this.stepper.previous(),
+          enabled: () => true,
+        },
+        {
           label: 'Finish',
           click: () => this.createWidget(),
-          enabled: () => !this.widgetIdError && this.service !== null,
+          enabled: () => !!this.graphCfg,
         },
       ],
     };
@@ -80,16 +97,24 @@ export default class GraphWizard extends Vue {
     return null;
   }
 
+  get formComponent() {
+    return formById(this.$store, this.$props.featureId);
+  }
+
+  placeholderConfig(): GraphConfig {
+    return {
+      serviceId: (this.service as Service).id,
+      layout: {},
+      options: [],
+    };
+  }
+
   createWidget() {
     const service = this.service as Service;
     const item: DashboardItem = {
       id: this.widgetId,
       widget: this.$props.featureId,
-      config: {
-        name: featureNameById(this.$store, this.$props.featureId),
-        serviceId: service.id,
-        metrics: [],
-      },
+      config: this.graphCfg,
       ...widgetSizeById(this.$store, this.$props.featureId),
     };
     this.$props.onCreateItem(item);
@@ -108,6 +133,8 @@ export default class GraphWizard extends Vue {
     ref="stepper"
     v-model="currentStep"
   >
+
+    <!-- start -->
     <q-step
       default
       name="start"
@@ -140,6 +167,19 @@ export default class GraphWizard extends Vue {
         />
       </q-field>
 
+    </q-step>
+
+
+    <!-- configure -->
+    <q-step
+      name="config"
+      title="Configure graph"
+    >
+      <component
+        v-if="graphCfg"
+        v-model="graphCfg"
+        :is="formComponent"
+      />
     </q-step>
 
     <q-stepper-navigation>

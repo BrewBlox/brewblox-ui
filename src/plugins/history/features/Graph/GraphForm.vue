@@ -3,7 +3,10 @@ import Component from 'vue-class-component';
 import HistoryForm from '@/plugins/history/components/HistoryForm';
 import WidgetField from '@/components/Widget/WidgetField.vue';
 import { HistoryOptions } from '@/plugins/history/state';
-import { fields as availableFields } from '@/plugins/history/store/getters';
+import {
+  fields as availableFields,
+  measurements as availableMeasurements,
+} from '@/plugins/history/store/getters';
 
 @Component({
   components: {
@@ -11,10 +14,20 @@ import { fields as availableFields } from '@/plugins/history/store/getters';
   },
 })
 export default class GraphForm extends HistoryForm {
+  $q: any;
+
   get inputMapping() {
     return {
       options: { path: 'options', default: [] },
     };
+  }
+
+  get hasOptions() {
+    return this.inputValues.options.length > 0;
+  }
+
+  get sharedOptions(): HistoryOptions {
+    return this.inputValues.options[0] || {};
   }
 
   get knownFields() {
@@ -26,6 +39,10 @@ export default class GraphForm extends HistoryForm {
 
   fieldSections = (field: string) =>
     field.split('/');
+
+  updateSharedOption(key: string, val: any) {
+    this.inputValues.options.forEach((opt: HistoryOptions) => this.$set(opt, key, val));
+  }
 
   optionFields(opt: HistoryOptions) {
     return this.knownFields[opt.measurement] || [];
@@ -55,17 +72,43 @@ export default class GraphForm extends HistoryForm {
 
     return this.optionFields(opt)
       .filter(fkey => fkey.startsWith(pattern))
-      .map(fkey => fkey.split('/')[idx])
+      .map(fkey => this.fieldSections(fkey)[idx])
       .filter(this.uniqueFilter)
       .map(section => ({ label: section, value: section }));
   }
 
   changeFieldSection(opt: HistoryOptions, fieldIndex: number, sectionIndex: number, val: string) {
     const sections = [
-      ...opt.fields[fieldIndex].split('/').slice(0, sectionIndex),
+      ...this.fieldSections(opt.fields[fieldIndex]).slice(0, sectionIndex),
       val,
     ];
     this.changeField(opt, fieldIndex, sections.join('/'));
+  }
+
+  addOptions() {
+    this.$q.dialog({
+      title: 'Add data source',
+      message: 'Select data source',
+      cancel: true,
+      options: {
+        type: 'radio',
+        model: 'opt2',
+        items: availableMeasurements(this.$store, this.config.serviceId)
+          .map(m => ({ label: m, value: m })),
+      },
+    }).then((m: string) =>
+      this.$set(
+        this.inputValues,
+        'options',
+        [
+          ...this.inputValues.options,
+          {
+            ...this.sharedOptions,
+            measurement: m,
+            fields: [],
+          },
+        ],
+      ));
   }
 }
 </script>
@@ -74,68 +117,76 @@ export default class GraphForm extends HistoryForm {
   <q-card orientation="vertical">
     <q-card-main class="column centered">
 
+      <!-- shared history options config -->
+      <widget-field
+        v-if="hasOptions"
+        icon="edit"
+        label="History settings"
+      >
+        <div class="options-edit-container">
+
+          <q-input
+            :value="sharedOptions.start"
+            @input="v => updateSharedOption('start', v)"
+            stack-label="Start"
+            clearable
+          >
+            <q-popover fit :offset="[0, 10]">
+              <q-datetime-picker
+                dark
+                format24h
+                type="datetime"
+                :value="sharedOptions.start"
+                @input="v => updateSharedOption('start', v)"
+              />
+            </q-popover>
+          </q-input>
+
+          <q-input
+            :value="sharedOptions.duration"
+            @input="v => updateSharedOption('duration', v)"
+            stack-label="Duration"
+            clearable
+          />
+
+          <q-input
+            :value="sharedOptions.end"
+            @input="v => updateSharedOption('end', v)"
+            stack-label="End"
+            clearable
+          >
+            <q-popover fit :offset="[0, 10]">
+              <q-datetime-picker
+                dark
+                format24h
+                type="datetime"
+                :value="sharedOptions.end"
+                @input="v => updateSharedOption('end', v)"
+              />
+            </q-popover>
+          </q-input>
+
+        </div>
+
+        <div class="options-edit-container">
+          <q-input
+            :value="sharedOptions.approxPoints"
+            @input="v => updateSharedOption('approxPoints', v)"
+            stack-label="Points after downsampling"
+            type="number"
+          />
+        </div>
+
+        <q-card-separator />
+      </widget-field>
+
+      <!-- history options fields -->
       <div
         v-for="opt in inputValues.options"
         :key="opt.measurement"
-
       >
-
         <widget-field
-          icon="edit"
-          :label="`${opt.measurement} settings`"
-        >
-          <div class="options-edit-container">
-
-            <q-input
-              v-model="opt.start"
-              stack-label="Start"
-              clearable
-            >
-              <q-popover fit :offset="[0, 10]">
-                <q-datetime-picker
-                  dark
-                  format24h
-                  type="datetime"
-                  v-model="opt.start"
-                />
-              </q-popover>
-            </q-input>
-
-            <q-input
-              v-model="opt.duration"
-              stack-label="Duration"
-              clearable
-            />
-
-            <q-input
-              v-model="opt.end"
-              stack-label="End"
-              clearable
-            >
-              <q-popover fit :offset="[0, 10]">
-                <q-datetime-picker
-                  dark
-                  format24h
-                  type="datetime"
-                  v-model="opt.end"
-                />
-              </q-popover>
-            </q-input>
-
-          </div>
-
-          <div class="options-edit-container">
-            <q-input
-              v-model="opt.approxPoints"
-              stack-label="Points after downsampling"
-              type="number"
-            />
-          </div>
-
-        </widget-field>
-
-        <widget-field
-          icon=""
+          icon="show_chart"
           :label="`${opt.measurement} fields`"
         >
           <div
@@ -167,29 +218,40 @@ export default class GraphForm extends HistoryForm {
           <q-btn
             icon="add"
             label="Add field"
-            color="primary"
             @click="addField(opt)"
           />
         </widget-field>
         <q-card-separator />
       </div>
 
-    <q-card-separator />
-    <q-card-actions align="end">
-      <q-btn
-        flat
-        label="Reset"
-        color="primary"
-        :disabled="!changed"
-        @click="cancelChanges"
-      />
-      <q-btn
-        flat
-        label="Save"
-        color="primary"
-        @click="confirmChanges"
-      />
-    </q-card-actions>
+      <!-- new source button -->
+      <widget-field
+        label="New source"
+        icon="add"
+      >
+        <q-btn
+          label="Add source"
+          @click="addOptions"
+        />
+      </widget-field>
+      <q-card-separator />
+
+      <!-- card actions -->
+      <q-card-actions align="end">
+        <q-btn
+          flat
+          label="Reset"
+          color="primary"
+          :disabled="!changed"
+          @click="cancelChanges"
+        />
+        <q-btn
+          flat
+          label="Save"
+          color="primary"
+          @click="confirmChanges"
+        />
+      </q-card-actions>
 
     </q-card-main>
   </q-card>

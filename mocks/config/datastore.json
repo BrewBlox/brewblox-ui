@@ -119,25 +119,38 @@
       "rows": 5,
       "widget": "Graph",
       "config": {
-        "title": "Graph View",
         "serviceId": "history",
         "layout": {},
         "options": [
           {
             "measurement": "sparkey",
-            "duration": "1m",
             "fields": [
               "__time/millisSinceBoot"
-            ]
+            ],
+            "duration": "1m",
+            "approxPoints": 100
           },
           {
             "measurement": "spock",
-            "approxPoints": 100,
             "fields": [
               "__time/millisSinceBoot"
-            ]
+            ],
+            "duration": "1m",
+            "approxPoints": 100
           }
         ]
+      }
+    },
+    {
+      "id": "empty-graph",
+      "order": 2,
+      "cols": 5,
+      "rows": 5,
+      "widget": "Graph",
+      "config": {
+        "serviceId": "history",
+        "layout": {},
+        "options": []
       }
     },
     {
@@ -178,7 +191,8 @@
       "title": "Metrics Dashboard",
       "order": 2,
       "items": [
-        "item-graph"
+        "item-graph",
+        "empty-graph"
       ]
     },
     {

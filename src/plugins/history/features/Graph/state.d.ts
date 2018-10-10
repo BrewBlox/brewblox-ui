@@ -3,7 +3,6 @@ import { HistoryOptions } from '@/plugins/history/state';
 import { Layout } from 'plotly.js';
 
 export interface GraphConfig {
-  title: string;
   serviceId: string;
   layout: Partial<Layout>;
   options: HistoryOptions[];
