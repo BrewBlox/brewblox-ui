@@ -105,7 +105,7 @@ export default class GraphForm extends HistoryForm {
           {
             ...this.sharedOptions,
             measurement: m,
-            fields: [],
+            fields: [''], // avoid initializing as "select * from {measurement}"
           },
         ],
       ));
