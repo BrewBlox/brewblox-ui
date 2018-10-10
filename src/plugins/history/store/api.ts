@@ -5,6 +5,7 @@ import { defaultMaxPoints } from './getters';
 
 const snakeCased = (obj: any) =>
   Object.keys(obj)
+    .filter(key => !!obj[key])
     .reduce(
       (acc: any, key: string) => {
         // camelCasedKey => camel_cased_key
@@ -19,10 +20,7 @@ const fetchData = async (serviceId: string, endpoint: string, payload: any = {})
   post(`/${serviceId}${endpoint}`, { ...payload });
 
 export const fetchValueSource = async (serviceId: string, options: HistoryOptions) =>
-  sse(`/${serviceId}/sse/values?${queryString.stringify({
-    approx_points: defaultMaxPoints,
-    ...options,
-  })}`);
+  sse(`/${serviceId}/sse/values?${queryString.stringify(snakeCased(options))}`);
 
 export const fetchValues = async (
   serviceId: string,

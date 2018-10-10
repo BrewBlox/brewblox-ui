@@ -132,6 +132,7 @@
           },
           {
             "measurement": "spock",
+            "approxPoints": 100,
             "fields": [
               "__time/millisSinceBoot"
             ]

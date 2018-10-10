@@ -21,6 +21,7 @@ const actions = {
     const source = await fetchValueSource(serviceId, options);
     source.onmessage = (event: MessageEvent) =>
       transformMetricInStore(context, serviceId, { id, result: JSON.parse(event.data) });
+    source.onerror = () => source.close();
 
     updateMetricInStore(context, metric.serviceId, { id, source });
   },

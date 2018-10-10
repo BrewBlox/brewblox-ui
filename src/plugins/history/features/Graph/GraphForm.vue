@@ -35,19 +35,19 @@ export default class GraphForm extends HistoryForm {
     return this.optionFields(opt).includes(field);
   }
 
-  addField(opt: HistoryOptions, val = '') {
-    this.$set(opt, 'keys', [...opt.fields, val]);
+  addField(opt: HistoryOptions) {
+    this.$set(opt, 'fields', [...opt.fields, '']);
   }
 
   removeField(opt: HistoryOptions, index: number) {
-    this.$set(opt, 'keys', opt.fields.filter((_, idx) => idx !== index));
+    this.$set(opt, 'fields', opt.fields.filter((_, idx) => idx !== index));
   }
 
   changeField(opt: HistoryOptions, index: number, val: string) {
     opt.fields[index] = this.fieldValid(opt, val)
       ? val
       : `${val}/`;
-    this.$set(opt, 'keys', [...opt.fields]);
+    this.$set(opt, 'fields', [...opt.fields]);
   }
 
   fieldSectionOptions(opt: HistoryOptions, field: string, idx: number) {
@@ -85,19 +85,53 @@ export default class GraphForm extends HistoryForm {
           :label="`${opt.measurement} settings`"
         >
           <div class="options-edit-container">
-          <q-input
-            v-model="opt.start"
-            stack-label="Start"
-          />
-          <q-input
-            v-model="opt.duration"
-            stack-label="Duration"
-          />
-          <q-input
-            v-model="opt.end"
-            stack-label="End"
-          />
+
+            <q-input
+              v-model="opt.start"
+              stack-label="Start"
+              clearable
+            >
+              <q-popover fit :offset="[0, 10]">
+                <q-datetime-picker
+                  dark
+                  format24h
+                  type="datetime"
+                  v-model="opt.start"
+                />
+              </q-popover>
+            </q-input>
+
+            <q-input
+              v-model="opt.duration"
+              stack-label="Duration"
+              clearable
+            />
+
+            <q-input
+              v-model="opt.end"
+              stack-label="End"
+              clearable
+            >
+              <q-popover fit :offset="[0, 10]">
+                <q-datetime-picker
+                  dark
+                  format24h
+                  type="datetime"
+                  v-model="opt.end"
+                />
+              </q-popover>
+            </q-input>
+
           </div>
+
+          <div class="options-edit-container">
+            <q-input
+              v-model="opt.approxPoints"
+              stack-label="Points after downsampling"
+              type="number"
+            />
+          </div>
+
         </widget-field>
 
         <widget-field
@@ -137,7 +171,7 @@ export default class GraphForm extends HistoryForm {
             @click="addField(opt)"
           />
         </widget-field>
-
+        <q-card-separator />
       </div>
 
     <q-card-separator />
