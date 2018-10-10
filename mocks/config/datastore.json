@@ -126,13 +126,13 @@
           {
             "measurement": "sparkey",
             "duration": "1m",
-            "keys": [
+            "fields": [
               "__time/millisSinceBoot"
             ]
           },
           {
             "measurement": "spock",
-            "keys": [
+            "fields": [
               "__time/millisSinceBoot"
             ]
           }

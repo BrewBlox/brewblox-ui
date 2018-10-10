@@ -7,7 +7,7 @@ export interface History extends Service {
 
 export interface HistoryOptions {
   measurement: string;
-  keys: string[];
+  fields: string[];
   database?: string;
   start?: string;
   duration?: string;

@@ -15,16 +15,6 @@ const snakeCased = (obj: any) =>
       {},
     );
 
-const convertToFlatPaths = (input: { [measurement: string]: string[] }) =>
-  Object.keys(input)
-    .reduce(
-      (acc: string[], key: string) => ([
-        ...acc,
-        ...input[key].map(item => `${key}/${item}`),
-      ]),
-      [],
-    );
-
 const fetchData = async (serviceId: string, endpoint: string, payload: any = {}) =>
   post(`/${serviceId}${endpoint}`, { ...payload });
 

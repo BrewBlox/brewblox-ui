@@ -36,18 +36,18 @@ export default class GraphForm extends HistoryForm {
   }
 
   addField(opt: HistoryOptions, val = '') {
-    this.$set(opt, 'keys', [...opt.keys, val]);
+    this.$set(opt, 'keys', [...opt.fields, val]);
   }
 
   removeField(opt: HistoryOptions, index: number) {
-    this.$set(opt, 'keys', opt.keys.filter((_, idx) => idx !== index));
+    this.$set(opt, 'keys', opt.fields.filter((_, idx) => idx !== index));
   }
 
   changeField(opt: HistoryOptions, index: number, val: string) {
-    opt.keys[index] = this.fieldValid(opt, val)
+    opt.fields[index] = this.fieldValid(opt, val)
       ? val
       : `${val}/`;
-    this.$set(opt, 'keys', [...opt.keys]);
+    this.$set(opt, 'keys', [...opt.fields]);
   }
 
   fieldSectionOptions(opt: HistoryOptions, field: string, idx: number) {
@@ -62,7 +62,7 @@ export default class GraphForm extends HistoryForm {
 
   changeFieldSection(opt: HistoryOptions, fieldIndex: number, sectionIndex: number, val: string) {
     const sections = [
-      ...opt.keys[fieldIndex].split('/').slice(0, sectionIndex),
+      ...opt.fields[fieldIndex].split('/').slice(0, sectionIndex),
       val,
     ];
     this.changeField(opt, fieldIndex, sections.join('/'));
@@ -106,7 +106,7 @@ export default class GraphForm extends HistoryForm {
         >
           <div
             class="options-edit-container"
-            v-for="(field, fieldIdx) in opt.keys"
+            v-for="(field, fieldIdx) in opt.fields"
             :key="fieldIdx"
           >
             <q-select
