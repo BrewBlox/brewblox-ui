@@ -5,7 +5,7 @@ import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 import WidgetModal from '@/components/Widget/WidgetModal.vue';
 import GraphDisplay from './GraphDisplay.vue';
 import { metricById, tryMetricById } from '@/plugins/history/store/getters';
-import { Metric, QueryParams } from '@/plugins/history/state';
+import { Metric, QueryParams, QueryTarget } from '@/plugins/history/state';
 import { addPlotlyMetric, removeMetric } from './actions';
 import { GraphConfig } from './state';
 import { PlotData, Layout } from 'plotly.js';
@@ -30,21 +30,25 @@ export default class GraphWidget extends Widget {
     this.$props.onConfigChange(this.$props.id, { ...cfg });
   }
 
-  get params(): QueryParams[] {
-    return this.graphCfg.params;
+  get params(): QueryParams {
+    return this.graphCfg.params || {};
+  }
+
+  get targets(): QueryTarget[] {
+    return this.graphCfg.targets || [];
   }
 
   get serviceId(): string {
     return this.graphCfg.serviceId;
   }
 
-  metricId(params: QueryParams): string {
-    return `${this.$props.id}/${params.measurement}`;
+  metricId(target: QueryTarget): string {
+    return `${this.$props.id}/${target.measurement}`;
   }
 
   get metrics(): Metric[] {
-    return this.params
-      .map(params => tryMetricById(this.$store, this.serviceId, this.metricId(params)))
+    return this.targets
+      .map(target => tryMetricById(this.$store, this.serviceId, this.metricId(target)))
       .filter(metric => metric !== null) as Metric[];
   }
 
@@ -63,9 +67,9 @@ export default class GraphWidget extends Widget {
   }
 
   addMetrics() {
-    this.params
-      .forEach(params =>
-        addPlotlyMetric(this.$store, this.metricId(params), this.serviceId, params));
+    this.targets
+      .forEach(target =>
+        addPlotlyMetric(this.$store, this.metricId(target), this.serviceId, this.params, target));
   }
 
   removeMetrics() {
@@ -94,7 +98,7 @@ export default class GraphWidget extends Widget {
       :onClose="() => { this.modalOpen = false; }"
       :title="$props.id"
     >
-      <GraphForm
+      <graph-form
         v-model="graphCfg"
       />
     </widget-modal>
@@ -106,15 +110,34 @@ export default class GraphWidget extends Widget {
       :on-settings="() => { this.modalOpen = true; }"
     />
 
-    <GraphDisplay
-      class="widget-body"
+    <graph-display
       v-if="ready"
+      class="widget-body"
       :data="metricData"
       :layout="metricLayout"
     />
+    <div
+      v-else
+      class="alert-container"
+    >
+      <q-alert
+        icon="warning"
+        color="warning"
+      >
+        No data
+      </q-alert>
+    </div>
+
 
   </div>
 </template>
 
 <style scoped>
+.alert-container {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
 </style>

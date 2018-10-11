@@ -2,7 +2,7 @@
 import Component from 'vue-class-component';
 import HistoryForm from '@/plugins/history/components/HistoryForm';
 import WidgetField from '@/components/Widget/WidgetField.vue';
-import { QueryParams } from '@/plugins/history/state';
+import { QueryParams, QueryTarget } from '@/plugins/history/state';
 import {
   fields as availableFields,
   measurements as availableMeasurements,
@@ -18,16 +18,13 @@ export default class GraphForm extends HistoryForm {
 
   get inputMapping() {
     return {
-      params: { path: 'params', default: [] },
+      params: { path: 'params', default: {} },
+      targets: { path: 'targets', default: [] },
     };
   }
 
-  get hasOptions() {
-    return this.inputValues.params.length > 0;
-  }
-
-  get sharedParams(): QueryParams {
-    return this.inputValues.params[0] || {};
+  get hasTargets() {
+    return this.inputValues.targets.length > 0;
   }
 
   get knownFields() {
@@ -40,52 +37,48 @@ export default class GraphForm extends HistoryForm {
   fieldSections = (field: string) =>
     field.split('/');
 
-  updateSharedOption(key: string, val: any) {
-    this.inputValues.params.forEach((params: QueryParams) => this.$set(params, key, val));
+  relevantKnownFields(target: QueryTarget) {
+    return this.knownFields[target.measurement] || [];
   }
 
-  optionFields(params: QueryParams) {
-    return this.knownFields[params.measurement] || [];
+  fieldValid(target: QueryTarget, field: string): boolean {
+    return this.relevantKnownFields(target).includes(field);
   }
 
-  fieldValid(params: QueryParams, field: string): boolean {
-    return this.optionFields(params).includes(field);
+  addField(target: QueryTarget) {
+    this.$set(target, 'fields', [...target.fields, '']);
   }
 
-  addField(params: QueryParams) {
-    this.$set(params, 'fields', [...params.fields, '']);
+  removeField(target: QueryTarget, index: number) {
+    this.$set(target, 'fields', target.fields.filter((_, idx) => idx !== index));
   }
 
-  removeField(params: QueryParams, index: number) {
-    this.$set(params, 'fields', params.fields.filter((_, idx) => idx !== index));
-  }
-
-  changeField(params: QueryParams, index: number, val: string) {
-    params.fields[index] = this.fieldValid(params, val)
+  changeField(target: QueryTarget, index: number, val: string) {
+    target.fields[index] = this.fieldValid(target, val)
       ? val
       : `${val}/`;
-    this.$set(params, 'fields', [...params.fields]);
+    this.$set(target, 'fields', [...target.fields]);
   }
 
-  fieldSectionOptions(params: QueryParams, field: string, idx: number) {
+  fieldSectionOptions(target: QueryTarget, field: string, idx: number) {
     const pattern = this.fieldSections(field).slice(0, idx).join('/');
 
-    return this.optionFields(params)
+    return this.relevantKnownFields(target)
       .filter(fkey => fkey.startsWith(pattern))
       .map(fkey => this.fieldSections(fkey)[idx])
       .filter(this.uniqueFilter)
       .map(section => ({ label: section, value: section }));
   }
 
-  changeFieldSection(params: QueryParams, fieldIndex: number, sectionIndex: number, val: string) {
+  changeFieldSection(target: QueryTarget, fieldIndex: number, sectionIndex: number, val: string) {
     const sections = [
-      ...this.fieldSections(params.fields[fieldIndex]).slice(0, sectionIndex),
+      ...this.fieldSections(target.fields[fieldIndex]).slice(0, sectionIndex),
       val,
     ];
-    this.changeField(params, fieldIndex, sections.join('/'));
+    this.changeField(target, fieldIndex, sections.join('/'));
   }
 
-  addOptions() {
+  addTarget() {
     this.$q.dialog({
       title: 'Add data source',
       message: 'Select data source',
@@ -99,11 +92,10 @@ export default class GraphForm extends HistoryForm {
     }).then((m: string) =>
       this.$set(
         this.inputValues,
-        'params',
+        'targets',
         [
-          ...this.inputValues.params,
+          ...this.inputValues.targets,
           {
-            ...this.sharedParams,
             measurement: m,
             fields: [''], // avoid initializing as "select * from {measurement}"
           },
@@ -119,15 +111,14 @@ export default class GraphForm extends HistoryForm {
 
       <!-- shared history params config -->
       <widget-field
-        v-if="hasOptions"
+        v-if="hasTargets"
         icon="edit"
         label="History settings"
       >
         <div class="options-edit-container">
 
           <q-input
-            :value="sharedParams.start"
-            @input="v => updateSharedOption('start', v)"
+            v-model="inputValues.params.start"
             stack-label="Start"
             clearable
           >
@@ -136,22 +127,19 @@ export default class GraphForm extends HistoryForm {
                 dark
                 format24h
                 type="datetime"
-                :value="sharedParams.start"
-                @input="v => updateSharedOption('start', v)"
+                v-model="inputValues.params.start"
               />
             </q-popover>
           </q-input>
 
           <q-input
-            :value="sharedParams.duration"
-            @input="v => updateSharedOption('duration', v)"
+            v-model="inputValues.params.duration"
             stack-label="Duration"
             clearable
           />
 
           <q-input
-            :value="sharedParams.end"
-            @input="v => updateSharedOption('end', v)"
+            v-model="inputValues.params.end"
             stack-label="End"
             clearable
           >
@@ -160,8 +148,7 @@ export default class GraphForm extends HistoryForm {
                 dark
                 format24h
                 type="datetime"
-                :value="sharedParams.end"
-                @input="v => updateSharedOption('end', v)"
+                v-model="inputValues.params.end"
               />
             </q-popover>
           </q-input>
@@ -170,8 +157,7 @@ export default class GraphForm extends HistoryForm {
 
         <div class="options-edit-container">
           <q-input
-            :value="sharedParams.approxPoints"
-            @input="v => updateSharedOption('approxPoints', v)"
+            v-model="inputValues.params.approxPoints"
             stack-label="Points after downsampling"
             type="number"
           />
@@ -180,31 +166,31 @@ export default class GraphForm extends HistoryForm {
         <q-card-separator />
       </widget-field>
 
-      <!-- history params fields -->
+      <!-- history target fields -->
       <div
-        v-for="params in inputValues.params"
-        :key="params.measurement"
+        v-for="target in inputValues.targets"
+        :key="target.measurement"
       >
         <widget-field
           icon="show_chart"
-          :label="`${params.measurement} fields`"
+          :label="`${target.measurement} fields`"
         >
           <div
             class="options-edit-container"
-            v-for="(field, fieldIdx) in params.fields"
+            v-for="(field, fieldIdx) in target.fields"
             :key="fieldIdx"
           >
             <q-select
               v-for="(section, sectionIdx) in fieldSections(field)"
               :key="sectionIdx"
-              :options="fieldSectionOptions(params, field, sectionIdx)"
+              :options="fieldSectionOptions(target, field, sectionIdx)"
               :value="section"
-              @change="val => changeFieldSection(params, fieldIdx, sectionIdx, val)"
+              @change="val => changeFieldSection(target, fieldIdx, sectionIdx, val)"
             />
             <q-icon
               name="check"
               color="positive"
-              v-if="fieldValid(params, field)"
+              v-if="fieldValid(target, field)"
             />
             <q-btn
               flat
@@ -212,13 +198,13 @@ export default class GraphForm extends HistoryForm {
               dense
               icon="delete"
               label="Remove field"
-              @click="removeField(params, fieldIdx)"
+              @click="removeField(target, fieldIdx)"
             />
           </div>
           <q-btn
             icon="add"
             label="Add field"
-            @click="addField(params)"
+            @click="addField(target)"
           />
         </widget-field>
         <q-card-separator />
@@ -231,7 +217,7 @@ export default class GraphForm extends HistoryForm {
       >
         <q-btn
           label="Add source"
-          @click="addOptions"
+          @click="addTarget"
         />
       </widget-field>
       <q-card-separator />

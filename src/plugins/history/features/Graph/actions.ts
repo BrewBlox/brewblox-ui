@@ -1,6 +1,6 @@
 import { RootStore } from '@/store/state';
 import { addMetric } from '@/plugins/history/store/actions';
-import { QueryParams, Metric, QueryResult } from '@/plugins/history/state';
+import { QueryParams, Metric, QueryResult, QueryTarget } from '@/plugins/history/state';
 import parseDuration from 'parse-duration';
 
 export { removeMetric } from '@/plugins/history/store/actions';
@@ -75,11 +75,13 @@ export const addPlotlyMetric = async (
   id: string,
   serviceId: string,
   params: QueryParams,
+  target: QueryTarget,
 ) =>
   addMetric(store, serviceId, {
     id,
     serviceId,
     transformer,
     params,
+    target,
     values: {},
   });

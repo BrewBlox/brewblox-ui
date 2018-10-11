@@ -6,8 +6,6 @@ export interface History extends Service {
 }
 
 export interface QueryParams {
-  measurement: string;
-  fields: string[];
   database?: string;
   start?: string;
   duration?: string;
@@ -15,6 +13,11 @@ export interface QueryParams {
   limit?: number;
   orderBy?: string;
   approxPoints?: number;
+}
+
+export interface QueryTarget {
+  measurement: string;
+  fields: string[];
 }
 
 export type Slice = number[];
@@ -30,6 +33,7 @@ export interface Metric {
   serviceId: string;
   transformer: (metric: Metric, result: QueryResult) => Metric;
   params: QueryParams;
+  target: QueryTarget;
   source?: EventSource;
   values?: any;
 }

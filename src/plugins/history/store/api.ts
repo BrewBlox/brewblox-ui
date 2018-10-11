@@ -1,7 +1,6 @@
 import queryString from 'query-string';
 import { post, sse } from '@/helpers/fetch';
-import { Slice, QueryParams } from '@/plugins/history/state';
-import { defaultMaxPoints } from './getters';
+import { Slice, QueryParams, QueryTarget } from '@/plugins/history/state';
 
 const snakeCased = (obj: any) =>
   Object.keys(obj)
@@ -19,15 +18,15 @@ const snakeCased = (obj: any) =>
 const fetchData = async (serviceId: string, endpoint: string, payload: any = {}) =>
   post(`/${serviceId}${endpoint}`, { ...payload });
 
-export const fetchValueSource = async (serviceId: string, params: QueryParams) =>
-  sse(`/${serviceId}/sse/values?${queryString.stringify(snakeCased(params))}`);
-
-export const fetchValues = async (
+export const fetchValueSource = async (
   serviceId: string,
   params: QueryParams,
-): Promise<Slice[]> =>
-  fetchData(serviceId, '/query/values', snakeCased(params))
-    .then(response => (response.values || []));
+  target: QueryTarget,
+) =>
+  sse(`/${serviceId}/sse/values?${queryString.stringify({
+    ...snakeCased(params),
+    ...snakeCased(target),
+  })}`);
 
 export const fetchKnownKeys = async (serviceId: string) =>
   fetchData(serviceId, '/query/objects');

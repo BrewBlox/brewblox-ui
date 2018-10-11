@@ -121,22 +121,22 @@
       "config": {
         "serviceId": "history",
         "layout": {},
-        "params": [
+        "params": {
+          "duration": "10m",
+          "approxPoints": 100
+        },
+        "targets": [
           {
             "measurement": "sparkey",
             "fields": [
               "__time/millisSinceBoot"
-            ],
-            "duration": "1m",
-            "approxPoints": 100
+            ]
           },
           {
             "measurement": "spock",
             "fields": [
               "__time/millisSinceBoot"
-            ],
-            "duration": "1m",
-            "approxPoints": 100
+            ]
           }
         ]
       }
