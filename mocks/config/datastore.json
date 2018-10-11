@@ -113,15 +113,44 @@
       }
     },
     {
-      "id": "item-metrics",
+      "id": "item-graph",
       "order": 1,
       "cols": 10,
       "rows": 5,
-      "widget": "Metrics",
+      "widget": "Graph",
       "config": {
-        "name": "Metrics View",
         "serviceId": "history",
-        "metrics": []
+        "layout": {},
+        "params": {
+          "duration": "10m",
+          "approxPoints": 100
+        },
+        "targets": [
+          {
+            "measurement": "sparkey",
+            "fields": [
+              "__time/millisSinceBoot"
+            ]
+          },
+          {
+            "measurement": "spock",
+            "fields": [
+              "__time/millisSinceBoot"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "empty-graph",
+      "order": 2,
+      "cols": 5,
+      "rows": 5,
+      "widget": "Graph",
+      "config": {
+        "serviceId": "history",
+        "layout": {},
+        "params": []
       }
     },
     {
@@ -162,7 +191,8 @@
       "title": "Metrics Dashboard",
       "order": 2,
       "items": [
-        "item-metrics"
+        "item-graph",
+        "empty-graph"
       ]
     },
     {

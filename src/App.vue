@@ -21,6 +21,7 @@ export default class App extends Vue {
         initializerById(this.$store, service.type)(this.$store, service));
     await Promise.all(initPromises);
 
+    // Allow each service to fetch
     const fetchPromises = serviceValues(this.$store)
       .map(service =>
         fetcherById(this.$store, service.type)(this.$store, service));

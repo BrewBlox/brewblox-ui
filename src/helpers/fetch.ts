@@ -2,25 +2,19 @@ import { serialize, deserialize } from '@/helpers/units/parseObject';
 
 const host = process.env.VUE_APP_API_URI;
 
-function toJson(result: Promise<Response>): Promise<any> {
-  return result
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
+const toJson = async (result: Promise<Response>) => {
+  const response = await result;
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
+  return deserialize(await response.json());
+};
 
-      return response;
-    })
-    .then(response => response.json())
-    .then(data => deserialize(data));
-}
+export const get = async (url: string) =>
+  toJson(window.fetch(`${host}${url}`));
 
-export function get(url: string): Promise<any> {
-  return toJson(window.fetch(`${host}${url}`));
-}
-
-export function post(url: string, data: any, method = 'POST'): Promise<any> {
-  return toJson(window.fetch(
+export const post = async (url: string, data: any, method = 'POST') =>
+  toJson(window.fetch(
     `${host}${url}`,
     {
       method,
@@ -30,16 +24,15 @@ export function post(url: string, data: any, method = 'POST'): Promise<any> {
       }),
     },
   ));
-}
 
-export function put(url: string, data: any): Promise<any> {
-  return post(url, data, 'PUT');
-}
+export const put = async (url: string, data: any) =>
+  post(url, data, 'PUT');
 
-export function patch(url: string, data: any): Promise<any> {
-  return post(url, data, 'PATCH');
-}
+export const patch = async (url: string, data: any) =>
+  post(url, data, 'PATCH');
 
-export function del(url: string, data: any): Promise<any> {
-  return post(url, data, 'DELETE');
-}
+export const del = async (url: string, data: any) =>
+  post(url, data, 'DELETE');
+
+export const sse = (url: string) =>
+  new EventSource(`${host}${url}`);

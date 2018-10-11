@@ -22,7 +22,7 @@ interface NavAction {
   props: {
     featureId: {
       type: String,
-      default: 'SetpointSimple',
+      required: true,
     },
     onCreateItem: {
       type: Function,

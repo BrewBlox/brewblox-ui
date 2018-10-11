@@ -2,7 +2,7 @@ import { read } from '@/helpers/dynamic-store';
 import { RootStore } from '@/store/state';
 import { serviceById } from '@/store/services/getters';
 
-import { BlocksState } from './state';
+import { SparkState } from './state';
 import { Spark, Block } from '../state';
 
 const defaultProfileNames = [
@@ -19,10 +19,10 @@ const defaultProfileNames = [
 export const typeName: string = 'Spark';
 
 const getters = {
-  blocks: (state: BlocksState): { [id: string]: Block } => state.blocks,
-  blockIds: (state: BlocksState): string[] => Object.keys(state.blocks),
-  blockValues: (state: BlocksState): Block[] => Object.values(state.blocks),
-  isFetching: (state: BlocksState): boolean => state.fetching,
+  blocks: (state: SparkState): { [id: string]: Block } => state.blocks,
+  blockIds: (state: SparkState): string[] => Object.keys(state.blocks),
+  blockValues: (state: SparkState): Block[] => Object.values(state.blocks),
+  isFetching: (state: SparkState): boolean => state.fetching,
 };
 
 export default getters;

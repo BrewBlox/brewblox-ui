@@ -25,13 +25,13 @@ export const registerService = (store: RootStore, serviceId: string, module: any
   Example:
 
   const getters = {
-    blocks: (state: BlocksState): { [id: string]: Block } => state.blocks,
+    blocks: (state: SparkState): { [id: string]: Block } => state.blocks,
   };
 
   export const blocks = read(getters.blocks);
 
   const mutations = {
-    mutateBlock: (state: BlocksState, block: Block) => {
+    mutateBlock: (state: SparkState, block: Block) => {
       Vue.set(state.blocks, block.id, { ...block });
     },
   };

@@ -1,12 +1,12 @@
 import { ActionContext } from 'vuex';
-import { RootStore, RootState } from '@/store/state';
+import { RootState } from '@/store/state';
 import { Block } from '../state';
 
-export type BlocksState = {
+export type SparkState = {
   blocks: {
     [id: string]: Block;
   },
   fetching: boolean,
 };
 
-export type BlocksContext = ActionContext<BlocksState, RootState>;
+export type BlocksContext = ActionContext<SparkState, RootState>;

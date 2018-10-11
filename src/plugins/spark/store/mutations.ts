@@ -1,14 +1,14 @@
 import Vue from 'vue';
 import { commit, noArgCommit } from '@/helpers/dynamic-store';
-import { BlocksState } from './state';
+import { SparkState } from './state';
 import { Block } from '../state';
 
 const mutations = {
-  addBlock(state: BlocksState, block: Block) {
+  addBlock(state: SparkState, block: Block) {
     Vue.set(state.blocks, block.id, { ...block, isLoading: false });
   },
 
-  updateBlock(state: BlocksState, block: Partial<Block>) {
+  updateBlock(state: SparkState, block: Partial<Block>) {
     const id = block.id || '';
     const existing = state.blocks[id];
     if (!existing) {
@@ -17,27 +17,27 @@ const mutations = {
     Vue.set(state.blocks, id, { ...existing, ...block });
   },
 
-  updateBlockState(state: BlocksState, block: Partial<Block>) {
+  updateBlockState(state: SparkState, block: Partial<Block>) {
     mutations.updateBlock(state, block);
   },
 
-  mutateBlock(state: BlocksState, block: Partial<Block>) {
+  mutateBlock(state: SparkState, block: Partial<Block>) {
     mutations.updateBlock(state, block);
   },
 
-  blockLoading(state: BlocksState, id: string) {
+  blockLoading(state: SparkState, id: string) {
     Vue.set(state.blocks, id, { ...state.blocks[id], isLoading: true });
   },
 
-  mutateFetching(state: BlocksState, fetching: boolean) {
+  mutateFetching(state: SparkState, fetching: boolean) {
     state.fetching = fetching;
   },
 
-  removeBlock(state: BlocksState, id: string) {
+  removeBlock(state: SparkState, id: string) {
     Vue.delete(state.blocks, id);
   },
 
-  clearBlocks(state: BlocksState) {
+  clearBlocks(state: SparkState) {
     Vue.set(state, 'blocks', {});
   },
 };

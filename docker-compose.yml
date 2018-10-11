@@ -31,7 +31,6 @@ services:
     command:
       - "--name=sparkey"
       - "--simulation"
-      - "--debug"
       - "--seed-profiles=0"
       - "--seed-objects=seed_objects.json"
 
@@ -47,7 +46,6 @@ services:
     command:
       - "--name=spock"
       - "--simulation"
-      - "--debug"
       - "--seed-profiles=0"
       - "--seed-objects=seed_objects.json"
 

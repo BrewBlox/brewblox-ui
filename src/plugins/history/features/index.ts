@@ -1,8 +1,8 @@
 import { Feature } from '@/store/features/state';
-import Metrics from './Metrics';
+import Graph from './Graph';
 
 const features: { [id: string]: Feature } = {
-  Metrics,
+  Graph,
 };
 
 export default features;

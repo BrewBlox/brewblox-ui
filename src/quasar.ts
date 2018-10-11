@@ -43,6 +43,7 @@ import Quasar, {
   QPopover,
   QSearch,
   QScrollArea,
+  QDatetimePicker,
 } from 'quasar';
 
 import 'quasar-extras/roboto-font';
@@ -94,6 +95,7 @@ Vue.use(Quasar, {
     QPopover,
     QSearch,
     QScrollArea,
+    QDatetimePicker,
   },
   directives: { Ripple, CloseOverlay },
   plugins: { Notify, Dialog },
