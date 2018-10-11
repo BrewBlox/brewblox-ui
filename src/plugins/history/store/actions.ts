@@ -14,11 +14,11 @@ import { Metric } from '@/plugins/history/state';
 
 const actions = {
   add: async (context: HistoryContext, metric: Metric) => {
-    const { id, serviceId, options } = metric;
+    const { id, serviceId, params } = metric;
 
     addMetricInStore(context, serviceId, metric);
 
-    const source = await fetchValueSource(serviceId, options);
+    const source = await fetchValueSource(serviceId, params);
     source.onmessage = (event: MessageEvent) =>
       transformMetricInStore(context, serviceId, { id, result: JSON.parse(event.data) });
     source.onerror = () => source.close();

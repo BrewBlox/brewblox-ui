@@ -1,6 +1,6 @@
 import { RootStore } from '@/store/state';
 import { addMetric } from '@/plugins/history/store/actions';
-import { HistoryOptions, Metric, QueryResult } from '@/plugins/history/state';
+import { QueryParams, Metric, QueryResult } from '@/plugins/history/state';
 import parseDuration from 'parse-duration';
 
 export { removeMetric } from '@/plugins/history/store/actions';
@@ -50,12 +50,12 @@ const transformer = (
       });
 
     if (
-      metric.options.duration
-      && !metric.options.start
-      && !metric.options.end
+      metric.params.duration
+      && !metric.params.start
+      && !metric.params.end
     ) {
       // timestamp in Ms that should be discarded
-      const boundary = new Date().getTime() - parseDuration(metric.options.duration);
+      const boundary = new Date().getTime() - parseDuration(metric.params.duration);
       Object
         .values(metric.values)
         .forEach((val: any) => {
@@ -74,12 +74,12 @@ export const addPlotlyMetric = async (
   store: RootStore,
   id: string,
   serviceId: string,
-  options: HistoryOptions,
+  params: QueryParams,
 ) =>
   addMetric(store, serviceId, {
     id,
     serviceId,
     transformer,
-    options,
+    params,
     values: {},
   });

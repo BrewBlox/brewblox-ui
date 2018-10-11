@@ -5,7 +5,7 @@ import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 import WidgetModal from '@/components/Widget/WidgetModal.vue';
 import GraphDisplay from './GraphDisplay.vue';
 import { metricById, tryMetricById } from '@/plugins/history/store/getters';
-import { Metric, HistoryOptions } from '@/plugins/history/state';
+import { Metric, QueryParams } from '@/plugins/history/state';
 import { addPlotlyMetric, removeMetric } from './actions';
 import { GraphConfig } from './state';
 import { PlotData, Layout } from 'plotly.js';
@@ -30,21 +30,21 @@ export default class GraphWidget extends Widget {
     this.$props.onConfigChange(this.$props.id, { ...cfg });
   }
 
-  get options(): HistoryOptions[] {
-    return this.graphCfg.options;
+  get params(): QueryParams[] {
+    return this.graphCfg.params;
   }
 
   get serviceId(): string {
     return this.graphCfg.serviceId;
   }
 
-  metricId(opt: HistoryOptions): string {
-    return `${this.$props.id}/${opt.measurement}`;
+  metricId(params: QueryParams): string {
+    return `${this.$props.id}/${params.measurement}`;
   }
 
   get metrics(): Metric[] {
-    return this.options
-      .map(opt => tryMetricById(this.$store, this.serviceId, this.metricId(opt)))
+    return this.params
+      .map(params => tryMetricById(this.$store, this.serviceId, this.metricId(params)))
       .filter(metric => metric !== null) as Metric[];
   }
 
@@ -63,9 +63,9 @@ export default class GraphWidget extends Widget {
   }
 
   addMetrics() {
-    this.options
-      .forEach(opt =>
-        addPlotlyMetric(this.$store, this.metricId(opt), this.serviceId, opt));
+    this.params
+      .forEach(params =>
+        addPlotlyMetric(this.$store, this.metricId(params), this.serviceId, params));
   }
 
   removeMetrics() {

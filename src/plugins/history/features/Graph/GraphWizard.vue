@@ -105,7 +105,7 @@ export default class GraphWizard extends Vue {
     return {
       serviceId: (this.service as Service).id,
       layout: {},
-      options: [],
+      params: [],
     };
   }
 

@@ -5,7 +5,7 @@ export interface History extends Service {
   config: {};
 }
 
-export interface HistoryOptions {
+export interface QueryParams {
   measurement: string;
   fields: string[];
   database?: string;
@@ -29,7 +29,7 @@ export interface Metric {
   id: string;
   serviceId: string;
   transformer: (metric: Metric, result: QueryResult) => Metric;
-  options: HistoryOptions;
+  params: QueryParams;
   source?: EventSource;
   values?: any;
 }

@@ -1,11 +1,11 @@
 import { DashboardItem } from '@/store/dashboards/state';
-import { HistoryOptions } from '@/plugins/history/state';
+import { QueryParams } from '@/plugins/history/state';
 import { Layout } from 'plotly.js';
 
 export interface GraphConfig {
   serviceId: string;
   layout: Partial<Layout>;
-  options: HistoryOptions[];
+  params: QueryParams[];
 }
 
 export interface HistoryItem extends DashboardItem {
