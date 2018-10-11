@@ -76,12 +76,15 @@ export const addPlotlyMetric = async (
   serviceId: string,
   params: QueryParams,
   target: QueryTarget,
-) =>
-  addMetric(store, serviceId, {
-    id,
-    serviceId,
-    transformer,
-    params,
-    target,
-    values: {},
-  });
+) => {
+  if (target.fields.length > 0) {
+    addMetric(store, serviceId, {
+      id,
+      serviceId,
+      transformer,
+      params,
+      target,
+      values: {},
+    });
+  }
+};

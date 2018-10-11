@@ -45,19 +45,23 @@ export default class GraphForm extends HistoryForm {
     return this.relevantKnownFields(target).includes(field);
   }
 
+  updateFields(target: QueryTarget, fields: string[]) {
+    this.$set(target, 'fields', fields);
+  }
+
   addField(target: QueryTarget) {
-    this.$set(target, 'fields', [...target.fields, '']);
+    this.updateFields(target, [...target.fields, '']);
   }
 
   removeField(target: QueryTarget, index: number) {
-    this.$set(target, 'fields', target.fields.filter((_, idx) => idx !== index));
+    this.updateFields(target, target.fields.filter((_, idx) => idx !== index));
   }
 
   changeField(target: QueryTarget, index: number, val: string) {
     target.fields[index] = this.fieldValid(target, val)
       ? val
       : `${val}/`;
-    this.$set(target, 'fields', [...target.fields]);
+    this.updateFields(target, [...target.fields]);
   }
 
   fieldSectionOptions(target: QueryTarget, field: string, idx: number) {
@@ -97,7 +101,7 @@ export default class GraphForm extends HistoryForm {
           ...this.inputValues.targets,
           {
             measurement: m,
-            fields: [''], // avoid initializing as "select * from {measurement}"
+            fields: [],
           },
         ],
       ));
