@@ -83,6 +83,51 @@
     }
   },
   {
+    "id": "actuator-pin-1",
+    "profiles": [
+      0
+    ],
+    "type": "ActuatorPin",
+    "data": {
+      "constrainedBy": {
+        "constraints": [
+          {
+            "minOff": 10
+          },
+          {
+            "minOn": 15
+          },
+          {
+            "mutex<>": "actuator-1"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "actuator-pwm-1",
+    "profiles": [
+      0
+    ],
+    "type": "ActuatorPwm",
+    "data": {
+      "actuatorId<>": "actuator-1",
+      "constrainedBy": {
+        "constraints": [
+          {
+            "min": 5
+          },
+          {
+            "max": 10
+          },
+          {
+            "balancer<>": "actuator-1"
+          }
+        ]
+      }
+    }
+  },
+  {
     "id": "pid-1",
     "profiles": [
       0

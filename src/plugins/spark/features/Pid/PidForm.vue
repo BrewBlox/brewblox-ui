@@ -6,6 +6,7 @@ import ProfilesBar from '@/plugins/spark/components/ProfilesBar.vue';
 import { Unit } from '@/helpers/units';
 import Link from '@/helpers/units/Link';
 import { blockIds } from '@/plugins/spark/store/getters';
+import { filters } from './getters';
 
 @Component({
   components: {
@@ -41,16 +42,7 @@ export default class PidForm extends BlockForm {
   }
 
   get filterOpts() {
-    return [
-      'FILT_30s',
-      'FILT_1m',
-      'FILT_3m',
-      'FILT_5m',
-      'FILT_10m',
-      'FILT_20m',
-      'FILT_45m',
-    ]
-      .map(filter => ({ label: filter, value: filter }));
+    return filters.map((filter, idx) => ({ label: filter, value: idx }));
   }
 }
 </script>

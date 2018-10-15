@@ -15,7 +15,7 @@ export interface PidBlock extends Block {
     outputValue: number;
     outputSetting: number;
 
-    filter: string;
+    filter: number;
     filterThreshold: Unit;
 
     enabled: boolean;
