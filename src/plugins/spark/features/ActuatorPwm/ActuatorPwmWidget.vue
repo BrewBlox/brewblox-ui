@@ -5,7 +5,7 @@ import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 import WidgetModal from '@/components/Widget/WidgetModal.vue';
 import WidgetField from '@/components/Widget/WidgetField.vue';
-import DigitalConstraints from '@/plugins/spark/components/Constraints/DigitalConstraints.vue';
+import Constraints from '@/plugins/spark/components/Constraints.vue';
 import { ActuatorPwmBlock } from './state';
 import { getById } from './getters';
 
@@ -14,7 +14,7 @@ import { getById } from './getters';
     WidgetToolbar,
     WidgetModal,
     WidgetField,
-    DigitalConstraints,
+    Constraints,
   },
 })
 export default class ActuatorPwmWidget extends BlockWidget {
@@ -71,10 +71,11 @@ export default class ActuatorPwmWidget extends BlockWidget {
           <widget-field
             label="Constraints"
           >
-            <digital-constraints
+            <constraints
               readonly
+              type="analog"
               :serviceId="serviceId"
-              v-model="block.data.constrainedBy.constraints"
+              v-model="block.data.constrainedBy"
             />
           </widget-field>
 

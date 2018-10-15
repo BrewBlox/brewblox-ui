@@ -1,6 +1,7 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
+import Constraints from '@/plugins/spark/components/Constraints.vue';
 import WidgetField from '@/components/Widget/WidgetField.vue';
 import ProfilesBar from '@/plugins/spark/components/ProfilesBar.vue';
 import { state } from './getters';
@@ -9,6 +10,7 @@ import { state } from './getters';
   components: {
     WidgetField,
     ProfilesBar,
+    Constraints,
   },
 })
 export default class ActuatorPinForm extends BlockForm {
@@ -18,7 +20,7 @@ export default class ActuatorPinForm extends BlockForm {
       state: { path: 'data.state', default: 2 },
       pin: { path: 'data.pin', default: 0 },
       invert: { path: 'data.invert', default: false },
-      constrainedBy: { path: 'data.constrainedBy', default: {} },
+      constrainedBy: { path: 'data.constrainedBy', default: { constraints: [] } },
     };
   }
 
@@ -75,7 +77,11 @@ export default class ActuatorPinForm extends BlockForm {
         label="Constrained by"
         icon="edit"
       >
-        TODO
+        <constraints
+          type="digital"
+          :serviceId="block.serviceId"
+          v-model="inputValues.constrainedBy"
+        />
       </widget-field>
 
     <q-card-separator />

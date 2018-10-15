@@ -20,7 +20,7 @@ services:
       - "traefik.frontend.rule=PathPrefix: /history"
 
   sparkey:
-    image: brewblox/brewblox-devcon-spark:feature-protobuf-updates
+    image: brewblox/brewblox-devcon-spark:develop
     depends_on:
       - eventbus
     labels:
@@ -35,7 +35,7 @@ services:
       - "--seed-objects=seed_objects.json"
 
   spock:
-    image: brewblox/brewblox-devcon-spark:feature-protobuf-updates
+    image: brewblox/brewblox-devcon-spark:develop
     depends_on:
       - eventbus
     labels:

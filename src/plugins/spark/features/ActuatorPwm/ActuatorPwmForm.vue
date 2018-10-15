@@ -3,7 +3,7 @@ import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import WidgetField from '@/components/Widget/WidgetField.vue';
 import ProfilesBar from '@/plugins/spark/components/ProfilesBar.vue';
-import DigitalConstraints from '@/plugins/spark/components/Constraints/DigitalConstraints.vue';
+import Constraints from '@/plugins/spark/components/Constraints.vue';
 import Link from '@/helpers/units/Link';
 import { blockIds } from '@/plugins/spark/store/getters';
 
@@ -11,7 +11,7 @@ import { blockIds } from '@/plugins/spark/store/getters';
   components: {
     WidgetField,
     ProfilesBar,
-    DigitalConstraints,
+    Constraints,
   },
 })
 export default class ActuatorPwmForm extends BlockForm {
@@ -20,7 +20,7 @@ export default class ActuatorPwmForm extends BlockForm {
       profiles: { path: 'profiles', default: [] },
       actuatorId: { path: 'data.actuatorId', default: new Link(null) },
       period: { path: 'data.period', default: 0 },
-      constrainedBy: { path: 'data.constrainedBy', default: {} },
+      constrainedBy: { path: 'data.constrainedBy', default: { constraints: [] } },
     };
   }
 
@@ -76,9 +76,10 @@ export default class ActuatorPwmForm extends BlockForm {
         label="Constrained by"
         icon="edit"
       >
-        <digital-constraints
+        <constraints
+          type="analog"
           :serviceId="block.serviceId"
-          v-model="inputValues.constrainedBy.constraints"
+          v-model="inputValues.constrainedBy"
         />
       </widget-field>
 
