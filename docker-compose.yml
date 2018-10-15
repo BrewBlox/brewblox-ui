@@ -7,8 +7,8 @@ services:
 
   influx:
     image: influxdb:alpine
-    # volumes:
-    # - "./influxdb:/var/lib/influxdb"
+    volumes:
+    - "./influxdb:/var/lib/influxdb"
 
   history:
     image: brewblox/brewblox-history:develop

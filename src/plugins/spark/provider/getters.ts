@@ -1,7 +1,7 @@
 import { Block } from '@/plugins/spark/state';
 
 export const widgetSize = {
-  cols: 3,
+  cols: 4,
   rows: 4,
 };
 

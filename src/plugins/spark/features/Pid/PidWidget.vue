@@ -7,7 +7,7 @@ import WidgetModal from '@/components/Widget/WidgetModal.vue';
 import WidgetField from '@/components/Widget/WidgetField.vue';
 import { saveBlock } from '@/plugins/spark/store/actions';
 import { PidBlock } from './state';
-import { getById } from './getters';
+import { getById, filters } from './getters';
 
 @Component({
   components: {
@@ -25,6 +25,10 @@ export default class PidWidget extends BlockWidget {
 
   set block(block: PidBlock) {
     this.saveBlock(block);
+  }
+
+  get filterName() {
+    return filters[this.block.data.filter];
   }
 }
 </script>
@@ -88,7 +92,7 @@ export default class PidWidget extends BlockWidget {
             label="Filter / treshold"
             icon=""
           >
-            <big>{{ block.data.filter }} / {{ block.data.filterThreshold | unit }}</big>
+            <big>{{ filterName }} / {{ block.data.filterThreshold | unit }}</big>
           </widget-field>
 
           <!-- Enabled / active -->

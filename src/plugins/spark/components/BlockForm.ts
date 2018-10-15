@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
 import { Block } from '@/plugins/spark/state';
-import { toShadow, fromShadow, ShadowMapping } from '@/helpers/shadow-copy';
+import { toShadow, fromShadow, ShadowMapping, deepCopy } from '@/helpers/shadow-copy';
 import { profileNames as serviceProfiles } from '@/plugins/spark/store/getters';
 
 @Component({
@@ -49,12 +49,12 @@ export default class BlockForm extends Vue {
   @Watch('block', { immediate: true, deep: true })
   onBlockUpdate() {
     if (!this.block.isLoading) {
-      this.inputValues = toShadow(this.block, this.inputMapping);
+      this.inputValues = deepCopy(toShadow(this.block, this.inputMapping));
     }
   }
 
   cancelChanges() {
-    this.inputValues = toShadow(this.block, this.inputMapping);
+    this.inputValues = deepCopy(toShadow(this.block, this.inputMapping));
   }
 
   confirmChanges() {

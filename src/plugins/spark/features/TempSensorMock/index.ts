@@ -12,7 +12,7 @@ const feature: Feature = {
   widget: ref(widget),
   form: ref(form),
   widgetSize: {
-    cols: 3,
+    cols: 4,
     rows: 2,
   },
 };
