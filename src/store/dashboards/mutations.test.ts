@@ -7,7 +7,6 @@ const {
   addDashboard,
   addDashboardItem,
   setDashboardItemSize,
-  setDashboardItemOrder,
 } = mutations;
 /* eslint-enable */
 
@@ -15,6 +14,7 @@ const defaultStore: DashboardState = {
   dashboards: {},
   items: {},
   fetching: false,
+  defaultDashboard: null,
 };
 
 describe('mutateFetching', () => {

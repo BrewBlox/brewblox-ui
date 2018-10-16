@@ -25,6 +25,7 @@ export type DashboardState = {
     [id: string]: DashboardItem;
   },
   fetching: boolean,
+  defaultDashboard: string | null;
 };
 
 export type DashboardContext = ActionContext<DashboardState, RootState>;

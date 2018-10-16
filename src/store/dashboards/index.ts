@@ -12,6 +12,7 @@ const dashboards = {
     dashboards: {},
     items: {},
     fetching: true,
+    defaultDashboard: null,
   },
 };
 
