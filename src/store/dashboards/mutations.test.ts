@@ -7,7 +7,6 @@ const {
   addDashboard,
   addDashboardItem,
   setDashboardItemSize,
-  setDashboardItemOrder,
 } = mutations;
 /* eslint-enable */
 

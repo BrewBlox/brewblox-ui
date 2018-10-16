@@ -6,6 +6,7 @@ export interface Dashboard {
   id: string;
   title: string;
   order: number;
+  primary?: boolean;
   items: string[];
 }
 
@@ -20,11 +21,11 @@ export interface DashboardItem {
 export type DashboardState = {
   dashboards: {
     [id: string]: Dashboard;
-  },
+  };
   items: {
     [id: string]: DashboardItem;
-  },
-  fetching: boolean,
+  };
+  fetching: boolean;
 };
 
 export type DashboardContext = ActionContext<DashboardState, RootState>;
