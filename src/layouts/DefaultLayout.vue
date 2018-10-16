@@ -6,11 +6,16 @@ import draggable from 'vuedraggable';
 import byOrder from '@/helpers/byOrder';
 
 import { Dashboard } from '@/store/dashboards/state';
-import { allDashboards, isFetching } from '@/store/dashboards/getters';
+import {
+  allDashboards,
+  isFetching,
+  defaultDashboard as getDefaultDashboard,
+} from '@/store/dashboards/getters';
 import {
   addNewDashboard,
   updateDashboardOrder,
   removeDashboard as removeDashboardInStore,
+  updateDefaultDashboard,
 } from '@/store/dashboards/actions';
 
 import {
@@ -42,6 +47,10 @@ export default class DefaultLayout extends Vue {
 
   get dashboards() {
     return [...allDashboards(this.$store)].sort(byOrder);
+  }
+
+  get defaultDashboard() {
+    return getDefaultDashboard(this.$store);
   }
 
   set dashboards(dashboards: Dashboard[]) {
@@ -99,6 +108,10 @@ export default class DefaultLayout extends Vue {
       ok: 'Confirm',
       cancel: 'Cancel',
     }).then(() => removeServiceInStore(this.$store, service));
+  }
+
+  updateDefaultDashboard(id: string) {
+    updateDefaultDashboard(this.$store, this.defaultDashboard === id ? null : id);
   }
 }
 </script>
@@ -179,6 +192,18 @@ export default class DefaultLayout extends Vue {
             :key="dashboard.id"
             :to="dashboardEditing ? undefined : `/dashboard/${dashboard.id}`"
           >
+            <q-item-side
+              left
+              v-if="dashboardEditing"
+            >
+              <q-btn
+                round
+                flat
+                icon="home"
+                :color="defaultDashboard === dashboard.id ? 'primary' : ''"
+                @click="updateDefaultDashboard(dashboard.id)"
+              />
+            </q-item-side>
             <q-item-main :label="dashboard.title" />
             <q-item-side
               right

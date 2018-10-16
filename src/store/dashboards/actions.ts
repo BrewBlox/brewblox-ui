@@ -30,6 +30,7 @@ import {
   setDashboardItemSize as setDashboardItemSizeInStore,
   setDashboardItemConfig as setDashboardItemConfigInStore,
   removeDashboardItem as removeDashboardItemInStore,
+  mutateDefaultDashboard as mutateDefaultDashboardInStore,
 } from './mutations';
 
 const { dispatch } = getStoreAccessors<DashboardState, RootState>('dashboards');
@@ -138,6 +139,10 @@ const actions = {
     removeDashboardItemOnApi(item);
     removeDashboardItemInStore(context, item);
   },
+
+  updateDefaultDashboard(context: DashboardContext, val: string | null) {
+    mutateDefaultDashboardInStore(context, val);
+  },
 };
 
 export const fetchDashboards = dispatch(actions.fetchDashboards);
@@ -153,5 +158,6 @@ export const updateDashboardItemSize = dispatch(actions.updateDashboardItemSize)
 export const updateDashboardItemConfig = dispatch(actions.updateDashboardItemConfig);
 export const createDashboardItem = dispatch(actions.createDashboardItem);
 export const removeDashboardItem = dispatch(actions.removeDashboardItem);
+export const updateDefaultDashboard = dispatch(actions.updateDefaultDashboard);
 
 export default actions;

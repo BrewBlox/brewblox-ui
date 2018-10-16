@@ -62,6 +62,10 @@ const mutations = {
     Vue.delete(state.items, item.id);
   },
 
+  setDefaultDashboard(state: DashboardState, val: string | null) {
+    state.defaultDashboard = val;
+  },
+
 };
 
 // exported commit accessors
@@ -75,5 +79,6 @@ export const setDashboardItemOrder = commit(mutations.setDashboardItemOrder);
 export const setDashboardItemSize = commit(mutations.setDashboardItemSize);
 export const setDashboardItemConfig = commit(mutations.setDashboardItemConfig);
 export const removeDashboardItem = commit(mutations.removeDashboardItem);
+export const mutateDefaultDashboard = commit(mutations.setDefaultDashboard);
 
 export default mutations;
