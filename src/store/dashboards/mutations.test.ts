@@ -14,7 +14,6 @@ const defaultStore: DashboardState = {
   dashboards: {},
   items: {},
   fetching: false,
-  defaultDashboard: null,
 };
 
 describe('mutateFetching', () => {

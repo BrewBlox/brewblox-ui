@@ -9,13 +9,13 @@ import { Dashboard } from '@/store/dashboards/state';
 import {
   allDashboards,
   isFetching,
-  defaultDashboard as getDefaultDashboard,
+  primaryDashboard,
 } from '@/store/dashboards/getters';
 import {
   addNewDashboard,
   updateDashboardOrder,
   removeDashboard as removeDashboardInStore,
-  updateDefaultDashboard,
+  updatePrimaryDashboard,
 } from '@/store/dashboards/actions';
 
 import {
@@ -50,7 +50,7 @@ export default class DefaultLayout extends Vue {
   }
 
   get defaultDashboard() {
-    return getDefaultDashboard(this.$store);
+    return primaryDashboard(this.$store);
   }
 
   set dashboards(dashboards: Dashboard[]) {
@@ -111,7 +111,7 @@ export default class DefaultLayout extends Vue {
   }
 
   updateDefaultDashboard(id: string) {
-    updateDefaultDashboard(this.$store, this.defaultDashboard === id ? null : id);
+    updatePrimaryDashboard(this.$store, this.defaultDashboard === id ? null : id);
   }
 }
 </script>

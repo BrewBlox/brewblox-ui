@@ -1,12 +1,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { defaultDashboard } from '@/store/dashboards/getters';
+import { primaryDashboard } from '@/store/dashboards/getters';
 
 @Component
 export default class IndexPage extends Vue {
   mounted() {
-    const dash = defaultDashboard(this.$store);
+    const dash = primaryDashboard(this.$store);
     if (dash !== null) {
       this.$router.replace(`/dashboard/${dash}`);
     }

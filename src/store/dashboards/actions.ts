@@ -2,14 +2,14 @@ import { getStoreAccessors } from 'vuex-typescript';
 import UrlSafeString from 'url-safe-string';
 
 import {
-  fetchDashboards as fetchDashboardsFromApi,
-  fetchDashboardItems as fetchDashboardItemsFromApi,
-  createDashboard as createDashboardOnApi,
-  persistDashboard,
-  deleteDashboard as removeDashboardOnApi,
+  fetchDashboards as fetchDashboardsInApi,
+  fetchDashboardItems as fetchDashboardItemsInApi,
+  createDashboard as createDashboardInApi,
+  persistDashboard as persistDashboardInApi,
+  deleteDashboard as removeDashboardInApi,
   persistDashboardItem,
-  createDashboardItem as createDashboardItemOnApi,
-  deleteDashboardItem as removeDashboardItemOnApi,
+  createDashboardItem as createDashboardItemInApi,
+  deleteDashboardItem as removeDashboardItemInApi,
 } from './api';
 
 import { DashboardState, DashboardItem, DashboardContext, Dashboard } from './state';
@@ -18,22 +18,26 @@ import { RootState } from '../state';
 import {
   dashboardItemById as getDashboardItemInStore,
   dashboardById as getDashboardInStore,
+  dashboardIds as getDashboardIds,
 } from './getters';
 import {
   mutateFetching as mutateFetchingInStore,
-  addDashboard as addDashboardToStore,
+  addDashboard as addDashboardInStore,
   setDashboard as setDashboardInStore,
   removeDashboard as removeDashboardInStore,
-  setDashboardOrder as setDashboardOrderInStore,
-  addDashboardItem as addDashboardItemToStore,
+  addDashboardItem as addDashboardItemInStore,
   setDashboardItemOrder as setDashboardItemOrderInStore,
   setDashboardItemSize as setDashboardItemSizeInStore,
   setDashboardItemConfig as setDashboardItemConfigInStore,
   removeDashboardItem as removeDashboardItemInStore,
-  mutateDefaultDashboard as mutateDefaultDashboardInStore,
 } from './mutations';
 
 const { dispatch } = getStoreAccessors<DashboardState, RootState>('dashboards');
+
+const update = async (context: DashboardContext, dashboard: Dashboard) => {
+  setDashboardInStore(context, dashboard);
+  await persistDashboardInApi(dashboard);
+};
 
 const actions = {
   addNewDashboard(context: DashboardContext, title: string) {
@@ -44,25 +48,23 @@ const actions = {
       order: Object.keys(context.state.dashboards).length + 1,
       items: [],
     };
-    addDashboardToStore(context, dashboard);
-    createDashboardOnApi(dashboard);
+    addDashboardInStore(context, dashboard);
+    createDashboardInApi(dashboard);
   },
 
   updateDashboardOrder(context: DashboardContext, orders: string[]) {
     orders.forEach((id, index) => {
       const order = index + 1;
-      setDashboardOrderInStore(context, { id, order });
-      persistDashboard(getDashboardInStore(context, id));
+      update(context, { ...getDashboardInStore(context, id), order });
     });
   },
 
-  updateDashboard(context: DashboardContext, dashboard: Dashboard) {
-    setDashboardInStore(context, dashboard);
-    persistDashboard(dashboard);
+  addDashboard(context: DashboardContext, dashboard: Dashboard) {
+    addDashboardInStore(context, dashboard);
   },
 
-  addDashboard(context: DashboardContext, dashboard: Dashboard) {
-    addDashboardToStore(context, dashboard);
+  updateDashboard(context: DashboardContext, dashboard: Dashboard) {
+    update(context, dashboard);
   },
 
   async removeDashboard(context: DashboardContext, dashboard: Dashboard) {
@@ -71,11 +73,11 @@ const actions = {
       .map(itemId =>
         actions.removeDashboardItem(context, getDashboardItemInStore(context, itemId))));
     removeDashboardInStore(context, dashboard);
-    removeDashboardOnApi(dashboard);
+    removeDashboardInApi(dashboard);
   },
 
   addDashboardItem(context: DashboardContext, item: DashboardItem) {
-    addDashboardItemToStore(context, item);
+    addDashboardItemInStore(context, item);
   },
 
   updateDashboardItemOrder(context: DashboardContext, itemIds: string[]) {
@@ -105,8 +107,8 @@ const actions = {
   async fetchDashboards(context: DashboardContext) {
     mutateFetchingInStore(context, true);
     const [dashboards, items] = await Promise.all([
-      fetchDashboardsFromApi(),
-      fetchDashboardItemsFromApi(),
+      fetchDashboardsInApi(),
+      fetchDashboardItemsInApi(),
     ]);
     items.forEach(item => actions.addDashboardItem(context, item));
     dashboards.forEach(dashboard => actions.addDashboard(context, dashboard));
@@ -118,7 +120,7 @@ const actions = {
     payload: { dashboard: Dashboard, item: DashboardItem },
   ) {
     const { dashboard, item } = payload;
-    const dashboardItem = await createDashboardItemOnApi(item);
+    const dashboardItem = await createDashboardItemInApi(item);
     actions.addDashboardItem(context, dashboardItem);
     actions.addDashboardItemToDashboard(context, { dashboard, item });
   },
@@ -129,19 +131,27 @@ const actions = {
   ) {
     const { dashboard, item } = payload;
 
-    actions.updateDashboard(context, {
+    update(context, {
       ...dashboard,
       items: [...dashboard.items, item.id],
     });
   },
 
   removeDashboardItem(context: DashboardContext, item: DashboardItem) {
-    removeDashboardItemOnApi(item);
+    removeDashboardItemInApi(item);
     removeDashboardItemInStore(context, item);
   },
 
-  updateDefaultDashboard(context: DashboardContext, val: string | null) {
-    mutateDefaultDashboardInStore(context, val);
+  updatePrimaryDashboard(context: DashboardContext, newId: string | null) {
+    getDashboardIds(context)
+      .forEach((id: string) => {
+        const dash = getDashboardInStore(context, id);
+        if (dash.id === newId) {
+          update(context, { ...dash, primary: true });
+        } else if (dash.primary) {
+          update(context, { ...dash, primary: false });
+        }
+      });
   },
 };
 
@@ -158,6 +168,6 @@ export const updateDashboardItemSize = dispatch(actions.updateDashboardItemSize)
 export const updateDashboardItemConfig = dispatch(actions.updateDashboardItemConfig);
 export const createDashboardItem = dispatch(actions.createDashboardItem);
 export const removeDashboardItem = dispatch(actions.removeDashboardItem);
-export const updateDefaultDashboard = dispatch(actions.updateDefaultDashboard);
+export const updatePrimaryDashboard = dispatch(actions.updatePrimaryDashboard);
 
 export default actions;
