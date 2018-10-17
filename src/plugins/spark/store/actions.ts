@@ -2,7 +2,7 @@ import { saveService } from '@/store/services/actions';
 import { Service } from '@/store/services/state';
 import { RootStore } from '@/store/state';
 
-import { Block } from '../state';
+import { Block, UserUnits } from '../state';
 import { BlocksContext } from './state';
 import { dispatch } from '@/helpers/dynamic-store';
 
@@ -13,6 +13,8 @@ import {
   fetchBlock as fetchBlockInApi,
   fetchBlocks as fetchBlocksInApi,
   persistBlock as persistBlockInApi,
+  fetchUnits as fetchUnitsInApi,
+  persistUnits as persistUnitsInApi,
 } from './api';
 
 import { sparkServiceById } from './getters';
@@ -23,28 +25,29 @@ import {
   mutateFetching as mutateFetchingInStore,
   removeBlock as removeBlockInStore,
   clearBlocks as clearBlocksInStore,
+  setUnits as setUnitsInStore,
 } from './mutations';
 
 const actions = {
-  async fetchBlock(context: BlocksContext, block: Block) {
+  fetchBlock: async (context: BlocksContext, block: Block) => {
     mutateBlockInStore(context, block.serviceId, { ...block, isLoading: true });
     const fetchedBlock = await fetchBlockInApi(block);
     mutateBlockInStore(context, block.serviceId, { ...fetchedBlock, isLoading: false });
   },
 
-  async createBlock(context: BlocksContext, block: Block) {
+  createBlock: async (context: BlocksContext, block: Block) => {
     addBlockInStore(context, block.serviceId, { ...block, isLoading: true });
     const createdBlock = await createBlockInApi(block);
     mutateBlockInStore(context, block.serviceId, { ...createdBlock, isLoading: false });
   },
 
-  async saveBlock(context: BlocksContext, block: Block) {
+  saveBlock: async (context: BlocksContext, block: Block) => {
     mutateBlockInStore(context, block.serviceId, { ...block, isLoading: true });
     const savedBlock = await persistBlockInApi(block);
     mutateBlockInStore(context, block.serviceId, { ...savedBlock, isLoading: false });
   },
 
-  async removeBlock(context: BlocksContext, block: Block) {
+  removeBlock: async (context: BlocksContext, block: Block) => {
     mutateBlockInStore(context, block.serviceId, { ...block, isLoading: true });
     await deleteBlockInApi(block);
     removeBlockInStore(context, block.serviceId, block.id);
@@ -67,17 +70,29 @@ export const updateProfileNames = (store: RootStore, id: string, names: string[]
   });
 };
 
-export const fetchBlocks = async (store: RootStore, service: Service) => {
-  mutateFetchingInStore(store, service.id, true);
-  const fetched = await fetchBlocksInApi(service);
-  clearBlocksInStore(store, service.id);
-  fetched.forEach(block => addBlockInStore(store, service.id, block));
-  mutateFetchingInStore(store, service.id, false);
+export const fetchBlocks = async (store: RootStore, serviceId: string) => {
+  mutateFetchingInStore(store, serviceId, true);
+  const fetched = await fetchBlocksInApi(serviceId);
+  clearBlocksInStore(store, serviceId);
+  fetched.forEach(block => addBlockInStore(store, serviceId, block));
+  mutateFetchingInStore(store, serviceId, false);
 };
 
 export const clearBlocks = async (store: RootStore, service: Service) => {
   await clearBlocksInApi(service.id);
-  await fetchBlocks(store, service);
+  await fetchBlocks(store, service.id);
 };
+
+export const fetchUnits = async (store: RootStore, serviceId: string) =>
+  setUnitsInStore(store, serviceId, await fetchUnitsInApi(serviceId));
+
+export const saveUnits = async (store: RootStore, serviceId: string, units: UserUnits) =>
+  setUnitsInStore(store, serviceId, await persistUnitsInApi(serviceId, units));
+
+export const fetchAll = async (store: RootStore, service: Service) =>
+  Promise.all([
+    fetchBlocks(store, service.id),
+    fetchUnits(store, service.id),
+  ]);
 
 export default actions;

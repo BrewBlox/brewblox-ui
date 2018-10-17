@@ -3,7 +3,7 @@ import { RootStore } from '@/store/state';
 import { serviceById } from '@/store/services/getters';
 
 import { SparkState } from './state';
-import { Spark, Block } from '../state';
+import { Spark, Block, UserUnits } from '../state';
 
 const defaultProfileNames = [
   'P1',
@@ -19,18 +19,20 @@ const defaultProfileNames = [
 export const typeName: string = 'Spark';
 
 const getters = {
+  isFetching: (state: SparkState): boolean => state.fetching,
   blocks: (state: SparkState): { [id: string]: Block } => state.blocks,
   blockIds: (state: SparkState): string[] => Object.keys(state.blocks),
   blockValues: (state: SparkState): Block[] => Object.values(state.blocks),
-  isFetching: (state: SparkState): boolean => state.fetching,
+  units: (state: SparkState): UserUnits => state.units,
 };
 
 export default getters;
 
+export const isFetching = read(getters.isFetching);
 export const blocks = read(getters.blocks);
 export const blockIds = read(getters.blockIds);
 export const blockValues = read(getters.blockValues);
-export const isFetching = read(getters.isFetching);
+export const units = read(getters.units);
 
 export function blockById<T extends Block>(
   store: RootStore,
