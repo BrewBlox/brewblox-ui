@@ -83,10 +83,8 @@ export default class SparkForm extends Vue {
       this.inputMapping,
       this.stored,
     );
-    this.changeBlock(vals.sysInfo);
+    // sysInfo / oneWireBus / ticks have no editable fields
     this.changeBlock(vals.profiles);
-    this.changeBlock(vals.oneWireBus);
-    this.changeBlock(vals.ticks);
     updateProfileNames(this.$store, this.$props.serviceId, vals.profileNames);
     saveUnits(this.$store, this.$props.serviceId, vals.units)
       .catch(reason => Notify.create(`Failed to change unit: ${reason}`));
