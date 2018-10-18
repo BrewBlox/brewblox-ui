@@ -43,6 +43,13 @@ export default class NewServiceWizard extends Vue {
     return null;
   }
 
+  get serviceTitleError() {
+    if (!this.serviceTitle) {
+      return 'Title must not be empty';
+    }
+    return null;
+  }
+
   get serviceWizardActive() {
     return this.serviceWizard !== null;
   }
@@ -56,8 +63,9 @@ export default class NewServiceWizard extends Vue {
   }
 
   selectFeature(wizard: VueConstructor) {
-    if (this.serviceIdError !== null) {
-      Notify.create(this.serviceIdError);
+    const err = [this.serviceIdError, this.serviceTitleError].find(e => !!e);
+    if (err) {
+      Notify.create(err);
       return;
     }
     this.wizardComponent = wizard;
@@ -83,6 +91,11 @@ export default class NewServiceWizard extends Vue {
     await fetcherById(this.$store, service.type)(this.$store, service);
   }
 
+  onCancel(message: string) {
+    this.wizardComponent = null;
+    Notify.create({ message });
+  }
+
   reset() {
     this.serviceId = '';
     this.serviceTitle = '';
@@ -103,8 +116,9 @@ export default class NewServiceWizard extends Vue {
       <component
         v-if="serviceWizardActive"
         :is="serviceWizard"
+        :serviceId="serviceId"
         :onCreate="onCreate"
-        :onCancel="reset"
+        :onCancel="onCancel"
       />
     </q-item>
     <!-- Select a wizard -->
@@ -130,6 +144,8 @@ export default class NewServiceWizard extends Vue {
         <q-input
           v-model="serviceTitle"
           placeholder="Choose a name"
+          :error="serviceTitleError !== null"
+          :suffix="serviceTitleError"
         />
       </q-field>
 

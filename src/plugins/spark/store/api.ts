@@ -48,3 +48,8 @@ export const persistUnits = async (serviceId: string, units: UserUnits): Promise
 
 export const fetchUnitAlternatives = async (serviceId: string): Promise<UnitAlternatives> =>
   get(`/${encodeURIComponent(serviceId)}/codec/unit_alternatives`);
+
+export const validateService = async (serviceId: string): Promise<boolean> =>
+  get(`/${encodeURIComponent(serviceId)}/_service/status`)
+    .then(retv => retv.status === 'ok')
+    .catch(() => false);
