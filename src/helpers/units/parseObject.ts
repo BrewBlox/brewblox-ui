@@ -1,13 +1,11 @@
 import Unit from './Unit';
 import Link from './Link';
-import valueToUnit from './convertUnit';
 
-// const extractUnit = /^([a-zA-Z0-9_.\-[\]]+)(\[([a-zA-Z_]+)]|<>)$/;
+// "not brackets", then a left bracket, then more "not brackets", then right bracket
 const extractUnit = /^([^[<]+)([[<])([^\]>]*)[\]>]$/;
 
 export function propertyNameWithoutUnit(name: string): string {
   const matched = name.match(extractUnit);
-
   return matched ? matched[1] : name;
 }
 
@@ -39,13 +37,20 @@ export function convertToUnit(key: string, value: any): Unit | Link {
   const matched = key.match(extractUnit);
 
   if (matched) {
+    const [full, base, leftBracket, unit, rightBracket] = matched;
     try {
-      if (matched[2] === '<') {
+      console.log(matched);
+      if (leftBracket === '<') {
         return new Link(value);
       }
 
-      return valueToUnit(value, matched[3]);
+      if (leftBracket === '[') {
+        return new Unit(value, unit);
+      }
+
+      return value;
     } catch (e) {
+      console.log(e);
       return value;
     }
   }

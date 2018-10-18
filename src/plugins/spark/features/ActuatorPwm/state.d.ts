@@ -1,5 +1,5 @@
 import { Block } from '@/plugins/spark/state';
-import Link from '@/helpers/units/Link';
+import { Link } from '@/helpers/units';
 
 export interface ActuatorPwmBlock extends Block {
   data: {

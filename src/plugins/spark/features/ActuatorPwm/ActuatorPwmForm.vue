@@ -4,7 +4,7 @@ import BlockForm from '@/plugins/spark/components/BlockForm';
 import WidgetField from '@/components/Widget/WidgetField.vue';
 import ProfilesBar from '@/plugins/spark/components/ProfilesBar.vue';
 import Constraints from '@/plugins/spark/components/Constraints.vue';
-import Link from '@/helpers/units/Link';
+import { Link } from '@/helpers/units';
 import { blockIds } from '@/plugins/spark/store/getters';
 
 @Component({

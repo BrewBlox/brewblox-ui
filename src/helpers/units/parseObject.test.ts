@@ -1,6 +1,5 @@
 import Unit from './Unit';
 import Link from './Link';
-import { Celsius, Fahrenheit } from './Temperature';
 
 import { deserialize, serialize } from './parseObject';
 
@@ -21,9 +20,7 @@ describe('deserialize', () => {
     expect(output.something).not.toBeInstanceOf(Unit);
     expect(output.unknownUnit).not.toBeInstanceOf(Unit);
     expect(output.convert).toBeInstanceOf(Unit);
-    expect(output.convert).toBeInstanceOf(Celsius);
     expect(output.normal[0]).toBe(21);
-    expect(output.array[0]).toBeInstanceOf(Celsius);
   });
 
   it('Should recognise deep properties structured as units', () => {
@@ -41,9 +38,7 @@ describe('deserialize', () => {
 
     expect(output.data.test).toBe('Do not touch');
     expect(output.data.convert).toBeInstanceOf(Unit);
-    expect(output.data.convert).toBeInstanceOf(Celsius);
     expect(output.data.evenDeeper.convert).toBeInstanceOf(Unit);
-    expect(output.data.evenDeeper.convert).toBeInstanceOf(Fahrenheit);
   });
 
   it('Should handle undefined and null properties', () => {
@@ -70,7 +65,6 @@ describe('deserialize', () => {
     const output = deserialize(input);
 
     expect(output).toBeInstanceOf(Array);
-    expect(output[0].convert).toBeInstanceOf(Celsius);
     expect(output[1]).toBe(25);
     expect(output[2]).toBe('do not touch');
   });
@@ -95,13 +89,13 @@ describe('deserialize', () => {
 describe('serialize', () => {
   it('Converts unit properties for API saving', () => {
     const input = {
-      temperature: new Celsius(21),
+      temperature: new Unit(21, 'celsius'),
       leaveThisBe: 666,
-      handleArray: [new Celsius(22), new Celsius(23), new Celsius(24)],
+      handleArray: [new Unit(22, 'celsius'), new Unit(23, 'celsius'), new Unit(24, 'celsius')],
       normalArray: [22, 23, 24],
       emptyArray: [],
       deeper: {
-        temperatureInUSA: new Fahrenheit(60),
+        temperatureInUSA: new Unit(60, 'fahrenheit'),
       },
     };
 
@@ -123,7 +117,7 @@ describe('serialize', () => {
     const input = [
       20,
       {
-        test: new Celsius(23),
+        test: new Unit(23, 'celsius'),
       },
     ];
 
