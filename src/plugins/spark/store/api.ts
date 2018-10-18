@@ -1,54 +1,50 @@
 import { get, put, post, del } from '@/helpers/fetch';
-import { Service } from '@/store/services/state';
-import { Block, DataBlock } from '../state';
+import { Block, DataBlock, UserUnits, UnitAlternatives } from '../state';
 
-function asDataBlock(block: Block): DataBlock {
-  return {
+const asDataBlock = (block: Block): DataBlock =>
+  ({
     id: block.id,
     type: block.type,
     profiles: block.profiles,
     data: block.data,
-  };
-}
+  });
 
-function asBlock(block: DataBlock, serviceId: string): Block {
-  return {
-    ...block,
-    serviceId,
-  };
-}
+const asBlock = (block: DataBlock, serviceId: string): Block => ({ ...block, serviceId });
 
-export function fetchBlocks(service: Service): Promise<Block[]> {
-  return get(`/${encodeURIComponent(service.id)}/objects`)
-    .then(blocks => blocks.map((block: DataBlock) => asBlock(block, service.id)));
-}
+export const fetchBlocks = async (serviceId: string): Promise<Block[]> =>
+  get(`/${encodeURIComponent(serviceId)}/objects`)
+    .then(blocks => blocks.map((block: DataBlock) => asBlock(block, serviceId)));
 
-export function fetchBlock(block: Block): Promise<Block> {
-  return get(`/${encodeURIComponent(block.serviceId)}/objects/${encodeURIComponent(block.id)}`)
+export const fetchBlock = async (block: Block): Promise<Block> =>
+  get(`/${encodeURIComponent(block.serviceId)}/objects/${encodeURIComponent(block.id)}`)
     .then(fetched => asBlock(fetched, block.serviceId));
-}
 
-export function createBlock(block: Block): Promise<Block> {
-  return post(
+export const createBlock = async (block: Block): Promise<Block> =>
+  post(
     `/${encodeURIComponent(block.serviceId)}/objects`,
     asDataBlock(block),
   ).then(savedBlock => asBlock(savedBlock, block.serviceId));
-}
 
-export function persistBlock(block: Block): Promise<Block> {
-  return put(
+export const persistBlock = async (block: Block): Promise<Block> =>
+  put(
     `/${encodeURIComponent(block.serviceId)}/objects/${encodeURIComponent(block.id)}`,
     asDataBlock(block),
   ).then(savedBlock => asBlock(savedBlock, block.serviceId));
-}
 
-export function deleteBlock(block: Block): Promise<string> {
-  return del(
+export const deleteBlock = async (block: Block): Promise<string> =>
+  del(
     `/${encodeURIComponent(block.serviceId)}/objects/${encodeURIComponent(block.id)}`,
     asDataBlock(block),
   ).then(response => response.id);
-}
 
-export function clearBlocks(serviceId: string): Promise<any> {
-  return del(`/${encodeURIComponent(serviceId)}/objects`, {});
-}
+export const clearBlocks = async (serviceId: string): Promise<any> =>
+  del(`/${encodeURIComponent(serviceId)}/objects`, {});
+
+export const fetchUnits = async (serviceId: string): Promise<UserUnits> =>
+  get(`/${encodeURIComponent(serviceId)}/codec/units`);
+
+export const persistUnits = async (serviceId: string, units: UserUnits): Promise<UserUnits> =>
+  put(`/${encodeURIComponent(serviceId)}/codec/units`, units);
+
+export const fetchUnitAlternatives = async (serviceId: string): Promise<UnitAlternatives> =>
+  get(`/${encodeURIComponent(serviceId)}/codec/unit_alternatives`);

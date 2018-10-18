@@ -14,6 +14,8 @@ const vuexModule = () => ({
   strict: true,
   state: {
     blocks: {},
+    units: {},
+    unitAlternatives: {},
     fetching: true,
   },
 });

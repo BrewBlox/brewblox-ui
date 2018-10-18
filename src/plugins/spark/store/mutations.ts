@@ -1,14 +1,13 @@
 import Vue from 'vue';
 import { commit, noArgCommit } from '@/helpers/dynamic-store';
 import { SparkState } from './state';
-import { Block } from '../state';
+import { Block, UserUnits, UnitAlternatives } from '../state';
 
 const mutations = {
-  addBlock(state: SparkState, block: Block) {
-    Vue.set(state.blocks, block.id, { ...block, isLoading: false });
-  },
+  addBlock: (state: SparkState, block: Block) =>
+    Vue.set(state.blocks, block.id, { ...block, isLoading: false }),
 
-  updateBlock(state: SparkState, block: Partial<Block>) {
+  updateBlock: (state: SparkState, block: Partial<Block>) => {
     const id = block.id || '';
     const existing = state.blocks[id];
     if (!existing) {
@@ -17,29 +16,30 @@ const mutations = {
     Vue.set(state.blocks, id, { ...existing, ...block });
   },
 
-  updateBlockState(state: SparkState, block: Partial<Block>) {
-    mutations.updateBlock(state, block);
-  },
+  updateBlockState: (state: SparkState, block: Partial<Block>) =>
+    mutations.updateBlock(state, block),
 
-  mutateBlock(state: SparkState, block: Partial<Block>) {
-    mutations.updateBlock(state, block);
-  },
+  mutateBlock: (state: SparkState, block: Partial<Block>) =>
+    mutations.updateBlock(state, block),
 
-  blockLoading(state: SparkState, id: string) {
-    Vue.set(state.blocks, id, { ...state.blocks[id], isLoading: true });
-  },
+  blockLoading: (state: SparkState, id: string) =>
+    Vue.set(state.blocks, id, { ...state.blocks[id], isLoading: true }),
 
-  mutateFetching(state: SparkState, fetching: boolean) {
+  mutateFetching: (state: SparkState, fetching: boolean) => {
     state.fetching = fetching;
   },
 
-  removeBlock(state: SparkState, id: string) {
-    Vue.delete(state.blocks, id);
-  },
+  removeBlock: (state: SparkState, id: string) =>
+    Vue.delete(state.blocks, id),
 
-  clearBlocks(state: SparkState) {
-    Vue.set(state, 'blocks', {});
-  },
+  clearBlocks: (state: SparkState) =>
+    Vue.set(state, 'blocks', {}),
+
+  setUnits: (state: SparkState, units: UserUnits) =>
+    Vue.set(state, 'units', units),
+
+  setUnitAlternatives: (state: SparkState, alts: UnitAlternatives) =>
+    Vue.set(state, 'unitAlternatives', alts),
 };
 
 export const addBlock = commit(mutations.addBlock);
@@ -49,5 +49,7 @@ export const blockLoading = commit(mutations.blockLoading);
 export const mutateFetching = commit(mutations.mutateFetching);
 export const removeBlock = commit(mutations.removeBlock);
 export const clearBlocks = noArgCommit(mutations.clearBlocks);
+export const setUnits = commit(mutations.setUnits);
+export const setUnitAlternatives = commit(mutations.setUnitAlternatives);
 
 export default mutations;

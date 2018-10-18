@@ -25,3 +25,11 @@ export interface DashboardBlock extends DashboardItem {
     blockId: string;
   };
 }
+
+export interface UserUnits {
+  [key: string]: string;
+}
+
+export interface UnitAlternatives {
+  [key: string]: string[];
+}
