@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { commit, noArgCommit } from '@/helpers/dynamic-store';
 import { SparkState } from './state';
-import { Block, UserUnits } from '../state';
+import { Block, UserUnits, UnitAlternatives } from '../state';
 
 const mutations = {
   addBlock: (state: SparkState, block: Block) =>
@@ -37,6 +37,9 @@ const mutations = {
 
   setUnits: (state: SparkState, units: UserUnits) =>
     Vue.set(state, 'units', units),
+
+  setUnitAlternatives: (state: SparkState, alts: UnitAlternatives) =>
+    Vue.set(state, 'unitAlternatives', alts),
 };
 
 export const addBlock = commit(mutations.addBlock);
@@ -47,5 +50,6 @@ export const mutateFetching = commit(mutations.mutateFetching);
 export const removeBlock = commit(mutations.removeBlock);
 export const clearBlocks = noArgCommit(mutations.clearBlocks);
 export const setUnits = commit(mutations.setUnits);
+export const setUnitAlternatives = commit(mutations.setUnitAlternatives);
 
 export default mutations;

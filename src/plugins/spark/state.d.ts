@@ -29,3 +29,7 @@ export interface DashboardBlock extends DashboardItem {
 export interface UserUnits {
   [key: string]: string;
 }
+
+export interface UnitAlternatives {
+  [key: string]: string[];
+}

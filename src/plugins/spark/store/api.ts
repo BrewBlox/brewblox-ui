@@ -1,5 +1,5 @@
 import { get, put, post, del } from '@/helpers/fetch';
-import { Block, DataBlock, UserUnits } from '../state';
+import { Block, DataBlock, UserUnits, UnitAlternatives } from '../state';
 
 const asDataBlock = (block: Block): DataBlock =>
   ({
@@ -45,3 +45,6 @@ export const fetchUnits = async (serviceId: string): Promise<UserUnits> =>
 
 export const persistUnits = async (serviceId: string, units: UserUnits): Promise<UserUnits> =>
   put(`/${encodeURIComponent(serviceId)}/codec/units`, units);
+
+export const fetchUnitAlternatives = async (serviceId: string): Promise<UnitAlternatives> =>
+  get(`/${encodeURIComponent(serviceId)}/codec/unit_alternatives`);

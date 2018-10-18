@@ -6,7 +6,12 @@ import ProfilesBar from '@/plugins/spark/components/ProfilesBar.vue';
 import WidgetField from '@/components/Widget/WidgetField.vue';
 import { toShadow, fromShadow, ShadowMapping, deepCopy } from '@/helpers/shadow-copy';
 import { Block, UserUnits } from '@/plugins/spark/state';
-import { blockById, profileNames as serviceProfiles, units } from '@/plugins/spark/store/getters';
+import {
+  blockById,
+  profileNames as serviceProfiles,
+  units,
+  unitAlternatives,
+} from '@/plugins/spark/store/getters';
 import { updateProfileNames, saveBlock, saveUnits } from '@/plugins/spark/store/actions';
 
 import {
@@ -69,6 +74,20 @@ export default class SparkForm extends Vue {
     return new Date((this.inputValues.secondsSinceEpoch || 0) * 1000).toString();
   }
 
+  get unitAlternatives() {
+    return unitAlternatives(this.$store, this.$props.serviceId);
+  }
+
+  unitAlternativeOptions(name: string) {
+    return (this.unitAlternatives[name] || [])
+      .map(val => ({ label: val, value: val }));
+  }
+
+  spaceCased(input: string) {
+    // PascalCasedString -> Pascal cased string
+    return input.replace(/([^^])([A-Z]+)/g, (_, v1, v2) => `${v1} ${v2.toLowerCase()}`);
+  }
+
   generateShadow() {
     return toShadow(this.stored, this.inputMapping);
   }
@@ -98,7 +117,7 @@ export default class SparkForm extends Vue {
 </script>
 
 <template>
-  <q-card>
+  <q-card class="flex-center">
     <q-card-main class="column">
 
       <widget-field
@@ -134,11 +153,12 @@ export default class SparkForm extends Vue {
         label="Favored units"
         icon="edit"
       >
-        <q-input
+        <q-select
           v-for="(val, name) in inputValues.units"
           :key="name"
+          :options="unitAlternativeOptions(name)"
           v-model="inputValues.units[name]"
-          :suffix="`${name} units`"
+          :suffix="spaceCased(name)"
         />
       </widget-field>
 

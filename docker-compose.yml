@@ -15,9 +15,20 @@ services:
     depends_on:
       - influx
       - eventbus
+    volumes:
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /history"
+
+  sparksimulator:
+    image: brewblox/firmware-simulator:develop
+    volumes:
+        - "/etc/timezone:/etc/timezone:ro"
+        - "/etc/localtime:/etc/localtime:ro"
+    ports:
+        - "8332"
 
   sparkey:
     image: brewblox/brewblox-devcon-spark:develop
@@ -28,11 +39,13 @@ services:
       - "traefik.frontend.rule=PathPrefix: /sparkey"
     volumes:
       - "./mocks/config/seed_objects.json:/app/seed_objects.json"
-    command:
-      - "--name=sparkey"
-      - "--simulation"
-      - "--seed-profiles=0"
-      - "--seed-objects=seed_objects.json"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    command: >
+      --name=sparkey
+      --seed-profiles=0
+      --seed-objects=seed_objects.json
+      --device-host=sparksimulator
 
   spock:
     image: brewblox/brewblox-devcon-spark:develop
@@ -43,11 +56,13 @@ services:
       - "traefik.frontend.rule=PathPrefix: /spock"
     volumes:
       - "./mocks/config/seed_objects.json:/app/seed_objects.json"
-    command:
-      - "--name=spock"
-      - "--simulation"
-      - "--seed-profiles=0"
-      - "--seed-objects=seed_objects.json"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    command: >
+      --name=spock
+      --simulation
+      --seed-profiles=0
+      --seed-objects=seed_objects.json
 
   datastore:
     image: brewblox/brewblox-datastore:develop

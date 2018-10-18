@@ -3,7 +3,7 @@ import { RootStore } from '@/store/state';
 import { serviceById } from '@/store/services/getters';
 
 import { SparkState } from './state';
-import { Spark, Block, UserUnits } from '../state';
+import { Spark, Block, UserUnits, UnitAlternatives } from '../state';
 
 const defaultProfileNames = [
   'P1',
@@ -24,6 +24,7 @@ const getters = {
   blockIds: (state: SparkState): string[] => Object.keys(state.blocks),
   blockValues: (state: SparkState): Block[] => Object.values(state.blocks),
   units: (state: SparkState): UserUnits => state.units,
+  unitAlternatives: (state: SparkState): UnitAlternatives => state.unitAlternatives,
 };
 
 export default getters;
@@ -33,6 +34,7 @@ export const blocks = read(getters.blocks);
 export const blockIds = read(getters.blockIds);
 export const blockValues = read(getters.blockValues);
 export const units = read(getters.units);
+export const unitAlternatives = read(getters.unitAlternatives);
 
 export function blockById<T extends Block>(
   store: RootStore,

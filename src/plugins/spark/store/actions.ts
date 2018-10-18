@@ -15,6 +15,7 @@ import {
   persistBlock as persistBlockInApi,
   fetchUnits as fetchUnitsInApi,
   persistUnits as persistUnitsInApi,
+  fetchUnitAlternatives as fetchUnitAlternativesInApi,
 } from './api';
 
 import { sparkServiceById } from './getters';
@@ -26,6 +27,7 @@ import {
   removeBlock as removeBlockInStore,
   clearBlocks as clearBlocksInStore,
   setUnits as setUnitsInStore,
+  setUnitAlternatives as setUnitAlternativesInStore,
 } from './mutations';
 
 const actions = {
@@ -89,10 +91,14 @@ export const fetchUnits = async (store: RootStore, serviceId: string) =>
 export const saveUnits = async (store: RootStore, serviceId: string, units: UserUnits) =>
   setUnitsInStore(store, serviceId, await persistUnitsInApi(serviceId, units));
 
+export const fetchUnitAlternatives = async (store: RootStore, serviceId: string) =>
+  setUnitAlternativesInStore(store, serviceId, await fetchUnitAlternativesInApi(serviceId));
+
 export const fetchAll = async (store: RootStore, service: Service) =>
   Promise.all([
     fetchBlocks(store, service.id),
     fetchUnits(store, service.id),
+    fetchUnitAlternatives(store, service.id),
   ]);
 
 export default actions;
