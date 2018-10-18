@@ -16,6 +16,7 @@ import {
   fetchUnits as fetchUnitsInApi,
   persistUnits as persistUnitsInApi,
   fetchUnitAlternatives as fetchUnitAlternativesInApi,
+  validateService as validateServiceInApi,
 } from './api';
 
 import { sparkServiceById } from './getters';
@@ -100,5 +101,8 @@ export const fetchAll = async (store: RootStore, service: Service) =>
     fetchUnits(store, service.id),
     fetchUnitAlternatives(store, service.id),
   ]);
+
+export const validateService = async (serviceId: string) =>
+  validateServiceInApi(serviceId);
 
 export default actions;

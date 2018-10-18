@@ -1,5 +1,5 @@
 import queryString from 'query-string';
-import { post, sse } from '@/helpers/fetch';
+import { post, sse, get } from '@/helpers/fetch';
 import { Slice, QueryParams, QueryTarget } from '@/plugins/history/state';
 
 const snakeCased = (obj: any) =>
@@ -30,3 +30,8 @@ export const fetchValueSource = async (
 
 export const fetchKnownKeys = async (serviceId: string) =>
   fetchData(serviceId, '/query/objects');
+
+export const validateService = async (serviceId: string): Promise<boolean> =>
+  get(`/${encodeURIComponent(serviceId)}/_service/status`)
+    .then(retv => retv.status === 'ok')
+    .catch(() => false);

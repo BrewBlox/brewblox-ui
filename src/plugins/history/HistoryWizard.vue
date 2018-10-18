@@ -1,9 +1,14 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { validateService } from '@/plugins/history/store/actions';
 
 @Component({
   props: {
+    serviceId: {
+      type: String,
+      required: true,
+    },
     onCreate: {
       type: Function,
       required: true,
@@ -15,16 +20,21 @@ import Component from 'vue-class-component';
   },
 })
 export default class HistoryWizard extends Vue {
-  mounted() {
-    this.$props.onCreate({
-      type: 'History',
-    });
+  async mounted() {
+    const ok = await validateService(this.$props.serviceId);
+    if (ok) {
+      this.$props.onCreate({ type: 'History' });
+    } else {
+      this.$props.onCancel(`Service "${this.$props.serviceId}" invalid or not found`);
+    }
   }
 }
 </script>
 
 <template>
-  <div />
+  <div class="flex flex-center">
+    <q-spinner :size="30"/>
+  </div>
 </template>
 
 <style scoped>
