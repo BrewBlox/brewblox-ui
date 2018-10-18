@@ -39,7 +39,6 @@ export function convertToUnit(key: string, value: any): Unit | Link {
   if (matched) {
     const [full, base, leftBracket, unit, rightBracket] = matched;
     try {
-      console.log(matched);
       if (leftBracket === '<') {
         return new Link(value);
       }
@@ -50,7 +49,6 @@ export function convertToUnit(key: string, value: any): Unit | Link {
 
       return value;
     } catch (e) {
-      console.log(e);
       return value;
     }
   }
