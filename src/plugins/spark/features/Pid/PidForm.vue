@@ -3,8 +3,7 @@ import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import WidgetField from '@/components/Widget/WidgetField.vue';
 import ProfilesBar from '@/plugins/spark/components/ProfilesBar.vue';
-import { Unit } from '@/helpers/units';
-import Link from '@/helpers/units/Link';
+import { Unit, Link } from '@/helpers/units';
 import { blockIds } from '@/plugins/spark/store/getters';
 import { filters } from './getters';
 
@@ -108,19 +107,19 @@ export default class PidForm extends BlockForm {
       >
         <q-input
           v-model="inputValues.kp.value"
-          :suffix="inputValues.kp.unit"
+          :suffix="inputValues.kp.unitNotation"
           stack-label="Kp"
           type="number"
         />
         <q-input
           v-model="inputValues.ti.value"
-          :suffix="inputValues.ti.unit"
+          :suffix="inputValues.ti.unitNotation"
           stack-label="Ti"
           type="number"
         />
         <q-input
           v-model="inputValues.td.value"
-          :suffix="inputValues.ti.unit"
+          :suffix="inputValues.ti.unitNotation"
           stack-label="Td"
           type="number"
         />

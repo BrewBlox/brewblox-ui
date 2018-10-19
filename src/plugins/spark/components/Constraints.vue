@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import Link from '@/helpers/units/Link';
+import { Link } from '@/helpers/units';
 import { blockIds } from '@/plugins/spark/store/getters';
 
 interface ConstraintInfo {

@@ -1,9 +1,7 @@
 import Unit from './Unit';
-import { Temperature, Celsius, Fahrenheit } from './Temperature';
+import Link from './Link';
 
 export {
   Unit,
-  Temperature,
-  Celsius,
-  Fahrenheit,
+  Link,
 };
