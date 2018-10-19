@@ -18,8 +18,6 @@ import { getById } from './getters';
   },
 })
 export default class ActuatorPwmWidget extends BlockWidget {
-  modalOpen: boolean = false;
-
   get block(): ActuatorPwmBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
@@ -31,59 +29,38 @@ export default class ActuatorPwmWidget extends BlockWidget {
 </script>
 
 <template>
-  <div class="widget-container">
-
-    <widget-modal
-      :isOpen="modalOpen"
-      :onClose="() => { this.modalOpen = false; }"
-      :title="$props.id"
+  <widget-card
+    :title="$props.id"
+    :subTitle="$props.type"
+    :onRefresh="refreshBlock"
+    form="ActuatorPwmForm"
+    v-model="block"
+  >
+    <widget-field
+      :label="`Actuator (${block.data.actuatorId.id})`"
+      :icon="block.data.actuatorValid ? 'link' : 'link_off'"
     >
-      <actuator-pwm-form
-        v-model="block"
+      <big>Setting: {{ block.data.setting }}</big> <br/>
+      <big>Value: {{ block.data.value }}</big>
+    </widget-field>
+
+    <widget-field
+      label="Period"
+    >
+      <big>Period: {{ block.data.period }}</big>
+    </widget-field>
+
+    <widget-field
+      label="Constraints"
+    >
+      <constraints
+        readonly
+        type="analog"
+        :serviceId="serviceId"
+        v-model="block.data.constrainedBy"
       />
-    </widget-modal>
-
-    <widget-toolbar
-      :name="$props.id"
-      :type="$props.type"
-      :on-refresh="refreshBlock"
-      :on-settings="() => { this.modalOpen = true }"
-    />
-
-    <q-scroll-area class="widget-body">
-      <q-card>
-        <q-card-main class="row">
-
-          <widget-field
-            :label="`Actuator (${block.data.actuatorId.id})`"
-            :icon="block.data.actuatorValid ? 'link' : 'link_off'"
-          >
-            <big>Setting: {{ block.data.setting }}</big> <br/>
-            <big>Value: {{ block.data.value }}</big>
-          </widget-field>
-
-          <widget-field
-            label="Period"
-          >
-            <big>Period: {{ block.data.period }}</big>
-          </widget-field>
-
-          <widget-field
-            label="Constraints"
-          >
-            <constraints
-              readonly
-              type="analog"
-              :serviceId="serviceId"
-              v-model="block.data.constrainedBy"
-            />
-          </widget-field>
-
-        </q-card-main>
-      </q-card>
-    </q-scroll-area>
-
-  </div>
+    </widget-field>
+  </widget-card>
 </template>
 
 <style scoped>

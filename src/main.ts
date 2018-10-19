@@ -3,7 +3,7 @@ import Vue from 'vue';
 import createContainer from './create-container';
 import './quasar';
 
-import { autoRegister, componentPattern } from './helpers/component-ref';
+import { autoRegister } from './helpers/component-ref';
 
 import router from './router';
 import store from './store';
@@ -15,7 +15,7 @@ import history from './plugins/history';
 
 import App from './App.vue';
 
-autoRegister(require.context('./components', true, componentPattern));
+autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
 
 const plugins = [
   portal,

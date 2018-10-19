@@ -6,8 +6,6 @@ import { getById, state } from './getters';
 
 @Component
 export default class ActuatorPinWidget extends BlockWidget {
-  modalOpen: boolean = false;
-
   get block(): ActuatorPinBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
@@ -23,63 +21,44 @@ export default class ActuatorPinWidget extends BlockWidget {
 </script>
 
 <template>
-  <div class="widget-container">
+  <widget-card
+    :title="$props.id"
+    :subTitle="$props.type"
+    :onRefresh="refreshBlock"
+    form="ActuatorPinForm"
+    v-model="block"
+  >
 
-    <widget-modal
-      :isOpen="modalOpen"
-      :onClose="() => { this.modalOpen = false; }"
-      :title="$props.id"
+    <widget-field
+      label="State"
     >
-      <actuator-pin-form
-        v-model="block"
+      <big>{{ actuatorState }}</big>
+    </widget-field>
+
+    <widget-field
+      label="Pin"
+    >
+      <big>{{ block.data.pin }}</big>
+    </widget-field>
+
+    <widget-field
+      label="Inverted"
+    >
+      <big>{{ block.data.invert }}</big>
+    </widget-field>
+
+    <widget-field
+      label="Constraints"
+    >
+      <constraints
+        readonly
+        type="digital"
+        :serviceId="serviceId"
+        v-model="block.data.constrainedBy"
       />
-    </widget-modal>
+    </widget-field>
 
-    <widget-toolbar
-      :name="$props.id"
-      :type="$props.type"
-      :on-refresh="refreshBlock"
-      :on-settings="() => { this.modalOpen = true }"
-    />
-
-    <q-scroll-area class="widget-body">
-      <q-card>
-        <q-card-main class="row">
-
-          <widget-field
-            label="State"
-          >
-            <big>{{ actuatorState }}</big>
-          </widget-field>
-
-          <widget-field
-            label="Pin"
-          >
-            <big>{{ block.data.pin }}</big>
-          </widget-field>
-
-          <widget-field
-            label="Inverted"
-          >
-            <big>{{ block.data.invert }}</big>
-          </widget-field>
-
-          <widget-field
-            label="Constraints"
-          >
-            <constraints
-              readonly
-              type="digital"
-              :serviceId="serviceId"
-              v-model="block.data.constrainedBy"
-            />
-          </widget-field>
-
-        </q-card-main>
-      </q-card>
-    </q-scroll-area>
-
-  </div>
+  </widget-card>
 </template>
 
 <style scoped>

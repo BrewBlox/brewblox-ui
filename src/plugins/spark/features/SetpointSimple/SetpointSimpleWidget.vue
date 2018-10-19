@@ -7,8 +7,6 @@ import { getById } from './getters';
 
 @Component
 export default class SetpointSimpleWidget extends BlockWidget {
-  modalOpen: boolean = false;
-
   get block(): SetpointSimpleBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
@@ -24,41 +22,22 @@ export default class SetpointSimpleWidget extends BlockWidget {
 </script>
 
 <template>
-  <div class="widget-container">
+  <widget-card
+    :title="$props.id"
+    :subTitle="$props.type"
+    :onRefresh="refreshBlock"
+    form="SetpointSimpleForm"
+    v-model="block"
+  >
 
-    <widget-modal
-      :isOpen="modalOpen"
-      :onClose="() => { this.modalOpen = false; }"
-      :title="$props.id"
+    <widget-field
+      label="Setting"
+      icon="devices"
     >
-      <setpoint-simple-form
-        v-model="block"
-      />
-    </widget-modal>
+      <big>{{ setting | unit }}</big>
+    </widget-field>
 
-    <widget-toolbar
-      :name="$props.id"
-      :type="$props.type"
-      :on-refresh="refreshBlock"
-      :on-settings="() => { this.modalOpen = true; }"
-    />
-
-    <q-scroll-area class="widget-body">
-      <q-card>
-        <q-card-main class="row">
-
-          <widget-field
-            label="Setting"
-            icon="devices"
-          >
-            <big>{{ setting | unit }}</big>
-          </widget-field>
-
-        </q-card-main>
-      </q-card>
-    </q-scroll-area>
-
-  </div>
+  </widget-card>
 </template>
 
 <style scoped>
