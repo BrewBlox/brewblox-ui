@@ -1,18 +1,11 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import WidgetField from '@/components/Widget/WidgetField.vue';
-import ProfilesBar from '@/plugins/spark/components/ProfilesBar.vue';
 import { Unit, Link } from '@/helpers/units';
 import { blockIds } from '@/plugins/spark/store/getters';
 import { filters } from './getters';
 
-@Component({
-  components: {
-    WidgetField,
-    ProfilesBar,
-  },
-})
+@Component
 export default class PidForm extends BlockForm {
   get inputMapping() {
     return {

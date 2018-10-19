@@ -1,4 +1,4 @@
-import { ref } from '@/helpers/component-ref';
+import { ref, autoRegister } from '@/helpers/component-ref';
 import { createProvider } from '@/store/providers/actions';
 import { createFeature } from '@/store/features/actions';
 import features from './features';
@@ -9,6 +9,8 @@ import page from './provider/SparkPage.vue';
 import wizard from './provider/SparkWizard.vue';
 
 export default ({ store }: PluginArguments) => {
+  autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
+
   Object
     .values(features)
     .forEach(feature => createFeature(store, feature));

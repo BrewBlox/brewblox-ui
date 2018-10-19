@@ -2,8 +2,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Notify } from 'quasar';
-import ProfilesBar from '@/plugins/spark/components/ProfilesBar.vue';
-import WidgetField from '@/components/Widget/WidgetField.vue';
 import { toShadow, fromShadow, ShadowMapping, deepCopy } from '@/helpers/shadow-copy';
 import { Block, UserUnits } from '@/plugins/spark/state';
 import {
@@ -29,10 +27,6 @@ import {
 import { Watch } from 'vue-property-decorator';
 
 @Component({
-  components: {
-    ProfilesBar,
-    WidgetField,
-  },
   props: {
     serviceId: {
       type: String,

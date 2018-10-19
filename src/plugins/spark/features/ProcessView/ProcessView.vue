@@ -1,9 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-
-import Widget from '@/components/Widget/Widget';
-
+import Widget from '@/components/Widget/WidgetBase';
 import ProcessViewItem from './ProcessViewItem.vue';
 import componentByType from './Parts/componentByType';
 import { pathsFromSources, isSamePart } from './calculateFlows';

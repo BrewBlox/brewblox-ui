@@ -1,6 +1,6 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import Widget from '@/components/Widget/Widget';
+import Widget from '@/components/Widget/WidgetBase';
 import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 import WidgetModal from '@/components/Widget/WidgetModal.vue';
 import GraphDisplay from './GraphDisplay.vue';
@@ -91,24 +91,14 @@ export default class GraphWidget extends Widget {
 </script>
 
 <template>
-  <div class="widget-container">
-
-    <widget-modal
-      :isOpen="modalOpen"
-      :onClose="() => { this.modalOpen = false; }"
-      :title="$props.id"
-    >
-      <graph-form
-        v-model="graphCfg"
-      />
-    </widget-modal>
-
-    <widget-toolbar
-      :name="$props.id"
-      :type="$props.type"
-      :on-refresh="resetMetrics"
-      :on-settings="() => { this.modalOpen = true; }"
-    />
+  <widget-card
+    :title="$props.id"
+    :subTitle="$props.type"
+    :onRefresh="resetMetrics"
+    :body="false"
+    form="GraphForm"
+    v-model="graphCfg"
+  >
 
     <graph-display
       v-if="ready"
@@ -128,8 +118,7 @@ export default class GraphWidget extends Widget {
       </q-alert>
     </div>
 
-
-  </div>
+  </widget-card>
 </template>
 
 <style scoped>
