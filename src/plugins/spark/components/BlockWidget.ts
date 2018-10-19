@@ -1,4 +1,4 @@
-import Widget from '@/components/Widget/Widget';
+import Widget from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
 import { Block } from '../state';
 import { fetchBlock, saveBlock } from '../store/actions';

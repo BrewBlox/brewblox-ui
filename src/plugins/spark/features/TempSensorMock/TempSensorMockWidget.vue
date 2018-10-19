@@ -1,20 +1,10 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
-import WidgetModal from '@/components/Widget/WidgetModal.vue';
-import WidgetField from '@/components/Widget/WidgetField.vue';
 import { TempSensorMockBlock } from './state';
 import { getById } from './getters';
 
-@Component({
-  components: {
-    WidgetToolbar,
-    WidgetModal,
-    WidgetField,
-  },
-})
+@Component
 export default class TempSensorMockWidget extends BlockWidget {
   modalOpen: boolean = false;
 

@@ -1,21 +1,11 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-
-import { saveBlock } from '@/plugins/spark/store/actions';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
-import WidgetField from '@/components/Widget/WidgetField.vue';
-import WidgetModal from '@/components/Widget/WidgetModal.vue';
+import { saveBlock } from '@/plugins/spark/store/actions';
 import { SetpointSimpleBlock } from './state';
 import { getById } from './getters';
 
-@Component({
-  components: {
-    WidgetField,
-    WidgetToolbar,
-    WidgetModal,
-  },
-})
+@Component
 export default class SetpointSimpleWidget extends BlockWidget {
   modalOpen: boolean = false;
 

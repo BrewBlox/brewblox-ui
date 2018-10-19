@@ -1,16 +1,9 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import WidgetModal from '@/components/Widget/WidgetModal.vue';
-import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import { getById } from './getters';
 
-@Component({
-  components: {
-    WidgetModal,
-    WidgetToolbar,
-  },
-})
+@Component
 export default class InactiveObjectWidget extends BlockWidget {
   modalOpen: boolean = false;
 }

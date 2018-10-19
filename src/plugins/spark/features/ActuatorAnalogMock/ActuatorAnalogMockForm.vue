@@ -1,15 +1,8 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import WidgetField from '@/components/Widget/WidgetField.vue';
-import ProfilesBar from '@/plugins/spark/components/ProfilesBar.vue';
 
-@Component({
-  components: {
-    WidgetField,
-    ProfilesBar,
-  },
-})
+@Component
 export default class ActuatorAnalogMockForm extends BlockForm {
   get inputMapping() {
     return {

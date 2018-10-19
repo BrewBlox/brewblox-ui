@@ -1,10 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-
-import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
-import WidgetModal from '@/components/Widget/WidgetModal.vue';
-import WidgetField from '@/components/Widget/WidgetField.vue';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import SparkForm from './SparkForm.vue';
 
@@ -20,9 +16,6 @@ import { fetchBlock } from '@/plugins/spark/store/actions';
 
 @Component({
   components: {
-    WidgetToolbar,
-    WidgetModal,
-    WidgetField,
     SparkForm,
   },
   props: {

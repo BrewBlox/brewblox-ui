@@ -1,16 +1,9 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import WidgetField from '@/components/Widget/WidgetField.vue';
-import ProfilesBar from '@/plugins/spark/components/ProfilesBar.vue';
 import { Unit } from '@/helpers/units';
 
-@Component({
-  components: {
-    WidgetField,
-    ProfilesBar,
-  },
-})
+@Component
 export default class SetpointSimpleForm extends BlockForm {
   get inputMapping() {
     return {

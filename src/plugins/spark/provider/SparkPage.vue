@@ -1,10 +1,8 @@
 <script lang="ts">
 import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
-import GridContainer from '@/components/Grid/GridContainer.vue';
-import InvalidWidget from '@/components/Widget/InvalidWidget.vue';
-import SparkWidget from '@/plugins/spark/provider/SparkWidget.vue';
 import byOrder from '@/helpers/byOrder';
+import SparkWidget from './SparkWidget.vue';
 import { serviceAvailable } from '@/helpers/dynamic-store';
 import { DashboardItem } from '@/store/dashboards/state';
 import { Block } from '@/plugins/spark/state';
@@ -22,9 +20,7 @@ interface VueOrdered extends Vue {
 
 @Component({
   components: {
-    GridContainer,
     SparkWidget,
-    InvalidWidget,
   },
   props: {
     serviceId: {

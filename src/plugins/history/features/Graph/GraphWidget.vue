@@ -1,6 +1,6 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import Widget from '@/components/Widget/Widget';
+import Widget from '@/components/Widget/WidgetBase';
 import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
 import WidgetModal from '@/components/Widget/WidgetModal.vue';
 import GraphDisplay from './GraphDisplay.vue';

@@ -51,6 +51,8 @@
     "@types/plotly.js": "^1.38.8",
     "@types/query-string": "^6.1.0",
     "@types/shortid": "0.0.29",
+    "@types/webpack": "^4.4.17",
+    "@types/webpack-env": "^1.13.6",
     "@vue/cli-plugin-babel": "^3.0.3",
     "@vue/cli-plugin-e2e-cypress": "^3.0.3",
     "@vue/cli-plugin-eslint": "^3.0.3",

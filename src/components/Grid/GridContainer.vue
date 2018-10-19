@@ -1,7 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-
 import GridItem from './GridItem.vue';
 
 @Component({

@@ -1,4 +1,4 @@
-import { ref } from '@/helpers/component-ref';
+import { ref, autoRegister, componentPattern } from '@/helpers/component-ref';
 import { createFeature } from '@/store/features/actions';
 import { createProvider } from '@/store/providers/actions';
 import { register } from './store';
@@ -8,6 +8,8 @@ import features from './features';
 import wizard from './HistoryWizard.vue';
 
 export default ({ store }: PluginArguments) => {
+  autoRegister(require.context('./components', true, componentPattern));
+
   Object
     .values(features)
     .forEach(feature => createFeature(store, feature));

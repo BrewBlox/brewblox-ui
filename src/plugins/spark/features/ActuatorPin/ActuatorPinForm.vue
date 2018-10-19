@@ -1,18 +1,9 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import Constraints from '@/plugins/spark/components/Constraints.vue';
-import WidgetField from '@/components/Widget/WidgetField.vue';
-import ProfilesBar from '@/plugins/spark/components/ProfilesBar.vue';
 import { state } from './getters';
 
-@Component({
-  components: {
-    WidgetField,
-    ProfilesBar,
-    Constraints,
-  },
-})
+@Component
 export default class ActuatorPinForm extends BlockForm {
   get inputMapping() {
     return {

@@ -1,21 +1,10 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import Constraints from '@/plugins/spark/components/Constraints.vue';
-import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
-import WidgetModal from '@/components/Widget/WidgetModal.vue';
-import WidgetField from '@/components/Widget/WidgetField.vue';
 import { ActuatorPinBlock } from './state';
 import { getById, state } from './getters';
 
-@Component({
-  components: {
-    WidgetToolbar,
-    WidgetModal,
-    WidgetField,
-    Constraints,
-  },
-})
+@Component
 export default class ActuatorPinWidget extends BlockWidget {
   modalOpen: boolean = false;
 

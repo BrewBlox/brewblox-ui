@@ -1,17 +1,10 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import WidgetField from '@/components/Widget/WidgetField.vue';
-import ProfilesBar from '@/plugins/spark/components/ProfilesBar.vue';
 import Link from '@/helpers/units/Link';
 import { blockIds } from '@/plugins/spark/store/getters';
 
-@Component({
-  components: {
-    WidgetField,
-    ProfilesBar,
-  },
-})
+@Component
 export default class SetpointSensorPairForm extends BlockForm {
   get inputMapping() {
     return {
