@@ -1,17 +1,21 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import { ActuatorPwmBlock } from './state';
+import { ActuatorOffsetBlock } from './state';
 import { getById } from './getters';
 
 @Component
-export default class ActuatorPwmWidget extends BlockWidget {
-  get block(): ActuatorPwmBlock {
+export default class ActuatorOffsetWidget extends BlockWidget {
+  get block(): ActuatorOffsetBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
 
-  set block(block: ActuatorPwmBlock) {
+  set block(block: ActuatorOffsetBlock) {
     this.saveBlock(block);
+  }
+
+  get settingOrValue() {
+    return ['Setting', 'Value'][this.block.data.referenceSettingOrValue];
   }
 }
 </script>
@@ -21,21 +25,22 @@ export default class ActuatorPwmWidget extends BlockWidget {
     :title="$props.id"
     :subTitle="$props.type"
     :onRefresh="refreshBlock"
-    form="ActuatorPwmForm"
+    form="ActuatorOffsetForm"
     v-model="block"
   >
     <widget-field
-      :label="`Actuator (${block.data.actuatorId.id})`"
-      :icon="block.data.actuatorValid ? 'link' : 'link_off'"
+      :label="`Target (${block.data.targetId.id})`"
+      :icon="block.data.targetValid ? 'link' : 'link_off'"
     >
       <big>Setting: {{ block.data.setting }}</big> <br/>
       <big>Value: {{ block.data.value }}</big>
     </widget-field>
 
     <widget-field
-      label="Period"
+      :label="`Target (${block.data.referenceId.id})`"
+      :icon="block.data.referenceValid ? 'link' : 'link_off'"
     >
-      <big>Period: {{ block.data.period }}</big>
+      <big>Setting or value: {{ settingOrValue }}</big>
     </widget-field>
 
     <widget-field
