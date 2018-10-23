@@ -2,6 +2,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Link } from '@/helpers/units';
+import { MutexLink, BalancerLink } from '@/helpers/units/KnownLinks';
 import { blockIds } from '@/plugins/spark/store/getters';
 
 interface ConstraintInfo {
@@ -93,8 +94,19 @@ export default class DigitalConstraints extends Vue {
     }
   }
 
+  defaultValue(key: string) {
+    switch (key) {
+      case 'mutex':
+        return new MutexLink(null);
+      case 'balancer':
+        return new BalancerLink(null);
+      default:
+        return null;
+    }
+  }
+
   addConstraint(key: string) {
-    this.onChanged([...this.constraints, { key, value: null }]);
+    this.onChanged([...this.constraints, { key, value: this.defaultValue(key) }]);
   }
 
   updateConstraint(index: number, value: any) {
@@ -103,12 +115,13 @@ export default class DigitalConstraints extends Vue {
   }
 
   updateLinkConstraint(index: number, id: string) {
-    this.constraints[index].value = new Link(id);
+    const old = this.constraints[index].value;
+    this.constraints[index].value = new Link(id, old.type);
     this.onChanged(this.constraints);
   }
 
   changeConstraintType(index: number, key: string) {
-    this.constraints[index] = { key, value: null };
+    this.constraints[index] = { key, value: this.defaultValue(key) };
     this.onChanged(this.constraints);
   }
 }

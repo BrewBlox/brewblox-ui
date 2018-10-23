@@ -2,29 +2,22 @@
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { Link } from '@/helpers/units';
-import { blockIds } from '@/plugins/spark/store/getters';
+import { ActuatorDigitalLink } from '@/helpers/units/KnownLinks';
+import { blockIds, compatibleBlocks, isFetching } from '@/plugins/spark/store/getters';
 
 @Component
 export default class ActuatorPwmForm extends BlockForm {
   get inputMapping() {
     return {
       profiles: { path: 'profiles', default: [] },
-      actuatorId: { path: 'data.actuatorId', default: new Link(null) },
+      actuatorId: { path: 'data.actuatorId', default: new ActuatorDigitalLink(null) },
       period: { path: 'data.period', default: 0 },
       constrainedBy: { path: 'data.constrainedBy', default: { constraints: [] } },
     };
   }
 
-  get linkOpts() {
-    const unset = new Link(null);
-    return [
-      { label: unset.toString(), value: unset.id },
-      ...blockIds(this.$store, this.block.serviceId)
-        .map(id => ({
-          label: id,
-          value: id,
-        })),
-    ];
+  afterBlockFetch() {
+    this.fetchCompatibleToInputLinks();
   }
 }
 </script>
@@ -49,7 +42,7 @@ export default class ActuatorPwmForm extends BlockForm {
       >
         <q-select
           v-model="inputValues.actuatorId.id"
-          :options="linkOpts"
+          :options="linkOpts(inputValues.actuatorId)"
         />
       </widget-field>
 

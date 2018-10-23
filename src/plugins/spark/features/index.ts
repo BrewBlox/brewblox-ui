@@ -13,7 +13,7 @@ import TempSensorMock from './TempSensorMock';
 
 const features: { [id: string]: Feature } = {
   ActuatorAnalogMock,
-  ActuatorPin,
+  // ActuatorPin,
   ActuatorPwm,
   InactiveObject,
   TempSensorOneWire,

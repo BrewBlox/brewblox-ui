@@ -1,7 +1,7 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import Link from '@/helpers/units/Link';
+import { SetpointLink, TempSensorLink } from '@/helpers/units/KnownLinks';
 import { blockIds } from '@/plugins/spark/store/getters';
 
 @Component
@@ -9,21 +9,13 @@ export default class SetpointSensorPairForm extends BlockForm {
   get inputMapping() {
     return {
       profiles: { path: 'profiles', default: [] },
-      setpointId: { path: 'data.setpointId', default: new Link(null) },
-      sensorId: { path: 'data.sensorId', default: new Link(null) },
+      setpointId: { path: 'data.setpointId', default: new SetpointLink(null) },
+      sensorId: { path: 'data.sensorId', default: new TempSensorLink(null) },
     };
   }
 
-  get linkOpts() {
-    const unset = new Link(null);
-    return [
-      { label: unset.toString(), value: unset.id },
-      ...blockIds(this.$store, this.block.serviceId)
-        .map(id => ({
-          label: id,
-          value: id,
-        })),
-    ];
+  afterBlockFetch() {
+    this.fetchCompatibleToInputLinks();
   }
 }
 </script>
@@ -48,7 +40,7 @@ export default class SetpointSensorPairForm extends BlockForm {
       >
         <q-select
           v-model="inputValues.setpointId.id"
-          :options="linkOpts"
+          :options="linkOpts(inputValues.setpointId)"
         />
       </widget-field>
 
@@ -58,7 +50,7 @@ export default class SetpointSensorPairForm extends BlockForm {
       >
         <q-select
           v-model="inputValues.sensorId.id"
-          :options="linkOpts"
+          :options="linkOpts(inputValues.sensorId)"
         />
       </widget-field>
 

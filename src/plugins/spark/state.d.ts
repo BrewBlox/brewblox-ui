@@ -33,3 +33,7 @@ export interface UserUnits {
 export interface UnitAlternatives {
   [key: string]: string[];
 }
+
+export interface CompatibleBlocks {
+  [key: string]: string[];
+}

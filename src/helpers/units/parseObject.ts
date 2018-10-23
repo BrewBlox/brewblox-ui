@@ -24,10 +24,14 @@ function propertyNameWithUnit(key: string, inputObject: any): string {
   }
 
   if (
-    (Array.isArray(input) && input[0] instanceof Link) ||
-    input instanceof Link
+    Array.isArray(input) &&
+    input[0] instanceof Link
   ) {
-    return `${key}<>`;
+    return `${key}<${input[0].type}>`;
+  }
+
+  if (input instanceof Link) {
+    return `${key}<${input.type}>`;
   }
 
   return key;
@@ -37,14 +41,14 @@ export function convertToUnit(key: string, value: any): Unit | Link {
   const matched = key.match(extractUnit);
 
   if (matched) {
-    const [full, base, leftBracket, unit, rightBracket] = matched;
+    const [full, base, leftBracket, bracketed, rightBracket] = matched;
     try {
       if (leftBracket === '<') {
-        return new Link(value);
+        return new Link(value, bracketed);
       }
 
       if (leftBracket === '[') {
-        return new Unit(value, unit);
+        return new Unit(value, bracketed);
       }
 
       return value;

@@ -1,9 +1,8 @@
 import { read } from '@/helpers/dynamic-store';
 import { RootStore } from '@/store/state';
 import { serviceById } from '@/store/services/getters';
-
 import { SparkState } from './state';
-import { Spark, Block, UserUnits, UnitAlternatives } from '../state';
+import { Spark, Block, UserUnits, UnitAlternatives, CompatibleBlocks } from '../state';
 
 const defaultProfileNames = [
   'P1',
@@ -25,6 +24,7 @@ const getters = {
   blockValues: (state: SparkState): Block[] => Object.values(state.blocks),
   units: (state: SparkState): UserUnits => state.units,
   unitAlternatives: (state: SparkState): UnitAlternatives => state.unitAlternatives,
+  compatibleBlocks: (state: SparkState): CompatibleBlocks => state.compatibleBlocks,
 };
 
 export default getters;
@@ -35,6 +35,7 @@ export const blockIds = read(getters.blockIds);
 export const blockValues = read(getters.blockValues);
 export const units = read(getters.units);
 export const unitAlternatives = read(getters.unitAlternatives);
+export const compatibleBlocks = read(getters.compatibleBlocks);
 
 export function blockById<T extends Block>(
   store: RootStore,

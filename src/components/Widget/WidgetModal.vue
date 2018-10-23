@@ -52,7 +52,7 @@ export default class WidgetModal extends Vue {
         />
       </q-toolbar>
 
-      <slot />
+      <slot v-if="childOpen"/>
 
     </q-modal-layout>
   </q-modal>

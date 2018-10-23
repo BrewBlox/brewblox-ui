@@ -2,7 +2,9 @@
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { Unit, Link } from '@/helpers/units';
-import { blockIds } from '@/plugins/spark/store/getters';
+import { ProcessValueLink } from '@/helpers/units/KnownLinks';
+import { blockIds, compatibleBlocks, isFetching } from '@/plugins/spark/store/getters';
+import { fetchCompatibleBlocks } from '@/plugins/spark/store/actions';
 import { filters } from './getters';
 
 @Component
@@ -10,9 +12,9 @@ export default class PidForm extends BlockForm {
   get inputMapping() {
     return {
       profiles: { path: 'profiles', default: [] },
-      inputId: { path: 'data.inputId', default: new Link(null) },
-      outputId: { path: 'data.outputId', default: new Link(null) },
-      filter: { path: 'data.filter', default: 'FILT_30s' },
+      inputId: { path: 'data.inputId', default: new ProcessValueLink(null) },
+      outputId: { path: 'data.outputId', default: new ProcessValueLink(null) },
+      filter: { path: 'data.filter', default: 0 },
       filterThreshold: { path: 'data.filterThreshold', default: new Unit(0, 'delta_degC') },
       enabled: { path: 'data.enabled', default: false },
       kp: { path: 'data.kp', default: new Unit(0, 'celsius') },
@@ -21,20 +23,12 @@ export default class PidForm extends BlockForm {
     };
   }
 
-  get linkOpts() {
-    const unset = new Link(null);
-    return [
-      { label: unset.toString(), value: unset.id },
-      ...blockIds(this.$store, this.block.serviceId)
-        .map(id => ({
-          label: id,
-          value: id,
-        })),
-    ];
-  }
-
   get filterOpts() {
     return filters.map((filter, idx) => ({ label: filter, value: idx }));
+  }
+
+  afterBlockFetch() {
+    this.fetchCompatibleToInputLinks();
   }
 }
 </script>
@@ -69,12 +63,14 @@ export default class PidForm extends BlockForm {
         <q-select
           v-model="inputValues.inputId.id"
           stack-label="Input"
-          :options="linkOpts"
+          clearable
+          :options="linkOpts(inputValues.inputId)"
         />
         <q-select
           v-model="inputValues.outputId.id"
           stack-label="Output"
-          :options="linkOpts"
+          clearable
+          :options="linkOpts(inputValues.outputId)"
         />
       </widget-field>
 
@@ -88,7 +84,7 @@ export default class PidForm extends BlockForm {
           :options="filterOpts"
         />
         <q-input
-          v-model="inputValues.filterThreshold"
+          v-model="inputValues.filterThreshold.value"
           stack-label="Threshold"
           type="number"
         />

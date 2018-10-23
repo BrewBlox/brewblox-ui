@@ -1,3 +1,4 @@
+import queryString from 'query-string';
 import { get, put, post, del } from '@/helpers/fetch';
 import { Block, DataBlock, UserUnits, UnitAlternatives } from '../state';
 
@@ -48,6 +49,13 @@ export const persistUnits = async (serviceId: string, units: UserUnits): Promise
 
 export const fetchUnitAlternatives = async (serviceId: string): Promise<UnitAlternatives> =>
   get(`/${encodeURIComponent(serviceId)}/codec/unit_alternatives`);
+
+export const fetchCompatibleBlocks = async (
+  serviceId: string,
+  type: string,
+): Promise<string[]> =>
+  get(`/${encodeURIComponent(serviceId)}/compatible_objects?${
+    queryString.stringify({ interface: type })}`);
 
 export const validateService = async (serviceId: string): Promise<boolean> =>
   get(`/${encodeURIComponent(serviceId)}/_service/status`)
