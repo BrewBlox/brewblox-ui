@@ -1,5 +1,46 @@
 [
   {
+    "id": "balancer-1",
+    "profiles": [
+      0
+    ],
+    "type": "Balancer",
+    "data": {}
+  },
+  {
+    "id": "mutex-1",
+    "profiles": [
+      0
+    ],
+    "type": "Mutex",
+    "data": {
+      "differentActuatorWait": 43
+    }
+  },
+  {
+    "id": "profile-1",
+    "profiles": [
+      0
+    ],
+    "type": "SetpointProfile",
+    "data": {
+      "points": [
+        {
+          "time": 1540376829,
+          "temperature[degC]": 0
+        },
+        {
+          "time": 1540376839,
+          "temperature[degC]": 50
+        },
+        {
+          "time": 1540376849,
+          "temperature[degC]": 100
+        }
+      ]
+    }
+  },
+  {
     "id": "setpoint-1",
     "profiles": [
       0
@@ -52,7 +93,7 @@
     }
   },
   {
-    "id": "sensor-setpoint-pair-1",
+    "id": "setpoint-sensor-pair-1",
     "profiles": [
       0
     ],
@@ -83,28 +124,6 @@
     }
   },
   {
-    "id": "actuator-pin-1",
-    "profiles": [
-      0
-    ],
-    "type": "ActuatorPin",
-    "data": {
-      "constrainedBy": {
-        "constraints": [
-          {
-            "minOff": 10
-          },
-          {
-            "minOn": 15
-          },
-          {
-            "mutex<>": "actuator-1"
-          }
-        ]
-      }
-    }
-  },
-  {
     "id": "actuator-pwm-1",
     "profiles": [
       0
@@ -121,10 +140,21 @@
             "max": 10
           },
           {
-            "balancer<>": "actuator-1"
+            "balancer<>": "balancer-1"
           }
         ]
       }
+    }
+  },
+  {
+    "id": "offset-1",
+    "profiles": [
+      0
+    ],
+    "type": "ActuatorOffset",
+    "data": {
+      "targetId<ProcessValueLink>": "setpoint-sensor-pair-1",
+      "referenceId<ProcessValueLink>": "setpoint-sensor-pair-1"
     }
   },
   {

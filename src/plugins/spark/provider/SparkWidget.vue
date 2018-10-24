@@ -1,9 +1,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { durationString } from '@/helpers/functional';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import SparkForm from './SparkForm.vue';
-
 import { Block } from '@/plugins/spark/state';
 import {
   SysInfoBlock,
@@ -59,7 +59,11 @@ export default class SparkWidget extends Vue {
   }
 
   get sysDate() {
-    return new Date(this.ticks.data.secondsSinceEpoch * 1000).toString();
+    return new Date(this.ticks.data.secondsSinceEpoch * 1000).toLocaleString();
+  }
+
+  durationString(durationMs: number) {
+    return durationString(durationMs);
   }
 
   fetch() {
@@ -115,7 +119,7 @@ export default class SparkWidget extends Vue {
           label="Time since boot"
           icon="timelapse"
         >
-          <big>{{ ticks.data.millisSinceBoot }}</big> ms
+          <big>{{ durationString(ticks.data.millisSinceBoot) }}</big>
         </widget-field>
 
         <widget-field

@@ -9,7 +9,6 @@ export default class ActuatorPinForm extends BlockForm {
     return {
       profiles: { path: 'profiles', default: [] },
       state: { path: 'data.state', default: 2 },
-      pin: { path: 'data.pin', default: 0 },
       invert: { path: 'data.invert', default: false },
       constrainedBy: { path: 'data.constrainedBy', default: { constraints: [] } },
     };
@@ -46,16 +45,6 @@ export default class ActuatorPinForm extends BlockForm {
       </widget-field>
 
       <widget-field
-        label="Pin"
-        icon="edit"
-      >
-        <q-input
-          v-model="inputValues.pin"
-          type="number"
-        />
-      </widget-field>
-
-      <widget-field
         label="Invert"
         icon="edit"
       >
@@ -68,8 +57,7 @@ export default class ActuatorPinForm extends BlockForm {
         label="Constrained by"
         icon="edit"
       >
-        <constraints
-          type="digital"
+        <DigitalConstraints
           :serviceId="block.serviceId"
           v-model="inputValues.constrainedBy"
         />

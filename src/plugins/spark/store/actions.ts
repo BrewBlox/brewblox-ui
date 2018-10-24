@@ -16,6 +16,7 @@ import {
   fetchUnits as fetchUnitsInApi,
   persistUnits as persistUnitsInApi,
   fetchUnitAlternatives as fetchUnitAlternativesInApi,
+  fetchCompatibleBlocks as fetchCompatibleBlocksInApi,
   validateService as validateServiceInApi,
 } from './api';
 
@@ -29,6 +30,7 @@ import {
   clearBlocks as clearBlocksInStore,
   setUnits as setUnitsInStore,
   setUnitAlternatives as setUnitAlternativesInStore,
+  setCompatibleBlocks as setCompatibleBlocksInStore,
 } from './mutations';
 
 const actions = {
@@ -94,6 +96,13 @@ export const saveUnits = async (store: RootStore, serviceId: string, units: User
 
 export const fetchUnitAlternatives = async (store: RootStore, serviceId: string) =>
   setUnitAlternativesInStore(store, serviceId, await fetchUnitAlternativesInApi(serviceId));
+
+export const fetchCompatibleBlocks = async (store: RootStore, serviceId: string, type: string) =>
+  setCompatibleBlocksInStore(
+    store,
+    serviceId,
+    { type, ids: await fetchCompatibleBlocksInApi(serviceId, type) },
+  );
 
 export const fetchAll = async (store: RootStore, service: Service) =>
   Promise.all([

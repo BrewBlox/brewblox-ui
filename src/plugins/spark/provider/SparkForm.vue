@@ -1,7 +1,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { Watch } from 'vue-property-decorator';
 import { Notify } from 'quasar';
+import { durationString, spaceCased } from '@/helpers/functional';
 import { toShadow, fromShadow, ShadowMapping, deepCopy } from '@/helpers/shadow-copy';
 import { Block, UserUnits } from '@/plugins/spark/state';
 import {
@@ -11,7 +13,6 @@ import {
   unitAlternatives,
 } from '@/plugins/spark/store/getters';
 import { updateProfileNames, saveBlock, saveUnits } from '@/plugins/spark/store/actions';
-
 import {
   SysInfoBlock,
   ProfilesBlock,
@@ -24,7 +25,6 @@ import {
   oneWireBusId,
   ticksId,
 } from './getters';
-import { Watch } from 'vue-property-decorator';
 
 @Component({
   props: {
@@ -77,11 +77,6 @@ export default class SparkForm extends Vue {
       .map(val => ({ label: val, value: val }));
   }
 
-  spaceCased(input: string) {
-    // PascalCasedString -> Pascal cased string
-    return input.replace(/([^^])([A-Z]+)/g, (_, v1, v2) => `${v1} ${v2.toLowerCase()}`);
-  }
-
   generateShadow() {
     return toShadow(this.stored, this.inputMapping);
   }
@@ -106,6 +101,14 @@ export default class SparkForm extends Vue {
   @Watch('stored', { immediate: true, deep: true })
   cancelChanges() {
     this.inputValues = deepCopy(this.generateShadow());
+  }
+
+  durationString(durationMs: number) {
+    return durationString(durationMs);
+  }
+
+  spaceCased(input: string) {
+    return spaceCased(input);
   }
 }
 </script>
@@ -160,7 +163,7 @@ export default class SparkForm extends Vue {
         label="Time since boot"
         icon="timelapse"
       >
-        <big>{{ inputValues.millisSinceBoot }}</big> ms
+        <big>{{ durationString(inputValues.millisSinceBoot) }}</big>
       </widget-field>
 
       <widget-field

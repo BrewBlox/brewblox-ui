@@ -11,9 +11,10 @@ const feature: Feature = {
   displayName: 'Pin Actuator',
   widget: ref(widget),
   form: ref(form),
+  wizard: undefined, // Pins are static system objects
   widgetSize: {
     cols: 4,
-    rows: 4,
+    rows: 2,
   },
 };
 

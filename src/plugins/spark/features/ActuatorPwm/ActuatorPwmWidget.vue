@@ -1,22 +1,10 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
-import WidgetModal from '@/components/Widget/WidgetModal.vue';
-import WidgetField from '@/components/Widget/WidgetField.vue';
-import Constraints from '@/plugins/spark/components/Constraints.vue';
 import { ActuatorPwmBlock } from './state';
 import { getById } from './getters';
 
-@Component({
-  components: {
-    WidgetToolbar,
-    WidgetModal,
-    WidgetField,
-    Constraints,
-  },
-})
+@Component
 export default class ActuatorPwmWidget extends BlockWidget {
   get block(): ActuatorPwmBlock {
     return getById(this.$store, this.serviceId, this.blockId);
@@ -53,9 +41,7 @@ export default class ActuatorPwmWidget extends BlockWidget {
     <widget-field
       label="Constraints"
     >
-      <constraints
-        readonly
-        type="analog"
+      <ReadonlyConstraints
         :serviceId="serviceId"
         v-model="block.data.constrainedBy"
       />
