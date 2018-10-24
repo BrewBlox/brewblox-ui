@@ -1,9 +1,7 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import { Link } from '@/helpers/units';
 import { ActuatorDigitalLink } from '@/helpers/units/KnownLinks';
-import { blockIds, compatibleBlocks, isFetching } from '@/plugins/spark/store/getters';
 
 @Component
 export default class ActuatorPwmForm extends BlockForm {
@@ -12,6 +10,7 @@ export default class ActuatorPwmForm extends BlockForm {
       profiles: { path: 'profiles', default: [] },
       actuatorId: { path: 'data.actuatorId', default: new ActuatorDigitalLink(null) },
       period: { path: 'data.period', default: 0 },
+      setting: { path: 'data.setting', default: 0 },
       constrainedBy: { path: 'data.constrainedBy', default: { constraints: [] } },
     };
   }
@@ -57,11 +56,20 @@ export default class ActuatorPwmForm extends BlockForm {
       </widget-field>
 
       <widget-field
+        label="Setting"
+        icon="edit"
+      >
+        <q-input
+          v-model="inputValues.setting"
+          type="number"
+        />
+      </widget-field>
+
+      <widget-field
         label="Constrained by"
         icon="edit"
       >
-        <constraints
-          type="analog"
+        <AnalogConstraints
           :serviceId="block.serviceId"
           v-model="inputValues.constrainedBy"
         />

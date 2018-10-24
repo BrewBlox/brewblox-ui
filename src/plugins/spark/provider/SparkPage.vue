@@ -1,7 +1,6 @@
 <script lang="ts">
 import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
-import byOrder from '@/helpers/byOrder';
 import SparkWidget from './SparkWidget.vue';
 import { serviceAvailable } from '@/helpers/dynamic-store';
 import { DashboardItem } from '@/store/dashboards/state';

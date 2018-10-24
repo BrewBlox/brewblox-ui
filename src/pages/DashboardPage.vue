@@ -3,24 +3,18 @@ import Vue, { VueConstructor } from 'vue';
 import { Notify } from 'quasar';
 import Component from 'vue-class-component';
 import shortid from 'shortid';
-
 import GridContainer from '@/components/Grid/GridContainer.vue';
 import InvalidWidget from '@/components/Widget/InvalidWidget.vue';
 import WidgetModal from '@/components/Widget/WidgetModal.vue';
 import CopyWidgetWizard from '@/components/Wizard/CopyWidgetWizard.vue';
 import NewWidgetWizard from '@/components/Wizard/NewWidgetWizard.vue';
-
-import byOrder from '@/helpers/byOrder';
-
 import { Block } from '@/plugins/spark/state';
 import { DashboardItem } from '@/store/dashboards/state';
-
 import {
   isFetching,
   dashboardById,
   dashboardItemById,
 } from '@/store/dashboards/getters';
-
 import {
   updateDashboard,
   updateDashboardItemOrder,
@@ -29,7 +23,6 @@ import {
   createDashboardItem,
   addDashboardItemToDashboard,
 } from '@/store/dashboards/actions';
-
 import {
   validatorById,
   widgetById,

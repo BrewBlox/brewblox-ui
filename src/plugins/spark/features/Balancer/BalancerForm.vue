@@ -1,21 +1,16 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import { state } from './getters';
+import { ActuatorAnalogLink } from '@/helpers/units/KnownLinks';
+import { BalancedActuator } from './state';
 
 @Component
-export default class ActuatorPinForm extends BlockForm {
+export default class BalancerForm extends BlockForm {
   get inputMapping() {
     return {
       profiles: { path: 'profiles', default: [] },
-      state: { path: 'data.state', default: 2 },
-      invert: { path: 'data.invert', default: false },
-      constrainedBy: { path: 'data.constrainedBy', default: { constraints: [] } },
+      clients: { path: 'data.clients', default: [] },
     };
-  }
-
-  get stateOptions() {
-    return state.map((s, idx) => ({ label: s, value: idx }));
   }
 }
 </script>
@@ -35,32 +30,16 @@ export default class ActuatorPinForm extends BlockForm {
       </widget-field>
 
       <widget-field
-        label="State"
-        icon="edit"
+        v-for="(client, idx) in inputValues.clients"
+        :key="idx"
+        label="Client requested / granted"
       >
-        <q-select
-          v-model="inputValues.state"
-          :options="stateOptions"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Invert"
-        icon="edit"
-      >
-        <q-toggle
-          v-model="inputValues.invert"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Constrained by"
-        icon="edit"
-      >
-        <DigitalConstraints
-          :serviceId="block.serviceId"
-          v-model="inputValues.constrainedBy"
-        />
+        <big
+          v-for="(client, idx) in inputValues.clients"
+          :key="idx"
+        >
+          {{ client.id }}: {{ client.granted }} / {{ client.requested }}
+        </big>
       </widget-field>
 
     <q-card-separator />

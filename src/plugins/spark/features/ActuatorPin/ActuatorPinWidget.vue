@@ -36,12 +36,6 @@ export default class ActuatorPinWidget extends BlockWidget {
     </widget-field>
 
     <widget-field
-      label="Pin"
-    >
-      <big>{{ block.data.pin }}</big>
-    </widget-field>
-
-    <widget-field
       label="Inverted"
     >
       <big>{{ block.data.invert }}</big>
@@ -50,9 +44,7 @@ export default class ActuatorPinWidget extends BlockWidget {
     <widget-field
       label="Constraints"
     >
-      <constraints
-        readonly
-        type="digital"
+      <ReadonlyConstraints
         :serviceId="serviceId"
         v-model="block.data.constrainedBy"
       />

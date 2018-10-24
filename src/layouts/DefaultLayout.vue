@@ -2,9 +2,7 @@
 import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
 import draggable from 'vuedraggable';
-
-import byOrder from '@/helpers/byOrder';
-
+import { objectSorter } from '@/helpers/functional';
 import { Dashboard } from '@/store/dashboards/state';
 import {
   allDashboards,
@@ -17,7 +15,6 @@ import {
   removeDashboard as removeDashboardInStore,
   updatePrimaryDashboard,
 } from '@/store/dashboards/actions';
-
 import {
   updateServiceOrder,
   removeService as removeServiceInStore,
@@ -46,7 +43,7 @@ export default class DefaultLayout extends Vue {
   }
 
   get dashboards() {
-    return [...allDashboards(this.$store)].sort(byOrder);
+    return [...allDashboards(this.$store)].sort(objectSorter('order'));
   }
 
   get defaultDashboard() {
@@ -58,7 +55,7 @@ export default class DefaultLayout extends Vue {
   }
 
   get services() {
-    return [...serviceValues(this.$store)].sort(byOrder);
+    return [...serviceValues(this.$store)].sort(objectSorter('order'));
   }
 
   set services(services: Service[]) {

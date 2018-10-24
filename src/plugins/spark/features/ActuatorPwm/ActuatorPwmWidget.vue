@@ -41,9 +41,7 @@ export default class ActuatorPwmWidget extends BlockWidget {
     <widget-field
       label="Constraints"
     >
-      <constraints
-        readonly
-        type="analog"
+      <ReadonlyConstraints
         :serviceId="serviceId"
         v-model="block.data.constrainedBy"
       />

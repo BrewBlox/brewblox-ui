@@ -3,12 +3,10 @@ import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
 import { Block } from '@/plugins/spark/state';
 import { toShadow, fromShadow, ShadowMapping, deepCopy } from '@/helpers/shadow-copy';
+import { uniqueFilter } from '@/helpers/functional';
 import { profileNames, isFetching, compatibleBlocks } from '@/plugins/spark/store/getters';
 import { fetchCompatibleBlocks } from '@/plugins/spark/store/actions';
 import { Link } from '@/helpers/units';
-
-export const uniqueFilter = (val: any, idx: number, coll: any[]) =>
-  coll.indexOf(val) === idx;
 
 @Component({
   props: {

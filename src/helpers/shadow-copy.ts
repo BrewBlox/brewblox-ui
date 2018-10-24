@@ -30,11 +30,11 @@ export interface ShadowMapping {
 }
 
 export const toShadow = (source: AnyData, mapping: ShadowMapping): AnyData =>
-  Object.keys(mapping)
+  Object.entries(mapping)
     .reduce(
-      (total, key) => ({
-        [key]: get(source, mapping[key].path) || mapping[key].default,
+      (total, [key, val]) => ({
         ...total,
+        [key]: get(source, val.path, val.default),
       }),
       {},
     );
@@ -44,10 +44,10 @@ export const fromShadow = (
   mapping: ShadowMapping,
   output: AnyData = {},
 ): AnyData =>
-  Object.keys(mapping)
+  Object.entries(mapping)
     .reduce(
-      (acc, key) => {
-        set(acc, mapping[key].path, shadow[key]);
+      (acc, [key, val]) => {
+        set(acc, val.path, shadow[key]);
         return acc;
       },
       output,

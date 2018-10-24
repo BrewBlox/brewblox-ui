@@ -1,21 +1,14 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import { state } from './getters';
 
 @Component
-export default class ActuatorPinForm extends BlockForm {
+export default class MutexForm extends BlockForm {
   get inputMapping() {
     return {
       profiles: { path: 'profiles', default: [] },
-      state: { path: 'data.state', default: 2 },
-      invert: { path: 'data.invert', default: false },
-      constrainedBy: { path: 'data.constrainedBy', default: { constraints: [] } },
+      differentActuatorWait: { path: 'data.differentActuatorWait', default: 0 },
     };
-  }
-
-  get stateOptions() {
-    return state.map((s, idx) => ({ label: s, value: idx }));
   }
 }
 </script>
@@ -35,31 +28,12 @@ export default class ActuatorPinForm extends BlockForm {
       </widget-field>
 
       <widget-field
-        label="State"
+        label="Actuator wait"
         icon="edit"
       >
-        <q-select
-          v-model="inputValues.state"
-          :options="stateOptions"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Invert"
-        icon="edit"
-      >
-        <q-toggle
-          v-model="inputValues.invert"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Constrained by"
-        icon="edit"
-      >
-        <DigitalConstraints
-          :serviceId="block.serviceId"
-          v-model="inputValues.constrainedBy"
+        <q-input
+          v-model="inputValues.differentActuatorWait"
+          type="number"
         />
       </widget-field>
 

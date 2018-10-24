@@ -1,19 +1,12 @@
 import queryString from 'query-string';
 import { post, sse, get } from '@/helpers/fetch';
-import { Slice, QueryParams, QueryTarget } from '@/plugins/history/state';
+import { snakeCased } from '@/helpers/functional';
+import { QueryParams, QueryTarget } from '@/plugins/history/state';
 
-const snakeCased = (obj: any) =>
+const snakeCasedObj = (obj: any) =>
   Object.keys(obj)
     .filter(key => !!obj[key])
-    .reduce(
-      (acc: any, key: string) => {
-        // camelCasedKey => camel_cased_key
-        const snakeKey = key.replace(/\.?([A-Z]+)/g, (_, v: string) => `_${v.toLowerCase()}`);
-        acc[snakeKey] = obj[key];
-        return acc;
-      },
-      {},
-    );
+    .reduce((acc: any, key: string) => ({ ...acc, [snakeCased(key)]: obj[key] }), {});
 
 const fetchData = async (serviceId: string, endpoint: string, payload: any = {}) =>
   post(`/${serviceId}${endpoint}`, { ...payload });
@@ -24,8 +17,8 @@ export const fetchValueSource = async (
   target: QueryTarget,
 ) =>
   sse(`/${serviceId}/sse/values?${queryString.stringify({
-    ...snakeCased(params),
-    ...snakeCased(target),
+    ...snakeCasedObj(params),
+    ...snakeCasedObj(target),
   })}`);
 
 export const fetchKnownKeys = async (serviceId: string) =>

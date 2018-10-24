@@ -46,9 +46,7 @@ export default class ActuatorOffsetWidget extends BlockWidget {
     <widget-field
       label="Constraints"
     >
-      <constraints
-        readonly
-        type="analog"
+      <ReadonlyConstraints
         :serviceId="serviceId"
         v-model="block.data.constrainedBy"
       />

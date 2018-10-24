@@ -1,5 +1,6 @@
 <script lang="ts">
 import Component from 'vue-class-component';
+import { uniqueFilter } from '@/helpers/functional';
 import HistoryForm from '@/plugins/history/components/HistoryForm';
 import WidgetField from '@/components/Widget/WidgetField.vue';
 import { QueryParams, QueryTarget } from '@/plugins/history/state';
@@ -30,9 +31,6 @@ export default class GraphForm extends HistoryForm {
   get knownFields() {
     return availableFields(this.$store, this.config.serviceId);
   }
-
-  uniqueFilter = (val: any, idx: number, coll: any[]) =>
-    coll.indexOf(val) === idx;
 
   fieldSections = (field: string) =>
     field.split('/');
@@ -70,7 +68,7 @@ export default class GraphForm extends HistoryForm {
     return this.relevantKnownFields(target)
       .filter(fkey => fkey.startsWith(pattern))
       .map(fkey => this.fieldSections(fkey)[idx])
-      .filter(this.uniqueFilter)
+      .filter(uniqueFilter)
       .map(section => ({ label: section, value: section }));
   }
 

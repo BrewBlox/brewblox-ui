@@ -1,10 +1,8 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import { Unit, Link } from '@/helpers/units';
+import { Unit } from '@/helpers/units';
 import { ProcessValueLink } from '@/helpers/units/KnownLinks';
-import { blockIds, compatibleBlocks, isFetching } from '@/plugins/spark/store/getters';
-import { fetchCompatibleBlocks } from '@/plugins/spark/store/actions';
 import { filters } from './getters';
 
 @Component
