@@ -1,0 +1,151 @@
+[
+  {
+    "id": "sensor-1",
+    "profiles": [
+      0
+    ],
+    "type": "TempSensorOneWire",
+    "data": {
+      "address": "0000000000000000",
+      "valid": false,
+      "value[degC]": 0,
+      "offset[delta_degC]": 0
+    }
+  },
+  {
+    "id": "sensor-2",
+    "profiles": [
+      0
+    ],
+    "type": "TempSensorOneWire",
+    "data": {
+      "address": "0000000000000000",
+      "valid": false,
+      "value[degC]": 0,
+      "offset[delta_degC]": 0
+    }
+  },
+  {
+    "id": "balancer",
+    "profiles": [
+      0
+    ],
+    "type": "Balancer",
+    "data": {
+      "clients": [
+        {
+          "requested": 0,
+          "granted": 0,
+          "id<ActuatorAnalogLink>": null
+        },
+        {
+          "requested": 0,
+          "granted": 0,
+          "id<ActuatorAnalogLink>": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "mutex",
+    "profiles": [
+      0
+    ],
+    "type": "Mutex",
+    "data": {
+      "differentActuatorWait": 0
+    }
+  },
+  {
+    "id": "setpoint-1",
+    "profiles": [
+      0
+    ],
+    "type": "SetpointSimple",
+    "data": {
+      "setting[degC]": 0
+    }
+  },
+  {
+    "id": "setpoint-2",
+    "profiles": [
+      0
+    ],
+    "type": "SetpointSimple",
+    "data": {
+      "setting[degC]": 0
+    }
+  },
+  {
+    "id": "pwm-1",
+    "profiles": [
+      0
+    ],
+    "type": "ActuatorPwm",
+    "data": {
+      "actuatorValid": true,
+      "constrainedBy": {
+        "constraints": [
+          {
+            "balancer<BalancerLink>": "balancer"
+          }
+        ]
+      },
+      "period": 0,
+      "setting": 0,
+      "value": 0,
+      "actuatorId<ActuatorDigitalLink>": "__pin_bottom_1"
+    }
+  },
+  {
+    "id": "pwm-2",
+    "profiles": [
+      0
+    ],
+    "type": "ActuatorPwm",
+    "data": {
+      "actuatorValid": true,
+      "constrainedBy": {
+        "constraints": [
+          {
+            "balancer<BalancerLink>": "balancer"
+          }
+        ]
+      },
+      "period": 0,
+      "setting": 0,
+      "value": 0,
+      "actuatorId<ActuatorDigitalLink>": "__pin_bottom_2"
+    }
+  },
+  {
+    "id": "pair-1",
+    "profiles": [
+      0
+    ],
+    "type": "SetpointSensorPair",
+    "data": {
+      "setpointValid": true,
+      "sensorValid": true,
+      "setpointId<SetpointLink>": "setpoint-1",
+      "setpointValue[degC]": 0,
+      "sensorValue[degC]": 0,
+      "sensorId<TempSensorLink>": "sensor-1"
+    }
+  },
+  {
+    "id": "pair-2",
+    "profiles": [
+      0
+    ],
+    "type": "SetpointSensorPair",
+    "data": {
+      "setpointValid": true,
+      "sensorValid": true,
+      "setpointId<SetpointLink>": "setpoint-2",
+      "setpointValue[degC]": 0,
+      "sensorValue[degC]": 0,
+      "sensorId<TempSensorLink>": "sensor-2"
+    }
+  }
+]

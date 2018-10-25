@@ -21,23 +21,24 @@ services:
 
   sparksimulator:
     image: brewblox/firmware-simulator:develop
+    volumes:
+      - "./sim/eeprom.bin:/target/brewblox-gcc/eeprom.bin"
     ports:
         - "8332"
 
   sparkey:
-    image: brewblox/brewblox-devcon-spark:develop
+    image: brewblox/brewblox-devcon-spark:feature-hardware-test
     depends_on:
       - eventbus
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /sparkey"
     volumes:
-      - "./mocks/config/seed_objects.json:/app/seed_objects.json"
+      - "./app/hw_objects.json:/app/hw_objects.json"
     command: >
       --name=sparkey
-      --seed-profiles=0
-      --seed-objects=seed_objects.json
-      --device-host=sparksimulator
+      --device-host=192.168.0.2
+      --seed-objects=hw_objects.json
 
   spock:
     image: brewblox/brewblox-devcon-spark:develop
@@ -50,9 +51,7 @@ services:
       - "./mocks/config/seed_objects.json:/app/seed_objects.json"
     command: >
       --name=spock
-      --simulation
-      --seed-profiles=0
-      --seed-objects=seed_objects.json
+      --device-host=sparksimulator
 
   datastore:
     image: brewblox/brewblox-datastore:develop

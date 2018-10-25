@@ -44,7 +44,7 @@ export default class TempSensorMockForm extends BlockForm {
       >
         <q-input
           v-model="inputValues.value.value"
-          :suffix="inputValues.value.unit"
+          :suffix="inputValues.value.unitNotation"
           type="number"
         />
       </widget-field>

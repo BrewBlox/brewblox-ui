@@ -2,7 +2,7 @@
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { Unit } from '@/helpers/units';
-import { ProcessValueLink } from '@/helpers/units/KnownLinks';
+import { ProcessValueLink, ActuatorAnalogLink } from '@/helpers/units/KnownLinks';
 import { filters } from './getters';
 
 @Component
@@ -11,7 +11,7 @@ export default class PidForm extends BlockForm {
     return {
       profiles: { path: 'profiles', default: [] },
       inputId: { path: 'data.inputId', default: new ProcessValueLink(null) },
-      outputId: { path: 'data.outputId', default: new ProcessValueLink(null) },
+      outputId: { path: 'data.outputId', default: new ActuatorAnalogLink(null) },
       filter: { path: 'data.filter', default: 0 },
       filterThreshold: { path: 'data.filterThreshold', default: new Unit(0, 'delta_degC') },
       enabled: { path: 'data.enabled', default: false },
