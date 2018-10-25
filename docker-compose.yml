@@ -25,7 +25,7 @@ services:
         - "8332"
 
   sparkey:
-    image: brewblox/brewblox-devcon-spark:feature-link-content
+    image: brewblox/brewblox-devcon-spark:develop
     depends_on:
       - eventbus
     labels:

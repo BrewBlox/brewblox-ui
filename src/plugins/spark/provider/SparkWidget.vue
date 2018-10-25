@@ -1,6 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { serviceById } from '@/store/services/getters';
 import { durationString } from '@/helpers/functional';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import SparkForm from './SparkForm.vue';
@@ -11,8 +12,16 @@ import {
   OneWireBusBlock,
   TicksBlock,
 } from './state';
-import { blockById, profileNames as serviceProfiles } from '@/plugins/spark/store/getters';
-import { fetchBlock } from '@/plugins/spark/store/actions';
+import {
+  blockById,
+  profileNames,
+  discoveredBlocks,
+} from '@/plugins/spark/store/getters';
+import {
+  fetchAll,
+  fetchDiscoveredBlocks,
+  clearDiscoveredBlocks,
+} from '@/plugins/spark/store/actions';
 
 @Component({
   components: {
@@ -26,10 +35,16 @@ import { fetchBlock } from '@/plugins/spark/store/actions';
   },
 })
 export default class SparkWidget extends Vue {
-  modalOpen: boolean = false;
+  get service() {
+    return serviceById(this.$store, this.$props.serviceId);
+  }
+
+  get form() {
+    return SparkForm;
+  }
 
   sysBlock<T extends Block>(blockId: string) {
-    return blockById<T>(this.$store, this.$props.serviceId, blockId);
+    return blockById<T>(this.$store, this.service.id, blockId);
   }
 
   get sysInfo() {
@@ -49,7 +64,7 @@ export default class SparkWidget extends Vue {
   }
 
   get profileNames(): string[] {
-    return serviceProfiles(this.$store, this.$props.serviceId);
+    return profileNames(this.$store, this.service.id);
   }
 
   get activeNames() {
@@ -62,77 +77,82 @@ export default class SparkWidget extends Vue {
     return new Date(this.ticks.data.secondsSinceEpoch * 1000).toLocaleString();
   }
 
+  get discoveredBlocks() {
+    return discoveredBlocks(this.$store, this.service.id);
+  }
+
+  clearDiscoveredBlocks() {
+    clearDiscoveredBlocks(this.$store, this.service.id);
+  }
+
   durationString(durationMs: number) {
     return durationString(durationMs);
   }
 
   fetch() {
-    [
-      this.sysInfo,
-      this.profiles,
-      this.oneWireBus,
-      this.ticks,
-    ]
-      .forEach(block => fetchBlock(this.$store, this.$props.serviceId, block));
+    fetchAll(this.$store, serviceById(this.$store, this.service.id));
   }
 }
 </script>
 
 <template>
-  <div>
+  <widget-card
+    :title="$props.serviceId"
+    subTitle="Spark Service Configuration"
+    :onRefresh="fetch"
+    :form="form"
+    v-model="service"
+  >
 
-    <widget-modal
-      :isOpen="modalOpen"
-      :onClose="() => { this.modalOpen = false; }"
-      :title="$props.serviceId"
+    <widget-field
+      label="Device ID"
+      icon="devices"
     >
-      <spark-form
-        :serviceId="$props.serviceId"
+      <big>{{ sysInfo.data.deviceId }}</big>
+    </widget-field>
+
+    <widget-field
+      label="Active profiles"
+      icon="settings_input_component"
+    >
+      <big>{{ activeNames }}</big>
+    </widget-field>
+
+    <widget-field
+      label="Time since boot"
+      icon="timelapse"
+    >
+      <big>{{ durationString(ticks.data.millisSinceBoot) }}</big>
+    </widget-field>
+
+    <widget-field
+      label="Date"
+      icon="schedule"
+    >
+      <big>{{ sysDate }}</big>
+    </widget-field>
+
+    <widget-field
+      label="Discovered blocks"
+      icon="search"
+    >
+      <p
+      v-for="id in discoveredBlocks"
+      :key="id"
+      >
+        {{ id }}<br/>
+      </p>
+      <q-btn
+        label="Clear"
+        v-if="discoveredBlocks.length"
+        @click="clearDiscoveredBlocks"
       />
-    </widget-modal>
+      <p v-else>
+        -
+      </p>
+    </widget-field>
 
-    <widget-toolbar
-      :name="$props.serviceId"
-      type="Spark Service Configuration"
-      :on-refresh="fetch"
-      :on-settings="() => { this.modalOpen = true; }"
-    />
-
-    <q-card>
-      <q-card-main class="row">
-
-        <widget-field
-          label="Device ID"
-          icon="devices"
-        >
-          <big>{{ sysInfo.data.deviceId }}</big>
-        </widget-field>
-
-        <widget-field
-          label="Active profiles"
-          icon="settings_input_component"
-        >
-          <big>{{ activeNames }}</big>
-        </widget-field>
-
-       <widget-field
-          label="Time since boot"
-          icon="timelapse"
-        >
-          <big>{{ durationString(ticks.data.millisSinceBoot) }}</big>
-        </widget-field>
-
-        <widget-field
-          label="Date"
-          icon="schedule"
-        >
-          <big>{{ sysDate }}</big>
-        </widget-field>
-
-      </q-card-main>
-    </q-card>
-
-  </div>
+  </widget-card>
 </template>
 
 <style scoped>

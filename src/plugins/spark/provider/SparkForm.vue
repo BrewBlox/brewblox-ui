@@ -28,8 +28,8 @@ import {
 
 @Component({
   props: {
-    serviceId: {
-      type: String,
+    value: {
+      type: Object,
       required: true,
     },
   },
@@ -46,7 +46,11 @@ export default class SparkForm extends Vue {
   };
 
   sysBlock<T extends Block>(blockId: string) {
-    return blockById<T>(this.$store, this.$props.serviceId, blockId);
+    return blockById<T>(this.$store, this.service.id, blockId);
+  }
+
+  get service() {
+    return this.$props.value;
   }
 
   get stored() {
@@ -55,8 +59,8 @@ export default class SparkForm extends Vue {
       profiles: this.sysBlock<ProfilesBlock>(profilesId),
       oneWireBus: this.sysBlock<OneWireBusBlock>(oneWireBusId),
       ticks: this.sysBlock<TicksBlock>(ticksId),
-      profileNames: serviceProfiles(this.$store, this.$props.serviceId),
-      units: units(this.$store, this.$props.serviceId),
+      profileNames: serviceProfiles(this.$store, this.service.id),
+      units: units(this.$store, this.service.id),
     };
   }
 
@@ -69,7 +73,7 @@ export default class SparkForm extends Vue {
   }
 
   get unitAlternatives() {
-    return unitAlternatives(this.$store, this.$props.serviceId);
+    return unitAlternatives(this.$store, this.service.id);
   }
 
   unitAlternativeOptions(name: string) {
@@ -82,7 +86,7 @@ export default class SparkForm extends Vue {
   }
 
   changeBlock(block: Block) {
-    saveBlock(this.$store, this.$props.serviceId, block);
+    saveBlock(this.$store, this.service.id, block);
   }
 
   confirmChanges() {
@@ -93,8 +97,8 @@ export default class SparkForm extends Vue {
     );
     // sysInfo / oneWireBus / ticks have no editable fields
     this.changeBlock(vals.profiles);
-    updateProfileNames(this.$store, this.$props.serviceId, vals.profileNames);
-    saveUnits(this.$store, this.$props.serviceId, vals.units)
+    updateProfileNames(this.$store, this.service.id, vals.profileNames);
+    saveUnits(this.$store, this.service.id, vals.units)
       .catch(reason => Notify.create(`Failed to change unit: ${reason}`));
   }
 

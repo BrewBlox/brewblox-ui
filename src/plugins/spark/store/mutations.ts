@@ -43,6 +43,9 @@ const mutations = {
 
   setCompatibleBlocks: (state: SparkState, { type, ids }: { type: string, ids: string[] }) =>
     Vue.set(state.compatibleBlocks, type, ids),
+
+  setDiscoveredBlocks: (state: SparkState, ids: string[]) =>
+    Vue.set(state, 'discoveredBlocks', ids),
 };
 
 export const addBlock = commit(mutations.addBlock);
@@ -55,5 +58,6 @@ export const clearBlocks = noArgCommit(mutations.clearBlocks);
 export const setUnits = commit(mutations.setUnits);
 export const setUnitAlternatives = commit(mutations.setUnitAlternatives);
 export const setCompatibleBlocks = commit(mutations.setCompatibleBlocks);
+export const setDiscoveredBlocks = commit(mutations.setDiscoveredBlocks);
 
 export default mutations;
