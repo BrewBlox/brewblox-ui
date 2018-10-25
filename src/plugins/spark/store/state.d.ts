@@ -9,6 +9,7 @@ export type SparkState = {
   units: UserUnits;
   unitAlternatives: UnitAlternatives;
   compatibleBlocks: CompatibleBlocks;
+  discoveredBlocks: string[];
   fetching: boolean,
 };
 

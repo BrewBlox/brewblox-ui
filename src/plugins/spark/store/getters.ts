@@ -25,6 +25,7 @@ const getters = {
   units: (state: SparkState): UserUnits => state.units,
   unitAlternatives: (state: SparkState): UnitAlternatives => state.unitAlternatives,
   compatibleBlocks: (state: SparkState): CompatibleBlocks => state.compatibleBlocks,
+  discoveredBlocks: (state: SparkState): string[] => state.discoveredBlocks,
 };
 
 export default getters;
@@ -36,6 +37,7 @@ export const blockValues = read(getters.blockValues);
 export const units = read(getters.units);
 export const unitAlternatives = read(getters.unitAlternatives);
 export const compatibleBlocks = read(getters.compatibleBlocks);
+export const discoveredBlocks = read(getters.discoveredBlocks);
 
 export function blockById<T extends Block>(
   store: RootStore,

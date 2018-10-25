@@ -57,6 +57,9 @@ export const fetchCompatibleBlocks = async (
   get(`/${encodeURIComponent(serviceId)}/compatible_objects?${
     queryString.stringify({ interface: type })}`);
 
+export const fetchDiscoveredBlocks = async (serviceId: string): Promise<string[]> =>
+  get(`/${encodeURIComponent(serviceId)}/discover_objects`);
+
 export const validateService = async (serviceId: string): Promise<boolean> =>
   get(`/${encodeURIComponent(serviceId)}/_service/status`)
     .then(retv => retv.status === 'ok')
