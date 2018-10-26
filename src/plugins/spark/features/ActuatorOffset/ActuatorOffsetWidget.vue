@@ -32,8 +32,8 @@ export default class ActuatorOffsetWidget extends BlockWidget {
       :label="`Target (${block.data.targetId.id})`"
       :icon="block.data.targetValid ? 'link' : 'link_off'"
     >
-      <big>Setting: {{ block.data.setting }}</big> <br/>
-      <big>Value: {{ block.data.value }}</big>
+      <big>Setting: {{ block.data.setting | round }}</big> <br/>
+      <big>Value: {{ block.data.value | round }}</big>
     </widget-field>
 
     <widget-field

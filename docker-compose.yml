@@ -35,6 +35,7 @@ services:
       - "traefik.frontend.rule=PathPrefix: /sparkey"
     volumes:
       - "./app/hw_objects.json:/app/hw_objects.json"
+      - "./app/brewblox_db.json:/app/brewblox_db.json"
     command: >
       --name=sparkey
       --device-host=192.168.0.2

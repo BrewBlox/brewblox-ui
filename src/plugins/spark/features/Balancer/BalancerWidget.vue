@@ -29,7 +29,7 @@ export default class BalancerWidget extends BlockWidget {
       v-for="(client, idx) in block.data.clients"
       :key="idx"
     >
-      <big>{{ client.granted }} / {{ client.requested }}</big>
+      <big>{{ client.granted | round }} / {{ client.requested | round }}</big>
     </widget-field>
   </widget-card>
 </template>

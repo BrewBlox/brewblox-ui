@@ -3,6 +3,7 @@ import Vue, { VueConstructor } from 'vue';
 import { Notify } from 'quasar';
 import Component from 'vue-class-component';
 import shortid from 'shortid';
+import { objectSorter } from '@/helpers/functional';
 import GridContainer from '@/components/Grid/GridContainer.vue';
 import InvalidWidget from '@/components/Widget/InvalidWidget.vue';
 import WidgetModal from '@/components/Widget/WidgetModal.vue';
@@ -66,10 +67,9 @@ export default class DashboardPage extends Vue {
   }
 
   get items() {
-    return [
-      ...this.dashboard.items
-        .map(id => dashboardItemById(this.$store, id)),
-    ];
+    return this.dashboard.items
+      .map(id => dashboardItemById(this.$store, id))
+      .sort(objectSorter('order'));
   }
 
   get validatedItems() {

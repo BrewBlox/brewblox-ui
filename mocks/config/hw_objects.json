@@ -6,10 +6,10 @@
     ],
     "type": "TempSensorOneWire",
     "data": {
-      "address": "0000000000000000",
-      "valid": false,
-      "value[degC]": 0,
-      "offset[delta_degC]": 0
+      "valid": true,
+      "address": "28830a360700002b",
+      "offset[delta_degC]": 0,
+      "value[degC]": 52.0625
     }
   },
   {
@@ -19,10 +19,10 @@
     ],
     "type": "TempSensorOneWire",
     "data": {
-      "address": "0000000000000000",
-      "valid": false,
-      "value[degC]": 0,
-      "offset[delta_degC]": 0
+      "valid": true,
+      "address": "287e837f08000007",
+      "offset[delta_degC]": 0,
+      "value[degC]": 55.1875
     }
   },
   {
@@ -63,7 +63,7 @@
     ],
     "type": "SetpointSimple",
     "data": {
-      "setting[degC]": 0
+      "setting[degC]": 80
     }
   },
   {
@@ -73,7 +73,7 @@
     ],
     "type": "SetpointSimple",
     "data": {
-      "setting[degC]": 0
+      "setting[degC]": 80
     }
   },
   {
@@ -84,6 +84,7 @@
     "type": "ActuatorPwm",
     "data": {
       "actuatorValid": true,
+      "period": 10000,
       "constrainedBy": {
         "constraints": [
           {
@@ -91,7 +92,6 @@
           }
         ]
       },
-      "period": 0,
       "setting": 0,
       "value": 0,
       "actuatorId<ActuatorDigitalLink>": "__pin_bottom_1"
@@ -105,6 +105,7 @@
     "type": "ActuatorPwm",
     "data": {
       "actuatorValid": true,
+      "period": 10000,
       "constrainedBy": {
         "constraints": [
           {
@@ -112,7 +113,6 @@
           }
         ]
       },
-      "period": 0,
       "setting": 0,
       "value": 0,
       "actuatorId<ActuatorDigitalLink>": "__pin_bottom_2"
@@ -127,10 +127,10 @@
     "data": {
       "setpointValid": true,
       "sensorValid": true,
+      "sensorId<TempSensorLink>": "sensor-1",
+      "sensorValue[degC]": 52.0625,
       "setpointId<SetpointLink>": "setpoint-1",
-      "setpointValue[degC]": 0,
-      "sensorValue[degC]": 0,
-      "sensorId<TempSensorLink>": "sensor-1"
+      "setpointValue[degC]": 80
     }
   },
   {
@@ -142,10 +142,70 @@
     "data": {
       "setpointValid": true,
       "sensorValid": true,
+      "sensorId<TempSensorLink>": "sensor-2",
+      "sensorValue[degC]": 55.1875,
       "setpointId<SetpointLink>": "setpoint-2",
-      "setpointValue[degC]": 0,
-      "sensorValue[degC]": 0,
-      "sensorId<TempSensorLink>": "sensor-2"
+      "setpointValue[degC]": 80
+    }
+  },
+  {
+    "id": "pid-1",
+    "profiles": [
+      0
+    ],
+    "type": "Pid",
+    "data": {
+      "inputValid": true,
+      "outputValid": true,
+      "outputValue": 278.23583984375,
+      "enabled": true,
+      "active": true,
+      "p": 278.0712890625,
+      "i": 0.9267578125,
+      "d": -0.76220703125,
+      "outputSetting": 0,
+      "filter": 0,
+      "inputId<ProcessValueLink>": "pair-1",
+      "integral[delta_degC]": 0,
+      "td[second]": 10,
+      "ti[second]": 300,
+      "outputId<ActuatorAnalogLink>": "pwm-1",
+      "kp[degC]": 10,
+      "derivative[delta_degC / second]": 0.007623434066772461,
+      "filterThreshold[delta_degC]": 2,
+      "inputValue[degC]": 52.0625,
+      "inputSetting[degC]": 80,
+      "error[delta_degC]": 27.80712890625
+    }
+  },
+  {
+    "id": "pid-2",
+    "profiles": [
+      0
+    ],
+    "type": "Pid",
+    "data": {
+      "inputValid": true,
+      "outputValid": true,
+      "outputValue": 247.17138671875,
+      "enabled": true,
+      "active": true,
+      "p": 247.236328125,
+      "i": 0.823974609375,
+      "d": -0.888916015625,
+      "outputSetting": 0,
+      "filter": 0,
+      "inputId<ProcessValueLink>": "pair-2",
+      "integral[delta_degC]": 0,
+      "td[second]": 10,
+      "ti[second]": 300,
+      "outputId<ActuatorAnalogLink>": "pwm-2",
+      "kp[degC]": 10,
+      "derivative[delta_degC / second]": 0.008891582489013672,
+      "filterThreshold[delta_degC]": 2,
+      "inputValue[degC]": 55.1875,
+      "inputSetting[degC]": 80,
+      "error[delta_degC]": 24.7236328125
     }
   }
 ]

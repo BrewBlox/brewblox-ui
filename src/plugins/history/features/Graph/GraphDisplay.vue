@@ -42,6 +42,7 @@ export default class GraphDisplay extends Vue {
     yaxis: {
       gridcolor: '#666',
       zerolinecolor: '#eee',
+      autorange: true,
     },
     paper_bgcolor: '#1b1d21',
     plot_bgcolor: '#1b1d21',
@@ -61,6 +62,7 @@ export default class GraphDisplay extends Vue {
   get plotlyConfig() {
     return {
       displaylogo: false,
+      responsive: true,
     };
   }
 

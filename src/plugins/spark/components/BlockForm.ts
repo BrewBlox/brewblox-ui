@@ -53,19 +53,26 @@ export default class BlockForm extends Vue {
       .some(key => state[key] !== this.inputValues[key]);
   }
 
+  reset() {
+    this.inputValues = deepCopy(toShadow(this.block, this.inputMapping));
+  }
+
   // subclasses can override this as a lifecycle hook
   afterBlockFetch() { }
 
   @Watch('block', { immediate: true, deep: true })
   onBlockUpdate() {
     if (!this.block.isLoading) {
-      this.inputValues = deepCopy(toShadow(this.block, this.inputMapping));
       this.afterBlockFetch();
     }
   }
 
+  created() {
+    this.reset();
+  }
+
   cancelChanges() {
-    this.inputValues = deepCopy(toShadow(this.block, this.inputMapping));
+    this.reset();
   }
 
   confirmChanges() {

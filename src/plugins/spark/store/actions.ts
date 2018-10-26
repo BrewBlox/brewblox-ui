@@ -109,7 +109,7 @@ export const clearDiscoveredBlocks = async (store: RootStore, serviceId: string)
 
 export const fetchAll = async (store: RootStore, service: Service) =>
   Promise.all([
-    fetchDiscoveredBlocks(store, service.id),
+    // fetchDiscoveredBlocks(store, service.id),
     fetchBlocks(store, service.id),
     fetchUnits(store, service.id),
     fetchUnitAlternatives(store, service.id),
@@ -117,7 +117,7 @@ export const fetchAll = async (store: RootStore, service: Service) =>
 
 export const update = async (store: RootStore, service: Service) =>
   Promise.all([
-    fetchDiscoveredBlocks(store, service.id),
+    // fetchDiscoveredBlocks(store, service.id),
     fetchBlocks(store, service.id),
   ]);
 

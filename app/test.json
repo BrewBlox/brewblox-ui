@@ -1,0 +1,361 @@
+[
+  {
+    "id": "__profiles",
+    "profiles": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "type": "Profiles",
+    "data": {
+      "active": [
+        0
+      ]
+    }
+  },
+  {
+    "id": "__sysinfo",
+    "profiles": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "type": "SysInfo",
+    "data": {
+      "deviceId": "PwAlAAhRNTUyNDg1"
+    }
+  },
+  {
+    "id": "__time",
+    "profiles": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "type": "Ticks",
+    "data": {
+      "millisSinceBoot": 143762,
+      "secondsSinceEpoch": 1540560618
+    }
+  },
+  {
+    "id": "__onewirebus",
+    "profiles": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "type": "OneWireBus",
+    "data": {
+      "address": []
+    }
+  },
+  {
+    "id": "__pin_bottom_1",
+    "profiles": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "type": "ActuatorPin",
+    "data": {
+      "constrainedBy": {
+        "constraints": [
+          {
+            "mutex<MutexLink>": "mutex"
+          }
+        ]
+      },
+      "state": 0,
+      "invert": false
+    }
+  },
+  {
+    "id": "__pin_bottom_2",
+    "profiles": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "type": "ActuatorPin",
+    "data": {
+      "constrainedBy": {
+        "constraints": [
+          {
+            "mutex<MutexLink>": "mutex"
+          }
+        ]
+      },
+      "state": 0,
+      "invert": false
+    }
+  },
+  {
+    "id": "__pin_top_1",
+    "profiles": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "type": "ActuatorPin",
+    "data": {
+      "state": 0,
+      "invert": false
+    }
+  },
+  {
+    "id": "__pin_top_2",
+    "profiles": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "type": "ActuatorPin",
+    "data": {
+      "state": 0,
+      "invert": false
+    }
+  },
+  {
+    "id": "__pin_top_3",
+    "profiles": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "type": "ActuatorPin",
+    "data": {
+      "state": 0,
+      "invert": false
+    }
+  },
+  {
+    "id": "sensor-1",
+    "profiles": [
+      0
+    ],
+    "type": "TempSensorOneWire",
+    "data": {
+      "valid": true,
+      "address": "28830a360700002b",
+      "offset[delta_degC]": 0.0,
+      "value[degC]": 28.75
+    }
+  },
+  {
+    "id": "sensor-2",
+    "profiles": [
+      0
+    ],
+    "type": "TempSensorOneWire",
+    "data": {
+      "valid": true,
+      "address": "287e837f08000007",
+      "offset[delta_degC]": 0.0,
+      "value[degC]": 44.375
+    }
+  },
+  {
+    "id": "balancer",
+    "profiles": [
+      0
+    ],
+    "type": "Balancer",
+    "data": {
+      "clients": []
+    }
+  },
+  {
+    "id": "mutex",
+    "profiles": [
+      0
+    ],
+    "type": "Mutex",
+    "data": {
+      "differentActuatorWait": 0
+    }
+  },
+  {
+    "id": "setpoint-1",
+    "profiles": [
+      0
+    ],
+    "type": "SetpointSimple",
+    "data": {
+      "setting[degC]": 30.0
+    }
+  },
+  {
+    "id": "setpoint-2",
+    "profiles": [
+      0
+    ],
+    "type": "SetpointSimple",
+    "data": {
+      "setting[degC]": 30.0
+    }
+  },
+  {
+    "id": "pwm-1",
+    "profiles": [
+      0
+    ],
+    "type": "ActuatorPwm",
+    "data": {
+      "actuatorValid": true,
+      "period": 10000,
+      "setting": 12.26904296875,
+      "value": 10.9609375,
+      "actuatorId<ActuatorDigitalLink>": "__pin_bottom_1"
+    }
+  },
+  {
+    "id": "pwm-2",
+    "profiles": [
+      0
+    ],
+    "type": "ActuatorPwm",
+    "data": {
+      "actuatorValid": true,
+      "period": 10000,
+      "setting": 0.0,
+      "value": 0.0,
+      "actuatorId<ActuatorDigitalLink>": "__pin_bottom_2"
+    }
+  },
+  {
+    "id": "pair-1",
+    "profiles": [
+      0
+    ],
+    "type": "SetpointSensorPair",
+    "data": {
+      "setpointValid": true,
+      "sensorValid": true,
+      "sensorId<TempSensorLink>": "sensor-1",
+      "sensorValue[degC]": 28.75,
+      "setpointId<SetpointLink>": "setpoint-1",
+      "setpointValue[degC]": 30.0
+    }
+  },
+  {
+    "id": "pair-2",
+    "profiles": [
+      0
+    ],
+    "type": "SetpointSensorPair",
+    "data": {
+      "setpointValid": true,
+      "sensorValid": true,
+      "sensorId<TempSensorLink>": "sensor-2",
+      "sensorValue[degC]": 44.375,
+      "setpointId<SetpointLink>": "setpoint-2",
+      "setpointValue[degC]": 30.0
+    }
+  },
+  {
+    "id": "pid-1",
+    "profiles": [
+      0
+    ],
+    "type": "Pid",
+    "data": {
+      "inputValid": true,
+      "outputValid": true,
+      "outputValue": 12.26904296875,
+      "outputSetting": 12.26904296875,
+      "enabled": true,
+      "active": true,
+      "p": 12.021484375,
+      "i": 0.0400390625,
+      "d": 0.20751953125,
+      "filter": 0,
+      "inputId<ProcessValueLink>": "pair-1",
+      "integral[delta_degC]": 0.0,
+      "td[second]": 10,
+      "ti[second]": 300,
+      "outputId<ActuatorAnalogLink>": "pwm-1",
+      "kp[degC]": 10.0,
+      "derivative[delta_degC / second]": -0.0020771026611328125,
+      "filterThreshold[delta_degC]": 2.0,
+      "inputValue[degC]": 28.75,
+      "inputSetting[degC]": 30.0,
+      "error[delta_degC]": 1.2021484375
+    }
+  },
+  {
+    "id": "pid-2",
+    "profiles": [
+      0
+    ],
+    "type": "Pid",
+    "data": {
+      "inputValid": true,
+      "outputValid": true,
+      "outputValue": -129.884033203125,
+      "enabled": true,
+      "active": true,
+      "p": -132.7392578125,
+      "i": -0.4423828125,
+      "d": 3.297607421875,
+      "outputSetting": 0.0,
+      "filter": 0,
+      "inputId<ProcessValueLink>": "pair-2",
+      "integral[delta_degC]": 0.0,
+      "td[second]": 10,
+      "ti[second]": 300,
+      "outputId<ActuatorAnalogLink>": "pwm-2",
+      "kp[degC]": 10.0,
+      "derivative[delta_degC / second]": -0.03297829627990723,
+      "filterThreshold[delta_degC]": 2.0,
+      "inputValue[degC]": 44.375,
+      "inputSetting[degC]": 30.0,
+      "error[delta_degC]": -13.27392578125
+    }
+  }
+]
