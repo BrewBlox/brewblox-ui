@@ -1,11 +1,10 @@
 <script lang="ts">
 import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
-import SparkWidget from './SparkWidget.vue';
 import { serviceAvailable } from '@/helpers/dynamic-store';
 import { DashboardItem } from '@/store/dashboards/state';
 import { Block } from '@/plugins/spark/state';
-import { isFetching, allBlocks } from '@/plugins/spark/store/getters';
+import { allBlocks } from '@/plugins/spark/store/getters';
 import {
   featureIds,
   widgetById,
@@ -18,9 +17,6 @@ interface VueOrdered extends Vue {
 }
 
 @Component({
-  components: {
-    SparkWidget,
-  },
   props: {
     serviceId: {
       type: String,
@@ -59,10 +55,6 @@ export default class SparkPage extends Vue {
     ];
   }
 
-  get isFetching() {
-    return !this.isAvailable || isFetching(this.$store, this.$props.serviceId);
-  }
-
   get widgetSize() {
     return widgetSize;
   }
@@ -75,14 +67,14 @@ export default class SparkPage extends Vue {
 
 <template>
   <div>
-    <q-inner-loading :visible="isFetching">
+    <q-inner-loading :visible="items.length === 0">
       <q-spinner
         size="50px"
         color="primary"
       />
     </q-inner-loading>
 
-    <template v-if="!isFetching">
+    <template>
       <portal to="toolbar-title">
         <div>
           Blocks
@@ -90,7 +82,7 @@ export default class SparkPage extends Vue {
       </portal>
 
       <grid-container>
-        <spark-widget
+        <SparkWidget
           class="dashboard-item"
           :id="$props.serviceId"
           :serviceId="$props.serviceId"

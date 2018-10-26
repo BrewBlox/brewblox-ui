@@ -25,7 +25,6 @@ export type DashboardState = {
   items: {
     [id: string]: DashboardItem;
   };
-  fetching: boolean;
 };
 
 export type DashboardContext = ActionContext<DashboardState, RootState>;

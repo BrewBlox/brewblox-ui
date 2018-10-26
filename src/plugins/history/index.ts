@@ -21,5 +21,6 @@ export default ({ store }: PluginArguments) => {
     features: Object.keys(features),
     wizard: ref(wizard),
     initializer: register,
+    updater: fetcher,
   });
 };

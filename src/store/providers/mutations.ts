@@ -24,8 +24,8 @@ const mutations = {
   },
 };
 
+export default mutations;
+
 export const createProvider = commit(mutations.create);
 export const mutateProvider = commit(mutations.mutate);
 export const removeProvider = commit(mutations.remove);
-
-export default mutations;

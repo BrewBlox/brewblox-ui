@@ -11,7 +11,6 @@ import NewWidgetWizard from '@/components/Wizard/NewWidgetWizard.vue';
 import { Block } from '@/plugins/spark/state';
 import { DashboardItem } from '@/store/dashboards/state';
 import {
-  isFetching,
   dashboardById,
   dashboardItemById,
 } from '@/store/dashboards/getters';
@@ -99,10 +98,6 @@ export default class DashboardPage extends Vue {
       });
   }
 
-  get isFetching() {
-    return isFetching(this.$store);
-  }
-
   onStartEdit() {
     this.title = this.dashboard.title;
     this.editable = true;
@@ -184,14 +179,14 @@ export default class DashboardPage extends Vue {
 
 <template>
   <q-page padding>
-    <q-inner-loading :visible="isFetching">
+    <q-inner-loading>
       <q-spinner
         size="50px"
         color="primary"
       />
     </q-inner-loading>
 
-    <template v-if="!isFetching">
+    <template>
       <portal to="toolbar-title">
         <div v-if="!editable">
           {{ dashboard.title }}

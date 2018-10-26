@@ -1,5 +1,4 @@
 import { getStoreAccessors } from 'vuex-typescript';
-
 import { Dashboard, DashboardItem, DashboardState, DashboardContext } from './state';
 import { RootState, RootStore } from '../state';
 
@@ -12,7 +11,6 @@ const getters = {
   items: (state: DashboardState): { [id: string]: DashboardItem } => state.items,
   itemIds: (state: DashboardState): string[] => Object.keys(state.items),
   itemValues: (state: DashboardState): DashboardItem[] => Object.values(state.items),
-  isFetching: (state: DashboardState): boolean => state.fetching,
   primaryDashboard: (state: DashboardState): string | null => {
     const sorted = Object
       .values(state.dashboards)
@@ -31,11 +29,13 @@ const getters = {
   },
 };
 
-const dashboards = read(getters.dashboards);
+export default getters;
+
+export const dashboards = read(getters.dashboards);
 export const dashboardIds = read(getters.dashboardIds);
 export const allDashboards = read(getters.dashboardValues);
 
-const dashboardItems = read(getters.items);
+export const dashboardItems = read(getters.items);
 export const dashboardItemIds = read(getters.itemIds);
 export const allDashboardItems = read(getters.itemValues);
 export const primaryDashboard = read(getters.primaryDashboard);
@@ -44,7 +44,3 @@ export const dashboardById =
   (store: RootStore | DashboardContext, id: string): Dashboard => dashboards(store)[id];
 export const dashboardItemById =
   (store: RootStore | DashboardContext, id: string): DashboardItem => dashboardItems(store)[id];
-
-export const isFetching = read(getters.isFetching);
-
-export default getters;

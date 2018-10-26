@@ -10,7 +10,6 @@ export type SparkState = {
   unitAlternatives: UnitAlternatives;
   compatibleBlocks: CompatibleBlocks;
   discoveredBlocks: string[];
-  fetching: boolean,
 };
 
 export type BlocksContext = ActionContext<SparkState, RootState>;
