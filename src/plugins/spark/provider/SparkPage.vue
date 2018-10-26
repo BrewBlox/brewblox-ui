@@ -4,7 +4,7 @@ import Component from 'vue-class-component';
 import { serviceAvailable } from '@/helpers/dynamic-store';
 import { DashboardItem } from '@/store/dashboards/state';
 import { Block } from '@/plugins/spark/state';
-import { isFetching, allBlocks } from '@/plugins/spark/store/getters';
+import { allBlocks } from '@/plugins/spark/store/getters';
 import {
   featureIds,
   widgetById,
@@ -55,10 +55,6 @@ export default class SparkPage extends Vue {
     ];
   }
 
-  get isFetching() {
-    return !this.isAvailable || isFetching(this.$store, this.$props.serviceId);
-  }
-
   get widgetSize() {
     return widgetSize;
   }
@@ -71,14 +67,14 @@ export default class SparkPage extends Vue {
 
 <template>
   <div>
-    <q-inner-loading :visible="isFetching">
+    <q-inner-loading :visible="items.length === 0">
       <q-spinner
         size="50px"
         color="primary"
       />
     </q-inner-loading>
 
-    <template v-if="!isFetching">
+    <template>
       <portal to="toolbar-title">
         <div>
           Blocks

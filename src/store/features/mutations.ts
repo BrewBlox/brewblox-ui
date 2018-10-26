@@ -28,8 +28,8 @@ const mutations = {
   },
 };
 
+export default mutations;
+
 export const createFeature = commit(mutations.create);
 export const mutateFeature = commit(mutations.mutate);
 export const removeFeature = commit(mutations.remove);
-
-export default mutations;

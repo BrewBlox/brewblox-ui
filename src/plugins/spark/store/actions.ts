@@ -1,11 +1,9 @@
 import { saveService } from '@/store/services/actions';
 import { Service } from '@/store/services/state';
 import { RootStore } from '@/store/state';
-
 import { Block, UserUnits } from '../state';
 import { BlocksContext } from './state';
 import { dispatch } from '@/helpers/dynamic-store';
-
 import {
   clearBlocks as clearBlocksInApi,
   createBlock as createBlockInApi,
@@ -20,19 +18,19 @@ import {
   validateService as validateServiceInApi,
   fetchDiscoveredBlocks as fetchDiscoveredBlocksInApi,
 } from './api';
-
-import { sparkServiceById, discoveredBlocks } from './getters';
-
+import {
+  sparkServiceById,
+  discoveredBlocks,
+} from './getters';
 import {
   addBlock as addBlockInStore,
   mutateBlock as mutateBlockInStore,
-  mutateFetching as mutateFetchingInStore,
   removeBlock as removeBlockInStore,
-  clearBlocks as clearBlocksInStore,
   setUnits as setUnitsInStore,
   setUnitAlternatives as setUnitAlternativesInStore,
   setCompatibleBlocks as setCompatibleBlocksInStore,
   setDiscoveredBlocks as setDiscoveredBlocksInStore,
+  setBlocks as setBlocksInStore,
 } from './mutations';
 
 const actions = {
@@ -77,13 +75,8 @@ export const updateProfileNames = (store: RootStore, id: string, names: string[]
   });
 };
 
-export const fetchBlocks = async (store: RootStore, serviceId: string) => {
-  mutateFetchingInStore(store, serviceId, true);
-  const fetched = await fetchBlocksInApi(serviceId);
-  clearBlocksInStore(store, serviceId);
-  fetched.forEach(block => addBlockInStore(store, serviceId, block));
-  mutateFetchingInStore(store, serviceId, false);
-};
+export const fetchBlocks = async (store: RootStore, serviceId: string) =>
+  setBlocksInStore(store, serviceId, await fetchBlocksInApi(serviceId));
 
 export const clearBlocks = async (store: RootStore, service: Service) => {
   await clearBlocksInApi(service.id);
@@ -120,6 +113,12 @@ export const fetchAll = async (store: RootStore, service: Service) =>
     fetchBlocks(store, service.id),
     fetchUnits(store, service.id),
     fetchUnitAlternatives(store, service.id),
+  ]);
+
+export const update = async (store: RootStore, service: Service) =>
+  Promise.all([
+    fetchDiscoveredBlocks(store, service.id),
+    fetchBlocks(store, service.id),
   ]);
 
 export const validateService = async (serviceId: string) =>

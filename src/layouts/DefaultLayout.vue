@@ -6,7 +6,6 @@ import { objectSorter } from '@/helpers/functional';
 import { Dashboard } from '@/store/dashboards/state';
 import {
   allDashboards,
-  isFetching,
   primaryDashboard,
 } from '@/store/dashboards/getters';
 import {
@@ -37,10 +36,6 @@ export default class DefaultLayout extends Vue {
   serviceEditing: boolean = false;
   wizardModalOpen: boolean = false;
   $q: any;
-
-  get isFetching() {
-    return isFetching(this.$store);
-  }
 
   get dashboards() {
     return [...allDashboards(this.$store)].sort(objectSorter('order'));
@@ -161,7 +156,7 @@ export default class DefaultLayout extends Vue {
         <q-item-separator />
         <!-- dashboards -->
 
-        <q-list-header v-if="!isFetching">
+        <q-list-header>
           <q-item-side icon="dashboard" />
           Dashboards
           <q-btn
@@ -174,7 +169,7 @@ export default class DefaultLayout extends Vue {
           />
         </q-list-header>
 
-        <q-item v-if="!isFetching && dashboards.length === 0">
+        <q-item v-if="dashboards.length === 0">
           No dashboards yet
         </q-item>
 
@@ -235,7 +230,7 @@ export default class DefaultLayout extends Vue {
         <q-item-separator />
         <!-- services -->
 
-        <q-list-header v-if="!isFetching">
+        <q-list-header>
           <q-item-side icon="cloud" />
           Services
           <q-btn
@@ -248,7 +243,7 @@ export default class DefaultLayout extends Vue {
           />
         </q-list-header>
 
-        <q-item v-if="!isFetching && services.length === 0">
+        <q-item v-if="services.length === 0">
           No services yet
         </q-item>
 

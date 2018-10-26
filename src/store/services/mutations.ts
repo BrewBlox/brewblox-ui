@@ -8,11 +8,17 @@ import { RootState } from '../state';
 const { commit } = getStoreAccessors<ServiceState, RootState>('services');
 
 const mutations = {
-  addService(state: ServiceState, service: Service) {
-    Vue.set(state.services, service.id, { ...service });
-  },
+  addService: (state: ServiceState, service: Service) =>
+    Vue.set(state.services, service.id, { ...service }),
 
-  updateService(state: ServiceState, service: Partial<Service>) {
+  setServices: (state: ServiceState, services: Service[]) =>
+    Vue.set(
+      state,
+      'services',
+      services.reduce((acc, service) => ({ ...acc, [service.id]: service }), {}),
+    ),
+
+  updateService: (state: ServiceState, service: Partial<Service>) => {
     const id = service.id || '';
     const existing = state.services[id];
     if (!existing) {
@@ -21,22 +27,16 @@ const mutations = {
     Vue.set(state.services, id, { ...existing, ...service });
   },
 
-  mutateService(state: ServiceState, service: Partial<Service>) {
-    mutations.updateService(state, service);
-  },
+  mutateService: (state: ServiceState, service: Partial<Service>) =>
+    mutations.updateService(state, service),
 
-  removeService(state: ServiceState, id: string) {
-    Vue.delete(state.services, id);
-  },
-
-  mutateFetching(state: ServiceState, fetching: boolean) {
-    state.fetching = fetching;
-  },
+  removeService: (state: ServiceState, id: string) =>
+    Vue.delete(state.services, id),
 };
 
-export const mutateFetching = commit(mutations.mutateFetching);
+export default mutations;
+
 export const addService = commit(mutations.addService);
+export const setServices = commit(mutations.setServices);
 export const mutateService = commit(mutations.mutateService);
 export const removeService = commit(mutations.removeService);
-
-export default mutations;

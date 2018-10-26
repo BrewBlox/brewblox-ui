@@ -11,6 +11,6 @@ const actions = {
   },
 };
 
-export const createFeature = dispatch(actions.create);
-
 export default actions;
+
+export const createFeature = dispatch(actions.create);

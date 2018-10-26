@@ -1,9 +1,9 @@
-import { ref, autoRegister } from '@/helpers/component-ref';
+import { autoRegister } from '@/helpers/component-ref';
 import { createProvider } from '@/store/providers/actions';
 import { createFeature } from '@/store/features/actions';
 import features from './features';
 import { register } from './store';
-import { fetchAll } from './store/actions';
+import { fetchAll, update } from './store/actions';
 
 export default ({ store }: PluginArguments) => {
   autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
@@ -19,6 +19,7 @@ export default ({ store }: PluginArguments) => {
     features: Object.keys(features),
     initializer: register,
     fetcher: fetchAll,
+    updater: update,
     wizard: 'SparkWizard',
     page: 'SparkPage',
   });
