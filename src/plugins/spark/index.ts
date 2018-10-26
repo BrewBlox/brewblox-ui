@@ -5,11 +5,9 @@ import features from './features';
 import { register } from './store';
 import { fetchAll } from './store/actions';
 
-import page from './provider/SparkPage.vue';
-import wizard from './provider/SparkWizard.vue';
-
 export default ({ store }: PluginArguments) => {
   autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
+  autoRegister(require.context('./provider', true, /[A-Z]\w+\.vue$/));
 
   Object
     .values(features)
@@ -21,7 +19,7 @@ export default ({ store }: PluginArguments) => {
     features: Object.keys(features),
     initializer: register,
     fetcher: fetchAll,
-    wizard: ref(wizard),
-    page: ref(page),
+    wizard: 'SparkWizard',
+    page: 'SparkPage',
   });
 };

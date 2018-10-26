@@ -4,7 +4,6 @@ import Component from 'vue-class-component';
 import { serviceById } from '@/store/services/getters';
 import { durationString } from '@/helpers/functional';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import SparkForm from './SparkForm.vue';
 import { Block } from '@/plugins/spark/state';
 import {
   SysInfoBlock,
@@ -24,9 +23,6 @@ import {
 } from '@/plugins/spark/store/actions';
 
 @Component({
-  components: {
-    SparkForm,
-  },
   props: {
     serviceId: {
       type: String,
@@ -37,10 +33,6 @@ import {
 export default class SparkWidget extends Vue {
   get service() {
     return serviceById(this.$store, this.$props.serviceId);
-  }
-
-  get form() {
-    return SparkForm;
   }
 
   sysBlock<T extends Block>(blockId: string) {
@@ -99,9 +91,9 @@ export default class SparkWidget extends Vue {
   <widget-card
     :title="$props.serviceId"
     subTitle="Spark Service Configuration"
-    :onRefresh="fetch"
-    :form="form"
+    form="SparkForm"
     v-model="service"
+    :onRefresh="fetch"
   >
 
     <widget-field

@@ -1,7 +1,6 @@
 <script lang="ts">
 import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
-import SparkWidget from './SparkWidget.vue';
 import { serviceAvailable } from '@/helpers/dynamic-store';
 import { DashboardItem } from '@/store/dashboards/state';
 import { Block } from '@/plugins/spark/state';
@@ -18,9 +17,6 @@ interface VueOrdered extends Vue {
 }
 
 @Component({
-  components: {
-    SparkWidget,
-  },
   props: {
     serviceId: {
       type: String,
@@ -90,7 +86,7 @@ export default class SparkPage extends Vue {
       </portal>
 
       <grid-container>
-        <spark-widget
+        <SparkWidget
           class="dashboard-item"
           :id="$props.serviceId"
           :serviceId="$props.serviceId"
