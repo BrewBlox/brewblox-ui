@@ -18,7 +18,6 @@ const defaultProfileNames = [
 export const typeName: string = 'Spark';
 
 const getters = {
-  isFetching: (state: SparkState): boolean => state.fetching,
   blocks: (state: SparkState): { [id: string]: Block } => state.blocks,
   blockIds: (state: SparkState): string[] => Object.keys(state.blocks),
   blockValues: (state: SparkState): Block[] => Object.values(state.blocks),
@@ -30,7 +29,6 @@ const getters = {
 
 export default getters;
 
-export const isFetching = read(getters.isFetching);
 export const blocks = read(getters.blocks);
 export const blockIds = read(getters.blockIds);
 export const blockValues = read(getters.blockValues);

@@ -4,7 +4,6 @@ import Component from 'vue-class-component';
 import { serviceById } from '@/store/services/getters';
 import { durationString } from '@/helpers/functional';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import SparkForm from './SparkForm.vue';
 import { Block } from '@/plugins/spark/state';
 import {
   SysInfoBlock,
@@ -13,6 +12,7 @@ import {
   TicksBlock,
 } from './state';
 import {
+  blocks,
   blockById,
   profileNames,
   discoveredBlocks,
@@ -22,11 +22,14 @@ import {
   fetchDiscoveredBlocks,
   clearDiscoveredBlocks,
 } from '@/plugins/spark/store/actions';
+import {
+  sysInfoId,
+  profilesId,
+  oneWireBusId,
+  ticksId,
+} from './getters';
 
 @Component({
-  components: {
-    SparkForm,
-  },
   props: {
     serviceId: {
       type: String,
@@ -39,32 +42,37 @@ export default class SparkWidget extends Vue {
     return serviceById(this.$store, this.$props.serviceId);
   }
 
-  get form() {
-    return SparkForm;
-  }
-
   sysBlock<T extends Block>(blockId: string) {
-    return blockById<T>(this.$store, this.service.id, blockId);
+    return blocks(this.$store, this.service.id)[blockId] as T;
   }
 
   get sysInfo() {
-    return this.sysBlock<SysInfoBlock>('__sysinfo');
+    return this.sysBlock<SysInfoBlock>(sysInfoId);
   }
 
   get profiles() {
-    return this.sysBlock<ProfilesBlock>('__profiles');
+    return this.sysBlock<ProfilesBlock>(profilesId);
   }
 
   get oneWireBus() {
-    return this.sysBlock<OneWireBusBlock>('__onewirebus');
+    return this.sysBlock<OneWireBusBlock>(oneWireBusId);
   }
 
   get ticks() {
-    return this.sysBlock<TicksBlock>('__time');
+    return this.sysBlock<TicksBlock>(ticksId);
   }
 
   get profileNames(): string[] {
     return profileNames(this.$store, this.service.id);
+  }
+
+  get ready() {
+    return [
+      this.sysInfo,
+      this.profiles,
+      this.oneWireBus,
+      this.ticks,
+    ].every(v => v !== undefined);
   }
 
   get activeNames() {
@@ -97,11 +105,12 @@ export default class SparkWidget extends Vue {
 
 <template>
   <widget-card
+    v-if="ready"
     :title="$props.serviceId"
     subTitle="Spark Service Configuration"
-    :onRefresh="fetch"
-    :form="form"
+    form="SparkForm"
     v-model="service"
+    :onRefresh="fetch"
   >
 
     <widget-field

@@ -2,6 +2,9 @@ import { getStoreAccessors } from 'vuex-typescript';
 
 import { RootState, RootStore } from '../state';
 import { Provider, ProviderState } from './state';
+import { Service } from '../services/state';
+
+type ServiceFunc = (store: RootStore, service: Service) => Promise<any>;
 
 const { read } = getStoreAccessors<ProviderState, RootState>('providers');
 
@@ -10,6 +13,7 @@ const getters = {
   providerIds: (state: ProviderState): string[] => Object.keys(state.providers),
   providerValues: (state: ProviderState): Provider[] => Object.values(state.providers),
 };
+
 export default getters;
 
 export const providers = read(getters.providers);
@@ -22,11 +26,14 @@ export const providerById = (store: RootStore, id: string) =>
 export const displayNameById = (store: RootStore, id: string) =>
   providerById(store, id).displayName || id;
 
-export const initializerById = (store: RootStore, id: string) =>
+export const initializerById = (store: RootStore, id: string): ServiceFunc =>
   providerById(store, id).initializer || (async () => { });
 
-export const fetcherById = (store: RootStore, id: string) =>
+export const fetcherById = (store: RootStore, id: string): ServiceFunc =>
   providerById(store, id).fetcher || (async () => { });
+
+export const updaterById = (store: RootStore, id: string): ServiceFunc =>
+  providerById(store, id).updater || (async () => { });
 
 export const wizardById = (store: RootStore, id: string) =>
   providerById(store, id).wizard;

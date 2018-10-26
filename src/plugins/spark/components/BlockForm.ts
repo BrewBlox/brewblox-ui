@@ -4,7 +4,7 @@ import { Watch } from 'vue-property-decorator';
 import { Block } from '@/plugins/spark/state';
 import { toShadow, fromShadow, ShadowMapping, deepCopy } from '@/helpers/shadow-copy';
 import { uniqueFilter } from '@/helpers/functional';
-import { profileNames, isFetching, compatibleBlocks } from '@/plugins/spark/store/getters';
+import { profileNames, compatibleBlocks } from '@/plugins/spark/store/getters';
 import { fetchCompatibleBlocks } from '@/plugins/spark/store/actions';
 import { Link } from '@/helpers/units';
 
@@ -39,10 +39,6 @@ export default class BlockForm extends Vue {
     this.$emit('input', block);
   }
 
-  get isFetching() {
-    return isFetching(this.$store, this.block.serviceId);
-  }
-
   get profileNames(): string[] {
     return profileNames(this.$store, this.block.serviceId);
   }
@@ -57,19 +53,13 @@ export default class BlockForm extends Vue {
       .some(key => state[key] !== this.inputValues[key]);
   }
 
+  // subclasses can override this as a lifecycle hook
+  afterBlockFetch() { }
+
   @Watch('block', { immediate: true, deep: true })
   onBlockUpdate() {
     if (!this.block.isLoading) {
       this.inputValues = deepCopy(toShadow(this.block, this.inputMapping));
-    }
-  }
-
-  // subclasses can override this as a lifecycle hook
-  afterBlockFetch() { }
-
-  @Watch('isFetching', { immediate: true })
-  fetch() {
-    if (!this.isFetching) {
       this.afterBlockFetch();
     }
   }

@@ -3,7 +3,7 @@ import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
 import { Link } from '@/helpers/units';
 import { uniqueFilter } from '@/helpers/functional';
-import { profileNames, isFetching, compatibleBlocks } from '@/plugins/spark/store/getters';
+import { compatibleBlocks } from '@/plugins/spark/store/getters';
 import { fetchCompatibleBlocks } from '@/plugins/spark/store/actions';
 
 export interface ConstraintInfo {
@@ -50,10 +50,6 @@ export default class Constraints extends Vue {
   updateConstraint(index: number, cinfo: ConstraintInfo) {
     this.constraints[index] = cinfo;
     this.onChanged(this.constraints);
-  }
-
-  get isFetching() {
-    return isFetching(this.$store, this.$props.serviceId);
   }
 
   get compatibleBlocks() {

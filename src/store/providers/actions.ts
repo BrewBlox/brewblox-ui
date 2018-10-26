@@ -11,6 +11,6 @@ const actions = {
   },
 };
 
-export const createProvider = dispatch(actions.create);
-
 export default actions;
+
+export const createProvider = dispatch(actions.create);

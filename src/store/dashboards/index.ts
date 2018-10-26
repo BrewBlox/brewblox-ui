@@ -14,7 +14,6 @@ const dashboards = {
     settings: {
       primary: null,
     },
-    fetching: true,
   },
 };
 

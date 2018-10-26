@@ -14,8 +14,7 @@ export interface Service {
 export type ServiceState = {
   services: {
     [id: string]: Service;
-  },
-  fetching: boolean,
+  };
 };
 
 export type ServicesContext = ActionContext<ServiceState, RootState>;
