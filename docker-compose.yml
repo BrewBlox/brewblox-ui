@@ -27,7 +27,7 @@ services:
         - "8332"
 
   sparkey:
-    image: brewblox/brewblox-devcon-spark:feature-force-push-blocks
+    image: brewblox/brewblox-devcon-spark:develop
     depends_on:
       - eventbus
     labels:
@@ -42,7 +42,7 @@ services:
       --config=sparkey_config.json
 
   spock:
-    image: brewblox/brewblox-devcon-spark:feature-force-push-blocks
+    image: brewblox/brewblox-devcon-spark:develop
     depends_on:
       - eventbus
     labels:

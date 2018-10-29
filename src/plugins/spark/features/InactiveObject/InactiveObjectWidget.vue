@@ -13,6 +13,7 @@ export default class InactiveObjectWidget extends BlockWidget {
     :title="$props.id"
     :subTitle="$props.type"
     :onRefresh="refreshBlock"
+    :additionalInfo="additionalInfo"
     form="InactiveObjectForm"
     v-model="block"
   >

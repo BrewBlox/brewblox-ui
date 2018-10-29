@@ -21,6 +21,7 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
     :title="$props.id"
     :subTitle="$props.type"
     :onRefresh="refreshBlock"
+    :additionalInfo="additionalInfo"
     form="ActuatorAnalogMockForm"
     v-model="block"
   >

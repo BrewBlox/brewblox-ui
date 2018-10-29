@@ -12,6 +12,10 @@ import Component from 'vue-class-component';
       type: String,
       required: true,
     },
+    additionalInfo: {
+      type: Object,
+      default: () => ({}),
+    },
     body: {
       type: Boolean,
       default: true,
@@ -33,6 +37,10 @@ import Component from 'vue-class-component';
 export default class WidgetCard extends Vue {
   modalOpen: boolean = false;
 
+  get hasAdditionalInfo() {
+    return Object.keys(this.$props.additionalInfo).length > 0;
+  }
+
   get model() {
     return this.$props.value;
   }
@@ -51,6 +59,20 @@ export default class WidgetCard extends Vue {
       :onClose="() => { this.modalOpen = false; }"
       :title="$props.title"
     >
+      <q-collapsible
+        icon="info"
+        label="Additional info"
+        v-if="hasAdditionalInfo"
+      >
+        <q-list no-border dark>
+          <p
+            v-for="(val, key) in $props.additionalInfo"
+            :key="key"
+          >
+            {{ key }}: {{ val }}
+          </p>
+        </q-list>
+      </q-collapsible>
       <component
         :is="$props.form"
         v-model="model"

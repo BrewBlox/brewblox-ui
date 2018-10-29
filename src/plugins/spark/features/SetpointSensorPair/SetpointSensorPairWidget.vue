@@ -21,6 +21,7 @@ export default class SetpointSensorPairWidget extends BlockWidget {
     :title="$props.id"
     :subTitle="$props.type"
     :onRefresh="refreshBlock"
+    :additionalInfo="additionalInfo"
     form="SetpointSensorPairForm"
     v-model="block"
   >

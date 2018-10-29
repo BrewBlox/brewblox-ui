@@ -25,6 +25,7 @@ export default class SetpointProfileWidget extends BlockWidget {
     :title="$props.id"
     :subTitle="$props.type"
     :onRefresh="refreshBlock"
+    :additionalInfo="additionalInfo"
     form="SetpointProfileForm"
     v-model="block"
   >

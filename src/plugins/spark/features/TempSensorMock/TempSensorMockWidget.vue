@@ -21,6 +21,7 @@ export default class TempSensorMockWidget extends BlockWidget {
     :title="$props.id"
     :subTitle="$props.type"
     :onRefresh="refreshBlock"
+    :additionalInfo="additionalInfo"
     form="TempSensorMockForm"
     v-model="block"
   >

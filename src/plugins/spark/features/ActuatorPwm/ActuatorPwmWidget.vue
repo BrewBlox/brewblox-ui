@@ -21,6 +21,7 @@ export default class ActuatorPwmWidget extends BlockWidget {
     :title="$props.id"
     :subTitle="$props.type"
     :onRefresh="refreshBlock"
+    :additionalInfo="additionalInfo"
     form="ActuatorPwmForm"
     v-model="block"
   >

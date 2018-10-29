@@ -22,6 +22,15 @@ export default class BlockWidget extends WidgetBase {
     this.saveBlock(block);
   }
 
+  get additionalInfo() {
+    return {
+      'Widget ID': this.$props.id,
+      'Block ID': this.blockId,
+      'Service ID': this.serviceId,
+      'Feature type': this.$props.type,
+    };
+  }
+
   refreshBlock() {
     fetchBlock(this.$store, this.serviceId, this.block);
   }
