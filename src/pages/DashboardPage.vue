@@ -223,7 +223,7 @@ export default class DashboardPage extends Vue {
           :icon="editable ? 'check' : 'mode edit'"
           :color="editable ? 'positive' : 'primary'"
           @click="editable ? onStopEdit() : onStartEdit()"
-          :label="editable ? 'Save changes' : 'Edit dashboard'"
+          :label="editable ? 'Stop editing' : 'Edit dashboard'"
         />
 
       </portal>
@@ -249,6 +249,7 @@ export default class DashboardPage extends Vue {
           class="dashboard-item"
           v-for="item in validatedItems"
           :is="item.component"
+          :disabled="editable"
           :error="item.error"
           :key="item.id"
           :id="item.id"

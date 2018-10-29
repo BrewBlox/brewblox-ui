@@ -22,7 +22,7 @@ export default class CopyWidgetWizard extends Vue {
 
   get existingWidgetOptions() {
     return allDashboardItems(this.$store)
-      .filter(item => item.id.match(this.searchModel))
+      .filter(item => item.id.toLowerCase().match(this.searchModel.toLowerCase()))
       .map(item => ({
         id: item.id,
         displayName: displayNameById(this.$store, item.widget),

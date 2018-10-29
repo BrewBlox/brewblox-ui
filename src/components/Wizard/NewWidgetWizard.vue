@@ -32,7 +32,7 @@ export default class NewWidgetWizard extends Vue {
       }))
       .filter(opt =>
         wizardById(this.$store, opt.value)
-        && opt.label.match(this.searchModel))
+        && opt.label.toLowerCase().match(this.searchModel.toLowerCase()))
       .sort(objectStringSorter('label'));
   }
 
