@@ -381,7 +381,6 @@ export default class GridItem extends Vue {
   display: flex;
   align-items: flex-end;
   justify-content: space-evenly;
-  border: tomato;
   width: 100%;
   position: absolute;
   bottom: 0;
