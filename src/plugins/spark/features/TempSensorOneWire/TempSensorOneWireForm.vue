@@ -46,7 +46,7 @@ export default class TempSensorOneWireForm extends BlockForm {
       >
         <q-input
           v-model="inputValues.offset.value"
-          :suffix="inputValues.offset.unit"
+          :suffix="inputValues.offset.unitNotation"
           type="number"
         />
       </widget-field>

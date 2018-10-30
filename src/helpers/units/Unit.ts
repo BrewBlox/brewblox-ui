@@ -1,5 +1,5 @@
 const prettify = (v: string) => v
-  .replace(/delta_/g, 'Δ')
+  .replace(/delta_/g, '')
   .replace(/(celsius|degC(elsius)?)/gi, '°C')
   .replace(/(fahrenheit|degF(ahrenheit)?)/gi, '°F')
   .replace(/(kelvin|degK(elvin)?)/gi, '°K')

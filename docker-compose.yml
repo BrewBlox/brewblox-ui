@@ -21,6 +21,8 @@ services:
 
   sparksimulator:
     image: brewblox/firmware-simulator:develop
+    # volumes:
+    #   - "./mocks/app/eeprom.bin:/target/brewblox-gcc/eeprom.bin"
     ports:
         - "8332"
 
@@ -32,12 +34,12 @@ services:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /sparkey"
     volumes:
-      - "./mocks/config/seed_objects.json:/app/seed_objects.json"
+      - "./mocks/app/:/app/"
     command: >
       --name=sparkey
-      --seed-profiles=0
-      --seed-objects=seed_objects.json
       --device-host=sparksimulator
+      --database=sparkey_db.json
+      --config=sparkey_config.json
 
   spock:
     image: brewblox/brewblox-devcon-spark:develop
@@ -47,12 +49,12 @@ services:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /spock"
     volumes:
-      - "./mocks/config/seed_objects.json:/app/seed_objects.json"
+      - "./mocks/app/:/app/"
     command: >
       --name=spock
       --simulation
-      --seed-profiles=0
-      --seed-objects=seed_objects.json
+      --database=spock_db.json
+      --config=spock_config.json
 
   datastore:
     image: brewblox/brewblox-datastore:develop
@@ -61,9 +63,8 @@ services:
       - "traefik.frontend.rule=PathPrefixStrip: /datastore/"
     volumes:
       - "./mocks/config/datastore.json:/app/datastore.json"
-    command:
-      - "--watch"
-      - "datastore.json"
+    command: >
+      --watch datastore.json
 
   traefik:
     image: traefik

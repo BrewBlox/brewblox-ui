@@ -332,7 +332,12 @@ export default class GridItem extends Vue {
       @touchmove="onDragMove"
       @touchend="stopDrag"
       v-if="!dragging && editable"
-    />
+    >
+      <q-icon
+        name="open_with"
+        size="50px"
+      />
+    </button>
   </div>
 </template>
 
@@ -364,6 +369,10 @@ export default class GridItem extends Vue {
   top: 0;
   position: absolute;
   background: transparent;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 0;
   cursor: move;
   width: 100%;

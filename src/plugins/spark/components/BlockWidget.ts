@@ -1,11 +1,11 @@
-import Widget from '@/components/Widget/WidgetBase';
+import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
 import { Block } from '../state';
 import { fetchBlock, saveBlock } from '../store/actions';
 import { blockById } from '../store/getters';
 
 @Component
-export default class BlockWidget extends Widget {
+export default class BlockWidget extends WidgetBase {
   get serviceId(): string {
     return this.$props.config.serviceId;
   }
@@ -20,6 +20,15 @@ export default class BlockWidget extends Widget {
 
   set block(block: Block) {
     this.saveBlock(block);
+  }
+
+  get additionalInfo() {
+    return {
+      'Widget ID': this.$props.id,
+      'Block ID': this.blockId,
+      'Service ID': this.serviceId,
+      'Feature type': this.$props.type,
+    };
   }
 
   refreshBlock() {

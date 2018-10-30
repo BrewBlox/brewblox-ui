@@ -2,6 +2,7 @@
 import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
 import { Notify } from 'quasar';
+import { objectStringSorter } from '@/helpers/functional';
 import { DashboardItem } from '@/store/dashboards/state';
 import { dashboardItemById } from '@/store/dashboards/getters';
 
@@ -31,7 +32,8 @@ export default class NewWidgetWizard extends Vue {
       }))
       .filter(opt =>
         wizardById(this.$store, opt.value)
-        && opt.label.match(this.searchModel));
+        && opt.label.toLowerCase().match(this.searchModel.toLowerCase()))
+      .sort(objectStringSorter('label'));
   }
 
   get wizardComponent() {

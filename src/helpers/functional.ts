@@ -4,6 +4,19 @@ export const uniqueFilter = (val: any, idx: number, coll: any[]) =>
 export const objectSorter = (key: string) =>
   ((a: any, b: any) => a[key] - b[key]);
 
+export const objectStringSorter = (key: string) =>
+  (a: any, b: any) => {
+    const left = a[key].toLowerCase();
+    const right = b[key].toLowerCase();
+    if (left < right) {
+      return -1;
+    }
+    if (right > left) {
+      return 1;
+    }
+    return 0;
+  };
+
 export const durationString = (durationMs: number) => {
   const secondsTotal = Number(durationMs) / 1000;
   const days = Math.floor(secondsTotal / 86400);

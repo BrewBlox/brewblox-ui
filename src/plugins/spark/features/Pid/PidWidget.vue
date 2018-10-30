@@ -27,6 +27,7 @@ export default class PidWidget extends BlockWidget {
     :title="$props.id"
     :subTitle="$props.type"
     :onRefresh="refreshBlock"
+    :additionalInfo="additionalInfo"
     form="PidForm"
     v-model="block"
   >
@@ -51,14 +52,14 @@ export default class PidWidget extends BlockWidget {
       :label="`Output value (${block.data.outputId})`"
       :icon="block.data.outputValid ? 'link' : 'link_off'"
     >
-      <big>{{ block.data.outputValue }}</big>
+      <big>{{ block.data.outputValue | round }}</big>
     </widget-field>
 
     <widget-field
       label="Output setting"
       icon="settings"
     >
-      <big>{{ block.data.outputSetting }}</big>
+      <big>{{ block.data.outputSetting | round }}</big>
     </widget-field>
 
     <!-- Filter -->
@@ -115,21 +116,21 @@ export default class PidWidget extends BlockWidget {
       label="P"
       icon=""
     >
-      <big>{{ block.data.p }}</big>
+      <big>{{ block.data.p | round }}</big>
     </widget-field>
 
     <widget-field
       label="I"
       icon=""
     >
-      <big>{{ block.data.i }}</big>
+      <big>{{ block.data.i | round }}</big>
     </widget-field>
 
     <widget-field
       label="D"
       icon=""
     >
-      <big>{{ block.data.d }}</big>
+      <big>{{ block.data.d | round }}</big>
     </widget-field>
 
     <!-- error / integral / derivative -->

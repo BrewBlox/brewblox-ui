@@ -8,7 +8,7 @@ import form from './SetpointProfileForm.vue';
 const feature: Feature = {
   ...GenericBlock,
   id: typeName,
-  displayName: 'SetpointProfile',
+  displayName: 'Setpoint profile',
   widget: ref(widget),
   form: ref(form),
   widgetSize: {

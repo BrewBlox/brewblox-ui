@@ -21,6 +21,7 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
     :title="$props.id"
     :subTitle="$props.type"
     :onRefresh="refreshBlock"
+    :additionalInfo="additionalInfo"
     form="ActuatorAnalogMockForm"
     v-model="block"
   >
@@ -29,14 +30,14 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
       label="Setting"
       icon=""
     >
-      <big>{{ block.data.setting }}</big>
+      <big>{{ block.data.setting | round }}</big>
     </widget-field>
 
     <widget-field
       label="Value"
       icon=""
     >
-      <big>{{ block.data.value }}</big>
+      <big>{{ block.data.value | round }}</big>
     </widget-field>
 
   </widget-card>

@@ -179,13 +179,19 @@ export default class DefaultLayout extends Vue {
           v-model="dashboards"
         >
           <q-item
+            dark
             v-for="dashboard in dashboards"
             :link="!dashboardEditing"
             :key="dashboard.id"
             :to="dashboardEditing ? undefined : `/dashboard/${dashboard.id}`"
           >
             <q-item-side
-              left
+              v-if="dashboardEditing"
+              icon="drag_indicator"
+            />
+            <q-item-main :label="dashboard.title" />
+            <q-item-side
+              right
               v-if="dashboardEditing"
             >
               <q-btn
@@ -195,13 +201,6 @@ export default class DefaultLayout extends Vue {
                 :color="defaultDashboard === dashboard.id ? 'primary' : ''"
                 @click="updateDefaultDashboard(dashboard.id)"
               />
-            </q-item-side>
-            <q-item-main :label="dashboard.title" />
-            <q-item-side
-              right
-              v-if="dashboardEditing"
-            >
-              <q-icon name="menu" />
             </q-item-side>
             <q-item-side
               right
@@ -250,22 +249,21 @@ export default class DefaultLayout extends Vue {
         <draggable
           :class="{ editing: serviceEditing }"
           :options="{ disabled: !serviceEditing }"
+          :striped="serviceEditing"
           v-model="services"
         >
           <q-item
+            dark
             v-for="service in services"
             :link="!serviceEditing"
             :key="service.id"
             :to="serviceEditing ? undefined : `/service/${service.id}`"
           >
-            <q-item-main :label="service.title" />
-
             <q-item-side
-              right
               v-if="serviceEditing"
-            >
-              <q-icon name="menu" />
-            </q-item-side>
+              icon="drag_indicator"
+            />
+            <q-item-main :label="service.title" />
             <q-item-side
               right
               v-if="serviceEditing"

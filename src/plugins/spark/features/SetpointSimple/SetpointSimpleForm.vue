@@ -34,7 +34,7 @@ export default class SetpointSimpleForm extends BlockForm {
       >
         <q-input
           v-model="inputValues.setting.value"
-          :suffix="inputValues.setting.unit"
+          :suffix="inputValues.setting.unitNotation"
           type="number"
         />
       </widget-field>

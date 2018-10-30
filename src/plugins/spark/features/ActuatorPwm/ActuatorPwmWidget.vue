@@ -21,6 +21,7 @@ export default class ActuatorPwmWidget extends BlockWidget {
     :title="$props.id"
     :subTitle="$props.type"
     :onRefresh="refreshBlock"
+    :additionalInfo="additionalInfo"
     form="ActuatorPwmForm"
     v-model="block"
   >
@@ -28,8 +29,8 @@ export default class ActuatorPwmWidget extends BlockWidget {
       :label="`Actuator (${block.data.actuatorId.id})`"
       :icon="block.data.actuatorValid ? 'link' : 'link_off'"
     >
-      <big>Setting: {{ block.data.setting }}</big> <br/>
-      <big>Value: {{ block.data.value }}</big>
+      <big>Setting: {{ block.data.setting | round }}</big> <br/>
+      <big>Value: {{ block.data.value | round }}</big>
     </widget-field>
 
     <widget-field

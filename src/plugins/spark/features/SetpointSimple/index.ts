@@ -8,7 +8,7 @@ import { typeName } from './getters';
 const feature: Feature = {
   ...GenericBlock,
   id: typeName,
-  displayName: 'Basic Setpoint',
+  displayName: 'Setpoint',
   widget: ref(widget),
   form: ref(form),
   widgetSize: {

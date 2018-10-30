@@ -21,6 +21,7 @@ export default class BalancerWidget extends BlockWidget {
     :title="$props.id"
     :subTitle="$props.type"
     :onRefresh="refreshBlock"
+    :additionalInfo="additionalInfo"
     form="BalancerForm"
     v-model="block"
   >
@@ -29,7 +30,7 @@ export default class BalancerWidget extends BlockWidget {
       v-for="(client, idx) in block.data.clients"
       :key="idx"
     >
-      <big>{{ client.granted }} / {{ client.requested }}</big>
+      <big>{{ client.granted | round }} / {{ client.requested | round }}</big>
     </widget-field>
   </widget-card>
 </template>
