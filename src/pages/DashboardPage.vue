@@ -2,12 +2,15 @@
 import Vue, { VueConstructor } from 'vue';
 import { Notify } from 'quasar';
 import Component from 'vue-class-component';
+import CopyWidgetDialog from '@/components/Dialog/CopyWidgetDialog.vue';
 import shortid from 'shortid';
 import { objectSorter } from '@/helpers/functional';
 import { Block } from '@/plugins/spark/state';
 import { DashboardItem } from '@/store/dashboards/state';
 import {
+  allDashboards,
   dashboardById,
+  dashboardItemIds,
   dashboardItemById,
   dashboardItemsByDashboardId,
 } from '@/store/dashboards/getters';
@@ -48,6 +51,7 @@ interface ValidatedItem {
 export default class DashboardPage extends Vue {
   $q: any;
   editable: boolean = false;
+  copyDialogOpen: boolean = false;
   title: string = '';
 
   wizardModal: ModalConfig = {
@@ -63,9 +67,17 @@ export default class DashboardPage extends Vue {
     return dashboardById(this.$store, this.dashboardId);
   }
 
+  get dashboards() {
+    return allDashboards(this.$store);
+  }
+
   get items() {
     return dashboardItemsByDashboardId(this.$store, this.dashboardId)
       .sort(objectSorter('order'));
+  }
+
+  get itemIds() {
+    return dashboardItemIds(this.$store);
   }
 
   get validatedItems(): ValidatedItem[] {
@@ -167,36 +179,76 @@ export default class DashboardPage extends Vue {
     }
   }
 
-  async onDeleteItem(item: DashboardItem) {
+  onDeleteItem(item: DashboardItem) {
+    // Check whether the feature has a separate deleter
     const onDeleteFeature = onDeleteById(this.$store, item.widget);
     const opts = onDeleteFeature
       ? [{ label: 'Also delete widget in service', value: true }]
       : [];
 
     this.$q.dialog({
-      title: 'Delete widget',
+      title: `Delete widget ${item.id}`,
       message: '',
       options: {
-        type: 'checkbox',
-        model: [],
+        type: 'radio',
+        model: null,
         items: opts,
       },
       cancel: true,
-      preventClose: true,
-    }).then((data: boolean[]) => {
-      if (data.some(v => v)) {
-        (onDeleteFeature as Function)(this.$store, item.config);
-      }
-      removeDashboardItem(this.$store, item);
-    });
+    })
+      .then((del: boolean) => {
+        if (del) {
+          (onDeleteFeature as Function)(this.$store, item.config);
+        }
+        removeDashboardItem(this.$store, item);
+      });
   }
 
-  async onCopyItem(item: DashboardItem) {
-    console.log('copy');
+  generateItemCopyName(id: string) {
+    const copyName = (i: number): string =>
+      (id.match(/\(\d+\)$/)
+        ? id.replace(/\(\d+\)$/, `(${i})`)
+        : `${id}(${i})`);
+
+    let idx = 2;
+    while (this.itemIds.includes(copyName(idx))) {
+      idx += 1;
+    }
+    return copyName(idx);
   }
 
-  async onMoveItem(item: DashboardItem) {
-    console.log('move');
+  onCopyItem(item: DashboardItem) {
+    const id = this.generateItemCopyName(item.id);
+    this.$q.dialog({
+      title: `Copy widget ${item.id}`,
+      message: 'Select a dashboard.',
+      options: {
+        type: 'radio',
+        model: null,
+        items: this.dashboards
+          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
+      },
+      cancel: true,
+    })
+      .then((dashboard: string) =>
+        dashboard && createDashboardItem(this.$store, { ...item, id, dashboard }));
+  }
+
+  onMoveItem(item: DashboardItem) {
+    this.$q.dialog({
+      title: `Move widget ${item.id}`,
+      message: 'Select a dashboard.',
+      options: {
+        type: 'radio',
+        model: null,
+        items: this.dashboards
+          .filter(dashboard => dashboard.id !== this.dashboardId)
+          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
+      },
+      cancel: true,
+    })
+      .then((dashboard: string) =>
+        dashboard && saveDashboardItem(this.$store, { ...item, dashboard }));
   }
 }
 </script>
