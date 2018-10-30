@@ -181,7 +181,7 @@ export default class BlockWizard extends Vue {
       await createBlock(this.$store, service.id, block);
     }
 
-    const item: DashboardItem = {
+    const item: Partial<DashboardItem> = {
       id: this.widgetId,
       widget: this.$props.featureId,
       config: {

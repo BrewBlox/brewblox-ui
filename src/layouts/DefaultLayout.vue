@@ -9,9 +9,9 @@ import {
   primaryDashboard,
 } from '@/store/dashboards/getters';
 import {
-  addNewDashboard,
+  createDashboard,
   updateDashboardOrder,
-  removeDashboard as removeDashboardInStore,
+  removeDashboard,
   updatePrimaryDashboard,
 } from '@/store/dashboards/actions';
 import {
@@ -77,7 +77,7 @@ export default class DefaultLayout extends Vue {
       prompt: {
         model: '',
       },
-    }).then((name: string) => addNewDashboard(this.$store, name));
+    }).then((name: string) => createDashboard(this.$store, name));
   }
 
   removeDashboard(dashboard: Dashboard) {
@@ -86,7 +86,7 @@ export default class DefaultLayout extends Vue {
       message: `Are you sure you want to remove ${dashboard.title}?`,
       ok: 'Confirm',
       cancel: 'Cancel',
-    }).then(() => removeDashboardInStore(this.$store, dashboard));
+    }).then(() => removeDashboard(this.$store, dashboard));
   }
 
   createService() {

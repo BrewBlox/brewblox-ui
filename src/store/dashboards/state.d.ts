@@ -7,13 +7,14 @@ export interface Dashboard {
   title: string;
   order: number;
   primary?: boolean;
-  items: string[];
 }
 
 export interface DashboardItem {
   id: string;
   cols: number;
   rows: number;
+  order: number;
+  dashboard: string;
   widget: string;
   config: any;
 }

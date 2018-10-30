@@ -46,3 +46,8 @@ export const dashboardById =
 export const dashboardItemById =
   (store: RootStore | DashboardContext, id: string): DashboardItem =>
     dashboardItems(store)[id];
+
+export const dashboardItemsByDashboardId =
+  (store: RootStore | DashboardContext, id: string) =>
+    allDashboardItems(store)
+      .filter(item => item.dashboard === id);
