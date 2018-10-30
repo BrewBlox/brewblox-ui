@@ -128,7 +128,17 @@ const actions = {
   },
 
   removeDashboardItem: async (context: DashboardContext, item: DashboardItem) => {
-    removeDashboardItemInApi(item);
+    Object
+      .values(context.state.dashboards)
+      .forEach((dashboard: Dashboard) => {
+        if (dashboard.items.includes(item.id)) {
+          update(context, {
+            ...dashboard,
+            items: dashboard.items.filter(id => id !== item.id),
+          });
+        }
+      });
+    removeDashboardItemInApi(item).catch(() => { });
     removeDashboardItemInStore(context, item);
   },
 

@@ -22,12 +22,14 @@ import {
   updateDashboardItemConfig,
   createDashboardItem,
   addDashboardItemToDashboard,
+  removeDashboardItem,
 } from '@/store/dashboards/actions';
 import {
   validatorById,
   widgetById,
   displayNameById,
   widgetSizeById,
+  onDeleteById,
 } from '@/store/features/getters';
 
 interface VueOrdered extends Vue {
@@ -50,6 +52,7 @@ interface ModalConfig {
   },
 })
 export default class DashboardPage extends Vue {
+  $q: any;
   editable: boolean = false;
   title: string = '';
 
@@ -68,7 +71,7 @@ export default class DashboardPage extends Vue {
 
   get items() {
     return this.dashboard.items
-      .map(id => dashboardItemById(this.$store, id))
+      .map(id => dashboardItemById(this.$store, id) || { id })
       .sort(objectSorter('order'));
   }
 
@@ -174,6 +177,38 @@ export default class DashboardPage extends Vue {
       Notify.create(`Failed to add widget: ${e.toString()}`);
     }
   }
+
+  async onDeleteItem(item: DashboardItem) {
+    const onDeleteFeature = onDeleteById(this.$store, item.widget);
+    const opts = onDeleteFeature
+      ? [{ label: 'Also delete widget in service', value: true }]
+      : [];
+
+    this.$q.dialog({
+      title: 'Delete widget',
+      message: '',
+      options: {
+        type: 'checkbox',
+        model: [],
+        items: opts,
+      },
+      cancel: true,
+      preventClose: true,
+    }).then((data: boolean[]) => {
+      if (data.some(v => v)) {
+        (onDeleteFeature as Function)(this.$store, item.config);
+      }
+      removeDashboardItem(this.$store, item);
+    });
+  }
+
+  async onCopyItem(item: DashboardItem) {
+    console.log('copy');
+  }
+
+  async onMoveItem(item: DashboardItem) {
+    console.log('move');
+  }
 }
 </script>
 
@@ -257,7 +292,10 @@ export default class DashboardPage extends Vue {
           :cols="item.cols"
           :rows="item.rows"
           :config="item.config"
-          :on-config-change="onChangeItemConfig"
+          :onConfigChange="onChangeItemConfig"
+          :onDeleteItem="() => onDeleteItem(item)"
+          :onCopyItem="() => onCopyItem(item)"
+          :onMoveItem="() => onMoveItem(item)"
         />
       </grid-container>
     </template>

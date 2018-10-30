@@ -17,11 +17,11 @@ type Coordinates = { x: number, y: number };
     },
     cols: {
       type: Number,
-      required: true,
+      default: MIN_COLS,
     },
     rows: {
       type: Number,
-      required: true,
+      default: MIN_ROWS,
     },
     editable: {
       type: Boolean,
@@ -29,19 +29,31 @@ type Coordinates = { x: number, y: number };
     },
     onStartInteraction: {
       type: Function,
-      default: () => { },
+      default: () => () => { },
     },
     onStopInteraction: {
       type: Function,
-      default: () => { },
+      default: () => () => { },
     },
     onUpdateItemSize: {
       type: Function,
-      default: () => { },
+      default: () => (id: string, cols: number, rows: number) => { },
     },
     onNewItemsOrder: {
       type: Function,
-      default: () => { },
+      default: () => () => { },
+    },
+    onDeleteItem: {
+      type: Function,
+      default: () => () => { },
+    },
+    onCopyItem: {
+      type: Function,
+      default: () => () => { },
+    },
+    onMoveItem: {
+      type: Function,
+      default: () => () => { },
     },
   },
 })
@@ -71,7 +83,6 @@ export default class GridItem extends Vue {
       grid-column-end: span ${this.currentCols || this.$props.cols};
       grid-row-end: span ${this.currentRows || this.$props.rows};
     `;
-
     if (this.currentStartCols && this.currentStartRows) {
       return `
         grid-column-start: ${this.currentStartCols};
@@ -79,7 +90,6 @@ export default class GridItem extends Vue {
         ${spans}
       `;
     }
-
     return spans;
   }
 
@@ -344,14 +354,17 @@ export default class GridItem extends Vue {
       <q-btn
         flat
         icon="delete"
+        @click="$props.onDeleteItem"
       />
       <q-btn
         flat
         icon="file_copy"
+        @click="$props.onCopyItem"
       />
       <q-btn
         flat
         icon="exit_to_app"
+        @click="$props.onMoveItem"
       />
     </q-list>
   </div>

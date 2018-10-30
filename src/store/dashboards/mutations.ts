@@ -2,6 +2,7 @@ import Vue from 'vue';
 import { getStoreAccessors } from 'vuex-typescript';
 import { Dashboard, DashboardItem, DashboardState } from './state';
 import { RootState } from '../state';
+import { stat } from 'fs';
 
 const { commit } = getStoreAccessors<DashboardState, RootState>('dashboards');
 

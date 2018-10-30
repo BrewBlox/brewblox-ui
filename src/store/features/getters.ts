@@ -27,6 +27,9 @@ export const displayNameById = (store: RootStore, id: string) =>
 export const validatorById = (store: RootStore, id: string) =>
   (featureById(store, id).validator || (() => true));
 
+export const onDeleteById = (store: RootStore, id: string) =>
+  (featureById(store, id).onDelete);
+
 export const wizardById = (store: RootStore, id: string) =>
   featureById(store, id).wizard;
 
