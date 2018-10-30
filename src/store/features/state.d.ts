@@ -5,6 +5,7 @@ export interface Feature {
   id: string;
   displayName?: string;
   validator?: (store: RootStore, config: any) => boolean;
+  onDelete?: (store: RootStore, config: any) => void;
   widgetSize?: {
     cols: number;
     rows: number;

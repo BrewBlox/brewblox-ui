@@ -19,11 +19,13 @@ export interface Block extends DataBlock {
   isLoading?: boolean;
 }
 
+export interface BlockConfig {
+  serviceId: string;
+  blockId: string;
+}
+
 export interface DashboardBlock extends DashboardItem {
-  config: {
-    serviceId: string;
-    blockId: string;
-  };
+  config: BlockConfig;
 }
 
 export interface UserUnits {
