@@ -22,15 +22,15 @@ import Component from 'vue-class-component';
     },
     form: {
       type: String,
-      required: true,
+      required: false,
     },
     value: {
       type: Object,
-      required: true,
+      required: false,
     },
     onRefresh: {
       type: Function,
-      default: () => { },
+      required: false,
     },
   },
 })
@@ -47,6 +47,12 @@ export default class WidgetCard extends Vue {
 
   set model(obj: any) {
     this.$emit('input', obj);
+  }
+
+  get openSettingsFunc() {
+    return this.$props.form
+      ? () => { this.modalOpen = true; }
+      : null;
   }
 }
 </script>
@@ -74,6 +80,7 @@ export default class WidgetCard extends Vue {
         </q-list>
       </q-collapsible>
       <component
+        v-if="!!$props.form"
         :is="$props.form"
         v-model="model"
       />
@@ -82,8 +89,8 @@ export default class WidgetCard extends Vue {
     <widget-toolbar
       :name="$props.title"
       :type="$props.subTitle"
-      :on-refresh="$props.onRefresh"
-      :on-settings="() => { this.modalOpen = true }"
+      :onRefresh="$props.onRefresh"
+      :onSettings="openSettingsFunc"
     />
 
     <q-scroll-area

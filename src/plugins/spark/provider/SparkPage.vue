@@ -1,6 +1,7 @@
 <script lang="ts">
 import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
+import { Notify } from 'quasar';
 import { serviceAvailable } from '@/helpers/dynamic-store';
 import { DashboardItem } from '@/store/dashboards/state';
 import { Block } from '@/plugins/spark/state';
@@ -9,12 +10,11 @@ import {
   featureIds,
   widgetById,
   widgetSizeById,
+  onDeleteById,
 } from '@/store/features/getters';
+import { dashboardItemIds, allDashboards, itemCopyName } from '@/store/dashboards/getters';
+import { createDashboardItem } from '@/store/dashboards/actions';
 import { widgetSize, isSystemBlock } from './getters';
-
-interface VueOrdered extends Vue {
-  id: string;
-}
 
 @Component({
   props: {
@@ -25,8 +25,12 @@ interface VueOrdered extends Vue {
   },
 })
 export default class SparkPage extends Vue {
+  $q: any;
   editable: boolean = false;
-  modalOpen: boolean = false;
+
+  get dashboards() {
+    return allDashboards(this.$store);
+  }
 
   defaultItem(block: Block): DashboardItem {
     return {
@@ -62,7 +66,47 @@ export default class SparkPage extends Vue {
   }
 
   widgetComponent(id: string): string {
-    return widgetById(this.$store, id) || 'InvalidWidget';
+    return this.editable
+      ? 'EditWidget'
+      : (widgetById(this.$store, id) || 'InvalidWidget');
+  }
+
+  onDeleteItem(item: DashboardItem) {
+    // Check whether the feature has a separate deleter
+    const onDeleteFeature = onDeleteById(this.$store, item.widget);
+
+    if (!onDeleteFeature) {
+      Notify.create({
+        message: 'This block can\'t be deleted',
+      });
+      return;
+    }
+
+    this.$q.dialog({
+      title: 'Delete block',
+      message: `Are you sure you want to delete block ${item.id} on the controller?`,
+      cancel: true,
+    })
+      .then(() => (onDeleteFeature as Function)(this.$store, item.config))
+      .catch(() => { });
+  }
+
+  onCopyItem(item: DashboardItem) {
+    const id = itemCopyName(this.$store, item.id);
+    this.$q.dialog({
+      title: 'Create widget',
+      message: `On which dashboard do you want to create a widget for ${item.id}?`,
+      options: {
+        type: 'radio',
+        model: null,
+        items: this.dashboards
+          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
+      },
+      cancel: true,
+    })
+      .then((dashboard: string) =>
+        dashboard && createDashboardItem(this.$store, { ...item, id, dashboard }))
+      .catch(() => { });
   }
 }
 </script>
@@ -83,6 +127,17 @@ export default class SparkPage extends Vue {
         </div>
       </portal>
 
+      <portal to="toolbar-buttons">
+
+        <q-btn
+          :icon="editable ? 'check' : 'mode edit'"
+          :color="editable ? 'positive' : 'primary'"
+          @click="() => editable = !editable"
+          :label="editable ? 'Stop editing' : 'Edit blocks'"
+        />
+
+      </portal>
+
       <grid-container>
         <SparkWidget
           class="dashboard-item"
@@ -101,6 +156,8 @@ export default class SparkPage extends Vue {
           :cols="item.cols"
           :rows="item.rows"
           :config="item.config"
+          :onDeleteItem="() => onDeleteItem(item)"
+          :onCopyItem="() => onCopyItem(item)"
         />
       </grid-container>
     </template>

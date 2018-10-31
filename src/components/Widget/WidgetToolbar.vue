@@ -15,11 +15,11 @@ import { displayNameById } from '@/store/features/getters';
     },
     onRefresh: {
       type: Function,
-      default: (blockId: string) => { },
+      required: false,
     },
     onSettings: {
       type: Function,
-      default: (blockId: string) => { },
+      required: false,
     },
   },
 })
@@ -44,6 +44,7 @@ export default class WidgetToolbar extends Vue {
       round
       dense
       icon="settings"
+      v-if="$props.onSettings"
       @click="$props.onSettings"
     />
 
@@ -52,6 +53,7 @@ export default class WidgetToolbar extends Vue {
       round
       dense
       icon="refresh"
+      v-if="$props.onRefresh"
       @click="$props.onRefresh"
     />
   </q-toolbar>
