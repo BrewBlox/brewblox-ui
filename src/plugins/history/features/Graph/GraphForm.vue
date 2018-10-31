@@ -119,46 +119,51 @@ export default class GraphForm extends HistoryForm {
       >
         <div class="options-edit-container">
 
-          <q-input
-            v-model="inputValues.params.start"
-            stack-label="Start"
+          <q-datetime
+            class="options-field"
+            dark
+            format24h
             clearable
-          >
-            <q-popover fit :offset="[0, 10]">
-              <q-datetime-picker
-                dark
-                format24h
-                type="datetime"
-                v-model="inputValues.params.start"
-              />
-            </q-popover>
-          </q-input>
+            stack-label="Start"
+            type="datetime"
+            v-model="inputValues.params.start"
+            :after="[
+              {
+                icon: 'restore',
+                handler: () => inputValues.params.start = new Date(),
+              }
+            ]"
+          />
 
           <q-input
+            class="options-field"
             v-model="inputValues.params.duration"
             stack-label="Duration"
             clearable
           />
 
-          <q-input
-            v-model="inputValues.params.end"
-            stack-label="End"
+          <q-datetime
+            class="options-field"
+            dark
+            format24h
             clearable
-          >
-            <q-popover fit :offset="[0, 10]">
-              <q-datetime-picker
-                dark
-                format24h
-                type="datetime"
-                v-model="inputValues.params.end"
-              />
-            </q-popover>
-          </q-input>
+            no-parent-field
+            stack-label="End"
+            type="datetime"
+            v-model="inputValues.params.end"
+            :after="[
+              {
+                icon: 'restore',
+                handler: () => inputValues.params.end = new Date(),
+              }
+            ]"
+          />
 
         </div>
 
         <div class="options-edit-container">
           <q-input
+            class="options-field"
             v-model="inputValues.params.approxPoints"
             stack-label="Points after downsampling"
             type="number"
@@ -183,6 +188,7 @@ export default class GraphForm extends HistoryForm {
             :key="fieldIdx"
           >
             <q-select
+              class="options-field"
               v-for="(section, sectionIdx) in fieldSections(field)"
               :key="sectionIdx"
               :options="fieldSectionOptions(target, field, sectionIdx)"
@@ -259,12 +265,7 @@ export default class GraphForm extends HistoryForm {
   margin-bottom: 10px;
 }
 
-.options-edit-container .q-select {
-  width: 160px;
-  margin-right: 15px;
-}
-
-.options-edit-container .q-input {
+.options-field {
   width: 160px;
   margin-right: 15px;
 }

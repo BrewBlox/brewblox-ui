@@ -9,7 +9,7 @@ import { Unit } from '@/helpers/units';
 import { Setpoint } from './state';
 
 interface OffsetPoint {
-  time: Date;
+  time: number;
   temperature: Unit;
   offsetMs: number;
 }
@@ -31,7 +31,7 @@ export default class SetpointProfileForm extends BlockForm {
     return this.inputValues.points
       .sort(objectSorter('time'))
       .map((point: Setpoint, idx: number, arr: Setpoint[]) => ({
-        time: new Date(point.time * 1000),
+        time: new Date(point.time * 1000).getTime(),
         temperature: point.temperature,
         offsetMs: (idx > 0 ? ((point.time - arr[0].time) * 1000) : 0),
       }));
@@ -40,23 +40,25 @@ export default class SetpointProfileForm extends BlockForm {
   set points(points: OffsetPoint[]) {
     this.inputValues.points = points
       .map(offsetPoint => ({
-        time: (offsetPoint.time.getTime() / 1000),
+        time: (offsetPoint.time / 1000),
         temperature: offsetPoint.temperature,
       }));
   }
 
-  get start(): Date {
+  get start(): number {
     return (this.points.length > 0
       ? this.points[0].time
-      : new Date());
+      : new Date().getTime());
   }
 
-  set start(date: Date) {
+  set start(startTime: number) {
+    // console.log(date);
+    // console.log(date instanceof Date);
     if (this.points.length > 0) {
       this.points = this.points
         .map((offset: OffsetPoint, idx: number) => ({
           ...offset,
-          time: (idx === 0 ? date : new Date(offset.time.getTime() + offset.offsetMs)),
+          time: (idx === 0 ? startTime : new Date(startTime + offset.offsetMs).getTime()),
         }));
     } else {
       this.points = [this.defaultPoint()];
@@ -65,7 +67,7 @@ export default class SetpointProfileForm extends BlockForm {
 
   defaultPoint() {
     return {
-      time: new Date(),
+      time: new Date().getTime(),
       temperature: new Unit(0, this.tempUnit),
       offsetMs: 0,
     };
@@ -73,7 +75,7 @@ export default class SetpointProfileForm extends BlockForm {
 
   copyPoint(point: OffsetPoint) {
     return {
-      time: new Date(point.time.getTime()),
+      time: point.time,
       temperature: new Unit(point.temperature.value, point.temperature.unit),
       offsetMs: point.offsetMs,
     };
@@ -91,7 +93,7 @@ export default class SetpointProfileForm extends BlockForm {
     this.points = this.points.filter((_: any, idx: number) => idx !== index);
   }
 
-  updatePointTime(index: number, time: Date) {
+  updatePointTime(index: number, time: number) {
     this.points = this.points
       .map((point: OffsetPoint, idx: number) =>
         (idx !== index
@@ -99,7 +101,7 @@ export default class SetpointProfileForm extends BlockForm {
           : {
             time,
             temperature: this.points[index].temperature,
-            offsetMs: time.getTime() - this.start.getTime(),
+            offsetMs: time - this.start,
           }));
   }
 
@@ -111,7 +113,7 @@ export default class SetpointProfileForm extends BlockForm {
           : {
             offsetMs,
             temperature: this.points[index].temperature,
-            time: new Date(this.start.getTime() + offsetMs),
+            time: new Date(this.start + offsetMs).getTime(),
           }));
   }
 
@@ -132,20 +134,22 @@ export default class SetpointProfileForm extends BlockForm {
       <widget-field
         label="Start time"
       >
-        <q-input
-          :value="start.toLocaleString()"
+
+        <q-datetime
+          dark
+          format24h
+          no-parent-field
           stack-label="Time"
-        >
-          <q-popover fit :offset="[0, 10]">
-            <q-datetime-picker
-              dark
-              format24h
-              :disabled="points.length === 0"
-              type="datetime"
-              v-model="start"
-            />
-          </q-popover>
-        </q-input>
+          type="datetime"
+          v-model="start"
+          :disabled="points.length === 0"
+          :after="[
+            {
+              icon: 'restore',
+              handler: () => { start = new Date().getTime(); },
+            }
+          ]"
+        />
 
       </widget-field>
 
@@ -165,21 +169,27 @@ export default class SetpointProfileForm extends BlockForm {
 
           <q-icon name="add" />
 
-          <q-input
-            :value="point.time.toLocaleString()"
+          <!--
+          Notes:
+          - Change is triggered on blur to prevent firing when offset is changed.
+          - @blur is fired with undefined after clicking the "after" button,
+            and then selecting something else.
+          -->
+          <q-datetime
+            dark
+            format24h
+            no-parent-field
             stack-label="Time"
-            clearable
-          >
-            <q-popover fit :offset="[0, 10]">
-              <q-datetime-picker
-                dark
-                format24h
-                type="datetime"
-                :value="point.time"
-                @blur="v => updatePointTime(idx, v)"
-              />
-            </q-popover>
-          </q-input>
+            type="datetime"
+            :value="point.time"
+            @blur="v => v && updatePointTime(idx, v)"
+            :after="[
+              {
+                icon: 'restore',
+                handler: () => updatePointTime(idx, new Date().getTime()),
+              }
+            ]"
+          />
 
           <q-icon name="chevron_right" />
 
