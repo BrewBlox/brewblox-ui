@@ -44,11 +44,11 @@ export default class Constraints extends Vue {
   }
 
   addConstraint(cinfo: ConstraintInfo) {
-    this.onChanged([...this.constraints, cinfo]);
+    this.onChanged([...this.constraints, { ...cinfo }]);
   }
 
   updateConstraint(index: number, cinfo: ConstraintInfo) {
-    this.constraints[index] = cinfo;
+    this.constraints[index] = { ...cinfo };
     this.onChanged(this.constraints);
   }
 

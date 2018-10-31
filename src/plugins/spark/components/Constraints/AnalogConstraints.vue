@@ -61,7 +61,7 @@ export default class AnalogConstraints extends Constraints {
           v-if="fieldType(cinfo.key) === 'number'"
           type="number"
           :value="cinfo.value"
-          @change="value => updateConstraint(idx, createConstraint(cinfo.key, value))"
+          @change="value => updateConstraint(idx, createConstraint(cinfo.key, Number(value)))"
         />
         <q-select
           v-else-if="fieldType(cinfo.key) === 'link'"
