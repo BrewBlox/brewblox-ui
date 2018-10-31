@@ -22,7 +22,6 @@ import GridItem from './GridItem.vue';
 })
 export default class GridContainer extends Vue {
   interaction: boolean = false;
-  editable: boolean = false;
 
   startInteraction() {
     this.interaction = true;
@@ -38,21 +37,13 @@ export default class GridContainer extends Vue {
       const rectB = b.$el.getBoundingClientRect() as DOMRect;
 
       // check y position
-      if (rectA.y < rectB.y) {
-        return -1;
-      }
-
-      if (rectA.y > rectB.y) {
-        return 1;
+      if (rectA.y !== rectB.y) {
+        return rectA.y - rectB.y;
       }
 
       // check x position
-      if (rectA.x < rectB.x) {
-        return -1;
-      }
-
-      if (rectA.x > rectB.x) {
-        return 1;
+      if (rectA.x !== rectB.x) {
+        return rectA.x - rectB.x;
       }
 
       // is same position
@@ -88,7 +79,7 @@ export default class GridContainer extends Vue {
                   props: {
                     ...slot.data.attrs,
                     ...slot.componentOptions.propsData,
-                    editable: this.editable,
+                    editable: this.$props.editable,
                     onStartInteraction: this.startInteraction,
                     onStopInteraction: this.stopInteraction,
                     onUpdateItemSize: this.updateItemSize,
@@ -98,7 +89,7 @@ export default class GridContainer extends Vue {
                 [slot],
               )),
             // show overlay grid if interaction is happening or in edit mode
-            (this.interaction || this.editable) && createElement(
+            (this.interaction || this.$props.editable) && createElement(
               'div',
               {
                 class: 'grid-container-overlay',

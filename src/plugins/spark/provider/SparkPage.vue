@@ -32,6 +32,8 @@ export default class SparkPage extends Vue {
     return {
       id: block.id,
       widget: block.type,
+      order: 0,
+      dashboard: '',
       config: {
         serviceId: block.serviceId,
         blockId: block.id,

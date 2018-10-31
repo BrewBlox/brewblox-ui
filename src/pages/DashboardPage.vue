@@ -2,32 +2,33 @@
 import Vue, { VueConstructor } from 'vue';
 import { Notify } from 'quasar';
 import Component from 'vue-class-component';
+import CopyWidgetDialog from '@/components/Dialog/CopyWidgetDialog.vue';
 import shortid from 'shortid';
 import { objectSorter } from '@/helpers/functional';
-import GridContainer from '@/components/Grid/GridContainer.vue';
-import InvalidWidget from '@/components/Widget/InvalidWidget.vue';
-import WidgetModal from '@/components/Widget/WidgetModal.vue';
-import CopyWidgetWizard from '@/components/Wizard/CopyWidgetWizard.vue';
-import NewWidgetWizard from '@/components/Wizard/NewWidgetWizard.vue';
 import { Block } from '@/plugins/spark/state';
 import { DashboardItem } from '@/store/dashboards/state';
 import {
+  allDashboards,
   dashboardById,
+  dashboardItemIds,
   dashboardItemById,
+  dashboardItemsByDashboardId,
 } from '@/store/dashboards/getters';
 import {
-  updateDashboard,
+  saveDashboard,
   updateDashboardItemOrder,
   updateDashboardItemSize,
   updateDashboardItemConfig,
   createDashboardItem,
-  addDashboardItemToDashboard,
+  saveDashboardItem,
+  removeDashboardItem,
 } from '@/store/dashboards/actions';
 import {
   validatorById,
   widgetById,
   displayNameById,
   widgetSizeById,
+  onDeleteById,
 } from '@/store/features/getters';
 
 interface VueOrdered extends Vue {
@@ -37,20 +38,20 @@ interface VueOrdered extends Vue {
 interface ModalConfig {
   open: boolean;
   title: string;
-  component?: VueConstructor;
+  component?: string;
 }
 
-@Component({
-  components: {
-    GridContainer,
-    WidgetModal,
-    CopyWidgetWizard,
-    NewWidgetWizard,
-    InvalidWidget,
-  },
-})
+interface ValidatedItem {
+  item: DashboardItem;
+  component: string;
+  error?: Error;
+}
+
+@Component
 export default class DashboardPage extends Vue {
+  $q: any;
   editable: boolean = false;
+  copyDialogOpen: boolean = false;
   title: string = '';
 
   wizardModal: ModalConfig = {
@@ -66,13 +67,20 @@ export default class DashboardPage extends Vue {
     return dashboardById(this.$store, this.dashboardId);
   }
 
+  get dashboards() {
+    return allDashboards(this.$store);
+  }
+
   get items() {
-    return this.dashboard.items
-      .map(id => dashboardItemById(this.$store, id))
+    return dashboardItemsByDashboardId(this.$store, this.dashboardId)
       .sort(objectSorter('order'));
   }
 
-  get validatedItems() {
+  get itemIds() {
+    return dashboardItemIds(this.$store);
+  }
+
+  get validatedItems(): ValidatedItem[] {
     return this.items
       .map((item) => {
         try {
@@ -85,13 +93,13 @@ export default class DashboardPage extends Vue {
             throw new Error(`${item.widget} validation failed`);
           }
           return {
-            ...item,
+            item,
             component,
           };
         } catch (e) {
           return {
-            ...item,
-            component: InvalidWidget,
+            item,
+            component: 'InvalidWidget',
             error: e.toString(),
           };
         }
@@ -106,7 +114,7 @@ export default class DashboardPage extends Vue {
   onStopEdit() {
     if (this.title !== this.dashboard.title) {
       // update title of dashboard if changed
-      updateDashboard(this.$store, {
+      saveDashboard(this.$store, {
         ...this.dashboard,
         title: this.title,
       });
@@ -134,7 +142,7 @@ export default class DashboardPage extends Vue {
   onStartCopyWidget() {
     this.wizardModal = {
       open: true,
-      component: CopyWidgetWizard,
+      component: 'CopyWidgetWizard',
       title: 'Copy Existing Widget',
     };
   }
@@ -142,7 +150,7 @@ export default class DashboardPage extends Vue {
   onStartNewWidget() {
     this.wizardModal = {
       open: true,
-      component: NewWidgetWizard,
+      component: 'NewWidgetWizard',
       title: 'Add New Widget',
     };
   }
@@ -151,6 +159,8 @@ export default class DashboardPage extends Vue {
     return {
       id: shortid.generate(),
       widget: 'Unknown',
+      dashboard: this.dashboardId,
+      order: this.items.length + 1,
       config: {},
       ...widgetSizeById(this.$store, 'Unknown'),
     };
@@ -158,14 +168,8 @@ export default class DashboardPage extends Vue {
 
   async onCreateItem(partial: Partial<DashboardItem>) {
     try {
-      const item: DashboardItem = {
-        ...this.defaultItem(),
-        ...partial,
-      };
-      await createDashboardItem(
-        this.$store,
-        { item, dashboard: this.dashboard },
-      );
+      const item: DashboardItem = { ...this.defaultItem(), ...partial };
+      await createDashboardItem(this.$store, item);
       Notify.create({
         type: 'positive',
         message: `Added ${displayNameById(this.$store, item.widget)} "${item.id}"`,
@@ -173,6 +177,78 @@ export default class DashboardPage extends Vue {
     } catch (e) {
       Notify.create(`Failed to add widget: ${e.toString()}`);
     }
+  }
+
+  onDeleteItem(item: DashboardItem) {
+    // Check whether the feature has a separate deleter
+    const onDeleteFeature = onDeleteById(this.$store, item.widget);
+    const opts = onDeleteFeature
+      ? [{ label: 'Also delete widget in service', value: true }]
+      : [];
+
+    this.$q.dialog({
+      title: `Delete widget ${item.id}`,
+      message: '',
+      options: {
+        type: 'radio',
+        model: null,
+        items: opts,
+      },
+      cancel: true,
+    })
+      .then((del: boolean) => {
+        if (del) {
+          (onDeleteFeature as Function)(this.$store, item.config);
+        }
+        removeDashboardItem(this.$store, item);
+      });
+  }
+
+  generateItemCopyName(id: string) {
+    const copyName = (i: number): string =>
+      (id.match(/\(\d+\)$/)
+        ? id.replace(/\(\d+\)$/, `(${i})`)
+        : `${id}(${i})`);
+
+    let idx = 2;
+    while (this.itemIds.includes(copyName(idx))) {
+      idx += 1;
+    }
+    return copyName(idx);
+  }
+
+  onCopyItem(item: DashboardItem) {
+    const id = this.generateItemCopyName(item.id);
+    this.$q.dialog({
+      title: `Copy widget ${item.id}`,
+      message: 'Select a dashboard.',
+      options: {
+        type: 'radio',
+        model: null,
+        items: this.dashboards
+          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
+      },
+      cancel: true,
+    })
+      .then((dashboard: string) =>
+        dashboard && createDashboardItem(this.$store, { ...item, id, dashboard }));
+  }
+
+  onMoveItem(item: DashboardItem) {
+    this.$q.dialog({
+      title: `Move widget ${item.id}`,
+      message: 'Select a dashboard.',
+      options: {
+        type: 'radio',
+        model: null,
+        items: this.dashboards
+          .filter(dashboard => dashboard.id !== this.dashboardId)
+          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
+      },
+      cancel: true,
+    })
+      .then((dashboard: string) =>
+        dashboard && saveDashboardItem(this.$store, { ...item, dashboard }));
   }
 }
 </script>
@@ -228,7 +304,7 @@ export default class DashboardPage extends Vue {
 
       </portal>
 
-      <widget-modal
+      <WidgetModal
         :isOpen="wizardModal.open"
         :title="wizardModal.title"
         :onClose="() => { this.wizardModal.open = false; }"
@@ -238,28 +314,31 @@ export default class DashboardPage extends Vue {
           :is="wizardModal.component"
           :onCreateItem="onCreateItem"
         />
-      </widget-modal>
+      </WidgetModal>
 
-      <grid-container
+      <GridContainer
         :editable="editable"
         :on-change-order="onChangeOrder"
         :on-change-size="onChangeSize"
       >
         <component
           class="dashboard-item"
-          v-for="item in validatedItems"
-          :is="item.component"
+          v-for="val in validatedItems"
           :disabled="editable"
-          :error="item.error"
-          :key="item.id"
-          :id="item.id"
-          :type="item.widget"
-          :cols="item.cols"
-          :rows="item.rows"
-          :config="item.config"
-          :on-config-change="onChangeItemConfig"
+          :is="val.component"
+          :error="val.error"
+          :key="val.item.id"
+          :id="val.item.id"
+          :type="val.item.widget"
+          :cols="val.item.cols"
+          :rows="val.item.rows"
+          :config="val.item.config"
+          :onConfigChange="onChangeItemConfig"
+          :onDeleteItem="() => onDeleteItem(val.item)"
+          :onCopyItem="() => onCopyItem(val.item)"
+          :onMoveItem="() => onMoveItem(val.item)"
         />
-      </grid-container>
+      </GridContainer>
     </template>
   </q-page>
 </template>

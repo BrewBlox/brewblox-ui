@@ -6,6 +6,7 @@
       "cols": 3,
       "rows": 3,
       "widget": "ProcessView",
+      "dashboard": "process-view",
       "config": {
         "name": "Simple flow setup",
         "width": 5,
@@ -85,6 +86,7 @@
       "cols": 3,
       "rows": 3,
       "widget": "SetpointSensorPair",
+      "dashboard": "derp",
       "config": {
         "serviceId": "sparkey",
         "blockId": "BLARGH"
@@ -96,6 +98,7 @@
       "cols": 3,
       "rows": 3,
       "widget": "UnknownType",
+      "dashboard": "derp",
       "config": {
         "serviceId": "sparkey",
         "blockId": "setpoint-1"
@@ -107,6 +110,7 @@
       "cols": 3,
       "rows": 3,
       "widget": "Warbl",
+      "dashboard": "derp",
       "config": {
         "serviceId": "sparkey",
         "blockId": "BLORP"
@@ -118,6 +122,7 @@
       "cols": 10,
       "rows": 5,
       "widget": "Graph",
+      "dashboard": "metrics",
       "config": {
         "serviceId": "history",
         "layout": {},
@@ -147,6 +152,7 @@
       "cols": 5,
       "rows": 5,
       "widget": "Graph",
+      "dashboard": "metrics",
       "config": {
         "serviceId": "history",
         "layout": {},
@@ -159,6 +165,7 @@
       "cols": 4,
       "rows": 2,
       "widget": "SetpointSimple",
+      "dashboard": "dashboard-home",
       "config": {
         "serviceId": "sparkey",
         "blockId": "setpoint-1"
@@ -170,6 +177,7 @@
       "cols": 4,
       "rows": 4,
       "widget": "Pid",
+      "dashboard": "dashboard-home",
       "config": {
         "serviceId": "sparkey",
         "blockId": "pid-1"
@@ -180,38 +188,22 @@
     {
       "id": "dashboard-home",
       "title": "Home Dashboard",
-      "order": 1,
-      "items": [
-        "setpoint-widget",
-        "pid-widget"
-      ]
+      "order": 1
     },
     {
       "id": "metrics",
       "title": "Metrics Dashboard",
-      "order": 2,
-      "items": [
-        "item-graph",
-        "empty-graph"
-      ]
+      "order": 2
     },
     {
       "id": "process-view",
       "title": "ProcessView Dashboard",
-      "order": 3,
-      "items": [
-        "item-process-view"
-      ]
+      "order": 3
     },
     {
       "id": "derp",
       "title": "Derp Dashboard",
-      "order": 4,
-      "items": [
-        "item-invalid",
-        "item-unknown",
-        "item-invalid-unknown"
-      ]
+      "order": 4
     }
   ],
   "services": [

@@ -41,6 +41,13 @@ export const allDashboardItems = read(getters.itemValues);
 export const primaryDashboard = read(getters.primaryDashboard);
 
 export const dashboardById =
-  (store: RootStore | DashboardContext, id: string): Dashboard => dashboards(store)[id];
+  (store: RootStore | DashboardContext, id: string): Dashboard =>
+    dashboards(store)[id];
 export const dashboardItemById =
-  (store: RootStore | DashboardContext, id: string): DashboardItem => dashboardItems(store)[id];
+  (store: RootStore | DashboardContext, id: string): DashboardItem =>
+    dashboardItems(store)[id];
+
+export const dashboardItemsByDashboardId =
+  (store: RootStore | DashboardContext, id: string) =>
+    allDashboardItems(store)
+      .filter(item => item.dashboard === id);

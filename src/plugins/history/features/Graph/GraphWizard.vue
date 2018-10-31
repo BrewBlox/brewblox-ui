@@ -112,7 +112,7 @@ export default class GraphWizard extends Vue {
 
   createWidget() {
     const service = this.service as Service;
-    const item: DashboardItem = {
+    const item: Partial<DashboardItem> = {
       id: this.widgetId,
       widget: this.$props.featureId,
       config: this.graphCfg,

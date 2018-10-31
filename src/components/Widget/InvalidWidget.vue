@@ -10,7 +10,7 @@ import Component from 'vue-class-component';
     },
     config: {
       type: Object,
-      required: true,
+      default: () => ({}),
     },
     error: {
       type: String,

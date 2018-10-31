@@ -4,6 +4,8 @@ import Component from 'vue-class-component';
 
 const GRID_SIZE = 100;
 const GAP_SIZE = 20;
+const MIN_COLS = 2;
+const MIN_ROWS = 1;
 
 type Coordinates = { x: number, y: number };
 
@@ -15,11 +17,11 @@ type Coordinates = { x: number, y: number };
     },
     cols: {
       type: Number,
-      required: true,
+      default: MIN_COLS,
     },
     rows: {
       type: Number,
-      required: true,
+      default: MIN_ROWS,
     },
     editable: {
       type: Boolean,
@@ -27,19 +29,31 @@ type Coordinates = { x: number, y: number };
     },
     onStartInteraction: {
       type: Function,
-      default: () => { },
+      default: () => () => { },
     },
     onStopInteraction: {
       type: Function,
-      default: () => { },
+      default: () => () => { },
     },
     onUpdateItemSize: {
       type: Function,
-      default: () => { },
+      default: () => (id: string, cols: number, rows: number) => { },
     },
     onNewItemsOrder: {
       type: Function,
-      default: () => { },
+      default: () => () => { },
+    },
+    onDeleteItem: {
+      type: Function,
+      default: () => () => { },
+    },
+    onCopyItem: {
+      type: Function,
+      default: () => () => { },
+    },
+    onMoveItem: {
+      type: Function,
+      default: () => () => { },
     },
   },
 })
@@ -69,7 +83,6 @@ export default class GridItem extends Vue {
       grid-column-end: span ${this.currentCols || this.$props.cols};
       grid-row-end: span ${this.currentRows || this.$props.rows};
     `;
-
     if (this.currentStartCols && this.currentStartRows) {
       return `
         grid-column-start: ${this.currentStartCols};
@@ -77,7 +90,6 @@ export default class GridItem extends Vue {
         ${spans}
       `;
     }
-
     return spans;
   }
 
@@ -142,11 +154,11 @@ export default class GridItem extends Vue {
     const newRows = Math.round((this.dragHeight + GAP_SIZE) / (GRID_SIZE + GAP_SIZE));
 
     if (newCols !== this.currentCols && newCols <= this.gridWidth) {
-      this.currentCols = newCols;
+      this.currentCols = Math.max(newCols, MIN_COLS);
     }
 
     if (newRows !== this.currentRows) {
-      this.currentRows = newRows;
+      this.currentRows = Math.max(newRows, MIN_ROWS);
     }
   }
 
@@ -295,55 +307,85 @@ export default class GridItem extends Vue {
     :style="style"
     ref="container"
   >
+    <!-- Actual item -->
     <slot />
+    <!-- Drag effects -->
     <div
       v-if="dragging || moving"
       class="grid-item-drag-overlay"
       :style="dragStyle"
       ref="dragOverlay"
-    >
-      <div
-        v-if="!moving"
-        class="grid-item-resize-handle"
-      >
-        <q-icon
-          name="mdi-resize-bottom-right"
-          size="30px"
-        />
-      </div>
-    </div>
+    />
+    <!-- Item resize button -->
     <button
       class="grid-item-resize-handle"
       @mousedown="startResize"
       @touchstart="startResize"
       @touchmove="onResizeMove"
       @touchend="stopResize"
-      v-if="!dragging && !moving && editable"
+      v-if="!dragging && !moving && $props.editable"
     >
       <q-icon
         name="mdi-resize-bottom-right"
         size="30px"
       />
     </button>
+    <!-- Item drag button -->
     <button
       class="grid-item-move-handle"
       @mousedown="startDrag"
       @touchstart="startDrag"
       @touchmove="onDragMove"
       @touchend="stopDrag"
-      v-if="!dragging && editable"
+      v-if="!dragging && $props.editable"
     >
       <q-icon
-        name="open_with"
+        v-if="$props.rows >= 2"
+        name="touch_app"
         size="50px"
       />
     </button>
+    <!-- Additional widget actions -->
+    <q-list
+      v-if="!dragging && $props.editable"
+      class="grid-item-actions"
+      no-border
+    >
+      <q-btn
+        flat
+        icon="delete"
+        @click="$props.onDeleteItem"
+      />
+      <q-btn
+        flat
+        icon="file_copy"
+        @click="$props.onCopyItem"
+      />
+      <q-btn
+        flat
+        icon="exit_to_app"
+        @click="$props.onMoveItem"
+      />
+    </q-list>
   </div>
 </template>
 
 <style scoped>
 .grid-item {
   position: relative;
+}
+
+.grid-item-actions {
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-evenly;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
 }
 
 .grid-item-resize-handle {
@@ -358,7 +400,7 @@ export default class GridItem extends Vue {
   justify-content: center;
   color: #fff;
   outline: none;
-  z-index: 2;
+  z-index: 3;
   bottom: 0;
   cursor: nwse-resize;
   right: 0;
