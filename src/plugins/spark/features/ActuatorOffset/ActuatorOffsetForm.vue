@@ -55,26 +55,6 @@ export default class ActuatorOffsetForm extends BlockForm {
         />
       </widget-field>
 
-    <q-card-separator />
-    <q-card-actions align="end">
-
-      <q-btn
-        flat
-        label="Reset"
-        color="primary"
-        :disabled="!changed"
-        @click="cancelChanges"
-      />
-
-      <q-btn
-        flat
-        label="Save"
-        color="primary"
-        @click="confirmChanges"
-      />
-
-    </q-card-actions>
-
     </q-card-main>
   </q-card>
 </template>

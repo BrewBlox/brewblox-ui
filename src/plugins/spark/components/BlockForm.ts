@@ -1,6 +1,6 @@
-import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
+import FormBase from '@/components/Widget/FormBase';
 import { Block } from '@/plugins/spark/state';
 import { toShadow, fromShadow, ShadowMapping, deepCopy } from '@/helpers/shadow-copy';
 import { uniqueFilter } from '@/helpers/functional';
@@ -8,15 +8,8 @@ import { profileNames, compatibleBlocks } from '@/plugins/spark/store/getters';
 import { fetchCompatibleBlocks } from '@/plugins/spark/store/actions';
 import { Link } from '@/helpers/units';
 
-@Component({
-  props: {
-    value: {
-      type: Object,
-      required: true,
-    },
-  },
-})
-export default class BlockForm extends Vue {
+@Component
+export default class BlockForm extends FormBase {
   vals: { [key: string]: any; } = {};
 
   get inputMapping(): ShadowMapping {

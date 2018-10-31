@@ -1,6 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import FormBase from '@/components/Widget/FormBase';
 
 @Component({
   props: {
@@ -54,15 +55,28 @@ export default class WidgetCard extends Vue {
       ? () => { this.modalOpen = true; }
       : null;
   }
+
+  get formComponent() {
+    return this.$refs.form as FormBase;
+  }
+
+  onClose() {
+    this.modalOpen = false;
+  }
+
+  onSave() {
+    this.formComponent.confirmChanges();
+  }
 }
 </script>
 
 <template>
   <div class="widget-container">
 
-    <widget-modal
+    <WidgetModal
       :isOpen="modalOpen"
-      :onClose="() => { this.modalOpen = false; }"
+      :onClose="onClose"
+      :onSave="onSave"
       :title="$props.title"
     >
       <q-collapsible
@@ -81,12 +95,13 @@ export default class WidgetCard extends Vue {
       </q-collapsible>
       <component
         v-if="!!$props.form"
+        ref="form"
         :is="$props.form"
         v-model="model"
       />
-    </widget-modal>
+    </WidgetModal>
 
-    <widget-toolbar
+    <WidgetToolbar
       :name="$props.title"
       :type="$props.subTitle"
       :onRefresh="$props.onRefresh"

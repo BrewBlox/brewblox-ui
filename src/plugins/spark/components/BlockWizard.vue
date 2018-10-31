@@ -1,6 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import FormBase from '@/components/Widget/FormBase';
 import { get } from 'lodash';
 import { Notify } from 'quasar';
 import { dashboardItemById } from '@/store/dashboards/getters';
@@ -108,9 +109,17 @@ export default class BlockWizard extends Vue {
           enabled: () => true,
         },
         {
+          label: 'Reset',
+          click: () => this.blockFormComponent.cancelChanges(),
+          enabled: () => true,
+        },
+        {
           label: 'Finish',
-          click: () => this.createWidget(),
-          enabled: () => Object.keys(get(this, 'block.data', {})).length > 0,
+          click: () => {
+            this.blockFormComponent.confirmChanges();
+            this.createWidget();
+          },
+          enabled: () => true,
         },
       ],
     };
@@ -158,10 +167,14 @@ export default class BlockWizard extends Vue {
     return [];
   }
 
-  get blockFormComponent() {
+  get blockForm() {
     return this.block
       ? formById(this.$store, this.block.type)
       : '';
+  }
+
+  get blockFormComponent() {
+    return this.$refs.form as FormBase;
   }
 
   placeholderBlock(): Block {
@@ -306,7 +319,8 @@ export default class BlockWizard extends Vue {
       <component
         v-if="block"
         v-model="block"
-        :is="blockFormComponent"
+        ref="form"
+        :is="blockForm"
       />
     </q-step>
 

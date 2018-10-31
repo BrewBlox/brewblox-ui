@@ -1,5 +1,5 @@
-import Vue from 'vue';
 import Component from 'vue-class-component';
+import FormBase from '@/components/Widget/FormBase';
 import { Watch } from 'vue-property-decorator';
 import { Notify } from 'quasar';
 import { toShadow, fromShadow, ShadowMapping, deepCopy } from '@/helpers/shadow-copy';
@@ -12,7 +12,7 @@ import { toShadow, fromShadow, ShadowMapping, deepCopy } from '@/helpers/shadow-
     },
   },
 })
-export default class HistoryForm extends Vue {
+export default class HistoryForm extends FormBase {
   vals: { [key: string]: any; } = {};
 
   get inputMapping(): ShadowMapping {
