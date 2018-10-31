@@ -43,18 +43,6 @@ type Coordinates = { x: number, y: number };
       type: Function,
       default: () => () => { },
     },
-    onDeleteItem: {
-      type: Function,
-      default: () => () => { },
-    },
-    onCopyItem: {
-      type: Function,
-      default: () => () => { },
-    },
-    onMoveItem: {
-      type: Function,
-      default: () => () => { },
-    },
   },
 })
 export default class GridItem extends Vue {
@@ -345,47 +333,12 @@ export default class GridItem extends Vue {
         size="50px"
       />
     </button>
-    <!-- Additional widget actions -->
-    <q-list
-      v-if="!dragging && $props.editable"
-      class="grid-item-actions"
-      no-border
-    >
-      <q-btn
-        flat
-        icon="delete"
-        @click="$props.onDeleteItem"
-      />
-      <q-btn
-        flat
-        icon="file_copy"
-        @click="$props.onCopyItem"
-      />
-      <q-btn
-        flat
-        icon="exit_to_app"
-        @click="$props.onMoveItem"
-      />
-    </q-list>
   </div>
 </template>
 
 <style scoped>
 .grid-item {
   position: relative;
-}
-
-.grid-item-actions {
-  background: rgba(0, 0, 0, 0.5);
-  color: #fff;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-evenly;
-  width: 100%;
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  z-index: 2;
 }
 
 .grid-item-resize-handle {

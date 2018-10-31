@@ -7,7 +7,6 @@ import { state } from './getters';
 export default class ActuatorPinForm extends BlockForm {
   get inputMapping() {
     return {
-      profiles: { path: 'profiles', default: [] },
       state: { path: 'data.state', default: 2 },
       invert: { path: 'data.invert', default: false },
       constrainedBy: { path: 'data.constrainedBy', default: { constraints: [] } },
@@ -23,16 +22,6 @@ export default class ActuatorPinForm extends BlockForm {
 <template>
   <q-card orientation="vertical">
     <q-card-main class="column centered">
-
-      <widget-field
-        label="Active profiles"
-        icon="settings_input_component"
-      >
-        <profiles-bar
-          v-model="inputValues.profiles"
-          :profileNames="profileNames"
-        />
-      </widget-field>
 
       <widget-field
         label="State"

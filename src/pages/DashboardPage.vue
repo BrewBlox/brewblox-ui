@@ -10,9 +10,9 @@ import { DashboardItem } from '@/store/dashboards/state';
 import {
   allDashboards,
   dashboardById,
-  dashboardItemIds,
   dashboardItemById,
   dashboardItemsByDashboardId,
+  itemCopyName,
 } from '@/store/dashboards/getters';
 import {
   saveDashboard,
@@ -51,6 +51,7 @@ interface ValidatedItem {
 export default class DashboardPage extends Vue {
   $q: any;
   editable: boolean = false;
+  widgetEditable: boolean = false;
   copyDialogOpen: boolean = false;
   title: string = '';
 
@@ -74,10 +75,6 @@ export default class DashboardPage extends Vue {
   get items() {
     return dashboardItemsByDashboardId(this.$store, this.dashboardId)
       .sort(objectSorter('order'));
-  }
-
-  get itemIds() {
-    return dashboardItemIds(this.$store);
   }
 
   get validatedItems(): ValidatedItem[] {
@@ -187,8 +184,8 @@ export default class DashboardPage extends Vue {
       : [];
 
     this.$q.dialog({
-      title: `Delete widget ${item.id}`,
-      message: '',
+      title: 'Delete widget',
+      message: `Are you sure you want to delete widget ${item.id}?`,
       options: {
         type: 'radio',
         model: null,
@@ -201,27 +198,15 @@ export default class DashboardPage extends Vue {
           (onDeleteFeature as Function)(this.$store, item.config);
         }
         removeDashboardItem(this.$store, item);
-      });
-  }
-
-  generateItemCopyName(id: string) {
-    const copyName = (i: number): string =>
-      (id.match(/\(\d+\)$/)
-        ? id.replace(/\(\d+\)$/, `(${i})`)
-        : `${id}(${i})`);
-
-    let idx = 2;
-    while (this.itemIds.includes(copyName(idx))) {
-      idx += 1;
-    }
-    return copyName(idx);
+      })
+      .catch(() => { });
   }
 
   onCopyItem(item: DashboardItem) {
-    const id = this.generateItemCopyName(item.id);
+    const id = itemCopyName(this.$store, item.id);
     this.$q.dialog({
-      title: `Copy widget ${item.id}`,
-      message: 'Select a dashboard.',
+      title: 'Copy widget',
+      message: `To which dashboard do you want to copy widget ${item.id}?`,
       options: {
         type: 'radio',
         model: null,
@@ -231,13 +216,14 @@ export default class DashboardPage extends Vue {
       cancel: true,
     })
       .then((dashboard: string) =>
-        dashboard && createDashboardItem(this.$store, { ...item, id, dashboard }));
+        dashboard && createDashboardItem(this.$store, { ...item, id, dashboard }))
+      .catch(() => { });
   }
 
   onMoveItem(item: DashboardItem) {
     this.$q.dialog({
-      title: `Move widget ${item.id}`,
-      message: 'Select a dashboard.',
+      title: 'Move widget',
+      message: `To which dashboard do you want to move widget ${item.id}?`,
       options: {
         type: 'radio',
         model: null,
@@ -248,7 +234,8 @@ export default class DashboardPage extends Vue {
       cancel: true,
     })
       .then((dashboard: string) =>
-        dashboard && saveDashboardItem(this.$store, { ...item, dashboard }));
+        dashboard && saveDashboardItem(this.$store, { ...item, dashboard }))
+      .catch(() => { });
   }
 }
 </script>
@@ -280,7 +267,7 @@ export default class DashboardPage extends Vue {
       <portal to="toolbar-buttons">
 
         <q-btn
-          v-if="editable"
+          v-if="widgetEditable"
           color="primary"
           icon="add"
           label="Copy Widget"
@@ -288,7 +275,7 @@ export default class DashboardPage extends Vue {
         />
 
         <q-btn
-          v-if="editable"
+          v-if="widgetEditable"
           color="primary"
           icon="add"
           label="New Widget"
@@ -296,6 +283,15 @@ export default class DashboardPage extends Vue {
         />
 
         <q-btn
+          :disabled="editable"
+          :icon="widgetEditable ? 'check' : 'mode edit'"
+          :color="widgetEditable ? 'positive' : 'primary'"
+          @click="() => widgetEditable = !widgetEditable"
+          :label="widgetEditable ? 'Stop editing' : 'Edit widgets'"
+        />
+
+        <q-btn
+          :disabled="widgetEditable"
           :icon="editable ? 'check' : 'mode edit'"
           :color="editable ? 'positive' : 'primary'"
           @click="editable ? onStopEdit() : onStartEdit()"
@@ -325,7 +321,7 @@ export default class DashboardPage extends Vue {
           class="dashboard-item"
           v-for="val in validatedItems"
           :disabled="editable"
-          :is="val.component"
+          :is="widgetEditable ? 'EditWidget' : val.component"
           :error="val.error"
           :key="val.item.id"
           :id="val.item.id"
