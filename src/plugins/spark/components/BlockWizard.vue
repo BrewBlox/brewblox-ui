@@ -109,7 +109,7 @@ export default class BlockWizard extends Vue {
           enabled: () => true,
         },
         {
-          label: 'Reset',
+          label: 'Revert form',
           click: () => this.blockFormComponent.cancelChanges(),
           enabled: () => true,
         },
