@@ -43,6 +43,7 @@ import Quasar, {
   QPopover,
   QSearch,
   QScrollArea,
+  QDatetime,
   QDatetimePicker,
   QCollapsible,
 } from 'quasar';
@@ -96,6 +97,7 @@ Vue.use(Quasar, {
     QPopover,
     QSearch,
     QScrollArea,
+    QDatetime,
     QDatetimePicker,
     QCollapsible,
   },
