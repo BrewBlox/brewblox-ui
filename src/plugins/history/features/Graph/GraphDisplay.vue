@@ -37,7 +37,6 @@ export default class GraphDisplay extends Vue {
       type: 'date',
       gridcolor: '#666',
       autorange: true,
-      rangeslider: {},
     },
     yaxis: {
       gridcolor: '#666',
