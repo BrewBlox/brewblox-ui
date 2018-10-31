@@ -13,6 +13,7 @@ import {
 import { displayNameById } from '@/store/providers/getters';
 import { typeName } from '@/plugins/history/store/getters';
 import { GraphConfig } from '@/plugins/history/features/Graph/state';
+import FormBase from '@/components/Widget/FormBase';
 
 interface NavAction {
   label: string;
@@ -66,9 +67,17 @@ export default class GraphWizard extends Vue {
           enabled: () => true,
         },
         {
+          label: 'Revert form',
+          click: () => this.formComponent.cancelChanges(),
+          enabled: () => true,
+        },
+        {
           label: 'Finish',
-          click: () => this.createWidget(),
-          enabled: () => !!this.graphCfg,
+          click: () => {
+            this.formComponent.confirmChanges();
+            this.createWidget();
+          },
+          enabled: () => true,
         },
       ],
     };
@@ -97,8 +106,12 @@ export default class GraphWizard extends Vue {
     return null;
   }
 
-  get formComponent() {
+  get form() {
     return formById(this.$store, this.$props.featureId);
+  }
+
+  get formComponent() {
+    return this.$refs.form as FormBase;
   }
 
   placeholderConfig(): GraphConfig {
@@ -179,7 +192,8 @@ export default class GraphWizard extends Vue {
       <component
         v-if="graphCfg"
         v-model="graphCfg"
-        :is="formComponent"
+        ref="form"
+        :is="form"
       />
     </q-step>
 

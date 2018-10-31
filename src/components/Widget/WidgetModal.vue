@@ -16,6 +16,10 @@ import Component from 'vue-class-component';
       type: Function,
       required: true,
     },
+    onSave: {
+      type: Function,
+      required: false,
+    },
   },
 })
 export default class WidgetModal extends Vue {
@@ -45,6 +49,13 @@ export default class WidgetModal extends Vue {
         <q-toolbar-title>
           {{ $props.title }}
         </q-toolbar-title>
+        <q-btn
+          flat
+          v-close-overlay
+          label="Save & Close"
+          v-if="$props.onSave"
+          @click="$props.onSave"
+        />
         <q-btn
           flat
           v-close-overlay
