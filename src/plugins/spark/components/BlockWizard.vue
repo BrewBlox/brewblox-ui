@@ -60,6 +60,7 @@ export default class BlockWizard extends Vue {
           label: 'Create new block',
           click: () => {
             this.blockAction = 'create';
+            this.blockId = this.widgetId;
             this.stepper.goToStep('create');
           },
           enabled: () => !this.widgetIdError && this.service !== null,
