@@ -6,9 +6,8 @@ import { createFeature as createFeatureInStore } from './mutations';
 const { dispatch } = getStoreAccessors<FeatureState, RootState>('features');
 
 const actions = {
-  create: (context: FeatureContext, provider: Feature) => {
-    createFeatureInStore(context, provider);
-  },
+  create: (context: FeatureContext, provider: Feature) =>
+    createFeatureInStore(context, provider),
 };
 
 export default actions;

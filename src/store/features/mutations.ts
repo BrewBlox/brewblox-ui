@@ -6,9 +6,8 @@ import { RootState } from '../state';
 const { commit } = getStoreAccessors<FeatureState, RootState>('features');
 
 const mutations = {
-  create: (state: FeatureState, feature: Feature) => {
-    Vue.set(state.features, feature.id, { ...feature });
-  },
+  create: (state: FeatureState, feature: Feature) =>
+    Vue.set(state.features, feature.id, { ...feature }),
 
   mutate: (state: FeatureState, feature: Partial<Feature>) => {
     const id = feature.id || '';
@@ -19,13 +18,8 @@ const mutations = {
     Vue.set(state.features, id, { ...existing, ...feature });
   },
 
-  remove: (state: FeatureState, id: string) => {
-    Vue.delete(state.features, id);
-  },
-
-  mutateInitialized: (state: FeatureState, initialized: boolean) => {
-    state.initialized = initialized;
-  },
+  remove: (state: FeatureState, id: string) =>
+    Vue.delete(state.features, id),
 };
 
 export default mutations;

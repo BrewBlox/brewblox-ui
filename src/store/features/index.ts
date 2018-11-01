@@ -10,7 +10,6 @@ const features = {
   strict: true,
   state: {
     features: {},
-    initialized: false,
   },
 };
 

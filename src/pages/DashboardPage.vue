@@ -28,7 +28,7 @@ import {
   widgetById,
   displayNameById,
   widgetSizeById,
-  onDeleteById,
+  deletersById,
 } from '@/store/features/getters';
 
 interface VueOrdered extends Vue {
@@ -177,28 +177,31 @@ export default class DashboardPage extends Vue {
   }
 
   onDeleteItem(item: DashboardItem) {
-    // Check whether the feature has a separate deleter
-    const onDeleteFeature = onDeleteById(this.$store, item.widget);
-    const opts = onDeleteFeature
-      ? [{ label: 'Also delete widget in service', value: true }]
-      : [];
+    const deleteItem = () => removeDashboardItem(this.$store, item);
+
+    // Quasar dialog can't handle objects as value - they will be returned as null
+    // As workaround, we use array index as value, and add the "action" key to each option
+    const opts = [
+      {
+        label: 'Delete dashboard widget',
+        action: deleteItem,
+      },
+      ...deletersById(this.$store, item.widget)
+        .map(del => ({ label: del.description, action: del.action })),
+    ].map((opt, idx) => ({ ...opt, value: idx }));
 
     this.$q.dialog({
       title: 'Delete widget',
       message: `Are you sure you want to delete widget ${item.id}?`,
       options: {
-        type: 'radio',
-        model: null,
+        type: 'checkbox',
+        model: [0], // pre-check the default action
         items: opts,
       },
       cancel: true,
     })
-      .then((del: boolean) => {
-        if (del) {
-          (onDeleteFeature as Function)(this.$store, item.config);
-        }
-        removeDashboardItem(this.$store, item);
-      })
+      .then((selected: number[]) =>
+        selected.forEach(idx => opts[idx].action(this.$store, item.config)))
       .catch(() => { });
   }
 
