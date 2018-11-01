@@ -183,7 +183,7 @@ export default class DashboardPage extends Vue {
     // As workaround, we use array index as value, and add the "action" key to each option
     const opts = [
       {
-        label: 'Delete dashboard widget',
+        label: 'Remove widget from this dashboard',
         action: deleteItem,
       },
       ...deletersById(this.$store, item.widget)
@@ -192,7 +192,7 @@ export default class DashboardPage extends Vue {
 
     this.$q.dialog({
       title: 'Delete widget',
-      message: `Are you sure you want to delete widget ${item.id}?`,
+      message: `How do you want to delete widget ${item.id}?`,
       options: {
         type: 'checkbox',
         model: [0], // pre-check the default action

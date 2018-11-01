@@ -84,7 +84,7 @@ export default class SparkPage extends Vue {
 
     this.$q.dialog({
       title: 'Delete block',
-      message: `Are you sure you want to delete ${item.id}?`,
+      message: `How do you want to delete ${item.id}?`,
       options: {
         type: 'checkbox',
         model: opts.map(opt => opt.value),
