@@ -59,7 +59,7 @@ export default class BlockForm extends FormBase {
   }
 
   confirmChanges() {
-    this.$emit('input', fromShadow(this.inputValues, this.inputMapping, this.block));
+    this.$emit('input', fromShadow(this.inputValues, this.inputMapping, this.block) as Block);
   }
 
   fetchCompatibleBlocks(type: string) {

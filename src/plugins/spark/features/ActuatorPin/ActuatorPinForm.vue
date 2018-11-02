@@ -16,10 +16,6 @@ export default class ActuatorPinForm extends BlockForm {
   get stateOptions() {
     return state.map((s, idx) => ({ label: s, value: idx }));
   }
-
-  upd(constraints: any) {
-    this.inputValues.constrainedBy = constraints;
-  }
 }
 </script>
 
@@ -52,8 +48,7 @@ export default class ActuatorPinForm extends BlockForm {
       >
         <DigitalConstraints
           :serviceId="block.serviceId"
-          :value="inputValues.constrainedBy"
-          @input="upd"
+          v-model="inputValues.constrainedBy"
         />
       </widget-field>
 

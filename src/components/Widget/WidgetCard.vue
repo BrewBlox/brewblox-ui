@@ -2,7 +2,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import FormBase from '@/components/Widget/FormBase';
-import { setTimeout } from 'timers';
 
 @Component({
   props: {
