@@ -1,6 +1,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { Watch } from 'vue-property-decorator';
+import { setTimeout } from 'timers';
 
 @Component({
   props: {
@@ -23,21 +25,35 @@ import Component from 'vue-class-component';
   },
 })
 export default class WidgetModal extends Vue {
-  get childOpen() {
+  modalLoaded: boolean = false;
+
+  get modalOpen() {
+    this.modalLoaded = this.modalLoaded || this.$props.isOpen;
     return this.$props.isOpen;
   }
 
-  set childOpen(val: boolean) {
+  set modalOpen(val: boolean) {
     if (!val) {
       this.$props.onClose();
     }
+  }
+
+  saveClose() {
+    // todo: check that there are no dirty input fields
+    setTimeout(
+      () => {
+        this.$props.onSave();
+        this.$props.onClose();
+      },
+      500,
+    );
   }
 }
 </script>
 
 <template>
   <q-modal
-    v-model="childOpen"
+    v-model="modalOpen"
     :content-css="{ minWidth: '80vw', maxHeight: '80vh' }"
   >
     <q-modal-layout>
@@ -51,19 +67,18 @@ export default class WidgetModal extends Vue {
         </q-toolbar-title>
         <q-btn
           flat
-          v-close-overlay
           label="Save & Close"
           v-if="$props.onSave"
-          @click="$props.onSave"
+          @click="saveClose"
         />
         <q-btn
           flat
-          v-close-overlay
           label="Close"
+          @click="$props.onClose"
         />
       </q-toolbar>
 
-      <slot v-if="childOpen"/>
+      <slot v-if="modalLoaded" />
 
     </q-modal-layout>
   </q-modal>

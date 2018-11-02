@@ -52,8 +52,6 @@ export default class SetpointProfileForm extends BlockForm {
   }
 
   set start(startTime: number) {
-    // console.log(date);
-    // console.log(date instanceof Date);
     if (this.points.length > 0) {
       this.points = this.points
         .map((offset: OffsetPoint, idx: number) => ({

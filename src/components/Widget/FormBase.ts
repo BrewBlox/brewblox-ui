@@ -17,4 +17,8 @@ export default class FormBase extends Vue {
   confirmChanges() {
     // Should be overridden by child class
   }
+
+  created() {
+    this.cancelChanges();
+  }
 }

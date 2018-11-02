@@ -28,10 +28,6 @@ export default class BlockForm extends FormBase {
     return this.$props.value as Block;
   }
 
-  set block(block: Block) {
-    this.$emit('input', block);
-  }
-
   get profileNames(): string[] {
     return profileNames(this.$store, this.block.serviceId);
   }
@@ -55,13 +51,7 @@ export default class BlockForm extends FormBase {
 
   @Watch('block', { immediate: true, deep: true })
   onBlockUpdate() {
-    if (!this.block.isLoading) {
-      this.afterBlockFetch();
-    }
-  }
-
-  created() {
-    this.reset();
+    this.afterBlockFetch();
   }
 
   cancelChanges() {
@@ -69,7 +59,7 @@ export default class BlockForm extends FormBase {
   }
 
   confirmChanges() {
-    this.block = fromShadow(this.inputValues, this.inputMapping, { ...this.block }) as Block;
+    this.$emit('input', fromShadow(this.inputValues, this.inputMapping, this.block));
   }
 
   fetchCompatibleBlocks(type: string) {

@@ -1,8 +1,6 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import Widget from '@/components/Widget/WidgetBase';
-import WidgetToolbar from '@/components/Widget/WidgetToolbar.vue';
-import WidgetModal from '@/components/Widget/WidgetModal.vue';
 import GraphDisplay from './GraphDisplay.vue';
 import { metricById, tryMetricById } from '@/plugins/history/store/getters';
 import { Metric, QueryParams, QueryTarget } from '@/plugins/history/state';
@@ -14,13 +12,10 @@ import { Watch } from 'vue-property-decorator';
 @Component({
   components: {
     GraphDisplay,
-    WidgetToolbar,
-    WidgetModal,
   },
 })
 export default class GraphWidget extends Widget {
   editing: boolean = false;
-  modalOpen: boolean = false;
 
   get graphCfg(): GraphConfig {
     return this.$props.config;

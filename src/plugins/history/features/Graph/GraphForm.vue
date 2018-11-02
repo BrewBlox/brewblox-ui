@@ -25,7 +25,8 @@ export default class GraphForm extends HistoryForm {
   }
 
   get hasTargets() {
-    return this.inputValues.targets.length > 0;
+    return this.inputValues.targets
+      && this.inputValues.targets.length > 0;
   }
 
   get knownFields() {

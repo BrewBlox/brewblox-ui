@@ -34,26 +34,16 @@ import {
 } from './mutations';
 
 const actions = {
-  fetchBlock: async (context: BlocksContext, block: Block) => {
-    mutateBlockInStore(context, block.serviceId, { ...block, isLoading: true });
-    const fetchedBlock = await fetchBlockInApi(block);
-    mutateBlockInStore(context, block.serviceId, { ...fetchedBlock, isLoading: false });
-  },
+  fetchBlock: async (context: BlocksContext, block: Block) =>
+    mutateBlockInStore(context, block.serviceId, await fetchBlockInApi(block)),
 
-  createBlock: async (context: BlocksContext, block: Block) => {
-    addBlockInStore(context, block.serviceId, { ...block, isLoading: true });
-    const createdBlock = await createBlockInApi(block);
-    mutateBlockInStore(context, block.serviceId, { ...createdBlock, isLoading: false });
-  },
+  createBlock: async (context: BlocksContext, block: Block) =>
+    addBlockInStore(context, block.serviceId, await createBlockInApi(block)),
 
-  saveBlock: async (context: BlocksContext, block: Block) => {
-    mutateBlockInStore(context, block.serviceId, { ...block, isLoading: true });
-    const savedBlock = await persistBlockInApi(block);
-    mutateBlockInStore(context, block.serviceId, { ...savedBlock, isLoading: false });
-  },
+  saveBlock: async (context: BlocksContext, block: Block) =>
+    mutateBlockInStore(context, block.serviceId, await persistBlockInApi(block)),
 
   removeBlock: async (context: BlocksContext, block: Block) => {
-    mutateBlockInStore(context, block.serviceId, { ...block, isLoading: true });
     await deleteBlockInApi(block);
     removeBlockInStore(context, block.serviceId, block.id);
   },
