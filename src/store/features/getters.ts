@@ -9,14 +9,12 @@ const getters = {
   features: (state: FeatureState): { [id: string]: Feature } => state.features,
   featureIds: (state: FeatureState): string[] => Object.keys(state.features),
   featureValues: (state: FeatureState): Feature[] => Object.values(state.features),
-  initialized: (state: FeatureState): boolean => state.initialized,
 };
 export default getters;
 
 export const features = read(getters.features);
 export const featureIds = read(getters.featureIds);
 export const featureValues = read(getters.featureValues);
-export const initialized = read(getters.initialized);
 
 export const featureById = (store: RootStore, id: string) =>
   (features(store)[id] || {});
@@ -26,9 +24,6 @@ export const displayNameById = (store: RootStore, id: string) =>
 
 export const validatorById = (store: RootStore, id: string) =>
   (featureById(store, id).validator || (() => true));
-
-export const onDeleteById = (store: RootStore, id: string) =>
-  (featureById(store, id).onDelete);
 
 export const wizardById = (store: RootStore, id: string) =>
   featureById(store, id).wizard;
@@ -41,3 +36,6 @@ export const widgetSizeById = (store: RootStore, id: string) =>
 
 export const formById = (store: RootStore, id: string) =>
   featureById(store, id).form;
+
+export const deletersById = (store: RootStore, id: string) =>
+  (featureById(store, id).deleters || []);

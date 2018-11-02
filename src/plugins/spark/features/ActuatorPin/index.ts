@@ -11,12 +11,13 @@ const feature: Feature = {
   displayName: 'Pin Actuator',
   widget: ref(widget),
   form: ref(form),
-  wizard: undefined, // Pins are static system objects
-  onDelete: undefined,
   widgetSize: {
     cols: 4,
     rows: 2,
   },
+  // Pins are static system objects, and can't be created or deleted
+  wizard: undefined,
+  deleters: undefined,
 };
 
 export default feature;

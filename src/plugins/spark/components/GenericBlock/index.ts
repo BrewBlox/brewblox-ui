@@ -12,7 +12,7 @@ const validator = (store: RootStore, config: BlockConfig) =>
   serviceAvailable(store, config.serviceId) &&
   blockById(store, config.serviceId, config.blockId) !== undefined;
 
-const onDelete = (store: RootStore, config: BlockConfig) => {
+const deleteBlock = (store: RootStore, config: BlockConfig) => {
   const block = blocks(store, config.serviceId)[config.blockId];
   if (block) {
     removeBlock(store, config.serviceId, block);
@@ -21,13 +21,18 @@ const onDelete = (store: RootStore, config: BlockConfig) => {
 
 const feature: Partial<Feature> = {
   validator,
-  onDelete,
   widget: ref(widget),
   wizard: ref(wizard),
   widgetSize: {
     cols: 4,
     rows: 4,
   },
+  deleters: [
+    {
+      description: 'Delete block on controller',
+      action: deleteBlock,
+    },
+  ],
 };
 
 export default feature;

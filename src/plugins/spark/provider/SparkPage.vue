@@ -10,7 +10,7 @@ import {
   featureIds,
   widgetById,
   widgetSizeById,
-  onDeleteById,
+  deletersById,
 } from '@/store/features/getters';
 import { dashboardItemIds, allDashboards, itemCopyName } from '@/store/dashboards/getters';
 import { createDashboardItem } from '@/store/dashboards/actions';
@@ -72,22 +72,28 @@ export default class SparkPage extends Vue {
   }
 
   onDeleteItem(item: DashboardItem) {
-    // Check whether the feature has a separate deleter
-    const onDeleteFeature = onDeleteById(this.$store, item.widget);
+    // Quasar dialog can't handle objects as value - they will be returned as null
+    // As workaround, we use array index as value, and add the "action" key to each option
+    const opts = deletersById(this.$store, item.widget)
+      .map((del, idx) => ({ label: del.description, value: idx, action: del.action }));
 
-    if (!onDeleteFeature) {
-      Notify.create({
-        message: 'This block can\'t be deleted',
-      });
+    if (opts.length === 0) {
+      Notify.create('This block can\'t be deleted');
       return;
     }
 
     this.$q.dialog({
       title: 'Delete block',
-      message: `Are you sure you want to delete block ${item.id} on the controller?`,
+      message: `How do you want to delete ${item.id}?`,
+      options: {
+        type: 'checkbox',
+        model: opts.map(opt => opt.value),
+        items: opts,
+      },
       cancel: true,
     })
-      .then(() => (onDeleteFeature as Function)(this.$store, item.config))
+      .then((selected: number[]) =>
+        selected.forEach(idx => opts[idx].action(this.$store, item.config)))
       .catch(() => { });
   }
 
