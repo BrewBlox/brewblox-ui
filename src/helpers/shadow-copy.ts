@@ -50,7 +50,7 @@ export const fromShadow = (
         set(acc, val.path, shadow[key]);
         return acc;
       },
-      output,
+      { ...output },
     );
 
 export const deepCopy = (obj: any) => deserialize(JSON.parse(JSON.stringify(serialize(obj))));

@@ -5,6 +5,7 @@ import { Link } from '@/helpers/units';
 import { uniqueFilter } from '@/helpers/functional';
 import { compatibleBlocks } from '@/plugins/spark/store/getters';
 import { fetchCompatibleBlocks } from '@/plugins/spark/store/actions';
+import { clone } from 'lodash';
 
 export interface ConstraintInfo {
   key: string;
@@ -39,16 +40,16 @@ export default class Constraints extends Vue {
   onChanged(vals: ConstraintInfo[]) {
     const constraints = vals
       .filter(info => !!info.key)
-      .map(info => ({ [info.key]: info.value }));
+      .map(info => ({ [info.key]: clone(info.value) }));
     this.$emit('input', { constraints });
   }
 
   addConstraint(cinfo: ConstraintInfo) {
-    this.onChanged([...this.constraints, { ...cinfo }]);
+    this.onChanged([...this.constraints, cinfo]);
   }
 
   updateConstraint(index: number, cinfo: ConstraintInfo) {
-    this.constraints[index] = { ...cinfo };
+    this.constraints[index] = cinfo;
     this.onChanged(this.constraints);
   }
 

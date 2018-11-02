@@ -40,13 +40,12 @@ export default class HistoryForm extends FormBase {
     return JSON.stringify(state) !== JSON.stringify(this.inputValues);
   }
 
-  @Watch('config', { immediate: true, deep: true })
-  onBlockUpdate() {
+  reset() {
     this.inputValues = deepCopy(toShadow(this.config, this.inputMapping));
   }
 
   cancelChanges() {
-    this.inputValues = deepCopy(toShadow(this.config, this.inputMapping));
+    this.reset();
   }
 
   confirmChanges() {

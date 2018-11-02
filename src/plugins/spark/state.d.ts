@@ -16,7 +16,6 @@ export interface DataBlock {
 
 export interface Block extends DataBlock {
   serviceId: string;
-  isLoading?: boolean;
 }
 
 export interface BlockConfig {

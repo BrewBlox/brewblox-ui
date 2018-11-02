@@ -95,6 +95,10 @@ function serializeProperty(key: string, inputObject: any, input = inputObject[ke
     return input.id;
   }
 
+  if (input === null) {
+    return input;
+  }
+
   if (typeof input === 'object') {
     return serialize(input, key); // eslint-disable-line
   }

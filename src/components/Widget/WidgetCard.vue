@@ -52,7 +52,12 @@ export default class WidgetCard extends Vue {
 
   get openSettingsFunc() {
     return this.$props.form
-      ? () => { this.modalOpen = true; }
+      ? () => {
+        this.modalOpen = true;
+        if (this.$refs.form !== undefined) {
+          this.formComponent.cancelChanges();
+        }
+      }
       : null;
   }
 
@@ -94,9 +99,8 @@ export default class WidgetCard extends Vue {
         </q-list>
       </q-collapsible>
       <component
-        v-if="!!$props.form"
+        :is="$props.form || 'div'"
         ref="form"
-        :is="$props.form"
         v-model="model"
       />
     </WidgetModal>
@@ -108,19 +112,16 @@ export default class WidgetCard extends Vue {
       :onSettings="openSettingsFunc"
     />
 
-    <q-scroll-area
-      v-if="$props.body"
-      class="widget-body"
-    >
+    <!-- Wrap slot in scrollable card (default) -->
+    <q-scroll-area v-if="$props.body" class="widget-body">
       <q-card>
         <q-card-main class="row">
-
           <slot />
-
         </q-card-main>
       </q-card>
     </q-scroll-area>
 
+    <!-- Don't wrap slot -->
     <slot v-else />
 
   </div>

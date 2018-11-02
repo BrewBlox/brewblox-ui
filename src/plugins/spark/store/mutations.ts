@@ -5,7 +5,7 @@ import { Block, UserUnits, UnitAlternatives } from '../state';
 
 const mutations = {
   addBlock: (state: SparkState, block: Block) =>
-    Vue.set(state.blocks, block.id, { ...block, isLoading: false }),
+    Vue.set(state.blocks, block.id, { ...block }),
 
   updateBlock: (state: SparkState, block: Partial<Block>) => {
     const id = block.id || '';
@@ -18,9 +18,6 @@ const mutations = {
 
   mutateBlock: (state: SparkState, block: Partial<Block>) =>
     mutations.updateBlock(state, block),
-
-  blockLoading: (state: SparkState, id: string) =>
-    Vue.set(state.blocks, id, { ...state.blocks[id], isLoading: true }),
 
   removeBlock: (state: SparkState, id: string) =>
     Vue.delete(state.blocks, id),
@@ -44,7 +41,6 @@ const mutations = {
 
 export const addBlock = commit(mutations.addBlock);
 export const mutateBlock = commit(mutations.mutateBlock);
-export const blockLoading = commit(mutations.blockLoading);
 export const removeBlock = commit(mutations.removeBlock);
 export const setBlocks = commit(mutations.setBlocks);
 export const setUnits = commit(mutations.setUnits);
