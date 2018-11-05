@@ -93,6 +93,10 @@ export default class SparkWidget extends Vue {
     clearDiscoveredBlocks(this.$store, this.service.id);
   }
 
+  fetchDiscoveredBlocks() {
+    fetchDiscoveredBlocks(this.$store, this.service.id);
+  }
+
   durationString(durationMs: number) {
     return durationString(durationMs);
   }
@@ -145,6 +149,10 @@ export default class SparkWidget extends Vue {
       label="Discovered blocks"
       icon="search"
     >
+      <q-btn
+        label="Refresh"
+        @click="fetchDiscoveredBlocks"
+      />
       <p
       v-for="id in discoveredBlocks"
       :key="id"
@@ -156,9 +164,6 @@ export default class SparkWidget extends Vue {
         v-if="discoveredBlocks.length"
         @click="clearDiscoveredBlocks"
       />
-      <p v-else>
-        -
-      </p>
     </widget-field>
 
   </widget-card>
