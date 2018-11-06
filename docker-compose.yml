@@ -59,12 +59,13 @@ services:
   datastore:
     image: brewblox/brewblox-datastore:develop
     labels:
-      - "traefik.port=3000"
-      - "traefik.frontend.rule=PathPrefixStrip: /datastore/"
+      - "traefik.port=5000"
+      - "traefik.frontend.rule=PathPrefix: /datastore"
     volumes:
       - "./mocks/config/datastore.json:/app/datastore.json"
     command: >
-      --watch datastore.json
+      --file datastore.json
+      --volatile
 
   traefik:
     image: traefik
