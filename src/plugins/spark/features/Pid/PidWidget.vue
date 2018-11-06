@@ -70,7 +70,7 @@ export default class PidWidget extends BlockWidget {
     </WidgetModal>
 
     <!-- Overview -->
-    <q-carousel-slide class="no-padding">
+    <q-carousel-slide>
       <q-card dark>
 
         <q-card-title>
@@ -226,15 +226,15 @@ export default class PidWidget extends BlockWidget {
               class="col"
               label="Filter"
             >
-              <big>{{ block.data.filter | round }}</big>
+              <big>{{ filterName }}</big>
               <q-popup-edit
                 v-model="block.data.filter"
                 title="Edit filter"
                 buttons
               >
-                <q-input
-                  type="number"
+                <q-select
                   v-model="block.data.filter"
+                  :options="filterOpts"
                 />
               </q-popup-edit>
             </q-field>
