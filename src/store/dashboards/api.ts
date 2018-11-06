@@ -27,7 +27,7 @@ export const persistDashboardItem = (item: DashboardItem): Promise<DashboardItem
   put(`/datastore/dashboard-items/${encodeURIComponent(item.id)}`, item);
 
 export const createDashboardItem = (item: DashboardItem): Promise<DashboardItem> =>
-  post('/datastore/dashboard-items/', item);
+  post('/datastore/dashboard-items', item);
 
 export const deleteDashboardItem = (item: DashboardItem): Promise<DashboardItem> =>
   del(`/datastore/dashboard-items/${encodeURIComponent(item.id)}`, item);
