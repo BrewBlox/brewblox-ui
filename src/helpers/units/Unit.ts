@@ -6,7 +6,8 @@ const prettify = (v: string) => v
   .replace(/milliseconds?/gi, 'ms')
   .replace(/seconds?/gi, 's')
   .replace(/minutes?/gi, 'm')
-  .replace(/hours?/gi, 'h');
+  .replace(/hours?/gi, 'h')
+  .replace(/ \/ /gi, '/');
 
 export default class Unit {
   value: number;
@@ -28,7 +29,7 @@ export default class Unit {
   }
 
   toString(): string {
-    return `${this.roundedValue}${this.unitNotation}`;
+    return `${this.roundedValue} ${this.unitNotation}`;
   }
 
   toJSON(): number {

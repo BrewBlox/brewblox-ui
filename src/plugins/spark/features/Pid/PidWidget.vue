@@ -101,9 +101,7 @@ export default class PidWidget extends BlockWidget {
               class="col"
               label="Error"
             >
-              <big>
-                {{ block.data.error | unit }}
-              </big>
+              <big>{{ block.data.error | unit }}</big>
             </q-field>
             <q-field
               dark
@@ -169,16 +167,17 @@ export default class PidWidget extends BlockWidget {
               class="col"
               label="Kp"
             >
-              <big>{{ block.data.kp | unit }}</big>
+              <big class="editable">{{ block.data.kp | unit }}</big>
               <q-popup-edit
-                v-model="block.data.kp"
                 title="Edit Kp"
-                buttons
+                v-model="placeholder"
+                @show="() => startEdit(block.data.kp, 'value')"
+                @hide="() => endEdit(block.data.kp, 'value')"
               >
                 <q-input
                   type="number"
                   :suffix="block.data.kp.unitNotation"
-                  v-model="block.data.kp.value"
+                  v-model="placeholder"
                 />
               </q-popup-edit>
             </q-field>
@@ -187,16 +186,17 @@ export default class PidWidget extends BlockWidget {
               class="col"
               label="Ti"
             >
-              <big>{{ block.data.ti | unit }}</big>
+              <big class="editable">{{ block.data.ti | unit }}</big>
               <q-popup-edit
-                v-model="block.data.ti"
                 title="Edit Ti"
-                buttons
+                v-model="placeholder"
+                @show="() => startEdit(block.data.ti, 'value')"
+                @hide="() => endEdit(block.data.ti, 'value')"
               >
                 <q-input
                   type="number"
                   :suffix="block.data.ti.unitNotation"
-                  v-model="block.data.ti.value"
+                  v-model="placeholder"
                 />
               </q-popup-edit>
             </q-field>
@@ -205,16 +205,17 @@ export default class PidWidget extends BlockWidget {
               class="col"
               label="Td"
             >
-              <big>{{ block.data.td | unit }}</big>
+              <big class="editable">{{ block.data.td | unit }}</big>
               <q-popup-edit
-                v-model="block.data.td"
                 title="Edit Td"
-                buttons
+                v-model="placeholder"
+                @show="() => startEdit(block.data.td, 'value')"
+                @hide="() => endEdit(block.data.td, 'value')"
               >
                 <q-input
                   type="number"
                   :suffix="block.data.td.unitNotation"
-                  v-model="block.data.td.value"
+                  v-model="placeholder"
                 />
               </q-popup-edit>
             </q-field>
@@ -226,15 +227,16 @@ export default class PidWidget extends BlockWidget {
               class="col"
               label="Filter"
             >
-              <big>{{ filterName }}</big>
+              <big class="editable">{{ filterName }}</big>
               <q-popup-edit
-                v-model="block.data.filter"
                 title="Edit filter"
-                buttons
+                v-model="placeholder"
+                @show="() => startEdit(block.data, 'filter')"
               >
                 <q-select
-                  v-model="block.data.filter"
+                  :value="placeholder"
                   :options="filterOpts"
+                  @change="v => { placeholder = v; endEdit(block.data, 'filter'); }"
                 />
               </q-popup-edit>
             </q-field>
@@ -243,16 +245,17 @@ export default class PidWidget extends BlockWidget {
               class="col"
               label="Filter threshold"
             >
-              <big>{{ block.data.filterThreshold | unit }}</big>
+              <big class="editable">{{ block.data.filterThreshold | unit }}</big>
               <q-popup-edit
-                v-model="block.data.filterThreshold"
                 title="Edit filter threshold"
-                buttons
+                v-model="placeholder"
+                @show="() => startEdit(block.data.filterThreshold, 'value')"
+                @hide="() => endEdit(block.data.filterThreshold, 'value')"
               >
                 <q-input
                   type="number"
                   :suffix="block.data.filterThreshold.unitNotation"
-                  v-model="block.data.filterThreshold.value"
+                  v-model="placeholder"
                 />
               </q-popup-edit>
             </q-field>
