@@ -347,4 +347,8 @@ export default class DefaultLayout extends Vue {
 .centered {
   margin: auto;
 }
+
+.editable {
+  border-bottom: 1px solid gray;
+}
 </style>

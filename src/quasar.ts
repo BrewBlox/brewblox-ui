@@ -46,6 +46,9 @@ import Quasar, {
   QDatetime,
   QDatetimePicker,
   QCollapsible,
+  QCarousel,
+  QCarouselSlide,
+  QPopupEdit,
 } from 'quasar';
 
 import 'quasar-extras/roboto-font';
@@ -100,6 +103,9 @@ Vue.use(Quasar, {
     QDatetime,
     QDatetimePicker,
     QCollapsible,
+    QCarousel,
+    QCarouselSlide,
+    QPopupEdit,
   },
   directives: { Ripple, CloseOverlay },
   plugins: { Notify, Dialog },
