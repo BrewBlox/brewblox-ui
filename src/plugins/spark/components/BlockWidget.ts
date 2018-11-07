@@ -45,7 +45,7 @@ export default class BlockWidget extends WidgetBase {
     this.placeholder = val[key];
   }
 
-  async endEdit(val: any, key: string) {
+  endEdit(val: any, key: string) {
     if (val[key] !== this.placeholder) {
       val[key] = this.placeholder;
       this.block = this.block;
