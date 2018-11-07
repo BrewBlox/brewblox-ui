@@ -6,6 +6,8 @@ import { blockById } from '../store/getters';
 
 @Component
 export default class BlockWidget extends WidgetBase {
+  placeholder: any = null;
+
   get serviceId(): string {
     return this.$props.config.serviceId;
   }
@@ -37,5 +39,16 @@ export default class BlockWidget extends WidgetBase {
 
   saveBlock(block: Block) {
     saveBlock(this.$store, this.serviceId, block);
+  }
+
+  startEdit(val: any, key: string) {
+    this.placeholder = val[key];
+  }
+
+  endEdit(val: any, key: string) {
+    if (val[key] !== this.placeholder) {
+      val[key] = this.placeholder;
+      this.block = this.block;
+    }
   }
 }
