@@ -17,6 +17,7 @@ import FormBase from '@/components/Widget/FormBase';
 })
 export default class PidWidget extends BlockWidget {
   modalOpen: boolean = false;
+  subtitle = 'loading';
 
   get block(): PidBlock {
     return getById(this.$store, this.serviceId, this.blockId);
@@ -35,7 +36,7 @@ export default class PidWidget extends BlockWidget {
   }
 
   get horizontal() {
-    return this.$props.cols > 4;
+    return this.$props.cols >= 4;
   }
 
   get formComponent() {
@@ -49,14 +50,25 @@ export default class PidWidget extends BlockWidget {
   onSave() {
     this.formComponent.confirmChanges();
   }
+
+  onSlideChange(idx: number) {
+    const subtitles = [
+      'State',
+      'Input/Output',
+      'Settings',
+    ];
+
+    this.subtitle = subtitles[idx];
+  }
+
+  mounted() {
+    this.onSlideChange(0);
+  }
 }
 </script>
 
 <template>
-  <q-carousel
-    quick-nav
-  >
-
+  <div>
     <WidgetModal
       :isOpen="modalOpen"
       :onClose="onClose"
@@ -69,32 +81,41 @@ export default class PidWidget extends BlockWidget {
       />
     </WidgetModal>
 
-    <!-- Overview -->
-    <q-carousel-slide>
-      <q-card dark>
+    <q-card dark class="full-height column">
+      <q-card-title class="title-bar">
+        {{ $props.id }}
+        <span class="vertical-middle on-left" slot="right">{{ this.subtitle }}</span>
+        <q-btn
+          slot="right"
+          flat
+          dense
+          round
+          @click="() => this.modalOpen = true"
+          icon="settings"
+        />
+        <q-btn
+          slot="right"
+          flat
+          round
+          dense
+          @click="refreshBlock"
+          icon="refresh"
+        />
+      </q-card-title>
 
-        <q-card-title>
-          {{ $props.id }}
-          <span slot="subtitle">{{ $props.type }}</span>
-          <q-btn
-            slot="right"
-            flat
-            round
-            @click="() => this.modalOpen = true"
-            icon="settings"
-          />
-          <q-btn
-            slot="right"
-            flat
-            round
-            @click="refreshBlock"
-            icon="refresh"
-          />
-        </q-card-title>
-        <q-card-separator/>
+      <q-card-separator/>
 
-        <div :class="horizontal ? 'row' : 'column'">
+      <q-alert type="info" color="info" v-if="!!this.block.disabled">
+        This PID is disabled
+      </q-alert>
+      <q-alert type="warning" color="warn" v-if="!this.block.disabled && !this.block.active">
+        This PID is inactive
+      </q-alert>
 
+      <q-carousel quick-nav class="col" @input="onSlideChange">
+        <!-- Overview -->
+        <q-carousel-slide>
+          <div :class="['widget-body', horizontal ? 'row' : 'column']">
           <q-card-main class="column col">
             <q-field
               dark
@@ -141,215 +162,180 @@ export default class PidWidget extends BlockWidget {
             >
               <big>{{ block.data.d | round }}</big>
             </q-field>
-
           </q-card-main>
-
-        </div>
-
-      </q-card>
-    </q-carousel-slide>
-
-    <!-- Settings -->
-    <q-carousel-slide>
-      <q-card dark>
-
-        <q-card-title>
-          {{ $props.id }}
-          <span slot="subtitle">Settings</span>
-        </q-card-title>
-        <q-card-separator />
-
-        <div :class="horizontal ? 'row' : 'column'">
-
-          <q-card-main class="column col">
-            <q-field
-              dark
-              class="col"
-              label="Kp"
-            >
-              <big class="editable">{{ block.data.kp | unit }}</big>
-              <q-popup-edit
-                title="Edit Kp"
-                v-model="placeholder"
-                @show="() => startEdit(block.data.kp, 'value')"
-                @hide="() => endEdit(block.data.kp, 'value')"
+          </div>
+        </q-carousel-slide>
+        <q-carousel-slide>
+          <div :class="horizontal ? 'row' : 'column'">
+            <q-card-main class="column col">
+              <q-item class="full-width text-center">Input</q-item>
+              <q-field
+                dark
+                class="col"
+                label="Target"
               >
-                <q-input
-                  type="number"
-                  :suffix="block.data.kp.unitNotation"
+                <big>{{ block.data.inputValid ? block.data.inputSetting : '-' | unit }}</big>
+              </q-field>
+              <q-field
+                dark
+                class="col"
+                label="Actual"
+              >
+                <big>{{ block.data.inputValid ? block.data.inputValue : '-' | unit }}</big>
+              </q-field>
+            </q-card-main>
+
+            <q-card-main class="column col">
+              <q-item class="full-width text-center">Output</q-item>
+              <q-field
+                dark
+                class="col"
+                label="Target"
+              >
+                <big>{{ block.data.outputValid ? block.data.outputSetting : '-' | unit }}</big>
+              </q-field>
+              <q-field
+                dark
+                class="col"
+                label="Actual"
+              >
+                <big>{{ block.data.outputValid ? block.data.outputValue : '-' | unit }}</big>
+              </q-field>
+            </q-card-main>
+          </div>
+        </q-carousel-slide>
+        <q-carousel-slide>
+          <div :class="horizontal ? 'row' : 'column'">
+            <q-card-main class="column col">
+              <q-field
+                dark
+                class="col"
+                label="Kp"
+              >
+                <big class="editable">{{ block.data.kp | unit }}</big>
+                <q-popup-edit
+                  buttons
+                  persistent
+                  title="Edit Kp"
                   v-model="placeholder"
-                />
-              </q-popup-edit>
-            </q-field>
-            <q-field
-              dark
-              class="col"
-              label="Ti"
-            >
-              <big class="editable">{{ block.data.ti | unit }}</big>
-              <q-popup-edit
-                title="Edit Ti"
-                v-model="placeholder"
-                @show="() => startEdit(block.data.ti, 'value')"
-                @hide="() => endEdit(block.data.ti, 'value')"
+                  @show="() => startEdit(block.data.kp, 'value')"
+                  @save="() => endEdit(block.data.kp, 'value')"
+                >
+                  <q-input
+                    type="number"
+                    :suffix="block.data.kp.unitNotation"
+                    v-model="placeholder"
+                  />
+                </q-popup-edit>
+              </q-field>
+              <q-field
+                dark
+                class="col"
+                label="Ti"
               >
-                <q-input
-                  type="number"
-                  :suffix="block.data.ti.unitNotation"
+                <big class="editable">{{ block.data.ti | unit }}</big>
+                <q-popup-edit
+                  buttons
+                  persistent
+                  title="Edit Ti"
                   v-model="placeholder"
-                />
-              </q-popup-edit>
-            </q-field>
-            <q-field
-              dark
-              class="col"
-              label="Td"
-            >
-              <big class="editable">{{ block.data.td | unit }}</big>
-              <q-popup-edit
-                title="Edit Td"
-                v-model="placeholder"
-                @show="() => startEdit(block.data.td, 'value')"
-                @hide="() => endEdit(block.data.td, 'value')"
+                  @show="() => startEdit(block.data.ti, 'value')"
+                  @save="() => endEdit(block.data.ti, 'value')"
+                >
+                  <q-input
+                    type="number"
+                    :suffix="block.data.ti.unitNotation"
+                    v-model="placeholder"
+                  />
+                </q-popup-edit>
+              </q-field>
+              <q-field
+                dark
+                class="col"
+                label="Td"
               >
-                <q-input
-                  type="number"
-                  :suffix="block.data.td.unitNotation"
+                <big class="editable">{{ block.data.td | unit }}</big>
+                <q-popup-edit
+                  buttons
+                  persistent
+                  title="Edit Td"
                   v-model="placeholder"
-                />
-              </q-popup-edit>
-            </q-field>
-          </q-card-main>
+                  @show="() => startEdit(block.data.td, 'value')"
+                  @save="() => endEdit(block.data.td, 'value')"
+                >
+                  <q-input
+                    type="number"
+                    :suffix="block.data.td.unitNotation"
+                    v-model="placeholder"
+                  />
+                </q-popup-edit>
+              </q-field>
+            </q-card-main>
 
-          <q-card-main class="column col">
-            <q-field
-              dark
-              class="col"
-              label="Filter"
-            >
-              <big class="editable">{{ filterName }}</big>
-              <q-popup-edit
-                title="Edit filter"
-                v-model="placeholder"
-                @show="() => startEdit(block.data, 'filter')"
+            <q-card-main class="column col">
+              <q-field
+                dark
+                class="col"
+                label="Filter"
               >
-                <q-select
-                  :value="placeholder"
-                  :options="filterOpts"
-                  @change="v => { placeholder = v; endEdit(block.data, 'filter'); }"
-                />
-              </q-popup-edit>
-            </q-field>
-            <q-field
-              dark
-              class="col"
-              label="Filter threshold"
-            >
-              <big class="editable">{{ block.data.filterThreshold | unit }}</big>
-              <q-popup-edit
-                title="Edit filter threshold"
-                v-model="placeholder"
-                @show="() => startEdit(block.data.filterThreshold, 'value')"
-                @hide="() => endEdit(block.data.filterThreshold, 'value')"
-              >
-                <q-input
-                  type="number"
-                  :suffix="block.data.filterThreshold.unitNotation"
+                <big class="editable">{{ filterName }}</big>
+                <q-popup-edit
+                  buttons
+                  persistent
+                  title="Edit filter"
                   v-model="placeholder"
-                />
-              </q-popup-edit>
-            </q-field>
-          </q-card-main>
-
-        </div>
-
-      </q-card>
-    </q-carousel-slide>
-
-    <!-- Input / output -->
-    <q-carousel-slide>
-      <q-card dark>
-
-        <q-card-title>
-          {{ $props.id }}
-          <span slot="subtitle">Input / Output</span>
-        </q-card-title>
-        <q-card-separator />
-
-        <div :class="horizontal ? 'row' : 'column'">
-
-          <q-card-main class="column col">
-            <q-field
-              dark
-              class="col"
-              label="PID enabled"
-            >
-              <q-toggle v-model="block.data.enabled" />
-            </q-field>
-            <q-field
-              dark
-              class="col"
-              label="PID active"
-            >
-              <q-toggle disabled :value="block.data.active" />
-            </q-field>
-          </q-card-main>
-
-          <q-card-main class="column col">
-            <q-field
-              dark
-              class="col"
-              label="Input valid"
-            >
-              <q-toggle disabled :value="block.data.inputValid" />
-            </q-field>
-            <q-field
-              dark
-              class="col"
-              label="Input setting"
-            >
-              <big>{{ block.data.inputSetting | unit }}</big>
-            </q-field>
-            <q-field
-              dark
-              class="col"
-              label="Input value"
-            >
-              <big>{{ block.data.inputValue | unit }}</big>
-            </q-field>
-          </q-card-main>
-
-          <q-card-main class="column col">
-            <q-field
-              dark
-              class="col"
-              label="Output valid"
-            >
-              <q-toggle disabled :value="block.data.outputValid" />
-            </q-field>
-            <q-field
-              dark
-              class="col"
-              label="Output setting"
-            >
-              <big>{{ block.data.outputSetting | round }}</big>
-            </q-field>
-            <q-field
-              dark
-              class="col"
-              label="Output value"
-            >
-              <big>{{ block.data.outputValue | round }}</big>
-            </q-field>
-          </q-card-main>
-
-        </div>
-
-      </q-card>
-    </q-carousel-slide>
-
-  </q-carousel>
+                  @show="() => startEdit(block.data, 'filter')"
+                  @save="() => endEdit(block.data, 'filter')"
+                >
+                  <q-select
+                    v-model="placeholder"
+                    :options="filterOpts"
+                  />
+                </q-popup-edit>
+              </q-field>
+              <q-field
+                dark
+                class="col"
+                label="Filter threshold"
+              >
+                <big class="editable">{{ block.data.filterThreshold | unit }}</big>
+                <q-popup-edit
+                  buttons
+                  persistent
+                  title="Edit filter threshold"
+                  v-model="placeholder"
+                  @show="() => startEdit(block.data.filterThreshold, 'value')"
+                  @save="() => endEdit(block.data.filterThreshold, 'value')"
+                >
+                  <q-input
+                    type="number"
+                    :suffix="block.data.filterThreshold.unitNotation"
+                    v-model="placeholder"
+                  />
+                </q-popup-edit>
+              </q-field>
+            </q-card-main>
+          </div>
+        </q-carousel-slide>
+      </q-carousel>
+    </q-card>
+  </div>
 </template>
 
 <style scoped>
+.q-carousel-slide {
+  padding: 0px;
+}
+
+.q-card-container {
+  padding: 0px;
+}
+
+.title-bar {
+  padding: 5px 10px;
+}
+
+.q-card-main {
+  padding: 10px;
+}
 </style>
