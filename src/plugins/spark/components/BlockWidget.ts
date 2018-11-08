@@ -37,7 +37,7 @@ export default class BlockWidget extends WidgetBase {
     fetchBlock(this.$store, this.serviceId, this.block);
   }
 
-  saveBlock(block: Block) {
+  saveBlock(block: Block = this.block) {
     saveBlock(this.$store, this.serviceId, block);
   }
 
