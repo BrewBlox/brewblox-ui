@@ -242,63 +242,33 @@ export default class PidWidget extends BlockWidget {
                 class="col"
                 label="Kp"
               >
-                <big class="editable">{{ block.data.kp | unit }}</big>
-                <q-popup-edit
-                  buttons
-                  persistent
-                  title="Edit Kp"
-                  v-model="placeholder"
-                  @show="() => startEdit(block.data.kp, 'value')"
-                  @save="() => endEdit(block.data.kp, 'value')"
-                >
-                  <q-input
-                    type="number"
-                    :suffix="block.data.kp.unitNotation"
-                    v-model="placeholder"
-                  />
-                </q-popup-edit>
+              <UnitPopupEdit
+                label="Kp"
+                :field="block.data.kp"
+                :change="v => { block.data.kp = v; this.saveBlock(); }"
+              />
               </q-field>
               <q-field
                 dark
                 class="col"
                 label="Ti"
               >
-                <big class="editable">{{ block.data.ti | unit }}</big>
-                <q-popup-edit
-                  buttons
-                  persistent
-                  title="Edit Ti"
-                  v-model="placeholder"
-                  @show="() => startEdit(block.data.ti, 'value')"
-                  @save="() => endEdit(block.data.ti, 'value')"
-                >
-                  <q-input
-                    type="number"
-                    :suffix="block.data.ti.unitNotation"
-                    v-model="placeholder"
-                  />
-                </q-popup-edit>
+               <UnitPopupEdit
+                label="Ti"
+                :field="block.data.ti"
+                :change="v => { block.data.ti = v; this.saveBlock(); }"
+              />
               </q-field>
               <q-field
                 dark
                 class="col"
                 label="Td"
               >
-                <big class="editable">{{ block.data.td | unit }}</big>
-                <q-popup-edit
-                  buttons
-                  persistent
-                  title="Edit Td"
-                  v-model="placeholder"
-                  @show="() => startEdit(block.data.td, 'value')"
-                  @save="() => endEdit(block.data.td, 'value')"
-                >
-                  <q-input
-                    type="number"
-                    :suffix="block.data.td.unitNotation"
-                    v-model="placeholder"
-                  />
-                </q-popup-edit>
+                <UnitPopupEdit
+                  label="Td"
+                  :field="block.data.td"
+                  :change="v => { block.data.td = v; this.saveBlock(); }"
+                />
               </q-field>
             </q-card-main>
 
