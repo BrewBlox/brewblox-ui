@@ -32,105 +32,226 @@ export default class PidForm extends BlockForm {
 </script>
 
 <template>
-  <q-carousel
-    quick-nav
-  >
-    <q-carousel-slide class="no-padding">
-      <q-card orientation="vertical">
-        <q-card-main class="column centered">
+  <div>
+    <div class="calculation">
+      <!-- state -->
+      <q-field
+        label="Filtered Error"
+        orientation="vertical"
+      >
+        <big>{{ block.data.error | unit }}</big>
+      </q-field>
+      <q-field
+        label="Integral"
+        orientation="vertical"
+      >
+        <big>{{ block.data.integral | unit }}</big>
+      </q-field>
+      <q-field
+        label="Derivative"
+        orientation="vertical"
+      >
+        <big>{{ block.data.derivative | unit }}</big>
+      </q-field>
+      <div />
+      <!-- operators -->
+      <div />
+      <q-field
+        label=" "
+        orientation="vertical"
+      >
+        <big>*</big>
+      </q-field>
+      <q-field
+        label=" "
+        orientation="vertical"
+      >
+        <big>*</big>
+      </q-field>
+      <div />
 
-          <widget-field
-            label="Active profiles"
-            icon="settings_input_component"
-          >
-            <profiles-bar
-              v-model="inputValues.profiles"
-              :profileNames="profileNames"
-            />
-          </widget-field>
+      <!-- extra *Kp -->
+      <div />
+      <q-field
+        label="Kp"
+        orientation="vertical"
+      >
+        <big style="color: grey;">{{ block.data.kp | unit }}</big>
+      </q-field>
+      <q-field
+        label="Kp"
+        orientation="vertical"
+      >
+        <big style="color: grey;">{{ block.data.kp | unit }}</big>
+      </q-field>
+      <div />
 
-          <widget-field
-            label="Enabled"
-            icon="edit"
-          >
-            <q-toggle
-              v-model="inputValues.enabled"
-            />
-          </widget-field>
+      <!-- operators -->
+      <q-field
+        label=" "
+        orientation="vertical"
+      >
+        <big>*</big>
+      </q-field>
+      <q-field
+        label=" "
+        orientation="vertical"
+      >
+        <big>/</big>
+      </q-field>
+      <q-field
+        label=" "
+        orientation="vertical"
+      >
+        <big>*</big>
+      </q-field>
+      <div />
 
-          <widget-field
-            label="Input / Output"
-            icon="edit"
-          >
-            <q-select
-              v-model="inputValues.inputId.id"
-              stack-label="Input"
-              clearable
-              :options="linkOpts(inputValues.inputId)"
-            />
-            <q-select
-              v-model="inputValues.outputId.id"
-              stack-label="Output"
-              clearable
-              :options="linkOpts(inputValues.outputId)"
-            />
-          </widget-field>
+      <!-- settings -->
+      <q-field
+        label="Kp"
+        orientation="vertical"
+      >
+        <UnitPopupEdit
+          label="Kp"
+          :field="block.data.kp"
+          :change="v => { block.data.kp = v; this.saveBlock(); }"
+        />
+      </q-field>
+      <q-field
+        label="Ti"
+        orientation="vertical"
+      >
+        <UnitPopupEdit
+        label="Ti"
+        :field="block.data.ti"
+        :change="v => { block.data.ti = v; this.saveBlock(); }"
+      />
+      </q-field>
+      <q-field
+        label="Td"
+        orientation="vertical"
+      >
+        <UnitPopupEdit
+          label="Td"
+          :field="block.data.td"
+          :change="v => { block.data.td = v; this.saveBlock(); }"
+        />
+      </q-field>
+      <div />
 
-        </q-card-main>
-      </q-card>
-    </q-carousel-slide>
+      <!-- equal signs -->
+      <q-field
+        label=" "
+        orientation="vertical"
+      >
+        <big>=</big>
+      </q-field>
+      <q-field
+        label=" "
+        orientation="vertical"
+      >
+        <big>=</big>
+      </q-field>
+      <q-field
+        label=" "
+        orientation="vertical"
+      >
+        <big>=</big>
+      </q-field>
+      <div />
 
-    <q-carousel-slide class="no-padding">
-      <q-card orientation="vertical">
-        <q-card-main class="column centered">
+      <!-- result -->
+      <q-field
+        label="P"
+        orientation="vertical"
+      >
+        <big>{{ block.data.p | round }}</big>
+      </q-field>
+      <q-field
+        label="I"
+        orientation="vertical"
+      >
+        <big>{{ block.data.i | round }}</big>
+      </q-field>
+      <q-field
+        label="D"
+        orientation="vertical"
+        style="border-bottom: solid 2px white; min-width: 60px;"
+      >
+        <big>{{ block.data.d | round }}</big>
+        <big style="float: right;"><sub>+</sub></big>
+      </q-field>
+      <div>
+      <big>{{ block.data.outputValue | round }}</big>
+      </div>
+    </div>
+    <widget-field
+      label="Active profiles"
+      icon="settings_input_component"
+    >
+      <profiles-bar
+        v-model="inputValues.profiles"
+        :profileNames="profileNames"
+      />
+    </widget-field>
 
-          <widget-field
-            label="Filter"
-            icon="edit"
-          >
-            <q-select
-              v-model="inputValues.filter"
-              stack-label="Filter"
-              :options="filterOpts"
-            />
-            <q-input
-              v-model="inputValues.filterThreshold.value"
-              stack-label="Threshold"
-              type="number"
-            />
-          </widget-field>
+    <widget-field
+      label="Enabled"
+      icon="edit"
+    >
+      <q-toggle
+        v-model="inputValues.enabled"
+      />
+    </widget-field>
 
-          <widget-field
-            label="Kp / Ti / Td"
-            icon="edit"
-          >
-            <q-input
-              v-model="inputValues.kp.value"
-              :suffix="inputValues.kp.unitNotation"
-              stack-label="Kp"
-              type="number"
-            />
-            <q-input
-              v-model="inputValues.ti.value"
-              :suffix="inputValues.ti.unitNotation"
-              stack-label="Ti"
-              type="number"
-            />
-            <q-input
-              v-model="inputValues.td.value"
-              :suffix="inputValues.ti.unitNotation"
-              stack-label="Td"
-              type="number"
-            />
-          </widget-field>
+    <widget-field
+      label="Input / Output"
+      icon="edit"
+    >
+      <q-select
+        v-model="inputValues.inputId.id"
+        stack-label="Input"
+        clearable
+        :options="linkOpts(inputValues.inputId)"
+      />
+      <q-select
+        v-model="inputValues.outputId.id"
+        stack-label="Output"
+        clearable
+        :options="linkOpts(inputValues.outputId)"
+      />
+    </widget-field>
 
-        </q-card-main>
-      </q-card>
-    </q-carousel-slide>
-
-  </q-carousel>
+    <widget-field
+      label="Filter"
+      icon="edit"
+    >
+      <q-select
+        v-model="inputValues.filter"
+        stack-label="Filter"
+        :options="filterOpts"
+      />
+      <q-input
+        v-model="inputValues.filterThreshold.value"
+        stack-label="Threshold"
+        type="number"
+      />
+    </widget-field>
+  </div>
 </template>
 
 <style scoped>
+.calculation {
+  display: grid;
+  place-content: center;
+  grid-auto-flow: column;
+  grid-template-rows: auto auto auto auto;
+  grid-template-columns: auto auto auto auto auto auto;
+  grid-gap: 15px;
+}
+.calculation /deep/ .q-field-content {
+  padding-top: 6px;
+}
 </style>
 
