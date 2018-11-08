@@ -24,7 +24,6 @@ export default class PidWidget extends BlockWidget {
   }
 
   set block(block: PidBlock) {
-    console.log(block);
     this.saveBlock(block);
   }
 
@@ -213,10 +212,10 @@ export default class PidWidget extends BlockWidget {
                 class="col"
                 label="Kp"
               >
-              <editable-number
+              <UnitPopupEdit
                 label="Kp"
-                :block.sync="block"
-                keyName="kp"
+                :field="block.data.kp"
+                :change="v => { block.data.kp = v; this.saveBlock(); }"
               />
               </q-field>
               <q-field
@@ -224,10 +223,10 @@ export default class PidWidget extends BlockWidget {
                 class="col"
                 label="Ti"
               >
-               <editable-number
+               <UnitPopupEdit
                 label="Ti"
-                :block.sync="block"
-                keyName="ti"
+                :field="block.data.ti"
+                :change="v => { block.data.ti = v; this.saveBlock(); }"
               />
               </q-field>
               <q-field
@@ -235,10 +234,10 @@ export default class PidWidget extends BlockWidget {
                 class="col"
                 label="Td"
               >
-                <editable-number
+                <UnitPopupEdit
                   label="Td"
-                  :block.sync="block"
-                  keyName="td"
+                  :field="block.data.td"
+                  :change="v => { block.data.td = v; this.saveBlock(); }"
                 />
               </q-field>
             </q-card-main>

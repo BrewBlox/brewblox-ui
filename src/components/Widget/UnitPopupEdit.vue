@@ -1,55 +1,48 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import cloneDeep from 'lodash/cloneDeep';
+import { Unit } from '@/helpers/units';
 
 @Component({
   props: {
-    block: {
+    field: {
       type: Object,
       required: true,
     },
-    keyName: {
-      type: String,
+    change: {
+      type: Function,
       required: true,
     },
     label: {
       type: String,
       required: true,
-      default: '',
     },
   },
 })
 export default class EditableNumber extends Vue {
   placeholder = 0;
 
-  get blockData() {
-    console.log(this.$props.block.data);
-    return this.$props.block.data;
-  }
-
   get notation() {
-    return this.blockData[this.$props.keyName].notation;
+    return this.$props.field.notation;
   }
 
-  get value() {
-    return this.blockData[this.$props.keyName].value;
+  get initialValue() {
+    return this.$props.field.value;
   }
 
   startEdit() {
-    this.placeholder = this.blockData[this.$props.keyName].value;
+    this.placeholder = this.initialValue;
   }
   endEdit() {
-    const blockCopy = this.$props.block;
-    blockCopy.data[this.$props.keyName].value = this.placeholder;
-    this.$emit('updated:block', blockCopy);
+    const fieldCopy = new Unit(this.placeholder, this.$props.field.unit);
+    this.$props.change(fieldCopy);
   }
 }
 </script>
 
 <template>
   <div>
-    <big class="editable">{{ blockData[this.$props.keyName] | unit }}</big>
+    <big class="editable">{{ this.$props.field | unit }}</big>
     <q-popup-edit
       buttons
       persistent
