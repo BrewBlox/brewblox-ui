@@ -20,6 +20,10 @@ export interface QueryTarget {
   fields: string[];
 }
 
+export interface DisplayNames {
+  [key: string]: string;
+}
+
 export type Slice = number[];
 
 export interface QueryResult {
@@ -34,6 +38,8 @@ export interface Metric {
   transformer: (metric: Metric, result: QueryResult) => Metric;
   params: QueryParams;
   target: QueryTarget;
+  renames: DisplayNames;
   source?: EventSource;
   values?: any;
 }
+

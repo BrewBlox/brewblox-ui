@@ -12,7 +12,7 @@ import {
 } from '@/store/features/getters';
 import { displayNameById } from '@/store/providers/getters';
 import { typeName } from '@/plugins/history/store/getters';
-import { GraphConfig } from '@/plugins/history/features/Graph/state';
+import { GraphConfig } from '@/plugins/history/components/Graph/state';
 import FormBase from '@/components/Widget/FormBase';
 
 interface NavAction {
