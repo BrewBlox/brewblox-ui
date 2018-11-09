@@ -20,6 +20,10 @@ import Component from 'vue-class-component';
       type: String,
       default: 'text',
     },
+    display: {
+      type: String,
+      default: 'big',
+    },
   },
 })
 export default class InputPopupEdit extends Vue {
@@ -45,7 +49,7 @@ export default class InputPopupEdit extends Vue {
 
 <template>
   <div>
-    <big class="editable">{{ displayValue }}</big>
+    <component :is="$props.display" class="editable">{{ displayValue }}</component>
     <q-popup-edit
       buttons
       persistent

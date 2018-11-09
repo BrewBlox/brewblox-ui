@@ -22,6 +22,7 @@ import {
   createDashboardItem,
   saveDashboardItem,
   removeDashboardItem,
+  updateDashboardItemId,
 } from '@/store/dashboards/actions';
 import {
   validatorById,
@@ -134,6 +135,11 @@ export default class DashboardPage extends Vue {
 
   onChangeItemConfig(id: string, config: any) {
     updateDashboardItemConfig(this.$store, { id, config });
+  }
+
+  onChangeItemId(id: string, newId: string) {
+    updateDashboardItemId(this.$store, { id, newId })
+      .catch(e => this.$q.notify(`Failed to rename ${id}: ${e}`));
   }
 
   onStartCopyWidget() {
@@ -333,6 +339,7 @@ export default class DashboardPage extends Vue {
           :rows="val.item.rows"
           :config="val.item.config"
           :onConfigChange="onChangeItemConfig"
+          :onIdChange="onChangeItemId"
           :onDeleteItem="() => onDeleteItem(val.item)"
           :onCopyItem="() => onCopyItem(val.item)"
           :onMoveItem="() => onMoveItem(val.item)"

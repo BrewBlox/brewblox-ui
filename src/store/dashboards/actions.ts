@@ -74,6 +74,22 @@ const actions = {
   saveDashboardItem: async (context: DashboardContext, item: DashboardItem) =>
     setDashboardItemInStore(context, await persistDashboardItem(item)),
 
+  updateDashboardItemId: async (
+    context: DashboardContext,
+    { id, newId }: { id: string, newId: string },
+  ) => {
+    const item = getDashboardItemInStore(context, id);
+    const currentItemNewId = getDashboardItemInStore(context, newId);
+    if (!item) {
+      throw new Error(`Unable to rename ${id}: item does not exist`);
+    }
+    if (currentItemNewId) {
+      throw new Error(`An item with ID ${newId} already exists`);
+    }
+    actions.removeDashboardItem(context, { ...item });
+    actions.createDashboardItem(context, { ...item, id: newId });
+  },
+
   updateDashboardItemOrder: async (context: DashboardContext, itemIds: string[]) =>
     itemIds.forEach((id, index) => {
       const item = getDashboardItemInStore(context, id);
@@ -120,6 +136,7 @@ export const removeDashboard = dispatch(actions.removeDashboard);
 
 export const createDashboardItem = dispatch(actions.createDashboardItem);
 export const saveDashboardItem = dispatch(actions.saveDashboardItem);
+export const updateDashboardItemId = dispatch(actions.updateDashboardItemId);
 export const updateDashboardItemOrder = dispatch(actions.updateDashboardItemOrder);
 export const updateDashboardItemSize = dispatch(actions.updateDashboardItemSize);
 export const updateDashboardItemConfig = dispatch(actions.updateDashboardItemConfig);

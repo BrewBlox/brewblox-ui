@@ -7,6 +7,10 @@ import Component from 'vue-class-component';
       type: String,
       required: true,
     },
+    onIdChange: {
+      type: Function,
+      default: () => (id: string, newId: string) => { },
+    },
     type: {
       type: String,
       required: true,
@@ -35,5 +39,13 @@ export default class Widget extends Vue {
       'Widget ID': this.$props.id,
       'Feature type': this.$props.type,
     };
+  }
+
+  get widgetId() {
+    return this.$props.id;
+  }
+
+  set widgetId(newId: string) {
+    this.$props.onIdChange(this.widgetId, newId);
   }
 }

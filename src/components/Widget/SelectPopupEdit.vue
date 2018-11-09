@@ -20,6 +20,10 @@ import { Unit } from '@/helpers/units';
       type: String,
       required: true,
     },
+    display: {
+      type: String,
+      default: 'big',
+    },
   },
 })
 export default class SelectPopupEdit extends Vue {
@@ -44,7 +48,7 @@ export default class SelectPopupEdit extends Vue {
 
 <template>
   <div>
-    <big class="editable">{{ displayValue }}</big>
+    <component :is="$props.display" class="editable">{{ displayValue }}</component>
     <q-popup-edit
       buttons
       persistent
