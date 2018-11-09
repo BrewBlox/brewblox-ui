@@ -120,6 +120,7 @@ export default class GraphWizard extends Vue {
       layout: {},
       params: {},
       targets: [],
+      renames: {},
     };
   }
 

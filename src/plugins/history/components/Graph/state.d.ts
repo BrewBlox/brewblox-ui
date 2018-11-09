@@ -6,5 +6,5 @@ export interface GraphConfig {
   layout: Partial<Layout>;
   params: QueryParams;
   targets: QueryTarget[];
-  renames?: DisplayNames;
+  renames: DisplayNames;
 }
