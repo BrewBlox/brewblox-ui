@@ -45,7 +45,7 @@ export default class GraphCard extends Vue {
   }
 
   get serviceId(): string {
-    return this.graphCfg.serviceId || 'history';
+    return this.graphCfg.serviceId;
   }
 
   metricId(target: QueryTarget): string {

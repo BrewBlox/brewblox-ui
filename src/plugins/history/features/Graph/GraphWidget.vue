@@ -16,7 +16,7 @@ export default class GraphWidget extends WidgetBase {
 
   @Watch('graphCfg', { deep: true })
   regraph() {
-    (this.$refs.graph as any).resetMetrics();
+    this.$nextTick(() => (this.$refs.graph as any).resetMetrics());
   }
 }
 </script>
