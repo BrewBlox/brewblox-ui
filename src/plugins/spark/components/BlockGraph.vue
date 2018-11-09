@@ -34,13 +34,13 @@ export default class BlockGraph extends Vue {
 </script>
 
 <template>
-  <div class="column col">
+  <q-card-main class="column col full-height">
     <q-modal maximized v-model="modalOpen">
       <GraphCard v-if="modalOpen" :id="$props.id" :config="graphCfg"/>
     </q-modal>
     <q-field
       dark
-      class="col"
+      class="col items-center"
       label="Duration"
     >
       <InputPopupEdit
@@ -62,7 +62,7 @@ export default class BlockGraph extends Vue {
         @click="() => modalOpen = true"
       />
     </q-field>
-  </div>
+  </q-card-main>
 </template>
 
 <style>

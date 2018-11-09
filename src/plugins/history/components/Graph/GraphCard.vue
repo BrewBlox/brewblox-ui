@@ -99,9 +99,12 @@ export default class GraphCard extends Vue {
         removeMetric(this.$store, this.serviceId, metric));
   }
 
-  @Watch('graphCfg', { immediate: true, deep: true })
   resetMetrics() {
     this.removeMetrics();
+    this.addMetrics();
+  }
+
+  mounted() {
     this.addMetrics();
   }
 
@@ -112,14 +115,14 @@ export default class GraphCard extends Vue {
 </script>
 
 <template>
-    <GraphDisplay
-      v-if="!error"
-      :data="metricData"
-      :layout="metricLayout"
-    />
-    <div v-else class="alert-container">
-      <q-alert icon="warning" color="warning">{{ error }}</q-alert>
-    </div>
+  <GraphDisplay
+    v-if="!error"
+    :data="metricData"
+    :layout="metricLayout"
+  />
+  <div v-else class="alert-container">
+    <q-alert icon="warning" color="warning">{{ error }}</q-alert>
+  </div>
 </template>
 
 <style scoped>

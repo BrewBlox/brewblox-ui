@@ -37,9 +37,11 @@ export default class PidWidget extends BlockWidget {
     const serviceFmt = (val: string) => [this.serviceId, this.blockId, val].join('/');
 
     return {
+      // persisted in config
+      params: this.queryParams,
+      // constants
       serviceId: 'history',
       layout: {},
-      params: this.queryParams,
       targets: [
         {
           measurement: this.serviceId,
@@ -309,9 +311,7 @@ export default class PidWidget extends BlockWidget {
           </div>
         </q-carousel-slide>
         <q-carousel-slide>
-          <q-card-main>
-            <BlockGraph :id="$props.id" :config="graphCfg" :change="v => graphCfg = v"/>
-          </q-card-main>
+          <BlockGraph :id="$props.id" :config="graphCfg" :change="v => graphCfg = v"/>
         </q-carousel-slide>
       </q-carousel>
     </q-card>
