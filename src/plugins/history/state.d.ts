@@ -42,4 +42,3 @@ export interface Metric {
   source?: EventSource;
   values?: any;
 }
-
