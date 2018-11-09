@@ -1,12 +1,11 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { Unit } from '@/helpers/units';
 
 @Component({
   props: {
     field: {
-      type: Object,
+      type: [String, Number],
       required: true,
     },
     change: {
@@ -17,33 +16,36 @@ import { Unit } from '@/helpers/units';
       type: String,
       required: true,
     },
+    type: {
+      type: String,
+      default: 'text',
+    },
   },
 })
-export default class UnitPopupEdit extends Vue {
-  placeholder = 0;
+export default class InputPopupEdit extends Vue {
+  placeholder = null;
 
-  get notation() {
-    return this.$props.field.notation;
-  }
-
-  get initialValue() {
-    return this.$props.field.value;
+  get displayValue() {
+    const val = this.$props.field;
+    if (val === null || val === undefined || val === '') {
+      return '    ';
+    }
+    return val;
   }
 
   startEdit() {
-    this.placeholder = this.initialValue;
+    this.placeholder = this.$props.field;
   }
 
   endEdit() {
-    const fieldCopy = new Unit(this.placeholder, this.$props.field.unit);
-    this.$props.change(fieldCopy);
+    this.$props.change(this.placeholder);
   }
 }
 </script>
 
 <template>
   <div>
-    <big class="editable">{{ this.$props.field | unit }}</big>
+    <big class="editable">{{ displayValue }}</big>
     <q-popup-edit
       buttons
       persistent
@@ -53,8 +55,7 @@ export default class UnitPopupEdit extends Vue {
       @save="endEdit"
     >
       <q-input
-        type="number"
-        :suffix="this.notation"
+        :type="$props.type"
         v-model="placeholder"
       />
     </q-popup-edit>

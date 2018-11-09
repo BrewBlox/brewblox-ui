@@ -112,7 +112,7 @@ export default class GraphCard extends Vue {
 </script>
 
 <template>
-    <graph-display
+    <GraphDisplay
       v-if="!error"
       :data="metricData"
       :layout="metricLayout"

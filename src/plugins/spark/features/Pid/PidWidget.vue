@@ -4,18 +4,11 @@ import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import { saveBlock } from '@/plugins/spark/store/actions';
 import { PidBlock } from './state';
 import { getById, filters } from './getters';
-import { Watch } from 'vue-property-decorator';
 import FormBase from '@/components/Widget/FormBase';
 import { GraphConfig } from '@/plugins/history/components/Graph/state';
+import { QueryParams } from '@/plugins/history/state';
 
-@Component({
-  props: {
-    cols: {
-      type: Number,
-      required: true,
-    },
-  },
-})
+@Component
 export default class PidWidget extends BlockWidget {
   modalOpen: boolean = false;
   slideIndex: number = 0;
@@ -28,6 +21,17 @@ export default class PidWidget extends BlockWidget {
     this.saveBlock(block);
   }
 
+  get queryParams(): QueryParams {
+    return this.$props.config.queryParams || {
+      approxPoints: 200,
+      duration: '10m',
+    };
+  }
+
+  set queryParams(queryParams: QueryParams) {
+    this.$props.onConfigChange(this.$props.id, { ...this.$props.config, queryParams });
+  }
+
   get graphCfg(): GraphConfig {
     const blockFmt = (val: string) => [this.blockId, val].join('/');
     const serviceFmt = (val: string) => [this.serviceId, this.blockId, val].join('/');
@@ -35,26 +39,27 @@ export default class PidWidget extends BlockWidget {
     return {
       serviceId: 'history',
       layout: {},
-      params: {
-        approxPoints: 100,
-        duration: '10m',
-      },
+      params: this.queryParams,
       targets: [
         {
           measurement: this.serviceId,
           fields: [
-            blockFmt('p'),
-            blockFmt('i'),
-            blockFmt('d'),
+            blockFmt(`kp[${this.block.data.kp.unit}]`),
+            blockFmt(`ti[${this.block.data.ti.unit}]`),
+            blockFmt(`td[${this.block.data.td.unit}]`),
           ],
         },
       ],
       renames: {
-        [serviceFmt('p')]: 'P',
-        [serviceFmt('i')]: 'I',
-        [serviceFmt('d')]: 'D',
+        [serviceFmt(`kp[${this.block.data.kp.unit}]`)]: 'Kp',
+        [serviceFmt(`ti[${this.block.data.ti.unit}]`)]: 'Ti',
+        [serviceFmt(`td[${this.block.data.td.unit}]`)]: 'Td',
       },
     };
+  }
+
+  set graphCfg(config: GraphConfig) {
+    this.queryParams = { ...config.params };
   }
 
   get filterName() {
@@ -91,8 +96,8 @@ export default class PidWidget extends BlockWidget {
     this.formComponent.confirmChanges();
   }
 
-  onSlideChange(idx: number) {
-    this.slideIndex = idx;
+  saved(func: Function) {
+    return (v: any) => { func(v); this.saveBlock(); };
   }
 }
 </script>
@@ -142,7 +147,11 @@ export default class PidWidget extends BlockWidget {
         This PID is inactive
       </q-alert>
 
-      <q-carousel quick-nav ref="carousel" class="col" v-model="slideIndex">
+      <q-carousel
+        quick-nav
+        class="col"
+        v-model="slideIndex"
+      >
         <!-- Overview -->
         <q-carousel-slide>
           <div :class="['widget-body', horizontal ? 'row' : 'column']">
@@ -245,7 +254,7 @@ export default class PidWidget extends BlockWidget {
               <UnitPopupEdit
                 label="Kp"
                 :field="block.data.kp"
-                :change="v => { block.data.kp = v; this.saveBlock(); }"
+                :change="saved(v => block.data.kp = v)"
               />
               </q-field>
               <q-field
@@ -256,7 +265,7 @@ export default class PidWidget extends BlockWidget {
                <UnitPopupEdit
                 label="Ti"
                 :field="block.data.ti"
-                :change="v => { block.data.ti = v; this.saveBlock(); }"
+                :change="saved(v => block.data.ti = v)"
               />
               </q-field>
               <q-field
@@ -267,7 +276,7 @@ export default class PidWidget extends BlockWidget {
                 <UnitPopupEdit
                   label="Td"
                   :field="block.data.td"
-                  :change="v => { block.data.td = v; this.saveBlock(); }"
+                  :change="saved(v => block.data.td = v)"
                 />
               </q-field>
             </q-card-main>
@@ -278,64 +287,32 @@ export default class PidWidget extends BlockWidget {
                 class="col"
                 label="Filter"
               >
-                <big class="editable">{{ filterName }}</big>
-                <q-popup-edit
-                  buttons
-                  persistent
-                  title="Edit filter"
-                  v-model="placeholder"
-                  @show="() => startEdit(block.data, 'filter')"
-                  @save="() => endEdit(block.data, 'filter')"
-                >
-                  <q-select
-                    v-model="placeholder"
-                    :options="filterOpts"
-                  />
-                </q-popup-edit>
+                <SelectPopupEdit
+                  label="Filter"
+                  :field="block.data.filter"
+                  :change="saved(v => block.data.filter = v)"
+                  :options="filterOpts"
+                />
               </q-field>
               <q-field
                 dark
                 class="col"
                 label="Filter threshold"
               >
-                <big class="editable">{{ block.data.filterThreshold | unit }}</big>
-                <q-popup-edit
-                  buttons
-                  persistent
-                  title="Edit filter threshold"
-                  v-model="placeholder"
-                  @show="() => startEdit(block.data.filterThreshold, 'value')"
-                  @save="() => endEdit(block.data.filterThreshold, 'value')"
-                >
-                  <q-input
-                    type="number"
-                    :suffix="block.data.filterThreshold.unitNotation"
-                    v-model="placeholder"
-                  />
-                </q-popup-edit>
+                <UnitPopupEdit
+                  label="Filter threshold"
+                  :field="block.data.filterThreshold"
+                  :change="saved(v => block.data.filterThreshold = v)"
+                />
               </q-field>
             </q-card-main>
           </div>
         </q-carousel-slide>
         <q-carousel-slide>
-          <GraphCard ref="graph" v-if="subtitle === 'Graph'" :id="$props.id" :config="graphCfg"/>
+          <q-card-main>
+            <BlockGraph :id="$props.id" :config="graphCfg" :change="v => graphCfg = v"/>
+          </q-card-main>
         </q-carousel-slide>
-
-        <q-carousel-control
-          slot="control-button"
-          slot-scope="carousel"
-          position="bottom-right"
-          :offset="[18, 22]"
-        >
-          <q-btn
-            round dense push
-            color="amber"
-            v-if="subtitle === 'Graph'"
-            :icon="carousel.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-            @click="carousel.toggleFullscreen()"
-          />
-        </q-carousel-control>
-
       </q-carousel>
     </q-card>
   </div>
