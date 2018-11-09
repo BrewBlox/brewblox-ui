@@ -1,13 +1,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { Unit } from '@/helpers/units';
 
 @Component({
   props: {
     field: {
-      type: Object,
-      required: true,
+      type: Number,
+      required: false,
     },
     change: {
       type: Function,
@@ -19,31 +18,28 @@ import { Unit } from '@/helpers/units';
     },
   },
 })
-export default class UnitPopupEdit extends Vue {
-  placeholder = 0;
+export default class DatetimePopupEdit extends Vue {
+  placeholder = null;
 
-  get notation() {
-    return this.$props.field.notation;
-  }
-
-  get initialValue() {
-    return this.$props.field.value;
+  get dateString() {
+    return this.$props.field
+      ? new Date(this.$props.field).toLocaleString()
+      : '<not set>';
   }
 
   startEdit() {
-    this.placeholder = this.initialValue;
+    this.placeholder = this.$props.field;
   }
 
   endEdit() {
-    const fieldCopy = new Unit(this.placeholder, this.$props.field.unit);
-    this.$props.change(fieldCopy);
+    this.$props.change(this.placeholder);
   }
 }
 </script>
 
 <template>
   <div>
-    <big class="editable">{{ this.$props.field | unit }}</big>
+    <span class="editable">{{ dateString }}</span>
     <q-popup-edit
       buttons
       persistent
@@ -52,10 +48,18 @@ export default class UnitPopupEdit extends Vue {
       @show="startEdit"
       @save="endEdit"
     >
-      <q-input
-        type="number"
-        :suffix="this.notation"
+      <q-datetime
+        dark
+        format24h
+        clearable
+        type="datetime"
         v-model="placeholder"
+        :after="[
+          {
+            icon: 'restore',
+            handler: () => placeholder = new Date().getTime(),
+          }
+        ]"
       />
     </q-popup-edit>
   </div>

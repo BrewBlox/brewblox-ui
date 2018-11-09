@@ -21,6 +21,7 @@ export default class GraphForm extends HistoryForm {
     return {
       params: { path: 'params', default: {} },
       targets: { path: 'targets', default: [] },
+      renames: { path: 'renames', default: {} },
     };
   }
 
@@ -104,6 +105,20 @@ export default class GraphForm extends HistoryForm {
           },
         ],
       ));
+  }
+
+  fieldRename(target: QueryTarget, field: string) {
+    const key = `${target.measurement}/${field}`;
+    return this.inputValues.renames[`${target.measurement}/${field}`] || key;
+  }
+
+  changeFieldRename(target: QueryTarget, field: string, name: string) {
+    const key = `${target.measurement}/${field}`;
+    if (!name || name === key) {
+      this.$delete(this.inputValues.renames, key);
+    } else {
+      this.$set(this.inputValues.renames, key, name);
+    }
   }
 }
 </script>
@@ -208,6 +223,12 @@ export default class GraphForm extends HistoryForm {
               icon="delete"
               label="Remove field"
               @click="removeField(target, fieldIdx)"
+            />
+            <q-input
+              clearable
+              stack-label="Display name"
+              :value="fieldRename(target, field)"
+              @input="v => changeFieldRename(target, field, v)"
             />
           </div>
           <q-btn

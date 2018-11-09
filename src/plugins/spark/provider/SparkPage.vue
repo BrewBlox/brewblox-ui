@@ -114,6 +114,10 @@ export default class SparkPage extends Vue {
         dashboard && createDashboardItem(this.$store, { ...item, id, dashboard }))
       .catch(() => { });
   }
+
+  onConfigChange() {
+    this.$q.notify('Widget configuration can\'t be saved in this page');
+  }
 }
 </script>
 
@@ -162,6 +166,7 @@ export default class SparkPage extends Vue {
           :cols="item.cols"
           :rows="item.rows"
           :config="item.config"
+          :onConfigChange="onConfigChange"
           :onDeleteItem="() => onDeleteItem(item)"
           :onCopyItem="() => onCopyItem(item)"
         />

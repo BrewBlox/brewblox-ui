@@ -48,6 +48,7 @@ import Quasar, {
   QCollapsible,
   QCarousel,
   QCarouselSlide,
+  QCarouselControl,
   QPopupEdit,
 } from 'quasar';
 
@@ -105,6 +106,7 @@ Vue.use(Quasar, {
     QCollapsible,
     QCarousel,
     QCarouselSlide,
+    QCarouselControl,
     QPopupEdit,
   },
   directives: { Ripple, CloseOverlay },
