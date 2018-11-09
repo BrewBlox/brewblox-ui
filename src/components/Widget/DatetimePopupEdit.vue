@@ -16,6 +16,10 @@ import Component from 'vue-class-component';
       type: String,
       required: true,
     },
+    display: {
+      type: String,
+      default: 'span',
+    },
   },
 })
 export default class DatetimePopupEdit extends Vue {
@@ -39,7 +43,7 @@ export default class DatetimePopupEdit extends Vue {
 
 <template>
   <div>
-    <span class="editable">{{ dateString }}</span>
+    <component :is="$props.display" class="editable">{{ dateString }}</component>
     <q-popup-edit
       buttons
       persistent
