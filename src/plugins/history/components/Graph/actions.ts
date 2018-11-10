@@ -1,6 +1,12 @@
 import { RootStore } from '@/store/state';
 import { addMetric } from '@/plugins/history/store/actions';
-import { QueryParams, Metric, QueryResult, QueryTarget } from '@/plugins/history/state';
+import {
+  QueryParams,
+  Metric,
+  QueryResult,
+  QueryTarget,
+  DisplayNames,
+} from '@/plugins/history/state';
 import parseDuration from 'parse-duration';
 
 export { removeMetric } from '@/plugins/history/store/actions';
@@ -43,7 +49,7 @@ const transformer = (
         metric.values[key] = {
           type: 'scatter',
           ...value,
-          name: key,
+          name: metric.renames[key] || key,
           x: boundedConcat(value.x, time),
           y: boundedConcat(value.y, resultCols[idx]),
         };
@@ -75,6 +81,7 @@ export const addPlotlyMetric = async (
   id: string,
   serviceId: string,
   params: QueryParams,
+  renames: DisplayNames,
   target: QueryTarget,
 ) => {
   if (target.fields.length > 0) {
@@ -84,6 +91,7 @@ export const addPlotlyMetric = async (
       transformer,
       params,
       target,
+      renames,
       values: {},
     });
   }

@@ -75,6 +75,7 @@ export default class GraphDisplay extends Vue {
 
 <template>
   <Plotly
+    fit
     v-if="ready"
     :data="plotlyData"
     :layout="plotlyLayout"

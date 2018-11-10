@@ -7,7 +7,8 @@ const prettify = (v: string) => v
   .replace(/seconds?/gi, 's')
   .replace(/minutes?/gi, 'm')
   .replace(/hours?/gi, 'h')
-  .replace(/ \/ /gi, '/');
+  .replace(/ \/ /gi, '/')
+  .replace(/ \* /gi, '*');
 
 export default class Unit {
   value: number;
