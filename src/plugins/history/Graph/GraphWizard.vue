@@ -2,8 +2,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { dashboardItemById } from '@/store/dashboards/getters';
-import { serviceValues } from '@/store/services/getters';
-import { Service } from '@/store/services/state';
 import { DashboardItem } from '@/store/dashboards/state';
 import {
   widgetSizeById,
@@ -11,8 +9,7 @@ import {
   displayNameById as featureNameById,
 } from '@/store/features/getters';
 import { displayNameById } from '@/store/providers/getters';
-import { typeName } from '@/plugins/history/store/getters';
-import { GraphConfig } from '@/plugins/history/components/Graph/state';
+import { GraphConfig } from '@/components/Graph/state';
 import FormBase from '@/components/Widget/FormBase';
 
 interface NavAction {
@@ -40,7 +37,6 @@ interface NavAction {
 export default class GraphWizard extends Vue {
   currentStep: string = '';
   widgetId: string = '';
-  service: Service | null = null;
   graphCfg: GraphConfig | null = null;
 
   get navigation(): { [id: string]: NavAction[] } {
@@ -57,7 +53,7 @@ export default class GraphWizard extends Vue {
             this.graphCfg = this.placeholderConfig();
             this.stepper.goToStep('config');
           },
-          enabled: () => !this.widgetIdError && this.service !== null,
+          enabled: () => !this.widgetIdError,
         },
       ],
       config: [
@@ -87,15 +83,6 @@ export default class GraphWizard extends Vue {
     return this.$refs.stepper;
   }
 
-  get serviceOpts() {
-    return serviceValues(this.$store)
-      .filter(service => service.type === typeName)
-      .map(service => ({
-        label: service.title,
-        value: service,
-      }));
-  }
-
   get widgetIdError() {
     if (!this.widgetId) {
       return 'Name must not be empty';
@@ -116,7 +103,6 @@ export default class GraphWizard extends Vue {
 
   placeholderConfig(): GraphConfig {
     return {
-      serviceId: (this.service as Service).id,
       layout: {},
       params: {},
       targets: [],
@@ -125,7 +111,6 @@ export default class GraphWizard extends Vue {
   }
 
   createWidget() {
-    const service = this.service as Service;
     const item: Partial<DashboardItem> = {
       id: this.widgetId,
       widget: this.$props.featureId,
@@ -137,7 +122,6 @@ export default class GraphWizard extends Vue {
 
   mounted() {
     this.widgetId = '';
-    this.service = null;
     this.stepper.reset();
   }
 }
@@ -167,21 +151,6 @@ export default class GraphWizard extends Vue {
           :suffix="widgetIdError"
         />
       </q-field>
-
-      <q-field
-        label="Service"
-        icon="create"
-        orientation="vertical"
-      >
-        <q-option-group
-          dark
-          type="radio"
-          v-model="service"
-          :options="serviceOpts"
-          @input="() => { block = null; }"
-        />
-      </q-field>
-
     </q-step>
 
 

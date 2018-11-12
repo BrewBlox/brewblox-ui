@@ -124,7 +124,6 @@
       "widget": "Graph",
       "dashboard": "metrics",
       "config": {
-        "serviceId": "history",
         "layout": {},
         "params": {
           "duration": "10m",
@@ -157,7 +156,6 @@
       "widget": "Graph",
       "dashboard": "metrics",
       "config": {
-        "serviceId": "history",
         "layout": {},
         "params": [],
         "renames": {}
@@ -228,13 +226,6 @@
       "title": "Spark Controller 'spock'",
       "order": 2,
       "type": "Spark",
-      "config": {}
-    },
-    {
-      "id": "history",
-      "title": "The Librarian",
-      "order": 3,
-      "type": "History",
       "config": {}
     }
   ]

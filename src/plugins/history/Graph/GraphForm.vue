@@ -1,21 +1,31 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import { uniqueFilter } from '@/helpers/functional';
-import HistoryForm from '@/plugins/history/components/HistoryForm';
+import { Notify } from 'quasar';
+import FormBase from '@/components/Widget/FormBase';
 import WidgetField from '@/components/Widget/WidgetField.vue';
-import { QueryParams, QueryTarget } from '@/plugins/history/state';
+import { toShadow, fromShadow, ShadowMapping, deepCopy } from '@/helpers/shadow-copy';
+import { uniqueFilter } from '@/helpers/functional';
+import { QueryParams, QueryTarget } from '@/store/history/state';
 import {
   fields as availableFields,
   measurements as availableMeasurements,
-} from '@/plugins/history/store/getters';
+} from '@/store/history/getters';
+import { fetchKnownKeys } from '@/store/history/actions';
 
 @Component({
   components: {
     WidgetField,
   },
+  props: {
+    value: {
+      type: Object,
+      required: true,
+    },
+  },
 })
-export default class GraphForm extends HistoryForm {
+export default class GraphForm extends FormBase {
   $q: any;
+  vals: { [key: string]: any; } = {};
 
   get inputMapping() {
     return {
@@ -25,13 +35,56 @@ export default class GraphForm extends HistoryForm {
     };
   }
 
+  get inputValues(): { [key: string]: any; } {
+    return this.vals;
+  }
+
+  set inputValues(values: { [key: string]: any; }) {
+    this.vals = values;
+  }
+
+  get config() {
+    return this.$props.value;
+  }
+
+  set config(config: any) {
+    this.$emit('input', config);
+  }
+
+  get changed(): boolean {
+    const state = toShadow(this.config, this.inputMapping);
+    return JSON.stringify(state) !== JSON.stringify(this.inputValues);
+  }
+
   get hasTargets() {
     return this.inputValues.targets
       && this.inputValues.targets.length > 0;
   }
 
   get knownFields() {
-    return availableFields(this.$store, this.config.serviceId);
+    return availableFields(this.$store);
+  }
+
+  reset() {
+    this.inputValues = deepCopy(toShadow(this.config, this.inputMapping));
+    fetchKnownKeys(this.$store);
+  }
+
+  cancelChanges() {
+    this.reset();
+  }
+
+  confirmChanges() {
+    this.config = fromShadow(
+      this.inputValues,
+      this.inputMapping,
+      { ...this.config },
+    );
+    Notify.create({
+      type: 'positive',
+      position: 'bottom',
+      message: 'Saved changes',
+    });
   }
 
   fieldSections = (field: string) =>
@@ -90,7 +143,7 @@ export default class GraphForm extends HistoryForm {
       options: {
         type: 'radio',
         model: 'opt2',
-        items: availableMeasurements(this.$store, this.config.serviceId)
+        items: availableMeasurements(this.$store)
           .map(m => ({ label: m, value: m })),
       },
     }).then((m: string) =>
@@ -256,7 +309,7 @@ export default class GraphForm extends HistoryForm {
 </template>
 
 <style scoped lang="stylus">
-@import '../../../../../src/css/app.styl';
+@import '../../../../src/css/app.styl';
 
 .options-edit-container > .q-icon {
   margin: 0 15px 0 5px;

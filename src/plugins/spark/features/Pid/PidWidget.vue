@@ -5,8 +5,8 @@ import { saveBlock } from '@/plugins/spark/store/actions';
 import { PidBlock } from './state';
 import { getById, filters } from './getters';
 import FormBase from '@/components/Widget/FormBase';
-import { GraphConfig } from '@/plugins/history/components/Graph/state';
-import { QueryParams } from '@/plugins/history/state';
+import { GraphConfig } from '@/components/Graph/state';
+import { QueryParams } from '@/store/history/state';
 
 @Component
 export default class PidWidget extends BlockWidget {
@@ -40,7 +40,6 @@ export default class PidWidget extends BlockWidget {
       // persisted in config
       params: this.queryParams,
       // constants
-      serviceId: 'history',
       layout: {},
       targets: [
         {

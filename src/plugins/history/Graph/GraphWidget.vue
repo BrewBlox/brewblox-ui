@@ -1,7 +1,7 @@
 <script lang="ts">
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
-import { GraphConfig } from '@/plugins/history/components/Graph/state';
+import { GraphConfig } from '@/components/Graph/state';
 import { Watch } from 'vue-property-decorator';
 
 @Component
