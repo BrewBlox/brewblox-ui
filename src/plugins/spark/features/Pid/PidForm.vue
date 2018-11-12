@@ -35,63 +35,6 @@ export default class PidForm extends BlockForm {
   <div class="pid-modal">
     <q-card>
       <q-card-title>
-        PID explained
-      </q-card-title>
-      <q-card-main>
-        <p>
-          A PID block can drives its output to regulate its input.
-          The input is a process value, in most cases this will be a pair of a setpoint and sensor.
-          The difference between the setpoint and the sensor is called the <i>error</i>.
-        </p>
-        <p>
-         The output value is the sum of 3 parts derived from the error: proportional, integral and derivative.<br />
-        </p>
-        <div class="q-subheading">Proportional</div>
-        <p>
-          The proportonial part is, as you'd expect, proportional to the error.
-          This should be the main driver of the output value.
-        </p>
-        <div class="q-subheading">Integral</div>
-        <p>
-          Each second, the current value of the error is added to the integral.
-          When the proportional part brings the input close to the target value but a small error remains,
-          this small error will slowly build up in the integral.
-          This increases the output until the error becomes zero.
-          This is the purpose of the integral part of PID, to correct <i>steady state errors</i>.
-        </p>
-        <p>
-          It will take Ti seconds for the integral part to become as large as the proportional part.
-          If Ti is too small, the integral will do work that should be hanlded by the proportional part.
-          Because the integral is slow to increase <i>and decrease</i>,
-          a low Ti can cause too much actuator action after reaching the setpoint.<br />
-        </p>
-        <p>
-          Setting Ti to zero will disable the integrator.
-        </p>
-        <div class="q-subheading">Derivative</div>
-        <p>
-          Td can be seen as the duration of the overshoot that can be expected due to inertia in the system.
-          The role of the derivative part is to prevent this overshoot.
-          If the input is quickly approaching the target, the derivative can decrease the output for a slower approach.
-        </p>
-        <p>
-          When there is no overshoot in the system, Td should be set to zero.
-        </p>
-
-        <div class="q-subheading">Filtering</div>
-        <p>
-          The error value is passed through a filter to remove noise, spikes and sudden jumps.<br />
-          The amount of filtering can be configured.
-          You should set the filter to the minimum duration of signal changes that you wish to let through unfiltered.
-        </p>
-        <p>
-          The filter can detect steps in the input signal and temporarily respond faster.
-          The threshold for steps that trigger this faster response can be configured too.
-        </p>
-      </q-card-main>
-    </q-card>
-    <q-card>
-      <q-card-title>
         PID calculation
       </q-card-title>
       <q-card-main class="calculation">
@@ -314,6 +257,63 @@ export default class PidForm extends BlockForm {
         />
       </widget-field>
     </q-card>
+    <q-card>
+      <q-card-title>
+        The PID block
+      </q-card-title>
+      <q-card-main>
+        <p>
+          A PID block can drives its output to regulate its input.
+          The input is a process value, in most cases this will be a pair of a setpoint and sensor.
+          The difference between the setpoint and the sensor is called the <i>error</i>.
+        </p>
+        <p>
+         The output value is the sum of 3 parts derived from the error: proportional, integral and derivative.<br />
+        </p>
+        <div class="q-subheading">Proportional</div>
+        <p>
+          The proportonial part is, as you'd expect, proportional to the error.
+          This should be the main driver of the output value.
+        </p>
+        <div class="q-subheading">Integral</div>
+        <p>
+          Each second, the current value of the error is added to the integral.
+          When the proportional part brings the input close to the target value but a small error remains,
+          this small error will slowly build up in the integral.
+          This increases the output until the error becomes zero.
+          This is the purpose of the integral part of PID, to correct <i>steady state errors</i>.
+        </p>
+        <p>
+          It will take Ti seconds for the integral part to become as large as the proportional part.
+          If Ti is too small, the integral will do work that should be hanlded by the proportional part.
+          Because the integral is slow to increase <i>and decrease</i>,
+          a low Ti can cause too much actuator action after reaching the setpoint.<br />
+        </p>
+        <p>
+          Setting Ti to zero will disable the integrator.
+        </p>
+        <div class="q-subheading">Derivative</div>
+        <p>
+          Td can be seen as the duration of the overshoot that can be expected due to inertia in the system.
+          The role of the derivative part is to prevent this overshoot.
+          If the input is quickly approaching the target, the derivative can decrease the output for a slower approach.
+        </p>
+        <p>
+          When there is no overshoot in the system, Td should be set to zero.
+        </p>
+
+        <div class="q-subheading">Filtering</div>
+        <p>
+          The error value is passed through a filter to remove noise, spikes and sudden jumps.<br />
+          The amount of filtering can be configured.
+          You should set the filter to the minimum duration of signal changes that you wish to let through unfiltered.
+        </p>
+        <p>
+          The filter can detect steps in the input signal and temporarily respond faster.
+          The threshold for steps that trigger this faster response can be configured too.
+        </p>
+      </q-card-main>
+    </q-card>
   </div>
 </template>
 
@@ -322,11 +322,14 @@ export default class PidForm extends BlockForm {
 .pid-modal {
   display: flex;
   flex-wrap: wrap;
-
+  max-width: 800px;
+  align-items: center;
+  margin: auto;
 }
 .q-card {
   min-width: 400px;
   max-width: 800px;
+  width: 100%;
 }
 
 .section {
