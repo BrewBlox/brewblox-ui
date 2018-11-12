@@ -32,6 +32,10 @@
     // for eslint + typescript to work:
     "typescript/no-unused-vars": 1,
     "space-infix-ops": 0,
-    "indent": 0
+    "indent": 0,
+    "max-len": [1, 120, 2, {
+      "ignoreUrls": true,
+      "ignoreComments": false
+    }]
   }
 }
