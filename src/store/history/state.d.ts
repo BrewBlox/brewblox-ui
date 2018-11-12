@@ -1,9 +1,5 @@
-import { Service } from '@/store/services/state';
-import { DashboardItem } from '@/store/dashboards/state';
-
-export interface History extends Service {
-  config: {};
-}
+import { ActionContext } from 'vuex';
+import { RootState } from '@/store/state';
 
 export interface QueryParams {
   database?: string;
@@ -34,7 +30,6 @@ export interface QueryResult {
 
 export interface Metric {
   id: string;
-  serviceId: string;
   transformer: (metric: Metric, result: QueryResult) => Metric;
   params: QueryParams;
   target: QueryTarget;
@@ -42,3 +37,14 @@ export interface Metric {
   source?: EventSource;
   values?: any;
 }
+
+export type HistoryState = {
+  availableFields: {
+    [measurement: string]: string[];
+  };
+  metrics: {
+    [id: string]: Metric;
+  };
+};
+
+export type HistoryContext = ActionContext<HistoryState, RootState>;

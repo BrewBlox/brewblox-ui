@@ -3,8 +3,8 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
 import GraphDisplay from './GraphDisplay.vue';
-import { metricById, tryMetricById } from '@/plugins/history/store/getters';
-import { Metric, QueryParams, QueryTarget, DisplayNames } from '@/plugins/history/state';
+import { metricById, tryMetricById } from '@/store/history/getters';
+import { Metric, QueryParams, QueryTarget, DisplayNames } from '@/store/history/state';
 import { GraphConfig } from './state';
 import { addPlotlyMetric, removeMetric } from './actions';
 import { PlotData, Layout } from 'plotly.js';
@@ -44,27 +44,19 @@ export default class GraphCard extends Vue {
     return this.graphCfg.renames || {};
   }
 
-  get serviceId(): string {
-    return this.graphCfg.serviceId;
-  }
-
   metricId(target: QueryTarget): string {
     return `${this.$props.id}/${target.measurement}`;
   }
 
   get metrics(): Metric[] {
     return this.targets
-      .map(target => tryMetricById(this.$store, this.serviceId, this.metricId(target)))
+      .map(target => tryMetricById(this.$store, this.metricId(target)))
       .filter(metric => metric !== null) as Metric[];
   }
 
   get error() {
     if (this.metrics.length === 0) {
       return 'No data';
-    }
-
-    if (!serviceExists(this.$store, this.serviceId)) {
-      return `Service ${this.serviceId} not available`;
     }
 
     return null;
@@ -86,7 +78,6 @@ export default class GraphCard extends Vue {
         addPlotlyMetric(
           this.$store,
           this.metricId(target),
-          this.serviceId,
           this.params,
           this.renames,
           target,
@@ -96,7 +87,7 @@ export default class GraphCard extends Vue {
   removeMetrics() {
     this.metrics
       .forEach(metric =>
-        removeMetric(this.$store, this.serviceId, metric));
+        removeMetric(this.$store, metric));
   }
 
   resetMetrics() {
