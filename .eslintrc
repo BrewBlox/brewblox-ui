@@ -32,6 +32,8 @@
     // for eslint + typescript to work:
     "typescript/no-unused-vars": 1,
     "space-infix-ops": 0,
-    "indent": 0
+    "indent": 0,
+    "no-redeclare": 0,
+    "no-shadow": 0
   }
 }

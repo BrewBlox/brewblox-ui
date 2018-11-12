@@ -24,6 +24,11 @@ module.exports = {
     config.resolve.alias
       .set('quasar', 'quasar-framework/dist/quasar.mat.esm');
 
+    // We're only using a subset from plotly
+    // Add alias to enable typing regardless
+    config.resolve.alias
+      .set('plotly.js', 'plotly.js-basic-dist');
+
     // enable ts checking
     config.module
       .rule('ts')
