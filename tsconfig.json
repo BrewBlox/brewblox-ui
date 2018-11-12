@@ -9,6 +9,7 @@
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
+    "allowJs": true,
     "baseUrl": ".",
     "types": [
       "node",
@@ -18,9 +19,6 @@
     "paths": {
       "@/*": [
         "src/*"
-      ],
-      "plotly.js": [
-        "../node_modules/plotly.js-basic-dist"
       ]
     }
   },

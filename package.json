@@ -5,6 +5,7 @@
   "author": "Elco Jacobs / BrewPi B.V.",
   "repository": "https://github.com/BrewBlox/brewblox-ui",
   "license": "GPL-3.0",
+  "sideEffects": false,
   "scripts": {
     "spark:obj": "cat mocks/config/seed_objects.json | mocks/reset-objects.sh",
     "spark:sparkey": "npm run spark:obj -- http://localhost:9000/sparkey",
@@ -42,7 +43,6 @@
     "vue": "^2.5.17",
     "vue-class-component": "^6.3.2",
     "vue-i18n": "^8.3.1",
-    "vue-plotly.js": "^1.1.0",
     "vue-property-decorator": "^7.2.0",
     "vue-router": "^3.0.1",
     "vue-svg-loader": "^0.9.0",

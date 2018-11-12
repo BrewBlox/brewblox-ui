@@ -2,7 +2,7 @@
 import { merge } from 'lodash';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import createPlotlyComponent from 'vue-plotly.js/factory';
+import PlotlyFactory from './plotly-factory.js';
 import Plotly, { PlotData } from 'plotly.js';
 
 @Component({
@@ -17,7 +17,7 @@ import Plotly, { PlotData } from 'plotly.js';
     },
   },
   components: {
-    Plotly: createPlotlyComponent(Plotly),
+    Plotly: PlotlyFactory(Plotly),
   },
 })
 export default class GraphDisplay extends Vue {
