@@ -7,9 +7,9 @@
   "license": "GPL-3.0",
   "sideEffects": false,
   "scripts": {
-    "spark:obj": "cat mocks/config/seed_objects.json | mocks/reset-objects.sh",
-    "spark:sparkey": "npm run spark:obj -- http://localhost:9000/sparkey",
-    "spark:spock": "npm run spark:obj -- http://localhost:9000/spock",
+    "spark:obj": "bash mocks/reset-objects.sh mocks/config/seed_objects.json",
+    "spark:sparkey": "npm run spark:obj -- sparkey",
+    "spark:spock": "npm run spark:obj -- spock",
     "spark:reset": "npm run spark:sparkey && npm run spark:spock",
     "compose:down": "docker-compose down",
     "compose:up": "docker-compose up -d",
