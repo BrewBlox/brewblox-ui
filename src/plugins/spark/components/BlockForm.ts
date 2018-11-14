@@ -5,7 +5,7 @@ import { Block } from '@/plugins/spark/state';
 import { toShadow, fromShadow, ShadowMapping, deepCopy } from '@/helpers/shadow-copy';
 import { uniqueFilter } from '@/helpers/functional';
 import { profileNames, compatibleBlocks } from '@/plugins/spark/store/getters';
-import { fetchCompatibleBlocks } from '@/plugins/spark/store/actions';
+import { fetchCompatibleBlocks, saveBlock } from '@/plugins/spark/store/actions';
 import { Link } from '@/helpers/units';
 
 @Component
@@ -53,6 +53,12 @@ export default class BlockForm extends FormBase {
   onBlockUpdate() {
     this.afterBlockFetch();
   }
+
+  saveBlock(block: Block = this.block) {
+    saveBlock(this.$store, this.block.serviceId, block);
+  }
+
+  // TODO: remove everything below when obsolete after refactor
 
   cancelChanges() {
     this.reset();

@@ -54,7 +54,6 @@ export default class WidgetModal extends Vue {
 <template>
   <q-modal
     v-model="modalOpen"
-    :content-css="{ minWidth: '80vw', maxHeight: '80vh' }"
   >
     <q-modal-layout>
 

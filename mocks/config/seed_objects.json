@@ -164,7 +164,7 @@
     ],
     "type": "Pid",
     "data": {
-      "inputId<>": "sensor-1",
+      "inputId<>": "setpoint-sensor-pair-1",
       "outputId<>": "actuator-1",
       "inputValid": true,
       "outputValid": true,

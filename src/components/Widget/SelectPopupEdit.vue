@@ -24,12 +24,34 @@ import { Unit } from '@/helpers/units';
       type: String,
       default: 'big',
     },
+    multiple: {
+      type: Boolean,
+      default: false,
+    },
   },
 })
 export default class SelectPopupEdit extends Vue {
-  placeholder = null;
+  plc = null;
+
+  get placeholder() {
+    if (this.$props.multiple && this.plc === null) {
+      return [];
+    }
+    return this.plc;
+  }
+
+  set placeholder(v: any) {
+    this.plc = v;
+  }
 
   get displayValue() {
+    if (this.$props.multiple) {
+      const text = this.$props.field
+        .map((v: any) => this.$props.options.find((opt: any) => opt.value === v))
+        .map((v: any) => v.label)
+        .join(', ');
+      return text || '-';
+    }
     return (this.$props.options
       .find((opt: any) => opt.value === this.$props.field)
       || { label: '-' })
@@ -58,6 +80,7 @@ export default class SelectPopupEdit extends Vue {
       @save="endEdit"
     >
       <q-select
+        :multiple="$props.multiple"
         v-model="placeholder"
         :options="$props.options"
       />

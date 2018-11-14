@@ -4,29 +4,29 @@ import BlockForm from '@/plugins/spark/components/BlockForm';
 import { Unit } from '@/helpers/units';
 import { ProcessValueLink, ActuatorAnalogLink } from '@/helpers/units/KnownLinks';
 import { filters } from './getters';
+import { Block } from '@/plugins/spark/state';
+import { PidBlock } from '@/plugins/spark/features/Pid/state';
 
 @Component
 export default class PidForm extends BlockForm {
-  get inputMapping() {
-    return {
-      profiles: { path: 'profiles', default: [] },
-      inputId: { path: 'data.inputId', default: new ProcessValueLink(null) },
-      outputId: { path: 'data.outputId', default: new ActuatorAnalogLink(null) },
-      filter: { path: 'data.filter', default: 0 },
-      filterThreshold: { path: 'data.filterThreshold', default: new Unit(0, 'delta_degC') },
-      enabled: { path: 'data.enabled', default: false },
-      kp: { path: 'data.kp', default: new Unit(0, 'celsius') },
-      ti: { path: 'data.ti', default: new Unit(0, 'second') },
-      td: { path: 'data.td', default: new Unit(0, 'second') },
-    };
-  }
-
   get filterOpts() {
     return filters.map((filter, idx) => ({ label: filter, value: idx }));
   }
 
-  afterBlockFetch() {
-    this.fetchCompatibleToInputLinks();
+  get profileOpts() {
+    return this.profileNames.map((v, idx) => ({ label: v, value: idx }));
+  }
+
+  saved(func: Function) {
+    return (v: any) => {
+      func(v);
+      this.saveBlock(this.block);
+    };
+  }
+
+  changeEnabled(v: boolean) {
+    (this.block as PidBlock).data.enabled = v;
+    this.saveBlock(this.block);
   }
 }
 </script>
@@ -119,7 +119,7 @@ export default class PidForm extends BlockForm {
         <UnitPopupEdit
           label="Kp"
           :field="block.data.kp"
-          :change="v => { block.data.kp = v; this.saveBlock(); }"
+          :change="saved(v => block.data.kp = v)"
         />
       </q-field>
       <q-field
@@ -129,7 +129,7 @@ export default class PidForm extends BlockForm {
         <UnitPopupEdit
         label="Ti"
         :field="block.data.ti"
-        :change="v => { block.data.ti = v; this.saveBlock(); }"
+        :change="saved(v => block.data.ti = v)"
       />
       </q-field>
       <q-field
@@ -139,7 +139,7 @@ export default class PidForm extends BlockForm {
         <UnitPopupEdit
           label="Td"
           :field="block.data.td"
-          :change="v => { block.data.td = v; this.saveBlock(); }"
+          :change="saved(v => block.data.td = v)"
         />
       </q-field>
       <div />
@@ -192,70 +192,82 @@ export default class PidForm extends BlockForm {
       </q-card-main>
     </q-card>
     <q-card>
-      <widget-field
-        label="Active profiles"
-        icon="settings_input_component"
-      >
-        <profiles-bar
-          v-model="inputValues.profiles"
-          :profileNames="profileNames"
-        />
-      </widget-field>
+      <q-card-title>
+        Input and output
+      </q-card-title>
+      <q-card-main class="input-output">
+        <q-field
+          label="Input"
+        >
+          <LinkPopupEdit
+            label="Input"
+            :field="block.data.inputId"
+            :serviceId="block.serviceId"
+            :change="saved(v => block.data.inputId = v)"
+          />
+        </q-field>
 
-      <widget-field
-        label="Enabled"
-        icon="edit"
-      >
-        <q-toggle
-          v-model="inputValues.enabled"
-        />
-      </widget-field>
+        <q-field
+          label="Output"
+        >
+          <LinkPopupEdit
+            label="Output"
+            :field="block.data.outputId"
+            :serviceId="block.serviceId"
+            :change="saved(v => block.data.outputId = v)"
+          />
+        </q-field>
 
-      <widget-field
-        label="Input / Output"
-        icon="edit"
-      >
-        <q-select
-          v-model="inputValues.inputId.id"
-          stack-label="Input"
-          clearable
-          :options="linkOpts(inputValues.inputId)"
-        />
-        <q-select
-          v-model="inputValues.outputId.id"
-          stack-label="Output"
-          clearable
-          :options="linkOpts(inputValues.outputId)"
-        />
-      </widget-field>
-
-       <q-field
-        label="Filter"
-        orientation="vertical"
-      >
-        <SelectPopupEdit
+        <q-field
+          class="col"
           label="Filter"
-          :field="inputValues.filter"
-          :options="filterOpts"
-          :change="v => { block.data.kp = v; this.saveBlock(); }"
-        />
-      </q-field>
+        >
+          <SelectPopupEdit
+            label="Filter"
+            :field="block.data.filter"
+            :change="saved(v => block.data.filter = v)"
+            :options="filterOpts"
+          />
+        </q-field>
 
-      <widget-field
-        label="Filter"
-        icon="edit"
-      >
-        <q-select
-          v-model="inputValues.filter"
-          stack-label="Filter"
-          :options="filterOpts"
-        />
-        <q-input
-          v-model="inputValues.filterThreshold.value"
-          stack-label="Threshold"
-          type="number"
-        />
-      </widget-field>
+        <q-field
+          class="col"
+          label="Filter threshold"
+        >
+          <UnitPopupEdit
+            label="Filter threshold"
+            :field="block.data.filterThreshold"
+            :change="saved(v => block.data.filterThreshold = v)"
+          />
+        </q-field>
+      </q-card-main>
+    </q-card>
+    <q-card>
+      <q-card-title>
+        Other settings
+      </q-card-title>
+      <q-card-main class="other-settings">
+        <q-field
+          label="Block is active in profiles:"
+        >
+          <SelectPopupEdit
+            label="Profiles"
+            multiple
+            :field="block.profiles"
+            :options="profileOpts"
+            :change="saved(v => block.profiles = v)"
+          />
+        </q-field>
+
+        <q-field
+          label="PID is enabled:"
+        >
+          <q-toggle
+            :value="block.data.enabled"
+            @change="changeEnabled"
+          />
+        </q-field>
+      </q-card-main>
     </q-card>
     <q-card>
       <q-card-title>
@@ -324,12 +336,13 @@ export default class PidForm extends BlockForm {
   flex-wrap: wrap;
   max-width: 800px;
   align-items: center;
-  margin: auto;
+  padding: 10px;
+
 }
 .q-card {
   min-width: 400px;
-  max-width: 800px;
   width: 100%;
+  margin-bottom: 10px;
 }
 
 .section {

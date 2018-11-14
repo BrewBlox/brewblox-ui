@@ -1,0 +1,80 @@
+<script lang="ts">
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import { Link } from '@/helpers/units';
+import { compatibleBlocks } from '@/plugins/spark/store/getters';
+import { fetchCompatibleBlocks } from '@/plugins/spark/store/actions';
+
+@Component({
+  props: {
+    field: {
+      type: Object,
+      required: true,
+    },
+    serviceId: {
+      type: String,
+      required: true,
+    },
+    change: {
+      type: Function,
+      required: true,
+    },
+    label: {
+      type: String,
+      required: true,
+    },
+    display: {
+      type: String,
+      default: 'big',
+    },
+  },
+})
+export default class LinkPopupEdit extends Vue {
+  placeholder = null;
+
+  get linkOptions() {
+    const compatible = compatibleBlocks(this.$store, this.$props.serviceId);
+    return (compatible[this.$props.field.type || ''] || [])
+      .map(id => ({
+        label: id,
+        value: id,
+      }));
+  }
+
+  get displayValue() {
+    return this.$props.field.id || 'click to assign';
+  }
+
+  startEdit() {
+    this.placeholder = this.$props.field.id;
+    fetchCompatibleBlocks(this.$store, this.$props.serviceId, this.$props.field.type);
+  }
+
+  endEdit() {
+    this.$props.change(new Link(this.placeholder, this.$props.field.type));
+  }
+}
+</script>
+
+<template>
+  <div>
+    <component :is="$props.display" class="editable">{{ displayValue }}</component>
+    <q-popup-edit
+      buttons
+      persistent
+      :title="`Set ${this.$props.label} to:`"
+      v-model="placeholder"
+      @show="startEdit"
+      @save="endEdit"
+    >
+      <q-select
+        v-model="placeholder"
+        :options="linkOptions"
+        clearable
+      />
+    </q-popup-edit>
+  </div>
+</template>
+
+<style scoped>
+</style>
