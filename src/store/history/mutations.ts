@@ -1,7 +1,9 @@
 import Vue from 'vue';
-import { commit } from '@/helpers/dynamic-store';
-import { HistoryState } from './state';
-import { Metric, QueryResult } from '@/plugins/history/state';
+import { RootState } from '@/store/state';
+import { Metric, QueryResult, HistoryState } from './state';
+import { getStoreAccessors } from 'vuex-typescript';
+
+const { commit } = getStoreAccessors<HistoryState, RootState>('history');
 
 const mutations = {
   add: (state: HistoryState, metric: Metric) =>

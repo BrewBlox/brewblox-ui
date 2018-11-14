@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { GraphConfig } from '@/plugins/history/components/Graph/state';
+import { GraphConfig } from '@/components/Graph/state';
 
 @Component({
   props: {

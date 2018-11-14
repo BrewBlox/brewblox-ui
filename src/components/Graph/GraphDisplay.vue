@@ -2,8 +2,8 @@
 import { merge } from 'lodash';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import createPlotlyComponent from 'vue-plotly.js/factory';
-import Plotly, { PlotData } from 'plotly.js/lib/core.js';
+import PlotlyFactory from './plotly-factory.js';
+import Plotly, { PlotData } from 'plotly.js';
 
 @Component({
   props: {
@@ -17,7 +17,7 @@ import Plotly, { PlotData } from 'plotly.js/lib/core.js';
     },
   },
   components: {
-    Plotly: createPlotlyComponent(Plotly),
+    Plotly: PlotlyFactory(Plotly),
   },
 })
 export default class GraphDisplay extends Vue {
@@ -27,10 +27,10 @@ export default class GraphDisplay extends Vue {
       color: '#fff',
     },
     margin: {
-      t: 100,
-      l: 80,
+      t: 40,
+      l: 40,
       r: 40,
-      b: 80,
+      b: 40,
     },
     legend: { orientation: 'h' },
     xaxis: {

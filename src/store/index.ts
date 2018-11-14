@@ -6,6 +6,7 @@ import dashboards from './dashboards';
 import services from './services';
 import providers from './providers';
 import features from './features';
+import history from './history';
 
 Vue.use(Vuex);
 
@@ -15,6 +16,7 @@ const store = new Vuex.Store<RootState>({
     services,
     providers,
     features,
+    history,
   },
 });
 

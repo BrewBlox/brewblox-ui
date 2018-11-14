@@ -1,15 +1,15 @@
 import { RootStore } from '@/store/state';
-import { addMetric } from '@/plugins/history/store/actions';
+import { addMetric } from '@/store/history/actions';
 import {
   QueryParams,
   Metric,
   QueryResult,
   QueryTarget,
   DisplayNames,
-} from '@/plugins/history/state';
+} from '@/store/history/state';
 import parseDuration from 'parse-duration';
 
-export { removeMetric } from '@/plugins/history/store/actions';
+export { removeMetric } from '@/store/history/actions';
 
 const nanoToMilli = (nano: number) => Math.floor(nano / 1e6);
 
@@ -79,15 +79,13 @@ const transformer = (
 export const addPlotlyMetric = async (
   store: RootStore,
   id: string,
-  serviceId: string,
   params: QueryParams,
   renames: DisplayNames,
   target: QueryTarget,
 ) => {
   if (target.fields.length > 0) {
-    addMetric(store, serviceId, {
+    addMetric(store, {
       id,
-      serviceId,
       transformer,
       params,
       target,
