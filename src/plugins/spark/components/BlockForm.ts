@@ -42,6 +42,13 @@ export default class BlockForm extends FormBase {
       .some(key => state[key] !== this.inputValues[key]);
   }
 
+  callAndSaveBlock(func: Function) {
+    return (v: any) => {
+      func(v);
+      this.saveBlock(this.block);
+    };
+  }
+
   reset() {
     this.inputValues = deepCopy(toShadow(this.block, this.inputMapping));
   }

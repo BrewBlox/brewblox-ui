@@ -17,13 +17,6 @@ export default class PidForm extends BlockForm {
     return this.profileNames.map((v, idx) => ({ label: v, value: idx }));
   }
 
-  saved(func: Function) {
-    return (v: any) => {
-      func(v);
-      this.saveBlock(this.block);
-    };
-  }
-
   changeEnabled(v: boolean) {
     (this.block as PidBlock).data.enabled = v;
     this.saveBlock(this.block);
@@ -119,7 +112,7 @@ export default class PidForm extends BlockForm {
         <UnitPopupEdit
           label="Kp"
           :field="block.data.kp"
-          :change="saved(v => block.data.kp = v)"
+          :change="callAndSaveBlock(v => block.data.kp = v)"
         />
       </q-field>
       <q-field
@@ -129,7 +122,7 @@ export default class PidForm extends BlockForm {
         <UnitPopupEdit
         label="Ti"
         :field="block.data.ti"
-        :change="saved(v => block.data.ti = v)"
+        :change="callAndSaveBlock(v => block.data.ti = v)"
       />
       </q-field>
       <q-field
@@ -139,7 +132,7 @@ export default class PidForm extends BlockForm {
         <UnitPopupEdit
           label="Td"
           :field="block.data.td"
-          :change="saved(v => block.data.td = v)"
+          :change="callAndSaveBlock(v => block.data.td = v)"
         />
       </q-field>
       <div />
@@ -203,7 +196,7 @@ export default class PidForm extends BlockForm {
             label="Input"
             :field="block.data.inputId"
             :serviceId="block.serviceId"
-            :change="saved(v => block.data.inputId = v)"
+            :change="callAndSaveBlock(v => block.data.inputId = v)"
           />
         </q-field>
 
@@ -214,7 +207,7 @@ export default class PidForm extends BlockForm {
             label="Output"
             :field="block.data.outputId"
             :serviceId="block.serviceId"
-            :change="saved(v => block.data.outputId = v)"
+            :change="callAndSaveBlock(v => block.data.outputId = v)"
           />
         </q-field>
 
@@ -225,7 +218,7 @@ export default class PidForm extends BlockForm {
           <SelectPopupEdit
             label="Filter"
             :field="block.data.filter"
-            :change="saved(v => block.data.filter = v)"
+            :change="callAndSaveBlock(v => block.data.filter = v)"
             :options="filterOpts"
           />
         </q-field>
@@ -237,7 +230,7 @@ export default class PidForm extends BlockForm {
           <UnitPopupEdit
             label="Filter threshold"
             :field="block.data.filterThreshold"
-            :change="saved(v => block.data.filterThreshold = v)"
+            :change="callAndSaveBlock(v => block.data.filterThreshold = v)"
           />
         </q-field>
       </q-card-main>
@@ -255,7 +248,7 @@ export default class PidForm extends BlockForm {
             multiple
             :field="block.profiles"
             :options="profileOpts"
-            :change="saved(v => block.profiles = v)"
+            :change="callAndSaveBlock(v => block.profiles = v)"
           />
         </q-field>
 
