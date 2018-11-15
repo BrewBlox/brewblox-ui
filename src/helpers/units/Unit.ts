@@ -7,6 +7,7 @@ const prettify = (v: string) => v
   .replace(/seconds?/gi, 's')
   .replace(/minutes?/gi, 'm')
   .replace(/hours?/gi, 'h')
+  .replace(/1 \/ /gi, '/')
   .replace(/ \/ /gi, '/')
   .replace(/ \* /gi, '*');
 
