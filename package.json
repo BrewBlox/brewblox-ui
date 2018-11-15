@@ -5,7 +5,6 @@
   "author": "Elco Jacobs / BrewPi B.V.",
   "repository": "https://github.com/BrewBlox/brewblox-ui",
   "license": "GPL-3.0",
-  "sideEffects": false,
   "scripts": {
     "spark:obj": "bash mocks/reset-objects.sh mocks/config/seed_objects.json",
     "spark:sparkey": "npm run spark:obj -- sparkey",
