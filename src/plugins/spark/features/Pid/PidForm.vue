@@ -191,47 +191,73 @@ export default class PidForm extends BlockForm {
       <q-card-main class="input-output">
         <q-field
           label="Input"
+          orientation="vertical"
         >
-          <LinkPopupEdit
-            label="Input"
-            :field="block.data.inputId"
-            :serviceId="block.serviceId"
-            :change="callAndSaveBlock(v => block.data.inputId = v)"
-          />
+          <p>
+            <span>The input target value and actual value will come from:</span>
+            <LinkPopupEdit
+              label="Input"
+              :field="block.data.inputId"
+              :serviceId="block.serviceId"
+              :change="callAndSaveBlock(v => block.data.inputId = v)"
+              class="inline-popup"
+            />
+          </p>
+          <p>
+            <span>
+              The current target value is <b>{{block.data.inputSetting | unit}}</b>
+              and the actual value is <b>{{block.data.inputValue | unit}}</b>.
+            </span>
+          </p>
         </q-field>
 
         <q-field
           label="Output"
+          orientation="vertical"
         >
-          <LinkPopupEdit
-            label="Output"
-            :field="block.data.outputId"
-            :serviceId="block.serviceId"
-            :change="callAndSaveBlock(v => block.data.outputId = v)"
-          />
+          <p>
+            <span>The PID result will be used to drive: </span>
+            <LinkPopupEdit
+              label="Output"
+              :field="block.data.outputId"
+              :serviceId="block.serviceId"
+              :change="callAndSaveBlock(v => block.data.outputId = v)"
+              class="inline-popup"
+            />
+          </p>
+          <p>
+            <span>
+              The current setting of the output is <b>{{block.data.outputSetting | unit}}</b>
+              and the actually achieved value is  <b>{{block.data.outputValue | unit}}</b>.
+            </span>
+          </p>
         </q-field>
-
         <q-field
           class="col"
-          label="Filter"
+          label="Filtering"
+          orientation="vertical"
         >
+        <p>
+          <span>Input changes faster than</span>
           <SelectPopupEdit
             label="Filter"
             :field="block.data.filter"
             :change="callAndSaveBlock(v => block.data.filter = v)"
             :options="filterOpts"
+            class="inline-popup"
           />
-        </q-field>
-
-        <q-field
-          class="col"
-          label="Filter threshold"
-        >
+          <span>will be filtered out.</span>
+        </p>
+        <p>
+          <span>But steps exceeding</span>
           <UnitPopupEdit
             label="Filter threshold"
             :field="block.data.filterThreshold"
             :change="callAndSaveBlock(v => block.data.filterThreshold = v)"
+            class="inline-popup"
           />
+          <span>will trigger a faster response.</span>
+        </p>
         </q-field>
       </q-card-main>
     </q-card>
@@ -367,6 +393,11 @@ export default class PidForm extends BlockForm {
 .emphasize {
   font-weight: bold;
   padding: 10px;
+}
+
+.inline-popup {
+  display: inline-block;
+  margin: 0px 10px;
 }
 </style>
 
