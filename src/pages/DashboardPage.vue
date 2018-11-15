@@ -51,8 +51,8 @@ interface ValidatedItem {
 @Component
 export default class DashboardPage extends Vue {
   $q: any;
-  editable: boolean = false;
   widgetEditable: boolean = false;
+  widgetMovable: boolean = false;
   copyDialogOpen: boolean = false;
   title: string = '';
 
@@ -104,20 +104,20 @@ export default class DashboardPage extends Vue {
       });
   }
 
-  onStartEdit() {
-    this.title = this.dashboard.title;
-    this.editable = true;
-  }
-
-  onStopEdit() {
-    if (this.title !== this.dashboard.title) {
-      // update title of dashboard if changed
-      saveDashboard(this.$store, {
-        ...this.dashboard,
-        title: this.title,
-      });
+  toggleWidgetEditable() {
+    this.widgetEditable = !this.widgetEditable;
+    if (this.widgetEditable) {
+      this.title = this.dashboard.title;
+    } else {
+      if (this.title !== this.dashboard.title) {
+        // update title of dashboard if changed
+        saveDashboard(this.$store, {
+          ...this.dashboard,
+          title: this.title,
+        });
+      }
+      this.widgetMovable = false;
     }
-    this.editable = false;
   }
 
   async onChangeOrder(order: VueOrdered[]) {
@@ -275,6 +275,12 @@ export default class DashboardPage extends Vue {
 
       <portal to="toolbar-buttons">
 
+        <q-toggle
+          v-if="widgetEditable"
+          v-model="widgetMovable"
+          label="Move widgets"
+        />
+
         <q-btn
           v-if="widgetEditable"
           color="primary"
@@ -292,19 +298,10 @@ export default class DashboardPage extends Vue {
         />
 
         <q-btn
-          :disabled="editable"
           :icon="widgetEditable ? 'check' : 'mode edit'"
           :color="widgetEditable ? 'positive' : 'primary'"
-          @click="() => widgetEditable = !widgetEditable"
+          @click="toggleWidgetEditable"
           :label="widgetEditable ? 'Stop editing' : 'Edit widgets'"
-        />
-
-        <q-btn
-          :disabled="widgetEditable"
-          :icon="editable ? 'check' : 'mode edit'"
-          :color="editable ? 'positive' : 'primary'"
-          @click="editable ? onStopEdit() : onStartEdit()"
-          :label="editable ? 'Stop editing' : 'Edit dashboard'"
         />
 
       </portal>
@@ -322,14 +319,14 @@ export default class DashboardPage extends Vue {
       </WidgetModal>
 
       <GridContainer
-        :editable="editable"
+        :editable="widgetMovable"
         :on-change-order="onChangeOrder"
         :on-change-size="onChangeSize"
       >
         <component
           class="dashboard-item"
           v-for="val in validatedItems"
-          :disabled="editable"
+          :disabled="widgetMovable"
           :is="widgetEditable ? 'EditWidget' : val.component"
           :error="val.error"
           :key="val.item.id"
