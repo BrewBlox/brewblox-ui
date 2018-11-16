@@ -23,6 +23,8 @@ export default class SetpointProfileForm extends BlockForm {
     };
   }
 
+  inputValues: any = {};
+
   get tempUnit() {
     return units(this.$store, this.block.serviceId).Temp;
   }

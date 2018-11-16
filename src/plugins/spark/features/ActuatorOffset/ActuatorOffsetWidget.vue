@@ -3,6 +3,7 @@ import Component from 'vue-class-component';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import { ActuatorOffsetBlock } from './state';
 import { getById } from './getters';
+import { GraphConfig } from '@/components/Graph/state';
 
 @Component
 export default class ActuatorOffsetWidget extends BlockWidget {
@@ -10,49 +11,179 @@ export default class ActuatorOffsetWidget extends BlockWidget {
     return getById(this.$store, this.serviceId, this.blockId);
   }
 
-  set block(block: ActuatorOffsetBlock) {
-    this.saveBlock(block);
-  }
-
   get settingOrValue() {
     return ['Setting', 'Value'][this.block.data.referenceSettingOrValue];
+  }
+
+  get subtitles() {
+    return [
+      'State',
+      'Constraints',
+      'Graph',
+    ];
+  }
+
+  get warnings() {
+    const warn = [];
+    if (!this.block.data.targetValid) {
+      warn.push('Target invalid');
+    }
+    if (!this.block.data.referenceValid) {
+      warn.push('Reference invalid');
+    }
+    return warn.join(', ');
+  }
+
+  get graphCfg(): GraphConfig {
+    const blockFmt = (val: string) => [this.blockId, val].join('/');
+    const serviceFmt = (val: string) => [this.serviceId, this.blockId, val].join('/');
+
+    return {
+      // persisted in config
+      params: this.queryParams,
+      // constants
+      layout: {},
+      targets: [
+        {
+          measurement: this.serviceId,
+          fields: [
+            blockFmt('setting'),
+            blockFmt('value'),
+          ],
+        },
+      ],
+      renames: {
+        [serviceFmt('setting')]: 'Setting',
+        [serviceFmt('value')]: 'Value',
+      },
+    };
+  }
+
+  set graphCfg(config: GraphConfig) {
+    this.queryParams = { ...config.params };
   }
 }
 </script>
 
 <template>
-  <widget-card
-    :title="$props.id"
-    :subTitle="$props.type"
-    :onRefresh="refreshBlock"
-    :additionalInfo="additionalInfo"
-    form="ActuatorOffsetForm"
-    v-model="block"
-  >
-    <widget-field
-      :label="`Target (${block.data.targetId.id})`"
-      :icon="block.data.targetValid ? 'link' : 'link_off'"
-    >
-      <big>Setting: {{ block.data.setting | round }}</big> <br/>
-      <big>Value: {{ block.data.value | round }}</big>
-    </widget-field>
-
-    <widget-field
-      :label="`Target (${block.data.referenceId.id})`"
-      :icon="block.data.referenceValid ? 'link' : 'link_off'"
-    >
-      <big>Setting or value: {{ settingOrValue }}</big>
-    </widget-field>
-
-    <widget-field
-      label="Constraints"
-    >
-      <ReadonlyConstraints
-        :serviceId="serviceId"
-        v-model="block.data.constrainedBy"
+  <div>
+    <q-modal v-model="modalOpen">
+      <ActuatorOffsetForm
+        v-if="modalOpen"
+        :field="block"
+        :change="saveBlock"
       />
-    </widget-field>
-  </widget-card>
+    </q-modal>
+
+    <q-card dark class="full-height column">
+      <q-card-title class="title-bar">
+        <InputPopupEdit
+          :field="widgetId"
+          label="Widget ID"
+          display="span"
+          :change="v => widgetId = v"
+        />
+        <span class="vertical-middle on-left" slot="right">{{ this.subtitle }}</span>
+        <q-btn
+          slot="right"
+          flat
+          dense
+          round
+          @click="() => this.modalOpen = true"
+          icon="settings"
+        />
+        <q-btn
+          slot="right"
+          flat
+          round
+          dense
+          @click="refreshBlock"
+          icon="refresh"
+        />
+      </q-card-title>
+      <q-card-separator/>
+
+      <q-alert type="warning" color="warn" v-if="warnings">
+        {{ warnings }}
+      </q-alert>
+
+      <q-carousel
+        quick-nav
+        class="col"
+        v-model="slideIndex"
+      >
+        <!-- State -->
+        <q-carousel-slide class="unpadded">
+          <div :class="['widget-body', orientationClass]">
+            <q-card-main class="column col">
+              <q-field
+                class="col"
+                label="Target"
+              >
+                <LinkPopupEdit
+                  label="Target"
+                  :field="block.data.targetId"
+                  :serviceId="serviceId"
+                  :change="callAndSaveBlock(v => block.data.targetId = v)"
+                />
+              </q-field>
+              <q-field
+                class="col"
+                label="Reference"
+              >
+                <LinkPopupEdit
+                  label="Reference"
+                  :field="block.data.referenceId"
+                  :serviceId="serviceId"
+                  :change="callAndSaveBlock(v => block.data.referenceId = v)"
+                />
+              </q-field>
+              <q-field
+                class="col"
+                label="Setting"
+              >
+                <big>{{ block.data.setting | round }}</big>
+              </q-field>
+              <q-field
+                class="col"
+                label="Value"
+              >
+                <big>{{ block.data.value | round }}</big>
+              </q-field>
+              <q-field
+                class="col"
+                label="Setting or value"
+              >
+                <big>{{ settingOrValue }}</big>
+              </q-field>
+            </q-card-main>
+          </div>
+        </q-carousel-slide>
+        <!-- Constraints -->
+        <q-carousel-slide class="unpadded">
+          <div :class="['widget-body', orientationClass]">
+            <q-card-main class="column col">
+              <q-field
+                class="col"
+                label="Constraints"
+                orientation="vertical"
+              >
+                <ReadonlyConstraints
+                  :serviceId="serviceId"
+                  v-model="block.data.constrainedBy"
+                />
+              </q-field>
+            </q-card-main>
+          </div>
+        </q-carousel-slide>
+        <!-- Graph -->
+        <q-carousel-slide class="unpadded">
+          <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
+        </q-carousel-slide>
+
+      </q-carousel>
+    </q-card>
+  </div>
 </template>
 
 <style scoped>

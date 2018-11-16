@@ -13,10 +13,6 @@ export default class SetpointSensorPairForm extends BlockForm {
       sensorId: { path: 'data.sensorId', default: new TempSensorLink(null) },
     };
   }
-
-  afterBlockFetch() {
-    this.fetchCompatibleToInputLinks();
-  }
 }
 </script>
 

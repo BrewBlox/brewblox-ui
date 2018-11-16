@@ -14,10 +14,6 @@ export default class ActuatorPwmForm extends BlockForm {
       constrainedBy: { path: 'data.constrainedBy', default: { constraints: [] } },
     };
   }
-
-  afterBlockFetch() {
-    this.fetchCompatibleToInputLinks();
-  }
 }
 </script>
 

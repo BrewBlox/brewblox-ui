@@ -3,10 +3,12 @@ import Component from 'vue-class-component';
 import { Block } from '../state';
 import { fetchBlock, saveBlock } from '../store/actions';
 import { blockById } from '../store/getters';
+import { QueryParams } from '@/store/history/state';
 
 @Component
 export default class BlockWidget extends WidgetBase {
-  placeholder: any = null;
+  modalOpen: boolean = false;
+  slideIndex: number = 0;
 
   get serviceId(): string {
     return this.$props.config.serviceId;
@@ -20,10 +22,6 @@ export default class BlockWidget extends WidgetBase {
     return blockById(this.$store, this.serviceId, this.blockId);
   }
 
-  set block(block: Block) {
-    this.saveBlock(block);
-  }
-
   get additionalInfo() {
     return {
       'Widget ID': this.$props.id,
@@ -31,6 +29,33 @@ export default class BlockWidget extends WidgetBase {
       'Service ID': this.serviceId,
       'Feature type': this.$props.type,
     };
+  }
+
+  get subtitles(): string[] {
+    return [];
+  }
+
+  get subtitle() {
+    return this.subtitles[this.slideIndex] || '';
+  }
+
+  get horizontal() {
+    return this.$props.cols >= 4;
+  }
+
+  get orientationClass() {
+    return this.horizontal ? 'row' : 'column';
+  }
+
+  get queryParams(): QueryParams {
+    return this.$props.config.queryParams || {
+      approxPoints: 200,
+      duration: '10m',
+    };
+  }
+
+  set queryParams(queryParams: QueryParams) {
+    this.$props.onConfigChange(this.$props.id, { ...this.$props.config, queryParams });
   }
 
   refreshBlock() {
@@ -41,14 +66,7 @@ export default class BlockWidget extends WidgetBase {
     saveBlock(this.$store, this.serviceId, block);
   }
 
-  startEdit(val: any, key: string) {
-    this.placeholder = val[key];
-  }
-
-  endEdit(val: any, key: string) {
-    if (val[key] !== this.placeholder) {
-      val[key] = this.placeholder;
-      this.block = this.block;
-    }
+  callAndSaveBlock(func: (v: any) => void) {
+    return (v: any) => { func(v); this.saveBlock(); };
   }
 }

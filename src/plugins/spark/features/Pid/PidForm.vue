@@ -9,16 +9,16 @@ import { PidBlock } from '@/plugins/spark/features/Pid/state';
 
 @Component
 export default class PidForm extends BlockForm {
+  get block() {
+    return this.$props.field as PidBlock;
+  }
+
   get filterOpts() {
     return filters.map((filter, idx) => ({ label: filter, value: idx }));
   }
 
-  get profileOpts() {
-    return this.profileNames.map((v, idx) => ({ label: v, value: idx }));
-  }
-
   changeEnabled(v: boolean) {
-    (this.block as PidBlock).data.enabled = v;
+    this.block.data.enabled = v;
     this.saveBlock(this.block);
   }
 }
@@ -73,13 +73,13 @@ export default class PidForm extends BlockForm {
         label="Kp"
         orientation="vertical"
       >
-        <big style="color: grey;">{{ block.data.kp | unit }}</big>
+        <big class="unimportant">{{ block.data.kp | unit }}</big>
       </q-field>
       <q-field
         label="Kp"
         orientation="vertical"
       >
-        <big style="color: grey;">{{ block.data.kp | unit }}</big>
+        <big class="unimportant">{{ block.data.kp | unit }}</big>
       </q-field>
       <div />
 
@@ -350,14 +350,15 @@ export default class PidForm extends BlockForm {
 
 <style lang="stylus" scoped>
 @import '../../../../css/app.styl';
+
 .pid-modal {
   display: flex;
   flex-wrap: wrap;
   max-width: 800px;
   align-items: center;
   padding: 10px;
-
 }
+
 .q-card {
   min-width: 400px;
   width: 100%;
@@ -387,9 +388,11 @@ export default class PidForm extends BlockForm {
   grid-template-columns: auto auto auto auto auto auto;
   grid-gap: 15px;
 }
+
 .calculation /deep/ .q-field-content {
   padding-top: 6px;
 }
+
 .emphasize {
   font-weight: bold;
   padding: 10px;

@@ -10,26 +10,19 @@ import { QueryParams } from '@/store/history/state';
 
 @Component
 export default class PidWidget extends BlockWidget {
-  modalOpen: boolean = false;
   slideIndex: number = 0;
 
   get block(): PidBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
 
-  set block(block: PidBlock) {
-    this.saveBlock(block);
-  }
-
-  get queryParams(): QueryParams {
-    return this.$props.config.queryParams || {
-      approxPoints: 200,
-      duration: '10m',
-    };
-  }
-
-  set queryParams(queryParams: QueryParams) {
-    this.$props.onConfigChange(this.$props.id, { ...this.$props.config, queryParams });
+  get subtitles() {
+    return [
+      'State',
+      'Input/Output',
+      'Settings',
+      'Graph',
+    ];
   }
 
   get graphCfg(): GraphConfig {
@@ -70,52 +63,18 @@ export default class PidWidget extends BlockWidget {
   get filterOpts() {
     return filters.map((filter, idx) => ({ label: filter, value: idx }));
   }
-
-  get horizontal() {
-    return this.$props.cols >= 4;
-  }
-
-  get formComponent() {
-    return this.$refs.form as FormBase;
-  }
-
-  get subtitle() {
-    const subtitles = [
-      'State',
-      'Input/Output',
-      'Settings',
-      'Graph',
-    ];
-    return subtitles[this.slideIndex] || '';
-  }
-
-  onClose() {
-    this.modalOpen = false;
-  }
-
-  onSave() {
-    this.formComponent.confirmChanges();
-  }
-
-  saved(func: Function) {
-    return (v: any) => { func(v); this.saveBlock(); };
-  }
 }
 </script>
 
 <template>
   <div>
-    <WidgetModal
-      :isOpen="modalOpen"
-      :onClose="onClose"
-      :onSave="onSave"
-      :title="$props.id"
-    >
+    <q-modal v-model="modalOpen">
       <PidForm
-        ref="form"
-        v-model="block"
+        v-if="modalOpen"
+        :field="block"
+        :change="saveBlock"
       />
-    </WidgetModal>
+    </q-modal>
 
     <q-card dark class="full-height column">
       <q-card-title class="title-bar">
@@ -143,13 +102,12 @@ export default class PidWidget extends BlockWidget {
           icon="refresh"
         />
       </q-card-title>
-
       <q-card-separator/>
 
-      <q-alert type="info" color="info" v-if="!!this.block.disabled">
+      <q-alert type="info" color="info" v-if="this.block.disabled">
         This PID is disabled
       </q-alert>
-      <q-alert type="warning" color="warn" v-if="!this.block.disabled && !this.block.active">
+      <q-alert type="warning" color="warn" v-if="!this.block.active && !this.block.disabled">
         This PID is inactive
       </q-alert>
 
@@ -158,71 +116,63 @@ export default class PidWidget extends BlockWidget {
         class="col"
         v-model="slideIndex"
       >
-        <!-- Overview -->
-        <q-carousel-slide>
-          <div :class="['widget-body', horizontal ? 'row' : 'column']">
-          <q-card-main class="column col">
-            <q-field
-              dark
-              class="col"
-              label="Error"
-            >
-              <big>{{ block.data.error | unit }}</big>
-            </q-field>
-            <q-field
-              dark
-              class="col"
-              label="Integral"
-            >
-              <big>{{ block.data.integral | unit }}</big>
-            </q-field>
-            <q-field
-              dark
-              class="col"
-              label="Derivative"
-            >
-              <big>{{ block.data.derivative | unit }}</big>
-            </q-field>
-          </q-card-main>
+        <!-- State -->
+        <q-carousel-slide class="unpadded">
+          <div :class="['widget-body', orientationClass]">
+            <q-card-main class="column col">
+              <q-field
+                class="col"
+                label="Error"
+              >
+                <big>{{ block.data.error | unit }}</big>
+              </q-field>
+              <q-field
+                class="col"
+                label="Integral"
+              >
+                <big>{{ block.data.integral | unit }}</big>
+              </q-field>
+              <q-field
+                class="col"
+                label="Derivative"
+              >
+                <big>{{ block.data.derivative | unit }}</big>
+              </q-field>
+            </q-card-main>
 
-          <q-card-main class="column col">
-            <q-field
-              dark
-              class="col"
-              label="P"
-            >
-              <big>{{ block.data.p | round }}</big>
-            </q-field>
-            <q-field
-              dark
-              class="col"
-              label="I"
-            >
-              <big>{{ block.data.i | round }}</big>
-            </q-field>
-            <q-field
-              dark
-              class="col"
-              label="D"
-            >
-              <big>{{ block.data.d | round }}</big>
-            </q-field>
-          </q-card-main>
+            <q-card-main class="column col">
+              <q-field
+                class="col"
+                label="P"
+              >
+                <big>{{ block.data.p | round }}</big>
+              </q-field>
+              <q-field
+                class="col"
+                label="I"
+              >
+                <big>{{ block.data.i | round }}</big>
+              </q-field>
+              <q-field
+                class="col"
+                label="D"
+              >
+                <big>{{ block.data.d | round }}</big>
+              </q-field>
+            </q-card-main>
           </div>
         </q-carousel-slide>
-        <q-carousel-slide>
-          <div :class="horizontal ? 'row' : 'column'">
+        <q-carousel-slide class="unpadded">
+          <div :class="orientationClass">
             <q-card-main class="column col">
               <q-item class="full-width text-center">Input</q-item>
               <q-field
-                dark
                 class="col"
                 label="Target"
               >
                 <big>{{ block.data.inputValid ? block.data.inputSetting : '-' | unit }}</big>
               </q-field>
               <q-field
-                dark
                 class="col"
                 label="Actual"
               >
@@ -233,14 +183,12 @@ export default class PidWidget extends BlockWidget {
             <q-card-main class="column col">
               <q-item class="full-width text-center">Output</q-item>
               <q-field
-                dark
                 class="col"
                 label="Target"
               >
                 <big>{{ block.data.outputValid ? block.data.outputSetting : '-' | unit }}</big>
               </q-field>
               <q-field
-                dark
                 class="col"
                 label="Actual"
               >
@@ -249,73 +197,68 @@ export default class PidWidget extends BlockWidget {
             </q-card-main>
           </div>
         </q-carousel-slide>
-        <q-carousel-slide>
-          <div :class="horizontal ? 'row' : 'column'">
+        <q-carousel-slide class="unpadded">
+          <div :class="orientationClass">
             <q-card-main class="column col">
               <q-field
-                dark
                 class="col"
                 label="Kp"
               >
               <UnitPopupEdit
                 label="Kp"
                 :field="block.data.kp"
-                :change="saved(v => block.data.kp = v)"
+                :change="callAndSaveBlock(v => block.data.kp = v)"
               />
               </q-field>
               <q-field
-                dark
                 class="col"
                 label="Ti"
               >
                <UnitPopupEdit
                 label="Ti"
                 :field="block.data.ti"
-                :change="saved(v => block.data.ti = v)"
+                :change="callAndSaveBlock(v => block.data.ti = v)"
               />
               </q-field>
               <q-field
-                dark
                 class="col"
                 label="Td"
               >
                 <UnitPopupEdit
                   label="Td"
                   :field="block.data.td"
-                  :change="saved(v => block.data.td = v)"
+                  :change="callAndSaveBlock(v => block.data.td = v)"
                 />
               </q-field>
             </q-card-main>
 
             <q-card-main class="column col">
               <q-field
-                dark
                 class="col"
                 label="Filter"
               >
                 <SelectPopupEdit
                   label="Filter"
                   :field="block.data.filter"
-                  :change="saved(v => block.data.filter = v)"
+                  :change="callAndSaveBlock(v => block.data.filter = v)"
                   :options="filterOpts"
                 />
               </q-field>
               <q-field
-                dark
                 class="col"
                 label="Filter threshold"
               >
                 <UnitPopupEdit
                   label="Filter threshold"
                   :field="block.data.filterThreshold"
-                  :change="saved(v => block.data.filterThreshold = v)"
+                  :change="callAndSaveBlock(v => block.data.filterThreshold = v)"
                 />
               </q-field>
             </q-card-main>
           </div>
         </q-carousel-slide>
-        <q-carousel-slide>
-          <BlockGraph :id="$props.id" :config="graphCfg" :change="v => graphCfg = v"/>
+        <q-carousel-slide class="unpadded">
+          <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
         </q-carousel-slide>
       </q-carousel>
     </q-card>
@@ -323,27 +266,4 @@ export default class PidWidget extends BlockWidget {
 </template>
 
 <style scoped>
-.q-carousel-slide {
-  padding: 0px;
-}
-
-.q-card-container {
-  padding: 0px;
-}
-
-.title-bar {
-  padding: 5px 10px;
-}
-
-.q-card-main {
-  padding: 10px;
-}
-
-.float-button {
-  position: absolute;
-  z-index: 2;
-  left: 10px;
-  top: 10px;
-  display: flex;
-}
 </style>
