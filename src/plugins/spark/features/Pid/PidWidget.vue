@@ -146,10 +146,10 @@ export default class PidWidget extends BlockWidget {
 
       <q-card-separator/>
 
-      <q-alert type="info" color="info" v-if="!!this.block.disabled">
+      <q-alert type="info" color="info" v-if="!this.block.data.enabled">
         This PID is disabled
       </q-alert>
-      <q-alert type="warning" color="warn" v-if="!this.block.disabled && !this.block.active">
+      <q-alert type="warning" color="warn" v-if="this.block.data.enabled && !this.block.data.active">
         This PID is inactive
       </q-alert>
 
