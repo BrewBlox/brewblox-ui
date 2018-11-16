@@ -41,10 +41,8 @@ const actions = {
     createDashboardInApi(dashboard);
   },
 
-  saveDashboard: async (context: DashboardContext, dashboard: Dashboard) => {
-    setDashboardInStore(context, dashboard);
-    await persistDashboardInApi(dashboard);
-  },
+  saveDashboard: async (context: DashboardContext, dashboard: Dashboard) =>
+    setDashboardInStore(context, await persistDashboardInApi(dashboard)),
 
   updateDashboardOrder: async (context: DashboardContext, ids: string[]) =>
     ids.forEach((id, index) =>

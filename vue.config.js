@@ -1,6 +1,9 @@
 module.exports = {
   lintOnSave: true,
   configureWebpack: (config) => {
+    // Enable performance measuring in development mode
+    config.performance = true;
+
     // make sure to keep function names when uglifying to prevent Vuex-TypeScript from crying
     if (process.env.NODE_ENV === 'production') {
       config.optimization = {
