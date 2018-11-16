@@ -1,5 +1,6 @@
 <script lang="ts">
-import Vue, { VueConstructor } from 'vue';
+import Vue from 'vue';
+import { Watch } from 'vue-property-decorator';
 import { Notify } from 'quasar';
 import Component from 'vue-class-component';
 import CopyWidgetDialog from '@/components/Dialog/CopyWidgetDialog.vue';
@@ -53,8 +54,6 @@ export default class DashboardPage extends Vue {
   $q: any;
   widgetEditable: boolean = false;
   widgetMovable: boolean = false;
-  copyDialogOpen: boolean = false;
-  title: string = '';
 
   wizardModal: ModalConfig = {
     open: false,
@@ -65,11 +64,17 @@ export default class DashboardPage extends Vue {
     return this.$route.params.id;
   }
 
+  @Watch('dashboardId')
+  onChangeDashboard() {
+    this.widgetEditable = false;
+    this.widgetMovable = false;
+  }
+
   get dashboard() {
     return dashboardById(this.$store, this.dashboardId);
   }
 
-  get dashboards() {
+  get allDashboards() {
     return allDashboards(this.$store);
   }
 
@@ -106,18 +111,11 @@ export default class DashboardPage extends Vue {
 
   toggleWidgetEditable() {
     this.widgetEditable = !this.widgetEditable;
-    if (this.widgetEditable) {
-      this.title = this.dashboard.title;
-    } else {
-      if (this.title !== this.dashboard.title) {
-        // update title of dashboard if changed
-        saveDashboard(this.$store, {
-          ...this.dashboard,
-          title: this.title,
-        });
-      }
-      this.widgetMovable = false;
-    }
+    this.widgetMovable = this.widgetMovable && this.widgetEditable;
+  }
+
+  onChangeDashboardTitle(title: string) {
+    saveDashboard(this.$store, { ...this.dashboard, title });
   }
 
   async onChangeOrder(order: VueOrdered[]) {
@@ -219,7 +217,7 @@ export default class DashboardPage extends Vue {
       options: {
         type: 'radio',
         model: null,
-        items: this.dashboards
+        items: this.allDashboards
           .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
       },
       cancel: true,
@@ -236,7 +234,7 @@ export default class DashboardPage extends Vue {
       options: {
         type: 'radio',
         model: null,
-        items: this.dashboards
+        items: this.allDashboards
           .filter(dashboard => dashboard.id !== this.dashboardId)
           .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
       },
@@ -260,16 +258,16 @@ export default class DashboardPage extends Vue {
 
     <template>
       <portal to="toolbar-title">
-        <div v-if="!editable">
-          {{ dashboard.title }}
-        </div>
-        <div v-else>
-          <q-input
-            v-model="title"
-            placeholder="Name of this dashboard"
-            dark
-            :before="[{ icon: 'edit' }]"
-          />
+        <div :class="widgetEditable ? 'editable': ''">
+          <span>{{ dashboard.title }}</span>
+          <q-popup-edit
+            :disable="!widgetEditable"
+            title="Set dashboard title to:"
+            v-model="dashboard.title"
+            @save="onChangeDashboardTitle"
+          >
+            <q-input v-model="dashboard.title" />
+          </q-popup-edit>
         </div>
       </portal>
 
