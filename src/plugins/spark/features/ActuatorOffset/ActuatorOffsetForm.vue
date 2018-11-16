@@ -58,7 +58,6 @@ export default class ActuatorOffsetForm extends BlockForm {
         />
       </q-card-main>
     </q-card>
-
   </div>
 </template>
 
