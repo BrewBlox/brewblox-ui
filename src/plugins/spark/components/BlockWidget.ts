@@ -4,6 +4,7 @@ import { Block } from '../state';
 import { fetchBlock, saveBlock } from '../store/actions';
 import { blockById } from '../store/getters';
 import { QueryParams } from '@/store/history/state';
+import { GraphConfig } from '@/components/Graph/state';
 
 @Component
 export default class BlockWidget extends WidgetBase {
@@ -56,6 +57,35 @@ export default class BlockWidget extends WidgetBase {
 
   set queryParams(queryParams: QueryParams) {
     this.$props.onConfigChange(this.$props.id, { ...this.$props.config, queryParams });
+  }
+
+  get renamedTargets(): { [key: string]: string } {
+    return {};
+  }
+
+  get graphCfg(): GraphConfig {
+    const blockFmt = (val: string) => [this.blockId, val].join('/');
+    const serviceFmt = (val: string) => [this.serviceId, this.blockId, val].join('/');
+
+    return {
+      // persisted in config
+      params: this.queryParams,
+      // constants
+      layout: {},
+      targets: [
+        {
+          measurement: this.serviceId,
+          fields: Object.keys(this.renamedTargets)
+            .map(k => blockFmt(k)),
+        },
+      ],
+      renames: Object.entries(this.renamedTargets)
+        .reduce((acc, [k, v]) => ({ ...acc, [serviceFmt(k)]: v }), {}),
+    };
+  }
+
+  set graphCfg(config: GraphConfig) {
+    this.queryParams = { ...config.params };
   }
 
   refreshBlock() {

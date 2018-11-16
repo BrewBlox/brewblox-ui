@@ -2,79 +2,79 @@
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { ActuatorDigitalLink } from '@/helpers/units/KnownLinks';
+import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/state';
 
 @Component
 export default class ActuatorPwmForm extends BlockForm {
-  get inputMapping() {
-    return {
-      profiles: { path: 'profiles', default: [] },
-      actuatorId: { path: 'data.actuatorId', default: new ActuatorDigitalLink(null) },
-      period: { path: 'data.period', default: 0 },
-      setting: { path: 'data.setting', default: 0 },
-      constrainedBy: { path: 'data.constrainedBy', default: { constraints: [] } },
-    };
+  get block(): ActuatorPwmBlock {
+    return this.$props.field as ActuatorPwmBlock;
   }
 }
 </script>
 
 <template>
-  <q-card orientation="vertical">
-    <q-card-main class="column centered">
-
-      <widget-field
-        label="Active profiles"
-        icon="settings_input_component"
-      >
-        <profiles-bar
-          v-model="inputValues.profiles"
-          :profileNames="profileNames"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Actuator"
-        icon="edit"
-      >
-        <q-select
-          v-model="inputValues.actuatorId.id"
-          :options="linkOpts(inputValues.actuatorId)"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Period"
-        icon="edit"
-      >
-        <q-input
-          v-model="inputValues.period"
-          type="number"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Setting"
-        icon="edit"
-      >
-        <q-input
-          v-model="inputValues.setting"
-          type="number"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Constrained by"
-        icon="edit"
-      >
-        <AnalogConstraints
+  <div class="widget-modal">
+    <q-card>
+      <q-card-title>Settings</q-card-title>
+      <q-card-main>
+        <q-field
+          class="col"
+          label="Actuator"
+        >
+          <LinkPopupEdit
+            label="Actuator"
+            :field="block.data.actuatorId"
+            :serviceId="serviceId"
+            :change="callAndSaveBlock(v => block.data.actuatorId = v)"
+          />
+        </q-field>
+        <q-field
+          class="col"
+          label="Period"
+        >
+          <InputPopupEdit
+            label="Period"
+            type="number"
+            :field="block.data.period"
+            :change="callAndSaveBlock(v => block.data.period = v)"
+          />
+        </q-field>
+        <q-field
+          class="col"
+          label="Setting"
+        >
+          <InputPopupEdit
+            label="Setting"
+            type="number"
+            :field="block.data.setting"
+            :change="callAndSaveBlock(v => block.data.setting = v)"
+          />
+        </q-field>
+        <q-field
+          class="col"
+          label="Value"
+        >
+          <big>{{ block.data.value | round }}</big>
+        </q-field>
+      </q-card-main>
+    </q-card>
+    <q-card>
+      <q-card-title>Constraints</q-card-title>
+      <q-card-main>
+        <ReadonlyConstraints
           :serviceId="block.serviceId"
-          v-model="inputValues.constrainedBy"
+          :value="block.data.constrainedBy"
         />
-      </widget-field>
-
-    </q-card-main>
-  </q-card>
+      </q-card-main>
+    </q-card>
+  </div>
 </template>
 
 <style scoped>
+.q-card {
+  min-width: 400px;
+  width: 100%;
+  margin-bottom: 10px;
+}
 </style>
 

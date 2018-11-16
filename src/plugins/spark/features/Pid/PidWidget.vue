@@ -10,8 +10,6 @@ import { QueryParams } from '@/store/history/state';
 
 @Component
 export default class PidWidget extends BlockWidget {
-  slideIndex: number = 0;
-
   get block(): PidBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
@@ -25,35 +23,12 @@ export default class PidWidget extends BlockWidget {
     ];
   }
 
-  get graphCfg(): GraphConfig {
-    const blockFmt = (val: string) => [this.blockId, val].join('/');
-    const serviceFmt = (val: string) => [this.serviceId, this.blockId, val].join('/');
-
+  get renamedTargets() {
     return {
-      // persisted in config
-      params: this.queryParams,
-      // constants
-      layout: {},
-      targets: [
-        {
-          measurement: this.serviceId,
-          fields: [
-            blockFmt(`kp[${this.block.data.kp.unit}]`),
-            blockFmt(`ti[${this.block.data.ti.unit}]`),
-            blockFmt(`td[${this.block.data.td.unit}]`),
-          ],
-        },
-      ],
-      renames: {
-        [serviceFmt(`kp[${this.block.data.kp.unit}]`)]: 'Kp',
-        [serviceFmt(`ti[${this.block.data.ti.unit}]`)]: 'Ti',
-        [serviceFmt(`td[${this.block.data.td.unit}]`)]: 'Td',
-      },
+      [`kp[${this.block.data.kp.unit}]`]: 'Kp',
+      [`ti[${this.block.data.ti.unit}]`]: 'Ti',
+      [`td[${this.block.data.td.unit}]`]: 'Td',
     };
-  }
-
-  set graphCfg(config: GraphConfig) {
-    this.queryParams = { ...config.params };
   }
 
   get filterName() {

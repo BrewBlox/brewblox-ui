@@ -23,31 +23,10 @@ export default class ActuatorPinWidget extends BlockWidget {
     return state[this.block.data.state];
   }
 
-  get graphCfg(): GraphConfig {
-    const blockFmt = (val: string) => [this.blockId, val].join('/');
-    const serviceFmt = (val: string) => [this.serviceId, this.blockId, val].join('/');
-
+  get renamedTargets() {
     return {
-      // persisted in config
-      params: this.queryParams,
-      // constants
-      layout: {},
-      targets: [
-        {
-          measurement: this.serviceId,
-          fields: [
-            blockFmt('state'),
-          ],
-        },
-      ],
-      renames: {
-        [serviceFmt('state')]: 'State',
-      },
+      state: 'State',
     };
-  }
-
-  set graphCfg(config: GraphConfig) {
-    this.queryParams = { ...config.params };
   }
 
   changeInvert(val: boolean) {

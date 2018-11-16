@@ -10,44 +10,140 @@ export default class ActuatorPwmWidget extends BlockWidget {
     return getById(this.$store, this.serviceId, this.blockId);
   }
 
-  set block(block: ActuatorPwmBlock) {
-    this.saveBlock(block);
+  get subtitles() {
+    return [
+      'State',
+      'Constraints',
+      'Graph',
+    ];
+  }
+
+  get renamedTargets() {
+    return {
+      setting: 'Setting',
+      period: 'Period',
+      value: 'Value',
+    };
   }
 }
 </script>
 
 <template>
-  <widget-card
-    :title="$props.id"
-    :subTitle="$props.type"
-    :onRefresh="refreshBlock"
-    :additionalInfo="additionalInfo"
-    form="ActuatorPwmForm"
-    v-model="block"
-  >
-    <widget-field
-      :label="`Actuator (${block.data.actuatorId.id})`"
-      :icon="block.data.actuatorValid ? 'link' : 'link_off'"
-    >
-      <big>Setting: {{ block.data.setting | round }}</big> <br/>
-      <big>Value: {{ block.data.value | round }}</big>
-    </widget-field>
-
-    <widget-field
-      label="Period"
-    >
-      <big>Period: {{ block.data.period }}</big>
-    </widget-field>
-
-    <widget-field
-      label="Constraints"
-    >
-      <ReadonlyConstraints
-        :serviceId="serviceId"
-        v-model="block.data.constrainedBy"
+  <div>
+    <q-modal v-model="modalOpen">
+      <ActuatorPwmForm
+        v-if="modalOpen"
+        :field="block"
+        :change="saveBlock"
       />
-    </widget-field>
-  </widget-card>
+    </q-modal>
+
+    <q-card dark class="full-height column">
+      <q-card-title class="title-bar">
+        <InputPopupEdit
+          :field="widgetId"
+          label="Widget ID"
+          display="span"
+          :change="v => widgetId = v"
+        />
+        <span class="vertical-middle on-left" slot="right">{{ this.subtitle }}</span>
+        <q-btn
+          slot="right"
+          flat
+          dense
+          round
+          @click="() => this.modalOpen = true"
+          icon="settings"
+        />
+        <q-btn
+          slot="right"
+          flat
+          round
+          dense
+          @click="refreshBlock"
+          icon="refresh"
+        />
+      </q-card-title>
+      <q-card-separator />
+
+      <q-carousel
+        quick-nav
+        class="col"
+        v-model="slideIndex"
+      >
+        <!-- State -->
+        <q-carousel-slide class="unpadded">
+          <div :class="['widget-body', orientationClass]">
+            <q-card-main class="column col">
+              <q-field
+                class="col"
+                label="Actuator"
+              >
+                <LinkPopupEdit
+                  label="Actuator"
+                  :field="block.data.actuatorId"
+                  :serviceId="serviceId"
+                  :change="callAndSaveBlock(v => block.data.actuatorId = v)"
+                />
+              </q-field>
+              <q-field
+                class="col"
+                label="Period"
+              >
+                <InputPopupEdit
+                  label="Period"
+                  type="number"
+                  :field="block.data.period"
+                  :change="callAndSaveBlock(v => block.data.period = v)"
+                />
+              </q-field>
+              <q-field
+                class="col"
+                label="Setting"
+              >
+                <InputPopupEdit
+                  label="Setting"
+                  type="number"
+                  :field="block.data.setting"
+                  :change="callAndSaveBlock(v => block.data.setting = v)"
+                />
+              </q-field>
+              <q-field
+                class="col"
+                label="Value"
+              >
+                <big>{{ block.data.value | round }}</big>
+              </q-field>
+            </q-card-main>
+          </div>
+        </q-carousel-slide>
+
+        <!-- Constraints -->
+        <q-carousel-slide class="unpadded">
+          <div :class="['widget-body', orientationClass]">
+            <q-card-main class="column col">
+              <q-field
+                class="col"
+                label="Constraints"
+                orientation="vertical"
+              >
+                <ReadonlyConstraints
+                  :serviceId="serviceId"
+                  v-model="block.data.constrainedBy"
+                />
+              </q-field>
+            </q-card-main>
+          </div>
+        </q-carousel-slide>
+
+        <!-- Graph -->
+        <q-carousel-slide class="unpadded">
+          <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
+        </q-carousel-slide>
+
+      </q-carousel>
+    </q-card>
+  </div>
 </template>
 
 <style scoped>
