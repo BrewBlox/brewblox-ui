@@ -28,11 +28,6 @@ export default class ActuatorPinWidget extends BlockWidget {
       state: 'State',
     };
   }
-
-  changeInvert(val: boolean) {
-    this.block.data.invert = val;
-    this.saveBlock();
-  }
 }
 </script>
 
@@ -45,7 +40,7 @@ export default class ActuatorPinWidget extends BlockWidget {
     <q-card dark class="full-height column">
       <q-card-title class="title-bar">
         <InputPopupEdit :field="widgetId" label="Widget ID" display="span" :change="v => widgetId = v" />
-        <span class="vertical-middle on-left" slot="right">{{ this.subtitle }}</span>
+        <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
         <q-btn flat round dense slot="right" @click="openModal" icon="settings" />
         <q-btn flat round dense slot="right" @click="refreshBlock" icon="refresh" />
       </q-card-title>
@@ -60,7 +55,7 @@ export default class ActuatorPinWidget extends BlockWidget {
                 <big>{{ actuatorState }}</big>
               </q-field>
               <q-field class="col" label="Inverted">
-                <q-toggle :value="block.data.invert" @input="changeInvert" />
+                <q-toggle :value="block.data.invert" @input="v => { block.data.invert = v; saveBlock(); }" />
               </q-field>
             </q-card-main>
           </div>
@@ -81,6 +76,8 @@ export default class ActuatorPinWidget extends BlockWidget {
         <q-carousel-slide class="unpadded">
           <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v" />
         </q-carousel-slide>
+
+        <q-btn slot="quick-nav" slot-scope="props" color="white" flat dense :icon="navIcon(props.slide)" :label="navTitle(props.slide)" @click="props.goToSlide()" :class="{inactive: !props.current}" />
 
       </q-carousel>
     </q-card>

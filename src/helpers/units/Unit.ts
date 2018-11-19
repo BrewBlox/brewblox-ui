@@ -30,6 +30,10 @@ export default class Unit {
     return this.value.toFixed(2);
   }
 
+  serializedKeyName(key: string): string {
+    return `${key}[${this.unit}]`;
+  }
+
   toString(): string {
     return `${this.roundedValue} ${this.unitNotation}`;
   }

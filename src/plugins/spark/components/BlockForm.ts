@@ -18,8 +18,16 @@ export default class BlockForm extends FormBase {
     return this.blockField;
   }
 
+  get serviceId() {
+    return this.block.serviceId;
+  }
+
+  get profiles() {
+    return this.block.profiles;
+  }
+
   get profileNames(): string[] {
-    return profileNames(this.$store, this.block.serviceId);
+    return profileNames(this.$store, this.serviceId);
   }
 
   get profileOpts() {
@@ -27,7 +35,7 @@ export default class BlockForm extends FormBase {
   }
 
   get compatibleBlocks() {
-    return compatibleBlocks(this.$store, this.block.serviceId);
+    return compatibleBlocks(this.$store, this.serviceId);
   }
 
   saveBlock(block: Block = this.block) {

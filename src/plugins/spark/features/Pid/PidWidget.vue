@@ -1,5 +1,6 @@
 <script lang="ts">
 import Component from 'vue-class-component';
+import { serializedPropertyName } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import { saveBlock } from '@/plugins/spark/store/actions';
 import { PidBlock } from './state';
@@ -25,9 +26,9 @@ export default class PidWidget extends BlockWidget {
 
   get renamedTargets() {
     return {
-      [`kp[${this.block.data.kp.unit}]`]: 'Kp',
-      [`ti[${this.block.data.ti.unit}]`]: 'Ti',
-      [`td[${this.block.data.td.unit}]`]: 'Td',
+      [serializedPropertyName('kp', this.block.data)]: 'Kp',
+      [serializedPropertyName('ti', this.block.data)]: 'Ti',
+      [serializedPropertyName('td', this.block.data)]: 'Td',
     };
   }
 
@@ -50,7 +51,7 @@ export default class PidWidget extends BlockWidget {
     <q-card dark class="full-height column">
       <q-card-title class="title-bar">
         <InputPopupEdit :field="widgetId" label="Widget ID" display="span" :change="v => widgetId = v" />
-        <span class="vertical-middle on-left" slot="right">{{ this.subtitle }}</span>
+        <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
         <q-btn slot="right" flat dense round @click="openModal" icon="settings" />
         <q-btn slot="right" flat round dense @click="refreshBlock" icon="refresh" />
       </q-card-title>
@@ -142,6 +143,9 @@ export default class PidWidget extends BlockWidget {
         <q-carousel-slide class="unpadded">
           <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v" />
         </q-carousel-slide>
+
+        <q-btn slot="quick-nav" slot-scope="props" color="white" flat dense :icon="navIcon(props.slide)" :label="navTitle(props.slide)" @click="props.goToSlide()" :class="{inactive: !props.current}" />
+
       </q-carousel>
     </q-card>
   </div>

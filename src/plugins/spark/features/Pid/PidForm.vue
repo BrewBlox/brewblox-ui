@@ -20,11 +20,6 @@ export default class PidForm extends BlockForm {
   get filterOpts() {
     return filters.map((filter, idx) => ({ label: filter, value: idx }));
   }
-
-  changeEnabled(v: boolean) {
-    this.block.data.enabled = v;
-    this.saveBlock(this.block);
-  }
 }
 </script>
 
@@ -172,7 +167,7 @@ export default class PidForm extends BlockForm {
         </q-field>
 
         <q-field label="PID is enabled:">
-          <q-toggle :value="block.data.enabled" @change="changeEnabled" />
+          <q-toggle :value="block.data.enabled" @change="v => { block.data.enabled = v; saveBlock(); }" />
         </q-field>
       </q-card-main>
     </q-card>

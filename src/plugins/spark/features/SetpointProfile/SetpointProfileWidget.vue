@@ -53,6 +53,7 @@ export default class SetpointProfileWidget extends BlockWidget {
         <q-carousel-slide class="unpadded">
           <GraphDisplay v-if="!modalOpen" :data="plotlyData" :layout="plotlyLayout" />
         </q-carousel-slide>
+        <q-btn slot="quick-nav" slot-scope="props" color="white" flat dense :icon="navIcon(props.slide)" :label="navTitle(props.slide)" @click="props.goToSlide()" :class="{inactive: !props.current}" />
       </q-carousel>
 
     </q-card>

@@ -71,19 +71,8 @@ export default class SelectPopupEdit extends Vue {
 <template>
   <div>
     <component :is="$props.display" class="editable">{{ displayValue }}</component>
-    <q-popup-edit
-      buttons
-      persistent
-      :title="`Set ${this.$props.label} to:`"
-      v-model="placeholder"
-      @show="startEdit"
-      @save="endEdit"
-    >
-      <q-select
-        :multiple="$props.multiple"
-        v-model="placeholder"
-        :options="$props.options"
-      />
+    <q-popup-edit buttons persistent :title="`Set ${this.$props.label} to:`" v-model="placeholder" @show="startEdit" @save="endEdit">
+      <q-select :multiple="$props.multiple" v-model="placeholder" :options="$props.options" />
     </q-popup-edit>
   </div>
 </template>

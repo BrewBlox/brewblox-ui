@@ -40,6 +40,18 @@ export default class BlockWidget extends WidgetBase {
     return this.subtitles[this.slideIndex] || '';
   }
 
+  navTitle(idx: number) {
+    return idx === this.slideIndex
+      ? this.subtitles[this.slideIndex]
+      : null;
+  }
+
+  navIcon(idx: number) {
+    return (idx === this.slideIndex && this.navTitle(idx))
+      ? null
+      : 'fiber_manual_record';
+  }
+
   get horizontal() {
     return this.$props.cols >= 4;
   }

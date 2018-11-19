@@ -13,11 +13,6 @@ export default class ActuatorPinForm extends BlockForm {
   get actuatorState() {
     return state[this.block.data.state];
   }
-
-  changeInvert(val: boolean) {
-    this.block.data.invert = val;
-    this.saveBlock();
-  }
 }
 </script>
 
@@ -30,7 +25,7 @@ export default class ActuatorPinForm extends BlockForm {
           <big>{{ actuatorState }}</big>
         </q-field>
         <q-field class="col" label="Inverted">
-          <q-toggle :value="block.data.invert" @input="changeInvert" />
+          <q-toggle :value="block.data.invert" @input="v => { block.data.invert = v; saveBlock(); }" />
         </q-field>
       </q-card-main>
     </q-card>
