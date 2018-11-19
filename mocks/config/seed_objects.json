@@ -47,7 +47,8 @@
     ],
     "type": "SetpointSimple",
     "data": {
-      "setting": 21
+      "setting": 21,
+      "valid": true
     }
   },
   {
@@ -57,7 +58,8 @@
     ],
     "type": "SetpointSimple",
     "data": {
-      "setting": 50
+      "setting": 50,
+      "valid": false
     }
   },
   {
@@ -65,7 +67,8 @@
     "profiles": [],
     "type": "SetpointSimple",
     "data": {
-      "setting": 3
+      "setting": 3,
+      "valid": true
     }
   },
   {
