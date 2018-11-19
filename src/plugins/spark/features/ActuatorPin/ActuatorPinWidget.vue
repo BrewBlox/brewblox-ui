@@ -56,18 +56,14 @@ export default class ActuatorPinWidget extends BlockWidget {
         />
         <span class="vertical-middle on-left" slot="right">{{ this.subtitle }}</span>
         <q-btn
+          flat round dense
           slot="right"
-          flat
-          dense
-          round
           @click="() => this.modalOpen = true"
           icon="settings"
         />
         <q-btn
+          flat round dense
           slot="right"
-          flat
-          round
-          dense
           @click="refreshBlock"
           icon="refresh"
         />

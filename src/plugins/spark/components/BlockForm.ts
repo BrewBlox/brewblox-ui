@@ -16,8 +16,17 @@ import FormBase from '@/components/Widget/FormBase';
   },
 })
 export default class BlockForm extends FormBase {
+  get defaultData() {
+    return {};
+  }
+
+  get blockField(): Block {
+    const propBlock = this.$props.field as Block;
+    return { ...propBlock, data: propBlock.data || this.defaultData } as Block;
+  }
+
   get block(): Block {
-    return this.$props.field as Block;
+    return this.blockField;
   }
 
   get profileNames(): string[] {

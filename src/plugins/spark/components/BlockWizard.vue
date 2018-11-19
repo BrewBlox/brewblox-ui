@@ -183,7 +183,7 @@ export default class BlockWizard extends Vue {
       serviceId: (this.service as Service).id,
       type: this.$props.featureId,
       profiles: [0],
-      data: {},
+      data: null,
     };
   }
 
@@ -223,116 +223,45 @@ export default class BlockWizard extends Vue {
 </script>
 
 <template>
-  <q-stepper
-    ref="stepper"
-    v-model="currentStep"
-  >
+  <q-stepper ref="stepper" v-model="currentStep">
 
     <!-- start -->
-    <q-step
-      default
-      name="start"
-      title="Widget info"
-    >
+    <q-step default name="start" title="Widget info">
 
-      <q-field
-        label="Widget name"
-        icon="create"
-        orientation="vertical"
-      >
-        <q-input
-          v-model="widgetId"
-          placeholder="Enter a widget Name"
-          :error="widgetIdError !== null"
-          :suffix="widgetIdError"
-        />
+      <q-field label="Widget name" icon="create" orientation="vertical">
+        <q-input v-model="widgetId" placeholder="Enter a widget Name" :error="widgetIdError !== null" :suffix="widgetIdError" />
       </q-field>
 
-      <q-field
-        label="Service"
-        icon="create"
-        orientation="vertical"
-      >
-        <q-option-group
-          dark
-          type="radio"
-          v-model="service"
-          :options="serviceOpts"
-          @input="() => { block = null; }"
-        />
+      <q-field label="Service" icon="create" orientation="vertical">
+        <q-option-group dark type="radio" v-model="service" :options="serviceOpts" @input="() => { block = null; }" />
       </q-field>
 
     </q-step>
 
     <!-- create -->
-    <q-step
-      name="create"
-      title="Create block"
-      v-if="blockAction === 'create'"
-    >
-      <q-field
-        label="Block name"
-        icon="create"
-        orientation="vertical"
-      >
-        <q-input
-          v-model="blockId"
-          placeholder="Enter a block name"
-          :error="blockIdError !== null"
-          :suffix="blockIdError"
-        />
+    <q-step name="create" title="Create block" v-if="blockAction === 'create'">
+      <q-field label="Block name" icon="create" orientation="vertical">
+        <q-input v-model="blockId" placeholder="Enter a block name" :error="blockIdError !== null" :suffix="blockIdError" />
       </q-field>
     </q-step>
 
     <!-- select -->
-    <q-step
-      name="existing"
-      title="Select block"
-      v-else-if="blockAction === 'existing'"
-    >
-      <q-field
-        label="Service"
-        icon="create"
-        orientation="vertical"
-      >
-        <q-option-group
-          dark
-          type="radio"
-          v-model="block"
-          :options="blockOpts"
-        />
+    <q-step name="existing" title="Select block" v-else-if="blockAction === 'existing'">
+      <q-field label="Service" icon="create" orientation="vertical">
+        <q-option-group dark type="radio" v-model="block" :options="blockOpts" />
       </q-field>
     </q-step>
 
     <!-- placeholder -->
-    <q-step
-      name="placeholder"
-      title="Create or select block"
-      v-else
-    />
+    <q-step name="placeholder" title="Create or select block" v-else />
 
     <!-- configure -->
-    <q-step
-      name="config"
-      title="Configure block"
-    >
-      <component
-        v-if="block"
-        v-model="block"
-        ref="form"
-        :is="blockForm"
-      />
+    <q-step name="config" title="Configure block">
+      <component v-if="block" v-model="block" ref="form" :is="blockForm" />
     </q-step>
 
     <q-stepper-navigation>
-      <q-btn
-        flat
-        v-for="action in navigation[currentStep]"
-        :key="action.label"
-        :label="action.label"
-        :disabled="!action.enabled()"
-        @click="action.click"
-      />
+      <q-btn flat v-for="action in navigation[currentStep]" :key="action.label" :label="action.label" :disabled="!action.enabled()" @click="action.click" />
     </q-stepper-navigation>
 
   </q-stepper>

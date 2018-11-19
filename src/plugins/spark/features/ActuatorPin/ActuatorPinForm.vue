@@ -7,7 +7,7 @@ import { ActuatorPinBlock } from './state';
 @Component
 export default class ActuatorPinForm extends BlockForm {
   get block(): ActuatorPinBlock {
-    return this.$props.field as ActuatorPinBlock;
+    return this.blockField as ActuatorPinBlock;
   }
 
   get actuatorState() {
@@ -26,30 +26,18 @@ export default class ActuatorPinForm extends BlockForm {
     <q-card>
       <q-card-title>Settings</q-card-title>
       <q-card-main>
-        <q-field
-          class="col"
-          label="State"
-        >
+        <q-field class="col" label="State">
           <big>{{ actuatorState }}</big>
         </q-field>
-        <q-field
-          class="col"
-          label="Inverted"
-        >
-          <q-toggle
-            :value="block.data.invert"
-            @input="changeInvert"
-          />
+        <q-field class="col" label="Inverted">
+          <q-toggle :value="block.data.invert" @input="changeInvert" />
         </q-field>
       </q-card-main>
     </q-card>
     <q-card>
       <q-card-title>Constraints</q-card-title>
       <q-card-main>
-        <ReadonlyConstraints
-          :serviceId="block.serviceId"
-          :value="block.data.constrainedBy"
-        />
+        <ReadonlyConstraints :serviceId="block.serviceId" :value="block.data.constrainedBy" />
       </q-card-main>
     </q-card>
   </div>

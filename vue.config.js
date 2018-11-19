@@ -56,6 +56,8 @@ module.exports = {
         transpileOnly: false,
       }));
 
+    config.module.rules.delete('eslint');
+
     // add svg loader
     const svgRule = config.module.rule('svg');
 
