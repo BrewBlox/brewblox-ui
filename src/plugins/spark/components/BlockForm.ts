@@ -3,18 +3,7 @@ import { Block } from '@/plugins/spark/state';
 import { profileNames, compatibleBlocks } from '@/plugins/spark/store/getters';
 import FormBase from '@/components/Widget/FormBase';
 
-@Component({
-  props: {
-    field: {
-      type: Object,
-      required: true,
-    },
-    change: {
-      type: Function,
-      required: true,
-    },
-  },
-})
+@Component
 export default class BlockForm extends FormBase {
   get defaultData() {
     return {};

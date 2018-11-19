@@ -3,6 +3,8 @@ import Component from 'vue-class-component';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import { SetpointProfileBlock } from './state';
 import { getById } from './getters';
+import { PlotData, Layout } from 'plotly.js';
+import { Watch } from 'vue-property-decorator';
 
 @Component
 export default class SetpointProfileWidget extends BlockWidget {
@@ -10,12 +12,24 @@ export default class SetpointProfileWidget extends BlockWidget {
     return getById(this.$store, this.serviceId, this.blockId);
   }
 
-  set block(block: SetpointProfileBlock) {
-    this.saveBlock(block);
+  get subtitles() {
+    return [
+      'Setpoints',
+    ];
   }
 
-  asDate(timeS: number) {
-    return new Date(timeS * 1000).toLocaleString();
+  get plotlyData(): Partial<PlotData>[] {
+    // console.log(this.block.data.points.map(p => p.temperature.value));
+    return [{
+      name: 'Setpoints',
+      type: 'scatter',
+      x: this.block.data.points.map(p => p.time * 1000),
+      y: this.block.data.points.map(p => p.temperature.value),
+    }];
+  }
+
+  get plotlyLayout(): Partial<Layout> {
+    return {};
   }
 }
 </script>
@@ -30,22 +44,17 @@ export default class SetpointProfileWidget extends BlockWidget {
       <q-card-title class="title-bar">
         <InputPopupEdit :field="widgetId" label="Widget ID" display="span" :change="v => widgetId = v" />
         <span class="vertical-middle on-left" slot="right">{{ this.subtitle }}</span>
-        <q-btn flat round dense slot="right" @click="() => this.modalOpen = true" icon="settings" />
+        <q-btn flat round dense slot="right" @click="openModal" icon="settings" />
         <q-btn flat round dense slot="right" @click="refreshBlock" icon="refresh" />
       </q-card-title>
       <q-card-separator />
 
-      <q-carousel quick-nav class="col" v-model="slideIndex">
-        <!-- State -->
+      <q-carousel class="col" v-model="slideIndex">
         <q-carousel-slide class="unpadded">
-          <div :class="['widget-body', orientationClass]">
-            <q-card-main class="column col">
-
-            </q-card-main>
-          </div>
+          <GraphDisplay v-if="!modalOpen" :data="plotlyData" :layout="plotlyLayout" />
         </q-carousel-slide>
-
       </q-carousel>
+
     </q-card>
   </div>
 </template>

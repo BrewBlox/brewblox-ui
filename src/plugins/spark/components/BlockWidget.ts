@@ -88,6 +88,10 @@ export default class BlockWidget extends WidgetBase {
     this.queryParams = { ...config.params };
   }
 
+  openModal() {
+    this.modalOpen = true;
+  }
+
   refreshBlock() {
     fetchBlock(this.$store, this.serviceId, this.block);
   }

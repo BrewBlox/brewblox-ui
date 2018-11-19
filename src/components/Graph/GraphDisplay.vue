@@ -4,6 +4,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import PlotlyFactory from './plotly-factory.js';
 import Plotly, { PlotData } from 'plotly.js';
+import { Watch } from 'vue-property-decorator';
 
 @Component({
   props: {
@@ -74,13 +75,7 @@ export default class GraphDisplay extends Vue {
 </script>
 
 <template>
-  <Plotly
-    fit
-    v-if="ready"
-    :data="plotlyData"
-    :layout="plotlyLayout"
-    :config="plotlyConfig"
-  />
+  <Plotly fit v-if="ready" :data="plotlyData" :layout="plotlyLayout" :config="plotlyConfig" />
 </template>
 
 <style scoped>

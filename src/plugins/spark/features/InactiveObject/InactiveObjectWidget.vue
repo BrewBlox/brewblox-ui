@@ -10,34 +10,15 @@ export default class InactiveObjectWidget extends BlockWidget {
 <template>
   <div>
     <q-modal v-model="modalOpen">
-      <InactiveObjectForm
-        v-if="modalOpen"
-        :field="block"
-        :change="saveBlock"
-      />
+      <InactiveObjectForm v-if="modalOpen" :field="block" :change="saveBlock" />
     </q-modal>
 
     <q-card dark class="full-height column">
       <q-card-title class="title-bar">
-        <InputPopupEdit
-          :field="widgetId"
-          label="Widget ID"
-          display="span"
-          :change="v => widgetId = v"
-        />
+        <InputPopupEdit :field="widgetId" label="Widget ID" display="span" :change="v => widgetId = v" />
         <span class="vertical-middle on-left" slot="right">{{ this.subtitle }}</span>
-        <q-btn
-          flat round dense
-          slot="right"
-          @click="() => this.modalOpen = true"
-          icon="settings"
-        />
-        <q-btn
-          flat round dense
-          slot="right"
-          @click="refreshBlock"
-          icon="refresh"
-        />
+        <q-btn flat round dense slot="right" @click="openModal" icon="settings" />
+        <q-btn flat round dense slot="right" @click="refreshBlock" icon="refresh" />
       </q-card-title>
       <q-card-separator />
 
