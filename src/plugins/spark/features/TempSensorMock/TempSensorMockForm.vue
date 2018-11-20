@@ -1,9 +1,17 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
+import { Unit } from '@/helpers/units';
 
 @Component
 export default class TempSensorMockForm extends BlockForm {
+  defaultData() {
+    return {
+      value: new Unit(0, 'degC'),
+      valid: true,
+      connected: false,
+    };
+  }
 }
 </script>
 

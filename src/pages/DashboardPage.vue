@@ -250,95 +250,32 @@ export default class DashboardPage extends Vue {
 <template>
   <q-page padding>
     <q-inner-loading>
-      <q-spinner
-        size="50px"
-        color="primary"
-      />
+      <q-spinner size="50px" color="primary" />
     </q-inner-loading>
 
     <template>
       <portal to="toolbar-title">
         <div :class="widgetEditable ? 'editable': ''">
           <span>{{ dashboard.title }}</span>
-          <q-popup-edit
-            :disable="!widgetEditable"
-            title="Set dashboard title to:"
-            v-model="dashboard.title"
-            @save="onChangeDashboardTitle"
-          >
+          <q-popup-edit :disable="!widgetEditable" title="Set dashboard title to:" v-model="dashboard.title" @save="onChangeDashboardTitle">
             <q-input v-model="dashboard.title" />
           </q-popup-edit>
         </div>
       </portal>
 
       <portal to="toolbar-buttons">
-
-        <q-toggle
-          v-if="widgetEditable"
-          v-model="widgetMovable"
-          label="Move widgets"
-        />
-
-        <q-btn
-          v-if="widgetEditable"
-          color="primary"
-          icon="add"
-          label="Copy Widget"
-          @click="onStartCopyWidget"
-        />
-
-        <q-btn
-          v-if="widgetEditable"
-          color="primary"
-          icon="add"
-          label="New Widget"
-          @click="onStartNewWidget"
-        />
-
-        <q-btn
-          :icon="widgetEditable ? 'check' : 'mode edit'"
-          :color="widgetEditable ? 'positive' : 'primary'"
-          @click="toggleWidgetEditable"
-          :label="widgetEditable ? 'Stop editing' : 'Edit widgets'"
-        />
-
+        <q-toggle v-if="widgetEditable" v-model="widgetMovable" label="Move widgets" />
+        <q-btn v-if="widgetEditable" color="primary" icon="add" label="Copy Widget" @click="onStartCopyWidget" />
+        <q-btn v-if="widgetEditable" color="primary" icon="add" label="New Widget" @click="onStartNewWidget" />
+        <q-btn :icon="widgetEditable ? 'check' : 'mode edit'" :color="widgetEditable ? 'positive' : 'primary'" @click="toggleWidgetEditable" :label="widgetEditable ? 'Stop editing' : 'Edit widgets'" />
       </portal>
 
-      <WidgetModal
-        :isOpen="wizardModal.open"
-        :title="wizardModal.title"
-        :onClose="() => { this.wizardModal.open = false; }"
-      >
-        <component
-          v-if="wizardModal.open"
-          :is="wizardModal.component"
-          :onCreateItem="onCreateItem"
-        />
-      </WidgetModal>
+      <q-modal v-model="wizardModal.open">
+        <component v-if="wizardModal.open" :is="wizardModal.component" :onCreateItem="onCreateItem" />
+      </q-modal>
 
-      <GridContainer
-        :editable="widgetMovable"
-        :on-change-order="onChangeOrder"
-        :on-change-size="onChangeSize"
-      >
-        <component
-          class="dashboard-item"
-          v-for="val in validatedItems"
-          :disabled="widgetMovable"
-          :is="widgetEditable ? 'EditWidget' : val.component"
-          :error="val.error"
-          :key="val.item.id"
-          :id="val.item.id"
-          :type="val.item.widget"
-          :cols="val.item.cols"
-          :rows="val.item.rows"
-          :config="val.item.config"
-          :onConfigChange="onChangeItemConfig"
-          :onIdChange="onChangeItemId"
-          :onDeleteItem="() => onDeleteItem(val.item)"
-          :onCopyItem="() => onCopyItem(val.item)"
-          :onMoveItem="() => onMoveItem(val.item)"
-        />
+      <GridContainer :editable="widgetMovable" :on-change-order="onChangeOrder" :on-change-size="onChangeSize">
+        <component class="dashboard-item" v-for="val in validatedItems" :disabled="widgetMovable" :is="widgetEditable ? 'EditWidget' : val.component" :error="val.error" :key="val.item.id" :id="val.item.id" :type="val.item.widget" :cols="val.item.cols" :rows="val.item.rows" :config="val.item.config" :onConfigChange="onChangeItemConfig" :onIdChange="onChangeItemId" :onDeleteItem="() => onDeleteItem(val.item)" :onCopyItem="() => onCopyItem(val.item)" :onMoveItem="() => onMoveItem(val.item)" />
       </GridContainer>
     </template>
   </q-page>

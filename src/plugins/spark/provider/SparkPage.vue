@@ -14,7 +14,7 @@ import {
 } from '@/store/features/getters';
 import { dashboardItemIds, allDashboards, itemCopyName } from '@/store/dashboards/getters';
 import { createDashboardItem } from '@/store/dashboards/actions';
-import { widgetSize, isSystemBlock } from './getters';
+import { widgetSize, isSystemBlock, isReady } from './getters';
 
 @Component({
   props: {
@@ -48,6 +48,10 @@ export default class SparkPage extends Vue {
 
   get isAvailable() {
     return serviceAvailable(this.$store, this.$props.serviceId);
+  }
+
+  get isReady() {
+    return isReady(this.$store, this.$props.serviceId);
   }
 
   get items() {
@@ -124,10 +128,7 @@ export default class SparkPage extends Vue {
 <template>
   <div>
     <q-inner-loading :visible="items.length === 0">
-      <q-spinner
-        size="50px"
-        color="primary"
-      />
+      <q-spinner size="50px" color="primary" />
     </q-inner-loading>
 
     <template>
@@ -139,38 +140,13 @@ export default class SparkPage extends Vue {
 
       <portal to="toolbar-buttons">
 
-        <q-btn
-          :icon="editable ? 'check' : 'mode edit'"
-          :color="editable ? 'positive' : 'primary'"
-          @click="() => editable = !editable"
-          :label="editable ? 'Stop editing' : 'Edit blocks'"
-        />
+        <q-btn :icon="editable ? 'check' : 'mode edit'" :color="editable ? 'positive' : 'primary'" @click="() => editable = !editable" :label="editable ? 'Stop editing' : 'Edit blocks'" />
 
       </portal>
 
       <grid-container>
-        <SparkWidget
-          class="dashboard-item"
-          :id="$props.serviceId"
-          :serviceId="$props.serviceId"
-          :cols="widgetSize.cols"
-          :rows="widgetSize.rows"
-        />
-        <component
-          class="dashboard-item"
-          v-for="item in items"
-          :is="widgetComponent(item.widget)"
-          :key="item.id"
-          :id="item.id"
-          :type="item.widget"
-          :cols="item.cols"
-          :rows="item.rows"
-          :config="item.config"
-          :onConfigChange="onWidgetChange"
-          :onIdChange="onWidgetChange"
-          :onDeleteItem="() => onDeleteItem(item)"
-          :onCopyItem="() => onCopyItem(item)"
-        />
+        <SparkWidget v-if="isReady" class="dashboard-item" :id="$props.serviceId" :serviceId="$props.serviceId" :cols="widgetSize.cols" :rows="widgetSize.rows" />
+        <component class="dashboard-item" v-for="item in items" :is="widgetComponent(item.widget)" :key="item.id" :id="item.id" :type="item.widget" :cols="item.cols" :rows="item.rows" :config="item.config" :onConfigChange="onWidgetChange" :onIdChange="onWidgetChange" :onDeleteItem="() => onDeleteItem(item)" :onCopyItem="() => onCopyItem(item)" />
       </grid-container>
     </template>
   </div>

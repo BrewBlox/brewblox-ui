@@ -13,6 +13,14 @@ export default class ActuatorPinForm extends BlockForm {
   get actuatorState() {
     return state[this.block.data.state];
   }
+
+  defaultData() {
+    return {
+      state: 2,
+      invert: false,
+      constrainedBy: { constraints: [] },
+    };
+  }
 }
 </script>
 
