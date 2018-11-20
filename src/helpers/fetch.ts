@@ -7,7 +7,10 @@ const toJson = async (result: Promise<Response>) => {
   if (!response.ok) {
     throw new Error(response.statusText);
   }
-  return deserialize(await response.json());
+  const content = await response.json();
+  return content
+    ? deserialize(content)
+    : content;
 };
 
 export const get = async (url: string) =>

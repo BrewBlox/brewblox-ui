@@ -109,16 +109,8 @@ export default class BlockWizard extends Vue {
           enabled: () => true,
         },
         {
-          label: 'Revert form',
-          click: () => this.blockFormComponent.cancelChanges(),
-          enabled: () => true,
-        },
-        {
           label: 'Finish',
-          click: () => {
-            this.blockFormComponent.confirmChanges();
-            this.createWidget();
-          },
+          click: () => this.createWidget(),
           enabled: () => true,
         },
       ],

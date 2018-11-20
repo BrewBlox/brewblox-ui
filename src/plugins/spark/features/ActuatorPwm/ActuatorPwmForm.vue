@@ -9,6 +9,15 @@ export default class ActuatorPwmForm extends BlockForm {
   get block(): ActuatorPwmBlock {
     return this.blockField as ActuatorPwmBlock;
   }
+
+  defaultData() {
+    return {
+      actuatorId: new ActuatorDigitalLink(null),
+      period: 0,
+      setting: 0,
+      constrainedBy: { constraints: [] },
+    };
+  }
 }
 </script>
 

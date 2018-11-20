@@ -14,15 +14,4 @@ import Component from 'vue-class-component';
   },
 })
 export default class FormBase extends Vue {
-  cancelChanges() {
-    // Should be overridden by child class
-  }
-
-  confirmChanges() {
-    // Should be overridden by child class
-  }
-
-  created() {
-    this.cancelChanges();
-  }
 }

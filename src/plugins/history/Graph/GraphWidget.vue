@@ -45,21 +45,6 @@ export default class GraphWidget extends WidgetBase {
     </q-card>
 
   </div>
-
-  <!-- <widget-card
-    :title="$props.id"
-    :subTitle="$props.type"
-    :onRefresh="regraph"
-    :body="false"
-    form="GraphForm"
-    v-model="graphCfg"
-  >
-    <GraphCard
-      ref="graph"
-      :id="$props.id"
-      :config="graphCfg"
-    />
-  </widget-card> -->
 </template>
 
 <style scoped>

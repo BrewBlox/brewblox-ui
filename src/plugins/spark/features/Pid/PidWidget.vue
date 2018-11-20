@@ -50,7 +50,7 @@ export default class PidWidget extends BlockWidget {
 
     <q-card dark class="full-height column">
       <q-card-title class="title-bar">
-        <InputPopupEdit :field="widgetId" label="Widget ID" display="span" :change="v => widgetId = v" />
+        <InputPopupEdit class="ellipsis" :field="widgetId" label="Widget ID" display="span" :change="v => widgetId = v" />
         <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
         <q-btn slot="right" flat dense round @click="openModal" icon="settings" />
         <q-btn slot="right" flat round dense @click="refreshBlock" icon="refresh" />

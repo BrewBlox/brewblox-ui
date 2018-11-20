@@ -3,9 +3,21 @@ import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { SetpointLink, TempSensorLink } from '@/helpers/units/KnownLinks';
 import { blockIds } from '@/plugins/spark/store/getters';
+import { Unit } from '@/helpers/units';
 
 @Component
 export default class SetpointSensorPairForm extends BlockForm {
+  defaultData() {
+    return {
+      setpointId: new SetpointLink(null),
+      sensorId: new TempSensorLink(null),
+      setpointValid: true,
+      sensorValid: true,
+      setpointValue: new Unit(0, 'degC'),
+      sensorValue: new Unit(0, 'degC'),
+      valid: true,
+    };
+  }
 }
 </script>
 

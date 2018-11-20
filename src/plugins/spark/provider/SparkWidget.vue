@@ -38,6 +38,9 @@ import {
   },
 })
 export default class SparkWidget extends Vue {
+  modalOpen: boolean = false;
+  slideIndex: number = 0;
+
   get service() {
     return serviceById(this.$store, this.$props.serviceId);
   }
@@ -89,6 +92,33 @@ export default class SparkWidget extends Vue {
     return discoveredBlocks(this.$store, this.service.id);
   }
 
+  get subtitles(): string[] {
+    return [
+      'State',
+      'Discovered blocks',
+    ];
+  }
+
+  get subtitle() {
+    return this.subtitles[this.slideIndex] || '';
+  }
+
+  navTitle(idx: number) {
+    return idx === this.slideIndex
+      ? this.subtitles[this.slideIndex]
+      : null;
+  }
+
+  navIcon(idx: number) {
+    return (idx === this.slideIndex && this.navTitle(idx))
+      ? null
+      : 'fiber_manual_record';
+  }
+
+  openModal() {
+    this.modalOpen = true;
+  }
+
   clearDiscoveredBlocks() {
     clearDiscoveredBlocks(this.$store, this.service.id);
   }
@@ -101,72 +131,65 @@ export default class SparkWidget extends Vue {
     return durationString(durationMs);
   }
 
-  fetch() {
+  fetchAll() {
     fetchAll(this.$store, serviceById(this.$store, this.service.id));
   }
 }
 </script>
 
 <template>
-  <widget-card
-    v-if="ready"
-    :title="$props.serviceId"
-    subTitle="Spark Service Configuration"
-    form="SparkForm"
-    v-model="service"
-    :onRefresh="fetch"
-  >
+  <div>
+    <q-modal v-model="modalOpen">
+      <SparkForm v-if="modalOpen" :field="service" />
+    </q-modal>
 
-    <widget-field
-      label="Device ID"
-      icon="devices"
-    >
-      <big>{{ sysInfo.data.deviceId }}</big>
-    </widget-field>
+    <q-card dark class="full-height column">
+      <q-card-title class="title-bar">
+        <InputPopupEdit class="ellipsis" :field="service.id" label="Widget ID" display="span" :change="() => {}" />
+        <span class="vertical-middle on-left" slot="right">Spark Service</span>
+        <q-btn flat round dense slot="right" @click="openModal" icon="settings" />
+        <q-btn flat round dense slot="right" @click="fetchAll" icon="refresh" />
+      </q-card-title>
+      <q-card-separator />
 
-    <widget-field
-      label="Active profiles"
-      icon="settings_input_component"
-    >
-      <big>{{ activeNames }}</big>
-    </widget-field>
+      <q-carousel quick-nav class="col" v-model="slideIndex">
 
-    <widget-field
-      label="Time since boot"
-      icon="timelapse"
-    >
-      <big>{{ durationString(ticks.data.millisSinceBoot) }}</big>
-    </widget-field>
+        <!-- State -->
+        <q-carousel-slide class="unpadded">
+          <q-card-main class="column col">
+            <q-field class="col" label="Device ID">
+              <big>{{ sysInfo.data.deviceId }}</big>
+            </q-field>
+            <q-field class="col" label="Active Profiles">
+              <big>{{ activeNames }}</big>
+            </q-field>
+            <q-field class="col" label="Time since boot">
+              <big>{{ durationString(ticks.data.millisSinceBoot) }}</big>
+            </q-field>
+            <q-field class="col" label="Date">
+              <big>{{ sysDate }}</big>
+            </q-field>
+          </q-card-main>
+        </q-carousel-slide>
 
-    <widget-field
-      label="Date"
-      icon="schedule"
-    >
-      <big>{{ sysDate }}</big>
-    </widget-field>
+        <!-- Discovered blocks -->
+        <q-carousel-slide class="unpadded">
+          <q-card-main class="column col">
+            <q-field class="col column" label="Discovered blocks" orientation="vertical">
+              <div class="row">
+                <q-btn label="Refresh" @click="fetchDiscoveredBlocks" />
+                <q-btn label="Clear" v-if="discoveredBlocks.length" @click="clearDiscoveredBlocks" />
+              </div>
+              <p v-for="id in discoveredBlocks" :key="id">{{ id }}</p>
+            </q-field>
+          </q-card-main>
+        </q-carousel-slide>
 
-    <widget-field
-      label="Discovered blocks"
-      icon="search"
-    >
-      <q-btn
-        label="Refresh"
-        @click="fetchDiscoveredBlocks"
-      />
-      <p
-      v-for="id in discoveredBlocks"
-      :key="id"
-      >
-        {{ id }}<br/>
-      </p>
-      <q-btn
-        label="Clear"
-        v-if="discoveredBlocks.length"
-        @click="clearDiscoveredBlocks"
-      />
-    </widget-field>
+        <q-btn slot="quick-nav" slot-scope="props" color="white" flat dense :icon="navIcon(props.slide)" :label="navTitle(props.slide)" @click="props.goToSlide()" :class="{inactive: !props.current}" />
 
-  </widget-card>
+      </q-carousel>
+    </q-card>
+  </div>
 </template>
 
 <style scoped>

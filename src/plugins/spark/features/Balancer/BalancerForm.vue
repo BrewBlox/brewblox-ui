@@ -4,6 +4,11 @@ import BlockForm from '@/plugins/spark/components/BlockForm';
 
 @Component
 export default class BalancerForm extends BlockForm {
+  defaultData() {
+    return {
+      clients: [],
+    };
+  }
 }
 </script>
 
@@ -12,12 +17,7 @@ export default class BalancerForm extends BlockForm {
     <q-card>
       <q-card-title>Clients</q-card-title>
       <q-card-main>
-        <q-field
-          v-for="client in block.data.clients"
-          :key="client.id.id"
-          class="col"
-          :label="client.id.id || 'unknown'"
-        >
+        <q-field v-for="client in block.data.clients" :key="client.id.id" class="col" :label="client.id.id || 'unknown'">
           <big>{{ client.granted | round}} / {{ client.requested | round }}</big>
         </q-field>
       </q-card-main>

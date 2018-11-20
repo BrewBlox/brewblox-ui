@@ -1,4 +1,6 @@
 import { Block } from '@/plugins/spark/state';
+import { RootStore } from '@/store/state';
+import { blockIds } from '@/plugins/spark/store/getters';
 
 export const widgetSize = {
   cols: 4,
@@ -17,3 +19,11 @@ export const isSystemBlock = (block: Block) =>
     oneWireBusId,
     ticksId,
   ].includes(block.id);
+
+export const isReady = (store: RootStore, serviceId: string) =>
+  [
+    sysInfoId,
+    profilesId,
+    oneWireBusId,
+    ticksId,
+  ].every(id => blockIds(store, serviceId).includes(id));

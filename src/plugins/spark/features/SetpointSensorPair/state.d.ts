@@ -11,5 +11,7 @@ export interface SetpointSensorPairBlock extends Block {
 
     setpointValue: Unit;
     sensorValue: Unit;
+
+    valid: boolean;
   };
 }

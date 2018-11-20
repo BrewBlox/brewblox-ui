@@ -1,10 +1,18 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
+import { ProcessValueLink } from '@/helpers/units/KnownLinks';
 
 @Component
 export default class ActuatorOffsetForm extends BlockForm {
-
+  defaultData() {
+    return {
+      targetId: new ProcessValueLink(null),
+      referenceId: new ProcessValueLink(null),
+      referenceSettingOrValue: 0,
+      constrainedBy: { constraints: [] },
+    };
+  }
 }
 </script>
 

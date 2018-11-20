@@ -4,6 +4,8 @@ import { RootStore } from '@/store/state';
 import { Block, UserUnits } from '../state';
 import { BlocksContext } from './state';
 import { dispatch } from '@/helpers/dynamic-store';
+import { allDashboardItems } from '@/store/dashboards/getters';
+import { setDashboardItem } from '@/store/dashboards/mutations';
 import {
   clearBlocks as clearBlocksInApi,
   createBlock as createBlockInApi,
@@ -11,6 +13,7 @@ import {
   fetchBlock as fetchBlockInApi,
   fetchBlocks as fetchBlocksInApi,
   persistBlock as persistBlockInApi,
+  renameBlock as renameBlockInApi,
   fetchUnits as fetchUnitsInApi,
   persistUnits as persistUnitsInApi,
   fetchUnitAlternatives as fetchUnitAlternativesInApi,
@@ -67,6 +70,20 @@ export const updateProfileNames = (store: RootStore, id: string, names: string[]
 
 export const fetchBlocks = async (store: RootStore, serviceId: string) =>
   setBlocksInStore(store, serviceId, await fetchBlocksInApi(serviceId));
+
+export const renameBlock = async (
+  store: RootStore,
+  serviceId: string,
+  currentId: string,
+  newId: string,
+) => {
+  await renameBlockInApi(serviceId, currentId, newId);
+  await fetchBlocks(store, serviceId);
+  allDashboardItems(store)
+    .filter(item => item.config.serviceId === serviceId && item.config.blockId === currentId)
+    .forEach(
+      item => setDashboardItem(store, { ...item, config: { ...item.config, blockId: newId } }));
+};
 
 export const clearBlocks = async (store: RootStore, service: Service) => {
   await clearBlocksInApi(service.id);

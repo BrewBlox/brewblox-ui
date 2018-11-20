@@ -40,6 +40,12 @@ export default class SetpointProfileForm extends BlockForm {
       : new Date().getTime());
   }
 
+  defaultData() {
+    return {
+      points: [],
+    };
+  }
+
   savePoints(points: OffsetPoint[] = this.points) {
     this.block.data.points = points
       .sort(objectSorter('time'))
