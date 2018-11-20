@@ -50,6 +50,7 @@ import Quasar, {
   QCarouselSlide,
   QCarouselControl,
   QPopupEdit,
+  QTooltip,
 } from 'quasar';
 
 import 'quasar-extras/roboto-font';
@@ -108,6 +109,7 @@ Vue.use(Quasar, {
     QCarouselSlide,
     QCarouselControl,
     QPopupEdit,
+    QTooltip,
   },
   directives: { Ripple, CloseOverlay },
   plugins: { Notify, Dialog },

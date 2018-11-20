@@ -5,6 +5,7 @@ import { clone } from 'lodash';
 export interface ConstraintInfo {
   key: string;
   value: any;
+  blocking?: boolean;
 }
 
 const asInfo = (con: any): ConstraintInfo => {
@@ -33,10 +34,14 @@ const asConstraint = (cinfo: ConstraintInfo) =>
 })
 export default class Constraints extends Vue {
   get constraints(): ConstraintInfo[] {
-    return this.$props
+    const cons =  this.$props
       .field
       .constraints
       .map(asInfo);
+    if (this.$props.field.blocking > 0) {
+      cons[this.$props.field.blocking - 1]['blocking'] = true;
+    }
+    return cons;
   }
 
   saveConstraints(vals: ConstraintInfo[] = this.constraints) {
