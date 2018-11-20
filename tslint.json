@@ -18,5 +18,10 @@
       "error"
     ]
   },
-  "rulesDirectory": []
+  "rulesDirectory": [],
+  "linterOptions": {
+    "exclude": [
+      ".vscode"
+    ]
+  }
 }

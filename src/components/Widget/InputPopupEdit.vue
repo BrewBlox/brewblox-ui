@@ -20,9 +20,17 @@ import Component from 'vue-class-component';
       type: String,
       default: 'text',
     },
+    clearable: {
+      type: Boolean,
+      default: false,
+    },
     display: {
       type: String,
       default: 'big',
+    },
+    disable: {
+      type: Boolean,
+      default: false,
     },
   },
 })
@@ -32,9 +40,13 @@ export default class InputPopupEdit extends Vue {
   get displayValue() {
     const val = this.$props.field;
     if (val === null || val === undefined || val === '') {
-      return '    ';
+      return '<not set>';
     }
     return val;
+  }
+
+  get popupTitle() {
+    return `Set ${this.$props.label} to:`;
   }
 
   startEdit() {
@@ -49,9 +61,9 @@ export default class InputPopupEdit extends Vue {
 
 <template>
   <div>
-    <component :is="$props.display" class="editable">{{ displayValue }}</component>
-    <q-popup-edit buttons persistent :title="`Set ${this.$props.label} to:`" v-model="placeholder" @show="startEdit" @save="endEdit">
-      <q-input :type="$props.type" v-model="placeholder" />
+    <component :disabled="$props.disable" :is="$props.display" class="editable">{{ displayValue }}</component>
+    <q-popup-edit buttons persistent :disable="$props.disable" :title="popupTitle" v-model="placeholder" @show="startEdit" @save="endEdit">
+      <q-input :clearable="$props.clearable" :type="$props.type" v-model="placeholder" />
     </q-popup-edit>
   </div>
 </template>

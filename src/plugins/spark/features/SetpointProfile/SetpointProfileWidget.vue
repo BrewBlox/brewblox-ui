@@ -19,7 +19,6 @@ export default class SetpointProfileWidget extends BlockWidget {
   }
 
   get plotlyData(): Partial<PlotData>[] {
-    // console.log(this.block.data.points.map(p => p.temperature.value));
     return [{
       name: 'Setpoints',
       type: 'scatter',
