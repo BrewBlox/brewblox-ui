@@ -3,8 +3,12 @@ import Component from 'vue-class-component';
 
 @Component({
   props: {
-    value: {
+    field: {
       type: Object,
+      required: true,
+    },
+    change: {
+      type: Function,
       required: true,
     },
   },

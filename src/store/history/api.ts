@@ -8,12 +8,24 @@ const snakeCasedObj = (obj: any) =>
     .filter(key => !!obj[key])
     .reduce((acc: any, key: string) => ({ ...acc, [snakeCased(key)]: obj[key] }), {});
 
+const formatTime = (val?: string | number): string | undefined =>
+  (isNaN(val as number)
+    ? val as string
+    : new Date(Number(val)).toUTCString());
+
+const timeFormatted = (params: QueryParams) =>
+  ({
+    ...params,
+    start: formatTime(params.start),
+    end: formatTime(params.end),
+  });
+
 export const fetchValueSource = async (
   params: QueryParams,
   target: QueryTarget,
 ) =>
   sse(`/history/sse/values?${queryString.stringify({
-    ...snakeCasedObj(params),
+    ...snakeCasedObj(timeFormatted(params)),
     ...snakeCasedObj(target),
   })}`);
 

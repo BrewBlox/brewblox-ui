@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { displayNameById } from '@/store/features/getters';
 
 @Component({
   props: {
@@ -47,5 +48,9 @@ export default class Widget extends Vue {
 
   set widgetId(newId: string) {
     this.$props.onIdChange(this.widgetId, newId);
+  }
+
+  get displayName() {
+    return displayNameById(this.$store, this.$props.type);
   }
 }

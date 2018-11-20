@@ -1,15 +1,16 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { Unit } from '@/helpers/units';
+import { fetchKnownKeys } from '@/store/history/actions';
+import { fieldsByMeasurement } from '@/store/history/getters';
 
 @Component({
   props: {
     field: {
       required: true,
     },
-    options: {
-      type: Array,
+    measurement: {
+      type: String,
       required: true,
     },
     change: {
@@ -24,35 +25,18 @@ import { Unit } from '@/helpers/units';
       type: String,
       default: 'big',
     },
-    multiple: {
-      type: Boolean,
-      default: false,
-    },
   },
 })
-export default class SelectPopupEdit extends Vue {
-  plc = null;
+export default class FieldPopupEdit extends Vue {
+  placeholder = '';
 
-  get placeholder() {
-    if (this.$props.multiple && this.plc === null) {
-      return [];
-    }
-    return this.plc;
-  }
-
-  set placeholder(v: any) {
-    this.plc = v;
+  get options() {
+    return (fieldsByMeasurement(this.$store, this.$props.measurement) || [])
+      .map(m => ({ label: m, value: m }));
   }
 
   get displayValue() {
-    if (this.$props.multiple) {
-      const text = this.$props.field
-        .map((v: any) => this.$props.options.find((opt: any) => opt.value === v))
-        .map((v: any) => v.label)
-        .join(', ');
-      return text || '-';
-    }
-    return (this.$props.options
+    return (this.options
       .find((opt: any) => opt.value === this.$props.field)
       || { label: '-' })
       .label;
@@ -60,6 +44,7 @@ export default class SelectPopupEdit extends Vue {
 
   startEdit() {
     this.placeholder = this.$props.field;
+    fetchKnownKeys(this.$store);
   }
 
   endEdit() {
@@ -72,7 +57,7 @@ export default class SelectPopupEdit extends Vue {
   <div>
     <component :is="$props.display" class="editable">{{ displayValue }}</component>
     <q-popup-edit buttons persistent :title="`Set ${this.$props.label} to:`" v-model="placeholder" @show="startEdit" @save="endEdit">
-      <q-select :multiple="$props.multiple" v-model="placeholder" :options="$props.options" />
+      <q-select clearable v-model="placeholder" :options="options" />
     </q-popup-edit>
   </div>
 </template>

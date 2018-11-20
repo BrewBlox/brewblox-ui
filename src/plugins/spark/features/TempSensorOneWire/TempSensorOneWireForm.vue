@@ -5,59 +5,30 @@ import { Unit } from '@/helpers/units';
 
 @Component
 export default class TempSensorOneWireForm extends BlockForm {
-  get inputMapping() {
-    return {
-      profiles: { path: 'profiles', default: [] },
-      offset: { path: 'data.offset', default: new Unit(0, 'delta_degC') },
-      address: { path: 'data.address', default: '' },
-    };
-  }
 }
 </script>
 
 <template>
-  <q-card orientation="vertical">
-    <q-card-main class="column centered">
-
-      <widget-field
-        label="Active profiles"
-        icon="settings_input_component"
-      >
-        <profiles-bar
-          v-model="inputValues.profiles"
-          :profileNames="profileNames"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Address"
-        icon="edit"
-      >
-        <q-input
-          v-model="inputValues.address"
-          suffix="HEX"
-          upper-case
-        />
-      </widget-field>
-
-      <widget-field
-        label="Offset"
-        icon="edit"
-      >
-        <q-input
-          v-model="inputValues.offset.value"
-          :suffix="inputValues.offset.unitNotation"
-          type="number"
-        />
-      </widget-field>
-
-    </q-card-main>
-  </q-card>
+  <div class="widget-modal">
+    <q-card>
+      <q-card-title>Settings</q-card-title>
+      <q-card-main>
+        <q-field class="col" label="Address">
+          <InputPopupEdit label="Address" :field="block.data.address" :change="callAndSaveBlock(v => block.data.address = v)" />
+        </q-field>
+        <q-field class="col" label="Offset">
+          <UnitPopupEdit label="Offset" :field="block.data.offset" :change="callAndSaveBlock(v => block.data.offset = v)" />
+        </q-field>
+      </q-card-main>
+    </q-card>
+  </div>
 </template>
 
 <style scoped>
-.centered {
-  margin: auto;
+.q-card {
+  min-width: 400px;
+  width: 100%;
+  margin-bottom: 10px;
 }
 </style>
 

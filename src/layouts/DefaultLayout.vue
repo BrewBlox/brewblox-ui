@@ -339,6 +339,14 @@ export default class DefaultLayout extends Vue {
   flex-direction: column;
 }
 
+.widget-modal {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 800px;
+  align-items: center;
+  padding: 10px;
+}
+
 .widget-body {
   flex: 1;
   overflow: auto;
@@ -350,5 +358,21 @@ export default class DefaultLayout extends Vue {
 
 .editable {
   border-bottom: 1px solid gray;
+}
+
+.unimportant {
+  color: grey;
+}
+
+.unpadded {
+  padding: 0px;
+}
+
+.title-bar {
+  padding: 5px 10px;
+}
+
+.q-card-main {
+  padding: 10px;
 }
 </style>

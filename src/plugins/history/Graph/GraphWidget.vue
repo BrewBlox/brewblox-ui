@@ -6,11 +6,13 @@ import { Watch } from 'vue-property-decorator';
 
 @Component
 export default class GraphWidget extends WidgetBase {
+  modalOpen: boolean = false;
+
   get graphCfg(): GraphConfig {
     return this.$props.config;
   }
 
-  set graphCfg(cfg: GraphConfig) {
+  saveConfig(cfg: GraphConfig) {
     this.$props.onConfigChange(this.$props.id, { ...cfg });
   }
 
@@ -22,7 +24,29 @@ export default class GraphWidget extends WidgetBase {
 </script>
 
 <template>
-  <widget-card
+  <div>
+    <q-modal v-model="modalOpen">
+      <GraphForm v-if="modalOpen" :field="graphCfg" :change="saveConfig" />
+    </q-modal>
+
+    <q-card dark class="full-height column">
+      <q-card-title class="title-bar">
+        <InputPopupEdit :field="widgetId" label="Widget ID" display="span" :change="v => widgetId = v" />
+        <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
+        <q-btn flat round dense slot="right" @click="modalOpen = true" icon="settings" />
+        <q-btn flat round dense slot="right" @click="regraph" icon="refresh" />
+      </q-card-title>
+      <q-card-separator />
+
+      <div>
+        <GraphCard ref="graph" :id="$props.id" :config="graphCfg" />
+      </div>
+
+    </q-card>
+
+  </div>
+
+  <!-- <widget-card
     :title="$props.id"
     :subTitle="$props.type"
     :onRefresh="regraph"
@@ -35,7 +59,7 @@ export default class GraphWidget extends WidgetBase {
       :id="$props.id"
       :config="graphCfg"
     />
-  </widget-card>
+  </widget-card> -->
 </template>
 
 <style scoped>

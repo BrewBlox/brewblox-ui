@@ -6,58 +6,30 @@ import { blockIds } from '@/plugins/spark/store/getters';
 
 @Component
 export default class SetpointSensorPairForm extends BlockForm {
-  get inputMapping() {
-    return {
-      profiles: { path: 'profiles', default: [] },
-      setpointId: { path: 'data.setpointId', default: new SetpointLink(null) },
-      sensorId: { path: 'data.sensorId', default: new TempSensorLink(null) },
-    };
-  }
-
-  afterBlockFetch() {
-    this.fetchCompatibleToInputLinks();
-  }
 }
 </script>
 
 <template>
-  <q-card orientation="vertical">
-    <q-card-main class="column centered">
-
-      <widget-field
-        label="Active profiles"
-        icon="settings_input_component"
-      >
-        <profiles-bar
-          v-model="inputValues.profiles"
-          :profileNames="profileNames"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Setpoint"
-        icon="edit"
-      >
-        <q-select
-          v-model="inputValues.setpointId.id"
-          :options="linkOpts(inputValues.setpointId)"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Sensor"
-        icon="edit"
-      >
-        <q-select
-          v-model="inputValues.sensorId.id"
-          :options="linkOpts(inputValues.sensorId)"
-        />
-      </widget-field>
-
-    </q-card-main>
-  </q-card>
+  <div class="widget-modal">
+    <q-card>
+      <q-card-title>Settings</q-card-title>
+      <q-card-main>
+        <q-field class="col" label="Setpoint">
+          <LinkPopupEdit label="Setpoint" :field="block.data.setpointId" :serviceId="serviceId" :change="callAndSaveBlock(v => block.data.setpointId = v)" />
+        </q-field>
+        <q-field class="col" label="Sensor">
+          <LinkPopupEdit label="Sensor" :field="block.data.sensorId" :serviceId="serviceId" :change="callAndSaveBlock(v => block.data.sensorId = v)" />
+        </q-field>
+      </q-card-main>
+    </q-card>
+  </div>
 </template>
 
 <style scoped>
+.q-card {
+  min-width: 400px;
+  width: 100%;
+  margin-bottom: 10px;
+}
 </style>
 

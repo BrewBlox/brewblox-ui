@@ -1,138 +1,42 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import { Notify } from 'quasar';
+import parseDuration from 'parse-duration';
 import FormBase from '@/components/Widget/FormBase';
 import WidgetField from '@/components/Widget/WidgetField.vue';
 import { toShadow, fromShadow, ShadowMapping, deepCopy } from '@/helpers/shadow-copy';
-import { uniqueFilter } from '@/helpers/functional';
+import { uniqueFilter, durationString } from '@/helpers/functional';
 import { QueryParams, QueryTarget } from '@/store/history/state';
 import {
   fields as availableFields,
   measurements as availableMeasurements,
 } from '@/store/history/getters';
 import { fetchKnownKeys } from '@/store/history/actions';
+import { GraphConfig } from '@/components/Graph/state';
+import FieldPopupEdit from './FieldPopupEdit.vue';
 
 @Component({
   components: {
-    WidgetField,
-  },
-  props: {
-    value: {
-      type: Object,
-      required: true,
-    },
+    FieldPopupEdit,
   },
 })
 export default class GraphForm extends FormBase {
   $q: any;
-  vals: { [key: string]: any; } = {};
 
-  get inputMapping() {
-    return {
-      params: { path: 'params', default: {} },
-      targets: { path: 'targets', default: [] },
-      renames: { path: 'renames', default: {} },
-    };
+  get config(): GraphConfig {
+    return this.$props.field as GraphConfig;
   }
 
-  get inputValues(): { [key: string]: any; } {
-    return this.vals;
-  }
-
-  set inputValues(values: { [key: string]: any; }) {
-    this.vals = values;
-  }
-
-  get config() {
-    return this.$props.value;
-  }
-
-  set config(config: any) {
-    this.$emit('input', config);
-  }
-
-  get changed(): boolean {
-    const state = toShadow(this.config, this.inputMapping);
-    return JSON.stringify(state) !== JSON.stringify(this.inputValues);
-  }
-
-  get hasTargets() {
-    return this.inputValues.targets
-      && this.inputValues.targets.length > 0;
-  }
-
-  get knownFields() {
-    return availableFields(this.$store);
-  }
-
-  reset() {
-    this.inputValues = deepCopy(toShadow(this.config, this.inputMapping));
+  created() {
     fetchKnownKeys(this.$store);
   }
 
-  cancelChanges() {
-    this.reset();
+  saveConfig(config: GraphConfig = this.config) {
+    this.$props.change(config);
   }
 
-  confirmChanges() {
-    this.config = fromShadow(
-      this.inputValues,
-      this.inputMapping,
-      { ...this.config },
-    );
-    Notify.create({
-      type: 'positive',
-      position: 'bottom',
-      message: 'Saved changes',
-    });
-  }
-
-  fieldSections = (field: string) =>
-    field.split('/');
-
-  relevantKnownFields(target: QueryTarget) {
-    return this.knownFields[target.measurement] || [];
-  }
-
-  fieldValid(target: QueryTarget, field: string): boolean {
-    return this.relevantKnownFields(target).includes(field);
-  }
-
-  updateFields(target: QueryTarget, fields: string[]) {
-    this.$set(target, 'fields', fields);
-  }
-
-  addField(target: QueryTarget) {
-    this.updateFields(target, [...target.fields, '']);
-  }
-
-  removeField(target: QueryTarget, index: number) {
-    this.updateFields(target, target.fields.filter((_, idx) => idx !== index));
-  }
-
-  changeField(target: QueryTarget, index: number, val: string) {
-    target.fields[index] = this.fieldValid(target, val)
-      ? val
-      : `${val}/`;
-    this.updateFields(target, [...target.fields]);
-  }
-
-  fieldSectionOptions(target: QueryTarget, field: string, idx: number) {
-    const pattern = this.fieldSections(field).slice(0, idx).join('/');
-
-    return this.relevantKnownFields(target)
-      .filter(fkey => fkey.startsWith(pattern))
-      .map(fkey => this.fieldSections(fkey)[idx])
-      .filter(uniqueFilter)
-      .map(section => ({ label: section, value: section }));
-  }
-
-  changeFieldSection(target: QueryTarget, fieldIndex: number, sectionIndex: number, val: string) {
-    const sections = [
-      ...this.fieldSections(target.fields[fieldIndex]).slice(0, sectionIndex),
-      val,
-    ];
-    this.changeField(target, fieldIndex, sections.join('/'));
+  callAndSaveConfig(func: (v: any) => void) {
+    return (v: any) => { func(v); this.saveConfig(); };
   }
 
   addTarget() {
@@ -146,166 +50,101 @@ export default class GraphForm extends FormBase {
         items: availableMeasurements(this.$store)
           .map(m => ({ label: m, value: m })),
       },
-    }).then((m: string) =>
-      this.$set(
-        this.inputValues,
-        'targets',
-        [
-          ...this.inputValues.targets,
-          {
-            measurement: m,
-            fields: [],
-          },
-        ],
-      ));
+    }).then((m: string) => {
+      this.config.targets.push({ measurement: m, fields: [] });
+      this.saveConfig();
+    });
+  }
+
+  removeTarget(index: number) {
+    this.config.targets = this.config.targets.filter((_, idx) => idx !== index);
+  }
+
+  removeField(target: QueryTarget, index: number) {
+    target.fields = target.fields.filter((_, idx) => idx !== index);
   }
 
   fieldRename(target: QueryTarget, field: string) {
+    if (!field) {
+      return '';
+    }
     const key = `${target.measurement}/${field}`;
-    return this.inputValues.renames[`${target.measurement}/${field}`] || key;
+    return this.config.renames[`${target.measurement}/${field}`] || key;
   }
 
   changeFieldRename(target: QueryTarget, field: string, name: string) {
-    const key = `${target.measurement}/${field}`;
-    if (!name || name === key) {
-      this.$delete(this.inputValues.renames, key);
-    } else {
-      this.$set(this.inputValues.renames, key, name);
+    if (!field) {
+      return;
     }
+    const defaultKey = `${target.measurement}/${field}`;
+    if (!name || name === defaultKey) {
+      delete this.config.renames[defaultKey];
+    } else {
+      this.config.renames[defaultKey] = name;
+    }
+  }
+
+  durationString(valMs: number) {
+    return durationString(valMs);
+  }
+
+  parseDuration(val: string) {
+    return parseDuration(val);
   }
 }
 </script>
 
 <template>
-  <q-card orientation="vertical">
-    <q-card-main class="column centered">
-
-      <!-- shared history params config -->
-      <widget-field
-        v-if="hasTargets"
-        icon="edit"
-        label="History settings"
-      >
+  <div class="widget-modal">
+    <q-card dark>
+      <q-card-title>Period settings</q-card-title>
+      <q-card-main>
         <div class="options-edit-container">
-
-          <q-datetime
-            class="options-field"
-            dark
-            format24h
-            clearable
-            stack-label="Start"
-            type="datetime"
-            v-model="inputValues.params.start"
-            :after="[
-              {
-                icon: 'restore',
-                handler: () => inputValues.params.start = new Date(),
-              }
-            ]"
-          />
-
-          <q-input
-            class="options-field"
-            v-model="inputValues.params.duration"
-            stack-label="Duration"
-            clearable
-          />
-
-          <q-datetime
-            class="options-field"
-            dark
-            format24h
-            clearable
-            no-parent-field
-            stack-label="End"
-            type="datetime"
-            v-model="inputValues.params.end"
-            :after="[
-              {
-                icon: 'restore',
-                handler: () => inputValues.params.end = new Date(),
-              }
-            ]"
-          />
-
+          <q-field class="col" label="Start time" orientation="vertical">
+            <DatetimePopupEdit label="Start time" display="big" :field="config.params.start" :change="callAndSaveConfig(v => config.params.start = v)" />
+          </q-field>
+          <q-field class="col" label="Duration" orientation="vertical">
+            <InputPopupEdit clearable label="Duration" :field="durationString(config.params.duration)" :change="callAndSaveConfig(v => config.params.duration = parseDuration(v))" />
+          </q-field>
+          <q-field class="col" label="End time" orientation="vertical">
+            <DatetimePopupEdit label="End time" display="big" :field="config.params.end" :change="callAndSaveConfig(v => config.params.end = v)" />
+          </q-field>
         </div>
-
         <div class="options-edit-container">
-          <q-input
-            class="options-field"
-            v-model="inputValues.params.approxPoints"
-            stack-label="Points after downsampling"
-            type="number"
-          />
+          <q-field class="col" label="Points after downsampling" orientation="vertical">
+            <InputPopupEdit label="Points after downsampling" type="number" :field="config.params.approxPoints" :change="callAndSaveConfig(v => config.params.approxPoints = v)" />
+          </q-field>
         </div>
-
-        <q-card-separator />
-      </widget-field>
-
-      <!-- history target fields -->
-      <div
-        v-for="target in inputValues.targets"
-        :key="target.measurement"
-      >
-        <widget-field
-          icon="show_chart"
-          :label="`${target.measurement} fields`"
-        >
-          <div
-            class="options-edit-container"
-            v-for="(field, fieldIdx) in target.fields"
-            :key="fieldIdx"
-          >
-            <q-select
-              class="options-field"
-              v-for="(section, sectionIdx) in fieldSections(field)"
-              :key="sectionIdx"
-              :options="fieldSectionOptions(target, field, sectionIdx)"
-              :value="section"
-              @change="val => changeFieldSection(target, fieldIdx, sectionIdx, val)"
-            />
-            <q-icon
-              name="check"
-              color="positive"
-              v-if="fieldValid(target, field)"
-            />
-            <q-btn
-              flat
-              round
-              dense
-              icon="delete"
-              label="Remove field"
-              @click="removeField(target, fieldIdx)"
-            />
-            <q-input
-              clearable
-              stack-label="Display name"
-              :value="fieldRename(target, field)"
-              @input="v => changeFieldRename(target, field, v)"
-            />
-          </div>
-          <q-btn
-            icon="add"
-            label="Add field"
-            @click="addField(target)"
-          />
-        </widget-field>
-        <q-card-separator />
-      </div>
-
-      <!-- new source button -->
-      <widget-field
-        label="New source"
-        icon="add"
-      >
-        <q-btn
-          label="Add source"
-          @click="addTarget"
-        />
-      </widget-field>
-
-    </q-card-main>
-  </q-card>
+      </q-card-main>
+    </q-card>
+    <q-card dark v-for="(target, targetIdx) in config.targets" :key="targetIdx">
+      <q-card-title>
+        {{ target.measurement }}
+        <q-btn slot="right" flat dense icon="delete" label="Delete source" @click="removeTarget(targetIdx); saveConfig();" />
+      </q-card-title>
+      <q-card-main>
+        <div class="row no-wrap" v-for="(field, fieldIdx) in target.fields" :key="fieldIdx">
+          <q-field class="col" label="Field" orientation="vertical">
+            <FieldPopupEdit label="field" :field="field" :measurement="target.measurement" :change="callAndSaveConfig(v => target.fields[fieldIdx] = v)" />
+          </q-field>
+          <q-field class="col" label="Display name" orientation="vertical">
+            <InputPopupEdit :disable="!field" clearable label="Display name" :field="fieldRename(target, field)" :change="callAndSaveConfig(v => changeFieldRename(target, field, v))" />
+          </q-field>
+          <q-field class="col1" label=" " orientation="vertical">
+            <q-btn flat dense icon="delete" @click="removeField(target, fieldIdx); saveConfig();" />
+          </q-field>
+        </div>
+      </q-card-main>
+      <q-card-main>
+        <q-btn flat dense icon="add" label="Add field" @click="target.fields.push('')" />
+      </q-card-main>
+    </q-card>
+    <q-card dark>
+      <q-card-main>
+        <q-btn flat dense label="Add source" @click="addTarget" />
+      </q-card-main>
+    </q-card>
+  </div>
 </template>
 
 <style scoped lang="stylus">
@@ -329,6 +168,12 @@ export default class GraphForm extends FormBase {
 
 .options-edit-container .q-btn.q-btn-flat {
   margin-right: auto;
+}
+
+.q-card {
+  min-width: 400px;
+  width: 100%;
+  margin-bottom: 10px;
 }
 </style>
 

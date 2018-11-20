@@ -9,7 +9,7 @@ export function propertyNameWithoutUnit(name: string): string {
   return matched ? matched[1] : name;
 }
 
-function propertyNameWithUnit(key: string, inputObject: any): string {
+export function serializedPropertyName(key: string, inputObject: any): string {
   const input = inputObject[key];
 
   if (
@@ -115,7 +115,7 @@ export function serialize(input: any, prevKey: string = ''): any {
     .reduce(
       (acc, key) => ({
         ...acc,
-        [propertyNameWithUnit(key, input)]: serializeProperty(key, input),
+        [serializedPropertyName(key, input)]: serializeProperty(key, input),
       }),
       {},
     );

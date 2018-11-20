@@ -3,10 +3,13 @@ import Component from 'vue-class-component';
 import { Block } from '../state';
 import { fetchBlock, saveBlock } from '../store/actions';
 import { blockById } from '../store/getters';
+import { QueryParams } from '@/store/history/state';
+import { GraphConfig } from '@/components/Graph/state';
 
 @Component
 export default class BlockWidget extends WidgetBase {
-  placeholder: any = null;
+  modalOpen: boolean = false;
+  slideIndex: number = 0;
 
   get serviceId(): string {
     return this.$props.config.serviceId;
@@ -20,10 +23,6 @@ export default class BlockWidget extends WidgetBase {
     return blockById(this.$store, this.serviceId, this.blockId);
   }
 
-  set block(block: Block) {
-    this.saveBlock(block);
-  }
-
   get additionalInfo() {
     return {
       'Widget ID': this.$props.id,
@@ -31,6 +30,78 @@ export default class BlockWidget extends WidgetBase {
       'Service ID': this.serviceId,
       'Feature type': this.$props.type,
     };
+  }
+
+  get subtitles(): string[] {
+    return [];
+  }
+
+  get subtitle() {
+    return this.subtitles[this.slideIndex] || '';
+  }
+
+  navTitle(idx: number) {
+    return idx === this.slideIndex
+      ? this.subtitles[this.slideIndex]
+      : null;
+  }
+
+  navIcon(idx: number) {
+    return (idx === this.slideIndex && this.navTitle(idx))
+      ? null
+      : 'fiber_manual_record';
+  }
+
+  get horizontal() {
+    return this.$props.cols >= 4;
+  }
+
+  get orientationClass() {
+    return this.horizontal ? 'row' : 'column';
+  }
+
+  get queryParams(): QueryParams {
+    return this.$props.config.queryParams || {
+      approxPoints: 200,
+      duration: '10m',
+    };
+  }
+
+  set queryParams(queryParams: QueryParams) {
+    this.$props.onConfigChange(this.$props.id, { ...this.$props.config, queryParams });
+  }
+
+  get renamedTargets(): { [key: string]: string } {
+    return {};
+  }
+
+  get graphCfg(): GraphConfig {
+    const blockFmt = (val: string) => [this.blockId, val].join('/');
+    const serviceFmt = (val: string) => [this.serviceId, this.blockId, val].join('/');
+
+    return {
+      // persisted in config
+      params: this.queryParams,
+      // constants
+      layout: {},
+      targets: [
+        {
+          measurement: this.serviceId,
+          fields: Object.keys(this.renamedTargets)
+            .map(k => blockFmt(k)),
+        },
+      ],
+      renames: Object.entries(this.renamedTargets)
+        .reduce((acc, [k, v]) => ({ ...acc, [serviceFmt(k)]: v }), {}),
+    };
+  }
+
+  set graphCfg(config: GraphConfig) {
+    this.queryParams = { ...config.params };
+  }
+
+  openModal() {
+    this.modalOpen = true;
   }
 
   refreshBlock() {
@@ -41,14 +112,7 @@ export default class BlockWidget extends WidgetBase {
     saveBlock(this.$store, this.serviceId, block);
   }
 
-  startEdit(val: any, key: string) {
-    this.placeholder = val[key];
-  }
-
-  endEdit(val: any, key: string) {
-    if (val[key] !== this.placeholder) {
-      val[key] = this.placeholder;
-      this.block = this.block;
-    }
+  callAndSaveBlock(func: (v: any) => void) {
+    return (v: any) => { func(v); this.saveBlock(); };
   }
 }

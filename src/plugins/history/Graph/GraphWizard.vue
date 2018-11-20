@@ -128,54 +128,22 @@ export default class GraphWizard extends Vue {
 </script>
 
 <template>
-  <q-stepper
-    ref="stepper"
-    v-model="currentStep"
-  >
+  <q-stepper ref="stepper" v-model="currentStep">
 
     <!-- start -->
-    <q-step
-      default
-      name="start"
-      title="Widget info"
-    >
-      <q-field
-        label="Widget name"
-        icon="create"
-        orientation="vertical"
-      >
-        <q-input
-          v-model="widgetId"
-          placeholder="Enter a widget Name"
-          :error="widgetIdError !== null"
-          :suffix="widgetIdError"
-        />
+    <q-step default name="start" title="Widget info">
+      <q-field label="Widget name" icon="create" orientation="vertical">
+        <q-input v-model="widgetId" placeholder="Enter a widget Name" :error="widgetIdError !== null" :suffix="widgetIdError" />
       </q-field>
     </q-step>
 
-
     <!-- configure -->
-    <q-step
-      name="config"
-      title="Configure graph"
-    >
-      <component
-        v-if="graphCfg"
-        v-model="graphCfg"
-        ref="form"
-        :is="form"
-      />
+    <q-step name="config" title="Configure graph">
+      <component v-if="graphCfg" v-model="graphCfg" ref="form" :is="form" />
     </q-step>
 
     <q-stepper-navigation>
-      <q-btn
-        flat
-        v-for="action in navigation[currentStep]"
-        :key="action.label"
-        :label="action.label"
-        :disabled="!action.enabled()"
-        @click="action.click"
-      />
+      <q-btn flat v-for="action in navigation[currentStep]" :key="action.label" :label="action.label" :disabled="!action.enabled()" @click="action.click" />
     </q-stepper-navigation>
 
   </q-stepper>

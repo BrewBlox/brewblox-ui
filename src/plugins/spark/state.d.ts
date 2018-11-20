@@ -11,7 +11,7 @@ export interface DataBlock {
   id: string;
   type: string;
   profiles: number[];
-  data: Object;
+  data: Object | null;
 }
 
 export interface Block extends DataBlock {

@@ -1,7 +1,8 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import Constraints from './Constraints';
+import Constraints, { ConstraintInfo } from './Constraints';
 import { BalancerLink } from '@/helpers/units/KnownLinks';
+import { Watch } from 'vue-property-decorator';
 
 @Component
 export default class AnalogConstraints extends Constraints {
@@ -18,70 +19,44 @@ export default class AnalogConstraints extends Constraints {
     switch (key) {
       case 'min':
       case 'max':
-        return 'number';
+        return 'InputPopupEdit';
       case 'balancer':
-        return 'link';
+        return 'LinkPopupEdit';
       default:
         return null;
     }
   }
 
-  createConstraint(key: string, value: any = null) {
+  createConstraint(key: string, value: any = null): ConstraintInfo {
     switch (key) {
       case 'balancer':
         return { key, value: new BalancerLink(value) };
       default:
-        return { key, value };
+        return { key, value: 0 };
     }
   }
 }
 </script>
 
 <template>
-  <div
-    class="column gutter-y-xs"
-  >
+  <div class="column gutter-y-xs">
 
-    <div
-      v-for="(cinfo, idx) in constraints"
-      :key="idx"
-      class="row gutter-x-xs"
-    >
-
-      <q-select
-        class="col-4"
-        :options="constraintOptions"
-        :value="cinfo.key"
-        clearable
-        @change="key => updateConstraint(idx, createConstraint(key))"
-      />
-
-      <div class="col">
-        <q-input
-          v-if="fieldType(cinfo.key) === 'number'"
-          type="number"
-          :value="cinfo.value"
-          @change="value => updateConstraint(idx, createConstraint(cinfo.key, Number(value)))"
-        />
-        <q-select
-          v-else-if="fieldType(cinfo.key) === 'link'"
-          :options="linkOpts(cinfo.value)"
-          :value="cinfo.value.id"
-          @change="id => updateConstraint(idx, createConstraint(cinfo.key, id))"
-        />
-      </div>
-
+    <div v-for="(cinfo, idx) in constraints" :key="idx" class="row gutter-x-xs">
+      <SelectPopupEdit clearable class="col-4" label="Constraint type" :options="constraintOptions" :field="cinfo.key" :change="callAndSaveConstraints(k => constraints[idx] = createConstraint(k))" />
+      <component :is="fieldType(cinfo.key)" class="col" label="Constraint value" type="number" :serviceId="serviceId" :field="cinfo.value" :change="callAndSaveConstraints(v => cinfo.value = v)" />
+      <q-btn class="col-1" icon="delete" @click="removeConstraint(idx); saveConstraints();" />
     </div>
 
-    <div
-      class="row gutter-x-cs"
-    >
-      <q-select
-        value=""
-        :options="constraintOptions"
-        @change="key => addConstraint(createConstraint(key))"
-        class="col-4"
-      />
+    <div class="row gutter-x-cs">
+      <q-btn label="Add constraint">
+        <q-popover>
+          <q-list separator link>
+            <q-item v-close-overlay v-for="opt in constraintOptions" :key="opt.value" @click.native="constraints.push(createConstraint(opt.value)); saveConstraints();">
+              {{ opt.label }}
+            </q-item>
+          </q-list>
+        </q-popover>
+      </q-btn>
     </div>
 
   </div>

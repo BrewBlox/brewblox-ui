@@ -4,79 +4,56 @@ import BlockForm from '@/plugins/spark/components/BlockForm';
 
 @Component
 export default class ActuatorAnalogMockForm extends BlockForm {
-  get inputMapping() {
+  defaultData() {
     return {
-      profiles: { path: 'profiles', default: [] },
-      setting: { path: 'data.setting', default: 0 },
-      minSetting: { path: 'data.minSetting', default: 0 },
-      maxSetting: { path: 'data.maxSetting', default: 0 },
-      minValue: { path: 'data.minValue', default: 0 },
-      maxValue: { path: 'data.maxValue', default: 0 },
+      setting: 0,
+      minSetting: 0,
+      maxSetting: 0,
+      value: 0,
+      minValue: 0,
+      maxValue: 0,
     };
   }
 }
 </script>
 
 <template>
-  <q-card orientation="vertical">
-    <q-card-main class="column centered">
+  <div class="widget-modal">
+    <q-card>
+      <q-card-title>Settings</q-card-title>
+      <q-card-main>
+        <q-field class="col" label="Minimum setting">
+          <InputPopupEdit type="number" label="Minimum setting" :field="block.data.minSetting" :change="callAndSaveBlock(v => block.data.minSetting = v)" />
+        </q-field>
+        <q-field class="col" label="Current setting">
+          <InputPopupEdit type="number" label="Current setting" :field="block.data.setting" :change="callAndSaveBlock(v => block.data.setting = v)" />
+        </q-field>
+        <q-field class="col" label="Maximum setting">
+          <InputPopupEdit type="number" label="Maximum setting" :field="block.data.maxSetting" :change="callAndSaveBlock(v => block.data.maxSetting = v)" />
+        </q-field>
+      </q-card-main>
 
-      <widget-field
-        label="Active profiles"
-        icon="settings_input_component"
-      >
-        <profiles-bar
-          v-model="inputValues.profiles"
-          :profileNames="profileNames"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Setting"
-        icon="edit"
-      >
-        <q-input
-          v-model="inputValues.setting"
-          stack-label="Setting"
-          type="number"
-        />
-        <q-input
-          v-model="inputValues.minSetting"
-          stack-label="Minimum"
-          type="number"
-        />
-        <q-input
-          v-model="inputValues.maxSetting"
-          stack-label="Maximum"
-          type="number"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Value"
-        icon="edit"
-      >
-        <q-input
-          v-model="inputValues.value"
-          stack-label="Value"
-          type="number"
-        />
-        <q-input
-          v-model="inputValues.minValue"
-          stack-label="Minimum"
-          type="number"
-        />
-        <q-input
-          v-model="inputValues.maxValue"
-          stack-label="Maximum"
-          type="number"
-        />
-      </widget-field>
-
-    </q-card-main>
-  </q-card>
+      <q-card-title>Value</q-card-title>
+      <q-card-main>
+        <q-field class="col" label="Minimum value">
+          <InputPopupEdit type="number" label="Minimum value" :field="block.data.minValue" :change="callAndSaveBlock(v => block.data.minValue = v)" />
+        </q-field>
+        <q-field class="col" label="Current value">
+          <big>{{ block.data.value | round }}</big>
+        </q-field>
+        <q-field class="col" label="Maximum value">
+          <InputPopupEdit type="number" label="Maximum value" :field="block.data.maxValue" :change="callAndSaveBlock(v => block.data.maxValue = v)" />
+        </q-field>
+      </q-card-main>
+    </q-card>
+  </div>
 </template>
 
 <style scoped>
+.q-card {
+  min-width: 400px;
+  width: 100%;
+  margin-bottom: 10px;
+}
 </style>
 

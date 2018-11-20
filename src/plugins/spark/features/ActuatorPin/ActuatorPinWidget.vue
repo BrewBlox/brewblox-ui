@@ -3,6 +3,7 @@ import Component from 'vue-class-component';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import { ActuatorPinBlock } from './state';
 import { getById, state } from './getters';
+import { GraphConfig } from '@/components/Graph/state';
 
 @Component
 export default class ActuatorPinWidget extends BlockWidget {
@@ -10,48 +11,75 @@ export default class ActuatorPinWidget extends BlockWidget {
     return getById(this.$store, this.serviceId, this.blockId);
   }
 
-  set block(block: ActuatorPinBlock) {
-    this.saveBlock(block);
+  get subtitles() {
+    return [
+      'State',
+      'Constraints',
+      'Graph',
+    ];
   }
 
   get actuatorState() {
     return state[this.block.data.state];
   }
+
+  get renamedTargets() {
+    return {
+      state: 'State',
+    };
+  }
 }
 </script>
 
 <template>
-  <widget-card
-    :title="$props.id"
-    :subTitle="$props.type"
-    :onRefresh="refreshBlock"
-    :additionalInfo="additionalInfo"
-    form="ActuatorPinForm"
-    v-model="block"
-  >
+  <div>
+    <q-modal v-model="modalOpen">
+      <ActuatorPinForm v-if="modalOpen" :field="block" :change="saveBlock" />
+    </q-modal>
 
-    <widget-field
-      label="State"
-    >
-      <big>{{ actuatorState }}</big>
-    </widget-field>
+    <q-card dark class="full-height column">
+      <q-card-title class="title-bar">
+        <InputPopupEdit :field="widgetId" label="Widget ID" display="span" :change="v => widgetId = v" />
+        <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
+        <q-btn flat round dense slot="right" @click="openModal" icon="settings" />
+        <q-btn flat round dense slot="right" @click="refreshBlock" icon="refresh" />
+      </q-card-title>
+      <q-card-separator />
 
-    <widget-field
-      label="Inverted"
-    >
-      <big>{{ block.data.invert }}</big>
-    </widget-field>
+      <q-carousel quick-nav class="col" v-model="slideIndex">
+        <!-- State -->
+        <q-carousel-slide class="unpadded">
+          <div :class="['widget-body', orientationClass]">
+            <q-card-main class="column col">
+              <q-field class="col" label="State">
+                <big>{{ actuatorState }}</big>
+              </q-field>
+              <q-field class="col" label="Inverted">
+                <q-toggle :value="block.data.invert" @input="v => { block.data.invert = v; saveBlock(); }" />
+              </q-field>
+            </q-card-main>
+          </div>
+        </q-carousel-slide>
 
-    <widget-field
-      label="Constraints"
-    >
-      <ReadonlyConstraints
-        :serviceId="serviceId"
-        v-model="block.data.constrainedBy"
-      />
-    </widget-field>
+        <!-- Constraints -->
+        <q-carousel-slide class="unpadded">
+          <q-card-main class="column col">
+            <q-field class="col" label="Constraints" orientation="vertical">
+              <DigitalConstraints :serviceId="serviceId" :field="block.data.constrainedBy" :change="callAndSaveBlock(v => block.data.constrainedBy = v)" />
+            </q-field>
+          </q-card-main>
+        </q-carousel-slide>
 
-  </widget-card>
+        <!-- Graph -->
+        <q-carousel-slide class="unpadded">
+          <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v" />
+        </q-carousel-slide>
+
+        <q-btn slot="quick-nav" slot-scope="props" color="white" flat dense :icon="navIcon(props.slide)" :label="navTitle(props.slide)" @click="props.goToSlide()" :class="{inactive: !props.current}" />
+
+      </q-carousel>
+    </q-card>
+  </div>
 </template>
 
 <style scoped>

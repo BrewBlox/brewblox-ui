@@ -9,17 +9,16 @@ import { PidBlock } from '@/plugins/spark/features/Pid/state';
 
 @Component
 export default class PidForm extends BlockForm {
+  defaultData() {
+    return {};
+  }
+
+  get block() {
+    return this.blockField as PidBlock;
+  }
+
   get filterOpts() {
     return filters.map((filter, idx) => ({ label: filter, value: idx }));
-  }
-
-  get profileOpts() {
-    return this.profileNames.map((v, idx) => ({ label: v, value: idx }));
-  }
-
-  changeEnabled(v: boolean) {
-    (this.block as PidBlock).data.enabled = v;
-    this.saveBlock(this.block);
   }
 }
 </script>
@@ -31,157 +30,87 @@ export default class PidForm extends BlockForm {
         PID calculation
       </q-card-title>
       <q-card-main class="calculation">
-      <!-- state -->
-      <q-field
-        label="Filtered Error"
-        orientation="vertical"
-      >
-        <big>{{ block.data.error | unit }}</big>
-      </q-field>
-      <q-field
-        label="Integral"
-        orientation="vertical"
-      >
-        <big>{{ block.data.integral | unit }}</big>
-      </q-field>
-      <q-field
-        label="Derivative"
-        orientation="vertical"
-      >
-        <big>{{ block.data.derivative | unit }}</big>
-      </q-field>
-      <div />
-      <!-- operators -->
-      <div />
-      <q-field
-        label=" "
-        orientation="vertical"
-      >
-        <big>*</big>
-      </q-field>
-      <q-field
-        label=" "
-        orientation="vertical"
-      >
-        <big>*</big>
-      </q-field>
-      <div />
+        <!-- state -->
+        <q-field label="Filtered Error" orientation="vertical">
+          <big>{{ block.data.error | unit }}</big>
+        </q-field>
+        <q-field label="Integral" orientation="vertical">
+          <big>{{ block.data.integral | unit }}</big>
+        </q-field>
+        <q-field label="Derivative" orientation="vertical">
+          <big>{{ block.data.derivative | unit }}</big>
+        </q-field>
+        <div />
+        <!-- operators -->
+        <div />
+        <q-field label=" " orientation="vertical">
+          <big>*</big>
+        </q-field>
+        <q-field label=" " orientation="vertical">
+          <big>*</big>
+        </q-field>
+        <div />
 
-      <!-- extra *Kp -->
-      <div />
-      <q-field
-        label="Kp"
-        orientation="vertical"
-      >
-        <big style="color: grey;">{{ block.data.kp | unit }}</big>
-      </q-field>
-      <q-field
-        label="Kp"
-        orientation="vertical"
-      >
-        <big style="color: grey;">{{ block.data.kp | unit }}</big>
-      </q-field>
-      <div />
+        <!-- extra *Kp -->
+        <div />
+        <q-field label="Kp" orientation="vertical">
+          <big class="unimportant">{{ block.data.kp | unit }}</big>
+        </q-field>
+        <q-field label="Kp" orientation="vertical">
+          <big class="unimportant">{{ block.data.kp | unit }}</big>
+        </q-field>
+        <div />
 
-      <!-- operators -->
-      <q-field
-        label=" "
-        orientation="vertical"
-      >
-        <big>*</big>
-      </q-field>
-      <q-field
-        label=" "
-        orientation="vertical"
-      >
-        <big>/</big>
-      </q-field>
-      <q-field
-        label=" "
-        orientation="vertical"
-      >
-        <big>*</big>
-      </q-field>
-      <div />
+        <!-- operators -->
+        <q-field label=" " orientation="vertical">
+          <big>*</big>
+        </q-field>
+        <q-field label=" " orientation="vertical">
+          <big>/</big>
+        </q-field>
+        <q-field label=" " orientation="vertical">
+          <big>*</big>
+        </q-field>
+        <div />
 
-      <!-- settings -->
-      <q-field
-        label="Kp"
-        orientation="vertical"
-      >
-        <UnitPopupEdit
-          label="Kp"
-          :field="block.data.kp"
-          :change="callAndSaveBlock(v => block.data.kp = v)"
-        />
-      </q-field>
-      <q-field
-        label="Ti"
-        orientation="vertical"
-      >
-        <UnitPopupEdit
-        label="Ti"
-        :field="block.data.ti"
-        :change="callAndSaveBlock(v => block.data.ti = v)"
-      />
-      </q-field>
-      <q-field
-        label="Td"
-        orientation="vertical"
-      >
-        <UnitPopupEdit
-          label="Td"
-          :field="block.data.td"
-          :change="callAndSaveBlock(v => block.data.td = v)"
-        />
-      </q-field>
-      <div />
+        <!-- settings -->
+        <q-field label="Kp" orientation="vertical">
+          <UnitPopupEdit label="Kp" :field="block.data.kp" :change="callAndSaveBlock(v => block.data.kp = v)" />
+        </q-field>
+        <q-field label="Ti" orientation="vertical">
+          <UnitPopupEdit label="Ti" :field="block.data.ti" :change="callAndSaveBlock(v => block.data.ti = v)" />
+        </q-field>
+        <q-field label="Td" orientation="vertical">
+          <UnitPopupEdit label="Td" :field="block.data.td" :change="callAndSaveBlock(v => block.data.td = v)" />
+        </q-field>
+        <div />
 
-      <!-- equal signs -->
-      <q-field
-        label=" "
-        orientation="vertical"
-      >
-        <big>=</big>
-      </q-field>
-      <q-field
-        label=" "
-        orientation="vertical"
-      >
-        <big>=</big>
-      </q-field>
-      <q-field
-        label=" "
-        orientation="vertical"
-      >
-        <big>=</big>
-      </q-field>
-      <div />
+        <!-- equal signs -->
+        <q-field label=" " orientation="vertical">
+          <big>=</big>
+        </q-field>
+        <q-field label=" " orientation="vertical">
+          <big>=</big>
+        </q-field>
+        <q-field label=" " orientation="vertical">
+          <big>=</big>
+        </q-field>
+        <div />
 
-      <!-- result -->
-      <q-field
-        label="P"
-        orientation="vertical"
-      >
-        <big>{{ block.data.p | round }}</big>
-      </q-field>
-      <q-field
-        label="I"
-        orientation="vertical"
-      >
-        <big>{{ block.data.i | round }}</big>
-      </q-field>
-      <q-field
-        label="D"
-        orientation="vertical"
-        style="border-bottom: solid 2px white; min-width: 60px;"
-      >
-        <big>{{ block.data.d | round }}</big>
-        <big style="float: right;"><sub>+</sub></big>
-      </q-field>
-      <div>
-      <big>{{ block.data.outputValue | round }}</big>
-      </div>
+        <!-- result -->
+        <q-field label="P" orientation="vertical">
+          <big>{{ block.data.p | round }}</big>
+        </q-field>
+        <q-field label="I" orientation="vertical">
+          <big>{{ block.data.i | round }}</big>
+        </q-field>
+        <q-field label="D" orientation="vertical" style="border-bottom: solid 2px white; min-width: 60px;">
+          <big>{{ block.data.d | round }}</big>
+          <big style="float: right;"><sub>+</sub></big>
+        </q-field>
+        <div>
+          <big>{{ block.data.outputValue | round }}</big>
+        </div>
       </q-card-main>
     </q-card>
     <q-card>
@@ -189,19 +118,10 @@ export default class PidForm extends BlockForm {
         Input and output
       </q-card-title>
       <q-card-main class="input-output">
-        <q-field
-          label="Input"
-          orientation="vertical"
-        >
+        <q-field label="Input" orientation="vertical">
           <p>
             <span>The input target value and actual value will come from:</span>
-            <LinkPopupEdit
-              label="Input"
-              :field="block.data.inputId"
-              :serviceId="block.serviceId"
-              :change="callAndSaveBlock(v => block.data.inputId = v)"
-              class="inline-popup"
-            />
+            <LinkPopupEdit label="Input" :field="block.data.inputId" :serviceId="block.serviceId" :change="callAndSaveBlock(v => block.data.inputId = v)" class="inline-popup" />
           </p>
           <p>
             <span>
@@ -211,53 +131,29 @@ export default class PidForm extends BlockForm {
           </p>
         </q-field>
 
-        <q-field
-          label="Output"
-          orientation="vertical"
-        >
+        <q-field label="Output" orientation="vertical">
           <p>
             <span>The PID result will be used to drive: </span>
-            <LinkPopupEdit
-              label="Output"
-              :field="block.data.outputId"
-              :serviceId="block.serviceId"
-              :change="callAndSaveBlock(v => block.data.outputId = v)"
-              class="inline-popup"
-            />
+            <LinkPopupEdit label="Output" :field="block.data.outputId" :serviceId="block.serviceId" :change="callAndSaveBlock(v => block.data.outputId = v)" class="inline-popup" />
           </p>
           <p>
             <span>
               The current setting of the output is <b>{{block.data.outputSetting | unit}}</b>
-              and the actually achieved value is  <b>{{block.data.outputValue | unit}}</b>.
+              and the actually achieved value is <b>{{block.data.outputValue | unit}}</b>.
             </span>
           </p>
         </q-field>
-        <q-field
-          class="col"
-          label="Filtering"
-          orientation="vertical"
-        >
-        <p>
-          <span>Input changes faster than</span>
-          <SelectPopupEdit
-            label="Filter"
-            :field="block.data.filter"
-            :change="callAndSaveBlock(v => block.data.filter = v)"
-            :options="filterOpts"
-            class="inline-popup"
-          />
-          <span>will be filtered out.</span>
-        </p>
-        <p>
-          <span>But steps exceeding</span>
-          <UnitPopupEdit
-            label="Filter threshold"
-            :field="block.data.filterThreshold"
-            :change="callAndSaveBlock(v => block.data.filterThreshold = v)"
-            class="inline-popup"
-          />
-          <span>will trigger a faster response.</span>
-        </p>
+        <q-field class="col" label="Filtering" orientation="vertical">
+          <p>
+            <span>Input changes faster than</span>
+            <SelectPopupEdit label="Filter" :field="block.data.filter" :change="callAndSaveBlock(v => block.data.filter = v)" :options="filterOpts" class="inline-popup" />
+            <span>will be filtered out.</span>
+          </p>
+          <p>
+            <span>But steps exceeding</span>
+            <UnitPopupEdit label="Filter threshold" :field="block.data.filterThreshold" :change="callAndSaveBlock(v => block.data.filterThreshold = v)" class="inline-popup" />
+            <span>will trigger a faster response.</span>
+          </p>
         </q-field>
       </q-card-main>
     </q-card>
@@ -266,25 +162,12 @@ export default class PidForm extends BlockForm {
         Other settings
       </q-card-title>
       <q-card-main class="other-settings">
-        <q-field
-          label="Block is active in profiles:"
-        >
-          <SelectPopupEdit
-            label="Profiles"
-            multiple
-            :field="block.profiles"
-            :options="profileOpts"
-            :change="callAndSaveBlock(v => block.profiles = v)"
-          />
+        <q-field label="Block is active in profiles:">
+          <SelectPopupEdit label="Profiles" multiple :field="block.profiles" :options="profileOpts" :change="callAndSaveBlock(v => block.profiles = v)" />
         </q-field>
 
-        <q-field
-          label="PID is enabled:"
-        >
-          <q-toggle
-            :value="block.data.enabled"
-            @change="changeEnabled"
-          />
+        <q-field label="PID is enabled:">
+          <q-toggle :value="block.data.enabled" @change="v => { block.data.enabled = v; saveBlock(); }" />
         </q-field>
       </q-card-main>
     </q-card>
@@ -299,7 +182,7 @@ export default class PidForm extends BlockForm {
           The difference between the setpoint and the sensor is called the <i>error</i>.
         </p>
         <p>
-         The output value is the sum of 3 parts derived from the error: proportional, integral and derivative.<br />
+          The output value is the sum of 3 parts derived from the error: proportional, integral and derivative.<br />
         </p>
         <div class="q-subheading">Proportional</div>
         <p>
@@ -350,14 +233,15 @@ export default class PidForm extends BlockForm {
 
 <style lang="stylus" scoped>
 @import '../../../../css/app.styl';
+
 .pid-modal {
   display: flex;
   flex-wrap: wrap;
   max-width: 800px;
   align-items: center;
   padding: 10px;
-
 }
+
 .q-card {
   min-width: 400px;
   width: 100%;
@@ -387,9 +271,11 @@ export default class PidForm extends BlockForm {
   grid-template-columns: auto auto auto auto auto auto;
   grid-gap: 15px;
 }
+
 .calculation /deep/ .q-field-content {
   padding-top: 6px;
 }
+
 .emphasize {
   font-weight: bold;
   padding: 10px;

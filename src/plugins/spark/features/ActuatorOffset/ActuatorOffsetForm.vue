@@ -1,64 +1,46 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import { Unit } from '@/helpers/units';
-import { ProcessValueLink } from '@/helpers/units/KnownLinks';
 
 @Component
 export default class ActuatorOffsetForm extends BlockForm {
-  get inputMapping() {
-    return {
-      profiles: { path: 'profiles', default: [] },
-      targetId: { path: 'data.targetId', default: new ProcessValueLink(null) },
-      referenceId: { path: 'data.referenceId', default: new ProcessValueLink(null) },
-      constrainedBy: { path: 'data.constrainedBy', default: { constraints: [] } },
-    };
-  }
 
-  afterBlockFetch() {
-    this.fetchCompatibleToInputLinks();
-  }
 }
 </script>
 
 <template>
-  <q-card orientation="vertical">
-    <q-card-main class="column centered">
-
-      <widget-field
-        label="Target"
-        icon="edit"
-      >
-        <q-select
-          v-model="inputValues.targetId.id"
-          :options="linkOpts(inputValues.targetId)"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Reference"
-        icon="edit"
-      >
-        <q-select
-          v-model="inputValues.referenceId.id"
-          :options="linkOpts(inputValues.referenceId)"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Constrained by"
-        icon="edit"
-      >
-        <AnalogConstraints
-          :serviceId="block.serviceId"
-          v-model="inputValues.constrainedBy"
-        />
-      </widget-field>
-
-    </q-card-main>
-  </q-card>
+  <div class="widget-modal">
+    <q-card>
+      <q-card-title>Settings</q-card-title>
+      <q-card-main>
+        <q-field class="col" label="Target">
+          <LinkPopupEdit label="Target" :field="block.data.targetId" :serviceId="block.serviceId" :change="callAndSaveBlock(v => block.data.targetId = v)" />
+        </q-field>
+        <q-field class="col" label="Reference">
+          <LinkPopupEdit label="Reference" :field="block.data.referenceId" :serviceId="block.serviceId" :change="callAndSaveBlock(v => block.data.referenceId = v)" />
+        </q-field>
+        <q-field class="col" label="Setting">
+          <big>{{ block.data.setting | round }}</big>
+        </q-field>
+        <q-field class="col" label="Value">
+          <big>{{ block.data.value | round }}</big>
+        </q-field>
+      </q-card-main>
+    </q-card>
+    <q-card>
+      <q-card-title>Constraints</q-card-title>
+      <q-card-main>
+        <AnalogConstraints :serviceId="serviceId" :field="block.data.constrainedBy" :change="callAndSaveBlock(v => block.data.constrainedBy = v)" />
+      </q-card-main>
+    </q-card>
+  </div>
 </template>
 
 <style scoped>
+.q-card {
+  min-width: 400px;
+  width: 100%;
+  margin-bottom: 10px;
+}
 </style>
 

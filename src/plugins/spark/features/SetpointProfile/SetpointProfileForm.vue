@@ -6,7 +6,7 @@ import { deepCopy } from '@/helpers/shadow-copy';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { units } from '@/plugins/spark/store/getters';
 import { Unit } from '@/helpers/units';
-import { Setpoint } from './state';
+import { Setpoint, SetpointProfileBlock } from './state';
 
 interface OffsetPoint {
   time: number;
@@ -16,32 +16,21 @@ interface OffsetPoint {
 
 @Component
 export default class SetpointProfileForm extends BlockForm {
-  get inputMapping() {
-    return {
-      profiles: { path: 'profiles', default: [] },
-      points: { path: 'data.points', default: [] },
-    };
+  get block() {
+    return this.blockField as SetpointProfileBlock;
   }
 
   get tempUnit() {
     return units(this.$store, this.block.serviceId).Temp;
   }
 
-  get points() {
-    return this.inputValues.points
+  get points(): OffsetPoint[] {
+    return this.block.data.points
       .sort(objectSorter('time'))
       .map((point: Setpoint, idx: number, arr: Setpoint[]) => ({
         time: new Date(point.time * 1000).getTime(),
         temperature: point.temperature,
         offsetMs: (idx > 0 ? ((point.time - arr[0].time) * 1000) : 0),
-      }));
-  }
-
-  set points(points: OffsetPoint[]) {
-    this.inputValues.points = points
-      .map(offsetPoint => ({
-        time: (offsetPoint.time / 1000),
-        temperature: offsetPoint.temperature,
       }));
   }
 
@@ -51,16 +40,14 @@ export default class SetpointProfileForm extends BlockForm {
       : new Date().getTime());
   }
 
-  set start(startTime: number) {
-    if (this.points.length > 0) {
-      this.points = this.points
-        .map((offset: OffsetPoint, idx: number) => ({
-          ...offset,
-          time: (idx === 0 ? startTime : new Date(startTime + offset.offsetMs).getTime()),
-        }));
-    } else {
-      this.points = [this.defaultPoint()];
-    }
+  savePoints(points: OffsetPoint[] = this.points) {
+    this.block.data.points = points
+      .sort(objectSorter('time'))
+      .map(offsetPoint => ({
+        time: (offsetPoint.time / 1000),
+        temperature: offsetPoint.temperature,
+      }));
+    this.saveBlock();
   }
 
   defaultPoint() {
@@ -80,39 +67,48 @@ export default class SetpointProfileForm extends BlockForm {
   }
 
   addPoint() {
-    if (this.points.length > 0) {
-      this.points = [...this.points, this.copyPoint(this.points[this.points.length - 1])];
-    } else {
-      this.points = [...this.points, this.defaultPoint()];
-    }
+    const newPoints = this.points.length > 0
+      ? [...this.points, this.copyPoint(this.points[this.points.length - 1])]
+      : [...this.points, this.defaultPoint()];
+    this.savePoints(newPoints);
   }
 
   removePoint(index: number) {
-    this.points = this.points.filter((_: any, idx: number) => idx !== index);
+    this.savePoints(this.points.filter((_: any, idx: number) => idx !== index));
+  }
+
+  updateStartTime(startTime: number) {
+    const newPoints = this.points.length > 0
+      ? this.points
+        .map((offset: OffsetPoint, idx: number) => ({
+          ...offset,
+          time: (idx === 0 ? startTime : new Date(startTime + offset.offsetMs).getTime()),
+        }))
+      : [this.defaultPoint()];
+    this.savePoints(newPoints);
   }
 
   updatePointTime(index: number, time: number) {
-    this.points = this.points
-      .map((point: OffsetPoint, idx: number) =>
-        (idx !== index
-          ? point
-          : {
-            time,
-            temperature: this.points[index].temperature,
-            offsetMs: time - this.start,
-          }));
+    this.points[index] = {
+      time,
+      temperature: this.points[index].temperature,
+      offsetMs: time - this.start,
+    };
+    this.savePoints();
   }
 
   updatePointOffset(index: number, offsetMs: number) {
-    this.points = this.points
-      .map((point: OffsetPoint, idx: number) =>
-        (idx !== index
-          ? point
-          : {
-            offsetMs,
-            temperature: this.points[index].temperature,
-            time: new Date(this.start + offsetMs).getTime(),
-          }));
+    this.points[index] = {
+      offsetMs,
+      temperature: this.points[index].temperature,
+      time: new Date(this.start + offsetMs).getTime(),
+    };
+    this.savePoints();
+  }
+
+  updatePointTemperature(index: number, temp: Unit) {
+    this.points[index].temperature = temp;
+    this.savePoints();
   }
 
   durationString(valMs: number) {
@@ -126,101 +122,46 @@ export default class SetpointProfileForm extends BlockForm {
 </script>
 
 <template>
-  <q-card orientation="vertical">
-    <q-card-main class="column centered">
+  <div class="widget-modal">
+    <q-card>
+      <q-card-title>Setpoints</q-card-title>
+      <q-card-main>
 
-      <widget-field
-        label="Start time"
-      >
+        <q-field class="col" label="Start time" orientation="vertical">
+          <DatetimePopupEdit label="Start time" display="big" :field="start" :change="updateStartTime" />
+        </q-field>
 
-        <q-datetime
-          dark
-          format24h
-          no-parent-field
-          stack-label="Time"
-          type="datetime"
-          v-model="start"
-          :disabled="points.length === 0"
-          :after="[
-            {
-              icon: 'restore',
-              handler: () => { start = new Date().getTime(); },
-            }
-          ]"
-        />
+        <q-field class="col" label="Points" orientation="vertical">
+          <div v-for="(point, idx) in points" :key="idx" class="row justify-around">
+            <q-field label="Offset" orientation="vertical">
+              <InputPopupEdit label="Offset from start" :field="durationString(point.offsetMs)" :change="v => updatePointOffset(idx, parseDuration(v))" />
+            </q-field>
+            <q-field label="Time" orientation="vertical">
+              <DatetimePopupEdit label="Time" display="big" :field="point.time" :change="v => updatePointTime(idx, v)" />
+            </q-field>
+            <q-field label="Temperature" orientation="vertical">
+              <UnitPopupEdit label="Temperature" :field="point.temperature" :change="v => updatePointTemperature(idx, v)" />
+            </q-field>
+            <q-field label=" " orientation="vertical">
+              <q-btn flat round dense icon="delete" @click="removePoint(idx)" />
+            </q-field>
+          </div>
+        </q-field>
 
-      </widget-field>
+        <q-field>
+          <q-btn icon="add" label="Add point" @click="addPoint" />
+        </q-field>
 
-      <widget-field>
-        <div
-          v-for="(point, idx) in points"
-          :key="idx"
-          class="row items-end"
-        >
-
-          <q-input
-            stack-label="Offset from start"
-            :disabled="idx === 0"
-            :value="durationString(point.offsetMs)"
-            @change="v => updatePointOffset(idx, parseDuration(v))"
-          />
-
-          <q-icon name="add" />
-
-          <!--
-          Notes:
-          - Change is triggered on blur to prevent firing when offset is changed.
-          - @blur is fired with undefined after clicking the "after" button,
-            and then selecting something else.
-          -->
-          <q-datetime
-            dark
-            format24h
-            no-parent-field
-            stack-label="Time"
-            type="datetime"
-            :value="point.time"
-            @blur="v => v && updatePointTime(idx, v)"
-            :after="[
-              {
-                icon: 'restore',
-                handler: () => updatePointTime(idx, new Date().getTime()),
-              }
-            ]"
-          />
-
-          <q-icon name="chevron_right" />
-
-          <q-input
-            stack-label="Temperature"
-            v-model="point.temperature.value"
-            :suffix="point.temperature.unitNotation"
-            type="number"
-          />
-
-          <q-btn
-            flat
-            round
-            dense
-            icon="delete"
-            @click="removePoint(idx)"
-          />
-
-        </div>
-      </widget-field>
-
-      <widget-field>
-        <q-btn
-          icon="add"
-          label="Add point"
-          @click="addPoint"
-        />
-      </widget-field>
-
-    </q-card-main>
-  </q-card>
+      </q-card-main>
+    </q-card>
+  </div>
 </template>
 
 <style scoped>
+.q-card {
+  min-width: 400px;
+  width: 100%;
+  margin-bottom: 10px;
+}
 </style>
 

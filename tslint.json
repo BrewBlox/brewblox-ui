@@ -7,7 +7,21 @@
   "rules": {
     "import-name": false,
     "no-boolean-literal-compare": false,
-    "semicolon": [true, "always", "ignore-bound-class-methods"]
+    "semicolon": [
+      true,
+      "always",
+      "ignore-bound-class-methods"
+    ],
+    "no-console": [
+      true,
+      "log",
+      "error"
+    ]
   },
-  "rulesDirectory": []
+  "rulesDirectory": [],
+  "linterOptions": {
+    "exclude": [
+      ".vscode"
+    ]
+  }
 }

@@ -1,7 +1,6 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import { getById } from './getters';
 
 @Component
 export default class InactiveObjectWidget extends BlockWidget {
@@ -9,20 +8,26 @@ export default class InactiveObjectWidget extends BlockWidget {
 </script>
 
 <template>
-  <widget-card
-    :title="$props.id"
-    :subTitle="$props.type"
-    :onRefresh="refreshBlock"
-    :additionalInfo="additionalInfo"
-    form="InactiveObjectForm"
-    v-model="block"
-  >
+  <div>
+    <q-modal v-model="modalOpen">
+      <InactiveObjectForm v-if="modalOpen" :field="block" :change="saveBlock" />
+    </q-modal>
 
-    <q-item>
-      <q-list-header>This block is not in any active profile</q-list-header>
-    </q-item>
+    <q-card dark class="full-height column">
+      <q-card-title class="title-bar">
+        <InputPopupEdit :field="widgetId" label="Widget ID" display="span" :change="v => widgetId = v" />
+        <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
+        <q-btn flat round dense slot="right" @click="openModal" icon="settings" />
+        <q-btn flat round dense slot="right" @click="refreshBlock" icon="refresh" />
+      </q-card-title>
+      <q-card-separator />
 
-  </widget-card>
+      <q-alert type="info" class="centered">
+        This block is not in any active profile
+      </q-alert>
+
+    </q-card>
+  </div>
 </template>
 
 <style scoped>

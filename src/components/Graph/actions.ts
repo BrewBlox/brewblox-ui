@@ -83,13 +83,17 @@ export const addPlotlyMetric = async (
   renames: DisplayNames,
   target: QueryTarget,
 ) => {
-  if (target.fields.length > 0) {
+  const filteredTarget = {
+    ...target,
+    fields: target.fields.filter(field => !!field),
+  };
+  if (filteredTarget.fields.length > 0) {
     addMetric(store, {
       id,
       transformer,
       params,
-      target,
       renames,
+      target: filteredTarget,
       values: {},
     });
   }
