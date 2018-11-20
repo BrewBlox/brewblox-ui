@@ -32,6 +32,12 @@ export const persistBlock = async (block: Block): Promise<Block> =>
     asDataBlock(block),
   ).then(savedBlock => asBlock(savedBlock, block.serviceId));
 
+export const renameBlock = async (serviceId: string, currentId: string, newId: string) =>
+  put(
+    `/${encodeURIComponent(serviceId)}/aliases/${encodeURIComponent(currentId)}`,
+    { id: newId },
+  );
+
 export const deleteBlock = async (block: Block): Promise<string> =>
   del(
     `/${encodeURIComponent(block.serviceId)}/objects/${encodeURIComponent(block.id)}`,

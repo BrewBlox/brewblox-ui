@@ -4,7 +4,11 @@ import BlockForm from '@/plugins/spark/components/BlockForm';
 
 @Component
 export default class MutexForm extends BlockForm {
-
+  defaultData() {
+    return {
+      differentActuatorWait: 0,
+    };
+  }
 }
 </script>
 
@@ -13,16 +17,8 @@ export default class MutexForm extends BlockForm {
     <q-card>
       <q-card-title>Settings</q-card-title>
       <q-card-main>
-        <q-field
-          class="col"
-          label="Actuator wait time"
-        >
-          <InputPopupEdit
-            type="number"
-            label="Actuator wait time"
-            :field="block.data.differentActuatorWait"
-            :change="callAndSaveBlock(v => block.data.differentActuatorWait = v)"
-          />
+        <q-field class="col" label="Actuator wait time">
+          <InputPopupEdit type="number" label="Actuator wait time" :field="block.data.differentActuatorWait" :change="callAndSaveBlock(v => block.data.differentActuatorWait = v)" />
         </q-field>
       </q-card-main>
     </q-card>

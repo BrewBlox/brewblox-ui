@@ -63,16 +63,8 @@ export default class GraphWizard extends Vue {
           enabled: () => true,
         },
         {
-          label: 'Revert form',
-          click: () => this.formComponent.cancelChanges(),
-          enabled: () => true,
-        },
-        {
           label: 'Finish',
-          click: () => {
-            this.formComponent.confirmChanges();
-            this.createWidget();
-          },
+          click: () => this.createWidget(),
           enabled: () => true,
         },
       ],
@@ -139,7 +131,7 @@ export default class GraphWizard extends Vue {
 
     <!-- configure -->
     <q-step name="config" title="Configure graph">
-      <component v-if="graphCfg" v-model="graphCfg" ref="form" :is="form" />
+      <component v-if="graphCfg" :field="graphCfg" :change="v => graphCfg = v" ref="form" :is="form" />
     </q-step>
 
     <q-stepper-navigation>

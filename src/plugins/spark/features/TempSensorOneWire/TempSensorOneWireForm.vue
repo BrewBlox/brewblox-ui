@@ -5,6 +5,14 @@ import { Unit } from '@/helpers/units';
 
 @Component
 export default class TempSensorOneWireForm extends BlockForm {
+  defaultData() {
+    return {
+      value: new Unit(0, 'degC'),
+      valid: true,
+      offset: new Unit(0, 'delta_degC'),
+      address: '',
+    };
+  }
 }
 </script>
 

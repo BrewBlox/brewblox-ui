@@ -3,7 +3,6 @@ import Component from 'vue-class-component';
 import { Notify } from 'quasar';
 import parseDuration from 'parse-duration';
 import FormBase from '@/components/Widget/FormBase';
-import WidgetField from '@/components/Widget/WidgetField.vue';
 import { toShadow, fromShadow, ShadowMapping, deepCopy } from '@/helpers/shadow-copy';
 import { uniqueFilter, durationString } from '@/helpers/functional';
 import { QueryParams, QueryTarget } from '@/store/history/state';

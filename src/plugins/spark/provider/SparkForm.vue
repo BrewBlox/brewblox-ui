@@ -8,7 +8,7 @@ import { toShadow, fromShadow, ShadowMapping, deepCopy } from '@/helpers/shadow-
 import { Block, UserUnits } from '@/plugins/spark/state';
 import {
   blockById,
-  profileNames as serviceProfiles,
+  profileNames,
   units,
   unitAlternatives,
 } from '@/plugins/spark/store/getters';
@@ -28,48 +28,47 @@ import {
 
 @Component({
   props: {
-    value: {
+    field: {
       type: Object,
       required: true,
     },
   },
 })
 export default class SparkForm extends Vue {
-  inputValues: { [key: string]: any; } = {};
-  inputMapping: ShadowMapping = {
-    deviceId: { path: 'sysInfo.data.deviceId', default: '' },
-    activeProfiles: { path: 'profiles.data.active', default: [] },
-    profileNames: { path: 'profileNames', default: [] },
-    units: { path: 'units', default: {} },
-    millisSinceBoot: { path: 'ticks.data.millisSinceBoot', default: 0 },
-    secondsSinceEpoch: { path: 'ticks.data.secondsSinceEpoch', default: 0 },
-  };
-
   sysBlock<T extends Block>(blockId: string) {
     return blockById<T>(this.$store, this.service.id, blockId);
   }
 
   get service() {
-    return this.$props.value;
+    return this.$props.field;
   }
 
-  get stored() {
-    return {
-      sysInfo: this.sysBlock<SysInfoBlock>(sysInfoId),
-      profiles: this.sysBlock<ProfilesBlock>(profilesId),
-      oneWireBus: this.sysBlock<OneWireBusBlock>(oneWireBusId),
-      ticks: this.sysBlock<TicksBlock>(ticksId),
-      profileNames: serviceProfiles(this.$store, this.service.id),
-      units: units(this.$store, this.service.id),
-    };
+  get sysInfo() {
+    return this.sysBlock<SysInfoBlock>(sysInfoId);
   }
 
-  get changed(): boolean {
-    return JSON.stringify(this.generateShadow()) !== JSON.stringify(this.inputValues);
+  get profiles() {
+    return this.sysBlock<ProfilesBlock>(profilesId);
+  }
+
+  get oneWireBus() {
+    return this.sysBlock<OneWireBusBlock>(oneWireBusId);
+  }
+
+  get ticks() {
+    return this.sysBlock<TicksBlock>(ticksId);
+  }
+
+  get profileNames(): string[] {
+    return profileNames(this.$store, this.service.id);
   }
 
   get sysDate() {
-    return new Date((this.inputValues.secondsSinceEpoch || 0) * 1000).toString();
+    return new Date((this.ticks.data.secondsSinceEpoch || 0) * 1000).toString();
+  }
+
+  get units(): UserUnits {
+    return units(this.$store, this.service.id);
   }
 
   get unitAlternatives() {
@@ -81,30 +80,17 @@ export default class SparkForm extends Vue {
       .map(val => ({ label: val, value: val }));
   }
 
-  generateShadow() {
-    return toShadow(this.stored, this.inputMapping);
-  }
-
-  changeBlock(block: Block) {
+  saveBlock(block: Block) {
     saveBlock(this.$store, this.service.id, block);
   }
 
-  confirmChanges() {
-    const vals = fromShadow(
-      this.inputValues,
-      this.inputMapping,
-      this.stored,
-    );
-    // sysInfo / oneWireBus / ticks have no editable fields
-    this.changeBlock(vals.profiles);
-    updateProfileNames(this.$store, this.service.id, vals.profileNames);
-    saveUnits(this.$store, this.service.id, vals.units)
-      .catch(reason => Notify.create(`Failed to change unit: ${reason}`));
+  saveProfileNames(vals: string[] = this.profileNames) {
+    updateProfileNames(this.$store, this.service.id, vals);
   }
 
-  @Watch('stored', { immediate: true, deep: true })
-  cancelChanges() {
-    this.inputValues = deepCopy(this.generateShadow());
+  saveUnits(vals: UserUnits = this.units) {
+    saveUnits(this.$store, this.service.id, vals)
+      .catch(reason => Notify.create(`Failed to change unit: ${reason}`));
   }
 
   durationString(durationMs: number) {
@@ -118,71 +104,55 @@ export default class SparkForm extends Vue {
 </script>
 
 <template>
-  <q-card class="flex-center">
-    <q-card-main class="column">
+  <div class="widget-modal">
+    <q-card>
+      <q-card-title>System Info</q-card-title>
+      <q-card-main>
+        <q-field class="col" label="Device ID">
+          <big>{{ service.id }}</big>
+        </q-field>
+        <q-field class="col" label="Time since boot">
+          <big>{{ durationString(ticks.data.millisSinceBoot) }}</big>
+        </q-field>
+        <q-field class="col" label="Date">
+          <big>{{ sysDate }}</big>
+        </q-field>
+      </q-card-main>
+    </q-card>
 
-      <widget-field
-        label="Device ID"
-        icon="devices"
-      >
-        <big>{{ inputValues.deviceId }}</big>
-      </widget-field>
+    <q-card>
+      <q-card-title>Profiles</q-card-title>
+      <q-card-main>
+        <q-field class="col" label="Active profiles" orientation="vertical">
+          <ProfilesPopupEdit :field="profiles.data.active" :serviceId="service.id" :change="v => { profiles.data.active = v; saveBlock(profiles); }" />
+        </q-field>
+        <q-field class="col column" label="Profile names" orientation="vertical">
+          <div class="col row" v-for="(name, idx) in profileNames" :key="idx">
+            <q-field class="col" :label="`Profile ${idx + 1}`">
+              <InputPopupEdit label="Profile" :field="name" :change="v => { profileNames[idx] = v; saveProfileNames(); }" />
+            </q-field>
+          </div>
+        </q-field>
+      </q-card-main>
+    </q-card>
 
-      <widget-field
-        label="Active profiles"
-        icon="settings_input_component"
-      >
-        <profiles-bar
-          v-model="inputValues.activeProfiles"
-          :profileNames="inputValues.profileNames"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Profile names"
-        icon="edit"
-      >
-        <q-input
-          v-for="(name, idx) in inputValues.profileNames"
-          :key="idx"
-          v-model="inputValues.profileNames[idx]"
-          :suffix="`Profile ${idx + 1}`"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Favored units"
-        icon="edit"
-      >
-        <q-select
-          v-for="(val, name) in inputValues.units"
-          :key="name"
-          :options="unitAlternativeOptions(name)"
-          v-model="inputValues.units[name]"
-          :suffix="spaceCased(name)"
-        />
-      </widget-field>
-
-      <widget-field
-        label="Time since boot"
-        icon="timelapse"
-      >
-        <big>{{ durationString(inputValues.millisSinceBoot) }}</big>
-      </widget-field>
-
-      <widget-field
-        label="Date"
-        icon="schedule"
-      >
-        <big>{{ sysDate }}</big>
-      </widget-field>
-
-    </q-card-main>
-  </q-card>
+    <q-card>
+      <q-card-title>Units</q-card-title>
+      <q-card-main>
+        <q-field class="col column" label="Unit preferences" orientation="vertical">
+          <q-field v-for="(val, name) in units" :key="name" class="col" :label="spaceCased(name)">
+            <SelectPopupEdit label="Preferred unit" :field="val" :change="v => { units[name] = v; saveUnits(); }" :options="unitAlternativeOptions(name)" />
+          </q-field>
+        </q-field>
+      </q-card-main>
+    </q-card>
+  </div>
 </template>
 
 <style scoped>
 .q-card {
-  display: flex;
+  min-width: 400px;
+  width: 100%;
+  margin-bottom: 10px;
 }
 </style>
