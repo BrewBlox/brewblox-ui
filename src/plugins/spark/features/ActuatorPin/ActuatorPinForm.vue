@@ -32,7 +32,9 @@ export default class ActuatorPinForm extends BlockForm {
     <q-card>
       <q-card-title>Constraints</q-card-title>
       <q-card-main>
-        <ReadonlyConstraints :serviceId="block.serviceId" :value="block.data.constrainedBy" />
+        <q-field class="col" label="Constraints" orientation="vertical">
+          <DigitalConstraints :serviceId="serviceId" :field="block.data.constrainedBy" :change="callAndSaveBlock(v => block.data.constrainedBy = v)" />
+        </q-field>
       </q-card-main>
     </q-card>
   </div>

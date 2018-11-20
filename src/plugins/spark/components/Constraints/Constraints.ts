@@ -1,10 +1,5 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { Watch } from 'vue-property-decorator';
-import { Link } from '@/helpers/units';
-import { uniqueFilter } from '@/helpers/functional';
-import { compatibleBlocks } from '@/plugins/spark/store/getters';
-import { fetchCompatibleBlocks } from '@/plugins/spark/store/actions';
 import { clone } from 'lodash';
 
 export interface ConstraintInfo {
@@ -17,11 +12,18 @@ const asInfo = (con: any): ConstraintInfo => {
   return { key, value: con[key] };
 };
 
+const asConstraint = (cinfo: ConstraintInfo) =>
+  ({ [cinfo.key]: cinfo.value });
+
 @Component({
   props: {
-    value: {
+    field: {
       type: Object,
       default: () => ({ constraints: [] }),
+    },
+    change: {
+      type: Function,
+      default: () => () => { },
     },
     serviceId: {
       type: String,
@@ -32,56 +34,23 @@ const asInfo = (con: any): ConstraintInfo => {
 export default class Constraints extends Vue {
   get constraints(): ConstraintInfo[] {
     return this.$props
-      .value
+      .field
       .constraints
       .map(asInfo);
   }
 
-  onChanged(vals: ConstraintInfo[]) {
+  saveConstraints(vals: ConstraintInfo[] = this.constraints) {
     const constraints = vals
       .filter(info => !!info.key)
-      .map(info => ({ [info.key]: clone(info.value) }));
-    this.$emit('input', { constraints });
+      .map(asConstraint);
+    this.$props.change({ constraints });
   }
 
-  addConstraint(cinfo: ConstraintInfo) {
-    this.onChanged([...this.constraints, cinfo]);
+  callAndSaveConstraints(func: (v: any) => void) {
+    return (v: any) => { func(v); this.saveConstraints(); };
   }
 
-  updateConstraint(index: number, cinfo: ConstraintInfo) {
-    this.constraints[index] = cinfo;
-    this.onChanged(this.constraints);
-  }
-
-  get compatibleBlocks() {
-    return compatibleBlocks(this.$store, this.$props.serviceId);
-  }
-
-  fetchCompatibleBlocks(type: string) {
-    fetchCompatibleBlocks(this.$store, this.$props.serviceId, type);
-  }
-
-  @Watch('constraints', { immediate: true })
-  fetchCompatibleToInputLinks() {
-    this.constraints
-      .reduce(
-        (acc: string[], cinfo) => {
-          if (cinfo.value instanceof Link && cinfo.value.type) {
-            return [...acc, cinfo.value.type as string];
-          }
-          return acc;
-        },
-        [],
-      )
-      .filter(uniqueFilter)
-      .forEach(this.fetchCompatibleBlocks);
-  }
-
-  linkOpts(link: Link) {
-    return (this.compatibleBlocks[link.type || ''] || [])
-      .map(id => ({
-        label: id,
-        value: id,
-      }));
+  removeConstraint(index: number) {
+    this.$delete(this.constraints, index);
   }
 }

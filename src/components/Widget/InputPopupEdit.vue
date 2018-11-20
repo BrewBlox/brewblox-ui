@@ -5,7 +5,6 @@ import Component from 'vue-class-component';
 @Component({
   props: {
     field: {
-      type: [String, Number],
       required: true,
     },
     change: {

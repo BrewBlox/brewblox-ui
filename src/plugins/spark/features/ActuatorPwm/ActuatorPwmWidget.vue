@@ -66,13 +66,11 @@ export default class ActuatorPwmWidget extends BlockWidget {
 
         <!-- Constraints -->
         <q-carousel-slide class="unpadded">
-          <div :class="['widget-body', orientationClass]">
-            <q-card-main class="column col">
-              <q-field class="col" label="Constraints" orientation="vertical">
-                <ReadonlyConstraints :serviceId="serviceId" v-model="block.data.constrainedBy" />
-              </q-field>
-            </q-card-main>
-          </div>
+          <q-card-main class="column col">
+            <q-field class="col" label="Constraints" orientation="vertical">
+              <AnalogConstraints :serviceId="serviceId" :field="block.data.constrainedBy" :change="callAndSaveBlock(v => block.data.constrainedBy = v)" />
+            </q-field>
+          </q-card-main>
         </q-carousel-slide>
 
         <!-- Graph -->

@@ -13,38 +13,16 @@ export default class ActuatorOffsetForm extends BlockForm {
     <q-card>
       <q-card-title>Settings</q-card-title>
       <q-card-main>
-        <q-field
-          class="col"
-          label="Target"
-        >
-          <LinkPopupEdit
-            label="Target"
-            :field="block.data.targetId"
-            :serviceId="block.serviceId"
-            :change="callAndSaveBlock(v => block.data.targetId = v)"
-          />
+        <q-field class="col" label="Target">
+          <LinkPopupEdit label="Target" :field="block.data.targetId" :serviceId="block.serviceId" :change="callAndSaveBlock(v => block.data.targetId = v)" />
         </q-field>
-        <q-field
-          class="col"
-          label="Reference"
-        >
-          <LinkPopupEdit
-            label="Reference"
-            :field="block.data.referenceId"
-            :serviceId="block.serviceId"
-            :change="callAndSaveBlock(v => block.data.referenceId = v)"
-          />
+        <q-field class="col" label="Reference">
+          <LinkPopupEdit label="Reference" :field="block.data.referenceId" :serviceId="block.serviceId" :change="callAndSaveBlock(v => block.data.referenceId = v)" />
         </q-field>
-        <q-field
-          class="col"
-          label="Setting"
-        >
+        <q-field class="col" label="Setting">
           <big>{{ block.data.setting | round }}</big>
         </q-field>
-        <q-field
-          class="col"
-          label="Value"
-        >
+        <q-field class="col" label="Value">
           <big>{{ block.data.value | round }}</big>
         </q-field>
       </q-card-main>
@@ -52,10 +30,7 @@ export default class ActuatorOffsetForm extends BlockForm {
     <q-card>
       <q-card-title>Constraints</q-card-title>
       <q-card-main>
-        <ReadonlyConstraints
-          :serviceId="block.serviceId"
-          :value="block.data.constrainedBy"
-        />
+        <AnalogConstraints :serviceId="serviceId" :field="block.data.constrainedBy" :change="callAndSaveBlock(v => block.data.constrainedBy = v)" />
       </q-card-main>
     </q-card>
   </div>

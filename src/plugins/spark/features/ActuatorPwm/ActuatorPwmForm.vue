@@ -34,7 +34,9 @@ export default class ActuatorPwmForm extends BlockForm {
     <q-card>
       <q-card-title>Constraints</q-card-title>
       <q-card-main>
-        <ReadonlyConstraints :serviceId="block.serviceId" :value="block.data.constrainedBy" />
+        <q-field class="col" label="Constraints" orientation="vertical">
+          <AnalogConstraints :serviceId="block.serviceId" :field="block.data.constrainedBy" :change="callAndSaveBlock(v => block.data.constrainedBy = v)" />
+        </q-field>
       </q-card-main>
     </q-card>
   </div>
