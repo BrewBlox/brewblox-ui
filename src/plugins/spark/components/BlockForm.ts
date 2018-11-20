@@ -5,13 +5,17 @@ import FormBase from '@/components/Widget/FormBase';
 
 @Component
 export default class BlockForm extends FormBase {
-  get defaultData() {
+  defaultData() {
     return {};
   }
 
   get blockField(): Block {
-    const propBlock = this.$props.field as Block;
-    return { ...propBlock, data: propBlock.data || this.defaultData } as Block;
+    const propBlock: Block = this.$props.field;
+    const actualBlock: Block = { ...propBlock, data: propBlock.data || this.defaultData() };
+    if (!propBlock.data) {
+      this.$props.change(actualBlock);
+    }
+    return actualBlock;
   }
 
   get block(): Block {

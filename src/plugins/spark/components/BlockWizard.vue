@@ -257,7 +257,7 @@ export default class BlockWizard extends Vue {
 
     <!-- configure -->
     <q-step name="config" title="Configure block">
-      <component v-if="block" v-model="block" ref="form" :is="blockForm" />
+      <component :is="blockForm" v-if="block" :field="block" :change="v => block = v" ref="form" />
     </q-step>
 
     <q-stepper-navigation>

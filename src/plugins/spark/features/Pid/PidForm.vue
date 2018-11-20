@@ -9,7 +9,7 @@ import { PidBlock } from '@/plugins/spark/features/Pid/state';
 
 @Component
 export default class PidForm extends BlockForm {
-  get defaultData() {
+  defaultData() {
     return {};
   }
 
