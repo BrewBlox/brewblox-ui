@@ -6,6 +6,7 @@ import { serviceAvailable } from '@/helpers/dynamic-store';
 import { DashboardItem } from '@/store/dashboards/state';
 import { Block } from '@/plugins/spark/state';
 import { allBlocks } from '@/plugins/spark/store/getters';
+import { renameBlock } from '@/plugins/spark/store/actions';
 import {
   featureIds,
   widgetById,
@@ -73,6 +74,10 @@ export default class SparkPage extends Vue {
     return this.editable
       ? 'EditWidget'
       : (widgetById(this.$store, id) || 'InvalidWidget');
+  }
+
+  onChangeBlockId(currentId: string, newId: string) {
+    renameBlock(this.$store, this.$props.serviceId, currentId, newId);
   }
 
   onDeleteItem(item: DashboardItem) {
@@ -146,7 +151,7 @@ export default class SparkPage extends Vue {
 
       <grid-container>
         <SparkWidget v-if="isReady" class="dashboard-item" :id="$props.serviceId" :serviceId="$props.serviceId" :cols="widgetSize.cols" :rows="widgetSize.rows" />
-        <component class="dashboard-item" v-for="item in items" :is="widgetComponent(item.widget)" :key="item.id" :id="item.id" :type="item.widget" :cols="item.cols" :rows="item.rows" :config="item.config" :onConfigChange="onWidgetChange" :onIdChange="onWidgetChange" :onDeleteItem="() => onDeleteItem(item)" :onCopyItem="() => onCopyItem(item)" />
+        <component class="dashboard-item" v-for="item in items" :is="widgetComponent(item.widget)" :key="item.id" :id="item.id" :type="item.widget" :cols="item.cols" :rows="item.rows" :config="item.config" :onConfigChange="onWidgetChange" :onIdChange="onChangeBlockId" :onDeleteItem="() => onDeleteItem(item)" :onCopyItem="() => onCopyItem(item)" />
       </grid-container>
     </template>
   </div>
