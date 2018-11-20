@@ -19,7 +19,7 @@
     "test": "jest",
     "e2e": "npm run compose:new && vue-cli-service test:e2e --mode development",
     "tslint": "tslint -c tslint.json 'src/**/*.ts'",
-    "eslint": "eslint src --ext .js,.vue,.ts",
+    "eslint": "eslint src --ext .js",
     "lint": "npm run tslint && npm run eslint",
     "e2e:open": "vue-cli-service e2e:open"
   },
