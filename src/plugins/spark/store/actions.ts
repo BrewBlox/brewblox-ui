@@ -4,6 +4,7 @@ import { RootStore } from '@/store/state';
 import { Block, UserUnits } from '../state';
 import { BlocksContext } from './state';
 import { dispatch } from '@/helpers/dynamic-store';
+import { addVuexKey } from '@/store/vuex-key-fix';
 import { allDashboardItems } from '@/store/dashboards/getters';
 import { setDashboardItem } from '@/store/dashboards/mutations';
 import {
@@ -51,6 +52,9 @@ const actions = {
     removeBlockInStore(context, block.serviceId, block.id);
   },
 };
+
+addVuexKey(actions);
+export default actions;
 
 export const fetchBlock = dispatch(actions.fetchBlock);
 export const createBlock = dispatch(actions.createBlock);
@@ -126,5 +130,3 @@ export const update = async (store: RootStore, service: Service) =>
 
 export const validateService = async (serviceId: string) =>
   validateServiceInApi(serviceId);
-
-export default actions;

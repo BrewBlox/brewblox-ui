@@ -1,4 +1,5 @@
 import { getStoreAccessors } from 'vuex-typescript';
+import { addVuexKey } from '@/store/vuex-key-fix';
 import { RootStore, RootState } from '@/store/state';
 import { HistoryContext, HistoryState } from './state';
 import {
@@ -43,6 +44,7 @@ const actions = {
   },
 };
 
+addVuexKey(actions);
 export default actions;
 
 export const addMetric = dispatch(actions.add);

@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import { commit } from '@/helpers/dynamic-store';
+import { addVuexKey } from '@/store/vuex-key-fix';
 import { SparkState } from './state';
 import { Block, UserUnits, UnitAlternatives } from '../state';
 
@@ -39,6 +40,9 @@ const mutations = {
     Vue.set(state, 'discoveredBlocks', ids),
 };
 
+addVuexKey(mutations);
+export default mutations;
+
 export const addBlock = commit(mutations.addBlock);
 export const mutateBlock = commit(mutations.mutateBlock);
 export const removeBlock = commit(mutations.removeBlock);
@@ -47,5 +51,3 @@ export const setUnits = commit(mutations.setUnits);
 export const setUnitAlternatives = commit(mutations.setUnitAlternatives);
 export const setCompatibleBlocks = commit(mutations.setCompatibleBlocks);
 export const setDiscoveredBlocks = commit(mutations.setDiscoveredBlocks);
-
-export default mutations;

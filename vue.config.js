@@ -1,40 +1,8 @@
 module.exports = {
   lintOnSave: true,
   configureWebpack: (config) => {
-    // make sure to keep function names when uglifying to prevent Vuex-TypeScript from crying
     if (process.env.NODE_ENV === 'production') {
-      config.optimization = {
-        minimize: false,
-      };
-      // console.log(config.optimization.minimizer[0].options);
-
-      // config.optimization.minimizer.push(new UglifyJsPlugin({
-      //   uglifyOptions: {
-      //     ecma: 5,
-      //     compress: {
-      //       keep_fnames: true,
-      //     },
-      //     warnings: false,
-      //     mangle: {
-      //       keep_fnames: true,
-      //     },
-      //   },
-      // }));
-
-      // config.optimization.minimizer[0].options.uglifyOptions = Object.assign(
-      //   {},
-      //   config.optimization.minimizer[0].options.uglifyOptions,
-      //   {
-      //     ecma: 5,
-      //     compress: {
-      //       keep_fnames: true,
-      //     },
-      //     warnings: false,
-      //     mangle: {
-      //       keep_fnames: true,
-      //     },
-      //   },
-      // );
+      // Insert production-only settings here
     }
   },
   chainWebpack: (config) => {

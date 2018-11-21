@@ -1,4 +1,5 @@
 import { getStoreAccessors } from 'vuex-typescript';
+import { addVuexKey } from '@/store/vuex-key-fix';
 import UrlSafeString from 'url-safe-string';
 import {
   fetchDashboards as fetchDashboardsInApi,
@@ -124,6 +125,7 @@ const actions = {
   },
 };
 
+addVuexKey(actions);
 export default actions;
 
 export const createDashboard = dispatch(actions.createDashboard);

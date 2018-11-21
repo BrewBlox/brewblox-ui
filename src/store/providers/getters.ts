@@ -1,5 +1,5 @@
 import { getStoreAccessors } from 'vuex-typescript';
-
+import { addVuexKey } from '@/store/vuex-key-fix';
 import { RootState, RootStore } from '../state';
 import { Provider, ProviderState } from './state';
 import { Service } from '../services/state';
@@ -14,6 +14,7 @@ const getters = {
   providerValues: (state: ProviderState): Provider[] => Object.values(state.providers),
 };
 
+addVuexKey(getters);
 export default getters;
 
 export const providers = read(getters.providers);

@@ -1,4 +1,5 @@
 import { read } from '@/helpers/dynamic-store';
+import { addVuexKey } from '@/store/vuex-key-fix';
 import { RootStore } from '@/store/state';
 import { serviceById } from '@/store/services/getters';
 import { SparkState } from './state';
@@ -27,6 +28,7 @@ const getters = {
   discoveredBlocks: (state: SparkState): string[] => state.discoveredBlocks,
 };
 
+addVuexKey(getters);
 export default getters;
 
 export const blocks = read(getters.blocks);

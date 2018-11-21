@@ -3,6 +3,7 @@
 .thumbs.db
 node_modules
 /dist
+/devdist
 
 /tests/e2e/videos/
 /tests/e2e/screenshots/

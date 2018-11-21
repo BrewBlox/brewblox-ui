@@ -1,4 +1,5 @@
 import { getStoreAccessors } from 'vuex-typescript';
+import { addVuexKey } from '@/store/vuex-key-fix';
 import { Dashboard, DashboardItem, DashboardState, DashboardContext } from './state';
 import { RootState, RootStore } from '../state';
 
@@ -29,6 +30,7 @@ const getters = {
   },
 };
 
+addVuexKey(getters);
 export default getters;
 
 export const dashboards = read(getters.dashboards);

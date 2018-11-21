@@ -1,3 +1,4 @@
+import { addVuexKey } from '@/store/vuex-key-fix';
 import { Metric, HistoryState } from './state';
 import { RootStore, RootState } from '@/store/state';
 import { getStoreAccessors } from 'vuex-typescript';
@@ -14,6 +15,7 @@ const getters = {
   fields: (state: HistoryState): { [id: string]: string[] } => state.availableFields,
 };
 
+addVuexKey(getters);
 export default getters;
 
 export const metrics = read(getters.metrics);

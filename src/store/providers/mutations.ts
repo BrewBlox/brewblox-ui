@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import { getStoreAccessors } from 'vuex-typescript';
+import { addVuexKey } from '@/store/vuex-key-fix';
 import { ProviderState, Provider } from './state';
 import { RootState } from '../state';
 
@@ -24,6 +25,7 @@ const mutations = {
   },
 };
 
+addVuexKey(mutations);
 export default mutations;
 
 export const createProvider = commit(mutations.create);

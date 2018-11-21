@@ -1,5 +1,5 @@
 import { getStoreAccessors } from 'vuex-typescript';
-
+import { addVuexKey } from '@/store/vuex-key-fix';
 import { RootState, RootStore } from '../state';
 import { Feature, FeatureState } from './state';
 
@@ -10,6 +10,8 @@ const getters = {
   featureIds: (state: FeatureState): string[] => Object.keys(state.features),
   featureValues: (state: FeatureState): Feature[] => Object.values(state.features),
 };
+
+addVuexKey(getters);
 export default getters;
 
 export const features = read(getters.features);
