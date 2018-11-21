@@ -1,5 +1,5 @@
 <script lang="ts">
-import Vue, { VueConstructor } from 'vue';
+import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Notify } from 'quasar';
 import { serviceAvailable } from '@/helpers/dynamic-store';
@@ -50,9 +50,8 @@ export default class SparkPage extends Vue {
   get isAvailable() {
     return serviceAvailable(this.$store, this.$props.serviceId);
   }
-
   get isReady() {
-    return isReady(this.$store, this.$props.serviceId);
+    return this.isAvailable && isReady(this.$store, this.$props.serviceId);
   }
 
   get items() {
@@ -144,9 +143,7 @@ export default class SparkPage extends Vue {
       </portal>
 
       <portal to="toolbar-buttons">
-
         <q-btn :icon="editable ? 'check' : 'mode edit'" :color="editable ? 'positive' : 'primary'" @click="() => editable = !editable" :label="editable ? 'Stop editing' : 'Edit blocks'" />
-
       </portal>
 
       <grid-container>

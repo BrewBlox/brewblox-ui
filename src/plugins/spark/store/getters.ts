@@ -1,5 +1,4 @@
 import { read } from '@/helpers/dynamic-store';
-import { addVuexKey } from '@/store/vuex-key-fix';
 import { RootStore } from '@/store/state';
 import { serviceById } from '@/store/services/getters';
 import { SparkState } from './state';
@@ -28,7 +27,6 @@ const getters = {
   discoveredBlocks: (state: SparkState): string[] => state.discoveredBlocks,
 };
 
-addVuexKey(getters);
 export default getters;
 
 export const blocks = read(getters.blocks);
@@ -61,7 +59,7 @@ export function allBlocks<T extends Block>(
   type?: string,
 ): T[] {
   return blockValues(store, serviceId)
-    .filter(block => !type || block.type === type) as T[];
+    .filter((block: Block) => !type || block.type === type) as T[];
 }
 
 export const sparkServiceById = (store: RootStore, id: string) =>

@@ -3,6 +3,10 @@ module.exports = {
   configureWebpack: (config) => {
     if (process.env.NODE_ENV === 'production') {
       // Insert production-only settings here
+      config.optimization = {
+        // Insert production-only settings here
+        minimize: false,
+      };
     }
   },
   chainWebpack: (config) => {

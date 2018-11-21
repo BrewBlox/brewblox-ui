@@ -1,10 +1,10 @@
+import { ActionTree } from 'vuex';
 import { saveService } from '@/store/services/actions';
 import { Service } from '@/store/services/state';
-import { RootStore } from '@/store/state';
+import { RootStore, RootState } from '@/store/state';
 import { Block, UserUnits } from '../state';
-import { BlocksContext } from './state';
+import { BlocksContext, SparkState } from './state';
 import { dispatch } from '@/helpers/dynamic-store';
-import { addVuexKey } from '@/store/vuex-key-fix';
 import { allDashboardItems } from '@/store/dashboards/getters';
 import { setDashboardItem } from '@/store/dashboards/mutations';
 import {
@@ -37,7 +37,7 @@ import {
   setBlocks as setBlocksInStore,
 } from './mutations';
 
-const actions = {
+const actions: ActionTree<SparkState, RootState> = {
   fetchBlock: async (context: BlocksContext, block: Block) =>
     mutateBlockInStore(context, block.serviceId, await fetchBlockInApi(block)),
 
@@ -53,7 +53,6 @@ const actions = {
   },
 };
 
-addVuexKey(actions);
 export default actions;
 
 export const fetchBlock = dispatch(actions.fetchBlock);

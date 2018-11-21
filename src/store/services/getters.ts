@@ -1,9 +1,9 @@
-import { getStoreAccessors } from 'vuex-typescript';
 import { addVuexKey } from '@/store/vuex-key-fix';
 import { RootState, RootStore } from '../state';
 import { ServiceState, Service, ServicesContext } from './state';
+import { createAccessors } from '@/helpers/static-store';
 
-const { read } = getStoreAccessors<ServiceState, RootState>('services');
+const { read } = createAccessors('services');
 
 const getters = {
   services: (state: ServiceState): { [id: string]: Service } => state.services,

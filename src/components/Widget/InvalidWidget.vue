@@ -1,45 +1,29 @@
 <script lang="ts">
-import Vue from 'vue';
 import Component from 'vue-class-component';
+import WidgetBase from './WidgetBase';
 
 @Component({
   props: {
-    id: {
-      type: String,
-      required: true,
-    },
-    config: {
-      type: Object,
-      default: () => ({}),
-    },
     error: {
-      type: String,
-      default: () => 'Unspecified error',
+      default: 'Unknown error',
     },
   },
 })
-export default class InvalidWidget extends Vue { }
+export default class InvalidWidget extends WidgetBase { }
 </script>
 
 <template>
-  <q-card>
-    <q-toolbar color="negative">
-      <q-toolbar-title>
-        {{ $props.id }}
-      </q-toolbar-title>
-      <q-item-tile icon="error" />
-    </q-toolbar>
-    <q-item>
-      <q-item-tile label>
-        {{ $props.error }}
-      </q-item-tile>
-    </q-item>
+  <q-card dark class="full-height column">
+    <q-card-title class="title-bar">
+      <InputPopupEdit class="ellipsis" :field="widgetId" label="Widget ID" display="span" :change="v => widgetId = v" />
+      <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
+    </q-card-title>
+    <q-card-separator />
+    <q-alert icon="error" error>
+      {{ $props.error }}
+    </q-alert>
   </q-card>
 </template>
 
 <style scoped>
-.q-item {
-  display: grid;
-  grid-gap: 10px;
-}
 </style>

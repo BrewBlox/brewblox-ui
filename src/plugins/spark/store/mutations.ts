@@ -3,8 +3,9 @@ import { commit } from '@/helpers/dynamic-store';
 import { addVuexKey } from '@/store/vuex-key-fix';
 import { SparkState } from './state';
 import { Block, UserUnits, UnitAlternatives } from '../state';
+import { MutationTree } from 'vuex';
 
-const mutations = {
+const mutations: MutationTree<SparkState> = {
   addBlock: (state: SparkState, block: Block) =>
     Vue.set(state.blocks, block.id, { ...block }),
 

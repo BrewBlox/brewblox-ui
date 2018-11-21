@@ -1,6 +1,8 @@
 <script lang="ts">
 import Vue from 'vue';
+import { createNamespacedHelpers } from 'vuex';
 import Component from 'vue-class-component';
+import { State, Action, Getter } from 'vuex-class';
 import { serviceById } from '@/store/services/getters';
 import { durationString } from '@/helpers/functional';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
@@ -28,6 +30,7 @@ import {
   oneWireBusId,
   ticksId,
 } from './getters';
+import { addMapped } from '@/plugins/spark/class-store/actions';
 
 @Component({
   props: {
@@ -40,6 +43,17 @@ import {
 export default class SparkWidget extends Vue {
   modalOpen: boolean = false;
   slideIndex: number = 0;
+
+  mounted() {
+    console.log('mounted');
+    addMapped(this.$store, this.$props.serviceId, { key: 'testKey', val: 'testVal' });
+  }
+
+  get mappedValues() {
+    const val = this.$store.getters[`${this.$props.serviceId}-class/mappedValues`];
+    console.log(this.$props.serviceId, val);
+    return val;
+  }
 
   get service() {
     return serviceById(this.$store, this.$props.serviceId);
@@ -143,7 +157,7 @@ export default class SparkWidget extends Vue {
       <SparkForm v-if="modalOpen" :field="service" />
     </q-modal>
 
-    <q-card dark class="full-height column">
+    <q-card dark class="full-height column" v-if="ready">
       <q-card-title class="title-bar">
         <InputPopupEdit class="ellipsis" :field="service.id" label="Widget ID" display="span" :change="() => {}" />
         <span class="vertical-middle on-left" slot="right">Spark Service</span>
@@ -169,6 +183,7 @@ export default class SparkWidget extends Vue {
             <q-field class="col" label="Date">
               <big>{{ sysDate }}</big>
             </q-field>
+            {{ mappedValues }}
           </q-card-main>
         </q-carousel-slide>
 
