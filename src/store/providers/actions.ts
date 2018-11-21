@@ -1,4 +1,5 @@
 import { getStoreAccessors } from 'vuex-typescript';
+import { addVuexKey } from '@/store/vuex-key-fix';
 import { RootState } from '@/store/state';
 import { Provider, ProviderContext, ProviderState } from './state';
 import { createProvider as createProviderInStore } from './mutations';
@@ -11,6 +12,7 @@ const actions = {
   },
 };
 
+addVuexKey(actions);
 export default actions;
 
 export const createProvider = dispatch(actions.create);

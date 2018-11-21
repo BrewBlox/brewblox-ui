@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { addVuexKey } from '@/store/vuex-key-fix';
 import { RootState } from '@/store/state';
 import { Metric, QueryResult, HistoryState } from './state';
 import { getStoreAccessors } from 'vuex-typescript';
@@ -32,10 +33,11 @@ const mutations = {
     Vue.set(state, 'availableFields', { ...fields }),
 };
 
+addVuexKey(mutations);
+export default mutations;
+
 export const addMetric = commit(mutations.add);
 export const removeMetric = commit(mutations.remove);
 export const updateMetric = commit(mutations.update);
 export const transformMetric = commit(mutations.transform);
 export const mutateAvailableKeys = commit(mutations.setAvailableFields);
-
-export default mutations;

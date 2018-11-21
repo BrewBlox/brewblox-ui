@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { addVuexKey } from '@/store/vuex-key-fix';
 import { getStoreAccessors } from 'vuex-typescript';
 import { Dashboard, DashboardItem, DashboardState } from './state';
 import { RootState } from '../state';
@@ -25,6 +26,7 @@ const mutations = {
     Vue.delete(state.items, item.id),
 };
 
+addVuexKey(mutations);
 export default mutations;
 
 export const setDashboard = commit(mutations.setDashboard);

@@ -16,6 +16,7 @@
     "serve": "vue-cli-service serve",
     "start": "npm run compose:new && npm run serve",
     "build": "vue-cli-service build",
+    "devbuild": "npm run build && mkdir -p ./devdist && rm -r ./devdist/*; cp -r ./dist/* ./devdist/",
     "test": "jest",
     "e2e": "npm run compose:new && vue-cli-service test:e2e --mode development",
     "tslint": "tslint -c tslint.json 'src/**/*.ts'",

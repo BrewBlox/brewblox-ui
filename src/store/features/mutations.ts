@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { addVuexKey } from '@/store/vuex-key-fix';
 import { getStoreAccessors } from 'vuex-typescript';
 import { FeatureState, Feature } from './state';
 import { RootState } from '../state';
@@ -22,6 +23,7 @@ const mutations = {
     Vue.delete(state.features, id),
 };
 
+addVuexKey(mutations);
 export default mutations;
 
 export const createFeature = commit(mutations.create);

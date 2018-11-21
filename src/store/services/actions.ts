@@ -1,4 +1,5 @@
 import { getStoreAccessors } from 'vuex-typescript';
+import { addVuexKey } from '@/store/vuex-key-fix';
 import { RootState } from '../state';
 import { ServiceState, Service, ServicesContext } from './state';
 import { serviceById as getServiceInStore } from './getters';
@@ -49,6 +50,7 @@ const actions = {
   },
 };
 
+addVuexKey(actions);
 export default actions;
 
 export const fetchServices = dispatch(actions.fetchServices);
