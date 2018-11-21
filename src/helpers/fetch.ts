@@ -1,4 +1,4 @@
-import { serialize, deserialize } from '@/helpers/units/parseObject';
+import { deserialize, serialize } from '@/helpers/units/parseObject';
 
 const host = process.env.VUE_APP_API_URI;
 

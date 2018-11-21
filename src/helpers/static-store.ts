@@ -1,26 +1,28 @@
-import { Getter, Mutation, ActionContext, Action } from 'vuex';
-import { RootStore, RootState } from '@/store/state';
+import { RootState, RootStore } from '@/store/state';
+import { Action, ActionContext, Getter, Mutation } from 'vuex';
 
-const nestedName = (serviceId: string, func: Function) =>
-  `${serviceId}/${func.name}`;
+const nestedName = (serviceId: string, func: Function) => {
+  // console.log(serviceId, func.name);
+  return `${serviceId}/${func.name}`;
+};
 
-export function createAccessors(moduleName: string) {
-  return {
+type StoreType<TModuleState> = RootStore | ActionContext<TModuleState, RootState>;
+
+export const createAccessors = (moduleName: string) =>
+  ({
     read: function read<TModuleState>(getter: Getter<TModuleState, RootState>) {
-      return (store: RootStore | ActionContext<TModuleState, RootState>) =>
-        store.getters[nestedName(moduleName, getter)];
+      const name = nestedName(moduleName, getter);
+      return (store: StoreType<TModuleState>) =>
+        ((store as ActionContext<TModuleState, RootState>).rootGetters || store.getters)[name];
     },
     commit: function commit<TModuleState>(mutation: Mutation<TModuleState>) {
-      return (
-        store: RootStore | ActionContext<TModuleState, RootState>,
-        payload?: any,
-        options?: any,
-      ) =>
-        store.commit(nestedName(moduleName, mutation), payload, options);
+      const name = nestedName(moduleName, mutation);
+      return (store: StoreType<TModuleState>, payload?: any) =>
+        store.commit(name, payload, { root: true });
     },
     dispatch: function dispatch<TModuleState>(action: Action<TModuleState, RootState>) {
-      return async (store: RootStore, payload: any) =>
-        store.dispatch(nestedName(moduleName, action as Function), payload);
+      const name = nestedName(moduleName, action as Function);
+      return async (store: StoreType<TModuleState>, payload?: any) =>
+        store.dispatch(name, payload, { root: true });
     },
-  };
-}
+  });

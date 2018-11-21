@@ -1,23 +1,22 @@
 import { createAccessors } from '@/helpers/static-store';
-import { RootState } from '../state';
-import { ServiceState, Service, ServicesContext } from './state';
-import { serviceById as getServiceInStore } from './getters';
 import {
-  fetchServices as fetchServicesInApi,
   createService as createServiceInApi,
-  updateService as updateServiceInApi,
   deleteService as removeServiceInApi,
+  fetchServices as fetchServicesInApi,
+  updateService as updateServiceInApi,
 } from './api';
+import { serviceById as getServiceInStore } from './getters';
 import {
   addService as addServiceToStore,
   mutateService as mutateServiceInStore,
   removeService as removeServiceInStore,
   setServices as setServicesInStore,
 } from './mutations';
+import { Service, ServicesContext } from './state';
 
 const { dispatch } = createAccessors('services');
 
-const actions = {
+export const actions = {
   fetchServices: async (context: ServicesContext) =>
     setServicesInStore(context, await fetchServicesInApi()),
 
@@ -48,8 +47,6 @@ const actions = {
     });
   },
 };
-
-export default actions;
 
 export const fetchServices = dispatch(actions.fetchServices);
 export const createService = dispatch(actions.createService);

@@ -1,16 +1,14 @@
 <script lang="ts">
-import Vue from 'vue';
-import Component from 'vue-class-component';
+import { GraphConfig } from '@/components/Graph/state';
+import FormBase from '@/components/Widget/FormBase';
 import { dashboardItemById } from '@/store/dashboards/getters';
 import { DashboardItem } from '@/store/dashboards/state';
 import {
-  widgetSizeById,
   formById,
-  displayNameById as featureNameById,
+  widgetSizeById,
 } from '@/store/features/getters';
-import { displayNameById } from '@/store/providers/getters';
-import { GraphConfig } from '@/components/Graph/state';
-import FormBase from '@/components/Widget/FormBase';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 
 interface NavAction {
   label: string;

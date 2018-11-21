@@ -1,9 +1,9 @@
 <script lang="ts">
-import Component from 'vue-class-component';
 import { serializedPropertyName } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import { TempSensorOneWireBlock } from './state';
+import Component from 'vue-class-component';
 import { getById } from './getters';
+import { TempSensorOneWireBlock } from './state';
 
 @Component
 export default class TempSensorOneWireWidget extends BlockWidget {

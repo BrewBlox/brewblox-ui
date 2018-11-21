@@ -1,9 +1,8 @@
 <script lang="ts">
-import Component from 'vue-class-component';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import { ActuatorOffsetBlock } from './state';
+import Component from 'vue-class-component';
 import { getById } from './getters';
-import { GraphConfig } from '@/components/Graph/state';
+import { ActuatorOffsetBlock } from './state';
 
 @Component
 export default class ActuatorOffsetWidget extends BlockWidget {
@@ -24,7 +23,7 @@ export default class ActuatorOffsetWidget extends BlockWidget {
   }
 
   get warnings() {
-    const warn = [];
+    const warn: string[] = [];
     if (!this.block.data.targetValid) {
       warn.push('Target invalid');
     }

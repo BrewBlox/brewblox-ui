@@ -1,36 +1,34 @@
-import { getStoreAccessors } from 'vuex-typescript';
-import { addVuexKey } from '@/store/vuex-key-fix';
+import { createAccessors } from '@/helpers/static-store';
 import UrlSafeString from 'url-safe-string';
 import {
-  fetchDashboards as fetchDashboardsInApi,
-  fetchDashboardItems as fetchDashboardItemsInApi,
   createDashboard as createDashboardInApi,
-  persistDashboard as persistDashboardInApi,
-  deleteDashboard as removeDashboardInApi,
-  persistDashboardItem,
   createDashboardItem as createDashboardItemInApi,
+  deleteDashboard as removeDashboardInApi,
   deleteDashboardItem as removeDashboardItemInApi,
+  fetchDashboardItems as fetchDashboardItemsInApi,
+  fetchDashboards as fetchDashboardsInApi,
+  persistDashboard as persistDashboardInApi,
+  persistDashboardItem,
 } from './api';
-import { DashboardState, DashboardItem, DashboardContext, Dashboard } from './state';
-import { RootState } from '../state';
 import {
-  dashboardItemById as getDashboardItemInStore,
-  dashboardById as getDashboardInStore,
   allDashboards as getAllDashboards,
+  dashboardById as getDashboardInStore,
+  dashboardItemById as getDashboardItemInStore,
   dashboardItemsByDashboardId,
 } from './getters';
 import {
-  setDashboard as setDashboardInStore,
-  setAllDashboards as setAllDashboardsInStore,
   removeDashboard as removeDashboardInStore,
-  setDashboardItem as setDashboardItemInStore,
-  setAllDashboardItems as setAllDashboardItemsInStore,
   removeDashboardItem as removeDashboardItemInStore,
+  setAllDashboardItems as setAllDashboardItemsInStore,
+  setAllDashboards as setAllDashboardsInStore,
+  setDashboard as setDashboardInStore,
+  setDashboardItem as setDashboardItemInStore,
 } from './mutations';
+import { Dashboard, DashboardContext, DashboardItem } from './state';
 
-const { dispatch } = getStoreAccessors<DashboardState, RootState>('dashboards');
+const { dispatch } = createAccessors('dashboards');
 
-const actions = {
+export const actions = {
   createDashboard: async (context: DashboardContext, title: string) => {
     const id = new UrlSafeString().generate(title);
     const dashboard = {
@@ -62,7 +60,7 @@ const actions = {
 
   removeDashboard: async (context: DashboardContext, dashboard: Dashboard) => {
     dashboardItemsByDashboardId(context, dashboard.id)
-      .forEach(item => actions.removeDashboardItem(context, item));
+      .forEach((item: DashboardItem) => actions.removeDashboardItem(context, item));
     removeDashboardInApi(dashboard).catch(() => { });
     removeDashboardInStore(context, dashboard);
   },
@@ -124,9 +122,6 @@ const actions = {
     setAllDashboardItemsInStore(context, await fetchDashboardItemsInApi());
   },
 };
-
-addVuexKey(actions);
-export default actions;
 
 export const createDashboard = dispatch(actions.createDashboard);
 export const saveDashboard = dispatch(actions.saveDashboard);

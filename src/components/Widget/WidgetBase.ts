@@ -1,6 +1,6 @@
+import { displayNameById } from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { displayNameById } from '@/store/features/getters';
 
 @Component({
   props: {

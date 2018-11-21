@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { clone } from 'lodash';
 
 export interface ConstraintInfo {
   key: string;
@@ -8,7 +7,7 @@ export interface ConstraintInfo {
 }
 
 const asInfo = (con: any): ConstraintInfo => {
-  const [key, ..._] = Object.keys(con);
+  const [key] = Object.keys(con);
   return { key, value: con[key] };
 };
 

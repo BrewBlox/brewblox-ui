@@ -1,8 +1,8 @@
 <script lang="ts">
-import Component from 'vue-class-component';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import { ActuatorPwmBlock } from './state';
+import Component from 'vue-class-component';
 import { getById } from './getters';
+import { ActuatorPwmBlock } from './state';
 
 @Component
 export default class ActuatorPwmWidget extends BlockWidget {

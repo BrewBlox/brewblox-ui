@@ -1,9 +1,9 @@
 <script lang="ts">
-import Component from 'vue-class-component';
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import { TempSensorMockBlock } from './state';
-import { getById } from './getters';
 import { serializedPropertyName } from '@/helpers/units';
+import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import Component from 'vue-class-component';
+import { getById } from './getters';
+import { TempSensorMockBlock } from './state';
 
 @Component
 export default class TempSensorMockWidget extends BlockWidget {

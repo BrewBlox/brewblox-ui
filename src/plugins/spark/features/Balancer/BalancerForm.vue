@@ -1,6 +1,6 @@
 <script lang="ts">
-import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
+import Component from 'vue-class-component';
 
 @Component
 export default class BalancerForm extends BlockForm {

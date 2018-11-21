@@ -1,13 +1,9 @@
 <script lang="ts">
-import Component from 'vue-class-component';
 import { serializedPropertyName } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import { saveBlock } from '@/plugins/spark/store/actions';
+import Component from 'vue-class-component';
+import { filters, getById } from './getters';
 import { PidBlock } from './state';
-import { getById, filters } from './getters';
-import FormBase from '@/components/Widget/FormBase';
-import { GraphConfig } from '@/components/Graph/state';
-import { QueryParams } from '@/store/history/state';
 
 @Component
 export default class PidWidget extends BlockWidget {

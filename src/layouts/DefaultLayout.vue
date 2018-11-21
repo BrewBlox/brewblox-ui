@@ -1,26 +1,26 @@
 <script lang="ts">
-import Vue, { VueConstructor } from 'vue';
-import Component from 'vue-class-component';
-import draggable from 'vuedraggable';
+import NewServiceWizard from '@/components/Wizard/NewServiceWizard.vue';
 import { objectSorter } from '@/helpers/functional';
-import { Dashboard } from '@/store/dashboards/state';
+import {
+  createDashboard,
+  removeDashboard,
+  updateDashboardOrder,
+  updatePrimaryDashboard,
+} from '@/store/dashboards/actions';
 import {
   allDashboards,
   primaryDashboard,
 } from '@/store/dashboards/getters';
+import { Dashboard } from '@/store/dashboards/state';
 import {
-  createDashboard,
-  updateDashboardOrder,
-  removeDashboard,
-  updatePrimaryDashboard,
-} from '@/store/dashboards/actions';
-import {
-  updateServiceOrder,
   removeService as removeServiceInStore,
+  updateServiceOrder,
 } from '@/store/services/actions';
-import { Service } from '@/store/services/state';
 import { serviceValues } from '@/store/services/getters';
-import NewServiceWizard from '@/components/Wizard/NewServiceWizard.vue';
+import { Service } from '@/store/services/state';
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import draggable from 'vuedraggable';
 
 @Component({
   components: {

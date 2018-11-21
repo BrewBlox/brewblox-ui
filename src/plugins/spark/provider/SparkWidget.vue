@@ -1,36 +1,31 @@
 <script lang="ts">
-import Vue from 'vue';
-import { createNamespacedHelpers } from 'vuex';
-import Component from 'vue-class-component';
-import { State, Action, Getter } from 'vuex-class';
-import { serviceById } from '@/store/services/getters';
 import { durationString } from '@/helpers/functional';
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import { Block } from '@/plugins/spark/state';
 import {
-  SysInfoBlock,
-  ProfilesBlock,
-  OneWireBusBlock,
-  TicksBlock,
-} from './state';
-import {
-  blocks,
-  blockById,
-  profileNames,
-  discoveredBlocks,
-} from '@/plugins/spark/store/getters';
-import {
+  clearDiscoveredBlocks,
   fetchAll,
   fetchDiscoveredBlocks,
-  clearDiscoveredBlocks,
 } from '@/plugins/spark/store/actions';
 import {
-  sysInfoId,
-  profilesId,
+  blocks,
+  discoveredBlocks,
+  profileNames,
+} from '@/plugins/spark/store/getters';
+import { serviceById } from '@/store/services/getters';
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import {
   oneWireBusId,
+  profilesId,
+  sysInfoId,
   ticksId,
 } from './getters';
-import { addMapped } from '@/plugins/spark/class-store/actions';
+import {
+  OneWireBusBlock,
+  ProfilesBlock,
+  SysInfoBlock,
+  TicksBlock,
+} from './state';
 
 @Component({
   props: {
@@ -43,17 +38,6 @@ import { addMapped } from '@/plugins/spark/class-store/actions';
 export default class SparkWidget extends Vue {
   modalOpen: boolean = false;
   slideIndex: number = 0;
-
-  mounted() {
-    console.log('mounted');
-    addMapped(this.$store, this.$props.serviceId, { key: 'testKey', val: 'testVal' });
-  }
-
-  get mappedValues() {
-    const val = this.$store.getters[`${this.$props.serviceId}-class/mappedValues`];
-    console.log(this.$props.serviceId, val);
-    return val;
-  }
 
   get service() {
     return serviceById(this.$store, this.$props.serviceId);
@@ -156,7 +140,6 @@ export default class SparkWidget extends Vue {
     <q-modal v-model="modalOpen">
       <SparkForm v-if="modalOpen" :field="service" />
     </q-modal>
-
     <q-card dark class="full-height column" v-if="ready">
       <q-card-title class="title-bar">
         <InputPopupEdit class="ellipsis" :field="service.id" label="Widget ID" display="span" :change="() => {}" />
@@ -165,9 +148,7 @@ export default class SparkWidget extends Vue {
         <q-btn flat round dense slot="right" @click="fetchAll" icon="refresh" />
       </q-card-title>
       <q-card-separator />
-
       <q-carousel quick-nav class="col" v-model="slideIndex">
-
         <!-- State -->
         <q-carousel-slide class="unpadded">
           <q-card-main class="column col">
@@ -183,10 +164,8 @@ export default class SparkWidget extends Vue {
             <q-field class="col" label="Date">
               <big>{{ sysDate }}</big>
             </q-field>
-            {{ mappedValues }}
           </q-card-main>
         </q-carousel-slide>
-
         <!-- Discovered blocks -->
         <q-carousel-slide class="unpadded">
           <q-card-main class="column col">
@@ -199,9 +178,7 @@ export default class SparkWidget extends Vue {
             </q-field>
           </q-card-main>
         </q-carousel-slide>
-
-        <q-btn slot="quick-nav" slot-scope="props" color="white" flat dense :icon="navIcon(props.slide)" :label="navTitle(props.slide)" @click="props.goToSlide()" :class="{inactive: !props.current}" />
-
+        <q-btn flat dense slot="quick-nav" slot-scope="props" color="white" :icon="navIcon(props.slide)" :label="navTitle(props.slide)" @click="props.goToSlide()" :class="{inactive: !props.current}" />
       </q-carousel>
     </q-card>
   </div>

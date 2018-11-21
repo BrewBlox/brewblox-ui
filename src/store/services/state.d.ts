@@ -1,5 +1,4 @@
 import { ActionContext } from 'vuex';
-
 import { RootState } from '../state';
 
 export interface Service {

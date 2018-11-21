@@ -1,37 +1,34 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Watch } from 'vue-property-decorator';
-import { Notify } from 'quasar';
-import Component from 'vue-class-component';
-import CopyWidgetDialog from '@/components/Dialog/CopyWidgetDialog.vue';
-import shortid from 'shortid';
 import { objectSorter } from '@/helpers/functional';
-import { Block } from '@/plugins/spark/state';
-import { DashboardItem } from '@/store/dashboards/state';
+import {
+  createDashboardItem,
+  removeDashboardItem,
+  saveDashboard,
+  saveDashboardItem,
+  updateDashboardItemConfig,
+  updateDashboardItemId,
+  updateDashboardItemOrder,
+  updateDashboardItemSize,
+} from '@/store/dashboards/actions';
 import {
   allDashboards,
   dashboardById,
-  dashboardItemById,
   dashboardItemsByDashboardId,
   itemCopyName,
 } from '@/store/dashboards/getters';
+import { DashboardItem } from '@/store/dashboards/state';
 import {
-  saveDashboard,
-  updateDashboardItemOrder,
-  updateDashboardItemSize,
-  updateDashboardItemConfig,
-  createDashboardItem,
-  saveDashboardItem,
-  removeDashboardItem,
-  updateDashboardItemId,
-} from '@/store/dashboards/actions';
-import {
+  deletersById,
+  displayNameById,
   validatorById,
   widgetById,
-  displayNameById,
   widgetSizeById,
-  deletersById,
 } from '@/store/features/getters';
+import { Notify } from 'quasar';
+import shortid from 'shortid';
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import { Watch } from 'vue-property-decorator';
 
 interface VueOrdered extends Vue {
   id: string;

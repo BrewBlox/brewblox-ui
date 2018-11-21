@@ -8,6 +8,8 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
     "sourceMap": true,
     "allowJs": true,
     "baseUrl": ".",
@@ -30,7 +32,4 @@
     "tests/**/*.ts",
     "tests/**/*.tsx"
   ],
-  "exclude": [
-    "node_modules"
-  ]
 }

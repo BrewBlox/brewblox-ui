@@ -1,9 +1,9 @@
-import getters from './getters';
-import actions from './actions';
-import mutations from './mutations';
 import { Module } from 'vuex';
-import { HistoryState } from './state';
 import { RootState } from '../state';
+import { actions } from './actions';
+import { getters } from './getters';
+import { mutations } from './mutations';
+import { HistoryState } from './state';
 
 const features: Module<HistoryState, RootState> = {
   getters,

@@ -1,17 +1,12 @@
-import { getStoreAccessors } from 'vuex-typescript';
-import { addVuexKey } from '@/store/vuex-key-fix';
-import { RootState } from '../state';
-import { Feature, FeatureContext, FeatureState } from './state';
+import { createAccessors } from '@/helpers/static-store';
 import { createFeature as createFeatureInStore } from './mutations';
+import { Feature, FeatureContext } from './state';
 
-const { dispatch } = getStoreAccessors<FeatureState, RootState>('features');
+const { dispatch } = createAccessors('features');
 
-const actions = {
+export const actions = {
   create: (context: FeatureContext, provider: Feature) =>
     createFeatureInStore(context, provider),
 };
-
-addVuexKey(actions);
-export default actions;
 
 export const createFeature = dispatch(actions.create);

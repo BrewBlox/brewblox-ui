@@ -1,11 +1,9 @@
 <script lang="ts">
-import Vue from 'vue';
-import Component from 'vue-class-component';
-import { Notify } from 'quasar';
-import { allBlocks } from '@/plugins/spark/store/getters';
-import { DashboardItem } from '@/store/dashboards/state';
 import { allDashboardItems, dashboardItemById } from '@/store/dashboards/getters';
 import { displayNameById } from '@/store/features/getters';
+import { Notify } from 'quasar';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 
 @Component({
   components: {},
@@ -62,37 +60,16 @@ export default class CopyWidgetWizard extends Vue {
   <div class="layout-padding">
 
     <q-item>
-      <q-field
-        label="Widget ID"
-        icon="create"
-        orientation="vertical"
-      >
-        <q-input
-          v-model="widgetId"
-          placeholder="Enter a widget ID"
-          :error="widgetIdError !== null"
-          :suffix="widgetIdError"
-        />
+      <q-field label="Widget ID" icon="create" orientation="vertical">
+        <q-input v-model="widgetId" placeholder="Enter a widget ID" :error="widgetIdError !== null" :suffix="widgetIdError" />
       </q-field>
 
-      <q-field
-        label="Select a widget to copy"
-        icon="widgets"
-        orientation="vertical"
-      >
+      <q-field label="Select a widget to copy" icon="widgets" orientation="vertical">
         <q-item>
-          <q-search
-            v-model="searchModel"
-            placeholder="Search"
-          />
+          <q-search v-model="searchModel" placeholder="Search" />
         </q-item>
         <q-list link inset-separator>
-          <q-item
-            icon="widgets"
-            v-for="opt in existingWidgetOptions"
-            :key="opt.id"
-            @click.native="selectItem(opt.id)"
-          >
+          <q-item icon="widgets" v-for="opt in existingWidgetOptions" :key="opt.id" @click.native="selectItem(opt.id)">
             <div class="row">
               <q-item-main>
                 <q-item-tile label>{{ opt.id }}</q-item-tile>

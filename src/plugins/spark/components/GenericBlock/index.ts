@@ -1,12 +1,12 @@
 import { ref } from '@/helpers/component-ref';
 import { serviceAvailable } from '@/helpers/dynamic-store';
-import { RootStore } from '@/store/state';
-import { Feature } from '@/store/features/state';
 import { BlockConfig } from '@/plugins/spark/state';
-import { blockById, blocks } from '@/plugins/spark/store/getters';
 import { removeBlock } from '@/plugins/spark/store/actions';
-import widget from './GenericBlock.vue';
+import { blockById, blocks } from '@/plugins/spark/store/getters';
+import { Feature } from '@/store/features/state';
+import { RootStore } from '@/store/state';
 import wizard from '../BlockWizard.vue';
+import widget from './GenericBlock.vue';
 
 const validator = (store: RootStore, config: BlockConfig) =>
   serviceAvailable(store, config.serviceId) &&

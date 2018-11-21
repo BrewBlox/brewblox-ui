@@ -1,17 +1,12 @@
 <script lang="ts">
-import Component from 'vue-class-component';
-import { Notify } from 'quasar';
-import parseDuration from 'parse-duration';
-import FormBase from '@/components/Widget/FormBase';
-import { toShadow, fromShadow, ShadowMapping, deepCopy } from '@/helpers/shadow-copy';
-import { uniqueFilter, durationString } from '@/helpers/functional';
-import { QueryParams, QueryTarget } from '@/store/history/state';
-import {
-  fields as availableFields,
-  measurements as availableMeasurements,
-} from '@/store/history/getters';
-import { fetchKnownKeys } from '@/store/history/actions';
 import { GraphConfig } from '@/components/Graph/state';
+import FormBase from '@/components/Widget/FormBase';
+import { durationString } from '@/helpers/functional';
+import { fetchKnownKeys } from '@/store/history/actions';
+import { measurements } from '@/store/history/getters';
+import { QueryTarget } from '@/store/history/state';
+import parseDuration from 'parse-duration';
+import Component from 'vue-class-component';
 import FieldPopupEdit from './FieldPopupEdit.vue';
 
 @Component({
@@ -46,7 +41,7 @@ export default class GraphForm extends FormBase {
       options: {
         type: 'radio',
         model: 'opt2',
-        items: availableMeasurements(this.$store)
+        items: measurements(this.$store)
           .map(m => ({ label: m, value: m })),
       },
     }).then((m: string) => {

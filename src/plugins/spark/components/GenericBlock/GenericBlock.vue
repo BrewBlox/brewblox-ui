@@ -1,6 +1,6 @@
 <script lang="ts">
-import Component from 'vue-class-component';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import Component from 'vue-class-component';
 
 @Component
 export default class GenericBlock extends BlockWidget { }

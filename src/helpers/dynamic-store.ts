@@ -1,14 +1,8 @@
-import { Action, Getter, Mutation, Module, ActionContext } from 'vuex';
-import { RootStore, RootState } from '@/store/state';
+import { RootState, RootStore } from '@/store/state';
+import { Action, ActionContext, Getter, Module, Mutation } from 'vuex';
 
 export const serviceAvailable = (store: RootStore, serviceId: string) =>
   !!(store as any).state[serviceId];
-
-// export const registerService = (store: RootStore, serviceId: string, module: Module) => {
-//   if (!serviceAvailable(store, serviceId)) {
-//     store.registerModule(serviceId, module);
-//   }
-// };
 
 export function registerService<TModuleState>(
   store: RootStore,
@@ -63,25 +57,22 @@ export function registerService<TModuleState>(
     fetchBlock(store: RootStore, serviceId: string, block: Block)
 */
 
+type StoreType<TModuleState> = RootStore | ActionContext<TModuleState, RootState>;
+
 const nestedName = (serviceId: string, func: Function) =>
   `${serviceId}/${func.name}`;
 
 export function read<TModuleState>(getter: Getter<TModuleState, RootState>) {
-  return (store: RootStore, serviceId: string) =>
+  return (store: StoreType<TModuleState>, serviceId: string) =>
     store.getters[nestedName(serviceId, getter)];
 }
 
 export function commit<TModuleState>(mutation: Mutation<TModuleState>) {
-  return (
-    store: RootStore | ActionContext<TModuleState, RootState>,
-    serviceId: string,
-    payload?: any,
-    options?: any,
-  ) =>
-    store.commit(nestedName(serviceId, mutation), payload, options);
+  return (store: StoreType<TModuleState>, serviceId: string, payload?: any) =>
+    store.commit(nestedName(serviceId, mutation), payload, { root: true });
 }
 
 export function dispatch<TModuleState>(action: Action<TModuleState, RootState>) {
-  return async (store: RootStore, serviceId: string, payload: any) =>
-    store.dispatch(nestedName(serviceId, action as Function), payload);
+  return async (store: StoreType<TModuleState>, serviceId: string, payload?: any) =>
+    store.dispatch(nestedName(serviceId, action as Function), payload, { root: true });
 }
