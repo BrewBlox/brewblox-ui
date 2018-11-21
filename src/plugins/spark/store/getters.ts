@@ -5,14 +5,14 @@ import { SparkState } from './state';
 import { Spark, Block, UserUnits, UnitAlternatives, CompatibleBlocks } from '../state';
 
 const defaultProfileNames = [
-  'P1',
-  'P2',
-  'P3',
-  'P4',
-  'P5',
-  'P6',
-  'P7',
-  'P8',
+  'Profile1',
+  'Profile2',
+  'Profile3',
+  'Profile4',
+  'Profile5',
+  'Profile6',
+  'Profile7',
+  'Profile8',
 ];
 
 export const typeName: string = 'Spark';
