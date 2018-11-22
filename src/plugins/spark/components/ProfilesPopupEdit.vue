@@ -23,7 +23,7 @@ import Component from 'vue-class-component';
   },
 })
 export default class ProfilesPopupEdit extends Vue {
-  placeholder = [];
+  placeholder: any[] = [undefined]; // Ensures that value always changes during edit
 
   get profileOpts() {
     return profileNames(this.$store, this.$props.serviceId)
@@ -38,15 +38,15 @@ export default class ProfilesPopupEdit extends Vue {
       .map((v: any) => this.profileOpts.find((opt: any) => opt.value === v))
       .map((v: any) => v.label)
       .join(', ');
-    return text || '-';
+    return text || 'Click to set';
   }
 
   startEdit() {
-    this.placeholder = this.$props.field;
+    this.placeholder = [...this.$props.field];
   }
 
   endEdit() {
-    this.$props.change(this.placeholder);
+    this.$props.change([...this.placeholder]);
   }
 }
 </script>
@@ -54,8 +54,15 @@ export default class ProfilesPopupEdit extends Vue {
 <template>
   <div>
     <component :is="$props.display" class="editable">{{ displayValue }}</component>
-    <q-popup-edit buttons persistent title="Select active profiles" v-model="placeholder" @show="startEdit" @save="endEdit">
-      <q-select multiple v-model="placeholder" :options="profileOpts" />
+    <q-popup-edit
+      buttons
+      persistent
+      title="Select active profiles"
+      v-model="placeholder"
+      @show="startEdit"
+      @save="endEdit"
+    >
+      <q-select clearable multiple v-model="placeholder" :options="profileOpts"/>
     </q-popup-edit>
   </div>
 </template>

@@ -21,32 +21,48 @@ export default class SetpointSimpleWidget extends BlockWidget {
 <template>
   <div>
     <q-modal v-model="modalOpen">
-      <SetpointSimpleForm v-if="modalOpen" :field="block" :change="saveBlock" />
+      <SetpointSimpleForm v-if="modalOpen" :field="block" :change="saveBlock"/>
     </q-modal>
-
     <q-card dark class="full-height column">
       <q-card-title class="title-bar">
-        <InputPopupEdit class="ellipsis" :field="widgetId" label="Widget ID" display="span" :change="v => widgetId = v" />
+        <InputPopupEdit
+          class="ellipsis"
+          :field="widgetId"
+          label="Widget ID"
+          display="span"
+          :change="v => widgetId = v"
+        />
         <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
-        <q-btn flat round dense slot="right" @click="openModal" icon="settings" />
-        <q-btn flat round dense slot="right" @click="refreshBlock" icon="refresh" />
+        <q-btn flat round dense slot="right" @click="openModal" icon="settings"/>
+        <q-btn flat round dense slot="right" @click="refreshBlock" icon="refresh"/>
       </q-card-title>
-      <q-card-separator />
-
+      <q-card-separator/>
       <q-carousel quick-nav class="col" v-model="slideIndex">
         <!-- State -->
         <q-carousel-slide class="unpadded">
           <div :class="['widget-body', orientationClass]">
             <q-card-main class="column col">
               <q-field class="col" label="Setpoint">
-                <UnitPopupEdit label="Setpoint" :field="block.data.setting" :change="callAndSaveBlock(v => block.data.setting = v)" />
+                <UnitPopupEdit
+                  label="Setpoint"
+                  :field="block.data.setting"
+                  :change="callAndSaveBlock(v => block.data.setting = v)"
+                />
               </q-field>
             </q-card-main>
           </div>
         </q-carousel-slide>
-
-        <q-btn slot="quick-nav" slot-scope="props" color="white" flat dense :icon="navIcon(props.slide)" :label="navTitle(props.slide)" @click="props.goToSlide()" :class="{inactive: !props.current}" />
-
+        <q-btn
+          slot="quick-nav"
+          slot-scope="props"
+          color="white"
+          flat
+          dense
+          :icon="navIcon(props.slide)"
+          :label="navTitle(props.slide)"
+          @click="props.goToSlide()"
+          :class="{inactive: !props.current}"
+        />
       </q-carousel>
     </q-card>
   </div>

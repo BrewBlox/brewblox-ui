@@ -1,6 +1,5 @@
 import FormBase from '@/components/Widget/FormBase';
 import { Block } from '@/plugins/spark/state';
-import { compatibleBlocks, profileNames } from '@/plugins/spark/store/getters';
 import Component from 'vue-class-component';
 
 @Component
@@ -24,22 +23,6 @@ export default class BlockForm extends FormBase {
 
   get serviceId() {
     return this.block.serviceId;
-  }
-
-  get profiles() {
-    return this.block.profiles;
-  }
-
-  get profileNames(): string[] {
-    return profileNames(this.$store, this.serviceId);
-  }
-
-  get profileOpts() {
-    return this.profileNames.map((v, idx) => ({ label: v, value: idx }));
-  }
-
-  get compatibleBlocks() {
-    return compatibleBlocks(this.$store, this.serviceId);
   }
 
   saveBlock(block: Block = this.block) {

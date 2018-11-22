@@ -19,8 +19,19 @@ export default class SetpointSimpleForm extends BlockForm {
     <q-card>
       <q-card-title>Settings</q-card-title>
       <q-card-main>
+        <q-field class="col" label="Profiles">
+          <ProfilesPopupEdit
+            :field="block.profiles"
+            :serviceId="serviceId"
+            :change="callAndSaveBlock(v => block.profiles = v)"
+          />
+        </q-field>
         <q-field class="col" label="Setpoint">
-          <UnitPopupEdit label="Setpoint" :field="block.data.setting" :change="callAndSaveBlock(v => block.data.setting = v)" />
+          <UnitPopupEdit
+            label="Setpoint"
+            :field="block.data.setting"
+            :change="callAndSaveBlock(v => block.data.setting = v)"
+          />
         </q-field>
       </q-card-main>
     </q-card>
