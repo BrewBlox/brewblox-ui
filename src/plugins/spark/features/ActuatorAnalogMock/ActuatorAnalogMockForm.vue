@@ -46,13 +46,6 @@ export default class ActuatorAnalogMockForm extends BlockForm {
             :change="callAndSaveBlock(v => block.data.maxSetting = v)"
           />
         </q-field>
-        <q-field class="col" label="Profiles">
-          <ProfilesPopupEdit
-            :field="block.profiles"
-            :serviceId="serviceId"
-            :change="callAndSaveBlock(v => block.profiles = v)"
-          />
-        </q-field>
       </q-card-main>
     </q-card>
     <q-card>

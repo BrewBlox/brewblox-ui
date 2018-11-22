@@ -1,7 +1,7 @@
 <script lang="ts">
+import { Unit } from '@/helpers/units';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { Unit } from '@/helpers/units';
 
 @Component({
   props: {
@@ -48,8 +48,15 @@ export default class UnitPopupEdit extends Vue {
 <template>
   <div>
     <component :is="$props.display" class="editable">{{ this.$props.field | unit }}</component>
-    <q-popup-edit buttons persistent :title="`Set ${this.$props.label} to:`" v-model="placeholder" @show="startEdit" @save="endEdit">
-      <q-input type="number" :suffix="this.notation" v-model="placeholder" />
+    <q-popup-edit
+      buttons
+      persistent
+      :title="`Set ${this.$props.label} to:`"
+      v-model="placeholder"
+      @show="startEdit"
+      @save="endEdit"
+    >
+      <q-input type="number" :suffix="this.notation" v-model="placeholder"/>
     </q-popup-edit>
   </div>
 </template>

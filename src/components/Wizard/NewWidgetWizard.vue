@@ -59,32 +59,39 @@ export default class NewWidgetWizard extends Vue {
 
 <template>
   <div class="layout-padding">
-
     <!-- display wizard -->
     <q-item v-if="wizardComponent">
-      <component v-if="wizardComponent" :is="wizardComponent" :featureId="featureId" :onCreateItem="onCreate" :onCancel="reset" />
+      <component
+        v-if="wizardComponent"
+        :is="wizardComponent"
+        :featureId="featureId"
+        :onCreateItem="onCreate"
+        :onCancel="reset"
+      />
     </q-item>
-
     <!-- Select a wizard -->
     <q-item v-else>
-
       <q-field label="Select a widget type" icon="widgets" orientation="vertical">
         <q-item>
-          <q-search v-model="searchModel" placeholder="Search" />
+          <q-search v-model="searchModel" placeholder="Search"/>
         </q-item>
-        <q-list link inset-separator>
-          <q-item icon="widgets" v-for="opt in wizardOptions" :key="opt.label" @click.native="() => { featureId = opt.value; }">
+        <q-list link="" inset-separator>
+          <q-item
+            icon="widgets"
+            v-for="opt in wizardOptions"
+            :key="opt.label"
+            @click.native="() => { featureId = opt.value; }"
+          >
             <div class="row">
               <q-item-main>
-                <q-item-tile label>{{ opt.label }}</q-item-tile>
+                <q-item-tile label="">{{ opt.label }}</q-item-tile>
               </q-item-main>
-              <q-item-side right icon="chevron_right" />
+              <q-item-side right icon="chevron_right"/>
             </div>
           </q-item>
         </q-list>
       </q-field>
     </q-item>
-
   </div>
 </template>
 

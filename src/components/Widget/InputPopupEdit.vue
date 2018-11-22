@@ -61,8 +61,16 @@ export default class InputPopupEdit extends Vue {
 <template>
   <div>
     <component :disabled="$props.disable" :is="$props.display" class="editable">{{ displayValue }}</component>
-    <q-popup-edit buttons persistent :disable="$props.disable" :title="popupTitle" v-model="placeholder" @show="startEdit" @save="endEdit">
-      <q-input :clearable="$props.clearable" :type="$props.type" v-model="placeholder" />
+    <q-popup-edit
+      buttons
+      persistent
+      :disable="$props.disable"
+      :title="popupTitle"
+      v-model="placeholder"
+      @show="startEdit"
+      @save="endEdit"
+    >
+      <q-input :clearable="$props.clearable" :type="$props.type" v-model="placeholder"/>
     </q-popup-edit>
   </div>
 </template>

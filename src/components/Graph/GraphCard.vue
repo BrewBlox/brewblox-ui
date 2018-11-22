@@ -104,7 +104,7 @@ export default class GraphCard extends Vue {
 </script>
 
 <template>
-  <GraphDisplay v-if="!error" :data="metricData" :layout="metricLayout" />
+  <GraphDisplay v-if="!error" :data="metricData" :layout="metricLayout"/>
   <div v-else class="alert-container">
     <q-alert icon="warning" color="warning">{{ error }}</q-alert>
   </div>

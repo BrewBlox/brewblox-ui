@@ -50,7 +50,7 @@ export default class App extends Vue {
 
 <template>
   <div id="q-app">
-    <router-view />
+    <router-view/>
   </div>
 </template>
 

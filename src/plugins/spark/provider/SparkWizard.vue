@@ -34,7 +34,7 @@ export default class SparkWizard extends Vue {
 
 <template>
   <div class="flex flex-center">
-    <q-spinner :size="30" />
+    <q-spinner :size="30"/>
   </div>
 </template>
 

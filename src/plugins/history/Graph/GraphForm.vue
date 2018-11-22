@@ -95,18 +95,38 @@ export default class GraphForm extends FormBase {
       <q-card-main>
         <div class="options-edit-container">
           <q-field class="col" label="Start time" orientation="vertical">
-            <DatetimePopupEdit label="Start time" display="big" :field="config.params.start" :change="callAndSaveConfig(v => config.params.start = v)" />
+            <DatetimePopupEdit
+              label="Start time"
+              display="big"
+              :field="config.params.start"
+              :change="callAndSaveConfig(v => config.params.start = v)"
+            />
           </q-field>
           <q-field class="col" label="Duration" orientation="vertical">
-            <InputPopupEdit clearable label="Duration" :field="durationString(config.params.duration)" :change="callAndSaveConfig(v => config.params.duration = parseDuration(v))" />
+            <InputPopupEdit
+              clearable
+              label="Duration"
+              :field="durationString(config.params.duration)"
+              :change="callAndSaveConfig(v => config.params.duration = parseDuration(v))"
+            />
           </q-field>
           <q-field class="col" label="End time" orientation="vertical">
-            <DatetimePopupEdit label="End time" display="big" :field="config.params.end" :change="callAndSaveConfig(v => config.params.end = v)" />
+            <DatetimePopupEdit
+              label="End time"
+              display="big"
+              :field="config.params.end"
+              :change="callAndSaveConfig(v => config.params.end = v)"
+            />
           </q-field>
         </div>
         <div class="options-edit-container">
           <q-field class="col" label="Points after downsampling" orientation="vertical">
-            <InputPopupEdit label="Points after downsampling" type="number" :field="config.params.approxPoints" :change="callAndSaveConfig(v => config.params.approxPoints = v)" />
+            <InputPopupEdit
+              label="Points after downsampling"
+              type="number"
+              :field="config.params.approxPoints"
+              :change="callAndSaveConfig(v => config.params.approxPoints = v)"
+            />
           </q-field>
         </div>
       </q-card-main>
@@ -114,28 +134,46 @@ export default class GraphForm extends FormBase {
     <q-card dark v-for="(target, targetIdx) in config.targets" :key="targetIdx">
       <q-card-title>
         {{ target.measurement }}
-        <q-btn slot="right" flat dense icon="delete" label="Delete source" @click="removeTarget(targetIdx); saveConfig();" />
+        <q-btn
+          slot="right"
+          flat
+          dense
+          icon="delete"
+          label="Delete source"
+          @click="removeTarget(targetIdx); saveConfig();"
+        />
       </q-card-title>
       <q-card-main>
         <div class="row no-wrap" v-for="(field, fieldIdx) in target.fields" :key="fieldIdx">
           <q-field class="col" label="Field" orientation="vertical">
-            <FieldPopupEdit label="field" :field="field" :measurement="target.measurement" :change="callAndSaveConfig(v => target.fields[fieldIdx] = v)" />
+            <FieldPopupEdit
+              label="field"
+              :field="field"
+              :measurement="target.measurement"
+              :change="callAndSaveConfig(v => target.fields[fieldIdx] = v)"
+            />
           </q-field>
           <q-field class="col" label="Display name" orientation="vertical">
-            <InputPopupEdit :disable="!field" clearable label="Display name" :field="fieldRename(target, field)" :change="callAndSaveConfig(v => changeFieldRename(target, field, v))" />
+            <InputPopupEdit
+              :disable="!field"
+              clearable
+              label="Display name"
+              :field="fieldRename(target, field)"
+              :change="callAndSaveConfig(v => changeFieldRename(target, field, v))"
+            />
           </q-field>
           <q-field class="col1" label=" " orientation="vertical">
-            <q-btn flat dense icon="delete" @click="removeField(target, fieldIdx); saveConfig();" />
+            <q-btn flat dense icon="delete" @click="removeField(target, fieldIdx); saveConfig();"/>
           </q-field>
         </div>
       </q-card-main>
       <q-card-main>
-        <q-btn flat dense icon="add" label="Add field" @click="target.fields.push('')" />
+        <q-btn flat dense icon="add" label="Add field" @click="target.fields.push('')"/>
       </q-card-main>
     </q-card>
     <q-card dark>
       <q-card-main>
-        <q-btn flat dense label="Add source" @click="addTarget" />
+        <q-btn flat dense label="Add source" @click="addTarget"/>
       </q-card-main>
     </q-card>
   </div>

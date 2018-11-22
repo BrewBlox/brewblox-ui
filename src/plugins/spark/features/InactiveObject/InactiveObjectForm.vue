@@ -10,20 +10,8 @@ export default class InactiveObjectForm extends BlockForm {
 <template>
   <div class="widget-modal">
     <q-card>
-      <q-card-title>Settings</q-card-title>
-      <q-card-main class="column col">
-        <q-field class="col" label="Profiles">
-          <ProfilesPopupEdit
-            :field="block.profiles"
-            :serviceId="serviceId"
-            :change="callAndSaveBlock(v => block.profiles = v)"
-          />
-        </q-field>
-      </q-card-main>
-    </q-card>
-    <q-card>
       <q-card-title>Block Settings</q-card-title>
-      <q-card-main>
+      <q-card-main class="column col">
         <q-field class="col" label="Profiles">
           <ProfilesPopupEdit
             :field="block.profiles"

@@ -1,9 +1,9 @@
 <script lang="ts">
+import { Link } from '@/helpers/units';
+import { fetchCompatibleBlocks } from '@/plugins/spark/store/actions';
+import { compatibleBlocks } from '@/plugins/spark/store/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { Link } from '@/helpers/units';
-import { compatibleBlocks } from '@/plugins/spark/store/getters';
-import { fetchCompatibleBlocks } from '@/plugins/spark/store/actions';
 
 @Component({
   props: {
@@ -59,8 +59,15 @@ export default class LinkPopupEdit extends Vue {
 <template>
   <div>
     <component :is="$props.display" class="editable">{{ displayValue }}</component>
-    <q-popup-edit buttons persistent :title="`Set ${this.$props.label} to:`" v-model="placeholder" @show="startEdit" @save="endEdit">
-      <q-select v-model="placeholder" :options="linkOptions" clearable />
+    <q-popup-edit
+      buttons
+      persistent
+      :title="`Set ${this.$props.label} to:`"
+      v-model="placeholder"
+      @show="startEdit"
+      @save="endEdit"
+    >
+      <q-select v-model="placeholder" :options="linkOptions" clearable/>
     </q-popup-edit>
   </div>
 </template>
