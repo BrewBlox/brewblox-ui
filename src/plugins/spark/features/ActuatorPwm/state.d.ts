@@ -1,5 +1,6 @@
 import { Block } from '@/plugins/spark/state';
 import { Link } from '@/helpers/units';
+import { ConstraintsObj } from '../../components/Constraints/Constraints';
 
 export interface ActuatorPwmBlock extends Block {
   data: {
@@ -8,6 +9,6 @@ export interface ActuatorPwmBlock extends Block {
     period: number;
     setting: number;
     value: number;
-    constrainedBy: any[];
+    constrainedBy: ConstraintsObj;
   };
 }

@@ -13,7 +13,7 @@ const feature: Feature = {
   form: ref(form),
   widgetSize: {
     cols: 4,
-    rows: 5,
+    rows: 3,
   },
 };
 
