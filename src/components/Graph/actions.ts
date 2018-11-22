@@ -1,12 +1,12 @@
-import { RootStore } from '@/store/state';
 import { addMetric } from '@/store/history/actions';
 import {
-  QueryParams,
+  DisplayNames,
   Metric,
+  QueryParams,
   QueryResult,
   QueryTarget,
-  DisplayNames,
 } from '@/store/history/state';
+import { RootStore } from '@/store/state';
 import parseDuration from 'parse-duration';
 
 export { removeMetric } from '@/store/history/actions';

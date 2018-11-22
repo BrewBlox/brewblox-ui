@@ -1,9 +1,9 @@
 import { ref } from '@/helpers/component-ref';
+import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features/state';
 import { typeName } from './getters';
-import GenericBlock from '@/plugins/spark/components/GenericBlock';
-import widget from './MutexWidget.vue';
 import form from './MutexForm.vue';
+import widget from './MutexWidget.vue';
 
 const feature: Feature = {
   ...GenericBlock,

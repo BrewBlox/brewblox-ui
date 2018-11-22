@@ -1,18 +1,15 @@
-import { getStoreAccessors } from 'vuex-typescript';
-import { addVuexKey } from '@/store/vuex-key-fix';
+import { createAccessors } from '@/helpers/static-store';
+import { GetterTree } from 'vuex';
 import { RootState, RootStore } from '../state';
-import { ServiceState, Service, ServicesContext } from './state';
+import { Service, ServicesContext, ServiceState } from './state';
 
-const { read } = getStoreAccessors<ServiceState, RootState>('services');
+const { read } = createAccessors('services');
 
-const getters = {
+export const getters: GetterTree<ServiceState, RootState> = {
   services: (state: ServiceState): { [id: string]: Service } => state.services,
   serviceIds: (state: ServiceState): string[] => Object.keys(state.services),
   serviceValues: (state: ServiceState): Service[] => Object.values(state.services),
 };
-
-addVuexKey(getters);
-export default getters;
 
 const services = read(getters.services);
 

@@ -3,25 +3,27 @@
   "extends": [
     "tslint-config-airbnb"
   ],
-  "jsRules": {},
   "rules": {
     "import-name": false,
     "no-boolean-literal-compare": false,
+    "no-consecutive-blank-lines": true,
+    "ordered-imports": true,
+    "no-unsafe-any": false,
     "semicolon": [
       true,
       "always",
       "ignore-bound-class-methods"
     ],
-    "no-console": [
-      true,
-      "log",
-      "error"
-    ]
-  },
-  "rulesDirectory": [],
-  "linterOptions": {
-    "exclude": [
-      ".vscode"
-    ]
+    "no-console": {
+      "severity": "warning",
+      "options": [
+        "debug",
+        "info",
+        "log",
+        "time",
+        "timeEnd",
+        "trace"
+      ]
+    }
   }
 }

@@ -5,7 +5,7 @@ import { Block, UserUnits, UnitAlternatives, CompatibleBlocks } from '../state';
 export type SparkState = {
   blocks: {
     [id: string]: Block;
-  },
+  };
   units: UserUnits;
   unitAlternatives: UnitAlternatives;
   compatibleBlocks: CompatibleBlocks;

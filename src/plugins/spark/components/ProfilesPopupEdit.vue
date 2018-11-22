@@ -1,7 +1,7 @@
 <script lang="ts">
+import { profileNames } from '@/plugins/spark/store/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { profileNames } from '@/plugins/spark/store/getters';
 
 @Component({
   props: {

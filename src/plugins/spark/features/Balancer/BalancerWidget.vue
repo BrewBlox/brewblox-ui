@@ -1,8 +1,8 @@
 <script lang="ts">
-import Component from 'vue-class-component';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import { BalancerBlock } from './state';
+import Component from 'vue-class-component';
 import { getById } from './getters';
+import { BalancerBlock } from './state';
 
 @Component
 export default class BalancerWidget extends BlockWidget {

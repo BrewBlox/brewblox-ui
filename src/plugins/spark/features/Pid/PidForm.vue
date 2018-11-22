@@ -1,11 +1,10 @@
 <script lang="ts">
-import Component from 'vue-class-component';
-import BlockForm from '@/plugins/spark/components/BlockForm';
 import { Unit } from '@/helpers/units';
-import { ProcessValueLink, ActuatorAnalogLink } from '@/helpers/units/KnownLinks';
-import { filters } from './getters';
-import { Block } from '@/plugins/spark/state';
+import { ActuatorAnalogLink, ProcessValueLink } from '@/helpers/units/KnownLinks';
+import BlockForm from '@/plugins/spark/components/BlockForm';
 import { PidBlock } from '@/plugins/spark/features/Pid/state';
+import Component from 'vue-class-component';
+import { filters } from './getters';
 
 @Component
 export default class PidForm extends BlockForm {

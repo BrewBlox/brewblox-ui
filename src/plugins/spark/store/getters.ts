@@ -1,9 +1,9 @@
 import { read } from '@/helpers/dynamic-store';
-import { addVuexKey } from '@/store/vuex-key-fix';
-import { RootStore } from '@/store/state';
 import { serviceById } from '@/store/services/getters';
+import { RootState, RootStore } from '@/store/state';
+import { GetterTree } from 'vuex';
+import { Block, CompatibleBlocks, Spark, UnitAlternatives, UserUnits } from '../state';
 import { SparkState } from './state';
-import { Spark, Block, UserUnits, UnitAlternatives, CompatibleBlocks } from '../state';
 
 const defaultProfileNames = [
   'Profile1',
@@ -18,7 +18,7 @@ const defaultProfileNames = [
 
 export const typeName: string = 'Spark';
 
-const getters = {
+export const getters: GetterTree<SparkState, RootState> = {
   blocks: (state: SparkState): { [id: string]: Block } => state.blocks,
   blockIds: (state: SparkState): string[] => Object.keys(state.blocks),
   blockValues: (state: SparkState): Block[] => Object.values(state.blocks),
@@ -27,9 +27,6 @@ const getters = {
   compatibleBlocks: (state: SparkState): CompatibleBlocks => state.compatibleBlocks,
   discoveredBlocks: (state: SparkState): string[] => state.discoveredBlocks,
 };
-
-addVuexKey(getters);
-export default getters;
 
 export const blocks = read(getters.blocks);
 export const blockIds = read(getters.blockIds);
@@ -61,13 +58,13 @@ export function allBlocks<T extends Block>(
   type?: string,
 ): T[] {
   return blockValues(store, serviceId)
-    .filter(block => !type || block.type === type) as T[];
+    .filter((block: Block) => !type || block.type === type) as T[];
 }
 
 export const sparkServiceById = (store: RootStore, id: string) =>
   serviceById<Spark>(store, id, typeName);
 
-export const sparkConfigById = (store: RootStore, id: string) =>
+export const sparkConfigById = (store: RootStore, id: string): any =>
   sparkServiceById(store, id).config || {};
 
 export const profileNames = (store: RootStore, id: string) => {

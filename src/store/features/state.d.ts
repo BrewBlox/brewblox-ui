@@ -6,10 +6,12 @@ export interface Deleter {
   action: (store: RootStore, config: any) => void;
 }
 
+export type Validator = (store: RootStore, config: any) => boolean
+
 export interface Feature {
   id: string;
   displayName?: string;
-  validator?: (store: RootStore, config: any) => boolean;
+  validator?: Validator;
   deleters?: Deleter[];
   widgetSize?: {
     cols: number;

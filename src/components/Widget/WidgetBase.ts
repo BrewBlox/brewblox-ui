@@ -1,6 +1,6 @@
+import { displayNameById } from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { displayNameById } from '@/store/features/getters';
 
 @Component({
   props: {
@@ -34,7 +34,7 @@ import { displayNameById } from '@/store/features/getters';
     },
   },
 })
-export default class Widget extends Vue {
+export default class WidgetBase extends Vue {
   get additionalInfo() {
     return {
       'Widget ID': this.$props.id,

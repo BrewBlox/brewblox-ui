@@ -1,30 +1,28 @@
 <script lang="ts">
-import Vue from 'vue';
-import Component from 'vue-class-component';
-import { Watch } from 'vue-property-decorator';
-import { Notify } from 'quasar';
 import { durationString, spaceCased } from '@/helpers/functional';
-import { toShadow, fromShadow, ShadowMapping, deepCopy } from '@/helpers/shadow-copy';
 import { Block, UserUnits } from '@/plugins/spark/state';
+import { saveBlock, saveUnits, updateProfileNames } from '@/plugins/spark/store/actions';
 import {
   blockById,
   profileNames,
-  units,
   unitAlternatives,
+  units,
 } from '@/plugins/spark/store/getters';
-import { updateProfileNames, saveBlock, saveUnits } from '@/plugins/spark/store/actions';
+import { Notify } from 'quasar';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import {
-  SysInfoBlock,
-  ProfilesBlock,
-  OneWireBusBlock,
-  TicksBlock,
-} from './state';
-import {
-  sysInfoId,
-  profilesId,
   oneWireBusId,
+  profilesId,
+  sysInfoId,
   ticksId,
 } from './getters';
+import {
+  OneWireBusBlock,
+  ProfilesBlock,
+  SysInfoBlock,
+  TicksBlock,
+} from './state';
 
 @Component({
   props: {

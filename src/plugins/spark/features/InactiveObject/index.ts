@@ -1,9 +1,9 @@
 import { ref } from '@/helpers/component-ref';
-import { Feature } from '@/store/features/state';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
-import widget from './InactiveObjectWidget.vue';
-import form from './InactiveObjectForm.vue';
+import { Feature } from '@/store/features/state';
 import { typeName } from './getters';
+import form from './InactiveObjectForm.vue';
+import widget from './InactiveObjectWidget.vue';
 
 const feature: Feature = {
   ...GenericBlock,

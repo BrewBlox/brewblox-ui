@@ -1,8 +1,7 @@
 <script lang="ts">
+import { BalancerLink } from '@/helpers/units/KnownLinks';
 import Component from 'vue-class-component';
 import Constraints, { ConstraintInfo } from './Constraints';
-import { BalancerLink } from '@/helpers/units/KnownLinks';
-import { Watch } from 'vue-property-decorator';
 
 @Component
 export default class AnalogConstraints extends Constraints {

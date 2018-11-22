@@ -1,7 +1,7 @@
-import queryString from 'query-string';
-import { post, sse, get } from '@/helpers/fetch';
+import { get, post, sse } from '@/helpers/fetch';
 import { snakeCased } from '@/helpers/functional';
 import { QueryParams, QueryTarget } from '@/store/history/state';
+import queryString from 'query-string';
 
 const snakeCasedObj = (obj: any) =>
   Object.keys(obj)

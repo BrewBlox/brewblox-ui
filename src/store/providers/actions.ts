@@ -1,18 +1,15 @@
-import { getStoreAccessors } from 'vuex-typescript';
-import { addVuexKey } from '@/store/vuex-key-fix';
-import { RootState } from '@/store/state';
-import { Provider, ProviderContext, ProviderState } from './state';
+import { createAccessors } from '@/helpers/static-store';
+import { ActionTree } from 'vuex';
+import { RootState } from '../state';
 import { createProvider as createProviderInStore } from './mutations';
+import { Provider, ProviderContext, ProviderState } from './state';
 
-const { dispatch } = getStoreAccessors<ProviderState, RootState>('providers');
+const { dispatch } = createAccessors('providers');
 
-const actions = {
-  create: (context: ProviderContext, provider: Provider) => {
+export const actions: ActionTree<ProviderState, RootState> = {
+  create: async (context: ProviderContext, provider: Provider) => {
     createProviderInStore(context, provider);
   },
 };
-
-addVuexKey(actions);
-export default actions;
 
 export const createProvider = dispatch(actions.create);

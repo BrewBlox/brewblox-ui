@@ -1,26 +1,27 @@
-import { getStoreAccessors } from 'vuex-typescript';
-import { addVuexKey } from '@/store/vuex-key-fix';
+import { createAccessors } from '@/helpers/static-store';
+import { ActionTree } from 'vuex';
 import { RootState } from '../state';
-import { ServiceState, Service, ServicesContext } from './state';
-import { serviceById as getServiceInStore } from './getters';
 import {
-  fetchServices as fetchServicesInApi,
   createService as createServiceInApi,
-  updateService as updateServiceInApi,
   deleteService as removeServiceInApi,
+  fetchServices as fetchServicesInApi,
+  updateService as updateServiceInApi,
 } from './api';
+import { serviceById as getServiceInStore } from './getters';
 import {
   addService as addServiceToStore,
   mutateService as mutateServiceInStore,
   removeService as removeServiceInStore,
   setServices as setServicesInStore,
 } from './mutations';
+import { Service, ServicesContext, ServiceState } from './state';
 
-const { dispatch } = getStoreAccessors<ServiceState, RootState>('services');
+const { dispatch } = createAccessors('services');
 
-const actions = {
-  fetchServices: async (context: ServicesContext) =>
-    setServicesInStore(context, await fetchServicesInApi()),
+export const actions: ActionTree<ServiceState, RootState> = {
+  fetchServices: async (context: ServicesContext) => {
+    setServicesInStore(context, await fetchServicesInApi());
+  },
 
   createService: async (context: ServicesContext, service: Service) => {
     addServiceToStore(context, { ...service, isLoading: true });
@@ -49,9 +50,6 @@ const actions = {
     });
   },
 };
-
-addVuexKey(actions);
-export default actions;
 
 export const fetchServices = dispatch(actions.fetchServices);
 export const createService = dispatch(actions.createService);

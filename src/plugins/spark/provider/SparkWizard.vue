@@ -1,8 +1,8 @@
 <script lang="ts">
+import { validateService } from '@/plugins/spark/store/actions';
+import { typeName } from '@/plugins/spark/store/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { typeName } from '@/plugins/spark/store/getters';
-import { validateService } from '@/plugins/spark/store/actions';
 
 @Component({
   props: {
@@ -34,7 +34,7 @@ export default class SparkWizard extends Vue {
 
 <template>
   <div class="flex flex-center">
-    <q-spinner :size="30"/>
+    <q-spinner :size="30" />
   </div>
 </template>
 

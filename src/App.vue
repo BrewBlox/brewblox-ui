@@ -1,12 +1,11 @@
 <script lang="ts">
-import Vue from 'vue';
-import Component from 'vue-class-component';
+import { fetchAll as fetchDashboards } from '@/store/dashboards/actions';
+import { fetcherById, initializerById, updaterById } from '@/store/providers/getters';
 import { fetchServices } from '@/store/services/actions';
 import { serviceValues } from '@/store/services/getters';
-import { fetchAll as fetchDashboards } from '@/store/dashboards/actions';
-import { initializerById, fetcherById, updaterById } from '@/store/providers/getters';
 import { setInterval } from 'timers';
-import { Service } from '@/store/services/state';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 
 @Component
 export default class App extends Vue {
