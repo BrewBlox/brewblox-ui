@@ -1,10 +1,11 @@
 import { createAccessors } from '@/helpers/static-store';
 import Vue from 'vue';
+import { MutationTree } from 'vuex';
 import { Provider, ProviderState } from './state';
 
 const { commit } = createAccessors('providers');
 
-export const mutations = {
+export const mutations: MutationTree<ProviderState> = {
   create: (state: ProviderState, provider: Provider) => {
     Vue.set(state.providers, provider.id, { ...provider });
   },

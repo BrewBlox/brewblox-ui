@@ -1,12 +1,13 @@
 import { createAccessors } from '@/helpers/static-store';
-import { RootStore } from '@/store/state';
+import { RootState, RootStore } from '@/store/state';
+import { GetterTree } from 'vuex';
 import { HistoryState, Metric } from './state';
 
 const { read } = createAccessors('history');
 
 export const defaultMaxPoints: number = 500;
 
-export const getters = {
+export const getters: GetterTree<HistoryState, RootState> = {
   metrics: (state: HistoryState): { [id: string]: Metric } => state.metrics || {},
   metricIds: (state: HistoryState): string[] => Object.keys(state.metrics),
   metricValues: (state: HistoryState): Metric[] => Object.values(state.metrics),

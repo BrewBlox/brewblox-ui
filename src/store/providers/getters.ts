@@ -1,13 +1,14 @@
 import { createAccessors } from '@/helpers/static-store';
+import { GetterTree } from 'vuex';
 import { Service } from '../services/state';
-import { RootStore } from '../state';
+import { RootState, RootStore } from '../state';
 import { Provider, ProviderState } from './state';
 
 type ServiceFunc = (store: RootStore, service: Service) => Promise<any>;
 
 const { read } = createAccessors('providers');
 
-export const getters = {
+export const getters: GetterTree<ProviderState, RootState> = {
   providers: (state: ProviderState): { [id: string]: Provider } => state.providers,
   providerIds: (state: ProviderState): string[] => Object.keys(state.providers),
   providerValues: (state: ProviderState): Provider[] => Object.values(state.providers),

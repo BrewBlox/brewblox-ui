@@ -64,7 +64,9 @@ const nestedName = (serviceId: string, func: Function) =>
 
 export function read<TModuleState>(getter: Getter<TModuleState, RootState>) {
   return (store: StoreType<TModuleState>, serviceId: string) =>
-    store.getters[nestedName(serviceId, getter)];
+    ((store as ActionContext<TModuleState, RootState>).rootGetters
+      || store.getters
+    )[nestedName(serviceId, getter)];
 }
 
 export function commit<TModuleState>(mutation: Mutation<TModuleState>) {

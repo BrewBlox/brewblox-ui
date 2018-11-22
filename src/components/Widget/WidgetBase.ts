@@ -34,7 +34,7 @@ import Component from 'vue-class-component';
     },
   },
 })
-export default class Widget extends Vue {
+export default class WidgetBase extends Vue {
   get additionalInfo() {
     return {
       'Widget ID': this.$props.id,

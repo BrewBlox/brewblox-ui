@@ -1,12 +1,13 @@
 module.exports = {
-  lintOnSave: true,
   configureWebpack: (config) => {
     if (process.env.NODE_ENV === 'production') {
-      // Insert production-only settings here
-      config.optimization = {
-        // Insert production-only settings here
-        minimize: false,
-      };
+      // Function names are required to set up functions for VueX functionality
+      config
+        .optimization
+        .minimizer[0] // Terser
+        .options
+        .terserOptions
+        .keep_fnames = true;
     }
   },
   chainWebpack: (config) => {

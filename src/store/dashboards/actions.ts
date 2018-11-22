@@ -1,5 +1,7 @@
 import { createAccessors } from '@/helpers/static-store';
 import UrlSafeString from 'url-safe-string';
+import { ActionTree } from 'vuex';
+import { RootState } from '../state';
 import {
   createDashboard as createDashboardInApi,
   createDashboardItem as createDashboardItemInApi,
@@ -24,11 +26,11 @@ import {
   setDashboard as setDashboardInStore,
   setDashboardItem as setDashboardItemInStore,
 } from './mutations';
-import { Dashboard, DashboardContext, DashboardItem } from './state';
+import { Dashboard, DashboardContext, DashboardItem, DashboardState } from './state';
 
 const { dispatch } = createAccessors('dashboards');
 
-export const actions = {
+export const actions: ActionTree<DashboardState, RootState> = {
   createDashboard: async (context: DashboardContext, title: string) => {
     const id = new UrlSafeString().generate(title);
     const dashboard = {
@@ -45,22 +47,22 @@ export const actions = {
 
   updateDashboardOrder: async (context: DashboardContext, ids: string[]) =>
     ids.forEach((id, index) =>
-      actions.saveDashboard(context, { ...getDashboardInStore(context, id), order: index + 1 })),
+      context.dispatch('saveDashboard', { ...getDashboardInStore(context, id), order: index + 1 })),
 
   updatePrimaryDashboard: async (context: DashboardContext, newId: string | null) => {
     getAllDashboards(context)
       .forEach((dash: Dashboard) => {
         if (dash.id === newId) {
-          actions.saveDashboard(context, { ...dash, primary: true });
+          context.dispatch('saveDashboard', { ...dash, primary: true });
         } else if (dash.primary) {
-          actions.saveDashboard(context, { ...dash, primary: false });
+          context.dispatch('saveDashboard', { ...dash, primary: false });
         }
       });
   },
 
   removeDashboard: async (context: DashboardContext, dashboard: Dashboard) => {
     dashboardItemsByDashboardId(context, dashboard.id)
-      .forEach((item: DashboardItem) => actions.removeDashboardItem(context, item));
+      .forEach((item: DashboardItem) => context.dispatch('removeDashboardItem', item));
     removeDashboardInApi(dashboard).catch(() => { });
     removeDashboardInStore(context, dashboard);
   },
@@ -83,8 +85,8 @@ export const actions = {
     if (currentItemNewId) {
       throw new Error(`An item with ID ${newId} already exists`);
     }
-    actions.removeDashboardItem(context, { ...item });
-    actions.createDashboardItem(context, { ...item, id: newId });
+    context.dispatch('removeDashboardItem', { ...item });
+    context.dispatch('createDashboardItem', { ...item, id: newId });
   },
 
   updateDashboardItemOrder: async (context: DashboardContext, itemIds: string[]) =>
@@ -92,7 +94,7 @@ export const actions = {
       const item = getDashboardItemInStore(context, id);
       const order = index + 1;
       if (item.order !== order) {
-        actions.saveDashboardItem(context, { ...item, order });
+        context.dispatch('saveDashboardItem', { ...item, order });
       }
     }),
 
@@ -101,7 +103,7 @@ export const actions = {
     { id, cols, rows }: { id: string, cols: number, rows: number },
   ) => {
     const item = getDashboardItemInStore(context, id);
-    actions.saveDashboardItem(context, { ...item, cols, rows });
+    context.dispatch('saveDashboardItem', { ...item, cols, rows });
   },
 
   updateDashboardItemConfig: async (
@@ -109,7 +111,7 @@ export const actions = {
     { id, config }: { id: string, config: any },
   ) => {
     const item = getDashboardItemInStore(context, id);
-    actions.saveDashboardItem(context, { ...item, config });
+    context.dispatch('saveDashboardItem', { ...item, config });
   },
 
   removeDashboardItem: async (context: DashboardContext, item: DashboardItem) => {

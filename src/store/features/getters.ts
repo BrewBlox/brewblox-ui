@@ -1,10 +1,11 @@
 import { createAccessors } from '@/helpers/static-store';
-import { RootStore } from '../state';
+import { GetterTree } from 'vuex';
+import { RootState, RootStore } from '../state';
 import { Deleter, Feature, FeatureState, Validator } from './state';
 
 const { read } = createAccessors('features');
 
-export const getters = {
+export const getters: GetterTree<FeatureState, RootState> = {
   features: (state: FeatureState): { [id: string]: Feature } => state.features,
   featureIds: (state: FeatureState): string[] => Object.keys(state.features),
   featureValues: (state: FeatureState): Feature[] => Object.values(state.features),

@@ -1,10 +1,8 @@
 import { RootState, RootStore } from '@/store/state';
 import { Action, ActionContext, Getter, Mutation } from 'vuex';
 
-const nestedName = (serviceId: string, func: Function) => {
-  // console.log(serviceId, func.name);
-  return `${serviceId}/${func.name}`;
-};
+const nestedName = (serviceId: string, func: Function) =>
+  `${serviceId}/${func.name}`;
 
 type StoreType<TModuleState> = RootStore | ActionContext<TModuleState, RootState>;
 

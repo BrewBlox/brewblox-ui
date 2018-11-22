@@ -1,10 +1,11 @@
 import { createAccessors } from '@/helpers/static-store';
-import { RootStore } from '../state';
+import { GetterTree } from 'vuex';
+import { RootState, RootStore } from '../state';
 import { Dashboard, DashboardContext, DashboardItem, DashboardState } from './state';
 
 const { read } = createAccessors('dashboards');
 
-export const getters = {
+export const getters: GetterTree<DashboardState, RootState> = {
   dashboards: (state: DashboardState): { [id: string]: Dashboard } => state.dashboards,
   dashboardIds: (state: DashboardState): string[] => Object.keys(state.dashboards),
   dashboardValues: (state: DashboardState): Dashboard[] => Object.values(state.dashboards),

@@ -1,6 +1,7 @@
 import { createAccessors } from '@/helpers/static-store';
-import { Metric } from '@/store/history/state';
-import { RootStore } from '@/store/state';
+import { HistoryState, Metric } from '@/store/history/state';
+import { RootState, RootStore } from '@/store/state';
+import { ActionTree } from 'vuex';
 import {
   fetchKnownKeys as fetchKnownKeysInApi,
   fetchValueSource,
@@ -17,7 +18,7 @@ import { HistoryContext } from './state';
 
 const { dispatch } = createAccessors('history');
 
-export const actions = {
+export const actions: ActionTree<HistoryState, RootState> = {
   add: async (context: HistoryContext, metric: Metric) => {
     const {
       id,

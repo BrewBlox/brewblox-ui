@@ -1,10 +1,11 @@
 import { createAccessors } from '@/helpers/static-store';
 import Vue from 'vue';
+import { MutationTree } from 'vuex';
 import { Dashboard, DashboardItem, DashboardState } from './state';
 
 const { commit } = createAccessors('dashboards');
 
-export const mutations = {
+export const mutations: MutationTree<DashboardState> = {
   setDashboard: (state: DashboardState, dashboard: Dashboard) =>
     Vue.set(state.dashboards, dashboard.id, { ...dashboard }),
 

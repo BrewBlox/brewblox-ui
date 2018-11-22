@@ -1,10 +1,11 @@
 import { createAccessors } from '@/helpers/static-store';
-import { RootStore } from '../state';
+import { GetterTree } from 'vuex';
+import { RootState, RootStore } from '../state';
 import { Service, ServicesContext, ServiceState } from './state';
 
 const { read } = createAccessors('services');
 
-export const getters = {
+export const getters: GetterTree<ServiceState, RootState> = {
   services: (state: ServiceState): { [id: string]: Service } => state.services,
   serviceIds: (state: ServiceState): string[] => Object.keys(state.services),
   serviceValues: (state: ServiceState): Service[] => Object.values(state.services),

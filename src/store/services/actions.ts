@@ -1,4 +1,6 @@
 import { createAccessors } from '@/helpers/static-store';
+import { ActionTree } from 'vuex';
+import { RootState } from '../state';
 import {
   createService as createServiceInApi,
   deleteService as removeServiceInApi,
@@ -12,13 +14,14 @@ import {
   removeService as removeServiceInStore,
   setServices as setServicesInStore,
 } from './mutations';
-import { Service, ServicesContext } from './state';
+import { Service, ServicesContext, ServiceState } from './state';
 
 const { dispatch } = createAccessors('services');
 
-export const actions = {
-  fetchServices: async (context: ServicesContext) =>
-    setServicesInStore(context, await fetchServicesInApi()),
+export const actions: ActionTree<ServiceState, RootState> = {
+  fetchServices: async (context: ServicesContext) => {
+    setServicesInStore(context, await fetchServicesInApi());
+  },
 
   createService: async (context: ServicesContext, service: Service) => {
     addServiceToStore(context, { ...service, isLoading: true });

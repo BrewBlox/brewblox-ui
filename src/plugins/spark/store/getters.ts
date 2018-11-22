@@ -1,6 +1,7 @@
 import { read } from '@/helpers/dynamic-store';
 import { serviceById } from '@/store/services/getters';
-import { RootStore } from '@/store/state';
+import { RootState, RootStore } from '@/store/state';
+import { GetterTree } from 'vuex';
 import { Block, CompatibleBlocks, Spark, UnitAlternatives, UserUnits } from '../state';
 import { SparkState } from './state';
 
@@ -17,7 +18,7 @@ const defaultProfileNames = [
 
 export const typeName: string = 'Spark';
 
-export const getters = {
+export const getters: GetterTree<SparkState, RootState> = {
   blocks: (state: SparkState): { [id: string]: Block } => state.blocks,
   blockIds: (state: SparkState): string[] => Object.keys(state.blocks),
   blockValues: (state: SparkState): Block[] => Object.values(state.blocks),
