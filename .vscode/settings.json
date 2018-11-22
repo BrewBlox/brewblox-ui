@@ -5,4 +5,5 @@
   "tslint.autoFixOnSave": true,
   "tslint.run": "onType",
   "tslint.jsEnable": true,
+  "tslint.ignoreDefinitionFiles": false,
 }

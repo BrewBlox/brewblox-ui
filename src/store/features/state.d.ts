@@ -1,5 +1,5 @@
+import { RootState, RootStore } from '@/store/state';
 import { ActionContext } from 'vuex';
-import { RootStore, RootState } from '@/store/state';
 
 export interface Deleter {
   description: string;

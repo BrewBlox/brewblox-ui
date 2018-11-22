@@ -1,5 +1,5 @@
-import { Block } from '@/plugins/spark/state';
 import { Link } from '@/helpers/units';
+import { Block } from '@/plugins/spark/state';
 
 export interface ActuatorOffsetBlock extends Block {
   data: {

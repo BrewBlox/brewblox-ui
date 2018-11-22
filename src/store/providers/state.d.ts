@@ -1,6 +1,6 @@
-import { ActionContext } from 'vuex';
-import { RootStore, RootState } from '@/store/state';
 import { Service } from '@/store/services/state';
+import { RootState, RootStore } from '@/store/state';
+import { ActionContext } from 'vuex';
 
 export interface Provider {
   id: string;

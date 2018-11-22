@@ -1,4 +1,4 @@
-import { Unit, Link } from '@/helpers/units';
+import { Link, Unit } from '@/helpers/units';
 import { Block } from '@/plugins/spark/state';
 
 export interface SetpointSensorPairBlock extends Block {

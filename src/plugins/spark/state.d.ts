@@ -1,5 +1,5 @@
-import { Service } from '@/store/services/state';
 import { DashboardItem } from '@/store/dashboards/state';
+import { Service } from '@/store/services/state';
 
 export interface Spark extends Service {
   config: {

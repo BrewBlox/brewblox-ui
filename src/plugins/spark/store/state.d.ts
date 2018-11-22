@@ -1,6 +1,6 @@
-import { ActionContext } from 'vuex';
 import { RootState } from '@/store/state';
-import { Block, UserUnits, UnitAlternatives, CompatibleBlocks } from '../state';
+import { ActionContext } from 'vuex';
+import { Block, CompatibleBlocks, UnitAlternatives, UserUnits } from '../state';
 
 export type SparkState = {
   blocks: {
