@@ -17,7 +17,7 @@ const store = new Vuex.Store<RootState>({
     features,
     history,
   },
-  strict: process.env.NODE_ENV !== 'production',
+  strict: false,
 });
 
 export default store;
