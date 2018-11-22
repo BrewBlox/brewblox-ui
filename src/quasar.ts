@@ -48,6 +48,7 @@ import Quasar, {
   QToggle,
   QToolbar,
   QToolbarTitle,
+  QTooltip,
   Ripple,
 } from 'quasar';
 import Vue from 'vue';
@@ -108,6 +109,7 @@ Vue.use(Quasar, {
     QToggle,
     QToolbar,
     QToolbarTitle,
+    QTooltip,
   },
   directives: { Ripple, CloseOverlay },
   plugins: { Notify, Dialog },

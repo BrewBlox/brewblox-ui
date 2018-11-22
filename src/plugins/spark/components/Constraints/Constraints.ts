@@ -1,14 +1,21 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
+export interface ConstraintsObj {
+  constraints: any[];
+  unconstrained: number;
+}
+
 export interface ConstraintInfo {
   key: string;
   value: any;
+  limiting?: boolean;
 }
 
 const asInfo = (con: any): ConstraintInfo => {
-  const [key] = Object.keys(con);
-  return { key, value: con[key] };
+  const keys = Object.keys(con);
+  const [key, ...omit] = keys.filter(item => item !== 'limiting');
+  return { key, value: con[key], limiting: con.limiting };
 };
 
 const asConstraint = (cinfo: ConstraintInfo) =>
@@ -32,10 +39,12 @@ const asConstraint = (cinfo: ConstraintInfo) =>
 })
 export default class Constraints extends Vue {
   get constraints(): ConstraintInfo[] {
-    return this.$props
+    const cons =  this.$props
       .field
       .constraints
       .map(asInfo);
+
+    return cons;
   }
 
   saveConstraints(vals: ConstraintInfo[] = this.constraints) {
