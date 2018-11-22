@@ -57,11 +57,12 @@ export default class AnalogConstraints extends Constraints {
     <div v-for="(cinfo, idx) in constraints" :key="idx">
       <div :class="{row: true, limiting: cinfo.limiting}" v-if="readonly">
         <span class="col">{{ label(cinfo.key) }}</span>
-        <span class="col">{{ (cinfo.value.granted || cinfo.value) | unit }}</span>
+        <span class="col">{{ ( cinfo.key === 'balanced' ? cinfo.value.granted : cinfo.value) | unit }}</span>
       </div>
       <div class="row" v-else>
         <SelectPopupEdit clearable class="col-4" label="Constraint type" :options="constraintOptions" :field="cinfo.key" :change="callAndSaveConstraints(k => constraints[idx] = createConstraint(k))" />
-        <component :is="fieldType(cinfo.key)" class="col" label="Constraint value" type="number" :serviceId="serviceId" :field="cinfo.value.balancerId || cinfo.value" :change="callAndSaveConstraints(v => cinfo.value = v)" />
+        <component v-if="cinfo.key === 'balanced'" :is="fieldType(cinfo.key)" class="col" label="Constraint value" type="number" :serviceId="serviceId" :field="cinfo.value.balancerId" :change="callAndSaveConstraints(v => cinfo.value.balancerId = v)" />
+        <component v-else :is="fieldType(cinfo.key)" class="col" label="Constraint value" type="number" :serviceId="serviceId" :field="cinfo.value" :change="callAndSaveConstraints(v => cinfo.value = v)" />
         <q-btn class="col-1" icon="delete" @click="removeConstraint(idx); saveConstraints();" />
       </div>
     </div>
