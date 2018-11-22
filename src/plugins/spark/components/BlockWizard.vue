@@ -1,17 +1,15 @@
 <script lang="ts">
+import FormBase from '@/components/Widget/FormBase';
+import { Block } from '@/plugins/spark/state';
+import { createBlock } from '@/plugins/spark/store/actions';
+import { blockIds, blockValues } from '@/plugins/spark/store/getters';
+import { dashboardItemById } from '@/store/dashboards/getters';
+import { DashboardItem } from '@/store/dashboards/state';
+import { formById, widgetSizeById } from '@/store/features/getters';
+import { serviceValues } from '@/store/services/getters';
+import { Service } from '@/store/services/state';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import FormBase from '@/components/Widget/FormBase';
-import { get } from 'lodash';
-import { Notify } from 'quasar';
-import { dashboardItemById } from '@/store/dashboards/getters';
-import { serviceValues } from '@/store/services/getters';
-import { blockValues, blockIds } from '@/plugins/spark/store/getters';
-import { createBlock } from '@/plugins/spark/store/actions';
-import { Service } from '@/store/services/state';
-import { Block } from '@/plugins/spark/state';
-import { DashboardItem } from '@/store/dashboards/state';
-import { widgetSizeById, formById } from '@/store/features/getters';
 
 interface NavAction {
   label: string;

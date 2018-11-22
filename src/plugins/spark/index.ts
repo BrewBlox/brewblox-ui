@@ -1,6 +1,6 @@
 import { autoRegister } from '@/helpers/component-ref';
-import { createProvider } from '@/store/providers/actions';
 import { createFeature } from '@/store/features/actions';
+import { createProvider } from '@/store/providers/actions';
 import features from './features';
 import { register } from './store';
 import { fetchAll, update } from './store/actions';

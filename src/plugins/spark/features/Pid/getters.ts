@@ -1,5 +1,5 @@
-import { RootStore } from '@/store/state';
 import { blockById } from '@/plugins/spark/store/getters';
+import { RootStore } from '@/store/state';
 import { PidBlock } from './state';
 
 export const typeName = 'Pid';

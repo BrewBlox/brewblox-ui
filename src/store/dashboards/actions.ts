@@ -1,35 +1,36 @@
-import { getStoreAccessors } from 'vuex-typescript';
+import { createAccessors } from '@/helpers/static-store';
 import UrlSafeString from 'url-safe-string';
-import {
-  fetchDashboards as fetchDashboardsInApi,
-  fetchDashboardItems as fetchDashboardItemsInApi,
-  createDashboard as createDashboardInApi,
-  persistDashboard as persistDashboardInApi,
-  deleteDashboard as removeDashboardInApi,
-  persistDashboardItem,
-  createDashboardItem as createDashboardItemInApi,
-  deleteDashboardItem as removeDashboardItemInApi,
-} from './api';
-import { DashboardState, DashboardItem, DashboardContext, Dashboard } from './state';
+import { ActionTree } from 'vuex';
 import { RootState } from '../state';
 import {
-  dashboardItemById as getDashboardItemInStore,
-  dashboardById as getDashboardInStore,
+  createDashboard as createDashboardInApi,
+  createDashboardItem as createDashboardItemInApi,
+  deleteDashboard as removeDashboardInApi,
+  deleteDashboardItem as removeDashboardItemInApi,
+  fetchDashboardItems as fetchDashboardItemsInApi,
+  fetchDashboards as fetchDashboardsInApi,
+  persistDashboard as persistDashboardInApi,
+  persistDashboardItem,
+} from './api';
+import {
   allDashboards as getAllDashboards,
+  dashboardById as getDashboardInStore,
+  dashboardItemById as getDashboardItemInStore,
   dashboardItemsByDashboardId,
 } from './getters';
 import {
-  setDashboard as setDashboardInStore,
-  setAllDashboards as setAllDashboardsInStore,
   removeDashboard as removeDashboardInStore,
-  setDashboardItem as setDashboardItemInStore,
-  setAllDashboardItems as setAllDashboardItemsInStore,
   removeDashboardItem as removeDashboardItemInStore,
+  setAllDashboardItems as setAllDashboardItemsInStore,
+  setAllDashboards as setAllDashboardsInStore,
+  setDashboard as setDashboardInStore,
+  setDashboardItem as setDashboardItemInStore,
 } from './mutations';
+import { Dashboard, DashboardContext, DashboardItem, DashboardState } from './state';
 
-const { dispatch } = getStoreAccessors<DashboardState, RootState>('dashboards');
+const { dispatch } = createAccessors('dashboards');
 
-const actions = {
+export const actions: ActionTree<DashboardState, RootState> = {
   createDashboard: async (context: DashboardContext, title: string) => {
     const id = new UrlSafeString().generate(title);
     const dashboard = {
@@ -46,22 +47,22 @@ const actions = {
 
   updateDashboardOrder: async (context: DashboardContext, ids: string[]) =>
     ids.forEach((id, index) =>
-      actions.saveDashboard(context, { ...getDashboardInStore(context, id), order: index + 1 })),
+      context.dispatch('saveDashboard', { ...getDashboardInStore(context, id), order: index + 1 })),
 
   updatePrimaryDashboard: async (context: DashboardContext, newId: string | null) => {
     getAllDashboards(context)
       .forEach((dash: Dashboard) => {
         if (dash.id === newId) {
-          actions.saveDashboard(context, { ...dash, primary: true });
+          context.dispatch('saveDashboard', { ...dash, primary: true });
         } else if (dash.primary) {
-          actions.saveDashboard(context, { ...dash, primary: false });
+          context.dispatch('saveDashboard', { ...dash, primary: false });
         }
       });
   },
 
   removeDashboard: async (context: DashboardContext, dashboard: Dashboard) => {
     dashboardItemsByDashboardId(context, dashboard.id)
-      .forEach(item => actions.removeDashboardItem(context, item));
+      .forEach((item: DashboardItem) => context.dispatch('removeDashboardItem', item));
     removeDashboardInApi(dashboard).catch(() => { });
     removeDashboardInStore(context, dashboard);
   },
@@ -84,8 +85,8 @@ const actions = {
     if (currentItemNewId) {
       throw new Error(`An item with ID ${newId} already exists`);
     }
-    actions.removeDashboardItem(context, { ...item });
-    actions.createDashboardItem(context, { ...item, id: newId });
+    context.dispatch('removeDashboardItem', { ...item });
+    context.dispatch('createDashboardItem', { ...item, id: newId });
   },
 
   updateDashboardItemOrder: async (context: DashboardContext, itemIds: string[]) =>
@@ -93,7 +94,7 @@ const actions = {
       const item = getDashboardItemInStore(context, id);
       const order = index + 1;
       if (item.order !== order) {
-        actions.saveDashboardItem(context, { ...item, order });
+        context.dispatch('saveDashboardItem', { ...item, order });
       }
     }),
 
@@ -102,7 +103,7 @@ const actions = {
     { id, cols, rows }: { id: string, cols: number, rows: number },
   ) => {
     const item = getDashboardItemInStore(context, id);
-    actions.saveDashboardItem(context, { ...item, cols, rows });
+    context.dispatch('saveDashboardItem', { ...item, cols, rows });
   },
 
   updateDashboardItemConfig: async (
@@ -110,7 +111,7 @@ const actions = {
     { id, config }: { id: string, config: any },
   ) => {
     const item = getDashboardItemInStore(context, id);
-    actions.saveDashboardItem(context, { ...item, config });
+    context.dispatch('saveDashboardItem', { ...item, config });
   },
 
   removeDashboardItem: async (context: DashboardContext, item: DashboardItem) => {
@@ -123,8 +124,6 @@ const actions = {
     setAllDashboardItemsInStore(context, await fetchDashboardItemsInApi());
   },
 };
-
-export default actions;
 
 export const createDashboard = dispatch(actions.createDashboard);
 export const saveDashboard = dispatch(actions.saveDashboard);

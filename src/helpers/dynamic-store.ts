@@ -1,21 +1,18 @@
-import { ActionContext } from 'vuex';
-import {
-  ActionHandlerWithPayload,
-  getStoreAccessors,
-  GetterHandler,
-  MutationHandlerNoPayload,
-  MutationHandlerWithPayload,
-} from 'vuex-typescript';
-import { RootStore, RootState } from '@/store/state';
+import { RootState, RootStore } from '@/store/state';
+import { Action, ActionContext, Getter, Module, Mutation } from 'vuex';
 
 export const serviceAvailable = (store: RootStore, serviceId: string) =>
   !!(store as any).state[serviceId];
 
-export const registerService = (store: RootStore, serviceId: string, module: any) => {
+export function registerService<TModuleState>(
+  store: RootStore,
+  serviceId: string,
+  module: Module<TModuleState, RootState>,
+) {
   if (!serviceAvailable(store, serviceId)) {
     store.registerModule(serviceId, module);
   }
-};
+}
 
 /*
   These store accessors are for use by dynamically created store modules (services).
@@ -60,47 +57,24 @@ export const registerService = (store: RootStore, serviceId: string, module: any
     fetchBlock(store: RootStore, serviceId: string, block: Block)
 */
 
-export function read<
-  TModuleState,
-  TResult>(handler: GetterHandler<TModuleState, RootState, TResult>) {
-  return (
-    store: RootStore,
-    serviceId: string,
-  ): TResult =>
-    getStoreAccessors<TModuleState, RootState>(serviceId)
-      .read(handler)(store);
+type StoreType<TModuleState> = RootStore | ActionContext<TModuleState, RootState>;
+
+const nestedName = (serviceId: string, func: Function) =>
+  `${serviceId}/${func.name}`;
+
+export function read<TModuleState>(getter: Getter<TModuleState, RootState>) {
+  return (store: StoreType<TModuleState>, serviceId: string) =>
+    ((store as ActionContext<TModuleState, RootState>).rootGetters
+      || store.getters
+    )[nestedName(serviceId, getter)];
 }
 
-export function commit<
-  TModuleState,
-  TPayload>(handler: MutationHandlerWithPayload<TModuleState, TPayload>) {
-  return (
-    store: RootStore | ActionContext<TModuleState, RootState>,
-    serviceId: string, payload: TPayload,
-  ) =>
-    getStoreAccessors<TModuleState, RootState>(serviceId)
-      .commit(handler)(store, payload);
+export function commit<TModuleState>(mutation: Mutation<TModuleState>) {
+  return (store: StoreType<TModuleState>, serviceId: string, payload?: any) =>
+    store.commit(nestedName(serviceId, mutation), payload, { root: true });
 }
 
-export function noArgCommit<
-  TModuleState>(handler: MutationHandlerNoPayload<TModuleState>) {
-  return (
-    store: RootStore | ActionContext<TModuleState, RootState>,
-    serviceId: string,
-  ) =>
-    getStoreAccessors<TModuleState, RootState>(serviceId)
-      .commit(handler)(store);
-}
-
-export function dispatch<
-  TModuleState,
-  TPayload,
-  TResult>(handler: ActionHandlerWithPayload<TModuleState, RootState, TPayload, TResult>) {
-  return (
-    store: RootStore,
-    serviceId: string,
-    payload: TPayload,
-  ) =>
-    getStoreAccessors<TModuleState, RootState>(serviceId)
-      .dispatch(handler)(store, payload);
+export function dispatch<TModuleState>(action: Action<TModuleState, RootState>) {
+  return async (store: StoreType<TModuleState>, serviceId: string, payload?: any) =>
+    store.dispatch(nestedName(serviceId, action as Function), payload, { root: true });
 }

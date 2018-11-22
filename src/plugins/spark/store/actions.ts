@@ -1,42 +1,43 @@
-import { saveService } from '@/store/services/actions';
-import { Service } from '@/store/services/state';
-import { RootStore } from '@/store/state';
-import { Block, UserUnits } from '../state';
-import { BlocksContext } from './state';
 import { dispatch } from '@/helpers/dynamic-store';
 import { allDashboardItems } from '@/store/dashboards/getters';
 import { setDashboardItem } from '@/store/dashboards/mutations';
+import { saveService } from '@/store/services/actions';
+import { Service } from '@/store/services/state';
+import { RootState, RootStore } from '@/store/state';
+import { ActionTree } from 'vuex';
+import { Block, UserUnits } from '../state';
 import {
   clearBlocks as clearBlocksInApi,
   createBlock as createBlockInApi,
   deleteBlock as deleteBlockInApi,
   fetchBlock as fetchBlockInApi,
   fetchBlocks as fetchBlocksInApi,
-  persistBlock as persistBlockInApi,
-  renameBlock as renameBlockInApi,
-  fetchUnits as fetchUnitsInApi,
-  persistUnits as persistUnitsInApi,
-  fetchUnitAlternatives as fetchUnitAlternativesInApi,
   fetchCompatibleBlocks as fetchCompatibleBlocksInApi,
-  validateService as validateServiceInApi,
   fetchDiscoveredBlocks as fetchDiscoveredBlocksInApi,
+  fetchUnitAlternatives as fetchUnitAlternativesInApi,
+  fetchUnits as fetchUnitsInApi,
+  persistBlock as persistBlockInApi,
+  persistUnits as persistUnitsInApi,
+  renameBlock as renameBlockInApi,
+  validateService as validateServiceInApi,
 } from './api';
 import {
-  sparkServiceById,
   discoveredBlocks,
+  sparkServiceById,
 } from './getters';
 import {
   addBlock as addBlockInStore,
   mutateBlock as mutateBlockInStore,
   removeBlock as removeBlockInStore,
-  setUnits as setUnitsInStore,
-  setUnitAlternatives as setUnitAlternativesInStore,
+  setBlocks as setBlocksInStore,
   setCompatibleBlocks as setCompatibleBlocksInStore,
   setDiscoveredBlocks as setDiscoveredBlocksInStore,
-  setBlocks as setBlocksInStore,
+  setUnitAlternatives as setUnitAlternativesInStore,
+  setUnits as setUnitsInStore,
 } from './mutations';
+import { BlocksContext, SparkState } from './state';
 
-const actions = {
+export const actions: ActionTree<SparkState, RootState> = {
   fetchBlock: async (context: BlocksContext, block: Block) =>
     mutateBlockInStore(context, block.serviceId, await fetchBlockInApi(block)),
 
@@ -126,5 +127,3 @@ export const update = async (store: RootStore, service: Service) =>
 
 export const validateService = async (serviceId: string) =>
   validateServiceInApi(serviceId);
-
-export default actions;

@@ -1,8 +1,8 @@
 <script lang="ts">
-import Component from 'vue-class-component';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import { MutexBlock } from './state';
+import Component from 'vue-class-component';
 import { getById } from './getters';
+import { MutexBlock } from './state';
 
 @Component
 export default class MutexWidget extends BlockWidget {

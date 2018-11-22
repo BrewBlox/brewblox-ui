@@ -1,16 +1,13 @@
 <script lang="ts">
-import Vue, { VueConstructor } from 'vue';
-import Component from 'vue-class-component';
-import { Notify } from 'quasar';
 import { objectStringSorter } from '@/helpers/functional';
 import { DashboardItem } from '@/store/dashboards/state';
-import { dashboardItemById } from '@/store/dashboards/getters';
-
 import {
+  displayNameById,
   featureIds,
   wizardById,
-  displayNameById,
 } from '@/store/features/getters';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 
 @Component({
   props: {
@@ -65,36 +62,18 @@ export default class NewWidgetWizard extends Vue {
 
     <!-- display wizard -->
     <q-item v-if="wizardComponent">
-      <component
-        v-if="wizardComponent"
-        :is="wizardComponent"
-        :featureId="featureId"
-        :onCreateItem="onCreate"
-        :onCancel="reset"
-      />
+      <component v-if="wizardComponent" :is="wizardComponent" :featureId="featureId" :onCreateItem="onCreate" :onCancel="reset" />
     </q-item>
 
     <!-- Select a wizard -->
     <q-item v-else>
 
-      <q-field
-        label="Select a widget type"
-        icon="widgets"
-        orientation="vertical"
-      >
+      <q-field label="Select a widget type" icon="widgets" orientation="vertical">
         <q-item>
-          <q-search
-            v-model="searchModel"
-            placeholder="Search"
-          />
+          <q-search v-model="searchModel" placeholder="Search" />
         </q-item>
         <q-list link inset-separator>
-          <q-item
-            icon="widgets"
-            v-for="opt in wizardOptions"
-            :key="opt.label"
-            @click.native="() => { featureId = opt.value; }"
-          >
+          <q-item icon="widgets" v-for="opt in wizardOptions" :key="opt.label" @click.native="() => { featureId = opt.value; }">
             <div class="row">
               <q-item-main>
                 <q-item-tile label>{{ opt.label }}</q-item-tile>

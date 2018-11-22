@@ -1,4 +1,4 @@
-import { StraightTube, InputTube, OutputTube, ElbowTube, TeeTube } from './Tubes/index';
+import { ElbowTube, InputTube, OutputTube, StraightTube, TeeTube } from './Tubes/index';
 import { Valve } from './Valves/index';
 
 const parts: { [name in ProcessViewPartType]: any } = {

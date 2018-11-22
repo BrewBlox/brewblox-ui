@@ -1,6 +1,6 @@
 <script lang="ts">
-import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
+import Component from 'vue-class-component';
 import { state } from './getters';
 import { ActuatorPinBlock } from './state';
 

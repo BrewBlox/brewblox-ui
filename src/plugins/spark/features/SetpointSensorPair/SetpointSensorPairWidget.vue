@@ -1,9 +1,9 @@
 <script lang="ts">
-import Component from 'vue-class-component';
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import { SetpointSensorPairBlock } from './state';
-import { getById } from './getters';
 import { serializedPropertyName } from '@/helpers/units';
+import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import Component from 'vue-class-component';
+import { getById } from './getters';
+import { SetpointSensorPairBlock } from './state';
 
 @Component
 export default class SetpointSensorPairWidget extends BlockWidget {

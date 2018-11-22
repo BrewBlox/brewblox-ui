@@ -1,14 +1,12 @@
 <script lang="ts">
+import { tryMetricById } from '@/store/history/getters';
+import { DisplayNames, Metric, QueryParams, QueryTarget } from '@/store/history/state';
+import { Layout, PlotData } from 'plotly.js';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { Watch } from 'vue-property-decorator';
-import GraphDisplay from './GraphDisplay.vue';
-import { metricById, tryMetricById } from '@/store/history/getters';
-import { Metric, QueryParams, QueryTarget, DisplayNames } from '@/store/history/state';
-import { GraphConfig } from './state';
 import { addPlotlyMetric, removeMetric } from './actions';
-import { PlotData, Layout } from 'plotly.js';
-import { serviceExists } from '@/store/services/getters';
+import GraphDisplay from './GraphDisplay.vue';
+import { GraphConfig } from './state';
 
 @Component({
   props: {
@@ -106,11 +104,7 @@ export default class GraphCard extends Vue {
 </script>
 
 <template>
-  <GraphDisplay
-    v-if="!error"
-    :data="metricData"
-    :layout="metricLayout"
-  />
+  <GraphDisplay v-if="!error" :data="metricData" :layout="metricLayout" />
   <div v-else class="alert-container">
     <q-alert icon="warning" color="warning">{{ error }}</q-alert>
   </div>

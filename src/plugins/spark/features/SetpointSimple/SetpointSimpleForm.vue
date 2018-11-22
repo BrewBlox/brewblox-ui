@@ -1,7 +1,7 @@
 <script lang="ts">
-import Component from 'vue-class-component';
-import BlockForm from '@/plugins/spark/components/BlockForm';
 import { Unit } from '@/helpers/units';
+import BlockForm from '@/plugins/spark/components/BlockForm';
+import Component from 'vue-class-component';
 
 @Component
 export default class SetpointSimpleForm extends BlockForm {
@@ -20,7 +20,14 @@ export default class SetpointSimpleForm extends BlockForm {
       <q-card-title>Settings</q-card-title>
       <q-card-main>
         <q-field class="col" label="Setpoint">
-          <UnitPopupEdit label="Setpoint" :field="block.data.setting" :change="callAndSaveBlock(v => block.data.setting = v)" />
+          <UnitPopupEdit
+            label="Setpoint"
+            :field="block.data.setting"
+            :change="callAndSaveBlock(v => block.data.setting = v)"
+          />
+        </q-field>
+        <q-field class="col" label="Valid">
+          <q-toggle :value="block.data.valid" @input="v => { block.data.valid = v; saveBlock(); }"/>
         </q-field>
       </q-card-main>
     </q-card>

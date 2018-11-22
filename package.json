@@ -16,6 +16,7 @@
     "serve": "vue-cli-service serve",
     "start": "npm run compose:new && npm run serve",
     "build": "vue-cli-service build",
+    "devbuild": "npm run build && mkdir -p ./devdist && rm -r ./devdist/*; cp -r ./dist/* ./devdist/",
     "test": "jest",
     "e2e": "npm run compose:new && vue-cli-service test:e2e --mode development",
     "tslint": "tslint -c tslint.json 'src/**/*.ts'",
@@ -46,8 +47,7 @@
     "vue-router": "^3.0.1",
     "vue-svg-loader": "^0.9.0",
     "vuedraggable": "^2.16.0",
-    "vuex": "^3.0.1",
-    "vuex-typescript": "^3.0.2"
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "@types/jest": "^23.3.9",
@@ -71,6 +71,7 @@
     "stylus-loader": "^3.0.1",
     "ts-jest": "^23.10.4",
     "tslint-config-airbnb": "^5.11.1",
+    "tsutils": "^3.5.0",
     "vue-template-compiler": "^2.5.17"
   },
   "browserslist": [

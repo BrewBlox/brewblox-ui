@@ -1,15 +1,14 @@
-import { getStoreAccessors } from 'vuex-typescript';
+import { createAccessors } from '@/helpers/static-store';
+import { ActionTree } from 'vuex';
 import { RootState } from '../state';
-import { Feature, FeatureContext, FeatureState } from './state';
 import { createFeature as createFeatureInStore } from './mutations';
+import { Feature, FeatureContext, FeatureState } from './state';
 
-const { dispatch } = getStoreAccessors<FeatureState, RootState>('features');
+const { dispatch } = createAccessors('features');
 
-const actions = {
-  create: (context: FeatureContext, provider: Feature) =>
+export const actions: ActionTree<FeatureState, RootState> = {
+  create: async (context: FeatureContext, provider: Feature) =>
     createFeatureInStore(context, provider),
 };
-
-export default actions;
 
 export const createFeature = dispatch(actions.create);

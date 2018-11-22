@@ -1,6 +1,6 @@
+import { del, get, post, put } from '@/helpers/fetch';
 import queryString from 'query-string';
-import { get, put, post, del } from '@/helpers/fetch';
-import { Block, DataBlock, UserUnits, UnitAlternatives } from '../state';
+import { Block, DataBlock, UnitAlternatives, UserUnits } from '../state';
 
 const asDataBlock = (block: Block): DataBlock =>
   ({

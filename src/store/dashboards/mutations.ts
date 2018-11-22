@@ -1,11 +1,11 @@
+import { createAccessors } from '@/helpers/static-store';
 import Vue from 'vue';
-import { getStoreAccessors } from 'vuex-typescript';
+import { MutationTree } from 'vuex';
 import { Dashboard, DashboardItem, DashboardState } from './state';
-import { RootState } from '../state';
 
-const { commit } = getStoreAccessors<DashboardState, RootState>('dashboards');
+const { commit } = createAccessors('dashboards');
 
-const mutations = {
+export const mutations: MutationTree<DashboardState> = {
   setDashboard: (state: DashboardState, dashboard: Dashboard) =>
     Vue.set(state.dashboards, dashboard.id, { ...dashboard }),
 
@@ -24,8 +24,6 @@ const mutations = {
   removeDashboardItem: (state: DashboardState, item: DashboardItem) =>
     Vue.delete(state.items, item.id),
 };
-
-export default mutations;
 
 export const setDashboard = commit(mutations.setDashboard);
 export const setAllDashboards = commit(mutations.setAllDashboards);

@@ -67,6 +67,14 @@ services:
       --file datastore.json
       --volatile
 
+  ui:
+    image: brewblox/brewblox-ui:develop
+    volumes:
+      - "./devdist:/usr/share/nginx/html"
+    labels:
+      - "traefik.port=80"
+      - "traefik.frontend.rule=PathPrefix: /"
+
   traefik:
     image: traefik
     command: -c /dev/null --api --docker --docker.domain=docker.localhost

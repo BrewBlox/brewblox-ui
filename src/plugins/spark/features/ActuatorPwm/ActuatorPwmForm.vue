@@ -1,8 +1,8 @@
 <script lang="ts">
-import Component from 'vue-class-component';
-import BlockForm from '@/plugins/spark/components/BlockForm';
 import { ActuatorDigitalLink } from '@/helpers/units/KnownLinks';
+import BlockForm from '@/plugins/spark/components/BlockForm';
 import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/state';
+import Component from 'vue-class-component';
 
 @Component
 export default class ActuatorPwmForm extends BlockForm {

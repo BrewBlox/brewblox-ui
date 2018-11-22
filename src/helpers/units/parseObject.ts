@@ -1,5 +1,5 @@
-import Unit from './Unit';
 import Link from './Link';
+import Unit from './Unit';
 
 // "not brackets", then a left bracket, then more "not brackets", then right bracket
 const extractUnit = /^([^[<]+)([[<])([^\]>]*)[\]>]$/;
@@ -41,7 +41,7 @@ export function convertToUnit(key: string, value: any): Unit | Link {
   const matched = key.match(extractUnit);
 
   if (matched) {
-    const [full, base, leftBracket, bracketed, rightBracket] = matched;
+    const [, , leftBracket, bracketed] = matched;
     try {
       if (leftBracket === '<') {
         return new Link(value, bracketed);

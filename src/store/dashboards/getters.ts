@@ -1,10 +1,11 @@
-import { getStoreAccessors } from 'vuex-typescript';
-import { Dashboard, DashboardItem, DashboardState, DashboardContext } from './state';
+import { createAccessors } from '@/helpers/static-store';
+import { GetterTree } from 'vuex';
 import { RootState, RootStore } from '../state';
+import { Dashboard, DashboardContext, DashboardItem, DashboardState } from './state';
 
-const { read } = getStoreAccessors<DashboardState, RootState>('dashboards');
+const { read } = createAccessors('dashboards');
 
-const getters = {
+export const getters: GetterTree<DashboardState, RootState> = {
   dashboards: (state: DashboardState): { [id: string]: Dashboard } => state.dashboards,
   dashboardIds: (state: DashboardState): string[] => Object.keys(state.dashboards),
   dashboardValues: (state: DashboardState): Dashboard[] => Object.values(state.dashboards),
@@ -29,8 +30,6 @@ const getters = {
   },
 };
 
-export default getters;
-
 export const dashboards = read(getters.dashboards);
 export const dashboardIds = read(getters.dashboardIds);
 export const allDashboards = read(getters.dashboardValues);
@@ -43,6 +42,7 @@ export const primaryDashboard = read(getters.primaryDashboard);
 export const dashboardById =
   (store: RootStore | DashboardContext, id: string): Dashboard =>
     dashboards(store)[id];
+
 export const dashboardItemById =
   (store: RootStore | DashboardContext, id: string): DashboardItem =>
     dashboardItems(store)[id];

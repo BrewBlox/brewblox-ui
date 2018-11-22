@@ -1,23 +1,24 @@
-import { getStoreAccessors } from 'vuex-typescript';
-import { RootStore, RootState } from '@/store/state';
-import { HistoryContext, HistoryState } from './state';
+import { createAccessors } from '@/helpers/static-store';
+import { HistoryState, Metric } from '@/store/history/state';
+import { RootState, RootStore } from '@/store/state';
+import { ActionTree } from 'vuex';
 import {
-  fetchValueSource,
   fetchKnownKeys as fetchKnownKeysInApi,
+  fetchValueSource,
   validateService as validateServiceInApi,
 } from './api';
 import {
   addMetric as addMetricInStore,
-  updateMetric as updateMetricInStore,
-  transformMetric as transformMetricInStore,
-  removeMetric as removeMetricInStore,
   mutateAvailableKeys as mutateAvailableKeysInStore,
+  removeMetric as removeMetricInStore,
+  transformMetric as transformMetricInStore,
+  updateMetric as updateMetricInStore,
 } from './mutations';
-import { Metric } from '@/store/history/state';
+import { HistoryContext } from './state';
 
-const { dispatch } = getStoreAccessors<HistoryState, RootState>('history');
+const { dispatch } = createAccessors('history');
 
-const actions = {
+export const actions: ActionTree<HistoryState, RootState> = {
   add: async (context: HistoryContext, metric: Metric) => {
     const {
       id,
@@ -42,8 +43,6 @@ const actions = {
     }
   },
 };
-
-export default actions;
 
 export const addMetric = dispatch(actions.add);
 export const removeMetric = dispatch(actions.remove);

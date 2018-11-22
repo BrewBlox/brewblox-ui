@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { clone } from 'lodash';
 
 export interface ConstraintsObj {
   constraints: any[];

@@ -1,6 +1,6 @@
 import { Block } from '@/plugins/spark/state';
-import { RootStore } from '@/store/state';
 import { blockIds } from '@/plugins/spark/store/getters';
+import { RootStore } from '@/store/state';
 
 export const widgetSize = {
   cols: 4,

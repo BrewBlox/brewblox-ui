@@ -1,9 +1,8 @@
 <script lang="ts">
-import Component from 'vue-class-component';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import { ActuatorPinBlock } from './state';
+import Component from 'vue-class-component';
 import { getById, state } from './getters';
-import { GraphConfig } from '@/components/Graph/state';
+import { ActuatorPinBlock } from './state';
 
 @Component
 export default class ActuatorPinWidget extends BlockWidget {

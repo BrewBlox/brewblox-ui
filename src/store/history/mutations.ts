@@ -1,11 +1,11 @@
+import { createAccessors } from '@/helpers/static-store';
 import Vue from 'vue';
-import { RootState } from '@/store/state';
-import { Metric, QueryResult, HistoryState } from './state';
-import { getStoreAccessors } from 'vuex-typescript';
+import { MutationTree } from 'vuex';
+import { HistoryState, Metric, QueryResult } from './state';
 
-const { commit } = getStoreAccessors<HistoryState, RootState>('history');
+const { commit } = createAccessors('history');
 
-const mutations = {
+export const mutations: MutationTree<HistoryState> = {
   add: (state: HistoryState, metric: Metric) =>
     Vue.set(state.metrics, metric.id, metric),
 
@@ -37,5 +37,3 @@ export const removeMetric = commit(mutations.remove);
 export const updateMetric = commit(mutations.update);
 export const transformMetric = commit(mutations.transform);
 export const mutateAvailableKeys = commit(mutations.setAvailableFields);
-
-export default mutations;

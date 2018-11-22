@@ -1,10 +1,8 @@
 <script lang="ts">
-import Component from 'vue-class-component';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import { ActuatorAnalogMockBlock } from './state';
+import Component from 'vue-class-component';
 import { getById } from './getters';
-import { GraphConfig } from '@/components/Graph/state';
-import { QueryParams } from '@/store/history/state';
+import { ActuatorAnalogMockBlock } from './state';
 
 @Component
 export default class ActuatorAnalogMockWidget extends BlockWidget {

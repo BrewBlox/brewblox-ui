@@ -1,13 +1,11 @@
+import { createAccessors } from '@/helpers/static-store';
 import Vue from 'vue';
-import { getStoreAccessors } from 'vuex-typescript';
+import { MutationTree } from 'vuex';
+import { Service, ServiceState } from './state';
 
-import { ServiceState, Service } from './state';
+const { commit } = createAccessors('services');
 
-import { RootState } from '../state';
-
-const { commit } = getStoreAccessors<ServiceState, RootState>('services');
-
-const mutations = {
+export const mutations: MutationTree<ServiceState> = {
   addService: (state: ServiceState, service: Service) =>
     Vue.set(state.services, service.id, { ...service }),
 
@@ -33,8 +31,6 @@ const mutations = {
   removeService: (state: ServiceState, id: string) =>
     Vue.delete(state.services, id),
 };
-
-export default mutations;
 
 export const addService = commit(mutations.addService);
 export const setServices = commit(mutations.setServices);

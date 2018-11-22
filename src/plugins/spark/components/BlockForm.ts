@@ -1,7 +1,7 @@
-import Component from 'vue-class-component';
-import { Block } from '@/plugins/spark/state';
-import { profileNames, compatibleBlocks } from '@/plugins/spark/store/getters';
 import FormBase from '@/components/Widget/FormBase';
+import { Block } from '@/plugins/spark/state';
+import { compatibleBlocks, profileNames } from '@/plugins/spark/store/getters';
+import Component from 'vue-class-component';
 
 @Component
 export default class BlockForm extends FormBase {

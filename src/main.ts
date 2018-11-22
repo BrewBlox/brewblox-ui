@@ -1,19 +1,14 @@
 import Vue from 'vue';
-
+import App from './App.vue';
 import createContainer from './create-container';
-import './quasar';
-
 import { autoRegister } from './helpers/component-ref';
-
+import history from './plugins/history';
+import portal from './plugins/portal';
+import spark from './plugins/spark';
+import units from './plugins/units';
+import './quasar';
 import router from './router';
 import store from './store';
-
-import portal from './plugins/portal';
-import units from './plugins/units';
-import spark from './plugins/spark';
-import history from './plugins/history';
-
-import App from './App.vue';
 
 autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
 

@@ -1,5 +1,5 @@
-import Unit from './Unit';
 import Link from './Link';
+import Unit from './Unit';
 
 import { deserialize, serialize } from './parseObject';
 

@@ -1,11 +1,10 @@
 <script lang="ts">
-import Component from 'vue-class-component';
-import parseDuration from 'parse-duration';
-import { objectSorter, durationString } from '@/helpers/functional';
-import { deepCopy } from '@/helpers/shadow-copy';
+import { durationString, objectSorter } from '@/helpers/functional';
+import { Unit } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { units } from '@/plugins/spark/store/getters';
-import { Unit } from '@/helpers/units';
+import parseDuration from 'parse-duration';
+import Component from 'vue-class-component';
 import { Setpoint, SetpointProfileBlock } from './state';
 
 interface OffsetPoint {

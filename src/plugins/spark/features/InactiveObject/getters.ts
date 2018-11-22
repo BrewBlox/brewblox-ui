@@ -1,7 +1,5 @@
-import { RootStore } from '@/store/state';
-
 import { allBlocks, blockById } from '@/plugins/spark/store/getters';
-
+import { RootStore } from '@/store/state';
 import { InactiveObjectBlock } from './state';
 
 export const typeName = 'InactiveObject';

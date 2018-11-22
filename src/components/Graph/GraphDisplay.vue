@@ -1,10 +1,9 @@
 <script lang="ts">
 import { merge } from 'lodash';
+import Plotly, { PlotData } from 'plotly.js';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import PlotlyFactory from './plotly-factory.js';
-import Plotly, { PlotData } from 'plotly.js';
-import { Watch } from 'vue-property-decorator';
 
 @Component({
   props: {

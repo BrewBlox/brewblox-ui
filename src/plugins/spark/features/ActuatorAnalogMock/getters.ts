@@ -1,5 +1,5 @@
-import { RootStore } from '@/store/state';
 import { allBlocks, blockById } from '@/plugins/spark/store/getters';
+import { RootStore } from '@/store/state';
 import { ActuatorAnalogMockBlock } from './state';
 
 export const typeName = 'ActuatorAnalogMock';

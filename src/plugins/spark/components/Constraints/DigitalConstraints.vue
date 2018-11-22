@@ -1,7 +1,7 @@
 <script lang="ts">
+import { MutexLink } from '@/helpers/units/KnownLinks';
 import Component from 'vue-class-component';
 import Constraints from './Constraints';
-import { MutexLink } from '@/helpers/units/KnownLinks';
 
 @Component({
   props: {
