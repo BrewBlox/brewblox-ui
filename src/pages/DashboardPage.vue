@@ -84,13 +84,13 @@ export default class DashboardPage extends Vue {
     return this.items
       .map((item) => {
         try {
-          const component = widgetById(this.$store, item.widget);
+          const component = widgetById(this.$store, item.feature, item.config);
           if (!component) {
-            throw new Error(`No widget found for ${item.widget}`);
+            throw new Error(`No widget found for ${item.feature}`);
           }
-          const validator = validatorById(this.$store, item.widget);
+          const validator = validatorById(this.$store, item.feature);
           if (!validator(this.$store, item.config)) {
-            throw new Error(`${item.widget} validation failed`);
+            throw new Error(`${item.feature} validation failed`);
           }
           return {
             item,
@@ -156,7 +156,7 @@ export default class DashboardPage extends Vue {
   defaultItem(): DashboardItem {
     return {
       id: shortid.generate(),
-      widget: 'Unknown',
+      feature: 'Unknown',
       dashboard: this.dashboardId,
       order: this.items.length + 1,
       config: {},
@@ -170,7 +170,7 @@ export default class DashboardPage extends Vue {
       await createDashboardItem(this.$store, item);
       Notify.create({
         type: 'positive',
-        message: `Added ${displayNameById(this.$store, item.widget)} "${item.id}"`,
+        message: `Added ${displayNameById(this.$store, item.feature)} "${item.id}"`,
       });
     } catch (e) {
       Notify.create(`Failed to add widget: ${e.toString()}`);
@@ -187,7 +187,7 @@ export default class DashboardPage extends Vue {
         label: 'Remove widget from this dashboard',
         action: deleteItem,
       },
-      ...deletersById(this.$store, item.widget)
+      ...deletersById(this.$store, item.feature)
         .map(del => ({ label: del.description, action: del.action })),
     ].map((opt, idx) => ({ ...opt, value: idx }));
 
@@ -247,32 +247,75 @@ export default class DashboardPage extends Vue {
 <template>
   <q-page padding>
     <q-inner-loading>
-      <q-spinner size="50px" color="primary" />
+      <q-spinner size="50px" color="primary"/>
     </q-inner-loading>
-
     <template>
       <portal to="toolbar-title">
         <div :class="widgetEditable ? 'editable': ''">
           <span>{{ dashboard.title }}</span>
-          <q-popup-edit :disable="!widgetEditable" title="Set dashboard title to:" v-model="dashboard.title" @save="onChangeDashboardTitle">
-            <q-input v-model="dashboard.title" />
+          <q-popup-edit
+            :disable="!widgetEditable"
+            title="Set dashboard title to:"
+            v-model="dashboard.title"
+            @save="onChangeDashboardTitle"
+          >
+            <q-input v-model="dashboard.title"/>
           </q-popup-edit>
         </div>
       </portal>
-
       <portal to="toolbar-buttons">
-        <q-toggle v-if="widgetEditable" v-model="widgetMovable" label="Move widgets" />
-        <q-btn v-if="widgetEditable" color="primary" icon="add" label="Copy Widget" @click="onStartCopyWidget" />
-        <q-btn v-if="widgetEditable" color="primary" icon="add" label="New Widget" @click="onStartNewWidget" />
-        <q-btn :icon="widgetEditable ? 'check' : 'mode edit'" :color="widgetEditable ? 'positive' : 'primary'" @click="toggleWidgetEditable" :label="widgetEditable ? 'Stop editing' : 'Edit widgets'" />
+        <q-toggle v-if="widgetEditable" v-model="widgetMovable" label="Move widgets"/>
+        <q-btn
+          v-if="widgetEditable"
+          color="primary"
+          icon="add"
+          label="Copy Widget"
+          @click="onStartCopyWidget"
+        />
+        <q-btn
+          v-if="widgetEditable"
+          color="primary"
+          icon="add"
+          label="New Widget"
+          @click="onStartNewWidget"
+        />
+        <q-btn
+          :icon="widgetEditable ? 'check' : 'mode edit'"
+          :color="widgetEditable ? 'positive' : 'primary'"
+          @click="toggleWidgetEditable"
+          :label="widgetEditable ? 'Stop editing' : 'Edit widgets'"
+        />
       </portal>
-
       <q-modal v-model="wizardModal.open">
-        <component v-if="wizardModal.open" :is="wizardModal.component" :onCreateItem="onCreateItem" />
+        <component
+          v-if="wizardModal.open"
+          :is="wizardModal.component"
+          :onCreateItem="onCreateItem"
+        />
       </q-modal>
-
-      <GridContainer :editable="widgetMovable" :on-change-order="onChangeOrder" :on-change-size="onChangeSize">
-        <component class="dashboard-item" v-for="val in validatedItems" :disabled="widgetMovable" :is="widgetEditable ? 'EditWidget' : val.component" :error="val.error" :key="val.item.id" :id="val.item.id" :type="val.item.widget" :cols="val.item.cols" :rows="val.item.rows" :config="val.item.config" :onConfigChange="onChangeItemConfig" :onIdChange="onChangeItemId" :onDeleteItem="() => onDeleteItem(val.item)" :onCopyItem="() => onCopyItem(val.item)" :onMoveItem="() => onMoveItem(val.item)" />
+      <GridContainer
+        :editable="widgetMovable"
+        :on-change-order="onChangeOrder"
+        :on-change-size="onChangeSize"
+      >
+        <component
+          class="dashboard-item"
+          v-for="val in validatedItems"
+          :disabled="widgetMovable"
+          :is="widgetEditable ? 'EditWidget' : val.component"
+          :error="val.error"
+          :key="val.item.id"
+          :id="val.item.id"
+          :type="val.item.feature"
+          :cols="val.item.cols"
+          :rows="val.item.rows"
+          :config="val.item.config"
+          :onConfigChange="onChangeItemConfig"
+          :onIdChange="onChangeItemId"
+          :onDeleteItem="() => onDeleteItem(val.item)"
+          :onCopyItem="() => onCopyItem(val.item)"
+          :onMoveItem="() => onMoveItem(val.item)"
+        />
       </GridContainer>
     </template>
   </q-page>

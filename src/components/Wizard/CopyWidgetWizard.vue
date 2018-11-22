@@ -58,31 +58,37 @@ export default class CopyWidgetWizard extends Vue {
 
 <template>
   <div class="layout-padding">
-
     <q-item>
       <q-field label="Widget ID" icon="create" orientation="vertical">
-        <q-input v-model="widgetId" placeholder="Enter a widget ID" :error="widgetIdError !== null" :suffix="widgetIdError" />
+        <q-input
+          v-model="widgetId"
+          placeholder="Enter a widget ID"
+          :error="widgetIdError !== null"
+          :suffix="widgetIdError"
+        />
       </q-field>
-
       <q-field label="Select a widget to copy" icon="widgets" orientation="vertical">
         <q-item>
-          <q-search v-model="searchModel" placeholder="Search" />
+          <q-search v-model="searchModel" placeholder="Search"/>
         </q-item>
-        <q-list link inset-separator>
-          <q-item icon="widgets" v-for="opt in existingWidgetOptions" :key="opt.id" @click.native="selectItem(opt.id)">
+        <q-list link="" inset-separator>
+          <q-item
+            icon="widgets"
+            v-for="opt in existingWidgetOptions"
+            :key="opt.id"
+            @click.native="selectItem(opt.id)"
+          >
             <div class="row">
               <q-item-main>
-                <q-item-tile label>{{ opt.id }}</q-item-tile>
+                <q-item-tile label="">{{ opt.id }}</q-item-tile>
                 <q-item-tile sublabel>{{ opt.displayName }}</q-item-tile>
               </q-item-main>
-              <q-item-side right icon="chevron_right" />
+              <q-item-side right icon="chevron_right"/>
             </div>
           </q-item>
         </q-list>
       </q-field>
-
     </q-item>
-
   </div>
 </template>
 

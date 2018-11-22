@@ -1,12 +1,13 @@
+import { RootState, RootStore } from '@/store/state';
 import { ActionContext } from 'vuex';
-import { RootStore, RootState } from '@/store/state';
 
 export interface Deleter {
   description: string;
   action: (store: RootStore, config: any) => void;
 }
 
-export type Validator = (store: RootStore, config: any) => boolean
+export type Validator = (store: RootStore, config: any) => boolean;
+export type WidgetSelector = (store: RootStore, config: any) => string;
 
 export interface Feature {
   id: string;
@@ -18,6 +19,7 @@ export interface Feature {
     rows: number;
   };
   widget?: string;
+  selector?: WidgetSelector;
   wizard?: string;
   form?: string;
 }

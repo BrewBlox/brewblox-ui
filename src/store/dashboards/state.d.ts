@@ -14,7 +14,7 @@ export interface DashboardItem {
   rows: number;
   order: number;
   dashboard: string;
-  widget: string;
+  feature: string;
   config: any;
 }
 

@@ -111,93 +111,121 @@ export default class DefaultLayout extends Vue {
     <q-layout-header>
       <q-toolbar glossy color="dark-bright">
         <q-btn flat dense round @click="toggleDrawer">
-          <q-icon name="menu" />
+          <q-icon name="menu"/>
         </q-btn>
-
         <q-toolbar-title>
           <portal-target name="toolbar-title">BrewBlox</portal-target>
         </q-toolbar-title>
-
-        <portal-target name="toolbar-buttons" class="toolbar-buttons" />
+        <portal-target name="toolbar-buttons" class="toolbar-buttons"/>
       </q-toolbar>
     </q-layout-header>
-
     <q-layout-drawer v-model="leftDrawerOpen">
-      <q-list no-border link inset-delimiter>
-
-        <q-item link to="/" active-class="q-item-no-link-highlighting">
-          <q-item-side icon="home" />
-          Main menu
+      <q-list no-border link="" inset-delimiter>
+        <q-item link="" to="/" active-class="q-item-no-link-highlighting">
+          <q-item-side icon="home"/>Main menu
         </q-item>
-
-        <q-item-separator />
+        <q-item-separator/>
         <!-- dashboards -->
-
         <q-list-header>
-          <q-item-side icon="dashboard" />
-          Dashboards
-          <q-btn round size="sm" :flat="!dashboardEditing" :icon="dashboardEditing ? 'check' : 'mode edit'" :color="dashboardEditing ? 'primary': ''" @click="toggleDashboardEditing" />
+          <q-item-side icon="dashboard"/>Dashboards
+          <q-btn
+            round
+            size="sm"
+            :flat="!dashboardEditing"
+            :icon="dashboardEditing ? 'check' : 'mode edit'"
+            :color="dashboardEditing ? 'primary': ''"
+            @click="toggleDashboardEditing"
+          />
         </q-list-header>
-
-        <q-item v-if="dashboards.length === 0">
-          No dashboards yet
-        </q-item>
-
-        <draggable :class="{ editing: dashboardEditing }" :options="{ disabled: !dashboardEditing }" v-model="dashboards">
-          <q-item dark v-for="dashboard in dashboards" :link="!dashboardEditing" :key="dashboard.id" :to="dashboardEditing ? undefined : `/dashboard/${dashboard.id}`">
-            <q-item-side v-if="dashboardEditing" icon="drag_indicator" />
-            <q-item-main :label="dashboard.title" />
+        <q-item v-if="dashboards.length === 0">No dashboards yet</q-item>
+        <draggable
+          :class="{ editing: dashboardEditing }"
+          :options="{ disabled: !dashboardEditing }"
+          v-model="dashboards"
+        >
+          <q-item
+            dark
+            v-for="dashboard in dashboards"
+            :link="!dashboardEditing"
+            :key="dashboard.id"
+            :to="dashboardEditing ? undefined : `/dashboard/${dashboard.id}`"
+          >
+            <q-item-side v-if="dashboardEditing" icon="drag_indicator"/>
+            <q-item-main :label="dashboard.title"/>
             <q-item-side right v-if="dashboardEditing">
-              <q-btn round flat icon="home" :color="defaultDashboard === dashboard.id ? 'primary' : ''" @click="updateDefaultDashboard(dashboard.id)" />
+              <q-btn
+                round
+                flat
+                icon="home"
+                :color="defaultDashboard === dashboard.id ? 'primary' : ''"
+                @click="updateDefaultDashboard(dashboard.id)"
+              />
             </q-item-side>
             <q-item-side right v-if="dashboardEditing">
-              <q-btn round flat icon="delete" @click="removeDashboard(dashboard)" />
+              <q-btn round flat icon="delete" @click="removeDashboard(dashboard)"/>
             </q-item-side>
           </q-item>
         </draggable>
-
         <div class="q-list-container">
-          <q-btn icon="add" label="Add dashboard" color="dark-bright" v-if="dashboardEditing" @click="createDashboard" />
+          <q-btn
+            icon="add"
+            label="Add dashboard"
+            color="dark-bright"
+            v-if="dashboardEditing"
+            @click="createDashboard"
+          />
         </div>
-
-        <q-item-separator />
+        <q-item-separator/>
         <!-- services -->
-
         <q-list-header>
-          <q-item-side icon="cloud" />
-          Services
-          <q-btn round size="sm" :flat="!serviceEditing" :icon="serviceEditing ? 'check' : 'mode edit'" :color="serviceEditing ? 'primary': ''" @click="toggleServiceEditing" />
+          <q-item-side icon="cloud"/>Services
+          <q-btn
+            round
+            size="sm"
+            :flat="!serviceEditing"
+            :icon="serviceEditing ? 'check' : 'mode edit'"
+            :color="serviceEditing ? 'primary': ''"
+            @click="toggleServiceEditing"
+          />
         </q-list-header>
-
-        <q-item v-if="services.length === 0">
-          No services yet
-        </q-item>
-
-        <draggable :class="{ editing: serviceEditing }" :options="{ disabled: !serviceEditing }" :striped="serviceEditing" v-model="services">
-          <q-item dark v-for="service in services" :link="!serviceEditing" :key="service.id" :to="serviceEditing ? undefined : `/service/${service.id}`">
-            <q-item-side v-if="serviceEditing" icon="drag_indicator" />
-            <q-item-main :label="service.title" />
+        <q-item v-if="services.length === 0">No services yet</q-item>
+        <draggable
+          :class="{ editing: serviceEditing }"
+          :options="{ disabled: !serviceEditing }"
+          :striped="serviceEditing"
+          v-model="services"
+        >
+          <q-item
+            dark
+            v-for="service in services"
+            :link="!serviceEditing"
+            :key="service.id"
+            :to="serviceEditing ? undefined : `/service/${service.id}`"
+          >
+            <q-item-side v-if="serviceEditing" icon="drag_indicator"/>
+            <q-item-main :label="service.title"/>
             <q-item-side right v-if="serviceEditing">
-              <q-btn round flat icon="delete" @click="removeService(service)" />
+              <q-btn round flat icon="delete" @click="removeService(service)"/>
             </q-item-side>
           </q-item>
         </draggable>
-
         <div class="q-list-container">
-          <q-btn icon="add" label="Add service" color="dark-bright" v-if="serviceEditing" @click="createService" />
+          <q-btn
+            icon="add"
+            label="Add service"
+            color="dark-bright"
+            v-if="serviceEditing"
+            @click="createService"
+          />
         </div>
-
       </q-list>
     </q-layout-drawer>
-
     <q-modal v-model="wizardModalOpen">
-      <new-service-wizard v-if="wizardModalOpen" />
+      <new-service-wizard v-if="wizardModalOpen"/>
     </q-modal>
-
     <q-page-container>
-      <router-view />
+      <router-view/>
     </q-page-container>
-
   </q-layout>
 </template>
 

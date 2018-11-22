@@ -111,37 +111,54 @@ export default class NewServiceWizard extends Vue {
 
 <template>
   <div class="layout-padding">
-
     <q-item v-if="serviceWizardActive">
-      <component v-if="serviceWizardActive" :is="serviceWizard" :serviceId="serviceId" :onCreate="onCreate" :onCancel="onCancel" />
+      <component
+        v-if="serviceWizardActive"
+        :is="serviceWizard"
+        :serviceId="serviceId"
+        :onCreate="onCreate"
+        :onCancel="onCancel"
+      />
     </q-item>
     <!-- Select a wizard -->
     <q-item v-else>
       <q-field label="Service ID" icon="create" orientation="vertical">
-        <q-input v-model="serviceId" placeholder="Choose an ID" :error="serviceIdError !== null" :suffix="serviceIdError" />
+        <q-input
+          v-model="serviceId"
+          placeholder="Choose an ID"
+          :error="serviceIdError !== null"
+          :suffix="serviceIdError"
+        />
       </q-field>
-
       <q-field label="Service name" icon="create" orientation="vertical">
-        <q-input v-model="serviceTitle" placeholder="Choose a name" :error="serviceTitleError !== null" :suffix="serviceTitleError" />
+        <q-input
+          v-model="serviceTitle"
+          placeholder="Choose a name"
+          :error="serviceTitleError !== null"
+          :suffix="serviceTitleError"
+        />
       </q-field>
-
       <q-field label="Service type" icon="widgets" orientation="vertical">
         <q-item>
-          <q-search v-model="searchModel" placeholder="Search" />
+          <q-search v-model="searchModel" placeholder="Search"/>
         </q-item>
-        <q-list link inset-separator>
-          <q-item icon="widgets" v-for="opt in wizardOptions" :key="opt.label" @click.native="selectFeature(opt.value)">
+        <q-list link="" inset-separator>
+          <q-item
+            icon="widgets"
+            v-for="opt in wizardOptions"
+            :key="opt.label"
+            @click.native="selectFeature(opt.value)"
+          >
             <div class="row">
               <q-item-main>
-                <q-item-tile label>{{ opt.label }}</q-item-tile>
+                <q-item-tile label="">{{ opt.label }}</q-item-tile>
               </q-item-main>
-              <q-item-side right icon="chevron_right" />
+              <q-item-side right icon="chevron_right"/>
             </div>
           </q-item>
         </q-list>
       </q-field>
     </q-item>
-
   </div>
 </template>
 

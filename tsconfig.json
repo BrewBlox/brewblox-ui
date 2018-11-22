@@ -32,4 +32,8 @@
     "tests/**/*.ts",
     "tests/**/*.tsx"
   ],
+  "exclude": [
+    ".vscode/**",
+    "node_modules/**"
+  ]
 }

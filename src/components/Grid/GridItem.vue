@@ -290,13 +290,9 @@ export default class GridItem extends Vue {
 </script>
 
 <template>
-  <div
-    class="grid-item"
-    :style="style"
-    ref="container"
-  >
+  <div class="grid-item" :style="style" ref="container">
     <!-- Actual item -->
-    <slot />
+    <slot/>
     <!-- Drag effects -->
     <div
       v-if="dragging || moving"
@@ -313,10 +309,7 @@ export default class GridItem extends Vue {
       @touchend="stopResize"
       v-if="!dragging && !moving && $props.editable"
     >
-      <q-icon
-        name="mdi-resize-bottom-right"
-        size="30px"
-      />
+      <q-icon name="mdi-resize-bottom-right" size="30px"/>
     </button>
     <!-- Item drag button -->
     <button
@@ -327,11 +320,7 @@ export default class GridItem extends Vue {
       @touchend="stopDrag"
       v-if="!dragging && $props.editable"
     >
-      <q-icon
-        v-if="$props.rows >= 2"
-        name="touch_app"
-        size="50px"
-      />
+      <q-icon v-if="$props.rows >= 2" name="touch_app" size="50px"/>
     </button>
   </div>
 </template>

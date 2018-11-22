@@ -138,16 +138,22 @@ export default class SparkWidget extends Vue {
 <template>
   <div>
     <q-modal v-model="modalOpen">
-      <SparkForm v-if="modalOpen" :field="service" />
+      <SparkForm v-if="modalOpen" :field="service"/>
     </q-modal>
     <q-card dark class="full-height column" v-if="ready">
       <q-card-title class="title-bar">
-        <InputPopupEdit class="ellipsis" :field="service.id" label="Widget ID" display="span" :change="() => {}" />
+        <InputPopupEdit
+          class="ellipsis"
+          :field="service.id"
+          label="Widget ID"
+          display="span"
+          :change="() => {}"
+        />
         <span class="vertical-middle on-left" slot="right">Spark Service</span>
-        <q-btn flat round dense slot="right" @click="openModal" icon="settings" />
-        <q-btn flat round dense slot="right" @click="fetchAll" icon="refresh" />
+        <q-btn flat round dense slot="right" @click="openModal" icon="settings"/>
+        <q-btn flat round dense slot="right" @click="fetchAll" icon="refresh"/>
       </q-card-title>
-      <q-card-separator />
+      <q-card-separator/>
       <q-carousel quick-nav class="col" v-model="slideIndex">
         <!-- State -->
         <q-carousel-slide class="unpadded">
@@ -171,14 +177,24 @@ export default class SparkWidget extends Vue {
           <q-card-main class="column col">
             <q-field class="col column" label="Discovered blocks" orientation="vertical">
               <div class="row">
-                <q-btn label="Refresh" @click="fetchDiscoveredBlocks" />
-                <q-btn label="Clear" v-if="discoveredBlocks.length" @click="clearDiscoveredBlocks" />
+                <q-btn label="Refresh" @click="fetchDiscoveredBlocks"/>
+                <q-btn label="Clear" v-if="discoveredBlocks.length" @click="clearDiscoveredBlocks"/>
               </div>
               <p v-for="id in discoveredBlocks" :key="id">{{ id }}</p>
             </q-field>
           </q-card-main>
         </q-carousel-slide>
-        <q-btn flat dense slot="quick-nav" slot-scope="props" color="white" :icon="navIcon(props.slide)" :label="navTitle(props.slide)" @click="props.goToSlide()" :class="{inactive: !props.current}" />
+        <q-btn
+          flat
+          dense
+          slot="quick-nav"
+          slot-scope="props"
+          color="white"
+          :icon="navIcon(props.slide)"
+          :label="navTitle(props.slide)"
+          @click="props.goToSlide()"
+          :class="{inactive: !props.current}"
+        />
       </q-carousel>
     </q-card>
   </div>

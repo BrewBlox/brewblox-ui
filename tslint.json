@@ -25,5 +25,11 @@
         "trace"
       ]
     }
+  },
+  "linterOptions": {
+    "exclude": [
+      ".vscode/**",
+      "node_modules/**"
+    ]
   }
 }

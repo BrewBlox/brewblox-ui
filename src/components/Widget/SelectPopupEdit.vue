@@ -27,6 +27,10 @@ import Component from 'vue-class-component';
       type: Boolean,
       default: false,
     },
+    clearable: {
+      type: Boolean,
+      default: false,
+    },
   },
 })
 export default class SelectPopupEdit extends Vue {
@@ -34,7 +38,7 @@ export default class SelectPopupEdit extends Vue {
 
   get placeholder() {
     if (this.$props.multiple && this.plc === null) {
-      return [];
+      return [undefined]; // Ensures that value always changes during edit
     }
     return this.plc;
   }
@@ -70,8 +74,20 @@ export default class SelectPopupEdit extends Vue {
 <template>
   <div>
     <component :is="$props.display" class="editable">{{ displayValue }}</component>
-    <q-popup-edit buttons persistent :title="`Set ${this.$props.label} to:`" v-model="placeholder" @show="startEdit" @save="endEdit">
-      <q-select :multiple="$props.multiple" v-model="placeholder" :options="$props.options" />
+    <q-popup-edit
+      buttons
+      persistent
+      :title="`Set ${this.$props.label} to:`"
+      v-model="placeholder"
+      @show="startEdit"
+      @save="endEdit"
+    >
+      <q-select
+        :multiple="$props.multiple"
+        :clearable="$props.clearable"
+        :options="$props.options"
+        v-model="placeholder"
+      />
     </q-popup-edit>
   </div>
 </template>

@@ -131,32 +131,58 @@ export default class SetpointProfileForm extends BlockForm {
     <q-card>
       <q-card-title>Setpoints</q-card-title>
       <q-card-main>
-
         <q-field class="col" label="Start time" orientation="vertical">
-          <DatetimePopupEdit label="Start time" display="big" :field="start" :change="updateStartTime" />
+          <DatetimePopupEdit
+            label="Start time"
+            display="big"
+            :field="start"
+            :change="updateStartTime"
+          />
         </q-field>
-
         <q-field class="col" label="Points" orientation="vertical">
           <div v-for="(point, idx) in points" :key="idx" class="row justify-around">
             <q-field label="Offset" orientation="vertical">
-              <InputPopupEdit label="Offset from start" :field="durationString(point.offsetMs)" :change="v => updatePointOffset(idx, parseDuration(v))" />
+              <InputPopupEdit
+                label="Offset from start"
+                :field="durationString(point.offsetMs)"
+                :change="v => updatePointOffset(idx, parseDuration(v))"
+              />
             </q-field>
             <q-field label="Time" orientation="vertical">
-              <DatetimePopupEdit label="Time" display="big" :field="point.time" :change="v => updatePointTime(idx, v)" />
+              <DatetimePopupEdit
+                label="Time"
+                display="big"
+                :field="point.time"
+                :change="v => updatePointTime(idx, v)"
+              />
             </q-field>
             <q-field label="Temperature" orientation="vertical">
-              <UnitPopupEdit label="Temperature" :field="point.temperature" :change="v => updatePointTemperature(idx, v)" />
+              <UnitPopupEdit
+                label="Temperature"
+                :field="point.temperature"
+                :change="v => updatePointTemperature(idx, v)"
+              />
             </q-field>
             <q-field label=" " orientation="vertical">
-              <q-btn flat round dense icon="delete" @click="removePoint(idx)" />
+              <q-btn flat round dense icon="delete" @click="removePoint(idx)"/>
             </q-field>
           </div>
         </q-field>
-
         <q-field>
-          <q-btn icon="add" label="Add point" @click="addPoint" />
+          <q-btn icon="add" label="Add point" @click="addPoint"/>
         </q-field>
-
+      </q-card-main>
+    </q-card>
+    <q-card>
+      <q-card-title>Block Settings</q-card-title>
+      <q-card-main>
+        <q-field class="col" label="Profiles">
+          <ProfilesPopupEdit
+            :field="block.profiles"
+            :serviceId="serviceId"
+            :change="callAndSaveBlock(v => block.profiles = v)"
+          />
+        </q-field>
       </q-card-main>
     </q-card>
   </div>

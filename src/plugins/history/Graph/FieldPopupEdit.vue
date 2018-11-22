@@ -1,8 +1,8 @@
 <script lang="ts">
-import Vue from 'vue';
-import Component from 'vue-class-component';
 import { fetchKnownKeys } from '@/store/history/actions';
 import { fieldsByMeasurement } from '@/store/history/getters';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 
 @Component({
   props: {
@@ -56,8 +56,15 @@ export default class FieldPopupEdit extends Vue {
 <template>
   <div>
     <component :is="$props.display" class="editable">{{ displayValue }}</component>
-    <q-popup-edit buttons persistent :title="`Set ${this.$props.label} to:`" v-model="placeholder" @show="startEdit" @save="endEdit">
-      <q-select clearable v-model="placeholder" :options="options" />
+    <q-popup-edit
+      buttons
+      persistent
+      :title="`Set ${this.$props.label} to:`"
+      v-model="placeholder"
+      @show="startEdit"
+      @save="endEdit"
+    >
+      <q-select clearable v-model="placeholder" :options="options"/>
     </q-popup-edit>
   </div>
 </template>

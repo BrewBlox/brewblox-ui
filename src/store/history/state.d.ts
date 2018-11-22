@@ -1,5 +1,5 @@
-import { ActionContext } from 'vuex';
 import { RootState } from '@/store/state';
+import { ActionContext } from 'vuex';
 
 export interface QueryParams {
   database?: string;

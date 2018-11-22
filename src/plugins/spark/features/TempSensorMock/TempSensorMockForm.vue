@@ -24,7 +24,22 @@ export default class TempSensorMockForm extends BlockForm {
           <big>{{ block.data.value | unit }}</big>
         </q-field>
         <q-field class="col" label="Connected">
-          <q-toggle :value="block.data.connected" @input="v => { block.data.connected = v; saveBlock(); }" />
+          <q-toggle
+            :value="block.data.connected"
+            @input="v => { block.data.connected = v; saveBlock(); }"
+          />
+        </q-field>
+      </q-card-main>
+    </q-card>
+    <q-card>
+      <q-card-title>Block Settings</q-card-title>
+      <q-card-main>
+        <q-field class="col" label="Profiles">
+          <ProfilesPopupEdit
+            :field="block.profiles"
+            :serviceId="serviceId"
+            :change="callAndSaveBlock(v => block.profiles = v)"
+          />
         </q-field>
       </q-card-main>
     </q-card>

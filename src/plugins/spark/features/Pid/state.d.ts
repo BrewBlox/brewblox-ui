@@ -1,5 +1,5 @@
+import { Link, Unit } from '@/helpers/units';
 import { Block } from '@/plugins/spark/state';
-import { Unit, Link } from '@/helpers/units';
 
 export interface PidBlock extends Block {
   data: {
