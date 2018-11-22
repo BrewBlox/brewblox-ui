@@ -1,5 +1,7 @@
 <script lang="ts">
+import { Unit } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import { isNullOrUndefined } from 'util';
 import Component from 'vue-class-component';
 import { getById } from './getters';
 import { SetpointSimpleBlock } from './state';
@@ -37,6 +39,7 @@ export default class SetpointSimpleWidget extends BlockWidget {
         <q-btn flat round dense slot="right" @click="refreshBlock" icon="refresh"/>
       </q-card-title>
       <q-card-separator/>
+      <q-alert type="warning" color="warn" v-if="!this.block.data.valid">This Setpoint is invalid</q-alert>
       <q-carousel quick-nav class="col" v-model="slideIndex">
         <!-- State -->
         <q-carousel-slide class="unpadded">
@@ -47,6 +50,12 @@ export default class SetpointSimpleWidget extends BlockWidget {
                   label="Setpoint"
                   :field="block.data.setting"
                   :change="callAndSaveBlock(v => block.data.setting = v)"
+                />
+              </q-field>
+              <q-field class="col" label="Valid">
+                <q-toggle
+                  :value="block.data.valid"
+                  @input="v => { block.data.valid = v; saveBlock(); }"
                 />
               </q-field>
             </q-card-main>

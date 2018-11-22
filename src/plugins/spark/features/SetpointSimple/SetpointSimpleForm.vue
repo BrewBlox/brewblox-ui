@@ -33,6 +33,9 @@ export default class SetpointSimpleForm extends BlockForm {
             :change="callAndSaveBlock(v => block.data.setting = v)"
           />
         </q-field>
+        <q-field class="col" label="Valid">
+          <q-toggle :value="block.data.valid" @input="v => { block.data.valid = v; saveBlock(); }"/>
+        </q-field>
       </q-card-main>
     </q-card>
   </div>
