@@ -27,8 +27,12 @@ export const validatorById = (store: RootStore, id: string): Validator =>
 export const wizardById = (store: RootStore, id: string): string | undefined =>
   featureById(store, id).wizard;
 
-export const widgetById = (store: RootStore, id: string): string | undefined =>
-  featureById(store, id).widget;
+export const widgetById = (store: RootStore, id: string, config: any): string | undefined => {
+  const feature = featureById(store, id);
+  return feature.selector
+    ? feature.selector(store, config)
+    : feature.widget;
+};
 
 export const widgetSizeById = (store: RootStore, id: string) =>
   (featureById(store, id).widgetSize || { ...{ cols: 3, rows: 2 } });

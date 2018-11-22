@@ -5,7 +5,7 @@
       "order": 1,
       "cols": 3,
       "rows": 3,
-      "widget": "ProcessView",
+      "feature": "ProcessView",
       "dashboard": "process-view",
       "config": {
         "name": "Simple flow setup",
@@ -85,7 +85,7 @@
       "order": 1,
       "cols": 3,
       "rows": 3,
-      "widget": "SetpointSensorPair",
+      "feature": "SetpointSensorPair",
       "dashboard": "derp",
       "config": {
         "serviceId": "sparkey",
@@ -97,7 +97,7 @@
       "order": 2,
       "cols": 3,
       "rows": 3,
-      "widget": "UnknownType",
+      "feature": "UnknownType",
       "dashboard": "derp",
       "config": {
         "serviceId": "sparkey",
@@ -109,7 +109,7 @@
       "order": 3,
       "cols": 3,
       "rows": 3,
-      "widget": "Warbl",
+      "feature": "Warbl",
       "dashboard": "derp",
       "config": {
         "serviceId": "sparkey",
@@ -121,7 +121,7 @@
       "order": 1,
       "cols": 10,
       "rows": 5,
-      "widget": "Graph",
+      "feature": "Graph",
       "dashboard": "metrics",
       "config": {
         "layout": {},
@@ -153,7 +153,7 @@
       "order": 2,
       "cols": 5,
       "rows": 5,
-      "widget": "Graph",
+      "feature": "Graph",
       "dashboard": "metrics",
       "config": {
         "layout": {},
@@ -162,11 +162,11 @@
       }
     },
     {
-      "id": "setpoint-widget",
+      "id": "setpoint-feature",
       "order": 1,
       "cols": 4,
       "rows": 2,
-      "widget": "SetpointSimple",
+      "feature": "SetpointSimple",
       "dashboard": "dashboard-home",
       "config": {
         "serviceId": "sparkey",
@@ -174,11 +174,11 @@
       }
     },
     {
-      "id": "pid-widget",
+      "id": "pid-feature",
       "order": 2,
       "cols": 4,
       "rows": 4,
-      "widget": "Pid",
+      "feature": "Pid",
       "dashboard": "dashboard-home",
       "config": {
         "serviceId": "sparkey",

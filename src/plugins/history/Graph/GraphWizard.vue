@@ -103,7 +103,7 @@ export default class GraphWizard extends Vue {
   createWidget() {
     const item: Partial<DashboardItem> = {
       id: this.widgetId,
-      widget: this.$props.featureId,
+      feature: this.$props.featureId,
       config: this.graphCfg,
       ...widgetSizeById(this.$store, this.$props.featureId),
     };
@@ -119,22 +119,36 @@ export default class GraphWizard extends Vue {
 
 <template>
   <q-stepper ref="stepper" v-model="currentStep">
-
     <!-- start -->
     <q-step default name="start" title="Widget info">
       <q-field label="Widget name" icon="create" orientation="vertical">
-        <q-input v-model="widgetId" placeholder="Enter a widget Name" :error="widgetIdError !== null" :suffix="widgetIdError" />
+        <q-input
+          v-model="widgetId"
+          placeholder="Enter a widget Name"
+          :error="widgetIdError !== null"
+          :suffix="widgetIdError"
+        />
       </q-field>
     </q-step>
-
     <!-- configure -->
     <q-step name="config" title="Configure graph">
-      <component v-if="graphCfg" :field="graphCfg" :change="v => graphCfg = v" ref="form" :is="form" />
+      <component
+        v-if="graphCfg"
+        :field="graphCfg"
+        :change="v => graphCfg = v"
+        ref="form"
+        :is="form"
+      />
     </q-step>
-
     <q-stepper-navigation>
-      <q-btn flat v-for="action in navigation[currentStep]" :key="action.label" :label="action.label" :disabled="!action.enabled()" @click="action.click" />
+      <q-btn
+        flat
+        v-for="action in navigation[currentStep]"
+        :key="action.label"
+        :label="action.label"
+        :disabled="!action.enabled()"
+        @click="action.click"
+      />
     </q-stepper-navigation>
-
   </q-stepper>
 </template>

@@ -35,7 +35,7 @@ export default class SparkPage extends Vue {
   defaultItem(block: Block): DashboardItem {
     return {
       id: block.id,
-      widget: block.type,
+      feature: block.type,
       order: 0,
       dashboard: '',
       config: {
@@ -68,10 +68,10 @@ export default class SparkPage extends Vue {
     return widgetSize;
   }
 
-  widgetComponent(id: string): string {
+  widgetComponent(item: DashboardItem): string {
     return this.editable
       ? 'EditWidget'
-      : (widgetById(this.$store, id) || 'InvalidWidget');
+      : (widgetById(this.$store, item.feature, item.config) || 'InvalidWidget');
   }
 
   onChangeBlockId(currentId: string, newId: string) {
@@ -81,7 +81,7 @@ export default class SparkPage extends Vue {
   onDeleteItem(item: DashboardItem) {
     // Quasar dialog can't handle objects as value - they will be returned as null
     // As workaround, we use array index as value, and add the "action" key to each option
-    const opts = deletersById(this.$store, item.widget)
+    const opts = deletersById(this.$store, item.feature)
       .map((del, idx) => ({ label: del.description, value: idx, action: del.action }));
 
     if (opts.length === 0) {
@@ -157,10 +157,10 @@ export default class SparkPage extends Vue {
         <component
           class="dashboard-item"
           v-for="item in items"
-          :is="widgetComponent(item.widget)"
+          :is="widgetComponent(item)"
           :key="item.id"
           :id="item.id"
-          :type="item.widget"
+          :type="item.feature"
           :cols="item.cols"
           :rows="item.rows"
           :config="item.config"

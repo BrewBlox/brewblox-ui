@@ -6,7 +6,8 @@ export interface Deleter {
   action: (store: RootStore, config: any) => void;
 }
 
-export type Validator = (store: RootStore, config: any) => boolean
+export type Validator = (store: RootStore, config: any) => boolean;
+export type WidgetSelector = (store: RootStore, config: any) => string;
 
 export interface Feature {
   id: string;
@@ -18,6 +19,7 @@ export interface Feature {
     rows: number;
   };
   widget?: string;
+  selector?: WidgetSelector;
   wizard?: string;
   form?: string;
 }
