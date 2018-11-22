@@ -55,7 +55,7 @@ export default class DigitalConstraints extends Constraints {
   <div class="column gutter-y-xs">
 
     <div v-for="(cinfo, idx) in constraints" :key="idx">
-      <div :class="{row: true, blocking: cinfo.blocking}" v-if="readonly">
+      <div :class="{row: true, limiting: cinfo.limiting}" v-if="readonly">
         <span class="col">{{ label(cinfo.key) }}</span>
         <span class="col">{{ cinfo.value | unit }}</span>
       </div>
@@ -82,7 +82,7 @@ export default class DigitalConstraints extends Constraints {
 </template>
 
 <style scoped>
-.blocking {
+.limiting {
   color: red;
 }
 </style>

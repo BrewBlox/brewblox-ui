@@ -27,7 +27,7 @@ export default class ActuatorPinForm extends BlockForm {
     return {
       state: 2,
       invert: false,
-      constrainedBy: { constraints: [] },
+      constrainedBy: { constraints: [], unconstrained: 0 },
     };
   }
 }

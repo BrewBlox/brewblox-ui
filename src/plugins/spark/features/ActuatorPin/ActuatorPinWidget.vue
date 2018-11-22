@@ -19,6 +19,17 @@ export default class ActuatorPinWidget extends BlockWidget {
     ];
   }
 
+  get pending() {
+    if (!this.block.data.constrainedBy) {
+      return null;
+    }
+    const unconstrained = this.block.data.constrainedBy.unconstrained;
+    if (this.block.data.state === unconstrained) {
+      return null;
+    }
+    return state[unconstrained];
+  }
+
   get actuatorState() {
     return state[this.block.data.state];
   }
@@ -69,8 +80,8 @@ export default class ActuatorPinWidget extends BlockWidget {
                   </q-btn>
                 </div>
               </q-field>
-              <q-field class="col" label="Inverted">
-                <q-toggle :value="block.data.invert" @input="v => { block.data.invert = v; saveBlock(); }" />
+              <q-field v-if="pending !== null" class="col" label="Pending">
+                <span>{{pending}}</span>
               </q-field>
             </q-card-main>
           </div>

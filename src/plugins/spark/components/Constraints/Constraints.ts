@@ -2,15 +2,21 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { clone } from 'lodash';
 
+export interface ConstraintsObj {
+  constraints: any[];
+  unconstrained: number;
+}
+
 export interface ConstraintInfo {
   key: string;
   value: any;
-  blocking?: boolean;
+  limiting?: boolean;
 }
 
 const asInfo = (con: any): ConstraintInfo => {
-  const [key, ..._] = Object.keys(con);
-  return { key, value: con[key] };
+  const keys = Object.keys(con);
+  const [key, ...omit] = keys.filter(item => item !== 'limiting');
+  return { key, value: con[key], limiting: con.limiting };
 };
 
 const asConstraint = (cinfo: ConstraintInfo) =>
@@ -38,9 +44,7 @@ export default class Constraints extends Vue {
       .field
       .constraints
       .map(asInfo);
-    if (this.$props.field.blocking > 0) {
-      cons[this.$props.field.blocking - 1]['blocking'] = true;
-    }
+
     return cons;
   }
 
