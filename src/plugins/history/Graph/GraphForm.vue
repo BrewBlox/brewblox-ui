@@ -16,6 +16,7 @@ import FieldPopupEdit from './FieldPopupEdit.vue';
 })
 export default class GraphForm extends FormBase {
   $q: any;
+  error: string | null = null;
 
   get config(): GraphConfig {
     return this.$props.field as GraphConfig;
@@ -26,6 +27,11 @@ export default class GraphForm extends FormBase {
   }
 
   saveConfig(config: GraphConfig = this.config) {
+    if (config.params.start && config.params.duration && config.params.end) {
+      this.error = 'Unable to set start, duration, and end at the same time';
+      return;
+    }
+    this.error = null;
     this.$props.change(config);
   }
 
@@ -92,6 +98,7 @@ export default class GraphForm extends FormBase {
   <div class="widget-modal">
     <q-card dark>
       <q-card-title>Period settings</q-card-title>
+      <q-alert color="warning" icon="warning" v-if="error">{{error}}</q-alert>
       <q-card-main>
         <div class="options-edit-container">
           <q-field class="col" label="Start time" orientation="vertical">
