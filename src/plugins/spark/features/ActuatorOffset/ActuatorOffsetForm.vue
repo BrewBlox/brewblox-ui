@@ -22,10 +22,20 @@ export default class ActuatorOffsetForm extends BlockForm {
       <q-card-title>Settings</q-card-title>
       <q-card-main>
         <q-field class="col" label="Target">
-          <LinkPopupEdit label="Target" :field="block.data.targetId" :serviceId="block.serviceId" :change="callAndSaveBlock(v => block.data.targetId = v)" />
+          <LinkPopupEdit
+            label="Target"
+            :field="block.data.targetId"
+            :serviceId="block.serviceId"
+            :change="callAndSaveBlock(v => block.data.targetId = v)"
+          />
         </q-field>
         <q-field class="col" label="Reference">
-          <LinkPopupEdit label="Reference" :field="block.data.referenceId" :serviceId="block.serviceId" :change="callAndSaveBlock(v => block.data.referenceId = v)" />
+          <LinkPopupEdit
+            label="Reference"
+            :field="block.data.referenceId"
+            :serviceId="block.serviceId"
+            :change="callAndSaveBlock(v => block.data.referenceId = v)"
+          />
         </q-field>
         <q-field class="col" label="Setting">
           <big>{{ block.data.setting | round }}</big>
@@ -38,7 +48,23 @@ export default class ActuatorOffsetForm extends BlockForm {
     <q-card>
       <q-card-title>Constraints</q-card-title>
       <q-card-main>
-        <AnalogConstraints :serviceId="serviceId" :field="block.data.constrainedBy" :change="callAndSaveBlock(v => block.data.constrainedBy = v)" />
+        <AnalogConstraints
+          :serviceId="serviceId"
+          :field="block.data.constrainedBy"
+          :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+        />
+      </q-card-main>
+    </q-card>
+    <q-card>
+      <q-card-title>Block Settings</q-card-title>
+      <q-card-main>
+        <q-field class="col" label="Profiles">
+          <ProfilesPopupEdit
+            :field="block.profiles"
+            :serviceId="serviceId"
+            :change="callAndSaveBlock(v => block.profiles = v)"
+          />
+        </q-field>
       </q-card-main>
     </q-card>
   </div>
