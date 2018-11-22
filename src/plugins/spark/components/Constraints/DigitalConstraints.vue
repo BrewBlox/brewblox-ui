@@ -1,4 +1,5 @@
 <script lang="ts">
+import { Unit } from '@/helpers/units';
 import { MutexLink } from '@/helpers/units/KnownLinks';
 import Component from 'vue-class-component';
 import Constraints from './Constraints';
@@ -45,7 +46,7 @@ export default class DigitalConstraints extends Constraints {
       case 'mutex':
         return { key, value: new MutexLink(value) };
       default:
-        return { key, value: 0 };
+        return { key, value: new Unit(0, 'second') };
     }
   }
 }
