@@ -35,13 +35,6 @@ import Component from 'vue-class-component';
   },
 })
 export default class WidgetBase extends Vue {
-  get additionalInfo() {
-    return {
-      'Widget ID': this.$props.id,
-      'Feature type': this.$props.type,
-    };
-  }
-
   get widgetId() {
     return this.$props.id;
   }

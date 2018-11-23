@@ -3,11 +3,12 @@ import WidgetBase from '@/components/Widget/WidgetBase';
 import { QueryParams } from '@/store/history/state';
 import Component from 'vue-class-component';
 import { Block } from '../state';
-import { fetchBlock, saveBlock } from '../store/actions';
+import { fetchBlock, renameBlock, saveBlock } from '../store/actions';
 import { blockById } from '../store/getters';
 
 @Component
 export default class BlockWidget extends WidgetBase {
+  $q: any;
   modalOpen: boolean = false;
   slideIndex: number = 0;
 
@@ -21,15 +22,6 @@ export default class BlockWidget extends WidgetBase {
 
   get block(): Block {
     return blockById(this.$store, this.serviceId, this.blockId);
-  }
-
-  get additionalInfo() {
-    return {
-      'Widget ID': this.$props.id,
-      'Block ID': this.blockId,
-      'Service ID': this.serviceId,
-      'Feature type': this.$props.type,
-    };
   }
 
   get subtitles(): string[] {
@@ -105,14 +97,21 @@ export default class BlockWidget extends WidgetBase {
   }
 
   refreshBlock() {
-    fetchBlock(this.$store, this.serviceId, this.block);
+    fetchBlock(this.$store, this.serviceId, this.block)
+      .catch(err => this.$q.notify(err.toString()));
   }
 
   saveBlock(block: Block = this.block) {
-    saveBlock(this.$store, this.serviceId, block);
+    saveBlock(this.$store, this.serviceId, block)
+      .catch(err => this.$q.notify(err.toString()));
   }
 
   callAndSaveBlock(func: (v: any) => void) {
     return (v: any) => { func(v); this.saveBlock(); };
+  }
+
+  changeBlockId(newId: string) {
+    renameBlock(this.$store, this.serviceId, this.blockId, newId)
+      .catch(err => this.$q.notify(err.toString()));
   }
 }

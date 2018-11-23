@@ -42,7 +42,12 @@ export default class ActuatorPwmWidget extends BlockWidget {
 <template>
   <div>
     <q-modal v-model="modalOpen">
-      <ActuatorPwmForm v-if="modalOpen" :field="block" :change="saveBlock"/>
+      <ActuatorPwmForm
+        v-if="modalOpen"
+        :field="block"
+        :change="saveBlock"
+        :changeId="changeBlockId"
+      />
     </q-modal>
     <q-card dark class="full-height column">
       <q-card-title class="title-bar">

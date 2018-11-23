@@ -22,6 +22,7 @@ import {
   validateService as validateServiceInApi,
 } from './api';
 import {
+  blockIds,
   discoveredBlocks,
   sparkServiceById,
 } from './getters';
@@ -78,6 +79,9 @@ export const renameBlock = async (
   currentId: string,
   newId: string,
 ) => {
+  if (blockIds(store, serviceId).includes(newId)) {
+    throw new Error(`Block ${newId} already exists`);
+  }
   await renameBlockInApi(serviceId, currentId, newId);
   await fetchBlocks(store, serviceId);
   allDashboardItems(store)

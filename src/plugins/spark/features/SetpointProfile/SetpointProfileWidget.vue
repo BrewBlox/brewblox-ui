@@ -35,25 +35,43 @@ export default class SetpointProfileWidget extends BlockWidget {
 <template>
   <div>
     <q-modal v-model="modalOpen">
-      <SetpointProfileForm v-if="modalOpen" :field="block" :change="saveBlock" />
+      <SetpointProfileForm
+        v-if="modalOpen"
+        :field="block"
+        :change="saveBlock"
+        :changeId="changeBlockId"
+      />
     </q-modal>
-
     <q-card dark class="full-height column">
       <q-card-title class="title-bar">
-        <InputPopupEdit class="ellipsis" :field="widgetId" label="Widget ID" display="span" :change="v => widgetId = v" />
+        <InputPopupEdit
+          class="ellipsis"
+          :field="widgetId"
+          label="Widget ID"
+          display="span"
+          :change="v => widgetId = v"
+        />
         <span class="vertical-middle on-left" slot="right">{{ this.subtitle }}</span>
-        <q-btn flat round dense slot="right" @click="openModal" icon="settings" />
-        <q-btn flat round dense slot="right" @click="refreshBlock" icon="refresh" />
+        <q-btn flat round dense slot="right" @click="openModal" icon="settings"/>
+        <q-btn flat round dense slot="right" @click="refreshBlock" icon="refresh"/>
       </q-card-title>
-      <q-card-separator />
-
+      <q-card-separator/>
       <q-carousel class="col" v-model="slideIndex">
         <q-carousel-slide class="unpadded">
-          <GraphDisplay v-if="!modalOpen" :data="plotlyData" :layout="plotlyLayout" />
+          <GraphDisplay v-if="!modalOpen" :data="plotlyData" :layout="plotlyLayout"/>
         </q-carousel-slide>
-        <q-btn slot="quick-nav" slot-scope="props" color="white" flat dense :icon="navIcon(props.slide)" :label="navTitle(props.slide)" @click="props.goToSlide()" :class="{inactive: !props.current}" />
+        <q-btn
+          slot="quick-nav"
+          slot-scope="props"
+          color="white"
+          flat
+          dense
+          :icon="navIcon(props.slide)"
+          :label="navTitle(props.slide)"
+          @click="props.goToSlide()"
+          :class="{inactive: !props.current}"
+        />
       </q-carousel>
-
     </q-card>
   </div>
 </template>

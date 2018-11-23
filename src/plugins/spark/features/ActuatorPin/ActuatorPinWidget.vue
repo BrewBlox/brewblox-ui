@@ -53,7 +53,12 @@ export default class ActuatorPinWidget extends BlockWidget {
 <template>
   <div>
     <q-modal v-model="modalOpen">
-      <ActuatorPinForm v-if="modalOpen" :field="block" :change="saveBlock"/>
+      <ActuatorPinForm
+        v-if="modalOpen"
+        :field="block"
+        :change="saveBlock"
+        :changeId="changeBlockId"
+      />
     </q-modal>
     <q-card dark class="full-height column">
       <q-card-title class="title-bar">

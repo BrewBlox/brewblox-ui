@@ -197,6 +197,16 @@ export default class BlockWizard extends Vue {
     this.$props.onCreateItem(item);
   }
 
+  async changeBlockId(newId: string) {
+    this.blockId = newId;
+    await this.$nextTick();
+    if (this.blockIdError) {
+      this.$q.notify(this.blockIdError);
+      return;
+    }
+    (this.block as Block).id = newId;
+  }
+
   resetStepper() {
     this.stepper.reset();
     this.blockAction = null;
@@ -255,7 +265,14 @@ export default class BlockWizard extends Vue {
     <q-step name="placeholder" title="Create or select block" v-else/>
     <!-- configure -->
     <q-step name="config" title="Configure block">
-      <component :is="blockForm" v-if="block" :field="block" :change="v => block = v" ref="form"/>
+      <component
+        :is="blockForm"
+        v-if="block"
+        :field="block"
+        :change="v => block = v"
+        :changeId="changeBlockId"
+        ref="form"
+      />
     </q-step>
     <q-stepper-navigation>
       <q-btn

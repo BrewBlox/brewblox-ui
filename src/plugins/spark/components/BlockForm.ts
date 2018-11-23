@@ -2,12 +2,15 @@ import FormBase from '@/components/Widget/FormBase';
 import { Block } from '@/plugins/spark/state';
 import Component from 'vue-class-component';
 
-@Component
+@Component({
+  props: {
+    changeId: {
+      type: Function,
+      required: true,
+    },
+  },
+})
 export default class BlockForm extends FormBase {
-  defaultData() {
-    return {};
-  }
-
   get blockField(): Block {
     const propBlock: Block = this.$props.field;
     const actualBlock: Block = { ...propBlock, data: propBlock.data || this.defaultData() };
@@ -25,11 +28,19 @@ export default class BlockForm extends FormBase {
     return this.block.serviceId;
   }
 
+  defaultData() {
+    return {};
+  }
+
   saveBlock(block: Block = this.block) {
     this.$props.change(block);
   }
 
   callAndSaveBlock(func: (v: any) => void) {
     return (v: any) => { func(v); this.saveBlock(); };
+  }
+
+  changeBlockId(newId: string) {
+    this.$props.changeId(newId);
   }
 }
