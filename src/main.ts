@@ -5,7 +5,6 @@ import { autoRegister } from './helpers/component-ref';
 import history from './plugins/history';
 import portal from './plugins/portal';
 import spark from './plugins/spark';
-import units from './plugins/units';
 import './quasar';
 import router from './router';
 import store from './store';
@@ -14,7 +13,6 @@ autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
 
 const plugins = [
   portal,
-  units,
   spark,
   history,
 ];

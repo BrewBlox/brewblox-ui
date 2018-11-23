@@ -1,5 +1,5 @@
 <script lang="ts">
-import { durationString, spaceCased } from '@/helpers/functional';
+import { spaceCased } from '@/helpers/functional';
 import { Block, UserUnits } from '@/plugins/spark/state';
 import { saveBlock, saveUnits, updateProfileNames } from '@/plugins/spark/store/actions';
 import {
@@ -91,10 +91,6 @@ export default class SparkForm extends Vue {
       .catch(reason => Notify.create(`Failed to change unit: ${reason}`));
   }
 
-  durationString(durationMs: number) {
-    return durationString(durationMs);
-  }
-
   spaceCased(input: string) {
     return spaceCased(input);
   }
@@ -110,7 +106,7 @@ export default class SparkForm extends Vue {
           <big>{{ service.id }}</big>
         </q-field>
         <q-field class="col" label="Time since boot">
-          <big>{{ durationString(ticks.data.millisSinceBoot) }}</big>
+          <big>{{ ticks.data.millisSinceBoot | duration }}</big>
         </q-field>
         <q-field class="col" label="Date">
           <big>{{ sysDate }}</big>

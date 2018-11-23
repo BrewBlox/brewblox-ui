@@ -23,7 +23,12 @@ export default class SetpointSimpleWidget extends BlockWidget {
 <template>
   <div>
     <q-modal v-model="modalOpen">
-      <SetpointSimpleForm v-if="modalOpen" :field="block" :change="saveBlock"/>
+      <SetpointSimpleForm
+        v-if="modalOpen"
+        :field="block"
+        :change="saveBlock"
+        :changeId="changeBlockId"
+      />
     </q-modal>
     <q-card dark class="full-height column">
       <q-card-title class="title-bar">

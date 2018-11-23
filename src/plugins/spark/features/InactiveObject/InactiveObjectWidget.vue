@@ -10,7 +10,12 @@ export default class InactiveObjectWidget extends BlockWidget {
 <template>
   <div>
     <q-modal v-model="modalOpen">
-      <InactiveObjectForm v-if="modalOpen" :field="block" :change="saveBlock"/>
+      <InactiveObjectForm
+        v-if="modalOpen"
+        :field="block"
+        :change="saveBlock"
+        :changeId="changeBlockId"
+      />
     </q-modal>
     <q-card dark class="full-height column">
       <q-card-title class="title-bar">
