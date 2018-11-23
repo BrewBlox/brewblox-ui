@@ -1,10 +1,10 @@
 <script lang="ts">
-import { durationString } from '@/helpers/functional';
 import { Block } from '@/plugins/spark/state';
 import {
   clearDiscoveredBlocks,
   fetchAll,
   fetchDiscoveredBlocks,
+  saveBlock,
 } from '@/plugins/spark/store/actions';
 import {
   blocks,
@@ -76,12 +76,6 @@ export default class SparkWidget extends Vue {
     ].every(v => v !== undefined);
   }
 
-  get activeNames() {
-    return this.profiles.data.active
-      .map(idx => this.profileNames[idx])
-      .join(', ');
-  }
-
   get sysDate() {
     return new Date(this.ticks.data.secondsSinceEpoch * 1000).toLocaleString();
   }
@@ -125,12 +119,12 @@ export default class SparkWidget extends Vue {
     fetchDiscoveredBlocks(this.$store, this.service.id);
   }
 
-  durationString(durationMs: number) {
-    return durationString(durationMs);
-  }
-
   fetchAll() {
     fetchAll(this.$store, serviceById(this.$store, this.service.id));
+  }
+
+  saveBlock(block: Block) {
+    saveBlock(this.$store, this.service.id, block);
   }
 }
 </script>
@@ -159,13 +153,17 @@ export default class SparkWidget extends Vue {
         <q-carousel-slide class="unpadded">
           <q-card-main class="column col">
             <q-field class="col" label="Device ID">
-              <big>{{ sysInfo.data.deviceId }}</big>
+              <big style="word-wrap: break-word;">{{ sysInfo.data.deviceId | base64ToHex }}</big>
             </q-field>
             <q-field class="col" label="Active Profiles">
-              <big>{{ activeNames }}</big>
+              <ProfilesPopupEdit
+                :field="profiles.data.active"
+                :serviceId="service.id"
+                :change="v => { profiles.data.active = v; saveBlock(profiles); }"
+              />
             </q-field>
             <q-field class="col" label="Time since boot">
-              <big>{{ durationString(ticks.data.millisSinceBoot) }}</big>
+              <big>{{ ticks.data.millisSinceBoot | duration }}</big>
             </q-field>
             <q-field class="col" label="Date">
               <big>{{ sysDate }}</big>
