@@ -34,7 +34,7 @@ import Component from 'vue-class-component';
   },
 })
 export default class InputPopupEdit extends Vue {
-  placeholder = null;
+  placeholder = NaN; // must not equal clear-value
 
   get displayValue() {
     const val = this.$props.field;
@@ -60,7 +60,11 @@ export default class InputPopupEdit extends Vue {
 
 <template>
   <div>
-    <component :disabled="$props.disable" :is="$props.display" class="editable">{{ displayValue }}</component>
+    <component
+      :disabled="$props.disable"
+      :is="$props.display"
+      class="editable"
+    >{{ displayValue | round }}</component>
     <q-popup-edit
       buttons
       persistent

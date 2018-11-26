@@ -81,7 +81,7 @@ export default class ActuatorPinWidget extends BlockWidget {
             <q-card-main class="column col">
               <q-field class="col" label="State">
                 <q-toggle
-                  v-if="block.data.state <= 1"
+                  v-if="block.data.state <= 0"
                   :value="boolState"
                   @input="v => { boolState = v; }"
                 />

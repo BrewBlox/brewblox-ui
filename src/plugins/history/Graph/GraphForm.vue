@@ -84,8 +84,10 @@ export default class GraphForm extends FormBase {
     }
   }
 
-  durationString(valMs: number) {
-    return durationString(valMs);
+  durationString(val: number | string) {
+    return typeof val === 'number'
+      ? durationString(val)
+      : val;
   }
 
   parseDuration(val: string) {

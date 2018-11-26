@@ -37,8 +37,12 @@ export default class SelectPopupEdit extends Vue {
   plc = null;
 
   get placeholder() {
-    if (this.$props.multiple && this.plc === null) {
-      return [undefined]; // Ensures that value always changes during edit
+    // Ensures that value always changes during edit
+    // Placeholder must not equal clear-value
+    if (this.plc === null) {
+      return this.$props.multiple
+        ? [undefined]
+        : undefined;
     }
     return this.plc;
   }

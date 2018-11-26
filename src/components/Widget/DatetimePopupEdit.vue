@@ -1,11 +1,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { Watch } from 'vue-property-decorator';
 
 @Component({
   props: {
     field: {
-      type: Number,
+      type: [Number, String],
       required: false,
     },
     change: {
@@ -23,7 +24,7 @@ import Component from 'vue-class-component';
   },
 })
 export default class DatetimePopupEdit extends Vue {
-  placeholder = null;
+  placeholder = -1; // must not equal clear-value
 
   get dateString() {
     return this.$props.field

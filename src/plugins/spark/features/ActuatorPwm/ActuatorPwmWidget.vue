@@ -88,7 +88,7 @@ export default class ActuatorPwmWidget extends BlockWidget {
                 <big>{{ block.data.value | round }}</big>
               </q-field>
               <q-field v-if="pending !== null" class="col" label="Requested">
-                <big>{{pending}}</big>
+                <big>{{ pending | round }}</big>
               </q-field>
             </q-card-main>
           </div>

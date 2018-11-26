@@ -28,7 +28,7 @@ import Component from 'vue-class-component';
   },
 })
 export default class FieldPopupEdit extends Vue {
-  placeholder = '';
+  placeholder = ''; // must not equal clear-value
 
   get options() {
     return (fieldsByMeasurement(this.$store, this.$props.measurement) || [])
