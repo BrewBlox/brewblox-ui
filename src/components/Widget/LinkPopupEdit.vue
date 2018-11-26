@@ -30,7 +30,7 @@ import Component from 'vue-class-component';
   },
 })
 export default class LinkPopupEdit extends Vue {
-  placeholder = null;
+  placeholder = ''; // must not equal clear-value
 
   get linkOptions() {
     const compatible = compatibleBlocks(this.$store, this.$props.serviceId);

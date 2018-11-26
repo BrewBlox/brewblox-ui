@@ -5,9 +5,14 @@ import { durationString } from '@/helpers/functional';
 import { fetchKnownKeys } from '@/store/history/actions';
 import { measurements } from '@/store/history/getters';
 import { QueryTarget } from '@/store/history/state';
-import parseDuration from 'parse-duration';
 import Component from 'vue-class-component';
 import FieldPopupEdit from './FieldPopupEdit.vue';
+
+interface PeriodDisplay {
+  start: boolean;
+  duration: boolean;
+  end: boolean;
+}
 
 @Component({
   components: {
@@ -16,7 +21,56 @@ import FieldPopupEdit from './FieldPopupEdit.vue';
 })
 export default class GraphForm extends FormBase {
   $q: any;
-  error: string | null = null;
+  period: PeriodDisplay | null = null;
+
+  get periodOptions() {
+    return [
+      {
+        label: 'Live: [duration] to now',
+        value: { start: false, duration: true, end: false },
+      },
+      {
+        label: 'Live: from [date] to now',
+        value: { start: true, duration: false, end: false },
+      },
+      {
+        label: 'Fixed: [duration] to [date]',
+        value: { start: false, duration: true, end: true },
+      },
+      {
+        label: 'Fixed: [duration] since [date]',
+        value: { start: true, duration: true, end: false },
+      },
+      {
+        label: 'Fixed: from [date] to [date]',
+        value: { start: true, duration: false, end: true },
+      },
+    ];
+  }
+
+  findShownPeriod(): PeriodDisplay {
+    const params = this.config.params;
+    const keys = ['start', 'duration', 'end'];
+    const matching = this.periodOptions
+      .filter(opt => keys.every(k => opt.value[k] === !!params[k]));
+    return matching.length > 0
+      ? matching[0].value
+      : this.periodOptions[0].value;
+  }
+
+  get shownPeriod(): PeriodDisplay {
+    if (this.period === null) {
+      this.period = this.findShownPeriod();
+    }
+    return this.period;
+  }
+
+  set shownPeriod(val: PeriodDisplay) {
+    this.period = val;
+    Object.keys(this.config.params)
+      .filter(k => !(this.period || {})[k])
+      .forEach(k => this.$delete(this.config.params, k));
+  }
 
   get config(): GraphConfig {
     return this.$props.field as GraphConfig;
@@ -27,11 +81,6 @@ export default class GraphForm extends FormBase {
   }
 
   saveConfig(config: GraphConfig = this.config) {
-    if (config.params.start && config.params.duration && config.params.end) {
-      this.error = 'Unable to set start, duration, and end at the same time';
-      return;
-    }
-    this.error = null;
     this.$props.change(config);
   }
 
@@ -84,12 +133,8 @@ export default class GraphForm extends FormBase {
     }
   }
 
-  durationString(valMs: number) {
-    return durationString(valMs);
-  }
-
-  parseDuration(val: string) {
-    return parseDuration(val);
+  parseDuration(val: string): string {
+    return durationString(val);
   }
 }
 </script>
@@ -97,45 +142,54 @@ export default class GraphForm extends FormBase {
 <template>
   <div class="widget-modal">
     <q-card dark>
-      <q-card-title>Period settings</q-card-title>
-      <q-alert color="warning" icon="warning" v-if="error">{{error}}</q-alert>
+      <q-card-title>Settings</q-card-title>
       <q-card-main>
-        <div class="options-edit-container">
-          <q-field class="col" label="Start time" orientation="vertical">
-            <DatetimePopupEdit
-              label="Start time"
-              display="big"
-              :field="config.params.start"
-              :change="callAndSaveConfig(v => config.params.start = v)"
-            />
-          </q-field>
-          <q-field class="col" label="Duration" orientation="vertical">
-            <InputPopupEdit
-              clearable
-              label="Duration"
-              :field="durationString(config.params.duration)"
-              :change="callAndSaveConfig(v => config.params.duration = parseDuration(v))"
-            />
-          </q-field>
-          <q-field class="col" label="End time" orientation="vertical">
-            <DatetimePopupEdit
-              label="End time"
-              display="big"
-              :field="config.params.end"
-              :change="callAndSaveConfig(v => config.params.end = v)"
-            />
-          </q-field>
-        </div>
-        <div class="options-edit-container">
-          <q-field class="col" label="Points after downsampling" orientation="vertical">
-            <InputPopupEdit
-              label="Points after downsampling"
-              type="number"
-              :field="config.params.approxPoints"
-              :change="callAndSaveConfig(v => config.params.approxPoints = v)"
-            />
-          </q-field>
-        </div>
+        <q-field class="col" label="Points after downsampling">
+          <InputPopupEdit
+            label="Points after downsampling"
+            type="number"
+            :field="config.params.approxPoints"
+            :change="callAndSaveConfig(v => config.params.approxPoints = v)"
+          />
+        </q-field>
+        <q-field class="col" label="Display type">
+          <SelectPopupEdit
+            label="Display type"
+            :field="shownPeriod"
+            :options="periodOptions"
+            :change="callAndSaveConfig(v => shownPeriod = v)"
+          />
+        </q-field>
+      </q-card-main>
+    </q-card>
+    <q-card dark>
+      <q-card-title>Period settings</q-card-title>
+      <q-card-main>
+        <q-field v-if="shownPeriod.start" class="col" label="Start time">
+          <DatetimePopupEdit
+            label="Start time"
+            display="big"
+            :field="config.params.start"
+            :change="callAndSaveConfig(v => config.params.start = v)"
+          />
+        </q-field>
+        <q-field v-if="shownPeriod.duration" class="col" label="Duration">
+          <InputPopupEdit
+            clearable
+            label="Duration"
+            :field="config.params.duration"
+            :change="callAndSaveConfig(v => config.params.duration = parseDuration(v))"
+          />
+        </q-field>
+        <q-field v-if="shownPeriod.end" class="col" label="End time">
+          <DatetimePopupEdit
+            label="End time"
+            display="big"
+            :field="config.params.end"
+            :change="callAndSaveConfig(v => config.params.end = v)"
+          />
+        </q-field>
+        <!-- <div class="options-edit-container"></div> -->
       </q-card-main>
     </q-card>
     <q-card dark v-for="(target, targetIdx) in config.targets" :key="targetIdx">
@@ -162,7 +216,7 @@ export default class GraphForm extends FormBase {
           </q-field>
           <q-field class="col" label="Display name" orientation="vertical">
             <InputPopupEdit
-              :disable="!field"
+              :disabled="!field"
               clearable
               label="Display name"
               :field="fieldRename(target, field)"

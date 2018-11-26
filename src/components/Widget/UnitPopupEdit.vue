@@ -24,7 +24,7 @@ import Component from 'vue-class-component';
   },
 })
 export default class UnitPopupEdit extends Vue {
-  placeholder = 0;
+  placeholder = NaN; // must not equal clear-value
 
   get notation() {
     return this.$props.field.notation;

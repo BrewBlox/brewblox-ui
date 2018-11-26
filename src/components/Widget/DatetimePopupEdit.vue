@@ -5,7 +5,7 @@ import Component from 'vue-class-component';
 @Component({
   props: {
     field: {
-      type: Number,
+      type: [Number, String],
       required: false,
     },
     change: {
@@ -23,7 +23,7 @@ import Component from 'vue-class-component';
   },
 })
 export default class DatetimePopupEdit extends Vue {
-  placeholder = null;
+  placeholder = -1; // must not equal clear-value
 
   get dateString() {
     return this.$props.field
@@ -47,6 +47,7 @@ export default class DatetimePopupEdit extends Vue {
     <q-popup-edit
       buttons
       persistent
+      :disable="$attrs.disabled"
       :title="`Set ${this.$props.label} to:`"
       v-model="placeholder"
       @show="startEdit"

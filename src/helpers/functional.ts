@@ -1,3 +1,5 @@
+import parseDuration from 'parse-duration';
+
 export const uniqueFilter = (val: any, idx: number, coll: any[]) =>
   coll.indexOf(val) === idx;
 
@@ -17,7 +19,10 @@ export const objectStringSorter = (key: string) =>
     return 0;
   };
 
-export const durationString = (durationMs: number) => {
+export const durationString = (duration: number | string) => {
+  const durationMs = typeof duration === 'string'
+    ? parseDuration(duration)
+    : duration;
   const secondsTotal = Number(durationMs) / 1000;
   const days = Math.floor(secondsTotal / 86400);
   const hours = Math.floor((secondsTotal - (days * 86400)) / 3600);
