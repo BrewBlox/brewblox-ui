@@ -8,30 +8,35 @@ import { filters } from './getters';
 
 @Component
 export default class PidForm extends BlockForm {
-  defaultData() {
-    return {
-      inputId: new ProcessValueLink(null),
-      outputId: new ActuatorAnalogLink(null),
-      inputValid: true,
-      outputValid: true,
-      inputValue: new Unit(0, 'degC'),
-      inputSetting: new Unit(0, 'degC'),
-      outputValue: 0,
-      outputSetting: 0,
-      filter: 0,
-      filterThreshold: new Unit(0, 'delta_degC'),
-      enabled: false,
-      active: true,
-      kp: new Unit(0, '1/degC'),
-      ti: new Unit(0, 'second'),
-      td: new Unit(0, 'second'),
-      p: 0,
-      i: 0,
-      d: 0,
-      error: new Unit(0, 'delta_degC'),
-      integral: new Unit(0, 'delta_degC/second'),
-      derivative: new Unit(0, 'delta_degC*second'),
-    };
+  presets() {
+    return [
+      {
+        label: 'Default',
+        value: {
+          inputId: new ProcessValueLink(null),
+          outputId: new ActuatorAnalogLink(null),
+          inputValid: true,
+          outputValid: true,
+          inputValue: new Unit(0, 'degC'),
+          inputSetting: new Unit(0, 'degC'),
+          outputValue: 0,
+          outputSetting: 0,
+          filter: 0,
+          filterThreshold: new Unit(0, 'delta_degC'),
+          enabled: false,
+          active: true,
+          kp: new Unit(0, '1/degC'),
+          ti: new Unit(0, 'second'),
+          td: new Unit(0, 'second'),
+          p: 0,
+          i: 0,
+          d: 0,
+          error: new Unit(0, 'delta_degC'),
+          integral: new Unit(0, 'delta_degC/second'),
+          derivative: new Unit(0, 'delta_degC*second'),
+        },
+      },
+    ];
   }
 
   get block() {
@@ -302,6 +307,14 @@ export default class PidForm extends BlockForm {
             :field="block.profiles"
             :serviceId="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
+          />
+        </q-field>
+        <q-field class="col" label="Preset">
+          <SelectPopupEdit
+            label="Preset"
+            :field="block.data"
+            :options="presets()"
+            :change="callAndSaveBlock(v => block.data = v)"
           />
         </q-field>
       </q-card-main>

@@ -28,8 +28,14 @@ export default class BlockForm extends FormBase {
     return this.block.serviceId;
   }
 
+  presets(): { label: string, value: Object }[] {
+    return [];
+  }
+
   defaultData() {
-    return {};
+    return this.presets.length > 0
+      ? this.presets()[0].value
+      : {};
   }
 
   saveBlock(block: Block = this.block) {

@@ -4,10 +4,15 @@ import Component from 'vue-class-component';
 
 @Component
 export default class MutexForm extends BlockForm {
-  defaultData() {
-    return {
-      differentActuatorWait: 0,
-    };
+  presets() {
+    return [
+      {
+        label: 'Default',
+        value: {
+          differentActuatorWait: 0,
+        },
+      },
+    ];
   }
 }
 </script>
@@ -44,6 +49,14 @@ export default class MutexForm extends BlockForm {
             :field="block.profiles"
             :serviceId="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
+          />
+        </q-field>
+        <q-field class="col" label="Preset">
+          <SelectPopupEdit
+            label="Preset"
+            :field="block.data"
+            :options="presets()"
+            :change="callAndSaveBlock(v => block.data = v)"
           />
         </q-field>
       </q-card-main>

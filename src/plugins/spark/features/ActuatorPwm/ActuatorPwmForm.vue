@@ -10,13 +10,18 @@ export default class ActuatorPwmForm extends BlockForm {
     return this.blockField as ActuatorPwmBlock;
   }
 
-  defaultData() {
-    return {
-      actuatorId: new ActuatorDigitalLink(null),
-      period: 0,
-      setting: 0,
-      constrainedBy: { constraints: [] },
-    };
+  presets() {
+    return [
+      {
+        label: 'Default',
+        value: {
+          actuatorId: new ActuatorDigitalLink(null),
+          period: 0,
+          setting: 0,
+          constrainedBy: { constraints: [] },
+        },
+      },
+    ];
   }
 }
 </script>
@@ -84,6 +89,14 @@ export default class ActuatorPwmForm extends BlockForm {
             :field="block.profiles"
             :serviceId="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
+          />
+        </q-field>
+        <q-field class="col" label="Preset">
+          <SelectPopupEdit
+            label="Preset"
+            :field="block.data"
+            :options="presets()"
+            :change="callAndSaveBlock(v => block.data = v)"
           />
         </q-field>
       </q-card-main>

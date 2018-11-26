@@ -23,12 +23,17 @@ export default class ActuatorPinForm extends BlockForm {
     this.saveBlock();
   }
 
-  defaultData() {
-    return {
-      state: 2,
-      invert: false,
-      constrainedBy: { constraints: [], unconstrained: 0 },
-    };
+  presets() {
+    return [
+      {
+        label: 'Default',
+        value: {
+          state: 2,
+          invert: false,
+          constrainedBy: { constraints: [], unconstrained: 0 },
+        },
+      },
+    ];
   }
 }
 </script>
@@ -91,6 +96,14 @@ export default class ActuatorPinForm extends BlockForm {
         </q-field>
         <q-field class="col" label="Block Type">
           <big>{{ block.type }}</big>
+        </q-field>
+        <q-field class="col" label="Preset">
+          <SelectPopupEdit
+            label="Preset"
+            :field="block.data"
+            :options="presets()"
+            :change="callAndSaveBlock(v => block.data = v)"
+          />
         </q-field>
       </q-card-main>
     </q-card>

@@ -6,16 +6,21 @@ import Component from 'vue-class-component';
 
 @Component
 export default class SetpointSensorPairForm extends BlockForm {
-  defaultData() {
-    return {
-      setpointId: new SetpointLink(null),
-      sensorId: new TempSensorLink(null),
-      setpointValid: true,
-      sensorValid: true,
-      setpointValue: new Unit(0, 'degC'),
-      sensorValue: new Unit(0, 'degC'),
-      valid: true,
-    };
+  presets() {
+    return [
+      {
+        label: 'Default',
+        value: {
+          setpointId: new SetpointLink(null),
+          sensorId: new TempSensorLink(null),
+          setpointValid: true,
+          sensorValid: true,
+          setpointValue: new Unit(0, 'degC'),
+          sensorValue: new Unit(0, 'degC'),
+          valid: true,
+        },
+      },
+    ];
   }
 }
 </script>
@@ -60,6 +65,14 @@ export default class SetpointSensorPairForm extends BlockForm {
             :field="block.profiles"
             :serviceId="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
+          />
+        </q-field>
+        <q-field class="col" label="Preset">
+          <SelectPopupEdit
+            label="Preset"
+            :field="block.data"
+            :options="presets()"
+            :change="callAndSaveBlock(v => block.data = v)"
           />
         </q-field>
       </q-card-main>

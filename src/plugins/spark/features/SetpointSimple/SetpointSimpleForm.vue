@@ -5,11 +5,16 @@ import Component from 'vue-class-component';
 
 @Component
 export default class SetpointSimpleForm extends BlockForm {
-  defaultData() {
-    return {
-      setting: new Unit(0, 'degC'),
-      valid: true,
-    };
+  presets() {
+    return [
+      {
+        label: 'Default',
+        value: {
+          setting: new Unit(0, 'degC'),
+          valid: true,
+        },
+      },
+    ];
   }
 }
 </script>
@@ -48,6 +53,14 @@ export default class SetpointSimpleForm extends BlockForm {
             :field="block.profiles"
             :serviceId="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
+          />
+        </q-field>
+        <q-field class="col" label="Preset">
+          <SelectPopupEdit
+            label="Preset"
+            :field="block.data"
+            :options="presets()"
+            :change="callAndSaveBlock(v => block.data = v)"
           />
         </q-field>
       </q-card-main>
