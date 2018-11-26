@@ -15,6 +15,12 @@ interface PeriodDisplay {
 }
 
 @Component({
+  props: {
+    buttons: {
+      type: Boolean,
+      default: true,
+    },
+  },
   components: {
     FieldPopupEdit,
   },
@@ -141,6 +147,14 @@ export default class GraphForm extends FormBase {
 
 <template>
   <div class="widget-modal">
+    <q-btn
+      rounded
+      v-close-overlay
+      v-if="$props.buttons"
+      label="close"
+      icon="close"
+      style="position: absolute; right: 18px; top: 18px"
+    />
     <q-card dark>
       <q-card-title>Settings</q-card-title>
       <q-card-main>

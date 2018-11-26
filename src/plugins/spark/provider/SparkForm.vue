@@ -99,6 +99,13 @@ export default class SparkForm extends Vue {
 
 <template>
   <div class="widget-modal">
+    <q-btn
+      rounded
+      v-close-overlay
+      label="close"
+      icon="close"
+      style="position: absolute; right: 18px; top: 18px"
+    />
     <q-card>
       <q-card-title>System Info</q-card-title>
       <q-card-main>

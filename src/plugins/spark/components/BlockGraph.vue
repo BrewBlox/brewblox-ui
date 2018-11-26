@@ -42,6 +42,13 @@ export default class BlockGraph extends Vue {
   <q-card-main class="column col full-height">
     <q-modal maximized v-model="modalOpen">
       <GraphCard v-if="modalOpen" :id="$props.id" :config="graphCfg"/>
+      <q-btn
+        rounded
+        v-close-overlay
+        label="close"
+        icon="close"
+        style="position: absolute; right: 18px; top: 18px"
+      />
     </q-modal>
     <q-field dark class="col items-center" label="Duration">
       <InputPopupEdit

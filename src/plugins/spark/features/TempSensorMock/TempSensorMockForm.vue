@@ -22,6 +22,14 @@ export default class TempSensorMockForm extends BlockForm {
 
 <template>
   <div class="widget-modal">
+    <q-btn
+      rounded
+      v-close-overlay
+      v-if="$props.buttons"
+      label="close"
+      icon="close"
+      style="position: absolute; right: 18px; top: 18px"
+    />
     <q-card>
       <q-card-title>Settings</q-card-title>
       <q-card-main>
