@@ -27,10 +27,6 @@ import Component from 'vue-class-component';
       type: String,
       default: 'big',
     },
-    disable: {
-      type: Boolean,
-      default: false,
-    },
   },
 })
 export default class InputPopupEdit extends Vue {
@@ -68,7 +64,7 @@ export default class InputPopupEdit extends Vue {
     <q-popup-edit
       buttons
       persistent
-      :disable="$props.disable"
+      :disable="$attrs.disabled"
       :title="popupTitle"
       v-model="placeholder"
       @show="startEdit"

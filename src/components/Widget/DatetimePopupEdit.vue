@@ -48,6 +48,7 @@ export default class DatetimePopupEdit extends Vue {
     <q-popup-edit
       buttons
       persistent
+      :disable="$attrs.disabled"
       :title="`Set ${this.$props.label} to:`"
       v-model="placeholder"
       @show="startEdit"
