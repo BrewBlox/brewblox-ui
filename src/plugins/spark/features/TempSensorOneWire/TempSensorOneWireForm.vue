@@ -5,13 +5,18 @@ import Component from 'vue-class-component';
 
 @Component
 export default class TempSensorOneWireForm extends BlockForm {
-  defaultData() {
-    return {
-      value: new Unit(0, 'degC'),
-      valid: true,
-      offset: new Unit(0, 'delta_degC'),
-      address: '',
-    };
+  presets() {
+    return [
+      {
+        label: 'Default',
+        value: {
+          value: new Unit(0, 'degC'),
+          valid: true,
+          offset: new Unit(0, 'delta_degC'),
+          address: '',
+        },
+      },
+    ];
   }
 }
 </script>
@@ -54,6 +59,14 @@ export default class TempSensorOneWireForm extends BlockForm {
             :field="block.profiles"
             :serviceId="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
+          />
+        </q-field>
+        <q-field class="col" label="Preset">
+          <SelectPopupEdit
+            label="Preset"
+            :field="block.data"
+            :options="presets()"
+            :change="callAndSaveBlock(v => block.data = v)"
           />
         </q-field>
       </q-card-main>

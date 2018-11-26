@@ -4,15 +4,20 @@ import Component from 'vue-class-component';
 
 @Component
 export default class ActuatorAnalogMockForm extends BlockForm {
-  defaultData() {
-    return {
-      setting: 0,
-      minSetting: 0,
-      maxSetting: 0,
-      value: 0,
-      minValue: 0,
-      maxValue: 0,
-    };
+  presets() {
+    return [
+      {
+        label: 'Default',
+        value: {
+          setting: 0,
+          minSetting: 0,
+          maxSetting: 0,
+          value: 0,
+          minValue: 0,
+          maxValue: 0,
+        },
+      },
+    ];
   }
 }
 </script>
@@ -89,6 +94,14 @@ export default class ActuatorAnalogMockForm extends BlockForm {
             :field="block.profiles"
             :serviceId="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
+          />
+        </q-field>
+        <q-field class="col" label="Preset">
+          <SelectPopupEdit
+            label="Preset"
+            :field="block.data"
+            :options="presets()"
+            :change="callAndSaveBlock(v => block.data = v)"
           />
         </q-field>
       </q-card-main>

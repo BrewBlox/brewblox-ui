@@ -4,10 +4,15 @@ import Component from 'vue-class-component';
 
 @Component
 export default class BalancerForm extends BlockForm {
-  defaultData() {
-    return {
-      clients: [],
-    };
+  presets() {
+    return [
+      {
+        label: 'Default',
+        value: {
+          clients: [],
+        },
+      },
+    ];
   }
 }
 </script>
@@ -44,6 +49,14 @@ export default class BalancerForm extends BlockForm {
             :field="block.profiles"
             :serviceId="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
+          />
+        </q-field>
+        <q-field class="col" label="Preset">
+          <SelectPopupEdit
+            label="Preset"
+            :field="block.data"
+            :options="presets()"
+            :change="callAndSaveBlock(v => block.data = v)"
           />
         </q-field>
       </q-card-main>

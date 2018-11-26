@@ -39,10 +39,15 @@ export default class SetpointProfileForm extends BlockForm {
       : new Date().getTime());
   }
 
-  defaultData() {
-    return {
-      points: [],
-    };
+  presets() {
+    return [
+      {
+        label: 'Default',
+        value: {
+          points: [],
+        },
+      },
+    ];
   }
 
   savePoints(points: OffsetPoint[] = this.points) {
@@ -190,6 +195,14 @@ export default class SetpointProfileForm extends BlockForm {
             :field="block.profiles"
             :serviceId="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
+          />
+        </q-field>
+        <q-field class="col" label="Preset">
+          <SelectPopupEdit
+            label="Preset"
+            :field="block.data"
+            :options="presets()"
+            :change="callAndSaveBlock(v => block.data = v)"
           />
         </q-field>
       </q-card-main>

@@ -53,11 +53,11 @@ export default class SelectPopupEdit extends Vue {
         .map((v: any) => this.$props.options.find((opt: any) => opt.value === v))
         .map((v: any) => v.label)
         .join(', ');
-      return text || '-';
+      return text || 'Click to set';
     }
     return (this.$props.options
       .find((opt: any) => opt.value === this.$props.field)
-      || { label: '-' })
+      || { label: 'Click to set' })
       .label;
   }
 
