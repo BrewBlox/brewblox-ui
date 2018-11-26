@@ -8,6 +8,10 @@ import Component from 'vue-class-component';
       type: Function,
       required: true,
     },
+    buttons: {
+      type: Boolean,
+      default: true,
+    },
   },
 })
 export default class BlockForm extends FormBase {

@@ -272,6 +272,7 @@ export default class BlockWizard extends Vue {
         :change="v => block = v"
         :changeId="changeBlockId"
         ref="form"
+        :buttons="false"
       />
     </q-step>
     <q-stepper-navigation>

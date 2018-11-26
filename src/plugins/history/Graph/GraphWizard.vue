@@ -133,11 +133,12 @@ export default class GraphWizard extends Vue {
     <!-- configure -->
     <q-step name="config" title="Configure graph">
       <component
+        :is="form"
+        ref="form"
         v-if="graphCfg"
         :field="graphCfg"
         :change="v => graphCfg = v"
-        ref="form"
-        :is="form"
+        :buttons="false"
       />
     </q-step>
     <q-stepper-navigation>
