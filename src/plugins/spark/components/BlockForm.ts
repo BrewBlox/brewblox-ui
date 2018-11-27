@@ -37,7 +37,7 @@ export default class BlockForm extends FormBase {
   }
 
   defaultData() {
-    return this.presets.length > 0
+    return this.presets().length > 0
       ? this.presets()[0].value
       : {};
   }
