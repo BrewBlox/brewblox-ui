@@ -1,13 +1,14 @@
 <script lang="ts">
 import { serviceAvailable } from '@/helpers/dynamic-store';
 import { Block } from '@/plugins/spark/state';
-import { renameBlock } from '@/plugins/spark/store/actions';
+import { createBlock, renameBlock } from '@/plugins/spark/store/actions';
 import { allBlocks } from '@/plugins/spark/store/getters';
 import { createDashboardItem } from '@/store/dashboards/actions';
 import { allDashboards, itemCopyName } from '@/store/dashboards/getters';
 import { Dashboard, DashboardItem } from '@/store/dashboards/state';
 import {
   deletersById,
+  displayNameById,
   widgetById,
   widgetSizeById,
 } from '@/store/features/getters';
@@ -27,6 +28,7 @@ import { isReady, isSystemBlock, widgetSize } from './getters';
 export default class SparkPage extends Vue {
   $q: any;
   editable: boolean = false;
+  modalOpen: boolean = false;
 
   get dashboards(): Dashboard[] {
     return allDashboards(this.$store);
@@ -72,6 +74,19 @@ export default class SparkPage extends Vue {
     return this.editable
       ? 'EditWidget'
       : (widgetById(this.$store, item.feature, item.config) || 'InvalidWidget');
+  }
+
+  async onCreateBlock(block: Block) {
+    try {
+      await createBlock(this.$store, this.$props.serviceId, block);
+      this.modalOpen = false;
+      this.$q.notify({
+        type: 'positive',
+        message: `Created ${displayNameById(this.$store, block.type)} "${block.id}"`,
+      });
+    } catch (e) {
+      this.$q.notify(`Failed to create block: ${e.toString()}`);
+    }
   }
 
   onChangeBlockId(currentId: string, newId: string) {
@@ -139,12 +154,22 @@ export default class SparkPage extends Vue {
       </portal>
       <portal to="toolbar-buttons">
         <q-btn
+          v-if="editable"
+          color="primary"
+          icon="add"
+          label="New Block"
+          @click="modalOpen = true"
+        />
+        <q-btn
           :icon="editable ? 'check' : 'mode edit'"
           :color="editable ? 'positive' : 'primary'"
           @click="() => editable = !editable"
           :label="editable ? 'Stop editing' : 'Edit blocks'"
         />
       </portal>
+      <q-modal v-model="modalOpen">
+        <NewBlockWizard v-if="modalOpen" :serviceId="serviceId" :onCreateBlock="onCreateBlock"/>
+      </q-modal>
       <grid-container>
         <SparkWidget
           v-if="isReady"
