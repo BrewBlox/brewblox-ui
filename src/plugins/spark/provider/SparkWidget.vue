@@ -2,6 +2,7 @@
 import { Block } from '@/plugins/spark/state';
 import {
   clearDiscoveredBlocks,
+  createUpdateSource,
   fetchAll,
   fetchDiscoveredBlocks,
   saveBlock,
@@ -10,6 +11,7 @@ import {
   blocks,
   discoveredBlocks,
   profileNames,
+  updateSource,
 } from '@/plugins/spark/store/getters';
 import { serviceById } from '@/store/services/getters';
 import Vue from 'vue';
@@ -76,6 +78,10 @@ export default class SparkWidget extends Vue {
     ].every(v => v !== undefined);
   }
 
+  get updating() {
+    return updateSource(this.$store, this.service.id) !== null;
+  }
+
   get sysDate() {
     return new Date(this.ticks.data.secondsSinceEpoch * 1000).toLocaleString();
   }
@@ -123,6 +129,10 @@ export default class SparkWidget extends Vue {
     fetchAll(this.$store, serviceById(this.$store, this.service.id));
   }
 
+  createUpdateSource() {
+    createUpdateSource(this.$store, this.service.id);
+  }
+
   saveBlock(block: Block) {
     saveBlock(this.$store, this.service.id, block);
   }
@@ -152,6 +162,11 @@ export default class SparkWidget extends Vue {
         <!-- State -->
         <q-carousel-slide class="unpadded">
           <q-card-main class="column col">
+            <q-alert
+              v-if="!updating"
+              type="warning"
+              :actions="[{ label: 'Retry', handler: createUpdateSource }]"
+            >Unable to update automatically</q-alert>
             <q-field class="col" label="Device ID">
               <big style="word-wrap: break-word;">{{ sysInfo.data.deviceId | base64ToHex }}</big>
             </q-field>

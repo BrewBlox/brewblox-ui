@@ -16,6 +16,7 @@ import {
   fetchDiscoveredBlocks as fetchDiscoveredBlocksInApi,
   fetchUnitAlternatives as fetchUnitAlternativesInApi,
   fetchUnits as fetchUnitsInApi,
+  fetchUpdateSource as fetchUpdateSourceInApi,
   persistBlock as persistBlockInApi,
   persistUnits as persistUnitsInApi,
   renameBlock as renameBlockInApi,
@@ -35,6 +36,7 @@ import {
   setDiscoveredBlocks as setDiscoveredBlocksInStore,
   setUnitAlternatives as setUnitAlternativesInStore,
   setUnits as setUnitsInStore,
+  setUpdateSource as setUpdateSourceInStore,
 } from './mutations';
 import { BlocksContext, SparkState } from './state';
 
@@ -126,8 +128,16 @@ export const fetchAll = async (store: RootStore, service: Service) =>
     fetchUnitAlternatives(store, service.id),
   ]);
 
-export const update = async (store: RootStore, service: Service) =>
-  fetchBlocks(store, service.id);
+export const createUpdateSource = async (store: RootStore, serviceId: string) =>
+  setUpdateSourceInStore(
+    store,
+    serviceId,
+    await fetchUpdateSourceInApi(
+      serviceId,
+      blocks => setBlocksInStore(store, serviceId, blocks),
+      () => setUpdateSourceInStore(store, serviceId, null),
+    ),
+  );
 
 export const validateService = async (serviceId: string) =>
   validateServiceInApi(serviceId);

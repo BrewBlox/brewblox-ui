@@ -10,6 +10,7 @@ export type SparkState = {
   unitAlternatives: UnitAlternatives;
   compatibleBlocks: CompatibleBlocks;
   discoveredBlocks: string[];
+  updateSource: EventSource | null;
 };
 
 export type BlocksContext = ActionContext<SparkState, RootState>;

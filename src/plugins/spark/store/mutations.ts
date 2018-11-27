@@ -38,6 +38,9 @@ export const mutations: MutationTree<SparkState> = {
 
   setDiscoveredBlocks: (state: SparkState, ids: string[]) =>
     Vue.set(state, 'discoveredBlocks', ids),
+
+  setUpdateSource: (state: SparkState, source: EventSource) =>
+    Vue.set(state, 'updateSource', source),
 };
 
 export const addBlock = commit(mutations.addBlock);
@@ -48,3 +51,4 @@ export const setUnits = commit(mutations.setUnits);
 export const setUnitAlternatives = commit(mutations.setUnitAlternatives);
 export const setCompatibleBlocks = commit(mutations.setCompatibleBlocks);
 export const setDiscoveredBlocks = commit(mutations.setDiscoveredBlocks);
+export const setUpdateSource = commit(mutations.setUpdateSource);
