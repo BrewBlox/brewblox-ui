@@ -6,7 +6,7 @@ services:
     image: rabbitmq:alpine
 
   influx:
-    image: influxdb:alpine
+    image: influxdb
     volumes:
     - "./influxdb:/var/lib/influxdb"
 
