@@ -1,9 +1,9 @@
 <script lang="ts">
-import { merge } from 'lodash';
-import Plotly, { PlotData } from 'plotly.js';
+import merge from 'lodash/merge';
+import { Layout, PlotData } from 'plotly.js';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import PlotlyFactory from './plotly-factory.js';
+import PlotlyGraph from './PlotlyGraph';
 
 @Component({
   props: {
@@ -17,11 +17,11 @@ import PlotlyFactory from './plotly-factory.js';
     },
   },
   components: {
-    Plotly: PlotlyFactory(Plotly),
+    PlotlyGraph,
   },
 })
 export default class GraphDisplay extends Vue {
-  layoutDefaults: Partial<Plotly.Layout> = {
+  layoutDefaults: Partial<Layout> = {
     title: '',
     font: {
       color: '#fff',
@@ -51,7 +51,7 @@ export default class GraphDisplay extends Vue {
     return this.$props.data;
   }
 
-  get plotlyLayout(): Partial<Plotly.Layout> {
+  get plotlyLayout(): Partial<Layout> {
     return merge(
       this.layoutDefaults,
       this.$props.layout,
@@ -74,7 +74,7 @@ export default class GraphDisplay extends Vue {
 </script>
 
 <template>
-  <Plotly fit v-if="ready" :data="plotlyData" :layout="plotlyLayout" :config="plotlyConfig"/>
+  <PlotlyGraph fit v-if="ready" :data="plotlyData" :layout="plotlyLayout" :config="plotlyConfig"/>
 </template>
 
 <style scoped>
