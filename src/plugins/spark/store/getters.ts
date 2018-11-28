@@ -26,6 +26,7 @@ export const getters: GetterTree<SparkState, RootState> = {
   unitAlternatives: (state: SparkState): UnitAlternatives => state.unitAlternatives,
   compatibleBlocks: (state: SparkState): CompatibleBlocks => state.compatibleBlocks,
   discoveredBlocks: (state: SparkState): string[] => state.discoveredBlocks,
+  updateSource: (state: SparkState): EventSource | null => state.updateSource,
 };
 
 export const blocks = read(getters.blocks);
@@ -35,6 +36,7 @@ export const units = read(getters.units);
 export const unitAlternatives = read(getters.unitAlternatives);
 export const compatibleBlocks = read(getters.compatibleBlocks);
 export const discoveredBlocks = read(getters.discoveredBlocks);
+export const updateSource = read(getters.updateSource);
 
 export function blockById<T extends Block>(
   store: RootStore,

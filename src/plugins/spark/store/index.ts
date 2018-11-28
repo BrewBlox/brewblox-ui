@@ -18,6 +18,7 @@ const module: Module<SparkState, RootState> = {
     unitAlternatives: {},
     compatibleBlocks: {},
     discoveredBlocks: [],
+    updateSource: null,
   }),
 };
 

@@ -1,4 +1,5 @@
-import { del, get, post, put } from '@/helpers/fetch';
+import { del, get, post, put, sse } from '@/helpers/fetch';
+import { deserialize } from '@/helpers/units/parseObject';
 import queryString from 'query-string';
 import { Block, DataBlock, UnitAlternatives, UserUnits } from '../state';
 
@@ -70,3 +71,21 @@ export const validateService = async (serviceId: string): Promise<boolean> =>
   get(`/${encodeURIComponent(serviceId)}/_service/status`)
     .then(retv => retv.status === 'ok')
     .catch(() => false);
+
+export const fetchUpdateSource = async (
+  serviceId: string,
+  onData: (blocks: Block[]) => void,
+  onClose: () => void,
+) => {
+  const source = await sse(`/${encodeURIComponent(serviceId)}/sse/objects`);
+  source.onerror = () => {
+    source.close();
+    onClose();
+  };
+  source.onmessage = (event: MessageEvent) =>
+    onData(
+      deserialize(JSON.parse(event.data))
+        .map(((block: DataBlock) => asBlock(block, serviceId))));
+
+  return source;
+};

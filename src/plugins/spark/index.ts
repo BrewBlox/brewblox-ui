@@ -3,10 +3,17 @@ import { base64ToHex, durationString, hexToBase64 } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
 import { createFeature } from '@/store/features/actions';
 import { createProvider } from '@/store/providers/actions';
+import { Service } from '@/store/services/state';
+import { RootStore } from '@/store/state';
 import Vue from 'vue';
 import features from './features';
 import { register } from './store';
-import { fetchAll, update } from './store/actions';
+import { createUpdateSource, fetchAll } from './store/actions';
+
+const initialize = async (store: RootStore, service: Service) => {
+  await register(store, service);
+  await createUpdateSource(store, service.id);
+};
 
 export default ({ store }: PluginArguments) => {
   autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
@@ -27,9 +34,8 @@ export default ({ store }: PluginArguments) => {
     id: 'Spark',
     displayName: 'Spark Controller',
     features: Object.keys(features),
-    initializer: register,
+    initializer: initialize,
     fetcher: fetchAll,
-    updater: update,
     wizard: 'SparkWizard',
     page: 'SparkPage',
   });
