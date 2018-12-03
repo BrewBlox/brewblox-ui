@@ -225,7 +225,7 @@ export default class DefaultLayout extends Vue {
       </q-list>
       <q-list no-border class="build-info">
         <q-item>
-          <small>Version: {{ version }}</small>
+          <small>version: {{ version }}</small>
         </q-item>
       </q-list>
     </q-layout-drawer>
