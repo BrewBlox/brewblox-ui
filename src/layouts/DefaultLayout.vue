@@ -35,6 +35,10 @@ export default class DefaultLayout extends Vue {
   wizardModalOpen: boolean = false;
   $q: any;
 
+  get version() {
+    return process.env.GIT_VERSION || 'UNKNOWN';
+  }
+
   get dashboards() {
     return [...allDashboards(this.$store)].sort(objectSorter('order'));
   }
@@ -120,8 +124,8 @@ export default class DefaultLayout extends Vue {
       </q-toolbar>
     </q-layout-header>
     <q-layout-drawer v-model="leftDrawerOpen">
-      <q-list no-border link="" inset-delimiter>
-        <q-item link="" to="/" active-class="q-item-no-link-highlighting">
+      <q-list no-border link inset-delimiter>
+        <q-item link to="/" active-class="q-item-no-link-highlighting">
           <q-item-side icon="home"/>Main menu
         </q-item>
         <q-item-separator/>
@@ -219,6 +223,11 @@ export default class DefaultLayout extends Vue {
           />
         </div>
       </q-list>
+      <q-list no-border class="build-info">
+        <q-item>
+          <small>Version: {{ version }}</small>
+        </q-item>
+      </q-list>
     </q-layout-drawer>
     <q-modal v-model="wizardModalOpen">
       <new-service-wizard v-if="wizardModalOpen"/>
@@ -295,5 +304,10 @@ export default class DefaultLayout extends Vue {
 
 .q-card-main {
   padding: 10px;
+}
+
+.build-info {
+  bottom: 0;
+  position: absolute;
 }
 </style>
