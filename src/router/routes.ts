@@ -8,6 +8,7 @@ export default [
       // dynamic pages
       { path: '/dashboard/:id', component: () => import('@/pages/DashboardPage.vue') },
       { path: '/service/:id', component: () => import('@/pages/ServicePage.vue') },
+      { path: '/service/:id/display', component: () => import('@/pages/RemoteDisplay.vue') },
     ],
   },
 
