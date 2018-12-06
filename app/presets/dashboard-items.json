@@ -1,7 +1,7 @@
 {
-  "dashboard-items": [
+  "docs": [
     {
-      "id": "item-process-view",
+      "_id": "item-process-view",
       "order": 1,
       "cols": 3,
       "rows": 3,
@@ -81,7 +81,7 @@
       }
     },
     {
-      "id": "item-invalid",
+      "_id": "item-invalid",
       "order": 1,
       "cols": 3,
       "rows": 3,
@@ -93,7 +93,7 @@
       }
     },
     {
-      "id": "item-unknown",
+      "_id": "item-unknown",
       "order": 2,
       "cols": 3,
       "rows": 3,
@@ -105,7 +105,7 @@
       }
     },
     {
-      "id": "item-invalid-unknown",
+      "_id": "item-invalid-unknown",
       "order": 3,
       "cols": 3,
       "rows": 3,
@@ -117,7 +117,7 @@
       }
     },
     {
-      "id": "item-graph",
+      "_id": "item-graph",
       "order": 1,
       "cols": 10,
       "rows": 5,
@@ -149,7 +149,7 @@
       }
     },
     {
-      "id": "empty-graph",
+      "_id": "empty-graph",
       "order": 2,
       "cols": 5,
       "rows": 5,
@@ -162,7 +162,7 @@
       }
     },
     {
-      "id": "setpoint-feature",
+      "_id": "setpoint-feature",
       "order": 1,
       "cols": 4,
       "rows": 2,
@@ -174,7 +174,7 @@
       }
     },
     {
-      "id": "pid-feature",
+      "_id": "pid-feature",
       "order": 2,
       "cols": 4,
       "rows": 4,
@@ -184,49 +184,6 @@
         "serviceId": "sparkey",
         "blockId": "pid-1"
       }
-    }
-  ],
-  "dashboards": [
-    {
-      "id": "dashboard-home",
-      "title": "Home Dashboard",
-      "order": 1
-    },
-    {
-      "id": "metrics",
-      "title": "Metrics Dashboard",
-      "order": 2
-    },
-    {
-      "id": "process-view",
-      "title": "ProcessView Dashboard",
-      "order": 3
-    },
-    {
-      "id": "derp",
-      "title": "Derp Dashboard",
-      "order": 4
-    }
-  ],
-  "services": [
-    {
-      "id": "sparkey",
-      "title": "Spark Controller 'sparkey'",
-      "order": 1,
-      "type": "Spark",
-      "config": {
-        "profileNames": [
-          "testey1",
-          "testey2"
-        ]
-      }
-    },
-    {
-      "id": "spock",
-      "title": "Spark Controller 'spock'",
-      "order": 2,
-      "type": "Spark",
-      "config": {}
     }
   ]
 }

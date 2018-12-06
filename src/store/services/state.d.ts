@@ -8,6 +8,7 @@ export interface Service {
   type: string;
   config: Object;
   isLoading?: boolean;
+  _rev?: string;
 }
 
 export type ServiceState = {

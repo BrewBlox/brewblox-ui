@@ -8,15 +8,15 @@ services:
   influx:
     image: influxdb
     volumes:
-    - "./app/influxdb/:/var/lib/influxdb/"
+      - ./app/influxdb/:/var/lib/influxdb/
 
-  couchstore:
+  datastore:
     image: treehouses/couchdb
     labels:
       - "traefik.port=5984"
-      - "traefik.frontend.rule=PathPrefixStrip: /couchstore"
-    volumes:
-      - "./app/couchdb/:/opt/couchdb/data/"
+      - "traefik.frontend.rule=PathPrefixStrip: /datastore"
+    # volumes:
+    #   - ./app/couchdb/:/opt/couchdb/data/
 
   history:
     image: brewblox/brewblox-history:develop
@@ -34,7 +34,7 @@ services:
     image: brewblox/brewblox-devcon-spark:feature-couchdb
     depends_on:
       - eventbus
-      - couchstore
+      - datastore
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /sparkey"
@@ -46,24 +46,13 @@ services:
     image: brewblox/brewblox-devcon-spark:feature-couchdb
     depends_on:
       - eventbus
-      - couchstore
+      - datastore
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /spock"
     command: >
       --name=spock
       --simulation
-
-  datastore:
-    image: brewblox/brewblox-datastore:develop
-    labels:
-      - "traefik.port=5000"
-      - "traefik.frontend.rule=PathPrefix: /datastore"
-    volumes:
-      - "./app/presets/ui_objects.json:/app/ui_objects.json"
-    command: >
-      --file ui_objects.json
-      --volatile
 
   ui:
     image: brewblox/brewblox-ui:develop
