@@ -15,8 +15,8 @@ services:
     labels:
       - "traefik.port=5984"
       - "traefik.frontend.rule=PathPrefixStrip: /datastore"
-    # volumes:
-    #   - ./app/couchdb/:/opt/couchdb/data/
+    volumes:
+      - ./app/couchdb/:/opt/couchdb/data/
 
   history:
     image: brewblox/brewblox-history:develop
@@ -59,7 +59,7 @@ services:
     depends_on:
       - datastore
     volumes:
-      - "./devdist:/usr/share/nginx/html"
+      - ./app/dist:/usr/share/nginx/html
     labels:
       - "traefik.port=80"
       - "traefik.frontend.rule=PathPrefix: /"

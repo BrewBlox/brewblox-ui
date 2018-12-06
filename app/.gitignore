@@ -1,4 +1,3 @@
-influxdb/*
-!influxdb/.gitkeep
-couchdb/*
-!couchdb/.gitkeep
+influxdb/
+couchdb/
+dist/

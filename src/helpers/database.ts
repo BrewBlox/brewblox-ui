@@ -1,6 +1,6 @@
 import PouchDB from 'pouchdb';
 
-const host = process.env.VUE_APP_API_URI;
+const host = process.env.VUE_APP_API_URI || window.location.origin;
 
 export const createDatabase = (name: string) =>
   new PouchDB(`${host}/datastore/${name}`);
