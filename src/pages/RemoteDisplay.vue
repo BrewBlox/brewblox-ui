@@ -16,10 +16,15 @@ export default class RemoteDisplayPage extends Vue {
 
   url: string = 'ws://localhost:7376';
   debug: boolean = true;
-  context: CanvasRenderingContext2D | null = null;
-  canvas: HTMLCanvasElement | null = null;
-  ws: WebSocket | null = null;
-  imagedata: ImageData | null = null;
+
+  // initialize to undefined so they are not reactive
+  context: CanvasRenderingContext2D | undefined = undefined;
+  canvas: HTMLCanvasElement | undefined = undefined;
+  ws: WebSocket | undefined = undefined;
+  buf: ArrayBuffer | undefined = undefined;
+  buf8: Uint8ClampedArray | undefined = undefined;
+  data: Uint32Array | undefined = undefined;
+  rerender: boolean = true;
 
   pressed: number = 0;
 
@@ -38,6 +43,15 @@ export default class RemoteDisplayPage extends Vue {
     this.preventReconnection = false;
   }
 
+  renderCanvas(){
+    if(this.context !== undefined && this.buf8 !== undefined){
+      const imagedata = this.context.createImageData(this.width, this.height);
+      imagedata.data.set(this.buf8);
+      this.context.putImageData(imagedata, 0, 0);
+      this.rerender = false;
+    }
+  }
+
   mounted () {
     this.canvas = this.$refs['screen-canvas'] as HTMLCanvasElement;
 
@@ -45,26 +59,24 @@ export default class RemoteDisplayPage extends Vue {
     this.canvas.addEventListener<'mouseup'>('mouseup', this.onMouseUp);
     this.canvas.addEventListener<'mousemove'>('mousemove', this.onMouseMove);
 
-    this.context = this.canvas.getContext('2d');
+    this.context = this.canvas.getContext('2d') || undefined;
 
     // Draw the new rectangle.
     const ctx = this.context;
-    if (ctx !== null) {
-      this.imagedata = ctx.getImageData(0, 0, this.width, this.height);
-      if (!this.imagedata) {
-        this.log('mounted, but no image');
-      }
-      const img = this.imagedata.data;
+    if (ctx !== undefined) {
+      this.buf = new ArrayBuffer(this.width * this.height*4);
+      this.buf8 = new Uint8ClampedArray(this.buf);
+      this.data = new Uint32Array(this.buf);
+
       for (let i = 0; i < this.width * this.height; i += 1) {
-        img[i * 4] = 0;
-        img[i * 4 + 1] = 0;
-        img[i * 4 + 2] = 0;
-        img[i * 4 + 3] = 255;
+        this.data[i] = 255 << 24; // initalize alpha to 255, leave black
       }
-      ctx.putImageData(this.imagedata, 0, 0);
+      this.renderCanvas();
     }
 
     this.setupSocket();
+
+    window.setInterval(this.renderCanvas, 100);
   }
 
   beforeDestroy() {
@@ -72,23 +84,22 @@ export default class RemoteDisplayPage extends Vue {
     // we need to prevent reconnection! or we'll set state on an unmounted component
     this.preventReconnection = true;
     this.closeSocket();
-    this.imagedata = null;
-    this.context = null;
-    this.canvas = null;
+    this.context = undefined;
+    this.canvas = undefined;
   }
 
   closeSocket() {
     const ws = this.ws;
     if (ws) {
       ws.close();
-      this.ws = null;
+      this.ws = undefined;
       this.connecting = false;
       this.connected = false;
     }
   }
 
   getMousePos(evt) {
-    if (this.canvas !== null) {
+    if (this.canvas !== undefined) {
       return {
         x: evt.clientX - this.canvas.offsetLeft,
         y: evt.clientY - this.canvas.offsetTop,
@@ -126,7 +137,7 @@ export default class RemoteDisplayPage extends Vue {
   touchscreen(evt) {
     const { x, y } = this.getMousePos(evt);
     const connected = this.connected;
-    if (connected && this.ws !== null) {
+    if (connected && this.ws !== undefined) {
       this.log(`sending touch ${x},${y},${this.pressed}`);
       const buf = new ArrayBuffer(5);
       const view = new DataView(buf);
@@ -188,39 +199,36 @@ export default class RemoteDisplayPage extends Vue {
   }
 
   handleScreenUpdate(buffer: DataView, length: number) {
-    if (this.imagedata !== null && this.context !== null) {
-      const img = this.imagedata.data;
-      let index = 0;
-      // let s = '';
-      while (index < length) {
-        const base = buffer.getUint32(index, true);
-        const color = buffer.getUint32(index + 4, true);
+    let index = 0;
+    // let s = '';
 
-        const addr = base * 4;
-        const x = base % 360;
-        const y = (base - x) / 360;
-        const rr = ((color >>> 11) % 32);
-        const gg = ((color >>> 5) % 64);
-        const bb = ((color >>> 0) % 32);
+    while (index < length && this.data !== undefined) {
+      const addr = buffer.getUint32(index, true);
+      const color = buffer.getUint32(index + 4, true);
 
-        // scale back up to 8 bits, ensuring that 0 maps to 0 and 0x1F maps to 0xFF
-        const r = (rr << 3) | ((rr >>> 2) & 7);
-        const g = (gg << 2) | ((gg >>> 3) & 3);
-        const b = (bb << 3) | ((bb >>> 2) & 7);
+      const x = addr % this.width;
+      const y = (addr - x) /this.width;
 
-        // s += `(${x},${y}:${color}:${r},${g},${b}) `;
+      const rr = ((color >>> 11) % 32);
+      const gg = ((color >>> 5) % 64);
+      const bb = ((color >>> 0) % 32);
 
-        img[addr] = r;
-        img[addr + 1] = g;
-        img[addr + 2] = b;
-        img[addr + 3] = 255;
-        index += 8;
-        this.context.putImageData(this.imagedata, 0, 0);
-      }
-      // console.log(s);
+      // scale back up to 8 bits, ensuring that 0 maps to 0 and 0x1F maps to 0xFF
+      const r = (rr << 3) | ((rr >>> 2) & 7);
+      const g = (gg << 2) | ((gg >>> 3) & 3);
+      const b = (bb << 3) | ((bb >>> 2) & 7);
+
+      // s += `(${x},${y}:${color}:${r},${g},${b}) `;
+
+      this.data[addr] = (255   << 24) |    // alpha
+              (b << 16) |    // blue
+              (g <<  8) |    // green
+              r;            // red
+
+      index += 8;
     }
+    this.rerender = true;
   }
-
 }
 </script>
 
@@ -232,7 +240,7 @@ export default class RemoteDisplayPage extends Vue {
     <div class="container">
         <div class="background">
           <div class="display">
-            <canvas ref="screen-canvas" class="view" 
+            <canvas ref="screen-canvas" class="view"
                     :hidden="!connected"
                     :width="width" :height="height" />
             <div class="glass"
