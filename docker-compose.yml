@@ -8,7 +8,15 @@ services:
   influx:
     image: influxdb
     volumes:
-    - "./influxdb:/var/lib/influxdb"
+    - "./app/influxdb/:/var/lib/influxdb/"
+
+  couchstore:
+    image: treehouses/couchdb
+    labels:
+      - "traefik.port=5984"
+      - "traefik.frontend.rule=PathPrefixStrip: /couchstore"
+    volumes:
+      - "./app/couchdb/:/opt/couchdb/data/"
 
   history:
     image: brewblox/brewblox-history:develop
@@ -21,40 +29,30 @@ services:
 
   sparksimulator:
     image: brewblox/firmware-simulator:develop
-    # volumes:
-    #   - "./mocks/app/eeprom.bin:/target/brewblox-gcc/eeprom.bin"
-    ports:
-        - "8332"
 
   sparkey:
-    image: brewblox/brewblox-devcon-spark:develop
+    image: brewblox/brewblox-devcon-spark:feature-couchdb
     depends_on:
       - eventbus
+      - couchstore
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /sparkey"
-    volumes:
-      - "./mocks/app/:/app/"
     command: >
       --name=sparkey
       --device-host=sparksimulator
-      --database=sparkey_db.json
-      --config=sparkey_config.json
 
   spock:
-    image: brewblox/brewblox-devcon-spark:develop
+    image: brewblox/brewblox-devcon-spark:feature-couchdb
     depends_on:
       - eventbus
+      - couchstore
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /spock"
-    volumes:
-      - "./mocks/app/:/app/"
     command: >
       --name=spock
       --simulation
-      --database=spock_db.json
-      --config=spock_config.json
 
   datastore:
     image: brewblox/brewblox-datastore:develop
@@ -62,13 +60,15 @@ services:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /datastore"
     volumes:
-      - "./mocks/config/datastore.json:/app/datastore.json"
+      - "./app/presets/ui_objects.json:/app/ui_objects.json"
     command: >
-      --file datastore.json
+      --file ui_objects.json
       --volatile
 
   ui:
     image: brewblox/brewblox-ui:develop
+    depends_on:
+      - datastore
     volumes:
       - "./devdist:/usr/share/nginx/html"
     labels:

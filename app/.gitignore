@@ -1,0 +1,4 @@
+influxdb/*
+!influxdb/.gitkeep
+couchdb/*
+!couchdb/.gitkeep

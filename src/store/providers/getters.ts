@@ -30,9 +30,6 @@ export const initializerById = (store: RootStore, id: string): ServiceFunc =>
 export const fetcherById = (store: RootStore, id: string): ServiceFunc =>
   providerById(store, id).fetcher || (async () => { });
 
-export const updaterById = (store: RootStore, id: string): ServiceFunc =>
-  providerById(store, id).updater || (async () => { });
-
 export const wizardById = (store: RootStore, id: string) =>
   providerById(store, id).wizard;
 

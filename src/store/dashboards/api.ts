@@ -1,33 +1,49 @@
-import { del, get, post, put } from '@/helpers/fetch';
-
+import { createDatabase, fromDocument, toDocument } from '@/helpers/database';
 import { Dashboard, DashboardItem } from './state';
 
-export const fetchDashboards = (): Promise<Dashboard[]> =>
-  get('/datastore/dashboards');
+const dashboardDB = createDatabase('dashboards');
+const itemDB = createDatabase('dashboard-items');
+
+export const fetchDashboards = async (): Promise<Dashboard[]> =>
+  dashboardDB.allDocs({ include_docs: true })
+    .then(resp =>
+      resp.rows
+        .map(row => fromDocument(row.doc) as Dashboard));
 
 export const fetchDashboardById = (id: string): Promise<Dashboard> =>
-  get(`/datastore/dashboards/${encodeURIComponent(id)}`);
+  dashboardDB.get(id)
+    .then(fromDocument);
 
-export const createDashboard = (newData: Dashboard): Promise<boolean> =>
-  post('/datastore/dashboards', newData);
+export const createDashboard = (dashboard: Dashboard): Promise<Dashboard> =>
+  dashboardDB.put(toDocument(dashboard))
+    .then(resp => ({ ...dashboard, _rev: resp.rev }));
 
 export const persistDashboard = (dashboard: Dashboard): Promise<Dashboard> =>
-  put(`/datastore/dashboards/${encodeURIComponent(dashboard.id)}`, dashboard);
+  dashboardDB.put(toDocument(dashboard))
+    .then(resp => ({ ...dashboard, _rev: resp.rev }));
 
 export const deleteDashboard = (dashboard: Dashboard): Promise<Dashboard> =>
-  del(`/datastore/dashboards/${encodeURIComponent(dashboard.id)}`, dashboard);
+  dashboardDB.remove(toDocument(dashboard))
+    .then(resp => dashboard);
 
 export const fetchDashboardItems = (): Promise<DashboardItem[]> =>
-  get('/datastore/dashboard-items');
+  itemDB.allDocs({ include_docs: true })
+    .then(resp =>
+      resp.rows
+        .map(row => fromDocument(row.doc) as DashboardItem));
 
 export const fetchDashboardItemById = (id: string): Promise<DashboardItem> =>
-  get(`/datastore/dashboard-items/${encodeURIComponent(id)}`);
+  itemDB.get(id)
+    .then(fromDocument);
 
-export const persistDashboardItem = (item: DashboardItem): Promise<DashboardItem> =>
-  put(`/datastore/dashboard-items/${encodeURIComponent(item.id)}`, item);
+export const persistDashboardItem = (item: DashboardItem) =>
+  itemDB.put(toDocument(item))
+    .then(resp => ({ ...item, _rev: resp.rev }));
 
 export const createDashboardItem = (item: DashboardItem): Promise<DashboardItem> =>
-  post('/datastore/dashboard-items', item);
+  itemDB.put(toDocument(item))
+    .then(resp => ({ ...item, _rev: resp.rev }));
 
-export const deleteDashboardItem = (item: DashboardItem): Promise<DashboardItem> =>
-  del(`/datastore/dashboard-items/${encodeURIComponent(item.id)}`, item);
+export const deleteDashboardItem = (item: DashboardItem) =>
+  itemDB.remove(toDocument(item))
+    .then(resp => item);
