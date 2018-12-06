@@ -168,7 +168,7 @@ export default class SparkWidget extends Vue {
               :actions="[{ label: 'Retry', handler: createUpdateSource }]"
             >Unable to update automatically</q-alert>
             <q-field class="col" label="Device ID">
-              <big style="word-wrap: break-word;">{{ sysInfo.data.deviceId | base64ToHex }}</big>
+              <big style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</big>
             </q-field>
             <q-field class="col" label="Active Profiles">
               <ProfilesPopupEdit
