@@ -8,7 +8,6 @@ export interface Provider {
   features: string[];
   initializer: (store: RootStore, service: Service) => Promise<any>;
   fetcher?: (store: RootStore, service: Service) => Promise<any>;
-  updater?: (store: RootStore, service: Service) => Promise<any>;
   wizard?: string;
   page?: string;
 }

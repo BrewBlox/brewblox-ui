@@ -1,0 +1,24 @@
+{
+  "docs": [
+    {
+      "_id": "dashboard-home",
+      "title": "Home Dashboard",
+      "order": 1
+    },
+    {
+      "_id": "metrics",
+      "title": "Metrics Dashboard",
+      "order": 2
+    },
+    {
+      "_id": "process-view",
+      "title": "ProcessView Dashboard",
+      "order": 3
+    },
+    {
+      "_id": "derp",
+      "title": "Derp Dashboard",
+      "order": 4
+    }
+  ]
+}
