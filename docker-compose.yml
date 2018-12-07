@@ -31,7 +31,7 @@ services:
     image: brewblox/firmware-simulator:develop
 
   sparkey:
-    image: brewblox/brewblox-devcon-spark:feature-couchdb
+    image: brewblox/brewblox-devcon-spark:develop
     depends_on:
       - eventbus
       - datastore
@@ -43,7 +43,7 @@ services:
       --device-host=sparksimulator
 
   spock:
-    image: brewblox/brewblox-devcon-spark:feature-couchdb
+    image: brewblox/brewblox-devcon-spark:develop
     depends_on:
       - eventbus
       - datastore
