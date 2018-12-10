@@ -288,6 +288,9 @@ export default class DefaultLayout extends Vue {
 
 .editable {
   border-bottom: 1px solid gray;
+  /* white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; */
 }
 
 .unimportant {
@@ -310,4 +313,17 @@ export default class DefaultLayout extends Vue {
   bottom: 0;
   position: absolute;
 }
+
+.q-field {
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.restricted {
+  max-width: 100%;
+}
+
+/* .q-carousel .q-carousel-slide .q-card .q-card-title .q-field .title-bar {
+  max-width: 100%;
+} */
 </style>

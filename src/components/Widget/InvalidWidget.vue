@@ -13,7 +13,7 @@ export default class InvalidWidget extends WidgetBase { }
 </script>
 
 <template>
-  <q-card dark class="full-height column">
+  <q-card dark class="column">
     <q-card-title class="title-bar">
       <InputPopupEdit
         class="ellipsis"

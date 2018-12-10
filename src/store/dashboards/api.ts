@@ -1,4 +1,4 @@
-import { createDatabase, fromDocument, toDocument } from '@/helpers/database';
+import { createDatabase, fromDocument, toDocument, toNewDocument } from '@/helpers/database';
 import { Dashboard, DashboardItem } from './state';
 
 const dashboardDB = createDatabase('dashboards');
@@ -15,7 +15,7 @@ export const fetchDashboardById = async (id: string): Promise<Dashboard> =>
     .then(fromDocument);
 
 export const createDashboard = async (dashboard: Dashboard): Promise<Dashboard> =>
-  dashboardDB.put(toDocument(dashboard))
+  dashboardDB.put(toNewDocument(dashboard))
     .then(resp => ({ ...dashboard, _rev: resp.rev }));
 
 export const persistDashboard = async (dashboard: Dashboard): Promise<Dashboard> =>
@@ -41,7 +41,7 @@ export const persistDashboardItem = async (item: DashboardItem): Promise<Dashboa
     .then(resp => ({ ...item, _rev: resp.rev }));
 
 export const createDashboardItem = async (item: DashboardItem): Promise<DashboardItem> =>
-  itemDB.put(toDocument(item))
+  itemDB.put(toNewDocument(item))
     .then(resp => ({ ...item, _rev: resp.rev }));
 
 export const deleteDashboardItem = async (item: DashboardItem): Promise<DashboardItem> =>

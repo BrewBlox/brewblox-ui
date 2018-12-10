@@ -3,7 +3,8 @@ import merge from 'lodash/merge';
 import { Layout, PlotData } from 'plotly.js';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import PlotlyGraph from './PlotlyGraph';
+
+Vue.component('PlotlyGraph', () => import('./PlotlyGraph'));
 
 @Component({
   props: {
@@ -15,9 +16,6 @@ import PlotlyGraph from './PlotlyGraph';
       type: Object,
       required: true,
     },
-  },
-  components: {
-    PlotlyGraph,
   },
 })
 export default class GraphDisplay extends Vue {
