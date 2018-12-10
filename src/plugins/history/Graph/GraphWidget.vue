@@ -28,7 +28,7 @@ export default class GraphWidget extends WidgetBase {
     <q-modal v-model="modalOpen">
       <GraphForm v-if="modalOpen" :field="graphCfg" :change="saveConfig"/>
     </q-modal>
-    <q-card dark class="full-height column">
+    <q-card dark class="column">
       <q-card-title class="title-bar">
         <InputPopupEdit
           :field="widgetId"

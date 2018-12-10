@@ -38,8 +38,7 @@ export const actions: ActionTree<DashboardState, RootState> = {
       title,
       order: Object.keys(context.state.dashboards).length + 1,
     };
-    setDashboardInStore(context, dashboard);
-    createDashboardInApi(dashboard);
+    setDashboardInStore(context, await createDashboardInApi(dashboard));
   },
 
   saveDashboard: async (context: DashboardContext, dashboard: Dashboard) =>
