@@ -6,6 +6,7 @@ export interface Dashboard {
   title: string;
   order: number;
   primary?: boolean;
+  _rev?: string;
 }
 
 export interface DashboardItem {
@@ -16,6 +17,7 @@ export interface DashboardItem {
   dashboard: string;
   feature: string;
   config: any;
+  _rev?: string;
 }
 
 export type DashboardState = {

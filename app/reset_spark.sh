@@ -8,5 +8,6 @@ cat $1 | curl \
   -X POST \
   --header 'Content-Type: application/json' \
   --header 'Accept: application/json' \
-  --data "@-" "${VUE_APP_API_URI}/$2/reset_objects" \
-  > /dev/null
+  --data "@-" "${VUE_APP_API_URI}/$2/reset_objects"
+
+echo "Done"
