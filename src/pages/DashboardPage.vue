@@ -246,10 +246,10 @@ export default class DashboardPage extends Vue {
 
 <template>
   <q-page padding>
-    <q-inner-loading>
+    <q-inner-loading v-if="!dashboard">
       <q-spinner size="50px" color="primary"/>
     </q-inner-loading>
-    <template>
+    <template v-else>
       <portal to="toolbar-title">
         <div :class="widgetEditable ? 'editable': ''">
           <span>{{ dashboard.title }}</span>

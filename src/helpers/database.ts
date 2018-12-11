@@ -10,6 +10,11 @@ export const toDocument = (doc) => {
   return { ...obj, _id: id };
 };
 
+export const toNewDocument = (doc) => {
+  const { _rev, ...obj } = doc;
+  return toDocument(obj);
+};
+
 export const fromDocument = (doc) => {
   const { _id, ...obj } = doc;
   return { ...obj, id: _id };

@@ -25,6 +25,10 @@ export default ({ store }: PluginArguments) => {
   Vue.filter('hexToBase64', hexToBase64);
   Vue.filter('base64ToHex', base64ToHex);
   Vue.filter('duration', durationString);
+  Vue.filter('truncated', (value: string) => {
+    const strVal = value.toString();
+    return strVal.length <= 30 ? strVal : `${strVal.slice(0, 27)}...`;
+  });
 
   Object
     .values(features)

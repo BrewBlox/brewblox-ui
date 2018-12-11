@@ -77,7 +77,7 @@ export default class SelectPopupEdit extends Vue {
 
 <template>
   <div>
-    <component :is="$props.display" class="editable">{{ displayValue }}</component>
+    <component :is="$props.display" class="editable">{{ displayValue | truncated }}</component>
     <q-popup-edit
       buttons
       persistent

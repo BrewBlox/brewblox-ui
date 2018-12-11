@@ -60,7 +60,7 @@ export default class InputPopupEdit extends Vue {
       :disabled="$props.disable"
       :is="$props.display"
       class="editable"
-    >{{ displayValue | round }}</component>
+    >{{ displayValue | round | truncated }}</component>
     <q-popup-edit
       buttons
       persistent
