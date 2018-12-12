@@ -3,14 +3,11 @@
     {
       "_id": "item-process-view",
       "order": 1,
-      "cols": 3,
-      "rows": 3,
+      "cols": 8,
+      "rows": 8,
       "feature": "ProcessView",
       "dashboard": "process-view",
       "config": {
-        "name": "Simple flow setup",
-        "width": 5,
-        "height": 5,
         "parts": [
           {
             "x": 0,
