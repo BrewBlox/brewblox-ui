@@ -133,102 +133,98 @@ function flow(
 ): ProcessViewPartWithComponent[] {
   const candidateParts = [...candidates.filter(candidate => !isSamePart(part, candidate))];
 
-  return possibleOutputs(part, angleIn).reduce(
-    (parts, output) => {
-      const angle = output.out;
-      const totalFriction = accFriction + (output.friction || 0);
+  return possibleOutputs(part, angleIn)
+    .reduce(
+      (parts, output) => {
+        const angle = output.out;
+        const totalFriction = accFriction + (output.friction || 0);
 
-      if (typeof output.pressure === 'number') {
-        if (output.pressure < startPressure) {
-          const pathFlow = (startPressure - output.pressure) / totalFriction;
+        if (typeof output.pressure === 'number') {
+          if (output.pressure < startPressure) {
+            const pathFlow = (startPressure - output.pressure) / totalFriction;
+            return addFlowToPart(
+              part,
+              {
+                [angle]: pathFlow,
+                [angleIn]: pathFlow * -1,
+              },
+              parts,
+            );
+          }
+          return parts;
+        }
+
+        const nextPart = partAtAngle(part, candidateParts, angle);
+
+        if (!nextPart) {
+          // no flow possible
           return addFlowToPart(
             part,
             {
-              [angle]: pathFlow,
-              [angleIn]: pathFlow * -1,
+              [angle]: 0,
+              [angleIn]: 0,
             },
             parts,
           );
         }
 
-        return parts;
-      }
+        const notUpdatedNextPart = partAtAngle(part, parts, angle);
 
-      const nextPart = partAtAngle(part, candidateParts, angle);
+        const nextFlows = flow(
+          nextPart,
+          parts,
+          rotated(angle, 180),
+          totalFriction,
+          startPressure,
+          candidateParts,
+        );
 
-      if (!nextPart) {
-        // no flow possible
+        const updatedNextPart = partAtAngle(part, nextFlows, angle);
+
+        let additionalAngleFlow = 0;
+        if (updatedNextPart && updatedNextPart.flow) {
+          additionalAngleFlow += updatedNextPart.flow[rotated(angle, 180)];
+        }
+        if (notUpdatedNextPart && notUpdatedNextPart.flow) {
+          additionalAngleFlow -= notUpdatedNextPart.flow[rotated(angle, 180)];
+        }
+
         return addFlowToPart(
           part,
           {
-            [angle]: 0,
-            [angleIn]: 0,
+            [angle]: additionalAngleFlow * -1,
+            [angleIn]: additionalAngleFlow,
           },
-          parts,
+          nextFlows,
         );
-      }
-
-      const notUpdatedNextPart = partAtAngle(part, parts, angle);
-
-      const nextFlows = flow(
-        nextPart,
-        parts,
-        rotated(angle, 180),
-        totalFriction,
-        startPressure,
-        candidateParts,
-      );
-
-      const updatedNextPart = partAtAngle(part, nextFlows, angle);
-
-      let additionalAngleFlow = 0;
-      if (updatedNextPart && updatedNextPart.flow) {
-        additionalAngleFlow += updatedNextPart.flow[rotated(angle, 180)];
-      }
-      if (notUpdatedNextPart && notUpdatedNextPart.flow) {
-        additionalAngleFlow -= notUpdatedNextPart.flow[rotated(angle, 180)];
-      }
-
-      return addFlowToPart(
-        part,
-        {
-          [angle]: additionalAngleFlow * -1,
-          [angleIn]: additionalAngleFlow,
-        },
-        nextFlows,
-      );
-    },
-    allParts,
-  );
+      },
+      allParts,
+    );
 }
 
-export function pathsFromSources(parts: ProcessViewPartWithComponent[]):
-  ProcessViewPartWithComponent[] {
+export function pathsFromSources(
+  parts: ProcessViewPartWithComponent[],
+): ProcessViewPartWithComponent[] {
   const sources = getSources(parts);
   const flowsFromSources = sources.map(source => flow(source, parts));
-  return flatten(flowsFromSources).map((part) => {
-    if (!part.flow) {
-      return part;
-    }
-
-    // rotate flow to match Vue component (anti-rotate)
-    return {
-      ...part,
-      flow: Object.keys(part.flow)
-        .map(angle => parseInt(angle, 10))
-        .reduce(
-          (acc, angle) => {
-            if (!part.flow) {
-              return acc;
-            }
-
-            return {
-              ...acc,
-              [rotated(angle, 360 - (part.rotate || 0))]: part.flow[angle],
-            };
-          },
-          {},
-        ),
-    };
-  });
+  return flatten(flowsFromSources)
+    .map((part) => {
+      if (!part.flow) {
+        return part;
+      }
+      // rotate flow to match Vue component (anti-rotate)
+      return {
+        ...part,
+        flow: Object.keys(part.flow)
+          .map(angle => parseInt(angle, 10))
+          .reduce(
+            (acc, angle) => {
+              return part.flow
+                ? { ...acc, [rotated(angle, 360 - (part.rotate || 0))]: part.flow[angle] }
+                : acc;
+            },
+            {},
+          ),
+      };
+    });
 }
