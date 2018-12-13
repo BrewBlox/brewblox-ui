@@ -24,7 +24,7 @@ interface ContextAction {
   },
 })
 export default class ProcessViewWidget extends WidgetBase {
-  editable: boolean = false;
+  editable: boolean = true;
   frame: number = 0;
   animationFrame: number = 0;
   stateParts: ProcessViewPart[] = [];
@@ -141,7 +141,7 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   panHandler(part: ProcessViewPart, args: PanArguments) {
-    if (!this.editable) {
+    if (!this.editable || this.contextAction) {
       return;
     }
 
@@ -177,11 +177,17 @@ export default class ProcessViewWidget extends WidgetBase {
       part,
       style: {
         position: 'fixed',
-        top: `${args.position.top}px`,
+        top: `${args.position.top - (0.5 * SQUARE_SIZE)}px`,
         left: `${args.position.left + (0.5 * SQUARE_SIZE)}px`,
         zIndex: 5,
       },
     };
+    window.addEventListener('mouseup', this.finishAction);
+  }
+
+  finishAction() {
+    this.contextAction = null;
+    window.removeEventListener('mouseup', this.finishAction);
   }
 
   removePart(part: ProcessViewPart) {
@@ -253,10 +259,27 @@ export default class ProcessViewWidget extends WidgetBase {
     <q-card-separator/>
     <ProcessViewItem v-if="dragAction" :part="dragAction.part" :style="dragAction.style"/>
     <div v-if="contextAction" class="column" :style="contextAction.style">
-      <q-btn round color="primary" icon="close" @click="contextAction = null"/>
-      <q-btn round color="primary" icon="rotate_right" @click="rotatePart(contextAction.part, 90)"/>
-      <q-btn round color="primary" icon="rotate_left" @click="rotatePart(contextAction.part, -90)"/>
-      <q-btn round color="primary" icon="delete" @click="removePart(contextAction.part)"/>
+      <q-btn
+        fab
+        round
+        color="primary"
+        icon="rotate_right"
+        @mouseup.native="rotatePart(contextAction.part, 90)"
+      />
+      <q-btn
+        fab
+        round
+        color="primary"
+        icon="rotate_left"
+        @mouseup.native="rotatePart(contextAction.part, -90)"
+      />
+      <q-btn
+        fab
+        round
+        color="primary"
+        icon="delete"
+        @mouseup.native="removePart(contextAction.part)"
+      />
     </div>
     <div :class="gridClasses" ref="grid">
       <div
