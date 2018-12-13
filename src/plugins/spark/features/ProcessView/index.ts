@@ -1,6 +1,6 @@
 import { ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features/state';
-import widget from './ProcessView.vue';
+import widget from './ProcessViewWidget.vue';
 
 const feature: Feature = {
   id: 'ProcessView',

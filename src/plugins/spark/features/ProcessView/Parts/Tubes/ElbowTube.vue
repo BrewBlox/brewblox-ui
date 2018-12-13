@@ -1,54 +1,8 @@
-<template>
-  <SVGRoot>
-    <g class="outline">
-      <path d="M21,0v20c0,5,4,9,9,9h20"/>
-      <path d="M29,0v18c0,1.7,1.3,3,3,3h18"/>
-    </g>
-    <g
-      class="liquid"
-      v-if="liquid"
-      stroke="#4aa0ef"
-    >
-      <path d="M25,0V20a5,5,0,0,0,5,5H50"/>
-    </g>
-    <g
-      v-if="flowing"
-      class="outline"
-    >
-      <FlowArrow
-        :rotate="arrow(frame).rotate"
-        :x="arrow(frame).x"
-        :y="arrow(frame).y"
-      />
-
-      <FlowArrow
-        :rotate="arrow(frame - 1).rotate"
-        :x="arrow(frame - 1).x"
-        :y="arrow(frame - 1).y"
-      />
-
-      <FlowArrow
-        :rotate="arrow(frame - 0.5).rotate"
-        :x="arrow(frame - 0.5).x"
-        :y="arrow(frame - 0.5).y"
-      />
-
-      <FlowArrow
-        :rotate="arrow(frame + 0.5).rotate"
-        :x="arrow(frame + 0.5).x"
-        :y="arrow(frame + 0.5).y"
-      />
-    </g>
-  </SVGRoot>
-</template>
-
 <script lang="ts">
 import Component from 'vue-class-component';
-
-import SVGRoot from '../SVGRoot.vue';
-import Part from '../Part';
-
 import FlowArrow from '../Flows/FlowArrow.vue';
+import Part from '../Part';
+import SVGRoot from '../SVGRoot.vue';
 
 @Component({
   components: {
@@ -56,7 +10,7 @@ import FlowArrow from '../Flows/FlowArrow.vue';
     FlowArrow,
   },
 })
-class ElbowTube extends Part {
+export default class ElbowTube extends Part {
   static flows() {
     return {
       0: [{ out: 90, friction: 1 }],
@@ -87,9 +41,37 @@ class ElbowTube extends Part {
     };
   }
 }
-
-export default ElbowTube;
 </script>
+
+<template>
+  <SVGRoot>
+    <g class="outline">
+      <path d="M21,0v20c0,5,4,9,9,9h20"/>
+      <path d="M29,0v18c0,1.7,1.3,3,3,3h18"/>
+    </g>
+    <g class="liquid" v-if="liquid" stroke="#4aa0ef">
+      <path d="M25,0V20a5,5,0,0,0,5,5H50"/>
+    </g>
+    <g v-if="flowing" class="outline">
+      <FlowArrow :rotate="arrow(frame).rotate" :x="arrow(frame).x" :y="arrow(frame).y"/>
+
+      <FlowArrow :rotate="arrow(frame - 1).rotate" :x="arrow(frame - 1).x" :y="arrow(frame - 1).y"/>
+
+      <FlowArrow
+        :rotate="arrow(frame - 0.5).rotate"
+        :x="arrow(frame - 0.5).x"
+        :y="arrow(frame - 0.5).y"
+      />
+
+      <FlowArrow
+        :rotate="arrow(frame + 0.5).rotate"
+        :x="arrow(frame + 0.5).x"
+        :y="arrow(frame + 0.5).y"
+      />
+    </g>
+  </SVGRoot>
+</template>
+
 
 <style scoped>
 </style>

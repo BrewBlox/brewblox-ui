@@ -46,7 +46,6 @@ export default class Part extends Vue {
     if (!this.flow[angle]) {
       return 0;
     }
-
     return this.flow[angle];
   }
 

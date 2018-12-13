@@ -37,3 +37,27 @@ type ProcessViewPartWithComponent = {
   flow?: ProcessViewPartCalculatedFlow;
   visited?: boolean;
 } & ProcessViewPart;
+
+interface ProcessViewConfig {
+  parts: ProcessViewPart[];
+}
+
+interface PanArguments {
+  evt: MouseEvent | TouchEvent;
+  position: {
+    top: number;
+    left: number;
+  };
+  direction: 'left' | 'right' | 'up' | 'down';
+  duration: number;
+  distance: {
+    x: number;
+    y: number;
+  };
+  delta: {
+    x: number;
+    y: number;
+  };
+  isFirst: boolean;
+  isFinal: boolean;
+}
