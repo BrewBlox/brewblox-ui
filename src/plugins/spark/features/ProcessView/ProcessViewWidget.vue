@@ -24,7 +24,7 @@ interface ContextAction {
   },
 })
 export default class ProcessViewWidget extends WidgetBase {
-  editable: boolean = true;
+  editable: boolean = false;
   frame: number = 0;
   animationFrame: number = 0;
   stateParts: ProcessViewPart[] = [];
