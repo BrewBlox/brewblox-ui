@@ -6,7 +6,14 @@ import { isSamePart, pathsFromSources } from './calculateFlows';
 import { allParts, componentByType } from './Parts/componentByType';
 import ProcessViewItem from './ProcessViewItem.vue';
 
+const SQUARE_SIZE = 50;
+
 interface DragAction {
+  part: ProcessViewPart;
+  style: any;
+}
+
+interface ContextAction {
   part: ProcessViewPart;
   style: any;
 }
@@ -17,35 +24,12 @@ interface DragAction {
   },
 })
 export default class ProcessViewWidget extends WidgetBase {
-  debug: boolean = true;
-  gridSquareSize: number = 50;
+  editable: boolean = false;
   frame: number = 0;
   animationFrame: number = 0;
   stateParts: ProcessViewPart[] = [];
   dragAction: DragAction | null = null;
-
-  get gridRect() {
-    const { x, y, left, right, top, bottom } = (this.$refs.grid as any).getBoundingClientRect();
-    return { x, y, left, right, top, bottom };
-  }
-
-  gridContains(x: number, y: number) {
-    const { left, right, top, bottom } = this.gridRect;
-    return x >= left
-      && x <= right
-      && y >= top
-      && y <= bottom;
-  }
-
-  gridSquare(x: number, y: number) {
-    if (!this.gridContains(x, y)) {
-      return null;
-    }
-    return {
-      x: Math.floor((x - this.gridRect.x) / this.gridSquareSize),
-      y: Math.floor((y - this.gridRect.y) / this.gridSquareSize),
-    };
-  }
+  contextAction: ContextAction | null = null;
 
   get widgetConfig(): ProcessViewConfig {
     return this.$props.config;
@@ -53,6 +37,11 @@ export default class ProcessViewWidget extends WidgetBase {
 
   saveConfig(config: ProcessViewConfig = this.widgetConfig) {
     this.$props.onConfigChange(this.widgetId, { ...config });
+  }
+
+  get gridRect() {
+    const { x, y, left, right, top, bottom } = (this.$refs.grid as any).getBoundingClientRect();
+    return { x, y, left, right, top, bottom };
   }
 
   get availableParts(): ProcessViewPart[] {
@@ -74,30 +63,43 @@ export default class ProcessViewWidget extends WidgetBase {
     ];
   }
 
-  get partsWithComponent(): ProcessViewPartWithComponent[] {
-    return this.parts.map((part: ProcessViewPart) => ({
-      ...part,
-      component: componentByType(part.type),
-    }));
+  get partsWithFlow(): ProcessViewPartWithComponent[] {
+    const partsWithComponent = this.parts
+      .map((part: ProcessViewPart) => ({
+        ...part,
+        component: componentByType(part.type),
+      }));
+    return pathsFromSources(partsWithComponent);
   }
 
-  get partsWithFlows(): ProcessViewPartWithComponent[] {
-    return pathsFromSources(this.partsWithComponent);
-  }
-
-  get gridStyle(): any {
-    return {
-      width: '100%',
-      height: '100%',
-      gridTemplateColumns: `repeat(autofill, ${this.gridSquareSize}px)`,
-      gridTemplateRows: `repeat(autofill, ${this.gridSquareSize}px)`,
-    };
+  get gridClasses() {
+    return this.editable
+      ? ['grid-base', 'grid-editable']
+      : ['grid-base'];
   }
 
   get partSizeStyle() {
     return {
-      width: `${this.gridSquareSize}px`,
-      height: `${this.gridSquareSize}px`,
+      width: `${SQUARE_SIZE}px`,
+      height: `${SQUARE_SIZE}px`,
+    };
+  }
+
+  gridContains(x: number, y: number) {
+    const { left, right, top, bottom } = this.gridRect;
+    return x >= left
+      && x <= right
+      && y >= top
+      && y <= bottom;
+  }
+
+  findGridSquare(x: number, y: number) {
+    if (!this.gridContains(x, y)) {
+      return null;
+    }
+    return {
+      x: Math.floor((x - this.gridRect.x) / SQUARE_SIZE),
+      y: Math.floor((y - this.gridRect.y) / SQUARE_SIZE),
     };
   }
 
@@ -110,7 +112,7 @@ export default class ProcessViewWidget extends WidgetBase {
 
   tickAnimation() {
     this.animationFrame = window.requestAnimationFrame((timestamp) => {
-      if (!this.debug) {
+      if (!this.editable) {
         this.frame = (timestamp % 2000) / 2000;
       }
       this.tickAnimation();
@@ -118,6 +120,9 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   toggleClosed(part: ProcessViewPartWithComponent, closed: boolean) {
+    if (this.editable) {
+      return;
+    }
     if (this.stateParts.some(item => isSamePart(part, item))) {
       this.stateParts = this.stateParts.map(item =>
         isSamePart(part, item) ? { ...item, closed } : item);
@@ -136,6 +141,10 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   panHandler(part: ProcessViewPart, args: PanArguments) {
+    if (!this.editable) {
+      return;
+    }
+
     if (args.isFirst) {
       this.dragAction = {
         part,
@@ -146,19 +155,33 @@ export default class ProcessViewWidget extends WidgetBase {
     (this.dragAction as DragAction).style = {
       ...this.partSizeStyle,
       position: 'fixed',
-      top: `${args.position.top - (0.5 * this.gridSquareSize)}px`,
-      left: `${args.position.left - (0.5 * this.gridSquareSize)}px`,
+      top: `${args.position.top - (0.5 * SQUARE_SIZE)}px`,
+      left: `${args.position.left - (0.5 * SQUARE_SIZE)}px`,
     };
 
     if (args.isFinal) {
-      const gridPos = this.gridSquare(args.position.left, args.position.top);
+      const gridPos = this.findGridSquare(args.position.left, args.position.top);
       if (gridPos) {
         this.movePart(part, { ...part, ...gridPos });
-      } else {
-        this.removePart(part);
       }
       this.dragAction = null;
     }
+  }
+
+  holdHandler(part: ProcessViewPart, args: HoldArguments) {
+    if (!this.editable) {
+      return;
+    }
+
+    this.contextAction = {
+      part,
+      style: {
+        position: 'fixed',
+        top: `${args.position.top}px`,
+        left: `${args.position.left + (0.5 * SQUARE_SIZE)}px`,
+        zIndex: 5,
+      },
+    };
   }
 
   removePart(part: ProcessViewPart) {
@@ -176,13 +199,13 @@ export default class ProcessViewWidget extends WidgetBase {
     }
   }
 
-  beingDragged(part: ProcessViewPart) {
-    return this.dragAction && isSamePart(part, this.dragAction.part);
+  rotatePart(part: ProcessViewPart, rotation: number) {
+    part.rotate += rotation;
+    this.saveConfig();
   }
 
-  rotatePart(part: ProcessViewPart) {
-    part.rotate += 90;
-    this.saveConfig();
+  beingDragged(part: ProcessViewPart) {
+    return this.dragAction && isSamePart(part, this.dragAction.part);
   }
 
   mounted() {
@@ -205,21 +228,18 @@ export default class ProcessViewWidget extends WidgetBase {
         :change="v => widgetId = v"
       />
       <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
-      <q-btn flat round dense slot="right" icon="tune">
+      <!-- <q-btn flat round dense slot="right" icon="tune">
         <q-popover>
           <q-list>
-            <q-item>
-              <q-checkbox label="Debug" v-model="debug"/>
-            </q-item>
-            <q-item v-if="debug">
+            <q-item v-if="editable">
               Frame:
               <input step="0.01" type="range" min="0" max="1" v-model.number="frame">
               <div>{{frame}}</div>
             </q-item>
           </q-list>
         </q-popover>
-      </q-btn>
-      <q-btn flat round dense slot="right" icon="extension">
+      </q-btn>-->
+      <q-btn v-if="editable" flat round dense slot="right" icon="extension">
         <q-popover>
           <q-list link style="padding: 5px">
             <q-item v-for="part in availableParts" :key="part.type" :style="partSizeStyle">
@@ -228,20 +248,27 @@ export default class ProcessViewWidget extends WidgetBase {
           </q-list>
         </q-popover>
       </q-btn>
+      <q-toggle slot="right" v-model="editable"/>
     </q-card-title>
     <q-card-separator/>
     <ProcessViewItem v-if="dragAction" :part="dragAction.part" :style="dragAction.style"/>
-    <div class="grid-base" :style="gridStyle" ref="grid">
+    <div v-if="contextAction" class="column" :style="contextAction.style">
+      <q-btn round color="primary" icon="close" @click="contextAction = null"/>
+      <q-btn round color="primary" icon="rotate_right" @click="rotatePart(contextAction.part, 90)"/>
+      <q-btn round color="primary" icon="rotate_left" @click="rotatePart(contextAction.part, -90)"/>
+      <q-btn round color="primary" icon="delete" @click="removePart(contextAction.part)"/>
+    </div>
+    <div :class="gridClasses" ref="grid">
       <div
         class="grid-item"
-        v-for="(part, idx) in partsWithFlows"
+        v-for="(part, idx) in partsWithFlow"
         v-show="!beingDragged(part)"
         :key="`${part.x}_${part.y}`"
         :style="partStyle(part)"
         v-touch-pan="v => panHandler(parts[idx], v)"
-        @dblclick="rotatePart(parts[idx])"
+        v-touch-hold="v => holdHandler(parts[idx], v)"
       >
-        <span v-if="debug" class="grid-item-coordinates">{{ part.x }},{{ part.y }}</span>
+        <div v-if="editable" class="grid-item-coordinates">{{ part.x }},{{ part.y }}</div>
         <ProcessViewItem :part="part" :frame="frame" v-on:toggle-closed="toggleClosed"/>
       </div>
     </div>
@@ -252,9 +279,19 @@ export default class ProcessViewWidget extends WidgetBase {
 @import '../../../../../src/css/app.styl';
 
 .grid-base {
+  width: 100%;
+  height: 100%;
   display: grid;
+  background-size: 50px 50px, 50px 50px;
+  background-position: 0 -1px, -1px 0;
+  border-top: 1px solid $dark_bright;
   grid-auto-columns: 50px;
   grid-auto-rows: 50px;
+  grid-template-columns: repeat(autofill, 50px);
+  grid-template-rows: repeat(autofill, 50px);
+}
+
+.grid-editable {
   background-image: linear-gradient(
     $dark_bright 1px,
     transparent 1px
@@ -263,9 +300,6 @@ export default class ProcessViewWidget extends WidgetBase {
     $dark_bright 1px,
     transparent 1px
   );
-  background-size: 50px 50px, 50px 50px;
-  background-position: 0 -1px, -1px 0;
-  border-top: 1px solid $dark_bright;
 }
 
 .grid-item {
@@ -279,5 +313,9 @@ export default class ProcessViewWidget extends WidgetBase {
   top: 2px;
   left: 2px;
   z-index: 2;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 </style>

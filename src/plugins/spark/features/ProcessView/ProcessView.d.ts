@@ -61,3 +61,12 @@ interface PanArguments {
   isFirst: boolean;
   isFinal: boolean;
 }
+
+interface HoldArguments {
+  evt: MouseEvent | TouchEvent;
+  position: {
+    top: number;
+    left: number;
+  };
+  duration: number;
+}

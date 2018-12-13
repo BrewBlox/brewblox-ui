@@ -51,6 +51,7 @@ import Quasar, {
   QToolbarTitle,
   QTooltip,
   Ripple,
+  TouchHold,
   TouchPan,
 } from 'quasar';
 import Vue from 'vue';
@@ -114,6 +115,6 @@ Vue.use(Quasar, {
     QToolbarTitle,
     QTooltip,
   },
-  directives: { Ripple, CloseOverlay, TouchPan },
+  directives: { Ripple, CloseOverlay, TouchHold, TouchPan },
   plugins: { Notify, Dialog },
 });
