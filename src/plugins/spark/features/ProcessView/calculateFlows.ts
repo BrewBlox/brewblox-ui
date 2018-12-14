@@ -1,8 +1,9 @@
 import flatten from 'lodash/flatten';
+import { Part, AngledFlows, DisplayPart, CalculatedFlow, Flow } from './state';
 
 const rotated = (rotation: number) => rotation % 360;
 
-const rotatedFlows = (flows: ProcessViewPartFlows, rotation: number = 0): ProcessViewPartFlows =>
+const rotatedFlows = (flows: AngledFlows, rotation: number = 0): AngledFlows =>
   Object.keys(flows)
     .reduce(
       (acc, angle) => ({
@@ -14,14 +15,14 @@ const rotatedFlows = (flows: ProcessViewPartFlows, rotation: number = 0): Proces
       {},
     );
 
-const getSources = (parts: ProcessViewPartWithComponent[]) => parts.filter(part => part.component.isSource);
+const getSources = (parts: DisplayPart[]) => parts.filter(part => part.component.isSource);
 
-const liquidIn = (part: ProcessViewPartWithComponent, provided: number): number =>
+const liquidIn = (part: DisplayPart, provided: number): number =>
   (part.component.isSource
     ? parseInt(Object.keys(part.component.flows(part))[0], 10)
     : provided);
 
-const xyAtAngle = (part: ProcessViewPartWithComponent, angle: number): { x: number, y: number } => {
+const xyAtAngle = (part: DisplayPart, angle: number): { x: number, y: number } => {
   if (angle === 90) {
     return {
       x: part.x + 1,
@@ -50,32 +51,32 @@ const xyAtAngle = (part: ProcessViewPartWithComponent, angle: number): { x: numb
 };
 
 const partAtAngle = (
-  origin: ProcessViewPartWithComponent,
-  allParts: ProcessViewPartWithComponent[],
+  origin: DisplayPart,
+  allParts: DisplayPart[],
   angle: number,
-): ProcessViewPartWithComponent | undefined => {
+): DisplayPart | undefined => {
   const { x, y } = xyAtAngle(origin, angle);
   return allParts
     .filter(part => part.x === x && part.y === y)
-    .find((part: ProcessViewPartWithComponent) => {
+    .find((part: DisplayPart) => {
       const flows = rotatedFlows(part.component.flows(part), part.rotate);
       return !!flows[rotated(angle + (part.component.isSource ? 0 : 180))];
     });
 };
 
 export const isSamePart = (
-  left: ProcessViewPartWithComponent | ProcessViewPart,
-  right: ProcessViewPartWithComponent | ProcessViewPart,
+  left: DisplayPart | Part,
+  right: DisplayPart | Part,
 ) => (left.x === right.x
   && left.y === right.y
   && left.type === right.type
   && left.rotate === right.rotate);
 
 const addFlowToPart = (
-  part: ProcessViewPartWithComponent,
-  flowToAdd: ProcessViewPartCalculatedFlow,
-  allParts: ProcessViewPartWithComponent[],
-): ProcessViewPartWithComponent[] =>
+  part: DisplayPart,
+  flowToAdd: CalculatedFlow,
+  allParts: DisplayPart[],
+): DisplayPart[] =>
   allParts
     .map((item) => {
       if (!isSamePart(part, item)) {
@@ -103,22 +104,22 @@ const addFlowToPart = (
     });
 
 const possibleOutputs = (
-  part: ProcessViewPartWithComponent,
+  part: DisplayPart,
   angleIn: number,
-): ProcessViewPartFlow[] => {
+): Flow[] => {
   const flowFrom = liquidIn(part, angleIn);
   const flows = rotatedFlows(part.component.flows(part), part.rotate);
   return flows[flowFrom] || [];
 };
 
 const flow = (
-  part: ProcessViewPartWithComponent,
-  allParts: ProcessViewPartWithComponent[],
+  part: DisplayPart,
+  allParts: DisplayPart[],
   angleIn: number = 0,
   accFriction: number = 0,
   startPressure: number = 10,
-  candidates: ProcessViewPartWithComponent[] = allParts,
-): ProcessViewPartWithComponent[] => {
+  candidates: DisplayPart[] = allParts,
+): DisplayPart[] => {
   const candidateParts = [...candidates.filter(candidate => !isSamePart(part, candidate))];
 
   return possibleOutputs(part, angleIn)
@@ -191,12 +192,12 @@ const flow = (
 };
 
 const mergeSourceFlows = (
-  acc: ProcessViewPartWithComponent[],
-  sourceFlow: ProcessViewPartWithComponent[],
-): ProcessViewPartWithComponent[] =>
+  acc: DisplayPart[],
+  sourceFlow: DisplayPart[],
+): DisplayPart[] =>
   flatten([acc, sourceFlow]);
 
-const angledFlow = (part: ProcessViewPartWithComponent): ProcessViewPartCalculatedFlow =>
+const angledFlow = (part: DisplayPart): CalculatedFlow =>
   Object.keys(part.flow || {})
     .map(angle => parseInt(angle, 10))
     .reduce(
@@ -209,7 +210,7 @@ const angledFlow = (part: ProcessViewPartWithComponent): ProcessViewPartCalculat
       {},
     );
 
-export const pathsFromSources = (parts: ProcessViewPartWithComponent[]): ProcessViewPartWithComponent[] =>
+export const pathsFromSources = (parts: DisplayPart[]): DisplayPart[] =>
   getSources(parts)
     .map(source => flow(source, parts)) // Part[][]
     .reduce(mergeSourceFlows, []) // Part[]

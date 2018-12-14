@@ -1,7 +1,7 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import FlowArrow from '../Flows/FlowArrow.vue';
-import Part from '../Part';
+import PartComponent from '../PartComponent';
 import SVGRoot from '../SVGRoot.vue';
 
 @Component({
@@ -10,7 +10,7 @@ import SVGRoot from '../SVGRoot.vue';
     FlowArrow,
   },
 })
-export default class ElbowTube extends Part {
+export default class ElbowTube extends PartComponent {
   static flows() {
     return {
       0: [{ out: 90, friction: 1 }],

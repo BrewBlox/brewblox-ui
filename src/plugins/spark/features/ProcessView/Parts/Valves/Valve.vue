@@ -1,8 +1,9 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import FlowArrow from '../Flows/FlowArrow.vue';
-import Part from '../Part';
+import PartComponent from '../PartComponent';
 import SVGRoot from '../SVGRoot.vue';
+import { DisplayPart } from '../../state';
 
 @Component({
   components: {
@@ -10,8 +11,8 @@ import SVGRoot from '../SVGRoot.vue';
     FlowArrow,
   },
 })
-export default class Valve extends Part {
-  static flows(part: ProcessViewPartWithComponent) {
+export default class Valve extends PartComponent {
+  static flows(part: DisplayPart) {
     if (part.closed) {
       return {};
     }
