@@ -6,37 +6,39 @@ type ProcessViewPartType =
   'TUBE_ELBOW' |
   'VALVE';
 
-type ProcessViewPart = {
+interface ProcessViewPart {
   type: ProcessViewPartType;
   x: number;
   y: number;
   rotate: number;
   closed?: boolean;
-};
+}
 
-type ProcessViewPartFlow = {
+interface ProcessViewPartFlow {
   out: number,
   friction?: number,
   pressure?: number,
-};
+}
 
-type ProcessViewPartFlows = {
+interface ProcessViewPartFlows {
   [angleIn: number]: ProcessViewPartFlow[];
-};
+}
 
-type ProcessViewComponent = {
+interface ProcessViewComponent extends ProcessViewPart {
   isSource?: boolean;
   isSink?: boolean;
   flows: (part: ProcessViewPartWithComponent) => ProcessViewPartFlows;
-};
+}
 
-type ProcessViewPartCalculatedFlow = { [angle: number]: number };
+interface ProcessViewPartCalculatedFlow {
+  [angle: number]: number;
+}
 
-type ProcessViewPartWithComponent = {
+interface ProcessViewPartWithComponent extends ProcessViewPart {
   component: ProcessViewComponent;
   flow?: ProcessViewPartCalculatedFlow;
   visited?: boolean;
-} & ProcessViewPart;
+}
 
 interface ProcessViewConfig {
   parts: ProcessViewPart[];

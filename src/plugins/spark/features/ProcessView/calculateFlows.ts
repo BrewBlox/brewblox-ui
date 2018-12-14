@@ -1,38 +1,27 @@
 import flatten from 'lodash/flatten';
 
-export function rotated(original: number = 0, rotation: number = 0) {
-  return (original + rotation) % 360;
-}
+const rotated = (rotation: number) => rotation % 360;
 
-export function rotatedFlows(
-  flows: ProcessViewPartFlows,
-  rotation: number = 0,
-): ProcessViewPartFlows {
-  return Object.keys(flows)
+const rotatedFlows = (flows: ProcessViewPartFlows, rotation: number = 0): ProcessViewPartFlows =>
+  Object.keys(flows)
     .reduce(
       (acc, angle) => ({
         ...acc,
-        [rotated(parseInt(angle, 10), rotation)]:
+        [rotated(parseInt(angle, 10) + rotation)]:
           flows[parseInt(angle, 10)].map(flowAngle =>
-            ({ ...flowAngle, out: rotated(flowAngle.out, rotation) })),
+            ({ ...flowAngle, out: rotated(flowAngle.out + rotation) })),
       }),
       {},
     );
-}
 
-function getSources(parts: ProcessViewPartWithComponent[]) {
-  return parts.filter(part => part.component.isSource);
-}
+const getSources = (parts: ProcessViewPartWithComponent[]) => parts.filter(part => part.component.isSource);
 
-function liquidIn(part: ProcessViewPartWithComponent, provided: number): number {
-  if (part.component.isSource) {
-    return parseInt(Object.keys(part.component.flows(part))[0], 10);
-  }
+const liquidIn = (part: ProcessViewPartWithComponent, provided: number): number =>
+  (part.component.isSource
+    ? parseInt(Object.keys(part.component.flows(part))[0], 10)
+    : provided);
 
-  return provided;
-}
-
-function xyAtAngle(part: ProcessViewPartWithComponent, angle: number): { x: number, y: number } {
+const xyAtAngle = (part: ProcessViewPartWithComponent, angle: number): { x: number, y: number } => {
   if (angle === 90) {
     return {
       x: part.x + 1,
@@ -58,79 +47,78 @@ function xyAtAngle(part: ProcessViewPartWithComponent, angle: number): { x: numb
     x: part.x,
     y: part.y - 1,
   };
-}
+};
 
-function partAtAngle(
+const partAtAngle = (
   origin: ProcessViewPartWithComponent,
   allParts: ProcessViewPartWithComponent[],
   angle: number,
-): ProcessViewPartWithComponent | undefined {
+): ProcessViewPartWithComponent | undefined => {
   const { x, y } = xyAtAngle(origin, angle);
-  const partsOnPosition = allParts.filter(part => part.x === x && part.y === y);
-  return partsOnPosition.find((part: ProcessViewPartWithComponent) => {
-    const flows = rotatedFlows(part.component.flows(part), part.rotate);
-    return !!flows[rotated(angle, part.component.isSource ? 0 : 180)];
-  });
-}
+  return allParts
+    .filter(part => part.x === x && part.y === y)
+    .find((part: ProcessViewPartWithComponent) => {
+      const flows = rotatedFlows(part.component.flows(part), part.rotate);
+      return !!flows[rotated(angle + (part.component.isSource ? 0 : 180))];
+    });
+};
 
-export function isSamePart(
-  original: ProcessViewPartWithComponent | ProcessViewPart,
-  compare: ProcessViewPartWithComponent | ProcessViewPart,
-) {
-  return original.x === compare.x &&
-    original.y === compare.y &&
-    original.type === compare.type &&
-    original.rotate === compare.rotate;
-}
+export const isSamePart = (
+  left: ProcessViewPartWithComponent | ProcessViewPart,
+  right: ProcessViewPartWithComponent | ProcessViewPart,
+) => (left.x === right.x
+  && left.y === right.y
+  && left.type === right.type
+  && left.rotate === right.rotate);
 
-function addFlowToPart(
+const addFlowToPart = (
   part: ProcessViewPartWithComponent,
   flowToAdd: ProcessViewPartCalculatedFlow,
   allParts: ProcessViewPartWithComponent[],
-): ProcessViewPartWithComponent[] {
-  return allParts.map((item) => {
-    if (isSamePart(part, item)) {
+): ProcessViewPartWithComponent[] =>
+  allParts
+    .map((item) => {
+      if (!isSamePart(part, item)) {
+        return item;
+      }
+
       return {
         ...part,
         flow: {
           ...part.flow,
           ...item.flow,
-          ...Object.keys(flowToAdd).reduce(
-            (acc, key) => {
-              const angle = parseInt(key, 10);
-
-              return {
-                ...acc,
-                [angle]: flowToAdd[angle] + (item.flow && item.flow[angle] ? item.flow[angle] : 0),
-              };
-            },
-            {},
-          ),
+          ...Object.keys(flowToAdd)
+            .reduce(
+              (acc, key) => {
+                const angle = parseInt(key, 10);
+                return {
+                  ...acc,
+                  [angle]: flowToAdd[angle] + (item.flow && item.flow[angle] ? item.flow[angle] : 0),
+                };
+              },
+              {},
+            ),
         },
       };
-    }
+    });
 
-    return item;
-  });
-}
-
-function possibleOutputs(
+const possibleOutputs = (
   part: ProcessViewPartWithComponent,
   angleIn: number,
-): ProcessViewPartFlow[] {
+): ProcessViewPartFlow[] => {
   const flowFrom = liquidIn(part, angleIn);
   const flows = rotatedFlows(part.component.flows(part), part.rotate);
   return flows[flowFrom] || [];
-}
+};
 
-function flow(
+const flow = (
   part: ProcessViewPartWithComponent,
   allParts: ProcessViewPartWithComponent[],
   angleIn: number = 0,
   accFriction: number = 0,
   startPressure: number = 10,
   candidates: ProcessViewPartWithComponent[] = allParts,
-): ProcessViewPartWithComponent[] {
+): ProcessViewPartWithComponent[] => {
   const candidateParts = [...candidates.filter(candidate => !isSamePart(part, candidate))];
 
   return possibleOutputs(part, angleIn)
@@ -173,7 +161,7 @@ function flow(
         const nextFlows = flow(
           nextPart,
           parts,
-          rotated(angle, 180),
+          rotated(angle + 180),
           totalFriction,
           startPressure,
           candidateParts,
@@ -183,10 +171,10 @@ function flow(
 
         let additionalAngleFlow = 0;
         if (updatedNextPart && updatedNextPart.flow) {
-          additionalAngleFlow += updatedNextPart.flow[rotated(angle, 180)];
+          additionalAngleFlow += updatedNextPart.flow[rotated(angle + 180)];
         }
         if (notUpdatedNextPart && notUpdatedNextPart.flow) {
-          additionalAngleFlow -= notUpdatedNextPart.flow[rotated(angle, 180)];
+          additionalAngleFlow -= notUpdatedNextPart.flow[rotated(angle + 180)];
         }
 
         return addFlowToPart(
@@ -200,29 +188,29 @@ function flow(
       },
       allParts,
     );
-}
+};
 
-export function pathsFromSources(parts: ProcessViewPartWithComponent[]): ProcessViewPartWithComponent[] {
-  const sources = getSources(parts);
-  const flowsFromSources = sources.map(source => flow(source, parts));
-  return flatten(flowsFromSources)
-    .map((part) => {
-      if (!part.flow) {
-        return part;
-      }
-      // rotate flow to match Vue component (anti-rotate)
-      return {
-        ...part,
-        flow: Object.keys(part.flow)
-          .map(angle => parseInt(angle, 10))
-          .reduce(
-            (acc, angle) => (
-              part.flow
-                ? { ...acc, [rotated(angle, 360 - (part.rotate || 0))]: part.flow[angle] }
-                : acc
-            ),
-            {},
-          ),
-      };
-    });
-}
+const mergeSourceFlows = (
+  acc: ProcessViewPartWithComponent[],
+  sourceFlow: ProcessViewPartWithComponent[],
+): ProcessViewPartWithComponent[] =>
+  flatten([acc, sourceFlow]);
+
+const angledFlow = (part: ProcessViewPartWithComponent): ProcessViewPartCalculatedFlow =>
+  Object.keys(part.flow || {})
+    .map(angle => parseInt(angle, 10))
+    .reduce(
+      (acc, angle) => (
+        // rotate flow to match Vue component (anti-rotate)
+        part.flow
+          ? { ...acc, [rotated(angle + (360 - (part.rotate || 0)))]: part.flow[angle] }
+          : acc
+      ),
+      {},
+    );
+
+export const pathsFromSources = (parts: ProcessViewPartWithComponent[]): ProcessViewPartWithComponent[] =>
+  getSources(parts)
+    .map(source => flow(source, parts)) // Part[][]
+    .reduce(mergeSourceFlows, []) // Part[]
+    .map(part => (part.flow ? { ...part, flow: angledFlow(part) } : part));
