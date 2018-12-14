@@ -125,7 +125,7 @@ export default class ProcessViewWidget extends WidgetBase {
     }
     if (this.stateParts.some(item => isSamePart(part, item))) {
       this.stateParts = this.stateParts.map(item =>
-        isSamePart(part, item) ? { ...item, closed } : item);
+        (isSamePart(part, item) ? { ...item, closed } : item));
     } else {
       this.stateParts = [
         ...this.stateParts,

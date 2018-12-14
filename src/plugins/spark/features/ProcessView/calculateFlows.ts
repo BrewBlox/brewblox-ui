@@ -202,9 +202,7 @@ function flow(
     );
 }
 
-export function pathsFromSources(
-  parts: ProcessViewPartWithComponent[],
-): ProcessViewPartWithComponent[] {
+export function pathsFromSources(parts: ProcessViewPartWithComponent[]): ProcessViewPartWithComponent[] {
   const sources = getSources(parts);
   const flowsFromSources = sources.map(source => flow(source, parts));
   return flatten(flowsFromSources)
@@ -218,11 +216,11 @@ export function pathsFromSources(
         flow: Object.keys(part.flow)
           .map(angle => parseInt(angle, 10))
           .reduce(
-            (acc, angle) => {
-              return part.flow
+            (acc, angle) => (
+              part.flow
                 ? { ...acc, [rotated(angle, 360 - (part.rotate || 0))]: part.flow[angle] }
-                : acc;
-            },
+                : acc
+            ),
             {},
           ),
       };

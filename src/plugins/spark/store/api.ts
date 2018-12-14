@@ -83,9 +83,8 @@ export const fetchUpdateSource = async (
     onClose();
   };
   source.onmessage = (event: MessageEvent) =>
-    onData(
-      deserialize(JSON.parse(event.data))
-        .map(((block: DataBlock) => asBlock(block, serviceId))));
+    onData(deserialize(JSON.parse(event.data))
+      .map(((block: DataBlock) => asBlock(block, serviceId))));
 
   return source;
 };

@@ -2,8 +2,24 @@
   "vetur.format.defaultFormatter.html": "prettyhtml",
   "vetur.format.defaultFormatter.js": "vscode-typescript",
   "vetur.format.defaultFormatter.ts": "vscode-typescript",
-  "tslint.autoFixOnSave": true,
-  "tslint.run": "onType",
-  "tslint.jsEnable": true,
-  "tslint.ignoreDefinitionFiles": false,
+  "eslint.autoFixOnSave": true,
+  "eslint.run": "onType",
+  "eslint.validate": [
+    {
+      "language": "vue",
+      "autoFix": true
+    },
+    {
+      "language": "html",
+      "autoFix": true
+    },
+    {
+      "language": "javascript",
+      "autoFix": true
+    },
+    {
+      "language": "typescript",
+      "autoFix": true
+    }
+  ]
 }

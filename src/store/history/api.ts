@@ -9,7 +9,7 @@ const snakeCasedObj = (obj: any) =>
     .reduce((acc: any, key: string) => ({ ...acc, [snakeCased(key)]: obj[key] }), {});
 
 const formatTime = (val?: string | number): string | undefined =>
-  (isNaN(val as number)
+  (Number.isNaN(Number(val))
     ? val as string
     : new Date(Number(val)).toUTCString());
 

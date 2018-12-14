@@ -18,9 +18,7 @@
     "devbuild": "npm run build && mkdir -p ./app/dist && rm -r ./app/dist/*; cp -r ./dist/* ./app/dist/",
     "test": "jest",
     "e2e": "npm run compose:new && vue-cli-service test:e2e --mode development",
-    "tslint": "tslint -c tslint.json 'src/**/*.ts'",
-    "eslint": "eslint src --ext .js",
-    "lint": "npm run tslint",
+    "lint": "eslint \"src/**/*.{js,ts,vue}\"",
     "e2e:open": "vue-cli-service e2e:open"
   },
   "engines": {
@@ -75,6 +73,8 @@
     "ts-jest": "^23.10.4",
     "tslint-config-airbnb": "^5.11.1",
     "tsutils": "^3.5.0",
+    "typescript-eslint-parser": "^21.0.2",
+    "vue-eslint-parser": "^4.0.3",
     "vue-template-compiler": "^2.5.17"
   },
   "browserslist": [
