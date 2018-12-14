@@ -1,16 +1,26 @@
 {
   "root": true,
+  "parser": "vue-eslint-parser",
   "parserOptions": {
     "ecmaVersion": 2018,
-    "sourceType": "module"
+    "sourceType": "module",
+    "parser": "typescript-eslint-parser"
   },
+  "extends": [
+    "plugin:vue/essential",
+    "@vue/airbnb",
+    "@vue/typescript"
+  ],
   "rules": {
+    "class-methods-use-this": 0,
     "import/first": 0,
     "import/extensions": 0,
     "import/no-unresolved": 0,
     "import/no-extraneous-dependencies": 0,
     "import/prefer-default-export": 0,
     "import/newline-after-import": 0,
+    "object-curly-newline": 0,
+    "no-param-reassign": 0,
     "no-debugger": 2,
     "max-len": [
       1,

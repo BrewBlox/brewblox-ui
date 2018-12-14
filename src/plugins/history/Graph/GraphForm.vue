@@ -55,7 +55,7 @@ export default class GraphForm extends FormBase {
   }
 
   findShownPeriod(): PeriodDisplay {
-    const params = this.config.params;
+    const { params } = this.config;
     const keys = ['start', 'duration', 'end'];
     const matching = this.periodOptions
       .filter(opt => keys.every(k => opt.value[k] === !!params[k]));

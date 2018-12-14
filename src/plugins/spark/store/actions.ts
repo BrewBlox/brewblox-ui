@@ -88,8 +88,7 @@ export const renameBlock = async (
   await fetchBlocks(store, serviceId);
   allDashboardItems(store)
     .filter(item => item.config.serviceId === serviceId && item.config.blockId === currentId)
-    .forEach(
-      item => setDashboardItem(store, { ...item, config: { ...item.config, blockId: newId } }));
+    .forEach(item => setDashboardItem(store, { ...item, config: { ...item.config, blockId: newId } }));
 };
 
 export const clearBlocks = async (store: RootStore, service: Service) => {

@@ -44,7 +44,7 @@ const updateEvents = [
 const isBrowser = typeof window !== 'undefined';
 const hasReactAPIMethod = !!Plotly.react;
 
-const isNumber = n => !isNaN(parseFloat(n)) && isFinite(n);
+const isNumber = n => !Number.isNaN(parseFloat(n)) && Number.isFinite(n);
 
 const eventReducer = (acc, event) =>
   ({

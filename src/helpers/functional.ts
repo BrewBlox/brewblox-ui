@@ -59,21 +59,7 @@ export const camelCased = (input: string) =>
     .replace(/[ -_](.)/, (_, v1) => v1.toUpperCase());
 
 export const hexToBase64 = (hex: string) =>
-  btoa(
-    String
-      .fromCharCode
-      .apply(
-        null,
-        hex
-          .replace(/\r|\n/g, '')
-          .replace(/([\da-fA-F]{2}) ?/g, '0x$1 ')
-          .replace(/ +$/, '')
-          .split(' ')),
-  );
+  Buffer.from(hex, 'hex').toString('base64');
 
 export const base64ToHex = (b64: string) =>
-  atob(b64.replace(/[ \r\n]+$/, ''))
-    .split('')
-    .map(s => s.charCodeAt(0).toString(16))
-    .map(s => (s.length === 1 ? `0${s}` : s))
-    .join('');
+  Buffer.from(b64, 'base64').toString('hex');
