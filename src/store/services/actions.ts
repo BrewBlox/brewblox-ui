@@ -1,11 +1,12 @@
 import { createAccessors } from '@/helpers/static-store';
 import { ActionTree } from 'vuex';
-import { RootState } from '../state';
+import { RootState, RootStore } from '../state';
 import {
   createService as createServiceInApi,
   deleteService as removeServiceInApi,
   fetchServices as fetchServicesInApi,
   updateService as updateServiceInApi,
+  setup as setupInApi,
 } from './api';
 import { serviceById as getServiceInStore } from './getters';
 import {
@@ -56,3 +57,22 @@ export const createService = dispatch(actions.createService);
 export const saveService = dispatch(actions.saveService);
 export const removeService = dispatch(actions.removeService);
 export const updateServiceOrder = dispatch(actions.updateServiceOrder);
+
+export const setupApi = (store: RootStore) => {
+  /* eslint-disable no-underscore-dangle */
+  const onChange = (service: Service) => {
+    const existing = getServiceInStore(store, service.id);
+    if (!existing || existing._rev !== service._rev) {
+      setServicesInStore(store, service);
+    }
+  };
+  const onDelete = (id: string) => {
+    const existing = getServiceInStore(store, id);
+    if (existing) {
+      removeServiceInStore(store, existing);
+    }
+  };
+  /* eslint-enable no-underscore-dangle */
+
+  setupInApi(onChange, onDelete, (err) => { });
+};

@@ -1,7 +1,7 @@
 <script lang="ts">
-import { fetchAll as fetchDashboards } from '@/store/dashboards/actions';
+import { fetchAll as fetchDashboards, setupApi as setupDashboardApi } from '@/store/dashboards/actions';
 import { fetcherById, initializerById } from '@/store/providers/getters';
-import { fetchServices } from '@/store/services/actions';
+import { fetchServices, setupApi as setupServicesApi } from '@/store/services/actions';
 import { serviceValues } from '@/store/services/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
@@ -13,6 +13,9 @@ export default class App extends Vue {
       fetchServices(this.$store),
       fetchDashboards(this.$store),
     ]);
+
+    setupDashboardApi(this.$store);
+    setupServicesApi(this.$store);
 
     // Initialize each service
     const initPromises = serviceValues(this.$store)
