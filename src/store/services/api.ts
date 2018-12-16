@@ -32,7 +32,7 @@ export const createService = async (service: Service): Promise<Service> =>
   serviceDB.put(toNewDocument(service))
     .then(resp => ({ ...service, _rev: resp.rev }));
 
-export const updateService = async (service: Service): Promise<Service> =>
+export const persistService = async (service: Service): Promise<Service> =>
   serviceDB.put(toDocument(service))
     .then(resp => ({ ...service, _rev: resp.rev }));
 

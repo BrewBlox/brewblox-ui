@@ -11,8 +11,8 @@ import {
   fetchDashboards as fetchDashboardsInApi,
   persistDashboard as persistDashboardInApi,
   persistDashboardItem as persistDashboardItemInApi,
-  setupDashboardItems,
-  setupDashboards,
+  setupDashboards as setupDashboardsInApi,
+  setupDashboardItems as setupDashboardItemsInApi,
 } from './api';
 import {
   allDashboards as getAllDashboards,
@@ -119,11 +119,6 @@ export const actions: ActionTree<DashboardState, RootState> = {
     removeDashboardItemInApi(item).catch(() => { });
     removeDashboardItemInStore(context, item);
   },
-
-  fetchAll: async (context: DashboardContext) => {
-    setAllDashboardsInStore(context, await fetchDashboardsInApi());
-    setAllDashboardItemsInStore(context, await fetchDashboardItemsInApi());
-  },
 };
 
 export const createDashboard = dispatch(actions.createDashboard);
@@ -140,9 +135,7 @@ export const updateDashboardItemSize = dispatch(actions.updateDashboardItemSize)
 export const updateDashboardItemConfig = dispatch(actions.updateDashboardItemConfig);
 export const removeDashboardItem = dispatch(actions.removeDashboardItem);
 
-export const fetchAll = dispatch(actions.fetchAll);
-
-export const setupApi = (store: RootStore) => {
+export const setupApi = async (store: RootStore, onError: (err) => void) => {
   /* eslint-disable no-underscore-dangle */
   const onDashboardChange = (dashboard: Dashboard) => {
     const existing = getDashboardInStore(store, dashboard.id);
@@ -170,6 +163,9 @@ export const setupApi = (store: RootStore) => {
   };
   /* eslint-enable no-underscore-dangle */
 
-  setupDashboards(onDashboardChange, onDashboardDelete, (err) => { });
-  setupDashboardItems(onItemChange, onItemDelete, (err) => { });
+  setAllDashboardsInStore(store, await fetchDashboardsInApi());
+  setAllDashboardItemsInStore(store, await fetchDashboardItemsInApi());
+
+  setupDashboardsInApi(onDashboardChange, onDashboardDelete, onError);
+  setupDashboardItemsInApi(onItemChange, onItemDelete, onError);
 };

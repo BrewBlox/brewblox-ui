@@ -1,33 +1,35 @@
 <script lang="ts">
-import { fetchAll as fetchDashboards, setupApi as setupDashboardApi } from '@/store/dashboards/actions';
-import { fetcherById, initializerById } from '@/store/providers/getters';
-import { fetchServices, setupApi as setupServicesApi } from '@/store/services/actions';
-import { serviceValues } from '@/store/services/getters';
+import { setupApi as setupDashboardsApi } from '@/store/dashboards/actions';
+import { setupApi as setupServicesApi } from '@/store/services/actions';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { Notify } from 'quasar';
 
 @Component
 export default class App extends Vue {
+  showingError: boolean = false;
+
+  notifyError() {
+    if (this.showingError) {
+      return;
+    }
+    this.showingError = true;
+    Notify.create({
+      message: 'Remote datastore unreachable, please refresh page to retry',
+      timeout: 0,
+      type: 'negative',
+      actions: [
+        { label: 'Dismiss' },
+      ],
+      onDismiss: () => { this.showingError = false; },
+    });
+  }
+
   async created() {
     await Promise.all([
-      fetchServices(this.$store),
-      fetchDashboards(this.$store),
+      setupServicesApi(this.$store, this.notifyError),
+      setupDashboardsApi(this.$store, this.notifyError),
     ]);
-
-    setupDashboardApi(this.$store);
-    setupServicesApi(this.$store);
-
-    // Initialize each service
-    const initPromises = serviceValues(this.$store)
-      .map(service =>
-        initializerById(this.$store, service.type)(this.$store, service));
-    await Promise.all(initPromises);
-
-    // Allow each service to fetch
-    const fetchPromises = serviceValues(this.$store)
-      .map(service =>
-        fetcherById(this.$store, service.type)(this.$store, service));
-    await Promise.all(fetchPromises);
   }
 }
 </script>

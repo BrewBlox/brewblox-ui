@@ -1,12 +1,10 @@
 <script lang="ts">
 import {
   displayNameById,
-  fetcherById,
-  initializerById,
   providerIds,
   wizardById,
 } from '@/store/providers/getters';
-import { createService } from '@/store/services/actions';
+import { createService, initService } from '@/store/services/actions';
 import { serviceIds } from '@/store/services/getters';
 import { Service } from '@/store/services/state';
 import { Notify } from 'quasar';
@@ -80,15 +78,14 @@ export default class NewServiceWizard extends Vue {
       type: 'Unknown',
       ...partial,
     };
-    createService(this.$store, service);
+    await createService(this.$store, service);
+    await initService(this.$store, service);
     this.reset();
     Notify.create({
       type: 'positive',
       position: 'center',
       message: `Added ${displayNameById(this.$store, service.type)} "${service.title}"`,
     });
-    await initializerById(this.$store, service.type)(this.$store, service);
-    await fetcherById(this.$store, service.type)(this.$store, service);
   }
 
   onCancel(message: string) {
@@ -142,7 +139,7 @@ export default class NewServiceWizard extends Vue {
         <q-item>
           <q-search v-model="searchModel" placeholder="Search"/>
         </q-item>
-        <q-list link="" inset-separator>
+        <q-list link inset-separator>
           <q-item
             icon="widgets"
             v-for="opt in wizardOptions"
@@ -151,7 +148,7 @@ export default class NewServiceWizard extends Vue {
           >
             <div class="row">
               <q-item-main>
-                <q-item-tile label="">{{ opt.label }}</q-item-tile>
+                <q-item-tile label>{{ opt.label }}</q-item-tile>
               </q-item-main>
               <q-item-side right icon="chevron_right"/>
             </div>

@@ -12,7 +12,7 @@ export const addSync = (db: PouchDB.Database, onChange: (evt: ChangeEvent) => vo
 };
 
 export const addReplicate = (db: PouchDB.Database, onError: (err: PouchDB.Core.Error | null) => void) => {
-  db.sync(`${host}/datastore/${db.name}`, { live: true, retry: true }, onError);
+  db.sync(`${host}/datastore/${db.name}`, { live: true }, onError);
 };
 
 export const toDocument = (doc) => {
