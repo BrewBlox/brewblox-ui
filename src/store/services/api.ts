@@ -1,7 +1,22 @@
-import { createDatabase, fromDocument, toDocument, toNewDocument } from '@/helpers/database';
+import { addSync, addReplicate, createDatabase, fromDocument, toDocument, toNewDocument } from '@/helpers/database';
 import { Service } from './state';
 
 const serviceDB = createDatabase('services');
+
+export const setup = (
+  onChanged: (doc: any) => void,
+  onDeleted: (id: string) => void,
+  onError: (err: any) => void,
+) => {
+  addSync(serviceDB, (change) => {
+    if (change.deleted) {
+      onDeleted(change.id);
+    } else {
+      onChanged(fromDocument(change.doc));
+    }
+  });
+  addReplicate(serviceDB, (err) => { if (err !== null) onError(err); });
+};
 
 export const fetchServices = async (): Promise<Service[]> =>
   serviceDB.allDocs({ include_docs: true })
@@ -17,7 +32,7 @@ export const createService = async (service: Service): Promise<Service> =>
   serviceDB.put(toNewDocument(service))
     .then(resp => ({ ...service, _rev: resp.rev }));
 
-export const updateService = async (service: Service): Promise<Service> =>
+export const persistService = async (service: Service): Promise<Service> =>
   serviceDB.put(toDocument(service))
     .then(resp => ({ ...service, _rev: resp.rev }));
 

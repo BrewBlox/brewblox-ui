@@ -1,8 +1,36 @@
-import { createDatabase, fromDocument, toDocument, toNewDocument } from '@/helpers/database';
+import { createDatabase, addReplicate, addSync, fromDocument, toDocument, toNewDocument } from '@/helpers/database';
 import { Dashboard, DashboardItem } from './state';
 
 const dashboardDB = createDatabase('dashboards');
 const itemDB = createDatabase('dashboard-items');
+
+const setup = (
+  db: PouchDB.Database,
+  onChanged: (doc: any) => void,
+  onDeleted: (id: string) => void,
+  onError: (err: any) => void,
+) => {
+  addSync(db, (change) => {
+    if (change.deleted) {
+      onDeleted(change.id);
+    } else {
+      onChanged(fromDocument(change.doc));
+    }
+  });
+  addReplicate(db, (err) => { if (err !== null) onError(err); });
+};
+
+export const setupDashboards = (
+  onChanged: (doc: any) => void,
+  onDeleted: (id: string) => void,
+  onError: (err: any) => void,
+) => setup(dashboardDB, onChanged, onDeleted, onError);
+
+export const setupDashboardItems = (
+  onChanged: (doc: any) => void,
+  onDeleted: (id: string) => void,
+  onError: (err: any) => void,
+) => setup(itemDB, onChanged, onDeleted, onError);
 
 export const fetchDashboards = async (): Promise<Dashboard[]> =>
   dashboardDB.allDocs({ include_docs: true })
