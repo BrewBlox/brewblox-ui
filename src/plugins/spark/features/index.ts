@@ -4,6 +4,7 @@ import ActuatorOffset from './ActuatorOffset';
 import ActuatorPin from './ActuatorPin';
 import ActuatorPwm from './ActuatorPwm';
 import Balancer from './Balancer';
+import DisplaySettings from './DisplaySettings';
 import InactiveObject from './InactiveObject';
 import Mutex from './Mutex';
 import Pid from './Pid';
@@ -20,6 +21,7 @@ const features: { [id: string]: Feature } = {
   ActuatorPin,
   ActuatorPwm,
   Balancer,
+  DisplaySettings,
   InactiveObject,
   TempSensorOneWire,
   Pid,
