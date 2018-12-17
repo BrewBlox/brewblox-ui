@@ -74,6 +74,7 @@
     "tslint-config-airbnb": "^5.11.1",
     "tsutils": "^3.5.0",
     "typescript-eslint-parser": "^21.0.2",
+    "vue-cli-plugin-webpack-bundle-analyzer": "^1.2.0",
     "vue-eslint-parser": "^4.0.3",
     "vue-template-compiler": "^2.5.17"
   },
