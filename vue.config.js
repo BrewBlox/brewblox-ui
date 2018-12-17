@@ -1,14 +1,11 @@
 const { gitDescribeSync } = require('git-describe');
 
 module.exports = {
-  //
-  // Uncomment code below to analyze webpack size
-  //
-  // pluginOptions: {
-  //   webpackBundleAnalyzer: {
-  //     openAnalyzer: false,
-  //   },
-  // },
+  pluginOptions: {
+    webpackBundleAnalyzer: {
+      openAnalyzer: false,
+    },
+  },
   configureWebpack: (config) => {
     if (process.env.NODE_ENV === 'production') {
       // Function names are required to set up functions for VueX functionality
