@@ -18,7 +18,8 @@ export const serviceValues = read(getters.serviceValues);
 
 export function serviceById<T extends Service>(
   store: RootStore | ServicesContext,
-  id: string, type?: string,
+  id: string,
+  type?: string,
 ): T {
   const service = services(store)[id];
   if (!service) {
@@ -29,6 +30,9 @@ export function serviceById<T extends Service>(
   }
   return service as T;
 }
+
+export const tryServiceById = (store: RootStore | ServicesContext, id: string) =>
+  services(store)[id];
 
 export const serviceExists = (store: RootStore | ServicesContext, id: string) =>
   !!services(store)[id];
