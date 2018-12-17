@@ -97,13 +97,9 @@ export default class DisplaySettingsWidget extends BlockWidget {
   }
 
   updateSlotColor(idx: number, color: string) {
-    if (color.length !== 6) {
-      this.$q.notify('Color must be a 6 character hex string');
-      return;
-    }
     const pos = idx + 1;
     this.block.data.widgets = this.block.data.widgets
-      .map(w => (w.pos === pos ? { ...w, color } : w));
+      .map(w => (w.pos === pos ? { ...w, color: color.replace('#', '') } : w));
   }
 }
 </script>
@@ -154,14 +150,12 @@ export default class DisplaySettingsWidget extends BlockWidget {
               <big v-else>-</big>
             </q-field>
             <q-field class="col" label="Color">
-              <span v-if="slot" class="row col">
-                <InputPopupEdit
-                  label="Color"
-                  :field="slot.color"
-                  :change="callAndSaveBlock(v => updateSlotColor(idx, v))"
-                />
-                <big :style="slotColorStyle(slot)">[ ]</big>
-              </span>
+              <ColorPickerPopupEdit
+                v-if="slot"
+                label="Color"
+                :field="slot.color"
+                :change="callAndSaveBlock(v => updateSlotColor(idx, v))"
+              />
               <big v-else>-</big>
             </q-field>
           </q-card-main>

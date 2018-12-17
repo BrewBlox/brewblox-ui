@@ -1,0 +1,72 @@
+<script lang="ts">
+import Vue from 'vue';
+import Component from 'vue-class-component';
+
+@Component({
+  props: {
+    field: {
+      type: String,
+      required: false,
+    },
+    change: {
+      type: Function,
+      required: true,
+    },
+    label: {
+      type: String,
+      required: true,
+    },
+    display: {
+      type: String,
+      default: 'big',
+    },
+  },
+})
+export default class ColorPickerPopupEdit extends Vue {
+  placeholder = ''; // must not equal clear-value
+
+  get colorString() {
+    return this.$props.field || '<not set>';
+  }
+
+  get colorStyle() {
+    let color = this.$props.field || 'ffffff';
+    if (!color.startsWith('#')) {
+      color = `#${color}`;
+    }
+    return {
+      color,
+      backgroundColor: color,
+    };
+  }
+
+  startEdit() {
+    this.placeholder = this.$props.field;
+  }
+
+  endEdit() {
+    this.$props.change(this.placeholder);
+  }
+}
+</script>
+
+<template>
+  <div>
+    <component :is="$props.display" class="editable">{{ colorString }}</component>
+    <component :is="$props.display" :style="colorStyle">[ ]</component>
+    <q-popup-edit
+      buttons
+      persistent
+      :disable="$attrs.disabled"
+      :title="`Set ${this.$props.label} to:`"
+      v-model="placeholder"
+      @show="startEdit"
+      @save="endEdit"
+    >
+      <q-color-picker dark no-parent-field format-model="hex" v-model="placeholder"/>
+    </q-popup-edit>
+  </div>
+</template>
+
+<style scoped>
+</style>
