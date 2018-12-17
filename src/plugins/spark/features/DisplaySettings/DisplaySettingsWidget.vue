@@ -49,8 +49,14 @@ export default class DisplaySettingsWidget extends BlockWidget {
     return [...Array(6).keys()].map(k => `Slot ${k + 1}`);
   }
 
-  createSlot(idx, id) {
+  updateSlotLink(idx: number, id: string | null) {
     const pos = idx + 1;
+    if (!id) {
+      this.block.data.widgets = this.block.data.widgets
+        .filter(w => w.pos !== pos);
+      return;
+    }
+
     const block = blockById(this.$store, this.serviceId, id);
     const link = new Link(block.id, block.type);
     const existing = this.displaySlots[idx] || {};
@@ -134,10 +140,11 @@ export default class DisplaySettingsWidget extends BlockWidget {
           <q-card-main class="column col">
             <q-field class="col" label="Block">
               <SelectPopupEdit
+                clearable
                 label="Field"
                 :field="slotLink(slot).id"
                 :options="slotLinkOpts"
-                :change="callAndSaveBlock(v => createSlot(idx, v))"
+                :change="callAndSaveBlock(v => updateSlotLink(idx, v))"
               />
             </q-field>
             <q-field class="col" label="Name">

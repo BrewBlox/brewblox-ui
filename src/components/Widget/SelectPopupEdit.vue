@@ -34,12 +34,12 @@ import Component from 'vue-class-component';
   },
 })
 export default class SelectPopupEdit extends Vue {
-  plc = null;
+  plc = NaN;
 
   get placeholder() {
     // Ensures that value always changes during edit
     // Placeholder must not equal clear-value
-    if (this.plc === null) {
+    if (Number.isNaN(this.plc)) {
       return this.$props.multiple
         ? [undefined]
         : undefined;
