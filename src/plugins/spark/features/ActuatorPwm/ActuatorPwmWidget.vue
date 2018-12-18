@@ -30,7 +30,7 @@ export default class ActuatorPwmWidget extends BlockWidget {
     if (!this.block.data.constrainedBy) {
       return null;
     }
-    const unconstrained = this.block.data.constrainedBy.unconstrained;
+    const { unconstrained } = this.block.data.constrainedBy;
     if (this.block.data.setting === unconstrained) {
       return null;
     }

@@ -13,7 +13,9 @@ import Quasar, {
   QCarousel,
   QCarouselControl,
   QCarouselSlide,
+  QCheckbox,
   QCollapsible,
+  QColorPicker,
   QDatetime,
   QDatetimePicker,
   QField,
@@ -50,6 +52,8 @@ import Quasar, {
   QToolbarTitle,
   QTooltip,
   Ripple,
+  TouchHold,
+  TouchPan,
 } from 'quasar';
 import Vue from 'vue';
 
@@ -74,7 +78,9 @@ Vue.use(Quasar, {
     QCarousel,
     QCarouselControl,
     QCarouselSlide,
+    QCheckbox,
     QCollapsible,
+    QColorPicker,
     QDatetime,
     QDatetimePicker,
     QField,
@@ -111,6 +117,6 @@ Vue.use(Quasar, {
     QToolbarTitle,
     QTooltip,
   },
-  directives: { Ripple, CloseOverlay },
+  directives: { Ripple, CloseOverlay, TouchHold, TouchPan },
   plugins: { Notify, Dialog },
 });

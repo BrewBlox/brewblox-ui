@@ -13,9 +13,11 @@ curl -s -X PUT ${HOST}/_node/_local/_config/cors/headers -d '"accept, authorizat
 
 for db in "$@"; do
   echo ${db}
+  curl -s -X DELETE ${HOST}/${db}
   curl -s -X PUT ${HOST}/${db}
   cat ${MY_DIR}/presets/${db}.json \
   | curl \
+    -s \
     -X POST \
     --header 'Content-Type: application/json' \
     --header 'Accept: application/json' \

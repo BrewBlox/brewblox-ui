@@ -7,7 +7,6 @@ export interface Service {
   order: number;
   type: string;
   config: Object;
-  isLoading?: boolean;
   _rev?: string;
 }
 

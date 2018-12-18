@@ -24,28 +24,26 @@ export default class GraphWidget extends WidgetBase {
 </script>
 
 <template>
-  <div>
+  <q-card dark class="column">
     <q-modal v-model="modalOpen">
       <GraphForm v-if="modalOpen" :field="graphCfg" :change="saveConfig"/>
     </q-modal>
-    <q-card dark class="column">
-      <q-card-title class="title-bar">
-        <InputPopupEdit
-          :field="widgetId"
-          label="Widget ID"
-          display="span"
-          :change="v => widgetId = v"
-        />
-        <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
-        <q-btn flat round dense slot="right" @click="modalOpen = true" icon="settings"/>
-        <q-btn flat round dense slot="right" @click="regraph" icon="refresh"/>
-      </q-card-title>
-      <q-card-separator/>
-      <div>
-        <GraphCard ref="graph" :id="$props.id" :config="graphCfg"/>
-      </div>
-    </q-card>
-  </div>
+    <q-card-title class="title-bar">
+      <InputPopupEdit
+        :field="widgetId"
+        label="Widget ID"
+        display="span"
+        :change="v => widgetId = v"
+      />
+      <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
+      <q-btn flat round dense slot="right" @click="modalOpen = true" icon="settings"/>
+      <q-btn flat round dense slot="right" @click="regraph" icon="refresh"/>
+    </q-card-title>
+    <q-card-separator/>
+    <div>
+      <GraphCard ref="graph" :id="$props.id" :config="graphCfg"/>
+    </div>
+  </q-card>
 </template>
 
 <style scoped>

@@ -26,7 +26,7 @@ export default class BalancerWidget extends BlockWidget {
           [`clients/${idx}/granted`]: `${client.id.id} granted`,
         }),
         {},
-    );
+      );
   }
 }
 </script>

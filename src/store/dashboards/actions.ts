@@ -1,7 +1,7 @@
 import { createAccessors } from '@/helpers/static-store';
 import UrlSafeString from 'url-safe-string';
 import { ActionTree } from 'vuex';
-import { RootState } from '../state';
+import { RootState, RootStore } from '../state';
 import {
   createDashboard as createDashboardInApi,
   createDashboardItem as createDashboardItemInApi,
@@ -10,7 +10,9 @@ import {
   fetchDashboardItems as fetchDashboardItemsInApi,
   fetchDashboards as fetchDashboardsInApi,
   persistDashboard as persistDashboardInApi,
-  persistDashboardItem,
+  persistDashboardItem as persistDashboardItemInApi,
+  setupDashboards as setupDashboardsInApi,
+  setupDashboardItems as setupDashboardItemsInApi,
 } from './api';
 import {
   allDashboards as getAllDashboards,
@@ -70,7 +72,7 @@ export const actions: ActionTree<DashboardState, RootState> = {
     setDashboardItemInStore(context, await createDashboardItemInApi(item)),
 
   saveDashboardItem: async (context: DashboardContext, item: DashboardItem) =>
-    setDashboardItemInStore(context, await persistDashboardItem(item)),
+    setDashboardItemInStore(context, await persistDashboardItemInApi(item)),
 
   updateDashboardItemId: async (
     context: DashboardContext,
@@ -117,11 +119,6 @@ export const actions: ActionTree<DashboardState, RootState> = {
     removeDashboardItemInApi(item).catch(() => { });
     removeDashboardItemInStore(context, item);
   },
-
-  fetchAll: async (context: DashboardContext) => {
-    setAllDashboardsInStore(context, await fetchDashboardsInApi());
-    setAllDashboardItemsInStore(context, await fetchDashboardItemsInApi());
-  },
 };
 
 export const createDashboard = dispatch(actions.createDashboard);
@@ -138,4 +135,37 @@ export const updateDashboardItemSize = dispatch(actions.updateDashboardItemSize)
 export const updateDashboardItemConfig = dispatch(actions.updateDashboardItemConfig);
 export const removeDashboardItem = dispatch(actions.removeDashboardItem);
 
-export const fetchAll = dispatch(actions.fetchAll);
+export const setupApi = async (store: RootStore, onError: (err) => void) => {
+  /* eslint-disable no-underscore-dangle */
+  const onDashboardChange = (dashboard: Dashboard) => {
+    const existing = getDashboardInStore(store, dashboard.id);
+    if (!existing || existing._rev !== dashboard._rev) {
+      setDashboardInStore(store, dashboard);
+    }
+  };
+  const onDashboardDelete = (id: string) => {
+    const existing = getDashboardInStore(store, id);
+    if (existing) {
+      removeDashboardInStore(store, existing);
+    }
+  };
+  const onItemChange = (item: DashboardItem) => {
+    const existing = getDashboardItemInStore(store, item.id);
+    if (!existing || existing._rev !== item._rev) {
+      setDashboardItemInStore(store, item);
+    }
+  };
+  const onItemDelete = (id: string) => {
+    const existing = getDashboardItemInStore(store, id);
+    if (existing) {
+      removeDashboardItemInStore(store, existing);
+    }
+  };
+  /* eslint-enable no-underscore-dangle */
+
+  setAllDashboardsInStore(store, await fetchDashboardsInApi());
+  setAllDashboardItemsInStore(store, await fetchDashboardItemsInApi());
+
+  setupDashboardsInApi(onDashboardChange, onDashboardDelete, onError);
+  setupDashboardItemsInApi(onItemChange, onItemDelete, onError);
+};

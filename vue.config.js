@@ -1,6 +1,11 @@
 const { gitDescribeSync } = require('git-describe');
 
 module.exports = {
+  pluginOptions: {
+    webpackBundleAnalyzer: {
+      openAnalyzer: false,
+    },
+  },
   configureWebpack: (config) => {
     if (process.env.NODE_ENV === 'production') {
       // Function names are required to set up functions for VueX functionality
@@ -51,10 +56,10 @@ module.exports = {
     // Set process.env.GIT_VERSION to git version
     config
       .plugin('define')
-      .tap(args => {
-        const gitInfo = gitDescribeSync(__dirname, { match: `[0-9]*` });
-        args[0]['process.env']['GIT_VERSION'] = `"${gitInfo.semverString}"`;
+      .tap((args) => {
+        const gitInfo = gitDescribeSync(__dirname, { match: '[0-9]*' });
+        args[0]['process.env'].GIT_VERSION = `"${gitInfo.semverString}"`;
         return args;
-      })
+      });
   },
 };
