@@ -16,17 +16,22 @@ import {
 import { serviceById } from '@/store/services/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import WiFiSettingsPopup from './WiFiSettingsPopup.vue';
 import {
   oneWireBusId,
   profilesId,
   sysInfoId,
   ticksId,
+  wifiId,
+  isReady,
+  calcWiFiPct,
 } from './getters';
 import {
   OneWireBusBlock,
   ProfilesBlock,
   SysInfoBlock,
   TicksBlock,
+  WiFiSettingsBlock,
 } from './state';
 
 @Component({
@@ -36,9 +41,13 @@ import {
       required: true,
     },
   },
+  components: {
+    WiFiSettingsPopup,
+  },
 })
 export default class SparkWidget extends Vue {
   modalOpen: boolean = false;
+  wifiModal: boolean = false;
   slideIndex: number = 0;
 
   get service() {
@@ -65,17 +74,16 @@ export default class SparkWidget extends Vue {
     return this.sysBlock<TicksBlock>(ticksId);
   }
 
+  get wifi() {
+    return this.sysBlock<WiFiSettingsBlock>(wifiId);
+  }
+
   get profileNames(): string[] {
     return profileNames(this.$store, this.service.id);
   }
 
   get ready() {
-    return [
-      this.sysInfo,
-      this.profiles,
-      this.oneWireBus,
-      this.ticks,
-    ].every(v => v !== undefined);
+    return isReady(this.$store, this.service.id);
   }
 
   get updating() {
@@ -86,6 +94,13 @@ export default class SparkWidget extends Vue {
     return new Date(this.ticks.data.secondsSinceEpoch * 1000).toLocaleString();
   }
 
+  get signalPct() {
+    if (!this.wifi.data.signal) {
+      return 0;
+    }
+    return calcWiFiPct(this.wifi.data.signal);
+  }
+
   get discoveredBlocks() {
     return discoveredBlocks(this.$store, this.service.id);
   }
@@ -93,6 +108,7 @@ export default class SparkWidget extends Vue {
   get subtitles(): string[] {
     return [
       'State',
+      'WiFi',
       'Discovered blocks',
     ];
   }
@@ -144,6 +160,13 @@ export default class SparkWidget extends Vue {
     <q-modal v-model="modalOpen">
       <SparkForm v-if="modalOpen" :field="service"/>
     </q-modal>
+    <q-modal v-model="wifiModal">
+      <WiFiSettingsPopup
+        v-if="wifiModal"
+        :field="wifi.data"
+        :change="v => { wifi.data = v; saveBlock(wifi); }"
+      />
+    </q-modal>
     <q-card-title class="title-bar">
       <InputPopupEdit
         class="ellipsis"
@@ -181,6 +204,23 @@ export default class SparkWidget extends Vue {
           </q-field>
           <q-field class="col" label="Date">
             <big>{{ sysDate }}</big>
+          </q-field>
+        </q-card-main>
+      </q-carousel-slide>
+      <!-- WiFi -->
+      <q-carousel-slide class="unpadded">
+        <q-card-main class="column col">
+          <q-field class="col" label="Network">
+            <big
+              class="editable"
+              @click="wifiModal = true"
+            >{{ wifi.data.ssid || 'click to connect' }}</big>
+          </q-field>
+          <q-field class="col" label="Signal strength">
+            <big>{{ signalPct }}%</big>
+          </q-field>
+          <q-field class="col" label="IP address">
+            <big>{{ wifi.data.ip }}</big>
           </q-field>
         </q-card-main>
       </q-carousel-slide>

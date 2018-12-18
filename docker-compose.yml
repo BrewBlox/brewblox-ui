@@ -30,6 +30,10 @@ services:
   sparksimulator:
     image: brewblox/firmware-simulator:develop
 
+  mdns:
+    image: brewblox/brewblox-mdns:develop
+    network_mode: host
+
   sparkey:
     image: brewblox/brewblox-devcon-spark:develop
     depends_on:
