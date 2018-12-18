@@ -23,7 +23,6 @@ const features: { [id: string]: Feature } = {
   Balancer,
   DisplaySettings,
   InactiveObject,
-  TempSensorOneWire,
   Pid,
   Mutex,
   SetpointProfile,
@@ -31,6 +30,7 @@ const features: { [id: string]: Feature } = {
   SetpointSimple,
   ProcessView,
   TempSensorMock,
+  TempSensorOneWire,
 };
 
 export default features;
