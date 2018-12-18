@@ -1,4 +1,5 @@
 <script lang="ts">
+/* eslint no-bitwise: 0 */
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
@@ -34,8 +35,7 @@ export default class RemoteDisplayPage extends Vue {
 
   log(logline) {
     if (this.debug === true) {
-      // tslint:disable-next-line
-      console.log(logline);
+      console.log(logline); // eslint-disable-line
     }
   }
 
@@ -52,16 +52,14 @@ export default class RemoteDisplayPage extends Vue {
     }
   }
 
-  mounted () {
+  mounted() {
     this.canvas = this.$refs['screen-canvas'] as HTMLCanvasElement;
+    this.context = this.canvas.getContext('2d') || undefined;
 
     this.canvas.addEventListener<'mousedown'>('mousedown', this.onMouseDown);
     this.canvas.addEventListener<'mouseup'>('mouseup', this.onMouseUp);
     this.canvas.addEventListener<'mousemove'>('mousemove', this.onMouseMove);
 
-    this.context = this.canvas.getContext('2d') || undefined;
-
-    // Draw the new rectangle.
     const ctx = this.context;
     if (ctx !== undefined) {
       this.buf = new ArrayBuffer(this.width * this.height * 4);
@@ -76,12 +74,10 @@ export default class RemoteDisplayPage extends Vue {
 
     this.setupSocket();
 
-    window.setInterval(this.renderCanvas, 100);
+    window.setInterval(this.renderCanvas, 100); // 10 frames per second max
   }
 
   beforeDestroy() {
-    this.log('DeviceScreen componentWillUnmount');
-    // we need to prevent reconnection! or we'll set state on an unmounted component
     this.preventReconnection = true;
     this.closeSocket();
     this.context = undefined;
@@ -89,9 +85,8 @@ export default class RemoteDisplayPage extends Vue {
   }
 
   closeSocket() {
-    const ws = this.ws;
-    if (ws) {
-      ws.close();
+    if (this.ws) {
+      this.ws.close();
       this.ws = undefined;
       this.connecting = false;
       this.connected = false;
@@ -120,7 +115,7 @@ export default class RemoteDisplayPage extends Vue {
   }
 
   onMouseUp(evt) {
-    this.log(`mousedup ${evt} ${evt.button}`);
+    this.log(`mouseup ${evt} ${evt.button}`);
     if (evt.button === 0) {
       this.pressed -= 1;
       this.touchscreen(evt);
@@ -128,7 +123,6 @@ export default class RemoteDisplayPage extends Vue {
   }
 
   onMouseMove(evt) {
-      // send events only when pressed.
     if (this.pressed > 0) {
       this.touchscreen(evt);
     }
@@ -136,12 +130,11 @@ export default class RemoteDisplayPage extends Vue {
 
   touchscreen(evt) {
     const { x, y } = this.getMousePos(evt);
-    const connected = this.connected;
-    if (connected && this.ws !== undefined) {
+    if (this.connected && this.ws !== undefined) {
       this.log(`sending touch ${x},${y},${this.pressed}`);
       const buf = new ArrayBuffer(5);
       const view = new DataView(buf);
-      view.setInt8(0, this.pressed ? 1 : 2);    // command
+      view.setInt8(0, this.pressed ? 1 : 2); // command
       view.setUint16(1, x, true);
       view.setUint16(3, y, true);
       this.ws.send(buf);
@@ -160,7 +153,6 @@ export default class RemoteDisplayPage extends Vue {
   }
 
   createSocket() {
-
     const ws = new WebSocket(this.url);
     this.log('connecting');
     ws.binaryType = 'arraybuffer';
@@ -174,8 +166,6 @@ export default class RemoteDisplayPage extends Vue {
     };
 
     ws.onmessage = (msg: MessageEvent) => {
-      // this.log('Websocket incoming data');
-      // this.log(msg);
       this.handleScreenUpdate(new DataView(msg.data), msg.data.byteLength);
     };
 
@@ -186,44 +176,36 @@ export default class RemoteDisplayPage extends Vue {
     };
   }
 
-  rescheduleSetup () {
+  rescheduleSetup() {
     if (!this.preventReconnection) {
-      this.log('rescheduling socket connect in 4000 ms');
+      this.log('rescheduling socket connect in 1000 ms');
 
       setTimeout(() => {
         this.closeSocket();
         this.log('Websocket reconnecting');
         this.setupSocket();
-      },         1000);
+      }, 1000);
     }
   }
 
   handleScreenUpdate(buffer: DataView, length: number) {
     let index = 0;
-    // let s = '';
-
     while (index < length && this.data !== undefined) {
       const addr = buffer.getUint32(index, true);
       const color = buffer.getUint32(index + 4, true);
-
-      const x = addr % this.width;
-      const y = (addr - x) / this.width;
 
       const rr = ((color >>> 11) % 32);
       const gg = ((color >>> 5) % 64);
       const bb = ((color >>> 0) % 32);
 
-      // scale back up to 8 bits, ensuring that 0 maps to 0 and 0x1F maps to 0xFF
       const r = (rr << 3) | ((rr >>> 2) & 7);
       const g = (gg << 2) | ((gg >>> 3) & 3);
       const b = (bb << 3) | ((bb >>> 2) & 7);
 
-      // s += `(${x},${y}:${color}:${r},${g},${b}) `;
-
-      this.data[addr] = (255   << 24) |    // alpha
-              (b << 16) |    // blue
-              (g <<  8) |    // green
-              r;            // red
+      this.data[addr] = (255 << 24) | // alpha
+        (b << 16) | // blue
+        (g << 8) | // green
+        r; // red
 
       index += 8;
     }
@@ -234,28 +216,25 @@ export default class RemoteDisplayPage extends Vue {
 
 <template>
   <div class="page">
-    <div class="header">
-      Remote display for {{ serviceId }}
-    </div>
+    <div class="header">Remote display for {{ serviceId }}</div>
     <div class="container">
-        <div class="background">
-          <div class="display">
-            <canvas ref="screen-canvas" class="view"
-                    :hidden="!connected"
-                    :width="width" :height="height" />
-            <div class="glass"
-                 :hidden="connected"
-                 :width="width" :height="height" />
-          </div>
+      <div class="background">
+        <div class="display">
+          <canvas
+            ref="screen-canvas"
+            class="view"
+            :hidden="!connected"
+            :width="width"
+            :height="height"
+          />
+          <div class="glass" :hidden="connected" :width="width" :height="height"/>
         </div>
       </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.page {
-}
-
 .header {
   display: block;
   margin: 0 auto;
@@ -275,31 +254,17 @@ export default class RemoteDisplayPage extends Vue {
   margin: 0 auto;
 }
 
-.glass, .view {
+.glass,
+.view {
   display: block;
   margin: 0 auto;
   width: 320px;
   height: 240px;
 }
 
-.view {
-}
-
 .glass {
-  background-color: rgba(255,255,255,0.75);
+  background-color: rgba(255, 255, 255, 0.75);
   filter: blur(5px);
   display: none;
 }
-
-
-.background {
-  /* background: transparent url("./brewpi-spark.jpg");
-  background-repeat: no-repeat;
-  background-size:calc(517px*1.117) calc(345px*1.117);
-  width: 800px;
-  height: 600px;
-  */
-}
-
-
 </style>
