@@ -43,8 +43,8 @@ export default class RemoteDisplayPage extends Vue {
     this.preventReconnection = false;
   }
 
-  renderCanvas(){
-    if(this.context !== undefined && this.buf8 !== undefined){
+  renderCanvas() {
+    if (this.context !== undefined && this.buf8 !== undefined) {
       const imagedata = this.context.createImageData(this.width, this.height);
       imagedata.data.set(this.buf8);
       this.context.putImageData(imagedata, 0, 0);
@@ -64,7 +64,7 @@ export default class RemoteDisplayPage extends Vue {
     // Draw the new rectangle.
     const ctx = this.context;
     if (ctx !== undefined) {
-      this.buf = new ArrayBuffer(this.width * this.height*4);
+      this.buf = new ArrayBuffer(this.width * this.height * 4);
       this.buf8 = new Uint8ClampedArray(this.buf);
       this.data = new Uint32Array(this.buf);
 
@@ -194,7 +194,7 @@ export default class RemoteDisplayPage extends Vue {
         this.closeSocket();
         this.log('Websocket reconnecting');
         this.setupSocket();
-      },         4000);
+      },         1000);
     }
   }
 
@@ -207,7 +207,7 @@ export default class RemoteDisplayPage extends Vue {
       const color = buffer.getUint32(index + 4, true);
 
       const x = addr % this.width;
-      const y = (addr - x) /this.width;
+      const y = (addr - x) / this.width;
 
       const rr = ((color >>> 11) % 32);
       const gg = ((color >>> 5) % 64);
