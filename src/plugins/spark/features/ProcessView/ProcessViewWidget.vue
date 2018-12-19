@@ -2,7 +2,7 @@
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { isSamePart, pathsFromSources } from './calculateFlows';
+import { rotated, isSamePart, pathsFromSources } from './calculateFlows';
 import { allParts, componentByType } from './Parts/componentByType';
 import ProcessViewItem from './ProcessViewItem.vue';
 import { Part, ProcessViewConfig, DisplayPart, PanArguments, HoldArguments } from './state';
@@ -204,7 +204,7 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   rotatePart(part: Part, rotation: number) {
-    part.rotate += rotation;
+    part.rotate = rotated(part.rotate + rotation);
     this.saveConfig();
   }
 
@@ -243,6 +243,15 @@ export default class ProcessViewWidget extends WidgetBase {
           </q-list>
         </q-popover>
       </q-btn>-->
+      <q-btn
+        v-if="editable"
+        flat
+        round
+        dense
+        slot="right"
+        icon="delete"
+        @click="() => {widgetConfig.parts = []; saveConfig();}"
+      />
       <q-btn v-if="editable" flat round dense slot="right" icon="extension">
         <q-popover>
           <q-list link style="padding: 5px">

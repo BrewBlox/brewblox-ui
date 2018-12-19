@@ -1,10 +1,9 @@
-import flatten from 'lodash/flatten';
 import { Part, AngledFlows, DisplayPart, CalculatedFlow, Flow } from './state';
 
 export const isSamePart = (left: Part, right: Part) =>
   ['x', 'y', 'type', 'rotate'].every(k => left[k] === right[k]);
 
-const rotated = (rotation: number) => (rotation + 360) % 360;
+export const rotated = (rotation: number) => (rotation + 360) % 360;
 
 const rotatedFlows = (flows: AngledFlows, rotation: number = 0): AngledFlows =>
   Object.keys(flows)
@@ -19,10 +18,13 @@ const rotatedFlows = (flows: AngledFlows, rotation: number = 0): AngledFlows =>
       {},
     );
 
-const liquidIn = (part: DisplayPart, provided: number): number =>
-  (part.component.isSource
-    ? Number(Object.keys(part.component.flows(part))[0])
-    : provided);
+const liquidIn = (part: DisplayPart, provided: number): number => {
+  if (part.component.isSource) {
+    const [flow] = Object.keys(part.component.flows(part)).map(Number);
+    return rotated(flow + provided);
+  }
+  return provided;
+};
 
 const xyAtAngle = (part: DisplayPart, angle: number): { x: number, y: number } => {
   if (angle === 90) {
@@ -66,6 +68,10 @@ const partAtAngle = (
     });
 };
 
+const combineFlows = (left: CalculatedFlow = {}, right: CalculatedFlow = {}) =>
+  Object.entries(right)
+    .reduce((into: CalculatedFlow, [angle, val]) => ({ ...into, [angle]: (into[angle] || 0) + val }), left);
+
 const mergePartFlow = (
   part: DisplayPart,
   allParts: DisplayPart[],
@@ -77,21 +83,11 @@ const mergePartFlow = (
         return item;
       }
 
-      const newFlow = Object.entries(flowToAdd)
-        .reduce(
-          (acc, [angle, flowVal]: number[]) => ({
-            ...acc,
-            [angle]: flowVal + (item.flow && item.flow[angle] ? item.flow[angle] : 0),
-          }),
-          {},
-        );
-
       return {
         ...part,
         flow: {
           ...part.flow,
-          ...item.flow,
-          ...newFlow,
+          ...combineFlows(item.flow, flowToAdd),
         },
       };
     });
@@ -181,8 +177,18 @@ const calculateFlows = (
     .reduce(outFlowReducer, allParts);
 };
 
-const mergeSourceFlows = (acc: DisplayPart[], sourceFlow: DisplayPart[]): DisplayPart[] =>
-  flatten([acc, sourceFlow]);
+const mergeSourceFlows = (allParts: DisplayPart[], sourceFlow: DisplayPart[]): DisplayPart[] =>
+  sourceFlow.reduce(
+    (acc, part) => {
+      const existing = allParts.find(p => isSamePart(p, part));
+      if (existing) {
+        existing.flow = combineFlows(existing.flow, part.flow);
+        return acc;
+      }
+      return [...acc, part];
+    },
+    allParts,
+  );
 
 const angledFlow = (part: DisplayPart): CalculatedFlow =>
   Object.keys(part.flow || {})
@@ -200,6 +206,6 @@ const angledFlow = (part: DisplayPart): CalculatedFlow =>
 export const pathsFromSources = (parts: DisplayPart[]): DisplayPart[] =>
   parts
     .filter(part => part.component.isSource) // -> Part[]
-    .map(source => calculateFlows(source, parts)) // -> Part[][]
+    .map(source => calculateFlows(source, parts, source.rotate)) // -> Part[][]
     .reduce(mergeSourceFlows, []) // -> Part[]
     .map(part => (part.flow ? { ...part, flow: angledFlow(part) } : part));
