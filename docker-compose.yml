@@ -29,6 +29,8 @@ services:
 
   sparksimulator:
     image: brewblox/firmware-simulator:develop
+    ports:
+      - "7376:7376"
 
   mdns:
     image: brewblox/brewblox-mdns:develop
