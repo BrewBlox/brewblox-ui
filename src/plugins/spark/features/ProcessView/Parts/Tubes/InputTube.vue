@@ -1,8 +1,9 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import FlowArrow from '../Flows/FlowArrow.vue';
-import Part from '../Part';
+import PartComponent from '../PartComponent';
 import SVGRoot from '../SVGRoot.vue';
+import { AngledFlows } from '../../state';
 
 @Component({
   components: {
@@ -10,10 +11,10 @@ import SVGRoot from '../SVGRoot.vue';
     FlowArrow,
   },
 })
-export default class InputTube extends Part {
+export default class InputTube extends PartComponent {
   static isSource = true;
 
-  static flows(): ProcessViewPartFlows {
+  static flows(): AngledFlows {
     return {
       270: [{ out: 90, friction: 1 }],
     };
