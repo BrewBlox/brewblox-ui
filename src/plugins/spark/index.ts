@@ -19,8 +19,8 @@ export default ({ store }: PluginArguments) => {
   autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
   autoRegister(require.context('./provider', true, /[A-Z]\w+\.vue$/));
 
-  Vue.filter('unit', (value: Unit) => value.toString());
-  Vue.filter('link', (value: Link) => value.toString());
+  Vue.filter('unit', (value: Unit | null) => (value !== null && value !== undefined ? value.toString() : '-'));
+  Vue.filter('link', (value: Link | null) => (value !== null && value !== undefined ? value.toString() : '-'));
   Vue.filter('round', (value: any) => (typeof value !== 'number' ? value : +value.toFixed(2)));
   Vue.filter('hexToBase64', hexToBase64);
   Vue.filter('base64ToHex', base64ToHex);
