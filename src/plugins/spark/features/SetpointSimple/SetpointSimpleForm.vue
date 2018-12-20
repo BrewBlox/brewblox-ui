@@ -11,7 +11,7 @@ export default class SetpointSimpleForm extends BlockForm {
         label: 'Default',
         value: {
           setting: new Unit(0, 'degC'),
-          valid: true,
+          enabled: true,
         },
       },
     ];
@@ -39,8 +39,11 @@ export default class SetpointSimpleForm extends BlockForm {
             :change="callAndSaveBlock(v => block.data.setting = v)"
           />
         </q-field>
-        <q-field class="col" label="Valid">
-          <q-toggle :value="block.data.valid" @input="v => { block.data.valid = v; saveBlock(); }"/>
+        <q-field class="col" label="Enabled">
+          <q-toggle
+            :value="block.data.enabled"
+            @input="v => { block.data.enabled = v; saveBlock(); }"
+          />
         </q-field>
       </q-card-main>
     </q-card>

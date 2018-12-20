@@ -48,7 +48,7 @@
     "type": "SetpointSimple",
     "data": {
       "setting": 21,
-      "valid": true
+      "enabled": true
     }
   },
   {
@@ -59,7 +59,7 @@
     "type": "SetpointSimple",
     "data": {
       "setting": 50,
-      "valid": false
+      "enabled": false
     }
   },
   {
@@ -68,7 +68,7 @@
     "type": "SetpointSimple",
     "data": {
       "setting": 3,
-      "valid": true
+      "enabled": true
     }
   },
   {
@@ -79,7 +79,7 @@
     "type": "TempSensorMock",
     "data": {
       "value[celsius]": 20.89789201,
-      "valid": true
+      "connected": true
     }
   },
   {
@@ -90,7 +90,6 @@
     "type": "TempSensorOneWire",
     "data": {
       "value[celsius]": 20.89789201,
-      "valid": true,
       "offset[delta_degC]": 9,
       "address": "DEADBEEF"
     }
@@ -104,8 +103,6 @@
     "data": {
       "sensorId<>": "sensor-1",
       "setpointId<>": "setpoint-1",
-      "setpointValid": true,
-      "sensorValid": true,
       "setpointValue": 0,
       "sensorValue": 0
     }
@@ -117,7 +114,6 @@
     ],
     "type": "ActuatorAnalogMock",
     "data": {
-      "valid": true,
       "setting": 20,
       "minSetting": 10,
       "maxSetting": 30,
@@ -143,7 +139,9 @@
             "max": 10
           },
           {
-            "balanced": { "balancerId<>": "balancer-1" }
+            "balanced": {
+              "balancerId<>": "balancer-1"
+            }
           }
         ]
       }
@@ -169,8 +167,6 @@
     "data": {
       "inputId<>": "setpoint-sensor-pair-1",
       "outputId<>": "actuator-1",
-      "inputValid": true,
-      "outputValid": true,
       "inputValue": 0,
       "inputSetting": 10,
       "outputValue": 20,

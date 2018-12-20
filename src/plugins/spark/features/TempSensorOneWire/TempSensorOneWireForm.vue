@@ -11,7 +11,6 @@ export default class TempSensorOneWireForm extends BlockForm {
         label: 'Default',
         value: {
           value: new Unit(0, 'degC'),
-          valid: true,
           offset: new Unit(0, 'delta_degC'),
           address: '',
         },
