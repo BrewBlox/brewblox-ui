@@ -111,24 +111,21 @@ const calculateFlows = (
   const candidateParts = [...candidates.filter(candidate => !isSamePart(part, candidate))];
 
   const outFlowReducer = (parts: DisplayPart[], outFlow: Flow): DisplayPart[] => {
-    const { angleOut, pressure } = outFlow;
-    totalFriction += (outFlow.friction || 0);
-    totalDeltaPressure += (outFlow.deltaPressure || 0);
+    const { angleOut, pressure, friction, deltaPressure } = outFlow;
+    totalFriction += (friction || 0);
+    totalDeltaPressure += (deltaPressure || 0);
 
     if (pressure !== undefined) {
       const totalPressure = startPressure + totalDeltaPressure;
-      if (pressure < totalPressure) {
-        const pathFlow = (totalPressure - pressure) / totalFriction;
-        return mergePartFlow(
-          part,
-          parts,
-          {
-            [angleOut]: pathFlow,
-            [angleIn]: pathFlow * -1,
-          },
-        );
-      }
-      return parts;
+      const pathFlow = (totalPressure - pressure) / totalFriction;
+      return mergePartFlow(
+        part,
+        parts,
+        {
+          [angleOut]: pathFlow,
+          [angleIn]: pathFlow * -1,
+        },
+      );
     }
 
     const nextPart = partAtAngle(part, candidateParts, angleOut);

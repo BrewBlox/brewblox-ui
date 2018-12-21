@@ -14,8 +14,8 @@ import { AngledFlows } from '../../state';
 export default class FastTube extends PartComponent {
   static flows(): AngledFlows {
     return {
-      270: [{ angleOut: 90, friction: 1 }],
-      90: [{ angleOut: 270, friction: 1 }],
+      270: [{ angleOut: 90, friction: 1, deltaPressure: -99 }],
+      90: [{ angleOut: 270, friction: 1, deltaPressure: 99 }],
     };
   }
 
