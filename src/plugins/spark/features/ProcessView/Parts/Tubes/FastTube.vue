@@ -11,7 +11,7 @@ import { AngledFlows } from '../../state';
     FlowArrow,
   },
 })
-export default class StraightTube extends PartComponent {
+export default class FastTube extends PartComponent {
   static flows(): AngledFlows {
     return {
       270: [{ angleOut: 90, friction: 1 }],
@@ -40,7 +40,7 @@ export default class StraightTube extends PartComponent {
       <line y1="21" x2="50" y2="21"/>
       <line y1="29" x2="50" y2="29"/>
     </g>
-    <g class="liquid" v-if="liquid" stroke="#4aa0ef">
+    <g class="liquid" v-if="liquid" stroke="#ff0066">
       <line y1="25" x2="50" y2="25"/>
     </g>
     <g v-if="flowing" class="outline">

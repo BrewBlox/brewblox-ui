@@ -13,7 +13,7 @@ const rotatedFlows = (flows: AngledFlows, rotation: number = 0): AngledFlows =>
         ...acc,
         [rotated(angle + rotation)]:
           flows[angle]
-            .map(flowAngle => ({ ...flowAngle, out: rotated(flowAngle.out + rotation) })),
+            .map(flowAngle => ({ ...flowAngle, angleOut: rotated(flowAngle.angleOut + rotation) })),
       }),
       {},
     );
@@ -103,19 +103,22 @@ const calculateFlows = (
   part: DisplayPart,
   allParts: DisplayPart[],
   angleIn: number = 0,
-  accFriction: number = 0,
+  totalFriction: number = 0,
   startPressure: number = 10,
+  totalDeltaPressure: number = 0,
   candidates: DisplayPart[] = allParts,
 ): DisplayPart[] => {
   const candidateParts = [...candidates.filter(candidate => !isSamePart(part, candidate))];
 
   const outFlowReducer = (parts: DisplayPart[], outFlow: Flow): DisplayPart[] => {
-    const angleOut = outFlow.out;
-    const totalFriction = accFriction + (outFlow.friction || 0);
+    const { angleOut, pressure } = outFlow;
+    totalFriction += (outFlow.friction || 0);
+    totalDeltaPressure += (outFlow.deltaPressure || 0);
 
-    if (outFlow.pressure !== undefined) {
-      if (outFlow.pressure < startPressure) {
-        const pathFlow = (startPressure - outFlow.pressure) / totalFriction;
+    if (pressure !== undefined) {
+      const totalPressure = startPressure + totalDeltaPressure;
+      if (pressure < totalPressure) {
+        const pathFlow = (totalPressure - pressure) / totalFriction;
         return mergePartFlow(
           part,
           parts,
@@ -150,6 +153,7 @@ const calculateFlows = (
       rotated(angleOut + 180),
       totalFriction,
       startPressure,
+      totalDeltaPressure,
       candidateParts,
     );
 
