@@ -7,11 +7,10 @@ export interface DisplayWidget {
   name: string;
 
   // Value will be one of these
-  TempSensor?: Link;
-  SetpointSensorPair?: Link;
-  ActuatorPwm?: Link;
-  ActuatorAnalog?: Link;
-  Pid?: Link;
+  tempSensor?: Link;
+  setpointSensorPair?: Link;
+  actuatorAnalog?: Link;
+  pid?: Link;
 }
 
 export interface DisplaySettingsBlock extends Block {
