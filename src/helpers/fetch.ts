@@ -2,7 +2,7 @@ import { deserialize, serialize } from '@/helpers/units/parseObject';
 
 const host = process.env.VUE_APP_API_URI;
 
-const toJson = async (result: Promise<Response>) => {
+export const toJson = async (result: Promise<Response>) => {
   const response = await result;
   if (!response.ok) {
     throw new Error(response.statusText);
