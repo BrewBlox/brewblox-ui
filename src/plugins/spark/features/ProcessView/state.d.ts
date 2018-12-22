@@ -1,9 +1,10 @@
 import { VueConstructor } from 'vue';
 
 export interface Flow {
-  out: number,
-  friction?: number,
-  pressure?: number,
+  angleOut: number;
+  friction?: number;
+  pressure?: number;
+  deltaPressure?: number;
 }
 
 export interface AngledFlows {

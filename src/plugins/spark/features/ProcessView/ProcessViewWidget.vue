@@ -3,7 +3,7 @@ import WidgetBase from '@/components/Widget/WidgetBase';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { rotated, isSamePart, pathsFromSources } from './calculateFlows';
-import { allParts, componentByType } from './Parts/componentByType';
+import { allParts, componentByType } from './Parts';
 import ProcessViewItem from './ProcessViewItem.vue';
 import { Part, ProcessViewConfig, DisplayPart, PanArguments, HoldArguments } from './state';
 

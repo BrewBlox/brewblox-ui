@@ -16,7 +16,7 @@ export default class OutputTube extends PartComponent {
 
   static flows(): AngledFlows {
     return {
-      270: [{ out: 90, pressure: 0, friction: 1 }],
+      270: [{ angleOut: 90, pressure: 0, friction: 1 }],
     };
   }
 

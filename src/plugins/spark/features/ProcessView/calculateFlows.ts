@@ -13,7 +13,7 @@ const rotatedFlows = (flows: AngledFlows, rotation: number = 0): AngledFlows =>
         ...acc,
         [rotated(angle + rotation)]:
           flows[angle]
-            .map(flowAngle => ({ ...flowAngle, out: rotated(flowAngle.out + rotation) })),
+            .map(flowAngle => ({ ...flowAngle, angleOut: rotated(flowAngle.angleOut + rotation) })),
       }),
       {},
     );
@@ -103,29 +103,29 @@ const calculateFlows = (
   part: DisplayPart,
   allParts: DisplayPart[],
   angleIn: number = 0,
-  accFriction: number = 0,
+  totalFriction: number = 0,
   startPressure: number = 10,
+  totalDeltaPressure: number = 0,
   candidates: DisplayPart[] = allParts,
 ): DisplayPart[] => {
   const candidateParts = [...candidates.filter(candidate => !isSamePart(part, candidate))];
 
   const outFlowReducer = (parts: DisplayPart[], outFlow: Flow): DisplayPart[] => {
-    const angleOut = outFlow.out;
-    const totalFriction = accFriction + (outFlow.friction || 0);
+    const { angleOut, pressure, friction, deltaPressure } = outFlow;
+    totalFriction += (friction || 0);
+    totalDeltaPressure += (deltaPressure || 0);
 
-    if (outFlow.pressure !== undefined) {
-      if (outFlow.pressure < startPressure) {
-        const pathFlow = (startPressure - outFlow.pressure) / totalFriction;
-        return mergePartFlow(
-          part,
-          parts,
-          {
-            [angleOut]: pathFlow,
-            [angleIn]: pathFlow * -1,
-          },
-        );
-      }
-      return parts;
+    if (pressure !== undefined) {
+      const totalPressure = startPressure + totalDeltaPressure;
+      const pathFlow = (totalPressure - pressure) / totalFriction;
+      return mergePartFlow(
+        part,
+        parts,
+        {
+          [angleOut]: pathFlow,
+          [angleIn]: pathFlow * -1,
+        },
+      );
     }
 
     const nextPart = partAtAngle(part, candidateParts, angleOut);
@@ -150,6 +150,7 @@ const calculateFlows = (
       rotated(angleOut + 180),
       totalFriction,
       startPressure,
+      totalDeltaPressure,
       candidateParts,
     );
 

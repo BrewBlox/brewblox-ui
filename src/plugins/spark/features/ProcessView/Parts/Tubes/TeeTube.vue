@@ -14,9 +14,9 @@ import { AngledFlows } from '../../state';
 export default class TeeTube extends PartComponent {
   static flows(): AngledFlows {
     return {
-      0: [{ out: 90, friction: 1 }, { out: 270, friction: 1 }],
-      90: [{ out: 0, friction: 1 }, { out: 270, friction: 1 }],
-      270: [{ out: 0, friction: 1 }, { out: 90, friction: 1 }],
+      0: [{ angleOut: 90, friction: 1 }, { angleOut: 270, friction: 1 }],
+      90: [{ angleOut: 0, friction: 1 }, { angleOut: 270, friction: 1 }],
+      270: [{ angleOut: 0, friction: 1 }, { angleOut: 90, friction: 1 }],
     };
   }
 

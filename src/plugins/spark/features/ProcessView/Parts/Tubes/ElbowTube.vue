@@ -13,8 +13,8 @@ import SVGRoot from '../SVGRoot.vue';
 export default class ElbowTube extends PartComponent {
   static flows() {
     return {
-      0: [{ out: 90, friction: 1 }],
-      90: [{ out: 0, friction: 1 }],
+      0: [{ angleOut: 90, friction: 1 }],
+      90: [{ angleOut: 0, friction: 1 }],
     };
   }
 
@@ -54,15 +54,12 @@ export default class ElbowTube extends PartComponent {
     </g>
     <g v-if="flowing" class="outline">
       <FlowArrow :rotate="arrow(frame).rotate" :x="arrow(frame).x" :y="arrow(frame).y"/>
-
       <FlowArrow :rotate="arrow(frame - 1).rotate" :x="arrow(frame - 1).x" :y="arrow(frame - 1).y"/>
-
       <FlowArrow
         :rotate="arrow(frame - 0.5).rotate"
         :x="arrow(frame - 0.5).x"
         :y="arrow(frame - 0.5).y"
       />
-
       <FlowArrow
         :rotate="arrow(frame + 0.5).rotate"
         :x="arrow(frame + 0.5).x"

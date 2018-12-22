@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { componentByType } from './Parts/componentByType';
+import { componentByType } from './Parts';
 
 @Component({
   props: {
