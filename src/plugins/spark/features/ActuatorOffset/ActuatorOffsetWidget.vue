@@ -24,10 +24,10 @@ export default class ActuatorOffsetWidget extends BlockWidget {
 
   get warnings() {
     const warn: string[] = [];
-    if (!this.block.data.targetValid) {
+    if (!this.block.data.targetId === null) {
       warn.push('Target invalid');
     }
-    if (!this.block.data.referenceValid) {
+    if (this.block.data.referenceId === null) {
       warn.push('Reference invalid');
     }
     return warn.join(', ');

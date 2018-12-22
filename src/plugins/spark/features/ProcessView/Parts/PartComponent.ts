@@ -17,7 +17,7 @@ import Component from 'vue-class-component';
     },
   },
 })
-export default class Part extends Vue {
+export default class PartComponent extends Vue {
   get closed(): boolean {
     return !!this.$props.part.closed;
   }

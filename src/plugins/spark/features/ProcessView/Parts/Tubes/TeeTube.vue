@@ -1,8 +1,9 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import FlowArrow from '../Flows/FlowArrow.vue';
-import Part from '../Part';
+import PartComponent from '../PartComponent';
 import SVGRoot from '../SVGRoot.vue';
+import { AngledFlows } from '../../state';
 
 @Component({
   components: {
@@ -10,8 +11,8 @@ import SVGRoot from '../SVGRoot.vue';
     FlowArrow,
   },
 })
-export default class TeeTube extends Part {
-  static flows(): ProcessViewPartFlows {
+export default class TeeTube extends PartComponent {
+  static flows(): AngledFlows {
     return {
       0: [{ out: 90, friction: 1 }, { out: 270, friction: 1 }],
       90: [{ out: 0, friction: 1 }, { out: 270, friction: 1 }],

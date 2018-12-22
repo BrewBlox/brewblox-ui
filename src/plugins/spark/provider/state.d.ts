@@ -28,3 +28,14 @@ export interface TicksBlock extends Block {
     secondsSinceEpoch: number,
   };
 }
+
+export interface WiFiSettingsBlock extends Block {
+  data: {
+    ssid: string;
+    password: string;
+    security: number;
+    cipher: number;
+    signal: number;
+    ip: string;
+  }
+}

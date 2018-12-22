@@ -10,12 +10,6 @@
       "config": {
         "parts": [
           {
-            "x": 0,
-            "y": 1,
-            "type": "TUBE_INPUT",
-            "rotate": 0
-          },
-          {
             "x": 1,
             "y": 1,
             "type": "TUBE_STRAIGHT",
@@ -40,12 +34,6 @@
           },
           {
             "x": 3,
-            "y": 4,
-            "type": "TUBE_OUTPUT",
-            "rotate": 90
-          },
-          {
-            "x": 3,
             "y": 3,
             "type": "TUBE_TEE",
             "rotate": 180
@@ -58,12 +46,6 @@
           },
           {
             "x": 4,
-            "y": 2,
-            "type": "TUBE_STRAIGHT",
-            "rotate": 90
-          },
-          {
-            "x": 4,
             "y": 1,
             "type": "TUBE_ELBOW",
             "rotate": 180
@@ -73,6 +55,42 @@
             "y": 1,
             "type": "TUBE_STRAIGHT",
             "rotate": 0
+          },
+          {
+            "type": "TUBE_TEE",
+            "x": 4,
+            "y": 2,
+            "rotate": 90
+          },
+          {
+            "x": 5,
+            "y": 2,
+            "type": "TUBE_STRAIGHT",
+            "rotate": 0
+          },
+          {
+            "x": 0,
+            "y": 1,
+            "type": "TUBE_INPUT",
+            "rotate": 0
+          },
+          {
+            "type": "TUBE_INPUT",
+            "x": 6,
+            "y": 2,
+            "rotate": 180
+          },
+          {
+            "x": 3,
+            "y": 5,
+            "type": "TUBE_OUTPUT",
+            "rotate": 90
+          },
+          {
+            "type": "VALVE",
+            "x": 3,
+            "y": 4,
+            "rotate": 90
           }
         ]
       }

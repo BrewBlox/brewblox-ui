@@ -50,7 +50,11 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
       <q-btn flat round dense slot="right" @click="refreshBlock" icon="refresh"/>
     </q-card-title>
     <q-card-separator/>
-    <q-alert type="warning" color="warning" v-if="!this.block.valid">This Actuator is invalid</q-alert>
+    <q-alert
+      type="warning"
+      color="warning"
+      v-if="this.block.value === null"
+    >This Actuator is invalid</q-alert>
     <q-carousel quick-nav class="col" v-model="slideIndex">
       <!-- State -->
       <q-carousel-slide class="unpadded">

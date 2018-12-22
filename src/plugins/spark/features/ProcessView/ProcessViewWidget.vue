@@ -2,19 +2,20 @@
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { isSamePart, pathsFromSources } from './calculateFlows';
+import { rotated, isSamePart, pathsFromSources } from './calculateFlows';
 import { allParts, componentByType } from './Parts/componentByType';
 import ProcessViewItem from './ProcessViewItem.vue';
+import { Part, ProcessViewConfig, DisplayPart, PanArguments, HoldArguments } from './state';
 
 const SQUARE_SIZE = 50;
 
 interface DragAction {
-  part: ProcessViewPart;
+  part: Part;
   style: any;
 }
 
 interface ContextAction {
-  part: ProcessViewPart;
+  part: Part;
   style: any;
 }
 
@@ -27,7 +28,7 @@ export default class ProcessViewWidget extends WidgetBase {
   editable: boolean = false;
   frame: number = 0;
   animationFrame: number = 0;
-  stateParts: ProcessViewPart[] = [];
+  stateParts: Part[] = [];
   dragAction: DragAction | null = null;
   contextAction: ContextAction | null = null;
 
@@ -44,17 +45,17 @@ export default class ProcessViewWidget extends WidgetBase {
     return { x, y, left, right, top, bottom };
   }
 
-  get availableParts(): ProcessViewPart[] {
+  get availableParts(): Part[] {
     return Object.keys(allParts)
-      .map(key => ({
+      .map(type => ({
+        type,
         x: -1,
         y: -1,
         rotate: 0,
-        type: key as ProcessViewPartType,
       }));
   }
 
-  get parts(): ProcessViewPart[] {
+  get parts(): Part[] {
     return [
       ...this.widgetConfig.parts
         .map(item => (this.stateParts.find(part => isSamePart(item, part)) || item)),
@@ -63,12 +64,9 @@ export default class ProcessViewWidget extends WidgetBase {
     ];
   }
 
-  get partsWithFlow(): ProcessViewPartWithComponent[] {
+  get partsWithFlow(): DisplayPart[] {
     const partsWithComponent = this.parts
-      .map((part: ProcessViewPart) => ({
-        ...part,
-        component: componentByType(part.type),
-      }));
+      .map(part => ({ ...part, component: componentByType(part.type) }));
     return pathsFromSources(partsWithComponent);
   }
 
@@ -103,7 +101,7 @@ export default class ProcessViewWidget extends WidgetBase {
     };
   }
 
-  partStyle(part: ProcessViewPart): any {
+  partStyle(part: Part): any {
     return {
       gridColumnStart: part.x + 1,
       gridRowStart: part.y + 1,
@@ -119,7 +117,7 @@ export default class ProcessViewWidget extends WidgetBase {
     });
   }
 
-  toggleClosed(part: ProcessViewPartWithComponent, closed: boolean) {
+  toggleClosed(part: DisplayPart, closed: boolean) {
     if (this.editable) {
       return;
     }
@@ -140,7 +138,7 @@ export default class ProcessViewWidget extends WidgetBase {
     }
   }
 
-  panHandler(part: ProcessViewPart, args: PanArguments) {
+  panHandler(part: Part, args: PanArguments) {
     if (!this.editable || this.contextAction) {
       return;
     }
@@ -168,7 +166,7 @@ export default class ProcessViewWidget extends WidgetBase {
     }
   }
 
-  holdHandler(part: ProcessViewPart, args: HoldArguments) {
+  holdHandler(part: Part, args: HoldArguments) {
     if (!this.editable) {
       return;
     }
@@ -190,13 +188,13 @@ export default class ProcessViewWidget extends WidgetBase {
     window.removeEventListener('mouseup', this.finishAction);
   }
 
-  removePart(part: ProcessViewPart) {
+  removePart(part: Part) {
     this.widgetConfig.parts = this.widgetConfig.parts
       .filter(p => !isSamePart(p, part));
     this.saveConfig();
   }
 
-  movePart(from: ProcessViewPart, to: ProcessViewPart) {
+  movePart(from: Part, to: Part) {
     const spotTaken = this.widgetConfig.parts.some(p => p.x === to.x && p.y === to.y);
     if (!spotTaken) {
       this.widgetConfig.parts = [
@@ -205,12 +203,12 @@ export default class ProcessViewWidget extends WidgetBase {
     }
   }
 
-  rotatePart(part: ProcessViewPart, rotation: number) {
-    part.rotate += rotation;
+  rotatePart(part: Part, rotation: number) {
+    part.rotate = rotated(part.rotate + rotation);
     this.saveConfig();
   }
 
-  beingDragged(part: ProcessViewPart) {
+  beingDragged(part: Part) {
     return this.dragAction && isSamePart(part, this.dragAction.part);
   }
 
@@ -245,6 +243,15 @@ export default class ProcessViewWidget extends WidgetBase {
           </q-list>
         </q-popover>
       </q-btn>-->
+      <q-btn
+        v-if="editable"
+        flat
+        round
+        dense
+        slot="right"
+        icon="delete"
+        @click="() => {widgetConfig.parts = []; saveConfig();}"
+      />
       <q-btn v-if="editable" flat round dense slot="right" icon="extension">
         <q-popover>
           <q-list link style="padding: 5px">

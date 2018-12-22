@@ -32,6 +32,10 @@ services:
     ports:
       - "7376:7376"
 
+  mdns:
+    image: brewblox/brewblox-mdns:develop
+    network_mode: host
+
   sparkey:
     image: brewblox/brewblox-devcon-spark:develop
     depends_on:

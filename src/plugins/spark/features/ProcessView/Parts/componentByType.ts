@@ -1,5 +1,6 @@
 import { ElbowTube, InputTube, OutputTube, StraightTube, TeeTube } from './Tubes/index';
 import { Valve } from './Valves/index';
+import { ComponentConstructor } from '../state';
 
 export const allParts: { [key: string]: any } = {
   TUBE_STRAIGHT: StraightTube,
@@ -10,9 +11,9 @@ export const allParts: { [key: string]: any } = {
   VALVE: Valve,
 };
 
-export function componentByType(type: ProcessViewPartType): ProcessViewComponent {
+export const componentByType = (type: string): ComponentConstructor => {
   if (!allParts[type]) {
     throw new Error(`Cannot find ProcessView part '${type}'`);
   }
   return allParts[type];
-}
+};

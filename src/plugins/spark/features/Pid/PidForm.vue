@@ -15,8 +15,6 @@ export default class PidForm extends BlockForm {
         value: {
           inputId: new ProcessValueLink(null),
           outputId: new ActuatorAnalogLink(null),
-          inputValid: true,
-          outputValid: true,
           inputValue: new Unit(0, 'degC'),
           inputSetting: new Unit(0, 'degC'),
           outputValue: 0,

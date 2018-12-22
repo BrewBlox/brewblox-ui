@@ -17,21 +17,13 @@ import { componentByType } from './Parts/componentByType';
 })
 export default class ProcessViewItem extends Vue {
   get style() {
-    if (!this.$props.part.rotate) {
-      return {};
-    }
-
-    return {
-      transform: `rotate(${this.$props.part.rotate}deg)`,
-    };
-  }
-
-  get partType(): ProcessViewPartType {
-    return this.$props.part.type as ProcessViewPartType;
+    return this.$props.part.rotate
+      ? { transform: `rotate(${this.$props.part.rotate}deg)` }
+      : {};
   }
 
   get component() {
-    return componentByType(this.partType);
+    return componentByType(this.$props.part.type);
   }
 }
 </script>
