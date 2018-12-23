@@ -23,7 +23,12 @@ const feature: Feature = {
     <component is="ExampleFeatureWidget" />
     <ExampleFeatureWidget />
   */
+
+  // The widget is the rectangular card displayed on the dashboard
   widget: ref(widget),
+
+  // The wizard is responsible for creating new dashboard items for this feature
+  // It is an optional property: features without a wizard are considered not creatable by the user.
   wizard: ref(wizard),
 
   // This is the default size of a widget of this type
