@@ -6,9 +6,6 @@ export interface PidBlock extends Block {
     inputId: Link;
     outputId: Link;
 
-    inputValid: boolean;
-    outputValid: boolean;
-
     inputValue: Unit;
     inputSetting: Unit;
     outputValue: number;

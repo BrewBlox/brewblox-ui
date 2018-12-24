@@ -95,19 +95,19 @@ export default class PidWidget extends BlockWidget {
           <q-card-main class="column col">
             <q-item class="full-width text-center">Input</q-item>
             <q-field class="col" label="Target">
-              <big>{{ block.data.inputValid ? block.data.inputSetting : '-' | unit }}</big>
+              <big>{{ block.data.inputSetting | unit }}</big>
             </q-field>
             <q-field class="col" label="Actual">
-              <big>{{ block.data.inputValid ? block.data.inputValue : '-' | unit }}</big>
+              <big>{{ block.data.inputValue | unit }}</big>
             </q-field>
           </q-card-main>
           <q-card-main class="column col">
             <q-item class="full-width text-center">Output</q-item>
             <q-field class="col" label="Target">
-              <big>{{ block.data.outputValid ? block.data.outputSetting : '-' | unit }}</big>
+              <big>{{ block.data.outputSetting | unit }}</big>
             </q-field>
             <q-field class="col" label="Actual">
-              <big>{{ block.data.outputValid ? block.data.outputValue : '-' | unit }}</big>
+              <big>{{ block.data.outputValue | unit }}</big>
             </q-field>
           </q-card-main>
         </div>
