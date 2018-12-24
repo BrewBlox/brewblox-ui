@@ -1,22 +1,16 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import FlowArrow from '../Flows/FlowArrow.vue';
-import PartComponent from '../PartComponent';
-import SVGRoot from '../SVGRoot.vue';
-import { AngledFlows } from '../../state';
+import PartComponent from '../components/PartComponent';
+import { AngledFlows } from '../state';
+import { UP, LEFT, RIGHT, DOWN, SQUARE_SIZE } from './';
 
-@Component({
-  components: {
-    SVGRoot,
-    FlowArrow,
-  },
-})
+@Component
 export default class TeeTube extends PartComponent {
   static flows(): AngledFlows {
     return {
-      0: [{ angleOut: 90, friction: 1 }, { angleOut: 270, friction: 1 }],
-      90: [{ angleOut: 0, friction: 1 }, { angleOut: 270, friction: 1 }],
-      270: [{ angleOut: 0, friction: 1 }, { angleOut: 90, friction: 1 }],
+      [UP]: [{ angleOut: RIGHT, friction: 1 }, { angleOut: LEFT, friction: 1 }],
+      [RIGHT]: [{ angleOut: UP, friction: 1 }, { angleOut: LEFT, friction: 1 }],
+      [LEFT]: [{ angleOut: UP, friction: 1 }, { angleOut: RIGHT, friction: 1 }],
     };
   }
 
@@ -25,34 +19,34 @@ export default class TeeTube extends PartComponent {
   }
 
   leftArrow(frame: number) {
-    const toRight = this.flowOnAngle(270) < 0;
+    const toRight = this.flowOnAngle(LEFT) < 0;
     const animationFrame = toRight ? frame : 1 - frame;
 
     return {
-      rotate: toRight ? 270 : 90,
-      x: ((animationFrame % 0.5) * 50) - 8,
+      rotate: toRight ? LEFT : RIGHT,
+      x: ((animationFrame % 0.5) * SQUARE_SIZE) - 8,
       y: 23,
     };
   }
 
   topArrow(frame: number) {
-    const toBottom = this.flowOnAngle(0) < 0;
+    const toBottom = this.flowOnAngle(UP) < 0;
     const animationFrame = toBottom ? frame : 1 - frame;
 
     return {
-      rotate: toBottom ? 0 : 180,
+      rotate: toBottom ? UP : DOWN,
       x: 21,
-      y: ((animationFrame % 0.5) * 50) - (toBottom ? 0 : 6),
+      y: ((animationFrame % 0.5) * SQUARE_SIZE) - (toBottom ? 0 : 6),
     };
   }
 
   rightArrow(frame: number) {
-    const toLeft = this.flowOnAngle(90) < 0;
+    const toLeft = this.flowOnAngle(RIGHT) < 0;
     const animationFrame = toLeft ? frame + 0.25 : 1 - frame;
 
     return {
-      rotate: !toLeft ? 270 : 90,
-      x: (toLeft ? 54 : 50) - ((animationFrame % 0.5) * 50),
+      rotate: toLeft ? RIGHT : LEFT,
+      x: (toLeft ? 54 : 50) - ((animationFrame % 0.5) * SQUARE_SIZE),
       y: 23,
     };
   }

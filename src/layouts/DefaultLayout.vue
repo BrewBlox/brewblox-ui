@@ -286,6 +286,10 @@ export default class DefaultLayout extends Vue {
   margin: auto;
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 .editable {
   border-bottom: 1px solid gray;
   cursor: pointer;

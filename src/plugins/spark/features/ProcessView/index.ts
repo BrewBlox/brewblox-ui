@@ -1,7 +1,9 @@
-import { ref } from '@/helpers/component-ref';
+import { ref, autoRegister } from '@/helpers/component-ref';
 import { Feature } from '@/store/features/state';
 import widget from './ProcessViewWidget.vue';
 import wizard from './ProcessViewWizard.vue';
+
+autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
 
 const feature: Feature = {
   id: 'ProcessView',

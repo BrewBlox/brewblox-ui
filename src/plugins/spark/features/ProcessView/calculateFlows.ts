@@ -1,9 +1,11 @@
-import { Part, AngledFlows, DisplayPart, CalculatedFlow, Flow } from './state';
+import { Part, AngledFlows, FlowPart, FlowPressure, Flow, ComponentConstructor } from './state';
+import { UP, RIGHT, DOWN, LEFT, allParts as allPartComponents } from './parts';
+import { clampRotation } from '@/helpers/functional';
 
 export const isSamePart = (left: Part, right: Part) =>
   ['x', 'y', 'type', 'rotate'].every(k => left[k] === right[k]);
 
-export const rotated = (rotation: number) => (rotation + 360) % 360;
+const component = (part: Part): ComponentConstructor => allPartComponents[part.type];
 
 const rotatedFlows = (flows: AngledFlows, rotation: number = 0): AngledFlows =>
   Object.keys(flows)
@@ -11,72 +13,76 @@ const rotatedFlows = (flows: AngledFlows, rotation: number = 0): AngledFlows =>
     .reduce(
       (acc, angle) => ({
         ...acc,
-        [rotated(angle + rotation)]:
+        [clampRotation(angle + rotation)]:
           flows[angle]
-            .map(flowAngle => ({ ...flowAngle, angleOut: rotated(flowAngle.angleOut + rotation) })),
+            .map(flowAngle => ({ ...flowAngle, angleOut: clampRotation(flowAngle.angleOut + rotation) })),
       }),
       {},
     );
 
-const liquidIn = (part: DisplayPart, provided: number): number => {
-  if (part.component.isSource) {
-    const [flow] = Object.keys(part.component.flows(part)).map(Number);
-    return rotated(flow + provided);
+const liquidIn = (part: FlowPart, provided: number): number => {
+  if (component(part).isSource) {
+    const [flow] = Object.keys(component(part).flows(part)).map(Number);
+    return clampRotation(flow + provided);
   }
   return provided;
 };
 
-const xyAtAngle = (part: DisplayPart, angle: number): { x: number, y: number } => {
-  if (angle === 90) {
+const xyAtAngle = (part: FlowPart, angle: number): { x: number, y: number } => {
+  if (angle === UP) {
+    return {
+      x: part.x,
+      y: part.y - 1,
+    };
+  }
+
+  if (angle === RIGHT) {
     return {
       x: part.x + 1,
       y: part.y,
     };
   }
 
-  if (angle === 180) {
+  if (angle === DOWN) {
     return {
       x: part.x,
       y: part.y + 1,
     };
   }
 
-  if (angle === 270) {
+  if (angle === LEFT) {
     return {
       x: part.x - 1,
       y: part.y,
     };
   }
 
-  return {
-    x: part.x,
-    y: part.y - 1,
-  };
+  throw new Error(`Invalid angle: ${angle}`);
 };
 
 const partAtAngle = (
-  origin: DisplayPart,
-  allParts: DisplayPart[],
+  origin: FlowPart,
+  allParts: FlowPart[],
   angle: number,
-): DisplayPart | undefined => {
+): FlowPart | undefined => {
   const { x, y } = xyAtAngle(origin, angle);
   return allParts
     .filter(part => part.x === x && part.y === y)
-    .find((part: DisplayPart) => {
-      const flows = rotatedFlows(part.component.flows(part), part.rotate);
-      return !!flows[rotated(angle + (part.component.isSource ? 0 : 180))];
+    .find((part: FlowPart) => {
+      const flows = rotatedFlows(component(part).flows(part), part.rotate);
+      return !!flows[clampRotation(angle + (component(part).isSource ? 0 : 180))];
     });
 };
 
-const combineFlows = (left: CalculatedFlow = {}, right: CalculatedFlow = {}) =>
+const combineFlows = (left: FlowPressure = {}, right: FlowPressure = {}) =>
   Object.entries(right)
-    .reduce((into: CalculatedFlow, [angle, val]) => ({ ...into, [angle]: (into[angle] || 0) + val }), left);
+    .reduce((into: FlowPressure, [angle, val]) => ({ ...into, [angle]: (into[angle] || 0) + val }), left);
 
 const mergePartFlow = (
-  part: DisplayPart,
-  allParts: DisplayPart[],
-  flowToAdd: CalculatedFlow,
-): DisplayPart[] =>
+  part: FlowPart,
+  allParts: FlowPart[],
+  flowToAdd: FlowPressure,
+): FlowPart[] =>
   allParts
     .map((item) => {
       if (!isSamePart(part, item)) {
@@ -92,25 +98,25 @@ const mergePartFlow = (
       };
     });
 
-const partOutFlows = (part: DisplayPart, angleIn: number): Flow[] => {
+const partOutFlows = (part: FlowPart, angleIn: number): Flow[] => {
   const flowFrom = liquidIn(part, angleIn);
-  const flows = rotatedFlows(part.component.flows(part), part.rotate);
+  const flows = rotatedFlows(component(part).flows(part), part.rotate);
   return flows[flowFrom] || [];
 };
 
 
-const calculateFlows = (
-  part: DisplayPart,
-  allParts: DisplayPart[],
-  angleIn: number = 0,
+const calculateFromSource = (
+  part: FlowPart,
+  allParts: FlowPart[],
+  angleIn: number = UP,
   totalFriction: number = 0,
   startPressure: number = 10,
   totalDeltaPressure: number = 0,
-  candidates: DisplayPart[] = allParts,
-): DisplayPart[] => {
+  candidates: FlowPart[] = allParts,
+): FlowPart[] => {
   const candidateParts = [...candidates.filter(candidate => !isSamePart(part, candidate))];
 
-  const outFlowReducer = (parts: DisplayPart[], outFlow: Flow): DisplayPart[] => {
+  const outFlowReducer = (parts: FlowPart[], outFlow: Flow): FlowPart[] => {
     const { angleOut, pressure, friction, deltaPressure } = outFlow;
     totalFriction += (friction || 0);
     totalDeltaPressure += (deltaPressure || 0);
@@ -144,10 +150,10 @@ const calculateFlows = (
 
     const notUpdatedNextPart = partAtAngle(part, parts, angleOut);
 
-    const nextFlows = calculateFlows(
+    const nextFlows = calculateFromSource(
       nextPart,
       parts,
-      rotated(angleOut + 180),
+      clampRotation(angleOut + 180),
       totalFriction,
       startPressure,
       totalDeltaPressure,
@@ -158,10 +164,10 @@ const calculateFlows = (
 
     let additionalAngleFlow = 0;
     if (updatedNextPart && updatedNextPart.flow) {
-      additionalAngleFlow += updatedNextPart.flow[rotated(angleOut + 180)];
+      additionalAngleFlow += updatedNextPart.flow[clampRotation(angleOut + 180)];
     }
     if (notUpdatedNextPart && notUpdatedNextPart.flow) {
-      additionalAngleFlow -= notUpdatedNextPart.flow[rotated(angleOut + 180)];
+      additionalAngleFlow -= notUpdatedNextPart.flow[clampRotation(angleOut + 180)];
     }
 
     return mergePartFlow(
@@ -178,7 +184,7 @@ const calculateFlows = (
     .reduce(outFlowReducer, allParts);
 };
 
-const mergeSourceFlows = (allParts: DisplayPart[], sourceFlow: DisplayPart[]): DisplayPart[] =>
+const mergeSourceFlows = (allParts: FlowPart[], sourceFlow: FlowPart[]): FlowPart[] =>
   sourceFlow.reduce(
     (acc, part) => {
       const existing = allParts.find(p => isSamePart(p, part));
@@ -191,22 +197,22 @@ const mergeSourceFlows = (allParts: DisplayPart[], sourceFlow: DisplayPart[]): D
     allParts,
   );
 
-const angledFlow = (part: DisplayPart): CalculatedFlow =>
+const angledFlow = (part: FlowPart): FlowPressure =>
   Object.keys(part.flow || {})
     .map(Number)
     .reduce(
       (acc, angle) => (
         // rotate flow to match Vue component (anti-rotate)
         part.flow
-          ? { ...acc, [rotated(angle + (360 - (part.rotate || 0)))]: part.flow[angle] }
+          ? { ...acc, [clampRotation(angle + (part.rotate || 0))]: part.flow[angle] }
           : acc
       ),
       {},
     );
 
-export const pathsFromSources = (parts: DisplayPart[]): DisplayPart[] =>
+export const pathsFromSources = (parts: Part[]): FlowPart[] =>
   parts
-    .filter(part => part.component.isSource) // -> Part[]
-    .map(source => calculateFlows(source, parts, source.rotate)) // -> Part[][]
-    .reduce(mergeSourceFlows, []) // -> Part[]
+    .filter(part => component(part).isSource) // -> Part[]
+    .map(part => calculateFromSource(part as FlowPart, parts as FlowPart[], part.rotate)) // -> FlowPart[][]
+    .reduce(mergeSourceFlows, []) // -> FlowPart[]
     .map(part => (part.flow ? { ...part, flow: angledFlow(part) } : part));

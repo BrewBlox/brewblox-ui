@@ -65,7 +65,7 @@
           {
             "x": 5,
             "y": 2,
-            "type": "StraightTube",
+            "type": "Pump",
             "rotate": 0
           },
           {

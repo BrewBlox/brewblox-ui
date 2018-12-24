@@ -1,13 +1,12 @@
 <script lang="ts">
 import WidgetBase from '@/components/Widget/WidgetBase';
-import Vue from 'vue';
 import Component from 'vue-class-component';
-import { rotated, isSamePart, pathsFromSources } from './calculateFlows';
-import { allParts, componentByType } from './Parts';
+import { clampRotation } from '@/helpers/functional';
+import { isSamePart, pathsFromSources } from './calculateFlows';
+import { allParts, SQUARE_SIZE } from './parts';
 import ProcessViewItem from './ProcessViewItem.vue';
-import { Part, ProcessViewConfig, DisplayPart, PanArguments, HoldArguments } from './state';
-
-const SQUARE_SIZE = 50;
+import { Part, ProcessViewConfig, FlowPart, PanArguments, HoldArguments } from './state';
+import PartComponent from './components/PartComponent';
 
 interface DragAction {
   part: Part;
@@ -28,7 +27,6 @@ export default class ProcessViewWidget extends WidgetBase {
   editable: boolean = false;
   frame: number = 0;
   animationFrame: number = 0;
-  stateParts: Part[] = [];
   dragAction: DragAction | null = null;
   contextAction: ContextAction | null = null;
 
@@ -56,18 +54,15 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   get parts(): Part[] {
-    return [
-      ...this.widgetConfig.parts
-        .map(item => (this.stateParts.find(part => isSamePart(item, part)) || item)),
-      ...this.stateParts
-        .filter(item => !this.widgetConfig.parts.find(part => isSamePart(item, part))),
-    ];
+    return this.widgetConfig.parts;
   }
 
-  get partsWithFlow(): DisplayPart[] {
-    const partsWithComponent = this.parts
-      .map(part => ({ ...part, component: componentByType(part.type) }));
-    return pathsFromSources(partsWithComponent);
+  get partsKnown() {
+    return Object.values(allParts).every(part => part !== undefined);
+  }
+
+  get flowParts(): FlowPart[] {
+    return pathsFromSources(this.parts);
   }
 
   get gridClasses() {
@@ -117,25 +112,8 @@ export default class ProcessViewWidget extends WidgetBase {
     });
   }
 
-  toggleClosed(part: DisplayPart, closed: boolean) {
-    if (this.editable) {
-      return;
-    }
-    if (this.stateParts.some(item => isSamePart(part, item))) {
-      this.stateParts = this.stateParts.map(item =>
-        (isSamePart(part, item) ? { ...item, closed } : item));
-    } else {
-      this.stateParts = [
-        ...this.stateParts,
-        {
-          closed,
-          x: part.x,
-          y: part.y,
-          rotate: part.rotate,
-          type: part.type,
-        },
-      ];
-    }
+  updateParts(parts: Part[]) {
+    this.saveConfig({ ...this.widgetConfig, parts });
   }
 
   panHandler(part: Part, args: PanArguments) {
@@ -189,23 +167,26 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   removePart(part: Part) {
-    this.widgetConfig.parts = this.widgetConfig.parts
-      .filter(p => !isSamePart(p, part));
-    this.saveConfig();
+    this.updateParts(this.parts.filter(p => !isSamePart(p, part)));
   }
 
   movePart(from: Part, to: Part) {
     const spotTaken = this.widgetConfig.parts.some(p => p.x === to.x && p.y === to.y);
     if (!spotTaken) {
-      this.widgetConfig.parts = [
-        ...this.widgetConfig.parts.filter(p => !isSamePart(p, from)), to];
-      this.saveConfig();
+      this.updateParts([
+        ...this.widgetConfig.parts.filter(p => !isSamePart(p, from)), to]);
     }
   }
 
   rotatePart(part: Part, rotation: number) {
-    part.rotate = rotated(part.rotate + rotation);
+    part.rotate = clampRotation(part.rotate + rotation);
     this.saveConfig();
+  }
+
+  changePart(part: Part | FlowPart) {
+    // strip flow part components
+    const { flow, ...updated } = part as FlowPart;
+    this.updateParts(this.parts.map(p => (isSamePart(p, part) ? updated : p)));
   }
 
   beingDragged(part: Part) {
@@ -243,20 +224,12 @@ export default class ProcessViewWidget extends WidgetBase {
           </q-list>
         </q-popover>
       </q-btn>-->
-      <q-btn
-        v-if="editable"
-        flat
-        round
-        dense
-        slot="right"
-        icon="delete"
-        @click="() => {widgetConfig.parts = []; saveConfig();}"
-      />
+      <q-btn v-if="editable" flat round dense slot="right" icon="delete" @click="updateParts([])"/>
       <q-btn v-if="editable" flat round dense slot="right" icon="extension">
         <q-popover>
           <q-list link style="padding: 5px">
             <q-item v-for="part in availableParts" :key="part.type" :style="partSizeStyle">
-              <ProcessViewItem :part="part" v-touch-pan="v => panHandler(part, v)"/>
+              <ProcessViewItem :value="part" v-touch-pan="v => panHandler(part, v)"/>
             </q-item>
           </q-list>
         </q-popover>
@@ -264,7 +237,7 @@ export default class ProcessViewWidget extends WidgetBase {
       <q-toggle slot="right" v-model="editable"/>
     </q-card-title>
     <q-card-separator/>
-    <ProcessViewItem v-if="dragAction" :part="dragAction.part" :style="dragAction.style"/>
+    <ProcessViewItem v-if="dragAction" :value="dragAction.part" :style="dragAction.style"/>
     <div v-if="contextAction" class="column" :style="contextAction.style">
       <q-btn
         fab
@@ -288,18 +261,18 @@ export default class ProcessViewWidget extends WidgetBase {
         @mouseup.native="removePart(contextAction.part)"
       />
     </div>
-    <div :class="gridClasses" ref="grid">
+    <div :class="gridClasses" ref="grid" v-if="partsKnown">
       <div
         class="grid-item"
-        v-for="(part, idx) in partsWithFlow"
+        v-for="(part, idx) in parts"
         v-show="!beingDragged(part)"
         :key="`${part.x}_${part.y}`"
         :style="partStyle(part)"
-        v-touch-pan="v => panHandler(parts[idx], v)"
-        v-touch-hold="v => holdHandler(parts[idx], v)"
+        v-touch-pan="v => panHandler(part, v)"
+        v-touch-hold="v => holdHandler(part, v)"
       >
         <div v-if="editable" class="grid-item-coordinates">{{ part.x }},{{ part.y }}</div>
-        <ProcessViewItem :part="part" :frame="frame" v-on:toggle-closed="toggleClosed"/>
+        <ProcessViewItem :value="flowParts[idx]" @input="changePart" :frame="frame"/>
       </div>
     </div>
   </q-card>

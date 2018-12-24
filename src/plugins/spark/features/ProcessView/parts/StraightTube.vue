@@ -1,21 +1,15 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import FlowArrow from '../Flows/FlowArrow.vue';
-import PartComponent from '../PartComponent';
-import SVGRoot from '../SVGRoot.vue';
-import { AngledFlows } from '../../state';
+import PartComponent from '../components/PartComponent';
+import { AngledFlows } from '../state';
+import { LEFT, RIGHT } from './';
 
-@Component({
-  components: {
-    SVGRoot,
-    FlowArrow,
-  },
-})
+@Component
 export default class StraightTube extends PartComponent {
   static flows(): AngledFlows {
     return {
-      270: [{ angleOut: 90, friction: 1 }],
-      90: [{ angleOut: 270, friction: 1 }],
+      [LEFT]: [{ angleOut: RIGHT, friction: 1 }],
+      [RIGHT]: [{ angleOut: LEFT, friction: 1 }],
     };
   }
 

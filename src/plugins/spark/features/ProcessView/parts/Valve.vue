@@ -1,37 +1,30 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import FlowArrow from '../Flows/FlowArrow.vue';
-import PartComponent from '../PartComponent';
-import SVGRoot from '../SVGRoot.vue';
-import { DisplayPart } from '../../state';
+import PartComponent from '../components/PartComponent';
+import { FlowPart, AngledFlows } from '../state';
+import { LEFT, RIGHT, UP, DOWN, SQUARE_SIZE } from './';
 
-@Component({
-  components: {
-    SVGRoot,
-    FlowArrow,
-  },
-})
+@Component
 export default class Valve extends PartComponent {
-  static flows(part: DisplayPart) {
+  static flows(part: FlowPart): AngledFlows {
     if (part.closed) {
       return {};
     }
 
     return {
-      270: [{ angleOut: 90, friction: 1 }],
-      90: [{ angleOut: 270, friction: 1 }],
+      [LEFT]: [{ angleOut: RIGHT, friction: 1 }],
+      [RIGHT]: [{ angleOut: LEFT, friction: 1 }],
     };
   }
 
   get direction() {
-    return this.flowOnAngle(90) > 0 ? 270 : 90;
+    return this.flowOnAngle(RIGHT) > 0 ? LEFT : RIGHT;
   }
 
   get arrow() {
-    const x = this.frame * 50;
-
+    const x = this.frame * SQUARE_SIZE;
     return {
-      x: this.direction === 90 ? (75 - x) - 8 : x,
+      x: this.direction === RIGHT ? (75 - x) - 8 : x,
       y: 23,
     };
   }
@@ -39,7 +32,7 @@ export default class Valve extends PartComponent {
 </script>
 
 <template>
-  <button type="button" v-on:click="toggleClosed">
+  <div class="clickable" @click="toggleClosed">
     <SVGRoot>
       <g class="outline">
         <path d="M0,21h10.5c1.4-5.1,5.4-9.1,10.5-10.5C29,8.3,37.2,13,39.4,21h0.1H50"/>
@@ -61,19 +54,13 @@ export default class Valve extends PartComponent {
         <path d="M10.5,29C12.7,37,21,41.6,29,39.4C34,38,38,34,39.4,29H10.5z"/>
       </g>
     </SVGRoot>
-  </button>
+  </div>
 </template>
 
 
 <style scoped>
 .ProcessViewPart {
   cursor: pointer;
-}
-
-button {
-  border: 0;
-  background: none;
-  outline: none;
 }
 
 .valve {

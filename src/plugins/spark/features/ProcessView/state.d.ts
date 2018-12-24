@@ -11,8 +11,8 @@ export interface AngledFlows {
   [angleIn: number]: Flow[];
 }
 
-export interface CalculatedFlow {
-  [angle: number]: number;
+export interface FlowPressure {
+  [angleIn: number]: number; // pressure
 }
 
 export interface Part {
@@ -21,18 +21,18 @@ export interface Part {
   y: number;
   rotate: number;
   closed?: boolean;
+  disabled?: boolean;
+  flipped?: boolean;
 }
 
 export interface ComponentConstructor extends VueConstructor {
   isSource?: boolean;
   isSink?: boolean;
-  flows: (part: DisplayPart) => AngledFlows;
+  flows: (part: FlowPart) => AngledFlows;
 }
 
-export interface DisplayPart extends Part {
-  component: ComponentConstructor;
-  flow?: CalculatedFlow;
-  visited?: boolean;
+export interface FlowPart extends Part {
+  flow?: FlowPressure;
 }
 
 export interface ProcessViewConfig {
