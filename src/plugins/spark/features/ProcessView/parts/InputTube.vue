@@ -1,42 +1,28 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import FlowArrow from '../Flows/FlowArrow.vue';
-import PartComponent from '../PartComponent';
-import SVGRoot from '../SVGRoot.vue';
-import { AngledFlows } from '../../state';
+import PartComponent from '../components/PartComponent';
+import { AngledFlows } from '../state';
+import { LEFT, RIGHT, SQUARE_SIZE } from './';
+import { clamp } from '@/helpers/functional';
 
-@Component({
-  components: {
-    SVGRoot,
-    FlowArrow,
-  },
-})
+@Component
 export default class InputTube extends PartComponent {
   static isSource = true;
 
   static flows(): AngledFlows {
     return {
-      270: [{ out: 90, friction: 1 }],
+      [LEFT]: [{ angleOut: RIGHT, friction: 1 }],
     };
   }
 
   opacity(xPosition: number): number {
     const opacity = (xPosition - 23) / 5;
-
-    if (opacity < 0) {
-      return 0;
-    }
-
-    if (opacity > 1) {
-      return 1;
-    }
-
-    return opacity;
+    return clamp(opacity, 0, 1);
   }
 
   get arrow() {
     return {
-      x: this.frame * 50,
+      x: this.frame * SQUARE_SIZE,
       y: 23,
     };
   }

@@ -1,38 +1,34 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import FlowArrow from '../Flows/FlowArrow.vue';
-import PartComponent from '../PartComponent';
-import SVGRoot from '../SVGRoot.vue';
+import PartComponent from '../components/PartComponent';
+import { AngledFlows } from '../state';
+import { UP, RIGHT, SQUARE_SIZE, LEFT } from './';
 
-@Component({
-  components: {
-    SVGRoot,
-    FlowArrow,
-  },
-})
+@Component
 export default class ElbowTube extends PartComponent {
-  static flows() {
+  static flows(): AngledFlows {
     return {
-      0: [{ out: 90, friction: 1 }],
-      90: [{ out: 0, friction: 1 }],
+      [UP]: [{ angleOut: RIGHT, friction: 1 }],
+      [RIGHT]: [{ angleOut: UP, friction: 1 }],
     };
   }
 
   get direction() {
-    return this.flowOnAngle(0) > 0 ? 90 : 0;
+    return this.flowOnAngle(UP) > 0 ? RIGHT : UP;
   }
 
   arrow(frame: number) {
-    const pos = this.direction === 0 ? frame * 50 : 42 - (frame * 50);
+    const pos = this.direction === UP ? frame * SQUARE_SIZE : 42 - (frame * SQUARE_SIZE);
 
-    const rotateFrame = this.direction === 0 ? 0.43 : 0.36;
-    const rotateDir = this.direction === 0 ? -90 : 90;
+    const rotateFrame = this.direction === UP ? 0.43 : 0.36;
+    const rotateDir = this.direction === UP ? -RIGHT : RIGHT;
 
-    const rotate = frame > rotateFrame ?
-      (rotateDir < 0 ? Math.max : Math.min)(
+    const rotate = frame > rotateFrame
+      ? (rotateDir < 0 ? Math.max : Math.min)(
         this.direction + rotateDir,
         this.direction + (rotateDir * ((frame - rotateFrame) / 0.15)),
-      ) : this.direction;
+      )
+      : this.direction;
 
     return {
       rotate,
@@ -54,15 +50,12 @@ export default class ElbowTube extends PartComponent {
     </g>
     <g v-if="flowing" class="outline">
       <FlowArrow :rotate="arrow(frame).rotate" :x="arrow(frame).x" :y="arrow(frame).y"/>
-
       <FlowArrow :rotate="arrow(frame - 1).rotate" :x="arrow(frame - 1).x" :y="arrow(frame - 1).y"/>
-
       <FlowArrow
         :rotate="arrow(frame - 0.5).rotate"
         :x="arrow(frame - 0.5).x"
         :y="arrow(frame - 0.5).y"
       />
-
       <FlowArrow
         :rotate="arrow(frame + 0.5).rotate"
         :x="arrow(frame + 0.5).x"

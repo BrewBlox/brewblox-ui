@@ -63,3 +63,8 @@ export const hexToBase64 = (hex: string) =>
 
 export const base64ToHex = (b64: string) =>
   Buffer.from(b64, 'base64').toString('hex');
+
+export const clamp = (num: number, min: number, max: number) =>
+  Math.max(min, Math.min(num, max));
+
+export const clampRotation = (val: number) => (val + 360) % 360;

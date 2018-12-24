@@ -1,11 +1,11 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { componentByType } from './Parts/componentByType';
+import { allParts } from './parts';
 
 @Component({
   props: {
-    part: {
+    value: {
       type: Object,
       required: true,
     },
@@ -17,22 +17,23 @@ import { componentByType } from './Parts/componentByType';
 })
 export default class ProcessViewItem extends Vue {
   get style() {
-    return this.$props.part.rotate
-      ? { transform: `rotate(${this.$props.part.rotate}deg)` }
+    return this.$props.value.rotate
+      ? { transform: `rotate(${this.$props.value.rotate}deg)` }
       : {};
   }
 
   get component() {
-    return componentByType(this.$props.part.type);
+    return allParts[this.$props.value.type];
   }
 }
 </script>
 
 <template>
   <component
+    v-if="component"
     class="ProcessViewPart"
     :style="style"
-    :part="part"
+    :value="value"
     :animationFrame="frame"
     :is="component"
   />

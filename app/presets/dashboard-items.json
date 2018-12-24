@@ -12,52 +12,52 @@
           {
             "x": 1,
             "y": 1,
-            "type": "TUBE_STRAIGHT",
+            "type": "StraightTube",
             "rotate": 0
           },
           {
             "x": 2,
             "y": 1,
-            "type": "TUBE_TEE",
+            "type": "TeeTube",
             "rotate": 180
           },
           {
             "x": 2,
             "y": 2,
-            "type": "TUBE_STRAIGHT",
+            "type": "StraightTube",
             "rotate": 90
           },
           {
             "x": 2,
             "y": 3,
-            "type": "TUBE_ELBOW"
+            "type": "ElbowTube"
           },
           {
             "x": 3,
             "y": 3,
-            "type": "TUBE_TEE",
+            "type": "TeeTube",
             "rotate": 180
           },
           {
             "x": 4,
             "y": 3,
-            "type": "TUBE_ELBOW",
+            "type": "ElbowTube",
             "rotate": 270
           },
           {
             "x": 4,
             "y": 1,
-            "type": "TUBE_ELBOW",
+            "type": "ElbowTube",
             "rotate": 180
           },
           {
             "x": 3,
             "y": 1,
-            "type": "TUBE_STRAIGHT",
+            "type": "StraightTube",
             "rotate": 0
           },
           {
-            "type": "TUBE_TEE",
+            "type": "TeeTube",
             "x": 4,
             "y": 2,
             "rotate": 90
@@ -65,17 +65,17 @@
           {
             "x": 5,
             "y": 2,
-            "type": "TUBE_STRAIGHT",
+            "type": "Pump",
             "rotate": 0
           },
           {
             "x": 0,
             "y": 1,
-            "type": "TUBE_INPUT",
+            "type": "InputTube",
             "rotate": 0
           },
           {
-            "type": "TUBE_INPUT",
+            "type": "InputTube",
             "x": 6,
             "y": 2,
             "rotate": 180
@@ -83,11 +83,11 @@
           {
             "x": 3,
             "y": 5,
-            "type": "TUBE_OUTPUT",
+            "type": "OutputTube",
             "rotate": 90
           },
           {
-            "type": "VALVE",
+            "type": "Valve",
             "x": 3,
             "y": 4,
             "rotate": 90
