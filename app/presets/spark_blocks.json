@@ -229,5 +229,41 @@
       ],
       "name": "test"
     }
+  },
+  {
+    "id":  "ds2413-hw-1",
+    "profiles": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "type": "DS2413",
+    "data": {
+      "address": "4444444444444444"
+    }
+  },
+  {
+    "id": "ow-act",
+    "profiles": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "type": "ActuatorDS2413",
+    "data": {
+      "channel": 1,
+      "invert": true,
+      "hwDevice<DS2413>": "ds2413-hw-1"
+    }
   }
 ]
