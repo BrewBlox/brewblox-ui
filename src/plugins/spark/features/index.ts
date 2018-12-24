@@ -5,6 +5,7 @@ import ActuatorPin from './ActuatorPin';
 import ActuatorPwm from './ActuatorPwm';
 import Balancer from './Balancer';
 import DisplaySettings from './DisplaySettings';
+import DS2413 from './DS2413';
 import InactiveObject from './InactiveObject';
 import Mutex from './Mutex';
 import Pid from './Pid';
@@ -22,6 +23,7 @@ const features: { [id: string]: Feature } = {
   ActuatorPwm,
   Balancer,
   DisplaySettings,
+  DS2413,
   InactiveObject,
   Pid,
   Mutex,
