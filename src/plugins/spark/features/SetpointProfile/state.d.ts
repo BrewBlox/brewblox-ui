@@ -9,5 +9,7 @@ export interface Setpoint {
 export interface SetpointProfileBlock extends Block {
   data: {
     points: Setpoint[];
+    setting: Unit;
+    enabled: boolean;
   };
 }

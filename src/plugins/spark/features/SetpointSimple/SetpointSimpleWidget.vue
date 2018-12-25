@@ -66,7 +66,7 @@ export default class SetpointSimpleWidget extends BlockWidget {
             <q-field class="col" label="Enabled">
               <q-toggle
                 :value="block.data.enabled"
-                @input="callAndSaveBlock(v => block.data.enabled = v)"
+                @input="v => { block.data.enabled = v; saveBlock() }"
               />
             </q-field>
           </q-card-main>

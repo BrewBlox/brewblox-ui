@@ -74,7 +74,7 @@ export default class ActuatorDS2413Form extends BlockForm {
         <q-field class="col" label="Invert">
           <q-toggle
             :value="block.data.invert"
-            @input="callAndSaveBlock(v => block.data.invert = v)"
+            @input="v => { block.data.invert = v; saveBlock(); }"
           />
         </q-field>
       </q-card-main>

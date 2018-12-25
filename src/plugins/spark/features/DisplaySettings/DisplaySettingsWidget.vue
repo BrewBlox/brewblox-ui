@@ -66,24 +66,20 @@ export default class DisplaySettingsWidget extends BlockWidget {
       name: existing.name || block.id.slice(0, 15),
     };
 
-    if (block.type.startsWith('TempSensor')) {
-      obj.TempSensor = link;
+    if (block.type === 'TempSensorInterface') {
+      obj.tempSensor = link;
     }
 
     if (block.type === 'SetpointSensorPair') {
-      obj.SetpointSensorPair = link;
+      obj.setpointSensorPair = link;
     }
 
-    if (block.type === 'ActuatorPwm') {
-      obj.ActuatorPwm = link;
-    }
-
-    if (block.type === 'ActuatorAnalog') {
-      obj.ActuatorAnalog = link;
+    if (block.type === 'ActuatorAnalogInterface') {
+      obj.actuatorAnalog = link;
     }
 
     if (block.type === 'Pid') {
-      obj.Pid = link;
+      obj.pid = link;
     }
 
     this.block.data.widgets = [
