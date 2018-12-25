@@ -47,3 +47,9 @@ export class MutexLink extends Link {
     super(id, 'MutexLink');
   }
 }
+
+export class DS2413Link extends Link {
+  constructor(id: string | null) {
+    super(id, 'DS2413');
+  }
+}

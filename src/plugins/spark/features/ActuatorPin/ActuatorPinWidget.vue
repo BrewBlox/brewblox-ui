@@ -29,19 +29,6 @@ export default class ActuatorPinWidget extends BlockWidget {
     return state[unconstrained];
   }
 
-  get actuatorState() {
-    return state[this.block.data.state];
-  }
-
-  get boolState() {
-    return this.actuatorState === 'Active';
-  }
-
-  set boolState(v: boolean) {
-    this.block.data.state = v ? 1 : 0;
-    this.saveBlock();
-  }
-
   get renamedTargets() {
     return {
       state: 'State',
@@ -79,27 +66,10 @@ export default class ActuatorPinWidget extends BlockWidget {
         <div :class="['widget-body', orientationClass]">
           <q-card-main class="column col">
             <q-field class="col" label="State">
-              <q-toggle
-                v-if="block.data.state <= 1"
-                :value="boolState"
-                @input="v => { boolState = v; }"
+              <ActuatorState
+                :field="block.data.state"
+                :change="callAndSaveBlock(v => block.data.state = v)"
               />
-              <div v-else>
-                <q-btn
-                  class="reset-button"
-                  dense
-                  no-caps
-                  flat
-                  color="warning"
-                  @click="boolState = false"
-                  label="Unknown state!"
-                >
-                  <q-tooltip>
-                    Click to try to set to
-                    <i>inactive</i>
-                  </q-tooltip>
-                </q-btn>
-              </div>
             </q-field>
             <q-field v-if="pending !== null" class="col" label="Pending">
               <span>{{pending}}</span>

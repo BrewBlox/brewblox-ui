@@ -2,7 +2,7 @@ import { blockById } from '@/plugins/spark/store/getters';
 import { RootStore } from '@/store/state';
 import { DS2413Block } from './state';
 
-export const typeName = 'ActuatorPin';
+export const typeName = 'DS2413';
 
 export const state = [
   'Inactive',

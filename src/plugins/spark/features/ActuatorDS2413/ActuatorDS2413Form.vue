@@ -1,13 +1,23 @@
 <script lang="ts">
+import { DS2413Link } from '@/helpers/units/KnownLinks';
 import BlockForm from '@/plugins/spark/components/BlockForm';
+import { ActuatorDS2413Block } from '@/plugins/spark/features/ActuatorDS2413/state';
 import Component from 'vue-class-component';
-import { state } from './getters';
-import { ActuatorPinBlock } from './state';
+import { channel } from './getters';
 
 @Component
-export default class ActuatorPinForm extends BlockForm {
-  get block(): ActuatorPinBlock {
-    return this.blockField as ActuatorPinBlock;
+export default class ActuatorDS2413Form extends BlockForm {
+  get block(): ActuatorDS2413Block {
+    return this.blockField as ActuatorDS2413Block;
+  }
+
+  get actuatorChannel() {
+    return channel[this.block.data.channel];
+  }
+
+  get channelOpts() {
+    return channel
+      .map((v, idx) => ({ label: v, value: idx }));
   }
 
   presets() {
@@ -15,9 +25,10 @@ export default class ActuatorPinForm extends BlockForm {
       {
         label: 'Default',
         value: {
-          state: 2,
-          invert: false,
-          constrainedBy: { constraints: [], unconstrained: 0 },
+          hwDevice: new DS2413Link(null),
+          channel: 0,
+          state: 0,
+          constrainedBy: { constraints: [] },
         },
       },
     ];
@@ -38,16 +49,32 @@ export default class ActuatorPinForm extends BlockForm {
     <q-card>
       <q-card-title>Settings</q-card-title>
       <q-card-main>
+        <q-field class="col" label="Actuator">
+          <LinkPopupEdit
+            label="Actuator"
+            :field="block.data.hwDevice"
+            :serviceId="serviceId"
+            :change="callAndSaveBlock(v => block.data.hwDevice = v)"
+          />
+        </q-field>
+        <q-field class="col" label="Channel">
+          <SelectPopupEdit
+            label="Channel"
+            :field="block.data.channel"
+            :options="channelOpts"
+            :change="callAndSaveBlock(v => block.data.channel = v)"
+          />
+        </q-field>
         <q-field class="col" label="State">
           <ActuatorState
             :field="block.data.state"
             :change="callAndSaveBlock(v => block.data.state = v)"
           />
         </q-field>
-        <q-field class="col" label="Inverted">
+        <q-field class="col" label="Invert">
           <q-toggle
             :value="block.data.invert"
-            @input="v => { block.data.invert = v; saveBlock(); }"
+            @input="callAndSaveBlock(v => block.data.invert = v)"
           />
         </q-field>
       </q-card-main>
@@ -57,7 +84,7 @@ export default class ActuatorPinForm extends BlockForm {
       <q-card-main>
         <q-field class="col" label="Constraints" orientation="vertical">
           <DigitalConstraints
-            :serviceId="serviceId"
+            :serviceId="block.serviceId"
             :field="block.data.constrainedBy"
             :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
           />
@@ -75,6 +102,13 @@ export default class ActuatorPinForm extends BlockForm {
         </q-field>
         <q-field class="col" label="Block Type">
           <big>{{ block.type }}</big>
+        </q-field>
+        <q-field class="col" label="Profiles">
+          <ProfilesPopupEdit
+            :field="block.profiles"
+            :serviceId="serviceId"
+            :change="callAndSaveBlock(v => block.profiles = v)"
+          />
         </q-field>
         <q-field class="col" label="Preset">
           <SelectPopupEdit

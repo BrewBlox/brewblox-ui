@@ -1,21 +1,27 @@
 <script lang="ts">
-import { Unit } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import { isNullOrUndefined } from 'util';
 import Component from 'vue-class-component';
 import { getById } from './getters';
-import { SetpointSimpleBlock } from './state';
+import { ActuatorDS2413Block } from './state';
 
 @Component
-export default class SetpointSimpleWidget extends BlockWidget {
-  get block(): SetpointSimpleBlock {
+export default class ActuatorDS2413Widget extends BlockWidget {
+  get block(): ActuatorDS2413Block {
     return getById(this.$store, this.serviceId, this.blockId);
   }
 
   get subtitles() {
     return [
       'State',
+      'Constraints',
+      'Graph',
     ];
+  }
+
+  get renamedTargets() {
+    return {
+      state: 'State',
+    };
   }
 }
 </script>
@@ -23,7 +29,7 @@ export default class SetpointSimpleWidget extends BlockWidget {
 <template>
   <q-card dark class="column">
     <q-modal v-model="modalOpen">
-      <SetpointSimpleForm
+      <ActuatorDS2413Form
         v-if="modalOpen"
         :field="block"
         :change="saveBlock"
@@ -43,34 +49,44 @@ export default class SetpointSimpleWidget extends BlockWidget {
       <q-btn flat round dense slot="right" @click="refreshBlock" icon="refresh"/>
     </q-card-title>
     <q-card-separator/>
-    <q-alert
-      type="warning"
-      color="warn"
-      v-if="this.block.data.value === null"
-    >This Setpoint is invalid</q-alert>
     <q-carousel quick-nav class="col" v-model="slideIndex">
       <!-- State -->
       <q-carousel-slide class="unpadded">
         <div :class="['widget-body', orientationClass]">
           <q-card-main class="column col">
-            <q-field class="col" label="Setting">
-              <big>{{ block.data.setting | unit }}</big>
-            </q-field>
-            <q-field class="col" label="Setpoint">
-              <UnitPopupEdit
-                label="Setpoint"
-                :field="block.data.setpoint"
-                :change="callAndSaveBlock(v => block.data.setpoint = v)"
+            <q-field class="col" label="Actuator">
+              <LinkPopupEdit
+                label="Actuator"
+                :field="block.data.hwDevice"
+                :serviceId="serviceId"
+                :change="callAndSaveBlock(v => block.data.hwDevice = v)"
               />
             </q-field>
-            <q-field class="col" label="Enabled">
-              <q-toggle
-                :value="block.data.enabled"
-                @input="callAndSaveBlock(v => block.data.enabled = v)"
+            <q-field class="col" label="State">
+              <ActuatorState
+                :field="block.data.state"
+                :change="callAndSaveBlock(v => block.data.state = v)"
               />
             </q-field>
           </q-card-main>
         </div>
+      </q-carousel-slide>
+      <!-- Constraints -->
+      <q-carousel-slide class="unpadded">
+        <q-card-main class="column col">
+          <q-field class="col" label="Constraints" orientation="vertical">
+            <DigitalConstraints
+              readonly
+              :serviceId="serviceId"
+              :field="block.data.constrainedBy"
+              :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+            />
+          </q-field>
+        </q-card-main>
+      </q-carousel-slide>
+      <!-- Graph -->
+      <q-carousel-slide class="unpadded">
+        <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
       </q-carousel-slide>
       <q-btn
         slot="quick-nav"
@@ -89,3 +105,4 @@ export default class SetpointSimpleWidget extends BlockWidget {
 
 <style scoped>
 </style>
+

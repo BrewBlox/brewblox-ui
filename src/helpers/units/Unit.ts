@@ -12,11 +12,11 @@ const prettify = (v: string) => v
   .replace(/ \* /gi, '*');
 
 export default class Unit {
-  value: number;
+  value: number | null;
   unit: string;
   notation: string;
 
-  constructor(value: number, unit: string) {
+  constructor(value: number | null, unit: string) {
     this.value = value;
     this.unit = unit;
     this.notation = prettify(this.unit);
@@ -27,7 +27,9 @@ export default class Unit {
   }
 
   get roundedValue(): string {
-    return this.value.toFixed(2);
+    return (this.value === null)
+      ? '??'
+      : this.value.toFixed(2);
   }
 
   serializedKeyName(key: string): string {
@@ -38,7 +40,7 @@ export default class Unit {
     return `${this.roundedValue} ${this.unitNotation}`;
   }
 
-  toJSON(): number {
+  toJSON(): number | null {
     return this.value;
   }
 }
