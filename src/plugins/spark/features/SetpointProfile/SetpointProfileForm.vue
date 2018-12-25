@@ -45,6 +45,8 @@ export default class SetpointProfileForm extends BlockForm {
         label: 'Default',
         value: {
           points: [],
+          setting: new Unit(0, 'degC'),
+          enabled: true,
         },
       },
     ];
@@ -141,6 +143,20 @@ export default class SetpointProfileForm extends BlockForm {
       icon="close"
       style="position: absolute; right: 18px; top: 18px"
     />
+    <q-card>
+      <q-card-title>Settings</q-card-title>
+      <q-card-main>
+        <q-field class="col" label="Enabled">
+          <q-toggle
+            :value="block.data.enabled"
+            @input="v => { block.data.enabled = v; saveBlock(); }"
+          />
+        </q-field>
+        <q-field class="col" label="Setting">
+          <big>{{ block.data.setting | unit }}</big>
+        </q-field>
+      </q-card-main>
+    </q-card>
     <q-card>
       <q-card-title>Setpoints</q-card-title>
       <q-card-main>

@@ -139,9 +139,26 @@
             "max": 10
           },
           {
-            "balanced": {
+            "balanced<>": {
               "balancerId<>": "balancer-1"
             }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "actuator-ds2413-1",
+    "profiles": [
+      0
+    ],
+    "type": "ActuatorDS2413",
+    "data": {
+      "channel": 1,
+      "constrainedBy": {
+        "constraints": [
+          {
+            "mutex<>": "mutex-1"
           }
         ]
       }

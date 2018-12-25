@@ -2,12 +2,24 @@
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import Component from 'vue-class-component';
 import { state } from './getters';
-import { ActuatorPinBlock } from './state';
+import { DS2413Block } from './state';
 
 @Component
-export default class ActuatorPinForm extends BlockForm {
-  get block(): ActuatorPinBlock {
-    return this.blockField as ActuatorPinBlock;
+export default class DS2413Form extends BlockForm {
+  get block(): DS2413Block {
+    return this.blockField as DS2413Block;
+  }
+
+  get address() {
+    return this.block.data.address;
+  }
+
+  get actuatorState() {
+    return state[this.block.data.state];
+  }
+
+  get boolState() {
+    return this.actuatorState === 'Active';
   }
 
   presets() {
@@ -15,9 +27,8 @@ export default class ActuatorPinForm extends BlockForm {
       {
         label: 'Default',
         value: {
+          address: '',
           state: 2,
-          invert: false,
-          constrainedBy: { constraints: [], unconstrained: 0 },
         },
       },
     ];
@@ -36,31 +47,13 @@ export default class ActuatorPinForm extends BlockForm {
       style="position: absolute; right: 18px; top: 18px"
     />
     <q-card>
-      <q-card-title>Settings</q-card-title>
+      <q-card-title>State</q-card-title>
       <q-card-main>
+        <q-field class="col" label="Address">
+          <span>{{ address }}</span>
+        </q-field>
         <q-field class="col" label="State">
-          <ActuatorState
-            :field="block.data.state"
-            :change="callAndSaveBlock(v => block.data.state = v)"
-          />
-        </q-field>
-        <q-field class="col" label="Inverted">
-          <q-toggle
-            :value="block.data.invert"
-            @input="v => { block.data.invert = v; saveBlock(); }"
-          />
-        </q-field>
-      </q-card-main>
-    </q-card>
-    <q-card>
-      <q-card-title>Constraints</q-card-title>
-      <q-card-main>
-        <q-field class="col" label="Constraints" orientation="vertical">
-          <DigitalConstraints
-            :serviceId="serviceId"
-            :field="block.data.constrainedBy"
-            :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
-          />
+          <big>{{ actuatorState }}</big>
         </q-field>
       </q-card-main>
     </q-card>

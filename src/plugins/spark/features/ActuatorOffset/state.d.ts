@@ -1,5 +1,6 @@
 import { Link } from '@/helpers/units';
 import { Block } from '@/plugins/spark/state';
+import { ConstraintsObj } from '../../components/Constraints/state';
 
 export interface ActuatorOffsetBlock extends Block {
   data: {
@@ -8,6 +9,6 @@ export interface ActuatorOffsetBlock extends Block {
     referenceSettingOrValue: number;
     setting: number;
     value: number;
-    constrainedBy: any[];
+    constrainedBy: ConstraintsObj;
   };
 }
