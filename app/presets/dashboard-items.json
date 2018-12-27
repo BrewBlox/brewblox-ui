@@ -10,87 +10,157 @@
       "config": {
         "parts": [
           {
-            "x": 1,
-            "y": 1,
+            "x": 11,
+            "y": 2,
+            "type": "InputTube",
+            "rotate": 0
+          },
+          {
+            "x": 12,
+            "y": 2,
             "type": "StraightTube",
             "rotate": 0
           },
           {
-            "x": 2,
+            "type": "BridgeTube",
+            "x": 13,
+            "y": 2,
+            "rotate": 0
+          },
+          {
+            "type": "OutputTube",
+            "x": 13,
             "y": 1,
-            "type": "TeeTube",
+            "rotate": 270
+          },
+          {
+            "x": 14,
+            "y": 2,
+            "type": "ElbowTube",
             "rotate": 180
           },
           {
-            "x": 2,
-            "y": 2,
-            "type": "StraightTube",
-            "rotate": 90
+            "type": "ElbowTube",
+            "x": 14,
+            "y": 3,
+            "rotate": 270
           },
           {
-            "x": 2,
+            "x": 13,
             "y": 3,
             "type": "ElbowTube"
           },
           {
-            "x": 3,
-            "y": 3,
-            "type": "TeeTube",
-            "rotate": 180
-          },
-          {
-            "x": 4,
-            "y": 3,
-            "type": "ElbowTube",
-            "rotate": 270
-          },
-          {
-            "x": 4,
-            "y": 1,
-            "type": "ElbowTube",
-            "rotate": 180
-          },
-          {
-            "x": 3,
-            "y": 1,
-            "type": "StraightTube",
-            "rotate": 0
-          },
-          {
-            "type": "TeeTube",
-            "x": 4,
-            "y": 2,
-            "rotate": 90
-          },
-          {
-            "x": 5,
-            "y": 2,
-            "type": "Pump",
-            "rotate": 0
-          },
-          {
+            "type": "InputTube",
             "x": 0,
-            "y": 1,
-            "type": "InputTube",
+            "y": 2,
             "rotate": 0
           },
           {
-            "type": "InputTube",
-            "x": 6,
+            "type": "Valve",
+            "x": 1,
             "y": 2,
-            "rotate": 180
+            "rotate": 0
           },
           {
             "x": 3,
-            "y": 5,
+            "y": 6,
             "type": "OutputTube",
             "rotate": 90
           },
           {
             "type": "Valve",
             "x": 3,
+            "y": 5,
+            "rotate": 90,
+            "closed": false
+          },
+          {
+            "x": 3,
             "y": 4,
+            "type": "TeeTube",
+            "rotate": 180
+          },
+          {
+            "type": "ElbowTube",
+            "x": 2,
+            "y": 4,
+            "rotate": 0
+          },
+          {
+            "type": "TeeTube",
+            "x": 2,
+            "y": 3,
             "rotate": 90
+          },
+          {
+            "x": 2,
+            "y": 2,
+            "type": "TeeTube",
+            "rotate": 180
+          },
+          {
+            "type": "ElbowTube",
+            "x": 3,
+            "y": 3,
+            "rotate": 270
+          },
+          {
+            "type": "BridgeTube",
+            "x": 3,
+            "y": 2,
+            "rotate": 0
+          },
+          {
+            "x": 5,
+            "y": 4,
+            "type": "ElbowTube",
+            "rotate": 270
+          },
+          {
+            "type": "InputTube",
+            "x": 7,
+            "y": 3,
+            "rotate": 180
+          },
+          {
+            "type": "Valve",
+            "x": 6,
+            "y": 3,
+            "rotate": 180,
+            "closed": false
+          },
+          {
+            "type": "TeeTube",
+            "x": 5,
+            "y": 3,
+            "rotate": 90
+          },
+          {
+            "type": "ElbowTube",
+            "x": 5,
+            "y": 2,
+            "rotate": 180
+          },
+          {
+            "x": 4,
+            "y": 2,
+            "type": "Pump",
+            "rotate": 0,
+            "disabled": false
+          },
+          {
+            "type": "Valve",
+            "x": 4,
+            "y": 4,
+            "rotate": 0,
+            "closed": true
+          },
+          {
+            "type": "OutputTube",
+            "x": 3,
+            "y": 1,
+            "rotate": 270
           }
         ]
       }

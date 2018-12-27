@@ -210,10 +210,10 @@ export default class ProcessViewWidget extends WidgetBase {
         :change="v => widgetId = v"
       />
       <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
-      <q-btn flat round dense slot="right" icon="tune">
+      <q-btn v-if="editable" flat round dense slot="right" icon="tune">
         <q-popover>
           <q-list>
-            <q-item v-if="editable">
+            <q-item>
               Frame:
               <input step="0.01" type="range" min="0" max="1" v-model.number="frame">
               <div>{{frame}}</div>

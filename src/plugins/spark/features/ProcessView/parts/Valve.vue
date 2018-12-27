@@ -12,8 +12,8 @@ export default class Valve extends PartComponent {
     }
 
     return {
-      [LEFT]: [{ angleOut: RIGHT, friction: 1 }],
-      [RIGHT]: [{ angleOut: LEFT, friction: 1 }],
+      [LEFT]: [{ angleOut: RIGHT }],
+      [RIGHT]: [{ angleOut: LEFT }],
     };
   }
 

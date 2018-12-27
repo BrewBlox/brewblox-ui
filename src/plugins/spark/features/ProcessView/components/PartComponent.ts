@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { FlowPart } from '../state';
+import { FlowPart, AngledFlows } from '../state';
 
 @Component({
   props: {
@@ -15,6 +15,18 @@ import { FlowPart } from '../state';
   },
 })
 export default class PartComponent extends Vue {
+  static flows(part: FlowPart): AngledFlows {
+    return {};
+  }
+
+  static get isSource() {
+    return false;
+  }
+
+  static get isBridge() {
+    return false;
+  }
+
   get part(): FlowPart {
     return this.$props.value;
   }

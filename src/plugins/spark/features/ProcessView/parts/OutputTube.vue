@@ -9,7 +9,7 @@ import { LEFT, RIGHT, SQUARE_SIZE } from '../getters';
 export default class OutputTube extends PartComponent {
   static flows(): AngledFlows {
     return {
-      [LEFT]: [{ angleOut: RIGHT, pressure: 0, friction: 1 }],
+      [LEFT]: [{ angleOut: RIGHT, pressure: 0 }],
     };
   }
 

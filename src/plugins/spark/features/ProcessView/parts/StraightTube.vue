@@ -8,8 +8,8 @@ import { LEFT, RIGHT, SQUARE_SIZE } from '../getters';
 export default class StraightTube extends PartComponent {
   static flows(): AngledFlows {
     return {
-      [LEFT]: [{ angleOut: RIGHT, friction: 1 }],
-      [RIGHT]: [{ angleOut: LEFT, friction: 1 }],
+      [LEFT]: [{ angleOut: RIGHT }],
+      [RIGHT]: [{ angleOut: LEFT }],
     };
   }
 

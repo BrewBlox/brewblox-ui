@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Part, AngledFlows, FlowPart, FlowPressure, Flow, ComponentConstructor } from './state';
-import { UP, RIGHT, DOWN, LEFT } from './getters';
+import { UP, RIGHT, DOWN, LEFT, DEFAULT_FRICTION, DEFAULT_DELTA_PRESSURE } from './getters';
 import { clampRotation } from '@/helpers/functional';
 
 export const isSamePart = (left: Part, right: Part) =>
@@ -149,12 +149,13 @@ const calculateFromSource = (
   totalDeltaPressure: number = 0,
   candidates: FlowPart[] = allParts,
 ): FlowPart[] => {
-  const candidateParts = candidates.filter(candidate => !isSamePart(sourcePart, candidate));
+  const candidateParts = candidates
+    .filter(candidate => !isSamePart(sourcePart, candidate) || component(candidate).isBridge);
 
   const outFlowReducer = (parts: FlowPart[], outFlow: Flow): FlowPart[] => {
     const { angleOut, pressure, friction, deltaPressure } = outFlow;
-    totalFriction += (friction || 0);
-    totalDeltaPressure += (deltaPressure || 0);
+    totalFriction += (friction || DEFAULT_FRICTION);
+    totalDeltaPressure += (deltaPressure || DEFAULT_DELTA_PRESSURE);
 
     if (pressure !== undefined) {
       // Found an end part -> route is done
@@ -201,12 +202,14 @@ const calculateFromSource = (
 
     const updatedNextPart = adjacentPart(sourcePart, nextFlows, angleOut);
 
+    // I have no clue what this does
+    // Something with circular flows
     let additionalAngleFlow = 0;
     if (updatedNextPart && updatedNextPart.flow) {
-      additionalAngleFlow += updatedNextPart.flow[clampRotation(angleOut + 180)];
+      additionalAngleFlow += (updatedNextPart.flow[clampRotation(angleOut + 180)] || 0);
     }
     if (notUpdatedNextPart && notUpdatedNextPart.flow) {
-      additionalAngleFlow -= notUpdatedNextPart.flow[clampRotation(angleOut + 180)];
+      additionalAngleFlow -= (notUpdatedNextPart.flow[clampRotation(angleOut + 180)] || 0);
     }
 
     // The recursion tree has returned, merge the flow for this part into the result set

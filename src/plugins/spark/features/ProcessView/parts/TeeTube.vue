@@ -8,9 +8,9 @@ import { UP, LEFT, RIGHT, DOWN, SQUARE_SIZE } from '../getters';
 export default class TeeTube extends PartComponent {
   static flows(): AngledFlows {
     return {
-      [UP]: [{ angleOut: RIGHT, friction: 1 }, { angleOut: LEFT, friction: 1 }],
-      [RIGHT]: [{ angleOut: UP, friction: 1 }, { angleOut: LEFT, friction: 1 }],
-      [LEFT]: [{ angleOut: UP, friction: 1 }, { angleOut: RIGHT, friction: 1 }],
+      [UP]: [{ angleOut: RIGHT }, { angleOut: LEFT }],
+      [RIGHT]: [{ angleOut: UP }, { angleOut: LEFT }],
+      [LEFT]: [{ angleOut: UP }, { angleOut: RIGHT }],
     };
   }
 

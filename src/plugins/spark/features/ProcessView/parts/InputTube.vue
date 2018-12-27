@@ -7,11 +7,13 @@ import { clamp } from '@/helpers/functional';
 
 @Component
 export default class InputTube extends PartComponent {
-  static isSource = true;
+  static get isSource() {
+    return true;
+  }
 
   static flows(): AngledFlows {
     return {
-      [LEFT]: [{ angleOut: RIGHT, friction: 1 }],
+      [LEFT]: [{ angleOut: RIGHT }],
     };
   }
 
