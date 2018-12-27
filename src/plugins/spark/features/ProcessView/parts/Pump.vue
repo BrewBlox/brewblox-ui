@@ -2,7 +2,7 @@
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
 import { AngledFlows, FlowPart } from '../state';
-import { LEFT, RIGHT } from './';
+import { LEFT, RIGHT } from '../getters';
 
 @Component
 export default class Pump extends PartComponent {

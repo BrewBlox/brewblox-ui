@@ -1,7 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { allParts } from './parts';
 
 @Component({
   props: {
@@ -23,7 +22,7 @@ export default class ProcessViewItem extends Vue {
   }
 
   get component() {
-    return allParts[this.$props.value.type];
+    return Vue.component(this.$props.value.type);
   }
 }
 </script>

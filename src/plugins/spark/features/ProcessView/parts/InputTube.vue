@@ -2,7 +2,7 @@
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
 import { AngledFlows } from '../state';
-import { LEFT, RIGHT, SQUARE_SIZE } from './';
+import { LEFT, RIGHT, SQUARE_SIZE } from '../getters';
 import { clamp } from '@/helpers/functional';
 
 @Component

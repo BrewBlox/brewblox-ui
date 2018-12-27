@@ -27,7 +27,6 @@ export interface Part {
 
 export interface ComponentConstructor extends VueConstructor {
   isSource?: boolean;
-  isSink?: boolean;
   flows: (part: FlowPart) => AngledFlows;
 }
 

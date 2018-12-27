@@ -1,12 +1,13 @@
 <script lang="ts">
+import Vue from 'vue';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
 import { clampRotation } from '@/helpers/functional';
 import { isSamePart, pathsFromSources } from './calculateFlows';
-import { allParts, SQUARE_SIZE } from './parts';
+import { SQUARE_SIZE } from './getters';
+import { parts as knownParts } from './register';
 import ProcessViewItem from './ProcessViewItem.vue';
 import { Part, ProcessViewConfig, FlowPart, PanArguments, HoldArguments } from './state';
-import PartComponent from './components/PartComponent';
 
 interface DragAction {
   part: Part;
@@ -35,7 +36,9 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   saveConfig(config: ProcessViewConfig = this.widgetConfig) {
-    this.$props.onConfigChange(this.widgetId, { ...config });
+    const parts = config.parts
+      .map(({ flow, ...persistent }: FlowPart) => persistent);
+    this.$props.onConfigChange(this.widgetId, { ...config, parts });
   }
 
   get gridRect() {
@@ -44,7 +47,7 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   get availableParts(): Part[] {
-    return Object.keys(allParts)
+    return knownParts
       .map(type => ({
         type,
         x: -1,
@@ -55,10 +58,6 @@ export default class ProcessViewWidget extends WidgetBase {
 
   get parts(): Part[] {
     return this.widgetConfig.parts;
-  }
-
-  get partsKnown() {
-    return Object.values(allParts).every(part => part !== undefined);
   }
 
   get flowParts(): FlowPart[] {
@@ -184,9 +183,7 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   changePart(part: Part | FlowPart) {
-    // strip flow part components
-    const { flow, ...updated } = part as FlowPart;
-    this.updateParts(this.parts.map(p => (isSamePart(p, part) ? updated : p)));
+    this.updateParts(this.parts.map(p => (isSamePart(p, part) ? part : p)));
   }
 
   beingDragged(part: Part) {
@@ -213,7 +210,7 @@ export default class ProcessViewWidget extends WidgetBase {
         :change="v => widgetId = v"
       />
       <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
-      <!-- <q-btn flat round dense slot="right" icon="tune">
+      <q-btn flat round dense slot="right" icon="tune">
         <q-popover>
           <q-list>
             <q-item v-if="editable">
@@ -223,7 +220,7 @@ export default class ProcessViewWidget extends WidgetBase {
             </q-item>
           </q-list>
         </q-popover>
-      </q-btn>-->
+      </q-btn>
       <q-btn v-if="editable" flat round dense slot="right" icon="delete" @click="updateParts([])"/>
       <q-btn v-if="editable" flat round dense slot="right" icon="extension">
         <q-popover>
@@ -261,7 +258,7 @@ export default class ProcessViewWidget extends WidgetBase {
         @mouseup.native="removePart(contextAction.part)"
       />
     </div>
-    <div :class="gridClasses" ref="grid" v-if="partsKnown">
+    <div :class="gridClasses" ref="grid">
       <div
         class="grid-item"
         v-for="(part, idx) in parts"
