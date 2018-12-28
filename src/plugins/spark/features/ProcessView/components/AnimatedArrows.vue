@@ -22,7 +22,7 @@ import Component from 'vue-class-component';
     },
   },
 })
-export default class AnimatedArrow extends Vue {
+export default class AnimatedArrows extends Vue {
   get starts(): string[] {
     const interval = this.$props.duration / this.$props.numArrows;
     return [...Array(this.$props.numArrows).keys()]
