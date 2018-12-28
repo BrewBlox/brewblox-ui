@@ -14,7 +14,7 @@
     "compose:new": "docker-compose down && docker-compose up -d && npm run spark:blocks && npm run couchdb:docs",
     "serve": "vue-cli-service serve",
     "start": "npm run compose:new && npm run serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build --modern",
     "devbuild": "npm run build && mkdir -p ./app/dist && rm -r ./app/dist/*; cp -r ./dist/* ./app/dist/",
     "test": "jest",
     "e2e": "npm run compose:new && vue-cli-service test:e2e --mode development",
