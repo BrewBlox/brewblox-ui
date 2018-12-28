@@ -2,15 +2,15 @@
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
 import { AngledFlows } from '../state';
-import { UP, LEFT, RIGHT, DOWN, SQUARE_SIZE } from './';
+import { UP, LEFT, RIGHT, DOWN, SQUARE_SIZE } from '../getters';
 
 @Component
 export default class TeeTube extends PartComponent {
   static flows(): AngledFlows {
     return {
-      [UP]: [{ angleOut: RIGHT, friction: 1 }, { angleOut: LEFT, friction: 1 }],
-      [RIGHT]: [{ angleOut: UP, friction: 1 }, { angleOut: LEFT, friction: 1 }],
-      [LEFT]: [{ angleOut: UP, friction: 1 }, { angleOut: RIGHT, friction: 1 }],
+      [UP]: [{ angleOut: RIGHT }, { angleOut: LEFT }],
+      [RIGHT]: [{ angleOut: UP }, { angleOut: LEFT }],
+      [LEFT]: [{ angleOut: UP }, { angleOut: RIGHT }],
     };
   }
 

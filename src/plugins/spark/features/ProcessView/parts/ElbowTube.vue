@@ -2,14 +2,14 @@
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
 import { AngledFlows } from '../state';
-import { UP, RIGHT, SQUARE_SIZE, LEFT } from './';
+import { UP, RIGHT, SQUARE_SIZE, LEFT } from '../getters';
 
 @Component
 export default class ElbowTube extends PartComponent {
   static flows(): AngledFlows {
     return {
-      [UP]: [{ angleOut: RIGHT, friction: 1 }],
-      [RIGHT]: [{ angleOut: UP, friction: 1 }],
+      [UP]: [{ angleOut: RIGHT }],
+      [RIGHT]: [{ angleOut: UP }],
     };
   }
 

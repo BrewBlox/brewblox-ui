@@ -2,7 +2,7 @@
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
 import { FlowPart, AngledFlows } from '../state';
-import { LEFT, RIGHT, UP, DOWN, SQUARE_SIZE } from './';
+import { LEFT, RIGHT, UP, DOWN, SQUARE_SIZE } from '../getters';
 
 @Component
 export default class Valve extends PartComponent {
@@ -12,8 +12,8 @@ export default class Valve extends PartComponent {
     }
 
     return {
-      [LEFT]: [{ angleOut: RIGHT, friction: 1 }],
-      [RIGHT]: [{ angleOut: LEFT, friction: 1 }],
+      [LEFT]: [{ angleOut: RIGHT }],
+      [RIGHT]: [{ angleOut: LEFT }],
     };
   }
 

@@ -1,7 +1,7 @@
 <script>
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { SQUARE_SIZE } from '../parts';
+import { SQUARE_SIZE } from '../getters';
 
 @Component
 export default class SVGRoot extends Vue {
@@ -17,6 +17,6 @@ export default class SVGRoot extends Vue {
 
 <template>
   <svg :width="width" :height="height">
-    <slot />
+    <slot></slot>
   </svg>
 </template>

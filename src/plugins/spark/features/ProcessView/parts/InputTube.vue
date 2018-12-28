@@ -2,16 +2,18 @@
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
 import { AngledFlows } from '../state';
-import { LEFT, RIGHT, SQUARE_SIZE } from './';
+import { LEFT, RIGHT, SQUARE_SIZE } from '../getters';
 import { clamp } from '@/helpers/functional';
 
 @Component
 export default class InputTube extends PartComponent {
-  static isSource = true;
+  static get isSource() {
+    return true;
+  }
 
   static flows(): AngledFlows {
     return {
-      [LEFT]: [{ angleOut: RIGHT, friction: 1 }],
+      [LEFT]: [{ angleOut: RIGHT }],
     };
   }
 

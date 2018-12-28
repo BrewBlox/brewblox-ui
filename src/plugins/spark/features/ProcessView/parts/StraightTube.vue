@@ -2,26 +2,26 @@
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
 import { AngledFlows } from '../state';
-import { LEFT, RIGHT } from './';
+import { LEFT, RIGHT, SQUARE_SIZE } from '../getters';
 
 @Component
 export default class StraightTube extends PartComponent {
   static flows(): AngledFlows {
     return {
-      [LEFT]: [{ angleOut: RIGHT, friction: 1 }],
-      [RIGHT]: [{ angleOut: LEFT, friction: 1 }],
+      [LEFT]: [{ angleOut: RIGHT }],
+      [RIGHT]: [{ angleOut: LEFT }],
     };
   }
 
   get direction() {
-    return this.flowOnAngle(90) > 0 ? 270 : 90;
+    return this.flowOnAngle(RIGHT) > 0 ? LEFT : RIGHT;
   }
 
   get arrow() {
-    const x = this.frame * 50;
+    const x = this.frame * SQUARE_SIZE;
 
     return {
-      x: this.direction === 90 ? (75 - x) - 8 : x,
+      x: this.direction === RIGHT ? (75 - x) - 8 : x,
       y: 23,
     };
   }
