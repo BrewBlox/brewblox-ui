@@ -44,6 +44,55 @@ export default class BridgeTube extends PartComponent {
   get highFlowing(): boolean {
     return (this.flow[LEFT] || this.flow[RIGHT] || 0) !== 0;
   }
+
+  get lowPaths() {
+    return {
+      border1: 'M 21,50 V 0',
+      border2: 'M 29,50 V 0',
+      liquid: 'M 25,50 V 0',
+    };
+  }
+
+  get highPaths() {
+    return {
+      border1: [
+        'M50,29',
+        'H39',
+        'a7.69,7.69,0,0,1-6-3.46',
+        'l-1-1.9',
+        'A7.87,7.87,0,0,0,26,20',
+        'H24',
+        'a7.87,7.87,0,0,0-6,3.63',
+        'l-1,1.82',
+        'A7.78,7.78,0,0,1,11,29',
+        'H0',
+      ].join(''),
+      border2: [
+        'M0,21',
+        'H6.5',
+        'a7.67,7.67,0,0,0,6-3.47',
+        'l1-1.9',
+        'a7.86,7.86,0,0,1,6-3.64',
+        'H30.62',
+        'a7.87,7.87,0,0,1,6,3.63',
+        'l1,1.82',
+        'a7.78,7.78,0,0,0,6,3.55',
+        'H50',
+      ].join(''),
+      liquid: [
+        'M50,25',
+        'H41.31',
+        'a7.69,7.69,0,0,1-6-3.46',
+        'l-1-1.73',
+        'a7.69,7.69,0,0,0-6-3.46',
+        'H21.69',
+        'a7.69,7.69,0,0,0-6,3.46',
+        'l-1,1.73',
+        'a7.69,7.69,0,0,1-6,3.46',
+        'H0',
+      ].join(''),
+    };
+  }
 }
 </script>
 
@@ -51,22 +100,22 @@ export default class BridgeTube extends PartComponent {
   <SVGRoot>
     <!-- low -->
     <g class="outline">
-      <line x1="21" y2="50" x2="21"/>
-      <line x1="29" y2="50" x2="29"/>
+      <path :d="lowPaths.border1"/>
+      <path :d="lowPaths.border2"/>
     </g>
     <g class="liquid" v-if="lowLiquid" stroke="#4aa0ef">
-      <line x1="25" y2="50" x2="25"/>
+      <path :d="lowPaths.liquid"/>
     </g>
-    <AnimatedArrows v-if="lowFlowing" :reversed="lowReversed" path="M 21,50 V 0"/>
+    <AnimatedArrows v-if="lowFlowing" :reversed="lowReversed" :path="lowPaths.border1"/>
     <!-- high -->
     <g class="outline">
-      <path d="M 50, 21 q -25 -20, -50 0"/>
-      <path d="M 50, 29 q -25 -20, -50 0"/>
+      <path :d="highPaths.border1"/>
+      <path :d="highPaths.border2"/>
     </g>
     <g class="liquid" v-show="highLiquid" stroke="#4aa0ef">
-      <path d="M 50, 25 q -25 -20, -50 0" ref="liquidpath"/>
+      <path :d="highPaths.liquid"/>
     </g>
-    <AnimatedArrows v-if="highFlowing" :reversed="highReversed" path="M 50, 29 q -25 -20, -50 0"/>
+    <AnimatedArrows v-if="highFlowing" :reversed="highReversed" :path="highPaths.border1"/>
   </SVGRoot>
 </template>
 

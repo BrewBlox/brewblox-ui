@@ -14,7 +14,7 @@ import Component from 'vue-class-component';
     },
     numArrows: {
       type: Number,
-      default: 3,
+      default: 2,
     },
     reversed: {
       type: Boolean,

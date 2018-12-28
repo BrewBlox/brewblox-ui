@@ -65,6 +65,6 @@ export default class ProcessViewItem extends Vue {
 }
 
 .ProcessViewPart .liquid {
-  stroke-width: 6px;
+  stroke-width: 7px;
 }
 </style>
