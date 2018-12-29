@@ -34,13 +34,11 @@ export default class Valve extends PartComponent {
         <line v-if="closed" y1="25" x2="19" y2="25"/>
         <line v-if="closed" x1="31" y1="25" x2="50" y2="25"/>
       </g>
-      <g v-if="flowing && !closed" class="outline">
-        <AnimatedArrows path="M50,29H0" :reversed="reversed"/>
-      </g>
       <g :class="{ outline: true, fill: true, valve: true, closed }">
         <path d="M39.4,21C37.2,13,29,8.3,21,10.5c-5.1,1.4-9.1,5.4-10.5,10.5H39.4z"/>
         <path d="M10.5,29C12.7,37,21,41.6,29,39.4C34,38,38,34,39.4,29H10.5z"/>
       </g>
+      <AnimatedArrows v-if="flowing && !closed" path="M50,29H0" :reversed="reversed"/>
     </SVGRoot>
   </div>
 </template>

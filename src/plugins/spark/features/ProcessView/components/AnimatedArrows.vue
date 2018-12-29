@@ -50,7 +50,6 @@ export default class AnimatedArrows extends Vue {
     <g v-for="start in starts" :key="start" visibility="hidden">
       <path d="M0,0 l4,4 l-4,4" class="outline" :transform="transform"/>
       <animateMotion
-        id="motion"
         :path="$props.path"
         :begin="start"
         :keyPoints="keyPoints"
