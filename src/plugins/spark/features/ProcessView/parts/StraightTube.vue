@@ -13,16 +13,17 @@ export default class StraightTube extends PartComponent {
     };
   }
 
-  get direction() {
-    return this.flowOnAngle(RIGHT) > 0 ? LEFT : RIGHT;
+  get reversed() {
+    return this.flowOnAngle(RIGHT) > 0;
   }
 
-  get arrow() {
-    const x = this.frame * SQUARE_SIZE;
-
+  get paths() {
     return {
-      x: this.direction === RIGHT ? (75 - x) - 8 : x,
-      y: 23,
+      borders: [
+        'M 50,29 H 0',
+        'M 50,21 H 0',
+      ],
+      liquid: 'M 50,25 H 0',
     };
   }
 }
@@ -31,18 +32,13 @@ export default class StraightTube extends PartComponent {
 <template>
   <SVGRoot>
     <g class="outline">
-      <line y1="21" x2="50" y2="21"/>
-      <line y1="29" x2="50" y2="29"/>
+      <path :d="paths.borders[0]"/>
+      <path :d="paths.borders[1]"/>
     </g>
-    <g class="liquid" v-if="liquid" stroke="#4aa0ef">
-      <line y1="25" x2="50" y2="25"/>
+    <g class="liquid" v-if="liquid" :stroke="liquidColor">
+      <path :d="paths.liquid"/>
     </g>
-    <g v-if="flowing" class="outline">
-      <FlowArrow :rotate="direction" :x="arrow.x" :y="arrow.y"/>
-      <FlowArrow :rotate="direction" :x="arrow.x - 50" :y="arrow.y"/>
-      <FlowArrow :rotate="direction" :x="arrow.x + 25" :y="arrow.y"/>
-      <FlowArrow :rotate="direction" :x="arrow.x - 25" :y="arrow.y"/>
-    </g>
+    <AnimatedArrows v-if="flowing" :reversed="reversed" :path="paths.borders[0]"/>
   </SVGRoot>
 </template>
 

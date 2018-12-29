@@ -13,15 +13,13 @@ export default class OutputTube extends PartComponent {
     };
   }
 
-  opacity(xPosition: number): number {
-    const opacity = 1 - ((xPosition - 15) / 5);
-    return clamp(opacity, 0, 1);
-  }
-
-  get arrow() {
+  get paths() {
     return {
-      x: this.frame * SQUARE_SIZE,
-      y: 23,
+      borders: [
+        'M0,21 H20',
+        'M0,29 H20',
+      ],
+      liquid: 'M0,25 H20',
     };
   }
 }
@@ -33,17 +31,13 @@ export default class OutputTube extends PartComponent {
       <polyline points="40.5,17.5 48,25 40.5,32.5"/>
       <polyline points="36.4,19.3 42.1,25 36.4,30.8"/>
       <polyline points="32.3,21 36.3,25 32.3,29"/>
-      <line x1="0" y1="21" x2="20" y2="21"/>
-      <line x1="0" y1="29" x2="20" y2="29"/>
+      <path :d="paths.borders[0]"/>
+      <path :d="paths.borders[1]"/>
     </g>
-    <g class="liquid" v-if="liquid" stroke="#4aa0ef">
-      <line x1="0" y1="25" x2="20" y2="25"/>
+    <g class="liquid" v-if="liquid" :stroke="liquidColor">
+      <path :d="paths.liquid"/>
     </g>
-    <g v-if="flowing" class="outline">
-      <FlowArrow :rotate="270" :opacity="opacity(arrow.x)" :x="arrow.x" :y="arrow.y"/>
-      <FlowArrow :rotate="270" :opacity="opacity(arrow.x - 25)" :x="arrow.x - 25" :y="arrow.y"/>
-      <FlowArrow :rotate="270" :opacity="opacity(arrow.x - 50)" :x="arrow.x - 50" :y="arrow.y"/>
-    </g>
+    <AnimatedArrows v-if="flowing" :path="paths.borders[0]" :numArrows="1" :duration="1"/>
   </SVGRoot>
 </template>
 

@@ -14,41 +14,36 @@ export default class TeeTube extends PartComponent {
     };
   }
 
-  hasFlowOnAngle(angle: number) {
-    return this.flowOnAngle(angle) !== 0;
-  }
-
-  leftArrow(frame: number) {
-    const toRight = this.flowOnAngle(LEFT) < 0;
-    const animationFrame = toRight ? frame : 1 - frame;
-
+  get paths() {
     return {
-      rotate: toRight ? LEFT : RIGHT,
-      x: ((animationFrame % 0.5) * SQUARE_SIZE) - 8,
-      y: 23,
+      top: 'M29,0 V24',
+      left: 'M50,29 H28',
+      right: 'M0,21 H21',
     };
   }
 
-  topArrow(frame: number) {
-    const toBottom = this.flowOnAngle(UP) < 0;
-    const animationFrame = toBottom ? frame : 1 - frame;
-
-    return {
-      rotate: toBottom ? UP : DOWN,
-      x: 21,
-      y: ((animationFrame % 0.5) * SQUARE_SIZE) - (toBottom ? 0 : 6),
-    };
+  get topFlowing() {
+    return Boolean(this.flowOnAngle(UP));
   }
 
-  rightArrow(frame: number) {
-    const toLeft = this.flowOnAngle(RIGHT) < 0;
-    const animationFrame = toLeft ? frame + 0.25 : 1 - frame;
+  get topReversed() {
+    return this.flowOnAngle(UP) > 0;
+  }
 
-    return {
-      rotate: toLeft ? RIGHT : LEFT,
-      x: (toLeft ? 54 : 50) - ((animationFrame % 0.5) * SQUARE_SIZE),
-      y: 23,
-    };
+  get leftFlowing() {
+    return Boolean(this.flowOnAngle(RIGHT));
+  }
+
+  get leftReversed() {
+    return this.flowOnAngle(RIGHT) > 0;
+  }
+
+  get rightFlowing() {
+    return Boolean(this.flowOnAngle(LEFT));
+  }
+
+  get rightReversed() {
+    return this.flowOnAngle(LEFT) > 0;
   }
 }
 </script>
@@ -60,29 +55,32 @@ export default class TeeTube extends PartComponent {
       <path d="M21,0V20a1,1,0,0,1-1,1H0"/>
       <line class="line" y1="29" x2="50" y2="29"/>
     </g>
-    <g class="liquid" v-if="liquid" stroke="#4aa0ef">
+    <g class="liquid" v-if="liquid" :stroke="liquidColor">
       <line y1="25" x2="50" y2="25"/>
       <path d="M0,25H20a5,5,0,0,0,5-5V0"/>
       <path d="M25,0V20a5,5,0,0,0,5,5H50"/>
     </g>
-    <g v-if="flowing" class="outline">
-      <FlowArrow
-        v-if="hasFlowOnAngle(270)"
-        :rotate="leftArrow(frame).rotate"
-        :x="leftArrow(frame).x"
-        :y="leftArrow(frame).y"
+    <g class="outline">
+      <AnimatedArrows
+        v-if="topFlowing"
+        :path="paths.top"
+        :reversed="topReversed"
+        :numArrows="1"
+        :duration="1"
       />
-      <FlowArrow
-        v-if="hasFlowOnAngle(0)"
-        :rotate="topArrow(frame).rotate"
-        :x="topArrow(frame).x"
-        :y="topArrow(frame).y"
+      <AnimatedArrows
+        v-if="leftFlowing"
+        :path="paths.left"
+        :reversed="leftReversed"
+        :numArrows="1"
+        :duration="1"
       />
-      <FlowArrow
-        v-if="hasFlowOnAngle(90)"
-        :rotate="rightArrow(frame).rotate"
-        :x="rightArrow(frame).x"
-        :y="rightArrow(frame).y"
+      <AnimatedArrows
+        v-if="rightFlowing"
+        :path="paths.right"
+        :reversed="rightReversed"
+        :numArrows="1"
+        :duration="1"
       />
     </g>
   </SVGRoot>

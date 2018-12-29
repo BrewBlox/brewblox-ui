@@ -13,12 +13,6 @@ export default class Pump extends PartComponent {
       [RIGHT]: [{ angleOut: LEFT, deltaPressure: p }],
     };
   }
-
-  get rotation() {
-    return !this.disabled
-      ? `rotate(${this.frame * -180}, 0, 0)`
-      : '';
-  }
 }
 </script>
 
@@ -26,7 +20,7 @@ export default class Pump extends PartComponent {
   <div class="clickable" @click="toggleDisabled">
     <SVGRoot>
       <!-- ball -->
-      <g v-if="liquid" class="liquid" fill="#4aa0ef">
+      <g v-if="liquid" class="liquid" :fill="liquidColor">
         <circle cx="25" cy="30" r="16"/>
       </g>
       <!-- ball liquid -->
@@ -35,14 +29,24 @@ export default class Pump extends PartComponent {
       </g>
       <!-- blades -->
       <g class="blades-wrapper">
-        <g class="outline center-rotate" :transform="rotation">
+        <g class="outline center-rotate">
           <line x1="25" y1="39" x2="25" y2="11"/>
           <line x1="37.1" y1="32" x2="12.9" y2="18"/>
           <line x1="37.1" y1="18" x2="12.9" y2="32"/>
+          <animateTransform
+            v-if="!disabled"
+            attributeName="transform"
+            attributeType="XML"
+            type="rotate"
+            from="0 0 0"
+            to="-360 0 0"
+            dur="3s"
+            repeatCount="indefinite"
+          />
         </g>
       </g>
       <!-- tube liquid -->
-      <g v-if="liquid" class="liquid" stroke="#4aa0ef">
+      <g v-if="liquid" class="liquid" :stroke="liquidColor">
         <polyline points="25,33 25,25 50,25 "/>
         <line class="st0" x1="0" y1="25" x2="10" y2="25"/>
       </g>

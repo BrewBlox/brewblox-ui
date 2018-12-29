@@ -13,27 +13,17 @@ export default class ElbowTube extends PartComponent {
     };
   }
 
-  get direction() {
-    return this.flowOnAngle(UP) > 0 ? RIGHT : UP;
+  get reversed() {
+    return this.flowOnAngle(UP) > 0;
   }
 
-  arrow(frame: number) {
-    const pos = this.direction === UP ? frame * SQUARE_SIZE : 42 - (frame * SQUARE_SIZE);
-
-    const rotateFrame = this.direction === UP ? 0.43 : 0.36;
-    const rotateDir = this.direction === UP ? -RIGHT : RIGHT;
-
-    const rotate = frame > rotateFrame
-      ? (rotateDir < 0 ? Math.max : Math.min)(
-        this.direction + rotateDir,
-        this.direction + (rotateDir * ((frame - rotateFrame) / 0.15)),
-      )
-      : this.direction;
-
+  get paths() {
     return {
-      rotate,
-      x: pos > 21 ? pos : 21,
-      y: pos > 23 ? 23 : Math.min(23, pos + 2),
+      borders: [
+        'M21,0v20c0,5,4,9,9,9h20',
+        'M29,0v18c0,1.7,1.3,3,3,3h18',
+      ],
+      liquid: 'M25,0V20a5,5,0,0,0,5,5H50',
     };
   }
 }
@@ -42,26 +32,13 @@ export default class ElbowTube extends PartComponent {
 <template>
   <SVGRoot>
     <g class="outline">
-      <path d="M21,0v20c0,5,4,9,9,9h20"/>
-      <path d="M29,0v18c0,1.7,1.3,3,3,3h18"/>
+      <path :d="paths.borders[0]"/>
+      <path :d="paths.borders[1]"/>
     </g>
-    <g class="liquid" v-if="liquid" stroke="#4aa0ef">
-      <path d="M25,0V20a5,5,0,0,0,5,5H50"/>
+    <g class="liquid" v-if="liquid" :stroke="liquidColor">
+      <path :d="paths.liquid"/>
     </g>
-    <g v-if="flowing" class="outline">
-      <FlowArrow :rotate="arrow(frame).rotate" :x="arrow(frame).x" :y="arrow(frame).y"/>
-      <FlowArrow :rotate="arrow(frame - 1).rotate" :x="arrow(frame - 1).x" :y="arrow(frame - 1).y"/>
-      <FlowArrow
-        :rotate="arrow(frame - 0.5).rotate"
-        :x="arrow(frame - 0.5).x"
-        :y="arrow(frame - 0.5).y"
-      />
-      <FlowArrow
-        :rotate="arrow(frame + 0.5).rotate"
-        :x="arrow(frame + 0.5).x"
-        :y="arrow(frame + 0.5).y"
-      />
-    </g>
+    <AnimatedArrows v-if="flowing" :reversed="reversed" :path="paths.borders[1]"/>
   </SVGRoot>
 </template>
 

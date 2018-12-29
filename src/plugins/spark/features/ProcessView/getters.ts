@@ -5,3 +5,4 @@ export const DOWN = 180;
 export const LEFT = 270;
 export const DEFAULT_FRICTION = 1;
 export const DEFAULT_DELTA_PRESSURE = 0;
+export const COLD_WATER = '#4aa0ef';
