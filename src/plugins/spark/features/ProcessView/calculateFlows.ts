@@ -6,7 +6,7 @@ import { clampRotation } from '@/helpers/functional';
 export const isSamePart = (left: Part, right: Part) =>
   ['x', 'y', 'type', 'rotate'].every(k => left[k] === right[k]);
 
-const component = (part: Part) => Vue.component(part.type) as ComponentConstructor;
+export const component = (part: Part) => Vue.component(part.type) as ComponentConstructor;
 
 const rotatedFlows = (flows: AngledFlows, rotation: number = 0): AngledFlows =>
   Object.keys(flows)
@@ -298,11 +298,12 @@ const unRotateFlows = (part: FlowPart): FlowPart =>
 export const pathsFromSources = (parts: Part[]): FlowPart[] =>
   parts
     .filter(part => component(part).isSource) // -> Part[]
+    .map(part => ({ liquidSource: COLD_WATER, ...part })) // -> Part[]
     .map(part => calculateFromSource(
       part as FlowPart,
       parts as FlowPart[],
       part.rotate,
-      part.liquidSource || COLD_WATER,
+      part.liquidSource,
     )) // -> FlowPart[][]
     .reduce(mergeSourceFlows, []) // -> FlowPart[]
     .map(unRotateFlows);

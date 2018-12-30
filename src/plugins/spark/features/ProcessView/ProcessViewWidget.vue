@@ -3,7 +3,7 @@ import Vue from 'vue';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
 import { clampRotation } from '@/helpers/functional';
-import { isSamePart, pathsFromSources } from './calculateFlows';
+import { isSamePart, component, pathsFromSources } from './calculateFlows';
 import { SQUARE_SIZE, COLD_WATER, HOT_WATER, BEER, WORT } from './getters';
 import { parts as knownParts } from './register';
 import ProcessViewItem from './ProcessViewItem.vue';
@@ -16,9 +16,9 @@ interface DragAction {
 
 interface ContextAction {
   part: Part;
+  isSource: boolean;
   leftStyle: any;
   rightStyle: any;
-  popover: boolean;
 }
 
 @Component({
@@ -150,7 +150,7 @@ export default class ProcessViewWidget extends WidgetBase {
 
     this.contextAction = {
       part,
-      popover: false,
+      isSource: component(part).isSource,
       leftStyle: {
         position: 'fixed',
         top: `${args.position.top - (0.5 * SQUARE_SIZE)}px`,
@@ -228,7 +228,7 @@ export default class ProcessViewWidget extends WidgetBase {
     <q-card-separator/>
     <ProcessViewItem v-if="dragAction" :value="dragAction.part" :style="dragAction.style"/>
     <div
-      v-if="contextAction && contextAction.part.liquidSource"
+      v-if="contextAction && contextAction.isSource"
       class="column"
       :style="contextAction.leftStyle"
     >
