@@ -53,7 +53,7 @@ export default class PartComponent extends Vue {
   }
 
   get liquidColor() {
-    return COLD_WATER;
+    return this.part.liquidSource || this.part.liquid;
   }
 
   flowOnAngle(angle: number): number {

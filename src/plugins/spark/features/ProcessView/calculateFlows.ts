@@ -1,12 +1,12 @@
 import Vue from 'vue';
 import { Part, AngledFlows, FlowPart, FlowPressure, Flow, ComponentConstructor } from './state';
-import { UP, RIGHT, DOWN, LEFT, DEFAULT_FRICTION, DEFAULT_DELTA_PRESSURE } from './getters';
+import { UP, RIGHT, DOWN, LEFT, DEFAULT_FRICTION, DEFAULT_DELTA_PRESSURE, COLD_WATER, MIXED_LIQUIDS } from './getters';
 import { clampRotation } from '@/helpers/functional';
 
 export const isSamePart = (left: Part, right: Part) =>
   ['x', 'y', 'type', 'rotate'].every(k => left[k] === right[k]);
 
-const component = (part: Part) => Vue.component(part.type) as ComponentConstructor;
+export const component = (part: Part) => Vue.component(part.type) as ComponentConstructor;
 
 const rotatedFlows = (flows: AngledFlows, rotation: number = 0): AngledFlows =>
   Object.keys(flows)
@@ -82,6 +82,13 @@ const combineFlows = (left: FlowPressure = {}, right: FlowPressure = {}) =>
   Object.entries(right)
     .reduce((into: FlowPressure, [angle, val]) => ({ ...into, [angle]: (into[angle] || 0) + val }), left);
 
+const combineLiquids = (left: string | undefined, right: string | undefined): string | undefined => {
+  if (left && right && left !== right) {
+    return MIXED_LIQUIDS;
+  }
+  return left || right || undefined;
+};
+
 /*
   Find the part in allParts, and then merge the new flow into allParts.
 */
@@ -89,11 +96,12 @@ const additionalFlow = (
   part: FlowPart,
   allParts: FlowPart[],
   flowToAdd: FlowPressure,
+  liquid: string,
 ): FlowPart[] =>
   allParts
     .map((item) => {
       if (isSamePart(part, item)) {
-        return { ...item, flow: combineFlows(item.flow, flowToAdd) };
+        return { ...item, liquid, flow: combineFlows(item.flow, flowToAdd) };
       }
       return item;
     });
@@ -143,7 +151,8 @@ const partOutFlows = (part: FlowPart, angleIn: number): Flow[] => {
 const calculateFromSource = (
   sourcePart: FlowPart,
   allParts: FlowPart[],
-  angleIn: number = UP,
+  angleIn: number,
+  liquidSource: string,
   totalFriction: number = 0,
   startPressure: number = 10,
   totalDeltaPressure: number = 0,
@@ -170,6 +179,7 @@ const calculateFromSource = (
           [angleOut]: pathFlow,
           [angleIn]: -pathFlow,
         },
+        liquidSource,
       );
     }
 
@@ -184,6 +194,7 @@ const calculateFromSource = (
           [angleOut]: 0,
           [angleIn]: 0,
         },
+        liquidSource,
       );
     }
 
@@ -194,6 +205,7 @@ const calculateFromSource = (
       nextPart,
       parts,
       clampRotation(angleOut + 180),
+      liquidSource,
       totalFriction,
       startPressure,
       totalDeltaPressure,
@@ -220,6 +232,7 @@ const calculateFromSource = (
         [angleOut]: -additionalAngleFlow,
         [angleIn]: additionalAngleFlow,
       },
+      liquidSource,
     );
   };
 
@@ -240,6 +253,7 @@ const mergeSourceFlows = (allParts: FlowPart[], sourceFlow: FlowPart[]): FlowPar
       const existing = allParts.find(p => isSamePart(p, part));
       if (existing) {
         existing.flow = combineFlows(existing.flow, part.flow);
+        existing.liquid = combineLiquids(existing.liquid, part.liquid);
         return acc;
       }
       return [...acc, part];
@@ -284,6 +298,12 @@ const unRotateFlows = (part: FlowPart): FlowPart =>
 export const pathsFromSources = (parts: Part[]): FlowPart[] =>
   parts
     .filter(part => component(part).isSource) // -> Part[]
-    .map(part => calculateFromSource(part as FlowPart, parts as FlowPart[], part.rotate)) // -> FlowPart[][]
+    .map(part => ({ liquidSource: COLD_WATER, ...part })) // -> Part[]
+    .map(part => calculateFromSource(
+      part as FlowPart,
+      parts as FlowPart[],
+      part.rotate,
+      part.liquidSource,
+    )) // -> FlowPart[][]
     .reduce(mergeSourceFlows, []) // -> FlowPart[]
     .map(unRotateFlows);

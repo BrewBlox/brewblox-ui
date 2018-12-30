@@ -20,6 +20,7 @@ export interface Part {
   x: number;
   y: number;
   rotate: number;
+  liquidSource?: string;
   closed?: boolean;
   disabled?: boolean;
   flipped?: boolean;
@@ -33,6 +34,7 @@ export interface ComponentConstructor extends VueConstructor {
 
 export interface FlowPart extends Part {
   flow?: FlowPressure;
+  liquid?: string;
 }
 
 export interface ProcessViewConfig {
