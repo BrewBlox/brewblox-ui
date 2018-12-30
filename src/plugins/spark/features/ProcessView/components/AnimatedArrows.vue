@@ -30,12 +30,14 @@ export default class AnimatedArrows extends Vue {
   }
 
   get transform() {
+    // Flips the arrow
     return this.$props.reversed
       ? 'scale (-1, 1)'
       : '';
   }
 
   get keyPoints() {
+    // Makes the arrow travel end-to-start
     return this.$props.reversed
       ? '1;0'
       : '0;1';
@@ -45,7 +47,7 @@ export default class AnimatedArrows extends Vue {
 
 <template>
   <g>
-    <g v-for="start in starts" :key="start">
+    <g v-for="start in starts" :key="start" visibility="hidden">
       <path d="M0,0 l4,4 l-4,4" class="outline" :transform="transform"/>
       <animateMotion
         :path="$props.path"
@@ -58,6 +60,7 @@ export default class AnimatedArrows extends Vue {
         calcMode="linear"
         keyTimes="0;1"
       />
+      <set attributeName="visibility" from="hidden" to="visible" :begin="start"/>
     </g>
   </g>
 </template>

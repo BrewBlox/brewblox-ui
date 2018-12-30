@@ -26,8 +26,6 @@ interface ContextAction {
 })
 export default class ProcessViewWidget extends WidgetBase {
   editable: boolean = false;
-  frame: number = 0;
-  animationFrame: number = 0;
   dragAction: DragAction | null = null;
   contextAction: ContextAction | null = null;
 
@@ -100,15 +98,6 @@ export default class ProcessViewWidget extends WidgetBase {
       gridColumnStart: part.x + 1,
       gridRowStart: part.y + 1,
     };
-  }
-
-  tickAnimation() {
-    this.animationFrame = window.requestAnimationFrame((timestamp) => {
-      if (!this.editable) {
-        this.frame = (timestamp % 2000) / 2000;
-      }
-      this.tickAnimation();
-    });
   }
 
   updateParts(parts: Part[]) {
@@ -189,14 +178,6 @@ export default class ProcessViewWidget extends WidgetBase {
   beingDragged(part: Part) {
     return this.dragAction && isSamePart(part, this.dragAction.part);
   }
-
-  mounted() {
-    this.tickAnimation();
-  }
-
-  destroyed() {
-    window.cancelAnimationFrame(this.animationFrame);
-  }
 }
 </script>
 
@@ -210,17 +191,6 @@ export default class ProcessViewWidget extends WidgetBase {
         :change="v => widgetId = v"
       />
       <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
-      <q-btn v-if="editable" flat round dense slot="right" icon="tune">
-        <q-popover>
-          <q-list>
-            <q-item>
-              Frame:
-              <input step="0.01" type="range" min="0" max="1" v-model.number="frame">
-              <div>{{frame}}</div>
-            </q-item>
-          </q-list>
-        </q-popover>
-      </q-btn>
       <q-btn v-if="editable" flat round dense slot="right" icon="delete" @click="updateParts([])"/>
       <q-btn v-if="editable" flat round dense slot="right" icon="extension">
         <q-popover>
@@ -269,7 +239,7 @@ export default class ProcessViewWidget extends WidgetBase {
         v-touch-hold="v => holdHandler(part, v)"
       >
         <div v-if="editable" class="grid-item-coordinates">{{ part.x }},{{ part.y }}</div>
-        <ProcessViewItem :value="flowParts[idx]" @input="changePart" :frame="frame"/>
+        <ProcessViewItem :value="flowParts[idx]" @input="changePart"/>
       </div>
     </div>
   </q-card>

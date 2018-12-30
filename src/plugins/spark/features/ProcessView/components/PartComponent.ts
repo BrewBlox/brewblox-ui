@@ -1,16 +1,13 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { FlowPart, AngledFlows } from '../state';
+import { COLD_WATER } from '../getters';
 
 @Component({
   props: {
     value: {
       type: Object,
       required: true,
-    },
-    animationFrame: {
-      type: Number,
-      default: 0,
     },
   },
 })
@@ -43,10 +40,6 @@ export default class PartComponent extends Vue {
     return Boolean(this.part.disabled);
   }
 
-  get frame(): number {
-    return this.$props.animationFrame;
-  }
-
   get flowing(): boolean {
     return Object.keys(this.flow).some(angle => this.flowOnAngle(Number(angle)) !== 0);
   }
@@ -57,6 +50,10 @@ export default class PartComponent extends Vue {
 
   get liquid() {
     return Object.keys(this.flow).length > 0;
+  }
+
+  get liquidColor() {
+    return COLD_WATER;
   }
 
   flowOnAngle(angle: number): number {
