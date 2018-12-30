@@ -4,7 +4,7 @@ import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
 import { clampRotation } from '@/helpers/functional';
 import { isSamePart, pathsFromSources } from './calculateFlows';
-import { SQUARE_SIZE } from './getters';
+import { SQUARE_SIZE, COLD_WATER, HOT_WATER, BEER, WORT } from './getters';
 import { parts as knownParts } from './register';
 import ProcessViewItem from './ProcessViewItem.vue';
 import { Part, ProcessViewConfig, FlowPart, PanArguments, HoldArguments } from './state';
@@ -16,7 +16,9 @@ interface DragAction {
 
 interface ContextAction {
   part: Part;
-  style: any;
+  leftStyle: any;
+  rightStyle: any;
+  popover: boolean;
 }
 
 @Component({
@@ -25,7 +27,7 @@ interface ContextAction {
   },
 })
 export default class ProcessViewWidget extends WidgetBase {
-  editable: boolean = false;
+  editable: boolean = true;
   dragAction: DragAction | null = null;
   contextAction: ContextAction | null = null;
 
@@ -35,7 +37,7 @@ export default class ProcessViewWidget extends WidgetBase {
 
   saveConfig(config: ProcessViewConfig = this.widgetConfig) {
     const parts = config.parts
-      .map(({ flow, ...persistent }: FlowPart) => persistent);
+      .map(({ flow, liquid, ...persistent }: FlowPart) => persistent);
     this.$props.onConfigChange(this.widgetId, { ...config, parts });
   }
 
@@ -52,6 +54,15 @@ export default class ProcessViewWidget extends WidgetBase {
         y: -1,
         rotate: 0,
       }));
+  }
+
+  get liquidColors() {
+    return [
+      COLD_WATER,
+      HOT_WATER,
+      BEER,
+      WORT,
+    ];
   }
 
   get parts(): Part[] {
@@ -139,7 +150,14 @@ export default class ProcessViewWidget extends WidgetBase {
 
     this.contextAction = {
       part,
-      style: {
+      popover: false,
+      leftStyle: {
+        position: 'fixed',
+        top: `${args.position.top - (0.5 * SQUARE_SIZE)}px`,
+        left: `${args.position.left - (2 * SQUARE_SIZE)}px`,
+        zIndex: 5,
+      },
+      rightStyle: {
         position: 'fixed',
         top: `${args.position.top - (0.5 * SQUARE_SIZE)}px`,
         left: `${args.position.left + (0.5 * SQUARE_SIZE)}px`,
@@ -175,6 +193,10 @@ export default class ProcessViewWidget extends WidgetBase {
     this.updateParts(this.parts.map(p => (isSamePart(p, part) ? part : p)));
   }
 
+  changeLiquidSource(part: Part | FlowPart, liquidSource: string) {
+    this.changePart({ ...part, liquidSource });
+  }
+
   beingDragged(part: Part) {
     return this.dragAction && isSamePart(part, this.dragAction.part);
   }
@@ -205,7 +227,22 @@ export default class ProcessViewWidget extends WidgetBase {
     </q-card-title>
     <q-card-separator/>
     <ProcessViewItem v-if="dragAction" :value="dragAction.part" :style="dragAction.style"/>
-    <div v-if="contextAction" class="column" :style="contextAction.style">
+    <div
+      v-if="contextAction && contextAction.part.liquidSource"
+      class="column"
+      :style="contextAction.leftStyle"
+    >
+      <q-btn
+        fab
+        round
+        v-for="color in liquidColors"
+        :key="color"
+        :style="`background-color: ${color}`"
+        icon="format_color_fill"
+        @mouseup.native="changeLiquidSource(contextAction.part, color)"
+      />
+    </div>
+    <div v-if="contextAction" class="column" :style="contextAction.rightStyle">
       <q-btn
         fab
         round
