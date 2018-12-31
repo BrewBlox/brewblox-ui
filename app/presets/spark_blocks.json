@@ -108,6 +108,19 @@
     }
   },
   {
+    "id": "setpoint-sensor-pair-2",
+    "profiles": [
+      0
+    ],
+    "type": "SetpointSensorPair",
+    "data": {
+      "sensorId<>": 0,
+      "setpointId<>": 0,
+      "setpointValue": 0,
+      "sensorValue": 0
+    }
+  },
+  {
     "id": "actuator-1",
     "profiles": [
       0
@@ -185,23 +198,13 @@
     "data": {
       "inputId<>": "setpoint-sensor-pair-1",
       "outputId<>": "actuator-pwm-1",
-      "inputValue": 0,
-      "inputSetting": 10,
-      "outputValue": 20,
-      "outputSetting": 30,
       "filter": "FILT_30s",
-      "filterThreshold": 50,
+      "filterThreshold": 2,
       "enabled": true,
       "active": true,
-      "kp": 60,
-      "ti": 70,
-      "td": 80,
-      "p": 90,
-      "i": 100,
-      "d": 110,
-      "error": 120,
-      "integral": 130,
-      "derivative": 140
+      "kp": 20,
+      "ti": 3600,
+      "td": 60
     }
   },
   {

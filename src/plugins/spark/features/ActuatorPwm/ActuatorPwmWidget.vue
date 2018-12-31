@@ -21,7 +21,6 @@ export default class ActuatorPwmWidget extends BlockWidget {
   get renamedTargets() {
     return {
       setting: 'Setting',
-      period: 'Period',
       value: 'Value',
     };
   }

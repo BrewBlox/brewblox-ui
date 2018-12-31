@@ -22,9 +22,16 @@ export default class PidWidget extends BlockWidget {
 
   get renamedTargets() {
     return {
-      [serializedPropertyName('kp', this.block.data)]: 'Kp',
-      [serializedPropertyName('ti', this.block.data)]: 'Ti',
-      [serializedPropertyName('td', this.block.data)]: 'Td',
+      [serializedPropertyName('error', this.block.data)]: 'Error (filtered)',
+      [serializedPropertyName('derivative', this.block.data)]: 'Derivative or error',
+      [serializedPropertyName('integral', this.block.data)]: 'Integral of error',
+      [serializedPropertyName('p', this.block.data)]: 'Proportional action',
+      [serializedPropertyName('i', this.block.data)]: 'Integral action',
+      [serializedPropertyName('d', this.block.data)]: 'Derivative action',
+      [serializedPropertyName('inputValue', this.block.data)]: 'Input value',
+      [serializedPropertyName('inputSetting', this.block.data)]: 'Input target',
+      [serializedPropertyName('outputValue', this.block.data)]: 'Output value',
+      [serializedPropertyName('outputSetting', this.block.data)]: 'Output target',
     };
   }
 
