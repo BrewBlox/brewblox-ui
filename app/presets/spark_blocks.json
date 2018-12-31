@@ -129,14 +129,13 @@
     ],
     "type": "ActuatorPwm",
     "data": {
-      "actuatorId<>": "actuator-1",
       "constrainedBy": {
         "constraints": [
           {
             "min": 5
           },
           {
-            "max": 10
+            "max": 50
           },
           {
             "balanced<>": {
@@ -144,7 +143,9 @@
             }
           }
         ]
-      }
+      },
+      "period": 4000,
+      "actuatorId<>": "__pin_bottom_1"
     }
   },
   {
@@ -171,8 +172,8 @@
     ],
     "type": "ActuatorOffset",
     "data": {
-      "targetId<ProcessValueLink>": "setpoint-sensor-pair-1",
-      "referenceId<ProcessValueLink>": "setpoint-sensor-pair-1"
+      "targetId<>": "setpoint-sensor-pair-1",
+      "referenceId<>": "setpoint-sensor-pair-1"
     }
   },
   {
@@ -183,7 +184,7 @@
     "type": "Pid",
     "data": {
       "inputId<>": "setpoint-sensor-pair-1",
-      "outputId<>": "actuator-1",
+      "outputId<>": "actuator-pwm-1",
       "inputValue": 0,
       "inputSetting": 10,
       "outputValue": 20,
@@ -201,6 +202,85 @@
       "error": 120,
       "integral": 130,
       "derivative": 140
+    }
+  },
+  {
+    "id": "__displaysettings",
+    "profiles": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "type": "DisplaySettings",
+    "data": {
+      "widgets": [
+        {
+          "pos": 1,
+          "color": "0088aa",
+          "name": "pwm1",
+          "actuatorAnalog<>": "actuator-pwm-1"
+        },
+        {
+          "pos": 2,
+          "color": "00aa88",
+          "name": "pair1",
+          "setpointSensorPair<>": "setpoint-sensor-pair-1"
+        },
+        {
+          "pos": 3,
+          "color": "aa0088",
+          "name": "sensor1",
+          "tempSensor<>": "sensor-1"
+        },
+        {
+          "pos": 4,
+          "color": "aa8800",
+          "name": "pid",
+          "pid<>": "pid-1"
+        }
+      ],
+      "name": "test"
+    }
+  },
+  {
+    "id":  "ds2413-hw-1",
+    "profiles": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "type": "DS2413",
+    "data": {
+      "address": "4444444444444444"
+    }
+  },
+  {
+    "id": "ow-act",
+    "profiles": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "type": "ActuatorDS2413",
+    "data": {
+      "channel": 1,
+      "invert": true,
+      "hwDevice<DS2413>": "ds2413-hw-1"
     }
   }
 ]

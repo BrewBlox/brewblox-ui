@@ -9,8 +9,8 @@ export const validDisplayTypes = [
   'TempSensorOneWire',
   'SetpointSensorPair',
   'ActuatorPwm',
-  // 'ActuatorAnalog',
-  // 'Pid',
+  'ActuatorAnalogMock',
+  'Pid',
 ];
 
 export const getById = (store: RootStore, serviceId: string, id: string) =>
