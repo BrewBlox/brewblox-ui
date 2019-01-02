@@ -72,16 +72,24 @@ export default class PidForm extends BlockForm {
         </q-field>
         <div/>
         <!-- operators -->
-        <div/>
         <q-field label=" " orientation="vertical">
           <big>*</big>
         </q-field>
         <q-field label=" " orientation="vertical">
           <big>*</big>
         </q-field>
+        <q-field label=" " orientation="vertical">
+          <big>*</big>
+        </q-field>
         <div/>
-        <!-- extra *Kp -->
-        <div/>
+        <!-- Kp -->
+        <q-field label="Kp" orientation="vertical">
+          <UnitPopupEdit
+            label="Kp"
+            :field="block.data.kp"
+            :change="callAndSaveBlock(v => block.data.kp = v)"
+          />
+        </q-field>
         <q-field label="Kp" orientation="vertical">
           <big class="unimportant">{{ block.data.kp | unit }}</big>
         </q-field>
@@ -90,9 +98,7 @@ export default class PidForm extends BlockForm {
         </q-field>
         <div/>
         <!-- operators -->
-        <q-field label=" " orientation="vertical">
-          <big>*</big>
-        </q-field>
+        <div/>
         <q-field label=" " orientation="vertical">
           <big>/</big>
         </q-field>
@@ -101,13 +107,7 @@ export default class PidForm extends BlockForm {
         </q-field>
         <div/>
         <!-- settings -->
-        <q-field label="Kp" orientation="vertical">
-          <UnitPopupEdit
-            label="Kp"
-            :field="block.data.kp"
-            :change="callAndSaveBlock(v => block.data.kp = v)"
-          />
-        </q-field>
+        <div/>
         <q-field label="Ti" orientation="vertical">
           <UnitPopupEdit
             label="Ti"
@@ -285,7 +285,7 @@ export default class PidForm extends BlockForm {
         </p>
         <p>When there is no overshoot in the system, Td should be set to zero.</p>
         <div class="q-subheading">Filtering</div>
-        <p>
+\        <p>
           The error value is passed through a filter to remove noise, spikes and sudden jumps.
           <br>The amount of filtering can be configured.
           You should set the filter to the minimum duration of signal changes that you wish to let through unfiltered.
