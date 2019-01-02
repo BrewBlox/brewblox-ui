@@ -55,15 +55,15 @@ export default class ColorPickerPopupEdit extends Vue {
     <component :is="$props.display" class="editable">{{ colorString }}</component>
     <component :is="$props.display" :style="colorStyle">[ ]</component>
     <q-popup-edit
-      buttons
-      persistent
       :disable="$attrs.disabled"
       :title="`Set ${this.$props.label} to:`"
       v-model="placeholder"
+      buttons
+      persistent
       @show="startEdit"
       @save="endEdit"
     >
-      <q-color-picker dark no-parent-field format-model="hex" v-model="placeholder"/>
+      <q-color-picker v-model="placeholder" dark no-parent-field format-model="hex"/>
     </q-popup-edit>
   </div>
 </template>

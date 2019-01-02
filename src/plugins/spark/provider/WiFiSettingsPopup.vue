@@ -35,8 +35,8 @@ export default class WiFiSettingsPopup extends FormBase {
 <template>
   <div class="widget-modal">
     <div class="row" style="position: absolute; right: 18px; top: 18px">
-      <q-btn rounded v-close-overlay label="close" class="col"/>
-      <q-btn rounded v-close-overlay color="primary" label="connect" class="col" @click="save"/>
+      <q-btn v-close-overlay rounded label="close" class="col"/>
+      <q-btn v-close-overlay rounded color="primary" label="connect" class="col" @click="save"/>
     </div>
     <q-card>
       <q-card-title>Settings</q-card-title>
@@ -45,7 +45,7 @@ export default class WiFiSettingsPopup extends FormBase {
           <q-input v-model="values.ssid"/>
         </q-field>
         <q-field class="col" label="Password">
-          <q-input type="password" v-model="values.password" :disable="values.security === 0"/>
+          <q-input v-model="values.password" :disable="values.security === 0" type="password"/>
         </q-field>
         <q-field class="col" label="Security">
           <q-select v-model="values.security" :options="securityOpts"/>

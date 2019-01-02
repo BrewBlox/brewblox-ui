@@ -163,24 +163,23 @@ export default class SparkPage extends Vue {
         <q-btn
           :icon="editable ? 'check' : 'mode edit'"
           :color="editable ? 'positive' : 'primary'"
-          @click="() => editable = !editable"
           :label="editable ? 'Stop editing' : 'Edit blocks'"
+          @click="() => editable = !editable"
         />
       </portal>
       <q-modal v-model="modalOpen">
-        <NewBlockWizard v-if="modalOpen" :serviceId="serviceId" :onCreateBlock="onCreateBlock"/>
+        <NewBlockWizard v-if="modalOpen" :service-id="serviceId" :on-create-block="onCreateBlock"/>
       </q-modal>
       <grid-container>
         <SparkWidget
           v-if="isReady"
-          class="dashboard-item"
           :id="$props.serviceId"
-          :serviceId="$props.serviceId"
+          :service-id="$props.serviceId"
           :cols="widgetSize.cols"
           :rows="widgetSize.rows"
+          class="dashboard-item"
         />
         <component
-          class="dashboard-item"
           v-for="item in items"
           :is="widgetComponent(item)"
           :key="item.id"
@@ -189,10 +188,11 @@ export default class SparkPage extends Vue {
           :cols="item.cols"
           :rows="item.rows"
           :config="item.config"
-          :onConfigChange="onWidgetChange"
-          :onIdChange="onChangeBlockId"
-          :onDeleteItem="() => onDeleteItem(item)"
-          :onCopyItem="() => onCopyItem(item)"
+          :on-config-change="onWidgetChange"
+          :on-id-change="onChangeBlockId"
+          :on-delete-item="() => onDeleteItem(item)"
+          :on-copy-item="() => onCopyItem(item)"
+          class="dashboard-item"
         />
       </grid-container>
     </template>

@@ -30,11 +30,11 @@ export default class ProcessViewItem extends Vue {
 <template>
   <component
     v-if="component"
-    class="ProcessViewPart"
     :style="style"
     :value="value"
-    :animationFrame="frame"
+    :animation-frame="frame"
     :is="component"
+    class="ProcessViewPart"
   />
 </template>
 

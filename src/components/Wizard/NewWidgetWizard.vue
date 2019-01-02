@@ -64,9 +64,9 @@ export default class NewWidgetWizard extends Vue {
       <component
         v-if="wizardComponent"
         :is="wizardComponent"
-        :featureId="featureId"
-        :onCreateItem="onCreate"
-        :onCancel="reset"
+        :feature-id="featureId"
+        :on-create-item="onCreate"
+        :on-cancel="reset"
       />
     </q-item>
     <!-- Select a wizard -->
@@ -77,9 +77,9 @@ export default class NewWidgetWizard extends Vue {
         </q-item>
         <q-list link="" inset-separator>
           <q-item
-            icon="widgets"
             v-for="opt in wizardOptions"
             :key="opt.label"
+            icon="widgets"
             @click.native="() => { featureId = opt.value; }"
           >
             <div class="row">

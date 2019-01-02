@@ -14,20 +14,20 @@ export default class InactiveObjectWidget extends BlockWidget {
         v-if="modalOpen"
         :field="block"
         :change="saveBlock"
-        :changeId="changeBlockId"
+        :change-id="changeBlockId"
       />
     </q-modal>
     <q-card-title class="title-bar">
       <InputPopupEdit
-        class="ellipsis"
         :field="widgetId"
+        :change="v => widgetId = v"
+        class="ellipsis"
         label="Widget ID"
         display="span"
-        :change="v => widgetId = v"
       />
-      <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
-      <q-btn flat round dense slot="right" @click="openModal" icon="settings"/>
-      <q-btn flat round dense slot="right" @click="refreshBlock" icon="refresh"/>
+      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
+      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
+      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
     <q-alert type="info">This block is not in any active profile</q-alert>
@@ -35,7 +35,7 @@ export default class InactiveObjectWidget extends BlockWidget {
       <q-field class="col" label="Profiles">
         <ProfilesPopupEdit
           :field="block.profiles"
-          :serviceId="serviceId"
+          :service-id="serviceId"
           :change="callAndSaveBlock(v => block.profiles = v)"
         />
       </q-field>

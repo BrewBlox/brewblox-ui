@@ -28,9 +28,9 @@ export default class ActuatorPinForm extends BlockForm {
 <template>
   <div class="widget-modal">
     <q-btn
-      rounded
       v-close-overlay
       v-if="$props.buttons"
+      rounded
       label="close"
       icon="close"
       style="position: absolute; right: 18px; top: 18px"
@@ -57,7 +57,7 @@ export default class ActuatorPinForm extends BlockForm {
       <q-card-main>
         <q-field class="col" label="Constraints" orientation="vertical">
           <DigitalConstraints
-            :serviceId="serviceId"
+            :service-id="serviceId"
             :field="block.data.constrainedBy"
             :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
           />
@@ -68,7 +68,7 @@ export default class ActuatorPinForm extends BlockForm {
       <q-card-title>Block Settings</q-card-title>
       <q-card-main>
         <q-field class="col" label="Block ID">
-          <InputPopupEdit label="Block ID" :field="block.id" :change="changeBlockId"/>
+          <InputPopupEdit :field="block.id" :change="changeBlockId" label="Block ID"/>
         </q-field>
         <q-field class="col" label="Service ID">
           <big>{{ serviceId }}</big>
@@ -78,10 +78,10 @@ export default class ActuatorPinForm extends BlockForm {
         </q-field>
         <q-field class="col" label="Preset">
           <SelectPopupEdit
-            label="Preset"
             :field="block.data"
             :options="presets()"
             :change="callAndSaveBlock(v => block.data = v)"
+            label="Preset"
           />
         </q-field>
       </q-card-main>

@@ -222,12 +222,12 @@ export default class RemoteDisplayPage extends Vue {
         <div class="display">
           <canvas
             ref="screen-canvas"
-            class="view"
             :hidden="!connected"
             :width="width"
             :height="height"
+            class="view"
           />
-          <div class="glass" :hidden="connected" :width="width" :height="height"/>
+          <div :hidden="connected" :width="width" :height="height" class="glass"/>
         </div>
       </div>
     </div>

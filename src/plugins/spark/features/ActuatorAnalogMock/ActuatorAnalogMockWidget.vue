@@ -34,38 +34,34 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
         v-if="modalOpen"
         :field="block"
         :change="saveBlock"
-        :changeId="changeBlockId"
+        :change-id="changeBlockId"
       />
     </q-modal>
     <q-card-title class="title-bar">
       <InputPopupEdit
-        class="ellipsis"
         :field="widgetId"
+        :change="v => widgetId = v"
+        class="ellipsis"
         label="Widget ID"
         display="span"
-        :change="v => widgetId = v"
       />
-      <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
-      <q-btn flat round dense slot="right" @click="openModal" icon="settings"/>
-      <q-btn flat round dense slot="right" @click="refreshBlock" icon="refresh"/>
+      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
+      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
+      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-alert
-      type="warning"
-      color="warning"
-      v-if="this.block.value === null"
-    >This Actuator is invalid</q-alert>
-    <q-carousel quick-nav class="col" v-model="slideIndex">
+    <q-alert v-if="block.value === null" type="warning" color="warning">This Actuator is invalid</q-alert>
+    <q-carousel v-model="slideIndex" quick-nav class="col">
       <!-- State -->
       <q-carousel-slide class="unpadded">
         <div :class="['widget-body', orientationClass]">
           <q-card-main class="column col">
             <q-field class="col" label="Setting">
               <InputPopupEdit
-                type="number"
-                label="Setting"
                 :field="block.data.setting"
                 :change="callAndSaveBlock(v => block.data.setting = v)"
+                type="number"
+                label="Setting"
               />
             </q-field>
             <q-field class="col" label="Value">
@@ -82,26 +78,26 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
             <q-item class="full-width text-center">Setting</q-item>
             <q-field class="col" label="Minimum">
               <InputPopupEdit
-                type="number"
-                label="Minimum setting"
                 :field="block.data.minSetting"
                 :change="callAndSaveBlock(v => block.data.minSetting = v)"
+                type="number"
+                label="Minimum setting"
               />
             </q-field>
             <q-field class="col" label="Current">
               <InputPopupEdit
-                type="number"
-                label="Current setting"
                 :field="block.data.setting"
                 :change="callAndSaveBlock(v => block.data.setting = v)"
+                type="number"
+                label="Current setting"
               />
             </q-field>
             <q-field class="col" label="Maximum">
               <InputPopupEdit
-                type="number"
-                label="Maximum setting"
                 :field="block.data.maxSetting"
                 :change="callAndSaveBlock(v => block.data.maxSetting = v)"
+                type="number"
+                label="Maximum setting"
               />
             </q-field>
           </q-card-main>
@@ -110,10 +106,10 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
             <q-item class="full-width text-center">Value</q-item>
             <q-field class="col" label="Minimum">
               <InputPopupEdit
-                type="number"
-                label="Minimum value"
                 :field="block.data.minValue"
                 :change="callAndSaveBlock(v => block.data.minValue = v)"
+                type="number"
+                label="Minimum value"
               />
             </q-field>
             <q-field class="col" label="Current">
@@ -121,10 +117,10 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
             </q-field>
             <q-field class="col" label="Maximum">
               <InputPopupEdit
-                type="number"
-                label="Maximum value"
                 :field="block.data.maxValue"
                 :change="callAndSaveBlock(v => block.data.maxValue = v)"
+                type="number"
+                label="Maximum value"
               />
             </q-field>
           </q-card-main>
@@ -134,15 +130,15 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
         <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
       </q-carousel-slide>
       <q-btn
-        slot="quick-nav"
         slot-scope="props"
+        slot="quick-nav"
+        :icon="navIcon(props.slide)"
+        :label="navTitle(props.slide)"
+        :class="{inactive: !props.current}"
         color="white"
         flat
         dense
-        :icon="navIcon(props.slide)"
-        :label="navTitle(props.slide)"
         @click="props.goToSlide()"
-        :class="{inactive: !props.current}"
       />
     </q-carousel>
   </q-card>

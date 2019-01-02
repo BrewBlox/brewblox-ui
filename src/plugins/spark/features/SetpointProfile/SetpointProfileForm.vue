@@ -136,9 +136,9 @@ export default class SetpointProfileForm extends BlockForm {
 <template>
   <div class="widget-modal">
     <q-btn
-      rounded
       v-close-overlay
       v-if="$props.buttons"
+      rounded
       label="close"
       icon="close"
       style="position: absolute; right: 18px; top: 18px"
@@ -162,34 +162,34 @@ export default class SetpointProfileForm extends BlockForm {
       <q-card-main>
         <q-field class="col" label="Start time" orientation="vertical">
           <DatetimePopupEdit
-            label="Start time"
-            display="big"
             :field="start"
             :change="updateStartTime"
+            label="Start time"
+            display="big"
           />
         </q-field>
         <q-field class="col" label="Points" orientation="vertical">
           <div v-for="(point, idx) in points" :key="idx" class="row justify-around">
             <q-field label="Offset" orientation="vertical">
               <InputPopupEdit
-                label="Offset from start"
                 :field="durationString(point.offsetMs)"
                 :change="v => updatePointOffset(idx, parseDuration(v))"
+                label="Offset from start"
               />
             </q-field>
             <q-field label="Time" orientation="vertical">
               <DatetimePopupEdit
-                label="Time"
-                display="big"
                 :field="point.time"
                 :change="v => updatePointTime(idx, v)"
+                label="Time"
+                display="big"
               />
             </q-field>
             <q-field label="Temperature" orientation="vertical">
               <UnitPopupEdit
-                label="Temperature"
                 :field="point.temperature"
                 :change="v => updatePointTemperature(idx, v)"
+                label="Temperature"
               />
             </q-field>
             <q-field label=" " orientation="vertical">
@@ -206,7 +206,7 @@ export default class SetpointProfileForm extends BlockForm {
       <q-card-title>Block Settings</q-card-title>
       <q-card-main>
         <q-field class="col" label="Block ID">
-          <InputPopupEdit label="Block ID" :field="block.id" :change="changeBlockId"/>
+          <InputPopupEdit :field="block.id" :change="changeBlockId" label="Block ID"/>
         </q-field>
         <q-field class="col" label="Service ID">
           <big>{{ serviceId }}</big>
@@ -217,16 +217,16 @@ export default class SetpointProfileForm extends BlockForm {
         <q-field class="col" label="Profiles">
           <ProfilesPopupEdit
             :field="block.profiles"
-            :serviceId="serviceId"
+            :service-id="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
           />
         </q-field>
         <q-field class="col" label="Preset">
           <SelectPopupEdit
-            label="Preset"
             :field="block.data"
             :options="presets()"
             :change="callAndSaveBlock(v => block.data = v)"
+            label="Preset"
           />
         </q-field>
       </q-card-main>

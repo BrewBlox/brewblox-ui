@@ -255,8 +255,8 @@ export default class DashboardPage extends Vue {
           <span>{{ dashboard.title }}</span>
           <q-popup-edit
             :disable="!widgetEditable"
-            title="Set dashboard title to:"
             v-model="dashboard.title"
+            title="Set dashboard title to:"
             @save="onChangeDashboardTitle"
           >
             <q-input v-model="dashboard.title"/>
@@ -282,15 +282,15 @@ export default class DashboardPage extends Vue {
         <q-btn
           :icon="widgetEditable ? 'check' : 'mode edit'"
           :color="widgetEditable ? 'positive' : 'primary'"
-          @click="toggleWidgetEditable"
           :label="widgetEditable ? 'Stop editing' : 'Edit widgets'"
+          @click="toggleWidgetEditable"
         />
       </portal>
       <q-modal v-model="wizardModal.open">
         <component
           v-if="wizardModal.open"
           :is="wizardModal.component"
-          :onCreateItem="onCreateItem"
+          :on-create-item="onCreateItem"
         />
       </q-modal>
       <GridContainer
@@ -299,7 +299,6 @@ export default class DashboardPage extends Vue {
         :on-change-size="onChangeSize"
       >
         <component
-          class="dashboard-item"
           v-for="val in validatedItems"
           :disabled="widgetMovable"
           :is="widgetEditable ? 'EditWidget' : val.component"
@@ -310,11 +309,12 @@ export default class DashboardPage extends Vue {
           :cols="val.item.cols"
           :rows="val.item.rows"
           :config="val.item.config"
-          :onConfigChange="onChangeItemConfig"
-          :onIdChange="onChangeItemId"
-          :onDeleteItem="() => onDeleteItem(val.item)"
-          :onCopyItem="() => onCopyItem(val.item)"
-          :onMoveItem="() => onMoveItem(val.item)"
+          :on-config-change="onChangeItemConfig"
+          :on-id-change="onChangeItemId"
+          :on-delete-item="() => onDeleteItem(val.item)"
+          :on-copy-item="() => onCopyItem(val.item)"
+          :on-move-item="() => onMoveItem(val.item)"
+          class="dashboard-item"
         />
       </GridContainer>
     </template>

@@ -41,28 +41,28 @@ export default class PidWidget extends BlockWidget {
 <template>
   <q-card dark class="column">
     <q-modal v-model="modalOpen">
-      <PidForm v-if="modalOpen" :field="block" :change="saveBlock" :changeId="changeBlockId"/>
+      <PidForm v-if="modalOpen" :field="block" :change="saveBlock" :change-id="changeBlockId"/>
     </q-modal>
     <q-card-title class="title-bar">
       <InputPopupEdit
-        class="ellipsis"
         :field="widgetId"
+        :change="v => widgetId = v"
+        class="ellipsis"
         label="Widget ID"
         display="span"
-        :change="v => widgetId = v"
       />
-      <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
-      <q-btn slot="right" flat dense round @click="openModal" icon="settings"/>
-      <q-btn slot="right" flat round dense @click="refreshBlock" icon="refresh"/>
+      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
+      <q-btn slot="right" flat dense round icon="settings" @click="openModal"/>
+      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-alert type="info" color="info" v-if="!this.block.data.enabled">This PID is disabled</q-alert>
+    <q-alert v-if="!block.data.enabled" type="info" color="info">This PID is disabled</q-alert>
     <q-alert
+      v-if="block.data.enabled && !block.data.active"
       type="warning"
       color="warn"
-      v-if="this.block.data.enabled && !this.block.data.active"
     >This PID is inactive</q-alert>
-    <q-carousel quick-nav class="col" v-model="slideIndex">
+    <q-carousel v-model="slideIndex" quick-nav class="col">
       <!-- State -->
       <q-carousel-slide class="unpadded">
         <div :class="['widget-body', orientationClass]">
@@ -117,40 +117,40 @@ export default class PidWidget extends BlockWidget {
           <q-card-main class="column col">
             <q-field class="col" label="Kp">
               <UnitPopupEdit
-                label="Kp"
                 :field="block.data.kp"
                 :change="callAndSaveBlock(v => block.data.kp = v)"
+                label="Kp"
               />
             </q-field>
             <q-field class="col" label="Ti">
               <UnitPopupEdit
-                label="Ti"
                 :field="block.data.ti"
                 :change="callAndSaveBlock(v => block.data.ti = v)"
+                label="Ti"
               />
             </q-field>
             <q-field class="col" label="Td">
               <UnitPopupEdit
-                label="Td"
                 :field="block.data.td"
                 :change="callAndSaveBlock(v => block.data.td = v)"
+                label="Td"
               />
             </q-field>
           </q-card-main>
           <q-card-main class="column col">
             <q-field class="col" label="Filter">
               <SelectPopupEdit
-                label="Filter"
                 :field="block.data.filter"
                 :change="callAndSaveBlock(v => block.data.filter = v)"
                 :options="filterOpts"
+                label="Filter"
               />
             </q-field>
             <q-field class="col" label="Filter threshold">
               <UnitPopupEdit
-                label="Filter threshold"
                 :field="block.data.filterThreshold"
                 :change="callAndSaveBlock(v => block.data.filterThreshold = v)"
+                label="Filter threshold"
               />
             </q-field>
           </q-card-main>
@@ -160,15 +160,15 @@ export default class PidWidget extends BlockWidget {
         <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
       </q-carousel-slide>
       <q-btn
-        slot="quick-nav"
         slot-scope="props"
+        slot="quick-nav"
+        :icon="navIcon(props.slide)"
+        :label="navTitle(props.slide)"
+        :class="{inactive: !props.current}"
         color="white"
         flat
         dense
-        :icon="navIcon(props.slide)"
-        :label="navTitle(props.slide)"
         @click="props.goToSlide()"
-        :class="{inactive: !props.current}"
       />
     </q-carousel>
   </q-card>

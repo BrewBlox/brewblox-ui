@@ -42,10 +42,10 @@ export default class InputTube extends PartComponent {
       <path :d="paths.borders[0]"/>
       <path :d="paths.borders[1]"/>
     </g>
-    <g class="liquid" v-if="liquid" :stroke="liquidColor">
+    <g v-if="liquid" :stroke="liquidColor" class="liquid">
       <path :d="paths.liquid"/>
     </g>
-    <AnimatedArrows v-if="flowing" :path="paths.borders[0]" :numArrows="1" :duration="1"/>
+    <AnimatedArrows v-if="flowing" :path="paths.borders[0]" :num-arrows="1" :duration="1"/>
   </SVGRoot>
 </template>
 

@@ -29,9 +29,9 @@ export default class ActuatorPwmForm extends BlockForm {
 <template>
   <div class="widget-modal">
     <q-btn
-      rounded
       v-close-overlay
       v-if="$props.buttons"
+      rounded
       label="close"
       icon="close"
       style="position: absolute; right: 18px; top: 18px"
@@ -41,26 +41,26 @@ export default class ActuatorPwmForm extends BlockForm {
       <q-card-main>
         <q-field class="col" label="Actuator">
           <LinkPopupEdit
-            label="Actuator"
             :field="block.data.actuatorId"
-            :serviceId="serviceId"
+            :service-id="serviceId"
             :change="callAndSaveBlock(v => block.data.actuatorId = v)"
+            label="Actuator"
           />
         </q-field>
         <q-field class="col" label="Period">
           <InputPopupEdit
-            label="Period"
-            type="number"
             :field="block.data.period"
             :change="callAndSaveBlock(v => block.data.period = v)"
+            label="Period"
+            type="number"
           />
         </q-field>
         <q-field class="col" label="Setting">
           <InputPopupEdit
-            label="Setting"
-            type="number"
             :field="block.data.setting"
             :change="callAndSaveBlock(v => block.data.setting = v)"
+            label="Setting"
+            type="number"
           />
         </q-field>
         <q-field class="col" label="Value">
@@ -73,7 +73,7 @@ export default class ActuatorPwmForm extends BlockForm {
       <q-card-main>
         <q-field class="col" label="Constraints" orientation="vertical">
           <AnalogConstraints
-            :serviceId="block.serviceId"
+            :service-id="block.serviceId"
             :field="block.data.constrainedBy"
             :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
           />
@@ -84,7 +84,7 @@ export default class ActuatorPwmForm extends BlockForm {
       <q-card-title>Block Settings</q-card-title>
       <q-card-main>
         <q-field class="col" label="Block ID">
-          <InputPopupEdit label="Block ID" :field="block.id" :change="changeBlockId"/>
+          <InputPopupEdit :field="block.id" :change="changeBlockId" label="Block ID"/>
         </q-field>
         <q-field class="col" label="Service ID">
           <big>{{ serviceId }}</big>
@@ -95,16 +95,16 @@ export default class ActuatorPwmForm extends BlockForm {
         <q-field class="col" label="Profiles">
           <ProfilesPopupEdit
             :field="block.profiles"
-            :serviceId="serviceId"
+            :service-id="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
           />
         </q-field>
         <q-field class="col" label="Preset">
           <SelectPopupEdit
-            label="Preset"
             :field="block.data"
             :options="presets()"
             :change="callAndSaveBlock(v => block.data = v)"
+            label="Preset"
           />
         </q-field>
       </q-card-main>

@@ -17,6 +17,6 @@ export default class SVGRoot extends Vue {
 
 <template>
   <svg :width="width" :height="height">
-    <slot></slot>
+    <slot/>
   </svg>
 </template>

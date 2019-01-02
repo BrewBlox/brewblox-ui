@@ -77,17 +77,17 @@ export default class ExampleFeatureWidget extends WidgetBase {
       -->
       <InputPopupEdit
         :field="widgetId"
+        :change="v => widgetId = v"
         label="Widget ID"
         display="span"
-        :change="v => widgetId = v"
       />
       <!-- displayName is inherited from WidgetBase. The value is defined in the Feature definition (./index.ts) -->
-      <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
+      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
     </q-card-title>
     <q-card-separator/>
     <!-- The input fields and buttons at the top of the card are defined here -->
     <q-card-main class="row">
-      <q-input class="col" v-model="url"/>
+      <q-input v-model="url" class="col"/>
       <q-btn label="External" @click="fetchExternal"/>
       <q-btn label="Backend" @click="fetchBackend"/>
     </q-card-main>

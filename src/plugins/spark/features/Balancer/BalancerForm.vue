@@ -20,9 +20,9 @@ export default class BalancerForm extends BlockForm {
 <template>
   <div class="widget-modal">
     <q-btn
-      rounded
       v-close-overlay
       v-if="$props.buttons"
+      rounded
       label="close"
       icon="close"
       style="position: absolute; right: 18px; top: 18px"
@@ -33,10 +33,10 @@ export default class BalancerForm extends BlockForm {
         <q-field
           v-for="client in block.data.clients"
           :key="client.id.id"
-          class="col"
           :label="client.id.id || 'unknown'"
+          class="col"
         >
-          <big>{{ client.granted | round}} / {{ client.requested | round }}</big>
+          <big>{{ client.granted | round }} / {{ client.requested | round }}</big>
         </q-field>
       </q-card-main>
     </q-card>
@@ -44,7 +44,7 @@ export default class BalancerForm extends BlockForm {
       <q-card-title>Block Settings</q-card-title>
       <q-card-main>
         <q-field class="col" label="Block ID">
-          <InputPopupEdit label="Block ID" :field="block.id" :change="changeBlockId"/>
+          <InputPopupEdit :field="block.id" :change="changeBlockId" label="Block ID"/>
         </q-field>
         <q-field class="col" label="Service ID">
           <big>{{ serviceId }}</big>
@@ -55,16 +55,16 @@ export default class BalancerForm extends BlockForm {
         <q-field class="col" label="Profiles">
           <ProfilesPopupEdit
             :field="block.profiles"
-            :serviceId="serviceId"
+            :service-id="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
           />
         </q-field>
         <q-field class="col" label="Preset">
           <SelectPopupEdit
-            label="Preset"
             :field="block.data"
             :options="presets()"
             :change="callAndSaveBlock(v => block.data = v)"
+            label="Preset"
           />
         </q-field>
       </q-card-main>

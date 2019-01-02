@@ -21,47 +21,47 @@ export default class MutexWidget extends BlockWidget {
 <template>
   <q-card dark class="column">
     <q-modal v-model="modalOpen">
-      <MutexForm v-if="modalOpen" :field="block" :change="saveBlock" :changeId="changeBlockId"/>
+      <MutexForm v-if="modalOpen" :field="block" :change="saveBlock" :change-id="changeBlockId"/>
     </q-modal>
     <q-card-title class="title-bar">
       <InputPopupEdit
-        class="ellipsis"
         :field="widgetId"
+        :change="v => widgetId = v"
+        class="ellipsis"
         label="Widget ID"
         display="span"
-        :change="v => widgetId = v"
       />
-      <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
-      <q-btn flat round dense slot="right" @click="openModal" icon="settings"/>
-      <q-btn flat round dense slot="right" @click="refreshBlock" icon="refresh"/>
+      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
+      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
+      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-carousel quick-nav class="col" v-model="slideIndex">
+    <q-carousel v-model="slideIndex" quick-nav class="col">
       <!-- State -->
       <q-carousel-slide class="unpadded">
         <div :class="['widget-body', orientationClass]">
           <q-card-main class="column col">
             <q-field class="col" label="Actuator wait time">
               <InputPopupEdit
-                type="number"
-                label="Actuator wait time"
                 :field="block.data.differentActuatorWait"
                 :change="callAndSaveBlock(v => block.data.differentActuatorWait = v)"
+                type="number"
+                label="Actuator wait time"
               />
             </q-field>
           </q-card-main>
         </div>
       </q-carousel-slide>
       <q-btn
-        slot="quick-nav"
         slot-scope="props"
+        slot="quick-nav"
+        :icon="navIcon(props.slide)"
+        :label="navTitle(props.slide)"
+        :class="{inactive: !props.current}"
         color="white"
         flat
         dense
-        :icon="navIcon(props.slide)"
-        :label="navTitle(props.slide)"
         @click="props.goToSlide()"
-        :class="{inactive: !props.current}"
       />
     </q-carousel>
   </q-card>

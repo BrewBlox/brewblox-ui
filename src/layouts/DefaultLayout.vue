@@ -133,11 +133,11 @@ export default class DefaultLayout extends Vue {
         <q-list-header>
           <q-item-side icon="dashboard"/>Dashboards
           <q-btn
-            round
-            size="sm"
             :flat="!dashboardEditing"
             :icon="dashboardEditing ? 'check' : 'mode edit'"
             :color="dashboardEditing ? 'primary': ''"
+            round
+            size="sm"
             @click="toggleDashboardEditing"
           />
         </q-list-header>
@@ -148,34 +148,34 @@ export default class DefaultLayout extends Vue {
           v-model="dashboards"
         >
           <q-item
-            dark
             v-for="dashboard in dashboards"
             :link="!dashboardEditing"
             :key="dashboard.id"
             :to="dashboardEditing ? undefined : `/dashboard/${dashboard.id}`"
+            dark
           >
             <q-item-side v-if="dashboardEditing" icon="drag_indicator"/>
             <q-item-main :label="dashboard.title"/>
-            <q-item-side right v-if="dashboardEditing">
+            <q-item-side v-if="dashboardEditing" right>
               <q-btn
+                :color="defaultDashboard === dashboard.id ? 'primary' : ''"
                 round
                 flat
                 icon="home"
-                :color="defaultDashboard === dashboard.id ? 'primary' : ''"
                 @click="updateDefaultDashboard(dashboard.id)"
               />
             </q-item-side>
-            <q-item-side right v-if="dashboardEditing">
+            <q-item-side v-if="dashboardEditing" right>
               <q-btn round flat icon="delete" @click="removeDashboard(dashboard)"/>
             </q-item-side>
           </q-item>
         </draggable>
         <div class="q-list-container">
           <q-btn
+            v-if="dashboardEditing"
             icon="add"
             label="Add dashboard"
             color="dark-bright"
-            v-if="dashboardEditing"
             @click="createDashboard"
           />
         </div>
@@ -184,11 +184,11 @@ export default class DefaultLayout extends Vue {
         <q-list-header>
           <q-item-side icon="cloud"/>Services
           <q-btn
-            round
-            size="sm"
             :flat="!serviceEditing"
             :icon="serviceEditing ? 'check' : 'mode edit'"
             :color="serviceEditing ? 'primary': ''"
+            round
+            size="sm"
             @click="toggleServiceEditing"
           />
         </q-list-header>
@@ -200,25 +200,25 @@ export default class DefaultLayout extends Vue {
           v-model="services"
         >
           <q-item
-            dark
             v-for="service in services"
             :link="!serviceEditing"
             :key="service.id"
             :to="serviceEditing ? undefined : `/service/${service.id}`"
+            dark
           >
             <q-item-side v-if="serviceEditing" icon="drag_indicator"/>
             <q-item-main :label="service.title"/>
-            <q-item-side right v-if="serviceEditing">
+            <q-item-side v-if="serviceEditing" right>
               <q-btn round flat icon="delete" @click="removeService(service)"/>
             </q-item-side>
           </q-item>
         </draggable>
         <div class="q-list-container">
           <q-btn
+            v-if="serviceEditing"
             icon="add"
             label="Add service"
             color="dark-bright"
-            v-if="serviceEditing"
             @click="createService"
           />
         </div>

@@ -45,19 +45,15 @@ export default class DatetimePopupEdit extends Vue {
   <div>
     <component :is="$props.display" class="editable">{{ dateString }}</component>
     <q-popup-edit
-      buttons
-      persistent
       :disable="$attrs.disabled"
       :title="`Set ${this.$props.label} to:`"
       v-model="placeholder"
+      buttons
+      persistent
       @show="startEdit"
       @save="endEdit"
     >
       <q-datetime
-        dark
-        format24h
-        clearable
-        type="datetime"
         v-model="placeholder"
         :after="[
           {
@@ -65,6 +61,10 @@ export default class DatetimePopupEdit extends Vue {
             handler: () => placeholder = new Date().getTime(),
           }
         ]"
+        dark
+        format24h
+        clearable
+        type="datetime"
       />
     </q-popup-edit>
   </div>

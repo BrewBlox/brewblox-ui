@@ -35,7 +35,7 @@ export default class ServicePage extends Vue {
 
 <template>
   <q-page padding>
-    <component v-if="serviceValid" :is="pageComponent()" :serviceId="serviceId"/>
+    <component v-if="serviceValid" :is="pageComponent()" :service-id="serviceId"/>
     <p v-else>Service {{ serviceId }} not found.</p>
   </q-page>
 </template>

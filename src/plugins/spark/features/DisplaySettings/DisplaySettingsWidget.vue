@@ -113,51 +113,51 @@ export default class DisplaySettingsWidget extends BlockWidget {
         v-if="modalOpen"
         :field="block"
         :change="saveBlock"
-        :changeId="changeBlockId"
+        :change-id="changeBlockId"
       />
     </q-modal>
     <q-card-title class="title-bar">
       <InputPopupEdit
-        class="ellipsis"
         :field="widgetId"
+        :change="v => widgetId = v"
+        class="ellipsis"
         label="Widget ID"
         display="span"
-        :change="v => widgetId = v"
       />
-      <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
-      <q-btn flat round dense slot="right" @click="openModal" icon="settings"/>
-      <q-btn flat round dense slot="right" @click="refreshBlock" icon="refresh"/>
+      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
+      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
+      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-carousel quick-nav class="col" v-model="slideIndex">
+    <q-carousel v-model="slideIndex" quick-nav class="col">
       <!-- State -->
-      <q-carousel-slide class="unpadded" v-for="(slot, idx) in displaySlots" :key="idx">
+      <q-carousel-slide v-for="(slot, idx) in displaySlots" :key="idx" class="unpadded">
         <div :class="['widget-body', orientationClass]">
           <q-card-main class="column col">
             <q-field class="col" label="Block">
               <SelectPopupEdit
-                clearable
-                label="Field"
                 :field="slotLink(slot).id"
                 :options="slotLinkOpts"
                 :change="callAndSaveBlock(v => updateSlotLink(idx, v))"
+                clearable
+                label="Field"
               />
             </q-field>
             <q-field class="col" label="Name">
               <InputPopupEdit
                 v-if="slot"
-                label="Name"
                 :field="slot.name"
                 :change="callAndSaveBlock(v => updateSlotName(idx, v))"
+                label="Name"
               />
               <big v-else>-</big>
             </q-field>
             <q-field class="col" label="Color">
               <ColorPickerPopupEdit
                 v-if="slot"
-                label="Color"
                 :field="slot.color"
                 :change="callAndSaveBlock(v => updateSlotColor(idx, v))"
+                label="Color"
               />
               <big v-else>-</big>
             </q-field>
@@ -165,15 +165,15 @@ export default class DisplaySettingsWidget extends BlockWidget {
         </div>
       </q-carousel-slide>
       <q-btn
-        slot="quick-nav"
         slot-scope="props"
+        slot="quick-nav"
+        :icon="navIcon(props.slide)"
+        :label="navTitle(props.slide)"
+        :class="{inactive: !props.current}"
         color="white"
         flat
         dense
-        :icon="navIcon(props.slide)"
-        :label="navTitle(props.slide)"
         @click="props.goToSlide()"
-        :class="{inactive: !props.current}"
       />
     </q-carousel>
   </q-card>

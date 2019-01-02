@@ -55,14 +55,14 @@ export default class ProfilesPopupEdit extends Vue {
   <div>
     <component :is="$props.display" class="editable">{{ displayValue }}</component>
     <q-popup-edit
+      v-model="placeholder"
       buttons
       persistent
       title="Select active profiles"
-      v-model="placeholder"
       @show="startEdit"
       @save="endEdit"
     >
-      <q-select clearable multiple v-model="placeholder" :options="profileOpts"/>
+      <q-select v-model="placeholder" :options="profileOpts" clearable multiple/>
     </q-popup-edit>
   </div>
 </template>

@@ -48,27 +48,27 @@ export default class DigitalConstraints extends Constraints {
 <template>
   <div class="column gutter-y-xs">
     <div v-for="(cinfo, idx) in constraints" :key="idx">
-      <div :class="{row: true, limiting: cinfo.limiting}" v-if="readonly">
+      <div v-if="readonly" :class="{row: true, limiting: cinfo.limiting}">
         <span class="col">{{ label(cinfo.key) }}</span>
         <span class="col">{{ cinfo.value | unit }}</span>
       </div>
-      <div class="row" v-else>
+      <div v-else class="row">
         <SelectPopupEdit
-          clearable
-          class="col-8"
-          label="Constraint type"
           :options="constraintOptions"
           :field="cinfo.key"
           :change="callAndSaveConstraints(k => constraints[idx] = createConstraint(k))"
+          clearable
+          class="col-8"
+          label="Constraint type"
         />
         <component
           :is="fieldType(cinfo.key)"
+          :service-id="serviceId"
+          :field="cinfo.value"
+          :change="callAndSaveConstraints(v => cinfo.value = v)"
           class="col"
           label="Constraint value"
           type="number"
-          :serviceId="serviceId"
-          :field="cinfo.value"
-          :change="callAndSaveConstraints(v => cinfo.value = v)"
         />
         <q-btn class="col-1" icon="delete" @click="removeConstraint(idx); saveConstraints();"/>
       </div>

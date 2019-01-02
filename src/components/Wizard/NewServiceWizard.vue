@@ -112,9 +112,9 @@ export default class NewServiceWizard extends Vue {
       <component
         v-if="serviceWizardActive"
         :is="serviceWizard"
-        :serviceId="serviceId"
-        :onCreate="onCreate"
-        :onCancel="onCancel"
+        :service-id="serviceId"
+        :on-create="onCreate"
+        :on-cancel="onCancel"
       />
     </q-item>
     <!-- Select a wizard -->
@@ -122,17 +122,17 @@ export default class NewServiceWizard extends Vue {
       <q-field label="Service ID" icon="create" orientation="vertical">
         <q-input
           v-model="serviceId"
-          placeholder="Choose an ID"
           :error="serviceIdError !== null"
           :suffix="serviceIdError"
+          placeholder="Choose an ID"
         />
       </q-field>
       <q-field label="Service name" icon="create" orientation="vertical">
         <q-input
           v-model="serviceTitle"
-          placeholder="Choose a name"
           :error="serviceTitleError !== null"
           :suffix="serviceTitleError"
+          placeholder="Choose a name"
         />
       </q-field>
       <q-field label="Service type" icon="widgets" orientation="vertical">
@@ -141,9 +141,9 @@ export default class NewServiceWizard extends Vue {
         </q-item>
         <q-list link inset-separator>
           <q-item
-            icon="widgets"
             v-for="opt in wizardOptions"
             :key="opt.label"
+            icon="widgets"
             @click.native="selectFeature(opt.value)"
           >
             <div class="row">

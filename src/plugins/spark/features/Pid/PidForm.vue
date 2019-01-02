@@ -50,9 +50,9 @@ export default class PidForm extends BlockForm {
 <template>
   <div class="pid-modal">
     <q-btn
-      rounded
       v-close-overlay
       v-if="$props.buttons"
+      rounded
       label="close"
       icon="close"
       style="position: absolute; right: 18px; top: 18px"
@@ -103,23 +103,23 @@ export default class PidForm extends BlockForm {
         <!-- settings -->
         <q-field label="Kp" orientation="vertical">
           <UnitPopupEdit
-            label="Kp"
             :field="block.data.kp"
             :change="callAndSaveBlock(v => block.data.kp = v)"
+            label="Kp"
           />
         </q-field>
         <q-field label="Ti" orientation="vertical">
           <UnitPopupEdit
-            label="Ti"
             :field="block.data.ti"
             :change="callAndSaveBlock(v => block.data.ti = v)"
+            label="Ti"
           />
         </q-field>
         <q-field label="Td" orientation="vertical">
           <UnitPopupEdit
-            label="Td"
             :field="block.data.td"
             :change="callAndSaveBlock(v => block.data.td = v)"
+            label="Td"
           />
         </q-field>
         <div/>
@@ -163,19 +163,19 @@ export default class PidForm extends BlockForm {
           <p>
             <span>The input target value and actual value will come from:</span>
             <LinkPopupEdit
-              label="Input"
               :field="block.data.inputId"
-              :serviceId="block.serviceId"
+              :service-id="block.serviceId"
               :change="callAndSaveBlock(v => block.data.inputId = v)"
+              label="Input"
               class="inline-popup"
             />
           </p>
           <p>
             <span>
               The current target value is
-              <b>{{block.data.inputSetting | unit}}</b>
+              <b>{{ block.data.inputSetting | unit }}</b>
               and the actual value is
-              <b>{{block.data.inputValue | unit}}</b>.
+              <b>{{ block.data.inputValue | unit }}</b>.
             </span>
           </p>
         </q-field>
@@ -183,19 +183,19 @@ export default class PidForm extends BlockForm {
           <p>
             <span>The PID result will be used to drive:</span>
             <LinkPopupEdit
-              label="Output"
               :field="block.data.outputId"
-              :serviceId="block.serviceId"
+              :service-id="block.serviceId"
               :change="callAndSaveBlock(v => block.data.outputId = v)"
+              label="Output"
               class="inline-popup"
             />
           </p>
           <p>
             <span>
               The current setting of the output is
-              <b>{{block.data.outputSetting | unit}}</b>
+              <b>{{ block.data.outputSetting | unit }}</b>
               and the actually achieved value is
-              <b>{{block.data.outputValue | unit}}</b>.
+              <b>{{ block.data.outputValue | unit }}</b>.
             </span>
           </p>
         </q-field>
@@ -203,10 +203,10 @@ export default class PidForm extends BlockForm {
           <p>
             <span>Input changes faster than</span>
             <SelectPopupEdit
-              label="Filter"
               :field="block.data.filter"
               :change="callAndSaveBlock(v => block.data.filter = v)"
               :options="filterOpts"
+              label="Filter"
               class="inline-popup"
             />
             <span>will be filtered out.</span>
@@ -214,9 +214,9 @@ export default class PidForm extends BlockForm {
           <p>
             <span>But steps exceeding</span>
             <UnitPopupEdit
-              label="Filter threshold"
               :field="block.data.filterThreshold"
               :change="callAndSaveBlock(v => block.data.filterThreshold = v)"
+              label="Filter threshold"
               class="inline-popup"
             />
             <span>will trigger a faster response.</span>
@@ -230,7 +230,7 @@ export default class PidForm extends BlockForm {
         <q-field label="Block is active in profiles:">
           <ProfilesPopupEdit
             :field="block.profiles"
-            :serviceId="serviceId"
+            :service-id="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
           />
         </q-field>
@@ -300,7 +300,7 @@ export default class PidForm extends BlockForm {
       <q-card-title>Block Settings</q-card-title>
       <q-card-main>
         <q-field class="col" label="Block ID">
-          <InputPopupEdit label="Block ID" :field="block.id" :change="changeBlockId"/>
+          <InputPopupEdit :field="block.id" :change="changeBlockId" label="Block ID"/>
         </q-field>
         <q-field class="col" label="Service ID">
           <big>{{ serviceId }}</big>
@@ -311,16 +311,16 @@ export default class PidForm extends BlockForm {
         <q-field class="col" label="Profiles">
           <ProfilesPopupEdit
             :field="block.profiles"
-            :serviceId="serviceId"
+            :service-id="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
           />
         </q-field>
         <q-field class="col" label="Preset">
           <SelectPopupEdit
-            label="Preset"
             :field="block.data"
             :options="presets()"
             :change="callAndSaveBlock(v => block.data = v)"
+            label="Preset"
           />
         </q-field>
       </q-card-main>

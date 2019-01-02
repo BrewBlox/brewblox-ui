@@ -55,7 +55,7 @@ export default class TeeTube extends PartComponent {
       <path d="M21,0V20a1,1,0,0,1-1,1H0"/>
       <line class="line" y1="29" x2="50" y2="29"/>
     </g>
-    <g class="liquid" v-if="liquid" :stroke="liquidColor">
+    <g v-if="liquid" :stroke="liquidColor" class="liquid">
       <line y1="25" x2="50" y2="25"/>
       <path d="M0,25H20a5,5,0,0,0,5-5V0"/>
       <path d="M25,0V20a5,5,0,0,0,5,5H50"/>
@@ -65,21 +65,21 @@ export default class TeeTube extends PartComponent {
         v-if="topFlowing"
         :path="paths.top"
         :reversed="topReversed"
-        :numArrows="1"
+        :num-arrows="1"
         :duration="1"
       />
       <AnimatedArrows
         v-if="leftFlowing"
         :path="paths.left"
         :reversed="leftReversed"
-        :numArrows="1"
+        :num-arrows="1"
         :duration="1"
       />
       <AnimatedArrows
         v-if="rightFlowing"
         :path="paths.right"
         :reversed="rightReversed"
-        :numArrows="1"
+        :num-arrows="1"
         :duration="1"
       />
     </g>

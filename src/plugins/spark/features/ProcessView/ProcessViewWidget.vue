@@ -208,17 +208,17 @@ export default class ProcessViewWidget extends WidgetBase {
     <q-card-title class="title-bar">
       <InputPopupEdit
         :field="widgetId"
+        :change="v => widgetId = v"
         label="Widget ID"
         display="span"
-        :change="v => widgetId = v"
       />
-      <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
-      <q-btn v-if="editable" flat round dense slot="right" icon="delete" @click="updateParts([])"/>
-      <q-btn v-if="editable" flat round dense slot="right" icon="extension">
+      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
+      <q-btn v-if="editable" slot="right" flat round dense icon="delete" @click="updateParts([])"/>
+      <q-btn v-if="editable" slot="right" flat round dense icon="extension">
         <q-popover>
           <q-list link style="padding: 5px">
             <q-item v-for="part in availableParts" :key="part.type" :style="partSizeStyle">
-              <ProcessViewItem :value="part" v-touch-pan="v => panHandler(part, v)"/>
+              <ProcessViewItem v-touch-pan="v => panHandler(part, v)" :value="part"/>
             </q-item>
           </q-list>
         </q-popover>
@@ -229,20 +229,20 @@ export default class ProcessViewWidget extends WidgetBase {
     <ProcessViewItem v-if="dragAction" :value="dragAction.part" :style="dragAction.style"/>
     <div
       v-if="contextAction && contextAction.isSource"
-      class="column"
       :style="contextAction.leftStyle"
+      class="column"
     >
       <q-btn
-        fab
-        round
         v-for="color in liquidColors"
         :key="color"
         :style="`background-color: ${color}`"
+        fab
+        round
         icon="format_color_fill"
         @mouseup.native="changeLiquidSource(contextAction.part, color)"
       />
     </div>
-    <div v-if="contextAction" class="column" :style="contextAction.rightStyle">
+    <div v-if="contextAction" :style="contextAction.rightStyle" class="column">
       <q-btn
         fab
         round
@@ -265,15 +265,15 @@ export default class ProcessViewWidget extends WidgetBase {
         @mouseup.native="removePart(contextAction.part)"
       />
     </div>
-    <div :class="gridClasses" ref="grid">
+    <div ref="grid" :class="gridClasses">
       <div
-        class="grid-item"
+        v-touch-pan="v => panHandler(part, v)"
+        v-touch-hold="v => holdHandler(part, v)"
         v-for="(part, idx) in parts"
         v-show="!beingDragged(part)"
         :key="`${part.x}_${part.y}`"
         :style="partStyle(part)"
-        v-touch-pan="v => panHandler(part, v)"
-        v-touch-hold="v => holdHandler(part, v)"
+        class="grid-item"
       >
         <div v-if="editable" class="grid-item-coordinates">{{ part.x }},{{ part.y }}</div>
         <ProcessViewItem :value="flowParts[idx]" @input="changePart"/>

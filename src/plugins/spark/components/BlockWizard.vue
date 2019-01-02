@@ -229,59 +229,59 @@ export default class BlockWizard extends Vue {
       <q-field label="Widget name" icon="create" orientation="vertical">
         <q-input
           v-model="widgetId"
-          placeholder="Enter a widget Name"
           :error="widgetIdError !== null"
           :suffix="widgetIdError"
+          placeholder="Enter a widget Name"
         />
       </q-field>
       <q-field label="Service" icon="create" orientation="vertical">
         <q-option-group
-          dark
-          type="radio"
           v-model="service"
           :options="serviceOpts"
+          dark
+          type="radio"
           @input="() => { block = null; }"
         />
       </q-field>
     </q-step>
     <!-- create -->
-    <q-step name="create" title="Create block" v-if="blockAction === 'create'">
+    <q-step v-if="blockAction === 'create'" name="create" title="Create block">
       <q-field label="Block name" icon="create" orientation="vertical">
         <q-input
           v-model="blockId"
-          placeholder="Enter a block name"
           :error="blockIdError !== null"
           :suffix="blockIdError"
+          placeholder="Enter a block name"
         />
       </q-field>
     </q-step>
     <!-- select -->
-    <q-step name="existing" title="Select block" v-else-if="blockAction === 'existing'">
+    <q-step v-else-if="blockAction === 'existing'" name="existing" title="Select block">
       <q-field label="Service" icon="create" orientation="vertical">
-        <q-option-group dark type="radio" v-model="block" :options="blockOpts"/>
+        <q-option-group v-model="block" :options="blockOpts" dark type="radio"/>
       </q-field>
     </q-step>
     <!-- placeholder -->
-    <q-step name="placeholder" title="Create or select block" v-else/>
+    <q-step v-else name="placeholder" title="Create or select block"/>
     <!-- configure -->
     <q-step name="config" title="Configure block">
       <component
-        :is="blockForm"
         v-if="block"
+        ref="form"
+        :is="blockForm"
         :field="block"
         :change="v => block = v"
-        :changeId="changeBlockId"
-        ref="form"
+        :change-id="changeBlockId"
         :buttons="false"
       />
     </q-step>
     <q-stepper-navigation>
       <q-btn
-        flat
         v-for="action in navigation[currentStep]"
         :key="action.label"
         :label="action.label"
         :disabled="!action.enabled()"
+        flat
         @click="action.click"
       />
     </q-stepper-navigation>

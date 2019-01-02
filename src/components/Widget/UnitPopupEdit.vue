@@ -49,14 +49,14 @@ export default class UnitPopupEdit extends Vue {
   <div>
     <component :is="$props.display" class="editable">{{ this.$props.field | unit }}</component>
     <q-popup-edit
-      buttons
-      persistent
       :title="`Set ${this.$props.label} to:`"
       v-model="placeholder"
+      buttons
+      persistent
       @show="startEdit"
       @save="endEdit"
     >
-      <q-input type="number" :suffix="this.notation" v-model="placeholder"/>
+      <q-input :suffix="notation" v-model="placeholder" type="number"/>
     </q-popup-edit>
   </div>
 </template>

@@ -156,7 +156,7 @@ export default class SparkWidget extends Vue {
 </script>
 
 <template>
-  <q-card dark class="column" v-if="ready">
+  <q-card v-if="ready" dark class="column">
     <q-modal v-model="modalOpen">
       <SparkForm v-if="modalOpen" :field="service"/>
     </q-modal>
@@ -169,25 +169,25 @@ export default class SparkWidget extends Vue {
     </q-modal>
     <q-card-title class="title-bar">
       <InputPopupEdit
-        class="ellipsis"
         :field="service.id"
+        :change="() => {}"
+        class="ellipsis"
         label="Widget ID"
         display="span"
-        :change="() => {}"
       />
-      <span class="vertical-middle on-left" slot="right">Spark Service</span>
-      <q-btn flat round dense slot="right" @click="openModal" icon="settings"/>
-      <q-btn flat round dense slot="right" @click="fetchAll" icon="refresh"/>
+      <span slot="right" class="vertical-middle on-left">Spark Service</span>
+      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
+      <q-btn slot="right" flat round dense icon="refresh" @click="fetchAll"/>
     </q-card-title>
     <q-card-separator/>
-    <q-carousel quick-nav class="col" v-model="slideIndex">
+    <q-carousel v-model="slideIndex" quick-nav class="col">
       <!-- State -->
       <q-carousel-slide class="unpadded">
         <q-card-main class="column col">
           <q-alert
             v-if="!updating"
-            type="warning"
             :actions="[{ label: 'Retry', handler: createUpdateSource }]"
+            type="warning"
           >Unable to update automatically</q-alert>
           <q-field class="col" label="Device ID">
             <big style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</big>
@@ -195,7 +195,7 @@ export default class SparkWidget extends Vue {
           <q-field class="col" label="Active Profiles">
             <ProfilesPopupEdit
               :field="profiles.data.active"
-              :serviceId="service.id"
+              :service-id="service.id"
               :change="v => { profiles.data.active = v; saveBlock(profiles); }"
             />
           </q-field>
@@ -230,22 +230,22 @@ export default class SparkWidget extends Vue {
           <q-field class="col column" label="Discovered blocks" orientation="vertical">
             <div class="row">
               <q-btn label="Refresh" @click="fetchDiscoveredBlocks"/>
-              <q-btn label="Clear" v-if="discoveredBlocks.length" @click="clearDiscoveredBlocks"/>
+              <q-btn v-if="discoveredBlocks.length" label="Clear" @click="clearDiscoveredBlocks"/>
             </div>
             <p v-for="id in discoveredBlocks" :key="id">{{ id }}</p>
           </q-field>
         </q-card-main>
       </q-carousel-slide>
       <q-btn
-        flat
-        dense
-        slot="quick-nav"
         slot-scope="props"
-        color="white"
+        slot="quick-nav"
         :icon="navIcon(props.slide)"
         :label="navTitle(props.slide)"
-        @click="props.goToSlide()"
         :class="{inactive: !props.current}"
+        flat
+        dense
+        color="white"
+        @click="props.goToSlide()"
       />
     </q-carousel>
   </q-card>

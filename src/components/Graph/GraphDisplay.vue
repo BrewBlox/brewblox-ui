@@ -72,7 +72,7 @@ export default class GraphDisplay extends Vue {
 </script>
 
 <template>
-  <PlotlyGraph fit v-if="ready" :data="plotlyData" :layout="plotlyLayout" :config="plotlyConfig"/>
+  <PlotlyGraph v-if="ready" :data="plotlyData" :layout="plotlyLayout" :config="plotlyConfig" fit/>
 </template>
 
 <style scoped>
