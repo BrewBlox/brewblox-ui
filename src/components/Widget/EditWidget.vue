@@ -26,28 +26,28 @@ export default class EditWidget extends WidgetBase { }
     <q-card-title class="title-bar">
       <InputPopupEdit
         :field="widgetId"
+        :change="v => widgetId = v"
         label="Widget ID"
         display="span"
-        :change="v => widgetId = v"
       />
-      <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
+      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
     </q-card-title>
     <q-card-separator/>
     <q-card-main>
       <q-list class="actions-container" no-border>
         <q-btn
+          v-if="$props.onDeleteItem"
           flat
           size="lg"
           icon="delete"
-          v-if="$props.onDeleteItem"
           @click="$props.onDeleteItem"
         />
-        <q-btn flat size="lg" icon="file_copy" v-if="$props.onCopyItem" @click="$props.onCopyItem"/>
+        <q-btn v-if="$props.onCopyItem" flat size="lg" icon="file_copy" @click="$props.onCopyItem"/>
         <q-btn
+          v-if="$props.onMoveItem"
           flat
           size="lg"
           icon="exit_to_app"
-          v-if="$props.onMoveItem"
           @click="$props.onMoveItem"
         />
       </q-list>

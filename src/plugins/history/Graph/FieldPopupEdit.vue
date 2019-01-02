@@ -57,14 +57,14 @@ export default class FieldPopupEdit extends Vue {
   <div>
     <component :is="$props.display" class="editable">{{ displayValue }}</component>
     <q-popup-edit
-      buttons
-      persistent
       :title="`Set ${this.$props.label} to:`"
       v-model="placeholder"
+      buttons
+      persistent
       @show="startEdit"
       @save="endEdit"
     >
-      <q-select clearable v-model="placeholder" :options="options"/>
+      <q-select v-model="placeholder" :options="options" clearable/>
     </q-popup-edit>
   </div>
 </template>

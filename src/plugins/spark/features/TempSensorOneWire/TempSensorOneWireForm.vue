@@ -23,9 +23,9 @@ export default class TempSensorOneWireForm extends BlockForm {
 <template>
   <div class="widget-modal">
     <q-btn
-      rounded
       v-close-overlay
       v-if="$props.buttons"
+      rounded
       label="close"
       icon="close"
       style="position: absolute; right: 18px; top: 18px"
@@ -35,16 +35,16 @@ export default class TempSensorOneWireForm extends BlockForm {
       <q-card-main>
         <q-field class="col" label="Address">
           <InputPopupEdit
-            label="Address"
             :field="block.data.address"
             :change="callAndSaveBlock(v => block.data.address = v)"
+            label="Address"
           />
         </q-field>
         <q-field class="col" label="Offset">
           <UnitPopupEdit
-            label="Offset"
             :field="block.data.offset"
             :change="callAndSaveBlock(v => block.data.offset = v)"
+            label="Offset"
           />
         </q-field>
       </q-card-main>
@@ -53,7 +53,7 @@ export default class TempSensorOneWireForm extends BlockForm {
       <q-card-title>Block Settings</q-card-title>
       <q-card-main>
         <q-field class="col" label="Block ID">
-          <InputPopupEdit label="Block ID" :field="block.id" :change="changeBlockId"/>
+          <InputPopupEdit :field="block.id" :change="changeBlockId" label="Block ID"/>
         </q-field>
         <q-field class="col" label="Service ID">
           <big>{{ serviceId }}</big>
@@ -64,16 +64,16 @@ export default class TempSensorOneWireForm extends BlockForm {
         <q-field class="col" label="Profiles">
           <ProfilesPopupEdit
             :field="block.profiles"
-            :serviceId="serviceId"
+            :service-id="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
           />
         </q-field>
         <q-field class="col" label="Preset">
           <SelectPopupEdit
-            label="Preset"
             :field="block.data"
             :options="presets()"
             :change="callAndSaveBlock(v => block.data = v)"
+            label="Preset"
           />
         </q-field>
       </q-card-main>

@@ -1,4 +1,5 @@
 <script lang="ts">
+/* eslint-disable vue/attribute-hyphenation */
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
@@ -48,7 +49,8 @@ export default class AnimatedArrows extends Vue {
 <template>
   <g>
     <g v-for="start in starts" :key="start" visibility="hidden">
-      <path d="M0,0 l4,4 l-4,4" class="outline" :transform="transform"/>
+      <path :transform="transform" d="M0,0 l4,4 l-4,4" class="outline"/>
+      <!-- Note: SVG attributes are case-sensitive -->
       <animateMotion
         :path="$props.path"
         :begin="start"
@@ -60,7 +62,7 @@ export default class AnimatedArrows extends Vue {
         calcMode="linear"
         keyTimes="0;1"
       />
-      <set attributeName="visibility" from="hidden" to="visible" :begin="start"/>
+      <set :begin="start" attributeName="visibility" from="hidden" to="visible"/>
     </g>
   </g>
 </template>

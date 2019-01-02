@@ -62,9 +62,9 @@ export default class CopyWidgetWizard extends Vue {
       <q-field label="Widget ID" icon="create" orientation="vertical">
         <q-input
           v-model="widgetId"
-          placeholder="Enter a widget ID"
           :error="widgetIdError !== null"
           :suffix="widgetIdError"
+          placeholder="Enter a widget ID"
         />
       </q-field>
       <q-field label="Select a widget to copy" icon="widgets" orientation="vertical">
@@ -73,9 +73,9 @@ export default class CopyWidgetWizard extends Vue {
         </q-item>
         <q-list link="" inset-separator>
           <q-item
-            icon="widgets"
             v-for="opt in existingWidgetOptions"
             :key="opt.id"
+            icon="widgets"
             @click.native="selectItem(opt.id)"
           >
             <div class="row">

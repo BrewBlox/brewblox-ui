@@ -25,9 +25,9 @@ export default class ActuatorAnalogMockForm extends BlockForm {
 <template>
   <div class="widget-modal">
     <q-btn
-      rounded
       v-close-overlay
       v-if="$props.buttons"
+      rounded
       label="close"
       icon="close"
       style="position: absolute; right: 18px; top: 18px"
@@ -37,26 +37,26 @@ export default class ActuatorAnalogMockForm extends BlockForm {
       <q-card-main>
         <q-field class="col" label="Minimum setting">
           <InputPopupEdit
-            type="number"
-            label="Minimum setting"
             :field="block.data.minSetting"
             :change="callAndSaveBlock(v => block.data.minSetting = v)"
+            type="number"
+            label="Minimum setting"
           />
         </q-field>
         <q-field class="col" label="Current setting">
           <InputPopupEdit
-            type="number"
-            label="Current setting"
             :field="block.data.setting"
             :change="callAndSaveBlock(v => block.data.setting = v)"
+            type="number"
+            label="Current setting"
           />
         </q-field>
         <q-field class="col" label="Maximum setting">
           <InputPopupEdit
-            type="number"
-            label="Maximum setting"
             :field="block.data.maxSetting"
             :change="callAndSaveBlock(v => block.data.maxSetting = v)"
+            type="number"
+            label="Maximum setting"
           />
         </q-field>
       </q-card-main>
@@ -66,10 +66,10 @@ export default class ActuatorAnalogMockForm extends BlockForm {
       <q-card-main>
         <q-field class="col" label="Minimum value">
           <InputPopupEdit
-            type="number"
-            label="Minimum value"
             :field="block.data.minValue"
             :change="callAndSaveBlock(v => block.data.minValue = v)"
+            type="number"
+            label="Minimum value"
           />
         </q-field>
         <q-field class="col" label="Current value">
@@ -77,10 +77,10 @@ export default class ActuatorAnalogMockForm extends BlockForm {
         </q-field>
         <q-field class="col" label="Maximum value">
           <InputPopupEdit
-            type="number"
-            label="Maximum value"
             :field="block.data.maxValue"
             :change="callAndSaveBlock(v => block.data.maxValue = v)"
+            type="number"
+            label="Maximum value"
           />
         </q-field>
       </q-card-main>
@@ -89,7 +89,7 @@ export default class ActuatorAnalogMockForm extends BlockForm {
       <q-card-title>Block Settings</q-card-title>
       <q-card-main>
         <q-field class="col" label="Block ID">
-          <InputPopupEdit label="Block ID" :field="block.id" :change="changeBlockId"/>
+          <InputPopupEdit :field="block.id" :change="changeBlockId" label="Block ID"/>
         </q-field>
         <q-field class="col" label="Service ID">
           <big>{{ serviceId }}</big>
@@ -100,16 +100,16 @@ export default class ActuatorAnalogMockForm extends BlockForm {
         <q-field class="col" label="Profiles">
           <ProfilesPopupEdit
             :field="block.profiles"
-            :serviceId="serviceId"
+            :service-id="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
           />
         </q-field>
         <q-field class="col" label="Preset">
           <SelectPopupEdit
-            label="Preset"
             :field="block.data"
             :options="presets()"
             :change="callAndSaveBlock(v => block.data = v)"
+            label="Preset"
           />
         </q-field>
       </q-card-main>

@@ -124,18 +124,18 @@ export default class GraphWizard extends Vue {
       <q-field label="Widget name" icon="create" orientation="vertical">
         <q-input
           v-model="widgetId"
-          placeholder="Enter a widget Name"
           :error="widgetIdError !== null"
           :suffix="widgetIdError"
+          placeholder="Enter a widget Name"
         />
       </q-field>
     </q-step>
     <!-- configure -->
     <q-step name="config" title="Configure graph">
       <component
-        :is="form"
-        ref="form"
         v-if="graphCfg"
+        ref="form"
+        :is="form"
         :field="graphCfg"
         :change="v => graphCfg = v"
         :buttons="false"
@@ -143,11 +143,11 @@ export default class GraphWizard extends Vue {
     </q-step>
     <q-stepper-navigation>
       <q-btn
-        flat
         v-for="action in navigation[currentStep]"
         :key="action.label"
         :label="action.label"
         :disabled="!action.enabled()"
+        flat
         @click="action.click"
       />
     </q-stepper-navigation>

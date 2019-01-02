@@ -148,9 +148,9 @@ export default class GraphForm extends FormBase {
 <template>
   <div class="widget-modal">
     <q-btn
-      rounded
       v-close-overlay
       v-if="$props.buttons"
+      rounded
       label="close"
       icon="close"
       style="position: absolute; right: 18px; top: 18px"
@@ -160,18 +160,18 @@ export default class GraphForm extends FormBase {
       <q-card-main>
         <q-field class="col" label="Points after downsampling">
           <InputPopupEdit
-            label="Points after downsampling"
-            type="number"
             :field="config.params.approxPoints"
             :change="callAndSaveConfig(v => config.params.approxPoints = v)"
+            label="Points after downsampling"
+            type="number"
           />
         </q-field>
         <q-field class="col" label="Display type">
           <SelectPopupEdit
-            label="Display type"
             :field="shownPeriod"
             :options="periodOptions"
             :change="callAndSaveConfig(v => shownPeriod = v)"
+            label="Display type"
           />
         </q-field>
       </q-card-main>
@@ -181,32 +181,32 @@ export default class GraphForm extends FormBase {
       <q-card-main>
         <q-field v-if="shownPeriod.start" class="col" label="Start time">
           <DatetimePopupEdit
-            label="Start time"
-            display="big"
             :field="config.params.start"
             :change="callAndSaveConfig(v => config.params.start = v)"
+            label="Start time"
+            display="big"
           />
         </q-field>
         <q-field v-if="shownPeriod.duration" class="col" label="Duration">
           <InputPopupEdit
-            clearable
-            label="Duration"
             :field="config.params.duration"
             :change="callAndSaveConfig(v => config.params.duration = parseDuration(v))"
+            clearable
+            label="Duration"
           />
         </q-field>
         <q-field v-if="shownPeriod.end" class="col" label="End time">
           <DatetimePopupEdit
-            label="End time"
-            display="big"
             :field="config.params.end"
             :change="callAndSaveConfig(v => config.params.end = v)"
+            label="End time"
+            display="big"
           />
         </q-field>
         <!-- <div class="options-edit-container"></div> -->
       </q-card-main>
     </q-card>
-    <q-card dark v-for="(target, targetIdx) in config.targets" :key="targetIdx">
+    <q-card v-for="(target, targetIdx) in config.targets" :key="targetIdx" dark>
       <q-card-title>
         {{ target.measurement }}
         <q-btn
@@ -219,22 +219,22 @@ export default class GraphForm extends FormBase {
         />
       </q-card-title>
       <q-card-main>
-        <div class="row no-wrap" v-for="(field, fieldIdx) in target.fields" :key="fieldIdx">
+        <div v-for="(field, fieldIdx) in target.fields" :key="fieldIdx" class="row no-wrap">
           <q-field class="col" label="Field" orientation="vertical">
             <FieldPopupEdit
-              label="field"
               :field="field"
               :measurement="target.measurement"
               :change="callAndSaveConfig(v => target.fields[fieldIdx] = v)"
+              label="field"
             />
           </q-field>
           <q-field class="col" label="Display name" orientation="vertical">
             <InputPopupEdit
               :disabled="!field"
-              clearable
-              label="Display name"
               :field="fieldRename(target, field)"
               :change="callAndSaveConfig(v => changeFieldRename(target, field, v))"
+              clearable
+              label="Display name"
             />
           </q-field>
           <q-field class="col1" label=" " orientation="vertical">

@@ -31,13 +31,13 @@ export default class GraphWidget extends WidgetBase {
     <q-card-title class="title-bar">
       <InputPopupEdit
         :field="widgetId"
+        :change="v => widgetId = v"
         label="Widget ID"
         display="span"
-        :change="v => widgetId = v"
       />
-      <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
-      <q-btn flat round dense slot="right" @click="modalOpen = true" icon="settings"/>
-      <q-btn flat round dense slot="right" @click="regraph" icon="refresh"/>
+      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
+      <q-btn slot="right" flat round dense icon="settings" @click="modalOpen = true"/>
+      <q-btn slot="right" flat round dense icon="refresh" @click="regraph"/>
     </q-card-title>
     <q-card-separator/>
     <div>

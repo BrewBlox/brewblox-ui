@@ -62,11 +62,11 @@ export default class InputPopupEdit extends Vue {
       class="editable"
     >{{ displayValue | round | truncated }}</component>
     <q-popup-edit
-      buttons
-      persistent
       :disable="$attrs.disabled"
       :title="popupTitle"
       v-model="placeholder"
+      buttons
+      persistent
       @show="startEdit"
       @save="endEdit"
     >

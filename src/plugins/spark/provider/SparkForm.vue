@@ -100,8 +100,8 @@ export default class SparkForm extends Vue {
 <template>
   <div class="widget-modal">
     <q-btn
-      rounded
       v-close-overlay
+      rounded
       label="close"
       icon="close"
       style="position: absolute; right: 18px; top: 18px"
@@ -126,17 +126,17 @@ export default class SparkForm extends Vue {
         <q-field class="col" label="Active profiles" orientation="vertical">
           <ProfilesPopupEdit
             :field="profiles.data.active"
-            :serviceId="service.id"
+            :service-id="service.id"
             :change="v => { profiles.data.active = v; saveBlock(profiles); }"
           />
         </q-field>
         <q-field class="col column" label="Profile names" orientation="vertical">
-          <div class="col row" v-for="(name, idx) in profileNames" :key="idx">
-            <q-field class="col" :label="`Profile ${idx + 1}`">
+          <div v-for="(name, idx) in profileNames" :key="idx" class="col row">
+            <q-field :label="`Profile ${idx + 1}`" class="col">
               <InputPopupEdit
-                label="Profile"
                 :field="name"
                 :change="v => { profileNames[idx] = v; saveProfileNames(); }"
+                label="Profile"
               />
             </q-field>
           </div>
@@ -147,12 +147,12 @@ export default class SparkForm extends Vue {
       <q-card-title>Units</q-card-title>
       <q-card-main>
         <q-field class="col column" label="Unit preferences" orientation="vertical">
-          <q-field v-for="(val, name) in units" :key="name" class="col" :label="spaceCased(name)">
+          <q-field v-for="(val, name) in units" :key="name" :label="spaceCased(name)" class="col">
             <SelectPopupEdit
-              label="Preferred unit"
               :field="val"
               :change="v => { units[name] = v; saveUnits(); }"
               :options="unitAlternativeOptions(name)"
+              label="Preferred unit"
             />
           </q-field>
         </q-field>

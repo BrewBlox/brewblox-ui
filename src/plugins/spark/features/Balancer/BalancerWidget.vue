@@ -34,22 +34,22 @@ export default class BalancerWidget extends BlockWidget {
 <template>
   <q-card dark class="column">
     <q-modal v-model="modalOpen">
-      <BalancerForm v-if="modalOpen" :field="block" :change="saveBlock" :changeId="changeBlockId"/>
+      <BalancerForm v-if="modalOpen" :field="block" :change="saveBlock" :change-id="changeBlockId"/>
     </q-modal>
     <q-card-title class="title-bar">
       <InputPopupEdit
-        class="ellipsis"
         :field="widgetId"
+        :change="v => widgetId = v"
+        class="ellipsis"
         label="Widget ID"
         display="span"
-        :change="v => widgetId = v"
       />
-      <span class="vertical-middle on-left" slot="right">{{ displayName }}</span>
-      <q-btn flat round dense slot="right" @click="openModal" icon="settings"/>
-      <q-btn flat round dense slot="right" @click="refreshBlock" icon="refresh"/>
+      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
+      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
+      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-carousel quick-nav class="col" v-model="slideIndex">
+    <q-carousel v-model="slideIndex" quick-nav class="col">
       <!-- State -->
       <q-carousel-slide class="unpadded">
         <div :class="['widget-body', orientationClass]">
@@ -58,10 +58,10 @@ export default class BalancerWidget extends BlockWidget {
             <q-field
               v-for="client in block.data.clients"
               :key="client.id.id"
-              class="col"
               :label="client.id.id || 'unknown'"
+              class="col"
             >
-              <big>{{ client.granted | round}} / {{ client.requested | round }}</big>
+              <big>{{ client.granted | round }} / {{ client.requested | round }}</big>
             </q-field>
           </q-card-main>
         </div>
@@ -71,15 +71,15 @@ export default class BalancerWidget extends BlockWidget {
         <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
       </q-carousel-slide>
       <q-btn
-        slot="quick-nav"
         slot-scope="props"
+        slot="quick-nav"
+        :icon="navIcon(props.slide)"
+        :label="navTitle(props.slide)"
+        :class="{inactive: !props.current}"
         color="white"
         flat
         dense
-        :icon="navIcon(props.slide)"
-        :label="navTitle(props.slide)"
         @click="props.goToSlide()"
-        :class="{inactive: !props.current}"
       />
     </q-carousel>
   </q-card>

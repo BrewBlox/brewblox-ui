@@ -107,7 +107,7 @@ export default class BridgeTube extends PartComponent {
       <path :d="lowPaths.borders[0]"/>
       <path :d="lowPaths.borders[1]"/>
     </g>
-    <g class="liquid" v-if="lowLiquid" :stroke="liquidColor">
+    <g v-if="lowLiquid" :stroke="liquidColor" class="liquid">
       <path :d="lowPaths.liquid"/>
     </g>
     <AnimatedArrows v-if="lowFlowing" :reversed="lowReversed" :path="lowPaths.borders[0]"/>
@@ -116,7 +116,7 @@ export default class BridgeTube extends PartComponent {
       <path :d="highPaths.borders[0]"/>
       <path :d="highPaths.borders[1]"/>
     </g>
-    <g class="liquid" v-show="highLiquid" :stroke="liquidColor">
+    <g v-show="highLiquid" :stroke="liquidColor" class="liquid">
       <path :d="highPaths.liquid"/>
     </g>
     <AnimatedArrows v-if="highFlowing" :reversed="highReversed" :path="highPaths.borders[0]"/>

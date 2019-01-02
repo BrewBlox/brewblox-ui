@@ -88,20 +88,20 @@ export default class ProcessViewWizard extends Vue {
       <q-field label="Widget name" icon="create" orientation="vertical">
         <q-input
           v-model="widgetId"
-          placeholder="Enter a widget Name"
           :error="widgetIdError !== null"
           :suffix="widgetIdError"
+          placeholder="Enter a widget Name"
         />
       </q-field>
     </q-step>
     <!-- nav -->
     <q-stepper-navigation>
       <q-btn
-        flat
         v-for="action in navigation[currentStep]"
         :key="action.label"
         :label="action.label"
         :disabled="!action.enabled()"
+        flat
         @click="action.click"
       />
     </q-stepper-navigation>

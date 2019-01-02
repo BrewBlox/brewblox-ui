@@ -95,23 +95,23 @@ export default class NewBlockWizard extends Vue {
 
 <template>
   <div class="widget-modal">
-    <q-card dark v-if="formComponent">
+    <q-card v-if="formComponent" dark>
       <q-card-title>Configure new block
-        <q-btn flat dense slot="right" @click="reset" icon="clear" label="Cancel"/>
-        <q-btn flat dense slot="right" @click="confirm" icon="done_all" label="Create"/>
+        <q-btn slot="right" flat dense icon="clear" label="Cancel" @click="reset"/>
+        <q-btn slot="right" flat dense icon="done_all" label="Create" @click="confirm"/>
       </q-card-title>
       <component
         v-if="formComponent"
         :is="formComponent"
         :field="block"
         :change="v => block = v"
-        :changeId="v => block.id = v"
+        :change-id="v => block.id = v"
         :buttons="false"
       />
     </q-card>
-    <q-card dark v-else>
+    <q-card v-else dark>
       <q-card-title>Create new block
-        <q-btn flat v-close-overlay dense slot="right" icon="clear" label="Cancel"/>
+        <q-btn v-close-overlay slot="right" flat dense icon="clear" label="Cancel"/>
       </q-card-title>
       <q-card-main>
         <q-field label="Select a widget type" icon="widgets" orientation="vertical">
@@ -120,9 +120,9 @@ export default class NewBlockWizard extends Vue {
           </q-item>
           <q-list link inset-separator no-border>
             <q-item
-              icon="widgets"
               v-for="opt in wizardOptions"
               :key="opt.label"
+              icon="widgets"
               @click.native="() => selectFeature(opt.value)"
             >
               <q-item-main>
