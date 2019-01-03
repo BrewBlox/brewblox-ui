@@ -101,9 +101,6 @@ export default({ store, router }: PluginArguments) => {
     // Called after a service is created
     fetcher: async (store, service) => {},
 
-    // Called every few seconds, to keep service state updated
-    updater: async (store, service) => {},
-
     // Globally registered Vue components
     wizard: 'GizmoWizard',
     page: 'GizmoPage',
