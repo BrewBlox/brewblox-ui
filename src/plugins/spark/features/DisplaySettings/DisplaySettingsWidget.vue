@@ -25,7 +25,7 @@ export default class DisplaySettingsWidget extends BlockWidget {
     if (!slot) {
       return new Link(null);
     }
-    return Object.values(slot).find(v => v instanceof Link);
+    return Object.values(slot).find(v => v instanceof Link) || new Link(null);
   }
 
   slotColorStyle(slot) {
