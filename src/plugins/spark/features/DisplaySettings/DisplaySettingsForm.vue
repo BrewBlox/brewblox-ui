@@ -33,6 +33,18 @@ export default class DisplaySettingsForm extends BlockForm {
       <q-card-main/>
     </q-card>
     <q-card>
+      <q-card-title>Display</q-card-title>
+      <q-card-main>
+        <q-field class="col" label="Bottom Text">
+          <InputPopupEdit
+            :field="block.data.name"
+            :change="callAndSaveBlock(v => block.data.name = v)"
+            label="Bottom Text"
+          />
+        </q-field>
+      </q-card-main>
+    </q-card>
+    <q-card>
       <q-card-title>Block Settings</q-card-title>
       <q-card-main>
         <q-field class="col" label="Block ID">

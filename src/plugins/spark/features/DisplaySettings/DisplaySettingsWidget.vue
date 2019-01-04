@@ -66,7 +66,7 @@ export default class DisplaySettingsWidget extends BlockWidget {
       name: existing.name || block.id.slice(0, 15),
     };
 
-    if (block.type === 'TempSensorInterface') {
+    if (['TempSensorInterface', 'TempSensorMock', 'TempSensorOneWire'].includes(block.type)) {
       obj.tempSensor = link;
     }
 
@@ -74,7 +74,7 @@ export default class DisplaySettingsWidget extends BlockWidget {
       obj.setpointSensorPair = link;
     }
 
-    if (block.type === 'ActuatorAnalogInterface') {
+    if (['ActuatorAnalogInterface', 'ActuatorPwm', 'ActuatorAnalogMock'].includes(block.type)) {
       obj.actuatorAnalog = link;
     }
 
