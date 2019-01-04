@@ -305,6 +305,7 @@ export default class DefaultLayout extends Vue {
 
 .title-bar {
   padding: 5px 10px;
+  width: 100%;
 }
 
 .q-card-main {
@@ -323,5 +324,9 @@ export default class DefaultLayout extends Vue {
 
 .restricted {
   max-width: 100%;
+}
+
+.q-carousel {
+  width: 100%;
 }
 </style>
