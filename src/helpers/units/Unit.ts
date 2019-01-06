@@ -28,7 +28,7 @@ export default class Unit {
 
   get roundedValue(): string {
     return (this.value === null)
-      ? '??'
+      ? '--.--'
       : this.value.toFixed(2);
   }
 
