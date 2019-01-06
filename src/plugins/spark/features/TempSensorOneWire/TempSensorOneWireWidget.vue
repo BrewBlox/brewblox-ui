@@ -103,5 +103,3 @@ export default class TempSensorOneWireWidget extends BlockWidget {
   </q-card>
 </template>
 
-<style scoped>
-</style>

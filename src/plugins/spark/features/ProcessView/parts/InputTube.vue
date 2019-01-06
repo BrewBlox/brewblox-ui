@@ -50,5 +50,3 @@ export default class InputTube extends PartComponent {
 </template>
 
 
-<style scoped>
-</style>

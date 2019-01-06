@@ -77,6 +77,4 @@ export default class DS2413Widget extends BlockWidget {
   </q-card>
 </template>
 
-<style scoped>
-</style>
 

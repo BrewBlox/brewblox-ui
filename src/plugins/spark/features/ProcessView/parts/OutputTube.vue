@@ -42,5 +42,3 @@ export default class OutputTube extends PartComponent {
 </template>
 
 
-<style scoped>
-</style>

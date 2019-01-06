@@ -87,5 +87,3 @@ export default class TeeTube extends PartComponent {
 </template>
 
 
-<style scoped>
-</style>

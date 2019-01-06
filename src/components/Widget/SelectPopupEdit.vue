@@ -96,5 +96,3 @@ export default class SelectPopupEdit extends Vue {
   </div>
 </template>
 
-<style scoped>
-</style>

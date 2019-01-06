@@ -38,5 +38,3 @@ export default class SparkWizard extends Vue {
   </div>
 </template>
 
-<style scoped>
-</style>

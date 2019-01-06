@@ -18,5 +18,3 @@ export default class IndexPage extends Vue {
   <q-page class="flex flex-center">Home</q-page>
 </template>
 
-<style scoped>
-</style>

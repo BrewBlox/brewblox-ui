@@ -29,5 +29,3 @@ export default class InvalidWidget extends WidgetBase { }
   </q-card>
 </template>
 
-<style scoped>
-</style>

@@ -40,5 +40,3 @@ export default class ServicePage extends Vue {
   </q-page>
 </template>
 
-<style scoped>
-</style>

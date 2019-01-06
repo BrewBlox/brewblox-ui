@@ -107,6 +107,4 @@ export default class SetpointSensorPairWidget extends BlockWidget {
   </q-card>
 </template>
 
-<style scoped>
-</style>
 

@@ -144,6 +144,4 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
   </q-card>
 </template>
 
-<style scoped>
-</style>
 

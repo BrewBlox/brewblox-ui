@@ -75,5 +75,3 @@ export default class InputPopupEdit extends Vue {
   </div>
 </template>
 
-<style scoped>
-</style>

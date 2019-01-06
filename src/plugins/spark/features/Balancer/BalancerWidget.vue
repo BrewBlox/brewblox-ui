@@ -85,6 +85,4 @@ export default class BalancerWidget extends BlockWidget {
   </q-card>
 </template>
 
-<style scoped>
-</style>
 

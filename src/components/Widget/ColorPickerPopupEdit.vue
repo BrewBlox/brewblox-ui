@@ -68,5 +68,3 @@ export default class ColorPickerPopupEdit extends Vue {
   </div>
 </template>
 
-<style scoped>
-</style>

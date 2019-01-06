@@ -130,6 +130,4 @@ export default class ActuatorOffsetWidget extends BlockWidget {
   </q-card>
 </template>
 
-<style scoped>
-</style>
 
