@@ -74,5 +74,3 @@ export default class SetpointProfileWidget extends BlockWidget {
   </q-card>
 </template>
 
-<style scoped>
-</style>

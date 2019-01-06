@@ -61,5 +61,3 @@ export default class UnitPopupEdit extends Vue {
   </div>
 </template>
 
-<style scoped>
-</style>

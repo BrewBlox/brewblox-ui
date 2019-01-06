@@ -67,5 +67,3 @@ export default class ProfilesPopupEdit extends Vue {
   </div>
 </template>
 
-<style scoped>
-</style>

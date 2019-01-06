@@ -72,5 +72,3 @@ export default class LinkPopupEdit extends Vue {
   </div>
 </template>
 
-<style scoped>
-</style>

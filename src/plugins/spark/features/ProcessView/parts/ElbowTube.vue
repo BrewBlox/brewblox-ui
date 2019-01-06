@@ -43,5 +43,3 @@ export default class ElbowTube extends PartComponent {
 </template>
 
 
-<style scoped>
-</style>

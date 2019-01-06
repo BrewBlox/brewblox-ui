@@ -109,6 +109,4 @@ export default class ActuatorPinWidget extends BlockWidget {
   </q-card>
 </template>
 
-<style scoped>
-</style>
 

@@ -69,5 +69,3 @@ export default class FieldPopupEdit extends Vue {
   </div>
 </template>
 
-<style scoped>
-</style>

@@ -70,5 +70,3 @@ export default class DatetimePopupEdit extends Vue {
   </div>
 </template>
 
-<style scoped>
-</style>

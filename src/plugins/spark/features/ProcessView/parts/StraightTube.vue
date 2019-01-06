@@ -43,5 +43,3 @@ export default class StraightTube extends PartComponent {
 </template>
 
 
-<style scoped>
-</style>

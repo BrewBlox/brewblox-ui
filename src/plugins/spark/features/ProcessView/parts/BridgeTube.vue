@@ -124,5 +124,3 @@ export default class BridgeTube extends PartComponent {
 </template>
 
 
-<style scoped>
-</style>

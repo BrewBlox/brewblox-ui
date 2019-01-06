@@ -83,5 +83,3 @@ export default class SetpointSimpleWidget extends BlockWidget {
   </q-card>
 </template>
 
-<style scoped>
-</style>
