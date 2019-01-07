@@ -66,4 +66,3 @@ export default class AnimatedArrows extends Vue {
     </g>
   </g>
 </template>
-

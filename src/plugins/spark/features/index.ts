@@ -1,4 +1,4 @@
-import { Feature } from '@/store/features/state';
+import {Feature} from '@/store/features/state';
 import ActuatorAnalogMock from './ActuatorAnalogMock';
 import ActuatorDS2413 from './ActuatorDS2413';
 import ActuatorOffset from './ActuatorOffset';
@@ -17,7 +17,7 @@ import SetpointSimple from './SetpointSimple';
 import TempSensorMock from './TempSensorMock';
 import TempSensorOneWire from './TempSensorOneWire';
 
-const features: { [id: string]: Feature } = {
+const features: {[id: string]: Feature} = {
   ActuatorAnalogMock,
   ActuatorDS2413,
   ActuatorOffset,

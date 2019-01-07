@@ -11,6 +11,10 @@ export default class InputTube extends PartComponent {
     return true;
   }
 
+  static get cards(): string[] {
+    return ['LiquidSourcePartCard'];
+  }
+
   static flows(): AngledFlows {
     return {
       [LEFT]: [{ angleOut: RIGHT }],
