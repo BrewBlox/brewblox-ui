@@ -41,13 +41,12 @@ export default class ProcessViewForm extends Vue {
       icon="close"
       style="position: absolute; right: 18px; top: 18px"
     />
-    <component v-for="card in cards" :key="card" :is="card" :value="part"/>
+    <component v-for="card in cards" :key="card" :is="card" :value="part" v-on="$listeners"/>
   </div>
 </template>
 
 <style scoped>
 .q-card {
-  min-width: 400px;
   width: 100%;
   margin-bottom: 10px;
 }

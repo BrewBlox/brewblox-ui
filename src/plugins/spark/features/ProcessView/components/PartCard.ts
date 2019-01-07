@@ -10,16 +10,16 @@ import {FlowPart} from '../state';
     },
   },
 })
-export default class PartComponent extends Vue {
+export default class PartCard extends Vue {
   get part(): FlowPart {
     return this.$props.value;
   }
 
   savePart(part: FlowPart = this.part) {
-    this.$parent.$emit('input', {...part});
+    this.$emit('input', {...part});
   }
 
   removePart() {
-    this.$parent.$emit('remove', this.part);
+    this.$emit('remove', this.part);
   }
 }

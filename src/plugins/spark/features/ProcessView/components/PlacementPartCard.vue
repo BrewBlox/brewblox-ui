@@ -17,6 +17,7 @@ export default class PlacementPartCard extends PartCard {
       width: `${SQUARE_SIZE}px`,
       height: `${SQUARE_SIZE}px`,
       position: 'relative',
+      transform: 'scale(2,2)',
     };
   }
 }
@@ -24,7 +25,6 @@ export default class PlacementPartCard extends PartCard {
 
 <template>
   <q-card>
-    <q-card-title>Part</q-card-title>
     <q-card-main class="row justify-center">
       <div :style="itemStyle">
         <ProcessViewItem :value="part"/>
@@ -32,9 +32,9 @@ export default class PlacementPartCard extends PartCard {
     </q-card-main>
     <q-card-title>Placement</q-card-title>
     <q-card-main>
-      <div class="row">
-        <q-btn fab round color="primary" icon="rotate_right" @click="rotate(90)"/>
+      <div class="row justify-around">
         <q-btn fab round color="primary" icon="rotate_left" @click="rotate(-90)"/>
+        <q-btn fab round color="primary" icon="rotate_right" @click="rotate(90)"/>
         <q-btn fab round color="primary" icon="delete" @click="removePart"/>
       </div>
     </q-card-main>

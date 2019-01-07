@@ -4,7 +4,7 @@ import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
 import { clampRotation } from '@/helpers/functional';
 import { isSamePart, component, pathsFromSources } from './calculateFlows';
-import { SQUARE_SIZE, COLD_WATER, HOT_WATER, BEER, WORT } from './getters';
+import { SQUARE_SIZE } from './getters';
 import { parts as knownParts } from './register';
 import { Part, ProcessViewConfig, FlowPart, PanArguments, HoldArguments } from './state';
 
@@ -14,7 +14,7 @@ interface DragAction {
 }
 
 interface ContextAction {
-  part: Part;
+  idx: number;
 }
 
 @Component
@@ -47,15 +47,6 @@ export default class ProcessViewWidget extends WidgetBase {
         y: -1,
         rotate: 0,
       }));
-  }
-
-  get liquidColors() {
-    return [
-      COLD_WATER,
-      HOT_WATER,
-      BEER,
-      WORT,
-    ];
   }
 
   get parts(): Part[] {
@@ -142,7 +133,7 @@ export default class ProcessViewWidget extends WidgetBase {
     }
 
     this.contextAction = {
-      part,
+      idx: this.parts.findIndex(p => isSamePart(p, part)),
     };
     this.modalOpen = true;
   }
@@ -159,17 +150,8 @@ export default class ProcessViewWidget extends WidgetBase {
     }
   }
 
-  rotatePart(part: Part, rotation: number) {
-    part.rotate = clampRotation(part.rotate + rotation);
-    this.saveConfig();
-  }
-
-  changePart(part: Part | FlowPart) {
-    this.updateParts(this.parts.map(p => (isSamePart(p, part) ? part : p)));
-  }
-
-  changeLiquidSource(part: Part | FlowPart, liquidSource: string) {
-    this.changePart({ ...part, liquidSource });
+  updatePart(idx: number, part: Part | FlowPart) {
+    this.updateParts(this.parts.map((p, i) => (idx === i ? part : p)));
   }
 
   beingDragged(part: Part) {
@@ -181,7 +163,11 @@ export default class ProcessViewWidget extends WidgetBase {
 <template>
   <q-card dark>
     <q-modal v-model="modalOpen">
-      <ProcessViewForm v-if="modalOpen" :value="contextAction.part" @input="changePart"/>
+      <ProcessViewForm
+        v-if="modalOpen"
+        :value="flowParts[contextAction.idx]"
+        @input="v => updatePart(contextAction.idx, v)"
+      />
     </q-modal>
     <q-card-title class="title-bar">
       <InputPopupEdit
@@ -216,7 +202,7 @@ export default class ProcessViewWidget extends WidgetBase {
         class="grid-item"
       >
         <div v-if="editable" class="grid-item-coordinates">{{ part.x }},{{ part.y }}</div>
-        <ProcessViewItem :value="flowParts[idx]" @input="changePart"/>
+        <ProcessViewItem :value="flowParts[idx]" @input="v => updatePart(idx, v)"/>
       </div>
     </div>
   </q-card>
