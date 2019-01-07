@@ -1,4 +1,4 @@
-import { VueConstructor } from 'vue';
+import {VueConstructor} from 'vue';
 
 export interface Flow {
   angleOut: number;
@@ -12,7 +12,7 @@ export interface AngledFlows {
 }
 
 export interface FlowPressure {
-  [angleIn: number]: number; // pressure
+  [angleIn: number]: number;  // pressure
 }
 
 export interface Part {
@@ -29,6 +29,7 @@ export interface Part {
 export interface ComponentConstructor extends VueConstructor {
   isSource: boolean;
   isBridge: boolean;
+  cards: string[];
   flows: (part: FlowPart) => AngledFlows;
 }
 
@@ -42,30 +43,18 @@ export interface ProcessViewConfig {
 }
 
 export interface PanArguments {
-  evt: MouseEvent | TouchEvent;
-  position: {
-    top: number;
-    left: number;
-  };
-  direction: 'left' | 'right' | 'up' | 'down';
+  evt: MouseEvent|TouchEvent;
+  position: {top: number; left: number;};
+  direction: 'left'|'right'|'up'|'down';
   duration: number;
-  distance: {
-    x: number;
-    y: number;
-  };
-  delta: {
-    x: number;
-    y: number;
-  };
+  distance: {x: number; y: number;};
+  delta: {x: number; y: number;};
   isFirst: boolean;
   isFinal: boolean;
 }
 
 export interface HoldArguments {
-  evt: MouseEvent | TouchEvent;
-  position: {
-    top: number;
-    left: number;
-  };
+  evt: MouseEvent|TouchEvent;
+  position: {top: number; left: number;};
   duration: number;
 }

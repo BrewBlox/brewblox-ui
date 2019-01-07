@@ -6,7 +6,6 @@ import { clampRotation } from '@/helpers/functional';
 import { isSamePart, component, pathsFromSources } from './calculateFlows';
 import { SQUARE_SIZE, COLD_WATER, HOT_WATER, BEER, WORT } from './getters';
 import { parts as knownParts } from './register';
-import ProcessViewItem from './ProcessViewItem.vue';
 import { Part, ProcessViewConfig, FlowPart, PanArguments, HoldArguments } from './state';
 
 interface DragAction {
@@ -16,18 +15,12 @@ interface DragAction {
 
 interface ContextAction {
   part: Part;
-  isSource: boolean;
-  leftStyle: any;
-  rightStyle: any;
 }
 
-@Component({
-  components: {
-    ProcessViewItem,
-  },
-})
+@Component
 export default class ProcessViewWidget extends WidgetBase {
   editable: boolean = true;
+  modalOpen: boolean = false;
   dragAction: DragAction | null = null;
   contextAction: ContextAction | null = null;
 
@@ -150,26 +143,8 @@ export default class ProcessViewWidget extends WidgetBase {
 
     this.contextAction = {
       part,
-      isSource: component(part).isSource,
-      leftStyle: {
-        position: 'fixed',
-        top: `${args.position.top - (0.5 * SQUARE_SIZE)}px`,
-        left: `${args.position.left - (2 * SQUARE_SIZE)}px`,
-        zIndex: 5,
-      },
-      rightStyle: {
-        position: 'fixed',
-        top: `${args.position.top - (0.5 * SQUARE_SIZE)}px`,
-        left: `${args.position.left + (0.5 * SQUARE_SIZE)}px`,
-        zIndex: 5,
-      },
     };
-    window.addEventListener('mouseup', this.finishAction);
-  }
-
-  finishAction() {
-    this.contextAction = null;
-    window.removeEventListener('mouseup', this.finishAction);
+    this.modalOpen = true;
   }
 
   removePart(part: Part) {
@@ -205,6 +180,9 @@ export default class ProcessViewWidget extends WidgetBase {
 
 <template>
   <q-card dark>
+    <q-modal v-model="modalOpen">
+      <ProcessViewForm v-if="modalOpen" :value="contextAction.part" @input="changePart"/>
+    </q-modal>
     <q-card-title class="title-bar">
       <InputPopupEdit
         :field="widgetId"
@@ -227,44 +205,6 @@ export default class ProcessViewWidget extends WidgetBase {
     </q-card-title>
     <q-card-separator/>
     <ProcessViewItem v-if="dragAction" :value="dragAction.part" :style="dragAction.style"/>
-    <div
-      v-if="contextAction && contextAction.isSource"
-      :style="contextAction.leftStyle"
-      class="column"
-    >
-      <q-btn
-        v-for="color in liquidColors"
-        :key="color"
-        :style="`background-color: ${color}`"
-        fab
-        round
-        icon="format_color_fill"
-        @mouseup.native="changeLiquidSource(contextAction.part, color)"
-      />
-    </div>
-    <div v-if="contextAction" :style="contextAction.rightStyle" class="column">
-      <q-btn
-        fab
-        round
-        color="primary"
-        icon="rotate_right"
-        @mouseup.native="rotatePart(contextAction.part, 90)"
-      />
-      <q-btn
-        fab
-        round
-        color="primary"
-        icon="rotate_left"
-        @mouseup.native="rotatePart(contextAction.part, -90)"
-      />
-      <q-btn
-        fab
-        round
-        color="primary"
-        icon="delete"
-        @mouseup.native="removePart(contextAction.part)"
-      />
-    </div>
     <div ref="grid" :class="gridClasses">
       <div
         v-touch-pan="v => panHandler(part, v)"

@@ -23,6 +23,11 @@
     "no-debugger": 2,
     "no-mixed-operators": 0,
     "vue/max-attributes-per-line": 0,
+    "comma-dangle": [
+      "error",
+      "always-multiline"
+    ],
+    "semi": "error",
     "max-len": [
       1,
       120,
