@@ -278,8 +278,8 @@ export default class DefaultLayout extends Vue {
 }
 
 .widget-body {
-  flex: 1;
-  overflow: auto;
+  flex: 10000 1 0%;
+  overflow: hidden;
 }
 
 .centered {

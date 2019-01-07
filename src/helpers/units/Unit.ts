@@ -9,7 +9,7 @@ const prettify = (v: string) => v
   .replace(/hours?/gi, 'h')
   .replace(/1 \/ /gi, '/')
   .replace(/ \/ /gi, '/')
-  .replace(/ \* /gi, '*');
+  .replace(/ \* /gi, '·');
 
 export default class Unit {
   value: number | null;

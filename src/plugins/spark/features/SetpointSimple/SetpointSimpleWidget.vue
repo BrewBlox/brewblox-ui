@@ -44,9 +44,9 @@ export default class SetpointSimpleWidget extends BlockWidget {
     </q-card-title>
     <q-card-separator/>
     <q-alert v-if="block.data.value === null" type="warning" color="warn">This Setpoint is invalid</q-alert>
-    <q-carousel v-model="slideIndex" quick-nav class="col">
+    <q-carousel v-model="slideIndex" quick-nav class="col widget-body">
       <!-- State -->
-      <q-carousel-slide class="unpadded widget-body">
+      <q-carousel-slide class="unpadded">
         <q-card-main class="col-12">
           <q-field :label="block.data.enabled ? 'Target' : 'Target when enabled'" label-width="6">
             <UnitPopupEdit

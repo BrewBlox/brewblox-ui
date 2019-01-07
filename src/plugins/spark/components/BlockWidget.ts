@@ -48,6 +48,11 @@ export default class BlockWidget extends WidgetBase {
     return this.$props.cols >= 4;
   }
 
+  colMinBlocks(minBlocksForRow: number, colsTrue: number, colsFalse: number){
+    const cols = this.$props.cols >= minBlocksForRow ? colsTrue : colsFalse;
+    return "col-" +  cols.toString();
+  }
+
   get orientationClass() {
     return this.horizontal ? 'row' : 'column';
   }
