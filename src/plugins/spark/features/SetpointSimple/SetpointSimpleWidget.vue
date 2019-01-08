@@ -50,7 +50,7 @@ export default class SetpointSimpleWidget extends BlockWidget {
         <q-card-main class="col-12">
           <q-field :label="block.data.enabled ? 'Target' : 'Target when enabled'" label-width="6">
             <UnitPopupEdit
-              :class="[block.data.setting.value === null ? 'dimmed' : {}]"
+              :class="[block.data.setting.value === null ? 'darkened' : {}]"
               :field="block.data.setpoint"
               :change="callAndSaveBlock(v => block.data.setpoint = v)"
               label="Target"

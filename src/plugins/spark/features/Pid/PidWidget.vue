@@ -46,10 +46,10 @@ export default class PidWidget extends BlockWidget {
   gridStyle(items: number) {
     return {
       display: 'grid',
-      gridTemplateRows: `repeat(${this.$props.cols >= 4 ? items / 2 : items}, auto)`,
-      gridTemplateColumns: `repeat(${this.$props.cols >= 4 ? 2 : 1}, auto)`,
+      gridTemplateRows: `repeat(${this.$props.cols >= 4 ? Math.ceil(items / 2) : items}, auto)`,
+      gridTemplateColumns: `repeat(${this.$props.cols >= 4 ? 2 : 1}, 10fr)`,
       gridAutoFlow: 'column',
-      gridGap: "0px 10px",
+      gridGap: "0 5%",
     };
   }
 }
@@ -82,46 +82,47 @@ export default class PidWidget extends BlockWidget {
     <q-carousel v-model="slideIndex" quick-nav class="widget-body">
       <!-- State -->
       <q-carousel-slide class="unpadded">
-        <q-card-main :style="gridStyle(6)">
-          <q-field label="Error">
-            <big>{{ block.data.error | unit }}</big>
-          </q-field>
-          <q-field label="Integral">
-            <big>{{ block.data.integral | unit }}</big>
-          </q-field>
-          <q-field label="Derivative">
-            <big>{{ block.data.derivative | unit }}</big>
-          </q-field>
-          <q-field label="P">
-            <big>{{ block.data.p | round }}</big>
-          </q-field>
-          <q-field label="I">
-            <big>{{ block.data.i | round }}</big>
-          </q-field>
-          <q-field label="D">
-            <big>{{ block.data.d | round }}</big>
-          </q-field>
+        <q-card-main>
+          <div :style="gridStyle(6)" class="section">
+            <q-item class="unpadded">Input</q-item>
+            <q-field label="Target">
+              <big>{{ block.data.inputSetting | unit }}</big>
+            </q-field>
+            <q-field label="Actual">
+              <big>{{ block.data.inputValue | unit }}</big>
+            </q-field>
+            <q-item class="unpadded">Output</q-item>
+            <q-field label="Target">
+              <big>{{ block.data.outputSetting | round }}</big>
+            </q-field>
+            <q-field label="Actual">
+              <big>{{ block.data.outputValue | round }}</big>
+            </q-field>
+          </div>
+          <q-card-separator />
+          <div :style="gridStyle(6)" class="section">
+            <q-field label="Error">
+              <big>{{ block.data.error | unit }}</big>
+            </q-field>
+            <q-field label="Integral">
+              <big>{{ block.data.integral | unit }}</big>
+            </q-field>
+            <q-field label="Derivative">
+              <big>{{ block.data.derivative | unit }}</big>
+            </q-field>
+            <q-field label="P">
+              <big>{{ block.data.p | round }}</big>
+            </q-field>
+            <q-field label="I">
+              <big>{{ block.data.i | round }}</big>
+            </q-field>
+            <q-field label="D">
+              <big>{{ block.data.d | round }}</big>
+            </q-field>
+          </div>          
         </q-card-main>
       </q-carousel-slide>
       <q-carousel-slide class="unpadded">
-        <q-card-main :style="gridStyle(6)">
-          <q-item class="unpadded">Input</q-item>
-          <q-field label="Target">
-            <big>{{ block.data.inputSetting | unit }}</big>
-          </q-field>
-          <q-field label="Actual">
-            <big>{{ block.data.inputValue | unit }}</big>
-          </q-field>
-          <q-item class="unpadded">Output</q-item>
-          <q-field label="Target">
-            <big>{{ block.data.outputSetting | unit }}</big>
-          </q-field>
-          <q-field label="Actual">
-            <big>{{ block.data.outputValue | unit }}</big>
-          </q-field>
-        </q-card-main>
-      </q-carousel-slide>
-      <q-carousel-slide class="unpaddedY">
         <q-card-main :style="gridStyle(6)">
           <q-field label="Kp">
             <UnitPopupEdit
@@ -160,9 +161,9 @@ export default class PidWidget extends BlockWidget {
             />
           </q-field>
         </q-card-main>
-      </q-carousel-slide>
-      <q-carousel-slide class="unpadded">
-        <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
+        <q-card-main>
+          <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
+        </q-card-main>
       </q-carousel-slide>
       <q-btn
         slot-scope="props"
@@ -179,3 +180,8 @@ export default class PidWidget extends BlockWidget {
   </q-card>
 </template>
 
+<style lang="stylus" scoped>
+.section {
+  padding-bottom: 5px;
+}
+</style>

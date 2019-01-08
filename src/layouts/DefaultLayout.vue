@@ -295,7 +295,7 @@ export default class DefaultLayout extends Vue {
   cursor: pointer;
 }
 
-.unimportant {
+.darkened {
   color: grey;
 }
 
