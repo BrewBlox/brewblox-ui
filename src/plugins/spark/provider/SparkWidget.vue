@@ -12,17 +12,18 @@ import {
   discoveredBlocks,
   profileNames,
   updateSource,
+  blockValues,
 } from '@/plugins/spark/store/getters';
 import { serviceById } from '@/store/services/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import WiFiSettingsPopup from './WiFiSettingsPopup.vue';
 import {
-  oneWireBusId,
-  profilesId,
-  sysInfoId,
-  ticksId,
-  wifiId,
+  oneWireBusType,
+  profilesType,
+  sysInfoType,
+  ticksType,
+  wifiType,
   isReady,
   calcWiFiPct,
 } from './getters';
@@ -54,28 +55,29 @@ export default class SparkWidget extends Vue {
     return serviceById(this.$store, this.$props.serviceId);
   }
 
-  sysBlock<T extends Block>(blockId: string) {
-    return blocks(this.$store, this.service.id)[blockId] as T;
+  sysBlock<T extends Block>(blockType: string) {
+    return blockValues(this.$store, this.service.id)
+      .find(block => block.type === blockType) as T;
   }
 
   get sysInfo() {
-    return this.sysBlock<SysInfoBlock>(sysInfoId);
+    return this.sysBlock<SysInfoBlock>(sysInfoType);
   }
 
   get profiles() {
-    return this.sysBlock<ProfilesBlock>(profilesId);
+    return this.sysBlock<ProfilesBlock>(profilesType);
   }
 
   get oneWireBus() {
-    return this.sysBlock<OneWireBusBlock>(oneWireBusId);
+    return this.sysBlock<OneWireBusBlock>(oneWireBusType);
   }
 
   get ticks() {
-    return this.sysBlock<TicksBlock>(ticksId);
+    return this.sysBlock<TicksBlock>(ticksType);
   }
 
   get wifi() {
-    return this.sysBlock<WiFiSettingsBlock>(wifiId);
+    return this.sysBlock<WiFiSettingsBlock>(wifiType);
   }
 
   get profileNames(): string[] {
