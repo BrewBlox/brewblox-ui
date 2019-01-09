@@ -8,10 +8,6 @@ import Component from 'vue-class-component';
       type: Object,
       required: true,
     },
-    frame: {
-      type: Number,
-      default: 0,
-    },
   },
 })
 export default class ProcessViewItem extends Vue {
@@ -32,7 +28,6 @@ export default class ProcessViewItem extends Vue {
     v-if="component"
     :style="style"
     :value="value"
-    :animation-frame="frame"
     :is="component"
     class="ProcessViewPart"
   />

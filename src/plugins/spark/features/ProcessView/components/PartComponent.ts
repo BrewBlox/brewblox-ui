@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { FlowPart, AngledFlows } from '../state';
-import { COLD_WATER } from '../getters';
+
+import {AngledFlows, FlowPart} from '../state';
 
 @Component({
   props: {
@@ -24,6 +24,10 @@ export default class PartComponent extends Vue {
     return false;
   }
 
+  static get cards(): string[] {
+    return [];
+  }
+
   get part(): FlowPart {
     return this.$props.value;
   }
@@ -41,7 +45,8 @@ export default class PartComponent extends Vue {
   }
 
   get flowing(): boolean {
-    return Object.keys(this.flow).some(angle => this.flowOnAngle(Number(angle)) !== 0);
+    return Object.keys(this.flow).some(
+        angle => this.flowOnAngle(Number(angle)) !== 0);
   }
 
   get flow() {
@@ -61,14 +66,14 @@ export default class PartComponent extends Vue {
   }
 
   toggleClosed() {
-    this.$parent.$emit('input', { ...this.part, closed: !this.closed });
+    this.$parent.$emit('input', {...this.part, closed: !this.closed});
   }
 
   toggleFlipped() {
-    this.$parent.$emit('input', { ...this.part, flipped: !this.flipped });
+    this.$parent.$emit('input', {...this.part, flipped: !this.flipped});
   }
 
   toggleDisabled() {
-    this.$parent.$emit('input', { ...this.part, disabled: !this.disabled });
+    this.$parent.$emit('input', {...this.part, disabled: !this.disabled});
   }
 }

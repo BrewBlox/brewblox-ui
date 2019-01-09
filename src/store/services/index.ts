@@ -11,6 +11,7 @@ const services: Module<ServiceState, RootState> = {
   mutations,
   namespaced: true,
   state: {
+    replicating: false,
     services: {},
   },
 };

@@ -33,16 +33,18 @@ export default class Pump extends PartComponent {
           <line x1="25" y1="39" x2="25" y2="11"/>
           <line x1="37.1" y1="32" x2="12.9" y2="18"/>
           <line x1="37.1" y1="18" x2="12.9" y2="32"/>
+          <!-- eslint-disable vue/attribute-hyphenation -->
           <animateTransform
-            v-if="!disabled"
-            attribute-name="transform"
-            attribute-type="XML"
+            v-if="!part.disabled"
+            attributeName="transform"
+            attributeType="XML"
             type="rotate"
             from="0 0 0"
             to="-360 0 0"
             dur="3s"
-            repeat-count="indefinite"
+            repeatCount="indefinite"
           />
+          <!-- eslint-enable -->
         </g>
       </g>
       <!-- tube liquid -->

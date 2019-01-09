@@ -8,7 +8,6 @@ const setup = (
   db: PouchDB.Database,
   onChanged: (doc: any) => void,
   onDeleted: (id: string) => void,
-  onError: (err: any) => void,
 ) => {
   addSync(db, (change) => {
     if (change.deleted) {
@@ -17,20 +16,18 @@ const setup = (
       onChanged(fromDocument(change.doc));
     }
   });
-  addReplicate(db, (err) => { if (err !== null) onError(err); });
+  addReplicate(db);
 };
 
 export const setupDashboards = (
   onChanged: (doc: any) => void,
   onDeleted: (id: string) => void,
-  onError: (err: any) => void,
-) => setup(dashboardDB, onChanged, onDeleted, onError);
+) => setup(dashboardDB, onChanged, onDeleted);
 
 export const setupDashboardItems = (
   onChanged: (doc: any) => void,
   onDeleted: (id: string) => void,
-  onError: (err: any) => void,
-) => setup(itemDB, onChanged, onDeleted, onError);
+) => setup(itemDB, onChanged, onDeleted);
 
 export const fetchDashboards = async (): Promise<Dashboard[]> =>
   dashboardDB.allDocs({ include_docs: true })

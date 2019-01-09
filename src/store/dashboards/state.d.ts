@@ -21,9 +21,11 @@ export interface DashboardItem {
 }
 
 export type DashboardState = {
+  replicatingDashboards: boolean;
   dashboards: {
     [id: string]: Dashboard;
   };
+  replicatingItems: boolean;
   items: {
     [id: string]: DashboardItem;
   };
