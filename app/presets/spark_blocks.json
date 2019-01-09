@@ -47,7 +47,7 @@
     ],
     "type": "SetpointSimple",
     "data": {
-      "setting": 21,
+      "setpoint": 21,
       "enabled": true
     }
   },
@@ -58,7 +58,7 @@
     ],
     "type": "SetpointSimple",
     "data": {
-      "setting": 50,
+      "setpoint": 50,
       "enabled": false
     }
   },
@@ -67,7 +67,7 @@
     "profiles": [],
     "type": "SetpointSimple",
     "data": {
-      "setting": 3,
+      "setpoint": 3,
       "enabled": true
     }
   },
@@ -158,7 +158,7 @@
         ]
       },
       "period": 4000,
-      "actuatorId<>": "__pin_bottom_1"
+      "actuatorId<>": "Pin-Bottom-1"
     }
   },
   {
@@ -208,7 +208,7 @@
     }
   },
   {
-    "id": "__displaysettings",
+    "id": "DisplaySettings",
     "profiles": [
       0,
       1,
