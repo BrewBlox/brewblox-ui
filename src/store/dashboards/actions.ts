@@ -135,7 +135,7 @@ export const updateDashboardItemSize = dispatch(actions.updateDashboardItemSize)
 export const updateDashboardItemConfig = dispatch(actions.updateDashboardItemConfig);
 export const removeDashboardItem = dispatch(actions.removeDashboardItem);
 
-export const setupApi = async (store: RootStore, onError: (err) => void) => {
+export const setupApi = async (store: RootStore) => {
   /* eslint-disable no-underscore-dangle */
   const onDashboardChange = (dashboard: Dashboard) => {
     const existing = getDashboardInStore(store, dashboard.id);
@@ -166,6 +166,6 @@ export const setupApi = async (store: RootStore, onError: (err) => void) => {
   setAllDashboardsInStore(store, await fetchDashboardsInApi());
   setAllDashboardItemsInStore(store, await fetchDashboardItemsInApi());
 
-  setupDashboardsInApi(onDashboardChange, onDashboardDelete, onError);
-  setupDashboardItemsInApi(onItemChange, onItemDelete, onError);
+  setupDashboardsInApi(onDashboardChange, onDashboardDelete);
+  setupDashboardItemsInApi(onItemChange, onItemDelete);
 };
