@@ -11,7 +11,9 @@ const dashboards: Module<DashboardState, RootState> = {
   mutations,
   namespaced: true,
   state: {
+    replicatingDashboards: false,
     dashboards: {},
+    replicatingItems: false,
     items: {},
   },
 };

@@ -51,7 +51,7 @@ export const initService = async (store: RootStore, service: Service) => {
   await fetcherById(store, service.type)(store, service);
 };
 
-export const setupApi = async (store: RootStore, onError: (err) => void) => {
+export const setupApi = async (store: RootStore) => {
   /* eslint-disable no-underscore-dangle */
   const onChange = async (service: Service) => {
     const existing = tryGetServiceInStore(store, service.id);
@@ -74,5 +74,5 @@ export const setupApi = async (store: RootStore, onError: (err) => void) => {
   setAllServicesInStore(store, services);
   await Promise.all(services.map(service => initService(store, service)));
 
-  setupInApi(onChange, onDelete, onError);
+  setupInApi(onChange, onDelete);
 };

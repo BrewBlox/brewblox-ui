@@ -6,6 +6,7 @@ import { Service, ServicesContext, ServiceState } from './state';
 const { read } = createAccessors('services');
 
 export const getters: GetterTree<ServiceState, RootState> = {
+  replicating: (state: ServiceState): boolean => state.replicating,
   services: (state: ServiceState): { [id: string]: Service } => state.services,
   serviceIds: (state: ServiceState): string[] => Object.keys(state.services),
   serviceValues: (state: ServiceState): Service[] => Object.values(state.services),

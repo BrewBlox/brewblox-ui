@@ -7,28 +7,10 @@ import { Notify } from 'quasar';
 
 @Component
 export default class App extends Vue {
-  showingError: boolean = false;
-
-  notifyError() {
-    if (this.showingError) {
-      return;
-    }
-    this.showingError = true;
-    Notify.create({
-      message: 'Remote datastore unreachable, please refresh page to retry',
-      timeout: 0,
-      type: 'negative',
-      actions: [
-        { label: 'Dismiss' },
-      ],
-      onDismiss: () => { this.showingError = false; },
-    });
-  }
-
   async created() {
     await Promise.all([
-      setupServicesApi(this.$store, this.notifyError),
-      setupDashboardsApi(this.$store, this.notifyError),
+      setupServicesApi(this.$store),
+      setupDashboardsApi(this.$store),
     ]);
   }
 }

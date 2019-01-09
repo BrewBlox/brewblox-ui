@@ -6,7 +6,6 @@ const serviceDB = createDatabase('services');
 export const setup = (
   onChanged: (doc: any) => void,
   onDeleted: (id: string) => void,
-  onError: (err: any) => void,
 ) => {
   addSync(serviceDB, (change) => {
     if (change.deleted) {
@@ -15,7 +14,7 @@ export const setup = (
       onChanged(fromDocument(change.doc));
     }
   });
-  addReplicate(serviceDB, (err) => { if (err !== null) onError(err); });
+  addReplicate(serviceDB);
 };
 
 export const fetchServices = async (): Promise<Service[]> =>

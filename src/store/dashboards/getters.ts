@@ -6,9 +6,11 @@ import { Dashboard, DashboardContext, DashboardItem, DashboardState } from './st
 const { read } = createAccessors('dashboards');
 
 export const getters: GetterTree<DashboardState, RootState> = {
+  replicatingDashboards: (state: DashboardState): boolean => state.replicatingDashboards,
   dashboards: (state: DashboardState): { [id: string]: Dashboard } => state.dashboards,
   dashboardIds: (state: DashboardState): string[] => Object.keys(state.dashboards),
   dashboardValues: (state: DashboardState): Dashboard[] => Object.values(state.dashboards),
+  replicatingItems: (state: DashboardState): boolean => state.replicatingItems,
   items: (state: DashboardState): { [id: string]: DashboardItem } => state.items,
   itemIds: (state: DashboardState): string[] => Object.keys(state.items),
   itemValues: (state: DashboardState): DashboardItem[] => Object.values(state.items),
@@ -30,10 +32,12 @@ export const getters: GetterTree<DashboardState, RootState> = {
   },
 };
 
+export const replicatingDashboards = read(getters.replicatingDashboards);
 export const dashboards = read(getters.dashboards);
 export const dashboardIds = read(getters.dashboardIds);
 export const allDashboards = read(getters.dashboardValues);
 
+export const replicatingItems = read(getters.replicatingItems);
 export const dashboardItems = read(getters.items);
 export const dashboardItemIds = read(getters.itemIds);
 export const allDashboardItems = read(getters.itemValues);

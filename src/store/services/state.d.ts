@@ -11,6 +11,7 @@ export interface Service {
 }
 
 export type ServiceState = {
+  replicating: boolean;
   services: {
     [id: string]: Service;
   };
