@@ -1,36 +1,32 @@
-import { Block } from '@/plugins/spark/state';
-import { blockIds } from '@/plugins/spark/store/getters';
-import { RootStore } from '@/store/state';
+import {Block} from '@/plugins/spark/state';
+import {blockValues} from '@/plugins/spark/store/getters';
+import {RootStore} from '@/store/state';
 
 export const widgetSize = {
   cols: 4,
   rows: 4,
 };
 
-export const sysInfoId = '__sysinfo';
-export const profilesId = '__profiles';
-export const oneWireBusId = '__onewirebus';
-export const ticksId = '__time';
-export const wifiId = '__wifisettings';
-export const touchId = '__touchsettings';
+export const sysInfoType = 'SysInfo';
+export const profilesType = 'Profiles';
+export const oneWireBusType = 'OneWireBus';
+export const ticksType = 'Ticks';
+export const wifiType = 'WiFiSettings';
+export const touchType = 'TouchSettings';
 
-export const isSystemBlock = (block: Block) =>
-  [
-    sysInfoId,
-    profilesId,
-    oneWireBusId,
-    ticksId,
-    wifiId,
-    touchId,
-  ].includes(block.id);
+export const isSystemBlock = (block: Block) => [sysInfoType,
+                                                profilesType,
+                                                oneWireBusType,
+                                                ticksType,
+                                                wifiType,
+                                                touchType,
+].includes(block.type);
 
-export const isReady = (store: RootStore, serviceId: string) =>
-  [
-    sysInfoId,
-    profilesId,
-    oneWireBusId,
-    ticksId,
-  ].every(id => blockIds(store, serviceId).includes(id));
+export const isReady = (store: RootStore, serviceId: string) => [sysInfoType,
+                                                                 profilesType,
+                                                                 oneWireBusType,
+                                                                 ticksType,
+].every(t => blockValues(store, serviceId).some((b: Block) => b.type === t));
 
 export const WlanSecurityEnum = [
   [0, 'Unsecured'],

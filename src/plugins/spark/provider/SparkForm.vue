@@ -3,19 +3,19 @@ import { spaceCased } from '@/helpers/functional';
 import { Block, UserUnits } from '@/plugins/spark/state';
 import { saveBlock, saveUnits, updateProfileNames } from '@/plugins/spark/store/actions';
 import {
-  blockById,
   profileNames,
   unitAlternatives,
   units,
+  blockValues,
 } from '@/plugins/spark/store/getters';
 import { Notify } from 'quasar';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import {
-  oneWireBusId,
-  profilesId,
-  sysInfoId,
-  ticksId,
+  oneWireBusType,
+  profilesType,
+  sysInfoType,
+  ticksType,
 } from './getters';
 import {
   OneWireBusBlock,
@@ -33,8 +33,9 @@ import {
   },
 })
 export default class SparkForm extends Vue {
-  sysBlock<T extends Block>(blockId: string) {
-    return blockById<T>(this.$store, this.service.id, blockId);
+  sysBlock<T extends Block>(blockType: string) {
+    return blockValues(this.$store, this.service.id)
+      .find(block => block.type === blockType) as T;
   }
 
   get service() {
@@ -42,19 +43,19 @@ export default class SparkForm extends Vue {
   }
 
   get sysInfo() {
-    return this.sysBlock<SysInfoBlock>(sysInfoId);
+    return this.sysBlock<SysInfoBlock>(sysInfoType);
   }
 
   get profiles() {
-    return this.sysBlock<ProfilesBlock>(profilesId);
+    return this.sysBlock<ProfilesBlock>(profilesType);
   }
 
   get oneWireBus() {
-    return this.sysBlock<OneWireBusBlock>(oneWireBusId);
+    return this.sysBlock<OneWireBusBlock>(oneWireBusType);
   }
 
   get ticks() {
-    return this.sysBlock<TicksBlock>(ticksId);
+    return this.sysBlock<TicksBlock>(ticksType);
   }
 
   get profileNames(): string[] {
