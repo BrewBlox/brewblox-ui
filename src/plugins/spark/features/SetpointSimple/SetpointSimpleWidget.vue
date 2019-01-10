@@ -44,29 +44,25 @@ export default class SetpointSimpleWidget extends BlockWidget {
     </q-card-title>
     <q-card-separator/>
     <q-alert v-if="block.data.value === null" type="warning" color="warn">This Setpoint is invalid</q-alert>
-    <q-carousel v-model="slideIndex" quick-nav class="col">
+    <q-carousel v-model="slideIndex" quick-nav class="col widget-body">
       <!-- State -->
       <q-carousel-slide class="unpadded">
-        <div :class="['widget-body', orientationClass]">
-          <q-card-main class="column col">
-            <q-field class="col" label="Setting">
-              <big>{{ block.data.setting | unit }}</big>
-            </q-field>
-            <q-field class="col" label="Setpoint">
-              <UnitPopupEdit
-                :field="block.data.setpoint"
-                :change="callAndSaveBlock(v => block.data.setpoint = v)"
-                label="Setpoint"
-              />
-            </q-field>
-            <q-field class="col" label="Enabled">
-              <q-toggle
-                :value="block.data.enabled"
-                @input="v => { block.data.enabled = v; saveBlock() }"
-              />
-            </q-field>
-          </q-card-main>
-        </div>
+        <q-card-main class="col-12">
+          <q-field :label="block.data.enabled ? 'Target' : 'Target when enabled'" label-width="6">
+            <UnitPopupEdit
+              :class="[block.data.setting.value === null ? 'darkened' : {}]"
+              :field="block.data.setpoint"
+              :change="callAndSaveBlock(v => block.data.setpoint = v)"
+              label="Target"
+            />
+          </q-field>
+          <q-field label="Enabled" label-width="6">
+            <q-toggle
+              :value="block.data.enabled"
+              @input="v => { block.data.enabled = v; saveBlock() }"
+            />
+          </q-field>
+        </q-card-main>
       </q-carousel-slide>
       <q-btn
         slot-scope="props"

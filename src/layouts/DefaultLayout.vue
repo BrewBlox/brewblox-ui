@@ -278,8 +278,10 @@ export default class DefaultLayout extends Vue {
 }
 
 .widget-body {
-  flex: 1;
+  justify-content: space-around;
+  flex: 1 0;
   overflow: auto;
+  flex-wrap: nowrap;
 }
 
 .centered {
@@ -295,7 +297,7 @@ export default class DefaultLayout extends Vue {
   cursor: pointer;
 }
 
-.unimportant {
+.darkened {
   color: grey;
 }
 

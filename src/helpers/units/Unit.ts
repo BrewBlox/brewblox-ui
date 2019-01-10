@@ -10,7 +10,7 @@ const prettify = (v: string) =>
         .replace(/days?/gi, 'd')
         .replace(/1 \/ /gi, '/')
         .replace(/ \/ /gi, '/')
-        .replace(/ \* /gi, '*');
+        .replace(/ \* /gi, '·');
 
 export default class Unit {
   value: number|null;
@@ -28,7 +28,7 @@ export default class Unit {
   }
 
   get roundedValue(): string {
-    return (this.value === null) ? '??' : this.value.toFixed(2);
+    return (this.value === null) ? '--.--' : this.value.toFixed(2);
   }
 
   serializedKeyName(key: string): string {

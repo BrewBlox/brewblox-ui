@@ -39,7 +39,7 @@ export default class BlockGraph extends Vue {
 </script>
 
 <template>
-  <q-card-main class="column col full-height">
+  <div>
     <q-modal v-model="modalOpen" maximized>
       <GraphCard v-if="modalOpen" :id="$props.id" :config="graphCfg"/>
       <q-btn
@@ -49,19 +49,23 @@ export default class BlockGraph extends Vue {
         icon="close"
         style="position: absolute; right: 18px; top: 18px"
       />
+      <q-field label="Duration" class="col-8">
+        <InputPopupEdit
+          :field="graphCfg.params.duration"
+          :change="confirmed(v => graphCfg.params.duration = parseDuration(v))"
+          label="Duration"
+        />
+      </q-field>
     </q-modal>
-    <q-field dark class="col items-center" label="Duration">
-      <InputPopupEdit
-        :field="graphCfg.params.duration"
-        :change="confirmed(v => graphCfg.params.duration = parseDuration(v))"
-        label="Duration"
+    <div class="full-width">
+      <q-btn
+        dense
+        color="primary"
+        icon="show_chart"
+        label="Graph"
+        style="margin: 0 auto; display: block;"
+        @click="() => modalOpen = true"
       />
-    </q-field>
-    <q-field dark class="col" inset="label">
-      <q-btn dense color="primary" icon="show_chart" label="Graph" @click="() => modalOpen = true"/>
-    </q-field>
-  </q-card-main>
+    </div>
+  </div>
 </template>
-
-<style>
-</style>
