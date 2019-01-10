@@ -1,7 +1,7 @@
 import { commit } from '@/helpers/dynamic-store';
 import Vue from 'vue';
 import { MutationTree } from 'vuex';
-import { Block, UnitAlternatives, UserUnits } from '../state';
+import { Block, UnitAlternatives, UserUnits, SystemStatus } from '../state';
 import { SparkState } from './state';
 
 export const mutations: MutationTree<SparkState> = {
@@ -41,6 +41,9 @@ export const mutations: MutationTree<SparkState> = {
 
   setUpdateSource: (state: SparkState, source: EventSource) =>
     Vue.set(state, 'updateSource', source),
+
+  setLastStatus: (state: SparkState, status: SystemStatus) =>
+    Vue.set(state, 'lastStatus', status),
 };
 
 export const addBlock = commit(mutations.addBlock);
@@ -52,3 +55,4 @@ export const setUnitAlternatives = commit(mutations.setUnitAlternatives);
 export const setCompatibleBlocks = commit(mutations.setCompatibleBlocks);
 export const setDiscoveredBlocks = commit(mutations.setDiscoveredBlocks);
 export const setUpdateSource = commit(mutations.setUpdateSource);
+export const setLastStatus = commit(mutations.setLastStatus);

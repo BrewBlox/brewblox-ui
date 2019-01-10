@@ -1,8 +1,8 @@
 <script lang="ts">
 import { serviceAvailable } from '@/helpers/dynamic-store';
-import { Block } from '@/plugins/spark/state';
+import { Block, SystemStatus } from '@/plugins/spark/state';
 import { createBlock, renameBlock } from '@/plugins/spark/store/actions';
-import { allBlocks } from '@/plugins/spark/store/getters';
+import { allBlocks, lastStatus } from '@/plugins/spark/store/getters';
 import { createDashboardItem } from '@/store/dashboards/actions';
 import { allDashboards, itemCopyName } from '@/store/dashboards/getters';
 import { Dashboard, DashboardItem } from '@/store/dashboards/state';
@@ -51,12 +51,24 @@ export default class SparkPage extends Vue {
   get isAvailable() {
     return serviceAvailable(this.$store, this.$props.serviceId);
   }
+
   get isReady() {
     return this.isAvailable && isReady(this.$store, this.$props.serviceId);
   }
 
-  get items() {
+  get status(): SystemStatus | null {
     if (!this.isAvailable) {
+      return null;
+    }
+    return lastStatus(this.$store, this.$props.serviceId);
+  }
+
+  get statusNok() {
+    return this.isAvailable && this.status && !this.status.synchronized;
+  }
+
+  get items() {
+    if (this.statusNok) {
       return [];
     }
     return [
@@ -145,9 +157,6 @@ export default class SparkPage extends Vue {
 
 <template>
   <div>
-    <q-inner-loading :visible="items.length === 0">
-      <q-spinner size="50px" color="primary"/>
-    </q-inner-loading>
     <template>
       <portal to="toolbar-title">
         <div>Blocks</div>
@@ -172,11 +181,20 @@ export default class SparkPage extends Vue {
       </q-modal>
       <grid-container>
         <SparkWidget
-          v-if="isReady"
+          v-if="isReady && !statusNok"
           :id="$props.serviceId"
           :service-id="$props.serviceId"
           :cols="widgetSize.cols"
           :rows="widgetSize.rows"
+          class="dashboard-item"
+        />
+        <Troubleshooter
+          v-if="statusNok"
+          :id="$props.serviceId"
+          :config="{serviceId: $props.serviceId}"
+          :cols="widgetSize.cols"
+          :rows="widgetSize.rows"
+          type="Troubleshooter"
           class="dashboard-item"
         />
         <component

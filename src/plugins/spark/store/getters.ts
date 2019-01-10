@@ -2,7 +2,7 @@ import { read } from '@/helpers/dynamic-store';
 import { serviceById } from '@/store/services/getters';
 import { RootState, RootStore } from '@/store/state';
 import { GetterTree } from 'vuex';
-import { Block, CompatibleBlocks, Spark, UnitAlternatives, UserUnits } from '../state';
+import { Block, CompatibleBlocks, Spark, UnitAlternatives, UserUnits, SystemStatus } from '../state';
 import { SparkState } from './state';
 
 const defaultProfileNames = [
@@ -27,6 +27,7 @@ export const getters: GetterTree<SparkState, RootState> = {
   compatibleBlocks: (state: SparkState): CompatibleBlocks => state.compatibleBlocks,
   discoveredBlocks: (state: SparkState): string[] => state.discoveredBlocks,
   updateSource: (state: SparkState): EventSource | null => state.updateSource,
+  lastStatus: (state: SparkState): SystemStatus | null => state.lastStatus,
 };
 
 export const blocks = read(getters.blocks);
@@ -37,6 +38,7 @@ export const unitAlternatives = read(getters.unitAlternatives);
 export const compatibleBlocks = read(getters.compatibleBlocks);
 export const discoveredBlocks = read(getters.discoveredBlocks);
 export const updateSource = read(getters.updateSource);
+export const lastStatus = read(getters.lastStatus);
 
 export function blockById<T extends Block>(
   store: RootStore,

@@ -19,6 +19,7 @@ const module: Module<SparkState, RootState> = {
     compatibleBlocks: {},
     discoveredBlocks: [],
     updateSource: null,
+    lastStatus: null,
   }),
 };
 

@@ -38,3 +38,11 @@ export interface UnitAlternatives {
 export interface CompatibleBlocks {
   [key: string]: string[];
 }
+
+export interface SystemStatus {
+  checkedAt: Date;
+  available: boolean;
+  connected: boolean;
+  synchronized: boolean;
+  error?: any;
+}
