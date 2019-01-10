@@ -1,7 +1,7 @@
 import { del, get, post, put, sse } from '@/helpers/fetch';
 import { deserialize } from '@/helpers/units/parseObject';
 import queryString from 'query-string';
-import { Block, DataBlock, UnitAlternatives, UserUnits } from '../state';
+import { Block, DataBlock, UnitAlternatives, UserUnits, SystemStatus } from '../state';
 
 const asDataBlock = (block: Block): DataBlock =>
   ({
@@ -88,3 +88,18 @@ export const fetchUpdateSource = async (
 
   return source;
 };
+
+export const fetchSystemStatus = async (serviceId: string): Promise<SystemStatus> =>
+  get(`/${encodeURIComponent(serviceId)}/system/status`)
+    .then(retv => ({
+      ...retv,
+      available: true,
+      checkedAt: new Date(),
+    }))
+    .catch((error) => ({
+      error,
+      available: false,
+      connected: false,
+      synchronized: false,
+      checkedAt: new Date(),
+    }));

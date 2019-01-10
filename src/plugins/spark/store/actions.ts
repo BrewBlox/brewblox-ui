@@ -21,6 +21,7 @@ import {
   persistUnits as persistUnitsInApi,
   renameBlock as renameBlockInApi,
   validateService as validateServiceInApi,
+  fetchSystemStatus as fetchSystemStatusInApi,
 } from './api';
 import {
   blockIds,
@@ -37,6 +38,7 @@ import {
   setUnitAlternatives as setUnitAlternativesInStore,
   setUnits as setUnitsInStore,
   setUpdateSource as setUpdateSourceInStore,
+  setLastStatus as setLastStatusInStore,
 } from './mutations';
 import { BlocksContext, SparkState } from './state';
 
@@ -96,6 +98,9 @@ export const clearBlocks = async (store: RootStore, service: Service) => {
   await fetchBlocks(store, service.id);
 };
 
+export const fetchServiceStatus = async (store: RootStore, serviceId: string) =>
+  setLastStatusInStore(store, serviceId, await fetchSystemStatusInApi(serviceId));
+
 export const fetchUnits = async (store: RootStore, serviceId: string) =>
   setUnitsInStore(store, serviceId, await fetchUnitsInApi(serviceId));
 
@@ -122,6 +127,7 @@ export const clearDiscoveredBlocks = async (store: RootStore, serviceId: string)
 
 export const fetchAll = async (store: RootStore, service: Service) =>
   Promise.all([
+    fetchServiceStatus(store, service.id),
     fetchUnits(store, service.id),
     fetchUnitAlternatives(store, service.id),
   ]);

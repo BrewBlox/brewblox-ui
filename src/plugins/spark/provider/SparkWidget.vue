@@ -5,6 +5,7 @@ import {
   createUpdateSource,
   fetchAll,
   fetchDiscoveredBlocks,
+  fetchServiceStatus,
   saveBlock,
 } from '@/plugins/spark/store/actions';
 import {
@@ -147,7 +148,8 @@ export default class SparkWidget extends Vue {
     fetchAll(this.$store, serviceById(this.$store, this.service.id));
   }
 
-  createUpdateSource() {
+  retryUpdateSource() {
+    fetchServiceStatus(this.$store, this.service.id);
     createUpdateSource(this.$store, this.service.id);
   }
 
@@ -188,7 +190,7 @@ export default class SparkWidget extends Vue {
         <q-card-main class="column col">
           <q-alert
             v-if="!updating"
-            :actions="[{ label: 'Retry', handler: createUpdateSource }]"
+            :actions="[{ label: 'Retry', handler: retryUpdateSource }]"
             type="warning"
           >Unable to update automatically</q-alert>
           <q-field class="col" label="Device ID">
