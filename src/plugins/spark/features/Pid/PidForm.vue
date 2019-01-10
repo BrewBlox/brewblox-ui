@@ -165,14 +165,14 @@ export default class PidForm extends BlockForm {
         <!-- settings -->
         <div/>
         <q-field label="Ti" orientation="vertical">
-          <UnitPopupEdit
+          <TimeUnitPopupEdit
             :field="block.data.ti"
             :change="callAndSaveBlock(v => block.data.ti = v)"
             label="Ti"
           />
         </q-field>
         <q-field label="Td" orientation="vertical">
-          <UnitPopupEdit
+          <TimeUnitPopupEdit
             :field="block.data.td"
             :change="callAndSaveBlock(v => block.data.td = v)"
             label="Td"
