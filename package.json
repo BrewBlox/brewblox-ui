@@ -12,7 +12,7 @@
     "spark:blocks": "npm run spark:sparkey && npm run spark:spock",
     "couchdb:docs": "bash app/reset_ui.sh services dashboards dashboard-items",
     "cert:check": "bash app/check_cert.sh",
-    "compose:new": "docker-compose down && docker-compose up -d && npm run cert:check && npm run spark:blocks && npm run couchdb:docs",
+    "compose:new": "docker-compose down && npm run cert:check && docker-compose up -d && npm run spark:blocks && npm run couchdb:docs",
     "serve": "vue-cli-service serve",
     "start": "npm run compose:new && npm run serve",
     "build": "vue-cli-service build --modern",
