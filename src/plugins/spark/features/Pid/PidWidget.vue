@@ -70,7 +70,7 @@ export default class PidWidget extends BlockWidget {
       type="warning"
       color="warn"
     >This PID is inactive</q-alert>
-   
+
     <q-card-main class="column widget-body">
       <div :style="gridStyle(6)" class="full-width">
         <q-item>Input</q-item>
@@ -80,7 +80,7 @@ export default class PidWidget extends BlockWidget {
         <q-field label="Actual">
           <big>{{ block.data.inputValue | unit }}</big>
         </q-field>
-        <q-item >Output</q-item>
+        <q-item>Output</q-item>
         <q-field label="Target">
           <big>{{ block.data.outputSetting | round }}</big>
         </q-field>
@@ -89,7 +89,7 @@ export default class PidWidget extends BlockWidget {
         </q-field>
       </div>
       <div :style="gridStyle(8)" class="full-width">
-        <q-item >State</q-item>
+        <q-item>State</q-item>
         <q-field label="Error">
           <big>{{ block.data.error | unit }}</big>
         </q-field>
@@ -99,7 +99,7 @@ export default class PidWidget extends BlockWidget {
         <q-field label="Derivative">
           <big>{{ block.data.derivative | unit }}</big>
         </q-field>
-        <q-item >Result</q-item>
+        <q-item>Result</q-item>
         <q-field label="P">
           <big>{{ block.data.p | round }}</big>
         </q-field>
@@ -109,18 +109,19 @@ export default class PidWidget extends BlockWidget {
         <q-field label="D">
           <big>{{ block.data.d | round }}</big>
         </q-field>
-      </div>         
+      </div>
       <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v" class="full-width"/>
     </q-card-main>
   </q-card>
 </template>
 
 <style lang="stylus" scoped>
-/deep/ .q-field * {
+/deep/ .widget-body .q-field * {
   padding-top: 0px !important;
   margin-top: 0px !important;
 }
-/deep/ .q-item {
+
+/deep/ .widget-body .q-item {
   padding: 0;
   min-height: 0;
 }

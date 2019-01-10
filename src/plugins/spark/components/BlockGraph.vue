@@ -58,7 +58,14 @@ export default class BlockGraph extends Vue {
       </q-field>
     </q-modal>
     <div class="full-width">
-      <q-btn dense color="primary" icon="show_chart" label="Graph" style="margin: 0 auto; display: block;" @click="() => modalOpen = true"/>
+      <q-btn
+        dense
+        color="primary"
+        icon="show_chart"
+        label="Graph"
+        style="margin: 0 auto; display: block;"
+        @click="() => modalOpen = true"
+      />
     </div>
   </div>
 </template>
