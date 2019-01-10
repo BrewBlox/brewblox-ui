@@ -133,6 +133,7 @@ export default class DefaultLayout extends Vue {
         <q-list-header>
           <q-item-side icon="dashboard"/>Dashboards
           <q-btn
+            v-if="dashboards.length > 0"
             :flat="!dashboardEditing"
             :icon="dashboardEditing ? 'check' : 'mode edit'"
             :color="dashboardEditing ? 'primary': ''"
@@ -141,7 +142,6 @@ export default class DefaultLayout extends Vue {
             @click="toggleDashboardEditing"
           />
         </q-list-header>
-        <q-item v-if="dashboards.length === 0">No dashboards yet</q-item>
         <draggable
           :class="{ editing: dashboardEditing }"
           :options="{ disabled: !dashboardEditing }"
@@ -172,7 +172,7 @@ export default class DefaultLayout extends Vue {
         </draggable>
         <div class="q-list-container">
           <q-btn
-            v-if="dashboardEditing"
+            v-if="dashboardEditing || dashboards.length === 0"
             icon="add"
             label="Add dashboard"
             color="dark-bright"
@@ -184,6 +184,7 @@ export default class DefaultLayout extends Vue {
         <q-list-header>
           <q-item-side icon="cloud"/>Services
           <q-btn
+            v-if="services.length > 0"
             :flat="!serviceEditing"
             :icon="serviceEditing ? 'check' : 'mode edit'"
             :color="serviceEditing ? 'primary': ''"
@@ -192,7 +193,6 @@ export default class DefaultLayout extends Vue {
             @click="toggleServiceEditing"
           />
         </q-list-header>
-        <q-item v-if="services.length === 0">No services yet</q-item>
         <draggable
           :class="{ editing: serviceEditing }"
           :options="{ disabled: !serviceEditing }"
@@ -215,7 +215,7 @@ export default class DefaultLayout extends Vue {
         </draggable>
         <div class="q-list-container">
           <q-btn
-            v-if="serviceEditing"
+            v-if="serviceEditing || services.length === 0"
             icon="add"
             label="Add service"
             color="dark-bright"
