@@ -62,9 +62,7 @@ export default class ActuatorPwmWidget extends BlockWidget {
         <q-field v-if="pending !== null" class="col" label="Requested">
           <big>{{ pending | round }}</big>
         </q-field>
-      </div>
-      <div class="full-width">
-        <q-field label="Constraints" orientation="vertical">
+        <q-field label="Constraints">
           <AnalogConstraints
             :service-id="serviceId"
             :field="block.data.constrainedBy"

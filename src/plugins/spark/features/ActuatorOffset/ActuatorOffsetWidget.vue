@@ -70,13 +70,12 @@ export default class ActuatorOffsetWidget extends BlockWidget {
         <q-field label="Setting or value">
           <big>{{ settingOrValue }}</big>
         </q-field>
-      </div>
-      <div class="full-width">
-        <q-field label="Constraints" orientation="vertical">
+        <q-field label="Constraints">
           <AnalogConstraints
             :service-id="serviceId"
             :field="block.data.constrainedBy"
             :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+            readonly
           />
         </q-field>
       </div>

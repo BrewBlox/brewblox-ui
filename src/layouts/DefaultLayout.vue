@@ -277,23 +277,26 @@ export default class DefaultLayout extends Vue {
 }
 
 .widget-body {
-  justify-content: space-around;
   flex: 1 0;
   overflow: auto;
   flex-wrap: nowrap;
+}
+
+.widget-body-multiple {
+  flex: 1 0;
+  overflow: auto;
+  flex-wrap: nowrap;
+  justify-content: space-around;
 }
 
 .centered {
   margin: auto;
 }
 
-.clickable {
-  cursor: pointer;
-}
-
 .editable {
   border-bottom: 1px solid gray;
   cursor: pointer;
+  margin-bottom: 1px;
 }
 
 .darkened {
@@ -316,19 +319,6 @@ export default class DefaultLayout extends Vue {
 .build-info {
   bottom: 0;
   position: absolute;
-}
-
-.q-field {
-  overflow: hidden;
-  max-width: 100%;
-}
-
-.restricted {
-  max-width: 100%;
-}
-
-.q-carousel {
-  width: 100%;
 }
 
 .inline-popup {

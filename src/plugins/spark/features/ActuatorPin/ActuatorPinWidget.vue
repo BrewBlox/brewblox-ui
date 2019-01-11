@@ -74,7 +74,7 @@ export default class ActuatorPinWidget extends BlockWidget {
         </q-field>
       </div>
       <div class="full-width">
-        <q-field label="Constraints" orientation="vertical">
+        <q-field label="Constraints">
           <DigitalConstraints
             :service-id="serviceId"
             :field="block.data.constrainedBy"

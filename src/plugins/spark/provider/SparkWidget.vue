@@ -85,7 +85,6 @@ export default class SparkWidget extends Vue {
       <q-btn slot="right" flat round dense icon="refresh" @click="fetchAll"/>
     </q-card-title>
     <q-card-separator/>
-
     <q-card-main class="column widget-body">
       <div class="full-width">
         <q-alert

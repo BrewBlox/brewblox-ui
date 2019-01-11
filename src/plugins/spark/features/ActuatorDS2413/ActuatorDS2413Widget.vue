@@ -59,9 +59,7 @@ export default class ActuatorDS2413Widget extends BlockWidget {
             :change="callAndSaveBlock(v => block.data.state = v)"
           />
         </q-field>
-      </div>
-      <div class="full-width">
-        <q-field label="Constraints" orientation="vertical">
+        <q-field label="Constraints">
           <DigitalConstraints
             :service-id="serviceId"
             :field="block.data.constrainedBy"

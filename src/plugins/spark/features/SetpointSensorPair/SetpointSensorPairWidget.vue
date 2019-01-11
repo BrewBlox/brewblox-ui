@@ -46,24 +46,8 @@ export default class SetpointSensorPairWidget extends BlockWidget {
     <q-card-separator/>
     <q-card-main class="column widget-body">
       <div class="full-width">
-        <q-field label="Setpoint">
-          <LinkPopupEdit
-            :field="block.data.setpointId"
-            :service-id="serviceId"
-            :change="callAndSaveBlock(v => block.data.setpointId = v)"
-            label="Setpoint"
-          />
-        </q-field>
         <q-field label="Setpoint value">
           <big>{{ block.data.setpointValue | unit }}</big>
-        </q-field>
-        <q-field label="Sensor">
-          <LinkPopupEdit
-            :field="block.data.sensorId"
-            :service-id="serviceId"
-            :change="callAndSaveBlock(v => block.data.sensorId = v)"
-            label="Sensor"
-          />
         </q-field>
         <q-field label="Sensor value">
           <big>{{ block.data.sensorValue | unit }}</big>
