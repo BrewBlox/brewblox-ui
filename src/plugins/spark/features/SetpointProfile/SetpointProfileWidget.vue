@@ -11,12 +11,6 @@ export default class SetpointProfileWidget extends BlockWidget {
     return getById(this.$store, this.serviceId, this.blockId);
   }
 
-  get subtitles() {
-    return [
-      'Setpoints',
-    ];
-  }
-
   get plotlyData(): Partial<PlotData>[] {
     return [{
       name: 'Setpoints',
@@ -55,22 +49,8 @@ export default class SetpointProfileWidget extends BlockWidget {
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-carousel v-model="slideIndex" class="col">
-      <q-carousel-slide class="unpadded">
-        <GraphDisplay v-if="!modalOpen" :data="plotlyData" :layout="plotlyLayout"/>
-      </q-carousel-slide>
-      <q-btn
-        slot-scope="props"
-        slot="quick-nav"
-        :icon="navIcon(props.slide)"
-        :label="navTitle(props.slide)"
-        :class="{inactive: !props.current}"
-        color="white"
-        flat
-        dense
-        @click="props.goToSlide()"
-      />
-    </q-carousel>
+    <div class="col">
+      <GraphDisplay v-if="!modalOpen" :data="plotlyData" :layout="plotlyLayout"/>
+    </div>
   </q-card>
 </template>
-

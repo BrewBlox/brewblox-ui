@@ -10,12 +10,6 @@ export default class DS2413Widget extends BlockWidget {
     return getById(this.$store, this.serviceId, this.blockId);
   }
 
-  get subtitles() {
-    return [
-      'State',
-    ];
-  }
-
   get address() {
     return this.block.data.address;
   }
@@ -48,32 +42,16 @@ export default class DS2413Widget extends BlockWidget {
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-carousel v-model="slideIndex" quick-nav class="col">
-      <!-- State -->
-      <q-carousel-slide class="unpadded">
-        <div :class="['widget-body', orientationClass]">
-          <q-card-main class="column col">
-            <q-field class="col" label="Address">
-              <span>{{ address }}</span>
-            </q-field>
-            <q-field class="col" label="State">
-              <big>{{ actuatorState }}</big>
-            </q-field>
-          </q-card-main>
-        </div>
-      </q-carousel-slide>
-      <q-btn
-        slot-scope="props"
-        slot="quick-nav"
-        :icon="navIcon(props.slide)"
-        :label="navTitle(props.slide)"
-        :class="{inactive: !props.current}"
-        color="white"
-        flat
-        dense
-        @click="props.goToSlide()"
-      />
-    </q-carousel>
+    <q-card-main class="column widget-body">
+      <div class="full-width">
+        <q-field class="col" label="Address">
+          <span>{{ address }}</span>
+        </q-field>
+        <q-field class="col" label="State">
+          <big>{{ actuatorState }}</big>
+        </q-field>
+      </div>
+    </q-card-main>
   </q-card>
 </template>
 

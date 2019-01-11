@@ -31,7 +31,7 @@ export default class ActuatorPinForm extends BlockForm {
       <q-toolbar-title>{{ block.id }} settings</q-toolbar-title>
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
-    <q-collapsible group="modal" class="col-12" icon="help" label="Settings">
+    <q-collapsible group="modal" class="col-12" icon="help" label="State">
       <q-field label="State">
         <ActuatorState
           :field="block.data.state"
@@ -43,50 +43,16 @@ export default class ActuatorPinForm extends BlockForm {
       </q-field>
     </q-collapsible>
     <q-collapsible group="modal" class="col-12" icon="help" label="Constraints">
-      <div>
-        <q-field label="Constraints" orientation="vertical">
-          <DigitalConstraints
-            :service-id="block.serviceId"
-            :field="block.data.constrainedBy"
-            :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
-          />
-        </q-field>
-      </div>
+      <q-field label="Constraints" orientation="vertical">
+        <DigitalConstraints
+          :service-id="block.serviceId"
+          :field="block.data.constrainedBy"
+          :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+        />
+      </q-field>
     </q-collapsible>
     <q-collapsible group="modal" class="col-12" icon="help" label="Block Settings">
-      <div>
-        <q-field label="Block ID">
-          <InputPopupEdit
-            :field="block.id"
-            :change="changeBlockId"
-            display="span"
-            label="Block ID"
-          />
-        </q-field>
-        <q-field label="Block Type">
-          <span>{{ block.type }}</span>
-        </q-field>
-        <q-field label="Part of service">
-          <span>{{ serviceId }}</span>
-        </q-field>
-        <q-field label="Active in profiles">
-          <ProfilesPopupEdit
-            :field="block.profiles"
-            :service-id="serviceId"
-            :change="callAndSaveBlock(v => block.profiles = v)"
-            display="span"
-          />
-        </q-field>
-        <q-field label="Load defaults preset">
-          <SelectPopupEdit
-            :field="block.data"
-            :options="presets()"
-            :change="callAndSaveBlock(v => block.data = v)"
-            label="Select preset to load"
-            display="span"
-          />
-        </q-field>
-      </div>
+      <BlockSettings v-bind="settingsProps" :presets-func="presets"/>
     </q-collapsible>
   </div>
 </template>

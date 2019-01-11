@@ -42,4 +42,3 @@ export default class InactiveObjectWidget extends BlockWidget {
     </q-card-main>
   </q-card>
 </template>
-

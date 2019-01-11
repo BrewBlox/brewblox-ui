@@ -61,7 +61,6 @@ export default class PidWidget extends BlockWidget {
       type="warning"
       color="warn"
     >This PID is inactive</q-alert>
-
     <q-card-main class="column widget-body">
       <div :style="gridStyle(6)" class="full-width">
         <q-item>Input</q-item>

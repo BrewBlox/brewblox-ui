@@ -61,7 +61,6 @@ export default class ActuatorPinWidget extends BlockWidget {
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-
     <q-card-main class="column widget-body">
       <div class="full-width">
         <q-field label="State">
@@ -87,5 +86,3 @@ export default class ActuatorPinWidget extends BlockWidget {
     </q-card-main>
   </q-card>
 </template>
-
-

@@ -32,6 +32,10 @@ export default class BlockForm extends FormBase {
     return this.block.serviceId;
   }
 
+  get settingsProps() {
+    return { ...this.$props };
+  }
+
   presets(): { label: string, value: Object }[] {
     return [];
   }
