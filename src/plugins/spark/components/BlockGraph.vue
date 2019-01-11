@@ -18,6 +18,10 @@ import Component from 'vue-class-component';
       type: Function,
       required: true,
     },
+    label: {
+      type: String,
+      default: '',
+    },
   },
 })
 export default class BlockGraph extends Vue {
@@ -39,7 +43,7 @@ export default class BlockGraph extends Vue {
 </script>
 
 <template>
-  <div>
+  <span>
     <q-modal v-model="modalOpen" maximized>
       <GraphCard v-if="modalOpen" :id="$props.id" :config="graphCfg"/>
       <q-btn
@@ -57,15 +61,13 @@ export default class BlockGraph extends Vue {
         />
       </q-field>
     </q-modal>
-    <div class="full-width">
-      <q-btn
-        dense
-        color="primary"
-        icon="show_chart"
-        label="Graph"
-        style="margin: 0 auto; display: block;"
-        @click="() => modalOpen = true"
-      />
-    </div>
-  </div>
+    <q-btn
+      :label="$props.label"
+      flat
+      round
+      dense
+      icon="insert_chart_outlined"
+      @click="() => modalOpen = true"
+    />
+  </span>
 </template>

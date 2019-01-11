@@ -270,11 +270,10 @@ export default class DefaultLayout extends Vue {
 }
 
 .widget-modal {
-  display: flex;
-  flex-wrap: wrap;
-  max-width: 800px;
-  align-items: center;
+  width: 800px;
+  max-width: 100vw;
   padding: 10px;
+  display: flex;
 }
 
 .widget-body {
@@ -330,5 +329,10 @@ export default class DefaultLayout extends Vue {
 
 .q-carousel {
   width: 100%;
+}
+
+.inline-popup {
+  display: inline-block;
+  margin: 0px 10px;
 }
 </style>

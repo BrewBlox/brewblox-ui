@@ -57,11 +57,13 @@ export default class ActuatorPwmWidget extends BlockWidget {
         display="span"
       />
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
+      <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
       <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-carousel v-model="slideIndex" quick-nav class="col">
+
+    <q-carousel v-if="false" v-model="slideIndex" quick-nav class="col">
       <!-- State -->
       <q-carousel-slide class="unpadded">
         <div :class="['widget-body', orientationClass]">

@@ -23,19 +23,14 @@ export default class ActuatorAnalogMockForm extends BlockForm {
 </script>
 
 <template>
-  <div class="widget-modal">
-    <q-btn
-      v-close-overlay
-      v-if="$props.buttons"
-      rounded
-      label="close"
-      icon="close"
-      style="position: absolute; right: 18px; top: 18px"
-    />
-    <q-card>
-      <q-card-title>Settings</q-card-title>
-      <q-card-main>
-        <q-field class="col" label="Minimum setting">
+  <div class="widget-modal column">
+    <q-toolbar v-if="$props.buttons" class="unpadded">
+      <q-toolbar-title>{{ block.id }} settings</q-toolbar-title>
+      <q-btn v-close-overlay flat rounded label="close"/>
+    </q-toolbar>
+    <q-collapsible group="modal" class="col-12" icon="help" label="Setting & Value">
+      <div>
+        <q-field label="Min Setting">
           <InputPopupEdit
             :field="block.data.minSetting"
             :change="callAndSaveBlock(v => block.data.minSetting = v)"
@@ -43,15 +38,15 @@ export default class ActuatorAnalogMockForm extends BlockForm {
             label="Minimum setting"
           />
         </q-field>
-        <q-field class="col" label="Current setting">
+        <q-field label="Setting">
           <InputPopupEdit
             :field="block.data.setting"
             :change="callAndSaveBlock(v => block.data.setting = v)"
             type="number"
-            label="Current setting"
+            label="Setting"
           />
         </q-field>
-        <q-field class="col" label="Maximum setting">
+        <q-field label="Max Setting">
           <InputPopupEdit
             :field="block.data.maxSetting"
             :change="callAndSaveBlock(v => block.data.maxSetting = v)"
@@ -59,12 +54,7 @@ export default class ActuatorAnalogMockForm extends BlockForm {
             label="Maximum setting"
           />
         </q-field>
-      </q-card-main>
-    </q-card>
-    <q-card>
-      <q-card-title>Value</q-card-title>
-      <q-card-main>
-        <q-field class="col" label="Minimum value">
+        <q-field label="Min Value">
           <InputPopupEdit
             :field="block.data.minValue"
             :change="callAndSaveBlock(v => block.data.minValue = v)"
@@ -72,10 +62,10 @@ export default class ActuatorAnalogMockForm extends BlockForm {
             label="Minimum value"
           />
         </q-field>
-        <q-field class="col" label="Current value">
+        <q-field label="Value">
           <big>{{ block.data.value | round }}</big>
         </q-field>
-        <q-field class="col" label="Maximum value">
+        <q-field label="Max Value">
           <InputPopupEdit
             :field="block.data.maxValue"
             :change="callAndSaveBlock(v => block.data.maxValue = v)"
@@ -83,45 +73,42 @@ export default class ActuatorAnalogMockForm extends BlockForm {
             label="Maximum value"
           />
         </q-field>
-      </q-card-main>
-    </q-card>
-    <q-card>
-      <q-card-title>Block Settings</q-card-title>
-      <q-card-main>
-        <q-field class="col" label="Block ID">
-          <InputPopupEdit :field="block.id" :change="changeBlockId" label="Block ID"/>
+      </div>
+    </q-collapsible>
+    <q-collapsible group="modal" class="col-12" icon="help" label="Block Settings">
+      <div>
+        <q-field label="Block ID">
+          <InputPopupEdit
+            :field="block.id"
+            :change="changeBlockId"
+            display="span"
+            label="Block ID"
+          />
         </q-field>
-        <q-field class="col" label="Service ID">
-          <big>{{ serviceId }}</big>
+        <q-field label="Block Type">
+          <span>{{ block.type }}</span>
         </q-field>
-        <q-field class="col" label="Block Type">
-          <big>{{ block.type }}</big>
+        <q-field label="Part of service">
+          <span>{{ serviceId }}</span>
         </q-field>
-        <q-field class="col" label="Profiles">
+        <q-field label="Active in profiles">
           <ProfilesPopupEdit
             :field="block.profiles"
             :service-id="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
+            display="span"
           />
         </q-field>
-        <q-field class="col" label="Preset">
+        <q-field label="Load defaults preset">
           <SelectPopupEdit
             :field="block.data"
             :options="presets()"
             :change="callAndSaveBlock(v => block.data = v)"
-            label="Preset"
+            label="Select preset to load"
+            display="span"
           />
         </q-field>
-      </q-card-main>
-    </q-card>
+      </div>
+    </q-collapsible>
   </div>
 </template>
-
-<style scoped>
-.q-card {
-  min-width: 400px;
-  width: 100%;
-  margin-bottom: 10px;
-}
-</style>
-

@@ -48,9 +48,22 @@ export default class BlockWidget extends WidgetBase {
     return this.$props.cols >= 4;
   }
 
-  colMinBlocks(minBlocksForRow: number, colsTrue: number, colsFalse: number){
+  colMinBlocks(minBlocksForRow: number, colsTrue: number, colsFalse: number) {
     const cols = this.$props.cols >= minBlocksForRow ? colsTrue : colsFalse;
-    return "col-" +  cols.toString();
+    return `col-${cols.toString()}`;
+  }
+
+  gridStyle(items: number) {
+    if (items < 4) {
+      return {};
+    }
+    return {
+      display: 'grid',
+      gridTemplateRows: `repeat(${this.$props.cols >= 4 ? Math.ceil(items / 2) : items}, 1fr)`,
+      gridTemplateColumns: `repeat(${this.$props.cols >= 4 ? 2 : 1}, 1fr)`,
+      gridAutoFlow: 'column',
+      gridGap: '0 5%',
+    };
   }
 
   get orientationClass() {

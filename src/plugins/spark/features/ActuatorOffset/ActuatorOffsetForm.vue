@@ -22,19 +22,14 @@ export default class ActuatorOffsetForm extends BlockForm {
 </script>
 
 <template>
-  <div class="widget-modal">
-    <q-btn
-      v-close-overlay
-      v-if="$props.buttons"
-      rounded
-      label="close"
-      icon="close"
-      style="position: absolute; right: 18px; top: 18px"
-    />
-    <q-card>
-      <q-card-title>Settings</q-card-title>
-      <q-card-main>
-        <q-field class="col" label="Target">
+  <div class="widget-modal column">
+    <q-toolbar v-if="$props.buttons" class="unpadded">
+      <q-toolbar-title>{{ block.id }} settings</q-toolbar-title>
+      <q-btn v-close-overlay flat rounded label="close"/>
+    </q-toolbar>
+    <q-collapsible group="modal" class="col-12" icon="help" label="Settings">
+      <div>
+        <q-field label="Target">
           <LinkPopupEdit
             :field="block.data.targetId"
             :service-id="block.serviceId"
@@ -42,7 +37,7 @@ export default class ActuatorOffsetForm extends BlockForm {
             label="Target"
           />
         </q-field>
-        <q-field class="col" label="Reference">
+        <q-field label="Reference">
           <LinkPopupEdit
             :field="block.data.referenceId"
             :service-id="block.serviceId"
@@ -50,61 +45,59 @@ export default class ActuatorOffsetForm extends BlockForm {
             label="Reference"
           />
         </q-field>
-        <q-field class="col" label="Setting">
+        <q-field label="Setting">
           <big>{{ block.data.setting | round }}</big>
         </q-field>
-        <q-field class="col" label="Value">
+        <q-field label="Value">
           <big>{{ block.data.value | round }}</big>
         </q-field>
-      </q-card-main>
-    </q-card>
-    <q-card>
-      <q-card-title>Constraints</q-card-title>
-      <q-card-main>
-        <AnalogConstraints
-          :service-id="serviceId"
-          :field="block.data.constrainedBy"
-          :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
-        />
-      </q-card-main>
-    </q-card>
-    <q-card>
-      <q-card-title>Block Settings</q-card-title>
-      <q-card-main>
-        <q-field class="col" label="Block ID">
-          <InputPopupEdit :field="block.id" :change="changeBlockId" label="Block ID"/>
+      </div>
+    </q-collapsible>
+    <q-collapsible group="modal" class="col-12" icon="help" label="Constraints">
+      <div>
+        <q-field label="Constraints" orientation="vertical">
+          <AnalogConstraints
+            :service-id="block.serviceId"
+            :field="block.data.constrainedBy"
+            :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+          />
         </q-field>
-        <q-field class="col" label="Service ID">
-          <big>{{ serviceId }}</big>
+      </div>
+    </q-collapsible>
+    <q-collapsible group="modal" class="col-12" icon="help" label="Block Settings">
+      <div>
+        <q-field label="Block ID">
+          <InputPopupEdit
+            :field="block.id"
+            :change="changeBlockId"
+            display="span"
+            label="Block ID"
+          />
         </q-field>
-        <q-field class="col" label="Block Type">
-          <big>{{ block.type }}</big>
+        <q-field label="Block Type">
+          <span>{{ block.type }}</span>
         </q-field>
-        <q-field class="col" label="Profiles">
+        <q-field label="Part of service">
+          <span>{{ serviceId }}</span>
+        </q-field>
+        <q-field label="Active in profiles">
           <ProfilesPopupEdit
             :field="block.profiles"
             :service-id="serviceId"
             :change="callAndSaveBlock(v => block.profiles = v)"
+            display="span"
           />
         </q-field>
-        <q-field class="col" label="Preset">
+        <q-field label="Load defaults preset">
           <SelectPopupEdit
             :field="block.data"
             :options="presets()"
             :change="callAndSaveBlock(v => block.data = v)"
-            label="Preset"
+            label="Select preset to load"
+            display="span"
           />
         </q-field>
-      </q-card-main>
-    </q-card>
+      </div>
+    </q-collapsible>
   </div>
 </template>
-
-<style scoped>
-.q-card {
-  min-width: 400px;
-  width: 100%;
-  margin-bottom: 10px;
-}
-</style>
-
