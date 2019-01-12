@@ -53,11 +53,12 @@ export default class BlockGraph extends Vue {
         icon="close"
         style="position: absolute; right: 18px; top: 18px"
       />
-      <q-field label="Duration" class="col-8">
+      <q-field class="duration" label="Duration">
         <InputPopupEdit
           :field="graphCfg.params.duration"
           :change="confirmed(v => graphCfg.params.duration = parseDuration(v))"
           label="Duration"
+          display="big"
         />
       </q-field>
     </q-modal>
@@ -71,3 +72,19 @@ export default class BlockGraph extends Vue {
     />
   </span>
 </template>
+
+<style lang="stylus" scoped>
+.duration {
+  position: absolute; 
+  right: 32px;
+  top: 50px; 
+}
+/deep/ .duration * {
+  padding-top: 0px !important;
+  margin-top: 0px !important;
+  min-height: 0;
+  align-items: center;
+  text-align: right;
+}
+</style>
+

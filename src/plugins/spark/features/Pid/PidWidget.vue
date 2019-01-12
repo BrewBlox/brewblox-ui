@@ -105,12 +105,12 @@ export default class PidWidget extends BlockWidget {
 </template>
 
 <style lang="stylus" scoped>
-/deep/ .widget-body .q-field * {
+/deep/ .widget-body-multiple .q-field * {
   padding-top: 0px !important;
   margin-top: 0px !important;
 }
 
-/deep/ .widget-body .q-item {
+/deep/ .widget-body-multiple .q-item {
   padding: 0;
   min-height: 0;
 }
