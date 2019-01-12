@@ -144,7 +144,7 @@ export default class SparkForm extends Vue {
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
 
-    <q-collapsible group="modal" class="col-12" icon="help" label="System Info">
+    <q-collapsible group="modal" class="col-12" icon="info" label="System Info">
       <div>
         <q-field label="Device ID">
           <big>{{ service.id }}</big>
@@ -158,7 +158,7 @@ export default class SparkForm extends Vue {
       </div>
     </q-collapsible>
 
-    <q-collapsible group="modal" class="col-12" icon="help" label="WiFi">
+    <q-collapsible group="modal" class="col-12" icon="wifi" label="WiFi">
       <q-modal v-model="wifiModal">
         <WiFiSettingsPopup
           v-if="wifiModal"
@@ -179,7 +179,7 @@ export default class SparkForm extends Vue {
       </div>
     </q-collapsible>
 
-    <q-collapsible group="modal" class="col-12" icon="help" label="Profiles">
+    <q-collapsible group="modal" class="col-12" icon="mdi-checkbox-multiple-marked" label="Profiles">
       <div>
         <q-field label="Active profiles" orientation="vertical">
           <ProfilesPopupEdit
@@ -202,7 +202,7 @@ export default class SparkForm extends Vue {
       </div>
     </q-collapsible>
 
-    <q-collapsible group="modal" class="col-12" icon="help" label="Units">
+    <q-collapsible group="modal" class="col-12" icon="mdi-temperature-celsius" label="Units">
       <div>
         <q-field class="col column" label="Unit preferences" orientation="vertical">
           <q-field v-for="(val, name) in units" :key="name" :label="spaceCased(name)" class="col">
@@ -217,7 +217,7 @@ export default class SparkForm extends Vue {
       </div>
     </q-collapsible>
 
-    <q-collapsible group="modal" class="col-12" icon="help" label="Discovered Blocks">
+    <q-collapsible group="modal" class="col-12" icon="mdi-magnify-plus-outline" label="Discovered Blocks">
       <div>
         <q-field class="col column" label="Discovered blocks" orientation="vertical">
           <div class="row">

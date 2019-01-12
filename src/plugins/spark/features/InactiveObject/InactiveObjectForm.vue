@@ -13,7 +13,7 @@ export default class InactiveObjectForm extends BlockForm {
       <q-toolbar-title>{{ block.id }} settings</q-toolbar-title>
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
-    <q-collapsible group="modal" class="col-12" icon="help" label="Block Settings">
+    <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="settingsProps" :presets-func="presets"/>
     </q-collapsible>
   </div>

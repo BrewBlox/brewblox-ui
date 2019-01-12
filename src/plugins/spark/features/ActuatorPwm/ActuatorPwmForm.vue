@@ -32,7 +32,7 @@ export default class ActuatorPwmForm extends BlockForm {
       <q-toolbar-title>{{ block.id }} settings</q-toolbar-title>
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
-    <q-collapsible group="modal" class="col-12" icon="help" label="Settings">
+    <q-collapsible group="modal" class="col-12" icon="settings" label="Settings">
       <div>
         <q-field label="Actuator">
           <LinkPopupEdit
@@ -63,7 +63,7 @@ export default class ActuatorPwmForm extends BlockForm {
         </q-field>
       </div>
     </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="help" label="Constraints">
+    <q-collapsible group="modal" class="col-12" icon="mdi-less-than-or-equal" label="Constraints">
       <div>
         <q-field label="Constraints" orientation="vertical">
           <AnalogConstraints
@@ -74,7 +74,7 @@ export default class ActuatorPwmForm extends BlockForm {
         </q-field>
       </div>
     </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="help" label="Block Settings">
+    <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="settingsProps" :presets-func="presets"/>
     </q-collapsible>
   </div>

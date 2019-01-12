@@ -126,7 +126,7 @@ export default class DisplaySettingsForm extends BlockForm {
       :label="`Slot ${idx + 1}`"
       group="modal"
       class="col-12"
-      icon="help"
+      icon="mdi-widgets"
     >
       <div>
         <q-field label="Block">
@@ -158,7 +158,7 @@ export default class DisplaySettingsForm extends BlockForm {
         </q-field>
       </div>
     </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="help" label="Block Settings">
+    <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="settingsProps" :presets-func="presets"/>
     </q-collapsible>
   </div>

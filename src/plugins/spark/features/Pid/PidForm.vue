@@ -104,7 +104,7 @@ export default class PidForm extends BlockForm {
         </p>
       </div>
     </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="help" label="PID Calculation">
+    <q-collapsible group="modal" class="col-12" icon="mdi-calculator-variant" label="PID Algorithm">
       <div class="calculation">
         <!-- state -->
         <q-field label="Filtered Error" orientation="vertical">
@@ -202,7 +202,7 @@ export default class PidForm extends BlockForm {
         </div>
       </div>
     </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="help" label="Input and output">
+    <q-collapsible group="modal" class="col-12" icon="mdi-link" label="Input and output">
       <div class="input-output">
         <q-field label="PID is enabled:">
           <q-toggle
@@ -275,7 +275,7 @@ export default class PidForm extends BlockForm {
         </q-field>
       </div>
     </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="help" label="Block Settings">
+    <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="settingsProps" :presets-func="presets"/>
     </q-collapsible>
   </div>

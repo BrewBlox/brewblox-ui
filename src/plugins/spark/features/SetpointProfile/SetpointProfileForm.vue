@@ -139,7 +139,7 @@ export default class SetpointProfileForm extends BlockForm {
       <q-toolbar-title>{{ block.id }} settings</q-toolbar-title>
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
-    <q-collapsible group="modal" class="col-12" icon="help" label="Settings">
+    <q-collapsible group="modal" class="col-12" icon="settings" label="Settings">
       <div>
         <q-field label="Enabled">
           <q-toggle
@@ -147,12 +147,12 @@ export default class SetpointProfileForm extends BlockForm {
             @input="v => { block.data.enabled = v; saveBlock(); }"
           />
         </q-field>
-        <q-field label="Setting">
+        <q-field label="Current setting">
           <big>{{ block.data.setting | unit }}</big>
         </q-field>
       </div>
     </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="help" label="Setpoints">
+    <q-collapsible group="modal" class="col-12" icon="mdi-thermometer" label="Setpoints">
       <div>
         <q-field class="col" label="Start time" orientation="vertical">
           <DatetimePopupEdit
@@ -196,7 +196,7 @@ export default class SetpointProfileForm extends BlockForm {
         </q-field>
       </div>
     </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="help" label="Block Settings">
+    <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="settingsProps" :presets-func="presets"/>
     </q-collapsible>
   </div>

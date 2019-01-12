@@ -31,8 +31,8 @@ export default class ActuatorPinForm extends BlockForm {
       <q-toolbar-title>{{ block.id }} settings</q-toolbar-title>
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
-    <q-collapsible group="modal" class="col-12" icon="help" label="State">
-      <q-field label="State">
+    <q-collapsible group="modal" class="col-12" icon="settings" label="Settings">
+      <q-field label="Settings">
         <ActuatorState
           :field="block.data.state"
           :change="callAndSaveBlock(v => block.data.state = v)"
@@ -42,7 +42,7 @@ export default class ActuatorPinForm extends BlockForm {
         <q-toggle :value="block.data.invert" @input="v => { block.data.invert = v; saveBlock(); }"/>
       </q-field>
     </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="help" label="Constraints">
+    <q-collapsible group="modal" class="col-12" icon="mdi-less-than-or-equal" label="Constraints">
       <q-field label="Constraints" orientation="vertical">
         <DigitalConstraints
           :service-id="block.serviceId"
@@ -51,7 +51,7 @@ export default class ActuatorPinForm extends BlockForm {
         />
       </q-field>
     </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="help" label="Block Settings">
+    <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="settingsProps" :presets-func="presets"/>
     </q-collapsible>
   </div>

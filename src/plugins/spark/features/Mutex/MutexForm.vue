@@ -23,7 +23,7 @@ export default class MutexForm extends BlockForm {
       <q-toolbar-title>{{ block.id }} settings</q-toolbar-title>
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
-    <q-collapsible group="modal" class="col-12" icon="help" label="State">
+    <q-collapsible group="modal" class="col-12" icon="settings" label="Settings">
       <q-field label="Actuator wait time">
         <InputPopupEdit
           :field="block.data.differentActuatorWait"
@@ -33,7 +33,7 @@ export default class MutexForm extends BlockForm {
         />
       </q-field>
     </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="help" label="Block Settings">
+    <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="settingsProps" :presets-func="presets"/>
     </q-collapsible>
   </div>

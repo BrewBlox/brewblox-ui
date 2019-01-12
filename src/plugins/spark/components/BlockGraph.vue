@@ -67,7 +67,7 @@ export default class BlockGraph extends Vue {
       flat
       round
       dense
-      icon="insert_chart_outlined"
+      icon="mdi-chart-line"
       @click="() => modalOpen = true"
     />
   </span>
