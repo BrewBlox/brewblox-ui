@@ -62,4 +62,8 @@ export default class ProcessViewItem extends Vue {
 .ProcessViewPart .liquid {
   stroke-width: 7px;
 }
+
+.clickable {
+  cursor: pointer;
+}
 </style>

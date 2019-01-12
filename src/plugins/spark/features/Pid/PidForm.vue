@@ -48,16 +48,10 @@ export default class PidForm extends BlockForm {
 </script>
 
 <template>
-  <div class="pid-modal column" >
-    <q-toolbar color="primary" class="unpadded">
+  <div class="widget-modal column">
+    <q-toolbar v-if="$props.buttons" color="primary" class="unpadded">
       <q-toolbar-title>{{ block.id }} settings</q-toolbar-title>
-      <q-btn
-        v-close-overlay
-        rounded
-        dense
-        color="red"
-        icon="close"
-      />
+      <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
     <q-collapsible group="modal" class="col-12" icon="help" label="About the PID Block">
       <div>
@@ -65,11 +59,10 @@ export default class PidForm extends BlockForm {
         <p>
           A PID block can drive its output to regulate its input.
           The input is a process value, in most cases this will be a pair of a setpoint and sensor.
-          The difference between the setpoint and the sensor is called the <i>error</i>.
+          The difference between the setpoint and the sensor is called the
+          <i>error</i>.
         </p>
-        <p>
-          The output value is the sum of 3 parts derived from the error: proportional, integral and derivative.
-        </p>
+        <p>The output value is the sum of 3 parts derived from the error: proportional, integral and derivative.</p>
         <div class="q-subheading">Proportional</div>
         <p>
           The proportonial part is, as you'd expect, proportional to the error.
@@ -87,21 +80,18 @@ export default class PidForm extends BlockForm {
         <p>
           It will take Ti seconds for the integral part to become as large as the proportional part.
           If Ti is too small, the integral will do work that should be hanlded by the proportional part.
-          Because the integral is slow to increase <i>and decrease</i>,
+          Because the integral is slow to increase
+          <i>and decrease</i>,
           a low Ti can cause too much actuator action after reaching the setpoint.
         </p>
-        <p>
-          Setting Ti to zero will disable the integrator.
-        </p>
+        <p>Setting Ti to zero will disable the integrator.</p>
         <div class="q-subheading">Derivative</div>
         <p>
           Td can be seen as the duration of the overshoot that can be expected due to inertia in the system.
           The role of the derivative part is to prevent this overshoot.
           If the input is quickly approaching the target, the derivative can decrease the output for a slower approach.
         </p>
-        <p>
-          When there is no overshoot in the system, Td should be set to zero.
-        </p>
+        <p>When there is no overshoot in the system, Td should be set to zero.</p>
         <div class="q-subheading">Filtering</div>
         <p>
           The error value is passed through a filter to remove noise, spikes and sudden jumps.
@@ -114,7 +104,7 @@ export default class PidForm extends BlockForm {
         </p>
       </div>
     </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="help" label="PID Calculation">
+    <q-collapsible group="modal" class="col-12" icon="mdi-calculator-variant" label="PID Algorithm">
       <div class="calculation">
         <!-- state -->
         <q-field label="Filtered Error" orientation="vertical">
@@ -212,7 +202,7 @@ export default class PidForm extends BlockForm {
         </div>
       </div>
     </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="help" label="Input and output">
+    <q-collapsible group="modal" class="col-12" icon="mdi-link" label="Input and output">
       <div class="input-output">
         <q-field label="PID is enabled:">
           <q-toggle
@@ -285,35 +275,8 @@ export default class PidForm extends BlockForm {
         </q-field>
       </div>
     </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="help" label="Block Settings">
-      <div>
-        <q-field class="row" label="Block ID">
-          <InputPopupEdit :field="block.id" :change="changeBlockId" display="span" label="Block ID"/>
-        </q-field>
-        <q-field class="row" label="Block Type">
-          <span>{{ block.type }}</span>
-        </q-field>
-        <q-field class="row" label="Part of service">
-          <span>{{ serviceId }}</span>
-        </q-field>
-        <q-field class="row" label="Active in profiles">
-          <ProfilesPopupEdit
-            :field="block.profiles"
-            :service-id="serviceId"
-            :change="callAndSaveBlock(v => block.profiles = v)"
-            display="span"
-          />
-        </q-field>
-        <q-field class="row" label="Load defaults preset">
-          <SelectPopupEdit
-            :field="block.data"
-            :options="presets()"
-            :change="callAndSaveBlock(v => block.data = v)"
-            label="Select preset to load"
-            display="span"
-          />
-        </q-field>
-      </div>
+    <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
+      <BlockSettings v-bind="settingsProps" :presets-func="presets"/>
     </q-collapsible>
   </div>
 </template>
@@ -321,34 +284,10 @@ export default class PidForm extends BlockForm {
 <style lang="stylus" scoped>
 @import '../../../../css/app.styl';
 
-.pid-modal {
-  width: 800px;
-  max-width: 100vw;
-  padding: 10px;
-  display: flex;
-}
-
-.q-card {
-  min-width: 400px;
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.section {
-  padding: 20px;
-}
-
-/deep/ .q-card-title {
-  color: $secondary;
-}
-
 .q-subheading {
   color: $tertiary;
   display: block;
   clear: both;
-}
-
-.section {
 }
 
 .calculation {
@@ -363,16 +302,5 @@ export default class PidForm extends BlockForm {
 .calculation /deep/ .q-field-content {
   padding-top: 6px;
 }
-
-.emphasize {
-  font-weight: bold;
-  padding: 10px;
-}
-
-.inline-popup {
-  display: inline-block;
-  margin: 0px 10px;
-}
-
 </style>
 

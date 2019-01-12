@@ -56,57 +56,33 @@ export default class ActuatorPinWidget extends BlockWidget {
         display="span"
       />
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
+      <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
       <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-carousel v-model="slideIndex" quick-nav class="col">
-      <!-- State -->
-      <q-carousel-slide class="unpadded">
-        <div :class="['widget-body', orientationClass]">
-          <q-card-main class="column col">
-            <q-field class="col" label="State">
-              <ActuatorState
-                :field="block.data.state"
-                :change="callAndSaveBlock(v => block.data.state = v)"
-              />
-            </q-field>
-            <q-field v-if="pending !== null" class="col" label="Pending">
-              <span>{{ pending }}</span>
-            </q-field>
-          </q-card-main>
-        </div>
-      </q-carousel-slide>
-      <!-- Constraints -->
-      <q-carousel-slide class="unpadded">
-        <q-card-main class="column col">
-          <q-field class="col" label="Constraints" orientation="vertical">
-            <DigitalConstraints
-              :service-id="serviceId"
-              :field="block.data.constrainedBy"
-              :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
-              readonly
-            />
-          </q-field>
-        </q-card-main>
-      </q-carousel-slide>
-      <!-- Graph -->
-      <q-carousel-slide class="unpadded">
-        <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
-      </q-carousel-slide>
-      <q-btn
-        slot-scope="props"
-        slot="quick-nav"
-        :icon="navIcon(props.slide)"
-        :label="navTitle(props.slide)"
-        :class="{inactive: !props.current}"
-        color="white"
-        flat
-        dense
-        @click="props.goToSlide()"
-      />
-    </q-carousel>
+    <q-card-main class="column widget-body">
+      <div class="full-width">
+        <q-field label="State">
+          <ActuatorState
+            :field="block.data.state"
+            :change="callAndSaveBlock(v => block.data.state = v)"
+          />
+        </q-field>
+        <q-field v-if="pending !== null" label="Pending">
+          <span>{{ pending }}</span>
+        </q-field>
+      </div>
+      <div class="full-width">
+        <q-field label="Constraints">
+          <DigitalConstraints
+            :service-id="serviceId"
+            :field="block.data.constrainedBy"
+            :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+            readonly
+          />
+        </q-field>
+      </div>
+    </q-card-main>
   </q-card>
 </template>
-
-

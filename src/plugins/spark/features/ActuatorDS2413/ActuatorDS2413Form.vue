@@ -37,97 +37,51 @@ export default class ActuatorDS2413Form extends BlockForm {
 </script>
 
 <template>
-  <div class="widget-modal">
-    <q-btn
-      v-close-overlay
-      v-if="$props.buttons"
-      rounded
-      label="close"
-      icon="close"
-      style="position: absolute; right: 18px; top: 18px"
-    />
-    <q-card>
-      <q-card-title>Settings</q-card-title>
-      <q-card-main>
-        <q-field class="col" label="Actuator">
-          <LinkPopupEdit
-            :field="block.data.hwDevice"
-            :service-id="serviceId"
-            :change="callAndSaveBlock(v => block.data.hwDevice = v)"
-            label="Actuator"
-          />
-        </q-field>
-        <q-field class="col" label="Channel">
-          <SelectPopupEdit
-            :field="block.data.channel"
-            :options="channelOpts"
-            :change="callAndSaveBlock(v => block.data.channel = v)"
-            label="Channel"
-          />
-        </q-field>
-        <q-field class="col" label="State">
-          <ActuatorState
-            :field="block.data.state"
-            :change="callAndSaveBlock(v => block.data.state = v)"
-          />
-        </q-field>
-        <q-field class="col" label="Invert">
-          <q-toggle
-            :value="block.data.invert"
-            @input="v => { block.data.invert = v; saveBlock(); }"
-          />
-        </q-field>
-      </q-card-main>
-    </q-card>
-    <q-card>
-      <q-card-title>Constraints</q-card-title>
-      <q-card-main>
-        <q-field class="col" label="Constraints" orientation="vertical">
+  <div class="widget-modal column">
+    <q-toolbar v-if="$props.buttons" class="unpadded">
+      <q-toolbar-title>{{ block.id }} settings</q-toolbar-title>
+      <q-btn v-close-overlay flat rounded label="close"/>
+    </q-toolbar>
+    <q-collapsible group="modal" class="col-12" icon="settings" label="Settings">
+      <q-field label="Actuator">
+        <LinkPopupEdit
+          :field="block.data.hwDevice"
+          :service-id="serviceId"
+          :change="callAndSaveBlock(v => block.data.hwDevice = v)"
+          label="Actuator"
+        />
+      </q-field>
+      <q-field label="Channel">
+        <SelectPopupEdit
+          :field="block.data.channel"
+          :options="channelOpts"
+          :change="callAndSaveBlock(v => block.data.channel = v)"
+          label="Channel"
+        />
+      </q-field>
+      <q-field label="State">
+        <ActuatorState
+          :field="block.data.state"
+          :change="callAndSaveBlock(v => block.data.state = v)"
+        />
+      </q-field>
+      <q-field label="Invert">
+        <q-toggle :value="block.data.invert" @input="v => { block.data.invert = v; saveBlock(); }"/>
+      </q-field>
+    </q-collapsible>
+    <q-collapsible group="modal" class="col-12" icon="mdi-less-than-or-equal" label="Constraints">
+      <div>
+        <q-field label="Constraints" orientation="vertical">
           <DigitalConstraints
             :service-id="block.serviceId"
             :field="block.data.constrainedBy"
             :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
           />
         </q-field>
-      </q-card-main>
-    </q-card>
-    <q-card>
-      <q-card-title>Block Settings</q-card-title>
-      <q-card-main>
-        <q-field class="col" label="Block ID">
-          <InputPopupEdit :field="block.id" :change="changeBlockId" label="Block ID"/>
-        </q-field>
-        <q-field class="col" label="Service ID">
-          <big>{{ serviceId }}</big>
-        </q-field>
-        <q-field class="col" label="Block Type">
-          <big>{{ block.type }}</big>
-        </q-field>
-        <q-field class="col" label="Profiles">
-          <ProfilesPopupEdit
-            :field="block.profiles"
-            :service-id="serviceId"
-            :change="callAndSaveBlock(v => block.profiles = v)"
-          />
-        </q-field>
-        <q-field class="col" label="Preset">
-          <SelectPopupEdit
-            :field="block.data"
-            :options="presets()"
-            :change="callAndSaveBlock(v => block.data = v)"
-            label="Preset"
-          />
-        </q-field>
-      </q-card-main>
-    </q-card>
+      </div>
+    </q-collapsible>
+    <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
+      <BlockSettings v-bind="settingsProps" :presets-func="presets"/>
+    </q-collapsible>
   </div>
 </template>
-
-<style scoped>
-.q-card {
-  min-width: 400px;
-  width: 100%;
-  margin-bottom: 10px;
-}
-</style>
-

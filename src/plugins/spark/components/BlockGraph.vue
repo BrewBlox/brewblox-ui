@@ -18,6 +18,10 @@ import Component from 'vue-class-component';
       type: Function,
       required: true,
     },
+    label: {
+      type: String,
+      default: '',
+    },
   },
 })
 export default class BlockGraph extends Vue {
@@ -39,7 +43,7 @@ export default class BlockGraph extends Vue {
 </script>
 
 <template>
-  <div>
+  <span>
     <q-modal v-model="modalOpen" maximized>
       <GraphCard v-if="modalOpen" :id="$props.id" :config="graphCfg"/>
       <q-btn
@@ -49,23 +53,38 @@ export default class BlockGraph extends Vue {
         icon="close"
         style="position: absolute; right: 18px; top: 18px"
       />
-      <q-field label="Duration" class="col-8">
+      <q-field class="duration" label="Duration">
         <InputPopupEdit
           :field="graphCfg.params.duration"
           :change="confirmed(v => graphCfg.params.duration = parseDuration(v))"
           label="Duration"
+          display="big"
         />
       </q-field>
     </q-modal>
-    <div class="full-width">
-      <q-btn
-        dense
-        color="primary"
-        icon="show_chart"
-        label="Graph"
-        style="margin: 0 auto; display: block;"
-        @click="() => modalOpen = true"
-      />
-    </div>
-  </div>
+    <q-btn
+      :label="$props.label"
+      flat
+      round
+      dense
+      icon="mdi-chart-line"
+      @click="() => modalOpen = true"
+    />
+  </span>
 </template>
+
+<style lang="stylus" scoped>
+.duration {
+  position: absolute; 
+  right: 32px;
+  top: 50px; 
+}
+/deep/ .duration * {
+  padding-top: 0px !important;
+  margin-top: 0px !important;
+  min-height: 0;
+  align-items: center;
+  text-align: right;
+}
+</style>
+

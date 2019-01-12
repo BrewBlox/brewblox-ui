@@ -10,14 +10,6 @@ export default class ActuatorPwmWidget extends BlockWidget {
     return getById(this.$store, this.serviceId, this.blockId);
   }
 
-  get subtitles() {
-    return [
-      'State',
-      'Constraints',
-      'Graph',
-    ];
-  }
-
   get renamedTargets() {
     return {
       setting: 'Setting',
@@ -57,69 +49,29 @@ export default class ActuatorPwmWidget extends BlockWidget {
         display="span"
       />
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
+      <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
       <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-carousel v-model="slideIndex" quick-nav class="col">
-      <!-- State -->
-      <q-carousel-slide class="unpadded">
-        <div :class="['widget-body', orientationClass]">
-          <q-card-main class="column col">
-            <q-field class="col" label="Actuator">
-              <LinkPopupEdit
-                :field="block.data.actuatorId"
-                :service-id="serviceId"
-                :change="callAndSaveBlock(v => block.data.actuatorId = v)"
-                label="Actuator"
-              />
-            </q-field>
-            <q-field class="col" label="Setting">
-              <InputPopupEdit
-                :field="block.data.setting"
-                :change="callAndSaveBlock(v => block.data.setting = v)"
-                label="Setting"
-                type="number"
-              />
-            </q-field>
-            <q-field class="col" label="Value">
-              <big>{{ block.data.value | round }}</big>
-            </q-field>
-            <q-field v-if="pending !== null" class="col" label="Requested">
-              <big>{{ pending | round }}</big>
-            </q-field>
-          </q-card-main>
-        </div>
-      </q-carousel-slide>
-      <!-- Constraints -->
-      <q-carousel-slide class="unpadded">
-        <q-card-main class="column col">
-          <q-field class="col" label="Constraints" orientation="vertical">
-            <AnalogConstraints
-              :service-id="serviceId"
-              :field="block.data.constrainedBy"
-              :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
-              readonly
-            />
-          </q-field>
-        </q-card-main>
-      </q-carousel-slide>
-      <!-- Graph -->
-      <q-carousel-slide class="unpadded">
-        <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
-      </q-carousel-slide>
-      <q-btn
-        slot-scope="props"
-        slot="quick-nav"
-        :icon="navIcon(props.slide)"
-        :label="navTitle(props.slide)"
-        :class="{inactive: !props.current}"
-        color="white"
-        flat
-        dense
-        @click="props.goToSlide()"
-      />
-    </q-carousel>
+    <q-card-main class="column widget-body">
+      <div class="full-width">
+        <q-field label="Value">
+          <big>{{ block.data.value | round }}</big>
+        </q-field>
+        <q-field v-if="pending !== null" class="col" label="Requested">
+          <big>{{ pending | round }}</big>
+        </q-field>
+        <q-field label="Constraints">
+          <AnalogConstraints
+            :service-id="serviceId"
+            :field="block.data.constrainedBy"
+            :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+            readonly
+          />
+        </q-field>
+      </div>
+    </q-card-main>
   </q-card>
 </template>
 

@@ -9,12 +9,6 @@ export default class MutexWidget extends BlockWidget {
   get block(): MutexBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
-
-  get subtitles() {
-    return [
-      'State',
-    ];
-  }
 }
 </script>
 
@@ -36,34 +30,18 @@ export default class MutexWidget extends BlockWidget {
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-carousel v-model="slideIndex" quick-nav class="col">
-      <!-- State -->
-      <q-carousel-slide class="unpadded">
-        <div :class="['widget-body', orientationClass]">
-          <q-card-main class="column col">
-            <q-field class="col" label="Actuator wait time">
-              <InputPopupEdit
-                :field="block.data.differentActuatorWait"
-                :change="callAndSaveBlock(v => block.data.differentActuatorWait = v)"
-                type="number"
-                label="Actuator wait time"
-              />
-            </q-field>
-          </q-card-main>
-        </div>
-      </q-carousel-slide>
-      <q-btn
-        slot-scope="props"
-        slot="quick-nav"
-        :icon="navIcon(props.slide)"
-        :label="navTitle(props.slide)"
-        :class="{inactive: !props.current}"
-        color="white"
-        flat
-        dense
-        @click="props.goToSlide()"
-      />
-    </q-carousel>
+    <q-card-main class="column widget-body">
+      <div class="full-width">
+        <q-field label="Actuator wait time">
+          <InputPopupEdit
+            :field="block.data.differentActuatorWait"
+            :change="callAndSaveBlock(v => block.data.differentActuatorWait = v)"
+            type="number"
+            label="Actuator wait time"
+          />
+        </q-field>
+      </div>
+    </q-card-main>
   </q-card>
 </template>
 

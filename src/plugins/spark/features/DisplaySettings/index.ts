@@ -13,7 +13,7 @@ const feature: Feature = {
   form: ref(form),
   widgetSize: {
     cols: 4,
-    rows: 3,
+    rows: 2,
   },
   // DisplaySettings is a static system object, and can't be created or deleted
   wizard: undefined,

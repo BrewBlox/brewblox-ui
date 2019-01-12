@@ -1,35 +1,38 @@
-import {autoRegister} from '@/helpers/component-ref';
-import {base64ToHex, durationString, hexToBase64, unitDurationString} from '@/helpers/functional';
-import {Link, Unit} from '@/helpers/units';
-import {createFeature} from '@/store/features/actions';
-import {createProvider} from '@/store/providers/actions';
-import {Service} from '@/store/services/state';
-import {RootStore} from '@/store/state';
+import { autoRegister } from '@/helpers/component-ref';
+import { base64ToHex, durationString, hexToBase64, unitDurationString } from '@/helpers/functional';
+import { Link, Unit } from '@/helpers/units';
+import { createFeature } from '@/store/features/actions';
+import { createProvider } from '@/store/providers/actions';
+import { Service } from '@/store/services/state';
+import { RootStore } from '@/store/state';
 import Vue from 'vue';
 import features from './features';
-import {register} from './store';
-import {createUpdateSource, fetchAll} from './store/actions';
+import { register } from './store';
+import { createUpdateSource, fetchAll, fetchDiscoveredBlocks } from './store/actions';
 
 const initialize = async (store: RootStore, service: Service) => {
   await register(store, service);
-  await createUpdateSource(store, service.id);
+  await Promise.all([
+    createUpdateSource(store, service.id),
+    fetchDiscoveredBlocks(store, service.id),
+  ]);
 };
 
-export default ({store}: PluginArguments) => {
+export default ({ store }: PluginArguments) => {
   autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
   autoRegister(require.context('./provider', true, /[A-Z]\w+\.vue$/));
 
   Vue.filter(
-      'unit',
-      (value: Unit|null) =>
-          (value !== null && value !== undefined ? value.toString() : '-'));
+    'unit',
+    (value: Unit | null) =>
+      (value !== null && value !== undefined ? value.toString() : '-'));
   Vue.filter(
-      'link',
-      (value: Link|null) =>
-          (value !== null && value !== undefined ? value.toString() : '-'));
+    'link',
+    (value: Link | null) =>
+      (value !== null && value !== undefined ? value.toString() : '-'));
   Vue.filter(
-      'round',
-      (value: any) => (typeof value !== 'number' ? value : +value.toFixed(2)));
+    'round',
+    (value: any) => (typeof value !== 'number' ? value : +value.toFixed(2)));
   Vue.filter('hexToBase64', hexToBase64);
   Vue.filter('base64ToHex', base64ToHex);
   Vue.filter('duration', durationString);

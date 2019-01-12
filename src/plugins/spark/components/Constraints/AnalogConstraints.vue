@@ -88,7 +88,7 @@ export default class AnalogConstraints extends Constraints {
     <div v-if="!readonly" class="row gutter-x-cs">
       <q-btn label="Add constraint">
         <q-popover>
-          <q-list separator link="">
+          <q-list separator link>
             <q-item
               v-close-overlay
               v-for="opt in constraintOptions"
@@ -98,6 +98,9 @@ export default class AnalogConstraints extends Constraints {
           </q-list>
         </q-popover>
       </q-btn>
+    </div>
+    <div v-if="readonly && constraints.length === 0" class="row">
+      <span>No constraints set</span>
     </div>
   </div>
 </template>

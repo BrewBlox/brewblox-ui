@@ -33,16 +33,6 @@ export default class PidWidget extends BlockWidget {
   get filterOpts() {
     return filters.map((filter, idx) => ({ label: filter, value: idx }));
   }
-
-  gridStyle(items: number) {
-    return {
-      display: 'grid',
-      gridTemplateRows: `repeat(${this.$props.cols >= 4 ? Math.ceil(items / 2) : items}, 1fr)`,
-      gridTemplateColumns: `repeat(${this.$props.cols >= 4 ? 2 : 1}, 1fr)`,
-      gridAutoFlow: 'column',
-      gridGap: "0 5%",
-    };
-  }
 }
 </script>
 
@@ -60,6 +50,7 @@ export default class PidWidget extends BlockWidget {
         display="span"
       />
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
+      <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
       <q-btn slot="right" flat dense round icon="settings" @click="openModal"/>
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
@@ -70,8 +61,7 @@ export default class PidWidget extends BlockWidget {
       type="warning"
       color="warn"
     >This PID is inactive</q-alert>
-
-    <q-card-main class="column widget-body">
+    <q-card-main class="column widget-body-multiple">
       <div :style="gridStyle(6)" class="full-width">
         <q-item>Input</q-item>
         <q-field label="Target">
@@ -110,18 +100,17 @@ export default class PidWidget extends BlockWidget {
           <big>{{ block.data.d | round }}</big>
         </q-field>
       </div>
-      <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v" class="full-width"/>
     </q-card-main>
   </q-card>
 </template>
 
 <style lang="stylus" scoped>
-/deep/ .widget-body .q-field * {
+/deep/ .widget-body-multiple .q-field * {
   padding-top: 0px !important;
   margin-top: 0px !important;
 }
 
-/deep/ .widget-body .q-item {
+/deep/ .widget-body-multiple .q-item {
   padding: 0;
   min-height: 0;
 }
