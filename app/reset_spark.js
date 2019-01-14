@@ -18,7 +18,7 @@ const resetObjects = async () => {
       const resp = await request.post({
         uri: `${host}/${service}/reset_objects`,
         json: content,
-        timeout: 5000,
+        timeout: 70000,
       });
       console.log(resp);
       return;
