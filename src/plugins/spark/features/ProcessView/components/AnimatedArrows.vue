@@ -46,12 +46,13 @@ export default class AnimatedArrows extends Vue {
 
   mounted(){
     interface AnimateMotion extends Element {
-      beginElement();
+      beginElementAt(v: number);
+      getStartTime() : number;
     }
     const allAnimations = document.getElementsByTagName('animateMotion');
-    console.dir(allAnimations);
     [...allAnimations].forEach(element => {
-      (element as AnimateMotion).beginElement();
+      const motion = (element as AnimateMotion);
+      motion.beginElementAt(motion.getStartTime());
     });
   }
 }
