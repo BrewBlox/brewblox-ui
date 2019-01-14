@@ -43,6 +43,17 @@ export default class AnimatedArrows extends Vue {
       ? '1;0'
       : '0;1';
   }
+
+  mounted(){
+    interface AnimateMotion extends Element {
+      beginElement();
+    }
+    const allAnimations = document.getElementsByTagName('animateMotion');
+    console.dir(allAnimations);
+    [...allAnimations].forEach(element => {
+      (element as AnimateMotion).beginElement();
+    });
+  }
 }
 </script>
 
@@ -51,7 +62,7 @@ export default class AnimatedArrows extends Vue {
     <g v-for="start in starts" :key="start" visibility="hidden">
       <path :transform="transform" d="M0,0 l4,4 l-4,4" class="outline"/>
       <!-- Note: SVG attributes are case-sensitive -->
-      <animateMotion
+      <animateMotion 
         :path="$props.path"
         :begin="start"
         :keyPoints="keyPoints"
