@@ -158,7 +158,7 @@ export default class SparkForm extends Vue {
   }
 
   mounted() {
-    fetchAll(this.$store, this.service.id);
+    fetchAll(this.$store, this.service);
   }
 }
 </script>
