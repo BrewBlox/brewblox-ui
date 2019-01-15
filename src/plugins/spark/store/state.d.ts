@@ -10,6 +10,7 @@ export type SparkState = {
   unitAlternatives: UnitAlternatives;
   compatibleBlocks: CompatibleBlocks;
   discoveredBlocks: string[];
+  savepoints: string[];
   updateSource: EventSource | null;
   lastStatus: SystemStatus | null;
 };

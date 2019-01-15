@@ -67,6 +67,18 @@ export const fetchCompatibleBlocks = async (
 export const fetchDiscoveredBlocks = async (serviceId: string): Promise<string[]> =>
   get(`/${encodeURIComponent(serviceId)}/discover_objects`);
 
+export const fetchSavepoints = async (serviceId: string): Promise<string[]> =>
+  get(`/${encodeURIComponent(serviceId)}/savepoints`);
+
+export const writeSavepoint = async (serviceId: string, savepointId: string): Promise<string[]> =>
+  put(`/${encodeURIComponent(serviceId)}/savepoints/${encodeURIComponent(savepointId)}`, {});
+
+export const applySavepoint = async (serviceId: string, savepointId: string): Promise<string[]> =>
+  post(`/${encodeURIComponent(serviceId)}/savepoints/${encodeURIComponent(savepointId)}`, {});
+
+export const removeSavepoint = async (serviceId: string, savepointId: string): Promise<string[]> =>
+  del(`/${encodeURIComponent(serviceId)}/savepoints/${encodeURIComponent(savepointId)}`, {});
+
 export const validateService = async (serviceId: string): Promise<boolean> =>
   get(`/${encodeURIComponent(serviceId)}/_service/status`)
     .then(retv => retv.status === 'ok')

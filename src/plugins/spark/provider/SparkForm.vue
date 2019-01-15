@@ -7,6 +7,10 @@ import {
   updateProfileNames,
   clearDiscoveredBlocks,
   fetchDiscoveredBlocks,
+  writeSavepoint,
+  applySavepoint,
+  removeSavepoint,
+  fetchAll,
 } from '@/plugins/spark/store/actions';
 import {
   profileNames,
@@ -14,6 +18,7 @@ import {
   units,
   blockValues,
   discoveredBlocks,
+  savepoints,
 } from '@/plugins/spark/store/getters';
 import { Notify } from 'quasar';
 import WiFiSettingsPopup from './WiFiSettingsPopup.vue';
@@ -48,6 +53,7 @@ import {
 })
 export default class SparkForm extends Vue {
   wifiModal: boolean = false;
+  savepointInput: string = '';
 
   sysBlock<T extends Block>(blockType: string) {
     return blockValues(this.$store, this.service.id)
@@ -105,6 +111,10 @@ export default class SparkForm extends Vue {
     return discoveredBlocks(this.$store, this.service.id);
   }
 
+  get savepoints() {
+    return savepoints(this.$store, this.service.id);
+  }
+
   unitAlternativeOptions(name: string) {
     return (this.unitAlternatives[name] || [])
       .map(val => ({ label: val, value: val }));
@@ -133,6 +143,22 @@ export default class SparkForm extends Vue {
 
   spaceCased(input: string) {
     return spaceCased(input);
+  }
+
+  writeSavepoint(point: string) {
+    writeSavepoint(this.$store, this.service.id, point);
+  }
+
+  applySavepoint(point: string) {
+    applySavepoint(this.$store, this.service.id, point);
+  }
+
+  removeSavepoint(point: string) {
+    removeSavepoint(this.$store, this.service.id, point);
+  }
+
+  mounted() {
+    fetchAll(this.$store, this.service.id);
   }
 }
 </script>
@@ -179,7 +205,12 @@ export default class SparkForm extends Vue {
       </div>
     </q-collapsible>
 
-    <q-collapsible group="modal" class="col-12" icon="mdi-checkbox-multiple-marked" label="Profiles">
+    <q-collapsible
+      group="modal"
+      class="col-12"
+      icon="mdi-checkbox-multiple-marked"
+      label="Profiles"
+    >
       <div>
         <q-field label="Active profiles" orientation="vertical">
           <ProfilesPopupEdit
@@ -217,7 +248,12 @@ export default class SparkForm extends Vue {
       </div>
     </q-collapsible>
 
-    <q-collapsible group="modal" class="col-12" icon="mdi-magnify-plus-outline" label="Discovered Blocks">
+    <q-collapsible
+      group="modal"
+      class="col-12"
+      icon="mdi-magnify-plus-outline"
+      label="Discovered Blocks"
+    >
       <div>
         <q-field class="col column" label="Discovered blocks" orientation="vertical">
           <div class="row">
@@ -229,59 +265,45 @@ export default class SparkForm extends Vue {
       </div>
     </q-collapsible>
 
-    <div v-if="false">
-      <q-card>
-        <q-card-title>System Info</q-card-title>
-        <q-card-main>
-          <q-field label="Device ID">
-            <big>{{ service.id }}</big>
-          </q-field>
-          <q-field label="Time since boot">
-            <big>{{ ticks.data.millisSinceBoot | duration }}</big>
-          </q-field>
-          <q-field label="Date">
-            <big>{{ sysDate }}</big>
-          </q-field>
-        </q-card-main>
-      </q-card>
-      <q-card>
-        <q-card-title>Profiles</q-card-title>
-        <q-card-main>
-          <q-field label="Active profiles" orientation="vertical">
-            <ProfilesPopupEdit
-              :field="profiles.data.active"
-              :service-id="service.id"
-              :change="v => { profiles.data.active = v; saveBlock(profiles); }"
+    <q-collapsible group="modal" class="col-12" icon="mdi-content-save-all" label="Savepoints">
+      <q-list no-border separator>
+        <q-item v-for="point in savepoints" :key="point">
+          <q-item-main>{{ point }}</q-item-main>
+          <q-item-side right>
+            <q-btn flat rounded label="Save" @click="writeSavepoint(point)"/>
+            <q-btn flat rounded label="Load" @click="applySavepoint(point)"/>
+            <q-btn flat rounded label="Delete" @click="removeSavepoint(point)"/>
+          </q-item-side>
+        </q-item>
+        <q-item>
+          <q-item-main>
+            <q-input
+              v-model="savepointInput"
+              :error="savepoints.includes(savepointInput)"
+              placeholder="New Savepoint"
+              clearable
             />
-          </q-field>
-          <q-field class="col column" label="Profile names" orientation="vertical">
-            <div v-for="(name, idx) in profileNames" :key="idx" class="col row">
-              <q-field :label="`Profile ${idx + 1}`" class="col">
-                <InputPopupEdit
-                  :field="name"
-                  :change="v => { profileNames[idx] = v; saveProfileNames(); }"
-                  label="Profile"
-                />
-              </q-field>
-            </div>
-          </q-field>
-        </q-card-main>
-      </q-card>
-      <q-card>
-        <q-card-title>Units</q-card-title>
-        <q-card-main>
-          <q-field class="col column" label="Unit preferences" orientation="vertical">
-            <q-field v-for="(val, name) in units" :key="name" :label="spaceCased(name)" class="col">
-              <SelectPopupEdit
-                :field="val"
-                :change="v => { units[name] = v; saveUnits(); }"
-                :options="unitAlternativeOptions(name)"
-                label="Preferred unit"
-              />
-            </q-field>
-          </q-field>
-        </q-card-main>
-      </q-card>
-    </div>
+          </q-item-main>
+          <q-item-side right>
+            <q-btn
+              :disable="!savepointInput || savepoints.includes(savepointInput)"
+              flat
+              rounded
+              label="Create"
+              @click="() => { writeSavepoint(savepointInput); savepointInput = ''; }"
+            />
+          </q-item-side>
+        </q-item>
+      </q-list>
+    </q-collapsible>
   </div>
 </template>
+
+<style scoped>
+.savepoint-grid {
+  display: grid;
+  align-content: center;
+  grid-gap: 15px;
+  grid-template-columns: auto auto auto auto;
+}
+</style>
