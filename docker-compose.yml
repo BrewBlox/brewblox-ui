@@ -38,6 +38,7 @@ services:
 
   sparkey:
     image: brewblox/brewblox-devcon-spark:develop
+    privileged: true
     depends_on:
       - eventbus
       - datastore
@@ -65,7 +66,7 @@ services:
     depends_on:
       - datastore
     volumes:
-      - ./app/dist:/usr/share/nginx/html
+      - ./dist:/usr/share/nginx/html
     labels:
       - "traefik.port=80"
       - "traefik.frontend.rule=PathPrefix: /"
