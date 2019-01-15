@@ -26,6 +26,7 @@ export const getters: GetterTree<SparkState, RootState> = {
   unitAlternatives: (state: SparkState): UnitAlternatives => state.unitAlternatives,
   compatibleBlocks: (state: SparkState): CompatibleBlocks => state.compatibleBlocks,
   discoveredBlocks: (state: SparkState): string[] => state.discoveredBlocks,
+  savepoints: (state: SparkState): string[] => state.savepoints,
   updateSource: (state: SparkState): EventSource | null => state.updateSource,
   lastStatus: (state: SparkState): SystemStatus | null => state.lastStatus,
 };
@@ -37,6 +38,7 @@ export const units = read(getters.units);
 export const unitAlternatives = read(getters.unitAlternatives);
 export const compatibleBlocks = read(getters.compatibleBlocks);
 export const discoveredBlocks = read(getters.discoveredBlocks);
+export const savepoints = read(getters.savepoints);
 export const updateSource = read(getters.updateSource);
 export const lastStatus = read(getters.lastStatus);
 

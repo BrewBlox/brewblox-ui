@@ -22,6 +22,10 @@ import {
   renameBlock as renameBlockInApi,
   validateService as validateServiceInApi,
   fetchSystemStatus as fetchSystemStatusInApi,
+  fetchSavepoints as fetchSavepointsInApi,
+  writeSavepoint as writeSavepointInApi,
+  applySavepoint as applySavepointInApi,
+  removeSavepoint as removeSavepointInApi,
 } from './api';
 import {
   blockIds,
@@ -39,6 +43,7 @@ import {
   setUnits as setUnitsInStore,
   setUpdateSource as setUpdateSourceInStore,
   setLastStatus as setLastStatusInStore,
+  setSavepoints as setSavepointsInStore,
 } from './mutations';
 import { BlocksContext, SparkState } from './state';
 
@@ -125,11 +130,15 @@ export const fetchDiscoveredBlocks = async (store: RootStore, serviceId: string)
 export const clearDiscoveredBlocks = async (store: RootStore, serviceId: string) =>
   setDiscoveredBlocksInStore(store, serviceId, []);
 
+export const fetchSavepoints = async (store: RootStore, serviceId: string) =>
+  setSavepointsInStore(store, serviceId, await fetchSavepointsInApi(serviceId));
+
 export const fetchAll = async (store: RootStore, service: Service) =>
   Promise.all([
     fetchServiceStatus(store, service.id),
     fetchUnits(store, service.id),
     fetchUnitAlternatives(store, service.id),
+    fetchSavepoints(store, service.id),
   ]);
 
 export const createUpdateSource = async (store: RootStore, serviceId: string) =>
@@ -145,3 +154,16 @@ export const createUpdateSource = async (store: RootStore, serviceId: string) =>
 
 export const validateService = async (serviceId: string) =>
   validateServiceInApi(serviceId);
+
+export const writeSavepoint = async (store: RootStore, serviceId: string, savepointId: string) => {
+  await writeSavepointInApi(serviceId, savepointId);
+  await fetchSavepoints(store, serviceId);
+};
+
+export const applySavepoint = async (store: RootStore, serviceId: string, savepointId: string) =>
+  applySavepointInApi(serviceId, savepointId);
+
+export const removeSavepoint = async (store: RootStore, serviceId: string, savepointId: string) => {
+  await removeSavepointInApi(serviceId, savepointId);
+  await fetchSavepoints(store, serviceId);
+};
