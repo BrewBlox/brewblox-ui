@@ -56,7 +56,6 @@ export default class GraphCard extends Vue {
     if (this.metrics.length === 0) {
       return 'No data';
     }
-
     return null;
   }
 
