@@ -8,7 +8,7 @@ import Component from 'vue-class-component';
       type: Function,
       required: true,
     },
-    buttons: {
+    displayToolbar: {
       type: Boolean,
       default: true,
     },

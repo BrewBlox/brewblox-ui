@@ -35,7 +35,7 @@ export default class ProcessViewForm extends Vue {
   <div class="widget-modal">
     <q-btn
       v-close-overlay
-      v-if="$props.buttons"
+      v-if="$props.displayToolbar"
       rounded
       label="close"
       icon="close"
