@@ -29,23 +29,31 @@ export default class SparkPage extends Vue {
   $q: any;
   editable: boolean = false;
   modalOpen: boolean = false;
+  volatileItems: { [blockId: string]: DashboardItem } = {};
 
   get dashboards(): Dashboard[] {
     return allDashboards(this.$store);
   }
 
   defaultItem(block: Block): DashboardItem {
-    return {
-      id: block.id,
-      feature: block.type,
-      order: 0,
-      dashboard: '',
-      config: {
-        serviceId: block.serviceId,
-        blockId: block.id,
-      },
-      ...widgetSizeById(this.$store, block.type),
-    };
+    const existing = this.volatileItems[block.id];
+    if (!existing || existing.feature !== block.type) {
+      this.$set(
+        this.volatileItems,
+        block.id,
+        {
+          id: block.id,
+          feature: block.type,
+          order: 0,
+          dashboard: '',
+          config: {
+            serviceId: block.serviceId,
+            blockId: block.id,
+          },
+          ...widgetSizeById(this.$store, block.type),
+        });
+    }
+    return this.volatileItems[block.id];
   }
 
   get isAvailable() {
@@ -149,8 +157,12 @@ export default class SparkPage extends Vue {
       .catch(() => { });
   }
 
-  onWidgetChange() {
-    this.$q.notify('Widget settings can\'t be saved in this page');
+  onWidgetChange(id: string, config: any) {
+    this.volatileItems[id].config = { ...config };
+    this.$q.notify({
+      type: 'warning',
+      message: 'Changes will not be persisted',
+    });
   }
 }
 </script>
@@ -179,6 +191,15 @@ export default class SparkPage extends Vue {
       <q-modal v-model="modalOpen">
         <NewBlockWizard v-if="modalOpen" :service-id="serviceId" :on-create-block="onCreateBlock"/>
       </q-modal>
+      <q-alert
+        class="col-12"
+        icon="info"
+        color="dark-bright"
+        style="margin-bottom: 20px;"
+      >This service page shows all blocks that are running on your Spark controller.
+        <br>Changing the widget name here will change the block name.
+        <br>Deleting blocks on this page will remove them on the controller.
+      </q-alert>
       <grid-container>
         <SparkWidget
           v-if="isReady && !statusNok"
