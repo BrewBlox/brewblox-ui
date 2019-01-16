@@ -106,7 +106,7 @@ export default class NewBlockWizard extends Vue {
         :field="block"
         :change="v => block = v"
         :change-id="v => block.id = v"
-        :buttons="false"
+        :display-toolbar="false"
       />
     </q-card>
     <q-card v-else dark>

@@ -49,7 +49,7 @@ export default class PidForm extends BlockForm {
 
 <template>
   <div class="widget-modal column">
-    <q-toolbar v-if="$props.buttons" color="primary" class="unpadded">
+    <q-toolbar v-if="$props.displayToolbar" color="primary" class="unpadded">
       <q-toolbar-title>{{ block.id }} settings</q-toolbar-title>
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>

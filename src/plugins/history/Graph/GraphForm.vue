@@ -1,12 +1,15 @@
 <script lang="ts">
+import set from 'lodash/set';
+import get from 'lodash/get';
 import { GraphConfig } from '@/components/Graph/state';
 import FormBase from '@/components/Widget/FormBase';
 import { durationString } from '@/helpers/functional';
 import { fetchKnownKeys } from '@/store/history/actions';
-import { measurements } from '@/store/history/getters';
+import { measurements, fields } from '@/store/history/getters';
 import { QueryTarget } from '@/store/history/state';
 import Component from 'vue-class-component';
 import FieldPopupEdit from './FieldPopupEdit.vue';
+import { isString } from 'util';
 
 interface PeriodDisplay {
   start: boolean;
@@ -16,7 +19,7 @@ interface PeriodDisplay {
 
 @Component({
   props: {
-    buttons: {
+    displayToolbar: {
       type: Boolean,
       default: true,
     },
@@ -28,6 +31,7 @@ interface PeriodDisplay {
 export default class GraphForm extends FormBase {
   $q: any;
   period: PeriodDisplay | null = null;
+  selectFilter: string | null = null;
 
   get periodOptions() {
     return [
@@ -82,61 +86,82 @@ export default class GraphForm extends FormBase {
     return this.$props.field as GraphConfig;
   }
 
+  get fields() {
+    return fields(this.$store) as { [key: string]: string[] };
+  }
+
+  nodeRecurser(parent: string[], key: string, val: string | any) {
+    if (isString(val)) {
+      return { label: key, value: [...parent, key].join('/') };
+    }
+    return {
+      label: key,
+      value: [...parent, key].join('/'),
+      children: Object.entries(val)
+        .map(([k, v]) => this.nodeRecurser([...parent, key], k, v)),
+    };
+  };
+
+  get nodes() {
+    const raw = Object.entries(this.fields)
+      .reduce(
+        (acc, [k, fieldKeys]) => {
+          fieldKeys.forEach(fkey => {
+            const splitKeys = fkey.split('/');
+            set(acc, [k, ...splitKeys], splitKeys.pop());
+          });
+          return acc;
+        },
+        {},
+    );
+    return Object.entries(raw)
+      .map(([k, v]) => this.nodeRecurser([], k, v));
+  }
+
+  get selected(): string[] | null {
+    return this.config.targets
+      .reduce(
+        (acc: string[], tar: QueryTarget) =>
+          ([...acc, ...tar.fields.map(f => `${tar.measurement}/${f}`)]),
+        []
+      );
+  }
+
+  set selected(vals: string[] | null) {
+    vals = vals || [];
+    this.saveConfig({
+      ...this.config,
+      targets: vals.reduce(
+        (acc: QueryTarget[], v: string) => {
+          const [measurement, ...keys] = v.split('/');
+          const field = keys.join('/');
+          const existing = acc.find(t => t.measurement == measurement);
+          if (existing) {
+            existing.fields.push(field);
+            return acc;
+          }
+          return [...acc, { measurement, fields: [field] }];
+        },
+        [],
+      ),
+    });
+  }
+
+  get renames() {
+    return this.config.renames;
+  }
+
   created() {
     fetchKnownKeys(this.$store);
   }
 
   saveConfig(config: GraphConfig = this.config) {
+    console.log(config.targets);
     this.$props.change(config);
   }
 
   callAndSaveConfig(func: (v: any) => void) {
     return (v: any) => { func(v); this.saveConfig(); };
-  }
-
-  addTarget() {
-    this.$q.dialog({
-      title: 'Add data source',
-      message: 'Select data source',
-      cancel: true,
-      options: {
-        type: 'radio',
-        model: 'opt2',
-        items: measurements(this.$store)
-          .map(m => ({ label: m, value: m })),
-      },
-    }).then((m: string) => {
-      this.config.targets.push({ measurement: m, fields: [] });
-      this.saveConfig();
-    });
-  }
-
-  removeTarget(index: number) {
-    this.config.targets = this.config.targets.filter((_, idx) => idx !== index);
-  }
-
-  removeField(target: QueryTarget, index: number) {
-    target.fields = target.fields.filter((_, idx) => idx !== index);
-  }
-
-  fieldRename(target: QueryTarget, field: string) {
-    if (!field) {
-      return '';
-    }
-    const key = `${target.measurement}/${field}`;
-    return this.config.renames[`${target.measurement}/${field}`] || key;
-  }
-
-  changeFieldRename(target: QueryTarget, field: string, name: string) {
-    if (!field) {
-      return;
-    }
-    const defaultKey = `${target.measurement}/${field}`;
-    if (!name || name === defaultKey) {
-      delete this.config.renames[defaultKey];
-    } else {
-      this.config.renames[defaultKey] = name;
-    }
   }
 
   parseDuration(val: string): string {
@@ -146,19 +171,15 @@ export default class GraphForm extends FormBase {
 </script>
 
 <template>
-  <div class="widget-modal">
-    <q-btn
-      v-close-overlay
-      v-if="$props.buttons"
-      rounded
-      label="close"
-      icon="close"
-      style="position: absolute; right: 18px; top: 18px"
-    />
-    <q-card dark>
-      <q-card-title>Settings</q-card-title>
-      <q-card-main>
-        <q-field class="col" label="Points after downsampling">
+  <div class="widget-modal column">
+    <q-toolbar v-if="$props.displayToolbar" class="unpadded">
+      <q-toolbar-title>Graph Widget</q-toolbar-title>
+      <q-btn v-close-overlay flat rounded label="close"/>
+    </q-toolbar>
+
+    <q-collapsible group="modal" class="col-12" icon="info" label="Period settings">
+      <div>
+        <q-field label="Points after downsampling">
           <InputPopupEdit
             :field="config.params.approxPoints"
             :change="callAndSaveConfig(v => config.params.approxPoints = v)"
@@ -166,7 +187,7 @@ export default class GraphForm extends FormBase {
             type="number"
           />
         </q-field>
-        <q-field class="col" label="Display type">
+        <q-field label="Display type">
           <SelectPopupEdit
             :field="shownPeriod"
             :options="periodOptions"
@@ -174,12 +195,8 @@ export default class GraphForm extends FormBase {
             label="Display type"
           />
         </q-field>
-      </q-card-main>
-    </q-card>
-    <q-card dark>
-      <q-card-title>Period settings</q-card-title>
-      <q-card-main>
-        <q-field v-if="shownPeriod.start" class="col" label="Start time">
+        <q-item-separator/>
+        <q-field v-if="shownPeriod.start" label="Start time">
           <DatetimePopupEdit
             :field="config.params.start"
             :change="callAndSaveConfig(v => config.params.start = v)"
@@ -187,7 +204,7 @@ export default class GraphForm extends FormBase {
             display="big"
           />
         </q-field>
-        <q-field v-if="shownPeriod.duration" class="col" label="Duration">
+        <q-field v-if="shownPeriod.duration" label="Duration">
           <InputPopupEdit
             :field="config.params.duration"
             :change="callAndSaveConfig(v => config.params.duration = parseDuration(v))"
@@ -195,7 +212,7 @@ export default class GraphForm extends FormBase {
             label="Duration"
           />
         </q-field>
-        <q-field v-if="shownPeriod.end" class="col" label="End time">
+        <q-field v-if="shownPeriod.end" label="End time">
           <DatetimePopupEdit
             :field="config.params.end"
             :change="callAndSaveConfig(v => config.params.end = v)"
@@ -203,84 +220,40 @@ export default class GraphForm extends FormBase {
             display="big"
           />
         </q-field>
-        <!-- <div class="options-edit-container"></div> -->
-      </q-card-main>
-    </q-card>
-    <q-card v-for="(target, targetIdx) in config.targets" :key="targetIdx" dark>
-      <q-card-title>
-        {{ target.measurement }}
-        <q-btn
-          slot="right"
-          flat
-          dense
-          icon="delete"
-          label="Delete source"
-          @click="removeTarget(targetIdx); saveConfig();"
-        />
-      </q-card-title>
-      <q-card-main>
-        <div v-for="(field, fieldIdx) in target.fields" :key="fieldIdx" class="row no-wrap">
-          <q-field class="col" label="Field" orientation="vertical">
-            <FieldPopupEdit
-              :field="field"
-              :measurement="target.measurement"
-              :change="callAndSaveConfig(v => target.fields[fieldIdx] = v)"
-              label="field"
-            />
-          </q-field>
-          <q-field class="col" label="Display name" orientation="vertical">
-            <InputPopupEdit
-              :disabled="!field"
-              :field="fieldRename(target, field)"
-              :change="callAndSaveConfig(v => changeFieldRename(target, field, v))"
-              clearable
-              label="Display name"
-            />
-          </q-field>
-          <q-field class="col1" label=" " orientation="vertical">
-            <q-btn flat dense icon="delete" @click="removeField(target, fieldIdx); saveConfig();"/>
-          </q-field>
+      </div>
+    </q-collapsible>
+
+    <q-collapsible group="modal" class="col-12" icon="info" label="Legend">
+      <q-list no-border separator>
+        <q-item v-for="field in selected" :key="field">
+          <q-item-main>{{ field }}</q-item-main>
+          <InputPopupEdit
+            :field="renames[field]"
+            :change="callAndSaveConfig(v => config.renames[field] = v)"
+            label="Legend"
+            clearable
+          />
+        </q-item>
+        <q-item v-if="!selected || selected.length == 0">
+          <q-item-main class="darkened">No metrics selected</q-item-main>
+        </q-item>
+      </q-list>
+    </q-collapsible>
+
+    <q-collapsible group="modal" class="col-12" icon="info" label="Metrics">
+      <div>
+        <div class="q-mb-sm row no-wrap items-center">
+          <q-input v-model="selectFilter" stack-label="Filter" class="q-ma-none" clearable/>
         </div>
-      </q-card-main>
-      <q-card-main>
-        <q-btn flat dense icon="add" label="Add field" @click="target.fields.push('')"/>
-      </q-card-main>
-    </q-card>
-    <q-card dark>
-      <q-card-main>
-        <q-btn flat dense label="Add source" @click="addTarget"/>
-      </q-card-main>
-    </q-card>
+        <q-tree
+          :nodes="nodes"
+          :ticked.sync="selected"
+          :filter="selectFilter"
+          tick-strategy="leaf-filtered"
+          dark
+          node-key="value"
+        />
+      </div>
+    </q-collapsible>
   </div>
 </template>
-
-<style scoped lang="stylus">
-@import '../../../../src/css/app.styl';
-
-.options-edit-container > .q-icon {
-  margin: 0 15px 0 5px;
-}
-
-.options-edit-container {
-  background: $dark;
-  padding: 10px;
-  display: flex;
-  margin-bottom: 10px;
-}
-
-.options-field {
-  width: 160px;
-  margin-right: 15px;
-}
-
-.options-edit-container .q-btn.q-btn-flat {
-  margin-right: auto;
-}
-
-.q-card {
-  min-width: 400px;
-  width: 100%;
-  margin-bottom: 10px;
-}
-</style>
-
