@@ -223,23 +223,6 @@ export default class GraphForm extends FormBase {
       </div>
     </q-collapsible>
 
-    <q-collapsible group="modal" class="col-12" icon="info" label="Legend">
-      <q-list no-border separator>
-        <q-item v-for="field in selected" :key="field">
-          <q-item-main>{{ field }}</q-item-main>
-          <InputPopupEdit
-            :field="renames[field]"
-            :change="callAndSaveConfig(v => config.renames[field] = v)"
-            label="Legend"
-            clearable
-          />
-        </q-item>
-        <q-item v-if="!selected || selected.length == 0">
-          <q-item-main class="darkened">No metrics selected</q-item-main>
-        </q-item>
-      </q-list>
-    </q-collapsible>
-
     <q-collapsible group="modal" class="col-12" icon="info" label="Metrics">
       <div>
         <div class="q-mb-sm row no-wrap items-center">
@@ -254,6 +237,27 @@ export default class GraphForm extends FormBase {
           node-key="value"
         />
       </div>
+    </q-collapsible>
+
+    <q-collapsible group="modal" class="col-12" icon="info" label="Legend">
+      <q-list no-border separator>
+        <q-item>
+          <q-item-main>Metric</q-item-main>Display as
+        </q-item>
+        <q-item v-for="field in selected" :key="field">
+          <q-item-main>{{ field }}</q-item-main>
+          <InputPopupEdit
+            :field="renames[field]"
+            :change="callAndSaveConfig(v => config.renames[field] = v)"
+            label="Legend"
+            clearable
+            display="span"
+          />
+        </q-item>
+        <q-item v-if="!selected || selected.length == 0">
+          <q-item-main class="darkened">No metrics selected</q-item-main>
+        </q-item>
+      </q-list>
     </q-collapsible>
   </div>
 </template>
