@@ -41,7 +41,7 @@ export default class BlockGraph extends Vue {
     return durationString(val);
   }
 
-  @Watch('graphCfg', { immediate: true })
+  @Watch('graphCfg')
   onCfgChange() {
     // Vue considers configuration "changed" with every block data update
     // To avoid constantly refreshing metrics, we need to do a deep compare
@@ -50,6 +50,10 @@ export default class BlockGraph extends Vue {
       this.prevStrConfig = strConfig;
       this.$nextTick(() => this.$refs.graph && (this.$refs.graph as any).resetMetrics());
     }
+  }
+
+  mounted() {
+    this.prevStrConfig = JSON.stringify(this.graphCfg);
   }
 }
 </script>
