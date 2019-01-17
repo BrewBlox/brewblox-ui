@@ -14,4 +14,5 @@ import Component from 'vue-class-component';
   },
 })
 export default class FormBase extends Vue {
+  $q: any;
 }

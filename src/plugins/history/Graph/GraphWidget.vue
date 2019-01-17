@@ -40,9 +40,8 @@ export default class GraphWidget extends WidgetBase {
       <q-btn slot="right" flat round dense icon="refresh" @click="regraph"/>
     </q-card-title>
     <q-card-separator/>
-    <div>
+    <div class="widget-body">
       <GraphCard ref="graph" :id="$props.id" :config="graphCfg"/>
     </div>
   </q-card>
 </template>
-

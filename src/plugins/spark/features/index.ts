@@ -1,4 +1,4 @@
-import {Feature} from '@/store/features/state';
+import { Feature } from '@/store/features/state';
 import ActuatorAnalogMock from './ActuatorAnalogMock';
 import ActuatorDS2413 from './ActuatorDS2413';
 import ActuatorOffset from './ActuatorOffset';
@@ -11,13 +11,14 @@ import InactiveObject from './InactiveObject';
 import Mutex from './Mutex';
 import Pid from './Pid';
 import ProcessView from './ProcessView';
+import SessionView from './SessionView';
 import SetpointProfile from './SetpointProfile';
 import SetpointSensorPair from './SetpointSensorPair';
 import SetpointSimple from './SetpointSimple';
 import TempSensorMock from './TempSensorMock';
 import TempSensorOneWire from './TempSensorOneWire';
 
-const features: {[id: string]: Feature} = {
+const features: { [id: string]: Feature } = {
   ActuatorAnalogMock,
   ActuatorDS2413,
   ActuatorOffset,
@@ -35,6 +36,7 @@ const features: {[id: string]: Feature} = {
   ProcessView,
   TempSensorMock,
   TempSensorOneWire,
+  SessionView,
 };
 
 export default features;

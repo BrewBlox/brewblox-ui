@@ -23,6 +23,14 @@ import { Watch } from 'vue-property-decorator';
       type: String,
       default: '',
     },
+    noDuration: {
+      type: Boolean,
+      default: false,
+    },
+    buttonSize: {
+      type: String,
+      default: 'md',
+    },
   },
 })
 export default class BlockGraph extends Vue {
@@ -68,7 +76,7 @@ export default class BlockGraph extends Vue {
             <q-btn v-close-overlay rounded color="dark-bright" icon="close" label="close"/>
           </q-item-side>
         </q-item>
-        <q-item>
+        <q-item v-if="!$props.noDuration">
           <q-item-side right>
             <q-field label="Duration">
               <InputPopupEdit
@@ -84,8 +92,9 @@ export default class BlockGraph extends Vue {
     </q-modal>
     <q-btn
       :label="$props.label"
+      :size="$props.buttonSize"
       flat
-      round
+      rounded
       dense
       icon="mdi-chart-line"
       @click="() => modalOpen = true"

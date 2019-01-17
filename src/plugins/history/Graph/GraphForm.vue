@@ -2,6 +2,7 @@
 import set from 'lodash/set';
 import get from 'lodash/get';
 import { GraphConfig } from '@/components/Graph/state';
+import { nodeBuilder, targetSplitter, targetBuilder } from '@/components/Graph/functional';
 import FormBase from '@/components/Widget/FormBase';
 import { durationString } from '@/helpers/functional';
 import { fetchKnownKeys } from '@/store/history/actions';
@@ -29,7 +30,6 @@ interface PeriodDisplay {
   },
 })
 export default class GraphForm extends FormBase {
-  $q: any;
   period: PeriodDisplay | null = null;
   selectFilter: string | null = null;
 
@@ -90,61 +90,16 @@ export default class GraphForm extends FormBase {
     return fields(this.$store) as { [key: string]: string[] };
   }
 
-  nodeRecurser(parent: string[], key: string, val: string | any) {
-    if (isString(val)) {
-      return { label: key, value: [...parent, key].join('/') };
-    }
-    return {
-      label: key,
-      value: [...parent, key].join('/'),
-      children: Object.entries(val)
-        .map(([k, v]) => this.nodeRecurser([...parent, key], k, v)),
-    };
-  };
-
   get nodes() {
-    const raw = Object.entries(this.fields)
-      .reduce(
-        (acc, [k, fieldKeys]) => {
-          fieldKeys.forEach(fkey => {
-            const splitKeys = fkey.split('/');
-            set(acc, [k, ...splitKeys], splitKeys.pop());
-          });
-          return acc;
-        },
-        {},
-    );
-    return Object.entries(raw)
-      .map(([k, v]) => this.nodeRecurser([], k, v));
+    return nodeBuilder(this.fields);
   }
 
   get selected(): string[] | null {
-    return this.config.targets
-      .reduce(
-        (acc: string[], tar: QueryTarget) =>
-          ([...acc, ...tar.fields.map(f => `${tar.measurement}/${f}`)]),
-        []
-      );
+    return targetSplitter(this.config.targets);
   }
 
   set selected(vals: string[] | null) {
-    vals = vals || [];
-    this.saveConfig({
-      ...this.config,
-      targets: vals.reduce(
-        (acc: QueryTarget[], v: string) => {
-          const [measurement, ...keys] = v.split('/');
-          const field = keys.join('/');
-          const existing = acc.find(t => t.measurement == measurement);
-          if (existing) {
-            existing.fields.push(field);
-            return acc;
-          }
-          return [...acc, { measurement, fields: [field] }];
-        },
-        [],
-      ),
-    });
+    this.saveConfig({ ...this.config, targets: targetBuilder(vals || []) });
   }
 
   get renames() {
@@ -156,7 +111,6 @@ export default class GraphForm extends FormBase {
   }
 
   saveConfig(config: GraphConfig = this.config) {
-    console.log(config.targets);
     this.$props.change(config);
   }
 
@@ -177,7 +131,7 @@ export default class GraphForm extends FormBase {
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
 
-    <q-collapsible group="modal" class="col-12" icon="info" label="Period settings">
+    <q-collapsible group="modal" class="col-12" icon="mdi-timetable" label="Period settings">
       <div>
         <q-field label="Points after downsampling">
           <InputPopupEdit
@@ -223,7 +177,7 @@ export default class GraphForm extends FormBase {
       </div>
     </q-collapsible>
 
-    <q-collapsible group="modal" class="col-12" icon="info" label="Metrics">
+    <q-collapsible group="modal" class="col-12" icon="mdi-file-tree" label="Metrics">
       <div>
         <div class="q-mb-sm row no-wrap items-center">
           <q-input v-model="selectFilter" stack-label="Filter" class="q-ma-none" clearable/>
@@ -239,7 +193,7 @@ export default class GraphForm extends FormBase {
       </div>
     </q-collapsible>
 
-    <q-collapsible group="modal" class="col-12" icon="info" label="Legend">
+    <q-collapsible group="modal" class="col-12" icon="mdi-tag-multiple" label="Legend">
       <q-list no-border separator>
         <q-item>
           <q-item-main>Metric</q-item-main>Display as
@@ -254,7 +208,7 @@ export default class GraphForm extends FormBase {
             display="span"
           />
         </q-item>
-        <q-item v-if="!selected || selected.length == 0">
+        <q-item v-if="!selected || selected.length === 0">
           <q-item-main class="darkened">No metrics selected</q-item-main>
         </q-item>
       </q-list>
