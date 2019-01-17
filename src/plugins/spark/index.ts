@@ -41,6 +41,22 @@ export default ({ store }: PluginArguments) => {
     return strVal.length <= 30 ? strVal : `${strVal.slice(0, 27)}...`;
   });
   Vue.filter('unitDuration', unitDurationString);
+  Vue.filter('dateString', (value: number | string | null) => {
+    if (value === null || value === undefined) {
+      return '<not set>';
+    }
+    return new Date(value).toLocaleString();
+  });
+  Vue.filter('shortDateString', (value: number | string | null) => {
+    if (value === null || value === undefined) {
+      return '<not set>';
+    }
+    const date = new Date(value);
+    if (Math.abs(new Date().getTime() - date.getTime()) < (24 * 3600 * 1000)) {
+      return date.toLocaleTimeString();
+    }
+    return date.toLocaleDateString();
+  });
 
   Object.values(features).forEach(feature => createFeature(store, feature));
 

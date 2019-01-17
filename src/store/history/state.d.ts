@@ -3,9 +3,9 @@ import { ActionContext } from 'vuex';
 
 export interface QueryParams {
   database?: string;
-  start?: string;
+  start?: string | number;
   duration?: string;
-  end?: string;
+  end?: string | number;
   limit?: number;
   orderBy?: string;
   approxPoints?: number;

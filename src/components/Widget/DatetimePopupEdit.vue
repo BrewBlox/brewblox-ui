@@ -20,15 +20,27 @@ import Component from 'vue-class-component';
       type: String,
       default: 'span',
     },
+    short: {
+      type: Boolean,
+      default: false,
+    },
+    resetIcon: {
+      type: String,
+      default: 'restore',
+    },
   },
 })
 export default class DatetimePopupEdit extends Vue {
   placeholder = -1; // must not equal clear-value
 
   get dateString() {
-    return this.$props.field
-      ? new Date(this.$props.field).toLocaleString()
-      : '<not set>';
+    if (!this.$props.field) {
+      return '<not set>';
+    }
+    const date = new Date(this.$props.field);
+    return this.$props.short
+      ? date.toLocaleDateString()
+      : date.toLocaleString();
   }
 
   startEdit() {
@@ -57,7 +69,7 @@ export default class DatetimePopupEdit extends Vue {
         v-model="placeholder"
         :after="[
           {
-            icon: 'restore',
+            icon: $props.resetIcon,
             handler: () => placeholder = new Date().getTime(),
           }
         ]"

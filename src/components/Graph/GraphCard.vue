@@ -111,10 +111,11 @@ export default class GraphCard extends Vue {
 
 <style scoped>
 .alert-container {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex: 1;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
 }
 </style>

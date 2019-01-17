@@ -234,6 +234,42 @@
       }
     },
     {
+      "_id": "sessions",
+      "order": 2,
+      "cols": 4,
+      "rows": 5,
+      "feature": "SessionView",
+      "dashboard": "metrics",
+      "config": {
+        "sessions": [
+          {
+            "id": "mgKBmi4sv",
+            "name": "brew-session",
+            "hidden": false,
+            "start": 1547723679298,
+            "end": null,
+            "graphCfg": {
+              "layout": {},
+              "params": {
+                "start": 1547723679298
+              },
+              "targets": [
+                {
+                  "measurement": "sparkey",
+                  "fields": [
+                    "actuator-pwm-1/value"
+                  ]
+                }
+              ],
+              "renames": {
+                "sparkey/actuator-pwm-1/value": "PWM value"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "_id": "empty-graph",
       "order": 2,
       "cols": 5,
