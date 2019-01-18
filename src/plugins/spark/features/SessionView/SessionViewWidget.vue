@@ -4,14 +4,14 @@ import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
 import shortid from 'shortid';
 import { SessionViewConfig, Session } from './state';
-import { durationString } from '@/helpers/functional';
+import { durationString, shortDateString } from '@/helpers/functional';
 
 
 @Component
 export default class SessionViewWidget extends WidgetBase {
   modalOpen: boolean = false;
   modalSession: Session | null = null;
-  sessionInput: string = '';
+  sessionFilter: string = '';
 
   get widgetConfig(): SessionViewConfig {
     return this.$props.config;
@@ -20,6 +20,7 @@ export default class SessionViewWidget extends WidgetBase {
   get sessions(): Session[] {
     return this.widgetConfig.sessions
       .filter(session => !session.hidden)
+      .filter(session => session.name.toLowerCase().match(this.sessionFilter.toLowerCase()))
       .sort((left: Session, right: Session) => {
         // Sessions are sorted on their end date
         // In order:
@@ -36,6 +37,17 @@ export default class SessionViewWidget extends WidgetBase {
       });
   }
 
+  periodString(session: Session) {
+    if (!session.start && !session.end) {
+      return '<not yet started>';
+    }
+    if (!session.end) {
+      return `${shortDateString(session.start)} to <now>`;
+    }
+    return `${shortDateString(session.start)} to ${shortDateString(session.end)}`;
+  }
+
+
   openModal(session: Session | null = null) {
     this.modalSession = session;
     this.modalOpen = true;
@@ -51,27 +63,35 @@ export default class SessionViewWidget extends WidgetBase {
   }
 
   createSession() {
-    const session = {
-      id: shortid.generate(),
-      name: this.sessionInput,
-      hidden: false,
-      start: null,
-      end: null,
-      graphCfg: {
-        layout: {},
-        params: {},
-        targets: [],
-        renames: {},
+    this.$q.dialog({
+      title: 'Create session',
+      ok: 'Create',
+      cancel: 'Cancel',
+      prompt: {
+        model: '',
       },
-      notes: '',
-    };
-    this.saveConfig({
-      ...this.widgetConfig,
-      sessions: [...this.widgetConfig.sessions, session],
+    }).then((name) => {
+      const session = {
+        name,
+        id: shortid.generate(),
+        hidden: false,
+        start: null,
+        end: null,
+        graphCfg: {
+          layout: {},
+          params: {},
+          targets: [],
+          renames: {},
+        },
+        notes: '',
+      };
+      this.saveConfig({
+        ...this.widgetConfig,
+        sessions: [...this.widgetConfig.sessions, session],
+      });
+      this.modalSession = session;
+      this.modalOpen = true;
     });
-    this.sessionInput = '';
-    this.modalSession = session;
-    this.modalOpen = true;
   }
 }
 </script>
@@ -102,19 +122,17 @@ export default class SessionViewWidget extends WidgetBase {
       <div class="full-width">
         <q-item>
           <q-item-main>
-            <q-input v-model="sessionInput" placeholder="New Session" clearable/>
+            <q-input v-model="sessionFilter" placeholder="Search Session" clearable/>
           </q-item-main>
           <q-item-side right>
-            <q-btn :disable="!sessionInput" flat rounded label="Create" @click="createSession"/>
+            <q-btn flat rounded label="New Session" @click="createSession"/>
           </q-item-side>
         </q-item>
         <q-list dark no-border separator>
           <q-item v-for="session in sessions" :key="session.id">
             <q-item-main>
               {{ session.name }}
-              <span
-                class="row darkened"
-              >{{ session.start | shortDateString }} to {{ session.end | shortDateString }}</span>
+              <span class="row darkened">{{ periodString(session) }}</span>
             </q-item-main>
             <q-item-side right>
               <q-btn flat rounded icon="settings" @click="openModal(session)"/>
