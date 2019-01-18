@@ -6,7 +6,7 @@
       "order": 1,
       "type": "Spark",
       "config": {
-        "profileNames": [
+        "groupNames": [
           "testey1",
           "testey2"
         ]

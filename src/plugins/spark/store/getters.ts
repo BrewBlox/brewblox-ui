@@ -5,15 +5,15 @@ import { GetterTree } from 'vuex';
 import { Block, CompatibleBlocks, Spark, UnitAlternatives, UserUnits, SystemStatus } from '../state';
 import { SparkState } from './state';
 
-const defaultProfileNames = [
-  'Profile1',
-  'Profile2',
-  'Profile3',
-  'Profile4',
-  'Profile5',
-  'Profile6',
-  'Profile7',
-  'Profile8',
+const defaultGroupNames = [
+  'Group1',
+  'Group2',
+  'Group3',
+  'Group4',
+  'Group5',
+  'Group6',
+  'Group7',
+  // Ignore system block
 ];
 
 export const typeName: string = 'Spark';
@@ -73,10 +73,10 @@ export const sparkServiceById = (store: RootStore, id: string) =>
 export const sparkConfigById = (store: RootStore, id: string): any =>
   sparkServiceById(store, id).config || {};
 
-export const profileNames = (store: RootStore, id: string) => {
-  const configNames = sparkConfigById(store, id).profileNames || [];
+export const groupNames = (store: RootStore, id: string) => {
+  const configNames = sparkConfigById(store, id).groupNames || [];
   return [
-    ...configNames.slice(0, defaultProfileNames.length),
-    ...defaultProfileNames.slice(configNames.length),
+    ...configNames.slice(0, defaultGroupNames.length),
+    ...defaultGroupNames.slice(configNames.length),
   ];
 };

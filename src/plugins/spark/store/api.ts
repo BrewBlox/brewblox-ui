@@ -7,7 +7,7 @@ const asDataBlock = (block: Block): DataBlock =>
   ({
     id: block.id,
     type: block.type,
-    profiles: block.profiles,
+    groups: block.groups,
     data: block.data,
   });
 

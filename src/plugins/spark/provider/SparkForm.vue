@@ -4,7 +4,7 @@ import { Block, UserUnits } from '@/plugins/spark/state';
 import {
   saveBlock,
   saveUnits,
-  updateProfileNames,
+  updateGroupNames,
   clearDiscoveredBlocks,
   fetchDiscoveredBlocks,
   writeSavepoint,
@@ -13,7 +13,7 @@ import {
   fetchAll,
 } from '@/plugins/spark/store/actions';
 import {
-  profileNames,
+  groupNames,
   unitAlternatives,
   units,
   blockValues,
@@ -26,7 +26,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import {
   oneWireBusType,
-  profilesType,
+  groupsType,
   sysInfoType,
   ticksType,
   wifiType,
@@ -34,7 +34,7 @@ import {
 } from './getters';
 import {
   OneWireBusBlock,
-  ProfilesBlock,
+  GroupsBlock,
   SysInfoBlock,
   TicksBlock,
   WiFiSettingsBlock,
@@ -68,8 +68,8 @@ export default class SparkForm extends Vue {
     return this.sysBlock<SysInfoBlock>(sysInfoType);
   }
 
-  get profiles() {
-    return this.sysBlock<ProfilesBlock>(profilesType);
+  get groups() {
+    return this.sysBlock<GroupsBlock>(groupsType);
   }
 
   get oneWireBus() {
@@ -84,8 +84,8 @@ export default class SparkForm extends Vue {
     return this.sysBlock<WiFiSettingsBlock>(wifiType);
   }
 
-  get profileNames(): string[] {
-    return profileNames(this.$store, this.service.id);
+  get groupNames(): string[] {
+    return groupNames(this.$store, this.service.id);
   }
 
   get sysDate() {
@@ -124,8 +124,8 @@ export default class SparkForm extends Vue {
     saveBlock(this.$store, this.service.id, block);
   }
 
-  saveProfileNames(vals: string[] = this.profileNames) {
-    updateProfileNames(this.$store, this.service.id, vals);
+  saveGroupNames(vals: string[] = this.groupNames) {
+    updateGroupNames(this.$store, this.service.id, vals);
   }
 
   saveUnits(vals: UserUnits = this.units) {
@@ -205,27 +205,22 @@ export default class SparkForm extends Vue {
       </div>
     </q-collapsible>
 
-    <q-collapsible
-      group="modal"
-      class="col-12"
-      icon="mdi-checkbox-multiple-marked"
-      label="Profiles"
-    >
+    <q-collapsible group="modal" class="col-12" icon="mdi-checkbox-multiple-marked" label="Groups">
       <div>
-        <q-field label="Active profiles" orientation="vertical">
-          <ProfilesPopupEdit
-            :field="profiles.data.active"
+        <q-field label="Active groups" orientation="vertical">
+          <GroupsPopupEdit
+            :field="groups.data.active"
             :service-id="service.id"
-            :change="v => { profiles.data.active = v; saveBlock(profiles); }"
+            :change="v => { groups.data.active = v; saveBlock(groups); }"
           />
         </q-field>
-        <q-field class="col column" label="Profile names" orientation="vertical">
-          <div v-for="(name, idx) in profileNames" :key="idx" class="col row">
-            <q-field :label="`Profile ${idx + 1}`" class="col">
+        <q-field class="col column" label="Group names" orientation="vertical">
+          <div v-for="(name, idx) in groupNames" :key="idx" class="col row">
+            <q-field :label="`Group ${idx + 1}`" class="col">
               <InputPopupEdit
                 :field="name"
-                :change="v => { profileNames[idx] = v; saveProfileNames(); }"
-                label="Profile"
+                :change="v => { groupNames[idx] = v; saveGroupNames(); }"
+                label="Group"
               />
             </q-field>
           </div>

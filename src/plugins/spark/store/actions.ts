@@ -68,13 +68,13 @@ export const createBlock = dispatch(actions.createBlock);
 export const saveBlock = dispatch(actions.saveBlock);
 export const removeBlock = dispatch(actions.removeBlock);
 
-export const updateProfileNames = (store: RootStore, id: string, names: string[]) => {
+export const updateGroupNames = (store: RootStore, id: string, names: string[]) => {
   const existing = sparkServiceById(store, id);
   saveService(store, {
     ...existing,
     config: {
       ...existing.config,
-      profileNames: names,
+      groupNames: names,
     },
   });
 };

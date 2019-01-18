@@ -51,7 +51,7 @@ export default class NewBlockWizard extends Vue {
     this.block = {
       id: '',
       serviceId: this.$props.serviceId,
-      profiles: [0],
+      groups: [0],
       type: featureId,
       data: null,
     };
