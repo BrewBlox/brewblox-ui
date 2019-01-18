@@ -14,19 +14,23 @@ export const ticksType = 'Ticks';
 export const wifiType = 'WiFiSettings';
 export const touchType = 'TouchSettings';
 
-export const isSystemBlock = (block: Block) => [sysInfoType,
+export const isSystemBlock = (block: Block) => [
+  sysInfoType,
   groupsType,
   oneWireBusType,
   ticksType,
   wifiType,
   touchType,
-].includes(block.type);
+]
+  .includes(block.type);
 
-export const isReady = (store: RootStore, serviceId: string) => [sysInfoType,
+export const isReady = (store: RootStore, serviceId: string) => [
+  sysInfoType,
   groupsType,
   oneWireBusType,
   ticksType,
-].every(t => blockValues(store, serviceId).some((b: Block) => b.type === t));
+]
+  .every(t => blockValues(store, serviceId).some((b: Block) => b.type === t));
 
 export const WlanSecurityEnum = [
   [0, 'Unsecured'],
