@@ -28,6 +28,10 @@ import Component from 'vue-class-component';
       type: String,
       default: 'restore',
     },
+    clearLabel: {
+      type: String,
+      default: '<not set>',
+    },
   },
 })
 export default class DatetimePopupEdit extends Vue {
@@ -35,7 +39,7 @@ export default class DatetimePopupEdit extends Vue {
 
   get dateString() {
     if (!this.$props.field) {
-      return '<not set>';
+      return this.$props.clearLabel;
     }
     const date = new Date(this.$props.field);
     return this.$props.short

@@ -185,6 +185,7 @@ export default class SessionViewForm extends FormBase {
             reset-icon="mdi-clock-start"
             label="Start"
             display="span"
+            clear-label="<click to start>"
           />
         </q-item>
         <q-item>
@@ -195,6 +196,7 @@ export default class SessionViewForm extends FormBase {
             reset-icon="mdi-clock-end"
             label="End"
             display="span"
+            clear-label="<click to end>"
           />
         </q-item>
         <q-item>
