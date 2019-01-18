@@ -1,5 +1,5 @@
 <script lang="ts">
-import { profileNames } from '@/plugins/spark/store/getters';
+import { groupNames } from '@/plugins/spark/store/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
@@ -22,11 +22,11 @@ import Component from 'vue-class-component';
     },
   },
 })
-export default class ProfilesPopupEdit extends Vue {
+export default class GroupsPopupEdit extends Vue {
   placeholder: any[] = [undefined]; // Ensures that value always changes during edit
 
-  get profileOpts() {
-    return profileNames(this.$store, this.$props.serviceId)
+  get groupOpts() {
+    return groupNames(this.$store, this.$props.serviceId)
       .map((name: string, idx: number) => ({
         label: name,
         value: idx,
@@ -35,7 +35,8 @@ export default class ProfilesPopupEdit extends Vue {
 
   get displayValue() {
     const text = this.$props.field
-      .map((v: any) => this.profileOpts.find((opt: any) => opt.value === v))
+      .map((v: any) => this.groupOpts.find((opt: any) => opt.value === v))
+      .filter(v => v !== undefined)
       .map((v: any) => v.label)
       .join(', ');
     return text || 'Click to set';
@@ -58,12 +59,11 @@ export default class ProfilesPopupEdit extends Vue {
       v-model="placeholder"
       buttons
       persistent
-      title="Select active profiles"
+      title="Select active groups"
       @show="startEdit"
       @save="endEdit"
     >
-      <q-select v-model="placeholder" :options="profileOpts" clearable multiple/>
+      <q-select v-model="placeholder" :options="groupOpts" clearable multiple/>
     </q-popup-edit>
   </div>
 </template>
-

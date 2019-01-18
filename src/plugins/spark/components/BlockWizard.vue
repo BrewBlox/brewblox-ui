@@ -172,7 +172,7 @@ export default class BlockWizard extends Vue {
       id: this.blockId,
       serviceId: (this.service as Service).id,
       type: this.$props.featureId,
-      profiles: [0],
+      groups: [0],
       data: null,
     };
   }

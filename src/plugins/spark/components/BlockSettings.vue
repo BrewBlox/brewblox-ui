@@ -28,11 +28,11 @@ export default class BlockSettings extends BlockForm {
     <q-field label="Part of service">
       <span>{{ serviceId }}</span>
     </q-field>
-    <q-field label="Active in profiles">
-      <ProfilesPopupEdit
-        :field="block.profiles"
+    <q-field label="Active in groups">
+      <GroupsPopupEdit
+        :field="block.groups"
         :service-id="serviceId"
-        :change="callAndSaveBlock(v => block.profiles = v)"
+        :change="callAndSaveBlock(v => block.groups = v)"
         display="span"
       />
     </q-field>

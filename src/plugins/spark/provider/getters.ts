@@ -1,6 +1,6 @@
-import {Block} from '@/plugins/spark/state';
-import {blockValues} from '@/plugins/spark/store/getters';
-import {RootStore} from '@/store/state';
+import { Block } from '@/plugins/spark/state';
+import { blockValues } from '@/plugins/spark/store/getters';
+import { RootStore } from '@/store/state';
 
 export const widgetSize = {
   cols: 4,
@@ -8,25 +8,29 @@ export const widgetSize = {
 };
 
 export const sysInfoType = 'SysInfo';
-export const profilesType = 'Profiles';
+export const groupsType = 'Groups';
 export const oneWireBusType = 'OneWireBus';
 export const ticksType = 'Ticks';
 export const wifiType = 'WiFiSettings';
 export const touchType = 'TouchSettings';
 
-export const isSystemBlock = (block: Block) => [sysInfoType,
-                                                profilesType,
-                                                oneWireBusType,
-                                                ticksType,
-                                                wifiType,
-                                                touchType,
-].includes(block.type);
+export const isSystemBlock = (block: Block) => [
+  sysInfoType,
+  groupsType,
+  oneWireBusType,
+  ticksType,
+  wifiType,
+  touchType,
+]
+  .includes(block.type);
 
-export const isReady = (store: RootStore, serviceId: string) => [sysInfoType,
-                                                                 profilesType,
-                                                                 oneWireBusType,
-                                                                 ticksType,
-].every(t => blockValues(store, serviceId).some((b: Block) => b.type === t));
+export const isReady = (store: RootStore, serviceId: string) => [
+  sysInfoType,
+  groupsType,
+  oneWireBusType,
+  ticksType,
+]
+  .every(t => blockValues(store, serviceId).some((b: Block) => b.type === t));
 
 export const WlanSecurityEnum = [
   [0, 'Unsecured'],

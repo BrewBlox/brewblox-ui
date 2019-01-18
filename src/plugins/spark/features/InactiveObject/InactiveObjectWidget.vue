@@ -30,13 +30,13 @@ export default class InactiveObjectWidget extends BlockWidget {
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-alert type="info">This block is not in any active profile</q-alert>
+    <q-alert type="info">This block is not in any active group</q-alert>
     <q-card-main class="column col">
       <q-field class="col" label="Profiles">
-        <ProfilesPopupEdit
-          :field="block.profiles"
+        <GroupsPopupEdit
+          :field="block.groups"
           :service-id="serviceId"
-          :change="callAndSaveBlock(v => block.profiles = v)"
+          :change="callAndSaveBlock(v => block.groups = v)"
         />
       </q-field>
     </q-card-main>

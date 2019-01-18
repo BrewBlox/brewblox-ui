@@ -10,7 +10,7 @@ export interface OneWireBusBlock extends Block {
   };
 }
 
-export interface ProfilesBlock extends Block {
+export interface GroupsBlock extends Block {
   data: {
     active: number[],
   };

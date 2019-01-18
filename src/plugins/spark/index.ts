@@ -1,5 +1,12 @@
 import { autoRegister } from '@/helpers/component-ref';
-import { base64ToHex, durationString, hexToBase64, unitDurationString, shortDateString, dateString } from '@/helpers/functional';
+import {
+  base64ToHex,
+  durationString,
+  hexToBase64,
+  unitDurationString,
+  shortDateString,
+  dateString,
+} from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
 import { createFeature } from '@/store/features/actions';
 import { createProvider } from '@/store/providers/actions';
