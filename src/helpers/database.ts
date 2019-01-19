@@ -2,80 +2,26 @@ import PouchDB from 'pouchdb';
 
 type ChangeEvent = PouchDB.Core.ChangesResponseChange<{}>;
 
-const host = process.env.VUE_APP_API_URI || window.location.origin;
-
-export const createDatabase = (name: string): PouchDB.Database => new PouchDB(name);
-
-export const addSync = (db: PouchDB.Database, onChange: (evt: ChangeEvent) => void) => {
-  db
-    .changes({ live: true, include_docs: true, since: 'now' })
-    .on('change', onChange);
-};
-
-export const addReplicate = (db: PouchDB.Database) =>
-  db.sync(`${host}/datastore/${db.name}`, { live: true, retry: true });
-
-
-export const toDocument = (doc) => {
-  const { id, ...obj } = doc;
-  return { ...obj, _id: id };
-};
-
-export const toNewDocument = (doc) => {
-  const { _rev, ...obj } = doc;
-  return toDocument(obj);
-};
-
-export const fromDocument = (doc) => {
-  const { _id, ...obj } = doc;
-  return { ...obj, id: _id };
-};
-
-export interface NewStoreObject {
+export interface StoreObject {
   id: string;
+  _rev?: string;
 }
 
-export interface StoreObject extends NewStoreObject {
-  _rev: string;
-}
-
-export interface ChangeHandler {
+export interface Module {
   onDeleted: (id: string) => void;
   onChanged: (obj: any) => void;
-}
-
-interface Module extends ChangeHandler {
   id: string;
 }
 
+const HOST = process.env.VUE_APP_API_URI || window.location.origin;
 const MODULES: Module[] = [];
-const DB: PouchDB.Database = new PouchDB('brewblox-ui-store');
-
-const cleanId = (module: string, fullId: string) =>
-  fullId.substring(`${module}__`.length);
-
-const prefixId = (module: string, id: string) =>
-  `${module}__${id}`;
-
-const asStoreObject = (module: string, doc: any) => {
-  const { _id, ...obj } = doc;
-  return { ...obj, id: cleanId(module, _id) };
-};
-
-const asDocument = (module: string, obj: any) => {
-  const { id, ...doc } = obj;
-  return { ...doc, _id: prefixId(module, id) };
-};
-
-const asNewDocument = (module: string, obj: any) => {
-  const { _rev, ...cleanObj } = obj;
-  return asDocument(module, cleanObj);
-};
+const DB_NAME = 'brewblox-ui-store';
+const DB: PouchDB.Database = new PouchDB(DB_NAME);
 
 DB
   .changes({ live: true, include_docs: true, since: 'now' })
   .on('change', (evt: ChangeEvent) => {
-    const handler = MODULES.find(m => m.id.startsWith(`${evt.id}__`));
+    const handler = MODULES.find(m => checkInModule(m.id, evt.id));
     if (!handler) {
       return;
     }
@@ -86,35 +32,63 @@ DB
     }
   });
 
-const assertModule = (module: string) => {
-  if (!MODULES[module]) {
-    throw new Error(`Database module "${module}" was not registered before use`);
-  }
+DB
+  .sync(`${HOST}/datastore/${DB_NAME}`, { live: true, retry: true });
+
+const cleanId = (moduleId: string, fullId: string) =>
+  fullId.substring(`${moduleId}__`.length);
+
+const fullId = (moduleId: string, id: string) =>
+  `${moduleId}__${id}`;
+
+const checkInModule = (moduleId: string, fullId: string) =>
+  fullId.startsWith(`${moduleId}__`);
+
+const asStoreObject = (moduleId: string, doc: any) => {
+  const { _id, ...obj } = doc;
+  return { ...obj, id: cleanId(moduleId, _id) };
 };
 
-export function registerModule(module: string, handler: ChangeHandler) {
-  if (MODULES.find(m => m.id === module)) {
-    throw new Error(`Database module "${module}" is already registered`);
+const asDocument = (moduleId: string, obj: any) => {
+  const { id, ...doc } = obj;
+  return { ...doc, _id: fullId(moduleId, id) };
+};
+
+const asNewDocument = (moduleId: string, obj: any) => {
+  const { _rev, ...cleanObj } = obj;
+  return asDocument(moduleId, cleanObj);
+};
+
+export function registerModule(module: Module) {
+  if (MODULES.find(m => m.id === module.id)) {
+    throw new Error(`Database module "${module.id}" is already registered`);
   }
-  MODULES.push({ id: module, ...handler });
+  MODULES.push({ ...module });
 }
 
-export async function fetchAll(module: string) {
-  const prefix = `${module}__`;
+export async function fetchAll(moduleId: string) {
   const resp = await DB.allDocs({ include_docs: true });
   return resp.rows
-    .filter(row => row.id.startsWith(prefix))
-    .map(row => asStoreObject(row.id.substring(prefix.length), row.doc));
+    .filter(row => checkInModule(moduleId, row.id))
+    .map(row => asStoreObject(moduleId, row.doc));
 }
 
-export function create<T extends NewStoreObject>(module: string, obj: T) {
-
+export async function fetchById(moduleId: string, objId: string) {
+  return asStoreObject(moduleId, await DB.get(fullId(moduleId, objId)));
 }
 
-export function persist<T extends StoreObject>(module: string, obj: T) {
-
+export async function create<T extends StoreObject>(moduleId: string, obj: T) {
+  const resp = await DB.put(asNewDocument(moduleId, obj));
+  return { ...obj, _rev: resp.rev };
 }
 
-export function remove<T extends StoreObject>(module: string, obj: T) {
+export async function persist<T extends StoreObject>(moduleId: string, obj: T) {
+  const resp = await DB.put(asDocument(moduleId, obj));
+  return { ...obj, _rev: resp.rev };
+}
 
+export async function remove<T extends StoreObject>(moduleId: string, obj: T) {
+  await DB.remove(asDocument(moduleId, obj));
+  const { _rev, ...cleanObj } = obj;
+  return cleanObj;
 }

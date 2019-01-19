@@ -1,40 +1,24 @@
-import { addSync, addReplicate, createDatabase, fromDocument, toDocument, toNewDocument } from '@/helpers/database';
+import { registerModule, fetchAll, fetchById, create, persist, remove } from '@/helpers/database';
 import { Service } from './state';
 
-const serviceDB = createDatabase('services');
+const SERVICES = 'services';
 
 export const setup = (
   onChanged: (doc: any) => void,
   onDeleted: (id: string) => void,
-) => {
-  addSync(serviceDB, (change) => {
-    if (change.deleted) {
-      onDeleted(change.id);
-    } else {
-      onChanged(fromDocument(change.doc));
-    }
-  });
-  addReplicate(serviceDB);
-};
+) => registerModule({ onChanged, onDeleted, id: SERVICES });
 
 export const fetchServices = async (): Promise<Service[]> =>
-  serviceDB.allDocs({ include_docs: true })
-    .then(resp =>
-      resp.rows
-        .map(row => fromDocument(row.doc) as Service));
+  fetchAll(SERVICES);
 
 export const fetchServiceById = async (id: string): Promise<Service> =>
-  serviceDB.get(id)
-    .then(fromDocument);
+  fetchById(SERVICES, id);
 
 export const createService = async (service: Service): Promise<Service> =>
-  serviceDB.put(toNewDocument(service))
-    .then(resp => ({ ...service, _rev: resp.rev }));
+  create(SERVICES, service);
 
 export const persistService = async (service: Service): Promise<Service> =>
-  serviceDB.put(toDocument(service))
-    .then(resp => ({ ...service, _rev: resp.rev }));
+  persist(SERVICES, service);
 
 export const deleteService = async (service: Service): Promise<Service> =>
-  serviceDB.remove(toDocument(service))
-    .then(() => service);
+  remove(SERVICES, service);
