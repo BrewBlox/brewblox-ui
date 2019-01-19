@@ -280,12 +280,6 @@ export default class DefaultLayout extends Vue {
   flex: 1 0;
   overflow: auto;
   flex-wrap: nowrap;
-}
-
-.widget-body-multiple {
-  flex: 1 0;
-  overflow: auto;
-  flex-wrap: nowrap;
   justify-content: space-around;
 }
 

@@ -63,7 +63,7 @@ export default class ActuatorPinWidget extends BlockWidget {
     <q-card-separator/>
     <q-card-main class="column widget-body">
       <div class="full-width">
-        <q-field label="State">
+        <q-field label="Active">
           <ActuatorState
             :field="block.data.state"
             :change="callAndSaveBlock(v => block.data.state = v)"

@@ -45,15 +45,7 @@ export default class ActuatorDS2413Widget extends BlockWidget {
 
     <q-card-main class="column widget-body">
       <div class="full-width">
-        <q-field label="Actuator">
-          <LinkPopupEdit
-            :field="block.data.hwDevice"
-            :service-id="serviceId"
-            :change="callAndSaveBlock(v => block.data.hwDevice = v)"
-            label="Actuator"
-          />
-        </q-field>
-        <q-field label="State">
+        <q-field label="Active">
           <ActuatorState
             :field="block.data.state"
             :change="callAndSaveBlock(v => block.data.state = v)"

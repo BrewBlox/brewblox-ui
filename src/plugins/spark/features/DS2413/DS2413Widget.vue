@@ -47,7 +47,7 @@ export default class DS2413Widget extends BlockWidget {
         <q-field class="col" label="Address">
           <span>{{ address }}</span>
         </q-field>
-        <q-field class="col" label="State">
+        <q-field class="col" label="Active">
           <big>{{ actuatorState }}</big>
         </q-field>
       </div>

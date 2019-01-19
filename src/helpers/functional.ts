@@ -29,11 +29,13 @@ export const durationString = (duration: number | string) => {
     Math.floor((secondsTotal - (days * 86400) - (hours * 3600)) / 60);
   const seconds = Math.floor(
     secondsTotal - (days * 86400) - (hours * 3600) - (minutes * 60));
+  const milliseconds = (secondsTotal < 10 ) ? Math.floor((secondsTotal - Math.floor(secondsTotal)) * 1000) : 0;
   const values = [
     [days, 'd'],
     [hours, 'h'],
     [minutes, 'm'],
     [seconds, 's'],
+    [milliseconds, 'ms'],
   ];
   return values.reduceRight(
     (acc: string, [val, unit]) => (val ? `${val}${unit} ${acc}` : acc),

@@ -51,6 +51,16 @@ export default class DisplaySettingsWidget extends BlockWidget {
           <big v-else>Not set</big>
         </q-field>
       </div>
+      <div class="row full-width" style="margin-top: 20px">
+        <div class="q-field-label col-3">Footer text</div>
+        <InputPopupEdit
+          :field="block.data.name"
+          :change="callAndSaveBlock(v => block.data.name = v)"
+          class="col-9 self-center"
+          label="footer text"
+          display="span"
+        />
+      </div>
     </q-card-main>
   </q-card>
 </template>

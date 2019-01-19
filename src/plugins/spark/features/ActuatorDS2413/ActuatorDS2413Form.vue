@@ -31,6 +31,20 @@ export default class ActuatorDS2413Form extends BlockForm {
           constrainedBy: { constraints: [] },
         },
       },
+      {
+        label: 'Fridge compressor',
+        value: {
+          hwDevice: new DS2413Link(null),
+          channel: 0,
+          state: 0,
+          constrainedBy: {
+            constraints: [
+              { "minOff[second]": 300 },
+              { "minOn[second]": 180 },
+            ],
+          },
+        },
+      },
     ];
   }
 }
@@ -43,23 +57,23 @@ export default class ActuatorDS2413Form extends BlockForm {
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
     <q-collapsible group="modal" class="col-12" icon="settings" label="Settings">
-      <q-field label="Actuator">
+      <q-field label="DS2413 Block">
         <LinkPopupEdit
           :field="block.data.hwDevice"
           :service-id="serviceId"
           :change="callAndSaveBlock(v => block.data.hwDevice = v)"
-          label="Actuator"
+          label="DS2413 Block"
         />
       </q-field>
-      <q-field label="Channel">
+      <q-field label="DS2413 Channel">
         <SelectPopupEdit
           :field="block.data.channel"
           :options="channelOpts"
           :change="callAndSaveBlock(v => block.data.channel = v)"
-          label="Channel"
+          label="DS2413 Channel"
         />
       </q-field>
-      <q-field label="State">
+      <q-field label="Active">
         <ActuatorState
           :field="block.data.state"
           :change="callAndSaveBlock(v => block.data.state = v)"

@@ -135,15 +135,15 @@ export default class DisplaySettingsForm extends BlockForm {
             :options="slotLinkOpts"
             :change="callAndSaveBlock(v => updateSlotLink(idx, v))"
             clearable
-            label="Field"
+            label="block"
           />
         </q-field>
-        <q-field label="Name">
+        <q-field label="Display name">
           <InputPopupEdit
             v-if="slot"
             :field="slot.name"
             :change="callAndSaveBlock(v => updateSlotName(idx, v))"
-            label="Name"
+            label="name"
           />
           <big v-else>-</big>
         </q-field>
@@ -152,7 +152,7 @@ export default class DisplaySettingsForm extends BlockForm {
             v-if="slot"
             :field="slot.color"
             :change="callAndSaveBlock(v => updateSlotColor(idx, v))"
-            label="Color"
+            label="color"
           />
           <big v-else>-</big>
         </q-field>

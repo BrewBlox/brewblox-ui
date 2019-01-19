@@ -44,16 +44,18 @@ export default class BalancerWidget extends BlockWidget {
     </q-card-title>
     <q-card-separator/>
     <q-card-main class="column widget-body">
-      <div class="full-width">
-        <q-item class="full-width text-center">Clients</q-item>
-        <q-field
-          v-for="client in block.data.clients"
-          :key="client.id.id"
-          :label="client.id.id || 'unknown'"
-          class="col"
-        >
-          <big>{{ client.granted | round }} / {{ client.requested | round }}</big>
-        </q-field>
+      <div class="row">
+        <div class ="q-field-label col">Clients</div>
+        <div class ="q-field-label col">Granted</div>
+        <div class ="q-field-label col">Requested</div>
+      </div>
+      <div v-for="client in block.data.clients"
+           :key="client.id.id"
+           class="row"
+      >
+        <div class ="q-label col self-center">{{ client.id.id || 'unknown' }}</div>
+        <big class="col">{{ client.granted | round }}</big>
+        <big class="col">{{ client.requested | round }}</big>
       </div>
     </q-card-main>
   </q-card>

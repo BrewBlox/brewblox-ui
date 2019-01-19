@@ -30,15 +30,21 @@ export default class InactiveObjectWidget extends BlockWidget {
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-alert type="info">This block is not in any active group</q-alert>
-    <q-card-main class="column col">
-      <q-field class="col" label="Profiles">
-        <GroupsPopupEdit
-          :field="block.groups"
-          :service-id="serviceId"
-          :change="callAndSaveBlock(v => block.groups = v)"
-        />
-      </q-field>
+    <q-card-main class="column widget-body">
+      <div class="full-width placeholder-text">
+        This {{ block.data.actualType }} block is disabled.<br>
+        To enable it, ensure that it is in an enabled group.
+      </div>
     </q-card-main>
   </q-card>
 </template>
+
+<style lang="stylus" scoped>
+.placeholder-text {
+  color: #AA5555;
+  text-align: center;
+}
+.widget-body {
+  justify-content: space-around;
+}
+</style>

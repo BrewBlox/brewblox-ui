@@ -13,14 +13,23 @@ export default class ActuatorPwmForm extends BlockForm {
   presets() {
     return [
       {
-        label: 'Default',
+        label: 'Heater - 4s period',
         value: {
           actuatorId: new ActuatorDigitalLink(null),
-          period: 0,
+          period: 4,
           setting: 0,
           constrainedBy: { constraints: [] },
         },
       },
+      {
+        label: 'Fridge - 30m period',
+        value: {
+          actuatorId: new ActuatorDigitalLink(null),
+          period: 1800,
+          setting: 0,
+          constrainedBy: { constraints: [] },          
+          },
+        },
     ];
   }
 }
@@ -34,23 +43,23 @@ export default class ActuatorPwmForm extends BlockForm {
     </q-toolbar>
     <q-collapsible group="modal" class="col-12" icon="settings" label="Settings">
       <div>
-        <q-field label="Actuator">
+        <q-field label="Digtial Actuator Target">
           <LinkPopupEdit
             :field="block.data.actuatorId"
             :service-id="serviceId"
             :change="callAndSaveBlock(v => block.data.actuatorId = v)"
-            label="Actuator"
+            label="target"
           />
         </q-field>
         <q-field label="Period">
-          <InputPopupEdit
+          <TimeUnitPopupEdit
             :field="block.data.period"
             :change="callAndSaveBlock(v => block.data.period = v)"
             label="Period"
             type="number"
           />
         </q-field>
-        <q-field label="Setting">
+        <q-field label="Duty Setting">
           <InputPopupEdit
             :field="block.data.setting"
             :change="callAndSaveBlock(v => block.data.setting = v)"
@@ -58,7 +67,7 @@ export default class ActuatorPwmForm extends BlockForm {
             type="number"
           />
         </q-field>
-        <q-field label="Value">
+        <q-field label="Duty Achieved">
           <big>{{ block.data.value | round }}</big>
         </q-field>
       </div>

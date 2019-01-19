@@ -12,8 +12,8 @@ export default class ActuatorPwmWidget extends BlockWidget {
 
   get renamedTargets() {
     return {
-      setting: 'Setting',
-      value: 'Value',
+      setting: 'Duty Setting',
+      value: 'Duty Achieved',
     };
   }
 
@@ -56,10 +56,13 @@ export default class ActuatorPwmWidget extends BlockWidget {
     <q-card-separator/>
     <q-card-main class="column widget-body">
       <div class="full-width">
-        <q-field label="Value">
+        <q-field label="Duty Setting">
+          <big>{{ block.data.setting | round }}</big>
+        </q-field>
+        <q-field label="Duty Achieved">
           <big>{{ block.data.value | round }}</big>
         </q-field>
-        <q-field v-if="pending !== null" class="col" label="Requested">
+        <q-field v-if="pending !== null" class="col" label="Unconstrained setting">
           <big>{{ pending | round }}</big>
         </q-field>
         <q-field label="Constraints">

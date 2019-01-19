@@ -33,7 +33,7 @@ export default class MutexWidget extends BlockWidget {
     <q-card-main class="column widget-body">
       <div class="full-width">
         <q-field label="Actuator wait time">
-          <InputPopupEdit
+          <TimeUnitPopupEdit
             :field="block.data.differentActuatorWait"
             :change="callAndSaveBlock(v => block.data.differentActuatorWait = v)"
             type="number"

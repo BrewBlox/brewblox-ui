@@ -37,7 +37,7 @@ export default class ActuatorState extends Vue {
 
 <template>
   <div>
-    <q-toggle v-if="stringState !== 'Unknown'" v-model="boolState"/>
+    <q-toggle v-if="stringState !== 'Unknown'" v-model="boolState" checked-icon="mdi-power-on" unchecked-icon="mdi-power-off"/>
     <div v-else>
       <q-btn
         class="reset-button"
