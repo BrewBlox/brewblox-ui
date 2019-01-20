@@ -238,7 +238,7 @@ export default class DefaultLayout extends Vue {
   </q-layout>
 </template>
 
-<style>
+<style lang="stylus">
 /* not scoped */
 .toolbar-buttons .q-btn {
   margin-left: 10px;
@@ -281,6 +281,8 @@ export default class DefaultLayout extends Vue {
   overflow: auto;
   flex-wrap: nowrap;
   justify-content: space-around;
+  align-content: center;
+  flex-direction: column;
 }
 
 .centered {

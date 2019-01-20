@@ -45,13 +45,13 @@ export default class AnalogConstraints extends Constraints {
 </script>
 
 <template>
-  <div class="column gutter-y-xs">
-    <div v-for="(cinfo, idx) in constraints" :key="idx">
+  <div class="constraints-list gutter-y-xs">
+    <div v-for="(cinfo, idx) in constraints" :key="idx" class="column">
       <div v-if="readonly" :class="{row: true, limiting: cinfo.limiting}">
         <span class="col">{{ label(cinfo.key) }}</span>
-        <span
-          class="col"
-        >{{ ( cinfo.key === 'balanced' ? cinfo.value.granted : cinfo.value) | unit }}</span>
+        <span class="col">
+          {{ ( cinfo.key === 'balanced' ? cinfo.value.granted : cinfo.value) | unit }}
+        </span>
       </div>
       <div v-else class="row">
         <SelectPopupEdit
@@ -59,7 +59,7 @@ export default class AnalogConstraints extends Constraints {
           :field="cinfo.key"
           :change="callAndSaveConstraints(k => constraints[idx] = createConstraint(k))"
           clearable
-          class="col-4"
+          class="col-8"
           label="Constraint type"
         />
         <component
@@ -85,6 +85,9 @@ export default class AnalogConstraints extends Constraints {
         <q-btn class="col-1" icon="delete" @click="removeConstraint(idx); saveConstraints();"/>
       </div>
     </div>
+    <div v-if="readonly && constraints.length === 0" class="column">
+      <div class="row">None</div>
+    </div>
     <div v-if="!readonly" class="row gutter-x-cs">
       <q-btn label="Add constraint">
         <q-popover>
@@ -99,14 +102,15 @@ export default class AnalogConstraints extends Constraints {
         </q-popover>
       </q-btn>
     </div>
-    <div v-if="readonly && constraints.length === 0" class="row">
-      <span>No constraints set</span>
-    </div>
   </div>
 </template>
 
 <style scoped>
 .limiting {
   color: red;
+}
+
+.constraints-list {
+  padding-top: 5px;
 }
 </style>

@@ -44,7 +44,4 @@ export default class InactiveObjectWidget extends BlockWidget {
   color: #AA5555;
   text-align: center;
 }
-.widget-body {
-  justify-content: space-around;
-}
 </style>

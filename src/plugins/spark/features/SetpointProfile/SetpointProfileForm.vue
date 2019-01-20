@@ -42,10 +42,10 @@ export default class SetpointProfileForm extends BlockForm {
   presets() {
     return [
       {
-        label: 'Default',
+        label: 'Empty profile',
         value: {
           points: [],
-          setting: new Unit(0, 'degC'),
+          setting: new Unit(null, 'degC'),
           enabled: true,
         },
       },

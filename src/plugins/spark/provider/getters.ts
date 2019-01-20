@@ -4,7 +4,7 @@ import { RootStore } from '@/store/state';
 
 export const widgetSize = {
   cols: 4,
-  rows: 4,
+  rows: 2,
 };
 
 export const sysInfoType = 'SysInfo';

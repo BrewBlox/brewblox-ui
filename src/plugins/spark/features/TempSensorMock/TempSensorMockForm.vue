@@ -10,8 +10,8 @@ export default class TempSensorMockForm extends BlockForm {
       {
         label: 'Default',
         value: {
-          value: new Unit(0, 'degC'),
-          connected: false,
+          value: new Unit(20, 'degC'),
+          connected: true,
         },
       },
     ];

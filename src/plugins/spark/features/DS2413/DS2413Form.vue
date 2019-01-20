@@ -42,14 +42,6 @@ export default class DS2413Form extends BlockForm {
       <q-toolbar-title>{{ block.id }} settings</q-toolbar-title>
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
-    <q-collapsible group="modal" class="col-12" icon="settings" label="Settings">
-      <q-field class="col" label="Address">
-        <span>{{ address }}</span>
-      </q-field>
-      <q-field class="col" label="Active">
-        <big>{{ actuatorState }}</big>
-      </q-field>
-    </q-collapsible>
     <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="settingsProps" :presets-func="presets"/>
     </q-collapsible>

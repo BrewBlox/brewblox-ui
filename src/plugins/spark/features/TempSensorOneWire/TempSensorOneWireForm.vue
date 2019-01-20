@@ -10,7 +10,7 @@ export default class TempSensorOneWireForm extends BlockForm {
       {
         label: 'Default',
         value: {
-          value: new Unit(0, 'degC'),
+          value: new Unit(null, 'degC'),
           offset: new Unit(0, 'delta_degC'),
           address: '',
         },

@@ -13,8 +13,8 @@ export default class SetpointSensorPairForm extends BlockForm {
         value: {
           setpointId: new SetpointLink(null),
           sensorId: new TempSensorLink(null),
-          setpointValue: new Unit(0, 'degC'),
-          sensorValue: new Unit(0, 'degC'),
+          setpointValue: new Unit(null, 'degC'),
+          sensorValue: new Unit(null, 'degC'),
         },
       },
     ];

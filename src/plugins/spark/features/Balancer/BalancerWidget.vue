@@ -43,19 +43,21 @@ export default class BalancerWidget extends BlockWidget {
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-card-main class="column widget-body">
-      <div class="row">
-        <div class ="q-field-label col">Clients</div>
-        <div class ="q-field-label col">Granted</div>
-        <div class ="q-field-label col">Requested</div>
-      </div>
-      <div v-for="client in block.data.clients"
-           :key="client.id.id"
-           class="row"
-      >
-        <div class ="q-label col self-center">{{ client.id.id || 'unknown' }}</div>
-        <big class="col">{{ client.granted | round }}</big>
-        <big class="col">{{ client.requested | round }}</big>
+    <q-card-main class="widget-body column">
+      <div class="full-width">
+        <div class="row">
+          <div class ="q-field-label col">Clients</div>
+          <div class ="q-field-label col">Granted</div>
+          <div class ="q-field-label col">Requested</div>
+        </div>
+        <div v-for="client in block.data.clients"
+             :key="client.id.id"
+             class="row"
+        >
+          <div class ="q-label col self-center">{{ client.id.id || 'unknown' }}</div>
+          <big class="col">{{ client.granted | round }}</big>
+          <big class="col">{{ client.requested | round }}</big>
+        </div>
       </div>
     </q-card-main>
   </q-card>

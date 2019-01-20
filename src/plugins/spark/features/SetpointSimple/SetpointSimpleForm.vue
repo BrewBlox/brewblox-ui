@@ -10,8 +10,9 @@ export default class SetpointSimpleForm extends BlockForm {
       {
         label: 'Default',
         value: {
-          setting: new Unit(0, 'degC'),
-          enabled: true,
+          setting: new Unit(null, 'degC'),
+          setpoint: new Unit(20, 'degC'),
+          enabled: false,
         },
       },
     ];

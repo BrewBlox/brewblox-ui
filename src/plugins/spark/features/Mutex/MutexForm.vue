@@ -24,12 +24,12 @@ export default class MutexForm extends BlockForm {
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
     <q-collapsible group="modal" class="col-12" icon="settings" label="Settings">
-      <q-field label="Actuator wait time">
-        <InputPopupEdit
+      <q-field label="Idle time before allowing a different actuator">
+        <TimeUnitPopupEdit
           :field="block.data.differentActuatorWait"
           :change="callAndSaveBlock(v => block.data.differentActuatorWait = v)"
           type="number"
-          label="Actuator wait time"
+          label="minimum idle time"
         />
       </q-field>
     </q-collapsible>
