@@ -72,10 +72,10 @@ export default class PidWidget extends BlockWidget {
         </q-field>
         <q-item>Output</q-item>
         <q-field label="Target">
-          <big>{{ block.data.outputSetting | round }}</big>
+          <big>{{ (block.data.outputSetting | round) || "--.--" }}</big>
         </q-field>
         <q-field label="Actual">
-          <big>{{ block.data.outputValue | round }}</big>
+          <big>{{ (block.data.outputValue | round) || "--.--" }}</big>
         </q-field>
       </div>
       <div :style="gridStyle(8)" class="full-width">
@@ -105,12 +105,12 @@ export default class PidWidget extends BlockWidget {
 </template>
 
 <style lang="stylus" scoped>
-/deep/ .widget-body-multiple .q-field * {
+/deep/ .widget-body .q-field * {
   padding-top: 0px !important;
   margin-top: 0px !important;
 }
 
-/deep/ .widget-body-multiple .q-item {
+/deep/ .widget-body .q-item {
   padding: 0;
   min-height: 0;
 }
