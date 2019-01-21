@@ -1,74 +1,45 @@
-import { createDatabase, addReplicate, addSync, fromDocument, toDocument, toNewDocument } from '@/helpers/database';
+import { registerModule, fetchAll, fetchById, create, persist, remove } from '@/helpers/database';
 import { Dashboard, DashboardItem } from './state';
 
-const dashboardDB = createDatabase('dashboards');
-const itemDB = createDatabase('dashboard-items');
-
-const setup = (
-  db: PouchDB.Database,
-  onChanged: (doc: any) => void,
-  onDeleted: (id: string) => void,
-) => {
-  addSync(db, (change) => {
-    if (change.deleted) {
-      onDeleted(change.id);
-    } else {
-      onChanged(fromDocument(change.doc));
-    }
-  });
-  addReplicate(db);
-};
+const DASHBOARDS = 'dashboards';
+const ITEMS = 'dashboard-items';
 
 export const setupDashboards = (
   onChanged: (doc: any) => void,
   onDeleted: (id: string) => void,
-) => setup(dashboardDB, onChanged, onDeleted);
+) => registerModule({ onChanged, onDeleted, id: DASHBOARDS });
 
 export const setupDashboardItems = (
   onChanged: (doc: any) => void,
   onDeleted: (id: string) => void,
-) => setup(itemDB, onChanged, onDeleted);
+) => registerModule({ onChanged, onDeleted, id: ITEMS });
 
 export const fetchDashboards = async (): Promise<Dashboard[]> =>
-  dashboardDB.allDocs({ include_docs: true })
-    .then(resp =>
-      resp.rows
-        .map(row => fromDocument(row.doc) as Dashboard));
+  fetchAll(DASHBOARDS);
 
 export const fetchDashboardById = async (id: string): Promise<Dashboard> =>
-  dashboardDB.get(id)
-    .then(fromDocument);
+  fetchById(DASHBOARDS, id);
 
 export const createDashboard = async (dashboard: Dashboard): Promise<Dashboard> =>
-  dashboardDB.put(toNewDocument(dashboard))
-    .then(resp => ({ ...dashboard, _rev: resp.rev }));
+  create(DASHBOARDS, dashboard);
 
 export const persistDashboard = async (dashboard: Dashboard): Promise<Dashboard> =>
-  dashboardDB.put(toDocument(dashboard))
-    .then(resp => ({ ...dashboard, _rev: resp.rev }));
+  persist(DASHBOARDS, dashboard);
 
 export const deleteDashboard = async (dashboard: Dashboard): Promise<Dashboard> =>
-  dashboardDB.remove(toDocument(dashboard))
-    .then(() => dashboard);
+  remove(DASHBOARDS, dashboard);
 
 export const fetchDashboardItems = async (): Promise<DashboardItem[]> =>
-  itemDB.allDocs({ include_docs: true })
-    .then(resp =>
-      resp.rows
-        .map(row => fromDocument(row.doc) as DashboardItem));
+  fetchAll(ITEMS);
 
 export const fetchDashboardItemById = async (id: string): Promise<DashboardItem> =>
-  itemDB.get(id)
-    .then(fromDocument);
+  fetchById(ITEMS, id);
 
 export const persistDashboardItem = async (item: DashboardItem): Promise<DashboardItem> =>
-  itemDB.put(toDocument(item))
-    .then(resp => ({ ...item, _rev: resp.rev }));
+  persist(ITEMS, item);
 
 export const createDashboardItem = async (item: DashboardItem): Promise<DashboardItem> =>
-  itemDB.put(toNewDocument(item))
-    .then(resp => ({ ...item, _rev: resp.rev }));
+  create(ITEMS, item);
 
 export const deleteDashboardItem = async (item: DashboardItem): Promise<DashboardItem> =>
-  itemDB.remove(toDocument(item))
-    .then(() => item);
+  remove(ITEMS, item);

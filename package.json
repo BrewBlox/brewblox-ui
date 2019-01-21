@@ -10,7 +10,7 @@
     "spark:sparkey": "npm run spark:reset -- sparkey",
     "spark:spock": "npm run spark:reset -- spock",
     "spark:blocks": "npm run spark:sparkey && npm run spark:spock",
-    "couchdb:docs": "bash dev/reset_ui.sh services dashboards dashboard-items",
+    "couchdb:docs": "node dev/reset_datastore.js dev/presets services dashboards dashboard-items",
     "cert:check": "bash dev/check_cert.sh",
     "compose:new": "docker-compose down && npm run cert:check && docker-compose up -d && npm run spark:blocks && npm run couchdb:docs",
     "serve": "vue-cli-service serve",
