@@ -72,10 +72,10 @@ export default class PidWidget extends BlockWidget {
         </q-field>
         <q-item>Output</q-item>
         <q-field label="Target">
-          <big>{{ block.data.outputSetting !== null ? (block.data.outputSetting | round) : "--.--" }}</big>
+          <big>{{ block.data.outputSetting | round }}</big>
         </q-field>
         <q-field label="Actual">
-          <big>{{ block.data.outputSetting !== null ? (block.data.outputSetting | round) : "--.--" }}</big>
+          <big>{{ block.data.outputSetting | round }}</big>
         </q-field>
       </div>
       <div :style="gridStyle(8)" class="full-width">
