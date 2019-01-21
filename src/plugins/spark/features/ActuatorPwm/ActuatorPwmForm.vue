@@ -3,11 +3,21 @@ import { ActuatorDigitalLink } from '@/helpers/units/KnownLinks';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/state';
 import Component from 'vue-class-component';
+import { Unit } from '@/helpers/units';
 
 @Component
 export default class ActuatorPwmForm extends BlockForm {
   get block(): ActuatorPwmBlock {
     return this.blockField as ActuatorPwmBlock;
+  }
+
+  defaultData() {
+    return {
+      actuatorId: new ActuatorDigitalLink(null),
+      period: new Unit(4, 'second'),
+      setting: 0,
+      constrainedBy: { constraints: [] },
+    };
   }
 
   presets() {
@@ -16,7 +26,7 @@ export default class ActuatorPwmForm extends BlockForm {
         label: 'Heater - 4s period',
         value: {
           actuatorId: new ActuatorDigitalLink(null),
-          period: 4,
+          period: new Unit(4, 'second'),
           setting: 0,
           constrainedBy: { constraints: [] },
         },
@@ -25,11 +35,11 @@ export default class ActuatorPwmForm extends BlockForm {
         label: 'Fridge - 30m period',
         value: {
           actuatorId: new ActuatorDigitalLink(null),
-          period: 1800,
+          period: new Unit(1800, 'second'),
           setting: 0,
-          constrainedBy: { constraints: [] },          
-          },
+          constrainedBy: { constraints: [] },
         },
+      },
     ];
   }
 }

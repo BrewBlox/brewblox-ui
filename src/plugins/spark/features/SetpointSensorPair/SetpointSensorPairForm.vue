@@ -6,18 +6,17 @@ import Component from 'vue-class-component';
 
 @Component
 export default class SetpointSensorPairForm extends BlockForm {
+  defaultData() {
+    return {
+      setpointId: new SetpointLink(null),
+      sensorId: new TempSensorLink(null),
+      setpointValue: new Unit(null, 'degC'),
+      sensorValue: new Unit(null, 'degC'),
+    };
+  }
+
   presets() {
-    return [
-      {
-        label: 'Default',
-        value: {
-          setpointId: new SetpointLink(null),
-          sensorId: new TempSensorLink(null),
-          setpointValue: new Unit(null, 'degC'),
-          sensorValue: new Unit(null, 'degC'),
-        },
-      },
-    ];
+    return [];
   }
 }
 </script>

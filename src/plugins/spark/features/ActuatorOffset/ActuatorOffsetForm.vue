@@ -10,17 +10,17 @@ export default class ActuatorOffsetForm extends BlockForm {
     return this.blockField as ActuatorOffsetBlock;
   }
 
+  defaultData() {
+    return {
+      targetId: new ProcessValueLink(null),
+      referenceId: new ProcessValueLink(null),
+      referenceSettingOrValue: 0,
+      constrainedBy: { constraints: [] },
+    };
+  }
+
   presets() {
     return [
-      {
-        label: 'Default',
-        value: {
-          targetId: new ProcessValueLink(null),
-          referenceId: new ProcessValueLink(null),
-          referenceSettingOrValue: 0,
-          constrainedBy: { constraints: [] },
-        },
-      },
       {
         label: 'HLT Setpoint driver',
         value: {

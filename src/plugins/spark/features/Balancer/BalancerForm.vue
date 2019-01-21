@@ -4,15 +4,14 @@ import Component from 'vue-class-component';
 
 @Component
 export default class BalancerForm extends BlockForm {
+  defaultData() {
+    return {
+      clients: [],
+    };
+  }
+
   presets() {
-    return [
-      {
-        label: 'Default',
-        value: {
-          clients: [],
-        },
-      },
-    ];
+    return [];
   }
 }
 </script>

@@ -39,6 +39,14 @@ export default class SetpointProfileForm extends BlockForm {
       : new Date().getTime());
   }
 
+  defaultData() {
+    return {
+      points: [],
+      setting: new Unit(null, 'degC'),
+      enabled: true,
+    };
+  }
+
   presets() {
     return [
       {

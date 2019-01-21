@@ -8,6 +8,31 @@ import { filters } from './getters';
 
 @Component
 export default class PidForm extends BlockForm {
+  defaultData() {
+    console.log('returning default data');
+    return {
+      inputId: new ProcessValueLink(null),
+      outputId: new ActuatorAnalogLink(null),
+      inputValue: new Unit(0, 'degC'),
+      inputSetting: new Unit(0, 'degC'),
+      outputValue: 0,
+      outputSetting: 0,
+      filter: 0,
+      filterThreshold: new Unit(0, 'delta_degC'),
+      enabled: false,
+      active: true,
+      kp: new Unit(0, '1/degC'),
+      ti: new Unit(0, 'second'),
+      td: new Unit(0, 'second'),
+      p: 0,
+      i: 0,
+      d: 0,
+      error: new Unit(0, 'delta_degC'),
+      integral: new Unit(0, 'delta_degC/second'),
+      derivative: new Unit(0, 'delta_degC*second'),
+    };
+  }
+
   presets() {
     return [
       {
@@ -60,7 +85,7 @@ export default class PidForm extends BlockForm {
           td: new Unit(5, 'min'),
         },
       },
-       {
+      {
         label: 'Heating pad',
         value: {
           filter: 4,

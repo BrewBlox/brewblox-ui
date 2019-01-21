@@ -14,16 +14,15 @@ export default class DisplaySettingsForm extends BlockForm {
     return this.blockField as DisplaySettingsBlock;
   }
 
+  defaultData() {
+    return {
+      name: 'Display settings',
+      widgets: [],
+    };
+  }
+
   presets() {
-    return [
-      {
-        label: 'Default',
-        value: {
-          name: 'Display settings',
-          widgets: [],
-        },
-      },
-    ];
+    return [];
   }
 
   get displaySlots() {

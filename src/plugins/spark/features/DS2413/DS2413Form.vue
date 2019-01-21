@@ -22,16 +22,15 @@ export default class DS2413Form extends BlockForm {
     return this.actuatorState === 'Active';
   }
 
+  defaultData() {
+    return {
+      address: '',
+      state: 2,
+    };
+  }
+
   presets() {
-    return [
-      {
-        label: 'Default',
-        value: {
-          address: '',
-          state: 2,
-        },
-      },
-    ];
+    return [];
   }
 }
 </script>

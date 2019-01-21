@@ -20,17 +20,17 @@ export default class ActuatorDS2413Form extends BlockForm {
       .map((v, idx) => ({ label: v, value: idx }));
   }
 
+  defaultData() {
+    return {
+      hwDevice: new DS2413Link(null),
+      channel: 0,
+      state: 0,
+      constrainedBy: { constraints: [] },
+    };
+  }
+
   presets() {
     return [
-      {
-        label: 'Default',
-        value: {
-          hwDevice: new DS2413Link(null),
-          channel: 0,
-          state: 0,
-          constrainedBy: { constraints: [] },
-        },
-      },
       {
         label: 'Fridge compressor',
         value: {

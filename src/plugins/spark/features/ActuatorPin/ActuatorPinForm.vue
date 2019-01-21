@@ -10,16 +10,16 @@ export default class ActuatorPinForm extends BlockForm {
     return this.blockField as ActuatorPinBlock;
   }
 
+  defaultData() {
+    return {
+      state: 2,
+      invert: false,
+      constrainedBy: { constraints: [], unconstrained: 0 },
+    };
+  }
+
   presets() {
     return [
-      {
-        label: 'Default',
-        value: {
-          state: 2,
-          invert: false,
-          constrainedBy: { constraints: [], unconstrained: 0 },
-        },
-      },
       {
         label: 'Fridge compressor',
         value: {

@@ -4,15 +4,14 @@ import Component from 'vue-class-component';
 
 @Component
 export default class MutexForm extends BlockForm {
+  defaultData() {
+    return {
+      differentActuatorWait: 0,
+    };
+  }
+
   presets() {
-    return [
-      {
-        label: 'Default',
-        value: {
-          differentActuatorWait: 0,
-        },
-      },
-    ];
+    return [];
   }
 }
 </script>
