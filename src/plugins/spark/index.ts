@@ -6,6 +6,8 @@ import {
   unitDurationString,
   shortDateString,
   dateString,
+  round,
+  truncate,
 } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
 import { createFeature } from '@/store/features/actions';
@@ -37,16 +39,11 @@ export default ({ store }: PluginArguments) => {
     'link',
     (value: Link | null) =>
       (value !== null && value !== undefined ? value.toString() : '-'));
-  Vue.filter(
-    'round',
-    (value: any) => (typeof value !== 'number' ? value : +value.toFixed(2)));
+  Vue.filter('round', round);
   Vue.filter('hexToBase64', hexToBase64);
   Vue.filter('base64ToHex', base64ToHex);
   Vue.filter('duration', durationString);
-  Vue.filter('truncated', (value: string) => {
-    const strVal = value.toString();
-    return strVal.length <= 30 ? strVal : `${strVal.slice(0, 27)}...`;
-  });
+  Vue.filter('truncated', truncate);
   Vue.filter('unitDuration', unitDurationString);
   Vue.filter('dateString', dateString);
   Vue.filter('shortDateString', shortDateString);

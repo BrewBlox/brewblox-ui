@@ -1,6 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { round, truncate } from '@/helpers/functional';
 
 @Component({
   props: {
@@ -34,9 +35,18 @@ export default class InputPopupEdit extends Vue {
 
   get displayValue() {
     const val = this.$props.field;
-    if (val === null || val === undefined || val === '') {
-      return '<not set>';
+
+    if (this.$props.type === 'number') {
+      return round(val);
     }
+
+    if (this.$props.type === 'text') {
+      if (val === null || val === undefined) {
+        return '<not set>';
+      }
+      return truncate(val);
+    }
+
     return val;
   }
 
@@ -56,11 +66,7 @@ export default class InputPopupEdit extends Vue {
 
 <template>
   <div>
-    <component
-      :disabled="$props.disable"
-      :is="$props.display"
-      class="editable"
-    >{{ displayValue | round | truncated }}</component>
+    <component :disabled="$props.disable" :is="$props.display" class="editable">{{ displayValue }}</component>
     <q-popup-edit
       :disable="$attrs.disabled"
       :title="popupTitle"

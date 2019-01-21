@@ -9,7 +9,6 @@ import { filters } from './getters';
 @Component
 export default class PidForm extends BlockForm {
   defaultData() {
-    console.log('returning default data');
     return {
       inputId: new ProcessValueLink(null),
       outputId: new ActuatorAnalogLink(null),
@@ -17,12 +16,12 @@ export default class PidForm extends BlockForm {
       inputSetting: new Unit(0, 'degC'),
       outputValue: 0,
       outputSetting: 0,
-      filter: 0,
-      filterThreshold: new Unit(0, 'delta_degC'),
+      filter: 4,
+      filterThreshold: new Unit(5, 'delta_degC'),
       enabled: false,
       active: true,
-      kp: new Unit(0, '1/degC'),
-      ti: new Unit(0, 'second'),
+      kp: new Unit(20, '1/degC'),
+      ti: new Unit(2, 'hour'),
       td: new Unit(0, 'second'),
       p: 0,
       i: 0,
