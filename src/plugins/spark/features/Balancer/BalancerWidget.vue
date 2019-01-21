@@ -1,8 +1,11 @@
 <script lang="ts">
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
-import { getById } from './getters';
+import { getById, getClients } from './getters';
 import { BalancerBlock } from './state';
+import { allBlocks, compatibleBlocks } from '@/plugins/spark/store/getters';
+import { ActuatorAnalogLink } from '@/helpers/units/KnownLinks';
+import { fetchCompatibleBlocks } from '@/plugins/spark/store/actions';
 
 @Component
 export default class BalancerWidget extends BlockWidget {
@@ -10,13 +13,21 @@ export default class BalancerWidget extends BlockWidget {
     return getById(this.$store, this.serviceId, this.blockId);
   }
 
+  get clientNames() {
+    return getClients(this.$store, this.serviceId, this.blockId);
+  }
+
+  clientName(id: number) {
+    return this.clientNames[id] || id || 'unknown';
+  }
+
   get renamedTargets() {
     return this.block.data.clients
       .reduce(
         (acc, client, idx) => ({
           ...acc,
-          [`clients/${idx}/requested`]: `${client.id.id} requested`,
-          [`clients/${idx}/granted`]: `${client.id.id} granted`,
+          [`clients/${idx}/requested`]: `${this.clientName(client.id)} requested`,
+          [`clients/${idx}/granted`]: `${this.clientName(client.id)} granted`,
         }),
         {},
     );
@@ -54,7 +65,7 @@ export default class BalancerWidget extends BlockWidget {
              :key="client.id.id"
              class="row"
         >
-          <div class ="q-label col self-center">{{ client.id.id || 'unknown' }}</div>
+          <div class ="q-label col self-center">{{ clientName(client.id) }}</div>
           <big class="col">{{ client.granted | round }}</big>
           <big class="col">{{ client.requested | round }}</big>
         </div>

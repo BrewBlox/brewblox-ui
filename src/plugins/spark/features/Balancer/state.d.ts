@@ -2,7 +2,7 @@ import { Link } from '@/helpers/units';
 import { Block } from '@/plugins/spark/state';
 
 export interface BalancedActuator {
-  id: Link;
+  id: number;
   requested: number;
   granted: number;
 }
