@@ -60,5 +60,5 @@ export default class SetpointSensorPairWidget extends BlockWidget {
 <style lang="stylus" scoped>
 /deep/ .widget-body .q-field-margin {
   margin-top: 0px;
-} 
+}
 </style>

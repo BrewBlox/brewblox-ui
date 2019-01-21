@@ -11,7 +11,7 @@ export interface DataBlock {
   id: string;
   type: string;
   groups: number[];
-  data: Object | null;
+  data: any;
 }
 
 export interface Block extends DataBlock {

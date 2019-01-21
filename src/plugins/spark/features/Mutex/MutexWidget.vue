@@ -1,7 +1,7 @@
 <script lang="ts">
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
-import { getById, getMutexHolder } from './getters';
+import { getById, getMutexClients } from './getters';
 import { MutexBlock } from './state';
 
 @Component
@@ -9,8 +9,9 @@ export default class MutexWidget extends BlockWidget {
   get block(): MutexBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
-  get mutexClients(){
-    return getMutexHolder(this.$store, this.serviceId, this.blockId);
+
+  get mutexClients() {
+    return getMutexClients(this.$store, this.serviceId, this.blockId);
   }
 }
 </script>
@@ -44,22 +45,16 @@ export default class MutexWidget extends BlockWidget {
           />
         </q-field>
         <q-field label="Held by">
-          <span>
-            {{ mutexClients.active }}  
-          </span>
+          <span>{{ mutexClients.active }}</span>
         </q-field>
         <q-field label="Waiting">
           <div class="column">
-            <span v-for="client in mutexClients.waiting" :key="client">
-              {{ client }}
-            </span>
+            <span v-for="client in mutexClients.waiting" :key="client">{{ client }}</span>
           </div>
         </q-field>
         <q-field label="Idle">
           <div class="column">
-            <span v-for="client in mutexClients.idle" :key="client">
-              {{ client }}
-            </span>
+            <span v-for="client in mutexClients.idle" :key="client">{{ client }}</span>
           </div>
         </q-field>
       </div>
@@ -70,5 +65,5 @@ export default class MutexWidget extends BlockWidget {
 <style lang="stylus" scoped>
 /deep/ .widget-body .q-field-margin {
   margin-top: 0px;
-} 
+}
 </style>

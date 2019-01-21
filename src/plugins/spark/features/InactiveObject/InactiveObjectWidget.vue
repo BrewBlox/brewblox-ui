@@ -1,9 +1,13 @@
 <script lang="ts">
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
+import { displayNameById } from '@/store/features/getters';
 
 @Component
 export default class InactiveObjectWidget extends BlockWidget {
+  get actualDisplayName() {
+    return displayNameById(this.$store, this.block.data.actualType);
+  }
 }
 </script>
 
@@ -32,8 +36,8 @@ export default class InactiveObjectWidget extends BlockWidget {
     <q-card-separator/>
     <q-card-main class="column widget-body">
       <div class="full-width placeholder-text">
-        This {{ block.data.actualType }} block is disabled.<br>
-        To enable it, ensure that it is in an enabled group.
+        This {{ actualDisplayName }} block is disabled.
+        <br>To enable it, ensure that it is in an enabled group.
       </div>
     </q-card-main>
   </q-card>
