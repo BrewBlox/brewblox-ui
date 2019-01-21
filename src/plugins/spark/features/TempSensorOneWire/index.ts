@@ -8,7 +8,7 @@ import widget from './TempSensorOneWireWidget.vue';
 const feature: Feature = {
   ...GenericBlock,
   id: typeName,
-  displayName: 'Onewire Temperature Sensor',
+  displayName: 'OneWire Temp Sensor',
   widget: ref(widget),
   form: ref(form),
   widgetSize: {

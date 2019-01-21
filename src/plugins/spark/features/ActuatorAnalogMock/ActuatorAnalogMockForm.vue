@@ -4,20 +4,19 @@ import Component from 'vue-class-component';
 
 @Component
 export default class ActuatorAnalogMockForm extends BlockForm {
+  defaultData() {
+    return {
+      setting: 0,
+      minSetting: 0,
+      maxSetting: 100,
+      value: 0,
+      minValue: 0,
+      maxValue: 100,
+    };
+  }
+
   presets() {
-    return [
-      {
-        label: 'Default',
-        value: {
-          setting: 0,
-          minSetting: 0,
-          maxSetting: 0,
-          value: 0,
-          minValue: 0,
-          maxValue: 0,
-        },
-      },
-    ];
+    return [];
   }
 }
 </script>
@@ -71,6 +70,17 @@ export default class ActuatorAnalogMockForm extends BlockForm {
             :change="callAndSaveBlock(v => block.data.maxValue = v)"
             type="number"
             label="value max"
+          />
+        </q-field>
+      </div>
+    </q-collapsible>
+    <q-collapsible group="modal" class="col-12" icon="mdi-less-than-or-equal" label="Constraints">
+      <div>
+        <q-field label="Constraints" orientation="vertical">
+          <AnalogConstraints
+            :service-id="block.serviceId"
+            :field="block.data.constrainedBy"
+            :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
           />
         </q-field>
       </div>

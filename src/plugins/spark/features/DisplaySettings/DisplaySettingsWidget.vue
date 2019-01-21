@@ -45,12 +45,41 @@ export default class DisplaySettingsWidget extends BlockWidget {
     </q-card-title>
     <q-card-separator/>
     <q-card-main class="column widget-body">
-      <div :style="gridStyle(displaySlots.length)" class="full-width">
+      <div :style="gridStyle(displaySlots.length)" class="slots full-width">
         <q-field v-for="(slot, idx) in displaySlots" :key="idx" :label="`Slot ${idx + 1}`">
           <big v-if="slot" :style="`color: #${slot.color} !important`">{{ slot.name }}</big>
           <big v-else>Not set</big>
         </q-field>
       </div>
+      <div class="footer-text row full-width">
+        <div class="q-field-label col-3">Footer text</div>
+        <InputPopupEdit
+          :field="block.data.name"
+          :change="callAndSaveBlock(v => block.data.name = v)"
+          class="col-9 self-center"
+          label="footer text"
+          display="span"
+        />
+      </div>
     </q-card-main>
   </q-card>
 </template>
+
+
+<style lang="stylus" scoped>
+/deep/ .widget-body .q-field-margin {
+  margin-top: 0px;
+} 
+
+/deep/ .widget-body .q-field-content {
+  padding-top: 0px;
+}
+
+.footer-text {
+  margin-top: 20px;
+}
+
+.slots {
+  align-items: center;  
+}
+</style>

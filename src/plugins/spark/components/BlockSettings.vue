@@ -14,6 +14,10 @@ export default class BlockSettings extends BlockForm {
   presets() {
     return this.$props.presetsFunc();
   }
+
+  applyPreset(presetData: any) {
+    this.block.data = { ...this.block.data, ...presetData };
+  }
 }
 </script>
 
@@ -36,12 +40,12 @@ export default class BlockSettings extends BlockForm {
         display="span"
       />
     </q-field>
-    <q-field label="Load defaults preset">
+    <q-field label="Apply preset">
       <SelectPopupEdit
         :field="block.data"
         :options="presets()"
-        :change="callAndSaveBlock(v => block.data = v)"
-        label="Select preset to load"
+        :change="callAndSaveBlock(applyPreset)"
+        label="preset"
         display="span"
       />
     </q-field>

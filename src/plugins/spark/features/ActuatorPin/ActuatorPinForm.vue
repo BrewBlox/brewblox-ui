@@ -10,14 +10,27 @@ export default class ActuatorPinForm extends BlockForm {
     return this.blockField as ActuatorPinBlock;
   }
 
+  defaultData() {
+    return {
+      state: 2,
+      invert: false,
+      constrainedBy: { constraints: [], unconstrained: 0 },
+    };
+  }
+
   presets() {
     return [
       {
-        label: 'Default',
+        label: 'Fridge compressor',
         value: {
-          state: 2,
+          state: 0,
           invert: false,
-          constrainedBy: { constraints: [], unconstrained: 0 },
+          constrainedBy: {
+            constraints: [
+              { "minOff[second]": 300 },
+              { "minOn[second]": 180 },
+            ],
+          },
         },
       },
     ];
@@ -32,7 +45,7 @@ export default class ActuatorPinForm extends BlockForm {
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
     <q-collapsible group="modal" class="col-12" icon="settings" label="Settings">
-      <q-field label="Settings">
+      <q-field label="State">
         <ActuatorState
           :field="block.data.state"
           :change="callAndSaveBlock(v => block.data.state = v)"

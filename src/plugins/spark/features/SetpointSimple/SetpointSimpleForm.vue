@@ -5,16 +5,16 @@ import Component from 'vue-class-component';
 
 @Component
 export default class SetpointSimpleForm extends BlockForm {
+  defaultData() {
+    return {
+      setting: new Unit(null, 'degC'),
+      setpoint: new Unit(20, 'degC'),
+      enabled: false,
+    };
+  }
+
   presets() {
-    return [
-      {
-        label: 'Default',
-        value: {
-          setting: new Unit(0, 'degC'),
-          enabled: true,
-        },
-      },
-    ];
+    return [];
   }
 }
 </script>

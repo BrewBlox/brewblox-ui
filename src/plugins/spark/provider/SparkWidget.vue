@@ -93,18 +93,24 @@ export default class SparkWidget extends Vue {
           type="warning"
         >Unable to update automatically</q-alert>
         <q-field label="Device ID">
-          <big style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</big>
+          <span style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</span>
         </q-field>
         <q-field label="IP address">
-          <big>{{ wifi.data.ip }}</big>
+          <div>{{ wifi.data.ip }}</div>
         </q-field>
         <q-field label="Time since boot">
-          <big>{{ ticks.data.millisSinceBoot | duration }}</big>
+          <div>{{ ticks.data.millisSinceBoot | duration }}</div>
         </q-field>
         <q-field label="Date">
-          <big>{{ sysDate }}</big>
+          <div>{{ sysDate }}</div>
         </q-field>
       </div>
     </q-card-main>
   </q-card>
 </template>
+
+<style lang="stylus" scoped>
+/deep/ .widget-body .q-field-margin {
+  margin-top: 0px;
+} 
+</style>

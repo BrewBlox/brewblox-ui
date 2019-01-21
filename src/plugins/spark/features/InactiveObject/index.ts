@@ -8,7 +8,7 @@ import widget from './InactiveObjectWidget.vue';
 const feature: Feature = {
   ...GenericBlock,
   id: typeName,
-  displayName: 'Inactive Object',
+  displayName: 'Inactive Block',
   widget: ref(widget),
   form: ref(form),
   wizard: undefined,

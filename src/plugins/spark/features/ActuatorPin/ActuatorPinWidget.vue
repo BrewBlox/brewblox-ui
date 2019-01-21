@@ -72,8 +72,6 @@ export default class ActuatorPinWidget extends BlockWidget {
         <q-field v-if="pending !== null" label="Pending">
           <span>{{ pending }}</span>
         </q-field>
-      </div>
-      <div class="full-width">
         <q-field label="Constraints">
           <DigitalConstraints
             :service-id="serviceId"

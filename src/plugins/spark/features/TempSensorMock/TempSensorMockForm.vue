@@ -5,16 +5,15 @@ import Component from 'vue-class-component';
 
 @Component
 export default class TempSensorMockForm extends BlockForm {
+  defaultData() {
+    return {
+      value: new Unit(20, 'degC'),
+      connected: true,
+    };
+  }
+
   presets() {
-    return [
-      {
-        label: 'Default',
-        value: {
-          value: new Unit(0, 'degC'),
-          connected: false,
-        },
-      },
-    ];
+    return [];
   }
 }
 </script>

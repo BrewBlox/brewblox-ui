@@ -40,7 +40,7 @@ export default class SetpointSimpleWidget extends BlockWidget {
     <q-alert v-if="block.data.value === null" type="warning" color="warn">This Setpoint is invalid</q-alert>
     <q-card-main class="column widget-body">
       <div class="full-width">
-        <q-field :label="block.data.enabled ? 'Target' : 'Target when enabled'" label-width="6">
+        <q-field :label="block.data.enabled ? 'Target' : 'Target when enabled'">
           <UnitPopupEdit
             :class="[block.data.setting.value === null ? 'darkened' : {}]"
             :field="block.data.setpoint"
@@ -48,7 +48,7 @@ export default class SetpointSimpleWidget extends BlockWidget {
             label="Target"
           />
         </q-field>
-        <q-field label="Enabled" label-width="6">
+        <q-field label="Enabled">
           <q-toggle
             :value="block.data.enabled"
             @input="v => { block.data.enabled = v; saveBlock() }"
@@ -58,3 +58,9 @@ export default class SetpointSimpleWidget extends BlockWidget {
     </q-card-main>
   </q-card>
 </template>
+
+<style lang="stylus" scoped>
+/deep/ .widget-body .q-field-margin {
+  margin-top: 0px;
+} 
+</style>

@@ -9,26 +9,21 @@ export default class ActuatorOffsetWidget extends BlockWidget {
   get block(): ActuatorOffsetBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
-
-  get settingOrValue() {
-    return ['Setting', 'Value'][this.block.data.referenceSettingOrValue];
-  }
-
   get warnings() {
     const warn: string[] = [];
     if (!this.block.data.targetId === null) {
-      warn.push('Target invalid');
+      warn.push('Driven process value invalid');
     }
     if (this.block.data.referenceId === null) {
-      warn.push('Reference invalid');
+      warn.push('Reference process value');
     }
     return warn.join(', ');
   }
 
   get renamedTargets() {
     return {
-      setting: 'Setting',
-      value: 'Value',
+      setting: 'Target offset',
+      value: 'Actual offset',
     };
   }
 }
@@ -61,14 +56,11 @@ export default class ActuatorOffsetWidget extends BlockWidget {
     <q-alert v-if="warnings" type="warning" color="warn">{{ warnings }}</q-alert>
     <q-card-main class="column widget-body">
       <div class="full-width">
-        <q-field label="Setting">
+        <q-field label="Target offset">
           <big>{{ block.data.setting | round }}</big>
         </q-field>
-        <q-field label="Value">
+        <q-field label="Actual offset">
           <big>{{ block.data.value | round }}</big>
-        </q-field>
-        <q-field label="Setting or value">
-          <big>{{ settingOrValue }}</big>
         </q-field>
         <q-field label="Constraints">
           <AnalogConstraints
@@ -82,5 +74,3 @@ export default class ActuatorOffsetWidget extends BlockWidget {
     </q-card-main>
   </q-card>
 </template>
-
-

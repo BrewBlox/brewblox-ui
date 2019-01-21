@@ -46,8 +46,8 @@ export default class DigitalConstraints extends Constraints {
 </script>
 
 <template>
-  <div class="column gutter-y-xs">
-    <div v-for="(cinfo, idx) in constraints" :key="idx">
+  <div class="constraints-list gutter-y-xs">
+    <div v-for="(cinfo, idx) in constraints" :key="idx" class="column">
       <div v-if="readonly" :class="{row: true, limiting: cinfo.limiting}">
         <span class="col">{{ label(cinfo.key) }}</span>
         <span class="col">{{ cinfo.value | unit }}</span>
@@ -73,6 +73,9 @@ export default class DigitalConstraints extends Constraints {
         <q-btn class="col-1" icon="delete" @click="removeConstraint(idx); saveConstraints();"/>
       </div>
     </div>
+    <div v-if="readonly && constraints.length === 0" class="column">
+      <div class="row">None</div>
+    </div>
     <div v-if="!readonly" class="row gutter-x-cs">
       <q-btn label="Add constraint">
         <q-popover>
@@ -87,14 +90,14 @@ export default class DigitalConstraints extends Constraints {
         </q-popover>
       </q-btn>
     </div>
-    <div v-if="readonly && constraints.length === 0" class="row">
-      <span>No constraints set</span>
-    </div>
   </div>
 </template>
 
 <style scoped>
 .limiting {
   color: red;
+}
+.constraints-list {
+  padding-top: 5px;
 }
 </style>

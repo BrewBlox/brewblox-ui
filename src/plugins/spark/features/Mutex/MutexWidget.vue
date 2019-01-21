@@ -1,13 +1,17 @@
 <script lang="ts">
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
-import { getById } from './getters';
+import { getById, getMutexClients } from './getters';
 import { MutexBlock } from './state';
 
 @Component
 export default class MutexWidget extends BlockWidget {
   get block(): MutexBlock {
     return getById(this.$store, this.serviceId, this.blockId);
+  }
+
+  get mutexClients() {
+    return getMutexClients(this.$store, this.serviceId, this.blockId);
   }
 }
 </script>
@@ -32,17 +36,34 @@ export default class MutexWidget extends BlockWidget {
     <q-card-separator/>
     <q-card-main class="column widget-body">
       <div class="full-width">
-        <q-field label="Actuator wait time">
-          <InputPopupEdit
+        <q-field label="Idle time before allowing a different actuator">
+          <TimeUnitPopupEdit
             :field="block.data.differentActuatorWait"
             :change="callAndSaveBlock(v => block.data.differentActuatorWait = v)"
             type="number"
-            label="Actuator wait time"
+            label="minimum idle time"
           />
+        </q-field>
+        <q-field label="Held by">
+          <span>{{ mutexClients.active }}</span>
+        </q-field>
+        <q-field label="Waiting">
+          <div class="column">
+            <span v-for="client in mutexClients.waiting" :key="client">{{ client }}</span>
+          </div>
+        </q-field>
+        <q-field label="Idle">
+          <div class="column">
+            <span v-for="client in mutexClients.idle" :key="client">{{ client }}</span>
+          </div>
         </q-field>
       </div>
     </q-card-main>
   </q-card>
 </template>
 
-
+<style lang="stylus" scoped>
+/deep/ .widget-body .q-field-margin {
+  margin-top: 0px;
+}
+</style>

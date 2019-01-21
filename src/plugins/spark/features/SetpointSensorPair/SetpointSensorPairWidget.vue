@@ -44,7 +44,7 @@ export default class SetpointSensorPairWidget extends BlockWidget {
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-card-main class="column widget-body">
+    <q-card-main class="widget-body column">
       <div class="full-width">
         <q-field label="Setpoint value">
           <big>{{ block.data.setpointValue | unit }}</big>
@@ -56,3 +56,9 @@ export default class SetpointSensorPairWidget extends BlockWidget {
     </q-card-main>
   </q-card>
 </template>
+
+<style lang="stylus" scoped>
+/deep/ .widget-body .q-field-margin {
+  margin-top: 0px;
+}
+</style>

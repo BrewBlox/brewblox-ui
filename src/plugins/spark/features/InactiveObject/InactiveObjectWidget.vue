@@ -1,9 +1,13 @@
 <script lang="ts">
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
+import { displayNameById } from '@/store/features/getters';
 
 @Component
 export default class InactiveObjectWidget extends BlockWidget {
+  get actualDisplayName() {
+    return displayNameById(this.$store, this.block.data.actualType);
+  }
 }
 </script>
 
@@ -30,15 +34,18 @@ export default class InactiveObjectWidget extends BlockWidget {
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-alert type="info">This block is not in any active group</q-alert>
-    <q-card-main class="column col">
-      <q-field class="col" label="Profiles">
-        <GroupsPopupEdit
-          :field="block.groups"
-          :service-id="serviceId"
-          :change="callAndSaveBlock(v => block.groups = v)"
-        />
-      </q-field>
+    <q-card-main class="column widget-body">
+      <div class="full-width placeholder-text">
+        This {{ actualDisplayName }} block is disabled.
+        <br>To enable it, ensure that it is in an enabled group.
+      </div>
     </q-card-main>
   </q-card>
 </template>
+
+<style lang="stylus" scoped>
+.placeholder-text {
+  color: #AA5555;
+  text-align: center;
+}
+</style>

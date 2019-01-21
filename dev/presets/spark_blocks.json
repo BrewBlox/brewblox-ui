@@ -14,7 +14,7 @@
     ],
     "type": "Mutex",
     "data": {
-      "differentActuatorWait": 43
+      "differentActuatorWait": 0.01
     }
   },
   {
@@ -157,7 +157,7 @@
           }
         ]
       },
-      "period": 4000,
+      "period": 4,
       "actuatorId<>": "Pin-Bottom-1"
     }
   },

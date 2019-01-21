@@ -5,17 +5,16 @@ import Component from 'vue-class-component';
 
 @Component
 export default class TempSensorOneWireForm extends BlockForm {
+  defaultData() {
+    return {
+      value: new Unit(null, 'degC'),
+      offset: new Unit(0, 'delta_degC'),
+      address: '',
+    };
+  }
+
   presets() {
-    return [
-      {
-        label: 'Default',
-        value: {
-          value: new Unit(0, 'degC'),
-          offset: new Unit(0, 'delta_degC'),
-          address: '',
-        },
-      },
-    ];
+    return [];
   }
 }
 </script>

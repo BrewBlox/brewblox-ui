@@ -14,30 +14,48 @@ import Vue from 'vue';
   },
 })
 export default class ActuatorState extends Vue {
-  get state() {
+  get commonOpts() {
+    return {
+      color: 'grey-9',
+      toggleColor: 'grey-8',
+      textColor: 'grey',
+    };
+  }
+
+  get options() {
     return [
-      'Inactive',
-      'Active',
+      {
+        ...this.commonOpts,
+        toggleTextColor: 'white',
+        label: 'Off',
+        value: 0,
+      },
+      {
+        ...this.commonOpts,
+        toggleTextColor: 'white',
+        label: 'On',
+        value: 1,
+      },
     ];
   }
 
-  get stringState() {
-    return this.state[this.$props.field] || 'Unknown';
+  get state() {
+    return this.$props.field;
   }
 
-  get boolState() {
-    return this.stringState === 'Active';
+  set state(v: number) {
+    this.$props.change(v);
   }
 
-  set boolState(v: boolean) {
-    this.$props.change(v ? 1 : 0);
+  get known() {
+    return !!this.options.find(opt => opt.value === this.state);
   }
 }
 </script>
 
 <template>
   <div>
-    <q-toggle v-if="stringState !== 'Unknown'" v-model="boolState"/>
+    <q-btn-toggle v-if="known" v-model="state" :options="options" dense/>
     <div v-else>
       <q-btn
         class="reset-button"
@@ -45,6 +63,7 @@ export default class ActuatorState extends Vue {
         no-caps
         flat
         color="warning"
+        style="padding: 0px"
         @click="boolState = false"
       >Unknown state!
         <q-tooltip>

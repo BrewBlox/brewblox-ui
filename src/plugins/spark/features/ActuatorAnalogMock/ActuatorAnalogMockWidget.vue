@@ -57,6 +57,14 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
         <q-field label="Value">
           <big>{{ block.data.value | round }}</big>
         </q-field>
+        <q-field label="Constraints">
+          <AnalogConstraints
+            :service-id="serviceId"
+            :field="block.data.constrainedBy"
+            :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+            readonly
+          />
+        </q-field>
       </div>
     </q-card-main>
   </q-card>
