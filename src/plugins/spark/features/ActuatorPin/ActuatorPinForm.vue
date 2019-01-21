@@ -45,7 +45,7 @@ export default class ActuatorPinForm extends BlockForm {
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
     <q-collapsible group="modal" class="col-12" icon="settings" label="Settings">
-      <q-field label="Active">
+      <q-field label="State">
         <ActuatorState
           :field="block.data.state"
           :change="callAndSaveBlock(v => block.data.state = v)"

@@ -1,7 +1,7 @@
 <script lang="ts">
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
-import { getById, state } from './getters';
+import { getById } from './getters';
 import { DS2413Block } from './state';
 
 @Component
@@ -14,12 +14,12 @@ export default class DS2413Widget extends BlockWidget {
     return this.block.data.address;
   }
 
-  get pinState() { 
+  get pinState() {
     return {
-      latchA:(this.block.data.state & 2) !== 0,
-      latchB:(this.block.data.state & 8) !== 0,
-      senseA:(this.block.data.state & 1) !== 0,
-      senseB:(this.block.data.state & 4) !== 0,
+      latchA: (this.block.data.state & 2) !== 0,
+      latchB: (this.block.data.state & 8) !== 0,
+      senseA: (this.block.data.state & 1) !== 0,
+      senseB: (this.block.data.state & 4) !== 0,
     };
   }
 }
@@ -49,10 +49,10 @@ export default class DS2413Widget extends BlockWidget {
           <span>{{ address }}</span>
         </q-field>
         <q-field class="col" label="State">
-          <q-toggle :value="pinState.latchA" readonly label="Latch A" />
-          <q-toggle :value="pinState.senseA" readonly label="Sense A" />
-          <q-toggle :value="pinState.latchB" readonly label="Latch B" />
-          <q-toggle :value="pinState.senseB" readonly label="Sense B" />
+          <q-toggle :value="pinState.latchA" readonly label="Latch A"/>
+          <q-toggle :value="pinState.senseA" readonly label="Sense A"/>
+          <q-toggle :value="pinState.latchB" readonly label="Latch B"/>
+          <q-toggle :value="pinState.senseB" readonly label="Sense B"/>
         </q-field>
       </div>
     </q-card-main>
@@ -66,6 +66,6 @@ export default class DS2413Widget extends BlockWidget {
 
 /deep/ .widget-body .q-field-margin {
   margin-top: 0px;
-} 
+}
 </style>
 

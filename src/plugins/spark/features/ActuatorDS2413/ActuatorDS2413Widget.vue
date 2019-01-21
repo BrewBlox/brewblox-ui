@@ -45,7 +45,7 @@ export default class ActuatorDS2413Widget extends BlockWidget {
 
     <q-card-main class="column widget-body">
       <div class="full-width">
-        <q-field label="Active">
+        <q-field label="State">
           <ActuatorState
             :field="block.data.state"
             :change="callAndSaveBlock(v => block.data.state = v)"

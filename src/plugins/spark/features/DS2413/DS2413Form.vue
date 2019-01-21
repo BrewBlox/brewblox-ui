@@ -1,7 +1,6 @@
 <script lang="ts">
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import Component from 'vue-class-component';
-import { state } from './getters';
 import { DS2413Block } from './state';
 
 @Component
@@ -12,14 +11,6 @@ export default class DS2413Form extends BlockForm {
 
   get address() {
     return this.block.data.address;
-  }
-
-  get actuatorState() {
-    return state[this.block.data.state];
-  }
-
-  get boolState() {
-    return this.actuatorState === 'Active';
   }
 
   defaultData() {

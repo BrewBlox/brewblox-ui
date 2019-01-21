@@ -73,7 +73,7 @@ export default class ActuatorDS2413Form extends BlockForm {
           label="DS2413 Channel"
         />
       </q-field>
-      <q-field label="Active">
+      <q-field label="State">
         <ActuatorState
           :field="block.data.state"
           :change="callAndSaveBlock(v => block.data.state = v)"
