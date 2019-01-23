@@ -6,6 +6,7 @@ import {
   removeDashboard,
   updateDashboardOrder,
   updatePrimaryDashboard,
+  saveDashboard,
 } from '@/store/dashboards/actions';
 import {
   allDashboards,
@@ -15,6 +16,7 @@ import { Dashboard } from '@/store/dashboards/state';
 import {
   removeService as removeServiceInStore,
   updateServiceOrder,
+  saveService,
 } from '@/store/services/actions';
 import { serviceValues } from '@/store/services/getters';
 import { Service } from '@/store/services/state';
@@ -91,6 +93,10 @@ export default class DefaultLayout extends Vue {
     }).then(() => removeDashboard(this.$store, dashboard));
   }
 
+  changeDashboardTitle(dashboard: Dashboard, title: string) {
+    saveDashboard(this.$store, { ...dashboard, title });
+  }
+
   createService() {
     this.wizardModalOpen = true;
   }
@@ -102,6 +108,10 @@ export default class DefaultLayout extends Vue {
       ok: 'Confirm',
       cancel: 'Cancel',
     }).then(() => removeServiceInStore(this.$store, service));
+  }
+
+  changeServiceTitle(service: Service, title: string) {
+    saveService(this.$store, { ...service, title });
   }
 
   updateDefaultDashboard(id: string) {
@@ -155,7 +165,16 @@ export default class DefaultLayout extends Vue {
             dark
           >
             <q-item-side v-if="dashboardEditing" icon="drag_indicator"/>
-            <q-item-main :label="dashboard.title"/>
+            <q-item-main>
+              <InputPopupEdit
+                v-if="dashboardEditing"
+                :field="dashboard.title"
+                :change="v => changeDashboardTitle(dashboard, v)"
+                label="Title"
+                display="span"
+              />
+              <span v-else>{{ dashboard.title }}</span>
+            </q-item-main>
             <q-item-side v-if="dashboardEditing" right>
               <q-btn
                 :color="defaultDashboard === dashboard.id ? 'primary' : ''"
@@ -207,7 +226,16 @@ export default class DefaultLayout extends Vue {
             dark
           >
             <q-item-side v-if="serviceEditing" icon="drag_indicator"/>
-            <q-item-main :label="service.title"/>
+            <q-item-main>
+              <InputPopupEdit
+                v-if="serviceEditing"
+                :field="service.title"
+                :change="v => changeServiceTitle(service, v)"
+                label="Title"
+                display="span"
+              />
+              <span v-else>{{ service.title }}</span>
+            </q-item-main>
             <q-item-side v-if="serviceEditing" right>
               <q-btn round flat icon="delete" @click="removeService(service)"/>
             </q-item-side>

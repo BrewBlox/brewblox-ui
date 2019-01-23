@@ -43,19 +43,38 @@ export default class NewBlockWizard extends Vue {
       .sort(objectStringSorter('label'));
   }
 
+  blockIdError(id) {
+    if (!id) {
+      return 'Name must not be empty';
+    }
+    const serviceId = this.$props.serviceId;
+    if (blockIds(this.$store, serviceId).includes(id)) {
+      return 'Name must be unique';
+    }
+    return null;
+  }
+
   get formComponent() {
     return formById(this.$store, this.featureId);
   }
 
   selectFeature(featureId: string) {
     this.block = {
-      id: '',
+      id: `New ${featureId} Block`,
       serviceId: this.$props.serviceId,
       groups: [0],
       type: featureId,
       data: null,
     };
     this.featureId = featureId;
+  }
+
+  async changeBlockId(newId: string) {
+    if (this.blockIdError(newId)) {
+      this.$q.notify(this.blockIdError);
+      return;
+    }
+    (this.block as Block).id = newId;
   }
 
   onCreate(block: Block) {
@@ -94,19 +113,20 @@ export default class NewBlockWizard extends Vue {
 </script>
 
 <template>
-  <div class="widget-modal">
+  <div class="widget-modal column">
     <q-card v-if="formComponent" dark>
       <q-card-title>Configure new block
         <q-btn slot="right" flat dense icon="clear" label="Cancel" @click="reset"/>
         <q-btn slot="right" flat dense icon="done_all" label="Create" @click="confirm"/>
       </q-card-title>
       <component
-        v-if="formComponent"
         :is="formComponent"
+        :type="block.type"
         :field="block"
-        :change="v => block = v"
-        :change-id="v => block.id = v"
-        :display-toolbar="false"
+        :on-change-field="v => block = v"
+        :id="block.id"
+        :on-change-block-id="changeBlockId"
+        embedded
       />
     </q-card>
     <q-card v-else dark>
@@ -114,46 +134,25 @@ export default class NewBlockWizard extends Vue {
         <q-btn v-close-overlay slot="right" flat dense icon="clear" label="Cancel"/>
       </q-card-title>
       <q-card-main>
-        <q-field label="Select a widget type" icon="widgets" orientation="vertical">
+        <q-list no-border>
           <q-item>
             <q-search v-model="searchModel" placeholder="Search"/>
           </q-item>
-          <q-list link inset-separator no-border>
-            <q-item
-              v-for="opt in wizardOptions"
-              :key="opt.label"
-              icon="widgets"
-              @click.native="() => selectFeature(opt.value)"
-            >
-              <q-item-main>
-                <q-item-tile label>{{ opt.label }}</q-item-tile>
-              </q-item-main>
-              <q-item-side right icon="chevron_right"/>
-            </q-item>
-          </q-list>
-        </q-field>
+        </q-list>
+        <q-list link inset-separator no-border>
+          <q-item
+            v-for="opt in wizardOptions"
+            :key="opt.label"
+            icon="widgets"
+            @click.native="() => selectFeature(opt.value)"
+          >
+            <q-item-main>
+              <q-item-tile label>{{ opt.label }}</q-item-tile>
+            </q-item-main>
+            <q-item-side right icon="chevron_right"/>
+          </q-item>
+        </q-list>
       </q-card-main>
     </q-card>
   </div>
 </template>
-
-<style scoped>
-/* .q-item {
-  display: grid;
-  grid-gap: 10px;
-}
-
-.q-list {
-  border: 0;
-}
-
-.q-option-group {
-  border: 0;
-} */
-
-.q-card {
-  min-width: 400px;
-  width: 100%;
-  margin-bottom: 10px;
-}
-</style>

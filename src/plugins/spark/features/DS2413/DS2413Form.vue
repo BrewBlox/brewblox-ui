@@ -9,10 +9,6 @@ export default class DS2413Form extends BlockForm {
     return this.blockField as DS2413Block;
   }
 
-  get address() {
-    return this.block.data.address;
-  }
-
   defaultData() {
     return {
       address: '',
@@ -22,6 +18,10 @@ export default class DS2413Form extends BlockForm {
 
   presets() {
     return [];
+  }
+
+  created() {
+    this.block; // ensure getter is evaluated
   }
 }
 </script>

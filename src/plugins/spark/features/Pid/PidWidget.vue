@@ -33,6 +33,11 @@ export default class PidWidget extends BlockWidget {
   get filterOpts() {
     return filters.map((filter, idx) => ({ label: filter, value: idx }));
   }
+
+  enable() {
+    this.block.data.enabled = true;
+    this.saveBlock();
+  }
 }
 </script>
 
@@ -55,7 +60,12 @@ export default class PidWidget extends BlockWidget {
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-alert v-if="!block.data.enabled" type="info" color="info">This PID is disabled</q-alert>
+    <q-alert
+      v-if="!block.data.enabled"
+      :actions="[{label:'Enable', handler: enable }]"
+      type="info"
+      color="info"
+    >This PID is disabled</q-alert>
     <q-alert
       v-if="block.data.enabled && !block.data.active"
       type="warning"

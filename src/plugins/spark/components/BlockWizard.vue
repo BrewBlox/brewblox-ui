@@ -218,6 +218,10 @@ export default class BlockWizard extends Vue {
     this.service = null;
     this.block = null;
     this.resetStepper();
+
+    if (this.serviceOpts.length === 1) {
+      this.service = this.serviceOpts[0].value;
+    }
   }
 }
 </script>

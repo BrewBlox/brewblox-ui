@@ -13,6 +13,10 @@ export default class BalancerForm extends BlockForm {
   presets() {
     return [];
   }
+
+  created() {
+    this.block; // ensure getter is evaluated
+  }
 }
 </script>
 
