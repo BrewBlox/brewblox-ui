@@ -292,7 +292,7 @@ export default class DefaultLayout extends Vue {
 .editable {
   border-bottom: 1px solid gray;
   cursor: pointer;
-  margin-bottom: 1px;
+  margin-bottom: 5px;
 }
 
 .darkened {

@@ -23,7 +23,7 @@ interface NavAction {
       type: String,
       required: true,
     },
-    onCreateItem: {
+    onCreate: {
       type: Function,
       required: true,
     },
@@ -194,7 +194,7 @@ export default class BlockWizard extends Vue {
       },
       ...widgetSizeById(this.$store, this.$props.featureId),
     };
-    this.$props.onCreateItem(item);
+    this.$props.onCreate(item);
   }
 
   async changeBlockId(newId: string) {
@@ -269,10 +269,13 @@ export default class BlockWizard extends Vue {
         v-if="block"
         ref="form"
         :is="blockForm"
+        :type="block.type"
         :field="block"
-        :change="v => block = v"
-        :change-id="changeBlockId"
-        :display-toolbar="false"
+        :on-change-field="v => block = v"
+        :id="widgetId"
+        :on-change-id="v => widgetId = v"
+        :on-change-block-id="changeBlockId"
+        embedded
       />
     </q-step>
     <q-stepper-navigation>

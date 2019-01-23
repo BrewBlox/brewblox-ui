@@ -10,7 +10,7 @@ import Component from 'vue-class-component';
       type: String,
       required: true,
     },
-    onCreateItem: {
+    onCreate: {
       type: Function,
       required: true,
     },
@@ -34,7 +34,7 @@ export default class ExampleFeatureWizard extends Vue {
   }
 
   createItem(item: Partial<DashboardItem>) {
-    this.$props.onCreateItem(item);
+    this.$props.onCreate(item);
   }
 
   cancel() {

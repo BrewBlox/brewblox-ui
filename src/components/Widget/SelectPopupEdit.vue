@@ -81,6 +81,7 @@ export default class SelectPopupEdit extends Vue {
     <q-popup-edit
       :title="`Set ${this.$props.label} to:`"
       v-model="placeholder"
+      label-set="apply"
       buttons
       persistent
       @show="startEdit"

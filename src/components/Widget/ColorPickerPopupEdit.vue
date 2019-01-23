@@ -58,6 +58,7 @@ export default class ColorPickerPopupEdit extends Vue {
       :disable="$attrs.disabled"
       :title="`Set ${this.$props.label} to:`"
       v-model="placeholder"
+      label-set="apply"
       buttons
       persistent
       @show="startEdit"

@@ -11,7 +11,7 @@ import Component from 'vue-class-component';
 
 @Component({
   props: {
-    onCreateItem: {
+    onCreate: {
       type: Function,
       required: true,
     },
@@ -41,8 +41,8 @@ export default class NewWidgetWizard extends Vue {
     this.featureId = id;
   }
 
-  onCreate(partial: Partial<DashboardItem>) {
-    this.$props.onCreateItem(partial);
+  create(partial: Partial<DashboardItem>) {
+    this.$props.onCreate(partial);
     this.reset();
   }
 
@@ -65,7 +65,7 @@ export default class NewWidgetWizard extends Vue {
         v-if="wizardComponent"
         :is="wizardComponent"
         :feature-id="featureId"
-        :on-create-item="onCreate"
+        :on-create="create"
         :on-cancel="reset"
       />
     </q-item>
@@ -75,7 +75,7 @@ export default class NewWidgetWizard extends Vue {
         <q-item>
           <q-search v-model="searchModel" placeholder="Search"/>
         </q-item>
-        <q-list link="" inset-separator>
+        <q-list link inset-separator>
           <q-item
             v-for="opt in wizardOptions"
             :key="opt.label"
@@ -84,7 +84,7 @@ export default class NewWidgetWizard extends Vue {
           >
             <div class="row">
               <q-item-main>
-                <q-item-tile label="">{{ opt.label }}</q-item-tile>
+                <q-item-tile label>{{ opt.label }}</q-item-tile>
               </q-item-main>
               <q-item-side right icon="chevron_right"/>
             </div>

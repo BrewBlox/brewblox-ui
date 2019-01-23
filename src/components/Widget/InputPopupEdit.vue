@@ -71,6 +71,7 @@ export default class InputPopupEdit extends Vue {
       :disable="$attrs.disabled"
       :title="popupTitle"
       v-model="placeholder"
+      label-set="apply"
       buttons
       persistent
       @show="startEdit"
@@ -80,4 +81,3 @@ export default class InputPopupEdit extends Vue {
     </q-popup-edit>
   </div>
 </template>
-

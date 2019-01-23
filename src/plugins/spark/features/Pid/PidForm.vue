@@ -109,8 +109,8 @@ export default class PidForm extends BlockForm {
 
 <template>
   <div class="widget-modal column">
-    <q-toolbar v-if="$props.displayToolbar" color="primary" class="unpadded">
-      <q-toolbar-title>{{ block.id }} settings</q-toolbar-title>
+    <q-toolbar v-if="!$props.embedded" color="primary" class="unpadded">
+      <q-toolbar-title>{{ widgetId }} settings</q-toolbar-title>
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
     <q-collapsible group="modal" class="col-12" icon="help" label="About the PID Block">
@@ -262,7 +262,7 @@ export default class PidForm extends BlockForm {
         </div>
       </div>
     </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="mdi-link" label="Input and output">
+    <q-collapsible opened group="modal" class="col-12" icon="mdi-link" label="Input and output">
       <div class="input-output">
         <q-field label="PID is enabled:">
           <q-toggle
@@ -335,8 +335,11 @@ export default class PidForm extends BlockForm {
         </q-field>
       </div>
     </q-collapsible>
+    <q-collapsible group="modal" class="col-12" icon="view_compact" label="Widget Settings">
+      <WidgetSettings v-bind="$props"/>
+    </q-collapsible>
     <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
-      <BlockSettings v-bind="settingsProps" :presets-func="presets"/>
+      <BlockSettings v-bind="$props" :presets-data="presets()"/>
     </q-collapsible>
   </div>
 </template>

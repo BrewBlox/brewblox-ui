@@ -39,16 +39,16 @@ export default class PidWidget extends BlockWidget {
 <template>
   <q-card dark class="column">
     <q-modal v-model="modalOpen">
-      <PidForm v-if="modalOpen" :field="block" :change="saveBlock" :change-id="changeBlockId"/>
+      <PidForm
+        v-if="modalOpen"
+        v-bind="$props"
+        :field="block"
+        :on-change-field="saveBlock"
+        :on-change-block-id="changeBlockId"
+      />
     </q-modal>
     <q-card-title class="title-bar">
-      <InputPopupEdit
-        :field="widgetId"
-        :change="v => widgetId = v"
-        class="ellipsis"
-        label="Widget ID"
-        display="span"
-      />
+      <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
       <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
       <q-btn slot="right" flat dense round icon="settings" @click="openModal"/>

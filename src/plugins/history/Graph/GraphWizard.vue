@@ -137,8 +137,8 @@ export default class GraphWizard extends Vue {
         ref="form"
         :is="form"
         :field="graphCfg"
-        :change="v => graphCfg = v"
-        :display-toolbar="false"
+        :on-change-field="v => graphCfg = v"
+        embedded
       />
     </q-step>
     <q-stepper-navigation>

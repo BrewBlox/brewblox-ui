@@ -62,6 +62,7 @@ export default class LinkPopupEdit extends Vue {
     <q-popup-edit
       :title="`Set ${this.$props.label} to:`"
       v-model="placeholder"
+      label-set="apply"
       buttons
       persistent
       @show="startEdit"

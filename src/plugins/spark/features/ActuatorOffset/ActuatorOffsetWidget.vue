@@ -34,19 +34,14 @@ export default class ActuatorOffsetWidget extends BlockWidget {
     <q-modal v-model="modalOpen">
       <ActuatorOffsetForm
         v-if="modalOpen"
+        v-bind="$props"
         :field="block"
-        :change="saveBlock"
-        :change-id="changeBlockId"
+        :on-change-field="saveBlock"
+        :on-change-block-id="changeBlockId"
       />
     </q-modal>
     <q-card-title class="title-bar">
-      <InputPopupEdit
-        :field="widgetId"
-        :change="v => widgetId = v"
-        class="ellipsis"
-        label="Widget ID"
-        display="span"
-      />
+      <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
       <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
       <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>

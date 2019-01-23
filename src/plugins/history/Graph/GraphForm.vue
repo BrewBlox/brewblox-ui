@@ -19,12 +19,6 @@ interface PeriodDisplay {
 }
 
 @Component({
-  props: {
-    displayToolbar: {
-      type: Boolean,
-      default: true,
-    },
-  },
   components: {
     FieldPopupEdit,
   },
@@ -111,7 +105,7 @@ export default class GraphForm extends FormBase {
   }
 
   saveConfig(config: GraphConfig = this.config) {
-    this.$props.change(config);
+    this.$props.onChangeField(config);
   }
 
   callAndSaveConfig(func: (v: any) => void) {
@@ -126,8 +120,8 @@ export default class GraphForm extends FormBase {
 
 <template>
   <div class="widget-modal column">
-    <q-toolbar v-if="$props.displayToolbar" class="unpadded">
-      <q-toolbar-title>Graph Widget</q-toolbar-title>
+    <q-toolbar v-if="!$props.embedded" class="unpadded">
+      <q-toolbar-title>{{ widgetId }}</q-toolbar-title>
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
 
@@ -212,6 +206,10 @@ export default class GraphForm extends FormBase {
           <q-item-main class="darkened">No metrics selected</q-item-main>
         </q-item>
       </q-list>
+    </q-collapsible>
+
+    <q-collapsible group="modal" class="col-12" icon="view_compact" label="Widget Settings">
+      <WidgetSettings v-bind="$props"/>
     </q-collapsible>
   </div>
 </template>

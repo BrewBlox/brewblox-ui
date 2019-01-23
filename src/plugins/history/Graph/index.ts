@@ -6,7 +6,7 @@ import wizard from './GraphWizard.vue';
 
 const feature: Feature = {
   id: 'Graph',
-  displayName: 'History graph',
+  displayName: 'Graph',
   widget: ref(widget),
   wizard: ref(wizard),
   form: ref(form),

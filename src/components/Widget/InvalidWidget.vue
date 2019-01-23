@@ -15,17 +15,10 @@ export default class InvalidWidget extends WidgetBase { }
 <template>
   <q-card dark class="column">
     <q-card-title class="title-bar">
-      <InputPopupEdit
-        :field="widgetId"
-        :change="v => widgetId = v"
-        class="ellipsis"
-        label="Widget ID"
-        display="span"
-      />
+      <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
     </q-card-title>
     <q-card-separator/>
     <q-alert icon="error" error>{{ $props.error }}</q-alert>
   </q-card>
 </template>
-

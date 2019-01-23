@@ -31,20 +31,14 @@ export default class SetpointProfileWidget extends BlockWidget {
     <q-modal v-model="modalOpen">
       <SetpointProfileForm
         v-if="modalOpen"
+        v-bind="$props"
         :field="block"
-        :change="saveBlock"
-        :change-id="changeBlockId"
+        :on-change-field="saveBlock"
+        :on-change-block-id="changeBlockId"
       />
     </q-modal>
     <q-card-title class="title-bar">
-      <InputPopupEdit
-        :field="widgetId"
-        :change="v => widgetId = v"
-        class="ellipsis"
-        label="Widget ID"
-        display="span"
-      />
-      <span slot="right" class="vertical-middle on-left">{{ subtitle }}</span>
+      <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
       <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>

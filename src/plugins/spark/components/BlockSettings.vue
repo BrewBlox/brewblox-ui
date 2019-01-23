@@ -4,19 +4,19 @@ import Component from 'vue-class-component';
 
 @Component({
   props: {
-    presetsFunc: {
-      type: Function,
+    presetsData: {
+      type: Array,
       required: true,
     },
   },
 })
 export default class BlockSettings extends BlockForm {
-  presets() {
-    return this.$props.presetsFunc();
-  }
-
   applyPreset(presetData: any) {
     this.block.data = { ...this.block.data, ...presetData };
+    this.$q.notify({
+      type: 'positive',
+      message: 'Applying preset',
+    });
   }
 }
 </script>
@@ -24,7 +24,12 @@ export default class BlockSettings extends BlockForm {
 <template>
   <div>
     <q-field label="Block ID">
-      <InputPopupEdit :field="block.id" :change="changeBlockId" display="span" label="Block ID"/>
+      <InputPopupEdit
+        :field="block.id"
+        :change="$props.onChangeBlockId"
+        display="span"
+        label="Block ID"
+      />
     </q-field>
     <q-field label="Block Type">
       <span>{{ block.type }}</span>
@@ -40,10 +45,10 @@ export default class BlockSettings extends BlockForm {
         display="span"
       />
     </q-field>
-    <q-field label="Apply preset">
+    <q-field v-if="$props.presetsData.length > 0" label="Apply preset">
       <SelectPopupEdit
         :field="block.data"
-        :options="presets()"
+        :options="$props.presetsData"
         :change="callAndSaveBlock(applyPreset)"
         label="preset"
         display="span"

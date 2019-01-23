@@ -73,13 +73,7 @@ export default class SparkWidget extends Vue {
       <SparkForm v-if="modalOpen" :field="service"/>
     </q-modal>
     <q-card-title class="title-bar">
-      <InputPopupEdit
-        :field="service.id"
-        :change="() => {}"
-        class="ellipsis"
-        label="Widget ID"
-        display="span"
-      />
+      <div class="ellipsis">{{ service.id }}</div>
       <span slot="right" class="vertical-middle on-left">Spark Service</span>
       <q-btn slot="right" flat round dense icon="settings" @click="modalOpen = true"/>
       <q-btn slot="right" flat round dense icon="refresh" @click="fetchAll"/>
@@ -112,5 +106,5 @@ export default class SparkWidget extends Vue {
 <style lang="stylus" scoped>
 /deep/ .widget-body .q-field-margin {
   margin-top: 0px;
-} 
+}
 </style>

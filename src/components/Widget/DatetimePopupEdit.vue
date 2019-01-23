@@ -64,6 +64,7 @@ export default class DatetimePopupEdit extends Vue {
       :disable="$attrs.disabled"
       :title="`Set ${this.$props.label} to:`"
       v-model="placeholder"
+      label-set="apply"
       buttons
       persistent
       @show="startEdit"

@@ -1,51 +1,24 @@
-import { displayNameById } from '@/store/features/getters';
-import Vue from 'vue';
 import Component from 'vue-class-component';
+import ItemBase from './ItemBase';
 
 @Component({
   props: {
-    id: {
-      type: String,
-      required: true,
-    },
-    onIdChange: {
-      type: Function,
-      default: () => (id: string, newId: string) => { },
-    },
-    type: {
-      type: String,
-      required: true,
-    },
     config: {
       type: Object,
       required: true,
     },
-    onConfigChange: {
+    onChangeConfig: {
       type: Function,
       default: () => (id: string, config: Object) => { },
     },
     cols: {
       type: Number,
-      required: true,
+      required: false,
     },
     rows: {
       type: Number,
-      required: true,
+      required: false,
     },
   },
 })
-export default class WidgetBase extends Vue {
-  $q: any;
-
-  get widgetId() {
-    return this.$props.id;
-  }
-
-  set widgetId(newId: string) {
-    this.$props.onIdChange(this.widgetId, newId);
-  }
-
-  get displayName() {
-    return displayNameById(this.$store, this.$props.type);
-  }
-}
+export default class WidgetBase extends ItemBase { }

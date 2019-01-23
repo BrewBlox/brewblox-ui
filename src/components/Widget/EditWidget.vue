@@ -2,22 +2,7 @@
 import Component from 'vue-class-component';
 import WidgetBase from './WidgetBase';
 
-@Component({
-  props: {
-    onDeleteItem: {
-      type: Function,
-      required: false,
-    },
-    onCopyItem: {
-      type: Function,
-      required: false,
-    },
-    onMoveItem: {
-      type: Function,
-      required: false,
-    },
-  },
-})
+@Component
 export default class EditWidget extends WidgetBase { }
 </script>
 

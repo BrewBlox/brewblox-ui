@@ -27,7 +27,6 @@ import { isReady, isSystemBlock, widgetSize } from './getters';
 })
 export default class SparkPage extends Vue {
   $q: any;
-  editable: boolean = false;
   modalOpen: boolean = false;
   volatileItems: { [blockId: string]: DashboardItem } = {};
 
@@ -91,9 +90,7 @@ export default class SparkPage extends Vue {
   }
 
   widgetComponent(item: DashboardItem): string {
-    return this.editable
-      ? 'EditWidget'
-      : (widgetById(this.$store, item.feature, item.config) || 'InvalidWidget');
+    return widgetById(this.$store, item.feature, item.config) || 'InvalidWidget';
   }
 
   async onCreateBlock(block: Block) {
@@ -174,19 +171,7 @@ export default class SparkPage extends Vue {
         <div>Blocks</div>
       </portal>
       <portal to="toolbar-buttons">
-        <q-btn
-          v-if="editable"
-          color="primary"
-          icon="add"
-          label="New Block"
-          @click="modalOpen = true"
-        />
-        <q-btn
-          :icon="editable ? 'check' : 'mode edit'"
-          :color="editable ? 'positive' : 'primary'"
-          :label="editable ? 'Stop editing' : 'Edit blocks'"
-          @click="() => editable = !editable"
-        />
+        <q-btn color="primary" icon="add" label="New Block" @click="modalOpen = true"/>
       </portal>
       <q-modal v-model="modalOpen">
         <NewBlockWizard v-if="modalOpen" :service-id="serviceId" :on-create-block="onCreateBlock"/>
@@ -197,7 +182,6 @@ export default class SparkPage extends Vue {
         color="dark-bright"
         style="margin-bottom: 20px;"
       >This service page shows all blocks that are running on your Spark controller.
-        <br>Changing the widget name here will change the block name.
         <br>Deleting blocks on this page will remove them on the controller.
       </q-alert>
       <grid-container>
@@ -227,10 +211,9 @@ export default class SparkPage extends Vue {
           :cols="item.cols"
           :rows="item.rows"
           :config="item.config"
-          :on-config-change="onWidgetChange"
-          :on-id-change="onChangeBlockId"
-          :on-delete-item="() => onDeleteItem(item)"
-          :on-copy-item="() => onCopyItem(item)"
+          :on-change-config="onWidgetChange"
+          :on-delete="() => onDeleteItem(item)"
+          :on-copy="() => onCopyItem(item)"
           class="dashboard-item"
         />
       </grid-container>

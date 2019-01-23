@@ -115,8 +115,8 @@ export default class DisplaySettingsForm extends BlockForm {
 
 <template>
   <div class="widget-modal column">
-    <q-toolbar v-if="$props.displayToolbar" class="unpadded">
-      <q-toolbar-title>{{ block.id }} settings</q-toolbar-title>
+    <q-toolbar v-if="!$props.embedded" class="unpadded">
+      <q-toolbar-title>{{ widgetId }} settings</q-toolbar-title>
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
     <q-collapsible
@@ -157,8 +157,11 @@ export default class DisplaySettingsForm extends BlockForm {
         </q-field>
       </div>
     </q-collapsible>
+    <q-collapsible group="modal" class="col-12" icon="view_compact" label="Widget Settings">
+      <WidgetSettings v-bind="$props"/>
+    </q-collapsible>
     <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
-      <BlockSettings v-bind="settingsProps" :presets-func="presets"/>
+      <BlockSettings v-bind="$props" :presets-data="presets()"/>
     </q-collapsible>
   </div>
 </template>

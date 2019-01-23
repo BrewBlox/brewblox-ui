@@ -57,6 +57,7 @@ export default class GroupsPopupEdit extends Vue {
     <component :is="$props.display" class="editable">{{ displayValue }}</component>
     <q-popup-edit
       v-model="placeholder"
+      label-set="apply"
       buttons
       persistent
       title="Select active groups"

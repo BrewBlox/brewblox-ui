@@ -1,11 +1,22 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import FormBase from '@/components/Widget/FormBase';
+import Vue from 'vue';
 import { deepCopy } from '@/helpers/shadow-copy';
 import { WlanSecurityEnum, WlanCipherEnum } from './getters';
 
-@Component
-export default class WiFiSettingsPopup extends FormBase {
+@Component({
+  props: {
+    field: {
+      type: String,
+      required: false,
+    },
+    change: {
+      type: Function,
+      required: true,
+    },
+  },
+})
+export default class WiFiSettingsPopup extends Vue {
   localCopy: any = null;
 
   get values() {
@@ -57,12 +68,3 @@ export default class WiFiSettingsPopup extends FormBase {
     </q-card>
   </div>
 </template>
-
-<style scoped>
-.q-card {
-  min-width: 400px;
-  width: 100%;
-  margin-bottom: 10px;
-}
-</style>
-
