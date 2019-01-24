@@ -54,7 +54,6 @@ export default class SessionViewWidget extends WidgetBase {
   }
 
   saveConfig(config: SessionViewConfig = this.widgetConfig) {
-    console.log('change', config);
     this.$props.onConfigChange(this.widgetId, { ...config });
   }
 
@@ -98,7 +97,7 @@ export default class SessionViewWidget extends WidgetBase {
 
 <template>
   <q-card dark class="column">
-    <q-modal v-model="modalOpen">
+    <q-modal v-model="modalOpen" no-backdrop-dismiss>
       <SessionViewForm
         v-if="modalOpen"
         v-bind="$props"

@@ -12,6 +12,10 @@ import Component from 'vue-class-component';
       type: String,
       required: true,
     },
+    volatile: {
+      type: Boolean,
+      default: false,
+    },
     onChangeId: {
       type: Function,
       required: false,

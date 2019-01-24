@@ -102,4 +102,8 @@ export default class BlockWidget extends WidgetBase {
     renameBlock(this.$store, this.serviceId, this.blockId, newId)
       .catch(err => this.$q.notify(err.toString()));
   }
+
+  switchBlockId(blockId: string) {
+    this.$props.onChangeConfig(this.$props.id, { ...this.$props.config, blockId });
+  }
 }

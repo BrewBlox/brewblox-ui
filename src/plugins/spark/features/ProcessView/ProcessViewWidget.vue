@@ -162,7 +162,7 @@ export default class ProcessViewWidget extends WidgetBase {
 
 <template>
   <q-card dark>
-    <q-modal v-model="modalOpen">
+    <q-modal v-model="modalOpen" no-backdrop-dismiss>
       <ProcessViewForm
         v-if="modalOpen"
         :value="flowParts[contextAction.idx]"

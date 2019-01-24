@@ -8,6 +8,10 @@ import FormBase from '@/components/Widget/FormBase';
       type: Function,
       required: true,
     },
+    onSwitchBlockId: {
+      type: Function,
+      required: false,
+    },
   },
 })
 export default class BlockForm extends FormBase {

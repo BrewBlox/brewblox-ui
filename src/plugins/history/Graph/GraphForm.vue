@@ -120,10 +120,7 @@ export default class GraphForm extends FormBase {
 
 <template>
   <div class="widget-modal column">
-    <q-toolbar v-if="!$props.embedded" class="unpadded">
-      <q-toolbar-title>{{ widgetId }}</q-toolbar-title>
-      <q-btn v-close-overlay flat rounded label="close"/>
-    </q-toolbar>
+    <WidgetSettings v-if="!$props.embedded" v-bind="$props"/>
 
     <q-collapsible group="modal" class="col-12" icon="mdi-timetable" label="Period settings">
       <div>
@@ -206,10 +203,6 @@ export default class GraphForm extends FormBase {
           <q-item-main class="darkened">No metrics selected</q-item-main>
         </q-item>
       </q-list>
-    </q-collapsible>
-
-    <q-collapsible group="modal" class="col-12" icon="view_compact" label="Widget Settings">
-      <WidgetSettings v-bind="$props"/>
     </q-collapsible>
   </div>
 </template>

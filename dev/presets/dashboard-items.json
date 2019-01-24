@@ -279,6 +279,7 @@
       "config": {
         "layout": {},
         "params": [],
+        "targets": [],
         "renames": {}
       }
     },

@@ -2,7 +2,18 @@
 import Component from 'vue-class-component';
 import FormBase from '@/components/Widget/FormBase';
 
-@Component
+@Component({
+  props: {
+    slotIcon: {
+      type: String,
+      required: false,
+    },
+    slotLabel: {
+      type: String,
+      required: false,
+    },
+  },
+})
 export default class WidgetSettings extends FormBase {
 
 }
@@ -10,21 +21,31 @@ export default class WidgetSettings extends FormBase {
 
 <template>
   <div>
-    <q-field label="Widget ID">
-      <InputPopupEdit
-        v-if="$props.onChangeId"
-        :field="widgetId"
-        :change="$props.onChangeId"
-        class="text-justify"
-        label="Widget ID"
-      />
-      <big v-else>{{ widgetId }}</big>
-    </q-field>
-    <q-field label="Dashboard Actions">
-      <q-btn v-if="$props.onDelete" flat label="Delete" icon="delete" @click="$props.onDelete"/>
-      <q-btn v-if="$props.onCopy" flat label="Copy" icon="file_copy" @click="$props.onCopy"/>
-      <q-btn v-if="$props.onMove" flat label="Move" icon="exit_to_app" @click="$props.onMove"/>
-    </q-field>
-    <slot/>
+    <q-toolbar>
+      <span class="col row spaced">
+        <q-icon v-if="$props.onChangeId" name="mdi-view-dashboard"/>
+        <InputPopupEdit
+          v-if="$props.onChangeId"
+          :field="widgetId"
+          :change="$props.onChangeId"
+          label="Widget ID"
+          display="span"
+        />
+        <q-icon v-if="$props.slotIcon" :name="$props.slotIcon"/>
+        <span v-if="$props.slotLabel">{{ $props.slotLabel }}</span>
+        <slot/>
+      </span>
+
+      <q-btn v-if="$props.onDelete" flat icon="delete" @click="$props.onDelete"/>
+      <q-btn v-if="$props.onCopy" flat icon="file_copy" @click="$props.onCopy"/>
+      <q-btn v-if="$props.onMove" flat icon="exit_to_app" @click="$props.onMove"/>
+      <q-btn v-close-overlay flat rounded label="close"/>
+    </q-toolbar>
   </div>
 </template>
+
+<style scoped>
+.spaced * {
+  margin-right: 0.5em;
+}
+</style>

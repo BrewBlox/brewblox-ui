@@ -25,7 +25,7 @@ export default class GraphWidget extends WidgetBase {
 
 <template>
   <q-card dark class="column">
-    <q-modal v-model="modalOpen">
+    <q-modal v-model="modalOpen" no-backdrop-dismiss>
       <GraphForm v-if="modalOpen" v-bind="$props" :field="graphCfg" :on-change-field="saveConfig"/>
     </q-modal>
     <q-card-title class="title-bar">

@@ -62,7 +62,7 @@ export default class DatetimePopupEdit extends Vue {
     <component :is="$props.display" class="editable">{{ dateString }}</component>
     <q-popup-edit
       :disable="$attrs.disabled"
-      :title="`Set ${this.$props.label} to:`"
+      :title="$props.label"
       v-model="placeholder"
       label-set="apply"
       buttons
@@ -70,6 +70,7 @@ export default class DatetimePopupEdit extends Vue {
       @show="startEdit"
       @save="endEdit"
     >
+      <slot/>
       <q-datetime
         v-model="placeholder"
         :after="[

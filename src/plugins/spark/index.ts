@@ -17,10 +17,11 @@ import { RootStore } from '@/store/state';
 import Vue from 'vue';
 import features from './features';
 import { register } from './store';
-import { createUpdateSource, fetchAll, fetchDiscoveredBlocks } from './store/actions';
+import { createUpdateSource, fetchAll, fetchDiscoveredBlocks, fetchServiceStatus } from './store/actions';
 
 const initialize = async (store: RootStore, service: Service) => {
   await register(store, service);
+  await fetchServiceStatus(store, service.id);
   await Promise.all([
     createUpdateSource(store, service.id),
     fetchDiscoveredBlocks(store, service.id),

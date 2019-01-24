@@ -8,7 +8,7 @@ import widget from './TempSensorMockWidget.vue';
 const feature: Feature = {
   ...GenericBlock,
   id: typeName,
-  displayName: 'Mock Temp Sensor',
+  displayName: 'Temp Sensor (Mock)',
   widget: ref(widget),
   form: ref(form),
   widgetSize: {

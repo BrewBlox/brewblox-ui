@@ -18,13 +18,14 @@ export default class MutexWidget extends BlockWidget {
 
 <template>
   <q-card dark class="column">
-    <q-modal v-model="modalOpen">
+    <q-modal v-model="modalOpen" no-backdrop-dismiss>
       <MutexForm
         v-if="modalOpen"
         v-bind="$props"
         :field="block"
         :on-change-field="saveBlock"
         :on-change-block-id="changeBlockId"
+        :on-switch-block-id="switchBlockId"
       />
     </q-modal>
     <q-card-title class="title-bar">

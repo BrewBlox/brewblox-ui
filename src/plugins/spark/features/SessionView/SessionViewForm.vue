@@ -129,11 +129,11 @@ export default class SessionViewForm extends FormBase {
 
 <template>
   <div class="widget-modal column">
-    <q-toolbar v-if="!$props.embedded" color="primary" class="unpadded">
+    <WidgetSettings v-if="!$props.embedded" v-bind="$props"/>
+    <!-- <q-toolbar  color="primary" class="unpadded">
       <q-toolbar-title>{{ widgetId }}</q-toolbar-title>
       <q-btn v-close-overlay flat rounded label="close"/>
-    </q-toolbar>
-
+    </q-toolbar>-->
     <q-collapsible
       v-for="session in sessions"
       :key="session.id"
@@ -248,9 +248,6 @@ export default class SessionViewForm extends FormBase {
           />
         </q-collapsible>
       </q-list>
-    </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="view_compact" label="Widget Settings">
-      <WidgetSettings v-bind="$props"/>
     </q-collapsible>
   </div>
 </template>

@@ -109,10 +109,7 @@ export default class PidForm extends BlockForm {
 
 <template>
   <div class="widget-modal column">
-    <q-toolbar v-if="!$props.embedded" color="primary" class="unpadded">
-      <q-toolbar-title>{{ widgetId }} settings</q-toolbar-title>
-      <q-btn v-close-overlay flat rounded label="close"/>
-    </q-toolbar>
+    <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
     <q-collapsible group="modal" class="col-12" icon="help" label="About the PID Block">
       <div>
         <div class="q-subheading">What is a PID?</div>
@@ -164,7 +161,84 @@ export default class PidForm extends BlockForm {
         </p>
       </div>
     </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="mdi-calculator-variant" label="PID Algorithm">
+    <q-collapsible
+      opened
+      group="modal"
+      class="col-12"
+      icon="mdi-calculator-variant"
+      label="PID Algorithm"
+    >
+      <div class="input-output">
+        <q-field label="PID is enabled:">
+          <q-toggle
+            :value="block.data.enabled"
+            @change="v => { block.data.enabled = v; saveBlock(); }"
+          />
+        </q-field>
+        <q-field label="Input" orientation="vertical">
+          <p>
+            <span>The input target value and actual value will come from:</span>
+            <LinkPopupEdit
+              :field="block.data.inputId"
+              :service-id="block.serviceId"
+              :change="callAndSaveBlock(v => block.data.inputId = v)"
+              label="Input"
+              class="inline-popup"
+            />
+          </p>
+          <p>
+            <span>
+              The current target value is
+              <b>{{ block.data.inputSetting | unit }}</b>
+              and the actual value is
+              <b>{{ block.data.inputValue | unit }}</b>.
+            </span>
+          </p>
+        </q-field>
+        <q-field label="Output" orientation="vertical">
+          <p>
+            <span>The PID result will be used to drive:</span>
+            <LinkPopupEdit
+              :field="block.data.outputId"
+              :service-id="block.serviceId"
+              :change="callAndSaveBlock(v => block.data.outputId = v)"
+              label="Output"
+              class="inline-popup"
+            />
+          </p>
+          <p>
+            <span>
+              The current target value of the output is
+              <b>{{ block.data.outputSetting | round }}</b>
+              and the actually achieved value is
+              <b>{{ block.data.outputValue | round }}</b>.
+            </span>
+          </p>
+        </q-field>
+        <q-field class="col" label="Filtering" orientation="vertical">
+          <p>
+            <span>Input changes faster than</span>
+            <SelectPopupEdit
+              :field="block.data.filter"
+              :change="callAndSaveBlock(v => block.data.filter = v)"
+              :options="filterOpts"
+              label="Filter"
+              class="inline-popup"
+            />
+            <span>will be filtered out.</span>
+          </p>
+          <p>
+            <span>But steps exceeding</span>
+            <UnitPopupEdit
+              :field="block.data.filterThreshold"
+              :change="callAndSaveBlock(v => block.data.filterThreshold = v)"
+              label="Filter threshold"
+              class="inline-popup"
+            />
+            <span>will trigger a faster response.</span>
+          </p>
+        </q-field>
+      </div>
       <div class="calculation">
         <!-- state -->
         <q-field label="Filtered Error" orientation="vertical">
@@ -262,82 +336,7 @@ export default class PidForm extends BlockForm {
         </div>
       </div>
     </q-collapsible>
-    <q-collapsible opened group="modal" class="col-12" icon="mdi-link" label="Input and output">
-      <div class="input-output">
-        <q-field label="PID is enabled:">
-          <q-toggle
-            :value="block.data.enabled"
-            @change="v => { block.data.enabled = v; saveBlock(); }"
-          />
-        </q-field>
-        <q-field label="Input" orientation="vertical">
-          <p>
-            <span>The input target value and actual value will come from:</span>
-            <LinkPopupEdit
-              :field="block.data.inputId"
-              :service-id="block.serviceId"
-              :change="callAndSaveBlock(v => block.data.inputId = v)"
-              label="Input"
-              class="inline-popup"
-            />
-          </p>
-          <p>
-            <span>
-              The current target value is
-              <b>{{ block.data.inputSetting | unit }}</b>
-              and the actual value is
-              <b>{{ block.data.inputValue | unit }}</b>.
-            </span>
-          </p>
-        </q-field>
-        <q-field label="Output" orientation="vertical">
-          <p>
-            <span>The PID result will be used to drive:</span>
-            <LinkPopupEdit
-              :field="block.data.outputId"
-              :service-id="block.serviceId"
-              :change="callAndSaveBlock(v => block.data.outputId = v)"
-              label="Output"
-              class="inline-popup"
-            />
-          </p>
-          <p>
-            <span>
-              The current target value of the output is
-              <b>{{ block.data.outputSetting | round }}</b>
-              and the actually achieved value is
-              <b>{{ block.data.outputValue | round }}</b>.
-            </span>
-          </p>
-        </q-field>
-        <q-field class="col" label="Filtering" orientation="vertical">
-          <p>
-            <span>Input changes faster than</span>
-            <SelectPopupEdit
-              :field="block.data.filter"
-              :change="callAndSaveBlock(v => block.data.filter = v)"
-              :options="filterOpts"
-              label="Filter"
-              class="inline-popup"
-            />
-            <span>will be filtered out.</span>
-          </p>
-          <p>
-            <span>But steps exceeding</span>
-            <UnitPopupEdit
-              :field="block.data.filterThreshold"
-              :change="callAndSaveBlock(v => block.data.filterThreshold = v)"
-              label="Filter threshold"
-              class="inline-popup"
-            />
-            <span>will trigger a faster response.</span>
-          </p>
-        </q-field>
-      </div>
-    </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="view_compact" label="Widget Settings">
-      <WidgetSettings v-bind="$props"/>
-    </q-collapsible>
+
     <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="$props" :presets-data="presets()"/>
     </q-collapsible>

@@ -69,7 +69,7 @@ export default class SparkWidget extends Vue {
 
 <template>
   <q-card v-if="ready" dark class="column">
-    <q-modal v-model="modalOpen">
+    <q-modal v-model="modalOpen" no-backdrop-dismiss>
       <SparkForm v-if="modalOpen" :field="service"/>
     </q-modal>
     <q-card-title class="title-bar">
