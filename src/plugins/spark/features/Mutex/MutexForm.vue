@@ -1,12 +1,13 @@
 <script lang="ts">
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import Component from 'vue-class-component';
+import { Unit } from '@/helpers/units';
 
 @Component
 export default class MutexForm extends BlockForm {
   defaultData() {
     return {
-      differentActuatorWait: 0,
+      differentActuatorWait: new Unit(0, 'second'),
     };
   }
 

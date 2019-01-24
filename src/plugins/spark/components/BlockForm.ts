@@ -41,7 +41,7 @@ export default class BlockForm extends FormBase {
   }
 
   saveBlock(block: Block = this.block) {
-    this.$props.onChangeField(block);
+    this.$props.onChangeField({ ...block });
   }
 
   callAndSaveBlock(func: (v: any) => void) {

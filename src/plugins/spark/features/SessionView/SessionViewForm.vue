@@ -36,7 +36,7 @@ export default class SessionViewForm extends FormBase {
   }
 
   saveConfig(config: SessionViewConfig = this.widgetConfig) {
-    this.$props.onChangeField(config);
+    this.$props.onChangeField({ ...config });
   }
 
   callAndSaveConfig(func: (v: any) => void) {
@@ -130,10 +130,6 @@ export default class SessionViewForm extends FormBase {
 <template>
   <div class="widget-modal column">
     <WidgetSettings v-if="!$props.embedded" v-bind="$props"/>
-    <!-- <q-toolbar  color="primary" class="unpadded">
-      <q-toolbar-title>{{ widgetId }}</q-toolbar-title>
-      <q-btn v-close-overlay flat rounded label="close"/>
-    </q-toolbar>-->
     <q-collapsible
       v-for="session in sessions"
       :key="session.id"

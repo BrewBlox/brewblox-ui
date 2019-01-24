@@ -105,7 +105,7 @@ export default class GraphForm extends FormBase {
   }
 
   saveConfig(config: GraphConfig = this.config) {
-    this.$props.onChangeField(config);
+    this.$props.onChangeField({ ...config });
   }
 
   callAndSaveConfig(func: (v: any) => void) {

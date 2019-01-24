@@ -4,6 +4,12 @@ import { widgetSizeById } from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
+export interface NavAction {
+  label: string;
+  click: Function;
+  enabled: Function;
+}
+
 @Component({
   props: {
     featureId: {
