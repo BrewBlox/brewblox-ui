@@ -40,7 +40,7 @@ export const allDashboards = read(getters.dashboardValues);
 export const replicatingItems = read(getters.replicatingItems);
 export const dashboardItems = read(getters.items);
 export const dashboardItemIds = read(getters.itemIds);
-export const allDashboardItems = read(getters.itemValues);
+export const dashboardItemValues = read(getters.itemValues);
 export const primaryDashboard = read(getters.primaryDashboard);
 
 export const dashboardById =
@@ -53,7 +53,7 @@ export const dashboardItemById =
 
 export const dashboardItemsByDashboardId =
   (store: RootStore | DashboardContext, id: string) =>
-    allDashboardItems(store)
+    dashboardItemValues(store)
       .filter(item => item.dashboard === id);
 
 export const itemCopyName = (store: RootStore | DashboardContext, id: string) => {

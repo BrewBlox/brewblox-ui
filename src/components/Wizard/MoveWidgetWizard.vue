@@ -1,11 +1,11 @@
 <script lang="ts">
-import { itemCopyName, allDashboards, dashboardItemValues } from '@/store/dashboards/getters';
+import { allDashboards, dashboardItemValues } from '@/store/dashboards/getters';
 import { displayNameById } from '@/store/features/getters';
 import { Notify } from 'quasar';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { blockValues } from '@/plugins/spark/store/getters';
-import { appendDashboardItem } from '@/store/dashboards/actions';
+import { saveDashboardItem } from '@/store/dashboards/actions';
 import { DashboardItem } from '@/store/dashboards/state';
 
 @Component({
@@ -14,13 +14,9 @@ import { DashboardItem } from '@/store/dashboards/state';
       type: Array,
       required: false,
     },
-    onCopy: {
-      type: Function,
-      required: true,
-    },
   },
 })
-export default class CopyWidgetWizard extends Vue {
+export default class MoveWidgetWizard extends Vue {
   $q: any;
   searchModel: string = '';
 
@@ -46,33 +42,31 @@ export default class CopyWidgetWizard extends Vue {
     );
   }
 
-  // get dashboardOptions() {
-  //   return allDashboards(this.$store)
-  //     .map(dashboard => ({ label: dashboard.title, value: dashboard.id }));
-  // }
+  get dashboardOptions() {
+    return allDashboards(this.$store)
+      .map(dashboard => ({ label: dashboard.title, value: dashboard.id }));
+  }
 
   async selectItem(item: DashboardItem) {
-    this.$props.onCopy(item);
-    // try {
-    //   const dashboard = await this.$q.dialog({
-    //     title: 'Create Widget on Dashboard',
-    //     message: `To which dashboard do you want to copy ${item.id}?`,
-    //     options: {
-    //       type: 'radio',
-    //       model: this.dashboardOptions.length > 0 ? this.dashboardOptions[0].value : null,
-    //       items: this.dashboardOptions,
-    //     },
-    //     cancel: true,
-    //   });
-    //   if (dashboard) {
-    //     const id = itemCopyName(this.$store, item.id);
-    //     appendDashboardItem(this.$store, { ...item, dashboard, id })
-    //       .then(() => this.$q.notify({ type: 'positive', message: `Created ${id} on ${dashboard}` }))
-    //       .catch((e) => this.$q.notify(`Failed to create widget: ${e.message}`));
-    //   }
-    // } catch (e) {
-    //   // dialog cancelled
-    // }
+    try {
+      const dashboard = await this.$q.dialog({
+        title: 'Create Widget on Dashboard',
+        message: `To which dashboard do you want to copy ${item.id}?`,
+        options: {
+          type: 'radio',
+          model: this.dashboardOptions.length > 0 ? this.dashboardOptions[0].value : null,
+          items: this.dashboardOptions,
+        },
+        cancel: true,
+      });
+      if (dashboard) {
+        saveDashboardItem(this.$store, { ...item, dashboard })
+          .then(() => this.$q.notify({ type: 'positive', message: `Moved ${item.id} to ${dashboard}` }))
+          .catch((e) => this.$q.notify(`Failed to move widget: ${e.message}`));
+      }
+    } catch (e) {
+      // dialog cancelled
+    }
   }
 }
 </script>
@@ -80,7 +74,7 @@ export default class CopyWidgetWizard extends Vue {
 <template>
   <div class="widget-modal column">
     <q-toolbar class="unpadded">
-      <q-toolbar-title>Copy Widget to Dashboard</q-toolbar-title>
+      <q-toolbar-title>Move Widget to Dashboard</q-toolbar-title>
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
     <q-list no-border>

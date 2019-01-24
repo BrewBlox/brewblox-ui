@@ -9,12 +9,14 @@ import {
   updateDashboardItemId,
   updateDashboardItemOrder,
   updateDashboardItemSize,
+  appendDashboardItem,
 } from '@/store/dashboards/actions';
 import {
   allDashboards,
   dashboardById,
   dashboardItemsByDashboardId,
   itemCopyName,
+  dashboardItemValues,
 } from '@/store/dashboards/getters';
 import { DashboardItem } from '@/store/dashboards/state';
 import {
@@ -36,7 +38,6 @@ interface VueOrdered extends Vue {
 
 interface ModalConfig {
   open: boolean;
-  title: string;
   component?: string;
 }
 
@@ -53,7 +54,6 @@ export default class DashboardPage extends Vue {
 
   wizardModal: ModalConfig = {
     open: false,
-    title: '',
   };
 
   get dashboardId(): string {
@@ -72,6 +72,10 @@ export default class DashboardPage extends Vue {
 
   get allDashboards() {
     return allDashboards(this.$store);
+  }
+
+  get allItems() {
+    return dashboardItemValues(this.$store);
   }
 
   get items() {
@@ -135,7 +139,13 @@ export default class DashboardPage extends Vue {
     this.wizardModal = {
       open: true,
       component: 'CopyWidgetWizard',
-      title: 'Copy Existing Widget',
+    };
+  }
+
+  onStartMoveWidget() {
+    this.wizardModal = {
+      open: true,
+      component: 'MoveWidgetWizard',
     };
   }
 
@@ -143,7 +153,6 @@ export default class DashboardPage extends Vue {
     this.wizardModal = {
       open: true,
       component: 'NewWidgetWizard',
-      title: 'Add New Widget',
     };
   }
 
@@ -161,7 +170,7 @@ export default class DashboardPage extends Vue {
   async onCreateItem(partial: Partial<DashboardItem>) {
     try {
       const item: DashboardItem = { ...this.defaultItem(), ...partial };
-      await createDashboardItem(this.$store, item);
+      await appendDashboardItem(this.$store, item);
       Notify.create({
         type: 'positive',
         message: `Added ${displayNameById(this.$store, item.feature)} "${item.id}"`,
@@ -214,7 +223,7 @@ export default class DashboardPage extends Vue {
       cancel: true,
     })
       .then((dashboard: string) =>
-        dashboard && createDashboardItem(this.$store, { ...item, id, dashboard }))
+        dashboard && appendDashboardItem(this.$store, { ...item, id, dashboard }))
       .catch(() => { });
   }
 
@@ -259,28 +268,17 @@ export default class DashboardPage extends Vue {
       </portal>
       <portal to="toolbar-buttons">
         <q-btn
-          v-if="widgetEditable"
-          color="primary"
-          icon="add"
-          label="Copy Widget"
-          @click="onStartCopyWidget"
-        />
-        <q-btn
-          v-if="widgetEditable"
-          color="primary"
-          icon="add"
-          label="New Widget"
-          @click="onStartNewWidget"
-        />
-        <q-btn
           :icon="widgetEditable ? 'check' : 'mode edit'"
           :color="widgetEditable ? 'positive' : 'primary'"
-          :label="widgetEditable ? 'Stop editing' : 'Edit dashboard'"
+          :label="widgetEditable ? 'Stop editing' : 'Edit'"
           @click="widgetEditable = !widgetEditable"
         />
+        <q-btn color="primary" icon="file_copy" label="Copy" @click="onStartCopyWidget"/>
+        <q-btn color="primary" icon="exit_to_app" label="Move" @click="onStartMoveWidget"/>
+        <q-btn color="primary" icon="add" label="New" @click="onStartNewWidget"/>
       </portal>
       <q-modal v-model="wizardModal.open">
-        <component v-if="wizardModal.open" :is="wizardModal.component" :on-create="onCreateItem"/>
+        <component v-if="wizardModal.open" :is="wizardModal.component"/>
       </q-modal>
       <GridContainer
         :editable="widgetEditable"

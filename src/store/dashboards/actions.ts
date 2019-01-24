@@ -23,7 +23,7 @@ import {
 import {
   removeDashboard as removeDashboardInStore,
   removeDashboardItem as removeDashboardItemInStore,
-  setAllDashboardItems as setAllDashboardItemsInStore,
+  setdashboardItemValues as setdashboardItemValuesInStore,
   setAllDashboards as setAllDashboardsInStore,
   setDashboard as setDashboardInStore,
   setDashboardItem as setDashboardItemInStore,
@@ -70,6 +70,12 @@ export const actions: ActionTree<DashboardState, RootState> = {
 
   createDashboardItem: async (context: DashboardContext, item: DashboardItem) =>
     setDashboardItemInStore(context, await createDashboardItemInApi(item)),
+
+  appendDashboardItem: async (context: DashboardContext, item: DashboardItem) =>
+    setDashboardItemInStore(context, await createDashboardItemInApi({
+      ...item,
+      order: context.getters['dashboardIds'].length,
+    })),
 
   saveDashboardItem: async (context: DashboardContext, item: DashboardItem) =>
     setDashboardItemInStore(context, await persistDashboardItemInApi(item)),
@@ -128,6 +134,7 @@ export const updatePrimaryDashboard = dispatch(actions.updatePrimaryDashboard);
 export const removeDashboard = dispatch(actions.removeDashboard);
 
 export const createDashboardItem = dispatch(actions.createDashboardItem);
+export const appendDashboardItem = dispatch(actions.appendDashboardItem);
 export const saveDashboardItem = dispatch(actions.saveDashboardItem);
 export const updateDashboardItemId = dispatch(actions.updateDashboardItemId);
 export const updateDashboardItemOrder = dispatch(actions.updateDashboardItemOrder);
@@ -164,7 +171,7 @@ export const setupApi = async (store: RootStore) => {
   /* eslint-enable no-underscore-dangle */
 
   setAllDashboardsInStore(store, await fetchDashboardsInApi());
-  setAllDashboardItemsInStore(store, await fetchDashboardItemsInApi());
+  setdashboardItemValuesInStore(store, await fetchDashboardItemsInApi());
 
   setupDashboardsInApi(onDashboardChange, onDashboardDelete);
   setupDashboardItemsInApi(onItemChange, onItemDelete);

@@ -5,7 +5,7 @@ import { Notify } from 'quasar';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { blockValues } from '@/plugins/spark/store/getters';
-import { createDashboardItem } from '@/store/dashboards/actions';
+import { createDashboardItem, appendDashboardItem } from '@/store/dashboards/actions';
 import { DashboardItem } from '@/store/dashboards/state';
 import { Block } from '@/plugins/spark/state';
 
@@ -62,14 +62,14 @@ export default class BlockWidgetWizard extends Vue {
           dashboard,
           id: itemCopyName(this.$store, block.id),
           feature: block.type,
-          order: dashboardItemsByDashboardId(this.$store, dashboard).length,
+          order: 0, // auto-set by appendDashboardItem
           config: {
             serviceId: this.$props.serviceId,
             blockId: block.id,
           },
           ...widgetSizeById(this.$store, block.type),
         };
-        createDashboardItem(this.$store, item)
+        appendDashboardItem(this.$store, item)
           .then(() => this.$q.notify({ type: 'positive', message: `Created ${item.id} on ${dashboard}` }))
           .catch((e) => this.$q.notify(`Failed to create widget: ${e.message}`));
       }
