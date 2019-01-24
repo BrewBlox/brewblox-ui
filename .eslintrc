@@ -4,7 +4,7 @@
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module",
-    "parser": "typescript-eslint-parser"
+    "parser": "@typescript-eslint/parser"
   },
   "extends": [
     "plugin:vue/recommended",
