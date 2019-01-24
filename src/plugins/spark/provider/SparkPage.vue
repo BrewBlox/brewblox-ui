@@ -17,6 +17,11 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { isReady, isSystemBlock, widgetSize } from './getters';
 
+interface ModalSettings {
+  component: string;
+  props: any;
+}
+
 @Component({
   props: {
     serviceId: {
@@ -27,8 +32,8 @@ import { isReady, isSystemBlock, widgetSize } from './getters';
 })
 export default class SparkPage extends Vue {
   $q: any;
-  editable: boolean = false;
   modalOpen: boolean = false;
+  modalSettings: ModalSettings | null = null;
   volatileItems: { [blockId: string]: DashboardItem } = {};
 
   get dashboards(): Dashboard[] {
@@ -91,9 +96,7 @@ export default class SparkPage extends Vue {
   }
 
   widgetComponent(item: DashboardItem): string {
-    return this.editable
-      ? 'EditWidget'
-      : (widgetById(this.$store, item.feature, item.config) || 'InvalidWidget');
+    return widgetById(this.$store, item.feature, item.config) || 'InvalidWidget';
   }
 
   async onCreateBlock(block: Block) {
@@ -164,6 +167,27 @@ export default class SparkPage extends Vue {
       message: 'Changes will not be persisted',
     });
   }
+
+  startCreateBlock() {
+    this.modalSettings = {
+      component: 'NewBlockWizard',
+      props: {
+        serviceId: this.$props.serviceId,
+        onCreateBlock: this.onCreateBlock,
+      },
+    };
+    this.modalOpen = true;
+  }
+
+  startCopyToWidget() {
+    this.modalSettings = {
+      component: 'BlockWidgetWizard',
+      props: {
+        serviceId: this.$props.serviceId,
+      },
+    };
+    this.modalOpen = true;
+  }
 }
 </script>
 
@@ -175,21 +199,15 @@ export default class SparkPage extends Vue {
       </portal>
       <portal to="toolbar-buttons">
         <q-btn
-          v-if="editable"
           color="primary"
-          icon="add"
-          label="New Block"
-          @click="modalOpen = true"
+          icon="file_copy"
+          label="Copy to Dashboard"
+          @click="startCopyToWidget"
         />
-        <q-btn
-          :icon="editable ? 'check' : 'mode edit'"
-          :color="editable ? 'positive' : 'primary'"
-          :label="editable ? 'Stop editing' : 'Edit blocks'"
-          @click="() => editable = !editable"
-        />
+        <q-btn color="primary" icon="add" label="New Block" @click="startCreateBlock"/>
       </portal>
-      <q-modal v-model="modalOpen">
-        <NewBlockWizard v-if="modalOpen" :service-id="serviceId" :on-create-block="onCreateBlock"/>
+      <q-modal v-model="modalOpen" no-backdrop-dismiss>
+        <component v-if="modalOpen" :is="modalSettings.component" v-bind="modalSettings.props"/>
       </q-modal>
       <q-alert
         class="col-12"
@@ -197,7 +215,6 @@ export default class SparkPage extends Vue {
         color="dark-bright"
         style="margin-bottom: 20px;"
       >This service page shows all blocks that are running on your Spark controller.
-        <br>Changing the widget name here will change the block name.
         <br>Deleting blocks on this page will remove them on the controller.
       </q-alert>
       <grid-container>
@@ -213,8 +230,8 @@ export default class SparkPage extends Vue {
           v-if="statusNok"
           :id="$props.serviceId"
           :config="{serviceId: $props.serviceId}"
-          :cols="widgetSize.cols"
-          :rows="widgetSize.rows"
+          :cols="4"
+          :rows="4"
           type="Troubleshooter"
           class="dashboard-item"
         />
@@ -227,10 +244,10 @@ export default class SparkPage extends Vue {
           :cols="item.cols"
           :rows="item.rows"
           :config="item.config"
-          :on-config-change="onWidgetChange"
-          :on-id-change="onChangeBlockId"
-          :on-delete-item="() => onDeleteItem(item)"
-          :on-copy-item="() => onCopyItem(item)"
+          :on-change-config="onWidgetChange"
+          :on-delete="() => onDeleteItem(item)"
+          :on-copy="() => onCopyItem(item)"
+          volatile
           class="dashboard-item"
         />
       </grid-container>

@@ -9,12 +9,7 @@ export default class GenericBlock extends BlockWidget { }
 <template>
   <q-card dark class="column">
     <q-card-title class="title-bar">
-      <InputPopupEdit
-        :field="widgetId"
-        :change="v => widgetId = v"
-        label="Widget ID"
-        display="span"
-      />
+      <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>

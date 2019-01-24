@@ -5,7 +5,7 @@ import Component from 'vue-class-component';
 const GRID_SIZE = 100;
 const GAP_SIZE = 20;
 const MIN_COLS = 2;
-const MIN_ROWS = 1;
+const MIN_ROWS = 2;
 
 type Coordinates = { x: number, y: number };
 

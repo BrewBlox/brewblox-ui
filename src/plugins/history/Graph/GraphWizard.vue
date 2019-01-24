@@ -1,38 +1,13 @@
 <script lang="ts">
 import { GraphConfig } from '@/components/Graph/state';
 import FormBase from '@/components/Widget/FormBase';
-import { dashboardItemById } from '@/store/dashboards/getters';
-import { DashboardItem } from '@/store/dashboards/state';
-import {
-  formById,
-  widgetSizeById,
-} from '@/store/features/getters';
-import Vue from 'vue';
+import WizardBase, { NavAction } from '@/components/Widget/WizardBase';
+import { formById } from '@/store/features/getters';
 import Component from 'vue-class-component';
 
-interface NavAction {
-  label: string;
-  click: Function;
-  enabled: Function;
-}
 
-@Component({
-  props: {
-    featureId: {
-      type: String,
-      required: true,
-    },
-    onCreateItem: {
-      type: Function,
-      required: true,
-    },
-    onCancel: {
-      type: Function,
-      required: true,
-    },
-  },
-})
-export default class GraphWizard extends Vue {
+@Component
+export default class GraphWizard extends WizardBase {
   currentStep: string = '';
   widgetId: string = '';
   graphCfg: GraphConfig | null = null;
@@ -42,7 +17,7 @@ export default class GraphWizard extends Vue {
       start: [
         {
           label: 'Cancel',
-          click: () => this.$props.onCancel(),
+          click: () => this.cancel(),
           enabled: () => true,
         },
         {
@@ -77,14 +52,14 @@ export default class GraphWizard extends Vue {
     if (!this.widgetId) {
       return 'Name must not be empty';
     }
-    if (dashboardItemById(this.$store, this.widgetId)) {
+    if (this.itemAlreadyExists(this.widgetId)) {
       return 'Name must be unique';
     }
     return null;
   }
 
   get form() {
-    return formById(this.$store, this.$props.featureId);
+    return formById(this.$store, this.typeId);
   }
 
   get formComponent() {
@@ -101,13 +76,12 @@ export default class GraphWizard extends Vue {
   }
 
   createWidget() {
-    const item: Partial<DashboardItem> = {
+    this.createItem({
       id: this.widgetId,
-      feature: this.$props.featureId,
+      feature: this.typeId,
       config: this.graphCfg,
-      ...widgetSizeById(this.$store, this.$props.featureId),
-    };
-    this.$props.onCreateItem(item);
+      ...this.defaultWidgetSize,
+    });
   }
 
   mounted() {
@@ -136,9 +110,12 @@ export default class GraphWizard extends Vue {
         v-if="graphCfg"
         ref="form"
         :is="form"
+        :id="widgetId"
+        :type="typeId"
         :field="graphCfg"
-        :change="v => graphCfg = v"
-        :display-toolbar="false"
+        :on-change-id="v => widgetId = v"
+        :on-change-field="v => graphCfg = v"
+        embedded
       />
     </q-step>
     <q-stepper-navigation>

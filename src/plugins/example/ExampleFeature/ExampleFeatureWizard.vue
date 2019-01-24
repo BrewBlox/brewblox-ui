@@ -1,12 +1,6 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import WizardBase from '@/components/Widget/WizardBase';
-
-interface NavAction {
-  label: string;
-  click: Function;
-  enabled: Function;
-}
+import WizardBase, { NavAction } from '@/components/Widget/WizardBase';
 
 /*
 We inherit from WizardBase, which defines the properties provided to any wizard.

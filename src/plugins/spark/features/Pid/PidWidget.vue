@@ -33,29 +33,40 @@ export default class PidWidget extends BlockWidget {
   get filterOpts() {
     return filters.map((filter, idx) => ({ label: filter, value: idx }));
   }
+
+  enable() {
+    this.block.data.enabled = true;
+    this.saveBlock();
+  }
 }
 </script>
 
 <template>
   <q-card dark class="column">
-    <q-modal v-model="modalOpen">
-      <PidForm v-if="modalOpen" :field="block" :change="saveBlock" :change-id="changeBlockId"/>
+    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+      <PidForm
+        v-if="modalOpen"
+        v-bind="$props"
+        :field="block"
+        :on-change-field="saveBlock"
+        :on-change-block-id="changeBlockId"
+        :on-switch-block-id="switchBlockId"
+      />
     </q-modal>
     <q-card-title class="title-bar">
-      <InputPopupEdit
-        :field="widgetId"
-        :change="v => widgetId = v"
-        class="ellipsis"
-        label="Widget ID"
-        display="span"
-      />
+      <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
       <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
       <q-btn slot="right" flat dense round icon="settings" @click="openModal"/>
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-alert v-if="!block.data.enabled" type="info" color="info">This PID is disabled</q-alert>
+    <q-alert
+      v-if="!block.data.enabled"
+      :actions="[{label:'Enable', handler: enable }]"
+      type="info"
+      color="info"
+    >This PID is disabled</q-alert>
     <q-alert
       v-if="block.data.enabled && !block.data.active"
       type="warning"

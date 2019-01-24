@@ -3,37 +3,14 @@ import FormBase from '@/components/Widget/FormBase';
 import { Block } from '@/plugins/spark/state';
 import { createBlock } from '@/plugins/spark/store/actions';
 import { blockIds, blockValues } from '@/plugins/spark/store/getters';
-import { dashboardItemById } from '@/store/dashboards/getters';
-import { DashboardItem } from '@/store/dashboards/state';
-import { formById, widgetSizeById } from '@/store/features/getters';
+import { formById } from '@/store/features/getters';
 import { serviceValues } from '@/store/services/getters';
 import { Service } from '@/store/services/state';
-import Vue from 'vue';
+import WizardBase, { NavAction } from '@/components/Widget/WizardBase';
 import Component from 'vue-class-component';
 
-interface NavAction {
-  label: string;
-  click: Function;
-  enabled: Function;
-}
-
-@Component({
-  props: {
-    featureId: {
-      type: String,
-      required: true,
-    },
-    onCreateItem: {
-      type: Function,
-      required: true,
-    },
-    onCancel: {
-      type: Function,
-      required: true,
-    },
-  },
-})
-export default class BlockWizard extends Vue {
+@Component
+export default class BlockWizard extends WizardBase {
   $q: any;
   currentStep: string = '';
   blockAction: 'create' | 'existing' | null = null;
@@ -52,7 +29,7 @@ export default class BlockWizard extends Vue {
       start: [
         {
           label: 'Cancel',
-          click: () => this.$props.onCancel(),
+          click: () => this.cancel(),
           enabled: () => true,
         },
         {
@@ -119,7 +96,7 @@ export default class BlockWizard extends Vue {
     if (!this.widgetId) {
       return 'Name must not be empty';
     }
-    if (dashboardItemById(this.$store, this.widgetId)) {
+    if (this.itemAlreadyExists(this.widgetId)) {
       return 'Name must be unique';
     }
     return null;
@@ -148,7 +125,7 @@ export default class BlockWizard extends Vue {
   get blockOpts() {
     if (this.service) {
       return blockValues(this.$store, this.service.id)
-        .filter(block => block.type === this.$props.featureId)
+        .filter(block => block.type === this.typeId)
         .map(block => ({
           label: block.id,
           value: block,
@@ -171,7 +148,7 @@ export default class BlockWizard extends Vue {
     return {
       id: this.blockId,
       serviceId: (this.service as Service).id,
-      type: this.$props.featureId,
+      type: this.typeId,
       groups: [0],
       data: null,
     };
@@ -185,16 +162,15 @@ export default class BlockWizard extends Vue {
       await createBlock(this.$store, service.id, block);
     }
 
-    const item: Partial<DashboardItem> = {
+    this.createItem({
       id: this.widgetId,
-      feature: this.$props.featureId,
+      feature: this.typeId,
       config: {
         serviceId: service.id,
         blockId: block.id,
       },
-      ...widgetSizeById(this.$store, this.$props.featureId),
-    };
-    this.$props.onCreateItem(item);
+      ...this.defaultWidgetSize,
+    });
   }
 
   async changeBlockId(newId: string) {
@@ -218,6 +194,10 @@ export default class BlockWizard extends Vue {
     this.service = null;
     this.block = null;
     this.resetStepper();
+
+    if (this.serviceOpts.length === 1) {
+      this.service = this.serviceOpts[0].value;
+    }
   }
 }
 </script>
@@ -240,7 +220,7 @@ export default class BlockWizard extends Vue {
           :options="serviceOpts"
           dark
           type="radio"
-          @input="() => { block = null; }"
+          @input="() => block = null"
         />
       </q-field>
     </q-step>
@@ -269,10 +249,13 @@ export default class BlockWizard extends Vue {
         v-if="block"
         ref="form"
         :is="blockForm"
+        :type="block.type"
         :field="block"
-        :change="v => block = v"
-        :change-id="changeBlockId"
-        :display-toolbar="false"
+        :on-change-field="v => block = v"
+        :id="widgetId"
+        :on-change-id="v => widgetId = v"
+        :on-change-block-id="changeBlockId"
+        embedded
       />
     </q-step>
     <q-stepper-navigation>

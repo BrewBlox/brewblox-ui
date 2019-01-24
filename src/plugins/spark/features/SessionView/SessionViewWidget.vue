@@ -54,7 +54,6 @@ export default class SessionViewWidget extends WidgetBase {
   }
 
   saveConfig(config: SessionViewConfig = this.widgetConfig) {
-    console.log('change', config);
     this.$props.onConfigChange(this.widgetId, { ...config });
   }
 
@@ -98,22 +97,17 @@ export default class SessionViewWidget extends WidgetBase {
 
 <template>
   <q-card dark class="column">
-    <q-modal v-model="modalOpen">
+    <q-modal v-model="modalOpen" no-backdrop-dismiss>
       <SessionViewForm
         v-if="modalOpen"
+        v-bind="$props"
         :field="widgetConfig"
-        :change="saveConfig"
+        :on-change-field="saveConfig"
         :active-session="modalSession"
       />
     </q-modal>
     <q-card-title class="title-bar">
-      <InputPopupEdit
-        :field="widgetId"
-        :change="v => widgetId = v"
-        class="ellipsis"
-        label="Widget ID"
-        display="span"
-      />
+      <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
       <q-btn slot="right" flat dense round icon="settings" @click="openModal()"/>
     </q-card-title>

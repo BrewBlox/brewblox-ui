@@ -13,7 +13,7 @@ export default class GraphWidget extends WidgetBase {
   }
 
   saveConfig(cfg: GraphConfig) {
-    this.$props.onConfigChange(this.$props.id, { ...cfg });
+    this.$props.onChangeConfig(this.$props.id, { ...cfg });
   }
 
   @Watch('graphCfg', { deep: true })
@@ -25,16 +25,11 @@ export default class GraphWidget extends WidgetBase {
 
 <template>
   <q-card dark class="column">
-    <q-modal v-model="modalOpen">
-      <GraphForm v-if="modalOpen" :field="graphCfg" :change="saveConfig"/>
+    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+      <GraphForm v-if="modalOpen" v-bind="$props" :field="graphCfg" :on-change-field="saveConfig"/>
     </q-modal>
     <q-card-title class="title-bar">
-      <InputPopupEdit
-        :field="widgetId"
-        :change="v => widgetId = v"
-        label="Widget ID"
-        display="span"
-      />
+      <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
       <q-btn slot="right" flat round dense icon="settings" @click="modalOpen = true"/>
       <q-btn slot="right" flat round dense icon="refresh" @click="regraph"/>

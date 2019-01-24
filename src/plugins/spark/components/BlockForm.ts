@@ -1,16 +1,16 @@
-import FormBase from '@/components/Widget/FormBase';
 import { Block } from '@/plugins/spark/state';
 import Component from 'vue-class-component';
+import FormBase from '@/components/Widget/FormBase';
 
 @Component({
   props: {
-    changeId: {
+    onChangeBlockId: {
       type: Function,
       required: true,
     },
-    displayToolbar: {
-      type: Boolean,
-      default: true,
+    onSwitchBlockId: {
+      type: Function,
+      required: false,
     },
   },
 })
@@ -19,7 +19,7 @@ export default class BlockForm extends FormBase {
     const propBlock: Block = this.$props.field;
     const actualBlock: Block = { ...propBlock, data: propBlock.data || this.defaultData() };
     if (!propBlock.data && actualBlock.data) {
-      this.$props.change(actualBlock);
+      this.$props.onChangeField(actualBlock);
     }
     return actualBlock;
   }
@@ -32,10 +32,6 @@ export default class BlockForm extends FormBase {
     return this.block.serviceId;
   }
 
-  get settingsProps() {
-    return { ...this.$props };
-  }
-
   presets(): { label: string, value: Object }[] {
     return [];
   }
@@ -45,14 +41,10 @@ export default class BlockForm extends FormBase {
   }
 
   saveBlock(block: Block = this.block) {
-    this.$props.change(block);
+    this.$props.onChangeField({ ...block });
   }
 
   callAndSaveBlock(func: (v: any) => void) {
     return (v: any) => { func(v); this.saveBlock(); };
-  }
-
-  changeBlockId(newId: string) {
-    this.$props.changeId(newId);
   }
 }

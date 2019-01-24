@@ -8,7 +8,7 @@ import Component from 'vue-class-component';
 @Component({
   components: {},
   props: {
-    onCreateItem: {
+    onCreate: {
       type: Function,
       required: true,
     },
@@ -43,7 +43,7 @@ export default class CopyWidgetWizard extends Vue {
       return;
     }
     const item = dashboardItemById(this.$store, id);
-    this.$props.onCreateItem({
+    this.$props.onCreate({
       ...item,
       id: this.widgetId,
     });
@@ -71,7 +71,7 @@ export default class CopyWidgetWizard extends Vue {
         <q-item>
           <q-search v-model="searchModel" placeholder="Search"/>
         </q-item>
-        <q-list link="" inset-separator>
+        <q-list link inset-separator>
           <q-item
             v-for="opt in existingWidgetOptions"
             :key="opt.id"
@@ -80,7 +80,7 @@ export default class CopyWidgetWizard extends Vue {
           >
             <div class="row">
               <q-item-main>
-                <q-item-tile label="">{{ opt.id }}</q-item-tile>
+                <q-item-tile label>{{ opt.id }}</q-item-tile>
                 <q-item-tile sublabel>{{ opt.displayName }}</q-item-tile>
               </q-item-main>
               <q-item-side right icon="chevron_right"/>

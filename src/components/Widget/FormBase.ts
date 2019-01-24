@@ -1,5 +1,5 @@
-import Vue from 'vue';
 import Component from 'vue-class-component';
+import ItemBase from './ItemBase';
 
 @Component({
   props: {
@@ -7,12 +7,14 @@ import Component from 'vue-class-component';
       type: Object,
       required: true,
     },
-    change: {
+    onChangeField: {
       type: Function,
-      required: true,
+      required: false,
+    },
+    embedded: {
+      type: Boolean,
+      default: false,
     },
   },
 })
-export default class FormBase extends Vue {
-  $q: any;
-}
+export default class FormBase extends ItemBase { }

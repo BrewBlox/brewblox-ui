@@ -52,11 +52,8 @@ export default class ActuatorDS2413Form extends BlockForm {
 
 <template>
   <div class="widget-modal column">
-    <q-toolbar v-if="$props.displayToolbar" class="unpadded">
-      <q-toolbar-title>{{ block.id }} settings</q-toolbar-title>
-      <q-btn v-close-overlay flat rounded label="close"/>
-    </q-toolbar>
-    <q-collapsible group="modal" class="col-12" icon="settings" label="Settings">
+    <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <q-collapsible opened group="modal" class="col-12" icon="settings" label="Settings">
       <q-field label="DS2413 Block">
         <LinkPopupEdit
           :field="block.data.hwDevice"
@@ -94,8 +91,9 @@ export default class ActuatorDS2413Form extends BlockForm {
         </q-field>
       </div>
     </q-collapsible>
+
     <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
-      <BlockSettings v-bind="settingsProps" :presets-func="presets"/>
+      <BlockSettings v-bind="$props" :presets-data="presets()"/>
     </q-collapsible>
   </div>
 </template>

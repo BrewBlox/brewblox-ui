@@ -50,7 +50,6 @@ interface ValidatedItem {
 export default class DashboardPage extends Vue {
   $q: any;
   widgetEditable: boolean = false;
-  widgetMovable: boolean = false;
 
   wizardModal: ModalConfig = {
     open: false,
@@ -64,7 +63,7 @@ export default class DashboardPage extends Vue {
   @Watch('dashboardId')
   onChangeDashboard() {
     this.widgetEditable = false;
-    this.widgetMovable = false;
+    this.widgetEditable = false;
   }
 
   get dashboard() {
@@ -104,11 +103,6 @@ export default class DashboardPage extends Vue {
           };
         }
       });
-  }
-
-  toggleWidgetEditable() {
-    this.widgetEditable = !this.widgetEditable;
-    this.widgetMovable = this.widgetMovable && this.widgetEditable;
   }
 
   onChangeDashboardTitle(title: string) {
@@ -264,7 +258,6 @@ export default class DashboardPage extends Vue {
         </div>
       </portal>
       <portal to="toolbar-buttons">
-        <q-toggle v-if="widgetEditable" v-model="widgetMovable" label="Move widgets"/>
         <q-btn
           v-if="widgetEditable"
           color="primary"
@@ -282,26 +275,22 @@ export default class DashboardPage extends Vue {
         <q-btn
           :icon="widgetEditable ? 'check' : 'mode edit'"
           :color="widgetEditable ? 'positive' : 'primary'"
-          :label="widgetEditable ? 'Stop editing' : 'Edit widgets'"
-          @click="toggleWidgetEditable"
+          :label="widgetEditable ? 'Stop editing' : 'Edit dashboard'"
+          @click="widgetEditable = !widgetEditable"
         />
       </portal>
       <q-modal v-model="wizardModal.open">
-        <component
-          v-if="wizardModal.open"
-          :is="wizardModal.component"
-          :on-create-item="onCreateItem"
-        />
+        <component v-if="wizardModal.open" :is="wizardModal.component" :on-create="onCreateItem"/>
       </q-modal>
       <GridContainer
-        :editable="widgetMovable"
+        :editable="widgetEditable"
         :on-change-order="onChangeOrder"
         :on-change-size="onChangeSize"
       >
         <component
           v-for="val in validatedItems"
-          :disabled="widgetMovable"
-          :is="widgetEditable ? 'EditWidget' : val.component"
+          :disabled="widgetEditable"
+          :is="val.component"
           :error="val.error"
           :key="val.item.id"
           :id="val.item.id"
@@ -309,11 +298,11 @@ export default class DashboardPage extends Vue {
           :cols="val.item.cols"
           :rows="val.item.rows"
           :config="val.item.config"
-          :on-config-change="onChangeItemConfig"
-          :on-id-change="onChangeItemId"
-          :on-delete-item="() => onDeleteItem(val.item)"
-          :on-copy-item="() => onCopyItem(val.item)"
-          :on-move-item="() => onMoveItem(val.item)"
+          :on-change-config="onChangeItemConfig"
+          :on-change-id="v => onChangeItemId(val.item.id, v)"
+          :on-delete="() => onDeleteItem(val.item)"
+          :on-copy="() => onCopyItem(val.item)"
+          :on-move="() => onMoveItem(val.item)"
           class="dashboard-item"
         />
       </GridContainer>

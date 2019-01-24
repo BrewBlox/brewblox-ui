@@ -50,10 +50,6 @@ export default class InputPopupEdit extends Vue {
     return val;
   }
 
-  get popupTitle() {
-    return `Set ${this.$props.label} to:`;
-  }
-
   startEdit() {
     this.placeholder = this.$props.field;
   }
@@ -69,15 +65,16 @@ export default class InputPopupEdit extends Vue {
     <component :disabled="$props.disable" :is="$props.display" class="editable">{{ displayValue }}</component>
     <q-popup-edit
       :disable="$attrs.disabled"
-      :title="popupTitle"
+      :title="$props.label"
       v-model="placeholder"
+      label-set="apply"
       buttons
       persistent
       @show="startEdit"
       @save="endEdit"
     >
+      <slot/>
       <q-input :clearable="$props.clearable" :type="$props.type" v-model="placeholder"/>
     </q-popup-edit>
   </div>
 </template>
-

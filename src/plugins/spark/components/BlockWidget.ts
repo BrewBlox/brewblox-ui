@@ -8,9 +8,7 @@ import { blockById } from '../store/getters';
 
 @Component
 export default class BlockWidget extends WidgetBase {
-  $q: any;
   modalOpen: boolean = false;
-  slideIndex: number = 0;
 
   get serviceId(): string {
     return this.$props.config.serviceId;
@@ -22,30 +20,6 @@ export default class BlockWidget extends WidgetBase {
 
   get block(): Block {
     return blockById(this.$store, this.serviceId, this.blockId);
-  }
-
-  get subtitles(): string[] {
-    return [];
-  }
-
-  get subtitle() {
-    return this.subtitles[this.slideIndex] || '';
-  }
-
-  navTitle(idx: number) {
-    return idx === this.slideIndex
-      ? this.subtitles[this.slideIndex]
-      : null;
-  }
-
-  navIcon(idx: number) {
-    return (idx === this.slideIndex && this.navTitle(idx))
-      ? null
-      : 'fiber_manual_record';
-  }
-
-  get horizontal() {
-    return this.$props.cols >= 4;
   }
 
   colMinBlocks(minBlocksForRow: number, colsTrue: number, colsFalse: number) {
@@ -66,10 +40,6 @@ export default class BlockWidget extends WidgetBase {
     };
   }
 
-  get orientationClass() {
-    return this.horizontal ? 'row' : 'column';
-  }
-
   get queryParams(): QueryParams {
     return this.$props.config.queryParams || {
       approxPoints: 200,
@@ -78,7 +48,7 @@ export default class BlockWidget extends WidgetBase {
   }
 
   set queryParams(queryParams: QueryParams) {
-    this.$props.onConfigChange(this.$props.id, { ...this.$props.config, queryParams });
+    this.$props.onChangeConfig(this.$props.id, { ...this.$props.config, queryParams });
   }
 
   get renamedTargets(): { [key: string]: string } {
@@ -131,5 +101,9 @@ export default class BlockWidget extends WidgetBase {
   changeBlockId(newId: string) {
     renameBlock(this.$store, this.serviceId, this.blockId, newId)
       .catch(err => this.$q.notify(err.toString()));
+  }
+
+  switchBlockId(blockId: string) {
+    this.$props.onChangeConfig(this.$props.id, { ...this.$props.config, blockId });
   }
 }

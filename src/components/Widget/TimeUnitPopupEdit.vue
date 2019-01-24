@@ -43,13 +43,15 @@ export default class TimeUnitPopupEdit extends Vue {
   <div>
     <component :is="$props.display" class="editable">{{ this.$props.field | unitDuration }}</component>
     <q-popup-edit
-      :title="`Set ${this.$props.label} to:`"
+      :title="this.$props.label"
       v-model="placeholder"
+      label-set="apply"
       buttons
       persistent
       @show="startEdit"
       @save="endEdit"
     >
+      <slot/>
       <q-input v-model="placeholder"/>
     </q-popup-edit>
   </div>

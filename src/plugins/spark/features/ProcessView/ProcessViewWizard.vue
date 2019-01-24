@@ -1,33 +1,10 @@
 <script lang="ts">
-import { dashboardItemById } from '@/store/dashboards/getters';
-import { DashboardItem } from '@/store/dashboards/state';
-import { widgetSizeById } from '@/store/features/getters';
-import Vue from 'vue';
+import WizardBase, { NavAction } from '@/components/Widget/WizardBase';
 import Component from 'vue-class-component';
 
-interface NavAction {
-  label: string;
-  click: Function;
-  enabled: Function;
-}
 
-@Component({
-  props: {
-    featureId: {
-      type: String,
-      required: true,
-    },
-    onCreateItem: {
-      type: Function,
-      required: true,
-    },
-    onCancel: {
-      type: Function,
-      required: true,
-    },
-  },
-})
-export default class ProcessViewWizard extends Vue {
+@Component
+export default class ProcessViewWizard extends WizardBase {
   currentStep: string = '';
   widgetId: string = '';
 
@@ -36,7 +13,7 @@ export default class ProcessViewWizard extends Vue {
       start: [
         {
           label: 'Cancel',
-          click: () => this.$props.onCancel(),
+          click: () => this.cancel(),
           enabled: () => true,
         },
         {
@@ -56,22 +33,21 @@ export default class ProcessViewWizard extends Vue {
     if (!this.widgetId) {
       return 'Name must not be empty';
     }
-    if (dashboardItemById(this.$store, this.widgetId)) {
+    if (this.itemAlreadyExists(this.widgetId)) {
       return 'Name must be unique';
     }
     return null;
   }
 
   createWidget() {
-    const item: Partial<DashboardItem> = {
+    this.createItem({
       id: this.widgetId,
-      feature: this.$props.featureId,
+      feature: this.typeId,
       config: {
         parts: [],
       },
-      ...widgetSizeById(this.$store, this.$props.featureId),
-    };
-    this.$props.onCreateItem(item);
+      ...this.defaultWidgetSize,
+    });
   }
 
   mounted() {

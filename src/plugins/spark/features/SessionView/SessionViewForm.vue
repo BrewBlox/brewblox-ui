@@ -16,10 +16,6 @@ import { fetchKnownKeys } from '@/store/history/actions';
     activeSession: {
       default: null,
     },
-    displayToolbar: {
-      type: Boolean,
-      default: true,
-    },
   },
 })
 export default class SessionViewForm extends FormBase {
@@ -40,7 +36,7 @@ export default class SessionViewForm extends FormBase {
   }
 
   saveConfig(config: SessionViewConfig = this.widgetConfig) {
-    this.$props.change(config);
+    this.$props.onChangeField({ ...config });
   }
 
   callAndSaveConfig(func: (v: any) => void) {
@@ -133,11 +129,7 @@ export default class SessionViewForm extends FormBase {
 
 <template>
   <div class="widget-modal column">
-    <q-toolbar v-if="$props.displayToolbar" color="primary" class="unpadded">
-      <q-toolbar-title>Session View settings</q-toolbar-title>
-      <q-btn v-close-overlay flat rounded label="close"/>
-    </q-toolbar>
-
+    <WidgetSettings v-if="!$props.embedded" v-bind="$props"/>
     <q-collapsible
       v-for="session in sessions"
       :key="session.id"

@@ -53,7 +53,7 @@ export default class GraphCard extends Vue {
   }
 
   get error() {
-    if (this.metrics.length === 0) {
+    if (!this.metrics || this.metrics.length === 0) {
       return 'No data';
     }
     return null;

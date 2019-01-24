@@ -60,13 +60,15 @@ export default class LinkPopupEdit extends Vue {
   <div>
     <component :is="$props.display" class="editable">{{ displayValue | truncated }}</component>
     <q-popup-edit
-      :title="`Set ${this.$props.label} to:`"
+      :title="this.$props.label"
       v-model="placeholder"
+      label-set="apply"
       buttons
       persistent
       @show="startEdit"
       @save="endEdit"
     >
+      <slot/>
       <q-select v-model="placeholder" :options="linkOptions" clearable/>
     </q-popup-edit>
   </div>

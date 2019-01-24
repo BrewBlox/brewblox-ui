@@ -23,22 +23,18 @@ export default class DisplaySettingsWidget extends BlockWidget {
 
 <template>
   <q-card dark class="column">
-    <q-modal v-model="modalOpen">
+    <q-modal v-model="modalOpen" no-backdrop-dismiss>
       <DisplaySettingsForm
         v-if="modalOpen"
+        v-bind="$props"
         :field="block"
-        :change="saveBlock"
-        :change-id="changeBlockId"
+        :on-change-field="saveBlock"
+        :on-change-block-id="changeBlockId"
+        :on-switch-block-id="switchBlockId"
       />
     </q-modal>
     <q-card-title class="title-bar">
-      <InputPopupEdit
-        :field="widgetId"
-        :change="v => widgetId = v"
-        class="ellipsis"
-        label="Widget ID"
-        display="span"
-      />
+      <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
       <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
@@ -69,7 +65,7 @@ export default class DisplaySettingsWidget extends BlockWidget {
 <style lang="stylus" scoped>
 /deep/ .widget-body .q-field-margin {
   margin-top: 0px;
-} 
+}
 
 /deep/ .widget-body .q-field-content {
   padding-top: 0px;
@@ -80,6 +76,6 @@ export default class DisplaySettingsWidget extends BlockWidget {
 }
 
 .slots {
-  align-items: center;  
+  align-items: center;
 }
 </style>

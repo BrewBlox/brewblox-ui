@@ -21,22 +21,18 @@ export default class TempSensorMockWidget extends BlockWidget {
 
 <template>
   <q-card dark class="column">
-    <q-modal v-model="modalOpen">
+    <q-modal v-model="modalOpen" no-backdrop-dismiss>
       <TempSensorMockForm
         v-if="modalOpen"
+        v-bind="$props"
         :field="block"
-        :change="saveBlock"
-        :change-id="changeBlockId"
+        :on-change-field="saveBlock"
+        :on-change-block-id="changeBlockId"
+        :on-switch-block-id="switchBlockId"
       />
     </q-modal>
     <q-card-title class="title-bar">
-      <InputPopupEdit
-        :field="widgetId"
-        :change="v => widgetId = v"
-        class="ellipsis"
-        label="Widget ID"
-        display="span"
-      />
+      <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
       <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
       <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
@@ -47,7 +43,12 @@ export default class TempSensorMockWidget extends BlockWidget {
     <q-card-main class="column widget-body">
       <div class="full-width">
         <q-field label="Value">
-          <big>{{ block.data.value | unit }}</big>
+          <UnitPopupEdit
+            :field="block.data.value"
+            :disabled="!block.data.connected"
+            :change="callAndSaveBlock(v => block.data.value = v)"
+            label="Value"
+          />
         </q-field>
         <q-field label="Connected">
           <q-toggle
