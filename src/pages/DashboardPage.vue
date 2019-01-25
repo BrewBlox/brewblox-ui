@@ -36,11 +36,6 @@ interface VueOrdered extends Vue {
   id: string;
 }
 
-interface ModalConfig {
-  open: boolean;
-  component?: string;
-}
-
 interface ValidatedItem {
   item: DashboardItem;
   component: string;
@@ -51,10 +46,8 @@ interface ValidatedItem {
 export default class DashboardPage extends Vue {
   $q: any;
   widgetEditable: boolean = false;
-
-  wizardModal: ModalConfig = {
-    open: false,
-  };
+  menuModalOpen: boolean = false;
+  wizardModalOpen: boolean = false;
 
   get dashboardId(): string {
     return this.$route.params.id;
@@ -133,27 +126,6 @@ export default class DashboardPage extends Vue {
   onChangeItemId(id: string, newId: string) {
     updateDashboardItemId(this.$store, { id, newId })
       .catch(e => this.$q.notify(`Failed to rename ${id}: ${e}`));
-  }
-
-  onStartCopyWidget() {
-    this.wizardModal = {
-      open: true,
-      component: 'CopyWidgetWizard',
-    };
-  }
-
-  onStartMoveWidget() {
-    this.wizardModal = {
-      open: true,
-      component: 'MoveWidgetWizard',
-    };
-  }
-
-  onStartNewWidget() {
-    this.wizardModal = {
-      open: true,
-      component: 'NewWidgetWizard',
-    };
   }
 
   defaultItem(): DashboardItem {
@@ -270,20 +242,19 @@ export default class DashboardPage extends Vue {
         <q-btn
           :icon="widgetEditable ? 'check' : 'mode edit'"
           :color="widgetEditable ? 'positive' : 'primary'"
-          :label="widgetEditable ? 'Stop editing' : 'Edit'"
+          :label="widgetEditable ? 'Stop editing' : 'Edit Dashboard'"
           @click="widgetEditable = !widgetEditable"
         />
-        <q-btn color="primary" icon="file_copy" label="Copy" @click="onStartCopyWidget"/>
-        <q-btn color="primary" icon="exit_to_app" label="Move" @click="onStartMoveWidget"/>
-        <q-btn color="primary" icon="add" label="New" @click="onStartNewWidget"/>
+        <q-btn color="primary" icon="add" label="New Widget" @click="() => wizardModalOpen = true"/>
       </portal>
-      <q-modal v-model="wizardModal.open">
-        <component v-if="wizardModal.open" :is="wizardModal.component"/>
+      <q-modal v-model="wizardModalOpen">
+        <NewWidgetWizard v-if="wizardModalOpen"/>
       </q-modal>
       <GridContainer
         :editable="widgetEditable"
         :on-change-order="onChangeOrder"
         :on-change-size="onChangeSize"
+        :on-trigger-menu="() => menuModalOpen = true"
       >
         <component
           v-for="val in validatedItems"

@@ -53,7 +53,7 @@ export default class GridContainer extends Vue {
     this.$props.onChangeOrder(sortedChildren);
   }
 
-  updateItemSize(id: number, cols: number, rows: number) {
+  updateItemSize(id: string, cols: number, rows: number) {
     this.$props.onChangeSize(id, cols, rows);
   }
 
