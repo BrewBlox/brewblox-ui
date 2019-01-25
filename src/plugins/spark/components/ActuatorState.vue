@@ -44,7 +44,13 @@ export default class ActuatorState extends Vue {
   }
 
   set state(v: number) {
-    this.$props.change(v);
+    // always toggle, regardless of where the element was clicked
+    if (this.state === 0 || !this.known) {
+      this.$props.change(1);
+    }
+    if (this.state === 1) {
+      this.$props.change(0);
+    }
   }
 
   get known() {
