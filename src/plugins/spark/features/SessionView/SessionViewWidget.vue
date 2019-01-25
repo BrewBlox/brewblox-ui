@@ -54,7 +54,7 @@ export default class SessionViewWidget extends WidgetBase {
   }
 
   saveConfig(config: SessionViewConfig = this.widgetConfig) {
-    this.$props.onConfigChange(this.widgetId, { ...config });
+    this.$props.onChangeConfig(this.widgetId, { ...config });
   }
 
   callAndSaveConfig(func: (v: any) => void) {
