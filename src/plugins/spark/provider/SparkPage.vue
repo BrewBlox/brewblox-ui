@@ -32,6 +32,7 @@ interface ModalSettings {
 })
 export default class SparkPage extends Vue {
   $q: any;
+  widgetEditable: boolean = false;
   modalOpen: boolean = false;
   modalSettings: ModalSettings | null = null;
   volatileItems: { [blockId: string]: DashboardItem } = {};
@@ -178,16 +179,6 @@ export default class SparkPage extends Vue {
     };
     this.modalOpen = true;
   }
-
-  startCopyToWidget() {
-    this.modalSettings = {
-      component: 'BlockWidgetWizard',
-      props: {
-        serviceId: this.$props.serviceId,
-      },
-    };
-    this.modalOpen = true;
-  }
 }
 </script>
 
@@ -199,10 +190,10 @@ export default class SparkPage extends Vue {
       </portal>
       <portal to="toolbar-buttons">
         <q-btn
-          color="primary"
-          icon="file_copy"
-          label="Copy to Dashboard"
-          @click="startCopyToWidget"
+          :icon="widgetEditable ? 'check' : 'mode edit'"
+          :color="widgetEditable ? 'positive' : 'primary'"
+          :label="widgetEditable ? 'Stop editing' : 'Edit Dashboard'"
+          @click="widgetEditable = !widgetEditable"
         />
         <q-btn color="primary" icon="add" label="New Block" @click="startCreateBlock"/>
       </portal>
@@ -217,9 +208,10 @@ export default class SparkPage extends Vue {
       >This service page shows all blocks that are running on your Spark controller.
         <br>Deleting blocks on this page will remove them on the controller.
       </q-alert>
-      <grid-container>
+      <GridContainer :editable="widgetEditable" no-move>
         <SparkWidget
           v-if="isReady && !statusNok"
+          :disabled="widgetEditable"
           :id="$props.serviceId"
           :service-id="$props.serviceId"
           :cols="widgetSize.cols"
@@ -228,6 +220,7 @@ export default class SparkPage extends Vue {
         />
         <Troubleshooter
           v-if="statusNok"
+          :disabled="widgetEditable"
           :id="$props.serviceId"
           :config="{serviceId: $props.serviceId}"
           :cols="4"
@@ -237,6 +230,7 @@ export default class SparkPage extends Vue {
         />
         <component
           v-for="item in items"
+          :disabled="widgetEditable"
           :is="widgetComponent(item)"
           :key="item.id"
           :id="item.id"
@@ -250,7 +244,7 @@ export default class SparkPage extends Vue {
           volatile
           class="dashboard-item"
         />
-      </grid-container>
+      </GridContainer>
     </template>
   </div>
 </template>

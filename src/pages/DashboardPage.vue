@@ -254,7 +254,6 @@ export default class DashboardPage extends Vue {
         :editable="widgetEditable"
         :on-change-order="onChangeOrder"
         :on-change-size="onChangeSize"
-        :on-trigger-menu="() => menuModalOpen = true"
       >
         <component
           v-for="val in validatedItems"

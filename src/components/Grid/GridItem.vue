@@ -27,6 +27,10 @@ type Coordinates = { x: number, y: number };
       type: Boolean,
       default: false,
     },
+    noMove: {
+      type: Boolean,
+      default: false,
+    },
     onStartInteraction: {
       type: Function,
       default: () => () => { },
@@ -277,6 +281,10 @@ export default class GridItem extends Vue {
   }
 
   resizePanHandler(args: PanArguments) {
+    if (this.$props.noMove) {
+      return;
+    }
+
     if (args.isFirst) {
       this.startResize(args.evt);
       return;
@@ -291,6 +299,10 @@ export default class GridItem extends Vue {
   }
 
   movePanHandler(args: PanArguments) {
+    if (this.$props.noMove) {
+      return;
+    }
+
     if (args.isFirst) {
       this.startDrag(args.evt);
       return;
@@ -324,7 +336,7 @@ export default class GridItem extends Vue {
     <!-- Item resize button -->
     <button
       v-touch-pan="resizePanHandler"
-      v-if="!dragging && !moving && $props.editable"
+      v-if="!dragging && !moving && $props.editable && !$props.noMove"
       class="grid-item-resize-handle"
     >
       <q-icon name="mdi-resize-bottom-right" size="30px"/>
@@ -337,6 +349,11 @@ export default class GridItem extends Vue {
       class="grid-item-move-handle"
     >
       <q-icon v-if="$props.rows >= 2" name="touch_app" size="50px"/>
+      <q-icon
+        v-if="$props.rows >= 2 && !$props.noMove"
+        name="mdi-gesture-swipe-horizontal"
+        size="50px"
+      />
     </button>
     <!-- Action modal -->
     <q-modal v-model="modalOpen">
