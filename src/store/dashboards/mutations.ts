@@ -21,7 +21,7 @@ export const mutations: MutationTree<DashboardState> = {
   setDashboardItem: (state: DashboardState, item: DashboardItem) =>
     Vue.set(state.items, item.id, { ...item }),
 
-  setAllDashboardItems: (state: DashboardState, items: DashboardItem[]) =>
+  setdashboardItemValues: (state: DashboardState, items: DashboardItem[]) =>
     Vue.set(state, 'items', items.reduce((acc, item) => ({ ...acc, [item.id]: item }), {})),
 
   removeDashboardItem: (state: DashboardState, item: DashboardItem) =>
@@ -37,6 +37,6 @@ export const removeDashboard = commit(mutations.removeDashboard);
 export const setReplicatingDashboards = commit(mutations.setReplicatingDashboards);
 
 export const setDashboardItem = commit(mutations.setDashboardItem);
-export const setAllDashboardItems = commit(mutations.setAllDashboardItems);
+export const setdashboardItemValues = commit(mutations.setdashboardItemValues);
 export const removeDashboardItem = commit(mutations.removeDashboardItem);
 export const setReplicatingItems = commit(mutations.setReplicatingItems);

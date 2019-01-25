@@ -6,7 +6,7 @@ import { clampRotation } from '@/helpers/functional';
 import { isSamePart, component, pathsFromSources } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
 import { parts as knownParts } from './register';
-import { Part, ProcessViewConfig, FlowPart, PanArguments, HoldArguments } from './state';
+import { Part, ProcessViewConfig, FlowPart } from './state';
 
 interface DragAction {
   part: Part;

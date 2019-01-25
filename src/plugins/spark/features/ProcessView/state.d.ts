@@ -41,20 +41,3 @@ export interface FlowPart extends Part {
 export interface ProcessViewConfig {
   parts: Part[];
 }
-
-export interface PanArguments {
-  evt: MouseEvent | TouchEvent;
-  position: { top: number; left: number; };
-  direction: 'left' | 'right' | 'up' | 'down';
-  duration: number;
-  distance: { x: number; y: number; };
-  delta: { x: number; y: number; };
-  isFirst: boolean;
-  isFinal: boolean;
-}
-
-export interface HoldArguments {
-  evt: MouseEvent | TouchEvent;
-  position: { top: number; left: number; };
-  duration: number;
-}
