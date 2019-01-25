@@ -87,7 +87,9 @@ export default class SelectPopupEdit extends Vue {
       @show="startEdit"
       @save="endEdit"
     >
-      <slot/>
+      <div class="text-weight-light q-my-md">
+        <slot/>
+      </div>
       <q-select
         :multiple="$props.multiple"
         :clearable="$props.clearable"

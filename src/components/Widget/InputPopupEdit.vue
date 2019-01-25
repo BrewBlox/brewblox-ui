@@ -73,7 +73,9 @@ export default class InputPopupEdit extends Vue {
       @show="startEdit"
       @save="endEdit"
     >
-      <slot/>
+      <div class="text-weight-light q-my-md">
+        <slot/>
+      </div>
       <q-input :clearable="$props.clearable" :type="$props.type" v-model="placeholder"/>
     </q-popup-edit>
   </div>

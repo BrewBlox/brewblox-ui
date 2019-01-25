@@ -51,7 +51,9 @@ export default class TimeUnitPopupEdit extends Vue {
       @show="startEdit"
       @save="endEdit"
     >
-      <slot/>
+      <div class="text-weight-light q-my-md">
+        <slot/>
+      </div>
       <q-input v-model="placeholder"/>
     </q-popup-edit>
   </div>

@@ -70,7 +70,9 @@ export default class DatetimePopupEdit extends Vue {
       @show="startEdit"
       @save="endEdit"
     >
-      <slot/>
+      <div class="text-weight-light q-my-md">
+        <slot/>
+      </div>
       <q-datetime
         v-model="placeholder"
         :after="[

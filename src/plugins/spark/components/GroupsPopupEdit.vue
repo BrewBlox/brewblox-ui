@@ -64,7 +64,9 @@ export default class GroupsPopupEdit extends Vue {
       @show="startEdit"
       @save="endEdit"
     >
-      <slot/>
+      <div class="text-weight-light q-my-md">
+        <slot/>
+      </div>
       <q-select v-model="placeholder" :options="groupOpts" clearable multiple/>
     </q-popup-edit>
   </div>
