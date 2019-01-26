@@ -110,57 +110,6 @@ export default class PidForm extends BlockForm {
 <template>
   <div class="widget-modal column">
     <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
-    <q-collapsible group="modal" class="col-12" icon="help" label="About the PID Block">
-      <div>
-        <div class="q-subheading">What is a PID?</div>
-        <p>
-          A PID block can drive its output to regulate its input.
-          The input is a process value, in most cases this will be a pair of a setpoint and sensor.
-          The difference between the setpoint and the sensor is called the
-          <i>error</i>.
-        </p>
-        <p>The output value is the sum of 3 parts derived from the error: proportional, integral and derivative.</p>
-        <div class="q-subheading">Proportional</div>
-        <p>
-          The proportonial part is, as you'd expect, proportional to the error.
-          This should be the main driver of the output value.
-        </p>
-        <div class="q-subheading">Integral</div>
-        <p>
-          Each second, the current value of the error is added to the integral.
-          When the proportional part brings the input close to the target value but a small error remains,
-          this small error will slowly build up in the integral.
-          This increases the output until the error becomes zero.
-          This is the purpose of the integral part of PID, to correct
-          <i>steady state errors</i>.
-        </p>
-        <p>
-          It will take Ti seconds for the integral part to become as large as the proportional part.
-          If Ti is too small, the integral will do work that should be hanlded by the proportional part.
-          Because the integral is slow to increase
-          <i>and decrease</i>,
-          a low Ti can cause too much actuator action after reaching the setpoint.
-        </p>
-        <p>Setting Ti to zero will disable the integrator.</p>
-        <div class="q-subheading">Derivative</div>
-        <p>
-          Td can be seen as the duration of the overshoot that can be expected due to inertia in the system.
-          The role of the derivative part is to prevent this overshoot.
-          If the input is quickly approaching the target, the derivative can decrease the output for a slower approach.
-        </p>
-        <p>When there is no overshoot in the system, Td should be set to zero.</p>
-        <div class="q-subheading">Filtering</div>
-        <p>
-          The error value is passed through a filter to remove noise, spikes and sudden jumps.
-          <br>The amount of filtering can be configured.
-          You should set the filter to the minimum duration of signal changes that you wish to let through unfiltered.
-        </p>
-        <p>
-          The filter can detect steps in the input signal and temporarily respond faster.
-          The threshold for steps that trigger this faster response can be configured too.
-        </p>
-      </div>
-    </q-collapsible>
     <q-collapsible
       opened
       group="modal"
@@ -195,7 +144,7 @@ export default class PidForm extends BlockForm {
       </div>
       <div class="row">
         <q-list class="col-md-4 col-xs-12">
-          <q-list-header>Input</q-list-header>
+          <q-list-header class="justify-center">Input</q-list-header>
           <q-item>
             <q-item-side left class="label">Block</q-item-side>
             <q-item-main>
@@ -205,9 +154,10 @@ export default class PidForm extends BlockForm {
                 :change="callAndSaveBlock(v => block.data.inputId = v)"
                 label="Input"
                 display="span"
-              >A PID block drives its output to regulate its input.
-                <br>This input is a process value: something that has a target value and an actual value.
-                <br>In most cases, this will be a sensor and setpoint pair.
+              ><p>A PID block drives its output to regulate its input.</p>
+                <p>This input is a process value: something that has a target value and an actual value.
+                In most cases, this will be a sensor and setpoint pair.</p>
+                <p>The input target minus the input value is called the error</p>
               </LinkPopupEdit>
             </q-item-main>
           </q-item>
@@ -225,7 +175,7 @@ export default class PidForm extends BlockForm {
           </q-item>
         </q-list>
         <q-list class="col-md-4 col-xs-12">
-          <q-list-header>Output</q-list-header>
+          <q-list-header class="justify-center">Output</q-list-header>
           <q-item>
             <q-item-side left class="label">Block</q-item-side>
             <q-item-main>
@@ -235,9 +185,9 @@ export default class PidForm extends BlockForm {
                 :change="callAndSaveBlock(v => block.data.outputId = v)"
                 label="Output"
                 display="span"
-              >The PID sets its output block to the result from the PID calculation.
-                <br>The output block is an 'analog' actuator.
-                <br>A digital actuator can be driven indirectly via a PWM actuator.
+              ><p>The PID sets its output block to the result from the PID calculation.</p>
+               <p>The output value is the sum of 3 parts derived from the input error: Proportional, Integral and Derivative.</p>
+               <p>The output block is an 'analog' actuator. A digital actuator can be driven indirectly via a PWM actuator.</p>
               </LinkPopupEdit>
             </q-item-main>
           </q-item>
@@ -255,7 +205,7 @@ export default class PidForm extends BlockForm {
           </q-item>
         </q-list>
         <q-list class="col-md-4 col-xs-12">
-          <q-list-header>Filtering</q-list-header>
+          <q-list-header class="justify-center">Filtering</q-list-header>
           <q-item>
             <q-item-side left class="label">Filter period</q-item-side>
             <q-item-main>
@@ -265,7 +215,10 @@ export default class PidForm extends BlockForm {
                 :options="filterOpts"
                 label="Filter"
                 display="span"
-              />
+              ><p>The input error is passed through a filter to remove noise, spikes and sudden jumps.
+              This smooths the output of the PID.</p>
+              <p>The filter should block changes lasting shorter than:</p>
+              </SelectPopupEdit>
             </q-item-main>
           </q-item>
           <q-item>
@@ -276,14 +229,17 @@ export default class PidForm extends BlockForm {
                 :change="callAndSaveBlock(v => block.data.filterThreshold = v)"
                 label="Filter threshold"
                 display="span"
-              />
+              ><p>Filtering the input causes a delay in response, because it averages values.
+              The filter can detect when a larger step occurs to which it should respond faster.</p>
+              <p>If a step exceeds this threshold, respond faster:</p>
+              </UnitPopupEdit>
             </q-item-main>
           </q-item>
         </q-list>
       </div>
       <div class="bordered calculation">
         <!-- state -->
-        <q-field label="Filtered Error" orientation="vertical">{{ block.data.error | unit }}</q-field>
+        <q-field label="Filtered error" orientation="vertical">{{ block.data.error | unit }}</q-field>
         <q-field label="Integral" orientation="vertical">{{ block.data.integral | unit }}</q-field>
         <q-field label="Derivative" orientation="vertical">{{ block.data.derivative | unit }}</q-field>
         <div/>
@@ -297,9 +253,12 @@ export default class PidForm extends BlockForm {
           <UnitPopupEdit
             :field="block.data.kp"
             :change="callAndSaveBlock(v => block.data.kp = v)"
-            label="Kp"
+            label="Proportional gain Kp"
             display="span"
-          />
+          ><p>Kp is the proportional gain, which is directly mutiplied by the filtered error.
+          For each degree that the beer is too low, Kp is added to the output.</p>
+          <p>Kp should be negative if the actuator brings down the input, like a cooler.</p>
+          </UnitPopupEdit>
         </q-field>
         <q-field label="Kp" orientation="vertical">
           <span class="darkened">{{ block.data.kp | unit }}</span>
@@ -319,17 +278,29 @@ export default class PidForm extends BlockForm {
           <TimeUnitPopupEdit
             :field="block.data.ti"
             :change="callAndSaveBlock(v => block.data.ti = v)"
-            label="Ti"
+            label="Integral time constant Ti"
             display="span"
-          />
+          ><p>The purpose of the integrator is to remove steady state errors.
+          The integrator slowly builds up when the error is not zero.</p>
+          <p>When the proportional action (P) brings the input close to the target value but a small error remains, the integrator corrects it.
+          The integrator action (I) will increase by (P) every period of duration Ti.
+          </p>
+          <p>The integrator should be slow enough to give the process time to respond to proportional action (P).
+          Overshoot due to too much integrator action is usually a sign of Kp being too low.</p>
+          <p>Setting Ti to zero will disable the integrator.</p>
+          </TimeUnitPopupEdit>
         </q-field>
         <q-field label="Td" orientation="vertical">
           <TimeUnitPopupEdit
             :field="block.data.td"
             :change="callAndSaveBlock(v => block.data.td = v)"
-            label="Td"
+            label="Derivative time constant Td"
             display="span"
-          />
+          ><p>When the error is decreasing fast, the derivative action (D) counteracts the proportional action (P).
+          This slows down the approach to avoid overshoot.</p>
+          <p>Td is the derivative time constant. It should be equal how long it takes for the process to stabilize after you turn off the actuator.
+          When there is no overshoot in the system, Td should be set to zero.</p>
+          </TimeUnitPopupEdit>
         </q-field>
         <div/>
         <!-- equal signs -->
