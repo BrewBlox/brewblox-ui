@@ -1,8 +1,12 @@
 import Link from './Link';
 import Unit from './Unit';
 
-// "not brackets", then a left bracket, then more "not brackets", then right bracket
-const extractUnit = /^([^[<]+)([[<])([^\]>]*)[\]>]$/;
+// "not brackets",
+// then a left bracket,
+// then more "not brackets, not comma",
+// then optional comma + "not brackets"
+// then right bracket
+const extractUnit = /^([^[<]+)([[<])([^\]>,]*),?([^\]>]*)[\]>]$/;
 
 export function propertyNameWithoutUnit(name: string): string {
   const matched = name.match(extractUnit);
@@ -27,11 +31,11 @@ export function serializedPropertyName(key: string, inputObject: any): string {
     Array.isArray(input) &&
     input[0] instanceof Link
   ) {
-    return `${key}<${input[0].type}>`;
+    return `${key}${input[0].postfix}`;
   }
 
   if (input instanceof Link) {
-    return `${key}<${input.type}>`;
+    return `${key}${input.postfix}`;
   }
 
   return key;
@@ -41,10 +45,10 @@ export function convertToUnit(key: string, value: any): Unit | Link {
   const matched = key.match(extractUnit);
 
   if (matched) {
-    const [, , leftBracket, bracketed] = matched;
+    const [, , leftBracket, bracketed, driven] = matched;
     try {
       if (leftBracket === '<') {
-        return new Link(value, bracketed);
+        return new Link(value, bracketed, !!driven);
       }
 
       if (leftBracket === '[') {

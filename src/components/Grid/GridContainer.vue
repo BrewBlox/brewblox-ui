@@ -9,6 +9,10 @@ import GridItem from './GridItem.vue';
       type: Boolean,
       default: false,
     },
+    noMove: {
+      type: Boolean,
+      default: false,
+    },
     onChangeOrder: {
       type: Function,
       default: () => { },
@@ -53,7 +57,7 @@ export default class GridContainer extends Vue {
     this.$props.onChangeOrder(sortedChildren);
   }
 
-  updateItemSize(id: number, cols: number, rows: number) {
+  updateItemSize(id: string, cols: number, rows: number) {
     this.$props.onChangeSize(id, cols, rows);
   }
 
@@ -80,6 +84,7 @@ export default class GridContainer extends Vue {
                     ...slot.data.attrs,
                     ...slot.componentOptions.propsData,
                     editable: this.$props.editable,
+                    noMove: this.$props.noMove,
                     onStartInteraction: this.startInteraction,
                     onStopInteraction: this.stopInteraction,
                     onUpdateItemSize: this.updateItemSize,
@@ -89,7 +94,9 @@ export default class GridContainer extends Vue {
                 [slot],
               )),
             // show overlay grid if interaction is happening or in edit mode
-            (this.interaction || this.$props.editable) && createElement(
+            (this.interaction || this.$props.editable)
+            && !this.$props.noMove
+            && createElement(
               'div',
               {
                 class: 'grid-container-overlay',

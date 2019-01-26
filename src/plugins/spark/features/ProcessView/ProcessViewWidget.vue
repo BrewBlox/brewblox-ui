@@ -6,7 +6,7 @@ import { clampRotation } from '@/helpers/functional';
 import { isSamePart, component, pathsFromSources } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
 import { parts as knownParts } from './register';
-import { Part, ProcessViewConfig, FlowPart, PanArguments, HoldArguments } from './state';
+import { Part, ProcessViewConfig, FlowPart } from './state';
 
 interface DragAction {
   part: Part;
@@ -31,7 +31,7 @@ export default class ProcessViewWidget extends WidgetBase {
   saveConfig(config: ProcessViewConfig = this.widgetConfig) {
     const parts = config.parts
       .map(({ flow, liquid, ...persistent }: FlowPart) => persistent);
-    this.$props.onConfigChange(this.widgetId, { ...config, parts });
+    this.$props.onChangeConfig(this.widgetId, { ...config, parts });
   }
 
   get gridRect() {

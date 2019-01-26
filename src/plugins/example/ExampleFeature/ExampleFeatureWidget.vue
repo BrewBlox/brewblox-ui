@@ -34,7 +34,7 @@ export default class ExampleFeatureWidget extends WidgetBase {
     // This function must be called to persist the configuration in VueX and the datastore.
     // `this.widgetId` is inherited from WidgetBase.
     // `this.widgetCfg` will be automatically updated when the store is updated.
-    this.$props.onConfigChange(this.widgetId, { ...cfg });
+    this.$props.onChangeConfig(this.widgetId, { ...cfg });
   }
 
   fetchBackend() {

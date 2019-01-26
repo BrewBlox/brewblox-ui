@@ -27,6 +27,10 @@ type Coordinates = { x: number, y: number };
       type: Boolean,
       default: false,
     },
+    noMove: {
+      type: Boolean,
+      default: false,
+    },
     onStartInteraction: {
       type: Function,
       default: () => () => { },
@@ -43,11 +47,24 @@ type Coordinates = { x: number, y: number };
       type: Function,
       default: () => () => { },
     },
+    onDelete: {
+      type: Function,
+      required: false,
+    },
+    onCopy: {
+      type: Function,
+      required: false,
+    },
+    onMove: {
+      type: Function,
+      required: false,
+    },
   },
 })
 export default class GridItem extends Vue {
   dragging: boolean = false;
   moving: boolean = false;
+  modalOpen: boolean = false;
 
   gridWidth: number = 0;
   startX: number = 0;
@@ -89,9 +106,6 @@ export default class GridItem extends Vue {
   }
 
   startInteraction(e: MouseEvent | TouchEvent) {
-    // prevent scrolling
-    e.preventDefault();
-
     this.setMouseStartPosition(e);
 
     // set initial values of item
@@ -202,20 +216,11 @@ export default class GridItem extends Vue {
   }
 
   startResize(e: MouseEvent | TouchEvent) {
-    // bind mouseup on drag end
-    window.addEventListener('mouseup', this.stopResize);
-    window.addEventListener('mousemove', this.onResizeMove);
-
     this.dragging = true;
-
     this.startInteraction(e);
   }
 
   stopResize() {
-    // remove mouseup binding
-    window.removeEventListener('mouseup', this.stopResize);
-    window.removeEventListener('mousemove', this.onResizeMove);
-
     this.dragging = false;
 
     this.$props.onUpdateItemSize(
@@ -242,9 +247,8 @@ export default class GridItem extends Vue {
     };
   }
 
-  onDragMove(e: MouseEvent) {
+  onDragMove(e: MouseEvent | TouchEvent) {
     const delta = this.moveDelta(e);
-
     const position = this.gridPosition(delta);
 
     this.currentStartCols = position.x;
@@ -252,12 +256,7 @@ export default class GridItem extends Vue {
   }
 
   startDrag(e: MouseEvent | TouchEvent) {
-    // bind mouseup on drag end
-    window.addEventListener('mouseup', this.stopDrag);
-    window.addEventListener('mousemove', this.onDragMove);
-
     this.moving = true;
-
     this.startInteraction(e);
 
     const rects = this.containerSize();
@@ -276,15 +275,49 @@ export default class GridItem extends Vue {
   }
 
   stopDrag() {
-    // remove mouseup binding
-    window.removeEventListener('mouseup', this.stopDrag);
-    window.removeEventListener('mousemove', this.onDragMove);
-
     this.moving = false;
-
     this.$props.onNewItemsOrder();
-
     this.stopInteraction();
+  }
+
+  resizePanHandler(args: PanArguments) {
+    if (this.$props.noMove) {
+      return;
+    }
+
+    if (args.isFirst) {
+      this.startResize(args.evt);
+      return;
+    }
+
+    if (args.isFinal) {
+      this.stopResize();
+      return;
+    }
+
+    this.onResizeMove(args.evt);
+  }
+
+  movePanHandler(args: PanArguments) {
+    if (this.$props.noMove) {
+      return;
+    }
+
+    if (args.isFirst) {
+      this.startDrag(args.evt);
+      return;
+    }
+
+    if (args.isFinal) {
+      this.stopDrag();
+      return;
+    }
+
+    this.onDragMove(args.evt);
+  }
+
+  holdHandler(args: HoldArguments) {
+    this.modalOpen = true;
   }
 }
 </script>
@@ -302,26 +335,36 @@ export default class GridItem extends Vue {
     />
     <!-- Item resize button -->
     <button
-      v-if="!dragging && !moving && $props.editable"
+      v-touch-pan="resizePanHandler"
+      v-if="!dragging && !moving && $props.editable && !$props.noMove"
       class="grid-item-resize-handle"
-      @mousedown="startResize"
-      @touchstart="startResize"
-      @touchmove="onResizeMove"
-      @touchend="stopResize"
     >
       <q-icon name="mdi-resize-bottom-right" size="30px"/>
     </button>
     <!-- Item drag button -->
     <button
+      v-touch-hold="holdHandler"
+      v-touch-pan="movePanHandler"
       v-if="!dragging && $props.editable"
       class="grid-item-move-handle"
-      @mousedown="startDrag"
-      @touchstart="startDrag"
-      @touchmove="onDragMove"
-      @touchend="stopDrag"
     >
       <q-icon v-if="$props.rows >= 2" name="touch_app" size="50px"/>
+      <q-icon
+        v-if="$props.rows >= 2 && !$props.noMove"
+        name="mdi-gesture-swipe-horizontal"
+        size="50px"
+      />
     </button>
+    <!-- Action modal -->
+    <q-modal v-model="modalOpen">
+      <WidgetActionMenu
+        v-if="modalOpen"
+        :item-id="$props.id"
+        :on-copy="$props.onCopy"
+        :on-move="$props.onMove"
+        :on-delete="$props.onDelete"
+      />
+    </q-modal>
   </div>
 </template>
 
