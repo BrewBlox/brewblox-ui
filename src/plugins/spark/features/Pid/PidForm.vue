@@ -154,9 +154,12 @@ export default class PidForm extends BlockForm {
                 :change="callAndSaveBlock(v => block.data.inputId = v)"
                 label="Input"
                 display="span"
-              ><p>A PID block drives its output to regulate its input.</p>
-                <p>This input is a process value: something that has a target value and an actual value.
-                In most cases, this will be a sensor and setpoint pair.</p>
+              >
+                <p>A PID block drives its output to regulate its input.</p>
+                <p>
+                  This input is a process value: something that has a target value and an actual value.
+                  In most cases, this will be a sensor and setpoint pair.
+                </p>
                 <p>The input target minus the input value is called the error</p>
               </LinkPopupEdit>
             </q-item-main>
@@ -185,9 +188,16 @@ export default class PidForm extends BlockForm {
                 :change="callAndSaveBlock(v => block.data.outputId = v)"
                 label="Output"
                 display="span"
-              ><p>The PID sets its output block to the result from the PID calculation.</p>
-               <p>The output value is the sum of 3 parts derived from the input error: Proportional, Integral and Derivative.</p>
-               <p>The output block is an 'analog' actuator. A digital actuator can be driven indirectly via a PWM actuator.</p>
+              >
+                <p>The PID sets its output block to the result from the PID calculation.</p>
+                <p>
+                  The output value is the sum of 3 parts derived from the input error:
+                  Proportional, Integral and Derivative.
+                </p>
+                <p>
+                  The output block is an 'analog' actuator.
+                  A digital actuator can be driven indirectly via a PWM actuator.
+                </p>
               </LinkPopupEdit>
             </q-item-main>
           </q-item>
@@ -215,9 +225,12 @@ export default class PidForm extends BlockForm {
                 :options="filterOpts"
                 label="Filter"
                 display="span"
-              ><p>The input error is passed through a filter to remove noise, spikes and sudden jumps.
-              This smooths the output of the PID.</p>
-              <p>The filter should block changes lasting shorter than:</p>
+              >
+                <p>
+                  The input error is passed through a filter to remove noise, spikes and sudden jumps.
+                  This smooths the output of the PID.
+                </p>
+                <p>The filter should block changes lasting shorter than:</p>
               </SelectPopupEdit>
             </q-item-main>
           </q-item>
@@ -229,9 +242,12 @@ export default class PidForm extends BlockForm {
                 :change="callAndSaveBlock(v => block.data.filterThreshold = v)"
                 label="Filter threshold"
                 display="span"
-              ><p>Filtering the input causes a delay in response, because it averages values.
-              The filter can detect when a larger step occurs to which it should respond faster.</p>
-              <p>If a step exceeds this threshold, respond faster:</p>
+              >
+                <p>
+                  Filtering the input causes a delay in response, because it averages values.
+                  The filter can detect when a larger step occurs to which it should respond faster.
+                </p>
+                <p>If a step exceeds this threshold, respond faster:</p>
               </UnitPopupEdit>
             </q-item-main>
           </q-item>
@@ -255,9 +271,12 @@ export default class PidForm extends BlockForm {
             :change="callAndSaveBlock(v => block.data.kp = v)"
             label="Proportional gain Kp"
             display="span"
-          ><p>Kp is the proportional gain, which is directly mutiplied by the filtered error.
-          For each degree that the beer is too low, Kp is added to the output.</p>
-          <p>Kp should be negative if the actuator brings down the input, like a cooler.</p>
+          >
+            <p>
+              Kp is the proportional gain, which is directly mutiplied by the filtered error.
+              For each degree that the beer is too low, Kp is added to the output.
+            </p>
+            <p>Kp should be negative if the actuator brings down the input, like a cooler.</p>
           </UnitPopupEdit>
         </q-field>
         <q-field label="Kp" orientation="vertical">
@@ -280,14 +299,21 @@ export default class PidForm extends BlockForm {
             :change="callAndSaveBlock(v => block.data.ti = v)"
             label="Integral time constant Ti"
             display="span"
-          ><p>The purpose of the integrator is to remove steady state errors.
-          The integrator slowly builds up when the error is not zero.</p>
-          <p>When the proportional action (P) brings the input close to the target value but a small error remains, the integrator corrects it.
-          The integrator action (I) will increase by (P) every period of duration Ti.
-          </p>
-          <p>The integrator should be slow enough to give the process time to respond to proportional action (P).
-          Overshoot due to too much integrator action is usually a sign of Kp being too low.</p>
-          <p>Setting Ti to zero will disable the integrator.</p>
+          >
+            <p>
+              The purpose of the integrator is to remove steady state errors.
+              The integrator slowly builds up when the error is not zero.
+            </p>
+            <p>
+              When the proportional action (P) brings the input close to the target value but a small error remains,
+              the integrator corrects it.
+              The integrator action (I) will increase by (P) every period of duration Ti.
+            </p>
+            <p>
+              The integrator should be slow enough to give the process time to respond to proportional action (P).
+              Overshoot due to too much integrator action is usually a sign of Kp being too low.
+            </p>
+            <p>Setting Ti to zero will disable the integrator.</p>
           </TimeUnitPopupEdit>
         </q-field>
         <q-field label="Td" orientation="vertical">
@@ -296,10 +322,16 @@ export default class PidForm extends BlockForm {
             :change="callAndSaveBlock(v => block.data.td = v)"
             label="Derivative time constant Td"
             display="span"
-          ><p>When the error is decreasing fast, the derivative action (D) counteracts the proportional action (P).
-          This slows down the approach to avoid overshoot.</p>
-          <p>Td is the derivative time constant. It should be equal how long it takes for the process to stabilize after you turn off the actuator.
-          When there is no overshoot in the system, Td should be set to zero.</p>
+          >
+            <p>
+              When the error is decreasing fast, the derivative action (D) counteracts the proportional action (P).
+              This slows down the approach to avoid overshoot.
+            </p>
+            <p>
+              Td is the derivative time constant.
+              It should be equal how long it takes for the process to stabilize after you turn off the actuator.
+              When there is no overshoot in the system, Td should be set to zero.
+            </p>
           </TimeUnitPopupEdit>
         </q-field>
         <div/>
