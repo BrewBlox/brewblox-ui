@@ -28,9 +28,9 @@ export default class WidgetSettings extends FormBase {
           v-if="$props.onChangeId"
           :field="widgetId"
           :change="$props.onChangeId"
-          label="Widget ID"
+          label="Widget name"
           display="span"
-        />
+        >Choose a new name for this dashboard widget.</InputPopupEdit>
         <q-icon v-if="$props.slotIcon" :name="$props.slotIcon"/>
         <span v-if="$props.slotLabel">{{ $props.slotLabel }}</span>
         <slot/>

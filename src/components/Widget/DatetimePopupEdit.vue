@@ -70,7 +70,9 @@ export default class DatetimePopupEdit extends Vue {
       @show="startEdit"
       @save="endEdit"
     >
-      <slot/>
+      <div class="help-text text-weight-light q-my-md">
+        <slot/>
+      </div>
       <q-datetime
         v-model="placeholder"
         :after="[
@@ -88,3 +90,7 @@ export default class DatetimePopupEdit extends Vue {
   </div>
 </template>
 
+
+<style lang="stylus" scoped>
+@import './popups.styl'
+</style>

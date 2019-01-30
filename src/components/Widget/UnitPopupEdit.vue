@@ -57,9 +57,15 @@ export default class UnitPopupEdit extends Vue {
       @show="startEdit"
       @save="endEdit"
     >
-      <slot/>
+      <div class="help-text text-weight-light q-my-md">
+        <slot/>
+      </div>
       <q-input :suffix="notation" v-model="placeholder" type="number"/>
     </q-popup-edit>
   </div>
 </template>
+
+<style lang="stylus" scoped>
+@import './popups.styl'
+</style>
 

@@ -22,37 +22,49 @@ export default class BlockSettings extends BlockForm {
 </script>
 
 <template>
-  <div>
-    <q-field label="Block ID">
-      <InputPopupEdit
-        :field="block.id"
-        :change="$props.onChangeBlockId"
-        display="span"
-        label="Block ID"
-      />
-    </q-field>
-    <q-field label="Block Type">
-      <span>{{ block.type }}</span>
-    </q-field>
-    <q-field label="Part of service">
-      <span>{{ serviceId }}</span>
-    </q-field>
-    <q-field label="Active in groups">
-      <GroupsPopupEdit
-        :field="block.groups"
-        :service-id="serviceId"
-        :change="callAndSaveBlock(v => block.groups = v)"
-        display="span"
-      />
-    </q-field>
-    <q-field v-if="$props.presetsData.length > 0" label="Apply preset">
-      <SelectPopupEdit
-        :field="block.data"
-        :options="$props.presetsData"
-        :change="callAndSaveBlock(applyPreset)"
-        label="preset"
-        display="span"
-      />
-    </q-field>
-  </div>
+  <q-list>
+    <q-item>
+      <q-item-side left color="grey-7">Block ID</q-item-side>
+      <q-item-main>
+        <InputPopupEdit
+          :field="block.id"
+          :change="$props.onChangeBlockId"
+          display="span"
+          label="Block ID"
+        />
+      </q-item-main>
+    </q-item>
+    <q-item>
+      <q-item-side left color="grey-7">Block Type</q-item-side>
+      <q-item-main>{{ block.type }}</q-item-main>
+    </q-item>
+    <q-item>
+      <q-item-side left color="grey-7">Part of service</q-item-side>
+      <q-item-main>{{ serviceId }}</q-item-main>
+    </q-item>
+    <q-item>
+      <q-item-side left color="grey-7">Active in groups</q-item-side>
+      <q-item-main>
+        <GroupsPopupEdit
+          :field="block.groups"
+          :service-id="serviceId"
+          :change="callAndSaveBlock(v => block.groups = v)"
+          display="span"
+        />
+      </q-item-main>
+    </q-item>
+    <q-item v-if="$props.presetsData.length > 0">
+      <q-item-side left color="grey-7">Apply preset</q-item-side>
+      <q-item-main>
+        <SelectPopupEdit
+          :field="block.data"
+          :options="$props.presetsData"
+          :change="callAndSaveBlock(applyPreset)"
+          label="preset"
+          display="span"
+        />
+      </q-item-main>
+    </q-item>
+  </q-list>
 </template>
+
