@@ -41,7 +41,7 @@ export default class InputPopupEdit extends Vue {
     }
 
     if (this.$props.type === 'text') {
-      if (val === null || val === undefined) {
+      if (val === null || val === undefined || val === '') {
         return '<not set>';
       }
       return truncate(val);
@@ -82,5 +82,5 @@ export default class InputPopupEdit extends Vue {
 </template>
 
 <style lang="stylus" scoped>
-@import './popups.styl'
+@import './popups.styl';
 </style>
