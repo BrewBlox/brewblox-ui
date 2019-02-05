@@ -51,9 +51,7 @@ export default class MutexWidget extends BlockWidget {
           </div>
         </q-field>
         <q-field label="Wait time remaining">
-          <span>
-            {{block.data.waitRemaining | unit}}
-          </span>
+          <span>{{ block.data.waitRemaining | unitDuration }}</span>
         </q-field>
       </div>
     </q-card-main>
