@@ -37,14 +37,6 @@ export default class MutexWidget extends BlockWidget {
     <q-card-separator/>
     <q-card-main class="column widget-body">
       <div class="full-width">
-        <q-field label="Idle time before allowing a different actuator">
-          <TimeUnitPopupEdit
-            :field="block.data.differentActuatorWait"
-            :change="callAndSaveBlock(v => block.data.differentActuatorWait = v)"
-            type="number"
-            label="minimum idle time"
-          />
-        </q-field>
         <q-field label="Held by">
           <span>{{ mutexClients.active }}</span>
         </q-field>
@@ -57,6 +49,11 @@ export default class MutexWidget extends BlockWidget {
           <div class="column">
             <span v-for="client in mutexClients.idle" :key="client">{{ client }}</span>
           </div>
+        </q-field>
+        <q-field label="Wait time remaining">
+          <span>
+            {{block.data.waitRemaining | unit}}
+          </span>
         </q-field>
       </div>
     </q-card-main>
