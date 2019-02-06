@@ -1,7 +1,7 @@
 import { blockValues, blockById } from '@/plugins/spark/store/getters';
 import { RootStore } from '@/store/state';
 import { MutexBlock } from './state';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 export const typeName = 'Mutex';
 
