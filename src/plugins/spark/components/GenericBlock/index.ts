@@ -2,7 +2,7 @@ import { ref } from '@/helpers/component-ref';
 import { serviceAvailable } from '@/helpers/dynamic-store';
 import { BlockConfig } from '@/plugins/spark/state';
 import { removeBlock } from '@/plugins/spark/store/actions';
-import { blockById, blocks } from '@/plugins/spark/store/getters';
+import { blocks } from '@/plugins/spark/store/getters';
 import { featureById } from '@/store/features/getters';
 import { Feature, WidgetSelector } from '@/store/features/state';
 import { RootStore } from '@/store/state';
@@ -11,12 +11,15 @@ import widget from './GenericBlock.vue';
 
 const validator = (store: RootStore, config: BlockConfig) =>
   serviceAvailable(store, config.serviceId) &&
-  blockById(store, config.serviceId, config.blockId) !== undefined;
+  config.blockId !== undefined;
 
 // Selects the correct feature for the actual block
-const selector: WidgetSelector = (store: RootStore, config: BlockConfig) =>
-  featureById(store, blockById(store, config.serviceId, config.blockId).type).widget
-  || 'InvalidWidget';
+const selector: WidgetSelector = (store: RootStore, config: BlockConfig) => {
+  const block = blocks(store, config.serviceId)[config.blockId];
+  return block
+    ? featureById(store, block.type).widget || 'InvalidWidget'
+    : 'UnknownBlockWidget';
+};
 
 const deleteBlock = (store: RootStore, config: BlockConfig) => {
   const block = blocks(store, config.serviceId)[config.blockId];
