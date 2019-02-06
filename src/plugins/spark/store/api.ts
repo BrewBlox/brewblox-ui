@@ -88,7 +88,7 @@ export const fetchDiscoveredBlocks = async (serviceId: string): Promise<string[]
 
 export const fetchSavepoints = async (serviceId: string): Promise<string[]> =>
   get(`/${encodeURIComponent(serviceId)}/savepoints`)
-    .catch((e) => { Notify.create(`Failed to fetch savepoints on ${serviceId}`); throw e; });
+    .catch(intercept(`Failed to fetch savepoints on ${serviceId}`));
 
 export const writeSavepoint = async (serviceId: string, savepointId: string): Promise<string[]> =>
   put(`/${encodeURIComponent(serviceId)}/savepoints/${encodeURIComponent(savepointId)}`, {})

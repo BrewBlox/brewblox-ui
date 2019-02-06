@@ -134,12 +134,15 @@ export const fetchSavepoints = async (store: RootStore, serviceId: string) =>
   setSavepointsInStore(store, serviceId, await fetchSavepointsInApi(serviceId));
 
 export const fetchAll = async (store: RootStore, service: Service) => {
-  await fetchServiceStatus(store, service.id);
-  Promise.all([
-    fetchUnits(store, service.id),
-    fetchUnitAlternatives(store, service.id),
-    fetchSavepoints(store, service.id),
-  ]);
+  const status = await fetchSystemStatusInApi(service.id);
+  setLastStatusInStore(store, service.id, status);
+  if (status.synchronized) {
+    Promise.all([
+      fetchUnits(store, service.id),
+      fetchUnitAlternatives(store, service.id),
+      fetchSavepoints(store, service.id),
+    ]);
+  }
 };
 
 export const createUpdateSource = async (store: RootStore, serviceId: string) =>

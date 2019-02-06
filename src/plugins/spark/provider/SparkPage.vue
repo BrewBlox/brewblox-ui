@@ -1,7 +1,13 @@
 <script lang="ts">
 import { serviceAvailable } from '@/helpers/dynamic-store';
 import { Block, SystemStatus } from '@/plugins/spark/state';
-import { createBlock, renameBlock } from '@/plugins/spark/store/actions';
+import {
+  createBlock,
+  renameBlock,
+  fetchAll,
+  createUpdateSource,
+  fetchServiceStatus,
+} from '@/plugins/spark/store/actions';
 import { allBlocks, lastStatus } from '@/plugins/spark/store/getters';
 import { createDashboardItem } from '@/store/dashboards/actions';
 import { allDashboards, itemCopyName } from '@/store/dashboards/getters';
@@ -16,6 +22,9 @@ import { Notify } from 'quasar';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { isReady, isSystemBlock, widgetSize } from './getters';
+import { Watch } from 'vue-property-decorator';
+import { setInterval, clearTimeout } from 'timers';
+import { serviceById } from '@/store/services/getters';
 
 interface ModalSettings {
   component: string;
@@ -36,6 +45,7 @@ export default class SparkPage extends Vue {
   modalOpen: boolean = false;
   modalSettings: ModalSettings | null = null;
   volatileItems: { [blockId: string]: DashboardItem } = {};
+  statusCheckInterval: NodeJS.Timeout | null = null;
 
   get dashboards(): Dashboard[] {
     return allDashboards(this.$store);
@@ -81,10 +91,28 @@ export default class SparkPage extends Vue {
     return this.isAvailable && this.status && !this.status.synchronized;
   }
 
-  get items() {
-    if (this.statusNok) {
-      return [];
+  @Watch('statusNok', { immediate: true })
+  autoRecheck() {
+    if (this.statusNok && !this.statusCheckInterval) {
+      this.statusCheckInterval = setInterval(
+        () => fetchServiceStatus(this.$store, this.$props.serviceId),
+        5000,
+      );
     }
+    if (!this.statusNok && this.statusCheckInterval) {
+      fetchAll(this.$store, serviceById(this.$store, this.$props.serviceId));
+      createUpdateSource(this.$store, this.$props.serviceId);
+      clearTimeout(this.statusCheckInterval);
+      this.statusCheckInterval = null;
+      this.$forceUpdate();
+    }
+  }
+
+  destroyed() {
+    this.statusCheckInterval && clearTimeout(this.statusCheckInterval);
+  }
+
+  get items() {
     return [
       ...allBlocks(this.$store, this.$props.serviceId)
         .filter(block => !isSystemBlock(block))
@@ -208,24 +236,25 @@ export default class SparkPage extends Vue {
       >This service page shows all blocks that are running on your Spark controller.
         <br>Deleting blocks on this page will remove them on the controller.
       </q-alert>
-      <GridContainer :editable="widgetEditable" no-move>
-        <SparkWidget
-          v-if="isReady && !statusNok"
-          :disabled="widgetEditable"
-          :id="$props.serviceId"
-          :service-id="$props.serviceId"
-          :cols="widgetSize.cols"
-          :rows="widgetSize.rows"
-          class="dashboard-item"
-        />
+      <GridContainer v-if="statusNok" :editable="widgetEditable" no-move>
         <Troubleshooter
-          v-if="statusNok"
           :disabled="widgetEditable"
           :id="$props.serviceId"
           :config="{serviceId: $props.serviceId}"
           :cols="4"
           :rows="4"
           type="Troubleshooter"
+          class="dashboard-item"
+        />
+      </GridContainer>
+      <GridContainer v-else :editable="widgetEditable" no-move>
+        <SparkWidget
+          v-if="isReady"
+          :disabled="widgetEditable"
+          :id="$props.serviceId"
+          :service-id="$props.serviceId"
+          :cols="widgetSize.cols"
+          :rows="widgetSize.rows"
           class="dashboard-item"
         />
         <component
