@@ -89,14 +89,17 @@ export default class SparkWidget extends Vue {
         <q-field label="Device ID">
           <span style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</span>
         </q-field>
-        <q-field label="IP address">
-          <div>{{ wifi.data.ip }}</div>
-        </q-field>
         <q-field label="Time since boot">
           <div>{{ ticks.data.millisSinceBoot | duration }}</div>
         </q-field>
-        <q-field label="Date">
+        <q-field label="Device time">
           <div>{{ sysDate }}</div>
+        </q-field>
+        <q-field label="Version">
+          <div>{{ sysInfo.data.version }}</div>
+        </q-field>
+        <q-field label="IP address">
+          <div>{{ wifi.data.ip }}</div>
         </q-field>
       </div>
     </q-card-main>
