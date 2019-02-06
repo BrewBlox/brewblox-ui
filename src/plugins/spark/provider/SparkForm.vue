@@ -89,7 +89,7 @@ export default class SparkForm extends Vue {
   }
 
   get sysDate() {
-    return new Date((this.ticks.data.secondsSinceEpoch || 0) * 1000).toString();
+    return new Date((this.ticks.data.secondsSinceEpoch || 0) * 1000).toLocaleString();
   }
 
   get units(): UserUnits {
@@ -173,13 +173,16 @@ export default class SparkForm extends Vue {
     <q-collapsible group="modal" class="col-12" icon="info" label="System Info">
       <div>
         <q-field label="Device ID">
-          <big>{{ service.id }}</big>
+          <div>{{ sysInfo.data.deviceId }}</div>
         </q-field>
         <q-field label="Time since boot">
-          <big>{{ ticks.data.millisSinceBoot | duration }}</big>
+          <div>{{ ticks.data.millisSinceBoot | duration }}</div>
         </q-field>
-        <q-field label="Date">
-          <big>{{ sysDate }}</big>
+        <q-field label="Device time">
+          <div>{{ sysDate }}</div>
+        </q-field>
+        <q-field label="Version">
+          <div>{{ sysInfo.data.version }}</div>
         </q-field>
       </div>
     </q-collapsible>
