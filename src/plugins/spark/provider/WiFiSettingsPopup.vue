@@ -7,7 +7,7 @@ import { WlanSecurityEnum, WlanCipherEnum } from './getters';
 @Component({
   props: {
     field: {
-      type: String,
+      type: Object,
       required: false,
     },
     change: {
@@ -55,11 +55,11 @@ export default class WiFiSettingsPopup extends Vue {
         <q-field class="col" label="SSID">
           <q-input v-model="values.ssid"/>
         </q-field>
-        <q-field class="col" label="Password">
-          <q-input v-model="values.password" :disable="values.security === 0" type="password"/>
-        </q-field>
         <q-field class="col" label="Security">
           <q-select v-model="values.security" :options="securityOpts"/>
+        </q-field>
+        <q-field class="col" label="Password">
+          <q-input v-model="values.password" :disable="values.security === 0" type="password"/>
         </q-field>
         <q-field class="col" label="Cipher">
           <q-select v-model="values.cipher" :options="cipherOpts"/>
