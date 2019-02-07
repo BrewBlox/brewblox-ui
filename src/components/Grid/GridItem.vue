@@ -348,12 +348,14 @@ export default class GridItem extends Vue {
       v-if="!dragging && $props.editable"
       class="grid-item-move-handle"
     >
-      <q-icon v-if="$props.rows >= 2" name="touch_app" size="50px"/>
-      <q-icon
-        v-if="$props.rows >= 2 && !$props.noMove"
-        name="mdi-gesture-swipe-horizontal"
-        size="50px"
-      />
+      <div class="column">
+        <q-icon name="touch_app" size="50px"/>
+        <p>hold</p>
+      </div>
+      <div v-if="!$props.noMove" class="column">
+        <q-icon name="mdi-gesture-swipe-horizontal" size="50px"/>
+        <p>drag</p>
+      </div>
     </button>
     <!-- Action modal -->
     <q-modal v-model="modalOpen">

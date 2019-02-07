@@ -88,10 +88,7 @@ export default class DashboardPage extends Vue {
           if (!validator(this.$store, item.config)) {
             throw new Error(`${item.feature} validation failed`);
           }
-          return {
-            item,
-            component,
-          };
+          return { item, component };
         } catch (e) {
           return {
             item,
