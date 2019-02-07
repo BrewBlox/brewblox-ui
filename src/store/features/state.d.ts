@@ -7,7 +7,7 @@ export interface Deleter {
 }
 
 export type Validator = (store: RootStore, config: any) => boolean;
-export type WidgetSelector = (store: RootStore, config: any) => string;
+export type WidgetSelector = (store: RootStore, config: any) => string | undefined;
 
 export interface Feature {
   id: string;

@@ -94,7 +94,7 @@ export default class UnknownBlockWidget extends WidgetBase {
       </q-card-main>
     </div>
     <div v-else>
-      <q-alert icon="error" error>{{ reason.message }}</q-alert>
+      <q-alert color="warning" icon="warning" error>{{ reason.message }}</q-alert>
     </div>
   </q-card>
 </template>

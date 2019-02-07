@@ -9,16 +9,26 @@ import { RootStore } from '@/store/state';
 import wizard from '../BlockWizard.vue';
 import widget from './GenericBlock.vue';
 
-const validator = (store: RootStore, config: BlockConfig) =>
-  serviceAvailable(store, config.serviceId) &&
-  config.blockId !== undefined;
-
 // Selects the correct feature for the actual block
 const selector: WidgetSelector = (store: RootStore, config: BlockConfig) => {
+  if (!serviceAvailable(store, config.serviceId)) {
+    throw new Error(`Service "${config.serviceId}" not found`);
+  }
   const block = blocks(store, config.serviceId)[config.blockId];
   return block
-    ? featureById(store, block.type).widget || 'InvalidWidget'
+    ? featureById(store, block.type).widget
     : 'UnknownBlockWidget';
+};
+
+// validates feature config
+const validator = (store: RootStore, config: BlockConfig) => {
+  if (!serviceAvailable(store, config.serviceId)) {
+    throw new Error(`Service "${config.serviceId}" not found`);
+  }
+  if (config.blockId === null || config.blockId === undefined) {
+    throw new Error('Block ID is undefined');
+  }
+  return true;
 };
 
 const deleteBlock = (store: RootStore, config: BlockConfig) => {
@@ -29,8 +39,8 @@ const deleteBlock = (store: RootStore, config: BlockConfig) => {
 };
 
 const feature: Partial<Feature> = {
-  validator,
   selector,
+  validator,
   widget: ref(widget),
   wizard: ref(wizard),
   widgetSize: {
