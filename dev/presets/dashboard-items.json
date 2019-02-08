@@ -223,8 +223,7 @@
       "config": {
         "layout": {},
         "params": {
-          "duration": "10m",
-          "approxPoints": 100
+          "duration": "10m"
         },
         "targets": [
           {

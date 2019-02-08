@@ -1,4 +1,5 @@
 import { addMetric } from '@/store/history/actions';
+import { MAX_POINTS } from '@/store/history/getters';
 import {
   DisplayNames,
   Metric,
@@ -18,7 +19,7 @@ const transpose = (matrix: any[][]) => matrix[0].map((_, idx) => matrix.map(row 
 const boundedConcat = (
   left: number[] = [],
   right: number[] = [],
-  maxLength: number = 500,
+  maxLength: number = MAX_POINTS,
 ) => {
   const sliced = Math.max((left.length + right.length) - maxLength, 0);
   if (sliced > left.length) {

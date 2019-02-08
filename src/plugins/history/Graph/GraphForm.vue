@@ -124,14 +124,6 @@ export default class GraphForm extends FormBase {
 
     <q-collapsible group="modal" class="col-12" icon="mdi-timetable" label="Period settings">
       <div>
-        <q-field label="Points after downsampling">
-          <InputPopupEdit
-            :field="config.params.approxPoints"
-            :change="callAndSaveConfig(v => config.params.approxPoints = v)"
-            label="Points after downsampling"
-            type="number"
-          />
-        </q-field>
         <q-field label="Display type">
           <SelectPopupEdit
             :field="shownPeriod"
