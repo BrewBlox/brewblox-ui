@@ -5,7 +5,7 @@ import { HistoryState, Metric } from './state';
 
 const { read } = createAccessors('history');
 
-export const defaultMaxPoints: number = 500;
+export const MAX_POINTS: number = 2000;
 
 export const getters: GetterTree<HistoryState, RootState> = {
   metrics: (state: HistoryState): { [id: string]: Metric } => state.metrics || {},

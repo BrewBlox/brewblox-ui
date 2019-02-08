@@ -42,7 +42,6 @@ export default class BlockWidget extends WidgetBase {
 
   get queryParams(): QueryParams {
     return this.$props.config.queryParams || {
-      approxPoints: 200,
       duration: '10m',
     };
   }
