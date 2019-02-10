@@ -63,23 +63,33 @@ export const getters: GetterTree<SparkState, RootState> = {
       .reduce((acc, k) => ([...acc, ...generateChains([], k)]), output);
   },
   blockLinks: (state: SparkState) => {
-    const allLinks = Object.values(state.blocks).reduce(
-      (acc, block: Block) => {
-        Object.entries(block.data).forEach((obj: any) => {
-          if (obj[1] instanceof Link && obj[1].id && !obj[0].startsWith('driven')) {
-            acc = [
-              ...acc,
-              {
-                source: block.id,
-                target: obj[1].id.toString(),
-                relation: obj[0].replace(/Id$/, ''),
-              },
-            ];
-          }
-        });
-        return acc;
-      },
-      new Array<{ source: string, target: string, relation: string }>(),
+    const empty =  new Array<{ source: string, target: string, relation: string[] }>();
+    const findRelations = (source: string, relation: string[], val: any) => {
+      if (val instanceof Link) {
+        if(val.id === null || source === "DisplaySettings"){
+          return empty;
+        }
+        return [{
+          source: source,
+          target: val.toString(),
+          relation: relation,
+        }];
+      }
+      if (val instanceof Object){
+        return Object.entries(val).reduce(
+          (acc, child: Object) => {
+            return [...acc, ...findRelations(source, [...relation, child[0]], child[1])];
+          },
+          empty
+        );
+      }
+      return empty;
+    };
+
+    const allLinks = Object.values(state.blocks).reduce((rel, block: Block) => {
+        return [...rel, ...findRelations(block.id, [], block.data) ];
+      }, 
+      empty
     );
     return allLinks;
   },

@@ -4,15 +4,25 @@ import Component from 'vue-class-component';
 import dagreD3 from 'dagre-d3/dist/dagre-d3';
 import { select } from 'd3';
 
+
+interface Edge {
+  source: string,
+  target: string,
+  relation: string[],
+}
+
+
 @Component({
   props: {
     nodes: {
       type: Array,
       required: true,
+      default: [],
     },
     relations: {
       type: Array,
       required: true,
+      default: [],
     },
   },
 })
@@ -22,14 +32,16 @@ export default class DagreDiagram extends Vue {
     diagram: SVGGraphicsElement,
   }
 
-  graph = new dagreD3.graphlib.Graph({ compound: true });
+  graph = new dagreD3.graphlib.Graph({ compound: true }).setGraph({}).setDefaultEdgeLabel(function () { return {}; });
 
+  get edges() {
+    return this.$props.relations.map( rel => ({ source: rel.source, target: rel.target, relation: rel.relation })); 
+  } 
+  get drawnNodes() {
+    return this.$props.nodes.filter(n => this.edges.find(e => e.source === n.id || e.target === n.id));
+  } 
+  
   draw() {
-    this.graph.setGraph({}).setDefaultEdgeLabel(function () { return {}; });
-
-    var edges = this.$props.relations;
-    const nodes = this.$props.nodes.filter(n => edges.find(e => e.source === n.id || e.target === n.id));
-
     const nodeTemplate = (id: string, type: string) => {
       return `
         <div>
@@ -39,7 +51,7 @@ export default class DagreDiagram extends Vue {
         `;
     };
 
-    nodes.forEach(val => {
+    this.drawnNodes.forEach(val => {
       this.graph.setNode(val.id, {
         id: val.id,
         labelType: "html",
@@ -49,18 +61,16 @@ export default class DagreDiagram extends Vue {
       });
     });
 
-    edges.forEach(val => {
+    this.edges.forEach(val => {
       this.graph.setEdge(val.source, val.target, {
-        lineInterpolate: 'basis',
-        class: val.class,
         labelType: "html",
-        label: `<div class="relation">${val.relation}</div>`,
+        label: `<div class="relation">${val.relation[0]}</div>`,
       });
     });
-
     const renderer = new dagreD3.render();
     const diag = select(this.$refs.diagram);
     renderer(diag, this.graph);
+    this.fit();
   }
 
   fit() {
@@ -72,25 +82,15 @@ export default class DagreDiagram extends Vue {
   }
 
   mounted(){
-    this.draw();
-    this.fit();
+    this.$nextTick(() => {this.draw();});
   }
-
-  watch = ({
-    relations: () => {
-      this.$nextTick( () => {
-        this.draw();
-        this.fit();
-      });
-    },
-  });
 }
 </script>
 
 <template>
   <div class="container">
     <svg ref="svg" class="diag-svg">
-      <g ref="diagram"/>
+      <g ref="diagram" :key="redraws"/>
     </svg>
   </div>
 </template>
