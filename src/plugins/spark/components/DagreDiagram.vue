@@ -1,16 +1,13 @@
 <script lang="ts">
-import Vue from 'vue';
-import Component from 'vue-class-component';
-import dagreD3 from 'dagre-d3/dist/dagre-d3';
-import { select } from 'd3';
-
+import { graphlib, render } from 'dagre-d3/dist/dagre-d3';
+import { select } from 'd3-selection';
+import { Vue, Component, Watch } from 'vue-property-decorator';
 
 interface Edge {
   source: string,
   target: string,
   relation: string[],
 }
-
 
 @Component({
   props: {
@@ -32,8 +29,6 @@ export default class DagreDiagram extends Vue {
     diagram: SVGGraphicsElement,
   }
 
-  graph = new dagreD3.graphlib.Graph({ compound: true }).setGraph({}).setDefaultEdgeLabel(function () { return {}; });
-
   get edges() {
     return this.$props.relations.map( rel => ({ source: rel.source, target: rel.target, relation: rel.relation })); 
   } 
@@ -41,6 +36,7 @@ export default class DagreDiagram extends Vue {
     return this.$props.nodes.filter(n => this.edges.find(e => e.source === n.id || e.target === n.id));
   } 
   
+  @Watch('relations')
   draw() {
     const nodeTemplate = (id: string, type: string) => {
       return `
@@ -51,8 +47,10 @@ export default class DagreDiagram extends Vue {
         `;
     };
 
+    const graph = new graphlib.Graph({ compound: true }).setGraph({}).setDefaultEdgeLabel(function () { return {}; });
+
     this.drawnNodes.forEach(val => {
-      this.graph.setNode(val.id, {
+      graph.setNode(val.id, {
         id: val.id,
         labelType: "html",
         label: nodeTemplate(val.id, val.type),
@@ -62,27 +60,20 @@ export default class DagreDiagram extends Vue {
     });
 
     this.edges.forEach(val => {
-      this.graph.setEdge(val.source, val.target, {
+      graph.setEdge(val.source, val.target, {
         labelType: "html",
-        label: `<div class="relation">${val.relation[0]}</div>`,
+        label: `<div class="relation">${val.relation[0].replace(/Id$/, '')}</div>`,
       });
     });
-    const renderer = new dagreD3.render();
+    const renderer = new render();
     const diag = select(this.$refs.diagram);
-    renderer(diag, this.graph);
-    this.fit();
-  }
-
-  fit() {
+    renderer(diag, graph);
+    
     // resize svg to fit and center content
     const bbox = this.$refs.svg.getBBox();
     this.$refs.svg.setAttribute("width", bbox.width - bbox.x + "px");
     this.$refs.svg.setAttribute("height", bbox.height - bbox.y + "px");
     this.$refs.diagram.setAttribute("transform", `translate(${-bbox.x},${-bbox.y})`);
-  }
-
-  mounted(){
-    this.$nextTick(() => {this.draw();});
   }
 }
 </script>
@@ -90,7 +81,7 @@ export default class DagreDiagram extends Vue {
 <template>
   <div class="container">
     <svg ref="svg" class="diag-svg">
-      <g ref="diagram" :key="redraws"/>
+      <g ref="diagram"/>
     </svg>
   </div>
 </template>

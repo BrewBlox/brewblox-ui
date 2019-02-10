@@ -78,6 +78,9 @@ export const getters: GetterTree<SparkState, RootState> = {
       if (val instanceof Object){
         return Object.entries(val).reduce(
           (acc, child: Object) => {
+            if(child[0].startsWith("driven")){
+              return empty;
+            }
             return [...acc, ...findRelations(source, [...relation, child[0]], child[1])];
           },
           empty

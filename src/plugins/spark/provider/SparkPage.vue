@@ -222,7 +222,7 @@ export default class SparkPage extends Vue {
         <div>Blocks</div>
       </portal>
       <portal to="toolbar-buttons">
-        <q-btn color="primary" icon="add" label="Show Relations" @click="showRelations=true"/>
+        <q-btn color="primary" icon="mdi-ray-start-arrow" label="Show Relations" @click="showRelations=true"/>
         <q-btn
           :icon="widgetEditable ? 'check' : 'mode edit'"
           :color="widgetEditable ? 'positive' : 'primary'"
