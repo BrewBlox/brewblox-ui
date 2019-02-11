@@ -1,21 +1,14 @@
 import { read } from '@/helpers/dynamic-store';
+import { Link } from '@/helpers/units';
 import { serviceById } from '@/store/services/getters';
 import { RootState, RootStore } from '@/store/state';
 import { GetterTree } from 'vuex';
-import { Block, CompatibleBlocks, Spark, UnitAlternatives, UserUnits, SystemStatus } from '../state';
+import { Block, CompatibleBlocks, Spark, SystemStatus, UnitAlternatives, UserUnits } from '../state';
 import { SparkState } from './state';
-import { Link } from '@/helpers/units';
-import forEach from 'lodash/forEach';
 
+// Note: we're ignoring the system group (group 8)
 const defaultGroupNames = [
-  'Group1',
-  'Group2',
-  'Group3',
-  'Group4',
-  'Group5',
-  'Group6',
-  'Group7',
-  // Ignore system block
+  'Group1', 'Group2', 'Group3', 'Group4', 'Group5', 'Group6', 'Group7',
 ];
 
 export const typeName: string = 'Spark';
@@ -32,19 +25,20 @@ export const getters: GetterTree<SparkState, RootState> = {
   updateSource: (state: SparkState): EventSource | null => state.updateSource,
   lastStatus: (state: SparkState): SystemStatus | null => state.lastStatus,
   drivenChains: (state: SparkState): string[][] => {
-    const drivenBlocks: { [driven: string]: string[] } = Object.values(state.blocks)
-      .reduce(
-        (acc, block: Block) => {
-          Object.values(block.data)
-            .filter((obj: any) => obj instanceof Link && obj.driven && obj.id)
-            .forEach((obj: any) => {
-              const existing = acc[obj.id] || [];
-              acc[obj.id] = [...existing, block.id];
-            });
-          return acc;
-        },
-        {},
-      );
+    const drivenBlocks: { [driven: string]: string[] } =
+      Object.values(state.blocks)
+        .reduce(
+          (acc, block: Block) => {
+            Object.values(block.data)
+              .filter((obj: any) => obj instanceof Link && obj.driven && obj.id)
+              .forEach((obj: any) => {
+                const existing = acc[obj.id] || [];
+                acc[obj.id] = [...existing, block.id];
+              });
+            return acc;
+          },
+          {},
+        );
     const generateChains = (chain: string[], latest: string): string[][] => {
       const additional: string[] = drivenBlocks[latest];
       if (!additional) {
@@ -61,6 +55,38 @@ export const getters: GetterTree<SparkState, RootState> = {
     return Object.keys(drivenBlocks)
       .reduce((acc, k) => ([...acc, ...generateChains([], k)]), output);
   },
+  blockLinks: (state: SparkState) => {
+    const empty = new Array<{ source: string, target: string, relation: string[] }>();
+    const findRelations = (source: string, relation: string[], val: any) => {
+      if (val instanceof Link) {
+        if (val.id === null || source === 'DisplaySettings') {
+          return empty;
+        }
+        return [{
+          source: source,
+          target: val.toString(),
+          relation: relation,
+        }];
+      }
+      if (val instanceof Object) {
+        return Object.entries(val)
+          .reduce(
+            (acc, child: Object) => {
+              if (child[0].startsWith('driven')) {
+                return acc;
+              }
+              return [...acc, ...findRelations(source, [...relation, child[0]], child[1])];
+            },
+            empty
+          );
+      }
+      return empty;
+    };
+
+    const allLinks = Object.values(state.blocks)
+      .reduce((rel, block: Block) => ([...rel, ...findRelations(block.id, [], block.data)]), empty);
+    return allLinks;
+  },
 };
 
 export const blocks = read(getters.blocks);
@@ -74,6 +100,7 @@ export const savepoints = read(getters.savepoints);
 export const updateSource = read(getters.updateSource);
 export const lastStatus = read(getters.lastStatus);
 export const drivenChains = read(getters.drivenChains);
+export const blockLinks = read(getters.blockLinks);
 
 export function blockById<T extends Block>(
   store: RootStore,

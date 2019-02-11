@@ -8,7 +8,7 @@ import {
   createUpdateSource,
   fetchServiceStatus,
 } from '@/plugins/spark/store/actions';
-import { allBlocks, lastStatus } from '@/plugins/spark/store/getters';
+import { allBlocks, lastStatus, blockLinks } from '@/plugins/spark/store/getters';
 import { createDashboardItem } from '@/store/dashboards/actions';
 import { allDashboards, itemCopyName } from '@/store/dashboards/getters';
 import { Dashboard, DashboardItem } from '@/store/dashboards/state';
@@ -43,6 +43,7 @@ export default class SparkPage extends Vue {
   $q: any;
   widgetEditable: boolean = false;
   modalOpen: boolean = false;
+  relationsModalOpen: boolean = false;
   modalSettings: ModalSettings | null = null;
   volatileItems: { [blockId: string]: DashboardItem } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
@@ -118,6 +119,10 @@ export default class SparkPage extends Vue {
         .filter(block => !isSystemBlock(block))
         .map(this.defaultItem),
     ];
+  }
+
+  get relations() {
+    return blockLinks(this.$store, this.$props.serviceId);
   }
 
   get widgetSize() {
@@ -218,6 +223,12 @@ export default class SparkPage extends Vue {
       </portal>
       <portal to="toolbar-buttons">
         <q-btn
+          color="primary"
+          icon="mdi-ray-start-arrow"
+          label="Show Relations"
+          @click="relationsModalOpen=true"
+        />
+        <q-btn
           :icon="widgetEditable ? 'check' : 'mode edit'"
           :color="widgetEditable ? 'positive' : 'primary'"
           :label="widgetEditable ? 'Stop editing' : 'Edit Dashboard'"
@@ -227,6 +238,13 @@ export default class SparkPage extends Vue {
       </portal>
       <q-modal v-model="modalOpen" no-backdrop-dismiss>
         <component v-if="modalOpen" :is="modalSettings.component" v-bind="modalSettings.props"/>
+      </q-modal>
+      <q-modal v-model="relationsModalOpen">
+        <DagreDiagram
+          v-if="relationsModalOpen"
+          :nodes="items.map(i => ({id: i.id, type: i.feature}))"
+          :relations="relations"
+        />
       </q-modal>
       <q-alert
         class="col-12"
