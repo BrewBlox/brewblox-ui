@@ -43,10 +43,10 @@ export default class SparkPage extends Vue {
   $q: any;
   widgetEditable: boolean = false;
   modalOpen: boolean = false;
+  relationsModalOpen: boolean = false;
   modalSettings: ModalSettings | null = null;
   volatileItems: { [blockId: string]: DashboardItem } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
-  showRelations: boolean = false;
 
   get dashboards(): Dashboard[] {
     return allDashboards(this.$store);
@@ -222,7 +222,12 @@ export default class SparkPage extends Vue {
         <div>Blocks</div>
       </portal>
       <portal to="toolbar-buttons">
-        <q-btn color="primary" icon="mdi-ray-start-arrow" label="Show Relations" @click="showRelations=true"/>
+        <q-btn
+          color="primary"
+          icon="mdi-ray-start-arrow"
+          label="Show Relations"
+          @click="relationsModalOpen=true"
+        />
         <q-btn
           :icon="widgetEditable ? 'check' : 'mode edit'"
           :color="widgetEditable ? 'positive' : 'primary'"
@@ -234,8 +239,12 @@ export default class SparkPage extends Vue {
       <q-modal v-model="modalOpen" no-backdrop-dismiss>
         <component v-if="modalOpen" :is="modalSettings.component" v-bind="modalSettings.props"/>
       </q-modal>
-      <q-modal v-model="showRelations">
-        <DagreDiagram :nodes="items.map(i => ({id: i.id, type: i.feature}))" :relations="relations"/>
+      <q-modal v-model="relationsModalOpen">
+        <DagreDiagram
+          v-if="relationsModalOpen"
+          :nodes="items.map(i => ({id: i.id, type: i.feature}))"
+          :relations="relations"
+        />
       </q-modal>
       <q-alert
         class="col-12"
