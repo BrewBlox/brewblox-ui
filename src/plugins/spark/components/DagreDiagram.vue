@@ -47,7 +47,7 @@ export default class DagreDiagram extends Vue {
         `;
     };
 
-    const graph = new graphlib.Graph({ compound: true }).setGraph({}).setDefaultEdgeLabel(function () { return {}; });
+    const graph = new graphlib.Graph({ multigraph: true }).setGraph({});
 
     this.drawnNodes.forEach(val => {
       graph.setNode(val.id, {
@@ -63,7 +63,8 @@ export default class DagreDiagram extends Vue {
       graph.setEdge(val.source, val.target, {
         labelType: "html",
         label: `<div class="relation">${val.relation[0].replace(/Id$/, '')}</div>`,
-      });
+      },
+      val.relation[0]);
     });
     const renderer = new render();
     const diag = select(this.$refs.diagram);
