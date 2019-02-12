@@ -1,5 +1,5 @@
 <script lang="ts">
-import { serializedPropertyName } from '@/helpers/units';
+import { getDisplayNamesWithUnits } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { getById } from './getters';
@@ -12,9 +12,10 @@ export default class TempSensorMockWidget extends BlockWidget {
   }
 
   get renamedTargets() {
-    return {
-      [serializedPropertyName('value', this.block.data)]: 'Value',
-    };
+    return getDisplayNamesWithUnits({
+      value: 'Sensor value',
+    },
+      this.block.data);
   }
 }
 </script>

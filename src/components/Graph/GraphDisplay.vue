@@ -31,6 +31,7 @@ export default class GraphDisplay extends Vue {
       b: 40,
     },
     legend: { orientation: 'h' },
+    showlegend: true,
     xaxis: {
       type: 'date',
       gridcolor: '#666',

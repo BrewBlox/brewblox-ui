@@ -41,6 +41,30 @@ export function serializedPropertyName(key: string, inputObject: any): string {
   return key;
 }
 
+export function getDisplayNamesWithUnits(
+  renames: { [key: string]: string }, inputObject: any): { [serializedKey: string]: string } {
+  const displayNames = {};
+  Object.entries(renames).map(([key, newName]) => {
+    let displayName = newName;
+    let unit = '';
+
+    if (Array.isArray(inputObject[key]) && inputObject[key][0] instanceof Unit) {
+      unit = inputObject.key[0].notation;
+    }
+    else if (inputObject[key] instanceof Unit) {
+      unit = inputObject[key].notation;
+    }
+    if (unit !== '') {
+      displayName = `${displayName} [${unit}]`;
+    }
+
+    const serializedName = serializedPropertyName(key, inputObject);
+    displayNames[serializedName] = displayName;
+  });
+
+  return displayNames;
+}
+
 export function convertToUnit(key: string, value: any): Unit | Link {
   const matched = key.match(extractUnit);
 
