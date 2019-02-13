@@ -13,6 +13,16 @@ export function propertyNameWithoutUnit(name: string): string {
   return matched ? matched[1] : name;
 }
 
+export function objectUnit(val: any): string | null {
+  if (Array.isArray(val) && val[0] instanceof Unit) {
+    return val[0].notation;
+  }
+  if (val instanceof Unit) {
+    return val.notation;
+  }
+  return null;
+}
+
 export function serializedPropertyName(key: string, inputObject: any): string {
   const input = inputObject[key];
 
@@ -41,28 +51,17 @@ export function serializedPropertyName(key: string, inputObject: any): string {
   return key;
 }
 
-export function getDisplayNamesWithUnits(
-  renames: { [key: string]: string }, inputObject: any): { [serializedKey: string]: string } {
-  const displayNames = {};
-  Object.entries(renames).map(([key, newName]) => {
-    let displayName = newName;
-    let unit = '';
+type DisplayNameType = { [key: string]: string };
 
-    if (Array.isArray(inputObject[key]) && inputObject[key][0] instanceof Unit) {
-      unit = inputObject.key[0].notation;
-    }
-    else if (inputObject[key] instanceof Unit) {
-      unit = inputObject[key].notation;
-    }
-    if (unit !== '') {
-      displayName = `${displayName} [${unit}]`;
-    }
+export function postfixedDisplayNames(displayNames: DisplayNameType, inputObject: any): DisplayNameType {
+  const displayNameReducer = (acc: DisplayNameType, [key, displayName]) => {
+    const serializedKey = serializedPropertyName(key, inputObject);
+    const unit = objectUnit(inputObject[key]);
+    return { ...acc, [serializedKey]: unit ? `${displayName} [${unit}]` : displayName };
+  };
 
-    const serializedName = serializedPropertyName(key, inputObject);
-    displayNames[serializedName] = displayName;
-  });
-
-  return displayNames;
+  return Object.entries(displayNames)
+    .reduce(displayNameReducer, {});
 }
 
 export function convertToUnit(key: string, value: any): Unit | Link {

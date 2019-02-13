@@ -290,6 +290,10 @@ export default class DefaultLayout extends Vue {
   cursor: move;
 }
 
+.q-card-title {
+  max-width: 100%;
+}
+
 .widget-container {
   height: 100%;
   width: 100%;

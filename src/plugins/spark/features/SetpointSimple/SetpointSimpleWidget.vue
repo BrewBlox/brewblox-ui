@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Unit, getDisplayNamesWithUnits } from '@/helpers/units';
+import { Unit, postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import { isNullOrUndefined } from 'util';
 import Component from 'vue-class-component';
@@ -13,10 +13,12 @@ export default class SetpointSimpleWidget extends BlockWidget {
   }
 
   get renamedTargets() {
-    return getDisplayNamesWithUnits({
-      setting: 'Setpoint setting',
-    },
-      this.block.data);
+    return postfixedDisplayNames(
+      {
+        setting: 'Setpoint setting',
+      },
+      this.block.data,
+    );
   }
 }
 </script>

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { getDisplayNamesWithUnits } from '@/helpers/units';
+import { postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { filters, getById } from './getters';
@@ -12,19 +12,21 @@ export default class PidWidget extends BlockWidget {
   }
 
   get renamedTargets() {
-    return getDisplayNamesWithUnits({
-      inputSetting: 'Input target',
-      inputValue: 'Input value',
-      error: 'Error (filtered)',
-      derivative: 'Derivative or error',
-      integral: 'Integral of error',
-      p: 'P',
-      i: 'I',
-      d: 'D',
-      outputSetting: 'Output target (P+I+D)',
-      outputValue: 'Output value',
-    },
-    this.block.data);
+    return postfixedDisplayNames(
+      {
+        inputSetting: 'Input target',
+        inputValue: 'Input value',
+        error: 'Error (filtered)',
+        derivative: 'Derivative or error',
+        integral: 'Integral of error',
+        p: 'P',
+        i: 'I',
+        d: 'D',
+        outputSetting: 'Output target (P+I+D)',
+        outputValue: 'Output value',
+      },
+      this.block.data,
+    );
   }
 
   get filterName() {

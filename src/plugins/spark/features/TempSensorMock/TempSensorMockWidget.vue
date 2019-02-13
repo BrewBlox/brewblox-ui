@@ -1,5 +1,5 @@
 <script lang="ts">
-import { getDisplayNamesWithUnits } from '@/helpers/units';
+import { postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { getById } from './getters';
@@ -12,10 +12,12 @@ export default class TempSensorMockWidget extends BlockWidget {
   }
 
   get renamedTargets() {
-    return getDisplayNamesWithUnits({
-      value: 'Sensor value',
-    },
-      this.block.data);
+    return postfixedDisplayNames(
+      {
+        value: 'Sensor value',
+      },
+      this.block.data,
+    );
   }
 }
 </script>
