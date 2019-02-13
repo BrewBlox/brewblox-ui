@@ -52,13 +52,14 @@ export default class SparkPage extends Vue {
   }
 
   defaultItem(block: Block): DashboardItem {
-    const existing = this.volatileItems[block.id];
+    const widgetId = `${this.$props.serviceId}/${block.id}`;
+    const existing = this.volatileItems[widgetId];
     if (!existing || existing.feature !== block.type) {
       this.$set(
         this.volatileItems,
-        block.id,
+        widgetId,
         {
-          id: block.id,
+          id: widgetId,
           feature: block.type,
           order: 0,
           dashboard: '',
@@ -69,7 +70,7 @@ export default class SparkPage extends Vue {
           ...widgetSizeById(this.$store, block.type),
         });
     }
-    return this.volatileItems[block.id];
+    return this.volatileItems[widgetId];
   }
 
   get isAvailable() {
