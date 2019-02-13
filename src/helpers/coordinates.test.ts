@@ -36,13 +36,13 @@ describe('coordinates', () => {
   });
 
   it('Should rotate', () => {
-    expect(new Coordinates('1,1', 90).values()).toEqual([0, 1]);
-    expect(new Coordinates('0.5,0', -90).values()).toEqual([0, 0.5]);
+    expect(new Coordinates('1,1').rotate(90).values()).toEqual([0, 1]);
+    expect(new Coordinates('0.5,0').rotate(-90).values()).toEqual([0, 0.5]);
   });
 
   it('Should rotate bigger fields', () => {
-    expect(new Coordinates('1,0', 90, [1, 1]).values()).toEqual([2, 1]);
-    expect(new Coordinates('1,0', 270, [1, 1]).values()).toEqual([0, 1]);
+    expect(new Coordinates('1,0').rotate(90, [1, 1]).values()).toEqual([2, 1]);
+    expect(new Coordinates('1,0').rotate(270, [1, 1]).values()).toEqual([0, 1]);
   });
 
 });

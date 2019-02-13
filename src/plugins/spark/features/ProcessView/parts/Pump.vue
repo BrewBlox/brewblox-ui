@@ -1,12 +1,12 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { AngledFlows, FlowPart } from '../state';
+import { Transitions, Part } from '../state';
 import { LEFT, RIGHT } from '../getters';
 
 @Component
 export default class Pump extends PartComponent {
-  static flows(part: FlowPart): AngledFlows {
+  static transitions(part: Part): Transitions {
     const p = part.disabled ? 0 : 10;
     return {
       [LEFT]: [{ outCoords: RIGHT, deltaPressure: -p }],

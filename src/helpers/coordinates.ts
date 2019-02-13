@@ -4,7 +4,7 @@ export class Coordinates {
   x: number;
   y: number;
 
-  constructor(param: CoordinatesParam, rotation: number = 0, pivot: CoordinatesParam = [0.5, 0.5]) {
+  constructor(param: CoordinatesParam) {
     if (typeof param === 'string') {
       [this.x, this.y] = param.split(',').map(Number);
     }
@@ -22,17 +22,17 @@ export class Coordinates {
       throw new Error(`${param} is not a valid argument`);
     }
 
-    if (rotation) {
-      this.rotate(rotation, pivot);
-    }
-
     if (typeof this.x !== 'number' || Number.isNaN(this.x)
       || typeof this.y !== 'number' || Number.isNaN(this.y)) {
       throw new Error(`${param} could not be parsed as a coordinate`);
     }
   }
 
-  rotate(rotation: number, pivot: CoordinatesParam) {
+  rotate(rotation: number, pivot: CoordinatesParam = [0.5, 0.5]) {
+    if (!rotation) {
+      return this;
+    }
+
     const pivotCoord = new Coordinates(pivot);
 
     const s = Math.sin(rotation * Math.PI / 180);
@@ -46,6 +46,16 @@ export class Coordinates {
 
     this.x = +x.toFixed(1);
     this.y = +y.toFixed(1);
+
+    return this;
+  }
+
+  translate(offset: CoordinatesParam) {
+    const offsetCoord = new Coordinates(offset);
+    this.x += offsetCoord.x;
+    this.y += offsetCoord.y;
+
+    return this;
   }
 
   toString(): string {

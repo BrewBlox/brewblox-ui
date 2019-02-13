@@ -1,7 +1,7 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { AngledFlows } from '../state';
+import { Transitions } from '../state';
 import { LEFT, RIGHT, DOWN, UP, SQUARE_SIZE } from '../getters';
 
 @Component
@@ -10,7 +10,7 @@ export default class BridgeTube extends PartComponent {
     return true;
   }
 
-  static flows(): AngledFlows {
+  static transitions(): Transitions {
     return {
       // bridge (high)
       [LEFT]: [{ outCoords: RIGHT }],

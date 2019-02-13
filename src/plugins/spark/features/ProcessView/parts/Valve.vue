@@ -1,12 +1,12 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { FlowPart, AngledFlows } from '../state';
+import { Part, Transitions } from '../state';
 import { LEFT, RIGHT, UP, DOWN, SQUARE_SIZE } from '../getters';
 
 @Component
 export default class Valve extends PartComponent {
-  static flows(part: FlowPart): AngledFlows {
+  static transitions(part: Part): Transitions {
     if (part.closed) {
       return {};
     }

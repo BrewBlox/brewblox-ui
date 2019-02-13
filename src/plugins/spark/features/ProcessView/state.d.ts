@@ -9,7 +9,7 @@ export interface Flow {
   deltaPressure?: number;
 }
 
-export interface AngledFlows {
+export interface Transitions {
   [inCoords: string]: Flow[];
 }
 
@@ -32,10 +32,11 @@ export interface ComponentConstructor extends VueConstructor {
   isSource: boolean;
   isBridge: boolean;
   cards: string[];
-  flows: (part: FlowPart) => AngledFlows;
+  transitions: (part: Part) => Transitions;
 }
 
 export interface FlowPart extends Part {
+  transitions?: Transitions;
   flow?: FlowPressure;
   liquid?: string;
 }

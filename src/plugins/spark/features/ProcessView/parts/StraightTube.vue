@@ -1,12 +1,12 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { AngledFlows } from '../state';
+import { Transitions } from '../state';
 import { LEFT, RIGHT, SQUARE_SIZE } from '../getters';
 
 @Component
 export default class StraightTube extends PartComponent {
-  static flows(): AngledFlows {
+  static transitions(): Transitions {
     return {
       [LEFT]: [{ outCoords: RIGHT }],
       [RIGHT]: [{ outCoords: LEFT }],

@@ -30,7 +30,7 @@ export default class ProcessViewWidget extends WidgetBase {
 
   saveConfig(config: ProcessViewConfig = this.widgetConfig) {
     const parts = config.parts
-      .map(({ flow, liquid, ...persistent }: FlowPart) => persistent);
+      .map(({ flow, liquid, transitions, ...persistent }: FlowPart) => persistent);
     this.$props.onChangeConfig(this.widgetId, { ...config, parts });
   }
 
