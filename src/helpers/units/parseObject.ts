@@ -13,6 +13,16 @@ export function propertyNameWithoutUnit(name: string): string {
   return matched ? matched[1] : name;
 }
 
+export function objectUnit(val: any): string | null {
+  if (Array.isArray(val) && val[0] instanceof Unit) {
+    return val[0].notation;
+  }
+  if (val instanceof Unit) {
+    return val.notation;
+  }
+  return null;
+}
+
 export function serializedPropertyName(key: string, inputObject: any): string {
   const input = inputObject[key];
 
@@ -39,6 +49,19 @@ export function serializedPropertyName(key: string, inputObject: any): string {
   }
 
   return key;
+}
+
+type DisplayNameType = { [key: string]: string };
+
+export function postfixedDisplayNames(displayNames: DisplayNameType, inputObject: any): DisplayNameType {
+  const displayNameReducer = (acc: DisplayNameType, [key, displayName]) => {
+    const serializedKey = serializedPropertyName(key, inputObject);
+    const unit = objectUnit(inputObject[key]);
+    return { ...acc, [serializedKey]: unit ? `${displayName} [${unit}]` : displayName };
+  };
+
+  return Object.entries(displayNames)
+    .reduce(displayNameReducer, {});
 }
 
 export function convertToUnit(key: string, value: any): Unit | Link {

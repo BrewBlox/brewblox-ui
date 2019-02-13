@@ -1,5 +1,5 @@
 <script lang="ts">
-import { serializedPropertyName } from '@/helpers/units';
+import { postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { filters, getById } from './getters';
@@ -12,18 +12,21 @@ export default class PidWidget extends BlockWidget {
   }
 
   get renamedTargets() {
-    return {
-      [serializedPropertyName('error', this.block.data)]: 'Error (filtered)',
-      [serializedPropertyName('derivative', this.block.data)]: 'Derivative or error',
-      [serializedPropertyName('integral', this.block.data)]: 'Integral of error',
-      [serializedPropertyName('p', this.block.data)]: 'Proportional action',
-      [serializedPropertyName('i', this.block.data)]: 'Integral action',
-      [serializedPropertyName('d', this.block.data)]: 'Derivative action',
-      [serializedPropertyName('inputValue', this.block.data)]: 'Input value',
-      [serializedPropertyName('inputSetting', this.block.data)]: 'Input target',
-      [serializedPropertyName('outputValue', this.block.data)]: 'Output value',
-      [serializedPropertyName('outputSetting', this.block.data)]: 'Output target',
-    };
+    return postfixedDisplayNames(
+      {
+        inputSetting: 'Input target',
+        inputValue: 'Input value',
+        error: 'Error (filtered)',
+        derivative: 'Derivative or error',
+        integral: 'Integral of error',
+        p: 'P',
+        i: 'I',
+        d: 'D',
+        outputSetting: 'Output target (P+I+D)',
+        outputValue: 'Output value',
+      },
+      this.block.data,
+    );
   }
 
   get filterName() {

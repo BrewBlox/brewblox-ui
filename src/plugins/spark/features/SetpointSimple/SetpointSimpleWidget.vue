@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Unit } from '@/helpers/units';
+import { Unit, postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import { isNullOrUndefined } from 'util';
 import Component from 'vue-class-component';
@@ -10,6 +10,15 @@ import { SetpointSimpleBlock } from './state';
 export default class SetpointSimpleWidget extends BlockWidget {
   get block(): SetpointSimpleBlock {
     return getById(this.$store, this.serviceId, this.blockId);
+  }
+
+  get renamedTargets() {
+    return postfixedDisplayNames(
+      {
+        setting: 'Setpoint setting',
+      },
+      this.block.data,
+    );
   }
 }
 </script>
@@ -29,6 +38,7 @@ export default class SetpointSimpleWidget extends BlockWidget {
     <q-card-title class="title-bar">
       <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
+      <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
       <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>

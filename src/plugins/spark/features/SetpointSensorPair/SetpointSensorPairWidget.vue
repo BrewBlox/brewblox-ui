@@ -1,5 +1,5 @@
 <script lang="ts">
-import { serializedPropertyName } from '@/helpers/units';
+import { postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { getById } from './getters';
@@ -12,10 +12,13 @@ export default class SetpointSensorPairWidget extends BlockWidget {
   }
 
   get renamedTargets() {
-    return {
-      [serializedPropertyName('setpointValue', this.block.data)]: 'Setpoint',
-      [serializedPropertyName('sensorValue', this.block.data)]: 'Sensor',
-    };
+    return postfixedDisplayNames(
+      {
+        setpointValue: 'Setpoint',
+        sensorValue: 'Sensor',
+      },
+      this.block.data,
+    );
   }
 }
 </script>
