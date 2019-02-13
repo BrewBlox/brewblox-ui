@@ -9,8 +9,8 @@ export default class Pump extends PartComponent {
   static flows(part: FlowPart): AngledFlows {
     const p = part.disabled ? 0 : 10;
     return {
-      [LEFT]: [{ angleOut: RIGHT, deltaPressure: -p }],
-      [RIGHT]: [{ angleOut: LEFT, deltaPressure: p }],
+      [LEFT]: [{ outCoords: RIGHT, deltaPressure: -p }],
+      [RIGHT]: [{ outCoords: LEFT, deltaPressure: p }],
     };
   }
 }

@@ -8,7 +8,6 @@ describe('deserialize', () => {
     const input = {
       test: 'Do not touch',
       something: 1,
-      'unknownUnit[answers]': 42,
       'convert[celsius]': 25,
       normal: [21, 22, 23],
       'array[celsius]': [21, 22, 23],
@@ -18,7 +17,6 @@ describe('deserialize', () => {
 
     expect(output.test).toBe('Do not touch');
     expect(output.something).not.toBeInstanceOf(Unit);
-    expect(output.unknownUnit).not.toBeInstanceOf(Unit);
     expect(output.convert).toBeInstanceOf(Unit);
     expect(output.normal[0]).toBe(21);
   });

@@ -1,18 +1,20 @@
 import { VueConstructor } from 'vue';
 
+export type Coordinate = string;
+
 export interface Flow {
-  angleOut: number;
+  outCoords: string;
   friction?: number;
   pressure?: number;
   deltaPressure?: number;
 }
 
 export interface AngledFlows {
-  [angleIn: number]: Flow[];
+  [inCoords: string]: Flow[];
 }
 
 export interface FlowPressure {
-  [angleIn: number]: number;  // pressure
+  [inCoords: string]: number;  // pressure
 }
 
 export interface Part {

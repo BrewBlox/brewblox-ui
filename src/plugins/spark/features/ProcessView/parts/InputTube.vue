@@ -17,7 +17,7 @@ export default class InputTube extends PartComponent {
 
   static flows(): AngledFlows {
     return {
-      [LEFT]: [{ angleOut: RIGHT }],
+      [LEFT]: [{ outCoords: RIGHT }],
     };
   }
 

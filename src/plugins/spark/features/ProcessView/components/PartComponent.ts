@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import {AngledFlows, FlowPart} from '../state';
+import { AngledFlows, FlowPart } from '../state';
 
 @Component({
   props: {
@@ -45,8 +45,8 @@ export default class PartComponent extends Vue {
   }
 
   get flowing(): boolean {
-    return Object.keys(this.flow).some(
-        angle => this.flowOnAngle(Number(angle)) !== 0);
+    return Object.keys(this.flow)
+      .some(angle => this.flowOnAngle(angle) !== 0);
   }
 
   get flow() {
@@ -61,19 +61,19 @@ export default class PartComponent extends Vue {
     return this.part.liquidSource || this.part.liquid;
   }
 
-  flowOnAngle(angle: number): number {
-    return this.flow[Number(angle)] || 0;
+  flowOnAngle(angle: string): number {
+    return this.flow[angle] || 0;
   }
 
   toggleClosed() {
-    this.$parent.$emit('input', {...this.part, closed: !this.closed});
+    this.$parent.$emit('input', { ...this.part, closed: !this.closed });
   }
 
   toggleFlipped() {
-    this.$parent.$emit('input', {...this.part, flipped: !this.flipped});
+    this.$parent.$emit('input', { ...this.part, flipped: !this.flipped });
   }
 
   toggleDisabled() {
-    this.$parent.$emit('input', {...this.part, disabled: !this.disabled});
+    this.$parent.$emit('input', { ...this.part, disabled: !this.disabled });
   }
 }

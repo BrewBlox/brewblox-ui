@@ -8,8 +8,8 @@ import { UP, RIGHT, SQUARE_SIZE, LEFT } from '../getters';
 export default class ElbowTube extends PartComponent {
   static flows(): AngledFlows {
     return {
-      [UP]: [{ angleOut: RIGHT }],
-      [RIGHT]: [{ angleOut: UP }],
+      [UP]: [{ outCoords: RIGHT }],
+      [RIGHT]: [{ outCoords: UP }],
     };
   }
 

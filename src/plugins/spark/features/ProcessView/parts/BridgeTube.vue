@@ -13,11 +13,11 @@ export default class BridgeTube extends PartComponent {
   static flows(): AngledFlows {
     return {
       // bridge (high)
-      [LEFT]: [{ angleOut: RIGHT }],
-      [RIGHT]: [{ angleOut: LEFT }],
+      [LEFT]: [{ outCoords: RIGHT }],
+      [RIGHT]: [{ outCoords: LEFT }],
       // straight (low)
-      [UP]: [{ angleOut: DOWN }],
-      [DOWN]: [{ angleOut: UP }],
+      [UP]: [{ outCoords: DOWN }],
+      [DOWN]: [{ outCoords: UP }],
     };
   }
 
