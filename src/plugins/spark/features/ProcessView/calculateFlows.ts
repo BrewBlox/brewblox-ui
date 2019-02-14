@@ -1,13 +1,14 @@
 import Vue from 'vue';
-import { Part, Transitions, FlowPart, FlowPressure, Flow, ComponentConstructor } from './state';
+import { PersistentPart, Transitions, FlowPart, CalculatedFlows, FlowRoute, ComponentConstructor } from './state';
 import { CENTER, DEFAULT_FRICTION, DEFAULT_DELTA_PRESSURE, COLD_WATER, MIXED_LIQUIDS } from './getters';
 import { Coordinates } from '@/helpers/coordinates';
 import has from 'lodash/has';
+import get from 'lodash/get';
 
-export const isSamePart = (left: Part, right: Part) =>
+export const isSamePart = (left: PersistentPart, right: PersistentPart) =>
   ['x', 'y', 'type', 'rotate'].every(k => left[k] === right[k]);
 
-export const component = (part: Part) => Vue.component(part.type) as ComponentConstructor;
+export const component = (part: PersistentPart) => Vue.component(part.type) as ComponentConstructor;
 
 const adjacentPart = (
   allParts: FlowPart[],
@@ -19,9 +20,9 @@ const adjacentPart = (
       !(currentPart && isSamePart(part, currentPart))
       && has(part, ['transitions', outCoords]));
 
-const combineFlows = (left: FlowPressure = {}, right: FlowPressure = {}) =>
+const combineFlows = (left: CalculatedFlows = {}, right: CalculatedFlows = {}) =>
   Object.entries(right)
-    .reduce((into: FlowPressure, [coord, val]) => ({ ...into, [coord]: (into[coord] || 0) + val }), left);
+    .reduce((into: CalculatedFlows, [coord, val]) => ({ ...into, [coord]: (into[coord] || 0) + val }), left);
 
 const combineLiquids = (left: string | undefined, right: string | undefined): string | undefined => {
   if (left && right && left !== right) {
@@ -36,13 +37,13 @@ const combineLiquids = (left: string | undefined, right: string | undefined): st
 const additionalFlow = (
   part: FlowPart,
   allParts: FlowPart[],
-  flowToAdd: FlowPressure,
+  flowToAdd: CalculatedFlows,
   liquid: string,
 ): FlowPart[] =>
   allParts
     .map((item) => {
       if (isSamePart(part, item)) {
-        return { ...item, liquid, flow: combineFlows(item.flow, flowToAdd) };
+        return { ...item, liquid, calculated: combineFlows(item.calculated, flowToAdd) };
       }
       return item;
     });
@@ -96,7 +97,7 @@ const calculateFromSource = (
   const candidateParts = candidates
     .filter(candidate => !isSamePart(sourcePart, candidate) || component(candidate).isBridge);
 
-  const outFlowReducer = (parts: FlowPart[], outFlow: Flow): FlowPart[] => {
+  const outFlowReducer = (parts: FlowPart[], outFlow: FlowRoute): FlowPart[] => {
     const { outCoords, pressure, friction, deltaPressure } = outFlow;
     totalFriction += (friction || DEFAULT_FRICTION);
     totalDeltaPressure += (deltaPressure || DEFAULT_DELTA_PRESSURE);
@@ -133,10 +134,7 @@ const calculateFromSource = (
       );
     }
 
-    let existingFlow = 0;
-    if (nextPart.flow && nextPart.flow[outCoords]) {
-      existingFlow = nextPart.flow[outCoords]; // TODO: rotation
-    }
+    const existingFlow = get(nextPart, ['calculated', outCoords], 0);
 
     // recursively call calculateFromSource(), with the next part being the "source"
     const nextFlows = calculateFromSource(
@@ -150,12 +148,8 @@ const calculateFromSource = (
       candidateParts,
     );
 
-    const updatedNextPart = nextFlows.find((part: FlowPart) => isSamePart(part, nextPart));
-    let newFlow = 0;
-    if (updatedNextPart && updatedNextPart.flow && updatedNextPart.flow[outCoords]) {
-      newFlow = updatedNextPart.flow[outCoords];
-    }
-
+    const updatedNextPart = nextFlows.find((part: FlowPart) => isSamePart(part, nextPart)) || {};
+    const newFlow = get(updatedNextPart, ['calculated', outCoords], 0);
     const addedFlow = newFlow - existingFlow;
 
     // The recursion tree has returned, merge the flow for this part into the result set
@@ -187,7 +181,7 @@ const mergeSourceFlows = (allParts: FlowPart[], sourceFlow: FlowPart[]): FlowPar
     (acc, part) => {
       const existing = allParts.find(p => isSamePart(p, part));
       if (existing) {
-        existing.flow = combineFlows(existing.flow, part.flow);
+        existing.calculated = combineFlows(existing.calculated, part.calculated);
         existing.liquid = combineLiquids(existing.liquid, part.liquid);
         return acc;
       }
@@ -223,10 +217,10 @@ const mergeSourceFlows = (allParts: FlowPart[], sourceFlow: FlowPart[]): FlowPar
   }
 */
 const normalizeFlows = (part: FlowPart): FlowPart => {
-  if (!part.flow) {
-    return { ...part, flow: {} };
+  if (!part.calculated) {
+    return { ...part, calculated: {} };
   }
-  const newFlows = Object.entries(part.flow)
+  const newFlows = Object.entries(part.calculated)
     .reduce((acc, [inCoord, pressure]: [string, number]) => {
       const nullCoord = new Coordinates(inCoord)
         .translate([-part.x, -part.y])
@@ -236,11 +230,11 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
     },
       {},
     );
-  return { ...part, flow: newFlows };
+  return { ...part, calculated: newFlows };
 };
 
 
-const translations = (part: Part): Transitions =>
+const translations = (part: PersistentPart): Transitions =>
   Object.entries(component(part).transitions(part))
     .reduce((acc, [inCoords, flows]) => {
       const updatedKey = new Coordinates(inCoords)
@@ -261,11 +255,11 @@ const translations = (part: Part): Transitions =>
     );
 
 
-const asFlowParts = (parts: Part[]) =>
+const asFlowParts = (parts: PersistentPart[]) =>
   parts
     .map(part => ({ ...part, transitions: translations(part) }));
 
-export const pathsFromSources = (parts: Part[]): FlowPart[] => {
+export const pathsFromSources = (parts: PersistentPart[]): FlowPart[] => {
   const flowParts = asFlowParts(parts);
   return flowParts
     .filter(part => component(part).isSource) // -> FlowPart[]

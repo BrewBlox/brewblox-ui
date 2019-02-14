@@ -1,8 +1,6 @@
 import { VueConstructor } from 'vue';
 
-export type Coordinate = string;
-
-export interface Flow {
+export interface FlowRoute {
   outCoords: string;
   friction?: number;
   pressure?: number;
@@ -10,14 +8,14 @@ export interface Flow {
 }
 
 export interface Transitions {
-  [inCoords: string]: Flow[];
+  [inCoords: string]: FlowRoute[];
 }
 
-export interface FlowPressure {
+export interface CalculatedFlows {
   [inCoords: string]: number;  // pressure
 }
 
-export interface Part {
+export interface PersistentPart {
   type: string;
   x: number;
   y: number;
@@ -32,15 +30,15 @@ export interface ComponentConstructor extends VueConstructor {
   isSource: boolean;
   isBridge: boolean;
   cards: string[];
-  transitions: (part: Part) => Transitions;
+  transitions: (part: PersistentPart) => Transitions;
 }
 
-export interface FlowPart extends Part {
+export interface FlowPart extends PersistentPart {
   transitions?: Transitions;
-  flow?: FlowPressure;
+  calculated?: CalculatedFlows;
   liquid?: string;
 }
 
 export interface ProcessViewConfig {
-  parts: Part[];
+  parts: PersistentPart[];
 }

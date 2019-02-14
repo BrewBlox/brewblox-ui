@@ -6,10 +6,10 @@ import { clampRotation } from '@/helpers/functional';
 import { isSamePart, component, pathsFromSources } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
 import { parts as knownParts } from './register';
-import { Part, ProcessViewConfig, FlowPart } from './state';
+import { PersistentPart, ProcessViewConfig, FlowPart } from './state';
 
 interface DragAction {
-  part: Part;
+  part: PersistentPart;
   style: any;
 }
 
@@ -30,7 +30,7 @@ export default class ProcessViewWidget extends WidgetBase {
 
   saveConfig(config: ProcessViewConfig = this.widgetConfig) {
     const parts = config.parts
-      .map(({ flow, liquid, transitions, ...persistent }: FlowPart) => persistent);
+      .map(({ calculated, liquid, transitions, ...persistent }: FlowPart) => persistent);
     this.$props.onChangeConfig(this.widgetId, { ...config, parts });
   }
 
@@ -39,7 +39,7 @@ export default class ProcessViewWidget extends WidgetBase {
     return { x, y, left, right, top, bottom };
   }
 
-  get availableParts(): Part[] {
+  get availableParts(): PersistentPart[] {
     return knownParts
       .map(type => ({
         type,
@@ -49,7 +49,7 @@ export default class ProcessViewWidget extends WidgetBase {
       }));
   }
 
-  get parts(): Part[] {
+  get parts(): PersistentPart[] {
     return this.widgetConfig.parts;
   }
 
@@ -88,18 +88,18 @@ export default class ProcessViewWidget extends WidgetBase {
     };
   }
 
-  partStyle(part: Part): any {
+  partStyle(part: PersistentPart): any {
     return {
       gridColumnStart: part.x + 1,
       gridRowStart: part.y + 1,
     };
   }
 
-  updateParts(parts: Part[]) {
+  updateParts(parts: PersistentPart[]) {
     this.saveConfig({ ...this.widgetConfig, parts });
   }
 
-  panHandler(part: Part, args: PanArguments) {
+  panHandler(part: PersistentPart, args: PanArguments) {
     if (!this.editable || this.contextAction) {
       return;
     }
@@ -127,7 +127,7 @@ export default class ProcessViewWidget extends WidgetBase {
     }
   }
 
-  holdHandler(part: Part, args: HoldArguments) {
+  holdHandler(part: PersistentPart, args: HoldArguments) {
     if (!this.editable) {
       return;
     }
@@ -138,11 +138,11 @@ export default class ProcessViewWidget extends WidgetBase {
     this.modalOpen = true;
   }
 
-  removePart(part: Part) {
+  removePart(part: PersistentPart) {
     this.updateParts(this.parts.filter(p => !isSamePart(p, part)));
   }
 
-  movePart(from: Part, to: Part) {
+  movePart(from: PersistentPart, to: PersistentPart) {
     const spotTaken = this.widgetConfig.parts.some(p => p.x === to.x && p.y === to.y);
     if (!spotTaken) {
       this.updateParts([
@@ -150,11 +150,11 @@ export default class ProcessViewWidget extends WidgetBase {
     }
   }
 
-  updatePart(idx: number, part: Part | FlowPart) {
+  updatePart(idx: number, part: PersistentPart | FlowPart) {
     this.updateParts(this.parts.map((p, i) => (idx === i ? part : p)));
   }
 
-  beingDragged(part: Part) {
+  beingDragged(part: PersistentPart) {
     return this.dragAction && isSamePart(part, this.dragAction.part);
   }
 }

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { Transitions, FlowPart, Part } from '../state';
+import { Transitions, FlowPart } from '../state';
 
 @Component({
   props: {
@@ -12,7 +12,7 @@ import { Transitions, FlowPart, Part } from '../state';
   },
 })
 export default class PartComponent extends Vue {
-  static transitions(part: Part): Transitions {
+  static transitions(part: FlowPart): Transitions {
     return {};
   }
 
@@ -50,7 +50,7 @@ export default class PartComponent extends Vue {
   }
 
   get flow() {
-    return this.part.flow || {};
+    return this.part.calculated || {};
   }
 
   get liquid() {
