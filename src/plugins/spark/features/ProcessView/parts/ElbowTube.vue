@@ -1,15 +1,15 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { AngledFlows } from '../state';
+import { Transitions } from '../state';
 import { UP, RIGHT, SQUARE_SIZE, LEFT } from '../getters';
 
 @Component
 export default class ElbowTube extends PartComponent {
-  static flows(): AngledFlows {
+  static transitions(): Transitions {
     return {
-      [UP]: [{ angleOut: RIGHT }],
-      [RIGHT]: [{ angleOut: UP }],
+      [UP]: [{ outCoords: RIGHT }],
+      [RIGHT]: [{ outCoords: UP }],
     };
   }
 

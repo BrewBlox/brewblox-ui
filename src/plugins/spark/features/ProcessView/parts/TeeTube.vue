@@ -1,16 +1,16 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { AngledFlows } from '../state';
+import { Transitions } from '../state';
 import { UP, LEFT, RIGHT, DOWN, SQUARE_SIZE } from '../getters';
 
 @Component
 export default class TeeTube extends PartComponent {
-  static flows(): AngledFlows {
+  static transitions(): Transitions {
     return {
-      [UP]: [{ angleOut: RIGHT }, { angleOut: LEFT }],
-      [RIGHT]: [{ angleOut: UP }, { angleOut: LEFT }],
-      [LEFT]: [{ angleOut: UP }, { angleOut: RIGHT }],
+      [UP]: [{ outCoords: RIGHT }, { outCoords: LEFT }],
+      [RIGHT]: [{ outCoords: UP }, { outCoords: LEFT }],
+      [LEFT]: [{ outCoords: UP }, { outCoords: RIGHT }],
     };
   }
 

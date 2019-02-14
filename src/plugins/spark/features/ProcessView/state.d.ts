@@ -1,21 +1,21 @@
 import { VueConstructor } from 'vue';
 
-export interface Flow {
-  angleOut: number;
+export interface FlowRoute {
+  outCoords: string;
   friction?: number;
   pressure?: number;
   deltaPressure?: number;
 }
 
-export interface AngledFlows {
-  [angleIn: number]: Flow[];
+export interface Transitions {
+  [inCoords: string]: FlowRoute[];
 }
 
-export interface FlowPressure {
-  [angleIn: number]: number;  // pressure
+export interface CalculatedFlows {
+  [inCoords: string]: number;  // pressure
 }
 
-export interface Part {
+export interface PersistentPart {
   type: string;
   x: number;
   y: number;
@@ -30,14 +30,15 @@ export interface ComponentConstructor extends VueConstructor {
   isSource: boolean;
   isBridge: boolean;
   cards: string[];
-  flows: (part: FlowPart) => AngledFlows;
+  transitions: (part: PersistentPart) => Transitions;
 }
 
-export interface FlowPart extends Part {
-  flow?: FlowPressure;
+export interface FlowPart extends PersistentPart {
+  transitions?: Transitions;
+  calculated?: CalculatedFlows;
   liquid?: string;
 }
 
 export interface ProcessViewConfig {
-  parts: Part[];
+  parts: PersistentPart[];
 }

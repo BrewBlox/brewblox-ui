@@ -48,7 +48,8 @@
           {
             "x": 13,
             "y": 3,
-            "type": "ElbowTube"
+            "type": "ElbowTube",
+            "rotate": 0
           },
           {
             "type": "InputTube",

@@ -7,6 +7,7 @@ module.exports = {
     },
   },
   configureWebpack: (config) => {
+    config.devtool = 'source-map';
     if (process.env.NODE_ENV === 'production') {
       // Function names are required to set up functions for VueX functionality
       config

@@ -10,9 +10,13 @@ export default class Link {
   }
 
   get postfix(): string {
+    const typeStr =
+      this.type === null
+        ? ''
+        : this.type;
     return this.driven
-      ? `<${this.type},driven>`
-      : `<${this.type}>`;
+      ? `<${typeStr},driven>`
+      : `<${typeStr}>`;
   }
 
   toString(): string {

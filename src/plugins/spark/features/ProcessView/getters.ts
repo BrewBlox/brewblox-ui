@@ -1,8 +1,9 @@
 export const SQUARE_SIZE = 50;
-export const UP = 0;
-export const RIGHT = 90;
-export const DOWN = 180;
-export const LEFT = 270;
+export const UP = '0.5,0';
+export const RIGHT = '1,0.5';
+export const DOWN = '0.5,1';
+export const LEFT = '0,0.5';
+export const CENTER = '0.5,0.5';
 export const DEFAULT_FRICTION = 1;
 export const DEFAULT_DELTA_PRESSURE = 0;
 export const MIXED_LIQUIDS = '#C678DD';

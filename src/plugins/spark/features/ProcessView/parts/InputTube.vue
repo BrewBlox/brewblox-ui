@@ -1,8 +1,8 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { AngledFlows } from '../state';
-import { LEFT, RIGHT, SQUARE_SIZE } from '../getters';
+import { Transitions } from '../state';
+import { CENTER, RIGHT, SQUARE_SIZE } from '../getters';
 import { clamp } from '@/helpers/functional';
 
 @Component
@@ -15,9 +15,9 @@ export default class InputTube extends PartComponent {
     return ['LiquidSourcePartCard'];
   }
 
-  static flows(): AngledFlows {
+  static transitions(): Transitions {
     return {
-      [LEFT]: [{ angleOut: RIGHT }],
+      [CENTER]: [{ outCoords: RIGHT }],
     };
   }
 

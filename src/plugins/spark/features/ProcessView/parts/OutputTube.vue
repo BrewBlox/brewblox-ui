@@ -2,14 +2,14 @@
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
 import { clamp } from '@/helpers/functional';
-import { AngledFlows } from '../state';
-import { LEFT, RIGHT, SQUARE_SIZE } from '../getters';
+import { Transitions } from '../state';
+import { CENTER, LEFT, SQUARE_SIZE } from '../getters';
 
 @Component
 export default class OutputTube extends PartComponent {
-  static flows(): AngledFlows {
+  static transitions(): Transitions {
     return {
-      [LEFT]: [{ angleOut: RIGHT, pressure: 0 }],
+      [LEFT]: [{ outCoords: CENTER, pressure: 0 }],
     };
   }
 

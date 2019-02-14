@@ -1,86 +1,28 @@
 import Vue from 'vue';
-import { Part, AngledFlows, FlowPart, FlowPressure, Flow, ComponentConstructor } from './state';
-import { UP, RIGHT, DOWN, LEFT, DEFAULT_FRICTION, DEFAULT_DELTA_PRESSURE, COLD_WATER, MIXED_LIQUIDS } from './getters';
-import { clampRotation } from '@/helpers/functional';
+import { PersistentPart, Transitions, FlowPart, CalculatedFlows, FlowRoute, ComponentConstructor } from './state';
+import { CENTER, DEFAULT_FRICTION, DEFAULT_DELTA_PRESSURE, COLD_WATER, MIXED_LIQUIDS } from './getters';
+import { Coordinates } from '@/helpers/coordinates';
+import has from 'lodash/has';
+import get from 'lodash/get';
 
-export const isSamePart = (left: Part, right: Part) =>
+export const isSamePart = (left: PersistentPart, right: PersistentPart) =>
   ['x', 'y', 'type', 'rotate'].every(k => left[k] === right[k]);
 
-export const component = (part: Part) => Vue.component(part.type) as ComponentConstructor;
-
-const rotatedFlows = (flows: AngledFlows, rotation: number = 0): AngledFlows =>
-  Object.keys(flows)
-    .map(Number)
-    .reduce(
-      (acc, angle) => ({
-        ...acc,
-        [clampRotation(angle + rotation)]:
-          flows[angle]
-            .map(flowAngle => ({ ...flowAngle, angleOut: clampRotation(flowAngle.angleOut + rotation) })),
-      }),
-      {},
-    );
-
-const liquidIn = (part: FlowPart, provided: number): number => {
-  if (component(part).isSource) {
-    const [flow] = Object.keys(component(part).flows(part)).map(Number);
-    return clampRotation(flow + provided);
-  }
-  return provided;
-};
-
-const adjacentXY = (origin: FlowPart, angleOut: number): { x: number, y: number } => {
-  if (angleOut === UP) {
-    return {
-      x: origin.x,
-      y: origin.y - 1,
-    };
-  }
-
-  if (angleOut === RIGHT) {
-    return {
-      x: origin.x + 1,
-      y: origin.y,
-    };
-  }
-
-  if (angleOut === DOWN) {
-    return {
-      x: origin.x,
-      y: origin.y + 1,
-    };
-  }
-
-  if (angleOut === LEFT) {
-    return {
-      x: origin.x - 1,
-      y: origin.y,
-    };
-  }
-
-  throw new Error(`Invalid angle: ${angleOut}`);
-};
+export const component = (part: PersistentPart) => Vue.component(part.type) as ComponentConstructor;
 
 const adjacentPart = (
-  origin: FlowPart,
   allParts: FlowPart[],
-  angleOut: number,
-): FlowPart | undefined => {
-  const { x, y } = adjacentXY(origin, angleOut);
-  return allParts
-    .find((part: FlowPart) => {
-      if (part.x !== x || part.y !== y) {
-        return false;
-      }
-      const flows = rotatedFlows(component(part).flows(part), part.rotate);
-      const relevantAngle = clampRotation(angleOut + (component(part).isSource ? 0 : 180));
-      return Boolean(flows[relevantAngle]);
-    });
-};
+  outCoords: string,
+  currentPart: FlowPart | null = null,
+): FlowPart | undefined =>
+  allParts
+    .find((part: FlowPart) =>
+      !(currentPart && isSamePart(part, currentPart))
+      && has(part, ['transitions', outCoords]));
 
-const combineFlows = (left: FlowPressure = {}, right: FlowPressure = {}) =>
+const combineFlows = (left: CalculatedFlows = {}, right: CalculatedFlows = {}) =>
   Object.entries(right)
-    .reduce((into: FlowPressure, [angle, val]) => ({ ...into, [angle]: (into[angle] || 0) + val }), left);
+    .reduce((into: CalculatedFlows, [coord, val]) => ({ ...into, [coord]: (into[coord] || 0) + val }), left);
 
 const combineLiquids = (left: string | undefined, right: string | undefined): string | undefined => {
   if (left && right && left !== right) {
@@ -95,22 +37,16 @@ const combineLiquids = (left: string | undefined, right: string | undefined): st
 const additionalFlow = (
   part: FlowPart,
   allParts: FlowPart[],
-  flowToAdd: FlowPressure,
+  flowToAdd: CalculatedFlows,
   liquid: string,
 ): FlowPart[] =>
   allParts
     .map((item) => {
       if (isSamePart(part, item)) {
-        return { ...item, liquid, flow: combineFlows(item.flow, flowToAdd) };
+        return { ...item, liquid, calculated: combineFlows(item.calculated, flowToAdd) };
       }
       return item;
     });
-
-const partOutFlows = (part: FlowPart, angleIn: number): Flow[] => {
-  const flowFrom = liquidIn(part, angleIn);
-  const flows = rotatedFlows(component(part).flows(part), part.rotate);
-  return flows[flowFrom] || [];
-};
 
 /*
   Starting with a source part, we recursively find all connected parts.
@@ -122,11 +58,11 @@ const partOutFlows = (part: FlowPart, angleIn: number): Flow[] => {
     Only sources and sinks have defined pressure.
     The algorithm considers a route complete when it has found a part with defined pressure.
 
-  - angleIn / angleOut:
+  - inCoords / outCoords:
     The entrypoint / exit point of the flow in the tube.
-    A left-to-right straight tube will have two flows, with swapped angleIn and angleOut.
-    The angleIn where liquid enters the part will have positive pressure.
-    The angleIn where liquid leaves the part will have negative pressure.
+    A left-to-right straight tube will have two flows, with swapped inCoords and outCoords.
+    The inCoords where liquid enters the part will have positive pressure.
+    The inCoords where liquid leaves the part will have negative pressure.
 
   - friction:
     The longer the route between source and sink, the less flow.
@@ -151,7 +87,7 @@ const partOutFlows = (part: FlowPart, angleIn: number): Flow[] => {
 const calculateFromSource = (
   sourcePart: FlowPart,
   allParts: FlowPart[],
-  angleIn: number,
+  inCoords: string,
   liquidSource: string,
   totalFriction: number = 0,
   startPressure: number = 10,
@@ -161,8 +97,8 @@ const calculateFromSource = (
   const candidateParts = candidates
     .filter(candidate => !isSamePart(sourcePart, candidate) || component(candidate).isBridge);
 
-  const outFlowReducer = (parts: FlowPart[], outFlow: Flow): FlowPart[] => {
-    const { angleOut, pressure, friction, deltaPressure } = outFlow;
+  const outFlowReducer = (parts: FlowPart[], outFlow: FlowRoute): FlowPart[] => {
+    const { outCoords, pressure, friction, deltaPressure } = outFlow;
     totalFriction += (friction || DEFAULT_FRICTION);
     totalDeltaPressure += (deltaPressure || DEFAULT_DELTA_PRESSURE);
 
@@ -176,14 +112,14 @@ const calculateFromSource = (
         sourcePart,
         parts,
         {
-          [angleOut]: pathFlow,
-          [angleIn]: -pathFlow,
+          [outCoords]: pathFlow,
+          [inCoords]: -pathFlow,
         },
         liquidSource,
       );
     }
 
-    const nextPart = adjacentPart(sourcePart, candidateParts, angleOut);
+    const nextPart = adjacentPart(candidateParts, outCoords, sourcePart);
 
     if (!nextPart) {
       // no flow possible -> route is done
@@ -191,20 +127,20 @@ const calculateFromSource = (
         sourcePart,
         parts,
         {
-          [angleOut]: 0,
-          [angleIn]: 0,
+          [outCoords]: 0,
+          [inCoords]: 0,
         },
         liquidSource,
       );
     }
 
-    const notUpdatedNextPart = adjacentPart(sourcePart, parts, angleOut);
+    const existingFlow = get(nextPart, ['calculated', outCoords], 0);
 
     // recursively call calculateFromSource(), with the next part being the "source"
     const nextFlows = calculateFromSource(
       nextPart,
       parts,
-      clampRotation(angleOut + 180),
+      outCoords,
       liquidSource,
       totalFriction,
       startPressure,
@@ -212,32 +148,25 @@ const calculateFromSource = (
       candidateParts,
     );
 
-    const updatedNextPart = adjacentPart(sourcePart, nextFlows, angleOut);
-
-    // I have no clue what this does
-    // Something with circular flows
-    let additionalAngleFlow = 0;
-    if (updatedNextPart && updatedNextPart.flow) {
-      additionalAngleFlow += (updatedNextPart.flow[clampRotation(angleOut + 180)] || 0);
-    }
-    if (notUpdatedNextPart && notUpdatedNextPart.flow) {
-      additionalAngleFlow -= (notUpdatedNextPart.flow[clampRotation(angleOut + 180)] || 0);
-    }
+    const updatedNextPart = nextFlows.find((part: FlowPart) => isSamePart(part, nextPart)) || {};
+    const newFlow = get(updatedNextPart, ['calculated', outCoords], 0);
+    const addedFlow = newFlow - existingFlow;
 
     // The recursion tree has returned, merge the flow for this part into the result set
     return additionalFlow(
       sourcePart,
       nextFlows,
       {
-        [angleOut]: -additionalAngleFlow,
-        [angleIn]: additionalAngleFlow,
+        [outCoords]: -addedFlow,
+        [inCoords]: addedFlow,
       },
       liquidSource,
     );
   };
 
   // Calculate the route for each outflow the source part has
-  return partOutFlows(sourcePart, angleIn)
+  // return partOutFlows(sourcePart, inCoords)
+  return (sourcePart.transitions || {})[inCoords]
     .reduce(outFlowReducer, allParts);
 };
 
@@ -252,7 +181,7 @@ const mergeSourceFlows = (allParts: FlowPart[], sourceFlow: FlowPart[]): FlowPar
     (acc, part) => {
       const existing = allParts.find(p => isSamePart(p, part));
       if (existing) {
-        existing.flow = combineFlows(existing.flow, part.flow);
+        existing.calculated = combineFlows(existing.calculated, part.calculated);
         existing.liquid = combineLiquids(existing.liquid, part.liquid);
         return acc;
       }
@@ -268,8 +197,8 @@ const mergeSourceFlows = (allParts: FlowPart[], sourceFlow: FlowPart[]): FlowPar
 
   A straight tube component defines flows as:
   {
-    [LEFT]: [{ angleOut: RIGHT, friction: 1 }],
-    [RIGHT]: [{ angleOut: LEFT, friction: 1 }],
+    [LEFT]: [{ outCoords: RIGHT, friction: 1 }],
+    [RIGHT]: [{ outCoords: LEFT, friction: 1 }],
   }
 
   If we connect it, and rotate it by 90 degrees, calculateFromSource may yield:
@@ -279,7 +208,7 @@ const mergeSourceFlows = (allParts: FlowPart[], sourceFlow: FlowPart[]): FlowPar
   }
 
   The parts will be rendered at rotation=0, and then rotated in their entirety.
-  To enable this, we must match translate angleIn of calculated pressure to what it would be at rotation=0.
+  To enable this, we must match translate inCoords of calculated pressure to what it would be at rotation=0.
 
   Desired output:
   {
@@ -287,23 +216,63 @@ const mergeSourceFlows = (allParts: FlowPart[], sourceFlow: FlowPart[]): FlowPar
     [RIGHT]: -5,
   }
 */
-const unRotateFlows = (part: FlowPart): FlowPart =>
-  ({
-    ...part,
-    flow: Object.entries(part.flow || {})
-      .map(([angle, pressure]) => [clampRotation(Number(angle) - (part.rotate || 0)), pressure])
-      .reduce((acc, [angle, pressure]) => ({ ...acc, [angle]: pressure }), {}),
-  });
+const normalizeFlows = (part: FlowPart): FlowPart => {
+  if (!part.calculated) {
+    return { ...part, calculated: {} };
+  }
+  const newFlows = Object.entries(part.calculated)
+    .reduce((acc, [inCoord, pressure]: [string, number]) => {
+      const nullCoord = new Coordinates(inCoord)
+        .translate([-part.x, -part.y])
+        .rotate(-part.rotate)
+        .toString();
+      return { ...acc, [nullCoord]: pressure };
+    },
+      {},
+    );
+  return { ...part, calculated: newFlows };
+};
 
-export const pathsFromSources = (parts: Part[]): FlowPart[] =>
+
+const translations = (part: PersistentPart): Transitions =>
+  Object.entries(component(part).transitions(part))
+    .reduce((acc, [inCoords, flows]) => {
+      const updatedKey = new Coordinates(inCoords)
+        .rotate(part.rotate)
+        .translate([part.x, part.y])
+        .toString();
+      const updatedFlows = flows
+        .map(flow => ({
+          ...flow,
+          outCoords: new Coordinates(flow.outCoords)
+            .rotate(part.rotate)
+            .translate([part.x, part.y])
+            .toString(),
+        }));
+      return { ...acc, [updatedKey]: updatedFlows };
+    },
+      {},
+    );
+
+
+const asFlowParts = (parts: PersistentPart[]) =>
   parts
-    .filter(part => component(part).isSource) // -> Part[]
-    .map(part => ({ liquidSource: COLD_WATER, ...part })) // -> Part[]
+    .map(part => ({ ...part, transitions: translations(part) }));
+
+export const pathsFromSources = (parts: PersistentPart[]): FlowPart[] => {
+  const flowParts = asFlowParts(parts);
+  return flowParts
+    .filter(part => component(part).isSource) // -> FlowPart[]
+    .map(part => ({ liquidSource: COLD_WATER, ...part })) // -> FlowPart[]
     .map(part => calculateFromSource(
-      part as FlowPart,
-      parts as FlowPart[],
-      part.rotate,
+      part,
+      flowParts,
+      new Coordinates(CENTER) // Source starts from CENTER
+        .rotate(part.rotate)
+        .translate(part)
+        .toString(),
       part.liquidSource,
     )) // -> FlowPart[][]
     .reduce(mergeSourceFlows, []) // -> FlowPart[]
-    .map(unRotateFlows);
+    .map(normalizeFlows);
+};
