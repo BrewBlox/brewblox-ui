@@ -68,10 +68,6 @@ export default class ProcessViewWidget extends WidgetBase {
     return `translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`;
   }
 
-  partRotate(part: PersistentPart) {
-    return `rotate(${part.rotate})`;
-  }
-
   gridContains(x: number, y: number) {
     const { left, right, top, bottom } = this.gridRect;
     return x >= left
@@ -207,12 +203,11 @@ export default class ProcessViewWidget extends WidgetBase {
         <rect fill="none" x="0" y="0" width="50" height="50"/>
         <ProcessViewItem
           :value="flowParts[idx]"
-          :transform="partRotate(part)"
           @input="v => updatePart(idx, v)"
         />
       </g>
       <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
-        <ProcessViewItem :value="dragAction.part" :transform="partRotate(dragAction.part)"/>
+        <ProcessViewItem :value="dragAction.part"/>
       </g>
     </svg>
   </q-card>

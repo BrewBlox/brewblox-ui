@@ -27,11 +27,11 @@ export default class Pump extends PartComponent {
       <circle cx="25" cy="30" r="16"/>
     </g>
     <!-- blades -->
-    <g class="blades-wrapper" transform="translate(0,5)">
-      <g class="outline" transform-origin="25 25">
-        <line x1="25" y1="39" x2="25" y2="11"/>
-        <line x1="37.1" y1="32" x2="12.9" y2="18"/>
-        <line x1="37.1" y1="18" x2="12.9" y2="32"/>
+    <g class="blades-wrapper" transform="translate(25,30)">
+      <g class="outline">
+        <line x1="-14" y1="0" x2="14" y2="0"/>
+        <line x1="7" y1="-12.1" x2="-7" y2="12.1"/>
+        <line x1="7" y1="12.1" x2="-7" y2="-12.1"/>
         <!-- eslint-disable vue/attribute-hyphenation -->
         <animateTransform
           v-if="!part.disabled"

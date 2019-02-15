@@ -34,13 +34,17 @@ export default class Valve extends PartComponent {
       <line v-if="closed" y1="25" x2="19" y2="25"/>
       <line v-if="closed" x1="31" y1="25" x2="50" y2="25"/>
     </g>
-    <g
-      key="valve-inner"
-      :class="['fill', 'outline', 'inner', closed ? 'closed' : '']"
-      transform-origin="25 25"
-    >
-      <path d="M39.4,21C37.2,13,29,8.3,21,10.5c-5.1,1.4-9.1,5.4-10.5,10.5H39.4z"/>
-      <path d="M10.5,29C12.7,37,21,41.6,29,39.4C34,38,38,34,39.4,29H10.5z"/>
+    <g transform="translate(25, 25)">
+      <g
+        key="valve-inner"
+        :transform="`rotate(${closed ? '90' : '0'})`"
+        class="fill outline inner"
+      >
+        <g transform="translate(-25, -25)">
+          <path d="M39.4,21C37.2,13,29,8.3,21,10.5c-5.1,1.4-9.1,5.4-10.5,10.5H39.4z"/>
+          <path d="M10.5,29C12.7,37,21,41.6,29,39.4C34,38,38,34,39.4,29H10.5z"/>
+        </g>
+      </g>
     </g>
     <AnimatedArrows
       v-if="flowing && !closed"
@@ -55,12 +59,5 @@ export default class Valve extends PartComponent {
 <style scoped>
 .ProcessViewPart {
   cursor: pointer;
-}
-
-.inner {
-  transition: all 0.5s ease;
-}
-.closed {
-  transform: rotate(90deg);
 }
 </style>
