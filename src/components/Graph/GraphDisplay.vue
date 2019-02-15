@@ -76,9 +76,9 @@ export default class GraphDisplay extends Vue {
   <PlotlyGraph v-if="ready" :data="plotlyData" :layout="plotlyLayout" :config="plotlyConfig" fit/>
 </template>
 
-<style scoped>
+<style>
 .js-plotly-plot .plotly .modebar {
-  top: 10px;
+  left: 0px;
   background: transparent;
 }
 

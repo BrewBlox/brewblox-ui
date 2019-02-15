@@ -4,6 +4,7 @@ import Quasar, {
   Notify,
   QAlert,
   QBtn,
+  QBtnDropdown,
   QBtnGroup,
   QBtnToggle,
   QCard,
@@ -71,6 +72,7 @@ Vue.use(Quasar, {
   components: {
     QAlert,
     QBtn,
+    QBtnDropdown,
     QBtnGroup,
     QBtnToggle,
     QCard,

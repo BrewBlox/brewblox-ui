@@ -62,7 +62,9 @@ export default class BlockWidget extends WidgetBase {
       // persisted in config
       params: this.queryParams,
       // constants
-      layout: {},
+      layout: {
+        title: this.$props.id,
+      },
       targets: [
         {
           measurement: this.serviceId,

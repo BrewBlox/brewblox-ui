@@ -44,6 +44,7 @@ export default class SessionViewForm extends FormBase {
   }
 
   updateSession(session: Session) {
+    session.graphCfg.layout.title = session.name;
     this.saveConfig({
       ...this.widgetConfig,
       sessions: this.sessions
