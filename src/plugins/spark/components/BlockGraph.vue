@@ -41,6 +41,10 @@ export default class BlockGraph extends Vue {
     return this.$props.config;
   }
 
+  get hasSettings() {
+    return !this.$props.noDuration;
+  }
+
   confirmed(func: Function) {
     return (v: any) => { func(v); this.$props.change({ ...this.graphCfg }); };
   }
@@ -70,25 +74,25 @@ export default class BlockGraph extends Vue {
   <span>
     <q-modal v-model="modalOpen" maximized>
       <GraphCard v-if="modalOpen" ref="graph" :id="$props.id" :config="graphCfg"/>
-      <q-list class="graph-controls" dark>
-        <q-item>
-          <q-item-side right>
-            <q-btn v-close-overlay rounded color="dark-bright" icon="close" label="close"/>
-          </q-item-side>
-        </q-item>
-        <q-item v-if="!$props.noDuration">
-          <q-item-side right>
-            <q-field label="Duration">
-              <InputPopupEdit
-                :field="graphCfg.params.duration"
-                :change="confirmed(v => $set(graphCfg.params, 'duration', parseDuration(v)))"
-                label="Duration"
-                display="span"
-              />
-            </q-field>
-          </q-item-side>
-        </q-item>
-      </q-list>
+      <div class="row graph-controls z-top">
+        <q-btn-dropdown v-if="hasSettings" flat label="settings">
+          <q-list link>
+            <q-item @click.native="() => $refs.duration.$el.click()">
+              <q-item-side>Duration</q-item-side>
+              <q-item-main>
+                <InputPopupEdit
+                  ref="duration"
+                  :field="graphCfg.params.duration"
+                  :change="confirmed(v => $set(graphCfg.params, 'duration', parseDuration(v)))"
+                  label="Duration"
+                  display="span"
+                />
+              </q-item-main>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
+        <q-btn v-close-overlay flat label="close"/>
+      </div>
     </q-modal>
     <q-btn
       :label="$props.label"
@@ -104,11 +108,9 @@ export default class BlockGraph extends Vue {
 
 <style scoped lang="stylus">
 .graph-controls {
-  background-color: black;
-  opacity: 1;
   position: absolute;
-  top: 10%;
-  right: 0px;
+  top: 10px;
+  right: 10px;
 }
 
 .q-list {

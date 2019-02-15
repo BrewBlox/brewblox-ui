@@ -77,7 +77,7 @@ export default class SessionViewWidget extends WidgetBase {
         start: null,
         end: null,
         graphCfg: {
-          layout: {},
+          layout: { title: name },
           params: {},
           targets: [],
           renames: {},
