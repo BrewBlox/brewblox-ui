@@ -49,7 +49,7 @@ export default class TeeTube extends PartComponent {
 </script>
 
 <template>
-  <SVGRoot>
+  <g class="tee-tube">
     <g class="outline">
       <path d="M50,21H30a1,1,0,0,1-1-1V0"/>
       <path d="M21,0V20a1,1,0,0,1-1,1H0"/>
@@ -83,7 +83,7 @@ export default class TeeTube extends PartComponent {
         :duration="1"
       />
     </g>
-  </SVGRoot>
+  </g>
 </template>
 
 

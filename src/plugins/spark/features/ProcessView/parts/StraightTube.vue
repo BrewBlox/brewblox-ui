@@ -30,7 +30,7 @@ export default class StraightTube extends PartComponent {
 </script>
 
 <template>
-  <SVGRoot>
+  <g class="straight-tube">
     <g class="outline">
       <path :d="paths.borders[0]"/>
       <path :d="paths.borders[1]"/>
@@ -39,7 +39,7 @@ export default class StraightTube extends PartComponent {
       <path :d="paths.liquid"/>
     </g>
     <AnimatedArrows v-if="flowing" :reversed="reversed" :path="paths.borders[0]"/>
-  </SVGRoot>
+  </g>
 </template>
 
 

@@ -38,7 +38,7 @@ export default class InputTube extends PartComponent {
 </script>
 
 <template>
-  <SVGRoot>
+  <g class="input-tube">
     <g class="outline">
       <polyline points="1.25 17.5 8.75 25 1.25 32.5"/>
       <polyline points="9.13 19.25 14.88 25 9.13 30.75"/>
@@ -50,7 +50,7 @@ export default class InputTube extends PartComponent {
       <path :d="paths.liquid"/>
     </g>
     <AnimatedArrows v-if="flowing" :path="paths.borders[0]" :num-arrows="1" :duration="1"/>
-  </SVGRoot>
+  </g>
 </template>
 
 

@@ -101,7 +101,7 @@ export default class BridgeTube extends PartComponent {
 </script>
 
 <template>
-  <SVGRoot>
+  <g class="bridge-tube">
     <!-- low -->
     <g class="outline">
       <path :d="lowPaths.borders[0]"/>
@@ -120,7 +120,7 @@ export default class BridgeTube extends PartComponent {
       <path :d="highPaths.liquid"/>
     </g>
     <AnimatedArrows v-if="highFlowing" :reversed="highReversed" :path="highPaths.borders[0]"/>
-  </SVGRoot>
+  </g>
 </template>
 
 

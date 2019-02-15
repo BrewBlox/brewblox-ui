@@ -1,6 +1,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { ComponentConstructor } from '../state';
+import { SQUARE_SIZE } from '../getters';
 
 @Component({
   props: {
@@ -17,8 +19,19 @@ export default class ProcessViewItem extends Vue {
       : {};
   }
 
-  get component() {
-    return Vue.component(this.$props.value.type);
+  get component(): ComponentConstructor {
+    return Vue.component(this.$props.value.type) as ComponentConstructor;
+  }
+
+  get size() {
+    if (this.component.size !== undefined) {
+      return this.component.size(this.$props.value);
+    }
+    return [1, 1];
+  }
+
+  get transformOrigin() {
+    return this.size.map(v => v * SQUARE_SIZE / 2).join(' ');
   }
 }
 </script>
@@ -29,6 +42,7 @@ export default class ProcessViewItem extends Vue {
     :style="style"
     :value="value"
     :is="component"
+    :transform-origin="transformOrigin"
     class="ProcessViewPart"
   />
 </template>

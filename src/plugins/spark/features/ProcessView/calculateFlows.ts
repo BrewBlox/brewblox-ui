@@ -273,6 +273,6 @@ export const pathsFromSources = (parts: PersistentPart[]): FlowPart[] => {
         .toString(),
       part.liquidSource,
     )) // -> FlowPart[][]
-    .reduce(mergeSourceFlows, []) // -> FlowPart[]
+    .reduce(mergeSourceFlows, flowParts) // -> FlowPart[]
     .map(normalizeFlows);
 };

@@ -30,6 +30,7 @@ export interface ComponentConstructor extends VueConstructor {
   isSource: boolean;
   isBridge: boolean;
   cards: string[];
+  size: (part: PersistentPart) => [number, number];
   transitions: (part: PersistentPart) => Transitions;
 }
 
