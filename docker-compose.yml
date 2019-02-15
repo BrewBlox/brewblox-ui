@@ -74,10 +74,16 @@ services:
 
   traefik:
     image: traefik
-    command: -c /config/traefik.toml --docker --docker.domain=brewblox.local
     ports:
       - "9000:9000"
       - "9001:9001"
     volumes:
       - ./dev/traefik:/config
       - /var/run/docker.sock:/var/run/docker.sock
+    command: >
+      -c /dev/null
+      --docker
+      --docker.domain=brewblox.local
+      --entrypoints='name:http Address::9000 Redirect.EntryPoint:https'
+      --entrypoints='name:https Address::9001 TLS:config/brewblox.crt,config/brewblox.key'
+      --defaultentrypoints="http,https"
