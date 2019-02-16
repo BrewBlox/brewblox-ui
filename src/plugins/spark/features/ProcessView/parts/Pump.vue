@@ -59,6 +59,7 @@ export default class Pump extends PartComponent {
       <line class="st0" x1="0" y1="29" x2="9" y2="29"/>
       <path d="M50,29H29v3.5c0,2.2-1.8,4-4,4s-4-1.8-4-4V25c0-2.2,1.8-4,4-4h25"/>
     </g>
+    <rect fill="red" fill-opacity="0" x="0" y="0" width="50" height="50"/>
   </g>
 </template>
 

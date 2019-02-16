@@ -172,8 +172,8 @@ export default class ProcessViewWidget extends WidgetBase {
         <q-popover>
           <q-list link style="padding: 5px">
             <q-item v-for="part in availableParts" :key="part.type">
-              <svg>
-                <ProcessViewItem v-touch-pan="v => panHandler(part, v)" :value="part"/>
+              <svg v-touch-pan="v => panHandler(part, v)">
+                <ProcessViewItem :value="part"/>
               </svg>
             </q-item>
           </q-list>
@@ -191,7 +191,6 @@ export default class ProcessViewWidget extends WidgetBase {
         :transform="partTranslate(part)"
         :key="`${part.x}_${part.y}`"
         class="grid-item"
-        pointer-events="bounding-box"
       >
         <text
           v-if="editable"
@@ -200,11 +199,11 @@ export default class ProcessViewWidget extends WidgetBase {
           y="8"
           class="grid-item-coordinates"
         >{{ part.x }},{{ part.y }}</text>
-        <rect fill="none" x="0" y="0" width="50" height="50"/>
         <ProcessViewItem
           :value="flowParts[idx]"
           @input="v => updatePart(idx, v)"
         />
+        <rect v-if="editable" fill="red" fill-opacity="0" x="0" y="0" width="50" height="50"/>
       </g>
       <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
         <ProcessViewItem :value="dragAction.part"/>

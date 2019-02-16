@@ -52,6 +52,7 @@ export default class Valve extends PartComponent {
       :reversed="reversed"
       path="M50,29H0"
     />
+    <rect fill="red" fill-opacity="0" x="0" y="0" width="50" height="50"/>
   </g>
 </template>
 
