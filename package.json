@@ -43,6 +43,7 @@
     "quasar-framework": "^0.17.18",
     "query-string": "^6.2.0",
     "shortid": "^2.2.14",
+    "svg-path-properties": "^0.4.8",
     "typescript": "^3.2.4",
     "url-safe-string": "^1.1.0",
     "vue": "^2.5.21",

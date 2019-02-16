@@ -37,12 +37,12 @@ export default class BridgeTube extends PartComponent {
     return (this.flow[LEFT] || this.flow[RIGHT]) !== undefined;
   }
 
-  get lowFlowing(): boolean {
-    return (this.flow[UP] || this.flow[DOWN] || 0) !== 0;
+  get lowFlowSpeed() {
+    return this.flow[UP];
   }
 
-  get highFlowing(): boolean {
-    return (this.flow[LEFT] || this.flow[RIGHT] || 0) !== 0;
+  get highFlowSpeed() {
+    return this.flow[LEFT];
   }
 
   get lowPaths() {
@@ -110,7 +110,7 @@ export default class BridgeTube extends PartComponent {
     <g v-if="lowLiquid" :stroke="liquidColor" class="liquid">
       <path :d="lowPaths.liquid"/>
     </g>
-    <AnimatedArrows v-if="lowFlowing" :reversed="lowReversed" :path="lowPaths.borders[0]"/>
+    <AnimatedArrows v-if="lowFlowSpeed" :speed="lowFlowSpeed" :path="lowPaths.liquid"/>
     <!-- high -->
     <g class="outline">
       <path :d="highPaths.borders[0]"/>
@@ -119,7 +119,7 @@ export default class BridgeTube extends PartComponent {
     <g v-show="highLiquid" :stroke="liquidColor" class="liquid">
       <path :d="highPaths.liquid"/>
     </g>
-    <AnimatedArrows v-if="highFlowing" :reversed="highReversed" :path="highPaths.borders[0]"/>
+    <AnimatedArrows v-if="highFlowSpeed" :speed="highFlowSpeed" :path="highPaths.liquid"/>
   </g>
 </template>
 

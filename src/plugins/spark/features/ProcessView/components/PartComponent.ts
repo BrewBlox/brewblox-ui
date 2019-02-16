@@ -44,11 +44,6 @@ export default class PartComponent extends Vue {
     return Boolean(this.part.disabled);
   }
 
-  get flowing(): boolean {
-    return Object.keys(this.flow)
-      .some(angle => this.flowOnAngle(angle) !== 0);
-  }
-
   get flow() {
     return this.part.calculated || {};
   }

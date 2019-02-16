@@ -13,10 +13,6 @@ export default class ElbowTube extends PartComponent {
     };
   }
 
-  get reversed() {
-    return this.flowOnAngle(UP) > 0;
-  }
-
   get paths() {
     return {
       borders: [
@@ -25,6 +21,10 @@ export default class ElbowTube extends PartComponent {
       ],
       liquid: 'M25,0V20a5,5,0,0,0,5,5H50',
     };
+  }
+
+  get flowSpeed(){
+    return this.flow[RIGHT];
   }
 }
 </script>
@@ -38,7 +38,7 @@ export default class ElbowTube extends PartComponent {
     <g v-if="liquid" :stroke="liquidColor" class="liquid">
       <path :d="paths.liquid"/>
     </g>
-    <AnimatedArrows v-if="flowing" :reversed="reversed" :path="paths.borders[1]"/>
+    <AnimatedArrows v-if="flowSpeed" :speed="flowSpeed" :path="'M25,0V16a9,9,0,0,0,9,9H50'"/>
   </g>
 </template>
 

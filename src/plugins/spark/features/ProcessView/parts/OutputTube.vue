@@ -22,6 +22,10 @@ export default class OutputTube extends PartComponent {
       liquid: 'M0,25 H20',
     };
   }
+
+  get flowSpeed(){
+    return -this.flow[LEFT];
+  }
 }
 </script>
 
@@ -37,7 +41,7 @@ export default class OutputTube extends PartComponent {
     <g v-if="liquid" :stroke="liquidColor" class="liquid">
       <path :d="paths.liquid"/>
     </g>
-    <AnimatedArrows v-if="flowing" :path="paths.borders[0]" :num-arrows="1" :duration="1"/>
+    <AnimatedArrows v-if="flowSpeed" :num-arrows="1" :speed="flowSpeed" path="M0,25H25"/>
   </g>
 </template>
 

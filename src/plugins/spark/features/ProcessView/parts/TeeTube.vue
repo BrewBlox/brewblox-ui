@@ -16,34 +16,21 @@ export default class TeeTube extends PartComponent {
 
   get paths() {
     return {
-      top: 'M29,0 V24',
-      left: 'M50,29 H28',
-      right: 'M0,21 H21',
+      top: 'M25,25 V0',
+      left: 'M25,25 H0',
+      right: 'M25,25 H50',
     };
   }
 
-  get topFlowing() {
-    return Boolean(this.flowOnAngle(UP));
+  get topSpeed() {
+    return this.flowOnAngle(UP);
   }
 
-  get topReversed() {
-    return this.flowOnAngle(UP) > 0;
+  get leftSpeed() {
+    return this.flowOnAngle(LEFT);
   }
-
-  get leftFlowing() {
-    return Boolean(this.flowOnAngle(RIGHT));
-  }
-
-  get leftReversed() {
-    return this.flowOnAngle(RIGHT) > 0;
-  }
-
-  get rightFlowing() {
-    return Boolean(this.flowOnAngle(LEFT));
-  }
-
-  get rightReversed() {
-    return this.flowOnAngle(LEFT) > 0;
+  get rightSpeed() {
+    return this.flowOnAngle(RIGHT);
   }
 }
 </script>
@@ -62,25 +49,22 @@ export default class TeeTube extends PartComponent {
     </g>
     <g class="outline">
       <AnimatedArrows
-        v-if="topFlowing"
+        v-if="topSpeed"
         :path="paths.top"
-        :reversed="topReversed"
         :num-arrows="1"
-        :duration="1"
+        :speed="topSpeed"
       />
       <AnimatedArrows
-        v-if="leftFlowing"
+        v-if="leftSpeed"
         :path="paths.left"
-        :reversed="leftReversed"
         :num-arrows="1"
-        :duration="1"
+        :speed="leftSpeed"
       />
       <AnimatedArrows
-        v-if="rightFlowing"
+        v-if="rightSpeed"
         :path="paths.right"
-        :reversed="rightReversed"
         :num-arrows="1"
-        :duration="1"
+        :speed="rightSpeed"
       />
     </g>
   </g>

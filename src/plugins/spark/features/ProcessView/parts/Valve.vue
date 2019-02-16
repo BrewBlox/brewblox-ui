@@ -16,8 +16,8 @@ export default class Valve extends PartComponent {
     };
   }
 
-  get reversed() {
-    return this.flowOnAngle(RIGHT) > 0;
+  get flowSpeed(){
+    return this.flow[RIGHT];
   }
 
 }
@@ -47,10 +47,10 @@ export default class Valve extends PartComponent {
       </g>
     </g>
     <AnimatedArrows
-      v-if="flowing && !closed"
+      v-if="flowSpeed"
       key="valve-arrows"
-      :reversed="reversed"
-      path="M50,29H0"
+      :speed="flowSpeed"
+      path="M0,25H50"
     />
     <rect fill="red" fill-opacity="0" x="0" y="0" width="50" height="50"/>
   </g>
