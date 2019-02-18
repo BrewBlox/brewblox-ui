@@ -53,14 +53,15 @@ export default class SparkPage extends Vue {
   }
 
   defaultItem(block: Block): DashboardItem {
-    const widgetId = `${this.$props.serviceId}/${block.id}`;
-    const existing = this.volatileItems[widgetId];
+    const key = `${this.$props.serviceId}/${block.id}`;
+    const existing = this.volatileItems[key];
     if (!existing || existing.feature !== block.type) {
       this.$set(
         this.volatileItems,
-        widgetId,
+        key,
         {
-          id: widgetId,
+          key,
+          id: block.id,
           feature: block.type,
           order: 0,
           dashboard: '',
@@ -71,7 +72,7 @@ export default class SparkPage extends Vue {
           ...widgetSizeById(this.$store, block.type),
         });
     }
-    return this.volatileItems[widgetId];
+    return this.volatileItems[key];
   }
 
   get isAvailable() {
@@ -280,7 +281,7 @@ export default class SparkPage extends Vue {
           v-for="item in items"
           :disabled="widgetEditable"
           :is="widgetComponent(item)"
-          :key="item.id"
+          :key="item.key"
           :id="item.id"
           :type="item.feature"
           :cols="item.cols"
