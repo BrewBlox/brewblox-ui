@@ -34,6 +34,7 @@ export default class DefaultLayout extends Vue {
   leftDrawerOpen: boolean = false;
   dashboardEditing: boolean = false;
   serviceEditing: boolean = false;
+  serviceWizardActive: boolean = false;
   wizardModalOpen: boolean = false;
   $q: any;
 
@@ -97,10 +98,6 @@ export default class DefaultLayout extends Vue {
     saveDashboard(this.$store, { ...dashboard, title });
   }
 
-  createService() {
-    this.wizardModalOpen = true;
-  }
-
   removeService(service: Service) {
     this.$q.dialog({
       title: 'Remove service',
@@ -135,22 +132,30 @@ export default class DefaultLayout extends Vue {
     </q-layout-header>
     <q-layout-drawer v-model="leftDrawerOpen">
       <q-list no-border link inset-delimiter>
-        <q-item link to="/" active-class="q-item-no-link-highlighting">
+        <q-item link exact to="/">
           <q-item-side icon="home"/>Main menu
+        </q-item>
+        <q-item-separator/>
+        <q-item @click="wizardModalOpen = true">
+          <q-modal v-model="wizardModalOpen">test</q-modal>
+          <q-item-side icon="add"/>Wizardry
         </q-item>
         <q-item-separator/>
         <!-- dashboards -->
         <q-list-header>
           <q-item-side icon="dashboard"/>Dashboards
-          <q-btn
-            v-if="dashboards.length > 0"
-            :flat="!dashboardEditing"
-            :icon="dashboardEditing ? 'check' : 'mode edit'"
-            :color="dashboardEditing ? 'primary': ''"
-            round
-            size="sm"
-            @click="toggleDashboardEditing"
-          />
+          <q-btn flat round icon="add" label="Add dashboard" @click="createDashboard"/>
+          <q-item-side right>
+            <q-btn
+              :disable="dashboards.length === 0"
+              :flat="!dashboardEditing"
+              :icon="dashboardEditing ? 'check' : 'mode edit'"
+              :color="dashboardEditing ? 'primary': ''"
+              round
+              size="sm"
+              @click="toggleDashboardEditing"
+            />
+          </q-item-side>
         </q-list-header>
         <draggable
           :class="{ editing: dashboardEditing }"
@@ -189,28 +194,23 @@ export default class DefaultLayout extends Vue {
             </q-item-side>
           </q-item>
         </draggable>
-        <div class="q-list-container">
-          <q-btn
-            v-if="dashboardEditing || dashboards.length === 0"
-            icon="add"
-            label="Add dashboard"
-            color="dark-bright"
-            @click="createDashboard"
-          />
-        </div>
         <q-item-separator/>
         <!-- services -->
         <q-list-header>
-          <q-item-side icon="cloud"/>Services
-          <q-btn
-            v-if="services.length > 0"
-            :flat="!serviceEditing"
-            :icon="serviceEditing ? 'check' : 'mode edit'"
-            :color="serviceEditing ? 'primary': ''"
-            round
-            size="sm"
-            @click="toggleServiceEditing"
-          />
+          <q-item-side icon="cloud"/>
+          <label>Services</label>
+          <q-btn flat round icon="add" @click="serviceWizardActive = true"/>
+          <q-item-side right>
+            <q-btn
+              :disable="services.length === 0"
+              :flat="!serviceEditing"
+              :icon="serviceEditing ? 'check' : 'mode edit'"
+              :color="serviceEditing ? 'primary': ''"
+              round
+              size="sm"
+              @click="toggleServiceEditing"
+            />
+          </q-item-side>
         </q-list-header>
         <draggable
           :class="{ editing: serviceEditing }"
@@ -241,15 +241,6 @@ export default class DefaultLayout extends Vue {
             </q-item-side>
           </q-item>
         </draggable>
-        <div class="q-list-container">
-          <q-btn
-            v-if="serviceEditing || services.length === 0"
-            icon="add"
-            label="Add service"
-            color="dark-bright"
-            @click="createService"
-          />
-        </div>
       </q-list>
       <q-list no-border class="build-info">
         <q-item>
@@ -257,8 +248,8 @@ export default class DefaultLayout extends Vue {
         </q-item>
       </q-list>
     </q-layout-drawer>
-    <q-modal v-model="wizardModalOpen">
-      <new-service-wizard v-if="wizardModalOpen"/>
+    <q-modal v-model="serviceWizardActive">
+      <NewServiceWizard v-if="serviceWizardActive"/>
     </q-modal>
     <q-page-container>
       <router-view/>

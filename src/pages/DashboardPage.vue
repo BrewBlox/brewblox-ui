@@ -244,7 +244,7 @@ export default class DashboardPage extends Vue {
         />
         <q-btn color="primary" icon="add" label="New Widget" @click="() => wizardModalOpen = true"/>
       </portal>
-      <q-modal v-model="wizardModalOpen">
+      <q-modal v-model="wizardModalOpen" no-backdrop-dismiss>
         <NewWidgetWizard v-if="wizardModalOpen" :on-create="onCreateItem"/>
       </q-modal>
       <GridContainer

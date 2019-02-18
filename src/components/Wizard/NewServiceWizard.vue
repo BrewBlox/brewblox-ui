@@ -83,7 +83,6 @@ export default class NewServiceWizard extends Vue {
     this.reset();
     Notify.create({
       type: 'positive',
-      position: 'center',
       message: `Added ${displayNameById(this.$store, service.type)} "${service.title}"`,
     });
   }

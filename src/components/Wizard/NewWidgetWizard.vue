@@ -58,9 +58,9 @@ export default class NewWidgetWizard extends Vue {
 </script>
 
 <template>
-  <div class="layout-padding">
+  <div class="widget-modal column">
     <!-- display wizard -->
-    <q-item v-if="wizardComponent">
+    <q-card v-if="wizardComponent">
       <component
         v-if="wizardComponent"
         :is="wizardComponent"
@@ -68,48 +68,32 @@ export default class NewWidgetWizard extends Vue {
         :on-create="create"
         :on-cancel="reset"
       />
-    </q-item>
+    </q-card>
     <!-- Select a wizard -->
-    <q-item v-else>
-      <q-field label="Select a widget type" icon="widgets" orientation="vertical">
-        <q-item>
-          <q-search v-model="searchModel" placeholder="Search"/>
-        </q-item>
-        <q-list link inset-separator>
+    <q-card v-else dark>
+      <q-card-title>Create new widget
+        <q-btn v-close-overlay slot="right" flat dense icon="clear" label="Cancel"/>
+      </q-card-title>
+      <q-card-main>
+        <q-list no-border>
+          <q-item>
+            <q-search v-model="searchModel" placeholder="Search"/>
+          </q-item>
+        </q-list>
+        <q-list link inset-separator no-border>
           <q-item
             v-for="opt in wizardOptions"
             :key="opt.label"
             icon="widgets"
             @click.native="() => { featureId = opt.value; }"
           >
-            <div class="row">
-              <q-item-main>
-                <q-item-tile label>{{ opt.label }}</q-item-tile>
-              </q-item-main>
-              <q-item-side right icon="chevron_right"/>
-            </div>
+            <q-item-main>
+              <q-item-tile label>{{ opt.label }}</q-item-tile>
+            </q-item-main>
+            <q-item-side right icon="chevron_right"/>
           </q-item>
         </q-list>
-      </q-field>
-    </q-item>
+      </q-card-main>
+    </q-card>
   </div>
 </template>
-
-<style scoped>
-.q-item {
-  display: grid;
-  grid-gap: 10px;
-}
-
-.q-list {
-  border: 0;
-}
-
-.q-option-group {
-  border: 0;
-}
-
-.layout-padding {
-  position: relative;
-}
-</style>
