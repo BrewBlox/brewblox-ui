@@ -2,6 +2,7 @@
 /* eslint-disable vue/attribute-hyphenation */
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { svgPathProperties } from 'svg-path-properties';
 
 @Component({
   props: {
@@ -9,51 +10,50 @@ import Component from 'vue-class-component';
       type: String,
       required: true,
     },
-    duration: {
+    speed: {
       type: Number,
-      default: 2,
+      default: 0,
     },
     numArrows: {
       type: Number,
       default: 2,
     },
-    reversed: {
-      type: Boolean,
-      default: false,
-    },
   },
 })
 export default class AnimatedArrows extends Vue {
+  get pathLength (){
+    return svgPathProperties(this.$props.path).getTotalLength();
+  }
+
+  get duration(){
+    if(this.$props.speed && this.pathLength){
+      return this.pathLength / (10 * Math.abs(this.$props.speed));
+    }
+    return 0;
+  }
+
+  get reversed(){
+    return this.$props.speed < 0;
+  }
+
   get starts(): string[] {
-    const interval = this.$props.duration / this.$props.numArrows;
+    const interval = this.duration / this.$props.numArrows;
     return [...Array(this.$props.numArrows).keys()]
       .map(idx => `${idx * interval}s`);
   }
 
   get transform() {
     // Flips the arrow
-    return this.$props.reversed
+    return this.reversed
       ? 'scale (-1, 1)'
       : '';
   }
 
   get keyPoints() {
     // Makes the arrow travel end-to-start
-    return this.$props.reversed
+    return this.reversed
       ? '1;0'
       : '0;1';
-  }
-
-  mounted() {
-    interface AnimateMotion extends Element {
-      beginElementAt(v: number);
-      getStartTime(): number;
-    }
-    const allAnimations = document.getElementsByTagName('animateMotion');
-    [...allAnimations].forEach(element => {
-      const motion = (element as AnimateMotion);
-      motion.beginElementAt(motion.getStartTime());
-    });
   }
 }
 </script>
@@ -61,13 +61,13 @@ export default class AnimatedArrows extends Vue {
 <template>
   <g>
     <g v-for="start in starts" :key="start" visibility="hidden">
-      <path :transform="transform" d="M0,0 l4,4 l-4,4" class="outline"/>
+      <path :transform="transform" d="M-4,-4 L0,0 M-4,4 L0,0" class="outline"/>
       <!-- Note: SVG attributes are case-sensitive -->
       <animateMotion
         :path="$props.path"
         :begin="start"
         :keyPoints="keyPoints"
-        :dur="`${$props.duration}s`"
+        :dur="`${duration}s`"
         fill="freeze"
         repeatCount="indefinite"
         rotate="auto"

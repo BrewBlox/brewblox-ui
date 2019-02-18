@@ -10,7 +10,8 @@ import { PersistentPart, ProcessViewConfig, FlowPart } from './state';
 
 interface DragAction {
   part: PersistentPart;
-  style: any;
+  x: number;
+  y: number;
 }
 
 interface ContextAction {
@@ -63,11 +64,8 @@ export default class ProcessViewWidget extends WidgetBase {
       : ['grid-base'];
   }
 
-  get partSizeStyle() {
-    return {
-      width: `${SQUARE_SIZE}px`,
-      height: `${SQUARE_SIZE}px`,
-    };
+  partTranslate(part: PersistentPart) {
+    return `translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`;
   }
 
   gridContains(x: number, y: number) {
@@ -88,13 +86,6 @@ export default class ProcessViewWidget extends WidgetBase {
     };
   }
 
-  partStyle(part: PersistentPart): any {
-    return {
-      gridColumnStart: part.x + 1,
-      gridRowStart: part.y + 1,
-    };
-  }
-
   updateParts(parts: PersistentPart[]) {
     this.saveConfig({ ...this.widgetConfig, parts });
   }
@@ -107,16 +98,15 @@ export default class ProcessViewWidget extends WidgetBase {
     if (args.isFirst) {
       this.dragAction = {
         part,
-        style: {},
+        x: 0,
+        y: 0,
       };
     }
 
-    (this.dragAction as DragAction).style = {
-      ...this.partSizeStyle,
-      position: 'fixed',
-      top: `${args.position.top - (0.5 * SQUARE_SIZE)}px`,
-      left: `${args.position.left - (0.5 * SQUARE_SIZE)}px`,
-    };
+    if (this.dragAction !== null) {
+      this.dragAction.x = args.position.left - (0.5 * SQUARE_SIZE) - this.gridRect.x;
+      this.dragAction.y = args.position.top - (0.5 * SQUARE_SIZE) - this.gridRect.y;
+    }
 
     if (args.isFinal) {
       const gridPos = this.findGridSquare(args.position.left, args.position.top);
@@ -181,8 +171,10 @@ export default class ProcessViewWidget extends WidgetBase {
       <q-btn v-if="editable" slot="right" flat round dense icon="extension">
         <q-popover>
           <q-list link style="padding: 5px">
-            <q-item v-for="part in availableParts" :key="part.type" :style="partSizeStyle">
-              <ProcessViewItem v-touch-pan="v => panHandler(part, v)" :value="part"/>
+            <q-item v-for="part in availableParts" :key="part.type">
+              <svg v-touch-pan="v => panHandler(part, v)">
+                <ProcessViewItem :value="part"/>
+              </svg>
             </q-item>
           </q-list>
         </q-popover>
@@ -190,21 +182,33 @@ export default class ProcessViewWidget extends WidgetBase {
       <q-toggle slot="right" v-model="editable"/>
     </q-card-title>
     <q-card-separator/>
-    <ProcessViewItem v-if="dragAction" :value="dragAction.part" :style="dragAction.style"/>
-    <div ref="grid" :class="gridClasses">
-      <div
+    <svg ref="grid" :class="gridClasses">
+      <g
         v-touch-pan="v => panHandler(part, v)"
         v-touch-hold="v => holdHandler(part, v)"
         v-for="(part, idx) in parts"
         v-show="!beingDragged(part)"
+        :transform="partTranslate(part)"
         :key="`${part.x}_${part.y}`"
-        :style="partStyle(part)"
         class="grid-item"
       >
-        <div v-if="editable" class="grid-item-coordinates">{{ part.x }},{{ part.y }}</div>
-        <ProcessViewItem :value="flowParts[idx]" @input="v => updatePart(idx, v)"/>
-      </div>
-    </div>
+        <text
+          v-if="editable"
+          fill="white"
+          x="0"
+          y="8"
+          class="grid-item-coordinates"
+        >{{ part.x }},{{ part.y }}</text>
+        <ProcessViewItem
+          :value="flowParts[idx]"
+          @input="v => updatePart(idx, v)"
+        />
+        <rect v-if="editable" fill="red" fill-opacity="0" x="0" y="0" width="50" height="50"/>
+      </g>
+      <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
+        <ProcessViewItem :value="dragAction.part"/>
+      </g>
+    </svg>
   </q-card>
 </template>
 
@@ -214,14 +218,9 @@ export default class ProcessViewWidget extends WidgetBase {
 .grid-base {
   width: 100%;
   height: 100%;
-  display: grid;
   background-size: 50px 50px, 50px 50px;
   background-position: 0 -1px, -1px 0;
   border-top: 1px solid $dark_bright;
-  grid-auto-columns: 50px;
-  grid-auto-rows: 50px;
-  grid-template-columns: repeat(autofill, 50px);
-  grid-template-rows: repeat(autofill, 50px);
 }
 
 .grid-editable {
@@ -240,11 +239,7 @@ export default class ProcessViewWidget extends WidgetBase {
 }
 
 .grid-item-coordinates {
-  color: $white;
   font-size: x-small;
-  position: absolute;
-  top: 2px;
-  left: 2px;
   z-index: 2;
   -webkit-user-select: none;
   -moz-user-select: none;

@@ -22,11 +22,15 @@ export default class OutputTube extends PartComponent {
       liquid: 'M0,25 H20',
     };
   }
+
+  get flowSpeed(){
+    return -this.flow[LEFT];
+  }
 }
 </script>
 
 <template>
-  <SVGRoot>
+  <g class="ouput-tube">
     <g class="outline">
       <polyline points="40.5,17.5 48,25 40.5,32.5"/>
       <polyline points="36.4,19.3 42.1,25 36.4,30.8"/>
@@ -37,8 +41,8 @@ export default class OutputTube extends PartComponent {
     <g v-if="liquid" :stroke="liquidColor" class="liquid">
       <path :d="paths.liquid"/>
     </g>
-    <AnimatedArrows v-if="flowing" :path="paths.borders[0]" :num-arrows="1" :duration="1"/>
-  </SVGRoot>
+    <AnimatedArrows v-if="flowSpeed" :num-arrows="1" :speed="flowSpeed" path="M0,25H25"/>
+  </g>
 </template>
 
 

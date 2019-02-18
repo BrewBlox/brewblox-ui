@@ -1,6 +1,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { ComponentConstructor } from '../state';
+import { SQUARE_SIZE } from '../getters';
 
 @Component({
   props: {
@@ -11,26 +13,37 @@ import Component from 'vue-class-component';
   },
 })
 export default class ProcessViewItem extends Vue {
-  get style() {
-    return this.$props.value.rotate
-      ? { transform: `rotate(${this.$props.value.rotate}deg)` }
-      : {};
+  get component(): ComponentConstructor {
+    return Vue.component(this.$props.value.type) as ComponentConstructor;
   }
 
-  get component() {
-    return Vue.component(this.$props.value.type);
+  get size() {
+    if (this.component.size !== undefined) {
+      return this.component.size(this.$props.value);
+    }
+    return [1, 1];
+  }
+
+  // to rotate correctly in all browsers, center part around 0,0 before rotation
+  // Firefox does not support transform-origin in SVG.
+  get center() {
+    return this.size.map(v => v * SQUARE_SIZE / 2);
   }
 }
 </script>
 
 <template>
-  <component
-    v-if="component"
-    :style="style"
-    :value="value"
-    :is="component"
-    class="ProcessViewPart"
-  />
+  <g :transform="`translate(${center.join(',')})`">
+    <g :transform="`rotate(${value.rotate})`">
+      <component
+        v-if="component"
+        :value="value"
+        :is="component"
+        :transform="`translate(${center.map(v => -v).join(',')})`"
+        class="ProcessViewPart"
+      />
+    </g>
+  </g>
 </template>
 
 <style>

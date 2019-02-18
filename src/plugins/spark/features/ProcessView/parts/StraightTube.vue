@@ -13,24 +13,24 @@ export default class StraightTube extends PartComponent {
     };
   }
 
-  get reversed() {
-    return this.flowOnAngle(RIGHT) > 0;
-  }
-
   get paths() {
     return {
       borders: [
-        'M 50,29 H 0',
-        'M 50,21 H 0',
+        'M 0,21 H 50',
+        'M 0,29 H 50',
       ],
-      liquid: 'M 50,25 H 0',
+      liquid: 'M 0,25 H 50',
     };
+  }
+
+  get flowSpeed(){
+    return this.flow[RIGHT];
   }
 }
 </script>
 
 <template>
-  <SVGRoot>
+  <g class="straight-tube">
     <g class="outline">
       <path :d="paths.borders[0]"/>
       <path :d="paths.borders[1]"/>
@@ -38,8 +38,8 @@ export default class StraightTube extends PartComponent {
     <g v-if="liquid" :stroke="liquidColor" class="liquid">
       <path :d="paths.liquid"/>
     </g>
-    <AnimatedArrows v-if="flowing" :reversed="reversed" :path="paths.borders[0]"/>
-  </SVGRoot>
+    <AnimatedArrows v-if="flowSpeed" :speed="flowSpeed" path="M0,25H50"/>
+  </g>
 </template>
 
 
