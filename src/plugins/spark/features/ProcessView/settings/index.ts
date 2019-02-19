@@ -9,7 +9,7 @@ import Valve from './Valve';
 
 import { ComponentSettings } from '../state';
 
-export const settings: { [key: string]: ComponentSettings } = {
+const settings: { [key: string]: ComponentSettings } = {
   BridgeTube,
   ElbowTube,
   InputTube,
@@ -19,3 +19,5 @@ export const settings: { [key: string]: ComponentSettings } = {
   TeeTube,
   Valve,
 };
+
+export default settings;

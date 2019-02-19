@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { component } from '@/plugins/spark/features/ProcessView/calculateFlows';
+import { partSettings } from '@/plugins/spark/features/ProcessView/calculateFlows';
 import { FlowPart } from '@/plugins/spark/features/ProcessView/state';
 
 @Component({
@@ -17,14 +17,10 @@ export default class ProcessViewForm extends Vue {
     return this.$props.value;
   }
 
-  get partComponent() {
-    return component(this.part);
-  }
-
   get cards() {
     return [
       'PlacementPartCard',
-      ...(this.partComponent.cards || []),
+      ...partSettings(this.part).cards,
     ];
   }
 }

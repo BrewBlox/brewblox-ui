@@ -1,7 +1,7 @@
 import { PersistentPart, Transitions, FlowPart, CalculatedFlows, FlowRoute, ComponentSettings } from './state';
 import { CENTER, DEFAULT_FRICTION, DEFAULT_DELTA_PRESSURE, COLD_WATER, MIXED_LIQUIDS } from './getters';
 import { Coordinates } from '@/helpers/coordinates';
-import { settings } from './parts/getters';
+import settings from './settings';
 import has from 'lodash/has';
 import get from 'lodash/get';
 
