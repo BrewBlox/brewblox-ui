@@ -14,5 +14,6 @@ export const filters = [
   '45m',
 ];
 
-export const getById = (store: RootStore, serviceId: string, id: string) =>
-  blockById<PidBlock>(store, serviceId, id, typeName);
+export const getById =
+  (store: RootStore, serviceId: string, id: string): PidBlock =>
+    blockById<PidBlock>(store, serviceId, id, typeName);

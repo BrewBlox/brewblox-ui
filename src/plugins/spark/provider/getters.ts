@@ -14,23 +14,25 @@ export const ticksType = 'Ticks';
 export const wifiType = 'WiFiSettings';
 export const touchType = 'TouchSettings';
 
-export const isSystemBlock = (block: Block) => [
-  sysInfoType,
-  groupsType,
-  oneWireBusType,
-  ticksType,
-  wifiType,
-  touchType,
-]
-  .includes(block.type);
+export const isSystemBlock =
+  (block: Block): boolean => [
+    sysInfoType,
+    groupsType,
+    oneWireBusType,
+    ticksType,
+    wifiType,
+    touchType,
+  ]
+    .includes(block.type);
 
-export const isReady = (store: RootStore, serviceId: string) => [
-  sysInfoType,
-  groupsType,
-  oneWireBusType,
-  ticksType,
-]
-  .every(t => blockValues(store, serviceId).some((b: Block) => b.type === t));
+export const isReady =
+  (store: RootStore, serviceId: string): boolean => [
+    sysInfoType,
+    groupsType,
+    oneWireBusType,
+    ticksType,
+  ]
+    .every(t => blockValues(store, serviceId).some((b: Block) => b.type === t));
 
 export const WlanSecurityEnum = [
   [0, 'Unsecured'],
@@ -50,12 +52,13 @@ export const WlanCipherEnum = [
 ];
 
 // source: https://www.adriangranados.com/blog/dbm-to-percent-conversion
-export const calcWiFiPct = (dbm: number) => {
-  if (dbm < -92) {
-    return 1;
-  }
-  if (dbm > -21) {
-    return 100;
-  }
-  return Math.round(((-0.0154 * dbm * dbm) - (0.3794 * dbm)) + 98.182);
-};
+export const calcWiFiPct =
+  (dbm: number): number => {
+    if (dbm < -92) {
+      return 1;
+    }
+    if (dbm > -21) {
+      return 100;
+    }
+    return Math.round(((-0.0154 * dbm * dbm) - (0.3794 * dbm)) + 98.182);
+  };

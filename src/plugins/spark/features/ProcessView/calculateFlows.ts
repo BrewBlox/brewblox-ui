@@ -5,10 +5,12 @@ import { Coordinates } from '@/helpers/coordinates';
 import has from 'lodash/has';
 import get from 'lodash/get';
 
-export const isSamePart = (left: PersistentPart, right: PersistentPart) =>
-  ['x', 'y', 'type', 'rotate'].every(k => left[k] === right[k]);
+export const isSamePart =
+  (left: PersistentPart, right: PersistentPart): boolean =>
+    ['x', 'y', 'type', 'rotate'].every(k => left[k] === right[k]);
 
-export const component = (part: PersistentPart) => Vue.component(part.type) as ComponentConstructor;
+export const component =
+  (part: PersistentPart): ComponentConstructor => Vue.component(part.type) as ComponentConstructor;
 
 const adjacentPart = (
   allParts: FlowPart[],
@@ -20,16 +22,18 @@ const adjacentPart = (
       !(currentPart && isSamePart(part, currentPart))
       && has(part, ['transitions', outCoords]));
 
-const combineFlows = (left: CalculatedFlows = {}, right: CalculatedFlows = {}) =>
-  Object.entries(right)
-    .reduce((into: CalculatedFlows, [coord, val]) => ({ ...into, [coord]: (into[coord] || 0) + val }), left);
+const combineFlows =
+  (left: CalculatedFlows = {}, right: CalculatedFlows = {}): CalculatedFlows =>
+    Object.entries(right)
+      .reduce((into: CalculatedFlows, [coord, val]) => ({ ...into, [coord]: (into[coord] || 0) + val }), left);
 
-const combineLiquids = (left: string | undefined, right: string | undefined): string | undefined => {
-  if (left && right && left !== right) {
-    return MIXED_LIQUIDS;
-  }
-  return left || right || undefined;
-};
+const combineLiquids =
+  (left: string | undefined, right: string | undefined): string | undefined => {
+    if (left && right && left !== right) {
+      return MIXED_LIQUIDS;
+    }
+    return left || right || undefined;
+  };
 
 /*
   Find the part in allParts, and then merge the new flow into allParts.
@@ -255,9 +259,10 @@ const translations = (part: PersistentPart): Transitions =>
     );
 
 
-const asFlowParts = (parts: PersistentPart[]) =>
-  parts
-    .map(part => ({ ...part, transitions: translations(part) }));
+const asFlowParts =
+  (parts: PersistentPart[]): PersistentPart[] =>
+    parts
+      .map(part => ({ ...part, transitions: translations(part) }));
 
 export const pathsFromSources = (parts: PersistentPart[]): FlowPart[] => {
   const flowParts = asFlowParts(parts);

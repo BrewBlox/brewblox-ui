@@ -19,6 +19,7 @@ Vue.component('PlotlyGraph', () => import('./PlotlyGraph'));
   },
 })
 export default class GraphDisplay extends Vue {
+  /* eslint-disable @typescript-eslint/camelcase */
   layoutDefaults: Partial<Layout> = {
     title: '',
     font: {
@@ -45,6 +46,7 @@ export default class GraphDisplay extends Vue {
     paper_bgcolor: '#1b1d21',
     plot_bgcolor: '#1b1d21',
   };
+  /* eslint-enable */
 
   get plotlyData(): PlotData[] {
     return this.$props.data;

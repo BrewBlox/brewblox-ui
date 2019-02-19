@@ -38,13 +38,13 @@ export interface Metric {
   values?: any;
 }
 
-export type HistoryState = {
+export interface HistoryState {
   availableFields: {
     [measurement: string]: string[];
   };
   metrics: {
     [id: string]: Metric;
   };
-};
+}
 
 export type HistoryContext = ActionContext<HistoryState, RootState>;

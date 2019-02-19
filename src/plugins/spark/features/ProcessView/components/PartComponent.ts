@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { Transitions, FlowPart } from '../state';
+import { Transitions, FlowPart, CalculatedFlows } from '../state';
 
 @Component({
   props: {
@@ -12,63 +12,64 @@ import { Transitions, FlowPart } from '../state';
   },
 })
 export default class PartComponent extends Vue {
-  static transitions(part: FlowPart): Transitions {
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+  public static transitions(part: FlowPart): Transitions {
     return {};
   }
 
-  static get isSource() {
+  public static get isSource(): boolean {
     return false;
   }
 
-  static get isBridge() {
+  public static get isBridge(): boolean {
     return false;
   }
 
-  static get cards(): string[] {
+  public static get cards(): string[] {
     return [];
   }
 
-  get part(): FlowPart {
+  public get part(): FlowPart {
     return this.$props.value;
   }
 
-  get closed(): boolean {
+  public get closed(): boolean {
     return Boolean(this.part.closed);
   }
 
-  get flipped(): boolean {
+  public get flipped(): boolean {
     return Boolean(this.part.flipped);
   }
 
-  get disabled(): boolean {
+  public get disabled(): boolean {
     return Boolean(this.part.disabled);
   }
 
-  get flow() {
+  public get flow(): CalculatedFlows {
     return this.part.calculated || {};
   }
 
-  get liquid() {
+  public get liquid(): boolean {
     return Object.keys(this.flow).length > 0;
   }
 
-  get liquidColor() {
+  public get liquidColor(): string | undefined {
     return this.part.liquidSource || this.part.liquid;
   }
 
-  flowOnAngle(angle: string): number {
+  public flowOnAngle(angle: string): number {
     return this.flow[angle] || 0;
   }
 
-  toggleClosed() {
+  public toggleClosed(): void {
     this.$parent.$emit('input', { ...this.part, closed: !this.closed });
   }
 
-  toggleFlipped() {
+  public toggleFlipped(): void {
     this.$parent.$emit('input', { ...this.part, flipped: !this.flipped });
   }
 
-  toggleDisabled() {
+  public toggleDisabled(): void {
     this.$parent.$emit('input', { ...this.part, disabled: !this.disabled });
   }
 }

@@ -3,7 +3,6 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { component } from '@/plugins/spark/features/ProcessView/calculateFlows';
 import { FlowPart } from '@/plugins/spark/features/ProcessView/state';
-import PartComponent from '@/plugins/spark/features/ProcessView/components/PartCard';
 
 @Component({
   props: {

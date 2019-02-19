@@ -82,7 +82,7 @@ export const actions: ActionTree<DashboardState, RootState> = {
 
   updateDashboardItemId: async (
     context: DashboardContext,
-    { id, newId }: { id: string, newId: string },
+    { id, newId }: { id: string; newId: string },
   ) => {
     const item = getDashboardItemInStore(context, id);
     const currentItemNewId = getDashboardItemInStore(context, newId);
@@ -107,7 +107,7 @@ export const actions: ActionTree<DashboardState, RootState> = {
 
   updateDashboardItemSize: async (
     context: DashboardContext,
-    { id, cols, rows }: { id: string, cols: number, rows: number },
+    { id, cols, rows }: { id: string; cols: number; rows: number },
   ) => {
     const item = getDashboardItemInStore(context, id);
     context.dispatch('saveDashboardItem', { ...item, cols, rows });
@@ -115,7 +115,7 @@ export const actions: ActionTree<DashboardState, RootState> = {
 
   updateDashboardItemConfig: async (
     context: DashboardContext,
-    { id, config }: { id: string, config: any },
+    { id, config }: { id: string; config: any },
   ) => {
     const item = getDashboardItemInStore(context, id);
     context.dispatch('saveDashboardItem', { ...item, config });
@@ -142,37 +142,38 @@ export const updateDashboardItemSize = dispatch(actions.updateDashboardItemSize)
 export const updateDashboardItemConfig = dispatch(actions.updateDashboardItemConfig);
 export const removeDashboardItem = dispatch(actions.removeDashboardItem);
 
-export const setupApi = async (store: RootStore) => {
-  /* eslint-disable no-underscore-dangle */
-  const onDashboardChange = (dashboard: Dashboard) => {
-    const existing = getDashboardInStore(store, dashboard.id);
-    if (!existing || existing._rev !== dashboard._rev) {
-      setDashboardInStore(store, dashboard);
-    }
-  };
-  const onDashboardDelete = (id: string) => {
-    const existing = getDashboardInStore(store, id);
-    if (existing) {
-      removeDashboardInStore(store, existing);
-    }
-  };
-  const onItemChange = (item: DashboardItem) => {
-    const existing = getDashboardItemInStore(store, item.id);
-    if (!existing || existing._rev !== item._rev) {
-      setDashboardItemInStore(store, item);
-    }
-  };
-  const onItemDelete = (id: string) => {
-    const existing = getDashboardItemInStore(store, id);
-    if (existing) {
-      removeDashboardItemInStore(store, existing);
-    }
-  };
-  /* eslint-enable no-underscore-dangle */
+export const setupApi =
+  async (store: RootStore): Promise<void> => {
+    /* eslint-disable no-underscore-dangle */
+    const onDashboardChange = (dashboard: Dashboard): void => {
+      const existing = getDashboardInStore(store, dashboard.id);
+      if (!existing || existing._rev !== dashboard._rev) {
+        setDashboardInStore(store, dashboard);
+      }
+    };
+    const onDashboardDelete = (id: string): void => {
+      const existing = getDashboardInStore(store, id);
+      if (existing) {
+        removeDashboardInStore(store, existing);
+      }
+    };
+    const onItemChange = (item: DashboardItem): void => {
+      const existing = getDashboardItemInStore(store, item.id);
+      if (!existing || existing._rev !== item._rev) {
+        setDashboardItemInStore(store, item);
+      }
+    };
+    const onItemDelete = (id: string): void => {
+      const existing = getDashboardItemInStore(store, id);
+      if (existing) {
+        removeDashboardItemInStore(store, existing);
+      }
+    };
+    /* eslint-enable no-underscore-dangle */
 
-  setAllDashboardsInStore(store, await fetchDashboardsInApi());
-  setdashboardItemValuesInStore(store, await fetchDashboardItemsInApi());
+    setAllDashboardsInStore(store, await fetchDashboardsInApi());
+    setdashboardItemValuesInStore(store, await fetchDashboardItemsInApi());
 
-  setupDashboardsInApi(onDashboardChange, onDashboardDelete);
-  setupDashboardItemsInApi(onItemChange, onItemDelete);
-};
+    setupDashboardsInApi(onDashboardChange, onDashboardDelete);
+    setupDashboardItemsInApi(onItemChange, onItemDelete);
+  };

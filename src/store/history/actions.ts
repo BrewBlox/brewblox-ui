@@ -47,8 +47,9 @@ export const actions: ActionTree<HistoryState, RootState> = {
 export const addMetric = dispatch(actions.add);
 export const removeMetric = dispatch(actions.remove);
 
-export const fetchKnownKeys = async (store: RootStore) =>
-  mutateAvailableKeysInStore(store, await fetchKnownKeysInApi());
+export const fetchKnownKeys =
+  async (store: RootStore): Promise<void> =>
+    mutateAvailableKeysInStore(store, await fetchKnownKeysInApi());
 
-export const validateService = async () =>
-  validateServiceInApi();
+export const validateService =
+  async (): Promise<boolean> => validateServiceInApi();

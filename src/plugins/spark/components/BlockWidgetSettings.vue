@@ -1,6 +1,5 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import FormBase from '@/components/Widget/FormBase';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { blockValues } from '@/plugins/spark/store/getters';
 

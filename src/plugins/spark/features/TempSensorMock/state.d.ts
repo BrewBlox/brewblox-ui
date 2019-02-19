@@ -3,7 +3,7 @@ import { Block } from '@/plugins/spark/state';
 
 export interface TempSensorMockBlock extends Block {
   data: {
-    value: Unit,
-    connected: boolean,
+    value: Unit;
+    connected: boolean;
   };
 }

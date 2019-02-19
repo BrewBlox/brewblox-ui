@@ -1,5 +1,4 @@
 <script lang="ts">
-import { GraphConfig } from '@/components/Graph/state';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
 import { MODULE_ID } from '@/plugins/example';

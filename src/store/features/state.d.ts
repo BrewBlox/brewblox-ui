@@ -24,10 +24,10 @@ export interface Feature {
   form?: string;
 }
 
-export type FeatureState = {
+export interface FeatureState {
   features: {
     [id: string]: Feature;
   };
-};
+}
 
 export type FeatureContext = ActionContext<FeatureState, RootState>;

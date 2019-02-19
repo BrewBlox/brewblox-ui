@@ -1,9 +1,7 @@
 <script lang="ts">
-import Vue from 'vue';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
-import { clampRotation } from '@/helpers/functional';
-import { isSamePart, component, pathsFromSources } from './calculateFlows';
+import { isSamePart, pathsFromSources } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
 import { parts as knownParts } from './register';
 import { PersistentPart, ProcessViewConfig, FlowPart } from './state';
@@ -31,6 +29,7 @@ export default class ProcessViewWidget extends WidgetBase {
 
   saveConfig(config: ProcessViewConfig = this.widgetConfig) {
     const parts = config.parts
+      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
       .map(({ calculated, liquid, transitions, ...persistent }: FlowPart) => persistent);
     this.$props.onChangeConfig(this.widgetId, { ...config, parts });
   }
@@ -117,6 +116,7 @@ export default class ProcessViewWidget extends WidgetBase {
     }
   }
 
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   holdHandler(part: PersistentPart, args: HoldArguments) {
     if (!this.editable) {
       return;
@@ -199,10 +199,7 @@ export default class ProcessViewWidget extends WidgetBase {
           y="8"
           class="grid-item-coordinates"
         >{{ part.x }},{{ part.y }}</text>
-        <ProcessViewItem
-          :value="flowParts[idx]"
-          @input="v => updatePart(idx, v)"
-        />
+        <ProcessViewItem :value="flowParts[idx]" @input="v => updatePart(idx, v)"/>
         <rect v-if="editable" fill="red" fill-opacity="0" x="0" y="0" width="50" height="50"/>
       </g>
       <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">

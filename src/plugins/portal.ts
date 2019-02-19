@@ -1,6 +1,6 @@
 import * as PortalVue from 'portal-vue';
 import Vue from 'vue';
 
-export default (_: PluginArguments) => {
+export default () => {
   Vue.use(PortalVue);
 };

@@ -4,5 +4,6 @@ import { ActuatorOffsetBlock } from './state';
 
 export const typeName = 'ActuatorOffset';
 
-export const getById = (store: RootStore, serviceId: string, id: string) =>
-  blockById<ActuatorOffsetBlock>(store, serviceId, id, typeName);
+export const getById =
+  (store: RootStore, serviceId: string, id: string): ActuatorOffsetBlock =>
+    blockById<ActuatorOffsetBlock>(store, serviceId, id, typeName);

@@ -24,7 +24,7 @@ plugins.forEach(plugin => plugin({
   router,
 }));
 
-const app = new Vue({
+new Vue({
   router,
   store,
   el: createContainer('q-app'),

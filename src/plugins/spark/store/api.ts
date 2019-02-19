@@ -15,10 +15,11 @@ const asDataBlock = (block: Block): DataBlock =>
 
 const asBlock = (block: DataBlock, serviceId: string): Block => ({ ...block, serviceId });
 
-const intercept = (message: string) => (e: Error) => {
-  Notify.create(`${message}: ${e.message}`);
-  throw e;
-};
+const intercept = (message: string): (e: Error) => never =>
+  (e: Error) => {
+    Notify.create(`${message}: ${e.message}`);
+    throw e;
+  };
 
 export const fetchBlocks = async (serviceId: string): Promise<Block[]> =>
   get(`/${encodeURIComponent(serviceId)}/objects`)
@@ -46,12 +47,13 @@ export const persistBlock = async (block: Block): Promise<Block> =>
     .then(savedBlock => asBlock(savedBlock, block.serviceId))
     .catch(intercept(`Failed to persist ${block.id}`));
 
-export const renameBlock = async (serviceId: string, currentId: string, newId: string) =>
-  put(
-    `/${encodeURIComponent(serviceId)}/aliases/${encodeURIComponent(currentId)}`,
-    { id: newId },
-  )
-    .catch(intercept(`Failed to rename ${currentId}`));
+export const renameBlock =
+  async (serviceId: string, currentId: string, newId: string): Promise<any> =>
+    put(
+      `/${encodeURIComponent(serviceId)}/aliases/${encodeURIComponent(currentId)}`,
+      { id: newId },
+    )
+      .catch(intercept(`Failed to rename ${currentId}`));
 
 export const deleteBlock = async (block: Block): Promise<string> =>
   del(
@@ -111,7 +113,7 @@ export const fetchUpdateSource = async (
   serviceId: string,
   onData: (blocks: Block[]) => void,
   onClose: () => void,
-) => {
+): Promise<EventSource> => {
   const source = await sse(`/${encodeURIComponent(serviceId)}/sse/objects`);
   source.onerror = () => {
     source.close();

@@ -7,8 +7,8 @@ export interface Message {
   content: string | any;
 }
 
-export type ExampleState = {
+export interface ExampleState {
   messages: Message[];
-};
+}
 
 export type ExampleContext = ActionContext<ExampleState, RootState>;

@@ -21,7 +21,7 @@ export const mutations: MutationTree<HistoryState> = {
     Vue.set(state.metrics, id, { ...existing, ...metric });
   },
 
-  transform: (state: HistoryState, { id, result }: { id: string, result: QueryResult }) => {
+  transform: (state: HistoryState, { id, result }: { id: string; result: QueryResult }) => {
     const metric: Metric = state.metrics[id];
     if (metric !== undefined) {
       Vue.set(state.metrics, id, { ...metric.transformer(metric, result) });

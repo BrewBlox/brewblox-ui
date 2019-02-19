@@ -1,15 +1,15 @@
 export default class Link {
-  id: string | null;
-  type: string | null;
-  driven: boolean;
+  public id: string | null;
+  public type: string | null;
+  public driven: boolean;
 
-  constructor(id: string | null, type: string | null = null, driven: boolean = false) {
+  public constructor(id: string | null, type: string | null = null, driven: boolean = false) {
     this.id = id;
     this.type = type;
     this.driven = driven;
   }
 
-  get postfix(): string {
+  public get postfix(): string {
     const typeStr =
       this.type === null
         ? ''
@@ -19,11 +19,11 @@ export default class Link {
       : `<${typeStr}>`;
   }
 
-  toString(): string {
+  public toString(): string {
     return this.id || '<not set>';
   }
 
-  toJSON(): string | null {
+  public toJSON(): string | null {
     return this.id;
   }
 }

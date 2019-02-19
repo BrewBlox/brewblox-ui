@@ -4,15 +4,13 @@ import { Dashboard, DashboardItem } from './state';
 const DASHBOARDS = 'dashboards';
 const ITEMS = 'dashboard-items';
 
-export const setupDashboards = (
-  onChanged: (doc: any) => void,
-  onDeleted: (id: string) => void,
-) => registerModule({ onChanged, onDeleted, id: DASHBOARDS });
+export const setupDashboards =
+  (onChanged: (doc: any) => void, onDeleted: (id: string) => void): void =>
+    registerModule({ onChanged, onDeleted, id: DASHBOARDS });
 
-export const setupDashboardItems = (
-  onChanged: (doc: any) => void,
-  onDeleted: (id: string) => void,
-) => registerModule({ onChanged, onDeleted, id: ITEMS });
+export const setupDashboardItems =
+  (onChanged: (doc: any) => void, onDeleted: (id: string) => void): void =>
+    registerModule({ onChanged, onDeleted, id: ITEMS });
 
 export const fetchDashboards = async (): Promise<Dashboard[]> =>
   fetchAll(DASHBOARDS);

@@ -1,16 +1,12 @@
 <script lang="ts">
-import set from 'lodash/set';
-import get from 'lodash/get';
 import { GraphConfig } from '@/components/Graph/state';
 import { nodeBuilder, targetSplitter, targetBuilder } from '@/components/Graph/functional';
 import FormBase from '@/components/Widget/FormBase';
 import { durationString } from '@/helpers/functional';
 import { fetchKnownKeys } from '@/store/history/actions';
-import { measurements, fields } from '@/store/history/getters';
-import { QueryTarget } from '@/store/history/state';
+import { fields } from '@/store/history/getters';
 import Component from 'vue-class-component';
 import FieldPopupEdit from './FieldPopupEdit.vue';
-import { isString } from 'util';
 
 interface PeriodDisplay {
   start: boolean;

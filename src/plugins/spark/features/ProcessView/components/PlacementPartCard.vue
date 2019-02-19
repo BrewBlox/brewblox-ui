@@ -2,7 +2,6 @@
 import PartCard from './PartCard';
 import Component from 'vue-class-component';
 import { clampRotation } from '@/helpers/functional';
-import { component } from '../calculateFlows';
 import { SQUARE_SIZE } from '../getters';
 
 @Component

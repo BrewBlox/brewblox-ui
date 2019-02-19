@@ -10,5 +10,6 @@ export const state = [
   'Unknown',
 ];
 
-export const getById = (store: RootStore, serviceId: string, id: string) =>
-  blockById<ActuatorPinBlock>(store, serviceId, id, typeName);
+export const getById =
+  (store: RootStore, serviceId: string, id: string): ActuatorPinBlock =>
+    blockById<ActuatorPinBlock>(store, serviceId, id, typeName);

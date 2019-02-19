@@ -15,7 +15,7 @@ import FormBase from '@/components/Widget/FormBase';
   },
 })
 export default class BlockForm extends FormBase {
-  get blockField(): Block {
+  public get blockField(): Block {
     const propBlock: Block = this.$props.field;
     const actualBlock: Block = { ...propBlock, data: propBlock.data || this.defaultData() };
     if (!propBlock.data && actualBlock.data) {
@@ -24,27 +24,27 @@ export default class BlockForm extends FormBase {
     return actualBlock;
   }
 
-  get block(): Block {
+  public get block(): Block {
     return this.blockField;
   }
 
-  get serviceId() {
+  public get serviceId(): string {
     return this.block.serviceId;
   }
 
-  presets(): { label: string, value: Object }[] {
+  public presets(): { label: string; value: Record<string, any> }[] {
     return [];
   }
 
-  defaultData(): Object | null {
+  public defaultData(): Record<string, any> | null {
     return null;
   }
 
-  saveBlock(block: Block = this.block) {
+  public saveBlock(block: Block = this.block): void {
     this.$props.onChangeField({ ...block });
   }
 
-  callAndSaveBlock(func: (v: any) => void) {
+  public callAndSaveBlock(func: (v: any) => void): (v: any) => void {
     return (v: any) => { func(v); this.saveBlock(); };
   }
 }

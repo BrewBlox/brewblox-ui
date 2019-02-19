@@ -35,13 +35,13 @@ import Component from 'vue-class-component';
   },
 })
 export default class ItemBase extends Vue {
-  $q: any;
+  protected $q: any;
 
-  get widgetId() {
+  protected get widgetId(): string {
     return this.$props.id;
   }
 
-  get displayName() {
+  protected get displayName(): string {
     return displayNameById(this.$store, this.$props.type);
   }
 }

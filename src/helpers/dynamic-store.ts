@@ -1,14 +1,14 @@
 import { RootState, RootStore } from '@/store/state';
 import { Action, ActionContext, Getter, Module, Mutation } from 'vuex';
 
-export const serviceAvailable = (store: RootStore, serviceId: string) =>
-  !!(store as any).state[serviceId];
+export const serviceAvailable =
+  (store: RootStore, serviceId: string): boolean => !!(store as any).state[serviceId];
 
 export function registerService<TModuleState>(
   store: RootStore,
   serviceId: string,
   module: Module<TModuleState, RootState>,
-) {
+): void {
   if (!serviceAvailable(store, serviceId)) {
     store.registerModule(serviceId, module);
   }
@@ -59,22 +59,28 @@ export function registerService<TModuleState>(
 
 type StoreType<TModuleState> = RootStore | ActionContext<TModuleState, RootState>;
 
-const nestedName = (serviceId: string, func: Function) =>
-  `${serviceId}/${func.name}`;
+const nestedName =
+  (serviceId: string, func: Function): string => `${serviceId}/${func.name}`;
 
-export function read<TModuleState>(getter: Getter<TModuleState, RootState>) {
+export function read<TModuleState>(
+  getter: Getter<TModuleState, RootState>
+): (store: StoreType<TModuleState>, serviceId: string) => any {
   return (store: StoreType<TModuleState>, serviceId: string) =>
     ((store as ActionContext<TModuleState, RootState>).rootGetters
       || store.getters
     )[nestedName(serviceId, getter)];
 }
 
-export function commit<TModuleState>(mutation: Mutation<TModuleState>) {
+export function commit<TModuleState>(
+  mutation: Mutation<TModuleState>
+): (store: StoreType<TModuleState>, serviceId: string, payload?: any) => any {
   return (store: StoreType<TModuleState>, serviceId: string, payload?: any) =>
     store.commit(nestedName(serviceId, mutation), payload, { root: true });
 }
 
-export function dispatch<TModuleState>(action: Action<TModuleState, RootState>) {
+export function dispatch<TModuleState>(
+  action: Action<TModuleState, RootState>
+): (store: StoreType<TModuleState>, serviceId: string, payload?: any) => Promise<any> {
   return async (store: StoreType<TModuleState>, serviceId: string, payload?: any) =>
     store.dispatch(nestedName(serviceId, action as Function), payload, { root: true });
 }

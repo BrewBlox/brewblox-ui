@@ -2,7 +2,7 @@
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
 import { FlowPart, Transitions } from '../state';
-import { LEFT, RIGHT, UP, SQUARE_SIZE } from '../getters';
+import { LEFT, RIGHT } from '../getters';
 
 @Component
 export default class Valve extends PartComponent {
@@ -16,7 +16,7 @@ export default class Valve extends PartComponent {
     };
   }
 
-  get flowSpeed(){
+  get flowSpeed() {
     return this.flow[RIGHT];
   }
 
@@ -35,23 +35,14 @@ export default class Valve extends PartComponent {
       <line v-if="closed" x1="31" y1="25" x2="50" y2="25"/>
     </g>
     <g transform="translate(25, 25)">
-      <g
-        key="valve-inner"
-        :transform="`rotate(${closed ? '90' : '0'})`"
-        class="fill outline inner"
-      >
+      <g key="valve-inner" :transform="`rotate(${closed ? '90' : '0'})`" class="fill outline inner">
         <g transform="translate(-25, -25)">
           <path d="M39.4,21C37.2,13,29,8.3,21,10.5c-5.1,1.4-9.1,5.4-10.5,10.5H39.4z"/>
           <path d="M10.5,29C12.7,37,21,41.6,29,39.4C34,38,38,34,39.4,29H10.5z"/>
         </g>
       </g>
     </g>
-    <AnimatedArrows
-      v-if="flowSpeed"
-      key="valve-arrows"
-      :speed="flowSpeed"
-      path="M0,25H50"
-    />
+    <AnimatedArrows v-if="flowSpeed" key="valve-arrows" :speed="flowSpeed" path="M0,25H50"/>
     <rect fill="red" fill-opacity="0" x="0" y="0" width="50" height="50"/>
   </g>
 </template>

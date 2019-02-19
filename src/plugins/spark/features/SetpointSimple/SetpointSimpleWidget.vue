@@ -1,7 +1,6 @@
 <script lang="ts">
-import { Unit, postfixedDisplayNames } from '@/helpers/units';
+import { postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import { isNullOrUndefined } from 'util';
 import Component from 'vue-class-component';
 import { getById } from './getters';
 import { SetpointSimpleBlock } from './state';

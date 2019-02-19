@@ -3,9 +3,6 @@ import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { getById, getClients } from './getters';
 import { BalancerBlock } from './state';
-import { allBlocks, compatibleBlocks } from '@/plugins/spark/store/getters';
-import { ActuatorAnalogLink } from '@/helpers/units/KnownLinks';
-import { fetchCompatibleBlocks } from '@/plugins/spark/store/actions';
 
 @Component
 export default class BalancerWidget extends BlockWidget {

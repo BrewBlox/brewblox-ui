@@ -13,5 +13,6 @@ export const validDisplayTypes = [
   'Pid',
 ];
 
-export const getById = (store: RootStore, serviceId: string, id: string) =>
-  blockById<DisplaySettingsBlock>(store, serviceId, id, typeName);
+export const getById =
+  (store: RootStore, serviceId: string, id: string): DisplaySettingsBlock =>
+    blockById<DisplaySettingsBlock>(store, serviceId, id, typeName);

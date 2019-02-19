@@ -27,23 +27,23 @@ export interface NavAction {
   },
 })
 export default class ExampleFeatureWizard extends Vue {
-  get typeId(): string {
+  protected get typeId(): string {
     return this.$props.featureId;
   }
 
-  get defaultWidgetSize() {
+  protected get defaultWidgetSize(): { cols: number; rows: number } {
     return widgetSizeById(this.$store, this.typeId);
   }
 
-  itemAlreadyExists(id: string): boolean {
+  protected itemAlreadyExists(id: string): boolean {
     return !!dashboardItemById(this.$store, id);
   }
 
-  createItem(item: Partial<DashboardItem>) {
+  protected createItem(item: Partial<DashboardItem>): void {
     this.$props.onCreate(item);
   }
 
-  cancel() {
+  protected cancel(): void {
     this.$props.onCancel();
   }
 }

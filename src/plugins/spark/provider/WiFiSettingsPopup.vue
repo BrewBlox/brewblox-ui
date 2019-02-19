@@ -28,7 +28,7 @@ export default class WiFiSettingsPopup extends Vue {
 
   get securityOpts() {
     return WlanSecurityEnum
-      .filter(([i, s]) => i !== 255) // not set
+      .filter(([i]) => i !== 255) // not set
       .map(([i, s]) => ({ label: s, value: i }));
   }
 

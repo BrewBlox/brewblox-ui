@@ -5,7 +5,7 @@ import { HistoryState, Metric } from './state';
 
 const { read } = createAccessors('history');
 
-export const MAX_POINTS: number = 2000;
+export const MAX_POINTS = 2000;
 
 export const getters: GetterTree<HistoryState, RootState> = {
   metrics: (state: HistoryState): { [id: string]: Metric } => state.metrics || {},
@@ -21,16 +21,19 @@ export const metricValues = read(getters.metricValues);
 export const measurements = read(getters.measurements);
 export const fields = read(getters.fields);
 
-export const metricById = (store: RootStore, metricId: string): Metric => {
-  const metric = metrics(store)[metricId];
-  if (metric === undefined) {
-    throw new Error(`${metricId} not found in history store`);
-  }
-  return metric;
-};
+export const metricById =
+  (store: RootStore, metricId: string): Metric => {
+    const metric = metrics(store)[metricId];
+    if (metric === undefined) {
+      throw new Error(`${metricId} not found in history store`);
+    }
+    return metric;
+  };
 
-export const tryMetricById = (store: RootStore, metricId: string): Metric | null =>
-  metrics(store)[metricId] || null;
+export const tryMetricById =
+  (store: RootStore, metricId: string): Metric | null =>
+    metrics(store)[metricId] || null;
 
-export const fieldsByMeasurement = (store: RootStore, measurement: string) =>
-  fields(store)[measurement];
+export const fieldsByMeasurement =
+  (store: RootStore, measurement: string): string[] =>
+    fields(store)[measurement];

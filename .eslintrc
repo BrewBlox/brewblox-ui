@@ -8,6 +8,7 @@
   },
   "extends": [
     "plugin:vue/recommended",
+    "plugin:@typescript-eslint/recommended",
     "@vue/typescript"
   ],
   "rules": {
@@ -36,6 +37,8 @@
         "ignoreUrls": true,
         "ignoreComments": false
       }
-    ]
+    ],
+    "@typescript-eslint/indent": 0,
+    "@typescript-eslint/no-explicit-any": 0
   }
 }

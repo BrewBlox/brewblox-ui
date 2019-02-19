@@ -32,8 +32,10 @@ export function serviceById<T extends Service>(
   return service as T;
 }
 
-export const tryServiceById = (store: RootStore | ServicesContext, id: string) =>
-  services(store)[id];
+export const tryServiceById =
+  (store: RootStore | ServicesContext, id: string): Service =>
+    services(store)[id];
 
-export const serviceExists = (store: RootStore | ServicesContext, id: string) =>
-  !!services(store)[id];
+export const serviceExists =
+  (store: RootStore | ServicesContext, id: string): boolean =>
+    !!services(store)[id];

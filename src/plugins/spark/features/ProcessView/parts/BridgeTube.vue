@@ -2,7 +2,7 @@
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
 import { Transitions } from '../state';
-import { LEFT, RIGHT, DOWN, UP, SQUARE_SIZE } from '../getters';
+import { LEFT, RIGHT, DOWN, UP } from '../getters';
 
 @Component
 export default class BridgeTube extends PartComponent {

@@ -5,9 +5,9 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 import { setTimeout } from 'timers';
 
 interface Edge {
-  source: string,
-  target: string,
-  relation: string[],
+  source: string;
+  target: string;
+  relation: string[];
 }
 
 @Component({
@@ -26,8 +26,8 @@ interface Edge {
 })
 export default class DagreDiagram extends Vue {
   $refs!: {
-    svg: SVGGraphicsElement,
-    diagram: SVGGraphicsElement,
+    svg: SVGGraphicsElement;
+    diagram: SVGGraphicsElement;
   }
   renderFunc = new dagreRender();
 

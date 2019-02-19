@@ -12,10 +12,10 @@ export interface Provider {
   page?: string;
 }
 
-export type ProviderState = {
+export interface ProviderState {
   providers: {
     [id: string]: Provider;
   };
-};
+}
 
 export type ProviderContext = ActionContext<ProviderState, RootState>;

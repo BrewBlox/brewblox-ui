@@ -13,8 +13,8 @@ const asInfo = (con: any): ConstraintInfo => {
   return { key, value: con[key], limiting: con.limiting };
 };
 
-const asConstraint = (cinfo: ConstraintInfo) =>
-  ({ [cinfo.key]: cinfo.value });
+const asConstraint =
+  (cinfo: ConstraintInfo): Record<string, any> => ({ [cinfo.key]: cinfo.value });
 
 @Component({
   props: {
@@ -37,7 +37,7 @@ const asConstraint = (cinfo: ConstraintInfo) =>
   },
 })
 export default class Constraints extends Vue {
-  get constraints(): ConstraintInfo[] {
+  protected get constraints(): ConstraintInfo[] {
     const cons = this.$props
       .field
       .constraints
@@ -46,18 +46,18 @@ export default class Constraints extends Vue {
     return cons;
   }
 
-  saveConstraints(vals: ConstraintInfo[] = this.constraints) {
+  protected saveConstraints(vals: ConstraintInfo[] = this.constraints): void {
     const constraints = vals
       .filter(info => !!info.key)
       .map(asConstraint);
     this.$props.change({ constraints });
   }
 
-  callAndSaveConstraints(func: (v: any) => void) {
+  protected callAndSaveConstraints(func: (v: any) => void): (v: any) => void {
     return (v: any) => { func(v); this.saveConstraints(); };
   }
 
-  removeConstraint(index: number) {
+  protected removeConstraint(index: number): void {
     this.$delete(this.constraints, index);
   }
 }

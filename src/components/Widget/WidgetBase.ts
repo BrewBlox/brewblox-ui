@@ -9,7 +9,8 @@ import ItemBase from './ItemBase';
     },
     onChangeConfig: {
       type: Function,
-      default: () => (id: string, config: Object) => { },
+      /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+      default: () => (id: string, config: Record<string, any>) => { },
     },
     cols: {
       type: Number,

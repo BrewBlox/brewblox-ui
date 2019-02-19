@@ -1,9 +1,7 @@
 <script lang="ts">
 import PartCard from './PartCard';
 import Component from 'vue-class-component';
-import { clampRotation } from '@/helpers/functional';
-import { component } from '../calculateFlows';
-import { SQUARE_SIZE, COLD_WATER, HOT_WATER, BEER, WORT } from '../getters';
+import { COLD_WATER, HOT_WATER, BEER, WORT } from '../getters';
 
 @Component
 export default class LiquidSourcePartCard extends PartCard {

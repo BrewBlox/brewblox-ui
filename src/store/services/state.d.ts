@@ -6,15 +6,15 @@ export interface Service {
   title: string;
   order: number;
   type: string;
-  config: Object;
+  config: Record<string, any>;
   _rev?: string;
 }
 
-export type ServiceState = {
+export interface ServiceState {
   replicating: boolean;
   services: {
     [id: string]: Service;
   };
-};
+}
 
 export type ServicesContext = ActionContext<ServiceState, RootState>;

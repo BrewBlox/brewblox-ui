@@ -24,5 +24,6 @@ const module: Module<SparkState, RootState> = {
   }),
 };
 
-export const register = async (store: RootStore, service: Service) =>
-  registerService(store, service.id, module);
+export const register =
+  async (store: RootStore, service: Service): Promise<void> =>
+    registerService(store, service.id, module);

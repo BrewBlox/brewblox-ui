@@ -52,24 +52,25 @@ export const dashboardItemById =
     dashboardItems(store)[id];
 
 export const dashboardItemsByDashboardId =
-  (store: RootStore | DashboardContext, id: string) =>
+  (store: RootStore | DashboardContext, id: string): DashboardItem[] =>
     dashboardItemValues(store)
       .filter(item => item.dashboard === id);
 
-export const itemCopyName = (store: RootStore | DashboardContext, id: string) => {
-  const existingIds = dashboardItemIds(store);
-  if (!existingIds.includes(id)) {
-    return id;
-  }
+export const itemCopyName =
+  (store: RootStore | DashboardContext, id: string): string => {
+    const existingIds = dashboardItemIds(store);
+    if (!existingIds.includes(id)) {
+      return id;
+    }
 
-  const copyName = (i: number): string =>
-    (id.match(/\(\d+\)$/)
-      ? id.replace(/\(\d+\)$/, `(${i})`)
-      : `${id}(${i})`);
+    const copyName = (i: number): string =>
+      (id.match(/\(\d+\)$/)
+        ? id.replace(/\(\d+\)$/, `(${i})`)
+        : `${id}(${i})`);
 
-  let idx = 2;
-  while (existingIds.includes(copyName(idx))) {
-    idx += 1;
-  }
-  return copyName(idx);
-};
+    let idx = 2;
+    while (existingIds.includes(copyName(idx))) {
+      idx += 1;
+    }
+    return copyName(idx);
+  };

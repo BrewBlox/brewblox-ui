@@ -51,10 +51,10 @@ export function serializedPropertyName(key: string, inputObject: any): string {
   return key;
 }
 
-type DisplayNameType = { [key: string]: string };
+interface DisplayNameType { [key: string]: string }
 
 export function postfixedDisplayNames(displayNames: DisplayNameType, inputObject: any): DisplayNameType {
-  const displayNameReducer = (acc: DisplayNameType, [key, displayName]) => {
+  const displayNameReducer = (acc: DisplayNameType, [key, displayName]): DisplayNameType => {
     const serializedKey = serializedPropertyName(key, inputObject);
     const unit = objectUnit(inputObject[key]);
     return { ...acc, [serializedKey]: unit ? `${displayName} [${unit}]` : displayName };

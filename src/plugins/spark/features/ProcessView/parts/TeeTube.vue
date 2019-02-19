@@ -2,7 +2,7 @@
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
 import { Transitions } from '../state';
-import { UP, LEFT, RIGHT, DOWN, SQUARE_SIZE } from '../getters';
+import { UP, LEFT, RIGHT } from '../getters';
 
 @Component
 export default class TeeTube extends PartComponent {
@@ -48,24 +48,9 @@ export default class TeeTube extends PartComponent {
       <path d="M25,0V20a5,5,0,0,0,5,5H50"/>
     </g>
     <g class="outline">
-      <AnimatedArrows
-        v-if="topSpeed"
-        :path="paths.top"
-        :num-arrows="1"
-        :speed="topSpeed"
-      />
-      <AnimatedArrows
-        v-if="leftSpeed"
-        :path="paths.left"
-        :num-arrows="1"
-        :speed="leftSpeed"
-      />
-      <AnimatedArrows
-        v-if="rightSpeed"
-        :path="paths.right"
-        :num-arrows="1"
-        :speed="rightSpeed"
-      />
+      <AnimatedArrows v-if="topSpeed" :path="paths.top" :num-arrows="1" :speed="topSpeed"/>
+      <AnimatedArrows v-if="leftSpeed" :path="paths.left" :num-arrows="1" :speed="leftSpeed"/>
+      <AnimatedArrows v-if="rightSpeed" :path="paths.right" :num-arrows="1" :speed="rightSpeed"/>
     </g>
   </g>
 </template>

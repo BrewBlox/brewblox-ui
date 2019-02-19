@@ -46,12 +46,12 @@ export default class DefaultLayout extends Vue {
     return [...allDashboards(this.$store)].sort(objectSorter('order'));
   }
 
-  get defaultDashboard() {
-    return primaryDashboard(this.$store);
-  }
-
   set dashboards(dashboards: Dashboard[]) {
     updateDashboardOrder(this.$store, dashboards.map(dashboard => dashboard.id));
+  }
+
+  get defaultDashboard() {
+    return primaryDashboard(this.$store);
   }
 
   get services() {

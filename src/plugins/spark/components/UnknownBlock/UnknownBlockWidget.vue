@@ -1,11 +1,9 @@
 <script lang="ts">
-import { GraphConfig } from '@/components/Graph/state';
 import WidgetBase from '@/components/Widget/WidgetBase';
-import { QueryParams } from '@/store/history/state';
 import Component from 'vue-class-component';
 import { Block } from '@/plugins/spark/state';
-import { fetchBlock, renameBlock, saveBlock, fetchAll } from '@/plugins/spark/store/actions';
-import { blockById, lastStatus } from '@/plugins/spark/store/getters';
+import { fetchAll } from '@/plugins/spark/store/actions';
+import { lastStatus } from '@/plugins/spark/store/getters';
 import { serviceById } from '@/store/services/getters';
 
 interface AbsenceReason {

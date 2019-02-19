@@ -33,7 +33,7 @@ export const mutations: MutationTree<SparkState> = {
   setUnitAlternatives: (state: SparkState, alts: UnitAlternatives) =>
     Vue.set(state, 'unitAlternatives', alts),
 
-  setCompatibleBlocks: (state: SparkState, { type, ids }: { type: string, ids: string[] }) =>
+  setCompatibleBlocks: (state: SparkState, { type, ids }: { type: string; ids: string[] }) =>
     Vue.set(state.compatibleBlocks, type, ids),
 
   setDiscoveredBlocks: (state: SparkState, ids: string[]) =>

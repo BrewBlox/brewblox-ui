@@ -1,7 +1,5 @@
 <script lang="ts">
-import Vue from 'vue';
 import Component from 'vue-class-component';
-import { component } from '@/plugins/spark/features/ProcessView/calculateFlows';
 import shortid from 'shortid';
 import { objectSorter } from '@/helpers/functional';
 import FormBase from '@/components/Widget/FormBase';
