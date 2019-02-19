@@ -1,18 +1,10 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { Transitions } from '../state';
-import { LEFT, RIGHT } from '../getters';
+import { RIGHT } from '../getters';
 
 @Component
 export default class StraightTube extends PartComponent {
-  static transitions(): Transitions {
-    return {
-      [LEFT]: [{ outCoords: RIGHT }],
-      [RIGHT]: [{ outCoords: LEFT }],
-    };
-  }
-
   get paths() {
     return {
       borders: [

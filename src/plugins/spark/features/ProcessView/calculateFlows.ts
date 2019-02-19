@@ -1,7 +1,7 @@
-import Vue from 'vue';
-import { PersistentPart, Transitions, FlowPart, CalculatedFlows, FlowRoute, ComponentConstructor } from './state';
+import { PersistentPart, Transitions, FlowPart, CalculatedFlows, FlowRoute, ComponentSettings } from './state';
 import { CENTER, DEFAULT_FRICTION, DEFAULT_DELTA_PRESSURE, COLD_WATER, MIXED_LIQUIDS } from './getters';
 import { Coordinates } from '@/helpers/coordinates';
+import { settings } from './parts/getters';
 import has from 'lodash/has';
 import get from 'lodash/get';
 
@@ -9,8 +9,8 @@ export const isSamePart =
   (left: PersistentPart, right: PersistentPart): boolean =>
     ['x', 'y', 'type', 'rotate'].every(k => left[k] === right[k]);
 
-export const component =
-  (part: PersistentPart): ComponentConstructor => Vue.component(part.type) as ComponentConstructor;
+export const partSettings =
+  (part: PersistentPart): ComponentSettings => settings[part.type];
 
 const adjacentPart = (
   allParts: FlowPart[],
@@ -99,7 +99,7 @@ const calculateFromSource = (
   candidates: FlowPart[] = allParts,
 ): FlowPart[] => {
   const candidateParts = candidates
-    .filter(candidate => !isSamePart(sourcePart, candidate) || component(candidate).isBridge);
+    .filter(candidate => !isSamePart(sourcePart, candidate) || partSettings(candidate).isBridge);
 
   const outFlowReducer = (parts: FlowPart[], outFlow: FlowRoute): FlowPart[] => {
     const { outCoords, pressure, friction, deltaPressure } = outFlow;
@@ -239,14 +239,14 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
 
 
 const translations = (part: PersistentPart): Transitions =>
-  Object.entries(component(part).transitions(part))
-    .reduce((acc, [inCoords, flows]) => {
+  Object.entries(partSettings(part).transitions(part))
+    .reduce((acc, [inCoords, flows]: [string, any]) => {
       const updatedKey = new Coordinates(inCoords)
         .rotate(part.rotate)
         .translate([part.x, part.y])
         .toString();
       const updatedFlows = flows
-        .map(flow => ({
+        .map((flow: FlowRoute) => ({
           ...flow,
           outCoords: new Coordinates(flow.outCoords)
             .rotate(part.rotate)
@@ -267,7 +267,7 @@ const asFlowParts =
 export const pathsFromSources = (parts: PersistentPart[]): FlowPart[] => {
   const flowParts = asFlowParts(parts);
   return flowParts
-    .filter(part => component(part).isSource) // -> FlowPart[]
+    .filter(part => partSettings(part).isSource) // -> FlowPart[]
     .map(part => ({ liquidSource: COLD_WATER, ...part })) // -> FlowPart[]
     .map(part => calculateFromSource(
       part,

@@ -1,18 +1,10 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { Transitions } from '../state';
-import { UP, RIGHT } from '../getters';
+import { RIGHT } from '../getters';
 
 @Component
 export default class ElbowTube extends PartComponent {
-  static transitions(): Transitions {
-    return {
-      [UP]: [{ outCoords: RIGHT }],
-      [RIGHT]: [{ outCoords: UP }],
-    };
-  }
-
   get paths() {
     return {
       borders: [

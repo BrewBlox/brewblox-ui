@@ -1,25 +1,13 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { FlowPart, Transitions } from '../state';
-import { LEFT, RIGHT } from '../getters';
+import { RIGHT } from '../getters';
 
 @Component
 export default class Valve extends PartComponent {
-  static transitions(part: FlowPart): Transitions {
-    if (part.closed) {
-      return {};
-    }
-    return {
-      [LEFT]: [{ outCoords: RIGHT }],
-      [RIGHT]: [{ outCoords: LEFT }],
-    };
-  }
-
   get flowSpeed() {
     return this.flow[RIGHT];
   }
-
 }
 </script>
 
