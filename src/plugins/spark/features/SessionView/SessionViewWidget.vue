@@ -1,10 +1,9 @@
 <script lang="ts">
-import Vue from 'vue';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
 import shortid from 'shortid';
 import { SessionViewConfig, Session } from './state';
-import { durationString, shortDateString } from '@/helpers/functional';
+import { shortDateString } from '@/helpers/functional';
 
 
 @Component

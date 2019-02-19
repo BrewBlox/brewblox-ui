@@ -8,26 +8,26 @@ import { blockById } from '../store/getters';
 
 @Component
 export default class BlockWidget extends WidgetBase {
-  modalOpen: boolean = false;
+  protected modalOpen: boolean = false;
 
-  get serviceId(): string {
+  protected get serviceId(): string {
     return this.$props.config.serviceId;
   }
 
-  get blockId(): string {
+  protected get blockId(): string {
     return this.$props.config.blockId;
   }
 
-  get block(): Block {
+  protected get block(): Block {
     return blockById(this.$store, this.serviceId, this.blockId);
   }
 
-  colMinBlocks(minBlocksForRow: number, colsTrue: number, colsFalse: number) {
+  protected colMinBlocks(minBlocksForRow: number, colsTrue: number, colsFalse: number): string {
     const cols = this.$props.cols >= minBlocksForRow ? colsTrue : colsFalse;
     return `col-${cols.toString()}`;
   }
 
-  gridStyle(items: number) {
+  protected gridStyle(items: number): { [key: string]: string } {
     if (items < 4) {
       return {};
     }
@@ -40,23 +40,23 @@ export default class BlockWidget extends WidgetBase {
     };
   }
 
-  get queryParams(): QueryParams {
+  protected get queryParams(): QueryParams {
     return this.$props.config.queryParams || {
       duration: '10m',
     };
   }
 
-  set queryParams(queryParams: QueryParams) {
+  protected set queryParams(queryParams: QueryParams) {
     this.$props.onChangeConfig(this.$props.id, { ...this.$props.config, queryParams });
   }
 
-  get renamedTargets(): { [key: string]: string } {
+  protected get renamedTargets(): { [key: string]: string } {
     return {};
   }
 
-  get graphCfg(): GraphConfig {
-    const blockFmt = (val: string) => [this.blockId, val].join('/');
-    const serviceFmt = (val: string) => [this.serviceId, this.blockId, val].join('/');
+  protected get graphCfg(): GraphConfig {
+    const blockFmt = (val: string): string => [this.blockId, val].join('/');
+    const serviceFmt = (val: string): string => [this.serviceId, this.blockId, val].join('/');
 
     return {
       // persisted in config
@@ -77,34 +77,34 @@ export default class BlockWidget extends WidgetBase {
     };
   }
 
-  set graphCfg(config: GraphConfig) {
+  protected set graphCfg(config: GraphConfig) {
     this.queryParams = { ...config.params };
   }
 
-  openModal() {
+  protected openModal(): void {
     this.modalOpen = true;
   }
 
-  refreshBlock() {
+  protected refreshBlock(): void {
     fetchBlock(this.$store, this.serviceId, this.block)
       .catch(err => this.$q.notify(err.toString()));
   }
 
-  saveBlock(block: Block = this.block) {
+  protected saveBlock(block: Block = this.block): void {
     saveBlock(this.$store, this.serviceId, block)
       .catch(err => this.$q.notify(err.toString()));
   }
 
-  callAndSaveBlock(func: (v: any) => void) {
+  protected callAndSaveBlock(func: (v: any) => void): (v: any) => void {
     return (v: any) => { func(v); this.saveBlock(); };
   }
 
-  changeBlockId(newId: string) {
+  protected changeBlockId(newId: string): void {
     renameBlock(this.$store, this.serviceId, this.blockId, newId)
       .catch(err => this.$q.notify(err.toString()));
   }
 
-  switchBlockId(blockId: string) {
+  protected switchBlockId(blockId: string): void {
     this.$props.onChangeConfig(this.$props.id, { ...this.$props.config, blockId });
   }
 }

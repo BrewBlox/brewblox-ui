@@ -2,7 +2,7 @@
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
 import { Transitions } from '../state';
-import { LEFT, RIGHT, SQUARE_SIZE } from '../getters';
+import { LEFT, RIGHT } from '../getters';
 
 @Component
 export default class StraightTube extends PartComponent {
@@ -23,7 +23,7 @@ export default class StraightTube extends PartComponent {
     };
   }
 
-  get flowSpeed(){
+  get flowSpeed() {
     return this.flow[RIGHT];
   }
 }

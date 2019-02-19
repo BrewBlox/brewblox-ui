@@ -4,5 +4,6 @@ import { TempSensorMockBlock } from './state';
 
 export const typeName = 'TempSensorMock';
 
-export const getById = (store: RootStore, serviceId: string, id: string) =>
-  blockById<TempSensorMockBlock>(store, serviceId, id, typeName);
+export const getById =
+  (store: RootStore, serviceId: string, id: string): TempSensorMockBlock =>
+    blockById<TempSensorMockBlock>(store, serviceId, id, typeName);

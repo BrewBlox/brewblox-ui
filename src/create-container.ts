@@ -1,4 +1,4 @@
-export default function createContainer(id: string = '') {
+export default function createContainer(id: string = ''): HTMLElement {
   const documentElement = document.getElementById(id);
 
   if (documentElement) {

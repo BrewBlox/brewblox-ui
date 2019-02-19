@@ -5,8 +5,9 @@ import get from 'lodash/get';
 
 export const typeName = 'Mutex';
 
-export const getById = (store: RootStore, serviceId: string, id: string) =>
-  blockById<MutexBlock>(store, serviceId, id, typeName);
+export const getById =
+  (store: RootStore, serviceId: string, id: string): MutexBlock =>
+    blockById<MutexBlock>(store, serviceId, id, typeName);
 
 export interface MutexBlocks {
   active: string;

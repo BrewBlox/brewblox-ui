@@ -11,7 +11,7 @@ const defaultGroupNames = [
   'Group1', 'Group2', 'Group3', 'Group4', 'Group5', 'Group6', 'Group7',
 ];
 
-export const typeName: string = 'Spark';
+export const typeName = 'Spark';
 
 export const getters: GetterTree<SparkState, RootState> = {
   blocks: (state: SparkState): { [id: string]: Block } => state.blocks,
@@ -56,35 +56,36 @@ export const getters: GetterTree<SparkState, RootState> = {
       .reduce((acc, k) => ([...acc, ...generateChains([], k)]), output);
   },
   blockLinks: (state: SparkState) => {
-    const empty = new Array<{ source: string, target: string, relation: string[] }>();
-    const findRelations = (source: string, relation: string[], val: any) => {
-      if (val instanceof Link) {
-        if (val.id === null || source === 'DisplaySettings') {
-          return empty;
+    const linkArray = new Array<{ source: string; target: string; relation: string[] }>();
+    const findRelations =
+      (source: string, relation: string[], val: any): typeof linkArray => {
+        if (val instanceof Link) {
+          if (val.id === null || source === 'DisplaySettings') {
+            return linkArray;
+          }
+          return [{
+            source: source,
+            target: val.toString(),
+            relation: relation,
+          }];
         }
-        return [{
-          source: source,
-          target: val.toString(),
-          relation: relation,
-        }];
-      }
-      if (val instanceof Object) {
-        return Object.entries(val)
-          .reduce(
-            (acc, child: Object) => {
-              if (child[0].startsWith('driven')) {
-                return acc;
-              }
-              return [...acc, ...findRelations(source, [...relation, child[0]], child[1])];
-            },
-            empty
-          );
-      }
-      return empty;
-    };
+        if (val instanceof Object) {
+          return Object.entries(val)
+            .reduce(
+              (acc, child: Record<string, any>) => {
+                if (child[0].startsWith('driven')) {
+                  return acc;
+                }
+                return [...acc, ...findRelations(source, [...relation, child[0]], child[1])];
+              },
+              linkArray
+            );
+        }
+        return linkArray;
+      };
 
     const allLinks = Object.values(state.blocks)
-      .reduce((rel, block: Block) => ([...rel, ...findRelations(block.id, [], block.data)]), empty);
+      .reduce((rel, block: Block) => ([...rel, ...findRelations(block.id, [], block.data)]), linkArray);
     return allLinks;
   },
 };
@@ -127,13 +128,13 @@ export function allBlocks<T extends Block>(
     .filter((block: Block) => !type || block.type === type) as T[];
 }
 
-export const sparkServiceById = (store: RootStore, id: string) =>
+export const sparkServiceById = (store: RootStore, id: string): Spark =>
   serviceById<Spark>(store, id, typeName);
 
 export const sparkConfigById = (store: RootStore, id: string): any =>
   sparkServiceById(store, id).config || {};
 
-export const groupNames = (store: RootStore, id: string) => {
+export const groupNames = (store: RootStore, id: string): string[] => {
   const configNames = sparkConfigById(store, id).groupNames || [];
   return [
     ...configNames.slice(0, defaultGroupNames.length),

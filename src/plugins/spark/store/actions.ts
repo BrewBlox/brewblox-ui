@@ -68,106 +68,118 @@ export const createBlock = dispatch(actions.createBlock);
 export const saveBlock = dispatch(actions.saveBlock);
 export const removeBlock = dispatch(actions.removeBlock);
 
-export const updateGroupNames = (store: RootStore, id: string, names: string[]) => {
-  const existing = sparkServiceById(store, id);
-  saveService(store, {
-    ...existing,
-    config: {
-      ...existing.config,
-      groupNames: names,
-    },
-  });
-};
+export const updateGroupNames =
+  (store: RootStore, id: string, names: string[]): void => {
+    const existing = sparkServiceById(store, id);
+    saveService(store, {
+      ...existing,
+      config: {
+        ...existing.config,
+        groupNames: names,
+      },
+    });
+  };
 
-export const fetchBlocks = async (store: RootStore, serviceId: string) =>
-  setBlocksInStore(store, serviceId, await fetchBlocksInApi(serviceId));
+export const fetchBlocks =
+  async (store: RootStore, serviceId: string): Promise<void> =>
+    setBlocksInStore(store, serviceId, await fetchBlocksInApi(serviceId));
 
-export const renameBlock = async (
-  store: RootStore,
-  serviceId: string,
-  currentId: string,
-  newId: string,
-) => {
-  if (blockIds(store, serviceId).includes(newId)) {
-    throw new Error(`Block ${newId} already exists`);
-  }
-  await renameBlockInApi(serviceId, currentId, newId);
-  await fetchBlocks(store, serviceId);
-  dashboardItemValues(store)
-    .filter(item => item.config.serviceId === serviceId && item.config.blockId === currentId)
-    .forEach(item => setDashboardItem(store, { ...item, config: { ...item.config, blockId: newId } }));
-};
+export const renameBlock =
+  async (store: RootStore, serviceId: string, currentId: string, newId: string): Promise<void> => {
+    if (blockIds(store, serviceId).includes(newId)) {
+      throw new Error(`Block ${newId} already exists`);
+    }
+    await renameBlockInApi(serviceId, currentId, newId);
+    await fetchBlocks(store, serviceId);
+    dashboardItemValues(store)
+      .filter(item => item.config.serviceId === serviceId && item.config.blockId === currentId)
+      .forEach(item => setDashboardItem(store, { ...item, config: { ...item.config, blockId: newId } }));
+  };
 
-export const clearBlocks = async (store: RootStore, service: Service) => {
-  await clearBlocksInApi(service.id);
-  await fetchBlocks(store, service.id);
-};
+export const clearBlocks =
+  async (store: RootStore, service: Service): Promise<void> => {
+    await clearBlocksInApi(service.id);
+    await fetchBlocks(store, service.id);
+  };
 
-export const fetchServiceStatus = async (store: RootStore, serviceId: string) =>
-  setLastStatusInStore(store, serviceId, await fetchSystemStatusInApi(serviceId));
+export const fetchServiceStatus =
+  async (store: RootStore, serviceId: string): Promise<void> =>
+    setLastStatusInStore(store, serviceId, await fetchSystemStatusInApi(serviceId));
 
-export const fetchUnits = async (store: RootStore, serviceId: string) =>
-  setUnitsInStore(store, serviceId, await fetchUnitsInApi(serviceId));
+export const fetchUnits =
+  async (store: RootStore, serviceId: string): Promise<void> =>
+    setUnitsInStore(store, serviceId, await fetchUnitsInApi(serviceId));
 
-export const saveUnits = async (store: RootStore, serviceId: string, units: UserUnits) =>
-  setUnitsInStore(store, serviceId, await persistUnitsInApi(serviceId, units));
+export const saveUnits =
+  async (store: RootStore, serviceId: string, units: UserUnits): Promise<void> =>
+    setUnitsInStore(store, serviceId, await persistUnitsInApi(serviceId, units));
 
-export const fetchUnitAlternatives = async (store: RootStore, serviceId: string) =>
-  setUnitAlternativesInStore(store, serviceId, await fetchUnitAlternativesInApi(serviceId));
+export const fetchUnitAlternatives =
+  async (store: RootStore, serviceId: string): Promise<void> =>
+    setUnitAlternativesInStore(store, serviceId, await fetchUnitAlternativesInApi(serviceId));
 
-export const fetchCompatibleBlocks = async (store: RootStore, serviceId: string, type: string) =>
-  setCompatibleBlocksInStore(
-    store,
-    serviceId,
-    { type, ids: await fetchCompatibleBlocksInApi(serviceId, type) },
-  );
-
-export const fetchDiscoveredBlocks = async (store: RootStore, serviceId: string) => {
-  const newIds = await fetchDiscoveredBlocksInApi(serviceId);
-  setDiscoveredBlocksInStore(store, serviceId, [...discoveredBlocks(store, serviceId), ...newIds]);
-};
-
-export const clearDiscoveredBlocks = async (store: RootStore, serviceId: string) =>
-  setDiscoveredBlocksInStore(store, serviceId, []);
-
-export const fetchSavepoints = async (store: RootStore, serviceId: string) =>
-  setSavepointsInStore(store, serviceId, await fetchSavepointsInApi(serviceId));
-
-export const fetchAll = async (store: RootStore, service: Service) => {
-  const status = await fetchSystemStatusInApi(service.id);
-  setLastStatusInStore(store, service.id, status);
-  if (status.synchronized) {
-    Promise.all([
-      fetchUnits(store, service.id),
-      fetchUnitAlternatives(store, service.id),
-      fetchSavepoints(store, service.id),
-    ]);
-  }
-};
-
-export const createUpdateSource = async (store: RootStore, serviceId: string) =>
-  setUpdateSourceInStore(
-    store,
-    serviceId,
-    await fetchUpdateSourceInApi(
+export const fetchCompatibleBlocks =
+  async (store: RootStore, serviceId: string, type: string): Promise<void> =>
+    setCompatibleBlocksInStore(
+      store,
       serviceId,
-      blocks => setBlocksInStore(store, serviceId, blocks),
-      () => setUpdateSourceInStore(store, serviceId, null),
-    ),
-  );
+      { type, ids: await fetchCompatibleBlocksInApi(serviceId, type) },
+    );
 
-export const validateService = async (serviceId: string) =>
-  validateServiceInApi(serviceId);
+export const fetchDiscoveredBlocks =
+  async (store: RootStore, serviceId: string): Promise<void> => {
+    const newIds = await fetchDiscoveredBlocksInApi(serviceId);
+    setDiscoveredBlocksInStore(store, serviceId, [...discoveredBlocks(store, serviceId), ...newIds]);
+  };
 
-export const writeSavepoint = async (store: RootStore, serviceId: string, savepointId: string) => {
-  await writeSavepointInApi(serviceId, savepointId);
-  await fetchSavepoints(store, serviceId);
-};
+export const clearDiscoveredBlocks =
+  async (store: RootStore, serviceId: string): Promise<void> =>
+    setDiscoveredBlocksInStore(store, serviceId, []);
 
-export const applySavepoint = async (store: RootStore, serviceId: string, savepointId: string) =>
-  applySavepointInApi(serviceId, savepointId);
+export const fetchSavepoints =
+  async (store: RootStore, serviceId: string): Promise<void> =>
+    setSavepointsInStore(store, serviceId, await fetchSavepointsInApi(serviceId));
 
-export const removeSavepoint = async (store: RootStore, serviceId: string, savepointId: string) => {
-  await removeSavepointInApi(serviceId, savepointId);
-  await fetchSavepoints(store, serviceId);
-};
+export const fetchAll =
+  async (store: RootStore, service: Service): Promise<void> => {
+    const status = await fetchSystemStatusInApi(service.id);
+    setLastStatusInStore(store, service.id, status);
+    if (status.synchronized) {
+      Promise.all([
+        fetchUnits(store, service.id),
+        fetchUnitAlternatives(store, service.id),
+        fetchSavepoints(store, service.id),
+      ]);
+    }
+  };
+
+export const createUpdateSource =
+  async (store: RootStore, serviceId: string): Promise<void> =>
+    setUpdateSourceInStore(
+      store,
+      serviceId,
+      await fetchUpdateSourceInApi(
+        serviceId,
+        blocks => setBlocksInStore(store, serviceId, blocks),
+        () => setUpdateSourceInStore(store, serviceId, null),
+      ),
+    );
+
+export const validateService =
+  async (serviceId: string): Promise<boolean> => validateServiceInApi(serviceId);
+
+export const writeSavepoint =
+  async (store: RootStore, serviceId: string, savepointId: string): Promise<void> => {
+    await writeSavepointInApi(serviceId, savepointId);
+    await fetchSavepoints(store, serviceId);
+  };
+
+export const applySavepoint =
+  async (store: RootStore, serviceId: string, savepointId: string): Promise<string[]> =>
+    applySavepointInApi(serviceId, savepointId);
+
+export const removeSavepoint =
+  async (store: RootStore, serviceId: string, savepointId: string): Promise<void> => {
+    await removeSavepointInApi(serviceId, savepointId);
+    await fetchSavepoints(store, serviceId);
+  };

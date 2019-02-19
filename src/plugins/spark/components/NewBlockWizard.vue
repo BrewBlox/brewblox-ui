@@ -2,7 +2,6 @@
 import { objectStringSorter } from '@/helpers/functional';
 import { Block } from '@/plugins/spark/state';
 import { blockIds } from '@/plugins/spark/store/getters';
-import { DashboardItem } from '@/store/dashboards/state';
 import {
   displayNameById,
   formById,

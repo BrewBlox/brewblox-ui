@@ -7,7 +7,7 @@ const GAP_SIZE = 20;
 const MIN_COLS = 2;
 const MIN_ROWS = 2;
 
-type Coordinates = { x: number, y: number };
+interface Coordinates { x: number; y: number }
 
 @Component({
   props: {
@@ -41,6 +41,7 @@ type Coordinates = { x: number, y: number };
     },
     onUpdateItemSize: {
       type: Function,
+      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
       default: () => (id: string, cols: number, rows: number) => { },
     },
     onNewItemsOrder: {
@@ -232,7 +233,7 @@ export default class GridItem extends Vue {
     this.stopInteraction();
   }
 
-  gridPosition(delta: Coordinates = { x: 0, y: 0 }): { x: number, y: number } {
+  gridPosition(delta: Coordinates = { x: 0, y: 0 }): { x: number; y: number } {
     if (!this.dragStartX || !this.dragStartY || !this.dragStartParentX || !this.dragStartParentY) {
       throw new Error('No starting drag positions know');
     }
@@ -316,7 +317,7 @@ export default class GridItem extends Vue {
     this.onDragMove(args.evt);
   }
 
-  holdHandler(args: HoldArguments) {
+  holdHandler() {
     this.modalOpen = true;
   }
 }

@@ -19,5 +19,6 @@ const module: Module<ExampleState, RootState> = {
 
 // After calling this, there is a new submodule in the global VueX store
 // It can be accessed using the getters / mutations / actions in this directory
-export const register = async (store: RootStore, moduleId: string) =>
-  registerService(store, moduleId, module);
+export const register =
+  async (store: RootStore, moduleId: string): Promise<void> =>
+    registerService(store, moduleId, module);

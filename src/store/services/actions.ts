@@ -46,14 +46,15 @@ export const saveService = dispatch(actions.saveService);
 export const removeService = dispatch(actions.removeService);
 export const updateServiceOrder = dispatch(actions.updateServiceOrder);
 
-export const initService = async (store: RootStore, service: Service) => {
-  await initializerById(store, service.type)(store, service);
-  await fetcherById(store, service.type)(store, service);
-};
+export const initService =
+  async (store: RootStore, service: Service): Promise<void> => {
+    await initializerById(store, service.type)(store, service);
+    await fetcherById(store, service.type)(store, service);
+  };
 
-export const setupApi = async (store: RootStore) => {
+export const setupApi = async (store: RootStore): Promise<void> => {
   /* eslint-disable no-underscore-dangle */
-  const onChange = async (service: Service) => {
+  const onChange = async (service: Service): Promise<void> => {
     const existing = tryGetServiceInStore(store, service.id);
     if (!existing) {
       setServiceInStore(store, service);
@@ -62,7 +63,7 @@ export const setupApi = async (store: RootStore) => {
       setServiceInStore(store, service);
     }
   };
-  const onDelete = (id: string) => {
+  const onDelete = (id: string): void => {
     const existing = tryGetServiceInStore(store, id);
     if (existing) {
       removeServiceInStore(store, existing);

@@ -2,6 +2,12 @@ import Plotly from 'plotly.js';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
+interface VueProp {
+  type: any;
+  required?: boolean;
+  default: any;
+}
+
 // The naming convention is:
 //   - events are attached as `'plotly_' + eventName.toLowerCase()`
 //   - vue props are `'on' + eventName`
@@ -44,16 +50,18 @@ const updateEvents = [
 const isBrowser = typeof window !== 'undefined';
 const hasReactAPIMethod = !!Plotly.react;
 
-const isNumber = n => !Number.isNaN(parseFloat(n)) && Number.isFinite(n);
+const isNumber =
+  (n: any): boolean => !Number.isNaN(parseFloat(n)) && Number.isFinite(n);
 
-const eventReducer = (acc, event) =>
-  ({
-    ...acc,
-    [`on${event}`]: {
-      type: Function,
-      default: () => () => { },
-    },
-  });
+const eventReducer =
+  (acc: { [key: string]: VueProp }, event: string): typeof acc =>
+    ({
+      ...acc,
+      [`on${event}`]: {
+        type: Function,
+        default: () => () => { },
+      },
+    });
 
 @Component({
   props: {
@@ -117,15 +125,15 @@ const eventReducer = (acc, event) =>
   },
 })
 export default class PlotlyGraph extends Vue {
-  fitHandler: EventListener | null = null;
-  resizeHandler: EventListener | null = null;
-  handlers = {};
+  private fitHandler: EventListener | null = null;
+  private resizeHandler: EventListener | null = null;
+  private handlers = {};
 
-  get plotlyElement(): any {
+  private get plotlyElement(): any {
     return this.$refs.plotly;
   }
 
-  handlePropsUpdate() {
+  private handlePropsUpdate(): void {
     if (!hasReactAPIMethod) {
       this.handlers = {};
     }
@@ -150,7 +158,7 @@ export default class PlotlyGraph extends Vue {
       });
   }
 
-  removeUpdateEvents() {
+  private removeUpdateEvents(): void {
     if (!this.plotlyElement || !this.plotlyElement.removeListener) return;
 
     updateEvents.forEach((eventName) => {
@@ -158,7 +166,7 @@ export default class PlotlyGraph extends Vue {
     });
   }
 
-  attachUpdateEvents() {
+  private attachUpdateEvents(): void {
     if (!this.plotlyElement || !this.plotlyElement.removeListener) return;
 
     updateEvents.forEach((eventName) => {
@@ -166,16 +174,16 @@ export default class PlotlyGraph extends Vue {
     });
   }
 
-  handleUpdate() {
+  private handleUpdate(): void {
     this.handleUpdateWithProps(this.$props);
   }
 
-  handleUpdateWithProps(props) {
+  private handleUpdateWithProps(props): void {
     props.onUpdate(this.plotlyElement);
   }
 
   // Attach and remove event handlers as they're added or removed from props:
-  syncEventHandlers(propsIn = null) {
+  private syncEventHandlers(propsIn = null): void {
     // Allow use of nextProps if passed explicitly:
     const props = propsIn || this.$props;
 
@@ -200,7 +208,7 @@ export default class PlotlyGraph extends Vue {
     });
   }
 
-  syncWindowResize(props = this.$props, invoke = false) {
+  private syncWindowResize(props = this.$props, invoke = false): void {
     if (!isBrowser) return;
 
     if (props.fit && !this.fitHandler) {
@@ -229,15 +237,15 @@ export default class PlotlyGraph extends Vue {
     }
   }
 
-  resizedLayoutIfFit(layout) {
+  private resizedLayoutIfFit(layout: Plotly.Layout): Plotly.Layout {
     if (!this.$props.fit) {
       return layout;
     }
     return Object.assign({}, layout, this.getSize(layout));
   }
 
-  getSize(layout = this.$props.layout) {
-    let rect;
+  private getSize(layout = this.$props.layout): { width: number; height: number } {
+    let rect: any = {};
     const layoutWidth = layout ? layout.width : null;
     const layoutHeight = layout ? layout.height : null;
     const hasWidth = isNumber(layoutWidth);
@@ -253,7 +261,7 @@ export default class PlotlyGraph extends Vue {
     };
   }
 
-  created() {
+  public created(): void {
     this.handleUpdate = this.handleUpdate.bind(this);
     this.$watch('$props.config', this.handlePropsUpdate);
     this.$watch('$props.data', this.handlePropsUpdate);
@@ -262,7 +270,7 @@ export default class PlotlyGraph extends Vue {
     this.$watch('$props.revision', this.handlePropsUpdate);
   }
 
-  mounted() {
+  public mounted(): void {
     Plotly.newPlot(
       this.plotlyElement,
       this.$props.data,
@@ -279,7 +287,7 @@ export default class PlotlyGraph extends Vue {
       });
   }
 
-  beforeDestroy() {
+  public beforeDestroy(): void {
     this.$props.onPurge(this.plotlyElement);
 
     if (this.fitHandler && isBrowser) {
@@ -296,7 +304,7 @@ export default class PlotlyGraph extends Vue {
     Plotly.purge(this.plotlyElement);
   }
 
-  render(createElement) {
+  public render(createElement: Function): void {
     return createElement(
       'div',
       {

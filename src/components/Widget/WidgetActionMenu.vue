@@ -1,12 +1,7 @@
 <script lang="ts">
-import { itemCopyName, allDashboards, dashboardItemValues } from '@/store/dashboards/getters';
-import { displayNameById } from '@/store/features/getters';
-import { Notify } from 'quasar';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { blockValues } from '@/plugins/spark/store/getters';
-import { appendDashboardItem } from '@/store/dashboards/actions';
-import { DashboardItem } from '@/store/dashboards/state';
+
 
 @Component({
   props: {

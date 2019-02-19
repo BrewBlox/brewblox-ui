@@ -1,10 +1,10 @@
-type CoordinatesParam = string | { x: number, y: number } | [number, number] | Coordinates;
+type CoordinatesParam = string | { x: number; y: number } | [number, number] | Coordinates;
 
 export class Coordinates {
-  x: number;
-  y: number;
+  public x: number;
+  public y: number;
 
-  constructor(param: CoordinatesParam) {
+  public constructor(param: CoordinatesParam) {
     if (typeof param === 'string') {
       [this.x, this.y] = param.split(',').map(Number);
     }
@@ -28,7 +28,7 @@ export class Coordinates {
     }
   }
 
-  rotate(rotation: number, pivot: CoordinatesParam = [0.5, 0.5]) {
+  public rotate(rotation: number, pivot: CoordinatesParam = [0.5, 0.5]): Coordinates {
     if (!rotation) {
       return this;
     }
@@ -50,7 +50,7 @@ export class Coordinates {
     return this;
   }
 
-  translate(offset: CoordinatesParam) {
+  public translate(offset: CoordinatesParam): Coordinates {
     const offsetCoord = new Coordinates(offset);
     this.x += offsetCoord.x;
     this.y += offsetCoord.y;
@@ -58,15 +58,15 @@ export class Coordinates {
     return this;
   }
 
-  toString(): string {
+  public toString(): string {
     return `${this.x},${this.y}`;
   }
 
-  values(): [number, number] {
+  public values(): [number, number] {
     return [this.x, this.y];
   }
 
-  raw(): { x: number, y: number } {
+  public raw(): { x: number; y: number } {
     return { x: this.x, y: this.y };
   }
 }

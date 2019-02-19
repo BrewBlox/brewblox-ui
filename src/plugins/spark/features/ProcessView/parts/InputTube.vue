@@ -2,8 +2,7 @@
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
 import { Transitions } from '../state';
-import { CENTER, RIGHT, SQUARE_SIZE } from '../getters';
-import { clamp } from '@/helpers/functional';
+import { CENTER, RIGHT } from '../getters';
 
 @Component
 export default class InputTube extends PartComponent {
@@ -31,7 +30,7 @@ export default class InputTube extends PartComponent {
     };
   }
 
-  get flowSpeed(){
+  get flowSpeed() {
     return this.flowOnAngle(RIGHT);
   }
 }

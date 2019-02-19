@@ -1,4 +1,4 @@
-const prettify = (v: string) =>
+const prettify = (v: string): string =>
   v.replace(/delta_/g, '')
     .replace(/(celsius|degC(elsius)?)/gi, '°C')
     .replace(/(fahrenheit|degF(ahrenheit)?)/gi, '°F')
@@ -13,37 +13,37 @@ const prettify = (v: string) =>
     .replace(/ \* /gi, '·');
 
 export default class Unit {
-  value: number | null;
-  unit: string;
-  notation: string;
+  public value: number | null;
+  public unit: string;
+  public notation: string;
 
-  constructor(value: number | null, unit: string) {
+  public constructor(value: number | null, unit: string) {
     this.value = value;
     this.unit = unit;
     this.notation = prettify(this.unit);
   }
 
-  get unitNotation(): string {
+  public get unitNotation(): string {
     return this.notation;
   }
 
-  get roundedValue(): string {
+  public get roundedValue(): string {
     return (this.value === null) ? '--.--' : this.value.toFixed(2);
   }
 
-  get postfix(): string {
+  public get postfix(): string {
     return `[${this.unit}]`;
   }
 
-  serializedKeyName(key: string): string {
+  public serializedKeyName(key: string): string {
     return `${key}${this.postfix}`;
   }
 
-  toString(): string {
+  public toString(): string {
     return `${this.roundedValue} ${this.unitNotation}`;
   }
 
-  toJSON(): number | null {
+  public toJSON(): number | null {
     return this.value;
   }
 }

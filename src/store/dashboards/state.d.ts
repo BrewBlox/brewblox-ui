@@ -20,7 +20,7 @@ export interface DashboardItem {
   _rev?: string;
 }
 
-export type DashboardState = {
+export interface DashboardState {
   replicatingDashboards: boolean;
   dashboards: {
     [id: string]: Dashboard;
@@ -29,6 +29,6 @@ export type DashboardState = {
   items: {
     [id: string]: DashboardItem;
   };
-};
+}
 
 export type DashboardContext = ActionContext<DashboardState, RootState>;

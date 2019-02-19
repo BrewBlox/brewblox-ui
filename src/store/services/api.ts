@@ -3,10 +3,9 @@ import { Service } from './state';
 
 const SERVICES = 'services';
 
-export const setup = (
-  onChanged: (doc: any) => void,
-  onDeleted: (id: string) => void,
-) => registerModule({ onChanged, onDeleted, id: SERVICES });
+export const setup =
+  (onChanged: (doc: any) => void, onDeleted: (id: string) => void, ): void =>
+    registerModule({ onChanged, onDeleted, id: SERVICES });
 
 export const fetchServices = async (): Promise<Service[]> =>
   fetchAll(SERVICES);

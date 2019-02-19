@@ -34,11 +34,12 @@ export const widgetById = (store: RootStore, id: string, config: any): string | 
     : feature.widget;
 };
 
-export const widgetSizeById = (store: RootStore, id: string) =>
-  (featureById(store, id).widgetSize || { ...{ cols: 3, rows: 2 } });
+export const widgetSizeById =
+  (store: RootStore, id: string): { cols: number; rows: number } =>
+    (featureById(store, id).widgetSize || Object.assign({}, { cols: 3, rows: 2 }));
 
-export const formById = (store: RootStore, id: string): string | undefined =>
-  featureById(store, id).form;
+export const formById =
+  (store: RootStore, id: string): string | undefined => featureById(store, id).form;
 
-export const deletersById = (store: RootStore, id: string): Deleter[] =>
-  (featureById(store, id).deleters || []);
+export const deletersById =
+  (store: RootStore, id: string): Deleter[] => (featureById(store, id).deleters || []);

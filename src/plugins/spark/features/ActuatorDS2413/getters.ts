@@ -10,5 +10,6 @@ export const channel = [
   'B',
 ];
 
-export const getById = (store: RootStore, serviceId: string, id: string) =>
-  blockById<ActuatorDS2413Block>(store, serviceId, id, typeName);
+export const getById =
+  (store: RootStore, serviceId: string, id: string): ActuatorDS2413Block =>
+    blockById<ActuatorDS2413Block>(store, serviceId, id, typeName);

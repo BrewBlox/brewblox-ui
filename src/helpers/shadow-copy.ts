@@ -54,4 +54,5 @@ export const fromShadow = (
       { ...output },
     );
 
-export const deepCopy = (obj: any) => deserialize(JSON.parse(JSON.stringify(serialize(obj))));
+export const deepCopy =
+  (obj: any): any => deserialize(JSON.parse(JSON.stringify(serialize(obj))));

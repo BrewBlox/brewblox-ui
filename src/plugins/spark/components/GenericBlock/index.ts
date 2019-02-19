@@ -10,28 +10,31 @@ import wizard from '../BlockWizard.vue';
 import widget from './GenericBlock.vue';
 
 // Selects the correct feature for the actual block
-const selector: WidgetSelector = (store: RootStore, config: BlockConfig) => {
-  if (!serviceAvailable(store, config.serviceId)) {
-    throw new Error(`Service "${config.serviceId}" not found`);
-  }
-  const block = blocks(store, config.serviceId)[config.blockId];
-  return block
-    ? featureById(store, block.type).widget
-    : 'UnknownBlockWidget';
-};
+const selector: WidgetSelector =
+  (store: RootStore, config: BlockConfig): string | undefined => {
+    if (!serviceAvailable(store, config.serviceId)) {
+      throw new Error(`Service "${config.serviceId}" not found`);
+    }
+    const block = blocks(store, config.serviceId)[config.blockId];
+    return block
+      ? featureById(store, block.type).widget
+      : 'UnknownBlockWidget';
+  };
 
 // validates feature config
-const validator = (store: RootStore, config: BlockConfig) => {
-  if (!serviceAvailable(store, config.serviceId)) {
-    throw new Error(`Service "${config.serviceId}" not found`);
-  }
-  if (config.blockId === null || config.blockId === undefined) {
-    throw new Error('Block ID is undefined');
-  }
-  return true;
-};
+const validator =
+  (store: RootStore, config: BlockConfig): boolean => {
+    if (!serviceAvailable(store, config.serviceId)) {
+      throw new Error(`Service "${config.serviceId}" not found`);
+    }
+    if (config.blockId === null || config.blockId === undefined) {
+      throw new Error('Block ID is undefined');
+    }
+    return true;
+  };
 
-const deleteBlock = (store: RootStore, config: BlockConfig) => {
+const deleteBlock = 
+  (store: RootStore, config: BlockConfig): void => {
   const block = blocks(store, config.serviceId)[config.blockId];
   if (block) {
     removeBlock(store, config.serviceId, block);

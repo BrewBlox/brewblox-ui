@@ -3,16 +3,16 @@ import { Block } from '@/plugins/spark/state';
 export interface OneWireBusBlock extends Block {
   data: {
     command: {
-      opcode: number,
-      data: number,
-    },
-    address: string[],
+      opcode: number;
+      data: number;
+    };
+    address: string[];
   };
 }
 
 export interface GroupsBlock extends Block {
   data: {
-    active: number[],
+    active: number[];
   };
 }
 
@@ -24,8 +24,8 @@ export interface SysInfoBlock extends Block {
 
 export interface TicksBlock extends Block {
   data: {
-    millisSinceBoot: number,
-    secondsSinceEpoch: number,
+    millisSinceBoot: number;
+    secondsSinceEpoch: number;
   };
 }
 
@@ -37,5 +37,5 @@ export interface WiFiSettingsBlock extends Block {
     cipher: number;
     signal: number;
     ip: string;
-  }
+  };
 }

@@ -18,23 +18,26 @@ export const providers = read(getters.providers);
 export const providerIds = read(getters.providerIds);
 export const providerValues = read(getters.providerValues);
 
-export const providerById = (store: RootStore, id: string) =>
-  (providers(store)[id] || {});
+export const providerById =
+  (store: RootStore, id: string): Provider => (providers(store)[id] || {});
 
-export const displayNameById = (store: RootStore, id: string) =>
-  providerById(store, id).displayName || id;
+export const displayNameById =
+  (store: RootStore, id: string): string => providerById(store, id).displayName || id;
 
-export const initializerById = (store: RootStore, id: string): ServiceFunc =>
-  providerById(store, id).initializer || (async () => { });
+export const initializerById =
+  (store: RootStore, id: string): ServiceFunc =>
+    providerById(store, id).initializer || (async () => { });
 
-export const fetcherById = (store: RootStore, id: string): ServiceFunc =>
-  providerById(store, id).fetcher || (async () => { });
+export const fetcherById =
+  (store: RootStore, id: string): ServiceFunc =>
+    providerById(store, id).fetcher || (async () => { });
 
-export const wizardById = (store: RootStore, id: string) =>
-  providerById(store, id).wizard;
+export const wizardById =
+  (store: RootStore, id: string): string | undefined =>
+    providerById(store, id).wizard;
 
-export const pageById = (store: RootStore, id: string) =>
-  providerById(store, id).page;
+export const pageById =
+  (store: RootStore, id: string): string | undefined => providerById(store, id).page;
 
-export const featuresById = (store: RootStore, id: string) =>
-  providerById(store, id).features;
+export const featuresById =
+  (store: RootStore, id: string): string[] => providerById(store, id).features;

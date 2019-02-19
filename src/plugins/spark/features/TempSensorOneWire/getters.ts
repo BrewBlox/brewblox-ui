@@ -4,5 +4,6 @@ import { TempSensorOneWireBlock } from './state';
 
 export const typeName = 'TempSensorOneWire';
 
-export const getById = (store: RootStore, serviceId: string, id: string) =>
-  blockById<TempSensorOneWireBlock>(store, serviceId, id, typeName);
+export const getById =
+  (store: RootStore, serviceId: string, id: string): TempSensorOneWireBlock =>
+    blockById<TempSensorOneWireBlock>(store, serviceId, id, typeName);
