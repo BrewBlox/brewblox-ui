@@ -1,25 +1,10 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { Transitions } from '../state';
-import { CENTER, RIGHT } from '../getters';
+import { RIGHT } from '../getters';
 
 @Component
 export default class InputTube extends PartComponent {
-  static get isSource() {
-    return true;
-  }
-
-  static get cards(): string[] {
-    return ['LiquidSourcePartCard'];
-  }
-
-  static transitions(): Transitions {
-    return {
-      [CENTER]: [{ outCoords: RIGHT }],
-    };
-  }
-
   get paths() {
     return {
       borders: [

@@ -1,19 +1,10 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { Transitions } from '../state';
 import { UP, LEFT, RIGHT } from '../getters';
 
 @Component
 export default class TeeTube extends PartComponent {
-  static transitions(): Transitions {
-    return {
-      [UP]: [{ outCoords: RIGHT }, { outCoords: LEFT }],
-      [RIGHT]: [{ outCoords: UP }, { outCoords: LEFT }],
-      [LEFT]: [{ outCoords: UP }, { outCoords: RIGHT }],
-    };
-  }
-
   get paths() {
     return {
       top: 'M25,25 V0',

@@ -1,26 +1,10 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { Transitions } from '../state';
 import { LEFT, RIGHT, DOWN, UP } from '../getters';
 
 @Component
 export default class BridgeTube extends PartComponent {
-  static get isBridge() {
-    return true;
-  }
-
-  static transitions(): Transitions {
-    return {
-      // bridge (high)
-      [LEFT]: [{ outCoords: RIGHT }],
-      [RIGHT]: [{ outCoords: LEFT }],
-      // straight (low)
-      [UP]: [{ outCoords: DOWN }],
-      [DOWN]: [{ outCoords: UP }],
-    };
-  }
-
   get lowReversed() {
     return this.flowOnAngle(DOWN) > 0;
   }

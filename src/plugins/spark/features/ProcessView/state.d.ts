@@ -1,5 +1,3 @@
-import { VueConstructor } from 'vue';
-
 export interface FlowRoute {
   outCoords: string;
   friction?: number;
@@ -26,12 +24,12 @@ export interface PersistentPart {
   flipped?: boolean;
 }
 
-export interface ComponentConstructor extends VueConstructor {
+export interface ComponentSettings {
   isSource: boolean;
   isBridge: boolean;
   cards: string[];
-  size: (part: PersistentPart) => [number, number];
   transitions: (part: PersistentPart) => Transitions;
+  size: (part: PersistentPart) => [number, number];
 }
 
 export interface FlowPart extends PersistentPart {

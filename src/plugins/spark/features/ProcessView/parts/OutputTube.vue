@@ -1,17 +1,10 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { Transitions } from '../state';
-import { CENTER, LEFT } from '../getters';
+import { LEFT } from '../getters';
 
 @Component
 export default class OutputTube extends PartComponent {
-  static transitions(): Transitions {
-    return {
-      [LEFT]: [{ outCoords: CENTER, pressure: 0 }],
-    };
-  }
-
   get paths() {
     return {
       borders: [

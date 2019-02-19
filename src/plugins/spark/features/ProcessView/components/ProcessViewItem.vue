@@ -1,7 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { ComponentConstructor } from '../state';
 import { SQUARE_SIZE } from '../getters';
 
 @Component({
@@ -13,8 +12,8 @@ import { SQUARE_SIZE } from '../getters';
   },
 })
 export default class ProcessViewItem extends Vue {
-  get component(): ComponentConstructor {
-    return Vue.component(this.$props.value.type) as ComponentConstructor;
+  get component(): any {
+    return Vue.component(this.$props.value.type);
   }
 
   get size() {
