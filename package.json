@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@types/d3": "^5.7.0",
+    "babel-jest": "^24.1.0",
     "d3-selection": "^1.4.0",
     "dagre-d3": "^0.6.3",
     "date-fns": "^1.30.1",
@@ -57,7 +58,7 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.11",
+    "@types/jest": "^23.3.14",
     "@types/lodash": "^4.14.121",
     "@types/plotly.js": "^1.42.0",
     "@types/pouchdb": "^6.3.2",
@@ -80,6 +81,7 @@
     "dotenv": "^6.2.0",
     "eslint": "^5.12.1",
     "git-describe": "^4.0.3",
+    "jest": "^24.1.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
     "semver": "^5.6.0",
