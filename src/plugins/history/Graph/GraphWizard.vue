@@ -79,6 +79,8 @@ export default class GraphWizard extends WizardBase {
     this.createItem({
       id: this.widgetId,
       feature: this.typeId,
+      order: 0,
+      dashboard: this.$props.dashboardId,
       config: this.graphCfg,
       ...this.defaultWidgetSize,
     });

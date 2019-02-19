@@ -11,7 +11,6 @@ import Component from 'vue-class-component';
 
 @Component
 export default class BlockWizard extends WizardBase {
-  $q: any;
   currentStep: string = '';
   blockAction: 'create' | 'existing' | null = null;
 
@@ -165,6 +164,8 @@ export default class BlockWizard extends WizardBase {
     this.createItem({
       id: this.widgetId,
       feature: this.typeId,
+      dashboard: this.$props.dashboardId,
+      order: 0,
       config: {
         serviceId: service.id,
         blockId: block.id,

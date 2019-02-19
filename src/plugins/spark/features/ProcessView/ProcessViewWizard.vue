@@ -43,6 +43,8 @@ export default class ProcessViewWizard extends WizardBase {
     this.createItem({
       id: this.widgetId,
       feature: this.typeId,
+      dashboard: this.$props.dashboardId,
+      order: 0,
       config: {
         parts: [],
       },

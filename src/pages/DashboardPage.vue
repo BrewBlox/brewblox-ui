@@ -20,13 +20,9 @@ import {
 import { DashboardItem } from '@/store/dashboards/state';
 import {
   deletersById,
-  displayNameById,
   validatorById,
   widgetById,
-  widgetSizeById,
 } from '@/store/features/getters';
-import { Notify } from 'quasar';
-import shortid from 'shortid';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
@@ -122,30 +118,6 @@ export default class DashboardPage extends Vue {
   onChangeItemId(id: string, newId: string) {
     updateDashboardItemId(this.$store, { id, newId })
       .catch(e => this.$q.notify(`Failed to rename ${id}: ${e}`));
-  }
-
-  defaultItem(): DashboardItem {
-    return {
-      id: shortid.generate(),
-      feature: 'Unknown',
-      dashboard: this.dashboardId,
-      order: this.items.length + 1,
-      config: {},
-      ...widgetSizeById(this.$store, 'Unknown'),
-    };
-  }
-
-  async onCreateItem(partial: Partial<DashboardItem>) {
-    try {
-      const item: DashboardItem = { ...this.defaultItem(), ...partial };
-      await appendDashboardItem(this.$store, item);
-      Notify.create({
-        type: 'positive',
-        message: `Added ${displayNameById(this.$store, item.feature)} "${item.id}"`,
-      });
-    } catch (e) {
-      Notify.create(`Failed to add widget: ${e.toString()}`);
-    }
   }
 
   onDeleteItem(item: DashboardItem) {
@@ -244,7 +216,7 @@ export default class DashboardPage extends Vue {
         <q-btn color="primary" icon="add" label="New Widget" @click="() => wizardModalOpen = true"/>
       </portal>
       <q-modal v-model="wizardModalOpen" no-backdrop-dismiss>
-        <NewWidgetWizard v-if="wizardModalOpen" :on-create="onCreateItem"/>
+        <NewWidgetWizard v-if="wizardModalOpen" :dashboard-id="dashboardId"/>
       </q-modal>
       <GridContainer
         :editable="widgetEditable"

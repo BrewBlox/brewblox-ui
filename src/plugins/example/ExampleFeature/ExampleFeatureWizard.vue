@@ -42,11 +42,11 @@ export default class ExampleFeatureWizard extends WizardBase {
 
   createWidget() {
     // this.createItem() is inherited from WizardBase.
-    // We define a partial DashboardItem here, with all settings we know.
-    // Other settings (eg. item order) will be added by the dashboard.
     this.createItem({
       id: this.widgetId,
       feature: this.typeId,
+      dashboard: this.$props.dashboardId,
+      order: 0,
       config: {
         lastUrl: '/datastore',
       },

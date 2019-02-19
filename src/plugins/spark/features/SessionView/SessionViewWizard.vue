@@ -43,6 +43,8 @@ export default class SessionViewWizard extends WizardBase {
     this.createItem({
       id: this.widgetId,
       feature: this.$props.featureId,
+      dashboard: this.$props.dashboardId,
+      order: 0,
       config: {
         sessions: [],
       },

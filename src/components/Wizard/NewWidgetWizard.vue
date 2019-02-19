@@ -1,6 +1,5 @@
 <script lang="ts">
 import { objectStringSorter } from '@/helpers/functional';
-import { DashboardItem } from '@/store/dashboards/state';
 import {
   displayNameById,
   featureIds,
@@ -14,6 +13,10 @@ import Component from 'vue-class-component';
     onCreate: {
       type: Function,
       required: true,
+    },
+    dashboardId: {
+      type: String,
+      required: false,
     },
   },
 })
@@ -41,11 +44,6 @@ export default class NewWidgetWizard extends Vue {
     this.featureId = id;
   }
 
-  create(partial: Partial<DashboardItem>) {
-    this.$props.onCreate(partial);
-    this.reset();
-  }
-
   reset() {
     this.featureId = '';
     this.searchModel = '';
@@ -65,7 +63,7 @@ export default class NewWidgetWizard extends Vue {
         v-if="wizardComponent"
         :is="wizardComponent"
         :feature-id="featureId"
-        :on-create="create"
+        :dashboard-id="dashboardId"
         :on-cancel="reset"
       />
     </q-card>
