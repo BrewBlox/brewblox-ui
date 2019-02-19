@@ -20,6 +20,7 @@
     "build": "vue-cli-service build --modern",
     "devbuild": "npm run build && mkdir -p ./dev/dist && rm -r ./dev/dist/*; cp -r ./dist/* ./dev/dist/",
     "test": "vue-cli-service test:unit",
+    "test:watch": "vue-cli-service test:unit --watchAll",
     "e2e": "npm run compose:new && vue-cli-service test:e2e --mode development",
     "lint": "eslint \"src/**/*.{js,ts,vue}\"",
     "fix": "npm run lint -- --fix",
@@ -57,6 +58,7 @@
   },
   "devDependencies": {
     "@types/jest": "^23.3.11",
+    "@types/lodash": "^4.14.121",
     "@types/plotly.js": "^1.42.0",
     "@types/pouchdb": "^6.3.2",
     "@types/query-string": "^6.1.1",
