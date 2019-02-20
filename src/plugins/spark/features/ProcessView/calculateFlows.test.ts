@@ -1,6 +1,26 @@
 import { partSettings, partTransitions, flowPath, asFlowParts, FlowSegment } from './calculateFlows';
 import { PersistentPart } from './state';
 import { CENTER, DEFAULT_FRICTION, DEFAULT_DELTA_PRESSURE, COLD_WATER, MIXED_LIQUIDS } from './getters';
+import get from 'lodash/get';
+
+
+type TypeList = string | any[];
+
+const propertyWalker = (acc: any[], next: FlowSegment, prop: string[]): any[] => {
+  acc = [...acc, get(next, prop)];
+  if (next.children.length === 0) {
+    return acc; // end of path
+  }
+  if (next.children.length === 1) {
+    return [...acc, ...propertyWalker([], next.children[0], prop)];  // no split
+  }
+  let subtree: TypeList[] = [];
+  next.children.forEach((child) => {
+    subtree = [...subtree, ...propertyWalker([], child, prop)]; // split
+  });
+  console.log(subtree);
+  return [...acc, subtree];
+};
 
 
 describe('calculate Flows', () => {
@@ -154,25 +174,7 @@ describe('A path with a split', () => {
 
     const path = flowPath(parts, start, "1.5,2.5");
 
-    type TypeList = string | any[];
-
-    const walkTypes = (acc: any[], next: FlowSegment): any[] => {
-      acc = [...acc, next.root[0].type];
-      if (next.children.length === 0) {
-        return acc; // end of path
-      }
-      if (next.children.length === 1) {
-        return [...acc, ...walkTypes([], next.children[0])];  // no split
-      }
-      let subtree: TypeList[] = [];
-      next.children.forEach((child) => {
-        subtree = [...subtree, ...walkTypes([], child)]; // split
-      });
-      console.log(subtree);
-      return [...acc, subtree];
-    };
-
-    const visitedTypes = walkTypes([], path);
+    const visitedTypes = propertyWalker([], path, ['root', '0', 'type']);
     expect(visitedTypes).toEqual(
       [
         'InputTube',
@@ -181,6 +183,18 @@ describe('A path with a split', () => {
         [
           'OutputTube',
           'OutputTube',
+        ],
+      ]);
+
+    const visitedInCoords = propertyWalker([], path, ['inCoord']);
+    expect(visitedInCoords).toEqual(
+      [
+        "1.5,2.5",
+        "2,2.5",
+        "3,2.5",
+        [
+          "3.5,2",
+          "3.5,3",
         ],
       ]);
   });
