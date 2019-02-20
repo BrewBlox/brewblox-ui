@@ -1,5 +1,6 @@
 module.exports = {
   moduleFileExtensions: [
+    'd.ts',
     'ts',
     'tsx',
     'js',
@@ -19,3 +20,9 @@ module.exports = {
     'jest-serializer-vue',
   ],
 };
+
+// I use these plugins to show hot reloaded test results in vscode:
+// Plugins:
+// - vscode-jest
+// - output colorizer (to colorize the jest output)
+// - output colorizer doesn't work with quokka.js enabled
