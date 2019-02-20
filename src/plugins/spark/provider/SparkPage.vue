@@ -10,7 +10,7 @@ import {
 } from '@/plugins/spark/store/actions';
 import { allBlocks, lastStatus, blockLinks } from '@/plugins/spark/store/getters';
 import { createDashboardItem } from '@/store/dashboards/actions';
-import { allDashboards, itemCopyName } from '@/store/dashboards/getters';
+import { dashboardValues, itemCopyName } from '@/store/dashboards/getters';
 import { Dashboard, DashboardItem } from '@/store/dashboards/state';
 import {
   deletersById,
@@ -49,7 +49,7 @@ export default class SparkPage extends Vue {
   statusCheckInterval: NodeJS.Timeout | null = null;
 
   get dashboards(): Dashboard[] {
-    return allDashboards(this.$store);
+    return dashboardValues(this.$store);
   }
 
   defaultItem(block: Block): DashboardItem {

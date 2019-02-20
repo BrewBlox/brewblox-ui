@@ -7,22 +7,36 @@ import {
 } from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { dashboardValues, primaryDashboardId } from '@/store/dashboards/getters';
 
 @Component({
   props: {
-    onCreate: {
-      type: Function,
-      required: true,
-    },
     dashboardId: {
       type: String,
       required: false,
     },
   },
 })
-export default class NewWidgetWizard extends Vue {
+export default class WidgetWizardPicker extends Vue {
   featureId: string = '';
   searchModel: string = '';
+
+  _chosenDashboardId: string = '';
+
+  get chosenDashboardId() {
+    return this._chosenDashboardId
+      || this.$props.dashboardId
+      || primaryDashboardId(this.$store);
+  }
+
+  set chosenDashboardId(id: string) {
+    this._chosenDashboardId = id;
+  }
+
+  get dashboardOptions() {
+    return dashboardValues(this.$store)
+      .map(dash => ({ label: dash.title, value: dash.id }));
+  }
 
   get wizardOptions() {
     return featureIds(this.$store)
@@ -64,7 +78,7 @@ export default class NewWidgetWizard extends Vue {
         :is="wizardComponent"
         :feature-id="featureId"
         :dashboard-id="dashboardId"
-        :on-cancel="reset"
+        @close="reset"
       />
     </q-card>
     <!-- Select a wizard -->
@@ -74,6 +88,13 @@ export default class NewWidgetWizard extends Vue {
       </q-card-title>
       <q-card-main>
         <q-list no-border>
+          <q-item>
+            <q-select
+              v-model="chosenDashboardId"
+              :options="dashboardOptions"
+              float-label="Dashboard"
+            />
+          </q-item>
           <q-item>
             <q-search v-model="searchModel" placeholder="Search"/>
           </q-item>

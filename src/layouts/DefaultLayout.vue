@@ -1,5 +1,5 @@
 <script lang="ts">
-import NewServiceWizard from '@/components/Wizard/NewServiceWizard.vue';
+import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
 import { objectSorter } from '@/helpers/functional';
 import {
   createDashboard,
@@ -9,8 +9,8 @@ import {
   saveDashboard,
 } from '@/store/dashboards/actions';
 import {
-  allDashboards,
-  primaryDashboard,
+  dashboardValues,
+  primaryDashboardId,
 } from '@/store/dashboards/getters';
 import { Dashboard } from '@/store/dashboards/state';
 import {
@@ -27,7 +27,7 @@ import draggable from 'vuedraggable';
 @Component({
   components: {
     draggable,
-    NewServiceWizard,
+    ServiceWizardPicker,
   },
 })
 export default class DefaultLayout extends Vue {
@@ -35,7 +35,7 @@ export default class DefaultLayout extends Vue {
   dashboardEditing: boolean = false;
   serviceEditing: boolean = false;
   serviceWizardActive: boolean = false;
-  wizardModalOpen: boolean = false;
+  widgetWizardActive: boolean = false;
   $q: any;
 
   get version() {
@@ -43,7 +43,7 @@ export default class DefaultLayout extends Vue {
   }
 
   get dashboards() {
-    return [...allDashboards(this.$store)].sort(objectSorter('order'));
+    return [...dashboardValues(this.$store)].sort(objectSorter('order'));
   }
 
   set dashboards(dashboards: Dashboard[]) {
@@ -51,7 +51,7 @@ export default class DefaultLayout extends Vue {
   }
 
   get defaultDashboard() {
-    return primaryDashboard(this.$store);
+    return primaryDashboardId(this.$store);
   }
 
   get services() {
@@ -136,8 +136,7 @@ export default class DefaultLayout extends Vue {
           <q-item-side icon="home"/>Main menu
         </q-item>
         <q-item-separator/>
-        <q-item @click="wizardModalOpen = true">
-          <q-modal v-model="wizardModalOpen">test</q-modal>
+        <q-item @click.native="widgetWizardActive = true">
           <q-item-side icon="add"/>Wizardry
         </q-item>
         <q-item-separator/>
@@ -248,8 +247,11 @@ export default class DefaultLayout extends Vue {
         </q-item>
       </q-list>
     </q-layout-drawer>
+    <q-modal v-model="widgetWizardActive">
+      <WidgetWizardPicker v-if="widgetWizardActive"/>
+    </q-modal>
     <q-modal v-model="serviceWizardActive">
-      <NewServiceWizard v-if="serviceWizardActive"/>
+      <ServiceWizardPicker v-if="serviceWizardActive"/>
     </q-modal>
     <q-page-container>
       <router-view/>

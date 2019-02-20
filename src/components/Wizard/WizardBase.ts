@@ -22,10 +22,6 @@ export interface NavAction {
       type: String,
       required: false,
     },
-    onCancel: {
-      type: Function,
-      required: true,
-    },
   },
 })
 export default class WizardBase extends Vue {
@@ -53,10 +49,10 @@ export default class WizardBase extends Vue {
     } catch (e) {
       this.$q.notify(`Failed to add widget: ${e.toString()}`);
     }
-    this.$props.onCreate(item);
+    this.$emit('close');
   }
 
   protected cancel(): void {
-    this.$props.onCancel();
+    this.$emit('close');
   }
 }

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { GraphConfig } from '@/components/Graph/state';
-import FormBase from '@/components/Widget/FormBase';
-import WizardBase, { NavAction } from '@/components/Widget/WizardBase';
+import FormBase from '@/components/Form/FormBase';
+import WizardBase, { NavAction } from '@/components/Wizard/WizardBase';
 import { formById } from '@/store/features/getters';
 import Component from 'vue-class-component';
 

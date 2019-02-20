@@ -52,4 +52,3 @@ export default class EditWidget extends WidgetBase { }
   right: 0;
 }
 </style>
-

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { GraphConfig } from '@/components/Graph/state';
 import { nodeBuilder, targetSplitter, targetBuilder } from '@/components/Graph/functional';
-import FormBase from '@/components/Widget/FormBase';
+import FormBase from '@/components/Form/FormBase';
 import { durationString } from '@/helpers/functional';
 import { fetchKnownKeys } from '@/store/history/actions';
 import { fields } from '@/store/history/getters';

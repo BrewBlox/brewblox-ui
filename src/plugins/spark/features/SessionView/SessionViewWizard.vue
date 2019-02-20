@@ -1,5 +1,5 @@
 <script lang="ts">
-import WizardBase, { NavAction } from '@/components/Widget/WizardBase';
+import WizardBase, { NavAction } from '@/components/Wizard/WizardBase';
 import Component from 'vue-class-component';
 
 

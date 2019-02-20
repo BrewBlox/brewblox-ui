@@ -12,7 +12,7 @@ import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
 
 @Component
-export default class NewServiceWizard extends Vue {
+export default class ServiceWizardPicker extends Vue {
   serviceId: string = '';
   serviceTitle: string = '';
   searchModel: string = '';
@@ -106,7 +106,14 @@ export default class NewServiceWizard extends Vue {
 </script>
 
 <template>
-  <div class="layout-padding">
+  <div class="widget-modal column">
+    <q-toolbar>
+      <span class="col row spaced">
+        New Service Wizard
+      </span>
+      <q-btn v-close-overlay flat rounded label="close"/>
+    </q-toolbar>
+
     <q-item v-if="serviceWizardActive">
       <component
         v-if="serviceWizardActive"

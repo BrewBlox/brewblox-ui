@@ -2,7 +2,7 @@
 import Component from 'vue-class-component';
 import shortid from 'shortid';
 import { objectSorter } from '@/helpers/functional';
-import FormBase from '@/components/Widget/FormBase';
+import FormBase from '@/components/Form/FormBase';
 import { nodeBuilder, targetSplitter, targetBuilder } from '@/components/Graph/functional';
 import { SessionViewConfig, Session } from '@/plugins/spark/features/SessionView/state';
 import { durationString } from '@/helpers/functional';

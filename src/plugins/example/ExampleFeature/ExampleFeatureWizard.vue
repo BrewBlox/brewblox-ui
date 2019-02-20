@@ -1,6 +1,6 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import WizardBase, { NavAction } from '@/components/Widget/WizardBase';
+import WizardBase, { NavAction } from '@/components/Wizard/WizardBase';
 
 /*
 We inherit from WizardBase, which defines the properties provided to any wizard.

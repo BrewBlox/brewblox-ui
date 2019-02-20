@@ -1,5 +1,5 @@
 import Component from 'vue-class-component';
-import ItemBase from './ItemBase';
+import ItemBase from '../ItemBase';
 
 @Component({
   props: {

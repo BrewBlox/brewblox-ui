@@ -1,12 +1,12 @@
 <script lang="ts">
-import FormBase from '@/components/Widget/FormBase';
+import FormBase from '@/components/Form/FormBase';
 import { Block } from '@/plugins/spark/state';
 import { createBlock } from '@/plugins/spark/store/actions';
 import { blockIds, blockValues } from '@/plugins/spark/store/getters';
 import { formById } from '@/store/features/getters';
 import { serviceValues } from '@/store/services/getters';
 import { Service } from '@/store/services/state';
-import WizardBase, { NavAction } from '@/components/Widget/WizardBase';
+import WizardBase, { NavAction } from '@/components/Wizard/WizardBase';
 import Component from 'vue-class-component';
 
 @Component

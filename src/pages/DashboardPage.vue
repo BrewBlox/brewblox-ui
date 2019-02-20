@@ -11,7 +11,7 @@ import {
   appendDashboardItem,
 } from '@/store/dashboards/actions';
 import {
-  allDashboards,
+  dashboardValues,
   dashboardById,
   dashboardItemsByDashboardId,
   itemCopyName,
@@ -59,7 +59,7 @@ export default class DashboardPage extends Vue {
   }
 
   get allDashboards() {
-    return allDashboards(this.$store);
+    return dashboardValues(this.$store);
   }
 
   get allItems() {
@@ -216,7 +216,7 @@ export default class DashboardPage extends Vue {
         <q-btn color="primary" icon="add" label="New Widget" @click="() => wizardModalOpen = true"/>
       </portal>
       <q-modal v-model="wizardModalOpen" no-backdrop-dismiss>
-        <NewWidgetWizard v-if="wizardModalOpen" :dashboard-id="dashboardId"/>
+        <WidgetWizardPicker v-if="wizardModalOpen" :dashboard-id="dashboardId"/>
       </q-modal>
       <GridContainer
         :editable="widgetEditable"
