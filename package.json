@@ -20,6 +20,7 @@
     "build": "vue-cli-service build --modern",
     "devbuild": "npm run build && mkdir -p ./dev/dist && rm -r ./dev/dist/*; cp -r ./dist/* ./dev/dist/",
     "test": "vue-cli-service test:unit",
+    "test:watch": "vue-cli-service test:unit --watchAll",
     "e2e": "npm run compose:new && vue-cli-service test:e2e --mode development",
     "lint": "eslint \"src/**/*.{js,ts,vue}\"",
     "fix": "npm run lint -- --fix",
@@ -31,6 +32,7 @@
   },
   "dependencies": {
     "@types/d3": "^5.7.0",
+    "babel-jest": "^24.1.0",
     "d3-selection": "^1.4.0",
     "dagre-d3": "^0.6.3",
     "date-fns": "^1.30.1",
@@ -56,7 +58,8 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.11",
+    "@types/jest": "^23.3.14",
+    "@types/lodash": "^4.14.121",
     "@types/plotly.js": "^1.42.0",
     "@types/pouchdb": "^6.3.2",
     "@types/query-string": "^6.1.1",
@@ -78,6 +81,7 @@
     "dotenv": "^6.2.0",
     "eslint": "^5.12.1",
     "git-describe": "^4.0.3",
+    "jest": "^24.1.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
     "semver": "^5.6.0",
