@@ -4,7 +4,7 @@ import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 
 
 @Component
-export default class BrewPiCfgSettingsTask extends WizardTaskBase {
+export default class BrewPiSettingsTask extends WizardTaskBase {
   mounted() {
     console.log('settings');
     this.finish();

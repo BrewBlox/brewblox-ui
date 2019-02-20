@@ -1,8 +1,9 @@
 import { Block } from '@/plugins/spark/state';
 
 
-export interface BrewPiCfgConfig {
+export interface BrewPiConfig {
   serviceId: string;
+  arrangementId: string;
   dashboardId: string;
   groups: string[];
   names: {

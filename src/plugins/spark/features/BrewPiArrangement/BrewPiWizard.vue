@@ -3,12 +3,12 @@ import WizardBase from '@/components/Wizard/WizardBase';
 import Component from 'vue-class-component';
 
 @Component
-export default class BrewPiConfigurationWizard extends WizardBase {
+export default class BrewPiWizard extends WizardBase {
   get initialTasks() {
     return [
-      'BrewPiCfgNamingTask',
-      'BrewPiCfgHardwareTask',
-      'BrewPiCfgSettingsTask',
+      'BrewPiNamingTask',
+      'BrewPiHardwareTask',
+      'BrewPiSettingsTask',
     ];
   }
 }
