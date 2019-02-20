@@ -12,6 +12,9 @@ export const isSamePart =
 export const partSettings =
   (part: PersistentPart): ComponentSettings => settings[part.type];
 
+export const partTransitions =
+  (part: PersistentPart): Transitions => partSettings(part).transitions(part);
+
 const adjacentPart = (
   allParts: FlowPart[],
   outCoords: string,
@@ -88,6 +91,8 @@ const additionalFlow = (
 
   If all connected parts are explored, and no sink is found, pressure is considered 0.
 */
+
+
 const calculateFromSource = (
   sourcePart: FlowPart,
   allParts: FlowPart[],
@@ -239,7 +244,7 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
 
 
 const translations = (part: PersistentPart): Transitions =>
-  Object.entries(partSettings(part).transitions(part))
+  Object.entries(partTransitions(part))
     .reduce((acc, [inCoords, flows]: [string, any]) => {
       const updatedKey = new Coordinates(inCoords)
         .rotate(part.rotate)
@@ -258,11 +263,8 @@ const translations = (part: PersistentPart): Transitions =>
       {},
     );
 
-
-const asFlowParts =
-  (parts: PersistentPart[]): PersistentPart[] =>
-    parts
-      .map(part => ({ ...part, transitions: translations(part) }));
+export const asFlowParts = (parts: PersistentPart[]): FlowPart[] =>
+  parts.map(part => ({ ...part, transitions: translations(part) }));
 
 export const pathsFromSources = (parts: PersistentPart[]): FlowPart[] => {
   const flowParts = asFlowParts(parts);
@@ -280,4 +282,46 @@ export const pathsFromSources = (parts: PersistentPart[]): FlowPart[] => {
     )) // -> FlowPart[][]
     .reduce(mergeSourceFlows, flowParts) // -> FlowPart[]
     .map(normalizeFlows);
+};
+
+
+
+
+export class FlowSegment {
+  public constructor(part: FlowPart, inCoord: string) {
+    this.root = [part];
+    this.inCoord = inCoord;
+  }
+
+  public root: FlowPart[];
+  public inCoord: string;
+  public children: FlowSegment[] = [];
+
+  public addChild(next: FlowSegment): void {
+    this.children = [...this.children, next];
+  }
+
+  public friction(): number {
+    return 1;
+  }
+}
+
+export const flowPath = (parts: FlowPart[], start: FlowPart, inCoord: string): FlowSegment => {
+  if (!start) {
+    throw ("Start part not found");
+  }
+  const path = new FlowSegment(start, inCoord);
+  const outFlows: FlowRoute[] = get(start, ['transitions', inCoord]);
+
+  if (outFlows) {
+    outFlows.forEach(outFlow => {
+      const nextPart = adjacentPart(parts, outFlow.outCoords, start);
+      if (nextPart) {
+        const nextPath = flowPath(parts, nextPart, outFlow.outCoords);
+        path.addChild(nextPath);
+      }
+    });
+  }
+
+  return path;
 };
