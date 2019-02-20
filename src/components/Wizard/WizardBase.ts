@@ -55,4 +55,8 @@ export default class WizardBase extends Vue {
   protected cancel(): void {
     this.$emit('close');
   }
+
+  protected close(): void {
+    this.$emit('close');
+  }
 }

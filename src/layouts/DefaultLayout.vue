@@ -31,7 +31,7 @@ import draggable from 'vuedraggable';
   },
 })
 export default class DefaultLayout extends Vue {
-  leftDrawerOpen: boolean = false;
+  leftDrawerOpen: boolean = true;
   dashboardEditing: boolean = false;
   serviceEditing: boolean = false;
   serviceWizardActive: boolean = false;

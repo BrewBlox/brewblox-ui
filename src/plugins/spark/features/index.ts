@@ -5,6 +5,7 @@ import ActuatorOffset from './ActuatorOffset';
 import ActuatorPin from './ActuatorPin';
 import ActuatorPwm from './ActuatorPwm';
 import Balancer from './Balancer';
+import BrewPiConfiguration from './BrewPiConfiguration';
 import DisplaySettings from './DisplaySettings';
 import DS2413 from './DS2413';
 import InactiveObject from './InactiveObject';
@@ -25,6 +26,7 @@ const features: { [id: string]: Feature } = {
   ActuatorPin,
   ActuatorPwm,
   Balancer,
+  BrewPiConfiguration,
   DisplaySettings,
   DS2413,
   InactiveObject,
