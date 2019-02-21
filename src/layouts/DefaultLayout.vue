@@ -31,12 +31,11 @@ import draggable from 'vuedraggable';
   },
 })
 export default class DefaultLayout extends Vue {
+  $q: any;
   leftDrawerOpen: boolean = true;
   dashboardEditing: boolean = false;
   serviceEditing: boolean = false;
-  serviceWizardActive: boolean = false;
-  widgetWizardActive: boolean = false;
-  $q: any;
+  wizardModalOpen: boolean = false;
 
   get version() {
     return process.env.GIT_VERSION || 'UNKNOWN';
@@ -72,17 +71,6 @@ export default class DefaultLayout extends Vue {
 
   toggleServiceEditing() {
     this.serviceEditing = !this.serviceEditing;
-  }
-
-  createDashboard() {
-    this.$q.dialog({
-      title: 'Add dashboard',
-      message: 'Enter name of the dashboard',
-      cancel: true,
-      prompt: {
-        model: '',
-      },
-    }).then((name: string) => createDashboard(this.$store, name));
   }
 
   removeDashboard(dashboard: Dashboard) {
@@ -136,25 +124,22 @@ export default class DefaultLayout extends Vue {
           <q-item-side icon="home"/>Main menu
         </q-item>
         <q-item-separator/>
-        <q-item @click.native="widgetWizardActive = true">
+        <q-item @click.native="wizardModalOpen = true">
           <q-item-side icon="add"/>Wizardry
         </q-item>
         <q-item-separator/>
         <!-- dashboards -->
         <q-list-header>
           <q-item-side icon="dashboard"/>Dashboards
-          <q-btn flat round icon="add" label="Add dashboard" @click="createDashboard"/>
-          <q-item-side right>
-            <q-btn
-              :disable="dashboards.length === 0"
-              :flat="!dashboardEditing"
-              :icon="dashboardEditing ? 'check' : 'mode edit'"
-              :color="dashboardEditing ? 'primary': ''"
-              round
-              size="sm"
-              @click="toggleDashboardEditing"
-            />
-          </q-item-side>
+          <q-btn
+            :disable="dashboards.length === 0"
+            :flat="!dashboardEditing"
+            :icon="dashboardEditing ? 'check' : 'mode edit'"
+            :color="dashboardEditing ? 'primary': ''"
+            round
+            size="sm"
+            @click="toggleDashboardEditing"
+          />
         </q-list-header>
         <draggable
           :class="{ editing: dashboardEditing }"
@@ -198,18 +183,15 @@ export default class DefaultLayout extends Vue {
         <q-list-header>
           <q-item-side icon="cloud"/>
           <label>Services</label>
-          <q-btn flat round icon="add" @click="serviceWizardActive = true"/>
-          <q-item-side right>
-            <q-btn
-              :disable="services.length === 0"
-              :flat="!serviceEditing"
-              :icon="serviceEditing ? 'check' : 'mode edit'"
-              :color="serviceEditing ? 'primary': ''"
-              round
-              size="sm"
-              @click="toggleServiceEditing"
-            />
-          </q-item-side>
+          <q-btn
+            :disable="services.length === 0"
+            :flat="!serviceEditing"
+            :icon="serviceEditing ? 'check' : 'mode edit'"
+            :color="serviceEditing ? 'primary': ''"
+            round
+            size="sm"
+            @click="toggleServiceEditing"
+          />
         </q-list-header>
         <draggable
           :class="{ editing: serviceEditing }"
@@ -247,11 +229,8 @@ export default class DefaultLayout extends Vue {
         </q-item>
       </q-list>
     </q-layout-drawer>
-    <q-modal v-model="widgetWizardActive">
-      <WizardPicker v-if="widgetWizardActive"/>
-    </q-modal>
-    <q-modal v-model="serviceWizardActive">
-      <ServiceWizardPicker v-if="serviceWizardActive"/>
+    <q-modal v-model="wizardModalOpen" no-backdrop-dismiss>
+      <WizardPicker v-if="wizardModalOpen"/>
     </q-modal>
     <q-page-container>
       <router-view/>

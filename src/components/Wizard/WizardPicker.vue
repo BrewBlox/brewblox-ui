@@ -26,7 +26,7 @@ export default class WizardPicker extends Vue {
   }
 
   startArrangementWizard() {
-
+    this.wizardComponent = 'ArrangementWizardPicker';
   }
 }
 </script>
@@ -35,12 +35,14 @@ export default class WizardPicker extends Vue {
   <div class="widget-modal column">
     <!-- display wizard -->
     <component v-if="wizardComponent" :is="wizardComponent" class="unpadded fit"/>
+
     <!-- Select a wizard -->
     <q-list v-else no-border>
       <q-toolbar class="unpadded">
         <q-toolbar-title>Select a wizard</q-toolbar-title>
         <q-btn v-close-overlay flat rounded label="close"/>
       </q-toolbar>
+
       <q-card dark class="cursor-pointer" @click.native="startServiceWizard">
         <q-card-title>
           Service
@@ -57,6 +59,7 @@ export default class WizardPicker extends Vue {
           In vel nibh ac mi mollis mollis.
         </q-card-main>
       </q-card>
+
       <q-card dark class="cursor-pointer" @click.native="startDashboardWizard">
         <q-card-title>
           Dashboard
@@ -73,6 +76,7 @@ export default class WizardPicker extends Vue {
           In vel nibh ac mi mollis mollis.
         </q-card-main>
       </q-card>
+
       <q-card dark class="cursor-pointer" @click.native="startWidgetWizard">
         <q-card-title>
           Widget
@@ -89,6 +93,7 @@ export default class WizardPicker extends Vue {
           In vel nibh ac mi mollis mollis.
         </q-card-main>
       </q-card>
+
       <q-card dark class="cursor-pointer" @click.native="startArrangementWizard">
         <q-card-title>
           Arrangement
