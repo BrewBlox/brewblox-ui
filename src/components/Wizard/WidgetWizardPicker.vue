@@ -71,21 +71,22 @@ export default class WidgetWizardPicker extends Vue {
 
 <template>
   <div class="widget-modal column">
+    <q-toolbar class="unpadded">
+      <q-toolbar-title>Create new widget</q-toolbar-title>
+      <q-btn v-close-overlay flat rounded label="close"/>
+    </q-toolbar>
+
     <!-- display wizard -->
-    <q-card v-if="wizardComponent">
-      <component
-        v-if="wizardComponent"
-        :is="wizardComponent"
-        :feature-id="featureId"
-        :dashboard-id="dashboardId"
-        @close="reset"
-      />
-    </q-card>
+    <component
+      v-if="wizardComponent"
+      :is="wizardComponent"
+      :feature-id="featureId"
+      :dashboard-id="dashboardId"
+      @close="reset"
+    />
+
     <!-- Select a wizard -->
     <q-card v-else dark>
-      <q-card-title>Create new widget
-        <q-btn v-close-overlay slot="right" flat dense icon="clear" label="Cancel"/>
-      </q-card-title>
       <q-card-main>
         <q-list no-border>
           <q-item>

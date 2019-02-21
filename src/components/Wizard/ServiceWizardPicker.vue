@@ -108,21 +108,19 @@ export default class ServiceWizardPicker extends Vue {
 <template>
   <div class="widget-modal column">
     <q-toolbar>
-      <span class="col row spaced">
-        New Service Wizard
-      </span>
+      <span class="col row spaced">New Service Wizard</span>
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
 
-    <q-item v-if="serviceWizardActive">
-      <component
-        v-if="serviceWizardActive"
-        :is="serviceWizard"
-        :service-id="serviceId"
-        :on-create="onCreate"
-        :on-cancel="onCancel"
-      />
-    </q-item>
+    <!-- Display selected wizard -->
+    <component
+      v-if="serviceWizardActive"
+      :is="serviceWizard"
+      :service-id="serviceId"
+      :on-create="onCreate"
+      :on-cancel="onCancel"
+    />
+
     <!-- Select a wizard -->
     <q-item v-else>
       <q-field label="Service ID" icon="create" orientation="vertical">
