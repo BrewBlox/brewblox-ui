@@ -16,9 +16,8 @@ const propertyWalker = (acc: any[], next: FlowSegment, prop: string[]): any[] =>
   }
   let subtree: TypeList[] = [];
   next.children.forEach((child) => {
-    subtree = [...subtree, ...propertyWalker([], child, prop)]; // split
+    subtree.push(propertyWalker([], child, prop)); // split
   });
-  console.log(subtree);
   return [...acc, subtree];
 };
 
@@ -52,8 +51,6 @@ describe('Data describing an input tube', () => {
       });
   });
 });
-
-
 
 
 describe('asFlowParts', () => {
@@ -118,6 +115,9 @@ describe('A single path without splits', () => {
     const start = parts[0];
 
     const path = flowPath(parts, start, "1.5,2.5");
+    if (path === null) {
+      throw ("no path found");
+    }
     let walker: FlowSegment = path;
     let pathTypes: string[] = ['InputTube'];
     while (true) {
@@ -125,7 +125,7 @@ describe('A single path without splits', () => {
         break; // end of path
       }
       expect(walker.children).toHaveLength(1);
-      pathTypes.push(walker.children[0].root[0].type);
+      pathTypes.push(walker.children[0].root.type);
       walker = walker.children[0];
     }
     expect(pathTypes).toEqual(['InputTube', 'StraightTube', 'OutputTube']);
@@ -173,16 +173,23 @@ describe('A path with a split', () => {
     const start = parts[0];
 
     const path = flowPath(parts, start, "1.5,2.5");
+    if (path === null) {
+      throw ("no path found");
+    }
 
-    const visitedTypes = propertyWalker([], path, ['root', '0', 'type']);
+    const visitedTypes = propertyWalker([], path, ['root', 'type']);
     expect(visitedTypes).toEqual(
       [
         'InputTube',
         'StraightTube',
         'TeeTube',
         [
-          'OutputTube',
-          'OutputTube',
+          [
+            'OutputTube',
+          ],
+          [
+            'OutputTube',
+          ],
         ],
       ]);
 
@@ -193,8 +200,127 @@ describe('A path with a split', () => {
         "2,2.5",
         "3,2.5",
         [
-          "3.5,2",
-          "3.5,3",
+          [
+            "3.5,2",
+          ]
+          , [
+            "3.5,3",
+          ],
+        ],
+      ]);
+  });
+});
+
+
+describe('A path that splits and rejoins', () => {
+  const createParts = (): PersistentPart[] => ([
+    {
+
+      x: 1,
+      y: 2,
+      rotate: 0,
+      type: 'InputTube',
+    },
+    {
+      x: 2,
+      y: 2,
+      rotate: 0,
+      type: 'StraightTube',
+    },
+    {
+      x: 3,
+      y: 2,
+      rotate: 270,
+      type: 'TeeTube',
+    },
+    {
+      x: 3,
+      y: 1,
+      rotate: 90,
+      type: 'ElbowTube',
+    },
+    {
+      x: 3,
+      y: 3,
+      rotate: 0,
+      type: 'ElbowTube',
+    },
+    {
+      x: 4,
+      y: 1,
+      rotate: 180,
+      type: 'ElbowTube',
+    },
+    {
+      x: 4,
+      y: 3,
+      rotate: 270,
+      type: 'ElbowTube',
+    },
+    {
+      x: 4,
+      y: 2,
+      rotate: 90,
+      type: 'TeeTube',
+    },
+    {
+      x: 5,
+      y: 2,
+      rotate: 0,
+      type: 'OutputTube',
+    },
+  ]);
+
+  it('Should return a forking and rejoining path', () => {
+    const parts = asFlowParts(createParts());
+    const start = parts[0];
+
+    const path = flowPath(parts, start, "1.5,2.5");
+    if (path === null) {
+      throw ("no path found");
+    }
+    const visitedTypes = propertyWalker([], path, ['root', 'type']);
+    console.log(JSON.stringify(visitedTypes));
+    expect(visitedTypes).toEqual(
+      [
+        'InputTube',
+        'StraightTube',
+        'TeeTube',
+        [
+          [
+            'ElbowTube',
+            'ElbowTube',
+            'TeeTube',
+            'OutputTube',
+          ],
+          [
+            'ElbowTube',
+            'ElbowTube',
+            'TeeTube',
+            'OutputTube',
+          ],
+        ],
+      ]);
+
+    const visitedInCoords = propertyWalker([], path, ['inCoord']);
+    expect(visitedInCoords).toEqual(
+      [
+        "1.5,2.5",
+        "2,2.5",
+        "3,2.5",
+        [
+          [
+            "3.5,2",
+            "4,1.5",
+            "4.5,2",
+            "5,2.5",
+          ],
+          [
+            "3.5,3",
+            "4,3.5",
+            "4.5,3",
+            "5,2.5",
+          ],
         ],
       ]);
   });

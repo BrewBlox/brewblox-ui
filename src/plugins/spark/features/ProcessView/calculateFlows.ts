@@ -289,11 +289,11 @@ export const pathsFromSources = (parts: PersistentPart[]): FlowPart[] => {
 
 export class FlowSegment {
   public constructor(part: FlowPart, inCoord: string) {
-    this.root = [part];
+    this.root = part;
     this.inCoord = inCoord;
   }
 
-  public root: FlowPart[];
+  public root: FlowPart;
   public inCoord: string;
   public children: FlowSegment[] = [];
 
@@ -306,22 +306,33 @@ export class FlowSegment {
   }
 }
 
-export const flowPath = (parts: FlowPart[], start: FlowPart, inCoord: string): FlowSegment => {
+export const flowPath = (parts: FlowPart[], start: FlowPart, inCoord: string): FlowSegment | null=> {
   if (!start) {
     throw ("Start part not found");
   }
   const path = new FlowSegment(start, inCoord);
   const outFlows: FlowRoute[] = get(start, ['transitions', inCoord]);
 
+  const candidateParts = parts
+    .filter(candidate => !isSamePart(start, candidate) || partSettings(candidate).isBridge);
+
+  if(start.type === 'OutputTube'){
+    return path;
+  }
+
   if (outFlows) {
     outFlows.forEach(outFlow => {
-      const nextPart = adjacentPart(parts, outFlow.outCoords, start);
+      const nextPart = adjacentPart(candidateParts, outFlow.outCoords, start);
       if (nextPart) {
-        const nextPath = flowPath(parts, nextPart, outFlow.outCoords);
-        path.addChild(nextPath);
+        const nextPath = flowPath(candidateParts, nextPart, outFlow.outCoords);
+        if(nextPath !== null){
+          path.addChild(nextPath);
+        }
       }
     });
   }
-
+  if(path.children.length === 0){
+    return null;
+  }
   return path;
 };
