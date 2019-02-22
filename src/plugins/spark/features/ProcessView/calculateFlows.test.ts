@@ -4,21 +4,21 @@ import { CENTER, DEFAULT_FRICTION, DEFAULT_DELTA_PRESSURE, COLD_WATER, MIXED_LIQ
 import get from 'lodash/get';
 
 
-type TypeList = string | any[];
+type StringList = string | any[];
 
 const propertyWalker = (acc: any[], next: FlowSegment, prop: string[]): any[] => {
   acc = [...acc, get(next, prop)];
-  if (next.children.length === 0) {
-    return acc; // end of path
-  }
-  if (next.children.length === 1) {
-    return [...acc, ...propertyWalker([], next.children[0], prop)];  // no split
-  }
-  let subtree: TypeList[] = [];
-  next.children.forEach((child) => {
-    subtree.push(propertyWalker([], child, prop)); // split
+  let subtree: StringList[] = [];
+  next.splits.forEach((child) => {
+    subtree.push(propertyWalker([], child, prop)); // splits
   });
-  return [...acc, subtree];
+  if (subtree.length !== 0) {
+    acc = [...acc, subtree];
+  }
+  if (next.next !== null) {
+    acc = [...acc, ...propertyWalker([], next.next, prop)];
+  }
+  return acc;
 };
 
 
@@ -47,7 +47,7 @@ describe('Data describing an input tube', () => {
   it('can resolve to transitions', () => {
     expect(partTransitions(createInput())).toEqual(
       {
-        "0.5,0.5": [{ outCoords: "1,0.5" }],
+        '0.5,0.5': [{ outCoords: '1,0.5' }],
       });
   });
 });
@@ -110,30 +110,30 @@ describe('A single path without splits', () => {
     },
   ]);
 
-  it('Should have a only one child at each node', () => {
+  it('Should have no splits', () => {
     const parts = asFlowParts(createParts());
     const start = parts[0];
 
-    const path = flowPath(parts, start, "1.5,2.5");
+    const path = flowPath(parts, start, '1.5,2.5');
     if (path === null) {
-      throw ("no path found");
+      throw ('no path found');
     }
     let walker: FlowSegment = path;
     let pathTypes: string[] = ['InputTube'];
     while (true) {
-      if (walker.children.length === 0) {
+      if (walker.next === null) {
         break; // end of path
       }
-      expect(walker.children).toHaveLength(1);
-      pathTypes.push(walker.children[0].root.type);
-      walker = walker.children[0];
+      expect(walker.splits).toHaveLength(0);
+      pathTypes.push(walker.next.root.type);
+      walker = walker.next;
     }
     expect(pathTypes).toEqual(['InputTube', 'StraightTube', 'OutputTube']);
   });
 });
 
 
-describe('A path with a split', () => {
+describe('A path with a split, but no joins', () => {
   const createParts = (): PersistentPart[] => ([
     {
 
@@ -168,13 +168,13 @@ describe('A path with a split', () => {
     },
   ]);
 
-  it('Should return a nested path', () => {
+  it('Should return a forking path', () => {
     const parts = asFlowParts(createParts());
     const start = parts[0];
 
-    const path = flowPath(parts, start, "1.5,2.5");
+    const path = flowPath(parts, start, '1.5,2.5');
     if (path === null) {
-      throw ("no path found");
+      throw ('no path found');
     }
 
     const visitedTypes = propertyWalker([], path, ['root', 'type']);
@@ -193,18 +193,18 @@ describe('A path with a split', () => {
         ],
       ]);
 
-    const visitedInCoords = propertyWalker([], path, ['inCoord']);
+    const visitedInCoords = propertyWalker([], path, ['inCoords']);
     expect(visitedInCoords).toEqual(
       [
-        "1.5,2.5",
-        "2,2.5",
-        "3,2.5",
+        ['1.5,2.5'],
+        ['2,2.5'],
+        ['3,2.5'],
         [
           [
-            "3.5,2",
+            ['3.5,2'],
           ]
           , [
-            "3.5,3",
+            ['3.5,3'],
           ],
         ],
       ]);
@@ -212,7 +212,7 @@ describe('A path with a split', () => {
 });
 
 
-describe('A path that splits and rejoins', () => {
+describe('A path that forks and rejoins', () => {
   const createParts = (): PersistentPart[] => ([
     {
 
@@ -275,12 +275,12 @@ describe('A path that splits and rejoins', () => {
     const parts = asFlowParts(createParts());
     const start = parts[0];
 
-    const path = flowPath(parts, start, "1.5,2.5");
+    const path = flowPath(parts, start, '1.5,2.5');
     if (path === null) {
-      throw ("no path found");
+      throw ('no path found');
     }
     const visitedTypes = propertyWalker([], path, ['root', 'type']);
-    console.log(JSON.stringify(visitedTypes));
+
     expect(visitedTypes).toEqual(
       [
         'InputTube',
@@ -290,38 +290,35 @@ describe('A path that splits and rejoins', () => {
           [
             'ElbowTube',
             'ElbowTube',
-            'TeeTube',
-            'OutputTube',
           ],
           [
             'ElbowTube',
             'ElbowTube',
-            'TeeTube',
-            'OutputTube',
           ],
         ],
+        'TeeTube',
+        'OutputTube',
       ]);
 
-    const visitedInCoords = propertyWalker([], path, ['inCoord']);
+    const visitedInCoords = propertyWalker([], path, ['inCoords']);
     expect(visitedInCoords).toEqual(
       [
-        "1.5,2.5",
-        "2,2.5",
-        "3,2.5",
+        ['1.5,2.5'],
+        ['2,2.5'],
+        ['3,2.5'],
         [
           [
-            "3.5,2",
-            "4,1.5",
-            "4.5,2",
-            "5,2.5",
+            ['3.5,2'],
+            ['4,1.5'],
           ],
           [
-            "3.5,3",
-            "4,3.5",
-            "4.5,3",
-            "5,2.5",
+            ['3.5,3'],
+            ['4,3.5'],
           ],
         ],
+        ['4.5,2', '4.5,3'],
+        ['5,2.5'],
       ]);
   });
 });
+

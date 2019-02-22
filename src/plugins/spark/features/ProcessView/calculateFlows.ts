@@ -4,6 +4,7 @@ import { Coordinates } from '@/helpers/coordinates';
 import settings from './settings';
 import has from 'lodash/has';
 import get from 'lodash/get';
+import omit from 'lodash/omit';
 
 export const isSamePart =
   (left: PersistentPart, right: PersistentPart): boolean =>
@@ -199,32 +200,6 @@ const mergeSourceFlows = (allParts: FlowPart[], sourceFlow: FlowPart[]): FlowPar
     allParts,
   );
 
-/*
-  Correct calculated pressure for display in the part component.
-
-  Example:
-
-  A straight tube component defines flows as:
-  {
-    [LEFT]: [{ outCoords: RIGHT, friction: 1 }],
-    [RIGHT]: [{ outCoords: LEFT, friction: 1 }],
-  }
-
-  If we connect it, and rotate it by 90 degrees, calculateFromSource may yield:
-  {
-    [UP]: 5,
-    [DOWN]: -5
-  }
-
-  The parts will be rendered at rotation=0, and then rotated in their entirety.
-  To enable this, we must match translate inCoords of calculated pressure to what it would be at rotation=0.
-
-  Desired output:
-  {
-    [LEFT]: 5,
-    [RIGHT]: -5,
-  }
-*/
 const normalizeFlows = (part: FlowPart): FlowPart => {
   if (!part.calculated) {
     return { ...part, calculated: {} };
@@ -284,29 +259,87 @@ export const pathsFromSources = (parts: PersistentPart[]): FlowPart[] => {
     .map(normalizeFlows);
 };
 
-
-
-
 export class FlowSegment {
   public constructor(part: FlowPart, inCoord: string) {
     this.root = part;
-    this.inCoord = inCoord;
+    this.inCoords = [inCoord];
   }
 
+  public inCoords: string[];
   public root: FlowPart;
-  public inCoord: string;
-  public children: FlowSegment[] = [];
+  public splits: FlowSegment[] = [];
+  public next: FlowSegment | null = null;
 
-  public addChild(next: FlowSegment): void {
-    this.children = [...this.children, next];
+  public addChild(segment: FlowSegment): void {
+    if (this.splits.length == 0) {
+      if (this.next !== null) {
+        this.splits.push(this.next); // move next to splits
+        this.splits.push(segment); // add other segment to splits
+        this.next = null; // set next to null for no shared next
+      }
+      else {
+        this.next = segment;
+      }
+    }
+    else {
+      this.splits.push(segment);
+    }
   }
 
   public friction(): number {
     return 1;
   }
+
+  public reduceSegments(func: (acc: any, segment: FlowSegment) => any, acc: any): any {
+    acc = func(acc, this);
+    this.splits.forEach((child) => {
+      acc = child.reduceSegments(func, acc);
+    });
+    if (this.next !== null) {
+      acc = func(acc, this.next);
+    }
+  };
+
+  public isSameSegment(other: FlowSegment): boolean {
+    return JSON.stringify(omit(this, 'inCoords')) === JSON.stringify(omit(other, 'inCoords'));
+  }
+
+  public leafSegments(): FlowSegment[] {
+    if (this.splits.length !== 0) {
+      return this.splits.reduce((acc, child) => [...acc, ...child.leafSegments()], new Array<FlowSegment>());
+    }
+    if (this.next !== null) {
+      return this.next.leafSegments();
+    }
+    return [this];
+  }
+
+  public removeLeafSegment(segment: FlowSegment): void {
+    this.splits.forEach((child) => child.removeLeafSegment(segment));
+    if (this.next !== null) {
+      if (this.next.isSameSegment(segment)) {
+        this.next = null;
+        return;
+      }
+      else {
+        this.next.removeLeafSegment(segment);
+      }
+    }
+  }
+
+  public popDuplicatedLeaves(): FlowSegment | null {
+    const leaves = this.leafSegments();
+    if (leaves.length !== 0 && leaves.every(v => v.isSameSegment(leaves[0]))) {
+      const combinedInCoords = leaves.reduce((acc: string[], leaf) => ([...acc, ...leaf.inCoords]), []);
+      leaves[0].inCoords = [...new Set(combinedInCoords)]; // use Set to remove duplicates
+      this.removeLeafSegment(leaves[0]);
+      return leaves[0];
+    }
+    return null;
+  }
 }
 
-export const flowPath = (parts: FlowPart[], start: FlowPart, inCoord: string): FlowSegment | null=> {
+export const flowPath = (parts: FlowPart[], start: FlowPart, inCoord: string): FlowSegment | null => {
   if (!start) {
     throw ("Start part not found");
   }
@@ -316,7 +349,7 @@ export const flowPath = (parts: FlowPart[], start: FlowPart, inCoord: string): F
   const candidateParts = parts
     .filter(candidate => !isSamePart(start, candidate) || partSettings(candidate).isBridge);
 
-  if(start.type === 'OutputTube'){
+  if (start.type === 'OutputTube') {
     return path;
   }
 
@@ -325,14 +358,35 @@ export const flowPath = (parts: FlowPart[], start: FlowPart, inCoord: string): F
       const nextPart = adjacentPart(candidateParts, outFlow.outCoords, start);
       if (nextPart) {
         const nextPath = flowPath(candidateParts, nextPart, outFlow.outCoords);
-        if(nextPath !== null){
+        if (nextPath !== null) {
           path.addChild(nextPath);
         }
       }
     });
   }
-  if(path.children.length === 0){
+  if (path.splits.length === 0 && path.next === null) {
     return null;
+  }
+
+  while (true) {
+    if (path.splits.length !== 0) {
+      const duplicated = path.popDuplicatedLeaves();
+      if (duplicated !== null) {
+        if (path.next === null) {
+          path.next = duplicated;
+        }
+        else {
+          duplicated.addChild(path.next);
+          path.next = duplicated;
+        }
+      }
+      else {
+        return path;
+      }
+    }
+    else {
+      break;
+    }
   }
   return path;
 };
