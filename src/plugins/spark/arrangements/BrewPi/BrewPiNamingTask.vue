@@ -1,17 +1,207 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
+import { serviceValues } from '@/store/services/getters';
+import { typeName } from '@/plugins/spark/store/getters';
+import { BrewPiConfig, BrewPiConfigNames } from '@/plugins/spark/arrangements/BrewPi/state';
+import { spaceCased, valOrDefault } from '@/helpers/functional';
 
 
 @Component
 export default class BrewPiNamingTask extends WizardTaskBase {
-  mounted() {
-    console.log('naming');
+  chosenNames: Partial<BrewPiConfigNames> = {};
+
+  get cfg(): BrewPiConfig {
+    return this.stagedConfig;
+  }
+
+  get serviceOpts() {
+    return serviceValues(this.$store)
+      .filter(svc => svc.type === typeName)
+      .map(svc => ({ label: svc.title, value: svc.id }));
+  }
+
+  get serviceId() {
+    let id = this.cfg.serviceId;
+    if (!id && this.serviceOpts.length > 0) {
+      id = this.serviceOpts[0].value;
+    }
+    return id;
+  }
+
+  set serviceId(id: string) {
+    this.updateConfig({ ...this.cfg, serviceId: id });
+  }
+
+  get arrangementId() {
+    return valOrDefault(this.cfg.arrangementId, 'BrewPi');
+  }
+
+  set arrangementId(id: string) {
+    this.updateConfig({ ...this.cfg, arrangementId: id });
+  }
+
+  get prefix() {
+    return valOrDefault(this.cfg.prefix, this.arrangementId.slice(0, 6));
+  }
+
+  set prefix(prefix: string) {
+    this.updateConfig({ ...this.cfg, prefix });
+  }
+
+  get dashboardId() {
+    return valOrDefault(this.cfg.dashboardId, `${this.arrangementId} Dashboard`);
+  }
+
+  set dashboardId(id: string) {
+    this.updateConfig({ ...this.cfg, dashboardId: id });
+  }
+
+  get groups() {
+    return valOrDefault(this.cfg.groups, [0]);
+  }
+
+  set groups(groups: number[]) {
+    this.updateConfig({ ...this.cfg, groups });
+  }
+
+  get defaultNames(): BrewPiConfigNames {
+    return {
+      fridgeSensor: `${this.prefix} fridge sensor`,
+      beerSensor: `${this.prefix} beer sensor`,
+      fridgeSetpoint: `${this.prefix} fridge setpoint`,
+      beerSetpoint: `${this.prefix} beer setpoint`,
+      fridgeSSPair: `${this.prefix} fridge SSPair`,
+      beerSSPair: `${this.prefix} beer SSPair`,
+      coolPin: `${this.prefix} cool pin`,
+      heatPin: `${this.prefix} heat pin`,
+      coolPwm: `${this.prefix} cool PWM`,
+      heatPwm: `${this.prefix} heat PWM`,
+      mutex: `${this.prefix} mutex`,
+      coolPid: `${this.prefix} cool PID`,
+      heatPid: `${this.prefix} heat PID`,
+      beerPid: `${this.prefix} beer PID`,
+      fridgeOffset: `${this.prefix} fridge offset`,
+    };
+  }
+
+  get names(): BrewPiConfigNames {
+    return {
+      ...this.defaultNames,
+      ...this.chosenNames,
+    };
+  }
+
+  get valuesOk() {
+    return [
+      this.dashboardId,
+      ...Object.values(this.names),
+    ]
+      .find(v => !v) === undefined;
+  }
+
+  updateName(key: string, val: string) {
+    console.log(key, val);
+    this.$set(this.chosenNames, key, val.trim());
+  }
+
+  clearKey(key: string) {
+    delete this.cfg[key];
+    this.updateConfig(this.cfg);
+  }
+
+  clearName(key: string) {
+    this.$delete(this.chosenNames, key);
+  }
+
+  spaceCased(s: string) {
+    return spaceCased(s);
+  }
+
+  next() {
+    this.updateConfig({
+      ...this.cfg,
+      serviceId: this.serviceId,
+      arrangementId: this.arrangementId,
+      dashboardId: this.dashboardId,
+      groups: this.groups,
+      names: this.names,
+      blocks: {},
+      createdBlocks: [],
+      renamedBlocks: {},
+    });
+    this.pushTask('BrewPiHardwareTask');
     this.finish();
   }
 }
 </script>
 
 <template>
-  <div/>
+  <q-card dark>
+    <q-card-actions align="end">
+      <q-btn :disable="!valuesOk" label="Next" color="primary" @click="next"/>
+    </q-card-actions>
+    <q-card-main class="row">
+      <div>
+        <q-item>
+          <big>Arrangement</big>
+        </q-item>
+        <q-list no-border>
+          <q-item>
+            <q-select v-model="serviceId" :options="serviceOpts" float-label="Service"/>
+          </q-item>
+          <q-item>
+            <q-input
+              v-model="arrangementId"
+              :after="[{icon: 'mdi-backup-restore', handler: () => clearKey('arrangementId')}]"
+              float-label="Arrangement name"
+            />
+          </q-item>
+          <q-item>
+            <q-input
+              v-model="prefix"
+              :after="[{icon: 'mdi-backup-restore', handler: () => clearKey('prefix')}]"
+              float-label="Widget prefix"
+            />
+          </q-item>
+          <q-item>
+            <q-input
+              v-model="dashboardId"
+              :error="!dashboardId"
+              :after="[{icon: 'mdi-backup-restore', handler: () => clearKey('dashboardId')}]"
+              float-label="Dashboard"
+            />
+          </q-item>
+          <q-item>
+            <q-field label="Groups" orientation="vertical" style="max-width: 200px;">
+              <GroupsPopupEdit
+                v-if="serviceId"
+                :field="groups"
+                :service-id="serviceId"
+                :change="v => groups = v"
+                display="span"
+              />
+              <label v-else>No service selected</label>
+            </q-field>
+          </q-item>
+        </q-list>
+      </div>
+      <div>
+        <q-item>
+          <big>Widget Names</big>
+        </q-item>
+        <q-list no-border>
+          <q-item v-for="(nVal, nKey) in names" :key="nKey">
+            <q-input
+              :value="nVal"
+              :error="!nVal"
+              :float-label="spaceCased(nKey)"
+              :after="[{icon: 'mdi-backup-restore', handler: () => clearName(nKey)}]"
+              @change="v => updateName(nKey, v)"
+            />
+          </q-item>
+        </q-list>
+      </div>
+    </q-card-main>
+  </q-card>
 </template>

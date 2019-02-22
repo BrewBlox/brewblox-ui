@@ -6,11 +6,11 @@ import { blockIds, blockValues } from '@/plugins/spark/store/getters';
 import { formById } from '@/store/features/getters';
 import { serviceValues } from '@/store/services/getters';
 import { Service } from '@/store/services/state';
-import WizardBase, { NavAction } from '@/components/Wizard/WizardBase';
+import WidgetWizardBase, { NavAction } from '@/components/Wizard/WidgetWizardBase';
 import Component from 'vue-class-component';
 
 @Component
-export default class BlockWizard extends WizardBase {
+export default class BlockWizard extends WidgetWizardBase {
   currentStep: string = '';
   blockAction: 'create' | 'existing' | null = null;
 

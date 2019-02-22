@@ -7,6 +7,7 @@ import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 export default class BrewPiHardwareTask extends WizardTaskBase {
   mounted() {
     console.log('hardware');
+    this.pushTask('BrewPiSettingsTask');
     this.finish();
   }
 }

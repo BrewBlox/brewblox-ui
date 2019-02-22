@@ -24,7 +24,7 @@ export interface NavAction {
     },
   },
 })
-export default class WizardBase extends Vue {
+export default class WidgetWizardBase extends Vue {
   protected $q: any;
 
   protected get typeId(): string {

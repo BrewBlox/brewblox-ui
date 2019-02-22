@@ -10,6 +10,10 @@ import { WizardAction } from '@/components/Wizard/WizardTaskBase';
       type: Array,
       required: true,
     },
+    initialConfig: {
+      type: Object,
+      default: () => ({}),
+    },
   },
 })
 export default class WizardTaskMaster extends Vue {
@@ -39,6 +43,7 @@ export default class WizardTaskMaster extends Vue {
 
   created() {
     this.tasks = [...this.$props.initialTasks];
+    this.config = { ...this.$props.initialConfig };
     this.nextTask();
   }
 

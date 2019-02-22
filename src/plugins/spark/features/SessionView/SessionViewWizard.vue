@@ -1,10 +1,10 @@
 <script lang="ts">
-import WizardBase, { NavAction } from '@/components/Wizard/WizardBase';
+import WidgetWizardBase, { NavAction } from '@/components/Wizard/WidgetWizardBase';
 import Component from 'vue-class-component';
 
 
 @Component
-export default class SessionViewWizard extends WizardBase {
+export default class SessionViewWizard extends WidgetWizardBase {
   currentStep: string = '';
   widgetId: string = '';
 

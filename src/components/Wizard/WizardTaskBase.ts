@@ -31,7 +31,7 @@ export default class WizardTaskBase extends Vue {
   protected $q: any;
 
   protected get stagedConfig(): any {
-    return this.$props.stagedConfig();
+    return this.$props.config;
   }
 
   protected get stagedActions(): WizardAction[] {

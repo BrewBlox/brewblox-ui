@@ -1,13 +1,13 @@
 <script lang="ts">
 import { GraphConfig } from '@/components/Graph/state';
 import FormBase from '@/components/Form/FormBase';
-import WizardBase, { NavAction } from '@/components/Wizard/WizardBase';
+import WidgetWizardBase, { NavAction } from '@/components/Wizard/WidgetWizardBase';
 import { formById } from '@/store/features/getters';
 import Component from 'vue-class-component';
 
 
 @Component
-export default class GraphWizard extends WizardBase {
+export default class GraphWizard extends WidgetWizardBase {
   currentStep: string = '';
   widgetId: string = '';
   graphCfg: GraphConfig | null = null;
