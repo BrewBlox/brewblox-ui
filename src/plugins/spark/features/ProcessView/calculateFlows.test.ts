@@ -110,14 +110,15 @@ describe('A single path without splits', () => {
     },
   ]);
 
-  it('Should have no splits', () => {
-    const parts = asFlowParts(createParts());
-    const start = parts[0];
+  const parts = asFlowParts(createParts());
+  const start = parts[0];
 
-    const path = flowPath(parts, start, '1.5,2.5');
-    if (path === null) {
-      throw ('no path found');
-    }
+  const path = flowPath(parts, start, '1.5,2.5');
+  if (path === null) {
+    throw ('no path found');
+  }
+
+  it('Should have no splits', () => {
     let walker: FlowSegment = path;
     let pathTypes: string[] = ['InputTube'];
     while (true) {
@@ -129,6 +130,10 @@ describe('A single path without splits', () => {
       walker = walker.next;
     }
     expect(pathTypes).toEqual(['InputTube', 'StraightTube', 'OutputTube']);
+  });
+
+  it('Should have a friction value of 3', () => {
+    expect(path.friction()).toEqual(3);
   });
 });
 
@@ -168,14 +173,15 @@ describe('A path with a split, but no joins', () => {
     },
   ]);
 
-  it('Should return a forking path', () => {
-    const parts = asFlowParts(createParts());
-    const start = parts[0];
+  const parts = asFlowParts(createParts());
+  const start = parts[0];
 
-    const path = flowPath(parts, start, '1.5,2.5');
-    if (path === null) {
-      throw ('no path found');
-    }
+  const path = flowPath(parts, start, '1.5,2.5');
+  if (path === null) {
+    throw ('no path found');
+  }
+
+  it('Should return a forking path', () => {
 
     const visitedTypes = propertyWalker([], path, ['root', 'type']);
     expect(visitedTypes).toEqual(
@@ -208,6 +214,10 @@ describe('A path with a split, but no joins', () => {
           ],
         ],
       ]);
+  });
+
+  it('Should have a friction value of 3.5', () => {
+    expect(path.friction()).toEqual(3.5);
   });
 });
 
@@ -271,14 +281,16 @@ describe('A path that forks and rejoins', () => {
     },
   ]);
 
-  it('Should return a forking and rejoining path', () => {
-    const parts = asFlowParts(createParts());
-    const start = parts[0];
+  const parts = asFlowParts(createParts());
+  const start = parts[0];
 
-    const path = flowPath(parts, start, '1.5,2.5');
-    if (path === null) {
-      throw ('no path found');
-    }
+  const path = flowPath(parts, start, '1.5,2.5');
+  if (path === null) {
+    throw ('no path found');
+  }
+
+  it('Should return a forking and rejoining path', () => {
+
     const visitedTypes = propertyWalker([], path, ['root', 'type']);
 
     expect(visitedTypes).toEqual(
@@ -319,6 +331,10 @@ describe('A path that forks and rejoins', () => {
         ['4.5,2', '4.5,3'],
         ['5,2.5'],
       ]);
+  });
+
+  it('Should have a friction value of 6', () => {
+    expect(path.friction()).toEqual(6);
   });
 });
 

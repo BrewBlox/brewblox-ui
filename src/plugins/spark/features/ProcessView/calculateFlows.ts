@@ -287,7 +287,21 @@ export class FlowSegment {
   }
 
   public friction(): number {
-    return 1;
+    let series = 1;
+    let parallel = 0;
+    this.splits.forEach(splitPath => {
+      const splitFriction = splitPath.friction();
+      if (parallel === 0) {
+        parallel = splitFriction;
+      }
+      else {
+        parallel = parallel * splitFriction / (parallel + splitFriction);
+      }
+    });
+    if (this.next !== null) {
+      series += this.next.friction();
+    }
+    return parallel + series;
   }
 
   public reduceSegments(func: (acc: any, segment: FlowSegment) => any, acc: any): any {
