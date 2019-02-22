@@ -241,7 +241,7 @@ export default class SparkPage extends Vue {
       <q-modal v-model="modalOpen" no-backdrop-dismiss>
         <component v-if="modalOpen" :is="modalSettings.component" v-bind="modalSettings.props"/>
       </q-modal>
-      <q-modal v-model="relationsModalOpen">
+      <q-modal v-model="relationsModalOpen" no-backdrop-dismiss>
         <DagreDiagram
           v-if="relationsModalOpen"
           :nodes="items.map(i => ({id: i.id, type: i.feature}))"
