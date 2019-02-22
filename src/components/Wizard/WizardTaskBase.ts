@@ -42,7 +42,7 @@ export default class WizardTaskBase extends Vue {
     return this.$props.tasks;
   }
 
-  protected updateConfig(config: any = this.stagedConfig): void {
+  protected updateConfig<T>(config: T = this.stagedConfig): void {
     this.$emit('update:config', { ...config });
   }
 

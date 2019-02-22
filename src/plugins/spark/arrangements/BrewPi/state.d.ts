@@ -1,4 +1,5 @@
 import { Block } from '@/plugins/spark/state';
+import { DashboardItem } from '@/store/dashboards/state';
 
 export interface BrewPiConfigNames {
   fridgeSensor: string;
@@ -25,10 +26,9 @@ export interface BrewPiConfig {
   dashboardId: string;
   groups: number[];
   names: BrewPiConfigNames;
-  blocks: {
-    [id: string]: Block;
-  };
-  createdBlocks: string[];
+  widgets: DashboardItem[];
+  createdBlocks: Block[];
+  updatedBlocks: Block[];
   renamedBlocks: {
     [old: string]: string;
   };

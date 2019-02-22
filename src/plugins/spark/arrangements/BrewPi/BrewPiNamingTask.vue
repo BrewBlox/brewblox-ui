@@ -30,7 +30,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   set serviceId(id: string) {
-    this.updateConfig({ ...this.cfg, serviceId: id });
+    this.updateConfig<BrewPiConfig>({ ...this.cfg, serviceId: id });
   }
 
   get arrangementId() {
@@ -38,7 +38,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   set arrangementId(id: string) {
-    this.updateConfig({ ...this.cfg, arrangementId: id });
+    this.updateConfig<BrewPiConfig>({ ...this.cfg, arrangementId: id });
   }
 
   get prefix() {
@@ -46,7 +46,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   set prefix(prefix: string) {
-    this.updateConfig({ ...this.cfg, prefix });
+    this.updateConfig<BrewPiConfig>({ ...this.cfg, prefix });
   }
 
   get dashboardId() {
@@ -54,7 +54,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   set dashboardId(id: string) {
-    this.updateConfig({ ...this.cfg, dashboardId: id });
+    this.updateConfig<BrewPiConfig>({ ...this.cfg, dashboardId: id });
   }
 
   get groups() {
@@ -62,7 +62,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   set groups(groups: number[]) {
-    this.updateConfig({ ...this.cfg, groups });
+    this.updateConfig<BrewPiConfig>({ ...this.cfg, groups });
   }
 
   get defaultNames(): BrewPiConfigNames {
@@ -97,7 +97,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
       this.dashboardId,
       ...Object.values(this.names),
     ]
-      .find(v => !v) === undefined;
+      .every(Boolean);
   }
 
   updateName(key: string, val: string) {
@@ -107,7 +107,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
 
   clearKey(key: string) {
     delete this.cfg[key];
-    this.updateConfig(this.cfg);
+    this.updateConfig<BrewPiConfig>(this.cfg);
   }
 
   clearName(key: string) {
@@ -119,15 +119,16 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   next() {
-    this.updateConfig({
+    this.updateConfig<BrewPiConfig>({
       ...this.cfg,
       serviceId: this.serviceId,
       arrangementId: this.arrangementId,
       dashboardId: this.dashboardId,
       groups: this.groups,
       names: this.names,
-      blocks: {},
+      widgets: [],
       createdBlocks: [],
+      updatedBlocks: [],
       renamedBlocks: {},
     });
     this.pushTask('BrewPiHardwareTask');
@@ -138,7 +139,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
 
 <template>
   <q-card dark>
-    <q-card-actions align="end">
+    <q-card-actions>
       <q-btn :disable="!valuesOk" label="Next" color="primary" @click="next"/>
     </q-card-actions>
     <q-card-main class="row">
