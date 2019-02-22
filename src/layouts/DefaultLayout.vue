@@ -2,7 +2,6 @@
 import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
 import { objectSorter } from '@/helpers/functional';
 import {
-  createDashboard,
   removeDashboard,
   updateDashboardOrder,
   updatePrimaryDashboard,
