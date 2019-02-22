@@ -3,9 +3,10 @@ import UrlSafeString from 'url-safe-string';
 import Component from 'vue-class-component';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { serviceValues } from '@/store/services/getters';
-import { typeName } from '@/plugins/spark/store/getters';
+import { typeName, blockIds } from '@/plugins/spark/store/getters';
 import { BrewPiConfig, BrewPiConfigNames } from '@/plugins/spark/arrangements/BrewPi/state';
 import { spaceCased, valOrDefault } from '@/helpers/functional';
+import { dashboardItemIds } from '@/store/dashboards/getters';
 
 
 @Component
@@ -95,10 +96,23 @@ export default class BrewPiNamingTask extends WizardTaskBase {
 
   get valuesOk() {
     return [
+      this.serviceId,
       this.dashboardTitle,
       ...Object.values(this.names),
+      ...Object.values(this.names).map(v => !this.nameExists(v)),
     ]
       .every(Boolean);
+  }
+
+  nameExists(val: string) {
+    if (!this.serviceId) {
+      return false;
+    }
+    return [
+      ...blockIds(this.$store, this.serviceId),
+      ...dashboardItemIds(this.$store),
+    ]
+      .includes(val);
   }
 
   updateName(key: string, val: string) {
@@ -146,10 +160,10 @@ export default class BrewPiNamingTask extends WizardTaskBase {
     </q-card-actions>
     <q-card-main class="row">
       <div>
-        <q-item>
-          <big>Arrangement</big>
-        </q-item>
         <q-list no-border>
+          <q-item>
+            <big>Arrangement</big>
+          </q-item>
           <q-item>
             <q-select v-model="serviceId" :options="serviceOpts" float-label="Service"/>
           </q-item>
@@ -190,14 +204,14 @@ export default class BrewPiNamingTask extends WizardTaskBase {
         </q-list>
       </div>
       <div>
-        <q-item>
-          <big>Widget Names</big>
-        </q-item>
         <q-list no-border>
+          <q-item>
+            <big>Widget Names</big>
+          </q-item>
           <q-item v-for="(nVal, nKey) in names" :key="nKey">
             <q-input
               :value="nVal"
-              :error="!nVal"
+              :error="!nVal || nameExists(nVal)"
               :float-label="spaceCased(nKey)"
               :after="[{icon: 'mdi-backup-restore', handler: () => clearName(nKey)}]"
               @change="v => updateName(nKey, v)"

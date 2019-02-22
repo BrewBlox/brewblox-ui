@@ -9,7 +9,8 @@ import { createDashboard, appendDashboardItem } from '@/store/dashboards/actions
 import { widgetSizeById } from '@/store/features/getters';
 import { RootStore } from '@/store/state';
 import { typeName as pinType } from '@/plugins/spark/features/ActuatorPin/getters';
-import { typeName as setpointType } from '@/plugins/spark/features/SetpointProfile/getters';
+import { typeName as spProfileType } from '@/plugins/spark/features/SetpointProfile/getters';
+import { typeName as spSimpleType } from '@/plugins/spark/features/SetpointSimple/getters';
 import { typeName as pairType } from '@/plugins/spark/features/SetpointSensorPair/getters';
 import { typeName as pwmType } from '@/plugins/spark/features/ActuatorPwm/getters';
 import { typeName as mutexType } from '@/plugins/spark/features/Mutex/getters';
@@ -36,25 +37,17 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       {
         id: this.cfg.names.fridgeSetpoint,
         serviceId: this.cfg.serviceId,
-        type: setpointType,
+        type: spSimpleType,
         groups: this.cfg.groups,
         data: {
-          points: [
-            {
-              time: new Date().getTime() / 1000,
-              'temperature[degC]': this.fridgeSetpointValue.value,
-            },
-            {
-              time: (new Date().getTime() + parseDuration('2w')) / 1000,
-              'temperature[degC]': this.fridgeSetpointValue.value,
-            },
-          ],
+          enabled: true,
+          setpoint: this.fridgeSetpointValue,
         },
       },
       {
         id: this.cfg.names.beerSetpoint,
         serviceId: this.cfg.serviceId,
-        type: setpointType,
+        type: spProfileType,
         groups: this.cfg.groups,
         data: {
           points: [
@@ -267,8 +260,8 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       createWidget(this.cfg.names.heatPid, pidType),
       createWidget(this.cfg.names.beerPid, pidType),
       // Setpoints
-      createWidget(this.cfg.names.fridgeSetpoint, setpointType),
-      createWidget(this.cfg.names.beerSetpoint, setpointType),
+      createWidget(this.cfg.names.fridgeSetpoint, spSimpleType),
+      createWidget(this.cfg.names.beerSetpoint, spProfileType),
       // Sensors
       createWidget(this.cfg.names.fridgeSensor, sensorTypes.fridge),
       createWidget(this.cfg.names.beerSensor, sensorTypes.beer),
@@ -299,6 +292,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       },
 
       async (store: RootStore, cfg: BrewPiConfig): Promise<void> => {
+        // Create synchronously, to ensure dependencies are created first
         for (let block of cfg.createdBlocks) {
           await createBlock(store, cfg.serviceId, block);
         }
@@ -326,6 +320,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
     this.defineChangedBlocks();
     this.defineWidgets();
     this.defineActions();
+    // We're updating all at once, to avoid having to wait a tick before the prop changes
     this.updateConfig(this.cfg);
     this.finish();
   }
