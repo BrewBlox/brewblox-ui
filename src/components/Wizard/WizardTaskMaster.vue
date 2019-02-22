@@ -18,6 +18,7 @@ import { WizardAction } from '@/components/Wizard/WizardTaskBase';
 })
 export default class WizardTaskMaster extends Vue {
   $q: any;
+  busyExecuting: boolean = false;
   config: any = {};
   actions: WizardAction[] = [];
   tasks: string[] = [];
@@ -31,14 +32,19 @@ export default class WizardTaskMaster extends Vue {
     }
   }
 
-  executePrepared() {
-    Promise
-      .all(this.actions.map(func => () => func(this.$store, this.config)))
-      .then(() => {
-        this.$q.notify({ type: 'positive', message: `Done!` });
-        this.close();
-      })
-      .catch((e) => this.$q.notify(`Failed to execute actions: ${e.message()}`));
+  async executePrepared() {
+    try {
+      // We're intentionally waiting for each async function
+      // Actions may be async, but may have dependencies
+      this.busyExecuting = true;
+      for (let func of this.actions) {
+        await func(this.$store, this.config);
+      }
+      this.$q.notify({ type: 'positive', message: `Done!` });
+    } catch (e) {
+      this.$q.notify(`Failed to execute actions: ${e.message}`);
+    }
+    this.close();
   }
 
   created() {
@@ -55,6 +61,9 @@ export default class WizardTaskMaster extends Vue {
 
 <template>
   <div class="widget-modal">
+    <div v-if="busyExecuting" style="width: 100%; height: 400px;">
+      <q-spinner :size="50" class="absolute-center"/>
+    </div>
     <component
       v-if="currentTask"
       :is="currentTask"

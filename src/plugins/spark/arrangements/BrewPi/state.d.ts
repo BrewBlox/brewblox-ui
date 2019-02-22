@@ -13,10 +13,10 @@ export interface BrewPiConfigNames {
   coolPwm: string;
   heatPwm: string;
   mutex: string;
+  fridgeOffset: string;
   coolPid: string;
   heatPid: string;
   beerPid: string;
-  fridgeOffset: string;
 }
 
 export interface BrewPiConfig {
@@ -24,11 +24,12 @@ export interface BrewPiConfig {
   arrangementId: string;
   prefix: string;
   dashboardId: string;
+  dashboardTitle: string;
   groups: number[];
   names: BrewPiConfigNames;
   widgets: DashboardItem[];
   createdBlocks: Block[];
-  updatedBlocks: Block[];
+  changedBlocks: Block[];
   renamedBlocks: {
     [old: string]: string;
   };

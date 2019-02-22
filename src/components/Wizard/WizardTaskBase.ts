@@ -50,8 +50,16 @@ export default class WizardTaskBase extends Vue {
     this.$emit('update:actions', [...this.$props.actions, action]);
   }
 
+  protected pushActions(actions: WizardAction[]): void {
+    this.$emit('update:actions', [...this.$props.actions, ...actions]);
+  }
+
   protected pushTask(task: string): void {
     this.$emit('update:tasks', [...this.$props.tasks, task]);
+  }
+
+  protected pushTasks(tasks: string[]): void {
+    this.$emit('update:tasks', [...this.$props.tasks, ...tasks]);
   }
 
   protected cancel(): void {

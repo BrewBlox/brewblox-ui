@@ -230,7 +230,7 @@ export default class DefaultLayout extends Vue {
       </q-list>
     </q-layout-drawer>
     <q-modal v-model="wizardModalOpen" no-backdrop-dismiss>
-      <WizardPicker v-if="wizardModalOpen"/>
+      <WizardPicker v-if="wizardModalOpen" @close="wizardModalOpen = false"/>
     </q-modal>
     <q-page-container>
       <router-view/>

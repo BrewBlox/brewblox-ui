@@ -1,4 +1,5 @@
 <script lang="ts">
+import UrlSafeString from 'url-safe-string';
 import Component from 'vue-class-component';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { serviceValues } from '@/store/services/getters';
@@ -49,12 +50,12 @@ export default class BrewPiNamingTask extends WizardTaskBase {
     this.updateConfig<BrewPiConfig>({ ...this.cfg, prefix });
   }
 
-  get dashboardId() {
-    return valOrDefault(this.cfg.dashboardId, `${this.arrangementId} Dashboard`);
+  get dashboardTitle() {
+    return valOrDefault(this.cfg.dashboardTitle, `${this.arrangementId} Dashboard`);
   }
 
-  set dashboardId(id: string) {
-    this.updateConfig<BrewPiConfig>({ ...this.cfg, dashboardId: id });
+  set dashboardTitle(id: string) {
+    this.updateConfig<BrewPiConfig>({ ...this.cfg, dashboardTitle: id });
   }
 
   get groups() {
@@ -94,7 +95,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
 
   get valuesOk() {
     return [
-      this.dashboardId,
+      this.dashboardTitle,
       ...Object.values(this.names),
     ]
       .every(Boolean);
@@ -123,12 +124,13 @@ export default class BrewPiNamingTask extends WizardTaskBase {
       ...this.cfg,
       serviceId: this.serviceId,
       arrangementId: this.arrangementId,
-      dashboardId: this.dashboardId,
+      dashboardId: new UrlSafeString().generate(this.dashboardTitle),
+      dashboardTitle: this.dashboardTitle,
       groups: this.groups,
       names: this.names,
       widgets: [],
       createdBlocks: [],
-      updatedBlocks: [],
+      changedBlocks: [],
       renamedBlocks: {},
     });
     this.pushTask('BrewPiHardwareTask');
@@ -167,9 +169,9 @@ export default class BrewPiNamingTask extends WizardTaskBase {
           </q-item>
           <q-item>
             <q-input
-              v-model="dashboardId"
-              :error="!dashboardId"
-              :after="[{icon: 'mdi-backup-restore', handler: () => clearKey('dashboardId')}]"
+              v-model="dashboardTitle"
+              :error="!dashboardTitle"
+              :after="[{icon: 'mdi-backup-restore', handler: () => clearKey('dashboardTitle')}]"
               float-label="Dashboard"
             />
           </q-item>

@@ -28,13 +28,17 @@ export default class WizardPicker extends Vue {
   startArrangementWizard() {
     this.wizardComponent = 'ArrangementWizardPicker';
   }
+
+  close() {
+    this.$emit('close');
+  }
 }
 </script>
 
 <template>
   <div class="widget-modal column">
     <!-- display wizard -->
-    <component v-if="wizardComponent" :is="wizardComponent" class="unpadded fit"/>
+    <component v-if="wizardComponent" :is="wizardComponent" class="unpadded fit" @close="close"/>
 
     <!-- Select a wizard -->
     <q-list v-else no-border>

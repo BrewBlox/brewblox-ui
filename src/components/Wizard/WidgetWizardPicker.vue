@@ -58,13 +58,8 @@ export default class WidgetWizardPicker extends Vue {
     this.featureId = id;
   }
 
-  reset() {
-    this.featureId = '';
-    this.searchModel = '';
-  }
-
-  mounted() {
-    this.reset();
+  close() {
+    this.$emit('close');
   }
 }
 </script>
@@ -82,7 +77,7 @@ export default class WidgetWizardPicker extends Vue {
       :is="wizardComponent"
       :feature-id="featureId"
       :dashboard-id="dashboardId"
-      @close="reset"
+      @close="close"
     />
 
     <!-- Select a wizard -->

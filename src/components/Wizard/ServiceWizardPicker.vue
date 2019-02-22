@@ -80,11 +80,11 @@ export default class ServiceWizardPicker extends Vue {
     };
     await createService(this.$store, service);
     await initService(this.$store, service);
-    this.reset();
     Notify.create({
       type: 'positive',
       message: `Added ${displayNameById(this.$store, service.type)} "${service.title}"`,
     });
+    this.close();
   }
 
   onCancel(message: string) {
@@ -92,15 +92,8 @@ export default class ServiceWizardPicker extends Vue {
     Notify.create({ message });
   }
 
-  reset() {
-    this.serviceId = '';
-    this.serviceTitle = '';
-    this.searchModel = '';
-    this.wizardComponent = null;
-  }
-
-  mounted() {
-    this.reset();
+  close() {
+    this.$emit('close');
   }
 }
 </script>
@@ -119,6 +112,7 @@ export default class ServiceWizardPicker extends Vue {
       :service-id="serviceId"
       :on-create="onCreate"
       :on-cancel="onCancel"
+      @close="close"
     />
 
     <!-- Select a wizard -->

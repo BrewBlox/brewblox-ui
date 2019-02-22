@@ -65,7 +65,6 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
 
     this.updateConfig<BrewPiConfig>(this.cfg);
     this.pushTask('BrewPiSettingsTask');
-    console.log(JSON.stringify(this.cfg));
     this.finish();
   }
 }

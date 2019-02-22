@@ -26,13 +26,8 @@ export default class ArrangementWizardPicker extends Vue {
     return arrangements(this.$store)[this.arrangementId].wizard;
   }
 
-  reset() {
-    this.arrangementId = '';
-    this.searchModel = '';
-  }
-
-  mounted() {
-    this.reset();
+  close() {
+    this.$emit('close');
   }
 }
 </script>
@@ -49,7 +44,7 @@ export default class ArrangementWizardPicker extends Vue {
       v-if="wizardComponent"
       :is="wizardComponent"
       :feature-id="arrangementId"
-      @close="reset"
+      @close="close"
     />
 
     <!-- Select a wizard -->
