@@ -23,29 +23,29 @@ const propertyWalker = (acc: any[], next: FlowSegment, prop: string[]): any[] =>
 
 
 describe('calculate Flows', () => {
-  const createInput = (): PersistentPart => ({
+  const part: PersistentPart = {
     x: 1,
     y: 2,
     rotate: 0,
     type: 'InputTube',
-  });
+  };
 
   it('Should return part settings', () => {
-    expect(partSettings(createInput()).isSource).toBeTruthy();
+    expect(partSettings(part).isSource).toBeTruthy();
   });
 });
 
 
 describe('Data describing an input tube', () => {
-  const createInput = (): PersistentPart => ({
+  const part: PersistentPart = {
     x: 1,
     y: 2,
     rotate: 0,
     type: 'InputTube',
-  });
+  };
 
   it('can resolve to transitions', () => {
-    expect(partTransitions(createInput())).toEqual(
+    expect(partTransitions(part)).toEqual(
       {
         '0.5,0.5': [{ outCoords: '1,0.5' }],
       });
@@ -54,7 +54,7 @@ describe('Data describing an input tube', () => {
 
 
 describe('asFlowParts', () => {
-  const createPath = (): PersistentPart[] => ([
+  const path: PersistentPart[] = [
     {
 
       x: 1,
@@ -76,10 +76,10 @@ describe('asFlowParts', () => {
       rotate: 0,
       type: 'OutputTube',
     },
-  ]);
+  ];
 
   it('it adds transitions', () => {
-    asFlowParts(createPath()).forEach(part => {
+    asFlowParts(path).forEach(part => {
       expect(part).toHaveProperty('transitions');
     });
   });
@@ -87,9 +87,8 @@ describe('asFlowParts', () => {
 
 
 describe('A single path without splits', () => {
-  const createParts = (): PersistentPart[] => ([
+  const parts: PersistentPart[] = [
     {
-
       x: 1,
       y: 2,
       rotate: 0,
@@ -108,12 +107,12 @@ describe('A single path without splits', () => {
       rotate: 0,
       type: 'StraightTube',
     },
-  ]);
+  ];
 
-  const parts = asFlowParts(createParts());
-  const start = parts[0];
+  const flowParts = asFlowParts(parts);
+  const start = flowParts[0];
 
-  const path = flowPath(parts, start, '1.5,2.5');
+  const path = flowPath(flowParts, start, '1.5,2.5');
   if (path === null) {
     throw ('no path found');
   }
@@ -139,7 +138,7 @@ describe('A single path without splits', () => {
 
 
 describe('A path with a split, but no joins', () => {
-  const createParts = (): PersistentPart[] => ([
+  const parts: PersistentPart[] = [
     {
 
       x: 1,
@@ -171,12 +170,12 @@ describe('A path with a split, but no joins', () => {
       rotate: 90,
       type: 'OutputTube',
     },
-  ]);
+  ];
 
-  const parts = asFlowParts(createParts());
-  const start = parts[0];
+  const flowParts = asFlowParts(parts);
+  const start = flowParts[0];
 
-  const path = flowPath(parts, start, '1.5,2.5');
+  const path = flowPath(flowParts, start, '1.5,2.5');
   if (path === null) {
     throw ('no path found');
   }
@@ -199,18 +198,29 @@ describe('A path with a split, but no joins', () => {
         ],
       ]);
 
-    const visitedInCoords = propertyWalker([], path, ['inCoords']);
-    expect(visitedInCoords).toEqual(
+    const transitions = propertyWalker([], path, ['transitions']);
+    console.log(JSON.stringify(transitions));
+    expect(transitions).toEqual(
       [
-        ['1.5,2.5'],
-        ['2,2.5'],
-        ['3,2.5'],
+        {
+          "1.5,2.5": [{ "outCoords": "2,2.5" }],
+        },
+        {
+          "2,2.5": [{ "outCoords": "3,2.5" }],
+        },
+        {
+          "3,2.5": [{ "outCoords": "3.5,2" }, { "outCoords": "3.5,3" }],
+        },
         [
           [
-            ['3.5,2'],
-          ]
-          , [
-            ['3.5,3'],
+            {
+              "3.5,2": [{ "outCoords": "3.5,1.5", "pressure": 0 }],
+            },
+          ],
+          [
+            {
+              "3.5,3": [{ "outCoords": "3.5,3.5", "pressure": 0 }],
+            },
           ],
         ],
       ]);
@@ -223,7 +233,7 @@ describe('A path with a split, but no joins', () => {
 
 
 describe('A path that forks and rejoins', () => {
-  const createParts = (): PersistentPart[] => ([
+  const parts: PersistentPart[] = [
     {
 
       x: 1,
@@ -279,12 +289,12 @@ describe('A path that forks and rejoins', () => {
       rotate: 0,
       type: 'OutputTube',
     },
-  ]);
+  ];
 
-  const parts = asFlowParts(createParts());
-  const start = parts[0];
+  const flowParts = asFlowParts(parts);
+  const start = flowParts[0];
 
-  const path = flowPath(parts, start, '1.5,2.5');
+  const path = flowPath(flowParts, start, '1.5,2.5');
   if (path === null) {
     throw ('no path found');
   }
@@ -312,24 +322,27 @@ describe('A path that forks and rejoins', () => {
         'OutputTube',
       ]);
 
-    const visitedInCoords = propertyWalker([], path, ['inCoords']);
-    expect(visitedInCoords).toEqual(
+    const transitions = propertyWalker([], path, ['transitions']);
+    expect(transitions).toEqual(
       [
-        ['1.5,2.5'],
-        ['2,2.5'],
-        ['3,2.5'],
+        { "1.5,2.5": [{ "outCoords": "2,2.5" }] },
+        { "2,2.5": [{ "outCoords": "3,2.5" }] },
+        { "3,2.5": [{ "outCoords": "3.5,2" }, { "outCoords": "3.5,3" }] },
         [
           [
-            ['3.5,2'],
-            ['4,1.5'],
+            { "3.5,2": [{ "outCoords": "4,1.5" }] },
+            { "4,1.5": [{ "outCoords": "4.5,2" }] },
           ],
           [
-            ['3.5,3'],
-            ['4,3.5'],
+            { "3.5,3": [{ "outCoords": "4,3.5" }] },
+            { "4,3.5": [{ "outCoords": "4.5,3" }] },
           ],
         ],
-        ['4.5,2', '4.5,3'],
-        ['5,2.5'],
+        {
+          "4.5,2": [{ "outCoords": "5,2.5" }],
+          "4.5,3": [{ "outCoords": "5,2.5" }],
+        },
+        { "5,2.5": [{ "outCoords": "5.5,2.5", "pressure": 0 }] },
       ]);
   });
 

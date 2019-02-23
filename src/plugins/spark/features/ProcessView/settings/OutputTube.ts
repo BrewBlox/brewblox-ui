@@ -4,6 +4,7 @@ import { defaultSettings } from '../components/getters';
 
 const settings: ComponentSettings = {
   ...defaultSettings,
+  isSink: true,
   transitions: () => ({
     [LEFT]: [{ outCoords: CENTER, pressure: 0 }],
   }),

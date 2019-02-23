@@ -241,31 +241,13 @@ const translations = (part: PersistentPart): Transitions =>
 export const asFlowParts = (parts: PersistentPart[]): FlowPart[] =>
   parts.map(part => ({ ...part, transitions: translations(part) }));
 
-export const pathsFromSources = (parts: PersistentPart[]): FlowPart[] => {
-  const flowParts = asFlowParts(parts);
-  return flowParts
-    .filter(part => partSettings(part).isSource) // -> FlowPart[]
-    .map(part => ({ liquidSource: COLD_WATER, ...part })) // -> FlowPart[]
-    .map(part => calculateFromSource(
-      part,
-      flowParts,
-      new Coordinates(CENTER) // Source starts from CENTER
-        .rotate(part.rotate)
-        .translate(part)
-        .toString(),
-      part.liquidSource,
-    )) // -> FlowPart[][]
-    .reduce(mergeSourceFlows, flowParts) // -> FlowPart[]
-    .map(normalizeFlows);
-};
-
 export class FlowSegment {
-  public constructor(part: FlowPart, inCoord: string) {
+  public constructor(part: FlowPart, transitions: Transitions) {
     this.root = part;
-    this.inCoords = [inCoord];
+    this.transitions = transitions;
   }
 
-  public inCoords: string[];
+  public transitions: Transitions;
   public root: FlowPart;
   public splits: FlowSegment[] = [];
   public next: FlowSegment | null = null;
@@ -315,7 +297,7 @@ export class FlowSegment {
   };
 
   public isSameSegment(other: FlowSegment): boolean {
-    return JSON.stringify(omit(this, 'inCoords')) === JSON.stringify(omit(other, 'inCoords'));
+    return JSON.stringify(omit(this, 'transitions')) === JSON.stringify(omit(other, 'transitions'));
   }
 
   public leafSegments(): FlowSegment[] {
@@ -344,8 +326,8 @@ export class FlowSegment {
   public popDuplicatedLeaves(): FlowSegment | null {
     const leaves = this.leafSegments();
     if (leaves.length !== 0 && leaves.every(v => v.isSameSegment(leaves[0]))) {
-      const combinedInCoords = leaves.reduce((acc: string[], leaf) => ([...acc, ...leaf.inCoords]), []);
-      leaves[0].inCoords = [...new Set(combinedInCoords)]; // use Set to remove duplicates
+      const combinedTransitions = leaves.reduce((acc: Transitions, leaf) => ({ ...acc, ...leaf.transitions }), {});
+      leaves[0].transitions = combinedTransitions;
       this.removeLeafSegment(leaves[0]);
       return leaves[0];
     }
@@ -354,31 +336,32 @@ export class FlowSegment {
 }
 
 export const flowPath = (parts: FlowPart[], start: FlowPart, inCoord: string): FlowSegment | null => {
-  if (!start) {
-    throw ("Start part not found");
-  }
-  const path = new FlowSegment(start, inCoord);
-  const outFlows: FlowRoute[] = get(start, ['transitions', inCoord]);
-
+  const outFlows = get(start, ['transitions', inCoord], []);
+  const path = new FlowSegment(start, {});
   const candidateParts = parts
     .filter(candidate => !isSamePart(start, candidate) || partSettings(candidate).isBridge);
 
-  if (start.type === 'OutputTube') {
-    return path;
-  }
-
-  if (outFlows) {
+  if (outFlows !== null) {
     outFlows.forEach(outFlow => {
       const nextPart = adjacentPart(candidateParts, outFlow.outCoords, start);
-      if (nextPart) {
-        const nextPath = flowPath(candidateParts, nextPart, outFlow.outCoords);
+      let nextPath: FlowSegment | null = null;
+      if (nextPart !== undefined) {
+        nextPath = flowPath(candidateParts, nextPart, outFlow.outCoords);
         if (nextPath !== null) {
           path.addChild(nextPath);
         }
       }
+      if (nextPath !== null || partSettings(start).isSink) {
+        if (path.transitions[inCoord] === undefined) {
+          path.transitions[inCoord] = [outFlow];
+        }
+        else {
+          path.transitions[inCoord].push(outFlow);
+        }
+      }
     });
   }
-  if (path.splits.length === 0 && path.next === null) {
+  if (path.splits.length === 0 && path.next === null && !partSettings(start).isSink) {
     return null;
   }
 
@@ -404,3 +387,51 @@ export const flowPath = (parts: FlowPart[], start: FlowPart, inCoord: string): F
   }
   return path;
 };
+
+/*
+export const addFlowForSegment(parts: FlowPart[], segment: FlowSegment, flow: number, liquid: string){
+
+  // add flow for root part
+  segment
+  parts = additionalFlow(
+    segment.root,
+    parts,
+    {
+      [segment.inCoords]: addedFlow,
+    },
+    liquid,
+  );
+
+  // divide flow for split
+  const frictionInvTotal = segment.splits.reduce((acc, split) => acc + 1 / split.friction(), 0);
+
+  segment.splits.forEach((child) => {
+    const invFriction = 1 / child.friction();
+    const splitFlow = flow * invFriction / frictionInvTotal;
+    parts = addFlowForSegment(parts, child, splitFlow, liquid);
+  });
+
+  // add flow to next
+  parts = addFlowForSegment(parts, segment.next, flow, liquid);
+
+  return parts;
+}
+
+export const pathsFromSources = (parts: PersistentPart[]): FlowSegment[] => {
+  const flowParts = asFlowParts(parts);
+  return flowParts
+    .filter(part => partSettings(part).isSource) // -> FlowPart[]
+    .map(part => ({ liquidSource: COLD_WATER, ...part })) // -> FlowPart[]
+    .map(part => flowPath(
+      flowParts,
+      part,
+      new Coordinates(CENTER) // Source starts from CENTER
+        .rotate(part.rotate)
+        .translate(part)
+        .toString(),
+        )) // -> FlowSegment[][]
+        .reduce(mergeSourceFlows, flowParts) // -> FlowPart[]
+        .map(normalizeFlows);
+      };
+
+*/

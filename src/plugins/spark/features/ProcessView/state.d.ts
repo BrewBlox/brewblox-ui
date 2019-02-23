@@ -10,7 +10,7 @@ export interface Transitions {
 }
 
 export interface CalculatedFlows {
-  [inCoords: string]: number;  // pressure
+  [inCoords: string]: number;
 }
 
 export interface PersistentPart {
@@ -26,6 +26,7 @@ export interface PersistentPart {
 
 export interface ComponentSettings {
   isSource: boolean;
+  isSink: boolean;
   isBridge: boolean;
   cards: string[];
   transitions: (part: PersistentPart) => Transitions;
