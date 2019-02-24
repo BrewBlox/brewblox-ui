@@ -1,12 +1,11 @@
 import { ComponentSettings } from '../state';
-import { LEFT, CENTER } from '../getters';
+import { LEFT, IN_OUT } from '../getters';
 import { defaultSettings } from '../components/getters';
 
 const settings: ComponentSettings = {
   ...defaultSettings,
-  isSink: true,
   transitions: () => ({
-    [LEFT]: [{ outCoords: CENTER, pressure: 0 }],
+    [LEFT]: [{ outCoords: IN_OUT, pressure: 0 }],
   }),
 };
 

@@ -1,6 +1,6 @@
-import { partSettings, partTransitions, flowPath, asFlowParts, FlowSegment } from './calculateFlows';
+import { partSettings, partTransitions, flowPath, asFlowParts, FlowSegment, calculateFlows } from './calculateFlows';
 import { PersistentPart } from './state';
-import { CENTER, DEFAULT_FRICTION, DEFAULT_DELTA_PRESSURE, COLD_WATER, MIXED_LIQUIDS } from './getters';
+import { IN_OUT, DEFAULT_FRICTION, DEFAULT_DELTA_PRESSURE, COLD_WATER, MIXED_LIQUIDS } from './getters';
 import get from 'lodash/get';
 
 
@@ -21,33 +21,19 @@ const propertyWalker = (acc: any[], next: FlowSegment, prop: string[]): any[] =>
   return acc;
 };
 
-
-describe('calculate Flows', () => {
-  const part: PersistentPart = {
-    x: 1,
-    y: 2,
-    rotate: 0,
-    type: 'InputTube',
-  };
-
-  it('Should return part settings', () => {
-    expect(partSettings(part).isSource).toBeTruthy();
-  });
-});
-
-
 describe('Data describing an input tube', () => {
   const part: PersistentPart = {
     x: 1,
     y: 2,
     rotate: 0,
     type: 'InputTube',
+    pressure: 11,
   };
 
   it('can resolve to transitions', () => {
     expect(partTransitions(part)).toEqual(
       {
-        '0.5,0.5': [{ outCoords: '1,0.5' }],
+        [IN_OUT]: [{ outCoords: '1,0.5', pressure: 11 }],
       });
   });
 });
@@ -93,6 +79,7 @@ describe('A single path without splits', () => {
       y: 2,
       rotate: 0,
       type: 'InputTube',
+      pressure: 6,
     },
     {
 
@@ -112,7 +99,7 @@ describe('A single path without splits', () => {
   const flowParts = asFlowParts(parts);
   const start = flowParts[0];
 
-  const path = flowPath(flowParts, start, '1.5,2.5');
+  const path = flowPath(flowParts, start, IN_OUT);
   if (path === null) {
     throw ('no path found');
   }
@@ -134,6 +121,37 @@ describe('A single path without splits', () => {
   it('Should have a friction value of 3', () => {
     expect(path.friction()).toEqual(3);
   });
+
+  it('Should have a flow of value of 2 for all parts', () => {
+    const partsWithFlow = calculateFlows(flowParts);
+    expect(partsWithFlow).toMatchObject(
+      [{
+        x: 1,
+        y: 2,
+        rotate: 0,
+        type: 'InputTube',
+        pressure: 6,
+        liquid: 'water',
+        flows: { '-1,-1': -2, '2,2.5': 2 },
+      },
+      {
+        x: 3,
+        y: 2,
+        rotate: 0,
+        type: 'OutputTube',
+        liquid: 'water',
+        flows: { '3,2.5': -2, '-1,-1': 2 },
+      },
+      {
+        x: 2,
+        y: 2,
+        rotate: 0,
+        type: 'StraightTube',
+        liquid: 'water',
+        flows: { '2,2.5': -2, '3,2.5': 2 },
+      }]
+    );
+  });
 });
 
 
@@ -145,6 +163,7 @@ describe('A path with a split, but no joins', () => {
       y: 2,
       rotate: 0,
       type: 'InputTube',
+      pressure: 14,
     },
     {
       x: 2,
@@ -175,7 +194,7 @@ describe('A path with a split, but no joins', () => {
   const flowParts = asFlowParts(parts);
   const start = flowParts[0];
 
-  const path = flowPath(flowParts, start, '1.5,2.5');
+  const path = flowPath(flowParts, start, IN_OUT);
   if (path === null) {
     throw ('no path found');
   }
@@ -199,27 +218,26 @@ describe('A path with a split, but no joins', () => {
       ]);
 
     const transitions = propertyWalker([], path, ['transitions']);
-    console.log(JSON.stringify(transitions));
     expect(transitions).toEqual(
       [
         {
-          "1.5,2.5": [{ "outCoords": "2,2.5" }],
+          [IN_OUT]: [{ outCoords: "2,2.5", pressure: 14 }],
         },
         {
-          "2,2.5": [{ "outCoords": "3,2.5" }],
+          "2,2.5": [{ outCoords: "3,2.5" }],
         },
         {
-          "3,2.5": [{ "outCoords": "3.5,2" }, { "outCoords": "3.5,3" }],
+          "3,2.5": [{ outCoords: "3.5,2" }, { outCoords: "3.5,3" }],
         },
         [
           [
             {
-              "3.5,2": [{ "outCoords": "3.5,1.5", "pressure": 0 }],
+              "3.5,2": [{ outCoords: IN_OUT, pressure: 0 }],
             },
           ],
           [
             {
-              "3.5,3": [{ "outCoords": "3.5,3.5", "pressure": 0 }],
+              "3.5,3": [{ outCoords: IN_OUT, pressure: 0 }],
             },
           ],
         ],
@@ -229,17 +247,63 @@ describe('A path with a split, but no joins', () => {
   it('Should have a friction value of 3.5', () => {
     expect(path.friction()).toEqual(3.5);
   });
+
+  it('Should have a flow of value of 4 total and 2 for each split', () => {
+    const partsWithFlow = calculateFlows(flowParts);
+    expect(partsWithFlow).toMatchObject(
+      [
+        {
+          flows: {
+            "-1,-1": -4,
+            "2,2.5": 4,
+          },
+          type: "InputTube",
+        },
+        {
+          flows: {
+            "2,2.5": -4,
+            "3,2.5": 4,
+          },
+          type: "StraightTube",
+        },
+        {
+          flows: {
+            "3,2.5": -4,
+            "3.5,2": 2,
+            "3.5,3": 2,
+          },
+          type: "TeeTube",
+        },
+        {
+          flows: {
+            "-1,-1": 2,
+            "3.5,2": -2,
+          },
+          type: "OutputTube",
+          x: 3,
+          y: 1,
+        },
+        {
+          flows: {
+            "-1,-1": 2,
+            "3.5,3": -2,
+          },
+          type: "OutputTube",
+        },
+      ]
+    );
+  });
 });
 
 
 describe('A path that forks and rejoins', () => {
   const parts: PersistentPart[] = [
     {
-
       x: 1,
       y: 2,
       rotate: 0,
       type: 'InputTube',
+      pressure: 12,
     },
     {
       x: 2,
@@ -294,7 +358,7 @@ describe('A path that forks and rejoins', () => {
   const flowParts = asFlowParts(parts);
   const start = flowParts[0];
 
-  const path = flowPath(flowParts, start, '1.5,2.5');
+  const path = flowPath(flowParts, start, IN_OUT);
   if (path === null) {
     throw ('no path found');
   }
@@ -325,29 +389,103 @@ describe('A path that forks and rejoins', () => {
     const transitions = propertyWalker([], path, ['transitions']);
     expect(transitions).toEqual(
       [
-        { "1.5,2.5": [{ "outCoords": "2,2.5" }] },
-        { "2,2.5": [{ "outCoords": "3,2.5" }] },
-        { "3,2.5": [{ "outCoords": "3.5,2" }, { "outCoords": "3.5,3" }] },
+        { [IN_OUT]: [{ outCoords: "2,2.5", pressure: 12 }] },
+        { "2,2.5": [{ outCoords: "3,2.5" }] },
+        { "3,2.5": [{ outCoords: "3.5,2" }, { outCoords: "3.5,3" }] },
         [
           [
-            { "3.5,2": [{ "outCoords": "4,1.5" }] },
-            { "4,1.5": [{ "outCoords": "4.5,2" }] },
+            { "3.5,2": [{ outCoords: "4,1.5" }] },
+            { "4,1.5": [{ outCoords: "4.5,2" }] },
           ],
           [
-            { "3.5,3": [{ "outCoords": "4,3.5" }] },
-            { "4,3.5": [{ "outCoords": "4.5,3" }] },
+            { "3.5,3": [{ outCoords: "4,3.5" }] },
+            { "4,3.5": [{ outCoords: "4.5,3" }] },
           ],
         ],
         {
-          "4.5,2": [{ "outCoords": "5,2.5" }],
-          "4.5,3": [{ "outCoords": "5,2.5" }],
+          "4.5,2": [{ outCoords: "5,2.5" }],
+          "4.5,3": [{ outCoords: "5,2.5" }],
         },
-        { "5,2.5": [{ "outCoords": "5.5,2.5", "pressure": 0 }] },
+        { "5,2.5": [{ outCoords: IN_OUT, pressure: 0 }] },
       ]);
   });
 
   it('Should have a friction value of 6', () => {
     expect(path.friction()).toEqual(6);
+  });
+
+  it('Should have a flow of value of 4 total and 2 for each split', () => {
+    const partsWithFlow = calculateFlows(flowParts);
+    expect(partsWithFlow).toMatchObject(
+      [
+        {
+          flows: {
+            "-1,-1": -2,
+            "2,2.5": 2,
+          },
+          type: "InputTube",
+        },
+        {
+          flows: {
+            "2,2.5": -2,
+            "3,2.5": 2,
+          },
+          type: "StraightTube",
+        },
+        {
+          flows: {
+            "3,2.5": -2,
+            "3.5,2": 1,
+            "3.5,3": 1,
+          },
+          type: "TeeTube",
+
+        },
+        {
+          flows: {
+            "3.5,2": -1,
+            "4,1.5": 1,
+          },
+          type: "ElbowTube",
+        },
+        {
+          flows: {
+            "3.5,3": -1,
+            "4,3.5": 1,
+          },
+          type: "ElbowTube",
+        },
+        {
+          flows: {
+            "4,1.5": -1,
+            "4.5,2": 1,
+          },
+          type: "ElbowTube",
+        },
+        {
+          flows: {
+            "4,3.5": -1,
+            "4.5,3": 1,
+          },
+          type: "ElbowTube",
+        },
+        {
+          flows: {
+            "4.5,2": -1,
+            "4.5,3": -1,
+            "5,2.5": 2,
+          },
+          type: "TeeTube",
+        },
+        {
+          flows: {
+            "-1,-1": 2,
+            "5,2.5": -2,
+          },
+          type: "OutputTube",
+        },
+      ]
+    );
   });
 });
 

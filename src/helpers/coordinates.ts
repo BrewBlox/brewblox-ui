@@ -29,6 +29,9 @@ export class Coordinates {
   }
 
   public rotate(rotation: number, pivot: CoordinatesParam = [0.5, 0.5]): Coordinates {
+    if (this.x == -1 && this.y == -1) {
+      return this; // don't modify special case for Input/Ouput coordinate
+    }
     if (!rotation) {
       return this;
     }
@@ -51,6 +54,9 @@ export class Coordinates {
   }
 
   public translate(offset: CoordinatesParam): Coordinates {
+    if (this.x == -1 && this.y == -1) {
+      return this; // don't modify special case for Input/Ouput coordinate
+    }
     const offsetCoord = new Coordinates(offset);
     this.x += offsetCoord.x;
     this.y += offsetCoord.y;

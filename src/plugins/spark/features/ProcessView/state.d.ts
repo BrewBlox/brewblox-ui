@@ -22,12 +22,10 @@ export interface PersistentPart {
   closed?: boolean;
   disabled?: boolean;
   flipped?: boolean;
+  pressure?: number;
 }
 
 export interface ComponentSettings {
-  isSource: boolean;
-  isSink: boolean;
-  isBridge: boolean;
   cards: string[];
   transitions: (part: PersistentPart) => Transitions;
   size: (part: PersistentPart) => [number, number];
@@ -35,7 +33,7 @@ export interface ComponentSettings {
 
 export interface FlowPart extends PersistentPart {
   transitions: Transitions;
-  calculated?: CalculatedFlows;
+  flows?: CalculatedFlows;
   liquid?: string;
 }
 

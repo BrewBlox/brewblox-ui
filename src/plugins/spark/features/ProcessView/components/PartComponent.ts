@@ -16,14 +16,6 @@ export default class PartComponent extends Vue {
     return {};
   }
 
-  public static get isSource(): boolean {
-    return false;
-  }
-
-  public static get isBridge(): boolean {
-    return false;
-  }
-
   public static get cards(): string[] {
     return [];
   }
@@ -45,7 +37,7 @@ export default class PartComponent extends Vue {
   }
 
   protected get flow(): CalculatedFlows {
-    return this.part.calculated || {};
+    return this.part.flows || {};
   }
 
   protected get liquid(): boolean {

@@ -1,10 +1,12 @@
 import { PersistentPart, Transitions, FlowPart, CalculatedFlows, FlowRoute, ComponentSettings } from './state';
-import { CENTER, DEFAULT_FRICTION, DEFAULT_DELTA_PRESSURE, COLD_WATER, MIXED_LIQUIDS } from './getters';
+import { IN_OUT, DEFAULT_FRICTION, DEFAULT_DELTA_PRESSURE, COLD_WATER, MIXED_LIQUIDS } from './getters';
 import { Coordinates } from '@/helpers/coordinates';
 import settings from './settings';
 import has from 'lodash/has';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
+import { access } from 'fs';
+import { itemCopyName } from '@/store/dashboards/getters';
 
 export const isSamePart =
   (left: PersistentPart, right: PersistentPart): boolean =>
@@ -26,11 +28,6 @@ const adjacentPart = (
       !(currentPart && isSamePart(part, currentPart))
       && has(part, ['transitions', outCoords]));
 
-const combineFlows =
-  (left: CalculatedFlows = {}, right: CalculatedFlows = {}): CalculatedFlows =>
-    Object.entries(right)
-      .reduce((into: CalculatedFlows, [coord, val]) => ({ ...into, [coord]: (into[coord] || 0) + val }), left);
-
 const combineLiquids =
   (left: string | undefined, right: string | undefined): string | undefined => {
     if (left && right && left !== right) {
@@ -38,23 +35,6 @@ const combineLiquids =
     }
     return left || right || undefined;
   };
-
-/*
-  Find the part in allParts, and then merge the new flow into allParts.
-*/
-const additionalFlow = (
-  part: FlowPart,
-  allParts: FlowPart[],
-  flowToAdd: CalculatedFlows,
-  liquid: string,
-): FlowPart[] =>
-  allParts
-    .map((item) => {
-      if (isSamePart(part, item)) {
-        return { ...item, liquid, calculated: combineFlows(item.calculated, flowToAdd) };
-      }
-      return item;
-    });
 
 /*
   Starting with a source part, we recursively find all connected parts.
@@ -82,7 +62,7 @@ const additionalFlow = (
     This is modelled by giving each part a deltaPressure value,.
     The cumulative deltaPressure is used to calculate the actual flow between source and sink.
 
-  Route pressure is calculated using:
+  Route pressure is flows using:
     startPressure: the pressure defined by the source
     endPressure: the pressure defined by the end part (sink or source)
     totalDeltaPressure: the cumulative deltaPressure value for each part in the route from source to sink.
@@ -93,118 +73,20 @@ const additionalFlow = (
   If all connected parts are explored, and no sink is found, pressure is considered 0.
 */
 
-
-const calculateFromSource = (
-  sourcePart: FlowPart,
-  allParts: FlowPart[],
-  inCoords: string,
-  liquidSource: string,
-  totalFriction: number = 0,
-  startPressure: number = 10,
-  totalDeltaPressure: number = 0,
-  candidates: FlowPart[] = allParts,
-): FlowPart[] => {
-  const candidateParts = candidates
-    .filter(candidate => !isSamePart(sourcePart, candidate) || partSettings(candidate).isBridge);
-
-  const outFlowReducer = (parts: FlowPart[], outFlow: FlowRoute): FlowPart[] => {
-    const { outCoords, pressure, friction, deltaPressure } = outFlow;
-    totalFriction += (friction || DEFAULT_FRICTION);
-    totalDeltaPressure += (deltaPressure || DEFAULT_DELTA_PRESSURE);
-
-    if (pressure !== undefined) {
-      // Found an end part -> route is done
-      // An end part can be a source, a sink, or a part for which a route was already calculated
-      // The last scenario happens if the route forks, and then re-joins
-      const totalPressure = startPressure + totalDeltaPressure;
-      const pathFlow = (totalPressure - pressure) / totalFriction;
-      return additionalFlow(
-        sourcePart,
-        parts,
-        {
-          [outCoords]: pathFlow,
-          [inCoords]: -pathFlow,
-        },
-        liquidSource,
-      );
-    }
-
-    const nextPart = adjacentPart(candidateParts, outCoords, sourcePart);
-
-    if (!nextPart) {
-      // no flow possible -> route is done
-      return additionalFlow(
-        sourcePart,
-        parts,
-        {
-          [outCoords]: 0,
-          [inCoords]: 0,
-        },
-        liquidSource,
-      );
-    }
-
-    const existingFlow = get(nextPart, ['calculated', outCoords], 0);
-
-    // recursively call calculateFromSource(), with the next part being the "source"
-    const nextFlows = calculateFromSource(
-      nextPart,
-      parts,
-      outCoords,
-      liquidSource,
-      totalFriction,
-      startPressure,
-      totalDeltaPressure,
-      candidateParts,
-    );
-
-    const updatedNextPart = nextFlows.find((part: FlowPart) => isSamePart(part, nextPart)) || {};
-    const newFlow = get(updatedNextPart, ['calculated', outCoords], 0);
-    const addedFlow = newFlow - existingFlow;
-
-    // The recursion tree has returned, merge the flow for this part into the result set
-    return additionalFlow(
-      sourcePart,
-      nextFlows,
-      {
-        [outCoords]: -addedFlow,
-        [inCoords]: addedFlow,
-      },
-      liquidSource,
-    );
-  };
-
-  // Calculate the route for each outflow the source part has
-  // return partOutFlows(sourcePart, inCoords)
-  return (sourcePart.transitions || {})[inCoords]
-    .reduce(outFlowReducer, allParts);
+const hasIndependentTransitions = (part: FlowPart): boolean => {
+  // const transitions = partSettings(part).transitions(part);
+  // TODO: calculate this from actual transitions
+  if (part.type === 'BridgeTube') {
+    return true;
+  }
+  return false;
 };
 
-/*
-  calculateFromSource() calculates the flow created by a single source.
-  Parts can be connected to multiple sources, and thus used by multiple flows.
-
-  We must merge the result of various calculations into a single Part.
-*/
-const mergeSourceFlows = (allParts: FlowPart[], sourceFlow: FlowPart[]): FlowPart[] =>
-  sourceFlow.reduce(
-    (acc, part) => {
-      const existing = allParts.find(p => isSamePart(p, part));
-      if (existing) {
-        existing.calculated = combineFlows(existing.calculated, part.calculated);
-        existing.liquid = combineLiquids(existing.liquid, part.liquid);
-        return acc;
-      }
-      return [...acc, part];
-    },
-    allParts,
-  );
-
 const normalizeFlows = (part: FlowPart): FlowPart => {
-  if (!part.calculated) {
-    return { ...part, calculated: {} };
+  if (!part.flows) {
+    return { ...part, flows: {} };
   }
-  const newFlows = Object.entries(part.calculated)
+  const newFlows = Object.entries(part.flows)
     .reduce((acc, [inCoord, pressure]: [string, number]) => {
       const nullCoord = new Coordinates(inCoord)
         .translate([-part.x, -part.y])
@@ -214,7 +96,7 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
     },
       {},
     );
-  return { ...part, calculated: newFlows };
+  return { ...part, flows: newFlows };
 };
 
 
@@ -339,7 +221,7 @@ export const flowPath = (parts: FlowPart[], start: FlowPart, inCoord: string): F
   const outFlows = get(start, ['transitions', inCoord], []);
   const path = new FlowSegment(start, {});
   const candidateParts = parts
-    .filter(candidate => !isSamePart(start, candidate) || partSettings(candidate).isBridge);
+    .filter(candidate => !isSamePart(start, candidate) || hasIndependentTransitions(candidate));
 
   if (outFlows !== null) {
     outFlows.forEach(outFlow => {
@@ -351,7 +233,7 @@ export const flowPath = (parts: FlowPart[], start: FlowPart, inCoord: string): F
           path.addChild(nextPath);
         }
       }
-      if (nextPath !== null || partSettings(start).isSink) {
+      if (nextPath !== null || outFlow.outCoords === IN_OUT) {
         if (path.transitions[inCoord] === undefined) {
           path.transitions[inCoord] = [outFlow];
         }
@@ -361,7 +243,7 @@ export const flowPath = (parts: FlowPart[], start: FlowPart, inCoord: string): F
       }
     });
   }
-  if (path.splits.length === 0 && path.next === null && !partSettings(start).isSink) {
+  if (path.transitions[inCoord] === undefined) {
     return null;
   }
 
@@ -388,19 +270,35 @@ export const flowPath = (parts: FlowPart[], start: FlowPart, inCoord: string): F
   return path;
 };
 
-/*
-export const addFlowForSegment(parts: FlowPart[], segment: FlowSegment, flow: number, liquid: string){
+
+export const addFlowForSegment = (
+  parts: FlowPart[],
+  segment: FlowSegment,
+  flow: number,
+  liquid: string
+): FlowPart[] => {
 
   // add flow for root part
-  segment
-  parts = additionalFlow(
-    segment.root,
-    parts,
-    {
-      [segment.inCoords]: addedFlow,
-    },
-    liquid,
-  );
+  Object.entries(segment.transitions).forEach(([inCoords, outFlows]) => {
+    const inFlow = { [inCoords]: -flow };
+
+    const outFlow = outFlows.reduce((acc: CalculatedFlows, v: FlowRoute) => ({ ...acc, [v.outCoords]: flow }), {});
+    if (segment.root.type === 'TeeTube') {
+      console.log(segment.transitions);
+    }
+
+    parts = parts.map(item =>
+      isSamePart(segment.root, item) ?
+        {
+          ...item,
+          flows: {
+            ...item.flows,
+            ...inFlow,
+            ...outFlow,
+          },
+          liquid,
+        } : item);
+  });
 
   // divide flow for split
   const frictionInvTotal = segment.splits.reduce((acc, split) => acc + 1 / split.friction(), 0);
@@ -412,26 +310,36 @@ export const addFlowForSegment(parts: FlowPart[], segment: FlowSegment, flow: nu
   });
 
   // add flow to next
-  parts = addFlowForSegment(parts, segment.next, flow, liquid);
+  if (segment.next) {
+    parts = addFlowForSegment(parts, segment.next, flow, liquid);
+  }
 
   return parts;
-}
+};
 
-export const pathsFromSources = (parts: PersistentPart[]): FlowSegment[] => {
-  const flowParts = asFlowParts(parts);
-  return flowParts
-    .filter(part => partSettings(part).isSource) // -> FlowPart[]
-    .map(part => ({ liquidSource: COLD_WATER, ...part })) // -> FlowPart[]
-    .map(part => flowPath(
-      flowParts,
-      part,
-      new Coordinates(CENTER) // Source starts from CENTER
-        .rotate(part.rotate)
-        .translate(part)
-        .toString(),
-        )) // -> FlowSegment[][]
-        .reduce(mergeSourceFlows, flowParts) // -> FlowPart[]
-        .map(normalizeFlows);
-      };
 
-*/
+export const calculateFlows = (
+  parts: FlowPart[],
+): FlowPart[] => {
+
+  const addFlowFromPressures = (parts: FlowPart[], pressureType: string): FlowPart[] => {
+    parts.forEach(part => {
+      Object.entries(part.transitions).forEach(([inCoords, outFlows]) => {
+        outFlows.forEach(outFlow => {
+          const pressure = outFlow[pressureType];
+          if (pressure) {
+            const path = flowPath(parts, part, inCoords);
+            if (path !== null) {
+              const startFlow = pressure / path.friction();
+              parts = addFlowForSegment(parts, path, startFlow, "water");
+            }
+          }
+        });
+      });
+    });
+    return parts;
+  };
+
+  return addFlowFromPressures(parts, "pressure");
+};
+

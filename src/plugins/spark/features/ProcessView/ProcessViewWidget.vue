@@ -28,10 +28,7 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   saveConfig(config: ProcessViewConfig = this.widgetConfig) {
-    const parts = config.parts
-      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      .map(({ calculated, liquid, transitions, ...persistent }: FlowPart) => persistent);
-    this.$props.onChangeConfig(this.widgetId, { ...config, parts });
+    this.$props.onChangeConfig(this.widgetId, config);
   }
 
   get gridRect() {
