@@ -303,7 +303,7 @@ describe('A path that forks and rejoins', () => {
       y: 2,
       rotate: 0,
       type: 'InputTube',
-      pressure: 12,
+      pressure: 11,
     },
     {
       x: 2,
@@ -376,42 +376,41 @@ describe('A path that forks and rejoins', () => {
           [
             'ElbowTube',
             'ElbowTube',
+            'TeeTube',
           ],
           [
             'ElbowTube',
             'ElbowTube',
+            'TeeTube',
           ],
         ],
-        'TeeTube',
         'OutputTube',
       ]);
 
     const transitions = propertyWalker([], path, ['transitions']);
     expect(transitions).toEqual(
       [
-        { [IN_OUT]: [{ outCoords: "2,2.5", pressure: 12 }] },
+        { [IN_OUT]: [{ outCoords: "2,2.5", pressure: 11 }] },
         { "2,2.5": [{ outCoords: "3,2.5" }] },
         { "3,2.5": [{ outCoords: "3.5,2" }, { outCoords: "3.5,3" }] },
         [
           [
             { "3.5,2": [{ outCoords: "4,1.5" }] },
             { "4,1.5": [{ outCoords: "4.5,2" }] },
+            { "4.5,2": [{ outCoords: "5,2.5" }] },
           ],
           [
             { "3.5,3": [{ outCoords: "4,3.5" }] },
             { "4,3.5": [{ outCoords: "4.5,3" }] },
+            { "4.5,3": [{ outCoords: "5,2.5" }] },
           ],
         ],
-        {
-          "4.5,2": [{ outCoords: "5,2.5" }],
-          "4.5,3": [{ outCoords: "5,2.5" }],
-        },
         { "5,2.5": [{ outCoords: IN_OUT, pressure: 0 }] },
       ]);
   });
 
   it('Should have a friction value of 6', () => {
-    expect(path.friction()).toEqual(6);
+    expect(path.friction()).toEqual(5.5);
   });
 
   it('Should have a flow of value of 4 total and 2 for each split', () => {

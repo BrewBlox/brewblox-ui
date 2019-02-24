@@ -33,7 +33,7 @@ export interface ComponentSettings {
 
 export interface FlowPart extends PersistentPart {
   transitions: Transitions;
-  flows?: CalculatedFlows;
+  flows: CalculatedFlows;
   liquid?: string;
 }
 

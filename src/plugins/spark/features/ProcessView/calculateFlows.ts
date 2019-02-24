@@ -28,51 +28,6 @@ const adjacentPart = (
       !(currentPart && isSamePart(part, currentPart))
       && has(part, ['transitions', outCoords]));
 
-const combineLiquids =
-  (left: string | undefined, right: string | undefined): string | undefined => {
-    if (left && right && left !== right) {
-      return MIXED_LIQUIDS;
-    }
-    return left || right || undefined;
-  };
-
-/*
-  Starting with a source part, we recursively find all connected parts.
-  Flow pressure is undefined until both the source, and the sink (or another source!) are known.
-
-  Relevant part properties:
-
-  - pressure:
-    Only sources and sinks have defined pressure.
-    The algorithm considers a route complete when it has found a part with defined pressure.
-
-  - inCoords / outCoords:
-    The entrypoint / exit point of the flow in the tube.
-    A left-to-right straight tube will have two flows, with swapped inCoords and outCoords.
-    The inCoords where liquid enters the part will have positive pressure.
-    The inCoords where liquid leaves the part will have negative pressure.
-
-  - friction:
-    The longer the route between source and sink, the less flow.
-    This is modelled by giving each part a friction value.
-    The cumulative friction is used to calculate the actual flow between source and sink.
-
-  - deltaPressure
-    Pumps increase flow throughout the route without contributing additional liquid.
-    This is modelled by giving each part a deltaPressure value,.
-    The cumulative deltaPressure is used to calculate the actual flow between source and sink.
-
-  Route pressure is flows using:
-    startPressure: the pressure defined by the source
-    endPressure: the pressure defined by the end part (sink or source)
-    totalDeltaPressure: the cumulative deltaPressure value for each part in the route from source to sink.
-    totalFriction: the cumulative friction value for each part in the route from source to sink.
-
-  routePressure = (startPressure + totalDeltaPressure - endPressure) / totalFriction.
-
-  If all connected parts are explored, and no sink is found, pressure is considered 0.
-*/
-
 const hasIndependentTransitions = (part: FlowPart): boolean => {
   // const transitions = partSettings(part).transitions(part);
   // TODO: calculate this from actual transitions
@@ -121,7 +76,38 @@ const translations = (part: PersistentPart): Transitions =>
     );
 
 export const asFlowParts = (parts: PersistentPart[]): FlowPart[] =>
-  parts.map(part => ({ ...part, transitions: translations(part) }));
+  parts.map(part => ({ ...part, transitions: translations(part), flows: {} }));
+
+const combineFlows =
+  (left: CalculatedFlows = {}, right: CalculatedFlows = {}): CalculatedFlows =>
+    Object.entries(right)
+      .reduce((into: CalculatedFlows, [coord, val]) => ({ ...into, [coord]: (into[coord] || 0) + val }), left);
+
+const combineLiquids =
+  (left: string | undefined, right: string | undefined): string | undefined => {
+    if (left && right && left !== right) {
+      return MIXED_LIQUIDS;
+    }
+    return left || right || undefined;
+  };
+
+/*
+  Find the part in allParts, and then merge the new flow into allParts.
+*/
+const additionalFlow = (
+  part: FlowPart,
+  allParts: FlowPart[],
+  flowToAdd: CalculatedFlows,
+  liquid: string,
+): FlowPart[] =>
+  allParts
+    .map((item) => {
+      if (isSamePart(part, item)) {
+        return { ...item, liquid, flows: combineFlows(item.flows, flowToAdd) };
+      }
+      return item;
+    });
+
 
 export class FlowSegment {
   public constructor(part: FlowPart, transitions: Transitions) {
@@ -179,7 +165,7 @@ export class FlowSegment {
   };
 
   public isSameSegment(other: FlowSegment): boolean {
-    return JSON.stringify(omit(this, 'transitions')) === JSON.stringify(omit(other, 'transitions'));
+    return JSON.stringify(this) === JSON.stringify(other);
   }
 
   public leafSegments(): FlowSegment[] {
@@ -278,38 +264,46 @@ export const addFlowForSegment = (
   liquid: string
 ): FlowPart[] => {
 
+  let inFlow: CalculatedFlows = {};
+  let outFlow: CalculatedFlows = {};
+
   // add flow for root part
   Object.entries(segment.transitions).forEach(([inCoords, outFlows]) => {
-    const inFlow = { [inCoords]: -flow };
-
-    const outFlow = outFlows.reduce((acc: CalculatedFlows, v: FlowRoute) => ({ ...acc, [v.outCoords]: flow }), {});
-    if (segment.root.type === 'TeeTube') {
-      console.log(segment.transitions);
-    }
-
-    parts = parts.map(item =>
-      isSamePart(segment.root, item) ?
+    inFlow[inCoords] = -flow;
+    if (segment.splits.length === 0) { // for split path, outflow is handled below to split it
+      outFlow = outFlows.reduce((acc: CalculatedFlows, v: FlowRoute) => (
         {
-          ...item,
-          flows: {
-            ...item.flows,
-            ...inFlow,
-            ...outFlow,
-          },
-          liquid,
-        } : item);
+          ...acc,
+          [v.outCoords]: (acc[v.outCoords] || 0) + flow,
+        }
+      ), {});
+    }
   });
 
-  // divide flow for split
-  const frictionInvTotal = segment.splits.reduce((acc, split) => acc + 1 / split.friction(), 0);
+  if (segment.splits.length !== 0) {
+    // divide flow for split
+    const frictionInvTotal = segment.splits.reduce((acc, split) => acc + 1 / split.friction(), 0);
+    segment.splits.forEach((child) => {
+      const invFriction = 1 / child.friction();
+      const splitFlow = flow * invFriction / frictionInvTotal;
+      const childTransition = Object.entries(child.transitions);
+      const childInCoords = childTransition[0][0];
+      outFlow[childInCoords] = outFlow[childInCoords] || 0 + splitFlow;
+      parts = addFlowForSegment(parts, child, splitFlow, liquid);
+    });
+  }
 
-  segment.splits.forEach((child) => {
-    const invFriction = 1 / child.friction();
-    const splitFlow = flow * invFriction / frictionInvTotal;
-    parts = addFlowForSegment(parts, child, splitFlow, liquid);
-  });
+  parts = additionalFlow(
+    segment.root,
+    parts,
+    {
+      ...inFlow,
+      ...outFlow,
+    },
+    liquid
+  );
 
-  // add flow to next
+  // add flow for next
   if (segment.next) {
     parts = addFlowForSegment(parts, segment.next, flow, liquid);
   }
