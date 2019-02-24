@@ -5,10 +5,10 @@ import { defaultSettings } from '../components/getters';
 const settings: ComponentSettings = {
   ...defaultSettings,
   transitions: (part: PersistentPart) => {
-    const p = part.disabled ? 0 : 10;
+    const p = (part.settings || {}).disabled ? 0 : (part.settings || {}).pressure || 10;
     return {
-      [LEFT]: [{ outCoords: RIGHT, deltaPressure: -p }],
-      [RIGHT]: [{ outCoords: LEFT, deltaPressure: p }],
+      [LEFT]: [{ outCoords: RIGHT }],
+      [RIGHT]: [{ outCoords: LEFT, pressure: p }],
     };
   },
 };

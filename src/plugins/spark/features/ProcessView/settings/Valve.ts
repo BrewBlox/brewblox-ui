@@ -5,7 +5,7 @@ import { defaultSettings } from '../components/getters';
 const settings: ComponentSettings = {
   ...defaultSettings,
   transitions: (part: PersistentPart): Transitions => {
-    if (part.closed) {
+    if ((part.settings || {}).closed) {
       return {};
     }
     return {

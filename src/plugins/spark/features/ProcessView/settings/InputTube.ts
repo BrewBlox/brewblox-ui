@@ -6,7 +6,8 @@ const settings: ComponentSettings = {
   ...defaultSettings,
   cards: ['LiquidSourcePartCard'],
   transitions: (part: PersistentPart) => ({
-    [IN_OUT]: [{ outCoords: RIGHT, pressure: part.pressure || 10 }],
+    [IN_OUT]: [{ outCoords: RIGHT, pressure: (part.settings || {}).pressure || 10 }],
+    [RIGHT]: [{ outCoords: IN_OUT }],
   }),
 };
 

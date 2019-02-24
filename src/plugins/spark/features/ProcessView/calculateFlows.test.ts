@@ -2,6 +2,7 @@ import { partSettings, partTransitions, flowPath, asFlowParts, FlowSegment, calc
 import { PersistentPart } from './state';
 import { IN_OUT, DEFAULT_FRICTION, DEFAULT_DELTA_PRESSURE, COLD_WATER, MIXED_LIQUIDS } from './getters';
 import get from 'lodash/get';
+import set from 'lodash/set';
 
 
 type StringList = string | any[];
@@ -27,13 +28,16 @@ describe('Data describing an input tube', () => {
     y: 2,
     rotate: 0,
     type: 'InputTube',
-    pressure: 11,
+    settings: {
+      pressure: 11,
+    },
   };
 
   it('can resolve to transitions', () => {
     expect(partTransitions(part)).toEqual(
       {
         [IN_OUT]: [{ outCoords: '1,0.5', pressure: 11 }],
+        '1,0.5': [{ outCoords: IN_OUT }],
       });
   });
 });
@@ -79,7 +83,9 @@ describe('A single path without splits', () => {
       y: 2,
       rotate: 0,
       type: 'InputTube',
-      pressure: 6,
+      settings: {
+        pressure: 6,
+      },
     },
     {
 
@@ -130,9 +136,11 @@ describe('A single path without splits', () => {
         y: 2,
         rotate: 0,
         type: 'InputTube',
-        pressure: 6,
         liquid: 'water',
         flows: { '-1,-1': -2, '2,2.5': 2 },
+        settings: {
+          pressure: 6,
+        },
       },
       {
         x: 3,
@@ -163,7 +171,9 @@ describe('A path with a split, but no joins', () => {
       y: 2,
       rotate: 0,
       type: 'InputTube',
-      pressure: 14,
+      settings: {
+        pressure: 14,
+      },
     },
     {
       x: 2,
@@ -232,12 +242,12 @@ describe('A path with a split, but no joins', () => {
         [
           [
             {
-              "3.5,2": [{ outCoords: IN_OUT, pressure: 0 }],
+              "3.5,2": [{ outCoords: IN_OUT }],
             },
           ],
           [
             {
-              "3.5,3": [{ outCoords: IN_OUT, pressure: 0 }],
+              "3.5,3": [{ outCoords: IN_OUT }],
             },
           ],
         ],
@@ -303,7 +313,9 @@ describe('A path that forks and rejoins', () => {
       y: 2,
       rotate: 0,
       type: 'InputTube',
-      pressure: 11,
+      settings: {
+        pressure: 11,
+      },
     },
     {
       x: 2,
@@ -405,7 +417,7 @@ describe('A path that forks and rejoins', () => {
             { "4.5,3": [{ outCoords: "5,2.5" }] },
           ],
         ],
-        { "5,2.5": [{ outCoords: IN_OUT, pressure: 0 }] },
+        { "5,2.5": [{ outCoords: IN_OUT }] },
       ]);
   });
 
@@ -488,3 +500,114 @@ describe('A path that forks and rejoins', () => {
   });
 });
 
+describe('A single path with a pump', () => {
+  const parts: PersistentPart[] = [
+    {
+      x: 3,
+      y: 2,
+      rotate: 180,
+      type: 'InputTube',
+      settings: {
+        pressure: 6,
+      },
+    },
+    {
+      x: 2,
+      y: 2,
+      rotate: 0,
+      type: 'Pump',
+      settings: {
+        disabled: true,
+        pressure: 12,
+      },
+    },
+    {
+      x: 1,
+      y: 2,
+      rotate: 180,
+      type: 'OutputTube',
+    },
+  ];
+
+
+  it('Should have a flow of value of 2 for all parts with the pump disabled', () => {
+    const flowParts = asFlowParts(parts);
+    const partsWithFlow = calculateFlows(flowParts);
+    console.log(JSON.stringify(partsWithFlow));
+    expect(partsWithFlow).toMatchObject(
+      [{
+        x: 3,
+        y: 2,
+        rotate: 180,
+        type: 'InputTube',
+        liquid: 'water',
+        flows: { '-1,-1': -2, '3,2.5': 2 },
+        settings: {
+          pressure: 6,
+        },
+      },
+      {
+        x: 2,
+        y: 2,
+        rotate: 0,
+        type: 'Pump',
+        liquid: 'water',
+        flows: { '2,2.5': 2, '3,2.5': -2 },
+        settings: {
+          disabled: true,
+          pressure: 12,
+        },
+      },
+      {
+        x: 1,
+        y: 2,
+        rotate: 180,
+        type: 'OutputTube',
+        liquid: 'water',
+        flows: { '2,2.5': -2, '-1,-1': 2 },
+      },
+      ]
+    );
+  });
+
+
+  it('Should have a flow of value of (input pressure 6 + pump pressure 12) / friction 3 = 6 when the pump is enabled', () => {
+    set(parts[1], ['settings', 'disabled'], false);
+    const flowParts = asFlowParts(parts);
+    const partsWithFlow = calculateFlows(flowParts);
+    expect(partsWithFlow).toMatchObject(
+      [{
+        x: 3,
+        y: 2,
+        rotate: 180,
+        type: 'InputTube',
+        liquid: 'water',
+        flows: { '-1,-1': -6, '3,2.5': 6 },
+        settings: {
+          pressure: 6,
+        },
+      },
+      {
+        x: 2,
+        y: 2,
+        rotate: 0,
+        type: 'Pump',
+        liquid: 'water',
+        flows: { '2,2.5': 6, '3,2.5': -6 },
+        settings: {
+          disabled: false,
+          pressure: 12,
+        },
+      },
+      {
+        x: 1,
+        y: 2,
+        rotate: 180,
+        type: 'OutputTube',
+        liquid: 'water',
+        flows: { '2,2.5': -6, '-1,-1': 6 },
+      },
+      ]
+    );
+  });
+});

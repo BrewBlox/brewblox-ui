@@ -1,7 +1,7 @@
 <script lang="ts">
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
-import { isSamePart, pathsFromSources } from './calculateFlows';
+import { isSamePart, calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
 import { parts as knownParts } from './register';
 import { PersistentPart, ProcessViewConfig, FlowPart } from './state';
@@ -51,7 +51,7 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   get flowParts(): FlowPart[] {
-    return pathsFromSources(this.parts);
+    return calculateNormalizedFlows(this.parts);
   }
 
   get gridClasses() {

@@ -4,9 +4,6 @@ import { Coordinates } from '@/helpers/coordinates';
 import settings from './settings';
 import has from 'lodash/has';
 import get from 'lodash/get';
-import omit from 'lodash/omit';
-import { access } from 'fs';
-import { itemCopyName } from '@/store/dashboards/getters';
 
 export const isSamePart =
   (left: PersistentPart, right: PersistentPart): boolean =>
@@ -31,7 +28,7 @@ const adjacentPart = (
 const hasIndependentTransitions = (part: FlowPart): boolean => {
   // const transitions = partSettings(part).transitions(part);
   // TODO: calculate this from actual transitions
-  if (part.type === 'BridgeTube') {
+  if (part.type === 'BridgeTube' || part.type === 'Pump') {
     return true;
   }
   return false;
@@ -203,7 +200,11 @@ export class FlowSegment {
   }
 }
 
-export const flowPath = (parts: FlowPart[], start: FlowPart, inCoord: string): FlowSegment | null => {
+export const flowPath = (
+  parts: FlowPart[],
+  start: FlowPart,
+  inCoord: string,
+  startCoord: string = inCoord): FlowSegment | null => {
   const outFlows = get(start, ['transitions', inCoord], []);
   const path = new FlowSegment(start, {});
   const candidateParts = parts
@@ -214,12 +215,12 @@ export const flowPath = (parts: FlowPart[], start: FlowPart, inCoord: string): F
       const nextPart = adjacentPart(candidateParts, outFlow.outCoords, start);
       let nextPath: FlowSegment | null = null;
       if (nextPart !== undefined) {
-        nextPath = flowPath(candidateParts, nextPart, outFlow.outCoords);
+        nextPath = flowPath(candidateParts, nextPart, outFlow.outCoords, startCoord);
         if (nextPath !== null) {
           path.addChild(nextPath);
         }
       }
-      if (nextPath !== null || outFlow.outCoords === IN_OUT) {
+      if (nextPath !== null || outFlow.outCoords === startCoord) {
         if (path.transitions[inCoord] === undefined) {
           path.transitions[inCoord] = [outFlow];
         }
@@ -312,12 +313,10 @@ export const addFlowForSegment = (
 };
 
 
-export const calculateFlows = (
-  parts: FlowPart[],
-): FlowPart[] => {
+export const calculateFlows = (parts: FlowPart[]): FlowPart[] => {
 
   const addFlowFromPressures = (parts: FlowPart[], pressureType: string): FlowPart[] => {
-    parts.forEach(part => {
+    return parts.reduce((parts, part): FlowPart[] => {
       Object.entries(part.transitions).forEach(([inCoords, outFlows]) => {
         outFlows.forEach(outFlow => {
           const pressure = outFlow[pressureType];
@@ -330,10 +329,13 @@ export const calculateFlows = (
           }
         });
       });
-    });
-    return parts;
+      return parts;
+    }, parts);
   };
 
   return addFlowFromPressures(parts, "pressure");
 };
 
+export const calculateNormalizedFlows = (parts: PersistentPart[]): FlowPart[] => {
+  return calculateFlows(asFlowParts(parts)).map(normalizeFlows);
+};

@@ -18,11 +18,8 @@ export interface PersistentPart {
   x: number;
   y: number;
   rotate: number;
-  liquidSource?: string;
-  closed?: boolean;
-  disabled?: boolean;
   flipped?: boolean;
-  pressure?: number;
+  settings?: Record<string, any>;
 }
 
 export interface ComponentSettings {

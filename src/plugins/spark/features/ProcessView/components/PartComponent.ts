@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Transitions, FlowPart, CalculatedFlows } from '../state';
+import get from 'lodash/get';
 
 @Component({
   props: {
@@ -25,7 +26,7 @@ export default class PartComponent extends Vue {
   }
 
   protected get closed(): boolean {
-    return Boolean(this.part.closed);
+    return get(this.part, ['settings', 'closed'], false);
   }
 
   protected get flipped(): boolean {
@@ -33,7 +34,7 @@ export default class PartComponent extends Vue {
   }
 
   protected get disabled(): boolean {
-    return Boolean(this.part.disabled);
+    return get(this.part, ['settings', 'disabled'], false);
   }
 
   protected get flow(): CalculatedFlows {
@@ -45,7 +46,7 @@ export default class PartComponent extends Vue {
   }
 
   protected get liquidColor(): string | undefined {
-    return this.part.liquidSource || this.part.liquid;
+    return get(this.part, ['settings', 'liquidSource'], this.part.liquid);
   }
 
   protected flowOnAngle(angle: string): number {
@@ -53,7 +54,7 @@ export default class PartComponent extends Vue {
   }
 
   protected toggleClosed(): void {
-    this.$parent.$emit('input', { ...this.part, closed: !this.closed });
+    this.$parent.$emit('input', { ...this.part, settings: { ...this.part.settings, closed: !this.closed } });
   }
 
   protected toggleFlipped(): void {
@@ -61,6 +62,6 @@ export default class PartComponent extends Vue {
   }
 
   protected toggleDisabled(): void {
-    this.$parent.$emit('input', { ...this.part, disabled: !this.disabled });
+    this.$parent.$emit('input', { ...this.part, settings: { ...this.part.settings, disabled: !this.disabled } });
   }
 }

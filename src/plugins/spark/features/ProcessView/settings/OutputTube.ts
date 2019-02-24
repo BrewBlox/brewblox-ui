@@ -5,7 +5,8 @@ import { defaultSettings } from '../components/getters';
 const settings: ComponentSettings = {
   ...defaultSettings,
   transitions: () => ({
-    [LEFT]: [{ outCoords: IN_OUT, pressure: 0 }],
+    [LEFT]: [{ outCoords: IN_OUT }],
+    [IN_OUT]: [{ outCoords: LEFT }],
   }),
 };
 
