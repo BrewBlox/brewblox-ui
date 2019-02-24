@@ -1,15 +1,22 @@
-import { partSettings, partTransitions, flowPath, asFlowParts, FlowSegment, calculateFlows } from './calculateFlows';
+import {
+  partTransitions,
+  flowPath,
+  asFlowParts,
+  FlowSegment,
+  calculateFlows,
+} from './calculateFlows';
 import { PersistentPart } from './state';
-import { IN_OUT, DEFAULT_FRICTION, DEFAULT_DELTA_PRESSURE, COLD_WATER, MIXED_LIQUIDS } from './getters';
+import { IN_OUT } from './getters';
 import get from 'lodash/get';
 import set from 'lodash/set';
 
 
-type StringList = string | any[];
-
 const propertyWalker = (acc: any[], next: FlowSegment, prop: string[]): any[] => {
   acc = [...acc, get(next, prop)];
+
+  type StringList = string | any[];
   let subtree: StringList[] = [];
+
   next.splits.forEach((child) => {
     subtree.push(propertyWalker([], child, prop)); // splits
   });

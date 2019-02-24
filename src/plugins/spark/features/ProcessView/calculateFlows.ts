@@ -1,5 +1,5 @@
 import { PersistentPart, Transitions, FlowPart, CalculatedFlows, FlowRoute, ComponentSettings } from './state';
-import { IN_OUT, DEFAULT_FRICTION, DEFAULT_DELTA_PRESSURE, COLD_WATER, MIXED_LIQUIDS } from './getters';
+import { DEFAULT_FRICTION, COLD_WATER, MIXED_LIQUIDS } from './getters';
 import { Coordinates } from '@/helpers/coordinates';
 import settings from './settings';
 import has from 'lodash/has';
@@ -134,7 +134,7 @@ export class FlowSegment {
   }
 
   public friction(): number {
-    let series = 1;
+    let series = DEFAULT_FRICTION;
     let parallel = 0;
     this.splits.forEach(splitPath => {
       const splitFriction = splitPath.friction();
@@ -312,28 +312,23 @@ export const addFlowForSegment = (
   return parts;
 };
 
-
 export const calculateFlows = (parts: FlowPart[]): FlowPart[] => {
-
-  const addFlowFromPressures = (parts: FlowPart[], pressureType: string): FlowPart[] => {
-    return parts.reduce((parts, part): FlowPart[] => {
-      Object.entries(part.transitions).forEach(([inCoords, outFlows]) => {
-        outFlows.forEach(outFlow => {
-          const pressure = outFlow[pressureType];
-          if (pressure) {
-            const path = flowPath(parts, part, inCoords);
-            if (path !== null) {
-              const startFlow = pressure / path.friction();
-              parts = addFlowForSegment(parts, path, startFlow, "water");
-            }
+  // total flow is a superposition of all pressure sources in the system
+  return parts.reduce((parts, part): FlowPart[] => {
+    Object.entries(part.transitions).forEach(([inCoords, outFlows]) => {
+      outFlows.forEach(outFlow => {
+        const pressure = outFlow.pressure;
+        if (pressure) {
+          const path = flowPath(parts, part, inCoords);
+          if (path !== null) {
+            const startFlow = pressure / path.friction();
+            parts = addFlowForSegment(parts, path, startFlow, COLD_WATER);
           }
-        });
+        }
       });
-      return parts;
-    }, parts);
-  };
-
-  return addFlowFromPressures(parts, "pressure");
+    });
+    return parts;
+  }, parts);
 };
 
 export const calculateNormalizedFlows = (parts: PersistentPart[]): FlowPart[] => {

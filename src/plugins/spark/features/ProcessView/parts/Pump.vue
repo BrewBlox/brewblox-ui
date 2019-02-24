@@ -25,7 +25,7 @@ export default class Pump extends PartComponent {
         <line x1="7" y1="12.1" x2="-7" y2="-12.1"/>
         <!-- eslint-disable vue/attribute-hyphenation -->
         <animateTransform
-          v-if="!part.disabled"
+          v-if="!part.settings.disabled"
           attributeName="transform"
           attributeType="XML"
           type="rotate"

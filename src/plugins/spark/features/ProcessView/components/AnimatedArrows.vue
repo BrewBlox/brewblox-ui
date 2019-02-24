@@ -21,18 +21,18 @@ import { svgPathProperties } from 'svg-path-properties';
   },
 })
 export default class AnimatedArrows extends Vue {
-  get pathLength (){
+  get pathLength() {
     return svgPathProperties(this.$props.path).getTotalLength();
   }
 
-  get duration(){
-    if(this.$props.speed && this.pathLength){
-      return this.pathLength / (10 * Math.abs(this.$props.speed));
+  get duration() {
+    if (this.$props.speed && this.pathLength) {
+      return this.pathLength / (25 * Math.abs(this.$props.speed));
     }
     return 0;
   }
 
-  get reversed(){
+  get reversed() {
     return this.$props.speed < 0;
   }
 
