@@ -4,6 +4,7 @@ import { durationString } from '@/helpers/functional';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
+import { targetSplitter } from '@/components/Graph/functional';
 
 @Component({
   props: {
@@ -45,8 +46,23 @@ export default class BlockGraph extends Vue {
     return !this.$props.noDuration;
   }
 
+  get targetKeys() {
+    return targetSplitter(this.graphCfg.targets)
+      .map(key => [key, this.graphCfg.renames[key] || key]);
+  }
+
   confirmed(func: Function) {
     return (v: any) => { func(v); this.$props.change({ ...this.graphCfg }); };
+  }
+
+  updateKeySide(key: string, isRight: boolean) {
+    this.$props.change({
+      ...this.graphCfg,
+      axes: {
+        ...this.graphCfg.axes,
+        [key]: isRight ? 'y2' : 'y',
+      },
+    });
   }
 
   parseDuration(val: string): string {
@@ -89,6 +105,17 @@ export default class BlockGraph extends Vue {
                 />
               </q-item-main>
             </q-item>
+            <q-collapsible label="Display Side">
+              <q-item v-for="[key, renamed] in targetKeys" :key="key">
+                <q-item-side>
+                  <q-toggle
+                    :value="graphCfg.axes[key] === 'y2'"
+                    @input="v => updateKeySide(key, v)"
+                  />
+                </q-item-side>
+                <q-item-main>{{ renamed }}</q-item-main>
+              </q-item>
+            </q-collapsible>
           </q-list>
         </q-btn-dropdown>
         <q-btn v-close-overlay flat label="close"/>

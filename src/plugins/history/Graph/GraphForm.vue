@@ -7,6 +7,7 @@ import { fetchKnownKeys } from '@/store/history/actions';
 import { fields } from '@/store/history/getters';
 import Component from 'vue-class-component';
 import FieldPopupEdit from './FieldPopupEdit.vue';
+import { ValueAxes } from '@/store/history/state';
 
 interface PeriodDisplay {
   start: boolean;
@@ -72,8 +73,22 @@ export default class GraphForm extends FormBase {
       .forEach(k => this.$delete(this.config.params, k));
   }
 
+  get axisOpts() {
+    return [
+      { label: 'left', value: 'y' },
+      { label: 'right', value: 'y2' },
+    ];
+  }
+
   get config(): GraphConfig {
-    return this.$props.field as GraphConfig;
+    return {
+      layout: {},
+      params: {},
+      targets: [],
+      renames: {},
+      axes: {},
+      ...this.$props.field,
+    };
   }
 
   get fields() {
@@ -94,6 +109,10 @@ export default class GraphForm extends FormBase {
 
   get renames() {
     return this.config.renames;
+  }
+
+  get axes(): ValueAxes {
+    return this.config.axes;
   }
 
   created() {
@@ -185,6 +204,24 @@ export default class GraphForm extends FormBase {
             label="Legend"
             clearable
             display="span"
+          />
+        </q-item>
+        <q-item v-if="!selected || selected.length === 0">
+          <q-item-main class="darkened">No metrics selected</q-item-main>
+        </q-item>
+      </q-list>
+    </q-collapsible>
+
+    <q-collapsible group="modal" class="col-12" icon="mdi-chart-line" label="Axes">
+      <q-list no-border separator>
+        <q-item>
+          <q-item-main>Metric</q-item-main>Display on right
+        </q-item>
+        <q-item v-for="field in selected" :key="field">
+          <q-item-main>{{ field }}</q-item-main>
+          <q-toggle
+            :value="axes[field] === 'y2'"
+            @change="v => { config.axes[field] = v ? 'y2' : 'y'; saveConfig(); }"
           />
         </q-item>
         <q-item v-if="!selected || selected.length === 0">
