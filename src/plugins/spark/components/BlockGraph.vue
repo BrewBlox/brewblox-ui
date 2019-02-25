@@ -54,6 +54,10 @@ export default class BlockGraph extends Vue {
       .map(key => [key, this.graphCfg.renames[key] || key]);
   }
 
+  isRightAxis(key: string) {
+    return this.graphCfg.axes[key] === 'y2';
+  }
+
   confirmed(func: Function) {
     return (v: any) => { func(v); this.$props.change({ ...this.graphCfg }); };
   }
@@ -108,16 +112,17 @@ export default class BlockGraph extends Vue {
                 />
               </q-item-main>
             </q-item>
-            <q-collapsible label="Display Side">
-              <q-item v-for="[key, renamed] in targetKeys" :key="key">
-                <q-item-side>
-                  <q-toggle
-                    :value="graphCfg.axes[key] === 'y2'"
-                    @input="v => updateKeySide(key, v)"
-                  />
-                </q-item-side>
-                <q-item-main>{{ renamed }}</q-item-main>
-              </q-item>
+            <q-collapsible label="Left or right axis">
+              <q-list link no-border>
+                <q-item
+                  v-for="[key, renamed] in targetKeys"
+                  :key="key"
+                  @click.native="updateKeySide(key, !isRightAxis(key))"
+                >
+                  <q-item-side :class="{mirrored: isRightAxis(key)}" icon="mdi-chart-line"/>
+                  <q-item-main>{{ renamed }}</q-item-main>
+                </q-item>
+              </q-list>
             </q-collapsible>
           </q-list>
         </q-btn-dropdown>
@@ -151,5 +156,10 @@ export default class BlockGraph extends Vue {
 /deep/ .graph-controls .q-field * {
   align-items: center;
   margin-top: 0px !important;
+}
+
+.mirrored {
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
 }
 </style>

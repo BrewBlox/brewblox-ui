@@ -73,13 +73,6 @@ export default class GraphForm extends FormBase {
       .forEach(k => this.$delete(this.config.params, k));
   }
 
-  get axisOpts() {
-    return [
-      { label: 'left', value: 'y' },
-      { label: 'right', value: 'y2' },
-    ];
-  }
-
   get config(): GraphConfig {
     return this.$props.field;
   }
@@ -106,6 +99,15 @@ export default class GraphForm extends FormBase {
 
   get axes(): ValueAxes {
     return this.config.axes;
+  }
+
+  isRightAxis(field: string) {
+    return this.config.axes[field] === 'y2';
+  }
+
+  updateAxisSide(field: string, isRight: boolean) {
+    this.config.axes[field] = isRight ? 'y2' : 'y';
+    this.saveConfig();
   }
 
   created() {
@@ -208,13 +210,16 @@ export default class GraphForm extends FormBase {
     <q-collapsible group="modal" class="col-12" icon="mdi-chart-line" label="Axes">
       <q-list no-border separator>
         <q-item>
-          <q-item-main>Metric</q-item-main>Display on right
+          <q-item-main>Metric</q-item-main>Left or right axis
         </q-item>
         <q-item v-for="field in selected" :key="field">
           <q-item-main>{{ field }}</q-item-main>
-          <q-toggle
-            :value="axes[field] === 'y2'"
-            @change="v => { config.axes[field] = v ? 'y2' : 'y'; saveConfig(); }"
+          <q-btn
+            :class="{mirrored: isRightAxis(field)}"
+            flat
+            size="lg"
+            icon="mdi-chart-line"
+            @click="updateAxisSide(field, !isRightAxis(field))"
           />
         </q-item>
         <q-item v-if="!selected || selected.length === 0">
@@ -224,3 +229,10 @@ export default class GraphForm extends FormBase {
     </q-collapsible>
   </div>
 </template>
+
+<style scoped>
+.mirrored {
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
+}
+</style>

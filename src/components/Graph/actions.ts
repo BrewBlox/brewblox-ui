@@ -29,14 +29,6 @@ const boundedConcat =
     return [...left, ...right];
   };
 
-const keyName =
-  (metric: Metric, key: string): string => {
-    const base = metric.renames[key] || key;
-    return metric.axes[key] == 'y2'
-      ? `(R) ${base}`
-      : base;
-  };
-
 const transformer =
   (metric: Metric, result: QueryResult): Metric => {
     if (result.values && result.values.length > 0) {
@@ -54,7 +46,8 @@ const transformer =
           metric.values[key] = {
             type: 'scatter',
             ...value,
-            name: keyName(metric, key),
+            legendgroup: metric.axes[key] || 'y',
+            name: metric.renames[key] || key,
             yaxis: metric.axes[key] || 'y',
             x: boundedConcat(value.x, time),
             y: boundedConcat(value.y, resultCols[idx]),
