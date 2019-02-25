@@ -39,11 +39,14 @@ export default class BlockGraph extends Vue {
   prevStrConfig: string = '';
 
   get graphCfg(): GraphConfig {
-    return this.$props.config;
-  }
-
-  get hasSettings() {
-    return !this.$props.noDuration;
+    return {
+      layout: {},
+      params: {},
+      targets: [],
+      renames: {},
+      axes: {},
+      ...this.$props.config,
+    };
   }
 
   get targetKeys() {
@@ -91,7 +94,7 @@ export default class BlockGraph extends Vue {
     <q-modal v-model="modalOpen" maximized>
       <GraphCard v-if="modalOpen" ref="graph" :id="$props.id" :config="graphCfg"/>
       <div class="row graph-controls z-top">
-        <q-btn-dropdown v-if="hasSettings" flat label="settings">
+        <q-btn-dropdown flat label="settings">
           <q-list link>
             <q-item @click.native="() => $refs.duration.$el.click()">
               <q-item-side>Duration</q-item-side>

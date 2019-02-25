@@ -46,6 +46,8 @@ export default class GraphDisplay extends Vue {
     yaxis2: {
       overlaying: 'y',
       side: 'right',
+      gridcolor: '#444',
+      zerolinecolor: '#eee',
       autorange: true,
     },
     paper_bgcolor: '#1b1d21',

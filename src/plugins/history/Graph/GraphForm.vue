@@ -81,14 +81,7 @@ export default class GraphForm extends FormBase {
   }
 
   get config(): GraphConfig {
-    return {
-      layout: {},
-      params: {},
-      targets: [],
-      renames: {},
-      axes: {},
-      ...this.$props.field,
-    };
+    return this.$props.field;
   }
 
   get fields() {

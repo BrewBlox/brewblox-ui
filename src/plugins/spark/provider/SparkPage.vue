@@ -197,7 +197,8 @@ export default class SparkPage extends Vue {
   }
 
   onWidgetChange(id: string, config: any) {
-    this.volatileItems[id].config = { ...config };
+    const key = `${this.$props.serviceId}/${id}`;
+    this.volatileItems[key].config = { ...config };
     this.$q.notify({
       type: 'warning',
       message: 'Changes will not be persisted',
