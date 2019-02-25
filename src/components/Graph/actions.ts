@@ -6,6 +6,7 @@ import {
   QueryParams,
   QueryResult,
   QueryTarget,
+  ValueAxes,
 } from '@/store/history/state';
 import { RootStore } from '@/store/state';
 import parseDuration from 'parse-duration';
@@ -45,7 +46,9 @@ const transformer =
           metric.values[key] = {
             type: 'scatter',
             ...value,
+            legendgroup: metric.axes[key] || 'y',
             name: metric.renames[key] || key,
+            yaxis: metric.axes[key] || 'y',
             x: boundedConcat(value.x, time),
             y: boundedConcat(value.y, resultCols[idx]),
           };
@@ -78,6 +81,7 @@ export const addPlotlyMetric =
     id: string,
     params: QueryParams,
     renames: DisplayNames,
+    axes: ValueAxes,
     target: QueryTarget,
   ): Promise<void> => {
     const filteredTarget = {
@@ -90,6 +94,7 @@ export const addPlotlyMetric =
         transformer,
         params,
         renames,
+        axes,
         target: filteredTarget,
         values: {},
       });

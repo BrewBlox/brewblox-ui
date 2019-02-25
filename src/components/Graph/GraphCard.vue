@@ -1,6 +1,6 @@
 <script lang="ts">
 import { tryMetricById } from '@/store/history/getters';
-import { DisplayNames, Metric, QueryParams, QueryTarget } from '@/store/history/state';
+import { DisplayNames, Metric, QueryParams, QueryTarget, ValueAxes } from '@/store/history/state';
 import { Layout, PlotData } from 'plotly.js';
 import Vue from 'vue';
 import Component from 'vue-class-component';
@@ -42,6 +42,10 @@ export default class GraphCard extends Vue {
     return this.graphCfg.renames || {};
   }
 
+  get axes(): ValueAxes {
+    return this.graphCfg.axes || {};
+  }
+
   metricId(target: QueryTarget): string {
     return `${this.$props.id}/${target.measurement}`;
   }
@@ -77,6 +81,7 @@ export default class GraphCard extends Vue {
           this.metricId(target),
           this.params,
           this.renames,
+          this.axes,
           target,
         ));
   }

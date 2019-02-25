@@ -1,6 +1,6 @@
 import { GraphConfig } from '@/components/Graph/state';
 import WidgetBase from '@/components/Widget/WidgetBase';
-import { QueryParams } from '@/store/history/state';
+import { QueryParams, ValueAxes } from '@/store/history/state';
 import Component from 'vue-class-component';
 import { Block } from '../state';
 import { fetchBlock, renameBlock, saveBlock } from '../store/actions';
@@ -46,8 +46,8 @@ export default class BlockWidget extends WidgetBase {
     };
   }
 
-  protected set queryParams(queryParams: QueryParams) {
-    this.$props.onChangeConfig(this.$props.id, { ...this.$props.config, queryParams });
+  protected get graphAxes(): ValueAxes {
+    return this.$props.config.graphAxes || {};
   }
 
   protected get renamedTargets(): { [key: string]: string } {
@@ -61,6 +61,7 @@ export default class BlockWidget extends WidgetBase {
     return {
       // persisted in config
       params: this.queryParams,
+      axes: this.graphAxes,
       // constants
       layout: {
         title: this.$props.id,
@@ -78,7 +79,11 @@ export default class BlockWidget extends WidgetBase {
   }
 
   protected set graphCfg(config: GraphConfig) {
-    this.queryParams = { ...config.params };
+    this.$props.onChangeConfig(this.$props.id, {
+      ...this.$props.config,
+      queryParams: { ...config.params },
+      graphAxes: { ...config.axes },
+    });
   }
 
   protected openModal(): void {

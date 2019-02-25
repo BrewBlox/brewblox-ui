@@ -4,6 +4,7 @@ import { durationString } from '@/helpers/functional';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
+import { targetSplitter } from '@/components/Graph/functional';
 
 @Component({
   props: {
@@ -38,15 +39,37 @@ export default class BlockGraph extends Vue {
   prevStrConfig: string = '';
 
   get graphCfg(): GraphConfig {
-    return this.$props.config;
+    return {
+      layout: {},
+      params: {},
+      targets: [],
+      renames: {},
+      axes: {},
+      ...this.$props.config,
+    };
   }
 
-  get hasSettings() {
-    return !this.$props.noDuration;
+  get targetKeys() {
+    return targetSplitter(this.graphCfg.targets)
+      .map(key => [key, this.graphCfg.renames[key] || key]);
+  }
+
+  isRightAxis(key: string) {
+    return this.graphCfg.axes[key] === 'y2';
   }
 
   confirmed(func: Function) {
     return (v: any) => { func(v); this.$props.change({ ...this.graphCfg }); };
+  }
+
+  updateKeySide(key: string, isRight: boolean) {
+    this.$props.change({
+      ...this.graphCfg,
+      axes: {
+        ...this.graphCfg.axes,
+        [key]: isRight ? 'y2' : 'y',
+      },
+    });
   }
 
   parseDuration(val: string): string {
@@ -75,7 +98,7 @@ export default class BlockGraph extends Vue {
     <q-modal v-model="modalOpen" maximized>
       <GraphCard v-if="modalOpen" ref="graph" :id="$props.id" :config="graphCfg"/>
       <div class="row graph-controls z-top">
-        <q-btn-dropdown v-if="hasSettings" flat label="settings">
+        <q-btn-dropdown flat label="settings">
           <q-list link>
             <q-item @click.native="() => $refs.duration.$el.click()">
               <q-item-side>Duration</q-item-side>
@@ -89,6 +112,18 @@ export default class BlockGraph extends Vue {
                 />
               </q-item-main>
             </q-item>
+            <q-collapsible label="Left or right axis">
+              <q-list link no-border>
+                <q-item
+                  v-for="[key, renamed] in targetKeys"
+                  :key="key"
+                  @click.native="updateKeySide(key, !isRightAxis(key))"
+                >
+                  <q-item-side :class="{mirrored: isRightAxis(key)}" icon="mdi-chart-line"/>
+                  <q-item-main>{{ renamed }}</q-item-main>
+                </q-item>
+              </q-list>
+            </q-collapsible>
           </q-list>
         </q-btn-dropdown>
         <q-btn v-close-overlay flat label="close"/>
@@ -121,5 +156,10 @@ export default class BlockGraph extends Vue {
 /deep/ .graph-controls .q-field * {
   align-items: center;
   margin-top: 0px !important;
+}
+
+.mirrored {
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
 }
 </style>
