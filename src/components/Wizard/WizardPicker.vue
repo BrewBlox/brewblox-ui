@@ -53,14 +53,11 @@ export default class WizardPicker extends Vue {
           <span slot="subtitle">Click to start</span>
         </q-card-title>
         <q-card-main>
-          Sed accumsan, sem vel suscipit bibendum, sapien arcu ornare nulla, a placerat urna libero nec justo.
-          <br>Donec mollis erat sit amet interdum iaculis.
-          Ut sagittis, erat quis viverra rutrum, risus neque dictum augue, in sodales ex sapien vel nisi.
-          In viverra finibus leo et pretium. Etiam sollicitudin porta tincidunt.
-          Etiam gravida, ligula quis interdum sodales, neque dui porta nibh, a molestie ipsum nibh fermentum lorem.
-          Nunc ut nisi tristique, malesuada tellus et, lacinia tortor.
-          Donec blandit, nisi vitae congue dignissim, lectus metus porttitor quam, sit amet rutrum eros elit a ligula.
-          In vel nibh ac mi mollis mollis.
+          <ul>
+            <li>Services communicate with containers in docker-compose.</li>
+            <li>There should be one service per container.</li>
+            <li>There can be multiple services of the same type.</li>
+          </ul>
         </q-card-main>
       </q-card>
 
@@ -70,14 +67,11 @@ export default class WizardPicker extends Vue {
           <span slot="subtitle">Click to start</span>
         </q-card-title>
         <q-card-main>
-          Sed accumsan, sem vel suscipit bibendum, sapien arcu ornare nulla, a placerat urna libero nec justo.
-          <br>Donec mollis erat sit amet interdum iaculis.
-          Ut sagittis, erat quis viverra rutrum, risus neque dictum augue, in sodales ex sapien vel nisi.
-          In viverra finibus leo et pretium. Etiam sollicitudin porta tincidunt.
-          Etiam gravida, ligula quis interdum sodales, neque dui porta nibh, a molestie ipsum nibh fermentum lorem.
-          Nunc ut nisi tristique, malesuada tellus et, lacinia tortor.
-          Donec blandit, nisi vitae congue dignissim, lectus metus porttitor quam, sit amet rutrum eros elit a ligula.
-          In vel nibh ac mi mollis mollis.
+          <ul>
+            <li>Dashboards display widgets.</li>
+            <li>You can have as many dashboards as you want.</li>
+            <li>Deleting a dashboard will delete all widgets on the dashboard.</li>
+          </ul>
         </q-card-main>
       </q-card>
 
@@ -87,14 +81,11 @@ export default class WizardPicker extends Vue {
           <span slot="subtitle">Click to start</span>
         </q-card-title>
         <q-card-main>
-          Sed accumsan, sem vel suscipit bibendum, sapien arcu ornare nulla, a placerat urna libero nec justo.
-          <br>Donec mollis erat sit amet interdum iaculis.
-          Ut sagittis, erat quis viverra rutrum, risus neque dictum augue, in sodales ex sapien vel nisi.
-          In viverra finibus leo et pretium. Etiam sollicitudin porta tincidunt.
-          Etiam gravida, ligula quis interdum sodales, neque dui porta nibh, a molestie ipsum nibh fermentum lorem.
-          Nunc ut nisi tristique, malesuada tellus et, lacinia tortor.
-          Donec blandit, nisi vitae congue dignissim, lectus metus porttitor quam, sit amet rutrum eros elit a ligula.
-          In vel nibh ac mi mollis mollis.
+          <ul>
+            <li>A Widget is a card on a dashboard.</li>
+            <li>Widgets can be anything, but usually display something from a service.</li>
+            <li>Multiple block widgets can be linked to the same block on a Spark controller.</li>
+          </ul>
         </q-card-main>
       </q-card>
 
@@ -104,14 +95,10 @@ export default class WizardPicker extends Vue {
           <span slot="subtitle">Click to start</span>
         </q-card-title>
         <q-card-main>
-          Sed accumsan, sem vel suscipit bibendum, sapien arcu ornare nulla, a placerat urna libero nec justo.
-          <br>Donec mollis erat sit amet interdum iaculis.
-          Ut sagittis, erat quis viverra rutrum, risus neque dictum augue, in sodales ex sapien vel nisi.
-          In viverra finibus leo et pretium. Etiam sollicitudin porta tincidunt.
-          Etiam gravida, ligula quis interdum sodales, neque dui porta nibh, a molestie ipsum nibh fermentum lorem.
-          Nunc ut nisi tristique, malesuada tellus et, lacinia tortor.
-          Donec blandit, nisi vitae congue dignissim, lectus metus porttitor quam, sit amet rutrum eros elit a ligula.
-          In vel nibh ac mi mollis mollis.
+          <ul>
+            <li>An arrangement creates and configures a group of widgets.</li>
+            <li>This is a quick way to set up default configurations.</li>
+          </ul>
         </q-card-main>
       </q-card>
     </q-list>
