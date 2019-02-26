@@ -108,7 +108,7 @@ export default class BlockGraph extends Vue {
                   :field="graphCfg.params.duration"
                   :change="confirmed(v => $set(graphCfg.params, 'duration', parseDuration(v)))"
                   label="Duration"
-                  display="span"
+                  tag="span"
                 />
               </q-item-main>
             </q-item>

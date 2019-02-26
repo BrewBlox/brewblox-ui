@@ -24,7 +24,7 @@ import { round, truncate } from '@/helpers/functional';
       type: Boolean,
       default: false,
     },
-    display: {
+    tag: {
       type: String,
       default: 'big',
     },
@@ -32,6 +32,9 @@ import { round, truncate } from '@/helpers/functional';
 })
 export default class InputPopupEdit extends Vue {
   placeholder = NaN; // must not equal clear-value
+  $refs!: {
+    input: any;
+  }
 
   get displayValue() {
     const val = this.$props.field;
@@ -52,6 +55,7 @@ export default class InputPopupEdit extends Vue {
 
   startEdit() {
     this.placeholder = this.$props.field;
+    this.$nextTick(() => this.$refs.input.select());
   }
 
   endEdit() {
@@ -62,7 +66,7 @@ export default class InputPopupEdit extends Vue {
 
 <template>
   <div>
-    <component :disabled="$props.disable" :is="$props.display" class="editable">{{ displayValue }}</component>
+    <component :disabled="$props.disable" :is="$props.tag" class="editable">{{ displayValue }}</component>
     <q-popup-edit
       :disable="$attrs.disabled"
       :title="$props.label"
@@ -76,7 +80,7 @@ export default class InputPopupEdit extends Vue {
       <div class="help-text text-weight-light q-my-md">
         <slot/>
       </div>
-      <q-input :clearable="$props.clearable" :type="$props.type" v-model="placeholder"/>
+      <q-input ref="input" :clearable="$props.clearable" :type="$props.type" v-model="placeholder"/>
     </q-popup-edit>
   </div>
 </template>

@@ -23,7 +23,7 @@ export default class BlockWidgetSettings extends BlockForm {
       :field="block.id"
       :change="$props.onSwitchBlockId"
       label="Block"
-      display="span"
+      tag="span"
     >Select a different block to be displayed by this widget.</SelectPopupEdit>
     <span v-else>{{ block.id }}</span>
   </WidgetSettings>

@@ -19,7 +19,7 @@ import parseDuration from 'parse-duration';
       type: String,
       required: true,
     },
-    display: {
+    tag: {
       type: String,
       default: 'big',
     },
@@ -41,7 +41,7 @@ export default class TimeUnitPopupEdit extends Vue {
 
 <template>
   <div>
-    <component :is="$props.display" class="editable">{{ this.$props.field | unitDuration }}</component>
+    <component :is="$props.tag" class="editable">{{ this.$props.field | unitDuration }}</component>
     <q-popup-edit
       :title="this.$props.label"
       v-model="placeholder"
@@ -60,5 +60,5 @@ export default class TimeUnitPopupEdit extends Vue {
 </template>
 
 <style lang="stylus" scoped>
-@import './popups.styl'
+@import './popups.styl';
 </style>

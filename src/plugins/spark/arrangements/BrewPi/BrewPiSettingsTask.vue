@@ -344,7 +344,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
                 :field="fridgeSetpointValue"
                 :change="v => fridgeSetpointValue = v"
                 label="Fridge temperature"
-                display="span"
+                tag="span"
               />
             </q-field>
           </q-item>
@@ -354,7 +354,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
                 :field="beerSetpointValue"
                 :change="v => beerSetpointValue = v"
                 label="Beer temperature"
-                display="span"
+                tag="span"
               />
             </q-field>
           </q-item>

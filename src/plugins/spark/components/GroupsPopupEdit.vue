@@ -16,7 +16,7 @@ import Component from 'vue-class-component';
       type: Function,
       required: true,
     },
-    display: {
+    tag: {
       type: String,
       default: 'big',
     },
@@ -54,7 +54,7 @@ export default class GroupsPopupEdit extends Vue {
 
 <template>
   <div>
-    <component :is="$props.display" class="editable">{{ displayValue }}</component>
+    <component :is="$props.tag" class="editable">{{ displayValue }}</component>
     <q-popup-edit
       v-model="placeholder"
       label-set="apply"

@@ -78,7 +78,7 @@ export default class ExampleFeatureWidget extends WidgetBase {
         :field="widgetId"
         :change="v => widgetId = v"
         label="Widget ID"
-        display="span"
+        tag="span"
       />
       <!-- displayName is inherited from WidgetBase. The value is defined in the Feature definition (./index.ts) -->
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>

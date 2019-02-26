@@ -164,7 +164,7 @@ export default class SetpointProfileForm extends BlockForm {
             :field="start"
             :change="updateStartTime"
             label="Start time"
-            display="big"
+            tag="big"
           />
         </q-field>
         <q-field class="col" label="Points" orientation="vertical">
@@ -181,7 +181,7 @@ export default class SetpointProfileForm extends BlockForm {
                 :field="point.time"
                 :change="v => updatePointTime(idx, v)"
                 label="Time"
-                display="big"
+                tag="big"
               />
             </q-field>
             <q-field label="Temperature" orientation="vertical">
