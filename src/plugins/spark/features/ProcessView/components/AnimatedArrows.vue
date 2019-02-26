@@ -59,7 +59,7 @@ export default class AnimatedArrows extends Vue {
 </script>
 
 <template>
-  <g>
+  <g v-if="speed">
     <g v-for="start in starts" :key="start" visibility="hidden">
       <path :transform="transform" d="M-4,-4 L0,0 M-4,4 L0,0" class="outline"/>
       <!-- Note: SVG attributes are case-sensitive -->

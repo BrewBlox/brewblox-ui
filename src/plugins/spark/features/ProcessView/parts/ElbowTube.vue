@@ -27,14 +27,8 @@ export default class ElbowTube extends PartComponent {
       <path :d="paths.borders[0]"/>
       <path :d="paths.borders[1]"/>
     </g>
-    <g v-if="hasLiquid" :stroke="liquidColor" class="liquid">
-      <path :d="paths.liquid"/>
-    </g>
-    <AnimatedArrows
-      v-if="flowSpeed && hasLiquid"
-      :speed="flowSpeed"
-      :path="'M25,0V16a9,9,0,0,0,9,9H50'"
-    />
+    <LiquidStroke :paths="[paths.liquid]" :colors="liquidColor"/>
+    <AnimatedArrows v-if="hasLiquid" :speed="flowSpeed" :path="'M25,0V16a9,9,0,0,0,9,9H50'"/>
   </g>
 </template>
 

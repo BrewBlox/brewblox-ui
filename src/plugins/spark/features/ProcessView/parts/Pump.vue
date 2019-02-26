@@ -17,14 +17,16 @@ export default class Pump extends PartComponent {
 
 <template>
   <g class="pump clickable" @click="toggleDisabled">
-    <!-- ball -->
-    <g v-if="hasLiquid" :fill="liquidColor" class="liquid">
-      <circle cx="25" cy="30" r="16"/>
-    </g>
+    <!-- tube liquid bottom-->
+    <LiquidStroke :paths="['M50,25H0']" :colors="liquidColor"/>
     <!-- ball liquid -->
-    <g class="outline">
-      <circle cx="25" cy="30" r="16"/>
-    </g>
+    <LiquidStroke
+      :paths="['M 15 30 A 9 9 0 1 1 15 31 Z']"
+      :colors="liquidColor"
+      class="ballLiquid"
+    />
+    <!-- ball outline-->
+    <circle cx="25" cy="30" r="16" class="outline"/>
     <!-- blades -->
     <g class="blades-wrapper" transform="translate(25,30)">
       <g class="outline">
@@ -45,10 +47,11 @@ export default class Pump extends PartComponent {
         <!-- eslint-enable -->
       </g>
     </g>
-    <!-- tube liquid -->
-    <g v-if="hasLiquid" :stroke="liquidColor" class="liquid">
-      <polyline points="25,33 25,25 50,25 "/>
-      <line class="st0" x1="0" y1="25" x2="10" y2="25"/>
+    <!-- tube liquid top-->
+    <LiquidStroke :paths="['M50,25H25V36']" :colors="liquidColor"/>
+    <!-- ball -->
+    <g v-if="hasLiquid" :fill="liquidColor" class="liquid">
+      <circle cx="25" cy="30" r="16"/>
     </g>
     <!-- tubes -->
     <g class="outline">
@@ -62,3 +65,8 @@ export default class Pump extends PartComponent {
   </g>
 </template>
 
+<style lang="stylus" scoped>
+/deep/ .ballLiquid path {
+  stroke-width: 15px !important;
+}
+</style>

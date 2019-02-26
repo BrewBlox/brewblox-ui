@@ -1,6 +1,7 @@
 <script>
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { svgPathProperties } from 'svg-path-properties';
 
 @Component({
   props: {
@@ -15,29 +16,41 @@ import Component from 'vue-class-component';
   },
 })
 export default class LiquidStroke extends Vue {
-  get width() {
-    return SQUARE_SIZE;
+  get pathLengths() {
+    return this.$props.paths.map(v => svgPathProperties(v).getTotalLength());
   }
 
-  get height() {
-    return SQUARE_SIZE;
+  get dashArrays() {
+    const numColors = this.$props.colors.length;
+    if (numColors < 2) {
+      return [];
+    }
+    return this.pathLengths.map(v => {
+      const colorLength = v / numColors;
+      return Array.from(new Array(numColors * 2), (x, i) => (i % 2 ? v - colorLength : colorLength));
+    });
   }
 }
 </script>
 
 <template>
-  <g>
-    <g v-for="(path, idx) in paths" :key="idx">
+  <g v-if="colors.length == 1">
+    <template v-for="(path, pidx) in paths">
+      <path :d="path" :key="`${pidx}`" :stroke="colors[0]" stroke-linecap="butt" class="liquid"/>
+    </template>
+  </g>
+  <g v-else-if="colors.length > 1">
+    <template v-for="(path, pidx) in paths">
       <path
-        v-for="(color, idx) in colors"
+        v-for="(color, cidx) in colors"
+        :key="`${pidx}-${cidx}`"
         :d="path"
-        :key="color"
         :stroke="color"
-        :stroke-dashoffset="`${idx*10}`"
+        :stroke-dashoffset="cidx * dashArrays[pidx][0]"
+        :stroke-dasharray="dashArrays[pidx].join(',')"
         stroke-linecap="butt"
         class="liquid"
-        stroke-dasharray="10,20,10,20,10,20"
       />
-    </g>
+    </template>
   </g>
 </template>
