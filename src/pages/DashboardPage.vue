@@ -16,6 +16,7 @@ import {
   dashboardItemsByDashboardId,
   itemCopyName,
   dashboardItemValues,
+  dashboardItemById,
 } from '@/store/dashboards/getters';
 import { DashboardItem } from '@/store/dashboards/state';
 import {
@@ -50,7 +51,6 @@ export default class DashboardPage extends Vue {
 
   @Watch('dashboardId')
   onChangeDashboard() {
-    this.widgetEditable = false;
     this.widgetEditable = false;
   }
 
@@ -99,9 +99,32 @@ export default class DashboardPage extends Vue {
   }
 
   async onChangeOrder(order: VueOrdered[]) {
-    const newOrder = order.map(item => item.id);
+    console.log('ordering');
     try {
-      await updateDashboardItemOrder(this.$store, newOrder);
+      await updateDashboardItemOrder(this.$store, order.map(item => item.id));
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: VueOrdered[]) {
+    try {
+      await saveDashboardItem(
+        this.$store,
+        { ...dashboardItemById(this.$store, id), pinnedPosition },
+      );
+      await updateDashboardItemOrder(this.$store, order.map(item => item.id));
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async onChangePinnedPosition(id: string, pinnedPosition: XYPosition | null) {
+    try {
+      await saveDashboardItem(
+        this.$store,
+        { ...dashboardItemById(this.$store, id), pinnedPosition },
+      );
     } catch (e) {
       throw e;
     }
@@ -221,6 +244,7 @@ export default class DashboardPage extends Vue {
       <GridContainer
         :editable="widgetEditable"
         :on-change-order="onChangeOrder"
+        :on-change-positions="onChangePositions"
         :on-change-size="onChangeSize"
       >
         <component
@@ -231,6 +255,7 @@ export default class DashboardPage extends Vue {
           :key="val.item.id"
           :id="val.item.id"
           :type="val.item.feature"
+          :pos="val.item.pinnedPosition"
           :cols="val.item.cols"
           :rows="val.item.rows"
           :config="val.item.config"

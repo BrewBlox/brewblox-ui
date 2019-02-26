@@ -31,7 +31,7 @@ import draggable from 'vuedraggable';
 })
 export default class DefaultLayout extends Vue {
   $q: any;
-  leftDrawerOpen: boolean = true;
+  leftDrawerOpen: boolean = false;
   dashboardEditing: boolean = false;
   serviceEditing: boolean = false;
   wizardModalOpen: boolean = false;
@@ -117,7 +117,7 @@ export default class DefaultLayout extends Vue {
         <portal-target name="toolbar-buttons" class="toolbar-buttons"/>
       </q-toolbar>
     </q-layout-header>
-    <q-layout-drawer v-model="leftDrawerOpen">
+    <q-layout-drawer v-model="leftDrawerOpen" overlay>
       <q-list no-border link inset-delimiter>
         <q-item link exact to="/">
           <q-item-side icon="home"/>Main menu

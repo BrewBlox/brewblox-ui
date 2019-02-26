@@ -17,6 +17,7 @@ export interface DashboardItem {
   dashboard: string;
   feature: string;
   config: any;
+  pinnedPosition?: XYPosition | null;
   _rev?: string;
 }
 
