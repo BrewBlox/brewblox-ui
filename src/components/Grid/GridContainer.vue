@@ -13,10 +13,6 @@ import GridItem from './GridItem.vue';
       type: Boolean,
       default: false,
     },
-    onChangeOrder: {
-      type: Function,
-      default: () => { },
-    },
     onChangeSize: {
       type: Function,
       default: () => { },

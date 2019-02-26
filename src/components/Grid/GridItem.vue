@@ -318,10 +318,6 @@ export default class GridItem extends Vue {
     this.onDragMove(args.evt);
   }
 
-  holdHandler() {
-    this.modalOpen = true;
-  }
-
   unpin() {
     this.$props.onUpdatePos(this.$props.id, null);
   }
@@ -367,29 +363,37 @@ export default class GridItem extends Vue {
     </button>
     <!-- Item drag button -->
     <button
-      v-touch-hold="holdHandler"
       v-touch-pan="movePanHandler"
       v-if="!dragging && $props.editable"
       class="grid-item-move-handle"
     >
       <div class="column">
-        <q-icon name="touch_app" size="50px"/>
-        <p>hold</p>
-      </div>
-      <big v-if="!$props.noMove">/</big>
-      <div v-if="!$props.noMove" class="column">
-        <q-icon name="mdi-gesture-swipe-horizontal" size="50px"/>
-        <p>drag</p>
-      </div>
-      <big v-if="!$props.noMove">/</big>
-      <div v-if="!$props.noMove">
-        <div v-if="$props.pos" class="column cursor-pointer" @click="unpin">
-          <q-icon name="mdi-pin-off" size="50px" class="cursor-pointer"/>
-          <p>unpin</p>
+        <div v-if="!$props.noMove" class="column">
+          <q-icon name="mdi-gesture-swipe-horizontal" size="50px" class="shadowed"/>
+          <p class="shadowed">drag</p>
         </div>
-        <div v-else class="column cursor-pointer" @click="pin">
-          <q-icon name="mdi-pin" size="50px" class="cursor-pointer"/>
-          <p>pin</p>
+        <div class="row">
+          <q-btn
+            color="primary"
+            icon="settings"
+            fab
+            style="margin-right: 20px"
+            @click="modalOpen = true"
+          />
+          <q-btn
+            v-if="!$props.noMove && $props.pos"
+            fab
+            icon="mdi-pin-off"
+            color="primary"
+            @click="unpin"
+          />
+          <q-btn
+            v-if="!$props.noMove && !$props.pos"
+            fab
+            icon="mdi-pin"
+            color="primary"
+            @click="pin"
+          />
         </div>
       </div>
     </button>
@@ -406,7 +410,9 @@ export default class GridItem extends Vue {
   </div>
 </template>
 
-<style scoped>
+<style lang="stylus" scoped>
+@import '../../css/app.styl';
+
 .grid-item {
   position: relative;
 }
@@ -451,5 +457,9 @@ export default class GridItem extends Vue {
   bottom: 0;
   position: absolute;
   z-index: 1;
+}
+
+.shadowed {
+  text-shadow: 0px 2px 0px $dark, 0px -2px 0px $dark, 2px 0px 0px $dark, -2px 0px 0px $dark;
 }
 </style>

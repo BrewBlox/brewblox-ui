@@ -98,33 +98,17 @@ export default class DashboardPage extends Vue {
     saveDashboard(this.$store, { ...this.dashboard, title });
   }
 
-  async onChangeOrder(order: VueOrdered[]) {
-    console.log('ordering');
-    try {
-      await updateDashboardItemOrder(this.$store, order.map(item => item.id));
-    } catch (e) {
-      throw e;
-    }
-  }
-
   async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: VueOrdered[]) {
     try {
+      // Make a local change to the validated item, to avoid it "jumping" during the store round trip
+      this.validatedItems
+        .filter(valItem => valItem.item.id === id)
+        .forEach(valItem => valItem.item.pinnedPosition = pinnedPosition);
       await saveDashboardItem(
         this.$store,
         { ...dashboardItemById(this.$store, id), pinnedPosition },
       );
       await updateDashboardItemOrder(this.$store, order.map(item => item.id));
-    } catch (e) {
-      throw e;
-    }
-  }
-
-  async onChangePinnedPosition(id: string, pinnedPosition: XYPosition | null) {
-    try {
-      await saveDashboardItem(
-        this.$store,
-        { ...dashboardItemById(this.$store, id), pinnedPosition },
-      );
     } catch (e) {
       throw e;
     }
@@ -243,7 +227,6 @@ export default class DashboardPage extends Vue {
       </q-modal>
       <GridContainer
         :editable="widgetEditable"
-        :on-change-order="onChangeOrder"
         :on-change-positions="onChangePositions"
         :on-change-size="onChangeSize"
       >
