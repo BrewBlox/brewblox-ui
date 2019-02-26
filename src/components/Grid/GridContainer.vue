@@ -21,21 +21,31 @@ import GridItem from './GridItem.vue';
       type: Function,
       default: () => { },
     },
+    onChangePositions: {
+      type: Function,
+      default: () => { },
+    },
   },
   components: { GridItem },
 })
 export default class GridContainer extends Vue {
-  interaction: boolean = false;
+  activeItem: string | null = null;
+  activeItemPos: XYPosition | null = null;
 
-  startInteraction() {
-    this.interaction = true;
+  startInteraction(id: string) {
+    this.activeItem = id;
+  }
+
+  moveInteraction(pos: XYPosition) {
+    this.activeItemPos = pos;
   }
 
   stopInteraction() {
-    this.interaction = false;
+    this.activeItem = null;
+    this.activeItemPos = null;
   }
 
-  newItemsOrder() {
+  newItemsOrder(): Vue[] {
     const sortedChildren = [...this.$children].sort((a, b) => {
       const rectA = a.$el.getBoundingClientRect() as DOMRect;
       const rectB = b.$el.getBoundingClientRect() as DOMRect;
@@ -53,8 +63,29 @@ export default class GridContainer extends Vue {
       // is same position
       return 0;
     });
+    return sortedChildren;
+  }
 
-    this.$props.onChangeOrder(sortedChildren);
+  updateItemPosition(id: string, pos: XYPosition | null) {
+    this.$props.onChangePositions(id, pos, this.newItemsOrder());
+  }
+
+  slotStyle(slot: any) {
+    const { propsData } = slot.componentOptions;
+    const style: Record<string, string> = {};
+    const { cols, rows } = propsData;
+
+    if (propsData.pos) {
+      const { pos } = propsData;
+      style.gridArea = `${pos.y} / ${pos.x} / span ${rows} / span ${cols}`;
+    }
+
+    if (propsData.id === this.activeItem && this.activeItemPos) {
+      const { x, y } = this.activeItemPos;
+      style.gridArea = `${y} / ${x} / span ${rows} / span ${cols}`;
+    }
+
+    return style;
   }
 
   updateItemSize(id: string, cols: number, rows: number) {
@@ -80,6 +111,9 @@ export default class GridContainer extends Vue {
               .map((slot: any) => createElement(
                 GridItem,
                 {
+                  style: {
+                    ...this.slotStyle(slot),
+                  },
                   props: {
                     ...slot.data.attrs,
                     ...slot.componentOptions.propsData,
@@ -87,14 +121,15 @@ export default class GridContainer extends Vue {
                     noMove: this.$props.noMove,
                     onStartInteraction: this.startInteraction,
                     onStopInteraction: this.stopInteraction,
+                    onMoveInteraction: this.moveInteraction,
                     onUpdateItemSize: this.updateItemSize,
-                    onNewItemsOrder: this.newItemsOrder,
+                    onUpdatePos: this.updateItemPosition,
                   },
                 },
                 [slot],
               )),
-            // show overlay grid if interaction is happening or in edit mode
-            (this.interaction || this.$props.editable)
+            // show overlay grid if activeItem is happening or in edit mode
+            (this.activeItem || this.$props.editable)
             && !this.$props.noMove
             && createElement(
               'div',
