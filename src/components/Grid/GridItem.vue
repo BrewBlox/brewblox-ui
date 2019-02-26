@@ -369,8 +369,8 @@ export default class GridItem extends Vue {
     >
       <div class="column">
         <div v-if="!$props.noMove" class="column">
-          <q-icon name="mdi-gesture-swipe-horizontal" size="50px"/>
-          <p>drag</p>
+          <q-icon name="mdi-gesture-swipe-horizontal" size="50px" class="shadowed"/>
+          <p class="shadowed">drag</p>
         </div>
         <div class="row">
           <q-btn
@@ -410,7 +410,9 @@ export default class GridItem extends Vue {
   </div>
 </template>
 
-<style scoped>
+<style lang="stylus" scoped>
+@import '../../css/app.styl';
+
 .grid-item {
   position: relative;
 }
@@ -455,5 +457,9 @@ export default class GridItem extends Vue {
   bottom: 0;
   position: absolute;
   z-index: 1;
+}
+
+.shadowed {
+  text-shadow: 0px 2px 0px $dark, 0px -2px 0px $dark, 2px 0px 0px $dark, -2px 0px 0px $dark;
 }
 </style>
