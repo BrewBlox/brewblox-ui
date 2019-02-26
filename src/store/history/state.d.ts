@@ -20,6 +20,10 @@ export interface DisplayNames {
   [key: string]: string;
 }
 
+export interface ValueAxes {
+  [key: string]: 'y' | 'y2';
+}
+
 export type Slice = number[];
 
 export interface QueryResult {
@@ -34,6 +38,7 @@ export interface Metric {
   params: QueryParams;
   target: QueryTarget;
   renames: DisplayNames;
+  axes: ValueAxes;
   source?: EventSource;
   values?: any;
 }

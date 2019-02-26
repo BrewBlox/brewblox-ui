@@ -161,7 +161,7 @@ export default class ProcessViewWidget extends WidgetBase {
         :field="widgetId"
         :change="v => widgetId = v"
         label="Widget ID"
-        display="span"
+        tag="span"
       />
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
       <q-btn v-if="editable" slot="right" flat round dense icon="delete" @click="updateParts([])"/>

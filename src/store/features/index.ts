@@ -12,6 +12,7 @@ const features: Module<FeatureState, RootState> = {
   namespaced: true,
   state: {
     features: {},
+    arrangements: {},
   },
 };
 

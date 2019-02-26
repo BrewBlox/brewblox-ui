@@ -80,6 +80,7 @@ export default class SessionViewWidget extends WidgetBase {
           params: {},
           targets: [],
           renames: {},
+          axes: {},
         },
         notes: '',
       };

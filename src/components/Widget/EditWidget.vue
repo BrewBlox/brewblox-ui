@@ -9,12 +9,7 @@ export default class EditWidget extends WidgetBase { }
 <template>
   <q-card dark class="column">
     <q-card-title class="title-bar">
-      <InputPopupEdit
-        :field="widgetId"
-        :change="v => widgetId = v"
-        label="Widget ID"
-        display="span"
-      />
+      <InputPopupEdit :field="widgetId" :change="v => widgetId = v" label="Widget ID" tag="span"/>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
     </q-card-title>
     <q-card-separator/>
@@ -52,4 +47,3 @@ export default class EditWidget extends WidgetBase { }
   right: 0;
 }
 </style>
-

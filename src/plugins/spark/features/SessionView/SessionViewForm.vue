@@ -2,7 +2,7 @@
 import Component from 'vue-class-component';
 import shortid from 'shortid';
 import { objectSorter } from '@/helpers/functional';
-import FormBase from '@/components/Widget/FormBase';
+import FormBase from '@/components/Form/FormBase';
 import { nodeBuilder, targetSplitter, targetBuilder } from '@/components/Graph/functional';
 import { SessionViewConfig, Session } from '@/plugins/spark/features/SessionView/state';
 import { durationString } from '@/helpers/functional';
@@ -165,7 +165,7 @@ export default class SessionViewForm extends FormBase {
             :field="session.name"
             :change="v => { session.name = v; updateSession(session); }"
             label="Session name"
-            display="span"
+            tag="span"
           />
         </q-item>
         <q-item>
@@ -175,7 +175,7 @@ export default class SessionViewForm extends FormBase {
             :change="v => startSession(session, v)"
             reset-icon="mdi-clock-start"
             label="Start"
-            display="span"
+            tag="span"
             clear-label="<click to start>"
           />
         </q-item>
@@ -186,7 +186,7 @@ export default class SessionViewForm extends FormBase {
             :change="v => endSession(session, v)"
             reset-icon="mdi-clock-end"
             label="End"
-            display="span"
+            tag="span"
             clear-label="<click to end>"
           />
         </q-item>
@@ -226,7 +226,7 @@ export default class SessionViewForm extends FormBase {
                 :change="v => updateSessionRename(session, field, v)"
                 label="Legend"
                 clearable
-                display="span"
+                tag="span"
               />
             </q-item>
             <q-item v-if="sessionSelected(session).length === 0">

@@ -9,7 +9,14 @@ export default class GraphWidget extends WidgetBase {
   modalOpen: boolean = false;
 
   get graphCfg(): GraphConfig {
-    return this.$props.config;
+    return {
+      layout: {},
+      params: {},
+      targets: [],
+      renames: {},
+      axes: {},
+      ...this.$props.config,
+    };
   }
 
   saveConfig(cfg: GraphConfig) {

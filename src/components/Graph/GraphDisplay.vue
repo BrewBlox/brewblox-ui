@@ -43,6 +43,13 @@ export default class GraphDisplay extends Vue {
       zerolinecolor: '#eee',
       autorange: true,
     },
+    yaxis2: {
+      overlaying: 'y',
+      side: 'right',
+      gridcolor: '#444',
+      zerolinecolor: '#eee',
+      autorange: true,
+    },
     paper_bgcolor: '#1b1d21',
     plot_bgcolor: '#1b1d21',
   };

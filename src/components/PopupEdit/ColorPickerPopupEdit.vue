@@ -1,12 +1,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { round, truncate } from '@/helpers/functional';
 
 @Component({
   props: {
     field: {
-      required: true,
+      type: String,
+      required: false,
     },
     change: {
       type: Function,
@@ -16,38 +16,28 @@ import { round, truncate } from '@/helpers/functional';
       type: String,
       required: true,
     },
-    type: {
-      type: String,
-      default: 'text',
-    },
-    clearable: {
-      type: Boolean,
-      default: false,
-    },
-    display: {
+    tag: {
       type: String,
       default: 'big',
     },
   },
 })
-export default class InputPopupEdit extends Vue {
-  placeholder = NaN; // must not equal clear-value
+export default class ColorPickerPopupEdit extends Vue {
+  placeholder = ''; // must not equal clear-value
 
-  get displayValue() {
-    const val = this.$props.field;
+  get colorString() {
+    return this.$props.field || '<not set>';
+  }
 
-    if (this.$props.type === 'number') {
-      return round(val);
+  get colorStyle() {
+    let color = this.$props.field || 'ffffff';
+    if (!color.startsWith('#')) {
+      color = `#${color}`;
     }
-
-    if (this.$props.type === 'text') {
-      if (val === null || val === undefined || val === '') {
-        return '<not set>';
-      }
-      return truncate(val);
-    }
-
-    return val;
+    return {
+      color,
+      backgroundColor: color,
+    };
   }
 
   startEdit() {
@@ -62,7 +52,8 @@ export default class InputPopupEdit extends Vue {
 
 <template>
   <div>
-    <component :disabled="$props.disable" :is="$props.display" class="editable">{{ displayValue }}</component>
+    <component :is="$props.tag" class="editable">{{ colorString }}</component>
+    <component :is="$props.tag" :style="colorStyle">[ ]</component>
     <q-popup-edit
       :disable="$attrs.disabled"
       :title="$props.label"
@@ -76,7 +67,7 @@ export default class InputPopupEdit extends Vue {
       <div class="help-text text-weight-light q-my-md">
         <slot/>
       </div>
-      <q-input :clearable="$props.clearable" :type="$props.type" v-model="placeholder"/>
+      <q-color-picker v-model="placeholder" dark no-parent-field format-model="hex"/>
     </q-popup-edit>
   </div>
 </template>

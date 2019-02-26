@@ -14,7 +14,7 @@ export const getters: GetterTree<DashboardState, RootState> = {
   items: (state: DashboardState): { [id: string]: DashboardItem } => state.items,
   itemIds: (state: DashboardState): string[] => Object.keys(state.items),
   itemValues: (state: DashboardState): DashboardItem[] => Object.values(state.items),
-  primaryDashboard: (state: DashboardState): string | null => {
+  primaryDashboardId: (state: DashboardState): string | null => {
     const sorted = Object
       .values(state.dashboards)
       .sort((left, right) => {
@@ -35,13 +35,13 @@ export const getters: GetterTree<DashboardState, RootState> = {
 export const replicatingDashboards = read(getters.replicatingDashboards);
 export const dashboards = read(getters.dashboards);
 export const dashboardIds = read(getters.dashboardIds);
-export const allDashboards = read(getters.dashboardValues);
+export const dashboardValues = read(getters.dashboardValues);
 
 export const replicatingItems = read(getters.replicatingItems);
 export const dashboardItems = read(getters.items);
 export const dashboardItemIds = read(getters.itemIds);
 export const dashboardItemValues = read(getters.itemValues);
-export const primaryDashboard = read(getters.primaryDashboard);
+export const primaryDashboardId = read(getters.primaryDashboardId);
 
 export const dashboardById =
   (store: RootStore | DashboardContext, id: string): Dashboard =>

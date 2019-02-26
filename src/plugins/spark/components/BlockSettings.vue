@@ -29,7 +29,7 @@ export default class BlockSettings extends BlockForm {
         <InputPopupEdit
           :field="block.id"
           :change="$props.onChangeBlockId"
-          display="span"
+          tag="span"
           label="Block ID"
         />
       </q-item-main>
@@ -49,7 +49,7 @@ export default class BlockSettings extends BlockForm {
           :field="block.groups"
           :service-id="serviceId"
           :change="callAndSaveBlock(v => block.groups = v)"
-          display="span"
+          tag="span"
         />
       </q-item-main>
     </q-item>
@@ -61,7 +61,7 @@ export default class BlockSettings extends BlockForm {
           :options="$props.presetsData"
           :change="callAndSaveBlock(applyPreset)"
           label="preset"
-          display="span"
+          tag="span"
         />
       </q-item-main>
     </q-item>
