@@ -23,7 +23,7 @@ export default class LiquidStroke extends Vue {
   get dashArrays() {
     const numColors = this.$props.colors.length;
     if (numColors < 2) {
-      return [];
+      return [1];
     }
     return this.pathLengths.map(v => {
       const colorLength = v / numColors;
