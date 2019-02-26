@@ -4,13 +4,21 @@ import PartComponent from '../components/PartComponent';
 
 @Component
 export default class Pump extends PartComponent {
+
+  get disabled() {
+    return this.part.settings.disabled || false;
+  }
+
+  protected toggleDisabled(): void {
+    this.$parent.$emit('input', { ...this.part, settings: { ...this.part.settings, disabled: !this.disabled } });
+  }
 }
 </script>
 
 <template>
   <g class="pump clickable" @click="toggleDisabled">
     <!-- ball -->
-    <g v-if="liquid" :fill="liquidColor" class="liquid">
+    <g v-if="hasLiquid" :fill="liquidColor" class="liquid">
       <circle cx="25" cy="30" r="16"/>
     </g>
     <!-- ball liquid -->
@@ -38,7 +46,7 @@ export default class Pump extends PartComponent {
       </g>
     </g>
     <!-- tube liquid -->
-    <g v-if="liquid" :stroke="liquidColor" class="liquid">
+    <g v-if="hasLiquid" :stroke="liquidColor" class="liquid">
       <polyline points="25,33 25,25 50,25 "/>
       <line class="st0" x1="0" y1="25" x2="10" y2="25"/>
     </g>

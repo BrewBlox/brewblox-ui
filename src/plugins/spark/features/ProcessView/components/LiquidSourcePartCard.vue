@@ -15,7 +15,7 @@ export default class LiquidSourcePartCard extends PartCard {
   }
 
   changeLiquidSource(liquidSource: string) {
-    this.savePart({ ...this.part, settings: { ...this.part.settings, liquidSource } });
+    this.savePart({ ...this.part, settings: { ...this.part.settings, liquids: [liquidSource] } });
   }
 }
 </script>

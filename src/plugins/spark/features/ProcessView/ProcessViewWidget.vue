@@ -43,11 +43,19 @@ export default class ProcessViewWidget extends WidgetBase {
         x: -1,
         y: -1,
         rotate: 0,
+        settings: {},
+        flipped: false,
       }));
   }
 
   get parts(): PersistentPart[] {
-    return this.widgetConfig.parts;
+    return this.widgetConfig.parts
+      .map(v => ({
+        rotate: 0,
+        settings: {},
+        flipped: false,
+        ...v,
+      }));
   }
 
   get flowParts(): FlowPart[] {
@@ -157,12 +165,7 @@ export default class ProcessViewWidget extends WidgetBase {
       />
     </q-modal>
     <q-card-title class="title-bar">
-      <InputPopupEdit
-        :field="widgetId"
-        :change="v => widgetId = v"
-        label="Widget ID"
-        tag="span"
-      />
+      <InputPopupEdit :field="widgetId" :change="v => widgetId = v" label="Widget ID" tag="span"/>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
       <q-btn v-if="editable" slot="right" flat round dense icon="delete" @click="updateParts([])"/>
       <q-btn v-if="editable" slot="right" flat round dense icon="extension">

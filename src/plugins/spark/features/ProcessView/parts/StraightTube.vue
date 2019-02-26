@@ -27,10 +27,8 @@ export default class StraightTube extends PartComponent {
       <path :d="paths.borders[0]"/>
       <path :d="paths.borders[1]"/>
     </g>
-    <g v-if="liquid" :stroke="liquidColor" class="liquid">
-      <path :d="paths.liquid"/>
-    </g>
-    <AnimatedArrows v-if="flowSpeed" :speed="flowSpeed" path="M0,25H50"/>
+    <LiquidStroke v-if="hasLiquid" :paths="[paths.liquid]" :colors="liquidColor"/>
+    <AnimatedArrows v-if="flowSpeed && hasLiquid" :speed="flowSpeed" path="M0,25H50"/>
   </g>
 </template>
 

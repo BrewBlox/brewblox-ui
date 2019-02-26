@@ -54,20 +54,20 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
 
 const translations = (part: PersistentPart): Transitions =>
   Object.entries(partTransitions(part))
-    .reduce((acc, [inCoords, flows]: [string, any]) => {
+    .reduce((acc, [inCoords, transition]: [string, any]) => {
       const updatedKey = new Coordinates(inCoords)
         .rotate(part.rotate)
         .translate([part.x, part.y])
         .toString();
-      const updatedFlows = flows
-        .map((flow: FlowRoute) => ({
-          ...flow,
-          outCoords: new Coordinates(flow.outCoords)
+      const updatedTransition = transition
+        .map((transition: FlowRoute) => ({
+          ...transition,
+          outCoords: new Coordinates(transition.outCoords)
             .rotate(part.rotate)
             .translate([part.x, part.y])
             .toString(),
         }));
-      return { ...acc, [updatedKey]: updatedFlows };
+      return { ...acc, [updatedKey]: updatedTransition };
     },
       {},
     );
@@ -92,7 +92,11 @@ const additionalFlow = (
   allParts
     .map((item) => {
       if (isSamePart(part, item)) {
-        return { ...item, liquids: [...item.liquids, ...liquids], flows: combineFlows(item.flows, flowToAdd) };
+        return {
+          ...item,
+          liquids: [...new Set<string>([...item.liquids, ...liquids])],
+          flows: combineFlows(item.flows, flowToAdd),
+        };
       }
       return item;
     });

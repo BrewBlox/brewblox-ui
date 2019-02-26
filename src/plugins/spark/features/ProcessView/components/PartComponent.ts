@@ -22,46 +22,49 @@ export default class PartComponent extends Vue {
   }
 
   protected get part(): FlowPart {
-    return this.$props.value;
-  }
-
-  protected get closed(): boolean {
-    return get(this.part, ['settings', 'closed'], false);
+    return {
+      transitions: {},
+      flows: {},
+      liquids: [],
+      ...this.$props.value,
+    };
   }
 
   protected get flipped(): boolean {
     return Boolean(this.part.flipped);
   }
 
-  protected get disabled(): boolean {
-    return get(this.part, ['settings', 'disabled'], false);
+  protected toggleFlipped(): void {
+    this.$parent.$emit('input', { ...this.part, flipped: !this.flipped });
   }
 
   protected get flow(): CalculatedFlows {
     return this.part.flows || {};
   }
 
-  protected get liquid(): boolean {
-    return Object.keys(this.flow).length > 0;
+  protected get hasLiquid(): boolean {
+    return this.part.liquids.length > 0;
   }
 
   protected get liquidColor(): string | undefined {
-    return get(this.part, ['settings', 'liquidSource'], this.part.liquid);
+    return get(this.part, ['settings', 'liquids'], this.part.liquids);
   }
 
   protected flowOnAngle(angle: string): number {
     return this.flow[angle] || 0;
   }
 
-  protected toggleClosed(): void {
-    this.$parent.$emit('input', { ...this.part, settings: { ...this.part.settings, closed: !this.closed } });
+  protected settings(): Record<string, any> {
+    return this.part.settings || {};
   }
 
-  protected toggleFlipped(): void {
-    this.$parent.$emit('input', { ...this.part, flipped: !this.flipped });
-  }
+  /*
+    protected toggleClosed(): void {
+      this.$parent.$emit('input', { ...this.part, settings: { ...this.part.settings, closed: !this.closed } });
+    }
 
-  protected toggleDisabled(): void {
-    this.$parent.$emit('input', { ...this.part, settings: { ...this.part.settings, disabled: !this.disabled } });
-  }
+
+    protected toggleDisabled(): void {
+      this.$parent.$emit('input', { ...this.part, settings: { ...this.part.settings, disabled: !this.disabled } });
+    }*/
 }

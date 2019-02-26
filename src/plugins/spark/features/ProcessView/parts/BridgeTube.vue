@@ -94,7 +94,7 @@ export default class BridgeTube extends PartComponent {
     <g v-if="lowLiquid" :stroke="liquidColor" class="liquid">
       <path :d="lowPaths.liquid"/>
     </g>
-    <AnimatedArrows v-if="lowFlowSpeed" :speed="lowFlowSpeed" :path="lowPaths.liquid"/>
+    <AnimatedArrows v-if="lowFlowSpeed && hasLiquid" :speed="lowFlowSpeed" :path="lowPaths.liquid"/>
     <!-- high -->
     <g class="outline">
       <path :d="highPaths.borders[0]"/>
@@ -103,7 +103,11 @@ export default class BridgeTube extends PartComponent {
     <g v-show="highLiquid" :stroke="liquidColor" class="liquid">
       <path :d="highPaths.liquid"/>
     </g>
-    <AnimatedArrows v-if="highFlowSpeed" :speed="highFlowSpeed" :path="highPaths.liquid"/>
+    <AnimatedArrows
+      v-if="highFlowSpeed && hasLiquid"
+      :speed="highFlowSpeed"
+      :path="highPaths.liquid"
+    />
   </g>
 </template>
 

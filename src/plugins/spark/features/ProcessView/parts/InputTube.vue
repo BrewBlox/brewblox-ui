@@ -30,10 +30,13 @@ export default class InputTube extends PartComponent {
       <path :d="paths.borders[0]"/>
       <path :d="paths.borders[1]"/>
     </g>
-    <g v-if="liquid" :stroke="liquidColor" class="liquid">
-      <path :d="paths.liquid"/>
-    </g>
-    <AnimatedArrows v-if="flowSpeed" :num-arrows="1" :speed="flowSpeed" path="M25,25H50"/>
+    <LiquidStroke v-if="hasLiquid" :paths="[paths.liquid]" :colors="liquidColor"/>
+    <AnimatedArrows
+      v-if="flowSpeed && hasLiquid"
+      :num-arrows="1"
+      :speed="flowSpeed"
+      path="M25,25H50"
+    />
   </g>
 </template>
 
