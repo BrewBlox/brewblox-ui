@@ -1,5 +1,5 @@
 import { PersistentPart, Transitions, FlowPart, CalculatedFlows, FlowRoute, ComponentSettings } from './state';
-import { DEFAULT_FRICTION, COLD_WATER, MIXED_LIQUIDS } from './getters';
+import { DEFAULT_FRICTION, MIXED_LIQUIDS } from './getters';
 import { Coordinates } from '@/helpers/coordinates';
 import settings from './settings';
 import has from 'lodash/has';
@@ -73,20 +73,12 @@ const translations = (part: PersistentPart): Transitions =>
     );
 
 export const asFlowParts = (parts: PersistentPart[]): FlowPart[] =>
-  parts.map(part => ({ ...part, transitions: translations(part), flows: {} }));
+  parts.map(part => ({ ...part, transitions: translations(part), flows: {}, liquids: [] }));
 
 const combineFlows =
   (left: CalculatedFlows = {}, right: CalculatedFlows = {}): CalculatedFlows =>
     Object.entries(right)
       .reduce((into: CalculatedFlows, [coord, val]) => ({ ...into, [coord]: (into[coord] || 0) + val }), left);
-
-const combineLiquids =
-  (left: string | undefined, right: string | undefined): string | undefined => {
-    if (left && right && left !== right) {
-      return MIXED_LIQUIDS;
-    }
-    return left || right || undefined;
-  };
 
 /*
   Find the part in allParts, and then merge the new flow into allParts.
@@ -95,12 +87,12 @@ const additionalFlow = (
   part: FlowPart,
   allParts: FlowPart[],
   flowToAdd: CalculatedFlows,
-  liquid: string,
+  liquids: string[],
 ): FlowPart[] =>
   allParts
     .map((item) => {
       if (isSamePart(part, item)) {
-        return { ...item, liquid, flows: combineFlows(item.flows, flowToAdd) };
+        return { ...item, liquids: [...item.liquids, ...liquids], flows: combineFlows(item.flows, flowToAdd) };
       }
       return item;
     });
@@ -262,7 +254,7 @@ export const addFlowForSegment = (
   parts: FlowPart[],
   segment: FlowSegment,
   flow: number,
-  liquid: string
+  liquids: string[]
 ): FlowPart[] => {
 
   let inFlow: CalculatedFlows = {};
@@ -290,7 +282,7 @@ export const addFlowForSegment = (
       const childTransition = Object.entries(child.transitions);
       const childInCoords = childTransition[0][0];
       outFlow[childInCoords] = outFlow[childInCoords] || 0 + splitFlow;
-      parts = addFlowForSegment(parts, child, splitFlow, liquid);
+      parts = addFlowForSegment(parts, child, splitFlow, liquids);
     });
   }
 
@@ -301,12 +293,12 @@ export const addFlowForSegment = (
       ...inFlow,
       ...outFlow,
     },
-    liquid
+    liquids
   );
 
   // add flow for next
   if (segment.next) {
-    parts = addFlowForSegment(parts, segment.next, flow, liquid);
+    parts = addFlowForSegment(parts, segment.next, flow, liquids);
   }
 
   return parts;
@@ -318,11 +310,12 @@ export const calculateFlows = (parts: FlowPart[]): FlowPart[] => {
     Object.entries(part.transitions).forEach(([inCoords, outFlows]) => {
       outFlows.forEach(outFlow => {
         const pressure = outFlow.pressure;
+        const liquids = outFlow.liquids || [];
         if (pressure) {
           const path = flowPath(parts, part, inCoords);
           if (path !== null) {
             const startFlow = pressure / path.friction();
-            parts = addFlowForSegment(parts, path, startFlow, COLD_WATER);
+            parts = addFlowForSegment(parts, path, startFlow, liquids);
           }
         }
       });

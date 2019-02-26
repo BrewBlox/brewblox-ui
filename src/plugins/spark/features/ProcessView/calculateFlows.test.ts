@@ -6,7 +6,7 @@ import {
   calculateFlows,
 } from './calculateFlows';
 import { PersistentPart } from './state';
-import { IN_OUT } from './getters';
+import { IN_OUT, COLD_WATER, HOT_WATER } from './getters';
 import get from 'lodash/get';
 import set from 'lodash/set';
 
@@ -37,13 +37,14 @@ describe('Data describing an input tube', () => {
     type: 'InputTube',
     settings: {
       pressure: 11,
+      liquids: [COLD_WATER],
     },
   };
 
   it('can resolve to transitions', () => {
     expect(partTransitions(part)).toEqual(
       {
-        [IN_OUT]: [{ outCoords: '1,0.5', pressure: 11 }],
+        [IN_OUT]: [{ outCoords: '1,0.5', pressure: 11, liquids: [COLD_WATER] }],
         '1,0.5': [{ outCoords: IN_OUT }],
       });
   });
@@ -58,13 +59,16 @@ describe('asFlowParts', () => {
       y: 2,
       rotate: 0,
       type: 'InputTube',
+      settings: {
+        liquids: [COLD_WATER],
+      },
     },
     {
-
       x: 2,
       y: 2,
       rotate: 0,
       type: 'StraightTube',
+      settings: {},
     },
     {
 
@@ -72,6 +76,7 @@ describe('asFlowParts', () => {
       y: 2,
       rotate: 0,
       type: 'OutputTube',
+      settings: {},
     },
   ];
 
@@ -92,6 +97,7 @@ describe('A single path without splits', () => {
       type: 'InputTube',
       settings: {
         pressure: 6,
+        liquids: [HOT_WATER],
       },
     },
     {
@@ -100,12 +106,14 @@ describe('A single path without splits', () => {
       y: 2,
       rotate: 0,
       type: 'OutputTube',
+      settings: {},
     },
     {
       x: 2,
       y: 2,
       rotate: 0,
       type: 'StraightTube',
+      settings: {},
     },
   ];
 
@@ -143,10 +151,11 @@ describe('A single path without splits', () => {
         y: 2,
         rotate: 0,
         type: 'InputTube',
-        liquid: 'water',
         flows: { '-1,-1': -2, '2,2.5': 2 },
+        liquids: [HOT_WATER],
         settings: {
           pressure: 6,
+          liquids: [HOT_WATER],
         },
       },
       {
@@ -154,7 +163,7 @@ describe('A single path without splits', () => {
         y: 2,
         rotate: 0,
         type: 'OutputTube',
-        liquid: 'water',
+        liquids: [HOT_WATER],
         flows: { '3,2.5': -2, '-1,-1': 2 },
       },
       {
@@ -162,7 +171,7 @@ describe('A single path without splits', () => {
         y: 2,
         rotate: 0,
         type: 'StraightTube',
-        liquid: 'water',
+        liquids: [HOT_WATER],
         flows: { '2,2.5': -2, '3,2.5': 2 },
       }]
     );
@@ -180,6 +189,7 @@ describe('A path with a split, but no joins', () => {
       type: 'InputTube',
       settings: {
         pressure: 14,
+        liquids: [COLD_WATER],
       },
     },
     {
@@ -187,24 +197,28 @@ describe('A path with a split, but no joins', () => {
       y: 2,
       rotate: 0,
       type: 'StraightTube',
+      settings: {},
     },
     {
       x: 3,
       y: 2,
       rotate: 270,
       type: 'TeeTube',
+      settings: {},
     },
     {
       x: 3,
       y: 1,
       rotate: 270,
       type: 'OutputTube',
+      settings: {},
     },
     {
       x: 3,
       y: 3,
       rotate: 90,
       type: 'OutputTube',
+      settings: {},
     },
   ];
 
@@ -238,7 +252,7 @@ describe('A path with a split, but no joins', () => {
     expect(transitions).toEqual(
       [
         {
-          [IN_OUT]: [{ outCoords: "2,2.5", pressure: 14 }],
+          [IN_OUT]: [{ outCoords: "2,2.5", pressure: 14, liquids: [COLD_WATER] }],
         },
         {
           "2,2.5": [{ outCoords: "3,2.5" }],
@@ -322,6 +336,7 @@ describe('A path that forks and rejoins', () => {
       type: 'InputTube',
       settings: {
         pressure: 11,
+        liquids: [COLD_WATER],
       },
     },
     {
@@ -329,48 +344,56 @@ describe('A path that forks and rejoins', () => {
       y: 2,
       rotate: 0,
       type: 'StraightTube',
+      settings: {},
     },
     {
       x: 3,
       y: 2,
       rotate: 270,
       type: 'TeeTube',
+      settings: {},
     },
     {
       x: 3,
       y: 1,
       rotate: 90,
       type: 'ElbowTube',
+      settings: {},
     },
     {
       x: 3,
       y: 3,
       rotate: 0,
       type: 'ElbowTube',
+      settings: {},
     },
     {
       x: 4,
       y: 1,
       rotate: 180,
       type: 'ElbowTube',
+      settings: {},
     },
     {
       x: 4,
       y: 3,
       rotate: 270,
       type: 'ElbowTube',
+      settings: {},
     },
     {
       x: 4,
       y: 2,
       rotate: 90,
       type: 'TeeTube',
+      settings: {},
     },
     {
       x: 5,
       y: 2,
       rotate: 0,
       type: 'OutputTube',
+      settings: {},
     },
   ];
 
@@ -409,7 +432,7 @@ describe('A path that forks and rejoins', () => {
     const transitions = propertyWalker([], path, ['transitions']);
     expect(transitions).toEqual(
       [
-        { [IN_OUT]: [{ outCoords: "2,2.5", pressure: 11 }] },
+        { [IN_OUT]: [{ outCoords: "2,2.5", pressure: 11, liquids: [COLD_WATER] }] },
         { "2,2.5": [{ outCoords: "3,2.5" }] },
         { "3,2.5": [{ outCoords: "3.5,2" }, { outCoords: "3.5,3" }] },
         [
@@ -516,6 +539,7 @@ describe('A single path with a pump', () => {
       type: 'InputTube',
       settings: {
         pressure: 6,
+        liquids: [COLD_WATER],
       },
     },
     {
@@ -533,6 +557,7 @@ describe('A single path with a pump', () => {
       y: 2,
       rotate: 180,
       type: 'OutputTube',
+      settings: {},
     },
   ];
 
@@ -547,10 +572,11 @@ describe('A single path with a pump', () => {
         y: 2,
         rotate: 180,
         type: 'InputTube',
-        liquid: 'water',
+        liquids: [COLD_WATER],
         flows: { '-1,-1': -2, '3,2.5': 2 },
         settings: {
           pressure: 6,
+          liquids: [COLD_WATER],
         },
       },
       {
@@ -558,7 +584,7 @@ describe('A single path with a pump', () => {
         y: 2,
         rotate: 0,
         type: 'Pump',
-        liquid: 'water',
+        liquids: [COLD_WATER],
         flows: { '2,2.5': 2, '3,2.5': -2 },
         settings: {
           disabled: true,
@@ -570,7 +596,7 @@ describe('A single path with a pump', () => {
         y: 2,
         rotate: 180,
         type: 'OutputTube',
-        liquid: 'water',
+        liquids: [COLD_WATER],
         flows: { '2,2.5': -2, '-1,-1': 2 },
       },
       ]
@@ -588,7 +614,7 @@ describe('A single path with a pump', () => {
         y: 2,
         rotate: 180,
         type: 'InputTube',
-        liquid: 'water',
+        liquids: [COLD_WATER],
         flows: { '-1,-1': -6, '3,2.5': 6 },
         settings: {
           pressure: 6,
@@ -599,7 +625,7 @@ describe('A single path with a pump', () => {
         y: 2,
         rotate: 0,
         type: 'Pump',
-        liquid: 'water',
+        liquids: [COLD_WATER],
         flows: { '2,2.5': 6, '3,2.5': -6 },
         settings: {
           disabled: false,
@@ -611,7 +637,7 @@ describe('A single path with a pump', () => {
         y: 2,
         rotate: 180,
         type: 'OutputTube',
-        liquid: 'water',
+        liquids: [COLD_WATER],
         flows: { '2,2.5': -6, '-1,-1': 6 },
       },
       ]

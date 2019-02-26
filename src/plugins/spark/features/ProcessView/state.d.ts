@@ -2,7 +2,7 @@ export interface FlowRoute {
   outCoords: string;
   friction?: number;
   pressure?: number;
-  deltaPressure?: number;
+  liquids?: string[];
 }
 
 export interface Transitions {
@@ -19,7 +19,7 @@ export interface PersistentPart {
   y: number;
   rotate: number;
   flipped?: boolean;
-  settings?: Record<string, any>;
+  settings: Record<string, any>;
 }
 
 export interface ComponentSettings {
@@ -31,7 +31,7 @@ export interface ComponentSettings {
 export interface FlowPart extends PersistentPart {
   transitions: Transitions;
   flows: CalculatedFlows;
-  liquid?: string;
+  liquids: string[];
 }
 
 export interface ProcessViewConfig {
