@@ -68,4 +68,3 @@ export default class UnitPopupEdit extends Vue {
 <style lang="stylus" scoped>
 @import './popups.styl'
 </style>
-

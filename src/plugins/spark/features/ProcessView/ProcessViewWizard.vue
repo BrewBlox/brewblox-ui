@@ -1,10 +1,10 @@
 <script lang="ts">
-import WizardBase, { NavAction } from '@/components/Widget/WizardBase';
+import WidgetWizardBase, { NavAction } from '@/components/Wizard/WidgetWizardBase';
 import Component from 'vue-class-component';
 
 
 @Component
-export default class ProcessViewWizard extends WizardBase {
+export default class ProcessViewWizard extends WidgetWizardBase {
   currentStep: string = '';
   widgetId: string = '';
 
@@ -43,6 +43,8 @@ export default class ProcessViewWizard extends WizardBase {
     this.createItem({
       id: this.widgetId,
       feature: this.typeId,
+      dashboard: this.$props.dashboardId,
+      order: 0,
       config: {
         parts: [],
       },

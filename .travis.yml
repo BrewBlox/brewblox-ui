@@ -24,18 +24,21 @@ before_deploy:
   cp -r dist/ docker/;
   docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD};
   docker run --rm --privileged multiarch/qemu-user-static:register --reset;
-  export CLEAN_TRAVIS_BRANCH=$(echo "${TRAVIS_BRANCH}" | tr '/' '-' | tr '[:upper:]' '[:lower:]');
-  export TAG_VERSION=$(git describe --tags);
+  export BRANCH_TAG=$(echo "${TRAVIS_BRANCH}" | tr '/' '-' | tr '[:upper:]' '[:lower:]');
+  export GIT_TAG=$(git describe --tags);
 
 deploy:
   # Deploy AMD "newest-tag" and version tag to Docker Hub on tagged commits
   - provider: script
     script:
-      docker build --no-cache -t ${DOCKER_REPO}:amd -f docker/amd/Dockerfile docker;
-      docker tag ${DOCKER_REPO}:amd ${DOCKER_REPO}:newest-tag;
+      docker build
+        --no-cache
+        -t ${DOCKER_REPO}:newest-tag
+        -t ${DOCKER_REPO}:${GIT_TAG}
+        -f docker/amd/Dockerfile
+        docker;
       docker push ${DOCKER_REPO}:newest-tag;
-      docker tag ${DOCKER_REPO}:amd ${DOCKER_REPO}:${TAG_VERSION};
-      docker push ${DOCKER_REPO}:${TAG_VERSION};
+      docker push ${DOCKER_REPO}:${GIT_TAG};
     skip_cleanup: true
     on:
       tags: true
@@ -43,11 +46,14 @@ deploy:
   # Deploy ARM "rpi-newest-tag" and version tag to Docker Hub on tagged commits
   - provider: script
     script:
-      docker build --no-cache -t ${DOCKER_REPO}:arm -f docker/arm/Dockerfile docker;
-      docker tag ${DOCKER_REPO}:arm ${DOCKER_REPO}:rpi-newest-tag;
+      docker build
+        --no-cache
+        -t ${DOCKER_REPO}:rpi-newest-tag
+        -t ${DOCKER_REPO}:rpi-${GIT_TAG}
+        -f docker/arm/Dockerfile
+        docker;
       docker push ${DOCKER_REPO}:rpi-newest-tag;
-      docker tag ${DOCKER_REPO}:arm ${DOCKER_REPO}:rpi-${TAG_VERSION};
-      docker push ${DOCKER_REPO}:rpi-${TAG_VERSION};
+      docker push ${DOCKER_REPO}:rpi-${GIT_TAG};
     skip_cleanup: true
     on:
       tags: true
@@ -55,9 +61,12 @@ deploy:
   # Deploy AMD branch to Docker Hub on any push to an upstream development branch
   - provider: script
     script:
-      docker build --no-cache -t ${DOCKER_REPO}:amd -f docker/amd/Dockerfile docker;
-      docker tag ${DOCKER_REPO}:amd ${DOCKER_REPO}:${CLEAN_TRAVIS_BRANCH};
-      docker push ${DOCKER_REPO}:${CLEAN_TRAVIS_BRANCH};
+      docker build
+        --no-cache
+        -t ${DOCKER_REPO}:${BRANCH_TAG}
+        -f docker/amd/Dockerfile
+        docker;
+      docker push ${DOCKER_REPO}:${BRANCH_TAG};
     skip_cleanup: true
     on:
       tags: false
@@ -67,9 +76,12 @@ deploy:
   # Deploy ARM branch to Docker Hub on any push to an upstream development branch
   - provider: script
     script:
-      docker build --no-cache -t ${DOCKER_REPO}:arm -f docker/arm/Dockerfile docker;
-      docker tag ${DOCKER_REPO}:arm ${DOCKER_REPO}:rpi-${CLEAN_TRAVIS_BRANCH};
-      docker push ${DOCKER_REPO}:rpi-${CLEAN_TRAVIS_BRANCH};
+      docker build
+        --no-cache
+        -t ${DOCKER_REPO}:rpi-${BRANCH_TAG}
+        -f docker/arm/Dockerfile
+        docker;
+      docker push ${DOCKER_REPO}:rpi-${BRANCH_TAG};
     skip_cleanup: true
     on:
       tags: false

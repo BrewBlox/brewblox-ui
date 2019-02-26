@@ -1,6 +1,6 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import FormBase from '@/components/Widget/FormBase';
+import FormBase from '@/components/Form/FormBase';
 
 @Component({
   props: {

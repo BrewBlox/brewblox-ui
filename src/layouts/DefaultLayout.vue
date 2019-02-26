@@ -1,16 +1,15 @@
 <script lang="ts">
-import NewServiceWizard from '@/components/Wizard/NewServiceWizard.vue';
+import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
 import { objectSorter } from '@/helpers/functional';
 import {
-  createDashboard,
   removeDashboard,
   updateDashboardOrder,
   updatePrimaryDashboard,
   saveDashboard,
 } from '@/store/dashboards/actions';
 import {
-  allDashboards,
-  primaryDashboard,
+  dashboardValues,
+  primaryDashboardId,
 } from '@/store/dashboards/getters';
 import { Dashboard } from '@/store/dashboards/state';
 import {
@@ -27,23 +26,22 @@ import draggable from 'vuedraggable';
 @Component({
   components: {
     draggable,
-    NewServiceWizard,
+    ServiceWizardPicker,
   },
 })
 export default class DefaultLayout extends Vue {
-  leftDrawerOpen: boolean = false;
+  $q: any;
+  leftDrawerOpen: boolean = true;
   dashboardEditing: boolean = false;
   serviceEditing: boolean = false;
-  serviceWizardActive: boolean = false;
   wizardModalOpen: boolean = false;
-  $q: any;
 
   get version() {
     return process.env.GIT_VERSION || 'UNKNOWN';
   }
 
   get dashboards() {
-    return [...allDashboards(this.$store)].sort(objectSorter('order'));
+    return [...dashboardValues(this.$store)].sort(objectSorter('order'));
   }
 
   set dashboards(dashboards: Dashboard[]) {
@@ -51,7 +49,7 @@ export default class DefaultLayout extends Vue {
   }
 
   get defaultDashboard() {
-    return primaryDashboard(this.$store);
+    return primaryDashboardId(this.$store);
   }
 
   get services() {
@@ -72,17 +70,6 @@ export default class DefaultLayout extends Vue {
 
   toggleServiceEditing() {
     this.serviceEditing = !this.serviceEditing;
-  }
-
-  createDashboard() {
-    this.$q.dialog({
-      title: 'Add dashboard',
-      message: 'Enter name of the dashboard',
-      cancel: true,
-      prompt: {
-        model: '',
-      },
-    }).then((name: string) => createDashboard(this.$store, name));
   }
 
   removeDashboard(dashboard: Dashboard) {
@@ -136,26 +123,22 @@ export default class DefaultLayout extends Vue {
           <q-item-side icon="home"/>Main menu
         </q-item>
         <q-item-separator/>
-        <q-item @click="wizardModalOpen = true">
-          <q-modal v-model="wizardModalOpen">test</q-modal>
+        <q-item @click.native="wizardModalOpen = true">
           <q-item-side icon="add"/>Wizardry
         </q-item>
         <q-item-separator/>
         <!-- dashboards -->
         <q-list-header>
           <q-item-side icon="dashboard"/>Dashboards
-          <q-btn flat round icon="add" label="Add dashboard" @click="createDashboard"/>
-          <q-item-side right>
-            <q-btn
-              :disable="dashboards.length === 0"
-              :flat="!dashboardEditing"
-              :icon="dashboardEditing ? 'check' : 'mode edit'"
-              :color="dashboardEditing ? 'primary': ''"
-              round
-              size="sm"
-              @click="toggleDashboardEditing"
-            />
-          </q-item-side>
+          <q-btn
+            :disable="dashboards.length === 0"
+            :flat="!dashboardEditing"
+            :icon="dashboardEditing ? 'check' : 'mode edit'"
+            :color="dashboardEditing ? 'primary': ''"
+            round
+            size="sm"
+            @click="toggleDashboardEditing"
+          />
         </q-list-header>
         <draggable
           :class="{ editing: dashboardEditing }"
@@ -199,18 +182,15 @@ export default class DefaultLayout extends Vue {
         <q-list-header>
           <q-item-side icon="cloud"/>
           <label>Services</label>
-          <q-btn flat round icon="add" @click="serviceWizardActive = true"/>
-          <q-item-side right>
-            <q-btn
-              :disable="services.length === 0"
-              :flat="!serviceEditing"
-              :icon="serviceEditing ? 'check' : 'mode edit'"
-              :color="serviceEditing ? 'primary': ''"
-              round
-              size="sm"
-              @click="toggleServiceEditing"
-            />
-          </q-item-side>
+          <q-btn
+            :disable="services.length === 0"
+            :flat="!serviceEditing"
+            :icon="serviceEditing ? 'check' : 'mode edit'"
+            :color="serviceEditing ? 'primary': ''"
+            round
+            size="sm"
+            @click="toggleServiceEditing"
+          />
         </q-list-header>
         <draggable
           :class="{ editing: serviceEditing }"
@@ -248,8 +228,8 @@ export default class DefaultLayout extends Vue {
         </q-item>
       </q-list>
     </q-layout-drawer>
-    <q-modal v-model="serviceWizardActive">
-      <NewServiceWizard v-if="serviceWizardActive"/>
+    <q-modal v-model="wizardModalOpen" no-backdrop-dismiss>
+      <WizardPicker v-if="wizardModalOpen" @close="wizardModalOpen = false"/>
     </q-modal>
     <q-page-container>
       <router-view/>
@@ -257,91 +237,5 @@ export default class DefaultLayout extends Vue {
   </q-layout>
 </template>
 
-<style lang="stylus">
-/* not scoped */
-.toolbar-buttons .q-btn {
-  margin-left: 10px;
-}
-
-.q-list-container {
-  padding: 16px;
-}
-
-.q-list-header {
-  display: flex;
-  align-items: center;
-}
-
-.q-list-header .q-btn {
-  margin-left: auto;
-  margin-right: 8px;
-}
-
-.q-list .editing .q-item {
-  cursor: move;
-}
-
-.q-card-title {
-  max-width: 100%;
-}
-
-.widget-container {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.widget-modal {
-  width: 800px;
-  max-width: 100vw;
-  padding: 10px;
-  display: flex;
-}
-
-.widget-body {
-  flex: 1 0;
-  overflow: auto;
-  flex-wrap: nowrap;
-  justify-content: space-around;
-  align-content: center;
-  flex-direction: column;
-}
-
-.centered {
-  margin: auto;
-}
-
-.editable {
-  border-bottom: 1px solid gray;
-  cursor: pointer;
-  margin-bottom: 5px;
-}
-
-.darkened {
-  color: grey;
-}
-
-.unpadded {
-  padding: 0px;
-}
-
-.title-bar {
-  padding: 5px 10px;
-  width: 100%;
-}
-
-.q-card-main {
-  padding: 10px;
-}
-
-.build-info {
-  bottom: 0;
-  position: absolute;
-}
-
-.inline-popup {
-  display: inline-block;
-  margin: 0px 10px;
-}
+<style scoped lang="stylus">
 </style>

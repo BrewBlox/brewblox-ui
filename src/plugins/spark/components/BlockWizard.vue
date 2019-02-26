@@ -1,17 +1,16 @@
 <script lang="ts">
-import FormBase from '@/components/Widget/FormBase';
+import FormBase from '@/components/Form/FormBase';
 import { Block } from '@/plugins/spark/state';
 import { createBlock } from '@/plugins/spark/store/actions';
 import { blockIds, blockValues } from '@/plugins/spark/store/getters';
 import { formById } from '@/store/features/getters';
 import { serviceValues } from '@/store/services/getters';
 import { Service } from '@/store/services/state';
-import WizardBase, { NavAction } from '@/components/Widget/WizardBase';
+import WidgetWizardBase, { NavAction } from '@/components/Wizard/WidgetWizardBase';
 import Component from 'vue-class-component';
 
 @Component
-export default class BlockWizard extends WizardBase {
-  $q: any;
+export default class BlockWizard extends WidgetWizardBase {
   currentStep: string = '';
   blockAction: 'create' | 'existing' | null = null;
 
@@ -165,6 +164,8 @@ export default class BlockWizard extends WizardBase {
     this.createItem({
       id: this.widgetId,
       feature: this.typeId,
+      dashboard: this.$props.dashboardId,
+      order: 0,
       config: {
         serviceId: service.id,
         blockId: block.id,

@@ -1,13 +1,13 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import WizardBase, { NavAction } from '@/components/Widget/WizardBase';
+import WidgetWizardBase, { NavAction } from '@/components/Wizard/WidgetWizardBase';
 
 /*
-We inherit from WizardBase, which defines the properties provided to any wizard.
-WizardBase inherits from Vue, and defines some generic getters and functions.
+We inherit from WidgetWizardBase, which defines the properties provided to any wizard.
+WidgetWizardBase inherits from Vue, and defines some generic getters and functions.
 */
 @Component
-export default class ExampleFeatureWizard extends WizardBase {
+export default class ExampleFeatureWizard extends WidgetWizardBase {
   widgetId: string = '';
 
   get navigation(): NavAction[] {
@@ -33,7 +33,7 @@ export default class ExampleFeatureWizard extends WizardBase {
     if (!this.widgetId) {
       return 'Name must not be empty';
     }
-    // this.itemAlreadyExists() is inherited from WizardBase
+    // this.itemAlreadyExists() is inherited from WidgetWizardBase
     if (this.itemAlreadyExists(this.widgetId)) {
       return 'Name must be unique';
     }
@@ -41,12 +41,12 @@ export default class ExampleFeatureWizard extends WizardBase {
   }
 
   createWidget() {
-    // this.createItem() is inherited from WizardBase.
-    // We define a partial DashboardItem here, with all settings we know.
-    // Other settings (eg. item order) will be added by the dashboard.
+    // this.createItem() is inherited from WidgetWizardBase.
     this.createItem({
       id: this.widgetId,
       feature: this.typeId,
+      dashboard: this.$props.dashboardId,
+      order: 0,
       config: {
         lastUrl: '/datastore',
       },

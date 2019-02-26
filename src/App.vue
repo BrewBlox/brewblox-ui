@@ -21,3 +21,7 @@ export default class App extends Vue {
   </div>
 </template>
 
+<style lang="stylus">
+// We import global styling here
+@import './css/app.styl';
+</style>

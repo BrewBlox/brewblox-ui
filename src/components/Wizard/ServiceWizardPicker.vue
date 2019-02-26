@@ -12,7 +12,7 @@ import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
 
 @Component
-export default class NewServiceWizard extends Vue {
+export default class ServiceWizardPicker extends Vue {
   serviceId: string = '';
   serviceTitle: string = '';
   searchModel: string = '';
@@ -80,11 +80,11 @@ export default class NewServiceWizard extends Vue {
     };
     await createService(this.$store, service);
     await initService(this.$store, service);
-    this.reset();
     Notify.create({
       type: 'positive',
       message: `Added ${displayNameById(this.$store, service.type)} "${service.title}"`,
     });
+    this.close();
   }
 
   onCancel(message: string) {
@@ -92,30 +92,29 @@ export default class NewServiceWizard extends Vue {
     Notify.create({ message });
   }
 
-  reset() {
-    this.serviceId = '';
-    this.serviceTitle = '';
-    this.searchModel = '';
-    this.wizardComponent = null;
-  }
-
-  mounted() {
-    this.reset();
+  close() {
+    this.$emit('close');
   }
 }
 </script>
 
 <template>
-  <div class="layout-padding">
-    <q-item v-if="serviceWizardActive">
-      <component
-        v-if="serviceWizardActive"
-        :is="serviceWizard"
-        :service-id="serviceId"
-        :on-create="onCreate"
-        :on-cancel="onCancel"
-      />
-    </q-item>
+  <div class="widget-modal column">
+    <q-toolbar>
+      <span class="col row spaced">New Service Wizard</span>
+      <q-btn v-close-overlay flat rounded label="close"/>
+    </q-toolbar>
+
+    <!-- Display selected wizard -->
+    <component
+      v-if="serviceWizardActive"
+      :is="serviceWizard"
+      :service-id="serviceId"
+      :on-create="onCreate"
+      :on-cancel="onCancel"
+      @close="close"
+    />
+
     <!-- Select a wizard -->
     <q-item v-else>
       <q-field label="Service ID" icon="create" orientation="vertical">

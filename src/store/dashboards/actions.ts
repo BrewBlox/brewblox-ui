@@ -15,7 +15,7 @@ import {
   setupDashboardItems as setupDashboardItemsInApi,
 } from './api';
 import {
-  allDashboards as getAllDashboards,
+  dashboardValues as getAllDashboards,
   dashboardById as getDashboardInStore,
   dashboardItemById as getDashboardItemInStore,
   dashboardItemsByDashboardId,

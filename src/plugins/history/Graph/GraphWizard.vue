@@ -1,13 +1,13 @@
 <script lang="ts">
 import { GraphConfig } from '@/components/Graph/state';
-import FormBase from '@/components/Widget/FormBase';
-import WizardBase, { NavAction } from '@/components/Widget/WizardBase';
+import FormBase from '@/components/Form/FormBase';
+import WidgetWizardBase, { NavAction } from '@/components/Wizard/WidgetWizardBase';
 import { formById } from '@/store/features/getters';
 import Component from 'vue-class-component';
 
 
 @Component
-export default class GraphWizard extends WizardBase {
+export default class GraphWizard extends WidgetWizardBase {
   currentStep: string = '';
   widgetId: string = '';
   graphCfg: GraphConfig | null = null;
@@ -80,6 +80,8 @@ export default class GraphWizard extends WizardBase {
     this.createItem({
       id: this.widgetId,
       feature: this.typeId,
+      order: 0,
+      dashboard: this.$props.dashboardId,
       config: this.graphCfg,
       ...this.defaultWidgetSize,
     });
