@@ -148,7 +148,7 @@ export default class GraphForm extends FormBase {
             :field="config.params.start"
             :change="callAndSaveConfig(v => config.params.start = v)"
             label="Start time"
-            display="big"
+            tag="big"
           />
         </q-field>
         <q-field v-if="shownPeriod.duration" label="Duration">
@@ -164,7 +164,7 @@ export default class GraphForm extends FormBase {
             :field="config.params.end"
             :change="callAndSaveConfig(v => config.params.end = v)"
             label="End time"
-            display="big"
+            tag="big"
           />
         </q-field>
       </div>
@@ -198,7 +198,7 @@ export default class GraphForm extends FormBase {
             :change="callAndSaveConfig(v => config.renames[field] = v)"
             label="Legend"
             clearable
-            display="span"
+            tag="span"
           />
         </q-item>
         <q-item v-if="!selected || selected.length === 0">

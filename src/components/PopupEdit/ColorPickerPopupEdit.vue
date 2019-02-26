@@ -16,7 +16,7 @@ import Component from 'vue-class-component';
       type: String,
       required: true,
     },
-    display: {
+    tag: {
       type: String,
       default: 'big',
     },
@@ -52,8 +52,8 @@ export default class ColorPickerPopupEdit extends Vue {
 
 <template>
   <div>
-    <component :is="$props.display" class="editable">{{ colorString }}</component>
-    <component :is="$props.display" :style="colorStyle">[ ]</component>
+    <component :is="$props.tag" class="editable">{{ colorString }}</component>
+    <component :is="$props.tag" :style="colorStyle">[ ]</component>
     <q-popup-edit
       :disable="$attrs.disabled"
       :title="$props.label"
@@ -73,5 +73,5 @@ export default class ColorPickerPopupEdit extends Vue {
 </template>
 
 <style lang="stylus" scoped>
-@import './popups.styl'
+@import './popups.styl';
 </style>

@@ -159,7 +159,7 @@ export default class DefaultLayout extends Vue {
                 :field="dashboard.title"
                 :change="v => changeDashboardTitle(dashboard, v)"
                 label="Title"
-                display="span"
+                tag="span"
               />
               <span v-else>{{ dashboard.title }}</span>
             </q-item-main>
@@ -212,7 +212,7 @@ export default class DefaultLayout extends Vue {
                 :field="service.title"
                 :change="v => changeServiceTitle(service, v)"
                 label="Title"
-                display="span"
+                tag="span"
               />
               <span v-else>{{ service.title }}</span>
             </q-item-main>

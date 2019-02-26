@@ -196,7 +196,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
                 :field="groups"
                 :service-id="serviceId"
                 :change="v => groups = v"
-                display="span"
+                tag="span"
               />
               <label v-else>No service selected</label>
             </q-field>

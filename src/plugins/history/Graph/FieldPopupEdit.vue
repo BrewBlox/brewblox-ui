@@ -21,7 +21,7 @@ import Component from 'vue-class-component';
       type: String,
       required: true,
     },
-    display: {
+    tag: {
       type: String,
       default: 'big',
     },
@@ -55,7 +55,7 @@ export default class FieldPopupEdit extends Vue {
 
 <template>
   <div>
-    <component :is="$props.display" class="editable">{{ displayValue }}</component>
+    <component :is="$props.tag" class="editable">{{ displayValue }}</component>
     <q-popup-edit
       :title="$props.label"
       v-model="placeholder"
