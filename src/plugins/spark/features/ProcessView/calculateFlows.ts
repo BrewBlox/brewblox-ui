@@ -1,12 +1,18 @@
-import { PersistentPart, Transitions, FlowPart, CalculatedFlows, LiquidFlow, FlowRoute, ComponentSettings } from './state';
-import { DEFAULT_FRICTION, MIXED_LIQUIDS, RIGHT } from './getters';
+import {
+  PersistentPart,
+  Transitions,
+  FlowPart,
+  CalculatedFlows,
+  LiquidFlow,
+  FlowRoute,
+  ComponentSettings,
+} from './state';
+import { DEFAULT_FRICTION } from './getters';
 import { Coordinates } from '@/helpers/coordinates';
 import settings from './settings';
 import has from 'lodash/has';
 import get from 'lodash/get';
 import set from 'lodash/set';
-import { toASCII } from 'punycode';
-import { setMaxListeners } from 'cluster';
 
 export const isSamePart =
   (left: PersistentPart, right: PersistentPart): boolean =>
@@ -88,21 +94,25 @@ const combineFlows =
 const mergeFlows = (flows: CalculatedFlows): CalculatedFlows =>
   Object.entries(flows)
     .reduce((mergedFlows, [coord, coordFlows]: [string, LiquidFlow]): CalculatedFlows => {
-      let positive: LiquidFlow = {};
-      let negative: LiquidFlow = {};
-      let posTotal = 0;
-      let negTotal = 0;
-      Object.entries(coordFlows).forEach(([liquid, flow]) => {
-        if (flow > 0) {
-          positive = { ...positive, [liquid]: flow };
-          posTotal += flow;
-        }
-        else {
-          negative = { ...negative, [liquid]: flow };
-          negTotal += flow;
-        }
-      });
-      let totalFlow = posTotal + negTotal;
+
+      const splitPosNeg = (toSplit: LiquidFlow): [LiquidFlow, LiquidFlow, number, number] => {
+        let positive: LiquidFlow = {};
+        let negative: LiquidFlow = {};
+        let posTotal = 0;
+        let negTotal = 0;
+        Object.entries(toSplit)
+          .forEach(([liquid, flow]) => {
+            if (flow > 0) {
+              positive = { ...positive, [liquid]: flow };
+              posTotal += flow;
+            }
+            else {
+              negative = { ...negative, [liquid]: flow };
+              negTotal += flow;
+            }
+          });
+        return [positive, negative, posTotal, negTotal];
+      };
 
       const scale = (unscaledFlows: LiquidFlow, factor: number): LiquidFlow =>
         Object.entries(unscaledFlows)
@@ -113,25 +123,42 @@ const mergeFlows = (flows: CalculatedFlows): CalculatedFlows =>
             })
             , {});
 
-      let toMerge: LiquidFlow = coordFlows;
+      let toMerge = coordFlows;
+      let acceleration = coordFlows['*ACCELERATE_OTHERS*']; // special liquid type set by pumps
+
+
+      let [positive, negative, posTotal, negTotal] = splitPosNeg(toMerge);
+      const liquidsTotal = posTotal + negTotal - acceleration;
+
+      // if acceleration is bigger than other flows combined and opposite sign, the flow is reversed
+      if (acceleration / liquidsTotal < -1) {
+        const newTotal = acceleration + liquidsTotal;
+        toMerge = scale(toMerge, newTotal / liquidsTotal);
+        delete toMerge['*ACCELERATE_OTHERS*'];
+        acceleration = 0;
+        [positive, negative, posTotal, negTotal] = splitPosNeg(toMerge);
+      }
+
+      let total = posTotal + negTotal;
       // if flow exists in both directions, only keep the biggest and scale it down to the net flow
-      if (posTotal !== 0 && negTotal !== 0 && totalFlow !== 0) {
+      if (posTotal !== 0 && negTotal !== 0) {
         if (posTotal >= -negTotal) {
-          toMerge = scale(positive, totalFlow / posTotal);
-          totalFlow = posTotal;
+          toMerge = scale(positive, total / posTotal);
         }
         else {
-          toMerge = scale(negative, totalFlow / negTotal);
-          totalFlow = negTotal;
+          toMerge = scale(negative, total / negTotal);
         }
       }
-      const acceleration = toMerge['*ACCELERATE_OTHERS*']; // special liquid type set by pumps
+
+      // check again, could be discard as part of positive or negative
+      acceleration = toMerge['*ACCELERATE_OTHERS*'];
       if (acceleration) {
-        if (totalFlow !== acceleration) {
-          toMerge = scale(toMerge, totalFlow / (totalFlow - acceleration));
+        if (total !== acceleration) {
+          toMerge = scale(toMerge, total / (total - acceleration));
+          delete toMerge['*ACCELERATE_OTHERS*'];
         }
-        delete toMerge['*ACCELERATE_OTHERS*'];
       }
+
       if (toMerge === {}) {
         return mergedFlows;
       }
@@ -247,7 +274,8 @@ export class FlowSegment {
   public popDuplicatedLeaves(): FlowSegment | null {
     const leaves = this.leafSegments();
     if (leaves.length !== 0 && leaves.every(v => v.isSameSegment(leaves[0]))) {
-      const combinedTransitions = leaves.reduce((acc: Transitions, leaf) => ({ ...acc, ...leaf.transitions }), {});
+      const combinedTransitions = leaves
+        .reduce((acc: Transitions, leaf) => ({ ...acc, ...leaf.transitions }), {});
       leaves[0].transitions = combinedTransitions;
       this.removeLeafSegment(leaves[0]);
       return leaves[0];
@@ -261,38 +289,38 @@ export const flowPath = (
   start: FlowPart,
   inCoord: string,
   startCoord: string = inCoord): FlowSegment | null => {
-  const outFlows = get(start, ['transitions', inCoord], []);
+  const outFlows: FlowRoute[] = get(start, ['transitions', inCoord], []);
   const path = new FlowSegment(start, {});
   const candidateParts = parts
     .filter(candidate => !isSamePart(start, candidate) || hasIndependentTransitions(candidate));
 
-  if (outFlows !== null) {
-    outFlows.forEach(outFlow => {
-      const nextPart = adjacentPart(candidateParts, outFlow.outCoords, start);
-      let nextPath: FlowSegment | null = null;
-      if (nextPart !== undefined && outFlow.outCoords !== startCoord) {
-        nextPath = flowPath(candidateParts, nextPart, outFlow.outCoords, startCoord);
-        if (nextPath !== null) {
-          path.addChild(nextPath);
-        }
+
+  outFlows.forEach(outFlow => {
+    const nextPart = adjacentPart(candidateParts, outFlow.outCoords, start);
+    let nextPath: FlowSegment | null = null;
+    if (nextPart !== undefined && outFlow.outCoords !== startCoord) {
+      nextPath = flowPath(candidateParts, nextPart, outFlow.outCoords, startCoord);
+      if (nextPath !== null) {
+        path.addChild(nextPath);
       }
-      if (nextPath !== null || outFlow.outCoords === startCoord) {
-        if (path.transitions[inCoord] === undefined) {
-          path.transitions[inCoord] = [outFlow];
-        }
-        else {
-          path.transitions[inCoord].push(outFlow);
-        }
+    }
+    if (nextPath !== null || outFlow.outCoords === startCoord) {
+      if (path.transitions[inCoord] === undefined) {
+        path.transitions[inCoord] = [outFlow];
       }
-    });
-  }
+      else {
+        path.transitions[inCoord].push(outFlow);
+      }
+    }
+  });
   if (path.transitions[inCoord] === undefined) {
     return null;
   }
 
-  while (true) {
+  let duplicated: FlowSegment | null = null;
+  do {
     if (path.splits.length !== 0) {
-      const duplicated = path.popDuplicatedLeaves();
+      duplicated = path.popDuplicatedLeaves();
       if (duplicated !== null) {
         if (path.next === null) {
           path.next = duplicated;
@@ -302,14 +330,8 @@ export const flowPath = (
           path.next = duplicated;
         }
       }
-      else {
-        return path;
-      }
     }
-    else {
-      break;
-    }
-  }
+  } while (duplicated !== null);
   return path;
 };
 
@@ -382,28 +404,39 @@ export const addFlowForSegment = (
 export const calculateFlows = (parts: FlowPart[]): FlowPart[] => {
   // total flow is a superposition of all pressure sources in the system
   return parts.reduce((parts, part): FlowPart[] => {
-    Object.entries(part.transitions).forEach(([inCoords, outFlows]) => {
-      outFlows.forEach(outFlow => {
-        const pressure: number = outFlow.pressure || 0;
-        const liquids: string[] | undefined = outFlow.liquids;
-        if (pressure && Array.isArray(liquids)) {
-          const path = flowPath(parts, part, inCoords);
-          if (path !== null) {
-            const startFlow = liquids
-              .reduce((acc: LiquidFlow, liquid: string) => ({
-                ...acc,
-                [liquid]: pressure / path.friction(),
-              }), {});
-            parts = addFlowForSegment(parts, path, startFlow);
+    Object.entries(part.transitions)
+      .forEach(([inCoords, outFlows]) => {
+        outFlows.forEach(outFlow => {
+          const pressure: number = outFlow.pressure || 0;
+          const liquids: string[] | undefined = outFlow.liquids;
+          if (pressure && Array.isArray(liquids)) {
+            const path = flowPath(parts, part, inCoords);
+            if (path !== null) {
+              const startFlow = liquids
+                .reduce((acc: LiquidFlow, liquid: string) => ({
+                  ...acc,
+                  [liquid]: pressure / path.friction(),
+                }), {});
+              parts = addFlowForSegment(parts, path, startFlow);
+            }
           }
-        }
+        });
       });
-    });
     return parts;
   }, parts)
     .map(part => ({ ...part, flows: mergeFlows(part.flows) }));
 };
 
+// can be used to check whether a part has equal in and out flow
+/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+const unbalancedFlow = (part: FlowPart): number =>
+  Object.values(part.flows)
+    .reduce((sum: number, v: LiquidFlow) => Object.values(v)
+      .reduce((sum2: number, w: number) => sum2 + w, sum),
+      0);
+
+
 export const calculateNormalizedFlows = (parts: PersistentPart[]): FlowPart[] => {
-  return calculateFlows(asFlowParts(parts)).map(normalizeFlows);
+  return calculateFlows(asFlowParts(parts))
+    .map(normalizeFlows);
 };

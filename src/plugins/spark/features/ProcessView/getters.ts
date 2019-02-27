@@ -6,8 +6,6 @@ export const LEFT = '0,0.5';
 export const IN_OUT = '-1,-1';
 export const DEFAULT_FRICTION = 1;
 export const DEFAULT_PUMP_PRESSURE = 10;
-export const MIXED_LIQUIDS = '#C678DD';
-
 export const COLD_WATER = '#4AA0EF';
 export const HOT_WATER = '#DB0023';
 export const BEER = '#E1AC00';

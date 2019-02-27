@@ -648,7 +648,8 @@ describe('A single path with a pump', () => {
   });
 
   describe('Two input tubes with different liquid joining', () => {
-    it('Should have a flow of value of (input pressure 6 + pump pressure 12) / friction 3 = 6 when the pump is enabled', () => {
+    it('Should have a flow of value of 6 when the pump is enabled', () => {
+      // (input pressure 6 + pump pressure 12) / friction 3 = 6
       set(parts[1], ['settings', 'disabled'], false);
       const flowParts = asFlowParts(parts);
       const partsWithFlow = calculateFlows(flowParts);
@@ -902,7 +903,6 @@ describe('A path with a bridge', () => {
 
   it('Should have the correct flow and liquids in all paths', () => {
     const partsWithFlow = calculateFlows(asFlowParts(parts));
-    console.log(JSON.stringify(partsWithFlow));
     expect(partsWithFlow).toMatchObject(
       [
         {

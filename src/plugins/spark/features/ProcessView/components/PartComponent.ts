@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Transitions, FlowPart, CalculatedFlows } from '../state';
-import get from 'lodash/get';
 
 @Component({
   props: {
