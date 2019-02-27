@@ -57,14 +57,4 @@ export default class PartComponent extends Vue {
   protected settings(): Record<string, any> {
     return this.part.settings || {};
   }
-
-  /*
-    protected toggleClosed(): void {
-      this.$parent.$emit('input', { ...this.part, settings: { ...this.part.settings, closed: !this.closed } });
-    }
-
-
-    protected toggleDisabled(): void {
-      this.$parent.$emit('input', { ...this.part, settings: { ...this.part.settings, disabled: !this.disabled } });
-    }*/
 }

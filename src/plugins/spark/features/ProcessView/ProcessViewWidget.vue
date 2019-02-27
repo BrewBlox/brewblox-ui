@@ -40,8 +40,8 @@ export default class ProcessViewWidget extends WidgetBase {
     return knownParts
       .map(type => ({
         type,
-        x: -1,
-        y: -1,
+        x: -2,
+        y: -2,
         rotate: 0,
         settings: {},
         flipped: false,

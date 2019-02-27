@@ -25,14 +25,7 @@ const adjacentPart = (
       !(currentPart && isSamePart(part, currentPart))
       && has(part, ['transitions', outCoords]));
 
-const hasIndependentTransitions = (part: FlowPart): boolean => {
-  // const transitions = partSettings(part).transitions(part);
-  // TODO: calculate this from actual transitions
-  if (part.type === 'BridgeTube' || part.type === 'Pump') {
-    return true;
-  }
-  return false;
-};
+const hasIndependentTransitions = (part: FlowPart): boolean => part.type === 'BridgeTube';
 
 const normalizeFlows = (part: FlowPart): FlowPart => {
   if (!part.flows) {
@@ -210,7 +203,7 @@ export const flowPath = (
     outFlows.forEach(outFlow => {
       const nextPart = adjacentPart(candidateParts, outFlow.outCoords, start);
       let nextPath: FlowSegment | null = null;
-      if (nextPart !== undefined) {
+      if (nextPart !== undefined && outFlow.outCoords !== startCoord) {
         nextPath = flowPath(candidateParts, nextPart, outFlow.outCoords, startCoord);
         if (nextPath !== null) {
           path.addChild(nextPath);
