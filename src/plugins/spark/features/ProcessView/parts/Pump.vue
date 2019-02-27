@@ -1,6 +1,7 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
+import { LEFT } from '../getters';
 
 @Component
 export default class Pump extends PartComponent {
@@ -12,19 +13,19 @@ export default class Pump extends PartComponent {
   protected toggleDisabled(): void {
     this.$parent.$emit('input', { ...this.part, settings: { ...this.part.settings, disabled: !this.disabled } });
   }
+
+  get liquids() {
+    return this.liquidOnCoord(LEFT);
+  }
 }
 </script>
 
 <template>
   <g class="pump clickable" @click="toggleDisabled">
     <!-- tube liquid bottom-->
-    <LiquidStroke :paths="['M50,25H0']" :colors="liquidColor"/>
+    <LiquidStroke :paths="['M50,25H0']" :colors="liquids"/>
     <!-- ball liquid -->
-    <LiquidStroke
-      :paths="['M 17 29 A 8 8 0 1 1 17 31 Z']"
-      :colors="liquidColor"
-      class="ballLiquid"
-    />
+    <LiquidStroke :paths="['M 17 29 A 8 8 0 1 1 17 31 Z']" :colors="liquids" class="ballLiquid"/>
     <!-- ball outline-->
     <circle cx="25" cy="30" r="16" class="outline"/>
     <!-- blades -->
@@ -48,7 +49,7 @@ export default class Pump extends PartComponent {
       </g>
     </g>
     <!-- tube liquid top-->
-    <LiquidStroke :paths="['M50,25H25V36']" :colors="liquidColor"/>
+    <LiquidStroke :paths="['M50,25H25V36']" :colors="liquids"/>
     <!-- tubes -->
     <g class="outline">
       <polyline points="20.5,10 16.5,6 20.5,2 "/>

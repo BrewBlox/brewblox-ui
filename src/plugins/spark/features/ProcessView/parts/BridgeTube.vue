@@ -1,32 +1,24 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { LEFT, RIGHT, DOWN, UP } from '../getters';
+import { LEFT, UP } from '../getters';
 
 @Component
 export default class BridgeTube extends PartComponent {
-  get lowReversed() {
-    return this.flowOnAngle(DOWN) > 0;
+  get lowLiquid() {
+    return this.liquidOnCoord(UP);
   }
 
-  get highReversed() {
-    return this.flowOnAngle(RIGHT) > 0;
-  }
-
-  get lowLiquid(): boolean {
-    return (this.flow[UP] || this.flow[DOWN]) !== undefined;
-  }
-
-  get highLiquid(): boolean {
-    return (this.flow[LEFT] || this.flow[RIGHT]) !== undefined;
+  get highLiquid() {
+    return this.liquidOnCoord(LEFT);
   }
 
   get lowFlowSpeed() {
-    return this.flow[UP];
+    return this.flowOnCoord(UP);
   }
 
   get highFlowSpeed() {
-    return this.flow[LEFT];
+    return this.flowOnCoord(LEFT);
   }
 
   get lowPaths() {
@@ -91,19 +83,15 @@ export default class BridgeTube extends PartComponent {
       <path :d="lowPaths.borders[0]"/>
       <path :d="lowPaths.borders[1]"/>
     </g>
-    <LiquidStroke :paths="[lowPaths.liquid]" :colors="liquidColor"/>
-    <AnimatedArrows v-if="lowFlowSpeed && hasLiquid" :speed="lowFlowSpeed" :path="lowPaths.liquid"/>
+    <LiquidStroke :paths="[lowPaths.liquid]" :colors="lowLiquid"/>
+    <AnimatedArrows :speed="lowFlowSpeed" :path="lowPaths.liquid"/>
     <!-- high -->
     <g class="outline">
       <path :d="highPaths.borders[0]"/>
       <path :d="highPaths.borders[1]"/>
     </g>
-    <LiquidStroke :paths="[highPaths.liquid]" :colors="liquidColor"/>
-    <AnimatedArrows
-      v-if="highFlowSpeed && hasLiquid"
-      :speed="highFlowSpeed"
-      :path="highPaths.liquid"
-    />
+    <LiquidStroke :paths="[highPaths.liquid]" :colors="highLiquid"/>
+    <AnimatedArrows :speed="highFlowSpeed" :path="highPaths.liquid"/>
   </g>
 </template>
 

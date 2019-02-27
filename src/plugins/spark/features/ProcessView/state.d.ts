@@ -9,8 +9,12 @@ export interface Transitions {
   [inCoords: string]: FlowRoute[];
 }
 
+export interface LiquidFlow {
+  [liquid: string]: number;
+}
+
 export interface CalculatedFlows {
-  [inCoords: string]: number;
+  [inCoords: string]: LiquidFlow;
 }
 
 export interface PersistentPart {
@@ -31,7 +35,6 @@ export interface ComponentSettings {
 export interface FlowPart extends PersistentPart {
   transitions: Transitions;
   flows: CalculatedFlows;
-  liquids: string[];
 }
 
 export interface ProcessViewConfig {

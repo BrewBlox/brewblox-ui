@@ -6,7 +6,11 @@ import { RIGHT } from '../getters';
 @Component
 export default class Valve extends PartComponent {
   get flowSpeed() {
-    return this.flow[RIGHT];
+    return this.flowOnCoord(RIGHT);
+  }
+
+  get liquids() {
+    return this.liquidOnCoord(RIGHT);
   }
 
   get closed() {
@@ -25,14 +29,9 @@ export default class Valve extends PartComponent {
       <path d="M0,21h10.5c1.4-5.1,5.4-9.1,10.5-10.5C29,8.3,37.2,13,39.4,21h0.1H50"/>
       <path d="M0,29h10.5h0C12.7,37,21,41.6,29,39.4C34,38,38,34,39.4,29h0.1H50"/>
     </g>
-    <LiquidStroke v-if="hasLiquid && !closed" :paths="['m0,25h50']" :colors="liquidColor"/>
-    <LiquidStroke v-if="hasLiquid && closed" :paths="['m0,25h19']" :colors="liquidColor"/>
-    <LiquidStroke v-if="hasLiquid && closed" :paths="['m31,25h50']" :colors="liquidColor"/>
-    <g v-if="hasLiquid" key="liquid" :stroke="liquidColor" class="liquid">
-      <line v-if="!closed" y1="25" x2="50" y2="25"/>
-      <line v-if="closed" y1="25" x2="19" y2="25"/>
-      <line v-if="closed" x1="31" y1="25" x2="50" y2="25"/>
-    </g>
+    <LiquidStroke v-if="!closed" :paths="['m0,25h50']" :colors="liquids"/>
+    <LiquidStroke v-if="closed" :paths="['m0,25h19']" :colors="liquids"/>
+    <LiquidStroke v-if="closed" :paths="['m31,25h50']" :colors="liquids"/>
     <g transform="translate(25, 25)">
       <g key="valve-inner" :transform="`rotate(${closed ? '90' : '0'})`" class="fill outline inner">
         <g transform="translate(-25, -25)">
@@ -41,7 +40,7 @@ export default class Valve extends PartComponent {
         </g>
       </g>
     </g>
-    <AnimatedArrows v-if="hasLiquid" key="valve-arrows" :speed="flowSpeed" path="M0,25H50"/>
+    <AnimatedArrows key="valve-arrows" :speed="flowSpeed" path="M0,25H50"/>
     <rect fill="red" fill-opacity="0" x="0" y="0" width="50" height="50"/>
   </g>
 </template>

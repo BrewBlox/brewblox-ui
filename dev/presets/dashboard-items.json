@@ -15,7 +15,9 @@
             "type": "InputTube",
             "rotate": 0,
             "settings": {
-              "liquids": "#C678DD"
+              "liquids": [
+                "#C678DD"
+              ]
             }
           },
           {
@@ -127,7 +129,9 @@
             "y": 3,
             "rotate": 180,
             "settings": {
-              "liquids": "#DB0023"
+              "liquids": [
+                "#DB0023"
+              ]
             }
           },
           {

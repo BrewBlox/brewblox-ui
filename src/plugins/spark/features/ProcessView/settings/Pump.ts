@@ -8,7 +8,7 @@ const settings: ComponentSettings = {
     const p = (part.settings || {}).disabled ? 0 : (part.settings || {}).pressure || DEFAULT_PUMP_PRESSURE;
     return {
       [LEFT]: [{ outCoords: RIGHT }],
-      [RIGHT]: [{ outCoords: LEFT, pressure: p }],
+      [RIGHT]: [{ outCoords: LEFT, pressure: p, liquids: ["*ACCELERATE_OTHERS*"] }],
     };
   },
 };

@@ -25,7 +25,6 @@ export default class PartComponent extends Vue {
     return {
       transitions: {},
       flows: {},
-      liquids: [],
       ...this.$props.value,
     };
   }
@@ -39,19 +38,15 @@ export default class PartComponent extends Vue {
   }
 
   protected get flow(): CalculatedFlows {
-    return this.part.flows || {};
+    return this.part.flows;
   }
 
-  protected get hasLiquid(): boolean {
-    return this.part.liquids.length > 0;
+  protected liquidOnCoord(coord: string): string[] {
+    return Object.keys(this.flow[coord] || {});
   }
 
-  protected get liquidColor(): string | undefined {
-    return get(this.part, ['settings', 'liquids'], this.part.liquids);
-  }
-
-  protected flowOnAngle(angle: string): number {
-    return this.flow[angle] || 0;
+  protected flowOnCoord(coord: string): number {
+    return Object.values(this.flow[coord] || {}).reduce((sum, v) => sum + v, 0);
   }
 
   protected settings(): Record<string, any> {

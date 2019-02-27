@@ -151,8 +151,14 @@ describe('A single path without splits', () => {
         y: 2,
         rotate: 0,
         type: 'InputTube',
-        flows: { '-1,-1': -2, '2,2.5': 2 },
-        liquids: [HOT_WATER],
+        flows: {
+          '-1,-1': {
+            [HOT_WATER]: -2,
+          },
+          '2,2.5': {
+            [HOT_WATER]: 2,
+          },
+        },
         settings: {
           pressure: 6,
           liquids: [HOT_WATER],
@@ -163,16 +169,28 @@ describe('A single path without splits', () => {
         y: 2,
         rotate: 0,
         type: 'OutputTube',
-        liquids: [HOT_WATER],
-        flows: { '3,2.5': -2, '-1,-1': 2 },
+        flows: {
+          '3,2.5': {
+            [HOT_WATER]: -2,
+          },
+          '-1,-1': {
+            [HOT_WATER]: 2,
+          },
+        },
       },
       {
         x: 2,
         y: 2,
         rotate: 0,
         type: 'StraightTube',
-        liquids: [HOT_WATER],
-        flows: { '2,2.5': -2, '3,2.5': 2 },
+        flows: {
+          '2,2.5': {
+            [HOT_WATER]: - 2,
+          }
+          , '3,2.5': {
+            [HOT_WATER]: 2,
+          },
+        },
       }]
     );
   });
@@ -285,30 +303,48 @@ describe('A path with a split, but no joins', () => {
       [
         {
           flows: {
-            "-1,-1": -4,
-            "2,2.5": 4,
+            "-1,-1": {
+              [COLD_WATER]: -4,
+            },
+            "2,2.5": {
+              [COLD_WATER]: 4,
+            },
           },
           type: 'InputTube',
         },
         {
           flows: {
-            "2,2.5": -4,
-            "3,2.5": 4,
+            "2,2.5": {
+              [COLD_WATER]: -4,
+            },
+            "3,2.5": {
+              [COLD_WATER]: 4,
+            },
           },
           type: 'StraightTube',
         },
         {
           flows: {
-            "3,2.5": -4,
-            "3.5,2": 2,
-            "3.5,3": 2,
+            "3,2.5": {
+              [COLD_WATER]: -4,
+            },
+            "3.5,2": {
+              [COLD_WATER]: 2,
+            },
+            "3.5,3": {
+              [COLD_WATER]: 2,
+            },
           },
           type: 'TeeTube',
         },
         {
           flows: {
-            "-1,-1": 2,
-            "3.5,2": -2,
+            "-1,-1": {
+              [COLD_WATER]: 2,
+            },
+            "3.5,2": {
+              [COLD_WATER]: -2,
+            },
           },
           type: 'OutputTube',
           x: 3,
@@ -316,8 +352,12 @@ describe('A path with a split, but no joins', () => {
         },
         {
           flows: {
-            "-1,-1": 2,
-            "3.5,3": -2,
+            "-1,-1": {
+              [COLD_WATER]: 2,
+            },
+            "3.5,3": {
+              [COLD_WATER]: -2,
+            },
           },
           type: 'OutputTube',
         },
@@ -454,73 +494,73 @@ describe('A path that forks and rejoins', () => {
     expect(path.friction()).toEqual(5.5);
   });
 
-  it('Should have a flow of value of 4 total and 2 for each split', () => {
+  it('Should have a flow of value of 2 total and 1 for each split', () => {
     const partsWithFlow = calculateFlows(flowParts);
     expect(partsWithFlow).toMatchObject(
       [
         {
           flows: {
-            "-1,-1": -2,
-            "2,2.5": 2,
+            "-1,-1": { [COLD_WATER]: -2 },
+            "2,2.5": { [COLD_WATER]: 2 },
           },
           type: 'InputTube',
         },
         {
           flows: {
-            "2,2.5": -2,
-            "3,2.5": 2,
+            "2,2.5": { [COLD_WATER]: -2 },
+            "3,2.5": { [COLD_WATER]: 2 },
           },
           type: 'StraightTube',
         },
         {
           flows: {
-            "3,2.5": -2,
-            "3.5,2": 1,
-            "3.5,3": 1,
+            "3,2.5": { [COLD_WATER]: -2 },
+            "3.5,2": { [COLD_WATER]: 1 },
+            "3.5,3": { [COLD_WATER]: 1 },
           },
           type: 'TeeTube',
 
         },
         {
           flows: {
-            "3.5,2": -1,
-            "4,1.5": 1,
+            "3.5,2": { [COLD_WATER]: -1 },
+            "4,1.5": { [COLD_WATER]: 1 },
           },
           type: 'ElbowTube',
         },
         {
           flows: {
-            "3.5,3": -1,
-            "4,3.5": 1,
+            "3.5,3": { [COLD_WATER]: -1 },
+            "4,3.5": { [COLD_WATER]: 1 },
           },
           type: 'ElbowTube',
         },
         {
           flows: {
-            "4,1.5": -1,
-            "4.5,2": 1,
+            "4,1.5": { [COLD_WATER]: -1 },
+            "4.5,2": { [COLD_WATER]: 1 },
           },
           type: 'ElbowTube',
         },
         {
           flows: {
-            "4,3.5": -1,
-            "4.5,3": 1,
+            "4,3.5": { [COLD_WATER]: -1 },
+            "4.5,3": { [COLD_WATER]: 1 },
           },
           type: 'ElbowTube',
         },
         {
           flows: {
-            "4.5,2": -1,
-            "4.5,3": -1,
-            "5,2.5": 2,
+            "4.5,2": { [COLD_WATER]: -1 },
+            "4.5,3": { [COLD_WATER]: -1 },
+            "5,2.5": { [COLD_WATER]: 2 },
           },
           type: 'TeeTube',
         },
         {
           flows: {
-            "-1,-1": 2,
-            "5,2.5": -2,
+            "-1,-1": { [COLD_WATER]: 2 },
+            "5,2.5": { [COLD_WATER]: -2 },
           },
           type: 'OutputTube',
         },
@@ -570,8 +610,10 @@ describe('A single path with a pump', () => {
         y: 2,
         rotate: 180,
         type: 'InputTube',
-        liquids: [COLD_WATER],
-        flows: { '-1,-1': -2, '3,2.5': 2 },
+        flows: {
+          '-1,-1': { [COLD_WATER]: -2 },
+          '3,2.5': { [COLD_WATER]: 2 },
+        },
         settings: {
           pressure: 6,
           liquids: [COLD_WATER],
@@ -582,8 +624,10 @@ describe('A single path with a pump', () => {
         y: 2,
         rotate: 0,
         type: 'Pump',
-        liquids: [COLD_WATER],
-        flows: { '2,2.5': 2, '3,2.5': -2 },
+        flows: {
+          '3,2.5': { [COLD_WATER]: -2 },
+          '2,2.5': { [COLD_WATER]: 2 },
+        },
         settings: {
           disabled: true,
           pressure: 12,
@@ -594,14 +638,16 @@ describe('A single path with a pump', () => {
         y: 2,
         rotate: 180,
         type: 'OutputTube',
-        liquids: [COLD_WATER],
-        flows: { '2,2.5': -2, '-1,-1': 2 },
+        flows: {
+          '2,2.5': { [COLD_WATER]: -2 },
+          '-1,-1': { [COLD_WATER]: 2 },
+        },
       },
       ]
     );
   });
 
-  describe('To input tubes with different liquid joining', () => {
+  describe('Two input tubes with different liquid joining', () => {
     it('Should have a flow of value of (input pressure 6 + pump pressure 12) / friction 3 = 6 when the pump is enabled', () => {
       set(parts[1], ['settings', 'disabled'], false);
       const flowParts = asFlowParts(parts);
@@ -612,8 +658,10 @@ describe('A single path with a pump', () => {
           y: 2,
           rotate: 180,
           type: 'InputTube',
-          liquids: [COLD_WATER],
-          flows: { '-1,-1': -6, '3,2.5': 6 },
+          flows: {}, /*{
+            '-1,-1': { [COLD_WATER]: -6 },
+            '3,2.5': { [COLD_WATER]: 6 },
+          },*/
           settings: {
             pressure: 6,
           },
@@ -623,8 +671,10 @@ describe('A single path with a pump', () => {
           y: 2,
           rotate: 0,
           type: 'Pump',
-          liquids: [COLD_WATER],
-          flows: { '2,2.5': 6, '3,2.5': -6 },
+          flows: {
+            '3,2.5': { [COLD_WATER]: -6 },
+            '2,2.5': { [COLD_WATER]: 6 },
+          },
           settings: {
             disabled: false,
             pressure: 12,
@@ -635,148 +685,340 @@ describe('A single path with a pump', () => {
           y: 2,
           rotate: 180,
           type: 'OutputTube',
-          liquids: [COLD_WATER],
-          flows: { '2,2.5': -6, '-1,-1': 6 },
+          flows: {
+            '2,2.5': { [COLD_WATER]: -6 },
+            '-1,-1': { [COLD_WATER]: 6 },
+          },
         },
         ]
       );
     });
   });
+});
 
 
-  describe('Two sources joining', () => {
-    const parts: PersistentPart[] = [
-      {
-        x: 1,
-        y: 1,
-        rotate: 0,
-        type: 'InputTube',
-        settings: {
-          pressure: 11,
-          liquids: [COLD_WATER],
+describe('Two sources joining', () => {
+  const parts: PersistentPart[] = [
+    {
+      x: 1,
+      y: 1,
+      rotate: 0,
+      type: 'InputTube',
+      settings: {
+        pressure: 11,
+        liquids: [COLD_WATER],
+      },
+    },
+    {
+      x: 1,
+      y: 3,
+      rotate: 0,
+      type: 'InputTube',
+      settings: {
+        pressure: 11,
+        liquids: [HOT_WATER],
+      },
+    },
+    {
+      x: 2,
+      y: 1,
+      rotate: 180,
+      type: 'ElbowTube',
+      settings: {},
+    },
+    {
+      x: 2,
+      y: 3,
+      rotate: 270,
+      type: 'ElbowTube',
+      settings: {},
+    },
+    {
+      x: 2,
+      y: 2,
+      rotate: 90,
+      type: 'TeeTube',
+      settings: {},
+    },
+    {
+      x: 3,
+      y: 2,
+      rotate: 0,
+      type: 'OutputTube',
+      settings: {},
+    },
+  ];
+
+  it('Should have the correct flow and liquids in all paths', () => {
+    const partsWithFlow = calculateFlows(asFlowParts(parts));
+    expect(partsWithFlow).toMatchObject(
+      [
+        {
+          'flows': {
+            "-1,-1": {
+              [COLD_WATER]: -2,
+            },
+            "2,1.5": {
+              [COLD_WATER]: 2,
+            },
+          },
+          'type': 'InputTube',
+          'x': 1,
+          'y': 1,
         },
-      },
-      {
-        x: 1,
-        y: 3,
-        rotate: 0,
-        type: 'InputTube',
-        settings: {
-          pressure: 11,
-          liquids: [HOT_WATER],
+        {
+          'flows': {
+            "-1,-1": {
+              [HOT_WATER]: -2,
+            },
+            "2,3.5": {
+              [HOT_WATER]: 2,
+            },
+          },
+          'type': 'InputTube',
+          'x': 1,
+          'y': 3,
         },
-      },
-      {
-        x: 2,
-        y: 1,
-        rotate: 180,
-        type: 'ElbowTube',
-        settings: {},
-      },
-      {
-        x: 2,
-        y: 3,
-        rotate: 270,
-        type: 'ElbowTube',
-        settings: {},
-      },
-      {
-        x: 2,
-        y: 2,
-        rotate: 90,
-        type: 'TeeTube',
-        settings: {},
-      },
-      {
-        x: 3,
-        y: 2,
-        rotate: 0,
-        type: 'OutputTube',
-        settings: {},
-      },
-    ];
+        {
+          flows: {
+            "2,1.5": {
+              [COLD_WATER]: -2,
+            },
+            "2.5,2": {
+              [COLD_WATER]: 2,
+            },
+          },
+          'type': 'ElbowTube',
+          'x': 2,
+          'y': 1,
+        },
+        {
+          'flows': {
+            "2,3.5": {
+              [HOT_WATER]: -2,
+            },
+            "2.5,3": {
+              [HOT_WATER]: 2,
+            },
+          },
+          'type': 'ElbowTube',
+          'x': 2,
+          'y': 3,
+        },
+        {
+          'flows': {
+            "2.5,2": {
+              [COLD_WATER]: -2,
+            },
+            "2.5,3": {
+              [HOT_WATER]: -2,
+            },
+            "3,2.5": {
+              [COLD_WATER]: 2,
+              [HOT_WATER]: 2,
+            },
+          },
+          'type': 'TeeTube',
+          'x': 2,
+          'y': 2,
+        },
+        {
+          'flows': {
+            "-1,-1": {
+              [COLD_WATER]: 2,
+              [HOT_WATER]: 2,
+            },
+            "3,2.5": {
+              [COLD_WATER]: -2,
+              [HOT_WATER]: -2,
+            },
+          },
+          'type': 'OutputTube',
+          'x': 3,
+          'y': 2,
+        },
+      ]
+    );
+  });
+});
 
-    it('Should have the correct flow and liquids in all paths', () => {
-      const partsWithFlow = calculateFlows(asFlowParts(parts));
-      expect(partsWithFlow).toMatchObject(
-        [
-          {
-            'flows': {
-              "-1,-1": -2,
-              "2,1.5": 2,
-            },
-            'liquids': [
-              COLD_WATER,
-            ],
-            'type': 'InputTube',
-            'x': 1,
-            'y': 1,
+
+
+describe('A path with a bridge', () => {
+  const parts: PersistentPart[] = [
+    {
+      x: 11,
+      y: 2,
+      type: "InputTube",
+      rotate: 0,
+      settings: {
+        liquids: [COLD_WATER],
+        pressure: 8,
+      },
+    },
+    {
+      x: 12,
+      y: 2,
+      type: "StraightTube",
+      rotate: 0,
+      settings: {},
+    },
+    {
+      type: "BridgeTube",
+      x: 13,
+      y: 2,
+      rotate: 0,
+      settings: {},
+    },
+    {
+      type: "OutputTube",
+      x: 13,
+      y: 1,
+      rotate: 270,
+      settings: {},
+    },
+    {
+      x: 14,
+      y: 2,
+      type: "ElbowTube",
+      rotate: 180,
+      settings: {},
+    },
+    {
+      type: "ElbowTube",
+      x: 14,
+      y: 3,
+      rotate: 270,
+      settings: {},
+    },
+    {
+      x: 13,
+      y: 3,
+      type: "ElbowTube",
+      rotate: 0,
+      settings: {},
+    },
+  ];
+
+  it('Should have the correct flow and liquids in all paths', () => {
+    const partsWithFlow = calculateFlows(asFlowParts(parts));
+    console.log(JSON.stringify(partsWithFlow));
+    expect(partsWithFlow).toMatchObject(
+      [
+        {
+          x: 11,
+          y: 2,
+          type: "InputTube",
+          rotate: 0,
+          settings: {
+            liquids: [COLD_WATER],
+            pressure: 8,
           },
-          {
-            'flows': {
-              "-1,-1": -2,
-              "2,3.5": 2,
+          flows: {
+            "-1,-1": {
+              [COLD_WATER]: -1,
             },
-            'liquids': [
-              HOT_WATER,
-            ],
-            'type': 'InputTube',
-            'x': 1,
-            'y': 3,
-          },
-          {
-            "flows": {
-              "2,1.5": -2,
-              "2.5,2": 2,
+            "12,2.5": {
+              [COLD_WATER]: 1,
             },
-            'liquids': [
-              COLD_WATER,
-            ],
-            'type': 'ElbowTube',
-            'x': 2,
-            'y': 1,
           },
-          {
-            'flows': {
-              "2,3.5": -2,
-              "2.5,3": 2,
+        },
+        {
+          x: 12,
+          y: 2,
+          type: "StraightTube",
+          rotate: 0,
+          settings: {},
+          flows: {
+            "12,2.5": {
+              [COLD_WATER]: -1,
             },
-            'liquids': [
-              HOT_WATER,
-            ],
-            'type': 'ElbowTube',
-            'x': 2,
-            'y': 3,
-          },
-          {
-            'flows': {
-              "2.5,2": -2,
-              "2.5,3": -2,
-              "3,2.5": 4,
+            "13,2.5": {
+              [COLD_WATER]: 1,
             },
-            'liquids': [
-              COLD_WATER,
-              HOT_WATER,
-            ],
-            'type': 'TeeTube',
-            'x': 2,
-            'y': 2,
           },
-          {
-            'flows': {
-              "-1,-1": 4,
-              "3,2.5": -4,
+        },
+        {
+          type: "BridgeTube",
+          x: 13,
+          y: 2,
+          rotate: 0,
+          settings: {},
+          flows: {
+            "13.5,3": {
+              [COLD_WATER]: -1,
             },
-            'liquids': [
-              COLD_WATER,
-              HOT_WATER,
-            ],
-            'type': 'OutputTube',
-            'x': 3,
-            'y': 2,
+            "13.5,2": {
+              [COLD_WATER]: 1,
+            },
+            "14,2.5": {
+              [COLD_WATER]: 1,
+            },
+            "13,2.5": {
+              [COLD_WATER]: -1,
+            },
           },
-        ]
-      );
-    });
+        },
+        {
+          type: "OutputTube",
+          x: 13,
+          y: 1,
+          rotate: 270,
+          settings: {},
+          flows: {
+            "13.5,2": {
+              [COLD_WATER]: -1,
+            },
+            "-1,-1": {
+              [COLD_WATER]: 1,
+            },
+          },
+        },
+        {
+          x: 14,
+          y: 2,
+          type: "ElbowTube",
+          rotate: 180,
+          settings: {},
+          flows: {
+            "14,2.5": {
+              [COLD_WATER]: -1,
+            },
+            "14.5,3": {
+              [COLD_WATER]: 1,
+            },
+          },
+        },
+        {
+          type: "ElbowTube",
+          x: 14,
+          y: 3,
+          rotate: 270,
+          settings: {},
+          flows: {
+            "14.5,3": {
+              [COLD_WATER]: -1,
+            },
+            "14,3.5": {
+              [COLD_WATER]: 1,
+            },
+          },
+        },
+        {
+          x: 13,
+          y: 3,
+          type: "ElbowTube",
+          rotate: 0,
+          settings: {},
+          flows: {
+            "14,3.5": {
+              [COLD_WATER]: -1,
+            },
+            "13.5,3": {
+              [COLD_WATER]: 1,
+            },
+          },
+        },
+      ]);
   });
 });
