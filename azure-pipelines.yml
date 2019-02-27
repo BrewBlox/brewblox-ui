@@ -1,6 +1,14 @@
 pool:
   vmImage: 'Ubuntu-16.04'
 
+variables:
+  # Variables imported from brewblox group:
+  # DOCKER_USER
+  # DOCKER_PASSWORD
+  # PYPI_USER
+  # PYPI_PASSWORD
+  - group: brewblox
+
 steps:
 - task: NodeTool@0
   inputs:
@@ -12,8 +20,8 @@ steps:
     TAG=$(git describe --tags | grep "^[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]$")
     echo "##vso[task.setvariable variable=brewblox.branch]$BRANCH"
     echo "##vso[task.setvariable variable=brewblox.tag]$TAG"
-    export DOCKER_REPO=brewblox/brewblox-ui
-    export BRANCH_TAG=$(echo $BRANCH | tr '/' '-' | tr '[:upper:]' '[:lower:]');
+    echo "##vso[task.setvariable variable=brewblox.repo]brewblox/brewblox-ui"
+    echo "##vso[task.setvariable variable=brewblox.cleantag]$(echo $BRANCH | tr '/' '-' | tr '[:upper:]' '[:lower:]')"
   displayName: export build variables
 
 - bash: |
@@ -37,43 +45,43 @@ steps:
 - bash:
     docker build
       --no-cache
-      -t ${DOCKER_REPO}:newest-tag
-      -t ${DOCKER_REPO}:$(brewblox.tag)
+      -t $(brewblox.repo):newest-tag
+      -t $(brewblox.repo):$(brewblox.tag)
       -f docker/amd/Dockerfile
       docker;
-    docker push ${DOCKER_REPO}:newest-tag;
-    docker push ${DOCKER_REPO}:$(brewblox.tag);
+    docker push $(brewblox.repo):newest-tag;
+    docker push $(brewblox.repo):$(brewblox.tag);
   displayName: Deploy AMD newest-tag and version tag to Docker Hub on tagged commits
   condition: and(succeeded(), variables['brewblox.tag'])
 
 - bash:
     docker build
       --no-cache
-      -t ${DOCKER_REPO}:rpi-newest-tag
-      -t ${DOCKER_REPO}:rpi-$(brewblox.tag)
+      -t $(brewblox.repo):rpi-newest-tag
+      -t $(brewblox.repo):rpi-$(brewblox.tag)
       -f docker/arm/Dockerfile
       docker;
-    docker push ${DOCKER_REPO}:rpi-newest-tag;
-    docker push ${DOCKER_REPO}:rpi-$(brewblox.tag);
+    docker push $(brewblox.repo):rpi-newest-tag;
+    docker push $(brewblox.repo):rpi-$(brewblox.tag);
   displayName: Deploy ARM newest-tag and version tag to Docker Hub on tagged commits
   condition: and(succeeded(), variables['brewblox.tag'])
 
 - bash:
     docker build
       --no-cache
-      -t ${DOCKER_REPO}:${BRANCH_TAG}
+      -t $(brewblox.repo):$(brewblox.cleantag)
       -f docker/amd/Dockerfile
       docker;
-    docker push ${DOCKER_REPO}:${BRANCH_TAG};
+    docker push $(brewblox.repo):$(brewblox.cleantag);
   displayName: Deploy AMD branch to Docker Hub on any push to the GitHub repository
   condition: and(succeeded(), variables['brewblox.branch'], not(variables['brewblox.tag']))
 
 - bash:
     docker build
       --no-cache
-      -t ${DOCKER_REPO}:rpi-${BRANCH_TAG}
+      -t $(brewblox.repo):rpi-$(brewblox.cleantag)
       -f docker/arm/Dockerfile
       docker;
-    docker push ${DOCKER_REPO}:rpi-${BRANCH_TAG};
+    docker push $(brewblox.repo):rpi-$(brewblox.cleantag);
   displayName: Deploy ARM branch to Docker Hub on any push to the GitHub repository
   condition: and(succeeded(), variables['brewblox.branch'], not(variables['brewblox.tag']))
