@@ -1,0 +1,79 @@
+pool:
+  vmImage: 'Ubuntu-16.04'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '10.x'
+  displayName: 'Install Node.js'
+
+- bash: |
+    BRANCH=$(echo $(Build.SourceBranch) | grep -oP "^refs/heads/\K.*")
+    TAG=$(git describe --tags | grep "^[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]$")
+    echo "##vso[task.setvariable variable=brewblox.branch]$BRANCH"
+    echo "##vso[task.setvariable variable=brewblox.tag]$TAG"
+    export DOCKER_REPO=brewblox/brewblox-ui
+    export BRANCH_TAG=$(echo $BRANCH | tr '/' '-' | tr '[:upper:]' '[:lower:]');
+  displayName: export build variables
+
+- bash: |
+    npm ci
+    npm run lint
+    npm run test
+    npm run build
+  displayName: NPM test
+
+- bash: |
+    npm run build
+  displayName: NPM build
+
+- bash: |
+    echo $(DOCKER_PASSWORD) | docker login -u $(DOCKER_USER) --password-stdin
+    docker run --rm --privileged multiarch/qemu-user-static:register --reset
+    cp -r dist/ docker/
+  displayName: Prepare deploy
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+- bash:
+    docker build
+      --no-cache
+      -t ${DOCKER_REPO}:newest-tag
+      -t ${DOCKER_REPO}:$(brewblox.tag)
+      -f docker/amd/Dockerfile
+      docker;
+    docker push ${DOCKER_REPO}:newest-tag;
+    docker push ${DOCKER_REPO}:$(brewblox.tag);
+  displayName: Deploy AMD newest-tag and version tag to Docker Hub on tagged commits
+  condition: and(succeeded(), variables['brewblox.tag'])
+
+- bash:
+    docker build
+      --no-cache
+      -t ${DOCKER_REPO}:rpi-newest-tag
+      -t ${DOCKER_REPO}:rpi-$(brewblox.tag)
+      -f docker/arm/Dockerfile
+      docker;
+    docker push ${DOCKER_REPO}:rpi-newest-tag;
+    docker push ${DOCKER_REPO}:rpi-$(brewblox.tag);
+  displayName: Deploy ARM newest-tag and version tag to Docker Hub on tagged commits
+  condition: and(succeeded(), variables['brewblox.tag'])
+
+- bash:
+    docker build
+      --no-cache
+      -t ${DOCKER_REPO}:${BRANCH_TAG}
+      -f docker/amd/Dockerfile
+      docker;
+    docker push ${DOCKER_REPO}:${BRANCH_TAG};
+  displayName: Deploy AMD branch to Docker Hub on any push to the GitHub repository
+  condition: and(succeeded(), variables['brewblox.branch'], not(variables['brewblox.tag']))
+
+- bash:
+    docker build
+      --no-cache
+      -t ${DOCKER_REPO}:rpi-${BRANCH_TAG}
+      -f docker/arm/Dockerfile
+      docker;
+    docker push ${DOCKER_REPO}:rpi-${BRANCH_TAG};
+  displayName: Deploy ARM branch to Docker Hub on any push to the GitHub repository
+  condition: and(succeeded(), variables['brewblox.branch'], not(variables['brewblox.tag']))
