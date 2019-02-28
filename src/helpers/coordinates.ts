@@ -29,11 +29,11 @@ export class Coordinates {
   }
 
   public rotate(rotation: number, pivot: CoordinatesParam = [0.5, 0.5]): Coordinates {
-    if (this.x == -1 && this.y == -1) {
-      return this; // don't modify special case for Input/Ouput coordinate
-    }
     if (!rotation) {
       return this;
+    }
+    if (this.x < 0 || this.y < 0) {
+      return this; // exclude negative coordinates which are used for exceptions
     }
 
     const pivotCoord = new Coordinates(pivot);
@@ -54,8 +54,8 @@ export class Coordinates {
   }
 
   public translate(offset: CoordinatesParam): Coordinates {
-    if (this.x == -1 && this.y == -1) {
-      return this; // don't modify special case for Input/Ouput coordinate
+    if (this.x < 0 || this.y < 0) {
+      return this; // exclude negative coordinates which are used for exceptions
     }
     const offsetCoord = new Coordinates(offset);
     this.x += offsetCoord.x;
