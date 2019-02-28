@@ -17,7 +17,7 @@ import Component from 'vue-class-component';
       type: String,
       required: true,
     },
-    display: {
+    tag: {
       type: String,
       default: 'big',
     },
@@ -25,6 +25,9 @@ import Component from 'vue-class-component';
 })
 export default class UnitPopupEdit extends Vue {
   placeholder = NaN; // must not equal clear-value
+  $refs!: {
+    input: any;
+  }
 
   get notation() {
     return this.$props.field.notation;
@@ -36,6 +39,7 @@ export default class UnitPopupEdit extends Vue {
 
   startEdit() {
     this.placeholder = this.initialValue;
+    this.$nextTick(() => this.$refs.input.select());
   }
 
   endEdit() {
@@ -47,7 +51,7 @@ export default class UnitPopupEdit extends Vue {
 
 <template>
   <div>
-    <component :is="$props.display" class="editable">{{ this.$props.field | unit }}</component>
+    <component :is="$props.tag" class="editable">{{ this.$props.field | unit }}</component>
     <q-popup-edit
       :title="this.$props.label"
       v-model="placeholder"
@@ -60,12 +64,11 @@ export default class UnitPopupEdit extends Vue {
       <div class="help-text text-weight-light q-my-md">
         <slot/>
       </div>
-      <q-input :suffix="notation" v-model="placeholder" type="number"/>
+      <q-input ref="input" :suffix="notation" v-model="placeholder" type="number"/>
     </q-popup-edit>
   </div>
 </template>
 
 <style lang="stylus" scoped>
-@import './popups.styl'
+@import './popups.styl';
 </style>
-

@@ -1,5 +1,5 @@
 import Component from 'vue-class-component';
-import ItemBase from './ItemBase';
+import ItemBase from '../ItemBase';
 
 @Component({
   props: {
@@ -11,6 +11,10 @@ import ItemBase from './ItemBase';
       type: Function,
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
       default: () => (id: string, config: Record<string, any>) => { },
+    },
+    pos: {
+      type: Object, // XYPosition
+      required: false,
     },
     cols: {
       type: Number,

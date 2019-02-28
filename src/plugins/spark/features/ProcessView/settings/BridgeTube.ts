@@ -4,7 +4,6 @@ import { defaultSettings } from '../components/getters';
 
 const settings: ComponentSettings = {
   ...defaultSettings,
-  isBridge: true,
   transitions: () => ({
     // bridge (high)
     [LEFT]: [{ outCoords: RIGHT }],

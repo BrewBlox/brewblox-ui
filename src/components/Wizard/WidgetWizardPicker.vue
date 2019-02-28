@@ -1,6 +1,5 @@
 <script lang="ts">
 import { objectStringSorter } from '@/helpers/functional';
-import { DashboardItem } from '@/store/dashboards/state';
 import {
   displayNameById,
   featureIds,
@@ -8,18 +7,36 @@ import {
 } from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { dashboardValues, primaryDashboardId } from '@/store/dashboards/getters';
 
 @Component({
   props: {
-    onCreate: {
-      type: Function,
-      required: true,
+    dashboardId: {
+      type: String,
+      required: false,
     },
   },
 })
-export default class NewWidgetWizard extends Vue {
+export default class WidgetWizardPicker extends Vue {
   featureId: string = '';
   searchModel: string = '';
+
+  _chosenDashboardId: string = '';
+
+  get chosenDashboardId() {
+    return this._chosenDashboardId
+      || this.$props.dashboardId
+      || primaryDashboardId(this.$store);
+  }
+
+  set chosenDashboardId(id: string) {
+    this._chosenDashboardId = id;
+  }
+
+  get dashboardOptions() {
+    return dashboardValues(this.$store)
+      .map(dash => ({ label: dash.title, value: dash.id }));
+  }
 
   get wizardOptions() {
     return featureIds(this.$store)
@@ -41,41 +58,39 @@ export default class NewWidgetWizard extends Vue {
     this.featureId = id;
   }
 
-  create(partial: Partial<DashboardItem>) {
-    this.$props.onCreate(partial);
-    this.reset();
-  }
-
-  reset() {
-    this.featureId = '';
-    this.searchModel = '';
-  }
-
-  mounted() {
-    this.reset();
+  close() {
+    this.$emit('close');
   }
 }
 </script>
 
 <template>
   <div class="widget-modal column">
+    <q-toolbar class="unpadded">
+      <q-toolbar-title>Create new widget</q-toolbar-title>
+      <q-btn v-close-overlay flat rounded label="close"/>
+    </q-toolbar>
+
     <!-- display wizard -->
-    <q-card v-if="wizardComponent">
-      <component
-        v-if="wizardComponent"
-        :is="wizardComponent"
-        :feature-id="featureId"
-        :on-create="create"
-        :on-cancel="reset"
-      />
-    </q-card>
+    <component
+      v-if="wizardComponent"
+      :is="wizardComponent"
+      :feature-id="featureId"
+      :dashboard-id="dashboardId"
+      @close="close"
+    />
+
     <!-- Select a wizard -->
     <q-card v-else dark>
-      <q-card-title>Create new widget
-        <q-btn v-close-overlay slot="right" flat dense icon="clear" label="Cancel"/>
-      </q-card-title>
       <q-card-main>
         <q-list no-border>
+          <q-item>
+            <q-select
+              v-model="chosenDashboardId"
+              :options="dashboardOptions"
+              float-label="Dashboard"
+            />
+          </q-item>
           <q-item>
             <q-search v-model="searchModel" placeholder="Search"/>
           </q-item>

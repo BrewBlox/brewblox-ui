@@ -14,14 +14,27 @@ export default class TeeTube extends PartComponent {
   }
 
   get topSpeed() {
-    return this.flowOnAngle(UP);
+    return this.flowOnCoord(UP);
   }
 
   get leftSpeed() {
-    return this.flowOnAngle(LEFT);
+    return this.flowOnCoord(LEFT);
   }
+
   get rightSpeed() {
-    return this.flowOnAngle(RIGHT);
+    return this.flowOnCoord(RIGHT);
+  }
+
+  get topLiquids() {
+    return this.liquidOnCoord(UP);
+  }
+
+  get leftLiquids() {
+    return this.liquidOnCoord(LEFT);
+  }
+
+  get rightLiquids() {
+    return this.liquidOnCoord(RIGHT);
   }
 }
 </script>
@@ -29,19 +42,17 @@ export default class TeeTube extends PartComponent {
 <template>
   <g class="tee-tube">
     <g class="outline">
-      <path d="M50,21H30a1,1,0,0,1-1-1V0"/>
-      <path d="M21,0V20a1,1,0,0,1-1,1H0"/>
-      <line class="line" y1="29" x2="50" y2="29"/>
+      <path d="M0,21H21V0"/>
+      <path d="M50,21H29V0"/>
+      <path d="M0,29H50"/>
     </g>
-    <g v-if="liquid" :stroke="liquidColor" class="liquid">
-      <line y1="25" x2="50" y2="25"/>
-      <path d="M0,25H20a5,5,0,0,0,5-5V0"/>
-      <path d="M25,0V20a5,5,0,0,0,5,5H50"/>
-    </g>
+    <LiquidStroke :paths="['M25,22V0']" :colors="topLiquids"/>
+    <LiquidStroke :paths="['M0,25H25']" :colors="leftLiquids"/>
+    <LiquidStroke :paths="['M25,25H50']" :colors="rightLiquids"/>
     <g class="outline">
-      <AnimatedArrows v-if="topSpeed" :path="paths.top" :num-arrows="1" :speed="topSpeed"/>
-      <AnimatedArrows v-if="leftSpeed" :path="paths.left" :num-arrows="1" :speed="leftSpeed"/>
-      <AnimatedArrows v-if="rightSpeed" :path="paths.right" :num-arrows="1" :speed="rightSpeed"/>
+      <AnimatedArrows :path="paths.top" :num-arrows="1" :speed="topSpeed"/>
+      <AnimatedArrows :path="paths.left" :num-arrows="1" :speed="leftSpeed"/>
+      <AnimatedArrows :path="paths.right" :num-arrows="1" :speed="rightSpeed"/>
     </g>
   </g>
 </template>

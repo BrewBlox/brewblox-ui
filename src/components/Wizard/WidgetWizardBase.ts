@@ -3,6 +3,8 @@ import { DashboardItem } from '@/store/dashboards/state';
 import { widgetSizeById } from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { appendDashboardItem } from '@/store/dashboards/actions';
+import { displayNameById } from '@/store/providers/getters';
 
 export interface NavAction {
   label: string;
@@ -16,17 +18,15 @@ export interface NavAction {
       type: String,
       required: true,
     },
-    onCreate: {
-      type: Function,
-      required: true,
-    },
-    onCancel: {
-      type: Function,
-      required: true,
+    dashboardId: {
+      type: String,
+      required: false,
     },
   },
 })
-export default class ExampleFeatureWizard extends Vue {
+export default class WidgetWizardBase extends Vue {
+  protected $q: any;
+
   protected get typeId(): string {
     return this.$props.featureId;
   }
@@ -39,11 +39,24 @@ export default class ExampleFeatureWizard extends Vue {
     return !!dashboardItemById(this.$store, id);
   }
 
-  protected createItem(item: Partial<DashboardItem>): void {
-    this.$props.onCreate(item);
+  protected async createItem(item: DashboardItem): Promise<void> {
+    try {
+      await appendDashboardItem(this.$store, item);
+      this.$q.notify({
+        type: 'positive',
+        message: `Added ${displayNameById(this.$store, item.feature)} "${item.id}"`,
+      });
+    } catch (e) {
+      this.$q.notify(`Failed to add widget: ${e.toString()}`);
+    }
+    this.$emit('close');
   }
 
   protected cancel(): void {
-    this.$props.onCancel();
+    this.$emit('close');
+  }
+
+  protected close(): void {
+    this.$emit('close');
   }
 }

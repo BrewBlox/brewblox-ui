@@ -1,11 +1,11 @@
-import { ComponentSettings, FlowPart, Transitions } from '../state';
+import { ComponentSettings, PersistentPart, Transitions } from '../state';
 import { LEFT, RIGHT } from '../getters';
 import { defaultSettings } from '../components/getters';
 
 const settings: ComponentSettings = {
   ...defaultSettings,
-  transitions: (part: FlowPart): Transitions => {
-    if (part.closed) {
+  transitions: (part: PersistentPart): Transitions => {
+    if ((part.settings || {}).closed) {
       return {};
     }
     return {

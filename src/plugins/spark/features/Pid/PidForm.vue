@@ -1,100 +1,17 @@
 <script lang="ts">
-import { Unit } from '@/helpers/units';
-import { ActuatorAnalogLink, ProcessValueLink } from '@/helpers/units/KnownLinks';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { PidBlock } from '@/plugins/spark/features/Pid/state';
 import Component from 'vue-class-component';
-import { filters } from './getters';
+import { filters, defaultData, presets } from './getters';
 
 @Component
 export default class PidForm extends BlockForm {
   defaultData() {
-    return {
-      inputId: new ProcessValueLink(null),
-      outputId: new ActuatorAnalogLink(null),
-      inputValue: new Unit(0, 'degC'),
-      inputSetting: new Unit(0, 'degC'),
-      outputValue: 0,
-      outputSetting: 0,
-      filter: 4,
-      filterThreshold: new Unit(5, 'delta_degC'),
-      enabled: false,
-      active: true,
-      kp: new Unit(20, '1/degC'),
-      ti: new Unit(2, 'hour'),
-      td: new Unit(0, 'second'),
-      p: 0,
-      i: 0,
-      d: 0,
-      error: new Unit(0, 'delta_degC'),
-      integral: new Unit(0, 'delta_degC/second'),
-      derivative: new Unit(0, 'delta_degC*second'),
-    };
+    return defaultData();
   }
 
   presets() {
-    return [
-      {
-        label: 'Fridge compressor (cooling)',
-        value: {
-          filter: 4,
-          filterThreshold: new Unit(5, 'delta_degC'),
-          kp: new Unit(-10, '1/degC'),
-          ti: new Unit(2, 'hour'),
-          td: new Unit(5, 'min'),
-        },
-      },
-      {
-        label: 'Fridge heater',
-        value: {
-          filter: 4,
-          filterThreshold: new Unit(5, 'delta_degC'),
-          kp: new Unit(20, '1/degC'),
-          ti: new Unit(2, 'hour'),
-          td: new Unit(3, 'min'),
-        },
-      },
-      {
-        label: 'Kettle heating element',
-        value: {
-          filter: 2,
-          filterThreshold: new Unit(2, 'delta_degC'),
-          kp: new Unit(50, '1/degC'),
-          ti: new Unit(10, 'min'),
-          td: new Unit(0, 'min'),
-        },
-      },
-      {
-        label: 'HLT setpoint driver',
-        value: {
-          filter: 2,
-          filterThreshold: new Unit(2, 'delta_degC'),
-          kp: new Unit(1, '1/degC'),
-          ti: new Unit(10, 'min'),
-          td: new Unit(0, 'min'),
-        },
-      },
-      {
-        label: 'Glycol pump',
-        value: {
-          filter: 4,
-          filterThreshold: new Unit(2, 'delta_degC'),
-          kp: new Unit(-5, '1/degC'),
-          ti: new Unit(2, 'hour'),
-          td: new Unit(5, 'min'),
-        },
-      },
-      {
-        label: 'Heating pad',
-        value: {
-          filter: 4,
-          filterThreshold: new Unit(2, 'delta_degC'),
-          kp: new Unit(30, '1/degC'),
-          ti: new Unit(2, 'hour'),
-          td: new Unit(5, 'min'),
-        },
-      },
-    ];
+    return presets();
   }
 
   get block() {
@@ -153,7 +70,7 @@ export default class PidForm extends BlockForm {
                 :service-id="block.serviceId"
                 :change="callAndSaveBlock(v => block.data.inputId = v)"
                 label="Input"
-                display="span"
+                tag="span"
               >
                 <p>A PID block drives its output to regulate its input.</p>
                 <p>
@@ -187,7 +104,7 @@ export default class PidForm extends BlockForm {
                 :service-id="block.serviceId"
                 :change="callAndSaveBlock(v => block.data.outputId = v)"
                 label="Output"
-                display="span"
+                tag="span"
               >
                 <p>The PID sets its output block to the result from the PID calculation.</p>
                 <p>
@@ -224,7 +141,7 @@ export default class PidForm extends BlockForm {
                 :change="callAndSaveBlock(v => block.data.filter = v)"
                 :options="filterOpts"
                 label="Filter"
-                display="span"
+                tag="span"
               >
                 <p>
                   The input error is passed through a filter to remove noise, spikes and sudden jumps.
@@ -241,7 +158,7 @@ export default class PidForm extends BlockForm {
                 :field="block.data.filterThreshold"
                 :change="callAndSaveBlock(v => block.data.filterThreshold = v)"
                 label="Filter threshold"
-                display="span"
+                tag="span"
               >
                 <p>
                   Filtering the input causes a delay in response, because it averages values.
@@ -270,7 +187,7 @@ export default class PidForm extends BlockForm {
             :field="block.data.kp"
             :change="callAndSaveBlock(v => block.data.kp = v)"
             label="Proportional gain Kp"
-            display="span"
+            tag="span"
           >
             <p>
               Kp is the proportional gain, which is directly mutiplied by the filtered error.
@@ -298,7 +215,7 @@ export default class PidForm extends BlockForm {
             :field="block.data.ti"
             :change="callAndSaveBlock(v => block.data.ti = v)"
             label="Integral time constant Ti"
-            display="span"
+            tag="span"
           >
             <p>
               The purpose of the integrator is to remove steady state errors.
@@ -321,7 +238,7 @@ export default class PidForm extends BlockForm {
             :field="block.data.td"
             :change="callAndSaveBlock(v => block.data.td = v)"
             label="Derivative time constant Td"
-            display="span"
+            tag="span"
           >
             <p>
               When the error is decreasing fast, the derivative action (D) counteracts the proportional action (P).

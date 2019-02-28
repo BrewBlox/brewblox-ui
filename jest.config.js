@@ -19,6 +19,10 @@ module.exports = {
   snapshotSerializers: [
     'jest-serializer-vue',
   ],
+  modulePathIgnorePatterns: [
+    "<rootDir>/dist/",
+    "<rootDir>/dev/",
+  ],
 };
 
 // I use these plugins to show hot reloaded test results in vscode:

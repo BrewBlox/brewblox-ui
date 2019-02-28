@@ -16,59 +16,39 @@ export default class PartComponent extends Vue {
     return {};
   }
 
-  public static get isSource(): boolean {
-    return false;
-  }
-
-  public static get isBridge(): boolean {
-    return false;
-  }
-
   public static get cards(): string[] {
     return [];
   }
 
   protected get part(): FlowPart {
-    return this.$props.value;
-  }
-
-  protected get closed(): boolean {
-    return Boolean(this.part.closed);
+    return {
+      transitions: {},
+      flows: {},
+      ...this.$props.value,
+    };
   }
 
   protected get flipped(): boolean {
     return Boolean(this.part.flipped);
   }
 
-  protected get disabled(): boolean {
-    return Boolean(this.part.disabled);
-  }
-
-  protected get flow(): CalculatedFlows {
-    return this.part.calculated || {};
-  }
-
-  protected get liquid(): boolean {
-    return Object.keys(this.flow).length > 0;
-  }
-
-  protected get liquidColor(): string | undefined {
-    return this.part.liquidSource || this.part.liquid;
-  }
-
-  protected flowOnAngle(angle: string): number {
-    return this.flow[angle] || 0;
-  }
-
-  protected toggleClosed(): void {
-    this.$parent.$emit('input', { ...this.part, closed: !this.closed });
-  }
-
   protected toggleFlipped(): void {
     this.$parent.$emit('input', { ...this.part, flipped: !this.flipped });
   }
 
-  protected toggleDisabled(): void {
-    this.$parent.$emit('input', { ...this.part, disabled: !this.disabled });
+  protected get flow(): CalculatedFlows {
+    return this.part.flows;
+  }
+
+  protected liquidOnCoord(coord: string): string[] {
+    return Object.keys(this.flow[coord] || {});
+  }
+
+  protected flowOnCoord(coord: string): number {
+    return Object.values(this.flow[coord] || {}).reduce((sum, v) => sum + v, 0);
+  }
+
+  protected settings(): Record<string, any> {
+    return this.part.settings || {};
   }
 }

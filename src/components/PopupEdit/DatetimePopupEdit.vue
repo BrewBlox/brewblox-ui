@@ -16,7 +16,7 @@ import Component from 'vue-class-component';
       type: String,
       required: true,
     },
-    display: {
+    tag: {
       type: String,
       default: 'span',
     },
@@ -59,7 +59,7 @@ export default class DatetimePopupEdit extends Vue {
 
 <template>
   <div>
-    <component :is="$props.display" class="editable">{{ dateString }}</component>
+    <component :is="$props.tag" class="editable">{{ dateString }}</component>
     <q-popup-edit
       :disable="$attrs.disabled"
       :title="$props.label"
@@ -92,5 +92,5 @@ export default class DatetimePopupEdit extends Vue {
 
 
 <style lang="stylus" scoped>
-@import './popups.styl'
+@import './popups.styl';
 </style>

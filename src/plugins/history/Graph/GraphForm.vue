@@ -1,12 +1,13 @@
 <script lang="ts">
 import { GraphConfig } from '@/components/Graph/state';
 import { nodeBuilder, targetSplitter, targetBuilder } from '@/components/Graph/functional';
-import FormBase from '@/components/Widget/FormBase';
+import FormBase from '@/components/Form/FormBase';
 import { durationString } from '@/helpers/functional';
 import { fetchKnownKeys } from '@/store/history/actions';
 import { fields } from '@/store/history/getters';
 import Component from 'vue-class-component';
 import FieldPopupEdit from './FieldPopupEdit.vue';
+import { ValueAxes } from '@/store/history/state';
 
 interface PeriodDisplay {
   start: boolean;
@@ -73,7 +74,7 @@ export default class GraphForm extends FormBase {
   }
 
   get config(): GraphConfig {
-    return this.$props.field as GraphConfig;
+    return this.$props.field;
   }
 
   get fields() {
@@ -94,6 +95,19 @@ export default class GraphForm extends FormBase {
 
   get renames() {
     return this.config.renames;
+  }
+
+  get axes(): ValueAxes {
+    return this.config.axes;
+  }
+
+  isRightAxis(field: string) {
+    return this.config.axes[field] === 'y2';
+  }
+
+  updateAxisSide(field: string, isRight: boolean) {
+    this.config.axes[field] = isRight ? 'y2' : 'y';
+    this.saveConfig();
   }
 
   created() {
@@ -134,7 +148,7 @@ export default class GraphForm extends FormBase {
             :field="config.params.start"
             :change="callAndSaveConfig(v => config.params.start = v)"
             label="Start time"
-            display="big"
+            tag="big"
           />
         </q-field>
         <q-field v-if="shownPeriod.duration" label="Duration">
@@ -150,7 +164,7 @@ export default class GraphForm extends FormBase {
             :field="config.params.end"
             :change="callAndSaveConfig(v => config.params.end = v)"
             label="End time"
-            display="big"
+            tag="big"
           />
         </q-field>
       </div>
@@ -184,7 +198,28 @@ export default class GraphForm extends FormBase {
             :change="callAndSaveConfig(v => config.renames[field] = v)"
             label="Legend"
             clearable
-            display="span"
+            tag="span"
+          />
+        </q-item>
+        <q-item v-if="!selected || selected.length === 0">
+          <q-item-main class="darkened">No metrics selected</q-item-main>
+        </q-item>
+      </q-list>
+    </q-collapsible>
+
+    <q-collapsible group="modal" class="col-12" icon="mdi-chart-line" label="Axes">
+      <q-list no-border separator>
+        <q-item>
+          <q-item-main>Metric</q-item-main>Left or right axis
+        </q-item>
+        <q-item v-for="field in selected" :key="field">
+          <q-item-main>{{ field }}</q-item-main>
+          <q-btn
+            :class="{mirrored: isRightAxis(field)}"
+            flat
+            size="lg"
+            icon="mdi-chart-line"
+            @click="updateAxisSide(field, !isRightAxis(field))"
           />
         </q-item>
         <q-item v-if="!selected || selected.length === 0">
@@ -194,3 +229,10 @@ export default class GraphForm extends FormBase {
     </q-collapsible>
   </div>
 </template>
+
+<style scoped>
+.mirrored {
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
+}
+</style>

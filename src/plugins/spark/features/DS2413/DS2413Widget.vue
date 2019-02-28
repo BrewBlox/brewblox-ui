@@ -69,4 +69,3 @@ export default class DS2413Widget extends BlockWidget {
   margin-top: 0px;
 }
 </style>
-

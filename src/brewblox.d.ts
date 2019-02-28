@@ -20,3 +20,8 @@ interface HoldArguments {
   position: { top: number; left: number };
   duration: number;
 }
+
+interface XYPosition {
+  x: number;
+  y: number;
+}

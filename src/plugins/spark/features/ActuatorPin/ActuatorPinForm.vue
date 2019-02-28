@@ -26,8 +26,8 @@ export default class ActuatorPinForm extends BlockForm {
           invert: false,
           constrainedBy: {
             constraints: [
-              { "minOff[second]": 300 },
-              { "minOn[second]": 180 },
+              { 'minOff[second]': 300 },
+              { 'minOn[second]': 180 },
             ],
           },
         },

@@ -11,7 +11,7 @@ export type WidgetSelector = (store: RootStore, config: any) => string | undefin
 
 export interface Feature {
   id: string;
-  displayName?: string;
+  displayName: string;
   validator?: Validator;
   deleters?: Deleter[];
   widgetSize?: {
@@ -24,9 +24,18 @@ export interface Feature {
   form?: string;
 }
 
+export interface Arrangement {
+  id: string;
+  displayName: string;
+  wizard: string;
+}
+
 export interface FeatureState {
   features: {
     [id: string]: Feature;
+  };
+  arrangements: {
+    [id: string]: Arrangement;
   };
 }
 

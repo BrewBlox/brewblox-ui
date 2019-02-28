@@ -19,7 +19,7 @@ import Component from 'vue-class-component';
       type: String,
       required: true,
     },
-    display: {
+    tag: {
       type: String,
       default: 'big',
     },
@@ -77,7 +77,7 @@ export default class SelectPopupEdit extends Vue {
 
 <template>
   <div>
-    <component :is="$props.display" class="editable">{{ displayValue | truncated }}</component>
+    <component :is="$props.tag" class="editable">{{ displayValue | truncated }}</component>
     <q-popup-edit
       :title="this.$props.label"
       v-model="placeholder"
@@ -101,5 +101,5 @@ export default class SelectPopupEdit extends Vue {
 </template>
 
 <style lang="stylus" scoped>
-@import './popups.styl'
+@import './popups.styl';
 </style>

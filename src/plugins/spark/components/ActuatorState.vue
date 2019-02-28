@@ -17,7 +17,7 @@ export default class ActuatorState extends Vue {
   get commonOpts() {
     return {
       color: 'grey-9',
-      toggleColor: 'grey-8',
+      toggleColor: 'primary',
       textColor: 'grey',
     };
   }

@@ -10,7 +10,7 @@ import {
 } from '@/plugins/spark/store/actions';
 import { allBlocks, lastStatus, blockLinks } from '@/plugins/spark/store/getters';
 import { createDashboardItem } from '@/store/dashboards/actions';
-import { allDashboards, itemCopyName } from '@/store/dashboards/getters';
+import { dashboardValues, itemCopyName } from '@/store/dashboards/getters';
 import { Dashboard, DashboardItem } from '@/store/dashboards/state';
 import {
   deletersById,
@@ -49,7 +49,7 @@ export default class SparkPage extends Vue {
   statusCheckInterval: NodeJS.Timeout | null = null;
 
   get dashboards(): Dashboard[] {
-    return allDashboards(this.$store);
+    return dashboardValues(this.$store);
   }
 
   defaultItem(block: Block): DashboardItem {
@@ -197,7 +197,8 @@ export default class SparkPage extends Vue {
   }
 
   onWidgetChange(id: string, config: any) {
-    this.volatileItems[id].config = { ...config };
+    const key = `${this.$props.serviceId}/${id}`;
+    this.volatileItems[key].config = { ...config };
     this.$q.notify({
       type: 'warning',
       message: 'Changes will not be persisted',
@@ -241,7 +242,7 @@ export default class SparkPage extends Vue {
       <q-modal v-model="modalOpen" no-backdrop-dismiss>
         <component v-if="modalOpen" :is="modalSettings.component" v-bind="modalSettings.props"/>
       </q-modal>
-      <q-modal v-model="relationsModalOpen">
+      <q-modal v-model="relationsModalOpen" no-backdrop-dismiss>
         <DagreDiagram
           v-if="relationsModalOpen"
           :nodes="items.map(i => ({id: i.id, type: i.feature}))"

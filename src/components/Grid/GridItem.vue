@@ -9,11 +9,16 @@ const MIN_ROWS = 2;
 
 interface Coordinates { x: number; y: number }
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 @Component({
   props: {
     id: {
       type: [String, Number],
       required: true,
+    },
+    pos: {
+      type: Object,
+      required: false,
     },
     cols: {
       type: Number,
@@ -33,7 +38,11 @@ interface Coordinates { x: number; y: number }
     },
     onStartInteraction: {
       type: Function,
-      default: () => () => { },
+      default: () => (id: string) => { },
+    },
+    onMoveInteraction: {
+      type: Function,
+      default: () => (pos: XYPosition) => { },
     },
     onStopInteraction: {
       type: Function,
@@ -41,12 +50,11 @@ interface Coordinates { x: number; y: number }
     },
     onUpdateItemSize: {
       type: Function,
-      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
       default: () => (id: string, cols: number, rows: number) => { },
     },
-    onNewItemsOrder: {
+    onUpdatePos: {
       type: Function,
-      default: () => () => { },
+      default: () => (id: string, pos: XYPosition | null) => { },
     },
     onDelete: {
       type: Function,
@@ -62,6 +70,7 @@ interface Coordinates { x: number; y: number }
     },
   },
 })
+/* eslint-enable */
 export default class GridItem extends Vue {
   dragging: boolean = false;
   moving: boolean = false;
@@ -84,26 +93,18 @@ export default class GridItem extends Vue {
   currentStartCols: number | null = null;
   currentStartRows: number | null = null;
 
-  get style(): string {
-    const spans = `
-      grid-column-end: span ${this.currentCols || this.$props.cols};
-      grid-row-end: span ${this.currentRows || this.$props.rows};
-    `;
-    if (this.currentStartCols && this.currentStartRows) {
-      return `
-        grid-column-start: ${this.currentStartCols};
-        grid-row-start: ${this.currentStartRows};
-        ${spans}
-      `;
-    }
-    return spans;
+  get style(): Record<string, string> {
+    return {
+      gridColumnEnd: `span ${this.currentCols || this.$props.cols}`,
+      gridRowEnd: `span ${this.currentRows || this.$props.rows}`,
+    };
   }
 
-  get dragStyle(): string {
-    return `
-      width: ${this.dragWidth}px;
-      height: ${this.dragHeight}px;
-    `;
+  get dragStyle(): Record<string, string> {
+    return {
+      width: `${this.dragWidth}px`,
+      height: `${this.dragHeight}px`,
+    };
   }
 
   startInteraction(e: MouseEvent | TouchEvent) {
@@ -122,7 +123,7 @@ export default class GridItem extends Vue {
     this.dragStartHeight = height;
 
     // communicate start to parent
-    this.$props.onStartInteraction();
+    this.$props.onStartInteraction(this.$props.id);
   }
 
   stopInteraction() {
@@ -179,7 +180,6 @@ export default class GridItem extends Vue {
     if (e instanceof MouseEvent) {
       return { x: e.pageX - this.startX, y: e.pageY - this.startY };
     }
-
     return { x: e.touches[0].pageX - this.startX, y: e.touches[0].pageY - this.startY };
   }
 
@@ -212,7 +212,6 @@ export default class GridItem extends Vue {
     if (this.$refs.container instanceof Element) {
       return this.$refs.container.getBoundingClientRect() as DOMRect;
     }
-
     throw new Error('Container is not a valid Element');
   }
 
@@ -254,6 +253,8 @@ export default class GridItem extends Vue {
 
     this.currentStartCols = position.x;
     this.currentStartRows = position.y;
+
+    this.$props.onMoveInteraction({ x: this.currentStartCols, y: this.currentStartRows });
   }
 
   startDrag(e: MouseEvent | TouchEvent) {
@@ -277,7 +278,7 @@ export default class GridItem extends Vue {
 
   stopDrag() {
     this.moving = false;
-    this.$props.onNewItemsOrder();
+    this.$props.onUpdatePos(this.$props.id, { x: this.currentStartCols, y: this.currentStartRows });
     this.stopInteraction();
   }
 
@@ -317,8 +318,26 @@ export default class GridItem extends Vue {
     this.onDragMove(args.evt);
   }
 
-  holdHandler() {
-    this.modalOpen = true;
+  unpin() {
+    this.$props.onUpdatePos(this.$props.id, null);
+  }
+
+  pin() {
+    const rects = this.containerSize();
+    const firstChildRects = this.containerFirstChildSize();
+
+    const touchX = rects.x;
+    const touchY = rects.y;
+
+    const parentX = firstChildRects.x;
+    const parentY = firstChildRects.y;
+
+    const pos: XYPosition = {
+      x: ((touchX - parentX) / (GRID_SIZE + GAP_SIZE)) + 1,
+      y: ((touchY - parentY) / (GRID_SIZE + GAP_SIZE)) + 1,
+    };
+
+    this.$props.onUpdatePos(this.$props.id, pos);
   }
 }
 </script>
@@ -344,22 +363,42 @@ export default class GridItem extends Vue {
     </button>
     <!-- Item drag button -->
     <button
-      v-touch-hold="holdHandler"
       v-touch-pan="movePanHandler"
       v-if="!dragging && $props.editable"
       class="grid-item-move-handle"
     >
       <div class="column">
-        <q-icon name="touch_app" size="50px"/>
-        <p>hold</p>
-      </div>
-      <div v-if="!$props.noMove" class="column">
-        <q-icon name="mdi-gesture-swipe-horizontal" size="50px"/>
-        <p>drag</p>
+        <div v-if="!$props.noMove" class="column">
+          <q-icon name="mdi-gesture-swipe-horizontal" size="50px" class="shadowed"/>
+          <p class="shadowed">drag</p>
+        </div>
+        <div class="row">
+          <q-btn
+            color="primary"
+            icon="settings"
+            fab
+            style="margin-right: 20px"
+            @click="modalOpen = true"
+          />
+          <q-btn
+            v-if="!$props.noMove && $props.pos"
+            fab
+            icon="mdi-pin-off"
+            color="primary"
+            @click="unpin"
+          />
+          <q-btn
+            v-if="!$props.noMove && !$props.pos"
+            fab
+            icon="mdi-pin"
+            color="primary"
+            @click="pin"
+          />
+        </div>
       </div>
     </button>
     <!-- Action modal -->
-    <q-modal v-model="modalOpen">
+    <q-modal v-model="modalOpen" no-backdrop-dismiss>
       <WidgetActionMenu
         v-if="modalOpen"
         :item-id="$props.id"
@@ -371,7 +410,9 @@ export default class GridItem extends Vue {
   </div>
 </template>
 
-<style scoped>
+<style lang="stylus" scoped>
+@import '../../css/app.styl';
+
 .grid-item {
   position: relative;
 }
@@ -416,5 +457,9 @@ export default class GridItem extends Vue {
   bottom: 0;
   position: absolute;
   z-index: 1;
+}
+
+.shadowed {
+  text-shadow: 0px 2px 0px $dark, 0px -2px 0px $dark, 2px 0px 0px $dark, -2px 0px 0px $dark;
 }
 </style>

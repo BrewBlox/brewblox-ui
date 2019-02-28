@@ -2,15 +2,19 @@ export interface FlowRoute {
   outCoords: string;
   friction?: number;
   pressure?: number;
-  deltaPressure?: number;
+  liquids?: string[];
 }
 
 export interface Transitions {
   [inCoords: string]: FlowRoute[];
 }
 
+export interface LiquidFlow {
+  [liquid: string]: number;
+}
+
 export interface CalculatedFlows {
-  [inCoords: string]: number;  // pressure
+  [inCoords: string]: LiquidFlow;
 }
 
 export interface PersistentPart {
@@ -18,24 +22,19 @@ export interface PersistentPart {
   x: number;
   y: number;
   rotate: number;
-  liquidSource?: string;
-  closed?: boolean;
-  disabled?: boolean;
   flipped?: boolean;
+  settings: Record<string, any>;
 }
 
 export interface ComponentSettings {
-  isSource: boolean;
-  isBridge: boolean;
   cards: string[];
   transitions: (part: PersistentPart) => Transitions;
   size: (part: PersistentPart) => [number, number];
 }
 
 export interface FlowPart extends PersistentPart {
-  transitions?: Transitions;
-  calculated?: CalculatedFlows;
-  liquid?: string;
+  transitions: Transitions;
+  flows: CalculatedFlows;
 }
 
 export interface ProcessViewConfig {

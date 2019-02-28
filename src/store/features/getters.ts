@@ -1,7 +1,7 @@
 import { createAccessors } from '@/helpers/static-store';
 import { GetterTree } from 'vuex';
 import { RootState, RootStore } from '../state';
-import { Deleter, Feature, FeatureState, Validator } from './state';
+import { Deleter, Feature, FeatureState, Validator, Arrangement } from './state';
 
 const { read } = createAccessors('features');
 
@@ -9,17 +9,23 @@ export const getters: GetterTree<FeatureState, RootState> = {
   features: (state: FeatureState): { [id: string]: Feature } => state.features,
   featureIds: (state: FeatureState): string[] => Object.keys(state.features),
   featureValues: (state: FeatureState): Feature[] => Object.values(state.features),
+  arrangements: (state: FeatureState): { [id: string]: Arrangement } => state.arrangements,
+  arrangementIds: (state: FeatureState): string[] => Object.keys(state.arrangements),
+  arrangementValues: (state: FeatureState): Arrangement[] => Object.values(state.arrangements),
 };
 
 export const features = read(getters.features);
 export const featureIds = read(getters.featureIds);
 export const featureValues = read(getters.featureValues);
+export const arrangements = read(getters.arrangements);
+export const arrangementIds = read(getters.arrangementIds);
+export const arrangementValues = read(getters.arrangementValues);
 
 export const featureById = (store: RootStore, id: string): Feature =>
   (features(store)[id] || {});
 
 export const displayNameById = (store: RootStore, id: string): string =>
-  (featureById(store, id).displayName || id);
+  featureById(store, id).displayName;
 
 export const validatorById = (store: RootStore, id: string): Validator =>
   (featureById(store, id).validator || (() => true));

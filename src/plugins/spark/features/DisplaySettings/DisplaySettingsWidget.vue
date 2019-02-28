@@ -54,7 +54,7 @@ export default class DisplaySettingsWidget extends BlockWidget {
           :change="callAndSaveBlock(v => block.data.name = v)"
           class="col-9 self-center"
           label="footer text"
-          display="span"
+          tag="span"
         />
       </div>
     </q-card-main>

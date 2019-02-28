@@ -4,9 +4,12 @@ import { Layout, PlotData } from 'plotly.js';
 import Component from 'vue-class-component';
 import { getById } from './getters';
 import { SetpointProfileBlock } from './state';
+import { Watch } from 'vue-property-decorator';
 
 @Component
 export default class SetpointProfileWidget extends BlockWidget {
+  now: Date = new Date();
+
   get block(): SetpointProfileBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
@@ -21,7 +24,27 @@ export default class SetpointProfileWidget extends BlockWidget {
   }
 
   get plotlyLayout(): Partial<Layout> {
-    return {};
+    return {
+      shapes: [
+        {
+          type: 'line',
+          yref: 'paper',
+          x0: this.now,
+          x1: this.now,
+          y0: 0,
+          y1: 1,
+          line: {
+            color: 'rgb(0, 200, 0)',
+            dash: 'dot',
+          },
+        },
+      ],
+    };
+  }
+
+  @Watch('block')
+  refresh() {
+    this.now = new Date();
   }
 }
 </script>
