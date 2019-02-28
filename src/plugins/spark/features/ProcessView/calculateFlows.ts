@@ -16,10 +16,15 @@ import set from 'lodash/set';
 import mapValues from 'lodash/mapValues';
 import mapKeys from 'lodash/mapKeys';
 import pickBy from 'lodash/pickBy';
+import omit from 'lodash/omit';
 
 export const isSamePart =
   (left: PersistentPart, right: PersistentPart): boolean =>
     ['x', 'y', 'type', 'rotate'].every(k => left[k] === right[k]);
+
+export const removeTransitions =
+  (parts: FlowPart[], inCoord: string): FlowPart[] => parts.map(
+    part => ({ ...part, transitions: omit(part.transitions, inCoord) }));
 
 export const partSettings =
   (part: PersistentPart): ComponentSettings => settings[part.type];
@@ -36,8 +41,6 @@ const adjacentPart = (
     .find((part: FlowPart) =>
       !(currentPart && isSamePart(part, currentPart))
       && has(part, ['transitions', outCoords]));
-
-const hasIndependentTransitions = (part: FlowPart): boolean => part.type === 'BridgeTube';
 
 const normalizeFlows = (part: FlowPart): FlowPart => {
   if (!part.flows) {
@@ -113,7 +116,7 @@ const mergeFlows = (flows: CalculatedFlows): CalculatedFlows =>
       const liquidsTotal = posTotal + negTotal - acceleration;
 
       // if acceleration is bigger than other flows combined and opposite sign, the flow is reversed
-      if (acceleration / liquidsTotal < -1) {
+      if (liquidsTotal && acceleration / liquidsTotal < -1) {
         const newTotal = acceleration + liquidsTotal;
         toMerge = scale(toMerge, newTotal / liquidsTotal);
         delete toMerge[ACCELERATE_OTHERS];
@@ -258,31 +261,39 @@ export const flowPath = (
   startCoord: string = inCoord): FlowSegment | null => {
   const outFlows: FlowRoute[] = get(start, ['transitions', inCoord], []);
   const path = new FlowSegment(start, {});
-  const candidateParts = parts
-    .filter(candidate => !isSamePart(start, candidate) || hasIndependentTransitions(candidate));
 
+  let candidateParts = removeTransitions(parts, inCoord);
 
-  outFlows.forEach(outFlow => {
-    const nextPart = adjacentPart(candidateParts, outFlow.outCoords, start);
-    let nextPath: FlowSegment | null = null;
-    if (nextPart !== undefined && outFlow.outCoords !== startCoord) {
-      nextPath = flowPath(candidateParts, nextPart, outFlow.outCoords, startCoord);
-      if (nextPath !== null) {
-        path.addChild(nextPath);
+  for (let outFlow of outFlows) {
+    let nextPart: FlowPart | undefined;
+    while (true) {
+      nextPart = adjacentPart(candidateParts, outFlow.outCoords, start);
+      let nextPath: FlowSegment | null = null;
+      if (nextPart !== undefined && outFlow.outCoords !== startCoord) {
+        nextPath = flowPath(candidateParts, nextPart, outFlow.outCoords, startCoord);
+        if (nextPath !== null) {
+          path.addChild(nextPath);
+        }
       }
+      if (nextPath !== null || outFlow.outCoords === startCoord) {
+        if (path.transitions[inCoord] === undefined) {
+          path.transitions[inCoord] = [outFlow];
+        }
+        else {
+          path.transitions[inCoord].push(outFlow);
+        }
+      }
+      if (!nextPart) {
+        break;
+      }
+      candidateParts = candidateParts
+        .filter(part => nextPart && !isSamePart(nextPart, part));
     }
-    if (nextPath !== null || outFlow.outCoords === startCoord) {
-      if (path.transitions[inCoord] === undefined) {
-        path.transitions[inCoord] = [outFlow];
-      }
-      else {
-        path.transitions[inCoord].push(outFlow);
-      }
-    }
-  });
+  };
   if (path.transitions[inCoord] === undefined) {
     return null;
   }
+  path.transitions[inCoord] = [...new Set(path.transitions[inCoord])]; // remove duplicates
 
   let duplicated: FlowSegment | null = null;
   do {

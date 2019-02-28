@@ -7,7 +7,7 @@ const settings: ComponentSettings = {
   transitions: (part: PersistentPart) => {
     const p = (part.settings || {}).disabled ? 0 : part.settings.pressure || DEFAULT_PUMP_PRESSURE;
     return {
-      [LEFT]: [{ outCoords: RIGHT, pressure: -p, liquids: [ACCELERATE_OTHERS] }],
+      [LEFT]: [{ outCoords: RIGHT }],
       [RIGHT]: [{ outCoords: LEFT, pressure: p, liquids: [ACCELERATE_OTHERS] }],
     };
   },
