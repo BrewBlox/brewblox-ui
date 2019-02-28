@@ -16,7 +16,11 @@ export default class InputTube extends PartComponent {
   }
 
   get flowSpeed() {
-    return this.flowOnAngle(RIGHT);
+    return this.flowOnCoord(RIGHT);
+  }
+
+  get liquids() {
+    return this.liquidOnCoord(RIGHT);
   }
 }
 </script>
@@ -30,10 +34,8 @@ export default class InputTube extends PartComponent {
       <path :d="paths.borders[0]"/>
       <path :d="paths.borders[1]"/>
     </g>
-    <g v-if="liquid" :stroke="liquidColor" class="liquid">
-      <path :d="paths.liquid"/>
-    </g>
-    <AnimatedArrows v-if="flowSpeed" :num-arrows="1" :speed="flowSpeed" path="M25,25H50"/>
+    <LiquidStroke :paths="[paths.liquid]" :colors="liquids"/>
+    <AnimatedArrows :num-arrows="1" :speed="flowSpeed" path="M25,25H50"/>
   </g>
 </template>
 

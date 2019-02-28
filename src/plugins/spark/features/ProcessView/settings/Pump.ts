@@ -1,14 +1,14 @@
-import { ComponentSettings, FlowPart } from '../state';
-import { LEFT, RIGHT } from '../getters';
+import { ComponentSettings, PersistentPart } from '../state';
+import { LEFT, RIGHT, DEFAULT_PUMP_PRESSURE, ACCELERATE_OTHERS } from '../getters';
 import { defaultSettings } from '../components/getters';
 
 const settings: ComponentSettings = {
   ...defaultSettings,
-  transitions: (part: FlowPart) => {
-    const p = part.disabled ? 0 : 10;
+  transitions: (part: PersistentPart) => {
+    const p = (part.settings || {}).disabled ? 0 : part.settings.pressure || DEFAULT_PUMP_PRESSURE;
     return {
-      [LEFT]: [{ outCoords: RIGHT, deltaPressure: -p }],
-      [RIGHT]: [{ outCoords: LEFT, deltaPressure: p }],
+      [LEFT]: [{ outCoords: RIGHT }],
+      [RIGHT]: [{ outCoords: LEFT, pressure: p, liquids: [ACCELERATE_OTHERS] }],
     };
   },
 };

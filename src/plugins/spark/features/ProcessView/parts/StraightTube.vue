@@ -16,7 +16,11 @@ export default class StraightTube extends PartComponent {
   }
 
   get flowSpeed() {
-    return this.flow[RIGHT];
+    return this.flowOnCoord(RIGHT);
+  }
+
+  get liquids() {
+    return this.liquidOnCoord(RIGHT);
   }
 }
 </script>
@@ -27,10 +31,8 @@ export default class StraightTube extends PartComponent {
       <path :d="paths.borders[0]"/>
       <path :d="paths.borders[1]"/>
     </g>
-    <g v-if="liquid" :stroke="liquidColor" class="liquid">
-      <path :d="paths.liquid"/>
-    </g>
-    <AnimatedArrows v-if="flowSpeed" :speed="flowSpeed" path="M0,25H50"/>
+    <LiquidStroke :paths="[paths.liquid]" :colors="liquids"/>
+    <AnimatedArrows :speed="flowSpeed" path="M0,25H50"/>
   </g>
 </template>
 

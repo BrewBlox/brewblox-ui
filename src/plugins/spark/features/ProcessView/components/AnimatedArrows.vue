@@ -21,18 +21,18 @@ import { svgPathProperties } from 'svg-path-properties';
   },
 })
 export default class AnimatedArrows extends Vue {
-  get pathLength (){
+  get pathLength() {
     return svgPathProperties(this.$props.path).getTotalLength();
   }
 
-  get duration(){
-    if(this.$props.speed && this.pathLength){
-      return this.pathLength / (10 * Math.abs(this.$props.speed));
+  get duration() {
+    if (this.$props.speed && this.pathLength) {
+      return this.pathLength / (25 * Math.abs(this.$props.speed));
     }
     return 0;
   }
 
-  get reversed(){
+  get reversed() {
     return this.$props.speed < 0;
   }
 
@@ -59,7 +59,7 @@ export default class AnimatedArrows extends Vue {
 </script>
 
 <template>
-  <g>
+  <g v-if="speed">
     <g v-for="start in starts" :key="start" visibility="hidden">
       <path :transform="transform" d="M-4,-4 L0,0 M-4,4 L0,0" class="outline"/>
       <!-- Note: SVG attributes are case-sensitive -->

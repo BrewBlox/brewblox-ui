@@ -3,11 +3,10 @@ export const UP = '0.5,0';
 export const RIGHT = '1,0.5';
 export const DOWN = '0.5,1';
 export const LEFT = '0,0.5';
-export const CENTER = '0.5,0.5';
+export const IN_OUT = '-1,-1';
+export const ACCELERATE_OTHERS = '*ACCELERATE_OTHERS*';
 export const DEFAULT_FRICTION = 1;
-export const DEFAULT_DELTA_PRESSURE = 0;
-export const MIXED_LIQUIDS = '#C678DD';
-
+export const DEFAULT_PUMP_PRESSURE = 10;
 export const COLD_WATER = '#4AA0EF';
 export const HOT_WATER = '#DB0023';
 export const BEER = '#E1AC00';

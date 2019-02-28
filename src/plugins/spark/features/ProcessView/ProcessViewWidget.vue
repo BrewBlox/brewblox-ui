@@ -1,7 +1,7 @@
 <script lang="ts">
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
-import { isSamePart, pathsFromSources } from './calculateFlows';
+import { isSamePart, calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
 import { parts as knownParts } from './register';
 import { PersistentPart, ProcessViewConfig, FlowPart } from './state';
@@ -28,10 +28,7 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   saveConfig(config: ProcessViewConfig = this.widgetConfig) {
-    const parts = config.parts
-      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      .map(({ calculated, liquid, transitions, ...persistent }: FlowPart) => persistent);
-    this.$props.onChangeConfig(this.widgetId, { ...config, parts });
+    this.$props.onChangeConfig(this.widgetId, config);
   }
 
   get gridRect() {
@@ -43,18 +40,26 @@ export default class ProcessViewWidget extends WidgetBase {
     return knownParts
       .map(type => ({
         type,
-        x: -1,
-        y: -1,
+        x: -2,
+        y: -2,
         rotate: 0,
+        settings: {},
+        flipped: false,
       }));
   }
 
   get parts(): PersistentPart[] {
-    return this.widgetConfig.parts;
+    return this.widgetConfig.parts
+      .map(v => ({
+        rotate: 0,
+        settings: {},
+        flipped: false,
+        ...v,
+      }));
   }
 
   get flowParts(): FlowPart[] {
-    return pathsFromSources(this.parts);
+    return calculateNormalizedFlows(this.parts);
   }
 
   get gridClasses() {
@@ -160,12 +165,7 @@ export default class ProcessViewWidget extends WidgetBase {
       />
     </q-modal>
     <q-card-title class="title-bar">
-      <InputPopupEdit
-        :field="widgetId"
-        :change="v => widgetId = v"
-        label="Widget ID"
-        tag="span"
-      />
+      <InputPopupEdit :field="widgetId" :change="v => widgetId = v" label="Widget ID" tag="span"/>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
       <q-btn v-if="editable" slot="right" flat round dense icon="delete" @click="updateParts([])"/>
       <q-btn v-if="editable" slot="right" flat round dense icon="extension">
