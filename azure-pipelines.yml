@@ -34,6 +34,9 @@ steps:
 
 - bash: |
     npm ci
+  displayName: NPM install
+
+- bash: |
     npm run lint
     npm run test
   displayName: NPM test
