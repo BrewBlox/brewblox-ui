@@ -88,10 +88,16 @@ export default class DagreDiagram extends Vue {
 </script>
 
 <template>
-  <div class="container">
-    <svg ref="svg" class="diag-svg">
-      <g ref="diagram" class="diag-g"/>
-    </svg>
+  <div>
+    <q-toolbar class="unpadded">
+      <q-toolbar-title>Block Relations</q-toolbar-title>
+      <q-btn v-close-overlay flat rounded label="close"/>
+    </q-toolbar>
+    <div class="container">
+      <svg ref="svg" class="diag-svg">
+        <g ref="diagram" class="diag-g"/>
+      </svg>
+    </div>
   </div>
 </template>
 

@@ -12,6 +12,10 @@ import ItemBase from '../ItemBase';
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
       default: () => (id: string, config: Record<string, any>) => { },
     },
+    pos: {
+      type: Object, // XYPosition
+      required: false,
+    },
     cols: {
       type: Number,
       required: false,
