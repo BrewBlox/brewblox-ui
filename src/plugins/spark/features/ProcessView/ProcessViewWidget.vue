@@ -152,6 +152,17 @@ export default class ProcessViewWidget extends WidgetBase {
   beingDragged(part: PersistentPart) {
     return this.dragAction && isSamePart(part, this.dragAction.part);
   }
+
+  clearParts() {
+    this.$q.dialog({
+      title: 'Remove all',
+      message: 'Are you sure you wish to remove all parts?',
+      noBackdropDismiss: true,
+      cancel: true,
+    })
+      .then(() => this.updateParts([]))
+      .catch(() => { });
+  }
 }
 </script>
 
@@ -167,7 +178,7 @@ export default class ProcessViewWidget extends WidgetBase {
     <q-card-title class="title-bar">
       <InputPopupEdit :field="widgetId" :change="v => widgetId = v" label="Widget ID" tag="span"/>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <q-btn v-if="editable" slot="right" flat round dense icon="delete" @click="updateParts([])"/>
+      <q-btn v-if="editable" slot="right" flat round dense icon="delete" @click="clearParts"/>
       <q-btn v-if="editable" slot="right" flat round dense icon="extension">
         <q-popover>
           <q-list link style="padding: 5px">
