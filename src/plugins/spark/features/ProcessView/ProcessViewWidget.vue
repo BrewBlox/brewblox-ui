@@ -95,7 +95,7 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   panHandler(part: PersistentPart, args: PanArguments) {
-    if (!this.editable || this.contextAction) {
+    if (!this.editable || this.modalOpen) {
       return;
     }
 
