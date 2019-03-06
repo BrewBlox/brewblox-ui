@@ -71,6 +71,22 @@ export default class DashboardPage extends Vue {
       .sort(objectSorter('order'));
   }
 
+  itemProps(item: DashboardItem): any {
+    return {
+      id: item.id,
+      type: item.feature,
+      pos: item.pinnedPosition,
+      cols: item.cols,
+      rows: item.rows,
+      config: item.config,
+      onChangeConfig: this.onChangeItemConfig,
+      onChangeId: v => this.onChangeItemId(item.id, v),
+      onDelete: () => this.onDeleteItem(item),
+      onCopy: () => this.onCopyItem(item),
+      onMove: () => this.onMoveItem(item),
+    };
+  }
+
   get validatedItems(): ValidatedItem[] {
     return this.items
       .map((item) => {
@@ -91,7 +107,12 @@ export default class DashboardPage extends Vue {
             error: e.toString(),
           };
         }
-      });
+      })
+      .map(validated => ({ ...validated, props: this.itemProps(validated.item) }));
+  }
+
+  get isMobile(): boolean {
+    return this.$q.platform.is.mobile;
   }
 
   onChangeDashboardTitle(title: string) {
@@ -199,7 +220,7 @@ export default class DashboardPage extends Vue {
     <q-inner-loading v-if="!dashboard">
       <q-spinner size="50px" color="primary"/>
     </q-inner-loading>
-    <template v-else>
+    <div v-else>
       <portal to="toolbar-title">
         <div :class="widgetEditable ? 'editable': ''">
           <span>{{ dashboard.title }}</span>
@@ -214,18 +235,34 @@ export default class DashboardPage extends Vue {
         </div>
       </portal>
       <portal to="toolbar-buttons">
-        <q-btn
-          :icon="widgetEditable ? 'check' : 'mode edit'"
-          :color="widgetEditable ? 'positive' : 'primary'"
-          :label="widgetEditable ? 'Stop editing' : 'Edit Dashboard'"
-          @click="widgetEditable = !widgetEditable"
-        />
-        <q-btn color="primary" icon="add" label="New Widget" @click="() => wizardModalOpen = true"/>
+        <q-btn-dropdown color="primary" label="actions">
+          <q-list dark link>
+            <q-item @click.native="widgetEditable = !widgetEditable">
+              <q-item-side :icon="widgetEditable ? 'check' : 'mode edit'"/>
+              <q-item-main :label="widgetEditable ? 'Stop editing' : 'Edit Dashboard'"/>
+            </q-item>
+            <q-item @click.native="() => wizardModalOpen = true">
+              <q-item-side icon="add"/>
+              <q-item-main label="New Widget"/>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
       </portal>
       <q-modal v-model="wizardModalOpen" no-backdrop-dismiss>
         <WidgetWizardPicker v-if="wizardModalOpen" :dashboard-id="dashboardId"/>
       </q-modal>
+      <q-list v-if="isMobile" no-border>
+        <q-item v-for="val in validatedItems" :key="val.item.id">
+          <component
+            :disabled="widgetEditable"
+            :is="val.component"
+            v-bind="val.props"
+            class="dashboard-item"
+          />
+        </q-item>
+      </q-list>
       <GridContainer
+        v-else
         :editable="widgetEditable"
         :on-change-positions="onChangePositions"
         :on-change-size="onChangeSize"
@@ -234,23 +271,12 @@ export default class DashboardPage extends Vue {
           v-for="val in validatedItems"
           :disabled="widgetEditable"
           :is="val.component"
-          :error="val.error"
           :key="val.item.id"
-          :id="val.item.id"
-          :type="val.item.feature"
-          :pos="val.item.pinnedPosition"
-          :cols="val.item.cols"
-          :rows="val.item.rows"
-          :config="val.item.config"
-          :on-change-config="onChangeItemConfig"
-          :on-change-id="v => onChangeItemId(val.item.id, v)"
-          :on-delete="() => onDeleteItem(val.item)"
-          :on-copy="() => onCopyItem(val.item)"
-          :on-move="() => onMoveItem(val.item)"
+          v-bind="val.props"
           class="dashboard-item"
         />
       </GridContainer>
-    </template>
+    </div>
   </q-page>
 </template>
 

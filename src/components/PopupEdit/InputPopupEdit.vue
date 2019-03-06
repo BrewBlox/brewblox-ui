@@ -66,7 +66,11 @@ export default class InputPopupEdit extends Vue {
 
 <template>
   <div>
-    <component :disabled="$props.disable" :is="$props.tag" class="editable">{{ displayValue }}</component>
+    <component
+      :disabled="$props.disable"
+      :is="$props.tag"
+      class="editable ellipsis"
+    >{{ displayValue }}</component>
     <q-popup-edit
       :disable="$attrs.disabled"
       :title="$props.label"
