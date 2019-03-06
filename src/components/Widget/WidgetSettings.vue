@@ -20,7 +20,7 @@ export default class WidgetSettings extends FormBase {
 </script>
 
 <template>
-  <div>
+  <div class="root">
     <q-toolbar>
       <span class="col row spaced">
         <q-icon v-if="$props.onChangeId" name="mdi-view-dashboard"/>
@@ -32,7 +32,7 @@ export default class WidgetSettings extends FormBase {
           tag="span"
         >Choose a new name for this dashboard widget.</InputPopupEdit>
         <q-icon v-if="$props.slotIcon" :name="$props.slotIcon"/>
-        <span v-if="$props.slotLabel">{{ $props.slotLabel }}</span>
+        <div v-if="$props.slotLabel" class="ellipsis">{{ $props.slotLabel }}</div>
         <slot/>
       </span>
 
@@ -47,5 +47,8 @@ export default class WidgetSettings extends FormBase {
 <style scoped>
 .spaced * {
   margin-right: 0.5em;
+}
+.root {
+  max-width: 100%;
 }
 </style>
