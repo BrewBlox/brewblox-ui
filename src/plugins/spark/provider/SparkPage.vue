@@ -301,6 +301,17 @@ export default class SparkPage extends Vue {
         </q-item>
       </q-list>
       <q-list v-else-if="isMobile" dark no-border>
+        <q-item>
+          <SparkWidget
+            v-if="isReady"
+            :disabled="widgetEditable"
+            :id="$props.serviceId"
+            :service-id="$props.serviceId"
+            :cols="widgetSize.cols"
+            :rows="widgetSize.rows"
+            class="dashboard-item"
+          />
+        </q-item>
         <q-item v-for="val in validatedItems" :key="val.key">
           <component
             :disabled="widgetEditable"
@@ -311,6 +322,15 @@ export default class SparkPage extends Vue {
         </q-item>
       </q-list>
       <GridContainer v-else :editable="widgetEditable" no-move>
+        <SparkWidget
+          v-if="isReady"
+          :disabled="widgetEditable"
+          :id="$props.serviceId"
+          :service-id="$props.serviceId"
+          :cols="widgetSize.cols"
+          :rows="widgetSize.rows"
+          class="dashboard-item"
+        />
         <component
           v-for="val in validatedItems"
           :disabled="widgetEditable"
