@@ -31,8 +31,9 @@ const boundedConcat =
 
 const valueName =
   (metric: Metric, key: string): string => {
-    const postfix = metric.axes[key] === 'y2' ? '<y2>' : '';
-    return `${metric.renames[key] || key} ${postfix}`;
+    return metric.axes[key] === 'y2'
+      ? `<span style="color: #aef">${metric.renames[key] || key}</span>`
+      : `<span>${metric.renames[key] || key}</span>`;
   };
 
 const transformer =

@@ -46,9 +46,12 @@ export default class GraphDisplay extends Vue {
     yaxis2: {
       overlaying: 'y',
       side: 'right',
-      gridcolor: '#444',
-      zerolinecolor: '#eee',
+      gridcolor: '#467',
+      zerolinecolor: '#aef',
       autorange: true,
+      tickfont: {
+        color: '#aef',
+      },
     },
     paper_bgcolor: '#1b1d21',
     plot_bgcolor: '#1b1d21',
@@ -85,7 +88,7 @@ export default class GraphDisplay extends Vue {
   <PlotlyGraph v-if="ready" :data="plotlyData" :layout="plotlyLayout" :config="plotlyConfig" fit/>
 </template>
 
-<style>
+<style lang="stylus">
 .js-plotly-plot .plotly .modebar {
   left: 0px;
   background: transparent;
@@ -95,8 +98,11 @@ export default class GraphDisplay extends Vue {
   fill: rgba(255, 255, 255, 0.6);
 }
 
-.js-plotly-plot .plotly .modebar-btn.active path,
-.js-plotly-plot .plotly .modebar-btn:hover path {
+.js-plotly-plot .plotly .modebar-btn.active path, .js-plotly-plot .plotly .modebar-btn:hover path {
   fill: rgba(255, 255, 255, 1);
+}
+
+/deep .xy2 {
+  color: green;
 }
 </style>
