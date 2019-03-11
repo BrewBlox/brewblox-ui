@@ -16,7 +16,7 @@ export interface DisplayWidget {
 export interface DisplaySettingsBlock extends Block {
   data: {
     name: string;
-    tempUnit: 0 | 1; // 0: Celcius 1: Fahrenheit
+    tempUnit: 0 | 1; // 0: Celsius 1: Fahrenheit
     widgets: DisplayWidget[];
   };
 }

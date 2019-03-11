@@ -59,7 +59,7 @@ export default class DisplaySettingsWidget extends BlockWidget {
         <div class="q-field-label col-4">Temperature Unit</div>
         <SelectPopupEdit
           :field="block.data.tempUnit"
-          :options="[{ label: 'Celcius', value: 0}, {label: 'Fahrenheit', value: 1}]"
+          :options="[{ label: 'Celsius', value: 0 }, { label: 'Fahrenheit', value: 1 }]"
           :change="callAndSaveBlock(v => block.data.tempUnit = v)"
           class="col-8 self-center"
           label="Temperature Unit"
