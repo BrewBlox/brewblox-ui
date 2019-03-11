@@ -48,12 +48,21 @@ export default class DisplaySettingsWidget extends BlockWidget {
         </q-field>
       </div>
       <div class="footer-text row full-width">
-        <div class="q-field-label col-3">Footer text</div>
+        <div class="q-field-label col-4">Footer text</div>
         <InputPopupEdit
           :field="block.data.name"
           :change="callAndSaveBlock(v => block.data.name = v)"
-          class="col-9 self-center"
+          class="col-8 self-center"
           label="footer text"
+          tag="span"
+        />
+        <div class="q-field-label col-4">Temperature Unit</div>
+        <SelectPopupEdit
+          :field="block.data.tempUnit"
+          :options="[{ label: 'Celsius', value: 0 }, { label: 'Fahrenheit', value: 1 }]"
+          :change="callAndSaveBlock(v => block.data.tempUnit = v)"
+          class="col-8 self-center"
+          label="Temperature Unit"
           tag="span"
         />
       </div>

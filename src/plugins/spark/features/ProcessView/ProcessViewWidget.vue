@@ -5,6 +5,7 @@ import { isSamePart, calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
 import { parts as knownParts } from './register';
 import { PersistentPart, ProcessViewConfig, FlowPart } from './state';
+import { spaceCased } from '@/helpers/functional';
 
 interface DragAction {
   part: PersistentPart;
@@ -18,6 +19,7 @@ interface ContextAction {
 
 @Component
 export default class ProcessViewWidget extends WidgetBase {
+  SQUARE_SIZE: number = SQUARE_SIZE; // make value accessible in template
   editable: boolean = true;
   modalOpen: boolean = false;
   dragAction: DragAction | null = null;
@@ -95,7 +97,7 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   panHandler(part: PersistentPart, args: PanArguments) {
-    if (!this.editable || this.contextAction) {
+    if (!this.editable || this.modalOpen) {
       return;
     }
 
@@ -146,11 +148,27 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   updatePart(idx: number, part: PersistentPart | FlowPart) {
+    console.log('update', idx, part);
     this.updateParts(this.parts.map((p, i) => (idx === i ? part : p)));
   }
 
   beingDragged(part: PersistentPart) {
     return this.dragAction && isSamePart(part, this.dragAction.part);
+  }
+
+  clearParts() {
+    this.$q.dialog({
+      title: 'Remove all',
+      message: 'Are you sure you wish to remove all parts?',
+      noBackdropDismiss: true,
+      cancel: true,
+    })
+      .then(() => this.updateParts([]))
+      .catch(() => { });
+  }
+
+  spaceCased(v: string): string {
+    return spaceCased(v);
   }
 }
 </script>
@@ -162,19 +180,27 @@ export default class ProcessViewWidget extends WidgetBase {
         v-if="modalOpen"
         :value="flowParts[contextAction.idx]"
         @input="v => updatePart(contextAction.idx, v)"
+        @remove="v => { removePart(v); modalOpen = false; }"
       />
     </q-modal>
     <q-card-title class="title-bar">
       <InputPopupEdit :field="widgetId" :change="v => widgetId = v" label="Widget ID" tag="span"/>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <q-btn v-if="editable" slot="right" flat round dense icon="delete" @click="updateParts([])"/>
+      <q-btn v-if="editable" slot="right" flat round dense icon="delete" @click="clearParts"/>
       <q-btn v-if="editable" slot="right" flat round dense icon="extension">
         <q-popover>
           <q-list link style="padding: 5px">
-            <q-item v-for="part in availableParts" :key="part.type">
-              <svg v-touch-pan="v => panHandler(part, v)">
-                <ProcessViewItem :value="part"/>
-              </svg>
+            <q-item
+              v-touch-pan="v => panHandler(part, v)"
+              v-for="part in availableParts"
+              :key="part.type"
+            >
+              <q-item-side>
+                <svg :width="`${SQUARE_SIZE}px`" :height="`${SQUARE_SIZE}px`">
+                  <ProcessViewItem :value="part"/>
+                </svg>
+              </q-item-side>
+              <q-item-main>{{ spaceCased(part.type) }}</q-item-main>
             </q-item>
           </q-list>
         </q-popover>

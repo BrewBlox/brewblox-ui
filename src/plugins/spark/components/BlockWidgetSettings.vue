@@ -25,6 +25,6 @@ export default class BlockWidgetSettings extends BlockForm {
       label="Block"
       tag="span"
     >Select a different block to be displayed by this widget.</SelectPopupEdit>
-    <span v-else>{{ block.id }}</span>
+    <div v-else class="ellipsis">{{ block.id }}</div>
   </WidgetSettings>
 </template>
