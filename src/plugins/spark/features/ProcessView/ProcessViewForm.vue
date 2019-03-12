@@ -4,6 +4,9 @@ import Component from 'vue-class-component';
 import { partSettings } from '@/plugins/spark/features/ProcessView/calculateFlows';
 import { FlowPart } from '@/plugins/spark/features/ProcessView/state';
 import { SQUARE_SIZE } from './getters';
+import settings from './settings';
+import { Coordinates } from '@/helpers/coordinates';
+import { clampRotation } from '@/helpers/functional';
 
 @Component({
   props: {
@@ -14,6 +17,8 @@ import { SQUARE_SIZE } from './getters';
   },
 })
 export default class ProcessViewForm extends Vue {
+  SQUARE_SIZE: number = SQUARE_SIZE; // make value accessible in template
+
   get part(): FlowPart {
     return this.$props.value;
   }
@@ -25,20 +30,41 @@ export default class ProcessViewForm extends Vue {
     ];
   }
 
-  get gridStyle() {
-    return {
-      width: `${SQUARE_SIZE * 2}px`,
-      height: `${SQUARE_SIZE * 2}px`,
-    };
+  get partSize(): [number, number] {
+    return settings[this.part.type].size(this.part);
   }
 
-  get itemStyle() {
-    return {
-      width: `${SQUARE_SIZE}px`,
-      height: `${SQUARE_SIZE}px`,
-      position: 'relative',
-      transform: 'scale(2,2)',
-    };
+  get rotatedSize(): [number, number] {
+    const [x, y] = this.partSize;
+    return (clampRotation(this.part.rotate) / 90) % 2
+      ? [y, x]
+      : [x, y];
+  }
+
+  get sizeMult() {
+    const maxSize = Math.max(...this.partSize);
+    if (maxSize >= 6) {
+      return 0.5;
+    }
+    if (maxSize >= 4) {
+      return 1;
+    }
+    return 2;
+  }
+
+  get partViewBox(): string {
+    const leftMost =
+      new Coordinates(this.partSize)
+        .rotate(this.part.rotate)
+        .values()
+        .map(v => Math.min(v, 0));
+
+    return [
+      ...leftMost,
+      ...this.rotatedSize,
+    ]
+      .map(v => v * SQUARE_SIZE)
+      .join(', ');
   }
 }
 </script>
@@ -51,8 +77,12 @@ export default class ProcessViewForm extends Vue {
     </q-toolbar>
     <q-card>
       <q-card-main class="row justify-center">
-        <svg :style="gridStyle">
-          <g :style="itemStyle">
+        <svg
+          :width="`${SQUARE_SIZE * sizeMult * rotatedSize[0]}px`"
+          :height="`${SQUARE_SIZE * sizeMult * rotatedSize[1]}px`"
+          :viewBox="partViewBox"
+        >
+          <g>
             <ProcessViewItem :value="part"/>
           </g>
         </svg>

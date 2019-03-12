@@ -1,25 +1,16 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { RIGHT } from '../getters';
 
 @Component
 export default class Kettle extends PartComponent {
   get paths() {
     return {
       borders: [
-        'M 0,0 H 200 V 300 H 0 V 0',
+        'M 50,0 H 150 l 50,50 V 250 l -50,50 H 50 l -50,-50 V 50 l 50,-50',
       ],
-      liquid: 'M 0,25 H 50',
+      liquid: '',
     };
-  }
-
-  get flowSpeed() {
-    return this.flowOnCoord(RIGHT);
-  }
-
-  get liquids() {
-    return this.liquidOnCoord(RIGHT);
   }
 }
 </script>
