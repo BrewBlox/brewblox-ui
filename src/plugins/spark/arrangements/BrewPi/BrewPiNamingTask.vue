@@ -116,7 +116,6 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   updateName(key: string, val: string) {
-    console.log(key, val);
     this.$set(this.chosenNames, key, val.trim());
   }
 
