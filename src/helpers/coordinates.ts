@@ -1,3 +1,6 @@
+import { clampRotation } from './functional';
+import isEqual from 'lodash/isEqual';
+
 type CoordinatesParam = string | { x: number; y: number } | [number, number] | Coordinates;
 
 export class Coordinates {
@@ -64,6 +67,53 @@ export class Coordinates {
     return this;
   }
 
+  public rotateSquare(
+    rotation: number,
+    currentRotation: number,
+    size: [number, number],
+    coordinatesWithinShape: CoordinatesParam = [0, 0]
+  ): Coordinates {
+    rotation = clampRotation(rotation);
+    const [sizeX, sizeY] = size;
+    const offset = new Coordinates(coordinatesWithinShape);
+
+    if (this.x < 0 || this.y < 0) {
+      return this; // exclude negative coordinates which are used for exceptions
+    }
+
+    if (rotation === 0 || (sizeX === 1 && sizeY === 1)) {
+      return this;
+    }
+
+    const anchorCenter = new Coordinates(this)
+      .translate([0.5, 0.5]);
+
+    const shapeEdge = new Coordinates(this)
+      .rotate(currentRotation, anchorCenter);
+
+    const shapeCenter = new Coordinates(shapeEdge)
+      .translate([(0.5 * sizeX) - offset.x, (0.5 * sizeY) - offset.y])
+      .rotate(currentRotation, shapeEdge);
+
+    const newAnchorCenter = new Coordinates(anchorCenter)
+      .rotate(rotation, shapeCenter);
+
+    // We want two things:
+    // - The shape must snap to grid
+    //    => integer coordinates
+    // - After a 360 rotation, the shape must return to starting coordinates
+    //    => alternate round and floor
+    const roundFunc =
+      (clampRotation(currentRotation + rotation) / 90) % 2
+        ? Math.round
+        : Math.floor;
+
+    this.x = roundFunc(newAnchorCenter.x - 0.5);
+    this.y = roundFunc(newAnchorCenter.y - 0.5);
+
+    return this;
+  }
+
   public toString(): string {
     return `${this.x},${this.y}`;
   }
@@ -75,4 +125,9 @@ export class Coordinates {
   public raw(): { x: number; y: number } {
     return { x: this.x, y: this.y };
   }
+
+  public equals(other: Coordinates): boolean {
+    return this.x === other.x && this.y === other.y;
+  }
 }
+

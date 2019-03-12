@@ -2,12 +2,20 @@
 import PartCard from './PartCard';
 import Component from 'vue-class-component';
 import { clampRotation } from '@/helpers/functional';
+import { Coordinates } from '@/helpers/coordinates';
+import settings from '../settings';
 
 @Component
 export default class PlacementPartCard extends PartCard {
   rotate(rotation: number) {
+    const partSize = settings[this.part.type].size(this.part);
     const rotate = clampRotation(this.part.rotate + rotation);
-    this.savePart({ ...this.part, rotate });
+
+    const updated = new Coordinates(this.part)
+      .rotateSquare(rotation, this.part.rotate, partSize)
+      .raw();
+
+    this.savePart({ ...this.part, ...updated, rotate });
   }
 
   flip() {

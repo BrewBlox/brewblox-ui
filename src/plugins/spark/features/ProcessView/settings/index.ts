@@ -1,6 +1,7 @@
 import BridgeTube from './BridgeTube';
 import ElbowTube from './ElbowTube';
 import InputTube from './InputTube';
+import Kettle from './Kettle';
 import OutputTube from './OutputTube';
 import Pump from './Pump';
 import StraightTube from './StraightTube';
@@ -13,6 +14,7 @@ const settings: { [key: string]: ComponentSettings } = {
   BridgeTube,
   ElbowTube,
   InputTube,
+  Kettle,
   OutputTube,
   Pump,
   StraightTube,
