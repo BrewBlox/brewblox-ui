@@ -41,7 +41,7 @@ export default class ProcessViewForm extends Vue {
       : [x, y];
   }
 
-  get sizeMult() {
+  get displayScale() {
     const maxSize = Math.max(...this.partSize);
     if (maxSize >= 6) {
       return 0.5;
@@ -53,6 +53,16 @@ export default class ProcessViewForm extends Vue {
   }
 
   get partViewBox(): string {
+    /*
+    * SVG viewBox accepts four arguments: startX, startY, sizeX, sizeY.
+    * sizeX/Y should match the size of the component, regardless of any scaling.
+    * startX/Y need to take into account that rotated parts may extend into negative coordinates.
+    *
+    * A square part rotated 180 deg will extend both to the left, and above its anchor square.
+    * startX and startY should be placed at the left most position of the square.
+    * They will never be > 0, as the anchor square is always [0,0].
+    */
+
     const leftMost =
       new Coordinates(this.partSize)
         .rotate(this.part.rotate)
@@ -78,8 +88,8 @@ export default class ProcessViewForm extends Vue {
     <q-card>
       <q-card-main class="row justify-center">
         <svg
-          :width="`${SQUARE_SIZE * sizeMult * rotatedSize[0]}px`"
-          :height="`${SQUARE_SIZE * sizeMult * rotatedSize[1]}px`"
+          :width="`${SQUARE_SIZE * displayScale * rotatedSize[0]}px`"
+          :height="`${SQUARE_SIZE * displayScale * rotatedSize[1]}px`"
           :viewBox="partViewBox"
         >
           <g>

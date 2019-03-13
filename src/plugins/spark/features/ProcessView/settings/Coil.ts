@@ -1,12 +1,12 @@
 import { ComponentSettings, PersistentPart } from '../state';
 import { defaultSettings } from '../components/getters';
-import { Coordinates } from '@/helpers/coordinates';
-import { slotLocations } from '../helpers/functional';
+import { Coordinates, CoordinatesParam } from '@/helpers/coordinates';
+import { subSquares } from '../helpers/functional';
 
 export const COIL_TOP = '0,0.5';
 export const COIL_BOTTOM = '0,1.5';
 
-const SLOTS: [number, number][] = [
+const BLOCKED: CoordinatesParam[] = [
   [0, 0],
   [0, 1],
 ];
@@ -22,7 +22,7 @@ const settings: ComponentSettings = {
     [COIL_BOTTOM]: [{ outCoords: COIL_TOP, friction: 20 }],
   }),
   blockedCoordinates: (part: PersistentPart): Coordinates[] =>
-    slotLocations(SLOTS, part, part.rotate, [SIZE_X, SIZE_Y]),
+    subSquares(BLOCKED, part, part.rotate, [SIZE_X, SIZE_Y]),
 };
 
 export default settings;

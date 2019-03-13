@@ -1,8 +1,8 @@
 import { Coordinates, CoordinatesParam } from '@/helpers/coordinates';
 
-export const slotLocations =
+export const subSquares =
   (
-    slots: CoordinatesParam[],
+    squares: CoordinatesParam[],
     position: CoordinatesParam,
     rotation: number,
     size: [number, number],
@@ -11,10 +11,10 @@ export const slotLocations =
     const origin =
       new Coordinates(position)
         .rotateSquare(-rotation, rotation, size);
-    return slots
-      .map((slot) =>
+    return squares
+      .map((square) =>
         new Coordinates(origin)
-          .translate(slot)
-          .rotateSquare(rotation, 0, size, slot)
+          .translate(square)
+          .rotateSquare(rotation, 0, size, square)
       );
   };

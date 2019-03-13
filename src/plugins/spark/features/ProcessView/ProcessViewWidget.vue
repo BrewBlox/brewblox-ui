@@ -150,13 +150,14 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   movePart(from: PersistentPart, to: PersistentPart) {
-    const willBlock: Coordinates[] = this.blockedByPart(to);
-    const allBlocked = this.widgetConfig.parts
-      .reduce(
-        (acc: Coordinates[], part: PersistentPart) => [...acc, ...this.blockedByPart(part)], []);
+    const toCoords: Coordinates[] = this.blockedByPart(to);
+    const allBlockedCoords: Coordinates[] =
+      this.widgetConfig.parts
+        .reduce(
+          (acc: Coordinates[], part: PersistentPart) => [...acc, ...this.blockedByPart(part)], []);
 
-    for (let toCoord of willBlock) {
-      if (allBlocked.some(coord => coord.equals(toCoord))) {
+    for (let toCoord of toCoords) {
+      if (allBlockedCoords.some(coord => coord.equals(toCoord))) {
         return;
       }
     }

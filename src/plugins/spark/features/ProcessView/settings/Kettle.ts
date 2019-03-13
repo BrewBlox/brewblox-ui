@@ -1,9 +1,9 @@
 import { ComponentSettings, PersistentPart } from '../state';
 import { defaultSettings } from '../components/getters';
-import { Coordinates } from '@/helpers/coordinates';
-import { slotLocations } from '../helpers/functional';
+import { Coordinates, CoordinatesParam } from '@/helpers/coordinates';
+import { subSquares } from '../helpers/functional';
 
-const SLOTS: [number, number][] = [
+const BLOCKED: CoordinatesParam[] = [
   [0, 0],
   [3, 0],
   [3, 5],
@@ -18,7 +18,7 @@ const settings: ComponentSettings = {
   size: () => [SIZE_X, SIZE_Y],
   transitions: () => ({}),
   blockedCoordinates: (part: PersistentPart): Coordinates[] =>
-    slotLocations(SLOTS, part, part.rotate, [SIZE_X, SIZE_Y]),
+    subSquares(BLOCKED, part, part.rotate, [SIZE_X, SIZE_Y]),
 };
 
 export default settings;
