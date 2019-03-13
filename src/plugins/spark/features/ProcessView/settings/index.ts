@@ -1,4 +1,5 @@
 import BridgeTube from './BridgeTube';
+import CheckValve from './CheckValve';
 import Coil from './Coil';
 import CounterflowChiller from './CounterflowChiller';
 import ElbowTube from './ElbowTube';
@@ -16,6 +17,7 @@ import { ComponentSettings } from '../state';
 
 const settings: { [key: string]: ComponentSettings } = {
   BridgeTube,
+  CheckValve,
   Coil,
   CounterflowChiller,
   ElbowTube,
