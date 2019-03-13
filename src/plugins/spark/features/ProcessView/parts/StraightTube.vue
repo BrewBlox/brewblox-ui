@@ -35,5 +35,3 @@ export default class StraightTube extends PartComponent {
     <AnimatedArrows :speed="flowSpeed" path="M0,25H50"/>
   </g>
 </template>
-
-

@@ -1,3 +1,5 @@
+import { Coordinates } from "@/helpers/coordinates";
+
 export interface FlowRoute {
   outCoords: string;
   friction?: number;
@@ -30,6 +32,7 @@ export interface ComponentSettings {
   cards: string[];
   transitions: (part: PersistentPart) => Transitions;
   size: (part: PersistentPart) => [number, number];
+  blockedCoordinates: (part: PersistentPart) => Coordinates[];
 }
 
 export interface FlowPart extends PersistentPart {

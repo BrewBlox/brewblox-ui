@@ -4,8 +4,10 @@ import Component from 'vue-class-component';
 import { isSamePart, calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
 import { parts as knownParts } from './register';
+import settings from './settings';
 import { PersistentPart, ProcessViewConfig, FlowPart } from './state';
 import { spaceCased } from '@/helpers/functional';
+import { Coordinates } from '@/helpers/coordinates';
 
 interface DragAction {
   part: PersistentPart;
@@ -74,6 +76,10 @@ export default class ProcessViewWidget extends WidgetBase {
     return `translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`;
   }
 
+  partViewBox(part: PersistentPart): string {
+    return settings[part.type].size(part).map(v => v * SQUARE_SIZE).join(' ');
+  }
+
   gridContains(x: number, y: number) {
     const { left, right, top, bottom } = this.gridRect;
     return x >= left
@@ -139,16 +145,29 @@ export default class ProcessViewWidget extends WidgetBase {
     this.updateParts(this.parts.filter(p => !isSamePart(p, part)));
   }
 
+  blockedByPart(part: PersistentPart) {
+    return settings[part.type].blockedCoordinates(part);
+  }
+
   movePart(from: PersistentPart, to: PersistentPart) {
-    const spotTaken = this.widgetConfig.parts.some(p => p.x === to.x && p.y === to.y);
-    if (!spotTaken) {
-      this.updateParts([
-        ...this.widgetConfig.parts.filter(p => !isSamePart(p, from)), to]);
+    const toCoords: Coordinates[] = this.blockedByPart(to);
+    const allBlockedCoords: Coordinates[] =
+      this.widgetConfig.parts
+        .reduce(
+          (acc: Coordinates[], part: PersistentPart) => [...acc, ...this.blockedByPart(part)], []);
+
+    for (let toCoord of toCoords) {
+      if (allBlockedCoords.some(coord => coord.equals(toCoord))) {
+        return;
+      }
     }
+
+    this.updateParts([
+      ...this.widgetConfig.parts.filter(p => !isSamePart(p, from)), to]);
+
   }
 
   updatePart(idx: number, part: PersistentPart | FlowPart) {
-    console.log('update', idx, part);
     this.updateParts(this.parts.map((p, i) => (idx === i ? part : p)));
   }
 
@@ -169,6 +188,10 @@ export default class ProcessViewWidget extends WidgetBase {
 
   spaceCased(v: string): string {
     return spaceCased(v);
+  }
+
+  partKey(part: PersistentPart): string {
+    return `${part.x}_${part.y}_${part.type}`;
   }
 }
 </script>
@@ -196,7 +219,11 @@ export default class ProcessViewWidget extends WidgetBase {
               :key="part.type"
             >
               <q-item-side>
-                <svg :width="`${SQUARE_SIZE}px`" :height="`${SQUARE_SIZE}px`">
+                <svg
+                  :width="`${SQUARE_SIZE}px`"
+                  :height="`${SQUARE_SIZE}px`"
+                  :viewBox="`0 0 ${partViewBox(part)}`"
+                >
                   <ProcessViewItem :value="part"/>
                 </svg>
               </q-item-side>
@@ -215,7 +242,7 @@ export default class ProcessViewWidget extends WidgetBase {
         v-for="(part, idx) in parts"
         v-show="!beingDragged(part)"
         :transform="partTranslate(part)"
-        :key="`${part.x}_${part.y}`"
+        :key="partKey(part)"
         class="grid-item"
       >
         <text
@@ -226,7 +253,14 @@ export default class ProcessViewWidget extends WidgetBase {
           class="grid-item-coordinates"
         >{{ part.x }},{{ part.y }}</text>
         <ProcessViewItem :value="flowParts[idx]" @input="v => updatePart(idx, v)"/>
-        <rect v-if="editable" fill="red" fill-opacity="0" x="0" y="0" width="50" height="50"/>
+        <rect
+          v-if="editable"
+          :width="SQUARE_SIZE"
+          :height="SQUARE_SIZE"
+          stroke="silver"
+          stroke-opacity="0.6"
+          fill-opacity="0"
+        />
       </g>
       <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
         <ProcessViewItem :value="dragAction.part"/>
