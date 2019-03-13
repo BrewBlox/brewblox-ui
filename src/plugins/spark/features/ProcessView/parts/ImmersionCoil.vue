@@ -56,9 +56,15 @@ export default class ImmersionCoil extends PartComponent {
 
 <template>
   <g class="immersion-coil">
-    <LiquidStroke :paths="paths.liquid" :colors="liquids"/>
+    <LiquidStroke :paths="paths.liquid" :colors="liquids" class="coil-liquid"/>
     <g class="outline">
       <path v-for="border in paths.borders" :key="border" :d="border"/>
     </g>
   </g>
 </template>
+
+<style lang="stylus" scoped>
+/deep/ .coil-liquid path {
+  stroke-linecap: round;
+}
+</style>

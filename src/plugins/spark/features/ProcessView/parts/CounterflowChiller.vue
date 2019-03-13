@@ -70,13 +70,13 @@ export default class CounterflowChiller extends PartComponent {
 
 <template>
   <g class="counterflow-chiller">
+    <LiquidStroke :paths="paths.topBulbLiquid" :colors="topLiquids" class="bulbLiquid"/>
+    <LiquidStroke :paths="paths.bottomBulbLiquid" :colors="bottomLiquids" class="bulbLiquid"/>
     <g class="outline">
       <path v-for="border in paths.borders" :key="border" :d="border"/>
     </g>
     <LiquidStroke :paths="paths.topTubeLiquid" :colors="topLiquids"/>
     <LiquidStroke :paths="paths.bottomTubeLiquid" :colors="bottomLiquids"/>
-    <LiquidStroke :paths="paths.topBulbLiquid" :colors="topLiquids" class="bulbLiquid"/>
-    <LiquidStroke :paths="paths.bottomBulbLiquid" :colors="bottomLiquids" class="bulbLiquid"/>
     <AnimatedArrows :speed="topFlowSpeed" :path="paths.topArrows" :num-arrows="5"/>
     <AnimatedArrows :speed="bottomFlowSpeed" :path="paths.bottomArrows" :num-arrows="5"/>
   </g>
@@ -84,7 +84,7 @@ export default class CounterflowChiller extends PartComponent {
 
 <style lang="stylus" scoped>
 /deep/ .bulbLiquid path {
-  stroke-width: 17pt !important;
+  stroke-width: 18pt !important;
   stroke-linecap: round;
   fill: none;
 }
