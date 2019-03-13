@@ -2,6 +2,7 @@ import BridgeTube from './BridgeTube';
 import Coil from './Coil';
 import CounterflowChiller from './CounterflowChiller';
 import ElbowTube from './ElbowTube';
+import ImmersionCoil from './ImmersionCoil';
 import InputTube from './InputTube';
 import Kettle from './Kettle';
 import OutputTube from './OutputTube';
@@ -17,6 +18,7 @@ const settings: { [key: string]: ComponentSettings } = {
   Coil,
   CounterflowChiller,
   ElbowTube,
+  ImmersionCoil,
   InputTube,
   Kettle,
   OutputTube,
