@@ -71,16 +71,18 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
 const translations = (part: PersistentPart): Transitions =>
   Object.entries(partTransitions(part))
     .reduce((acc, [inCoords, transition]: [string, any]) => {
+      const unrotatedAnchor = new Coordinates(part)
+        .rotateSquare(-part.rotate, part.rotate, partSize(part));
       const updatedKey = new Coordinates(inCoords)
         .rotate(part.rotate, partCenter(part))
-        .translate([part.x, part.y])
+        .translate(unrotatedAnchor)
         .toString();
       const updatedTransition = transition
         .map((transition: FlowRoute) => ({
           ...transition,
           outCoords: new Coordinates(transition.outCoords)
             .rotate(part.rotate, partCenter(part))
-            .translate([part.x, part.y])
+            .translate(unrotatedAnchor)
             .toString(),
         }));
       return { ...acc, [updatedKey]: updatedTransition };

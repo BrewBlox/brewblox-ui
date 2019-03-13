@@ -252,7 +252,14 @@ export default class ProcessViewWidget extends WidgetBase {
           class="grid-item-coordinates"
         >{{ part.x }},{{ part.y }}</text>
         <ProcessViewItem :value="flowParts[idx]" @input="v => updatePart(idx, v)"/>
-        <rect v-if="editable" fill="red" fill-opacity="0" x="0" y="0" width="50" height="50"/>
+        <rect
+          v-if="editable"
+          :width="SQUARE_SIZE"
+          :height="SQUARE_SIZE"
+          stroke="silver"
+          stroke-opacity="0.6"
+          fill-opacity="0"
+        />
       </g>
       <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
         <ProcessViewItem :value="dragAction.part"/>

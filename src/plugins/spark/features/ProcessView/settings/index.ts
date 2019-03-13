@@ -1,4 +1,5 @@
 import BridgeTube from './BridgeTube';
+import Coil from './Coil';
 import ElbowTube from './ElbowTube';
 import InputTube from './InputTube';
 import Kettle from './Kettle';
@@ -12,6 +13,7 @@ import { ComponentSettings } from '../state';
 
 const settings: { [key: string]: ComponentSettings } = {
   BridgeTube,
+  Coil,
   ElbowTube,
   InputTube,
   Kettle,

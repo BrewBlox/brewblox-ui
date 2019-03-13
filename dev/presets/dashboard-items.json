@@ -41,14 +41,8 @@
           {
             "x": 14,
             "y": 2,
-            "type": "ElbowTube",
-            "rotate": 180
-          },
-          {
-            "type": "ElbowTube",
-            "x": 14,
-            "y": 3,
-            "rotate": 270
+            "type": "Coil",
+            "rotate": 0
           },
           {
             "x": 13,
