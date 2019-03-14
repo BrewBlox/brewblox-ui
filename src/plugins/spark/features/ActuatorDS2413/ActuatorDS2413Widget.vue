@@ -59,5 +59,3 @@ export default class ActuatorDS2413Widget extends BlockWidget {
     </q-card-main>
   </q-card>
 </template>
-
-

@@ -35,5 +35,3 @@ export default class ElbowTube extends PartComponent {
     <AnimatedArrows :speed="flowSpeed" :path="'M25,0V16a9,9,0,0,0,9,9H50'"/>
   </g>
 </template>
-
-

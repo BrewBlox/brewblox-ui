@@ -90,7 +90,6 @@ export default class DatetimePopupEdit extends Vue {
   </div>
 </template>
 
-
 <style lang="stylus" scoped>
 @import './popups.styl';
 </style>
