@@ -7,11 +7,10 @@ import DipTube from './DipTube';
 import ElbowTube from './ElbowTube';
 import HeatingElement from './HeatingElement';
 import ImmersionCoil from './ImmersionCoil';
-import InputTube from './InputTube';
 import Kettle from './Kettle';
 import Lauterhexe from './Lauterhexe';
-import OutputTube from './OutputTube';
 import Pump from './Pump';
+import SystemIO from './SystemIO';
 import StraightInletTube from './StraightInletTube';
 import StraightTube from './StraightTube';
 import TeeTube from './TeeTube';
@@ -30,11 +29,10 @@ const settings: { [key: string]: ComponentSettings } = {
   ElbowTube,
   HeatingElement,
   ImmersionCoil,
-  InputTube,
   Kettle,
   Lauterhexe,
-  OutputTube,
   Pump,
+  SystemIO,
   StraightInletTube,
   StraightTube,
   TeeTube,
