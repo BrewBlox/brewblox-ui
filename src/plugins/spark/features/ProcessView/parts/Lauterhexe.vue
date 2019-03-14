@@ -54,7 +54,7 @@ export default class Lauterhexe extends PartComponent {
 </script>
 
 <template>
-  <g class="straight-tube">
+  <g class="lauterhexe">
     <g class="outline">
       <path :d="paths.fixture" fill="#fff"/>
       <path v-for="border in paths.borders" :key="border" :d="border"/>

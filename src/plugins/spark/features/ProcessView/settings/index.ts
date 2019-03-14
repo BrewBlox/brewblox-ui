@@ -5,6 +5,7 @@ import CounterflowChiller from './CounterflowChiller';
 import CrossTube from './CrossTube';
 import DipTube from './DipTube';
 import ElbowTube from './ElbowTube';
+import HeatingElement from './HeatingElement';
 import ImmersionCoil from './ImmersionCoil';
 import InputTube from './InputTube';
 import Kettle from './Kettle';
@@ -26,6 +27,7 @@ const settings: { [key: string]: ComponentSettings } = {
   CrossTube,
   DipTube,
   ElbowTube,
+  HeatingElement,
   ImmersionCoil,
   InputTube,
   Kettle,
