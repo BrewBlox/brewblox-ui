@@ -20,7 +20,7 @@ export default class HeatingElement extends PartComponent {
 <template>
   <g class="heating-element">
     <g class="text">
-      <text x="10" y="30">20</text>
+      <text x="10" y="30">20°</text>
     </g>
     <g class="outline">
       <rect x="0" y="10" width="50" height="30" rx="10" ry="10"/>

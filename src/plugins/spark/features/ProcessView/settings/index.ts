@@ -12,6 +12,7 @@ import Kettle from './Kettle';
 import Lauterhexe from './Lauterhexe';
 import OutputTube from './OutputTube';
 import Pump from './Pump';
+import StraightInletTube from './StraightInletTube';
 import StraightTube from './StraightTube';
 import TeeTube from './TeeTube';
 import Valve from './Valve';
@@ -34,6 +35,7 @@ const settings: { [key: string]: ComponentSettings } = {
   Lauterhexe,
   OutputTube,
   Pump,
+  StraightInletTube,
   StraightTube,
   TeeTube,
   Valve,
