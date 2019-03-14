@@ -14,6 +14,7 @@ import Pump from './Pump';
 import StraightTube from './StraightTube';
 import TeeTube from './TeeTube';
 import Valve from './Valve';
+import WhirlpoolInlet from './WhirlpoolInlet';
 
 import { ComponentSettings } from '../state';
 
@@ -34,6 +35,7 @@ const settings: { [key: string]: ComponentSettings } = {
   StraightTube,
   TeeTube,
   Valve,
+  WhirlpoolInlet,
 };
 
 export default settings;
