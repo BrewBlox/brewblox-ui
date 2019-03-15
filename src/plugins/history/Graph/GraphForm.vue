@@ -212,15 +212,14 @@ export default class GraphForm extends FormBase {
         <q-item>
           <q-item-main>Metric</q-item-main>Left or right axis
         </q-item>
-        <q-item v-for="field in selected" :key="field">
+        <q-item
+          v-for="field in selected"
+          :key="field"
+          link
+          @click.native="updateAxisSide(field, !isRightAxis(field))"
+        >
           <q-item-main>{{ field }}</q-item-main>
-          <q-btn
-            :class="{mirrored: isRightAxis(field)}"
-            flat
-            size="lg"
-            icon="mdi-chart-line"
-            @click="updateAxisSide(field, !isRightAxis(field))"
-          />
+          <q-icon :class="{mirrored: isRightAxis(field)}" name="mdi-chart-line" size="30px"/>
         </q-item>
         <q-item v-if="!selected || selected.length === 0">
           <q-item-main class="darkened">No metrics selected</q-item-main>

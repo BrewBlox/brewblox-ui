@@ -18,13 +18,21 @@ import { GraphConfig } from './state';
       type: Object, // GraphConfig
       default: () => ({}),
     },
+    sharedMetrics: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     GraphDisplay,
   },
 })
 export default class GraphCard extends Vue {
+  revision: number = 0;
   editing: boolean = false;
+  $refs!: {
+    display: any;
+  }
 
   get graphCfg(): GraphConfig {
     return this.$props.config;
@@ -98,17 +106,33 @@ export default class GraphCard extends Vue {
   }
 
   mounted() {
-    this.addMetrics();
+    if (!this.$props.sharedMetrics) {
+      this.addMetrics();
+    } else {
+      this.$nextTick(() => this.refresh());
+    }
   }
 
   destroyed() {
-    this.removeMetrics();
+    if (!this.$props.sharedMetrics) {
+      this.removeMetrics();
+    }
+  }
+
+  public refresh() {
+    this.revision += 1;
   }
 }
 </script>
 
 <template>
-  <GraphDisplay v-if="!error" :data="metricData" :layout="metricLayout"/>
+  <GraphDisplay
+    v-if="!error"
+    ref="display"
+    :data="metricData"
+    :layout="metricLayout"
+    :revision="revision"
+  />
   <div v-else class="alert-container">
     <q-alert icon="warning" color="warning">{{ error }}</q-alert>
   </div>
