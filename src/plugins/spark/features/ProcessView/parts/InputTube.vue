@@ -38,5 +38,3 @@ export default class InputTube extends PartComponent {
     <AnimatedArrows :num-arrows="1" :speed="flowSpeed" path="M25,25H50"/>
   </g>
 </template>
-
-

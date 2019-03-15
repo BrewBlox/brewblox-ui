@@ -107,5 +107,3 @@ export default class Troubleshooter extends WidgetBase {
     </q-card-main>
   </q-card>
 </template>
-
-

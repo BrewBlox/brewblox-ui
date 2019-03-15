@@ -4,14 +4,14 @@ import PartComponent from '../components/PartComponent';
 import { LEFT } from '../getters';
 
 @Component
-export default class OutputTube extends PartComponent {
+export default class StraightInletTube extends PartComponent {
   get paths() {
     return {
       borders: [
-        'M0,21 H20',
-        'M0,29 H20',
+        'M 0,21 L 25,21',
+        'M 0,29 L 25,29',
       ],
-      liquid: 'M0,25 H20',
+      liquid: 'M0,25 H25',
     };
   }
 
@@ -26,15 +26,16 @@ export default class OutputTube extends PartComponent {
 </script>
 
 <template>
-  <g class="ouput-tube">
+  <g class="straight-inlet-tube">
     <g class="outline">
       <polyline points="40.5,17.5 48,25 40.5,32.5"/>
       <polyline points="36.4,19.3 42.1,25 36.4,30.8"/>
       <polyline points="32.3,21 36.3,25 32.3,29"/>
-      <path :d="paths.borders[0]"/>
-      <path :d="paths.borders[1]"/>
+      <rect fill="white" y="12.5" width="8" height="8"/>
+      <rect fill="white" y="30" width="8" height="8"/>
+      <path v-for="border in paths.borders" :key="border" :d="border"/>
     </g>
     <LiquidStroke :paths="[paths.liquid]" :colors="liquids"/>
-    <AnimatedArrows :num-arrows="1" :speed="flowSpeed" path="M0,25H25"/>
+    <AnimatedArrows :num-arrows="1" :speed="flowSpeed" :path="paths.liquid"/>
   </g>
 </template>

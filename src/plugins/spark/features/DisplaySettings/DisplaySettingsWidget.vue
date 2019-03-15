@@ -70,7 +70,6 @@ export default class DisplaySettingsWidget extends BlockWidget {
   </q-card>
 </template>
 
-
 <style lang="stylus" scoped>
 /deep/ .widget-body .q-field-margin {
   margin-top: 0px;

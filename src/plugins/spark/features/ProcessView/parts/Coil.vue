@@ -51,6 +51,7 @@ export default class Coil extends PartComponent {
 
 <template>
   <g class="coil">
+    <LiquidStroke :paths="paths.liquid" :colors="liquids" class="coil-liquid"/>
     <g class="outline">
       <rect fill="white" y="12.5" width="8" height="8"/>
       <rect fill="white" y="30" width="8" height="8"/>
@@ -58,8 +59,13 @@ export default class Coil extends PartComponent {
       <rect fill="white" y="80" width="8" height="8"/>
       <path v-for="border in paths.borders" :key="border" :d="border"/>
     </g>
-    <LiquidStroke :paths="paths.liquid" :colors="liquids"/>
     <AnimatedArrows :speed="flowSpeed" path="M0,25H50"/>
     <AnimatedArrows :speed="flowSpeed" path="M50,75H0"/>
   </g>
 </template>
+
+<style lang="stylus" scoped>
+/deep/ .coil-liquid path {
+  stroke-linecap: round;
+}
+</style>
