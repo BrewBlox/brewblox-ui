@@ -102,7 +102,7 @@ export default class BlockGraph extends Vue {
           <q-list link>
             <q-item @click.native="() => $refs.duration.$el.click()">
               <q-item-side>Duration</q-item-side>
-              <q-item-main>
+              <q-item-main @click.native="() => $refs.duration.$el.click()">
                 <InputPopupEdit
                   ref="duration"
                   :field="graphCfg.params.duration"
