@@ -1,13 +1,15 @@
 <script lang="ts">
 import { GraphConfig } from '@/components/Graph/state';
+import { defaultPresets } from '@/components/Graph/getters';
 import { nodeBuilder, targetSplitter, targetBuilder } from '@/components/Graph/functional';
 import FormBase from '@/components/Form/FormBase';
 import { durationString } from '@/helpers/functional';
+import { ValueAxes, QueryParams } from '@/store/history/state';
 import { fetchKnownKeys } from '@/store/history/actions';
 import { fields } from '@/store/history/getters';
 import Component from 'vue-class-component';
 import FieldPopupEdit from './FieldPopupEdit.vue';
-import { ValueAxes } from '@/store/history/state';
+import has from 'lodash/has';
 
 interface PeriodDisplay {
   start: boolean;
@@ -69,7 +71,7 @@ export default class GraphForm extends FormBase {
   set shownPeriod(val: PeriodDisplay) {
     this.period = val;
     Object.keys(this.config.params)
-      .filter(k => !(this.period || {})[k])
+      .filter(k => !has(this.period, k))
       .forEach(k => this.$delete(this.config.params, k));
   }
 
@@ -99,6 +101,10 @@ export default class GraphForm extends FormBase {
 
   get axes(): ValueAxes {
     return this.config.axes;
+  }
+
+  get presets(): QueryParams[] {
+    return defaultPresets();
   }
 
   isRightAxis(field: string) {

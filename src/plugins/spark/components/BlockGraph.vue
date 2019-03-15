@@ -5,6 +5,8 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
 import { targetSplitter } from '@/components/Graph/functional';
+import { QueryParams } from '@/store/history/state';
+import { defaultPresets } from '@/components/Graph/getters';
 
 @Component({
   props: {
@@ -54,6 +56,10 @@ export default class BlockGraph extends Vue {
       .map(key => [key, this.graphCfg.renames[key] || key]);
   }
 
+  get presets(): QueryParams[] {
+    return defaultPresets();
+  }
+
   isRightAxis(key: string) {
     return this.graphCfg.axes[key] === 'y2';
   }
@@ -69,6 +75,13 @@ export default class BlockGraph extends Vue {
         ...this.graphCfg.axes,
         [key]: isRight ? 'y2' : 'y',
       },
+    });
+  }
+
+  applyPreset(preset: QueryParams) {
+    this.$props.change({
+      ...this.graphCfg,
+      params: { ...preset },
     });
   }
 
@@ -96,13 +109,21 @@ export default class BlockGraph extends Vue {
 <template>
   <span>
     <q-modal v-model="modalOpen" maximized>
-      <GraphCard v-if="modalOpen" ref="graph" :id="$props.id" :config="graphCfg"/>
-      <div class="row graph-controls z-top">
-        <q-btn-dropdown flat label="settings">
+      <GraphCard v-if="modalOpen" ref="graph" :id="$props.id" :config="graphCfg">
+        <q-btn-dropdown flat label="presets" icon="mdi-timelapse">
+          <q-list link>
+            <q-item
+              v-for="(preset, idx) in presets"
+              :key="idx"
+              @click.native="() => applyPreset(preset)"
+            >{{ preset.duration }}</q-item>
+          </q-list>
+        </q-btn-dropdown>
+        <q-btn-dropdown flat label="settings" icon="settings">
           <q-list link>
             <q-item @click.native="() => $refs.duration.$el.click()">
               <q-item-side>Duration</q-item-side>
-              <q-item-main>
+              <q-item-main @click.native="() => $refs.duration.$el.click()">
                 <InputPopupEdit
                   ref="duration"
                   :field="graphCfg.params.duration"
@@ -127,7 +148,7 @@ export default class BlockGraph extends Vue {
           </q-list>
         </q-btn-dropdown>
         <q-btn v-close-overlay flat label="close"/>
-      </div>
+      </GraphCard>
     </q-modal>
     <q-btn
       :label="$props.label"
@@ -142,22 +163,6 @@ export default class BlockGraph extends Vue {
 </template>
 
 <style scoped lang="stylus">
-.graph-controls {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
-
-.q-list {
-  border: 1px solid gray;
-  border-right: 0px;
-}
-
-/deep/ .graph-controls .q-field * {
-  align-items: center;
-  margin-top: 0px !important;
-}
-
 .mirrored {
   -webkit-transform: scaleX(-1);
   transform: scaleX(-1);
