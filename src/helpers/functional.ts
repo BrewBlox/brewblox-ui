@@ -59,7 +59,8 @@ export const unitDurationString =
 export const spaceCased =
   (input: string): string =>
     input.replace(/[_-]/, ' ')
-      .replace(/([^^])([A-Z]+)/g, (_, v1, v2) => `${v1} ${v2.toLowerCase()}`);
+      .replace(/([^^])([A-Z][^A-Z])/g, (_, v1, v2) => `${v1} ${v2.toLowerCase()}`)
+      .replace(/([^^])([A-Z]+)/g, (_, v1, v2) => `${v1} ${v2}`);
 
 export const snakeCased =
   (input: string): string =>
