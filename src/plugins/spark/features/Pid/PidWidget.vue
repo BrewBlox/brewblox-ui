@@ -69,7 +69,7 @@ export default class PidWidget extends BlockWidget {
       :actions="[{label:'Enable', handler: enable }]"
       type="info"
       color="info"
-    >This PID is disabled</q-alert>
+    >Driving {{ block.data.outputId }} is disabled</q-alert>
     <q-alert
       v-if="block.data.enabled && !block.data.active"
       type="warning"
@@ -115,7 +115,7 @@ export default class PidWidget extends BlockWidget {
         </q-field>
       </div>
     </q-card-main>
-  </q-card>
+  </q-alert></q-alert></q-card>
 </template>
 
 <style lang="stylus" scoped>

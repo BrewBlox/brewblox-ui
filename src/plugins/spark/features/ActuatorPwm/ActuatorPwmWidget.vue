@@ -27,6 +27,11 @@ export default class ActuatorPwmWidget extends BlockWidget {
     }
     return unconstrained;
   }
+
+  enable() {
+    this.block.data.enabled = true;
+    this.saveBlock();
+  }
 }
 </script>
 
@@ -50,6 +55,12 @@ export default class ActuatorPwmWidget extends BlockWidget {
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
+    <q-alert
+      v-if="!block.data.enabled"
+      :actions="[{label:'Enable', handler: enable }]"
+      type="info"
+      color="info"
+    >Toggling {{ block.data.actuatorId }} is disabled</q-alert>
     <q-card-main class="column widget-body">
       <div class="full-width">
         <q-field label="Duty Setting">

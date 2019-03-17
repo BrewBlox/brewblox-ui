@@ -9,5 +9,6 @@ export interface ActuatorPwmBlock extends Block {
     setting: number;
     value: number;
     constrainedBy: ConstraintsObj;
+    enabled: boolean;
   };
 }
