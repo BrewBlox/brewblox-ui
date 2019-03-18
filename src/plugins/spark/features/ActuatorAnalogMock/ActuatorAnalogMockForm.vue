@@ -34,13 +34,16 @@ export default class ActuatorAnalogMockForm extends BlockForm {
             label="supported setting min"
           />
         </q-field>
-        <q-field label="Target">
+        <q-field label="Setting">
           <InputPopupEdit
+            v-if="!isDriven"
             :field="block.data.setting"
             :change="callAndSaveBlock(v => block.data.setting = v)"
             type="number"
             label="target"
           />
+          <big v-else>{{ block.data.setting | unit }}</big>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-field>
         <q-field label="Supported setting max">
           <InputPopupEdit

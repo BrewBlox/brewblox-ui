@@ -44,11 +44,14 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
       <div class="full-width">
         <q-field label="Setting">
           <InputPopupEdit
+            v-if="!isDriven"
             :field="block.data.setting"
             :change="callAndSaveBlock(v => block.data.setting = v)"
             type="number"
             label="Setting"
           />
+          <big v-else>{{ block.data.setting | unit }}</big>
+          <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
         </q-field>
         <q-field label="Value">
           <big>{{ block.data.value | round }}</big>

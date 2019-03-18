@@ -50,11 +50,14 @@ export default class ActuatorPwmForm extends BlockForm {
         </q-field>
         <q-field label="Duty Setting">
           <InputPopupEdit
+            v-if="!isDriven"
             :field="block.data.setting"
             :change="callAndSaveBlock(v => block.data.setting = v)"
             label="Setting"
             type="number"
           />
+          <big>{{ block.data.setting | round }}</big>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-field>
         <q-field label="Duty Achieved">
           <big>{{ block.data.value | round }}</big>

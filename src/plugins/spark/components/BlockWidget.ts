@@ -4,7 +4,7 @@ import { QueryParams, ValueAxes } from '@/store/history/state';
 import Component from 'vue-class-component';
 import { Block } from '../state';
 import { fetchBlock, renameBlock, saveBlock } from '../store/actions';
-import { blockById } from '../store/getters';
+import { blockById, drivenChains } from '../store/getters';
 
 @Component
 export default class BlockWidget extends WidgetBase {
@@ -20,6 +20,11 @@ export default class BlockWidget extends WidgetBase {
 
   protected get block(): Block {
     return blockById(this.$store, this.serviceId, this.blockId);
+  }
+
+  protected get isDriven(): boolean {
+    return drivenChains(this.$store, this.serviceId)
+      .some((chain: string[]) => chain[0] === this.blockId);
   }
 
   protected colMinBlocks(minBlocksForRow: number, colsTrue: number, colsFalse: number): string {
