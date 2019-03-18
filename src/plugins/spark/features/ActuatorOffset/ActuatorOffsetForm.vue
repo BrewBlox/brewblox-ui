@@ -28,9 +28,10 @@ export default class ActuatorOffsetForm extends BlockForm {
       <BlockEnableToggle
         v-bind="$props"
         :block="block"
-        :text="`Offsetting ${block.data.targetId} from the
-          ${block.data.referenceSettingOrValue == 0 ? 'setting' : 'value'} of ${block.data.referenceId} is`"
-        class="full-width bordered"
+        :text-enabled="`Offset is enabled: ${block.data.targetId} will be offset from the
+          ${block.data.referenceSettingOrValue == 0 ? 'setting' : 'value'} of ${block.data.referenceId}.`"
+        :text-disabled="`Offset is disabled: ${block.data.targetId} will not be changed.`"
+        class="full-width"
       />
       <div>
         <q-field label="Driven process value">

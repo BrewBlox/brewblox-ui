@@ -60,7 +60,7 @@ export default class ActuatorPwmWidget extends BlockWidget {
       :actions="[{label:'Enable', handler: enable }]"
       type="info"
       color="info"
-    >Toggling {{ block.data.actuatorId }} is disabled</q-alert>
+    >PWM is disabled: {{ block.data.actuatorId }} will not be toggled.</q-alert>
     <q-card-main class="column widget-body">
       <div class="full-width">
         <q-field label="Duty Setting">

@@ -27,8 +27,9 @@ export default class ActuatorPwmForm extends BlockForm {
       <BlockEnableToggle
         v-bind="$props"
         :block="block"
-        :text="`Toggling target ${block.data.actuatorId} is`"
-        class="full-width bordered"
+        :text-enabled="`PWM is enabled: ${block.data.actuatorId} will be toggled automatically.`"
+        :text-disabled="`PWM is disabled: ${block.data.actuatorId} will not be toggled.`"
+        class="full-width"
       />
       <div>
         <q-field label="Digital Actuator Target">

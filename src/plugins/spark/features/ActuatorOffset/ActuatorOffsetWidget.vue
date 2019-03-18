@@ -60,7 +60,7 @@ export default class ActuatorOffsetWidget extends BlockWidget {
       :actions="[{label:'Enable', handler: enable }]"
       type="info"
       color="info"
-    >Offsetting {{ block.data.targetId }} is disabled</q-alert>
+    >Offset is disabled: {{ block.data.targetId }} will not be changed.</q-alert>
     <q-card-main class="column widget-body">
       <div class="full-width">
         <q-field label="Target offset">

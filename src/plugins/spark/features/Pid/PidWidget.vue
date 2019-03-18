@@ -69,12 +69,12 @@ export default class PidWidget extends BlockWidget {
       :actions="[{label:'Enable', handler: enable }]"
       type="info"
       color="info"
-    >Driving {{ block.data.outputId }} is disabled</q-alert>
+    >PID is disabled: Output {{ block.data.outputId }} will not be set</q-alert>
     <q-alert
       v-if="block.data.enabled && !block.data.active"
       type="warning"
       color="warn"
-    >This PID is inactive</q-alert>
+    >PID is inactive. Output {{ block.data.outputId }} will not be set</q-alert>
     <q-card-main class="column widget-body">
       <div :style="gridStyle(6)" class="full-width">
         <q-item>Input</q-item>
@@ -115,7 +115,7 @@ export default class PidWidget extends BlockWidget {
         </q-field>
       </div>
     </q-card-main>
-  </q-alert></q-alert></q-card>
+  </q-card>
 </template>
 
 <style lang="stylus" scoped>

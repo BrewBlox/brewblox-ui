@@ -37,7 +37,8 @@ export default class PidForm extends BlockForm {
       <BlockEnableToggle
         v-bind="$props"
         :block="block"
-        :text="`Driving output ${block.data.outputId} is`"
+        :text-enabled="`PID is enabled: output ${block.data.outputId} will be set to result of PID.`"
+        :text-disabled="`PID is disabled: output ${block.data.outputId} will not be set.`"
         class="full-width bordered"
       />
       <div class="row">
