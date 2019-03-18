@@ -65,6 +65,7 @@ export default class ActuatorOffsetWidget extends BlockWidget {
       <div class="full-width">
         <q-field label="Target offset">
           <big>{{ block.data.setting | round }}</big>
+          <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
         </q-field>
         <q-field label="Actual offset">
           <big>{{ block.data.value | round }}</big>

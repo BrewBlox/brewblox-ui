@@ -43,9 +43,11 @@ export default class ActuatorPinForm extends BlockForm {
     <q-collapsible opened group="modal" class="col-12" icon="settings" label="Settings">
       <q-field label="State">
         <ActuatorState
+          :disable="isDriven"
           :field="block.data.state"
           :change="callAndSaveBlock(v => block.data.state = v)"
         />
+        <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
       </q-field>
       <q-field label="Inverted">
         <q-toggle :value="block.data.invert" @input="v => { block.data.invert = v; saveBlock(); }"/>

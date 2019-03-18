@@ -33,6 +33,7 @@ export default class SetpointSensorPairForm extends BlockForm {
             :change="callAndSaveBlock(v => block.data.setpointId = v)"
             label="Setpoint"
           />
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-field>
         <q-field label="Sensor">
           <LinkPopupEdit

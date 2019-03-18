@@ -72,9 +72,11 @@ export default class ActuatorDS2413Form extends BlockForm {
       </q-field>
       <q-field label="State">
         <ActuatorState
+          :disable="isDriven"
           :field="block.data.state"
           :change="callAndSaveBlock(v => block.data.state = v)"
         />
+        <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
       </q-field>
       <q-field label="Invert">
         <q-toggle :value="block.data.invert" @input="v => { block.data.invert = v; saveBlock(); }"/>

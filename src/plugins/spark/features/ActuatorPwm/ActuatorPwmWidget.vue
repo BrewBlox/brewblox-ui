@@ -65,6 +65,7 @@ export default class ActuatorPwmWidget extends BlockWidget {
       <div class="full-width">
         <q-field label="Duty Setting">
           <big>{{ block.data.setting | round }}</big>
+          <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
         </q-field>
         <q-field label="Duty Achieved">
           <big>{{ block.data.value | round }}</big>

@@ -47,11 +47,17 @@ export default class SetpointSimpleWidget extends BlockWidget {
       <div class="full-width">
         <q-field :label="block.data.enabled ? 'Target' : 'Target when enabled'">
           <UnitPopupEdit
-            :class="[block.data.setting.value === null ? 'darkened' : {}]"
+            v-if="!isDriven"
+            :class="{ darkened: block.data.setting.value === null }"
             :field="block.data.setpoint"
             :change="callAndSaveBlock(v => block.data.setpoint = v)"
             label="Target"
           />
+          <big
+            v-else
+            :class="{ darkened: block.data.setting.value === null }"
+          >{{ block.data.setpoint | unit }}</big>
+          <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
         </q-field>
         <q-field label="Enabled">
           <q-toggle

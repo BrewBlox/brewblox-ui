@@ -63,7 +63,9 @@ export default class ActuatorPinWidget extends BlockWidget {
           <ActuatorState
             :field="block.data.state"
             :change="callAndSaveBlock(v => block.data.state = v)"
+            :disable="isDriven"
           />
+          <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
         </q-field>
         <q-field v-if="pending !== null" label="Pending">
           <span>{{ pending }}</span>

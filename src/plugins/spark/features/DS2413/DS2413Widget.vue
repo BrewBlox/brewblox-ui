@@ -54,6 +54,7 @@ export default class DS2413Widget extends BlockWidget {
           <q-toggle :value="pinState.senseA" readonly label="Sense A"/>
           <q-toggle :value="pinState.latchB" readonly label="Latch B"/>
           <q-toggle :value="pinState.senseB" readonly label="Sense B"/>
+          <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
         </q-field>
       </div>
     </q-card-main>

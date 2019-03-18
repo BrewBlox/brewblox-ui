@@ -1,5 +1,4 @@
 <script lang="ts">
-import { ProcessValueLink } from '@/helpers/units/KnownLinks';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import Component from 'vue-class-component';
 import { ActuatorOffsetBlock } from '@/plugins/spark/features/ActuatorOffset/state';
@@ -60,11 +59,14 @@ export default class ActuatorOffsetForm extends BlockForm {
         </q-field>
         <q-field label="Target offset">
           <InputPopupEdit
+            v-if="!isDriven"
             :field="block.data.setting"
             :change="callAndSaveBlock(v => block.data.setting = v)"
             label="Target offset"
             type="number"
           />
+          <big>{{ block.data.setting | round }}</big>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-field>
         <q-field label="Current offset">
           <big>{{ block.data.value | round }}</big>
