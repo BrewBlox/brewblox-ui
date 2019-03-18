@@ -34,31 +34,13 @@ export default class PidForm extends BlockForm {
       icon="mdi-calculator-variant"
       label="Settings"
     >
-      <div class="full-width bordered">
-        <q-item>
-          <q-item-main>
-            This PID is currently
-            <b v-if="block.data.enabled">enabled</b>
-            <b v-if="!block.data.enabled">disabled</b>.
-          </q-item-main>
-          <q-item-side right>
-            <q-btn
-              v-if="block.data.enabled"
-              label="Disable"
-              color="negative"
-              dense
-              @click="() => { block.data.enabled = false; saveBlock(); }"
-            />
-            <q-btn
-              v-if="!block.data.enabled"
-              label="Enable"
-              color="positive"
-              dense
-              @click="() => { block.data.enabled = true; saveBlock(); }"
-            />
-          </q-item-side>
-        </q-item>
-      </div>
+      <BlockEnableToggle
+        v-bind="$props"
+        :block="block"
+        :text-enabled="`PID is enabled: output ${block.data.outputId} will be set to result of PID.`"
+        :text-disabled="`PID is disabled: output ${block.data.outputId} will not be set.`"
+        class="full-width bordered"
+      />
       <div class="row">
         <q-list class="col-md-4 col-xs-12">
           <q-list-header class="justify-center">Input</q-list-header>

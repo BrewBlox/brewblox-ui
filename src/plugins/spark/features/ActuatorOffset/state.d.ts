@@ -10,5 +10,6 @@ export interface ActuatorOffsetBlock extends Block {
     setting: number;
     value: number;
     constrainedBy: ConstraintsObj;
+    enabled: boolean;
   };
 }

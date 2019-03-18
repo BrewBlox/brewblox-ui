@@ -16,6 +16,7 @@ export const defaultData =
     period: new Unit(4, 'second'),
     setting: 0,
     constrainedBy: { constraints: [] },
+    enabled: true,
   });
 
 export const presets =
@@ -23,19 +24,13 @@ export const presets =
     {
       label: 'Heater - 4s period',
       value: {
-        actuatorId: new ActuatorDigitalLink(null),
         period: new Unit(4, 'second'),
-        setting: 0,
-        constrainedBy: { constraints: [] },
       },
     },
     {
       label: 'Fridge - 30m period',
       value: {
-        actuatorId: new ActuatorDigitalLink(null),
         period: new Unit(1800, 'second'),
-        setting: 0,
-        constrainedBy: { constraints: [] },
       },
     },
   ]);

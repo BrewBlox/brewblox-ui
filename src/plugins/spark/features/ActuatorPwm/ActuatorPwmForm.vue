@@ -23,8 +23,14 @@ export default class ActuatorPwmForm extends BlockForm {
 <template>
   <div class="widget-modal column">
     <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
-
     <q-collapsible opened group="modal" class="col-12" icon="settings" label="Settings">
+      <BlockEnableToggle
+        v-bind="$props"
+        :block="block"
+        :text-enabled="`PWM is enabled: ${block.data.actuatorId} will be toggled automatically.`"
+        :text-disabled="`PWM is disabled: ${block.data.actuatorId} will not be toggled.`"
+        class="full-width"
+      />
       <div>
         <q-field label="Digital Actuator Target">
           <LinkPopupEdit
