@@ -12,7 +12,7 @@
           {
             "x": 11,
             "y": 2,
-            "type": "InputTube",
+            "type": "SystemIO",
             "rotate": 0,
             "settings": {
               "liquids": [
@@ -33,22 +33,16 @@
             "rotate": 0
           },
           {
-            "type": "OutputTube",
+            "type": "SystemIO",
             "x": 13,
             "y": 1,
-            "rotate": 270
+            "rotate": 90
           },
           {
             "x": 14,
             "y": 2,
-            "type": "ElbowTube",
-            "rotate": 180
-          },
-          {
-            "type": "ElbowTube",
-            "x": 14,
-            "y": 3,
-            "rotate": 270
+            "type": "Coil",
+            "rotate": 0
           },
           {
             "x": 13,
@@ -57,10 +51,16 @@
             "rotate": 0
           },
           {
-            "type": "InputTube",
+            "type": "SystemIO",
             "x": 0,
             "y": 2,
-            "rotate": 0
+            "rotate": 0,
+            "settings": {
+              "liquids": [
+                "#4AA0EF"
+              ],
+              "pressure": 10
+            }
           },
           {
             "type": "Valve",
@@ -71,8 +71,8 @@
           {
             "x": 3,
             "y": 6,
-            "type": "OutputTube",
-            "rotate": 90
+            "type": "SystemIO",
+            "rotate": 270
           },
           {
             "type": "Valve",
@@ -124,7 +124,7 @@
             "rotate": 270
           },
           {
-            "type": "InputTube",
+            "type": "SystemIO",
             "x": 7,
             "y": 3,
             "rotate": 180,
@@ -168,10 +168,10 @@
             "closed": true
           },
           {
-            "type": "OutputTube",
+            "type": "SystemIO",
             "x": 3,
             "y": 1,
-            "rotate": 270
+            "rotate": 90
           }
         ]
       }

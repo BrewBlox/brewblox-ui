@@ -26,6 +26,11 @@ export default class ActuatorOffsetWidget extends BlockWidget {
       value: 'Actual offset',
     };
   }
+
+  enable() {
+    this.block.data.enabled = true;
+    this.saveBlock();
+  }
 }
 </script>
 
@@ -50,10 +55,17 @@ export default class ActuatorOffsetWidget extends BlockWidget {
     </q-card-title>
     <q-card-separator/>
     <q-alert v-if="warnings" type="warning" color="warn">{{ warnings }}</q-alert>
+    <q-alert
+      v-if="!block.data.enabled"
+      :actions="[{label:'Enable', handler: enable }]"
+      type="info"
+      color="info"
+    >Offset is disabled: {{ block.data.targetId }} will not be changed.</q-alert>
     <q-card-main class="column widget-body">
       <div class="full-width">
         <q-field label="Target offset">
           <big>{{ block.data.setting | round }}</big>
+          <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
         </q-field>
         <q-field label="Actual offset">
           <big>{{ block.data.value | round }}</big>

@@ -1,8 +1,8 @@
 <script lang="ts">
-import { ProcessValueLink } from '@/helpers/units/KnownLinks';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import Component from 'vue-class-component';
 import { ActuatorOffsetBlock } from '@/plugins/spark/features/ActuatorOffset/state';
+import { defaultData, presets } from './getters';
 
 @Component
 export default class ActuatorOffsetForm extends BlockForm {
@@ -11,30 +11,11 @@ export default class ActuatorOffsetForm extends BlockForm {
   }
 
   defaultData() {
-    return {
-      targetId: new ProcessValueLink(null),
-      referenceId: new ProcessValueLink(null),
-      referenceSettingOrValue: 0,
-      constrainedBy: { constraints: [] },
-    };
+    return defaultData();
   }
 
   presets() {
-    return [
-      {
-        label: 'HLT Setpoint driver',
-        value: {
-          targetId: new ProcessValueLink(null),
-          referenceId: new ProcessValueLink(null),
-          referenceSettingOrValue: 0,
-          constrainedBy: {
-            constraints: [
-              { max: 10 },
-            ],
-          },
-        },
-      },
-    ];
+    return presets();
   }
 }
 </script>
@@ -43,6 +24,14 @@ export default class ActuatorOffsetForm extends BlockForm {
   <div class="widget-modal column">
     <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
     <q-collapsible opened group="modal" class="col-12" icon="settings" label="Settings">
+      <BlockEnableToggle
+        v-bind="$props"
+        :block="block"
+        :text-enabled="`Offset is enabled: ${block.data.targetId} will be offset from the
+          ${block.data.referenceSettingOrValue == 0 ? 'setting' : 'value'} of ${block.data.referenceId}.`"
+        :text-disabled="`Offset is disabled: ${block.data.targetId} will not be changed.`"
+        class="full-width"
+      />
       <div>
         <q-field label="Driven process value">
           <LinkPopupEdit
@@ -64,17 +53,20 @@ export default class ActuatorOffsetForm extends BlockForm {
           <SelectPopupEdit
             :field="block.data.referenceSettingOrValue"
             :change="callAndSaveBlock(v => block.data.referenceSettingOrValue = v)"
-            :options="[{label: 'Setting', value: 0}, {label: 'Current value', value: 1}]"
+            :options="[{label: 'Setting', value: 0}, {label: 'Measured value', value: 1}]"
             label="reference field"
           />
         </q-field>
         <q-field label="Target offset">
           <InputPopupEdit
+            v-if="!isDriven"
             :field="block.data.setting"
             :change="callAndSaveBlock(v => block.data.setting = v)"
             label="Target offset"
             type="number"
           />
+          <big>{{ block.data.setting | round }}</big>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-field>
         <q-field label="Current offset">
           <big>{{ block.data.value | round }}</big>

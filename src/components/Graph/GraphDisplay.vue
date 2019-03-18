@@ -16,6 +16,10 @@ Vue.component('PlotlyGraph', () => import('./PlotlyGraph'));
       type: Object,
       required: true,
     },
+    revision: {
+      type: Number,
+      required: false,
+    },
   },
 })
 export default class GraphDisplay extends Vue {
@@ -85,7 +89,14 @@ export default class GraphDisplay extends Vue {
 </script>
 
 <template>
-  <PlotlyGraph v-if="ready" :data="plotlyData" :layout="plotlyLayout" :config="plotlyConfig" fit/>
+  <PlotlyGraph
+    v-if="ready"
+    :data="plotlyData"
+    :layout="plotlyLayout"
+    :config="plotlyConfig"
+    :revision="$props.revision"
+    fit
+  />
 </template>
 
 <style lang="stylus">

@@ -24,12 +24,19 @@ export default class SetpointSimpleForm extends BlockForm {
     <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
     <q-collapsible opened group="modal" class="col-12" icon="settings" label="Settings">
       <div>
-        <q-field label="Setpoint">
+        <q-field label="Target">
           <UnitPopupEdit
-            :field="block.data.setting"
-            :change="callAndSaveBlock(v => block.data.setting = v)"
-            label="Setpoint"
+            v-if="!isDriven"
+            :class="{ darkened: block.data.setting.value === null }"
+            :field="block.data.setpoint"
+            :change="callAndSaveBlock(v => block.data.setpoint = v)"
+            label="Target"
           />
+          <big
+            v-else
+            :class="{ darkened: block.data.setting.value === null }"
+          >{{ block.data.setpoint | unit }}</big>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-field>
         <q-field label="Enabled">
           <q-toggle

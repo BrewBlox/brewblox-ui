@@ -34,7 +34,7 @@ describe('Data describing an input tube', () => {
     x: 1,
     y: 2,
     rotate: 0,
-    type: 'InputTube',
+    type: 'SystemIO',
     settings: {
       pressure: 11,
       liquids: [COLD_WATER],
@@ -58,7 +58,7 @@ describe('asFlowParts', () => {
       x: 1,
       y: 2,
       rotate: 0,
-      type: 'InputTube',
+      type: 'SystemIO',
       settings: {
         liquids: [COLD_WATER],
       },
@@ -75,7 +75,7 @@ describe('asFlowParts', () => {
       x: 3,
       y: 2,
       rotate: 0,
-      type: 'OutputTube',
+      type: 'SystemIO',
       settings: {},
     },
   ];
@@ -94,7 +94,7 @@ describe('A single path without splits', () => {
       x: 1,
       y: 2,
       rotate: 0,
-      type: 'InputTube',
+      type: 'SystemIO',
       settings: {
         pressure: 6,
         liquids: [HOT_WATER],
@@ -104,8 +104,8 @@ describe('A single path without splits', () => {
 
       x: 3,
       y: 2,
-      rotate: 0,
-      type: 'OutputTube',
+      rotate: 180,
+      type: 'SystemIO',
       settings: {},
     },
     {
@@ -127,7 +127,7 @@ describe('A single path without splits', () => {
 
   it('Should have no splits', () => {
     let walker: FlowSegment = path;
-    let pathTypes: string[] = ['InputTube'];
+    let pathTypes: string[] = ['SystemIO'];
     while (true) {
       if (walker.next === null) {
         break; // end of path
@@ -136,7 +136,7 @@ describe('A single path without splits', () => {
       pathTypes.push(walker.next.root.type);
       walker = walker.next;
     }
-    expect(pathTypes).toEqual(['InputTube', 'StraightTube', 'OutputTube']);
+    expect(pathTypes).toEqual(['SystemIO', 'StraightTube', 'SystemIO']);
   });
 
   it('Should have a friction value of 3', () => {
@@ -150,7 +150,7 @@ describe('A single path without splits', () => {
         x: 1,
         y: 2,
         rotate: 0,
-        type: 'InputTube',
+        type: 'SystemIO',
         flows: {
           '-1,-1': {
             [HOT_WATER]: -2,
@@ -167,8 +167,8 @@ describe('A single path without splits', () => {
       {
         x: 3,
         y: 2,
-        rotate: 0,
-        type: 'OutputTube',
+        rotate: 180,
+        type: 'SystemIO',
         flows: {
           '3,2.5': {
             [HOT_WATER]: -2,
@@ -204,7 +204,7 @@ describe('A path with a split, but no joins', () => {
       x: 1,
       y: 2,
       rotate: 0,
-      type: 'InputTube',
+      type: 'SystemIO',
       settings: {
         pressure: 14,
         liquids: [COLD_WATER],
@@ -227,15 +227,15 @@ describe('A path with a split, but no joins', () => {
     {
       x: 3,
       y: 1,
-      rotate: 270,
-      type: 'OutputTube',
+      rotate: 90,
+      type: 'SystemIO',
       settings: {},
     },
     {
       x: 3,
       y: 3,
-      rotate: 90,
-      type: 'OutputTube',
+      rotate: 270,
+      type: 'SystemIO',
       settings: {},
     },
   ];
@@ -253,15 +253,15 @@ describe('A path with a split, but no joins', () => {
     const visitedTypes = propertyWalker([], path, ['root', 'type']);
     expect(visitedTypes).toEqual(
       [
-        'InputTube',
+        'SystemIO',
         'StraightTube',
         'TeeTube',
         [
           [
-            'OutputTube',
+            'SystemIO',
           ],
           [
-            'OutputTube',
+            'SystemIO',
           ],
         ],
       ]);
@@ -310,7 +310,7 @@ describe('A path with a split, but no joins', () => {
               [COLD_WATER]: 4,
             },
           },
-          type: 'InputTube',
+          type: 'SystemIO',
         },
         {
           flows: {
@@ -346,7 +346,7 @@ describe('A path with a split, but no joins', () => {
               [COLD_WATER]: -2,
             },
           },
-          type: 'OutputTube',
+          type: 'SystemIO',
           x: 3,
           y: 1,
         },
@@ -359,7 +359,7 @@ describe('A path with a split, but no joins', () => {
               [COLD_WATER]: -2,
             },
           },
-          type: 'OutputTube',
+          type: 'SystemIO',
         },
       ]
     );
@@ -372,7 +372,7 @@ describe('A path that forks and rejoins', () => {
       x: 1,
       y: 2,
       rotate: 0,
-      type: 'InputTube',
+      type: 'SystemIO',
       settings: {
         pressure: 11,
         liquids: [COLD_WATER],
@@ -430,8 +430,8 @@ describe('A path that forks and rejoins', () => {
     {
       x: 5,
       y: 2,
-      rotate: 0,
-      type: 'OutputTube',
+      rotate: 180,
+      type: 'SystemIO',
       settings: {},
     },
   ];
@@ -450,7 +450,7 @@ describe('A path that forks and rejoins', () => {
 
     expect(visitedTypes).toEqual(
       [
-        'InputTube',
+        'SystemIO',
         'StraightTube',
         'TeeTube',
         [
@@ -465,7 +465,7 @@ describe('A path that forks and rejoins', () => {
             'TeeTube',
           ],
         ],
-        'OutputTube',
+        'SystemIO',
       ]);
 
     const transitions = propertyWalker([], path, ['transitions']);
@@ -503,7 +503,7 @@ describe('A path that forks and rejoins', () => {
             "-1,-1": { [COLD_WATER]: -2 },
             "2,2.5": { [COLD_WATER]: 2 },
           },
-          type: 'InputTube',
+          type: 'SystemIO',
         },
         {
           flows: {
@@ -562,7 +562,7 @@ describe('A path that forks and rejoins', () => {
             "-1,-1": { [COLD_WATER]: 2 },
             "5,2.5": { [COLD_WATER]: -2 },
           },
-          type: 'OutputTube',
+          type: 'SystemIO',
         },
       ]
     );
@@ -575,7 +575,7 @@ describe('A single path with a pump', () => {
       x: 3,
       y: 2,
       rotate: 180,
-      type: 'InputTube',
+      type: 'SystemIO',
       settings: {
         pressure: 6,
         liquids: [COLD_WATER],
@@ -594,8 +594,8 @@ describe('A single path with a pump', () => {
     {
       x: 1,
       y: 2,
-      rotate: 180,
-      type: 'OutputTube',
+      rotate: 0,
+      type: 'SystemIO',
       settings: {},
     },
   ];
@@ -609,7 +609,7 @@ describe('A single path with a pump', () => {
         x: 3,
         y: 2,
         rotate: 180,
-        type: 'InputTube',
+        type: 'SystemIO',
         flows: {
           '-1,-1': { [COLD_WATER]: -2 },
           '3,2.5': { [COLD_WATER]: 2 },
@@ -636,8 +636,8 @@ describe('A single path with a pump', () => {
       {
         x: 1,
         y: 2,
-        rotate: 180,
-        type: 'OutputTube',
+        rotate: 0,
+        type: 'SystemIO',
         flows: {
           '2,2.5': { [COLD_WATER]: -2 },
           '-1,-1': { [COLD_WATER]: 2 },
@@ -658,7 +658,7 @@ describe('A single path with a pump', () => {
           x: 3,
           y: 2,
           rotate: 180,
-          type: 'InputTube',
+          type: 'SystemIO',
           flows: {}, /*{
             '-1,-1': { [COLD_WATER]: -6 },
             '3,2.5': { [COLD_WATER]: 6 },
@@ -684,8 +684,8 @@ describe('A single path with a pump', () => {
         {
           x: 1,
           y: 2,
-          rotate: 180,
-          type: 'OutputTube',
+          rotate: 0,
+          type: 'SystemIO',
           flows: {
             '2,2.5': { [COLD_WATER]: -6 },
             '-1,-1': { [COLD_WATER]: 6 },
@@ -704,7 +704,7 @@ describe('Two sources joining', () => {
       x: 1,
       y: 1,
       rotate: 0,
-      type: 'InputTube',
+      type: 'SystemIO',
       settings: {
         pressure: 11,
         liquids: [COLD_WATER],
@@ -714,7 +714,7 @@ describe('Two sources joining', () => {
       x: 1,
       y: 3,
       rotate: 0,
-      type: 'InputTube',
+      type: 'SystemIO',
       settings: {
         pressure: 11,
         liquids: [HOT_WATER],
@@ -744,8 +744,8 @@ describe('Two sources joining', () => {
     {
       x: 3,
       y: 2,
-      rotate: 0,
-      type: 'OutputTube',
+      rotate: 180,
+      type: 'SystemIO',
       settings: {},
     },
   ];
@@ -763,7 +763,7 @@ describe('Two sources joining', () => {
               [COLD_WATER]: 2,
             },
           },
-          'type': 'InputTube',
+          'type': 'SystemIO',
           'x': 1,
           'y': 1,
         },
@@ -776,7 +776,7 @@ describe('Two sources joining', () => {
               [HOT_WATER]: 2,
             },
           },
-          'type': 'InputTube',
+          'type': 'SystemIO',
           'x': 1,
           'y': 3,
         },
@@ -834,7 +834,7 @@ describe('Two sources joining', () => {
               [HOT_WATER]: -2,
             },
           },
-          'type': 'OutputTube',
+          'type': 'SystemIO',
           'x': 3,
           'y': 2,
         },
@@ -850,7 +850,7 @@ describe('A path with a bridge', () => {
     {
       x: 11,
       y: 2,
-      type: "InputTube",
+      type: "SystemIO",
       rotate: 0,
       settings: {
         liquids: [COLD_WATER],
@@ -872,10 +872,10 @@ describe('A path with a bridge', () => {
       settings: {},
     },
     {
-      type: "OutputTube",
+      type: "SystemIO",
       x: 13,
       y: 1,
-      rotate: 270,
+      rotate: 90,
       settings: {},
     },
     {
@@ -908,7 +908,7 @@ describe('A path with a bridge', () => {
         {
           x: 11,
           y: 2,
-          type: "InputTube",
+          type: "SystemIO",
           rotate: 0,
           settings: {
             liquids: [COLD_WATER],
@@ -960,10 +960,10 @@ describe('A path with a bridge', () => {
           },
         },
         {
-          type: "OutputTube",
+          type: "SystemIO",
           x: 13,
           y: 1,
-          rotate: 270,
+          rotate: 90,
           settings: {},
           flows: {
             "13.5,2": {

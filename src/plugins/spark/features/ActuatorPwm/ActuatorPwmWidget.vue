@@ -27,6 +27,11 @@ export default class ActuatorPwmWidget extends BlockWidget {
     }
     return unconstrained;
   }
+
+  enable() {
+    this.block.data.enabled = true;
+    this.saveBlock();
+  }
 }
 </script>
 
@@ -50,10 +55,17 @@ export default class ActuatorPwmWidget extends BlockWidget {
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
+    <q-alert
+      v-if="!block.data.enabled"
+      :actions="[{label:'Enable', handler: enable }]"
+      type="info"
+      color="info"
+    >PWM is disabled: {{ block.data.actuatorId }} will not be toggled.</q-alert>
     <q-card-main class="column widget-body">
       <div class="full-width">
         <q-field label="Duty Setting">
           <big>{{ block.data.setting | round }}</big>
+          <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
         </q-field>
         <q-field label="Duty Achieved">
           <big>{{ block.data.value | round }}</big>

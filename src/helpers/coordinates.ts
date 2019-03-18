@@ -1,4 +1,7 @@
-type CoordinatesParam = string | { x: number; y: number } | [number, number] | Coordinates;
+import { clampRotation } from './functional';
+import isEqual from 'lodash/isEqual';
+
+export type CoordinatesParam = string | { x: number; y: number } | [number, number] | Coordinates;
 
 export class Coordinates {
   public x: number;
@@ -28,12 +31,15 @@ export class Coordinates {
     }
   }
 
+  private isException(): boolean {
+    return this.x < 0 || this.y < 0; // exclude negative coordinates which are used for exceptions
+  }
+
   public rotate(rotation: number, pivot: CoordinatesParam = [0.5, 0.5]): Coordinates {
-    if (!rotation) {
+    rotation = clampRotation(rotation);
+
+    if (this.isException() || rotation === 0) {
       return this;
-    }
-    if (this.x < 0 || this.y < 0) {
-      return this; // exclude negative coordinates which are used for exceptions
     }
 
     const pivotCoord = new Coordinates(pivot);
@@ -54,12 +60,87 @@ export class Coordinates {
   }
 
   public translate(offset: CoordinatesParam): Coordinates {
-    if (this.x < 0 || this.y < 0) {
-      return this; // exclude negative coordinates which are used for exceptions
+    if (this.isException()) {
+      return this;
     }
+
     const offsetCoord = new Coordinates(offset);
     this.x += offsetCoord.x;
     this.y += offsetCoord.y;
+
+    return this;
+  }
+
+  public rotateSquare(
+    rotation: number,
+    currentRotation: number,
+    size: [number, number],
+    coordinatesWithinShape: CoordinatesParam = [0, 0]
+  ): Coordinates {
+    rotation = clampRotation(rotation);
+
+    if (this.isException() || rotation === 0 || isEqual(size, [1, 1])) {
+      return this;
+    }
+
+    // An example:
+    //
+    // rotation = 180
+    // currentRotation = 0
+    //
+    // XXX is a square with offset [0, 0]
+    // YYY is a square with offset [2, 1]
+    //  @  is the anchor of the XXX square - its coordinates in the global grid
+    //  O  is the shape center
+    //
+    // Before:
+    //
+    //     @---------------+
+    //     |XXX|   |   |   |
+    //     |XXX|   |   |   |
+    //     +-------O-------+
+    //     |   |   |YYY|   |
+    //     |   |   |YYY|   |
+    //     +---------------+
+    //
+    // After:
+    //
+    //     +---------------+
+    //     |   |YYY|   |   |
+    //     |   |YYY|   |   |
+    //     +-------O---@---+
+    //     |   |   |   |XXX|
+    //     |   |   |   |XXX|
+    //     +---------------+
+
+    const squareCenter = new Coordinates(this)
+      .translate([0.5, 0.5]);
+
+    const shapeEdge = new Coordinates(this)
+      .rotate(currentRotation, squareCenter);
+
+    const [sizeX, sizeY] = size;
+    const offset = new Coordinates(coordinatesWithinShape);
+
+    const shapeCenter = new Coordinates(shapeEdge)
+      .translate([(0.5 * sizeX) - offset.x, (0.5 * sizeY) - offset.y])
+      .rotate(currentRotation, shapeEdge);
+
+    const newSquareCenter = new Coordinates(squareCenter)
+      .rotate(rotation, shapeCenter);
+
+    // We want two things:
+    // - The shape must snap to grid
+    //    => integer coordinates
+    // - After a 360 rotation, the shape must return to starting coordinates
+    //    => alternate ceil and floor
+    const roundFunc =
+      (clampRotation(currentRotation + rotation) / 90) % 2
+        ? Math.ceil
+        : Math.floor;
+
+    this.x = roundFunc(newSquareCenter.x - 0.5);
+    this.y = roundFunc(newSquareCenter.y - 0.5);
 
     return this;
   }
@@ -75,4 +156,9 @@ export class Coordinates {
   public raw(): { x: number; y: number } {
     return { x: this.x, y: this.y };
   }
+
+  public equals(other: Coordinates): boolean {
+    return this.x === other.x && this.y === other.y;
+  }
 }
+

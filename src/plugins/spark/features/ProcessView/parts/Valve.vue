@@ -41,13 +41,5 @@ export default class Valve extends PartComponent {
       </g>
     </g>
     <AnimatedArrows key="valve-arrows" :speed="flowSpeed" path="M0,25H50"/>
-    <rect fill="red" fill-opacity="0" x="0" y="0" width="50" height="50"/>
   </g>
 </template>
-
-
-<style scoped>
-.ProcessViewPart {
-  cursor: pointer;
-}
-</style>

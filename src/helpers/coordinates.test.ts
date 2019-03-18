@@ -45,4 +45,100 @@ describe('coordinates', () => {
     expect(new Coordinates('1,0').rotate(270, [1, 1]).values()).toEqual([0, 1]);
   });
 
+  it('Should rotate squares', () => {
+    // from 0
+    expect(
+      new Coordinates([2, 2])
+        .rotateSquare(90, 0, [4, 2])
+        .values()
+    )
+      .toEqual([4, 1]);
+
+    // CCW
+    expect(
+      new Coordinates([2, 2])
+        .rotateSquare(-90, 0, [4, 2])
+        .values()
+    )
+      .toEqual([3, 4]);
+
+    // intermediate value
+    expect(
+      new Coordinates([4, 1])
+        .rotateSquare(90, 90, [4, 2])
+        .values()
+    )
+      .toEqual([5, 3]);
+
+    // full rotation
+    expect(
+      new Coordinates([2, 2])
+        .rotateSquare(90, 0, [4, 2])
+        .rotateSquare(90, 90, [4, 2])
+        .rotateSquare(90, 180, [4, 2])
+        .rotateSquare(90, 270, [4, 2])
+        .values()
+    )
+      .toEqual([2, 2]);
+  });
+
+  it('Should rotate squares with odd length', () => {
+    // from 0
+    expect(
+      new Coordinates([2, 2])
+        .rotateSquare(90, 0, [3, 2])
+        .values()
+    )
+      .toEqual([4, 2]);
+
+
+    // full rotation
+    expect(
+      new Coordinates([2, 2])
+        .rotateSquare(90, 0, [3, 2])
+        .rotateSquare(90, 90, [3, 2])
+        .rotateSquare(90, 180, [3, 2])
+        .rotateSquare(90, 270, [3, 2])
+        .values()
+    )
+      .toEqual([2, 2]);
+  });
+
+  it('Should rotate offset squares', () => {
+    // from 0
+    expect(
+      new Coordinates([3, 3])
+        .rotateSquare(90, 0, [4, 2], [1, 1])
+        .values()
+    )
+      .toEqual([3, 2]);
+
+    // CCW
+    expect(
+      new Coordinates([3, 3])
+        .rotateSquare(-90, 0, [4, 2], [1, 1])
+        .values()
+    )
+      .toEqual([4, 3]);
+
+    // intermediate value
+    expect(
+      new Coordinates([3, 2])
+        .rotateSquare(90, 90, [4, 2], [1, 1])
+        .values()
+    )
+      .toEqual([4, 2]);
+
+    // full rotation
+    expect(
+      new Coordinates([3, 3])
+        .rotateSquare(90, 0, [4, 2], [1, 1])
+        .rotateSquare(90, 90, [4, 2], [1, 1])
+        .rotateSquare(90, 180, [4, 2], [1, 1])
+        .rotateSquare(90, 270, [4, 2], [1, 1])
+        .values()
+    )
+      .toEqual([3, 3]);
+  });
+
 });

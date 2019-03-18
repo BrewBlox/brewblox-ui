@@ -11,6 +11,10 @@ import Vue from 'vue';
       type: Function,
       required: true,
     },
+    disable: {
+      type: Boolean,
+      default: false,
+    },
   },
 })
 export default class ActuatorState extends Vue {
@@ -61,9 +65,10 @@ export default class ActuatorState extends Vue {
 
 <template>
   <div>
-    <q-btn-toggle v-if="known" v-model="state" :options="options" dense/>
+    <q-btn-toggle v-if="known" v-model="state" :options="options" :disable="$props.disable" dense/>
     <div v-else>
       <q-btn
+        :disable="$props.disable"
         class="reset-button"
         dense
         no-caps

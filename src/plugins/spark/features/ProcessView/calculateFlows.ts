@@ -32,6 +32,15 @@ export const partSettings =
 export const partTransitions =
   (part: PersistentPart): Transitions => partSettings(part).transitions(part);
 
+export const partSize =
+  (part: PersistentPart): [number, number] => partSettings(part).size(part);
+
+export const partCenter =
+  (part: PersistentPart): [number, number] => {
+    const [sizeX, sizeY] = partSize(part);
+    return [0.5 * sizeX, 0.5 * sizeY];
+  };
+
 const adjacentPart = (
   allParts: FlowPart[],
   outCoords: string,
@@ -51,7 +60,7 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
     (flow, inCoord) =>
       new Coordinates(inCoord)
         .translate([-part.x, -part.y])
-        .rotate(-part.rotate)
+        .rotate(-part.rotate, partCenter(part))
         .toString()
   );
 
@@ -62,16 +71,18 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
 const translations = (part: PersistentPart): Transitions =>
   Object.entries(partTransitions(part))
     .reduce((acc, [inCoords, transition]: [string, any]) => {
+      const unrotatedAnchor = new Coordinates(part)
+        .rotateSquare(-part.rotate, part.rotate, partSize(part));
       const updatedKey = new Coordinates(inCoords)
-        .rotate(part.rotate)
-        .translate([part.x, part.y])
+        .rotate(part.rotate, partCenter(part))
+        .translate(unrotatedAnchor)
         .toString();
       const updatedTransition = transition
         .map((transition: FlowRoute) => ({
           ...transition,
           outCoords: new Coordinates(transition.outCoords)
-            .rotate(part.rotate)
-            .translate([part.x, part.y])
+            .rotate(part.rotate, partCenter(part))
+            .translate(unrotatedAnchor)
             .toString(),
         }));
       return { ...acc, [updatedKey]: updatedTransition };

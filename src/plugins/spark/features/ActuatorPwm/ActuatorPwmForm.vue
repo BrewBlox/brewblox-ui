@@ -23,8 +23,14 @@ export default class ActuatorPwmForm extends BlockForm {
 <template>
   <div class="widget-modal column">
     <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
-
     <q-collapsible opened group="modal" class="col-12" icon="settings" label="Settings">
+      <BlockEnableToggle
+        v-bind="$props"
+        :block="block"
+        :text-enabled="`PWM is enabled: ${block.data.actuatorId} will be toggled automatically.`"
+        :text-disabled="`PWM is disabled: ${block.data.actuatorId} will not be toggled.`"
+        class="full-width"
+      />
       <div>
         <q-field label="Digital Actuator Target">
           <LinkPopupEdit
@@ -44,11 +50,14 @@ export default class ActuatorPwmForm extends BlockForm {
         </q-field>
         <q-field label="Duty Setting">
           <InputPopupEdit
+            v-if="!isDriven"
             :field="block.data.setting"
             :change="callAndSaveBlock(v => block.data.setting = v)"
             label="Setting"
             type="number"
           />
+          <big>{{ block.data.setting | round }}</big>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-field>
         <q-field label="Duty Achieved">
           <big>{{ block.data.value | round }}</big>
