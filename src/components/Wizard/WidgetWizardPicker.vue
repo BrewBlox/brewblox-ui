@@ -54,10 +54,6 @@ export default class WidgetWizardPicker extends Vue {
     return wizardById(this.$store, this.featureId);
   }
 
-  selectFeature(id: string) {
-    this.featureId = id;
-  }
-
   close() {
     this.$emit('close');
   }
@@ -100,7 +96,7 @@ export default class WidgetWizardPicker extends Vue {
             v-for="opt in wizardOptions"
             :key="opt.label"
             icon="widgets"
-            @click.native="() => { featureId = opt.value; }"
+            @click.native="featureId = opt.value"
           >
             <q-item-main>
               <q-item-tile label>{{ opt.label }}</q-item-tile>
