@@ -270,7 +270,12 @@ export default class SparkPage extends Vue {
         </q-btn-dropdown>
       </portal>
       <q-modal v-model="modalOpen" no-backdrop-dismiss>
-        <component v-if="modalOpen" :is="modalSettings.component" v-bind="modalSettings.props"/>
+        <component
+          v-if="modalOpen"
+          :is="modalSettings.component"
+          v-bind="modalSettings.props"
+          @close="modalOpen = false"
+        />
       </q-modal>
       <q-modal v-model="relationsModalOpen" no-backdrop-dismiss>
         <DagreDiagram

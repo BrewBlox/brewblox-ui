@@ -1,12 +1,14 @@
 <script lang="ts">
 import WidgetWizardBase, { NavAction } from '@/components/Wizard/WidgetWizardBase';
 import Component from 'vue-class-component';
+import { dashboardValues } from '@/store/dashboards/getters';
 
 
 @Component
 export default class ProcessViewWizard extends WidgetWizardBase {
   currentStep: string = '';
   widgetId: string = '';
+  chosenDashboardId: string | null = null;
 
   get navigation(): { [id: string]: NavAction[] } {
     return {
@@ -19,7 +21,7 @@ export default class ProcessViewWizard extends WidgetWizardBase {
         {
           label: 'Finish',
           click: () => this.createWidget(),
-          enabled: () => !this.widgetIdError,
+          enabled: () => !this.widgetIdError && this.chosenDashboardId,
         },
       ],
     };
@@ -39,6 +41,14 @@ export default class ProcessViewWizard extends WidgetWizardBase {
     return null;
   }
 
+  get dashboardOpts() {
+    return dashboardValues(this.$store)
+      .map(dash => ({
+        label: dash.title,
+        value: dash.id,
+      }));
+  }
+
   createWidget() {
     this.createItem({
       id: this.widgetId,
@@ -54,6 +64,7 @@ export default class ProcessViewWizard extends WidgetWizardBase {
 
   mounted() {
     this.widgetId = '';
+    this.chosenDashboardId = this.$props.dashboardId || null;
     this.stepper.reset();
   }
 }
@@ -70,6 +81,9 @@ export default class ProcessViewWizard extends WidgetWizardBase {
           :suffix="widgetIdError"
           placeholder="Enter a widget Name"
         />
+      </q-field>
+      <q-field label="Dashboard" icon="create" orientation="vertical">
+        <q-option-group v-model="chosenDashboardId" :options="dashboardOpts" dark type="radio"/>
       </q-field>
     </q-step>
     <!-- nav -->

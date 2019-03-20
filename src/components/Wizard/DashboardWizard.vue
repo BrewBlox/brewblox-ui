@@ -8,8 +8,9 @@ import { createDashboard } from '@/store/dashboards/actions';
 export default class DashboardWizard extends Vue {
   dashboardName: string = '';
 
-  createDashboard() {
-    createDashboard(this.$store, this.dashboardName);
+  async createDashboard() {
+    await createDashboard(this.$store, this.dashboardName);
+    this.$emit('close');
   }
 }
 </script>
