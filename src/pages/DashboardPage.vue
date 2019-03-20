@@ -285,7 +285,7 @@ export default class DashboardPage extends Vue {
 </template>
 
 <style lang="stylus" scoped>
-@import '../css/app.styl';
+@import '../styles/quasar.styl';
 
 .dashboard-item {
   background: $block-background;

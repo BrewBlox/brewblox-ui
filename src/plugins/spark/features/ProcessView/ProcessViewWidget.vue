@@ -270,7 +270,7 @@ export default class ProcessViewWidget extends WidgetBase {
 </template>
 
 <style lang="stylus" scoped>
-@import '../../../../../src/css/app.styl';
+@import '../../../../../src/styles/quasar.styl';
 
 .grid-base {
   width: 100%;

@@ -18,7 +18,6 @@ import {
   widgetById,
   widgetSizeById,
 } from '@/store/features/getters';
-import { Notify } from 'quasar';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { isReady, isSystemBlock, widgetSize } from './getters';
@@ -186,7 +185,7 @@ export default class SparkPage extends Vue {
       .map((del, idx) => ({ label: del.description, value: idx, action: del.action }));
 
     if (opts.length === 0) {
-      Notify.create('This block can\'t be deleted');
+      this.$q.notify('This block can\'t be deleted');
       return;
     }
 
@@ -350,7 +349,7 @@ export default class SparkPage extends Vue {
 </template>
 
 <style lang="stylus" scoped>
-@import '../../../css/app.styl';
+@import '../../../styles/quasar.styl';
 
 .dashboard-item {
   background: $block-background;

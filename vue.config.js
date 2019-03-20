@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { gitDescribeSync } = require('git-describe');
 
 module.exports = {
@@ -5,7 +6,11 @@ module.exports = {
     webpackBundleAnalyzer: {
       openAnalyzer: false,
     },
+    quasar: {
+      treeShake: true,
+    },
   },
+  transpileDependencies: [/[\\\/]node_modules[\\\/]quasar[\\\/]/],
   configureWebpack: (config) => {
     config.devtool = 'source-map';
     if (process.env.NODE_ENV === 'production') {
@@ -15,14 +20,10 @@ module.exports = {
         .minimizer[0] // Terser
         .options
         .terserOptions
-        .keep_fnames = true;
+        .keep_fnames = true; // eslint-disable-line @typescript-eslint/camelcase
     }
   },
   chainWebpack: (config) => {
-    // add quasar alias
-    config.resolve.alias
-      .set('quasar', 'quasar-framework/dist/quasar.mat.esm');
-
     // We're only using a subset from plotly
     // Add alias to enable typing regardless
     config.resolve.alias

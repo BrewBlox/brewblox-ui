@@ -16,12 +16,12 @@ export default class App extends Vue {
 </script>
 
 <template>
-  <div id="q-app">
+  <div id="app">
     <router-view/>
   </div>
 </template>
 
 <style lang="stylus">
 // We import global styling here
-@import './css/app.styl';
+@import './styles/quasar.styl';
 </style>

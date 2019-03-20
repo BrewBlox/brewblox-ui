@@ -263,7 +263,7 @@ export default class PidForm extends BlockForm {
 </template>
 
 <style lang="stylus" scoped>
-@import '../../../../css/app.styl';
+@import '../../../../styles/quasar.styl';
 
 .q-subheading {
   color: $tertiary;

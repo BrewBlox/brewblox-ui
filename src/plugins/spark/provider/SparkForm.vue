@@ -20,7 +20,6 @@ import {
   discoveredBlocks,
   savepoints,
 } from '@/plugins/spark/store/getters';
-import { Notify } from 'quasar';
 import WiFiSettingsPopup from './WiFiSettingsPopup.vue';
 import Vue from 'vue';
 import Component from 'vue-class-component';
@@ -52,6 +51,7 @@ import {
   },
 })
 export default class SparkForm extends Vue {
+  $q: any;
   wifiModal: boolean = false;
   savepointInput: string = '';
 
@@ -130,7 +130,7 @@ export default class SparkForm extends Vue {
 
   saveUnits(vals: UserUnits = this.units) {
     saveUnits(this.$store, this.service.id, vals)
-      .catch(reason => Notify.create(`Failed to change unit: ${reason}`));
+      .catch(reason => this.$q.notify(`Failed to change unit: ${reason}`));
   }
 
   clearDiscoveredBlocks() {
