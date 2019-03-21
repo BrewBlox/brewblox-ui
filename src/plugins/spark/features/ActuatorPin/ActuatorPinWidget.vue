@@ -39,7 +39,7 @@ export default class ActuatorPinWidget extends BlockWidget {
 
 <template>
   <q-card dark class="column">
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <ActuatorPinForm
         v-if="modalOpen"
         v-bind="$props"
@@ -48,7 +48,7 @@ export default class ActuatorPinWidget extends BlockWidget {
         :on-change-block-id="changeBlockId"
         :on-switch-block-id="switchBlockId"
       />
-    </q-modal>
+    </q-dialog>
     <q-card-title class="title-bar">
       <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>

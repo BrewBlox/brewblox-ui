@@ -46,7 +46,7 @@ export default class PidWidget extends BlockWidget {
 
 <template>
   <q-card dark class="column">
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <PidForm
         v-if="modalOpen"
         v-bind="$props"
@@ -55,7 +55,7 @@ export default class PidWidget extends BlockWidget {
         :on-change-block-id="changeBlockId"
         :on-switch-block-id="switchBlockId"
       />
-    </q-modal>
+    </q-dialog>
     <q-card-title class="title-bar">
       <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
@@ -64,17 +64,17 @@ export default class PidWidget extends BlockWidget {
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-alert
+    <q-banner
       v-if="!block.data.enabled"
       :actions="[{label:'Enable', handler: enable }]"
       type="info"
       color="info"
-    >PID is disabled: Output {{ block.data.outputId }} will not be set</q-alert>
-    <q-alert
+    >PID is disabled: Output {{ block.data.outputId }} will not be set</q-banner>
+    <q-banner
       v-if="block.data.enabled && !block.data.active"
       type="warning"
       color="warn"
-    >PID is inactive. Output {{ block.data.outputId }} will not be set</q-alert>
+    >PID is inactive. Output {{ block.data.outputId }} will not be set</q-banner>
     <q-card-main class="column widget-body">
       <div :style="gridStyle(6)" class="full-width">
         <q-item>Input</q-item>

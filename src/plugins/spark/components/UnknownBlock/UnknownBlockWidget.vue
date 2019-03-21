@@ -60,7 +60,7 @@ export default class UnknownBlockWidget extends WidgetBase {
 
 <template>
   <q-card dark class="column">
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <UnknownBlockForm
         v-if="modalOpen"
         v-bind="$props"
@@ -69,7 +69,7 @@ export default class UnknownBlockWidget extends WidgetBase {
         :on-change-block-id="() => {}"
         :on-switch-block-id="switchBlockId"
       />
-    </q-modal>
+    </q-dialog>
     <q-card-title class="title-bar">
       <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
@@ -92,7 +92,7 @@ export default class UnknownBlockWidget extends WidgetBase {
       </q-card-main>
     </div>
     <div v-else>
-      <q-alert color="warning" icon="warning" error>{{ reason.message }}</q-alert>
+      <q-banner color="warning" icon="warning" error>{{ reason.message }}</q-banner>
     </div>
   </q-card>
 </template>

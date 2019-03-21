@@ -248,13 +248,13 @@ export default class DashboardPage extends Vue {
           </q-list>
         </q-btn-dropdown>
       </portal>
-      <q-modal v-model="wizardModalOpen" no-backdrop-dismiss>
+      <q-dialog v-model="wizardModalOpen" no-backdrop-dismiss>
         <WidgetWizardPicker
           v-if="wizardModalOpen"
           :dashboard-id="dashboardId"
           @close="wizardModalOpen = false"
         />
-      </q-modal>
+      </q-dialog>
       <q-list v-if="isMobile" no-border>
         <q-item v-for="val in validatedItems" :key="val.item.id">
           <component

@@ -103,7 +103,4 @@ Vue.use(Quasar, {
   },
   directives: { Ripple, ClosePopup, TouchHold, TouchPan },
   plugins: { Notify, Dialog },
-  config: {
-    notify: {},
-  },
 });

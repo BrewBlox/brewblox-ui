@@ -69,9 +69,9 @@ export default class SparkWidget extends Vue {
 
 <template>
   <q-card v-if="ready" dark class="column">
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <SparkForm v-if="modalOpen" :field="service"/>
-    </q-modal>
+    </q-dialog>
     <q-card-title class="title-bar">
       <div class="ellipsis">{{ service.id }}</div>
       <span slot="right" class="vertical-middle on-left">Spark Service</span>
@@ -81,11 +81,11 @@ export default class SparkWidget extends Vue {
     <q-card-separator/>
     <q-card-main class="column widget-body">
       <div class="full-width">
-        <q-alert
+        <q-banner
           v-if="!updating"
           :actions="[{ label: 'Retry', handler: retryUpdateSource }]"
           type="warning"
-        >Unable to update automatically</q-alert>
+        >Unable to update automatically</q-banner>
         <q-field label="Device ID">
           <span style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</span>
         </q-field>

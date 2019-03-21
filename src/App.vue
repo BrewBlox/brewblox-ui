@@ -16,7 +16,7 @@ export default class App extends Vue {
 </script>
 
 <template>
-  <div id="app">
+  <div id="q-app">
     <router-view/>
   </div>
 </template>

@@ -36,7 +36,7 @@ export default class ActuatorOffsetWidget extends BlockWidget {
 
 <template>
   <q-card dark class="column">
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <ActuatorOffsetForm
         v-if="modalOpen"
         v-bind="$props"
@@ -45,7 +45,7 @@ export default class ActuatorOffsetWidget extends BlockWidget {
         :on-change-block-id="changeBlockId"
         :on-switch-block-id="switchBlockId"
       />
-    </q-modal>
+    </q-dialog>
     <q-card-title class="title-bar">
       <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
@@ -54,13 +54,13 @@ export default class ActuatorOffsetWidget extends BlockWidget {
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-alert v-if="warnings" type="warning" color="warn">{{ warnings }}</q-alert>
-    <q-alert
+    <q-banner v-if="warnings" type="warning" color="warn">{{ warnings }}</q-banner>
+    <q-banner
       v-if="!block.data.enabled"
       :actions="[{label:'Enable', handler: enable }]"
       type="info"
       color="info"
-    >Offset is disabled: {{ block.data.targetId }} will not be changed.</q-alert>
+    >Offset is disabled: {{ block.data.targetId }} will not be changed.</q-banner>
     <q-card-main class="column widget-body">
       <div class="full-width">
         <q-field label="Target offset">

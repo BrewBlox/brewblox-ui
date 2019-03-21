@@ -1,11 +1,12 @@
 import Vue from 'vue';
 import App from './App.vue';
-import './quasar';
+import createContainer from './create-container';
 import { autoRegister } from './helpers/component-ref';
 import history from './plugins/history';
 import portal from './plugins/portal';
 import spark from './plugins/spark';
 import example from './plugins/example';
+import './quasar';
 import router from './router';
 import store from './store';
 
@@ -26,5 +27,6 @@ plugins.forEach(plugin => plugin({
 new Vue({
   router,
   store,
+  el: createContainer('q-app'),
   render: h => h(App),
-}).$mount('#app');
+});

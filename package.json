@@ -33,12 +33,10 @@
   "dependencies": {
     "@quasar/extras": "^1.1.1",
     "@types/d3": "^5.7.0",
-    "babel-eslint": "^10.0.1",
     "babel-jest": "^24.1.0",
     "d3-selection": "^1.4.0",
     "dagre-d3": "^0.6.3",
     "date-fns": "^1.30.1",
-    "eslint-plugin-vue": "^5.2.2",
     "lodash": "^4.17.11",
     "parse-duration": "^0.1.1",
     "plotly.js-basic-dist": "^1.43.1",
@@ -60,6 +58,7 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@types/jest": "^23.3.14",
     "@types/lodash": "^4.14.121",
     "@types/plotly.js": "^1.42.0",

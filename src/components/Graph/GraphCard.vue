@@ -140,7 +140,7 @@ export default class GraphCard extends Vue {
       :revision="revision"
     />
     <div v-else class="alert-container">
-      <q-alert icon="warning" color="warning">{{ error }}</q-alert>
+      <q-banner icon="warning" color="warning">{{ error }}</q-banner>
     </div>
     <div class="row graph-controls z-top">
       <slot/>

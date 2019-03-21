@@ -398,7 +398,7 @@ export default class GridItem extends Vue {
       </div>
     </button>
     <!-- Action modal -->
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <WidgetActionMenu
         v-if="modalOpen"
         :item-id="$props.id"
@@ -406,7 +406,7 @@ export default class GridItem extends Vue {
         :on-move="$props.onMove"
         :on-delete="$props.onDelete"
       />
-    </q-modal>
+    </q-dialog>
   </div>
 </template>
 

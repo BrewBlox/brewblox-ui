@@ -24,7 +24,7 @@ export default class SetpointSimpleWidget extends BlockWidget {
 
 <template>
   <q-card dark class="column">
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <SetpointSimpleForm
         v-if="modalOpen"
         v-bind="$props"
@@ -33,7 +33,7 @@ export default class SetpointSimpleWidget extends BlockWidget {
         :on-change-block-id="changeBlockId"
         :on-switch-block-id="switchBlockId"
       />
-    </q-modal>
+    </q-dialog>
     <q-card-title class="title-bar">
       <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
@@ -42,7 +42,7 @@ export default class SetpointSimpleWidget extends BlockWidget {
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-alert v-if="block.data.value === null" type="warning" color="warn">This Setpoint is invalid</q-alert>
+    <q-banner v-if="block.data.value === null" type="warning" color="warn">This Setpoint is invalid</q-banner>
     <q-card-main class="column widget-body">
       <div class="full-width">
         <q-field :label="block.data.enabled ? 'Target' : 'Target when enabled'">

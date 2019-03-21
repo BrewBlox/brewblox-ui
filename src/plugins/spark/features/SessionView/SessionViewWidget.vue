@@ -97,7 +97,7 @@ export default class SessionViewWidget extends WidgetBase {
 
 <template>
   <q-card dark class="column">
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <SessionViewForm
         v-if="modalOpen"
         v-bind="$props"
@@ -105,7 +105,7 @@ export default class SessionViewWidget extends WidgetBase {
         :on-change-field="saveConfig"
         :active-session="modalSession"
       />
-    </q-modal>
+    </q-dialog>
     <q-card-title class="title-bar">
       <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>

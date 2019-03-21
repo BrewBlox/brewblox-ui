@@ -254,48 +254,49 @@ export default class SparkPage extends Vue {
         <q-btn-dropdown color="primary" label="actions">
           <q-list dark link>
             <q-item @click.native="relationsModalOpen = true">
-              <q-item-side icon="mdi-ray-start-arrow"/>
-              <q-item-main label="Show Relations"/>
+              <q-item-side icon="mdi-ray-start-arrow" />
+              <q-item-main label="Show Relations" />
             </q-item>
             <q-item @click.native="widgetEditable = !widgetEditable">
-              <q-item-side :icon="widgetEditable ? 'check' : 'mode edit'"/>
-              <q-item-main :label="widgetEditable ? 'Stop editing' : 'Edit Dashboard'"/>
+              <q-item-side :icon="widgetEditable ? 'check' : 'mode edit'" />
+              <q-item-main :label="widgetEditable ? 'Stop editing' : 'Edit Dashboard'" />
             </q-item>
             <q-item @click.native="startCreateBlock">
-              <q-item-side icon="add"/>
-              <q-item-main label="New Block"/>
+              <q-item-side icon="add" />
+              <q-item-main label="New Block" />
             </q-item>
           </q-list>
         </q-btn-dropdown>
       </portal>
-      <q-modal v-model="modalOpen" no-backdrop-dismiss>
+      <q-dialog v-model="modalOpen" no-backdrop-dismiss>
         <component
-          v-if="modalOpen"
           :is="modalSettings.component"
+          v-if="modalOpen"
           v-bind="modalSettings.props"
           @close="modalOpen = false"
         />
-      </q-modal>
-      <q-modal v-model="relationsModalOpen" no-backdrop-dismiss>
+      </q-dialog>
+      <q-dialog v-model="relationsModalOpen" no-backdrop-dismiss>
         <DagreDiagram
           v-if="relationsModalOpen"
           :nodes="validatedItems.map(v => ({id: v.item.id, type: v.item.feature}))"
           :relations="relations"
         />
-      </q-modal>
-      <q-alert
+      </q-dialog>
+      <q-banner
         class="col-12"
         icon="info"
         color="dark-bright"
         style="margin-bottom: 20px;"
-      >This service page shows all blocks that are running on your Spark controller.
+      >
+This service page shows all blocks that are running on your Spark controller.
         <br>Deleting blocks on this page will remove them on the controller.
-      </q-alert>
+      </q-banner>
       <q-list v-if="statusNok" dark no-border>
         <q-item>
           <Troubleshooter
-            :disabled="widgetEditable"
             :id="$props.serviceId"
+            :disabled="widgetEditable"
             :config="{serviceId: $props.serviceId}"
             :cols="4"
             :rows="4"
@@ -308,8 +309,8 @@ export default class SparkPage extends Vue {
         <q-item>
           <SparkWidget
             v-if="isReady"
-            :disabled="widgetEditable"
             :id="$props.serviceId"
+            :disabled="widgetEditable"
             :service-id="$props.serviceId"
             :cols="widgetSize.cols"
             :rows="widgetSize.rows"
@@ -318,8 +319,8 @@ export default class SparkPage extends Vue {
         </q-item>
         <q-item v-for="val in validatedItems" :key="val.key">
           <component
-            :disabled="widgetEditable"
             :is="val.component"
+            :disabled="widgetEditable"
             v-bind="val.props"
             class="dashboard-item"
           />
@@ -328,8 +329,8 @@ export default class SparkPage extends Vue {
       <GridContainer v-else :editable="widgetEditable" no-move>
         <SparkWidget
           v-if="isReady"
-          :disabled="widgetEditable"
           :id="$props.serviceId"
+          :disabled="widgetEditable"
           :service-id="$props.serviceId"
           :cols="widgetSize.cols"
           :rows="widgetSize.rows"
@@ -337,8 +338,8 @@ export default class SparkPage extends Vue {
         />
         <component
           v-for="val in validatedItems"
-          :disabled="widgetEditable"
           :is="val.component"
+          :disabled="widgetEditable"
           :key="val.key"
           v-bind="val.props"
           class="dashboard-item"

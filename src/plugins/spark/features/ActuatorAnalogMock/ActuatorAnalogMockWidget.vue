@@ -21,7 +21,7 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
 
 <template>
   <q-card dark class="column">
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <ActuatorAnalogMockForm
         v-if="modalOpen"
         v-bind="$props"
@@ -30,7 +30,7 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
         :on-change-block-id="changeBlockId"
         :on-switch-block-id="switchBlockId"
       />
-    </q-modal>
+    </q-dialog>
     <q-card-title class="title-bar">
       <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
@@ -39,7 +39,7 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
     </q-card-title>
     <q-card-separator/>
-    <q-alert v-if="block.value === null" type="warning" color="warning">This Actuator is invalid</q-alert>
+    <q-banner v-if="block.value === null" type="warning" color="warning">This Actuator is invalid</q-banner>
     <q-card-main class="column widget-body">
       <div class="full-width">
         <q-field label="Setting">

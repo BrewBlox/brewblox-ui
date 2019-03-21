@@ -198,20 +198,20 @@ export default class ProcessViewWidget extends WidgetBase {
 
 <template>
   <q-card dark>
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <ProcessViewForm
         v-if="modalOpen"
         :value="flowParts[contextAction.idx]"
         @input="v => updatePart(contextAction.idx, v)"
         @remove="v => { removePart(v); modalOpen = false; }"
       />
-    </q-modal>
+    </q-dialog>
     <q-card-title class="title-bar">
       <InputPopupEdit :field="widgetId" :change="v => widgetId = v" label="Widget ID" tag="span"/>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
       <q-btn v-if="editable" slot="right" flat round dense icon="delete" @click="clearParts"/>
       <q-btn v-if="editable" slot="right" flat round dense icon="extension">
-        <q-popover>
+        <q-menu>
           <q-list link style="padding: 5px">
             <q-item
               v-touch-pan="v => panHandler(part, v)"
@@ -224,13 +224,13 @@ export default class ProcessViewWidget extends WidgetBase {
                   :height="`${SQUARE_SIZE}px`"
                   :viewBox="`0 0 ${partViewBox(part)}`"
                 >
-                  <ProcessViewItem :value="part"/>
+                  <ProcessViewItem :value="part"></ProcessViewItem>
                 </svg>
               </q-item-side>
               <q-item-main>{{ spaceCased(part.type) }}</q-item-main>
             </q-item>
           </q-list>
-        </q-popover>
+        </q-menu>
       </q-btn>
       <q-toggle slot="right" v-model="editable"/>
     </q-card-title>
@@ -252,7 +252,7 @@ export default class ProcessViewWidget extends WidgetBase {
           y="8"
           class="grid-item-coordinates"
         >{{ part.x }},{{ part.y }}</text>
-        <ProcessViewItem :value="flowParts[idx]" @input="v => updatePart(idx, v)"/>
+        <ProcessViewItem :value="flowParts[idx]" @input="v => updatePart(idx, v)"></ProcessViewItem>
         <rect
           v-if="editable"
           :width="SQUARE_SIZE"
@@ -260,10 +260,10 @@ export default class ProcessViewWidget extends WidgetBase {
           stroke="silver"
           stroke-opacity="0.6"
           fill-opacity="0"
-        />
+        ></rect>
       </g>
       <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
-        <ProcessViewItem :value="dragAction.part"/>
+        <ProcessViewItem :value="dragAction.part"></ProcessViewItem>
       </g>
     </svg>
   </q-card>

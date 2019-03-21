@@ -1,13 +1,52 @@
-// It's highly recommended to change the default colors
-// to match your app's branding.
-
-$primary   = #027BE3
-$secondary = #26A69A
-$accent    = #9C27B0
-
-$positive  = #21BA45
-$negative  = #C10015
-$info      = #31CCEC
-$warning   = #F2C037
+// This stylesheet contains the dark variables used for the dark theme
+// It overrides the variables in common.variables.styl
 
 @import '~quasar-variables'
+
+$dark_darker = #1b1d21;
+$dark = #282c34;
+$dark_bright = #454c59;
+$red = #E06C75;
+$red_bright = #FF7A85;
+$green = #70c358;
+$green_bright = #B5E890;
+$yellow = #E5C07B;
+$yellow_bright = #FFD68A;
+$blue = #4aa0ef;
+$blue_bright = #69BBFF;
+$magenta = #C678DD;
+$magenta_bright = #E48AFF;
+$cyan = #56B6C2;
+$cyan_bright = #66D9E8;
+$white = #ABB2BF;
+$white_bright = #CFD7E6;
+$white_very = #fffafa;
+
+$primary = $blue;
+$secondary = $magenta;
+$tertiary  = $yellow;
+
+$neutral   = $white;
+$positive  = $green;
+$negative  = $red;
+$info      = $blue;
+$warning   = $yellow;
+
+$block-background = $dark;
+$standard-text-color = $white_very;
+
+$body-background = $dark_darker;
+$body-color = $standard-text-color;
+
+$layout-aside-background = $block-background;
+$modal-background = $block-background;
+$modal-body-color = $white_very;
+$dimmed-background = rgba(0, 0, 0, 0.6);
+$toolbar-background = $block-background;
+$item-side-color = $standard-text-color;
+$item-label-color = $standard-text-color;
+$item-separator-color = $dark_bright;
+$card-separator-color = $dark_bright;
+
+$stepper-divider-color = $white;
+$stepper-label-inactive-color = $dark_bright;

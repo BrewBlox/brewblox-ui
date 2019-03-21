@@ -108,7 +108,7 @@ export default class BlockGraph extends Vue {
 
 <template>
   <span>
-    <q-modal v-model="modalOpen" maximized>
+    <q-dialog v-model="modalOpen" maximized>
       <GraphCard v-if="modalOpen" ref="graph" :id="$props.id" :config="graphCfg">
         <q-btn-dropdown flat label="presets" icon="mdi-timelapse">
           <q-list link>
@@ -149,7 +149,7 @@ export default class BlockGraph extends Vue {
         </q-btn-dropdown>
         <q-btn v-close-overlay flat label="close"/>
       </GraphCard>
-    </q-modal>
+    </q-dialog>
     <q-btn
       :label="$props.label"
       :size="$props.buttonSize"

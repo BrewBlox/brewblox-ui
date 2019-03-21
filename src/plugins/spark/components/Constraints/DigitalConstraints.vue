@@ -78,7 +78,7 @@ export default class DigitalConstraints extends Constraints {
     </div>
     <div v-if="!readonly" class="row gutter-x-cs">
       <q-btn label="Add constraint">
-        <q-popover>
+        <q-menu>
           <q-list separator link>
             <q-item
               v-close-overlay
@@ -87,7 +87,7 @@ export default class DigitalConstraints extends Constraints {
               @click.native="constraints.push(createConstraint(opt.value)); saveConstraints();"
             >{{ opt.label }}</q-item>
           </q-list>
-        </q-popover>
+        </q-menu>
       </q-btn>
     </div>
   </div>

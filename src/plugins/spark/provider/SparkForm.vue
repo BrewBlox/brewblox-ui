@@ -188,13 +188,13 @@ export default class SparkForm extends Vue {
     </q-collapsible>
 
     <q-collapsible group="modal" class="col-12" icon="wifi" label="WiFi">
-      <q-modal v-model="wifiModal" no-backdrop-dismiss>
+      <q-dialog v-model="wifiModal" no-backdrop-dismiss>
         <WiFiSettingsPopup
           v-if="wifiModal"
           :field="wifi.data"
           :change="v => { wifi.data = v; saveBlock(wifi); }"
         />
-      </q-modal>
+      </q-dialog>
       <div>
         <q-field label="Network">
           <big class="editable" @click="wifiModal = true">{{ wifi.data.ssid || 'click to connect' }}</big>
