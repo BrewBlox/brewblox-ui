@@ -81,10 +81,10 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
           <q-item class="column">
             <big>Hardware Blocks</big>
           </q-item>
-          <q-item>
+          <q-item dark>
             <q-btn label="Discover sensors" color="primary" @click="discover"/>
           </q-item>
-          <q-item>
+          <q-item dark>
             <q-select
               v-model="coolPin"
               :error="!coolPin || coolPin === heatPin"
@@ -92,7 +92,7 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
               :float-label="cfg.names.coolPin"
             />
           </q-item>
-          <q-item>
+          <q-item dark>
             <q-select
               v-model="heatPin"
               :error="!heatPin || coolPin === heatPin"
@@ -100,7 +100,7 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
               :float-label="cfg.names.heatPin"
             />
           </q-item>
-          <q-item>
+          <q-item dark>
             <q-select
               v-model="fridgeSensor"
               :error="!fridgeSensor || fridgeSensor === beerSensor"
@@ -108,7 +108,7 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
               :float-label="cfg.names.fridgeSensor"
             />
           </q-item>
-          <q-item>
+          <q-item dark>
             <q-select
               v-model="beerSensor"
               :error="!beerSensor || fridgeSensor === beerSensor"

@@ -23,7 +23,7 @@ export default class SetpointSimpleWidget extends BlockWidget {
 </script>
 
 <template>
-  <q-card dark class="text-white nopad">
+  <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <SetpointSimpleForm
         v-if="modalOpen"
@@ -35,34 +35,17 @@ export default class SetpointSimpleWidget extends BlockWidget {
       />
     </q-dialog>
 
-    <q-card-section class="q-pa-xs">
-      <q-item dark>
-        <q-item-section>
-          <q-item-label class="ellipsis text-h6">{{ widgetId }}</q-item-label>
-        </q-item-section>
-        <q-item-section side>{{ displayName }}</q-item-section>
-        <q-item-section side>
-          <q-btn flat round dense icon="refresh" @click="refreshBlock"/>
-        </q-item-section>
-        <q-item-section side>
-          <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
-        </q-item-section>
-        <q-item-section side>
-          <q-btn flat round dense icon="settings" @click="openModal"/>
-        </q-item-section>
-      </q-item>
-      <q-separator dark inset/>
-    </q-card-section>
+    <BlockWidgetToolbar :field="me" graph/>
 
     <q-card-section>
-      <q-item v-if="block.data.value === null">
+      <q-item dark v-if="block.data.value === null">
         <q-item-section avatar>
           <q-icon name="warning"></q-icon>
         </q-item-section>
         <q-item-section>This Setpoint is invalid</q-item-section>
       </q-item>
-      <q-item>
-        <q-item-section side>{{ block.data.enabled ? 'Target' : 'Target when enabled' }}</q-item-section>
+      <q-item dark>
+        <q-item-section>{{ block.data.enabled ? 'Target' : 'Target when enabled' }}</q-item-section>
         <q-item-section>
           <UnitPopupEdit
             v-if="!isDriven"
@@ -75,11 +58,11 @@ export default class SetpointSimpleWidget extends BlockWidget {
             v-else
             :class="{ darkened: block.data.setting.value === null }"
           >{{ block.data.setpoint | unit }}</big>
-          <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
       </q-item>
-      <q-item>
-        <q-item-section side>Enabled</q-item-section>
+      <q-item dark>
+        <q-item-section>Enabled</q-item-section>
         <q-item-section>
           <q-toggle
             :value="block.data.enabled"

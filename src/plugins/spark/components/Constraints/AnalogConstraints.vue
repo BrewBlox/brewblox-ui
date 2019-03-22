@@ -45,72 +45,68 @@ export default class AnalogConstraints extends Constraints {
 </script>
 
 <template>
-  <div class="constraints-list gutter-y-xs">
-    <div v-for="(cinfo, idx) in constraints" :key="idx" class="column">
-      <div v-if="readonly" :class="{row: true, limiting: cinfo.limiting}">
-        <span class="col">{{ label(cinfo.key) }}</span>
-        <span class="col">
-          {{ ( cinfo.key === 'balanced' ? cinfo.value.granted : cinfo.value) | unit }}
-        </span>
-      </div>
-      <div v-else class="row">
-        <SelectPopupEdit
-          :options="constraintOptions"
-          :field="cinfo.key"
-          :change="callAndSaveConstraints(k => constraints[idx] = createConstraint(k))"
-          clearable
-          class="col-8"
-          label="Constraint type"
+  <q-list separator dark>
+    <q-item dark v-for="(cinfo, idx) in constraints" :key="idx">
+      <template v-if="readonly">
+        <q-item-section :class="{ limiting: cinfo.limiting }" side>{{ label(cinfo.key) }}</q-item-section>
+        <q-item-section>{{ ( cinfo.key === 'balanced' ? cinfo.value.granted : cinfo.value) | unit }}</q-item-section>
+      </template>
+      <template v-else>
+        <q-item-section side>
+          <SelectPopupEdit
+            :options="constraintOptions"
+            :field="cinfo.key"
+            :change="callAndSaveConstraints(k => constraints[idx] = createConstraint(k))"
+            clearable
+            label="Constraint type"
+            tag="span"
+          />
+        </q-item-section>
+        <q-item-section>
+          <component
+            v-if="cinfo.key === 'balanced'"
+            :is="fieldType(cinfo.key)"
+            :service-id="serviceId"
+            :field="cinfo.value.balancerId"
+            :change="callAndSaveConstraints(v => cinfo.value.balancerId = v)"
+            label="Constraint value"
+            type="number"
+            tag="span"
+          />
+          <component
+            v-else
+            :is="fieldType(cinfo.key)"
+            :service-id="serviceId"
+            :field="cinfo.value"
+            :change="callAndSaveConstraints(v => cinfo.value = v)"
+            label="Constraint value"
+            type="number"
+            tag="span"
+          />
+        </q-item-section>
+        <q-item-section side>
+          <q-btn icon="delete" @click="removeConstraint(idx); saveConstraints();"/>
+        </q-item-section>
+      </template>
+    </q-item>
+    <q-item dark v-if="readonly && constraints.length === 0">
+      <q-item-section>No Constraints</q-item-section>
+    </q-item>
+    <q-item dark v-if="!readonly">
+      <q-item-section side>Add constraint</q-item-section>
+      <q-item-section v-for="opt in constraintOptions" :key="opt.value">
+        <q-btn
+          :label="opt.label"
+          @click="constraints.push(createConstraint(opt.value)); saveConstraints();"
+          v-close-popup
         />
-        <component
-          v-if="cinfo.key === 'balanced'"
-          :is="fieldType(cinfo.key)"
-          :service-id="serviceId"
-          :field="cinfo.value.balancerId"
-          :change="callAndSaveConstraints(v => cinfo.value.balancerId = v)"
-          class="col"
-          label="Constraint value"
-          type="number"
-        />
-        <component
-          v-else
-          :is="fieldType(cinfo.key)"
-          :service-id="serviceId"
-          :field="cinfo.value"
-          :change="callAndSaveConstraints(v => cinfo.value = v)"
-          class="col"
-          label="Constraint value"
-          type="number"
-        />
-        <q-btn class="col-1" icon="delete" @click="removeConstraint(idx); saveConstraints();"/>
-      </div>
-    </div>
-    <div v-if="readonly && constraints.length === 0" class="column">
-      <div class="row">None</div>
-    </div>
-    <div v-if="!readonly" class="row gutter-x-cs">
-      <q-btn label="Add constraint">
-        <q-menu>
-          <q-list separator link>
-            <q-item
-              v-close-overlay
-              v-for="opt in constraintOptions"
-              :key="opt.value"
-              @click.native="constraints.push(createConstraint(opt.value)); saveConstraints();"
-            >{{ opt.label }}</q-item>
-          </q-list>
-        </q-menu>
-      </q-btn>
-    </div>
-  </div>
+      </q-item-section>
+    </q-item>
+  </q-list>
 </template>
 
 <style scoped>
 .limiting {
   color: red;
-}
-
-.constraints-list {
-  padding-top: 5px;
 }
 </style>

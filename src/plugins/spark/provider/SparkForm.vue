@@ -170,7 +170,7 @@ export default class SparkForm extends Vue {
       <q-btn v-close-overlay flat rounded label="close"/>
     </q-toolbar>
 
-    <q-collapsible group="modal" class="col-12" icon="info" label="System Info">
+    <q-expansion-item class="text-h6" group="modal" icon="info" label="System Info">
       <div>
         <q-field label="Device ID">
           <div>{{ sysInfo.data.deviceId }}</div>
@@ -185,9 +185,9 @@ export default class SparkForm extends Vue {
           <div>{{ sysInfo.data.version }}</div>
         </q-field>
       </div>
-    </q-collapsible>
+    </q-expansion-item>
 
-    <q-collapsible group="modal" class="col-12" icon="wifi" label="WiFi">
+    <q-expansion-item class="text-h6" group="modal" icon="wifi" label="WiFi">
       <q-dialog v-model="wifiModal" no-backdrop-dismiss>
         <WiFiSettingsPopup
           v-if="wifiModal"
@@ -206,9 +206,14 @@ export default class SparkForm extends Vue {
           <big>{{ wifi.data.ip }}</big>
         </q-field>
       </div>
-    </q-collapsible>
+    </q-expansion-item>
 
-    <q-collapsible group="modal" class="col-12" icon="mdi-checkbox-multiple-marked" label="Groups">
+    <q-expansion-item class="text-h6"
+      group="modal"
+      
+      icon="mdi-checkbox-multiple-marked"
+      label="Groups"
+    >
       <div>
         <q-field label="Active groups" orientation="vertical">
           <GroupsPopupEdit
@@ -229,9 +234,9 @@ export default class SparkForm extends Vue {
           </div>
         </q-field>
       </div>
-    </q-collapsible>
+    </q-expansion-item>
 
-    <q-collapsible group="modal" class="col-12" icon="mdi-temperature-celsius" label="Units">
+    <q-expansion-item class="text-h6" group="modal" icon="mdi-temperature-celsius" label="Units">
       <div>
         <q-field class="col column" label="Unit preferences" orientation="vertical">
           <q-field v-for="(val, name) in units" :key="name" :label="spaceCased(name)" class="col">
@@ -244,11 +249,11 @@ export default class SparkForm extends Vue {
           </q-field>
         </q-field>
       </div>
-    </q-collapsible>
+    </q-expansion-item>
 
-    <q-collapsible
+    <q-expansion-item class="text-h6"
       group="modal"
-      class="col-12"
+      
       icon="mdi-magnify-plus-outline"
       label="Discovered Blocks"
     >
@@ -261,9 +266,9 @@ export default class SparkForm extends Vue {
           <p v-for="id in discoveredBlocks" :key="id">{{ id }}</p>
         </q-field>
       </div>
-    </q-collapsible>
+    </q-expansion-item>
 
-    <q-collapsible group="modal" class="col-12" icon="mdi-content-save-all" label="Savepoints">
+    <q-expansion-item class="text-h6" group="modal" icon="mdi-content-save-all" label="Savepoints">
       <q-list no-border separator>
         <q-item v-for="point in savepoints" :key="point">
           <q-item-main>{{ point }}</q-item-main>
@@ -273,7 +278,7 @@ export default class SparkForm extends Vue {
             <q-btn flat rounded label="Delete" @click="removeSavepoint(point)"/>
           </q-item-side>
         </q-item>
-        <q-item>
+        <q-item dark>
           <q-item-main>
             <q-input
               v-model="savepointInput"
@@ -293,7 +298,7 @@ export default class SparkForm extends Vue {
           </q-item-side>
         </q-item>
       </q-list>
-    </q-collapsible>
+    </q-expansion-item>
   </div>
 </template>
 

@@ -129,17 +129,17 @@ export default class SessionViewForm extends FormBase {
 <template>
   <div class="widget-modal column">
     <WidgetSettings v-if="!$props.embedded" v-bind="$props"/>
-    <q-collapsible
+    <q-expansion-item class="text-h6"
       v-for="session in sessions"
       :key="session.id"
       :label="`Session ${session.name}`"
       :opened="$props.activeSession && $props.activeSession.id === session.id"
       group="modal"
-      class="col-12"
+      
       icon="help"
     >
       <q-list>
-        <q-item>
+        <q-item dark>
           <q-item-main>
             <BlockGraph
               :id="`SessionView::form::${session.id}`"
@@ -159,7 +159,7 @@ export default class SessionViewForm extends FormBase {
           <q-btn flat rounded icon="delete" @click="deleteSession(session)"/>
         </q-item>
         <q-item-separator/>
-        <q-item>
+        <q-item dark>
           <q-item-main>Session name</q-item-main>
           <InputPopupEdit
             :field="session.name"
@@ -168,7 +168,7 @@ export default class SessionViewForm extends FormBase {
             tag="span"
           />
         </q-item>
-        <q-item>
+        <q-item dark>
           <q-item-main>Start</q-item-main>
           <DatetimePopupEdit
             :field="session.start"
@@ -179,7 +179,7 @@ export default class SessionViewForm extends FormBase {
             clear-label="<click to start>"
           />
         </q-item>
-        <q-item>
+        <q-item dark>
           <q-item-main>End</q-item-main>
           <DatetimePopupEdit
             :field="session.end"
@@ -190,14 +190,14 @@ export default class SessionViewForm extends FormBase {
             clear-label="<click to end>"
           />
         </q-item>
-        <q-item>
+        <q-item dark>
           <q-item-main>Duration</q-item-main>
           <span v-if="session.start && session.end">{{ sessionDuration(session) }}</span>
           <span v-else-if="session.start">In progress...</span>
           <span v-else>Not yet started</span>
         </q-item>
 
-        <q-collapsible group="sub-modal" class="col-12" icon="mdi-file-tree" label="Fields">
+        <q-expansion-item class="text-h6" group="sub-modal"  icon="mdi-file-tree" label="Fields">
           <div>
             <div class="q-mb-sm row no-wrap items-center">
               <q-input v-model="selectFilter" stack-label="Filter" class="q-ma-none" clearable/>
@@ -212,11 +212,11 @@ export default class SessionViewForm extends FormBase {
               @update:ticked="v => updateSessionSelected(session, v)"
             />
           </div>
-        </q-collapsible>
+        </q-expansion-item>
 
-        <q-collapsible group="sub-modal" class="col-12" icon="mdi-tag-multiple" label="Legend">
+        <q-expansion-item class="text-h6" group="sub-modal"  icon="mdi-tag-multiple" label="Legend">
           <q-list no-border separator>
-            <q-item>
+            <q-item dark>
               <q-item-main>Metric</q-item-main>Display as
             </q-item>
             <q-item v-for="field in sessionSelected(session)" :key="field">
@@ -233,16 +233,16 @@ export default class SessionViewForm extends FormBase {
               <q-item-main class="darkened">No metrics selected</q-item-main>
             </q-item>
           </q-list>
-        </q-collapsible>
-        <q-collapsible group="sub-modal" class="col-12" icon="edit" label="Notes">
+        </q-expansion-item>
+        <q-expansion-item class="text-h6" group="sub-modal"  icon="edit" label="Notes">
           <textarea
             :value="session.notes"
             class="full-width"
             style="min-height: 200px;"
             @change="ev => { session.notes = ev.target.value; updateSession(session); }"
           />
-        </q-collapsible>
+        </q-expansion-item>
       </q-list>
-    </q-collapsible>
+    </q-expansion-item>
   </div>
 </template>

@@ -80,14 +80,14 @@ export default class WidgetWizardPicker extends Vue {
     <q-card v-else dark>
       <q-card-main>
         <q-list no-border>
-          <q-item>
+          <q-item dark>
             <q-select
               v-model="chosenDashboardId"
               :options="dashboardOptions"
               float-label="Dashboard"
             />
           </q-item>
-          <q-item>
+          <q-item dark>
             <q-search v-model="searchModel" placeholder="Search"/>
           </q-item>
         </q-list>

@@ -254,16 +254,16 @@ export default class SparkPage extends Vue {
         <q-btn-dropdown color="primary" label="actions">
           <q-list dark link>
             <q-item @click.native="relationsModalOpen = true">
-              <q-item-side icon="mdi-ray-start-arrow" />
-              <q-item-main label="Show Relations" />
+              <q-item-side icon="mdi-ray-start-arrow"/>
+              <q-item-main label="Show Relations"/>
             </q-item>
             <q-item @click.native="widgetEditable = !widgetEditable">
-              <q-item-side :icon="widgetEditable ? 'check' : 'mode edit'" />
-              <q-item-main :label="widgetEditable ? 'Stop editing' : 'Edit Dashboard'" />
+              <q-item-side :icon="widgetEditable ? 'check' : 'mode edit'"/>
+              <q-item-main :label="widgetEditable ? 'Stop editing' : 'Edit Dashboard'"/>
             </q-item>
             <q-item @click.native="startCreateBlock">
-              <q-item-side icon="add" />
-              <q-item-main label="New Block" />
+              <q-item-side icon="add"/>
+              <q-item-main label="New Block"/>
             </q-item>
           </q-list>
         </q-btn-dropdown>
@@ -283,17 +283,12 @@ export default class SparkPage extends Vue {
           :relations="relations"
         />
       </q-dialog>
-      <q-banner
-        class="col-12"
-        icon="info"
-        color="dark-bright"
-        style="margin-bottom: 20px;"
-      >
-This service page shows all blocks that are running on your Spark controller.
+      <q-banner icon="info" color="dark-bright" style="margin-bottom: 20px;">
+        This service page shows all blocks that are running on your Spark controller.
         <br>Deleting blocks on this page will remove them on the controller.
       </q-banner>
       <q-list v-if="statusNok" dark no-border>
-        <q-item>
+        <q-item dark>
           <Troubleshooter
             :id="$props.serviceId"
             :disabled="widgetEditable"
@@ -306,7 +301,7 @@ This service page shows all blocks that are running on your Spark controller.
         </q-item>
       </q-list>
       <q-list v-else-if="isMobile" dark no-border>
-        <q-item>
+        <q-item dark>
           <SparkWidget
             v-if="isReady"
             :id="$props.serviceId"

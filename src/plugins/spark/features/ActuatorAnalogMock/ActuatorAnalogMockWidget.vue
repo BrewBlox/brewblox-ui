@@ -20,7 +20,7 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
 </script>
 
 <template>
-  <q-card dark class="text-white nopad">
+  <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <ActuatorAnalogMockForm
         v-if="modalOpen"
@@ -32,34 +32,22 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
       />
     </q-dialog>
 
-    <q-card-section class="q-pa-xs">
-      <q-item dark>
-        <q-item-section>
-          <q-item-label class="ellipsis text-h6">{{ widgetId }}</q-item-label>
-        </q-item-section>
-        <q-item-section side>{{ displayName }}</q-item-section>
-        <q-item-section side>
-          <q-btn flat round dense icon="refresh" @click="refreshBlock"/>
-        </q-item-section>
-        <q-item-section side>
-          <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
-        </q-item-section>
-        <q-item-section side>
-          <q-btn flat round dense icon="settings" @click="openModal"/>
-        </q-item-section>
-      </q-item>
-      <q-separator dark inset/>
-    </q-card-section>
+    <BlockWidgetToolbar :field="me" graph/>
 
     <q-card-section>
-      <q-item v-if="block.value === null">
+      <q-item v-if="block.value === null" dark>
         <q-item-section avatar>
           <q-icon name="warning"></q-icon>
         </q-item-section>
         <q-item-section>This Actuator is invalid</q-item-section>
       </q-item>
-      <q-item>
-        <q-item-section side>Setting</q-item-section>
+      <q-item dark>
+        <q-item-section>
+          <div class="column">
+            <span>Setting</span>
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          </div>
+        </q-item-section>
         <q-item-section>
           <InputPopupEdit
             v-if="!isDriven"
@@ -71,20 +59,14 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
           <big v-else>{{ block.data.setting | unit }}</big>
         </q-item-section>
       </q-item>
-      <q-item v-if="isDriven">
-        <q-item-section side>Driven</q-item-section>
-        <q-item-section>
-          <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
-        </q-item-section>
-      </q-item>
-      <q-item>
-        <q-item-section side>Value</q-item-section>
+      <q-item dark>
+        <q-item-section>Value</q-item-section>
         <q-item-section>
           <big>{{ block.data.value | round }}</big>
         </q-item-section>
       </q-item>
-      <q-item>
-        <q-item-section side>Constraints</q-item-section>
+      <q-item dark>
+        <q-item-label>Constraints</q-item-label>
         <q-item-section>
           <AnalogConstraints
             :service-id="serviceId"

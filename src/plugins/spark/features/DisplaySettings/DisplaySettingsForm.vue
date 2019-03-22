@@ -114,18 +114,20 @@ export default class DisplaySettingsForm extends BlockForm {
 </script>
 
 <template>
-  <div class="widget-modal column">
+  <q-card dark class="widget-modal">
     <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
-    <q-collapsible
+
+    <q-expansion-item
+      class="text-h6"
       v-for="(slot, idx) in displaySlots"
       :key="idx"
       :label="`Slot ${idx + 1}`"
       group="modal"
-      class="col-12"
       icon="mdi-widgets"
     >
-      <div>
-        <q-field label="Block">
+      <q-item dark>
+        <q-item-section>Block</q-item-section>
+        <q-item-section>
           <SelectPopupEdit
             :field="slotLink(slot).id"
             :options="slotLinkOpts"
@@ -133,8 +135,11 @@ export default class DisplaySettingsForm extends BlockForm {
             clearable
             label="block"
           />
-        </q-field>
-        <q-field label="Display name">
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>Display name</q-item-section>
+        <q-item-section>
           <InputPopupEdit
             v-if="slot"
             :field="slot.name"
@@ -142,8 +147,11 @@ export default class DisplaySettingsForm extends BlockForm {
             label="name"
           />
           <big v-else>-</big>
-        </q-field>
-        <q-field label="Color">
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>Color</q-item-section>
+        <q-item-section>
           <ColorPickerPopupEdit
             v-if="slot"
             :field="slot.color"
@@ -151,12 +159,12 @@ export default class DisplaySettingsForm extends BlockForm {
             label="color"
           />
           <big v-else>-</big>
-        </q-field>
-      </div>
-    </q-collapsible>
+        </q-item-section>
+      </q-item>
+    </q-expansion-item>
 
-    <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
+    <q-expansion-item class="text-h6" group="modal" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="$props" :presets-data="presets()"/>
-    </q-collapsible>
-  </div>
+    </q-expansion-item>
+  </q-card>
 </template>

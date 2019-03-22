@@ -8,11 +8,11 @@ export default class InactiveObjectForm extends BlockForm {
 </script>
 
 <template>
-  <div class="widget-modal column">
+  <q-card dark class="widget-modal">
     <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
 
-    <q-collapsible opened group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
+    <q-expansion-item class="text-h6" opened group="modal" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="$props" :presets-data="presets()"/>
-    </q-collapsible>
-  </div>
+    </q-expansion-item>
+  </q-card>
 </template>

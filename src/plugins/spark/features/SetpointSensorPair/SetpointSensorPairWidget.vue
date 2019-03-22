@@ -47,7 +47,7 @@ export default class SetpointSensorPairWidget extends BlockWidget {
       <div class="full-width">
         <q-field label="Setpoint value">
           <big>{{ block.data.setpointValue | unit }}</big>
-          <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-field>
         <q-field label="Sensor value">
           <big>{{ block.data.sensorValue | unit }}</big>

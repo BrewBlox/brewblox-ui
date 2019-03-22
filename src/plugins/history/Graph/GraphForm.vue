@@ -138,7 +138,7 @@ export default class GraphForm extends FormBase {
   <div class="widget-modal column">
     <WidgetSettings v-if="!$props.embedded" v-bind="$props"/>
 
-    <q-collapsible group="modal" class="col-12" icon="mdi-timetable" label="Period settings">
+    <q-expansion-item class="text-h6" group="modal" icon="mdi-timetable" label="Period settings">
       <div>
         <q-field label="Display type">
           <SelectPopupEdit
@@ -174,9 +174,9 @@ export default class GraphForm extends FormBase {
           />
         </q-field>
       </div>
-    </q-collapsible>
+    </q-expansion-item>
 
-    <q-collapsible group="modal" class="col-12" icon="mdi-file-tree" label="Metrics">
+    <q-expansion-item class="text-h6" group="modal" icon="mdi-file-tree" label="Metrics">
       <div>
         <div class="q-mb-sm row no-wrap items-center">
           <q-input v-model="selectFilter" stack-label="Filter" class="q-ma-none" clearable/>
@@ -190,11 +190,11 @@ export default class GraphForm extends FormBase {
           node-key="value"
         />
       </div>
-    </q-collapsible>
+    </q-expansion-item>
 
-    <q-collapsible group="modal" class="col-12" icon="mdi-tag-multiple" label="Legend">
+    <q-expansion-item class="text-h6" group="modal" icon="mdi-tag-multiple" label="Legend">
       <q-list no-border separator>
-        <q-item>
+        <q-item dark>
           <q-item-main>Metric</q-item-main>Display as
         </q-item>
         <q-item v-for="field in selected" :key="field">
@@ -211,11 +211,11 @@ export default class GraphForm extends FormBase {
           <q-item-main class="darkened">No metrics selected</q-item-main>
         </q-item>
       </q-list>
-    </q-collapsible>
+    </q-expansion-item>
 
-    <q-collapsible group="modal" class="col-12" icon="mdi-chart-line" label="Axes">
+    <q-expansion-item class="text-h6" group="modal" icon="mdi-chart-line" label="Axes">
       <q-list no-border separator>
-        <q-item>
+        <q-item dark>
           <q-item-main>Metric</q-item-main>Left or right axis
         </q-item>
         <q-item
@@ -231,7 +231,7 @@ export default class GraphForm extends FormBase {
           <q-item-main class="darkened">No metrics selected</q-item-main>
         </q-item>
       </q-list>
-    </q-collapsible>
+    </q-expansion-item>
   </div>
 </template>
 

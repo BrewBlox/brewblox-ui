@@ -106,7 +106,7 @@ export default class DefaultLayout extends Vue {
 
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header class="glossy">
+    <q-header class="glossy bg-dark">
       <q-toolbar>
         <q-btn flat dense round @click="toggleDrawer">
           <q-icon name="menu"/>
@@ -118,8 +118,8 @@ export default class DefaultLayout extends Vue {
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" content-class="bg-grey-3">
-      <q-list separator>
+    <q-drawer v-model="leftDrawerOpen" content-class="bg-dark">
+      <q-list separator dark>
         <q-item exact to="/">
           <q-item-section avatar>
             <q-icon name="mdi-home"></q-icon>
@@ -127,7 +127,7 @@ export default class DefaultLayout extends Vue {
           <q-item-section>Main menu</q-item-section>
         </q-item>
 
-        <q-separator/>
+        <q-separator dark/>
 
         <q-item clickable @click.native="wizardModalOpen = true">
           <q-item-section avatar>
@@ -136,9 +136,9 @@ export default class DefaultLayout extends Vue {
           <q-item-section>Wizardry</q-item-section>
         </q-item>
 
-        <q-separator/>
+        <q-separator dark/>
 
-        <q-item>
+        <q-item dark>
           <q-item-section side>
             <q-icon name="dashboard"/>
           </q-item-section>
@@ -194,9 +194,9 @@ export default class DefaultLayout extends Vue {
           </q-item>
         </draggable>
 
-        <q-separator/>
+        <q-separator dark/>
 
-        <q-item>
+        <q-item dark>
           <q-item-section side>
             <q-icon name="cloud"></q-icon>
           </q-item-section>
@@ -247,7 +247,7 @@ export default class DefaultLayout extends Vue {
       </q-list>
 
       <q-list no-border class="build-info">
-        <q-item>
+        <q-item dark>
           <small>version: {{ version }}</small>
         </q-item>
       </q-list>

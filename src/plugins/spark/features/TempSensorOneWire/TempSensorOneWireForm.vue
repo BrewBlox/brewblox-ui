@@ -22,7 +22,7 @@ export default class TempSensorOneWireForm extends BlockForm {
 <template>
   <div class="widget-modal column">
     <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
-    <q-collapsible opened group="modal" class="col-12" icon="settings" label="Settings">
+    <q-expansion-item class="text-h6" opened group="modal" icon="settings" label="Settings">
       <div>
         <q-field label="Address">
           <InputPopupEdit
@@ -39,10 +39,10 @@ export default class TempSensorOneWireForm extends BlockForm {
           />
         </q-field>
       </div>
-    </q-collapsible>
+    </q-expansion-item>
 
-    <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
+    <q-expansion-item class="text-h6" group="modal" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="$props" :presets-data="presets()"/>
-    </q-collapsible>
+    </q-expansion-item>
   </div>
 </template>

@@ -77,14 +77,14 @@ export default class PidWidget extends BlockWidget {
     >PID is inactive. Output {{ block.data.outputId }} will not be set</q-banner>
     <q-card-main class="column widget-body">
       <div :style="gridStyle(6)" class="full-width">
-        <q-item>Input</q-item>
+        <q-item dark>Input</q-item>
         <q-field label="Target">
           <big>{{ block.data.inputSetting | unit }}</big>
         </q-field>
         <q-field label="Actual">
           <big>{{ block.data.inputValue | unit }}</big>
         </q-field>
-        <q-item>Output</q-item>
+        <q-item dark>Output</q-item>
         <q-field label="Target">
           <big>{{ block.data.outputSetting | round }}</big>
         </q-field>
@@ -93,7 +93,7 @@ export default class PidWidget extends BlockWidget {
         </q-field>
       </div>
       <div :style="gridStyle(8)" class="full-width">
-        <q-item>State</q-item>
+        <q-item dark>State</q-item>
         <q-field label="Error">
           <big>{{ block.data.error | unit }}</big>
         </q-field>
@@ -103,7 +103,7 @@ export default class PidWidget extends BlockWidget {
         <q-field label="Derivative">
           <big>{{ block.data.derivative | unit }}</big>
         </q-field>
-        <q-item>Result</q-item>
+        <q-item dark>Result</q-item>
         <q-field label="P">
           <big>{{ block.data.p | round }}</big>
         </q-field>

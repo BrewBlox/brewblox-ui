@@ -335,10 +335,10 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
     <q-card-main class="row">
       <div>
         <q-list no-border>
-          <q-item>
+          <q-item dark>
             <big>Settings</big>
           </q-item>
-          <q-item>
+          <q-item dark>
             <q-field label="Fridge temperature" orientation="vertical" style="max-width: 200px;">
               <UnitPopupEdit
                 :field="fridgeSetpointValue"
@@ -348,7 +348,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
               />
             </q-field>
           </q-item>
-          <q-item>
+          <q-item dark>
             <q-field label="Beer temperature" orientation="vertical" style="max-width: 200px;">
               <UnitPopupEdit
                 :field="beerSetpointValue"

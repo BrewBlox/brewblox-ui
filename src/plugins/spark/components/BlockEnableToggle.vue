@@ -24,7 +24,7 @@ export default class BlockEnableToggle extends BlockForm {
 </script>
 
 <template>
-  <q-item>
+  <q-item dark>
     <q-item-main>
       <p>{{ mainText }}</p>
     </q-item-main>

@@ -23,8 +23,8 @@ export default class BlockSettings extends BlockForm {
 
 <template>
   <q-list>
-    <q-item>
-      <q-item-section side>Block ID</q-item-section>
+    <q-item dark>
+      <q-item-section>Block ID</q-item-section>
       <q-item-section>
         <InputPopupEdit
           :field="block.id"
@@ -34,16 +34,16 @@ export default class BlockSettings extends BlockForm {
         />
       </q-item-section>
     </q-item>
-    <q-item>
-      <q-item-section side>Block Type</q-item-section>
+    <q-item dark>
+      <q-item-section>Block Type</q-item-section>
       <q-item-section>{{ block.type }}</q-item-section>
     </q-item>
-    <q-item>
-      <q-item-section side>Part of service</q-item-section>
+    <q-item dark>
+      <q-item-section>Part of service</q-item-section>
       <q-item-section>{{ serviceId }}</q-item-section>
     </q-item>
-    <q-item>
-      <q-item-section side>Active in groups</q-item-section>
+    <q-item dark>
+      <q-item-section>Active in groups</q-item-section>
       <q-item-section>
         <GroupsPopupEdit
           :field="block.groups"
@@ -53,8 +53,8 @@ export default class BlockSettings extends BlockForm {
         />
       </q-item-section>
     </q-item>
-    <q-item v-if="$props.presetsData.length > 0">
-      <q-item-section side>Apply preset</q-item-section>
+    <q-item v-if="$props.presetsData.length > 0" dark>
+      <q-item-section>Apply preset</q-item-section>
       <q-item-section>
         <SelectPopupEdit
           :field="block.data"

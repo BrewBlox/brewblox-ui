@@ -27,10 +27,10 @@ export default class PidForm extends BlockForm {
 <template>
   <div class="widget-modal column">
     <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block" />
-    <q-collapsible
+    <q-expansion-item class="text-h6"
       opened
       group="modal"
-      class="col-12"
+      
       icon="mdi-calculator-variant"
       label="Settings"
     >
@@ -46,7 +46,7 @@ export default class PidForm extends BlockForm {
           <q-item-label class="justify-center">
 Input
             <q-item-label header>
-              <q-item>
+              <q-item dark>
                 <q-item-side left class="label">
 Block
 </q-item-side>
@@ -67,7 +67,7 @@ Block
                   </LinkPopupEdit>
                 </q-item-main>
               </q-item>
-              <q-item>
+              <q-item dark>
                 <q-item-side left class="label">
 Target value is
 </q-item-side>
@@ -75,7 +75,7 @@ Target value is
                   <b>{{ block.data.inputSetting | unit }}</b>
                 </q-item-main>
               </q-item>
-              <q-item>
+              <q-item dark>
                 <q-item-side left class="label">
 Current value is
 </q-item-side>
@@ -90,7 +90,7 @@ Current value is
           <q-item-label class="justify-center">
 Output
             <q-item-label header>
-              <q-item>
+              <q-item dark>
                 <q-item-side left class="label">
 Block
 </q-item-side>
@@ -114,7 +114,7 @@ Block
                   </LinkPopupEdit>
                 </q-item-main>
               </q-item>
-              <q-item>
+              <q-item dark>
                 <q-item-side left class="label">
 Target value is
 </q-item-side>
@@ -122,7 +122,7 @@ Target value is
                   <b>{{ block.data.outputSetting | round }}</b>
                 </q-item-main>
               </q-item>
-              <q-item>
+              <q-item dark>
                 <q-item-side left class="label">
 Current value is
 </q-item-side>
@@ -137,7 +137,7 @@ Current value is
           <q-item-label class="justify-center">
 Filtering
             <q-item-label header>
-              <q-item>
+              <q-item dark>
                 <q-item-side left class="label">
 Filter period
 </q-item-side>
@@ -157,7 +157,7 @@ Filter period
                   </SelectPopupEdit>
                 </q-item-main>
               </q-item>
-              <q-item>
+              <q-item dark>
                 <q-item-side left class="label">
 Fast step threshold
 </q-item-side>
@@ -310,11 +310,11 @@ Fast step threshold
 {{ block.data.p + block.data.i + block.data.d | round }}
 </q-field>
       </div>
-    </q-collapsible>
+    </q-expansion-item>
 
-    <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
+    <q-expansion-item class="text-h6" group="modal" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="$props" :presets-data="presets()" />
-    </q-collapsible>
+    </q-expansion-item>
   </div>
 </template>
 

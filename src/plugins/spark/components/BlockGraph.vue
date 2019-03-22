@@ -133,7 +133,7 @@ export default class BlockGraph extends Vue {
                 />
               </q-item-main>
             </q-item>
-            <q-collapsible label="Left or right axis">
+            <q-expansion-item class="text-h6" label="Left or right axis">
               <q-list link no-border>
                 <q-item
                   v-for="[key, renamed] in targetKeys"
@@ -144,7 +144,7 @@ export default class BlockGraph extends Vue {
                   <q-item-main>{{ renamed }}</q-item-main>
                 </q-item>
               </q-list>
-            </q-collapsible>
+            </q-expansion-item>
           </q-list>
         </q-btn-dropdown>
         <q-btn v-close-overlay flat label="close"/>

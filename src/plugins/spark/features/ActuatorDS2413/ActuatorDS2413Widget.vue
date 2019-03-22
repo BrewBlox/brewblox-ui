@@ -19,7 +19,7 @@ export default class ActuatorDS2413Widget extends BlockWidget {
 </script>
 
 <template>
-  <q-card dark class="column">
+  <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <ActuatorDS2413Form
         v-if="modalOpen"
@@ -30,34 +30,37 @@ export default class ActuatorDS2413Widget extends BlockWidget {
         :on-switch-block-id="switchBlockId"
       />
     </q-dialog>
-    <q-card-title class="title-bar">
-      <div class="ellipsis">{{ widgetId }}</div>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
-      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
-      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
-    </q-card-title>
-    <q-card-separator/>
 
-    <q-card-main class="column widget-body">
-      <div class="full-width">
-        <q-field label="State">
+    <BlockWidgetToolbar :field="me" graph/>
+
+    <q-card-section>
+      <q-item dark>
+        <q-item-section>State</q-item-section>
+        <q-item-section>
           <ActuatorState
             :field="block.data.state"
             :change="callAndSaveBlock(v => block.data.state = v)"
             :disable="isDriven"
           />
-          <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
-        </q-field>
-        <q-field label="Constraints">
+        </q-item-section>
+      </q-item>
+      <q-item v-if="isDriven">
+        <q-item-section>Driven</q-item-section>
+        <q-item-section>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-label>Constraints</q-item-label>
+        <q-item-section>
           <DigitalConstraints
             :service-id="serviceId"
             :field="block.data.constrainedBy"
             :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
             readonly
           />
-        </q-field>
-      </div>
-    </q-card-main>
+        </q-item-section>
+      </q-item>
+    </q-card-section>
   </q-card>
 </template>

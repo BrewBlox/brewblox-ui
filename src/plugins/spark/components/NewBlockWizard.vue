@@ -134,7 +134,7 @@ export default class NewBlockWizard extends Vue {
       </q-card-title>
       <q-card-main>
         <q-list no-border>
-          <q-item>
+          <q-item dark>
             <q-search v-model="searchModel" placeholder="Search"/>
           </q-item>
         </q-list>

@@ -114,7 +114,7 @@ export default class SessionViewWidget extends WidgetBase {
     <q-card-separator/>
     <q-card-main class="column widget-body">
       <div class="full-width">
-        <q-item>
+        <q-item dark>
           <q-item-main>
             <q-input v-model="sessionFilter" placeholder="Search Session" clearable/>
           </q-item-main>

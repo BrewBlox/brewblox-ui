@@ -26,9 +26,9 @@ export default class ActuatorAnalogMockForm extends BlockForm {
     <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
 
     <q-card-section>
-      <q-expansion-item opened group="modal" icon="settings" label="Settings">
-        <q-item>
-          <q-item-section side>Supported setting min</q-item-section>
+      <q-expansion-item class="text-h6" opened group="modal" icon="settings" label="Settings">
+        <q-item dark>
+          <q-item-section>Supported setting min</q-item-section>
           <q-item-section>
             <InputPopupEdit
               :field="block.data.minSetting"
@@ -38,8 +38,13 @@ export default class ActuatorAnalogMockForm extends BlockForm {
             />
           </q-item-section>
         </q-item>
-        <q-item>
-          <q-item-section side>Setting</q-item-section>
+        <q-item dark>
+          <q-item-section>
+            <div class="column">
+              <span>Setting</span>
+              <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+            </div>
+          </q-item-section>
           <q-item-section>
             <InputPopupEdit
               v-if="!isDriven"
@@ -51,14 +56,8 @@ export default class ActuatorAnalogMockForm extends BlockForm {
             <big v-else>{{ block.data.setting | unit }}</big>
           </q-item-section>
         </q-item>
-        <q-item v-if="driven">
-          <q-item-section side>Driven</q-item-section>
-          <q-item-section>
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section side>Supported setting max</q-item-section>
+        <q-item dark>
+          <q-item-section>Supported setting max</q-item-section>
           <q-item-section>
             <InputPopupEdit
               :field="block.data.maxSetting"
@@ -68,8 +67,8 @@ export default class ActuatorAnalogMockForm extends BlockForm {
             />
           </q-item-section>
         </q-item>
-        <q-item>
-          <q-item-section side>Value min (clipping)</q-item-section>
+        <q-item dark>
+          <q-item-section>Value min (clipping)</q-item-section>
           <q-item-section>
             <InputPopupEdit
               :field="block.data.minValue"
@@ -79,14 +78,14 @@ export default class ActuatorAnalogMockForm extends BlockForm {
             />
           </q-item-section>
         </q-item>
-        <q-item>
-          <q-item-section side>Value</q-item-section>
+        <q-item dark>
+          <q-item-section>Value</q-item-section>
           <q-item-section>
             <big>{{ block.data.value | round }}</big>
           </q-item-section>
         </q-item>
-        <q-item>
-          <q-item-section side>Value max (clipping)</q-item-section>
+        <q-item dark>
+          <q-item-section>Value max (clipping)</q-item-section>
           <q-item-section>
             <InputPopupEdit
               :field="block.data.minValue"
@@ -98,9 +97,13 @@ export default class ActuatorAnalogMockForm extends BlockForm {
         </q-item>
       </q-expansion-item>
 
-      <q-expansion-item group="modal" icon="mdi-less-than-or-equal" label="Constraints">
-        <q-item>
-          <q-item-section side>Constraints</q-item-section>
+      <q-expansion-item
+        class="text-h6"
+        group="modal"
+        icon="mdi-less-than-or-equal"
+        label="Constraints"
+      >
+        <q-item dark>
           <q-item-section>
             <AnalogConstraints
               :service-id="block.serviceId"
@@ -111,7 +114,7 @@ export default class ActuatorAnalogMockForm extends BlockForm {
         </q-item>
       </q-expansion-item>
 
-      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
+      <q-expansion-item class="text-h6" group="modal" icon="mdi-cube" label="Block Settings">
         <BlockSettings v-bind="$props" :presets-data="presets()"/>
       </q-expansion-item>
     </q-card-section>

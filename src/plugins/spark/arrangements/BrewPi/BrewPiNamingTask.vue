@@ -160,27 +160,27 @@ export default class BrewPiNamingTask extends WizardTaskBase {
     <q-card-main class="row">
       <div>
         <q-list no-border>
-          <q-item>
+          <q-item dark>
             <big>Arrangement</big>
           </q-item>
-          <q-item>
+          <q-item dark>
             <q-select v-model="serviceId" :options="serviceOpts" float-label="Service"/>
           </q-item>
-          <q-item>
+          <q-item dark>
             <q-input
               v-model="arrangementId"
               :after="[{icon: 'mdi-backup-restore', handler: () => clearKey('arrangementId')}]"
               float-label="Arrangement name"
             />
           </q-item>
-          <q-item>
+          <q-item dark>
             <q-input
               v-model="prefix"
               :after="[{icon: 'mdi-backup-restore', handler: () => clearKey('prefix')}]"
               float-label="Widget prefix"
             />
           </q-item>
-          <q-item>
+          <q-item dark>
             <q-input
               v-model="dashboardTitle"
               :error="!dashboardTitle"
@@ -188,7 +188,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
               float-label="Dashboard"
             />
           </q-item>
-          <q-item>
+          <q-item dark>
             <q-field label="Groups" orientation="vertical" style="max-width: 200px;">
               <GroupsPopupEdit
                 v-if="serviceId"
@@ -204,7 +204,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
       </div>
       <div>
         <q-list no-border>
-          <q-item>
+          <q-item dark>
             <big>Widget Names</big>
           </q-item>
           <q-item v-for="(nVal, nKey) in names" :key="nKey">

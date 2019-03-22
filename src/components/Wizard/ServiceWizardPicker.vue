@@ -134,7 +134,7 @@ export default class ServiceWizardPicker extends Vue {
         />
       </q-field>
       <q-field label="Service type" icon="widgets" orientation="vertical">
-        <q-item>
+        <q-item dark>
           <q-search v-model="searchModel" placeholder="Search"/>
         </q-item>
         <q-list link inset-separator>
