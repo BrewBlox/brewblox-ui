@@ -39,42 +39,39 @@ export default class DisplaySettingsWidget extends BlockWidget {
     <BlockWidgetToolbar :field="me"/>
 
     <q-card-section>
-      <q-item>
-        <q-item-section v-for="(slot, idx) in displaySlots.slice(0, 3)" :key="idx">
-          <big v-if="slot" :style="slotStyle(slot)">{{ slot.name }}</big>
-          <big v-else>Not set</big>
-        </q-item-section>
-      </q-item>
-      <q-item>
-        <q-item-section v-for="(slot, idx) in displaySlots.slice(3, 6)" :key="idx">
-          <big v-if="slot" :style="slotStyle(slot)">{{ slot.name }}</big>
-          <big v-else>Not set</big>
-        </q-item-section>
-      </q-item>
+      <q-list dark dense>
+        <q-item v-for="(slot, idx) in displaySlots" :key="idx">
+          <q-item-section side>Slot {{ idx + 1 }}</q-item-section>
+          <q-item-section>
+            <big v-if="slot" :style="slotStyle(slot)">{{ slot.name }}</big>
+            <big v-else>Not set</big>
+          </q-item-section>
+        </q-item>
 
-      <q-item dark>
-        <q-item-section side>Footer text</q-item-section>
-        <q-item-section>
-          <InputPopupEdit
-            :field="block.data.name"
-            :change="callAndSaveBlock(v => block.data.name = v)"
-            label="footer text"
-            tag="span"
-          />
-        </q-item-section>
-      </q-item>
-      <q-item dark>
-        <q-item-section side>Temperature Unit</q-item-section>
-        <q-item-section>
-          <SelectPopupEdit
-            :field="block.data.tempUnit"
-            :options="[{ label: 'Celsius', value: 0 }, { label: 'Fahrenheit', value: 1 }]"
-            :change="callAndSaveBlock(v => block.data.tempUnit = v)"
-            label="Temperature Unit"
-            tag="span"
-          />
-        </q-item-section>
-      </q-item>
+        <q-item dark>
+          <q-item-section side>Footer text</q-item-section>
+          <q-item-section>
+            <InputPopupEdit
+              :field="block.data.name"
+              :change="callAndSaveBlock(v => block.data.name = v)"
+              label="footer text"
+              tag="span"
+            />
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section side>Temperature Unit</q-item-section>
+          <q-item-section>
+            <SelectPopupEdit
+              :field="block.data.tempUnit"
+              :options="[{ label: 'Celsius', value: 0 }, { label: 'Fahrenheit', value: 1 }]"
+              :change="callAndSaveBlock(v => block.data.tempUnit = v)"
+              label="Temperature Unit"
+              tag="span"
+            />
+          </q-item-section>
+        </q-item>
+      </q-list>
     </q-card-section>
   </q-card>
 </template>
