@@ -20,7 +20,7 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
 </script>
 
 <template>
-  <q-card dark class="column">
+  <q-card dark class="text-white nopad">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <ActuatorAnalogMockForm
         v-if="modalOpen"
@@ -31,18 +31,36 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
         :on-switch-block-id="switchBlockId"
       />
     </q-dialog>
-    <q-card-title class="title-bar">
-      <div class="ellipsis">{{ widgetId }}</div>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
-      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
-      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
-    </q-card-title>
-    <q-card-separator/>
-    <q-banner v-if="block.value === null" type="warning" color="warning">This Actuator is invalid</q-banner>
-    <q-card-main class="column widget-body">
-      <div class="full-width">
-        <q-field label="Setting">
+
+    <q-card-section class="q-pa-xs">
+      <q-item dark>
+        <q-item-section>
+          <q-item-label class="ellipsis text-h6">{{ widgetId }}</q-item-label>
+        </q-item-section>
+        <q-item-section side>{{ displayName }}</q-item-section>
+        <q-item-section side>
+          <q-btn flat round dense icon="refresh" @click="refreshBlock"/>
+        </q-item-section>
+        <q-item-section side>
+          <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
+        </q-item-section>
+        <q-item-section side>
+          <q-btn flat round dense icon="settings" @click="openModal"/>
+        </q-item-section>
+      </q-item>
+      <q-separator dark inset/>
+    </q-card-section>
+
+    <q-card-section>
+      <q-item v-if="block.value === null">
+        <q-item-section avatar>
+          <q-icon name="warning"></q-icon>
+        </q-item-section>
+        <q-item-section>This Actuator is invalid</q-item-section>
+      </q-item>
+      <q-item>
+        <q-item-section side>Setting</q-item-section>
+        <q-item-section>
           <InputPopupEdit
             v-if="!isDriven"
             :field="block.data.setting"
@@ -51,20 +69,31 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
             label="Setting"
           />
           <big v-else>{{ block.data.setting | unit }}</big>
+        </q-item-section>
+      </q-item>
+      <q-item v-if="isDriven">
+        <q-item-section side>Driven</q-item-section>
+        <q-item-section>
           <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
-        </q-field>
-        <q-field label="Value">
+        </q-item-section>
+      </q-item>
+      <q-item>
+        <q-item-section side>Value</q-item-section>
+        <q-item-section>
           <big>{{ block.data.value | round }}</big>
-        </q-field>
-        <q-field label="Constraints">
+        </q-item-section>
+      </q-item>
+      <q-item>
+        <q-item-section side>Constraints</q-item-section>
+        <q-item-section>
           <AnalogConstraints
             :service-id="serviceId"
             :field="block.data.constrainedBy"
             :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
             readonly
           />
-        </q-field>
-      </div>
-    </q-card-main>
+        </q-item-section>
+      </q-item>
+    </q-card-section>
   </q-card>
 </template>

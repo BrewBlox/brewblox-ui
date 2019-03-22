@@ -16,7 +16,8 @@ export default class BlockWidgetSettings extends BlockForm {
 </script>
 
 <template>
-  <WidgetSettings v-bind="$props" slot-icon="mdi-cube">
+  <WidgetSettings v-bind="$props">
+    <q-icon name="mdi-cube"/>
     <SelectPopupEdit
       v-if="!$props.volatile && $props.onSwitchBlockId"
       :options="blockOptions"
@@ -24,6 +25,7 @@ export default class BlockWidgetSettings extends BlockForm {
       :change="$props.onSwitchBlockId"
       label="Block"
       tag="span"
+      class="text-h6"
     >Select a different block to be displayed by this widget.</SelectPopupEdit>
     <div v-else class="ellipsis">{{ block.id }}</div>
   </WidgetSettings>

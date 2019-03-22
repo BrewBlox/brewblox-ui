@@ -22,72 +22,98 @@ export default class ActuatorAnalogMockForm extends BlockForm {
 </script>
 
 <template>
-  <div class="widget-modal column">
+  <q-card dark class="widget-modal">
     <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
-    <q-collapsible opened group="modal" class="col-12" icon="settings" label="Settings">
-      <div>
-        <q-field label="Supported setting min">
-          <InputPopupEdit
-            :field="block.data.minSetting"
-            :change="callAndSaveBlock(v => block.data.minSetting = v)"
-            type="number"
-            label="supported setting min"
-          />
-        </q-field>
-        <q-field label="Setting">
-          <InputPopupEdit
-            v-if="!isDriven"
-            :field="block.data.setting"
-            :change="callAndSaveBlock(v => block.data.setting = v)"
-            type="number"
-            label="target"
-          />
-          <big v-else>{{ block.data.setting | unit }}</big>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
-        </q-field>
-        <q-field label="Supported setting max">
-          <InputPopupEdit
-            :field="block.data.maxSetting"
-            :change="callAndSaveBlock(v => block.data.maxSetting = v)"
-            type="number"
-            label="supported setting max"
-          />
-        </q-field>
-        <q-field label="Value min (clipping)">
-          <InputPopupEdit
-            :field="block.data.minValue"
-            :change="callAndSaveBlock(v => block.data.minValue = v)"
-            type="number"
-            label="value min"
-          />
-        </q-field>
-        <q-field label="Value">
-          <big>{{ block.data.value | round }}</big>
-        </q-field>
-        <q-field label="Value max (clipping)">
-          <InputPopupEdit
-            :field="block.data.maxValue"
-            :change="callAndSaveBlock(v => block.data.maxValue = v)"
-            type="number"
-            label="value max"
-          />
-        </q-field>
-      </div>
-    </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="mdi-less-than-or-equal" label="Constraints">
-      <div>
-        <q-field label="Constraints" orientation="vertical">
-          <AnalogConstraints
-            :service-id="block.serviceId"
-            :field="block.data.constrainedBy"
-            :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
-          />
-        </q-field>
-      </div>
-    </q-collapsible>
 
-    <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
-      <BlockSettings v-bind="$props" :presets-data="presets()"/>
-    </q-collapsible>
-  </div>
+    <q-card-section>
+      <q-expansion-item opened group="modal" icon="settings" label="Settings">
+        <q-item>
+          <q-item-section side>Supported setting min</q-item-section>
+          <q-item-section>
+            <InputPopupEdit
+              :field="block.data.minSetting"
+              :change="callAndSaveBlock(v => block.data.minSetting = v)"
+              type="number"
+              label="supported setting min"
+            />
+          </q-item-section>
+        </q-item>
+        <q-item>
+          <q-item-section side>Setting</q-item-section>
+          <q-item-section>
+            <InputPopupEdit
+              v-if="!isDriven"
+              :field="block.data.setting"
+              :change="callAndSaveBlock(v => block.data.setting = v)"
+              type="number"
+              label="target"
+            />
+            <big v-else>{{ block.data.setting | unit }}</big>
+          </q-item-section>
+        </q-item>
+        <q-item v-if="driven">
+          <q-item-section side>Driven</q-item-section>
+          <q-item-section>
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          </q-item-section>
+        </q-item>
+        <q-item>
+          <q-item-section side>Supported setting max</q-item-section>
+          <q-item-section>
+            <InputPopupEdit
+              :field="block.data.maxSetting"
+              :change="callAndSaveBlock(v => block.data.maxSetting = v)"
+              type="number"
+              label="supported setting max"
+            />
+          </q-item-section>
+        </q-item>
+        <q-item>
+          <q-item-section side>Value min (clipping)</q-item-section>
+          <q-item-section>
+            <InputPopupEdit
+              :field="block.data.minValue"
+              :change="callAndSaveBlock(v => block.data.minValue = v)"
+              type="number"
+              label="value min"
+            />
+          </q-item-section>
+        </q-item>
+        <q-item>
+          <q-item-section side>Value</q-item-section>
+          <q-item-section>
+            <big>{{ block.data.value | round }}</big>
+          </q-item-section>
+        </q-item>
+        <q-item>
+          <q-item-section side>Value max (clipping)</q-item-section>
+          <q-item-section>
+            <InputPopupEdit
+              :field="block.data.minValue"
+              :change="callAndSaveBlock(v => block.data.minValue = v)"
+              type="number"
+              label="value min"
+            />
+          </q-item-section>
+        </q-item>
+      </q-expansion-item>
+
+      <q-expansion-item group="modal" icon="mdi-less-than-or-equal" label="Constraints">
+        <q-item>
+          <q-item-section side>Constraints</q-item-section>
+          <q-item-section>
+            <AnalogConstraints
+              :service-id="block.serviceId"
+              :field="block.data.constrainedBy"
+              :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+            />
+          </q-item-section>
+        </q-item>
+      </q-expansion-item>
+
+      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
+        <BlockSettings v-bind="$props" :presets-data="presets()"/>
+      </q-expansion-item>
+    </q-card-section>
+  </q-card>
 </template>

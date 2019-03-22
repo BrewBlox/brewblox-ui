@@ -236,14 +236,18 @@ export default class DashboardPage extends Vue {
       </portal>
       <portal to="toolbar-buttons">
         <q-btn-dropdown color="primary" label="actions">
-          <q-list dark link>
-            <q-item @click.native="widgetEditable = !widgetEditable">
-              <q-item-side :icon="widgetEditable ? 'check' : 'mode edit'"/>
-              <q-item-main :label="widgetEditable ? 'Stop editing' : 'Edit Dashboard'"/>
+          <q-list dark>
+            <q-item clickable @click.native="widgetEditable = !widgetEditable">
+              <q-item-section avatar>
+                <q-icon :name="widgetEditable ? 'check' : 'edit'"></q-icon>
+              </q-item-section>
+              <q-item-section>{{ widgetEditable ? 'Stop editing' : 'Edit Dashboard' }}</q-item-section>
             </q-item>
-            <q-item @click.native="() => wizardModalOpen = true">
-              <q-item-side icon="add"/>
-              <q-item-main label="New Widget"/>
+            <q-item clickable @click.native="() => wizardModalOpen = true">
+              <q-item-section avatar>
+                <q-icon name="add"></q-icon>
+              </q-item-section>
+              <q-item-section>New Widget</q-item-section>
             </q-item>
           </q-list>
         </q-btn-dropdown>

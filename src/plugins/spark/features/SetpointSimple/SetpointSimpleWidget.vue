@@ -23,7 +23,7 @@ export default class SetpointSimpleWidget extends BlockWidget {
 </script>
 
 <template>
-  <q-card dark class="column">
+  <q-card dark class="text-white nopad">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <SetpointSimpleForm
         v-if="modalOpen"
@@ -34,18 +34,36 @@ export default class SetpointSimpleWidget extends BlockWidget {
         :on-switch-block-id="switchBlockId"
       />
     </q-dialog>
-    <q-card-title class="title-bar">
-      <div class="ellipsis">{{ widgetId }}</div>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
-      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
-      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
-    </q-card-title>
-    <q-card-separator/>
-    <q-banner v-if="block.data.value === null" type="warning" color="warn">This Setpoint is invalid</q-banner>
-    <q-card-main class="column widget-body">
-      <div class="full-width">
-        <q-field :label="block.data.enabled ? 'Target' : 'Target when enabled'">
+
+    <q-card-section class="q-pa-xs">
+      <q-item dark>
+        <q-item-section>
+          <q-item-label class="ellipsis text-h6">{{ widgetId }}</q-item-label>
+        </q-item-section>
+        <q-item-section side>{{ displayName }}</q-item-section>
+        <q-item-section side>
+          <q-btn flat round dense icon="refresh" @click="refreshBlock"/>
+        </q-item-section>
+        <q-item-section side>
+          <BlockGraph :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
+        </q-item-section>
+        <q-item-section side>
+          <q-btn flat round dense icon="settings" @click="openModal"/>
+        </q-item-section>
+      </q-item>
+      <q-separator dark inset/>
+    </q-card-section>
+
+    <q-card-section>
+      <q-item v-if="block.data.value === null">
+        <q-item-section avatar>
+          <q-icon name="warning"></q-icon>
+        </q-item-section>
+        <q-item-section>This Setpoint is invalid</q-item-section>
+      </q-item>
+      <q-item>
+        <q-item-section side>{{ block.data.enabled ? 'Target' : 'Target when enabled' }}</q-item-section>
+        <q-item-section>
           <UnitPopupEdit
             v-if="!isDriven"
             :class="{ darkened: block.data.setting.value === null }"
@@ -58,20 +76,17 @@ export default class SetpointSimpleWidget extends BlockWidget {
             :class="{ darkened: block.data.setting.value === null }"
           >{{ block.data.setpoint | unit }}</big>
           <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
-        </q-field>
-        <q-field label="Enabled">
+        </q-item-section>
+      </q-item>
+      <q-item>
+        <q-item-section side>Enabled</q-item-section>
+        <q-item-section>
           <q-toggle
             :value="block.data.enabled"
             @input="v => { block.data.enabled = v; saveBlock() }"
           />
-        </q-field>
-      </div>
-    </q-card-main>
+        </q-item-section>
+      </q-item>
+    </q-card-section>
   </q-card>
 </template>
-
-<style lang="stylus" scoped>
-/deep/ .widget-body .q-field-margin {
-  margin-top: 0px;
-}
-</style>
