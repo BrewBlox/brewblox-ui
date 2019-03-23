@@ -26,16 +26,12 @@ export default class ActuatorPwmForm extends BlockForm {
 
     <q-card-section>
       <q-expansion-item class="text-h6" opened group="modal" icon="settings" label="Settings">
-        <q-item dark>
-          <q-item-section>
-            <BlockEnableToggle
-              v-bind="$props"
-              :block="block"
-              :text-enabled="`PWM is enabled: ${block.data.actuatorId} will be toggled automatically.`"
-              :text-disabled="`PWM is disabled: ${block.data.actuatorId} will not be toggled.`"
-            />
-          </q-item-section>
-        </q-item>
+        <BlockEnableToggle
+          v-bind="$props"
+          :text-enabled="`PWM is enabled: ${block.data.actuatorId} will be toggled automatically.`"
+          :text-disabled="`PWM is disabled: ${block.data.actuatorId} will not be toggled.`"
+        />
+
         <q-item dark>
           <q-item-section>Digital Actuator Target</q-item-section>
           <q-item-section>

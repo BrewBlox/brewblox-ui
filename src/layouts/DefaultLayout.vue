@@ -118,11 +118,11 @@ export default class DefaultLayout extends Vue {
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" content-class="bg-dark">
-      <q-list separator dark>
+    <q-drawer v-model="leftDrawerOpen" content-class="bg-dark" elevated>
+      <q-list dark>
         <q-item exact to="/">
           <q-item-section avatar>
-            <q-icon name="mdi-home"></q-icon>
+            <q-icon name="mdi-home"/>
           </q-item-section>
           <q-item-section>Main menu</q-item-section>
         </q-item>
@@ -131,20 +131,18 @@ export default class DefaultLayout extends Vue {
 
         <q-item clickable @click.native="wizardModalOpen = true">
           <q-item-section avatar>
-            <q-icon name="add"></q-icon>
+            <q-icon name="add"/>
           </q-item-section>
           <q-item-section>Wizardry</q-item-section>
         </q-item>
 
         <q-separator dark/>
 
-        <q-item dark>
-          <q-item-section side>
+        <q-item dark class="q-pb-none">
+          <q-item-section avatar>
             <q-icon name="dashboard"/>
           </q-item-section>
-          <q-item-section>
-            <q-item-label header>Dashboards</q-item-label>
-          </q-item-section>
+          <q-item-section>Dashboards</q-item-section>
           <q-item-section side>
             <q-btn
               :disable="dashboards.length === 0"
@@ -168,17 +166,22 @@ export default class DefaultLayout extends Vue {
             :key="dashboard.id"
             :link="!dashboardEditing"
             :to="dashboardEditing ? undefined : `/dashboard/${dashboard.id}`"
+            dark
+            style="min-height: 0px"
+            class="q-pb-sm"
           >
-            <q-item-section>
+            <q-item-section side v-if="dashboardEditing">
+              <q-icon name="mdi-drag-vertical"/>
+            </q-item-section>
+            <q-item-section v-if="dashboardEditing">
               <InputPopupEdit
-                v-if="dashboardEditing"
                 :field="dashboard.title"
                 :change="v => changeDashboardTitle(dashboard, v)"
                 label="Title"
                 tag="span"
               />
-              <span v-else>{{ dashboard.title }}</span>
             </q-item-section>
+            <q-item-section v-else>{{ dashboard.title }}</q-item-section>
             <q-item-section v-if="dashboardEditing" side>
               <div class="row">
                 <q-btn
@@ -196,12 +199,12 @@ export default class DefaultLayout extends Vue {
 
         <q-separator dark/>
 
-        <q-item dark>
-          <q-item-section side>
-            <q-icon name="cloud"></q-icon>
+        <q-item dark class="q-pb-none">
+          <q-item-section avatar>
+            <q-icon name="cloud"/>
           </q-item-section>
           <q-item-section>
-            <q-item-label header>Services</q-item-label>
+            <q-item-section>Services</q-item-section>
           </q-item-section>
           <q-item-section side>
             <q-btn
@@ -227,18 +230,22 @@ export default class DefaultLayout extends Vue {
             :key="service.id"
             :link="!serviceEditing"
             :to="serviceEditing ? undefined : `/service/${service.id}`"
+            dark
+            style="min-height: 0px"
+            class="q-pb-sm"
           >
-            <q-item-section>
+            <q-item-section side v-if="serviceEditing">
+              <q-icon name="mdi-drag-vertical"/>
+            </q-item-section>
+            <q-item-section v-if="serviceEditing">
               <InputPopupEdit
-                v-if="serviceEditing"
                 :field="service.title"
                 :change="v => changeServiceTitle(service, v)"
                 label="Title"
                 tag="span"
               />
-              <span v-else>{{ service.title }}</span>
             </q-item-section>
-
+            <q-item-section v-else>{{ service.title }}</q-item-section>
             <q-item-section v-if="serviceEditing" side>
               <q-btn round flat icon="delete" @click="removeService(service)"/>
             </q-item-section>

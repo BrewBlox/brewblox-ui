@@ -62,7 +62,7 @@ export default class ActuatorPwmWidget extends BlockWidget {
           </span>
         </q-item-section>
         <q-item-section side>
-          <q-btn text-color="white" label="Enable" @click="enable"/>
+          <q-btn text-color="white" flat label="Enable" @click="enable"/>
         </q-item-section>
       </q-item>
 
