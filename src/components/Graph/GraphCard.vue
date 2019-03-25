@@ -139,9 +139,13 @@ export default class GraphCard extends Vue {
       :layout="metricLayout"
       :revision="revision"
     />
-    <div v-else class="alert-container">
-      <q-banner icon="warning" color="warning">{{ error }}</q-banner>
-    </div>
+    <q-item v-else dark class="absolute-center">
+      <q-item-section avatar>
+        <q-icon name="warning"/>
+      </q-item-section>
+      <q-item-section>{{ error }}</q-item-section>
+    </q-item>
+
     <div class="row graph-controls z-top">
       <slot/>
     </div>
@@ -152,14 +156,6 @@ export default class GraphCard extends Vue {
 .parent {
   width: 100%;
   height: 100%;
-}
-.alert-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
 }
 </style>
 

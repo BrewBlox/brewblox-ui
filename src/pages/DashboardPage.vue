@@ -261,12 +261,14 @@ export default class DashboardPage extends Vue {
       </q-dialog>
       <q-list v-if="isMobile" no-border>
         <q-item v-for="val in validatedItems" :key="val.item.id">
-          <component
-            :disabled="widgetEditable"
-            :is="val.component"
-            v-bind="val.props"
-            class="dashboard-item"
-          />
+          <q-item-section>
+            <component
+              :disabled="widgetEditable"
+              :is="val.component"
+              v-bind="val.props"
+              class="dashboard-item"
+            />
+          </q-item-section>
         </q-item>
       </q-list>
       <GridContainer

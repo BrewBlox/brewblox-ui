@@ -57,8 +57,8 @@ export default class GraphDisplay extends Vue {
         color: '#aef',
       },
     },
-    paper_bgcolor: '#1b1d21',
-    plot_bgcolor: '#1b1d21',
+    paper_bgcolor: '#282c34',
+    plot_bgcolor: '#282c34',
   };
   /* eslint-enable */
 

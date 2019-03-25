@@ -63,7 +63,9 @@ export default class UnitPopupEdit extends Vue {
       <div class="help-text text-weight-light q-my-md">
         <slot/>
       </div>
-      <q-input ref="input" :suffix="notation" v-model="placeholder" type="number" step="any" dark/>
+      <q-input ref="input" v-model="placeholder" type="number" step="any" dark>
+        <template v-slot:append>{{ notation }}</template>
+      </q-input>
     </q-popup-edit>
   </div>
 </template>

@@ -8,7 +8,6 @@ import { ValueAxes, QueryParams } from '@/store/history/state';
 import { fetchKnownKeys } from '@/store/history/actions';
 import { fields } from '@/store/history/getters';
 import Component from 'vue-class-component';
-import FieldPopupEdit from './FieldPopupEdit.vue';
 import has from 'lodash/has';
 
 interface PeriodDisplay {
@@ -17,11 +16,7 @@ interface PeriodDisplay {
   end: boolean;
 }
 
-@Component({
-  components: {
-    FieldPopupEdit,
-  },
-})
+@Component
 export default class GraphForm extends FormBase {
   period: PeriodDisplay | null = null;
   selectFilter: string | null = null;
@@ -135,104 +130,140 @@ export default class GraphForm extends FormBase {
 </script>
 
 <template>
-  <div class="widget-modal column">
+  <q-card dark class="widget-modal">
     <WidgetSettings v-if="!$props.embedded" v-bind="$props"/>
 
-    <q-expansion-item group="modal" icon="mdi-timetable" label="Period settings">
-      <div>
-        <q-field label="Display type">
-          <SelectPopupEdit
-            :field="shownPeriod"
-            :options="periodOptions"
-            :change="callAndSaveConfig(v => shownPeriod = v)"
-            label="Display type"
-          />
-        </q-field>
-        <q-item-separator/>
-        <q-field v-if="shownPeriod.start" label="Start time">
-          <DatetimePopupEdit
-            :field="config.params.start"
-            :change="callAndSaveConfig(v => config.params.start = v)"
-            label="Start time"
-            tag="big"
-          />
-        </q-field>
-        <q-field v-if="shownPeriod.duration" label="Duration">
-          <InputPopupEdit
-            :field="config.params.duration"
-            :change="callAndSaveConfig(v => config.params.duration = parseDuration(v))"
-            clearable
-            label="Duration"
-          />
-        </q-field>
-        <q-field v-if="shownPeriod.end" label="End time">
-          <DatetimePopupEdit
-            :field="config.params.end"
-            :change="callAndSaveConfig(v => config.params.end = v)"
-            label="End time"
-            tag="big"
-          />
-        </q-field>
-      </div>
-    </q-expansion-item>
-
-    <q-expansion-item group="modal" icon="mdi-file-tree" label="Metrics">
-      <div>
-        <div class="q-mb-sm row no-wrap items-center">
-          <q-input v-model="selectFilter" stack-label="Filter" class="q-ma-none" clearable/>
-        </div>
-        <q-tree
-          :nodes="nodes"
-          :ticked.sync="selected"
-          :filter="selectFilter"
-          tick-strategy="leaf-filtered"
-          dark
-          node-key="value"
-        />
-      </div>
-    </q-expansion-item>
-
-    <q-expansion-item group="modal" icon="mdi-tag-multiple" label="Legend">
-      <q-list no-border separator>
+    <q-card-section>
+      <q-expansion-item group="modal" icon="mdi-timetable" label="Period settings">
         <q-item dark>
-          <q-item-main>Metric</q-item-main>Display as
+          <q-item-section>Display type</q-item-section>
+          <q-item-section>
+            <SelectPopupEdit
+              :field="shownPeriod"
+              :options="periodOptions"
+              :change="callAndSaveConfig(v => shownPeriod = v)"
+              label="Display type"
+            />
+          </q-item-section>
         </q-item>
-        <q-item v-for="field in selected" :key="field">
-          <q-item-main>{{ field }}</q-item-main>
-          <InputPopupEdit
-            :field="renames[field]"
-            :change="callAndSaveConfig(v => config.renames[field] = v)"
-            label="Legend"
-            clearable
-            tag="span"
-          />
+        <q-separator dark inset/>
+        <q-item v-if="shownPeriod.start" dark>
+          <q-item-section>Start time</q-item-section>
+          <q-item-section>
+            <DatetimePopupEdit
+              :field="config.params.start"
+              :change="callAndSaveConfig(v => config.params.start = v)"
+              label="Start time"
+              tag="big"
+            />
+          </q-item-section>
         </q-item>
-        <q-item v-if="!selected || selected.length === 0">
-          <q-item-main class="darkened">No metrics selected</q-item-main>
+        <q-item v-if="shownPeriod.duration" dark>
+          <q-item-section>Duration</q-item-section>
+          <q-item-section>
+            <InputPopupEdit
+              :field="config.params.duration"
+              :change="callAndSaveConfig(v => config.params.duration = parseDuration(v))"
+              clearable
+              label="Duration"
+            />
+          </q-item-section>
         </q-item>
-      </q-list>
-    </q-expansion-item>
+        <q-item v-if="shownPeriod.end" dark>
+          <q-item-section>End time</q-item-section>
+          <q-item-section>
+            <DatetimePopupEdit
+              :field="config.params.end"
+              :change="callAndSaveConfig(v => config.params.end = v)"
+              label="End time"
+              tag="big"
+            />
+          </q-item-section>
+        </q-item>
+      </q-expansion-item>
 
-    <q-expansion-item group="modal" icon="mdi-chart-line" label="Axes">
-      <q-list no-border separator>
+      <q-expansion-item group="modal" icon="mdi-file-tree" label="Metrics">
         <q-item dark>
-          <q-item-main>Metric</q-item-main>Left or right axis
+          <q-item-section>
+            <q-input
+              v-model="selectFilter"
+              placeholder="Filter keys"
+              class="q-ma-none"
+              dark
+              clearable
+            >
+              <template v-slot:append>
+                <q-icon name="search"/>
+              </template>
+            </q-input>
+          </q-item-section>
         </q-item>
+        <q-item dark>
+          <q-item-section>
+            <q-btn flat label="clear" icon="clear" @click="selected = []"/>
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>
+            <q-tree
+              :nodes="nodes"
+              :ticked.sync="selected"
+              :filter="selectFilter"
+              tick-strategy="leaf-filtered"
+              dark
+              node-key="value"
+            />
+          </q-item-section>
+        </q-item>
+      </q-expansion-item>
+
+      <q-expansion-item group="modal" icon="mdi-tag-multiple" label="Legend">
+        <q-item dark>
+          <q-item-section>Metric</q-item-section>
+          <q-item-section>Display as</q-item-section>
+        </q-item>
+        <q-separator dark inset/>
+        <q-item v-for="field in selected" :key="field" dark>
+          <q-item-section>{{ field }}</q-item-section>
+          <q-item-section>
+            <InputPopupEdit
+              :field="renames[field]"
+              :change="callAndSaveConfig(v => config.renames[field] = v)"
+              label="Legend"
+              clearable
+              tag="span"
+            />
+          </q-item-section>
+        </q-item>
+        <q-item v-if="!selected || selected.length === 0" dark>
+          <q-item-section side>No metrics selected</q-item-section>
+        </q-item>
+      </q-expansion-item>
+
+      <q-expansion-item group="modal" icon="mdi-chart-line" label="Axes">
+        <q-item dark>
+          <q-item-section>Metric</q-item-section>
+          <q-item-section side>Left or right axis</q-item-section>
+        </q-item>
+        <q-separator dark inset/>
         <q-item
           v-for="field in selected"
           :key="field"
-          link
-          @click.native="updateAxisSide(field, !isRightAxis(field))"
+          dark
+          clickable
+          @click="updateAxisSide(field, !isRightAxis(field))"
         >
-          <q-item-main>{{ field }}</q-item-main>
-          <q-icon :class="{mirrored: isRightAxis(field)}" name="mdi-chart-line" size="30px"/>
+          <q-item-section>{{ field }}</q-item-section>
+          <q-item-section side>
+            <q-icon :class="{mirrored: isRightAxis(field)}" name="mdi-chart-line" size="30px"/>
+          </q-item-section>
         </q-item>
-        <q-item v-if="!selected || selected.length === 0">
-          <q-item-main class="darkened">No metrics selected</q-item-main>
+        <q-item v-if="!selected || selected.length === 0" dark>
+          <q-item-section side>No metrics selected</q-item-section>
         </q-item>
-      </q-list>
-    </q-expansion-item>
-  </div>
+      </q-expansion-item>
+    </q-card-section>
+  </q-card>
 </template>
 
 <style scoped>

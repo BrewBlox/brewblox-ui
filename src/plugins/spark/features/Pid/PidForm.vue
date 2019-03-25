@@ -141,7 +141,7 @@ export default class PidForm extends BlockForm {
             <q-item-label caption>Filtered error</q-item-label>
             {{ block.data.error | unit }}
           </q-item-section>
-          <q-item-section>*</q-item-section>
+          <q-item-section class="text-center">*</q-item-section>
           <q-item-section>
             <q-item-label caption>Kp</q-item-label>
             <UnitPopupEdit
@@ -159,7 +159,7 @@ export default class PidForm extends BlockForm {
           </q-item-section>
           <q-item-section/>
           <q-item-section/>
-          <q-item-section>=</q-item-section>
+          <q-item-section class="text-center">=</q-item-section>
           <q-item-section>
             <q-item-label caption>P</q-item-label>
             {{ block.data.p | round }}
@@ -171,12 +171,12 @@ export default class PidForm extends BlockForm {
             <q-item-label caption>Integral</q-item-label>
             {{ block.data.integral | unit }}
           </q-item-section>
-          <q-item-section>*</q-item-section>
+          <q-item-section class="text-center">*</q-item-section>
           <q-item-section>
             <q-item-label caption>Kp</q-item-label>
             <div class="darkened">{{ block.data.kp | unit }}</div>
           </q-item-section>
-          <q-item-section>/</q-item-section>
+          <q-item-section class="text-center">/</q-item-section>
           <q-item-section>
             <q-item-label caption>Ti</q-item-label>
             <TimeUnitPopupEdit
@@ -201,7 +201,7 @@ export default class PidForm extends BlockForm {
               <p>Setting Ti to zero will disable the integrator.</p>
             </TimeUnitPopupEdit>
           </q-item-section>
-          <q-item-section>=</q-item-section>
+          <q-item-section class="text-center">=</q-item-section>
           <q-item-section>
             <q-item-label caption>I</q-item-label>
             {{ block.data.i | round }}
@@ -213,12 +213,12 @@ export default class PidForm extends BlockForm {
             <q-item-label caption>Derivative</q-item-label>
             {{ block.data.derivative | unit }}
           </q-item-section>
-          <q-item-section>*</q-item-section>
+          <q-item-section class="text-center">*</q-item-section>
           <q-item-section>
             <q-item-label caption>Kp</q-item-label>
             <div class="darkened">{{ block.data.kp | unit }}</div>
           </q-item-section>
-          <q-item-section>*</q-item-section>
+          <q-item-section class="text-center">*</q-item-section>
           <q-item-section>
             <q-item-label caption>Td</q-item-label>
             <TimeUnitPopupEdit
@@ -238,7 +238,7 @@ export default class PidForm extends BlockForm {
               </p>
             </TimeUnitPopupEdit>
           </q-item-section>
-          <q-item-section>=</q-item-section>
+          <q-item-section class="text-center">=</q-item-section>
           <q-item-section>
             <q-item-label caption>D</q-item-label>
             <div style="border-bottom: solid 2px white; min-width: 60px;">

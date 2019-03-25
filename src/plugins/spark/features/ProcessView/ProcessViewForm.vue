@@ -80,26 +80,31 @@ export default class ProcessViewForm extends Vue {
 </script>
 
 <template>
-  <div class="widget-modal column">
-    <q-toolbar class="unpadded">
-      <q-toolbar-title>{{ part.type }} {{ part.x }},{{ part.y }}</q-toolbar-title>
+  <q-card dark class="widget-modal">
+    <q-bar class="row items-center bg-primary q-py-lg">
+      {{ part.type }} {{ part.x }},{{ part.y }}
+      <q-space/>
       <q-btn v-close-popup flat rounded label="close"/>
-    </q-toolbar>
-    <q-card>
-      <q-card-main class="row justify-center">
-        <svg
-          :width="`${SQUARE_SIZE * displayScale * rotatedSize[0]}px`"
-          :height="`${SQUARE_SIZE * displayScale * rotatedSize[1]}px`"
-          :viewBox="partViewBox"
-        >
-          <g>
-            <ProcessViewItem :value="part"/>
-          </g>
-        </svg>
-      </q-card-main>
-    </q-card>
-    <component v-for="card in cards" :key="card" :is="card" :value="part" v-on="$listeners"/>
-  </div>
+    </q-bar>
+
+    <q-card-section>
+      <q-item dark>
+        <q-item-section>
+          <svg
+            class="q-mx-auto"
+            :width="`${SQUARE_SIZE * displayScale * rotatedSize[0]}px`"
+            :height="`${SQUARE_SIZE * displayScale * rotatedSize[1]}px`"
+            :viewBox="partViewBox"
+          >
+            <g>
+              <ProcessViewItem :value="part"></ProcessViewItem>
+            </g>
+          </svg>
+        </q-item-section>
+      </q-item>
+      <component v-for="card in cards" :key="card" :is="card" :value="part" v-on="$listeners"/>
+    </q-card-section>
+  </q-card>
 </template>
 
 <style scoped>

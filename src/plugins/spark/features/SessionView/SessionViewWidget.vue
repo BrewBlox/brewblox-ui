@@ -96,7 +96,7 @@ export default class SessionViewWidget extends WidgetBase {
 </script>
 
 <template>
-  <q-card dark class="column">
+  <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <SessionViewForm
         v-if="modalOpen"
@@ -106,41 +106,44 @@ export default class SessionViewWidget extends WidgetBase {
         :active-session="modalSession"
       />
     </q-dialog>
-    <q-card-title class="title-bar">
-      <div class="ellipsis">{{ widgetId }}</div>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <q-btn slot="right" flat dense round icon="settings" @click="openModal()"/>
-    </q-card-title>
-    <q-card-separator/>
-    <q-card-main class="column widget-body">
-      <div class="full-width">
-        <q-item dark>
-          <q-item-main>
-            <q-input v-model="sessionFilter" placeholder="Search Session" clearable/>
-          </q-item-main>
-          <q-item-side right>
-            <q-btn flat rounded label="New Session" @click="createSession"/>
-          </q-item-side>
-        </q-item>
-        <q-list dark no-border separator>
-          <q-item v-for="session in sessions" :key="session.id">
-            <q-item-main>
-              {{ session.name }}
-              <span class="row darkened">{{ periodString(session) }}</span>
-            </q-item-main>
-            <q-item-side right>
-              <q-btn flat rounded icon="settings" @click="openModal(session)"/>
-              <BlockGraph
-                :id="`${widgetId}::${session.id}`"
-                :config="session.graphCfg"
-                :change="callAndSaveConfig(v => session.graphCfg = v)"
-                button-size="lg"
-                no-duration
-              />
-            </q-item-side>
-          </q-item>
-        </q-list>
-      </div>
-    </q-card-main>
+
+    <WidgetToolbar :title="widgetId" :subtitle="displayName">
+      <q-item-section side>
+        <q-btn flat dense round icon="settings" @click="openModal()"/>
+      </q-item-section>
+    </WidgetToolbar>
+
+    <q-card-section>
+      <q-item dark>
+        <q-item-section>
+          <q-input v-model="sessionFilter" placeholder="Search Session" clearable dark>
+            <template v-slot:append>
+              <q-icon name="search"/>
+            </template>
+          </q-input>
+        </q-item-section>
+        <q-item-section side>
+          <q-btn outline icon="add" label="New" class="text-white" @click="createSession"/>
+        </q-item-section>
+      </q-item>
+      <q-item dark v-for="session in sessions" :key="session.id">
+        <q-item-section>
+          {{ session.name }}
+          <q-item-label caption>{{ periodString(session) }}</q-item-label>
+        </q-item-section>
+        <q-item-section side>
+          <q-btn flat rounded icon="settings" @click="openModal(session)"/>
+        </q-item-section>
+        <q-item-section side>
+          <BlockGraph
+            :id="`${widgetId}::${session.id}`"
+            :config="session.graphCfg"
+            :change="callAndSaveConfig(v => session.graphCfg = v)"
+            button-size="lg"
+            no-duration
+          />
+        </q-item-section>
+      </q-item>
+    </q-card-section>
   </q-card>
 </template>

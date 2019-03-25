@@ -289,42 +289,48 @@ export default class SparkPage extends Vue {
           :relations="relations"
         />
       </q-dialog>
-      <q-banner icon="info" color="dark-bright" style="margin-bottom: 20px;">
+      <q-banner icon="info" class="bg-dark text-white q-mb-lg">
         This service page shows all blocks that are running on your Spark controller.
         <br>Deleting blocks on this page will remove them on the controller.
       </q-banner>
       <q-list v-if="statusNok" dark no-border>
         <q-item dark>
-          <Troubleshooter
-            :id="$props.serviceId"
-            :disabled="widgetEditable"
-            :config="{serviceId: $props.serviceId}"
-            :cols="4"
-            :rows="4"
-            type="Troubleshooter"
-            class="dashboard-item"
-          />
+          <q-item-section>
+            <Troubleshooter
+              :id="$props.serviceId"
+              :disabled="widgetEditable"
+              :config="{serviceId: $props.serviceId}"
+              :cols="4"
+              :rows="4"
+              type="Troubleshooter"
+              class="dashboard-item"
+            />
+          </q-item-section>
         </q-item>
       </q-list>
       <q-list v-else-if="isMobile" dark no-border>
         <q-item dark>
-          <SparkWidget
-            v-if="isReady"
-            :id="$props.serviceId"
-            :disabled="widgetEditable"
-            :service-id="$props.serviceId"
-            :cols="widgetSize.cols"
-            :rows="widgetSize.rows"
-            class="dashboard-item"
-          />
+          <q-item-section>
+            <SparkWidget
+              v-if="isReady"
+              :id="$props.serviceId"
+              :disabled="widgetEditable"
+              :service-id="$props.serviceId"
+              :cols="widgetSize.cols"
+              :rows="widgetSize.rows"
+              class="dashboard-item"
+            />
+          </q-item-section>
         </q-item>
-        <q-item v-for="val in validatedItems" :key="val.key">
-          <component
-            :is="val.component"
-            :disabled="widgetEditable"
-            v-bind="val.props"
-            class="dashboard-item"
-          />
+        <q-item v-for="val in validatedItems" :key="val.key" dark>
+          <q-item-section>
+            <component
+              :is="val.component"
+              :disabled="widgetEditable"
+              v-bind="val.props"
+              class="dashboard-item"
+            />
+          </q-item-section>
         </q-item>
       </q-list>
       <GridContainer v-else :editable="widgetEditable" no-move>

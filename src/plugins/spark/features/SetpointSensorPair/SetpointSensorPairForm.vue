@@ -60,34 +60,5 @@ export default class SetpointSensorPairForm extends BlockForm {
         <BlockSettings v-bind="$props" :presets-data="presets()"/>
       </q-expansion-item>
     </q-card-section>
-
-    <div v-if="false" class="widget-modal column">
-      <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
-      <q-expansion-item  group="modal" icon="settings" label="Settings">
-        <div>
-          <q-field label="Setpoint">
-            <LinkPopupEdit
-              :field="block.data.setpointId"
-              :service-id="serviceId"
-              :change="callAndSaveBlock(v => block.data.setpointId = v)"
-              label="Setpoint"
-            />
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
-          </q-field>
-          <q-field label="Sensor">
-            <LinkPopupEdit
-              :field="block.data.sensorId"
-              :service-id="serviceId"
-              :change="callAndSaveBlock(v => block.data.sensorId = v)"
-              label="Sensor"
-            />
-          </q-field>
-        </div>
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
-      </q-expansion-item>
-    </div>
   </q-card>
 </template>

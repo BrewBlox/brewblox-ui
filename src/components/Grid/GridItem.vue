@@ -355,7 +355,7 @@ export default class GridItem extends Vue {
     />
     <!-- Item resize button -->
     <button
-      v-touch-pan="resizePanHandler"
+      v-touch-pan.mouse="resizePanHandler"
       v-if="!dragging && !moving && $props.editable && !$props.noMove"
       class="grid-item-resize-handle"
     >
@@ -363,7 +363,7 @@ export default class GridItem extends Vue {
     </button>
     <!-- Item drag button -->
     <button
-      v-touch-pan="movePanHandler"
+      v-touch-pan.mouse="movePanHandler"
       v-if="!dragging && $props.editable"
       class="grid-item-move-handle"
     >
