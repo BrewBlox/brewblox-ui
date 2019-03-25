@@ -42,11 +42,11 @@ export default class DrivenIndicator extends Vue {
       class="unpadded"
       style="min-height: 0px;"
     >
-      <q-item-main>
+      <q-item-section>
         <div v-for="text in chain" :key="text">
           <small style="opacity: 0.5" v-html="text"/>
         </div>
-      </q-item-main>
+      </q-item-section>
     </q-item>
   </q-list>
 </template>

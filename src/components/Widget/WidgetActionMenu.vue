@@ -27,39 +27,39 @@ export default class WidgetActionMenu extends Vue { }
 </script>
 
 <template>
-  <div class="widget-modal column">
-    <q-toolbar class="unpadded">
-      <q-toolbar-title>{{ $props.itemId }} Menu</q-toolbar-title>
-      <q-btn v-close-overlay flat rounded label="close"/>
-    </q-toolbar>
-    <div class="row justify-around" style="margin-top: 20px">
-      <q-btn
-        v-close-overlay
-        v-if="$props.onCopy"
-        flat
-        size="lg"
-        icon="file_copy"
-        label="Copy"
-        @click="$props.onCopy"
-      />
-      <q-btn
-        v-close-overlay
-        v-if="$props.onMove"
-        flat
-        size="lg"
-        icon="exit_to_app"
-        label="Move"
-        @click="$props.onMove"
-      />
-      <q-btn
-        v-close-overlay
-        v-if="$props.onDelete"
-        flat
-        size="lg"
-        icon="delete"
-        label="Delete"
-        @click="$props.onDelete"
-      />
-    </div>
-  </div>
+  <q-card dark class="widget-modal">
+    <q-bar class="row items-center bg-primary q-py-lg">
+      {{ $props.itemId }} Menu
+      <q-space/>
+      <q-btn v-close-popup flat rounded label="close"/>
+    </q-bar>
+
+    <q-card-section>
+      <q-item dark>
+        <q-item-section v-if="$props.onCopy">
+          <q-btn v-close-popup flat size="lg" icon="file_copy" label="Copy" @click="$props.onCopy"/>
+        </q-item-section>
+        <q-item-section v-if="$props.onMove">
+          <q-btn
+            v-close-popup
+            flat
+            size="lg"
+            icon="exit_to_app"
+            label="Move"
+            @click="$props.onMove"
+          />
+        </q-item-section>
+        <q-item-section v-if="$props.onDelete">
+          <q-btn
+            v-close-popup
+            flat
+            size="lg"
+            icon="delete"
+            label="Delete"
+            @click="$props.onDelete"
+          />
+        </q-item-section>
+      </q-item>
+    </q-card-section>
+  </q-card>
 </template>

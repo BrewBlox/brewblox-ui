@@ -44,7 +44,7 @@ export default class WizardPicker extends Vue {
     <q-list v-else no-border>
       <q-toolbar class="unpadded">
         <q-toolbar-title>Select a wizard</q-toolbar-title>
-        <q-btn v-close-overlay flat rounded label="close"/>
+        <q-btn v-close-popup flat rounded label="close"/>
       </q-toolbar>
 
       <q-card dark class="cursor-pointer" @click.native="startServiceWizard">

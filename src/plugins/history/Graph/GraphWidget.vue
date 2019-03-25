@@ -59,31 +59,27 @@ export default class GraphWidget extends WidgetBase {
     </q-dialog>
 
     <q-card-title class="title-bar">
-      <div class="ellipsis">
-{{ widgetId }}
-</div>
+      <div class="ellipsis">{{ widgetId }}</div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
       <q-btn slot="right" flat round dense icon="mdi-timelapse">
         <q-menu>
           <q-list link>
             <q-item
               v-for="(preset, idx) in presets"
-              v-close-overlay
+              v-close-popup
               :key="idx"
               @click.native="() => applyPreset(preset)"
-            >
-{{ preset.duration }}
-</q-item>
+            >{{ preset.duration }}</q-item>
           </q-list>
         </q-menu>
       </q-btn>
-      <q-btn slot="right" flat round dense icon="mdi-chart-line" @click="graphModalOpen = true" />
-      <q-btn slot="right" flat round dense icon="settings" @click="settingsModalOpen = true" />
-      <q-btn slot="right" flat round dense icon="refresh" @click="regraph" />
+      <q-btn slot="right" flat round dense icon="mdi-chart-line" @click="graphModalOpen = true"/>
+      <q-btn slot="right" flat round dense icon="settings" @click="settingsModalOpen = true"/>
+      <q-btn slot="right" flat round dense icon="refresh" @click="regraph"/>
     </q-card-title>
-    <q-card-separator />
+    <q-card-separator/>
     <div class="widget-body">
-      <GraphCard :id="$props.id" ref="widgetGraph" :config="graphCfg" />
+      <GraphCard :id="$props.id" ref="widgetGraph" :config="graphCfg"/>
     </div>
     <q-dialog v-model="graphModalOpen" maximized>
       <GraphCard v-if="graphModalOpen" :id="$props.id" :config="graphCfg" shared-metrics>
@@ -93,12 +89,10 @@ export default class GraphWidget extends WidgetBase {
               v-for="(preset, idx) in presets"
               :key="idx"
               @click.native="() => applyPreset(preset)"
-            >
-{{ preset.duration }}
-</q-item>
+            >{{ preset.duration }}</q-item>
           </q-list>
         </q-btn-dropdown>
-        <q-btn v-close-overlay flat label="close" />
+        <q-btn v-close-popup flat label="close"/>
       </GraphCard>
     </q-dialog>
   </q-card>

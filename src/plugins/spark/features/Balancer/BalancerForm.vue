@@ -24,7 +24,7 @@ export default class BalancerForm extends BlockForm {
   <q-card dark class="widget-modal">
     <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
 
-    <q-expansion-item class="text-h6" opened group="modal" icon="mdi-cube" label="Block Settings">
+    <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="$props" :presets-data="presets()"/>
     </q-expansion-item>
   </q-card>

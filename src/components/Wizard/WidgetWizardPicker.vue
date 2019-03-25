@@ -64,7 +64,7 @@ export default class WidgetWizardPicker extends Vue {
   <div class="widget-modal column">
     <q-toolbar class="unpadded">
       <q-toolbar-title>Create new widget</q-toolbar-title>
-      <q-btn v-close-overlay flat rounded label="close"/>
+      <q-btn v-close-popup flat rounded label="close"/>
     </q-toolbar>
 
     <!-- display wizard -->

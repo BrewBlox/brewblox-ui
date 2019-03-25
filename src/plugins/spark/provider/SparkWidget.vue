@@ -73,21 +73,14 @@ export default class SparkWidget extends Vue {
       <SparkForm v-if="modalOpen" :field="service"/>
     </q-dialog>
 
-    <q-card-section class="q-pa-xs">
-      <q-item dark>
-        <q-item-section>
-          <q-item-label class="ellipsis text-h6">{{ service.id }}</q-item-label>
-          <q-item-label caption class="ellipsis">Spark Service</q-item-label>
-        </q-item-section>
-        <q-item-section class="dense" side>
-          <q-btn flat round dense icon="settings" @click="modalOpen = true"/>
-        </q-item-section>
-        <q-item-section class="dense" side>
-          <q-btn flat round dense icon="refresh" @click="fetchAll"/>
-        </q-item-section>
-      </q-item>
-      <q-separator dark inset/>
-    </q-card-section>
+    <WidgetToolbar :title="service.id" subtitle="Spark Service">
+      <q-item-section class="dense" side>
+        <q-btn flat round dense icon="settings" @click="modalOpen = true"/>
+      </q-item-section>
+      <q-item-section class="dense" side>
+        <q-btn flat round dense icon="refresh" @click="fetchAll"/>
+      </q-item-section>
+    </WidgetToolbar>
 
     <q-card-section>
       <q-item v-if="!updating" dark>

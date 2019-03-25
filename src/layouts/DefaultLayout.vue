@@ -159,7 +159,7 @@ export default class DefaultLayout extends Vue {
         <draggable
           v-model="dashboards"
           :class="{ editing: dashboardEditing }"
-          :options="{ disabled: !dashboardEditing }"
+          :disabled="!dashboardEditing"
         >
           <q-item
             v-for="dashboard in dashboards"
@@ -222,7 +222,7 @@ export default class DefaultLayout extends Vue {
         <draggable
           v-model="services"
           :class="{ editing: serviceEditing }"
-          :options="{ disabled: !serviceEditing }"
+          :disabled="!serviceEditing"
           :striped="serviceEditing"
         >
           <q-item

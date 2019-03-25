@@ -91,11 +91,11 @@ export default class DagreDiagram extends Vue {
   <div>
     <q-toolbar class="unpadded">
       <q-toolbar-title>Block Relations</q-toolbar-title>
-      <q-btn v-close-overlay flat rounded label="close"/>
+      <q-btn v-close-popup flat rounded label="close"/>
     </q-toolbar>
     <div class="container">
       <svg ref="svg" class="diag-svg">
-        <g ref="diagram" class="diag-g"/>
+        <g ref="diagram" class="diag-g"></g>
       </svg>
     </div>
   </div>

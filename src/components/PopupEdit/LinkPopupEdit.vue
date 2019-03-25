@@ -58,21 +58,40 @@ export default class LinkPopupEdit extends Vue {
 
 <template>
   <div>
-    <component :is="$props.tag" class="editable">{{ displayValue | truncated }}</component>
-    <q-popup-edit
-      :title="this.$props.label"
-      v-model="placeholder"
-      label-set="apply"
-      buttons
-      persistent
-      @show="startEdit"
-      @save="endEdit"
-    >
-      <div class="help-text text-weight-light q-my-md">
-        <slot/>
-      </div>
-      <q-select v-model="placeholder" :options="linkOptions" clearable/>
-    </q-popup-edit>
+    <component :is="$props.tag" class="editable clickable" @click="startEdit">
+      {{ displayValue | truncated }}
+      <q-menu>
+        <q-item dark>
+          <q-item-section class="help-text text-weight-light">
+            <big>{{ $props.label }}</big>
+            <slot/>
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>
+            <q-btn
+              icon="clear"
+              label="clear"
+              flat
+              @click="() => { placeholder = null; endEdit() }"
+              v-close-popup
+            />
+          </q-item-section>
+        </q-item>
+        <q-separator dark inset/>
+        <q-item
+          v-for="opt in linkOptions"
+          :key="opt.value"
+          :active="opt.value === placeholder"
+          clickable
+          dark
+          v-close-popup
+          @click="() => { placeholder = opt.value; endEdit() }"
+        >
+          <q-item-section>{{ opt.label }}</q-item-section>
+        </q-item>
+      </q-menu>
+    </component>
   </div>
 </template>
 

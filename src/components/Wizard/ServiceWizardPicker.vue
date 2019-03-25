@@ -102,7 +102,7 @@ export default class ServiceWizardPicker extends Vue {
   <div class="widget-modal column">
     <q-toolbar>
       <span class="col row spaced">New Service Wizard</span>
-      <q-btn v-close-overlay flat rounded label="close"/>
+      <q-btn v-close-popup flat rounded label="close"/>
     </q-toolbar>
 
     <!-- Display selected wizard -->

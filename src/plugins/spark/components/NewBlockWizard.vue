@@ -114,7 +114,8 @@ export default class NewBlockWizard extends Vue {
 <template>
   <div class="widget-modal column">
     <q-card v-if="formComponent" dark>
-      <q-card-title>Configure new block
+      <q-card-title>
+        Configure new block
         <q-btn slot="right" flat dense icon="clear" label="Cancel" @click="reset"/>
         <q-btn slot="right" flat dense icon="done_all" label="Create" @click="confirm"/>
       </q-card-title>
@@ -129,8 +130,9 @@ export default class NewBlockWizard extends Vue {
       />
     </q-card>
     <q-card v-else dark>
-      <q-card-title>Create new block
-        <q-btn v-close-overlay slot="right" flat dense icon="clear" label="Cancel"/>
+      <q-card-title>
+        Create new block
+        <q-btn v-close-popup slot="right" flat dense icon="clear" label="Cancel"/>
       </q-card-title>
       <q-card-main>
         <q-list no-border>

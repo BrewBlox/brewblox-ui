@@ -138,7 +138,7 @@ export default class GraphForm extends FormBase {
   <div class="widget-modal column">
     <WidgetSettings v-if="!$props.embedded" v-bind="$props"/>
 
-    <q-expansion-item class="text-h6" group="modal" icon="mdi-timetable" label="Period settings">
+    <q-expansion-item group="modal" icon="mdi-timetable" label="Period settings">
       <div>
         <q-field label="Display type">
           <SelectPopupEdit
@@ -176,7 +176,7 @@ export default class GraphForm extends FormBase {
       </div>
     </q-expansion-item>
 
-    <q-expansion-item class="text-h6" group="modal" icon="mdi-file-tree" label="Metrics">
+    <q-expansion-item group="modal" icon="mdi-file-tree" label="Metrics">
       <div>
         <div class="q-mb-sm row no-wrap items-center">
           <q-input v-model="selectFilter" stack-label="Filter" class="q-ma-none" clearable/>
@@ -192,7 +192,7 @@ export default class GraphForm extends FormBase {
       </div>
     </q-expansion-item>
 
-    <q-expansion-item class="text-h6" group="modal" icon="mdi-tag-multiple" label="Legend">
+    <q-expansion-item group="modal" icon="mdi-tag-multiple" label="Legend">
       <q-list no-border separator>
         <q-item dark>
           <q-item-main>Metric</q-item-main>Display as
@@ -213,7 +213,7 @@ export default class GraphForm extends FormBase {
       </q-list>
     </q-expansion-item>
 
-    <q-expansion-item class="text-h6" group="modal" icon="mdi-chart-line" label="Axes">
+    <q-expansion-item group="modal" icon="mdi-chart-line" label="Axes">
       <q-list no-border separator>
         <q-item dark>
           <q-item-main>Metric</q-item-main>Left or right axis

@@ -44,27 +44,44 @@ export default class WiFiSettingsPopup extends Vue {
 </script>
 
 <template>
-  <div class="widget-modal">
-    <div class="row" style="position: absolute; right: 18px; top: 18px">
-      <q-btn v-close-overlay rounded label="close" class="col"/>
-      <q-btn v-close-overlay rounded color="primary" label="connect" class="col" @click="save"/>
-    </div>
-    <q-card>
-      <q-card-title>Settings</q-card-title>
-      <q-card-main>
-        <q-field class="col" label="SSID">
-          <q-input v-model="values.ssid"/>
-        </q-field>
-        <q-field class="col" label="Security">
-          <q-select v-model="values.security" :options="securityOpts"/>
-        </q-field>
-        <q-field class="col" label="Password">
-          <q-input v-model="values.password" :disable="values.security === 0" type="password"/>
-        </q-field>
-        <q-field class="col" label="Cipher">
-          <q-select v-model="values.cipher" :options="cipherOpts"/>
-        </q-field>
-      </q-card-main>
-    </q-card>
-  </div>
+  <q-card dark class="widget-modal">
+    <q-bar class="row items-center bg-primary q-py-lg">
+      WiFi Settings
+      <q-space/>
+      <q-btn v-close-popup flat rounded label="close"/>
+    </q-bar>
+
+    <q-card-section>
+      <q-item dark>
+        <q-item-section>SSID</q-item-section>
+        <q-item-section>
+          <q-input v-model="values.ssid" dark/>
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>Security</q-item-section>
+        <q-item-section>
+          <q-select v-model="values.security" :options="securityOpts" dark/>
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>Password</q-item-section>
+        <q-item-section>
+          <q-input v-model="values.password" :disable="values.security === 0" type="password" dark/>
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>Cipher</q-item-section>
+        <q-item-section>
+          <q-select v-model="values.cipher" :options="cipherOpts" dark/>
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section/>
+        <q-item-section side>
+          <q-btn v-close-popup color="primary" label="connect" @click="save"/>
+        </q-item-section>
+      </q-item>
+    </q-card-section>
+  </q-card>
 </template>

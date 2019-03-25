@@ -118,7 +118,6 @@ export default class DisplaySettingsForm extends BlockForm {
     <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
 
     <q-expansion-item
-      class="text-h6"
       v-for="(slot, idx) in displaySlots"
       :key="idx"
       :label="`Slot ${idx + 1}`"
@@ -163,7 +162,7 @@ export default class DisplaySettingsForm extends BlockForm {
       </q-item>
     </q-expansion-item>
 
-    <q-expansion-item class="text-h6" group="modal" icon="mdi-cube" label="Block Settings">
+    <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="$props" :presets-data="presets()"/>
     </q-expansion-item>
   </q-card>

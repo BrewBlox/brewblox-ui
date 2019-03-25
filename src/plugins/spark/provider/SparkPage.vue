@@ -253,17 +253,23 @@ export default class SparkPage extends Vue {
       <portal to="toolbar-buttons">
         <q-btn-dropdown color="primary" label="actions">
           <q-list dark link>
-            <q-item @click.native="relationsModalOpen = true">
-              <q-item-side icon="mdi-ray-start-arrow"/>
-              <q-item-main label="Show Relations"/>
+            <q-item dark clickable @click="widgetEditable = !widgetEditable">
+              <q-item-section avatar>
+                <q-icon :name="widgetEditable ? 'check' : 'edit'"/>
+              </q-item-section>
+              <q-item-section>{{ widgetEditable ? 'Stop editing' : 'Edit Dashboard' }}</q-item-section>
             </q-item>
-            <q-item @click.native="widgetEditable = !widgetEditable">
-              <q-item-side :icon="widgetEditable ? 'check' : 'mode edit'"/>
-              <q-item-main :label="widgetEditable ? 'Stop editing' : 'Edit Dashboard'"/>
+            <q-item dark clickable @click="relationsModalOpen = true">
+              <q-item-section avatar>
+                <q-icon name="mdi-ray-start-arrow"/>
+              </q-item-section>
+              <q-item-section>Show Relations</q-item-section>
             </q-item>
-            <q-item @click.native="startCreateBlock">
-              <q-item-side icon="add"/>
-              <q-item-main label="New Block"/>
+            <q-item dark clickable @click="startCreateBlock">
+              <q-item-section avatar>
+                <q-icon name="add"/>
+              </q-item-section>
+              <q-item-section>New Block</q-item-section>
             </q-item>
           </q-list>
         </q-btn-dropdown>

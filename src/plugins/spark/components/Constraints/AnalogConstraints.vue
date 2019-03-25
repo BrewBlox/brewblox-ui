@@ -97,6 +97,7 @@ export default class AnalogConstraints extends Constraints {
       <q-item-section v-for="opt in constraintOptions" :key="opt.value">
         <q-btn
           :label="opt.label"
+          outline
           @click="constraints.push(createConstraint(opt.value)); saveConstraints();"
           v-close-popup
         />

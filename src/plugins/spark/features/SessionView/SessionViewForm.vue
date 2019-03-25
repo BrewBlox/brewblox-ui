@@ -129,7 +129,7 @@ export default class SessionViewForm extends FormBase {
 <template>
   <div class="widget-modal column">
     <WidgetSettings v-if="!$props.embedded" v-bind="$props"/>
-    <q-expansion-item class="text-h6"
+    <q-expansion-item
       v-for="session in sessions"
       :key="session.id"
       :label="`Session ${session.name}`"
@@ -197,7 +197,7 @@ export default class SessionViewForm extends FormBase {
           <span v-else>Not yet started</span>
         </q-item>
 
-        <q-expansion-item class="text-h6" group="sub-modal"  icon="mdi-file-tree" label="Fields">
+        <q-expansion-item group="sub-modal"  icon="mdi-file-tree" label="Fields">
           <div>
             <div class="q-mb-sm row no-wrap items-center">
               <q-input v-model="selectFilter" stack-label="Filter" class="q-ma-none" clearable/>
@@ -214,7 +214,7 @@ export default class SessionViewForm extends FormBase {
           </div>
         </q-expansion-item>
 
-        <q-expansion-item class="text-h6" group="sub-modal"  icon="mdi-tag-multiple" label="Legend">
+        <q-expansion-item group="sub-modal"  icon="mdi-tag-multiple" label="Legend">
           <q-list no-border separator>
             <q-item dark>
               <q-item-main>Metric</q-item-main>Display as
@@ -234,7 +234,7 @@ export default class SessionViewForm extends FormBase {
             </q-item>
           </q-list>
         </q-expansion-item>
-        <q-expansion-item class="text-h6" group="sub-modal"  icon="edit" label="Notes">
+        <q-expansion-item group="sub-modal"  icon="edit" label="Notes">
           <textarea
             :value="session.notes"
             class="full-width"

@@ -19,7 +19,7 @@ export default class DashboardWizard extends Vue {
   <div>
     <q-toolbar class="unpadded">
       <q-toolbar-title>Create new dashboard</q-toolbar-title>
-      <q-btn v-close-overlay flat rounded label="close"/>
+      <q-btn v-close-popup flat rounded label="close"/>
     </q-toolbar>
     <q-card dark>
       <q-card-main>

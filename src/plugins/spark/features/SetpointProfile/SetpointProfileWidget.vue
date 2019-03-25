@@ -50,7 +50,7 @@ export default class SetpointProfileWidget extends BlockWidget {
 </script>
 
 <template>
-  <q-card dark class="column">
+  <q-card dark class="text-white column">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <SetpointProfileForm
         v-if="modalOpen"
@@ -61,13 +61,9 @@ export default class SetpointProfileWidget extends BlockWidget {
         :on-switch-block-id="switchBlockId"
       />
     </q-dialog>
-    <q-card-title class="title-bar">
-      <div class="ellipsis">{{ widgetId }}</div>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
-      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
-    </q-card-title>
-    <q-card-separator/>
+
+    <BlockWidgetToolbar :field="me"/>
+
     <div class="col">
       <GraphDisplay v-if="!modalOpen" :data="plotlyData" :layout="plotlyLayout"/>
     </div>

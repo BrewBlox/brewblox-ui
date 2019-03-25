@@ -24,7 +24,7 @@ export default class SetpointSensorPairWidget extends BlockWidget {
 </script>
 
 <template>
-  <q-card dark class="column">
+  <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <SetpointSensorPairForm
         v-if="modalOpen"
@@ -35,30 +35,27 @@ export default class SetpointSensorPairWidget extends BlockWidget {
         :on-switch-block-id="switchBlockId"
       />
     </q-dialog>
-    <q-card-title class="title-bar">
-      <div class="ellipsis">{{ widgetId }}</div>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
-      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
-      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
-    </q-card-title>
-    <q-card-separator/>
-    <q-card-main class="widget-body column">
-      <div class="full-width">
-        <q-field label="Setpoint value">
+
+    <BlockWidgetToolbar :field="me" graph/>
+
+    <q-card-section>
+      <q-item dark>
+        <q-item-section>
+          <div class="column">
+            <span>Setpoint value</span>
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          </div>
+        </q-item-section>
+        <q-item-section>
           <big>{{ block.data.setpointValue | unit }}</big>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
-        </q-field>
-        <q-field label="Sensor value">
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>Sensor value</q-item-section>
+        <q-item-section>
           <big>{{ block.data.sensorValue | unit }}</big>
-        </q-field>
-      </div>
-    </q-card-main>
+        </q-item-section>
+      </q-item>
+    </q-card-section>
   </q-card>
 </template>
-
-<style lang="stylus" scoped>
-/deep/ .widget-body .q-field-margin {
-  margin-top: 0px;
-}
-</style>

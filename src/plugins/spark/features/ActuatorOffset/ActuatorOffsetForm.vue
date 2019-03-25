@@ -25,7 +25,7 @@ export default class ActuatorOffsetForm extends BlockForm {
     <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
 
     <q-card-section>
-      <q-expansion-item class="text-h6" opened group="modal" icon="settings" label="Settings">
+      <q-expansion-item group="modal" icon="settings" label="Settings">
         <BlockEnableToggle
           v-bind="$props"
           :text-enabled="`Offset is enabled: ${block.data.targetId} will be offset from the
@@ -91,12 +91,7 @@ export default class ActuatorOffsetForm extends BlockForm {
         </q-item>
       </q-expansion-item>
 
-      <q-expansion-item
-        class="text-h6"
-        group="modal"
-        icon="mdi-less-than-or-equal"
-        label="Constraints"
-      >
+      <q-expansion-item group="modal" icon="mdi-less-than-or-equal" label="Constraints">
         <q-item dark>
           <q-item-section>
             <AnalogConstraints
@@ -108,14 +103,14 @@ export default class ActuatorOffsetForm extends BlockForm {
         </q-item>
       </q-expansion-item>
 
-      <q-expansion-item class="text-h6" group="modal" icon="mdi-cube" label="Block Settings">
+      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
         <BlockSettings v-bind="$props" :presets-data="presets()"/>
       </q-expansion-item>
     </q-card-section>
 
     <div v-if="false" class="widget-modal column">
       <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
-      <q-expansion-item class="text-h6" opened group="modal" icon="settings" label="Settings">
+      <q-expansion-item group="modal" icon="settings" label="Settings">
         <BlockEnableToggle
           v-bind="$props"
           :block="block"
@@ -164,12 +159,7 @@ export default class ActuatorOffsetForm extends BlockForm {
           </q-field>
         </div>
       </q-expansion-item>
-      <q-expansion-item
-        class="text-h6"
-        group="modal"
-        icon="mdi-less-than-or-equal"
-        label="Constraints"
-      >
+      <q-expansion-item group="modal" icon="mdi-less-than-or-equal" label="Constraints">
         <div>
           <q-field label="Constraints" orientation="vertical">
             <AnalogConstraints
@@ -181,7 +171,7 @@ export default class ActuatorOffsetForm extends BlockForm {
         </div>
       </q-expansion-item>
 
-      <q-expansion-item class="text-h6" group="modal" icon="mdi-cube" label="Block Settings">
+      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
         <BlockSettings v-bind="$props" :presets-data="presets()"/>
       </q-expansion-item>
     </div>

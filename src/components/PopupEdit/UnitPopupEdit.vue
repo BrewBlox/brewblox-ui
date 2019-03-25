@@ -39,7 +39,6 @@ export default class UnitPopupEdit extends Vue {
 
   startEdit() {
     this.placeholder = this.initialValue;
-    this.$nextTick(() => this.$refs.input.select());
   }
 
   endEdit() {
@@ -64,7 +63,7 @@ export default class UnitPopupEdit extends Vue {
       <div class="help-text text-weight-light q-my-md">
         <slot/>
       </div>
-      <q-input ref="input" :suffix="notation" v-model="placeholder" type="number"/>
+      <q-input ref="input" :suffix="notation" v-model="placeholder" type="number" step="any" dark/>
     </q-popup-edit>
   </div>
 </template>

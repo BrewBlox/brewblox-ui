@@ -67,7 +67,7 @@ export default class ColorPickerPopupEdit extends Vue {
       <div class="help-text text-weight-light q-my-md">
         <slot/>
       </div>
-      <q-color-picker v-model="placeholder" dark no-parent-field format-model="hex"/>
+      <q-color v-model="placeholder" dark no-parent-field format-model="hex"/>
     </q-popup-edit>
   </div>
 </template>

@@ -20,29 +20,35 @@ export default class TempSensorOneWireForm extends BlockForm {
 </script>
 
 <template>
-  <div class="widget-modal column">
+  <q-card dark class="widget-modal">
     <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
-    <q-expansion-item class="text-h6" opened group="modal" icon="settings" label="Settings">
-      <div>
-        <q-field label="Address">
-          <InputPopupEdit
-            :field="block.data.address"
-            :change="callAndSaveBlock(v => block.data.address = v)"
-            label="Address"
-          />
-        </q-field>
-        <q-field label="Offset">
-          <UnitPopupEdit
-            :field="block.data.offset"
-            :change="callAndSaveBlock(v => block.data.offset = v)"
-            label="Offset"
-          />
-        </q-field>
-      </div>
-    </q-expansion-item>
+    <q-card-section>
+      <q-expansion-item group="modal" icon="settings" label="Settings">
+        <q-item dark>
+          <q-item-section>Address</q-item-section>
+          <q-item-section>
+            <InputPopupEdit
+              :field="block.data.address"
+              :change="callAndSaveBlock(v => block.data.address = v)"
+              label="Address"
+            />
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>Offset</q-item-section>
+          <q-item-section>
+            <UnitPopupEdit
+              :field="block.data.offset"
+              :change="callAndSaveBlock(v => block.data.offset = v)"
+              label="Offset"
+            />
+          </q-item-section>
+        </q-item>
+      </q-expansion-item>
 
-    <q-expansion-item class="text-h6" group="modal" icon="mdi-cube" label="Block Settings">
-      <BlockSettings v-bind="$props" :presets-data="presets()"/>
-    </q-expansion-item>
-  </div>
+      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
+        <BlockSettings v-bind="$props" :presets-data="presets()"/>
+      </q-expansion-item>
+    </q-card-section>
+  </q-card>
 </template>

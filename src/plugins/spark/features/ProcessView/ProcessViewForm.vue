@@ -83,7 +83,7 @@ export default class ProcessViewForm extends Vue {
   <div class="widget-modal column">
     <q-toolbar class="unpadded">
       <q-toolbar-title>{{ part.type }} {{ part.x }},{{ part.y }}</q-toolbar-title>
-      <q-btn v-close-overlay flat rounded label="close"/>
+      <q-btn v-close-popup flat rounded label="close"/>
     </q-toolbar>
     <q-card>
       <q-card-main class="row justify-center">

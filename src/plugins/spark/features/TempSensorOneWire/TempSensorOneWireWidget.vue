@@ -23,7 +23,7 @@ export default class TempSensorOneWireWidget extends BlockWidget {
 </script>
 
 <template>
-  <q-card dark class="column">
+  <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <TempSensorOneWireForm
         v-if="modalOpen"
@@ -34,21 +34,22 @@ export default class TempSensorOneWireWidget extends BlockWidget {
         :on-switch-block-id="switchBlockId"
       />
     </q-dialog>
-    <q-card-title class="title-bar">
-      <div class="ellipsis">{{ widgetId }}</div>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
-      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
-      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
-    </q-card-title>
-    <q-card-separator/>
-    <q-banner v-if="block.data.value === null" type="warning" color="warn">This sensor is invalid</q-banner>
-    <q-card-main class="column widget-body">
-      <div class="full-width">
-        <q-field class="col" label="Value">
+
+    <BlockWidgetToolbar :field="me" graph/>
+
+    <q-card-section>
+      <q-item v-if="block.data.value === null" dark>
+        <q-item-section avatar>
+          <q-icon name="warning"/>
+        </q-item-section>
+        <q-item-section>This sensor is invalid</q-item-section>
+      </q-item>
+      <q-item v-else dark>
+        <q-item-section>Value</q-item-section>
+        <q-item-section>
           <big>{{ block.data.value | unit }}</big>
-        </q-field>
-      </div>
-    </q-card-main>
+        </q-item-section>
+      </q-item>
+    </q-card-section>
   </q-card>
 </template>
