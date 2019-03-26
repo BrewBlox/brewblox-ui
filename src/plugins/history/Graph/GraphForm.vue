@@ -131,7 +131,7 @@ export default class GraphForm extends FormBase {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetSettings v-if="!$props.embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
 
     <q-card-section>
       <q-expansion-item group="modal" icon="mdi-timetable" label="Period settings">

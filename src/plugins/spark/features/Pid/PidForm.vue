@@ -26,7 +26,7 @@ export default class PidForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
 
     <q-card-section>
       <q-expansion-item group="modal" icon="mdi-calculator-variant" label="Settings">
@@ -138,7 +138,7 @@ export default class PidForm extends BlockForm {
 
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>Filtered error</q-item-label>
+            <q-item-label caption class="text-no-wrap">Filtered error</q-item-label>
             {{ block.data.error | unit }}
           </q-item-section>
           <q-item-section class="text-center">*</q-item-section>

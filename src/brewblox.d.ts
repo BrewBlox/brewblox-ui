@@ -25,3 +25,5 @@ interface XYPosition {
   x: number;
   y: number;
 }
+
+type InputRule = (val: any) => boolean | string;

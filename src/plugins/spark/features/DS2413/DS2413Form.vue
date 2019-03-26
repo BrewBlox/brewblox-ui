@@ -28,7 +28,7 @@ export default class DS2413Form extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
 
     <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="$props" :presets-data="presets()"/>

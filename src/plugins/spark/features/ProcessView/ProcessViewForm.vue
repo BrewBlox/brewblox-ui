@@ -81,11 +81,7 @@ export default class ProcessViewForm extends Vue {
 
 <template>
   <q-card dark class="widget-modal">
-    <q-bar class="row items-center bg-primary q-py-lg">
-      {{ part.type }} {{ part.x }},{{ part.y }}
-      <q-space/>
-      <q-btn v-close-popup flat rounded label="close"/>
-    </q-bar>
+    <FormToolbar>{{ part.type }} {{ part.x }},{{ part.y }}</FormToolbar>
 
     <q-card-section>
       <q-item dark>

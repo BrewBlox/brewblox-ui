@@ -128,7 +128,7 @@ export default class SessionViewForm extends FormBase {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetSettings v-if="!$props.embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
 
     <q-expansion-item
       v-for="session in sessions"

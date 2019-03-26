@@ -123,7 +123,7 @@ export default class SessionViewWidget extends WidgetBase {
           </q-input>
         </q-item-section>
         <q-item-section side>
-          <q-btn outline icon="add" label="New" class="text-white" @click="createSession"/>
+          <q-btn flat icon="add" label="New" class="text-white" @click="createSession"/>
         </q-item-section>
       </q-item>
       <q-item dark v-for="session in sessions" :key="session.id">

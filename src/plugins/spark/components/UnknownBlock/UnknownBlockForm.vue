@@ -9,7 +9,7 @@ export default class UnknownBlockForm extends BlockForm {
 
 <template>
   <div dark class="widget-modal">
-    <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
     <q-card-section>
       <q-item dark>
         <q-item-section avatar>

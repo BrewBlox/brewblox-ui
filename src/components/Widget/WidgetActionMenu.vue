@@ -28,11 +28,7 @@ export default class WidgetActionMenu extends Vue { }
 
 <template>
   <q-card dark class="widget-modal">
-    <q-bar class="row items-center bg-primary q-py-lg">
-      {{ $props.itemId }} Menu
-      <q-space/>
-      <q-btn v-close-popup flat rounded label="close"/>
-    </q-bar>
+    <FormToolbar>{{ $props.itemId }} Menu</FormToolbar>
 
     <q-card-section>
       <q-item dark>

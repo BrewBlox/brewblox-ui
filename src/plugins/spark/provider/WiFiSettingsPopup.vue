@@ -45,11 +45,7 @@ export default class WiFiSettingsPopup extends Vue {
 
 <template>
   <q-card dark class="widget-modal">
-    <q-bar class="row items-center bg-primary q-py-lg">
-      WiFi Settings
-      <q-space/>
-      <q-btn v-close-popup flat rounded label="close"/>
-    </q-bar>
+    <FormToolbar>WiFi Settings</FormToolbar>
 
     <q-card-section>
       <q-item dark>

@@ -165,11 +165,7 @@ export default class SparkForm extends Vue {
 
 <template>
   <q-card dark class="widget-modal">
-    <q-bar class="row items-center bg-primary q-py-lg">
-      Spark Service
-      <q-space/>
-      <q-btn v-close-popup flat rounded label="close"/>
-    </q-bar>
+    <FormToolbar>Spark Service</FormToolbar>
 
     <q-card-section>
       <q-expansion-item group="modal" icon="info" label="System Info">
@@ -222,12 +218,7 @@ export default class SparkForm extends Vue {
         </q-item>
       </q-expansion-item>
 
-      <q-expansion-item
-
-        group="modal"
-        icon="mdi-checkbox-multiple-marked"
-        label="Groups"
-      >
+      <q-expansion-item group="modal" icon="mdi-checkbox-multiple-marked" label="Groups">
         <q-item dark>
           <q-item-section>Active groups</q-item-section>
           <q-item-section>
@@ -274,12 +265,7 @@ export default class SparkForm extends Vue {
         </q-item>
       </q-expansion-item>
 
-      <q-expansion-item
-
-        group="modal"
-        icon="mdi-magnify-plus-outline"
-        label="Discovered Blocks"
-      >
+      <q-expansion-item group="modal" icon="mdi-magnify-plus-outline" label="Discovered Blocks">
         <q-item dark>
           <q-item-section>
             <q-btn outline label="Refresh" @click="fetchDiscoveredBlocks"/>
@@ -298,12 +284,7 @@ export default class SparkForm extends Vue {
         </q-item>
       </q-expansion-item>
 
-      <q-expansion-item
-
-        group="modal"
-        icon="mdi-content-save-all"
-        label="Savepoints"
-      >
+      <q-expansion-item group="modal" icon="mdi-content-save-all" label="Savepoints">
         <q-item v-for="point in savepoints" :key="point" dark>
           <q-item-section>{{ point }}</q-item-section>
           <q-item-section side>

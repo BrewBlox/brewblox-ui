@@ -6,69 +6,89 @@ import Component from 'vue-class-component';
 
 @Component
 export default class ArrangementWizardPicker extends Vue {
+  $q: any;
   arrangementId: string = '';
   searchModel: string = '';
+  wizardModel: any = null;
+  wizardActive: boolean = false;
 
   get wizardOptions() {
     return arrangementValues(this.$store)
       .filter(arr => !!arr.wizard)
-      .map(arr => ({
-        label: arr.displayName,
-        value: arr.id,
-      }))
-      .sort(objectStringSorter('label'));
+      .sort(objectStringSorter('displayName'));
   }
 
-  get wizardComponent() {
-    if (!this.arrangementId) {
-      return null;
-    }
-    return arrangements(this.$store)[this.arrangementId].wizard;
+  setTitle(title: string) {
+    this.$emit('title', title);
+  }
+
+  reset() {
+    this.wizardActive = false;
+    this.setTitle('Arrangement Wizard');
+  }
+
+  back() {
+    this.$emit('back');
   }
 
   close() {
     this.$emit('close');
   }
+
+  next() {
+    if (!this.wizardModel) {
+      this.$q.notify({
+        message: 'Please select a wizard',
+        color: 'negative',
+        icon: 'error',
+      });
+      return;
+    }
+    this.wizardActive = true;
+  }
+
+  mounted() {
+    this.reset();
+    this.wizardModel = this.wizardOptions[0];
+  }
 }
 </script>
 
 <template>
-  <div class="widget-modal column">
-    <q-toolbar class="unpadded">
-      <q-toolbar-title>Create new arrangement</q-toolbar-title>
-      <q-btn v-close-popup flat rounded label="close"/>
-    </q-toolbar>
-
-    <!-- display wizard -->
+  <div>
+    <!-- Display selected wizard -->
     <component
-      v-if="wizardComponent"
-      :is="wizardComponent"
-      :feature-id="arrangementId"
+      v-if="wizardActive"
+      :is="wizardModel.wizard"
+      :feature-id="wizardModel.id"
+      @title="setTitle"
+      @back="reset"
       @close="close"
     />
 
     <!-- Select a wizard -->
-    <q-card v-else dark>
-      <q-card-main>
-        <q-list no-border>
-          <q-item dark>
-            <q-search v-model="searchModel" placeholder="Search"/>
-          </q-item>
-        </q-list>
-        <q-list link inset-separator no-border>
-          <q-item
-            v-for="opt in wizardOptions"
-            :key="opt.label"
-            icon="widgets"
-            @click.native="arrangementId = opt.value"
-          >
-            <q-item-main>
-              <q-item-tile label>{{ opt.label }}</q-item-tile>
-            </q-item-main>
-            <q-item-side right icon="chevron_right"/>
-          </q-item>
-        </q-list>
-      </q-card-main>
-    </q-card>
+    <template v-else>
+      <q-card-section>
+        <q-item dark>
+          <q-item-section>
+            <q-select
+              label="Arrangement type"
+              :options="wizardOptions"
+              v-model="wizardModel"
+              option-label="displayName"
+              dark
+              options-dark
+            />
+          </q-item-section>
+        </q-item>
+      </q-card-section>
+
+      <q-separator dark/>
+
+      <q-card-actions>
+        <q-btn unelevated label="Back" class="full-width" @click="back"/>
+        <q-btn unelevated label="Next" color="primary" class="full-width q-mt-sm" @click="next"/>
+      </q-card-actions>
+    </template>
   </div>
 </template>

@@ -3,11 +3,11 @@ import Component from 'vue-class-component';
 import FormBase from '@/components/Form/FormBase';
 
 @Component
-export default class WidgetSettings extends FormBase { }
+export default class WidgetFormToolbar extends FormBase { }
 </script>
 
 <template>
-  <q-bar class="row items-center bg-primary q-py-lg">
+  <FormToolbar>
     <q-icon v-if="$props.onChangeId" name="mdi-view-dashboard"/>
     <InputPopupEdit
       v-if="$props.onChangeId"
@@ -18,12 +18,12 @@ export default class WidgetSettings extends FormBase { }
       class="text-h6 q-mr-md"
     >Choose a new name for this dashboard widget.</InputPopupEdit>
     <slot/>
-    <q-space/>
-    <slot name="buttons"/>
-    <q-btn v-if="$props.onDelete" flat icon="delete" @click="$props.onDelete"/>
-    <q-btn v-if="$props.onCopy" flat icon="file_copy" @click="$props.onCopy"/>
-    <q-btn v-if="$props.onMove" flat icon="exit_to_app" @click="$props.onMove"/>
-    <q-btn v-close-popup flat rounded label="close"/>
-  </q-bar>
+    <template v-slot:buttons>
+      <slot name="buttons"/>
+      <q-btn v-if="$props.onDelete" flat icon="delete" @click="$props.onDelete"/>
+      <q-btn v-if="$props.onCopy" flat icon="file_copy" @click="$props.onCopy"/>
+      <q-btn v-if="$props.onMove" flat icon="exit_to_app" @click="$props.onMove"/>
+    </template>
+  </FormToolbar>
 </template>
 

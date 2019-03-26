@@ -78,7 +78,7 @@ export default class DefaultLayout extends Vue {
       message: `Are you sure you want to remove ${dashboard.title}?`,
       ok: 'Confirm',
       cancel: 'Cancel',
-    }).then(() => removeDashboard(this.$store, dashboard));
+    }).onOk(() => removeDashboard(this.$store, dashboard));
   }
 
   changeDashboardTitle(dashboard: Dashboard, title: string) {
@@ -91,7 +91,7 @@ export default class DefaultLayout extends Vue {
       message: `Are you sure you want to remove ${service.title}?`,
       ok: 'Confirm',
       cancel: 'Cancel',
-    }).then(() => removeServiceInStore(this.$store, service));
+    }).onOk(() => removeServiceInStore(this.$store, service));
   }
 
   changeServiceTitle(service: Service, title: string) {

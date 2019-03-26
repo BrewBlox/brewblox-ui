@@ -115,7 +115,7 @@ export default class DisplaySettingsForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
 
     <q-expansion-item
       v-for="(slot, idx) in displaySlots"

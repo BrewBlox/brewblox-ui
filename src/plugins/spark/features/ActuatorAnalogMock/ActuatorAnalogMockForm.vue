@@ -23,7 +23,7 @@ export default class ActuatorAnalogMockForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
 
     <q-card-section>
       <q-expansion-item group="modal" icon="settings" label="Settings">
