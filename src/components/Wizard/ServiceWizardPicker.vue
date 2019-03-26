@@ -44,7 +44,7 @@ export default class ServiceWizardPicker extends Vue {
 
   reset() {
     this.serviceWizardActive = false;
-    this.setTitle('Service Wizard');
+    this.setTitle('Service wizard');
   }
 
   back() {

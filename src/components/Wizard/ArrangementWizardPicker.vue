@@ -24,7 +24,7 @@ export default class ArrangementWizardPicker extends Vue {
 
   reset() {
     this.wizardActive = false;
-    this.setTitle('Arrangement Wizard');
+    this.setTitle('Arrangement wizard');
   }
 
   back() {
@@ -44,6 +44,7 @@ export default class ArrangementWizardPicker extends Vue {
       });
       return;
     }
+    this.setTitle(`${this.wizardModel.displayName} wizard`);
     this.wizardActive = true;
   }
 

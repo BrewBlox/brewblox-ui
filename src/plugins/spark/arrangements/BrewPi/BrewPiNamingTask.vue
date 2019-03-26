@@ -236,7 +236,8 @@ export default class BrewPiNamingTask extends WizardTaskBase {
               :error="!nVal || nameExists(nVal)"
               :label="spaceCased(nKey)"
               dark
-              @change="v => updateName(nKey, v)"
+              bottom-slots
+              @input="v => updateName(nKey, v)"
             >
               <template v-slot:append>
                 <q-btn
@@ -247,6 +248,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
                   @click="clearName(nKey)"
                 />
               </template>
+              <template v-slot:error>Name must not exist, and not be empty</template>
             </q-input>
           </q-item>
         </q-list>

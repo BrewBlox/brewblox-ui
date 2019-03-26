@@ -54,7 +54,7 @@ export default class DashboardWizard extends Vue {
   }
 
   mounted() {
-    this.$emit('title', 'Dashboard Wizard');
+    this.$emit('title', 'Dashboard wizard');
   }
 }
 </script>
