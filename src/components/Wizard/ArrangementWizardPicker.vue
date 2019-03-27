@@ -1,6 +1,6 @@
 <script lang="ts">
 import { objectStringSorter } from '@/helpers/functional';
-import { arrangementValues, arrangements } from '@/store/features/getters';
+import { arrangementValues } from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
@@ -73,9 +73,9 @@ export default class ArrangementWizardPicker extends Vue {
         <q-item dark>
           <q-item-section>
             <q-select
-              label="Arrangement type"
               :options="wizardOptions"
               v-model="wizardModel"
+              label="Arrangement type"
               option-label="displayName"
               dark
               options-dark

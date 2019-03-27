@@ -70,22 +70,22 @@ export default class LinkPopupEdit extends Vue {
         <q-item dark>
           <q-item-section>
             <q-btn
+              v-close-popup
               icon="clear"
               label="clear"
               flat
               @click="() => { placeholder = null; endEdit() }"
-              v-close-popup
             />
           </q-item-section>
         </q-item>
         <q-separator dark inset/>
         <q-item
+          v-close-popup
           v-for="opt in linkOptions"
           :key="opt.value"
           :active="opt.value === placeholder"
           clickable
           dark
-          v-close-popup
           @click="() => { placeholder = opt.value; endEdit() }"
         >
           <q-item-section>{{ opt.label }}</q-item-section>

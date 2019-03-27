@@ -60,7 +60,7 @@ export default class PidWidget extends BlockWidget {
     <BlockWidgetToolbar :field="me" graph/>
 
     <q-card-section>
-      <q-item dark v-if="!block.data.enabled">
+      <q-item v-if="!block.data.enabled" dark>
         <q-item-section avatar>
           <q-icon name="warning"/>
         </q-item-section>
@@ -75,7 +75,7 @@ export default class PidWidget extends BlockWidget {
         </q-item-section>
       </q-item>
 
-      <q-item dark v-if="block.data.enabled && !block.data.active">
+      <q-item v-if="block.data.enabled && !block.data.active" dark>
         <q-item-section avatar>
           <q-icon name="warning"/>
         </q-item-section>

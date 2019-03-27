@@ -85,8 +85,8 @@ export default class GraphWidget extends WidgetBase {
           <q-menu>
             <q-list dark link>
               <q-item
-                v-for="(preset, idx) in presets"
                 v-close-popup
+                v-for="(preset, idx) in presets"
                 :key="idx"
                 dark
                 clickable
@@ -110,7 +110,7 @@ export default class GraphWidget extends WidgetBase {
     </WidgetToolbar>
 
     <div class="col">
-      <GraphCard :id="$props.id" ref="widgetGraph" :config="graphCfg"/>
+      <GraphCard ref="widgetGraph" :id="$props.id" :config="graphCfg"/>
     </div>
   </q-card>
 </template>

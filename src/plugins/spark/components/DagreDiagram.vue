@@ -95,7 +95,7 @@ export default class DagreDiagram extends Vue {
     </q-toolbar>
     <div class="container">
       <svg ref="svg" class="diag-svg">
-        <g ref="diagram" class="diag-g"></g>
+        <g ref="diagram" class="diag-g"/>
       </svg>
     </div>
   </div>

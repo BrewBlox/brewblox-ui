@@ -170,7 +170,7 @@ export default class DefaultLayout extends Vue {
             style="min-height: 0px"
             class="q-pb-sm"
           >
-            <q-item-section side v-if="dashboardEditing">
+            <q-item-section v-if="dashboardEditing" side>
               <q-icon name="mdi-drag-vertical"/>
             </q-item-section>
             <q-item-section v-if="dashboardEditing">
@@ -234,7 +234,7 @@ export default class DefaultLayout extends Vue {
             style="min-height: 0px"
             class="q-pb-sm"
           >
-            <q-item-section side v-if="serviceEditing">
+            <q-item-section v-if="serviceEditing" side>
               <q-icon name="mdi-drag-vertical"/>
             </q-item-section>
             <q-item-section v-if="serviceEditing">

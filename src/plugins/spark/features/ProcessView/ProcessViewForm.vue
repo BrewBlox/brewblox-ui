@@ -87,13 +87,13 @@ export default class ProcessViewForm extends Vue {
       <q-item dark>
         <q-item-section>
           <svg
-            class="q-mx-auto"
             :width="`${SQUARE_SIZE * displayScale * rotatedSize[0]}px`"
             :height="`${SQUARE_SIZE * displayScale * rotatedSize[1]}px`"
             :viewBox="partViewBox"
+            class="q-mx-auto"
           >
             <g>
-              <ProcessViewItem :value="part"></ProcessViewItem>
+              <ProcessViewItem :value="part"/>
             </g>
           </svg>
         </q-item-section>

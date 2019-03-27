@@ -47,7 +47,7 @@ export default class DigitalConstraints extends Constraints {
 
 <template>
   <q-list separator dark>
-    <q-item dark v-for="(cinfo, idx) in constraints" :key="idx">
+    <q-item v-for="(cinfo, idx) in constraints" :key="idx" dark>
       <template v-if="readonly">
         <q-item-section :class="{ limiting: cinfo.limiting }" side>{{ label(cinfo.key) }}</q-item-section>
         <q-item-section>{{ cinfo.value | unit }}</q-item-section>
@@ -79,17 +79,17 @@ export default class DigitalConstraints extends Constraints {
         </q-item-section>
       </template>
     </q-item>
-    <q-item dark v-if="readonly && constraints.length === 0">
+    <q-item v-if="readonly && constraints.length === 0" dark>
       <q-item-section>No Constraints</q-item-section>
     </q-item>
-    <q-item dark v-if="!readonly">
+    <q-item v-if="!readonly" dark>
       <q-item-section side>Add constraint</q-item-section>
       <q-item-section v-for="opt in constraintOptions" :key="opt.value">
         <q-btn
+          v-close-popup
           :label="opt.label"
           outline
           @click="constraints.push(createConstraint(opt.value)); saveConstraints();"
-          v-close-popup
         />
       </q-item-section>
     </q-item>

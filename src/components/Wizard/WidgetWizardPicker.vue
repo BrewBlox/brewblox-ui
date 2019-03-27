@@ -57,7 +57,7 @@ export default class WidgetWizardPicker extends Vue {
 
   filterFn(val, update) {
     if (val === '') {
-      update(() => this.filteredOptions = this.wizardOptions)
+      update(() => this.filteredOptions = this.wizardOptions);
       return;
     }
 
@@ -66,7 +66,7 @@ export default class WidgetWizardPicker extends Vue {
       this.filteredOptions = this.wizardOptions
         .filter(opt => opt.label.toLowerCase().match(needle));
       console.log(this.filteredOptions);
-    })
+    });
   }
 
   setTitle(title: string) {
@@ -116,12 +116,12 @@ export default class WidgetWizardPicker extends Vue {
           <q-item-section>
             <q-select
               v-model="feature"
+              :options="filteredOptions"
+              :rules="[v => !!v || 'You must select a widget type']"
               dark
               use-input
               options-dark
               label="Widget Type"
-              :options="filteredOptions"
-              :rules="[v => !!v || 'You must select a widget type']"
               @filter="filterFn"
             >
               <template v-slot:no-option>

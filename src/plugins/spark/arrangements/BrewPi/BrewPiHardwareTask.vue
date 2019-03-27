@@ -47,14 +47,14 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
   get pinRules(): InputRule[] {
     return [
       v => !!v || 'Pin must be selected',
-      v => this.coolPin !== this.heatPin || 'Cool pin and Heat pin may not be the same',
+      () => this.coolPin !== this.heatPin || 'Cool pin and Heat pin may not be the same',
     ];
   }
 
   get sensorRules(): InputRule[] {
     return [
       v => !!v || 'Sensor must be selected',
-      v => this.fridgeSensor !== this.beerSensor || 'Fridge sensor and Beer sensor may not be the same',
+      () => this.fridgeSensor !== this.beerSensor || 'Fridge sensor and Beer sensor may not be the same',
     ];
   }
 

@@ -97,7 +97,7 @@ export default class DatetimePopupEdit extends Vue {
       </div>
       <q-item dark>
         <q-item-section>
-          <q-input v-model="datePlaceholder" dark mask="date" :rules="['date']">
+          <q-input v-model="datePlaceholder" :rules="['date']" dark mask="date">
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">
                 <q-popup-proxy ref="qDateProxy">
@@ -110,7 +110,7 @@ export default class DatetimePopupEdit extends Vue {
       </q-item>
       <q-item dark>
         <q-item-section>
-          <q-input dark v-model="timePlaceholder" mask="time" :rules="['time']">
+          <q-input v-model="timePlaceholder" :rules="['time']" dark mask="time">
             <template v-slot:append>
               <q-icon name="access_time" class="cursor-pointer">
                 <q-popup-proxy ref="qTimeProxy">

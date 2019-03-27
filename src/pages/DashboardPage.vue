@@ -239,13 +239,13 @@ export default class DashboardPage extends Vue {
           <q-list dark>
             <q-item clickable @click="widgetEditable = !widgetEditable">
               <q-item-section avatar>
-                <q-icon :name="widgetEditable ? 'check' : 'edit'"></q-icon>
+                <q-icon :name="widgetEditable ? 'check' : 'edit'"/>
               </q-item-section>
               <q-item-section>{{ widgetEditable ? 'Stop editing' : 'Edit Dashboard' }}</q-item-section>
             </q-item>
             <q-item clickable @click="() => wizardModalOpen = true">
               <q-item-section avatar>
-                <q-icon name="add"></q-icon>
+                <q-icon name="add"/>
               </q-item-section>
               <q-item-section>New Widget</q-item-section>
             </q-item>

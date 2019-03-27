@@ -276,8 +276,8 @@ export default class SparkPage extends Vue {
       </portal>
       <q-dialog v-model="modalOpen" no-backdrop-dismiss>
         <component
-          :is="modalSettings.component"
           v-if="modalOpen"
+          :is="modalSettings.component"
           v-bind="modalSettings.props"
           @close="modalOpen = false"
         />

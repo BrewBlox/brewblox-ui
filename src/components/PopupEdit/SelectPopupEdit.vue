@@ -89,17 +89,17 @@ export default class SelectPopupEdit extends Vue {
         </q-item>
         <q-item v-if="$props.clearable" dark>
           <q-item-section>
-            <q-btn icon="clear" label="clear" flat @click="endEdit(null)" v-close-popup/>
+            <q-btn v-close-popup icon="clear" label="clear" flat @click="endEdit(null)"/>
           </q-item-section>
         </q-item>
         <q-separator dark inset/>
         <q-item
+          v-close-popup
           v-for="opt in $props.options"
           :key="String(opt.value)"
           :active="opt.value === placeholder"
           clickable
           dark
-          v-close-popup
           @click="endEdit(opt.value)"
         >
           <q-item-section>{{ opt.label }}</q-item-section>

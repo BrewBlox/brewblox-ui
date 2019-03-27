@@ -4,11 +4,8 @@ import {
   providerIds,
   wizardById,
 } from '@/store/providers/getters';
-import { createService, initService } from '@/store/services/actions';
 import { serviceIds } from '@/store/services/getters';
-import { Service } from '@/store/services/state';
-import { Notify } from 'quasar';
-import Vue, { VueConstructor } from 'vue';
+import Vue from 'vue';
 import Component from 'vue-class-component';
 import isString from 'lodash/isString';
 import { objectStringSorter } from '@/helpers/functional';
@@ -99,9 +96,9 @@ export default class ServiceWizardPicker extends Vue {
         <q-item dark>
           <q-item-section>
             <q-select
-              label="Service type"
               :options="wizardOptions"
               v-model="serviceTypeModel"
+              label="Service type"
               dark
               options-dark
             />
@@ -109,7 +106,7 @@ export default class ServiceWizardPicker extends Vue {
         </q-item>
         <q-item dark>
           <q-item-section>
-            <q-input label="Service ID" dark v-model="serviceId" :rules="serviceIdRules" lazy-rules>
+            <q-input v-model="serviceId" :rules="serviceIdRules" label="Service ID" dark lazy-rules>
               <template v-slot:after>
                 <q-icon name="information">
                   <q-tooltip>
@@ -123,7 +120,7 @@ export default class ServiceWizardPicker extends Vue {
         </q-item>
         <q-item dark>
           <q-item-section>
-            <q-input label="Service title" dark v-model="serviceTitle">
+            <q-input v-model="serviceTitle" label="Service title" dark>
               <template v-slot:after>
                 <q-icon name="information">
                   <q-tooltip>

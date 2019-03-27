@@ -76,7 +76,7 @@ export default class UnknownBlockWidget extends WidgetBase {
         <q-btn flat round dense icon="settings" @click="modalOpen = true"/>
       </q-item-section>
       <q-item-section class="dense" side>
-        <q-btn flat round dense :disable="!reason.temporary" icon="refresh" @click="fetchAll"/>
+        <q-btn :disable="!reason.temporary" flat round dense icon="refresh" @click="fetchAll"/>
       </q-item-section>
     </WidgetToolbar>
 

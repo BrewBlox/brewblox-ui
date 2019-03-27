@@ -38,9 +38,9 @@ export default class SetpointSimpleWidget extends BlockWidget {
     <BlockWidgetToolbar :field="me" graph/>
 
     <q-card-section>
-      <q-item dark v-if="block.data.value === null">
+      <q-item v-if="block.data.value === null" dark>
         <q-item-section avatar>
-          <q-icon name="warning"></q-icon>
+          <q-icon name="warning"/>
         </q-item-section>
         <q-item-section>This Setpoint is invalid</q-item-section>
       </q-item>

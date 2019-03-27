@@ -51,7 +51,7 @@ export default class ActuatorPwmWidget extends BlockWidget {
     <BlockWidgetToolbar :field="me" graph/>
 
     <q-card-section>
-      <q-item dark v-if="!block.data.enabled">
+      <q-item v-if="!block.data.enabled" dark>
         <q-item-section avatar>
           <q-icon name="warning"/>
         </q-item-section>

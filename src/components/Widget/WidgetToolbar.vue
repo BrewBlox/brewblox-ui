@@ -10,8 +10,8 @@ import Vue from 'vue';
     },
     subtitle: {
       type: String,
-      default: ''
-    }
+      default: '',
+    },
   },
 })
 export default class WidgetToolbar extends Vue { }
@@ -21,7 +21,7 @@ export default class WidgetToolbar extends Vue { }
   <q-card-section class="q-pa-xs">
     <q-item dark>
       <q-item-section>
-        <q-item-label class="ellipsis text-h6">{{ $props.title}}</q-item-label>
+        <q-item-label class="ellipsis text-h6">{{ $props.title }}</q-item-label>
         <q-item-label caption class="ellipsis">{{ $props.subtitle }}</q-item-label>
       </q-item-section>
       <slot/>

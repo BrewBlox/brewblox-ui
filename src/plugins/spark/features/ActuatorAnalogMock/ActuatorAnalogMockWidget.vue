@@ -37,7 +37,7 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
     <q-card-section>
       <q-item v-if="block.value === null" dark>
         <q-item-section avatar>
-          <q-icon name="warning"></q-icon>
+          <q-icon name="warning"/>
         </q-item-section>
         <q-item-section>This Actuator is invalid</q-item-section>
       </q-item>

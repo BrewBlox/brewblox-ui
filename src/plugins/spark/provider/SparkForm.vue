@@ -272,8 +272,8 @@ export default class SparkForm extends Vue {
           </q-item-section>
           <q-item-section>
             <q-btn
-              outline
               :disable="!discoveredBlocks.length"
+              outline
               label="Clear"
               @click="clearDiscoveredBlocks"
             />

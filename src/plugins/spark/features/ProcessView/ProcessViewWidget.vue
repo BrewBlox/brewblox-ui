@@ -228,7 +228,7 @@ export default class ProcessViewWidget extends WidgetBase {
                     :height="`${SQUARE_SIZE}px`"
                     :viewBox="`0 0 ${partViewBox(part)}`"
                   >
-                    <ProcessViewItem :value="part"></ProcessViewItem>
+                    <ProcessViewItem :value="part"/>
                   </svg>
                 </q-item-section>
                 <q-item-section>{{ spaceCased(part.type) }}</q-item-section>
@@ -260,7 +260,7 @@ export default class ProcessViewWidget extends WidgetBase {
             y="8"
             class="grid-item-coordinates"
           >{{ part.x }},{{ part.y }}</text>
-          <ProcessViewItem :value="flowParts[idx]" @input="v => updatePart(idx, v)"></ProcessViewItem>
+          <ProcessViewItem :value="flowParts[idx]" @input="v => updatePart(idx, v)"/>
           <rect
             v-if="editable"
             :width="SQUARE_SIZE"
@@ -268,10 +268,10 @@ export default class ProcessViewWidget extends WidgetBase {
             stroke="silver"
             stroke-opacity="0.6"
             fill-opacity="0"
-          ></rect>
+          />
         </g>
         <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
-          <ProcessViewItem :value="dragAction.part"></ProcessViewItem>
+          <ProcessViewItem :value="dragAction.part"/>
         </g>
       </svg>
     </div>

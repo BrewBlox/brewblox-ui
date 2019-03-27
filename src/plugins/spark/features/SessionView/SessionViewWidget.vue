@@ -126,7 +126,7 @@ export default class SessionViewWidget extends WidgetBase {
           <q-btn flat icon="add" label="New" class="text-white" @click="createSession"/>
         </q-item-section>
       </q-item>
-      <q-item dark v-for="session in sessions" :key="session.id">
+      <q-item v-for="session in sessions" :key="session.id" dark>
         <q-item-section>
           {{ session.name }}
           <q-item-label caption>{{ periodString(session) }}</q-item-label>

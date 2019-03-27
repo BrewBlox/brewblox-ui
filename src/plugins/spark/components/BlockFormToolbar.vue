@@ -23,8 +23,8 @@ export default class BlockFormToolbar extends BlockForm {
       :change="$props.onSwitchBlockId"
       label="Block"
       tag="span"
-      class="text-h6"
+      class="text-h6 text-no-wrap"
     >Select a different block to be displayed by this widget.</SelectPopupEdit>
-    <div v-else class="ellipsis">{{ block.id }}</div>
+    <div v-else class="ellipsis text-no-wrap">{{ block.id }}</div>
   </WidgetFormToolbar>
 </template>

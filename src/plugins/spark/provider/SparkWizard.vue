@@ -36,7 +36,7 @@ export default class SparkWizard extends Vue {
     this.$q.notify({
       icon: 'mdi-check-all',
       color: 'positive',
-      message: `Added ${displayNameById(this.$store, service.type)} ${service.title}`
+      message: `Added ${displayNameById(this.$store, service.type)} ${service.title}`,
     });
     this.$emit('close');
   }
@@ -46,7 +46,7 @@ export default class SparkWizard extends Vue {
       color: 'negative',
       icon: 'error',
       message: `Service with ID '${this.$props.serviceId}' invalid or not found`,
-    })
+    });
     this.$emit('back');
   }
 

@@ -5,7 +5,6 @@ import { createDashboard } from '@/store/dashboards/actions';
 import { dashboardIds } from '@/store/dashboards/getters';
 import isString from 'lodash/isString';
 import { Dashboard } from '@/store/dashboards/state';
-import UrlSafeString from 'url-safe-string';
 
 @Component
 export default class DashboardWizard extends Vue {
@@ -42,13 +41,13 @@ export default class DashboardWizard extends Vue {
       id: this.dashboardId,
       title: this.dashboardTitle || this.dashboardId,
       order: dashboardIds(this.$store).length + 1,
-    }
+    };
 
     await createDashboard(this.$store, dashboard);
     this.$q.notify({
       icon: 'mdi-check-all',
       color: 'positive',
-      message: `Added dashboard ${dashboard.title}`
+      message: `Added dashboard ${dashboard.title}`,
     });
     this.$emit('close');
   }
@@ -65,10 +64,10 @@ export default class DashboardWizard extends Vue {
       <q-item dark>
         <q-item-section>
           <q-input
-            label="Dashboard ID"
-            dark
             v-model="dashboardId"
             :rules="dashboardIdRules"
+            label="Dashboard ID"
+            dark
             lazy-rules
           >
             <template v-slot:after>
@@ -81,7 +80,7 @@ export default class DashboardWizard extends Vue {
       </q-item>
       <q-item dark>
         <q-item-section>
-          <q-input label="Dashboard Title" dark v-model="dashboardTitle">
+          <q-input v-model="dashboardTitle" label="Dashboard Title" dark>
             <template v-slot:after>
               <q-icon name="information">
                 <q-tooltip>

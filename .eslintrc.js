@@ -21,8 +21,6 @@ module.exports = {
     'import/newline-after-import': 0,
     'object-curly-newline': 0,
     'no-param-reassign': 0,
-    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'warning',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'warning',
     'no-mixed-operators': 0,
     'vue/max-attributes-per-line': 0,
     'comma-dangle': [

@@ -52,7 +52,7 @@ export default class ActuatorOffsetWidget extends BlockWidget {
     <q-card-section>
       <q-item v-if="!block.data.enabled" dark>
         <q-item-section avatar>
-          <q-icon name="warning"></q-icon>
+          <q-icon name="warning"/>
         </q-item-section>
         <q-item-section>
           <span>
