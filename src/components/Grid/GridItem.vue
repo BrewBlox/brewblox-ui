@@ -354,7 +354,7 @@ export default class GridItem extends Vue {
     <!-- Item resize button -->
     <button
       v-touch-pan.mouse="resizePanHandler"
-      v-if="!$props.noMove"
+      v-if="!$props.noMove && !$props.editable"
       class="grid-item-resize-handle"
     >
       <q-icon name="mdi-resize-bottom-right" size="30px"/>

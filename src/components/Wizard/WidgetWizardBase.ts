@@ -1,3 +1,4 @@
+import isString from 'lodash/isString';
 import { dashboardItemById } from '@/store/dashboards/getters';
 import { DashboardItem } from '@/store/dashboards/state';
 import { widgetSizeById } from '@/store/features/getters';
@@ -27,6 +28,8 @@ export interface NavAction {
 export default class WidgetWizardBase extends Vue {
   protected $q: any;
 
+  protected widgetId: string = '';
+
   protected get typeId(): string {
     return this.$props.featureId;
   }
@@ -35,8 +38,35 @@ export default class WidgetWizardBase extends Vue {
     return widgetSizeById(this.$store, this.typeId);
   }
 
+  protected get widgetIdRules(): InputRule[] {
+    return [
+      v => !!v || 'Name must not be empty',
+      v => !this.itemAlreadyExists(v) || 'Name must be unique',
+    ];
+  }
+
+  protected get widgetIdOk(): boolean {
+    return !this.widgetIdRules.some(rule => isString(rule(this.widgetId)));
+  }
+
   protected itemAlreadyExists(id: string): boolean {
     return !!dashboardItemById(this.$store, id);
+  }
+
+  protected changeWidgetId(newId: string): void {
+    const errors = this.widgetIdRules
+      .map(rule => rule(newId))
+      .filter(isString);
+
+    if (errors.length > 0) {
+      this.$q.notify({
+        message: errors.join(', '),
+        color: 'negative',
+        icon: 'error',
+      });
+      return;
+    }
+    this.widgetId = newId;
   }
 
   protected async createItem(item: DashboardItem): Promise<void> {
@@ -59,10 +89,6 @@ export default class WidgetWizardBase extends Vue {
 
   protected back(): void {
     this.$emit('back');
-  }
-
-  protected cancel(): void {
-    this.$emit('close');
   }
 
   protected close(): void {

@@ -161,19 +161,6 @@ export default class SparkPage extends Vue {
     this.statusCheckInterval && clearTimeout(this.statusCheckInterval);
   }
 
-  async onCreateBlock(block: Block) {
-    try {
-      await createBlock(this.$store, this.$props.serviceId, block);
-      this.modalOpen = false;
-      this.$q.notify({
-        type: 'positive',
-        message: `Created ${displayNameById(this.$store, block.type)} "${block.id}"`,
-      });
-    } catch (e) {
-      this.$q.notify(`Failed to create block: ${e.toString()}`);
-    }
-  }
-
   onChangeBlockId(currentId: string, newId: string) {
     renameBlock(this.$store, this.$props.serviceId, currentId, newId);
   }
@@ -233,10 +220,9 @@ export default class SparkPage extends Vue {
 
   startCreateBlock() {
     this.modalSettings = {
-      component: 'NewBlockWizard',
+      component: 'BlockWizard',
       props: {
         serviceId: this.$props.serviceId,
-        onCreateBlock: this.onCreateBlock,
       },
     };
     this.modalOpen = true;

@@ -131,7 +131,7 @@ export default class DefaultLayout extends Vue {
 
         <q-item clickable @click.native="wizardModalOpen = true">
           <q-item-section avatar>
-            <q-icon name="add"/>
+            <q-icon name="mdi-creation"/>
           </q-item-section>
           <q-item-section>Wizardry</q-item-section>
         </q-item>

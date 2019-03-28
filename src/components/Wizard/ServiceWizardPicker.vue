@@ -107,8 +107,8 @@ export default class ServiceWizardPicker extends Vue {
         <q-item dark>
           <q-item-section>
             <q-input v-model="serviceId" :rules="serviceIdRules" label="Service ID" dark lazy-rules>
-              <template v-slot:after>
-                <q-icon name="information">
+              <template v-slot:append>
+                <q-icon name="mdi-information">
                   <q-tooltip>
                     The Service ID is how the service is contacted.
                     <br>This should match the ID in docker-compose.
@@ -121,8 +121,8 @@ export default class ServiceWizardPicker extends Vue {
         <q-item dark>
           <q-item-section>
             <q-input v-model="serviceTitle" label="Service title" dark>
-              <template v-slot:after>
-                <q-icon name="information">
+              <template v-slot:append>
+                <q-icon name="mdi-information">
                   <q-tooltip>
                     The Service title is how the service is displayed in the UI.
                     <br>This choice is purely graphical: pick a name that makes sense to you.
@@ -137,9 +137,9 @@ export default class ServiceWizardPicker extends Vue {
 
       <q-separator dark/>
 
-      <q-card-actions>
-        <q-btn unelevated label="Back" class="full-width" @click="back"/>
-        <q-btn unelevated label="Next" color="primary" class="full-width q-mt-sm" @click="next"/>
+      <q-card-actions class="row justify-between">
+        <q-btn unelevated label="Back" @click="back"/>
+        <q-btn unelevated label="Next" color="primary" @click="next"/>
       </q-card-actions>
     </template>
   </div>

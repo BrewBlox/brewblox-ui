@@ -26,4 +26,3 @@ export default class WidgetFormToolbar extends FormBase { }
     </template>
   </FormToolbar>
 </template>
-

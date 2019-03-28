@@ -35,11 +35,11 @@ export default class DrivenIndicator extends Vue {
 </script>
 
 <template>
-  <q-list v-if="isDriven" dark separator no-border class="unpadded">
+  <q-list v-if="isDriven" dark separator no-border class="q-pa-none">
     <q-item
       v-for="(chain, chainIdx) in textChains"
       :key="chainIdx"
-      class="unpadded"
+      class="q-pa-none"
       style="min-height: 0px;"
     >
       <q-item-section>

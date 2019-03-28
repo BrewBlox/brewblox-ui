@@ -86,9 +86,9 @@ export default class ArrangementWizardPicker extends Vue {
 
       <q-separator dark/>
 
-      <q-card-actions>
-        <q-btn unelevated label="Back" class="full-width" @click="back"/>
-        <q-btn unelevated label="Next" color="primary" class="full-width q-mt-sm" @click="next"/>
+      <q-card-actions class="row justify-between">
+        <q-btn unelevated label="Back" @click="back"/>
+        <q-btn unelevated label="Next" color="primary" @click="next"/>
       </q-card-actions>
     </template>
   </div>

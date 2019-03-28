@@ -368,40 +368,5 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
     <q-card-actions>
       <q-btn unelevated label="Done" color="primary" class="full-width" @click="done"/>
     </q-card-actions>
-
-    <q-card v-if="false" dark>
-      <q-card-actions>
-        <q-btn label="Done" color="primary" @click="done"/>
-      </q-card-actions>
-      <q-card-main class="row">
-        <div>
-          <q-list no-border>
-            <q-item dark>
-              <big>Settings</big>
-            </q-item>
-            <q-item dark>
-              <q-field label="Fridge temperature" orientation="vertical" style="max-width: 200px;">
-                <UnitPopupEdit
-                  :field="fridgeSetpointValue"
-                  :change="v => fridgeSetpointValue = v"
-                  label="Fridge temperature"
-                  tag="span"
-                />
-              </q-field>
-            </q-item>
-            <q-item dark>
-              <q-field label="Beer temperature" orientation="vertical" style="max-width: 200px;">
-                <UnitPopupEdit
-                  :field="beerSetpointValue"
-                  :change="v => beerSetpointValue = v"
-                  label="Beer temperature"
-                  tag="span"
-                />
-              </q-field>
-            </q-item>
-          </q-list>
-        </div>
-      </q-card-main>
-    </q-card>
   </div>
 </template>

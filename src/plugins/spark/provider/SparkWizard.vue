@@ -64,7 +64,7 @@ export default class SparkWizard extends Vue {
 <template>
   <q-card-section style="min-height: 100px">
     <q-item>
-      <q-spinner :size="30" class="centered"/>
+      <q-spinner :size="30" style="margin: auto"/>
     </q-item>
   </q-card-section>
 </template>
