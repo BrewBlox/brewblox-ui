@@ -39,8 +39,8 @@ export default class ActuatorDS2413Form extends BlockForm {
           state: 0,
           constrainedBy: {
             constraints: [
-              { "minOff[second]": 300 },
-              { "minOn[second]": 180 },
+              { 'minOff[second]': 300 },
+              { 'minOn[second]': 180 },
             ],
           },
         },

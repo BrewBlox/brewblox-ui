@@ -144,15 +144,6 @@ export default class GridItem extends Vue {
     this.$props.onStopInteraction();
   }
 
-  onResizeMove(e: MouseEvent | TouchEvent) {
-    const delta = this.moveDelta(e);
-
-    this.dragWidth = this.dragStartWidth + delta.x;
-    this.dragHeight = this.dragStartHeight + delta.y;
-
-    this.updateSize();
-  }
-
   updateSize() {
     const newCols = Math.round((this.dragWidth + GAP_SIZE) / (GRID_SIZE + GAP_SIZE));
     const newRows = Math.round((this.dragHeight + GAP_SIZE) / (GRID_SIZE + GAP_SIZE));
@@ -215,23 +206,6 @@ export default class GridItem extends Vue {
     throw new Error('Container is not a valid Element');
   }
 
-  startResize(e: MouseEvent | TouchEvent) {
-    this.dragging = true;
-    this.startInteraction(e);
-  }
-
-  stopResize() {
-    this.dragging = false;
-
-    this.$props.onUpdateItemSize(
-      this.$props.id,
-      this.currentCols || this.$props.cols,
-      this.currentRows || this.$props.rows,
-    );
-
-    this.stopInteraction();
-  }
-
   gridPosition(delta: Coordinates = { x: 0, y: 0 }): { x: number; y: number } {
     if (!this.dragStartX || !this.dragStartY || !this.dragStartParentX || !this.dragStartParentY) {
       throw new Error('No starting drag positions know');
@@ -283,6 +257,7 @@ export default class GridItem extends Vue {
   }
 
   resizePanHandler(args: PanArguments) {
+    console.log(args);
     if (this.$props.noMove) {
       return;
     }
@@ -297,7 +272,32 @@ export default class GridItem extends Vue {
       return;
     }
 
+    console.log('move');
     this.onResizeMove(args.evt);
+  }
+
+  startResize(e: MouseEvent | TouchEvent) {
+    this.dragging = true;
+    this.startInteraction(e);
+  }
+
+  onResizeMove(e: MouseEvent | TouchEvent) {
+    const delta = this.moveDelta(e);
+    this.dragWidth = this.dragStartWidth + delta.x;
+    this.dragHeight = this.dragStartHeight + delta.y;
+    this.updateSize();
+  }
+
+  stopResize() {
+    this.dragging = false;
+
+    this.$props.onUpdateItemSize(
+      this.$props.id,
+      this.currentCols || this.$props.cols,
+      this.currentRows || this.$props.rows,
+    );
+
+    this.stopInteraction();
   }
 
   movePanHandler(args: PanArguments) {
@@ -356,7 +356,7 @@ export default class GridItem extends Vue {
     <!-- Item resize button -->
     <button
       v-touch-pan.mouse="resizePanHandler"
-      v-if="!dragging && !moving && $props.editable && !$props.noMove"
+      v-if="!$props.noMove"
       class="grid-item-resize-handle"
     >
       <q-icon name="mdi-resize-bottom-right" size="30px"/>

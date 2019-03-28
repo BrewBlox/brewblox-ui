@@ -6,11 +6,11 @@ import BlockForm from '@/plugins/spark/components/BlockForm';
   props: {
     textEnabled: {
       type: String,
-      default: "This block is enabled",
+      default: 'This block is enabled',
     },
     textDisabled: {
       type: String,
-      default: "This block is disabled",
+      default: 'This block is disabled',
     },
   },
 })

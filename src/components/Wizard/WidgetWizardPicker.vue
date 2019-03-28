@@ -65,7 +65,6 @@ export default class WidgetWizardPicker extends Vue {
       const needle = val.toLowerCase();
       this.filteredOptions = this.wizardOptions
         .filter(opt => opt.label.toLowerCase().match(needle));
-      console.log(this.filteredOptions);
     });
   }
 

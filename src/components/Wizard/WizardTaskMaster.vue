@@ -43,7 +43,7 @@ export default class WizardTaskMaster extends Vue {
       this.$q.notify({
         color: 'positive',
         icon: 'mdi-check-all',
-        message: `Done!`,
+        message: 'Done!',
       });
     } catch (e) {
       this.$q.notify({

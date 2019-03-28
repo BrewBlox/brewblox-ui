@@ -12,6 +12,7 @@ module.exports = {
     '@vue/typescript'
   ],
   'rules': {
+    'quotes': ['error', 'single', { 'avoidEscape': true }],
     'class-methods-use-this': 0,
     'import/first': 0,
     'import/extensions': 0,

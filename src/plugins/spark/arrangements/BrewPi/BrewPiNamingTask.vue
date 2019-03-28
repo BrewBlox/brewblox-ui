@@ -154,105 +154,107 @@ export default class BrewPiNamingTask extends WizardTaskBase {
 
 <template>
   <div>
-    <q-card-section class="row no-wrap">
-      <div>
-        <q-list no-border>
-          <q-item dark>
-            <big>Arrangement</big>
-          </q-item>
-          <q-item dark>
-            <q-select
-              v-model="serviceId"
-              :options="serviceOpts"
-              options-dark
-              map-options
-              label="Service"
-              dark
-            />
-          </q-item>
-          <q-item dark>
-            <q-input v-model="arrangementId" label="Arrangement name" dark>
-              <template v-slot:append>
-                <q-btn
-                  icon="mdi-backup-restore"
-                  flat
-                  size="sm"
-                  color="white"
-                  @click="clearKey('arrangementId')"
-                />
-              </template>
-            </q-input>
-          </q-item>
-          <q-item dark>
-            <q-input v-model="prefix" label="Widget prefix" dark>
-              <template v-slot:append>
-                <q-btn
-                  icon="mdi-backup-restore"
-                  flat
-                  size="sm"
-                  color="white"
-                  @click="clearKey('prefix')"
-                />
-              </template>
-            </q-input>
-          </q-item>
-          <q-item dark>
-            <q-input v-model="dashboardTitle" :error="!dashboardTitle" label="Dashboard" dark>
-              <template v-slot:append>
-                <q-btn
-                  icon="mdi-backup-restore"
-                  flat
-                  size="sm"
-                  color="white"
-                  @click="clearKey('dashboardTitle')"
-                />
-              </template>
-            </q-input>
-          </q-item>
-          <q-item dark>
-            <big>Groups</big>
-          </q-item>
-          <q-item dark>
-            <GroupsPopupEdit
-              v-if="serviceId"
-              :field="groups"
-              :service-id="serviceId"
-              :change="v => groups = v"
-              tag="span"
-              dark
-            />
-            <q-item-label v-else>No service selected</q-item-label>
-          </q-item>
-        </q-list>
-      </div>
-      <div>
-        <q-list no-border>
-          <q-item dark>
-            <big>Widget Names</big>
-          </q-item>
-          <q-item v-for="(nVal, nKey) in names" :key="nKey">
-            <q-input
-              :value="nVal"
-              :error="!nVal || nameExists(nVal)"
-              :label="spaceCased(nKey)"
-              dark
-              bottom-slots
-              @input="v => updateName(nKey, v)"
-            >
-              <template v-slot:append>
-                <q-btn
-                  icon="mdi-backup-restore"
-                  flat
-                  size="sm"
-                  color="white"
-                  @click="clearName(nKey)"
-                />
-              </template>
-              <template v-slot:error>Name must not exist, and not be empty</template>
-            </q-input>
-          </q-item>
-        </q-list>
-      </div>
+    <q-card-section class="row no-wrap" style="height: 80vh">
+      <q-scroll-area>
+        <div>
+          <q-list no-border>
+            <q-item dark>
+              <big>Arrangement</big>
+            </q-item>
+            <q-item dark>
+              <q-select
+                v-model="serviceId"
+                :options="serviceOpts"
+                options-dark
+                map-options
+                label="Service"
+                dark
+              />
+            </q-item>
+            <q-item dark>
+              <q-input v-model="arrangementId" label="Arrangement name" dark>
+                <template v-slot:append>
+                  <q-btn
+                    icon="mdi-backup-restore"
+                    flat
+                    size="sm"
+                    color="white"
+                    @click="clearKey('arrangementId')"
+                  />
+                </template>
+              </q-input>
+            </q-item>
+            <q-item dark>
+              <q-input v-model="prefix" label="Widget prefix" dark>
+                <template v-slot:append>
+                  <q-btn
+                    icon="mdi-backup-restore"
+                    flat
+                    size="sm"
+                    color="white"
+                    @click="clearKey('prefix')"
+                  />
+                </template>
+              </q-input>
+            </q-item>
+            <q-item dark>
+              <q-input v-model="dashboardTitle" :error="!dashboardTitle" label="Dashboard" dark>
+                <template v-slot:append>
+                  <q-btn
+                    icon="mdi-backup-restore"
+                    flat
+                    size="sm"
+                    color="white"
+                    @click="clearKey('dashboardTitle')"
+                  />
+                </template>
+              </q-input>
+            </q-item>
+            <q-item dark>
+              <big>Groups</big>
+            </q-item>
+            <q-item dark>
+              <GroupsPopupEdit
+                v-if="serviceId"
+                :field="groups"
+                :service-id="serviceId"
+                :change="v => groups = v"
+                tag="span"
+                dark
+              />
+              <q-item-label v-else>No service selected</q-item-label>
+            </q-item>
+          </q-list>
+        </div>
+        <div>
+          <q-list no-border dense>
+            <q-item dark>
+              <big>Widget Names</big>
+            </q-item>
+            <q-item v-for="(nVal, nKey) in names" :key="nKey">
+              <q-input
+                :value="nVal"
+                :error="!nVal || nameExists(nVal)"
+                :label="spaceCased(nKey)"
+                dark
+                bottom-slots
+                @input="v => updateName(nKey, v)"
+              >
+                <template v-slot:append>
+                  <q-btn
+                    icon="mdi-backup-restore"
+                    flat
+                    size="sm"
+                    color="white"
+                    @click="clearName(nKey)"
+                  />
+                </template>
+                <template v-slot:error>Name must not exist, and not be empty</template>
+              </q-input>
+            </q-item>
+          </q-list>
+        </div>
+      </q-scroll-area>
     </q-card-section>
 
     <q-separator dark/>

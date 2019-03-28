@@ -43,13 +43,22 @@ export default class WidgetWizardBase extends Vue {
     try {
       await appendDashboardItem(this.$store, item);
       this.$q.notify({
-        type: 'positive',
-        message: `Added ${displayNameById(this.$store, item.feature)} "${item.id}"`,
+        icon: 'mdi-check-all',
+        color: 'positive',
+        message: `Added ${displayNameById(this.$store, item.feature)} '${item.id}'`,
       });
     } catch (e) {
-      this.$q.notify(`Failed to add widget: ${e.toString()}`);
+      this.$q.notify({
+        icon: 'error',
+        color: 'negative',
+        message: `Failed to add widget: ${e.toString()}`,
+      });
     }
     this.$emit('close');
+  }
+
+  protected back(): void {
+    this.$emit('back');
   }
 
   protected cancel(): void {

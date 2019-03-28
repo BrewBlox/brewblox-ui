@@ -1,4 +1,4 @@
-import { Coordinates } from "@/helpers/coordinates";
+import { Coordinates } from '@/helpers/coordinates';
 
 export interface FlowRoute {
   outCoords: string;
