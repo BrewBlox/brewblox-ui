@@ -257,7 +257,6 @@ export default class GridItem extends Vue {
   }
 
   resizePanHandler(args: PanArguments) {
-    console.log(args);
     if (this.$props.noMove) {
       return;
     }
@@ -272,7 +271,6 @@ export default class GridItem extends Vue {
       return;
     }
 
-    console.log('move');
     this.onResizeMove(args.evt);
   }
 
