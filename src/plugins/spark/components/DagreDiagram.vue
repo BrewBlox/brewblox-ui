@@ -10,6 +10,9 @@ interface Edge {
   relation: string[];
 }
 
+const LABEL_HEIGHT = 50;
+const LABEL_WIDTH = 150;
+
 @Component({
   props: {
     nodes: {
@@ -29,7 +32,8 @@ export default class DagreDiagram extends Vue {
     svg: SVGGraphicsElement;
     diagram: SVGGraphicsElement;
   }
-  renderFunc = new dagreRender();
+  lastRelationString: string = '';
+  graphObj: any = null;
 
   get edges() {
     return this.$props.relations
@@ -41,75 +45,98 @@ export default class DagreDiagram extends Vue {
       .filter(n => this.edges.find(e => e.source === n.id || e.target === n.id));
   }
 
-  mounted() {
-    setTimeout(() => this.draw(), 50);
+  @Watch('relations', { immediate: true })
+  display() {
+    setTimeout(() => this.calc() && setTimeout(() => this.draw(), 100), 100);
   }
 
-  @Watch('relations')
-  draw() {
+  calc(): boolean {
+    const newRelationString = JSON.stringify(this.$props.relations);
+    if (newRelationString === this.lastRelationString) {
+      return false;
+    }
+
     const nodeTemplate = (id: string, type: string) => {
       return `
-        <div>
+        <div style="width: ${LABEL_WIDTH}px; height: ${LABEL_HEIGHT}px">
           <div class="type">${type}</div>
           <div class="id">${id}</div>
         </div>
         `;
     };
 
-    const graphObj = new graphlib
+    const obj = new graphlib
       .Graph({ multigraph: true })
       .setGraph({ marginx: 20, marginy: 20 });
 
     this.drawnNodes.forEach(val => {
-      graphObj.setNode(val.id, {
+      obj.setNode(val.id, {
         id: val.id,
-        labelType: 'html',
         label: nodeTemplate(val.id, val.type),
+        labelType: 'html',
+        width: LABEL_WIDTH,
+        height: LABEL_HEIGHT,
         rx: 5,
         ry: 5,
+        class: 'test-label',
       });
     });
 
     this.edges.forEach(val => {
-      graphObj.setEdge(val.source, val.target, {
-        labelType: 'html',
-        label: `<div class="relation">${val.relation[0].replace(/Id$/, '')}</div>`,
+      obj.setEdge(val.source, val.target, {
+        label: val.relation[0].replace(/Id$/, ''),
+        labelStyle: 'fill: white; stroke: none;',
+        style: 'fill: none; stroke: red; stroke-width: 1.5px;',
+        arrowheadStyle: 'fill: red; stroke: red;',
       },
         val.relation[0]);
     });
 
-    this.renderFunc(d3Select(this.$refs.diagram), graphObj);
+    this.graphObj = obj;
+    this.lastRelationString = newRelationString;
+    return true;
+  }
 
-    const outGraph = graphObj.graph();
-    this.$refs.svg.setAttribute('width', outGraph.width);
+  draw() {
+    const renderFunc = new dagreRender();
+    renderFunc(d3Select(this.$refs.diagram), this.graphObj);
+    const outGraph = this.graphObj.graph();
     this.$refs.svg.setAttribute('height', outGraph.height);
+    this.$refs.svg.setAttribute('width', outGraph.width);
+    this.$refs.svg.setAttribute('viewBox', `0 0 ${outGraph.width} ${outGraph.height}`);
+
+    this.$nextTick(() => {
+      // Here be dragons
+      // Dagre incorrectly renders the injected HTML as a "foreignObject" with 0x0 size
+      // The hacky, but working solution is to override the SVG properties
+      this.$el.querySelectorAll('foreignObject')
+        .forEach(el => {
+          el.setAttribute('width', `${LABEL_WIDTH}`);
+          el.setAttribute('height', `${LABEL_HEIGHT}`);
+          (el.parentElement as HTMLElement)
+            .setAttribute('transform', `translate(-${LABEL_WIDTH / 2}, -${LABEL_HEIGHT / 2})`);
+        });
+    });
   }
 }
 </script>
 
 <template>
-  <div>
-    <q-toolbar class="unpadded">
-      <q-toolbar-title>Block Relations</q-toolbar-title>
-      <q-btn v-close-overlay flat rounded label="close"/>
-    </q-toolbar>
-    <div class="container">
+  <q-card dark class="maximized bg-dark-bright">
+    <FormToolbar>Block Relations</FormToolbar>
+
+    <q-card-section class="absolute-center">
       <svg ref="svg" class="diag-svg">
         <g ref="diagram" class="diag-g"/>
       </svg>
-    </div>
-  </div>
+    </q-card-section>
+  </q-card>
 </template>
 
 <style lang="stylus" scoped>
-.diag-svg {
-  stroke: red;
-  fill: red;
-}
-
 /deep/ .node .id {
   font-weight: 300;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serf;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 14px;
   color: black;
   padding: 10px;
@@ -119,7 +146,7 @@ export default class DagreDiagram extends Vue {
 
 /deep/ .node .type {
   font-weight: 300;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serf;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 12px;
   color: green;
   width: 100%;
@@ -127,17 +154,6 @@ export default class DagreDiagram extends Vue {
 }
 
 /deep/ .node rect {
-  stroke: none;
   fill: #fff;
-  stroke-width: 1.5px;
-}
-
-/deep/ .edgePath path.path {
-  fill: none;
-  stroke-width: 1.5px;
-}
-
-.container {
-  padding: 20px;
 }
 </style>

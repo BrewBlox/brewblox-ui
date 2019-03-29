@@ -20,8 +20,8 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
 </script>
 
 <template>
-  <q-card dark class="column">
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+  <q-card dark class="text-white scroll">
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <ActuatorAnalogMockForm
         v-if="modalOpen"
         v-bind="$props"
@@ -30,19 +30,25 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
         :on-change-block-id="changeBlockId"
         :on-switch-block-id="switchBlockId"
       />
-    </q-modal>
-    <q-card-title class="title-bar">
-      <div class="ellipsis">{{ widgetId }}</div>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
-      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
-      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
-    </q-card-title>
-    <q-card-separator/>
-    <q-alert v-if="block.value === null" type="warning" color="warning">This Actuator is invalid</q-alert>
-    <q-card-main class="column widget-body">
-      <div class="full-width">
-        <q-field label="Setting">
+    </q-dialog>
+
+    <BlockWidgetToolbar :field="me" graph/>
+
+    <q-card-section>
+      <q-item v-if="block.value === null" dark>
+        <q-item-section avatar>
+          <q-icon name="warning"/>
+        </q-item-section>
+        <q-item-section>This Actuator is invalid</q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>
+          <div class="column">
+            <span>Setting</span>
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          </div>
+        </q-item-section>
+        <q-item-section>
           <InputPopupEdit
             v-if="!isDriven"
             :field="block.data.setting"
@@ -51,20 +57,25 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
             label="Setting"
           />
           <big v-else>{{ block.data.setting | unit }}</big>
-          <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
-        </q-field>
-        <q-field label="Value">
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>Value</q-item-section>
+        <q-item-section>
           <big>{{ block.data.value | round }}</big>
-        </q-field>
-        <q-field label="Constraints">
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-label>Constraints</q-item-label>
+        <q-item-section>
           <AnalogConstraints
             :service-id="serviceId"
             :field="block.data.constrainedBy"
             :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
             readonly
           />
-        </q-field>
-      </div>
-    </q-card-main>
+        </q-item-section>
+      </q-item>
+    </q-card-section>
   </q-card>
 </template>

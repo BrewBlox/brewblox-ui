@@ -13,14 +13,22 @@ const prettify = (v: string): string =>
     .replace(/ \* /gi, '·');
 
 export default class Unit {
-  public value: number | null;
+  private val: number | null;
   public unit: string;
   public notation: string;
 
   public constructor(value: number | null, unit: string) {
-    this.value = value;
+    this.val = Number(value);
     this.unit = unit;
     this.notation = prettify(this.unit);
+  }
+
+  public get value(): number | null {
+    return this.val;
+  }
+
+  public set value(v: number | null) {
+    this.val = Number(v);
   }
 
   public get unitNotation(): string {

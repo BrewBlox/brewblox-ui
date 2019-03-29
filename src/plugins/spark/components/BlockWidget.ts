@@ -10,6 +10,10 @@ import { blockById, drivenChains } from '../store/getters';
 export default class BlockWidget extends WidgetBase {
   protected modalOpen: boolean = false;
 
+  public get me(): BlockWidget {
+    return this;
+  }
+
   protected get serviceId(): string {
     return this.$props.config.serviceId;
   }

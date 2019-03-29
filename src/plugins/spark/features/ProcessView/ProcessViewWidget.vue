@@ -197,80 +197,89 @@ export default class ProcessViewWidget extends WidgetBase {
 </script>
 
 <template>
-  <q-card dark>
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+  <q-card dark class="text-white column">
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <ProcessViewForm
         v-if="modalOpen"
         :value="flowParts[contextAction.idx]"
         @input="v => updatePart(contextAction.idx, v)"
         @remove="v => { removePart(v); modalOpen = false; }"
       />
-    </q-modal>
-    <q-card-title class="title-bar">
-      <InputPopupEdit :field="widgetId" :change="v => widgetId = v" label="Widget ID" tag="span"/>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <q-btn v-if="editable" slot="right" flat round dense icon="delete" @click="clearParts"/>
-      <q-btn v-if="editable" slot="right" flat round dense icon="extension">
-        <q-popover>
-          <q-list link style="padding: 5px">
-            <q-item
-              v-touch-pan="v => panHandler(part, v)"
-              v-for="part in availableParts"
-              :key="part.type"
-            >
-              <q-item-side>
-                <svg
-                  :width="`${SQUARE_SIZE}px`"
-                  :height="`${SQUARE_SIZE}px`"
-                  :viewBox="`0 0 ${partViewBox(part)}`"
-                >
-                  <ProcessViewItem :value="part"/>
-                </svg>
-              </q-item-side>
-              <q-item-main>{{ spaceCased(part.type) }}</q-item-main>
-            </q-item>
-          </q-list>
-        </q-popover>
-      </q-btn>
-      <q-toggle slot="right" v-model="editable"/>
-    </q-card-title>
-    <q-card-separator/>
-    <svg ref="grid" :class="gridClasses">
-      <g
-        v-touch-pan="v => panHandler(part, v)"
-        v-touch-hold="v => holdHandler(part, v)"
-        v-for="(part, idx) in parts"
-        v-show="!beingDragged(part)"
-        :transform="partTranslate(part)"
-        :key="partKey(part)"
-        class="grid-item"
-      >
-        <text
-          v-if="editable"
-          fill="white"
-          x="0"
-          y="8"
-          class="grid-item-coordinates"
-        >{{ part.x }},{{ part.y }}</text>
-        <ProcessViewItem :value="flowParts[idx]" @input="v => updatePart(idx, v)"/>
-        <rect
-          v-if="editable"
-          :width="SQUARE_SIZE"
-          :height="SQUARE_SIZE"
-          stroke="silver"
-          stroke-opacity="0.6"
-          fill-opacity="0"
-        />
-      </g>
-      <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
-        <ProcessViewItem :value="dragAction.part"/>
-      </g>
-    </svg>
+    </q-dialog>
+
+    <WidgetToolbar :title="widgetId" :subtitle="displayName">
+      <q-item-section v-if="editable" side>
+        <q-btn flat round dense icon="delete" @click="clearParts"/>
+      </q-item-section>
+      <q-item-section v-if="editable" side>
+        <q-btn flat round dense icon="extension">
+          <q-menu>
+            <q-list link style="padding: 5px">
+              <q-item
+                v-touch-pan.mouse="v => panHandler(part, v)"
+                v-for="part in availableParts"
+                :key="part.type"
+                dark
+                clickable
+              >
+                <q-item-section side>
+                  <svg
+                    :width="`${SQUARE_SIZE}px`"
+                    :height="`${SQUARE_SIZE}px`"
+                    :viewBox="`0 0 ${partViewBox(part)}`"
+                  >
+                    <ProcessViewItem :value="part"/>
+                  </svg>
+                </q-item-section>
+                <q-item-section>{{ spaceCased(part.type) }}</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
+      </q-item-section>
+      <q-item-section side>
+        <q-toggle v-model="editable"/>
+      </q-item-section>
+    </WidgetToolbar>
+
+    <div class="col">
+      <svg ref="grid" :class="gridClasses">
+        <g
+          v-touch-pan.mouse="v => panHandler(part, v)"
+          v-touch-hold.mouse="v => holdHandler(part, v)"
+          v-for="(part, idx) in parts"
+          v-show="!beingDragged(part)"
+          :transform="partTranslate(part)"
+          :key="partKey(part)"
+          class="grid-item"
+        >
+          <text
+            v-if="editable"
+            fill="white"
+            x="0"
+            y="8"
+            class="grid-item-coordinates"
+          >{{ part.x }},{{ part.y }}</text>
+          <ProcessViewItem :value="flowParts[idx]" @input="v => updatePart(idx, v)"/>
+          <rect
+            v-if="editable"
+            :width="SQUARE_SIZE"
+            :height="SQUARE_SIZE"
+            stroke="silver"
+            stroke-opacity="0.6"
+            fill-opacity="0"
+          />
+        </g>
+        <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
+          <ProcessViewItem :value="dragAction.part"/>
+        </g>
+      </svg>
+    </div>
   </q-card>
 </template>
 
 <style lang="stylus" scoped>
-@import '../../../../../src/css/app.styl';
+@import '../../../../../src/styles/quasar.styl';
 
 .grid-base {
   width: 100%;

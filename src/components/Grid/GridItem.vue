@@ -144,15 +144,6 @@ export default class GridItem extends Vue {
     this.$props.onStopInteraction();
   }
 
-  onResizeMove(e: MouseEvent | TouchEvent) {
-    const delta = this.moveDelta(e);
-
-    this.dragWidth = this.dragStartWidth + delta.x;
-    this.dragHeight = this.dragStartHeight + delta.y;
-
-    this.updateSize();
-  }
-
   updateSize() {
     const newCols = Math.round((this.dragWidth + GAP_SIZE) / (GRID_SIZE + GAP_SIZE));
     const newRows = Math.round((this.dragHeight + GAP_SIZE) / (GRID_SIZE + GAP_SIZE));
@@ -213,23 +204,6 @@ export default class GridItem extends Vue {
       return this.$refs.container.getBoundingClientRect() as DOMRect;
     }
     throw new Error('Container is not a valid Element');
-  }
-
-  startResize(e: MouseEvent | TouchEvent) {
-    this.dragging = true;
-    this.startInteraction(e);
-  }
-
-  stopResize() {
-    this.dragging = false;
-
-    this.$props.onUpdateItemSize(
-      this.$props.id,
-      this.currentCols || this.$props.cols,
-      this.currentRows || this.$props.rows,
-    );
-
-    this.stopInteraction();
   }
 
   gridPosition(delta: Coordinates = { x: 0, y: 0 }): { x: number; y: number } {
@@ -300,6 +274,30 @@ export default class GridItem extends Vue {
     this.onResizeMove(args.evt);
   }
 
+  startResize(e: MouseEvent | TouchEvent) {
+    this.dragging = true;
+    this.startInteraction(e);
+  }
+
+  onResizeMove(e: MouseEvent | TouchEvent) {
+    const delta = this.moveDelta(e);
+    this.dragWidth = this.dragStartWidth + delta.x;
+    this.dragHeight = this.dragStartHeight + delta.y;
+    this.updateSize();
+  }
+
+  stopResize() {
+    this.dragging = false;
+
+    this.$props.onUpdateItemSize(
+      this.$props.id,
+      this.currentCols || this.$props.cols,
+      this.currentRows || this.$props.rows,
+    );
+
+    this.stopInteraction();
+  }
+
   movePanHandler(args: PanArguments) {
     if (this.$props.noMove) {
       return;
@@ -355,17 +353,20 @@ export default class GridItem extends Vue {
     />
     <!-- Item resize button -->
     <button
-      v-touch-pan="resizePanHandler"
-      v-if="!dragging && !moving && $props.editable && !$props.noMove"
+      v-touch-pan.mouse="resizePanHandler"
+      v-if="!$props.noMove && !$props.editable"
       class="grid-item-resize-handle"
     >
       <q-icon name="mdi-resize-bottom-right" size="30px"/>
     </button>
     <!-- Item drag button -->
     <button
-      v-touch-pan="movePanHandler"
+      v-touch-pan.mouse="movePanHandler"
       v-if="!dragging && $props.editable"
-      class="grid-item-move-handle"
+      :class="{
+        ['grid-item-move-handle']: true,
+        ['grid-item-movable']: !$props.noMove,
+      }"
     >
       <div class="column">
         <div v-if="!$props.noMove" class="column">
@@ -398,7 +399,7 @@ export default class GridItem extends Vue {
       </div>
     </button>
     <!-- Action modal -->
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <WidgetActionMenu
         v-if="modalOpen"
         :item-id="$props.id"
@@ -406,12 +407,12 @@ export default class GridItem extends Vue {
         :on-move="$props.onMove"
         :on-delete="$props.onDelete"
       />
-    </q-modal>
+    </q-dialog>
   </div>
 </template>
 
 <style lang="stylus" scoped>
-@import '../../css/app.styl';
+@import '../../styles/quasar.styl';
 
 .grid-item {
   position: relative;
@@ -445,10 +446,13 @@ export default class GridItem extends Vue {
   align-items: center;
   justify-content: center;
   border: 0;
-  cursor: move;
   width: 100%;
   height: 100%;
   z-index: 1;
+}
+
+.grid-item-movable {
+  cursor: move;
 }
 
 .grid-item-drag-overlay {

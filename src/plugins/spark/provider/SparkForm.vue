@@ -20,7 +20,6 @@ import {
   discoveredBlocks,
   savepoints,
 } from '@/plugins/spark/store/getters';
-import { Notify } from 'quasar';
 import WiFiSettingsPopup from './WiFiSettingsPopup.vue';
 import Vue from 'vue';
 import Component from 'vue-class-component';
@@ -52,6 +51,7 @@ import {
   },
 })
 export default class SparkForm extends Vue {
+  $q: any;
   wifiModal: boolean = false;
   savepointInput: string = '';
 
@@ -130,7 +130,7 @@ export default class SparkForm extends Vue {
 
   saveUnits(vals: UserUnits = this.units) {
     saveUnits(this.$store, this.service.id, vals)
-      .catch(reason => Notify.create(`Failed to change unit: ${reason}`));
+      .catch(reason => this.$q.notify(`Failed to change unit: ${reason}`));
   }
 
   clearDiscoveredBlocks() {
@@ -164,144 +164,161 @@ export default class SparkForm extends Vue {
 </script>
 
 <template>
-  <div class="widget-modal column">
-    <q-toolbar class="unpadded">
-      <q-toolbar-title>Spark Service</q-toolbar-title>
-      <q-btn v-close-overlay flat rounded label="close"/>
-    </q-toolbar>
+  <q-card dark class="widget-modal">
+    <FormToolbar>Spark Service</FormToolbar>
 
-    <q-collapsible group="modal" class="col-12" icon="info" label="System Info">
-      <div>
-        <q-field label="Device ID">
-          <div>{{ sysInfo.data.deviceId }}</div>
-        </q-field>
-        <q-field label="Time since boot">
-          <div>{{ ticks.data.millisSinceBoot | duration }}</div>
-        </q-field>
-        <q-field label="Device time">
-          <div>{{ sysDate }}</div>
-        </q-field>
-        <q-field label="Version">
-          <div>{{ sysInfo.data.version }}</div>
-        </q-field>
-      </div>
-    </q-collapsible>
-
-    <q-collapsible group="modal" class="col-12" icon="wifi" label="WiFi">
-      <q-modal v-model="wifiModal" no-backdrop-dismiss>
-        <WiFiSettingsPopup
-          v-if="wifiModal"
-          :field="wifi.data"
-          :change="v => { wifi.data = v; saveBlock(wifi); }"
-        />
-      </q-modal>
-      <div>
-        <q-field label="Network">
-          <big class="editable" @click="wifiModal = true">{{ wifi.data.ssid || 'click to connect' }}</big>
-        </q-field>
-        <q-field label="Signal strength">
-          <big>{{ signalPct }}%</big>
-        </q-field>
-        <q-field label="IP address">
-          <big>{{ wifi.data.ip }}</big>
-        </q-field>
-      </div>
-    </q-collapsible>
-
-    <q-collapsible group="modal" class="col-12" icon="mdi-checkbox-multiple-marked" label="Groups">
-      <div>
-        <q-field label="Active groups" orientation="vertical">
-          <GroupsPopupEdit
-            :field="groups.data.active"
-            :service-id="service.id"
-            :change="v => { groups.data.active = v; saveBlock(groups); }"
-          />
-        </q-field>
-        <q-field class="col column" label="Group names" orientation="vertical">
-          <div v-for="(name, idx) in groupNames" :key="idx" class="col row">
-            <q-field :label="`Group ${idx + 1}`" class="col">
-              <InputPopupEdit
-                :field="name"
-                :change="v => { groupNames[idx] = v; saveGroupNames(); }"
-                label="Group"
-              />
-            </q-field>
-          </div>
-        </q-field>
-      </div>
-    </q-collapsible>
-
-    <q-collapsible group="modal" class="col-12" icon="mdi-temperature-celsius" label="Units">
-      <div>
-        <q-field class="col column" label="Unit preferences" orientation="vertical">
-          <q-field v-for="(val, name) in units" :key="name" :label="spaceCased(name)" class="col">
-            <SelectPopupEdit
-              :field="val"
-              :change="v => { units[name] = v; saveUnits(); }"
-              :options="unitAlternativeOptions(name)"
-              label="Preferred unit"
-            />
-          </q-field>
-        </q-field>
-      </div>
-    </q-collapsible>
-
-    <q-collapsible
-      group="modal"
-      class="col-12"
-      icon="mdi-magnify-plus-outline"
-      label="Discovered Blocks"
-    >
-      <div>
-        <q-field class="col column" label="Discovered blocks" orientation="vertical">
-          <div class="row">
-            <q-btn label="Refresh" @click="fetchDiscoveredBlocks"/>
-            <q-btn v-if="discoveredBlocks.length" label="Clear" @click="clearDiscoveredBlocks"/>
-          </div>
-          <p v-for="id in discoveredBlocks" :key="id">{{ id }}</p>
-        </q-field>
-      </div>
-    </q-collapsible>
-
-    <q-collapsible group="modal" class="col-12" icon="mdi-content-save-all" label="Savepoints">
-      <q-list no-border separator>
-        <q-item v-for="point in savepoints" :key="point">
-          <q-item-main>{{ point }}</q-item-main>
-          <q-item-side right>
-            <q-btn flat rounded label="Save" @click="writeSavepoint(point)"/>
-            <q-btn flat rounded label="Load" @click="applySavepoint(point)"/>
-            <q-btn flat rounded label="Delete" @click="removeSavepoint(point)"/>
-          </q-item-side>
+    <q-card-section>
+      <q-expansion-item group="modal" icon="info" label="System Info">
+        <q-item dark>
+          <q-item-section>Device ID</q-item-section>
+          <q-item-section>{{ sysInfo.data.deviceId }}</q-item-section>
         </q-item>
-        <q-item>
-          <q-item-main>
+        <q-item dark>
+          <q-item-section>Time since boot</q-item-section>
+          <q-item-section>{{ ticks.data.millisSinceBoot | duration }}</q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>Device time</q-item-section>
+          <q-item-section>{{ sysDate }}</q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>Version</q-item-section>
+          <q-item-section>{{ sysInfo.data.version }}</q-item-section>
+        </q-item>
+      </q-expansion-item>
+
+      <q-expansion-item group="modal" icon="wifi" label="WiFi">
+        <q-dialog v-model="wifiModal" no-backdrop-dismiss>
+          <WiFiSettingsPopup
+            v-if="wifiModal"
+            :field="wifi.data"
+            :change="v => { wifi.data = v; saveBlock(wifi); }"
+          />
+        </q-dialog>
+        <q-item dark>
+          <q-item-section>Network</q-item-section>
+          <q-item-section>
+            <big
+              class="editable"
+              @click="wifiModal = true"
+            >{{ wifi.data.ssid || 'click to connect' }}</big>
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>Signal strength</q-item-section>
+          <q-item-section>
+            <big>{{ signalPct }}%</big>
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>IP address</q-item-section>
+          <q-item-section>
+            <big>{{ wifi.data.ip }}</big>
+          </q-item-section>
+        </q-item>
+      </q-expansion-item>
+
+      <q-expansion-item group="modal" icon="mdi-checkbox-multiple-marked" label="Groups">
+        <q-item dark>
+          <q-item-section>Active groups</q-item-section>
+          <q-item-section>
+            <GroupsPopupEdit
+              :field="groups.data.active"
+              :service-id="service.id"
+              :change="v => { groups.data.active = v; saveBlock(groups); }"
+            />
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section side>Group names</q-item-section>
+          <q-item-section>
+            <q-item v-for="(name, idx) in groupNames" :key="idx" dark>
+              <q-item-section>{{ `Group ${idx + 1}` }}</q-item-section>
+              <q-item-section>
+                <InputPopupEdit
+                  :field="name"
+                  :change="v => { groupNames[idx] = v; saveGroupNames(); }"
+                  label="Group"
+                />
+              </q-item-section>
+            </q-item>
+          </q-item-section>
+        </q-item>
+      </q-expansion-item>
+
+      <q-expansion-item group="modal" icon="mdi-temperature-celsius" label="Units">
+        <q-item dark>
+          <q-item-section side>Unit preferences</q-item-section>
+          <q-item-section>
+            <q-item v-for="(val, name) in units" :key="name" dark>
+              <q-item-section>{{ spaceCased(name) }}</q-item-section>
+              <q-item-section>
+                <SelectPopupEdit
+                  :field="val"
+                  :change="v => { units[name] = v; saveUnits(); }"
+                  :options="unitAlternativeOptions(name)"
+                  label="Preferred unit"
+                />
+              </q-item-section>
+            </q-item>
+          </q-item-section>
+        </q-item>
+      </q-expansion-item>
+
+      <q-expansion-item group="modal" icon="mdi-magnify-plus-outline" label="Discovered Blocks">
+        <q-item dark>
+          <q-item-section>
+            <q-btn outline label="Refresh" @click="fetchDiscoveredBlocks"/>
+          </q-item-section>
+          <q-item-section>
+            <q-btn
+              :disable="!discoveredBlocks.length"
+              outline
+              label="Clear"
+              @click="clearDiscoveredBlocks"
+            />
+          </q-item-section>
+        </q-item>
+        <q-item v-for="id in discoveredBlocks" :key="id" :inset-level="1" dark>
+          <q-item-section>{{ id }}</q-item-section>
+        </q-item>
+      </q-expansion-item>
+
+      <q-expansion-item group="modal" icon="mdi-content-save-all" label="Savepoints">
+        <q-item v-for="point in savepoints" :key="point" dark>
+          <q-item-section>{{ point }}</q-item-section>
+          <q-item-section side>
+            <q-btn flat rounded label="Save" @click="writeSavepoint(point)"/>
+          </q-item-section>
+          <q-item-section side>
+            <q-btn flat rounded label="Load" @click="applySavepoint(point)"/>
+          </q-item-section>
+          <q-item-section side>
+            <q-btn flat rounded label="Delete" @click="removeSavepoint(point)"/>
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>
             <q-input
               v-model="savepointInput"
               :error="savepoints.includes(savepointInput)"
               placeholder="New Savepoint"
               clearable
+              dark
             />
-          </q-item-main>
-          <q-item-side right>
+          </q-item-section>
+          <q-item-section side>
             <q-btn
               :disable="!savepointInput || savepoints.includes(savepointInput)"
               flat
               rounded
+              text-color="white"
               label="Create"
               @click="() => { writeSavepoint(savepointInput); savepointInput = ''; }"
             />
-          </q-item-side>
+          </q-item-section>
         </q-item>
-      </q-list>
-    </q-collapsible>
-  </div>
+      </q-expansion-item>
+    </q-card-section>
+  </q-card>
 </template>
-
-<style scoped>
-.savepoint-grid {
-  display: grid;
-  align-content: center;
-  grid-gap: 15px;
-  grid-template-columns: auto auto auto auto;
-}
-</style>

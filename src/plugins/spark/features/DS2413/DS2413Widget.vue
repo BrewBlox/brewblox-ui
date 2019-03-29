@@ -26,8 +26,8 @@ export default class DS2413Widget extends BlockWidget {
 </script>
 
 <template>
-  <q-card dark class="column">
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+  <q-card dark class="text-white scroll">
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <DS2413Form
         v-if="modalOpen"
         v-bind="$props"
@@ -36,37 +36,31 @@ export default class DS2413Widget extends BlockWidget {
         :on-change-block-id="changeBlockId"
         :on-switch-block-id="switchBlockId"
       />
-    </q-modal>
-    <q-card-title class="title-bar">
-      <div class="ellipsis">{{ widgetId }}</div>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
-      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
-    </q-card-title>
-    <q-card-separator/>
-    <q-card-main class="column widget-body">
-      <div class="full-width">
-        <q-field class="col" label="Address">
-          <span>{{ address }}</span>
-        </q-field>
-        <q-field class="col" label="State">
-          <q-toggle :value="pinState.latchA" readonly label="Latch A"/>
-          <q-toggle :value="pinState.senseA" readonly label="Sense A"/>
-          <q-toggle :value="pinState.latchB" readonly label="Latch B"/>
-          <q-toggle :value="pinState.senseB" readonly label="Sense B"/>
-          <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
-        </q-field>
-      </div>
-    </q-card-main>
+    </q-dialog>
+
+    <BlockWidgetToolbar :field="me"/>
+
+    <q-card-section>
+      <q-item dark>
+        <q-item-section>Address</q-item-section>
+        <q-item-section>{{ address }}</q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>
+          <div class="column">
+            <span>State</span>
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          </div>
+        </q-item-section>
+        <q-item-section>
+          <div class="col">
+            <q-toggle :value="pinState.latchA" readonly label="Latch A"/>
+            <q-toggle :value="pinState.senseA" readonly label="Sense A"/>
+            <q-toggle :value="pinState.latchB" readonly label="Latch B"/>
+            <q-toggle :value="pinState.senseB" readonly label="Sense B"/>
+          </div>
+        </q-item-section>
+      </q-item>
+    </q-card-section>
   </q-card>
 </template>
-
-<style lang="stylus" scoped>
-.q-toggle {
-  padding: 0px 10px 10px 0px;
-}
-
-/deep/ .widget-body .q-field-margin {
-  margin-top: 0px;
-}
-</style>

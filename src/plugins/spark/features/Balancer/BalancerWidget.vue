@@ -33,8 +33,8 @@ export default class BalancerWidget extends BlockWidget {
 </script>
 
 <template>
-  <q-card dark class="column">
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+  <q-card dark class="text-white scroll">
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <BalancerForm
         v-if="modalOpen"
         v-bind="$props"
@@ -43,28 +43,23 @@ export default class BalancerWidget extends BlockWidget {
         :on-change-block-id="changeBlockId"
         :on-switch-block-id="switchBlockId"
       />
-    </q-modal>
-    <q-card-title class="title-bar">
-      <div class="ellipsis">{{ widgetId }}</div>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
-      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
-      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
-    </q-card-title>
-    <q-card-separator/>
-    <q-card-main class="widget-body column">
-      <div class="full-width">
-        <div class="row">
-          <div class="q-field-label col">Clients</div>
-          <div class="q-field-label col">Granted</div>
-          <div class="q-field-label col">Requested</div>
-        </div>
-        <div v-for="client in block.data.clients" :key="client.id.id" class="row">
-          <div class="q-label col self-center">{{ clientName(client.id) }}</div>
-          <big class="col">{{ client.granted | round }}</big>
-          <big class="col">{{ client.requested | round }}</big>
-        </div>
-      </div>
-    </q-card-main>
+    </q-dialog>
+
+    <BlockWidgetToolbar :field="me" graph/>
+
+    <q-card-section>
+      <q-item dark>
+        <q-item-section>Client</q-item-section>
+        <q-item-section>Granted</q-item-section>
+        <q-item-section>Requested</q-item-section>
+      </q-item>
+      <q-item v-for="client in block.data.clients" :key="client.id.id" dark>
+        <q-item-section>
+          <i>{{ clientName(client.id) }}</i>
+        </q-item-section>
+        <q-item-section>{{ client.granted | round }}</q-item-section>
+        <q-item-section>{{ client.requested | round }}</q-item-section>
+      </q-item>
+    </q-card-section>
   </q-card>
 </template>

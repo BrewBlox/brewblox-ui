@@ -59,8 +59,8 @@ export default class UnknownBlockWidget extends WidgetBase {
 </script>
 
 <template>
-  <q-card dark class="column">
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+  <q-card dark class="text-white scroll">
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <UnknownBlockForm
         v-if="modalOpen"
         v-bind="$props"
@@ -69,30 +69,33 @@ export default class UnknownBlockWidget extends WidgetBase {
         :on-change-block-id="() => {}"
         :on-switch-block-id="switchBlockId"
       />
-    </q-modal>
-    <q-card-title class="title-bar">
-      <div class="ellipsis">{{ widgetId }}</div>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <q-btn slot="right" flat round dense icon="settings" @click="modalOpen = true"/>
-      <q-btn
-        slot="right"
-        :disable="!reason.temporary"
-        flat
-        round
-        dense
-        icon="refresh"
-        @click="fetchAll"
-      />
-    </q-card-title>
-    <q-card-separator/>
-    <div v-if="reason.temporary">
-      <q-card-main>{{ reason.message }}</q-card-main>
-      <q-card-main class="row justify-center">
-        <q-spinner size="50px"/>
-      </q-card-main>
-    </div>
-    <div v-else>
-      <q-alert color="warning" icon="warning" error>{{ reason.message }}</q-alert>
-    </div>
+    </q-dialog>
+
+    <WidgetToolbar :title="widgetId" :subtitle="displayName">
+      <q-item-section class="dense" side>
+        <q-btn flat round dense icon="settings" @click="modalOpen = true"/>
+      </q-item-section>
+      <q-item-section class="dense" side>
+        <q-btn :disable="!reason.temporary" flat round dense icon="refresh" @click="fetchAll"/>
+      </q-item-section>
+    </WidgetToolbar>
+
+    <q-card-section>
+      <q-item dark>
+        <q-item-section v-if="reason.temporary" avatar>
+          <q-spinner size="25px"/>
+        </q-item-section>
+        <q-item-section v-else avatar>
+          <q-icon name="warning" color="negative"/>
+        </q-item-section>
+        <q-item-section>{{ reason.message }}</q-item-section>
+      </q-item>
+    </q-card-section>
   </q-card>
 </template>
+
+<style scoped>
+.dense {
+  padding: 0px;
+}
+</style>

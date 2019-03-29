@@ -27,11 +27,11 @@ export default class DS2413Form extends BlockForm {
 </script>
 
 <template>
-  <div class="widget-modal column">
-    <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
+  <q-card dark class="widget-modal">
+    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
 
-    <q-collapsible opened group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
+    <q-expansion-item default-opened group="modal" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="$props" :presets-data="presets()"/>
-    </q-collapsible>
-  </div>
+    </q-expansion-item>
+  </q-card>
 </template>

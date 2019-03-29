@@ -25,15 +25,19 @@ export default class PlacementPartCard extends PartCard {
 </script>
 
 <template>
-  <q-card>
-    <q-card-title>Placement</q-card-title>
-    <q-card-main>
-      <div class="row justify-around">
-        <q-btn fab round color="primary" icon="rotate_left" @click="rotate(-90)"/>
-        <q-btn fab round color="primary" icon="rotate_right" @click="rotate(90)"/>
-        <q-btn fab round color="primary" icon="mdi-swap-horizontal-bold" @click="flip"/>
-        <q-btn fab round color="primary" icon="delete" @click="removePart"/>
-      </div>
-    </q-card-main>
-  </q-card>
+  <q-item dark>
+    <q-item-section side>Placement</q-item-section>
+    <q-item-section>
+      <q-btn fab round color="primary" icon="rotate_left" @click="rotate(-90)"/>
+    </q-item-section>
+    <q-item-section>
+      <q-btn fab round color="primary" icon="rotate_right" @click="rotate(90)"/>
+    </q-item-section>
+    <q-item-section>
+      <q-btn fab round color="primary" icon="mdi-swap-horizontal-bold" @click="flip"/>
+    </q-item-section>
+    <q-item-section>
+      <q-btn fab round color="primary" icon="delete" @click="removePart"/>
+    </q-item-section>
+  </q-item>
 </template>

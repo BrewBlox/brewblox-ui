@@ -8,6 +8,7 @@ import Component from 'vue-class-component';
 import { addPlotlyMetric, removeMetric } from './actions';
 import GraphDisplay from './GraphDisplay.vue';
 import { GraphConfig } from './state';
+import { setTimeout } from 'timers';
 
 @Component({
   props: {
@@ -116,6 +117,10 @@ export default class GraphCard extends Vue {
     } else {
       this.$nextTick(() => this.refresh());
     }
+    // There's a race condition where the Plotly SVG renders just before it gets its correct size
+    // The next re-render might take minutes or seconds, depending on the graph data
+    // This is the brute force approach to rectifying the problem quickly if it shows
+    setTimeout(() => this.refresh(), 1000);
   }
 
   destroyed() {
@@ -139,9 +144,13 @@ export default class GraphCard extends Vue {
       :layout="metricLayout"
       :revision="revision"
     />
-    <div v-else class="alert-container">
-      <q-alert icon="warning" color="warning">{{ error }}</q-alert>
-    </div>
+    <q-item v-else dark class="absolute-center">
+      <q-item-section avatar>
+        <q-icon name="warning"/>
+      </q-item-section>
+      <q-item-section>{{ error }}</q-item-section>
+    </q-item>
+
     <div class="row graph-controls z-top">
       <slot/>
     </div>
@@ -152,14 +161,6 @@ export default class GraphCard extends Vue {
 .parent {
   width: 100%;
   height: 100%;
-}
-.alert-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
 }
 </style>
 

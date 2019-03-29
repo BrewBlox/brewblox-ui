@@ -55,7 +55,7 @@ export default class InputPopupEdit extends Vue {
 
   startEdit() {
     this.placeholder = this.$props.field;
-    this.$nextTick(() => this.$refs.input.select());
+    // this.$nextTick(() => this.$refs.input.select());
   }
 
   endEdit() {
@@ -84,7 +84,14 @@ export default class InputPopupEdit extends Vue {
       <div class="help-text text-weight-light q-my-md">
         <slot/>
       </div>
-      <q-input ref="input" :clearable="$props.clearable" :type="$props.type" v-model="placeholder"/>
+      <q-input
+        ref="input"
+        :clearable="$props.clearable"
+        :type="$props.type"
+        v-model="placeholder"
+        step="any"
+        dark
+      />
     </q-popup-edit>
   </div>
 </template>

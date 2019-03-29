@@ -18,21 +18,27 @@ export default class MutexForm extends BlockForm {
 </script>
 
 <template>
-  <div class="widget-modal column">
-    <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
-    <q-collapsible opened group="modal" class="col-12" icon="settings" label="Settings">
-      <q-field label="Idle time before allowing a different actuator">
-        <TimeUnitPopupEdit
-          :field="block.data.differentActuatorWait"
-          :change="callAndSaveBlock(v => block.data.differentActuatorWait = v)"
-          type="number"
-          label="minimum idle time"
-        />
-      </q-field>
-    </q-collapsible>
+  <q-card dark class="widget-modal">
+    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
 
-    <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
-      <BlockSettings v-bind="$props" :presets-data="presets()"/>
-    </q-collapsible>
-  </div>
+    <q-card-section>
+      <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
+        <q-item dark>
+          <q-item-section>Idle time before allowing a different actuator</q-item-section>
+          <q-item-section>
+            <TimeUnitPopupEdit
+              :field="block.data.differentActuatorWait"
+              :change="callAndSaveBlock(v => block.data.differentActuatorWait = v)"
+              type="number"
+              label="minimum idle time"
+            />
+          </q-item-section>
+        </q-item>
+      </q-expansion-item>
+
+      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
+        <BlockSettings v-bind="$props" :presets-data="presets()"/>
+      </q-expansion-item>
+    </q-card-section>
+  </q-card>
 </template>

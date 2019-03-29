@@ -172,9 +172,8 @@ export default class DashboardPage extends Vue {
       },
       cancel: true,
     })
-      .then((selected: number[]) =>
-        selected.forEach(idx => opts[idx].action(this.$store, item.config)))
-      .catch(() => { });
+      .onOk((selected: number[]) =>
+        selected.forEach(idx => opts[idx].action(this.$store, item.config)));
   }
 
   onCopyItem(item: DashboardItem) {
@@ -190,9 +189,8 @@ export default class DashboardPage extends Vue {
       },
       cancel: true,
     })
-      .then((dashboard: string) =>
-        dashboard && appendDashboardItem(this.$store, { ...item, id, dashboard }))
-      .catch(() => { });
+      .onOk((dashboard: string) =>
+        dashboard && appendDashboardItem(this.$store, { ...item, id, dashboard }));
   }
 
   onMoveItem(item: DashboardItem) {
@@ -208,9 +206,8 @@ export default class DashboardPage extends Vue {
       },
       cancel: true,
     })
-      .then((dashboard: string) =>
-        dashboard && saveDashboardItem(this.$store, { ...item, dashboard }))
-      .catch(() => { });
+      .onOk((dashboard: string) =>
+        dashboard && saveDashboardItem(this.$store, { ...item, dashboard }));
   }
 }
 </script>
@@ -236,33 +233,40 @@ export default class DashboardPage extends Vue {
       </portal>
       <portal to="toolbar-buttons">
         <q-btn-dropdown color="primary" label="actions">
-          <q-list dark link>
-            <q-item @click.native="widgetEditable = !widgetEditable">
-              <q-item-side :icon="widgetEditable ? 'check' : 'mode edit'"/>
-              <q-item-main :label="widgetEditable ? 'Stop editing' : 'Edit Dashboard'"/>
+          <q-list dark>
+            <q-item clickable @click="widgetEditable = !widgetEditable">
+              <q-item-section avatar>
+                <q-icon :name="widgetEditable ? 'check' : 'edit'"/>
+              </q-item-section>
+              <q-item-section>{{ widgetEditable ? 'Stop editing' : 'Edit Dashboard' }}</q-item-section>
             </q-item>
-            <q-item @click.native="() => wizardModalOpen = true">
-              <q-item-side icon="add"/>
-              <q-item-main label="New Widget"/>
+            <q-item clickable @click="() => wizardModalOpen = true">
+              <q-item-section avatar>
+                <q-icon name="add"/>
+              </q-item-section>
+              <q-item-section>New Widget</q-item-section>
             </q-item>
           </q-list>
         </q-btn-dropdown>
       </portal>
-      <q-modal v-model="wizardModalOpen" no-backdrop-dismiss>
-        <WidgetWizardPicker
+      <q-dialog v-model="wizardModalOpen" no-backdrop-dismiss>
+        <WizardPicker
           v-if="wizardModalOpen"
           :dashboard-id="dashboardId"
+          initial-component="WidgetWizardPicker"
           @close="wizardModalOpen = false"
         />
-      </q-modal>
+      </q-dialog>
       <q-list v-if="isMobile" no-border>
         <q-item v-for="val in validatedItems" :key="val.item.id">
-          <component
-            :disabled="widgetEditable"
-            :is="val.component"
-            v-bind="val.props"
-            class="dashboard-item"
-          />
+          <q-item-section>
+            <component
+              :disabled="widgetEditable"
+              :is="val.component"
+              v-bind="val.props"
+              class="dashboard-item"
+            />
+          </q-item-section>
         </q-item>
       </q-list>
       <GridContainer
@@ -285,13 +289,12 @@ export default class DashboardPage extends Vue {
 </template>
 
 <style lang="stylus" scoped>
-@import '../css/app.styl';
+@import '../styles/quasar.variables.styl';
+@import '../styles/quasar.styl';
 
 .dashboard-item {
   background: $block-background;
   height: 100%;
   width: 100%;
-  display: flex;
-  flex-direction: column;
 }
 </style>

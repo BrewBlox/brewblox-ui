@@ -16,7 +16,7 @@ export default class GenericBlock extends BlockWidget { }
     <q-card-separator/>
 
     <q-card-main>
-      <q-item>
+      <q-item dark>
         <pre>{{ block.data }}</pre>
       </q-item>
     </q-card-main>

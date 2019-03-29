@@ -17,8 +17,8 @@ export default class MutexWidget extends BlockWidget {
 </script>
 
 <template>
-  <q-card dark class="column">
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+  <q-card dark class="text-white scroll">
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <MutexForm
         v-if="modalOpen"
         v-bind="$props"
@@ -27,39 +27,35 @@ export default class MutexWidget extends BlockWidget {
         :on-change-block-id="changeBlockId"
         :on-switch-block-id="switchBlockId"
       />
-    </q-modal>
-    <q-card-title class="title-bar">
-      <div class="ellipsis">{{ widgetId }}</div>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
-      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
-    </q-card-title>
-    <q-card-separator/>
-    <q-card-main class="column widget-body">
-      <div class="full-width">
-        <q-field label="Held by">
-          <span>{{ mutexClients.active }}</span>
-        </q-field>
-        <q-field label="Waiting">
+    </q-dialog>
+
+    <BlockWidgetToolbar :field="me"/>
+
+    <q-card-section>
+      <q-item dark>
+        <q-item-section>Held by</q-item-section>
+        <q-item-section>{{ mutexClients.active }}</q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>Waiting</q-item-section>
+        <q-item-section>
           <div class="column">
             <span v-for="client in mutexClients.waiting" :key="client">{{ client }}</span>
           </div>
-        </q-field>
-        <q-field label="Idle">
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>Idle</q-item-section>
+        <q-item-section>
           <div class="column">
             <span v-for="client in mutexClients.idle" :key="client">{{ client }}</span>
           </div>
-        </q-field>
-        <q-field label="Wait time remaining">
-          <span>{{ block.data.waitRemaining | unitDuration }}</span>
-        </q-field>
-      </div>
-    </q-card-main>
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>Wait time remaining</q-item-section>
+        <q-item-section>{{ block.data.waitRemaining | unitDuration }}</q-item-section>
+      </q-item>
+    </q-card-section>
   </q-card>
 </template>
-
-<style lang="stylus" scoped>
-/deep/ .widget-body .q-field-margin {
-  margin-top: 0px;
-}
-</style>

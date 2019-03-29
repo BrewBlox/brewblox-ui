@@ -40,9 +40,17 @@ export default class WizardTaskMaster extends Vue {
       for (let func of this.actions) {
         await func(this.$store, this.config);
       }
-      this.$q.notify({ type: 'positive', message: `Done!` });
+      this.$q.notify({
+        color: 'positive',
+        icon: 'mdi-check-all',
+        message: 'Done!',
+      });
     } catch (e) {
-      this.$q.notify(`Failed to execute actions: ${e.message}`);
+      this.$q.notify({
+        color: 'negative',
+        icon: 'error',
+        message: `Failed to execute actions: ${e.message}`,
+      });
     }
     this.close();
   }
@@ -60,7 +68,7 @@ export default class WizardTaskMaster extends Vue {
 </script>
 
 <template>
-  <div class="widget-modal">
+  <div>
     <div v-if="busyExecuting" style="width: 100%; height: 400px;">
       <q-spinner :size="50" class="absolute-center"/>
     </div>

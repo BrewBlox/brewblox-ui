@@ -142,68 +142,80 @@ export default class SetpointProfileForm extends BlockForm {
 </script>
 
 <template>
-  <div class="widget-modal column">
-    <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
-    <q-collapsible opened group="modal" class="col-12" icon="settings" label="Settings">
-      <div>
-        <q-field label="Enabled">
-          <q-toggle
-            :value="block.data.enabled"
-            @input="v => { block.data.enabled = v; saveBlock(); }"
-          />
-        </q-field>
-        <q-field label="Current setting">
-          <big>{{ block.data.setting | unit }}</big>
-        </q-field>
-      </div>
-    </q-collapsible>
-    <q-collapsible group="modal" class="col-12" icon="mdi-thermometer" label="Setpoints">
-      <div>
-        <q-field class="col" label="Start time" orientation="vertical">
-          <DatetimePopupEdit
-            :field="start"
-            :change="updateStartTime"
-            label="Start time"
-            tag="big"
-          />
-        </q-field>
-        <q-field class="col" label="Points" orientation="vertical">
-          <div v-for="(point, idx) in points" :key="idx" class="row justify-around">
-            <q-field label="Offset" orientation="vertical">
-              <InputPopupEdit
-                :field="durationString(point.offsetMs)"
-                :change="v => updatePointOffset(idx, parseDuration(v))"
-                label="Offset from start"
-              />
-            </q-field>
-            <q-field label="Time" orientation="vertical">
-              <DatetimePopupEdit
-                :field="point.time"
-                :change="v => updatePointTime(idx, v)"
-                label="Time"
-                tag="big"
-              />
-            </q-field>
-            <q-field label="Temperature" orientation="vertical">
-              <UnitPopupEdit
-                :field="point.temperature"
-                :change="v => updatePointTemperature(idx, v)"
-                label="Temperature"
-              />
-            </q-field>
-            <q-field label=" " orientation="vertical">
-              <q-btn flat round dense icon="delete" @click="removePoint(idx)"/>
-            </q-field>
-          </div>
-        </q-field>
-        <q-field>
-          <q-btn icon="add" label="Add point" @click="addPoint"/>
-        </q-field>
-      </div>
-    </q-collapsible>
+  <q-card dark class="widget-modal">
+    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
 
-    <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
-      <BlockSettings v-bind="$props" :presets-data="presets()"/>
-    </q-collapsible>
-  </div>
+    <q-card-section>
+      <q-expansion-item group="modal" icon="settings" label="Settings">
+        <q-item dark>
+          <q-item-section>Enabled</q-item-section>
+          <q-item-section>
+            <q-toggle
+              :value="block.data.enabled"
+              @input="v => { block.data.enabled = v; saveBlock(); }"
+            />
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>Current setting</q-item-section>
+          <q-item-section>
+            <big>{{ block.data.setting | unit }}</big>
+          </q-item-section>
+        </q-item>
+      </q-expansion-item>
+
+      <q-expansion-item default-opened group="modal" icon="mdi-thermometer" label="Setpoints">
+        <q-item dark>
+          <q-item-section side>Start time</q-item-section>
+          <q-item-section>
+            <DatetimePopupEdit
+              :field="start"
+              :change="updateStartTime"
+              label="Start time"
+              tag="span"
+            />
+          </q-item-section>
+        </q-item>
+        <q-item v-for="(point, idx) in points" :key="idx" dark>
+          <q-item-section>
+            <q-item-label caption>Offset</q-item-label>
+            <InputPopupEdit
+              :field="durationString(point.offsetMs)"
+              :change="v => updatePointOffset(idx, parseDuration(v))"
+              label="Offset from start"
+            />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>Time</q-item-label>
+            <DatetimePopupEdit
+              :field="point.time"
+              :change="v => updatePointTime(idx, v)"
+              label="Time"
+              tag="span"
+            />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>Temperature</q-item-label>
+            <UnitPopupEdit
+              :field="point.temperature"
+              :change="v => updatePointTemperature(idx, v)"
+              label="Temperature"
+            />
+          </q-item-section>
+          <q-item-section side>
+            <q-btn flat round dense icon="delete" @click="removePoint(idx)"/>
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>
+            <q-btn flat icon="add" label="Add point" @click="addPoint"/>
+          </q-item-section>
+        </q-item>
+      </q-expansion-item>
+
+      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
+        <BlockSettings v-bind="$props" :presets-data="presets()"/>
+      </q-expansion-item>
+    </q-card-section>
+  </q-card>
 </template>

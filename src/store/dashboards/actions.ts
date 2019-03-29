@@ -1,5 +1,4 @@
 import { createAccessors } from '@/helpers/static-store';
-import UrlSafeString from 'url-safe-string';
 import { ActionTree } from 'vuex';
 import { RootState, RootStore } from '../state';
 import {
@@ -33,15 +32,8 @@ import { Dashboard, DashboardContext, DashboardItem, DashboardState } from './st
 const { dispatch } = createAccessors('dashboards');
 
 export const actions: ActionTree<DashboardState, RootState> = {
-  createDashboard: async (context: DashboardContext, title: string) => {
-    const id = new UrlSafeString().generate(title);
-    const dashboard = {
-      id,
-      title,
-      order: Object.keys(context.state.dashboards).length + 1,
-    };
-    setDashboardInStore(context, await createDashboardInApi(dashboard));
-  },
+  createDashboard: async (context: DashboardContext, dashboard: Dashboard) =>
+    setDashboardInStore(context, await createDashboardInApi(dashboard)),
 
   saveDashboard: async (context: DashboardContext, dashboard: Dashboard) =>
     setDashboardInStore(context, await persistDashboardInApi(dashboard)),

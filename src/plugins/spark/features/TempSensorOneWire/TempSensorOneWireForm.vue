@@ -20,29 +20,35 @@ export default class TempSensorOneWireForm extends BlockForm {
 </script>
 
 <template>
-  <div class="widget-modal column">
-    <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
-    <q-collapsible opened group="modal" class="col-12" icon="settings" label="Settings">
-      <div>
-        <q-field label="Address">
-          <InputPopupEdit
-            :field="block.data.address"
-            :change="callAndSaveBlock(v => block.data.address = v)"
-            label="Address"
-          />
-        </q-field>
-        <q-field label="Offset">
-          <UnitPopupEdit
-            :field="block.data.offset"
-            :change="callAndSaveBlock(v => block.data.offset = v)"
-            label="Offset"
-          />
-        </q-field>
-      </div>
-    </q-collapsible>
+  <q-card dark class="widget-modal">
+    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <q-card-section>
+      <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
+        <q-item dark>
+          <q-item-section>Address</q-item-section>
+          <q-item-section>
+            <InputPopupEdit
+              :field="block.data.address"
+              :change="callAndSaveBlock(v => block.data.address = v)"
+              label="Address"
+            />
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>Offset</q-item-section>
+          <q-item-section>
+            <UnitPopupEdit
+              :field="block.data.offset"
+              :change="callAndSaveBlock(v => block.data.offset = v)"
+              label="Offset"
+            />
+          </q-item-section>
+        </q-item>
+      </q-expansion-item>
 
-    <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
-      <BlockSettings v-bind="$props" :presets-data="presets()"/>
-    </q-collapsible>
-  </div>
+      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
+        <BlockSettings v-bind="$props" :presets-data="presets()"/>
+      </q-expansion-item>
+    </q-card-section>
+  </q-card>
 </template>
