@@ -344,6 +344,7 @@ export default class SparkPage extends Vue {
 
 <style lang="stylus" scoped>
 @import '../../../styles/quasar.styl';
+@import '../../../styles/quasar.variables.styl';
 
 .dashboard-item {
   background: $block-background;

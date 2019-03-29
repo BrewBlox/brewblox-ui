@@ -269,3 +269,8 @@ export default class DefaultLayout extends Vue {
     </q-page-container>
   </q-layout>
 </template>
+
+<style lang="stylus">
+@import '../styles/quasar.variables.styl';
+@import '../styles/quasar.styl';
+</style>
