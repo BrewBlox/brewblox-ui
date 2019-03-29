@@ -23,16 +23,16 @@ export default class WidgetWizardPicker extends Vue {
   feature: any = null;
   wizardActive: boolean = false;
 
-  _chosenDashboardId: string = '';
+  localChosenDashboardId: string = '';
 
   get chosenDashboardId() {
-    return this._chosenDashboardId
+    return this.localChosenDashboardId
       || this.$props.dashboardId
       || primaryDashboardId(this.$store);
   }
 
   set chosenDashboardId(id: string) {
-    this._chosenDashboardId = id;
+    this.localChosenDashboardId = id;
   }
 
   get dashboardOptions() {

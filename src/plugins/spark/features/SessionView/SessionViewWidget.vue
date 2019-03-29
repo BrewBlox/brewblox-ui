@@ -68,29 +68,30 @@ export default class SessionViewWidget extends WidgetBase {
       prompt: {
         model: '',
       },
-    }).then((name) => {
-      const session = {
-        name,
-        id: shortid.generate(),
-        hidden: false,
-        start: null,
-        end: null,
-        graphCfg: {
-          layout: { title: name },
-          params: {},
-          targets: [],
-          renames: {},
-          axes: {},
-        },
-        notes: '',
-      };
-      this.saveConfig({
-        ...this.widgetConfig,
-        sessions: [...this.widgetConfig.sessions, session],
+    })
+      .onOk((name) => {
+        const session = {
+          name,
+          id: shortid.generate(),
+          hidden: false,
+          start: null,
+          end: null,
+          graphCfg: {
+            layout: { title: name },
+            params: {},
+            targets: [],
+            renames: {},
+            axes: {},
+          },
+          notes: '',
+        };
+        this.saveConfig({
+          ...this.widgetConfig,
+          sessions: [...this.widgetConfig.sessions, session],
+        });
+        this.modalSession = session;
+        this.modalOpen = true;
       });
-      this.modalSession = session;
-      this.modalOpen = true;
-    });
   }
 }
 </script>
