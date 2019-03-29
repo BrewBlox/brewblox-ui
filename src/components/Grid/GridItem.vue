@@ -363,7 +363,10 @@ export default class GridItem extends Vue {
     <button
       v-touch-pan.mouse="movePanHandler"
       v-if="!dragging && $props.editable"
-      class="grid-item-move-handle"
+      :class="{
+        ['grid-item-move-handle']: true,
+        ['grid-item-movable']: !$props.noMove,
+      }"
     >
       <div class="column">
         <div v-if="!$props.noMove" class="column">
@@ -443,10 +446,13 @@ export default class GridItem extends Vue {
   align-items: center;
   justify-content: center;
   border: 0;
-  cursor: move;
   width: 100%;
   height: 100%;
   z-index: 1;
+}
+
+.grid-item-movable {
+  cursor: move;
 }
 
 .grid-item-drag-overlay {
