@@ -6,14 +6,18 @@ import {
   updateDashboardOrder,
   updatePrimaryDashboard,
   saveDashboard,
+  createDashboard,
+  saveDashboardItem,
 } from '@/store/dashboards/actions';
 import {
   dashboardValues,
   primaryDashboardId,
+  dashboardIds,
+  dashboardItemValues,
 } from '@/store/dashboards/getters';
 import { Dashboard } from '@/store/dashboards/state';
 import {
-  removeService as removeServiceInStore,
+  removeService,
   updateServiceOrder,
   saveService,
 } from '@/store/services/actions';
@@ -22,6 +26,7 @@ import { Service } from '@/store/services/state';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import draggable from 'vuedraggable';
+import buildEnv from '@/build-env.json';
 
 @Component({
   components: {
@@ -37,7 +42,7 @@ export default class DefaultLayout extends Vue {
   wizardModalOpen: boolean = false;
 
   get version() {
-    return process.env.GIT_VERSION || 'UNKNOWN';
+    return buildEnv.version || 'UNKNOWN';
   }
 
   get dashboards() {
@@ -60,29 +65,88 @@ export default class DefaultLayout extends Vue {
     updateServiceOrder(this.$store, services.map(service => service.id));
   }
 
-  toggleDrawer() {
-    this.leftDrawerOpen = !this.leftDrawerOpen;
-  }
-
-  toggleDashboardEditing() {
-    this.dashboardEditing = !this.dashboardEditing;
-  }
-
-  toggleServiceEditing() {
-    this.serviceEditing = !this.serviceEditing;
-  }
-
   removeDashboard(dashboard: Dashboard) {
     this.$q.dialog({
       title: 'Remove dashboard',
       message: `Are you sure you want to remove ${dashboard.title}?`,
       ok: 'Confirm',
       cancel: 'Cancel',
-    }).onOk(() => removeDashboard(this.$store, dashboard));
+    })
+      .onOk(() => removeDashboard(this.$store, dashboard));
   }
 
-  changeDashboardTitle(dashboard: Dashboard, title: string) {
-    saveDashboard(this.$store, { ...dashboard, title });
+  changeDashboardId(dashboard: Dashboard) {
+    this.$q.dialog({
+      title: 'Change dashboard ID',
+      message: "This will change your dashboard's unique ID",
+      cancel: true,
+      prompt: {
+        model: dashboard.id,
+        type: 'text',
+      },
+    })
+      .onOk(async newId => {
+        const oldId = dashboard.id;
+        if (!newId || newId === oldId) {
+          return;
+        }
+
+        if (dashboardIds(this.$store).includes(newId)) {
+          this.$q.notify({
+            color: 'negative',
+            icon: 'error',
+            message: `Dashboard ${newId} already exists`,
+          });
+          return;
+        }
+
+        await createDashboard(this.$store, { ...dashboard, id: newId });
+        await Promise.all(
+          dashboardItemValues(this.$store)
+            .filter(item => item.dashboard === oldId)
+            .map(item => saveDashboardItem(this.$store, { ...item, dashboard: newId }))
+        );
+        await removeDashboard(this.$store, { ...dashboard });
+
+        if (this.defaultDashboard === oldId) {
+          await updatePrimaryDashboard(this.$store, newId);
+        }
+
+        if (this.$route.path === `/dashboard/${oldId}`) {
+          this.$router.replace(`/dashboard/${newId}`);
+        }
+
+        this.$q.notify({
+          color: 'positive',
+          icon: 'edit',
+          message: `Changed dashboard ID '${oldId}' to '${newId}'`,
+        });
+      });
+  }
+
+  changeDashboardTitle(dashboard: Dashboard) {
+    this.$q.dialog({
+      title: 'Change dashboard Title',
+      message: "Change your dashboard's display name",
+      cancel: true,
+      prompt: {
+        model: dashboard.title,
+        type: 'text',
+      },
+    })
+      .onOk(async newTitle => {
+        const oldTitle = dashboard.title;
+        if (!newTitle || oldTitle === newTitle) {
+          return;
+        }
+
+        await saveDashboard(this.$store, { ...dashboard, title: newTitle });
+        this.$q.notify({
+          color: 'positive',
+          icon: 'edit',
+          message: `Renamed dashboard '${oldTitle}' to '${newTitle}'`,
+        });
+      });
   }
 
   removeService(service: Service) {
@@ -91,11 +155,33 @@ export default class DefaultLayout extends Vue {
       message: `Are you sure you want to remove ${service.title}?`,
       ok: 'Confirm',
       cancel: 'Cancel',
-    }).onOk(() => removeServiceInStore(this.$store, service));
+    })
+      .onOk(() => removeService(this.$store, service));
   }
 
-  changeServiceTitle(service: Service, title: string) {
-    saveService(this.$store, { ...service, title });
+  changeServiceTitle(service: Service) {
+    this.$q.dialog({
+      title: 'Change service Title',
+      message: "Change your service's display name",
+      cancel: true,
+      prompt: {
+        model: service.title,
+        type: 'text',
+      },
+    })
+      .onOk(async newTitle => {
+        const oldTitle = service.title;
+        if (!newTitle || oldTitle === newTitle) {
+          return;
+        }
+
+        await saveService(this.$store, { ...service, title: newTitle });
+        this.$q.notify({
+          color: 'positive',
+          icon: 'edit',
+          message: `Renamed service '${oldTitle}' to '${newTitle}'`,
+        });
+      });
   }
 
   updateDefaultDashboard(id: string) {
@@ -108,7 +194,7 @@ export default class DefaultLayout extends Vue {
   <q-layout view="lHh Lpr lFf">
     <q-header class="glossy bg-dark">
       <q-toolbar>
-        <q-btn flat dense round @click="toggleDrawer">
+        <q-btn flat dense round @click="leftDrawerOpen = !leftDrawerOpen">
           <q-icon name="menu"/>
         </q-btn>
         <q-toolbar-title>
@@ -151,7 +237,7 @@ export default class DefaultLayout extends Vue {
               :color="dashboardEditing ? 'primary': ''"
               round
               size="sm"
-              @click="toggleDashboardEditing"
+              @click="dashboardEditing = !dashboardEditing"
             />
           </q-item-section>
         </q-item>
@@ -164,35 +250,47 @@ export default class DefaultLayout extends Vue {
           <q-item
             v-for="dashboard in dashboards"
             :key="dashboard.id"
-            :link="!dashboardEditing"
             :to="dashboardEditing ? undefined : `/dashboard/${dashboard.id}`"
             dark
             style="min-height: 0px"
             class="q-pb-sm"
           >
-            <q-item-section v-if="dashboardEditing" side>
+            <q-item-section v-if="dashboardEditing" avatar>
               <q-icon name="mdi-drag-vertical"/>
             </q-item-section>
-            <q-item-section v-if="dashboardEditing">
-              <InputPopupEdit
-                :field="dashboard.title"
-                :change="v => changeDashboardTitle(dashboard, v)"
-                label="Title"
-                tag="span"
-              />
-            </q-item-section>
-            <q-item-section v-else>{{ dashboard.title }}</q-item-section>
+            <q-item-section>{{ dashboard.title }}</q-item-section>
             <q-item-section v-if="dashboardEditing" side>
-              <div class="row">
-                <q-btn
-                  :color="defaultDashboard === dashboard.id ? 'primary' : ''"
-                  round
-                  flat
-                  icon="home"
-                  @click="updateDefaultDashboard(dashboard.id)"
-                />
-                <q-btn round flat icon="delete" @click="removeDashboard(dashboard)"/>
-              </div>
+              <q-btn-dropdown outline icon="edit" size="sm">
+                <q-list dark>
+                  <q-item dark link clickable @click="updateDefaultDashboard(dashboard.id)">
+                    <q-item-section avatar>
+                      <q-icon
+                        :color="defaultDashboard === dashboard.id ? 'primary' : ''"
+                        name="home"
+                      />
+                    </q-item-section>
+                    <q-item-section>Default dashboard</q-item-section>
+                  </q-item>
+                  <q-item dark link clickable @click="changeDashboardId(dashboard)">
+                    <q-item-section avatar>
+                      <q-icon name="edit"/>
+                    </q-item-section>
+                    <q-item-section>Change dashboard ID</q-item-section>
+                  </q-item>
+                  <q-item dark link clickable @click="changeDashboardTitle(dashboard)">
+                    <q-item-section avatar>
+                      <q-icon name="edit"/>
+                    </q-item-section>
+                    <q-item-section>Change dashboard title</q-item-section>
+                  </q-item>
+                  <q-item dark link clickable @click="removeDashboard(dashboard)">
+                    <q-item-section avatar>
+                      <q-icon name="delete"/>
+                    </q-item-section>
+                    <q-item-section>Delete dashboard</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-btn-dropdown>
             </q-item-section>
           </q-item>
         </draggable>
@@ -214,7 +312,7 @@ export default class DefaultLayout extends Vue {
               :color="serviceEditing ? 'primary': ''"
               round
               size="sm"
-              @click="toggleServiceEditing"
+              @click="serviceEditing = !serviceEditing"
             />
           </q-item-section>
         </q-item>
@@ -223,31 +321,36 @@ export default class DefaultLayout extends Vue {
           v-model="services"
           :class="{ editing: serviceEditing }"
           :disabled="!serviceEditing"
-          :striped="serviceEditing"
         >
           <q-item
             v-for="service in services"
             :key="service.id"
-            :link="!serviceEditing"
             :to="serviceEditing ? undefined : `/service/${service.id}`"
             dark
             style="min-height: 0px"
             class="q-pb-sm"
           >
-            <q-item-section v-if="serviceEditing" side>
+            <q-item-section v-if="serviceEditing" avatar>
               <q-icon name="mdi-drag-vertical"/>
             </q-item-section>
-            <q-item-section v-if="serviceEditing">
-              <InputPopupEdit
-                :field="service.title"
-                :change="v => changeServiceTitle(service, v)"
-                label="Title"
-                tag="span"
-              />
-            </q-item-section>
-            <q-item-section v-else>{{ service.title }}</q-item-section>
+            <q-item-section>{{ service.title }}</q-item-section>
             <q-item-section v-if="serviceEditing" side>
-              <q-btn round flat icon="delete" @click="removeService(service)"/>
+              <q-btn-dropdown outline icon="edit" size="sm">
+                <q-list dark>
+                  <q-item dark link clickable @click="changeServiceTitle(service)">
+                    <q-item-section avatar>
+                      <q-icon name="edit"/>
+                    </q-item-section>
+                    <q-item-section>Change service title</q-item-section>
+                  </q-item>
+                  <q-item dark link clickable @click="removeService(service)">
+                    <q-item-section avatar>
+                      <q-icon name="delete"/>
+                    </q-item-section>
+                    <q-item-section>Delete service</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-btn-dropdown>
             </q-item-section>
           </q-item>
         </draggable>
@@ -270,7 +373,11 @@ export default class DefaultLayout extends Vue {
   </q-layout>
 </template>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 @import '../styles/quasar.variables.styl';
 @import '../styles/quasar.styl';
+
+.editing {
+  cursor: move;
+}
 </style>

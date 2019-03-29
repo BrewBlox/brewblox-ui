@@ -1,5 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+/* eslint-disable @typescript-eslint/no-var-requires */
 const { gitDescribeSync } = require('git-describe');
+const fs = require('fs');
+/* eslint-enable */
 
 module.exports = {
   pluginOptions: {
@@ -55,12 +57,14 @@ module.exports = {
       .plugins
       .delete('fork-ts-checker');
 
-    // Set process.env.GIT_VERSION to git version
+    // Write git version to a file that can be imported
+    // src/build-env.json is gitignored, and will be replaced every time
     config
       .plugin('define')
       .tap((args) => {
         const gitInfo = gitDescribeSync(__dirname, { match: '[0-9]*' });
-        args[0]['process.env'].GIT_VERSION = `"${gitInfo.semverString}"`;
+        const version = gitInfo.semverString;
+        fs.writeFileSync('src/build-env.json', JSON.stringify({ version }));
         return args;
       });
   },

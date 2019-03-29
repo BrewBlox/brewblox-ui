@@ -3,6 +3,11 @@ declare module '*.vue' {
   export default Vue;
 }
 
+declare module '*.json' {
+  const value: any;
+  export default value;
+}
+
 declare module 'quasar';
 declare module 'portal-vue';
 declare module 'vuedraggable';
