@@ -172,9 +172,8 @@ export default class DashboardPage extends Vue {
       },
       cancel: true,
     })
-      .then((selected: number[]) =>
-        selected.forEach(idx => opts[idx].action(this.$store, item.config)))
-      .catch(() => { });
+      .onOk((selected: number[]) =>
+        selected.forEach(idx => opts[idx].action(this.$store, item.config)));
   }
 
   onCopyItem(item: DashboardItem) {
@@ -190,9 +189,8 @@ export default class DashboardPage extends Vue {
       },
       cancel: true,
     })
-      .then((dashboard: string) =>
-        dashboard && appendDashboardItem(this.$store, { ...item, id, dashboard }))
-      .catch(() => { });
+      .onOk((dashboard: string) =>
+        dashboard && appendDashboardItem(this.$store, { ...item, id, dashboard }));
   }
 
   onMoveItem(item: DashboardItem) {
@@ -208,9 +206,8 @@ export default class DashboardPage extends Vue {
       },
       cancel: true,
     })
-      .then((dashboard: string) =>
-        dashboard && saveDashboardItem(this.$store, { ...item, dashboard }))
-      .catch(() => { });
+      .onOk((dashboard: string) =>
+        dashboard && saveDashboardItem(this.$store, { ...item, dashboard }));
   }
 }
 </script>
@@ -292,13 +289,12 @@ export default class DashboardPage extends Vue {
 </template>
 
 <style lang="stylus" scoped>
+@import '../styles/quasar.variables.styl';
 @import '../styles/quasar.styl';
 
 .dashboard-item {
   background: $block-background;
   height: 100%;
   width: 100%;
-  display: flex;
-  flex-direction: column;
 }
 </style>

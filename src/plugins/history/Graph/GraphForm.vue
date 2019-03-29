@@ -205,14 +205,16 @@ export default class GraphForm extends FormBase {
         </q-item>
         <q-item dark>
           <q-item-section>
-            <q-tree
-              :nodes="nodes"
-              :ticked.sync="selected"
-              :filter="selectFilter"
-              tick-strategy="leaf-filtered"
-              dark
-              node-key="value"
-            />
+            <q-scroll-area style="height: 300px; max-height: 30vh">
+              <q-tree
+                :nodes="nodes"
+                :ticked.sync="selected"
+                :filter="selectFilter"
+                tick-strategy="leaf-filtered"
+                dark
+                node-key="value"
+              />
+            </q-scroll-area>
           </q-item-section>
         </q-item>
       </q-expansion-item>

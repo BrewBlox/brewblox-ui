@@ -186,9 +186,8 @@ export default class SparkPage extends Vue {
       },
       cancel: true,
     })
-      .then((selected: number[]) =>
-        selected.forEach(idx => opts[idx].action(this.$store, item.config)))
-      .catch(() => { });
+      .onOk((selected: number[]) =>
+        selected.forEach(idx => opts[idx].action(this.$store, item.config)));
   }
 
   onCopyItem(item: DashboardItem) {
@@ -204,9 +203,8 @@ export default class SparkPage extends Vue {
       },
       cancel: true,
     })
-      .then((dashboard: string) =>
-        dashboard && createDashboardItem(this.$store, { ...item, id, dashboard }))
-      .catch(() => { });
+      .onOk((dashboard: string) =>
+        dashboard && createDashboardItem(this.$store, { ...item, id, dashboard }));
   }
 
   onWidgetChange(id: string, config: any) {
