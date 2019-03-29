@@ -245,7 +245,7 @@ export default class SparkPage extends Vue {
               </q-item-section>
               <q-item-section>{{ widgetEditable ? 'Stop editing' : 'Edit Dashboard' }}</q-item-section>
             </q-item>
-            <q-item dark clickable @click="relationsModalOpen = true">
+            <q-item v-close-popup dark clickable @click="relationsModalOpen = true">
               <q-item-section avatar>
                 <q-icon name="mdi-ray-start-arrow"/>
               </q-item-section>
@@ -268,7 +268,7 @@ export default class SparkPage extends Vue {
           @close="modalOpen = false"
         />
       </q-dialog>
-      <q-dialog v-model="relationsModalOpen" no-backdrop-dismiss>
+      <q-dialog v-model="relationsModalOpen" no-backdrop-dismiss maximized>
         <DagreDiagram
           v-if="relationsModalOpen"
           :nodes="validatedItems.map(v => ({id: v.item.id, type: v.item.feature}))"
