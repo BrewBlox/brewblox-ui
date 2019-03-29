@@ -37,6 +37,9 @@ import { defaultPresets } from '@/components/Graph/getters';
   },
 })
 export default class BlockGraph extends Vue {
+  $refs!: {
+    graph: any;
+  }
   modalOpen: boolean = false;
   prevStrConfig: string = '';
 
@@ -96,7 +99,7 @@ export default class BlockGraph extends Vue {
     const strConfig = JSON.stringify(this.graphCfg);
     if (strConfig !== this.prevStrConfig) {
       this.prevStrConfig = strConfig;
-      this.$nextTick(() => this.$refs.graph && (this.$refs.graph as any).resetMetrics());
+      this.$nextTick(() => this.$refs.graph && this.$refs.graph.resetMetrics());
     }
   }
 
@@ -118,7 +121,7 @@ export default class BlockGraph extends Vue {
       @click="() => modalOpen = true"
     />
     <q-dialog v-model="modalOpen" maximized>
-      <q-card class="text-white">
+      <q-card class="text-white bg-dark-bright" dark>
         <GraphCard v-if="modalOpen" ref="graph" :id="$props.id" :config="graphCfg">
           <q-btn-dropdown flat label="presets" icon="mdi-timelapse">
             <q-item

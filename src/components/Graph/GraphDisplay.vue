@@ -95,6 +95,7 @@ export default class GraphDisplay extends Vue {
     :layout="plotlyLayout"
     :config="plotlyConfig"
     :revision="$props.revision"
+    class="maximized"
     fit
   />
 </template>
