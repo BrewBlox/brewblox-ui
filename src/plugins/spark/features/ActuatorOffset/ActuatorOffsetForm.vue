@@ -25,7 +25,7 @@ export default class ActuatorOffsetForm extends BlockForm {
     <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
 
     <q-card-section>
-      <q-expansion-item group="modal" icon="settings" label="Settings">
+      <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <BlockEnableToggle
           v-bind="$props"
           :text-enabled="`Offset is enabled: ${block.data.targetId} will be offset from the

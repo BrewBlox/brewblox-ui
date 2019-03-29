@@ -29,7 +29,7 @@ export default class PidForm extends BlockForm {
     <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
 
     <q-card-section>
-      <q-expansion-item group="modal" icon="mdi-calculator-variant" label="Settings">
+      <q-expansion-item default-opened group="modal" icon="mdi-calculator-variant" label="Settings">
         <BlockEnableToggle
           v-bind="$props"
           :text-enabled="`PID is enabled: output ${block.data.outputId} will be set to result of PID.`"

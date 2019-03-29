@@ -164,7 +164,7 @@ export default class SetpointProfileForm extends BlockForm {
         </q-item>
       </q-expansion-item>
 
-      <q-expansion-item group="modal" icon="mdi-thermometer" label="Setpoints">
+      <q-expansion-item default-opened group="modal" icon="mdi-thermometer" label="Setpoints">
         <q-item dark>
           <q-item-section side>Start time</q-item-section>
           <q-item-section>

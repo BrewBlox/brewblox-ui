@@ -23,7 +23,7 @@ export default class TempSensorOneWireForm extends BlockForm {
   <q-card dark class="widget-modal">
     <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
     <q-card-section>
-      <q-expansion-item group="modal" icon="settings" label="Settings">
+      <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <q-item dark>
           <q-item-section>Address</q-item-section>
           <q-item-section>
