@@ -2,7 +2,6 @@
 import { serviceAvailable } from '@/helpers/dynamic-store';
 import { Block, SystemStatus } from '@/plugins/spark/state';
 import {
-  createBlock,
   renameBlock,
   fetchAll,
   createUpdateSource,
@@ -12,12 +11,7 @@ import { allBlocks, lastStatus, blockLinks } from '@/plugins/spark/store/getters
 import { createDashboardItem } from '@/store/dashboards/actions';
 import { dashboardValues, itemCopyName } from '@/store/dashboards/getters';
 import { Dashboard, DashboardItem } from '@/store/dashboards/state';
-import {
-  deletersById,
-  displayNameById,
-  widgetById,
-  widgetSizeById,
-} from '@/store/features/getters';
+import { deletersById, widgetById, widgetSizeById } from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { isReady, isSystemBlock, widgetSize } from './getters';
