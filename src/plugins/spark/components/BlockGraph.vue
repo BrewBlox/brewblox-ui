@@ -107,49 +107,7 @@ export default class BlockGraph extends Vue {
 </script>
 
 <template>
-  <span>
-    <q-dialog v-model="modalOpen" maximized>
-      <GraphCard v-if="modalOpen" ref="graph" :id="$props.id" :config="graphCfg">
-        <q-btn-dropdown flat label="presets" icon="mdi-timelapse">
-          <q-list link>
-            <q-item
-              v-for="(preset, idx) in presets"
-              :key="idx"
-              @click.native="() => applyPreset(preset)"
-            >{{ preset.duration }}</q-item>
-          </q-list>
-        </q-btn-dropdown>
-        <q-btn-dropdown flat label="settings" icon="settings">
-          <q-list link>
-            <q-item @click.native="() => $refs.duration.$el.click()">
-              <q-item-side>Duration</q-item-side>
-              <q-item-main @click.native="() => $refs.duration.$el.click()">
-                <InputPopupEdit
-                  ref="duration"
-                  :field="graphCfg.params.duration"
-                  :change="confirmed(v => $set(graphCfg.params, 'duration', parseDuration(v)))"
-                  label="Duration"
-                  tag="span"
-                />
-              </q-item-main>
-            </q-item>
-            <q-expansion-item label="Left or right axis">
-              <q-list link no-border>
-                <q-item
-                  v-for="[key, renamed] in targetKeys"
-                  :key="key"
-                  @click.native="updateKeySide(key, !isRightAxis(key))"
-                >
-                  <q-item-side :class="{mirrored: isRightAxis(key)}" icon="mdi-chart-line"/>
-                  <q-item-main>{{ renamed }}</q-item-main>
-                </q-item>
-              </q-list>
-            </q-expansion-item>
-          </q-list>
-        </q-btn-dropdown>
-        <q-btn v-close-popup flat label="close"/>
-      </GraphCard>
-    </q-dialog>
+  <div>
     <q-btn
       :label="$props.label"
       :size="$props.buttonSize"
@@ -159,7 +117,55 @@ export default class BlockGraph extends Vue {
       icon="mdi-chart-line"
       @click="() => modalOpen = true"
     />
-  </span>
+    <q-dialog v-model="modalOpen" maximized>
+      <q-card class="text-white">
+        <GraphCard v-if="modalOpen" ref="graph" :id="$props.id" :config="graphCfg">
+          <q-btn-dropdown flat label="presets" icon="mdi-timelapse">
+            <q-item
+              v-for="(preset, idx) in presets"
+              :key="idx"
+              dark
+              link
+              clickable
+              @click="() => applyPreset(preset)"
+            >
+              <q-item-section>{{ preset.duration }}</q-item-section>
+            </q-item>
+          </q-btn-dropdown>
+          <q-btn-dropdown flat label="settings" icon="settings">
+            <q-item dark link clickable @click="() => $refs.duration.$el.click()">
+              <q-item-section side>Duration</q-item-section>
+              <q-item-section @click="() => $refs.duration.$el.click()">
+                <InputPopupEdit
+                  ref="duration"
+                  :field="graphCfg.params.duration"
+                  :change="confirmed(v => $set(graphCfg.params, 'duration', parseDuration(v)))"
+                  label="Duration"
+                  tag="span"
+                />
+              </q-item-section>
+            </q-item>
+            <q-expansion-item label="Left or right axis">
+              <q-item
+                v-for="[key, renamed] in targetKeys"
+                :key="key"
+                dark
+                link
+                clickable
+                @click="updateKeySide(key, !isRightAxis(key))"
+              >
+                <q-item-section>{{ renamed }}</q-item-section>
+                <q-item-section side>
+                  <q-icon :class="{mirrored: isRightAxis(key)}" name="mdi-chart-line"/>
+                </q-item-section>
+              </q-item>
+            </q-expansion-item>
+          </q-btn-dropdown>
+          <q-btn v-close-popup flat label="close"/>
+        </GraphCard>
+      </q-card>
+    </q-dialog>
+  </div>
 </template>
 
 <style scoped lang="stylus">
