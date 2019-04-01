@@ -5,12 +5,13 @@ import Component from 'vue-class-component';
 import { Block } from '../state';
 import { fetchBlock, renameBlock, saveBlock } from '../store/actions';
 import { blockById, drivenChains } from '../store/getters';
+import { Watch } from 'vue-property-decorator';
 
 @Component
 export default class BlockWidget extends WidgetBase {
   protected modalOpen: boolean = false;
 
-  public get me(): BlockWidget {
+  protected get me(): BlockWidget {
     return this;
   }
 
@@ -21,6 +22,8 @@ export default class BlockWidget extends WidgetBase {
       onChangeField: this.saveBlock,
       onChangeBlockId: this.changeBlockId,
       onSwitchBlockId: this.switchBlockId,
+      // Block widgets can't independently change title - it is set to block ID
+      onChangeTitle: null,
     };
   }
 
@@ -103,6 +106,14 @@ export default class BlockWidget extends WidgetBase {
       queryParams: { ...config.params },
       graphAxes: { ...config.axes },
     });
+  }
+
+  @Watch('blockId', { immediate: true })
+  private fixWidgetTitle(): void {
+    if (this.blockId !== this.widgetTitle && this.$props.onChangeTitle) {
+      console.log('fixing block title');
+      this.$props.onChangeTitle(this.$props.id, this.blockId);
+    }
   }
 
   protected openModal(): void {

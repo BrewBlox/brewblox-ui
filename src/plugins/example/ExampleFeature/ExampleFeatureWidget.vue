@@ -60,7 +60,7 @@ export default class ExampleFeatureWidget extends WidgetBase {
     this.$q.notify({
       color: 'positive',
       icon: 'mdi-message-alert',
-      message: `Hi! I'm ${this.widgetId}.`,
+      message: `Hi! I'm ${this.widgetTitle}.`,
     });
   }
 
@@ -75,7 +75,7 @@ export default class ExampleFeatureWidget extends WidgetBase {
 <template>
   <q-card dark class="text-white scroll">
     <!-- displayName is inherited from WidgetBase. The value is defined in the Feature definition (./index.ts) -->
-    <WidgetToolbar :title="widgetId" :subtitle="displayName">
+    <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
       <q-item-section side>
         <q-btn flat round icon="mdi-message-alert" @click="alert"/>
       </q-item-section>

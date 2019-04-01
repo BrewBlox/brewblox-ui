@@ -1,4 +1,5 @@
 <script lang="ts">
+import { uid } from 'quasar';
 import { serviceAvailable } from '@/helpers/dynamic-store';
 import { Block, SystemStatus } from '@/plugins/spark/state';
 import {
@@ -9,7 +10,7 @@ import {
 } from '@/plugins/spark/store/actions';
 import { allBlocks, lastStatus, blockLinks } from '@/plugins/spark/store/getters';
 import { createDashboardItem } from '@/store/dashboards/actions';
-import { dashboardValues, itemCopyName } from '@/store/dashboards/getters';
+import { dashboardValues, dashboardById } from '@/store/dashboards/getters';
 import { Dashboard, DashboardItem } from '@/store/dashboards/state';
 import { deletersById, widgetById, widgetSizeById } from '@/store/features/getters';
 import Vue from 'vue';
@@ -83,23 +84,28 @@ export default class SparkPage extends Vue {
     return widgetSize;
   }
 
+  volatileKey(blockId: string): string {
+    return `${this.$props.serviceId}/${blockId}`;
+  }
+
   itemProps(item: DashboardItem): any {
     return {
       id: item.id,
+      title: item.title,
       type: item.feature,
       pos: item.pinnedPosition,
       cols: item.cols,
       rows: item.rows,
       config: item.config,
       onChangeConfig: this.onWidgetChange,
-      onDelete: () => this.onDeleteItem(item),
-      onCopy: () => this.onCopyItem(item),
+      onDelete: this.onDeleteItem,
+      onCopy: this.onCopyItem,
       volatile: true,
     };
   }
 
   validateBlock(block: Block): ValidatedItem {
-    const key = `${this.$props.serviceId}/${block.id}`;
+    const key = this.volatileKey(block.id);
     const existing = this.volatileItems[key];
     if (!existing || existing.feature !== block.type) {
       this.$set(
@@ -107,6 +113,7 @@ export default class SparkPage extends Vue {
         key,
         {
           id: block.id,
+          title: block.id,
           feature: block.type,
           order: 0,
           dashboard: '',
@@ -159,7 +166,8 @@ export default class SparkPage extends Vue {
     renameBlock(this.$store, this.$props.serviceId, currentId, newId);
   }
 
-  onDeleteItem(item: DashboardItem) {
+  onDeleteItem(itemId: string) {
+    const item = this.volatileItems[this.volatileKey(itemId)];
     // Quasar dialog can't handle objects as value - they will be returned as null
     // As workaround, we use array index as value, and add the "action" key to each option
     const opts = deletersById(this.$store, item.feature)
@@ -184,8 +192,9 @@ export default class SparkPage extends Vue {
         selected.forEach(idx => opts[idx].action(this.$store, item.config)));
   }
 
-  onCopyItem(item: DashboardItem) {
-    const id = itemCopyName(this.$store, item.id);
+  onCopyItem(itemId: string) {
+    const item = this.volatileItems[this.volatileKey(itemId)];
+    const id = uid();
     this.$q.dialog({
       title: 'Create widget',
       message: `On which dashboard do you want to create a widget for ${item.id}?`,
@@ -197,13 +206,21 @@ export default class SparkPage extends Vue {
       },
       cancel: true,
     })
-      .onOk((dashboard: string) =>
-        dashboard && createDashboardItem(this.$store, { ...item, id, dashboard }));
+      .onOk((dashboard: string) => {
+        if (!dashboard) {
+          return;
+        }
+        createDashboardItem(this.$store, { ...item, id, dashboard });
+        this.$q.notify({
+          color: 'positive',
+          icon: 'file_copy',
+          message: `Copied ${item.title} to ${dashboardById(this.$store, dashboard).title}`,
+        });
+      });
   }
 
   onWidgetChange(id: string, config: any) {
-    const key = `${this.$props.serviceId}/${id}`;
-    this.volatileItems[key].config = { ...config };
+    this.volatileItems[this.volatileKey(id)].config = { ...config };
     this.$q.notify({
       type: 'warning',
       message: 'Changes will not be persisted',

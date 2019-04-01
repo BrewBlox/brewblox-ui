@@ -33,6 +33,18 @@ export default class UnknownBlockWidget extends WidgetBase {
     };
   }
 
+  get formProps(): any {
+    return {
+      ...this.$props,
+      field: this.block,
+      onChangeField: () => { },
+      onChangeBlockId: () => { },
+      onSwitchBlockId: this.switchBlockId,
+      // Block widgets can't independently change title - it is set to block ID
+      onChangeTitle: null,
+    };
+  }
+
   get reason(): AbsenceReason {
     const status = lastStatus(this.$store, this.serviceId);
     if (!status || !status.synchronized) {
@@ -61,17 +73,10 @@ export default class UnknownBlockWidget extends WidgetBase {
 <template>
   <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <UnknownBlockForm
-        v-if="modalOpen"
-        v-bind="$props"
-        :field="block"
-        :on-change-field="() => {}"
-        :on-change-block-id="() => {}"
-        :on-switch-block-id="switchBlockId"
-      />
+      <UnknownBlockForm v-if="modalOpen" v-bind="formProps"/>
     </q-dialog>
 
-    <WidgetToolbar :title="widgetId" :subtitle="displayName">
+    <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
       <q-item-section class="dense" side>
         <q-btn flat round dense icon="settings" @click="modalOpen = true"/>
       </q-item-section>

@@ -20,7 +20,7 @@ export default class BlockWidgetToolbar extends Vue {
 </script>
 
 <template>
-  <WidgetToolbar :title="field.widgetId" :subtitle="field.displayName">
+  <WidgetToolbar :title="field.widgetTitle" :subtitle="field.displayName">
     <BlockGraph
       v-if="graphModalOpen"
       :value="graphModalOpen"
@@ -50,7 +50,7 @@ export default class BlockWidgetToolbar extends Vue {
             v-if="field.$props.onCopy"
             dark
             clickable
-            @click="field.$props.onCopy"
+            @click="field.$props.onCopy(field.widgetId)"
           >
             <q-item-section avatar>
               <q-icon name="file_copy"/>
@@ -62,7 +62,7 @@ export default class BlockWidgetToolbar extends Vue {
             v-if="field.$props.onMove"
             dark
             clickable
-            @click="field.$props.onMove"
+            @click="field.$props.onMove(field.widgetId)"
           >
             <q-item-section avatar>
               <q-icon name="exit_to_app"/>
@@ -74,7 +74,7 @@ export default class BlockWidgetToolbar extends Vue {
             v-if="field.$props.onDelete"
             dark
             clickable
-            @click="field.$props.onDelete"
+            @click="field.$props.onDelete(field.widgetId)"
           >
             <q-item-section avatar>
               <q-icon name="delete"/>

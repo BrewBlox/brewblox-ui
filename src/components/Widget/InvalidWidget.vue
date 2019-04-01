@@ -14,7 +14,7 @@ export default class InvalidWidget extends WidgetBase { }
 
 <template>
   <q-card dark class="text-white scroll">
-    <WidgetToolbar :title="widgetId" :subtitle="displayName"/>
+    <WidgetToolbar :title="widgetTitle" :subtitle="displayName"/>
 
     <q-card-section>
       <q-item dark>

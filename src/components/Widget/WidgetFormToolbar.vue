@@ -8,11 +8,11 @@ export default class WidgetFormToolbar extends FormBase { }
 
 <template>
   <FormToolbar>
-    <q-icon v-if="$props.onChangeId" name="mdi-view-dashboard"/>
+    <q-icon v-if="$props.onChangeTitle" name="mdi-view-dashboard"/>
     <InputPopupEdit
-      v-if="$props.onChangeId"
-      :field="widgetId"
-      :change="$props.onChangeId"
+      v-if="$props.onChangeTitle"
+      :field="widgetTitle"
+      :change="v => $props.onChangeTitle(widgetId, v)"
       label="Widget name"
       tag="span"
       class="text-h6 q-mr-md"
@@ -20,9 +20,9 @@ export default class WidgetFormToolbar extends FormBase { }
     <slot/>
     <template v-slot:buttons>
       <slot name="buttons"/>
-      <q-btn v-if="$props.onDelete" flat icon="delete" @click="$props.onDelete"/>
-      <q-btn v-if="$props.onCopy" flat icon="file_copy" @click="$props.onCopy"/>
-      <q-btn v-if="$props.onMove" flat icon="exit_to_app" @click="$props.onMove"/>
+      <q-btn v-if="$props.onDelete" flat icon="delete" @click="$props.onDelete(widgetId)"/>
+      <q-btn v-if="$props.onCopy" flat icon="file_copy" @click="$props.onCopy(widgetId)"/>
+      <q-btn v-if="$props.onMove" flat icon="exit_to_app" @click="$props.onMove(widgetId)"/>
     </template>
   </FormToolbar>
 </template>

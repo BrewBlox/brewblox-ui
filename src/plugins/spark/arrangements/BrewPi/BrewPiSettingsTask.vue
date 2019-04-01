@@ -1,4 +1,5 @@
 <script lang="ts">
+import { uid } from 'quasar';
 import Component from 'vue-class-component';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { Unit, Link } from '@/helpers/units';
@@ -244,13 +245,14 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
     };
 
     const createWidget =
-      (id: string, type: string) => ({
+      (name: string, type: string) => ({
         ...genericSettings,
         ...widgetSizeById(this.$store, type),
-        id: id,
+        id: uid(),
+        title: name,
         feature: type,
         config: {
-          blockId: id,
+          blockId: name,
           serviceId: this.cfg.serviceId,
         },
       });
