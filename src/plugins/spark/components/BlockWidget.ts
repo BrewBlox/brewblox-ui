@@ -111,7 +111,6 @@ export default class BlockWidget extends WidgetBase {
   @Watch('blockId', { immediate: true })
   private fixWidgetTitle(): void {
     if (this.blockId !== this.widgetTitle && this.$props.onChangeTitle) {
-      console.log('fixing block title');
       this.$props.onChangeTitle(this.$props.id, this.blockId);
     }
   }
