@@ -25,14 +25,7 @@ export default class TempSensorOneWireWidget extends BlockWidget {
 <template>
   <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <TempSensorOneWireForm
-        v-if="modalOpen"
-        v-bind="$props"
-        :field="block"
-        :on-change-field="saveBlock"
-        :on-change-block-id="changeBlockId"
-        :on-switch-block-id="switchBlockId"
-      />
+      <TempSensorOneWireForm v-if="modalOpen" v-bind="formProps"/>
     </q-dialog>
 
     <BlockWidgetToolbar :field="me" graph/>

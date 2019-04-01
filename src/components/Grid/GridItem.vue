@@ -74,7 +74,6 @@ interface Coordinates { x: number; y: number }
 export default class GridItem extends Vue {
   dragging: boolean = false;
   moving: boolean = false;
-  modalOpen: boolean = false;
 
   gridWidth: number = 0;
   startX: number = 0;
@@ -368,46 +367,20 @@ export default class GridItem extends Vue {
         ['grid-item-movable']: !$props.noMove,
       }"
     >
-      <div class="column">
+      <div class="row">
         <div v-if="!$props.noMove" class="column">
           <q-icon name="mdi-gesture-swipe-horizontal" size="50px" class="shadowed"/>
           <p class="shadowed">drag</p>
         </div>
-        <div class="row">
-          <q-btn
-            color="primary"
-            icon="settings"
-            fab
-            style="margin-right: 20px"
-            @click="modalOpen = true"
-          />
-          <q-btn
-            v-if="!$props.noMove && $props.pos"
-            fab
-            icon="mdi-pin-off"
-            color="primary"
-            @click="unpin"
-          />
-          <q-btn
-            v-if="!$props.noMove && !$props.pos"
-            fab
-            icon="mdi-pin"
-            color="primary"
-            @click="pin"
-          />
-        </div>
+        <q-btn
+          v-if="!$props.noMove"
+          :icon="$props.pos ? 'mdi-pin-off' : 'mdi-pin'"
+          fab
+          color="primary"
+          @click="() => ($props.pos ? unpin : pin)()"
+        />
       </div>
     </button>
-    <!-- Action modal -->
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <WidgetActionMenu
-        v-if="modalOpen"
-        :item-id="$props.id"
-        :on-copy="$props.onCopy"
-        :on-move="$props.onMove"
-        :on-delete="$props.onDelete"
-      />
-    </q-dialog>
   </div>
 </template>
 

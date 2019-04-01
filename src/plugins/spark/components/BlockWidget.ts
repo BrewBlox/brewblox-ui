@@ -14,6 +14,16 @@ export default class BlockWidget extends WidgetBase {
     return this;
   }
 
+  protected get formProps(): any {
+    return {
+      ...this.$props,
+      field: this.block,
+      onChangeField: this.saveBlock,
+      onChangeBlockId: this.changeBlockId,
+      onSwitchBlockId: this.switchBlockId,
+    };
+  }
+
   protected get serviceId(): string {
     return this.$props.config.serviceId;
   }
