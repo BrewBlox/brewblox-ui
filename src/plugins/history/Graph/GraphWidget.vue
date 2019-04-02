@@ -88,7 +88,7 @@ export default class GraphWidget extends WidgetBase {
               label="Show maximized"
               @click="graphModalOpen = true"
             />
-            <q-expansion-item label="Presets" icon="mdi-timelapse">
+            <q-expansion-item label="Timespan" icon="mdi-timelapse">
               <q-list dark>
                 <q-item
                   v-close-popup
