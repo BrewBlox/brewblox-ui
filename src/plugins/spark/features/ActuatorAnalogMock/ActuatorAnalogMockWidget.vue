@@ -36,38 +36,34 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
       </q-item>
       <q-item dark>
         <q-item-section>
-          <div class="column">
-            <span>Setting</span>
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          <q-item-label caption>Setting</q-item-label>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          <div>
+            <InputPopupEdit
+              v-if="!isDriven"
+              :field="block.data.setting"
+              :change="callAndSaveBlock(v => block.data.setting = v)"
+              type="number"
+              label="Setting"
+            />
+            <div v-else>
+              <big>{{ block.data.setting | round }}</big>
+              <small class="q-ml-xs">{{ block.data.error.notation }}</small>
+            </div>
           </div>
         </q-item-section>
         <q-item-section>
-          <InputPopupEdit
-            v-if="!isDriven"
-            :field="block.data.setting"
-            :change="callAndSaveBlock(v => block.data.setting = v)"
-            type="number"
-            label="Setting"
-          />
-          <big v-else>{{ block.data.setting | unit }}</big>
-        </q-item-section>
-      </q-item>
-      <q-item dark>
-        <q-item-section>Value</q-item-section>
-        <q-item-section>
+          <q-item-label caption>Value</q-item-label>
           <big>{{ block.data.value | round }}</big>
         </q-item-section>
       </q-item>
       <q-item dark>
-        <q-item-label>Constraints</q-item-label>
-        <q-item-section>
-          <AnalogConstraints
-            :service-id="serviceId"
-            :field="block.data.constrainedBy"
-            :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
-            readonly
-          />
-        </q-item-section>
+        <AnalogConstraints
+          :service-id="serviceId"
+          :field="block.data.constrainedBy"
+          :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+          readonly
+        />
       </q-item>
     </q-card-section>
   </q-card>

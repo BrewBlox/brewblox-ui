@@ -26,28 +26,24 @@ export default class MutexWidget extends BlockWidget {
 
     <q-card-section>
       <q-item dark>
-        <q-item-section>Held by</q-item-section>
-        <q-item-section>{{ mutexClients.active }}</q-item-section>
-      </q-item>
-      <q-item dark>
-        <q-item-section>Waiting</q-item-section>
-        <q-item-section>
-          <div class="column">
-            <span v-for="client in mutexClients.waiting" :key="client">{{ client }}</span>
-          </div>
+        <q-item-section style="justify-content: flex-start">
+          <q-item-label caption>Held by</q-item-label>
+          <div>{{ mutexClients.active }}</div>
+        </q-item-section>
+        <q-item-section style="justify-content: flex-start">
+          <q-item-label caption>Waiting</q-item-label>
+          <div v-for="client in mutexClients.waiting" :key="client">{{ client }}</div>
+        </q-item-section>
+        <q-item-section style="justify-content: flex-start">
+          <q-item-label caption>Idle</q-item-label>
+          <div v-for="client in mutexClients.idle" :key="client">{{ client }}</div>
         </q-item-section>
       </q-item>
       <q-item dark>
-        <q-item-section>Idle</q-item-section>
         <q-item-section>
-          <div class="column">
-            <span v-for="client in mutexClients.idle" :key="client">{{ client }}</span>
-          </div>
+          <q-item-label caption>Wait time remaining</q-item-label>
+          <div>{{ block.data.waitRemaining | unitDuration }}</div>
         </q-item-section>
-      </q-item>
-      <q-item dark>
-        <q-item-section>Wait time remaining</q-item-section>
-        <q-item-section>{{ block.data.waitRemaining | unitDuration }}</q-item-section>
       </q-item>
     </q-card-section>
   </q-card>

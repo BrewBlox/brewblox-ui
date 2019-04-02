@@ -35,22 +35,19 @@ export default class DS2413Widget extends BlockWidget {
 
     <q-card-section>
       <q-item dark>
-        <q-item-section>Address</q-item-section>
-        <q-item-section>{{ address }}</q-item-section>
-      </q-item>
-      <q-item dark>
         <q-item-section>
-          <div class="column">
-            <span>State</span>
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          <q-item-label caption>Latches</q-item-label>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          <div>
+            <q-toggle :value="pinState.latchA" class="col-6" readonly label="Latch A"/>
+            <q-toggle :value="pinState.latchB" class="col-6" readonly label="Latch B"/>
           </div>
         </q-item-section>
-        <q-item-section>
-          <div class="col">
-            <q-toggle :value="pinState.latchA" readonly label="Latch A"/>
-            <q-toggle :value="pinState.senseA" readonly label="Sense A"/>
-            <q-toggle :value="pinState.latchB" readonly label="Latch B"/>
-            <q-toggle :value="pinState.senseB" readonly label="Sense B"/>
+        <q-item-section style="justify-content: space-between">
+          <q-item-label caption>Sensing</q-item-label>
+          <div>
+            <q-toggle :value="pinState.senseA" class="col-6" readonly label="Sense A"/>
+            <q-toggle :value="pinState.senseB" class="col-6" readonly label="Sense B"/>
           </div>
         </q-item-section>
       </q-item>

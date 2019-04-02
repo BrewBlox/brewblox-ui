@@ -53,107 +53,121 @@ export default class PidWidget extends BlockWidget {
     <BlockWidgetToolbar :field="me" graph/>
 
     <q-card-section>
-      <q-item v-if="!block.data.enabled" dark>
-        <q-item-section avatar>
-          <q-icon name="warning"/>
+      <template v-if="!block.data.enabled">
+        <q-item dark>
+          <q-item-section avatar>
+            <q-icon name="warning"/>
+          </q-item-section>
+          <q-item-section>
+            <span>
+              PID is disabled:
+              <i>{{ block.data.outputId }}</i> will not be set.
+            </span>
+          </q-item-section>
+          <q-item-section side>
+            <q-btn text-color="white" flat label="Enable" @click="enable"/>
+          </q-item-section>
+        </q-item>
+        <q-separator dark inset class="q-mb-md"/>
+      </template>
+
+      <template v-else-if="!block.data.active">
+        <q-item dark>
+          <q-item-section avatar>
+            <q-icon name="warning"/>
+          </q-item-section>
+          <q-item-section>
+            <span>
+              PID is inactive:
+              <i>{{ block.data.outputId }}</i> will not be set.
+            </span>
+          </q-item-section>
+        </q-item>
+        <q-separator dark inset class="q-mb-md"/>
+      </template>
+
+      <q-item dark>
+        <div class="col-3 text-weight-light text-subtitle2 q-pt-xs">Input</div>
+        <q-item-section>
+          <q-item-label caption>Measured</q-item-label>
+          <div>
+            <big>{{ block.data.inputValue.val | round }}</big>
+            <span class="q-ml-xs">{{ block.data.inputValue.notation }}</span>
+          </div>
         </q-item-section>
         <q-item-section>
-          <span>
-            PID is disabled:
-            <i>{{ block.data.outputId }}</i> will not be set.
-          </span>
-        </q-item-section>
-        <q-item-section side>
-          <q-btn text-color="white" flat label="Enable" @click="enable"/>
+          <q-item-label caption>Target</q-item-label>
+          <div>
+            <big>{{ block.data.inputSetting.val | round }}</big>
+            <span class="q-ml-xs">{{ block.data.inputSetting.notation }}</span>
+          </div>
         </q-item-section>
       </q-item>
 
-      <q-item v-if="block.data.enabled && !block.data.active" dark>
-        <q-item-section avatar>
-          <q-icon name="warning"/>
+      <q-separator dark inset/>
+
+      <q-item dark>
+        <div class="col-3 text-weight-light text-subtitle2 q-pt-xs">Output</div>
+        <q-item-section>
+          <q-item-label caption>Measured</q-item-label>
+          <big>{{ block.data.outputSetting | round }}</big>
         </q-item-section>
         <q-item-section>
-          <span>
-            PID is inactive:
-            <i>{{ block.data.outputId }}</i> will not be set.
-          </span>
+          <q-item-label caption>Target</q-item-label>
+          <big>{{ block.data.outputValue | round }}</big>
         </q-item-section>
       </q-item>
 
-      <q-list dense dark>
-        <q-item dark>
-          <q-item-section>Target input</q-item-section>
-          <q-item-section>
-            <big>{{ block.data.inputSetting | unit }}</big>
-          </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Actual input</q-item-section>
-          <q-item-section>
-            <big>{{ block.data.inputValue | unit }}</big>
-          </q-item-section>
-        </q-item>
-        <q-separator dark inset/>
-      </q-list>
+      <q-separator dark inset/>
 
-      <q-list dense dark>
-        <q-item dark>
-          <q-item-section>Target output</q-item-section>
-          <q-item-section>
-            <big>{{ block.data.outputSetting | round }}</big>
-          </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Actual output</q-item-section>
-          <q-item-section>
-            <big>{{ block.data.outputSetting | round }}</big>
-          </q-item-section>
-        </q-item>
-        <q-separator dark inset/>
-      </q-list>
+      <q-item dark>
+        <div class="col-3 text-weight-light text-subtitle2 q-pt-xs">Error</div>
+        <q-item-section>
+          <q-item-label caption>Proportional</q-item-label>
+          <div>
+            <span>{{ block.data.error.val | round }}</span>
+            <small class="q-ml-xs">{{ block.data.error.notation }}</small>
+          </div>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>Integral</q-item-label>
+          <div>
+            <span>{{ block.data.integral.val | round }}</span>
+            <small class="q-ml-xs">{{ block.data.integral.notation }}</small>
+          </div>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>Derivative</q-item-label>
+          <div>
+            <span>{{ block.data.derivative.val | round }}</span>
+            <small class="q-ml-xs">{{ block.data.derivative.notation }}</small>
+          </div>
+        </q-item-section>
+      </q-item>
 
-      <q-list dense dark>
-        <q-item dark>
-          <q-item-section>Error</q-item-section>
-          <q-item-section>
-            <big>{{ block.data.error | unit }}</big>
-          </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Integral</q-item-section>
-          <q-item-section>
-            <big>{{ block.data.integral | unit }}</big>
-          </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Derivative</q-item-section>
-          <q-item-section>
-            <big>{{ block.data.derivative | unit }}</big>
-          </q-item-section>
-        </q-item>
-        <q-separator dark inset/>
-      </q-list>
+      <q-separator dark inset/>
 
-      <q-list dense dark>
-        <q-item dark class="q-my-none">
-          <q-item-section>P</q-item-section>
-          <q-item-section>
-            <big>{{ block.data.p | round }}</big>
-          </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>I</q-item-section>
-          <q-item-section>
-            <big>{{ block.data.i | round }}</big>
-          </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>D</q-item-section>
-          <q-item-section>
-            <big>{{ block.data.d | round }}</big>
-          </q-item-section>
-        </q-item>
-      </q-list>
+      <q-item dark>
+        <div class="col-3 text-weight-light text-subtitle2 q-pt-xs">Result</div>
+        <q-item-section>
+          <q-item-label caption>P</q-item-label>
+          <span>{{ block.data.p | round }}</span>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>I</q-item-label>
+          <span>{{ block.data.i | round }}</span>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>D</q-item-label>
+          <span>{{ block.data.d | round }}</span>
+        </q-item-section>
+      </q-item>
     </q-card-section>
   </q-card>
 </template>
+
+<style lang="stylus" scoped>
+.q-card__section .q-separator {
+  opacity: 0.2;
+}
+</style>

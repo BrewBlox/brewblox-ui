@@ -34,19 +34,19 @@ export default class SetpointSensorPairWidget extends BlockWidget {
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <div class="column">
-            <span>Setpoint value</span>
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          <q-item-label caption>Setpoint</q-item-label>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          <div>
+            <big>{{ block.data.setpointValue.val | round }}</big>
+            <span class="q-ml-xs">{{ block.data.setpointValue.notation }}</span>
           </div>
         </q-item-section>
         <q-item-section>
-          <big>{{ block.data.setpointValue | unit }}</big>
-        </q-item-section>
-      </q-item>
-      <q-item dark>
-        <q-item-section>Sensor value</q-item-section>
-        <q-item-section>
-          <big>{{ block.data.sensorValue | unit }}</big>
+          <q-item-label caption>Sensor</q-item-label>
+          <div>
+            <big>{{ block.data.sensorValue.val | round }}</big>
+            <span class="q-ml-xs">{{ block.data.sensorValue.notation }}</span>
+          </div>
         </q-item-section>
       </q-item>
     </q-card-section>

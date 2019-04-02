@@ -21,6 +21,10 @@ import Component from 'vue-class-component';
       type: String,
       default: 'big',
     },
+    unitTag: {
+      type: String,
+      default: 'span',
+    },
   },
 })
 export default class UnitPopupEdit extends Vue {
@@ -50,7 +54,8 @@ export default class UnitPopupEdit extends Vue {
 
 <template>
   <div>
-    <component :is="$props.tag" class="editable">{{ this.$props.field | unit }}</component>
+    <component :is="$props.tag" class="editable">{{ this.$props.field.value | round }}</component>
+    <component :is="$props.unitTag" class="q-ml-xs">{{ this.$props.field.notation }}</component>
     <q-popup-edit
       :title="this.$props.label"
       v-model="placeholder"

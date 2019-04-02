@@ -37,9 +37,10 @@ export default class SetpointSimpleWidget extends BlockWidget {
         </q-item-section>
         <q-item-section>This Setpoint is invalid</q-item-section>
       </q-item>
+
       <q-item dark>
-        <q-item-section>{{ block.data.enabled ? 'Target' : 'Target when enabled' }}</q-item-section>
         <q-item-section>
+          <q-item-label caption>{{ block.data.enabled ? 'Target' : 'Target when enabled' }}</q-item-label>
           <UnitPopupEdit
             v-if="!isDriven"
             :class="{ darkened: block.data.setting.value === null }"
@@ -53,10 +54,8 @@ export default class SetpointSimpleWidget extends BlockWidget {
           >{{ block.data.setpoint | unit }}</big>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
-      </q-item>
-      <q-item dark>
-        <q-item-section>Enabled</q-item-section>
         <q-item-section>
+          <q-item-label caption>Enabled</q-item-label>
           <q-toggle
             :value="block.data.enabled"
             @input="v => { block.data.enabled = v; saveBlock() }"
