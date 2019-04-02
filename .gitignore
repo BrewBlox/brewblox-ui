@@ -26,3 +26,5 @@ yarn-error.log*
 *.sln
 
 influxdb/
+
+src/build-env.json
