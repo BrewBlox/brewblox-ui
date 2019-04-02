@@ -1,17 +1,13 @@
 import { ComponentSettings } from '../state';
 import { defaultSettings } from '../components/getters';
-import { IN_OUT, LEFT } from '../getters';
 
-const SIZE_X = 4;
-const SIZE_Y = 1;
+const SIZE_X = 6;
+const SIZE_Y = 8;
 
 const settings: ComponentSettings = {
   ...defaultSettings,
   size: () => [SIZE_X, SIZE_Y],
-  transitions: () => ({
-    [LEFT]: [{ outCoords: IN_OUT }],
-    [IN_OUT]: [{ outCoords: LEFT }],
-  }),
+  transitions: () => ({}),
 };
 
 export default settings;
