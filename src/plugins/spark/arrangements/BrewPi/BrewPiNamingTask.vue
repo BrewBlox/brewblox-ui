@@ -108,11 +108,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
     if (!this.serviceId) {
       return false;
     }
-    return [
-      ...blockIds(this.$store, this.serviceId),
-      ...dashboardItemIds(this.$store),
-    ]
-      .includes(val);
+    return blockIds(this.$store, this.serviceId).includes(val);
   }
 
   updateName(key: string, val: string) {

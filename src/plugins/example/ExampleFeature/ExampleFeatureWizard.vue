@@ -11,7 +11,8 @@ export default class ExampleFeatureWizard extends WidgetWizardBase {
   createWidget() {
     // this.createItem() is inherited from WidgetWizardBase.
     this.createItem({
-      id: this.widgetId,
+      id: this.widgetId, // inherited from WidgetWizardBase. Defaults to a 128-bit random string.
+      title: this.widgetTitle,
       feature: this.typeId,
       dashboard: this.$props.dashboardId,
       order: 0,
@@ -21,6 +22,11 @@ export default class ExampleFeatureWizard extends WidgetWizardBase {
       ...this.defaultWidgetSize,
     });
   }
+
+  mounted() {
+    // The widget title is not required, but certainly nice
+    this.widgetTitle = this.typeDisplayName;
+  }
 }
 </script>
 
@@ -29,20 +35,14 @@ export default class ExampleFeatureWizard extends WidgetWizardBase {
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-input v-model="widgetId" :rules="widgetIdRules" dark label="Widget name"/>
+          <q-input v-model="widgetTitle" dark label="Widget name"/>
         </q-item-section>
       </q-item>
     </q-card-section>
 
     <q-card-actions class="row justify-between">
       <q-btn unelevated label="Back" @click="back"/>
-      <q-btn
-        :disable="!widgetIdOk"
-        unelevated
-        label="Create"
-        color="primary"
-        @click="createWidget"
-      />
+      <q-btn unelevated label="Create" color="primary" @click="createWidget"/>
     </q-card-actions>
   </div>
 </template>

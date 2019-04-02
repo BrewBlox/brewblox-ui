@@ -1,11 +1,11 @@
 <script lang="ts">
+import { uid } from 'quasar';
 import { objectSorter } from '@/helpers/functional';
 import {
   removeDashboardItem,
   saveDashboard,
   saveDashboardItem,
   updateDashboardItemConfig,
-  updateDashboardItemId,
   updateDashboardItemOrder,
   updateDashboardItemSize,
   appendDashboardItem,
@@ -14,7 +14,6 @@ import {
   dashboardValues,
   dashboardById,
   dashboardItemsByDashboardId,
-  itemCopyName,
   dashboardItemValues,
   dashboardItemById,
 } from '@/store/dashboards/getters';
@@ -74,23 +73,29 @@ export default class DashboardPage extends Vue {
   itemProps(item: DashboardItem): any {
     return {
       id: item.id,
+      title: item.title,
       type: item.feature,
       pos: item.pinnedPosition,
       cols: item.cols,
       rows: item.rows,
       config: item.config,
       onChangeConfig: this.onChangeItemConfig,
-      onChangeId: v => this.onChangeItemId(item.id, v),
-      onDelete: () => this.onDeleteItem(item),
-      onCopy: () => this.onCopyItem(item),
-      onMove: () => this.onMoveItem(item),
+      onChangeTitle: this.onChangeItemTitle,
+      onDelete: this.onDeleteItem,
+      onCopy: this.onCopyItem,
+      onMove: this.onMoveItem,
     };
   }
 
   get validatedItems(): ValidatedItem[] {
     return this.items
-      .map((item) => {
+      .map((item: DashboardItem) => {
         try {
+          if (item.title === undefined) {
+            // ensure backwards compatibility
+            // older items may not have a title
+            item.title = item.id;
+          }
           const component = widgetById(this.$store, item.feature, item.config);
           if (!component) {
             throw new Error(`No widget found for ${item.feature}`);
@@ -143,12 +148,12 @@ export default class DashboardPage extends Vue {
     updateDashboardItemConfig(this.$store, { id, config });
   }
 
-  onChangeItemId(id: string, newId: string) {
-    updateDashboardItemId(this.$store, { id, newId })
-      .catch(e => this.$q.notify(`Failed to rename ${id}: ${e}`));
+  onChangeItemTitle(id: string, title: string) {
+    saveDashboardItem(this.$store, { ...dashboardItemById(this.$store, id), title });
   }
 
-  onDeleteItem(item: DashboardItem) {
+  onDeleteItem(itemId: string) {
+    const item = dashboardItemById(this.$store, itemId);
     const deleteItem = () => removeDashboardItem(this.$store, item);
 
     // Quasar dialog can't handle objects as value - they will be returned as null
@@ -164,7 +169,7 @@ export default class DashboardPage extends Vue {
 
     this.$q.dialog({
       title: 'Delete widget',
-      message: `How do you want to delete widget ${item.id}?`,
+      message: `How do you want to delete widget ${item.title}?`,
       options: {
         type: 'checkbox',
         model: [0], // pre-check the default action
@@ -176,11 +181,12 @@ export default class DashboardPage extends Vue {
         selected.forEach(idx => opts[idx].action(this.$store, item.config)));
   }
 
-  onCopyItem(item: DashboardItem) {
-    const id = itemCopyName(this.$store, item.id);
+  onCopyItem(itemId: string) {
+    const item = dashboardItemById(this.$store, itemId);
+    const id = uid();
     this.$q.dialog({
       title: 'Copy widget',
-      message: `To which dashboard do you want to copy widget ${item.id}?`,
+      message: `To which dashboard do you want to copy widget ${item.title}?`,
       options: {
         type: 'radio',
         model: null,
@@ -189,14 +195,25 @@ export default class DashboardPage extends Vue {
       },
       cancel: true,
     })
-      .onOk((dashboard: string) =>
-        dashboard && appendDashboardItem(this.$store, { ...item, id, dashboard }));
+      .onOk((dashboard: string) => {
+        if (!dashboard) {
+          return;
+        }
+        appendDashboardItem(this.$store, { ...item, id, dashboard });
+        this.$q.notify({
+          color: 'positive',
+          icon: 'file_copy',
+          message: `Copied ${item.title} to ${dashboardById(this.$store, dashboard).title}`,
+        });
+      });
+
   }
 
-  onMoveItem(item: DashboardItem) {
+  onMoveItem(itemId: string) {
+    const item = dashboardItemById(this.$store, itemId);
     this.$q.dialog({
       title: 'Move widget',
-      message: `To which dashboard do you want to move widget ${item.id}?`,
+      message: `To which dashboard do you want to move widget ${item.title}?`,
       options: {
         type: 'radio',
         model: null,

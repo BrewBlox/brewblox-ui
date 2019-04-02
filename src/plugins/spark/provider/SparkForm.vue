@@ -165,7 +165,7 @@ export default class SparkForm extends Vue {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar>Spark Service</FormToolbar>
+    <FormToolbar>{{ service.id }}</FormToolbar>
 
     <q-card-section>
       <q-expansion-item group="modal" icon="info" label="System Info">

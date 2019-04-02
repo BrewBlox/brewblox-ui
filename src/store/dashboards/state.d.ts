@@ -11,6 +11,7 @@ export interface Dashboard {
 
 export interface DashboardItem {
   id: string;
+  title: string;
   cols: number;
   rows: number;
   order: number;

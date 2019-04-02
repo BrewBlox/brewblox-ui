@@ -59,7 +59,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
   }
 
   get startOk() {
-    return !!this.service && this.widgetIdOk;
+    return !!this.service;
   }
 
   get createOk() {
@@ -85,6 +85,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
 
     this.createItem({
       id: this.widgetId,
+      title: block.id,
       feature: this.typeId,
       dashboard: this.$props.dashboardId,
       order: 0,
@@ -153,21 +154,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
       animated
       dark
     >
-      <q-step name="start" title="Widget info">
-        <q-item dark>
-          <q-item-section>
-            <q-input v-model="widgetId" :rules="widgetIdRules" dark label="Widget name">
-              <template v-slot:append>
-                <q-icon name="mdi-information">
-                  <q-tooltip>
-                    The name of the dashboard widget that displays the Block.
-                    <br>Multiple widgets can display the same Block.
-                  </q-tooltip>
-                </q-icon>
-              </template>
-            </q-input>
-          </q-item-section>
-        </q-item>
+      <q-step name="start" title="Select Service">
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Service</q-item-label>
@@ -183,7 +170,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
             label="Create new Block"
             color="primary"
             class="q-mx-md"
-            @click="blockId = widgetId; currentStep = 'create'"
+            @click="currentStep = 'create'"
           />
           <q-btn
             :disable="!startOk"

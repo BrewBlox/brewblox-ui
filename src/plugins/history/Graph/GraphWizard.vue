@@ -18,6 +18,7 @@ export default class GraphWizard extends WidgetWizardBase {
   createWidget() {
     this.createItem({
       id: this.widgetId,
+      title: this.widgetTitle,
       feature: this.typeId,
       order: 0,
       dashboard: this.$props.dashboardId,
@@ -26,6 +27,9 @@ export default class GraphWizard extends WidgetWizardBase {
     });
   }
 
+  mounted() {
+    this.widgetTitle = this.typeDisplayName;
+  }
 }
 </script>
 
@@ -37,15 +41,15 @@ export default class GraphWizard extends WidgetWizardBase {
         :id="widgetId"
         :type="typeId"
         :field="graphCfg"
-        :on-change-id="changeWidgetId"
         :on-change-field="v => graphCfg = v"
+        :on-change-title="v => widgetTitle = v"
       />
     </q-dialog>
 
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-input v-model="widgetId" :rules="widgetIdRules" dark label="Widget name"/>
+          <q-input v-model="widgetTitle" dark label="Widget name"/>
         </q-item-section>
       </q-item>
     </q-card-section>
@@ -54,20 +58,13 @@ export default class GraphWizard extends WidgetWizardBase {
       <q-btn unelevated label="Back" @click="back"/>
       <div class="row">
         <q-btn
-          :disable="!widgetIdOk"
           unelevated
           label="Configure"
           color="primary"
           class="q-mx-md"
           @click="modalOpen = true"
         />
-        <q-btn
-          :disable="!widgetIdOk"
-          unelevated
-          label="Create"
-          color="primary"
-          @click="createWidget"
-        />
+        <q-btn unelevated label="Create" color="primary" @click="createWidget"/>
       </div>
     </q-card-actions>
   </div>

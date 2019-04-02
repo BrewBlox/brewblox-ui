@@ -124,23 +124,41 @@ export default class SessionViewWidget extends WidgetBase {
       @input="v => {if(!v) { graphSessionId = null; }}"
     />
 
-    <WidgetToolbar :title="widgetId" :subtitle="displayName">
+    <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="openModal()">
           <q-list dark bordered>
-            <q-item v-close-popup v-if="$props.onCopy" dark clickable @click="$props.onCopy">
+            <q-item
+              v-close-popup
+              v-if="$props.onCopy"
+              dark
+              clickable
+              @click="$props.onCopy(widgetId)"
+            >
               <q-item-section avatar>
                 <q-icon name="file_copy"/>
               </q-item-section>
               <q-item-section>Copy widget</q-item-section>
             </q-item>
-            <q-item v-close-popup v-if="$props.onMove" dark clickable @click="$props.onMove">
+            <q-item
+              v-close-popup
+              v-if="$props.onMove"
+              dark
+              clickable
+              @click="$props.onMove(widgetId)"
+            >
               <q-item-section avatar>
                 <q-icon name="exit_to_app"/>
               </q-item-section>
               <q-item-section>Move widget</q-item-section>
             </q-item>
-            <q-item v-close-popup v-if="$props.onDelete" dark clickable @click="$props.onDelete">
+            <q-item
+              v-close-popup
+              v-if="$props.onDelete"
+              dark
+              clickable
+              @click="$props.onDelete(widgetId)"
+            >
               <q-item-section avatar>
                 <q-icon name="delete"/>
               </q-item-section>
