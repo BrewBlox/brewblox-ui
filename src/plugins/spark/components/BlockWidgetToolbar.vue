@@ -58,7 +58,6 @@ export default class BlockWidgetToolbar extends Vue {
             label="Delete widget"
             @click="field.$props.onDelete(field.widgetId)"
           />
-          <ExportAction :widget-id="field.widgetId"/>
         </q-list>
       </q-btn-dropdown>
     </q-item-section>
