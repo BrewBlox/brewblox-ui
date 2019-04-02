@@ -209,9 +209,6 @@ export default class ProcessViewWidget extends WidgetBase {
 
     <WidgetToolbar :title="widgetId" :subtitle="displayName">
       <q-item-section v-if="editable" side>
-        <q-btn flat round dense icon="delete" @click="clearParts"/>
-      </q-item-section>
-      <q-item-section v-if="editable" side>
         <q-btn flat round dense icon="extension">
           <q-menu>
             <q-list link style="padding: 5px">
@@ -238,7 +235,48 @@ export default class ProcessViewWidget extends WidgetBase {
         </q-btn>
       </q-item-section>
       <q-item-section side>
-        <q-toggle v-model="editable"/>
+        <q-btn-dropdown flat label="menu">
+          <q-list dark bordered>
+            <q-item v-close-popup dark clickable @click="editable = !editable">
+              <template v-if="editable">
+                <q-item-section avatar>
+                  <q-icon name="mdi-pencil-off"/>
+                </q-item-section>
+                <q-item-section>Stop editing</q-item-section>
+              </template>
+              <template v-else>
+                <q-item-section avatar>
+                  <q-icon name="mdi-pencil"/>
+                </q-item-section>
+                <q-item-section>Edit parts</q-item-section>
+              </template>
+            </q-item>
+            <q-item v-close-popup dark clickable @click="clearParts">
+              <q-item-section avatar>
+                <q-icon name="delete"/>
+              </q-item-section>
+              <q-item-section>Remove all parts</q-item-section>
+            </q-item>
+            <q-item v-close-popup v-if="$props.onCopy" dark clickable @click="$props.onCopy">
+              <q-item-section avatar>
+                <q-icon name="file_copy"/>
+              </q-item-section>
+              <q-item-section>Copy widget</q-item-section>
+            </q-item>
+            <q-item v-close-popup v-if="$props.onMove" dark clickable @click="$props.onMove">
+              <q-item-section avatar>
+                <q-icon name="exit_to_app"/>
+              </q-item-section>
+              <q-item-section>Move widget</q-item-section>
+            </q-item>
+            <q-item v-close-popup v-if="$props.onDelete" dark clickable @click="$props.onDelete">
+              <q-item-section avatar>
+                <q-icon name="delete"/>
+              </q-item-section>
+              <q-item-section>Delete widget</q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
       </q-item-section>
     </WidgetToolbar>
 

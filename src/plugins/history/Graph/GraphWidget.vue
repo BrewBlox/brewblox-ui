@@ -81,31 +81,55 @@ export default class GraphWidget extends WidgetBase {
 
     <WidgetToolbar :title="widgetId" :subtitle="displayName">
       <q-item-section side>
-        <q-btn flat round dense icon="mdi-timelapse">
-          <q-menu>
-            <q-list dark link>
-              <q-item
-                v-close-popup
-                v-for="(preset, idx) in presets"
-                :key="idx"
-                dark
-                clickable
-                @click="() => applyPreset(preset)"
-              >
-                <q-item-section>{{ preset.duration }}</q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </q-btn>
-      </q-item-section>
-      <q-item-section side>
-        <q-btn flat round dense icon="mdi-chart-line" @click="graphModalOpen = true"/>
-      </q-item-section>
-      <q-item-section side>
-        <q-btn flat round dense icon="settings" @click="settingsModalOpen = true"/>
-      </q-item-section>
-      <q-item-section side>
-        <q-btn flat round dense icon="refresh" @click="regraph"/>
+        <q-btn-dropdown flat split icon="settings" @click="settingsModalOpen = true">
+          <q-list dark bordered>
+            <q-item v-close-popup dark clickable @click="graphModalOpen = true">
+              <q-item-section avatar>
+                <q-icon name="mdi-chart-line"/>
+              </q-item-section>
+              <q-item-section>Show maximized</q-item-section>
+            </q-item>
+            <q-expansion-item label="Presets" icon="mdi-timelapse">
+              <q-list dark>
+                <q-item
+                  v-close-popup
+                  v-for="(preset, idx) in presets"
+                  :key="idx"
+                  :inset-level="1"
+                  dark
+                  clickable
+                  @click="() => applyPreset(preset)"
+                >
+                  <q-item-section>{{ preset.duration }}</q-item-section>
+                </q-item>
+              </q-list>
+            </q-expansion-item>
+            <q-item v-close-popup dark clickable @click="regraph">
+              <q-item-section avatar>
+                <q-icon name="refresh"/>
+              </q-item-section>
+              <q-item-section>Refresh</q-item-section>
+            </q-item>
+            <q-item v-close-popup v-if="$props.onCopy" dark clickable @click="$props.onCopy">
+              <q-item-section avatar>
+                <q-icon name="file_copy"/>
+              </q-item-section>
+              <q-item-section>Copy widget</q-item-section>
+            </q-item>
+            <q-item v-close-popup v-if="$props.onMove" dark clickable @click="$props.onMove">
+              <q-item-section avatar>
+                <q-icon name="exit_to_app"/>
+              </q-item-section>
+              <q-item-section>Move widget</q-item-section>
+            </q-item>
+            <q-item v-close-popup v-if="$props.onDelete" dark clickable @click="$props.onDelete">
+              <q-item-section avatar>
+                <q-icon name="delete"/>
+              </q-item-section>
+              <q-item-section>Delete widget</q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
       </q-item-section>
     </WidgetToolbar>
 

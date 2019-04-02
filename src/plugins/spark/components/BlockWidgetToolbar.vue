@@ -14,19 +14,75 @@ import Vue from 'vue';
     },
   },
 })
-export default class BlockWidgetToolbar extends Vue { }
+export default class BlockWidgetToolbar extends Vue {
+  graphModalOpen: boolean = false;
+}
 </script>
 
 <template>
-  <WidgetToolbar :title="$props.field.widgetId" :subtitle="$props.field.displayName">
-    <q-item-section v-if="graph" side>
-      <BlockGraph :id="field.widgetId" :config="field.graphCfg" :change="v => field.graphCfg = v"/>
-    </q-item-section>
-    <q-item-section class="dense" side>
-      <q-btn flat round dense icon="settings" @click="field.openModal"/>
-    </q-item-section>
-    <q-item-section class="dense" side>
-      <q-btn flat round dense icon="refresh" @click="field.refreshBlock"/>
+  <WidgetToolbar :title="field.widgetId" :subtitle="field.displayName">
+    <BlockGraph
+      v-if="graphModalOpen"
+      :value="graphModalOpen"
+      :id="field.widgetId"
+      :config="field.graphCfg"
+      :change="v => field.graphCfg = v"
+      @input="v => graphModalOpen = v"
+    />
+
+    <q-item-section side>
+      <q-btn-dropdown flat split icon="settings" @click="field.openModal">
+        <q-list dark bordered>
+          <q-item v-close-popup v-if="graph" dark clickable @click="graphModalOpen = true">
+            <q-item-section avatar>
+              <q-icon name="mdi-chart-line"/>
+            </q-item-section>
+            <q-item-section>Show graph</q-item-section>
+          </q-item>
+          <q-item v-close-popup dark clickable @click="field.refreshBlock">
+            <q-item-section avatar>
+              <q-icon name="refresh"/>
+            </q-item-section>
+            <q-item-section>Refresh</q-item-section>
+          </q-item>
+          <q-item
+            v-close-popup
+            v-if="field.$props.onCopy"
+            dark
+            clickable
+            @click="field.$props.onCopy"
+          >
+            <q-item-section avatar>
+              <q-icon name="file_copy"/>
+            </q-item-section>
+            <q-item-section>Copy widget</q-item-section>
+          </q-item>
+          <q-item
+            v-close-popup
+            v-if="field.$props.onMove"
+            dark
+            clickable
+            @click="field.$props.onMove"
+          >
+            <q-item-section avatar>
+              <q-icon name="exit_to_app"/>
+            </q-item-section>
+            <q-item-section>Move widget</q-item-section>
+          </q-item>
+          <q-item
+            v-close-popup
+            v-if="field.$props.onDelete"
+            dark
+            clickable
+            @click="field.$props.onDelete"
+          >
+            <q-item-section avatar>
+              <q-icon name="delete"/>
+            </q-item-section>
+            <q-item-section>Delete widget</q-item-section>
+          </q-item>
+        </q-list>
+      </q-btn-dropdown>
     </q-item-section>
   </WidgetToolbar>
 </template>

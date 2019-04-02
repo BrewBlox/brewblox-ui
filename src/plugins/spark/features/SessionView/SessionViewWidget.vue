@@ -10,6 +10,7 @@ import { shortDateString } from '@/helpers/functional';
 export default class SessionViewWidget extends WidgetBase {
   modalOpen: boolean = false;
   modalSession: Session | null = null;
+  graphSessionId: string | null = null;
   sessionFilter: string = '';
 
   get widgetConfig(): SessionViewConfig {
@@ -34,6 +35,12 @@ export default class SessionViewWidget extends WidgetBase {
         }
         return Number(right.end) - Number(left.end);
       });
+  }
+
+  get graphSession() {
+    return this.graphSessionId
+      ? this.widgetConfig.sessions.find(session => session.id === this.graphSessionId)
+      : null;
   }
 
   periodString(session: Session) {
@@ -107,10 +114,40 @@ export default class SessionViewWidget extends WidgetBase {
         :active-session="modalSession"
       />
     </q-dialog>
+    <BlockGraph
+      v-if="graphSession"
+      :value="true"
+      :id="`${widgetId}::${graphSession.id}`"
+      :config="graphSession.graphCfg"
+      :change="callAndSaveConfig(v => graphSession.graphCfg = v)"
+      no-duration
+      @input="v => {if(!v) { graphSessionId = null; }}"
+    />
 
     <WidgetToolbar :title="widgetId" :subtitle="displayName">
       <q-item-section side>
-        <q-btn flat dense round icon="settings" @click="openModal()"/>
+        <q-btn-dropdown flat split icon="settings" @click="openModal()">
+          <q-list dark bordered>
+            <q-item v-close-popup v-if="$props.onCopy" dark clickable @click="$props.onCopy">
+              <q-item-section avatar>
+                <q-icon name="file_copy"/>
+              </q-item-section>
+              <q-item-section>Copy widget</q-item-section>
+            </q-item>
+            <q-item v-close-popup v-if="$props.onMove" dark clickable @click="$props.onMove">
+              <q-item-section avatar>
+                <q-icon name="exit_to_app"/>
+              </q-item-section>
+              <q-item-section>Move widget</q-item-section>
+            </q-item>
+            <q-item v-close-popup v-if="$props.onDelete" dark clickable @click="$props.onDelete">
+              <q-item-section avatar>
+                <q-icon name="delete"/>
+              </q-item-section>
+              <q-item-section>Delete widget</q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
       </q-item-section>
     </WidgetToolbar>
 
@@ -124,7 +161,7 @@ export default class SessionViewWidget extends WidgetBase {
           </q-input>
         </q-item-section>
         <q-item-section side>
-          <q-btn flat icon="add" label="New" class="text-white" @click="createSession"/>
+          <q-btn flat rounded icon="add" label="New" class="text-white" @click="createSession"/>
         </q-item-section>
       </q-item>
       <q-item v-for="session in sessions" :key="session.id" dark>
@@ -136,13 +173,7 @@ export default class SessionViewWidget extends WidgetBase {
           <q-btn flat rounded icon="settings" @click="openModal(session)"/>
         </q-item-section>
         <q-item-section side>
-          <BlockGraph
-            :id="`${widgetId}::${session.id}`"
-            :config="session.graphCfg"
-            :change="callAndSaveConfig(v => session.graphCfg = v)"
-            button-size="lg"
-            no-duration
-          />
+          <q-btn flat rounded icon="mdi-chart-line" @click="graphSessionId = session.id"/>
         </q-item-section>
       </q-item>
     </q-card-section>

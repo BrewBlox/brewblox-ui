@@ -17,6 +17,7 @@ import { fetchKnownKeys } from '@/store/history/actions';
   },
 })
 export default class SessionViewForm extends FormBase {
+  graphSessionId: string | null = null;
   sessionInput: string = '';
   selectFilter: string | null = null;
 
@@ -31,6 +32,12 @@ export default class SessionViewForm extends FormBase {
 
   get nodes() {
     return nodeBuilder(fields(this.$store));
+  }
+
+  get graphSession() {
+    return this.graphSessionId
+      ? this.sessions.find(session => session.id === this.graphSessionId)
+      : null;
   }
 
   saveConfig(config: SessionViewConfig = this.widgetConfig) {
@@ -129,6 +136,15 @@ export default class SessionViewForm extends FormBase {
 <template>
   <q-card dark class="widget-modal">
     <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
+    <BlockGraph
+      v-if="graphSession"
+      :value="true"
+      :id="`SessionView::form::${graphSession.id}`"
+      :config="graphSession.graphCfg"
+      :change="v => { graphSession.graphCfg = v; updateSession(graphSession); }"
+      no-duration
+      @input="v => {if(!v) { graphSessionId = null; }}"
+    />
 
     <q-scroll-area style="height: 75vh">
       <q-expansion-item
@@ -142,13 +158,7 @@ export default class SessionViewForm extends FormBase {
         <q-list>
           <q-item dark>
             <q-item-section>
-              <BlockGraph
-                :id="`SessionView::form::${session.id}`"
-                :config="session.graphCfg"
-                :change="v => { session.graphCfg = v; updateSession(session); }"
-                label="Show Graph"
-                no-duration
-              />
+              <q-btn flat rounded icon="mdi-chart-line" @click="graphSessionId = session.id"/>
             </q-item-section>
             <q-item-section>
               <q-btn flat rounded icon="mdi-content-copy" @click="duplicateSession(session)"/>

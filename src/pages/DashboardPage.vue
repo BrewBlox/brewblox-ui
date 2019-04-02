@@ -236,7 +236,7 @@ export default class DashboardPage extends Vue {
           <q-list dark>
             <q-item clickable @click="widgetEditable = !widgetEditable">
               <q-item-section avatar>
-                <q-icon :name="widgetEditable ? 'check' : 'edit'"/>
+                <q-icon :name="widgetEditable ? 'mdi-pencil-off' : 'mdi-pencil'"/>
               </q-item-section>
               <q-item-section>{{ widgetEditable ? 'Stop editing' : 'Edit Dashboard' }}</q-item-section>
             </q-item>
