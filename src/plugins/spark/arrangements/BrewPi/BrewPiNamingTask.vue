@@ -6,7 +6,6 @@ import { serviceValues } from '@/store/services/getters';
 import { typeName, blockIds } from '@/plugins/spark/store/getters';
 import { BrewPiConfig, BrewPiConfigNames } from '@/plugins/spark/arrangements/BrewPi/state';
 import { spaceCased, valOrDefault } from '@/helpers/functional';
-import { dashboardItemIds } from '@/store/dashboards/getters';
 
 
 @Component

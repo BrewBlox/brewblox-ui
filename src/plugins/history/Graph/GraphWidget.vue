@@ -83,12 +83,11 @@ export default class GraphWidget extends WidgetBase {
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="settingsModalOpen = true">
           <q-list dark bordered>
-            <q-item v-close-popup dark clickable @click="graphModalOpen = true">
-              <q-item-section avatar>
-                <q-icon name="mdi-chart-line"/>
-              </q-item-section>
-              <q-item-section>Show maximized</q-item-section>
-            </q-item>
+            <ActionItem
+              icon="mdi-chart-line"
+              label="Show maximized"
+              @click="graphModalOpen = true"
+            />
             <q-expansion-item label="Presets" icon="mdi-timelapse">
               <q-list dark>
                 <q-item
@@ -98,54 +97,31 @@ export default class GraphWidget extends WidgetBase {
                   :inset-level="1"
                   dark
                   clickable
-                  @click="() => applyPreset(preset)"
+                  @click="applyPreset(preset)"
                 >
                   <q-item-section>{{ preset.duration }}</q-item-section>
                 </q-item>
               </q-list>
             </q-expansion-item>
-            <q-item v-close-popup dark clickable @click="regraph">
-              <q-item-section avatar>
-                <q-icon name="refresh"/>
-              </q-item-section>
-              <q-item-section>Refresh</q-item-section>
-            </q-item>
-            <q-item
-              v-close-popup
+            <ActionItem icon="refresh" label="Refresh" @click="regraph"/>
+            <ActionItem
               v-if="$props.onCopy"
-              dark
-              clickable
+              icon="file_copy"
+              label="Copy widget"
               @click="$props.onCopy(widgetId)"
-            >
-              <q-item-section avatar>
-                <q-icon name="file_copy"/>
-              </q-item-section>
-              <q-item-section>Copy widget</q-item-section>
-            </q-item>
-            <q-item
-              v-close-popup
+            />
+            <ActionItem
               v-if="$props.onMove"
-              dark
-              clickable
+              icon="exit_to_app"
+              label="Move widget"
               @click="$props.onMove(widgetId)"
-            >
-              <q-item-section avatar>
-                <q-icon name="exit_to_app"/>
-              </q-item-section>
-              <q-item-section>Move widget</q-item-section>
-            </q-item>
-            <q-item
-              v-close-popup
+            />
+            <ActionItem
               v-if="$props.onDelete"
-              dark
-              clickable
+              icon="delete"
+              label="Delete widget"
               @click="$props.onDelete(widgetId)"
-            >
-              <q-item-section avatar>
-                <q-icon name="delete"/>
-              </q-item-section>
-              <q-item-section>Delete widget</q-item-section>
-            </q-item>
+            />
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

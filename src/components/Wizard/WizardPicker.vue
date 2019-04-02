@@ -114,6 +114,23 @@ export default class WizardPicker extends Vue {
           </q-item-section>
         </q-item>
       </q-card-section>
+
+      <q-separator dark inset/>
+
+      <q-card-section>
+        <q-item link clickable dark @click="wizardComponent = 'ImportWizard'">
+          <q-item-section side class="col-3">
+            <q-item-label class="text-h6">Import</q-item-label>
+            <q-item-label caption>Click to start</q-item-label>
+          </q-item-section>
+          <q-item-section>
+            <ul>
+              <li>Import widget from JSON string</li>
+              <li>Use widgets shared by other users</li>
+            </ul>
+          </q-item-section>
+        </q-item>
+      </q-card-section>
     </template>
   </q-card>
 </template>

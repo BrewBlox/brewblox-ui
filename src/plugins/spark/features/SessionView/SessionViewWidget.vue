@@ -128,42 +128,24 @@ export default class SessionViewWidget extends WidgetBase {
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="openModal()">
           <q-list dark bordered>
-            <q-item
-              v-close-popup
+            <ActionItem
               v-if="$props.onCopy"
-              dark
-              clickable
+              icon="file_copy"
+              label="Copy widget"
               @click="$props.onCopy(widgetId)"
-            >
-              <q-item-section avatar>
-                <q-icon name="file_copy"/>
-              </q-item-section>
-              <q-item-section>Copy widget</q-item-section>
-            </q-item>
-            <q-item
-              v-close-popup
+            />
+            <ActionItem
               v-if="$props.onMove"
-              dark
-              clickable
+              icon="exit_to_app"
+              label="Move widget"
               @click="$props.onMove(widgetId)"
-            >
-              <q-item-section avatar>
-                <q-icon name="exit_to_app"/>
-              </q-item-section>
-              <q-item-section>Move widget</q-item-section>
-            </q-item>
-            <q-item
-              v-close-popup
+            />
+            <ActionItem
               v-if="$props.onDelete"
-              dark
-              clickable
+              icon="delete"
+              label="Delete widget"
               @click="$props.onDelete(widgetId)"
-            >
-              <q-item-section avatar>
-                <q-icon name="delete"/>
-              </q-item-section>
-              <q-item-section>Delete widget</q-item-section>
-            </q-item>
+            />
           </q-list>
         </q-btn-dropdown>
       </q-item-section>
