@@ -1,4 +1,5 @@
 <script lang="ts">
+import UrlSafeString from 'url-safe-string';
 import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
 import { objectSorter } from '@/helpers/functional';
 import {
@@ -14,6 +15,7 @@ import {
   primaryDashboardId,
   dashboardIds,
   dashboardItemValues,
+  dashboardById,
 } from '@/store/dashboards/getters';
 import { Dashboard } from '@/store/dashboards/state';
 import {
@@ -100,28 +102,56 @@ export default class DefaultLayout extends Vue {
           return;
         }
 
-        await createDashboard(this.$store, { ...dashboard, id: newId });
-        await Promise.all(
-          dashboardItemValues(this.$store)
-            .filter(item => item.dashboard === oldId)
-            .map(item => saveDashboardItem(this.$store, { ...item, dashboard: newId }))
-        );
-        await removeDashboard(this.$store, { ...dashboard });
-
-        if (this.defaultDashboard === oldId) {
-          await updatePrimaryDashboard(this.$store, newId);
-        }
-
-        if (this.$route.path === `/dashboard/${oldId}`) {
-          this.$router.replace(`/dashboard/${newId}`);
-        }
-
-        this.$q.notify({
-          color: 'positive',
-          icon: 'edit',
-          message: `Changed dashboard ID '${oldId}' to '${newId}'`,
-        });
+        this.doChangeDashboardId(oldId, newId);
       });
+  }
+
+  async doChangeDashboardId(oldId: string, newId: string) {
+    const dashboard = dashboardById(this.$store, oldId);
+
+    await createDashboard(this.$store, { ...dashboard, id: newId });
+    await Promise.all(
+      dashboardItemValues(this.$store)
+        .filter(item => item.dashboard === oldId)
+        .map(item => saveDashboardItem(this.$store, { ...item, dashboard: newId }))
+    );
+    await removeDashboard(this.$store, { ...dashboard });
+
+    if (this.defaultDashboard === oldId) {
+      await updatePrimaryDashboard(this.$store, newId);
+    }
+
+    if (this.$route.path === `/dashboard/${oldId}`) {
+      this.$router.replace(`/dashboard/${newId}`);
+    }
+
+    this.$q.notify({
+      color: 'positive',
+      icon: 'edit',
+      message: `Changed dashboard ID '${oldId}' to '${newId}'`,
+    });
+  }
+
+  findIdSuggestion(id: string, oldId: string): null | string {
+    if (id === oldId) {
+      return null;
+    }
+    const existingIds = dashboardIds(this.$store);
+    if (!existingIds.includes(id)) {
+      return id;
+    }
+
+    const copyName = (i: number): string =>
+      (id.match(/-\d+$/)
+        ? id.replace(/-\d+$/, `-${i}`)
+        : `${id}-${i}`);
+
+    let idx = 2;
+    while (existingIds.includes(copyName(idx))) {
+      idx += 1;
+    }
+
+    return copyName(idx);
   }
 
   changeDashboardTitle(dashboard: Dashboard) {
@@ -135,6 +165,7 @@ export default class DefaultLayout extends Vue {
       },
     })
       .onOk(async newTitle => {
+        const oldId = dashboard.id;
         const oldTitle = dashboard.title;
         if (!newTitle || oldTitle === newTitle) {
           return;
@@ -146,6 +177,19 @@ export default class DefaultLayout extends Vue {
           icon: 'edit',
           message: `Renamed dashboard '${oldTitle}' to '${newTitle}'`,
         });
+
+        const defaultId = new UrlSafeString().generate(newTitle);
+        const suggestedId = this.findIdSuggestion(defaultId, oldId);
+        if (!suggestedId) {
+          return; // no change
+        }
+
+        this.$q.dialog({
+          title: 'Update dashboard URL',
+          message: `Do you want to change the dashboard ID from '${oldId}' to '${suggestedId}'?`,
+          cancel: true,
+        })
+          .onOk(() => this.doChangeDashboardId(oldId, suggestedId));
       });
   }
 
@@ -271,24 +315,21 @@ export default class DefaultLayout extends Vue {
                     </q-item-section>
                     <q-item-section>Default dashboard</q-item-section>
                   </q-item>
-                  <q-item dark link clickable @click="changeDashboardId(dashboard)">
-                    <q-item-section avatar>
-                      <q-icon name="edit"/>
-                    </q-item-section>
-                    <q-item-section>Change dashboard ID</q-item-section>
-                  </q-item>
-                  <q-item dark link clickable @click="changeDashboardTitle(dashboard)">
-                    <q-item-section avatar>
-                      <q-icon name="edit"/>
-                    </q-item-section>
-                    <q-item-section>Change dashboard title</q-item-section>
-                  </q-item>
-                  <q-item dark link clickable @click="removeDashboard(dashboard)">
-                    <q-item-section avatar>
-                      <q-icon name="delete"/>
-                    </q-item-section>
-                    <q-item-section>Delete dashboard</q-item-section>
-                  </q-item>
+                  <ActionItem
+                    icon="edit"
+                    label="Change dashboard ID"
+                    @click="changeDashboardId(dashboard)"
+                  />
+                  <ActionItem
+                    icon="edit"
+                    label="Change dashboard Title"
+                    @click="changeDashboardTitle(dashboard)"
+                  />
+                  <ActionItem
+                    icon="delete"
+                    label="Delete dashboard"
+                    @click="removeDashboard(dashboard)"
+                  />
                 </q-list>
               </q-btn-dropdown>
             </q-item-section>
@@ -337,18 +378,12 @@ export default class DefaultLayout extends Vue {
             <q-item-section v-if="serviceEditing" side>
               <q-btn-dropdown outline icon="edit" size="sm">
                 <q-list dark>
-                  <q-item dark link clickable @click="changeServiceTitle(service)">
-                    <q-item-section avatar>
-                      <q-icon name="edit"/>
-                    </q-item-section>
-                    <q-item-section>Change service title</q-item-section>
-                  </q-item>
-                  <q-item dark link clickable @click="removeService(service)">
-                    <q-item-section avatar>
-                      <q-icon name="delete"/>
-                    </q-item-section>
-                    <q-item-section>Delete service</q-item-section>
-                  </q-item>
+                  <ActionItem
+                    icon="edit"
+                    label="Change service title"
+                    @click="changeServiceTitle(service)"
+                  />
+                  <ActionItem icon="delete" label="Delete service" @click="removeService(service)"/>
                 </q-list>
               </q-btn-dropdown>
             </q-item-section>
@@ -379,5 +414,10 @@ export default class DefaultLayout extends Vue {
 
 .editing {
   cursor: move;
+}
+
+.build-info {
+  bottom: 0;
+  position: absolute;
 }
 </style>
