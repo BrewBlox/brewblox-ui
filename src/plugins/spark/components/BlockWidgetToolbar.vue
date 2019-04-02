@@ -33,54 +33,32 @@ export default class BlockWidgetToolbar extends Vue {
     <q-item-section side>
       <q-btn-dropdown flat split icon="settings" @click="field.openModal">
         <q-list dark bordered>
-          <q-item v-close-popup v-if="graph" dark clickable @click="graphModalOpen = true">
-            <q-item-section avatar>
-              <q-icon name="mdi-chart-line"/>
-            </q-item-section>
-            <q-item-section>Show graph</q-item-section>
-          </q-item>
-          <q-item v-close-popup dark clickable @click="field.refreshBlock">
-            <q-item-section avatar>
-              <q-icon name="refresh"/>
-            </q-item-section>
-            <q-item-section>Refresh</q-item-section>
-          </q-item>
-          <q-item
-            v-close-popup
+          <ActionItem
+            v-if="graph"
+            icon="mdi-chart-line"
+            label="Show graph"
+            @click="graphModalOpen = true"
+          />
+          <ActionItem icon="refresh" label="Refresh" @click="field.refreshBlock"/>
+          <ActionItem
             v-if="field.$props.onCopy"
-            dark
-            clickable
+            icon="file_copy"
+            label="Copy widget"
             @click="field.$props.onCopy(field.widgetId)"
-          >
-            <q-item-section avatar>
-              <q-icon name="file_copy"/>
-            </q-item-section>
-            <q-item-section>Copy widget</q-item-section>
-          </q-item>
-          <q-item
-            v-close-popup
+          />
+          <ActionItem
             v-if="field.$props.onMove"
-            dark
-            clickable
+            icon="exit_to_app"
+            label="Move widget"
             @click="field.$props.onMove(field.widgetId)"
-          >
-            <q-item-section avatar>
-              <q-icon name="exit_to_app"/>
-            </q-item-section>
-            <q-item-section>Move widget</q-item-section>
-          </q-item>
-          <q-item
-            v-close-popup
+          />
+          <ActionItem
             v-if="field.$props.onDelete"
-            dark
-            clickable
+            icon="delete"
+            label="Delete widget"
             @click="field.$props.onDelete(field.widgetId)"
-          >
-            <q-item-section avatar>
-              <q-icon name="delete"/>
-            </q-item-section>
-            <q-item-section>Delete widget</q-item-section>
-          </q-item>
+          />
+          <ExportAction :widget-id="field.widgetId"/>
         </q-list>
       </q-btn-dropdown>
     </q-item-section>
