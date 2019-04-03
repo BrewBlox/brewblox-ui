@@ -3,6 +3,7 @@ import Component from 'vue-class-component';
 import Vue from 'vue';
 import { dashboardItemById } from '@/store/dashboards/getters';
 import { serialize } from '@/helpers/units/parseObject';
+import FileSaver from 'file-saver';
 
 @Component({
   props: {
@@ -27,9 +28,8 @@ export default class ExportAction extends Vue {
     const item = dashboardItemById(this.$store, this.$props.widgetId);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, _rev, dashboard, ...exported } = item;
-    this.$q.dialog({
-      message: JSON.stringify(serialize(exported)),
-    });
+    const blob = new Blob([JSON.stringify(serialize(exported))], { type: 'text/plain;charset=utf-8' });
+    FileSaver.saveAs(blob, `brewblox-${item.title}-${item.id}.json`);
   }
 }
 </script>
