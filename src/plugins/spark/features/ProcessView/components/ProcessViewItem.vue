@@ -12,36 +12,15 @@ import { SQUARE_SIZE } from '../getters';
   },
 })
 export default class ProcessViewItem extends Vue {
-  get component(): any {
-    return Vue.component(this.$props.value.type);
-  }
-
-  get size() {
-    if (this.component.size !== undefined) {
-      return this.component.size(this.$props.value);
-    }
-    return [1, 1];
-  }
-
-  // to rotate correctly in all browsers, center part around 0,0 before rotation
-  // Firefox does not support transform-origin in SVG.
-  get center() {
-    return this.size.map(v => v * SQUARE_SIZE / 2);
+  get transformation() {
+    return `rotate(${this.$props.value.rotate}, ${SQUARE_SIZE / 2}, ${SQUARE_SIZE / 2})`;
   }
 }
 </script>
 
 <template>
-  <g :transform="`translate(${center.join(',')})`">
-    <g :transform="`rotate(${value.rotate})`">
-      <component
-        v-if="component"
-        :value="value"
-        :is="component"
-        :transform="`translate(${center.map(v => -v).join(',')})`"
-        class="ProcessViewPart"
-      />
-    </g>
+  <g :transform="transformation">
+    <component v-if="value.type" :value="value" :is="value.type" class="ProcessViewPart"/>
   </g>
 </template>
 

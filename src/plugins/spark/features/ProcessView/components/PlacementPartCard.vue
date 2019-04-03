@@ -25,19 +25,33 @@ export default class PlacementPartCard extends PartCard {
 </script>
 
 <template>
-  <q-item dark>
-    <q-item-section side>Placement</q-item-section>
-    <q-item-section>
-      <q-btn fab round color="primary" icon="rotate_left" @click="rotate(-90)"/>
-    </q-item-section>
-    <q-item-section>
-      <q-btn fab round color="primary" icon="rotate_right" @click="rotate(90)"/>
-    </q-item-section>
-    <q-item-section>
-      <q-btn fab round color="primary" icon="mdi-swap-horizontal-bold" @click="flip"/>
-    </q-item-section>
-    <q-item-section>
-      <q-btn fab round color="primary" icon="delete" @click="removePart"/>
-    </q-item-section>
-  </q-item>
+  <q-list dark>
+    <q-separator dark/>
+    <q-item dark>
+      <q-item-section>
+        <q-btn
+          color="primary"
+          icon="mdi-rotate-left-variant"
+          no-wrap
+          label="rotate"
+          @click="rotate(-90)"
+        />
+      </q-item-section>
+      <q-item-section>
+        <q-btn
+          color="primary"
+          icon="mdi-rotate-right-variant"
+          no-wrap
+          label="rotate"
+          @click="rotate(90)"
+        />
+      </q-item-section>
+      <q-item-section>
+        <q-btn color="primary" icon="mdi-swap-horizontal-bold" label="flip" @click="flip"/>
+      </q-item-section>
+      <q-item-section>
+        <q-btn color="primary" icon="delete" label="delete" @click="removePart"/>
+      </q-item-section>
+    </q-item>
+  </q-list>
 </template>
