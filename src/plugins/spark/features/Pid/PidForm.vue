@@ -39,8 +39,8 @@ export default class PidForm extends BlockForm {
         <q-separator dark inset/>
 
         <q-item dark>
-          <q-item-section>Input Block</q-item-section>
           <q-item-section>
+            <q-item-label caption>Input Block</q-item-label>
             <LinkPopupEdit
               :field="block.data.inputId"
               :service-id="block.serviceId"
@@ -56,20 +56,21 @@ export default class PidForm extends BlockForm {
               <p>The input target minus the input value is called the error</p>
             </LinkPopupEdit>
           </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Target value is</q-item-section>
-          <q-item-section class="text-bold">{{ block.data.inputSetting | unit }}</q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Current value is</q-item-section>
-          <q-item-section class="text-bold">{{ block.data.inputValue | unit }}</q-item-section>
+
+          <q-item-section>
+            <q-item-label caption>Target value is</q-item-label>
+            <q-item-section class="text-bold">{{ block.data.inputSetting | unit }}</q-item-section>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>Current value is</q-item-label>
+            <div class="text-bold">{{ block.data.inputValue | unit }}</div>
+          </q-item-section>
         </q-item>
         <q-separator dark inset/>
 
         <q-item dark>
-          <q-item-section>Output Block</q-item-section>
           <q-item-section>
+            <q-item-label caption>Output Block</q-item-label>
             <LinkPopupEdit
               :field="block.data.outputId"
               :service-id="block.serviceId"
@@ -88,20 +89,22 @@ export default class PidForm extends BlockForm {
               </p>
             </LinkPopupEdit>
           </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Target value is</q-item-section>
-          <q-item-section class="text-bold">{{ block.data.outputSetting | round }}</q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Current value is</q-item-section>
-          <q-item-section class="text-bold">{{ block.data.outputValue | unit }}</q-item-section>
+
+          <q-item-section>
+            <q-item-label caption>Target value is</q-item-label>
+            <div class="text-bold">{{ block.data.outputSetting | round }}</div>
+          </q-item-section>
+
+          <q-item-section>
+            <q-item-label caption>Current value is</q-item-label>
+            <div class="text-bold">{{ block.data.outputValue | round }}</div>
+          </q-item-section>
         </q-item>
         <q-separator dark inset/>
 
         <q-item dark>
-          <q-item-section>Filter period</q-item-section>
           <q-item-section>
+            <q-item-label caption>Filter period</q-item-label>
             <SelectPopupEdit
               :field="block.data.filter"
               :change="callAndSaveBlock(v => block.data.filter = v)"
@@ -116,10 +119,9 @@ export default class PidForm extends BlockForm {
               <p>The filter should block changes lasting shorter than:</p>
             </SelectPopupEdit>
           </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Fast step threshold</q-item-section>
+
           <q-item-section>
+            <q-item-label caption>Fast step threshold</q-item-label>
             <UnitPopupEdit
               :field="block.data.filterThreshold"
               :change="callAndSaveBlock(v => block.data.filterThreshold = v)"
@@ -133,6 +135,7 @@ export default class PidForm extends BlockForm {
               <p>If a step exceeds this threshold, respond faster:</p>
             </UnitPopupEdit>
           </q-item-section>
+          <q-item-section/>
         </q-item>
         <q-separator dark inset/>
 
@@ -251,7 +254,10 @@ export default class PidForm extends BlockForm {
         </q-item>
         <q-item dark>
           <q-item-section v-for="i in 6" :key="i"/>
-          <q-item-section>{{ block.data.p + block.data.i + block.data.d | round }}</q-item-section>
+          <q-item-section>
+            <q-item-label caption>Output</q-item-label>
+            {{ block.data.p + block.data.i + block.data.d | round }}
+          </q-item-section>
         </q-item>
       </q-expansion-item>
 

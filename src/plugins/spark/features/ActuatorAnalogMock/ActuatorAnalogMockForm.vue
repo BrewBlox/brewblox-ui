@@ -28,24 +28,9 @@ export default class ActuatorAnalogMockForm extends BlockForm {
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <q-item dark>
-          <q-item-section>Supported setting min</q-item-section>
-          <q-item-section>
-            <InputPopupEdit
-              :field="block.data.minSetting"
-              :change="callAndSaveBlock(v => block.data.minSetting = v)"
-              type="number"
-              label="supported setting min"
-            />
-          </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>
-            <div class="column">
-              <span>Setting</span>
-              <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
-            </div>
-          </q-item-section>
-          <q-item-section>
+          <q-item-section style="justify-content: space-between">
+            <q-item-label caption>Setting</q-item-label>
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
             <InputPopupEdit
               v-if="!isDriven"
               :field="block.data.setting"
@@ -55,43 +40,46 @@ export default class ActuatorAnalogMockForm extends BlockForm {
             />
             <big v-else>{{ block.data.setting | unit }}</big>
           </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Supported setting max</q-item-section>
-          <q-item-section>
+          <q-item-section style="justify-content: space-between">
+            <q-item-label caption>Clip to min</q-item-label>
+            <InputPopupEdit
+              :field="block.data.minSetting"
+              :change="callAndSaveBlock(v => block.data.minSetting = v)"
+              type="number"
+              label="Setting min"
+            />
+          </q-item-section>
+          <q-item-section style="justify-content: space-between">
+            <q-item-label caption>Clip to max</q-item-label>
             <InputPopupEdit
               :field="block.data.maxSetting"
               :change="callAndSaveBlock(v => block.data.maxSetting = v)"
               type="number"
-              label="supported setting max"
+              label="Setting max"
             />
           </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section>Value min (clipping)</q-item-section>
           <q-item-section>
-            <InputPopupEdit
-              :field="block.data.minValue"
-              :change="callAndSaveBlock(v => block.data.minValue = v)"
-              type="number"
-              label="value min"
-            />
-          </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Value</q-item-section>
-          <q-item-section>
+            <q-item-label caption>Value</q-item-label>
             <big>{{ block.data.value | round }}</big>
           </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Value max (clipping)</q-item-section>
           <q-item-section>
+            <q-item-label caption>Clip to min</q-item-label>
             <InputPopupEdit
               :field="block.data.minValue"
               :change="callAndSaveBlock(v => block.data.minValue = v)"
               type="number"
-              label="value min"
+              label="Value min"
+            />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>Clip to max</q-item-label>
+            <InputPopupEdit
+              :field="block.data.maxValue"
+              :change="callAndSaveBlock(v => block.data.maxValue = v)"
+              type="number"
+              label="Value max"
             />
           </q-item-section>
         </q-item>
