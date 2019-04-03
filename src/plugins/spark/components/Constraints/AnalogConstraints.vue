@@ -87,7 +87,7 @@ export default class AnalogConstraints extends Constraints {
             />
           </q-item-section>
           <q-item-section side>
-            <q-btn icon="delete" @click="removeConstraint(idx); saveConstraints();"/>
+            <q-btn icon="delete" flat @click="removeConstraint(idx); saveConstraints();"/>
           </q-item-section>
         </template>
       </q-item>
@@ -95,7 +95,6 @@ export default class AnalogConstraints extends Constraints {
         <q-item-section side>Add constraint</q-item-section>
         <q-item-section v-for="opt in constraintOptions" :key="opt.value">
           <q-btn
-            v-close-popup
             :label="opt.label"
             outline
             @click="constraints.push(createConstraint(opt.value)); saveConstraints();"

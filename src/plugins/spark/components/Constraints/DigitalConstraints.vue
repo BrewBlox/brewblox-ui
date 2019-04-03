@@ -85,7 +85,6 @@ export default class DigitalConstraints extends Constraints {
         <q-item-section side>Add constraint</q-item-section>
         <q-item-section v-for="opt in constraintOptions" :key="opt.value">
           <q-btn
-            v-close-popup
             :label="opt.label"
             outline
             @click="constraints.push(createConstraint(opt.value)); saveConstraints();"

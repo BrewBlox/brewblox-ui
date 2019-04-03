@@ -59,12 +59,14 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
         </q-item-section>
       </q-item>
       <q-item dark>
-        <AnalogConstraints
-          :service-id="serviceId"
-          :field="block.data.constrainedBy"
-          :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
-          readonly
-        />
+        <q-item-section>
+          <AnalogConstraints
+            :service-id="serviceId"
+            :field="block.data.constrainedBy"
+            :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+            readonly
+          />
+        </q-item-section>
       </q-item>
     </q-card-section>
   </q-card>

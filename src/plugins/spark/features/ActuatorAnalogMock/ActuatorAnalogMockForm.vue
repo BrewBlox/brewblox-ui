@@ -86,15 +86,11 @@ export default class ActuatorAnalogMockForm extends BlockForm {
       </q-expansion-item>
 
       <q-expansion-item group="modal" icon="mdi-less-than-or-equal" label="Constraints">
-        <q-item dark>
-          <q-item-section>
-            <AnalogConstraints
-              :service-id="block.serviceId"
-              :field="block.data.constrainedBy"
-              :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
-            />
-          </q-item-section>
-        </q-item>
+        <AnalogConstraints
+          :service-id="block.serviceId"
+          :field="block.data.constrainedBy"
+          :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+        />
       </q-expansion-item>
 
       <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
