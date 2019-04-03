@@ -28,17 +28,17 @@ import Component from 'vue-class-component';
   },
 })
 export default class UnitPopupEdit extends Vue {
-  placeholder = NaN; // must not equal clear-value
-  $refs!: {
-    input: any;
+  placeholder: number | null = null;
+
+  get value() {
+    if (this.placeholder === null) {
+      this.placeholder = this.$props.field.val;
+    }
+    return this.placeholder;
   }
 
-  get initialValue() {
-    return this.$props.field.value;
-  }
-
-  startEdit() {
-    this.placeholder = this.initialValue;
+  set value(v: any) {
+    this.placeholder = +v;
   }
 
   endEdit() {
@@ -58,11 +58,10 @@ export default class UnitPopupEdit extends Vue {
     />
     <q-popup-edit
       :title="this.$props.label"
-      v-model="placeholder"
+      v-model="value"
       label-set="apply"
       buttons
       persistent
-      @show="startEdit"
       @save="endEdit"
     >
       <div class="help-text text-weight-light q-my-md">
@@ -70,7 +69,7 @@ export default class UnitPopupEdit extends Vue {
       </div>
       <q-input
         ref="input"
-        v-model="placeholder"
+        v-model="value"
         input-style="font-size: 170%"
         type="number"
         step="any"

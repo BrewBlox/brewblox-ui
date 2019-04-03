@@ -30,28 +30,26 @@ import Component from 'vue-class-component';
   },
 })
 export default class LinkPopupEdit extends Vue {
-  placeholder = ''; // must not equal clear-value
+  get value(): string | null {
+    return this.$props.field.id;
+  }
+
+  set value(v: string | null) {
+    this.$props.change(new Link(v, this.$props.field.type));
+  }
 
   get linkOptions() {
-    const compatible = compatibleBlocks(this.$store, this.$props.serviceId);
-    return (compatible[this.$props.field.type || ''] || [])
-      .map(id => ({
-        label: id,
-        value: id,
-      }));
+    const compatibleTable = compatibleBlocks(this.$store, this.$props.serviceId);
+    const compatible = compatibleTable[this.$props.field.type || ''] || [];
+    return compatible;
   }
 
   get displayValue() {
-    return this.$props.field.id || 'click to assign';
+    return this.value || 'click to assign';
   }
 
   startEdit() {
-    this.placeholder = this.$props.field.id;
     fetchCompatibleBlocks(this.$store, this.$props.serviceId, this.$props.field.type);
-  }
-
-  endEdit() {
-    this.$props.change(new Link(this.placeholder, this.$props.field.type));
   }
 }
 </script>
@@ -60,41 +58,42 @@ export default class LinkPopupEdit extends Vue {
   <div>
     <component :is="$props.tag" class="editable clickable" @click="startEdit">
       {{ displayValue | truncated }}
-      <q-menu>
+      <q-menu content-style="overflow: visible">
         <q-item dark>
           <q-item-section class="help-text text-weight-light">
             <big>{{ $props.label }}</big>
             <slot/>
           </q-item-section>
         </q-item>
+
         <q-item dark>
           <q-item-section>
-            <q-btn
-              v-close-popup
-              icon="clear"
-              label="clear"
-              flat
-              @click="() => { placeholder = null; endEdit() }"
-            />
+            <q-select
+              v-model="value"
+              :options="linkOptions"
+              :label="`${$props.label} block`"
+              dark
+              options-dark
+            >
+              <template v-slot:no-option>
+                <q-item dark>
+                  <q-item-section class="text-grey">No results</q-item-section>
+                </q-item>
+              </template>
+              <template v-slot:append>
+                <q-btn icon="mdi-close-circle" flat round size="sm" @click="value=null">
+                  <q-tooltip>
+                    <span>
+                      Set {{ $props.label }} to
+                      <i>None</i>
+                    </span>
+                  </q-tooltip>
+                </q-btn>
+              </template>
+            </q-select>
           </q-item-section>
-        </q-item>
-        <q-separator dark inset/>
-        <q-item
-          v-close-popup
-          v-for="opt in linkOptions"
-          :key="opt.value"
-          :active="opt.value === placeholder"
-          clickable
-          dark
-          @click="() => { placeholder = opt.value; endEdit() }"
-        >
-          <q-item-section>{{ opt.label }}</q-item-section>
         </q-item>
       </q-menu>
     </component>
   </div>
 </template>
-
-<style lang="stylus" scoped>
-@import './popups.styl';
-</style>

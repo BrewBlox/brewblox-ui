@@ -2,7 +2,7 @@
 import { Unit } from '@/helpers/units';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { unitDurationString } from '@/helpers/functional';
+import { durationString, unitDurationString } from '@/helpers/functional';
 import parseDuration from 'parse-duration';
 
 @Component({
@@ -26,14 +26,21 @@ import parseDuration from 'parse-duration';
   },
 })
 export default class TimeUnitPopupEdit extends Vue {
-  placeholder: any = NaN; // must not equal clear-value
+  placeholder: string | null = null;
 
-  startEdit() {
-    this.placeholder = unitDurationString(this.$props.field);
+  get value(): string {
+    if (this.placeholder === null) {
+      this.placeholder = unitDurationString(this.$props.field);
+    }
+    return this.placeholder;
+  }
+
+  set value(v: string) {
+    this.placeholder = v;
   }
 
   endEdit() {
-    const fieldCopy = new Unit(parseDuration(this.placeholder), 'ms');
+    const fieldCopy = new Unit(parseDuration(this.value), 'ms');
     this.$props.change(fieldCopy);
   }
 }
@@ -44,17 +51,16 @@ export default class TimeUnitPopupEdit extends Vue {
     <component :is="$props.tag" class="editable">{{ this.$props.field | unitDuration }}</component>
     <q-popup-edit
       :title="this.$props.label"
-      v-model="placeholder"
+      v-model.lazy="value"
       label-set="apply"
       buttons
       persistent
-      @show="startEdit"
       @save="endEdit"
     >
       <div class="help-text text-weight-light q-my-md">
         <slot/>
       </div>
-      <q-input v-model="placeholder" dark/>
+      <q-input v-model.lazy="value" dark/>
     </q-popup-edit>
   </div>
 </template>
