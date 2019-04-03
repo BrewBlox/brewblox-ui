@@ -40,10 +40,7 @@ export default class TempSensorOneWireWidget extends BlockWidget {
       <q-item v-else dark>
         <q-item-section>
           <q-item-label caption>Value</q-item-label>
-          <div>
-            <big>{{ block.data.value.val | round }}</big>
-            <span class="q-ml-xs">{{ block.data.value.notation }}</span>
-          </div>
+          <UnitField :field="block.data.value"/>
         </q-item-section>
       </q-item>
     </q-card-section>

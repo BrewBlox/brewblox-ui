@@ -48,10 +48,11 @@ export default class SetpointSimpleWidget extends BlockWidget {
             :change="callAndSaveBlock(v => block.data.setpoint = v)"
             label="Target"
           />
-          <big
+          <UnitField
             v-else
+            :field="block.data.setpoint"
             :class="{ darkened: block.data.setting.value === null }"
-          >{{ block.data.setpoint | unit }}</big>
+          />
           <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
         <q-item-section>

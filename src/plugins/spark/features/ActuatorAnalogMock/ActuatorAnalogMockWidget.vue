@@ -46,10 +46,11 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
               type="number"
               label="Setting"
             />
-            <div v-else>
-              <big>{{ block.data.setting | round }}</big>
-              <small class="q-ml-xs">{{ block.data.error.notation }}</small>
-            </div>
+            <UnitField
+              v-else
+              :field="block.data.setting"
+              :class="{ darkened: block.data.setting.value === null }"
+            />
           </div>
         </q-item-section>
         <q-item-section>

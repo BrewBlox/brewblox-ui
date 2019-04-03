@@ -18,7 +18,7 @@ export default class Unit {
   public notation: string;
 
   public constructor(value: number | null, unit: string) {
-    this.val = Number(value);
+    this.val = value;
     this.unit = unit;
     this.notation = prettify(this.unit);
   }

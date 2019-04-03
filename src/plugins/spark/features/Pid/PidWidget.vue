@@ -90,17 +90,11 @@ export default class PidWidget extends BlockWidget {
         <div class="col-3 text-weight-light text-subtitle2 q-pt-xs">Input</div>
         <q-item-section>
           <q-item-label caption>Measured</q-item-label>
-          <div>
-            <big>{{ block.data.inputValue.val | round }}</big>
-            <span class="q-ml-xs">{{ block.data.inputValue.notation }}</span>
-          </div>
+          <UnitField :field="block.data.inputValue"/>
         </q-item-section>
         <q-item-section>
           <q-item-label caption>Target</q-item-label>
-          <div>
-            <big>{{ block.data.inputSetting.val | round }}</big>
-            <span class="q-ml-xs">{{ block.data.inputSetting.notation }}</span>
-          </div>
+          <UnitField :field="block.data.inputSetting"/>
         </q-item-section>
       </q-item>
 
@@ -124,24 +118,15 @@ export default class PidWidget extends BlockWidget {
         <div class="col-3 text-weight-light text-subtitle2 q-pt-xs">Error</div>
         <q-item-section>
           <q-item-label caption>Proportional</q-item-label>
-          <div>
-            <span>{{ block.data.error.val | round }}</span>
-            <small class="q-ml-xs">{{ block.data.error.notation }}</small>
-          </div>
+          <UnitField :field="block.data.error" tag="span" unit-tag="small"/>
         </q-item-section>
         <q-item-section>
           <q-item-label caption>Integral</q-item-label>
-          <div>
-            <span>{{ block.data.integral.val | round }}</span>
-            <small class="q-ml-xs">{{ block.data.integral.notation }}</small>
-          </div>
+          <UnitField :field="block.data.integral" tag="span" unit-tag="small"/>
         </q-item-section>
         <q-item-section>
           <q-item-label caption>Derivative</q-item-label>
-          <div>
-            <span>{{ block.data.derivative.val | round }}</span>
-            <small class="q-ml-xs">{{ block.data.derivative.notation }}</small>
-          </div>
+          <UnitField :field="block.data.derivative" tag="span" unit-tag="small"/>
         </q-item-section>
       </q-item>
 

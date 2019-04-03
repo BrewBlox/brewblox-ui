@@ -33,10 +33,6 @@ export default class UnitPopupEdit extends Vue {
     input: any;
   }
 
-  get notation() {
-    return this.$props.field.notation;
-  }
-
   get initialValue() {
     return this.$props.field.value;
   }
@@ -54,8 +50,12 @@ export default class UnitPopupEdit extends Vue {
 
 <template>
   <div>
-    <component :is="$props.tag" class="editable">{{ this.$props.field.value | round }}</component>
-    <component :is="$props.unitTag" class="q-ml-xs">{{ this.$props.field.notation }}</component>
+    <UnitField
+      :tag="$props.tag"
+      :unit-tag="$props.unitTag"
+      :field="$props.field"
+      tag-class="editable"
+    />
     <q-popup-edit
       :title="this.$props.label"
       v-model="placeholder"
@@ -68,8 +68,15 @@ export default class UnitPopupEdit extends Vue {
       <div class="help-text text-weight-light q-my-md">
         <slot/>
       </div>
-      <q-input ref="input" v-model="placeholder" type="number" step="any" dark>
-        <template v-slot:append>{{ notation }}</template>
+      <q-input
+        ref="input"
+        v-model="placeholder"
+        input-style="font-size: 170%"
+        type="number"
+        step="any"
+        dark
+      >
+        <template v-slot:append>{{ field.notation }}</template>
       </q-input>
     </q-popup-edit>
   </div>

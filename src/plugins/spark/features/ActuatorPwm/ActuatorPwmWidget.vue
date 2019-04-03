@@ -68,11 +68,16 @@ export default class ActuatorPwmWidget extends BlockWidget {
               v-if="!isDriven"
               :field="block.data.setting"
               :change="callAndSaveBlock(v => block.data.setting = v)"
+              style="display: inline-block"
               type="number"
-              label="Setting"
+              label="Duty Setting"
             />
             <big v-else>{{ block.data.setting | round }}</big>
-            <small class="q-ml-xs">%</small>
+            <small
+              v-if="block.data.setting !== null"
+              style="display: inline-block"
+              class="q-ml-xs"
+            >%</small>
           </div>
         </q-item-section>
         <q-item-section style="justify-content: space-between">
