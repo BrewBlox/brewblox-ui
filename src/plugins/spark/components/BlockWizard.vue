@@ -1,273 +1,202 @@
 <script lang="ts">
-import FormBase from '@/components/Form/FormBase';
-import { Block } from '@/plugins/spark/state';
-import { createBlock } from '@/plugins/spark/store/actions';
-import { blockIds, blockValues } from '@/plugins/spark/store/getters';
-import { formById } from '@/store/features/getters';
-import { serviceValues } from '@/store/services/getters';
-import { Service } from '@/store/services/state';
-import WidgetWizardBase, { NavAction } from '@/components/Wizard/WidgetWizardBase';
+import Vue from 'vue';
 import Component from 'vue-class-component';
+import isString from 'lodash/isString';
+import { objectStringSorter } from '@/helpers/functional';
+import { Block } from '@/plugins/spark/state';
+import { blockIds } from '@/plugins/spark/store/getters';
+import {
+  displayNameById,
+  formById,
+  wizardById,
+} from '@/store/features/getters';
+import { featuresById } from '@/store/providers/getters';
+import { createBlock } from '@/plugins/spark/store/actions';
 
-@Component
-export default class BlockWizard extends WidgetWizardBase {
-  currentStep: string = '';
-  blockAction: 'create' | 'existing' | null = null;
+@Component({
+  props: {
+    serviceId: {
+      type: String,
+      required: true,
+    },
+  },
+})
+export default class BlockWizard extends Vue {
+  $q: any;
+  filteredOptions: any[] = [];
+  modalOpen: boolean = false;
 
-  widgetId: string = '';
+  feature: any = null;
   blockId: string = '';
-  service: Service | null = null;
   block: Block | null = null;
 
-  get stepper(): any {
-    return this.$refs.stepper;
+  get blockIdRules() {
+    return [
+      v => !!v || 'Name must not be empty',
+      v => !blockIds(this.$store, this.$props.serviceId).includes(v) || 'Name must be unique',
+      v => v.match(/^[a-zA-Z]/) || 'Name must start with a letter',
+      v => v.match(/^[^\[\]\<\>]*$/) || 'Name must not contain brackets ([]<>)',
+      v => v.length < 200 || 'Name must be less than 200 characters',
+    ];
   }
 
-  get navigation(): { [id: string]: NavAction[] } {
-    return {
-      start: [
-        {
-          label: 'Cancel',
-          click: () => this.cancel(),
-          enabled: () => true,
-        },
-        {
-          label: 'Create new block',
-          click: () => {
-            this.blockAction = 'create';
-            this.blockId = this.widgetId;
-            this.stepper.goToStep('create');
-          },
-          enabled: () => !this.widgetIdError && this.service !== null,
-        },
-        {
-          label: 'Use existing block',
-          click: () => {
-            this.blockAction = 'existing';
-            this.stepper.goToStep('existing');
-          },
-          enabled: () => !this.widgetIdError && this.service !== null,
-        },
-      ],
-      create: [
-        {
-          label: 'Back',
-          click: () => this.resetStepper(),
-          enabled: () => true,
-        },
-        {
-          label: 'Configure block',
-          click: () => {
-            this.block = this.placeholderBlock();
-            this.stepper.goToStep('config');
-          },
-          enabled: () => !this.blockIdError,
-        },
-      ],
-      existing: [
-        {
-          label: 'Back',
-          click: () => this.resetStepper(),
-          enabled: () => true,
-        },
-        {
-          label: 'Configure block',
-          click: () => this.stepper.goToStep('config'),
-          enabled: () => this.block !== null,
-        },
-      ],
-      config: [
-        {
-          label: 'Back',
-          click: () => this.stepper.previous(),
-          enabled: () => true,
-        },
-        {
-          label: 'Finish',
-          click: () => this.createWidget(),
-          enabled: () => true,
-        },
-      ],
-    };
+  get configureReady() {
+    return !!this.feature && !this.blockIdRules.some(rule => isString(rule(this.blockId)));
   }
 
-  get widgetIdError() {
-    if (!this.widgetId) {
-      return 'Name must not be empty';
+  get createReady() {
+    return this.configureReady && !!this.block && !!this.block.data;
+  }
+
+  get wizardOptions() {
+    return featuresById(this.$store, 'Spark')
+      .map(id => ({
+        label: displayNameById(this.$store, id),
+        value: id,
+        form: formById(this.$store, id),
+      }))
+      .filter(opt => wizardById(this.$store, opt.value) === 'BlockWidgetWizard')
+      .sort(objectStringSorter('label'));
+  }
+
+  filterFn(val, update) {
+    if (val === '') {
+      update(() => this.filteredOptions = this.wizardOptions);
+      return;
     }
-    if (this.itemAlreadyExists(this.widgetId)) {
-      return 'Name must be unique';
-    }
-    return null;
+
+    update(() => {
+      const needle = val.toLowerCase();
+      this.filteredOptions = this.wizardOptions
+        .filter(opt => opt.label.toLowerCase().match(needle));
+    });
   }
 
-  get blockIdError() {
-    if (!this.blockId) {
-      return 'Name must not be empty';
-    }
-    const serviceId = this.service ? this.service.id : '';
-    if (blockIds(this.$store, serviceId).includes(this.blockId)) {
-      return 'Name must be unique';
-    }
-    return null;
-  }
-
-  get serviceOpts() {
-    return serviceValues(this.$store)
-      .filter(service => service.type === 'Spark')
-      .map(service => ({
-        label: service.title,
-        value: service,
-      }));
-  }
-
-  get blockOpts() {
-    if (this.service) {
-      return blockValues(this.$store, this.service.id)
-        .filter(block => block.type === this.typeId)
-        .map(block => ({
-          label: block.id,
-          value: block,
-        }));
-    }
-    return [];
-  }
-
-  get blockForm() {
-    return this.block
-      ? formById(this.$store, this.block.type)
-      : '';
-  }
-
-  get blockFormComponent() {
-    return this.$refs.form as FormBase;
-  }
-
-  placeholderBlock(): Block {
-    return {
+  ensureLocalBlock() {
+    this.block = this.block || {
       id: this.blockId,
-      serviceId: (this.service as Service).id,
-      type: this.typeId,
+      serviceId: this.$props.serviceId,
+      type: this.feature.value,
       groups: [0],
       data: null,
     };
   }
 
-  async createWidget() {
-    const service = this.service as Service;
-    const block = this.block as Block;
+  changeBlockId(newId: string) {
+    const errors = this.blockIdRules
+      .map(rule => rule(newId))
+      .filter(isString);
 
-    if (!blockIds(this.$store, service.id).includes(block.id)) {
-      await createBlock(this.$store, service.id, block);
-    }
-
-    this.createItem({
-      id: this.widgetId,
-      feature: this.typeId,
-      dashboard: this.$props.dashboardId,
-      order: 0,
-      config: {
-        serviceId: service.id,
-        blockId: block.id,
-      },
-      ...this.defaultWidgetSize,
-    });
-  }
-
-  async changeBlockId(newId: string) {
-    this.blockId = newId;
-    await this.$nextTick();
-    if (this.blockIdError) {
-      this.$q.notify(this.blockIdError);
+    if (errors.length > 0) {
+      this.$q.notify({
+        message: errors.join(', '),
+        color: 'negative',
+        icon: 'error',
+      });
       return;
     }
+    this.blockId = newId;
     (this.block as Block).id = newId;
   }
 
-  resetStepper() {
-    this.stepper.reset();
-    this.blockAction = null;
-  }
-
-  mounted() {
-    this.widgetId = '';
-    this.blockId = '';
-    this.service = null;
-    this.block = null;
-    this.resetStepper();
-
-    if (this.serviceOpts.length === 1) {
-      this.service = this.serviceOpts[0].value;
+  async createBlock() {
+    try {
+      await createBlock(this.$store, this.$props.serviceId, this.block);
+      this.$q.notify({
+        icon: 'mdi-check-all',
+        color: 'positive',
+        message: `Created ${displayNameById(this.$store, (this.block as Block).type)} Block '${this.blockId}'`,
+      });
+    } catch (e) {
+      this.$q.notify({
+        icon: 'error',
+        color: 'negative',
+        message: `Failed to create Block: ${e.toString()}`,
+      });
     }
+    this.$emit('close');
   }
 }
 </script>
 
 <template>
-  <q-stepper ref="stepper" v-model="currentStep">
-    <!-- start -->
-    <q-step default name="start" title="Widget info">
-      <q-field label="Widget name" icon="create" orientation="vertical">
-        <q-input
-          v-model="widgetId"
-          :error="widgetIdError !== null"
-          :suffix="widgetIdError"
-          placeholder="Enter a widget Name"
-        />
-      </q-field>
-      <q-field label="Service" icon="create" orientation="vertical">
-        <q-option-group
-          v-model="service"
-          :options="serviceOpts"
-          dark
-          type="radio"
-          @input="() => block = null"
-        />
-      </q-field>
-    </q-step>
-    <!-- create -->
-    <q-step v-if="blockAction === 'create'" name="create" title="Create block">
-      <q-field label="Block name" icon="create" orientation="vertical">
-        <q-input
-          v-model="blockId"
-          :error="blockIdError !== null"
-          :suffix="blockIdError"
-          placeholder="Enter a block name"
-        />
-      </q-field>
-    </q-step>
-    <!-- select -->
-    <q-step v-else-if="blockAction === 'existing'" name="existing" title="Select block">
-      <q-field label="Service" icon="create" orientation="vertical">
-        <q-option-group v-model="block" :options="blockOpts" dark type="radio"/>
-      </q-field>
-    </q-step>
-    <!-- placeholder -->
-    <q-step v-else name="placeholder" title="Create or select block"/>
-    <!-- configure -->
-    <q-step name="config" title="Configure block">
+  <q-card dark class="widget-modal">
+    <FormToolbar>Block wizard</FormToolbar>
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <component
-        v-if="block"
-        ref="form"
-        :is="blockForm"
+        v-if="modalOpen"
+        :is="feature.form"
         :type="block.type"
         :field="block"
         :on-change-field="v => block = v"
-        :id="widgetId"
-        :on-change-id="v => widgetId = v"
+        :id="blockId"
         :on-change-block-id="changeBlockId"
-        embedded
       />
-    </q-step>
-    <q-stepper-navigation>
+    </q-dialog>
+
+    <q-card-section>
+      <q-item dark>
+        <q-item-section>
+          <q-select
+            v-model="feature"
+            :options="filteredOptions"
+            :rules="[v => !!v || 'You must select a block type']"
+            dark
+            use-input
+            options-dark
+            label="Widget Type"
+            @filter="filterFn"
+            @change="block = null"
+          >
+            <template v-slot:no-option>
+              <q-item dark>
+                <q-item-section class="text-grey">No results</q-item-section>
+              </q-item>
+            </template>
+          </q-select>
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>
+          <q-input v-model="blockId" :rules="blockIdRules" dark label="Block name">
+            <template v-slot:append>
+              <q-icon name="mdi-information">
+                <q-tooltip>
+                  The name of the Spark Controller Block.
+                  <br>Multiple widgets can display the same Block.
+                  <br>Rules:
+                  <ul>
+                    <li>The name must not be empty.</li>
+                    <li>The name must be unique.</li>
+                    <li>The name must begin with a letter (a-z).</li>
+                    <li>The name must not contain brackets ([]&lt;&gt;).</li>
+                    <li>The name must be less than 200 characters.</li>
+                  </ul>
+                </q-tooltip>
+              </q-icon>
+            </template>
+          </q-input>
+        </q-item-section>
+      </q-item>
+    </q-card-section>
+
+    <q-separator dark/>
+
+    <q-card-actions align="right">
       <q-btn
-        v-for="action in navigation[currentStep]"
-        :key="action.label"
-        :label="action.label"
-        :disabled="!action.enabled()"
-        flat
-        @click="action.click"
+        :disable="!configureReady"
+        unelevated
+        label="Configure"
+        color="primary"
+        @click="ensureLocalBlock(); modalOpen = true"
       />
-    </q-stepper-navigation>
-  </q-stepper>
+      <q-btn
+        :disable="!createReady"
+        unelevated
+        label="Create"
+        color="primary"
+        @click="createBlock"
+      />
+    </q-card-actions>
+  </q-card>
 </template>

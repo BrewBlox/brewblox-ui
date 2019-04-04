@@ -24,41 +24,25 @@ export default class SetpointSensorPairWidget extends BlockWidget {
 </script>
 
 <template>
-  <q-card dark class="column">
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
-      <SetpointSensorPairForm
-        v-if="modalOpen"
-        v-bind="$props"
-        :field="block"
-        :on-change-field="saveBlock"
-        :on-change-block-id="changeBlockId"
-        :on-switch-block-id="switchBlockId"
-      />
-    </q-modal>
-    <q-card-title class="title-bar">
-      <div class="ellipsis">{{ widgetId }}</div>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
-      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
-      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
-    </q-card-title>
-    <q-card-separator/>
-    <q-card-main class="widget-body column">
-      <div class="full-width">
-        <q-field label="Setpoint value">
-          <big>{{ block.data.setpointValue | unit }}</big>
-          <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
-        </q-field>
-        <q-field label="Sensor value">
-          <big>{{ block.data.sensorValue | unit }}</big>
-        </q-field>
-      </div>
-    </q-card-main>
+  <q-card dark class="text-white scroll">
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
+      <SetpointSensorPairForm v-if="modalOpen" v-bind="formProps"/>
+    </q-dialog>
+
+    <BlockWidgetToolbar :field="me" graph/>
+
+    <q-card-section>
+      <q-item dark>
+        <q-item-section style="justify-content: flex-start">
+          <q-item-label caption>Setpoint</q-item-label>
+          <UnitField :field="block.data.setpointValue"/>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+        </q-item-section>
+        <q-item-section style="justify-content: flex-start">
+          <q-item-label caption>Sensor</q-item-label>
+          <UnitField :field="block.data.sensorValue"/>
+        </q-item-section>
+      </q-item>
+    </q-card-section>
   </q-card>
 </template>
-
-<style lang="stylus" scoped>
-/deep/ .widget-body .q-field-margin {
-  margin-top: 0px;
-}
-</style>

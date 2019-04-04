@@ -55,6 +55,15 @@ export default class ExampleFeatureWidget extends WidgetBase {
     removeMessage(this.$store, MODULE_ID, idx);
   }
 
+  alert() {
+    // An example notification, triggered by the button on the toolbar
+    this.$q.notify({
+      color: 'positive',
+      icon: 'mdi-message-alert',
+      message: `Hi! I'm ${this.widgetTitle}.`,
+    });
+  }
+
   created() {
     // created() is a standard Vue lifecycle function (https://vuejs.org/v2/guide/instance.html#Lifecycle-Diagram)
     // It will be called after the properties are injected, but before the HTML is rendered.
@@ -64,48 +73,44 @@ export default class ExampleFeatureWidget extends WidgetBase {
 </script>
 
 <template>
-  <q-card dark class="column">
-    <q-card-title class="title-bar">
-      <!--
-        InputPopupEdit is a generic component, defined in src/components/Widget/.
-        When clicked, it will display a popup with an edit field and an accept button.
+  <q-card dark class="text-white scroll">
+    <!-- displayName is inherited from WidgetBase. The value is defined in the Feature definition (./index.ts) -->
+    <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
+      <q-item-section side>
+        <q-btn flat round icon="mdi-message-alert" @click="alert"/>
+      </q-item-section>
+    </WidgetToolbar>
 
-        PopupEdits are used throughout the application.
-        An important use case is that they "freeze" their value while open.
-        This prevents updates to the VueX store from changing the value the user is currently editing.
-      -->
-      <InputPopupEdit
-        :field="widgetId"
-        :change="v => widgetId = v"
-        label="Widget ID"
-        tag="span"
-      />
-      <!-- displayName is inherited from WidgetBase. The value is defined in the Feature definition (./index.ts) -->
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-    </q-card-title>
-    <q-card-separator/>
-    <!-- The input fields and buttons at the top of the card are defined here -->
-    <q-card-main class="row">
-      <q-input v-model="url" class="col"/>
-      <q-btn label="External" @click="fetchExternal"/>
-      <q-btn label="Backend" @click="fetchBackend"/>
-    </q-card-main>
-    <!--
+    <q-card-section>
+      <!-- The input fields and buttons at the top of the card are defined here -->
+      <q-item dark>
+        <q-item-section>
+          <q-input v-model="url" dark label="URL"/>
+        </q-item-section>
+        <q-item-section side>
+          <q-btn outline color="white" label="External" @click="fetchExternal"/>
+        </q-item-section>
+        <q-item-section side>
+          <q-btn outline color="white" label="Backend" @click="fetchBackend"/>
+        </q-item-section>
+      </q-item>
+      <!--
       All messages from the VueX store are displayed here.
       The list will re-render when a message is added or removed
-    -->
-    <q-list>
-      <q-item v-for="(msg, idx) in messages" :key="idx">
-        <q-item-side :icon="msg.ok ? 'check_circle' : 'error'"/>
-        <q-item-main>
-          <q-item-tile>{{ msg.url }}</q-item-tile>
-          <q-item-tile>{{ msg.content }}</q-item-tile>
-        </q-item-main>
-        <q-item-side right>
+      -->
+      <q-item v-for="(msg, idx) in messages" :key="idx" dark>
+        <q-item-section avatar>
+          <q-icon :name="msg.ok ? 'check_circle' : 'error'"/>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>{{ msg.url }}</q-item-label>
+          {{ msg.content }}
+        </q-item-section>
+        <q-item-section side>
           <q-btn round icon="delete" @click="removeMessage(idx)"/>
-        </q-item-side>
+        </q-item-section>
       </q-item>
-    </q-list>
+    </q-card-section>
   </q-card>
 </template>
 

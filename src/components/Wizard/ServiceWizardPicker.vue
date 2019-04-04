@@ -4,19 +4,19 @@ import {
   providerIds,
   wizardById,
 } from '@/store/providers/getters';
-import { createService, initService } from '@/store/services/actions';
 import { serviceIds } from '@/store/services/getters';
-import { Service } from '@/store/services/state';
-import { Notify } from 'quasar';
-import Vue, { VueConstructor } from 'vue';
+import Vue from 'vue';
 import Component from 'vue-class-component';
+import isString from 'lodash/isString';
+import { objectStringSorter } from '@/helpers/functional';
 
 @Component
 export default class ServiceWizardPicker extends Vue {
-  serviceId: string = '';
-  serviceTitle: string = '';
-  searchModel: string = '';
-  serviceWizard: VueConstructor | null = null;
+  $q: any;
+  serviceId: string | null = null;
+  serviceTitle: string | null = null;
+  serviceTypeModel: any = null;
+  serviceWizardActive: boolean = false;
 
   get wizardOptions() {
     return providerIds(this.$store)
@@ -24,154 +24,123 @@ export default class ServiceWizardPicker extends Vue {
         label: displayNameById(this.$store, id),
         value: wizardById(this.$store, id),
       }))
-      .filter(opt => opt.value && opt.label.match(this.searchModel));
+      .filter(opt => opt.value)
+      .sort(objectStringSorter('label'));
   }
 
-  get existingIds() {
-    return serviceIds(this.$store);
+  get serviceIdRules(): InputRule[] {
+    return [
+      v => !!v || 'ID is required',
+      v => !serviceIds(this.$store).includes(v) || 'ID must be unique',
+    ];
   }
 
-  get serviceIdError() {
-    if (!this.serviceId) {
-      return 'ID must not be empty';
-    }
-    if (this.existingIds.includes(this.serviceId)) {
-      return 'ID must be unique';
-    }
-    return null;
+  setTitle(title: string) {
+    this.$emit('title', title);
   }
 
-  get serviceTitleError() {
-    if (!this.serviceTitle) {
-      return 'Title must not be empty';
-    }
-    return null;
+  reset() {
+    this.serviceWizardActive = false;
+    this.setTitle('Service wizard');
   }
 
-  get serviceWizardActive() {
-    return this.serviceWizard !== null;
-  }
-
-  get wizardComponent() {
-    return this.serviceWizard;
-  }
-
-  set wizardComponent(component: VueConstructor | null) {
-    this.serviceWizard = component;
-  }
-
-  selectFeature(wizard: VueConstructor) {
-    const err = [this.serviceIdError, this.serviceTitleError].find(e => !!e);
-    if (err) {
-      Notify.create(err);
-      return;
-    }
-    this.wizardComponent = wizard;
-  }
-
-  async onCreate(partial: Partial<Service>) {
-    const service: Service = {
-      id: this.serviceId,
-      title: this.serviceTitle,
-      order: this.existingIds.length + 1,
-      config: {},
-      type: 'Unknown',
-      ...partial,
-    };
-    await createService(this.$store, service);
-    await initService(this.$store, service);
-    Notify.create({
-      type: 'positive',
-      message: `Added ${displayNameById(this.$store, service.type)} "${service.title}"`,
-    });
-    this.close();
-  }
-
-  onCancel(message: string) {
-    this.wizardComponent = null;
-    Notify.create({ message });
+  back() {
+    this.$emit('back');
   }
 
   close() {
     this.$emit('close');
   }
+
+  next() {
+    const errors = this.serviceIdRules
+      .map(rule => rule(this.serviceId))
+      .filter(isString);
+
+    if (errors.length > 0) {
+      this.$q.notify({
+        message: errors.join(', '),
+        color: 'negative',
+        icon: 'error',
+      });
+      return;
+    }
+
+    this.serviceTitle = this.serviceTitle || this.serviceId;
+    this.serviceWizardActive = true;
+  }
+
+  mounted() {
+    this.reset();
+    this.serviceTypeModel = this.wizardOptions[0];
+  }
 }
 </script>
 
 <template>
-  <div class="widget-modal column">
-    <q-toolbar>
-      <span class="col row spaced">New Service Wizard</span>
-      <q-btn v-close-overlay flat rounded label="close"/>
-    </q-toolbar>
-
+  <div>
     <!-- Display selected wizard -->
     <component
       v-if="serviceWizardActive"
-      :is="serviceWizard"
+      :is="serviceTypeModel.value"
       :service-id="serviceId"
-      :on-create="onCreate"
-      :on-cancel="onCancel"
+      :service-title="serviceTitle"
+      @title="setTitle"
+      @back="reset"
       @close="close"
     />
 
     <!-- Select a wizard -->
-    <q-item v-else>
-      <q-field label="Service ID" icon="create" orientation="vertical">
-        <q-input
-          v-model="serviceId"
-          :error="serviceIdError !== null"
-          :suffix="serviceIdError"
-          placeholder="Choose an ID"
-        />
-      </q-field>
-      <q-field label="Service name" icon="create" orientation="vertical">
-        <q-input
-          v-model="serviceTitle"
-          :error="serviceTitleError !== null"
-          :suffix="serviceTitleError"
-          placeholder="Choose a name"
-        />
-      </q-field>
-      <q-field label="Service type" icon="widgets" orientation="vertical">
-        <q-item>
-          <q-search v-model="searchModel" placeholder="Search"/>
+    <template v-else>
+      <q-card-section>
+        <q-item dark>
+          <q-item-section>
+            <q-select
+              :options="wizardOptions"
+              v-model="serviceTypeModel"
+              label="Service type"
+              dark
+              options-dark
+            />
+          </q-item-section>
         </q-item>
-        <q-list link inset-separator>
-          <q-item
-            v-for="opt in wizardOptions"
-            :key="opt.label"
-            icon="widgets"
-            @click.native="selectFeature(opt.value)"
-          >
-            <div class="row">
-              <q-item-main>
-                <q-item-tile label>{{ opt.label }}</q-item-tile>
-              </q-item-main>
-              <q-item-side right icon="chevron_right"/>
-            </div>
-          </q-item>
-        </q-list>
-      </q-field>
-    </q-item>
+        <q-item dark>
+          <q-item-section>
+            <q-input v-model="serviceId" :rules="serviceIdRules" label="Service ID" dark lazy-rules>
+              <template v-slot:append>
+                <q-icon name="mdi-information">
+                  <q-tooltip>
+                    The Service ID is how the service is contacted.
+                    <br>This should match the ID in docker-compose.
+                  </q-tooltip>
+                </q-icon>
+              </template>
+            </q-input>
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>
+            <q-input v-model="serviceTitle" label="Service title" dark>
+              <template v-slot:append>
+                <q-icon name="mdi-information">
+                  <q-tooltip>
+                    The Service title is how the service is displayed in the UI.
+                    <br>This choice is purely graphical: pick a name that makes sense to you.
+                    <br>If left empty, the service ID will be used.
+                  </q-tooltip>
+                </q-icon>
+              </template>
+            </q-input>
+          </q-item-section>
+        </q-item>
+      </q-card-section>
+
+      <q-separator dark/>
+
+      <q-card-actions class="row justify-between">
+        <q-btn unelevated label="Back" @click="back"/>
+        <q-btn unelevated label="Next" color="primary" @click="next"/>
+      </q-card-actions>
+    </template>
   </div>
 </template>
-
-<style scoped>
-.q-item {
-  display: grid;
-  grid-gap: 10px;
-}
-
-.q-list {
-  border: 0;
-}
-
-.q-option-group {
-  border: 0;
-}
-
-.layout-padding {
-  position: relative;
-}
-</style>

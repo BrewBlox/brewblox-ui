@@ -1,10 +1,10 @@
-import { dashboardItemById } from '@/store/dashboards/getters';
 import { DashboardItem } from '@/store/dashboards/state';
 import { widgetSizeById } from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { appendDashboardItem } from '@/store/dashboards/actions';
-import { displayNameById } from '@/store/providers/getters';
+import { displayNameById } from '@/store/features/getters';
+import { uid } from 'quasar';
 
 export interface NavAction {
   label: string;
@@ -27,33 +27,41 @@ export interface NavAction {
 export default class WidgetWizardBase extends Vue {
   protected $q: any;
 
+  protected widgetId: string = uid();
+  protected widgetTitle: string = '';
+
   protected get typeId(): string {
     return this.$props.featureId;
+  }
+
+  protected get typeDisplayName(): string {
+    return displayNameById(this.$store, this.typeId);
   }
 
   protected get defaultWidgetSize(): { cols: number; rows: number } {
     return widgetSizeById(this.$store, this.typeId);
   }
 
-  protected itemAlreadyExists(id: string): boolean {
-    return !!dashboardItemById(this.$store, id);
-  }
-
   protected async createItem(item: DashboardItem): Promise<void> {
     try {
       await appendDashboardItem(this.$store, item);
       this.$q.notify({
-        type: 'positive',
-        message: `Added ${displayNameById(this.$store, item.feature)} "${item.id}"`,
+        icon: 'mdi-check-all',
+        color: 'positive',
+        message: `Created ${displayNameById(this.$store, item.feature)} '${item.title}'`,
       });
     } catch (e) {
-      this.$q.notify(`Failed to add widget: ${e.toString()}`);
+      this.$q.notify({
+        icon: 'error',
+        color: 'negative',
+        message: `Failed to create widget: ${e.toString()}`,
+      });
     }
     this.$emit('close');
   }
 
-  protected cancel(): void {
-    this.$emit('close');
+  protected back(): void {
+    this.$emit('back');
   }
 
   protected close(): void {

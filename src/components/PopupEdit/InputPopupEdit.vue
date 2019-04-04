@@ -31,7 +31,17 @@ import { round, truncate } from '@/helpers/functional';
   },
 })
 export default class InputPopupEdit extends Vue {
-  placeholder = NaN; // must not equal clear-value
+  placeholder: any = null;
+  get value() {
+    if (this.placeholder === null) {
+      this.placeholder = this.$props.field;
+    }
+    return this.placeholder;
+  }
+  set value(v: any) {
+    this.placeholder = this.$props.type === 'number' ? +v : v;
+  }
+
   $refs!: {
     input: any;
   }
@@ -53,13 +63,8 @@ export default class InputPopupEdit extends Vue {
     return val;
   }
 
-  startEdit() {
-    this.placeholder = this.$props.field;
-    this.$nextTick(() => this.$refs.input.select());
-  }
-
   endEdit() {
-    this.$props.change(this.placeholder);
+    this.$props.change(this.value);
   }
 }
 </script>
@@ -74,17 +79,25 @@ export default class InputPopupEdit extends Vue {
     <q-popup-edit
       :disable="$attrs.disabled"
       :title="$props.label"
-      v-model="placeholder"
+      v-model="value"
       label-set="apply"
       buttons
       persistent
-      @show="startEdit"
       @save="endEdit"
     >
       <div class="help-text text-weight-light q-my-md">
         <slot/>
       </div>
-      <q-input ref="input" :clearable="$props.clearable" :type="$props.type" v-model="placeholder"/>
+      <q-input
+        ref="input"
+        :clearable="$props.clearable"
+        :type="$props.type"
+        v-model="value"
+        step="any"
+        dark
+        autofocus
+        input-style="font-size: 170%"
+      />
     </q-popup-edit>
   </div>
 </template>

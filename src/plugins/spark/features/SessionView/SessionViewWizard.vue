@@ -1,48 +1,15 @@
 <script lang="ts">
-import WidgetWizardBase, { NavAction } from '@/components/Wizard/WidgetWizardBase';
+import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 import Component from 'vue-class-component';
 
 
 @Component
 export default class SessionViewWizard extends WidgetWizardBase {
-  currentStep: string = '';
-  widgetId: string = '';
-
-  get navigation(): { [id: string]: NavAction[] } {
-    return {
-      start: [
-        {
-          label: 'Cancel',
-          click: () => this.cancel(),
-          enabled: () => true,
-        },
-        {
-          label: 'Finish',
-          click: () => this.createWidget(),
-          enabled: () => !this.widgetIdError,
-        },
-      ],
-    };
-  }
-
-  get stepper(): any {
-    return this.$refs.stepper;
-  }
-
-  get widgetIdError() {
-    if (!this.widgetId) {
-      return 'Name must not be empty';
-    }
-    if (this.itemAlreadyExists(this.widgetId)) {
-      return 'Name must be unique';
-    }
-    return null;
-  }
-
   createWidget() {
     this.createItem({
       id: this.widgetId,
-      feature: this.$props.featureId,
+      title: this.widgetTitle,
+      feature: this.typeId,
       dashboard: this.$props.dashboardId,
       order: 0,
       config: {
@@ -53,35 +20,24 @@ export default class SessionViewWizard extends WidgetWizardBase {
   }
 
   mounted() {
-    this.widgetId = '';
-    this.stepper.reset();
+    this.widgetTitle = this.typeDisplayName;
   }
 }
 </script>
 
 <template>
-  <q-stepper ref="stepper" v-model="currentStep">
-    <!-- start -->
-    <q-step default name="start" title="Widget info">
-      <q-field label="Widget name" icon="create" orientation="vertical">
-        <q-input
-          v-model="widgetId"
-          :error="widgetIdError !== null"
-          :suffix="widgetIdError"
-          placeholder="Enter a widget Name"
-        />
-      </q-field>
-    </q-step>
-    <!-- nav -->
-    <q-stepper-navigation>
-      <q-btn
-        v-for="action in navigation[currentStep]"
-        :key="action.label"
-        :label="action.label"
-        :disabled="!action.enabled()"
-        flat
-        @click="action.click"
-      />
-    </q-stepper-navigation>
-  </q-stepper>
+  <div>
+    <q-card-section>
+      <q-item dark>
+        <q-item-section>
+          <q-input v-model="widgetTitle" dark label="Widget name"/>
+        </q-item-section>
+      </q-item>
+    </q-card-section>
+
+    <q-card-actions class="row justify-between">
+      <q-btn unelevated label="Back" @click="back"/>
+      <q-btn unelevated label="Create" color="primary" @click="createWidget"/>
+    </q-card-actions>
+  </div>
 </template>

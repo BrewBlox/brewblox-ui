@@ -21,25 +21,24 @@ import Component from 'vue-class-component';
       type: String,
       default: 'big',
     },
+    unitTag: {
+      type: String,
+      default: 'span',
+    },
   },
 })
 export default class UnitPopupEdit extends Vue {
-  placeholder = NaN; // must not equal clear-value
-  $refs!: {
-    input: any;
+  placeholder: number | null = null;
+
+  get value() {
+    if (this.placeholder === null) {
+      this.placeholder = this.$props.field.val;
+    }
+    return this.placeholder;
   }
 
-  get notation() {
-    return this.$props.field.notation;
-  }
-
-  get initialValue() {
-    return this.$props.field.value;
-  }
-
-  startEdit() {
-    this.placeholder = this.initialValue;
-    this.$nextTick(() => this.$refs.input.select());
+  set value(v: any) {
+    this.placeholder = +v;
   }
 
   endEdit() {
@@ -51,20 +50,33 @@ export default class UnitPopupEdit extends Vue {
 
 <template>
   <div>
-    <component :is="$props.tag" class="editable">{{ this.$props.field | unit }}</component>
+    <UnitField
+      :tag="$props.tag"
+      :unit-tag="$props.unitTag"
+      :field="$props.field"
+      tag-class="editable"
+    />
     <q-popup-edit
       :title="this.$props.label"
-      v-model="placeholder"
+      v-model="value"
       label-set="apply"
       buttons
       persistent
-      @show="startEdit"
       @save="endEdit"
     >
       <div class="help-text text-weight-light q-my-md">
         <slot/>
       </div>
-      <q-input ref="input" :suffix="notation" v-model="placeholder" type="number"/>
+      <q-input
+        ref="input"
+        v-model="value"
+        input-style="font-size: 170%"
+        type="number"
+        step="any"
+        dark
+      >
+        <template v-slot:append>{{ field.notation }}</template>
+      </q-input>
     </q-popup-edit>
   </div>
 </template>

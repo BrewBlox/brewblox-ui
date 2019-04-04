@@ -3,6 +3,7 @@ import Component from 'vue-class-component';
 import { FlowPart, CalculatedFlows } from '../state';
 import partSettings from '../settings';
 import { Coordinates } from '@/helpers/coordinates';
+import { SQUARE_SIZE } from '../getters';
 
 @Component({
   props: {
@@ -13,6 +14,8 @@ import { Coordinates } from '@/helpers/coordinates';
   },
 })
 export default class PartComponent extends Vue {
+  protected SQUARE_SIZE: number = SQUARE_SIZE;
+
   protected get part(): FlowPart {
     return {
       transitions: {},

@@ -1,4 +1,4 @@
-import { GraphConfig } from "@/components/Graph/state";
+import { GraphConfig } from '@/components/Graph/state';
 
 export interface Session {
   id: string;

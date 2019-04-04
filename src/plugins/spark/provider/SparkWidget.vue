@@ -68,46 +68,65 @@ export default class SparkWidget extends Vue {
 </script>
 
 <template>
-  <q-card v-if="ready" dark class="column">
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
+  <q-card v-if="ready" dark class="text-white scroll">
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <SparkForm v-if="modalOpen" :field="service"/>
-    </q-modal>
-    <q-card-title class="title-bar">
-      <div class="ellipsis">{{ service.id }}</div>
-      <span slot="right" class="vertical-middle on-left">Spark Service</span>
-      <q-btn slot="right" flat round dense icon="settings" @click="modalOpen = true"/>
-      <q-btn slot="right" flat round dense icon="refresh" @click="fetchAll"/>
-    </q-card-title>
-    <q-card-separator/>
-    <q-card-main class="column widget-body">
-      <div class="full-width">
-        <q-alert
-          v-if="!updating"
-          :actions="[{ label: 'Retry', handler: retryUpdateSource }]"
-          type="warning"
-        >Unable to update automatically</q-alert>
-        <q-field label="Device ID">
-          <span style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</span>
-        </q-field>
-        <q-field label="Time since boot">
-          <div>{{ ticks.data.millisSinceBoot | duration }}</div>
-        </q-field>
-        <q-field label="Device time">
-          <div>{{ sysDate }}</div>
-        </q-field>
-        <q-field label="Version">
-          <div>{{ sysInfo.data.version }}</div>
-        </q-field>
-        <q-field label="IP address">
-          <div>{{ wifi.data.ip }}</div>
-        </q-field>
-      </div>
-    </q-card-main>
+    </q-dialog>
+
+    <WidgetToolbar :title="service.id" subtitle="Spark Service">
+      <q-item-section class="dense" side>
+        <q-btn flat round dense icon="settings" @click="modalOpen = true"/>
+      </q-item-section>
+      <q-item-section class="dense" side>
+        <q-btn flat round dense icon="refresh" @click="fetchAll"/>
+      </q-item-section>
+    </WidgetToolbar>
+
+    <q-card-section>
+      <q-item v-if="!updating" dark>
+        <q-item-section avatar>
+          <q-icon name="warning" color="warning"/>
+        </q-item-section>
+        <q-item-section>Unable to update automatically</q-item-section>
+        <q-item-section side>
+          <q-btn label="Retry" color="warning" outline @click="retryUpdateSource"/>
+        </q-item-section>
+      </q-item>
+
+      <q-list>
+        <q-item dark>
+          <q-item-section>
+            <q-item-label caption>Version</q-item-label>
+            <span>{{ sysInfo.data.version }}</span>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>IP address</q-item-label>
+            <span>{{ wifi.data.ip }}</span>
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>
+            <q-item-label caption>Device time</q-item-label>
+            <span>{{ sysDate }}</span>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>Time since boot</q-item-label>
+            <span>{{ ticks.data.millisSinceBoot | duration }}</span>
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>
+            <q-item-label caption>Device ID</q-item-label>
+            <span style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</span>
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </q-card-section>
   </q-card>
 </template>
 
-<style lang="stylus" scoped>
-/deep/ .widget-body .q-field-margin {
-  margin-top: 0px;
+<style scoped>
+.dense {
+  padding: 0px;
 }
 </style>

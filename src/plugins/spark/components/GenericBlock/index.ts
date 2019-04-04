@@ -6,7 +6,7 @@ import { blocks } from '@/plugins/spark/store/getters';
 import { featureById } from '@/store/features/getters';
 import { Feature, WidgetSelector } from '@/store/features/state';
 import { RootStore } from '@/store/state';
-import wizard from '../BlockWizard.vue';
+import wizard from '../BlockWidgetWizard.vue';
 import widget from './GenericBlock.vue';
 
 // Selects the correct feature for the actual block
@@ -33,13 +33,13 @@ const validator =
     return true;
   };
 
-const deleteBlock = 
+const deleteBlock =
   (store: RootStore, config: BlockConfig): void => {
-  const block = blocks(store, config.serviceId)[config.blockId];
-  if (block) {
-    removeBlock(store, config.serviceId, block);
-  }
-};
+    const block = blocks(store, config.serviceId)[config.blockId];
+    if (block) {
+      removeBlock(store, config.serviceId, block);
+    }
+  };
 
 const feature: Partial<Feature> = {
   selector,

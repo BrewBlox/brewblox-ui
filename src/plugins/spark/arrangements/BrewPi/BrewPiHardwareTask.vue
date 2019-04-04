@@ -23,13 +23,13 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
   get pinOptions() {
     return blockValues(this.$store, this.cfg.serviceId)
       .filter(block => block.type === pinType)
-      .map(block => ({ label: block.id, value: block.id }));
+      .map(block => block.id);
   }
 
   get sensorOptions() {
     return blockValues(this.$store, this.cfg.serviceId)
       .filter(block => block.type === sensorOneWireType || block.type === sensorMockType)
-      .map(block => ({ label: block.id, value: block.id }));
+      .map(block => block.id);
   }
 
   get valuesOk() {
@@ -42,6 +42,20 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
       this.fridgeSensor !== this.beerSensor,
     ]
       .every(Boolean);
+  }
+
+  get pinRules(): InputRule[] {
+    return [
+      v => !!v || 'Pin must be selected',
+      () => this.coolPin !== this.heatPin || 'Cool pin and Heat pin may not be the same',
+    ];
+  }
+
+  get sensorRules(): InputRule[] {
+    return [
+      v => !!v || 'Sensor must be selected',
+      () => this.fridgeSensor !== this.beerSensor || 'Fridge sensor and Beer sensor may not be the same',
+    ];
   }
 
   mounted() {
@@ -71,53 +85,71 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
 </script>
 
 <template>
-  <q-card dark>
+  <div>
+    <q-card-section>
+      <q-item>
+        <big>Hardware Blocks</big>
+      </q-item>
+      <q-item dark>
+        <q-btn label="Discover sensors" color="primary" @click="discover"/>
+      </q-item>
+      <q-item dark>
+        <q-item-section>
+          <q-select
+            v-model="coolPin"
+            :options="pinOptions"
+            :label="cfg.names.coolPin"
+            :rules="pinRules"
+            dark
+            options-dark
+          />
+        </q-item-section>
+        <q-item-section>
+          <q-select
+            v-model="heatPin"
+            :options="pinOptions"
+            :label="cfg.names.heatPin"
+            :rules="pinRules"
+            dark
+            options-dark
+          />
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>
+          <q-select
+            v-model="fridgeSensor"
+            :options="sensorOptions"
+            :label="cfg.names.fridgeSensor"
+            :rules="sensorRules"
+            dark
+            options-dark
+          />
+        </q-item-section>
+        <q-item-section>
+          <q-select
+            v-model="beerSensor"
+            :options="sensorOptions"
+            :label="cfg.names.beerSensor"
+            :rules="sensorRules"
+            dark
+            options-dark
+          />
+        </q-item-section>
+      </q-item>
+    </q-card-section>
+
+    <q-separator dark/>
+
     <q-card-actions>
-      <q-btn :disable="!valuesOk" label="Next" color="primary" @click="next"/>
+      <q-btn
+        :disable="!valuesOk"
+        unelevated
+        label="Next"
+        color="primary"
+        class="full-width"
+        @click="next"
+      />
     </q-card-actions>
-    <q-card-main class="row">
-      <div>
-        <q-list no-border>
-          <q-item class="column">
-            <big>Hardware Blocks</big>
-          </q-item>
-          <q-item>
-            <q-btn label="Discover sensors" color="primary" @click="discover"/>
-          </q-item>
-          <q-item>
-            <q-select
-              v-model="coolPin"
-              :error="!coolPin || coolPin === heatPin"
-              :options="pinOptions"
-              :float-label="cfg.names.coolPin"
-            />
-          </q-item>
-          <q-item>
-            <q-select
-              v-model="heatPin"
-              :error="!heatPin || coolPin === heatPin"
-              :options="pinOptions"
-              :float-label="cfg.names.heatPin"
-            />
-          </q-item>
-          <q-item>
-            <q-select
-              v-model="fridgeSensor"
-              :error="!fridgeSensor || fridgeSensor === beerSensor"
-              :options="sensorOptions"
-              :float-label="cfg.names.fridgeSensor"
-            />
-          </q-item>
-          <q-item>
-            <q-select
-              v-model="beerSensor"
-              :error="!beerSensor || fridgeSensor === beerSensor"
-              :options="sensorOptions"
-              :float-label="cfg.names.beerSensor"
-            />
-          </q-item>
-        </q-list>
-      </div>
-    </q-card-main>
-  </q-card>
+  </div>
 </template>

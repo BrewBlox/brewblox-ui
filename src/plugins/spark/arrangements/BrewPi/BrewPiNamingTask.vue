@@ -6,7 +6,6 @@ import { serviceValues } from '@/store/services/getters';
 import { typeName, blockIds } from '@/plugins/spark/store/getters';
 import { BrewPiConfig, BrewPiConfigNames } from '@/plugins/spark/arrangements/BrewPi/state';
 import { spaceCased, valOrDefault } from '@/helpers/functional';
-import { dashboardItemIds } from '@/store/dashboards/getters';
 
 
 @Component
@@ -108,11 +107,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
     if (!this.serviceId) {
       return false;
     }
-    return [
-      ...blockIds(this.$store, this.serviceId),
-      ...dashboardItemIds(this.$store),
-    ]
-      .includes(val);
+    return blockIds(this.$store, this.serviceId).includes(val);
   }
 
   updateName(key: string, val: string) {
@@ -153,71 +148,121 @@ export default class BrewPiNamingTask extends WizardTaskBase {
 </script>
 
 <template>
-  <q-card dark>
-    <q-card-actions>
-      <q-btn :disable="!valuesOk" label="Next" color="primary" @click="next"/>
-    </q-card-actions>
-    <q-card-main class="row">
-      <div>
-        <q-list no-border>
-          <q-item>
-            <big>Arrangement</big>
-          </q-item>
-          <q-item>
-            <q-select v-model="serviceId" :options="serviceOpts" float-label="Service"/>
-          </q-item>
-          <q-item>
-            <q-input
-              v-model="arrangementId"
-              :after="[{icon: 'mdi-backup-restore', handler: () => clearKey('arrangementId')}]"
-              float-label="Arrangement name"
-            />
-          </q-item>
-          <q-item>
-            <q-input
-              v-model="prefix"
-              :after="[{icon: 'mdi-backup-restore', handler: () => clearKey('prefix')}]"
-              float-label="Widget prefix"
-            />
-          </q-item>
-          <q-item>
-            <q-input
-              v-model="dashboardTitle"
-              :error="!dashboardTitle"
-              :after="[{icon: 'mdi-backup-restore', handler: () => clearKey('dashboardTitle')}]"
-              float-label="Dashboard"
-            />
-          </q-item>
-          <q-item>
-            <q-field label="Groups" orientation="vertical" style="max-width: 200px;">
+  <div>
+    <q-card-section class="row no-wrap" style="height: 80vh">
+      <q-scroll-area>
+        <div>
+          <q-list no-border>
+            <q-item dark>
+              <big>Arrangement</big>
+            </q-item>
+            <q-item dark>
+              <q-select
+                v-model="serviceId"
+                :options="serviceOpts"
+                options-dark
+                map-options
+                label="Service"
+                dark
+              />
+            </q-item>
+            <q-item dark>
+              <q-input v-model="arrangementId" label="Arrangement name" dark>
+                <template v-slot:append>
+                  <q-btn
+                    icon="mdi-backup-restore"
+                    flat
+                    size="sm"
+                    color="white"
+                    @click="clearKey('arrangementId')"
+                  />
+                </template>
+              </q-input>
+            </q-item>
+            <q-item dark>
+              <q-input v-model="prefix" label="Widget prefix" dark>
+                <template v-slot:append>
+                  <q-btn
+                    icon="mdi-backup-restore"
+                    flat
+                    size="sm"
+                    color="white"
+                    @click="clearKey('prefix')"
+                  />
+                </template>
+              </q-input>
+            </q-item>
+            <q-item dark>
+              <q-input v-model="dashboardTitle" :error="!dashboardTitle" label="Dashboard" dark>
+                <template v-slot:append>
+                  <q-btn
+                    icon="mdi-backup-restore"
+                    flat
+                    size="sm"
+                    color="white"
+                    @click="clearKey('dashboardTitle')"
+                  />
+                </template>
+              </q-input>
+            </q-item>
+            <q-item dark>
+              <big>Groups</big>
+            </q-item>
+            <q-item dark>
               <GroupsPopupEdit
                 v-if="serviceId"
                 :field="groups"
                 :service-id="serviceId"
                 :change="v => groups = v"
                 tag="span"
+                dark
               />
-              <label v-else>No service selected</label>
-            </q-field>
-          </q-item>
-        </q-list>
-      </div>
-      <div>
-        <q-list no-border>
-          <q-item>
-            <big>Widget Names</big>
-          </q-item>
-          <q-item v-for="(nVal, nKey) in names" :key="nKey">
-            <q-input
-              :value="nVal"
-              :error="!nVal || nameExists(nVal)"
-              :float-label="spaceCased(nKey)"
-              :after="[{icon: 'mdi-backup-restore', handler: () => clearName(nKey)}]"
-              @change="v => updateName(nKey, v)"
-            />
-          </q-item>
-        </q-list>
-      </div>
-    </q-card-main>
-  </q-card>
+              <q-item-label v-else>No service selected</q-item-label>
+            </q-item>
+          </q-list>
+        </div>
+        <div>
+          <q-list no-border dense>
+            <q-item dark>
+              <big>Widget Names</big>
+            </q-item>
+            <q-item v-for="(nVal, nKey) in names" :key="nKey">
+              <q-input
+                :value="nVal"
+                :error="!nVal || nameExists(nVal)"
+                :label="spaceCased(nKey)"
+                dark
+                bottom-slots
+                @input="v => updateName(nKey, v)"
+              >
+                <template v-slot:append>
+                  <q-btn
+                    icon="mdi-backup-restore"
+                    flat
+                    size="sm"
+                    color="white"
+                    @click="clearName(nKey)"
+                  />
+                </template>
+                <template v-slot:error>Name must not exist, and not be empty</template>
+              </q-input>
+            </q-item>
+          </q-list>
+        </div>
+      </q-scroll-area>
+    </q-card-section>
+
+    <q-separator dark/>
+
+    <q-card-actions>
+      <q-btn
+        :disable="!valuesOk"
+        unelevated
+        label="Next"
+        color="primary"
+        class="full-width"
+        @click="next"
+      />
+    </q-card-actions>
+  </div>
 </template>

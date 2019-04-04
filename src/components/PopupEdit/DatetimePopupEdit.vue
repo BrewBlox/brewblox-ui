@@ -1,6 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { date as qdate } from 'quasar';
 
 @Component({
   props: {
@@ -35,7 +36,14 @@ import Component from 'vue-class-component';
   },
 })
 export default class DatetimePopupEdit extends Vue {
-  placeholder = -1; // must not equal clear-value
+  $refs!: {
+    qDateProxy: any;
+    qTimeProxy: any;
+  }
+
+  placeholder: any = -1; // must not equal clear-value
+  timePlaceholder = '';
+  datePlaceholder = '';
 
   get dateString() {
     if (!this.$props.field) {
@@ -48,11 +56,25 @@ export default class DatetimePopupEdit extends Vue {
   }
 
   startEdit() {
-    this.placeholder = this.$props.field;
+    this.setDateValues(this.$props.field);
+  }
+
+  setDateValues(v: any) {
+    this.placeholder = new Date(v);
+    this.datePlaceholder = qdate.formatDate(this.placeholder, 'YYYY/MM/DD');
+    this.timePlaceholder = qdate.formatDate(this.placeholder, 'HH:mm:ss');
   }
 
   endEdit() {
+    const [year, month, date] = this.datePlaceholder.split('/');
+    const [hours, minutes] = this.timePlaceholder.split(':');
+    this.placeholder = qdate.buildDate({ year, month, hours, minutes, date });
     this.$props.change(this.placeholder);
+  }
+
+  closeDialog() {
+    this.$refs.qDateProxy.hide();
+    this.$refs.qTimeProxy.hide();
   }
 }
 </script>
@@ -73,19 +95,44 @@ export default class DatetimePopupEdit extends Vue {
       <div class="help-text text-weight-light q-my-md">
         <slot/>
       </div>
-      <q-datetime
-        v-model="placeholder"
-        :after="[
-          {
-            icon: $props.resetIcon,
-            handler: () => placeholder = new Date().getTime(),
-          }
-        ]"
-        dark
-        format24h
-        clearable
-        type="datetime"
-      />
+      <q-item dark>
+        <q-item-section>
+          <q-input v-model="datePlaceholder" :rules="['date']" dark mask="date">
+            <template v-slot:append>
+              <q-icon name="event" class="cursor-pointer">
+                <q-popup-proxy ref="qDateProxy">
+                  <q-date v-model="datePlaceholder" dark @input="closeDialog"/>
+                </q-popup-proxy>
+              </q-icon>
+            </template>
+          </q-input>
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>
+          <q-input v-model="timePlaceholder" :rules="['time']" dark mask="time">
+            <template v-slot:append>
+              <q-icon name="access_time" class="cursor-pointer">
+                <q-popup-proxy ref="qTimeProxy">
+                  <q-time v-model="timePlaceholder" dark format24h @input="closeDialog"/>
+                </q-popup-proxy>
+              </q-icon>
+            </template>
+          </q-input>
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>
+          <q-btn
+            :icon="$props.resetIcon"
+            flat
+            dense
+            label="now"
+            class="text-white"
+            @click="setDateValues(new Date())"
+          />
+        </q-item-section>
+      </q-item>
     </q-popup-edit>
   </div>
 </template>

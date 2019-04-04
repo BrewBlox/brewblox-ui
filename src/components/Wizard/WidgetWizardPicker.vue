@@ -18,19 +18,21 @@ import { dashboardValues, primaryDashboardId } from '@/store/dashboards/getters'
   },
 })
 export default class WidgetWizardPicker extends Vue {
-  featureId: string = '';
-  searchModel: string = '';
+  $q: any;
+  filteredOptions: any[] = [];
+  feature: any = null;
+  wizardActive: boolean = false;
 
-  _chosenDashboardId: string = '';
+  localChosenDashboardId: string = '';
 
   get chosenDashboardId() {
-    return this._chosenDashboardId
+    return this.localChosenDashboardId
       || this.$props.dashboardId
       || primaryDashboardId(this.$store);
   }
 
   set chosenDashboardId(id: string) {
-    this._chosenDashboardId = id;
+    this.localChosenDashboardId = id;
   }
 
   get dashboardOptions() {
@@ -43,72 +45,106 @@ export default class WidgetWizardPicker extends Vue {
       .map(id => ({
         label: displayNameById(this.$store, id),
         value: id,
+        component: wizardById(this.$store, id),
       }))
-      .filter(opt =>
-        wizardById(this.$store, opt.value)
-        && opt.label.toLowerCase().match(this.searchModel.toLowerCase()))
+      .filter(opt => !!opt.component)
       .sort(objectStringSorter('label'));
   }
 
-  get wizardComponent() {
-    return wizardById(this.$store, this.featureId);
+  get valuesOk() {
+    return !!this.chosenDashboardId && !!this.feature;
   }
 
-  selectFeature(id: string) {
-    this.featureId = id;
+  filterFn(val, update) {
+    if (val === '') {
+      update(() => this.filteredOptions = this.wizardOptions);
+      return;
+    }
+
+    update(() => {
+      const needle = val.toLowerCase();
+      this.filteredOptions = this.wizardOptions
+        .filter(opt => opt.label.toLowerCase().match(needle));
+    });
+  }
+
+  setTitle(title: string) {
+    this.$emit('title', title);
+  }
+
+  reset() {
+    this.wizardActive = false;
+    this.setTitle('Widget wizard');
+    this.filteredOptions = this.wizardOptions;
+  }
+
+  back() {
+    this.$emit('back');
   }
 
   close() {
     this.$emit('close');
   }
+
+  next() {
+    this.wizardActive = true;
+    this.setTitle(`${this.feature.label} wizard`);
+  }
+
+  mounted() {
+    this.reset();
+  }
 }
 </script>
 
 <template>
-  <div class="widget-modal column">
-    <q-toolbar class="unpadded">
-      <q-toolbar-title>Create new widget</q-toolbar-title>
-      <q-btn v-close-overlay flat rounded label="close"/>
-    </q-toolbar>
-
-    <!-- display wizard -->
+  <div>
     <component
-      v-if="wizardComponent"
-      :is="wizardComponent"
-      :feature-id="featureId"
-      :dashboard-id="dashboardId"
+      v-if="wizardActive"
+      :is="feature.component"
+      :feature-id="feature.value"
+      :dashboard-id="chosenDashboardId"
+      @title="setTitle"
+      @back="reset"
       @close="close"
     />
 
-    <!-- Select a wizard -->
-    <q-card v-else dark>
-      <q-card-main>
-        <q-list no-border>
-          <q-item>
+    <template v-else>
+      <q-card-section>
+        <q-item dark>
+          <q-item-section>
             <q-select
-              v-model="chosenDashboardId"
-              :options="dashboardOptions"
-              float-label="Dashboard"
-            />
-          </q-item>
-          <q-item>
-            <q-search v-model="searchModel" placeholder="Search"/>
-          </q-item>
-        </q-list>
-        <q-list link inset-separator no-border>
-          <q-item
-            v-for="opt in wizardOptions"
-            :key="opt.label"
-            icon="widgets"
-            @click.native="() => { featureId = opt.value; }"
-          >
-            <q-item-main>
-              <q-item-tile label>{{ opt.label }}</q-item-tile>
-            </q-item-main>
-            <q-item-side right icon="chevron_right"/>
-          </q-item>
-        </q-list>
-      </q-card-main>
-    </q-card>
+              v-model="feature"
+              :options="filteredOptions"
+              :rules="[v => !!v || 'You must select a widget type']"
+              dark
+              use-input
+              options-dark
+              label="Widget Type"
+              @filter="filterFn"
+            >
+              <template v-slot:no-option>
+                <q-item dark>
+                  <q-item-section class="text-grey">No results</q-item-section>
+                </q-item>
+              </template>
+            </q-select>
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>
+            <q-item-label>Dashboard</q-item-label>
+            <q-option-group v-model="chosenDashboardId" :options="dashboardOptions"/>
+          </q-item-section>
+        </q-item>
+      </q-card-section>
+
+      <q-separator dark/>
+
+      <q-card-actions class="row justify-between">
+        <q-btn unelevated label="Back" @click="back"/>
+        <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="next"/>
+      </q-card-actions>
+    </template>
   </div>
 </template>

@@ -12,36 +12,23 @@ export default class InactiveObjectWidget extends BlockWidget {
 </script>
 
 <template>
-  <q-card dark class="column">
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
-      <InactiveObjectForm
-        v-if="modalOpen"
-        v-bind="$props"
-        :field="block"
-        :on-change-field="saveBlock"
-        :on-change-block-id="changeBlockId"
-        :on-switch-block-id="switchBlockId"
-      />
-    </q-modal>
-    <q-card-title class="title-bar">
-      <div class="ellipsis">{{ widgetId }}</div>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
-      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
-    </q-card-title>
-    <q-card-separator/>
-    <q-card-main class="column widget-body">
-      <div class="full-width placeholder-text">
-        This {{ actualDisplayName }} block is disabled.
-        <br>To enable it, ensure that it is in an enabled group.
-      </div>
-    </q-card-main>
+  <q-card dark class="text-white scroll">
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
+      <InactiveObjectForm v-if="modalOpen" v-bind="formProps"/>
+    </q-dialog>
+
+    <BlockWidgetToolbar :field="me"/>
+
+    <q-card-section>
+      <q-item dark>
+        <q-item-section avatar>
+          <q-icon name="warning"/>
+        </q-item-section>
+        <q-item-section>
+          This {{ actualDisplayName }} block is disabled.
+          <br>To enable it, ensure that it is in an enabled group.
+        </q-item-section>
+      </q-item>
+    </q-card-section>
   </q-card>
 </template>
-
-<style lang="stylus" scoped>
-.placeholder-text {
-  color: #AA5555;
-  text-align: center;
-}
-</style>

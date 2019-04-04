@@ -36,21 +36,24 @@ export default class LiquidSourcePartCard extends PartCard {
 </script>
 
 <template>
-  <q-card>
-    <q-card-title>Liquid Source</q-card-title>
-    <q-card-main>
-      <div class="row justify-around">
-        <q-checkbox :value="pressured" label="Pressured" size="lg" @input="togglePressure"/>
+  <q-list dark>
+    <q-separator dark/>
+    <q-item dark>
+      <q-item-section>
+        <q-item-label caption>Pressure</q-item-label>
+        <q-toggle :value="pressured" @input="togglePressure"/>
+      </q-item-section>
+      <q-item-section v-for="color in liquidColors" :key="color">
         <q-btn
-          v-for="color in liquidColors"
-          :key="color"
           :style="`background-color: ${color}`"
           :size="currentLiquids.includes(color) ? 'lg' : 'md'"
+          :disable="!pressured"
           round
           icon="format_color_fill"
+          class="q-mx-auto"
           @click="changeLiquidSource(color)"
         />
-      </div>
-    </q-card-main>
-  </q-card>
+      </q-item-section>
+    </q-item>
+  </q-list>
 </template>

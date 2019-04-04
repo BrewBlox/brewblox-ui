@@ -20,35 +20,40 @@ export default class SetpointSimpleForm extends BlockForm {
 </script>
 
 <template>
-  <div class="widget-modal column">
-    <BlockWidgetSettings v-if="!$props.embedded" v-bind="$props" :block="block"/>
-    <q-collapsible opened group="modal" class="col-12" icon="settings" label="Settings">
-      <div>
-        <q-field label="Target">
-          <UnitPopupEdit
-            v-if="!isDriven"
-            :class="{ darkened: block.data.setting.value === null }"
-            :field="block.data.setpoint"
-            :change="callAndSaveBlock(v => block.data.setpoint = v)"
-            label="Target"
-          />
-          <big
-            v-else
-            :class="{ darkened: block.data.setting.value === null }"
-          >{{ block.data.setpoint | unit }}</big>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
-        </q-field>
-        <q-field label="Enabled">
-          <q-toggle
-            :value="block.data.enabled"
-            @input="v => { block.data.enabled = v; saveBlock(); }"
-          />
-        </q-field>
-      </div>
-    </q-collapsible>
+  <q-card dark class="widget-modal">
+    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
 
-    <q-collapsible group="modal" class="col-12" icon="mdi-cube" label="Block Settings">
-      <BlockSettings v-bind="$props" :presets-data="presets()"/>
-    </q-collapsible>
-  </div>
+    <q-card-section>
+      <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
+        <q-item dark>
+          <q-item-section style="justify-content: flex-start">
+            <q-item-label caption>Target</q-item-label>
+            <UnitPopupEdit
+              v-if="!isDriven"
+              :class="{ darkened: block.data.setting.value === null }"
+              :field="block.data.setpoint"
+              :change="callAndSaveBlock(v => block.data.setpoint = v)"
+              label="Target"
+            />
+            <big
+              v-else
+              :class="{ darkened: block.data.setting.value === null }"
+            >{{ block.data.setpoint | unit }}</big>
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          </q-item-section>
+
+          <q-item-section style="justify-content: flex-start">
+            <q-item-label caption>Enabled</q-item-label>
+            <q-toggle
+              :value="block.data.enabled"
+              @input="v => { block.data.enabled = v; saveBlock(); }"
+            />
+          </q-item-section>
+        </q-item>
+      </q-expansion-item>
+      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
+        <BlockSettings v-bind="$props" :presets-data="presets()"/>
+      </q-expansion-item>
+    </q-card-section>
+  </q-card>
 </template>

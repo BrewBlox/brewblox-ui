@@ -36,52 +36,78 @@ export default class ActuatorPwmWidget extends BlockWidget {
 </script>
 
 <template>
-  <q-card dark class="column">
-    <q-modal v-model="modalOpen" no-backdrop-dismiss>
-      <ActuatorPwmForm
-        v-if="modalOpen"
-        v-bind="$props"
-        :field="block"
-        :on-change-field="saveBlock"
-        :on-change-block-id="changeBlockId"
-        :on-switch-block-id="switchBlockId"
-      />
-    </q-modal>
-    <q-card-title class="title-bar">
-      <div class="ellipsis">{{ widgetId }}</div>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <BlockGraph slot="right" :id="widgetId" :config="graphCfg" :change="v => graphCfg = v"/>
-      <q-btn slot="right" flat round dense icon="settings" @click="openModal"/>
-      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
-    </q-card-title>
-    <q-card-separator/>
-    <q-alert
-      v-if="!block.data.enabled"
-      :actions="[{label:'Enable', handler: enable }]"
-      type="info"
-      color="info"
-    >PWM is disabled: {{ block.data.actuatorId }} will not be toggled.</q-alert>
-    <q-card-main class="column widget-body">
-      <div class="full-width">
-        <q-field label="Duty Setting">
-          <big>{{ block.data.setting | round }}</big>
-          <DrivenIndicator :block-id="blockId" :service-id="serviceId"/>
-        </q-field>
-        <q-field label="Duty Achieved">
-          <big>{{ block.data.value | round }}</big>
-        </q-field>
-        <q-field v-if="pending !== null" class="col" label="Unconstrained setting">
-          <big>{{ pending | round }}</big>
-        </q-field>
-        <q-field label="Constraints">
+  <q-card dark class="text-white scroll">
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
+      <ActuatorPwmForm v-if="modalOpen" v-bind="formProps"/>
+    </q-dialog>
+
+    <BlockWidgetToolbar :field="me" graph/>
+
+    <q-card-section>
+      <q-item v-if="!block.data.enabled" dark>
+        <q-item-section avatar>
+          <q-icon name="warning"/>
+        </q-item-section>
+        <q-item-section>
+          <span>
+            PWM is disabled:
+            <i>{{ block.data.actuatorId }}</i> will not be toggled.
+          </span>
+        </q-item-section>
+        <q-item-section side>
+          <q-btn text-color="white" flat label="Enable" @click="enable"/>
+        </q-item-section>
+      </q-item>
+
+      <q-item dark>
+        <q-item-section>
+          <q-item-label caption>Duty setting</q-item-label>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          <div>
+            <InputPopupEdit
+              v-if="!isDriven"
+              :field="block.data.setting"
+              :change="callAndSaveBlock(v => block.data.setting = v)"
+              style="display: inline-block"
+              type="number"
+              label="Duty Setting"
+            />
+            <big v-else>{{ block.data.setting | round }}</big>
+            <small
+              v-if="block.data.setting !== null"
+              style="display: inline-block"
+              class="q-ml-xs"
+            >%</small>
+          </div>
+        </q-item-section>
+        <q-item-section style="justify-content: flex-start">
+          <q-item-label caption>Duty achieved</q-item-label>
+          <div>
+            <big>{{ block.data.value | round }}</big>
+            <small class="q-ml-xs">%</small>
+          </div>
+        </q-item-section>
+      </q-item>
+
+      <q-item v-if="pending !== null" dark>
+        <q-item-section>
+          <q-item-label caption>Unconstrained setting</q-item-label>
+          <div>
+            <big>{{ pending | round }}</big>
+            <small class="q-ml-xs">%</small>
+          </div>
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>
           <AnalogConstraints
             :service-id="serviceId"
             :field="block.data.constrainedBy"
             :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
             readonly
           />
-        </q-field>
-      </div>
-    </q-card-main>
+        </q-item-section>
+      </q-item>
+    </q-card-section>
   </q-card>
 </template>

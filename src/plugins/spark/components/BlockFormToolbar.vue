@@ -4,19 +4,18 @@ import BlockForm from '@/plugins/spark/components/BlockForm';
 import { blockValues } from '@/plugins/spark/store/getters';
 
 @Component
-export default class BlockWidgetSettings extends BlockForm {
+export default class BlockFormToolbar extends BlockForm {
   get blockOptions() {
     return blockValues(this.$store, this.block.serviceId)
       .filter(block => block.type === this.block.type)
       .map(block => ({ label: block.id, value: block.id }));
   }
-
-
 }
 </script>
 
 <template>
-  <WidgetSettings v-bind="$props" slot-icon="mdi-cube">
+  <WidgetFormToolbar v-bind="$props">
+    <q-icon name="mdi-cube"/>
     <SelectPopupEdit
       v-if="!$props.volatile && $props.onSwitchBlockId"
       :options="blockOptions"
@@ -24,7 +23,8 @@ export default class BlockWidgetSettings extends BlockForm {
       :change="$props.onSwitchBlockId"
       label="Block"
       tag="span"
+      class="text-h6 text-no-wrap"
     >Select a different block to be displayed by this widget.</SelectPopupEdit>
-    <div v-else class="ellipsis">{{ block.id }}</div>
-  </WidgetSettings>
+    <div v-else class="ellipsis text-no-wrap">{{ block.id }}</div>
+  </WidgetFormToolbar>
 </template>

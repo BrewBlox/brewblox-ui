@@ -4,9 +4,9 @@ import {
   asFlowParts,
   FlowSegment,
   calculateFlows,
-} from './calculateFlows';
-import { PersistentPart } from './state';
-import { IN_OUT, COLD_WATER, HOT_WATER } from './getters';
+} from '@/plugins/spark/features/ProcessView/calculateFlows';
+import { PersistentPart } from '@/plugins/spark/features/ProcessView/state';
+import { IN_OUT, COLD_WATER, HOT_WATER } from '@/plugins/spark/features/ProcessView/getters';
 import get from 'lodash/get';
 import set from 'lodash/set';
 

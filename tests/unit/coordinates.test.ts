@@ -1,4 +1,4 @@
-import { Coordinates } from './coordinates';
+import { Coordinates } from '@/helpers/coordinates';
 
 describe('coordinates', () => {
   it('Should parse strings', () => {

@@ -1,11 +1,18 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const { gitDescribeSync } = require('git-describe');
+const fs = require('fs');
+/* eslint-enable */
 
 module.exports = {
   pluginOptions: {
     webpackBundleAnalyzer: {
       openAnalyzer: false,
     },
+    quasar: {
+      treeShake: true,
+    },
   },
+  transpileDependencies: [/[\\\/]node_modules[\\\/]quasar[\\\/]/],
   configureWebpack: (config) => {
     config.devtool = 'source-map';
     if (process.env.NODE_ENV === 'production') {
@@ -15,14 +22,10 @@ module.exports = {
         .minimizer[0] // Terser
         .options
         .terserOptions
-        .keep_fnames = true;
+        .keep_fnames = true; // eslint-disable-line @typescript-eslint/camelcase
     }
   },
   chainWebpack: (config) => {
-    // add quasar alias
-    config.resolve.alias
-      .set('quasar', 'quasar-framework/dist/quasar.mat.esm');
-
     // We're only using a subset from plotly
     // Add alias to enable typing regardless
     config.resolve.alias
@@ -54,12 +57,14 @@ module.exports = {
       .plugins
       .delete('fork-ts-checker');
 
-    // Set process.env.GIT_VERSION to git version
+    // Write git version to a file that can be imported
+    // src/build-env.json is gitignored, and will be replaced every time
     config
       .plugin('define')
       .tap((args) => {
         const gitInfo = gitDescribeSync(__dirname, { match: '[0-9]*' });
-        args[0]['process.env'].GIT_VERSION = `"${gitInfo.semverString}"`;
+        const version = gitInfo.semverString;
+        fs.writeFileSync('src/build-env.json', JSON.stringify({ version }));
         return args;
       });
   },

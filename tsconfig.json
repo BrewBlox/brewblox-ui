@@ -4,11 +4,13 @@
     "module": "esnext",
     "strict": true,
     "jsx": "preserve",
+    "importHelpers": true,
+    "resolveJsonModule": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
+    "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
     "noImplicitAny": false,
     "noUnusedLocals": false,
     "sourceMap": true,
@@ -23,7 +25,13 @@
       "@/*": [
         "src/*"
       ]
-    }
+    },
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost"
+    ]
   },
   "include": [
     "src/**/*.ts",

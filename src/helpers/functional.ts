@@ -115,7 +115,7 @@ export const round =
     if (value === null || value === undefined) {
       return '--.--';
     }
-    return +value.toFixed(2);
+    return (+value).toFixed(2);
   };
 
 export const truncate =

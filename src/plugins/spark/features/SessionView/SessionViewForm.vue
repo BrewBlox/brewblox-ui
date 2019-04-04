@@ -17,6 +17,7 @@ import { fetchKnownKeys } from '@/store/history/actions';
   },
 })
 export default class SessionViewForm extends FormBase {
+  graphSessionId: string | null = null;
   sessionInput: string = '';
   selectFilter: string | null = null;
 
@@ -31,6 +32,12 @@ export default class SessionViewForm extends FormBase {
 
   get nodes() {
     return nodeBuilder(fields(this.$store));
+  }
+
+  get graphSession() {
+    return this.graphSessionId
+      ? this.sessions.find(session => session.id === this.graphSessionId)
+      : null;
   }
 
   saveConfig(config: SessionViewConfig = this.widgetConfig) {
@@ -127,122 +134,157 @@ export default class SessionViewForm extends FormBase {
 </script>
 
 <template>
-  <div class="widget-modal column">
-    <WidgetSettings v-if="!$props.embedded" v-bind="$props"/>
-    <q-collapsible
-      v-for="session in sessions"
-      :key="session.id"
-      :label="`Session ${session.name}`"
-      :opened="$props.activeSession && $props.activeSession.id === session.id"
-      group="modal"
-      class="col-12"
-      icon="help"
-    >
-      <q-list>
-        <q-item>
-          <q-item-main>
-            <BlockGraph
-              :id="`SessionView::form::${session.id}`"
-              :config="session.graphCfg"
-              :change="v => { session.graphCfg = v; updateSession(session); }"
-              label="Show Graph"
-              no-duration
-            />
-          </q-item-main>
-          <q-btn flat rounded icon="mdi-content-copy" @click="duplicateSession(session)"/>
-          <q-toggle
-            :value="!session.hidden"
-            checked-icon="visibility"
-            unchecked-icon="visibility_off"
-            @input="v => { session.hidden = !v; updateSession(session); }"
-          />
-          <q-btn flat rounded icon="delete" @click="deleteSession(session)"/>
-        </q-item>
-        <q-item-separator/>
-        <q-item>
-          <q-item-main>Session name</q-item-main>
-          <InputPopupEdit
-            :field="session.name"
-            :change="v => { session.name = v; updateSession(session); }"
-            label="Session name"
-            tag="span"
-          />
-        </q-item>
-        <q-item>
-          <q-item-main>Start</q-item-main>
-          <DatetimePopupEdit
-            :field="session.start"
-            :change="v => startSession(session, v)"
-            reset-icon="mdi-clock-start"
-            label="Start"
-            tag="span"
-            clear-label="<click to start>"
-          />
-        </q-item>
-        <q-item>
-          <q-item-main>End</q-item-main>
-          <DatetimePopupEdit
-            :field="session.end"
-            :change="v => endSession(session, v)"
-            reset-icon="mdi-clock-end"
-            label="End"
-            tag="span"
-            clear-label="<click to end>"
-          />
-        </q-item>
-        <q-item>
-          <q-item-main>Duration</q-item-main>
-          <span v-if="session.start && session.end">{{ sessionDuration(session) }}</span>
-          <span v-else-if="session.start">In progress...</span>
-          <span v-else>Not yet started</span>
-        </q-item>
+  <q-card dark class="widget-modal">
+    <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
+    <BlockGraph
+      v-if="graphSession"
+      :value="true"
+      :id="`SessionView::form::${graphSession.id}`"
+      :config="graphSession.graphCfg"
+      :change="v => { graphSession.graphCfg = v; updateSession(graphSession); }"
+      no-duration
+      @input="v => {if(!v) { graphSessionId = null; }}"
+    />
 
-        <q-collapsible group="sub-modal" class="col-12" icon="mdi-file-tree" label="Fields">
-          <div>
-            <div class="q-mb-sm row no-wrap items-center">
-              <q-input v-model="selectFilter" stack-label="Filter" class="q-ma-none" clearable/>
-            </div>
-            <q-tree
-              :nodes="nodes"
-              :ticked="sessionSelected(session)"
-              :filter="selectFilter"
-              tick-strategy="leaf-filtered"
-              dark
-              node-key="value"
-              @update:ticked="v => updateSessionSelected(session, v)"
-            />
-          </div>
-        </q-collapsible>
-
-        <q-collapsible group="sub-modal" class="col-12" icon="mdi-tag-multiple" label="Legend">
-          <q-list no-border separator>
-            <q-item>
-              <q-item-main>Metric</q-item-main>Display as
-            </q-item>
-            <q-item v-for="field in sessionSelected(session)" :key="field">
-              <q-item-main>{{ field }}</q-item-main>
+    <q-scroll-area style="height: 75vh">
+      <q-expansion-item
+        v-for="session in sessions"
+        :key="session.id"
+        :label="`Session ${session.name}`"
+        :default-opened="$props.activeSession && $props.activeSession.id === session.id"
+        group="modal"
+        icon="help"
+      >
+        <q-list>
+          <q-item dark>
+            <q-item-section>
+              <q-btn flat rounded icon="mdi-chart-line" @click="graphSessionId = session.id"/>
+            </q-item-section>
+            <q-item-section>
+              <q-btn flat rounded icon="mdi-content-copy" @click="duplicateSession(session)"/>
+            </q-item-section>
+            <q-item-section>
+              <q-toggle
+                :value="!session.hidden"
+                checked-icon="visibility"
+                unchecked-icon="visibility_off"
+                @input="v => { session.hidden = !v; updateSession(session); }"
+              />
+            </q-item-section>
+            <q-item-section>
+              <q-btn flat rounded icon="delete" @click="deleteSession(session)"/>
+            </q-item-section>
+          </q-item>
+          <q-separator dark/>
+          <q-item dark>
+            <q-item-section>
+              <q-item-label caption>Session name</q-item-label>
               <InputPopupEdit
-                :field="session.graphCfg.renames[field]"
-                :change="v => updateSessionRename(session, field, v)"
-                label="Legend"
-                clearable
+                :field="session.name"
+                :change="v => { session.name = v; updateSession(session); }"
+                label="Session name"
                 tag="span"
               />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label caption>Duration</q-item-label>
+              <span v-if="session.start && session.end">{{ sessionDuration(session) }}</span>
+              <span v-else-if="session.start">In progress...</span>
+              <span v-else>Not yet started</span>
+            </q-item-section>
+          </q-item>
+          <q-item dark>
+            <q-item-section>
+              <q-item-label caption>Start</q-item-label>
+              <DatetimePopupEdit
+                :field="session.start"
+                :change="v => startSession(session, v)"
+                reset-icon="mdi-clock-start"
+                label="Start"
+                tag="span"
+                clear-label="<click to start>"
+              />
+            </q-item-section>
+
+            <q-item-section>
+              <q-item-label caption>End</q-item-label>
+              <DatetimePopupEdit
+                :field="session.end"
+                :change="v => endSession(session, v)"
+                reset-icon="mdi-clock-end"
+                label="End"
+                tag="span"
+                clear-label="<click to end>"
+              />
+            </q-item-section>
+          </q-item>
+
+          <q-expansion-item group="sub-modal" icon="mdi-file-tree" label="Fields">
+            <q-item dark>
+              <q-item-section>
+                <q-input
+                  v-model="selectFilter"
+                  placeholder="Filter keys"
+                  class="q-ma-none"
+                  dark
+                  clearable
+                >
+                  <template v-slot:append>
+                    <q-icon name="search"/>
+                  </template>
+                </q-input>
+              </q-item-section>
             </q-item>
-            <q-item v-if="sessionSelected(session).length === 0">
-              <q-item-main class="darkened">No metrics selected</q-item-main>
+            <q-item dark>
+              <q-item-section>
+                <q-tree
+                  :nodes="nodes"
+                  :ticked="sessionSelected(session)"
+                  :filter="selectFilter"
+                  tick-strategy="leaf-filtered"
+                  dark
+                  node-key="value"
+                  @update:ticked="v => updateSessionSelected(session, v)"
+                />
+              </q-item-section>
             </q-item>
-          </q-list>
-        </q-collapsible>
-        <q-collapsible group="sub-modal" class="col-12" icon="edit" label="Notes">
-          <textarea
-            :value="session.notes"
-            class="full-width"
-            style="min-height: 200px;"
-            @change="ev => { session.notes = ev.target.value; updateSession(session); }"
-          />
-        </q-collapsible>
-      </q-list>
-    </q-collapsible>
-  </div>
+          </q-expansion-item>
+
+          <q-expansion-item group="sub-modal" icon="mdi-tag-multiple" label="Legend">
+            <q-list dark>
+              <q-item dark>
+                <q-item-section>Metric</q-item-section>
+                <q-item-section>Display as</q-item-section>
+              </q-item>
+              <q-separator dark inset/>
+              <q-item v-for="field in sessionSelected(session)" :key="field" dark>
+                <q-item-section>{{ field }}</q-item-section>
+                <q-item-section>
+                  <InputPopupEdit
+                    :field="session.graphCfg.renames[field]"
+                    :change="v => updateSessionRename(session, field, v)"
+                    label="Legend"
+                    clearable
+                    tag="span"
+                  />
+                </q-item-section>
+              </q-item>
+              <q-item v-if="sessionSelected(session).length === 0" dark>
+                <q-item-section>No metrics selected</q-item-section>
+              </q-item>
+            </q-list>
+          </q-expansion-item>
+
+          <q-expansion-item group="sub-modal" icon="edit" label="Notes">
+            <textarea
+              :value="session.notes"
+              class="full-width"
+              style="min-height: 200px;"
+              @change="ev => { session.notes = ev.target.value; updateSession(session); }"
+            />
+          </q-expansion-item>
+        </q-list>
+      </q-expansion-item>
+    </q-scroll-area>
+  </q-card>
 </template>

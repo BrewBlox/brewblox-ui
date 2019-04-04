@@ -271,12 +271,14 @@ export default class PlotlyGraph extends Vue {
   }
 
   public mounted(): void {
-    Plotly.newPlot(
-      this.plotlyElement,
-      this.$props.data,
-      this.resizedLayoutIfFit(this.$props.layout),
-      this.$props.config,
-    )
+    this.$nextTick()
+      .then(() => this.$nextTick())
+      .then(() => Plotly.newPlot(
+        this.plotlyElement,
+        this.$props.data,
+        this.resizedLayoutIfFit(this.$props.layout),
+        this.$props.config,
+      ))
       .then(() => this.syncWindowResize())
       .then(() => this.syncEventHandlers())
       .then(() => this.attachUpdateEvents())
@@ -311,6 +313,8 @@ export default class PlotlyGraph extends Vue {
         props: {
           id: this.$props.id,
           class: this.$props.className,
+          width: '100%',
+          height: '100%',
         },
         ref: 'plotly',
       },

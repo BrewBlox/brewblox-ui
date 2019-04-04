@@ -1,24 +1,18 @@
 <script lang="ts">
+import { uid } from 'quasar';
 import { serviceAvailable } from '@/helpers/dynamic-store';
 import { Block, SystemStatus } from '@/plugins/spark/state';
 import {
-  createBlock,
   renameBlock,
   fetchAll,
   createUpdateSource,
   fetchServiceStatus,
 } from '@/plugins/spark/store/actions';
 import { allBlocks, lastStatus, blockLinks } from '@/plugins/spark/store/getters';
-import { createDashboardItem } from '@/store/dashboards/actions';
-import { dashboardValues, itemCopyName } from '@/store/dashboards/getters';
+import { appendDashboardItem } from '@/store/dashboards/actions';
+import { dashboardValues, dashboardById } from '@/store/dashboards/getters';
 import { Dashboard, DashboardItem } from '@/store/dashboards/state';
-import {
-  deletersById,
-  displayNameById,
-  widgetById,
-  widgetSizeById,
-} from '@/store/features/getters';
-import { Notify } from 'quasar';
+import { deletersById, widgetById, widgetSizeById } from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { isReady, isSystemBlock, widgetSize } from './getters';
@@ -48,7 +42,6 @@ interface ValidatedItem {
 })
 export default class SparkPage extends Vue {
   $q: any;
-  widgetEditable: boolean = false;
   modalOpen: boolean = false;
   relationsModalOpen: boolean = false;
   modalSettings: ModalSettings | null = null;
@@ -90,23 +83,28 @@ export default class SparkPage extends Vue {
     return widgetSize;
   }
 
+  volatileKey(blockId: string): string {
+    return `${this.$props.serviceId}/${blockId}`;
+  }
+
   itemProps(item: DashboardItem): any {
     return {
       id: item.id,
+      title: item.title,
       type: item.feature,
       pos: item.pinnedPosition,
       cols: item.cols,
       rows: item.rows,
       config: item.config,
       onChangeConfig: this.onWidgetChange,
-      onDelete: () => this.onDeleteItem(item),
-      onCopy: () => this.onCopyItem(item),
+      onDelete: this.onDeleteItem,
+      onCopy: this.onCopyItem,
       volatile: true,
     };
   }
 
   validateBlock(block: Block): ValidatedItem {
-    const key = `${this.$props.serviceId}/${block.id}`;
+    const key = this.volatileKey(block.id);
     const existing = this.volatileItems[key];
     if (!existing || existing.feature !== block.type) {
       this.$set(
@@ -114,6 +112,7 @@ export default class SparkPage extends Vue {
         key,
         {
           id: block.id,
+          title: block.id,
           feature: block.type,
           order: 0,
           dashboard: '',
@@ -162,31 +161,19 @@ export default class SparkPage extends Vue {
     this.statusCheckInterval && clearTimeout(this.statusCheckInterval);
   }
 
-  async onCreateBlock(block: Block) {
-    try {
-      await createBlock(this.$store, this.$props.serviceId, block);
-      this.modalOpen = false;
-      this.$q.notify({
-        type: 'positive',
-        message: `Created ${displayNameById(this.$store, block.type)} "${block.id}"`,
-      });
-    } catch (e) {
-      this.$q.notify(`Failed to create block: ${e.toString()}`);
-    }
-  }
-
   onChangeBlockId(currentId: string, newId: string) {
     renameBlock(this.$store, this.$props.serviceId, currentId, newId);
   }
 
-  onDeleteItem(item: DashboardItem) {
+  onDeleteItem(itemId: string) {
+    const item = this.volatileItems[this.volatileKey(itemId)];
     // Quasar dialog can't handle objects as value - they will be returned as null
     // As workaround, we use array index as value, and add the "action" key to each option
     const opts = deletersById(this.$store, item.feature)
       .map((del, idx) => ({ label: del.description, value: idx, action: del.action }));
 
     if (opts.length === 0) {
-      Notify.create('This block can\'t be deleted');
+      this.$q.notify('This block can\'t be deleted');
       return;
     }
 
@@ -200,13 +187,13 @@ export default class SparkPage extends Vue {
       },
       cancel: true,
     })
-      .then((selected: number[]) =>
-        selected.forEach(idx => opts[idx].action(this.$store, item.config)))
-      .catch(() => { });
+      .onOk((selected: number[]) =>
+        selected.forEach(idx => opts[idx].action(this.$store, item.config)));
   }
 
-  onCopyItem(item: DashboardItem) {
-    const id = itemCopyName(this.$store, item.id);
+  onCopyItem(itemId: string) {
+    const item = this.volatileItems[this.volatileKey(itemId)];
+    const id = uid();
     this.$q.dialog({
       title: 'Create widget',
       message: `On which dashboard do you want to create a widget for ${item.id}?`,
@@ -218,14 +205,21 @@ export default class SparkPage extends Vue {
       },
       cancel: true,
     })
-      .then((dashboard: string) =>
-        dashboard && createDashboardItem(this.$store, { ...item, id, dashboard }))
-      .catch(() => { });
+      .onOk((dashboard: string) => {
+        if (!dashboard) {
+          return;
+        }
+        appendDashboardItem(this.$store, { ...item, id, dashboard });
+        this.$q.notify({
+          color: 'positive',
+          icon: 'file_copy',
+          message: `Copied ${item.title} to ${dashboardById(this.$store, dashboard).title}`,
+        });
+      });
   }
 
   onWidgetChange(id: string, config: any) {
-    const key = `${this.$props.serviceId}/${id}`;
-    this.volatileItems[key].config = { ...config };
+    this.volatileItems[this.volatileKey(id)].config = { ...config };
     this.$q.notify({
       type: 'warning',
       message: 'Changes will not be persisted',
@@ -234,10 +228,9 @@ export default class SparkPage extends Vue {
 
   startCreateBlock() {
     this.modalSettings = {
-      component: 'NewBlockWizard',
+      component: 'BlockWizard',
       props: {
         serviceId: this.$props.serviceId,
-        onCreateBlock: this.onCreateBlock,
       },
     };
     this.modalOpen = true;
@@ -254,77 +247,76 @@ export default class SparkPage extends Vue {
       <portal to="toolbar-buttons">
         <q-btn-dropdown color="primary" label="actions">
           <q-list dark link>
-            <q-item @click.native="relationsModalOpen = true">
-              <q-item-side icon="mdi-ray-start-arrow"/>
-              <q-item-main label="Show Relations"/>
+            <q-item v-close-popup dark clickable @click="relationsModalOpen = true">
+              <q-item-section avatar>
+                <q-icon name="mdi-ray-start-arrow"/>
+              </q-item-section>
+              <q-item-section>Show Relations</q-item-section>
             </q-item>
-            <q-item @click.native="widgetEditable = !widgetEditable">
-              <q-item-side :icon="widgetEditable ? 'check' : 'mode edit'"/>
-              <q-item-main :label="widgetEditable ? 'Stop editing' : 'Edit Dashboard'"/>
-            </q-item>
-            <q-item @click.native="startCreateBlock">
-              <q-item-side icon="add"/>
-              <q-item-main label="New Block"/>
+            <q-item dark clickable @click="startCreateBlock">
+              <q-item-section avatar>
+                <q-icon name="add"/>
+              </q-item-section>
+              <q-item-section>New Block</q-item-section>
             </q-item>
           </q-list>
         </q-btn-dropdown>
       </portal>
-      <q-modal v-model="modalOpen" no-backdrop-dismiss>
-        <component v-if="modalOpen" :is="modalSettings.component" v-bind="modalSettings.props"/>
-      </q-modal>
-      <q-modal v-model="relationsModalOpen" no-backdrop-dismiss>
+      <q-dialog v-model="modalOpen" no-backdrop-dismiss>
+        <component
+          v-if="modalOpen"
+          :is="modalSettings.component"
+          v-bind="modalSettings.props"
+          @close="modalOpen = false"
+        />
+      </q-dialog>
+      <q-dialog v-model="relationsModalOpen" no-backdrop-dismiss maximized>
         <DagreDiagram
           v-if="relationsModalOpen"
           :nodes="validatedItems.map(v => ({id: v.item.id, type: v.item.feature}))"
           :relations="relations"
         />
-      </q-modal>
-      <q-alert
-        class="col-12"
-        icon="info"
-        color="dark-bright"
-        style="margin-bottom: 20px;"
-      >This service page shows all blocks that are running on your Spark controller.
+      </q-dialog>
+      <q-banner icon="info" class="bg-dark text-white q-mb-lg">
+        This service page shows all blocks that are running on your Spark controller.
         <br>Deleting blocks on this page will remove them on the controller.
-      </q-alert>
+      </q-banner>
       <q-list v-if="statusNok" dark no-border>
-        <q-item>
-          <Troubleshooter
-            :disabled="widgetEditable"
-            :id="$props.serviceId"
-            :config="{serviceId: $props.serviceId}"
-            :cols="4"
-            :rows="4"
-            type="Troubleshooter"
-            class="dashboard-item"
-          />
+        <q-item dark>
+          <q-item-section>
+            <Troubleshooter
+              :id="$props.serviceId"
+              :config="{serviceId: $props.serviceId}"
+              :cols="4"
+              :rows="4"
+              type="Troubleshooter"
+              class="dashboard-item"
+            />
+          </q-item-section>
         </q-item>
       </q-list>
       <q-list v-else-if="isMobile" dark no-border>
-        <q-item>
-          <SparkWidget
-            v-if="isReady"
-            :disabled="widgetEditable"
-            :id="$props.serviceId"
-            :service-id="$props.serviceId"
-            :cols="widgetSize.cols"
-            :rows="widgetSize.rows"
-            class="dashboard-item"
-          />
+        <q-item dark>
+          <q-item-section>
+            <SparkWidget
+              v-if="isReady"
+              :id="$props.serviceId"
+              :service-id="$props.serviceId"
+              :cols="widgetSize.cols"
+              :rows="widgetSize.rows"
+              class="dashboard-item"
+            />
+          </q-item-section>
         </q-item>
-        <q-item v-for="val in validatedItems" :key="val.key">
-          <component
-            :disabled="widgetEditable"
-            :is="val.component"
-            v-bind="val.props"
-            class="dashboard-item"
-          />
+        <q-item v-for="val in validatedItems" :key="val.key" dark>
+          <q-item-section>
+            <component :is="val.component" v-bind="val.props" class="dashboard-item"/>
+          </q-item-section>
         </q-item>
       </q-list>
-      <GridContainer v-else :editable="widgetEditable" no-move>
+      <GridContainer v-else no-move>
         <SparkWidget
           v-if="isReady"
-          :disabled="widgetEditable"
           :id="$props.serviceId"
           :service-id="$props.serviceId"
           :cols="widgetSize.cols"
@@ -333,7 +325,6 @@ export default class SparkPage extends Vue {
         />
         <component
           v-for="val in validatedItems"
-          :disabled="widgetEditable"
           :is="val.component"
           :key="val.key"
           v-bind="val.props"
@@ -345,7 +336,8 @@ export default class SparkPage extends Vue {
 </template>
 
 <style lang="stylus" scoped>
-@import '../../../css/app.styl';
+@import '../../../styles/quasar.styl';
+@import '../../../styles/quasar.variables.styl';
 
 .dashboard-item {
   background: $block-background;

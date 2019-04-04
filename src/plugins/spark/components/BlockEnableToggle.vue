@@ -6,43 +6,43 @@ import BlockForm from '@/plugins/spark/components/BlockForm';
   props: {
     textEnabled: {
       type: String,
-      required: false,
-      default: "This block is enabled",
+      default: 'This block is enabled',
     },
     textDisabled: {
       type: String,
-      required: false,
-      default: "This block is disabled",
+      default: 'This block is disabled',
     },
   },
 })
 export default class BlockEnableToggle extends BlockForm {
+  get enabled() {
+    return Boolean(this.block.data.enabled);
+  }
+
   get mainText() {
-    return this.block.data.enabled ? this.$props.textEnabled : this.$props.textDisabled;
+    return this.enabled
+      ? this.$props.textEnabled
+      : this.$props.textDisabled;
+  }
+
+  toggleEnabled() {
+    this.block.data.enabled = !this.enabled;
+    this.saveBlock();
   }
 }
 </script>
 
 <template>
-  <q-item>
-    <q-item-main>
-      <p>{{ mainText }}</p>
-    </q-item-main>
-    <q-item-side right>
+  <q-item dark>
+    <q-item-section>{{ mainText }}</q-item-section>
+    <q-item-section side>
       <q-btn
-        v-if="block.data.enabled"
-        label="Disable"
-        color="negative"
+        :label="enabled ? 'Disable': 'Enable'"
+        :color="enabled ? 'negative' : 'positive'"
+        outline
         dense
-        @click="() => { block.data.enabled = false; saveBlock(); }"
+        @click="toggleEnabled"
       />
-      <q-btn
-        v-if="!block.data.enabled"
-        label="Enable"
-        color="positive"
-        dense
-        @click="() => { block.data.enabled = true; saveBlock(); }"
-      />
-    </q-item-side>
+    </q-item-section>
   </q-item>
 </template>

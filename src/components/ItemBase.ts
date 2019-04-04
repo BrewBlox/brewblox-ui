@@ -12,11 +12,15 @@ import Component from 'vue-class-component';
       type: String,
       required: true,
     },
+    title: {
+      type: String,
+      required: true,
+    },
     volatile: {
       type: Boolean,
       default: false,
     },
-    onChangeId: {
+    onChangeTitle: {
       type: Function,
       required: false,
     },
@@ -39,6 +43,10 @@ export default class ItemBase extends Vue {
 
   protected get widgetId(): string {
     return this.$props.id;
+  }
+
+  protected get widgetTitle(): string {
+    return this.$props.title;
   }
 
   protected get displayName(): string {

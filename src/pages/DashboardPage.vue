@@ -1,11 +1,11 @@
 <script lang="ts">
+import { uid } from 'quasar';
 import { objectSorter } from '@/helpers/functional';
 import {
   removeDashboardItem,
   saveDashboard,
   saveDashboardItem,
   updateDashboardItemConfig,
-  updateDashboardItemId,
   updateDashboardItemOrder,
   updateDashboardItemSize,
   appendDashboardItem,
@@ -14,7 +14,6 @@ import {
   dashboardValues,
   dashboardById,
   dashboardItemsByDashboardId,
-  itemCopyName,
   dashboardItemValues,
   dashboardItemById,
 } from '@/store/dashboards/getters';
@@ -74,23 +73,29 @@ export default class DashboardPage extends Vue {
   itemProps(item: DashboardItem): any {
     return {
       id: item.id,
+      title: item.title,
       type: item.feature,
       pos: item.pinnedPosition,
       cols: item.cols,
       rows: item.rows,
       config: item.config,
       onChangeConfig: this.onChangeItemConfig,
-      onChangeId: v => this.onChangeItemId(item.id, v),
-      onDelete: () => this.onDeleteItem(item),
-      onCopy: () => this.onCopyItem(item),
-      onMove: () => this.onMoveItem(item),
+      onChangeTitle: this.onChangeItemTitle,
+      onDelete: this.onDeleteItem,
+      onCopy: this.onCopyItem,
+      onMove: this.onMoveItem,
     };
   }
 
   get validatedItems(): ValidatedItem[] {
     return this.items
-      .map((item) => {
+      .map((item: DashboardItem) => {
         try {
+          if (item.title === undefined) {
+            // ensure backwards compatibility
+            // older items may not have a title
+            item.title = item.id;
+          }
           const component = widgetById(this.$store, item.feature, item.config);
           if (!component) {
             throw new Error(`No widget found for ${item.feature}`);
@@ -143,12 +148,12 @@ export default class DashboardPage extends Vue {
     updateDashboardItemConfig(this.$store, { id, config });
   }
 
-  onChangeItemId(id: string, newId: string) {
-    updateDashboardItemId(this.$store, { id, newId })
-      .catch(e => this.$q.notify(`Failed to rename ${id}: ${e}`));
+  onChangeItemTitle(id: string, title: string) {
+    saveDashboardItem(this.$store, { ...dashboardItemById(this.$store, id), title });
   }
 
-  onDeleteItem(item: DashboardItem) {
+  onDeleteItem(itemId: string) {
+    const item = dashboardItemById(this.$store, itemId);
     const deleteItem = () => removeDashboardItem(this.$store, item);
 
     // Quasar dialog can't handle objects as value - they will be returned as null
@@ -164,7 +169,7 @@ export default class DashboardPage extends Vue {
 
     this.$q.dialog({
       title: 'Delete widget',
-      message: `How do you want to delete widget ${item.id}?`,
+      message: `How do you want to delete widget ${item.title}?`,
       options: {
         type: 'checkbox',
         model: [0], // pre-check the default action
@@ -172,16 +177,16 @@ export default class DashboardPage extends Vue {
       },
       cancel: true,
     })
-      .then((selected: number[]) =>
-        selected.forEach(idx => opts[idx].action(this.$store, item.config)))
-      .catch(() => { });
+      .onOk((selected: number[]) =>
+        selected.forEach(idx => opts[idx].action(this.$store, item.config)));
   }
 
-  onCopyItem(item: DashboardItem) {
-    const id = itemCopyName(this.$store, item.id);
+  onCopyItem(itemId: string) {
+    const item = dashboardItemById(this.$store, itemId);
+    const id = uid();
     this.$q.dialog({
       title: 'Copy widget',
-      message: `To which dashboard do you want to copy widget ${item.id}?`,
+      message: `To which dashboard do you want to copy widget ${item.title}?`,
       options: {
         type: 'radio',
         model: null,
@@ -190,15 +195,25 @@ export default class DashboardPage extends Vue {
       },
       cancel: true,
     })
-      .then((dashboard: string) =>
-        dashboard && appendDashboardItem(this.$store, { ...item, id, dashboard }))
-      .catch(() => { });
+      .onOk((dashboard: string) => {
+        if (!dashboard) {
+          return;
+        }
+        appendDashboardItem(this.$store, { ...item, id, dashboard });
+        this.$q.notify({
+          color: 'positive',
+          icon: 'file_copy',
+          message: `Copied ${item.title} to ${dashboardById(this.$store, dashboard).title}`,
+        });
+      });
+
   }
 
-  onMoveItem(item: DashboardItem) {
+  onMoveItem(itemId: string) {
+    const item = dashboardItemById(this.$store, itemId);
     this.$q.dialog({
       title: 'Move widget',
-      message: `To which dashboard do you want to move widget ${item.id}?`,
+      message: `To which dashboard do you want to move widget ${item.title}?`,
       options: {
         type: 'radio',
         model: null,
@@ -208,9 +223,8 @@ export default class DashboardPage extends Vue {
       },
       cancel: true,
     })
-      .then((dashboard: string) =>
-        dashboard && saveDashboardItem(this.$store, { ...item, dashboard }))
-      .catch(() => { });
+      .onOk((dashboard: string) =>
+        dashboard && saveDashboardItem(this.$store, { ...item, dashboard }));
   }
 }
 </script>
@@ -221,44 +235,40 @@ export default class DashboardPage extends Vue {
       <q-spinner size="50px" color="primary"/>
     </q-inner-loading>
     <div v-else>
-      <portal to="toolbar-title">
-        <div :class="widgetEditable ? 'editable': ''">
-          <span>{{ dashboard.title }}</span>
-          <q-popup-edit
-            :disable="!widgetEditable"
-            v-model="dashboard.title"
-            title="Set dashboard title to:"
-            @save="onChangeDashboardTitle"
-          >
-            <q-input v-model="dashboard.title"/>
-          </q-popup-edit>
-        </div>
-      </portal>
+      <portal to="toolbar-title">{{ dashboard.title }}</portal>
       <portal to="toolbar-buttons">
+        <q-toggle v-model="widgetEditable" checked-icon="mdi-lock-open" unchecked-icon="mdi-lock">
+          <q-tooltip>{{ widgetEditable ? 'Lock widgets' : 'Move widgets' }}</q-tooltip>
+        </q-toggle>
         <q-btn-dropdown color="primary" label="actions">
-          <q-list dark link>
-            <q-item @click.native="widgetEditable = !widgetEditable">
-              <q-item-side :icon="widgetEditable ? 'check' : 'mode edit'"/>
-              <q-item-main :label="widgetEditable ? 'Stop editing' : 'Edit Dashboard'"/>
-            </q-item>
-            <q-item @click.native="() => wizardModalOpen = true">
-              <q-item-side icon="add"/>
-              <q-item-main label="New Widget"/>
+          <q-list dark>
+            <q-item clickable @click="() => wizardModalOpen = true">
+              <q-item-section avatar>
+                <q-icon name="add"/>
+              </q-item-section>
+              <q-item-section>New Widget</q-item-section>
             </q-item>
           </q-list>
         </q-btn-dropdown>
       </portal>
-      <q-modal v-model="wizardModalOpen" no-backdrop-dismiss>
-        <WidgetWizardPicker v-if="wizardModalOpen" :dashboard-id="dashboardId"/>
-      </q-modal>
+      <q-dialog v-model="wizardModalOpen" no-backdrop-dismiss>
+        <WizardPicker
+          v-if="wizardModalOpen"
+          :dashboard-id="dashboardId"
+          initial-component="WidgetWizardPicker"
+          @close="wizardModalOpen = false"
+        />
+      </q-dialog>
       <q-list v-if="isMobile" no-border>
         <q-item v-for="val in validatedItems" :key="val.item.id">
-          <component
-            :disabled="widgetEditable"
-            :is="val.component"
-            v-bind="val.props"
-            class="dashboard-item"
-          />
+          <q-item-section>
+            <component
+              :disabled="widgetEditable"
+              :is="val.component"
+              v-bind="val.props"
+              class="dashboard-item"
+            />
+          </q-item-section>
         </q-item>
       </q-list>
       <GridContainer
@@ -281,13 +291,12 @@ export default class DashboardPage extends Vue {
 </template>
 
 <style lang="stylus" scoped>
-@import '../css/app.styl';
+@import '../styles/quasar.variables.styl';
+@import '../styles/quasar.styl';
 
 .dashboard-item {
   background: $block-background;
   height: 100%;
   width: 100%;
-  display: flex;
-  flex-direction: column;
 }
 </style>

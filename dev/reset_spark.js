@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs');
 const request = require('request-promise-native');
-require('dotenv').config({path: '.env.development'});
+require('dotenv').config({ path: '.env.development' });
+/* eslint-enable */
 
 // Ignore errors about our self-signed certificate
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
@@ -31,9 +33,9 @@ const resetObjects = async () => {
 };
 
 resetObjects()
-    .then(() => {
-      console.log(`Succesfully reset objects for ${service}`);
-    })
-    .catch((e) => {
-      console.log(e);
-    });
+  .then(() => {
+    console.log(`Succesfully reset objects for ${service}`);
+  })
+  .catch((e) => {
+    console.log(e);
+  });

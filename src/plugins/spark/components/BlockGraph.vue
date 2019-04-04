@@ -10,6 +10,10 @@ import { defaultPresets } from '@/components/Graph/getters';
 
 @Component({
   props: {
+    value: {
+      type: Boolean,
+      required: true,
+    },
     id: {
       type: String,
       required: true,
@@ -22,23 +26,25 @@ import { defaultPresets } from '@/components/Graph/getters';
       type: Function,
       required: true,
     },
-    label: {
-      type: String,
-      default: '',
-    },
     noDuration: {
       type: Boolean,
       default: false,
     },
-    buttonSize: {
-      type: String,
-      default: 'md',
-    },
   },
 })
 export default class BlockGraph extends Vue {
-  modalOpen: boolean = false;
+  $refs!: {
+    graph: any;
+  }
   prevStrConfig: string = '';
+
+  get modalModel() {
+    return this.$props.value;
+  }
+
+  set modalModel(val: boolean) {
+    this.$emit('input', val);
+  }
 
   get graphCfg(): GraphConfig {
     return {
@@ -96,7 +102,7 @@ export default class BlockGraph extends Vue {
     const strConfig = JSON.stringify(this.graphCfg);
     if (strConfig !== this.prevStrConfig) {
       this.prevStrConfig = strConfig;
-      this.$nextTick(() => this.$refs.graph && (this.$refs.graph as any).resetMetrics());
+      this.$nextTick(() => this.$refs.graph && this.$refs.graph.resetMetrics());
     }
   }
 
@@ -107,59 +113,54 @@ export default class BlockGraph extends Vue {
 </script>
 
 <template>
-  <span>
-    <q-modal v-model="modalOpen" maximized>
-      <GraphCard v-if="modalOpen" ref="graph" :id="$props.id" :config="graphCfg">
-        <q-btn-dropdown flat label="presets" icon="mdi-timelapse">
-          <q-list link>
-            <q-item
-              v-for="(preset, idx) in presets"
-              :key="idx"
-              @click.native="() => applyPreset(preset)"
-            >{{ preset.duration }}</q-item>
-          </q-list>
+  <q-dialog v-model="modalModel" maximized>
+    <q-card v-if="modalModel" class="text-white bg-dark-bright" dark>
+      <GraphCard ref="graph" :id="$props.id" :config="graphCfg">
+        <q-btn-dropdown v-if="!$props.noDuration" flat label="timespan" icon="mdi-timelapse">
+          <q-item
+            v-for="(preset, idx) in presets"
+            :key="idx"
+            dark
+            link
+            clickable
+            @click="() => applyPreset(preset)"
+          >
+            <q-item-section>{{ preset.duration }}</q-item-section>
+          </q-item>
         </q-btn-dropdown>
         <q-btn-dropdown flat label="settings" icon="settings">
-          <q-list link>
-            <q-item @click.native="() => $refs.duration.$el.click()">
-              <q-item-side>Duration</q-item-side>
-              <q-item-main @click.native="() => $refs.duration.$el.click()">
-                <InputPopupEdit
-                  ref="duration"
-                  :field="graphCfg.params.duration"
-                  :change="confirmed(v => $set(graphCfg.params, 'duration', parseDuration(v)))"
-                  label="Duration"
-                  tag="span"
-                />
-              </q-item-main>
+          <q-item dark link clickable @click="() => $refs.duration.$el.click()">
+            <q-item-section side>Duration</q-item-section>
+            <q-item-section @click="() => $refs.duration.$el.click()">
+              <InputPopupEdit
+                ref="duration"
+                :field="graphCfg.params.duration"
+                :change="confirmed(v => $set(graphCfg.params, 'duration', parseDuration(v)))"
+                label="Duration"
+                tag="span"
+              />
+            </q-item-section>
+          </q-item>
+          <q-expansion-item label="Left or right axis">
+            <q-item
+              v-for="[key, renamed] in targetKeys"
+              :key="key"
+              dark
+              link
+              clickable
+              @click="updateKeySide(key, !isRightAxis(key))"
+            >
+              <q-item-section>{{ renamed }}</q-item-section>
+              <q-item-section side>
+                <q-icon :class="{mirrored: isRightAxis(key)}" name="mdi-chart-line"/>
+              </q-item-section>
             </q-item>
-            <q-collapsible label="Left or right axis">
-              <q-list link no-border>
-                <q-item
-                  v-for="[key, renamed] in targetKeys"
-                  :key="key"
-                  @click.native="updateKeySide(key, !isRightAxis(key))"
-                >
-                  <q-item-side :class="{mirrored: isRightAxis(key)}" icon="mdi-chart-line"/>
-                  <q-item-main>{{ renamed }}</q-item-main>
-                </q-item>
-              </q-list>
-            </q-collapsible>
-          </q-list>
+          </q-expansion-item>
         </q-btn-dropdown>
-        <q-btn v-close-overlay flat label="close"/>
+        <q-btn v-close-popup flat label="close"/>
       </GraphCard>
-    </q-modal>
-    <q-btn
-      :label="$props.label"
-      :size="$props.buttonSize"
-      flat
-      rounded
-      dense
-      icon="mdi-chart-line"
-      @click="() => modalOpen = true"
-    />
-  </span>
+    </q-card>
+  </q-dialog>
 </template>
 
 <style scoped lang="stylus">

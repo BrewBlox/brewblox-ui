@@ -1,7 +1,8 @@
 {
   "docs": [
     {
-      "_id": "item-process-view",
+      "_id": "a0634d76-5499-11e9-8647-d663bd873d93",
+      "title": "item-process-view",
       "order": 1,
       "cols": 8,
       "rows": 8,
@@ -177,7 +178,8 @@
       }
     },
     {
-      "_id": "item-invalid",
+      "_id": "a06350b4-5499-11e9-8647-d663bd873d93",
+      "title": "item-invalid",
       "order": 1,
       "cols": 3,
       "rows": 3,
@@ -189,7 +191,8 @@
       }
     },
     {
-      "_id": "item-unknown",
+      "_id": "a06355e6-5499-11e9-8647-d663bd873d93",
+      "title": "item-unknown",
       "order": 2,
       "cols": 3,
       "rows": 3,
@@ -201,7 +204,8 @@
       }
     },
     {
-      "_id": "item-invalid-unknown",
+      "_id": "a06358fc-5499-11e9-8647-d663bd873d93",
+      "title": "item-invalid-unknown",
       "order": 3,
       "cols": 3,
       "rows": 3,
@@ -213,7 +217,8 @@
       }
     },
     {
-      "_id": "item-service-unknown",
+      "_id": "a0635bb8-5499-11e9-8647-d663bd873d93",
+      "title": "item-service-unknown",
       "order": 3,
       "cols": 3,
       "rows": 3,
@@ -225,7 +230,8 @@
       }
     },
     {
-      "_id": "item-graph",
+      "_id": "a0635e1a-5499-11e9-8647-d663bd873d93",
+      "title": "item-graph",
       "order": 1,
       "cols": 10,
       "rows": 5,
@@ -256,7 +262,8 @@
       }
     },
     {
-      "_id": "sessions",
+      "_id": "a06362e8-5499-11e9-8647-d663bd873d93",
+      "title": "sessions",
       "order": 2,
       "cols": 4,
       "rows": 5,
@@ -292,7 +299,8 @@
       }
     },
     {
-      "_id": "empty-graph",
+      "_id": "a0636842-5499-11e9-8647-d663bd873d93",
+      "title": "empty-graph",
       "order": 2,
       "cols": 5,
       "rows": 5,
@@ -306,7 +314,8 @@
       }
     },
     {
-      "_id": "setpoint-feature",
+      "_id": "a06369be-5499-11e9-8647-d663bd873d93",
+      "title": "setpoint-feature",
       "order": 1,
       "cols": 4,
       "rows": 2,
@@ -318,7 +327,8 @@
       }
     },
     {
-      "_id": "pid-feature",
+      "_id": "a0636b12-5499-11e9-8647-d663bd873d93",
+      "title": "pid-feature",
       "order": 2,
       "cols": 4,
       "rows": 4,

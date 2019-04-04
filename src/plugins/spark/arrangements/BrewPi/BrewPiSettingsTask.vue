@@ -1,4 +1,5 @@
 <script lang="ts">
+import { uid } from 'quasar';
 import Component from 'vue-class-component';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { Unit, Link } from '@/helpers/units';
@@ -21,6 +22,7 @@ import {
 } from '@/plugins/spark/features/Pid/getters';
 import { dashboardIds } from '@/store/dashboards/getters';
 import { blockById } from '@/plugins/spark/store/getters';
+import { Dashboard } from '@/store/dashboards/state';
 
 @Component
 export default class BrewPiSettingsTask extends WizardTaskBase {
@@ -243,13 +245,14 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
     };
 
     const createWidget =
-      (id: string, type: string) => ({
+      (name: string, type: string) => ({
         ...genericSettings,
         ...widgetSizeById(this.$store, type),
-        id: id,
+        id: uid(),
+        title: name,
         feature: type,
         config: {
-          blockId: id,
+          blockId: name,
           serviceId: this.cfg.serviceId,
         },
       });
@@ -306,7 +309,12 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
 
       async (store: RootStore, cfg: BrewPiConfig): Promise<void> => {
         if (!dashboardIds(store).includes(cfg.dashboardId)) {
-          await createDashboard(store, cfg.dashboardTitle);
+          const dashboard: Dashboard = {
+            id: cfg.dashboardId,
+            title: cfg.dashboardTitle,
+            order: dashboardIds(store).length + 1,
+          };
+          await createDashboard(store, dashboard);
         }
         await Promise.all(
           cfg.widgets
@@ -328,38 +336,39 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
 </script>
 
 <template>
-  <q-card dark>
+  <div>
+    <q-card-section>
+      <q-item dark>
+        <big>Settings</big>
+      </q-item>
+      <q-item dark>
+        <q-item-section>Fridge temperature</q-item-section>
+        <q-item-section>
+          <UnitPopupEdit
+            :field="fridgeSetpointValue"
+            :change="v => fridgeSetpointValue = v"
+            label="Fridge temperature"
+            tag="span"
+          />
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>Beer temperature</q-item-section>
+        <q-item-section>
+          <UnitPopupEdit
+            :field="beerSetpointValue"
+            :change="v => beerSetpointValue = v"
+            label="Beer temperature"
+            tag="span"
+          />
+        </q-item-section>
+      </q-item>
+    </q-card-section>
+
+    <q-separator dark/>
+
     <q-card-actions>
-      <q-btn label="Done" color="primary" @click="done"/>
+      <q-btn unelevated label="Done" color="primary" class="full-width" @click="done"/>
     </q-card-actions>
-    <q-card-main class="row">
-      <div>
-        <q-list no-border>
-          <q-item>
-            <big>Settings</big>
-          </q-item>
-          <q-item>
-            <q-field label="Fridge temperature" orientation="vertical" style="max-width: 200px;">
-              <UnitPopupEdit
-                :field="fridgeSetpointValue"
-                :change="v => fridgeSetpointValue = v"
-                label="Fridge temperature"
-                tag="span"
-              />
-            </q-field>
-          </q-item>
-          <q-item>
-            <q-field label="Beer temperature" orientation="vertical" style="max-width: 200px;">
-              <UnitPopupEdit
-                :field="beerSetpointValue"
-                :change="v => beerSetpointValue = v"
-                label="Beer temperature"
-                tag="span"
-              />
-            </q-field>
-          </q-item>
-        </q-list>
-      </div>
-    </q-card-main>
-  </q-card>
+  </div>
 </template>

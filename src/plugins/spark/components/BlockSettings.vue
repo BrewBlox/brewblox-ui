@@ -23,47 +23,47 @@ export default class BlockSettings extends BlockForm {
 
 <template>
   <q-list>
-    <q-item>
-      <q-item-side left color="grey-7">Block ID</q-item-side>
-      <q-item-main>
+    <q-item dark>
+      <q-item-section>
+        <q-item-label caption>Block ID</q-item-label>
         <InputPopupEdit
           :field="block.id"
           :change="$props.onChangeBlockId"
           tag="span"
           label="Block ID"
         />
-      </q-item-main>
+      </q-item-section>
+      <q-item-section>
+        <q-item-label caption>Block Type</q-item-label>
+        <span>{{ block.type }}</span>
+      </q-item-section>
     </q-item>
-    <q-item>
-      <q-item-side left color="grey-7">Block Type</q-item-side>
-      <q-item-main>{{ block.type }}</q-item-main>
-    </q-item>
-    <q-item>
-      <q-item-side left color="grey-7">Part of service</q-item-side>
-      <q-item-main>{{ serviceId }}</q-item-main>
-    </q-item>
-    <q-item>
-      <q-item-side left color="grey-7">Active in groups</q-item-side>
-      <q-item-main>
+    <q-item dark>
+      <q-item-section>
+        <q-item-label caption>Part of service</q-item-label>
+        <span>{{ serviceId }}</span>
+      </q-item-section>
+      <q-item-section>
+        <q-item-label caption>Active in groups</q-item-label>
         <GroupsPopupEdit
           :field="block.groups"
           :service-id="serviceId"
           :change="callAndSaveBlock(v => block.groups = v)"
           tag="span"
         />
-      </q-item-main>
+      </q-item-section>
     </q-item>
-    <q-item v-if="$props.presetsData.length > 0">
-      <q-item-side left color="grey-7">Apply preset</q-item-side>
-      <q-item-main>
+    <q-item v-if="$props.presetsData.length > 0" dark>
+      <q-item-section>
+        <q-item-label caption>Apply block settings preset</q-item-label>
         <SelectPopupEdit
           :field="block.data"
           :options="$props.presetsData"
           :change="callAndSaveBlock(applyPreset)"
-          label="preset"
+          label="Select a preset"
           tag="span"
         />
-      </q-item-main>
+      </q-item-section>
     </q-item>
   </q-list>
 </template>

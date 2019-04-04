@@ -13,12 +13,16 @@ export default class InvalidWidget extends WidgetBase { }
 </script>
 
 <template>
-  <q-card dark class="column">
-    <q-card-title class="title-bar">
-      <div class="ellipsis">{{ widgetId }}</div>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-    </q-card-title>
-    <q-card-separator/>
-    <q-alert icon="error" error>{{ $props.error }}</q-alert>
+  <q-card dark class="text-white scroll">
+    <WidgetToolbar :title="widgetTitle" :subtitle="displayName"/>
+
+    <q-card-section>
+      <q-item dark>
+        <q-item-section avatar>
+          <q-icon name="warning" color="negative"/>
+        </q-item-section>
+        <q-item-section>{{ $props.error }}</q-item-section>
+      </q-item>
+    </q-card-section>
   </q-card>
 </template>
