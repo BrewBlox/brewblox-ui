@@ -39,6 +39,7 @@ export default class SensorDisplay extends PartComponent {
     <foreignObject :transform="textTransformation" :width="SQUARE_SIZE" :height="SQUARE_SIZE">
       <div class="text-white text-bold text-center">
         <q-icon name="mdi-thermometer"/>
+        <q-icon v-if="!sensorLink" name="mdi-link-variant-off"/>
         <br>
         {{ temperature | round }}
       </div>

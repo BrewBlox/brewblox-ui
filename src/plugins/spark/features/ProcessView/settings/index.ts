@@ -1,3 +1,4 @@
+import ActuatorValve from './ActuatorValve';
 import BridgeTube from './BridgeTube';
 import CheckValve from './CheckValve';
 import Coil from './Coil';
@@ -23,6 +24,7 @@ import WhirlpoolInlet from './WhirlpoolInlet';
 import { ComponentSettings } from '../state';
 
 const settings: { [key: string]: ComponentSettings } = {
+  ActuatorValve,
   BridgeTube,
   CheckValve,
   Coil,

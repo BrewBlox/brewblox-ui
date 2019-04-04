@@ -9,7 +9,7 @@ import {
   fetchServiceStatus,
 } from '@/plugins/spark/store/actions';
 import { allBlocks, lastStatus, blockLinks } from '@/plugins/spark/store/getters';
-import { createDashboardItem } from '@/store/dashboards/actions';
+import { appendDashboardItem } from '@/store/dashboards/actions';
 import { dashboardValues, dashboardById } from '@/store/dashboards/getters';
 import { Dashboard, DashboardItem } from '@/store/dashboards/state';
 import { deletersById, widgetById, widgetSizeById } from '@/store/features/getters';
@@ -210,7 +210,7 @@ export default class SparkPage extends Vue {
         if (!dashboard) {
           return;
         }
-        createDashboardItem(this.$store, { ...item, id, dashboard });
+        appendDashboardItem(this.$store, { ...item, id, dashboard });
         this.$q.notify({
           color: 'positive',
           icon: 'file_copy',

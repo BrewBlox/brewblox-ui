@@ -8,14 +8,14 @@ import { objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
 
 @Component
-export default class SensorPartCard extends PartCard {
+export default class ActuatorPartCard extends PartCard {
   serviceId: string | null = null;
   block: Block | null = null;
 
-  get supportedSensors() {
+  get supportedTypes() {
     return [
-      'TempSensorMock',
-      'TempSensorOneWire',
+      'ActuatorPin',
+      'ActuatorDS2413',
     ];
   }
 
@@ -29,18 +29,18 @@ export default class SensorPartCard extends PartCard {
     }
 
     return blockValues(this.$store, this.serviceId)
-      .filter(block => this.supportedSensors.includes(block.type))
+      .filter(block => this.supportedTypes.includes(block.type))
       .sort(objectStringSorter('id'));
   }
 
-  saveSensor() {
+  saveBlock() {
     const updatedSettings = this.block
       ? {
-        sensorServiceId: this.serviceId,
-        sensorLink: new Link(this.block.id, this.block.type),
+        actuatorServiceId: this.serviceId,
+        actuatorLink: new Link(this.block.id, this.block.type),
       }
       : {
-        sensorLink: null,
+        actuatorLink: null,
       };
 
     this.savePart({
@@ -53,9 +53,9 @@ export default class SensorPartCard extends PartCard {
   }
 
   mounted() {
-    this.serviceId = this.part.settings.sensorServiceId || null;
-    if (this.serviceId && this.part.settings.sensorLink) {
-      this.block = blocks(this.$store, this.serviceId as string)[this.part.settings.sensorLink.id];
+    this.serviceId = this.part.settings.actuatorServiceId || null;
+    if (this.serviceId && this.part.settings.actuatorLink) {
+      this.block = blocks(this.$store, this.serviceId as string)[this.part.settings.actuatorLink.id];
     }
   }
 }
@@ -82,7 +82,7 @@ export default class SensorPartCard extends PartCard {
           :options="blockOptions"
           dark
           options-dark
-          label="Sensor"
+          label="Actuator"
           option-label="id"
           option-value="id"
         >
@@ -100,7 +100,7 @@ export default class SensorPartCard extends PartCard {
     </q-item>
     <q-item dark>
       <q-item-section>
-        <q-btn label="Save" unelevated color="primary" @click="saveSensor"/>
+        <q-btn label="Save" unelevated color="primary" @click="saveBlock"/>
       </q-item-section>
     </q-item>
   </q-list>
