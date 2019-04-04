@@ -46,54 +46,53 @@ export default class DigitalConstraints extends Constraints {
 </script>
 
 <template>
-  <q-list separator dark>
-    <q-item v-for="(cinfo, idx) in constraints" :key="idx" dark>
-      <template v-if="readonly">
-        <q-item-section :class="{ limiting: cinfo.limiting }" side>{{ label(cinfo.key) }}</q-item-section>
-        <q-item-section>{{ cinfo.value | unit }}</q-item-section>
-      </template>
-      <template v-else>
-        <q-item-section side>
-          <SelectPopupEdit
-            :options="constraintOptions"
-            :field="cinfo.key"
-            :change="callAndSaveConstraints(k => constraints[idx] = createConstraint(k))"
-            clearable
-            label="Constraint type"
-            tag="span"
+  <div>
+    <q-item-label v-if="constraints.length !== 0 && readonly" caption>Constraints</q-item-label>
+    <q-list dark>
+      <q-item v-for="(cinfo, idx) in constraints" :key="idx" dark>
+        <template v-if="readonly">
+          <q-item-section :class="{ limiting: cinfo.limiting }" side>{{ label(cinfo.key) }}</q-item-section>
+          <q-item-section>{{ cinfo.value | unit }}</q-item-section>
+        </template>
+        <template v-else>
+          <q-item-section side>
+            <SelectPopupEdit
+              :options="constraintOptions"
+              :field="cinfo.key"
+              :change="callAndSaveConstraints(k => constraints[idx] = createConstraint(k))"
+              clearable
+              label="Constraint type"
+              tag="span"
+            />
+          </q-item-section>
+          <q-item-section>
+            <component
+              :is="fieldType(cinfo.key)"
+              :service-id="serviceId"
+              :field="cinfo.value"
+              :change="callAndSaveConstraints(v => cinfo.value = v)"
+              label="Constraint value"
+              type="number"
+              tag="span"
+            />
+          </q-item-section>
+          <q-item-section side>
+            <q-btn icon="delete" flat @click="removeConstraint(idx); saveConstraints();"/>
+          </q-item-section>
+        </template>
+      </q-item>
+      <q-item v-if="!readonly" dark>
+        <q-item-section side>Add constraint</q-item-section>
+        <q-item-section v-for="opt in constraintOptions" :key="opt.value">
+          <q-btn
+            :label="opt.label"
+            outline
+            @click="constraints.push(createConstraint(opt.value)); saveConstraints();"
           />
         </q-item-section>
-        <q-item-section>
-          <component
-            :is="fieldType(cinfo.key)"
-            :service-id="serviceId"
-            :field="cinfo.value"
-            :change="callAndSaveConstraints(v => cinfo.value = v)"
-            label="Constraint value"
-            type="number"
-            tag="span"
-          />
-        </q-item-section>
-        <q-item-section side>
-          <q-btn icon="delete" flat @click="removeConstraint(idx); saveConstraints();"/>
-        </q-item-section>
-      </template>
-    </q-item>
-    <q-item v-if="readonly && constraints.length === 0" dark>
-      <q-item-section>No Constraints</q-item-section>
-    </q-item>
-    <q-item v-if="!readonly" dark>
-      <q-item-section side>Add constraint</q-item-section>
-      <q-item-section v-for="opt in constraintOptions" :key="opt.value">
-        <q-btn
-          v-close-popup
-          :label="opt.label"
-          outline
-          @click="constraints.push(createConstraint(opt.value)); saveConstraints();"
-        />
-      </q-item-section>
-    </q-item>
-  </q-list>
+      </q-item>
+    </q-list>
+  </div>
 </template>
 
 <style scoped>

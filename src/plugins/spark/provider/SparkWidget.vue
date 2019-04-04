@@ -93,26 +93,32 @@ export default class SparkWidget extends Vue {
         </q-item-section>
       </q-item>
 
-      <q-list dense>
+      <q-list>
         <q-item dark>
-          <q-item-section>Device ID</q-item-section>
-          <q-item-section style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</q-item-section>
+          <q-item-section>
+            <q-item-label caption>Version</q-item-label>
+            <span>{{ sysInfo.data.version }}</span>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>IP address</q-item-label>
+            <span>{{ wifi.data.ip }}</span>
+          </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section>Time since boot</q-item-section>
-          <q-item-section>{{ ticks.data.millisSinceBoot | duration }}</q-item-section>
+          <q-item-section>
+            <q-item-label caption>Device time</q-item-label>
+            <span>{{ sysDate }}</span>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>Time since boot</q-item-label>
+            <span>{{ ticks.data.millisSinceBoot | duration }}</span>
+          </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section>Device time</q-item-section>
-          <q-item-section>{{ sysDate }}</q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Version</q-item-section>
-          <q-item-section>{{ sysInfo.data.version }}</q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>IP address</q-item-section>
-          <q-item-section>{{ wifi.data.ip }}</q-item-section>
+          <q-item-section>
+            <q-item-label caption>Device ID</q-item-label>
+            <span style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</span>
+          </q-item-section>
         </q-item>
       </q-list>
     </q-card-section>

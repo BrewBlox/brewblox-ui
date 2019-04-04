@@ -24,13 +24,13 @@ export default class MutexForm extends BlockForm {
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <q-item dark>
-          <q-item-section>Idle time before allowing a different actuator</q-item-section>
           <q-item-section>
+            <q-item-label caption>Idle time before allowing a different actuator</q-item-label>
             <TimeUnitPopupEdit
               :field="block.data.differentActuatorWait"
               :change="callAndSaveBlock(v => block.data.differentActuatorWait = v)"
               type="number"
-              label="minimum idle time"
+              label="Minimum idle time"
             />
           </q-item-section>
         </q-item>

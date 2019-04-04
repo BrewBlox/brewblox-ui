@@ -47,27 +47,21 @@ export default class ActuatorPinWidget extends BlockWidget {
 
     <q-card-section>
       <q-item dark>
-        <q-item-section>State</q-item-section>
-        <q-item-section>
+        <q-item-section style="justify-content: flex-start">
+          <q-item-label caption>State</q-item-label>
           <ActuatorState
             :field="block.data.state"
             :change="callAndSaveBlock(v => block.data.state = v)"
             :disable="isDriven"
           />
-        </q-item-section>
-      </q-item>
-      <q-item v-if="isDriven" dark>
-        <q-item-section>Driven</q-item-section>
-        <q-item-section>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
-      </q-item>
-      <q-item v-if="pending !== null" dark>
-        <q-item-section>Pending</q-item-section>
-        <q-item-section>{{ pending }}</q-item-section>
+        <q-item-section v-if="pending !== null" dark style="justify-content: flex-start">
+          <q-item-label caption>pending</q-item-label>
+          <span>{{ pending }}</span>
+        </q-item-section>
       </q-item>
       <q-item dark>
-        <q-item-label>Constraints</q-item-label>
         <q-item-section>
           <DigitalConstraints
             :service-id="serviceId"

@@ -25,8 +25,8 @@ export default class TempSensorMockForm extends BlockForm {
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <q-item dark>
-          <q-item-section>Value</q-item-section>
           <q-item-section>
+            <q-item-label caption>Value</q-item-label>
             <UnitPopupEdit
               :field="block.data.value"
               :disabled="!block.data.connected"
@@ -36,8 +36,8 @@ export default class TempSensorMockForm extends BlockForm {
           </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section>Connected</q-item-section>
           <q-item-section>
+            <q-item-label caption>Connected</q-item-label>
             <q-toggle
               :value="block.data.connected"
               @input="v => { block.data.connected = v; saveBlock(); }"

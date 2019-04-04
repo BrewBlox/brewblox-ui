@@ -44,23 +44,17 @@ export default class ActuatorPinForm extends BlockForm {
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <q-item dark>
-          <q-item-section>
-            <div class="column">
-              <span>State</span>
-              <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
-            </div>
-          </q-item-section>
-          <q-item-section>
+          <q-item-section style="justify-content: flex-start">
+            <q-item-label caption>State</q-item-label>
             <ActuatorState
               :disable="isDriven"
               :field="block.data.state"
               :change="callAndSaveBlock(v => block.data.state = v)"
             />
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section side>Inverted</q-item-section>
-          <q-item-section>
+          <q-item-section style="justify-content: flex-start">
+            <q-item-label caption>Inverted</q-item-label>
             <q-toggle
               :value="block.data.invert"
               @input="v => { block.data.invert = v; saveBlock(); }"

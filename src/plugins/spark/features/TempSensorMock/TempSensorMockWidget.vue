@@ -32,8 +32,8 @@ export default class TempSensorMockWidget extends BlockWidget {
 
     <q-card-section>
       <q-item dark>
-        <q-item-section>Value</q-item-section>
         <q-item-section>
+          <q-item-label caption>Value</q-item-label>
           <UnitPopupEdit
             :field="block.data.value"
             :disabled="!block.data.connected"
@@ -41,10 +41,8 @@ export default class TempSensorMockWidget extends BlockWidget {
             label="Value"
           />
         </q-item-section>
-      </q-item>
-      <q-item dark>
-        <q-item-section>Connected</q-item-section>
         <q-item-section>
+          <q-item-label caption>Connected</q-item-label>
           <q-toggle
             :value="block.data.connected"
             @input="v => { block.data.connected = v; saveBlock(); }"

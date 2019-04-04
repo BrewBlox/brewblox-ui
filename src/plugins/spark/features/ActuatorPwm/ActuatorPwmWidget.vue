@@ -61,36 +61,44 @@ export default class ActuatorPwmWidget extends BlockWidget {
 
       <q-item dark>
         <q-item-section>
-          <div class="column">
-            <span>Duty setting</span>
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          <q-item-label caption>Duty setting</q-item-label>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          <div>
+            <InputPopupEdit
+              v-if="!isDriven"
+              :field="block.data.setting"
+              :change="callAndSaveBlock(v => block.data.setting = v)"
+              style="display: inline-block"
+              type="number"
+              label="Duty Setting"
+            />
+            <big v-else>{{ block.data.setting | round }}</big>
+            <small
+              v-if="block.data.setting !== null"
+              style="display: inline-block"
+              class="q-ml-xs"
+            >%</small>
           </div>
         </q-item-section>
-        <q-item-section>
-          <InputPopupEdit
-            v-if="!isDriven"
-            :field="block.data.setting"
-            :change="callAndSaveBlock(v => block.data.setting = v)"
-            label="Setting"
-            type="number"
-          />
-          <big v-else>{{ block.data.setting | round }}</big>
+        <q-item-section style="justify-content: flex-start">
+          <q-item-label caption>Duty achieved</q-item-label>
+          <div>
+            <big>{{ block.data.value | round }}</big>
+            <small class="q-ml-xs">%</small>
+          </div>
         </q-item-section>
       </q-item>
-      <q-item dark>
-        <q-item-section>Duty achieved</q-item-section>
-        <q-item-section>
-          <big>{{ block.data.value | round }}</big>
-        </q-item-section>
-      </q-item>
+
       <q-item v-if="pending !== null" dark>
-        <q-item-section>Unconstrained setting</q-item-section>
         <q-item-section>
-          <big>{{ pending | round }}</big>
+          <q-item-label caption>Unconstrained setting</q-item-label>
+          <div>
+            <big>{{ pending | round }}</big>
+            <small class="q-ml-xs">%</small>
+          </div>
         </q-item-section>
       </q-item>
       <q-item dark>
-        <q-item-label>Constraints</q-item-label>
         <q-item-section>
           <AnalogConstraints
             :service-id="serviceId"

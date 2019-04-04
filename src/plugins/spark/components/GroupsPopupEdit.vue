@@ -18,7 +18,7 @@ import Component from 'vue-class-component';
     },
     tag: {
       type: String,
-      default: 'big',
+      default: 'span',
     },
   },
 })

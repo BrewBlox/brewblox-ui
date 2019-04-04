@@ -26,8 +26,8 @@ export default class SetpointSimpleForm extends BlockForm {
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <q-item dark>
-          <q-item-section side>Target</q-item-section>
-          <q-item-section>
+          <q-item-section style="justify-content: flex-start">
+            <q-item-label caption>Target</q-item-label>
             <UnitPopupEdit
               v-if="!isDriven"
               :class="{ darkened: block.data.setting.value === null }"
@@ -39,14 +39,11 @@ export default class SetpointSimpleForm extends BlockForm {
               v-else
               :class="{ darkened: block.data.setting.value === null }"
             >{{ block.data.setpoint | unit }}</big>
-          </q-item-section>
-          <q-item-section>
             <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section side>Enabled</q-item-section>
-          <q-item-section>
+
+          <q-item-section style="justify-content: flex-start">
+            <q-item-label caption>Enabled</q-item-label>
             <q-toggle
               :value="block.data.enabled"
               @input="v => { block.data.enabled = v; saveBlock(); }"

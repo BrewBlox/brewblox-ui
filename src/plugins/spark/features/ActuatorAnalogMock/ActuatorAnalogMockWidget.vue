@@ -35,31 +35,30 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
         <q-item-section>This Actuator is invalid</q-item-section>
       </q-item>
       <q-item dark>
-        <q-item-section>
-          <div class="column">
-            <span>Setting</span>
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+        <q-item-section style="justify-content: flex-start">
+          <q-item-label caption>Setting</q-item-label>
+          <div>
+            <InputPopupEdit
+              v-if="!isDriven"
+              :field="block.data.setting"
+              :change="callAndSaveBlock(v => block.data.setting = v)"
+              type="number"
+              label="Setting"
+            />
+            <UnitField
+              v-else
+              :field="block.data.setting"
+              :class="{ darkened: block.data.setting.value === null }"
+            />
           </div>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
-        <q-item-section>
-          <InputPopupEdit
-            v-if="!isDriven"
-            :field="block.data.setting"
-            :change="callAndSaveBlock(v => block.data.setting = v)"
-            type="number"
-            label="Setting"
-          />
-          <big v-else>{{ block.data.setting | unit }}</big>
-        </q-item-section>
-      </q-item>
-      <q-item dark>
-        <q-item-section>Value</q-item-section>
-        <q-item-section>
+        <q-item-section style="justify-content: flex-start">
+          <q-item-label caption>Value</q-item-label>
           <big>{{ block.data.value | round }}</big>
         </q-item-section>
       </q-item>
       <q-item dark>
-        <q-item-label>Constraints</q-item-label>
         <q-item-section>
           <AnalogConstraints
             :service-id="serviceId"

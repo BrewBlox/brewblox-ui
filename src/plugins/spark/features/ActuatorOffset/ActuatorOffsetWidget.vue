@@ -59,31 +59,25 @@ export default class ActuatorOffsetWidget extends BlockWidget {
       </q-item>
 
       <q-item dark>
-        <q-item-section>Target offset</q-item-section>
-        <q-item-section>
+        <q-item-section style="justify-content: flex-start">
+          <q-item-label caption>Target offset</q-item-label>
           <big>{{ block.data.setting | round }}</big>
-        </q-item-section>
-      </q-item>
-      <q-item v-if="isDriven">
-        <q-item-section>Driven</q-item-section>
-        <q-item-section>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
-      </q-item>
-      <q-item dark>
-        <q-item-section>Actual offset</q-item-section>
-        <q-item-section>
+        <q-item-section style="justify-content: flex-start">
+          <q-item-label caption>Actual offset</q-item-label>
           <big>{{ block.data.value | round }}</big>
         </q-item-section>
       </q-item>
       <q-item dark>
-        <q-item-label>Constraints</q-item-label>
-        <AnalogConstraints
-          :service-id="serviceId"
-          :field="block.data.constrainedBy"
-          :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
-          readonly
-        />
+        <q-item-section>
+          <AnalogConstraints
+            :service-id="serviceId"
+            :field="block.data.constrainedBy"
+            :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+            readonly
+          />
+        </q-item-section>
       </q-item>
     </q-card-section>
   </q-card>

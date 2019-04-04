@@ -255,20 +255,30 @@ export default class SparkForm extends Vue {
     <q-card-section>
       <q-expansion-item group="modal" icon="info" label="System Info">
         <q-item dark>
-          <q-item-section>Device ID</q-item-section>
-          <q-item-section>{{ sysInfo.data.deviceId }}</q-item-section>
+          <q-item-section>
+            <q-item-label caption>Version</q-item-label>
+            <span>{{ sysInfo.data.version }}</span>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>IP address</q-item-label>
+            <span>{{ wifi.data.ip }}</span>
+          </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section>Time since boot</q-item-section>
-          <q-item-section>{{ ticks.data.millisSinceBoot | duration }}</q-item-section>
+          <q-item-section>
+            <q-item-label caption>Device time</q-item-label>
+            <span>{{ sysDate }}</span>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>Time since boot</q-item-label>
+            <span>{{ ticks.data.millisSinceBoot | duration }}</span>
+          </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section>Device time</q-item-section>
-          <q-item-section>{{ sysDate }}</q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Version</q-item-section>
-          <q-item-section>{{ sysInfo.data.version }}</q-item-section>
+          <q-item-section>
+            <q-item-label caption>Device ID</q-item-label>
+            <span style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</span>
+          </q-item-section>
         </q-item>
       </q-expansion-item>
 
@@ -281,32 +291,28 @@ export default class SparkForm extends Vue {
           />
         </q-dialog>
         <q-item dark>
-          <q-item-section>Network</q-item-section>
           <q-item-section>
-            <big
+            <q-item-label caption>Network</q-item-label>
+            <span
               class="editable"
               @click="wifiModal = true"
-            >{{ wifi.data.ssid || 'click to connect' }}</big>
+            >{{ wifi.data.ssid || 'click to connect' }}</span>
           </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Signal strength</q-item-section>
           <q-item-section>
-            <big>{{ signalPct }}%</big>
+            <q-item-label caption>IP address</q-item-label>
+            <span>{{ wifi.data.ip }}</span>
           </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>IP address</q-item-section>
           <q-item-section>
-            <big>{{ wifi.data.ip }}</big>
+            <q-item-label caption>Signal strength</q-item-label>
+            <span>{{ signalPct }}%</span>
           </q-item-section>
         </q-item>
       </q-expansion-item>
 
       <q-expansion-item group="modal" icon="mdi-checkbox-multiple-marked" label="Groups">
         <q-item dark>
-          <q-item-section>Active groups</q-item-section>
           <q-item-section>
+            <q-item-label caption>Active groups</q-item-label>
             <GroupsPopupEdit
               :field="groups.data.active"
               :service-id="service.id"
@@ -314,58 +320,60 @@ export default class SparkForm extends Vue {
             />
           </q-item-section>
         </q-item>
-        <q-item dark>
-          <q-item-section side>Group names</q-item-section>
-          <q-item-section>
-            <q-item v-for="(name, idx) in groupNames" :key="idx" dark>
-              <q-item-section>{{ `Group ${idx + 1}` }}</q-item-section>
-              <q-item-section>
-                <InputPopupEdit
-                  :field="name"
-                  :change="v => { groupNames[idx] = v; saveGroupNames(); }"
-                  label="Group"
-                />
-              </q-item-section>
-            </q-item>
-          </q-item-section>
-        </q-item>
+
+        <div class="row">
+          <q-item v-for="(name, idx) in groupNames" :key="idx" dark class="col-4">
+            <q-item-section>
+              <q-item-label caption>{{ `Group ${idx + 1} name` }}</q-item-label>
+              <InputPopupEdit
+                :field="name"
+                :change="v => { groupNames[idx] = v; saveGroupNames(); }"
+                label="Group"
+                tag="span"
+              />
+            </q-item-section>
+          </q-item>
+        </div>
       </q-expansion-item>
 
       <q-expansion-item group="modal" icon="mdi-temperature-celsius" label="Units">
         <q-item dark>
-          <q-item-section side>Unit preferences</q-item-section>
-          <q-item-section>
-            <q-item v-for="(val, name) in units" :key="name" dark>
-              <q-item-section>{{ spaceCased(name) }}</q-item-section>
-              <q-item-section>
-                <SelectPopupEdit
-                  :field="val"
-                  :change="v => { units[name] = v; saveUnits(); }"
-                  :options="unitAlternativeOptions(name)"
-                  label="Preferred unit"
-                />
-              </q-item-section>
-            </q-item>
+          <q-item-section v-for="(val, name) in units" :key="name">
+            <q-item-label caption>{{ `${spaceCased(name)} unit` }}</q-item-label>
+            <SelectPopupEdit
+              :field="val"
+              :change="v => { units[name] = v; saveUnits(); }"
+              :options="unitAlternativeOptions(name)"
+              :label="`Preferred ${spaceCased(name)} unit`"
+              tag="span"
+            />
           </q-item-section>
         </q-item>
       </q-expansion-item>
 
-      <q-expansion-item group="modal" icon="mdi-magnify-plus-outline" label="Discovered Blocks">
+      <q-expansion-item
+        group="modal"
+        icon="mdi-magnify-plus-outline"
+        label="Discover new OneWire Blocks"
+      >
+        <q-item v-if="discoveredBlocks.length !== 0" dark dense>
+          <q-item-label caption>Recently discovered:</q-item-label>
+        </q-item>
+        <q-item v-for="id in discoveredBlocks" :key="id" :inset-level="1" dense dark>
+          <q-item-section>{{ id }}</q-item-section>
+        </q-item>
         <q-item dark>
           <q-item-section>
-            <q-btn outline label="Refresh" @click="fetchDiscoveredBlocks"/>
+            <q-btn outline label="Search for new devices" @click="fetchDiscoveredBlocks"/>
           </q-item-section>
           <q-item-section>
             <q-btn
               :disable="!discoveredBlocks.length"
               outline
-              label="Clear"
+              label="Clear recent"
               @click="clearDiscoveredBlocks"
             />
           </q-item-section>
-        </q-item>
-        <q-item v-for="id in discoveredBlocks" :key="id" :inset-level="1" dark>
-          <q-item-section>{{ id }}</q-item-section>
         </q-item>
       </q-expansion-item>
 

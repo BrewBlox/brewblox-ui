@@ -114,7 +114,7 @@ export default class GraphDisplay extends Vue {
   fill: rgba(255, 255, 255, 1);
 }
 
-/deep .xy2 {
+/deep/ .xy2 {
   color: green;
 }
 </style>

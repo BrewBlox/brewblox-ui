@@ -177,8 +177,8 @@ export default class SessionViewForm extends FormBase {
           </q-item>
           <q-separator dark/>
           <q-item dark>
-            <q-item-section>Session name</q-item-section>
             <q-item-section>
+              <q-item-label caption>Session name</q-item-label>
               <InputPopupEdit
                 :field="session.name"
                 :change="v => { session.name = v; updateSession(session); }"
@@ -186,10 +186,16 @@ export default class SessionViewForm extends FormBase {
                 tag="span"
               />
             </q-item-section>
+            <q-item-section>
+              <q-item-label caption>Duration</q-item-label>
+              <span v-if="session.start && session.end">{{ sessionDuration(session) }}</span>
+              <span v-else-if="session.start">In progress...</span>
+              <span v-else>Not yet started</span>
+            </q-item-section>
           </q-item>
           <q-item dark>
-            <q-item-section>Start</q-item-section>
             <q-item-section>
+              <q-item-label caption>Start</q-item-label>
               <DatetimePopupEdit
                 :field="session.start"
                 :change="v => startSession(session, v)"
@@ -199,10 +205,9 @@ export default class SessionViewForm extends FormBase {
                 clear-label="<click to start>"
               />
             </q-item-section>
-          </q-item>
-          <q-item dark>
-            <q-item-section>End</q-item-section>
+
             <q-item-section>
+              <q-item-label caption>End</q-item-label>
               <DatetimePopupEdit
                 :field="session.end"
                 :change="v => endSession(session, v)"
@@ -212,12 +217,6 @@ export default class SessionViewForm extends FormBase {
                 clear-label="<click to end>"
               />
             </q-item-section>
-          </q-item>
-          <q-item dark>
-            <q-item-section>Duration</q-item-section>
-            <q-item-section v-if="session.start && session.end">{{ sessionDuration(session) }}</q-item-section>
-            <q-item-section v-else-if="session.start">In progress...</q-item-section>
-            <q-item-section v-else>Not yet started</q-item-section>
           </q-item>
 
           <q-expansion-item group="sub-modal" icon="mdi-file-tree" label="Fields">

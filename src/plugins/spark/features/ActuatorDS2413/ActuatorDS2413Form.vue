@@ -53,49 +53,42 @@ export default class ActuatorDS2413Form extends BlockForm {
 <template>
   <q-card dark class="widget-modal">
     <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
-
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <q-item dark>
-          <q-item-section>DS2413 Block</q-item-section>
           <q-item-section>
+            <q-item-label caption>DS2413 target Block</q-item-label>
             <LinkPopupEdit
               :field="block.data.hwDevice"
               :service-id="serviceId"
               :change="callAndSaveBlock(v => block.data.hwDevice = v)"
               label="DS2413 Block"
+              tag="span"
             />
           </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>DS2413 Channel</q-item-section>
           <q-item-section>
+            <q-item-label caption>DS2413 Channel</q-item-label>
             <SelectPopupEdit
               :field="block.data.channel"
               :options="channelOpts"
               :change="callAndSaveBlock(v => block.data.channel = v)"
               label="DS2413 Channel"
+              tag="span"
             />
           </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section>
-            <div class="column">
-              <span>State</span>
-              <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
-            </div>
-          </q-item-section>
-          <q-item-section>
+          <q-item-section style="justify-content: flex-start">
+            <q-item-label caption>State</q-item-label>
             <ActuatorState
               :disable="isDriven"
               :field="block.data.state"
               :change="callAndSaveBlock(v => block.data.state = v)"
             />
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Invert</q-item-section>
-          <q-item-section>
+          <q-item-section style="justify-content: flex-start">
+            <q-item-label caption>Invert</q-item-label>
             <q-toggle
               :value="block.data.invert"
               @input="v => { block.data.invert = v; saveBlock(); }"
