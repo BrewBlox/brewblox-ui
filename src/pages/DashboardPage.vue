@@ -235,28 +235,13 @@ export default class DashboardPage extends Vue {
       <q-spinner size="50px" color="primary"/>
     </q-inner-loading>
     <div v-else>
-      <portal to="toolbar-title">
-        <div :class="widgetEditable ? 'editable': ''">
-          <span>{{ dashboard.title }}</span>
-          <q-popup-edit
-            :disable="!widgetEditable"
-            v-model="dashboard.title"
-            title="Set dashboard title to:"
-            @save="onChangeDashboardTitle"
-          >
-            <q-input v-model="dashboard.title"/>
-          </q-popup-edit>
-        </div>
-      </portal>
+      <portal to="toolbar-title">{{ dashboard.title }}</portal>
       <portal to="toolbar-buttons">
+        <q-toggle v-model="widgetEditable" checked-icon="mdi-lock-open" unchecked-icon="mdi-lock">
+          <q-tooltip>{{ widgetEditable ? 'Lock widgets' : 'Move widgets' }}</q-tooltip>
+        </q-toggle>
         <q-btn-dropdown color="primary" label="actions">
           <q-list dark>
-            <q-item clickable @click="widgetEditable = !widgetEditable">
-              <q-item-section avatar>
-                <q-icon :name="widgetEditable ? 'mdi-pencil-off' : 'mdi-pencil'"/>
-              </q-item-section>
-              <q-item-section>{{ widgetEditable ? 'Stop editing' : 'Edit Dashboard' }}</q-item-section>
-            </q-item>
             <q-item clickable @click="() => wizardModalOpen = true">
               <q-item-section avatar>
                 <q-icon name="add"/>
