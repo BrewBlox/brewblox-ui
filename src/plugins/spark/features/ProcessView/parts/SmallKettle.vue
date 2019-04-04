@@ -13,7 +13,15 @@ export default class SmallKettle extends PartComponent {
       <text x="10" y="30">50L</text>
     </g>
     <g class="outline">
-      <rect width="100" height="100" rx="8" ry="8" stroke-width="4px"/>
+      <rect
+        :width="SQUARE_SIZE*2-4"
+        :height="SQUARE_SIZE*2-4"
+        x="2"
+        y="2"
+        rx="8"
+        ry="8"
+        stroke-width="4px"
+      />
     </g>
   </g>
 </template>

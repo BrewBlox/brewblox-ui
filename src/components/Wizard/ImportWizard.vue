@@ -2,6 +2,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { uid } from 'quasar';
+import get from 'lodash/get';
 import { displayNameById } from '@/store/features/getters';
 import { dashboardValues, primaryDashboardId } from '@/store/dashboards/getters';
 import { appendDashboardItem } from '@/store/dashboards/actions';
@@ -17,6 +18,7 @@ import { deserialize } from '@/helpers/units/parseObject';
 })
 export default class ImportWizard extends Vue {
   $q: any;
+  reader: FileReader = new FileReader();
   serializedWidget: string = '';
 
   localChosenDashboardId: string = '';
@@ -67,8 +69,18 @@ export default class ImportWizard extends Vue {
     this.$emit('back');
   }
 
+  handleFileSelect(evt) {
+    const file = evt.target.files[0];
+    if (file) {
+      this.reader.readAsText(file);
+    } else {
+      this.serializedWidget = '';
+    }
+  }
+
   mounted() {
     this.$emit('title', 'Import wizard');
+    this.reader.onload = e => this.serializedWidget = get(e, 'target.result', '');
   }
 }
 </script>
@@ -83,12 +95,7 @@ export default class ImportWizard extends Vue {
         </q-item-section>
       </q-item>
       <q-item dark>
-        <textarea
-          v-model="serializedWidget"
-          placeholder="Paste your export string here"
-          class="full-width"
-          style="min-height: 200px"
-        />
+        <input type="file" @change="handleFileSelect">
       </q-item>
     </q-card-section>
 
