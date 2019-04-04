@@ -30,12 +30,12 @@ export default class ActuatorDS2413Widget extends BlockWidget {
       <q-item dark>
         <q-item-section>
           <q-item-label caption>State</q-item-label>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           <ActuatorState
             :field="block.data.state"
             :change="callAndSaveBlock(v => block.data.state = v)"
             :disable="isDriven"
           />
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
       </q-item>
       <q-item dark>

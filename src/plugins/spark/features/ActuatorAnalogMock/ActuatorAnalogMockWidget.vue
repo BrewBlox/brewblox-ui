@@ -35,9 +35,8 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
         <q-item-section>This Actuator is invalid</q-item-section>
       </q-item>
       <q-item dark>
-        <q-item-section>
+        <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Setting</q-item-label>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           <div>
             <InputPopupEdit
               v-if="!isDriven"
@@ -52,8 +51,9 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
               :class="{ darkened: block.data.setting.value === null }"
             />
           </div>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
-        <q-item-section>
+        <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Value</q-item-label>
           <big>{{ block.data.value | round }}</big>
         </q-item-section>

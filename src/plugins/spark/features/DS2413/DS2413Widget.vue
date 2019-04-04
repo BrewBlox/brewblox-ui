@@ -35,15 +35,15 @@ export default class DS2413Widget extends BlockWidget {
 
     <q-card-section>
       <q-item dark>
-        <q-item-section>
+        <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Latches</q-item-label>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           <div>
             <q-toggle :value="pinState.latchA" class="col-6" readonly label="Latch A"/>
             <q-toggle :value="pinState.latchB" class="col-6" readonly label="Latch B"/>
           </div>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
-        <q-item-section style="justify-content: space-between">
+        <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Sensing</q-item-label>
           <div>
             <q-toggle :value="pinState.senseA" class="col-6" readonly label="Sense A"/>

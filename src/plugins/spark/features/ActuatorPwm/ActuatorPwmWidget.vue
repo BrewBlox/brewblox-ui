@@ -80,7 +80,7 @@ export default class ActuatorPwmWidget extends BlockWidget {
             >%</small>
           </div>
         </q-item-section>
-        <q-item-section style="justify-content: space-between">
+        <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Duty achieved</q-item-label>
           <div>
             <big>{{ block.data.value | round }}</big>

@@ -28,9 +28,8 @@ export default class ActuatorAnalogMockForm extends BlockForm {
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <q-item dark>
-          <q-item-section style="justify-content: space-between">
+          <q-item-section style="justify-content: flex-start">
             <q-item-label caption>Setting</q-item-label>
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
             <InputPopupEdit
               v-if="!isDriven"
               :field="block.data.setting"
@@ -39,8 +38,9 @@ export default class ActuatorAnalogMockForm extends BlockForm {
               label="target"
             />
             <big v-else>{{ block.data.setting | unit }}</big>
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>
-          <q-item-section style="justify-content: space-between">
+          <q-item-section style="justify-content: flex-start">
             <q-item-label caption>Clip to min</q-item-label>
             <InputPopupEdit
               :field="block.data.minSetting"
@@ -49,7 +49,7 @@ export default class ActuatorAnalogMockForm extends BlockForm {
               label="Setting min"
             />
           </q-item-section>
-          <q-item-section style="justify-content: space-between">
+          <q-item-section style="justify-content: flex-start">
             <q-item-label caption>Clip to max</q-item-label>
             <InputPopupEdit
               :field="block.data.maxSetting"

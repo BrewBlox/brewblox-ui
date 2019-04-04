@@ -148,17 +148,8 @@ export default class SetpointProfileForm extends BlockForm {
     <q-card-section>
       <q-expansion-item group="modal" icon="settings" label="Settings">
         <q-item dark>
-          <q-item-section>Enabled</q-item-section>
           <q-item-section>
-            <q-toggle
-              :value="block.data.enabled"
-              @input="v => { block.data.enabled = v; saveBlock(); }"
-            />
-          </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Current setting</q-item-section>
-          <q-item-section>
+            <q-item-label caption>Current setting</q-item-label>
             <big>{{ block.data.setting | unit }}</big>
           </q-item-section>
         </q-item>

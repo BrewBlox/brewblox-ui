@@ -29,12 +29,7 @@ export default class SetpointSensorPairForm extends BlockForm {
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <q-item dark>
           <q-item-section>
-            <div class="column">
-              <span>Setpoint</span>
-              <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
-            </div>
-          </q-item-section>
-          <q-item-section>
+            <q-item-label caption>Setpoint</q-item-label>
             <LinkPopupEdit
               :field="block.data.setpointId"
               :service-id="serviceId"
@@ -42,10 +37,8 @@ export default class SetpointSensorPairForm extends BlockForm {
               label="Setpoint"
             />
           </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Sensor</q-item-section>
           <q-item-section>
+            <q-item-label caption>Sensor</q-item-label>
             <LinkPopupEdit
               :field="block.data.sensorId"
               :service-id="serviceId"

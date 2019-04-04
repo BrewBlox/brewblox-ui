@@ -33,46 +33,42 @@ export default class ActuatorOffsetForm extends BlockForm {
           :text-disabled="`Offset is disabled: ${block.data.targetId} will not be changed.`"
         />
         <q-item dark>
-          <q-item-section>Driven Process value</q-item-section>
           <q-item-section>
+            <q-item-label caption>Driven block</q-item-label>
             <LinkPopupEdit
               :field="block.data.targetId"
               :service-id="block.serviceId"
               :change="callAndSaveBlock(v => block.data.targetId = v)"
-              label="Driven process value"
+              label="Driven block"
+              tag="span"
             />
           </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Reference process value</q-item-section>
           <q-item-section>
-            <LinkPopupEdit
-              :field="block.data.referenceId"
-              :service-id="block.serviceId"
-              :change="callAndSaveBlock(v => block.data.referenceId = v)"
-              label="Reference process value"
-            />
-          </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Offset from setting or current value</q-item-section>
-          <q-item-section>
-            <SelectPopupEdit
-              :field="block.data.referenceSettingOrValue"
-              :change="callAndSaveBlock(v => block.data.referenceSettingOrValue = v)"
-              :options="[{label: 'Setting', value: 0}, {label: 'Measured value', value: 1}]"
-              label="reference field"
-            />
-          </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>
-            <div class="column">
-              <span>Target Offset</span>
-              <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+            <q-item-label caption>Offset from</q-item-label>
+            <div>
+              <LinkPopupEdit
+                :field="block.data.referenceId"
+                :service-id="block.serviceId"
+                :change="callAndSaveBlock(v => block.data.referenceId = v)"
+                label="Reference block"
+                tag="span"
+                style="display: inline-block"
+              />
+              <span class="q-px-xs">&gt;</span>
+              <SelectPopupEdit
+                :field="block.data.referenceSettingOrValue"
+                :change="callAndSaveBlock(v => block.data.referenceSettingOrValue = v)"
+                :options="[{label: 'Setting', value: 0}, {label: 'Measured value', value: 1}]"
+                label="reference field"
+                tag="span"
+                style="display: inline-block"
+              />
             </div>
           </q-item-section>
-          <q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section style="justify-content: flex-start">
+            <q-item-label caption>Target Offset</q-item-label>
             <InputPopupEdit
               v-if="!isDriven"
               :field="block.data.setting"
@@ -81,11 +77,10 @@ export default class ActuatorOffsetForm extends BlockForm {
               type="number"
             />
             <big v-else>{{ block.data.setting | round }}</big>
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>Current offset</q-item-section>
-          <q-item-section>
+          <q-item-section style="justify-content: flex-start">
+            <q-item-label caption>Current offset</q-item-label>
             <big>{{ block.data.value | round }}</big>
           </q-item-section>
         </q-item>

@@ -33,12 +33,12 @@ export default class SetpointSensorPairWidget extends BlockWidget {
 
     <q-card-section>
       <q-item dark>
-        <q-item-section>
+        <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Setpoint</q-item-label>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           <UnitField :field="block.data.setpointValue"/>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
-        <q-item-section style="justify-content: space-between">
+        <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Sensor</q-item-label>
           <UnitField :field="block.data.sensorValue"/>
         </q-item-section>
