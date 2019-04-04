@@ -37,6 +37,7 @@ export default class ActuatorValve extends PartComponent {
         'm0,25h19',
         'm31,25h50',
       ],
+      arrows: 'M0,25H50',
     };
   }
 
@@ -74,10 +75,8 @@ export default class ActuatorValve extends PartComponent {
           return 90;
         case 1:
           return 0;
-        case 2:
-          return 45;
         default:
-          return 90;
+          return 45;
       }
     }
     return this.closed ? 90 : 0;
@@ -86,10 +85,10 @@ export default class ActuatorValve extends PartComponent {
   @Watch('actuatorBlock', { immediate: true, deep: true })
   updateClosed() {
     const closed = !!this.actuatorBlock
-      ? this.actuatorBlock.data.state === 0
+      ? this.actuatorBlock.data.state !== 1
       : true;
 
-    if (closed !== this.closed) {
+    if (closed !== this.part.settings.closed) {
       this.$parent.$emit('input', { ...this.part, settings: { ...this.part.settings, closed } });
     }
   }
@@ -127,7 +126,7 @@ export default class ActuatorValve extends PartComponent {
         <path :d="paths.powerIcon"/>
       </g>
     </g>
-    <AnimatedArrows key="valve-arrows" :speed="flowSpeed" :path="paths.closedLiquid[0]"/>
+    <AnimatedArrows key="valve-arrows" :speed="flowSpeed" :path="paths.arrows"/>
   </g>
 </template>
 

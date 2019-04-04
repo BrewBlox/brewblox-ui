@@ -23,6 +23,7 @@ export default class Valve extends PartComponent {
         'm0,25h19',
         'm31,25h50',
       ],
+      arrows: 'M0,25H50',
     };
   }
 
@@ -60,6 +61,6 @@ export default class Valve extends PartComponent {
       <path :d="paths.innerValve[0]"/>
       <path :d="paths.innerValve[1]"/>
     </g>
-    <AnimatedArrows key="valve-arrows" :speed="flowSpeed" :path="paths.closedLiquid[0]"/>
+    <AnimatedArrows key="valve-arrows" :speed="flowSpeed" :path="paths.arrows"/>
   </g>
 </template>
