@@ -42,7 +42,6 @@ interface ValidatedItem {
 })
 export default class SparkPage extends Vue {
   $q: any;
-  widgetEditable: boolean = false;
   modalOpen: boolean = false;
   relationsModalOpen: boolean = false;
   modalSettings: ModalSettings | null = null;
@@ -248,12 +247,6 @@ export default class SparkPage extends Vue {
       <portal to="toolbar-buttons">
         <q-btn-dropdown color="primary" label="actions">
           <q-list dark link>
-            <q-item dark clickable @click="widgetEditable = !widgetEditable">
-              <q-item-section avatar>
-                <q-icon :name="widgetEditable ? 'mdi-pencil-off' : 'mdi-pencil'"/>
-              </q-item-section>
-              <q-item-section>{{ widgetEditable ? 'Stop editing' : 'Edit Dashboard' }}</q-item-section>
-            </q-item>
             <q-item v-close-popup dark clickable @click="relationsModalOpen = true">
               <q-item-section avatar>
                 <q-icon name="mdi-ray-start-arrow"/>
@@ -293,7 +286,6 @@ export default class SparkPage extends Vue {
           <q-item-section>
             <Troubleshooter
               :id="$props.serviceId"
-              :disabled="widgetEditable"
               :config="{serviceId: $props.serviceId}"
               :cols="4"
               :rows="4"
@@ -309,7 +301,6 @@ export default class SparkPage extends Vue {
             <SparkWidget
               v-if="isReady"
               :id="$props.serviceId"
-              :disabled="widgetEditable"
               :service-id="$props.serviceId"
               :cols="widgetSize.cols"
               :rows="widgetSize.rows"
@@ -319,20 +310,14 @@ export default class SparkPage extends Vue {
         </q-item>
         <q-item v-for="val in validatedItems" :key="val.key" dark>
           <q-item-section>
-            <component
-              :is="val.component"
-              :disabled="widgetEditable"
-              v-bind="val.props"
-              class="dashboard-item"
-            />
+            <component :is="val.component" v-bind="val.props" class="dashboard-item"/>
           </q-item-section>
         </q-item>
       </q-list>
-      <GridContainer v-else :editable="widgetEditable" no-move>
+      <GridContainer v-else no-move>
         <SparkWidget
           v-if="isReady"
           :id="$props.serviceId"
-          :disabled="widgetEditable"
           :service-id="$props.serviceId"
           :cols="widgetSize.cols"
           :rows="widgetSize.rows"
@@ -341,7 +326,6 @@ export default class SparkPage extends Vue {
         <component
           v-for="val in validatedItems"
           :is="val.component"
-          :disabled="widgetEditable"
           :key="val.key"
           v-bind="val.props"
           class="dashboard-item"
