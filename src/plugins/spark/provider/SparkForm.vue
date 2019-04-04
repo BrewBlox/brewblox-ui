@@ -1,6 +1,9 @@
 <script lang="ts">
 import { spaceCased } from '@/helpers/functional';
+import { serialize, deserialize } from '@/helpers/units/parseObject';
 import { Block, UserUnits } from '@/plugins/spark/state';
+import FileSaver from 'file-saver';
+import get from 'lodash/get';
 import {
   saveBlock,
   saveUnits,
@@ -11,6 +14,9 @@ import {
   applySavepoint,
   removeSavepoint,
   fetchAll,
+  fetchStored,
+  resetStored,
+  clearBlocks,
 } from '@/plugins/spark/store/actions';
 import {
   groupNames,
@@ -54,6 +60,9 @@ export default class SparkForm extends Vue {
   $q: any;
   wifiModal: boolean = false;
   savepointInput: string = '';
+  reader: FileReader = new FileReader();
+  serializedBlocks: string = '';
+  importBusy: boolean = false;
 
   sysBlock<T extends Block>(blockType: string) {
     return blockValues(this.$store, this.service.id)
@@ -157,7 +166,83 @@ export default class SparkForm extends Vue {
     removeSavepoint(this.$store, this.service.id, point);
   }
 
+  async exportBlocks() {
+    const stored = await fetchStored(this.$store, this.service);
+    const data = JSON.stringify(serialize(stored));
+    const blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
+    FileSaver.saveAs(blob, `brewblox-blocks-${this.service.id}.json`);
+  }
+
+  handleImportFileSelect(evt) {
+    const file = evt.target.files[0];
+    if (file) {
+      this.reader.readAsText(file);
+    } else {
+      this.serializedBlocks = '';
+    }
+  }
+
+  startImportBlocks() {
+    this.$q.dialog({
+      title: 'Reset Blocks',
+      message: 'This will remove all Blocks, and import new ones from file. Are you sure?',
+      noBackdropDismiss: true,
+      cancel: true,
+    })
+      .onOk(async () => this.importBlocks());
+  }
+
+  async importBlocks() {
+    try {
+      this.importBusy = true;
+      const blocks = deserialize(JSON.parse(this.serializedBlocks));
+      await resetStored(this.$store, this.service, blocks);
+      this.$q.notify({
+        icon: 'mdi-check-all',
+        color: 'positive',
+        message: 'Imported Blocks',
+      });
+    } catch (e) {
+      this.$q.notify({
+        icon: 'error',
+        color: 'negative',
+        message: `Failed to import blocks: ${e.toString()}`,
+      });
+    }
+    this.importBusy = false;
+  }
+
+  startClearBlocks() {
+    this.$q.dialog({
+      title: 'Reset Blocks',
+      message: 'This will remove all Blocks. Are you sure?',
+      noBackdropDismiss: true,
+      cancel: true,
+    })
+      .onOk(async () => this.clearBlocks());
+  }
+
+  async clearBlocks() {
+    try {
+      this.importBusy = true;
+      await clearBlocks(this.$store, this.service);
+      this.$q.notify({
+        icon: 'mdi-check-all',
+        color: 'positive',
+        message: 'Removed all Blocks',
+      });
+    } catch (e) {
+      this.$q.notify({
+        icon: 'error',
+        color: 'negative',
+        message: `Failed to remove Blocks: ${e.toString()}`,
+      });
+    }
+    this.importBusy = false;
+  }
+
   mounted() {
+    this.reader.onload = e => this.serializedBlocks = get(e, 'target.result', '');
     fetchAll(this.$store, this.service);
   }
 }
@@ -316,6 +401,40 @@ export default class SparkForm extends Vue {
               label="Create"
               @click="() => { writeSavepoint(savepointInput); savepointInput = ''; }"
             />
+          </q-item-section>
+        </q-item>
+      </q-expansion-item>
+
+      <q-expansion-item group="modal" icon="mdi-file-export" label="Import/Export Blocks">
+        <q-item dark>
+          <q-item-section>
+            <input type="file" @change="handleImportFileSelect">
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>
+            <q-btn
+              :disable="!serializedBlocks"
+              :loading="importBusy"
+              outline
+              label="Load Blocks from file"
+              @click="startImportBlocks"
+            />
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>
+            <q-btn
+              :loading="importBusy"
+              outline
+              label="Remove all Blocks"
+              @click="startClearBlocks"
+            />
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>
+            <q-btn :loading="importBusy" outline label="Export Blocks" @click="exportBlocks"/>
           </q-item-section>
         </q-item>
       </q-expansion-item>
