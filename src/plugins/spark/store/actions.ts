@@ -5,7 +5,7 @@ import { saveService } from '@/store/services/actions';
 import { Service } from '@/store/services/state';
 import { RootState, RootStore } from '@/store/state';
 import { ActionTree } from 'vuex';
-import { Block, UserUnits } from '../state';
+import { Block, UserUnits, DataBlock } from '../state';
 import {
   clearBlocks as clearBlocksInApi,
   createBlock as createBlockInApi,
@@ -26,6 +26,8 @@ import {
   writeSavepoint as writeSavepointInApi,
   applySavepoint as applySavepointInApi,
   removeSavepoint as removeSavepointInApi,
+  fetchStored as fetchStoredInApi,
+  resetStored as resetStoredInApi,
 } from './api';
 import {
   blockIds,
@@ -182,4 +184,15 @@ export const removeSavepoint =
   async (store: RootStore, serviceId: string, savepointId: string): Promise<void> => {
     await removeSavepointInApi(serviceId, savepointId);
     await fetchSavepoints(store, serviceId);
+  };
+
+export const fetchStored =
+  async (store: RootStore, service: Service): Promise<DataBlock[]> =>
+    fetchStoredInApi(service.id);
+
+export const resetStored =
+  async (store: RootStore, service: Service, blocks: DataBlock[]): Promise<DataBlock[]> => {
+    const dataBlocks = await resetStoredInApi(service.id, blocks);
+    await fetchBlocks(store, service.id);
+    return dataBlocks;
   };

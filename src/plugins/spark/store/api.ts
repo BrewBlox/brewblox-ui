@@ -140,3 +140,11 @@ export const fetchSystemStatus = async (serviceId: string): Promise<SystemStatus
       synchronized: false,
       checkedAt: new Date(),
     }));
+
+export const fetchStored = async (serviceId: string): Promise<DataBlock[]> =>
+  get(`/${encodeURIComponent(serviceId)}/stored_objects`)
+    .catch(intercept(`Failed to fetch stored blocks from ${serviceId}`));
+
+export const resetStored = async (serviceId: string, blocks: DataBlock[]): Promise<DataBlock[]> =>
+  post(`/${encodeURIComponent(serviceId)}/reset_objects`, blocks)
+    .catch(intercept(`Failed to reset stored blocks in ${serviceId}`));

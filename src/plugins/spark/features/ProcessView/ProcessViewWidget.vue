@@ -182,8 +182,7 @@ export default class ProcessViewWidget extends WidgetBase {
       noBackdropDismiss: true,
       cancel: true,
     })
-      .then(() => this.updateParts([]))
-      .catch(() => { });
+      .onOk(() => this.updateParts([]));
   }
 
   spaceCased(v: string): string {
