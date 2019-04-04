@@ -53,8 +53,8 @@ export default class SensorPartCard extends PartCard {
   }
 
   mounted() {
-    if (this.part.settings.sensorLink) {
-      this.serviceId = this.part.settings.sensorServiceId;
+    this.serviceId = this.part.settings.sensorServiceId || null;
+    if (this.serviceId && this.part.settings.sensorLink) {
       this.block = blocks(this.$store, this.serviceId as string)[this.part.settings.sensorLink.id];
     }
   }
