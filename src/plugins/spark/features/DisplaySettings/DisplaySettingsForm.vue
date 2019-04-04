@@ -161,6 +161,31 @@ export default class DisplaySettingsForm extends BlockForm {
         </q-item-section>
       </q-item>
     </q-expansion-item>
+    <q-expansion-item group="modal" icon="mdi-format-text" label="Shared Display Settings">
+      <q-item dark>
+        <q-item-section side>Footer text</q-item-section>
+        <q-item-section>
+          <InputPopupEdit
+            :field="block.data.name"
+            :change="callAndSaveBlock(v => block.data.name = v)"
+            label="Footer text"
+            tag="span"
+          />
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section side>Temperature Unit</q-item-section>
+        <q-item-section>
+          <SelectPopupEdit
+            :field="block.data.tempUnit"
+            :options="[{ label: 'Celsius', value: 0 }, { label: 'Fahrenheit', value: 1 }]"
+            :change="callAndSaveBlock(v => block.data.tempUnit = v)"
+            label="Temperature Unit"
+            tag="span"
+          />
+        </q-item-section>
+      </q-item>
+    </q-expansion-item>
 
     <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
       <BlockSettings v-bind="$props" :presets-data="presets()"/>

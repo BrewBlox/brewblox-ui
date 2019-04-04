@@ -26,23 +26,22 @@ export default class DisplaySettingsWidget extends BlockWidget {
 <template>
   <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <DisplaySettingsForm
-        v-if="modalOpen"
-        v-bind="formProps"
-      />
+      <DisplaySettingsForm v-if="modalOpen" v-bind="formProps"/>
     </q-dialog>
 
     <BlockWidgetToolbar :field="me"/>
 
     <q-card-section>
       <q-list dark dense>
-        <q-item v-for="(slot, idx) in displaySlots" :key="idx">
-          <q-item-section side>Slot {{ idx + 1 }}</q-item-section>
-          <q-item-section>
-            <big v-if="slot" :style="slotStyle(slot)">{{ slot.name }}</big>
-            <big v-else>Not set</big>
-          </q-item-section>
-        </q-item>
+        <div class="row">
+          <q-item v-for="(slot, idx) in displaySlots" :key="idx" class="col-4">
+            <q-item-section>
+              <q-item-label caption>Slot {{ idx + 1 }}</q-item-label>
+              <span v-if="slot" :style="slotStyle(slot)" class="text-bold">{{ slot.name }}</span>
+              <span v-else class="darkened">Not set</span>
+            </q-item-section>
+          </q-item>
+        </div>
 
         <q-item dark>
           <q-item-section side>Footer text</q-item-section>
@@ -51,18 +50,6 @@ export default class DisplaySettingsWidget extends BlockWidget {
               :field="block.data.name"
               :change="callAndSaveBlock(v => block.data.name = v)"
               label="footer text"
-              tag="span"
-            />
-          </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section side>Temperature Unit</q-item-section>
-          <q-item-section>
-            <SelectPopupEdit
-              :field="block.data.tempUnit"
-              :options="[{ label: 'Celsius', value: 0 }, { label: 'Fahrenheit', value: 1 }]"
-              :change="callAndSaveBlock(v => block.data.tempUnit = v)"
-              label="Temperature Unit"
               tag="span"
             />
           </q-item-section>
