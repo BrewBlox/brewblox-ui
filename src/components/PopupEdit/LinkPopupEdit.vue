@@ -30,12 +30,16 @@ import Component from 'vue-class-component';
   },
 })
 export default class LinkPopupEdit extends Vue {
+  placeholder: string | null = '';
   get value(): string | null {
-    return this.$props.field.id;
+    if (this.placeholder === '') {
+      this.placeholder = this.$props.field.id;
+    }
+    return this.placeholder;
   }
 
   set value(v: string | null) {
-    this.$props.change(new Link(v, this.$props.field.type));
+    this.placeholder = v;
   }
 
   get linkOptions() {
@@ -45,11 +49,15 @@ export default class LinkPopupEdit extends Vue {
   }
 
   get displayValue() {
-    return this.value || 'click to assign';
+    return this.$props.field || 'click to assign';
   }
 
   startEdit() {
     fetchCompatibleBlocks(this.$store, this.$props.serviceId, this.$props.field.type);
+  }
+
+  endEdit() {
+    this.$props.change(new Link(this.value, this.$props.field.type));
   }
 }
 </script>
@@ -91,6 +99,15 @@ export default class LinkPopupEdit extends Vue {
                 </q-btn>
               </template>
             </q-select>
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section/>
+          <q-item-section side>
+            <q-btn v-close-popup dark flat color="primary" label="Cancel"/>
+          </q-item-section>
+          <q-item-section side>
+            <q-btn v-close-popup dark flat color="primary" label="Apply" @click="endEdit()"/>
           </q-item-section>
         </q-item>
       </q-menu>

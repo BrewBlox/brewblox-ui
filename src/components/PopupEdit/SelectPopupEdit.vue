@@ -34,21 +34,17 @@ import Component from 'vue-class-component';
   },
 })
 export default class SelectPopupEdit extends Vue {
-  plc = NaN;
+  placeholder: any = NaN;
 
-  get placeholder() {
-    // Ensures that value always changes during edit
-    // Placeholder must not equal clear-value
-    if (Number.isNaN(this.plc)) {
-      return this.$props.multiple
-        ? [undefined]
-        : undefined;
+  get selected(): any {
+    if (Number.isNaN(this.placeholder)) {
+      this.placeholder = this.$props.options.find(v => v.value === this.$props.field) || null;
     }
-    return this.plc;
+    return this.placeholder;
   }
 
-  set placeholder(v: any) {
-    this.plc = v;
+  set selected(v: any) {
+    this.placeholder = v;
   }
 
   get displayValue() {
@@ -65,44 +61,53 @@ export default class SelectPopupEdit extends Vue {
       .label;
   }
 
-  startEdit() {
-    this.placeholder = this.$props.field;
-  }
-
-  endEdit(v: any) {
-    this.placeholder = v;
-    this.$props.change(this.placeholder);
+  endEdit() {
+    this.$props.change(this.selected === null ? null : this.selected.value);
   }
 }
 </script>
 
 <template>
   <div>
-    <component :is="$props.tag" class="editable clickable" @click="startEdit">
+    <component :is="$props.tag" class="editable">
       {{ displayValue | truncated }}
-      <q-menu>
+      <q-menu content-style="overflow: visible">
         <q-item dark>
           <q-item-section class="help-text text-weight-light">
             <big>{{ $props.label }}</big>
             <slot/>
           </q-item-section>
         </q-item>
-        <q-item v-if="$props.clearable" dark>
+        <q-item dark>
           <q-item-section>
-            <q-btn v-close-popup icon="clear" label="clear" flat @click="endEdit(null)"/>
+            <q-select
+              v-model="selected"
+              :options="$props.options"
+              dark
+              options-dark
+              option-label="label"
+            >
+              <template v-slot:append v-if="clearable">
+                <q-btn icon="mdi-close-circle" flat round size="sm" @click.stop="selected = null">
+                  <q-tooltip>
+                    <span>
+                      Set {{ $props.label }} to
+                      <i>None</i>
+                    </span>
+                  </q-tooltip>
+                </q-btn>
+              </template>
+            </q-select>
           </q-item-section>
         </q-item>
-        <q-separator dark inset/>
-        <q-item
-          v-close-popup
-          v-for="opt in $props.options"
-          :key="String(opt.value)"
-          :active="opt.value === placeholder"
-          clickable
-          dark
-          @click="endEdit(opt.value)"
-        >
-          <q-item-section>{{ opt.label }}</q-item-section>
+        <q-item dark>
+          <q-item-section/>
+          <q-item-section side>
+            <q-btn v-close-popup dark flat color="primary" label="Cancel"/>
+          </q-item-section>
+          <q-item-section side>
+            <q-btn v-close-popup dark flat color="primary" label="Apply" @click="endEdit()"/>
+          </q-item-section>
         </q-item>
       </q-menu>
     </component>
