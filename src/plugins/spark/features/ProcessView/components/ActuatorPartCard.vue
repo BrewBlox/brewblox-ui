@@ -53,8 +53,8 @@ export default class ActuatorPartCard extends PartCard {
   }
 
   mounted() {
-    if (this.part.settings.actuatorLink) {
-      this.serviceId = this.part.settings.actuatorServiceId;
+    this.serviceId = this.part.settings.actuatorServiceId || null;
+    if (this.serviceId && this.part.settings.actuatorLink) {
       this.block = blocks(this.$store, this.serviceId as string)[this.part.settings.actuatorLink.id];
     }
   }
@@ -82,7 +82,7 @@ export default class ActuatorPartCard extends PartCard {
           :options="blockOptions"
           dark
           options-dark
-          label="Sensor"
+          label="Actuator"
           option-label="id"
           option-value="id"
         >
@@ -93,7 +93,7 @@ export default class ActuatorPartCard extends PartCard {
             </q-item>
           </template>
           <template v-slot:append>
-            <q-btn flat round icon="mdi-close-circle" @click="block = null"/>
+            <q-btn flat round icon="mdi-close-circle" @click.stop="block = null"/>
           </template>
         </q-select>
       </q-item-section>

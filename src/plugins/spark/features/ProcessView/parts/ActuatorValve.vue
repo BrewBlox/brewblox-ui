@@ -55,14 +55,6 @@ export default class ActuatorValve extends PartComponent {
     return blocks(this.$store, this.actuatorServiceId)[this.actuatorLink.id];
   }
 
-  get iconStyle() {
-    const color = this.closed ? 'black' : '#C78A49';
-    return {
-      stroke: color,
-      fill: color,
-    };
-  }
-
   get flowSpeed() {
     return this.flowOnCoord(RIGHT);
   }
@@ -106,9 +98,10 @@ export default class ActuatorValve extends PartComponent {
     if (this.actuatorBlock) {
       this.actuatorBlock.data.state = this.closed ? 1 : 0;
       saveBlock(this.$store, this.actuatorServiceId, this.actuatorBlock);
+      return;
     }
     this.$q.notify({
-      message: 'Actuator Block unavailable',
+      message: 'Actuator Block not linked',
       color: 'negative',
       icon: 'error',
     });
@@ -118,25 +111,20 @@ export default class ActuatorValve extends PartComponent {
 
 <template>
   <g class="actuator-valve clickable" @click="toggleClosed">
+    <foreignObject v-if="!actuatorBlock" :height="SQUARE_SIZE" :width="SQUARE_SIZE">
+      <q-icon name="mdi-link-variant-off" size="sm" class="absolute-right" style="height: 15px;"/>
+    </foreignObject>
     <g key="valve-outer" class="outline">
       <path :d="paths.outerValve[0]"/>
       <path :d="paths.outerValve[1]"/>
     </g>
-    <LiquidStroke v-if="!closed" :paths="paths.openLiquid" :colors="liquids"/>
     <LiquidStroke v-if="closed" :paths="paths.closedLiquid" :colors="liquids"/>
-    <g>
-      <g
-        key="valve-inner"
-        :transform="`rotate(${valveRotation}, 25, 25)`"
-        class="fill outline inner"
-      >
-        <g>
-          <path :d="paths.innerValve[0]"/>
-          <path :d="paths.innerValve[1]"/>
-        </g>
-        <g :style="iconStyle" class="power-icon">
-          <path :d="paths.powerIcon"/>
-        </g>
+    <LiquidStroke v-else :paths="paths.openLiquid" :colors="liquids"/>
+    <g key="valve-inner" :transform="`rotate(${valveRotation}, 25, 25)`" class="fill outline inner">
+      <path :d="paths.innerValve[0]"/>
+      <path :d="paths.innerValve[1]"/>
+      <g class="power-icon">
+        <path :d="paths.powerIcon"/>
       </g>
     </g>
     <AnimatedArrows key="valve-arrows" :speed="flowSpeed" :path="paths.closedLiquid[0]"/>
@@ -145,6 +133,8 @@ export default class ActuatorValve extends PartComponent {
 
 <style lang="stylus" scoped>
 /deep/ .power-icon path {
-  stroke-width: 1px !important;
+  stroke-width: 1px;
+  stroke: black;
+  fill: black;
 }
 </style>

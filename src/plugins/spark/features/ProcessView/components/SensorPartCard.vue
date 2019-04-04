@@ -93,7 +93,7 @@ export default class SensorPartCard extends PartCard {
             </q-item>
           </template>
           <template v-slot:append>
-            <q-btn flat round icon="mdi-close-circle" @click="block = null"/>
+            <q-btn flat round icon="mdi-close-circle" @click.stop="block = null"/>
           </template>
         </q-select>
       </q-item-section>
