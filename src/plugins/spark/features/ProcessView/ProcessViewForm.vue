@@ -24,10 +24,7 @@ export default class ProcessViewForm extends Vue {
   }
 
   get cards() {
-    return [
-      'PlacementPartCard',
-      ...partSettings(this.part).cards,
-    ];
+    return partSettings(this.part).cards;
   }
 
   get partSize(): [number, number] {

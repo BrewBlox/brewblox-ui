@@ -129,3 +129,13 @@ export function valOrDefault<T>(val: T, defaultVal: T): T {
     ? val
     : defaultVal;
 }
+
+export function chunked<T>(arr: T[], chunkSize: number): T[][] {
+  let chunks: T[][] = [];
+  let i = 0;
+  const n = arr.length;
+  while (i < n) {
+    chunks.push(arr.slice(i, i += chunkSize));
+  }
+  return chunks;
+}

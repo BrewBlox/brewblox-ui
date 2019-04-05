@@ -20,7 +20,7 @@ import omit from 'lodash/omit';
 
 export const isSamePart =
   (left: PersistentPart, right: PersistentPart): boolean =>
-    ['x', 'y', 'type', 'rotate'].every(k => left[k] === right[k]);
+    ['x', 'y', 'type', 'rotate'].every(k => left && right && left[k] === right[k]);
 
 export const removeTransitions =
   (parts: FlowPart[], inCoord: string): FlowPart[] => parts.map(
