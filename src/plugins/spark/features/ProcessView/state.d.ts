@@ -20,6 +20,7 @@ export interface CalculatedFlows {
 }
 
 export interface PersistentPart {
+  id: string;
   type: string;
   x: number;
   y: number;

@@ -1,9 +1,9 @@
 <script lang="ts">
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
-import { isSamePart, calculateNormalizedFlows } from './calculateFlows';
+import { uid } from 'quasar';
+import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
-import { parts as knownParts } from './register';
 import settings from './settings';
 import { PersistentPart, ProcessViewConfig, FlowPart } from './state';
 import { spaceCased, clampRotation } from '@/helpers/functional';
@@ -13,18 +13,17 @@ import ProcessViewCatalog from './ProcessViewCatalog.vue';
 type ClickEvent = MouseEvent | TouchEvent;
 
 interface DragAction {
+  hide: boolean;
   part: PersistentPart;
   x: number;
   y: number;
 }
 
-interface ContextAction {
-  idx: number;
-}
-
 interface ToolAction {
   label: string;
   value: string;
+  icon: string;
+  cursor?: string;
   onClick?: (evt: ClickEvent, part: PersistentPart) => void;
   onPan?: (args: PanArguments, part: PersistentPart) => void;
 }
@@ -36,21 +35,21 @@ interface ToolAction {
   },
 })
 export default class ProcessViewWidget extends WidgetBase {
-  $refs!: {
-    grid: any;
-  }
-
   // make imported values accessible in template
   SQUARE_SIZE: number = SQUARE_SIZE;
   spaceCased = spaceCased;
+
+  $refs!: {
+    grid: any;
+  }
 
   editable: boolean = true;
   menuModalOpen: boolean = false;
   catalogModalOpen: boolean = false;
 
   dragAction: DragAction | null = null;
-  configurePartIdx: number = 0;
-  currentAction: ToolAction = this.actions[0];
+  configuredPartId: string | null = null;
+  currentTool: ToolAction = this.tools[0];
   catalogPartial: Partial<PersistentPart> | null = null
 
   get widgetConfig(): ProcessViewConfig {
@@ -61,6 +60,28 @@ export default class ProcessViewWidget extends WidgetBase {
     this.$props.onChangeConfig(this.widgetId, config);
   }
 
+  updateParts(parts: PersistentPart[]) {
+    this.saveConfig({ ...this.widgetConfig, parts });
+  }
+
+  updatePart(part: PersistentPart | FlowPart) {
+    this.updateParts(this.parts.map(p => (p.id === part.id ? part : p)));
+  }
+
+  removePart(part: PersistentPart) {
+    this.updateParts(this.parts.filter(p => p.id !== part.id));
+  }
+
+  clearParts() {
+    this.$q.dialog({
+      title: 'Remove all',
+      message: 'Are you sure you wish to remove all parts?',
+      noBackdropDismiss: true,
+      cancel: true,
+    })
+      .onOk(() => this.updateParts([]));
+  }
+
   get gridRect() {
     const { x, y, left, right, top, bottom } = this.$refs.grid.getBoundingClientRect();
     return { x, y, left, right, top, bottom };
@@ -69,6 +90,7 @@ export default class ProcessViewWidget extends WidgetBase {
   get parts(): PersistentPart[] {
     return this.widgetConfig.parts
       .map(v => ({
+        id: uid(),
         rotate: 0,
         settings: {},
         flipped: false,
@@ -80,42 +102,59 @@ export default class ProcessViewWidget extends WidgetBase {
     return calculateNormalizedFlows(this.parts);
   }
 
-  get gridClasses() {
-    return this.editable
-      ? ['grid-base', 'grid-editable']
-      : ['grid-base'];
+  get configuredPart(): FlowPart | null {
+    return this.flowParts.find(p => p.id === this.configuredPartId) || null;
   }
 
-  get actions(): ToolAction[] {
+  get gridClasses() {
+    return {
+      ['grid-base']: true,
+      ['grid-editable']: this.editable,
+    };
+  }
+
+  get tools(): ToolAction[] {
     return [
       {
-        label: 'Move Part',
+        label: 'Move (Drag)',
         value: 'move',
+        icon: 'mdi-cursor-move',
         onPan: this.movePanHandler,
       },
       {
-        label: 'Add Part',
+        label: 'Copy (Drag)',
+        value: 'copy',
+        icon: 'file_copy',
+        onPan: this.copyPanHandler,
+      },
+      {
+        label: 'New (Click)',
         value: 'add',
+        icon: 'add',
         onClick: this.addPartClickHandler,
       },
       {
-        label: 'Configure Part',
+        label: 'Configure (Click)',
         value: 'config',
+        icon: 'settings',
         onClick: this.configurePartClickHandler,
       },
       {
-        label: 'Rotate left',
+        label: 'Rotate left (Click)',
         value: 'rotate-left',
+        icon: 'mdi-rotate-left-variant',
         onClick: (evt, part) => this.rotateClickHandler(evt, part, -90),
       },
       {
-        label: 'Rotate right',
+        label: 'Rotate right (Click)',
         value: 'rotate-right',
+        icon: 'mdi-rotate-right-variant',
         onClick: (evt, part) => this.rotateClickHandler(evt, part, 90),
       },
       {
-        label: 'Delete Part',
+        label: 'Remove (Click)',
         value: 'delete',
+        icon: 'delete',
         onClick: (evt, part) => this.removePart(part),
       },
       // TODO: flip part
@@ -123,14 +162,14 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   clickHandler(evt: ClickEvent, part: PersistentPart) {
-    if (this.currentAction && this.currentAction.onClick) {
-      this.currentAction.onClick(evt, part);
+    if (this.editable && this.currentTool && this.currentTool.onClick) {
+      this.currentTool.onClick(evt, part);
     }
   }
 
   panHandler(args: PanArguments, part: PersistentPart) {
-    if (this.currentAction && this.currentAction.onPan) {
-      this.currentAction.onPan(args, part);
+    if (this.editable && this.currentTool && this.currentTool.onPan) {
+      this.currentTool.onPan(args, part);
     }
   }
 
@@ -158,18 +197,15 @@ export default class ProcessViewWidget extends WidgetBase {
       : this.findGridSquare(evt.touches[0].pageX, evt.touches[0].pageY);
   }
 
-  updateParts(parts: PersistentPart[]) {
-    this.saveConfig({ ...this.widgetConfig, parts });
-  }
-
-  movePanHandler(args: PanArguments, part: PersistentPart) {
-    if (!this.editable || this.menuModalOpen || !part) {
+  movePanHandler(args: PanArguments, part: PersistentPart, copy: boolean = false) {
+    if (!part) {
       return;
     }
 
     if (args.isFirst) {
       this.dragAction = {
         part,
+        hide: !copy,
         x: 0,
         y: 0,
       };
@@ -183,10 +219,16 @@ export default class ProcessViewWidget extends WidgetBase {
     if (args.isFinal) {
       const gridPos = this.findGridSquare(args.position.left, args.position.top);
       if (gridPos) {
-        this.movePart(part, { ...part, ...gridPos });
+        const from = copy ? null : part;
+        const id = copy ? uid() : part.id;
+        this.movePart(from, { ...part, ...gridPos, id });
       }
       this.dragAction = null;
     }
+  }
+
+  copyPanHandler(args: PanArguments, part: PersistentPart) {
+    this.movePanHandler(args, part, true);
   }
 
   addPartClickHandler(evt: ClickEvent, part: PersistentPart) {
@@ -198,14 +240,13 @@ export default class ProcessViewWidget extends WidgetBase {
 
   configurePartClickHandler(evt: ClickEvent, part: PersistentPart) {
     if (part) {
-      this.configurePartIdx = this.parts.findIndex(p => isSamePart(p, part));
+      this.configuredPartId = part.id;
       this.menuModalOpen = true;
     }
   }
 
   rotateClickHandler(evt: ClickEvent, part: PersistentPart, rotation: number) {
     if (part) {
-      const idx = this.parts.findIndex(p => isSamePart(p, part));
       const partSize = settings[part.type].size(part);
       const rotate = clampRotation(part.rotate + rotation);
 
@@ -213,12 +254,8 @@ export default class ProcessViewWidget extends WidgetBase {
         .rotateSquare(rotation, part.rotate, partSize)
         .raw();
 
-      this.updatePart(idx, { ...part, ...updated, rotate });
+      this.updatePart({ ...part, ...updated, rotate });
     }
-  }
-
-  removePart(part: PersistentPart) {
-    this.updateParts(this.parts.filter(p => !isSamePart(p, part)));
   }
 
   blockedByPart(part: PersistentPart) {
@@ -226,9 +263,16 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   movePart(from: PersistentPart | null, to: PersistentPart) {
+    if (from
+      && from.id === to.id
+      && from.x === to.x
+      && from.y === to.y) {
+      return;
+    }
+
     const toCoords: Coordinates[] = this.blockedByPart(to);
     const allBlockedCoords: Coordinates[] =
-      this.widgetConfig.parts
+      this.parts
         .reduce(
           (acc: Coordinates[], part: PersistentPart) => [...acc, ...this.blockedByPart(part)], []);
 
@@ -243,36 +287,17 @@ export default class ProcessViewWidget extends WidgetBase {
       }
     }
 
-    this.updateParts([
-      ...this.widgetConfig.parts.filter(p => !from || !isSamePart(p, from)),
-      to,
-    ]);
+    this.updateParts([...this.parts.filter(p => !from || p.id !== from.id), to]);
   }
 
-  addPart(part: PersistentPart) {
+  tryAddPart(part: PersistentPart) {
     this.movePart(null, part);
   }
 
-  updatePart(idx: number, part: PersistentPart | FlowPart) {
-    this.updateParts(this.parts.map((p, i) => (idx === i ? part : p)));
-  }
-
   beingDragged(part: PersistentPart) {
-    return this.dragAction && isSamePart(part, this.dragAction.part);
-  }
-
-  clearParts() {
-    this.$q.dialog({
-      title: 'Remove all',
-      message: 'Are you sure you wish to remove all parts?',
-      noBackdropDismiss: true,
-      cancel: true,
-    })
-      .onOk(() => this.updateParts([]));
-  }
-
-  partKey(part: PersistentPart): string {
-    return `${part.x}_${part.y}_${part.type}`;
+    return this.dragAction
+      && this.dragAction.hide
+      && this.dragAction.part.id === part.id;
   }
 }
 </script>
@@ -282,9 +307,9 @@ export default class ProcessViewWidget extends WidgetBase {
     <q-dialog v-model="menuModalOpen" no-backdrop-dismiss>
       <ProcessViewForm
         v-if="menuModalOpen"
-        :value="flowParts[configurePartIdx]"
-        @input="v => updatePart(configurePartIdx, v)"
-        @remove="v => removePart(v)"
+        :value="configuredPart"
+        @input="updatePart"
+        @remove="removePart"
         @close="menuModalOpen = false"
       />
     </q-dialog>
@@ -293,22 +318,12 @@ export default class ProcessViewWidget extends WidgetBase {
       <ProcessViewCatalog
         v-if="catalogModalOpen"
         :partial="catalogPartial"
-        @create="addPart"
+        @create="tryAddPart"
         @close="catalogModalOpen = false"
       />
     </q-dialog>
 
     <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
-      <q-item-section v-if="editable" side>
-        <q-select
-          v-model="currentAction"
-          :options="actions"
-          dark
-          options-dark
-          label="Tool"
-          style="min-width: 150px"
-        />
-      </q-item-section>
       <q-item-section side>
         <q-btn-dropdown flat label="menu">
           <q-list dark bordered>
@@ -344,6 +359,25 @@ export default class ProcessViewWidget extends WidgetBase {
       </q-item-section>
     </WidgetToolbar>
 
+    <q-card-section v-if="editable" class="q-py-none">
+      <q-item dark dense class="justify-around">
+        <q-item-section class="col-auto">
+          <q-btn-dropdown :label="currentTool.label" flat>
+            <q-list dark bordered>
+              <ActionItem
+                v-for="tool in tools"
+                :key="tool.value"
+                :icon="tool.icon"
+                :label="tool.label"
+                :active="currentTool.value === tool.value"
+                @click="currentTool = tool"
+              />
+            </q-list>
+          </q-btn-dropdown>
+        </q-item-section>
+      </q-item>
+    </q-card-section>
+
     <div class="col">
       <svg
         v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, null)"
@@ -353,10 +387,10 @@ export default class ProcessViewWidget extends WidgetBase {
       >
         <g
           v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, part)"
-          v-for="(part, idx) in parts"
+          v-for="part in flowParts"
           v-show="!beingDragged(part)"
           :transform="`translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`"
-          :key="partKey(part)"
+          :key="part.id"
           class="grid-item"
           @click.stop="v => clickHandler(v, part)"
         >
@@ -367,7 +401,7 @@ export default class ProcessViewWidget extends WidgetBase {
             y="8"
             class="grid-item-coordinates"
           >{{ part.x }},{{ part.y }}</text>
-          <ProcessViewItem :value="flowParts[idx]" @input="v => updatePart(idx, v)"/>
+          <ProcessViewItem :value="part" @input="updatePart"/>
           <rect
             v-if="editable"
             :width="SQUARE_SIZE"

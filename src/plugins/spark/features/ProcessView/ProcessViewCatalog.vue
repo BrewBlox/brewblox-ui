@@ -1,6 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { uid } from 'quasar';
 import { SQUARE_SIZE } from './getters';
 import { parts } from './register';
 import settings from './settings';
@@ -24,6 +25,7 @@ export default class ProcessViewCatalog extends Vue {
     return parts
       .map(type => ({
         type,
+        id: uid(),
         x: -2,
         y: -2,
         rotate: 0,

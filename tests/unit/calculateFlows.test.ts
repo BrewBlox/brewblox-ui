@@ -31,6 +31,7 @@ const propertyWalker = (acc: any[], next: FlowSegment, prop: string[]): any[] =>
 
 describe('Data describing an input tube', () => {
   const part: PersistentPart = {
+    id: '',
     x: 1,
     y: 2,
     rotate: 0,
@@ -54,6 +55,7 @@ describe('Data describing an input tube', () => {
 describe('asFlowParts', () => {
   const path: PersistentPart[] = [
     {
+      id: 'one',
       x: 1,
       y: 2,
       rotate: 0,
@@ -63,6 +65,7 @@ describe('asFlowParts', () => {
       },
     },
     {
+      id: 'two',
       x: 2,
       y: 2,
       rotate: 0,
@@ -70,6 +73,7 @@ describe('asFlowParts', () => {
       settings: {},
     },
     {
+      id: 'three',
       x: 3,
       y: 2,
       rotate: 0,
@@ -89,6 +93,7 @@ describe('asFlowParts', () => {
 describe('A single path without splits', () => {
   const parts: PersistentPart[] = [
     {
+      id: '1',
       x: 1,
       y: 2,
       rotate: 0,
@@ -99,6 +104,7 @@ describe('A single path without splits', () => {
       },
     },
     {
+      id: '2',
       x: 3,
       y: 2,
       rotate: 180,
@@ -106,6 +112,7 @@ describe('A single path without splits', () => {
       settings: {},
     },
     {
+      id: '3',
       x: 2,
       y: 2,
       rotate: 0,
@@ -197,6 +204,7 @@ describe('A single path without splits', () => {
 describe('A path with a split, but no joins', () => {
   const parts: PersistentPart[] = [
     {
+      id: '1',
       x: 1,
       y: 2,
       rotate: 0,
@@ -207,6 +215,7 @@ describe('A path with a split, but no joins', () => {
       },
     },
     {
+      id: '2',
       x: 2,
       y: 2,
       rotate: 0,
@@ -214,6 +223,7 @@ describe('A path with a split, but no joins', () => {
       settings: {},
     },
     {
+      id: '3',
       x: 3,
       y: 2,
       rotate: 270,
@@ -221,6 +231,7 @@ describe('A path with a split, but no joins', () => {
       settings: {},
     },
     {
+      id: '4',
       x: 3,
       y: 1,
       rotate: 90,
@@ -228,6 +239,7 @@ describe('A path with a split, but no joins', () => {
       settings: {},
     },
     {
+      id: '5',
       x: 3,
       y: 3,
       rotate: 270,
@@ -365,6 +377,7 @@ describe('A path with a split, but no joins', () => {
 describe('A path that forks and rejoins', () => {
   const parts: PersistentPart[] = [
     {
+      id: '1',
       x: 1,
       y: 2,
       rotate: 0,
@@ -375,6 +388,7 @@ describe('A path that forks and rejoins', () => {
       },
     },
     {
+      id: '2',
       x: 2,
       y: 2,
       rotate: 0,
@@ -382,6 +396,7 @@ describe('A path that forks and rejoins', () => {
       settings: {},
     },
     {
+      id: '3',
       x: 3,
       y: 2,
       rotate: 270,
@@ -389,6 +404,7 @@ describe('A path that forks and rejoins', () => {
       settings: {},
     },
     {
+      id: '4',
       x: 3,
       y: 1,
       rotate: 90,
@@ -396,6 +412,7 @@ describe('A path that forks and rejoins', () => {
       settings: {},
     },
     {
+      id: '5',
       x: 3,
       y: 3,
       rotate: 0,
@@ -403,6 +420,7 @@ describe('A path that forks and rejoins', () => {
       settings: {},
     },
     {
+      id: '6',
       x: 4,
       y: 1,
       rotate: 180,
@@ -410,6 +428,7 @@ describe('A path that forks and rejoins', () => {
       settings: {},
     },
     {
+      id: '7',
       x: 4,
       y: 3,
       rotate: 270,
@@ -417,6 +436,7 @@ describe('A path that forks and rejoins', () => {
       settings: {},
     },
     {
+      id: '8',
       x: 4,
       y: 2,
       rotate: 90,
@@ -424,6 +444,7 @@ describe('A path that forks and rejoins', () => {
       settings: {},
     },
     {
+      id: '9',
       x: 5,
       y: 2,
       rotate: 180,
@@ -568,6 +589,7 @@ describe('A path that forks and rejoins', () => {
 describe('A single path with a pump', () => {
   const parts: PersistentPart[] = [
     {
+      id: '1',
       x: 3,
       y: 2,
       rotate: 180,
@@ -578,6 +600,7 @@ describe('A single path with a pump', () => {
       },
     },
     {
+      id: '2',
       x: 2,
       y: 2,
       rotate: 0,
@@ -588,6 +611,7 @@ describe('A single path with a pump', () => {
       },
     },
     {
+      id: '3',
       x: 1,
       y: 2,
       rotate: 0,
@@ -602,6 +626,7 @@ describe('A single path with a pump', () => {
     const partsWithFlow = calculateFlows(flowParts);
     expect(partsWithFlow).toMatchObject(
       [{
+        id: '1',
         x: 3,
         y: 2,
         rotate: 180,
@@ -616,6 +641,7 @@ describe('A single path with a pump', () => {
         },
       },
       {
+        id: '2',
         x: 2,
         y: 2,
         rotate: 0,
@@ -630,6 +656,7 @@ describe('A single path with a pump', () => {
         },
       },
       {
+        id: '3',
         x: 1,
         y: 2,
         rotate: 0,
@@ -651,6 +678,7 @@ describe('A single path with a pump', () => {
       const partsWithFlow = calculateFlows(flowParts);
       expect(partsWithFlow).toMatchObject(
         [{
+          id: '1',
           x: 3,
           y: 2,
           rotate: 180,
@@ -664,6 +692,7 @@ describe('A single path with a pump', () => {
           },
         },
         {
+          id: '2',
           x: 2,
           y: 2,
           rotate: 0,
@@ -678,6 +707,7 @@ describe('A single path with a pump', () => {
           },
         },
         {
+          id: '3',
           x: 1,
           y: 2,
           rotate: 0,
@@ -697,6 +727,7 @@ describe('A single path with a pump', () => {
 describe('Two sources joining', () => {
   const parts: PersistentPart[] = [
     {
+      id: '1',
       x: 1,
       y: 1,
       rotate: 0,
@@ -707,6 +738,7 @@ describe('Two sources joining', () => {
       },
     },
     {
+      id: '2',
       x: 1,
       y: 3,
       rotate: 0,
@@ -717,6 +749,7 @@ describe('Two sources joining', () => {
       },
     },
     {
+      id: '3',
       x: 2,
       y: 1,
       rotate: 180,
@@ -724,6 +757,7 @@ describe('Two sources joining', () => {
       settings: {},
     },
     {
+      id: '4',
       x: 2,
       y: 3,
       rotate: 270,
@@ -731,6 +765,7 @@ describe('Two sources joining', () => {
       settings: {},
     },
     {
+      id: '5',
       x: 2,
       y: 2,
       rotate: 90,
@@ -738,6 +773,7 @@ describe('Two sources joining', () => {
       settings: {},
     },
     {
+      id: '6',
       x: 3,
       y: 2,
       rotate: 180,
@@ -844,6 +880,7 @@ describe('Two sources joining', () => {
 describe('A path with a bridge', () => {
   const parts: PersistentPart[] = [
     {
+      id: '1',
       x: 11,
       y: 2,
       type: 'SystemIO',
@@ -854,6 +891,7 @@ describe('A path with a bridge', () => {
       },
     },
     {
+      id: '2',
       x: 12,
       y: 2,
       type: 'StraightTube',
@@ -861,6 +899,7 @@ describe('A path with a bridge', () => {
       settings: {},
     },
     {
+      id: '3',
       type: 'BridgeTube',
       x: 13,
       y: 2,
@@ -868,6 +907,7 @@ describe('A path with a bridge', () => {
       settings: {},
     },
     {
+      id: '4',
       type: 'SystemIO',
       x: 13,
       y: 1,
@@ -875,6 +915,7 @@ describe('A path with a bridge', () => {
       settings: {},
     },
     {
+      id: '5',
       x: 14,
       y: 2,
       type: 'ElbowTube',
@@ -882,6 +923,7 @@ describe('A path with a bridge', () => {
       settings: {},
     },
     {
+      id: '6',
       type: 'ElbowTube',
       x: 14,
       y: 3,
@@ -889,6 +931,7 @@ describe('A path with a bridge', () => {
       settings: {},
     },
     {
+      id: '7',
       x: 13,
       y: 3,
       type: 'ElbowTube',

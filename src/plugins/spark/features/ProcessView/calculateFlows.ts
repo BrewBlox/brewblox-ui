@@ -18,10 +18,6 @@ import mapKeys from 'lodash/mapKeys';
 import pickBy from 'lodash/pickBy';
 import omit from 'lodash/omit';
 
-export const isSamePart =
-  (left: PersistentPart, right: PersistentPart): boolean =>
-    ['x', 'y', 'type', 'rotate'].every(k => left && right && left[k] === right[k]);
-
 export const removeTransitions =
   (parts: FlowPart[], inCoord: string): FlowPart[] => parts.map(
     part => ({ ...part, transitions: omit(part.transitions, inCoord) }));
@@ -48,7 +44,7 @@ const adjacentPart = (
 ): FlowPart | undefined =>
   allParts
     .find((part: FlowPart) =>
-      !(currentPart && isSamePart(part, currentPart))
+      !(currentPart && part.id === currentPart.id)
       && has(part, ['transitions', outCoords]));
 
 const normalizeFlows = (part: FlowPart): FlowPart => {
@@ -168,7 +164,7 @@ const additionalFlow = (
 ): FlowPart[] =>
   allParts
     .map((item) =>
-      isSamePart(part, item)
+      part.id === item.id
         ? { ...item, flows: combineFlows(item.flows, flowToAdd) }
         : item);
 
@@ -298,7 +294,7 @@ export const flowPath = (
         break;
       }
       candidateParts = candidateParts
-        .filter(part => nextPart && !isSamePart(nextPart, part));
+        .filter(part => nextPart && !(nextPart.id === part.id));
     }
   };
   if (path.transitions[inCoord] === undefined) {

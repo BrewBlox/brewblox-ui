@@ -24,7 +24,10 @@ export default class ProcessViewForm extends Vue {
   }
 
   get cards() {
-    return partSettings(this.part).cards;
+    return [
+      'PlacementPartCard',
+      ...partSettings(this.part).cards,
+    ];
   }
 
   get partSize(): [number, number] {
@@ -89,9 +92,7 @@ export default class ProcessViewForm extends Vue {
             :viewBox="partViewBox"
             class="q-mx-auto"
           >
-            <g>
-              <ProcessViewItem :value="part"/>
-            </g>
+            <ProcessViewItem :value="part"/>
           </svg>
         </q-item-section>
       </q-item>
@@ -99,10 +100,3 @@ export default class ProcessViewForm extends Vue {
     </q-card-section>
   </q-card>
 </template>
-
-<style scoped>
-.q-card {
-  width: 100%;
-  margin-bottom: 10px;
-}
-</style>
