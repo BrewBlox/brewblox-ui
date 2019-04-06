@@ -61,7 +61,13 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   updateParts(parts: PersistentPart[]) {
-    this.saveConfig({ ...this.widgetConfig, parts });
+    const asPersistent = (part: PersistentPart | FlowPart) => {
+      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+      const { transitions, flows, ...persistent } = part as FlowPart;
+      return persistent;
+    };
+
+    this.saveConfig({ ...this.widgetConfig, parts: parts.map(asPersistent) });
   }
 
   updatePart(part: PersistentPart | FlowPart) {
@@ -223,7 +229,7 @@ export default class ProcessViewWidget extends WidgetBase {
         const id = copy ? uid() : part.id;
         this.movePart(from, { ...part, ...gridPos, id });
       }
-      this.dragAction = null;
+      this.$nextTick(() => this.dragAction = null);
     }
   }
 
