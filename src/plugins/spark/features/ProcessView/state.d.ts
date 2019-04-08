@@ -49,3 +49,14 @@ export interface ProcessViewConfig {
   currentToolId?: string;
   parts: PersistentPart[];
 }
+
+interface Rect {
+  x: number;
+  y: number;
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
+type ClickEvent = MouseEvent | TouchEvent;
