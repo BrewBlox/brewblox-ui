@@ -20,7 +20,13 @@ export default class ProcessViewItem extends Vue {
 
 <template>
   <g :transform="transformation">
-    <component v-if="value.type" :value="value" :is="value.type" class="ProcessViewPart"/>
+    <component
+      v-if="value.type"
+      :value="value"
+      :is="value.type"
+      class="ProcessViewPart"
+      v-on="$listeners"
+    />
   </g>
 </template>
 

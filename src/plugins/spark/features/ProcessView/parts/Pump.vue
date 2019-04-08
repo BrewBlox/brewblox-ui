@@ -11,7 +11,7 @@ export default class Pump extends PartComponent {
   }
 
   protected toggleDisabled(): void {
-    this.$parent.$emit('input', { ...this.part, settings: { ...this.part.settings, disabled: !this.disabled } });
+    this.$emit('input', { ...this.part, settings: { ...this.part.settings, disabled: !this.disabled } });
   }
 
   get liquids() {
@@ -22,6 +22,8 @@ export default class Pump extends PartComponent {
 
 <template>
   <g class="pump clickable" @click="toggleDisabled">
+    <!-- background element, to make the full square clickable -->
+    <rect :width="sizeX*SQUARE_SIZE" :height="sizeY*SQUARE_SIZE" fill="black" opacity="0"/>
     <!-- tube liquid bottom-->
     <LiquidStroke :paths="['M50,25H0']" :colors="liquids"/>
     <!-- ball liquid -->

@@ -40,13 +40,15 @@ export default class Valve extends PartComponent {
   }
 
   protected toggleClosed(): void {
-    this.$parent.$emit('input', { ...this.part, settings: { ...this.part.settings, closed: !this.closed } });
+    this.$emit('input', { ...this.part, settings: { ...this.part.settings, closed: !this.closed } });
   }
 }
 </script>
 
 <template>
   <g class="valve clickable" @click="toggleClosed">
+    <!-- background element, to make the full square clickable -->
+    <rect :width="sizeX*SQUARE_SIZE" :height="sizeY*SQUARE_SIZE" fill="black" opacity="0"/>
     <g key="valve-outer" class="outline">
       <path :d="paths.outerValve[0]"/>
       <path :d="paths.outerValve[1]"/>
