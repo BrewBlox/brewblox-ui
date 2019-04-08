@@ -42,5 +42,6 @@ export interface FlowPart extends PersistentPart {
 }
 
 export interface ProcessViewConfig {
+  currentToolId?: string;
   parts: PersistentPart[];
 }

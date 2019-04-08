@@ -59,11 +59,19 @@ export default class ProcessViewWidget extends WidgetBase {
   titleModel: string = '';
   dragAction: DragAction | null = null;
   configuredPartId: string | null = null;
-  currentTool: ToolAction = this.tools[0];
-  catalogPartial: Partial<PersistentPart> | null = null
+  catalogPartial: Partial<PersistentPart> | null = null;
 
   get widgetConfig(): ProcessViewConfig {
     return this.$props.config;
+  }
+
+  get currentTool(): ToolAction {
+    const toolId = this.widgetConfig.currentToolId;
+    return this.tools.find(tool => tool.value === toolId) || this.tools[0];
+  }
+
+  set currentTool(tool: ToolAction) {
+    this.saveConfig({ ...this.widgetConfig, currentToolId: tool.value });
   }
 
   saveConfig(config: ProcessViewConfig = this.widgetConfig) {
@@ -132,10 +140,28 @@ export default class ProcessViewWidget extends WidgetBase {
   get tools(): ToolAction[] {
     return [
       {
+        label: 'New (Click)',
+        value: 'add',
+        icon: 'add',
+        onClick: this.addPartClickHandler,
+      },
+      {
         label: 'Move (Drag)',
         value: 'move',
         icon: 'mdi-cursor-move',
         onPan: this.movePanHandler,
+      },
+      {
+        label: 'Rotate (Click)',
+        value: 'rotate-right',
+        icon: 'mdi-rotate-right-variant',
+        onClick: (evt, part) => this.rotateClickHandler(evt, part, 90),
+      },
+      {
+        label: 'Edit Settings (Click)',
+        value: 'config',
+        icon: 'settings',
+        onClick: this.configurePartClickHandler,
       },
       {
         label: 'Copy (Drag)',
@@ -144,31 +170,7 @@ export default class ProcessViewWidget extends WidgetBase {
         onPan: this.copyPanHandler,
       },
       {
-        label: 'New (Click)',
-        value: 'add',
-        icon: 'add',
-        onClick: this.addPartClickHandler,
-      },
-      {
-        label: 'Configure (Click)',
-        value: 'config',
-        icon: 'settings',
-        onClick: this.configurePartClickHandler,
-      },
-      {
-        label: 'Rotate left (Click)',
-        value: 'rotate-left',
-        icon: 'mdi-rotate-left-variant',
-        onClick: (evt, part) => this.rotateClickHandler(evt, part, -90),
-      },
-      {
-        label: 'Rotate right (Click)',
-        value: 'rotate-right',
-        icon: 'mdi-rotate-right-variant',
-        onClick: (evt, part) => this.rotateClickHandler(evt, part, 90),
-      },
-      {
-        label: 'Remove (Click)',
+        label: 'Delete (Click)',
         value: 'delete',
         icon: 'delete',
         onClick: (evt, part) => this.removePart(part),
