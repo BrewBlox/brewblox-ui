@@ -339,6 +339,9 @@ export default class ProcessViewForm extends FormBase {
         <q-item dark dense>
           <q-item-section class="text-h6">Tools</q-item-section>
         </q-item>
+
+        <q-separator dark inset/>
+
         <q-item
           v-for="tool in tools"
           :key="tool.value"
@@ -353,9 +356,12 @@ export default class ProcessViewForm extends FormBase {
           <q-item-section>{{ tool.label }}</q-item-section>
         </q-item>
 
+        <q-item/>
         <q-item dark dense>
           <q-item-section class="text-h6">Global Actions</q-item-section>
         </q-item>
+
+        <q-separator dark inset/>
 
         <q-item dark clickable @click="clearParts">
           <q-item-section avatar>
