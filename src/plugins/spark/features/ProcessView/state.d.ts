@@ -29,16 +29,20 @@ export interface PersistentPart {
   settings: Record<string, any>;
 }
 
-export interface ComponentSettings {
-  cards: string[];
-  transitions: (part: PersistentPart) => Transitions;
-  size: (part: PersistentPart) => [number, number];
-  blockedCoordinates: (part: PersistentPart) => Coordinates[];
+export interface StatePart extends PersistentPart {
+  state: Record<string, any>;
 }
 
-export interface FlowPart extends PersistentPart {
+export interface FlowPart extends StatePart {
   transitions: Transitions;
   flows: CalculatedFlows;
+}
+
+export interface ComponentSettings {
+  cards: string[];
+  transitions: (part: StatePart) => Transitions;
+  size: (part: PersistentPart) => [number, number];
+  blockedCoordinates: (part: PersistentPart) => Coordinates[];
 }
 
 export interface ProcessViewConfig {

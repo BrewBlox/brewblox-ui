@@ -5,7 +5,7 @@ import {
   FlowSegment,
   calculateFlows,
 } from '@/plugins/spark/features/ProcessView/calculateFlows';
-import { PersistentPart } from '@/plugins/spark/features/ProcessView/state';
+import { StatePart } from '@/plugins/spark/features/ProcessView/state';
 import { IN_OUT, COLD_WATER, HOT_WATER } from '@/plugins/spark/features/ProcessView/getters';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -30,7 +30,7 @@ const propertyWalker = (acc: any[], next: FlowSegment, prop: string[]): any[] =>
 };
 
 describe('Data describing an input tube', () => {
-  const part: PersistentPart = {
+  const part: StatePart = {
     id: '',
     x: 1,
     y: 2,
@@ -40,6 +40,7 @@ describe('Data describing an input tube', () => {
       pressure: 11,
       liquids: [COLD_WATER],
     },
+    state: {},
   };
 
   it('can resolve to transitions', () => {
@@ -53,7 +54,7 @@ describe('Data describing an input tube', () => {
 
 
 describe('asFlowParts', () => {
-  const path: PersistentPart[] = [
+  const path: StatePart[] = [
     {
       id: 'one',
       x: 1,
@@ -63,6 +64,7 @@ describe('asFlowParts', () => {
       settings: {
         liquids: [COLD_WATER],
       },
+      state: {},
     },
     {
       id: 'two',
@@ -71,6 +73,7 @@ describe('asFlowParts', () => {
       rotate: 0,
       type: 'StraightTube',
       settings: {},
+      state: {},
     },
     {
       id: 'three',
@@ -79,6 +82,7 @@ describe('asFlowParts', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {},
+      state: {},
     },
   ];
 
@@ -91,7 +95,7 @@ describe('asFlowParts', () => {
 
 
 describe('A single path without splits', () => {
-  const parts: PersistentPart[] = [
+  const parts: StatePart[] = [
     {
       id: '1',
       x: 1,
@@ -102,6 +106,7 @@ describe('A single path without splits', () => {
         pressure: 6,
         liquids: [HOT_WATER],
       },
+      state: {},
     },
     {
       id: '2',
@@ -110,6 +115,7 @@ describe('A single path without splits', () => {
       rotate: 180,
       type: 'SystemIO',
       settings: {},
+      state: {},
     },
     {
       id: '3',
@@ -118,6 +124,7 @@ describe('A single path without splits', () => {
       rotate: 0,
       type: 'StraightTube',
       settings: {},
+      state: {},
     },
   ];
 
@@ -202,7 +209,7 @@ describe('A single path without splits', () => {
 
 
 describe('A path with a split, but no joins', () => {
-  const parts: PersistentPart[] = [
+  const parts: StatePart[] = [
     {
       id: '1',
       x: 1,
@@ -213,6 +220,7 @@ describe('A path with a split, but no joins', () => {
         pressure: 14,
         liquids: [COLD_WATER],
       },
+      state: {},
     },
     {
       id: '2',
@@ -221,6 +229,7 @@ describe('A path with a split, but no joins', () => {
       rotate: 0,
       type: 'StraightTube',
       settings: {},
+      state: {},
     },
     {
       id: '3',
@@ -229,6 +238,7 @@ describe('A path with a split, but no joins', () => {
       rotate: 270,
       type: 'TeeTube',
       settings: {},
+      state: {},
     },
     {
       id: '4',
@@ -237,6 +247,7 @@ describe('A path with a split, but no joins', () => {
       rotate: 90,
       type: 'SystemIO',
       settings: {},
+      state: {},
     },
     {
       id: '5',
@@ -245,6 +256,7 @@ describe('A path with a split, but no joins', () => {
       rotate: 270,
       type: 'SystemIO',
       settings: {},
+      state: {},
     },
   ];
 
@@ -375,7 +387,7 @@ describe('A path with a split, but no joins', () => {
 });
 
 describe('A path that forks and rejoins', () => {
-  const parts: PersistentPart[] = [
+  const parts: StatePart[] = [
     {
       id: '1',
       x: 1,
@@ -386,6 +398,7 @@ describe('A path that forks and rejoins', () => {
         pressure: 11,
         liquids: [COLD_WATER],
       },
+      state: {},
     },
     {
       id: '2',
@@ -394,6 +407,7 @@ describe('A path that forks and rejoins', () => {
       rotate: 0,
       type: 'StraightTube',
       settings: {},
+      state: {},
     },
     {
       id: '3',
@@ -402,6 +416,7 @@ describe('A path that forks and rejoins', () => {
       rotate: 270,
       type: 'TeeTube',
       settings: {},
+      state: {},
     },
     {
       id: '4',
@@ -410,6 +425,7 @@ describe('A path that forks and rejoins', () => {
       rotate: 90,
       type: 'ElbowTube',
       settings: {},
+      state: {},
     },
     {
       id: '5',
@@ -418,6 +434,7 @@ describe('A path that forks and rejoins', () => {
       rotate: 0,
       type: 'ElbowTube',
       settings: {},
+      state: {},
     },
     {
       id: '6',
@@ -426,6 +443,7 @@ describe('A path that forks and rejoins', () => {
       rotate: 180,
       type: 'ElbowTube',
       settings: {},
+      state: {},
     },
     {
       id: '7',
@@ -434,6 +452,7 @@ describe('A path that forks and rejoins', () => {
       rotate: 270,
       type: 'ElbowTube',
       settings: {},
+      state: {},
     },
     {
       id: '8',
@@ -442,6 +461,7 @@ describe('A path that forks and rejoins', () => {
       rotate: 90,
       type: 'TeeTube',
       settings: {},
+      state: {},
     },
     {
       id: '9',
@@ -450,6 +470,7 @@ describe('A path that forks and rejoins', () => {
       rotate: 180,
       type: 'SystemIO',
       settings: {},
+      state: {},
     },
   ];
 
@@ -587,7 +608,7 @@ describe('A path that forks and rejoins', () => {
 });
 
 describe('A single path with a pump', () => {
-  const parts: PersistentPart[] = [
+  const parts: StatePart[] = [
     {
       id: '1',
       x: 3,
@@ -598,6 +619,7 @@ describe('A single path with a pump', () => {
         pressure: 6,
         liquids: [COLD_WATER],
       },
+      state: {},
     },
     {
       id: '2',
@@ -609,6 +631,7 @@ describe('A single path with a pump', () => {
         disabled: true,
         pressure: 12,
       },
+      state: {},
     },
     {
       id: '3',
@@ -617,6 +640,7 @@ describe('A single path with a pump', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {},
+      state: {},
     },
   ];
 
@@ -725,7 +749,7 @@ describe('A single path with a pump', () => {
 
 
 describe('Two sources joining', () => {
-  const parts: PersistentPart[] = [
+  const parts: StatePart[] = [
     {
       id: '1',
       x: 1,
@@ -736,6 +760,7 @@ describe('Two sources joining', () => {
         pressure: 11,
         liquids: [COLD_WATER],
       },
+      state: {},
     },
     {
       id: '2',
@@ -747,6 +772,7 @@ describe('Two sources joining', () => {
         pressure: 11,
         liquids: [HOT_WATER],
       },
+      state: {},
     },
     {
       id: '3',
@@ -755,6 +781,7 @@ describe('Two sources joining', () => {
       rotate: 180,
       type: 'ElbowTube',
       settings: {},
+      state: {},
     },
     {
       id: '4',
@@ -763,6 +790,7 @@ describe('Two sources joining', () => {
       rotate: 270,
       type: 'ElbowTube',
       settings: {},
+      state: {},
     },
     {
       id: '5',
@@ -771,6 +799,7 @@ describe('Two sources joining', () => {
       rotate: 90,
       type: 'TeeTube',
       settings: {},
+      state: {},
     },
     {
       id: '6',
@@ -779,6 +808,7 @@ describe('Two sources joining', () => {
       rotate: 180,
       type: 'SystemIO',
       settings: {},
+      state: {},
     },
   ];
 
@@ -878,7 +908,7 @@ describe('Two sources joining', () => {
 
 
 describe('A path with a bridge', () => {
-  const parts: PersistentPart[] = [
+  const parts: StatePart[] = [
     {
       id: '1',
       x: 11,
@@ -889,6 +919,7 @@ describe('A path with a bridge', () => {
         liquids: [COLD_WATER],
         pressure: 8,
       },
+      state: {},
     },
     {
       id: '2',
@@ -897,6 +928,7 @@ describe('A path with a bridge', () => {
       type: 'StraightTube',
       rotate: 0,
       settings: {},
+      state: {},
     },
     {
       id: '3',
@@ -905,6 +937,7 @@ describe('A path with a bridge', () => {
       y: 2,
       rotate: 0,
       settings: {},
+      state: {},
     },
     {
       id: '4',
@@ -913,6 +946,7 @@ describe('A path with a bridge', () => {
       y: 1,
       rotate: 90,
       settings: {},
+      state: {},
     },
     {
       id: '5',
@@ -921,6 +955,7 @@ describe('A path with a bridge', () => {
       type: 'ElbowTube',
       rotate: 180,
       settings: {},
+      state: {},
     },
     {
       id: '6',
@@ -929,6 +964,7 @@ describe('A path with a bridge', () => {
       y: 3,
       rotate: 270,
       settings: {},
+      state: {},
     },
     {
       id: '7',
@@ -937,6 +973,7 @@ describe('A path with a bridge', () => {
       type: 'ElbowTube',
       rotate: 0,
       settings: {},
+      state: {},
     },
   ];
 

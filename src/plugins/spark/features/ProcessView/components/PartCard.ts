@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { FlowPart } from '../state';
+import { FlowPart, PersistentPart } from '../state';
 
 @Component({
   props: {
@@ -16,7 +16,11 @@ export default class PartCard extends Vue {
   }
 
   protected savePart(part: FlowPart = this.part): void {
-    this.$emit('input', { ...part });
+    this.$emit('input', part);
+  }
+
+  protected savePartState(part: FlowPart = this.part): void {
+    this.$emit('state', part);
   }
 
   protected removePart(): void {

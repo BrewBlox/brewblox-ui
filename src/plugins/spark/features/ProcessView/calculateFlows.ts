@@ -1,5 +1,5 @@
 import {
-  PersistentPart,
+  StatePart,
   Transitions,
   FlowPart,
   CalculatedFlows,
@@ -23,16 +23,16 @@ export const removeTransitions =
     part => ({ ...part, transitions: omit(part.transitions, inCoord) }));
 
 export const partSettings =
-  (part: PersistentPart): ComponentSettings => settings[part.type];
+  (part: StatePart): ComponentSettings => settings[part.type];
 
 export const partTransitions =
-  (part: PersistentPart): Transitions => partSettings(part).transitions(part);
+  (part: StatePart): Transitions => partSettings(part).transitions(part);
 
 export const partSize =
-  (part: PersistentPart): [number, number] => partSettings(part).size(part);
+  (part: StatePart): [number, number] => partSettings(part).size(part);
 
 export const partCenter =
-  (part: PersistentPart): [number, number] => {
+  (part: StatePart): [number, number] => {
     const [sizeX, sizeY] = partSize(part);
     return [0.5 * sizeX, 0.5 * sizeY];
   };
@@ -64,7 +64,7 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
 };
 
 
-const translations = (part: PersistentPart): Transitions =>
+const translations = (part: StatePart): Transitions =>
   Object.entries(partTransitions(part))
     .reduce((acc, [inCoords, transition]: [string, any]) => {
       const unrotatedAnchor = new Coordinates(part)
@@ -86,7 +86,7 @@ const translations = (part: PersistentPart): Transitions =>
       {},
     );
 
-export const asFlowParts = (parts: PersistentPart[]): FlowPart[] =>
+export const asFlowParts = (parts: StatePart[]): FlowPart[] =>
   parts.map(part => ({ ...part, transitions: translations(part), flows: {} }));
 
 const combineFlows =
@@ -422,5 +422,5 @@ const unbalancedFlow = (part: FlowPart): number =>
       0);
 
 
-export const calculateNormalizedFlows = (parts: PersistentPart[]): FlowPart[] =>
+export const calculateNormalizedFlows = (parts: StatePart[]): FlowPart[] =>
   calculateFlows(asFlowParts(parts)).map(normalizeFlows);

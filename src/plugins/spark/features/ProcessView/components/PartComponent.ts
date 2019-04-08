@@ -36,6 +36,14 @@ export default class PartComponent extends Vue {
     return this.part.flows;
   }
 
+  protected get settings(): Record<string, any> {
+    return this.part.settings || {};
+  }
+
+  protected get state(): Record<string, any> {
+    return this.part.state || {};
+  }
+
   protected get size(): [number, number] {
     return partSettings[this.part.type].size(this.part);
   }
@@ -69,7 +77,11 @@ export default class PartComponent extends Vue {
       .reduce((sum, v) => sum + v, 0);
   }
 
-  protected settings(): Record<string, any> {
-    return this.part.settings || {};
+  protected savePart(part: FlowPart = this.part): void {
+    this.$emit('input', part);
+  }
+
+  protected savePartState(part: FlowPart = this.part): void {
+    this.$emit('state', part);
   }
 }

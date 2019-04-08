@@ -40,7 +40,8 @@ export default class Valve extends PartComponent {
   }
 
   protected toggleClosed(): void {
-    this.$emit('input', { ...this.part, settings: { ...this.part.settings, closed: !this.closed } });
+    this.part.settings.closed = !this.closed;
+    this.savePart();
   }
 }
 </script>

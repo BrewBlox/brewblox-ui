@@ -65,7 +65,7 @@ export default class ActuatorValve extends PartComponent {
   }
 
   get closed() {
-    return Boolean(this.part.settings.closed);
+    return Boolean(this.state.closed);
   }
 
   get valveRotation() {
@@ -88,8 +88,9 @@ export default class ActuatorValve extends PartComponent {
       ? this.actuatorBlock.data.state !== 1
       : true;
 
-    if (closed !== this.part.settings.closed) {
-      this.$emit('input', { ...this.part, settings: { ...this.part.settings, closed } });
+    if (closed !== this.part.state.closed) {
+      this.state.closed = closed;
+      this.savePartState();
     }
   }
 
