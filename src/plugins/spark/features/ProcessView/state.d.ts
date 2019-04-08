@@ -20,6 +20,7 @@ export interface CalculatedFlows {
 }
 
 export interface PersistentPart {
+  id: string;
   type: string;
   x: number;
   y: number;
@@ -41,5 +42,6 @@ export interface FlowPart extends PersistentPart {
 }
 
 export interface ProcessViewConfig {
+  currentToolId?: string;
   parts: PersistentPart[];
 }

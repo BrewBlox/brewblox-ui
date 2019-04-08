@@ -12,13 +12,17 @@ import Vue from 'vue';
       type: String,
       required: false,
     },
+    active: {
+      type: Boolean,
+      default: false,
+    },
   },
 })
 export default class ActionItem extends Vue { }
 </script>
 
 <template>
-  <q-item v-close-popup dark clickable @click="$emit('click')">
+  <q-item v-close-popup :active="$props.active" dark clickable @click="$emit('click')">
     <q-item-section v-if="$props.icon" avatar>
       <q-icon :name="$props.icon"/>
     </q-item-section>
