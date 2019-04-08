@@ -1,8 +1,6 @@
 <script lang="ts">
-import Vue from 'vue';
 import { uid } from 'quasar';
 import Component from 'vue-class-component';
-import { partSettings } from './calculateFlows';
 import { FlowPart, ClickEvent, PersistentPart, Rect, ProcessViewConfig, StatePart } from './state';
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';

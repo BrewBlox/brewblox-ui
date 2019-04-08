@@ -4,10 +4,8 @@ import Component from 'vue-class-component';
 import { uid, debounce } from 'quasar';
 import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
-import settings from './settings';
 import { PersistentPart, StatePart, ProcessViewConfig, FlowPart, Rect, ClickEvent } from './state';
-import { spaceCased, clampRotation } from '@/helpers/functional';
-import { Coordinates } from '@/helpers/coordinates';
+import { spaceCased } from '@/helpers/functional';
 import ProcessViewCatalog from './ProcessViewCatalog.vue';
 
 interface DragAction {
