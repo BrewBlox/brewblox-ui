@@ -2,7 +2,7 @@
 import { Unit } from '@/helpers/units';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { durationString, unitDurationString } from '@/helpers/functional';
+import { unitDurationString } from '@/helpers/functional';
 import parseDuration from 'parse-duration';
 
 @Component({
