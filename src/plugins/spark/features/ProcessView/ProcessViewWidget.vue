@@ -28,6 +28,15 @@ interface ToolAction {
   onPan?: (args: PanArguments, part: PersistentPart) => void;
 }
 
+interface Rect {
+  x: number;
+  y: number;
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
 
 @Component({
   components: {
@@ -47,6 +56,7 @@ export default class ProcessViewWidget extends WidgetBase {
   menuModalOpen: boolean = false;
   catalogModalOpen: boolean = false;
 
+  titleModel: string = '';
   dragAction: DragAction | null = null;
   configuredPartId: string | null = null;
   currentTool: ToolAction = this.tools[0];
@@ -88,7 +98,7 @@ export default class ProcessViewWidget extends WidgetBase {
       .onOk(() => this.updateParts([]));
   }
 
-  get gridRect() {
+  gridRect(): Rect {
     const { x, y, left, right, top, bottom } = this.$refs.grid.getBoundingClientRect();
     return { x, y, left, right, top, bottom };
   }
@@ -179,28 +189,28 @@ export default class ProcessViewWidget extends WidgetBase {
     }
   }
 
-  gridContains(x: number, y: number) {
-    const { left, right, top, bottom } = this.gridRect;
-    return x >= left
-      && x <= right
-      && y >= top
-      && y <= bottom;
+  rectContains(rect: Rect, x: number, y: number) {
+    return x >= rect.left
+      && x <= rect.right
+      && y >= rect.top
+      && y <= rect.bottom;
   }
 
-  findGridSquare(x: number, y: number) {
-    if (!this.gridContains(x, y)) {
+  findGridSquare(grid: Rect, x: number, y: number) {
+    if (!this.rectContains(grid, x, y)) {
       return null;
     }
     return {
-      x: Math.floor((x - this.gridRect.x) / SQUARE_SIZE),
-      y: Math.floor((y - this.gridRect.y) / SQUARE_SIZE),
+      x: Math.floor((x - grid.x) / SQUARE_SIZE),
+      y: Math.floor((y - grid.y) / SQUARE_SIZE),
     };
   }
 
   findClickSquare(evt: ClickEvent) {
+    const grid = this.gridRect();
     return (evt instanceof MouseEvent)
-      ? this.findGridSquare(evt.pageX, evt.pageY)
-      : this.findGridSquare(evt.touches[0].pageX, evt.touches[0].pageY);
+      ? this.findGridSquare(grid, evt.pageX, evt.pageY)
+      : this.findGridSquare(grid, evt.touches[0].pageX, evt.touches[0].pageY);
   }
 
   movePanHandler(args: PanArguments, part: PersistentPart, copy: boolean = false) {
@@ -217,13 +227,15 @@ export default class ProcessViewWidget extends WidgetBase {
       };
     }
 
+    const grid = this.gridRect();
+
     if (this.dragAction !== null) {
-      this.dragAction.x = args.position.left - (0.5 * SQUARE_SIZE) - this.gridRect.x;
-      this.dragAction.y = args.position.top - (0.5 * SQUARE_SIZE) - this.gridRect.y;
+      this.dragAction.x = args.position.left - (0.5 * SQUARE_SIZE) - grid.x;
+      this.dragAction.y = args.position.top - (0.5 * SQUARE_SIZE) - grid.y;
     }
 
     if (args.isFinal) {
-      const gridPos = this.findGridSquare(args.position.left, args.position.top);
+      const gridPos = this.findGridSquare(grid, args.position.left, args.position.top);
       if (gridPos) {
         const from = copy ? null : part;
         const id = copy ? uid() : part.id;
@@ -305,6 +317,19 @@ export default class ProcessViewWidget extends WidgetBase {
       && this.dragAction.hide
       && this.dragAction.part.id === part.id;
   }
+
+  editTitle() {
+    this.titleModel = this.widgetTitle;
+    this.$q.dialog({
+      title: 'Edit widget title',
+      cancel: true,
+      prompt: {
+        model: this.titleModel,
+        type: 'text',
+      },
+    })
+      .onOk(title => this.$props.onChangeTitle(this.widgetId, title));
+  }
 }
 </script>
 
@@ -341,6 +366,12 @@ export default class ProcessViewWidget extends WidgetBase {
             />
             <ActionItem v-else icon="mdi-pencil" label="Edit parts" @click="editable = true"/>
             <ActionItem icon="delete" label="Remove all parts" @click="clearParts"/>
+            <ActionItem
+              v-if="$props.onChangeTitle"
+              icon="mdi-format-text"
+              label="Edit widget title"
+              @click="editTitle"
+            />
             <ActionItem
               v-if="$props.onCopy"
               icon="file_copy"
