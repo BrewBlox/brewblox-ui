@@ -65,7 +65,7 @@ export default class ActuatorValve extends PartComponent {
   }
 
   get closed() {
-    return Boolean(this.part.settings.closed);
+    return Boolean(this.state.closed);
   }
 
   get valveRotation() {
@@ -88,8 +88,9 @@ export default class ActuatorValve extends PartComponent {
       ? this.actuatorBlock.data.state !== 1
       : true;
 
-    if (closed !== this.part.settings.closed) {
-      this.$parent.$emit('input', { ...this.part, settings: { ...this.part.settings, closed } });
+    if (closed !== this.part.state.closed) {
+      this.state.closed = closed;
+      this.savePartState();
     }
   }
 
@@ -110,6 +111,8 @@ export default class ActuatorValve extends PartComponent {
 
 <template>
   <g class="actuator-valve clickable" @click="toggleClosed">
+    <!-- background element, to make the full square clickable -->
+    <rect :width="sizeX*SQUARE_SIZE" :height="sizeY*SQUARE_SIZE" fill="black" opacity="0"/>
     <foreignObject v-if="!actuatorBlock" :height="SQUARE_SIZE" :width="SQUARE_SIZE">
       <q-icon name="mdi-link-variant-off" size="sm" class="absolute-right" style="height: 15px;"/>
     </foreignObject>

@@ -29,22 +29,41 @@ export default class PartComponent extends Vue {
   }
 
   protected toggleFlipped(): void {
-    this.$parent.$emit('input', { ...this.part, flipped: !this.flipped });
+    this.$emit('input', { ...this.part, flipped: !this.flipped });
   }
 
   protected get flow(): CalculatedFlows {
     return this.part.flows;
   }
 
+  protected get settings(): Record<string, any> {
+    return this.part.settings || {};
+  }
+
+  protected get state(): Record<string, any> {
+    return this.part.state || {};
+  }
+
+  protected get size(): [number, number] {
+    return partSettings[this.part.type].size(this.part);
+  }
+
+  protected get sizeX(): number {
+    return this.size[0];
+  }
+
+  protected get sizeY(): number {
+    return this.size[1];
+  }
+
   private rotatedCoord(coord: string): string {
-    const [sizeX, sizeY] = partSettings[this.part.type].size(this.part);
-    if (sizeX === 1 && sizeY === 1) {
+    if (this.sizeX === 1 && this.sizeY === 1) {
       return coord;
     }
     const anchor = new Coordinates([0, 0])
-      .rotateSquare(-this.part.rotate, this.part.rotate, [sizeX, sizeY]);
+      .rotateSquare(-this.part.rotate, this.part.rotate, [this.sizeX, this.sizeY]);
     return new Coordinates(coord)
-      .rotate(this.part.rotate, [0.5 * sizeX, 0.5 * sizeY])
+      .rotate(this.part.rotate, [0.5 * this.sizeX, 0.5 * this.sizeY])
       .translate(anchor)
       .toString();
   }
@@ -58,7 +77,11 @@ export default class PartComponent extends Vue {
       .reduce((sum, v) => sum + v, 0);
   }
 
-  protected settings(): Record<string, any> {
-    return this.part.settings || {};
+  protected savePart(part: FlowPart = this.part): void {
+    this.$emit('input', part);
+  }
+
+  protected savePartState(part: FlowPart = this.part): void {
+    this.$emit('state', part);
   }
 }

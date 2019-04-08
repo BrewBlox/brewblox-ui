@@ -140,16 +140,16 @@ export default class DashboardPage extends Vue {
     }
   }
 
-  onChangeSize(id: string, cols: number, rows: number) {
-    updateDashboardItemSize(this.$store, { id, cols, rows });
+  async onChangeSize(id: string, cols: number, rows: number) {
+    await updateDashboardItemSize(this.$store, { id, cols, rows });
   }
 
-  onChangeItemConfig(id: string, config: any) {
-    updateDashboardItemConfig(this.$store, { id, config });
+  async onChangeItemConfig(id: string, config: any) {
+    await updateDashboardItemConfig(this.$store, { id, config });
   }
 
-  onChangeItemTitle(id: string, title: string) {
-    saveDashboardItem(this.$store, { ...dashboardItemById(this.$store, id), title });
+  async onChangeItemTitle(id: string, title: string) {
+    await saveDashboardItem(this.$store, { ...dashboardItemById(this.$store, id), title });
   }
 
   onDeleteItem(itemId: string) {

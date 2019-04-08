@@ -27,12 +27,12 @@ export default class WhirlpoolInlet extends PartComponent {
 
 <template>
   <g class="whirlpool-inlet">
+    <LiquidStroke :paths="[paths.liquid]" :colors="liquids"/>
     <g class="outline">
       <rect y="12" width="8" height="8" fill="white"/>
       <rect y="30" width="8" height="8" fill="white"/>
       <path v-for="border in paths.borders" :key="border" :d="border"/>
     </g>
-    <LiquidStroke :paths="[paths.liquid]" :colors="liquids"/>
     <AnimatedArrows :speed="flowSpeed" :path="paths.liquid" :num-arrows="8"/>
   </g>
 </template>

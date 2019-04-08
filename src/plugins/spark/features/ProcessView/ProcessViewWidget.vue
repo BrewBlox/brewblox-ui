@@ -1,11 +1,11 @@
 <script lang="ts">
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
-import { uid } from 'quasar';
+import { uid, debounce } from 'quasar';
 import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';
-import { PersistentPart, ProcessViewConfig, FlowPart } from './state';
+import { PersistentPart, StatePart, ProcessViewConfig, FlowPart } from './state';
 import { spaceCased, clampRotation } from '@/helpers/functional';
 import { Coordinates } from '@/helpers/coordinates';
 import ProcessViewCatalog from './ProcessViewCatalog.vue';
@@ -60,6 +60,9 @@ export default class ProcessViewWidget extends WidgetBase {
   dragAction: DragAction | null = null;
   configuredPartId: string | null = null;
   catalogPartial: Partial<PersistentPart> | null = null;
+  partState: Record<string, any> = {};
+  flowParts: FlowPart[] = [];
+  calculateFlowFunc: Function = () => { };
 
   get widgetConfig(): ProcessViewConfig {
     return this.$props.config;
@@ -74,26 +77,42 @@ export default class ProcessViewWidget extends WidgetBase {
     this.saveConfig({ ...this.widgetConfig, currentToolId: tool.value });
   }
 
-  saveConfig(config: ProcessViewConfig = this.widgetConfig) {
-    this.$props.onChangeConfig(this.widgetId, config);
+  async saveConfig(config: ProcessViewConfig = this.widgetConfig) {
+    await this.$props.onChangeConfig(this.widgetId, config)
+      .catch((e) => {
+        this.$q.notify({
+          color: 'negative',
+          icon: 'error',
+          message: `save error: ${e}`,
+        });
+        this.$forceUpdate();
+      });
   }
 
-  updateParts(parts: PersistentPart[]) {
+  async updateParts(parts: PersistentPart[]) {
     const asPersistent = (part: PersistentPart | FlowPart) => {
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      const { transitions, flows, ...persistent } = part as FlowPart;
+      const { state, transitions, flows, ...persistent } = part as FlowPart;
       return persistent;
     };
 
-    this.saveConfig({ ...this.widgetConfig, parts: parts.map(asPersistent) });
+    // first set local value, to avoid jitters caused by the period between action and vueX refresh
+    this.widgetConfig.parts = parts.map(asPersistent);
+    await this.saveConfig({ ...this.widgetConfig });
+    this.calculateFlowFunc();
   }
 
-  updatePart(part: PersistentPart | FlowPart) {
-    this.updateParts(this.parts.map(p => (p.id === part.id ? part : p)));
+  async updatePart(part: PersistentPart) {
+    await this.updateParts(this.parts.map(p => (p.id === part.id ? part : p)));
   }
 
-  removePart(part: PersistentPart) {
-    this.updateParts(this.parts.filter(p => p.id !== part.id));
+  updatePartState(part: StatePart) {
+    this.$set(this.partState, part.id, part.state);
+    this.calculateFlowFunc();
+  }
+
+  async removePart(part: PersistentPart) {
+    await this.updateParts(this.parts.filter(p => p.id !== part.id));
   }
 
   clearParts() {
@@ -111,19 +130,16 @@ export default class ProcessViewWidget extends WidgetBase {
     return { x, y, left, right, top, bottom };
   }
 
-  get parts(): PersistentPart[] {
+  get parts(): StatePart[] {
     return this.widgetConfig.parts
-      .map(v => ({
+      .map(part => ({
         id: uid(),
         rotate: 0,
         settings: {},
         flipped: false,
-        ...v,
+        ...part,
+        state: this.partState[part.id] || {},
       }));
-  }
-
-  get flowParts(): FlowPart[] {
-    return calculateNormalizedFlows(this.parts);
   }
 
   get configuredPart(): FlowPart | null {
@@ -155,7 +171,7 @@ export default class ProcessViewWidget extends WidgetBase {
         label: 'Rotate (Click)',
         value: 'rotate-right',
         icon: 'mdi-rotate-right-variant',
-        onClick: (evt, part) => this.rotateClickHandler(evt, part, 90),
+        onClick: this.rotateClickHandler,
       },
       {
         label: 'Edit Settings (Click)',
@@ -241,9 +257,12 @@ export default class ProcessViewWidget extends WidgetBase {
       if (gridPos) {
         const from = copy ? null : part;
         const id = copy ? uid() : part.id;
-        this.movePart(from, { ...part, ...gridPos, id });
+        this.movePart(from, { ...part, ...gridPos, id })
+          .then(() => this.$nextTick())
+          .then(() => this.dragAction = null);
+      } else {
+        this.dragAction = null;
       }
-      this.$nextTick(() => this.dragAction = null);
     }
   }
 
@@ -265,7 +284,7 @@ export default class ProcessViewWidget extends WidgetBase {
     }
   }
 
-  rotateClickHandler(evt: ClickEvent, part: PersistentPart, rotation: number) {
+  rotateClickHandler(evt: ClickEvent, part: PersistentPart, rotation: number = 90) {
     if (part) {
       const partSize = settings[part.type].size(part);
       const rotate = clampRotation(part.rotate + rotation);
@@ -282,7 +301,7 @@ export default class ProcessViewWidget extends WidgetBase {
     return settings[part.type].blockedCoordinates(part);
   }
 
-  movePart(from: PersistentPart | null, to: PersistentPart) {
+  async movePart(from: PersistentPart | null, to: PersistentPart) {
     if (from
       && from.id === to.id
       && from.x === to.x
@@ -307,7 +326,7 @@ export default class ProcessViewWidget extends WidgetBase {
       }
     }
 
-    this.updateParts([...this.parts.filter(p => !from || p.id !== from.id), to]);
+    await this.updateParts([...this.parts.filter(p => !from || p.id !== from.id), to]);
   }
 
   tryAddPart(part: PersistentPart) {
@@ -331,6 +350,15 @@ export default class ProcessViewWidget extends WidgetBase {
       },
     })
       .onOk(title => this.$props.onChangeTitle(this.widgetId, title));
+  }
+
+  mounted() {
+    this.calculateFlowFunc =
+      debounce(
+        () => this.$nextTick(() => this.flowParts = calculateNormalizedFlows(this.parts)),
+        50,
+        false);
+    this.calculateFlowFunc();
   }
 }
 </script>
@@ -440,7 +468,7 @@ export default class ProcessViewWidget extends WidgetBase {
             y="8"
             class="grid-item-coordinates"
           >{{ part.x }},{{ part.y }}</text>
-          <ProcessViewItem :value="part" @input="updatePart"/>
+          <ProcessViewItem :value="part" @input="updatePart" @state="updatePartState"/>
           <rect
             v-if="editable"
             :width="SQUARE_SIZE"
