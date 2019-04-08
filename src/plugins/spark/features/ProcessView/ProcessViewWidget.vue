@@ -399,7 +399,7 @@ export default class ProcessViewWidget extends WidgetBase {
     <q-card-section v-if="editable" class="q-py-none">
       <q-item dark dense class="justify-around">
         <q-item-section class="col-auto">
-          <q-btn-dropdown :label="currentTool.label" flat>
+          <q-btn-dropdown :icon="currentTool.icon" :label="currentTool.label" flat>
             <q-list dark bordered>
               <ActionItem
                 v-for="tool in tools"
