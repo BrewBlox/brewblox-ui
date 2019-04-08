@@ -74,26 +74,28 @@ export default class ProcessViewWidget extends WidgetBase {
     this.saveConfig({ ...this.widgetConfig, currentToolId: tool.value });
   }
 
-  saveConfig(config: ProcessViewConfig = this.widgetConfig) {
-    this.$props.onChangeConfig(this.widgetId, config);
+  async saveConfig(config: ProcessViewConfig = this.widgetConfig) {
+    await this.$props.onChangeConfig(this.widgetId, config);
   }
 
-  updateParts(parts: PersistentPart[]) {
+  async updateParts(parts: PersistentPart[]) {
     const asPersistent = (part: PersistentPart | FlowPart) => {
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
       const { transitions, flows, ...persistent } = part as FlowPart;
       return persistent;
     };
 
-    this.saveConfig({ ...this.widgetConfig, parts: parts.map(asPersistent) });
+    // first set local value, to avoid jitters caused by the period between action and vueX refresh
+    this.widgetConfig.parts = parts.map(asPersistent);
+    await this.saveConfig({ ...this.widgetConfig });
   }
 
-  updatePart(part: PersistentPart | FlowPart) {
-    this.updateParts(this.parts.map(p => (p.id === part.id ? part : p)));
+  async updatePart(part: PersistentPart | FlowPart) {
+    await this.updateParts(this.parts.map(p => (p.id === part.id ? part : p)));
   }
 
-  removePart(part: PersistentPart) {
-    this.updateParts(this.parts.filter(p => p.id !== part.id));
+  async removePart(part: PersistentPart) {
+    await this.updateParts(this.parts.filter(p => p.id !== part.id));
   }
 
   clearParts() {
@@ -241,9 +243,12 @@ export default class ProcessViewWidget extends WidgetBase {
       if (gridPos) {
         const from = copy ? null : part;
         const id = copy ? uid() : part.id;
-        this.movePart(from, { ...part, ...gridPos, id });
+        this.movePart(from, { ...part, ...gridPos, id })
+          .then(() => this.$nextTick())
+          .then(() => this.dragAction = null);
+      } else {
+        this.dragAction = null;
       }
-      this.$nextTick(() => this.dragAction = null);
     }
   }
 
@@ -282,7 +287,7 @@ export default class ProcessViewWidget extends WidgetBase {
     return settings[part.type].blockedCoordinates(part);
   }
 
-  movePart(from: PersistentPart | null, to: PersistentPart) {
+  async movePart(from: PersistentPart | null, to: PersistentPart) {
     if (from
       && from.id === to.id
       && from.x === to.x
@@ -307,7 +312,7 @@ export default class ProcessViewWidget extends WidgetBase {
       }
     }
 
-    this.updateParts([...this.parts.filter(p => !from || p.id !== from.id), to]);
+    await this.updateParts([...this.parts.filter(p => !from || p.id !== from.id), to]);
   }
 
   tryAddPart(part: PersistentPart) {
