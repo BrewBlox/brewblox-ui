@@ -342,19 +342,15 @@ export default class ProcessViewForm extends FormBase {
 
         <q-separator dark inset/>
 
-        <q-item
+        <ActionItem
           v-for="tool in tools"
           :key="tool.value"
           :active="currentTool.value === tool.value"
-          dark
-          clickable
+          :icon="tool.icon"
+          :label="tool.label"
+          no-close
           @click="currentTool = tool"
-        >
-          <q-item-section avatar>
-            <q-icon :name="tool.icon"/>
-          </q-item-section>
-          <q-item-section>{{ tool.label }}</q-item-section>
-        </q-item>
+        />
 
         <q-item/>
         <q-item dark dense>
@@ -363,12 +359,8 @@ export default class ProcessViewForm extends FormBase {
 
         <q-separator dark inset/>
 
-        <q-item dark clickable @click="clearParts">
-          <q-item-section avatar>
-            <q-icon name="delete"/>
-          </q-item-section>
-          <q-item-section>Delete all parts</q-item-section>
-        </q-item>
+        <ExportAction :widget-id="widgetId" no-close/>
+        <ActionItem icon="delete" label="Delete all parts" no-close @click="clearParts"/>
       </q-list>
 
       <div class="col row justify-around">

@@ -19,6 +19,10 @@ import FileSaver from 'file-saver';
       type: String,
       default: 'Export widget',
     },
+    noClose: {
+      type: Boolean,
+      default: false,
+    },
   },
 })
 export default class ExportAction extends Vue {
@@ -35,5 +39,5 @@ export default class ExportAction extends Vue {
 </script>
 
 <template>
-  <ActionItem :icon="$props.icon" :label="$props.label" @click="showDialog"/>
+  <ActionItem v-bind="$props" @click="showDialog"/>
 </template>

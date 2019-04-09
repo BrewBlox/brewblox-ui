@@ -247,18 +247,12 @@ export default class SparkPage extends Vue {
       <portal to="toolbar-buttons">
         <q-btn-dropdown color="primary" label="actions">
           <q-list dark link>
-            <q-item v-close-popup dark clickable @click="relationsModalOpen = true">
-              <q-item-section avatar>
-                <q-icon name="mdi-ray-start-arrow"/>
-              </q-item-section>
-              <q-item-section>Show Relations</q-item-section>
-            </q-item>
-            <q-item dark clickable @click="startCreateBlock">
-              <q-item-section avatar>
-                <q-icon name="add"/>
-              </q-item-section>
-              <q-item-section>New Block</q-item-section>
-            </q-item>
+            <ActionItem
+              icon="mdi-ray-start-arrow"
+              label="Show Relations"
+              @click="relationsModalOpen = true"
+            />
+            <ActionItem icon="add" label="New Block" @click="startCreateBlock"/>
           </q-list>
         </q-btn-dropdown>
       </portal>

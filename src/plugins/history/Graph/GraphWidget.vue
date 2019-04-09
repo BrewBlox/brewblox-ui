@@ -61,7 +61,7 @@ export default class GraphWidget extends WidgetBase {
     <q-dialog v-model="graphModalOpen" maximized>
       <q-card v-if="graphModalOpen" dark>
         <GraphCard :id="$props.id" :config="graphCfg" shared-metrics>
-          <q-btn-dropdown flat label="presets" icon="mdi-timelapse">
+          <q-btn-dropdown flat auto-close label="presets" icon="mdi-timelapse">
             <q-list dark link>
               <q-item
                 v-for="(preset, idx) in presets"

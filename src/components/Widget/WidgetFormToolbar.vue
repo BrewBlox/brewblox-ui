@@ -20,9 +20,15 @@ export default class WidgetFormToolbar extends FormBase { }
     <slot/>
     <template v-slot:buttons>
       <slot name="buttons"/>
-      <q-btn v-if="$props.onDelete" flat icon="delete" @click="$props.onDelete(widgetId)"/>
-      <q-btn v-if="$props.onCopy" flat icon="file_copy" @click="$props.onCopy(widgetId)"/>
-      <q-btn v-if="$props.onMove" flat icon="exit_to_app" @click="$props.onMove(widgetId)"/>
+      <q-btn v-if="$props.onDelete" flat icon="delete" @click="$props.onDelete(widgetId)">
+        <q-tooltip>Delete widget</q-tooltip>
+      </q-btn>
+      <q-btn v-if="$props.onCopy" flat icon="file_copy" @click="$props.onCopy(widgetId)">
+        <q-tooltip>Copy widget</q-tooltip>
+      </q-btn>
+      <q-btn v-if="$props.onMove" flat icon="exit_to_app" @click="$props.onMove(widgetId)">
+        <q-tooltip>Move widget</q-tooltip>
+      </q-btn>
     </template>
   </FormToolbar>
 </template>
