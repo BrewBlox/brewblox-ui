@@ -4,9 +4,14 @@ import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { filters, getById } from './getters';
 import { PidBlock } from './state';
+import { blocks } from '../../store/getters';
+import { saveBlock } from '../../store/actions';
+import { formById } from '../../../../store/features/getters';
 
 @Component
 export default class PidWidget extends BlockWidget {
+  inputFormOpen = false;
+
   get block(): PidBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
@@ -41,6 +46,26 @@ export default class PidWidget extends BlockWidget {
     this.block.data.enabled = true;
     this.saveBlock();
   }
+
+  get inputBlock() {
+    const inputId = this.block.data.inputId.id;
+    if (!inputId) {
+      return null;
+    }
+    return blocks(this.$store, this.serviceId)[inputId] || null;
+  }
+
+  get inputBlockForm() {
+    if (this.inputBlock === null) {
+      return '';
+    }
+    return formById(this.$store, this.inputBlock.type);
+  }
+
+  saveInputBlock(v) {
+    saveBlock(this.$store, this.serviceId, v)
+      .catch(err => this.$q.notify(err.toString()));
+  }
 }
 </script>
 
@@ -48,6 +73,18 @@ export default class PidWidget extends BlockWidget {
   <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <PidForm v-if="modalOpen" v-bind="formProps"/>
+    </q-dialog>
+    <q-dialog v-model="inputFormOpen" no-backdrop-dismiss>
+      <component
+        v-if="inputFormOpen"
+        :is="inputBlockForm"
+        :type="inputBlock.type"
+        :field="inputBlock"
+        :on-change-field="v => saveInputBlock(v)"
+        :id="inputBlock.id"
+        :title="`Input of ${block.id}`"
+        :on-change-block-id="() => {}"
+      />
     </q-dialog>
 
     <BlockWidgetToolbar :field="me" graph/>
@@ -86,7 +123,7 @@ export default class PidWidget extends BlockWidget {
         <q-separator dark inset class="q-mb-md"/>
       </template>
 
-      <q-item dark>
+      <q-item dark clickable @click="inputFormOpen = true">
         <div class="col-3 text-weight-light text-subtitle2 q-pt-xs">Input</div>
         <q-item-section>
           <q-item-label caption>Measured</q-item-label>
@@ -94,7 +131,7 @@ export default class PidWidget extends BlockWidget {
         </q-item-section>
         <q-item-section>
           <q-item-label caption>Target</q-item-label>
-          <UnitField :field="block.data.inputSetting"/>
+          <UnitField :field="block.data.inputSetting" tag-class="editable"/>
         </q-item-section>
       </q-item>
 

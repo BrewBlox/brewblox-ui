@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Unit } from '@/helpers/units';
-import { SetpointLink, TempSensorLink } from '@/helpers/units/KnownLinks';
+import { TempSensorLink } from '@/helpers/units/KnownLinks';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import Component from 'vue-class-component';
 
@@ -8,10 +8,10 @@ import Component from 'vue-class-component';
 export default class SetpointSensorPairForm extends BlockForm {
   defaultData() {
     return {
-      setpointId: new SetpointLink(null),
       sensorId: new TempSensorLink(null),
-      setpointValue: new Unit(null, 'degC'),
-      sensorValue: new Unit(null, 'degC'),
+      setting: new Unit(null, 'degC'),
+      value: new Unit(null, 'degC'),
+      settingEnabled: true,
     };
   }
 
@@ -29,12 +29,12 @@ export default class SetpointSensorPairForm extends BlockForm {
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>Setpoint</q-item-label>
-            <LinkPopupEdit
-              :field="block.data.setpointId"
+            <q-item-label caption>Setting</q-item-label>
+            <UnitPopupEdit
+              :field="block.data.setting"
               :service-id="serviceId"
-              :change="callAndSaveBlock(v => block.data.setpointId = v)"
-              label="Setpoint"
+              :change="callAndSaveBlock(v => block.data.setting = v)"
+              label="Setting"
             />
           </q-item-section>
           <q-item-section>

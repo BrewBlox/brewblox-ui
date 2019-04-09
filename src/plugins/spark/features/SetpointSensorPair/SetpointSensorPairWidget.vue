@@ -14,8 +14,8 @@ export default class SetpointSensorPairWidget extends BlockWidget {
   get renamedTargets() {
     return postfixedDisplayNames(
       {
-        setpointValue: 'Setpoint',
-        sensorValue: 'Sensor',
+        setting: 'Setting',
+        value: 'Sensor value',
       },
       this.block.data,
     );
@@ -34,13 +34,20 @@ export default class SetpointSensorPairWidget extends BlockWidget {
     <q-card-section>
       <q-item dark>
         <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>Setpoint</q-item-label>
-          <UnitField :field="block.data.setpointValue"/>
+          <q-item-label caption>Setting</q-item-label>
+          <UnitPopupEdit
+            v-if="!isDriven"
+            :field="block.data.setting"
+            :change="callAndSaveBlock(v => block.data.setting = v)"
+            label="Setting"
+          />
+
+          <UnitField v-else :field="block.data.setting"/>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
         <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>Sensor</q-item-label>
-          <UnitField :field="block.data.sensorValue"/>
+          <q-item-label caption>Sensor value</q-item-label>
+          <UnitField :field="block.data.value"/>
         </q-item-section>
       </q-item>
     </q-card-section>
