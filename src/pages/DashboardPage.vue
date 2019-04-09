@@ -199,7 +199,7 @@ export default class DashboardPage extends Vue {
         if (!dashboard) {
           return;
         }
-        appendDashboardItem(this.$store, { ...item, id, dashboard });
+        appendDashboardItem(this.$store, { ...item, id, dashboard, pinnedPosition: null });
         this.$q.notify({
           color: 'positive',
           icon: 'file_copy',
@@ -224,7 +224,7 @@ export default class DashboardPage extends Vue {
       cancel: true,
     })
       .onOk((dashboard: string) =>
-        dashboard && saveDashboardItem(this.$store, { ...item, dashboard }));
+        dashboard && saveDashboardItem(this.$store, { ...item, dashboard, pinnedPosition: null }));
   }
 }
 </script>

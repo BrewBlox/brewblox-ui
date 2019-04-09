@@ -31,7 +31,7 @@ export default class ExportAction extends Vue {
   async showDialog() {
     const item = dashboardItemById(this.$store, this.$props.widgetId);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, _rev, dashboard, ...exported } = item;
+    const { id, _rev, dashboard, pinnedPosition, ...exported } = item;
     const blob = new Blob([JSON.stringify(serialize(exported))], { type: 'text/plain;charset=utf-8' });
     FileSaver.saveAs(blob, `brewblox-${item.title}-${item.id}.json`);
   }
