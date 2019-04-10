@@ -39,7 +39,7 @@ import Component from 'vue-class-component';
   },
 })
 export default class ItemBase extends Vue {
-  protected $q: any;
+  protected $q: any; // inserted by quasar
 
   protected get widgetId(): string {
     return this.$props.id;

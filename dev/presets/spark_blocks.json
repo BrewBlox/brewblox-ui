@@ -80,8 +80,7 @@
     "type": "SetpointSensorPair",
     "data": {
       "sensorId<>": "sensor-1",
-      "setting": 0,
-      "value": 0,
+      "setting": 20,
       "settingEnabled": true
     }
   },
@@ -93,8 +92,7 @@
     "type": "SetpointSensorPair",
     "data": {
       "sensorId<>": 0,
-      "setting": 0,
-      "value": 0,
+      "setting": 20,
       "settingEnabled": true
     }
   },
@@ -122,9 +120,6 @@
     "data": {
       "constrainedBy": {
         "constraints": [
-          {
-            "min": 5
-          },
           {
             "max": 50
           },
