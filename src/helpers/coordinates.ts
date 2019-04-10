@@ -1,45 +1,52 @@
 import { clampRotation } from './functional';
 import isEqual from 'lodash/isEqual';
 
-export type CoordinatesParam = string | { x: number; y: number } | [number, number] | Coordinates;
+export type CoordinatesParam =
+  string | { x: number; y: number; z: number } | [number, number, number] | Coordinates;
 
 export class Coordinates {
-  public x: number;
-  public y: number;
+  public readonly x: number;
+  public readonly y: number;
+  public readonly z: number;
 
   public constructor(param: CoordinatesParam) {
     if (typeof param === 'string') {
-      [this.x, this.y] = param.split(',').map(Number);
+      [this.x, this.y, this.z] = param.split(',').map(Number);
     }
 
     else if (Array.isArray(param)) {
-      [this.x, this.y] = param;
+      [this.x, this.y, this.z] = param;
     }
 
     else if (typeof param === 'object') {
       this.x = param.x;
       this.y = param.y;
+      this.z = param.z;
     }
 
     else {
       throw new Error(`${param} is not a valid argument`);
     }
 
-    if (typeof this.x !== 'number' || Number.isNaN(this.x)
-      || typeof this.y !== 'number' || Number.isNaN(this.y)) {
+    const rules = [
+      (v: number) => typeof v === 'number',
+      (v: number) => !Number.isNaN(v),
+    ];
+
+    if (!rules.every(rule => [this.x, this.y, this.z].every(v => rule(v)))) {
       throw new Error(`${param} could not be parsed as a coordinate`);
     }
   }
 
   private isException(): boolean {
-    return this.x < 0 || this.y < 0; // exclude negative coordinates which are used for exceptions
+    return this.z < 0; // negative Z values are used for static objects that should not move
   }
 
-  public rotate(rotation: number, pivot: CoordinatesParam = [0.5, 0.5]): Coordinates {
+  public rotate(rotation: number, pivot: CoordinatesParam = [0.5, 0.5, 0]): Coordinates {
     rotation = clampRotation(rotation);
 
     if (this.isException() || rotation === 0) {
-      return this;
+      return new Coordinates(this);
     }
 
     const pivotCoord = new Coordinates(pivot);
@@ -47,40 +54,39 @@ export class Coordinates {
     const s = Math.sin(rotation * Math.PI / 180);
     const c = Math.cos(rotation * Math.PI / 180);
 
-    this.x -= pivotCoord.x;
-    this.y -= pivotCoord.y;
+    const shiftX = this.x - pivotCoord.x;
+    const shiftY = this.y - pivotCoord.y;
 
-    const x = (this.x * c - this.y * s) + pivotCoord.x;
-    const y = (this.x * s + this.y * c) + pivotCoord.y;
+    const x = (shiftX * c - shiftY * s) + pivotCoord.x;
+    const y = (shiftX * s + shiftY * c) + pivotCoord.y;
 
-    this.x = +x.toFixed(1);
-    this.y = +y.toFixed(1);
-
-    return this;
+    return new Coordinates([+x.toFixed(1), +y.toFixed(1), this.z]);
   }
 
   public translate(offset: CoordinatesParam): Coordinates {
     if (this.isException()) {
-      return this;
+      return new Coordinates(this);
     }
 
     const offsetCoord = new Coordinates(offset);
-    this.x += offsetCoord.x;
-    this.y += offsetCoord.y;
 
-    return this;
+    return new Coordinates([
+      this.x + offsetCoord.x,
+      this.y + offsetCoord.y,
+      this.z,
+    ]);
   }
 
   public rotateSquare(
     rotation: number,
     currentRotation: number,
     size: [number, number],
-    coordinatesWithinShape: CoordinatesParam = [0, 0]
+    coordinatesWithinShape: CoordinatesParam = [0, 0, 0]
   ): Coordinates {
     rotation = clampRotation(rotation);
 
     if (this.isException() || rotation === 0 || isEqual(size, [1, 1])) {
-      return this;
+      return new Coordinates(this);
     }
 
     // An example:
@@ -113,20 +119,20 @@ export class Coordinates {
     //     |   |   |   |XXX|
     //     +---------------+
 
-    const squareCenter = new Coordinates(this)
-      .translate([0.5, 0.5]);
+    const squareCenter = this
+      .translate([0.5, 0.5, 0]);
 
-    const shapeEdge = new Coordinates(this)
+    const shapeEdge = this
       .rotate(currentRotation, squareCenter);
 
     const [sizeX, sizeY] = size;
     const offset = new Coordinates(coordinatesWithinShape);
 
-    const shapeCenter = new Coordinates(shapeEdge)
-      .translate([(0.5 * sizeX) - offset.x, (0.5 * sizeY) - offset.y])
+    const shapeCenter = shapeEdge
+      .translate([(sizeX / 2 - offset.x), (sizeY / 2 - offset.y), 0])
       .rotate(currentRotation, shapeEdge);
 
-    const newSquareCenter = new Coordinates(squareCenter)
+    const newSquareCenter = squareCenter
       .rotate(rotation, shapeCenter);
 
     // We want two things:
@@ -139,26 +145,121 @@ export class Coordinates {
         ? Math.ceil
         : Math.floor;
 
-    this.x = roundFunc(newSquareCenter.x - 0.5);
-    this.y = roundFunc(newSquareCenter.y - 0.5);
+    return new Coordinates([
+      roundFunc(newSquareCenter.x - 0.5),
+      roundFunc(newSquareCenter.y - 0.5),
+      this.z,
+    ]);
+  }
 
-    return this;
+  public rotateSquareEdge(
+    rotation: number,
+    shapeAnchor: CoordinatesParam,
+    shapeRotation: number,
+    shapeSize: [number, number],
+  ): Coordinates {
+    rotation = clampRotation(rotation);
+
+    if (this.isException() || rotation === 0) {
+      return new Coordinates(this);
+    }
+
+    // An example:
+    //
+    // rotation = 180
+    // this.values() = 0.5,0,0
+    // shapeAnchor = 0,0,0
+    // shapeRotation = 0
+    // shapeSize = [4, 2]
+    //
+    //  @  is the rotated edge
+    //  O  is the shape center
+    //
+    // Note that we're taking rotateSquare behavior into account
+    // Relevant is how shapes with an odd length are treated:
+    // the value is alternatively rounded up and down
+    //
+    // Before:
+    //
+    //     +-@-------------+
+    //     |   |   |   |   |
+    //     |   |   |   |   |
+    //     +-------O-------+
+    //     |   |   |   |   |
+    //     |   |   |   |   |
+    //     +---------------+
+    //
+    // After:
+    //
+    //     +---------------+
+    //     |   |   |   |   |
+    //     |   |   |   |   |
+    //     +-------O-------+
+    //     |   |   |   |   |
+    //     |   |   |   |   |
+    //     +-------------@-+
+    //
+    // Steps:
+    // 1 - Start position
+    // 2 - Shift left/up to the anchor position of the current square
+    // 3 - Rotate the full shape, treating the current square as a shape subsquare
+    // 4 - Unshift from the anchor position
+    // 5 - Rotate the unshifted position around the center of the subsquare
+    //
+    //     2-1-------------+
+    //     |   |   |   |   |
+    //     |   |   |   |   |
+    //     +-------O---3-4-+
+    //     |   |   |   |   |
+    //     |   |   |   |   |
+    //     +-------------5-+
+
+    // Step 1 - start position
+    const edge = this;
+    const shape = new Coordinates(shapeAnchor);
+
+    // Step 2 - Shift left/up to the anchor position of the current square
+    const anchor = new Coordinates([Math.floor(edge.x), Math.floor(edge.y), 0]);
+    const shiftX = anchor.x - edge.x;
+    const shiftY = anchor.y - edge.y;
+
+    // Step 3 - Rotate the full shape, treating current square as shape subsquare
+    const coordinatesWithinShape = anchor
+      .translate([-shape.x, -shape.y, 0]);
+    const rotatedSquareAnchor = anchor
+      .rotateSquare(rotation, shapeRotation, shapeSize, coordinatesWithinShape);
+
+    // Step 4 - Unshift coordinates
+    const unshiftedAnchor = rotatedSquareAnchor
+      .translate([-shiftX, -shiftY, 0]);
+
+    // Step 5 - Rotate around center of subsquare
+    const squareCenter = rotatedSquareAnchor
+      .translate([0.5, 0.5, 0]);
+    const rotatedEdge = unshiftedAnchor
+      .rotate(rotation, squareCenter);
+
+    // Step 6 - Profit
+    return new Coordinates([
+      rotatedEdge.x,
+      rotatedEdge.y,
+      this.z,
+    ]);
   }
 
   public toString(): string {
-    return `${this.x},${this.y}`;
+    return `${this.x},${this.y},${this.z}`;
   }
 
-  public values(): [number, number] {
-    return [this.x, this.y];
+  public values(): [number, number, number] {
+    return [this.x, this.y, this.z];
   }
 
-  public raw(): { x: number; y: number } {
-    return { x: this.x, y: this.y };
+  public raw(): { x: number; y: number; z: number } {
+    return { x: this.x, y: this.y, z: this.z };
   }
 
   public equals(other: Coordinates): boolean {
-    return this.x === other.x && this.y === other.y;
+    return ['x', 'y', 'z'].every(k => this[k] === other[k]);
   }
 }
-
