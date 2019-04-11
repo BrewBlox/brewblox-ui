@@ -138,27 +138,29 @@ export default class SetpointProfileForm extends BlockForm {
   parseDuration(val: string) {
     return parseDuration(val);
   }
+
+  enable() {
+    this.block.data.enabled = true;
+    this.saveBlock();
+  }
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
     <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
-
     <q-card-section>
-      <q-expansion-item group="modal" icon="settings" label="Settings">
-        <q-item dark>
+      <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
+        <BlockEnableToggle
+          v-if="block.data.targetId.id !== null"
+          v-bind="$props"
+          :text-enabled="`Profile is enabled: ${block.data.targetId} will be set by the profile.`"
+          :text-disabled="`Profile is disabled: ${block.data.targetId} will not be changed.`"
+        />
+        <q-separator v-if="block.data.targetId.id !== null" dark/>
+        <q-item dark class="q-py-md">
           <q-item-section>
-            <q-item-label caption>Current setting</q-item-label>
-            <big>{{ block.data.setting | unit }}</big>
-          </q-item-section>
-        </q-item>
-      </q-expansion-item>
-
-      <q-expansion-item default-opened group="modal" icon="mdi-thermometer" label="Setpoints">
-        <q-item dark>
-          <q-item-section side>Start time</q-item-section>
-          <q-item-section>
+            <q-item-label caption>Start time</q-item-label>
             <DatetimePopupEdit
               :field="start"
               :change="updateStartTime"
@@ -166,18 +168,40 @@ export default class SetpointProfileForm extends BlockForm {
               tag="span"
             />
           </q-item-section>
-        </q-item>
-        <q-item v-for="(point, idx) in points" :key="idx" dark>
           <q-item-section>
+            <q-item-label caption>Driven Setpoint/Sensor pair</q-item-label>
+            <LinkPopupEdit
+              :field="block.data.targetId"
+              :service-id="block.serviceId"
+              :change="callAndSaveBlock(v => block.data.targetId = v)"
+              label="Driven Setpoint/Sensor pair"
+              tag="span"
+            />
+          </q-item-section>
+        </q-item>
+        <q-separator dark/>
+        <q-item dark class="q-pt-md">
+          <q-item-section class="col-3 q-py-none">
             <q-item-label caption>Offset</q-item-label>
+          </q-item-section>
+          <q-item-section class="col-5 q-py-none">
+            <q-item-label caption>Time</q-item-label>
+          </q-item-section>
+          <q-item-section class="col-3 q-py-none">
+            <q-item-label caption>Temperature</q-item-label>
+          </q-item-section>
+          <q-item-section class="col-1 q-py-none" side/>
+        </q-item>
+        <q-item v-for="(point, idx) in points" :key="idx" dark dense>
+          <q-item-section class="col-3">
             <InputPopupEdit
               :field="durationString(point.offsetMs)"
               :change="v => updatePointOffset(idx, parseDuration(v))"
-              label="Offset from start"
+              label="Offset from start time"
+              tag="span"
             />
           </q-item-section>
-          <q-item-section>
-            <q-item-label caption>Time</q-item-label>
+          <q-item-section class="col-5">
             <DatetimePopupEdit
               :field="point.time"
               :change="v => updatePointTime(idx, v)"
@@ -185,15 +209,15 @@ export default class SetpointProfileForm extends BlockForm {
               tag="span"
             />
           </q-item-section>
-          <q-item-section>
-            <q-item-label caption>Temperature</q-item-label>
+          <q-item-section class="col-3">
             <UnitPopupEdit
               :field="point.temperature"
               :change="v => updatePointTemperature(idx, v)"
               label="Temperature"
+              tag="span"
             />
           </q-item-section>
-          <q-item-section side>
+          <q-item-section class="col-1" side>
             <q-btn flat round dense icon="delete" @click="removePoint(idx)"/>
           </q-item-section>
         </q-item>

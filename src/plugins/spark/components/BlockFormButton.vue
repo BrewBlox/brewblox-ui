@@ -16,10 +16,6 @@ import { Block } from '../state';
       type: String,
       required: true,
     },
-    label: {
-      type: String,
-      required: true,
-    },
     btnProps: {
       type: Object,
       default: {},
