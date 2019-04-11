@@ -5,7 +5,7 @@ import { uid } from 'quasar';
 import { SQUARE_SIZE } from './getters';
 import { parts } from './register';
 import settings from './settings';
-import { PersistentPart } from './state';
+import { PersistentPart, StatePart } from './state';
 import { spaceCased } from '@/helpers/functional';
 
 
@@ -21,16 +21,17 @@ export default class ProcessViewCatalog extends Vue {
   SQUARE_SIZE: number = SQUARE_SIZE;
   spaceCased = spaceCased;
 
-  get availableParts(): PersistentPart[] {
+  get availableParts(): StatePart[] {
     return parts
       .map(type => ({
         type,
         id: uid(),
-        x: -2,
-        y: -2,
+        x: -100,
+        y: -100,
         rotate: 0,
         settings: {},
         flipped: false,
+        state: {},
       }));
   }
 

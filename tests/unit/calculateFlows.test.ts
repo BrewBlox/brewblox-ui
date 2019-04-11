@@ -46,8 +46,8 @@ describe('Data describing an input tube', () => {
   it('can resolve to transitions', () => {
     expect(partTransitions(part)).toEqual(
       {
-        [IN_OUT]: [{ outCoords: '1,0.5', pressure: 11, liquids: [COLD_WATER] }],
-        '1,0.5': [{ outCoords: IN_OUT }],
+        [IN_OUT]: [{ outCoords: '1,0.5,0', pressure: 11, liquids: [COLD_WATER] }],
+        '1,0.5,0': [{ outCoords: IN_OUT }],
       });
   });
 });
@@ -163,10 +163,10 @@ describe('A single path without splits', () => {
         rotate: 0,
         type: 'SystemIO',
         flows: {
-          '-1,-1': {
+          [IN_OUT]: {
             [HOT_WATER]: -2,
           },
-          '2,2.5': {
+          '2,2.5,0': {
             [HOT_WATER]: 2,
           },
         },
@@ -181,10 +181,10 @@ describe('A single path without splits', () => {
         rotate: 180,
         type: 'SystemIO',
         flows: {
-          '3,2.5': {
+          '3,2.5,0': {
             [HOT_WATER]: -2,
           },
-          '-1,-1': {
+          [IN_OUT]: {
             [HOT_WATER]: 2,
           },
         },
@@ -195,10 +195,10 @@ describe('A single path without splits', () => {
         rotate: 0,
         type: 'StraightTube',
         flows: {
-          '2,2.5': {
+          '2,2.5,0': {
             [HOT_WATER]: - 2,
-          }
-          , '3,2.5': {
+          },
+          '3,2.5,0': {
             [HOT_WATER]: 2,
           },
         },
@@ -290,23 +290,23 @@ describe('A path with a split, but no joins', () => {
     expect(transitions).toEqual(
       [
         {
-          [IN_OUT]: [{ outCoords: '2,2.5', pressure: 14, liquids: [COLD_WATER] }],
+          [IN_OUT]: [{ outCoords: '2,2.5,0', pressure: 14, liquids: [COLD_WATER] }],
         },
         {
-          '2,2.5': [{ outCoords: '3,2.5' }],
+          '2,2.5,0': [{ outCoords: '3,2.5,0' }],
         },
         {
-          '3,2.5': [{ outCoords: '3.5,2' }, { outCoords: '3.5,3' }],
+          '3,2.5,0': [{ outCoords: '3.5,2,0' }, { outCoords: '3.5,3,0' }],
         },
         [
           [
             {
-              '3.5,2': [{ outCoords: IN_OUT }],
+              '3.5,2,0': [{ outCoords: IN_OUT }],
             },
           ],
           [
             {
-              '3.5,3': [{ outCoords: IN_OUT }],
+              '3.5,3,0': [{ outCoords: IN_OUT }],
             },
           ],
         ],
@@ -323,10 +323,10 @@ describe('A path with a split, but no joins', () => {
       [
         {
           flows: {
-            '-1,-1': {
+            [IN_OUT]: {
               [COLD_WATER]: -4,
             },
-            '2,2.5': {
+            '2,2.5,0': {
               [COLD_WATER]: 4,
             },
           },
@@ -334,10 +334,10 @@ describe('A path with a split, but no joins', () => {
         },
         {
           flows: {
-            '2,2.5': {
+            '2,2.5,0': {
               [COLD_WATER]: -4,
             },
-            '3,2.5': {
+            '3,2.5,0': {
               [COLD_WATER]: 4,
             },
           },
@@ -345,13 +345,13 @@ describe('A path with a split, but no joins', () => {
         },
         {
           flows: {
-            '3,2.5': {
+            '3,2.5,0': {
               [COLD_WATER]: -4,
             },
-            '3.5,2': {
+            '3.5,2,0': {
               [COLD_WATER]: 2,
             },
-            '3.5,3': {
+            '3.5,3,0': {
               [COLD_WATER]: 2,
             },
           },
@@ -359,10 +359,10 @@ describe('A path with a split, but no joins', () => {
         },
         {
           flows: {
-            '-1,-1': {
+            [IN_OUT]: {
               [COLD_WATER]: 2,
             },
-            '3.5,2': {
+            '3.5,2,0': {
               [COLD_WATER]: -2,
             },
           },
@@ -372,10 +372,10 @@ describe('A path with a split, but no joins', () => {
         },
         {
           flows: {
-            '-1,-1': {
+            [IN_OUT]: {
               [COLD_WATER]: 2,
             },
-            '3.5,3': {
+            '3.5,3,0': {
               [COLD_WATER]: -2,
             },
           },
@@ -509,22 +509,22 @@ describe('A path that forks and rejoins', () => {
     const transitions = propertyWalker([], path, ['transitions']);
     expect(transitions).toEqual(
       [
-        { [IN_OUT]: [{ outCoords: '2,2.5', pressure: 11, liquids: [COLD_WATER] }] },
-        { '2,2.5': [{ outCoords: '3,2.5' }] },
-        { '3,2.5': [{ outCoords: '3.5,2' }, { outCoords: '3.5,3' }] },
+        { [IN_OUT]: [{ outCoords: '2,2.5,0', pressure: 11, liquids: [COLD_WATER] }] },
+        { '2,2.5,0': [{ outCoords: '3,2.5,0' }] },
+        { '3,2.5,0': [{ outCoords: '3.5,2,0' }, { outCoords: '3.5,3,0' }] },
         [
           [
-            { '3.5,2': [{ outCoords: '4,1.5' }] },
-            { '4,1.5': [{ outCoords: '4.5,2' }] },
-            { '4.5,2': [{ outCoords: '5,2.5' }] },
+            { '3.5,2,0': [{ outCoords: '4,1.5,0' }] },
+            { '4,1.5,0': [{ outCoords: '4.5,2,0' }] },
+            { '4.5,2,0': [{ outCoords: '5,2.5,0' }] },
           ],
           [
-            { '3.5,3': [{ outCoords: '4,3.5' }] },
-            { '4,3.5': [{ outCoords: '4.5,3' }] },
-            { '4.5,3': [{ outCoords: '5,2.5' }] },
+            { '3.5,3,0': [{ outCoords: '4,3.5,0' }] },
+            { '4,3.5,0': [{ outCoords: '4.5,3,0' }] },
+            { '4.5,3,0': [{ outCoords: '5,2.5,0' }] },
           ],
         ],
-        { '5,2.5': [{ outCoords: IN_OUT }] },
+        { '5,2.5,0': [{ outCoords: IN_OUT }] },
       ]);
   });
 
@@ -538,67 +538,67 @@ describe('A path that forks and rejoins', () => {
       [
         {
           flows: {
-            '-1,-1': { [COLD_WATER]: -2 },
-            '2,2.5': { [COLD_WATER]: 2 },
+            [IN_OUT]: { [COLD_WATER]: -2 },
+            '2,2.5,0': { [COLD_WATER]: 2 },
           },
           type: 'SystemIO',
         },
         {
           flows: {
-            '2,2.5': { [COLD_WATER]: -2 },
-            '3,2.5': { [COLD_WATER]: 2 },
+            '2,2.5,0': { [COLD_WATER]: -2 },
+            '3,2.5,0': { [COLD_WATER]: 2 },
           },
           type: 'StraightTube',
         },
         {
           flows: {
-            '3,2.5': { [COLD_WATER]: -2 },
-            '3.5,2': { [COLD_WATER]: 1 },
-            '3.5,3': { [COLD_WATER]: 1 },
+            '3,2.5,0': { [COLD_WATER]: -2 },
+            '3.5,2,0': { [COLD_WATER]: 1 },
+            '3.5,3,0': { [COLD_WATER]: 1 },
           },
           type: 'TeeTube',
 
         },
         {
           flows: {
-            '3.5,2': { [COLD_WATER]: -1 },
-            '4,1.5': { [COLD_WATER]: 1 },
+            '3.5,2,0': { [COLD_WATER]: -1 },
+            '4,1.5,0': { [COLD_WATER]: 1 },
           },
           type: 'ElbowTube',
         },
         {
           flows: {
-            '3.5,3': { [COLD_WATER]: -1 },
-            '4,3.5': { [COLD_WATER]: 1 },
+            '3.5,3,0': { [COLD_WATER]: -1 },
+            '4,3.5,0': { [COLD_WATER]: 1 },
           },
           type: 'ElbowTube',
         },
         {
           flows: {
-            '4,1.5': { [COLD_WATER]: -1 },
-            '4.5,2': { [COLD_WATER]: 1 },
+            '4,1.5,0': { [COLD_WATER]: -1 },
+            '4.5,2,0': { [COLD_WATER]: 1 },
           },
           type: 'ElbowTube',
         },
         {
           flows: {
-            '4,3.5': { [COLD_WATER]: -1 },
-            '4.5,3': { [COLD_WATER]: 1 },
+            '4,3.5,0': { [COLD_WATER]: -1 },
+            '4.5,3,0': { [COLD_WATER]: 1 },
           },
           type: 'ElbowTube',
         },
         {
           flows: {
-            '4.5,2': { [COLD_WATER]: -1 },
-            '4.5,3': { [COLD_WATER]: -1 },
-            '5,2.5': { [COLD_WATER]: 2 },
+            '4.5,2,0': { [COLD_WATER]: -1 },
+            '4.5,3,0': { [COLD_WATER]: -1 },
+            '5,2.5,0': { [COLD_WATER]: 2 },
           },
           type: 'TeeTube',
         },
         {
           flows: {
-            '-1,-1': { [COLD_WATER]: 2 },
-            '5,2.5': { [COLD_WATER]: -2 },
+            [IN_OUT]: { [COLD_WATER]: 2 },
+            '5,2.5,0': { [COLD_WATER]: -2 },
           },
           type: 'SystemIO',
         },
@@ -656,8 +656,8 @@ describe('A single path with a pump', () => {
         rotate: 180,
         type: 'SystemIO',
         flows: {
-          '-1,-1': { [COLD_WATER]: -2 },
-          '3,2.5': { [COLD_WATER]: 2 },
+          [IN_OUT]: { [COLD_WATER]: -2 },
+          '3,2.5,0': { [COLD_WATER]: 2 },
         },
         settings: {
           pressure: 6,
@@ -671,8 +671,8 @@ describe('A single path with a pump', () => {
         rotate: 0,
         type: 'Pump',
         flows: {
-          '3,2.5': { [COLD_WATER]: -2 },
-          '2,2.5': { [COLD_WATER]: 2 },
+          '3,2.5,0': { [COLD_WATER]: -2 },
+          '2,2.5,0': { [COLD_WATER]: 2 },
         },
         settings: {
           disabled: true,
@@ -686,8 +686,8 @@ describe('A single path with a pump', () => {
         rotate: 0,
         type: 'SystemIO',
         flows: {
-          '2,2.5': { [COLD_WATER]: -2 },
-          '-1,-1': { [COLD_WATER]: 2 },
+          '2,2.5,0': { [COLD_WATER]: -2 },
+          [IN_OUT]: { [COLD_WATER]: 2 },
         },
       },
       ]
@@ -708,7 +708,7 @@ describe('A single path with a pump', () => {
           rotate: 180,
           type: 'SystemIO',
           flows: {}, /*{
-            '-1,-1': { [COLD_WATER]: -6 },
+            [IN_OUT]: { [COLD_WATER]: -6 },
             '3,2.5': { [COLD_WATER]: 6 },
           },*/
           settings: {
@@ -722,8 +722,8 @@ describe('A single path with a pump', () => {
           rotate: 0,
           type: 'Pump',
           flows: {
-            '3,2.5': { [COLD_WATER]: -6 },
-            '2,2.5': { [COLD_WATER]: 6 },
+            '3,2.5,0': { [COLD_WATER]: -6 },
+            '2,2.5,0': { [COLD_WATER]: 6 },
           },
           settings: {
             disabled: false,
@@ -737,8 +737,8 @@ describe('A single path with a pump', () => {
           rotate: 0,
           type: 'SystemIO',
           flows: {
-            '2,2.5': { [COLD_WATER]: -6 },
-            '-1,-1': { [COLD_WATER]: 6 },
+            '2,2.5,0': { [COLD_WATER]: -6 },
+            [IN_OUT]: { [COLD_WATER]: 6 },
           },
         },
         ]
@@ -818,10 +818,10 @@ describe('Two sources joining', () => {
       [
         {
           'flows': {
-            '-1,-1': {
+            [IN_OUT]: {
               [COLD_WATER]: -2,
             },
-            '2,1.5': {
+            '2,1.5,0': {
               [COLD_WATER]: 2,
             },
           },
@@ -831,10 +831,10 @@ describe('Two sources joining', () => {
         },
         {
           'flows': {
-            '-1,-1': {
+            [IN_OUT]: {
               [HOT_WATER]: -2,
             },
-            '2,3.5': {
+            '2,3.5,0': {
               [HOT_WATER]: 2,
             },
           },
@@ -844,10 +844,10 @@ describe('Two sources joining', () => {
         },
         {
           flows: {
-            '2,1.5': {
+            '2,1.5,0': {
               [COLD_WATER]: -2,
             },
-            '2.5,2': {
+            '2.5,2,0': {
               [COLD_WATER]: 2,
             },
           },
@@ -857,10 +857,10 @@ describe('Two sources joining', () => {
         },
         {
           'flows': {
-            '2,3.5': {
+            '2,3.5,0': {
               [HOT_WATER]: -2,
             },
-            '2.5,3': {
+            '2.5,3,0': {
               [HOT_WATER]: 2,
             },
           },
@@ -870,13 +870,13 @@ describe('Two sources joining', () => {
         },
         {
           'flows': {
-            '2.5,2': {
+            '2.5,2,0': {
               [COLD_WATER]: -2,
             },
-            '2.5,3': {
+            '2.5,3,0': {
               [HOT_WATER]: -2,
             },
-            '3,2.5': {
+            '3,2.5,0': {
               [COLD_WATER]: 2,
               [HOT_WATER]: 2,
             },
@@ -887,11 +887,11 @@ describe('Two sources joining', () => {
         },
         {
           'flows': {
-            '-1,-1': {
+            [IN_OUT]: {
               [COLD_WATER]: 2,
               [HOT_WATER]: 2,
             },
-            '3,2.5': {
+            '3,2.5,0': {
               [COLD_WATER]: -2,
               [HOT_WATER]: -2,
             },
@@ -991,10 +991,10 @@ describe('A path with a bridge', () => {
             pressure: 8,
           },
           flows: {
-            '-1,-1': {
+            [IN_OUT]: {
               [COLD_WATER]: -1,
             },
-            '12,2.5': {
+            '12,2.5,0': {
               [COLD_WATER]: 1,
             },
           },
@@ -1006,10 +1006,10 @@ describe('A path with a bridge', () => {
           rotate: 0,
           settings: {},
           flows: {
-            '12,2.5': {
+            '12,2.5,0': {
               [COLD_WATER]: -1,
             },
-            '13,2.5': {
+            '13,2.5,0': {
               [COLD_WATER]: 1,
             },
           },
@@ -1021,16 +1021,16 @@ describe('A path with a bridge', () => {
           rotate: 0,
           settings: {},
           flows: {
-            '13.5,3': {
+            '13.5,3,0': {
               [COLD_WATER]: -1,
             },
-            '13.5,2': {
+            '13.5,2,0': {
               [COLD_WATER]: 1,
             },
-            '14,2.5': {
+            '14,2.5,0': {
               [COLD_WATER]: 1,
             },
-            '13,2.5': {
+            '13,2.5,0': {
               [COLD_WATER]: -1,
             },
           },
@@ -1042,10 +1042,10 @@ describe('A path with a bridge', () => {
           rotate: 90,
           settings: {},
           flows: {
-            '13.5,2': {
+            '13.5,2,0': {
               [COLD_WATER]: -1,
             },
-            '-1,-1': {
+            [IN_OUT]: {
               [COLD_WATER]: 1,
             },
           },
@@ -1057,10 +1057,10 @@ describe('A path with a bridge', () => {
           rotate: 180,
           settings: {},
           flows: {
-            '14,2.5': {
+            '14,2.5,0': {
               [COLD_WATER]: -1,
             },
-            '14.5,3': {
+            '14.5,3,0': {
               [COLD_WATER]: 1,
             },
           },
@@ -1072,10 +1072,10 @@ describe('A path with a bridge', () => {
           rotate: 270,
           settings: {},
           flows: {
-            '14.5,3': {
+            '14.5,3,0': {
               [COLD_WATER]: -1,
             },
-            '14,3.5': {
+            '14,3.5,0': {
               [COLD_WATER]: 1,
             },
           },
@@ -1087,10 +1087,10 @@ describe('A path with a bridge', () => {
           rotate: 0,
           settings: {},
           flows: {
-            '14,3.5': {
+            '14,3.5,0': {
               [COLD_WATER]: -1,
             },
-            '13.5,3': {
+            '13.5,3,0': {
               [COLD_WATER]: 1,
             },
           },

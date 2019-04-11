@@ -256,14 +256,8 @@ export default class ProcessViewForm extends FormBase {
 
   rotateClickHandler(evt: ClickEvent, part: PersistentPart, rotation: number = 90) {
     if (part) {
-      const partSize = settings[part.type].size(part);
       const rotate = clampRotation(part.rotate + rotation);
-
-      const updated = new Coordinates(part)
-        .rotateSquare(rotation, part.rotate, partSize)
-        .raw();
-
-      this.updatePart({ ...part, ...updated, rotate });
+      this.updatePart({ ...part, rotate });
     }
   }
 

@@ -1,5 +1,4 @@
 import { clampRotation } from './functional';
-import isEqual from 'lodash/isEqual';
 
 export type CoordinatesParam =
   string | { x: number; y: number; z: number } | [number, number, number] | Coordinates;
@@ -8,6 +7,48 @@ export class Coordinates {
   public readonly x: number;
   public readonly y: number;
   public readonly z: number;
+
+  /*
+  * A general introduction to how shape coordinates are handled:
+  *
+  * Shapes are placed on a grid. A shape is always rectangular, but does not have to be square.
+  * A shape consists of one or more squares.
+  * A square is always 1x1, and all four corners of a square have integer coordinates.
+  *
+  * The top left corner (lowest value x / y) of a shape or square is the anchor.
+  * As the anchor is a square corner, its coordinates are always integer values.
+  * We can infer that the center of a square always is [anchor.x + 0.5, anchor.y + 0.5].
+  *
+  * Edge points are indeterminate positions on the grid. Their coordinates values can be decimal in both X and Y.
+  *
+  * When rotating shapes, the shape anchor always retains the same global coordinates.
+  * Because all corners of squares must have integer coordinates, the smallest possible rotation is 90 degrees.
+  *
+  * To rotate a shape, we first rotate the shape around its anchor coordinate,
+  * and then shift it until the new anchor is at the same place as the old anchor.
+  *
+  * This shift will only ever be in the positive direction, on either or both X and Y axes.
+  * A small example of rotating a 3x2 shape 90 degrees:
+  *
+  * X marks the anchor position.
+  *
+  *  Start:
+  *              X
+  *               1 2 3
+  *               4 5 6
+  *
+  *  Rotate:
+  *              X
+  *           4 1
+  *           5 2
+  *           6 3
+  *
+  *  Shift:
+  *              X
+  *               4 1
+  *               5 2
+  *               6 3
+  */
 
   public constructor(param: CoordinatesParam) {
     if (typeof param === 'string') {
@@ -42,8 +83,8 @@ export class Coordinates {
     return this.z < 0; // negative Z values are used for static objects that should not move
   }
 
-  public rotate(rotation: number, pivot: CoordinatesParam = [0.5, 0.5, 0]): Coordinates {
-    rotation = clampRotation(rotation);
+  public rotate(rotate: number, pivot: CoordinatesParam = [0.5, 0.5, 0]): Coordinates {
+    const rotation = clampRotation(rotate);
 
     if (this.isException() || rotation === 0) {
       return new Coordinates(this);
@@ -93,22 +134,25 @@ export class Coordinates {
     // Step 1 - start
     const squareAnchor = this;
     const shapeAnchor = new Coordinates(shapeCoordinates);
-    const [newSizeX, newSizeY] = (totalRotation % 180 > 0) ? shapeSize.reverse() : shapeSize;
+    const [newSizeX, newSizeY] =
+      (totalRotation % 180 > 0)
+        ? [...shapeSize].reverse()
+        : [...shapeSize];
 
     const rotatedSquareCenter = squareAnchor
       // Step 2 - shift from square anchor to center
       .translate([0.5, 0.5, 0])
-      // Step 3 - rotate around shape origin
+      // Step 3 - rotate around shape anchor
       .rotate(rotation, shapeAnchor);
 
     const rotatedSquareAnchor = rotatedSquareCenter
-      // Step 4 - shift until shape anchor will be the same again
+      // Step 4 - shift until new shape anchor has the same coordinates as the old anchor
       .translate([
         rotatedSquareCenter.x < shapeAnchor.x ? newSizeX : 0,
         rotatedSquareCenter.y < shapeAnchor.y ? newSizeY : 0,
         0,
       ])
-      // Step 5 - shift back from center to anchor
+      // Step 5 - shift back from square center to square anchor
       .translate([-0.5, -0.5, 0]);
 
     return rotatedSquareAnchor;
@@ -134,7 +178,7 @@ export class Coordinates {
     const shiftX = squareAnchor.x - edge.x;
     const shiftY = squareAnchor.y - edge.y;
 
-    // Step 3 - Rotate square
+    // Step 3 - Rotate square around shape anchor
     const rotatedSquareAnchor = squareAnchor
       .rotateShapeSquare(rotation, shapeRotation, shapeSize, shapeCoordinates);
 
