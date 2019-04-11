@@ -57,14 +57,8 @@ export default class PartComponent extends Vue {
   }
 
   private rotatedCoord(coord: string): string {
-    if (this.sizeX === 1 && this.sizeY === 1) {
-      return coord;
-    }
-    const anchor = new Coordinates([0, 0])
-      .rotateSquare(-this.part.rotate, this.part.rotate, [this.sizeX, this.sizeY]);
     return new Coordinates(coord)
-      .rotate(this.part.rotate, [0.5 * this.sizeX, 0.5 * this.sizeY])
-      .translate(anchor)
+      .rotateShapeEdge(this.part.rotate, 0, this.size)
       .toString();
   }
 

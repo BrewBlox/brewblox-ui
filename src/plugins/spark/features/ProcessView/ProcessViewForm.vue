@@ -256,14 +256,8 @@ export default class ProcessViewForm extends FormBase {
 
   rotateClickHandler(evt: ClickEvent, part: PersistentPart, rotation: number = 90) {
     if (part) {
-      const partSize = settings[part.type].size(part);
       const rotate = clampRotation(part.rotate + rotation);
-
-      const updated = new Coordinates(part)
-        .rotateSquare(rotation, part.rotate, partSize)
-        .raw();
-
-      this.updatePart({ ...part, ...updated, rotate });
+      this.updatePart({ ...part, rotate });
     }
   }
 
@@ -282,18 +276,20 @@ export default class ProcessViewForm extends FormBase {
     const toCoords: Coordinates[] = this.blockedByPart(to);
     const allBlockedCoords: Coordinates[] =
       this.$props.parts
+        .filter(part => !from || part.id !== from.id)
         .reduce(
           (acc: Coordinates[], part: PersistentPart) => [...acc, ...this.blockedByPart(part)], []);
 
     for (let toCoord of toCoords) {
-      if (allBlockedCoords.some(coord => coord.equals(toCoord))) {
-        this.$q.notify({
-          color: 'negative',
-          icon: 'error',
-          message: "Can't place this part here: location is blocked",
-        });
-        return;
-      }
+      for (let blockedCoord of allBlockedCoords)
+        if (blockedCoord.equals(toCoord)) {
+          this.$q.notify({
+            color: 'negative',
+            icon: 'error',
+            message: "Can't place this part here: location is blocked",
+          });
+          return;
+        }
     }
 
     await this.updateParts([...this.$props.parts.filter(p => !from || p.id !== from.id), to]);

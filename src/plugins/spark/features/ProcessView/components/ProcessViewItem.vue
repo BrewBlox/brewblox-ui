@@ -2,6 +2,10 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { SQUARE_SIZE } from '../getters';
+import { Coordinates } from '@/helpers/coordinates';
+import { FlowPart } from '../state';
+import settings from '../settings';
+
 
 @Component({
   props: {
@@ -12,8 +16,28 @@ import { SQUARE_SIZE } from '../getters';
   },
 })
 export default class ProcessViewItem extends Vue {
+  get part(): FlowPart {
+    return this.$props.value;
+  }
+
+  get settings() {
+    return settings[this.part.type];
+  }
+
   get transformation() {
-    return `rotate(${this.$props.value.rotate}, ${SQUARE_SIZE / 2}, ${SQUARE_SIZE / 2})`;
+    const [normalSizeX, normalSizeY] = this.settings.size(this.part);
+    const [rotatedSizeX, rotatedSizeY] =
+      (this.part.rotate % 180 > 0)
+        ? [normalSizeY, normalSizeX]
+        : [normalSizeX, normalSizeY];
+
+    const farEdge = new Coordinates([normalSizeX, normalSizeY, 0])
+      .rotate(this.part.rotate, [0, 0, 0]);
+
+    const trX = farEdge.x < 0 ? (rotatedSizeX * SQUARE_SIZE) : 0;
+    const trY = farEdge.y < 0 ? (rotatedSizeY * SQUARE_SIZE) : 0;
+
+    return `translate(${trX}, ${trY}) rotate(${this.part.rotate})`;
   }
 }
 </script>

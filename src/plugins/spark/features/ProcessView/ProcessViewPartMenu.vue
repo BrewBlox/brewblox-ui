@@ -5,7 +5,6 @@ import { partSettings } from '@/plugins/spark/features/ProcessView/calculateFlow
 import { FlowPart } from '@/plugins/spark/features/ProcessView/state';
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';
-import { Coordinates } from '@/helpers/coordinates';
 import { clampRotation } from '@/helpers/functional';
 
 @Component({
@@ -36,7 +35,7 @@ export default class ProcessViewPartMenu extends Vue {
 
   get rotatedSize(): [number, number] {
     const [x, y] = this.partSize;
-    return (clampRotation(this.part.rotate) / 90) % 2
+    return clampRotation(this.part.rotate) % 180
       ? [y, x]
       : [x, y];
   }
@@ -51,31 +50,6 @@ export default class ProcessViewPartMenu extends Vue {
     }
     return 2;
   }
-
-  get partViewBox(): string {
-    /*
-    * SVG viewBox accepts four arguments: startX, startY, sizeX, sizeY.
-    * sizeX/Y should match the size of the component, regardless of any scaling.
-    * startX/Y need to take into account that rotated parts may extend into negative coordinates.
-    *
-    * A square part rotated 180 deg will extend both to the left, and above its anchor square.
-    * startX and startY should be placed at the left most position of the square.
-    * They will never be > 0, as the anchor square is always [0,0].
-    */
-
-    const leftMost =
-      new Coordinates(this.partSize)
-        .rotate(this.part.rotate)
-        .values()
-        .map(v => Math.min(v, 0));
-
-    return [
-      ...leftMost,
-      ...this.rotatedSize,
-    ]
-      .map(v => v * SQUARE_SIZE)
-      .join(', ');
-  }
 }
 </script>
 
@@ -89,7 +63,7 @@ export default class ProcessViewPartMenu extends Vue {
           <svg
             :width="`${SQUARE_SIZE * displayScale * rotatedSize[0]}px`"
             :height="`${SQUARE_SIZE * displayScale * rotatedSize[1]}px`"
-            :viewBox="partViewBox"
+            :viewBox="`0, 0, ${SQUARE_SIZE * rotatedSize[0]}, ${SQUARE_SIZE * rotatedSize[1]}`"
             class="q-mx-auto"
           >
             <ProcessViewItem :value="part"/>

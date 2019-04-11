@@ -32,9 +32,9 @@ export const partSize =
   (part: StatePart): [number, number] => partSettings(part).size(part);
 
 export const partCenter =
-  (part: StatePart): [number, number] => {
+  (part: StatePart): [number, number, number] => {
     const [sizeX, sizeY] = partSize(part);
-    return [0.5 * sizeX, 0.5 * sizeY];
+    return [sizeX / 2, sizeY / 2, 0];
   };
 
 const adjacentPart = (
@@ -55,8 +55,7 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
   const newFlows = mapKeys(part.flows,
     (flow, inCoord) =>
       new Coordinates(inCoord)
-        .translate([-part.x, -part.y])
-        .rotate(-part.rotate, partCenter(part))
+        .translate([-part.x, -part.y, 0])
         .toString()
   );
 
@@ -66,21 +65,25 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
 
 const translations = (part: StatePart): Transitions =>
   Object.entries(partTransitions(part))
-    .reduce((acc, [inCoords, transition]: [string, any]) => {
-      const unrotatedAnchor = new Coordinates(part)
-        .rotateSquare(-part.rotate, part.rotate, partSize(part));
-      const updatedKey = new Coordinates(inCoords)
-        .rotate(part.rotate, partCenter(part))
-        .translate(unrotatedAnchor)
+    .reduce((acc, [inCoordStr, transition]: [string, any]) => {
+      // inCoords are relative from part anchor === [0, 0, 0]
+
+      const size = partSize(part);
+
+      const updatedKey = new Coordinates(inCoordStr)
+        .translate([part.x, part.y, 0])
+        .rotateShapeEdge(part.rotate, 0, size, [part.x, part.y, 0])
         .toString();
+
       const updatedTransition = transition
-        .map((transition: FlowRoute) => ({
-          ...transition,
-          outCoords: new Coordinates(transition.outCoords)
-            .rotate(part.rotate, partCenter(part))
-            .translate(unrotatedAnchor)
+        .map((route: FlowRoute) => ({
+          ...route,
+          outCoords: new Coordinates(route.outCoords)
+            .translate([part.x, part.y, 0])
+            .rotateShapeEdge(part.rotate, 0, size, [part.x, part.y, 0])
             .toString(),
         }));
+
       return { ...acc, [updatedKey]: updatedTransition };
     },
       {},

@@ -7,14 +7,10 @@ export const subSquares =
     rotation: number,
     size: [number, number],
   ): Coordinates[] => {
-    // anchor coordinates @ 0 rotation
-    const origin =
-      new Coordinates(position)
-        .rotateSquare(-rotation, rotation, size);
     return squares
       .map((square) =>
-        new Coordinates(origin)
-          .translate(square)
-          .rotateSquare(rotation, 0, size, square)
+        new Coordinates(square)
+          .rotateShapeSquare(rotation, 0, size)
+          .translate(position)
       );
   };
