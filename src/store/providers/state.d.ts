@@ -10,6 +10,7 @@ export interface Provider {
   fetcher?: (store: RootStore, service: Service) => Promise<any>;
   wizard?: string;
   page?: string;
+  watcher?: string;
 }
 
 export interface ProviderState {

@@ -64,5 +64,6 @@ export default ({ store }: PluginArguments) => {
     fetcher: fetchAll,
     wizard: 'SparkWizard',
     page: 'SparkPage',
+    watcher: 'SparkWatcher',
   });
 };

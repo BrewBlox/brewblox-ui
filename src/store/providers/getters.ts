@@ -39,5 +39,8 @@ export const wizardById =
 export const pageById =
   (store: RootStore, id: string): string | undefined => providerById(store, id).page;
 
+export const watcherById =
+  (store: RootStore, id: string): string | undefined => providerById(store, id).watcher;
+
 export const featuresById =
   (store: RootStore, id: string): string[] => providerById(store, id).features;
