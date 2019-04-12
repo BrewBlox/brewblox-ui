@@ -13,6 +13,10 @@ import settings from '../settings';
       type: Object,
       required: true,
     },
+    showHover: {
+      type: Boolean,
+      default: false,
+    },
   },
 })
 export default class ProcessViewItem extends Vue {
@@ -57,19 +61,19 @@ export default class ProcessViewItem extends Vue {
 
 <template>
   <g :transform="transformation">
-    <!-- background element, to make the full part clickable -->
-    <rect
-      :width="renderSize[0]*SQUARE_SIZE"
-      :height="renderSize[1]*SQUARE_SIZE"
-      fill="black"
-      opacity="0"
-    />
     <component
       v-if="value.type"
       :value="value"
       :is="value.type"
       class="ProcessViewPart"
       v-on="$listeners"
+    />
+    <!-- background element, to make the full part clickable -->
+    <rect
+      :width="partSize[0]*SQUARE_SIZE"
+      :height="partSize[1]*SQUARE_SIZE"
+      :class="{showhover: $props.showHover}"
+      opacity="0"
     />
   </g>
 </template>
@@ -107,5 +111,11 @@ export default class ProcessViewItem extends Vue {
 
 .ProcessViewPart .liquid {
   stroke-width: 7px;
+}
+
+.showhover:hover {
+  fill: silver;
+  fill-opacity: 0.5;
+  opacity: 0.5;
 }
 </style>
