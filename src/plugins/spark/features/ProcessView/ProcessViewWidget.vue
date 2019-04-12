@@ -4,7 +4,8 @@ import Component from 'vue-class-component';
 import { uid, debounce } from 'quasar';
 import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
-import { PersistentPart, StatePart, ProcessViewConfig, FlowPart, Rect, ClickEvent } from './state';
+import settings from './settings';
+import { PersistentPart, StatePart, ProcessViewConfig, FlowPart, Rect, ClickEvent, PartUpdater } from './state';
 import { spaceCased } from '@/helpers/functional';
 import ProcessViewCatalog from './ProcessViewCatalog.vue';
 
@@ -104,6 +105,18 @@ export default class ProcessViewWidget extends WidgetBase {
       }));
   }
 
+  get updater(): PartUpdater {
+    return {
+      updatePart: this.updatePart,
+      updatePartState: this.updatePartState,
+      store: this.$store,
+    };
+  }
+
+  interact(part: FlowPart) {
+    settings[part.type].interactHandler(part, this.updater);
+  }
+
   mounted() {
     this.calculateFlowFunc =
       debounce(
@@ -174,6 +187,7 @@ export default class ProcessViewWidget extends WidgetBase {
           :transform="`translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`"
           :key="part.id"
           class="grid-item"
+          @click="interact(part)"
         >
           <ProcessViewItem :value="part" @input="updatePart" @state="updatePartState"/>
         </g>

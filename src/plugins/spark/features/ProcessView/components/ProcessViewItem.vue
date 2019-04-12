@@ -16,6 +16,11 @@ import settings from '../settings';
   },
 })
 export default class ProcessViewItem extends Vue {
+  SQUARE_SIZE = SQUARE_SIZE;
+  $refs!: {
+    part: any;
+  }
+
   get part(): FlowPart {
     return this.$props.value;
   }
@@ -24,18 +29,26 @@ export default class ProcessViewItem extends Vue {
     return settings[this.part.type];
   }
 
-  get transformation() {
-    const [normalSizeX, normalSizeY] = this.settings.size(this.part);
-    const [rotatedSizeX, rotatedSizeY] =
-      (this.part.rotate % 180 > 0)
-        ? [normalSizeY, normalSizeX]
-        : [normalSizeX, normalSizeY];
+  get partSize() {
+    return this.settings.size(this.part);
+  }
 
-    const farEdge = new Coordinates([normalSizeX, normalSizeY, 0])
+  get renderSize() {
+    const [partSizeX, partSizeY] = this.partSize;
+    return (this.part.rotate % 180 > 0)
+      ? [partSizeY, partSizeX]
+      : [partSizeX, partSizeY];
+  }
+
+  get transformation() {
+    const [partSizeX, partSizeY] = this.partSize;
+    const [renderSizeX, renderSizeY] = this.renderSize;
+
+    const farEdge = new Coordinates([partSizeX, partSizeY, 0])
       .rotate(this.part.rotate, [0, 0, 0]);
 
-    const trX = farEdge.x < 0 ? (rotatedSizeX * SQUARE_SIZE) : 0;
-    const trY = farEdge.y < 0 ? (rotatedSizeY * SQUARE_SIZE) : 0;
+    const trX = farEdge.x < 0 ? (renderSizeX * SQUARE_SIZE) : 0;
+    const trY = farEdge.y < 0 ? (renderSizeY * SQUARE_SIZE) : 0;
 
     return `translate(${trX}, ${trY}) rotate(${this.part.rotate})`;
   }
@@ -44,6 +57,13 @@ export default class ProcessViewItem extends Vue {
 
 <template>
   <g :transform="transformation">
+    <!-- background element, to make the full part clickable -->
+    <rect
+      :width="renderSize[0]*SQUARE_SIZE"
+      :height="renderSize[1]*SQUARE_SIZE"
+      fill="black"
+      opacity="0"
+    />
     <component
       v-if="value.type"
       :value="value"

@@ -6,7 +6,6 @@ import { Link } from '@/helpers/units';
 import { Block } from '@/plugins/spark/state';
 import { blocks } from '@/plugins/spark/store/getters';
 import { Watch } from 'vue-property-decorator';
-import { saveBlock } from '@/plugins/spark/store/actions';
 
 @Component
 export default class ActuatorValve extends PartComponent {
@@ -93,26 +92,11 @@ export default class ActuatorValve extends PartComponent {
       this.savePartState();
     }
   }
-
-  toggleClosed() {
-    if (this.actuatorBlock) {
-      this.actuatorBlock.data.state = this.closed ? 1 : 0;
-      saveBlock(this.$store, this.actuatorServiceId, this.actuatorBlock);
-      return;
-    }
-    this.$q.notify({
-      message: 'Actuator Block not linked',
-      color: 'negative',
-      icon: 'error',
-    });
-  }
 }
 </script>
 
 <template>
-  <g class="actuator-valve clickable" @click="toggleClosed">
-    <!-- background element, to make the full square clickable -->
-    <rect :width="sizeX*SQUARE_SIZE" :height="sizeY*SQUARE_SIZE" fill="black" opacity="0"/>
+  <g class="actuator-valve">
     <foreignObject v-if="!actuatorBlock" :height="SQUARE_SIZE" :width="SQUARE_SIZE">
       <q-icon name="mdi-link-variant-off" size="sm" class="absolute-right" style="height: 15px;"/>
     </foreignObject>

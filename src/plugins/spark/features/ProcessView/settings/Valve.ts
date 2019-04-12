@@ -1,4 +1,4 @@
-import { ComponentSettings, Transitions, StatePart } from '../state';
+import { ComponentSettings, Transitions, StatePart, PartUpdater } from '../state';
 import { LEFT, RIGHT } from '../getters';
 import { defaultSettings } from '../components/getters';
 
@@ -11,6 +11,10 @@ const settings: ComponentSettings = {
         [LEFT]: [{ outCoords: RIGHT }],
         [RIGHT]: [{ outCoords: LEFT }],
       },
+  interactHandler: (part: StatePart, updater: PartUpdater) => {
+    part.settings.closed = !part.settings.closed;
+    updater.updatePart(part);
+  },
 };
 
 export default settings;

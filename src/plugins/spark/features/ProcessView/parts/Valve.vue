@@ -38,18 +38,11 @@ export default class Valve extends PartComponent {
   get closed() {
     return Boolean(this.part.settings.closed);
   }
-
-  protected toggleClosed(): void {
-    this.part.settings.closed = !this.closed;
-    this.savePart();
-  }
 }
 </script>
 
 <template>
-  <g class="valve clickable" @click="toggleClosed">
-    <!-- background element, to make the full square clickable -->
-    <rect :width="sizeX*SQUARE_SIZE" :height="sizeY*SQUARE_SIZE" fill="black" opacity="0"/>
+  <g class="valve">
     <g key="valve-outer" class="outline">
       <path :d="paths.outerValve[0]"/>
       <path :d="paths.outerValve[1]"/>
