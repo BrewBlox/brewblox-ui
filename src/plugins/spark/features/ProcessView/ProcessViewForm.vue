@@ -21,7 +21,7 @@ interface ToolAction {
   label: string;
   value: string;
   icon: string;
-  cursor?: string;
+  cursor: (part: FlowPart) => boolean;
   onClick?: (evt: ClickEvent, part: FlowPart) => void;
   onPan?: (args: PanArguments, part: FlowPart) => void;
 }
@@ -124,42 +124,49 @@ export default class ProcessViewForm extends FormBase {
         label: 'New (Click)',
         value: 'add',
         icon: 'add',
+        cursor: () => false,
         onClick: this.addPartClickHandler,
       },
       {
         label: 'Move (Drag)',
         value: 'move',
         icon: 'mdi-cursor-move',
+        cursor: part => !!part,
         onPan: this.movePanHandler,
       },
       {
         label: 'Rotate (Click)',
         value: 'rotate-right',
         icon: 'mdi-rotate-right-variant',
+        cursor: part => !!part,
         onClick: this.rotateClickHandler,
       },
       {
         label: 'Edit Settings (Click)',
         value: 'config',
         icon: 'settings',
+        cursor: part => !!part,
         onClick: this.configurePartClickHandler,
       },
       {
         label: 'Interact (Click)',
         value: 'interact',
         icon: 'mdi-cursor-default',
+        cursor: part => !!part && !!settings[part.type].interactHandler,
         onClick: this.interactClickHandler,
       },
       {
         label: 'Copy (Drag)',
         value: 'copy',
         icon: 'file_copy',
+        cursor: part => !!part,
         onPan: this.copyPanHandler,
       },
       {
         label: 'Delete (Click)',
         value: 'delete',
         icon: 'delete',
+        cursor: part => !!part,
         onClick: (evt, part) => this.removePart(part),
       },
       // TODO: flip part
@@ -266,11 +273,6 @@ export default class ProcessViewForm extends FormBase {
       this.configuredPartId = part.id;
       this.menuModalOpen = true;
     }
-  }
-
-  isClickable(part: FlowPart) {
-    return this.currentTool.value === 'interact'
-      && settings[part.type].interactHandler;
   }
 
   interactClickHandler(evt: ClickEvent, part: FlowPart) {
@@ -395,7 +397,7 @@ export default class ProcessViewForm extends FormBase {
               v-show="!beingDragged(part)"
               :transform="`translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`"
               :key="part.id"
-              :class="{ clickable: isClickable(part) }"
+              :class="{ clickable: currentTool.cursor(part) }"
               @click.stop="v => clickHandler(v, part)"
             >
               <text fill="white" x="0" y="8" class="grid-item-coordinates">{{ part.x }},{{ part.y }}</text>
