@@ -268,9 +268,15 @@ export default class ProcessViewForm extends FormBase {
     }
   }
 
+  isClickable(part: FlowPart) {
+    return this.currentTool.value === 'interact'
+      && settings[part.type].interactHandler;
+  }
+
   interactClickHandler(evt: ClickEvent, part: FlowPart) {
     if (part) {
-      settings[part.type].interactHandler(part, this.updater);
+      const handler = settings[part.type].interactHandler;
+      handler && handler(part, this.updater);
     }
   }
 
@@ -389,7 +395,7 @@ export default class ProcessViewForm extends FormBase {
               v-show="!beingDragged(part)"
               :transform="`translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`"
               :key="part.id"
-              class="grid-item"
+              :class="{ clickable: isClickable(part) }"
               @click.stop="v => clickHandler(v, part)"
             >
               <text fill="white" x="0" y="8" class="grid-item-coordinates">{{ part.x }},{{ part.y }}</text>

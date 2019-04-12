@@ -1,6 +1,5 @@
 import { ComponentSettings, Transitions, StatePart, PartUpdater } from '../state';
-import { LEFT, RIGHT } from '../getters';
-import { defaultSettings } from '../components/getters';
+import { LEFT, RIGHT, defaultSettings } from '../getters';
 import { blocks } from '@/plugins/spark/store/getters';
 import { Block } from '@/plugins/spark/state';
 import { saveBlock } from '@/plugins/spark/store/actions';

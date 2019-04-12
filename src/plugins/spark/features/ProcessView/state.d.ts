@@ -50,7 +50,7 @@ export interface ComponentSettings {
   transitions: (part: StatePart) => Transitions;
   size: (part: PersistentPart) => [number, number];
   blockedCoordinates: (part: PersistentPart) => Coordinates[];
-  interactHandler: (part: StatePart, updater: PartUpdater) => void;
+  interactHandler?: (part: StatePart, updater: PartUpdater) => void;
 }
 
 export interface ProcessViewConfig {

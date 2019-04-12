@@ -113,8 +113,13 @@ export default class ProcessViewWidget extends WidgetBase {
     };
   }
 
+  isClickable(part) {
+    return !!settings[part.type].interactHandler;
+  }
+
   interact(part: FlowPart) {
-    settings[part.type].interactHandler(part, this.updater);
+    const handler = settings[part.type].interactHandler;
+    handler && handler(part, this.updater);
   }
 
   mounted() {
@@ -186,7 +191,7 @@ export default class ProcessViewWidget extends WidgetBase {
           v-for="part in flowParts"
           :transform="`translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`"
           :key="part.id"
-          class="grid-item"
+          :class="{ clickable: isClickable(part) }"
           @click="interact(part)"
         >
           <ProcessViewItem :value="part" @input="updatePart" @state="updatePartState"/>
