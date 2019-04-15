@@ -63,8 +63,8 @@ export default class LinkPopupEdit extends Vue {
 </script>
 
 <template>
-  <div>
-    <component :is="$props.tag" class="editable clickable" @click="startEdit">
+  <div style="max-width: 100%">
+    <component :is="$props.tag" class="editable clickable ellipsis" @click="startEdit">
       {{ displayValue | truncated }}
       <q-menu content-style="overflow: visible">
         <q-item dark>
