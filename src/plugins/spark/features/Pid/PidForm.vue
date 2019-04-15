@@ -46,7 +46,7 @@ export default class PidForm extends BlockForm {
               :service-id="block.serviceId"
               :change="callAndSaveBlock(v => block.data.inputId = v)"
               label="Input"
-              tag="span"
+              tag="div"
             >
               <p>A PID block drives its output to regulate its input.</p>
               <p>
@@ -76,7 +76,7 @@ export default class PidForm extends BlockForm {
               :service-id="block.serviceId"
               :change="callAndSaveBlock(v => block.data.outputId = v)"
               label="Output"
-              tag="span"
+              tag="div"
             >
               <p>The PID sets its output block to the result from the PID calculation.</p>
               <p>
