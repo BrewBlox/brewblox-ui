@@ -401,13 +401,11 @@ export default class ProcessViewForm extends FormBase {
               @click.stop="v => clickHandler(v, part)"
             >
               <text fill="white" x="0" y="8" class="grid-item-coordinates">{{ part.x }},{{ part.y }}</text>
-              <ProcessViewItem :value="part" @input="updatePart" @state="updatePartState"/>
-              <rect
-                :width="SQUARE_SIZE"
-                :height="SQUARE_SIZE"
-                stroke="silver"
-                stroke-opacity="0.6"
-                fill-opacity="0"
+              <ProcessViewItem
+                :value="part"
+                show-hover
+                @input="updatePart"
+                @state="updatePartState"
               />
             </g>
             <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
