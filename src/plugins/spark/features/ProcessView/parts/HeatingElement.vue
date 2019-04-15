@@ -1,6 +1,10 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
+import { SQUARE_SIZE } from '../getters';
+import { blocks } from '@/plugins/spark/store/getters';
+import get from 'lodash/get';
+import { Link } from '@/helpers/units';
 
 @Component
 export default class HeatingElement extends PartComponent {
@@ -10,21 +14,58 @@ export default class HeatingElement extends PartComponent {
         'M0,10l0,30h19v-7h-6.5c0,0,0,0,0,0c-4.1,0.1-7.4-3.2-7.5-7.2c0-4.7,2.8-7.8,7.5-7.8H19v-8H0z',
       ],
       borders: [
-        'M52.6,24.7h21c7.1,0,6.6-6.7,14-6.7h126.9c0,0,7,0.1,7,7c0,7-7,7-7,7H90',
+        'M50,24.7h24c7.1,0,6.6-6.7,14-6.7h126.9c0,0,7,0.1,7,7c0,7-7,7-7,7H90',
       ],
     };
+  }
+
+  get textTransformation() {
+    return `rotate(${-this.part.rotate},${SQUARE_SIZE / 2},${SQUARE_SIZE / 2})`;
+  }
+
+  get blockServiceId(): string {
+    return this.part.settings.blockServiceId;
+  }
+
+  get blockLink(): Link {
+    return this.part.settings.blockLink;
+  }
+
+  get blockValue(): number | null {
+    if (!this.blockServiceId || !this.blockLink || !this.blockLink.id) {
+      return null;
+    }
+
+    return get(
+      blocks(this.$store, this.blockServiceId),
+      [this.blockLink.id, 'data', 'value'],
+      null
+    );
   }
 }
 </script>
 
 <template>
   <g class="heating-element">
-    <g class="text">
-      <text x="10" y="30">20°</text>
-    </g>
+    <foreignObject :transform="textTransformation" :width="SQUARE_SIZE" :height="SQUARE_SIZE">
+      <div class="text-white text-bold text-center">
+        <span>%</span>
+        <q-icon v-if="!blockLink" name="mdi-link-variant-off"/>
+        <br>
+        <span>{{ blockValue | round }}</span>
+      </div>
+    </foreignObject>
     <g class="outline">
-      <rect x="0" y="10" width="50" height="30" rx="10" ry="10"/>
       <path v-for="border in paths.borders" :key="border" :d="border"/>
+      <rect
+        :width="SQUARE_SIZE-2"
+        :height="SQUARE_SIZE-2"
+        x="1"
+        y="1"
+        rx="6"
+        ry="6"
+        stroke-width="2px"
+      />
     </g>
   </g>
 </template>

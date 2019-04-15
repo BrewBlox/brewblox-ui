@@ -13,6 +13,7 @@ const SIZE_Y = 1;
 
 const settings: ComponentSettings = {
   ...defaultSettings,
+  cards: ['PwmPartCard'],
   size: () => [SIZE_X, SIZE_Y],
   transitions: () => ({}),
   blockedCoordinates: (part: PersistentPart): Coordinates[] =>

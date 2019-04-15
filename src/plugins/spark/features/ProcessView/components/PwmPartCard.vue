@@ -3,16 +3,13 @@ import PartCard from './PartCard';
 import Component from 'vue-class-component';
 
 @Component
-export default class SensorPartCard extends PartCard {
+export default class PwmPartCard extends PartCard {
   get blockCardProps() {
     return {
       ...this.$props,
       types: [
-        'TempSensorMock',
-        'TempSensorOneWire',
+        'ActuatorPwm',
       ],
-      blockServiceIdKey: 'sensorServiceId',
-      blockLinkKey: 'sensorLink',
     };
   }
 }
