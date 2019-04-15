@@ -1,5 +1,5 @@
 import { ComponentSettings, PersistentPart } from '../state';
-import { defaultSettings } from '../components/getters';
+import { defaultSettings } from '../getters';
 import { Coordinates, CoordinatesParam } from '@/helpers/coordinates';
 import { subSquares } from '../helpers/functional';
 

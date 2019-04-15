@@ -1,7 +1,7 @@
 <script lang="ts">
 import { uid } from 'quasar';
 import Component from 'vue-class-component';
-import { FlowPart, ClickEvent, PersistentPart, Rect, ProcessViewConfig, StatePart } from './state';
+import { FlowPart, ClickEvent, PersistentPart, Rect, ProcessViewConfig, StatePart, PartUpdater } from './state';
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';
 import { Coordinates } from '@/helpers/coordinates';
@@ -21,9 +21,9 @@ interface ToolAction {
   label: string;
   value: string;
   icon: string;
-  cursor?: string;
-  onClick?: (evt: ClickEvent, part: PersistentPart) => void;
-  onPan?: (args: PanArguments, part: PersistentPart) => void;
+  cursor: (part: FlowPart) => boolean;
+  onClick?: (evt: ClickEvent, part: FlowPart) => void;
+  onPan?: (args: PanArguments, part: FlowPart) => void;
 }
 
 @Component({
@@ -110,42 +110,63 @@ export default class ProcessViewForm extends FormBase {
       .onOk(() => this.updateParts([]));
   }
 
+  get updater(): PartUpdater {
+    return {
+      updatePart: this.updatePart,
+      updatePartState: this.updatePartState,
+      store: this.$store,
+    };
+  }
+
   get tools(): ToolAction[] {
     return [
       {
         label: 'New (Click)',
         value: 'add',
         icon: 'add',
+        cursor: () => false,
         onClick: this.addPartClickHandler,
       },
       {
         label: 'Move (Drag)',
         value: 'move',
         icon: 'mdi-cursor-move',
+        cursor: part => !!part,
         onPan: this.movePanHandler,
       },
       {
         label: 'Rotate (Click)',
         value: 'rotate-right',
         icon: 'mdi-rotate-right-variant',
+        cursor: part => !!part,
         onClick: this.rotateClickHandler,
       },
       {
         label: 'Edit Settings (Click)',
         value: 'config',
         icon: 'settings',
+        cursor: part => !!part,
         onClick: this.configurePartClickHandler,
+      },
+      {
+        label: 'Interact (Click)',
+        value: 'interact',
+        icon: 'mdi-cursor-default',
+        cursor: part => !!part && !!settings[part.type].interactHandler,
+        onClick: this.interactClickHandler,
       },
       {
         label: 'Copy (Drag)',
         value: 'copy',
         icon: 'file_copy',
+        cursor: part => !!part,
         onPan: this.copyPanHandler,
       },
       {
         label: 'Delete (Click)',
         value: 'delete',
         icon: 'delete',
+        cursor: part => !!part,
         onClick: (evt, part) => this.removePart(part),
       },
       // TODO: flip part
@@ -165,13 +186,13 @@ export default class ProcessViewForm extends FormBase {
     return this.$props.flowParts.find(p => p.id === this.configuredPartId) || null;
   }
 
-  clickHandler(evt: ClickEvent, part: PersistentPart) {
+  clickHandler(evt: ClickEvent, part: FlowPart) {
     if (this.currentTool.onClick) {
       this.currentTool.onClick(evt, part);
     }
   }
 
-  panHandler(args: PanArguments, part: PersistentPart) {
+  panHandler(args: PanArguments, part: FlowPart) {
     if (this.currentTool.onPan) {
       this.currentTool.onPan(args, part);
     }
@@ -201,7 +222,7 @@ export default class ProcessViewForm extends FormBase {
       : this.findGridSquare(grid, evt.touches[0].pageX, evt.touches[0].pageY);
   }
 
-  movePanHandler(args: PanArguments, part: PersistentPart, copy: boolean = false) {
+  movePanHandler(args: PanArguments, part: FlowPart, copy: boolean = false) {
     if (!part) {
       return;
     }
@@ -236,25 +257,32 @@ export default class ProcessViewForm extends FormBase {
     }
   }
 
-  copyPanHandler(args: PanArguments, part: PersistentPart) {
+  copyPanHandler(args: PanArguments, part: FlowPart) {
     this.movePanHandler(args, part, true);
   }
 
-  addPartClickHandler(evt: ClickEvent, part: PersistentPart) {
+  addPartClickHandler(evt: ClickEvent, part: FlowPart) {
     if (!part) {
       this.catalogPartial = this.findClickSquare(evt);
       this.catalogModalOpen = true;
     }
   }
 
-  configurePartClickHandler(evt: ClickEvent, part: PersistentPart) {
+  configurePartClickHandler(evt: ClickEvent, part: FlowPart) {
     if (part) {
       this.configuredPartId = part.id;
       this.menuModalOpen = true;
     }
   }
 
-  rotateClickHandler(evt: ClickEvent, part: PersistentPart, rotation: number = 90) {
+  interactClickHandler(evt: ClickEvent, part: FlowPart) {
+    if (part) {
+      const handler = settings[part.type].interactHandler;
+      handler && handler(part, this.updater);
+    }
+  }
+
+  rotateClickHandler(evt: ClickEvent, part: FlowPart, rotation: number = 90) {
     if (part) {
       const rotate = clampRotation(part.rotate + rotation);
       this.updatePart({ ...part, rotate });
@@ -361,19 +389,15 @@ export default class ProcessViewForm extends FormBase {
 
       <div class="col row justify-around">
         <div :style="`width: ${gridWidth}px; height: ${gridHeight}px;`">
-          <svg
-            v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, null)"
-            ref="grid"
-            class="grid-base grid-editable"
-            @click="v => clickHandler(v, null)"
-          >
+          <!-- No tools have a pan handler for non-part grid squares -->
+          <svg ref="grid" class="grid-base grid-editable" @click="v => clickHandler(v, null)">
             <g
               v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, part)"
               v-for="part in flowParts"
               v-show="!beingDragged(part)"
               :transform="`translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`"
               :key="part.id"
-              class="grid-item"
+              :class="{ clickable: currentTool.cursor(part) }"
               @click.stop="v => clickHandler(v, part)"
             >
               <text fill="white" x="0" y="8" class="grid-item-coordinates">{{ part.x }},{{ part.y }}</text>

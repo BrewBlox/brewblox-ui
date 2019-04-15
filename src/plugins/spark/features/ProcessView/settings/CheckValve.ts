@@ -1,6 +1,5 @@
 import { ComponentSettings, Transitions } from '../state';
-import { LEFT, RIGHT } from '../getters';
-import { defaultSettings } from '../components/getters';
+import { LEFT, RIGHT, defaultSettings } from '../getters';
 
 const settings: ComponentSettings = {
   ...defaultSettings,

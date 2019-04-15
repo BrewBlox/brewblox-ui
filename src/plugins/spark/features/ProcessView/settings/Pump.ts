@@ -1,6 +1,5 @@
-import { ComponentSettings, StatePart } from '../state';
-import { LEFT, RIGHT, DEFAULT_PUMP_PRESSURE, ACCELERATE_OTHERS } from '../getters';
-import { defaultSettings } from '../components/getters';
+import { ComponentSettings, StatePart, PartUpdater } from '../state';
+import { LEFT, RIGHT, DEFAULT_PUMP_PRESSURE, ACCELERATE_OTHERS, defaultSettings } from '../getters';
 
 const settings: ComponentSettings = {
   ...defaultSettings,
@@ -10,6 +9,10 @@ const settings: ComponentSettings = {
       [LEFT]: [{ outCoords: RIGHT }],
       [RIGHT]: [{ outCoords: LEFT, pressure: p, liquids: [ACCELERATE_OTHERS] }],
     };
+  },
+  interactHandler: (part: StatePart, updater: PartUpdater) => {
+    part.settings.disabled = !part.settings.disabled;
+    updater.updatePart(part);
   },
 };
 
