@@ -402,6 +402,8 @@ export default class DefaultLayout extends Vue {
       <WizardPicker v-if="wizardModalOpen" @close="wizardModalOpen = false"/>
     </q-dialog>
 
+    <ServiceWatchers/>
+
     <q-page-container>
       <router-view/>
     </q-page-container>
