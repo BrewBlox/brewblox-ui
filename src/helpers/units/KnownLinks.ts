@@ -12,12 +12,6 @@ export class TempSensorLink extends Link {
   }
 }
 
-export class SetpointLink extends Link {
-  public constructor(id: string | null) {
-    super(id, 'SetpointInterface');
-  }
-}
-
 export class SetpointSensorPairLink extends Link {
   public constructor(id: string | null) {
     super(id, 'SetpointSensorPairInterface');

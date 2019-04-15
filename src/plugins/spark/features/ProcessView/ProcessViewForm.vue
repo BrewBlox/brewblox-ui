@@ -1,111 +1,423 @@
 <script lang="ts">
-import Vue from 'vue';
+import { uid } from 'quasar';
 import Component from 'vue-class-component';
-import { partSettings } from '@/plugins/spark/features/ProcessView/calculateFlows';
-import { FlowPart } from '@/plugins/spark/features/ProcessView/state';
+import { FlowPart, ClickEvent, PersistentPart, Rect, ProcessViewConfig, StatePart, PartUpdater } from './state';
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';
 import { Coordinates } from '@/helpers/coordinates';
-import { clampRotation } from '@/helpers/functional';
+import { clampRotation, spaceCased } from '@/helpers/functional';
+import FormBase from '@/components/Form/FormBase';
+import ProcessViewCatalog from './ProcessViewCatalog.vue';
+import ProcessViewPartMenu from './ProcessViewPartMenu.vue';
+
+interface DragAction {
+  hide: boolean;
+  part: PersistentPart;
+  x: number;
+  y: number;
+}
+
+interface ToolAction {
+  label: string;
+  value: string;
+  icon: string;
+  cursor: (part: FlowPart) => boolean;
+  onClick?: (evt: ClickEvent, part: FlowPart) => void;
+  onPan?: (args: PanArguments, part: FlowPart) => void;
+}
 
 @Component({
   props: {
-    value: {
+    widgetGridRect: {
       type: Object,
       required: true,
     },
+    parts: {
+      type: Array,
+      required: true,
+    },
+    flowParts: {
+      type: Array,
+      required: true,
+    },
+  },
+  components: {
+    ProcessViewCatalog,
+    ProcessViewPartMenu,
   },
 })
-export default class ProcessViewForm extends Vue {
-  SQUARE_SIZE: number = SQUARE_SIZE; // make value accessible in template
+export default class ProcessViewForm extends FormBase {
+  SQUARE_SIZE = SQUARE_SIZE;
+  spaceCased = spaceCased;
 
-  get part(): FlowPart {
-    return this.$props.value;
+  $refs!: {
+    grid: any;
   }
 
-  get cards() {
+  menuModalOpen: boolean = false;
+  catalogModalOpen: boolean = false;
+
+  dragAction: DragAction | null = null;
+  configuredPartId: string | null = null;
+  catalogPartial: Partial<PersistentPart> | null = null;
+
+  get widgetConfig(): ProcessViewConfig {
+    return this.$props.field;
+  }
+
+  saveConfig(config: ProcessViewConfig = this.widgetConfig) {
+    this.$props.onChangeField(config);
+  }
+
+  get gridHeight() {
+    const { top, bottom } = this.$props.widgetGridRect;
+    return bottom - top;
+  }
+
+  get gridWidth() {
+    const { left, right } = this.$props.widgetGridRect;
+    return right - left;
+  }
+
+  gridRect(): Rect {
+    const { x, y, left, right, top, bottom } = this.$refs.grid.getBoundingClientRect();
+    return { x, y, left, right, top, bottom };
+  }
+
+  updateParts(parts: PersistentPart[]) {
+    this.$emit('parts', parts);
+  }
+
+  updatePart(part: PersistentPart) {
+    this.$emit('part', part);
+  }
+
+  updatePartState(part: StatePart) {
+    this.$emit('state', part);
+  }
+
+  removePart(part: PersistentPart) {
+    this.$emit('remove', part);
+  }
+
+  clearParts() {
+    this.$q.dialog({
+      title: 'Remove all',
+      message: 'Are you sure you wish to remove all parts?',
+      noBackdropDismiss: true,
+      cancel: true,
+    })
+      .onOk(() => this.updateParts([]));
+  }
+
+  get updater(): PartUpdater {
+    return {
+      updatePart: this.updatePart,
+      updatePartState: this.updatePartState,
+      store: this.$store,
+    };
+  }
+
+  get tools(): ToolAction[] {
     return [
-      'PlacementPartCard',
-      ...partSettings(this.part).cards,
+      {
+        label: 'New (Click)',
+        value: 'add',
+        icon: 'add',
+        cursor: () => false,
+        onClick: this.addPartClickHandler,
+      },
+      {
+        label: 'Move (Drag)',
+        value: 'move',
+        icon: 'mdi-cursor-move',
+        cursor: part => !!part,
+        onPan: this.movePanHandler,
+      },
+      {
+        label: 'Rotate (Click)',
+        value: 'rotate-right',
+        icon: 'mdi-rotate-right-variant',
+        cursor: part => !!part,
+        onClick: this.rotateClickHandler,
+      },
+      {
+        label: 'Edit Settings (Click)',
+        value: 'config',
+        icon: 'settings',
+        cursor: part => !!part,
+        onClick: this.configurePartClickHandler,
+      },
+      {
+        label: 'Interact (Click)',
+        value: 'interact',
+        icon: 'mdi-cursor-default',
+        cursor: part => !!part && !!settings[part.type].interactHandler,
+        onClick: this.interactClickHandler,
+      },
+      {
+        label: 'Copy (Drag)',
+        value: 'copy',
+        icon: 'file_copy',
+        cursor: part => !!part,
+        onPan: this.copyPanHandler,
+      },
+      {
+        label: 'Delete (Click)',
+        value: 'delete',
+        icon: 'delete',
+        cursor: part => !!part,
+        onClick: (evt, part) => this.removePart(part),
+      },
+      // TODO: flip part
     ];
   }
 
-  get partSize(): [number, number] {
-    return settings[this.part.type].size(this.part);
+  get currentTool(): ToolAction {
+    const toolId = this.widgetConfig.currentToolId;
+    return this.tools.find(tool => tool.value === toolId) || this.tools[0];
   }
 
-  get rotatedSize(): [number, number] {
-    const [x, y] = this.partSize;
-    return (clampRotation(this.part.rotate) / 90) % 2
-      ? [y, x]
-      : [x, y];
+  set currentTool(tool: ToolAction) {
+    this.saveConfig({ ...this.widgetConfig, currentToolId: tool.value });
   }
 
-  get displayScale() {
-    const maxSize = Math.max(...this.partSize);
-    if (maxSize >= 6) {
-      return 0.5;
+  get configuredPart(): FlowPart | null {
+    return this.$props.flowParts.find(p => p.id === this.configuredPartId) || null;
+  }
+
+  clickHandler(evt: ClickEvent, part: FlowPart) {
+    if (this.currentTool.onClick) {
+      this.currentTool.onClick(evt, part);
     }
-    if (maxSize >= 4) {
-      return 1;
-    }
-    return 2;
   }
 
-  get partViewBox(): string {
-    /*
-    * SVG viewBox accepts four arguments: startX, startY, sizeX, sizeY.
-    * sizeX/Y should match the size of the component, regardless of any scaling.
-    * startX/Y need to take into account that rotated parts may extend into negative coordinates.
-    *
-    * A square part rotated 180 deg will extend both to the left, and above its anchor square.
-    * startX and startY should be placed at the left most position of the square.
-    * They will never be > 0, as the anchor square is always [0,0].
-    */
+  panHandler(args: PanArguments, part: FlowPart) {
+    if (this.currentTool.onPan) {
+      this.currentTool.onPan(args, part);
+    }
+  }
 
-    const leftMost =
-      new Coordinates(this.partSize)
-        .rotate(this.part.rotate)
-        .values()
-        .map(v => Math.min(v, 0));
+  rectContains(rect: Rect, x: number, y: number) {
+    return x >= rect.left
+      && x <= rect.right
+      && y >= rect.top
+      && y <= rect.bottom;
+  }
 
-    return [
-      ...leftMost,
-      ...this.rotatedSize,
-    ]
-      .map(v => v * SQUARE_SIZE)
-      .join(', ');
+  findGridSquare(grid: Rect, x: number, y: number) {
+    if (!this.rectContains(grid, x, y)) {
+      return null;
+    }
+    return {
+      x: Math.floor((x - grid.x) / SQUARE_SIZE),
+      y: Math.floor((y - grid.y) / SQUARE_SIZE),
+    };
+  }
+
+  findClickSquare(evt: ClickEvent) {
+    const grid = this.gridRect();
+    return (evt instanceof MouseEvent)
+      ? this.findGridSquare(grid, evt.pageX, evt.pageY)
+      : this.findGridSquare(grid, evt.touches[0].pageX, evt.touches[0].pageY);
+  }
+
+  movePanHandler(args: PanArguments, part: FlowPart, copy: boolean = false) {
+    if (!part) {
+      return;
+    }
+
+    if (args.isFirst) {
+      this.dragAction = {
+        part,
+        hide: !copy,
+        x: 0,
+        y: 0,
+      };
+    }
+
+    const grid = this.gridRect();
+
+    if (this.dragAction !== null) {
+      this.dragAction.x = args.position.left - (0.5 * SQUARE_SIZE) - grid.x;
+      this.dragAction.y = args.position.top - (0.5 * SQUARE_SIZE) - grid.y;
+    }
+
+    if (args.isFinal) {
+      const gridPos = this.findGridSquare(grid, args.position.left, args.position.top);
+      if (gridPos) {
+        const from = copy ? null : part;
+        const id = copy ? uid() : part.id;
+        this.movePart(from, { ...part, ...gridPos, id })
+          .then(() => this.$nextTick())
+          .then(() => this.dragAction = null);
+      } else {
+        this.dragAction = null;
+      }
+    }
+  }
+
+  copyPanHandler(args: PanArguments, part: FlowPart) {
+    this.movePanHandler(args, part, true);
+  }
+
+  addPartClickHandler(evt: ClickEvent, part: FlowPart) {
+    if (!part) {
+      this.catalogPartial = this.findClickSquare(evt);
+      this.catalogModalOpen = true;
+    }
+  }
+
+  configurePartClickHandler(evt: ClickEvent, part: FlowPart) {
+    if (part) {
+      this.configuredPartId = part.id;
+      this.menuModalOpen = true;
+    }
+  }
+
+  interactClickHandler(evt: ClickEvent, part: FlowPart) {
+    if (part) {
+      const handler = settings[part.type].interactHandler;
+      handler && handler(part, this.updater);
+    }
+  }
+
+  rotateClickHandler(evt: ClickEvent, part: FlowPart, rotation: number = 90) {
+    if (part) {
+      const rotate = clampRotation(part.rotate + rotation);
+      this.updatePart({ ...part, rotate });
+    }
+  }
+
+  blockedByPart(part: PersistentPart) {
+    return settings[part.type].blockedCoordinates(part);
+  }
+
+  async movePart(from: PersistentPart | null, to: PersistentPart) {
+    if (from
+      && from.id === to.id
+      && from.x === to.x
+      && from.y === to.y) {
+      return;
+    }
+
+    const toCoords: Coordinates[] = this.blockedByPart(to);
+    const allBlockedCoords: Coordinates[] =
+      this.$props.parts
+        .filter(part => !from || part.id !== from.id)
+        .reduce(
+          (acc: Coordinates[], part: PersistentPart) => [...acc, ...this.blockedByPart(part)], []);
+
+    for (let toCoord of toCoords) {
+      for (let blockedCoord of allBlockedCoords)
+        if (blockedCoord.equals(toCoord)) {
+          this.$q.notify({
+            color: 'negative',
+            icon: 'error',
+            message: "Can't place this part here: location is blocked",
+          });
+          return;
+        }
+    }
+
+    await this.updateParts([...this.$props.parts.filter(p => !from || p.id !== from.id), to]);
+  }
+
+  tryAddPart(part: PersistentPart) {
+    this.movePart(null, part);
+  }
+
+  beingDragged(part: PersistentPart) {
+    return this.dragAction
+      && this.dragAction.hide
+      && this.dragAction.part.id === part.id;
   }
 }
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <FormToolbar>{{ part.type }} {{ part.x }},{{ part.y }}</FormToolbar>
+  <q-card dark class="maximized bg-dark-bright">
+    <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
 
-    <q-card-section>
-      <q-item dark>
-        <q-item-section>
-          <svg
-            :width="`${SQUARE_SIZE * displayScale * rotatedSize[0]}px`"
-            :height="`${SQUARE_SIZE * displayScale * rotatedSize[1]}px`"
-            :viewBox="partViewBox"
-            class="q-mx-auto"
-          >
-            <g>
-              <ProcessViewItem :value="part"/>
+    <q-dialog v-model="menuModalOpen" no-backdrop-dismiss>
+      <ProcessViewPartMenu
+        v-if="menuModalOpen"
+        :value="configuredPart"
+        @input="updatePart"
+        @remove="removePart"
+        @close="menuModalOpen = false"
+      />
+    </q-dialog>
+
+    <q-dialog v-model="catalogModalOpen" no-backdrop-dismiss>
+      <ProcessViewCatalog
+        v-if="catalogModalOpen"
+        :partial="catalogPartial"
+        @create="tryAddPart"
+        @close="catalogModalOpen = false"
+      />
+    </q-dialog>
+
+    <q-card-section class="row">
+      <q-list dark bordered class="col-auto">
+        <q-item dark dense>
+          <q-item-section class="text-h6">Tools</q-item-section>
+        </q-item>
+
+        <q-separator dark inset/>
+
+        <ActionItem
+          v-for="tool in tools"
+          :key="tool.value"
+          :active="currentTool.value === tool.value"
+          :icon="tool.icon"
+          :label="tool.label"
+          no-close
+          @click="currentTool = tool"
+        />
+
+        <q-item/>
+        <q-item dark dense>
+          <q-item-section class="text-h6">Global Actions</q-item-section>
+        </q-item>
+
+        <q-separator dark inset/>
+
+        <ExportAction :widget-id="widgetId" no-close/>
+        <ActionItem icon="delete" label="Delete all parts" no-close @click="clearParts"/>
+      </q-list>
+
+      <div class="col row justify-around">
+        <div :style="`width: ${gridWidth}px; height: ${gridHeight}px;`">
+          <!-- No tools have a pan handler for non-part grid squares -->
+          <svg ref="grid" class="grid-base grid-editable" @click="v => clickHandler(v, null)">
+            <g
+              v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, part)"
+              v-for="part in flowParts"
+              v-show="!beingDragged(part)"
+              :transform="`translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`"
+              :key="part.id"
+              :class="{ clickable: currentTool.cursor(part) }"
+              @click.stop="v => clickHandler(v, part)"
+            >
+              <text fill="white" x="0" y="8" class="grid-item-coordinates">{{ part.x }},{{ part.y }}</text>
+              <ProcessViewItem
+                :value="part"
+                show-hover
+                @input="updatePart"
+                @state="updatePartState"
+              />
+            </g>
+            <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
+              <ProcessViewItem :value="dragAction.part"/>
             </g>
           </svg>
-        </q-item-section>
-      </q-item>
-      <component v-for="card in cards" :key="card" :is="card" :value="part" v-on="$listeners"/>
+        </div>
+      </div>
     </q-card-section>
   </q-card>
 </template>
 
-<style scoped>
-.q-card {
-  width: 100%;
-  margin-bottom: 10px;
-}
+<style lang="stylus" scoped>
+@import './grid.styl';
 </style>

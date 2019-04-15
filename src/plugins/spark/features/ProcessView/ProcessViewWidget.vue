@@ -1,249 +1,166 @@
 <script lang="ts">
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
-import { isSamePart, calculateNormalizedFlows } from './calculateFlows';
+import { uid, debounce } from 'quasar';
+import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
-import { parts as knownParts } from './register';
 import settings from './settings';
-import { PersistentPart, ProcessViewConfig, FlowPart } from './state';
+import { PersistentPart, StatePart, ProcessViewConfig, FlowPart, Rect, ClickEvent, PartUpdater } from './state';
 import { spaceCased } from '@/helpers/functional';
-import { Coordinates } from '@/helpers/coordinates';
+import ProcessViewCatalog from './ProcessViewCatalog.vue';
 
 interface DragAction {
+  hide: boolean;
   part: PersistentPart;
   x: number;
   y: number;
 }
 
-interface ContextAction {
-  idx: number;
+interface ToolAction {
+  label: string;
+  value: string;
+  icon: string;
+  cursor?: string;
+  onClick?: (evt: ClickEvent, part: PersistentPart) => void;
+  onPan?: (args: PanArguments, part: PersistentPart) => void;
 }
 
-@Component
+
+@Component({
+  components: {
+    ProcessViewCatalog,
+  },
+})
 export default class ProcessViewWidget extends WidgetBase {
-  SQUARE_SIZE: number = SQUARE_SIZE; // make value accessible in template
-  editable: boolean = true;
-  modalOpen: boolean = false;
-  dragAction: DragAction | null = null;
-  contextAction: ContextAction | null = null;
+  // make imported values accessible in template
+  SQUARE_SIZE: number = SQUARE_SIZE;
+  spaceCased = spaceCased;
+
+  $refs!: {
+    grid: any;
+  }
+
+  formModalOpen: boolean = false;
+  widgetGridRect: Rect | null = null;
+  partState: Record<string, any> = {};
+  flowParts: FlowPart[] = [];
+  calculateFlowFunc: Function = () => { };
 
   get widgetConfig(): ProcessViewConfig {
     return this.$props.config;
   }
 
-  saveConfig(config: ProcessViewConfig = this.widgetConfig) {
-    this.$props.onChangeConfig(this.widgetId, config);
+  async saveConfig(config: ProcessViewConfig = this.widgetConfig) {
+    await this.$props.onChangeConfig(this.widgetId, config)
+      .catch((e) => {
+        this.$q.notify({
+          color: 'negative',
+          icon: 'error',
+          message: `save error: ${e}`,
+        });
+        this.$forceUpdate();
+      });
   }
 
-  get gridRect() {
-    const { x, y, left, right, top, bottom } = (this.$refs.grid as any).getBoundingClientRect();
+  async updateParts(parts: PersistentPart[]) {
+    const asPersistent = (part: PersistentPart | FlowPart) => {
+      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+      const { state, transitions, flows, ...persistent } = part as FlowPart;
+      return persistent;
+    };
+
+    // first set local value, to avoid jitters caused by the period between action and vueX refresh
+    this.widgetConfig.parts = parts.map(asPersistent);
+    await this.saveConfig({ ...this.widgetConfig });
+    this.calculateFlowFunc();
+  }
+
+  async updatePart(part: PersistentPart) {
+    await this.updateParts(this.parts.map(p => (p.id === part.id ? part : p)));
+  }
+
+  updatePartState(part: StatePart) {
+    this.$set(this.partState, part.id, part.state);
+    this.calculateFlowFunc();
+  }
+
+  async removePart(part: PersistentPart) {
+    await this.updateParts(this.parts.filter(p => p.id !== part.id));
+  }
+
+  gridRect(): Rect {
+    const { x, y, left, right, top, bottom } = this.$refs.grid.getBoundingClientRect();
     return { x, y, left, right, top, bottom };
   }
 
-  get availableParts(): PersistentPart[] {
-    return knownParts
-      .map(type => ({
-        type,
-        x: -2,
-        y: -2,
-        rotate: 0,
-        settings: {},
-        flipped: false,
-      }));
-  }
-
-  get parts(): PersistentPart[] {
+  get parts(): StatePart[] {
     return this.widgetConfig.parts
-      .map(v => ({
+      .map(part => ({
+        id: uid(),
         rotate: 0,
         settings: {},
         flipped: false,
-        ...v,
+        ...part,
+        state: this.partState[part.id] || {},
       }));
   }
 
-  get flowParts(): FlowPart[] {
-    return calculateNormalizedFlows(this.parts);
-  }
-
-  get gridClasses() {
-    return this.editable
-      ? ['grid-base', 'grid-editable']
-      : ['grid-base'];
-  }
-
-  partTranslate(part: PersistentPart) {
-    return `translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`;
-  }
-
-  partViewBox(part: PersistentPart): string {
-    return settings[part.type].size(part).map(v => v * SQUARE_SIZE).join(' ');
-  }
-
-  gridContains(x: number, y: number) {
-    const { left, right, top, bottom } = this.gridRect;
-    return x >= left
-      && x <= right
-      && y >= top
-      && y <= bottom;
-  }
-
-  findGridSquare(x: number, y: number) {
-    if (!this.gridContains(x, y)) {
-      return null;
-    }
+  get updater(): PartUpdater {
     return {
-      x: Math.floor((x - this.gridRect.x) / SQUARE_SIZE),
-      y: Math.floor((y - this.gridRect.y) / SQUARE_SIZE),
+      updatePart: this.updatePart,
+      updatePartState: this.updatePartState,
+      store: this.$store,
     };
   }
 
-  updateParts(parts: PersistentPart[]) {
-    this.saveConfig({ ...this.widgetConfig, parts });
+  isClickable(part) {
+    return !!settings[part.type].interactHandler;
   }
 
-  panHandler(part: PersistentPart, args: PanArguments) {
-    if (!this.editable || this.modalOpen) {
-      return;
-    }
-
-    if (args.isFirst) {
-      this.dragAction = {
-        part,
-        x: 0,
-        y: 0,
-      };
-    }
-
-    if (this.dragAction !== null) {
-      this.dragAction.x = args.position.left - (0.5 * SQUARE_SIZE) - this.gridRect.x;
-      this.dragAction.y = args.position.top - (0.5 * SQUARE_SIZE) - this.gridRect.y;
-    }
-
-    if (args.isFinal) {
-      const gridPos = this.findGridSquare(args.position.left, args.position.top);
-      if (gridPos) {
-        this.movePart(part, { ...part, ...gridPos });
-      }
-      this.dragAction = null;
-    }
+  interact(part: FlowPart) {
+    const handler = settings[part.type].interactHandler;
+    handler && handler(part, this.updater);
   }
 
-  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-  holdHandler(part: PersistentPart, args: HoldArguments) {
-    if (!this.editable) {
-      return;
-    }
-
-    this.contextAction = {
-      idx: this.parts.findIndex(p => isSamePart(p, part)),
-    };
-    this.modalOpen = true;
-  }
-
-  removePart(part: PersistentPart) {
-    this.updateParts(this.parts.filter(p => !isSamePart(p, part)));
-  }
-
-  blockedByPart(part: PersistentPart) {
-    return settings[part.type].blockedCoordinates(part);
-  }
-
-  movePart(from: PersistentPart, to: PersistentPart) {
-    const toCoords: Coordinates[] = this.blockedByPart(to);
-    const allBlockedCoords: Coordinates[] =
-      this.widgetConfig.parts
-        .reduce(
-          (acc: Coordinates[], part: PersistentPart) => [...acc, ...this.blockedByPart(part)], []);
-
-    for (let toCoord of toCoords) {
-      if (allBlockedCoords.some(coord => coord.equals(toCoord))) {
-        return;
-      }
-    }
-
-    this.updateParts([
-      ...this.widgetConfig.parts.filter(p => !isSamePart(p, from)), to]);
-
-  }
-
-  updatePart(idx: number, part: PersistentPart | FlowPart) {
-    this.updateParts(this.parts.map((p, i) => (idx === i ? part : p)));
-  }
-
-  beingDragged(part: PersistentPart) {
-    return this.dragAction && isSamePart(part, this.dragAction.part);
-  }
-
-  clearParts() {
-    this.$q.dialog({
-      title: 'Remove all',
-      message: 'Are you sure you wish to remove all parts?',
-      noBackdropDismiss: true,
-      cancel: true,
-    })
-      .onOk(() => this.updateParts([]));
-  }
-
-  spaceCased(v: string): string {
-    return spaceCased(v);
-  }
-
-  partKey(part: PersistentPart): string {
-    return `${part.x}_${part.y}_${part.type}`;
+  mounted() {
+    this.calculateFlowFunc =
+      debounce(
+        () => this.$nextTick(() => this.flowParts = calculateNormalizedFlows(this.parts)),
+        50,
+        false);
+    this.calculateFlowFunc();
   }
 }
 </script>
 
 <template>
   <q-card dark class="text-white column">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
+    <q-dialog v-model="formModalOpen" no-backdrop-dismiss maximized>
       <ProcessViewForm
-        v-if="modalOpen"
-        :value="flowParts[contextAction.idx]"
-        @input="v => updatePart(contextAction.idx, v)"
-        @remove="v => { removePart(v); modalOpen = false; }"
+        v-if="formModalOpen"
+        v-bind="$props"
+        :field="$props.config"
+        :on-change-field="saveConfig"
+        :widget-grid-rect="widgetGridRect"
+        :parts="parts"
+        :flow-parts="flowParts"
+        @parts="updateParts"
+        @part="updatePart"
+        @state="updatePartState"
+        @remove="removePart"
+        @close="formModalOpen = false"
       />
     </q-dialog>
 
     <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
-      <q-item-section v-if="editable" side>
-        <q-btn flat round dense icon="extension">
-          <q-menu>
-            <q-list link style="padding: 5px">
-              <q-item
-                v-touch-pan.mouse="v => panHandler(part, v)"
-                v-for="part in availableParts"
-                :key="part.type"
-                dark
-                clickable
-              >
-                <q-item-section side>
-                  <svg
-                    :width="`${SQUARE_SIZE}px`"
-                    :height="`${SQUARE_SIZE}px`"
-                    :viewBox="`0 0 ${partViewBox(part)}`"
-                  >
-                    <ProcessViewItem :value="part"/>
-                  </svg>
-                </q-item-section>
-                <q-item-section>{{ spaceCased(part.type) }}</q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </q-btn>
-      </q-item-section>
       <q-item-section side>
-        <q-btn-dropdown flat label="menu">
+        <q-btn-dropdown
+          flat
+          split
+          icon="mdi-pencil"
+          @click="widgetGridRect = gridRect(); formModalOpen = true"
+        >
           <q-list dark bordered>
-            <ActionItem
-              v-if="editable"
-              icon="mdi-pencil-off"
-              label="Stop editing"
-              @click="editable = false"
-            />
-            <ActionItem v-else icon="mdi-pencil" label="Edit parts" @click="editable = true"/>
-            <ActionItem icon="delete" label="Remove all parts" @click="clearParts"/>
             <ActionItem
               v-if="$props.onCopy"
               icon="file_copy"
@@ -269,35 +186,15 @@ export default class ProcessViewWidget extends WidgetBase {
     </WidgetToolbar>
 
     <div class="col">
-      <svg ref="grid" :class="gridClasses">
+      <svg v-if="!formModalOpen" ref="grid" class="grid-base">
         <g
-          v-touch-pan.mouse="v => panHandler(part, v)"
-          v-touch-hold.mouse="v => holdHandler(part, v)"
-          v-for="(part, idx) in parts"
-          v-show="!beingDragged(part)"
-          :transform="partTranslate(part)"
-          :key="partKey(part)"
-          class="grid-item"
+          v-for="part in flowParts"
+          :transform="`translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`"
+          :key="part.id"
+          :class="{ clickable: isClickable(part) }"
+          @click="interact(part)"
         >
-          <text
-            v-if="editable"
-            fill="white"
-            x="0"
-            y="8"
-            class="grid-item-coordinates"
-          >{{ part.x }},{{ part.y }}</text>
-          <ProcessViewItem :value="flowParts[idx]" @input="v => updatePart(idx, v)"/>
-          <rect
-            v-if="editable"
-            :width="SQUARE_SIZE"
-            :height="SQUARE_SIZE"
-            stroke="silver"
-            stroke-opacity="0.6"
-            fill-opacity="0"
-          />
-        </g>
-        <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
-          <ProcessViewItem :value="dragAction.part"/>
+          <ProcessViewItem :value="part" @input="updatePart" @state="updatePartState"/>
         </g>
       </svg>
     </div>
@@ -305,37 +202,6 @@ export default class ProcessViewWidget extends WidgetBase {
 </template>
 
 <style lang="stylus" scoped>
-@import '../../../../../src/styles/quasar.styl';
-
-.grid-base {
-  width: 100%;
-  height: 100%;
-  background-size: 50px 50px, 50px 50px;
-  background-position: 0 -1px, -1px 0;
-  border-top: 1px solid $dark_bright;
-}
-
-.grid-editable {
-  background-image: linear-gradient(
-    $dark_bright 1px,
-    transparent 1px
-  ), linear-gradient(
-    90deg,
-    $dark_bright 1px,
-    transparent 1px
-  );
-}
-
-.grid-item {
-  position: relative;
-}
-
-.grid-item-coordinates {
-  font-size: x-small;
-  z-index: 2;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
+@import './grid.styl';
 </style>
+

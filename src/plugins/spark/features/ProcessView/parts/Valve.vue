@@ -38,15 +38,11 @@ export default class Valve extends PartComponent {
   get closed() {
     return Boolean(this.part.settings.closed);
   }
-
-  protected toggleClosed(): void {
-    this.$parent.$emit('input', { ...this.part, settings: { ...this.part.settings, closed: !this.closed } });
-  }
 }
 </script>
 
 <template>
-  <g class="valve clickable" @click="toggleClosed">
+  <g class="valve">
     <g key="valve-outer" class="outline">
       <path :d="paths.outerValve[0]"/>
       <path :d="paths.outerValve[1]"/>

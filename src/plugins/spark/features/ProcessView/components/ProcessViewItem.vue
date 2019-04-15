@@ -2,6 +2,10 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { SQUARE_SIZE } from '../getters';
+import { Coordinates } from '@/helpers/coordinates';
+import { FlowPart } from '../state';
+import settings from '../settings';
+
 
 @Component({
   props: {
@@ -9,18 +13,65 @@ import { SQUARE_SIZE } from '../getters';
       type: Object,
       required: true,
     },
+    showHover: {
+      type: Boolean,
+      default: false,
+    },
   },
 })
 export default class ProcessViewItem extends Vue {
+  SQUARE_SIZE = SQUARE_SIZE;
+
+  get part(): FlowPart {
+    return this.$props.value;
+  }
+
+  get settings() {
+    return settings[this.part.type];
+  }
+
+  get partSize() {
+    return this.settings.size(this.part);
+  }
+
+  get renderSize() {
+    const [partSizeX, partSizeY] = this.partSize;
+    return (this.part.rotate % 180 > 0)
+      ? [partSizeY, partSizeX]
+      : [partSizeX, partSizeY];
+  }
+
   get transformation() {
-    return `rotate(${this.$props.value.rotate}, ${SQUARE_SIZE / 2}, ${SQUARE_SIZE / 2})`;
+    const [partSizeX, partSizeY] = this.partSize;
+    const [renderSizeX, renderSizeY] = this.renderSize;
+
+    const farEdge = new Coordinates([partSizeX, partSizeY, 0])
+      .rotate(this.part.rotate, [0, 0, 0]);
+
+    const trX = farEdge.x < 0 ? (renderSizeX * SQUARE_SIZE) : 0;
+    const trY = farEdge.y < 0 ? (renderSizeY * SQUARE_SIZE) : 0;
+
+    return `translate(${trX}, ${trY}) rotate(${this.part.rotate})`;
   }
 }
 </script>
 
 <template>
   <g :transform="transformation">
-    <component v-if="value.type" :value="value" :is="value.type" class="ProcessViewPart"/>
+    <component
+      v-if="value.type"
+      :value="value"
+      :is="value.type"
+      class="ProcessViewPart"
+      v-on="$listeners"
+    />
+    <!-- background element, to make the full part clickable -->
+    <rect
+      :width="partSize[0]*SQUARE_SIZE"
+      :height="partSize[1]*SQUARE_SIZE"
+      :class="{showhover: $props.showHover}"
+      opacity="0"
+    />
   </g>
 </template>
 
@@ -59,7 +110,9 @@ export default class ProcessViewItem extends Vue {
   stroke-width: 7px;
 }
 
-.clickable {
-  cursor: pointer;
+.showhover:hover {
+  fill: silver;
+  fill-opacity: 0.5;
+  opacity: 0.5;
 }
 </style>

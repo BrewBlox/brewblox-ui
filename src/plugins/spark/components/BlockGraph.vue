@@ -116,7 +116,13 @@ export default class BlockGraph extends Vue {
   <q-dialog v-model="modalModel" maximized>
     <q-card v-if="modalModel" class="text-white bg-dark-bright" dark>
       <GraphCard ref="graph" :id="$props.id" :config="graphCfg">
-        <q-btn-dropdown v-if="!$props.noDuration" flat label="timespan" icon="mdi-timelapse">
+        <q-btn-dropdown
+          v-if="!$props.noDuration"
+          auto-close
+          flat
+          label="timespan"
+          icon="mdi-timelapse"
+        >
           <q-item
             v-for="(preset, idx) in presets"
             :key="idx"

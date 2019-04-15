@@ -3,9 +3,9 @@ import { Block } from '@/plugins/spark/state';
 
 export interface SetpointSensorPairBlock extends Block {
   data: {
-    setpointId: Link;
     sensorId: Link;
-    setpointValue: Unit;
-    sensorValue: Unit;
+    setting: Unit;
+    value: Unit;
+    settingEnabled: boolean;
   };
 }

@@ -1,5 +1,5 @@
 import {
-  PersistentPart,
+  StatePart,
   Transitions,
   FlowPart,
   CalculatedFlows,
@@ -18,27 +18,23 @@ import mapKeys from 'lodash/mapKeys';
 import pickBy from 'lodash/pickBy';
 import omit from 'lodash/omit';
 
-export const isSamePart =
-  (left: PersistentPart, right: PersistentPart): boolean =>
-    ['x', 'y', 'type', 'rotate'].every(k => left[k] === right[k]);
-
 export const removeTransitions =
   (parts: FlowPart[], inCoord: string): FlowPart[] => parts.map(
     part => ({ ...part, transitions: omit(part.transitions, inCoord) }));
 
 export const partSettings =
-  (part: PersistentPart): ComponentSettings => settings[part.type];
+  (part: StatePart): ComponentSettings => settings[part.type];
 
 export const partTransitions =
-  (part: PersistentPart): Transitions => partSettings(part).transitions(part);
+  (part: StatePart): Transitions => partSettings(part).transitions(part);
 
 export const partSize =
-  (part: PersistentPart): [number, number] => partSettings(part).size(part);
+  (part: StatePart): [number, number] => partSettings(part).size(part);
 
 export const partCenter =
-  (part: PersistentPart): [number, number] => {
+  (part: StatePart): [number, number, number] => {
     const [sizeX, sizeY] = partSize(part);
-    return [0.5 * sizeX, 0.5 * sizeY];
+    return [sizeX / 2, sizeY / 2, 0];
   };
 
 const adjacentPart = (
@@ -48,7 +44,7 @@ const adjacentPart = (
 ): FlowPart | undefined =>
   allParts
     .find((part: FlowPart) =>
-      !(currentPart && isSamePart(part, currentPart))
+      !(currentPart && part.id === currentPart.id)
       && has(part, ['transitions', outCoords]));
 
 const normalizeFlows = (part: FlowPart): FlowPart => {
@@ -59,8 +55,7 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
   const newFlows = mapKeys(part.flows,
     (flow, inCoord) =>
       new Coordinates(inCoord)
-        .translate([-part.x, -part.y])
-        .rotate(-part.rotate, partCenter(part))
+        .translate([-part.x, -part.y, 0])
         .toString()
   );
 
@@ -68,29 +63,33 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
 };
 
 
-const translations = (part: PersistentPart): Transitions =>
+const translations = (part: StatePart): Transitions =>
   Object.entries(partTransitions(part))
-    .reduce((acc, [inCoords, transition]: [string, any]) => {
-      const unrotatedAnchor = new Coordinates(part)
-        .rotateSquare(-part.rotate, part.rotate, partSize(part));
-      const updatedKey = new Coordinates(inCoords)
-        .rotate(part.rotate, partCenter(part))
-        .translate(unrotatedAnchor)
+    .reduce((acc, [inCoordStr, transition]: [string, any]) => {
+      // inCoords are relative from part anchor === [0, 0, 0]
+
+      const size = partSize(part);
+
+      const updatedKey = new Coordinates(inCoordStr)
+        .translate([part.x, part.y, 0])
+        .rotateShapeEdge(part.rotate, 0, size, [part.x, part.y, 0])
         .toString();
+
       const updatedTransition = transition
-        .map((transition: FlowRoute) => ({
-          ...transition,
-          outCoords: new Coordinates(transition.outCoords)
-            .rotate(part.rotate, partCenter(part))
-            .translate(unrotatedAnchor)
+        .map((route: FlowRoute) => ({
+          ...route,
+          outCoords: new Coordinates(route.outCoords)
+            .translate([part.x, part.y, 0])
+            .rotateShapeEdge(part.rotate, 0, size, [part.x, part.y, 0])
             .toString(),
         }));
+
       return { ...acc, [updatedKey]: updatedTransition };
     },
       {},
     );
 
-export const asFlowParts = (parts: PersistentPart[]): FlowPart[] =>
+export const asFlowParts = (parts: StatePart[]): FlowPart[] =>
   parts.map(part => ({ ...part, transitions: translations(part), flows: {} }));
 
 const combineFlows =
@@ -168,7 +167,7 @@ const additionalFlow = (
 ): FlowPart[] =>
   allParts
     .map((item) =>
-      isSamePart(part, item)
+      part.id === item.id
         ? { ...item, flows: combineFlows(item.flows, flowToAdd) }
         : item);
 
@@ -298,7 +297,7 @@ export const flowPath = (
         break;
       }
       candidateParts = candidateParts
-        .filter(part => nextPart && !isSamePart(nextPart, part));
+        .filter(part => nextPart && !(nextPart.id === part.id));
     }
   };
   if (path.transitions[inCoord] === undefined) {
@@ -426,5 +425,5 @@ const unbalancedFlow = (part: FlowPart): number =>
       0);
 
 
-export const calculateNormalizedFlows = (parts: PersistentPart[]): FlowPart[] =>
+export const calculateNormalizedFlows = (parts: StatePart[]): FlowPart[] =>
   calculateFlows(asFlowParts(parts)).map(normalizeFlows);

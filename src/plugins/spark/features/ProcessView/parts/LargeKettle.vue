@@ -14,8 +14,8 @@ export default class LargeKettle extends PartComponent {
     </g>
     <g class="outline">
       <rect
-        :width="SQUARE_SIZE*6-4"
-        :height="SQUARE_SIZE*8-4"
+        :width="SQUARE_SIZE*sizeX-4"
+        :height="SQUARE_SIZE*sizeY-4"
         x="2"
         y="2"
         rx="8"

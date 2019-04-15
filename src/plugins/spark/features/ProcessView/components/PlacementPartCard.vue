@@ -2,20 +2,12 @@
 import PartCard from './PartCard';
 import Component from 'vue-class-component';
 import { clampRotation } from '@/helpers/functional';
-import { Coordinates } from '@/helpers/coordinates';
-import settings from '../settings';
 
 @Component
 export default class PlacementPartCard extends PartCard {
   rotate(rotation: number) {
-    const partSize = settings[this.part.type].size(this.part);
     const rotate = clampRotation(this.part.rotate + rotation);
-
-    const updated = new Coordinates(this.part)
-      .rotateSquare(rotation, this.part.rotate, partSize)
-      .raw();
-
-    this.savePart({ ...this.part, ...updated, rotate });
+    this.savePart({ ...this.part, rotate });
   }
 
   flip() {
@@ -47,7 +39,8 @@ export default class PlacementPartCard extends PartCard {
         />
       </q-item-section>
       <q-item-section>
-        <q-btn color="primary" icon="mdi-swap-horizontal-bold" label="flip" @click="flip"/>
+        <q-btn disable color="primary" icon="mdi-swap-horizontal-bold" label="flip" @click="flip"/>
+        <q-tooltip>Disabled until part flipping is fixed</q-tooltip>
       </q-item-section>
       <q-item-section>
         <q-btn color="primary" icon="delete" label="delete" @click="removePart"/>

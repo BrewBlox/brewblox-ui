@@ -6,6 +6,7 @@ import { serviceValues } from '@/store/services/getters';
 import { typeName, blockIds } from '@/plugins/spark/store/getters';
 import { BrewPiConfig, BrewPiConfigNames } from '@/plugins/spark/arrangements/BrewPi/state';
 import { spaceCased, valOrDefault } from '@/helpers/functional';
+import mapValues from 'lodash/mapValues';
 
 
 @Component
@@ -35,7 +36,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   get arrangementId() {
-    return valOrDefault(this.cfg.arrangementId, 'BrewPi');
+    return valOrDefault(this.cfg.arrangementId, 'Fermentation');
   }
 
   set arrangementId(id: string) {
@@ -43,7 +44,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   get prefix() {
-    return valOrDefault(this.cfg.prefix, this.arrangementId.slice(0, 6));
+    return valOrDefault(this.cfg.prefix, this.arrangementId.slice(0, 7));
   }
 
   set prefix(prefix: string) {
@@ -68,27 +69,26 @@ export default class BrewPiNamingTask extends WizardTaskBase {
 
   get defaultNames(): BrewPiConfigNames {
     return {
-      fridgeSensor: `${this.prefix} fridge sensor`,
-      beerSensor: `${this.prefix} beer sensor`,
-      fridgeSetpoint: `${this.prefix} fridge setpoint`,
-      beerSetpoint: `${this.prefix} beer setpoint`,
-      fridgeSSPair: `${this.prefix} fridge SSPair`,
-      beerSSPair: `${this.prefix} beer SSPair`,
-      coolPin: `${this.prefix} cool pin`,
-      heatPin: `${this.prefix} heat pin`,
-      coolPwm: `${this.prefix} cool PWM`,
-      heatPwm: `${this.prefix} heat PWM`,
-      mutex: `${this.prefix} mutex`,
-      coolPid: `${this.prefix} cool PID`,
-      heatPid: `${this.prefix} heat PID`,
-      beerPid: `${this.prefix} beer PID`,
-      fridgeOffset: `${this.prefix} fridge offset`,
+      fridgeSensor: 'Fridge Sensor',
+      beerSensor: 'Beer Sensor',
+      fridgeSSPair: 'Fridge Setting',
+      beerSSPair: 'Beer Setting',
+      tempProfile: 'Temperature Profile',
+      coolPin: 'Cool Pin',
+      heatPin: 'Heat Pin',
+      coolPwm: 'Cool PWM',
+      heatPwm: 'Heat PWM',
+      mutex: 'Mutex',
+      coolPid: 'Cool PID',
+      heatPid: 'Heat PID',
+      beerPid: 'Beer PID',
+      fridgeOffset: 'Fridge Offset',
     };
   }
 
   get names(): BrewPiConfigNames {
     return {
-      ...this.defaultNames,
+      ...mapValues(this.defaultNames, v => `${this.prefix} ${v}`),
       ...this.chosenNames,
     };
   }
@@ -230,7 +230,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
               <q-input
                 :value="nVal"
                 :error="!nVal || nameExists(nVal)"
-                :label="spaceCased(nKey)"
+                :label="defaultNames[nKey]"
                 dark
                 bottom-slots
                 @input="v => updateName(nKey, v)"

@@ -10,10 +10,6 @@ export default class Pump extends PartComponent {
     return this.part.settings.disabled || false;
   }
 
-  protected toggleDisabled(): void {
-    this.$parent.$emit('input', { ...this.part, settings: { ...this.part.settings, disabled: !this.disabled } });
-  }
-
   get liquids() {
     return this.liquidOnCoord(LEFT);
   }
@@ -21,7 +17,7 @@ export default class Pump extends PartComponent {
 </script>
 
 <template>
-  <g class="pump clickable" @click="toggleDisabled">
+  <g class="pump">
     <!-- tube liquid bottom-->
     <LiquidStroke :paths="['M50,25H0']" :colors="liquids"/>
     <!-- ball liquid -->

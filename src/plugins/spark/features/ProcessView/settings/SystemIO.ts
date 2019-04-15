@@ -1,6 +1,5 @@
 import { ComponentSettings, PersistentPart } from '../state';
-import { IN_OUT, RIGHT } from '../getters';
-import { defaultSettings } from '../components/getters';
+import { IN_OUT, RIGHT, defaultSettings } from '../getters';
 
 const settings: ComponentSettings = {
   ...defaultSettings,

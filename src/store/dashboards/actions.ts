@@ -39,19 +39,24 @@ export const actions: ActionTree<DashboardState, RootState> = {
     setDashboardInStore(context, await persistDashboardInApi(dashboard)),
 
   updateDashboardOrder: async (context: DashboardContext, ids: string[]) =>
-    ids.forEach((id, index) =>
-      context.dispatch('saveDashboard', { ...getDashboardInStore(context, id), order: index + 1 })),
+    await Promise.all(
+      ids
+        .map(async (id, index) =>
+          await context.dispatch(
+            'saveDashboard',
+            { ...getDashboardInStore(context, id), order: index + 1 },
+          ))),
 
-  updatePrimaryDashboard: async (context: DashboardContext, newId: string | null) => {
-    getAllDashboards(context)
-      .forEach((dash: Dashboard) => {
-        if (dash.id === newId) {
-          context.dispatch('saveDashboard', { ...dash, primary: true });
-        } else if (dash.primary) {
-          context.dispatch('saveDashboard', { ...dash, primary: false });
-        }
-      });
-  },
+  updatePrimaryDashboard: async (context: DashboardContext, newId: string | null) =>
+    await Promise.all(
+      getAllDashboards(context)
+        .map(async (dash: Dashboard) => {
+          if (dash.id === newId) {
+            await context.dispatch('saveDashboard', { ...dash, primary: true });
+          } else if (dash.primary) {
+            await context.dispatch('saveDashboard', { ...dash, primary: false });
+          }
+        })),
 
   removeDashboard: async (context: DashboardContext, dashboard: Dashboard) => {
     dashboardItemsByDashboardId(context, dashboard.id)
@@ -73,20 +78,22 @@ export const actions: ActionTree<DashboardState, RootState> = {
     setDashboardItemInStore(context, await persistDashboardItemInApi(item)),
 
   updateDashboardItemOrder: async (context: DashboardContext, itemIds: string[]) =>
-    itemIds.forEach((id, index) => {
-      const item = getDashboardItemInStore(context, id);
-      const order = index + 1;
-      if (item.order !== order) {
-        context.dispatch('saveDashboardItem', { ...item, order });
-      }
-    }),
+    await Promise.all(
+      itemIds
+        .map(async (id, index) => {
+          const item = getDashboardItemInStore(context, id);
+          const order = index + 1;
+          if (item.order !== order) {
+            await context.dispatch('saveDashboardItem', { ...item, order });
+          }
+        })),
 
   updateDashboardItemSize: async (
     context: DashboardContext,
     { id, cols, rows }: { id: string; cols: number; rows: number },
   ) => {
     const item = getDashboardItemInStore(context, id);
-    context.dispatch('saveDashboardItem', { ...item, cols, rows });
+    await context.dispatch('saveDashboardItem', { ...item, cols, rows });
   },
 
   updateDashboardItemConfig: async (
@@ -94,13 +101,13 @@ export const actions: ActionTree<DashboardState, RootState> = {
     { id, config }: { id: string; config: any },
   ) => {
     const item = getDashboardItemInStore(context, id);
-    context.dispatch('saveDashboardItem', { ...item, config });
+    await context.dispatch('saveDashboardItem', { ...item, config });
   },
 
-  removeDashboardItem: async (context: DashboardContext, item: DashboardItem) => {
-    removeDashboardItemInApi(item).catch(() => { });
-    removeDashboardItemInStore(context, item);
-  },
+  removeDashboardItem: async (context: DashboardContext, item: DashboardItem) =>
+    await removeDashboardItemInApi(item)
+      .catch(() => { })
+      .finally(() => removeDashboardItemInStore(context, item)),
 };
 
 export const createDashboard = dispatch(actions.createDashboard);

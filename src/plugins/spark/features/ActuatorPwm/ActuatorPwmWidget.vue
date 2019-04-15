@@ -60,9 +60,8 @@ export default class ActuatorPwmWidget extends BlockWidget {
       </q-item>
 
       <q-item dark>
-        <q-item-section>
+        <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Duty setting</q-item-label>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           <div>
             <InputPopupEdit
               v-if="!isDriven"
@@ -79,6 +78,7 @@ export default class ActuatorPwmWidget extends BlockWidget {
               class="q-ml-xs"
             >%</small>
           </div>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
         <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Duty achieved</q-item-label>

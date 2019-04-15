@@ -19,6 +19,10 @@ import FileSaver from 'file-saver';
       type: String,
       default: 'Export widget',
     },
+    noClose: {
+      type: Boolean,
+      default: false,
+    },
   },
 })
 export default class ExportAction extends Vue {
@@ -27,7 +31,7 @@ export default class ExportAction extends Vue {
   async showDialog() {
     const item = dashboardItemById(this.$store, this.$props.widgetId);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, _rev, dashboard, ...exported } = item;
+    const { id, _rev, dashboard, pinnedPosition, ...exported } = item;
     const blob = new Blob([JSON.stringify(serialize(exported))], { type: 'text/plain;charset=utf-8' });
     FileSaver.saveAs(blob, `brewblox-${item.title}-${item.id}.json`);
   }
@@ -35,5 +39,5 @@ export default class ExportAction extends Vue {
 </script>
 
 <template>
-  <ActionItem :icon="$props.icon" :label="$props.label" @click="showDialog"/>
+  <ActionItem v-bind="$props" @click="showDialog"/>
 </template>

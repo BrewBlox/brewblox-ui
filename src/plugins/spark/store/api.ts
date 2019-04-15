@@ -17,7 +17,10 @@ const asBlock = (block: DataBlock, serviceId: string): Block => ({ ...block, ser
 
 const intercept = (message: string): (e: Error) => never =>
   (e: Error) => {
-    Notify.create(`${message}: ${e.message}`);
+    Notify.create({
+      icon: 'warning',
+      message: `${message}: ${e.message}`,
+    });
     throw e;
   };
 
