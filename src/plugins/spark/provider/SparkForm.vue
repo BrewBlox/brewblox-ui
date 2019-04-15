@@ -421,8 +421,9 @@ export default class SparkForm extends Vue {
         </q-item>
         <q-item dark>
           <q-item-section>
+            <q-tooltip>Disabled while we fix some bugs.</q-tooltip>
             <q-btn
-              :disable="!serializedBlocks"
+              :disable="!serializedBlocks || true"
               :loading="importBusy"
               outline
               label="Load Blocks from file"
