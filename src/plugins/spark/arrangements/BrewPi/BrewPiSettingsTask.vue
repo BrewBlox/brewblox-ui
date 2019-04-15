@@ -96,7 +96,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         type: offsetType,
         groups: this.cfg.groups,
         data: {
-          enabled: true,
+          enabled: false,
           targetId: new Link(this.cfg.names.fridgeSSPair),
           referenceId: new Link(this.cfg.names.beerSSPair),
           referenceSettingOrValue: 0,
