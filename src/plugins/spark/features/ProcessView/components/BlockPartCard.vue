@@ -92,7 +92,7 @@ export default class BlockPartCard extends PartCard {
           :options="blockOptions"
           dark
           options-dark
-          label="Sensor"
+          label="Block"
           option-label="id"
           option-value="id"
         >
