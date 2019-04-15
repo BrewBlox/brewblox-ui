@@ -63,6 +63,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         type: pwmType,
         groups: this.cfg.groups,
         data: {
+          enabled: true,
           period: new Unit(30, 'minute'),
           actuatorId: new Link(this.cfg.names.coolPin),
         },
@@ -73,6 +74,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         type: pwmType,
         groups: this.cfg.groups,
         data: {
+          enabled: true,
           period: new Unit(10, 'second'),
           actuatorId: new Link(this.cfg.names.heatPin),
         },
@@ -94,6 +96,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         type: offsetType,
         groups: this.cfg.groups,
         data: {
+          enabled: false,
           targetId: new Link(this.cfg.names.fridgeSSPair),
           referenceId: new Link(this.cfg.names.beerSSPair),
           referenceSettingOrValue: 0,
@@ -103,6 +106,18 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
               { max: 10 },
             ],
           },
+        },
+      },
+      // Setpoint Profile
+      {
+        id: this.cfg.names.tempProfile,
+        serviceId: this.cfg.serviceId,
+        type: spProfileType,
+        groups: this.cfg.groups,
+        data: {
+          enabled: false,
+          targetId: new Link(this.cfg.names.beerSSPair),
+          points: [],
         },
       },
       // PID
@@ -147,7 +162,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         groups: this.cfg.groups,
         data: {
           ...pidData(),
-          enabled: true,
+          enabled: false,
           inputId: new Link(this.cfg.names.beerSSPair),
           outputId: new Link(this.cfg.names.fridgeOffset),
           filter: 4,
@@ -327,7 +342,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         <q-item-section>
           <UnitPopupEdit
             :field="beerSetting"
-            :change="v => tempProfile = v"
+            :change="v => beerSetting = v"
             label="Beer setting"
             tag="span"
           />

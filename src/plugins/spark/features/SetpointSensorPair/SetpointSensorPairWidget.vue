@@ -41,7 +41,6 @@ export default class SetpointSensorPairWidget extends BlockWidget {
             :change="callAndSaveBlock(v => block.data.setting = v)"
             label="Setting"
           />
-
           <UnitField v-else :field="block.data.setting"/>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
