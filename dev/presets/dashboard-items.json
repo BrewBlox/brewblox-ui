@@ -679,19 +679,6 @@
       }
     },
     {
-      "_id": "a06369be-5499-11e9-8647-d663bd873d93",
-      "title": "setpoint-feature",
-      "order": 1,
-      "cols": 4,
-      "rows": 2,
-      "feature": "SetpointSimple",
-      "dashboard": "dashboard-home",
-      "config": {
-        "serviceId": "sparkey",
-        "blockId": "setpoint-1"
-      }
-    },
-    {
       "_id": "a0636b12-5499-11e9-8647-d663bd873d93",
       "title": "pid-feature",
       "order": 2,

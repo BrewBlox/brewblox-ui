@@ -46,6 +46,11 @@ export default class SetpointProfileWidget extends BlockWidget {
   refresh() {
     this.now = new Date();
   }
+
+  enable() {
+    this.block.data.enabled = true;
+    this.saveBlock();
+  }
 }
 </script>
 
@@ -56,7 +61,22 @@ export default class SetpointProfileWidget extends BlockWidget {
     </q-dialog>
 
     <BlockWidgetToolbar :field="me"/>
-
+    <div class="col-auto">
+      <q-item v-if="!block.data.enabled" dark>
+        <q-item-section avatar>
+          <q-icon name="warning"/>
+        </q-item-section>
+        <q-item-section>
+          <span>
+            Profile is disabled:
+            <i>{{ block.data.targetId }}</i> will not be changed.
+          </span>
+        </q-item-section>
+        <q-item-section side>
+          <q-btn text-color="white" flat label="Enable" @click="enable"/>
+        </q-item-section>
+      </q-item>
+    </div>
     <div class="col">
       <GraphDisplay v-if="!modalOpen" :data="plotlyData" :layout="plotlyLayout"/>
     </div>

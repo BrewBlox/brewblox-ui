@@ -41,34 +41,12 @@
     }
   },
   {
-    "id": "setpoint-1",
-    "groups": [
-      0
-    ],
-    "type": "SetpointSimple",
-    "data": {
-      "setpoint": 21,
-      "enabled": true
-    }
-  },
-  {
-    "id": "setpoint-2",
-    "groups": [
-      0
-    ],
-    "type": "SetpointSimple",
-    "data": {
-      "setpoint": 50,
-      "enabled": false
-    }
-  },
-  {
-    "id": "setpoint-inactive",
+    "id": "sensor-inactive",
     "groups": [],
-    "type": "SetpointSimple",
+    "type": "TempSensorMock",
     "data": {
-      "setpoint": 3,
-      "enabled": true
+      "value[celsius]": 20.89789201,
+      "connected": true
     }
   },
   {
@@ -102,9 +80,8 @@
     "type": "SetpointSensorPair",
     "data": {
       "sensorId<>": "sensor-1",
-      "setpointId<>": "setpoint-1",
-      "setpointValue": 0,
-      "sensorValue": 0
+      "setting": 20,
+      "settingEnabled": true
     }
   },
   {
@@ -115,9 +92,8 @@
     "type": "SetpointSensorPair",
     "data": {
       "sensorId<>": 0,
-      "setpointId<>": 0,
-      "setpointValue": 0,
-      "sensorValue": 0
+      "setting": 20,
+      "settingEnabled": true
     }
   },
   {
@@ -144,9 +120,6 @@
     "data": {
       "constrainedBy": {
         "constraints": [
-          {
-            "min": 5
-          },
           {
             "max": 50
           },

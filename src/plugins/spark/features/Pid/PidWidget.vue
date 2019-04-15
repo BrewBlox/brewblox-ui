@@ -7,6 +7,8 @@ import { PidBlock } from './state';
 
 @Component
 export default class PidWidget extends BlockWidget {
+  inputFormOpen = false;
+
   get block(): PidBlock {
     return getById(this.$store, this.serviceId, this.blockId);
   }
@@ -49,7 +51,6 @@ export default class PidWidget extends BlockWidget {
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <PidForm v-if="modalOpen" v-bind="formProps"/>
     </q-dialog>
-
     <BlockWidgetToolbar :field="me" graph/>
 
     <q-card-section>
@@ -87,7 +88,9 @@ export default class PidWidget extends BlockWidget {
       </template>
 
       <q-item dark>
-        <div class="col-3 text-weight-light text-subtitle2 q-pt-xs">Input</div>
+        <q-item-section side class="col-3">
+          <div class="text-weight-light text-subtitle2 q-mb-xs">Input</div>
+        </q-item-section>
         <q-item-section>
           <q-item-label caption>Measured</q-item-label>
           <UnitField :field="block.data.inputValue"/>
@@ -96,12 +99,21 @@ export default class PidWidget extends BlockWidget {
           <q-item-label caption>Target</q-item-label>
           <UnitField :field="block.data.inputSetting"/>
         </q-item-section>
+        <q-item-section side>
+          <BlockFormButton
+            :block-id="block.data.inputId.id"
+            :service-id="serviceId"
+            :btn-props="{ icon: 'mdi-pencil', flat: true, class:'q-py-xs q-px-sm'}"
+          />
+        </q-item-section>
       </q-item>
 
       <q-separator dark inset/>
 
       <q-item dark>
-        <div class="col-3 text-weight-light text-subtitle2 q-pt-xs">Output</div>
+        <q-item-section side class="col-3">
+          <div class="text-weight-light text-subtitle2 q-mb-xs">Output</div>
+        </q-item-section>
         <q-item-section>
           <q-item-label caption>Measured</q-item-label>
           <big>{{ block.data.outputSetting | round }}</big>
@@ -110,12 +122,21 @@ export default class PidWidget extends BlockWidget {
           <q-item-label caption>Target</q-item-label>
           <big>{{ block.data.outputValue | round }}</big>
         </q-item-section>
+        <q-item-section side>
+          <BlockFormButton
+            :block-id="block.data.outputId.id"
+            :service-id="serviceId"
+            :btn-props="{ icon: 'mdi-pencil', flat: true, class:'q-py-xs q-px-sm'}"
+          />
+        </q-item-section>
       </q-item>
 
       <q-separator dark inset/>
 
       <q-item dark>
-        <div class="col-3 text-weight-light text-subtitle2 q-pt-xs">Error</div>
+        <q-item-section side class="col-3">
+          <div class="text-weight-light text-subtitle2 q-my-xs">Error</div>
+        </q-item-section>
         <q-item-section>
           <q-item-label caption>Proportional</q-item-label>
           <UnitField :field="block.data.error" tag="span" unit-tag="small"/>
@@ -133,7 +154,9 @@ export default class PidWidget extends BlockWidget {
       <q-separator dark inset/>
 
       <q-item dark>
-        <div class="col-3 text-weight-light text-subtitle2 q-pt-xs">Result</div>
+        <q-item-section side class="col-3">
+          <div class="text-weight-light text-subtitle2 q-my-xs">Result</div>
+        </q-item-section>
         <q-item-section>
           <q-item-label caption>P</q-item-label>
           <span>{{ block.data.p | round }}</span>

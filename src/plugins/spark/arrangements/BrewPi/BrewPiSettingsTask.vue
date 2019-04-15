@@ -3,7 +3,6 @@ import { uid } from 'quasar';
 import Component from 'vue-class-component';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { Unit, Link } from '@/helpers/units';
-import parseDuration from 'parse-duration';
 import { BrewPiConfig } from '@/plugins/spark/arrangements/BrewPi/state';
 import { renameBlock, createBlock, saveBlock } from '@/plugins/spark/store/actions';
 import { createDashboard, appendDashboardItem } from '@/store/dashboards/actions';
@@ -11,7 +10,6 @@ import { widgetSizeById } from '@/store/features/getters';
 import { RootStore } from '@/store/state';
 import { typeName as pinType } from '@/plugins/spark/features/ActuatorPin/getters';
 import { typeName as spProfileType } from '@/plugins/spark/features/SetpointProfile/getters';
-import { typeName as spSimpleType } from '@/plugins/spark/features/SetpointSimple/getters';
 import { typeName as pairType } from '@/plugins/spark/features/SetpointSensorPair/getters';
 import { typeName as pwmType } from '@/plugins/spark/features/ActuatorPwm/getters';
 import { typeName as mutexType } from '@/plugins/spark/features/Mutex/getters';
@@ -26,8 +24,8 @@ import { Dashboard } from '@/store/dashboards/state';
 
 @Component
 export default class BrewPiSettingsTask extends WizardTaskBase {
-  fridgeSetpointValue = new Unit(20, 'degC');
-  beerSetpointValue = new Unit(20, 'degC');
+  fridgeSetting = new Unit(20, 'degC');
+  beerSetting = new Unit(20, 'degC');
 
   get cfg(): BrewPiConfig {
     return this.stagedConfig;
@@ -35,35 +33,6 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
 
   defineCreatedBlocks() {
     this.cfg.createdBlocks = [
-      // setpoint
-      {
-        id: this.cfg.names.fridgeSetpoint,
-        serviceId: this.cfg.serviceId,
-        type: spSimpleType,
-        groups: this.cfg.groups,
-        data: {
-          enabled: true,
-          setpoint: this.fridgeSetpointValue,
-        },
-      },
-      {
-        id: this.cfg.names.beerSetpoint,
-        serviceId: this.cfg.serviceId,
-        type: spProfileType,
-        groups: this.cfg.groups,
-        data: {
-          points: [
-            {
-              time: new Date().getTime() / 1000,
-              'temperature[degC]': this.beerSetpointValue.value,
-            },
-            {
-              time: (new Date().getTime() + parseDuration('2w')) / 1000,
-              'temperature[degC]': this.beerSetpointValue.value,
-            },
-          ],
-        },
-      },
       // setpoint sensor pair
       {
         id: this.cfg.names.fridgeSSPair,
@@ -71,8 +40,9 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         type: pairType,
         groups: this.cfg.groups,
         data: {
-          setpointId: new Link(this.cfg.names.fridgeSetpoint),
           sensorId: new Link(this.cfg.names.fridgeSensor),
+          setting: this.fridgeSetting,
+          settingEnabled: true,
         },
       },
       {
@@ -81,8 +51,9 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         type: pairType,
         groups: this.cfg.groups,
         data: {
-          setpointId: new Link(this.cfg.names.beerSetpoint),
           sensorId: new Link(this.cfg.names.beerSensor),
+          setting: this.beerSetting,
+          settingEnabled: true,
         },
       },
       // PWM
@@ -262,9 +233,8 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       createWidget(this.cfg.names.coolPid, pidType),
       createWidget(this.cfg.names.heatPid, pidType),
       createWidget(this.cfg.names.beerPid, pidType),
-      // Setpoints
-      createWidget(this.cfg.names.fridgeSetpoint, spSimpleType),
-      createWidget(this.cfg.names.beerSetpoint, spProfileType),
+      // Setpoint profile
+      createWidget(this.cfg.names.tempProfile, spProfileType),
       // Sensors
       createWidget(this.cfg.names.fridgeSensor, sensorTypes.fridge),
       createWidget(this.cfg.names.beerSensor, sensorTypes.beer),
@@ -342,23 +312,23 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         <big>Settings</big>
       </q-item>
       <q-item dark>
-        <q-item-section>Fridge temperature</q-item-section>
+        <q-item-section>Initial Fridge temperature</q-item-section>
         <q-item-section>
           <UnitPopupEdit
-            :field="fridgeSetpointValue"
-            :change="v => fridgeSetpointValue = v"
-            label="Fridge temperature"
+            :field="fridgeSetting"
+            :change="v => fridgeSetting = v"
+            label="Fridge setting"
             tag="span"
           />
         </q-item-section>
       </q-item>
       <q-item dark>
-        <q-item-section>Beer temperature</q-item-section>
+        <q-item-section>Initial Beer temperature</q-item-section>
         <q-item-section>
           <UnitPopupEdit
-            :field="beerSetpointValue"
-            :change="v => beerSetpointValue = v"
-            label="Beer temperature"
+            :field="beerSetting"
+            :change="v => tempProfile = v"
+            label="Beer setting"
             tag="span"
           />
         </q-item-section>

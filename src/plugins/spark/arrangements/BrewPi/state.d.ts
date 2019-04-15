@@ -4,10 +4,9 @@ import { DashboardItem } from '@/store/dashboards/state';
 export interface BrewPiConfigNames {
   fridgeSensor: string;
   beerSensor: string;
-  fridgeSetpoint: string;
-  beerSetpoint: string;
   fridgeSSPair: string;
   beerSSPair: string;
+  tempProfile: string;
   coolPin: string;
   heatPin: string;
   coolPwm: string;
