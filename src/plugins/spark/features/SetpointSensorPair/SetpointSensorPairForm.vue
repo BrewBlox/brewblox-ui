@@ -28,7 +28,7 @@ export default class SetpointSensorPairForm extends BlockForm {
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <q-item dark>
-          <q-item-section style="justify-content: flex-start">
+          <q-item-section class="col-3" style="justify-content: flex-start">
             <q-item-label caption>Setting</q-item-label>
             <UnitPopupEdit
               v-if="!isDriven"
@@ -40,7 +40,14 @@ export default class SetpointSensorPairForm extends BlockForm {
             <UnitField v-else :field="block.data.setting"/>
             <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>
-          <q-item-section style="justify-content: flex-start">
+          <q-item-section class="col-3" style="justify-content: flex-start">
+            <q-item-label caption>Enabled</q-item-label>
+            <q-toggle
+              :value="block.data.settingEnabled"
+              @input="v => { block.data.settingEnabled = v; saveBlock(); }"
+            />
+          </q-item-section>
+          <q-item-section class="col-6" style="justify-content: flex-start">
             <q-item-label caption>Sensor</q-item-label>
             <LinkPopupEdit
               :field="block.data.sensorId"
