@@ -21,9 +21,6 @@ import settings from '../settings';
 })
 export default class ProcessViewItem extends Vue {
   SQUARE_SIZE = SQUARE_SIZE;
-  $refs!: {
-    part: any;
-  }
 
   get part(): FlowPart {
     return this.$props.value;
