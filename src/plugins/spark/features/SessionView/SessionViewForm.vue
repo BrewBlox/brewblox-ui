@@ -3,7 +3,7 @@ import Component from 'vue-class-component';
 import shortid from 'shortid';
 import { objectSorter } from '@/helpers/functional';
 import FormBase from '@/components/Form/FormBase';
-import { nodeBuilder, targetSplitter, targetBuilder } from '@/components/Graph/functional';
+import { nodeBuilder, targetSplitter, targetBuilder, QuasarNode, expandedNodes } from '@/components/Graph/functional';
 import { SessionViewConfig, Session } from '@/plugins/spark/features/SessionView/state';
 import { durationString } from '@/helpers/functional';
 import { fields } from '@/store/history/getters';
@@ -20,6 +20,7 @@ export default class SessionViewForm extends FormBase {
   graphSessionId: string | null = null;
   sessionInput: string = '';
   selectFilter: string | null = null;
+  expandedKeys: string[] = [];
 
   get widgetConfig(): SessionViewConfig {
     return this.$props.field;
@@ -127,6 +128,16 @@ export default class SessionViewForm extends FormBase {
     return durationString(session.end - session.start);
   }
 
+  nodeFilter(node: QuasarNode, filter: string): boolean {
+    return node && node.value.toLowerCase().match(filter.toLowerCase());
+  }
+
+  updateExpanded(filter: string) {
+    if (filter) {
+      this.expandedKeys = expandedNodes(this.nodes, filter);
+    }
+  }
+
   created() {
     fetchKnownKeys(this.$store);
   }
@@ -223,24 +234,52 @@ export default class SessionViewForm extends FormBase {
             <q-item dark>
               <q-item-section>
                 <q-input
-                  v-model="selectFilter"
+                  :value="selectFilter"
                   placeholder="Filter keys"
                   class="q-ma-none"
                   dark
                   clearable
+                  @input="v => { selectFilter = v; updateExpanded(v); }"
                 >
                   <template v-slot:append>
+                    <q-btn flat round icon="mdi-close-circle" @click.stop="selectFilter = ''">
+                      <q-tooltip>Clear filter</q-tooltip>
+                    </q-btn>
                     <q-icon name="search"/>
                   </template>
                 </q-input>
               </q-item-section>
             </q-item>
             <q-item dark>
+              <q-item-section class="col-auto">
+                <q-btn
+                  flat
+                  label="Expand"
+                  icon="mdi-expand-all"
+                  @click="$refs.tree[0].expandAll()"
+                />
+              </q-item-section>
+              <q-item-section class="col-auto">
+                <q-btn
+                  flat
+                  label="Collapse"
+                  icon="mdi-collapse-all"
+                  @click="$refs.tree[0].collapseAll()"
+                />
+              </q-item-section>
+              <q-item-section class="col-auto">
+                <q-btn flat label="clear" icon="clear" @click="updateSessionSelected(session, [])"/>
+              </q-item-section>
+            </q-item>
+            <q-item dark>
               <q-item-section>
                 <q-tree
+                  ref="tree"
                   :nodes="nodes"
                   :ticked="sessionSelected(session)"
                   :filter="selectFilter"
+                  :expanded.sync="expandedKeys"
+                  :filter-method="nodeFilter"
                   tick-strategy="leaf-filtered"
                   dark
                   node-key="value"
