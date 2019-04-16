@@ -23,7 +23,18 @@ import Component from 'vue-class-component';
   },
 })
 export default class ColorPickerPopupEdit extends Vue {
-  placeholder = ''; // must not equal clear-value
+  placeholder: string = '';
+  active: boolean = false;
+
+  get value(): string {
+    return this.active
+      ? this.placeholder
+      : '';
+  }
+
+  set value(v: string) {
+    this.placeholder = v;
+  }
 
   get colorString() {
     return this.$props.field || '<not set>';
@@ -41,11 +52,12 @@ export default class ColorPickerPopupEdit extends Vue {
   }
 
   startEdit() {
-    this.placeholder = this.$props.field;
+    this.placeholder = this.colorStyle.color;
+    this.active = true;
   }
 
-  endEdit() {
-    this.$props.change(this.placeholder);
+  save() {
+    this.$props.change(this.placeholder.replace('#', ''));
   }
 }
 </script>
@@ -57,17 +69,18 @@ export default class ColorPickerPopupEdit extends Vue {
     <q-popup-edit
       :disable="$attrs.disabled"
       :title="$props.label"
-      v-model="placeholder"
+      v-model="value"
       label-set="apply"
       buttons
       persistent
       @show="startEdit"
-      @save="endEdit"
+      @hide="active = false"
+      @save="save"
     >
       <div class="help-text text-weight-light q-my-md">
         <slot/>
       </div>
-      <q-color v-model="placeholder" dark no-parent-field format-model="hex"/>
+      <q-color v-model="value" dark no-parent-field format-model="hex"/>
     </q-popup-edit>
   </div>
 </template>

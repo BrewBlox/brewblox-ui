@@ -31,20 +31,22 @@ import { round, truncate } from '@/helpers/functional';
   },
 })
 export default class InputPopupEdit extends Vue {
-  placeholder: any = null;
-  get value() {
-    if (this.placeholder === null) {
-      this.placeholder = this.$props.field;
-    }
-    return this.placeholder;
+  $refs!: {
+    input: any;
   }
+  placeholder: any = null;
+  active: boolean = false;
+
+  get value() {
+    return this.active
+      ? this.placeholder
+      : NaN;
+  }
+
   set value(v: any) {
     this.placeholder = this.$props.type === 'number' ? +v : v;
   }
 
-  $refs!: {
-    input: any;
-  }
 
   get displayValue() {
     const val = this.$props.field;
@@ -63,8 +65,14 @@ export default class InputPopupEdit extends Vue {
     return val;
   }
 
-  endEdit() {
-    this.$props.change(this.value);
+  onShow() {
+    this.placeholder = this.$props.field;
+    this.active = true;
+    this.$refs.input.focus();
+  }
+
+  save() {
+    this.$props.change(this.placeholder);
   }
 }
 </script>
@@ -83,7 +91,9 @@ export default class InputPopupEdit extends Vue {
       label-set="apply"
       buttons
       persistent
-      @save="endEdit"
+      @show="onShow"
+      @hide="active = false"
+      @save="save"
     >
       <div class="help-text text-weight-light q-my-md">
         <slot/>

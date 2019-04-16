@@ -30,15 +30,16 @@ import Component from 'vue-class-component';
   },
 })
 export default class LinkPopupEdit extends Vue {
-  placeholder: string | null = '';
-  get value(): string | null {
-    if (this.placeholder === '') {
-      this.placeholder = this.$props.field.id;
-    }
-    return this.placeholder;
+  placeholder: string | null = null;
+  active: boolean = false;
+
+  get value(): any {
+    return this.active
+      ? this.placeholder
+      : NaN;
   }
 
-  set value(v: string | null) {
+  set value(v: any) {
     this.placeholder = v;
   }
 
@@ -54,19 +55,21 @@ export default class LinkPopupEdit extends Vue {
 
   startEdit() {
     fetchCompatibleBlocks(this.$store, this.$props.serviceId, this.$props.field.type);
+    this.placeholder = this.$props.field.id;
+    this.active = true;
   }
 
-  endEdit() {
-    this.$props.change(new Link(this.value, this.$props.field.type));
+  save() {
+    this.$props.change(new Link(this.placeholder, this.$props.field.type));
   }
 }
 </script>
 
 <template>
   <div style="max-width: 100%">
-    <component :is="$props.tag" class="editable clickable ellipsis" @click="startEdit">
+    <component :is="$props.tag" class="editable clickable ellipsis">
       {{ displayValue | truncated }}
-      <q-menu content-style="overflow: visible">
+      <q-menu content-style="overflow: visible" @before-show="startEdit" @hide="active = false">
         <q-item dark>
           <q-item-section class="help-text text-weight-light">
             <big>{{ $props.label }}</big>
@@ -107,7 +110,7 @@ export default class LinkPopupEdit extends Vue {
             <q-btn v-close-popup dark flat color="primary" label="Cancel"/>
           </q-item-section>
           <q-item-section side>
-            <q-btn v-close-popup dark flat color="primary" label="Apply" @click="endEdit()"/>
+            <q-btn v-close-popup dark flat color="primary" label="Apply" @click="save"/>
           </q-item-section>
         </q-item>
       </q-menu>
