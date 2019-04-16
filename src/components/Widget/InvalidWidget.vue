@@ -14,7 +14,15 @@ export default class InvalidWidget extends WidgetBase { }
 
 <template>
   <q-card dark class="text-white scroll">
-    <WidgetToolbar :title="widgetTitle" :subtitle="displayName"/>
+    <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
+      <q-item-section side>
+        <q-btn-dropdown flat label="Menu">
+          <q-list dark bordered>
+            <ActionItem icon="delete" label="Delete widget" @click="$props.onDelete(widgetId)"/>
+          </q-list>
+        </q-btn-dropdown>
+      </q-item-section>
+    </WidgetToolbar>
 
     <q-card-section>
       <q-item dark>

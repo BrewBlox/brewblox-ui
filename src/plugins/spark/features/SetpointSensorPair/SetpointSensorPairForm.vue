@@ -32,18 +32,19 @@ export default class SetpointSensorPairForm extends BlockForm {
             <q-item-label caption>Setting</q-item-label>
             <UnitPopupEdit
               v-if="!isDriven"
-              :field="block.data.setting"
-              :service-id="serviceId"
-              :change="callAndSaveBlock(v => block.data.setting = v)"
+              :field="block.data.storedSetting"
+              :change="callAndSaveBlock(v => block.data.storedSetting = v)"
+              :class="{darkened: !block.data.settingEnabled}"
               label="Setting"
             />
-            <UnitField v-else :field="block.data.setting"/>
+            <UnitField v-else :field="block.data.storedSetting"/>
             <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>
           <q-item-section class="col-3" style="justify-content: flex-start">
             <q-item-label caption>Enabled</q-item-label>
             <q-toggle
               :value="block.data.settingEnabled"
+              :disable="isDriven"
               @input="v => { block.data.settingEnabled = v; saveBlock(); }"
             />
           </q-item-section>

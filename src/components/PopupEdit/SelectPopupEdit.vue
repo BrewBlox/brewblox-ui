@@ -34,13 +34,13 @@ import Component from 'vue-class-component';
   },
 })
 export default class SelectPopupEdit extends Vue {
-  placeholder: any = NaN;
+  placeholder: any = null;
+  active: boolean = false;
 
   get selected(): any {
-    if (Number.isNaN(this.placeholder)) {
-      this.placeholder = this.$props.options.find(v => v.value === this.$props.field) || null;
-    }
-    return this.placeholder;
+    return this.active
+      ? this.placeholder
+      : NaN;
   }
 
   set selected(v: any) {
@@ -61,6 +61,11 @@ export default class SelectPopupEdit extends Vue {
       .label;
   }
 
+  onShow() {
+    this.placeholder = this.$props.options.find(v => v.value === this.$props.field) || null;
+    this.active = true;
+  }
+
   endEdit() {
     this.$props.change(this.selected === null ? null : this.selected.value);
   }
@@ -71,7 +76,7 @@ export default class SelectPopupEdit extends Vue {
   <div>
     <component :is="$props.tag" class="editable">
       {{ displayValue | truncated }}
-      <q-menu content-style="overflow: visible">
+      <q-menu content-style="overflow: visible" @before-show="onShow" @hide="active = false">
         <q-item dark>
           <q-item-section class="help-text text-weight-light">
             <big>{{ $props.label }}</big>

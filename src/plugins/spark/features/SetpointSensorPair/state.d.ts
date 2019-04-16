@@ -7,5 +7,6 @@ export interface SetpointSensorPairBlock extends Block {
     setting: Unit;
     value: Unit;
     settingEnabled: boolean;
+    storedSetting: Unit;
   };
 }

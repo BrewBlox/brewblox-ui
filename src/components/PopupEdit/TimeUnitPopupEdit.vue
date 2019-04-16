@@ -26,21 +26,30 @@ import parseDuration from 'parse-duration';
   },
 })
 export default class TimeUnitPopupEdit extends Vue {
+  $refs!: {
+    input: any;
+  }
   placeholder: string | null = null;
+  active: boolean = false;
 
-  get value(): string {
-    if (this.placeholder === null) {
-      this.placeholder = unitDurationString(this.$props.field);
-    }
-    return this.placeholder;
+  get value() {
+    return this.active
+      ? this.placeholder
+      : NaN;
   }
 
-  set value(v: string) {
+  set value(v: any) {
     this.placeholder = v;
   }
 
+  onShow() {
+    this.placeholder = unitDurationString(this.$props.field);
+    this.active = true;
+    this.$refs.input.focus();
+  }
+
   endEdit() {
-    const fieldCopy = new Unit(parseDuration(this.value), 'ms');
+    const fieldCopy = new Unit(parseDuration(this.placeholder), 'ms');
     this.$props.change(fieldCopy);
   }
 }
@@ -55,12 +64,14 @@ export default class TimeUnitPopupEdit extends Vue {
       label-set="apply"
       buttons
       persistent
+      @show="onShow"
+      @hide="active = false"
       @save="endEdit"
     >
       <div class="help-text text-weight-light q-my-md">
         <slot/>
       </div>
-      <q-input v-model.lazy="value" dark/>
+      <q-input ref="input" v-model.lazy="value" dark/>
     </q-popup-edit>
   </div>
 </template>

@@ -28,17 +28,28 @@ import Component from 'vue-class-component';
   },
 })
 export default class UnitPopupEdit extends Vue {
+  $refs!: {
+    input: any;
+  }
   placeholder: number | null = null;
+  active: boolean = false;
 
   get value() {
-    if (this.placeholder === null) {
-      this.placeholder = this.$props.field.val;
-    }
-    return this.placeholder;
+    return this.active
+      ? this.placeholder
+      : NaN;
   }
 
   set value(v: any) {
     this.placeholder = +v;
+  }
+
+  onShow() {
+    this.placeholder = !!this.$props.field.val
+      ? +this.$props.field.val.toFixed(2)
+      : this.$props.field.val;
+    this.active = true;
+    this.$refs.input.focus();
   }
 
   endEdit() {
@@ -62,6 +73,8 @@ export default class UnitPopupEdit extends Vue {
       label-set="apply"
       buttons
       persistent
+      @show="onShow"
+      @hide="active = false"
       @save="endEdit"
     >
       <div class="help-text text-weight-light q-my-md">

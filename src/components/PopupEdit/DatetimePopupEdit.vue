@@ -41,7 +41,7 @@ export default class DatetimePopupEdit extends Vue {
     qTimeProxy: any;
   }
 
-  placeholder: any = -1; // must not equal clear-value
+  placeholder: any = NaN; // must not equal clear-value
   timePlaceholder = '';
   datePlaceholder = '';
 
@@ -65,7 +65,7 @@ export default class DatetimePopupEdit extends Vue {
     this.timePlaceholder = qdate.formatDate(this.placeholder, 'HH:mm:ss');
   }
 
-  endEdit() {
+  save() {
     const [year, month, date] = this.datePlaceholder.split('/');
     const [hours, minutes] = this.timePlaceholder.split(':');
     this.placeholder = qdate.buildDate({ year, month, hours, minutes, date });
@@ -90,7 +90,7 @@ export default class DatetimePopupEdit extends Vue {
       buttons
       persistent
       @show="startEdit"
-      @save="endEdit"
+      @save="save"
     >
       <div class="help-text text-weight-light q-my-md">
         <slot/>
