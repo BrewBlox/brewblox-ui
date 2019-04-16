@@ -1,7 +1,7 @@
 import set from 'lodash/set';
 import { QueryTarget } from '@/store/history/state';
 
-interface QuasarNode {
+export interface QuasarNode {
   label: string;
   value: any;
   children?: QuasarNode[];
@@ -26,7 +26,17 @@ export const nodeBuilder =
       .reduce(
         (acc, [k, fieldKeys]) => {
           fieldKeys.forEach(fkey => {
-            const splitKeys = fkey.split('/');
+            const splitKeys = fkey
+              // compensate for units containing a / - replace with placeholder, split, return
+              // start [
+              // then anything except / or ]
+              // then /
+              // then anything except / or ]
+              // then ]
+              // replace the / between the brackets with placeholder "{{div}}"
+              .replace(/(\[[^\/\]]*)(\/)([^\/\]]*\])/, '$1{{div}}$3')
+              .split('/')
+              .map(sk => sk.replace(/{{div}}/, '/'));
             set(acc, [k, ...splitKeys], splitKeys.pop());
           });
           return acc;
@@ -35,6 +45,25 @@ export const nodeBuilder =
       );
     return Object.entries(raw)
       .map(([k, v]) => nodeRecurser([], k, v));
+  };
+
+export const expandedNodes =
+  (nodes: QuasarNode[], filter: string): string[] => {
+    const lowerFilter = filter.toLowerCase();
+    const compare = (node: QuasarNode): boolean => !!node.label.toLowerCase().match(lowerFilter);
+
+    const checkNode = (node: QuasarNode): string[] => {
+      const children = node.children || [];
+      const vals: string[] = children
+        .reduce((acc: string[], n: QuasarNode) => [...acc, ...checkNode(n)], []);
+      if (vals.length > 0 || children.some(compare)) {
+        vals.push(node.value);
+      }
+      return vals;
+    };
+
+    return nodes
+      .reduce((acc: string[], n: QuasarNode) => [...acc, ...checkNode(n)], []);
   };
 
 export const targetSplitter =

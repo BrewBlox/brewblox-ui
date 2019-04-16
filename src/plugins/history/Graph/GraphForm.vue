@@ -1,7 +1,7 @@
 <script lang="ts">
 import { GraphConfig } from '@/components/Graph/state';
 import { defaultPresets } from '@/components/Graph/getters';
-import { nodeBuilder, targetSplitter, targetBuilder } from '@/components/Graph/functional';
+import { nodeBuilder, targetSplitter, targetBuilder, QuasarNode, expandedNodes } from '@/components/Graph/functional';
 import FormBase from '@/components/Form/FormBase';
 import { durationString } from '@/helpers/functional';
 import { ValueAxes, QueryParams } from '@/store/history/state';
@@ -20,6 +20,7 @@ interface PeriodDisplay {
 export default class GraphForm extends FormBase {
   period: PeriodDisplay | null = null;
   selectFilter: string | null = null;
+  expandedKeys: string[] = [];
 
   get periodOptions() {
     return [
@@ -126,6 +127,16 @@ export default class GraphForm extends FormBase {
   parseDuration(val: string): string {
     return durationString(val);
   }
+
+  nodeFilter(node: QuasarNode, filter: string): boolean {
+    return node && node.value.toLowerCase().match(filter.toLowerCase());
+  }
+
+  updateExpanded(filter: string) {
+    if (filter) {
+      this.expandedKeys = expandedNodes(this.nodes, filter);
+    }
+  }
 }
 </script>
 
@@ -186,20 +197,30 @@ export default class GraphForm extends FormBase {
         <q-item dark>
           <q-item-section>
             <q-input
-              v-model="selectFilter"
+              :value="selectFilter"
               placeholder="Filter keys"
               class="q-ma-none"
               dark
               clearable
+              @input="v => { selectFilter = v; updateExpanded(v); }"
             >
               <template v-slot:append>
+                <q-btn flat round icon="mdi-close-circle" @click.stop="selectFilter = ''">
+                  <q-tooltip>Clear filter</q-tooltip>
+                </q-btn>
                 <q-icon name="search"/>
               </template>
             </q-input>
           </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section>
+          <q-item-section class="col-auto">
+            <q-btn flat label="Expand" icon="mdi-expand-all" @click="$refs.tree.expandAll()"/>
+          </q-item-section>
+          <q-item-section class="col-auto">
+            <q-btn flat label="Collapse" icon="mdi-collapse-all" @click="$refs.tree.collapseAll()"/>
+          </q-item-section>
+          <q-item-section class="col-auto">
             <q-btn flat label="clear" icon="clear" @click="selected = []"/>
           </q-item-section>
         </q-item>
@@ -207,9 +228,12 @@ export default class GraphForm extends FormBase {
           <q-item-section>
             <q-scroll-area style="height: 300px; max-height: 30vh">
               <q-tree
+                ref="tree"
                 :nodes="nodes"
                 :ticked.sync="selected"
                 :filter="selectFilter"
+                :expanded.sync="expandedKeys"
+                :filter-method="nodeFilter"
                 tick-strategy="leaf-filtered"
                 dark
                 node-key="value"
