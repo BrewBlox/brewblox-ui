@@ -23,7 +23,18 @@ import Component from 'vue-class-component';
   },
 })
 export default class GroupsPopupEdit extends Vue {
-  placeholder: any[] = [undefined]; // Ensures that value always changes during edit
+  placeholder: any[] = [];
+  active: boolean = false;
+
+  get value(): any[] {
+    return this.active
+      ? this.placeholder
+      : [];
+  }
+
+  set value(v: any[]) {
+    this.placeholder = v;
+  }
 
   get groupOpts() {
     return groupNames(this.$store, this.$props.serviceId)
@@ -44,9 +55,10 @@ export default class GroupsPopupEdit extends Vue {
 
   startEdit() {
     this.placeholder = [...this.$props.field];
+    this.active = true;
   }
 
-  endEdit() {
+  save() {
     this.$props.change([...this.placeholder]);
   }
 }
@@ -62,7 +74,8 @@ export default class GroupsPopupEdit extends Vue {
       persistent
       title="Select active groups"
       @show="startEdit"
-      @save="endEdit"
+      @hide="active = false"
+      @save="save"
     >
       <div class="help-text text-weight-light q-my-md">
         <slot/>
