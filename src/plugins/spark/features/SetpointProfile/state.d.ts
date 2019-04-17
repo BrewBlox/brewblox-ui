@@ -8,6 +8,7 @@ export interface Setpoint {
 
 export interface SetpointProfileBlock extends Block {
   data: {
+    start: number;
     points: Setpoint[];
     enabled: boolean;
     targetId: Link;

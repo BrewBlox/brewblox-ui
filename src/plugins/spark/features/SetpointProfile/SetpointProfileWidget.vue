@@ -14,11 +14,15 @@ export default class SetpointProfileWidget extends BlockWidget {
     return getById(this.$store, this.serviceId, this.blockId);
   }
 
+  get startTime(): number {
+    return this.block.data.start * 1000;
+  }
+
   get plotlyData(): Partial<PlotData>[] {
     return [{
       name: 'Setpoints',
       type: 'scatter',
-      x: this.block.data.points.map(p => p.time * 1000),
+      x: this.block.data.points.map(p => this.startTime + (p.time * 1000)),
       y: this.block.data.points.map(p => p.temperature.value),
     }];
   }
