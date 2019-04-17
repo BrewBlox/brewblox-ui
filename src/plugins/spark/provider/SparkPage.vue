@@ -7,8 +7,10 @@ import {
   fetchAll,
   createUpdateSource,
   fetchServiceStatus,
+  fetchDiscoveredBlocks,
+  clearDiscoveredBlocks,
 } from '@/plugins/spark/store/actions';
-import { allBlocks, lastStatus, blockLinks } from '@/plugins/spark/store/getters';
+import { allBlocks, lastStatus, blockLinks, discoveredBlocks } from '@/plugins/spark/store/getters';
 import { appendDashboardItem } from '@/store/dashboards/actions';
 import { dashboardValues, dashboardById } from '@/store/dashboards/getters';
 import { Dashboard, DashboardItem } from '@/store/dashboards/state';
@@ -42,11 +44,12 @@ interface ValidatedItem {
 })
 export default class SparkPage extends Vue {
   $q: any;
-  modalOpen: boolean = false;
-  relationsModalOpen: boolean = false;
-  modalSettings: ModalSettings | null = null;
   volatileItems: { [blockId: string]: DashboardItem } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
+
+  modalOpen: boolean = false;
+  modalSettings: ModalSettings | null = null;
+  relationsModalOpen: boolean = false;
 
   get dashboards(): Dashboard[] {
     return dashboardValues(this.$store);
@@ -226,14 +229,30 @@ export default class SparkPage extends Vue {
     });
   }
 
-  startCreateBlock() {
+  startDialog(component: string, props: any = null) {
     this.modalSettings = {
-      component: 'BlockWizard',
-      props: {
+      component,
+      props: props || {
         serviceId: this.$props.serviceId,
       },
     };
     this.modalOpen = true;
+  }
+
+  async discoverBlocks() {
+    await clearDiscoveredBlocks(this.$store, this.$props.serviceId);
+    await fetchDiscoveredBlocks(this.$store, this.$props.serviceId);
+    await this.$nextTick();
+
+    const discovered = discoveredBlocks(this.$store, this.$props.serviceId);
+    const message = discovered.length > 0
+      ? `Discovered ${discovered.join(', ')}`
+      : 'Discovered no new blocks';
+
+    this.$q.notify({
+      message,
+      icon: 'mdi-magnify-plus-outline',
+    });
   }
 }
 </script>
@@ -245,14 +264,40 @@ export default class SparkPage extends Vue {
         <div>Blocks</div>
       </portal>
       <portal to="toolbar-buttons">
-        <q-btn-dropdown color="primary" label="actions">
+        <q-btn-dropdown :disable="!isReady || statusNok" color="primary" label="actions">
           <q-list dark link>
             <ActionItem
               icon="mdi-ray-start-arrow"
               label="Show Relations"
               @click="relationsModalOpen = true"
             />
-            <ActionItem icon="add" label="New Block" @click="startCreateBlock"/>
+            <ActionItem icon="wifi" label="Configure Wifi" @click="startDialog('SparkWifiMenu')"/>
+            <ActionItem
+              icon="mdi-checkbox-multiple-marked"
+              label="Groups"
+              @click="startDialog('SparkGroupMenu')"
+            />
+            <ActionItem
+              icon="mdi-temperature-celsius"
+              label="Units"
+              @click="startDialog('SparkUnitMenu')"
+            />
+            <ActionItem
+              icon="mdi-content-save-all"
+              label="Savepoints"
+              @click="startDialog('SparkSavepointMenu')"
+            />
+            <ActionItem
+              icon="mdi-file-export"
+              label="Import/Export Blocks"
+              @click="startDialog('SparkImportMenu')"
+            />
+            <ActionItem
+              icon="mdi-magnify-plus-outline"
+              label="Discover new OneWire Blocks"
+              @click="discoverBlocks"
+            />
+            <ActionItem icon="add" label="New Block" @click="startDialog('BlockWizard')"/>
           </q-list>
         </q-btn-dropdown>
       </portal>
@@ -283,6 +328,7 @@ export default class SparkPage extends Vue {
               :config="{serviceId: $props.serviceId}"
               :cols="4"
               :rows="4"
+              title="Troubleshooter"
               type="Troubleshooter"
               class="dashboard-item"
             />
