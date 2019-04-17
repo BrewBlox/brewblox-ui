@@ -39,8 +39,12 @@ export default class PlacementPartCard extends PartCard {
         />
       </q-item-section>
       <q-item-section>
-        <q-btn disable color="primary" icon="mdi-swap-horizontal-bold" label="flip" @click="flip"/>
-        <q-tooltip>Disabled until part flipping is fixed</q-tooltip>
+        <q-btn
+          :label="part.flipped ? 'unflip' : 'flip'"
+          color="primary"
+          icon="mdi-swap-horizontal-bold"
+          @click="flip"
+        />
       </q-item-section>
       <q-item-section>
         <q-btn color="primary" icon="delete" label="delete" @click="removePart"/>

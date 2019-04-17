@@ -51,11 +51,13 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
   if (!part.flows) {
     return { ...part, flows: {} };
   }
+  const size = partSize(part);
 
   const newFlows = mapKeys(part.flows,
     (flow, inCoord) =>
       new Coordinates(inCoord)
         .translate([-part.x, -part.y, 0])
+        .flipShapeEdge(!!part.flipped, part.rotate, size)
         .toString()
   );
 
@@ -71,6 +73,7 @@ const translations = (part: StatePart): Transitions =>
       const size = partSize(part);
 
       const updatedKey = new Coordinates(inCoordStr)
+        .flipShapeEdge(!!part.flipped, 0, size)
         .translate([part.x, part.y, 0])
         .rotateShapeEdge(part.rotate, 0, size, [part.x, part.y, 0])
         .toString();
@@ -79,6 +82,7 @@ const translations = (part: StatePart): Transitions =>
         .map((route: FlowRoute) => ({
           ...route,
           outCoords: new Coordinates(route.outCoords)
+            .flipShapeEdge(!!part.flipped, 0, size)
             .translate([part.x, part.y, 0])
             .rotateShapeEdge(part.rotate, 0, size, [part.x, part.y, 0])
             .toString(),

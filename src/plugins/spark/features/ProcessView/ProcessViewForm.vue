@@ -146,6 +146,14 @@ export default class ProcessViewForm extends FormBase {
         onClick: this.rotateClickHandler,
       },
       {
+        label: 'Flip (Click)',
+        value: 'flip',
+        icon: 'mdi-swap-horizontal-bold',
+        shortcut: 'f',
+        cursor: part => !!part,
+        onClick: this.flipClickHandler,
+      },
+      {
         label: 'Edit Settings (Click)',
         value: 'config',
         icon: 'settings',
@@ -294,6 +302,12 @@ export default class ProcessViewForm extends FormBase {
     if (part) {
       const rotate = clampRotation(part.rotate + rotation);
       this.updatePart({ ...part, rotate });
+    }
+  }
+
+  flipClickHandler(evt: ClickEvent, part: FlowPart) {
+    if (part) {
+      this.updatePart({ ...part, flipped: !part.flipped });
     }
   }
 
