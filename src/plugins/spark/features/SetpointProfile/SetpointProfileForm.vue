@@ -5,6 +5,7 @@ import BlockForm from '@/plugins/spark/components/BlockForm';
 import { units } from '@/plugins/spark/store/getters';
 import parseDuration from 'parse-duration';
 import Component from 'vue-class-component';
+import { uid } from 'quasar';
 import { Setpoint, SetpointProfileBlock } from './state';
 
 interface OffsetPoint {
@@ -27,6 +28,7 @@ export default class SetpointProfileForm extends BlockForm {
     return this.block.data.points
       .sort(objectSorter('time'))
       .map((point: Setpoint, idx: number, arr: Setpoint[]) => ({
+        id: uid(),
         time: new Date(point.time * 1000).getTime(),
         temperature: point.temperature,
         offsetMs: (idx > 0 ? ((point.time - arr[0].time) * 1000) : 0),
@@ -70,15 +72,15 @@ export default class SetpointProfileForm extends BlockForm {
     this.saveBlock();
   }
 
-  defaultPoint() {
+  defaultPoint(): OffsetPoint {
     return {
       time: new Date().getTime(),
-      temperature: new Unit(0, this.tempUnit),
+      temperature: new Unit(null, this.tempUnit),
       offsetMs: 0,
     };
   }
 
-  copyPoint(point: OffsetPoint) {
+  copyPoint(point: OffsetPoint): OffsetPoint {
     return {
       time: point.time,
       temperature: new Unit(point.temperature.value, point.temperature.unit),
@@ -97,7 +99,8 @@ export default class SetpointProfileForm extends BlockForm {
     this.savePoints(this.points.filter((_: any, idx: number) => idx !== index));
   }
 
-  updateStartTime(startTime: number) {
+  updateStartTime(startDate: Date) {
+    const startTime = startDate.getTime();
     const newPoints = this.points.length > 0
       ? this.points
         .map((offset: OffsetPoint, idx: number) => ({
@@ -108,7 +111,8 @@ export default class SetpointProfileForm extends BlockForm {
     this.savePoints(newPoints);
   }
 
-  updatePointTime(index: number, time: number) {
+  updatePointTime(index: number, date: Date) {
+    const time = date.getTime();
     this.points[index] = {
       time,
       temperature: this.points[index].temperature,
@@ -166,7 +170,11 @@ export default class SetpointProfileForm extends BlockForm {
               :change="updateStartTime"
               label="Start time"
               tag="span"
-            />
+            >
+              This will shift all points.
+              <br>Offset time will remain the same, absolute time values will change.
+              <br>The offset for the first point is always 0s.
+            </DatetimePopupEdit>
           </q-item-section>
           <q-item-section>
             <q-item-label caption>Driven Setpoint/Sensor pair</q-item-label>
@@ -180,9 +188,10 @@ export default class SetpointProfileForm extends BlockForm {
           </q-item-section>
         </q-item>
         <q-separator dark/>
+
         <q-item dark class="q-pt-md">
           <q-item-section class="col-3 q-py-none">
-            <q-item-label caption>Offset</q-item-label>
+            <q-item-label caption>Offset from first</q-item-label>
           </q-item-section>
           <q-item-section class="col-5 q-py-none">
             <q-item-label caption>Time</q-item-label>
@@ -199,7 +208,12 @@ export default class SetpointProfileForm extends BlockForm {
               :change="v => updatePointOffset(idx, parseDuration(v))"
               label="Offset from start time"
               tag="span"
-            />
+            >
+              This will change the point offset.
+              <br>The absolute point time will be changed to start time + offset.
+              <br>Changing point offset may change point order.
+              <br>Offset becomes 0s if this point's time is the new start time.
+            </InputPopupEdit>
           </q-item-section>
           <q-item-section class="col-5">
             <DatetimePopupEdit
@@ -207,7 +221,12 @@ export default class SetpointProfileForm extends BlockForm {
               :change="v => updatePointTime(idx, v)"
               label="Time"
               tag="span"
-            />
+            >
+              This will change the absolute point time.
+              <br>Changing point time may change point order.
+              <br>Point offset is changed to point time - start time.
+              <br>Other points will change offset if this point's time is the new start time.
+            </DatetimePopupEdit>
           </q-item-section>
           <q-item-section class="col-3">
             <UnitPopupEdit
