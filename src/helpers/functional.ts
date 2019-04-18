@@ -111,11 +111,11 @@ export const shortDateString =
   };
 
 export const round =
-  (value: any): string | number => {
+  (value: any, digits: number = 2): string | number => {
     if (value === null || value === undefined) {
       return '--.--';
     }
-    return (+value).toFixed(2);
+    return (+value).toFixed(digits);
   };
 
 export const truncate =
