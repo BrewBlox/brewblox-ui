@@ -1,6 +1,6 @@
 <script lang="ts">
 import { durationString, objectSorter } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
+import { Unit, Link } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { units } from '@/plugins/spark/store/getters';
 import parseDuration from 'parse-duration';
@@ -42,10 +42,11 @@ export default class SetpointProfileForm extends BlockForm {
 
   defaultData() {
     return {
-      points: [],
-      setting: new Unit(null, 'degC'),
-      enabled: true,
       start: new Date().getTime() / 1000,
+      points: [],
+      enabled: false,
+      targetId: new Link(null),
+      drivenTargetId: new Link(null),
     };
   }
 
@@ -55,7 +56,6 @@ export default class SetpointProfileForm extends BlockForm {
         label: 'Empty profile',
         value: {
           points: [],
-          setting: new Unit(null, 'degC'),
           enabled: true,
           start: new Date().getTime() / 1000,
         },

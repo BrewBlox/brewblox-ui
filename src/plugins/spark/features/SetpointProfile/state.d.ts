@@ -12,5 +12,6 @@ export interface SetpointProfileBlock extends Block {
     points: Setpoint[];
     enabled: boolean;
     targetId: Link;
+    drivenTargetId: Link;
   };
 }
