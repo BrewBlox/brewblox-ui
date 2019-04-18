@@ -40,7 +40,7 @@ export default class SensorDisplay extends PartComponent {
         <q-icon name="mdi-thermometer"/>
         <q-icon v-if="!sensorLink" name="mdi-link-variant-off"/>
         <br>
-        {{ temperature | round }}
+        {{ temperature | round(1) }}
       </div>
     </foreignObject>
     <g class="outline">

@@ -48,10 +48,10 @@ export default class HeatingElement extends PartComponent {
       :height="SQUARE_SIZE"
     >
       <div class="text-white text-bold text-center">
-        <span>%</span>
+        <q-icon name="mdi-gauge"/>
         <q-icon v-if="!blockLink" name="mdi-link-variant-off"/>
         <br>
-        <span>{{ blockValue | round }}</span>
+        <span>{{ blockValue | round(0) }}%</span>
       </div>
     </foreignObject>
     <g class="outline">
