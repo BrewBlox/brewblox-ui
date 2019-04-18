@@ -24,17 +24,18 @@
     ],
     "type": "SetpointProfile",
     "data": {
+      "start": 1540376829,
       "points": [
         {
-          "time": 1540376829,
+          "time": 10,
           "temperature[degC]": 0
         },
         {
-          "time": 1540376839,
+          "time": 20,
           "temperature[degC]": 50
         },
         {
-          "time": 1540376849,
+          "time": 30000,
           "temperature[degC]": 100
         }
       ]
