@@ -141,6 +141,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
         :field="block"
         :on-change-field="v => block = v"
         :id="widgetId"
+        :title="blockId"
         :on-change-id="changeWidgetId"
         :on-change-block-id="changeBlockId"
       />
