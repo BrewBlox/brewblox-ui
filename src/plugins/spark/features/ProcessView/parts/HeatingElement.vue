@@ -1,7 +1,6 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { SQUARE_SIZE } from '../getters';
 import { blocks } from '@/plugins/spark/store/getters';
 import get from 'lodash/get';
 import { Link } from '@/helpers/units';
@@ -17,10 +16,6 @@ export default class HeatingElement extends PartComponent {
         'M50,24.7h24c7.1,0,6.6-6.7,14-6.7h126.9c0,0,7,0.1,7,7c0,7-7,7-7,7H90',
       ],
     };
-  }
-
-  get textTransformation() {
-    return `rotate(${-this.part.rotate},${SQUARE_SIZE / 2},${SQUARE_SIZE / 2})`;
   }
 
   get blockServiceId(): string {
@@ -47,7 +42,11 @@ export default class HeatingElement extends PartComponent {
 
 <template>
   <g class="heating-element">
-    <foreignObject :transform="textTransformation" :width="SQUARE_SIZE" :height="SQUARE_SIZE">
+    <foreignObject
+      :transform="textTransformation([1,1])"
+      :width="SQUARE_SIZE"
+      :height="SQUARE_SIZE"
+    >
       <div class="text-white text-bold text-center">
         <span>%</span>
         <q-icon v-if="!blockLink" name="mdi-link-variant-off"/>

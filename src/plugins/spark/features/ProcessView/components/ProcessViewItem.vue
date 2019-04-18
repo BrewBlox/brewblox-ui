@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { SQUARE_SIZE } from '../getters';
-import { Coordinates } from '@/helpers/coordinates';
+import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 import { FlowPart } from '../state';
 import settings from '../settings';
 
@@ -34,16 +34,9 @@ export default class ProcessViewItem extends Vue {
     return this.settings.size(this.part);
   }
 
-  get renderSize() {
+  get rotateTransform() {
     const [partSizeX, partSizeY] = this.partSize;
-    return (this.part.rotate % 180 > 0)
-      ? [partSizeY, partSizeX]
-      : [partSizeX, partSizeY];
-  }
-
-  get transformation() {
-    const [partSizeX, partSizeY] = this.partSize;
-    const [renderSizeX, renderSizeY] = this.renderSize;
+    const [renderSizeX, renderSizeY] = rotatedSize(this.part.rotate, this.partSize);
 
     const farEdge = new Coordinates([partSizeX, partSizeY, 0])
       .rotate(this.part.rotate, [0, 0, 0]);
@@ -52,6 +45,18 @@ export default class ProcessViewItem extends Vue {
     const trY = farEdge.y < 0 ? (renderSizeY * SQUARE_SIZE) : 0;
 
     return `translate(${trX}, ${trY}) rotate(${this.part.rotate})`;
+  }
+
+  get flipTransform() {
+    if (!this.part.flipped) {
+      return '';
+    }
+    const sizeX = this.partSize[0];
+    return `translate(${sizeX * SQUARE_SIZE}, 0) scale(-1, 1)`;
+  }
+
+  get transformation() {
+    return `${this.rotateTransform} ${this.flipTransform}`;
   }
 }
 </script>
