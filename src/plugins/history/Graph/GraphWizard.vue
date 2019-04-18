@@ -41,6 +41,7 @@ export default class GraphWizard extends WidgetWizardBase {
         :id="widgetId"
         :type="typeId"
         :field="graphCfg"
+        :title="widgetTitle"
         :on-change-field="v => graphCfg = v"
         :on-change-title="v => widgetTitle = v"
       />

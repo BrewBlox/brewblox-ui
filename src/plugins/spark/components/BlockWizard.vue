@@ -130,6 +130,7 @@ export default class BlockWizard extends Vue {
         :field="block"
         :on-change-field="v => block = v"
         :id="blockId"
+        :title="blockId"
         :on-change-block-id="changeBlockId"
       />
     </q-dialog>
