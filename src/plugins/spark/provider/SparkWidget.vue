@@ -21,7 +21,6 @@ import { SysInfoBlock, TicksBlock, WiFiSettingsBlock } from './state';
   },
 })
 export default class SparkWidget extends Vue {
-  modalOpen: boolean = false;
 
   get service() {
     return serviceById(this.$store, this.$props.serviceId);
@@ -69,14 +68,7 @@ export default class SparkWidget extends Vue {
 
 <template>
   <q-card v-if="ready" dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <SparkForm v-if="modalOpen" :field="service"/>
-    </q-dialog>
-
     <WidgetToolbar :title="service.id" subtitle="Spark Service">
-      <q-item-section class="dense" side>
-        <q-btn flat round dense icon="settings" @click="modalOpen = true"/>
-      </q-item-section>
       <q-item-section class="dense" side>
         <q-btn flat round dense icon="refresh" @click="fetchAll"/>
       </q-item-section>
