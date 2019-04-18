@@ -1,20 +1,23 @@
 <script lang="ts">
 import { durationString, objectSorter } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
+import { Unit, Link } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { units } from '@/plugins/spark/store/getters';
 import parseDuration from 'parse-duration';
 import Component from 'vue-class-component';
 import { Setpoint, SetpointProfileBlock } from './state';
 
-interface OffsetPoint {
-  time: number;
-  temperature: Unit;
+interface DisplaySetpoint {
   offsetMs: number;
+  absTimeMs: number;
+  temperature: Unit;
 }
 
 @Component
 export default class SetpointProfileForm extends BlockForm {
+  durationString = durationString;
+  parseDuration = parseDuration;
+
   get block() {
     return this.blockField as SetpointProfileBlock;
   }
@@ -23,27 +26,27 @@ export default class SetpointProfileForm extends BlockForm {
     return units(this.$store, this.block.serviceId).Temp;
   }
 
-  get points(): OffsetPoint[] {
-    return this.block.data.points
-      .sort(objectSorter('time'))
-      .map((point: Setpoint, idx: number, arr: Setpoint[]) => ({
-        time: new Date(point.time * 1000).getTime(),
-        temperature: point.temperature,
-        offsetMs: (idx > 0 ? ((point.time - arr[0].time) * 1000) : 0),
-      }));
+  get start(): number {
+    return (this.block.data.start || 0) * 1000;
   }
 
-  get start(): number {
-    return (this.points.length > 0
-      ? this.points[0].time
-      : new Date().getTime());
+  get points(): DisplaySetpoint[] {
+    return this.block.data.points
+      .sort(objectSorter('time'))
+      .map((point: Setpoint) => ({
+        offsetMs: point.time * 1000,
+        absTimeMs: this.start + (point.time * 1000),
+        temperature: point.temperature,
+      }));
   }
 
   defaultData() {
     return {
+      start: new Date().getTime() / 1000,
       points: [],
-      setting: new Unit(null, 'degC'),
-      enabled: true,
+      enabled: false,
+      targetId: new Link(null),
+      drivenTargetId: new Link(null),
     };
   }
 
@@ -53,43 +56,42 @@ export default class SetpointProfileForm extends BlockForm {
         label: 'Empty profile',
         value: {
           points: [],
-          setting: new Unit(null, 'degC'),
           enabled: true,
+          start: new Date().getTime() / 1000,
         },
       },
     ];
   }
 
-  savePoints(points: OffsetPoint[] = this.points) {
+  savePoints(points: DisplaySetpoint[] = this.points) {
     this.block.data.points = points
-      .sort(objectSorter('time'))
-      .map(offsetPoint => ({
-        time: (offsetPoint.time / 1000),
-        temperature: offsetPoint.temperature,
+      .sort(objectSorter('offsetMs'))
+      .map((point: DisplaySetpoint) => ({
+        time: point.offsetMs / 1000,
+        temperature: point.temperature,
       }));
     this.saveBlock();
   }
 
-  defaultPoint() {
+  defaultPoint(): DisplaySetpoint {
     return {
-      time: new Date().getTime(),
-      temperature: new Unit(0, this.tempUnit),
       offsetMs: 0,
+      absTimeMs: new Date(this.start).getTime(),
+      temperature: new Unit(0, this.tempUnit),
     };
   }
 
-  copyPoint(point: OffsetPoint) {
+  copyPoint(point: DisplaySetpoint): DisplaySetpoint {
     return {
-      time: point.time,
+      ...point,
       temperature: new Unit(point.temperature.value, point.temperature.unit),
-      offsetMs: point.offsetMs,
     };
   }
 
   addPoint() {
     const newPoints = this.points.length > 0
       ? [...this.points, this.copyPoint(this.points[this.points.length - 1])]
-      : [...this.points, this.defaultPoint()];
+      : [this.defaultPoint()];
     this.savePoints(newPoints);
   }
 
@@ -97,31 +99,48 @@ export default class SetpointProfileForm extends BlockForm {
     this.savePoints(this.points.filter((_: any, idx: number) => idx !== index));
   }
 
-  updateStartTime(startTime: number) {
-    const newPoints = this.points.length > 0
-      ? this.points
-        .map((offset: OffsetPoint, idx: number) => ({
-          ...offset,
-          time: (idx === 0 ? startTime : new Date(startTime + offset.offsetMs).getTime()),
-        }))
-      : [this.defaultPoint()];
+  updateStartTime(startDate: Date) {
+    const startTime = startDate.getTime();
+    this.block.data.start = startTime / 1000;
+    const newPoints = this.points
+      .map((point: DisplaySetpoint) => ({
+        ...point,
+        absTimeMs: startTime + point.offsetMs,
+      }));
     this.savePoints(newPoints);
   }
 
-  updatePointTime(index: number, time: number) {
+  notifyInvalidTime() {
+    this.$q.notify({
+      icon: 'error',
+      color: 'negative',
+      message: 'Point time must be later than start time',
+    });
+  }
+
+  updatePointTime(index: number, date: Date) {
+    const absTimeMs = date.getTime();
+    if (absTimeMs < this.start) {
+      this.notifyInvalidTime();
+      return;
+    }
     this.points[index] = {
-      time,
+      absTimeMs,
       temperature: this.points[index].temperature,
-      offsetMs: time - this.start,
+      offsetMs: absTimeMs - this.start,
     };
     this.savePoints();
   }
 
   updatePointOffset(index: number, offsetMs: number) {
+    if (offsetMs < 0) {
+      this.notifyInvalidTime();
+      return;
+    }
     this.points[index] = {
       offsetMs,
       temperature: this.points[index].temperature,
-      time: new Date(this.start + offsetMs).getTime(),
+      absTimeMs: this.start + offsetMs,
     };
     this.savePoints();
   }
@@ -129,14 +148,6 @@ export default class SetpointProfileForm extends BlockForm {
   updatePointTemperature(index: number, temp: Unit) {
     this.points[index].temperature = temp;
     this.savePoints();
-  }
-
-  durationString(valMs: number) {
-    return durationString(valMs);
-  }
-
-  parseDuration(val: string) {
-    return parseDuration(val);
   }
 
   enable() {
@@ -166,7 +177,11 @@ export default class SetpointProfileForm extends BlockForm {
               :change="updateStartTime"
               label="Start time"
               tag="span"
-            />
+            >
+              This will shift all points.
+              <br>Offset time will remain the same, absolute time values will change.
+              <br>The offset for the first point is always 0s.
+            </DatetimePopupEdit>
           </q-item-section>
           <q-item-section>
             <q-item-label caption>Driven Setpoint/Sensor pair</q-item-label>
@@ -180,9 +195,10 @@ export default class SetpointProfileForm extends BlockForm {
           </q-item-section>
         </q-item>
         <q-separator dark/>
+
         <q-item dark class="q-pt-md">
           <q-item-section class="col-3 q-py-none">
-            <q-item-label caption>Offset</q-item-label>
+            <q-item-label caption>Offset from first</q-item-label>
           </q-item-section>
           <q-item-section class="col-5 q-py-none">
             <q-item-label caption>Time</q-item-label>
@@ -199,15 +215,23 @@ export default class SetpointProfileForm extends BlockForm {
               :change="v => updatePointOffset(idx, parseDuration(v))"
               label="Offset from start time"
               tag="span"
-            />
+            >
+              This will change the point offset.
+              <br>The absolute point time will be changed to start time + offset.
+              <br>Changing point offset may change point order.
+            </InputPopupEdit>
           </q-item-section>
           <q-item-section class="col-5">
             <DatetimePopupEdit
-              :field="point.time"
+              :field="point.absTimeMs"
               :change="v => updatePointTime(idx, v)"
               label="Time"
               tag="span"
-            />
+            >
+              This will change the absolute point time.
+              <br>Changing point time may change point order.
+              <br>Point offset is changed to point time - start time.
+            </DatetimePopupEdit>
           </q-item-section>
           <q-item-section class="col-3">
             <UnitPopupEdit

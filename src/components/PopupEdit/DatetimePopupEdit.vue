@@ -41,7 +41,7 @@ export default class DatetimePopupEdit extends Vue {
     qTimeProxy: any;
   }
 
-  placeholder: any = NaN; // must not equal clear-value
+  placeholder: Date | null = null;
   timePlaceholder = '';
   datePlaceholder = '';
 
