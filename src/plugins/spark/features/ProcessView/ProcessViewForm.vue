@@ -21,6 +21,7 @@ interface ToolAction {
   label: string;
   value: string;
   icon: string;
+  shortcut: string;
   cursor: (part: FlowPart) => boolean;
   onClick?: (evt: ClickEvent, part: FlowPart) => void;
   onPan?: (args: PanArguments, part: FlowPart) => void;
@@ -124,6 +125,7 @@ export default class ProcessViewForm extends FormBase {
         label: 'New (Click)',
         value: 'add',
         icon: 'add',
+        shortcut: 'n',
         cursor: () => false,
         onClick: this.addPartClickHandler,
       },
@@ -131,6 +133,7 @@ export default class ProcessViewForm extends FormBase {
         label: 'Move (Drag)',
         value: 'move',
         icon: 'mdi-cursor-move',
+        shortcut: 'm',
         cursor: part => !!part,
         onPan: this.movePanHandler,
       },
@@ -138,6 +141,7 @@ export default class ProcessViewForm extends FormBase {
         label: 'Rotate (Click)',
         value: 'rotate-right',
         icon: 'mdi-rotate-right-variant',
+        shortcut: 'r',
         cursor: part => !!part,
         onClick: this.rotateClickHandler,
       },
@@ -145,6 +149,7 @@ export default class ProcessViewForm extends FormBase {
         label: 'Edit Settings (Click)',
         value: 'config',
         icon: 'settings',
+        shortcut: 'e',
         cursor: part => !!part,
         onClick: this.configurePartClickHandler,
       },
@@ -152,6 +157,7 @@ export default class ProcessViewForm extends FormBase {
         label: 'Interact (Click)',
         value: 'interact',
         icon: 'mdi-cursor-default',
+        shortcut: 'i',
         cursor: part => !!part && !!settings[part.type].interactHandler,
         onClick: this.interactClickHandler,
       },
@@ -159,6 +165,7 @@ export default class ProcessViewForm extends FormBase {
         label: 'Copy (Drag)',
         value: 'copy',
         icon: 'file_copy',
+        shortcut: 'c',
         cursor: part => !!part,
         onPan: this.copyPanHandler,
       },
@@ -166,6 +173,7 @@ export default class ProcessViewForm extends FormBase {
         label: 'Delete (Click)',
         value: 'delete',
         icon: 'delete',
+        shortcut: 'd',
         cursor: part => !!part,
         onClick: (evt, part) => this.removePart(part),
       },
@@ -332,6 +340,23 @@ export default class ProcessViewForm extends FormBase {
       && this.dragAction.hide
       && this.dragAction.part.id === part.id;
   }
+
+  keyHandler(evt: KeyboardEvent) {
+    const key = evt.key.toLowerCase();
+    const tool = this.tools.find(t => t.shortcut === key);
+    if (tool) {
+      this.currentTool = tool;
+      evt.stopPropagation();
+    }
+  }
+
+  mounted() {
+    window.addEventListener('keyup', this.keyHandler);
+  }
+
+  destroyed() {
+    window.removeEventListener('keyup', this.keyHandler);
+  }
 }
 </script>
 
@@ -374,7 +399,9 @@ export default class ProcessViewForm extends FormBase {
           :label="tool.label"
           no-close
           @click="currentTool = tool"
-        />
+        >
+          <q-item-section side class="text-uppercase">{{ tool.shortcut }}</q-item-section>
+        </ActionItem>
 
         <q-item/>
         <q-item dark dense>
