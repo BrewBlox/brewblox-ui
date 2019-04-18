@@ -52,12 +52,13 @@ export default class ProcessViewCatalog extends Vue {
 
     <q-scroll-area style="min-height: 400px; height: 60vh;">
       <q-card-section>
-        <q-list style="padding: 5px">
+        <div class="row">
           <q-item
             v-for="part in availableParts"
             :key="part.type"
             dark
             clickable
+            class="col-6"
             @click="selectPart(part)"
           >
             <q-item-section side>
@@ -71,7 +72,7 @@ export default class ProcessViewCatalog extends Vue {
             </q-item-section>
             <q-item-section>{{ spaceCased(part.type) }}</q-item-section>
           </q-item>
-        </q-list>
+        </div>
       </q-card-section>
     </q-scroll-area>
   </q-card>
