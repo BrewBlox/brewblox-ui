@@ -4,11 +4,11 @@ import { defaultPresets } from '@/components/Graph/getters';
 import { nodeBuilder, targetSplitter, targetBuilder, QuasarNode, expandedNodes } from '@/components/Graph/functional';
 import FormBase from '@/components/Form/FormBase';
 import { durationString } from '@/helpers/functional';
+import parseDuration from 'parse-duration';
 import { ValueAxes, QueryParams } from '@/store/history/state';
 import { fetchKnownKeys } from '@/store/history/actions';
 import { fields } from '@/store/history/getters';
 import Component from 'vue-class-component';
-import has from 'lodash/has';
 
 interface PeriodDisplay {
   start: boolean;
@@ -18,9 +18,15 @@ interface PeriodDisplay {
 
 @Component
 export default class GraphForm extends FormBase {
+  durationString = durationString;
+
   period: PeriodDisplay | null = null;
   selectFilter: string | null = null;
   expandedKeys: string[] = [];
+
+  get config(): GraphConfig {
+    return this.$props.field;
+  }
 
   get periodOptions() {
     return [
@@ -47,32 +53,56 @@ export default class GraphForm extends FormBase {
     ];
   }
 
-  findShownPeriod(): PeriodDisplay {
-    const { params } = this.config;
-    const keys = ['start', 'duration', 'end'];
-    const matching = this.periodOptions
-      .filter(opt => keys.every(k => opt.value[k] === !!params[k]));
-    return matching.length > 0
-      ? matching[0].value
-      : this.periodOptions[0].value;
+  get paramDefaults() {
+    return {
+      start: () => new Date().getTime() - parseDuration('1d'),
+      duration: () => '1d',
+      end: () => new Date().getTime(),
+    };
+  }
+
+  sanitizeParams(period: PeriodDisplay) {
+    Object.entries(period)
+      .forEach(([key, isPresent]: [string, boolean]) =>
+        this.$set(
+          this.config.params,
+          key,
+          (isPresent
+            ? this.config.params[key] || this.paramDefaults[key]()
+            : undefined)
+        ));
   }
 
   get shownPeriod(): PeriodDisplay {
     if (this.period === null) {
-      this.period = this.findShownPeriod();
+      const keys = ['start', 'duration', 'end'];
+      const compare = (opt, k) => {
+        const val = this.config.params[k];
+        return opt.value[k] === (val !== null && val !== undefined);
+      };
+      const matching = this.periodOptions
+        .find(opt => keys.every(k => compare(opt, k)));
+
+      // set local variable
+      this.period = matching
+        ? matching.value
+        : this.periodOptions[0].value;
+
+      // if no match was found, params must be sanitized
+      if (!matching) {
+        this.sanitizeParams(this.period);
+        this.saveConfig(this.config);
+      }
+
     }
+
     return this.period;
   }
 
-  set shownPeriod(val: PeriodDisplay) {
+  updateShownPeriod(val: PeriodDisplay) {
     this.period = val;
-    Object.keys(this.config.params)
-      .filter(k => !has(this.period, k))
-      .forEach(k => this.$delete(this.config.params, k));
-  }
-
-  get config(): GraphConfig {
-    return this.$props.field;
+    this.sanitizeParams(val);
+    this.saveConfig(this.config);
   }
 
   get fields() {
@@ -109,23 +139,15 @@ export default class GraphForm extends FormBase {
 
   updateAxisSide(field: string, isRight: boolean) {
     this.config.axes[field] = isRight ? 'y2' : 'y';
-    this.saveConfig();
+    this.saveConfig(this.config);
   }
 
   created() {
     fetchKnownKeys(this.$store);
   }
 
-  saveConfig(config: GraphConfig = this.config) {
-    this.$props.onChangeField({ ...config });
-  }
-
   callAndSaveConfig(func: (v: any) => void) {
-    return (v: any) => { func(v); this.saveConfig(); };
-  }
-
-  parseDuration(val: string): string {
-    return durationString(val);
+    return (v: any) => { func(v); this.saveConfig(this.config); };
   }
 
   nodeFilter(node: QuasarNode, filter: string): boolean {
@@ -147,47 +169,43 @@ export default class GraphForm extends FormBase {
     <q-card-section>
       <q-expansion-item group="modal" icon="mdi-timetable" label="Period settings">
         <q-item dark>
-          <q-item-section>Display type</q-item-section>
           <q-item-section>
+            <q-item-label caption>Display type</q-item-label>
             <SelectPopupEdit
               :field="shownPeriod"
               :options="periodOptions"
-              :change="callAndSaveConfig(v => shownPeriod = v)"
+              :change="updateShownPeriod"
               label="Display type"
             />
           </q-item-section>
         </q-item>
-        <q-separator dark inset/>
-        <q-item v-if="shownPeriod.start" dark>
-          <q-item-section>Start time</q-item-section>
-          <q-item-section>
+        <q-item dark>
+          <q-item-section v-if="shownPeriod.start" class="col-6">
+            <q-item-label caption>Start time</q-item-label>
             <DatetimePopupEdit
               :field="config.params.start"
-              :change="callAndSaveConfig(v => config.params.start = v)"
+              :change="callAndSaveConfig(v => config.params.start = v.getTime())"
               label="Start time"
-              tag="big"
+              tag="span"
             />
           </q-item-section>
-        </q-item>
-        <q-item v-if="shownPeriod.duration" dark>
-          <q-item-section>Duration</q-item-section>
-          <q-item-section>
+          <q-item-section v-if="shownPeriod.duration" class="col-6">
+            <q-item-label caption>Duration</q-item-label>
             <InputPopupEdit
               :field="config.params.duration"
-              :change="callAndSaveConfig(v => config.params.duration = parseDuration(v))"
+              :change="callAndSaveConfig(v => config.params.duration = durationString(v))"
               clearable
               label="Duration"
+              tag="span"
             />
           </q-item-section>
-        </q-item>
-        <q-item v-if="shownPeriod.end" dark>
-          <q-item-section>End time</q-item-section>
-          <q-item-section>
+          <q-item-section v-if="shownPeriod.end" class="col-6">
+            <q-item-label caption>End time</q-item-label>
             <DatetimePopupEdit
               :field="config.params.end"
-              :change="callAndSaveConfig(v => config.params.end = v)"
+              :change="callAndSaveConfig(v => config.params.end = v.getTime())"
               label="End time"
-              tag="big"
+              tag="span"
             />
           </q-item-section>
         </q-item>

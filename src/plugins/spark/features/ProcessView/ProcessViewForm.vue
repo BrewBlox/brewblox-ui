@@ -66,10 +66,6 @@ export default class ProcessViewForm extends FormBase {
     return this.$props.field;
   }
 
-  saveConfig(config: ProcessViewConfig = this.widgetConfig) {
-    this.$props.onChangeField(config);
-  }
-
   get gridHeight() {
     const { top, bottom } = this.$props.widgetGridRect;
     return bottom - top;

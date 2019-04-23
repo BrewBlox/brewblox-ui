@@ -29,10 +29,6 @@ export default class GraphWidget extends WidgetBase {
     return defaultPresets();
   }
 
-  saveConfig(cfg: GraphConfig) {
-    this.$props.onChangeConfig(this.$props.id, { ...cfg });
-  }
-
   applyPreset(preset: QueryParams) {
     this.saveConfig({
       ...this.graphCfg,

@@ -101,7 +101,7 @@ export default class BlockWidget extends WidgetBase {
   }
 
   protected set graphCfg(config: GraphConfig) {
-    this.$props.onChangeConfig(this.$props.id, {
+    this.saveConfig({
       ...this.$props.config,
       queryParams: { ...config.params },
       graphAxes: { ...config.axes },
@@ -119,14 +119,21 @@ export default class BlockWidget extends WidgetBase {
     this.modalOpen = true;
   }
 
-  protected refreshBlock(): void {
-    fetchBlock(this.$store, this.serviceId, this.block)
+  protected async refreshBlock(): Promise<void> {
+    await fetchBlock(this.$store, this.serviceId, this.block)
       .catch(err => this.$q.notify(err.toString()));
   }
 
-  protected saveBlock(block: Block = this.block): void {
-    saveBlock(this.$store, this.serviceId, block)
-      .catch(err => this.$q.notify(err.toString()));
+  protected async saveBlock(block: Block = this.block): Promise<void> {
+    await saveBlock(this.$store, this.serviceId, block)
+      .catch((err: Error) => {
+        this.$q.notify({
+          icon: 'error',
+          color: 'negative',
+          message: err.toString(),
+        });
+        this.$forceUpdate();
+      });
   }
 
   protected callAndSaveBlock(func: (v: any) => void): (v: any) => void {
@@ -138,7 +145,7 @@ export default class BlockWidget extends WidgetBase {
       .catch(err => this.$q.notify(err.toString()));
   }
 
-  protected switchBlockId(blockId: string): void {
-    this.$props.onChangeConfig(this.$props.id, { ...this.$props.config, blockId });
+  protected async switchBlockId(blockId: string): Promise<void> {
+    await this.saveConfig({ ...this.$props.config, blockId });
   }
 }

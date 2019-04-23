@@ -10,7 +10,7 @@ import ItemBase from '../ItemBase';
     onChangeConfig: {
       type: Function,
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
-      default: () => (id: string, config: Record<string, any>) => { },
+      default: async () => (id: string, config: any) => { },
     },
     pos: {
       type: Object, // XYPosition
@@ -26,4 +26,16 @@ import ItemBase from '../ItemBase';
     },
   },
 })
-export default class WidgetBase extends ItemBase { }
+export default class WidgetBase extends ItemBase {
+  protected async saveConfig(config: any): Promise<void> {
+    await this.$props.onChangeConfig(this.$props.id, { ...config })
+      .catch((err: Error) => {
+        this.$q.notify({
+          icon: 'error',
+          color: 'negative',
+          message: err.toString(),
+        });
+        this.$forceUpdate();
+      });
+  }
+}
