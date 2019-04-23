@@ -6,7 +6,7 @@ import { date as qdate } from 'quasar';
 @Component({
   props: {
     field: {
-      type: [Number, String],
+      type: [Number, String, Object],
       required: false,
     },
     change: {

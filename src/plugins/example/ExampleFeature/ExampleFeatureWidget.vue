@@ -29,13 +29,6 @@ export default class ExampleFeatureWidget extends WidgetBase {
     return messages(this.$store, MODULE_ID);
   }
 
-  saveConfig(cfg: ExampleWidgetConfig) {
-    // This function must be called to persist the configuration in VueX and the datastore.
-    // `this.widgetId` is inherited from WidgetBase.
-    // `this.widgetCfg` will be automatically updated when the store is updated.
-    this.$props.onChangeConfig(this.widgetId, { ...cfg });
-  }
-
   fetchBackend() {
     // We save the configuration, and call the fetch action.
     // fetchBackend() will update VueX when a result arrives, which will trigger an update of `this.messages`.

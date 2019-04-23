@@ -59,12 +59,8 @@ export default class SessionViewWidget extends WidgetBase {
     this.modalOpen = true;
   }
 
-  saveConfig(config: SessionViewConfig = this.widgetConfig) {
-    this.$props.onChangeConfig(this.widgetId, { ...config });
-  }
-
   callAndSaveConfig(func: (v: any) => void) {
-    return (v: any) => { func(v); this.saveConfig(); };
+    return (v: any) => { func(v); this.saveConfig(this.widgetConfig); };
   }
 
   createSession() {

@@ -41,12 +41,8 @@ export default class SessionViewForm extends FormBase {
       : null;
   }
 
-  saveConfig(config: SessionViewConfig = this.widgetConfig) {
-    this.$props.onChangeField({ ...config });
-  }
-
   callAndSaveConfig(func: (v: any) => void) {
-    return (v: any) => { func(v); this.saveConfig(); };
+    return (v: any) => { func(v); this.saveConfig(this.widgetConfig); };
   }
 
   updateSession(session: Session) {
