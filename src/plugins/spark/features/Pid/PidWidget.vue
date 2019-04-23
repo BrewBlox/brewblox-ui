@@ -116,11 +116,11 @@ export default class PidWidget extends BlockWidget {
         </q-item-section>
         <q-item-section>
           <q-item-label caption>Measured</q-item-label>
-          <big>{{ block.data.outputSetting | round }}</big>
+          <big>{{ block.data.outputValue | round }}</big>
         </q-item-section>
         <q-item-section>
           <q-item-label caption>Target</q-item-label>
-          <big>{{ block.data.outputValue | round }}</big>
+          <big>{{ block.data.outputSetting | round }}</big>
         </q-item-section>
         <q-item-section side>
           <BlockFormButton
