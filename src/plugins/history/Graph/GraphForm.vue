@@ -56,7 +56,7 @@ export default class GraphForm extends FormBase {
   get paramDefaults() {
     return {
       start: () => new Date().getTime() - parseDuration('1d'),
-      duration: () => '1h',
+      duration: () => '1d',
       end: () => new Date().getTime(),
     };
   }
