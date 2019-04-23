@@ -3,7 +3,9 @@ import Component from 'vue-class-component';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { blockValues } from '@/plugins/spark/store/getters';
 import { BrewPiConfig } from '@/plugins/spark/arrangements/BrewPi/state';
-import { typeName as pinType } from '@/plugins/spark/features/ActuatorPin/getters';
+import { typeName as actuatorPinType } from '@/plugins/spark/features/ActuatorPin/getters';
+import { typeName as actuatorDS2413Type } from '@/plugins/spark/features/ActuatorDS2413/getters';
+import { typeName as actuatorMockType } from '@/plugins/spark/features/ActuatorAnalogMock/getters';
 import { typeName as sensorOneWireType } from '@/plugins/spark/features/TempSensorOneWire/getters';
 import { typeName as sensorMockType } from '@/plugins/spark/features/TempSensorMock/getters';
 import { fetchDiscoveredBlocks } from '@/plugins/spark/store/actions';
@@ -11,6 +13,8 @@ import { fetchDiscoveredBlocks } from '@/plugins/spark/store/actions';
 
 @Component
 export default class BrewPiHardwareTask extends WizardTaskBase {
+  blockWizardModalOpen: boolean = false;
+
   coolPin: any = null;
   heatPin: any = null;
   fridgeSensor: any = null;
@@ -21,8 +25,9 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
   }
 
   get pinOptions() {
+    const pinTypes = [actuatorPinType, actuatorDS2413Type, actuatorMockType];
     return blockValues(this.$store, this.cfg.serviceId)
-      .filter(block => block.type === pinType)
+      .filter(block => pinTypes.includes(block.type))
       .map(block => block.id);
   }
 
@@ -86,12 +91,41 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
 
 <template>
   <div>
+    <q-dialog v-model="blockWizardModalOpen" no-backdrop-dismiss>
+      <BlockWizard
+        v-if="blockWizardModalOpen"
+        :service-id="cfg.serviceId"
+        @close="blockWizardModalOpen = false"
+      />
+    </q-dialog>
     <q-card-section>
       <q-item>
         <big>Hardware Blocks</big>
       </q-item>
       <q-item dark>
-        <q-btn label="Discover sensors" color="primary" @click="discover"/>
+        <q-item-section class="col-auto">
+          <q-btn unelevated label="Discover OneWire objects" color="primary" @click="discover"/>
+          <q-tooltip>
+            OneWire temperature sensors and DS2413 chips can be discovered:
+            the Block will be created automatically.
+          </q-tooltip>
+        </q-item-section>
+        <q-item-section class="col-auto">
+          <q-btn
+            unelevated
+            label="Create block"
+            color="primary"
+            @click="blockWizardModalOpen = true"
+          />
+          <q-tooltip>
+            Example cases where a Block must be created and configured manually:
+            <ul>
+              <li>When using DS2413 actuators.</li>
+              <li>When using mock actuators.</li>
+              <li>When using mock temperature sensors.</li>
+            </ul>
+          </q-tooltip>
+        </q-item-section>
       </q-item>
       <q-item dark>
         <q-item-section>
