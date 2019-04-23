@@ -31,6 +31,15 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
     return this.stagedConfig;
   }
 
+  blockType(newId: string): string {
+    for (let [from, to] of Object.entries(this.cfg.renamedBlocks)) {
+      if (to === newId) {
+        return blockById(this.$store, this.cfg.serviceId, from).type;
+      }
+    }
+    throw new Error('Old block not found');
+  }
+
   defineCreatedBlocks() {
     this.cfg.createdBlocks = [
       // setpoint sensor pair
@@ -180,7 +189,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       {
         id: this.cfg.names.coolPin,
         serviceId: this.cfg.serviceId,
-        type: pinType,
+        type: this.blockType(this.cfg.names.coolPin),
         groups: this.cfg.groups,
         data: {
           constrainedBy: {
@@ -195,7 +204,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       {
         id: this.cfg.names.heatPin,
         serviceId: this.cfg.serviceId,
-        type: pinType,
+        type: this.blockType(this.cfg.names.heatPin),
         groups: this.cfg.groups,
         data: {
           constrainedBy: {
@@ -208,15 +217,6 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
     ];
   }
 
-  sensorType(newId: string): string {
-    for (let [from, to] of Object.entries(this.cfg.renamedBlocks)) {
-      if (to === newId) {
-        return blockById(this.$store, this.cfg.serviceId, from).type;
-      }
-    }
-    throw new Error('Old sensor not found');
-  }
-
   defineWidgets() {
     const genericSettings = {
       dashboard: this.cfg.dashboardId,
@@ -225,9 +225,11 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       order: 0,
     };
 
-    const sensorTypes = {
-      fridge: this.sensorType(this.cfg.names.fridgeSensor),
-      beer: this.sensorType(this.cfg.names.beerSensor),
+    const variableTypes = {
+      fridge: this.blockType(this.cfg.names.fridgeSensor),
+      beer: this.blockType(this.cfg.names.beerSensor),
+      coolPin: this.blockType(this.cfg.names.coolPin),
+      heatPin: this.blockType(this.cfg.names.heatPin),
     };
 
     const createWidget =
@@ -251,12 +253,12 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       // Setpoint profile
       createWidget(this.cfg.names.tempProfile, spProfileType),
       // Sensors
-      createWidget(this.cfg.names.fridgeSensor, sensorTypes.fridge),
-      createWidget(this.cfg.names.beerSensor, sensorTypes.beer),
+      createWidget(this.cfg.names.fridgeSensor, variableTypes.fridge),
+      createWidget(this.cfg.names.beerSensor, variableTypes.beer),
       // SSPairs are skipped
       // Pins
-      createWidget(this.cfg.names.coolPin, pinType),
-      createWidget(this.cfg.names.heatPin, pinType),
+      createWidget(this.cfg.names.coolPin, variableTypes.coolPin),
+      createWidget(this.cfg.names.heatPin, variableTypes.heatPin),
       // PWMs
       createWidget(this.cfg.names.coolPwm, pwmType),
       createWidget(this.cfg.names.heatPwm, pwmType),
