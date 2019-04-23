@@ -5,7 +5,7 @@ import { serviceById } from '@/store/services/getters';
 import FileSaver from 'file-saver';
 import get from 'lodash/get';
 import { serialize, deserialize } from '@/helpers/units/parseObject';
-import { fetchStored, resetStored, clearBlocks } from '@/plugins/spark/store/actions';
+import { fetchStored, resetStored } from '@/plugins/spark/store/actions';
 
 
 @Component({
@@ -72,35 +72,6 @@ export default class SparkImportMenu extends Vue {
     this.importBusy = false;
   }
 
-  startClearBlocks() {
-    this.$q.dialog({
-      title: 'Reset Blocks',
-      message: 'This will remove all Blocks. Are you sure?',
-      noBackdropDismiss: true,
-      cancel: true,
-    })
-      .onOk(async () => this.clearBlocks());
-  }
-
-  async clearBlocks() {
-    try {
-      this.importBusy = true;
-      await clearBlocks(this.$store, this.service);
-      this.$q.notify({
-        icon: 'mdi-check-all',
-        color: 'positive',
-        message: 'Removed all Blocks',
-      });
-    } catch (e) {
-      this.$q.notify({
-        icon: 'error',
-        color: 'negative',
-        message: `Failed to remove Blocks: ${e.toString()}`,
-      });
-    }
-    this.importBusy = false;
-  }
-
   mounted() {
     this.reader.onload = e => this.serializedBlocks = get(e, 'target.result', '');
   }
@@ -132,11 +103,6 @@ export default class SparkImportMenu extends Vue {
             label="Load Blocks from file"
             @click="startImportBlocks"
           />
-        </q-item-section>
-      </q-item>
-      <q-item dark>
-        <q-item-section>
-          <q-btn :loading="importBusy" outline label="Remove all Blocks" @click="startClearBlocks"/>
         </q-item-section>
       </q-item>
       <q-item dark>
