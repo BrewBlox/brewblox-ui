@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { FlowPart, CalculatedFlows } from '../state';
 import partSettings from '../settings';
-import { Coordinates } from '@/helpers/coordinates';
+import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 import { SQUARE_SIZE } from '../getters';
 
 @Component({
@@ -54,6 +54,15 @@ export default class PartComponent extends Vue {
 
   protected get sizeY(): number {
     return this.size[1];
+  }
+
+  protected textTransformation(textSize: [number, number]): string {
+    const [sizeX] = rotatedSize(this.part.rotate, textSize);
+    const rotate = `rotate(${-this.part.rotate},${SQUARE_SIZE / 2},${SQUARE_SIZE / 2})`;
+    const flip = `translate(${sizeX * SQUARE_SIZE}, 0) scale(-1,1)`;
+    return this.flipped
+      ? `${flip} ${rotate}`
+      : rotate;
   }
 
   private rotatedCoord(coord: string): string {

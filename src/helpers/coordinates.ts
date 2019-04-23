@@ -3,6 +3,13 @@ import { clampRotation } from './functional';
 export type CoordinatesParam =
   string | { x: number; y: number; z: number } | [number, number, number] | Coordinates;
 
+export const rotatedSize =
+  (rotation: number, size: [number, number]): [number, number] =>
+    clampRotation(rotation) % 180 > 0
+      ? [size[1], size[0]]
+      : [size[0], size[1]];
+
+
 export class Coordinates {
   public readonly x: number;
   public readonly y: number;
@@ -134,10 +141,7 @@ export class Coordinates {
     // Step 1 - start
     const squareAnchor = this;
     const shapeAnchor = new Coordinates(shapeCoordinates);
-    const [newSizeX, newSizeY] =
-      (totalRotation % 180 > 0)
-        ? [...shapeSize].reverse()
-        : [...shapeSize];
+    const [newSizeX, newSizeY] = rotatedSize(totalRotation, shapeSize);
 
     const rotatedSquareCenter = squareAnchor
       // Step 2 - shift from square anchor to center
@@ -189,6 +193,27 @@ export class Coordinates {
       .rotate(rotation, rotatedSquareAnchor.translate([0.5, 0.5, 0]));
 
     return rotatedEdge;
+  }
+
+  public flipShapeEdge(
+    flip: boolean, // allows chained syntax with optional flips
+    shapeRotation: number,
+    shapeSize: [number, number],
+    shapeCoordinates: CoordinatesParam = [0, 0, 0],
+  ): Coordinates {
+    if (this.isException() || !flip) {
+      return new Coordinates(this);
+    }
+
+    // Step 1 - start
+    const shape = new Coordinates(shapeCoordinates);
+
+    // Step 2 - shift in X past the midpoint
+    const [sizeX] = rotatedSize(shapeRotation, shapeSize);
+    const shiftX = ((shape.x + (sizeX / 2)) - this.x) * 2;
+    const flippedEdge = this.translate([shiftX, 0, 0]);
+
+    return flippedEdge;
   }
 
   public toString(): string {

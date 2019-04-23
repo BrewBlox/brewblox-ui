@@ -17,4 +17,8 @@ import ItemBase from '../ItemBase';
     },
   },
 })
-export default class FormBase extends ItemBase { }
+export default class FormBase extends ItemBase {
+  protected async saveConfig(config: any): Promise<void> {
+    await this.$props.onChangeField(config);
+  }
+}

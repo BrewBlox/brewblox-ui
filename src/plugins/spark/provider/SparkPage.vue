@@ -7,8 +7,11 @@ import {
   fetchAll,
   createUpdateSource,
   fetchServiceStatus,
+  fetchDiscoveredBlocks,
+  clearDiscoveredBlocks,
+  clearBlocks,
 } from '@/plugins/spark/store/actions';
-import { allBlocks, lastStatus, blockLinks } from '@/plugins/spark/store/getters';
+import { allBlocks, lastStatus, blockLinks, discoveredBlocks } from '@/plugins/spark/store/getters';
 import { appendDashboardItem } from '@/store/dashboards/actions';
 import { dashboardValues, dashboardById } from '@/store/dashboards/getters';
 import { Dashboard, DashboardItem } from '@/store/dashboards/state';
@@ -19,6 +22,7 @@ import { isReady, isSystemBlock, widgetSize } from './getters';
 import { Watch } from 'vue-property-decorator';
 import { setInterval, clearTimeout } from 'timers';
 import { serviceById } from '@/store/services/getters';
+import { Service } from '../../../store/services/state';
 
 interface ModalSettings {
   component: string;
@@ -42,29 +46,34 @@ interface ValidatedItem {
 })
 export default class SparkPage extends Vue {
   $q: any;
-  modalOpen: boolean = false;
-  relationsModalOpen: boolean = false;
-  modalSettings: ModalSettings | null = null;
   volatileItems: { [blockId: string]: DashboardItem } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
+
+  modalOpen: boolean = false;
+  modalSettings: ModalSettings | null = null;
+  relationsModalOpen: boolean = false;
+
+  get service(): Service {
+    return serviceById(this.$store, this.$props.serviceId);
+  }
 
   get dashboards(): Dashboard[] {
     return dashboardValues(this.$store);
   }
 
   get isAvailable() {
-    return serviceAvailable(this.$store, this.$props.serviceId);
+    return serviceAvailable(this.$store, this.service.id);
   }
 
   get isReady() {
-    return this.isAvailable && isReady(this.$store, this.$props.serviceId);
+    return this.isAvailable && isReady(this.$store, this.service.id);
   }
 
   get status(): SystemStatus | null {
     if (!this.isAvailable) {
       return null;
     }
-    return lastStatus(this.$store, this.$props.serviceId);
+    return lastStatus(this.$store, this.service.id);
   }
 
   get statusNok() {
@@ -76,7 +85,7 @@ export default class SparkPage extends Vue {
   }
 
   get relations() {
-    return blockLinks(this.$store, this.$props.serviceId);
+    return blockLinks(this.$store, this.service.id);
   }
 
   get widgetSize() {
@@ -84,7 +93,7 @@ export default class SparkPage extends Vue {
   }
 
   volatileKey(blockId: string): string {
-    return `${this.$props.serviceId}/${blockId}`;
+    return `${this.service.id}/${blockId}`;
   }
 
   itemProps(item: DashboardItem): any {
@@ -134,7 +143,7 @@ export default class SparkPage extends Vue {
 
   get validatedItems(): ValidatedItem[] {
     return [
-      ...allBlocks(this.$store, this.$props.serviceId)
+      ...allBlocks(this.$store, this.service.id)
         .filter(block => !isSystemBlock(block))
         .map(this.validateBlock),
     ];
@@ -144,13 +153,13 @@ export default class SparkPage extends Vue {
   autoRecheck() {
     if (this.statusNok && !this.statusCheckInterval) {
       this.statusCheckInterval = setInterval(
-        () => fetchServiceStatus(this.$store, this.$props.serviceId),
+        () => fetchServiceStatus(this.$store, this.service.id),
         5000,
       );
     }
     if (!this.statusNok && this.statusCheckInterval) {
-      fetchAll(this.$store, serviceById(this.$store, this.$props.serviceId));
-      createUpdateSource(this.$store, this.$props.serviceId);
+      fetchAll(this.$store, serviceById(this.$store, this.service.id));
+      createUpdateSource(this.$store, this.service.id);
       clearTimeout(this.statusCheckInterval);
       this.statusCheckInterval = null;
       this.$forceUpdate();
@@ -162,7 +171,7 @@ export default class SparkPage extends Vue {
   }
 
   onChangeBlockId(currentId: string, newId: string) {
-    renameBlock(this.$store, this.$props.serviceId, currentId, newId);
+    renameBlock(this.$store, this.service.id, currentId, newId);
   }
 
   onDeleteItem(itemId: string) {
@@ -226,14 +235,52 @@ export default class SparkPage extends Vue {
     });
   }
 
-  startCreateBlock() {
+  startDialog(component: string, props: any = null) {
     this.modalSettings = {
-      component: 'BlockWizard',
-      props: {
-        serviceId: this.$props.serviceId,
+      component,
+      props: props || {
+        serviceId: this.service.id,
       },
     };
     this.modalOpen = true;
+  }
+
+  async discoverBlocks() {
+    await clearDiscoveredBlocks(this.$store, this.service.id);
+    await fetchDiscoveredBlocks(this.$store, this.service.id);
+    await this.$nextTick();
+
+    const discovered = discoveredBlocks(this.$store, this.service.id);
+    const message = discovered.length > 0
+      ? `Discovered ${discovered.join(', ')}`
+      : 'Discovered no new blocks';
+
+    this.$q.notify({
+      message,
+      icon: 'mdi-magnify-plus-outline',
+    });
+  }
+
+  async resetBlocks() {
+    this.$q.dialog({
+      title: 'Reset Blocks',
+      message: `This will remove all Blocks on ${this.service.id}. Are you sure?`,
+      noBackdropDismiss: true,
+      cancel: true,
+    })
+      .onOk(async () => {
+        await clearBlocks(this.$store, this.service)
+          .then(() => this.$q.notify({
+            icon: 'mdi-check-all',
+            color: 'positive',
+            message: 'Removed all Blocks',
+          }))
+          .catch((e) => this.$q.notify({
+            icon: 'error',
+            color: 'negative',
+            message: `Failed to remove Blocks: ${e.toString()}`,
+          }));
+      });
   }
 }
 </script>
@@ -245,14 +292,41 @@ export default class SparkPage extends Vue {
         <div>Blocks</div>
       </portal>
       <portal to="toolbar-buttons">
-        <q-btn-dropdown color="primary" label="actions">
+        <q-btn-dropdown :disable="!isReady || statusNok" color="primary" label="actions">
           <q-list dark link>
             <ActionItem
               icon="mdi-ray-start-arrow"
               label="Show Relations"
               @click="relationsModalOpen = true"
             />
-            <ActionItem icon="add" label="New Block" @click="startCreateBlock"/>
+            <ActionItem icon="add" label="New Block" @click="startDialog('BlockWizard')"/>
+            <ActionItem
+              icon="mdi-magnify-plus-outline"
+              label="Discover new OneWire Blocks"
+              @click="discoverBlocks"
+            />
+            <ActionItem icon="wifi" label="Configure Wifi" @click="startDialog('SparkWifiMenu')"/>
+            <ActionItem
+              icon="mdi-checkbox-multiple-marked"
+              label="Groups"
+              @click="startDialog('SparkGroupMenu')"
+            />
+            <ActionItem
+              icon="mdi-temperature-celsius"
+              label="Units"
+              @click="startDialog('SparkUnitMenu')"
+            />
+            <ActionItem
+              icon="mdi-content-save-all"
+              label="Savepoints"
+              @click="startDialog('SparkSavepointMenu')"
+            />
+            <ActionItem
+              icon="mdi-file-export"
+              label="Import/Export Blocks"
+              @click="startDialog('SparkImportMenu')"
+            />
+            <ActionItem icon="delete" label="Remove all Blocks" @click="resetBlocks"/>
           </q-list>
         </q-btn-dropdown>
       </portal>
@@ -279,10 +353,11 @@ export default class SparkPage extends Vue {
         <q-item dark>
           <q-item-section>
             <Troubleshooter
-              :id="$props.serviceId"
-              :config="{serviceId: $props.serviceId}"
+              :id="service.id"
+              :config="{serviceId: service.id}"
               :cols="4"
               :rows="4"
+              title="Troubleshooter"
               type="Troubleshooter"
               class="dashboard-item"
             />
@@ -294,8 +369,8 @@ export default class SparkPage extends Vue {
           <q-item-section>
             <SparkWidget
               v-if="isReady"
-              :id="$props.serviceId"
-              :service-id="$props.serviceId"
+              :id="service.id"
+              :service-id="service.id"
               :cols="widgetSize.cols"
               :rows="widgetSize.rows"
               class="dashboard-item"
@@ -311,8 +386,8 @@ export default class SparkPage extends Vue {
       <GridContainer v-else no-move>
         <SparkWidget
           v-if="isReady"
-          :id="$props.serviceId"
-          :service-id="$props.serviceId"
+          :id="service.id"
+          :service-id="service.id"
           :cols="widgetSize.cols"
           :rows="widgetSize.rows"
           class="dashboard-item"

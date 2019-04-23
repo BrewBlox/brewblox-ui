@@ -4,15 +4,10 @@ import PartComponent from '../components/PartComponent';
 import { Link } from '@/helpers/units';
 import { blocks } from '@/plugins/spark/store/getters';
 import get from 'lodash/get';
-import { SQUARE_SIZE } from '../getters';
 
 
 @Component
 export default class SensorDisplay extends PartComponent {
-  get textTransformation() {
-    return `rotate(${-this.part.rotate},${SQUARE_SIZE / 2},${SQUARE_SIZE / 2})`;
-  }
-
   get sensorServiceId(): string {
     return this.part.settings.sensorServiceId;
   }
@@ -36,12 +31,16 @@ export default class SensorDisplay extends PartComponent {
 
 <template>
   <g class="sensor-display">
-    <foreignObject :transform="textTransformation" :width="SQUARE_SIZE" :height="SQUARE_SIZE">
+    <foreignObject
+      :transform="textTransformation([1,1])"
+      :width="SQUARE_SIZE"
+      :height="SQUARE_SIZE"
+    >
       <div class="text-white text-bold text-center">
         <q-icon name="mdi-thermometer"/>
         <q-icon v-if="!sensorLink" name="mdi-link-variant-off"/>
         <br>
-        {{ temperature | round }}
+        {{ temperature | round(1) }}
       </div>
     </foreignObject>
     <g class="outline">
