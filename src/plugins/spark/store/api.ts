@@ -86,26 +86,9 @@ export const fetchCompatibleBlocks = async (serviceId: string, type: string, ): 
   get(`/${encodeURIComponent(serviceId)}/compatible_objects?${queryString.stringify({ interface: type })}`)
     .catch(intercept(`Failed to fetch blocks compatible to ${type}`));
 
-
 export const fetchDiscoveredBlocks = async (serviceId: string): Promise<string[]> =>
   get(`/${encodeURIComponent(serviceId)}/discover_objects`)
     .catch(intercept(`Failed to discover objects on ${serviceId}`));
-
-export const fetchSavepoints = async (serviceId: string): Promise<string[]> =>
-  get(`/${encodeURIComponent(serviceId)}/savepoints`)
-    .catch(intercept(`Failed to fetch savepoints on ${serviceId}`));
-
-export const writeSavepoint = async (serviceId: string, savepointId: string): Promise<string[]> =>
-  put(`/${encodeURIComponent(serviceId)}/savepoints/${encodeURIComponent(savepointId)}`, {})
-    .catch(intercept(`Failed to write savepoint ${savepointId}`));
-
-export const applySavepoint = async (serviceId: string, savepointId: string): Promise<string[]> =>
-  post(`/${encodeURIComponent(serviceId)}/savepoints/${encodeURIComponent(savepointId)}`, {})
-    .catch(intercept(`Failed to apply savepoint ${savepointId}`));
-
-export const removeSavepoint = async (serviceId: string, savepointId: string): Promise<string[]> =>
-  del(`/${encodeURIComponent(serviceId)}/savepoints/${encodeURIComponent(savepointId)}`, {})
-    .catch(intercept(`Failed to remove savepoint ${savepointId}`));
 
 export const validateService = async (serviceId: string): Promise<boolean> =>
   get(`/${encodeURIComponent(serviceId)}/_service/status`)
