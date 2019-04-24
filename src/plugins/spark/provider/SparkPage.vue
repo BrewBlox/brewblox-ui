@@ -16,13 +16,13 @@ import { appendDashboardItem } from '@/store/dashboards/actions';
 import { dashboardValues, dashboardById } from '@/store/dashboards/getters';
 import { Dashboard, DashboardItem } from '@/store/dashboards/state';
 import { deletersById, widgetById, widgetSizeById } from '@/store/features/getters';
+import { Service } from '@/store/services/state';
+import { serviceById } from '@/store/services/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { isReady, isSystemBlock, widgetSize } from './getters';
 import { Watch } from 'vue-property-decorator';
 import { setInterval, clearTimeout } from 'timers';
-import { serviceById } from '@/store/services/getters';
-import { Service } from '../../../store/services/state';
 
 interface ModalSettings {
   component: string;
@@ -315,11 +315,6 @@ export default class SparkPage extends Vue {
               icon="mdi-temperature-celsius"
               label="Units"
               @click="startDialog('SparkUnitMenu')"
-            />
-            <ActionItem
-              icon="mdi-content-save-all"
-              label="Savepoints"
-              @click="startDialog('SparkSavepointMenu')"
             />
             <ActionItem
               icon="mdi-file-export"

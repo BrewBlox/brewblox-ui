@@ -5,7 +5,7 @@ import { saveService } from '@/store/services/actions';
 import { Service } from '@/store/services/state';
 import { RootState, RootStore } from '@/store/state';
 import { ActionTree } from 'vuex';
-import { Block, UserUnits, DataBlock } from '../state';
+import { Block, UserUnits } from '../state';
 import {
   clearBlocks as clearBlocksInApi,
   createBlock as createBlockInApi,
@@ -26,8 +26,8 @@ import {
   writeSavepoint as writeSavepointInApi,
   applySavepoint as applySavepointInApi,
   removeSavepoint as removeSavepointInApi,
-  fetchStored as fetchStoredInApi,
-  resetStored as resetStoredInApi,
+  serviceExport as serviceExportInApi,
+  serviceImport as serviceImportInApi,
 } from './api';
 import {
   blockIds,
@@ -186,13 +186,13 @@ export const removeSavepoint =
     await fetchSavepoints(store, serviceId);
   };
 
-export const fetchStored =
-  async (store: RootStore, service: Service): Promise<DataBlock[]> =>
-    fetchStoredInApi(service.id);
+export const serviceExport =
+  async (store: RootStore, service: Service): Promise<any> =>
+    serviceExportInApi(service.id);
 
-export const resetStored =
-  async (store: RootStore, service: Service, blocks: DataBlock[]): Promise<DataBlock[]> => {
-    const dataBlocks = await resetStoredInApi(service.id, blocks);
+export const serviceImport =
+  async (store: RootStore, service: Service, exported: any): Promise<string[]> => {
+    const importLog = await serviceImportInApi(service.id, exported);
     await fetchBlocks(store, service.id);
-    return dataBlocks;
+    return importLog;
   };

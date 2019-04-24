@@ -9,6 +9,7 @@ export interface Spark extends Service {
 
 export interface DataBlock {
   id: string;
+  nid?: number;
   type: string;
   groups: number[];
   data: any;
