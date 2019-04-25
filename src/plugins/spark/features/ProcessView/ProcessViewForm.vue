@@ -181,7 +181,6 @@ export default class ProcessViewForm extends FormBase {
         cursor: part => !!part,
         onClick: (evt, part) => this.removePart(part),
       },
-      // TODO: flip part
     ];
   }
 
@@ -218,6 +217,8 @@ export default class ProcessViewForm extends FormBase {
   }
 
   findGridSquare(grid: Rect, x: number, y: number) {
+    x -= window.pageXOffset;
+    y -= window.pageYOffset;
     if (!this.rectContains(grid, x, y)) {
       return null;
     }
