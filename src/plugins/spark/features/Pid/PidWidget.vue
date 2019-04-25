@@ -92,12 +92,12 @@ export default class PidWidget extends BlockWidget {
           <div class="text-weight-light text-subtitle2 q-mb-xs">Input</div>
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Measured</q-item-label>
-          <UnitField :field="block.data.inputValue"/>
-        </q-item-section>
-        <q-item-section>
           <q-item-label caption>Target</q-item-label>
           <UnitField :field="block.data.inputSetting"/>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>Measured</q-item-label>
+          <UnitField :field="block.data.inputValue"/>
         </q-item-section>
         <q-item-section side>
           <BlockFormButton
@@ -115,12 +115,12 @@ export default class PidWidget extends BlockWidget {
           <div class="text-weight-light text-subtitle2 q-mb-xs">Output</div>
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Measured</q-item-label>
-          <big>{{ block.data.outputValue | round }}</big>
-        </q-item-section>
-        <q-item-section>
           <q-item-label caption>Target</q-item-label>
           <big>{{ block.data.outputSetting | round }}</big>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>Measured</q-item-label>
+          <big>{{ block.data.outputValue | round }}</big>
         </q-item-section>
         <q-item-section side>
           <BlockFormButton
