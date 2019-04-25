@@ -8,7 +8,6 @@ import { renameBlock, createBlock, saveBlock } from '@/plugins/spark/store/actio
 import { createDashboard, appendDashboardItem } from '@/store/dashboards/actions';
 import { widgetSizeById } from '@/store/features/getters';
 import { RootStore } from '@/store/state';
-import { typeName as pinType } from '@/plugins/spark/features/ActuatorPin/getters';
 import { typeName as spProfileType } from '@/plugins/spark/features/SetpointProfile/getters';
 import { typeName as pairType } from '@/plugins/spark/features/SetpointSensorPair/getters';
 import { typeName as pwmType } from '@/plugins/spark/features/ActuatorPwm/getters';

@@ -18,7 +18,7 @@ const resetObjects = async () => {
   for (i = 0; i < 10; i++) {
     try {
       const resp = await request.post({
-        uri: `${host}/${service}/reset_objects`,
+        uri: `${host}/${service}/import_objects`,
         json: content,
         timeout: 70000,
       });
@@ -34,7 +34,7 @@ const resetObjects = async () => {
 
 resetObjects()
   .then(() => {
-    console.log(`Succesfully reset objects for ${service}`);
+    console.log(`Succesfully imported objects for ${service}`);
   })
   .catch((e) => {
     console.log(e);
