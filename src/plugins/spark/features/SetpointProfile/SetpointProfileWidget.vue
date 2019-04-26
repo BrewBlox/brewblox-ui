@@ -23,7 +23,7 @@ export default class SetpointProfileWidget extends BlockWidget {
       name: 'Setpoints',
       type: 'scatter',
       x: this.block.data.points.map(p => this.startTime + (p.time * 1000)),
-      y: this.block.data.points.map(p => p.temperature.value),
+      y: this.block.data.points.map(p => (p.temperature || {}).value || 0),
     }];
   }
 

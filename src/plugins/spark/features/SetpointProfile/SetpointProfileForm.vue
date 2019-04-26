@@ -36,7 +36,7 @@ export default class SetpointProfileForm extends BlockForm {
       .map((point: Setpoint) => ({
         offsetMs: point.time * 1000,
         absTimeMs: this.start + (point.time * 1000),
-        temperature: point.temperature,
+        temperature: point.temperature || new Unit(0, 'degC'),
       }));
   }
 
