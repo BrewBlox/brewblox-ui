@@ -681,7 +681,7 @@
     {
       "_id": "a0636b12-5499-11e9-8647-d663bd873d93",
       "title": "pid-feature",
-      "order": 2,
+      "order": 1,
       "cols": 4,
       "rows": 4,
       "feature": "Pid",
@@ -689,6 +689,29 @@
       "config": {
         "serviceId": "sparkey",
         "blockId": "pid-1"
+      }
+    },
+    {
+      "_id": "a0636b12-5499-11e9-8647-d663bd873d94",
+      "title": "inspector",
+      "order": 2,
+      "cols": 4,
+      "rows": 4,
+      "feature": "Metrics",
+      "dashboard": "dashboard-home",
+      "config": {
+        "targets": [
+          {
+            "measurement": "sparkey",
+            "fields": [
+              "actuator-pwm-1/setting",
+              "actuator-pwm-1/value"
+            ]
+          }
+        ],
+        "renames": {
+          "sparkey/actuator-pwm-1/value": "actuator value"
+        }
       }
     }
   ]

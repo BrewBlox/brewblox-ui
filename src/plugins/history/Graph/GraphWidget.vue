@@ -38,7 +38,7 @@ export default class GraphWidget extends WidgetBase {
 
   @Watch('graphCfg', { deep: true })
   regraph() {
-    this.$nextTick(() => this.$refs.widgetGraph.resetMetrics());
+    this.$nextTick(() => this.$refs.widgetGraph.resetListeners());
   }
 }
 </script>
@@ -56,7 +56,7 @@ export default class GraphWidget extends WidgetBase {
 
     <q-dialog v-model="graphModalOpen" maximized>
       <q-card v-if="graphModalOpen" dark>
-        <GraphCard :id="$props.id" :config="graphCfg" shared-metrics>
+        <GraphCard :id="$props.id" :config="graphCfg" shared-listeners>
           <q-btn-dropdown flat auto-close label="presets" icon="mdi-timelapse">
             <q-list dark link>
               <q-item

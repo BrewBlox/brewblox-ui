@@ -12,7 +12,7 @@ const features: Module<HistoryState, RootState> = {
   namespaced: true,
   state: {
     availableFields: {},
-    metrics: {},
+    listeners: {},
   },
 };
 

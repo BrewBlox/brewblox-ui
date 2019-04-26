@@ -1,6 +1,6 @@
 import { GraphConfig } from '@/components/Graph/state';
 import WidgetBase from '@/components/Widget/WidgetBase';
-import { QueryParams, ValueAxes } from '@/store/history/state';
+import { QueryParams, GraphValueAxes } from '@/store/history/state';
 import Component from 'vue-class-component';
 import { Block } from '../state';
 import { fetchBlock, renameBlock, saveBlock } from '../store/actions';
@@ -68,7 +68,7 @@ export default class BlockWidget extends WidgetBase {
     };
   }
 
-  protected get graphAxes(): ValueAxes {
+  protected get graphAxes(): GraphValueAxes {
     return this.$props.config.graphAxes || {};
   }
 
