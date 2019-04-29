@@ -23,10 +23,17 @@ const timeFormatted =
       end: formatTime(params.end),
     });
 
-export const fetchValueSource =
+export const subscribeValues =
   async (params: QueryParams, target: QueryTarget): Promise<EventSource> =>
     sse(`/history/sse/values?${queryString.stringify({
       ...snakeCasedObj(timeFormatted(params)),
+      ...snakeCasedObj(target),
+    })}`);
+
+export const subscribeMetrics =
+  async (params: QueryParams, target: QueryTarget): Promise<EventSource> =>
+    sse(`/history/sse/last_values?${queryString.stringify({
+      ...snakeCasedObj(params),
       ...snakeCasedObj(target),
     })}`);
 

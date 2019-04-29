@@ -1,30 +1,30 @@
 import { createAccessors } from '@/helpers/static-store';
 import Vue from 'vue';
 import { MutationTree } from 'vuex';
-import { HistoryState, Metric, QueryResult } from './state';
+import { HistoryState, Listener, QueryResult } from './state';
 
 const { commit } = createAccessors('history');
 
 export const mutations: MutationTree<HistoryState> = {
-  add: (state: HistoryState, metric: Metric) =>
-    Vue.set(state.metrics, metric.id, metric),
+  add: (state: HistoryState, listener: Listener) =>
+    Vue.set(state.listeners, listener.id, listener),
 
-  remove: (state: HistoryState, metric: Metric) =>
-    Vue.delete(state.metrics, metric.id),
+  remove: (state: HistoryState, listener: Listener) =>
+    Vue.delete(state.listeners, listener.id),
 
-  update: (state: HistoryState, metric: Partial<Metric>) => {
-    const id = metric.id || '';
-    const existing = state.metrics[id];
-    if (metric === undefined) {
+  update: (state: HistoryState, listener: Partial<Listener>) => {
+    const id = listener.id || '';
+    const existing = state.listeners[id];
+    if (listener === undefined) {
       throw new Error(`${id} not found in store`);
     }
-    Vue.set(state.metrics, id, { ...existing, ...metric });
+    Vue.set(state.listeners, id, { ...existing, ...listener });
   },
 
   transform: (state: HistoryState, { id, result }: { id: string; result: QueryResult }) => {
-    const metric: Metric = state.metrics[id];
-    if (metric !== undefined) {
-      Vue.set(state.metrics, id, { ...metric.transformer(metric, result) });
+    const listener: Listener = state.listeners[id];
+    if (listener !== undefined) {
+      Vue.set(state.listeners, id, { ...listener.transformer(listener, result) });
     }
   },
 
@@ -32,8 +32,8 @@ export const mutations: MutationTree<HistoryState> = {
     Vue.set(state, 'availableFields', { ...fields }),
 };
 
-export const addMetric = commit(mutations.add);
-export const removeMetric = commit(mutations.remove);
-export const updateMetric = commit(mutations.update);
-export const transformMetric = commit(mutations.transform);
+export const addListener = commit(mutations.add);
+export const removeListener = commit(mutations.remove);
+export const updateListener = commit(mutations.update);
+export const transformListener = commit(mutations.transform);
 export const mutateAvailableKeys = commit(mutations.setAvailableFields);

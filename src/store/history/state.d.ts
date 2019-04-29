@@ -20,7 +20,7 @@ export interface DisplayNames {
   [key: string]: string;
 }
 
-export interface ValueAxes {
+export interface GraphValueAxes {
   [key: string]: 'y' | 'y2';
 }
 
@@ -32,23 +32,26 @@ export interface QueryResult {
   values: Slice[];
 }
 
-export interface Metric {
+export interface Listener {
   id: string;
-  transformer: (metric: Metric, result: QueryResult) => Metric;
+  transformer: (listener: Listener, result: any) => Listener;
   params: QueryParams;
   target: QueryTarget;
   renames: DisplayNames;
-  axes: ValueAxes;
   source?: EventSource;
   values?: any;
+}
+
+export interface GraphValuesListener extends Listener {
+  axes: GraphValueAxes;
 }
 
 export interface HistoryState {
   availableFields: {
     [measurement: string]: string[];
   };
-  metrics: {
-    [id: string]: Metric;
+  listeners: {
+    [id: string]: Listener;
   };
 }
 

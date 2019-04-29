@@ -5,7 +5,7 @@ import { saveService } from '@/store/services/actions';
 import { Service } from '@/store/services/state';
 import { RootState, RootStore } from '@/store/state';
 import { ActionTree } from 'vuex';
-import { Block, UserUnits, DataBlock } from '../state';
+import { Block, UserUnits } from '../state';
 import {
   clearBlocks as clearBlocksInApi,
   createBlock as createBlockInApi,
@@ -22,12 +22,8 @@ import {
   renameBlock as renameBlockInApi,
   validateService as validateServiceInApi,
   fetchSystemStatus as fetchSystemStatusInApi,
-  fetchSavepoints as fetchSavepointsInApi,
-  writeSavepoint as writeSavepointInApi,
-  applySavepoint as applySavepointInApi,
-  removeSavepoint as removeSavepointInApi,
-  fetchStored as fetchStoredInApi,
-  resetStored as resetStoredInApi,
+  serviceExport as serviceExportInApi,
+  serviceImport as serviceImportInApi,
 } from './api';
 import {
   blockIds,
@@ -45,7 +41,6 @@ import {
   setUnits as setUnitsInStore,
   setUpdateSource as setUpdateSourceInStore,
   setLastStatus as setLastStatusInStore,
-  setSavepoints as setSavepointsInStore,
 } from './mutations';
 import { BlocksContext, SparkState } from './state';
 
@@ -138,10 +133,6 @@ export const clearDiscoveredBlocks =
   async (store: RootStore, serviceId: string): Promise<void> =>
     setDiscoveredBlocksInStore(store, serviceId, []);
 
-export const fetchSavepoints =
-  async (store: RootStore, serviceId: string): Promise<void> =>
-    setSavepointsInStore(store, serviceId, await fetchSavepointsInApi(serviceId));
-
 export const fetchAll =
   async (store: RootStore, service: Service): Promise<void> => {
     const status = await fetchSystemStatusInApi(service.id);
@@ -150,7 +141,6 @@ export const fetchAll =
       Promise.all([
         fetchUnits(store, service.id),
         fetchUnitAlternatives(store, service.id),
-        fetchSavepoints(store, service.id),
       ]);
     }
   };
@@ -170,29 +160,13 @@ export const createUpdateSource =
 export const validateService =
   async (serviceId: string): Promise<boolean> => validateServiceInApi(serviceId);
 
-export const writeSavepoint =
-  async (store: RootStore, serviceId: string, savepointId: string): Promise<void> => {
-    await writeSavepointInApi(serviceId, savepointId);
-    await fetchSavepoints(store, serviceId);
-  };
+export const serviceExport =
+  async (store: RootStore, service: Service): Promise<any> =>
+    serviceExportInApi(service.id);
 
-export const applySavepoint =
-  async (store: RootStore, serviceId: string, savepointId: string): Promise<string[]> =>
-    applySavepointInApi(serviceId, savepointId);
-
-export const removeSavepoint =
-  async (store: RootStore, serviceId: string, savepointId: string): Promise<void> => {
-    await removeSavepointInApi(serviceId, savepointId);
-    await fetchSavepoints(store, serviceId);
-  };
-
-export const fetchStored =
-  async (store: RootStore, service: Service): Promise<DataBlock[]> =>
-    fetchStoredInApi(service.id);
-
-export const resetStored =
-  async (store: RootStore, service: Service, blocks: DataBlock[]): Promise<DataBlock[]> => {
-    const dataBlocks = await resetStoredInApi(service.id, blocks);
+export const serviceImport =
+  async (store: RootStore, service: Service, exported: any): Promise<string[]> => {
+    const importLog = await serviceImportInApi(service.id, exported);
     await fetchBlocks(store, service.id);
-    return dataBlocks;
+    return importLog;
   };

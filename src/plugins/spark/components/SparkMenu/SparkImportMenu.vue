@@ -5,7 +5,7 @@ import { serviceById } from '@/store/services/getters';
 import FileSaver from 'file-saver';
 import get from 'lodash/get';
 import { serialize, deserialize } from '@/helpers/units/parseObject';
-import { fetchStored, resetStored } from '@/plugins/spark/store/actions';
+import { serviceExport, serviceImport } from '@/plugins/spark/store/actions';
 
 
 @Component({
@@ -19,17 +19,18 @@ import { fetchStored, resetStored } from '@/plugins/spark/store/actions';
 export default class SparkImportMenu extends Vue {
   $q: any;
   reader: FileReader = new FileReader();
-  serializedBlocks: string = '';
+  serializedData: string = '';
   importBusy: boolean = false;
+  messages: string[] = [];
 
   get service() {
     return serviceById(this.$store, this.$props.serviceId);
   }
 
   async exportBlocks() {
-    const stored = await fetchStored(this.$store, this.service);
-    const data = JSON.stringify(serialize(stored));
-    const blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
+    const exported = await serviceExport(this.$store, this.service);
+    const serialized = JSON.stringify(serialize(exported));
+    const blob = new Blob([serialized], { type: 'text/plain;charset=utf-8' });
     FileSaver.saveAs(blob, `brewblox-blocks-${this.service.id}.json`);
   }
 
@@ -38,7 +39,7 @@ export default class SparkImportMenu extends Vue {
     if (file) {
       this.reader.readAsText(file);
     } else {
-      this.serializedBlocks = '';
+      this.serializedData = '';
     }
   }
 
@@ -55,13 +56,21 @@ export default class SparkImportMenu extends Vue {
   async importBlocks() {
     try {
       this.importBusy = true;
-      const blocks = deserialize(JSON.parse(this.serializedBlocks));
-      await resetStored(this.$store, this.service, blocks);
-      this.$q.notify({
-        icon: 'mdi-check-all',
-        color: 'positive',
-        message: 'Imported Blocks',
-      });
+      this.messages = [];
+      const exported = deserialize(JSON.parse(this.serializedData));
+      this.messages = await serviceImport(this.$store, this.service, exported);
+      this.$q.notify(
+        this.messages.length > 0
+          ? {
+            icon: 'warning',
+            color: 'warning',
+            message: `Some Blocks could not be imported on ${this.service.id}`,
+          }
+          : {
+            icon: 'mdi-check-all',
+            color: 'positive',
+            message: `Imported Blocks on ${this.service.id}`,
+          });
     } catch (e) {
       this.$q.notify({
         icon: 'error',
@@ -73,7 +82,7 @@ export default class SparkImportMenu extends Vue {
   }
 
   mounted() {
-    this.reader.onload = e => this.serializedBlocks = get(e, 'target.result', '');
+    this.reader.onload = e => this.serializedData = get(e, 'target.result', '');
   }
 }
 </script>
@@ -95,12 +104,11 @@ export default class SparkImportMenu extends Vue {
       </q-item>
       <q-item dark>
         <q-item-section>
-          <q-tooltip>Disabled while we fix some bugs.</q-tooltip>
           <q-btn
-            :disable="!serializedBlocks || true"
+            :disable="!serializedData"
             :loading="importBusy"
             outline
-            label="Load Blocks from file"
+            label="Import Blocks from file"
             @click="startImportBlocks"
           />
         </q-item-section>
@@ -108,6 +116,14 @@ export default class SparkImportMenu extends Vue {
       <q-item dark>
         <q-item-section>
           <q-btn :loading="importBusy" outline label="Export Blocks" @click="exportBlocks"/>
+        </q-item-section>
+      </q-item>
+      <q-item v-if="messages.length > 0" dark>
+        <q-item-section>
+          Reported problems during last import:
+          <ul>
+            <li v-for="(msg, idx) in messages" :key="idx">{{ msg }}</li>
+          </ul>
         </q-item-section>
       </q-item>
     </q-card-section>
