@@ -1,11 +1,11 @@
 <script lang="ts">
-import { tryMetricById } from '@/store/history/getters';
+import { tryListenerById } from '@/store/history/getters';
 import { defaultPresets } from '@/components/Graph/getters';
-import { DisplayNames, Metric, QueryParams, QueryTarget, ValueAxes } from '@/store/history/state';
+import { DisplayNames, Listener, QueryParams, QueryTarget, GraphValueAxes } from '@/store/history/state';
 import { Layout, PlotData } from 'plotly.js';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { addPlotlyMetric, removeMetric } from './actions';
+import { addPlotlyListener, removeListener } from './actions';
 import GraphDisplay from './GraphDisplay.vue';
 import { GraphConfig } from './state';
 import { setTimeout } from 'timers';
@@ -20,7 +20,7 @@ import { setTimeout } from 'timers';
       type: Object, // GraphConfig
       default: () => ({}),
     },
-    sharedMetrics: {
+    sharedListeners: {
       type: Boolean,
       default: false,
     },
@@ -56,43 +56,43 @@ export default class GraphCard extends Vue {
     return this.graphCfg.renames || {};
   }
 
-  get axes(): ValueAxes {
+  get axes(): GraphValueAxes {
     return this.graphCfg.axes || {};
   }
 
-  metricId(target: QueryTarget): string {
+  listenerId(target: QueryTarget): string {
     return `${this.$props.id}/${target.measurement}`;
   }
 
-  get metrics(): Metric[] {
+  get listeners(): Listener[] {
     return this.targets
-      .map(target => tryMetricById(this.$store, this.metricId(target)))
-      .filter(metric => metric !== null) as Metric[];
+      .map(target => tryListenerById(this.$store, this.listenerId(target)))
+      .filter(listener => listener !== null) as Listener[];
   }
 
   get error() {
-    if (!this.metrics || this.metrics.length === 0) {
+    if (!this.listeners || this.listeners.length === 0) {
       return 'No data';
     }
     return null;
   }
 
-  get metricData(): PlotData[] {
+  get graphData(): PlotData[] {
     return Object
-      .values(this.metrics
-        .reduce((acc, metric) => ({ ...acc, ...metric.values }), {}));
+      .values(this.listeners
+        .reduce((acc, listener) => ({ ...acc, ...listener.values }), {}));
   }
 
-  get metricLayout(): Partial<Layout> {
+  get graphLayout(): Partial<Layout> {
     return this.graphCfg.layout;
   }
 
-  addMetrics() {
+  addListeners() {
     this.targets
       .forEach(target =>
-        addPlotlyMetric(
+        addPlotlyListener(
           this.$store,
-          this.metricId(target),
+          this.listenerId(target),
           this.params,
           this.renames,
           this.axes,
@@ -100,20 +100,20 @@ export default class GraphCard extends Vue {
         ));
   }
 
-  removeMetrics() {
-    this.metrics
-      .forEach(metric =>
-        removeMetric(this.$store, metric));
+  removeListeners() {
+    this.listeners
+      .forEach(listener =>
+        removeListener(this.$store, listener));
   }
 
-  resetMetrics() {
-    this.removeMetrics();
-    this.addMetrics();
+  resetListeners() {
+    this.removeListeners();
+    this.addListeners();
   }
 
   mounted() {
-    if (!this.$props.sharedMetrics) {
-      this.addMetrics();
+    if (!this.$props.sharedListeners) {
+      this.addListeners();
     } else {
       this.$nextTick(() => this.refresh());
     }
@@ -124,8 +124,8 @@ export default class GraphCard extends Vue {
   }
 
   destroyed() {
-    if (!this.$props.sharedMetrics) {
-      this.removeMetrics();
+    if (!this.$props.sharedListeners) {
+      this.removeListeners();
     }
   }
 
@@ -140,8 +140,8 @@ export default class GraphCard extends Vue {
     <GraphDisplay
       v-if="!error"
       ref="display"
-      :data="metricData"
-      :layout="metricLayout"
+      :data="graphData"
+      :layout="graphLayout"
       :revision="revision"
     />
     <q-item v-else dark class="absolute-center">

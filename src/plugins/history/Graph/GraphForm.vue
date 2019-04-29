@@ -5,7 +5,7 @@ import { nodeBuilder, targetSplitter, targetBuilder, QuasarNode, expandedNodes }
 import FormBase from '@/components/Form/FormBase';
 import { durationString } from '@/helpers/functional';
 import parseDuration from 'parse-duration';
-import { ValueAxes, QueryParams } from '@/store/history/state';
+import { GraphValueAxes, QueryParams } from '@/store/history/state';
 import { fetchKnownKeys } from '@/store/history/actions';
 import { fields } from '@/store/history/getters';
 import Component from 'vue-class-component';
@@ -125,7 +125,7 @@ export default class GraphForm extends FormBase {
     return this.config.renames;
   }
 
-  get axes(): ValueAxes {
+  get axes(): GraphValueAxes {
     return this.config.axes;
   }
 
@@ -211,7 +211,7 @@ export default class GraphForm extends FormBase {
         </q-item>
       </q-expansion-item>
 
-      <q-expansion-item group="modal" icon="mdi-file-tree" label="Metrics">
+      <q-expansion-item default-opened group="modal" icon="mdi-file-tree" label="Metrics">
         <q-item dark>
           <q-item-section>
             <q-input

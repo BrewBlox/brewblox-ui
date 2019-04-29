@@ -1,19 +1,18 @@
-import { addMetric } from '@/store/history/actions';
+import { addValuesListener } from '@/store/history/actions';
 import { MAX_POINTS } from '@/store/history/getters';
 import {
   DisplayNames,
-  Metric,
   QueryParams,
   QueryResult,
   QueryTarget,
-  ValueAxes,
+  GraphValueAxes,
+  GraphValuesListener,
 } from '@/store/history/state';
 import { RootStore } from '@/store/state';
 import parseDuration from 'parse-duration';
+import { nanoToMilli } from '@/helpers/functional';
 
-export { removeMetric } from '@/store/history/actions';
-
-const nanoToMilli = (nano: number): number => Math.floor(nano / 1e6);
+export { removeListener } from '@/store/history/actions';
 
 const transpose = (matrix: any[][]): any[][] => matrix[0].map((_, idx) => matrix.map(row => row[idx]));
 
@@ -30,14 +29,14 @@ const boundedConcat =
   };
 
 const valueName =
-  (metric: Metric, key: string): string => {
-    return metric.axes[key] === 'y2'
-      ? `<span style="color: #aef">${metric.renames[key] || key}</span>`
-      : `<span>${metric.renames[key] || key}</span>`;
+  (listener: GraphValuesListener, key: string): string => {
+    return listener.axes[key] === 'y2'
+      ? `<span style="color: #aef">${listener.renames[key] || key}</span>`
+      : `<span>${listener.renames[key] || key}</span>`;
   };
 
-const transformer =
-  (metric: Metric, result: QueryResult): Metric => {
+const valuesTransformer =
+  (listener: GraphValuesListener, result: QueryResult): GraphValuesListener => {
     if (result.values && result.values.length > 0) {
       const resultCols = transpose(result.values);
       const time = resultCols[0].map(nanoToMilli);
@@ -49,26 +48,26 @@ const transformer =
             return; // skip time
           }
           const key = `${result.name}/${col}`;
-          const value = metric.values[key] || {};
-          metric.values[key] = {
+          const value = listener.values[key] || {};
+          listener.values[key] = {
             type: 'scatter',
             ...value,
-            name: valueName(metric, key),
-            yaxis: metric.axes[key] || 'y',
+            name: valueName(listener, key),
+            yaxis: listener.axes[key] || 'y',
             x: boundedConcat(value.x, time),
             y: boundedConcat(value.y, resultCols[idx]),
           };
         });
 
       if (
-        metric.params.duration
-        && !metric.params.start
-        && !metric.params.end
+        listener.params.duration
+        && !listener.params.start
+        && !listener.params.end
       ) {
         // timestamp in Ms that should be discarded
-        const boundary = new Date().getTime() - parseDuration(metric.params.duration);
+        const boundary = new Date().getTime() - parseDuration(listener.params.duration);
         Object
-          .values(metric.values)
+          .values(listener.values)
           .forEach((val: any) => {
             const boundaryIdx = val.x.findIndex((x: number) => x > boundary);
             if (boundaryIdx > 0) {
@@ -78,16 +77,16 @@ const transformer =
           });
       }
     }
-    return metric;
+    return listener;
   };
 
-export const addPlotlyMetric =
+export const addPlotlyListener =
   async (
     store: RootStore,
     id: string,
     params: QueryParams,
     renames: DisplayNames,
-    axes: ValueAxes,
+    axes: GraphValueAxes,
     target: QueryTarget,
   ): Promise<void> => {
     const filteredTarget = {
@@ -95,12 +94,12 @@ export const addPlotlyMetric =
       fields: target.fields.filter(field => !!field),
     };
     if (filteredTarget.fields.length > 0) {
-      addMetric(store, {
+      addValuesListener(store, {
         id,
-        transformer,
         params,
         renames,
         axes,
+        transformer: valuesTransformer,
         target: filteredTarget,
         values: {},
       });

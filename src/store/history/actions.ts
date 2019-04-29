@@ -1,51 +1,59 @@
 import { createAccessors } from '@/helpers/static-store';
-import { HistoryState, Metric } from '@/store/history/state';
+import { HistoryState, Listener, QueryParams, QueryTarget } from '@/store/history/state';
 import { RootState, RootStore } from '@/store/state';
 import { ActionTree } from 'vuex';
 import {
   fetchKnownKeys as fetchKnownKeysInApi,
-  fetchValueSource,
   validateService as validateServiceInApi,
+  subscribeMetrics,
+  subscribeValues,
 } from './api';
 import {
-  addMetric as addMetricInStore,
+  addListener as addListenerInStore,
   mutateAvailableKeys as mutateAvailableKeysInStore,
-  removeMetric as removeMetricInStore,
-  transformMetric as transformMetricInStore,
-  updateMetric as updateMetricInStore,
+  removeListener as removeListenerInStore,
+  transformListener as transformListenerInStore,
+  updateListener as updateListenerInStore,
 } from './mutations';
 import { HistoryContext } from './state';
 
 const { dispatch } = createAccessors('history');
 
+const addListener = async (
+  context: HistoryContext,
+  listener: Listener,
+  fetcher: (p: QueryParams, t: QueryTarget) => Promise<EventSource>
+): Promise<void> => {
+  const { id, params, target } = listener;
+
+  addListenerInStore(context, listener);
+
+  const source = await fetcher(params, target);
+  source.onmessage = (event: MessageEvent) =>
+    transformListenerInStore(context, { id, result: JSON.parse(event.data) });
+  source.onerror = () => source.close();
+
+  updateListenerInStore(context, { id, source });
+};
+
 export const actions: ActionTree<HistoryState, RootState> = {
-  add: async (context: HistoryContext, metric: Metric) => {
-    const {
-      id,
-      params,
-      target,
-    } = metric;
+  addValuesListener: async (context: HistoryContext, listener: Listener) =>
+    addListener(context, listener, subscribeValues),
 
-    addMetricInStore(context, metric);
+  addMetricsListener: async (context: HistoryContext, listener: Listener) =>
+    addListener(context, listener, subscribeMetrics),
 
-    const source = await fetchValueSource(params, target);
-    source.onmessage = (event: MessageEvent) =>
-      transformMetricInStore(context, { id, result: JSON.parse(event.data) });
-    source.onerror = () => source.close();
-
-    updateMetricInStore(context, { id, source });
-  },
-
-  remove: async (context: HistoryContext, metric: Metric) => {
-    removeMetricInStore(context, metric);
-    if (metric.source) {
-      metric.source.close();
+  removeListener: async (context: HistoryContext, listener: Listener) => {
+    removeListenerInStore(context, listener);
+    if (listener.source) {
+      listener.source.close();
     }
   },
 };
 
-export const addMetric = dispatch(actions.add);
-export const removeMetric = dispatch(actions.remove);
+export const addValuesListener = dispatch(actions.addValuesListener);
+export const addMetricsListener = dispatch(actions.addMetricsListener);
+export const removeListener = dispatch(actions.removeListener);
 
 export const fetchKnownKeys =
   async (store: RootStore): Promise<void> =>
