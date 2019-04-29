@@ -18,7 +18,15 @@ import { Block } from '../state';
     },
     btnProps: {
       type: Object,
-      default: {},
+      default: () => ({}),
+    },
+    tag: {
+      type: String,
+      default: 'div',
+    },
+    tagProps: {
+      type: Object,
+      default: () => ({}),
     },
   },
 })
@@ -42,8 +50,8 @@ export default class BlockFormButton extends Vue {
 </script>
 
 <template>
-  <div>
-    <q-btn v-bind="btnProps" @click="() => {formOpen = true;}">
+  <component :is="tag" v-bind="tagProps">
+    <q-btn v-bind="btnProps" @click="formOpen = true">
       <slot/>
     </q-btn>
     <q-dialog v-model="formOpen" no-backdrop-dismiss>
@@ -58,5 +66,5 @@ export default class BlockFormButton extends Vue {
         :on-change-block-id="() => {}"
       />
     </q-dialog>
-  </div>
+  </component>
 </template>

@@ -1,6 +1,7 @@
 <script lang="ts">
 import PartCard from './PartCard';
 import Component from 'vue-class-component';
+import { formById } from '@/store/features/getters';
 import { serviceIds } from '@/store/services/getters';
 import { Block } from '@/plugins/spark/state';
 import { blockValues, blocks } from '@/plugins/spark/store/getters';
@@ -112,6 +113,14 @@ export default class BlockPartCard extends PartCard {
       <q-item-section>
         <q-btn label="Save" unelevated color="primary" @click="saveBlock"/>
       </q-item-section>
+    </q-item>
+    <q-item v-if="block" dark>
+      <BlockFormButton
+        :block-id="block.id"
+        :service-id="block.serviceId"
+        :btn-props="{ color: 'primary', label: 'Configure block', unelevated: true }"
+        tag="q-item-section"
+      />
     </q-item>
   </q-list>
 </template>
