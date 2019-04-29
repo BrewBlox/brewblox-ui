@@ -21,6 +21,7 @@ export default class SparkImportMenu extends Vue {
   reader: FileReader = new FileReader();
   serializedData: string = '';
   importBusy: boolean = false;
+  messages: string[] = [];
 
   get service() {
     return serviceById(this.$store, this.$props.serviceId);
@@ -55,13 +56,21 @@ export default class SparkImportMenu extends Vue {
   async importBlocks() {
     try {
       this.importBusy = true;
+      this.messages = [];
       const exported = deserialize(JSON.parse(this.serializedData));
-      const log = await serviceImport(this.$store, this.service, exported);
-      this.$q.notify({
-        icon: 'mdi-check-all',
-        color: 'positive',
-        message: JSON.stringify(log),
-      });
+      this.messages = await serviceImport(this.$store, this.service, exported);
+      this.$q.notify(
+        this.messages.length > 0
+          ? {
+            icon: 'warning',
+            color: 'warning',
+            message: `Some Blocks could not be imported on ${this.service.id}`,
+          }
+          : {
+            icon: 'mdi-check-all',
+            color: 'positive',
+            message: `Imported Blocks on ${this.service.id}`,
+          });
     } catch (e) {
       this.$q.notify({
         icon: 'error',
@@ -107,6 +116,14 @@ export default class SparkImportMenu extends Vue {
       <q-item dark>
         <q-item-section>
           <q-btn :loading="importBusy" outline label="Export Blocks" @click="exportBlocks"/>
+        </q-item-section>
+      </q-item>
+      <q-item v-if="messages.length > 0" dark>
+        <q-item-section>
+          Reported problems during last import:
+          <ul>
+            <li v-for="(msg, idx) in messages" :key="idx">{{ msg }}</li>
+          </ul>
         </q-item-section>
       </q-item>
     </q-card-section>
