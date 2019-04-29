@@ -32,7 +32,7 @@ export const subscribeValues =
 
 export const subscribeMetrics =
   async (params: QueryParams, target: QueryTarget): Promise<EventSource> =>
-    sse(`/history/sse/metrics?${queryString.stringify({
+    sse(`/history/sse/last_values?${queryString.stringify({
       ...snakeCasedObj(params),
       ...snakeCasedObj(target),
     })}`);

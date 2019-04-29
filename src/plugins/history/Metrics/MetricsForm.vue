@@ -1,13 +1,20 @@
 <script lang="ts">
-import { MetricsConfig } from './state';
+import parseDuration from 'parse-duration';
 import { nodeBuilder, targetSplitter, targetBuilder, QuasarNode, expandedNodes } from '@/components/Graph/functional';
 import FormBase from '@/components/Form/FormBase';
 import { fetchKnownKeys } from '@/store/history/actions';
 import { fields } from '@/store/history/getters';
 import Component from 'vue-class-component';
+import { durationString } from '@/helpers/functional';
+import { MetricsConfig } from './state';
+import { DEFAULT_FRESH_DURATION } from './getters';
 
 @Component
 export default class MetricsForm extends FormBase {
+  DEFAULT_FRESH_DURATION = DEFAULT_FRESH_DURATION;
+  parseDuration = parseDuration;
+  durationString = durationString;
+
   selectFilter: string | null = null;
   expandedKeys: string[] = [];
 
@@ -35,6 +42,10 @@ export default class MetricsForm extends FormBase {
     return this.config.renames;
   }
 
+  get freshDuration() {
+    return this.config.freshDuration;
+  }
+
   created() {
     fetchKnownKeys(this.$store);
   }
@@ -51,6 +62,11 @@ export default class MetricsForm extends FormBase {
     if (filter) {
       this.expandedKeys = expandedNodes(this.nodes, filter);
     }
+  }
+
+  resetFreshDuration(field: string) {
+    this.$delete(this.config.freshDuration, field);
+    this.saveConfig(this.config);
   }
 }
 </script>
@@ -130,6 +146,30 @@ export default class MetricsForm extends FormBase {
         </q-item>
         <q-item v-if="!selected || selected.length === 0" dark>
           <q-item-section side>No metrics selected</q-item-section>
+        </q-item>
+      </q-expansion-item>
+
+      <q-expansion-item group="modal" icon="warning" label="Old data warnings">
+        <q-item dark>
+          <q-item-section>Metric</q-item-section>
+          <q-item-section>Warn when older than</q-item-section>
+          <q-item-section class="col-1"/>
+        </q-item>
+        <q-separator dark inset/>
+        <q-item v-for="field in selected" :key="field" dark>
+          <q-item-section>{{ field }}</q-item-section>
+          <q-item-section>
+            <InputPopupEdit
+              :field="durationString(freshDuration[field] || DEFAULT_FRESH_DURATION)"
+              :change="callAndSaveConfig(v => config.freshDuration[field] = parseDuration(v))"
+              label="Fresh duration"
+              clearable
+              tag="span"
+            />
+          </q-item-section>
+          <q-item-section class="col-1">
+            <q-btn icon="restore" flat @click="resetFreshDuration(field)"/>
+          </q-item-section>
         </q-item>
       </q-expansion-item>
     </q-card-section>

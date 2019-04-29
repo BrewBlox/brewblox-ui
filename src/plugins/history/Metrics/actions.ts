@@ -15,10 +15,9 @@ const metricsTransformer =
   (listener: Listener, result: MetricsResult[]): Listener => ({
     ...listener,
     values: result.map(res => {
-      const key = `${listener.target.measurement}/${res.field}`;
       return {
         ...res,
-        field: listener.renames[key] || key,
+        field: `${listener.target.measurement}/${res.field}`,
         time: res.time ? nanoToMilli(res.time) : null,
       };
     }),

@@ -208,7 +208,7 @@
         "storedSetting[degC]": 0,
         "value[degC]": 0,
         "sensorId<TempSensorInterface>": "sensor-1",
-        "setting[degC]": 0
+        "setting[degC]": 30
       }
     },
     {

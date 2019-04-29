@@ -10,4 +10,7 @@ export interface MetricsConfig {
   params: QueryParams;
   targets: QueryTarget[];
   renames: DisplayNames;
+  freshDuration: {
+    [key: string]: number;
+  };
 }

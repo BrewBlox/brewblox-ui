@@ -11,6 +11,7 @@ export default class MetricsWizard extends WidgetWizardBase {
     targets: [],
     renames: {},
     params: {},
+    freshDuration: {},
   }
 
   createWidget() {
@@ -57,7 +58,6 @@ export default class MetricsWizard extends WidgetWizardBase {
       <q-btn unelevated label="Back" @click="back"/>
       <div class="row">
         <q-btn
-          disable
           unelevated
           label="Configure"
           color="primary"
