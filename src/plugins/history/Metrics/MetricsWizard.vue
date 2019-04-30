@@ -12,6 +12,7 @@ export default class MetricsWizard extends WidgetWizardBase {
     renames: {},
     params: {},
     freshDuration: {},
+    decimals: {},
   }
 
   createWidget() {

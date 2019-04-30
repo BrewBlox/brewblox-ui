@@ -28,6 +28,18 @@ import { round, truncate } from '@/helpers/functional';
       type: String,
       default: 'big',
     },
+    decimals: {
+      type: Number,
+      default: 2,
+    },
+    popupProps: {
+      type: Object,
+      default: () => ({}),
+    },
+    inputProps: {
+      type: Object,
+      default: () => ({}),
+    },
   },
 })
 export default class InputPopupEdit extends Vue {
@@ -47,12 +59,11 @@ export default class InputPopupEdit extends Vue {
     this.placeholder = this.$props.type === 'number' ? +v : v;
   }
 
-
   get displayValue() {
     const val = this.$props.field;
 
     if (this.$props.type === 'number') {
-      return round(val);
+      return round(val, this.$props.decimals);
     }
 
     if (this.$props.type === 'text') {
@@ -72,6 +83,7 @@ export default class InputPopupEdit extends Vue {
   }
 
   save() {
+    console.log('save', this.placeholder);
     this.$props.change(this.placeholder);
   }
 }
@@ -88,6 +100,7 @@ export default class InputPopupEdit extends Vue {
       :disable="$attrs.disabled"
       :title="$props.label"
       v-model="value"
+      v-bind="$props.popupProps"
       label-set="apply"
       buttons
       persistent
@@ -102,6 +115,7 @@ export default class InputPopupEdit extends Vue {
         ref="input"
         :clearable="$props.clearable"
         :type="$props.type"
+        v-bind="$props.inputProps"
         v-model="value"
         step="any"
         dark
