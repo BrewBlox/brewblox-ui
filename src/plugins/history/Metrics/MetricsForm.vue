@@ -140,7 +140,7 @@ export default class MetricsForm extends FormBase {
         </q-item>
       </q-expansion-item>
 
-      <q-expansion-item group="modal" icon="mdi-tag-multiple" label="Legend">
+      <q-expansion-item group="modal" icon="mdi-tag-multiple" label="Labels">
         <q-item dark>
           <q-item-section>Metric</q-item-section>
           <q-item-section>Display as</q-item-section>
@@ -152,7 +152,7 @@ export default class MetricsForm extends FormBase {
             <InputPopupEdit
               :field="renames[field]"
               :change="callAndSaveConfig(v => config.renames[field] = v)"
-              label="Legend"
+              label="Label"
               clearable
               tag="span"
             />
@@ -187,10 +187,10 @@ export default class MetricsForm extends FormBase {
         </q-item>
       </q-expansion-item>
 
-      <q-expansion-item group="modal" icon="mdi-numeric" label="Decimals">
+      <q-expansion-item group="modal" icon="mdi-numeric" label="Rounding">
         <q-item dark>
           <q-item-section>Metric</q-item-section>
-          <q-item-section>Decimal numbers</q-item-section>
+          <q-item-section>Number of decimals</q-item-section>
           <q-item-section class="col-1"/>
         </q-item>
         <q-separator dark inset/>
@@ -203,7 +203,7 @@ export default class MetricsForm extends FormBase {
               :decimals="0"
               :popup-props="{validate: (v) => v >= 0}"
               type="number"
-              label="Decimal numbers"
+              label="Number of decimals"
               clearable
               tag="span"
             />
