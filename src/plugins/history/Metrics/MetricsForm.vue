@@ -1,5 +1,6 @@
 <script lang="ts">
 import parseDuration from 'parse-duration';
+import get from 'lodash/get';
 import { nodeBuilder, targetSplitter, targetBuilder, QuasarNode, expandedNodes } from '@/components/Graph/functional';
 import FormBase from '@/components/Form/FormBase';
 import { fetchKnownKeys } from '@/store/history/actions';
@@ -7,7 +8,7 @@ import { fields } from '@/store/history/getters';
 import Component from 'vue-class-component';
 import { durationString } from '@/helpers/functional';
 import { MetricsConfig } from './state';
-import { DEFAULT_FRESH_DURATION } from './getters';
+import { DEFAULT_FRESH_DURATION, DEFAULT_DECIMALS } from './getters';
 
 @Component
 export default class MetricsForm extends FormBase {
@@ -46,6 +47,14 @@ export default class MetricsForm extends FormBase {
     return this.config.freshDuration;
   }
 
+  get decimals() {
+    return this.config.decimals;
+  }
+
+  fieldDecimals(field: string) {
+    return get(this.config.decimals, field, DEFAULT_DECIMALS);
+  }
+
   created() {
     fetchKnownKeys(this.$store);
   }
@@ -66,6 +75,11 @@ export default class MetricsForm extends FormBase {
 
   resetFreshDuration(field: string) {
     this.$delete(this.config.freshDuration, field);
+    this.saveConfig(this.config);
+  }
+
+  resetDecimals(field: string) {
+    this.$delete(this.config.decimals, field);
     this.saveConfig(this.config);
   }
 }
@@ -126,7 +140,7 @@ export default class MetricsForm extends FormBase {
         </q-item>
       </q-expansion-item>
 
-      <q-expansion-item group="modal" icon="mdi-tag-multiple" label="Legend">
+      <q-expansion-item group="modal" icon="mdi-tag-multiple" label="Labels">
         <q-item dark>
           <q-item-section>Metric</q-item-section>
           <q-item-section>Display as</q-item-section>
@@ -138,7 +152,7 @@ export default class MetricsForm extends FormBase {
             <InputPopupEdit
               :field="renames[field]"
               :change="callAndSaveConfig(v => config.renames[field] = v)"
-              label="Legend"
+              label="Label"
               clearable
               tag="span"
             />
@@ -161,7 +175,7 @@ export default class MetricsForm extends FormBase {
           <q-item-section>
             <InputPopupEdit
               :field="durationString(freshDuration[field] || DEFAULT_FRESH_DURATION)"
-              :change="callAndSaveConfig(v => config.freshDuration[field] = parseDuration(v))"
+              :change="callAndSaveConfig(v => freshDuration[field] = parseDuration(v))"
               label="Fresh duration"
               clearable
               tag="span"
@@ -169,6 +183,33 @@ export default class MetricsForm extends FormBase {
           </q-item-section>
           <q-item-section class="col-1">
             <q-btn icon="restore" flat @click="resetFreshDuration(field)"/>
+          </q-item-section>
+        </q-item>
+      </q-expansion-item>
+
+      <q-expansion-item group="modal" icon="mdi-numeric" label="Rounding">
+        <q-item dark>
+          <q-item-section>Metric</q-item-section>
+          <q-item-section>Number of decimals</q-item-section>
+          <q-item-section class="col-1"/>
+        </q-item>
+        <q-separator dark inset/>
+        <q-item v-for="field in selected" :key="field" dark>
+          <q-item-section>{{ field }}</q-item-section>
+          <q-item-section>
+            <InputPopupEdit
+              :field="fieldDecimals(field)"
+              :change="callAndSaveConfig(v => decimals[field] = v)"
+              :decimals="0"
+              :popup-props="{validate: (v) => v >= 0}"
+              type="number"
+              label="Number of decimals"
+              clearable
+              tag="span"
+            />
+          </q-item-section>
+          <q-item-section class="col-1">
+            <q-btn icon="mdi-undo-variant" flat @click="resetDecimals(field)"/>
           </q-item-section>
         </q-item>
       </q-expansion-item>

@@ -711,7 +711,9 @@
         ],
         "renames": {
           "sparkey/actuator-pwm-1/value": "actuator value"
-        }
+        },
+        "freshDuration": {},
+        "decimals": {}
       }
     }
   ]

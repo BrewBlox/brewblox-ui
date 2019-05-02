@@ -10,7 +10,6 @@ export interface MetricsConfig {
   params: QueryParams;
   targets: QueryTarget[];
   renames: DisplayNames;
-  freshDuration: {
-    [key: string]: number;
-  };
+  freshDuration: Record<string, number>;
+  decimals: Record<string, number>;
 }

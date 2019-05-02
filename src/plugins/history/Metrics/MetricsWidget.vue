@@ -8,7 +8,7 @@ import { durationString } from '@/helpers/functional';
 import { tryListenerById } from '@/store/history/getters';
 import { QueryTarget, Listener, DisplayNames, QueryParams } from '@/store/history/state';
 import { MetricsResult, MetricsConfig } from './state';
-import { DEFAULT_FRESH_DURATION } from './getters';
+import { DEFAULT_FRESH_DURATION, DEFAULT_DECIMALS } from './getters';
 import { addListener, removeListener } from './actions';
 
 interface CurrentValue extends MetricsResult {
@@ -30,6 +30,7 @@ export default class MetricsWidget extends WidgetBase {
       renames: {},
       params: {},
       freshDuration: {},
+      decimals: {},
       ...this.$props.config,
     };
   }
@@ -54,6 +55,10 @@ export default class MetricsWidget extends WidgetBase {
 
   fieldFreshDuration(field: string) {
     return get(this.widgetCfg.freshDuration, field, DEFAULT_FRESH_DURATION);
+  }
+
+  fieldDecimals(field: string) {
+    return get(this.widgetCfg.decimals, field, DEFAULT_DECIMALS);
   }
 
   get values(): CurrentValue[] {
@@ -163,7 +168,7 @@ export default class MetricsWidget extends WidgetBase {
           <q-item-section>
             <q-item-label caption>{{ val.name }}</q-item-label>
             <div class="row items-center">
-              <big :class="{darkened: val.stale}">{{ val.value | round }}</big>
+              <big :class="{darkened: val.stale}">{{ val.value | round(fieldDecimals(val.field)) }}</big>
               <q-icon v-if="val.stale" name="warning" right size="24px"/>
             </div>
             <q-tooltip v-if="val.stale">
