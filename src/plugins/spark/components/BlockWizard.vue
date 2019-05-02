@@ -35,7 +35,7 @@ export default class BlockWizard extends Vue {
       v => !!v || 'Name must not be empty',
       v => !blockIds(this.$store, this.$props.serviceId).includes(v) || 'Name must be unique',
       v => v.match(/^[a-zA-Z]/) || 'Name must start with a letter',
-      v => v.match(/^[^\[\]\<\>]*$/) || 'Name must not contain brackets ([]<>)',
+      v => v.match(/^[a-zA-Z0-9 \(\)_-\|]*$/) || 'Name may only contain letters, numbers, spaces, and ()-_|',
       v => v.length < 200 || 'Name must be less than 200 characters',
     ];
   }
