@@ -75,8 +75,9 @@ export default class ActuatorState extends Vue {
         flat
         color="warning"
         style="padding: 0px"
-        @click="boolState = false"
-      >Unknown state!
+        @click="state = 0"
+      >
+        Unknown state!
         <q-tooltip>
           Click to try to set to
           <i>inactive</i>
