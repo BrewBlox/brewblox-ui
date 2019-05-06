@@ -1,8 +1,5 @@
 import { ComponentSettings, Transitions, StatePart, PartUpdater } from '../state';
 import { LEFT, RIGHT, defaultSettings } from '../getters';
-import { blocks } from '@/plugins/spark/store/getters';
-import { Block } from '@/plugins/spark/state';
-import { saveBlock } from '@/plugins/spark/store/actions';
 import { post } from '@/helpers/fetch';
 
 import { Notify } from 'quasar';

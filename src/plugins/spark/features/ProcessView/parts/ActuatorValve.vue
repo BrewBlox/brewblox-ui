@@ -5,7 +5,6 @@ import { RIGHT } from '../getters';
 import { Link } from '@/helpers/units';
 import { Block } from '@/plugins/spark/state';
 import { blocks } from '@/plugins/spark/store/getters';
-import { Watch } from 'vue-property-decorator';
 
 @Component
 export default class ActuatorValve extends PartComponent {
