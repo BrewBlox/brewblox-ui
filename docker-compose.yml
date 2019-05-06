@@ -47,7 +47,21 @@ services:
       - "traefik.frontend.rule=PathPrefix: /sparkey"
     command: >
       --name=sparkey
-      --device-host=sparksimulator
+  valves:
+    image: brewblox/brewblox-serial:feature-serial
+    privileged: true
+    depends_on:
+      - eventbus
+      - datastore
+    labels:
+      - "traefik.port=5000"
+      - "traefik.frontend.rule=PathPrefix: /valves"
+    command: >
+      --name=valves
+      --device-serial=/dev/ttyACM0
+    volumes:
+      - "../brewblox-devcon-spark/:/app/"
+
 
   spock:
     image: brewblox/brewblox-devcon-spark:develop
