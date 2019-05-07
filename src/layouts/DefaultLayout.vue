@@ -260,7 +260,7 @@ export default class DefaultLayout extends Vue {
           <q-item-section avatar>
             <q-icon name="mdi-home"/>
           </q-item-section>
-          <q-item-section>Home</q-item-section>
+          <q-item-section>BrewBlox</q-item-section>
         </q-item>
 
         <q-separator dark/>
