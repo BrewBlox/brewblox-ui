@@ -1,16 +1,17 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { formById } from '@/store/features/getters';
 import { blocks } from '../store/getters';
 import { saveBlock } from '../store/actions';
-import { formById } from '../../../store/features/getters';
 import { Block } from '../state';
+import isString from 'lodash/isString';
 
 @Component({
   props: {
     blockId: {
       type: String,
-      required: true,
+      validator: v => v === null || isString(v),
     },
     serviceId: {
       type: String,
@@ -31,15 +32,21 @@ import { Block } from '../state';
   },
 })
 export default class BlockFormButton extends Vue {
-  formOpen = false;
-  protected $q: any; // injected by quasar
+  $q: any; // injected by quasar
+  modalOpen: boolean = false;
 
-  get block(): Block {
-    return blocks(this.$store, this.$props.serviceId)[this.$props.blockId] || null;
+  get block(): Block | null {
+    const id = this.$props.blockId;
+
+    return !!id
+      ? blocks(this.$store, this.$props.serviceId)[id] || null
+      : null;
   }
 
   get blockForm() {
-    return formById(this.$store, this.block.type);
+    return !!this.block
+      ? formById(this.$store, this.block.type)
+      : null;
   }
 
   saveBlock(v) {
@@ -51,12 +58,12 @@ export default class BlockFormButton extends Vue {
 
 <template>
   <component :is="tag" v-bind="tagProps">
-    <q-btn v-bind="btnProps" @click="formOpen = true">
+    <q-btn :disable="!block" v-bind="btnProps" @click="modalOpen = true">
       <slot/>
     </q-btn>
-    <q-dialog v-model="formOpen" no-backdrop-dismiss>
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <component
-        v-if="formOpen"
+        v-if="modalOpen"
         :is="blockForm"
         :type="block.type"
         :field="block"
