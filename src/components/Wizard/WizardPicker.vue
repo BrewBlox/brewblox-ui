@@ -45,7 +45,7 @@ export default class WizardPicker extends Vue {
       @close="close"
     />
 
-    <template v-else>
+    <q-scroll-area v-else style="height: 80vh;">
       <q-card-section>
         <q-item link clickable dark @click="wizardComponent = 'ServiceWizardPicker'">
           <q-item-section side class="col-3">
@@ -131,6 +131,6 @@ export default class WizardPicker extends Vue {
           </q-item-section>
         </q-item>
       </q-card-section>
-    </template>
+    </q-scroll-area>
   </q-card>
 </template>

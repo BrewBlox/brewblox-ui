@@ -42,6 +42,7 @@ export default class DefaultLayout extends Vue {
   dashboardEditing: boolean = false;
   serviceEditing: boolean = false;
   wizardModalOpen: boolean = false;
+  wizardComponent: string | null = null;
 
   get version() {
     return buildEnv.version || 'UNKNOWN';
@@ -231,6 +232,11 @@ export default class DefaultLayout extends Vue {
   updateDefaultDashboard(id: string) {
     updatePrimaryDashboard(this.$store, this.defaultDashboard === id ? null : id);
   }
+
+  openWizard(component: string | null = null) {
+    this.wizardComponent = component;
+    this.wizardModalOpen = true;
+  }
 }
 </script>
 
@@ -254,12 +260,12 @@ export default class DefaultLayout extends Vue {
           <q-item-section avatar>
             <q-icon name="mdi-home"/>
           </q-item-section>
-          <q-item-section>Main menu</q-item-section>
+          <q-item-section>Home</q-item-section>
         </q-item>
 
         <q-separator dark/>
 
-        <q-item clickable @click.native="wizardModalOpen = true">
+        <q-item clickable @click.native="openWizard(null)">
           <q-item-section avatar>
             <q-icon name="mdi-creation"/>
           </q-item-section>
@@ -273,6 +279,16 @@ export default class DefaultLayout extends Vue {
             <q-icon name="dashboard"/>
           </q-item-section>
           <q-item-section>Dashboards</q-item-section>
+          <q-item-section v-if="dashboardEditing" side>
+            <q-btn
+              icon="add"
+              outline
+              color="white"
+              round
+              size="sm"
+              @click="openWizard('DashboardWizard')"
+            />
+          </q-item-section>
           <q-item-section side>
             <q-btn
               :disable="dashboards.length === 0"
@@ -345,6 +361,16 @@ export default class DefaultLayout extends Vue {
           <q-item-section>
             <q-item-section>Services</q-item-section>
           </q-item-section>
+          <q-item-section v-if="serviceEditing" side>
+            <q-btn
+              icon="add"
+              outline
+              color="white"
+              round
+              size="sm"
+              @click="openWizard('ServiceWizardPicker')"
+            />
+          </q-item-section>
           <q-item-section side>
             <q-btn
               :disable="services.length === 0"
@@ -399,7 +425,11 @@ export default class DefaultLayout extends Vue {
     </q-drawer>
 
     <q-dialog v-model="wizardModalOpen" no-backdrop-dismiss>
-      <WizardPicker v-if="wizardModalOpen" @close="wizardModalOpen = false"/>
+      <WizardPicker
+        v-if="wizardModalOpen"
+        :initial-component="wizardComponent"
+        @close="wizardModalOpen = false"
+      />
     </q-dialog>
 
     <ServiceWatchers/>
