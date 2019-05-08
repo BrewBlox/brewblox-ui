@@ -2,12 +2,12 @@
 import Component from 'vue-class-component';
 import isString from 'lodash/isString';
 import featureStore from '@/store/features';
+import serviceStore from '@/store/services';
 import get from 'lodash/get';
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 import { Block } from '@/plugins/spark/state';
 import { createBlock } from '@/plugins/spark/store/actions';
 import { blockIds, blockValues } from '@/plugins/spark/store/getters';
-import { serviceValues } from '@/store/services/getters';
 import { Service } from '@/store/services/state';
 import { objectStringSorter } from '@/helpers/functional';
 
@@ -44,7 +44,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
   }
 
   get serviceOpts() {
-    return serviceValues(this.$store)
+    return serviceStore.serviceValues
       .filter(service => service.type === 'Spark')
       .map(service => ({
         label: service.title,

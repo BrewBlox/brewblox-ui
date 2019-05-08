@@ -2,8 +2,8 @@
 import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
 import providerStore from '@/store/providers';
+import serviceStore from '@/store/services';
 import { serviceAvailable } from '@/helpers/dynamic-store';
-import { serviceById, serviceExists } from '@/store/services/getters';
 import InvalidPage from './InvalidPage.vue';
 
 @Component({
@@ -17,13 +17,13 @@ export default class ServicePage extends Vue {
   }
 
   get serviceValid() {
-    return serviceExists(this.$store, this.serviceId)
+    return serviceStore.serviceExists(this.serviceId)
       && serviceAvailable(this.$store, this.serviceId);
   }
 
   pageComponent(): string | VueConstructor {
     try {
-      const service = serviceById(this.$store, this.serviceId);
+      const service = serviceStore.serviceById(this.serviceId);
       return providerStore.pageById(service.type) || InvalidPage;
     } catch (e) {
       return InvalidPage;

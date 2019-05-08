@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { serviceById } from '@/store/services/getters';
+import serviceStore from '@/store/services';
 import FileSaver from 'file-saver';
 import get from 'lodash/get';
 import { serialize, deserialize } from '@/helpers/units/parseObject';
@@ -24,7 +24,7 @@ export default class SparkImportMenu extends Vue {
   messages: string[] = [];
 
   get service() {
-    return serviceById(this.$store, this.$props.serviceId);
+    return serviceStore.serviceById(this.$props.serviceId);
   }
 
   async exportBlocks() {

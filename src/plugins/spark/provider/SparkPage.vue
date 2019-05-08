@@ -3,6 +3,7 @@ import { uid } from 'quasar';
 import { serviceAvailable } from '@/helpers/dynamic-store';
 import dashboardStore from '@/store/dashboards';
 import featureStore from '@/store/features';
+import serviceStore from '@/store/services';
 import { Block, SystemStatus } from '@/plugins/spark/state';
 import {
   renameBlock,
@@ -16,7 +17,6 @@ import {
 import { allBlocks, lastStatus, blockLinks, discoveredBlocks } from '@/plugins/spark/store/getters';
 import { Dashboard, DashboardItem } from '@/store/dashboards/state';
 import { Service } from '@/store/services/state';
-import { serviceById } from '@/store/services/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { isReady, isSystemBlock, widgetSize } from './getters';
@@ -53,7 +53,7 @@ export default class SparkPage extends Vue {
   relationsModalOpen: boolean = false;
 
   get service(): Service {
-    return serviceById(this.$store, this.$props.serviceId);
+    return serviceStore.serviceById(this.$props.serviceId);
   }
 
   get dashboards(): Dashboard[] {
@@ -157,7 +157,7 @@ export default class SparkPage extends Vue {
       );
     }
     if (!this.statusNok && this.statusCheckInterval) {
-      fetchAll(this.$store, serviceById(this.$store, this.service.id));
+      fetchAll(this.$store, serviceStore.serviceById(this.service.id));
       createUpdateSource(this.$store, this.service.id);
       clearTimeout(this.statusCheckInterval);
       this.statusCheckInterval = null;

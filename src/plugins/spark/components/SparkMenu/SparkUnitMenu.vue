@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { serviceById } from '@/store/services/getters';
+import serviceStore from '@/store/services';
 import { units, unitAlternatives } from '../../store/getters';
 import { UserUnits } from '../../state';
 import { saveUnits, fetchAll } from '../../store/actions';
@@ -21,7 +21,7 @@ export default class SparkUnitMenu extends Vue {
   spaceCased = spaceCased;
 
   get service() {
-    return serviceById(this.$store, this.$props.serviceId);
+    return serviceStore.serviceById(this.$props.serviceId);
   }
 
   get units(): UserUnits {

@@ -1,7 +1,7 @@
+import serviceStore from '@/store/services';
 import { read } from '@/helpers/dynamic-store';
 import { Link } from '@/helpers/units';
-import { serviceById } from '@/store/services/getters';
-import { RootState, RootStore } from '@/store/state';
+import { RootStore } from '@/store/state';
 import { GetterTree } from 'vuex';
 import { Block, CompatibleBlocks, Spark, SystemStatus, UnitAlternatives, UserUnits } from '../state';
 import { SparkState } from './state';
@@ -13,7 +13,7 @@ const defaultGroupNames = [
 
 export const typeName = 'Spark';
 
-export const getters: GetterTree<SparkState, RootState> = {
+export const getters: GetterTree<SparkState, {}> = {
   blocks: (state: SparkState): { [id: string]: Block } => state.blocks,
   blockIds: (state: SparkState): string[] => Object.keys(state.blocks),
   blockValues: (state: SparkState): Block[] => Object.values(state.blocks),
@@ -127,7 +127,7 @@ export function allBlocks<T extends Block>(
 }
 
 export const sparkServiceById = (store: RootStore, id: string): Spark =>
-  serviceById<Spark>(store, id, typeName);
+  serviceStore.serviceById(id, typeName) as Spark;
 
 export const sparkConfigById = (store: RootStore, id: string): any =>
   sparkServiceById(store, id).config || {};

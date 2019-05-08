@@ -1,10 +1,10 @@
 <script lang="ts">
-import Component from 'vue-class-component';
 import Vue from 'vue';
+import Component from 'vue-class-component';
+import serviceStore from '@/store/services';
 import { WiFiSettingsBlock } from '../../provider/state';
 import { blockValues } from '../../store/getters';
 import { saveBlock } from '../../store/actions';
-import { serviceById } from '@/store/services/getters';
 
 const WlanSecurityEnum = [
   [0, 'Unsecured'],
@@ -43,7 +43,7 @@ export default class SparkWifiMenu extends Vue {
   }
 
   get service() {
-    return serviceById(this.$store, this.$props.serviceId);
+    return serviceStore.serviceById(this.$props.serviceId);
   }
 
   get block(): WiFiSettingsBlock {

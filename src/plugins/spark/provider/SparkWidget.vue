@@ -1,4 +1,7 @@
 <script lang="ts">
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import serviceStore from '@/store/services';
 import { Block } from '@/plugins/spark/state';
 import {
   createUpdateSource,
@@ -6,9 +9,6 @@ import {
   fetchServiceStatus,
 } from '@/plugins/spark/store/actions';
 import { updateSource, blockValues } from '@/plugins/spark/store/getters';
-import { serviceById } from '@/store/services/getters';
-import Vue from 'vue';
-import Component from 'vue-class-component';
 import { sysInfoType, ticksType, wifiType, isReady } from './getters';
 import { SysInfoBlock, TicksBlock, WiFiSettingsBlock } from './state';
 
@@ -23,7 +23,7 @@ import { SysInfoBlock, TicksBlock, WiFiSettingsBlock } from './state';
 export default class SparkWidget extends Vue {
 
   get service() {
-    return serviceById(this.$store, this.$props.serviceId);
+    return serviceStore.serviceById(this.$props.serviceId);
   }
 
   sysBlock<T extends Block>(blockType: string) {
@@ -56,7 +56,7 @@ export default class SparkWidget extends Vue {
   }
 
   fetchAll() {
-    fetchAll(this.$store, serviceById(this.$store, this.service.id));
+    fetchAll(this.$store, serviceStore.serviceById(this.service.id));
   }
 
   retryUpdateSource() {

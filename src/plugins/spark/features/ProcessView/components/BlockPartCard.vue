@@ -1,7 +1,7 @@
 <script lang="ts">
 import PartCard from './PartCard';
 import Component from 'vue-class-component';
-import { serviceIds } from '@/store/services/getters';
+import serviceStore from '@/store/services';
 import { Block } from '@/plugins/spark/state';
 import { blockValues, blocks } from '@/plugins/spark/store/getters';
 import { objectStringSorter } from '@/helpers/functional';
@@ -29,7 +29,7 @@ export default class BlockPartCard extends PartCard {
   block: Block | null = null;
 
   get serviceOptions() {
-    return serviceIds(this.$store);
+    return serviceStore.serviceIds;
   }
 
   get blockOptions() {

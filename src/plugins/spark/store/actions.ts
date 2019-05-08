@@ -1,8 +1,8 @@
 import { dispatch } from '@/helpers/dynamic-store';
 import dashboardStore from '@/store/dashboards';
-import { saveService } from '@/store/services/actions';
+import serviceStore from '@/store/services';
 import { Service } from '@/store/services/state';
-import { RootState, RootStore } from '@/store/state';
+import { RootStore } from '@/store/state';
 import { ActionTree } from 'vuex';
 import { Block, UserUnits } from '../state';
 import {
@@ -43,7 +43,7 @@ import {
 } from './mutations';
 import { BlocksContext, SparkState } from './state';
 
-export const actions: ActionTree<SparkState, RootState> = {
+export const actions: ActionTree<SparkState, {}> = {
   fetchBlock: async (context: BlocksContext, block: Block) =>
     mutateBlockInStore(context, block.serviceId, await fetchBlockInApi(block)),
 
@@ -67,7 +67,7 @@ export const removeBlock = dispatch(actions.removeBlock);
 export const updateGroupNames =
   (store: RootStore, id: string, names: string[]): void => {
     const existing = sparkServiceById(store, id);
-    saveService(store, {
+    serviceStore.saveService({
       ...existing,
       config: {
         ...existing.config,

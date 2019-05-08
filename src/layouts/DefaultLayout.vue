@@ -3,13 +3,8 @@ import UrlSafeString from 'url-safe-string';
 import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
 import { objectSorter } from '@/helpers/functional';
 import dashboardStore from '@/store/dashboards';
+import serviceStore from '@/store/services';
 import { Dashboard } from '@/store/dashboards/state';
-import {
-  removeService,
-  updateServiceOrder,
-  saveService,
-} from '@/store/services/actions';
-import { serviceValues } from '@/store/services/getters';
 import { Service } from '@/store/services/state';
 import Vue from 'vue';
 import Component from 'vue-class-component';
@@ -47,11 +42,11 @@ export default class DefaultLayout extends Vue {
   }
 
   get services() {
-    return [...serviceValues(this.$store)].sort(objectSorter('order'));
+    return [...serviceStore.serviceValues].sort(objectSorter('order'));
   }
 
   set services(services: Service[]) {
-    updateServiceOrder(this.$store, services.map(service => service.id));
+    serviceStore.updateServiceOrder(services.map(service => service.id));
   }
 
   removeDashboard(dashboard: Dashboard) {
@@ -187,7 +182,7 @@ export default class DefaultLayout extends Vue {
       ok: 'Confirm',
       cancel: 'Cancel',
     })
-      .onOk(() => removeService(this.$store, service));
+      .onOk(() => serviceStore.removeService(service));
   }
 
   changeServiceTitle(service: Service) {
@@ -206,7 +201,7 @@ export default class DefaultLayout extends Vue {
           return;
         }
 
-        await saveService(this.$store, { ...service, title: newTitle });
+        await serviceStore.saveService({ ...service, title: newTitle });
         this.$q.notify({
           color: 'positive',
           icon: 'edit',

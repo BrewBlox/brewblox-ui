@@ -1,10 +1,10 @@
 <script lang="ts">
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
+import serviceStore from '@/store/services';
 import { Block } from '@/plugins/spark/state';
 import { fetchAll } from '@/plugins/spark/store/actions';
 import { lastStatus } from '@/plugins/spark/store/getters';
-import { serviceById } from '@/store/services/getters';
 
 interface AbsenceReason {
   message: string;
@@ -64,7 +64,7 @@ export default class UnknownBlockWidget extends WidgetBase {
   }
 
   fetchAll() {
-    fetchAll(this.$store, serviceById(this.$store, this.serviceId));
+    fetchAll(this.$store, serviceStore.serviceById(this.serviceId));
   }
 }
 

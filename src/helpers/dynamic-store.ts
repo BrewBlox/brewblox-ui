@@ -1,4 +1,4 @@
-import { RootState, RootStore } from '@/store/state';
+import { RootStore } from '@/store/state';
 import { Action, ActionContext, Getter, Module, Mutation } from 'vuex';
 
 export const serviceAvailable =
@@ -7,7 +7,7 @@ export const serviceAvailable =
 export function registerService<TModuleState>(
   store: RootStore,
   serviceId: string,
-  module: Module<TModuleState, RootState>,
+  module: Module<TModuleState, {}>,
 ): void {
   if (!serviceAvailable(store, serviceId)) {
     store.registerModule(serviceId, module);
@@ -57,16 +57,16 @@ export function registerService<TModuleState>(
     fetchBlock(store: RootStore, serviceId: string, block: Block)
 */
 
-type StoreType<TModuleState> = RootStore | ActionContext<TModuleState, RootState>;
+type StoreType<TModuleState> = RootStore | ActionContext<TModuleState, {}>;
 
 const nestedName =
   (serviceId: string, func: Function): string => `${serviceId}/${func.name}`;
 
 export function read<TModuleState>(
-  getter: Getter<TModuleState, RootState>
+  getter: Getter<TModuleState, {}>
 ): (store: StoreType<TModuleState>, serviceId: string) => any {
   return (store: StoreType<TModuleState>, serviceId: string) =>
-    ((store as ActionContext<TModuleState, RootState>).rootGetters
+    ((store as ActionContext<TModuleState, {}>).rootGetters
       || store.getters
     )[nestedName(serviceId, getter)];
 }
@@ -79,7 +79,7 @@ export function commit<TModuleState>(
 }
 
 export function dispatch<TModuleState>(
-  action: Action<TModuleState, RootState>
+  action: Action<TModuleState, {}>
 ): (store: StoreType<TModuleState>, serviceId: string, payload?: any) => Promise<any> {
   return async (store: StoreType<TModuleState>, serviceId: string, payload?: any) =>
     store.dispatch(nestedName(serviceId, action as Function), payload, { root: true });

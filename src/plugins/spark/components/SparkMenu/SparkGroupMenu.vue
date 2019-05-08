@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { serviceById } from '@/store/services/getters';
+import serviceStore from '@/store/services';
 import { blockValues, groupNames } from '../../store/getters';
 import { Block } from '../../state';
 import { saveBlock, updateGroupNames } from '../../store/actions';
@@ -17,7 +17,7 @@ import { saveBlock, updateGroupNames } from '../../store/actions';
 })
 export default class SparkGroupMenu extends Vue {
   get service() {
-    return serviceById(this.$store, this.$props.serviceId);
+    return serviceStore.serviceById(this.$props.serviceId);
   }
 
   get groups() {

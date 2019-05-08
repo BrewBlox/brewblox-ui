@@ -2,14 +2,14 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import providerStore from '@/store/providers';
-import { serviceValues } from '@/store/services/getters';
+import serviceStore from '@/store/services';
 
 @Component
 export default class ServiceWatchers extends Vue {
   $q: any;
 
   get watchers() {
-    return serviceValues(this.$store)
+    return serviceStore.serviceValues
       .map(service => ({
         serviceId: service.id,
         component: providerStore.watcherById(service.type),

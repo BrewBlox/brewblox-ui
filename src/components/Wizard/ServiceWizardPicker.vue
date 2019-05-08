@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import providerStore from '@/store/providers';
-import { serviceIds } from '@/store/services/getters';
+import serviceStore from '@/store/services';
 import isString from 'lodash/isString';
 import { objectStringSorter } from '@/helpers/functional';
 
@@ -27,7 +27,7 @@ export default class ServiceWizardPicker extends Vue {
   get serviceIdRules(): InputRule[] {
     return [
       v => !!v || 'ID is required',
-      v => !serviceIds(this.$store).includes(v) || 'ID must be unique',
+      v => !serviceStore.serviceIds.includes(v) || 'ID must be unique',
     ];
   }
 

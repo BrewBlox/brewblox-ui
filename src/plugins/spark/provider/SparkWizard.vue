@@ -2,11 +2,10 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import providerStore from '@/store/providers';
+import serviceStore from '@/store/services';
 import { validateService } from '@/plugins/spark/store/actions';
 import { typeName } from '@/plugins/spark/store/getters';
 import { Service } from '@/store/services/state';
-import { serviceIds } from '@/store/services/getters';
-import { createService, initService } from '@/store/services/actions';
 
 @Component({
   props: {
@@ -27,12 +26,12 @@ export default class SparkWizard extends Vue {
     const service: Service = {
       id: this.$props.serviceId,
       title: this.$props.serviceTitle,
-      order: serviceIds(this.$store).length + 1,
+      order: serviceStore.serviceIds.length + 1,
       config: {},
       type: typeName,
     };
-    await createService(this.$store, service);
-    await initService(this.$store, service);
+    await serviceStore.createService(service);
+    await serviceStore.initService(service);
     this.$q.notify({
       icon: 'mdi-check-all',
       color: 'positive',

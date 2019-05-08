@@ -1,13 +1,13 @@
 import { registerService } from '@/helpers/dynamic-store';
 import { Service } from '@/store/services/state';
-import { RootState, RootStore } from '@/store/state';
+import { RootStore } from '@/store/state';
 import { Module } from 'vuex';
 import { actions } from './actions';
 import { getters } from './getters';
 import { mutations } from './mutations';
 import { SparkState } from './state';
 
-const module: Module<SparkState, RootState> = {
+const module: Module<SparkState, {}> = {
   actions,
   getters,
   mutations,

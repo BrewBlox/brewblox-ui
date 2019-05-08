@@ -5,8 +5,6 @@ import get from 'lodash/get';
 import { Provider } from './state';
 import { Service } from '../services/state';
 
-console.log(store);
-
 type ServiceFunc = (service: Service) => Promise<any>;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'providers' })

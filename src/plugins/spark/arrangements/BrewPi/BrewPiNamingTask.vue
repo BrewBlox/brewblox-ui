@@ -2,7 +2,7 @@
 import UrlSafeString from 'url-safe-string';
 import Component from 'vue-class-component';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
-import { serviceValues } from '@/store/services/getters';
+import serviceStore from '@/store/services';
 import { typeName, blockIds } from '@/plugins/spark/store/getters';
 import { BrewPiConfig, BrewPiConfigNames } from '@/plugins/spark/arrangements/BrewPi/state';
 import { spaceCased, valOrDefault } from '@/helpers/functional';
@@ -18,7 +18,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   get serviceOpts() {
-    return serviceValues(this.$store)
+    return serviceStore.serviceValues
       .filter(svc => svc.type === typeName)
       .map(svc => ({ label: svc.title, value: svc.id }));
   }
