@@ -1,10 +1,7 @@
 <script lang="ts">
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
-import { MODULE_ID } from '@/plugins/example';
-import { messages } from '@/plugins/example/store/getters';
-import { removeMessage } from '@/plugins/example/store/mutations';
-import { fetchExternal, fetchBackend } from '@/plugins/example/store/actions';
+import exampleModule from '@/plugins/example/store';
 import { ExampleWidgetConfig } from '@/plugins/example/ExampleFeature/state';
 
 /*
@@ -26,26 +23,28 @@ export default class ExampleFeatureWidget extends WidgetBase {
   get messages() {
     // We define a getter for the messages here, so we can access them in the HTML code.
     // The result is cached, and will be automatically updated if the store changes.
-    return messages(this.$store, MODULE_ID);
+    // Note that all widgets share the same store.
+    // Widget A will see results of messages sent by Widget B
+    return exampleModule.messages;
   }
 
   fetchBackend() {
     // We save the configuration, and call the fetch action.
     // fetchBackend() will update VueX when a result arrives, which will trigger an update of `this.messages`.
     this.saveConfig({ lastUrl: this.url });
-    fetchBackend(this.$store, MODULE_ID, this.url);
+    exampleModule.fetchBackend(this.url);
   }
 
   fetchExternal() {
     // Same as fetchBackend(), but with a different store action.
     this.saveConfig({ lastUrl: this.url });
-    fetchExternal(this.$store, MODULE_ID, this.url);
+    exampleModule.fetchExternal(this.url);
   }
 
   removeMessage(idx: number) {
     // We call the VueX mutation from here.
     // `this.messages` will update automatically afterwards.
-    removeMessage(this.$store, MODULE_ID, idx);
+    exampleModule.removeMessage(idx);
   }
 
   alert() {

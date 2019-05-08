@@ -1,5 +1,5 @@
-import { RootState } from '@/store/state';
-import { ActionContext } from 'vuex';
+// import { RootState } from '@/store/state';
+// import { ActionContext } from 'vuex';
 
 export interface Message {
   url: string;
@@ -11,4 +11,4 @@ export interface ExampleState {
   messages: Message[];
 }
 
-export type ExampleContext = ActionContext<ExampleState, RootState>;
+// export type ExampleContext = ActionContext<ExampleState, RootState>;
