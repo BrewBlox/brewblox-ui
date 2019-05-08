@@ -17,11 +17,10 @@ import { Service } from '@/store/services/state';
 import { RootStore } from '@/store/state';
 import features from './features';
 import arrangements from './arrangements';
-import { register } from './store';
 import { createUpdateSource, fetchAll, fetchDiscoveredBlocks, fetchServiceStatus } from './store/actions';
 
 const initialize = async (store: RootStore, service: Service): Promise<void> => {
-  await register(store, service);
+  // await register(store, service);
   await fetchServiceStatus(store, service.id);
   await Promise.all([
     createUpdateSource(store, service.id),
@@ -29,7 +28,7 @@ const initialize = async (store: RootStore, service: Service): Promise<void> => 
   ]);
 };
 
-export default ({ store }: PluginArguments) => {
+export default () => {
   autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
   autoRegister(require.context('./provider', true, /[A-Z]\w+\.vue$/));
 
