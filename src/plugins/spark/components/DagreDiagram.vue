@@ -10,6 +10,11 @@ interface Edge {
   relation: string[];
 }
 
+interface Node {
+  id: string;
+  type: string;
+}
+
 const LABEL_HEIGHT = 50;
 const LABEL_WIDTH = 150;
 
@@ -41,8 +46,19 @@ export default class DagreDiagram extends Vue {
   }
 
   get drawnNodes() {
-    return this.$props.nodes
-      .filter(n => this.edges.find(e => e.source === n.id || e.target === n.id));
+    const findNode = (id: string): Node =>
+      this.$props.nodes.find(node => node.id === id) || { id, type: '???' };
+
+    return this.edges
+      // Create a list of each ID referenced by an edge
+      .reduce((acc: string[], edge: Edge) => [...acc, edge.target, edge.source], [])
+      // Find a node for each unique ID
+      .reduce((acc: Node[], id: string) =>
+        acc.find(node => node.id === id)
+          ? acc
+          : [...acc, findNode(id)],
+        [],
+      );
   }
 
   @Watch('relations', { immediate: true })
