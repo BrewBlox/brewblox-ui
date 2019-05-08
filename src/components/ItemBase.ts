@@ -1,6 +1,6 @@
-import { displayNameById } from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import featureStore from '@/store/features';
 
 @Component({
   props: {
@@ -50,6 +50,6 @@ export default class ItemBase extends Vue {
   }
 
   protected get displayName(): string {
-    return displayNameById(this.$store, this.$props.type);
+    return featureStore.displayNameById(this.$props.type);
   }
 }

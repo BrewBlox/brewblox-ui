@@ -1,4 +1,6 @@
+import Vue from 'vue';
 import { autoRegister } from '@/helpers/component-ref';
+import featureStore from '@/store/features';
 import {
   base64ToHex,
   durationString,
@@ -10,11 +12,9 @@ import {
   truncate,
 } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
-import { createFeature, createArrangement } from '@/store/features/actions';
 import { createProvider } from '@/store/providers/actions';
 import { Service } from '@/store/services/state';
 import { RootStore } from '@/store/state';
-import Vue from 'vue';
 import features from './features';
 import arrangements from './arrangements';
 import { register } from './store';
@@ -51,10 +51,10 @@ export default ({ store }: PluginArguments) => {
   Vue.filter('shortDateString', shortDateString);
 
   Object.values(features)
-    .forEach(feature => createFeature(store, feature));
+    .forEach(feature => featureStore.createFeature(feature));
 
   Object.values(arrangements)
-    .forEach(arr => createArrangement(store, arr));
+    .forEach(arr => featureStore.createArrangement(arr));
 
   createProvider(store, {
     id: 'Spark',

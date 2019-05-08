@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { formById } from '@/store/features/getters';
+import featureStore from '@/store/features';
 import { blocks } from '../store/getters';
 import { saveBlock } from '../store/actions';
 import { Block } from '../state';
@@ -45,7 +45,7 @@ export default class BlockFormButton extends Vue {
 
   get blockForm() {
     return !!this.block
-      ? formById(this.$store, this.block.type)
+      ? featureStore.formById(this.block.type)
       : null;
   }
 

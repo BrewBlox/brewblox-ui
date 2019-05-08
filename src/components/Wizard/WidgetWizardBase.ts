@@ -1,9 +1,8 @@
-import { DashboardItem } from '@/store/dashboards/state';
-import { widgetSizeById } from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import featureStore from '@/store/features';
+import { DashboardItem } from '@/store/dashboards/state';
 import dashboardStore from '@/store/dashboards';
-import { displayNameById } from '@/store/features/getters';
 import { uid } from 'quasar';
 
 export interface NavAction {
@@ -35,11 +34,11 @@ export default class WidgetWizardBase extends Vue {
   }
 
   protected get typeDisplayName(): string {
-    return displayNameById(this.$store, this.typeId);
+    return featureStore.displayNameById(this.typeId);
   }
 
   protected get defaultWidgetSize(): { cols: number; rows: number } {
-    return widgetSizeById(this.$store, this.typeId);
+    return featureStore.widgetSizeById(this.typeId);
   }
 
   protected async createItem(item: DashboardItem): Promise<void> {
@@ -48,7 +47,7 @@ export default class WidgetWizardBase extends Vue {
       this.$q.notify({
         icon: 'mdi-check-all',
         color: 'positive',
-        message: `Created ${displayNameById(this.$store, item.feature)} '${item.title}'`,
+        message: `Created ${featureStore.displayNameById(item.feature)} '${item.title}'`,
       });
     } catch (e) {
       this.$q.notify({

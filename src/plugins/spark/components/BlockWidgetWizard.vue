@@ -1,12 +1,12 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import isString from 'lodash/isString';
+import featureStore from '@/store/features';
 import get from 'lodash/get';
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 import { Block } from '@/plugins/spark/state';
 import { createBlock } from '@/plugins/spark/store/actions';
 import { blockIds, blockValues } from '@/plugins/spark/store/getters';
-import { formById } from '@/store/features/getters';
 import { serviceValues } from '@/store/services/getters';
 import { Service } from '@/store/services/state';
 import { objectStringSorter } from '@/helpers/functional';
@@ -54,7 +54,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
 
   get blockForm() {
     return this.block
-      ? formById(this.$store, this.block.type)
+      ? featureStore.formById(this.block.type)
       : '';
   }
 

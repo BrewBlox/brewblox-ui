@@ -1,10 +1,10 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import featureStore from '@/store/features';
 import { uid } from 'quasar';
 import get from 'lodash/get';
 import dashboardStore from '@/store/dashboards';
-import { displayNameById } from '@/store/features/getters';
 import { deserialize } from '@/helpers/units/parseObject';
 
 @Component({
@@ -52,7 +52,7 @@ export default class ImportWizard extends Vue {
       this.$q.notify({
         icon: 'mdi-check-all',
         color: 'positive',
-        message: `Created ${displayNameById(this.$store, item.feature)} '${item.title}'`,
+        message: `Created ${featureStore.displayNameById(item.feature)} '${item.title}'`,
       });
       this.$emit('close');
     } catch (e) {

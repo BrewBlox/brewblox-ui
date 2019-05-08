@@ -1,9 +1,9 @@
+import featureStore from '@/store/features';
 import { ref } from '@/helpers/component-ref';
 import { serviceAvailable } from '@/helpers/dynamic-store';
 import { BlockConfig } from '@/plugins/spark/state';
 import { removeBlock } from '@/plugins/spark/store/actions';
 import { blocks } from '@/plugins/spark/store/getters';
-import { featureById } from '@/store/features/getters';
 import { Feature, WidgetSelector } from '@/store/features/state';
 import { RootStore } from '@/store/state';
 import wizard from '../BlockWidgetWizard.vue';
@@ -17,7 +17,7 @@ const selector: WidgetSelector =
     }
     const block = blocks(store, config.serviceId)[config.blockId];
     return block
-      ? featureById(store, block.type).widget
+      ? featureStore.widgetById(block.type, config, false)
       : 'UnknownBlockWidget';
   };
 

@@ -1,15 +1,11 @@
 <script lang="ts">
-import { uid } from 'quasar';
-import { objectSorter } from '@/helpers/functional';
-import dashboardStore from '@/store/dashboards';
-import { DashboardItem } from '@/store/dashboards/state';
-import {
-  deletersById,
-  validatorById,
-  widgetById,
-} from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import featureStore from '@/store/features';
+import dashboardStore from '@/store/dashboards';
+import { uid } from 'quasar';
+import { objectSorter } from '@/helpers/functional';
+import { DashboardItem } from '@/store/dashboards/state';
 import { Watch } from 'vue-property-decorator';
 
 interface VueOrdered extends Vue {
@@ -81,11 +77,11 @@ export default class DashboardPage extends Vue {
             // older items may not have a title
             item.title = item.id;
           }
-          const component = widgetById(this.$store, item.feature, item.config);
+          const component = featureStore.widgetById(item.feature, item.config);
           if (!component) {
             throw new Error(`No widget found for ${item.feature}`);
           }
-          const validator = validatorById(this.$store, item.feature);
+          const validator = featureStore.validatorById(item.feature);
           if (!validator(this.$store, item.config)) {
             throw new Error(`${item.feature} validation failed`);
           }
@@ -146,7 +142,7 @@ export default class DashboardPage extends Vue {
         label: 'Remove widget from this dashboard',
         action: deleteItem,
       },
-      ...deletersById(this.$store, item.feature)
+      ...featureStore.deletersById(item.feature)
         .map(del => ({ label: del.description, action: del.action })),
     ].map((opt, idx) => ({ ...opt, value: idx }));
 

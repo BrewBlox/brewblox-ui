@@ -1,5 +1,4 @@
-import { RootState, RootStore } from '@/store/state';
-import { ActionContext } from 'vuex';
+import { RootStore } from '@/store/state';
 
 export interface Deleter {
   description: string;
@@ -38,5 +37,3 @@ export interface FeatureState {
     [id: string]: Arrangement;
   };
 }
-
-export type FeatureContext = ActionContext<FeatureState, RootState>;

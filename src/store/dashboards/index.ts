@@ -15,8 +15,6 @@ import {
   setupDashboardItems as setupDashboardItemsInApi,
 } from './api';
 
-console.log(store);
-
 @Module({ store, namespaced: true, dynamic: true, name: 'dashboards' })
 export class DashboardModule extends VuexModule {
   public replicatingDashboards: boolean = false;

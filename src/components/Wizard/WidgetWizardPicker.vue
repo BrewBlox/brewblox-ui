@@ -1,13 +1,9 @@
 <script lang="ts">
-import { objectStringSorter } from '@/helpers/functional';
-import dashboardStore from '@/store/dashboards';
-import {
-  displayNameById,
-  featureIds,
-  wizardById,
-} from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { objectStringSorter } from '@/helpers/functional';
+import dashboardStore from '@/store/dashboards';
+import featureStore from '@/store/features';
 
 @Component({
   props: {
@@ -41,11 +37,11 @@ export default class WidgetWizardPicker extends Vue {
   }
 
   get wizardOptions() {
-    return featureIds(this.$store)
+    return featureStore.featureIds
       .map(id => ({
-        label: displayNameById(this.$store, id),
+        label: featureStore.displayNameById(id),
         value: id,
-        component: wizardById(this.$store, id),
+        component: featureStore.wizardById(id),
       }))
       .filter(opt => !!opt.component)
       .sort(objectStringSorter('label'));

@@ -2,6 +2,7 @@
 import { uid } from 'quasar';
 import { serviceAvailable } from '@/helpers/dynamic-store';
 import dashboardStore from '@/store/dashboards';
+import featureStore from '@/store/features';
 import { Block, SystemStatus } from '@/plugins/spark/state';
 import {
   renameBlock,
@@ -14,7 +15,6 @@ import {
 } from '@/plugins/spark/store/actions';
 import { allBlocks, lastStatus, blockLinks, discoveredBlocks } from '@/plugins/spark/store/getters';
 import { Dashboard, DashboardItem } from '@/store/dashboards/state';
-import { deletersById, widgetById, widgetSizeById } from '@/store/features/getters';
 import { Service } from '@/store/services/state';
 import { serviceById } from '@/store/services/getters';
 import Vue from 'vue';
@@ -128,14 +128,14 @@ export default class SparkPage extends Vue {
             serviceId: block.serviceId,
             blockId: block.id,
           },
-          ...widgetSizeById(this.$store, block.type),
+          ...featureStore.widgetSizeById(block.type),
         });
     }
     const item = this.volatileItems[key];
     return {
       key,
       item,
-      component: widgetById(this.$store, item.feature, item.config) || 'InvalidWidget',
+      component: featureStore.widgetById(item.feature, item.config) || 'InvalidWidget',
       props: this.itemProps(item),
     };
   }
@@ -177,7 +177,7 @@ export default class SparkPage extends Vue {
     const item = this.volatileItems[this.volatileKey(itemId)];
     // Quasar dialog can't handle objects as value - they will be returned as null
     // As workaround, we use array index as value, and add the "action" key to each option
-    const opts = deletersById(this.$store, item.feature)
+    const opts = featureStore.deletersById(item.feature)
       .map((del, idx) => ({ label: del.description, value: idx, action: del.action }));
 
     if (opts.length === 0) {

@@ -1,12 +1,12 @@
 <script lang="ts">
-import { uid } from 'quasar';
 import Component from 'vue-class-component';
 import dashboardStore from '@/store/dashboards';
+import featureStore from '@/store/features';
+import { uid } from 'quasar';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { Unit, Link } from '@/helpers/units';
 import { BrewPiConfig } from '@/plugins/spark/arrangements/BrewPi/state';
 import { renameBlock, createBlock, saveBlock } from '@/plugins/spark/store/actions';
-import { widgetSizeById } from '@/store/features/getters';
 import { RootStore } from '@/store/state';
 import { typeName as spProfileType } from '@/plugins/spark/features/SetpointProfile/getters';
 import { typeName as pairType } from '@/plugins/spark/features/SetpointSensorPair/getters';
@@ -233,7 +233,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
     const createWidget =
       (name: string, type: string) => ({
         ...genericSettings,
-        ...widgetSizeById(this.$store, type),
+        ...featureStore.widgetSizeById(type),
         id: uid(),
         title: name,
         feature: type,
