@@ -93,7 +93,8 @@
     "vue-cli-plugin-quasar": "^1.0.0-beta.0",
     "vue-cli-plugin-webpack-bundle-analyzer": "^1.2.0",
     "vue-eslint-parser": "^4.0.3",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.6.10",
+    "vuex-module-decorators": "^0.9.8"
   },
   "browserslist": [
     "> 1%",
