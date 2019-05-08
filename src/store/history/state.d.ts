@@ -1,6 +1,3 @@
-import { RootState } from '@/store/state';
-import { ActionContext } from 'vuex';
-
 export interface QueryParams {
   database?: string;
   start?: string | number;
@@ -34,7 +31,7 @@ export interface QueryResult {
 
 export interface Listener {
   id: string;
-  transformer: (listener: Listener, result: any) => Listener;
+  transformer: (listener: any, result: any) => Listener;
   params: QueryParams;
   target: QueryTarget;
   renames: DisplayNames;
@@ -45,14 +42,3 @@ export interface Listener {
 export interface GraphValuesListener extends Listener {
   axes: GraphValueAxes;
 }
-
-export interface HistoryState {
-  availableFields: {
-    [measurement: string]: string[];
-  };
-  listeners: {
-    [id: string]: Listener;
-  };
-}
-
-export type HistoryContext = ActionContext<HistoryState, RootState>;

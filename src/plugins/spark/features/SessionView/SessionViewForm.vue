@@ -1,13 +1,12 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import shortid from 'shortid';
+import historyStore from '@/store/history';
 import { objectSorter } from '@/helpers/functional';
 import FormBase from '@/components/Form/FormBase';
 import { nodeBuilder, targetSplitter, targetBuilder, QuasarNode, expandedNodes } from '@/components/Graph/functional';
 import { SessionViewConfig, Session } from '@/plugins/spark/features/SessionView/state';
 import { durationString } from '@/helpers/functional';
-import { fields } from '@/store/history/getters';
-import { fetchKnownKeys } from '@/store/history/actions';
 
 @Component({
   props: {
@@ -32,7 +31,7 @@ export default class SessionViewForm extends FormBase {
   }
 
   get nodes() {
-    return nodeBuilder(fields(this.$store));
+    return nodeBuilder(historyStore.fields);
   }
 
   get graphSession() {
@@ -135,7 +134,7 @@ export default class SessionViewForm extends FormBase {
   }
 
   created() {
-    fetchKnownKeys(this.$store);
+    historyStore.fetchKnownKeys();
   }
 }
 </script>
