@@ -1,5 +1,5 @@
 <script lang="ts">
-import { setupApi as setupDashboardsApi } from '@/store/dashboards/actions';
+import dashboardStore from '@/store/dashboards';
 import { setupApi as setupServicesApi } from '@/store/services/actions';
 import Vue from 'vue';
 import Component from 'vue-class-component';
@@ -9,7 +9,7 @@ export default class App extends Vue {
   async created() {
     await Promise.all([
       setupServicesApi(this.$store),
-      setupDashboardsApi(this.$store),
+      dashboardStore.setup(),
     ]);
   }
 }

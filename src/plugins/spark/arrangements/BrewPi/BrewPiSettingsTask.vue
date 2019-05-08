@@ -1,11 +1,11 @@
 <script lang="ts">
 import { uid } from 'quasar';
 import Component from 'vue-class-component';
+import dashboardStore from '@/store/dashboards';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { Unit, Link } from '@/helpers/units';
 import { BrewPiConfig } from '@/plugins/spark/arrangements/BrewPi/state';
 import { renameBlock, createBlock, saveBlock } from '@/plugins/spark/store/actions';
-import { createDashboard, appendDashboardItem } from '@/store/dashboards/actions';
 import { widgetSizeById } from '@/store/features/getters';
 import { RootStore } from '@/store/state';
 import { typeName as spProfileType } from '@/plugins/spark/features/SetpointProfile/getters';
@@ -17,7 +17,6 @@ import {
   typeName as pidType,
   defaultData as pidData,
 } from '@/plugins/spark/features/Pid/getters';
-import { dashboardIds } from '@/store/dashboards/getters';
 import { blockById } from '@/plugins/spark/store/getters';
 import { Dashboard } from '@/store/dashboards/state';
 
@@ -294,17 +293,17 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       },
 
       async (store: RootStore, cfg: BrewPiConfig): Promise<void> => {
-        if (!dashboardIds(store).includes(cfg.dashboardId)) {
+        if (!dashboardStore.dashboardIds.includes(cfg.dashboardId)) {
           const dashboard: Dashboard = {
             id: cfg.dashboardId,
             title: cfg.dashboardTitle,
-            order: dashboardIds(store).length + 1,
+            order: dashboardStore.dashboardIds.length + 1,
           };
-          await createDashboard(store, dashboard);
+          await dashboardStore.createDashboard(dashboard);
         }
         await Promise.all(
           cfg.widgets
-            .map(item => appendDashboardItem(store, item)));
+            .map(item => dashboardStore.appendDashboardItem(item)));
       },
     ]);
   }

@@ -5,7 +5,7 @@ import { getBackend, getExternal } from './api';
 
 type FilterFunc = (message: Message) => boolean;
 
-@Module({ store, namespaced: true })
+@Module({ store, namespaced: true, dynamic: true, name: 'exampleStore' })
 export class ExampleModule extends VuexModule {
   private _messages: Message[] = [];
 

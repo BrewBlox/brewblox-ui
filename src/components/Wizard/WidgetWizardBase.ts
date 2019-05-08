@@ -2,7 +2,7 @@ import { DashboardItem } from '@/store/dashboards/state';
 import { widgetSizeById } from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { appendDashboardItem } from '@/store/dashboards/actions';
+import dashboardStore from '@/store/dashboards';
 import { displayNameById } from '@/store/features/getters';
 import { uid } from 'quasar';
 
@@ -44,7 +44,7 @@ export default class WidgetWizardBase extends Vue {
 
   protected async createItem(item: DashboardItem): Promise<void> {
     try {
-      await appendDashboardItem(this.$store, item);
+      await dashboardStore.appendDashboardItem(item);
       this.$q.notify({
         icon: 'mdi-check-all',
         color: 'positive',

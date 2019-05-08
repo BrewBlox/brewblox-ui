@@ -1,5 +1,6 @@
 <script lang="ts">
 import { objectStringSorter } from '@/helpers/functional';
+import dashboardStore from '@/store/dashboards';
 import {
   displayNameById,
   featureIds,
@@ -7,7 +8,6 @@ import {
 } from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { dashboardValues, primaryDashboardId } from '@/store/dashboards/getters';
 
 @Component({
   props: {
@@ -28,7 +28,7 @@ export default class WidgetWizardPicker extends Vue {
   get chosenDashboardId() {
     return this.localChosenDashboardId
       || this.$props.dashboardId
-      || primaryDashboardId(this.$store);
+      || dashboardStore.primaryDashboardId;
   }
 
   set chosenDashboardId(id: string) {
@@ -36,7 +36,7 @@ export default class WidgetWizardPicker extends Vue {
   }
 
   get dashboardOptions() {
-    return dashboardValues(this.$store)
+    return dashboardStore.dashboardValues
       .map(dash => ({ label: dash.title, value: dash.id }));
   }
 

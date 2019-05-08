@@ -1,5 +1,5 @@
 <script lang="ts">
-import { primaryDashboardId } from '@/store/dashboards/getters';
+import dashboardStore from '@/store/dashboards';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
@@ -7,7 +7,7 @@ import { Watch } from 'vue-property-decorator';
 @Component
 export default class IndexPage extends Vue {
   get primaryDashboardId() {
-    return primaryDashboardId(this.$store);
+    return dashboardStore.primaryDashboardId;
   }
 
   @Watch('primaryDashboardId', { immediate: true })

@@ -1,6 +1,7 @@
 <script lang="ts">
 import { uid } from 'quasar';
 import { serviceAvailable } from '@/helpers/dynamic-store';
+import dashboardStore from '@/store/dashboards';
 import { Block, SystemStatus } from '@/plugins/spark/state';
 import {
   renameBlock,
@@ -12,8 +13,6 @@ import {
   clearBlocks,
 } from '@/plugins/spark/store/actions';
 import { allBlocks, lastStatus, blockLinks, discoveredBlocks } from '@/plugins/spark/store/getters';
-import { appendDashboardItem } from '@/store/dashboards/actions';
-import { dashboardValues, dashboardById } from '@/store/dashboards/getters';
 import { Dashboard, DashboardItem } from '@/store/dashboards/state';
 import { deletersById, widgetById, widgetSizeById } from '@/store/features/getters';
 import { Service } from '@/store/services/state';
@@ -58,7 +57,7 @@ export default class SparkPage extends Vue {
   }
 
   get dashboards(): Dashboard[] {
-    return dashboardValues(this.$store);
+    return dashboardStore.dashboardValues;
   }
 
   get isAvailable() {
@@ -218,11 +217,11 @@ export default class SparkPage extends Vue {
         if (!dashboard) {
           return;
         }
-        appendDashboardItem(this.$store, { ...item, id, dashboard });
+        dashboardStore.appendDashboardItem({ ...item, id, dashboard });
         this.$q.notify({
           color: 'positive',
           icon: 'file_copy',
-          message: `Copied ${item.title} to ${dashboardById(this.$store, dashboard).title}`,
+          message: `Copied ${item.title} to ${dashboardStore.dashboardById(dashboard).title}`,
         });
       });
   }

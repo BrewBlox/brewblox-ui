@@ -1,6 +1,5 @@
 import { dispatch } from '@/helpers/dynamic-store';
-import { dashboardItemValues } from '@/store/dashboards/getters';
-import { setDashboardItem } from '@/store/dashboards/mutations';
+import dashboardStore from '@/store/dashboards';
 import { saveService } from '@/store/services/actions';
 import { Service } from '@/store/services/state';
 import { RootState, RootStore } from '@/store/state';
@@ -88,9 +87,9 @@ export const renameBlock =
     }
     await renameBlockInApi(serviceId, currentId, newId);
     await fetchBlocks(store, serviceId);
-    dashboardItemValues(store)
+    dashboardStore.itemValues
       .filter(item => item.config.serviceId === serviceId && item.config.blockId === currentId)
-      .forEach(item => setDashboardItem(store, { ...item, config: { ...item.config, blockId: newId } }));
+      .forEach(item => dashboardStore.commitDashboardItem({ ...item, config: { ...item.config, blockId: newId } }));
   };
 
 export const clearBlocks =

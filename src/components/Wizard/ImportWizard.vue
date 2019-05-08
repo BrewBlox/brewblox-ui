@@ -3,9 +3,8 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { uid } from 'quasar';
 import get from 'lodash/get';
+import dashboardStore from '@/store/dashboards';
 import { displayNameById } from '@/store/features/getters';
-import { dashboardValues, primaryDashboardId } from '@/store/dashboards/getters';
-import { appendDashboardItem } from '@/store/dashboards/actions';
 import { deserialize } from '@/helpers/units/parseObject';
 
 @Component({
@@ -26,7 +25,7 @@ export default class ImportWizard extends Vue {
   get chosenDashboardId() {
     return this.localChosenDashboardId
       || this.$props.dashboardId
-      || primaryDashboardId(this.$store);
+      || dashboardStore.primaryDashboardId;
   }
 
   set chosenDashboardId(id: string) {
@@ -34,7 +33,7 @@ export default class ImportWizard extends Vue {
   }
 
   get dashboardOptions() {
-    return dashboardValues(this.$store)
+    return dashboardStore.dashboardValues
       .map(dash => ({ label: dash.title, value: dash.id }));
   }
 
@@ -49,7 +48,7 @@ export default class ImportWizard extends Vue {
         id: uid(),
         dashboard: this.chosenDashboardId,
       };
-      await appendDashboardItem(this.$store, item);
+      await dashboardStore.appendDashboardItem(item);
       this.$q.notify({
         icon: 'mdi-check-all',
         color: 'positive',

@@ -2,21 +2,7 @@
 import UrlSafeString from 'url-safe-string';
 import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
 import { objectSorter } from '@/helpers/functional';
-import {
-  removeDashboard,
-  updateDashboardOrder,
-  updatePrimaryDashboard,
-  saveDashboard,
-  createDashboard,
-  saveDashboardItem,
-} from '@/store/dashboards/actions';
-import {
-  dashboardValues,
-  primaryDashboardId,
-  dashboardIds,
-  dashboardItemValues,
-  dashboardById,
-} from '@/store/dashboards/getters';
+import dashboardStore from '@/store/dashboards';
 import { Dashboard } from '@/store/dashboards/state';
 import {
   removeService,
@@ -49,15 +35,15 @@ export default class DefaultLayout extends Vue {
   }
 
   get dashboards() {
-    return [...dashboardValues(this.$store)].sort(objectSorter('order'));
+    return [...dashboardStore.dashboardValues].sort(objectSorter('order'));
   }
 
   set dashboards(dashboards: Dashboard[]) {
-    updateDashboardOrder(this.$store, dashboards.map(dashboard => dashboard.id));
+    dashboardStore.updateDashboardOrder(dashboards.map(dashboard => dashboard.id));
   }
 
   get defaultDashboard() {
-    return primaryDashboardId(this.$store);
+    return dashboardStore.primaryDashboardId;
   }
 
   get services() {
@@ -75,7 +61,7 @@ export default class DefaultLayout extends Vue {
       ok: 'Confirm',
       cancel: 'Cancel',
     })
-      .onOk(() => removeDashboard(this.$store, dashboard));
+      .onOk(() => dashboardStore.removeDashboard(dashboard));
   }
 
   changeDashboardId(dashboard: Dashboard) {
@@ -94,7 +80,7 @@ export default class DefaultLayout extends Vue {
           return;
         }
 
-        if (dashboardIds(this.$store).includes(newId)) {
+        if (dashboardStore.dashboardIds.includes(newId)) {
           this.$q.notify({
             color: 'negative',
             icon: 'error',
@@ -108,18 +94,18 @@ export default class DefaultLayout extends Vue {
   }
 
   async doChangeDashboardId(oldId: string, newId: string) {
-    const dashboard = dashboardById(this.$store, oldId);
+    const dashboard = dashboardStore.dashboardById(oldId);
 
-    await createDashboard(this.$store, { ...dashboard, id: newId });
+    await dashboardStore.createDashboard({ ...dashboard, id: newId });
     await Promise.all(
-      dashboardItemValues(this.$store)
+      dashboardStore.itemValues
         .filter(item => item.dashboard === oldId)
-        .map(item => saveDashboardItem(this.$store, { ...item, dashboard: newId }))
+        .map(item => dashboardStore.saveDashboardItem({ ...item, dashboard: newId }))
     );
-    await removeDashboard(this.$store, { ...dashboard });
+    await dashboardStore.removeDashboard({ ...dashboard });
 
     if (this.defaultDashboard === oldId) {
-      await updatePrimaryDashboard(this.$store, newId);
+      await dashboardStore.updatePrimaryDashboard(newId);
     }
 
     if (this.$route.path === `/dashboard/${oldId}`) {
@@ -137,7 +123,7 @@ export default class DefaultLayout extends Vue {
     if (id === oldId) {
       return null;
     }
-    const existingIds = dashboardIds(this.$store);
+    const existingIds = dashboardStore.dashboardIds;
     if (!existingIds.includes(id)) {
       return id;
     }
@@ -172,7 +158,7 @@ export default class DefaultLayout extends Vue {
           return;
         }
 
-        await saveDashboard(this.$store, { ...dashboard, title: newTitle });
+        await dashboardStore.saveDashboard({ ...dashboard, title: newTitle });
         this.$q.notify({
           color: 'positive',
           icon: 'edit',
@@ -230,7 +216,7 @@ export default class DefaultLayout extends Vue {
   }
 
   updateDefaultDashboard(id: string) {
-    updatePrimaryDashboard(this.$store, this.defaultDashboard === id ? null : id);
+    dashboardStore.updatePrimaryDashboard(this.defaultDashboard === id ? null : id);
   }
 
   openWizard(component: string | null = null) {

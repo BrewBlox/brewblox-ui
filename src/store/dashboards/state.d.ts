@@ -1,6 +1,3 @@
-import { ActionContext } from 'vuex';
-import { RootState } from '../state';
-
 export interface Dashboard {
   id: string;
   title: string;
@@ -21,16 +18,3 @@ export interface DashboardItem {
   pinnedPosition?: XYPosition | null;
   _rev?: string;
 }
-
-export interface DashboardState {
-  replicatingDashboards: boolean;
-  dashboards: {
-    [id: string]: Dashboard;
-  };
-  replicatingItems: boolean;
-  items: {
-    [id: string]: DashboardItem;
-  };
-}
-
-export type DashboardContext = ActionContext<DashboardState, RootState>;

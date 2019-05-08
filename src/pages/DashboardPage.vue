@@ -1,22 +1,7 @@
 <script lang="ts">
 import { uid } from 'quasar';
 import { objectSorter } from '@/helpers/functional';
-import {
-  removeDashboardItem,
-  saveDashboard,
-  saveDashboardItem,
-  updateDashboardItemConfig,
-  updateDashboardItemOrder,
-  updateDashboardItemSize,
-  appendDashboardItem,
-} from '@/store/dashboards/actions';
-import {
-  dashboardValues,
-  dashboardById,
-  dashboardItemsByDashboardId,
-  dashboardItemValues,
-  dashboardItemById,
-} from '@/store/dashboards/getters';
+import dashboardStore from '@/store/dashboards';
 import { DashboardItem } from '@/store/dashboards/state';
 import {
   deletersById,
@@ -54,19 +39,19 @@ export default class DashboardPage extends Vue {
   }
 
   get dashboard() {
-    return dashboardById(this.$store, this.dashboardId);
+    return dashboardStore.dashboardById(this.dashboardId);
   }
 
   get allDashboards() {
-    return dashboardValues(this.$store);
+    return dashboardStore.dashboardValues;
   }
 
   get allItems() {
-    return dashboardItemValues(this.$store);
+    return dashboardStore.itemValues;
   }
 
   get items() {
-    return dashboardItemsByDashboardId(this.$store, this.dashboardId)
+    return dashboardStore.dashboardItemsByDashboardId(this.dashboardId)
       .sort(objectSorter('order'));
   }
 
@@ -121,7 +106,7 @@ export default class DashboardPage extends Vue {
   }
 
   onChangeDashboardTitle(title: string) {
-    saveDashboard(this.$store, { ...this.dashboard, title });
+    dashboardStore.saveDashboard({ ...this.dashboard, title });
   }
 
   async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: VueOrdered[]) {
@@ -130,31 +115,29 @@ export default class DashboardPage extends Vue {
       this.validatedItems
         .filter(valItem => valItem.item.id === id)
         .forEach(valItem => valItem.item.pinnedPosition = pinnedPosition);
-      await saveDashboardItem(
-        this.$store,
-        { ...dashboardItemById(this.$store, id), pinnedPosition },
-      );
-      await updateDashboardItemOrder(this.$store, order.map(item => item.id));
+      await dashboardStore.saveDashboardItem({ ...dashboardStore.dashboardItemById(id), pinnedPosition });
+      await dashboardStore.updateDashboardItemOrder(order.map(item => item.id));
     } catch (e) {
       throw e;
     }
   }
 
   async onChangeSize(id: string, cols: number, rows: number) {
-    await updateDashboardItemSize(this.$store, { id, cols, rows });
+    await dashboardStore.updateDashboardItemSize({ id, cols, rows });
   }
 
   async onChangeItemConfig(id: string, config: any) {
-    await updateDashboardItemConfig(this.$store, { id, config });
+    await dashboardStore.updateDashboardItemConfig({ id, config });
   }
 
   async onChangeItemTitle(id: string, title: string) {
-    await saveDashboardItem(this.$store, { ...dashboardItemById(this.$store, id), title });
+    const item = dashboardStore.dashboardItemById(id);
+    await dashboardStore.saveDashboardItem({ ...item, title });
   }
 
   onDeleteItem(itemId: string) {
-    const item = dashboardItemById(this.$store, itemId);
-    const deleteItem = () => removeDashboardItem(this.$store, item);
+    const item = dashboardStore.dashboardItemById(itemId);
+    const deleteItem = () => dashboardStore.removeDashboardItem(item);
 
     // Quasar dialog can't handle objects as value - they will be returned as null
     // As workaround, we use array index as value, and add the "action" key to each option
@@ -182,7 +165,7 @@ export default class DashboardPage extends Vue {
   }
 
   onCopyItem(itemId: string) {
-    const item = dashboardItemById(this.$store, itemId);
+    const item = dashboardStore.dashboardItemById(itemId);
     const id = uid();
     this.$q.dialog({
       title: 'Copy widget',
@@ -199,18 +182,18 @@ export default class DashboardPage extends Vue {
         if (!dashboard) {
           return;
         }
-        appendDashboardItem(this.$store, { ...item, id, dashboard, pinnedPosition: null });
+        dashboardStore.appendDashboardItem({ ...item, id, dashboard, pinnedPosition: null });
         this.$q.notify({
           color: 'positive',
           icon: 'file_copy',
-          message: `Copied ${item.title} to ${dashboardById(this.$store, dashboard).title}`,
+          message: `Copied ${item.title} to ${dashboardStore.dashboardById(dashboard).title}`,
         });
       });
 
   }
 
   onMoveItem(itemId: string) {
-    const item = dashboardItemById(this.$store, itemId);
+    const item = dashboardStore.dashboardItemById(itemId);
     this.$q.dialog({
       title: 'Move widget',
       message: `To which dashboard do you want to move widget ${item.title}?`,
@@ -224,7 +207,7 @@ export default class DashboardPage extends Vue {
       cancel: true,
     })
       .onOk((dashboard: string) =>
-        dashboard && saveDashboardItem(this.$store, { ...item, dashboard, pinnedPosition: null }));
+        dashboard && dashboardStore.saveDashboardItem({ ...item, dashboard, pinnedPosition: null }));
   }
 }
 </script>
