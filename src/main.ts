@@ -24,10 +24,7 @@ const plugins = [
   example,
 ];
 
-plugins.forEach(plugin => plugin({
-  store,
-  router,
-}));
+plugins.forEach(plugin => plugin());
 
 new Vue({
   router,
