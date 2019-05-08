@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import providerStore from '@/store/providers';
 import { autoRegister } from '@/helpers/component-ref';
 import featureStore from '@/store/features';
 import {
@@ -12,7 +13,6 @@ import {
   truncate,
 } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
-import { createProvider } from '@/store/providers/actions';
 import { Service } from '@/store/services/state';
 import { RootStore } from '@/store/state';
 import features from './features';
@@ -56,7 +56,7 @@ export default ({ store }: PluginArguments) => {
   Object.values(arrangements)
     .forEach(arr => featureStore.createArrangement(arr));
 
-  createProvider(store, {
+  providerStore.createProvider({
     id: 'Spark',
     displayName: 'Spark Controller',
     features: Object.keys(features),

@@ -1,9 +1,8 @@
 <script lang="ts">
 import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
-
+import providerStore from '@/store/providers';
 import { serviceAvailable } from '@/helpers/dynamic-store';
-import { pageById } from '@/store/providers/getters';
 import { serviceById, serviceExists } from '@/store/services/getters';
 import InvalidPage from './InvalidPage.vue';
 
@@ -25,7 +24,7 @@ export default class ServicePage extends Vue {
   pageComponent(): string | VueConstructor {
     try {
       const service = serviceById(this.$store, this.serviceId);
-      return pageById(this.$store, service.type) || InvalidPage;
+      return providerStore.pageById(service.type) || InvalidPage;
     } catch (e) {
       return InvalidPage;
     }

@@ -85,10 +85,10 @@ In order to support the `gizmo` device:
 * Create the `src/plugins/gizmo` directory.
 * In `src/plugins/gizmo/index.ts`, add an initializer:
 ```js
-import { createProvider } from '@/store/providers/actions';
+import providerStore from '@/store/providers';
 
 export default({ store, router }: PluginArguments) => {
-  createProvider(store, {
+  providerStore.createProvider({
     id: 'Gizmo',
     displayName: 'Totally Awesome Gizmo Device',
 
@@ -96,10 +96,10 @@ export default({ store, router }: PluginArguments) => {
     features: [],
 
     // Called whenever a new service is created
-    initializer: async (store, service) => {},
+    initializer: async (service) => {},
 
     // Called after a service is created
-    fetcher: async (store, service) => {},
+    fetcher: async (service) => {},
 
     // Globally registered Vue components
     wizard: 'GizmoWizard',
@@ -121,38 +121,45 @@ const plugins = [
 
 ## Add a separate store for my provider
 
-Plugins can define and register their own store modules. If you only need a single store for your provider (it is shared by all services of type `Gizmo`), you can register it during plugin initialization.
-
-If each `Gizmo` service needs a separate store, it should be registered in the `initializer` function defined in the provider.
+Plugins can define and register their own store modules.
 
 ```js
-import { registerService } from '@/helpers/dynamic-store';
-import { Service } from '@/store/services/state';
-import { RootState, RootStore } from '@/store/state';
-import { Module } from 'vuex';
-import { actions } from './actions';
-import { getters } from './getters';
-import { mutations } from './mutations';
-import { GizmoState } from './state';
+import Vue from 'vue';
+import store from '@/store';
+import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
 
-const module: Module<GizmoState, RootState> = {
-  actions,
-  getters,
-  mutations,
-  namespaced: true,
-  // state as a function allows creating this module multiple times under different names
-  state: () => ({
-    gizmos: {},
-    gadgets: [],
-    awesome: true,
-  }),
-};
+@Module({ store, namespaced: true, dynamic: true, name: 'providers' })
+export class GizmoModule extends VuexModule {
+  public gizmos: Record<String, any> = {};
+  public gadgets: any[] = [];
 
-// We're using service ID here - this will create a store module specific to this service
-export const register = async (store: RootStore, service: Service) =>
-  registerService(store, service.id, module);
+  public get awesome(): boolean {
+    return true;
+  }
+
+  @Mutation
+  public setGizmo(gizmo: Gizmo): void {
+    // Using Vue.set ensures the new gizmo is picked up by reactive getters
+    Vue.set(this.gizmos, gizmo.id, gizmo);
+  }
+
+  @Mutation
+  public addGadget(gadget: Gadget): void {
+    // Array.prototype.push is watched by Vue, and will be reactive
+    this.gadgets.push(gadget);
+  }
+
+  // the commit will be automatically called with the return value
+  @Action({ commit: 'addGadget' })
+  public async createGadget() {
+    return { name: 'new gadget' };
+  }
+}
+
+// Allows directly calling getters and functions in components
+export default getModule(GizmoModule)
 ```
-See [Vuex dynamic modules][dynamic-vuex] for more information on dynamic stores.
+
 
 
 

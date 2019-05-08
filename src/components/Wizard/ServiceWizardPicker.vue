@@ -1,12 +1,8 @@
 <script lang="ts">
-import {
-  displayNameById,
-  providerIds,
-  wizardById,
-} from '@/store/providers/getters';
-import { serviceIds } from '@/store/services/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import providerStore from '@/store/providers';
+import { serviceIds } from '@/store/services/getters';
 import isString from 'lodash/isString';
 import { objectStringSorter } from '@/helpers/functional';
 
@@ -19,10 +15,10 @@ export default class ServiceWizardPicker extends Vue {
   serviceWizardActive: boolean = false;
 
   get wizardOptions() {
-    return providerIds(this.$store)
+    return providerStore.providerIds
       .map(id => ({
-        label: displayNameById(this.$store, id),
-        value: wizardById(this.$store, id),
+        label: providerStore.displayNameById(id),
+        value: providerStore.wizardById(id),
       }))
       .filter(opt => opt.value)
       .sort(objectStringSorter('label'));

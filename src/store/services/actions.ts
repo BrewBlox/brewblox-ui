@@ -1,6 +1,6 @@
+import providerStore from '@/store/providers';
 import { createAccessors } from '@/helpers/static-store';
 import { ActionTree } from 'vuex';
-import { fetcherById, initializerById } from '@/store/providers/getters';
 import { RootState, RootStore } from '../state';
 import {
   createService as createServiceInApi,
@@ -48,8 +48,8 @@ export const updateServiceOrder = dispatch(actions.updateServiceOrder);
 
 export const initService =
   async (store: RootStore, service: Service): Promise<void> => {
-    await initializerById(store, service.type)(store, service);
-    await fetcherById(store, service.type)(store, service);
+    await providerStore.initializerById(service.type)(service);
+    await providerStore.fetcherById(service.type)(service);
   };
 
 export const setupApi = async (store: RootStore): Promise<void> => {

@@ -1,8 +1,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import providerStore from '@/store/providers';
 import { serviceValues } from '@/store/services/getters';
-import { watcherById } from '@/store/providers/getters';
 
 @Component
 export default class ServiceWatchers extends Vue {
@@ -10,7 +10,10 @@ export default class ServiceWatchers extends Vue {
 
   get watchers() {
     return serviceValues(this.$store)
-      .map(service => ({ serviceId: service.id, component: watcherById(this.$store, service.type) }))
+      .map(service => ({
+        serviceId: service.id,
+        component: providerStore.watcherById(service.type),
+      }))
       .filter(w => !!w.component);
   }
 }

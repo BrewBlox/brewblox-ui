@@ -1,12 +1,12 @@
 <script lang="ts">
-import { validateService } from '@/plugins/spark/store/actions';
-import { typeName } from '@/plugins/spark/store/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import providerStore from '@/store/providers';
+import { validateService } from '@/plugins/spark/store/actions';
+import { typeName } from '@/plugins/spark/store/getters';
 import { Service } from '@/store/services/state';
 import { serviceIds } from '@/store/services/getters';
 import { createService, initService } from '@/store/services/actions';
-import { displayNameById } from '@/store/providers/getters';
 
 @Component({
   props: {
@@ -36,7 +36,7 @@ export default class SparkWizard extends Vue {
     this.$q.notify({
       icon: 'mdi-check-all',
       color: 'positive',
-      message: `Added ${displayNameById(this.$store, service.type)} ${service.title}`,
+      message: `Added ${providerStore.displayNameById(service.type)} ${service.title}`,
     });
     this.$emit('close');
   }

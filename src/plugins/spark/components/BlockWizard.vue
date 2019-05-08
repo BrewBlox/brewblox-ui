@@ -3,10 +3,10 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import isString from 'lodash/isString';
 import featureStore from '@/store/features';
+import providerStore from '@/store/providers';
 import { objectStringSorter } from '@/helpers/functional';
 import { Block } from '@/plugins/spark/state';
 import { blockIds } from '@/plugins/spark/store/getters';
-import { featuresById } from '@/store/providers/getters';
 import { createBlock } from '@/plugins/spark/store/actions';
 
 @Component({
@@ -45,7 +45,7 @@ export default class BlockWizard extends Vue {
   }
 
   get wizardOptions() {
-    return featuresById(this.$store, 'Spark')
+    return providerStore.featuresById('Spark')
       .map(id => ({
         label: featureStore.displayNameById(id),
         value: id,
