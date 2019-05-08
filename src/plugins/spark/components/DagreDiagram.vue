@@ -85,9 +85,6 @@ export default class DagreDiagram extends Vue {
       .Graph({ multigraph: true })
       .setGraph({ marginx: 20, marginy: 20 });
 
-    console.log(JSON.stringify(this.edges, null, 2));
-    console.log(JSON.stringify(this.drawnNodes, null, 2));
-
     this.drawnNodes.forEach(val => {
       obj.setNode(val.id, {
         id: val.id,
