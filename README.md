@@ -131,7 +131,7 @@ import Vue from 'vue';
 import store from '@/store';
 import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
 
-@Module({ store, namespaced: true, dynamic: true, name: 'providers' })
+@Module({ store, namespaced: true, dynamic: true, name: 'gizmos' })
 export class GizmoModule extends VuexModule {
   public gizmos: Record<String, any> = {};
   public gadgets: any[] = [];
