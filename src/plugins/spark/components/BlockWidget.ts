@@ -1,10 +1,9 @@
-import { GraphConfig } from '@/components/Graph/state';
 import WidgetBase from '@/components/Widget/WidgetBase';
+import sparkStore from '@/plugins/spark/store';
+import { GraphConfig } from '@/components/Graph/state';
 import { QueryParams, GraphValueAxes } from '@/store/history/state';
 import Component from 'vue-class-component';
 import { Block } from '../state';
-import { fetchBlock, renameBlock, saveBlock } from '../store/actions';
-import { blockById, drivenChains } from '../store/getters';
 import { Watch } from 'vue-property-decorator';
 
 @Component
@@ -36,11 +35,11 @@ export default class BlockWidget extends WidgetBase {
   }
 
   protected get block(): Block {
-    return blockById(this.$store, this.serviceId, this.blockId);
+    return sparkStore.blockById(this.serviceId, this.blockId);
   }
 
   protected get isDriven(): boolean {
-    return drivenChains(this.$store, this.serviceId)
+    return sparkStore.drivenChains(this.serviceId)
       .some((chain: string[]) => chain[0] === this.blockId);
   }
 
@@ -120,12 +119,12 @@ export default class BlockWidget extends WidgetBase {
   }
 
   protected async refreshBlock(): Promise<void> {
-    await fetchBlock(this.$store, this.serviceId, this.block)
+    await sparkStore.fetchBlock([this.serviceId, this.block])
       .catch(err => this.$q.notify(err.toString()));
   }
 
   protected async saveBlock(block: Block = this.block): Promise<void> {
-    await saveBlock(this.$store, this.serviceId, block)
+    await sparkStore.saveBlock([this.serviceId, block])
       .catch((err: Error) => {
         this.$q.notify({
           icon: 'error',
@@ -141,7 +140,7 @@ export default class BlockWidget extends WidgetBase {
   }
 
   protected changeBlockId(newId: string): void {
-    renameBlock(this.$store, this.serviceId, this.blockId, newId)
+    sparkStore.renameBlock([this.serviceId, this.blockId, newId])
       .catch(err => this.$q.notify(err.toString()));
   }
 

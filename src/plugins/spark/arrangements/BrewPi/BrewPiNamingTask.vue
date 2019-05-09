@@ -3,7 +3,8 @@ import UrlSafeString from 'url-safe-string';
 import Component from 'vue-class-component';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import serviceStore from '@/store/services';
-import { typeName, blockIds } from '@/plugins/spark/store/getters';
+import sparkStore from '@/plugins/spark/store';
+import { typeName } from '@/plugins/spark/getters';
 import { BrewPiConfig, BrewPiConfigNames } from '@/plugins/spark/arrangements/BrewPi/state';
 import { spaceCased, valOrDefault } from '@/helpers/functional';
 import mapValues from 'lodash/mapValues';
@@ -107,7 +108,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
     if (!this.serviceId) {
       return false;
     }
-    return blockIds(this.$store, this.serviceId).includes(val);
+    return sparkStore.blockIds(this.serviceId).includes(val);
   }
 
   updateName(key: string, val: string) {

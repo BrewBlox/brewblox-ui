@@ -96,10 +96,13 @@ export default({ store, router }: PluginArguments) => {
     features: [],
 
     // Called whenever a new service is created
-    initializer: async (service) => {},
+    onAdd: async (service) => {},
+
+    // Called whenever a service is removed
+    onRemove: async (service) => {},
 
     // Called after a service is created
-    fetcher: async (service) => {},
+    onFetch: async (service) => {},
 
     // Globally registered Vue components
     wizard: 'GizmoWizard',

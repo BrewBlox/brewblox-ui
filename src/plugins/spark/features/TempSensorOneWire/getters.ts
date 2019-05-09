@@ -1,9 +1,8 @@
-import { blockById } from '@/plugins/spark/store/getters';
-import { RootStore } from '@/store/state';
+import sparkStore from '@/plugins/spark/store';
 import { TempSensorOneWireBlock } from './state';
 
 export const typeName = 'TempSensorOneWire';
 
 export const getById =
-  (store: RootStore, serviceId: string, id: string): TempSensorOneWireBlock =>
-    blockById<TempSensorOneWireBlock>(store, serviceId, id, typeName);
+  (serviceId: string, id: string): TempSensorOneWireBlock =>
+    sparkStore.blockById(serviceId, id, typeName);

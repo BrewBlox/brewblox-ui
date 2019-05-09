@@ -2,6 +2,7 @@ import Vue from 'vue';
 import providerStore from '@/store/providers';
 import { autoRegister } from '@/helpers/component-ref';
 import featureStore from '@/store/features';
+import sparkStore from '@/plugins/spark/store';
 import {
   base64ToHex,
   durationString,
@@ -14,18 +15,25 @@ import {
 } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
 import { Service } from '@/store/services/state';
-import { RootStore } from '@/store/state';
 import features from './features';
 import arrangements from './arrangements';
-import { createUpdateSource, fetchAll, fetchDiscoveredBlocks, fetchServiceStatus } from './store/actions';
 
-const initialize = async (store: RootStore, service: Service): Promise<void> => {
-  // await register(store, service);
-  await fetchServiceStatus(store, service.id);
+
+const onAdd = async (service: Service): Promise<void> => {
+  await sparkStore.addService(service.id);
+  await sparkStore.fetchServiceStatus(service.id);
   await Promise.all([
-    createUpdateSource(store, service.id),
-    fetchDiscoveredBlocks(store, service.id),
+    sparkStore.createUpdateSource(service.id),
+    sparkStore.fetchDiscoveredBlocks(service.id),
   ]);
+};
+
+const onRemove = async (service: Service): Promise<void> => {
+  const source = sparkStore.updateSource(service.id);
+  await sparkStore.removeService(service.id);
+  if (source) {
+    source.close();
+  }
 };
 
 export default () => {
@@ -59,8 +67,9 @@ export default () => {
     id: 'Spark',
     displayName: 'Spark Controller',
     features: Object.keys(features),
-    initializer: initialize,
-    fetcher: fetchAll,
+    onAdd: onAdd,
+    onRemove: onRemove,
+    onFetch: (service: Service) => sparkStore.fetchAll(service.id),
     wizard: 'SparkWizard',
     page: 'SparkPage',
     watcher: 'SparkWatcher',

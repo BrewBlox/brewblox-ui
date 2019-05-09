@@ -7,7 +7,7 @@ import { ActuatorAnalogMockBlock } from './state';
 @Component
 export default class ActuatorAnalogMockWidget extends BlockWidget {
   get block(): ActuatorAnalogMockBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get renamedTargets() {

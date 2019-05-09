@@ -1,23 +1,27 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import { updateSource } from '../store/getters';
-import { fetchServiceStatus, createUpdateSource } from '../store/actions';
 import WatcherBase from '@/components/Watcher/WatcherBase';
+import sparkStore from '@/plugins/spark/store';
 
 @Component
 export default class SparkWatcher extends WatcherBase {
   dismissFunc: Function | null = null;
 
   get updating() {
-    return updateSource(this.$store, this.service.id) !== null;
+    return sparkStore.updateSource(this.service.id) !== null;
   }
 
   retryUpdateSource() {
-    fetchServiceStatus(this.$store, this.service.id);
-    createUpdateSource(this.$store, this.service.id);
+    sparkStore.fetchServiceStatus(this.service.id);
+    sparkStore.createUpdateSource(this.service.id);
   }
 
   handleUpdateChange(updating: boolean) {
+    if (!sparkStore.serviceAvailable(this.service.id)) {
+      this.dismissFunc && this.dismissFunc();
+      return;
+    }
+
     if (!updating && !this.dismissFunc) {
       this.dismissFunc = this.$q.notify({
         timeout: 0,

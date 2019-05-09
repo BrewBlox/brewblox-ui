@@ -1,20 +1,10 @@
 <script lang="ts">
 import { uid } from 'quasar';
-import { serviceAvailable } from '@/helpers/dynamic-store';
 import dashboardStore from '@/store/dashboards';
 import featureStore from '@/store/features';
 import serviceStore from '@/store/services';
+import sparkStore from '@/plugins/spark/store';
 import { Block, SystemStatus } from '@/plugins/spark/state';
-import {
-  renameBlock,
-  fetchAll,
-  createUpdateSource,
-  fetchServiceStatus,
-  fetchDiscoveredBlocks,
-  clearDiscoveredBlocks,
-  clearBlocks,
-} from '@/plugins/spark/store/actions';
-import { allBlocks, lastStatus, blockLinks, discoveredBlocks } from '@/plugins/spark/store/getters';
 import { Dashboard, DashboardItem } from '@/store/dashboards/state';
 import { Service } from '@/store/services/state';
 import Vue from 'vue';
@@ -61,18 +51,18 @@ export default class SparkPage extends Vue {
   }
 
   get isAvailable() {
-    return serviceAvailable(this.$store, this.service.id);
+    return sparkStore.serviceAvailable(this.service.id);
   }
 
   get isReady() {
-    return this.isAvailable && isReady(this.$store, this.service.id);
+    return this.isAvailable && isReady(this.service.id);
   }
 
   get status(): SystemStatus | null {
     if (!this.isAvailable) {
       return null;
     }
-    return lastStatus(this.$store, this.service.id);
+    return sparkStore.lastStatus(this.service.id);
   }
 
   get statusNok() {
@@ -84,7 +74,7 @@ export default class SparkPage extends Vue {
   }
 
   get relations() {
-    return blockLinks(this.$store, this.service.id);
+    return sparkStore.blockLinks(this.service.id);
   }
 
   get widgetSize() {
@@ -142,7 +132,7 @@ export default class SparkPage extends Vue {
 
   get validatedItems(): ValidatedItem[] {
     return [
-      ...allBlocks(this.$store, this.service.id)
+      ...sparkStore.blockValues(this.service.id)
         .filter(block => !isSystemBlock(block))
         .map(this.validateBlock),
     ];
@@ -152,13 +142,13 @@ export default class SparkPage extends Vue {
   autoRecheck() {
     if (this.statusNok && !this.statusCheckInterval) {
       this.statusCheckInterval = setInterval(
-        () => fetchServiceStatus(this.$store, this.service.id),
+        () => sparkStore.fetchServiceStatus(this.service.id),
         5000,
       );
     }
     if (!this.statusNok && this.statusCheckInterval) {
-      fetchAll(this.$store, serviceStore.serviceById(this.service.id));
-      createUpdateSource(this.$store, this.service.id);
+      sparkStore.fetchAll(this.service.id);
+      sparkStore.createUpdateSource(this.service.id);
       clearTimeout(this.statusCheckInterval);
       this.statusCheckInterval = null;
       this.$forceUpdate();
@@ -170,7 +160,7 @@ export default class SparkPage extends Vue {
   }
 
   onChangeBlockId(currentId: string, newId: string) {
-    renameBlock(this.$store, this.service.id, currentId, newId);
+    sparkStore.renameBlock([this.service.id, currentId, newId]);
   }
 
   onDeleteItem(itemId: string) {
@@ -196,7 +186,7 @@ export default class SparkPage extends Vue {
       cancel: true,
     })
       .onOk((selected: number[]) =>
-        selected.forEach(idx => opts[idx].action(this.$store, item.config)));
+        selected.forEach(idx => opts[idx].action(item.config)));
   }
 
   onCopyItem(itemId: string) {
@@ -245,11 +235,11 @@ export default class SparkPage extends Vue {
   }
 
   async discoverBlocks() {
-    await clearDiscoveredBlocks(this.$store, this.service.id);
-    await fetchDiscoveredBlocks(this.$store, this.service.id);
+    await sparkStore.clearDiscoveredBlocks(this.service.id);
+    await sparkStore.fetchDiscoveredBlocks(this.service.id);
     await this.$nextTick();
 
-    const discovered = discoveredBlocks(this.$store, this.service.id);
+    const discovered = sparkStore.discoveredBlocks(this.service.id);
     const message = discovered.length > 0
       ? `Discovered ${discovered.join(', ')}`
       : 'Discovered no new blocks';
@@ -268,7 +258,7 @@ export default class SparkPage extends Vue {
       cancel: true,
     })
       .onOk(async () => {
-        await clearBlocks(this.$store, this.service)
+        await sparkStore.clearBlocks(this.service.id)
           .then(() => this.$q.notify({
             icon: 'mdi-check-all',
             color: 'positive',

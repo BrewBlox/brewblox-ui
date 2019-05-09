@@ -1,8 +1,7 @@
-import Component from 'vue-class-component';
 import Vue from 'vue';
-import { RootStore } from '@/store/state';
+import Component from 'vue-class-component';
 
-export type WizardAction = (store: RootStore, config: any) => Promise<void>;
+export type WizardAction = (config: any) => Promise<void>;
 
 // emits:
 // - cancel

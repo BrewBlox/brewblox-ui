@@ -7,7 +7,7 @@ import { ActuatorPwmBlock } from './state';
 @Component
 export default class ActuatorPwmWidget extends BlockWidget {
   get block(): ActuatorPwmBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get renamedTargets() {

@@ -1,6 +1,5 @@
+import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/state';
-import { blockValues } from '@/plugins/spark/store/getters';
-import { RootStore } from '@/store/state';
 
 export const widgetSize = {
   cols: 4,
@@ -26,13 +25,13 @@ export const isSystemBlock =
     .includes(block.type);
 
 export const isReady =
-  (store: RootStore, serviceId: string): boolean => [
+  (serviceId: string): boolean => [
     sysInfoType,
     groupsType,
     oneWireBusType,
     ticksType,
   ]
-    .every(t => blockValues(store, serviceId).some((b: Block) => b.type === t));
+    .every(t => sparkStore.blockValues(serviceId).some((b: Block) => b.type === t));
 
 export const WlanSecurityEnum = [
   [0, 'Unsecured'],

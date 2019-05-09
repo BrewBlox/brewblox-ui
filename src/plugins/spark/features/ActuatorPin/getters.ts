@@ -1,5 +1,4 @@
-import { blockById } from '@/plugins/spark/store/getters';
-import { RootStore } from '@/store/state';
+import sparkStore from '@/plugins/spark/store';
 import { ActuatorPinBlock } from './state';
 
 export const typeName = 'ActuatorPin';
@@ -11,5 +10,5 @@ export const state = [
 ];
 
 export const getById =
-  (store: RootStore, serviceId: string, id: string): ActuatorPinBlock =>
-    blockById<ActuatorPinBlock>(store, serviceId, id, typeName);
+  (serviceId: string, id: string): ActuatorPinBlock =>
+    sparkStore.blockById(serviceId, id, typeName);

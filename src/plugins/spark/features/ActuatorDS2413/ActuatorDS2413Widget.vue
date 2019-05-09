@@ -7,7 +7,7 @@ import { ActuatorDS2413Block } from './state';
 @Component
 export default class ActuatorDS2413Widget extends BlockWidget {
   get block(): ActuatorDS2413Block {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get renamedTargets() {

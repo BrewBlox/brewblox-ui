@@ -1,12 +1,12 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import { blockValues } from '@/plugins/spark/store/getters';
+import sparkStore from '@/plugins/spark/store';
 
 @Component
 export default class BlockFormToolbar extends BlockForm {
   get blockOptions() {
-    return blockValues(this.$store, this.block.serviceId)
+    return sparkStore.blockValues(this.block.serviceId)
       .filter(block => block.type === this.block.type)
       .map(block => ({ label: block.id, value: block.id }));
   }

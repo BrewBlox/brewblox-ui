@@ -10,7 +10,7 @@ export default class PidWidget extends BlockWidget {
   inputFormOpen = false;
 
   get block(): PidBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get renamedTargets() {

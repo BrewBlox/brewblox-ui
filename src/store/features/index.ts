@@ -45,7 +45,7 @@ export class FeatureModule extends VuexModule {
     return (id: string, config: any, selector: boolean = true) => {
       const feature = this.features[id] || {};
       return selector && feature.selector
-        ? feature.selector(store, config)
+        ? feature.selector(config)
         : feature.widget;
     };
   }

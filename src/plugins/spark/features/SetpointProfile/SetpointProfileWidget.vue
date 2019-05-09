@@ -11,7 +11,7 @@ export default class SetpointProfileWidget extends BlockWidget {
   now: Date = new Date();
 
   get block(): SetpointProfileBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get startTime(): number {

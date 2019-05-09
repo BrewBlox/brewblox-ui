@@ -7,7 +7,7 @@ import { DS2413Block } from './state';
 @Component
 export default class DS2413Widget extends BlockWidget {
   get block(): DS2413Block {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get address() {

@@ -1,17 +1,16 @@
-import { blockValues, blockById } from '@/plugins/spark/store/getters';
-import { RootStore } from '@/store/state';
+import sparkStore from '@/plugins/spark/store';
 import { BalancerBlock } from './state';
 import get from 'lodash/get';
 
 export const typeName = 'Balancer';
 
 export const getById =
-  (store: RootStore, serviceId: string, id: string): BalancerBlock =>
-    blockById<BalancerBlock>(store, serviceId, id, typeName);
+  (serviceId: string, id: string): BalancerBlock =>
+    sparkStore.blockById(serviceId, id, typeName);
 
 export const getClients =
-  (store: RootStore, serviceId: string, balancerId: string): { [balanceId: string]: string } =>
-    blockValues(store, serviceId)
+  (serviceId: string, balancerId: string): { [balanceId: string]: string } =>
+    sparkStore.blockValues(serviceId)
       .reduce(
         (clientNames, block) => {
           const constraint = get(block, 'data.constrainedBy.constraints', [])

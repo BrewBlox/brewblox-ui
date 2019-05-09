@@ -1,13 +1,12 @@
-import { blockById } from '@/plugins/spark/store/getters';
-import { RootStore } from '@/store/state';
+import sparkStore from '@/plugins/spark/store';
 import { ActuatorOffsetBlock } from './state';
 import { SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
 
 export const typeName = 'ActuatorOffset';
 
 export const getById =
-  (store: RootStore, serviceId: string, id: string): ActuatorOffsetBlock =>
-    blockById<ActuatorOffsetBlock>(store, serviceId, id, typeName);
+  (serviceId: string, id: string): ActuatorOffsetBlock =>
+    sparkStore.blockById(serviceId, id, typeName);
 
 export const defaultData =
   (): any => ({

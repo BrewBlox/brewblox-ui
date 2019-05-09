@@ -82,7 +82,7 @@ export default class DashboardPage extends Vue {
             throw new Error(`No widget found for ${item.feature}`);
           }
           const validator = featureStore.validatorById(item.feature);
-          if (!validator(this.$store, item.config)) {
+          if (!validator(item.config)) {
             throw new Error(`${item.feature} validation failed`);
           }
           return { item, component };
@@ -157,7 +157,7 @@ export default class DashboardPage extends Vue {
       cancel: true,
     })
       .onOk((selected: number[]) =>
-        selected.forEach(idx => opts[idx].action(this.$store, item.config)));
+        selected.forEach(idx => opts[idx].action(item.config)));
   }
 
   onCopyItem(itemId: string) {

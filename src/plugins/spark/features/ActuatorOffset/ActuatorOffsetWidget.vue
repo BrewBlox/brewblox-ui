@@ -7,7 +7,7 @@ import { ActuatorOffsetBlock } from './state';
 @Component
 export default class ActuatorOffsetWidget extends BlockWidget {
   get block(): ActuatorOffsetBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
   get warnings() {
     const warn: string[] = [];

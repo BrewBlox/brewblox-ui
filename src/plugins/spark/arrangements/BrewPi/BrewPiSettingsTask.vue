@@ -2,12 +2,11 @@
 import Component from 'vue-class-component';
 import dashboardStore from '@/store/dashboards';
 import featureStore from '@/store/features';
+import sparkStore from '@/plugins/spark/store';
 import { uid } from 'quasar';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { Unit, Link } from '@/helpers/units';
 import { BrewPiConfig } from '@/plugins/spark/arrangements/BrewPi/state';
-import { renameBlock, createBlock, saveBlock } from '@/plugins/spark/store/actions';
-import { RootStore } from '@/store/state';
 import { typeName as spProfileType } from '@/plugins/spark/features/SetpointProfile/getters';
 import { typeName as pairType } from '@/plugins/spark/features/SetpointSensorPair/getters';
 import { typeName as pwmType } from '@/plugins/spark/features/ActuatorPwm/getters';
@@ -17,7 +16,6 @@ import {
   typeName as pidType,
   defaultData as pidData,
 } from '@/plugins/spark/features/Pid/getters';
-import { blockById } from '@/plugins/spark/store/getters';
 import { Dashboard } from '@/store/dashboards/state';
 
 @Component
@@ -32,7 +30,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
   blockType(newId: string): string {
     for (let [from, to] of Object.entries(this.cfg.renamedBlocks)) {
       if (to === newId) {
-        return blockById(this.$store, this.cfg.serviceId, from).type;
+        return sparkStore.blockById(this.cfg.serviceId, from).type;
       }
     }
     throw new Error('Old block not found');
@@ -270,29 +268,29 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
 
   defineActions() {
     this.pushActions([
-      async (store: RootStore, cfg: BrewPiConfig): Promise<void> => {
+      async (cfg: BrewPiConfig): Promise<void> => {
         await Promise.all(
           Object.entries(cfg.renamedBlocks)
             .filter(([currVal, newVal]: [string, string]) => currVal !== newVal)
             .map(
               ([currVal, newVal]: [string, string]) =>
-                renameBlock(store, cfg.serviceId, currVal, newVal)));
+                sparkStore.renameBlock([cfg.serviceId, currVal, newVal])));
       },
 
-      async (store: RootStore, cfg: BrewPiConfig): Promise<void> => {
+      async (cfg: BrewPiConfig): Promise<void> => {
         // Create synchronously, to ensure dependencies are created first
         for (let block of cfg.createdBlocks) {
-          await createBlock(store, cfg.serviceId, block);
+          await sparkStore.createBlock([cfg.serviceId, block]);
         }
       },
 
-      async (store: RootStore, cfg: BrewPiConfig): Promise<void> => {
+      async (cfg: BrewPiConfig): Promise<void> => {
         await Promise.all(
           cfg.changedBlocks
-            .map(block => saveBlock(store, cfg.serviceId, block)));
+            .map(block => sparkStore.saveBlock([cfg.serviceId, block])));
       },
 
-      async (store: RootStore, cfg: BrewPiConfig): Promise<void> => {
+      async (cfg: BrewPiConfig): Promise<void> => {
         if (!dashboardStore.dashboardIds.includes(cfg.dashboardId)) {
           const dashboard: Dashboard = {
             id: cfg.dashboardId,

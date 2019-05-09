@@ -7,7 +7,7 @@ import { DisplaySettingsBlock } from './state';
 @Component
 export default class DisplaySettingsWidget extends BlockWidget {
   get block(): DisplaySettingsBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get displaySlots(): any[][] {

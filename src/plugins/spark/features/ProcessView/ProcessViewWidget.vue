@@ -109,7 +109,6 @@ export default class ProcessViewWidget extends WidgetBase {
     return {
       updatePart: this.updatePart,
       updatePartState: this.updatePartState,
-      store: this.$store,
     };
   }
 

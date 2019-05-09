@@ -4,10 +4,9 @@ import Component from 'vue-class-component';
 import isString from 'lodash/isString';
 import featureStore from '@/store/features';
 import providerStore from '@/store/providers';
+import sparkStore from '@/plugins/spark/store';
 import { objectStringSorter } from '@/helpers/functional';
 import { Block } from '@/plugins/spark/state';
-import { blockIds } from '@/plugins/spark/store/getters';
-import { createBlock } from '@/plugins/spark/store/actions';
 
 @Component({
   props: {
@@ -29,7 +28,7 @@ export default class BlockWizard extends Vue {
   get blockIdRules() {
     return [
       v => !!v || 'Name must not be empty',
-      v => !blockIds(this.$store, this.$props.serviceId).includes(v) || 'Name must be unique',
+      v => !sparkStore.blockIds(this.$props.serviceId).includes(v) || 'Name must be unique',
       v => v.match(/^[a-zA-Z]/) || 'Name must start with a letter',
       v => v.match(/^[a-zA-Z0-9 \(\)_-\|]*$/) || 'Name may only contain letters, numbers, spaces, and ()-_|',
       v => v.length < 200 || 'Name must be less than 200 characters',
@@ -97,7 +96,7 @@ export default class BlockWizard extends Vue {
 
   async createBlock() {
     try {
-      await createBlock(this.$store, this.$props.serviceId, this.block);
+      await sparkStore.createBlock([this.$props.serviceId, this.block as Block]);
       this.$q.notify({
         icon: 'mdi-check-all',
         color: 'positive',

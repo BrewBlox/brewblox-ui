@@ -7,7 +7,7 @@ import { ActuatorPinBlock } from './state';
 @Component
 export default class ActuatorPinWidget extends BlockWidget {
   get block(): ActuatorPinBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get subtitles() {

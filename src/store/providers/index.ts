@@ -27,12 +27,16 @@ export class ProviderModule extends VuexModule {
     return (id: string) => get(this.providers, [id, 'displayName'], id);
   }
 
-  public get initializerById(): (id: string) => ServiceFunc {
-    return (id: string) => get(this.providers, [id, 'initializer'], async () => { });
+  public get onAddById(): (id: string) => ServiceFunc {
+    return (id: string) => get(this.providers, [id, 'onAdd'], async () => { });
   }
 
-  public get fetcherById(): (id: string) => ServiceFunc {
-    return (id: string) => get(this.providers, [id, 'fetcher'], async () => { });
+  public get onRemoveById(): (id: string) => ServiceFunc {
+    return (id: string) => get(this.providers, [id, 'onRemove'], async () => { });
+  }
+
+  public get onFetchById(): (id: string) => ServiceFunc {
+    return (id: string) => get(this.providers, [id, 'onFetch'], async () => { });
   }
 
   public get wizardById(): (id: string) => string | undefined {

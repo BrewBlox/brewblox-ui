@@ -1,12 +1,10 @@
-import { RootStore } from '@/store/state';
-
 export interface Deleter {
   description: string;
-  action: (store: RootStore, config: any) => void;
+  action: (config: any) => void;
 }
 
-export type Validator = (store: RootStore, config: any) => boolean;
-export type WidgetSelector = (store: RootStore, config: any) => string | undefined;
+export type Validator = (config: any) => boolean;
+export type WidgetSelector = (config: any) => string | undefined;
 
 export interface Feature {
   id: string;

@@ -1,13 +1,12 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
-import { blockValues } from '@/plugins/spark/store/getters';
+import sparkStore from '@/plugins/spark/store';
 import { BrewPiConfig } from '@/plugins/spark/arrangements/BrewPi/state';
 import { typeName as actuatorPinType } from '@/plugins/spark/features/ActuatorPin/getters';
 import { typeName as actuatorDS2413Type } from '@/plugins/spark/features/ActuatorDS2413/getters';
 import { typeName as sensorOneWireType } from '@/plugins/spark/features/TempSensorOneWire/getters';
 import { typeName as sensorMockType } from '@/plugins/spark/features/TempSensorMock/getters';
-import { fetchDiscoveredBlocks } from '@/plugins/spark/store/actions';
 
 
 @Component
@@ -25,13 +24,13 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
 
   get pinOptions() {
     const pinTypes = [actuatorPinType, actuatorDS2413Type];
-    return blockValues(this.$store, this.cfg.serviceId)
+    return sparkStore.blockValues(this.cfg.serviceId)
       .filter(block => pinTypes.includes(block.type))
       .map(block => block.id);
   }
 
   get sensorOptions() {
-    return blockValues(this.$store, this.cfg.serviceId)
+    return sparkStore.blockValues(this.cfg.serviceId)
       .filter(block => block.type === sensorOneWireType || block.type === sensorMockType)
       .map(block => block.id);
   }
@@ -67,7 +66,7 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
   }
 
   discover() {
-    fetchDiscoveredBlocks(this.$store, this.cfg.serviceId);
+    sparkStore.fetchDiscoveredBlocks(this.cfg.serviceId);
   }
 
   next() {

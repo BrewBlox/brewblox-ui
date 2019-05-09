@@ -1,8 +1,7 @@
-import { ComponentSettings, Transitions, StatePart, PartUpdater } from '../state';
+import { ComponentSettings, Transitions, StatePart } from '../state';
 import { LEFT, RIGHT, defaultSettings } from '../getters';
-import { blocks } from '@/plugins/spark/store/getters';
+import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/state';
-import { saveBlock } from '@/plugins/spark/store/actions';
 
 const settings: ComponentSettings = {
   ...defaultSettings,
@@ -14,16 +13,16 @@ const settings: ComponentSettings = {
         [LEFT]: [{ outCoords: RIGHT }],
         [RIGHT]: [{ outCoords: LEFT }],
       },
-  interactHandler: (part: StatePart, updater: PartUpdater) => {
+  interactHandler: (part: StatePart) => {
     const serviceId = part.settings.actuatorServiceId;
     const link = part.settings.actuatorLink;
     if (!serviceId || !link || !link.id) {
       return;
     }
-    const block: Block = blocks(updater.store, serviceId)[link.id];
+    const block: Block = sparkStore.blocks(serviceId)[link.id];
     if (block) {
       block.data.state = !!part.state.closed ? 1 : 0;
-      saveBlock(updater.store, serviceId, block);
+      sparkStore.saveBlock([serviceId, block]);
     }
   },
 };

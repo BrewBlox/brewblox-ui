@@ -8,7 +8,7 @@ import { TempSensorMockBlock } from './state';
 @Component
 export default class TempSensorMockWidget extends BlockWidget {
   get block(): TempSensorMockBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get renamedTargets() {

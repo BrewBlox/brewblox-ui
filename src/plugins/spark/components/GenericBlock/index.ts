@@ -1,21 +1,18 @@
 import featureStore from '@/store/features';
+import sparkStore from '@/plugins/spark/store';
 import { ref } from '@/helpers/component-ref';
-import { serviceAvailable } from '@/helpers/dynamic-store';
 import { BlockConfig } from '@/plugins/spark/state';
-import { removeBlock } from '@/plugins/spark/store/actions';
-import { blocks } from '@/plugins/spark/store/getters';
 import { Feature, WidgetSelector } from '@/store/features/state';
-import { RootStore } from '@/store/state';
 import wizard from '../BlockWidgetWizard.vue';
 import widget from './GenericBlock.vue';
 
 // Selects the correct feature for the actual block
 const selector: WidgetSelector =
-  (store: RootStore, config: BlockConfig): string | undefined => {
-    if (!serviceAvailable(store, config.serviceId)) {
+  (config: BlockConfig): string | undefined => {
+    if (!sparkStore.serviceAvailable(config.serviceId)) {
       throw new Error(`Service "${config.serviceId}" not found`);
     }
-    const block = blocks(store, config.serviceId)[config.blockId];
+    const block = sparkStore.blocks(config.serviceId)[config.blockId];
     return block
       ? featureStore.widgetById(block.type, config, false)
       : 'UnknownBlockWidget';
@@ -23,8 +20,8 @@ const selector: WidgetSelector =
 
 // validates feature config
 const validator =
-  (store: RootStore, config: BlockConfig): boolean => {
-    if (!serviceAvailable(store, config.serviceId)) {
+  (config: BlockConfig): boolean => {
+    if (!sparkStore.serviceAvailable(config.serviceId)) {
       throw new Error(`Service "${config.serviceId}" not found`);
     }
     if (config.blockId === null || config.blockId === undefined) {
@@ -34,10 +31,10 @@ const validator =
   };
 
 const deleteBlock =
-  (store: RootStore, config: BlockConfig): void => {
-    const block = blocks(store, config.serviceId)[config.blockId];
+  (config: BlockConfig): void => {
+    const block = sparkStore.blocks(config.serviceId)[config.blockId];
     if (block) {
-      removeBlock(store, config.serviceId, block);
+      sparkStore.removeBlock([config.serviceId, block]);
     }
   };
 

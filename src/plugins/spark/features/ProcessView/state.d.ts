@@ -1,5 +1,4 @@
 import { Coordinates } from '@/helpers/coordinates';
-import { RootStore } from '@/store/state';
 
 export interface FlowRoute {
   outCoords: string;
@@ -42,7 +41,6 @@ export interface FlowPart extends StatePart {
 export interface PartUpdater {
   updatePart: (part: PersistentPart) => void;
   updatePartState: (part: StatePart) => void;
-  store: RootStore;
 }
 
 export interface ComponentSettings {

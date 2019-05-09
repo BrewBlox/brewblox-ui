@@ -2,9 +2,8 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import serviceStore from '@/store/services';
-import { blockValues, groupNames } from '../../store/getters';
+import sparkStore from '@/plugins/spark/store';
 import { Block } from '../../state';
-import { saveBlock, updateGroupNames } from '../../store/actions';
 
 
 @Component({
@@ -21,20 +20,20 @@ export default class SparkGroupMenu extends Vue {
   }
 
   get groups() {
-    return blockValues(this.$store, this.service.id)
+    return sparkStore.blockValues(this.service.id)
       .find(block => block.type === 'Groups');
   }
 
   get groupNames(): string[] {
-    return groupNames(this.$store, this.service.id);
+    return sparkStore.groupNames(this.service.id);
   }
 
   saveBlock(block: Block) {
-    saveBlock(this.$store, this.service.id, block);
+    sparkStore.saveBlock([this.service.id, block]);
   }
 
   saveGroupNames(vals: string[] = this.groupNames) {
-    updateGroupNames(this.$store, this.service.id, vals);
+    sparkStore.updateGroupNames([this.service.id, vals]);
   }
 }
 </script>

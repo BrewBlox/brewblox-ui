@@ -2,13 +2,8 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import serviceStore from '@/store/services';
+import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/state';
-import {
-  createUpdateSource,
-  fetchAll,
-  fetchServiceStatus,
-} from '@/plugins/spark/store/actions';
-import { updateSource, blockValues } from '@/plugins/spark/store/getters';
 import { sysInfoType, ticksType, wifiType, isReady } from './getters';
 import { SysInfoBlock, TicksBlock, WiFiSettingsBlock } from './state';
 
@@ -27,7 +22,7 @@ export default class SparkWidget extends Vue {
   }
 
   sysBlock<T extends Block>(blockType: string) {
-    return blockValues(this.$store, this.service.id)
+    return sparkStore.blockValues(this.service.id)
       .find(block => block.type === blockType) as T;
   }
 
@@ -44,11 +39,11 @@ export default class SparkWidget extends Vue {
   }
 
   get ready() {
-    return isReady(this.$store, this.service.id);
+    return isReady(this.service.id);
   }
 
   get updating() {
-    return updateSource(this.$store, this.service.id) !== null;
+    return sparkStore.updateSource(this.service.id) !== null;
   }
 
   get sysDate() {
@@ -56,12 +51,12 @@ export default class SparkWidget extends Vue {
   }
 
   fetchAll() {
-    fetchAll(this.$store, serviceStore.serviceById(this.service.id));
+    sparkStore.fetchAll(this.service.id);
   }
 
   retryUpdateSource() {
-    fetchServiceStatus(this.$store, this.service.id);
-    createUpdateSource(this.$store, this.service.id);
+    sparkStore.fetchServiceStatus(this.service.id);
+    sparkStore.createUpdateSource(this.service.id);
   }
 }
 </script>

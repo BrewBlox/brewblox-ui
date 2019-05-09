@@ -1,10 +1,8 @@
 <script lang="ts">
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
-import serviceStore from '@/store/services';
+import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/state';
-import { fetchAll } from '@/plugins/spark/store/actions';
-import { lastStatus } from '@/plugins/spark/store/getters';
 
 interface AbsenceReason {
   message: string;
@@ -46,7 +44,7 @@ export default class UnknownBlockWidget extends WidgetBase {
   }
 
   get reason(): AbsenceReason {
-    const status = lastStatus(this.$store, this.serviceId);
+    const status = sparkStore.lastStatus(this.serviceId);
     if (!status || !status.synchronized) {
       return {
         message: 'Waiting for service...',
@@ -64,7 +62,7 @@ export default class UnknownBlockWidget extends WidgetBase {
   }
 
   fetchAll() {
-    fetchAll(this.$store, serviceStore.serviceById(this.serviceId));
+    sparkStore.fetchAll(this.serviceId);
   }
 }
 

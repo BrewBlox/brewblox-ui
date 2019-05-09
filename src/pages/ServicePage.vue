@@ -3,7 +3,6 @@ import Vue, { VueConstructor } from 'vue';
 import Component from 'vue-class-component';
 import providerStore from '@/store/providers';
 import serviceStore from '@/store/services';
-import { serviceAvailable } from '@/helpers/dynamic-store';
 import InvalidPage from './InvalidPage.vue';
 
 @Component({
@@ -17,8 +16,7 @@ export default class ServicePage extends Vue {
   }
 
   get serviceValid() {
-    return serviceStore.serviceExists(this.serviceId)
-      && serviceAvailable(this.$store, this.serviceId);
+    return serviceStore.serviceExists(this.serviceId);
   }
 
   pageComponent(): string | VueConstructor {

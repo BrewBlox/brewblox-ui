@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import store from '@/store';
+import providerStore from '@/store/providers';
 import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
 import { Service } from './state';
 import {
@@ -9,6 +10,11 @@ import {
   persistService as persistServiceInApi,
   setup as setupInApi,
 } from './api';
+
+const initService = async (service: Service): Promise<void> => {
+  await providerStore.onAddById(service.type)(service);
+  await providerStore.onFetchById(service.type)(service);
+};
 
 @Module({ store, namespaced: true, dynamic: true, name: 'services' })
 export class ServiceModule extends VuexModule {
@@ -59,9 +65,12 @@ export class ServiceModule extends VuexModule {
     Vue.delete(this.services, service.id);
   }
 
-  @Action({ commit: 'commitService' })
+  @Action
   public async createService(service: Service): Promise<Service> {
-    return await createServiceInApi(service);
+    const created = await createServiceInApi(service);
+    this.commitService(created);
+    await initService(created);
+    return created;
   }
 
   @Action({ commit: 'commitService' })
@@ -71,6 +80,7 @@ export class ServiceModule extends VuexModule {
 
   @Action({ commit: 'commitRemoveService' })
   public async removeService(service: Service): Promise<Service> {
+    await providerStore.onRemoveById(service.type)(service);
     return await removeServiceInApi(service);
   }
 
@@ -84,21 +94,13 @@ export class ServiceModule extends VuexModule {
   }
 
   @Action
-  public async initService(service: Service): Promise<void> {
-    await this.context.rootGetters['providers/initializerById'](service.type)(service);
-    await this.context.rootGetters['providers/fetcherById'](service.type)(service);
-    //await providerStore.initializerById(service.type)(service);
-    //await providerStore.fetcherById(service.type)(service);
-  }
-
-  @Action
   public async setup(): Promise<void> {
     /* eslint-disable no-underscore-dangle */
     const onChange = async (service: Service): Promise<void> => {
       const existing = this.tryServiceById(service.id);
       if (!existing) {
         this.commitService(service);
-        await this.initService(service);
+        await initService(service);
       } else if (existing._rev !== service._rev) {
         this.commitService(service);
       }
@@ -106,14 +108,14 @@ export class ServiceModule extends VuexModule {
     const onDelete = (id: string): void => {
       const existing = this.tryServiceById(id);
       if (existing) {
-        this.commitRemoveService(existing);
+        this.removeService(existing);
       }
     };
     /* eslint-enable no-underscore-dangle */
 
     const services = await fetchServicesInApi();
     this.commitAllServices(services);
-    await Promise.all(services.map(service => this.initService(service)));
+    await Promise.all(services.map(initService));
 
     setupInApi(onChange, onDelete);
   }

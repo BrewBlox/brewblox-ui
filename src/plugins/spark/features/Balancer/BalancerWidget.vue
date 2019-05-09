@@ -7,11 +7,11 @@ import { BalancerBlock } from './state';
 @Component
 export default class BalancerWidget extends BlockWidget {
   get block(): BalancerBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get clientNames() {
-    return getClients(this.$store, this.serviceId, this.blockId);
+    return getClients(this.serviceId, this.blockId);
   }
 
   clientName(id: number) {

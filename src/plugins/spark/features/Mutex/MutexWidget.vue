@@ -7,11 +7,11 @@ import { MutexBlock } from './state';
 @Component
 export default class MutexWidget extends BlockWidget {
   get block(): MutexBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get mutexClients() {
-    return getMutexClients(this.$store, this.serviceId, this.blockId);
+    return getMutexClients(this.serviceId, this.blockId);
   }
 }
 </script>

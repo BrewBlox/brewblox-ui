@@ -57,7 +57,7 @@ const feature: Feature = {
       Example code:
         featureWidget(feature: Feature, itemConfig: any) {
           if (feature.selector !== undefined) {
-            return feature.selector(this.$store, itemConfig);
+            return feature.selector(itemConfig);
           }
           return feature.widget;
         }

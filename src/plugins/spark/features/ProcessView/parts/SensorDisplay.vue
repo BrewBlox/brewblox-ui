@@ -1,8 +1,8 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
+import sparkStore from '@/plugins/spark/store';
 import { Link } from '@/helpers/units';
-import { blocks } from '@/plugins/spark/store/getters';
 import get from 'lodash/get';
 
 
@@ -21,7 +21,7 @@ export default class SensorDisplay extends PartComponent {
       return null;
     }
     return get(
-      blocks(this.$store, this.sensorServiceId),
+      sparkStore.blocks(this.sensorServiceId),
       [this.sensorLink.id, 'data', 'value', 'val'],
       null
     );

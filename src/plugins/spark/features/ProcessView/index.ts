@@ -12,7 +12,7 @@ const feature: Feature = {
   widget: ref(widget),
   wizard: ref(wizard),
   form: ref(form),
-  validator: (store: any, config: ProcessViewConfig) =>
+  validator: (config: ProcessViewConfig) =>
     config.parts.every(part => parts.includes(part.type)),
   widgetSize: {
     cols: 8,

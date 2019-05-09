@@ -2,8 +2,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import featureStore from '@/store/features';
-import { blocks } from '../store/getters';
-import { saveBlock } from '../store/actions';
+import sparkStore from '@/plugins/spark/store';
 import { Block } from '../state';
 import isString from 'lodash/isString';
 
@@ -39,7 +38,7 @@ export default class BlockFormButton extends Vue {
     const id = this.$props.blockId;
 
     return !!id
-      ? blocks(this.$store, this.$props.serviceId)[id] || null
+      ? sparkStore.blocks(this.$props.serviceId)[id] || null
       : null;
   }
 
@@ -50,7 +49,7 @@ export default class BlockFormButton extends Vue {
   }
 
   saveBlock(v) {
-    saveBlock(this.$store, this.$props.serviceId, v)
+    sparkStore.saveBlock([this.$props.serviceId, v])
       .catch(err => this.$q.notify(err.toString()));
   }
 }

@@ -111,7 +111,6 @@ export default class ProcessViewForm extends FormBase {
     return {
       updatePart: this.updatePart,
       updatePartState: this.updatePartState,
-      store: this.$store,
     };
   }
 

@@ -1,10 +1,12 @@
 import { DashboardItem } from '@/store/dashboards/state';
 import { Service } from '@/store/services/state';
 
+export interface SparkConfig {
+  groupNames: string[];
+}
+
 export interface Spark extends Service {
-  config: {
-    groupNames: string[];
-  };
+  config: SparkConfig;
 }
 
 export interface DataBlock {

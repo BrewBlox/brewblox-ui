@@ -3,9 +3,9 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import providerStore from '@/store/providers';
 import serviceStore from '@/store/services';
-import { validateService } from '@/plugins/spark/store/actions';
-import { typeName } from '@/plugins/spark/store/getters';
+import sparkStore from '@/plugins/spark/store';
 import { Service } from '@/store/services/state';
+import { typeName } from '@/plugins/spark/getters';
 
 @Component({
   props: {
@@ -31,7 +31,6 @@ export default class SparkWizard extends Vue {
       type: typeName,
     };
     await serviceStore.createService(service);
-    await serviceStore.initService(service);
     this.$q.notify({
       icon: 'mdi-check-all',
       color: 'positive',
@@ -50,7 +49,7 @@ export default class SparkWizard extends Vue {
   }
 
   async mounted() {
-    const ok = await validateService(this.$props.serviceId);
+    const ok = await sparkStore.validateService(this.$props.serviceId);
     if (ok) {
       this.create();
     } else {

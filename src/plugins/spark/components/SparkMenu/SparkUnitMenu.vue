@@ -2,9 +2,8 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import serviceStore from '@/store/services';
-import { units, unitAlternatives } from '../../store/getters';
+import sparkStore from '@/plugins/spark/store';
 import { UserUnits } from '../../state';
-import { saveUnits, fetchAll } from '../../store/actions';
 import { spaceCased } from '@/helpers/functional';
 
 
@@ -25,20 +24,15 @@ export default class SparkUnitMenu extends Vue {
   }
 
   get units(): UserUnits {
-    return units(this.$store, this.service.id);
-  }
-
-  get unitAlternatives() {
-    return unitAlternatives(this.$store, this.service.id);
+    return sparkStore.units(this.service.id);
   }
 
   unitAlternativeOptions(name: string): string[] {
-    return (this.unitAlternatives[name] || [])
-      .map(val => ({ label: val, value: val }));
+    return sparkStore.unitAlternatives(this.service.id)[name] || [];
   }
 
   saveUnits(vals: UserUnits = this.units) {
-    saveUnits(this.$store, this.service.id, vals)
+    sparkStore.saveUnits([this.service.id, vals])
       .catch(reason => this.$q.notify({
         icon: 'error',
         color: 'negative',
@@ -47,7 +41,7 @@ export default class SparkUnitMenu extends Vue {
   }
 
   mounted() {
-    fetchAll(this.$store, this.service);
+    sparkStore.fetchAll(this.service.id);
   }
 }
 </script>

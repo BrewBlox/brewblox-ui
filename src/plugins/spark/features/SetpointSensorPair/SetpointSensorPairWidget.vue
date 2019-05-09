@@ -8,7 +8,7 @@ import { SetpointSensorPairBlock } from './state';
 @Component
 export default class SetpointSensorPairWidget extends BlockWidget {
   get block(): SetpointSensorPairBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get renamedTargets() {

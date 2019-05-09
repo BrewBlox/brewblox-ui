@@ -11,7 +11,7 @@ const feature: Feature = {
   widget: ref(widget),
   form: ref(form),
   wizard: ref(wizard),
-  validator: (store: any, config: SessionViewConfig) => !!config.sessions,
+  validator: (config: SessionViewConfig) => !!config.sessions,
   widgetSize: {
     cols: 4,
     rows: 5,
