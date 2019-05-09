@@ -47,3 +47,9 @@ export interface SystemStatus {
   synchronized: boolean;
   error?: any;
 }
+
+export interface BlockLink {
+  source: string;
+  target: string;
+  relation: string[];
+}
