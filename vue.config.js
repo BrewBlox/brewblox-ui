@@ -38,24 +38,10 @@ module.exports = {
       .tap(options => ({
         ...options,
         transpileOnly: false,
+        experimentalWatchApi: true, // speeds up build
       }));
 
     config.module.rules.delete('eslint');
-
-    // add svg loader
-    const svgRule = config.module.rule('svg');
-
-    svgRule.uses.clear();
-
-    // add replacement loader(s)
-    svgRule
-      .use('vue-svg-loader')
-      .loader('vue-svg-loader');
-
-    // disable fork-ts-checker
-    config
-      .plugins
-      .delete('fork-ts-checker');
 
     // Write git version to a file that can be imported
     // src/build-env.json is gitignored, and will be replaced every time
