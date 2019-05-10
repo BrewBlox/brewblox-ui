@@ -38,6 +38,7 @@ module.exports = {
       .tap(options => ({
         ...options,
         transpileOnly: false,
+        experimentalWatchApi: true, // speeds up build
       }));
 
     config.module.rules.delete('eslint');
