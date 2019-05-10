@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import store from '@/store';
 import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
-import { Arrangement, Deleter, Feature, Validator } from './state';
+import { Arrangement, Deleter, Feature, Validator } from './types';
 import get from 'lodash/get';
 
 @Module({ store, namespaced: true, dynamic: true, name: 'features' })
@@ -26,19 +26,19 @@ export class FeatureModule extends VuexModule {
   }
 
   public get featureById(): (id: string) => Feature {
-    return (id: string) => this.features[id] || null;
+    return id => this.features[id] || null;
   }
 
   public get displayNameById(): (id: string) => string {
-    return (id: string) => get(this.features, [id, 'displayName']);
+    return id => get(this.features, [id, 'displayName']);
   }
 
   public get validatorById(): (id: string) => Validator {
-    return (id: string) => get(this.features, [id, 'validator'], () => true);
+    return id => get(this.features, [id, 'validator'], () => true);
   }
 
   public get wizardById(): (id: string) => string {
-    return (id: string) => get(this.features, [id, 'wizard']);
+    return id => get(this.features, [id, 'wizard']);
   }
 
   public get widgetById(): (id: string, config: any, selector?: boolean) => string | undefined {
@@ -51,15 +51,15 @@ export class FeatureModule extends VuexModule {
   }
 
   public get widgetSizeById(): (id: string) => { cols: number; rows: number } {
-    return (id: string) => get(this.features, [id, 'widgetSize'], Object.assign({}, { cols: 3, rows: 2 }));
+    return id => get(this.features, [id, 'widgetSize'], Object.assign({}, { cols: 3, rows: 2 }));
   }
 
   public get formById(): (id: string) => string | undefined {
-    return (id: string) => get(this.features, [id, 'form']);
+    return id => get(this.features, [id, 'form']);
   }
 
   public get deletersById(): (id: string) => Deleter[] {
-    return (id: string) => get(this.features, [id, 'deleters'], []);
+    return id => get(this.features, [id, 'deleters'], []);
   }
 
   @Mutation

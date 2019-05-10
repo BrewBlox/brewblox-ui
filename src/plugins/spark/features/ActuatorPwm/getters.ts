@@ -1,5 +1,5 @@
 import sparkStore from '@/plugins/spark/store';
-import { ActuatorPwmBlock } from './state';
+import { ActuatorPwmBlock } from './types';
 import { ActuatorDigitalLink } from '@/helpers/units/KnownLinks';
 import { Unit } from '@/helpers/units';
 

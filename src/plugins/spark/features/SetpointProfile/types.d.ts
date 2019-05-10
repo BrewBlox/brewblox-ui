@@ -1,5 +1,5 @@
 import { Unit, Link } from '@/helpers/units';
-import { Block } from '@/plugins/spark/state';
+import { Block } from '@/plugins/spark/types';
 
 export interface Setpoint {
   time: number;

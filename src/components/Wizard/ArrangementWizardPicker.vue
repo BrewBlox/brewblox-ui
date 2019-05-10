@@ -6,7 +6,6 @@ import { objectStringSorter } from '@/helpers/functional';
 
 @Component
 export default class ArrangementWizardPicker extends Vue {
-  $q: any;
   arrangementId: string = '';
   searchModel: string = '';
   wizardModel: any = null;

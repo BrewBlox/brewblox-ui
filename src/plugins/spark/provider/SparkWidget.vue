@@ -3,9 +3,9 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import serviceStore from '@/store/services';
 import sparkStore from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/state';
+import { Block } from '@/plugins/spark/types';
 import { sysInfoType, ticksType, wifiType, isReady } from './getters';
-import { SysInfoBlock, TicksBlock, WiFiSettingsBlock } from './state';
+import { SysInfoBlock, TicksBlock, WiFiSettingsBlock } from './types';
 
 @Component({
   props: {

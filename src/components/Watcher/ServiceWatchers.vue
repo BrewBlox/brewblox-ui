@@ -6,8 +6,6 @@ import serviceStore from '@/store/services';
 
 @Component
 export default class ServiceWatchers extends Vue {
-  $q: any;
-
   get watchers() {
     return serviceStore.serviceValues
       .map(service => ({

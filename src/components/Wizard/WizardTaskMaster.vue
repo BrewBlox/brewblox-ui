@@ -17,7 +17,6 @@ import { WizardAction } from '@/components/Wizard/WizardTaskBase';
   },
 })
 export default class WizardTaskMaster extends Vue {
-  $q: any;
   busyExecuting: boolean = false;
   config: any = {};
   actions: WizardAction[] = [];

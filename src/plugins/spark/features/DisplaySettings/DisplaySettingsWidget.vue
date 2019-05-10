@@ -2,7 +2,7 @@
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { getById } from './getters';
-import { DisplaySettingsBlock } from './state';
+import { DisplaySettingsBlock } from './types';
 
 @Component
 export default class DisplaySettingsWidget extends BlockWidget {

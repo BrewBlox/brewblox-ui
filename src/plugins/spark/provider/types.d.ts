@@ -1,4 +1,4 @@
-import { Block } from '@/plugins/spark/state';
+import { Block } from '@/plugins/spark/types';
 
 export interface OneWireBusBlock extends Block {
   data: {

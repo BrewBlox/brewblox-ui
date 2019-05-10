@@ -8,7 +8,6 @@ import { objectStringSorter } from '@/helpers/functional';
 
 @Component
 export default class ServiceWizardPicker extends Vue {
-  $q: any;
   serviceId: string | null = null;
   serviceTitle: string | null = null;
   serviceTypeModel: any = null;

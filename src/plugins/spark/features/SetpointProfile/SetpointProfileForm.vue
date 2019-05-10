@@ -5,7 +5,7 @@ import { durationString, objectSorter } from '@/helpers/functional';
 import { Unit, Link } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import parseDuration from 'parse-duration';
-import { Setpoint, SetpointProfileBlock } from './state';
+import { Setpoint, SetpointProfileBlock } from './types';
 
 interface DisplaySetpoint {
   offsetMs: number;

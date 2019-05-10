@@ -1,5 +1,5 @@
 import sparkStore from '@/plugins/spark/store';
-import { InactiveObjectBlock } from './state';
+import { InactiveObjectBlock } from './types';
 
 export const typeName = 'InactiveObject';
 

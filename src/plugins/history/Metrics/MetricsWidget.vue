@@ -6,8 +6,8 @@ import historyStore from '@/store/history';
 import get from 'lodash/get';
 import parseDuration from 'parse-duration';
 import { durationString } from '@/helpers/functional';
-import { QueryTarget, Listener, DisplayNames, QueryParams } from '@/store/history/state';
-import { MetricsResult, MetricsConfig } from './state';
+import { QueryTarget, Listener, DisplayNames, QueryParams } from '@/store/history/types';
+import { MetricsResult, MetricsConfig } from './types';
 import { DEFAULT_FRESH_DURATION, DEFAULT_DECIMALS } from './getters';
 import { addListener } from './actions';
 

@@ -2,7 +2,7 @@
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { getById, state } from './getters';
-import { ActuatorPinBlock } from './state';
+import { ActuatorPinBlock } from './types';
 
 @Component
 export default class ActuatorPinWidget extends BlockWidget {

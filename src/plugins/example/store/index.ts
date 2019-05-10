@@ -1,6 +1,6 @@
-import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
 import store from '@/store';
-import { Message } from './state';
+import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
+import { Message } from './types';
 import { getBackend, getExternal } from './api';
 
 type FilterFunc = (message: Message) => boolean;

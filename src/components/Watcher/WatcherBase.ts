@@ -1,7 +1,7 @@
-import Component from 'vue-class-component';
 import Vue from 'vue';
+import Component from 'vue-class-component';
 import serviceStore from '@/store/services';
-import { Service } from '@/store/services/state';
+import { Service } from '@/store/services/types';
 
 @Component({
   props: {
@@ -12,8 +12,6 @@ import { Service } from '@/store/services/state';
   },
 })
 export default class WatcherBase extends Vue {
-  protected $q: any;
-
   protected get service(): Service {
     return serviceStore.serviceById(this.$props.serviceId);
   }

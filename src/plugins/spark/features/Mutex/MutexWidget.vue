@@ -2,7 +2,7 @@
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { getById, getMutexClients } from './getters';
-import { MutexBlock } from './state';
+import { MutexBlock } from './types';
 
 @Component
 export default class MutexWidget extends BlockWidget {

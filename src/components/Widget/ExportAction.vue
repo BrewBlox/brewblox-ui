@@ -26,8 +26,6 @@ import FileSaver from 'file-saver';
   },
 })
 export default class ExportAction extends Vue {
-  $q: any;
-
   async showDialog() {
     const item = dashboardStore.dashboardItemById(this.$props.widgetId);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

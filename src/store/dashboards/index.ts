@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import store from '@/store';
 import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
-import { Dashboard, DashboardItem } from './state';
+import { Dashboard, DashboardItem } from './types';
 import {
   createDashboard as createDashboardInApi,
   createDashboardItem as createDashboardItemInApi,
@@ -57,15 +57,15 @@ export class DashboardModule extends VuexModule {
   }
 
   public get dashboardById(): (id: string) => Dashboard {
-    return (id: string) => this.dashboards[id];
+    return id => this.dashboards[id];
   }
 
   public get dashboardItemById(): (id: string) => DashboardItem {
-    return (id: string) => this.items[id];
+    return id => this.items[id];
   }
 
   public get dashboardItemsByDashboardId(): (id: string) => DashboardItem[] {
-    return (id: string) => this.itemValues.filter(item => item.dashboard === id);
+    return id => this.itemValues.filter(item => item.dashboard === id);
   }
 
   @Mutation

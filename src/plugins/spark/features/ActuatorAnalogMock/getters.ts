@@ -1,5 +1,5 @@
 import sparkStore from '@/plugins/spark/store';
-import { ActuatorAnalogMockBlock } from './state';
+import { ActuatorAnalogMockBlock } from './types';
 
 export const typeName = 'ActuatorAnalogMock';
 

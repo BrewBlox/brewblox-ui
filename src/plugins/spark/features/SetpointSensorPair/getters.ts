@@ -1,5 +1,5 @@
 import sparkStore from '@/plugins/spark/store';
-import { SetpointSensorPairBlock } from './state';
+import { SetpointSensorPairBlock } from './types';
 
 export const typeName = 'SetpointSensorPair';
 

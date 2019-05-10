@@ -1,14 +1,14 @@
 <script lang="ts">
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import { uid } from 'quasar';
 import dashboardStore from '@/store/dashboards';
 import featureStore from '@/store/features';
 import serviceStore from '@/store/services';
 import sparkStore from '@/plugins/spark/store';
-import { Block, SystemStatus } from '@/plugins/spark/state';
-import { Dashboard, DashboardItem } from '@/store/dashboards/state';
-import { Service } from '@/store/services/state';
-import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Block, SystemStatus } from '@/plugins/spark/types';
+import { Dashboard, DashboardItem } from '@/store/dashboards/types';
+import { Service } from '@/store/services/types';
 import { isReady, isSystemBlock, widgetSize } from './getters';
 import { Watch } from 'vue-property-decorator';
 import { setInterval, clearTimeout } from 'timers';
@@ -34,7 +34,6 @@ interface ValidatedItem {
   },
 })
 export default class SparkPage extends Vue {
-  $q: any;
   volatileItems: { [blockId: string]: DashboardItem } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
 
@@ -171,55 +170,64 @@ export default class SparkPage extends Vue {
       .map((del, idx) => ({ label: del.description, value: idx, action: del.action }));
 
     if (opts.length === 0) {
-      this.$q.notify('This block can\'t be deleted');
+      this.$q.notify({
+        color: 'negative',
+        message: "This block can't be deleted",
+      });
       return;
     }
 
-    this.$q.dialog({
+    const diag = this.$q.dialog({
       title: 'Delete block',
       message: `How do you want to delete ${item.id}?`,
+      dark: true,
       options: {
-        type: 'checkbox',
-        model: opts.map(opt => opt.value),
-        items: opts,
+        options: {
+          type: 'checkbox',
+          model: opts.map(opt => opt.value),
+          items: opts,
+        },
       },
       cancel: true,
-    })
-      .onOk((selected: number[]) =>
-        selected.forEach(idx => opts[idx].action(item.config)));
+    });
+    diag.onOk && diag.onOk((selected: number[]) =>
+      selected.forEach(idx => opts[idx].action(item.config)));
   }
 
   onCopyItem(itemId: string) {
     const item = this.volatileItems[this.volatileKey(itemId)];
     const id = uid();
-    this.$q.dialog({
+    const diag = this.$q.dialog({
       title: 'Create widget',
       message: `On which dashboard do you want to create a widget for ${item.id}?`,
+      dark: true,
       options: {
-        type: 'radio',
-        model: null,
-        items: this.dashboards
-          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
+        options: {
+          type: 'radio',
+          model: [],
+          items: this.dashboards
+            .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
+        },
       },
       cancel: true,
-    })
-      .onOk((dashboard: string) => {
-        if (!dashboard) {
-          return;
-        }
-        dashboardStore.appendDashboardItem({ ...item, id, dashboard });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'file_copy',
-          message: `Copied ${item.title} to ${dashboardStore.dashboardById(dashboard).title}`,
-        });
+    });
+    diag.onOk && diag.onOk((dashboard: string) => {
+      if (!dashboard) {
+        return;
+      }
+      dashboardStore.appendDashboardItem({ ...item, id, dashboard });
+      this.$q.notify({
+        color: 'positive',
+        icon: 'file_copy',
+        message: `Copied ${item.title} to ${dashboardStore.dashboardById(dashboard).title}`,
       });
+    });
   }
 
   onWidgetChange(id: string, config: any) {
     this.volatileItems[this.volatileKey(id)].config = { ...config };
     this.$q.notify({
-      type: 'warning',
+      color: 'warning',
       message: 'Changes will not be persisted',
     });
   }
@@ -251,13 +259,15 @@ export default class SparkPage extends Vue {
   }
 
   async resetBlocks() {
-    this.$q.dialog({
+    const diag = this.$q.dialog({
       title: 'Reset Blocks',
       message: `This will remove all Blocks on ${this.service.id}. Are you sure?`,
+      dark: true,
       noBackdropDismiss: true,
       cancel: true,
-    })
-      .onOk(async () => {
+    });
+    if (diag.onOk) {
+      diag.onOk(async () => {
         await sparkStore.clearBlocks(this.service.id)
           .then(() => this.$q.notify({
             icon: 'mdi-check-all',
@@ -270,6 +280,7 @@ export default class SparkPage extends Vue {
             message: `Failed to remove Blocks: ${e.toString()}`,
           }));
       });
+    }
   }
 }
 </script>

@@ -2,7 +2,7 @@
 import Component from 'vue-class-component';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import sparkStore from '@/plugins/spark/store';
-import { BrewPiConfig } from '@/plugins/spark/arrangements/BrewPi/state';
+import { BrewPiConfig } from '@/plugins/spark/arrangements/BrewPi/types';
 import { typeName as actuatorPinType } from '@/plugins/spark/features/ActuatorPin/getters';
 import { typeName as actuatorDS2413Type } from '@/plugins/spark/features/ActuatorDS2413/getters';
 import { typeName as sensorOneWireType } from '@/plugins/spark/features/TempSensorOneWire/getters';

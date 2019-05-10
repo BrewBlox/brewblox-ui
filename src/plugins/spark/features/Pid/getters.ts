@@ -1,5 +1,5 @@
 import sparkStore from '@/plugins/spark/store';
-import { PidBlock } from './state';
+import { PidBlock } from './types';
 import { ProcessValueLink, ActuatorAnalogLink } from '@/helpers/units/KnownLinks';
 import { Unit } from '@/helpers/units';
 

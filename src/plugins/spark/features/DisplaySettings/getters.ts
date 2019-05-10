@@ -1,5 +1,5 @@
 import sparkStore from '@/plugins/spark/store';
-import { DisplaySettingsBlock } from './state';
+import { DisplaySettingsBlock } from './types';
 
 export const typeName = 'DisplaySettings';
 

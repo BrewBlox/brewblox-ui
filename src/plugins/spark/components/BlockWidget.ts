@@ -1,9 +1,9 @@
+import Component from 'vue-class-component';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import sparkStore from '@/plugins/spark/store';
-import { GraphConfig } from '@/components/Graph/state';
-import { QueryParams, GraphValueAxes } from '@/store/history/state';
-import Component from 'vue-class-component';
-import { Block } from '../state';
+import { GraphConfig } from '@/components/Graph/types';
+import { QueryParams, GraphValueAxes } from '@/store/history/types';
+import { Block } from '../types';
 import { Watch } from 'vue-property-decorator';
 
 @Component

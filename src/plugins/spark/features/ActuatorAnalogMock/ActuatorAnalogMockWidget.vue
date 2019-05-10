@@ -2,7 +2,7 @@
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { getById } from './getters';
-import { ActuatorAnalogMockBlock } from './state';
+import { ActuatorAnalogMockBlock } from './types';
 
 @Component
 export default class ActuatorAnalogMockWidget extends BlockWidget {

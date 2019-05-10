@@ -3,7 +3,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import serviceStore from '@/store/services';
 import sparkStore from '@/plugins/spark/store';
-import { UserUnits } from '../../state';
+import { UserUnits } from '@/plugins/spark/types';
 import { spaceCased } from '@/helpers/functional';
 
 
@@ -16,7 +16,6 @@ import { spaceCased } from '@/helpers/functional';
   },
 })
 export default class SparkUnitMenu extends Vue {
-  $q: any;
   spaceCased = spaceCased;
 
   get service() {

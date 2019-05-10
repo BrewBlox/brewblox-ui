@@ -39,8 +39,6 @@ import featureStore from '@/store/features';
   },
 })
 export default class ItemBase extends Vue {
-  protected $q: any; // inserted by quasar
-
   protected get widgetId(): string {
     return this.$props.id;
   }

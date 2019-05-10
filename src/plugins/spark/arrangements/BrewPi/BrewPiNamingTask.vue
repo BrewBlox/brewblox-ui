@@ -5,7 +5,7 @@ import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import serviceStore from '@/store/services';
 import sparkStore from '@/plugins/spark/store';
 import { typeName } from '@/plugins/spark/getters';
-import { BrewPiConfig, BrewPiConfigNames } from '@/plugins/spark/arrangements/BrewPi/state';
+import { BrewPiConfig, BrewPiConfigNames } from '@/plugins/spark/arrangements/BrewPi/types';
 import { spaceCased, valOrDefault } from '@/helpers/functional';
 import mapValues from 'lodash/mapValues';
 

@@ -1,6 +1,6 @@
 import { ref } from '@/helpers/component-ref';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
-import { Feature } from '@/store/features/state';
+import { Feature } from '@/store/features/types';
 import form from './BalancerForm.vue';
 import widget from './BalancerWidget.vue';
 import { typeName } from './getters';

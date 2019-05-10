@@ -1,5 +1,5 @@
 import sparkStore from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/state';
+import { Block } from '@/plugins/spark/types';
 
 export const widgetSize = {
   cols: 4,

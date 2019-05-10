@@ -27,8 +27,6 @@ export type WizardAction = (config: any) => Promise<void>;
   },
 })
 export default class WizardTaskBase extends Vue {
-  protected $q: any;
-
   protected get stagedConfig(): any {
     return this.$props.config;
   }

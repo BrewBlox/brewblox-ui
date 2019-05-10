@@ -1,7 +1,7 @@
 <script lang="ts">
 import { uid } from 'quasar';
 import Component from 'vue-class-component';
-import { FlowPart, ClickEvent, PersistentPart, Rect, ProcessViewConfig, StatePart, PartUpdater } from './state';
+import { FlowPart, ClickEvent, PersistentPart, Rect, ProcessViewConfig, StatePart, PartUpdater } from './types';
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';
 import { Coordinates } from '@/helpers/coordinates';
@@ -98,13 +98,14 @@ export default class ProcessViewForm extends FormBase {
   }
 
   clearParts() {
-    this.$q.dialog({
+    const diag = this.$q.dialog({
       title: 'Remove all',
       message: 'Are you sure you wish to remove all parts?',
+      dark: true,
       noBackdropDismiss: true,
       cancel: true,
-    })
-      .onOk(() => this.updateParts([]));
+    });
+    diag.onOk && diag.onOk(() => this.updateParts([]));
   }
 
   get updater(): PartUpdater {

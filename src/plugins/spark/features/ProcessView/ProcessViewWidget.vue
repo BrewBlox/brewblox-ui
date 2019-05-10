@@ -5,7 +5,7 @@ import { uid, debounce } from 'quasar';
 import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';
-import { PersistentPart, StatePart, ProcessViewConfig, FlowPart, Rect, ClickEvent, PartUpdater } from './state';
+import { PersistentPart, StatePart, ProcessViewConfig, FlowPart, Rect, ClickEvent, PartUpdater } from './types';
 import { spaceCased } from '@/helpers/functional';
 import ProcessViewCatalog from './ProcessViewCatalog.vue';
 

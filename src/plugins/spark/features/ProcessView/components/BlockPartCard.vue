@@ -3,7 +3,7 @@ import PartCard from './PartCard';
 import Component from 'vue-class-component';
 import serviceStore from '@/store/services';
 import sparkStore from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/state';
+import { Block } from '@/plugins/spark/types';
 import { objectStringSorter } from '@/helpers/functional';
 import get from 'lodash/get';
 import { Link } from '@/helpers/units';

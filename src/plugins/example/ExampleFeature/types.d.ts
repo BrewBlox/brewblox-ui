@@ -1,4 +1,4 @@
-import { DashboardItem } from '@/store/dashboards/state';
+import { DashboardItem } from '@/store/dashboards/types';
 
 export interface ExampleWidgetConfig {
   lastUrl: string;

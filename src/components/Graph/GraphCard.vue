@@ -3,11 +3,11 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import historyStore from '@/store/history';
 import { defaultPresets } from '@/components/Graph/getters';
-import { DisplayNames, Listener, QueryParams, QueryTarget, GraphValueAxes } from '@/store/history/state';
+import { DisplayNames, Listener, QueryParams, QueryTarget, GraphValueAxes } from '@/store/history/types';
 import { Layout, PlotData } from 'plotly.js';
 import { addPlotlyListener } from './actions';
 import GraphDisplay from './GraphDisplay.vue';
-import { GraphConfig } from './state';
+import { GraphConfig } from './types';
 import { setTimeout } from 'timers';
 
 @Component({

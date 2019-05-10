@@ -6,7 +6,7 @@ import featureStore from '@/store/features';
 import providerStore from '@/store/providers';
 import sparkStore from '@/plugins/spark/store';
 import { objectStringSorter } from '@/helpers/functional';
-import { Block } from '@/plugins/spark/state';
+import { Block } from '@/plugins/spark/types';
 
 @Component({
   props: {
@@ -17,7 +17,6 @@ import { Block } from '@/plugins/spark/state';
   },
 })
 export default class BlockWizard extends Vue {
-  $q: any;
   filteredOptions: any[] = [];
   modalOpen: boolean = false;
 

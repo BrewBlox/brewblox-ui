@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { FlowPart } from '../state';
+import { FlowPart } from '../types';
 
 @Component({
   props: {

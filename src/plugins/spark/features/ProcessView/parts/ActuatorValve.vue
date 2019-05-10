@@ -4,13 +4,11 @@ import PartComponent from '../components/PartComponent';
 import sparkStore from '@/plugins/spark/store';
 import { RIGHT } from '../getters';
 import { Link } from '@/helpers/units';
-import { Block } from '@/plugins/spark/state';
+import { Block } from '@/plugins/spark/types';
 import { Watch } from 'vue-property-decorator';
 
 @Component
 export default class ActuatorValve extends PartComponent {
-  $q: any;
-
   get paths() {
     return {
       outerValve: [

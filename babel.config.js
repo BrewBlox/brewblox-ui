@@ -1,15 +1,15 @@
 module.exports = {
-  presets: ["@vue/app"],
+  presets: ['@vue/app'],
   plugins: [
-    "@babel/plugin-syntax-dynamic-import",
+    '@babel/plugin-syntax-dynamic-import',
     [
-      "transform-imports",
+      'transform-imports',
       {
         quasar: {
-          transform: "quasar/dist/babel-transforms/imports.js",
-          preventFullImport: true
-        }
-      }
-    ]
-  ]
+          transform: 'quasar/dist/babel-transforms/imports.js',
+          preventFullImport: true,
+        },
+      },
+    ],
+  ],
 };

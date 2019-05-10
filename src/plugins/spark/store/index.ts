@@ -14,7 +14,7 @@ import {
   BlockLink,
   Spark,
   SparkConfig,
-} from '../state';
+} from '../types';
 import {
   clearBlocks as clearBlocksInApi,
   createBlock as createBlockInApi,
@@ -147,51 +147,51 @@ export class SparkModule extends VuexModule {
   }
 
   public get serviceAvailable(): (serviceId: string) => boolean {
-    return (serviceId: string) => !!this.services[serviceId];
+    return serviceId => !!this.services[serviceId];
   }
 
   public get blocks(): (serviceId: string) => Record<string, Block> {
-    return (serviceId: string) => this.services[serviceId].blocks;
+    return serviceId => this.services[serviceId].blocks;
   }
 
   public get blockIds(): (serviceId: string) => string[] {
-    return (serviceId: string) => this.allBlockIds[serviceId];
+    return serviceId => this.allBlockIds[serviceId];
   }
 
   public get blockValues(): (serviceId: string) => Block[] {
-    return (serviceId: string) => this.allBlockValues[serviceId];
+    return serviceId => this.allBlockValues[serviceId];
   }
 
   public get units(): (serviceId: string) => UserUnits {
-    return (serviceId: string) => this.services[serviceId].units;
+    return serviceId => this.services[serviceId].units;
   }
 
   public get unitAlternatives(): (serviceId: string) => UnitAlternatives {
-    return (serviceId: string) => this.services[serviceId].unitAlternatives;
+    return serviceId => this.services[serviceId].unitAlternatives;
   }
 
   public get compatibleBlocks(): (serviceId: string) => CompatibleBlocks {
-    return (serviceId: string) => this.services[serviceId].compatibleBlocks;
+    return serviceId => this.services[serviceId].compatibleBlocks;
   }
 
   public get discoveredBlocks(): (serviceId: string) => string[] {
-    return (serviceId: string) => this.services[serviceId].discoveredBlocks;
+    return serviceId => this.services[serviceId].discoveredBlocks;
   }
 
   public get updateSource(): (serviceId: string) => EventSource | null {
-    return (serviceId: string) => this.services[serviceId].updateSource;
+    return serviceId => this.services[serviceId].updateSource;
   }
 
   public get lastStatus(): (serviceId: string) => SystemStatus | null {
-    return (serviceId: string) => this.services[serviceId].lastStatus;
+    return serviceId => this.services[serviceId].lastStatus;
   }
 
   public get drivenChains(): (serviceId: string) => string[][] {
-    return (serviceId: string) => this.allDrivenChains[serviceId];
+    return serviceId => this.allDrivenChains[serviceId];
   }
 
   public get blockLinks(): (serviceId: string) => BlockLink[] {
-    return (serviceId: string) => this.allBlockLinks[serviceId];
+    return serviceId => this.allBlockLinks[serviceId];
   }
 
   public get blockById(): (serviceId: string, id: string, type?: string) => Block {
@@ -213,11 +213,11 @@ export class SparkModule extends VuexModule {
   }
 
   public get sparkServiceById(): (serviceId: string) => Spark {
-    return (serviceId: string) => serviceStore.serviceById(serviceId, 'Spark') as Spark;
+    return serviceId => serviceStore.serviceById(serviceId, 'Spark') as Spark;
   }
 
   public get sparkConfigById(): (serviceId: string) => SparkConfig {
-    return (serviceId: string) => this.sparkServiceById(serviceId).config;
+    return serviceId => this.sparkServiceById(serviceId).config;
   }
 
   private get allGroupNames(): Record<string, string[]> {
@@ -236,7 +236,7 @@ export class SparkModule extends VuexModule {
   }
 
   public get groupNames(): (serviceId: string) => string[] {
-    return (serviceId: string) => this.allGroupNames[serviceId];
+    return serviceId => this.allGroupNames[serviceId];
   }
 
   @Mutation

@@ -1,5 +1,5 @@
 import sparkStore from '@/plugins/spark/store';
-import { TempSensorOneWireBlock } from './state';
+import { TempSensorOneWireBlock } from './types';
 
 export const typeName = 'TempSensorOneWire';
 

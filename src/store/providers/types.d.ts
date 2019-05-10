@@ -1,4 +1,4 @@
-import { Service } from '@/store/services/state';
+import { Service } from '@/store/services/types';
 
 export interface Provider {
   id: string;

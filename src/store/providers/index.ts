@@ -2,8 +2,8 @@ import Vue from 'vue';
 import store from '@/store';
 import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
 import get from 'lodash/get';
-import { Provider } from './state';
-import { Service } from '../services/state';
+import { Provider } from './types';
+import { Service } from '../services/types';
 
 type ServiceFunc = (service: Service) => Promise<any>;
 
@@ -20,39 +20,39 @@ export class ProviderModule extends VuexModule {
   }
 
   public get providerById(): (id: string) => Provider | null {
-    return (id: string) => this.providers[id] || null;
+    return id => this.providers[id] || null;
   }
 
   public get displayNameById(): (id: string) => string {
-    return (id: string) => get(this.providers, [id, 'displayName'], id);
+    return id => get(this.providers, [id, 'displayName'], id);
   }
 
   public get onAddById(): (id: string) => ServiceFunc {
-    return (id: string) => get(this.providers, [id, 'onAdd'], async () => { });
+    return id => get(this.providers, [id, 'onAdd'], async () => { });
   }
 
   public get onRemoveById(): (id: string) => ServiceFunc {
-    return (id: string) => get(this.providers, [id, 'onRemove'], async () => { });
+    return id => get(this.providers, [id, 'onRemove'], async () => { });
   }
 
   public get onFetchById(): (id: string) => ServiceFunc {
-    return (id: string) => get(this.providers, [id, 'onFetch'], async () => { });
+    return id => get(this.providers, [id, 'onFetch'], async () => { });
   }
 
   public get wizardById(): (id: string) => string | undefined {
-    return (id: string) => get(this.providers, [id, 'wizard']);
+    return id => get(this.providers, [id, 'wizard']);
   }
 
   public get pageById(): (id: string) => string | undefined {
-    return (id: string) => get(this.providers, [id, 'page']);
+    return id => get(this.providers, [id, 'page']);
   }
 
   public get watcherById(): (id: string) => string | undefined {
-    return (id: string) => get(this.providers, [id, 'watcher']);
+    return id => get(this.providers, [id, 'watcher']);
   }
 
   public get featuresById(): (id: string) => string[] {
-    return (id: string) => get(this.providers, [id, 'features']);
+    return id => get(this.providers, [id, 'features']);
   }
 
   @Mutation

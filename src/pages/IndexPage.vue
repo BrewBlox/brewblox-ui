@@ -1,7 +1,7 @@
 <script lang="ts">
-import dashboardStore from '@/store/dashboards';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import dashboardStore from '@/store/dashboards';
 import { Watch } from 'vue-property-decorator';
 
 @Component

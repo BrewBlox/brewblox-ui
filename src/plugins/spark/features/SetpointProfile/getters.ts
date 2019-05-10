@@ -1,5 +1,5 @@
 import sparkStore from '@/plugins/spark/store';
-import { SetpointProfileBlock } from './state';
+import { SetpointProfileBlock } from './types';
 
 export const typeName = 'SetpointProfile';
 

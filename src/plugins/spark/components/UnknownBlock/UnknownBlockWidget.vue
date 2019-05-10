@@ -2,7 +2,7 @@
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
 import sparkStore from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/state';
+import { Block } from '@/plugins/spark/types';
 
 interface AbsenceReason {
   message: string;

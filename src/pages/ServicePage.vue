@@ -1,15 +1,11 @@
 <script lang="ts">
-import Vue, { VueConstructor } from 'vue';
+import Vue from 'vue';
 import Component from 'vue-class-component';
 import providerStore from '@/store/providers';
 import serviceStore from '@/store/services';
-import InvalidPage from './InvalidPage.vue';
 
-@Component({
-  components: {
-    InvalidPage,
-  },
-})
+
+@Component
 export default class ServicePage extends Vue {
   get serviceId(): string {
     return this.$route.params.id;
@@ -19,21 +15,22 @@ export default class ServicePage extends Vue {
     return serviceStore.serviceExists(this.serviceId);
   }
 
-  pageComponent(): string | VueConstructor {
+  get pageComponent(): string | null {
     try {
       const service = serviceStore.serviceById(this.serviceId);
-      return providerStore.pageById(service.type) || InvalidPage;
+      return providerStore.pageById(service.type) || null;
     } catch (e) {
-      return InvalidPage;
+      return null;
     }
+
   }
 }
 </script>
 
 <template>
   <q-page padding>
-    <component v-if="serviceValid" :is="pageComponent()" :service-id="serviceId"/>
+    <component v-if="serviceValid && pageComponent" :is="pageComponent" :service-id="serviceId"/>
+    <div v-else-if="serviceValid" class="flex flex-center">Invalid service page: {{ serviceId }}</div>
     <p v-else>Service {{ serviceId }} not found.</p>
   </q-page>
 </template>
-

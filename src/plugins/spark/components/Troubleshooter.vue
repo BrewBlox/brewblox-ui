@@ -2,7 +2,7 @@
 import Component from 'vue-class-component';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import sparkStore from '@/plugins/spark/store';
-import { SystemStatus } from '@/plugins/spark/state';
+import { SystemStatus } from '@/plugins/spark/types';
 
 @Component
 export default class Troubleshooter extends WidgetBase {

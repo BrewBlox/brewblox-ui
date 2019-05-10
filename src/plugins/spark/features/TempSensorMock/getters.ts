@@ -1,5 +1,5 @@
 import sparkStore from '@/plugins/spark/store';
-import { TempSensorMockBlock } from './state';
+import { TempSensorMockBlock } from './types';
 
 export const typeName = 'TempSensorMock';
 

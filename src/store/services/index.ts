@@ -2,7 +2,7 @@ import Vue from 'vue';
 import store from '@/store';
 import providerStore from '@/store/providers';
 import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
-import { Service } from './state';
+import { Service } from './types';
 import {
   createService as createServiceInApi,
   deleteService as removeServiceInApi,
@@ -43,11 +43,11 @@ export class ServiceModule extends VuexModule {
   }
 
   public get tryServiceById(): (id: string) => Service | null {
-    return (id: string) => this.services[id] || null;
+    return id => this.services[id] || null;
   }
 
   public get serviceExists(): (id: string) => boolean {
-    return (id: string) => !!this.services[id];
+    return id => !!this.services[id];
   }
 
   @Mutation

@@ -4,8 +4,8 @@ import {
   Listener,
   QueryParams,
   QueryTarget,
-} from '@/store/history/state';
-import { MetricsResult } from './state';
+} from '@/store/history/types';
+import { MetricsResult } from './types';
 import { nanoToMilli } from '@/helpers/functional';
 
 const metricsTransformer =

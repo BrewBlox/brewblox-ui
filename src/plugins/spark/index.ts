@@ -14,7 +14,7 @@ import {
   truncate,
 } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
-import { Service } from '@/store/services/state';
+import { Service } from '@/store/services/types';
 import features from './features';
 import arrangements from './arrangements';
 

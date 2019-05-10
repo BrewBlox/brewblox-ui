@@ -2,14 +2,12 @@
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import Component from 'vue-class-component';
 import sparkStore from '@/plugins/spark/store';
-import { DisplaySettingsBlock, DisplayWidget } from '@/plugins/spark/features/DisplaySettings/state';
+import { DisplaySettingsBlock, DisplayWidget } from '@/plugins/spark/features/DisplaySettings/types';
 import { Link } from '@/helpers/units';
 import { validDisplayTypes } from '@/plugins/spark/features/DisplaySettings/getters';
 
 @Component
 export default class DisplaySettingsForm extends BlockForm {
-  $q: any;
-
   get block() {
     return this.blockField as DisplaySettingsBlock;
   }
@@ -97,7 +95,7 @@ export default class DisplaySettingsForm extends BlockForm {
 
   updateSlotName(idx: number, name: string) {
     if (name.length > 15) {
-      this.$q.notify('Name can only be 15 characters');
+      this.$q.notify({ message: 'Name can only be 15 characters' });
       return;
     }
     const pos = idx + 1;

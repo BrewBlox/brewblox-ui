@@ -2,7 +2,7 @@
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
 import exampleModule from '@/plugins/example/store';
-import { ExampleWidgetConfig } from '@/plugins/example/ExampleFeature/state';
+import { ExampleWidgetConfig } from '@/plugins/example/ExampleFeature/types';
 
 /*
   The WidgetBase class inherits from Vue, we inherit the properties from WidgetBase.

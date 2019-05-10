@@ -14,7 +14,6 @@ import featureStore from '@/store/features';
   },
 })
 export default class WidgetWizardPicker extends Vue {
-  $q: any;
   filteredOptions: any[] = [];
   feature: any = null;
   wizardActive: boolean = false;

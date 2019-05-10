@@ -1,7 +1,7 @@
 <script lang="ts">
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import Component from 'vue-class-component';
-import { ActuatorOffsetBlock } from '@/plugins/spark/features/ActuatorOffset/state';
+import { ActuatorOffsetBlock } from '@/plugins/spark/features/ActuatorOffset/types';
 import { defaultData, presets } from './getters';
 
 @Component

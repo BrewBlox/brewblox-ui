@@ -17,7 +17,6 @@ import { serialize, deserialize } from '@/helpers/units/parseObject';
   },
 })
 export default class SparkImportMenu extends Vue {
-  $q: any;
   reader: FileReader = new FileReader();
   serializedData: string = '';
   importBusy: boolean = false;
@@ -44,13 +43,14 @@ export default class SparkImportMenu extends Vue {
   }
 
   startImportBlocks() {
-    this.$q.dialog({
+    const diag = this.$q.dialog({
       title: 'Reset Blocks',
       message: 'This will remove all Blocks, and import new ones from file. Are you sure?',
+      dark: true,
       noBackdropDismiss: true,
       cancel: true,
-    })
-      .onOk(async () => this.importBlocks());
+    });
+    diag.onOk && diag.onOk(async () => this.importBlocks());
   }
 
   async importBlocks() {

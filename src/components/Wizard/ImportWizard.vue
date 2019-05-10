@@ -16,7 +16,6 @@ import { deserialize } from '@/helpers/units/parseObject';
   },
 })
 export default class ImportWizard extends Vue {
-  $q: any;
   reader: FileReader = new FileReader();
   serializedWidget: string = '';
 

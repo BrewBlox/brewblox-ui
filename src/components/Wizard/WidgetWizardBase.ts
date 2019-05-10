@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import featureStore from '@/store/features';
-import { DashboardItem } from '@/store/dashboards/state';
+import { DashboardItem } from '@/store/dashboards/types';
 import dashboardStore from '@/store/dashboards';
 import { uid } from 'quasar';
 
@@ -24,8 +24,6 @@ export interface NavAction {
   },
 })
 export default class WidgetWizardBase extends Vue {
-  protected $q: any;
-
   protected widgetId: string = uid();
   protected widgetTitle: string = '';
 

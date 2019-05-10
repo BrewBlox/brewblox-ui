@@ -5,7 +5,7 @@ import featureStore from '@/store/features';
 import dashboardStore from '@/store/dashboards';
 import { uid } from 'quasar';
 import { objectSorter } from '@/helpers/functional';
-import { DashboardItem } from '@/store/dashboards/state';
+import { DashboardItem } from '@/store/dashboards/types';
 import { Watch } from 'vue-property-decorator';
 
 interface VueOrdered extends Vue {
@@ -20,7 +20,6 @@ interface ValidatedItem {
 
 @Component
 export default class DashboardPage extends Vue {
-  $q: any;
   widgetEditable: boolean = false;
   menuModalOpen: boolean = false;
   wizardModalOpen: boolean = false;
@@ -146,64 +145,73 @@ export default class DashboardPage extends Vue {
         .map(del => ({ label: del.description, action: del.action })),
     ].map((opt, idx) => ({ ...opt, value: idx }));
 
-    this.$q.dialog({
+    const diag = this.$q.dialog({
       title: 'Delete widget',
       message: `How do you want to delete widget ${item.title}?`,
+      dark: true,
       options: {
-        type: 'checkbox',
-        model: [0], // pre-check the default action
-        items: opts,
+        options: {
+          type: 'checkbox',
+          model: [0], // pre-check the default action
+          items: opts,
+        },
       },
       cancel: true,
-    })
-      .onOk((selected: number[]) =>
-        selected.forEach(idx => opts[idx].action(item.config)));
+    });
+    diag.onOk && diag.onOk((selected: number[]) =>
+      selected.forEach(idx => opts[idx].action(item.config)));
   }
 
   onCopyItem(itemId: string) {
     const item = dashboardStore.dashboardItemById(itemId);
     const id = uid();
-    this.$q.dialog({
+    const diag = this.$q.dialog({
       title: 'Copy widget',
       message: `To which dashboard do you want to copy widget ${item.title}?`,
+      dark: true,
       options: {
-        type: 'radio',
-        model: null,
-        items: this.allDashboards
-          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
+        options: {
+          type: 'radio',
+          model: [],
+          items: this.allDashboards
+            .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
+        },
       },
       cancel: true,
-    })
-      .onOk((dashboard: string) => {
-        if (!dashboard) {
-          return;
-        }
-        dashboardStore.appendDashboardItem({ ...item, id, dashboard, pinnedPosition: null });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'file_copy',
-          message: `Copied ${item.title} to ${dashboardStore.dashboardById(dashboard).title}`,
-        });
+    });
+    diag.onOk && diag.onOk((dashboard: string) => {
+      if (!dashboard) {
+        return;
+      }
+      dashboardStore.appendDashboardItem({ ...item, id, dashboard, pinnedPosition: null });
+      this.$q.notify({
+        color: 'positive',
+        icon: 'file_copy',
+        message: `Copied ${item.title} to ${dashboardStore.dashboardById(dashboard).title}`,
       });
+    });
 
   }
 
   onMoveItem(itemId: string) {
     const item = dashboardStore.dashboardItemById(itemId);
-    this.$q.dialog({
+    const diag = this.$q.dialog({
       title: 'Move widget',
       message: `To which dashboard do you want to move widget ${item.title}?`,
+      dark: true,
       options: {
-        type: 'radio',
-        model: null,
-        items: this.allDashboards
-          .filter(dashboard => dashboard.id !== this.dashboardId)
-          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
+        options: {
+          type: 'radio',
+          model: [],
+          items: this.allDashboards
+            .filter(dashboard => dashboard.id !== this.dashboardId)
+            .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
+        },
       },
       cancel: true,
-    })
-      .onOk((dashboard: string) =>
-        dashboard && dashboardStore.saveDashboardItem({ ...item, dashboard, pinnedPosition: null }));
+    });
+    diag.onOk && diag.onOk((dashboard: string) =>
+      dashboard && dashboardStore.saveDashboardItem({ ...item, dashboard, pinnedPosition: null }));
   }
 }
 </script>

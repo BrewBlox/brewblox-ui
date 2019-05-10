@@ -3,7 +3,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import serviceStore from '@/store/services';
 import sparkStore from '@/plugins/spark/store';
-import { WiFiSettingsBlock } from '../../provider/state';
+import { WiFiSettingsBlock } from '@/plugins/spark/provider/types';
 
 const WlanSecurityEnum = [
   [0, 'Unsecured'],

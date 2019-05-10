@@ -3,7 +3,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import featureStore from '@/store/features';
 import sparkStore from '@/plugins/spark/store';
-import { Block } from '../state';
+import { Block } from '../types';
 import isString from 'lodash/isString';
 
 @Component({
@@ -31,7 +31,6 @@ import isString from 'lodash/isString';
   },
 })
 export default class BlockFormButton extends Vue {
-  $q: any; // injected by quasar
   modalOpen: boolean = false;
 
   get block(): Block | null {

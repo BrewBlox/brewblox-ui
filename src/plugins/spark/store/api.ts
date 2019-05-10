@@ -2,7 +2,7 @@ import { Notify } from 'quasar';
 import queryString from 'query-string';
 import { del, get, post, put, sse } from '@/helpers/fetch';
 import { deserialize } from '@/helpers/units/parseObject';
-import { Block, DataBlock, UnitAlternatives, UserUnits, SystemStatus } from '../state';
+import { Block, DataBlock, UnitAlternatives, UserUnits, SystemStatus } from '../types';
 
 
 const asDataBlock = (block: Block): DataBlock =>

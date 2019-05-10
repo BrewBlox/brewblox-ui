@@ -6,7 +6,7 @@ import sparkStore from '@/plugins/spark/store';
 import { uid } from 'quasar';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { Unit, Link } from '@/helpers/units';
-import { BrewPiConfig } from '@/plugins/spark/arrangements/BrewPi/state';
+import { BrewPiConfig } from '@/plugins/spark/arrangements/BrewPi/types';
 import { typeName as spProfileType } from '@/plugins/spark/features/SetpointProfile/getters';
 import { typeName as pairType } from '@/plugins/spark/features/SetpointSensorPair/getters';
 import { typeName as pwmType } from '@/plugins/spark/features/ActuatorPwm/getters';
@@ -16,7 +16,7 @@ import {
   typeName as pidType,
   defaultData as pidData,
 } from '@/plugins/spark/features/Pid/getters';
-import { Dashboard } from '@/store/dashboards/state';
+import { Dashboard } from '@/store/dashboards/types';
 
 @Component
 export default class BrewPiSettingsTask extends WizardTaskBase {

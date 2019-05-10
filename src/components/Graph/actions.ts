@@ -6,7 +6,7 @@ import {
   QueryTarget,
   GraphValueAxes,
   GraphValuesListener,
-} from '@/store/history/state';
+} from '@/store/history/types';
 import parseDuration from 'parse-duration';
 import { nanoToMilli } from '@/helpers/functional';
 

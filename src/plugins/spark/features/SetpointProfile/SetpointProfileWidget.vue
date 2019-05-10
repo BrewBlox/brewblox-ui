@@ -3,7 +3,7 @@ import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import { Layout, PlotData } from 'plotly.js';
 import Component from 'vue-class-component';
 import { getById } from './getters';
-import { SetpointProfileBlock } from './state';
+import { SetpointProfileBlock } from './types';
 import { Watch } from 'vue-property-decorator';
 
 @Component

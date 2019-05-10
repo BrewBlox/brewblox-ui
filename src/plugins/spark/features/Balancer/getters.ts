@@ -1,5 +1,5 @@
 import sparkStore from '@/plugins/spark/store';
-import { BalancerBlock } from './state';
+import { BalancerBlock } from './types';
 import get from 'lodash/get';
 
 export const typeName = 'Balancer';

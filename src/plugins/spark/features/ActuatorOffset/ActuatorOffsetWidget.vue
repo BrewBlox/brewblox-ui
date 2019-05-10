@@ -2,7 +2,7 @@
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { getById } from './getters';
-import { ActuatorOffsetBlock } from './state';
+import { ActuatorOffsetBlock } from './types';
 
 @Component
 export default class ActuatorOffsetWidget extends BlockWidget {
