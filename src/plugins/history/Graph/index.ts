@@ -1,5 +1,5 @@
 import { ref } from '@/helpers/component-ref';
-import { Feature } from '@/store/features/state';
+import { Feature } from '@/store/features/types';
 import form from './GraphForm.vue';
 import widget from './GraphWidget.vue';
 import wizard from './GraphWizard.vue';

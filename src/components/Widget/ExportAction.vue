@@ -1,7 +1,7 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import Vue from 'vue';
-import { dashboardItemById } from '@/store/dashboards/getters';
+import dashboardStore from '@/store/dashboards';
 import { serialize } from '@/helpers/units/parseObject';
 import FileSaver from 'file-saver';
 
@@ -26,10 +26,8 @@ import FileSaver from 'file-saver';
   },
 })
 export default class ExportAction extends Vue {
-  $q: any;
-
   async showDialog() {
-    const item = dashboardItemById(this.$store, this.$props.widgetId);
+    const item = dashboardStore.dashboardItemById(this.$props.widgetId);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, _rev, dashboard, pinnedPosition, ...exported } = item;
     const blob = new Blob([JSON.stringify(serialize(exported))], { type: 'text/plain;charset=utf-8' });

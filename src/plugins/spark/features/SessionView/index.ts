@@ -1,9 +1,9 @@
 import { ref } from '@/helpers/component-ref';
-import { Feature } from '@/store/features/state';
+import { Feature } from '@/store/features/types';
 import widget from './SessionViewWidget.vue';
 import form from './SessionViewForm.vue';
 import wizard from './SessionViewWizard.vue';
-import { SessionViewConfig } from './state';
+import { SessionViewConfig } from './types';
 
 const feature: Feature = {
   id: 'SessionView',
@@ -11,7 +11,7 @@ const feature: Feature = {
   widget: ref(widget),
   form: ref(form),
   wizard: ref(wizard),
-  validator: (store: any, config: SessionViewConfig) => !!config.sessions,
+  validator: (config: SessionViewConfig) => !!config.sessions,
   widgetSize: {
     cols: 4,
     rows: 5,

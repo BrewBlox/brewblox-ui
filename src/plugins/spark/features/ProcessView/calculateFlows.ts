@@ -6,7 +6,7 @@ import {
   LiquidFlow,
   FlowRoute,
   ComponentSettings,
-} from './state';
+} from './types';
 import { DEFAULT_FRICTION, ACCELERATE_OTHERS } from './getters';
 import { Coordinates } from '@/helpers/coordinates';
 import settings from './settings';

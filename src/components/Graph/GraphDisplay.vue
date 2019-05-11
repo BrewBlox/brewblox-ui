@@ -1,8 +1,8 @@
 <script lang="ts">
-import merge from 'lodash/merge';
-import { Layout, PlotData } from 'plotly.js';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import merge from 'lodash/merge';
+import { Layout, PlotData } from 'plotly.js';
 
 Vue.component('PlotlyGraph', () => import('./PlotlyGraph'));
 

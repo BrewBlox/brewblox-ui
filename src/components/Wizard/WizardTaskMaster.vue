@@ -17,7 +17,6 @@ import { WizardAction } from '@/components/Wizard/WizardTaskBase';
   },
 })
 export default class WizardTaskMaster extends Vue {
-  $q: any;
   busyExecuting: boolean = false;
   config: any = {};
   actions: WizardAction[] = [];
@@ -38,7 +37,7 @@ export default class WizardTaskMaster extends Vue {
       // Actions may be async, but may have dependencies
       this.busyExecuting = true;
       for (let func of this.actions) {
-        await func(this.$store, this.config);
+        await func(this.config);
       }
       this.$q.notify({
         color: 'positive',

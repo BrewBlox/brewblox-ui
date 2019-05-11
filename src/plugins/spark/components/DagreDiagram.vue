@@ -1,7 +1,9 @@
 <script lang="ts">
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import { graphlib, render as dagreRender } from 'dagre-d3';
 import { select as d3Select } from 'd3-selection';
-import { Vue, Component, Watch } from 'vue-property-decorator';
+import { Watch } from 'vue-property-decorator';
 import { setTimeout } from 'timers';
 
 interface Edge {

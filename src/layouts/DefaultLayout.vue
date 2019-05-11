@@ -1,34 +1,15 @@
 <script lang="ts">
-import UrlSafeString from 'url-safe-string';
-import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
-import { objectSorter } from '@/helpers/functional';
-import {
-  removeDashboard,
-  updateDashboardOrder,
-  updatePrimaryDashboard,
-  saveDashboard,
-  createDashboard,
-  saveDashboardItem,
-} from '@/store/dashboards/actions';
-import {
-  dashboardValues,
-  primaryDashboardId,
-  dashboardIds,
-  dashboardItemValues,
-  dashboardById,
-} from '@/store/dashboards/getters';
-import { Dashboard } from '@/store/dashboards/state';
-import {
-  removeService,
-  updateServiceOrder,
-  saveService,
-} from '@/store/services/actions';
-import { serviceValues } from '@/store/services/getters';
-import { Service } from '@/store/services/state';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import UrlSafeString from 'url-safe-string';
 import draggable from 'vuedraggable';
 import buildEnv from '@/build-env.json';
+import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
+import { objectSorter } from '@/helpers/functional';
+import dashboardStore from '@/store/dashboards';
+import serviceStore from '@/store/services';
+import { Dashboard } from '@/store/dashboards/types';
+import { Service } from '@/store/services/types';
 
 @Component({
   components: {
@@ -37,7 +18,6 @@ import buildEnv from '@/build-env.json';
   },
 })
 export default class DefaultLayout extends Vue {
-  $q: any;
   leftDrawerOpen: boolean = true;
   dashboardEditing: boolean = false;
   serviceEditing: boolean = false;
@@ -49,77 +29,81 @@ export default class DefaultLayout extends Vue {
   }
 
   get dashboards() {
-    return [...dashboardValues(this.$store)].sort(objectSorter('order'));
+    return [...dashboardStore.dashboardValues].sort(objectSorter('order'));
   }
 
   set dashboards(dashboards: Dashboard[]) {
-    updateDashboardOrder(this.$store, dashboards.map(dashboard => dashboard.id));
+    dashboardStore.updateDashboardOrder(dashboards.map(dashboard => dashboard.id));
   }
 
   get defaultDashboard() {
-    return primaryDashboardId(this.$store);
+    return dashboardStore.primaryDashboardId;
   }
 
   get services() {
-    return [...serviceValues(this.$store)].sort(objectSorter('order'));
+    return [...serviceStore.serviceValues].sort(objectSorter('order'));
   }
 
   set services(services: Service[]) {
-    updateServiceOrder(this.$store, services.map(service => service.id));
+    serviceStore.updateServiceOrder(services.map(service => service.id));
   }
 
   removeDashboard(dashboard: Dashboard) {
-    this.$q.dialog({
+    const diag = this.$q.dialog({
       title: 'Remove dashboard',
       message: `Are you sure you want to remove ${dashboard.title}?`,
+      dark: true,
       ok: 'Confirm',
       cancel: 'Cancel',
-    })
-      .onOk(() => removeDashboard(this.$store, dashboard));
+    });
+    diag.onOk && diag.onOk(() => dashboardStore.removeDashboard(dashboard));
   }
 
   changeDashboardId(dashboard: Dashboard) {
-    this.$q.dialog({
+    const diag = this.$q.dialog({
       title: 'Change dashboard ID',
       message: "This will change your dashboard's unique ID",
+      dark: true,
       cancel: true,
-      prompt: {
-        model: dashboard.id,
-        type: 'text',
+      options: {
+        prompt: {
+          model: dashboard.id,
+          type: 'text',
+        },
       },
-    })
-      .onOk(async newId => {
-        const oldId = dashboard.id;
-        if (!newId || newId === oldId) {
-          return;
-        }
+    });
+    diag.onOk && diag.onOk(async newId => {
+      const oldId = dashboard.id;
+      if (!newId || newId === oldId) {
+        return;
+      }
 
-        if (dashboardIds(this.$store).includes(newId)) {
-          this.$q.notify({
-            color: 'negative',
-            icon: 'error',
-            message: `Dashboard ${newId} already exists`,
-          });
-          return;
-        }
+      if (dashboardStore.dashboardIds.includes(newId)) {
+        this.$q.notify({
+          color: 'negative',
+          icon: 'error',
+          message: `Dashboard ${newId} already exists`,
+        });
+        return;
+      }
 
-        this.doChangeDashboardId(oldId, newId);
-      });
+      this.doChangeDashboardId(oldId, newId);
+    });
   }
 
   async doChangeDashboardId(oldId: string, newId: string) {
-    const dashboard = dashboardById(this.$store, oldId);
+    const dashboard = dashboardStore.dashboardById(oldId);
 
-    await createDashboard(this.$store, { ...dashboard, id: newId });
+    await dashboardStore.createDashboard({ ...dashboard, id: newId });
     await Promise.all(
-      dashboardItemValues(this.$store)
+      dashboardStore.itemValues
         .filter(item => item.dashboard === oldId)
-        .map(item => saveDashboardItem(this.$store, { ...item, dashboard: newId }))
+        .map(item => dashboardStore.saveDashboardItem({ ...item, dashboard: newId }))
     );
-    await removeDashboard(this.$store, { ...dashboard });
+    await dashboardStore.removeDashboard({ ...dashboard });
 
     if (this.defaultDashboard === oldId) {
-      await updatePrimaryDashboard(this.$store, newId);
+      await dashboardStore.updatePrimaryDashboard(newId);
     }
 
     if (this.$route.path === `/dashboard/${oldId}`) {
@@ -137,7 +121,7 @@ export default class DefaultLayout extends Vue {
     if (id === oldId) {
       return null;
     }
-    const existingIds = dashboardIds(this.$store);
+    const existingIds = dashboardStore.dashboardIds;
     if (!existingIds.includes(id)) {
       return id;
     }
@@ -156,81 +140,89 @@ export default class DefaultLayout extends Vue {
   }
 
   changeDashboardTitle(dashboard: Dashboard) {
-    this.$q.dialog({
+    const diag = this.$q.dialog({
       title: 'Change dashboard Title',
       message: "Change your dashboard's display name",
+      dark: true,
       cancel: true,
-      prompt: {
-        model: dashboard.title,
-        type: 'text',
+      options: {
+        prompt: {
+          model: dashboard.title,
+          type: 'text',
+        },
       },
-    })
-      .onOk(async newTitle => {
-        const oldId = dashboard.id;
-        const oldTitle = dashboard.title;
-        if (!newTitle || oldTitle === newTitle) {
-          return;
-        }
+    });
+    diag.onOk && diag.onOk(async newTitle => {
+      const oldId = dashboard.id;
+      const oldTitle = dashboard.title;
+      if (!newTitle || oldTitle === newTitle) {
+        return;
+      }
 
-        await saveDashboard(this.$store, { ...dashboard, title: newTitle });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'edit',
-          message: `Renamed dashboard '${oldTitle}' to '${newTitle}'`,
-        });
-
-        const defaultId = new UrlSafeString().generate(newTitle);
-        const suggestedId = this.findIdSuggestion(defaultId, oldId);
-        if (!suggestedId) {
-          return; // no change
-        }
-
-        this.$q.dialog({
-          title: 'Update dashboard URL',
-          message: `Do you want to change the dashboard ID from '${oldId}' to '${suggestedId}'?`,
-          cancel: true,
-        })
-          .onOk(() => this.doChangeDashboardId(oldId, suggestedId));
+      await dashboardStore.saveDashboard({ ...dashboard, title: newTitle });
+      this.$q.notify({
+        color: 'positive',
+        icon: 'edit',
+        message: `Renamed dashboard '${oldTitle}' to '${newTitle}'`,
       });
+
+      const defaultId = new UrlSafeString().generate(newTitle);
+      const suggestedId = this.findIdSuggestion(defaultId, oldId);
+      if (!suggestedId) {
+        return; // no change
+      }
+
+      const diag = this.$q.dialog({
+        title: 'Update dashboard URL',
+        message: `Do you want to change the dashboard ID from '${oldId}' to '${suggestedId}'?`,
+        dark: true,
+        cancel: true,
+      });
+      diag.onOk && diag.onOk(() => this.doChangeDashboardId(oldId, suggestedId));
+    });
   }
 
   removeService(service: Service) {
-    this.$q.dialog({
+    const diag = this.$q.dialog({
       title: 'Remove service',
       message: `Are you sure you want to remove ${service.title}?`,
+      dark: true,
       ok: 'Confirm',
       cancel: 'Cancel',
-    })
-      .onOk(() => removeService(this.$store, service));
+    });
+    diag.onOk && diag.onOk(() => serviceStore.removeService(service));
   }
 
   changeServiceTitle(service: Service) {
-    this.$q.dialog({
+    const diag = this.$q.dialog({
       title: 'Change service Title',
       message: "Change your service's display name",
+      dark: true,
       cancel: true,
-      prompt: {
-        model: service.title,
-        type: 'text',
+      options: {
+        prompt: {
+          model: service.title,
+          type: 'text',
+        },
       },
-    })
-      .onOk(async newTitle => {
-        const oldTitle = service.title;
-        if (!newTitle || oldTitle === newTitle) {
-          return;
-        }
+    });
+    diag.onOk && diag.onOk(async newTitle => {
+      const oldTitle = service.title;
+      if (!newTitle || oldTitle === newTitle) {
+        return;
+      }
 
-        await saveService(this.$store, { ...service, title: newTitle });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'edit',
-          message: `Renamed service '${oldTitle}' to '${newTitle}'`,
-        });
+      await serviceStore.saveService({ ...service, title: newTitle });
+      this.$q.notify({
+        color: 'positive',
+        icon: 'edit',
+        message: `Renamed service '${oldTitle}' to '${newTitle}'`,
       });
+    });
   }
 
   updateDefaultDashboard(id: string) {
-    updatePrimaryDashboard(this.$store, this.defaultDashboard === id ? null : id);
+    dashboardStore.updatePrimaryDashboard(this.defaultDashboard === id ? null : id);
   }
 
   openWizard(component: string | null = null) {

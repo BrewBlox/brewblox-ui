@@ -1,14 +1,13 @@
 <script lang="ts">
-import { GraphConfig } from '@/components/Graph/state';
+import Component from 'vue-class-component';
+import parseDuration from 'parse-duration';
+import FormBase from '@/components/Form/FormBase';
+import historyStore from '@/store/history';
+import { GraphConfig } from '@/components/Graph/types';
 import { defaultPresets } from '@/components/Graph/getters';
 import { nodeBuilder, targetSplitter, targetBuilder, QuasarNode, expandedNodes } from '@/components/Graph/functional';
-import FormBase from '@/components/Form/FormBase';
 import { durationString } from '@/helpers/functional';
-import parseDuration from 'parse-duration';
-import { GraphValueAxes, QueryParams } from '@/store/history/state';
-import { fetchKnownKeys } from '@/store/history/actions';
-import { fields } from '@/store/history/getters';
-import Component from 'vue-class-component';
+import { GraphValueAxes, QueryParams } from '@/store/history/types';
 
 interface PeriodDisplay {
   start: boolean;
@@ -105,8 +104,8 @@ export default class GraphForm extends FormBase {
     this.saveConfig(this.config);
   }
 
-  get fields() {
-    return fields(this.$store) as { [key: string]: string[] };
+  get fields(): Record<string, string[]> {
+    return historyStore.fields;
   }
 
   get nodes() {
@@ -143,7 +142,7 @@ export default class GraphForm extends FormBase {
   }
 
   created() {
-    fetchKnownKeys(this.$store);
+    historyStore.fetchKnownKeys();
   }
 
   callAndSaveConfig(func: (v: any) => void) {

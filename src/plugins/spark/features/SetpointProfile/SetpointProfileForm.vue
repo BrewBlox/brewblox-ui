@@ -1,11 +1,11 @@
 <script lang="ts">
+import Component from 'vue-class-component';
+import sparkStore from '@/plugins/spark/store';
 import { durationString, objectSorter } from '@/helpers/functional';
 import { Unit, Link } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import { units } from '@/plugins/spark/store/getters';
 import parseDuration from 'parse-duration';
-import Component from 'vue-class-component';
-import { Setpoint, SetpointProfileBlock } from './state';
+import { Setpoint, SetpointProfileBlock } from './types';
 
 interface DisplaySetpoint {
   offsetMs: number;
@@ -23,7 +23,7 @@ export default class SetpointProfileForm extends BlockForm {
   }
 
   get tempUnit() {
-    return units(this.$store, this.block.serviceId).Temp;
+    return sparkStore.units(this.block.serviceId).Temp;
   }
 
   get start(): number {

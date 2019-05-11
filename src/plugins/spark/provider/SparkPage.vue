@@ -1,25 +1,14 @@
 <script lang="ts">
-import { uid } from 'quasar';
-import { serviceAvailable } from '@/helpers/dynamic-store';
-import { Block, SystemStatus } from '@/plugins/spark/state';
-import {
-  renameBlock,
-  fetchAll,
-  createUpdateSource,
-  fetchServiceStatus,
-  fetchDiscoveredBlocks,
-  clearDiscoveredBlocks,
-  clearBlocks,
-} from '@/plugins/spark/store/actions';
-import { allBlocks, lastStatus, blockLinks, discoveredBlocks } from '@/plugins/spark/store/getters';
-import { appendDashboardItem } from '@/store/dashboards/actions';
-import { dashboardValues, dashboardById } from '@/store/dashboards/getters';
-import { Dashboard, DashboardItem } from '@/store/dashboards/state';
-import { deletersById, widgetById, widgetSizeById } from '@/store/features/getters';
-import { Service } from '@/store/services/state';
-import { serviceById } from '@/store/services/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { uid } from 'quasar';
+import dashboardStore from '@/store/dashboards';
+import featureStore from '@/store/features';
+import serviceStore from '@/store/services';
+import sparkStore from '@/plugins/spark/store';
+import { Block, SystemStatus } from '@/plugins/spark/types';
+import { Dashboard, DashboardItem } from '@/store/dashboards/types';
+import { Service } from '@/store/services/types';
 import { isReady, isSystemBlock, widgetSize } from './getters';
 import { Watch } from 'vue-property-decorator';
 import { setInterval, clearTimeout } from 'timers';
@@ -45,7 +34,6 @@ interface ValidatedItem {
   },
 })
 export default class SparkPage extends Vue {
-  $q: any;
   volatileItems: { [blockId: string]: DashboardItem } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
 
@@ -54,26 +42,26 @@ export default class SparkPage extends Vue {
   relationsModalOpen: boolean = false;
 
   get service(): Service {
-    return serviceById(this.$store, this.$props.serviceId);
+    return serviceStore.serviceById(this.$props.serviceId);
   }
 
   get dashboards(): Dashboard[] {
-    return dashboardValues(this.$store);
+    return dashboardStore.dashboardValues;
   }
 
   get isAvailable() {
-    return serviceAvailable(this.$store, this.service.id);
+    return sparkStore.serviceAvailable(this.service.id);
   }
 
   get isReady() {
-    return this.isAvailable && isReady(this.$store, this.service.id);
+    return this.isAvailable && isReady(this.service.id);
   }
 
   get status(): SystemStatus | null {
     if (!this.isAvailable) {
       return null;
     }
-    return lastStatus(this.$store, this.service.id);
+    return sparkStore.lastStatus(this.service.id);
   }
 
   get statusNok() {
@@ -85,7 +73,7 @@ export default class SparkPage extends Vue {
   }
 
   get relations() {
-    return blockLinks(this.$store, this.service.id);
+    return sparkStore.blockLinks(this.service.id);
   }
 
   get widgetSize() {
@@ -129,21 +117,21 @@ export default class SparkPage extends Vue {
             serviceId: block.serviceId,
             blockId: block.id,
           },
-          ...widgetSizeById(this.$store, block.type),
+          ...featureStore.widgetSizeById(block.type),
         });
     }
     const item = this.volatileItems[key];
     return {
       key,
       item,
-      component: widgetById(this.$store, item.feature, item.config) || 'InvalidWidget',
+      component: featureStore.widgetById(item.feature, item.config) || 'InvalidWidget',
       props: this.itemProps(item),
     };
   }
 
   get validatedItems(): ValidatedItem[] {
     return [
-      ...allBlocks(this.$store, this.service.id)
+      ...sparkStore.blockValues(this.service.id)
         .filter(block => !isSystemBlock(block))
         .map(this.validateBlock),
     ];
@@ -153,13 +141,13 @@ export default class SparkPage extends Vue {
   autoRecheck() {
     if (this.statusNok && !this.statusCheckInterval) {
       this.statusCheckInterval = setInterval(
-        () => fetchServiceStatus(this.$store, this.service.id),
+        () => sparkStore.fetchServiceStatus(this.service.id),
         5000,
       );
     }
     if (!this.statusNok && this.statusCheckInterval) {
-      fetchAll(this.$store, serviceById(this.$store, this.service.id));
-      createUpdateSource(this.$store, this.service.id);
+      sparkStore.fetchAll(this.service.id);
+      sparkStore.createUpdateSource(this.service.id);
       clearTimeout(this.statusCheckInterval);
       this.statusCheckInterval = null;
       this.$forceUpdate();
@@ -171,66 +159,75 @@ export default class SparkPage extends Vue {
   }
 
   onChangeBlockId(currentId: string, newId: string) {
-    renameBlock(this.$store, this.service.id, currentId, newId);
+    sparkStore.renameBlock([this.service.id, currentId, newId]);
   }
 
   onDeleteItem(itemId: string) {
     const item = this.volatileItems[this.volatileKey(itemId)];
     // Quasar dialog can't handle objects as value - they will be returned as null
     // As workaround, we use array index as value, and add the "action" key to each option
-    const opts = deletersById(this.$store, item.feature)
+    const opts = featureStore.deletersById(item.feature)
       .map((del, idx) => ({ label: del.description, value: idx, action: del.action }));
 
     if (opts.length === 0) {
-      this.$q.notify('This block can\'t be deleted');
+      this.$q.notify({
+        color: 'negative',
+        message: "This block can't be deleted",
+      });
       return;
     }
 
-    this.$q.dialog({
+    const diag = this.$q.dialog({
       title: 'Delete block',
       message: `How do you want to delete ${item.id}?`,
+      dark: true,
       options: {
-        type: 'checkbox',
-        model: opts.map(opt => opt.value),
-        items: opts,
+        options: {
+          type: 'checkbox',
+          model: opts.map(opt => opt.value),
+          items: opts,
+        },
       },
       cancel: true,
-    })
-      .onOk((selected: number[]) =>
-        selected.forEach(idx => opts[idx].action(this.$store, item.config)));
+    });
+    diag.onOk && diag.onOk((selected: number[]) =>
+      selected.forEach(idx => opts[idx].action(item.config)));
   }
 
   onCopyItem(itemId: string) {
     const item = this.volatileItems[this.volatileKey(itemId)];
     const id = uid();
-    this.$q.dialog({
+    const diag = this.$q.dialog({
       title: 'Create widget',
       message: `On which dashboard do you want to create a widget for ${item.id}?`,
+      dark: true,
       options: {
-        type: 'radio',
-        model: null,
-        items: this.dashboards
-          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
+        options: {
+          type: 'radio',
+          model: [],
+          items: this.dashboards
+            .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
+        },
       },
       cancel: true,
-    })
-      .onOk((dashboard: string) => {
-        if (!dashboard) {
-          return;
-        }
-        appendDashboardItem(this.$store, { ...item, id, dashboard });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'file_copy',
-          message: `Copied ${item.title} to ${dashboardById(this.$store, dashboard).title}`,
-        });
+    });
+    diag.onOk && diag.onOk((dashboard: string) => {
+      if (!dashboard) {
+        return;
+      }
+      dashboardStore.appendDashboardItem({ ...item, id, dashboard });
+      this.$q.notify({
+        color: 'positive',
+        icon: 'file_copy',
+        message: `Copied ${item.title} to ${dashboardStore.dashboardById(dashboard).title}`,
       });
+    });
   }
 
   onWidgetChange(id: string, config: any) {
     this.volatileItems[this.volatileKey(id)].config = { ...config };
     this.$q.notify({
-      type: 'warning',
+      color: 'warning',
       message: 'Changes will not be persisted',
     });
   }
@@ -246,11 +243,11 @@ export default class SparkPage extends Vue {
   }
 
   async discoverBlocks() {
-    await clearDiscoveredBlocks(this.$store, this.service.id);
-    await fetchDiscoveredBlocks(this.$store, this.service.id);
+    await sparkStore.clearDiscoveredBlocks(this.service.id);
+    await sparkStore.fetchDiscoveredBlocks(this.service.id);
     await this.$nextTick();
 
-    const discovered = discoveredBlocks(this.$store, this.service.id);
+    const discovered = sparkStore.discoveredBlocks(this.service.id);
     const message = discovered.length > 0
       ? `Discovered ${discovered.join(', ')}`
       : 'Discovered no new blocks';
@@ -262,14 +259,16 @@ export default class SparkPage extends Vue {
   }
 
   async resetBlocks() {
-    this.$q.dialog({
+    const diag = this.$q.dialog({
       title: 'Reset Blocks',
       message: `This will remove all Blocks on ${this.service.id}. Are you sure?`,
+      dark: true,
       noBackdropDismiss: true,
       cancel: true,
-    })
-      .onOk(async () => {
-        await clearBlocks(this.$store, this.service)
+    });
+    if (diag.onOk) {
+      diag.onOk(async () => {
+        await sparkStore.clearBlocks(this.service.id)
           .then(() => this.$q.notify({
             icon: 'mdi-check-all',
             color: 'positive',
@@ -281,6 +280,7 @@ export default class SparkPage extends Vue {
             message: `Failed to remove Blocks: ${e.toString()}`,
           }));
       });
+    }
   }
 }
 </script>

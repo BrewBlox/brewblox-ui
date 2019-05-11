@@ -1,6 +1,6 @@
-import { displayNameById } from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import featureStore from '@/store/features';
 
 @Component({
   props: {
@@ -39,8 +39,6 @@ import Component from 'vue-class-component';
   },
 })
 export default class ItemBase extends Vue {
-  protected $q: any; // inserted by quasar
-
   protected get widgetId(): string {
     return this.$props.id;
   }
@@ -50,6 +48,6 @@ export default class ItemBase extends Vue {
   }
 
   protected get displayName(): string {
-    return displayNameById(this.$store, this.$props.type);
+    return featureStore.displayNameById(this.$props.type);
   }
 }

@@ -1,14 +1,13 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import isString from 'lodash/isString';
+import featureStore from '@/store/features';
+import serviceStore from '@/store/services';
+import sparkStore from '@/plugins/spark/store';
 import get from 'lodash/get';
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
-import { Block } from '@/plugins/spark/state';
-import { createBlock } from '@/plugins/spark/store/actions';
-import { blockIds, blockValues } from '@/plugins/spark/store/getters';
-import { formById } from '@/store/features/getters';
-import { serviceValues } from '@/store/services/getters';
-import { Service } from '@/store/services/state';
+import { Block } from '@/plugins/spark/types';
+import { Service } from '@/store/services/types';
 import { objectStringSorter } from '@/helpers/functional';
 
 @Component
@@ -27,7 +26,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
   get blockIdRules() {
     return [
       v => !!v || 'Name must not be empty',
-      v => !blockIds(this.$store, this.serviceId).includes(v) || 'Name must be unique',
+      v => !sparkStore.blockIds(this.serviceId).includes(v) || 'Name must be unique',
       v => v.match(/^[a-zA-Z]/) || 'Name must start with a letter',
       v => v.match(/^[a-zA-Z0-9 \(\)_-\|]*$/) || 'Name may only contain letters, numbers, spaces, and ()-_|',
       v => v.length < 200 || 'Name must be less than 200 characters',
@@ -38,13 +37,13 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
     if (!this.service) {
       return [];
     }
-    return blockValues(this.$store, this.serviceId)
+    return sparkStore.blockValues(this.serviceId)
       .filter(block => block.type === this.typeId)
       .sort(objectStringSorter('id'));
   }
 
   get serviceOpts() {
-    return serviceValues(this.$store)
+    return serviceStore.serviceValues
       .filter(service => service.type === 'Spark')
       .map(service => ({
         label: service.title,
@@ -54,7 +53,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
 
   get blockForm() {
     return this.block
-      ? formById(this.$store, this.block.type)
+      ? featureStore.formById(this.block.type)
       : '';
   }
 
@@ -79,8 +78,8 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
     const service = this.service as Service;
     const block = this.block as Block;
 
-    if (!blockIds(this.$store, service.id).includes(block.id)) {
-      await createBlock(this.$store, service.id, block);
+    if (!sparkStore.blockIds(service.id).includes(block.id)) {
+      await sparkStore.createBlock([service.id, block]);
     }
 
     this.createItem({

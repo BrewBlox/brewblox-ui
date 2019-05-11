@@ -1,28 +1,23 @@
 <script lang="ts">
-import {
-  displayNameById,
-  providerIds,
-  wizardById,
-} from '@/store/providers/getters';
-import { serviceIds } from '@/store/services/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import providerStore from '@/store/providers';
+import serviceStore from '@/store/services';
 import isString from 'lodash/isString';
 import { objectStringSorter } from '@/helpers/functional';
 
 @Component
 export default class ServiceWizardPicker extends Vue {
-  $q: any;
   serviceId: string | null = null;
   serviceTitle: string | null = null;
   serviceTypeModel: any = null;
   serviceWizardActive: boolean = false;
 
   get wizardOptions() {
-    return providerIds(this.$store)
+    return providerStore.providerIds
       .map(id => ({
-        label: displayNameById(this.$store, id),
-        value: wizardById(this.$store, id),
+        label: providerStore.displayNameById(id),
+        value: providerStore.wizardById(id),
       }))
       .filter(opt => opt.value)
       .sort(objectStringSorter('label'));
@@ -31,7 +26,7 @@ export default class ServiceWizardPicker extends Vue {
   get serviceIdRules(): InputRule[] {
     return [
       v => !!v || 'ID is required',
-      v => !serviceIds(this.$store).includes(v) || 'ID must be unique',
+      v => !serviceStore.serviceIds.includes(v) || 'ID must be unique',
     ];
   }
 

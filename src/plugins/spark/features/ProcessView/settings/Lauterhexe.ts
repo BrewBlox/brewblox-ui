@@ -1,4 +1,4 @@
-import { ComponentSettings } from '../state';
+import { ComponentSettings } from '../types';
 import { IN_OUT, LEFT, defaultSettings } from '../getters';
 
 const SIZE_X = 4;

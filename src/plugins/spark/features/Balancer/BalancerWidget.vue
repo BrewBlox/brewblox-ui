@@ -2,16 +2,16 @@
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { getById, getClients } from './getters';
-import { BalancerBlock } from './state';
+import { BalancerBlock } from './types';
 
 @Component
 export default class BalancerWidget extends BlockWidget {
   get block(): BalancerBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get clientNames() {
-    return getClients(this.$store, this.serviceId, this.blockId);
+    return getClients(this.serviceId, this.blockId);
   }
 
   clientName(id: number) {

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { FlowPart, CalculatedFlows } from '../state';
+import { FlowPart, CalculatedFlows } from '../types';
 import partSettings from '../settings';
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 import { SQUARE_SIZE } from '../getters';

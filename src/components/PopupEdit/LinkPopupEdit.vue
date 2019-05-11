@@ -1,9 +1,8 @@
 <script lang="ts">
-import { Link } from '@/helpers/units';
-import { fetchCompatibleBlocks } from '@/plugins/spark/store/actions';
-import { compatibleBlocks } from '@/plugins/spark/store/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import sparkStore from '@/plugins/spark/store';
+import { Link } from '@/helpers/units';
 
 @Component({
   props: {
@@ -44,7 +43,7 @@ export default class LinkPopupEdit extends Vue {
   }
 
   get linkOptions() {
-    const compatibleTable = compatibleBlocks(this.$store, this.$props.serviceId);
+    const compatibleTable = sparkStore.compatibleBlocks(this.$props.serviceId);
     const compatible = compatibleTable[this.$props.field.type || ''] || [];
     return compatible;
   }
@@ -54,7 +53,7 @@ export default class LinkPopupEdit extends Vue {
   }
 
   startEdit() {
-    fetchCompatibleBlocks(this.$store, this.$props.serviceId, this.$props.field.type);
+    sparkStore.fetchCompatibleBlocks([this.$props.serviceId, this.$props.field.type]);
     this.placeholder = this.$props.field.id;
     this.active = true;
   }

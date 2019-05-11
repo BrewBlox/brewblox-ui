@@ -6,7 +6,7 @@ export const toJson =
   async (result: Promise<Response>): Promise<any> => {
     const response = await result;
     if (!response.ok) {
-      throw new Error(response.statusText);
+      throw new Error(await response.text());
     }
     const content = await response.json();
     return content

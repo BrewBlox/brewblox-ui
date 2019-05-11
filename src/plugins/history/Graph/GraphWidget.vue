@@ -1,10 +1,10 @@
 <script lang="ts">
-import { GraphConfig } from '@/components/Graph/state';
-import { defaultPresets } from '@/components/Graph/getters';
-import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
+import WidgetBase from '@/components/Widget/WidgetBase';
+import { GraphConfig } from '@/components/Graph/types';
+import { defaultPresets } from '@/components/Graph/getters';
 import { Watch } from 'vue-property-decorator';
-import { QueryParams } from '@/store/history/state';
+import { QueryParams } from '@/store/history/types';
 
 @Component
 export default class GraphWidget extends WidgetBase {

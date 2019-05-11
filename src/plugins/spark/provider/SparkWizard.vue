@@ -1,12 +1,11 @@
 <script lang="ts">
-import { validateService } from '@/plugins/spark/store/actions';
-import { typeName } from '@/plugins/spark/store/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { Service } from '@/store/services/state';
-import { serviceIds } from '@/store/services/getters';
-import { createService, initService } from '@/store/services/actions';
-import { displayNameById } from '@/store/providers/getters';
+import providerStore from '@/store/providers';
+import serviceStore from '@/store/services';
+import sparkStore from '@/plugins/spark/store';
+import { Service } from '@/store/services/types';
+import { typeName } from '@/plugins/spark/getters';
 
 @Component({
   props: {
@@ -21,22 +20,19 @@ import { displayNameById } from '@/store/providers/getters';
   },
 })
 export default class SparkWizard extends Vue {
-  $q: any;
-
   async create() {
     const service: Service = {
       id: this.$props.serviceId,
       title: this.$props.serviceTitle,
-      order: serviceIds(this.$store).length + 1,
+      order: serviceStore.serviceIds.length + 1,
       config: {},
       type: typeName,
     };
-    await createService(this.$store, service);
-    await initService(this.$store, service);
+    await serviceStore.createService(service);
     this.$q.notify({
       icon: 'mdi-check-all',
       color: 'positive',
-      message: `Added ${displayNameById(this.$store, service.type)} ${service.title}`,
+      message: `Added ${providerStore.displayNameById(service.type)} ${service.title}`,
     });
     this.$emit('close');
   }
@@ -51,7 +47,7 @@ export default class SparkWizard extends Vue {
   }
 
   async mounted() {
-    const ok = await validateService(this.$props.serviceId);
+    const ok = await sparkStore.validateService(this.$props.serviceId);
     if (ok) {
       this.create();
     } else {

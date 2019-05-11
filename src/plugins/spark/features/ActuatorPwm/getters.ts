@@ -1,14 +1,13 @@
-import { blockById } from '@/plugins/spark/store/getters';
-import { RootStore } from '@/store/state';
-import { ActuatorPwmBlock } from './state';
+import sparkStore from '@/plugins/spark/store';
+import { ActuatorPwmBlock } from './types';
 import { ActuatorDigitalLink } from '@/helpers/units/KnownLinks';
 import { Unit } from '@/helpers/units';
 
 export const typeName = 'ActuatorPwm';
 
 export const getById =
-  (store: RootStore, serviceId: string, id: string): ActuatorPwmBlock =>
-    blockById<ActuatorPwmBlock>(store, serviceId, id, typeName);
+  (serviceId: string, id: string): ActuatorPwmBlock =>
+    sparkStore.blockById(serviceId, id, typeName);
 
 export const defaultData =
   (): any => ({

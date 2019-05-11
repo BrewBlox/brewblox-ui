@@ -1,7 +1,7 @@
 <script lang="ts">
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import Component from 'vue-class-component';
-import { DS2413Block } from './state';
+import { DS2413Block } from './types';
 
 @Component
 export default class DS2413Form extends BlockForm {

@@ -1,9 +1,8 @@
-import { DashboardItem } from '@/store/dashboards/state';
-import { widgetSizeById } from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { appendDashboardItem } from '@/store/dashboards/actions';
-import { displayNameById } from '@/store/features/getters';
+import featureStore from '@/store/features';
+import { DashboardItem } from '@/store/dashboards/types';
+import dashboardStore from '@/store/dashboards';
 import { uid } from 'quasar';
 
 export interface NavAction {
@@ -25,8 +24,6 @@ export interface NavAction {
   },
 })
 export default class WidgetWizardBase extends Vue {
-  protected $q: any;
-
   protected widgetId: string = uid();
   protected widgetTitle: string = '';
 
@@ -35,20 +32,20 @@ export default class WidgetWizardBase extends Vue {
   }
 
   protected get typeDisplayName(): string {
-    return displayNameById(this.$store, this.typeId);
+    return featureStore.displayNameById(this.typeId);
   }
 
   protected get defaultWidgetSize(): { cols: number; rows: number } {
-    return widgetSizeById(this.$store, this.typeId);
+    return featureStore.widgetSizeById(this.typeId);
   }
 
   protected async createItem(item: DashboardItem): Promise<void> {
     try {
-      await appendDashboardItem(this.$store, item);
+      await dashboardStore.appendDashboardItem(item);
       this.$q.notify({
         icon: 'mdi-check-all',
         color: 'positive',
-        message: `Created ${displayNameById(this.$store, item.feature)} '${item.title}'`,
+        message: `Created ${featureStore.displayNameById(item.feature)} '${item.title}'`,
       });
     } catch (e) {
       this.$q.notify({

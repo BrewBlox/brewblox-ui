@@ -1,11 +1,11 @@
 <script lang="ts">
-import { GraphConfig } from '@/components/Graph/state';
-import { durationString } from '@/helpers/functional';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { GraphConfig } from '@/components/Graph/types';
+import { durationString } from '@/helpers/functional';
 import { Watch } from 'vue-property-decorator';
 import { targetSplitter } from '@/components/Graph/functional';
-import { QueryParams } from '@/store/history/state';
+import { QueryParams } from '@/store/history/types';
 import { defaultPresets } from '@/components/Graph/getters';
 
 @Component({

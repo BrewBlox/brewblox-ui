@@ -1,4 +1,4 @@
-import { ComponentSettings } from '../state';
+import { ComponentSettings } from '../types';
 import { LEFT, RIGHT, UP, defaultSettings } from '../getters';
 
 const settings: ComponentSettings = {
