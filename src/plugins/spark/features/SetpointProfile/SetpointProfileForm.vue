@@ -6,7 +6,7 @@ import { Unit, Link } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import parseDuration from 'parse-duration';
 import { Setpoint, SetpointProfileBlock } from './types';
-import { typeName as targetType } from '@/plugins/spark/features/SetpointSensorPair/getters';
+import { SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
 
 interface DisplaySetpoint {
   offsetMs: number;
@@ -46,7 +46,7 @@ export default class SetpointProfileForm extends BlockForm {
       start: new Date().getTime() / 1000,
       points: [],
       enabled: false,
-      targetId: new Link(null, targetType),
+      targetId: new SetpointSensorPairLink(null),
       drivenTargetId: new Link(null),
     };
   }
