@@ -217,8 +217,10 @@ export default class ProcessViewForm extends FormBase {
   }
 
   findGridSquare(grid: Rect, x: number, y: number) {
-    x -= window.pageXOffset;
-    y -= window.pageYOffset;
+    // The issue that required this correction appears fixed in upstream
+    // Commented in case the problem reappears
+    // x -= window.pageXOffset;
+    // y -= window.pageYOffset;
     if (!this.rectContains(grid, x, y)) {
       return null;
     }
