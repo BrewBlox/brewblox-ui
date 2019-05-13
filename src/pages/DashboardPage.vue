@@ -3,7 +3,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import featureStore from '@/store/features';
 import dashboardStore from '@/store/dashboards';
-import { uid } from 'quasar';
+import { uid, Dialog } from 'quasar';
 import { objectSorter } from '@/helpers/functional';
 import { DashboardItem } from '@/store/dashboards/types';
 import { Watch } from 'vue-property-decorator';
@@ -145,73 +145,69 @@ export default class DashboardPage extends Vue {
         .map(del => ({ label: del.description, action: del.action })),
     ].map((opt, idx) => ({ ...opt, value: idx }));
 
-    const diag = this.$q.dialog({
+    Dialog.create({
       title: 'Delete widget',
       message: `How do you want to delete widget ${item.title}?`,
       dark: true,
       options: {
-        options: {
-          type: 'checkbox',
-          model: [0], // pre-check the default action
-          items: opts,
-        },
+        type: 'checkbox',
+        model: [0], // pre-check the default action
+        items: opts,
       },
       cancel: true,
-    });
-    diag.onOk && diag.onOk((selected: number[]) =>
-      selected.forEach(idx => opts[idx].action(item.config)));
+    })
+      .onOk((selected: number[]) => {
+        console.log(selected);
+        selected.forEach(idx => opts[idx].action(item.config));
+      });
   }
 
   onCopyItem(itemId: string) {
     const item = dashboardStore.dashboardItemById(itemId);
     const id = uid();
-    const diag = this.$q.dialog({
+    Dialog.create({
       title: 'Copy widget',
       message: `To which dashboard do you want to copy widget ${item.title}?`,
       dark: true,
       options: {
-        options: {
-          type: 'radio',
-          model: [],
-          items: this.allDashboards
-            .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
-        },
+        type: 'radio',
+        model: null,
+        items: this.allDashboards
+          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
       },
       cancel: true,
-    });
-    diag.onOk && diag.onOk((dashboard: string) => {
-      if (!dashboard) {
-        return;
-      }
-      dashboardStore.appendDashboardItem({ ...item, id, dashboard, pinnedPosition: null });
-      this.$q.notify({
-        color: 'positive',
-        icon: 'file_copy',
-        message: `Copied ${item.title} to ${dashboardStore.dashboardById(dashboard).title}`,
+    })
+      .onOk((dashboard: string) => {
+        if (!dashboard) {
+          return;
+        }
+        dashboardStore.appendDashboardItem({ ...item, id, dashboard, pinnedPosition: null });
+        this.$q.notify({
+          color: 'positive',
+          icon: 'file_copy',
+          message: `Copied ${item.title} to ${dashboardStore.dashboardById(dashboard).title}`,
+        });
       });
-    });
 
   }
 
   onMoveItem(itemId: string) {
     const item = dashboardStore.dashboardItemById(itemId);
-    const diag = this.$q.dialog({
+    Dialog.create({
       title: 'Move widget',
       message: `To which dashboard do you want to move widget ${item.title}?`,
       dark: true,
       options: {
-        options: {
-          type: 'radio',
-          model: [],
-          items: this.allDashboards
-            .filter(dashboard => dashboard.id !== this.dashboardId)
-            .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
-        },
+        type: 'radio',
+        model: null,
+        items: this.allDashboards
+          .filter(dashboard => dashboard.id !== this.dashboardId)
+          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
       },
       cancel: true,
-    });
-    diag.onOk && diag.onOk((dashboard: string) =>
-      dashboard && dashboardStore.saveDashboardItem({ ...item, dashboard, pinnedPosition: null }));
+    })
+      .onOk((dashboard: string) =>
+        dashboard && dashboardStore.saveDashboardItem({ ...item, dashboard, pinnedPosition: null }));
   }
 }
 </script>

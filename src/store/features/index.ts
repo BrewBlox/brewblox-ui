@@ -34,7 +34,7 @@ export class FeatureModule extends VuexModule {
   }
 
   public get validatorById(): (id: string) => Validator {
-    return id => get(this.features, [id, 'validator'], () => true);
+    return id => get(this.features, [id, 'validator']) || (() => true);
   }
 
   public get wizardById(): (id: string) => string {
@@ -51,7 +51,7 @@ export class FeatureModule extends VuexModule {
   }
 
   public get widgetSizeById(): (id: string) => { cols: number; rows: number } {
-    return id => get(this.features, [id, 'widgetSize'], Object.assign({}, { cols: 3, rows: 2 }));
+    return id => get(this.features, [id, 'widgetSize']) || Object.assign({}, { cols: 3, rows: 2 });
   }
 
   public get formById(): (id: string) => string | undefined {
@@ -59,7 +59,7 @@ export class FeatureModule extends VuexModule {
   }
 
   public get deletersById(): (id: string) => Deleter[] {
-    return id => get(this.features, [id, 'deleters'], []);
+    return id => get(this.features, [id, 'deleters']) || [];
   }
 
   @Mutation

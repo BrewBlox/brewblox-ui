@@ -1,6 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { Dialog } from 'quasar';
 import serviceStore from '@/store/services';
 import sparkStore from '@/plugins/spark/store';
 import FileSaver from 'file-saver';
@@ -43,14 +44,14 @@ export default class SparkImportMenu extends Vue {
   }
 
   startImportBlocks() {
-    const diag = this.$q.dialog({
+    Dialog.create({
       title: 'Reset Blocks',
       message: 'This will remove all Blocks, and import new ones from file. Are you sure?',
       dark: true,
       noBackdropDismiss: true,
       cancel: true,
-    });
-    diag.onOk && diag.onOk(async () => this.importBlocks());
+    })
+      .onOk(async () => this.importBlocks());
   }
 
   async importBlocks() {
