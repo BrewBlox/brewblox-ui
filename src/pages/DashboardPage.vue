@@ -225,12 +225,7 @@ export default class DashboardPage extends Vue {
         </q-toggle>
         <q-btn-dropdown color="primary" label="actions">
           <q-list dark>
-            <q-item clickable @click="() => wizardModalOpen = true">
-              <q-item-section avatar>
-                <q-icon name="add"/>
-              </q-item-section>
-              <q-item-section>New Widget</q-item-section>
-            </q-item>
+            <ActionItem icon="add" label="New Widget" @click="wizardModalOpen = true"/>
           </q-list>
         </q-btn-dropdown>
       </portal>
