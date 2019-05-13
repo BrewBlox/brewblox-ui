@@ -404,11 +404,17 @@ export default class DefaultLayout extends Vue {
         </draggable>
       </q-list>
 
-      <q-list no-border class="build-info">
-        <q-item dark>
-          <small>version: {{ version }}</small>
-        </q-item>
-      </q-list>
+      <q-btn-dropdown text-color="white" icon="mdi-bug-outline" class="bottomed">
+        <q-list dark bordered>
+          <q-item dark>
+            <q-item-section>
+              <q-item-label caption>Version</q-item-label>
+              {{ version }}
+            </q-item-section>
+          </q-item>
+          <ExportErrorsAction/>
+        </q-list>
+      </q-btn-dropdown>
     </q-drawer>
 
     <q-dialog v-model="wizardModalOpen" no-backdrop-dismiss>
@@ -435,7 +441,7 @@ export default class DefaultLayout extends Vue {
   cursor: move;
 }
 
-.build-info {
+.bottomed {
   bottom: 0;
   position: absolute;
 }

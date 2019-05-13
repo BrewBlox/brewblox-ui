@@ -226,7 +226,6 @@ export default class DashboardPage extends Vue {
         <q-btn-dropdown color="primary" label="actions">
           <q-list dark>
             <ActionItem icon="add" label="New Widget" @click="wizardModalOpen = true"/>
-            <ExportErrorsAction/>
           </q-list>
         </q-btn-dropdown>
       </portal>
