@@ -1,6 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { Dialog } from 'quasar';
 import UrlSafeString from 'url-safe-string';
 import draggable from 'vuedraggable';
 import buildEnv from '@/build-env.json';
@@ -49,46 +50,44 @@ export default class DefaultLayout extends Vue {
   }
 
   removeDashboard(dashboard: Dashboard) {
-    const diag = this.$q.dialog({
+    Dialog.create({
       title: 'Remove dashboard',
       message: `Are you sure you want to remove ${dashboard.title}?`,
       dark: true,
       ok: 'Confirm',
       cancel: 'Cancel',
-    });
-    diag.onOk && diag.onOk(() => dashboardStore.removeDashboard(dashboard));
+    })
+      .onOk(() => dashboardStore.removeDashboard(dashboard));
   }
 
   changeDashboardId(dashboard: Dashboard) {
-    const diag = this.$q.dialog({
+    Dialog.create({
       title: 'Change dashboard ID',
       message: "This will change your dashboard's unique ID",
       dark: true,
       cancel: true,
-      options: {
-        prompt: {
-          model: dashboard.id,
-          type: 'text',
-        },
+      prompt: {
+        model: dashboard.id,
+        type: 'text',
       },
-    });
-    diag.onOk && diag.onOk(async newId => {
-      const oldId = dashboard.id;
-      if (!newId || newId === oldId) {
-        return;
-      }
+    })
+      .onOk(async newId => {
+        const oldId = dashboard.id;
+        if (!newId || newId === oldId) {
+          return;
+        }
 
-      if (dashboardStore.dashboardIds.includes(newId)) {
-        this.$q.notify({
-          color: 'negative',
-          icon: 'error',
-          message: `Dashboard ${newId} already exists`,
-        });
-        return;
-      }
+        if (dashboardStore.dashboardIds.includes(newId)) {
+          this.$q.notify({
+            color: 'negative',
+            icon: 'error',
+            message: `Dashboard ${newId} already exists`,
+          });
+          return;
+        }
 
-      this.doChangeDashboardId(oldId, newId);
-    });
+        this.doChangeDashboardId(oldId, newId);
+      });
   }
 
   async doChangeDashboardId(oldId: string, newId: string) {
@@ -140,85 +139,81 @@ export default class DefaultLayout extends Vue {
   }
 
   changeDashboardTitle(dashboard: Dashboard) {
-    const diag = this.$q.dialog({
+    Dialog.create({
       title: 'Change dashboard Title',
       message: "Change your dashboard's display name",
       dark: true,
       cancel: true,
-      options: {
-        prompt: {
-          model: dashboard.title,
-          type: 'text',
-        },
+      prompt: {
+        model: dashboard.title,
+        type: 'text',
       },
-    });
-    diag.onOk && diag.onOk(async newTitle => {
-      const oldId = dashboard.id;
-      const oldTitle = dashboard.title;
-      if (!newTitle || oldTitle === newTitle) {
-        return;
-      }
+    })
+      .onOk(async newTitle => {
+        const oldId = dashboard.id;
+        const oldTitle = dashboard.title;
+        if (!newTitle || oldTitle === newTitle) {
+          return;
+        }
 
-      await dashboardStore.saveDashboard({ ...dashboard, title: newTitle });
-      this.$q.notify({
-        color: 'positive',
-        icon: 'edit',
-        message: `Renamed dashboard '${oldTitle}' to '${newTitle}'`,
+        await dashboardStore.saveDashboard({ ...dashboard, title: newTitle });
+        this.$q.notify({
+          color: 'positive',
+          icon: 'edit',
+          message: `Renamed dashboard '${oldTitle}' to '${newTitle}'`,
+        });
+
+        const defaultId = new UrlSafeString().generate(newTitle);
+        const suggestedId = this.findIdSuggestion(defaultId, oldId);
+        if (!suggestedId) {
+          return; // no change
+        }
+
+        Dialog.create({
+          title: 'Update dashboard URL',
+          message: `Do you want to change the dashboard ID from '${oldId}' to '${suggestedId}'?`,
+          dark: true,
+          cancel: true,
+        })
+          .onOk(() => this.doChangeDashboardId(oldId, suggestedId));
       });
-
-      const defaultId = new UrlSafeString().generate(newTitle);
-      const suggestedId = this.findIdSuggestion(defaultId, oldId);
-      if (!suggestedId) {
-        return; // no change
-      }
-
-      const diag = this.$q.dialog({
-        title: 'Update dashboard URL',
-        message: `Do you want to change the dashboard ID from '${oldId}' to '${suggestedId}'?`,
-        dark: true,
-        cancel: true,
-      });
-      diag.onOk && diag.onOk(() => this.doChangeDashboardId(oldId, suggestedId));
-    });
   }
 
   removeService(service: Service) {
-    const diag = this.$q.dialog({
+    Dialog.create({
       title: 'Remove service',
       message: `Are you sure you want to remove ${service.title}?`,
       dark: true,
       ok: 'Confirm',
       cancel: 'Cancel',
-    });
-    diag.onOk && diag.onOk(() => serviceStore.removeService(service));
+    })
+      .onOk(() => serviceStore.removeService(service));
   }
 
   changeServiceTitle(service: Service) {
-    const diag = this.$q.dialog({
+    Dialog.create({
       title: 'Change service Title',
       message: "Change your service's display name",
       dark: true,
       cancel: true,
-      options: {
-        prompt: {
-          model: service.title,
-          type: 'text',
-        },
+      prompt: {
+        model: service.title,
+        type: 'text',
       },
-    });
-    diag.onOk && diag.onOk(async newTitle => {
-      const oldTitle = service.title;
-      if (!newTitle || oldTitle === newTitle) {
-        return;
-      }
+    })
+      .onOk(async newTitle => {
+        const oldTitle = service.title;
+        if (!newTitle || oldTitle === newTitle) {
+          return;
+        }
 
-      await serviceStore.saveService({ ...service, title: newTitle });
-      this.$q.notify({
-        color: 'positive',
-        icon: 'edit',
-        message: `Renamed service '${oldTitle}' to '${newTitle}'`,
+        await serviceStore.saveService({ ...service, title: newTitle });
+        this.$q.notify({
+          color: 'positive',
+          icon: 'edit',
+          message: `Renamed service '${oldTitle}' to '${newTitle}'`,
+        });
       });
-    });
   }
 
   updateDefaultDashboard(id: string) {

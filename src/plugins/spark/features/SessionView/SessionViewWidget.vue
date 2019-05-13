@@ -1,6 +1,7 @@
 <script lang="ts">
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
+import { Dialog } from 'quasar';
 import shortid from 'shortid';
 import { SessionViewConfig, Session } from './types';
 import { shortDateString } from '@/helpers/functional';
@@ -64,40 +65,39 @@ export default class SessionViewWidget extends WidgetBase {
   }
 
   createSession() {
-    const diag = this.$q.dialog({
+    Dialog.create({
       title: 'Create session',
       dark: true,
       ok: 'Create',
       cancel: 'Cancel',
-      options: {
-        prompt: {
-          model: '',
-        },
+      prompt: {
+        model: '',
+        type: 'text',
       },
-    });
-    diag.onOk && diag.onOk((name) => {
-      const session = {
-        name,
-        id: shortid.generate(),
-        hidden: false,
-        start: null,
-        end: null,
-        graphCfg: {
-          layout: { title: name },
-          params: {},
-          targets: [],
-          renames: {},
-          axes: {},
-        },
-        notes: '',
-      };
-      this.saveConfig({
-        ...this.widgetConfig,
-        sessions: [...this.widgetConfig.sessions, session],
+    })
+      .onOk((name) => {
+        const session = {
+          name,
+          id: shortid.generate(),
+          hidden: false,
+          start: null,
+          end: null,
+          graphCfg: {
+            layout: { title: name },
+            params: {},
+            targets: [],
+            renames: {},
+            axes: {},
+          },
+          notes: '',
+        };
+        this.saveConfig({
+          ...this.widgetConfig,
+          sessions: [...this.widgetConfig.sessions, session],
+        });
+        this.modalSession = session;
+        this.modalOpen = true;
       });
-      this.modalSession = session;
-      this.modalOpen = true;
-    });
   }
 }
 </script>
