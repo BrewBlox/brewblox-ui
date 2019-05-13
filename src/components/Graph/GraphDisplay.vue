@@ -32,7 +32,7 @@ export default class GraphDisplay extends Vue {
     margin: {
       t: 40,
       l: 40,
-      r: 40,
+      r: 0,
       b: 40,
     },
     legend: { orientation: 'h' },
@@ -41,8 +41,11 @@ export default class GraphDisplay extends Vue {
       type: 'date',
       gridcolor: '#666',
       autorange: true,
+      domain: [0, 0.9],
     },
     yaxis: {
+      side: 'right',
+      position: 0.9,
       gridcolor: '#666',
       zerolinecolor: '#eee',
       autorange: true,
@@ -50,6 +53,7 @@ export default class GraphDisplay extends Vue {
     yaxis2: {
       overlaying: 'y',
       side: 'right',
+      position: 0.95,
       gridcolor: '#467',
       zerolinecolor: '#aef',
       autorange: true,
