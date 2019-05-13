@@ -50,18 +50,6 @@ export default class ProcessViewWidget extends WidgetBase {
     return this.$props.config;
   }
 
-  async saveConfig(config: ProcessViewConfig = this.widgetConfig) {
-    await this.$props.onChangeConfig(this.widgetId, config)
-      .catch((e) => {
-        this.$q.notify({
-          color: 'negative',
-          icon: 'error',
-          message: `save error: ${e}`,
-        });
-        this.$forceUpdate();
-      });
-  }
-
   async updateParts(parts: PersistentPart[]) {
     const asPersistent = (part: PersistentPart | FlowPart) => {
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
@@ -71,7 +59,7 @@ export default class ProcessViewWidget extends WidgetBase {
 
     // first set local value, to avoid jitters caused by the period between action and vueX refresh
     this.widgetConfig.parts = parts.map(asPersistent);
-    await this.saveConfig({ ...this.widgetConfig });
+    await this.saveConfig(this.widgetConfig);
     this.calculateFlowFunc();
   }
 

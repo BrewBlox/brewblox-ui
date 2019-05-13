@@ -120,19 +120,12 @@ export default class BlockWidget extends WidgetBase {
 
   protected async refreshBlock(): Promise<void> {
     await sparkStore.fetchBlock([this.serviceId, this.block])
-      .catch(err => this.$q.notify(err.toString()));
+      .catch(() => { });
   }
 
   protected async saveBlock(block: Block = this.block): Promise<void> {
     await sparkStore.saveBlock([this.serviceId, block])
-      .catch((err: Error) => {
-        this.$q.notify({
-          icon: 'error',
-          color: 'negative',
-          message: err.toString(),
-        });
-        this.$forceUpdate();
-      });
+      .catch(() => this.$forceUpdate());
   }
 
   protected callAndSaveBlock(func: (v: any) => void): (v: any) => void {
@@ -141,7 +134,7 @@ export default class BlockWidget extends WidgetBase {
 
   protected changeBlockId(newId: string): void {
     sparkStore.renameBlock([this.serviceId, this.blockId, newId])
-      .catch(err => this.$q.notify(err.toString()));
+      .catch(() => { });
   }
 
   protected async switchBlockId(blockId: string): Promise<void> {

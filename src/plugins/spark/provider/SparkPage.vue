@@ -293,6 +293,7 @@ export default class SparkPage extends Vue {
               label="Show Relations"
               @click="relationsModalOpen = true"
             />
+            <ExportErrorsAction/>
             <ActionItem icon="add" label="New Block" @click="startDialog('BlockWizard')"/>
             <ActionItem
               icon="mdi-magnify-plus-outline"

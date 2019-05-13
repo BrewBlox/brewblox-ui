@@ -29,11 +29,11 @@ import ItemBase from '../ItemBase';
 export default class WidgetBase extends ItemBase {
   protected async saveConfig(config: any): Promise<void> {
     await this.$props.onChangeConfig(this.$props.id, { ...config })
-      .catch((err: Error) => {
+      .catch(() => {
         this.$q.notify({
-          icon: 'error',
-          color: 'negative',
-          message: err.toString(),
+          color: 'warning',
+          icon: 'warning',
+          message: `Failed to save '${this.widgetTitle}' configuration`,
         });
         this.$forceUpdate();
       });
