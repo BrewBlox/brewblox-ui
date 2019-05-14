@@ -75,10 +75,11 @@ export default class SetpointProfileForm extends BlockForm {
   }
 
   defaultPoint(): DisplaySetpoint {
+    const defaultTempValues = { degC: 20, degF: 68, degK: 293 };
     return {
       offsetMs: 0,
       absTimeMs: new Date(this.start).getTime(),
-      temperature: new Unit(0, this.tempUnit),
+      temperature: new Unit(defaultTempValues[this.tempUnit] || 20, this.tempUnit),
     };
   }
 
