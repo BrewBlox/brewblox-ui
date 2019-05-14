@@ -24,7 +24,7 @@ import { getErrors as getDbErrors } from '@/helpers/database';
 export default class ExportErrorsAction extends Vue {
   async showDialog() {
     const errors = { fetch: getFetchErrors(), db: getDbErrors() };
-    const blob = new Blob([JSON.stringify(errors)], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([JSON.stringify(errors, null, 2)], { type: 'text/plain;charset=utf-8' });
     FileSaver.saveAs(blob, 'brewblox-errors.json');
   }
 }
