@@ -33,11 +33,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
   }
 
   defaultTemp(): Unit {
-    const defaultTempValues = {
-      degC: 20,
-      degF: 68,
-      degK: 293,
-    };
+    const defaultTempValues = { degC: 20, degF: 68, degK: 293 };
     return new Unit(defaultTempValues[this.userTemp] || 20, this.userTemp);
   }
 
