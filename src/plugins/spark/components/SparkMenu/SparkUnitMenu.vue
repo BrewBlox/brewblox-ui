@@ -23,11 +23,12 @@ export default class SparkUnitMenu extends Vue {
   }
 
   get units(): UserUnits {
-    return sparkStore.units(this.service.id);
+    return sparkStore.units(this.service.id) || {};
   }
 
-  unitAlternativeOptions(name: string): string[] {
-    return sparkStore.unitAlternatives(this.service.id)[name] || [];
+  unitAlternativeOptions(name: string): { label: string; value: any }[] {
+    return (sparkStore.unitAlternatives(this.service.id)[name] || [])
+      .map(v => ({ label: v, value: v }));
   }
 
   saveUnits(vals: UserUnits = this.units) {

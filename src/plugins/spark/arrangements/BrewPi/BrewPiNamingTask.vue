@@ -84,6 +84,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
       heatPid: 'Heat PID',
       beerPid: 'Beer PID',
       fridgeOffset: 'Fridge Offset',
+      graph: 'Graph',
     };
   }
 
