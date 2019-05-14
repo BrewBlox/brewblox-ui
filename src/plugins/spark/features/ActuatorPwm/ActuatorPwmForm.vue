@@ -1,6 +1,6 @@
 <script lang="ts">
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/state';
+import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
 import Component from 'vue-class-component';
 import { defaultData, presets } from './getters';
 

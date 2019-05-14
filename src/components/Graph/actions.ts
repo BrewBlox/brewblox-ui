@@ -1,5 +1,4 @@
-import { addValuesListener } from '@/store/history/actions';
-import { MAX_POINTS } from '@/store/history/getters';
+import historyStore from '@/store/history';
 import {
   DisplayNames,
   QueryParams,
@@ -7,12 +6,11 @@ import {
   QueryTarget,
   GraphValueAxes,
   GraphValuesListener,
-} from '@/store/history/state';
-import { RootStore } from '@/store/state';
+} from '@/store/history/types';
 import parseDuration from 'parse-duration';
 import { nanoToMilli } from '@/helpers/functional';
 
-export { removeListener } from '@/store/history/actions';
+const MAX_POINTS = 5000;
 
 const transpose = (matrix: any[][]): any[][] => matrix[0].map((_, idx) => matrix.map(row => row[idx]));
 
@@ -82,7 +80,6 @@ const valuesTransformer =
 
 export const addPlotlyListener =
   async (
-    store: RootStore,
     id: string,
     params: QueryParams,
     renames: DisplayNames,
@@ -93,15 +90,17 @@ export const addPlotlyListener =
       ...target,
       fields: target.fields.filter(field => !!field),
     };
-    if (filteredTarget.fields.length > 0) {
-      addValuesListener(store, {
-        id,
-        params,
-        renames,
-        axes,
-        transformer: valuesTransformer,
-        target: filteredTarget,
-        values: {},
-      });
+    if (filteredTarget.fields.length == 0) {
+      return;
     }
+    const listener: GraphValuesListener = {
+      id,
+      params,
+      renames,
+      axes,
+      transformer: valuesTransformer,
+      target: filteredTarget,
+      values: {},
+    };
+    await historyStore.addValuesListener(listener);
   };

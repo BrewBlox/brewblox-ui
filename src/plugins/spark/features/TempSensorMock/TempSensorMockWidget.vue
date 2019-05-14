@@ -3,12 +3,12 @@ import { postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { getById } from './getters';
-import { TempSensorMockBlock } from './state';
+import { TempSensorMockBlock } from './types';
 
 @Component
 export default class TempSensorMockWidget extends BlockWidget {
   get block(): TempSensorMockBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get renamedTargets() {

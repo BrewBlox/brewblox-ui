@@ -1,7 +1,7 @@
 <script lang="ts">
-import { uid } from 'quasar';
+import { uid, Dialog } from 'quasar';
 import Component from 'vue-class-component';
-import { FlowPart, ClickEvent, PersistentPart, Rect, ProcessViewConfig, StatePart, PartUpdater } from './state';
+import { FlowPart, ClickEvent, PersistentPart, Rect, ProcessViewConfig, StatePart, PartUpdater } from './types';
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';
 import { Coordinates } from '@/helpers/coordinates';
@@ -98,9 +98,10 @@ export default class ProcessViewForm extends FormBase {
   }
 
   clearParts() {
-    this.$q.dialog({
+    Dialog.create({
       title: 'Remove all',
       message: 'Are you sure you wish to remove all parts?',
+      dark: true,
       noBackdropDismiss: true,
       cancel: true,
     })
@@ -111,7 +112,6 @@ export default class ProcessViewForm extends FormBase {
     return {
       updatePart: this.updatePart,
       updatePartState: this.updatePartState,
-      store: this.$store,
     };
   }
 
@@ -217,8 +217,10 @@ export default class ProcessViewForm extends FormBase {
   }
 
   findGridSquare(grid: Rect, x: number, y: number) {
-    x -= window.pageXOffset;
-    y -= window.pageYOffset;
+    // The issue that required this correction appears fixed in upstream
+    // Commented in case the problem reappears
+    // x -= window.pageXOffset;
+    // y -= window.pageYOffset;
     if (!this.rectContains(grid, x, y)) {
       return null;
     }

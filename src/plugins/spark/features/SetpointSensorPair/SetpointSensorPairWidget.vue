@@ -3,12 +3,12 @@ import { postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { getById } from './getters';
-import { SetpointSensorPairBlock } from './state';
+import { SetpointSensorPairBlock } from './types';
 
 @Component
 export default class SetpointSensorPairWidget extends BlockWidget {
   get block(): SetpointSensorPairBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get renamedTargets() {

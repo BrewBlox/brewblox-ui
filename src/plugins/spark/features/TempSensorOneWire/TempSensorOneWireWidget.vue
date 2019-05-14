@@ -3,12 +3,12 @@ import { postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { getById } from './getters';
-import { TempSensorOneWireBlock } from './state';
+import { TempSensorOneWireBlock } from './types';
 
 @Component
 export default class TempSensorOneWireWidget extends BlockWidget {
   get block(): TempSensorOneWireBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get renamedTargets() {

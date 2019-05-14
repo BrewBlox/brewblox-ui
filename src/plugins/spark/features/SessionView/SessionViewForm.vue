@@ -1,13 +1,12 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import shortid from 'shortid';
+import historyStore from '@/store/history';
 import { objectSorter } from '@/helpers/functional';
 import FormBase from '@/components/Form/FormBase';
 import { nodeBuilder, targetSplitter, targetBuilder, QuasarNode, expandedNodes } from '@/components/Graph/functional';
-import { SessionViewConfig, Session } from '@/plugins/spark/features/SessionView/state';
+import { SessionViewConfig, Session } from '@/plugins/spark/features/SessionView/types';
 import { durationString } from '@/helpers/functional';
-import { fields } from '@/store/history/getters';
-import { fetchKnownKeys } from '@/store/history/actions';
 
 @Component({
   props: {
@@ -32,7 +31,7 @@ export default class SessionViewForm extends FormBase {
   }
 
   get nodes() {
-    return nodeBuilder(fields(this.$store));
+    return nodeBuilder(historyStore.fields);
   }
 
   get graphSession() {
@@ -56,7 +55,7 @@ export default class SessionViewForm extends FormBase {
 
   startSession(session: Session, time: number) {
     if (time && session.end && time > session.end) {
-      this.$q.notify('Session start must be before its end');
+      this.$q.notify({ message: 'Session start must be before its end' });
       return;
     }
     session.start = time;
@@ -66,7 +65,7 @@ export default class SessionViewForm extends FormBase {
 
   endSession(session: Session, time: number) {
     if (time && session.start && time < session.start) {
-      this.$q.notify('Session end must be after its start');
+      this.$q.notify({ message: 'Session end must be after its start' });
       return;
     }
     session.end = time;
@@ -135,7 +134,7 @@ export default class SessionViewForm extends FormBase {
   }
 
   created() {
-    fetchKnownKeys(this.$store);
+    historyStore.fetchKnownKeys();
   }
 }
 </script>

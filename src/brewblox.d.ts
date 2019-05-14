@@ -1,9 +1,3 @@
-// interface for plugin arguments
-interface PluginArguments {
-  store: any;
-  router: any;
-}
-
 interface PanArguments {
   evt: MouseEvent | TouchEvent;
   position: { top: number; left: number };

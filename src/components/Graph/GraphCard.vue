@@ -1,13 +1,13 @@
 <script lang="ts">
-import { tryListenerById } from '@/store/history/getters';
-import { defaultPresets } from '@/components/Graph/getters';
-import { DisplayNames, Listener, QueryParams, QueryTarget, GraphValueAxes } from '@/store/history/state';
-import { Layout, PlotData } from 'plotly.js';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { addPlotlyListener, removeListener } from './actions';
+import historyStore from '@/store/history';
+import { defaultPresets } from '@/components/Graph/getters';
+import { DisplayNames, Listener, QueryParams, QueryTarget, GraphValueAxes } from '@/store/history/types';
+import { Layout, PlotData } from 'plotly.js';
+import { addPlotlyListener } from './actions';
 import GraphDisplay from './GraphDisplay.vue';
-import { GraphConfig } from './state';
+import { GraphConfig } from './types';
 import { setTimeout } from 'timers';
 
 @Component({
@@ -66,7 +66,7 @@ export default class GraphCard extends Vue {
 
   get listeners(): Listener[] {
     return this.targets
-      .map(target => tryListenerById(this.$store, this.listenerId(target)))
+      .map(target => historyStore.tryListenerById(this.listenerId(target)))
       .filter(listener => listener !== null) as Listener[];
   }
 
@@ -91,7 +91,6 @@ export default class GraphCard extends Vue {
     this.targets
       .forEach(target =>
         addPlotlyListener(
-          this.$store,
           this.listenerId(target),
           this.params,
           this.renames,
@@ -103,7 +102,7 @@ export default class GraphCard extends Vue {
   removeListeners() {
     this.listeners
       .forEach(listener =>
-        removeListener(this.$store, listener));
+        historyStore.removeListener(listener));
   }
 
   resetListeners() {

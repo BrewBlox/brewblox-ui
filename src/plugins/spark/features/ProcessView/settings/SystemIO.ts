@@ -1,4 +1,4 @@
-import { ComponentSettings, PersistentPart } from '../state';
+import { ComponentSettings, PersistentPart } from '../types';
 import { IN_OUT, RIGHT, defaultSettings } from '../getters';
 
 const settings: ComponentSettings = {

@@ -1,10 +1,9 @@
-import { GraphConfig } from '@/components/Graph/state';
-import WidgetBase from '@/components/Widget/WidgetBase';
-import { QueryParams, GraphValueAxes } from '@/store/history/state';
 import Component from 'vue-class-component';
-import { Block } from '../state';
-import { fetchBlock, renameBlock, saveBlock } from '../store/actions';
-import { blockById, drivenChains } from '../store/getters';
+import WidgetBase from '@/components/Widget/WidgetBase';
+import sparkStore from '@/plugins/spark/store';
+import { GraphConfig } from '@/components/Graph/types';
+import { QueryParams, GraphValueAxes } from '@/store/history/types';
+import { Block } from '../types';
 import { Watch } from 'vue-property-decorator';
 
 @Component
@@ -36,11 +35,11 @@ export default class BlockWidget extends WidgetBase {
   }
 
   protected get block(): Block {
-    return blockById(this.$store, this.serviceId, this.blockId);
+    return sparkStore.blockById(this.serviceId, this.blockId);
   }
 
   protected get isDriven(): boolean {
-    return drivenChains(this.$store, this.serviceId)
+    return sparkStore.drivenChains(this.serviceId)
       .some((chain: string[]) => chain[0] === this.blockId);
   }
 
@@ -86,7 +85,7 @@ export default class BlockWidget extends WidgetBase {
       axes: this.graphAxes,
       // constants
       layout: {
-        title: this.$props.id,
+        title: this.widgetTitle,
       },
       targets: [
         {
@@ -120,20 +119,13 @@ export default class BlockWidget extends WidgetBase {
   }
 
   protected async refreshBlock(): Promise<void> {
-    await fetchBlock(this.$store, this.serviceId, this.block)
-      .catch(err => this.$q.notify(err.toString()));
+    await sparkStore.fetchBlock([this.serviceId, this.block])
+      .catch(() => { });
   }
 
   protected async saveBlock(block: Block = this.block): Promise<void> {
-    await saveBlock(this.$store, this.serviceId, block)
-      .catch((err: Error) => {
-        this.$q.notify({
-          icon: 'error',
-          color: 'negative',
-          message: err.toString(),
-        });
-        this.$forceUpdate();
-      });
+    await sparkStore.saveBlock([this.serviceId, block])
+      .catch(() => this.$forceUpdate());
   }
 
   protected callAndSaveBlock(func: (v: any) => void): (v: any) => void {
@@ -141,8 +133,8 @@ export default class BlockWidget extends WidgetBase {
   }
 
   protected changeBlockId(newId: string): void {
-    renameBlock(this.$store, this.serviceId, this.blockId, newId)
-      .catch(err => this.$q.notify(err.toString()));
+    sparkStore.renameBlock([this.serviceId, this.blockId, newId])
+      .catch(() => { });
   }
 
   protected async switchBlockId(blockId: string): Promise<void> {

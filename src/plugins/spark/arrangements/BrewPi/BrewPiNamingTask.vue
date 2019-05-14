@@ -2,9 +2,10 @@
 import UrlSafeString from 'url-safe-string';
 import Component from 'vue-class-component';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
-import { serviceValues } from '@/store/services/getters';
-import { typeName, blockIds } from '@/plugins/spark/store/getters';
-import { BrewPiConfig, BrewPiConfigNames } from '@/plugins/spark/arrangements/BrewPi/state';
+import serviceStore from '@/store/services';
+import sparkStore from '@/plugins/spark/store';
+import { typeName } from '@/plugins/spark/getters';
+import { BrewPiConfig, BrewPiConfigNames } from '@/plugins/spark/arrangements/BrewPi/types';
 import { spaceCased, valOrDefault } from '@/helpers/functional';
 import mapValues from 'lodash/mapValues';
 
@@ -18,7 +19,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   get serviceOpts() {
-    return serviceValues(this.$store)
+    return serviceStore.serviceValues
       .filter(svc => svc.type === typeName)
       .map(svc => ({ label: svc.title, value: svc.id }));
   }
@@ -83,6 +84,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
       heatPid: 'Heat PID',
       beerPid: 'Beer PID',
       fridgeOffset: 'Fridge Offset',
+      graph: 'Graph',
     };
   }
 
@@ -107,7 +109,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
     if (!this.serviceId) {
       return false;
     }
-    return blockIds(this.$store, this.serviceId).includes(val);
+    return sparkStore.blockIds(this.serviceId).includes(val);
   }
 
   updateName(key: string, val: string) {

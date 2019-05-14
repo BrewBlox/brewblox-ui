@@ -1,9 +1,8 @@
-import { blockById } from '@/plugins/spark/store/getters';
-import { RootStore } from '@/store/state';
-import { InactiveObjectBlock } from './state';
+import sparkStore from '@/plugins/spark/store';
+import { InactiveObjectBlock } from './types';
 
 export const typeName = 'InactiveObject';
 
 export const getById =
-  (store: RootStore, serviceId: string, id: string): InactiveObjectBlock =>
-    blockById<InactiveObjectBlock>(store, serviceId, id, typeName);
+  (serviceId: string, id: string): InactiveObjectBlock =>
+    sparkStore.blockById(serviceId, id, typeName);

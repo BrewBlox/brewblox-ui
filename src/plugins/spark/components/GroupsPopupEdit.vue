@@ -1,7 +1,7 @@
 <script lang="ts">
-import { groupNames } from '@/plugins/spark/store/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import sparkStore from '@/plugins/spark/store';
 
 @Component({
   props: {
@@ -37,7 +37,7 @@ export default class GroupsPopupEdit extends Vue {
   }
 
   get groupOpts() {
-    return groupNames(this.$store, this.$props.serviceId)
+    return sparkStore.groupNames(this.$props.serviceId)
       .map((name: string, idx: number) => ({
         label: name,
         value: idx,

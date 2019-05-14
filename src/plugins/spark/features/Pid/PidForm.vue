@@ -1,6 +1,6 @@
 <script lang="ts">
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import { PidBlock } from '@/plugins/spark/features/Pid/state';
+import { PidBlock } from '@/plugins/spark/features/Pid/types';
 import Component from 'vue-class-component';
 import { filters, defaultData, presets } from './getters';
 

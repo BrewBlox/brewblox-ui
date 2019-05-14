@@ -1,7 +1,7 @@
-import { Block } from '@/plugins/spark/state';
 import Component from 'vue-class-component';
 import FormBase from '@/components/Form/FormBase';
-import { drivenChains } from '../store/getters';
+import sparkStore from '@/plugins/spark/store';
+import { Block } from '@/plugins/spark/types';
 
 @Component({
   props: {
@@ -34,7 +34,7 @@ export default class BlockForm extends FormBase {
   }
 
   protected get isDriven(): boolean {
-    return drivenChains(this.$store, this.serviceId)
+    return sparkStore.drivenChains(this.serviceId)
       .some((chain: string[]) => chain[0] === this.block.id);
   }
 

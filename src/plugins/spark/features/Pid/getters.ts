@@ -1,6 +1,5 @@
-import { blockById } from '@/plugins/spark/store/getters';
-import { RootStore } from '@/store/state';
-import { PidBlock } from './state';
+import sparkStore from '@/plugins/spark/store';
+import { PidBlock } from './types';
 import { ProcessValueLink, ActuatorAnalogLink } from '@/helpers/units/KnownLinks';
 import { Unit } from '@/helpers/units';
 
@@ -17,8 +16,8 @@ export const filters = [
 ];
 
 export const getById =
-  (store: RootStore, serviceId: string, id: string): PidBlock =>
-    blockById<PidBlock>(store, serviceId, id, typeName);
+  (serviceId: string, id: string): PidBlock =>
+    sparkStore.blockById(serviceId, id, typeName);
 
 export const defaultData =
   (): any => ({

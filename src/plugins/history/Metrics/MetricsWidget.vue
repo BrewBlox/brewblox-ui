@@ -2,14 +2,14 @@
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
+import historyStore from '@/store/history';
 import get from 'lodash/get';
 import parseDuration from 'parse-duration';
 import { durationString } from '@/helpers/functional';
-import { tryListenerById } from '@/store/history/getters';
-import { QueryTarget, Listener, DisplayNames, QueryParams } from '@/store/history/state';
-import { MetricsResult, MetricsConfig } from './state';
+import { QueryTarget, Listener, DisplayNames, QueryParams } from '@/store/history/types';
+import { MetricsResult, MetricsConfig } from './types';
 import { DEFAULT_FRESH_DURATION, DEFAULT_DECIMALS } from './getters';
-import { addListener, removeListener } from './actions';
+import { addListener } from './actions';
 
 interface CurrentValue extends MetricsResult {
   name: string;
@@ -49,7 +49,7 @@ export default class MetricsWidget extends WidgetBase {
 
   get listeners(): Listener[] {
     return this.targets
-      .map(target => tryListenerById(this.$store, this.listenerId(target)))
+      .map(target => historyStore.tryListenerById(this.listenerId(target)))
       .filter(listener => listener !== null && !!listener.values) as Listener[];
   }
 
@@ -80,7 +80,6 @@ export default class MetricsWidget extends WidgetBase {
     this.targets
       .forEach(target =>
         addListener(
-          this.$store,
           this.listenerId(target),
           this.params,
           this.renames,
@@ -91,7 +90,7 @@ export default class MetricsWidget extends WidgetBase {
   removeListeners() {
     this.listeners
       .forEach(listener =>
-        removeListener(this.$store, listener));
+        historyStore.removeListener(listener));
   }
 
   resetListeners() {

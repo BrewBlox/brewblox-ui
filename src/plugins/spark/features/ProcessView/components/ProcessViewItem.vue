@@ -3,7 +3,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { SQUARE_SIZE } from '../getters';
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
-import { FlowPart } from '../state';
+import { FlowPart } from '../types';
 import settings from '../settings';
 
 

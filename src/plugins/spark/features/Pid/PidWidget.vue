@@ -3,14 +3,14 @@ import { postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { filters, getById } from './getters';
-import { PidBlock } from './state';
+import { PidBlock } from './types';
 
 @Component
 export default class PidWidget extends BlockWidget {
   inputFormOpen = false;
 
   get block(): PidBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get renamedTargets() {

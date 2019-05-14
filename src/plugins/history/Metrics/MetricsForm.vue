@@ -1,13 +1,12 @@
 <script lang="ts">
+import Component from 'vue-class-component';
+import FormBase from '@/components/Form/FormBase';
 import parseDuration from 'parse-duration';
 import get from 'lodash/get';
+import historyStore from '@/store/history';
 import { nodeBuilder, targetSplitter, targetBuilder, QuasarNode, expandedNodes } from '@/components/Graph/functional';
-import FormBase from '@/components/Form/FormBase';
-import { fetchKnownKeys } from '@/store/history/actions';
-import { fields } from '@/store/history/getters';
-import Component from 'vue-class-component';
 import { durationString } from '@/helpers/functional';
-import { MetricsConfig } from './state';
+import { MetricsConfig } from './types';
 import { DEFAULT_FRESH_DURATION, DEFAULT_DECIMALS } from './getters';
 
 @Component
@@ -23,8 +22,8 @@ export default class MetricsForm extends FormBase {
     return this.$props.field;
   }
 
-  get fields() {
-    return fields(this.$store) as { [key: string]: string[] };
+  get fields(): Record<string, string[]> {
+    return historyStore.fields;
   }
 
   get nodes() {
@@ -56,7 +55,7 @@ export default class MetricsForm extends FormBase {
   }
 
   created() {
-    fetchKnownKeys(this.$store);
+    historyStore.fetchKnownKeys();
   }
 
   callAndSaveConfig(func: (v: any) => void) {

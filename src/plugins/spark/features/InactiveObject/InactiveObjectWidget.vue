@@ -1,12 +1,12 @@
 <script lang="ts">
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
-import { displayNameById } from '@/store/features/getters';
+import featureStore from '@/store/features';
 
 @Component
 export default class InactiveObjectWidget extends BlockWidget {
   get actualDisplayName() {
-    return displayNameById(this.$store, this.block.data.actualType);
+    return featureStore.displayNameById(this.block.data.actualType);
   }
 }
 </script>

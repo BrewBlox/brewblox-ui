@@ -1,5 +1,5 @@
 import { ref } from '@/helpers/component-ref';
-import { Arrangement } from '@/store/features/state';
+import { Arrangement } from '@/store/features/types';
 import BrewPiWizard from './BrewPiWizard.vue';
 import BrewPiNamingTask from './BrewPiNamingTask.vue';
 import BrewPiHardwareTask from './BrewPiHardwareTask.vue';

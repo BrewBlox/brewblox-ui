@@ -1,8 +1,8 @@
-import { createFeature } from '@/store/features/actions';
+import featureStore from '@/store/features';
 import Graph from './Graph';
 import CurrentValue from './Metrics';
 
-export default ({ store }: PluginArguments) => {
-  createFeature(store, Graph);
-  createFeature(store, CurrentValue);
+export default () => {
+  featureStore.createFeature(Graph);
+  featureStore.createFeature(CurrentValue);
 };

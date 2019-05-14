@@ -83,7 +83,6 @@ export default class InputPopupEdit extends Vue {
   }
 
   save() {
-    console.log('save', this.placeholder);
     this.$props.change(this.placeholder);
   }
 }

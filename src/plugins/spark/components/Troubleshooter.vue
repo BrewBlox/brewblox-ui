@@ -1,9 +1,8 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import WidgetBase from '@/components/Widget/WidgetBase';
-import { fetchServiceStatus, createUpdateSource } from '@/plugins/spark/store/actions';
-import { lastStatus } from '@/plugins/spark/store/getters';
-import { SystemStatus } from '@/plugins/spark/state';
+import sparkStore from '@/plugins/spark/store';
+import { SystemStatus } from '@/plugins/spark/types';
 
 @Component
 export default class Troubleshooter extends WidgetBase {
@@ -11,8 +10,8 @@ export default class Troubleshooter extends WidgetBase {
     return this.$props.config.serviceId;
   }
 
-  get lastStatus(): SystemStatus {
-    return lastStatus(this.$store, this.serviceId);
+  get lastStatus(): SystemStatus | null {
+    return sparkStore.lastStatus(this.serviceId);
   }
 
   get textAvailable(): string {
@@ -34,8 +33,8 @@ export default class Troubleshooter extends WidgetBase {
   }
 
   refresh() {
-    fetchServiceStatus(this.$store, this.serviceId)
-      .then(() => createUpdateSource(this.$store, this.serviceId))
+    sparkStore.fetchServiceStatus(this.serviceId)
+      .then(() => sparkStore.createUpdateSource(this.serviceId))
       .catch(() => { });
   }
 

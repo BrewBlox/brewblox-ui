@@ -1,13 +1,9 @@
 <script lang="ts">
-import { objectStringSorter } from '@/helpers/functional';
-import {
-  displayNameById,
-  featureIds,
-  wizardById,
-} from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { dashboardValues, primaryDashboardId } from '@/store/dashboards/getters';
+import { objectStringSorter } from '@/helpers/functional';
+import dashboardStore from '@/store/dashboards';
+import featureStore from '@/store/features';
 
 @Component({
   props: {
@@ -18,7 +14,6 @@ import { dashboardValues, primaryDashboardId } from '@/store/dashboards/getters'
   },
 })
 export default class WidgetWizardPicker extends Vue {
-  $q: any;
   filteredOptions: any[] = [];
   feature: any = null;
   wizardActive: boolean = false;
@@ -28,7 +23,7 @@ export default class WidgetWizardPicker extends Vue {
   get chosenDashboardId() {
     return this.localChosenDashboardId
       || this.$props.dashboardId
-      || primaryDashboardId(this.$store);
+      || dashboardStore.primaryDashboardId;
   }
 
   set chosenDashboardId(id: string) {
@@ -36,16 +31,16 @@ export default class WidgetWizardPicker extends Vue {
   }
 
   get dashboardOptions() {
-    return dashboardValues(this.$store)
+    return dashboardStore.dashboardValues
       .map(dash => ({ label: dash.title, value: dash.id }));
   }
 
   get wizardOptions() {
-    return featureIds(this.$store)
+    return featureStore.featureIds
       .map(id => ({
-        label: displayNameById(this.$store, id),
+        label: featureStore.displayNameById(id),
         value: id,
-        component: wizardById(this.$store, id),
+        component: featureStore.wizardById(id),
       }))
       .filter(opt => !!opt.component)
       .sort(objectStringSorter('label'));

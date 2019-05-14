@@ -1,5 +1,5 @@
 import { ref } from '@/helpers/component-ref';
-import { Feature } from '@/store/features/state';
+import { Feature } from '@/store/features/types';
 import widget from './ExampleFeatureWidget.vue';
 import wizard from './ExampleFeatureWizard.vue';
 
@@ -57,7 +57,7 @@ const feature: Feature = {
       Example code:
         featureWidget(feature: Feature, itemConfig: any) {
           if (feature.selector !== undefined) {
-            return feature.selector(this.$store, itemConfig);
+            return feature.selector(itemConfig);
           }
           return feature.widget;
         }

@@ -1,13 +1,20 @@
 <script lang="ts">
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import { graphlib, render as dagreRender } from 'dagre-d3';
 import { select as d3Select } from 'd3-selection';
-import { Vue, Component, Watch } from 'vue-property-decorator';
+import { Watch } from 'vue-property-decorator';
 import { setTimeout } from 'timers';
 
 interface Edge {
   source: string;
   target: string;
   relation: string[];
+}
+
+interface Node {
+  id: string;
+  type: string;
 }
 
 const LABEL_HEIGHT = 50;
@@ -41,8 +48,19 @@ export default class DagreDiagram extends Vue {
   }
 
   get drawnNodes() {
-    return this.$props.nodes
-      .filter(n => this.edges.find(e => e.source === n.id || e.target === n.id));
+    const findNode = (id: string): Node =>
+      this.$props.nodes.find(node => node.id === id) || { id, type: '???' };
+
+    return this.edges
+      // Create a list of each ID referenced by an edge
+      .reduce((acc: string[], edge: Edge) => [...acc, edge.target, edge.source], [])
+      // Find a node for each unique ID
+      .reduce((acc: Node[], id: string) =>
+        acc.find(node => node.id === id)
+          ? acc
+          : [...acc, findNode(id)],
+        [],
+      );
   }
 
   @Watch('relations', { immediate: true })

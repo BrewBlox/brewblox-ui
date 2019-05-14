@@ -2,12 +2,12 @@
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
 import { getById } from './getters';
-import { ActuatorPwmBlock } from './state';
+import { ActuatorPwmBlock } from './types';
 
 @Component
 export default class ActuatorPwmWidget extends BlockWidget {
   get block(): ActuatorPwmBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get renamedTargets() {

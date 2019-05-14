@@ -1,10 +1,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { formById } from '@/store/features/getters';
-import { blocks } from '../store/getters';
-import { saveBlock } from '../store/actions';
-import { Block } from '../state';
+import featureStore from '@/store/features';
+import sparkStore from '@/plugins/spark/store';
+import { Block } from '../types';
 import isString from 'lodash/isString';
 
 @Component({
@@ -32,25 +31,24 @@ import isString from 'lodash/isString';
   },
 })
 export default class BlockFormButton extends Vue {
-  $q: any; // injected by quasar
   modalOpen: boolean = false;
 
   get block(): Block | null {
     const id = this.$props.blockId;
 
     return !!id
-      ? blocks(this.$store, this.$props.serviceId)[id] || null
+      ? sparkStore.blocks(this.$props.serviceId)[id] || null
       : null;
   }
 
   get blockForm() {
     return !!this.block
-      ? formById(this.$store, this.block.type)
+      ? featureStore.formById(this.block.type)
       : null;
   }
 
   saveBlock(v) {
-    saveBlock(this.$store, this.$props.serviceId, v)
+    sparkStore.saveBlock([this.$props.serviceId, v])
       .catch(err => this.$q.notify(err.toString()));
   }
 }

@@ -21,7 +21,7 @@ import TeeTube from './TeeTube';
 import Valve from './Valve';
 import WhirlpoolInlet from './WhirlpoolInlet';
 
-import { ComponentSettings } from '../state';
+import { ComponentSettings } from '../types';
 
 const settings: { [key: string]: ComponentSettings } = {
   ActuatorValve,

@@ -1,5 +1,5 @@
 import { registerModule, fetchAll, fetchById, create, persist, remove } from '@/helpers/database';
-import { Service } from './state';
+import { Service } from './types';
 
 const SERVICES = 'services';
 

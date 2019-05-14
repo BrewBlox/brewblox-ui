@@ -1,15 +1,13 @@
 <script lang="ts">
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import Component from 'vue-class-component';
-import { DisplaySettingsBlock, DisplayWidget } from '@/plugins/spark/features/DisplaySettings/state';
+import sparkStore from '@/plugins/spark/store';
+import { DisplaySettingsBlock, DisplayWidget } from '@/plugins/spark/features/DisplaySettings/types';
 import { Link } from '@/helpers/units';
-import { blockValues, blockById } from '@/plugins/spark/store/getters';
 import { validDisplayTypes } from '@/plugins/spark/features/DisplaySettings/getters';
 
 @Component
 export default class DisplaySettingsForm extends BlockForm {
-  $q: any;
-
   get block() {
     return this.blockField as DisplaySettingsBlock;
   }
@@ -48,7 +46,7 @@ export default class DisplaySettingsForm extends BlockForm {
   }
 
   get slotLinkOpts() {
-    return blockValues(this.$store, this.serviceId)
+    return sparkStore.blockValues(this.serviceId)
       .filter(block => validDisplayTypes.includes(block.type))
       .map(block => ({
         label: block.id,
@@ -64,7 +62,7 @@ export default class DisplaySettingsForm extends BlockForm {
       return;
     }
 
-    const block = blockById(this.$store, this.serviceId, id);
+    const block = sparkStore.blockById(this.serviceId, id);
     const link = new Link(block.id, block.type);
     const existing = this.displaySlots[idx] || {};
     const obj: DisplayWidget = {
@@ -97,7 +95,7 @@ export default class DisplaySettingsForm extends BlockForm {
 
   updateSlotName(idx: number, name: string) {
     if (name.length > 15) {
-      this.$q.notify('Name can only be 15 characters');
+      this.$q.notify({ message: 'Name can only be 15 characters' });
       return;
     }
     const pos = idx + 1;

@@ -1,16 +1,14 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
+import sparkStore from '@/plugins/spark/store';
 import { RIGHT } from '../getters';
 import { Link } from '@/helpers/units';
-import { Block } from '@/plugins/spark/state';
-import { blocks } from '@/plugins/spark/store/getters';
+import { Block } from '@/plugins/spark/types';
 import { Watch } from 'vue-property-decorator';
 
 @Component
 export default class ActuatorValve extends PartComponent {
-  $q: any;
-
   get paths() {
     return {
       outerValve: [
@@ -52,7 +50,7 @@ export default class ActuatorValve extends PartComponent {
     if (!this.actuatorServiceId || !this.actuatorLink || !this.actuatorLink.id) {
       return null;
     }
-    return blocks(this.$store, this.actuatorServiceId)[this.actuatorLink.id];
+    return sparkStore.blocks(this.actuatorServiceId)[this.actuatorLink.id];
   }
 
   get flowSpeed() {

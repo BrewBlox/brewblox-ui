@@ -5,7 +5,7 @@ import { uid } from 'quasar';
 import { SQUARE_SIZE } from './getters';
 import { parts } from './register';
 import settings from './settings';
-import { PersistentPart, StatePart } from './state';
+import { PersistentPart, StatePart } from './types';
 import { spaceCased } from '@/helpers/functional';
 
 

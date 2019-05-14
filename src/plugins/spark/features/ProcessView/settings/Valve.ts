@@ -1,4 +1,4 @@
-import { ComponentSettings, Transitions, StatePart, PartUpdater } from '../state';
+import { ComponentSettings, Transitions, StatePart, PartUpdater } from '../types';
 import { LEFT, RIGHT, defaultSettings } from '../getters';
 
 const settings: ComponentSettings = {

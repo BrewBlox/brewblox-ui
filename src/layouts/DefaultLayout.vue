@@ -1,34 +1,16 @@
 <script lang="ts">
-import UrlSafeString from 'url-safe-string';
-import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
-import { objectSorter } from '@/helpers/functional';
-import {
-  removeDashboard,
-  updateDashboardOrder,
-  updatePrimaryDashboard,
-  saveDashboard,
-  createDashboard,
-  saveDashboardItem,
-} from '@/store/dashboards/actions';
-import {
-  dashboardValues,
-  primaryDashboardId,
-  dashboardIds,
-  dashboardItemValues,
-  dashboardById,
-} from '@/store/dashboards/getters';
-import { Dashboard } from '@/store/dashboards/state';
-import {
-  removeService,
-  updateServiceOrder,
-  saveService,
-} from '@/store/services/actions';
-import { serviceValues } from '@/store/services/getters';
-import { Service } from '@/store/services/state';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { Dialog } from 'quasar';
+import UrlSafeString from 'url-safe-string';
 import draggable from 'vuedraggable';
 import buildEnv from '@/build-env.json';
+import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
+import { objectSorter } from '@/helpers/functional';
+import dashboardStore from '@/store/dashboards';
+import serviceStore from '@/store/services';
+import { Dashboard } from '@/store/dashboards/types';
+import { Service } from '@/store/services/types';
 
 @Component({
   components: {
@@ -37,7 +19,6 @@ import buildEnv from '@/build-env.json';
   },
 })
 export default class DefaultLayout extends Vue {
-  $q: any;
   leftDrawerOpen: boolean = true;
   dashboardEditing: boolean = false;
   serviceEditing: boolean = false;
@@ -49,39 +30,41 @@ export default class DefaultLayout extends Vue {
   }
 
   get dashboards() {
-    return [...dashboardValues(this.$store)].sort(objectSorter('order'));
+    return [...dashboardStore.dashboardValues].sort(objectSorter('order'));
   }
 
   set dashboards(dashboards: Dashboard[]) {
-    updateDashboardOrder(this.$store, dashboards.map(dashboard => dashboard.id));
+    dashboardStore.updateDashboardOrder(dashboards.map(dashboard => dashboard.id));
   }
 
   get defaultDashboard() {
-    return primaryDashboardId(this.$store);
+    return dashboardStore.primaryDashboardId;
   }
 
   get services() {
-    return [...serviceValues(this.$store)].sort(objectSorter('order'));
+    return [...serviceStore.serviceValues].sort(objectSorter('order'));
   }
 
   set services(services: Service[]) {
-    updateServiceOrder(this.$store, services.map(service => service.id));
+    serviceStore.updateServiceOrder(services.map(service => service.id));
   }
 
   removeDashboard(dashboard: Dashboard) {
-    this.$q.dialog({
+    Dialog.create({
       title: 'Remove dashboard',
       message: `Are you sure you want to remove ${dashboard.title}?`,
+      dark: true,
       ok: 'Confirm',
       cancel: 'Cancel',
     })
-      .onOk(() => removeDashboard(this.$store, dashboard));
+      .onOk(() => dashboardStore.removeDashboard(dashboard));
   }
 
   changeDashboardId(dashboard: Dashboard) {
-    this.$q.dialog({
+    Dialog.create({
       title: 'Change dashboard ID',
       message: "This will change your dashboard's unique ID",
+      dark: true,
       cancel: true,
       prompt: {
         model: dashboard.id,
@@ -94,7 +77,7 @@ export default class DefaultLayout extends Vue {
           return;
         }
 
-        if (dashboardIds(this.$store).includes(newId)) {
+        if (dashboardStore.dashboardIds.includes(newId)) {
           this.$q.notify({
             color: 'negative',
             icon: 'error',
@@ -108,18 +91,18 @@ export default class DefaultLayout extends Vue {
   }
 
   async doChangeDashboardId(oldId: string, newId: string) {
-    const dashboard = dashboardById(this.$store, oldId);
+    const dashboard = dashboardStore.dashboardById(oldId);
 
-    await createDashboard(this.$store, { ...dashboard, id: newId });
+    await dashboardStore.createDashboard({ ...dashboard, id: newId });
     await Promise.all(
-      dashboardItemValues(this.$store)
+      dashboardStore.itemValues
         .filter(item => item.dashboard === oldId)
-        .map(item => saveDashboardItem(this.$store, { ...item, dashboard: newId }))
+        .map(item => dashboardStore.saveDashboardItem({ ...item, dashboard: newId }))
     );
-    await removeDashboard(this.$store, { ...dashboard });
+    await dashboardStore.removeDashboard({ ...dashboard });
 
     if (this.defaultDashboard === oldId) {
-      await updatePrimaryDashboard(this.$store, newId);
+      await dashboardStore.updatePrimaryDashboard(newId);
     }
 
     if (this.$route.path === `/dashboard/${oldId}`) {
@@ -137,7 +120,7 @@ export default class DefaultLayout extends Vue {
     if (id === oldId) {
       return null;
     }
-    const existingIds = dashboardIds(this.$store);
+    const existingIds = dashboardStore.dashboardIds;
     if (!existingIds.includes(id)) {
       return id;
     }
@@ -156,9 +139,10 @@ export default class DefaultLayout extends Vue {
   }
 
   changeDashboardTitle(dashboard: Dashboard) {
-    this.$q.dialog({
+    Dialog.create({
       title: 'Change dashboard Title',
       message: "Change your dashboard's display name",
+      dark: true,
       cancel: true,
       prompt: {
         model: dashboard.title,
@@ -172,7 +156,7 @@ export default class DefaultLayout extends Vue {
           return;
         }
 
-        await saveDashboard(this.$store, { ...dashboard, title: newTitle });
+        await dashboardStore.saveDashboard({ ...dashboard, title: newTitle });
         this.$q.notify({
           color: 'positive',
           icon: 'edit',
@@ -185,9 +169,10 @@ export default class DefaultLayout extends Vue {
           return; // no change
         }
 
-        this.$q.dialog({
+        Dialog.create({
           title: 'Update dashboard URL',
           message: `Do you want to change the dashboard ID from '${oldId}' to '${suggestedId}'?`,
+          dark: true,
           cancel: true,
         })
           .onOk(() => this.doChangeDashboardId(oldId, suggestedId));
@@ -195,19 +180,21 @@ export default class DefaultLayout extends Vue {
   }
 
   removeService(service: Service) {
-    this.$q.dialog({
+    Dialog.create({
       title: 'Remove service',
       message: `Are you sure you want to remove ${service.title}?`,
+      dark: true,
       ok: 'Confirm',
       cancel: 'Cancel',
     })
-      .onOk(() => removeService(this.$store, service));
+      .onOk(() => serviceStore.removeService(service));
   }
 
   changeServiceTitle(service: Service) {
-    this.$q.dialog({
+    Dialog.create({
       title: 'Change service Title',
       message: "Change your service's display name",
+      dark: true,
       cancel: true,
       prompt: {
         model: service.title,
@@ -220,7 +207,7 @@ export default class DefaultLayout extends Vue {
           return;
         }
 
-        await saveService(this.$store, { ...service, title: newTitle });
+        await serviceStore.saveService({ ...service, title: newTitle });
         this.$q.notify({
           color: 'positive',
           icon: 'edit',
@@ -230,7 +217,7 @@ export default class DefaultLayout extends Vue {
   }
 
   updateDefaultDashboard(id: string) {
-    updatePrimaryDashboard(this.$store, this.defaultDashboard === id ? null : id);
+    dashboardStore.updatePrimaryDashboard(this.defaultDashboard === id ? null : id);
   }
 
   openWizard(component: string | null = null) {
@@ -417,11 +404,17 @@ export default class DefaultLayout extends Vue {
         </draggable>
       </q-list>
 
-      <q-list no-border class="build-info">
-        <q-item dark>
-          <small>version: {{ version }}</small>
-        </q-item>
-      </q-list>
+      <q-btn-dropdown text-color="white" icon="mdi-bug-outline" class="bottomed">
+        <q-list dark bordered>
+          <q-item dark>
+            <q-item-section>
+              <q-item-label caption>Version</q-item-label>
+              {{ version }}
+            </q-item-section>
+          </q-item>
+          <ExportErrorsAction/>
+        </q-list>
+      </q-btn-dropdown>
     </q-drawer>
 
     <q-dialog v-model="wizardModalOpen" no-backdrop-dismiss>
@@ -448,7 +441,7 @@ export default class DefaultLayout extends Vue {
   cursor: move;
 }
 
-.build-info {
+.bottomed {
   bottom: 0;
   position: absolute;
 }

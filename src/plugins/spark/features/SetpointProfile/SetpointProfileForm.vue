@@ -1,11 +1,12 @@
 <script lang="ts">
+import Component from 'vue-class-component';
+import sparkStore from '@/plugins/spark/store';
 import { durationString, objectSorter } from '@/helpers/functional';
 import { Unit, Link } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import { units } from '@/plugins/spark/store/getters';
 import parseDuration from 'parse-duration';
-import Component from 'vue-class-component';
-import { Setpoint, SetpointProfileBlock } from './state';
+import { Setpoint, SetpointProfileBlock } from './types';
+import { SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
 
 interface DisplaySetpoint {
   offsetMs: number;
@@ -23,7 +24,7 @@ export default class SetpointProfileForm extends BlockForm {
   }
 
   get tempUnit() {
-    return units(this.$store, this.block.serviceId).Temp;
+    return sparkStore.units(this.block.serviceId).Temp;
   }
 
   get start(): number {
@@ -45,7 +46,7 @@ export default class SetpointProfileForm extends BlockForm {
       start: new Date().getTime() / 1000,
       points: [],
       enabled: false,
-      targetId: new Link(null),
+      targetId: new SetpointSensorPairLink(null),
       drivenTargetId: new Link(null),
     };
   }
@@ -74,10 +75,11 @@ export default class SetpointProfileForm extends BlockForm {
   }
 
   defaultPoint(): DisplaySetpoint {
+    const defaultTempValues = { degC: 20, degF: 68, degK: 293 };
     return {
       offsetMs: 0,
       absTimeMs: new Date(this.start).getTime(),
-      temperature: new Unit(0, this.tempUnit),
+      temperature: new Unit(defaultTempValues[this.tempUnit] || 20, this.tempUnit),
     };
   }
 
