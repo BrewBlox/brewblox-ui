@@ -12,6 +12,7 @@ import { typeName as pairType } from '@/plugins/spark/features/SetpointSensorPai
 import { typeName as pwmType } from '@/plugins/spark/features/ActuatorPwm/getters';
 import { typeName as mutexType } from '@/plugins/spark/features/Mutex/getters';
 import { typeName as offsetType } from '@/plugins/spark/features/ActuatorOffset/getters';
+import { typeName as graphType } from '@/plugins/history/Graph/getters';
 import {
   typeName as pidType,
   defaultData as pidData,
@@ -23,8 +24,21 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
   fridgeSetting = new Unit(20, 'degC');
   beerSetting = new Unit(20, 'degC');
 
+  get userTemp(): string {
+    return sparkStore.units(this.cfg.serviceId).Temp;
+  }
+
   get cfg(): BrewPiConfig {
     return this.stagedConfig;
+  }
+
+  defaultTemp(): Unit {
+    const defaultTempValues = {
+      degC: 20,
+      degF: 68,
+      degK: 293,
+    };
+    return new Unit(defaultTempValues[this.userTemp] || 20, this.userTemp);
   }
 
   blockType(newId: string): string {
@@ -241,6 +255,29 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         },
       });
 
+    const createGraph =
+      (name: string) => ({
+        ...createWidget(name, graphType),
+        pinnedPosition: { x: 1, y: 1 },
+        config: {
+          layout: {},
+          params: { duration: '10m' },
+          targets: [
+            {
+              measurement: this.cfg.serviceId,
+              fields: [
+                `${this.cfg.names.fridgeSSPair}/value[${this.userTemp}]`,
+                `${this.cfg.names.fridgeSSPair}/setting[${this.userTemp}]`,
+                `${this.cfg.names.beerSSPair}/value[${this.userTemp}]`,
+                `${this.cfg.names.beerSSPair}/setting[${this.userTemp}]`,
+                `${this.cfg.names.coolPwm}/value`,
+                `${this.cfg.names.heatPwm}/value`,
+              ],
+            },
+          ],
+        },
+      });
+
     this.cfg.widgets = [
       // PID
       createWidget(this.cfg.names.coolPid, pidType),
@@ -262,7 +299,8 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       createWidget(this.cfg.names.mutex, mutexType),
       // Offset
       createWidget(this.cfg.names.fridgeOffset, offsetType),
-
+      // Graph
+      createGraph(this.cfg.names.graph),
     ];
   }
 
@@ -314,6 +352,11 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
     // We're updating all at once, to avoid having to wait a tick before the prop changes
     this.updateConfig(this.cfg);
     this.finish();
+  }
+
+  mounted() {
+    this.fridgeSetting = this.defaultTemp();
+    this.beerSetting = this.defaultTemp();
   }
 }
 </script>

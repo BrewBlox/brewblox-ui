@@ -16,6 +16,7 @@ export interface BrewPiConfigNames {
   coolPid: string;
   heatPid: string;
   beerPid: string;
+  graph: string;
 }
 
 export interface BrewPiConfig {

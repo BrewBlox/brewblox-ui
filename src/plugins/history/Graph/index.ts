@@ -1,11 +1,12 @@
 import { ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features/types';
+import { typeName } from './getters';
 import form from './GraphForm.vue';
 import widget from './GraphWidget.vue';
 import wizard from './GraphWizard.vue';
 
 const feature: Feature = {
-  id: 'Graph',
+  id: typeName,
   displayName: 'Graph',
   widget: ref(widget),
   wizard: ref(wizard),
