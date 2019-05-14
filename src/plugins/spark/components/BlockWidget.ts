@@ -85,7 +85,7 @@ export default class BlockWidget extends WidgetBase {
       axes: this.graphAxes,
       // constants
       layout: {
-        title: this.$props.id,
+        title: this.widgetTitle,
       },
       targets: [
         {

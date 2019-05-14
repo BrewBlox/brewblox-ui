@@ -157,7 +157,6 @@ export default class DashboardPage extends Vue {
       cancel: true,
     })
       .onOk((selected: number[]) => {
-        console.log(selected);
         selected.forEach(idx => opts[idx].action(item.config));
       });
   }
