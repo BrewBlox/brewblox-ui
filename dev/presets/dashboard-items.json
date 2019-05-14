@@ -611,18 +611,19 @@
           {
             "measurement": "sparkey",
             "fields": [
-              "__time/millisSinceBoot"
+              "actuator-pwm-1/setting",
+              "actuator-pwm-1/value"
             ]
           },
           {
             "measurement": "spock",
             "fields": [
-              "__time/millisSinceBoot"
+              " Combined Influx points"
             ]
           }
         ],
         "renames": {
-          "sparkey/__time/millisSinceBoot": "Sparkey since boot"
+          "sparkey/actuator-pwm-1/setting": "Actuator setting"
         }
       }
     },
