@@ -46,15 +46,22 @@ export default class GraphWidget extends WidgetBase {
 <template>
   <q-card dark class="text-white column">
     <q-dialog v-model="settingsModalOpen" no-backdrop-dismiss class="row">
+      <ScreenSizeConstrained
+        v-if="settingsModalOpen"
+        :min-width="1500"
+        class="q-mr-md"
+        style="width: 600px"
+      >
+        <q-card dark class="q-pa-xs bg-dark-bright">
+          <GraphCard :id="$props.id" :config="graphCfg" shared-listeners/>
+        </q-card>
+      </ScreenSizeConstrained>
       <GraphForm
         v-if="settingsModalOpen"
         v-bind="$props"
         :field="graphCfg"
         :on-change-field="saveConfig"
       />
-      <ScreenSizeConstrained v-if="settingsModalOpen" :min-width="1500" class="q-ml-md col-auto">
-        <GraphCard :id="$props.id" :config="graphCfg" shared-listeners/>
-      </ScreenSizeConstrained>
     </q-dialog>
 
     <q-dialog v-model="graphModalOpen" maximized>

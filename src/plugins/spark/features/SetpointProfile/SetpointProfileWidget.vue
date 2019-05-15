@@ -61,15 +61,19 @@ export default class SetpointProfileWidget extends BlockWidget {
 <template>
   <q-card dark class="text-white column">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss class="row">
-      <SetpointProfileForm v-if="modalOpen" v-bind="formProps"/>
       <ScreenSizeConstrained
         v-if="modalOpen"
         :min-width="1500"
-        class="q-ml-md"
-        style="width: 800px; height: 50vh"
+        class="q-mr-md"
+        style="width: 600px"
       >
-        <GraphDisplay :data="plotlyData" :layout="plotlyLayout"/>
+        <q-card dark class="q-pa-xs bg-dark-bright">
+          <div>
+            <GraphDisplay :data="plotlyData" :layout="plotlyLayout"/>
+          </div>
+        </q-card>
       </ScreenSizeConstrained>
+      <SetpointProfileForm v-if="modalOpen" v-bind="formProps"/>
     </q-dialog>
 
     <BlockWidgetToolbar :field="me"/>
