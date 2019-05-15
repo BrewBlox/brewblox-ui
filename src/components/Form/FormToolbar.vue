@@ -7,7 +7,7 @@ export default class FormToolbar extends Vue { }
 </script>
 
 <template>
-  <q-bar class="row items-center bg-primary q-py-lg">
+  <q-bar class="row items-center bg-primary q-py-lg text-white">
     <slot/>
     <q-space/>
     <slot name="buttons"/>
