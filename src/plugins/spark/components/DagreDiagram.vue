@@ -41,6 +41,10 @@ export default class DagreDiagram extends Vue {
   }
   lastRelationString: string = '';
   graphObj: any = null;
+  invertedRelations: string[] = [
+    'input',
+    'reference',
+  ]
 
   get edges() {
     return this.$props.relations
@@ -101,8 +105,13 @@ export default class DagreDiagram extends Vue {
     });
 
     this.edges.forEach(val => {
-      obj.setEdge(val.source, val.target, {
-        label: val.relation[0].replace(/Id$/, ''),
+      const label = val.relation[0].replace(/Id$/, '');
+      const [source, target] = this.invertedRelations.includes(label)
+        ? [val.target, val.source]
+        : [val.source, val.target];
+
+      obj.setEdge(source, target, {
+        label,
         labelStyle: 'fill: white; stroke: none;',
         style: 'fill: none; stroke: red; stroke-width: 1.5px;',
         arrowheadStyle: 'fill: red; stroke: red;',
