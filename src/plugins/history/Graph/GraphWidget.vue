@@ -8,15 +8,10 @@ import { QueryParams } from '@/store/history/types';
 
 @Component
 export default class GraphWidget extends WidgetBase {
-  windowWidth: number = 0;
   settingsModalOpen: boolean = false;
   graphModalOpen: boolean = false;
   $refs!: {
     widgetGraph: any;
-  }
-
-  get showFormGraph() {
-    return this.windowWidth >= 1500;
   }
 
   get graphCfg(): GraphConfig {
@@ -41,22 +36,9 @@ export default class GraphWidget extends WidgetBase {
     });
   }
 
-  updateWidth() {
-    this.windowWidth = window.innerWidth;
-  }
-
   @Watch('graphCfg', { deep: true })
   regraph() {
     this.$nextTick(() => this.$refs.widgetGraph.resetListeners());
-  }
-
-  mounted() {
-    this.updateWidth();
-    this.$nextTick(() => window.addEventListener('resize', this.updateWidth));
-  }
-
-  beforeDestroy() {
-    window.removeEventListener('resize', this.updateWidth);
   }
 }
 </script>
@@ -70,9 +52,9 @@ export default class GraphWidget extends WidgetBase {
         :field="graphCfg"
         :on-change-field="saveConfig"
       />
-      <div v-if="settingsModalOpen && showFormGraph" class="form-graph col-auto">
+      <ScreenSizeConstrained v-if="settingsModalOpen" :min-width="1500" class="q-ml-md col-auto">
         <GraphCard :id="$props.id" :config="graphCfg" shared-listeners/>
-      </div>
+      </ScreenSizeConstrained>
     </q-dialog>
 
     <q-dialog v-model="graphModalOpen" maximized>
@@ -149,9 +131,3 @@ export default class GraphWidget extends WidgetBase {
     </div>
   </q-card>
 </template>
-
-<style>
-.form-graph {
-  margin-left: 40px;
-}
-</style>
