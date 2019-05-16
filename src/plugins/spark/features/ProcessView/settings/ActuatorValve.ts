@@ -1,8 +1,22 @@
 import { ComponentSettings, Transitions, StatePart, PartUpdater } from '../state';
 import { LEFT, RIGHT, defaultSettings } from '../getters';
-import { post } from '@/helpers/fetch';
+import { toJson } from '@/helpers/fetch';
 
 import { Notify } from 'quasar';
+import { serialize } from '@/helpers/units/parseObject';
+
+const post =
+  async (url: string, data: any, method = 'POST'): Promise<any> =>
+    toJson(window.fetch(
+      url,
+      {
+        method,
+        body: JSON.stringify(serialize(data)),
+        headers: new Headers({
+          'Content-Type': 'application/json',
+        }),
+      },
+    ));
 
 const intercept = (message: string): (e: Error) => never =>
   (e: Error) => {
@@ -25,9 +39,10 @@ const settings: ComponentSettings = {
       },
   interactHandler: (part: StatePart, updater: PartUpdater) => {
     if (part.settings.valveid !== undefined) {
-      const message = part.settings.valveid + (part.settings.closed ? 'o' : 'x');
+      const message = part.settings.valveid + (part.settings.closed ? '1' : '0');
+      console.log(message);
       post(
-        '/valves/write',
+        'https://localhost:9001/valves/write',
         {
           message,
         },
