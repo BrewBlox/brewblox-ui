@@ -374,7 +374,7 @@ export default class ProcessViewForm extends FormBase {
 </script>
 
 <template>
-  <q-card dark class="maximized bg-dark-bright">
+  <q-card dark class="maximized bg-dark">
     <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
 
     <q-dialog v-model="menuModalOpen" no-backdrop-dismiss>
