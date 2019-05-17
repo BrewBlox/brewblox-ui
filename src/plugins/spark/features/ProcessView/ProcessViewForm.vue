@@ -355,6 +355,9 @@ export default class ProcessViewForm extends FormBase {
   }
 
   keyHandler(evt: KeyboardEvent) {
+    if (this.menuModalOpen || this.catalogModalOpen || this.dragAction) {
+      return;
+    }
     const key = evt.key.toLowerCase();
     const tool = this.tools.find(t => t.shortcut === key);
     if (tool) {
@@ -374,7 +377,7 @@ export default class ProcessViewForm extends FormBase {
 </script>
 
 <template>
-  <q-card dark class="maximized bg-dark-bright">
+  <q-card dark class="maximized bg-dark">
     <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
 
     <q-dialog v-model="menuModalOpen" no-backdrop-dismiss>
