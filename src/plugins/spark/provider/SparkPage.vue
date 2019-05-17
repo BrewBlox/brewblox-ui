@@ -12,6 +12,8 @@ import { Service } from '@/store/services/types';
 import { isReady, isSystemBlock, widgetSize } from './getters';
 import { Watch } from 'vue-property-decorator';
 import { setInterval, clearTimeout } from 'timers';
+import { objectStringSorter } from '@/helpers/functional';
+import get from 'lodash/get';
 
 interface ModalSettings {
   component: string;
@@ -23,6 +25,7 @@ interface ValidatedItem {
   component: string;
   item: DashboardItem;
   props?: any;
+  minimized: boolean;
 }
 
 @Component({
@@ -36,6 +39,10 @@ interface ValidatedItem {
 export default class SparkPage extends Vue {
   volatileItems: { [blockId: string]: DashboardItem } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
+  sorting: string = 'none';
+  serviceMinimized: boolean = true;
+  minimized: Record<string, boolean> = {};
+  blockFilter: string = '';
 
   modalOpen: boolean = false;
   modalSettings: ModalSettings | null = null;
@@ -78,6 +85,28 @@ export default class SparkPage extends Vue {
 
   get widgetSize() {
     return widgetSize;
+  }
+
+  get allSorters(): { [id: string]: (a: ValidatedItem, b: ValidatedItem) => number } {
+    return {
+      none: () => 0,
+      name: (a, b) => objectStringSorter('title')(a.props, b.props),
+      type: (a: ValidatedItem, b: ValidatedItem): number => {
+        const left = featureStore.displayNameById(a.item.feature).toLowerCase();
+        const right = featureStore.displayNameById(b.item.feature).toLowerCase();
+        if (left < right) {
+          return -1;
+        }
+        if (right > left) {
+          return 1;
+        }
+        return 0;
+      },
+    };
+  }
+
+  get sorter(): (a: ValidatedItem, b: ValidatedItem) => number {
+    return this.allSorters[this.sorting] || (() => 0);
   }
 
   volatileKey(blockId: string): string {
@@ -126,6 +155,7 @@ export default class SparkPage extends Vue {
       item,
       component: featureStore.widgetById(item.feature, item.config) || 'InvalidWidget',
       props: this.itemProps(item),
+      minimized: get(this.minimized, item.id, true),
     };
   }
 
@@ -135,6 +165,17 @@ export default class SparkPage extends Vue {
         .filter(block => !isSystemBlock(block))
         .map(this.validateBlock),
     ];
+  }
+
+  get filteredItems(): ValidatedItem[] {
+    const filter = (this.blockFilter || '').toLowerCase();
+    return this.validatedItems
+      .filter(val => val.item.id.toLowerCase().match(filter))
+      .sort(this.sorter);
+  }
+
+  get colSize() {
+    return 'col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4';
   }
 
   @Watch('statusNok', { immediate: true })
@@ -281,125 +322,158 @@ export default class SparkPage extends Vue {
 
 <template>
   <div>
-    <template>
-      <portal to="toolbar-title">
-        <div>Blocks</div>
-      </portal>
-      <portal to="toolbar-buttons">
-        <q-btn-dropdown :disable="!isReady || statusNok" color="primary" label="actions">
-          <q-list dark link>
-            <ActionItem
-              icon="mdi-ray-start-arrow"
-              label="Show Relations"
-              @click="relationsModalOpen = true"
-            />
-            <ActionItem icon="add" label="New Block" @click="startDialog('BlockWizard')"/>
-            <ActionItem
-              icon="mdi-magnify-plus-outline"
-              label="Discover new OneWire Blocks"
-              @click="discoverBlocks"
-            />
-            <ActionItem icon="wifi" label="Configure Wifi" @click="startDialog('SparkWifiMenu')"/>
-            <ActionItem
-              icon="mdi-checkbox-multiple-marked"
-              label="Groups"
-              @click="startDialog('SparkGroupMenu')"
-            />
-            <ActionItem
-              icon="mdi-temperature-celsius"
-              label="Units"
-              @click="startDialog('SparkUnitMenu')"
-            />
-            <ActionItem
-              icon="mdi-file-export"
-              label="Import/Export Blocks"
-              @click="startDialog('SparkImportMenu')"
-            />
-            <ActionItem icon="delete" label="Remove all Blocks" @click="resetBlocks"/>
-          </q-list>
-        </q-btn-dropdown>
-      </portal>
-      <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-        <component
-          v-if="modalOpen"
-          :is="modalSettings.component"
-          v-bind="modalSettings.props"
-          @close="modalOpen = false"
-        />
-      </q-dialog>
-      <q-dialog v-model="relationsModalOpen" no-backdrop-dismiss maximized>
-        <DagreDiagram
-          v-if="relationsModalOpen"
-          :nodes="validatedItems.map(v => ({id: v.item.id, type: v.item.feature}))"
-          :relations="relations"
-        />
-      </q-dialog>
-      <q-banner icon="info" class="bg-dark text-white q-mb-lg">
-        This service page shows all blocks that are running on your Spark controller.
-        <br>Deleting blocks on this page will remove them on the controller.
-      </q-banner>
-      <q-list v-if="statusNok" dark no-border>
+    <portal to="toolbar-title">
+      <div>Blocks</div>
+    </portal>
+    <portal to="toolbar-buttons">
+      <q-btn-dropdown :disable="!isReady || statusNok" color="primary" label="actions">
+        <q-list dark link>
+          <ActionItem
+            icon="mdi-ray-start-arrow"
+            label="Show Relations"
+            @click="relationsModalOpen = true"
+          />
+          <ActionItem icon="add" label="New Block" @click="startDialog('BlockWizard')"/>
+          <ActionItem
+            icon="mdi-magnify-plus-outline"
+            label="Discover new OneWire Blocks"
+            @click="discoverBlocks"
+          />
+          <ActionItem icon="wifi" label="Configure Wifi" @click="startDialog('SparkWifiMenu')"/>
+          <ActionItem
+            icon="mdi-checkbox-multiple-marked"
+            label="Groups"
+            @click="startDialog('SparkGroupMenu')"
+          />
+          <ActionItem
+            icon="mdi-temperature-celsius"
+            label="Units"
+            @click="startDialog('SparkUnitMenu')"
+          />
+          <ActionItem
+            icon="mdi-file-export"
+            label="Import/Export Blocks"
+            @click="startDialog('SparkImportMenu')"
+          />
+          <ActionItem icon="delete" label="Remove all Blocks" @click="resetBlocks"/>
+        </q-list>
+      </q-btn-dropdown>
+    </portal>
+
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
+      <component
+        v-if="modalOpen"
+        :is="modalSettings.component"
+        v-bind="modalSettings.props"
+        @close="modalOpen = false"
+      />
+    </q-dialog>
+    <q-dialog v-model="relationsModalOpen" no-backdrop-dismiss maximized>
+      <DagreDiagram
+        v-if="relationsModalOpen"
+        :nodes="validatedItems.map(v => ({id: v.item.id, type: v.item.feature}))"
+        :relations="relations"
+      />
+    </q-dialog>
+
+    <!-- Shown if service was found in store, but not ok -->
+    <q-list v-if="statusNok" dark no-border class="colSize">
+      <q-item dark>
+        <q-item-section>
+          <Troubleshooter
+            :id="service.id"
+            :config="{serviceId: service.id}"
+            :cols="4"
+            :rows="4"
+            title="Troubleshooter"
+            type="Troubleshooter"
+            class="bg-dark"
+          />
+        </q-item-section>
+      </q-item>
+    </q-list>
+
+    <!-- Normal display -->
+    <div v-else class="row justify-around">
+      <q-list dark no-border class="col-auto">
         <q-item dark>
           <q-item-section>
-            <Troubleshooter
-              :id="service.id"
-              :config="{serviceId: service.id}"
-              :cols="4"
-              :rows="4"
-              title="Troubleshooter"
-              type="Troubleshooter"
-              class="dashboard-item"
-            />
+            <q-btn-dropdown :label="`Sort Blocks by (${sorting})`" outline>
+              <q-list dark>
+                <ActionItem
+                  v-for="(func, name) in allSorters"
+                  :key="name"
+                  :active="sorting === name"
+                  :label="name"
+                  @click="sorting = name"
+                />
+              </q-list>
+            </q-btn-dropdown>
           </q-item-section>
         </q-item>
-      </q-list>
-      <q-list v-else-if="isMobile" dark no-border>
+
         <q-item dark>
           <q-item-section>
+            <q-input v-model="blockFilter" placeholder="Search Block" clearable dark>
+              <template v-slot:append>
+                <q-icon name="search"/>
+              </template>
+            </q-input>
+          </q-item-section>
+        </q-item>
+
+        <q-item dark>
+          <q-item-section v-if="serviceMinimized">
+            <q-item class="bg-dark text-white" style="min-width: 500px">
+              <q-item-section avatar>
+                <q-icon name="mdi-cloud"/>
+              </q-item-section>
+              <q-item-section>{{ $props.serviceId }}</q-item-section>
+              <q-item-section side>Spark Service</q-item-section>
+            </q-item>
+          </q-item-section>
+          <q-item-section v-else>
             <SparkWidget
               v-if="isReady"
               :id="service.id"
               :service-id="service.id"
               :cols="widgetSize.cols"
               :rows="widgetSize.rows"
-              class="dashboard-item"
+              class="bg-dark"
+            />
+          </q-item-section>
+          <q-item-section side top>
+            <q-btn
+              :icon="serviceMinimized ? 'mdi-unfold-more-horizontal' : 'mdi-unfold-less-horizontal'"
+              flat
+              round
+              color="white"
+              @click="serviceMinimized = !serviceMinimized"
             />
           </q-item-section>
         </q-item>
-        <q-item v-for="val in validatedItems" :key="val.key" dark>
+
+        <q-item v-for="val in filteredItems" :key="val.key" dark>
           <q-item-section>
-            <component :is="val.component" v-bind="val.props" class="dashboard-item"/>
+            <MinimizedBlockWidget v-if="val.minimized" v-bind="val.props" class="bg-dark"/>
+            <component v-else :is="val.component" v-bind="val.props" class="bg-dark"/>
+          </q-item-section>
+          <q-item-section side top>
+            <q-btn
+              :icon="val.minimized ? 'mdi-unfold-more-horizontal' : 'mdi-unfold-less-horizontal'"
+              flat
+              round
+              color="white"
+              @click="$set(minimized, val.props.id, !val.minimized)"
+            />
           </q-item-section>
         </q-item>
       </q-list>
-      <GridContainer v-else no-move>
-        <SparkWidget
-          v-if="isReady"
-          :id="service.id"
-          :service-id="service.id"
-          :cols="widgetSize.cols"
-          :rows="widgetSize.rows"
-          class="dashboard-item"
-        />
-        <component
-          v-for="val in validatedItems"
-          :is="val.component"
-          :key="val.key"
-          v-bind="val.props"
-          class="dashboard-item"
-        />
-      </GridContainer>
-    </template>
+    </div>
   </div>
 </template>
 
 <style lang="stylus" scoped>
 @import '../../../styles/quasar.styl';
 @import '../../../styles/quasar.variables.styl';
-
-.dashboard-item {
-  background: $block-background;
-  height: 100%;
-  width: 100%;
-}
 </style>

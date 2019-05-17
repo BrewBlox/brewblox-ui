@@ -1,4 +1,4 @@
-<script lang="ts">
+]<script lang="ts">
 import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
 import { Dialog } from 'quasar';
