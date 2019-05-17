@@ -355,6 +355,9 @@ export default class ProcessViewForm extends FormBase {
   }
 
   keyHandler(evt: KeyboardEvent) {
+    if (this.menuModalOpen || this.catalogModalOpen || this.dragAction) {
+      return;
+    }
     const key = evt.key.toLowerCase();
     const tool = this.tools.find(t => t.shortcut === key);
     if (tool) {
