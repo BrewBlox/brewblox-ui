@@ -6,15 +6,13 @@ import dashboardStore from '@/store/dashboards';
 import featureStore from '@/store/features';
 import serviceStore from '@/store/services';
 import sparkStore from '@/plugins/spark/store';
-import { Block, SystemStatus } from '@/plugins/spark/types';
+import { Block, SystemStatus, Spark } from '@/plugins/spark/types';
 import { Dashboard, DashboardItem } from '@/store/dashboards/types';
-import { Service } from '@/store/services/types';
 import { isReady, isSystemBlock, widgetSize } from './getters';
 import { Watch } from 'vue-property-decorator';
 import { setInterval, clearTimeout } from 'timers';
 import { objectStringSorter } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/shadow-copy';
-import get from 'lodash/get';
 
 interface ModalSettings {
   component: string;
@@ -26,7 +24,7 @@ interface ValidatedItem {
   component: string;
   item: DashboardItem;
   props?: any;
-  minimized: boolean;
+  expanded: boolean;
 }
 
 @Component({
@@ -40,17 +38,15 @@ interface ValidatedItem {
 export default class SparkPage extends Vue {
   volatileItems: { [blockId: string]: DashboardItem } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
-  sorting: string = 'none';
-  serviceMinimized: boolean = true;
-  minimized: { [widgetId: string]: boolean } = {};
+  sorting: 'none' | 'name' | 'type' = 'none';
   blockFilter: string = '';
 
   modalOpen: boolean = false;
   modalSettings: ModalSettings | null = null;
   relationsModalOpen: boolean = false;
 
-  get service(): Service {
-    return serviceStore.serviceById(this.$props.serviceId);
+  get service(): Spark {
+    return serviceStore.serviceById(this.$props.serviceId) as Spark;
   }
 
   get dashboards(): Dashboard[] {
@@ -110,6 +106,40 @@ export default class SparkPage extends Vue {
     return this.allSorters[this.sorting] || (() => 0);
   }
 
+  get expandedBlocks() {
+    return this.service.config.expandedBlocks || {};
+  }
+
+  set expandedBlocks(expanded: { [id: string]: boolean }) {
+    const ids = [...sparkStore.blockIds(this.service.id), '_service'];
+    this.service.config.expandedBlocks = Object.entries(expanded)
+      .reduce(
+        (acc, [k, v]) => {
+          return ids.includes(k)
+            ? { ...acc, [k]: v }
+            : acc;
+        },
+        {},
+      );
+    this.saveServiceConfig();
+  }
+
+  get serviceExpanded() {
+    return this.expandedBlocks['_service'] || false;
+  }
+
+  set serviceExpanded(val: boolean) {
+    this.expandedBlocks = { ...this.expandedBlocks, ['_service']: val };
+  }
+
+  saveServiceConfig() {
+    serviceStore.saveService({ ...this.service });
+  }
+
+  updateExpandedBlock(id: string, val: boolean) {
+    this.expandedBlocks = { ...this.expandedBlocks, [id]: val };
+  }
+
   volatileKey(blockId: string): string {
     return `${this.service.id}/${blockId}`;
   }
@@ -156,7 +186,7 @@ export default class SparkPage extends Vue {
       item,
       component: featureStore.widgetById(item.feature, item.config) || 'InvalidWidget',
       props: this.itemProps(item),
-      minimized: get(this.minimized, item.id, true),
+      expanded: this.expandedBlocks[item.id] || false,
     };
   }
 
@@ -194,10 +224,6 @@ export default class SparkPage extends Vue {
       this.statusCheckInterval = null;
       this.$forceUpdate();
     }
-  }
-
-  destroyed() {
-    this.statusCheckInterval && clearTimeout(this.statusCheckInterval);
   }
 
   onChangeBlockId(currentId: string, newId: string) {
@@ -318,6 +344,19 @@ export default class SparkPage extends Vue {
           }));
       });
   }
+
+  expandAll() {
+    this.expandedBlocks = [...sparkStore.blockIds(this.service.id), '_service']
+      .reduce((acc, id) => ({ ...acc, [id]: true }), {});
+  }
+
+  expandNone() {
+    this.expandedBlocks = {};
+  }
+
+  destroyed() {
+    this.statusCheckInterval && clearTimeout(this.statusCheckInterval);
+  }
 }
 </script>
 
@@ -399,7 +438,14 @@ export default class SparkPage extends Vue {
       <q-list dark no-border class="col-auto">
         <q-item dark>
           <q-item-section>
-            <q-btn-dropdown :label="`Sort Blocks by (${sorting})`" outline>
+            <q-input v-model="blockFilter" placeholder="Search Block" clearable dark>
+              <template v-slot:append>
+                <q-icon name="search"/>
+              </template>
+            </q-input>
+          </q-item-section>
+          <q-item-section class="col-auto">
+            <q-btn-dropdown :label="sorting" flat>
               <q-list dark>
                 <ActionItem
                   v-for="(func, name) in allSorters"
@@ -410,30 +456,20 @@ export default class SparkPage extends Vue {
                 />
               </q-list>
             </q-btn-dropdown>
+            <q-tooltip>Sort Blocks</q-tooltip>
+          </q-item-section>
+          <q-item-section class="col-auto">
+            <q-btn flat round icon="mdi-unfold-less-horizontal" @click="expandNone"/>
+            <q-tooltip>Collapse all</q-tooltip>
+          </q-item-section>
+          <q-item-section class="col-auto">
+            <q-btn flat round icon="mdi-unfold-more-horizontal" @click="expandAll"/>
+            <q-tooltip>Expand all</q-tooltip>
           </q-item-section>
         </q-item>
 
         <q-item dark>
-          <q-item-section>
-            <q-input v-model="blockFilter" placeholder="Search Block" clearable dark>
-              <template v-slot:append>
-                <q-icon name="search"/>
-              </template>
-            </q-input>
-          </q-item-section>
-        </q-item>
-
-        <q-item dark>
-          <q-item-section v-if="serviceMinimized">
-            <q-item class="bg-dark text-white" style="min-width: 500px">
-              <q-item-section avatar>
-                <q-icon name="mdi-cloud"/>
-              </q-item-section>
-              <q-item-section>{{ $props.serviceId }}</q-item-section>
-              <q-item-section side>Spark Service</q-item-section>
-            </q-item>
-          </q-item-section>
-          <q-item-section v-else>
+          <q-item-section v-if="serviceExpanded">
             <SparkWidget
               v-if="isReady"
               :id="service.id"
@@ -443,30 +479,27 @@ export default class SparkPage extends Vue {
               class="bg-dark"
             />
           </q-item-section>
-          <q-item-section side top>
-            <q-btn
-              :icon="serviceMinimized ? 'mdi-unfold-more-horizontal' : 'mdi-unfold-less-horizontal'"
-              flat
-              round
-              color="white"
-              @click="serviceMinimized = !serviceMinimized"
-            />
+          <q-item-section v-else>
+            <q-item class="bg-dark text-white" style="min-width: 500px">
+              <q-item-section avatar>
+                <q-icon name="mdi-cloud"/>
+              </q-item-section>
+              <q-item-section>{{ $props.serviceId }}</q-item-section>
+              <q-item-section side>Spark Service</q-item-section>
+            </q-item>
+          </q-item-section>
+          <q-item-section class="col-auto" top>
+            <ExpandToggle v-model="serviceExpanded"/>
           </q-item-section>
         </q-item>
 
         <q-item v-for="val in filteredItems" :key="val.key" dark>
           <q-item-section>
-            <MinimizedBlockWidget v-if="val.minimized" v-bind="val.props" class="bg-dark"/>
-            <component v-else :is="val.component" v-bind="val.props" class="bg-dark"/>
+            <component v-if="val.expanded" :is="val.component" v-bind="val.props" class="bg-dark"/>
+            <MinimizedBlockWidget v-else v-bind="val.props" class="bg-dark"/>
           </q-item-section>
-          <q-item-section side top>
-            <q-btn
-              :icon="val.minimized ? 'mdi-unfold-more-horizontal' : 'mdi-unfold-less-horizontal'"
-              flat
-              round
-              color="white"
-              @click="$set(minimized, val.props.id, !val.minimized)"
-            />
+          <q-item-section class="col-auto" top>
+            <ExpandToggle :value="val.expanded" @input="v => updateExpandedBlock(val.props.id, v)"/>
           </q-item-section>
         </q-item>
       </q-list>

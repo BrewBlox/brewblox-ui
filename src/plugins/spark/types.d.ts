@@ -3,6 +3,7 @@ import { Service } from '@/store/services/types';
 
 export interface SparkConfig {
   groupNames: string[];
+  expandedBlocks: { [id: string]: boolean };
 }
 
 export interface Spark extends Service {
