@@ -11,7 +11,7 @@ import { Dashboard, DashboardItem } from '@/store/dashboards/types';
 import { isReady, isSystemBlock, widgetSize } from './getters';
 import { Watch } from 'vue-property-decorator';
 import { setInterval, clearTimeout } from 'timers';
-import { objectStringSorter } from '@/helpers/functional';
+import { objectStringSorter, capitalized } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/shadow-copy';
 
 interface ModalSettings {
@@ -23,6 +23,7 @@ interface ValidatedItem {
   key: string;
   component: string;
   item: DashboardItem;
+  typeName: string;
   props?: any;
   expanded: boolean;
 }
@@ -36,9 +37,11 @@ interface ValidatedItem {
   },
 })
 export default class SparkPage extends Vue {
+  capitalized = capitalized;
+
   volatileItems: { [blockId: string]: DashboardItem } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
-  sorting: 'none' | 'name' | 'type' = 'none';
+  sorting: 'unsorted' | 'name' | 'type' = 'unsorted';
   blockFilter: string = '';
 
   modalOpen: boolean = false;
@@ -72,12 +75,20 @@ export default class SparkPage extends Vue {
     return this.isAvailable && this.status && !this.status.synchronized;
   }
 
-  get isMobile(): boolean {
-    return this.$q.platform.is.mobile;
+  get nodes() {
+    return this.validatedItems.map(v => ({ id: v.item.id, type: v.item.feature }));
   }
 
   get relations() {
     return sparkStore.blockLinks(this.service.id);
+  }
+
+  get sparkWidgetProps() {
+    return {
+      id: this.service.id,
+      serviceId: this.service.id,
+      ...widgetSize,
+    };
   }
 
   get widgetSize() {
@@ -86,7 +97,7 @@ export default class SparkPage extends Vue {
 
   get allSorters(): { [id: string]: (a: ValidatedItem, b: ValidatedItem) => number } {
     return {
-      none: () => 0,
+      unsorted: () => 0,
       name: (a, b) => objectStringSorter('title')(a.props, b.props),
       type: (a: ValidatedItem, b: ValidatedItem): number => {
         const left = featureStore.displayNameById(a.item.feature).toLowerCase();
@@ -130,6 +141,11 @@ export default class SparkPage extends Vue {
 
   set serviceExpanded(val: boolean) {
     this.expandedBlocks = { ...this.expandedBlocks, ['_service']: val };
+  }
+
+  get serviceShown() {
+    return !this.blockFilter ||
+      this.service.id.toLowerCase().match(this.blockFilter.toLowerCase());
   }
 
   saveServiceConfig() {
@@ -184,6 +200,7 @@ export default class SparkPage extends Vue {
     return {
       key,
       item,
+      typeName: featureStore.displayNameById(item.feature),
       component: featureStore.widgetById(item.feature, item.config) || 'InvalidWidget',
       props: this.itemProps(item),
       expanded: this.expandedBlocks[item.id] || false,
@@ -201,12 +218,23 @@ export default class SparkPage extends Vue {
   get filteredItems(): ValidatedItem[] {
     const filter = (this.blockFilter || '').toLowerCase();
     return this.validatedItems
-      .filter(val => val.item.id.toLowerCase().match(filter))
+      .filter(val => !filter
+        || val.item.id.toLowerCase().match(filter)
+        || val.typeName.toLowerCase().match(filter))
       .sort(this.sorter);
   }
 
-  get colSize() {
-    return 'col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4';
+  get expandedItems(): ValidatedItem[] {
+    return this.filteredItems.filter(item => item.expanded);
+  }
+
+  expandAll() {
+    this.expandedBlocks = [...sparkStore.blockIds(this.service.id), '_service']
+      .reduce((acc, id) => ({ ...acc, [id]: true }), {});
+  }
+
+  expandNone() {
+    this.expandedBlocks = {};
   }
 
   @Watch('statusNok', { immediate: true })
@@ -345,15 +373,6 @@ export default class SparkPage extends Vue {
       });
   }
 
-  expandAll() {
-    this.expandedBlocks = [...sparkStore.blockIds(this.service.id), '_service']
-      .reduce((acc, id) => ({ ...acc, [id]: true }), {});
-  }
-
-  expandNone() {
-    this.expandedBlocks = {};
-  }
-
   destroyed() {
     this.statusCheckInterval && clearTimeout(this.statusCheckInterval);
   }
@@ -409,15 +428,11 @@ export default class SparkPage extends Vue {
       />
     </q-dialog>
     <q-dialog v-model="relationsModalOpen" no-backdrop-dismiss maximized>
-      <DagreDiagram
-        v-if="relationsModalOpen"
-        :nodes="validatedItems.map(v => ({id: v.item.id, type: v.item.feature}))"
-        :relations="relations"
-      />
+      <DagreDiagram v-if="relationsModalOpen" :nodes="nodes" :relations="relations"/>
     </q-dialog>
 
     <!-- Shown if service was found in store, but not ok -->
-    <q-list v-if="statusNok" dark no-border class="colSize">
+    <q-list v-if="statusNok" dark no-border>
       <q-item dark>
         <q-item-section>
           <Troubleshooter
@@ -435,23 +450,25 @@ export default class SparkPage extends Vue {
 
     <!-- Normal display -->
     <div v-else class="row justify-around">
-      <q-list dark no-border class="col-auto">
-        <q-item dark>
+      <!-- Minimized widgets -->
+      <q-list class="col-auto" dark no-border style="min-width: 400px">
+        <!-- Selection controls -->
+        <q-item dark class="q-mb-md">
           <q-item-section>
-            <q-input v-model="blockFilter" placeholder="Search Block" clearable dark>
+            <q-input v-model="blockFilter" placeholder="Search Blocks" clearable dark>
               <template v-slot:append>
                 <q-icon name="search"/>
               </template>
             </q-input>
           </q-item-section>
           <q-item-section class="col-auto">
-            <q-btn-dropdown :label="sorting" flat>
+            <q-btn-dropdown :label="sorting" icon="mdi-sort" flat>
               <q-list dark>
                 <ActionItem
                   v-for="(func, name) in allSorters"
                   :key="name"
                   :active="sorting === name"
-                  :label="name"
+                  :label="capitalized(name)"
                   @click="sorting = name"
                 />
               </q-list>
@@ -459,47 +476,57 @@ export default class SparkPage extends Vue {
             <q-tooltip>Sort Blocks</q-tooltip>
           </q-item-section>
           <q-item-section class="col-auto">
-            <q-btn flat round icon="mdi-unfold-less-horizontal" @click="expandNone"/>
-            <q-tooltip>Collapse all</q-tooltip>
+            <q-btn flat round icon="mdi-checkbox-multiple-blank-outline" @click="expandNone"/>
+            <q-tooltip>Unselect all</q-tooltip>
           </q-item-section>
           <q-item-section class="col-auto">
-            <q-btn flat round icon="mdi-unfold-more-horizontal" @click="expandAll"/>
-            <q-tooltip>Expand all</q-tooltip>
+            <q-btn flat round icon="mdi-checkbox-multiple-marked" @click="expandAll"/>
+            <q-tooltip>Select all</q-tooltip>
           </q-item-section>
         </q-item>
-
-        <q-item dark>
-          <q-item-section v-if="serviceExpanded">
-            <SparkWidget
-              v-if="isReady"
-              :id="service.id"
-              :service-id="service.id"
-              :cols="widgetSize.cols"
-              :rows="widgetSize.rows"
-              class="bg-dark"
-            />
+        <!-- Service -->
+        <q-item
+          v-if="serviceShown"
+          :class="['non-selectable', serviceExpanded ? 'text-primary' : 'text-white']"
+          clickable
+          dark
+          @click.native="serviceExpanded = !serviceExpanded"
+        >
+          <q-item-section avatar>
+            <q-icon name="mdi-cloud"/>
           </q-item-section>
-          <q-item-section v-else>
-            <q-item class="bg-dark text-white" style="min-width: 500px">
-              <q-item-section avatar>
-                <q-icon name="mdi-cloud"/>
-              </q-item-section>
-              <q-item-section>{{ $props.serviceId }}</q-item-section>
-              <q-item-section side>Spark Service</q-item-section>
-            </q-item>
-          </q-item-section>
-          <q-item-section class="col-auto" top>
-            <ExpandToggle v-model="serviceExpanded"/>
-          </q-item-section>
+          <q-item-section>{{ $props.serviceId }}</q-item-section>
+          <q-item-section side>Spark Service</q-item-section>
         </q-item>
+        <!-- Blocks -->
+        <q-item
+          v-for="val in filteredItems"
+          :key="val.key"
+          :class="['non-selectable', val.expanded ? 'text-primary' : 'text-white']"
+          clickable
+          dark
+          @click.native="updateExpandedBlock(val.props.id, !val.expanded)"
+        >
+          <q-item-section avatar>
+            <q-icon name="mdi-cube"/>
+          </q-item-section>
+          <q-item-section>{{ val.props.title }}</q-item-section>
+          <q-item-section side>{{ val.typeName }}</q-item-section>
+        </q-item>
+      </q-list>
 
-        <q-item v-for="val in filteredItems" :key="val.key" dark>
+      <!-- Widget List -->
+      <q-list class="col-auto" dark no-border style="min-width: 500px">
+        <!-- Service -->
+        <q-item v-if="serviceShown && serviceExpanded" dark>
           <q-item-section>
-            <component v-if="val.expanded" :is="val.component" v-bind="val.props" class="bg-dark"/>
-            <MinimizedBlockWidget v-else v-bind="val.props" class="bg-dark"/>
+            <SparkWidget v-if="isReady" v-bind="sparkWidgetProps" class="bg-dark"/>
           </q-item-section>
-          <q-item-section class="col-auto" top>
-            <ExpandToggle :value="val.expanded" @input="v => updateExpandedBlock(val.props.id, v)"/>
+        </q-item>
+        <!-- Blocks -->
+        <q-item v-for="val in expandedItems" :key="val.key" dark>
+          <q-item-section>
+            <component :is="val.component" v-bind="val.props" class="bg-dark"/>
           </q-item-section>
         </q-item>
       </q-list>
