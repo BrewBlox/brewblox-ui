@@ -445,7 +445,7 @@ export default class SparkPage extends Vue {
     </q-list>
 
     <!-- Normal display -->
-    <div v-else class="row justify-around">
+    <div v-else class="row justify-start">
       <!-- Minimized widgets -->
       <q-list class="col-auto" dark no-border style="min-width: 400px">
         <!-- Selection controls -->
@@ -512,7 +512,7 @@ export default class SparkPage extends Vue {
       </q-list>
 
       <!-- Widget List -->
-      <q-list class="col-auto" dark no-border style="min-width: 500px">
+      <q-list class="col-auto q-ml-xl" dark no-border style="min-width: 500px">
         <!-- Service -->
         <q-item v-if="serviceShown && serviceExpanded" dark>
           <q-item-section>
