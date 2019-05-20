@@ -91,10 +91,6 @@ export default class SparkPage extends Vue {
     };
   }
 
-  get widgetSize() {
-    return widgetSize;
-  }
-
   get allSorters(): { [id: string]: (a: ValidatedItem, b: ValidatedItem) => number } {
     return {
       unsorted: () => 0,
