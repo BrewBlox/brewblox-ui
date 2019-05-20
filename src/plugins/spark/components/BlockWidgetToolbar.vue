@@ -43,19 +43,19 @@ export default class BlockWidgetToolbar extends Vue {
           <ActionItem
             v-if="field.$props.onCopy"
             icon="file_copy"
-            label="Copy widget"
+            label="Copy to widget"
             @click="field.$props.onCopy(field.widgetId)"
           />
           <ActionItem
             v-if="field.$props.onMove"
             icon="exit_to_app"
-            label="Move widget"
+            label="Move"
             @click="field.$props.onMove(field.widgetId)"
           />
           <ActionItem
             v-if="field.$props.onDelete"
             icon="delete"
-            label="Delete widget"
+            label="Delete"
             @click="field.$props.onDelete(field.widgetId)"
           />
         </q-list>
