@@ -242,8 +242,8 @@ export default class GraphForm extends FormBase {
           </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section>
-            <q-scroll-area style="height: 300px; max-height: 30vh">
+          <q-item-section :class="{['scroll-parent']: expandedKeys.length > 0}">
+            <q-scroll-area>
               <q-tree
                 ref="tree"
                 :nodes="nodes"
@@ -261,49 +261,57 @@ export default class GraphForm extends FormBase {
       </q-expansion-item>
 
       <q-expansion-item group="modal" icon="mdi-tag-multiple" label="Legend">
-        <q-item dark>
-          <q-item-section>Metric</q-item-section>
-          <q-item-section>Display as</q-item-section>
-        </q-item>
-        <q-separator dark inset/>
-        <q-item v-for="field in selected" :key="field" dark>
-          <q-item-section>{{ field }}</q-item-section>
-          <q-item-section>
-            <InputPopupEdit
-              :field="renames[field]"
-              :change="callAndSaveConfig(v => config.renames[field] = v)"
-              label="Legend"
-              clearable
-              tag="span"
-            />
-          </q-item-section>
-        </q-item>
-        <q-item v-if="!selected || selected.length === 0" dark>
-          <q-item-section side>No metrics selected</q-item-section>
-        </q-item>
+        <div class="scroll-parent">
+          <q-scroll-area>
+            <q-item dark>
+              <q-item-section>Metric</q-item-section>
+              <q-item-section>Display as</q-item-section>
+            </q-item>
+            <q-separator dark inset/>
+            <q-item v-for="field in selected" :key="field" dark>
+              <q-item-section>{{ field }}</q-item-section>
+              <q-item-section>
+                <InputPopupEdit
+                  :field="renames[field]"
+                  :change="callAndSaveConfig(v => config.renames[field] = v)"
+                  label="Legend"
+                  clearable
+                  tag="span"
+                />
+              </q-item-section>
+            </q-item>
+            <q-item v-if="!selected || selected.length === 0" dark>
+              <q-item-section side>No metrics selected</q-item-section>
+            </q-item>
+          </q-scroll-area>
+        </div>
       </q-expansion-item>
 
       <q-expansion-item group="modal" icon="mdi-chart-line" label="Axes">
-        <q-item dark>
-          <q-item-section>Metric</q-item-section>
-          <q-item-section side>Left or right axis</q-item-section>
-        </q-item>
-        <q-separator dark inset/>
-        <q-item
-          v-for="field in selected"
-          :key="field"
-          dark
-          clickable
-          @click="updateAxisSide(field, !isRightAxis(field))"
-        >
-          <q-item-section>{{ field }}</q-item-section>
-          <q-item-section side>
-            <q-icon :class="{mirrored: isRightAxis(field)}" name="mdi-chart-line" size="30px"/>
-          </q-item-section>
-        </q-item>
-        <q-item v-if="!selected || selected.length === 0" dark>
-          <q-item-section side>No metrics selected</q-item-section>
-        </q-item>
+        <div class="scroll-parent">
+          <q-scroll-area>
+            <q-item dark>
+              <q-item-section>Metric</q-item-section>
+              <q-item-section side>Left or right axis</q-item-section>
+            </q-item>
+            <q-separator dark inset/>
+            <q-item
+              v-for="field in selected"
+              :key="field"
+              dark
+              clickable
+              @click="updateAxisSide(field, !isRightAxis(field))"
+            >
+              <q-item-section>{{ field }}</q-item-section>
+              <q-item-section side>
+                <q-icon :class="{mirrored: isRightAxis(field)}" name="mdi-chart-line" size="30px"/>
+              </q-item-section>
+            </q-item>
+            <q-item v-if="!selected || selected.length === 0" dark>
+              <q-item-section side>No metrics selected</q-item-section>
+            </q-item>
+          </q-scroll-area>
+        </div>
       </q-expansion-item>
     </q-card-section>
   </q-card>
@@ -313,5 +321,9 @@ export default class GraphForm extends FormBase {
 .mirrored {
   -webkit-transform: scaleX(-1);
   transform: scaleX(-1);
+}
+.scroll-parent {
+  height: 300px;
+  max-height: 30vh;
 }
 </style>

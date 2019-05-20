@@ -5,6 +5,7 @@ import { FlowPart, ClickEvent, PersistentPart, Rect, ProcessViewConfig, StatePar
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';
 import { Coordinates } from '@/helpers/coordinates';
+import { deepCopy } from '@/helpers/shadow-copy';
 import { clampRotation, spaceCased } from '@/helpers/functional';
 import FormBase from '@/components/Form/FormBase';
 import ProcessViewCatalog from './ProcessViewCatalog.vue';
@@ -263,7 +264,7 @@ export default class ProcessViewForm extends FormBase {
       if (gridPos) {
         const from = copy ? null : part;
         const id = copy ? uid() : part.id;
-        this.movePart(from, { ...part, ...gridPos, id })
+        this.movePart(from, { ...deepCopy(part), ...gridPos, id })
           .then(() => this.$nextTick())
           .then(() => this.dragAction = null);
       } else {

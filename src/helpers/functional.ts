@@ -1,5 +1,6 @@
 import parseDuration from 'parse-duration';
 import { Unit } from './units';
+import isString from 'lodash/isString';
 
 type SortFunc = (a: any, b: any) => number
 
@@ -141,3 +142,8 @@ export function chunked<T>(arr: T[], chunkSize: number): T[][] {
 }
 
 export const nanoToMilli = (nano: number): number => Math.floor(nano / 1e6);
+
+export const capitalized = (s: string): string =>
+  isString(s)
+    ? s.charAt(0).toUpperCase() + s.slice(1)
+    : s;

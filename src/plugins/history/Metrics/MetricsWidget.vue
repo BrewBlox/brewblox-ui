@@ -114,7 +114,7 @@ export default class MetricsWidget extends WidgetBase {
 </script>
 
 <template>
-  <q-card dark class="text-white column">
+  <q-card dark class="text-white column scroll no-wrap">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <MetricsForm
         v-if="modalOpen"
