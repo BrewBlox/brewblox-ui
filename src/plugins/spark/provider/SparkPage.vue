@@ -13,6 +13,7 @@ import { isReady, isSystemBlock, widgetSize } from './getters';
 import { Watch } from 'vue-property-decorator';
 import { setInterval, clearTimeout } from 'timers';
 import { objectStringSorter } from '@/helpers/functional';
+import { deepCopy } from '@/helpers/shadow-copy';
 import get from 'lodash/get';
 
 interface ModalSettings {
@@ -41,7 +42,7 @@ export default class SparkPage extends Vue {
   statusCheckInterval: NodeJS.Timeout | null = null;
   sorting: string = 'none';
   serviceMinimized: boolean = true;
-  minimized: Record<string, boolean> = {};
+  minimized: { [widgetId: string]: boolean } = {};
   blockFilter: string = '';
 
   modalOpen: boolean = false;
@@ -252,7 +253,7 @@ export default class SparkPage extends Vue {
         if (!dashboard) {
           return;
         }
-        dashboardStore.appendDashboardItem({ ...item, id, dashboard });
+        dashboardStore.appendDashboardItem({ ...deepCopy(item), id, dashboard });
         this.$q.notify({
           color: 'positive',
           icon: 'file_copy',

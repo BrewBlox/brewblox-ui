@@ -5,6 +5,7 @@ import featureStore from '@/store/features';
 import dashboardStore from '@/store/dashboards';
 import { uid, Dialog } from 'quasar';
 import { objectSorter } from '@/helpers/functional';
+import { deepCopy } from '@/helpers/shadow-copy';
 import { DashboardItem } from '@/store/dashboards/types';
 import { Watch } from 'vue-property-decorator';
 
@@ -180,7 +181,7 @@ export default class DashboardPage extends Vue {
         if (!dashboard) {
           return;
         }
-        dashboardStore.appendDashboardItem({ ...item, id, dashboard, pinnedPosition: null });
+        dashboardStore.appendDashboardItem({ ...deepCopy(item), id, dashboard, pinnedPosition: null });
         this.$q.notify({
           color: 'positive',
           icon: 'file_copy',
