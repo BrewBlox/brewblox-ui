@@ -76,7 +76,7 @@ export default class SparkPage extends Vue {
   }
 
   get nodes() {
-    return this.validatedItems.map(v => ({ id: v.item.id, type: v.item.feature }));
+    return this.validatedItems.map(v => ({ id: v.item.id, type: v.typeName }));
   }
 
   get relations() {
