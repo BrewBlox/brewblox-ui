@@ -106,7 +106,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       },
       // Offset Actuator
       {
-        id: this.cfg.names.fridgeOffset,
+        id: this.cfg.names.fridgeDriver,
         serviceId: this.cfg.serviceId,
         type: offsetType,
         groups: this.cfg.groups,
@@ -179,7 +179,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
           ...pidData(),
           enabled: false,
           inputId: new Link(this.cfg.names.beerSSPair),
-          outputId: new Link(this.cfg.names.fridgeOffset),
+          outputId: new Link(this.cfg.names.fridgeDriver),
           filter: 4,
           filterThreshold: new Unit(2, 'delta_degC'),
           kp: new Unit(5, '1/degC'),
@@ -294,7 +294,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       // Mutex
       createWidget(this.cfg.names.mutex, mutexType),
       // Offset
-      createWidget(this.cfg.names.fridgeOffset, offsetType),
+      createWidget(this.cfg.names.fridgeDriver, offsetType),
       // Graph
       createGraph(this.cfg.names.graph),
     ];
