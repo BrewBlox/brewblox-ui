@@ -8,15 +8,10 @@ import { QueryParams } from '@/store/history/types';
 
 @Component
 export default class GraphWidget extends WidgetBase {
-  windowWidth: number = 0;
   settingsModalOpen: boolean = false;
   graphModalOpen: boolean = false;
   $refs!: {
     widgetGraph: any;
-  }
-
-  get showFormGraph() {
-    return this.windowWidth >= 1500;
   }
 
   get graphCfg(): GraphConfig {
@@ -41,22 +36,9 @@ export default class GraphWidget extends WidgetBase {
     });
   }
 
-  updateWidth() {
-    this.windowWidth = window.innerWidth;
-  }
-
   @Watch('graphCfg', { deep: true })
   regraph() {
     this.$nextTick(() => this.$refs.widgetGraph.resetListeners());
-  }
-
-  mounted() {
-    this.updateWidth();
-    this.$nextTick(() => window.addEventListener('resize', this.updateWidth));
-  }
-
-  beforeDestroy() {
-    window.removeEventListener('resize', this.updateWidth);
   }
 }
 </script>
@@ -64,15 +46,22 @@ export default class GraphWidget extends WidgetBase {
 <template>
   <q-card dark class="text-white column">
     <q-dialog v-model="settingsModalOpen" no-backdrop-dismiss class="row">
+      <ScreenSizeConstrained
+        v-if="settingsModalOpen"
+        :min-width="1500"
+        class="q-mr-md"
+        style="width: 600px"
+      >
+        <q-card dark class="q-pa-xs bg-dark-bright">
+          <GraphCard :id="$props.id" :config="graphCfg" shared-listeners/>
+        </q-card>
+      </ScreenSizeConstrained>
       <GraphForm
         v-if="settingsModalOpen"
         v-bind="$props"
         :field="graphCfg"
         :on-change-field="saveConfig"
       />
-      <div v-if="settingsModalOpen && showFormGraph" class="form-graph col-auto">
-        <GraphCard :id="$props.id" :config="graphCfg" shared-listeners/>
-      </div>
     </q-dialog>
 
     <q-dialog v-model="graphModalOpen" maximized>
@@ -149,9 +138,3 @@ export default class GraphWidget extends WidgetBase {
     </div>
   </q-card>
 </template>
-
-<style>
-.form-graph {
-  margin-left: 40px;
-}
-</style>

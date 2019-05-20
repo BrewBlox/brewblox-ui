@@ -4,8 +4,8 @@ import Component from 'vue-class-component';
 import providerStore from '@/store/providers';
 import serviceStore from '@/store/services';
 import sparkStore from '@/plugins/spark/store';
-import { Service } from '@/store/services/types';
 import { typeName } from '@/plugins/spark/getters';
+import { Spark } from '../types';
 
 @Component({
   props: {
@@ -21,11 +21,14 @@ import { typeName } from '@/plugins/spark/getters';
 })
 export default class SparkWizard extends Vue {
   async create() {
-    const service: Service = {
+    const service: Spark = {
       id: this.$props.serviceId,
       title: this.$props.serviceTitle,
       order: serviceStore.serviceIds.length + 1,
-      config: {},
+      config: {
+        groupNames: [],
+        expandedBlocks: {},
+      },
       type: typeName,
     };
     await serviceStore.createService(service);

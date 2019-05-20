@@ -8,7 +8,7 @@ import { typeName } from './getters';
 const feature: Feature = {
   ...GenericBlock,
   id: typeName,
-  displayName: 'Pulse Width Modulator',
+  displayName: 'PWM',
   widget: ref(widget),
   form: ref(form),
   widgetSize: {

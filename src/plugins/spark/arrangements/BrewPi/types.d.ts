@@ -12,7 +12,7 @@ export interface BrewPiConfigNames {
   coolPwm: string;
   heatPwm: string;
   mutex: string;
-  fridgeOffset: string;
+  fridgeDriver: string;
   coolPid: string;
   heatPid: string;
   beerPid: string;
