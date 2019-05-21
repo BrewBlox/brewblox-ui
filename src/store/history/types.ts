@@ -27,6 +27,8 @@ export interface QueryResult {
   name: string;
   columns: string[];
   values: Slice[];
+  database: string;
+  policy: string;
 }
 
 export interface Listener {
@@ -41,4 +43,5 @@ export interface Listener {
 
 export interface GraphValuesListener extends Listener {
   axes: GraphValueAxes;
+  usedPolicy?: string;
 }
