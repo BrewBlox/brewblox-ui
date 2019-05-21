@@ -260,7 +260,7 @@ export default class GraphForm extends FormBase {
           </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section :class="{['scroll-parent']: expandedKeys.length > 0}">
+          <q-item-section class="scroll-parent">
             <q-scroll-area>
               <q-tree
                 ref="tree"
