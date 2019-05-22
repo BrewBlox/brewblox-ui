@@ -9,6 +9,7 @@ import {
 } from '@/store/history/types';
 import parseDuration from 'parse-duration';
 import { nanoToMilli } from '@/helpers/functional';
+import forEach from 'lodash/forEach';
 
 const MAX_POINTS = 5000;
 
@@ -38,6 +39,7 @@ const valuesTransformer =
     if (result.values && result.values.length > 0) {
       const resultCols = transpose(result.values);
       const time = resultCols[0].map(nanoToMilli);
+      listener.usedPolicy = result.policy;
 
       result
         .columns
@@ -64,15 +66,13 @@ const valuesTransformer =
       ) {
         // timestamp in Ms that should be discarded
         const boundary = new Date().getTime() - parseDuration(listener.params.duration);
-        Object
-          .values(listener.values)
-          .forEach((val: any) => {
-            const boundaryIdx = val.x.findIndex((x: number) => x > boundary);
-            if (boundaryIdx > 0) {
-              val.x = val.x.slice(boundaryIdx);
-              val.y = val.y.slice(boundaryIdx);
-            }
-          });
+        forEach(listener.values, val => {
+          const boundaryIdx = val.x.findIndex((x: number) => x > boundary);
+          if (boundaryIdx > 0) {
+            val.x = val.x.slice(boundaryIdx);
+            val.y = val.y.slice(boundaryIdx);
+          }
+        });
       }
     }
     return listener;

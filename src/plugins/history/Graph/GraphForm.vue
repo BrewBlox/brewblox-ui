@@ -15,7 +15,14 @@ interface PeriodDisplay {
   end: boolean;
 }
 
-@Component
+@Component({
+  props: {
+    downsampling: {
+      type: Object,
+      default: () => ({}),
+    },
+  },
+})
 export default class GraphForm extends FormBase {
   durationString = durationString;
 
@@ -208,6 +215,17 @@ export default class GraphForm extends FormBase {
             />
           </q-item-section>
         </q-item>
+        <q-item dark>
+          <q-item-section>
+            <q-item-label caption>Actual downsampling rate</q-item-label>
+            <div class="row q-mt-sm q-ml-sm">
+              <div v-for="(rate, meas) in downsampling" :key="meas" class="q-mr-md">
+                <q-item-label caption>{{ meas }}</q-item-label>
+                {{ rate }}
+              </div>
+            </div>
+          </q-item-section>
+        </q-item>
       </q-expansion-item>
 
       <q-expansion-item default-opened group="modal" icon="mdi-file-tree" label="Metrics">
@@ -242,7 +260,7 @@ export default class GraphForm extends FormBase {
           </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section :class="{['scroll-parent']: expandedKeys.length > 0}">
+          <q-item-section class="scroll-parent">
             <q-scroll-area>
               <q-tree
                 ref="tree"
