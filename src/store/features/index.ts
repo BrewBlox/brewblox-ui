@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import store from '@/store';
 import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
-import { Arrangement, Deleter, Feature, Validator } from './types';
+import { Arrangement, Deleter, Feature, Validator, FeatureRole } from '@/store/types';
 import get from 'lodash/get';
 
 @Module({ store, namespaced: true, dynamic: true, name: 'features' })
@@ -31,6 +31,10 @@ export class FeatureModule extends VuexModule {
 
   public get displayNameById(): (id: string) => string {
     return id => get(this.features, [id, 'displayName']);
+  }
+
+  public get roleById(): (id: string) => FeatureRole {
+    return id => get(this.features, [id, 'role']) || 'Other';
   }
 
   public get validatorById(): (id: string) => Validator {

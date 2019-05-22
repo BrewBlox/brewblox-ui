@@ -7,7 +7,7 @@ import featureStore from '@/store/features';
 import serviceStore from '@/store/services';
 import sparkStore from '@/plugins/spark/store';
 import { Block, SystemStatus, Spark } from '@/plugins/spark/types';
-import { Dashboard, DashboardItem } from '@/store/dashboards/types';
+import { Dashboard, DashboardItem, FeatureRole } from '@/store/types';
 import { isReady, isSystemBlock, widgetSize } from './getters';
 import { Watch } from 'vue-property-decorator';
 import { setInterval, clearTimeout } from 'timers';
@@ -24,6 +24,7 @@ interface ValidatedItem {
   component: string;
   item: DashboardItem;
   typeName: string;
+  role: FeatureRole;
   props?: any;
   expanded: boolean;
 }
@@ -91,6 +92,27 @@ export default class SparkPage extends Vue {
     };
   }
 
+  get roleOrder(): Record<FeatureRole, number> {
+    return {
+      Display: 0,
+      Process: 1,
+      Control: 2,
+      Output: 3,
+      Other: 4,
+    };
+  }
+
+  get roleIcons(): Record<FeatureRole, string> {
+    return {
+      Display: 'mdi-monitor-dashboard',
+      Process: 'mdi-gauge',
+      // Process: 'mdi-engine',
+      Control: 'mdi-calculator-variant',
+      Output: 'mdi-engine-outline',
+      Other: 'mdi-cube',
+    };
+  }
+
   get allSorters(): { [id: string]: (a: ValidatedItem, b: ValidatedItem) => number } {
     return {
       unsorted: () => 0,
@@ -106,6 +128,8 @@ export default class SparkPage extends Vue {
         }
         return 0;
       },
+      role: (a: ValidatedItem, b: ValidatedItem): number =>
+        this.roleOrder[a.role] - this.roleOrder[b.role],
     };
   }
 
@@ -197,6 +221,7 @@ export default class SparkPage extends Vue {
       key,
       item,
       typeName: featureStore.displayNameById(item.feature),
+      role: featureStore.roleById(item.feature),
       component: featureStore.widgetById(item.feature, item.config) || 'InvalidWidget',
       props: this.itemProps(item),
       expanded: this.expandedBlocks[item.id] || false,
@@ -504,7 +529,7 @@ export default class SparkPage extends Vue {
           @click.native="updateExpandedBlock(val.props.id, !val.expanded)"
         >
           <q-item-section avatar>
-            <q-icon name="mdi-cube"/>
+            <q-icon :name="roleIcons[val.role]"/>
           </q-item-section>
           <q-item-section>{{ val.props.title }}</q-item-section>
           <q-item-section side>{{ val.typeName }}</q-item-section>

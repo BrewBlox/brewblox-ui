@@ -6,7 +6,7 @@ import dashboardStore from '@/store/dashboards';
 import { uid, Dialog } from 'quasar';
 import { objectSorter } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/shadow-copy';
-import { DashboardItem } from '@/store/dashboards/types';
+import { DashboardItem } from '@/store/types';
 import { Watch } from 'vue-property-decorator';
 
 interface VueOrdered extends Vue {

@@ -1,4 +1,4 @@
-import { Arrangement } from '@/store/features/types';
+import { Arrangement } from '@/store/types';
 import BrewPi from './BrewPi';
 
 const arrangements: { [id: string]: Arrangement } = {

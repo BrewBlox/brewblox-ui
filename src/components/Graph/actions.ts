@@ -6,7 +6,7 @@ import {
   QueryTarget,
   GraphValueAxes,
   GraphValuesListener,
-} from '@/store/history/types';
+} from '@/store/types';
 import parseDuration from 'parse-duration';
 import { nanoToMilli } from '@/helpers/functional';
 import forEach from 'lodash/forEach';

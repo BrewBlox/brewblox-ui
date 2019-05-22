@@ -17,7 +17,7 @@ import {
   typeName as pidType,
   defaultData as pidData,
 } from '@/plugins/spark/features/Pid/getters';
-import { Dashboard } from '@/store/dashboards/types';
+import { Dashboard } from '@/store/types';
 
 @Component
 export default class BrewPiSettingsTask extends WizardTaskBase {

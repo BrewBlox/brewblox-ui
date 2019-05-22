@@ -2,7 +2,7 @@ import Vue from 'vue';
 import store from '@/store';
 import providerStore from '@/store/providers';
 import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
-import { Service } from './types';
+import { Service } from '@/store/types';
 import {
   createService as createServiceInApi,
   deleteService as removeServiceInApi,

@@ -5,7 +5,7 @@ import { GraphConfig } from '@/components/Graph/types';
 import { durationString } from '@/helpers/functional';
 import { Watch } from 'vue-property-decorator';
 import { targetSplitter } from '@/components/Graph/functional';
-import { QueryParams } from '@/store/history/types';
+import { QueryParams } from '@/store/types';
 import { defaultPresets } from '@/components/Graph/getters';
 
 @Component({

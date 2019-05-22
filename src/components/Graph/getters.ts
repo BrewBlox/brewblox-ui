@@ -1,4 +1,4 @@
-import { QueryParams } from '@/store/history/types';
+import { QueryParams } from '@/store/types';
 
 export const defaultPresets = (): QueryParams[] => [
   {

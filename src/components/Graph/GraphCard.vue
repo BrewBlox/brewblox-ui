@@ -4,7 +4,7 @@ import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
 import historyStore from '@/store/history';
 import { defaultPresets } from '@/components/Graph/getters';
-import { DisplayNames, QueryParams, QueryTarget, GraphValueAxes, GraphValuesListener } from '@/store/history/types';
+import { DisplayNames, QueryParams, QueryTarget, GraphValueAxes, GraphValuesListener } from '@/store/types';
 import { Layout, PlotData } from 'plotly.js';
 import { addPlotlyListener } from './actions';
 import GraphDisplay from './GraphDisplay.vue';

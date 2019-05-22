@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import serviceStore from '@/store/services';
-import { Service } from '@/store/services/types';
+import { Service } from '@/store/types';
 
 @Component({
   props: {

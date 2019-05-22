@@ -1,4 +1,4 @@
-import { DisplayNames, QueryParams, QueryTarget, GraphValueAxes } from '@/store/history/types';
+import { DisplayNames, QueryParams, QueryTarget, GraphValueAxes } from '@/store/types';
 import { Layout } from 'plotly.js';
 
 export interface GraphConfig {

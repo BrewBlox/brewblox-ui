@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import store from '@/store';
 import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
-import { Listener, QueryResult, QueryParams, QueryTarget } from './types';
+import { Listener, QueryResult, QueryParams, QueryTarget } from '@/store/types';
 import {
   fetchKnownKeys as fetchKnownKeysInApi,
   validateService as validateServiceInApi,

@@ -1,6 +1,6 @@
 import { ref } from '@/helpers/component-ref';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
-import { Feature } from '@/store/features/types';
+import { Feature } from '@/store/types';
 import form from './DisplaySettingsForm.vue';
 import widget from './DisplaySettingsWidget.vue';
 import { typeName } from './getters';
@@ -9,6 +9,7 @@ const feature: Feature = {
   ...GenericBlock,
   id: typeName,
   displayName: 'Display Settings',
+  role: 'Display',
   widget: ref(widget),
   form: ref(form),
   widgetSize: {

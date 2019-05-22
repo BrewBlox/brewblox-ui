@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import store from '@/store';
 import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
-import { Dashboard, DashboardItem } from './types';
+import { Dashboard, DashboardItem } from '@/store/types';
 import {
   createDashboard as createDashboardInApi,
   createDashboardItem as createDashboardItemInApi,

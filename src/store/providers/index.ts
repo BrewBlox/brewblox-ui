@@ -2,8 +2,7 @@ import Vue from 'vue';
 import store from '@/store';
 import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
 import get from 'lodash/get';
-import { Provider } from './types';
-import { Service } from '../services/types';
+import { Provider, Service } from '@/store/types';
 
 type ServiceFunc = (service: Service) => Promise<any>;
 

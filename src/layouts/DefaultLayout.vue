@@ -9,8 +9,8 @@ import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
 import { objectSorter } from '@/helpers/functional';
 import dashboardStore from '@/store/dashboards';
 import serviceStore from '@/store/services';
-import { Dashboard } from '@/store/dashboards/types';
-import { Service } from '@/store/services/types';
+import { Dashboard } from '@/store/types';
+import { Service } from '@/store/types';
 
 @Component({
   components: {

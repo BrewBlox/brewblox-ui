@@ -1,5 +1,5 @@
 import { Block } from '@/plugins/spark/types';
-import { DashboardItem } from '@/store/dashboards/types';
+import { DashboardItem } from '@/store/types';
 
 export interface BrewPiConfigNames {
   fridgeSensor: string;
