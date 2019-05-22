@@ -42,7 +42,6 @@ export default class SparkPage extends Vue {
 
   volatileItems: { [blockId: string]: DashboardItem } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
-  sorting: 'unsorted' | 'name' | 'type' = 'unsorted';
   blockFilter: string = '';
 
   modalOpen: boolean = false;
@@ -98,7 +97,8 @@ export default class SparkPage extends Vue {
       Process: 1,
       Control: 2,
       Output: 3,
-      Other: 4,
+      Constraint: 4,
+      Other: 5,
     };
   }
 
@@ -106,9 +106,9 @@ export default class SparkPage extends Vue {
     return {
       Display: 'mdi-monitor-dashboard',
       Process: 'mdi-gauge',
-      // Process: 'mdi-engine',
       Control: 'mdi-calculator-variant',
       Output: 'mdi-engine-outline',
+      Constraint: 'mdi-lock-outline',
       Other: 'mdi-cube',
     };
   }
@@ -131,6 +131,15 @@ export default class SparkPage extends Vue {
       role: (a: ValidatedItem, b: ValidatedItem): number =>
         this.roleOrder[a.role] - this.roleOrder[b.role],
     };
+  }
+
+  get sorting(): string {
+    return this.service.config.sorting || 'unsorted';
+  }
+
+  set sorting(val: string) {
+    this.service.config.sorting = val;
+    this.saveServiceConfig();
   }
 
   get sorter(): (a: ValidatedItem, b: ValidatedItem) => number {
@@ -515,6 +524,7 @@ export default class SparkPage extends Vue {
         >
           <q-item-section avatar>
             <q-icon name="mdi-cloud"/>
+            <q-tooltip>Service</q-tooltip>
           </q-item-section>
           <q-item-section>{{ $props.serviceId }}</q-item-section>
           <q-item-section side>Spark Service</q-item-section>
@@ -530,6 +540,7 @@ export default class SparkPage extends Vue {
         >
           <q-item-section avatar>
             <q-icon :name="roleIcons[val.role]"/>
+            <q-tooltip>{{ val.role }}</q-tooltip>
           </q-item-section>
           <q-item-section>{{ val.props.title }}</q-item-section>
           <q-item-section side>{{ val.typeName }}</q-item-section>

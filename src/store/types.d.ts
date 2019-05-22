@@ -30,7 +30,7 @@ export interface Deleter {
 
 export type Validator = (config: any) => boolean;
 export type WidgetSelector = (config: any) => string | undefined;
-export type FeatureRole = 'Process' | 'Control' | 'Output' | 'Display' | 'Other';
+export type FeatureRole = 'Process' | 'Control' | 'Output' | 'Constraint' | 'Display' | 'Other';
 
 export interface Feature {
   id: string;

@@ -9,7 +9,7 @@ const feature: Feature = {
   ...GenericBlock,
   id: typeName,
   displayName: 'Mutex',
-  role: 'Control',
+  role: 'Constraint',
   widget: ref(widget),
   form: ref(form),
   widgetSize: {
