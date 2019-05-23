@@ -28,6 +28,7 @@ export default class SparkWizard extends Vue {
       config: {
         groupNames: [],
         expandedBlocks: {},
+        sorting: 'unsorted',
       },
       type: typeName,
     };

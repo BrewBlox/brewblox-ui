@@ -1,8 +1,38 @@
 import Vue from 'vue';
 import store from '@/store';
 import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
-import { Arrangement, Deleter, Feature, Validator } from './types';
 import get from 'lodash/get';
+
+export type Validator = (config: any) => boolean;
+export type WidgetSelector = (config: any) => string | undefined;
+export type FeatureRole = 'Process' | 'Control' | 'Output' | 'Constraint' | 'Display' | 'Other';
+
+export interface Deleter {
+  description: string;
+  action: (config: any) => void;
+}
+
+export interface Feature {
+  id: string;
+  displayName: string;
+  role?: FeatureRole;
+  validator?: Validator;
+  deleters?: Deleter[];
+  widgetSize?: {
+    cols: number;
+    rows: number;
+  };
+  widget?: string;
+  selector?: WidgetSelector;
+  wizard?: string;
+  form?: string;
+}
+
+export interface Arrangement {
+  id: string;
+  displayName: string;
+  wizard: string;
+}
 
 @Module({ store, namespaced: true, dynamic: true, name: 'features' })
 export class FeatureModule extends VuexModule {
@@ -31,6 +61,10 @@ export class FeatureModule extends VuexModule {
 
   public get displayNameById(): (id: string) => string {
     return id => get(this.features, [id, 'displayName']);
+  }
+
+  public get roleById(): (id: string) => FeatureRole {
+    return id => get(this.features, [id, 'role']) || 'Other';
   }
 
   public get validatorById(): (id: string) => Validator {

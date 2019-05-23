@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import featureStore from '@/store/features';
-import { DashboardItem } from '@/store/dashboards/types';
+import { DashboardItem } from '@/store/dashboards';
 import dashboardStore from '@/store/dashboards';
 import { uid } from 'quasar';
 

@@ -1,6 +1,6 @@
 import { ref } from '@/helpers/component-ref';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
-import { Feature } from '@/store/features/types';
+import { Feature } from '@/store/features';
 import form from './BalancerForm.vue';
 import widget from './BalancerWidget.vue';
 import { typeName } from './getters';
@@ -9,6 +9,7 @@ const feature: Feature = {
   ...GenericBlock,
   id: typeName,
   displayName: 'Balancer',
+  role: 'Constraint',
   widget: ref(widget),
   form: ref(form),
   widgetSize: {

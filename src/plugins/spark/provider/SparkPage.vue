@@ -3,11 +3,11 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { uid, Dialog } from 'quasar';
 import dashboardStore from '@/store/dashboards';
-import featureStore from '@/store/features';
+import featureStore, { FeatureRole } from '@/store/features';
 import serviceStore from '@/store/services';
 import sparkStore from '@/plugins/spark/store';
 import { Block, SystemStatus, Spark } from '@/plugins/spark/types';
-import { Dashboard, DashboardItem } from '@/store/dashboards/types';
+import { Dashboard, DashboardItem } from '@/store/dashboards';
 import { isReady, isSystemBlock, widgetSize } from './getters';
 import { Watch } from 'vue-property-decorator';
 import { setInterval, clearTimeout } from 'timers';
@@ -24,6 +24,7 @@ interface ValidatedItem {
   component: string;
   item: DashboardItem;
   typeName: string;
+  role: FeatureRole;
   props?: any;
   expanded: boolean;
 }
@@ -41,7 +42,6 @@ export default class SparkPage extends Vue {
 
   volatileItems: { [blockId: string]: DashboardItem } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
-  sorting: 'unsorted' | 'name' | 'type' = 'unsorted';
   blockFilter: string = '';
 
   modalOpen: boolean = false;
@@ -91,6 +91,28 @@ export default class SparkPage extends Vue {
     };
   }
 
+  get roleOrder(): Record<FeatureRole, number> {
+    return {
+      Display: 0,
+      Process: 1,
+      Control: 2,
+      Output: 3,
+      Constraint: 4,
+      Other: 5,
+    };
+  }
+
+  get roleIcons(): Record<FeatureRole, string> {
+    return {
+      Display: 'mdi-monitor-dashboard',
+      Process: 'mdi-gauge',
+      Control: 'mdi-calculator-variant',
+      Output: 'mdi-engine-outline',
+      Constraint: 'mdi-lock-outline',
+      Other: 'mdi-cube',
+    };
+  }
+
   get allSorters(): { [id: string]: (a: ValidatedItem, b: ValidatedItem) => number } {
     return {
       unsorted: () => 0,
@@ -106,7 +128,18 @@ export default class SparkPage extends Vue {
         }
         return 0;
       },
+      role: (a: ValidatedItem, b: ValidatedItem): number =>
+        this.roleOrder[a.role] - this.roleOrder[b.role],
     };
+  }
+
+  get sorting(): string {
+    return this.service.config.sorting || 'unsorted';
+  }
+
+  set sorting(val: string) {
+    this.service.config.sorting = val;
+    this.saveServiceConfig();
   }
 
   get sorter(): (a: ValidatedItem, b: ValidatedItem) => number {
@@ -197,6 +230,7 @@ export default class SparkPage extends Vue {
       key,
       item,
       typeName: featureStore.displayNameById(item.feature),
+      role: featureStore.roleById(item.feature),
       component: featureStore.widgetById(item.feature, item.config) || 'InvalidWidget',
       props: this.itemProps(item),
       expanded: this.expandedBlocks[item.id] || false,
@@ -490,6 +524,7 @@ export default class SparkPage extends Vue {
         >
           <q-item-section avatar>
             <q-icon name="mdi-cloud"/>
+            <q-tooltip>Service</q-tooltip>
           </q-item-section>
           <q-item-section>{{ $props.serviceId }}</q-item-section>
           <q-item-section side>Spark Service</q-item-section>
@@ -504,7 +539,8 @@ export default class SparkPage extends Vue {
           @click.native="updateExpandedBlock(val.props.id, !val.expanded)"
         >
           <q-item-section avatar>
-            <q-icon name="mdi-cube"/>
+            <q-icon :name="roleIcons[val.role]"/>
+            <q-tooltip>{{ val.role }}</q-tooltip>
           </q-item-section>
           <q-item-section>{{ val.props.title }}</q-item-section>
           <q-item-section side>{{ val.typeName }}</q-item-section>

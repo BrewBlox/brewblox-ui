@@ -7,10 +7,8 @@ import draggable from 'vuedraggable';
 import buildEnv from '@/build-env.json';
 import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
 import { objectSorter } from '@/helpers/functional';
-import dashboardStore from '@/store/dashboards';
-import serviceStore from '@/store/services';
-import { Dashboard } from '@/store/dashboards/types';
-import { Service } from '@/store/services/types';
+import dashboardStore, { Dashboard } from '@/store/dashboards';
+import serviceStore, { Service } from '@/store/services';
 
 @Component({
   components: {
@@ -30,7 +28,7 @@ export default class DefaultLayout extends Vue {
   }
 
   get dashboards() {
-    return [...dashboardStore.dashboardValues].sort(objectSorter('order'));
+    return dashboardStore.dashboardValues.sort(objectSorter('order'));
   }
 
   set dashboards(dashboards: Dashboard[]) {
@@ -42,7 +40,7 @@ export default class DefaultLayout extends Vue {
   }
 
   get services() {
-    return [...serviceStore.serviceValues].sort(objectSorter('order'));
+    return serviceStore.serviceValues.sort(objectSorter('order'));
   }
 
   set services(services: Service[]) {

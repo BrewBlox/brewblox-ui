@@ -1,4 +1,4 @@
-import { Feature } from '@/store/features/types';
+import { Feature } from '@/store/features';
 import ActuatorAnalogMock from './ActuatorAnalogMock';
 import ActuatorDS2413 from './ActuatorDS2413';
 import ActuatorOffset from './ActuatorOffset';

@@ -1,5 +1,5 @@
 import { registerModule, fetchAll, fetchById, create, persist, remove } from '@/helpers/database';
-import { Dashboard, DashboardItem } from './types';
+import { Dashboard, DashboardItem } from '@/store/dashboards';
 
 const DASHBOARDS = 'dashboards';
 const ITEMS = 'dashboard-items';

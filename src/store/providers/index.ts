@@ -1,11 +1,22 @@
 import Vue from 'vue';
 import store from '@/store';
+import { Service } from '@/store/services';
 import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
 import get from 'lodash/get';
-import { Provider } from './types';
-import { Service } from '../services/types';
 
-type ServiceFunc = (service: Service) => Promise<any>;
+type ServiceFunc = (service: Service) => any | Promise<any>;
+
+export interface Provider {
+  id: string;
+  displayName?: string;
+  features: string[];
+  onAdd: ServiceFunc;
+  onRemove?: ServiceFunc;
+  onFetch?: ServiceFunc;
+  wizard?: string;
+  page?: string;
+  watcher?: string;
+}
 
 @Module({ store, namespaced: true, dynamic: true, name: 'providers' })
 export class ProviderModule extends VuexModule {

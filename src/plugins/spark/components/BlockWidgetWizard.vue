@@ -7,7 +7,7 @@ import sparkStore from '@/plugins/spark/store';
 import get from 'lodash/get';
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 import { Block } from '@/plugins/spark/types';
-import { Service } from '@/store/services/types';
+import { Service } from '@/store/services';
 import { objectStringSorter } from '@/helpers/functional';
 
 @Component

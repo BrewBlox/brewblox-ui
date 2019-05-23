@@ -4,7 +4,7 @@ import {
   Listener,
   QueryParams,
   QueryTarget,
-} from '@/store/history/types';
+} from '@/store/history';
 import { MetricsResult } from './types';
 import { nanoToMilli } from '@/helpers/functional';
 
