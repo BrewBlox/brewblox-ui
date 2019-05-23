@@ -1,6 +1,6 @@
 import { ref } from '@/helpers/component-ref';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
-import { Feature } from '@/store/types';
+import { Feature } from '@/store/features';
 import form from './ActuatorAnalogMockForm.vue';
 import widget from './ActuatorAnalogMockWidget.vue';
 import { typeName } from './getters';

@@ -4,7 +4,7 @@ import WidgetBase from '@/components/Widget/WidgetBase';
 import { GraphConfig } from '@/components/Graph/types';
 import { defaultPresets } from '@/components/Graph/getters';
 import { Watch } from 'vue-property-decorator';
-import { QueryParams } from '@/store/types';
+import { QueryParams } from '@/store/history';
 
 @Component
 export default class GraphWidget extends WidgetBase {

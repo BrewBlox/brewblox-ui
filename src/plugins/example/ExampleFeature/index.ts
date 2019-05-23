@@ -1,5 +1,5 @@
 import { ref } from '@/helpers/component-ref';
-import { Feature } from '@/store/types';
+import { Feature } from '@/store/features';
 import widget from './ExampleFeatureWidget.vue';
 import wizard from './ExampleFeatureWizard.vue';
 

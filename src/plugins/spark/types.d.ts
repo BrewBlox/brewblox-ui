@@ -1,4 +1,5 @@
-import { DashboardItem, Service } from '@/store/types';
+import { DashboardItem } from '@/store/dashboards';
+import { Service } from '@/store/services';
 
 export interface SparkConfig {
   groupNames: string[];

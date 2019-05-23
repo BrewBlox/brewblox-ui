@@ -7,9 +7,8 @@ import draggable from 'vuedraggable';
 import buildEnv from '@/build-env.json';
 import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
 import { objectSorter } from '@/helpers/functional';
-import dashboardStore from '@/store/dashboards';
-import serviceStore from '@/store/services';
-import { Dashboard, Service } from '@/store/types';
+import dashboardStore, { Dashboard } from '@/store/dashboards';
+import serviceStore, { Service } from '@/store/services';
 
 @Component({
   components: {

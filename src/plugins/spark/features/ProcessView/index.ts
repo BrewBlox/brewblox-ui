@@ -1,5 +1,5 @@
 import { ref } from '@/helpers/component-ref';
-import { Feature } from '@/store/types';
+import { Feature } from '@/store/features';
 import form from './ProcessViewForm.vue';
 import widget from './ProcessViewWidget.vue';
 import wizard from './ProcessViewWizard.vue';

@@ -2,11 +2,10 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import featureStore from '@/store/features';
-import dashboardStore from '@/store/dashboards';
+import dashboardStore, { DashboardItem } from '@/store/dashboards';
 import { uid, Dialog } from 'quasar';
 import { objectSorter } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/shadow-copy';
-import { DashboardItem } from '@/store/types';
 import { Watch } from 'vue-property-decorator';
 
 interface VueOrdered extends Vue {

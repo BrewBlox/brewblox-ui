@@ -7,7 +7,7 @@ import { GraphConfig } from '@/components/Graph/types';
 import { defaultPresets } from '@/components/Graph/getters';
 import { nodeBuilder, targetSplitter, targetBuilder, QuasarNode, expandedNodes } from '@/components/Graph/functional';
 import { durationString } from '@/helpers/functional';
-import { GraphValueAxes, QueryParams } from '@/store/types';
+import { GraphValueAxes, QueryParams } from '@/store/history';
 
 interface PeriodDisplay {
   start: boolean;

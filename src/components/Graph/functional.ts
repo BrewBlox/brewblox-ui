@@ -1,5 +1,5 @@
 import set from 'lodash/set';
-import { QueryTarget } from '@/store/types';
+import { QueryTarget } from '@/store/history';
 
 export interface QuasarNode {
   label: string;

@@ -1,6 +1,6 @@
 import { get, post, sse } from '@/helpers/fetch';
 import { snakeCased } from '@/helpers/functional';
-import { QueryParams, QueryTarget } from '@/store/types';
+import { QueryParams, QueryTarget } from '@/store/history';
 import queryString from 'query-string';
 
 const snakeCasedObj =
