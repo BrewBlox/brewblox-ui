@@ -458,7 +458,12 @@ export default class SparkPage extends Vue {
       />
     </q-dialog>
     <q-dialog v-model="relationsModalOpen" no-backdrop-dismiss maximized>
-      <DagreDiagram v-if="relationsModalOpen" :nodes="nodes" :relations="relations"/>
+      <DagreDiagram
+        v-if="relationsModalOpen"
+        :service-id="service.id"
+        :nodes="nodes"
+        :relations="relations"
+      />
     </q-dialog>
 
     <!-- Shown if service was found in store, but not ok -->
