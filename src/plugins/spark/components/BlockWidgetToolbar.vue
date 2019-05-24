@@ -40,6 +40,7 @@ export default class BlockWidgetToolbar extends Vue {
             @click="graphModalOpen = true"
           />
           <ActionItem icon="refresh" label="Refresh" @click="field.refreshBlock"/>
+          <slot name="actions"/>
           <ActionItem
             v-if="field.$props.onCopy"
             icon="file_copy"
