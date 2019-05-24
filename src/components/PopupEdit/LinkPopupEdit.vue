@@ -1,8 +1,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import sparkStore from '@/plugins/spark/store';
+
 import { Link } from '@/helpers/units';
+import sparkStore from '@/plugins/spark/store';
 
 @Component({
   props: {

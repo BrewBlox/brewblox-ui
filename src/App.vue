@@ -1,6 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+
 import dashboardStore from '@/store/dashboards';
 import serviceStore from '@/store/services';
 

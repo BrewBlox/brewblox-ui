@@ -1,7 +1,8 @@
 <script lang="ts">
 import Component from 'vue-class-component';
+
 import PartComponent from '../components/PartComponent';
-import { UP, DOWN, LEFT, RIGHT } from '../getters';
+import { DOWN, LEFT, RIGHT,UP } from '../getters';
 
 @Component
 export default class CrossTube extends PartComponent {

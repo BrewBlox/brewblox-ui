@@ -1,8 +1,9 @@
+import get from 'lodash/get';
 import Vue from 'vue';
+import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+
 import store from '@/store';
 import { Service } from '@/store/services';
-import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
-import get from 'lodash/get';
 
 type ServiceFunc = (service: Service) => any | Promise<any>;
 

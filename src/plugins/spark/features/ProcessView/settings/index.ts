@@ -1,3 +1,4 @@
+import { ComponentSettings } from '../types';
 import ActuatorValve from './ActuatorValve';
 import BridgeTube from './BridgeTube';
 import CheckValve from './CheckValve';
@@ -12,16 +13,14 @@ import Kettle from './Kettle';
 import LargeKettle from './LargeKettle';
 import Lauterhexe from './Lauterhexe';
 import Pump from './Pump';
-import SmallKettle from './SmallKettle';
 import SensorDisplay from './SensorDisplay';
+import SmallKettle from './SmallKettle';
 import StraightInletTube from './StraightInletTube';
 import StraightTube from './StraightTube';
 import SystemIO from './SystemIO';
 import TeeTube from './TeeTube';
 import Valve from './Valve';
 import WhirlpoolInlet from './WhirlpoolInlet';
-
-import { ComponentSettings } from '../types';
 
 const settings: { [key: string]: ComponentSettings } = {
   ActuatorValve,

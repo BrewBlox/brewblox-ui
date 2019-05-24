@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
+
 import featureStore from '@/store/features';
 
 @Component({

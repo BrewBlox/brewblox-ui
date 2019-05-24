@@ -1,4 +1,5 @@
 import Component from 'vue-class-component';
+
 import FormBase from '@/components/Form/FormBase';
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';

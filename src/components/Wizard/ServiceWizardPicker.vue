@@ -1,10 +1,11 @@
 <script lang="ts">
+import isString from 'lodash/isString';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+
+import { objectStringSorter } from '@/helpers/functional';
 import providerStore from '@/store/providers';
 import serviceStore from '@/store/services';
-import isString from 'lodash/isString';
-import { objectStringSorter } from '@/helpers/functional';
 
 @Component
 export default class ServiceWizardPicker extends Vue {

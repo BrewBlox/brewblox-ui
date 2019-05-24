@@ -1,5 +1,5 @@
-import { ComponentSettings, StatePart, PartUpdater } from '../types';
-import { LEFT, RIGHT, DEFAULT_PUMP_PRESSURE, ACCELERATE_OTHERS, defaultSettings } from '../getters';
+import { ACCELERATE_OTHERS, DEFAULT_PUMP_PRESSURE, LEFT, RIGHT, defaultSettings } from '../getters';
+import { ComponentSettings, PartUpdater,StatePart } from '../types';
 
 const settings: ComponentSettings = {
   ...defaultSettings,

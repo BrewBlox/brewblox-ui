@@ -1,12 +1,13 @@
 <script lang="ts">
+import { Dialog,uid } from 'quasar';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import featureStore from '@/store/features';
-import dashboardStore, { DashboardItem } from '@/store/dashboards';
-import { uid, Dialog } from 'quasar';
+import { Watch } from 'vue-property-decorator';
+
 import { objectSorter } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/shadow-copy';
-import { Watch } from 'vue-property-decorator';
+import dashboardStore, { DashboardItem } from '@/store/dashboards';
+import featureStore from '@/store/features';
 
 interface VueOrdered extends Vue {
   id: string;

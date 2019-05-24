@@ -1,5 +1,6 @@
 <script lang="ts">
 import Component from 'vue-class-component';
+
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import sparkStore from '@/plugins/spark/store';
 

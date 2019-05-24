@@ -1,6 +1,8 @@
 import Vue from 'vue';
+import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+
 import store from '@/store';
-import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
+
 import {
   createDashboard as createDashboardInApi,
   createDashboardItem as createDashboardItemInApi,
@@ -10,8 +12,8 @@ import {
   fetchDashboards as fetchDashboardsInApi,
   persistDashboard as persistDashboardInApi,
   persistDashboardItem as persistDashboardItemInApi,
-  setupDashboards as setupDashboardsInApi,
   setupDashboardItems as setupDashboardItemsInApi,
+  setupDashboards as setupDashboardsInApi,
 } from './api';
 
 export interface Dashboard {

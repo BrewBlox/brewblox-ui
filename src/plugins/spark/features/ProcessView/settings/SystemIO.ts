@@ -1,5 +1,5 @@
-import { ComponentSettings, PersistentPart } from '../types';
 import { IN_OUT, RIGHT, defaultSettings } from '../getters';
+import { ComponentSettings, PersistentPart } from '../types';
 
 const settings: ComponentSettings = {
   ...defaultSettings,

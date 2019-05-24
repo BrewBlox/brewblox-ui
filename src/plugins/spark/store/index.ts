@@ -1,19 +1,21 @@
-import Vue from 'vue';
-import store from '@/store';
-import serviceStore from '@/store/services';
-import dashboardStore from '@/store/dashboards';
-import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
-import { Link } from '@/helpers/units';
 import get from 'lodash/get';
+import Vue from 'vue';
+import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+
+import { Link } from '@/helpers/units';
+import store from '@/store';
+import dashboardStore from '@/store/dashboards';
+import serviceStore from '@/store/services';
+
 import {
   Block,
-  CompatibleBlocks,
-  UnitAlternatives,
-  UserUnits,
-  SystemStatus,
   BlockLink,
+  CompatibleBlocks,
   Spark,
   SparkConfig,
+  SystemStatus,
+  UnitAlternatives,
+  UserUnits,
 } from '../types';
 import {
   clearBlocks as clearBlocksInApi,
@@ -23,16 +25,16 @@ import {
   fetchBlocks as fetchBlocksInApi,
   fetchCompatibleBlocks as fetchCompatibleBlocksInApi,
   fetchDiscoveredBlocks as fetchDiscoveredBlocksInApi,
+  fetchSystemStatus as fetchSystemStatusInApi,
   fetchUnitAlternatives as fetchUnitAlternativesInApi,
   fetchUnits as fetchUnitsInApi,
   fetchUpdateSource as fetchUpdateSourceInApi,
   persistBlock as persistBlockInApi,
   persistUnits as persistUnitsInApi,
   renameBlock as renameBlockInApi,
-  validateService as validateServiceInApi,
-  fetchSystemStatus as fetchSystemStatusInApi,
   serviceExport as serviceExportInApi,
   serviceImport as serviceImportInApi,
+  validateService as validateServiceInApi,
 } from './api';
 
 // Note: we're ignoring the system group (group 8)

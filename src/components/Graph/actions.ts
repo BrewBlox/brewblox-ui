@@ -1,15 +1,16 @@
+import forEach from 'lodash/forEach';
+import parseDuration from 'parse-duration';
+
+import { nanoToMilli } from '@/helpers/functional';
 import historyStore from '@/store/history';
 import {
   DisplayNames,
+  GraphValueAxes,
+  GraphValuesListener,
   QueryParams,
   QueryResult,
   QueryTarget,
-  GraphValueAxes,
-  GraphValuesListener,
 } from '@/store/history';
-import parseDuration from 'parse-duration';
-import { nanoToMilli } from '@/helpers/functional';
-import forEach from 'lodash/forEach';
 
 const MAX_POINTS = 5000;
 

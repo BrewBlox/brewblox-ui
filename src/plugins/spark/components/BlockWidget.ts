@@ -1,10 +1,12 @@
 import Component from 'vue-class-component';
+import { Watch } from 'vue-property-decorator';
+
+import { GraphConfig } from '@/components/Graph/types';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import sparkStore from '@/plugins/spark/store';
-import { GraphConfig } from '@/components/Graph/types';
-import { QueryParams, GraphValueAxes } from '@/store/history';
+import { GraphValueAxes,QueryParams } from '@/store/history';
+
 import { Block } from '../types';
-import { Watch } from 'vue-property-decorator';
 
 @Component
 export default class BlockWidget extends WidgetBase {

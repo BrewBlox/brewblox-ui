@@ -1,9 +1,10 @@
 <script lang="ts">
-import Vue from 'vue';
-import Component from 'vue-class-component';
 import { Dialog } from 'quasar';
 import UrlSafeString from 'url-safe-string';
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import draggable from 'vuedraggable';
+
 import buildEnv from '@/build-env.json';
 import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
 import { objectSorter } from '@/helpers/functional';

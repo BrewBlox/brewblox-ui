@@ -1,4 +1,5 @@
 import sparkStore from '@/plugins/spark/store';
+
 import { ActuatorPinBlock } from './types';
 
 export const typeName = 'ActuatorPin';

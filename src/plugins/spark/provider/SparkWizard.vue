@@ -1,10 +1,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+
+import { typeName } from '@/plugins/spark/getters';
+import sparkStore from '@/plugins/spark/store';
 import providerStore from '@/store/providers';
 import serviceStore from '@/store/services';
-import sparkStore from '@/plugins/spark/store';
-import { typeName } from '@/plugins/spark/getters';
+
 import { Spark } from '../types';
 
 @Component({

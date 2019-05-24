@@ -1,6 +1,7 @@
 import { ref } from '@/helpers/component-ref';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
+
 import form from './DisplaySettingsForm.vue';
 import widget from './DisplaySettingsWidget.vue';
 import { typeName } from './getters';

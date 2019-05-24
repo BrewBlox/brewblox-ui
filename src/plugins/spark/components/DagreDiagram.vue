@@ -1,13 +1,14 @@
 <script lang="ts">
+import { select as d3Select } from 'd3-selection';
+import { graphlib, render as dagreRender } from 'dagre-d3';
+import { saveSvgAsPng } from 'save-svg-as-png';
+import { setTimeout } from 'timers';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import featureStore from '@/store/features';
-import sparkStore from '@/plugins/spark/store';
-import { graphlib, render as dagreRender } from 'dagre-d3';
-import { select as d3Select } from 'd3-selection';
 import { Watch } from 'vue-property-decorator';
-import { setTimeout } from 'timers';
-import { saveSvgAsPng } from 'save-svg-as-png';
+
+import sparkStore from '@/plugins/spark/store';
+import featureStore from '@/store/features';
 
 interface Edge {
   source: string;

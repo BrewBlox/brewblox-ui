@@ -1,7 +1,8 @@
-import Vue from 'vue';
-import store from '@/store';
-import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
 import get from 'lodash/get';
+import Vue from 'vue';
+import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+
+import store from '@/store';
 
 export type Validator = (config: any) => boolean;
 export type WidgetSelector = (config: any) => string | undefined;

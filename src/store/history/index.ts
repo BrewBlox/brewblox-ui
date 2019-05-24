@@ -1,11 +1,13 @@
 import Vue from 'vue';
+import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+
 import store from '@/store';
-import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
+
 import {
   fetchKnownKeys as fetchKnownKeysInApi,
-  validateService as validateServiceInApi,
   subscribeMetrics,
   subscribeValues,
+  validateService as validateServiceInApi,
 } from './api';
 
 export interface QueryParams {

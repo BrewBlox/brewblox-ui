@@ -1,12 +1,13 @@
 <script lang="ts">
+import isString from 'lodash/isString';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import isString from 'lodash/isString';
+
+import { objectStringSorter } from '@/helpers/functional';
+import sparkStore from '@/plugins/spark/store';
+import { Block } from '@/plugins/spark/types';
 import featureStore from '@/store/features';
 import providerStore from '@/store/providers';
-import sparkStore from '@/plugins/spark/store';
-import { objectStringSorter } from '@/helpers/functional';
-import { Block } from '@/plugins/spark/types';
 
 @Component({
   props: {

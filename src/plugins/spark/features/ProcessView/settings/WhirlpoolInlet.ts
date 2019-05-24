@@ -1,5 +1,5 @@
+import { IN_OUT, LEFT, defaultSettings } from '../getters';
 import { ComponentSettings } from '../types';
-import { LEFT, IN_OUT, defaultSettings } from '../getters';
 
 const SIZE_X = 1;
 const SIZE_Y = 4;

@@ -1,12 +1,13 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { Watch } from 'vue-property-decorator';
+
+import { targetSplitter } from '@/components/Graph/functional';
+import { defaultPresets } from '@/components/Graph/getters';
 import { GraphConfig } from '@/components/Graph/types';
 import { durationString } from '@/helpers/functional';
-import { Watch } from 'vue-property-decorator';
-import { targetSplitter } from '@/components/Graph/functional';
 import { QueryParams } from '@/store/history';
-import { defaultPresets } from '@/components/Graph/getters';
 
 @Component({
   props: {

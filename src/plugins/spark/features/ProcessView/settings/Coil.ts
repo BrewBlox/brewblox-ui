@@ -1,7 +1,8 @@
-import { ComponentSettings, PersistentPart } from '../types';
-import { defaultSettings } from '../getters';
 import { Coordinates, CoordinatesParam } from '@/helpers/coordinates';
+
+import { defaultSettings } from '../getters';
 import { subSquares } from '../helpers/functional';
+import { ComponentSettings, PersistentPart } from '../types';
 
 export const COIL_TOP = '0,0.5,0';
 export const COIL_BOTTOM = '0,1.5,0';

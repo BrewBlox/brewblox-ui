@@ -1,6 +1,7 @@
-import parseDuration from 'parse-duration';
-import { Unit } from './units';
 import isString from 'lodash/isString';
+import parseDuration from 'parse-duration';
+
+import { Unit } from './units';
 
 type SortFunc = (a: any, b: any) => number
 

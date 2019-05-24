@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import './styles/quasar.styl';
 import './styles/quasar.variables.styl';
 import '@quasar/extras/material-icons/material-icons.css';
@@ -6,7 +5,6 @@ import '@quasar/extras/mdi-v3/mdi-v3.css';
 import '@quasar/extras/roboto-font/roboto-font.css';
 
 import {
-  Quasar,
   ClosePopup,
   Dialog,
   Notify,
@@ -26,7 +24,9 @@ import {
   QColor,
   QDate,
   QDialog,
+  QDrawer,
   QExpansionItem,
+  QHeader,
   QIcon,
   QInnerLoading,
   QInput,
@@ -34,8 +34,6 @@ import {
   QItemLabel,
   QItemSection,
   QLayout,
-  QDrawer,
-  QHeader,
   QList,
   QMenu,
   QOptionGroup,
@@ -44,10 +42,10 @@ import {
   QPopupEdit,
   QPopupProxy,
   QRadio,
-  QSpace,
   QScrollArea,
   QSelect,
   QSeparator,
+  QSpace,
   QSpinner,
   QStep,
   QStepper,
@@ -58,10 +56,12 @@ import {
   QToolbarTitle,
   QTooltip,
   QTree,
+  Quasar,
   Ripple,
   TouchHold,
   TouchPan,
 } from 'quasar';
+import Vue from 'vue';
 
 
 Vue.use(Quasar, {

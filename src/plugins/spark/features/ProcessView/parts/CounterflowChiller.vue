@@ -1,7 +1,8 @@
 <script lang="ts">
 import Component from 'vue-class-component';
+
 import PartComponent from '../components/PartComponent';
-import { CFC_TOP_RIGHT, CFC_BOTTOM_LEFT } from '../settings/CounterflowChiller';
+import { CFC_BOTTOM_LEFT,CFC_TOP_RIGHT } from '../settings/CounterflowChiller';
 
 @Component
 export default class CounterflowChiller extends PartComponent {

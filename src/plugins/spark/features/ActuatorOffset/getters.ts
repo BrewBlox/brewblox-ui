@@ -1,6 +1,7 @@
-import sparkStore from '@/plugins/spark/store';
-import { ActuatorOffsetBlock } from './types';
 import { SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
+import sparkStore from '@/plugins/spark/store';
+
+import { ActuatorOffsetBlock } from './types';
 
 export const typeName = 'ActuatorOffset';
 
