@@ -2,7 +2,7 @@
 import get from 'lodash/get';
 import Component from 'vue-class-component';
 
-import { Link,postfixedDisplayNames } from '@/helpers/units';
+import { Link, postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import sparkStore from '@/plugins/spark/store';
 import { BlockLink } from '@/plugins/spark/types';
@@ -120,7 +120,7 @@ export default class PidWidget extends BlockWidget {
       <template v-slot:actions>
         <ActionItem
           icon="mdi-ray-start-arrow"
-          label="Show Control Loop"
+          label="Show Relations"
           @click="relationsOpen = true"
         />
       </template>
