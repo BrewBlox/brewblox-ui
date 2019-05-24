@@ -716,6 +716,19 @@
         "freshDuration": {},
         "decimals": {}
       }
+    },
+    {
+      "_id": "b2d56625-dab0-b8df-a883-78524f008ab5",
+      "title": "loopy",
+      "order": 3,
+      "cols": 4,
+      "rows": 6,
+      "feature": "ControlLoop",
+      "dashboard": "dashboard-home",
+      "config": {
+        "serviceId": "sparkey",
+        "pidId": "pid-1"
+      }
     }
   ]
 }
