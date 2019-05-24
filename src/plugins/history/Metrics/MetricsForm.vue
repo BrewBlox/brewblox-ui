@@ -1,13 +1,12 @@
 <script lang="ts">
+import Component from 'vue-class-component';
+import FormBase from '@/components/Form/FormBase';
 import parseDuration from 'parse-duration';
 import get from 'lodash/get';
+import historyStore from '@/store/history';
 import { nodeBuilder, targetSplitter, targetBuilder, QuasarNode, expandedNodes } from '@/components/Graph/functional';
-import FormBase from '@/components/Form/FormBase';
-import { fetchKnownKeys } from '@/store/history/actions';
-import { fields } from '@/store/history/getters';
-import Component from 'vue-class-component';
 import { durationString } from '@/helpers/functional';
-import { MetricsConfig } from './state';
+import { MetricsConfig } from './types';
 import { DEFAULT_FRESH_DURATION, DEFAULT_DECIMALS } from './getters';
 
 @Component
@@ -23,8 +22,8 @@ export default class MetricsForm extends FormBase {
     return this.$props.field;
   }
 
-  get fields() {
-    return fields(this.$store) as { [key: string]: string[] };
+  get fields(): Record<string, string[]> {
+    return historyStore.fields;
   }
 
   get nodes() {
@@ -56,7 +55,7 @@ export default class MetricsForm extends FormBase {
   }
 
   created() {
-    fetchKnownKeys(this.$store);
+    historyStore.fetchKnownKeys();
   }
 
   callAndSaveConfig(func: (v: any) => void) {
@@ -122,8 +121,8 @@ export default class MetricsForm extends FormBase {
           </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section>
-            <q-scroll-area style="height: 300px; max-height: 30vh">
+          <q-item-section :class="{['scroll-parent']: expandedKeys.length > 0}">
+            <q-scroll-area>
               <q-tree
                 ref="tree"
                 :nodes="nodes"
@@ -141,78 +140,97 @@ export default class MetricsForm extends FormBase {
       </q-expansion-item>
 
       <q-expansion-item group="modal" icon="mdi-tag-multiple" label="Labels">
-        <q-item dark>
-          <q-item-section>Metric</q-item-section>
-          <q-item-section>Display as</q-item-section>
-        </q-item>
-        <q-separator dark inset/>
-        <q-item v-for="field in selected" :key="field" dark>
-          <q-item-section>{{ field }}</q-item-section>
-          <q-item-section>
-            <InputPopupEdit
-              :field="renames[field]"
-              :change="callAndSaveConfig(v => config.renames[field] = v)"
-              label="Label"
-              clearable
-              tag="span"
-            />
-          </q-item-section>
-        </q-item>
-        <q-item v-if="!selected || selected.length === 0" dark>
-          <q-item-section side>No metrics selected</q-item-section>
-        </q-item>
+        <div class="scroll-parent">
+          <q-scroll-area>
+            <q-item dark>
+              <q-item-section>Metric</q-item-section>
+              <q-item-section>Display as</q-item-section>
+            </q-item>
+            <q-separator dark inset/>
+            <q-item v-for="field in selected" :key="field" dark>
+              <q-item-section>{{ field }}</q-item-section>
+              <q-item-section>
+                <InputPopupEdit
+                  :field="renames[field]"
+                  :change="callAndSaveConfig(v => config.renames[field] = v)"
+                  label="Label"
+                  clearable
+                  tag="span"
+                />
+              </q-item-section>
+            </q-item>
+            <q-item v-if="!selected || selected.length === 0" dark>
+              <q-item-section side>No metrics selected</q-item-section>
+            </q-item>
+          </q-scroll-area>
+        </div>
       </q-expansion-item>
 
       <q-expansion-item group="modal" icon="warning" label="Old data warnings">
-        <q-item dark>
-          <q-item-section>Metric</q-item-section>
-          <q-item-section>Warn when older than</q-item-section>
-          <q-item-section class="col-1"/>
-        </q-item>
-        <q-separator dark inset/>
-        <q-item v-for="field in selected" :key="field" dark>
-          <q-item-section>{{ field }}</q-item-section>
-          <q-item-section>
-            <InputPopupEdit
-              :field="durationString(freshDuration[field] || DEFAULT_FRESH_DURATION)"
-              :change="callAndSaveConfig(v => freshDuration[field] = parseDuration(v))"
-              label="Fresh duration"
-              clearable
-              tag="span"
-            />
-          </q-item-section>
-          <q-item-section class="col-1">
-            <q-btn icon="restore" flat @click="resetFreshDuration(field)"/>
-          </q-item-section>
-        </q-item>
+        <div class="scroll-parent">
+          <q-scroll-area>
+            <q-item dark>
+              <q-item-section>Metric</q-item-section>
+              <q-item-section>Warn when older than</q-item-section>
+              <q-item-section class="col-1"/>
+            </q-item>
+            <q-separator dark inset/>
+            <q-item v-for="field in selected" :key="field" dark>
+              <q-item-section>{{ field }}</q-item-section>
+              <q-item-section>
+                <InputPopupEdit
+                  :field="durationString(freshDuration[field] || DEFAULT_FRESH_DURATION)"
+                  :change="callAndSaveConfig(v => freshDuration[field] = parseDuration(v))"
+                  label="Fresh duration"
+                  clearable
+                  tag="span"
+                />
+              </q-item-section>
+              <q-item-section class="col-1">
+                <q-btn icon="restore" flat @click="resetFreshDuration(field)"/>
+              </q-item-section>
+            </q-item>
+          </q-scroll-area>
+        </div>
       </q-expansion-item>
 
       <q-expansion-item group="modal" icon="mdi-numeric" label="Rounding">
-        <q-item dark>
-          <q-item-section>Metric</q-item-section>
-          <q-item-section>Number of decimals</q-item-section>
-          <q-item-section class="col-1"/>
-        </q-item>
-        <q-separator dark inset/>
-        <q-item v-for="field in selected" :key="field" dark>
-          <q-item-section>{{ field }}</q-item-section>
-          <q-item-section>
-            <InputPopupEdit
-              :field="fieldDecimals(field)"
-              :change="callAndSaveConfig(v => decimals[field] = v)"
-              :decimals="0"
-              :popup-props="{validate: (v) => v >= 0}"
-              type="number"
-              label="Number of decimals"
-              clearable
-              tag="span"
-            />
-          </q-item-section>
-          <q-item-section class="col-1">
-            <q-btn icon="mdi-undo-variant" flat @click="resetDecimals(field)"/>
-          </q-item-section>
-        </q-item>
+        <div class="scroll-parent">
+          <q-scroll-area>
+            <q-item dark>
+              <q-item-section>Metric</q-item-section>
+              <q-item-section>Number of decimals</q-item-section>
+              <q-item-section class="col-1"/>
+            </q-item>
+            <q-separator dark inset/>
+            <q-item v-for="field in selected" :key="field" dark>
+              <q-item-section>{{ field }}</q-item-section>
+              <q-item-section>
+                <InputPopupEdit
+                  :field="fieldDecimals(field)"
+                  :change="callAndSaveConfig(v => decimals[field] = v)"
+                  :decimals="0"
+                  :popup-props="{validate: (v) => v >= 0}"
+                  type="number"
+                  label="Number of decimals"
+                  clearable
+                  tag="span"
+                />
+              </q-item-section>
+              <q-item-section class="col-1">
+                <q-btn icon="mdi-undo-variant" flat @click="resetDecimals(field)"/>
+              </q-item-section>
+            </q-item>
+          </q-scroll-area>
+        </div>
       </q-expansion-item>
     </q-card-section>
   </q-card>
 </template>
+
+<style scoped>
+.scroll-parent {
+  height: 300px;
+  max-height: 30vh;
+}
+</style>

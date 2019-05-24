@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Unit } from '@/helpers/units';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { Unit } from '@/helpers/units';
 import { unitDurationString } from '@/helpers/functional';
 import parseDuration from 'parse-duration';
 

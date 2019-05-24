@@ -14,7 +14,16 @@ export interface Module {
   id: string;
 }
 
+interface DBError {
+  time: string;
+  message: string;
+  moduleId: string;
+  content: string;
+  error: string;
+}
+
 const MODULES: Module[] = [];
+const dbErrors: DBError[] = [];
 let sharedDb: Promise<PouchDB.Database> | null = null;
 
 const cleanId = (moduleId: string, fullId: string): string =>
@@ -40,6 +49,19 @@ const asNewDocument = (moduleId: string, obj: any): any => {
   delete obj._rev;
   return asDocument(moduleId, obj);
 };
+
+const intercept =
+  (message: string, moduleId: string, obj: any = null): (e: Error) => never =>
+    (e: Error) => {
+      dbErrors.push({
+        message,
+        moduleId,
+        time: new Date().toString(),
+        content: JSON.stringify(obj),
+        error: e.message,
+      });
+      throw e;
+    };
 
 const databaseInfo =
   async (db: PouchDB.Database): Promise<PouchDB.Core.DatabaseInfo | null> => {
@@ -102,6 +124,14 @@ const promisedDb = async (): Promise<PouchDB.Database> => {
   return sharedDb as Promise<PouchDB.Database>;
 };
 
+export function getErrors(clear: boolean = false): DBError[] {
+  const retval = [...dbErrors];
+  if (clear) {
+    dbErrors.length = 0;
+  }
+  return retval;
+}
+
 export function registerModule(module: Module): void {
   if (MODULES.find(m => m.id === module.id)) {
     throw new Error(`Database module '${module.id}' is already registered`);
@@ -112,7 +142,8 @@ export function registerModule(module: Module): void {
 export async function fetchAll(moduleId: string): Promise<any[]> {
   const db = await promisedDb();
   /* eslint-disable-next-line @typescript-eslint/camelcase */
-  const resp = await db.allDocs({ include_docs: true });
+  const resp = await db.allDocs({ include_docs: true })
+    .catch(intercept('Fetch all objects', moduleId));
   return resp.rows
     .filter(row => checkInModule(moduleId, row.id))
     .map(row => asStoreObject(moduleId, row.doc));
@@ -122,24 +153,29 @@ export async function fetchById<T extends StoreObject>(
   moduleId: string, objId: string
 ): Promise<T> {
   const db = await promisedDb();
-  return asStoreObject(moduleId, await db.get(fullId(moduleId, objId)));
+  const obj = await db.get(fullId(moduleId, objId))
+    .catch(intercept(`Fetch '${objId}'`, moduleId));
+  return asStoreObject(moduleId, obj);
 }
 
 export async function create<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
   const db = await promisedDb();
-  const resp = await db.put(asNewDocument(moduleId, obj));
+  const resp = await db.put(asNewDocument(moduleId, obj))
+    .catch(intercept('Create object', moduleId, obj));
   return { ...obj, _rev: resp.rev };
 }
 
 export async function persist<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
   const db = await promisedDb();
-  const resp = await db.put(asDocument(moduleId, obj));
+  const resp = await db.put(asDocument(moduleId, obj))
+    .catch(intercept('Persist object', moduleId, obj));
   return { ...obj, _rev: resp.rev };
 }
 
 export async function remove<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
   const db = await promisedDb();
-  await db.remove(asDocument(moduleId, obj));
+  await db.remove(asDocument(moduleId, obj))
+    .catch(intercept('Remove object', moduleId, obj));
   delete obj._rev;
   return obj;
 }

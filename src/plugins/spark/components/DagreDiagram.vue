@@ -1,13 +1,21 @@
 <script lang="ts">
+import Vue from 'vue';
+import Component from 'vue-class-component';
 import { graphlib, render as dagreRender } from 'dagre-d3';
 import { select as d3Select } from 'd3-selection';
-import { Vue, Component, Watch } from 'vue-property-decorator';
+import { Watch } from 'vue-property-decorator';
 import { setTimeout } from 'timers';
+import { saveSvgAsPng } from 'save-svg-as-png';
 
 interface Edge {
   source: string;
   target: string;
   relation: string[];
+}
+
+interface Node {
+  id: string;
+  type: string;
 }
 
 const LABEL_HEIGHT = 50;
@@ -31,9 +39,17 @@ export default class DagreDiagram extends Vue {
   $refs!: {
     svg: SVGGraphicsElement;
     diagram: SVGGraphicsElement;
+    toolbar: Vue;
   }
+  exportBusy: boolean = false;
   lastRelationString: string = '';
   graphObj: any = null;
+  availableHeight: number = 0;
+  invertedRelations: string[] = [
+    'input',
+    'reference',
+    'sensor',
+  ];
 
   get edges() {
     return this.$props.relations
@@ -41,8 +57,19 @@ export default class DagreDiagram extends Vue {
   }
 
   get drawnNodes() {
-    return this.$props.nodes
-      .filter(n => this.edges.find(e => e.source === n.id || e.target === n.id));
+    const findNode = (id: string): Node =>
+      this.$props.nodes.find(node => node.id === id) || { id, type: '???' };
+
+    return this.edges
+      // Create a list of each ID referenced by an edge
+      .reduce((acc: string[], edge: Edge) => [...acc, edge.target, edge.source], [])
+      // Find a node for each unique ID
+      .reduce((acc: Node[], id: string) =>
+        acc.find(node => node.id === id)
+          ? acc
+          : [...acc, findNode(id)],
+        [],
+      );
   }
 
   @Watch('relations', { immediate: true })
@@ -83,8 +110,13 @@ export default class DagreDiagram extends Vue {
     });
 
     this.edges.forEach(val => {
-      obj.setEdge(val.source, val.target, {
-        label: val.relation[0].replace(/Id$/, ''),
+      const label = val.relation[0].replace(/Id$/, '');
+      const [source, target] = this.invertedRelations.includes(label)
+        ? [val.target, val.source]
+        : [val.source, val.target];
+
+      obj.setEdge(source, target, {
+        label,
         labelStyle: 'fill: white; stroke: none;',
         style: 'fill: none; stroke: red; stroke-width: 1.5px;',
         arrowheadStyle: 'fill: red; stroke: red;',
@@ -101,6 +133,8 @@ export default class DagreDiagram extends Vue {
     const renderFunc = new dagreRender();
     renderFunc(d3Select(this.$refs.diagram), this.graphObj);
     const outGraph = this.graphObj.graph();
+    const toolbarHeight = this.$refs.toolbar.$el.clientHeight || 50;
+    this.availableHeight = window.innerHeight - toolbarHeight;
     this.$refs.svg.setAttribute('height', outGraph.height);
     this.$refs.svg.setAttribute('width', outGraph.width);
     this.$refs.svg.setAttribute('viewBox', `0 0 ${outGraph.width} ${outGraph.height}`);
@@ -118,18 +152,30 @@ export default class DagreDiagram extends Vue {
         });
     });
   }
+
+  exportDiagram() {
+    this.exportBusy = true;
+    // uses quasar "dark" as background color
+    saveSvgAsPng(this.$refs.svg, 'block-relations.png', { backgroundColor: '#282c34' })
+      .finally(() => this.exportBusy = false);
+  }
 }
 </script>
 
 <template>
   <q-card dark class="maximized bg-dark-bright">
-    <FormToolbar>Block Relations</FormToolbar>
+    <FormToolbar ref="toolbar">
+      Block Relations
+      <template v-slot:buttons>
+        <q-btn :loading="exportBusy" flat rounded label="export" @click="exportDiagram"/>
+      </template>
+    </FormToolbar>
 
-    <q-card-section class="absolute-center">
-      <svg ref="svg" class="diag-svg">
+    <div :style="`overflow-y: scroll; max-height: ${availableHeight}px`" class="row">
+      <svg ref="svg" class="diag-svg col-12">
         <g ref="diagram" class="diag-g"/>
       </svg>
-    </q-card-section>
+    </div>
   </q-card>
 </template>
 

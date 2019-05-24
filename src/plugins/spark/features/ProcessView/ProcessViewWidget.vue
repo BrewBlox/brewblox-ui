@@ -5,7 +5,7 @@ import { uid, debounce } from 'quasar';
 import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';
-import { PersistentPart, StatePart, ProcessViewConfig, FlowPart, Rect, ClickEvent, PartUpdater } from './state';
+import { PersistentPart, StatePart, ProcessViewConfig, FlowPart, Rect, ClickEvent, PartUpdater } from './types';
 import { spaceCased } from '@/helpers/functional';
 import ProcessViewCatalog from './ProcessViewCatalog.vue';
 
@@ -50,18 +50,6 @@ export default class ProcessViewWidget extends WidgetBase {
     return this.$props.config;
   }
 
-  async saveConfig(config: ProcessViewConfig = this.widgetConfig) {
-    await this.$props.onChangeConfig(this.widgetId, config)
-      .catch((e) => {
-        this.$q.notify({
-          color: 'negative',
-          icon: 'error',
-          message: `save error: ${e}`,
-        });
-        this.$forceUpdate();
-      });
-  }
-
   async updateParts(parts: PersistentPart[]) {
     const asPersistent = (part: PersistentPart | FlowPart) => {
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
@@ -71,7 +59,7 @@ export default class ProcessViewWidget extends WidgetBase {
 
     // first set local value, to avoid jitters caused by the period between action and vueX refresh
     this.widgetConfig.parts = parts.map(asPersistent);
-    await this.saveConfig({ ...this.widgetConfig });
+    await this.saveConfig(this.widgetConfig);
     this.calculateFlowFunc();
   }
 
@@ -109,7 +97,6 @@ export default class ProcessViewWidget extends WidgetBase {
     return {
       updatePart: this.updatePart,
       updatePartState: this.updatePartState,
-      store: this.$store,
     };
   }
 

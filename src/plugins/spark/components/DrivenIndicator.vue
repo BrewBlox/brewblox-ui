@@ -1,7 +1,7 @@
 <script lang="ts">
-import Component from 'vue-class-component';
-import { drivenChains } from '@/plugins/spark/store/getters';
 import Vue from 'vue';
+import Component from 'vue-class-component';
+import sparkStore from '@/plugins/spark/store';
 
 @Component({
   props: {
@@ -17,7 +17,7 @@ import Vue from 'vue';
 })
 export default class DrivenIndicator extends Vue {
   get textChains() {
-    return drivenChains(this.$store, this.$props.serviceId)
+    return sparkStore.drivenChains(this.$props.serviceId)
       .filter(chain => chain[0] === this.$props.blockId)
       .map(chain => chain
         .slice(1)

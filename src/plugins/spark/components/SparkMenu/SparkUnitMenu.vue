@@ -1,10 +1,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { serviceById } from '@/store/services/getters';
-import { units, unitAlternatives } from '../../store/getters';
-import { UserUnits } from '../../state';
-import { saveUnits, fetchAll } from '../../store/actions';
+import serviceStore from '@/store/services';
+import sparkStore from '@/plugins/spark/store';
+import { UserUnits } from '@/plugins/spark/types';
 import { spaceCased } from '@/helpers/functional';
 
 
@@ -17,28 +16,23 @@ import { spaceCased } from '@/helpers/functional';
   },
 })
 export default class SparkUnitMenu extends Vue {
-  $q: any;
   spaceCased = spaceCased;
 
   get service() {
-    return serviceById(this.$store, this.$props.serviceId);
+    return serviceStore.serviceById(this.$props.serviceId);
   }
 
   get units(): UserUnits {
-    return units(this.$store, this.service.id);
+    return sparkStore.units(this.service.id) || {};
   }
 
-  get unitAlternatives() {
-    return unitAlternatives(this.$store, this.service.id);
-  }
-
-  unitAlternativeOptions(name: string): string[] {
-    return (this.unitAlternatives[name] || [])
-      .map(val => ({ label: val, value: val }));
+  unitAlternativeOptions(name: string): { label: string; value: any }[] {
+    return (sparkStore.unitAlternatives(this.service.id)[name] || [])
+      .map(v => ({ label: v, value: v }));
   }
 
   saveUnits(vals: UserUnits = this.units) {
-    saveUnits(this.$store, this.service.id, vals)
+    sparkStore.saveUnits([this.service.id, vals])
       .catch(reason => this.$q.notify({
         icon: 'error',
         color: 'negative',
@@ -47,7 +41,7 @@ export default class SparkUnitMenu extends Vue {
   }
 
   mounted() {
-    fetchAll(this.$store, this.service);
+    sparkStore.fetchAll(this.service.id);
   }
 }
 </script>

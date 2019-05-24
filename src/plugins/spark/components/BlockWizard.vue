@@ -2,16 +2,11 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import isString from 'lodash/isString';
+import featureStore from '@/store/features';
+import providerStore from '@/store/providers';
+import sparkStore from '@/plugins/spark/store';
 import { objectStringSorter } from '@/helpers/functional';
-import { Block } from '@/plugins/spark/state';
-import { blockIds } from '@/plugins/spark/store/getters';
-import {
-  displayNameById,
-  formById,
-  wizardById,
-} from '@/store/features/getters';
-import { featuresById } from '@/store/providers/getters';
-import { createBlock } from '@/plugins/spark/store/actions';
+import { Block } from '@/plugins/spark/types';
 
 @Component({
   props: {
@@ -22,7 +17,6 @@ import { createBlock } from '@/plugins/spark/store/actions';
   },
 })
 export default class BlockWizard extends Vue {
-  $q: any;
   filteredOptions: any[] = [];
   modalOpen: boolean = false;
 
@@ -33,7 +27,7 @@ export default class BlockWizard extends Vue {
   get blockIdRules() {
     return [
       v => !!v || 'Name must not be empty',
-      v => !blockIds(this.$store, this.$props.serviceId).includes(v) || 'Name must be unique',
+      v => !sparkStore.blockIds(this.$props.serviceId).includes(v) || 'Name must be unique',
       v => v.match(/^[a-zA-Z]/) || 'Name must start with a letter',
       v => v.match(/^[a-zA-Z0-9 \(\)_-\|]*$/) || 'Name may only contain letters, numbers, spaces, and ()-_|',
       v => v.length < 200 || 'Name must be less than 200 characters',
@@ -49,13 +43,13 @@ export default class BlockWizard extends Vue {
   }
 
   get wizardOptions() {
-    return featuresById(this.$store, 'Spark')
+    return providerStore.featuresById('Spark')
       .map(id => ({
-        label: displayNameById(this.$store, id),
+        label: featureStore.displayNameById(id),
         value: id,
-        form: formById(this.$store, id),
+        form: featureStore.formById(id),
       }))
-      .filter(opt => wizardById(this.$store, opt.value) === 'BlockWidgetWizard')
+      .filter(opt => featureStore.wizardById(opt.value) === 'BlockWidgetWizard')
       .sort(objectStringSorter('label'));
   }
 
@@ -101,11 +95,11 @@ export default class BlockWizard extends Vue {
 
   async createBlock() {
     try {
-      await createBlock(this.$store, this.$props.serviceId, this.block);
+      await sparkStore.createBlock([this.$props.serviceId, this.block as Block]);
       this.$q.notify({
         icon: 'mdi-check-all',
         color: 'positive',
-        message: `Created ${displayNameById(this.$store, (this.block as Block).type)} Block '${this.blockId}'`,
+        message: `Created ${featureStore.displayNameById((this.block as Block).type)} Block '${this.blockId}'`,
       });
     } catch (e) {
       this.$q.notify({

@@ -1,10 +1,10 @@
 <script lang="ts">
-import { GraphConfig } from '@/components/Graph/state';
-import { defaultPresets } from '@/components/Graph/getters';
-import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
+import WidgetBase from '@/components/Widget/WidgetBase';
+import { GraphConfig } from '@/components/Graph/types';
+import { defaultPresets } from '@/components/Graph/getters';
 import { Watch } from 'vue-property-decorator';
-import { QueryParams } from '@/store/history/state';
+import { QueryParams } from '@/store/history/types';
 
 @Component
 export default class GraphWidget extends WidgetBase {
@@ -45,7 +45,17 @@ export default class GraphWidget extends WidgetBase {
 
 <template>
   <q-card dark class="text-white column">
-    <q-dialog v-model="settingsModalOpen" no-backdrop-dismiss>
+    <q-dialog v-model="settingsModalOpen" no-backdrop-dismiss class="row">
+      <ScreenSizeConstrained
+        v-if="settingsModalOpen"
+        :min-width="1500"
+        class="q-mr-md"
+        style="width: 600px"
+      >
+        <q-card dark class="q-pa-xs bg-dark-bright">
+          <GraphCard :id="$props.id" :config="graphCfg" shared-listeners/>
+        </q-card>
+      </ScreenSizeConstrained>
       <GraphForm
         v-if="settingsModalOpen"
         v-bind="$props"

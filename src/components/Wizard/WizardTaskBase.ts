@@ -1,8 +1,7 @@
-import Component from 'vue-class-component';
 import Vue from 'vue';
-import { RootStore } from '@/store/state';
+import Component from 'vue-class-component';
 
-export type WizardAction = (store: RootStore, config: any) => Promise<void>;
+export type WizardAction = (config: any) => Promise<void>;
 
 // emits:
 // - cancel
@@ -28,8 +27,6 @@ export type WizardAction = (store: RootStore, config: any) => Promise<void>;
   },
 })
 export default class WizardTaskBase extends Vue {
-  protected $q: any;
-
   protected get stagedConfig(): any {
     return this.$props.config;
   }

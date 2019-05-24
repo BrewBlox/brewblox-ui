@@ -1,9 +1,9 @@
 <script lang="ts">
 import PartCard from './PartCard';
 import Component from 'vue-class-component';
-import { serviceIds } from '@/store/services/getters';
-import { Block } from '@/plugins/spark/state';
-import { blockValues, blocks } from '@/plugins/spark/store/getters';
+import serviceStore from '@/store/services';
+import sparkStore from '@/plugins/spark/store';
+import { Block } from '@/plugins/spark/types';
 import { objectStringSorter } from '@/helpers/functional';
 import get from 'lodash/get';
 import { Link } from '@/helpers/units';
@@ -29,7 +29,7 @@ export default class BlockPartCard extends PartCard {
   block: Block | null = null;
 
   get serviceOptions() {
-    return serviceIds(this.$store);
+    return serviceStore.serviceIds;
   }
 
   get blockOptions() {
@@ -37,7 +37,7 @@ export default class BlockPartCard extends PartCard {
       return [];
     }
 
-    return blockValues(this.$store, this.serviceId)
+    return sparkStore.blockValues(this.serviceId)
       .filter(block => this.$props.types.includes(block.type))
       .sort(objectStringSorter('id'));
   }
@@ -65,7 +65,7 @@ export default class BlockPartCard extends PartCard {
     this.serviceId = get(this.part.settings, this.$props.blockServiceIdKey, null);
     const link = get(this.part.settings, this.$props.blockLinkKey, null);
     if (this.serviceId && link) {
-      this.block = blocks(this.$store, this.serviceId as string)[link.id];
+      this.block = sparkStore.blocks(this.serviceId as string)[link.id];
     }
   }
 }

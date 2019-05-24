@@ -1,39 +1,46 @@
 <script lang="ts">
-import { uid } from 'quasar';
 import Component from 'vue-class-component';
+import dashboardStore from '@/store/dashboards';
+import featureStore from '@/store/features';
+import sparkStore from '@/plugins/spark/store';
+import { uid } from 'quasar';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { Unit, Link } from '@/helpers/units';
-import { BrewPiConfig } from '@/plugins/spark/arrangements/BrewPi/state';
-import { renameBlock, createBlock, saveBlock } from '@/plugins/spark/store/actions';
-import { createDashboard, appendDashboardItem } from '@/store/dashboards/actions';
-import { widgetSizeById } from '@/store/features/getters';
-import { RootStore } from '@/store/state';
+import { BrewPiConfig } from '@/plugins/spark/arrangements/BrewPi/types';
 import { typeName as spProfileType } from '@/plugins/spark/features/SetpointProfile/getters';
 import { typeName as pairType } from '@/plugins/spark/features/SetpointSensorPair/getters';
 import { typeName as pwmType } from '@/plugins/spark/features/ActuatorPwm/getters';
 import { typeName as mutexType } from '@/plugins/spark/features/Mutex/getters';
 import { typeName as offsetType } from '@/plugins/spark/features/ActuatorOffset/getters';
+import { typeName as graphType } from '@/plugins/history/Graph/getters';
 import {
   typeName as pidType,
   defaultData as pidData,
 } from '@/plugins/spark/features/Pid/getters';
-import { dashboardIds } from '@/store/dashboards/getters';
-import { blockById } from '@/plugins/spark/store/getters';
-import { Dashboard } from '@/store/dashboards/state';
+import { Dashboard } from '@/store/dashboards/types';
 
 @Component
 export default class BrewPiSettingsTask extends WizardTaskBase {
   fridgeSetting = new Unit(20, 'degC');
   beerSetting = new Unit(20, 'degC');
 
+  get userTemp(): string {
+    return sparkStore.units(this.cfg.serviceId).Temp;
+  }
+
   get cfg(): BrewPiConfig {
     return this.stagedConfig;
+  }
+
+  defaultTemp(): Unit {
+    const defaultTempValues = { degC: 20, degF: 68, degK: 293 };
+    return new Unit(defaultTempValues[this.userTemp] || 20, this.userTemp);
   }
 
   blockType(newId: string): string {
     for (let [from, to] of Object.entries(this.cfg.renamedBlocks)) {
       if (to === newId) {
-        return blockById(this.$store, this.cfg.serviceId, from).type;
+        return sparkStore.blockById(this.cfg.serviceId, from).type;
       }
     }
     throw new Error('Old block not found');
@@ -99,7 +106,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       },
       // Offset Actuator
       {
-        id: this.cfg.names.fridgeOffset,
+        id: this.cfg.names.fridgeDriver,
         serviceId: this.cfg.serviceId,
         type: offsetType,
         groups: this.cfg.groups,
@@ -172,7 +179,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
           ...pidData(),
           enabled: false,
           inputId: new Link(this.cfg.names.beerSSPair),
-          outputId: new Link(this.cfg.names.fridgeOffset),
+          outputId: new Link(this.cfg.names.fridgeDriver),
           filter: 4,
           filterThreshold: new Unit(2, 'delta_degC'),
           kp: new Unit(5, '1/degC'),
@@ -234,13 +241,36 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
     const createWidget =
       (name: string, type: string) => ({
         ...genericSettings,
-        ...widgetSizeById(this.$store, type),
+        ...featureStore.widgetSizeById(type),
         id: uid(),
         title: name,
         feature: type,
         config: {
           blockId: name,
           serviceId: this.cfg.serviceId,
+        },
+      });
+
+    const createGraph =
+      (name: string) => ({
+        ...createWidget(name, graphType),
+        pinnedPosition: { x: 1, y: 1 },
+        config: {
+          layout: {},
+          params: { duration: '10m' },
+          targets: [
+            {
+              measurement: this.cfg.serviceId,
+              fields: [
+                `${this.cfg.names.fridgeSSPair}/value[${this.userTemp}]`,
+                `${this.cfg.names.fridgeSSPair}/setting[${this.userTemp}]`,
+                `${this.cfg.names.beerSSPair}/value[${this.userTemp}]`,
+                `${this.cfg.names.beerSSPair}/setting[${this.userTemp}]`,
+                `${this.cfg.names.coolPwm}/value`,
+                `${this.cfg.names.heatPwm}/value`,
+              ],
+            },
+          ],
         },
       });
 
@@ -264,47 +294,48 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       // Mutex
       createWidget(this.cfg.names.mutex, mutexType),
       // Offset
-      createWidget(this.cfg.names.fridgeOffset, offsetType),
-
+      createWidget(this.cfg.names.fridgeDriver, offsetType),
+      // Graph
+      createGraph(this.cfg.names.graph),
     ];
   }
 
   defineActions() {
     this.pushActions([
-      async (store: RootStore, cfg: BrewPiConfig): Promise<void> => {
+      async (cfg: BrewPiConfig): Promise<void> => {
         await Promise.all(
           Object.entries(cfg.renamedBlocks)
             .filter(([currVal, newVal]: [string, string]) => currVal !== newVal)
             .map(
               ([currVal, newVal]: [string, string]) =>
-                renameBlock(store, cfg.serviceId, currVal, newVal)));
+                sparkStore.renameBlock([cfg.serviceId, currVal, newVal])));
       },
 
-      async (store: RootStore, cfg: BrewPiConfig): Promise<void> => {
+      async (cfg: BrewPiConfig): Promise<void> => {
         // Create synchronously, to ensure dependencies are created first
         for (let block of cfg.createdBlocks) {
-          await createBlock(store, cfg.serviceId, block);
+          await sparkStore.createBlock([cfg.serviceId, block]);
         }
       },
 
-      async (store: RootStore, cfg: BrewPiConfig): Promise<void> => {
+      async (cfg: BrewPiConfig): Promise<void> => {
         await Promise.all(
           cfg.changedBlocks
-            .map(block => saveBlock(store, cfg.serviceId, block)));
+            .map(block => sparkStore.saveBlock([cfg.serviceId, block])));
       },
 
-      async (store: RootStore, cfg: BrewPiConfig): Promise<void> => {
-        if (!dashboardIds(store).includes(cfg.dashboardId)) {
+      async (cfg: BrewPiConfig): Promise<void> => {
+        if (!dashboardStore.dashboardIds.includes(cfg.dashboardId)) {
           const dashboard: Dashboard = {
             id: cfg.dashboardId,
             title: cfg.dashboardTitle,
-            order: dashboardIds(store).length + 1,
+            order: dashboardStore.dashboardIds.length + 1,
           };
-          await createDashboard(store, dashboard);
+          await dashboardStore.createDashboard(dashboard);
         }
         await Promise.all(
           cfg.widgets
-            .map(item => appendDashboardItem(store, item)));
+            .map(item => dashboardStore.appendDashboardItem(item)));
       },
     ]);
   }
@@ -317,6 +348,11 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
     // We're updating all at once, to avoid having to wait a tick before the prop changes
     this.updateConfig(this.cfg);
     this.finish();
+  }
+
+  mounted() {
+    this.fridgeSetting = this.defaultTemp();
+    this.beerSetting = this.defaultTemp();
   }
 }
 </script>

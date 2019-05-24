@@ -1,7 +1,7 @@
 <script lang="ts">
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 import Component from 'vue-class-component';
-import { MetricsConfig } from './state';
+import { MetricsConfig } from './types';
 
 
 @Component

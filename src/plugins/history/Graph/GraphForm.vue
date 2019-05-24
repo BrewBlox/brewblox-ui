@@ -1,14 +1,13 @@
 <script lang="ts">
-import { GraphConfig } from '@/components/Graph/state';
+import Component from 'vue-class-component';
+import parseDuration from 'parse-duration';
+import FormBase from '@/components/Form/FormBase';
+import historyStore from '@/store/history';
+import { GraphConfig } from '@/components/Graph/types';
 import { defaultPresets } from '@/components/Graph/getters';
 import { nodeBuilder, targetSplitter, targetBuilder, QuasarNode, expandedNodes } from '@/components/Graph/functional';
-import FormBase from '@/components/Form/FormBase';
 import { durationString } from '@/helpers/functional';
-import parseDuration from 'parse-duration';
-import { GraphValueAxes, QueryParams } from '@/store/history/state';
-import { fetchKnownKeys } from '@/store/history/actions';
-import { fields } from '@/store/history/getters';
-import Component from 'vue-class-component';
+import { GraphValueAxes, QueryParams } from '@/store/history/types';
 
 interface PeriodDisplay {
   start: boolean;
@@ -105,8 +104,8 @@ export default class GraphForm extends FormBase {
     this.saveConfig(this.config);
   }
 
-  get fields() {
-    return fields(this.$store) as { [key: string]: string[] };
+  get fields(): Record<string, string[]> {
+    return historyStore.fields;
   }
 
   get nodes() {
@@ -143,7 +142,7 @@ export default class GraphForm extends FormBase {
   }
 
   created() {
-    fetchKnownKeys(this.$store);
+    historyStore.fetchKnownKeys();
   }
 
   callAndSaveConfig(func: (v: any) => void) {
@@ -243,8 +242,8 @@ export default class GraphForm extends FormBase {
           </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section>
-            <q-scroll-area style="height: 300px; max-height: 30vh">
+          <q-item-section :class="{['scroll-parent']: expandedKeys.length > 0}">
+            <q-scroll-area>
               <q-tree
                 ref="tree"
                 :nodes="nodes"
@@ -262,49 +261,57 @@ export default class GraphForm extends FormBase {
       </q-expansion-item>
 
       <q-expansion-item group="modal" icon="mdi-tag-multiple" label="Legend">
-        <q-item dark>
-          <q-item-section>Metric</q-item-section>
-          <q-item-section>Display as</q-item-section>
-        </q-item>
-        <q-separator dark inset/>
-        <q-item v-for="field in selected" :key="field" dark>
-          <q-item-section>{{ field }}</q-item-section>
-          <q-item-section>
-            <InputPopupEdit
-              :field="renames[field]"
-              :change="callAndSaveConfig(v => config.renames[field] = v)"
-              label="Legend"
-              clearable
-              tag="span"
-            />
-          </q-item-section>
-        </q-item>
-        <q-item v-if="!selected || selected.length === 0" dark>
-          <q-item-section side>No metrics selected</q-item-section>
-        </q-item>
+        <div class="scroll-parent">
+          <q-scroll-area>
+            <q-item dark>
+              <q-item-section>Metric</q-item-section>
+              <q-item-section>Display as</q-item-section>
+            </q-item>
+            <q-separator dark inset/>
+            <q-item v-for="field in selected" :key="field" dark>
+              <q-item-section>{{ field }}</q-item-section>
+              <q-item-section>
+                <InputPopupEdit
+                  :field="renames[field]"
+                  :change="callAndSaveConfig(v => config.renames[field] = v)"
+                  label="Legend"
+                  clearable
+                  tag="span"
+                />
+              </q-item-section>
+            </q-item>
+            <q-item v-if="!selected || selected.length === 0" dark>
+              <q-item-section side>No metrics selected</q-item-section>
+            </q-item>
+          </q-scroll-area>
+        </div>
       </q-expansion-item>
 
       <q-expansion-item group="modal" icon="mdi-chart-line" label="Axes">
-        <q-item dark>
-          <q-item-section>Metric</q-item-section>
-          <q-item-section side>Left or right axis</q-item-section>
-        </q-item>
-        <q-separator dark inset/>
-        <q-item
-          v-for="field in selected"
-          :key="field"
-          dark
-          clickable
-          @click="updateAxisSide(field, !isRightAxis(field))"
-        >
-          <q-item-section>{{ field }}</q-item-section>
-          <q-item-section side>
-            <q-icon :class="{mirrored: isRightAxis(field)}" name="mdi-chart-line" size="30px"/>
-          </q-item-section>
-        </q-item>
-        <q-item v-if="!selected || selected.length === 0" dark>
-          <q-item-section side>No metrics selected</q-item-section>
-        </q-item>
+        <div class="scroll-parent">
+          <q-scroll-area>
+            <q-item dark>
+              <q-item-section>Metric</q-item-section>
+              <q-item-section side>Left or right axis</q-item-section>
+            </q-item>
+            <q-separator dark inset/>
+            <q-item
+              v-for="field in selected"
+              :key="field"
+              dark
+              clickable
+              @click="updateAxisSide(field, !isRightAxis(field))"
+            >
+              <q-item-section>{{ field }}</q-item-section>
+              <q-item-section side>
+                <q-icon :class="{mirrored: isRightAxis(field)}" name="mdi-chart-line" size="30px"/>
+              </q-item-section>
+            </q-item>
+            <q-item v-if="!selected || selected.length === 0" dark>
+              <q-item-section side>No metrics selected</q-item-section>
+            </q-item>
+          </q-scroll-area>
+        </div>
       </q-expansion-item>
     </q-card-section>
   </q-card>
@@ -314,5 +321,9 @@ export default class GraphForm extends FormBase {
 .mirrored {
   -webkit-transform: scaleX(-1);
   transform: scaleX(-1);
+}
+.scroll-parent {
+  height: 300px;
+  max-height: 30vh;
 }
 </style>

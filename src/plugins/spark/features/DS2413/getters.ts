@@ -1,9 +1,8 @@
-import { blockById } from '@/plugins/spark/store/getters';
-import { RootStore } from '@/store/state';
-import { DS2413Block } from './state';
+import sparkStore from '@/plugins/spark/store';
+import { DS2413Block } from './types';
 
 export const typeName = 'DS2413';
 
 export const getById =
-  (store: RootStore, serviceId: string, id: string): DS2413Block =>
-    blockById<DS2413Block>(store, serviceId, id, typeName);
+  (serviceId: string, id: string): DS2413Block =>
+    sparkStore.blockById(serviceId, id, typeName);

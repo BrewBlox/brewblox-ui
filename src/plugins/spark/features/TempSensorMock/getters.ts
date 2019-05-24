@@ -1,9 +1,8 @@
-import { blockById } from '@/plugins/spark/store/getters';
-import { RootStore } from '@/store/state';
-import { TempSensorMockBlock } from './state';
+import sparkStore from '@/plugins/spark/store';
+import { TempSensorMockBlock } from './types';
 
 export const typeName = 'TempSensorMock';
 
 export const getById =
-  (store: RootStore, serviceId: string, id: string): TempSensorMockBlock =>
-    blockById<TempSensorMockBlock>(store, serviceId, id, typeName);
+  (serviceId: string, id: string): TempSensorMockBlock =>
+    sparkStore.blockById(serviceId, id, typeName);

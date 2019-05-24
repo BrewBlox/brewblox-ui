@@ -1,13 +1,13 @@
-import { blockValues, blockById } from '@/plugins/spark/store/getters';
-import { RootStore } from '@/store/state';
-import { MutexBlock } from './state';
+import sparkStore from '@/plugins/spark/store';
+import { MutexBlock } from './types';
+import { Block } from '@/plugins/spark/types';
 import get from 'lodash/get';
 
 export const typeName = 'Mutex';
 
 export const getById =
-  (store: RootStore, serviceId: string, id: string): MutexBlock =>
-    blockById<MutexBlock>(store, serviceId, id, typeName);
+  (serviceId: string, id: string): MutexBlock =>
+    sparkStore.blockById(serviceId, id, typeName);
 
 export interface MutexBlocks {
   active: string;
@@ -15,10 +15,10 @@ export interface MutexBlocks {
   idle: string[];
 }
 
-export const getMutexClients = (store: RootStore, serviceId: string, mutexId: string): MutexBlocks =>
-  blockValues(store, serviceId)
+export const getMutexClients = (serviceId: string, mutexId: string): MutexBlocks =>
+  sparkStore.blockValues(serviceId)
     .reduce(
-      (mutexed: MutexBlocks, block: any) => {
+      (mutexed: MutexBlocks, block: Block) => {
         const constraint = get(block, 'data.constrainedBy.constraints', [])
           .find(constraint => get(constraint, 'mutex.id') === mutexId);
         if (!constraint) {
@@ -33,6 +33,7 @@ export const getMutexClients = (store: RootStore, serviceId: string, mutexId: st
         if (!constraint.limiting && constraint.mutex && block.data.state !== 1) {
           return { ...mutexed, idle: [...mutexed.idle, block.id] };
         }
+        return mutexed;
       },
       {
         active: 'None',

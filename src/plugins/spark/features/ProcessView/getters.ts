@@ -1,4 +1,4 @@
-import { ComponentSettings, PersistentPart } from './state';
+import { ComponentSettings, PersistentPart } from './types';
 import { Coordinates } from '@/helpers/coordinates';
 
 export const SQUARE_SIZE = 50;

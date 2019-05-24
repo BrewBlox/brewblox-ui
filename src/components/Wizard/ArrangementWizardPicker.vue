@@ -1,19 +1,18 @@
 <script lang="ts">
-import { objectStringSorter } from '@/helpers/functional';
-import { arrangementValues } from '@/store/features/getters';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import featureStore from '@/store/features';
+import { objectStringSorter } from '@/helpers/functional';
 
 @Component
 export default class ArrangementWizardPicker extends Vue {
-  $q: any;
   arrangementId: string = '';
   searchModel: string = '';
   wizardModel: any = null;
   wizardActive: boolean = false;
 
   get wizardOptions() {
-    return arrangementValues(this.$store)
+    return featureStore.arrangementValues
       .filter(arr => !!arr.wizard)
       .sort(objectStringSorter('displayName'));
   }

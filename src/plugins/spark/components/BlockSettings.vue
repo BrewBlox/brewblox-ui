@@ -14,7 +14,7 @@ export default class BlockSettings extends BlockForm {
   applyPreset(presetData: any) {
     this.block.data = { ...this.block.data, ...presetData };
     this.$q.notify({
-      type: 'positive',
+      color: 'positive',
       message: 'Applying preset',
     });
   }

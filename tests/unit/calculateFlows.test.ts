@@ -5,7 +5,7 @@ import {
   FlowSegment,
   calculateFlows,
 } from '@/plugins/spark/features/ProcessView/calculateFlows';
-import { StatePart } from '@/plugins/spark/features/ProcessView/state';
+import { StatePart } from '@/plugins/spark/features/ProcessView/types';
 import { IN_OUT, COLD_WATER, HOT_WATER } from '@/plugins/spark/features/ProcessView/getters';
 import get from 'lodash/get';
 import set from 'lodash/set';

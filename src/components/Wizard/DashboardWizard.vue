@@ -1,21 +1,19 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { createDashboard } from '@/store/dashboards/actions';
-import { dashboardIds } from '@/store/dashboards/getters';
+import dashboardStore from '@/store/dashboards';
 import isString from 'lodash/isString';
-import { Dashboard } from '@/store/dashboards/state';
+import { Dashboard } from '@/store/dashboards/types';
 
 @Component
 export default class DashboardWizard extends Vue {
-  $q: any;
   dashboardId: string = '';
   dashboardTitle: string = '';
 
   get dashboardIdRules(): InputRule[] {
     return [
       v => !!v || 'ID is required',
-      v => !dashboardIds(this.$store).includes(v) || 'ID must be unique',
+      v => !dashboardStore.dashboardIds.includes(v) || 'ID must be unique',
     ];
   }
 
@@ -40,10 +38,10 @@ export default class DashboardWizard extends Vue {
     const dashboard: Dashboard = {
       id: this.dashboardId,
       title: this.dashboardTitle || this.dashboardId,
-      order: dashboardIds(this.$store).length + 1,
+      order: dashboardStore.dashboardIds.length + 1,
     };
 
-    await createDashboard(this.$store, dashboard);
+    await dashboardStore.createDashboard(dashboard);
     this.$q.notify({
       icon: 'mdi-check-all',
       color: 'positive',

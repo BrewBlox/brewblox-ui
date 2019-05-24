@@ -1,10 +1,11 @@
 <script lang="ts">
-import { uid } from 'quasar';
+import { uid, Dialog } from 'quasar';
 import Component from 'vue-class-component';
-import { FlowPart, ClickEvent, PersistentPart, Rect, ProcessViewConfig, StatePart, PartUpdater } from './state';
+import { FlowPart, ClickEvent, PersistentPart, Rect, ProcessViewConfig, StatePart, PartUpdater } from './types';
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';
 import { Coordinates } from '@/helpers/coordinates';
+import { deepCopy } from '@/helpers/shadow-copy';
 import { clampRotation, spaceCased } from '@/helpers/functional';
 import FormBase from '@/components/Form/FormBase';
 import ProcessViewCatalog from './ProcessViewCatalog.vue';
@@ -98,9 +99,10 @@ export default class ProcessViewForm extends FormBase {
   }
 
   clearParts() {
-    this.$q.dialog({
+    Dialog.create({
       title: 'Remove all',
       message: 'Are you sure you wish to remove all parts?',
+      dark: true,
       noBackdropDismiss: true,
       cancel: true,
     })
@@ -111,7 +113,6 @@ export default class ProcessViewForm extends FormBase {
     return {
       updatePart: this.updatePart,
       updatePartState: this.updatePartState,
-      store: this.$store,
     };
   }
 
@@ -217,8 +218,10 @@ export default class ProcessViewForm extends FormBase {
   }
 
   findGridSquare(grid: Rect, x: number, y: number) {
-    x -= window.pageXOffset;
-    y -= window.pageYOffset;
+    // The issue that required this correction appears fixed in upstream
+    // Commented in case the problem reappears
+    // x -= window.pageXOffset;
+    // y -= window.pageYOffset;
     if (!this.rectContains(grid, x, y)) {
       return null;
     }
@@ -261,7 +264,7 @@ export default class ProcessViewForm extends FormBase {
       if (gridPos) {
         const from = copy ? null : part;
         const id = copy ? uid() : part.id;
-        this.movePart(from, { ...part, ...gridPos, id })
+        this.movePart(from, { ...deepCopy(part), ...gridPos, id })
           .then(() => this.$nextTick())
           .then(() => this.dragAction = null);
       } else {
@@ -353,6 +356,9 @@ export default class ProcessViewForm extends FormBase {
   }
 
   keyHandler(evt: KeyboardEvent) {
+    if (this.menuModalOpen || this.catalogModalOpen || this.dragAction) {
+      return;
+    }
     const key = evt.key.toLowerCase();
     const tool = this.tools.find(t => t.shortcut === key);
     if (tool) {
@@ -372,7 +378,7 @@ export default class ProcessViewForm extends FormBase {
 </script>
 
 <template>
-  <q-card dark class="maximized bg-dark-bright">
+  <q-card dark class="maximized bg-dark">
     <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
 
     <q-dialog v-model="menuModalOpen" no-backdrop-dismiss>

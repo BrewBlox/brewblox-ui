@@ -3,7 +3,7 @@ import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import { Layout, PlotData } from 'plotly.js';
 import Component from 'vue-class-component';
 import { getById } from './getters';
-import { SetpointProfileBlock } from './state';
+import { SetpointProfileBlock } from './types';
 import { Watch } from 'vue-property-decorator';
 
 @Component
@@ -11,7 +11,7 @@ export default class SetpointProfileWidget extends BlockWidget {
   now: Date = new Date();
 
   get block(): SetpointProfileBlock {
-    return getById(this.$store, this.serviceId, this.blockId);
+    return getById(this.serviceId, this.blockId);
   }
 
   get startTime(): number {
@@ -60,7 +60,19 @@ export default class SetpointProfileWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white column">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss class="row">
+      <ScreenSizeConstrained
+        v-if="modalOpen"
+        :min-width="1500"
+        class="q-mr-md"
+        style="width: 600px"
+      >
+        <q-card dark class="q-pa-xs bg-dark-bright">
+          <div>
+            <GraphDisplay :data="plotlyData" :layout="plotlyLayout"/>
+          </div>
+        </q-card>
+      </ScreenSizeConstrained>
       <SetpointProfileForm v-if="modalOpen" v-bind="formProps"/>
     </q-dialog>
 

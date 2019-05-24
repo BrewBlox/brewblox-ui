@@ -1,7 +1,7 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import PartComponent from '../components/PartComponent';
-import { blocks } from '@/plugins/spark/store/getters';
+import sparkStore from '@/plugins/spark/store';
 import get from 'lodash/get';
 import { Link } from '@/helpers/units';
 
@@ -32,7 +32,7 @@ export default class HeatingElement extends PartComponent {
     }
 
     return get(
-      blocks(this.$store, this.blockServiceId),
+      sparkStore.blocks(this.blockServiceId),
       [this.blockLink.id, 'data', 'value'],
       null
     );

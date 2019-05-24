@@ -1,11 +1,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { serviceById } from '@/store/services/getters';
+import { Dialog } from 'quasar';
+import serviceStore from '@/store/services';
+import sparkStore from '@/plugins/spark/store';
 import FileSaver from 'file-saver';
 import get from 'lodash/get';
 import { serialize, deserialize } from '@/helpers/units/parseObject';
-import { serviceExport, serviceImport } from '@/plugins/spark/store/actions';
 
 
 @Component({
@@ -17,18 +18,17 @@ import { serviceExport, serviceImport } from '@/plugins/spark/store/actions';
   },
 })
 export default class SparkImportMenu extends Vue {
-  $q: any;
   reader: FileReader = new FileReader();
   serializedData: string = '';
   importBusy: boolean = false;
   messages: string[] = [];
 
   get service() {
-    return serviceById(this.$store, this.$props.serviceId);
+    return serviceStore.serviceById(this.$props.serviceId);
   }
 
   async exportBlocks() {
-    const exported = await serviceExport(this.$store, this.service);
+    const exported = await sparkStore.serviceExport(this.service.id);
     const serialized = JSON.stringify(serialize(exported));
     const blob = new Blob([serialized], { type: 'text/plain;charset=utf-8' });
     FileSaver.saveAs(blob, `brewblox-blocks-${this.service.id}.json`);
@@ -44,9 +44,10 @@ export default class SparkImportMenu extends Vue {
   }
 
   startImportBlocks() {
-    this.$q.dialog({
+    Dialog.create({
       title: 'Reset Blocks',
       message: 'This will remove all Blocks, and import new ones from file. Are you sure?',
+      dark: true,
       noBackdropDismiss: true,
       cancel: true,
     })
@@ -58,7 +59,7 @@ export default class SparkImportMenu extends Vue {
       this.importBusy = true;
       this.messages = [];
       const exported = deserialize(JSON.parse(this.serializedData));
-      this.messages = await serviceImport(this.$store, this.service, exported);
+      this.messages = await sparkStore.serviceImport([this.service.id, exported]);
       this.$q.notify(
         this.messages.length > 0
           ? {
