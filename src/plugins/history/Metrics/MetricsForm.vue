@@ -1,13 +1,15 @@
 <script lang="ts">
-import Component from 'vue-class-component';
-import FormBase from '@/components/Form/FormBase';
-import parseDuration from 'parse-duration';
 import get from 'lodash/get';
-import historyStore from '@/store/history';
-import { nodeBuilder, targetSplitter, targetBuilder, QuasarNode, expandedNodes } from '@/components/Graph/functional';
+import parseDuration from 'parse-duration';
+import Component from 'vue-class-component';
+
+import FormBase from '@/components/Form/FormBase';
+import { QuasarNode, expandedNodes,nodeBuilder, targetBuilder, targetSplitter } from '@/components/Graph/functional';
 import { durationString } from '@/helpers/functional';
+import historyStore from '@/store/history';
+
+import { DEFAULT_DECIMALS,DEFAULT_FRESH_DURATION } from './getters';
 import { MetricsConfig } from './types';
-import { DEFAULT_FRESH_DURATION, DEFAULT_DECIMALS } from './getters';
 
 @Component
 export default class MetricsForm extends FormBase {

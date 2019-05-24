@@ -1,4 +1,5 @@
 import Component from 'vue-class-component';
+
 import ItemBase from '../ItemBase';
 
 @Component({

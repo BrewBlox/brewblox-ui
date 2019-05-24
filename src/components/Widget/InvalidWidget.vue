@@ -1,5 +1,6 @@
 <script lang="ts">
 import Component from 'vue-class-component';
+
 import WidgetBase from './WidgetBase';
 
 @Component({

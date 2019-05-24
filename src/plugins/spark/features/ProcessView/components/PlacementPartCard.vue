@@ -1,7 +1,9 @@
 <script lang="ts">
-import PartCard from './PartCard';
 import Component from 'vue-class-component';
+
 import { clampRotation } from '@/helpers/functional';
+
+import PartCard from './PartCard';
 
 @Component
 export default class PlacementPartCard extends PartCard {

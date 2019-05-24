@@ -1,14 +1,16 @@
 <script lang="ts">
-import { postfixedDisplayNames, Link } from '@/helpers/units';
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import get from 'lodash/get';
 import Component from 'vue-class-component';
+
+import { Link,postfixedDisplayNames } from '@/helpers/units';
+import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import sparkStore from '@/plugins/spark/store';
+import { BlockLink } from '@/plugins/spark/types';
 import featureStore from '@/store/features';
+
+import PidDisplay from './PidDisplay.vue';
 import { filters, getById } from './getters';
 import { PidBlock } from './types';
-import PidDisplay from './PidDisplay.vue';
-import { BlockLink } from '@/plugins/spark/types';
-import get from 'lodash/get';
 
 @Component({
   components: {

@@ -1,5 +1,5 @@
-import { ComponentSettings, Transitions } from '../types';
 import { LEFT, RIGHT, defaultSettings } from '../getters';
+import { ComponentSettings, Transitions } from '../types';
 
 const settings: ComponentSettings = {
   ...defaultSettings,

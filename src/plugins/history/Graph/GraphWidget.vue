@@ -1,9 +1,10 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import WidgetBase from '@/components/Widget/WidgetBase';
-import { GraphConfig } from '@/components/Graph/types';
-import { defaultPresets } from '@/components/Graph/getters';
 import { Watch } from 'vue-property-decorator';
+
+import { defaultPresets } from '@/components/Graph/getters';
+import { GraphConfig } from '@/components/Graph/types';
+import WidgetBase from '@/components/Widget/WidgetBase';
 import { QueryParams } from '@/store/history';
 
 @Component

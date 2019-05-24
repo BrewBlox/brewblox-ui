@@ -1,4 +1,4 @@
-import { QueryTarget, DisplayNames, QueryParams } from '@/store/history';
+import { DisplayNames, QueryParams,QueryTarget } from '@/store/history';
 
 export interface MetricsResult {
   field: string;

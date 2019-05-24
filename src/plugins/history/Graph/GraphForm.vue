@@ -1,12 +1,13 @@
 <script lang="ts">
-import Component from 'vue-class-component';
 import parseDuration from 'parse-duration';
+import Component from 'vue-class-component';
+
 import FormBase from '@/components/Form/FormBase';
-import historyStore from '@/store/history';
-import { GraphConfig } from '@/components/Graph/types';
+import { QuasarNode, expandedNodes,nodeBuilder, targetBuilder, targetSplitter } from '@/components/Graph/functional';
 import { defaultPresets } from '@/components/Graph/getters';
-import { nodeBuilder, targetSplitter, targetBuilder, QuasarNode, expandedNodes } from '@/components/Graph/functional';
+import { GraphConfig } from '@/components/Graph/types';
 import { durationString } from '@/helpers/functional';
+import historyStore from '@/store/history';
 import { GraphValueAxes, QueryParams } from '@/store/history';
 
 interface PeriodDisplay {

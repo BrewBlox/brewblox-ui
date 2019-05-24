@@ -1,15 +1,17 @@
 <script lang="ts">
-import WidgetBase from '@/components/Widget/WidgetBase';
-import Component from 'vue-class-component';
-import { Watch } from 'vue-property-decorator';
-import historyStore from '@/store/history';
 import get from 'lodash/get';
 import parseDuration from 'parse-duration';
+import Component from 'vue-class-component';
+import { Watch } from 'vue-property-decorator';
+
+import WidgetBase from '@/components/Widget/WidgetBase';
 import { durationString } from '@/helpers/functional';
-import { QueryTarget, Listener, DisplayNames, QueryParams } from '@/store/history';
-import { MetricsResult, MetricsConfig } from './types';
-import { DEFAULT_FRESH_DURATION, DEFAULT_DECIMALS } from './getters';
+import historyStore from '@/store/history';
+import { DisplayNames, Listener, QueryParams,QueryTarget } from '@/store/history';
+
 import { addListener } from './actions';
+import { DEFAULT_DECIMALS,DEFAULT_FRESH_DURATION } from './getters';
+import { MetricsConfig,MetricsResult } from './types';
 
 interface CurrentValue extends MetricsResult {
   name: string;

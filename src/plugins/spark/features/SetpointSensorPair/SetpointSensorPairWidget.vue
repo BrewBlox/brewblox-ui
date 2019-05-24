@@ -1,7 +1,9 @@
 <script lang="ts">
+import Component from 'vue-class-component';
+
 import { postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import Component from 'vue-class-component';
+
 import { getById } from './getters';
 import { SetpointSensorPairBlock } from './types';
 

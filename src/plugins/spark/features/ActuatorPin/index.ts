@@ -1,6 +1,7 @@
 import { ref } from '@/helpers/component-ref';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
+
 import form from './ActuatorPinForm.vue';
 import widget from './ActuatorPinWidget.vue';
 import { typeName } from './getters';

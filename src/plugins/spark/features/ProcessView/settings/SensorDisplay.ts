@@ -1,5 +1,5 @@
-import { ComponentSettings } from '../types';
 import { defaultSettings } from '../getters';
+import { ComponentSettings } from '../types';
 
 const SIZE_X = 1;
 const SIZE_Y = 1;

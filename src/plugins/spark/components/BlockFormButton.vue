@@ -1,10 +1,12 @@
 <script lang="ts">
+import isString from 'lodash/isString';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import featureStore from '@/store/features';
+
 import sparkStore from '@/plugins/spark/store';
+import featureStore from '@/store/features';
+
 import { Block } from '../types';
-import isString from 'lodash/isString';
 
 @Component({
   props: {

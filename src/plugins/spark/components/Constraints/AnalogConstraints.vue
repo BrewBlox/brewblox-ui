@@ -1,6 +1,8 @@
 <script lang="ts">
-import { BalancerLink } from '@/helpers/units/KnownLinks';
 import Component from 'vue-class-component';
+
+import { BalancerLink } from '@/helpers/units/KnownLinks';
+
 import Constraints, { ConstraintInfo } from './Constraints';
 
 @Component

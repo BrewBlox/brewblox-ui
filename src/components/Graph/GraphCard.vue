@@ -1,16 +1,18 @@
 <script lang="ts">
+import mapValues from 'lodash/mapValues';
+import { Layout, PlotData } from 'plotly.js';
+import { setTimeout } from 'timers';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
-import historyStore from '@/store/history';
+
 import { defaultPresets } from '@/components/Graph/getters';
-import { DisplayNames, QueryParams, QueryTarget, GraphValueAxes, GraphValuesListener } from '@/store/history';
-import { Layout, PlotData } from 'plotly.js';
-import { addPlotlyListener } from './actions';
+import historyStore from '@/store/history';
+import { DisplayNames, GraphValueAxes, GraphValuesListener,QueryParams, QueryTarget } from '@/store/history';
+
 import GraphDisplay from './GraphDisplay.vue';
+import { addPlotlyListener } from './actions';
 import { GraphConfig } from './types';
-import { setTimeout } from 'timers';
-import mapValues from 'lodash/mapValues';
 
 interface Policies { [measurement: string]: string }
 

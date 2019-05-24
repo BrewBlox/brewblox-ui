@@ -1,7 +1,8 @@
 import { ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features';
-import widget from './SessionViewWidget.vue';
+
 import form from './SessionViewForm.vue';
+import widget from './SessionViewWidget.vue';
 import wizard from './SessionViewWizard.vue';
 import { SessionViewConfig } from './types';
 

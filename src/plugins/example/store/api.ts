@@ -1,4 +1,4 @@
-import { get, fetchJson } from '@/helpers/fetch';
+import { fetchJson,get } from '@/helpers/fetch';
 
 export const getBackend =
   async (url: string): Promise<any> => get(url);

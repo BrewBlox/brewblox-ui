@@ -11,9 +11,13 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     '@vue/typescript'
   ],
+  'plugins': ['simple-import-sort'],
   'rules': {
     'quotes': ['error', 'single', { 'avoidEscape': true }],
     'class-methods-use-this': 0,
+    'simple-import-sort/sort': 'error',
+    'sort-imports': 'off',
+    'import/order': 'off',
     'import/first': 0,
     'import/extensions': 0,
     'import/no-unresolved': 0,

@@ -1,9 +1,10 @@
 <script lang="ts">
+import parseDuration from 'parse-duration';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { Unit } from '@/helpers/units';
+
 import { unitDurationString } from '@/helpers/functional';
-import parseDuration from 'parse-duration';
+import { Unit } from '@/helpers/units';
 
 @Component({
   props: {

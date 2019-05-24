@@ -1,6 +1,7 @@
 <script lang="ts">
-import BlockForm from '@/plugins/spark/components/BlockForm';
 import Component from 'vue-class-component';
+
+import BlockForm from '@/plugins/spark/components/BlockForm';
 
 @Component({
   props: {

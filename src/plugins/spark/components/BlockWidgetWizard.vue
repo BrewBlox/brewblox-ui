@@ -1,14 +1,15 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import get from 'lodash/get';
 import isString from 'lodash/isString';
+import Component from 'vue-class-component';
+
+import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
+import { objectStringSorter } from '@/helpers/functional';
+import sparkStore from '@/plugins/spark/store';
+import { Block } from '@/plugins/spark/types';
 import featureStore from '@/store/features';
 import serviceStore from '@/store/services';
-import sparkStore from '@/plugins/spark/store';
-import get from 'lodash/get';
-import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
-import { Block } from '@/plugins/spark/types';
 import { Service } from '@/store/services';
-import { objectStringSorter } from '@/helpers/functional';
 
 @Component
 export default class BlockWidgetWizard extends WidgetWizardBase {

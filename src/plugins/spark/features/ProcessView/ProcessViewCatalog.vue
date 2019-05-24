@@ -1,12 +1,14 @@
 <script lang="ts">
+import { uid } from 'quasar';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { uid } from 'quasar';
+
+import { spaceCased } from '@/helpers/functional';
+
 import { SQUARE_SIZE } from './getters';
 import { parts } from './register';
 import settings from './settings';
 import { PersistentPart, StatePart } from './types';
-import { spaceCased } from '@/helpers/functional';
 
 
 @Component({

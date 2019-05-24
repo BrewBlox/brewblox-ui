@@ -1,18 +1,20 @@
 <script lang="ts">
+import { Dialog,uid } from 'quasar';
+import { clearTimeout,setInterval } from 'timers';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { uid, Dialog } from 'quasar';
+import { Watch } from 'vue-property-decorator';
+
+import { capitalized,objectStringSorter } from '@/helpers/functional';
+import { deepCopy } from '@/helpers/shadow-copy';
+import sparkStore from '@/plugins/spark/store';
+import { Block, Spark,SystemStatus } from '@/plugins/spark/types';
 import dashboardStore from '@/store/dashboards';
+import { Dashboard, DashboardItem } from '@/store/dashboards';
 import featureStore, { FeatureRole } from '@/store/features';
 import serviceStore from '@/store/services';
-import sparkStore from '@/plugins/spark/store';
-import { Block, SystemStatus, Spark } from '@/plugins/spark/types';
-import { Dashboard, DashboardItem } from '@/store/dashboards';
+
 import { isReady, isSystemBlock, widgetSize } from './getters';
-import { Watch } from 'vue-property-decorator';
-import { setInterval, clearTimeout } from 'timers';
-import { objectStringSorter, capitalized } from '@/helpers/functional';
-import { deepCopy } from '@/helpers/shadow-copy';
 
 interface ModalSettings {
   component: string;

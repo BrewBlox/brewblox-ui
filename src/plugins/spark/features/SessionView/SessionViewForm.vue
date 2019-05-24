@@ -1,12 +1,13 @@
 <script lang="ts">
-import Component from 'vue-class-component';
 import shortid from 'shortid';
-import historyStore from '@/store/history';
-import { objectSorter } from '@/helpers/functional';
+import Component from 'vue-class-component';
+
 import FormBase from '@/components/Form/FormBase';
-import { nodeBuilder, targetSplitter, targetBuilder, QuasarNode, expandedNodes } from '@/components/Graph/functional';
-import { SessionViewConfig, Session } from '@/plugins/spark/features/SessionView/types';
+import { QuasarNode, expandedNodes,nodeBuilder, targetBuilder, targetSplitter } from '@/components/Graph/functional';
+import { objectSorter } from '@/helpers/functional';
 import { durationString } from '@/helpers/functional';
+import { Session,SessionViewConfig } from '@/plugins/spark/features/SessionView/types';
+import historyStore from '@/store/history';
 
 @Component({
   props: {

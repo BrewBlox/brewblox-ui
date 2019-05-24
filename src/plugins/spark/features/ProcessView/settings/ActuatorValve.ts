@@ -1,7 +1,8 @@
-import { ComponentSettings, Transitions, StatePart } from '../types';
-import { LEFT, RIGHT, defaultSettings } from '../getters';
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
+
+import { LEFT, RIGHT, defaultSettings } from '../getters';
+import { ComponentSettings, StatePart,Transitions } from '../types';
 
 const settings: ComponentSettings = {
   ...defaultSettings,

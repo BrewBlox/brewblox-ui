@@ -1,8 +1,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import featureStore from '@/store/features';
+
 import { objectStringSorter } from '@/helpers/functional';
+import featureStore from '@/store/features';
 
 @Component
 export default class ArrangementWizardPicker extends Vue {
