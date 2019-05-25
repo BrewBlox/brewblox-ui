@@ -28,7 +28,7 @@ const settings: ComponentSettings = {
       const message = part.settings.valveid + (part.settings.closed ? '1' : '0');
       console.log(message);
       post(
-        'https://localhost:9001/valves/write',
+        'https://valves.local:9001/valves/write',
         {
           message,
         },
