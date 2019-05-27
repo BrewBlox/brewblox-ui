@@ -3,11 +3,11 @@ import shortid from 'shortid';
 import Component from 'vue-class-component';
 
 import FormBase from '@/components/Form/FormBase';
-import { QuasarNode, expandedNodes,nodeBuilder, targetBuilder, targetSplitter } from '@/components/Graph/functional';
+import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
 import { objectSorter } from '@/helpers/functional';
 import { durationString } from '@/helpers/functional';
-import { Session,SessionViewConfig } from '@/plugins/spark/features/SessionView/types';
-import historyStore from '@/store/history';
+import { Session, SessionViewConfig } from '@/plugins/spark/features/SessionView/types';
+import historyStore, { DisplayNames } from '@/store/history';
 
 @Component({
   props: {
@@ -19,8 +19,6 @@ import historyStore from '@/store/history';
 export default class SessionViewForm extends FormBase {
   graphSessionId: string | null = null;
   sessionInput: string = '';
-  selectFilter: string | null = null;
-  expandedKeys: string[] = [];
 
   get widgetConfig(): SessionViewConfig {
     return this.$props.field;
@@ -29,10 +27,6 @@ export default class SessionViewForm extends FormBase {
   get sessions(): Session[] {
     return this.widgetConfig.sessions
       .sort(objectSorter('name'));
-  }
-
-  get nodes() {
-    return nodeBuilder(historyStore.fields);
   }
 
   get graphSession() {
@@ -118,12 +112,12 @@ export default class SessionViewForm extends FormBase {
   }
 
   updateSessionSelected(session: Session, selected: string[]) {
-    session.graphCfg.targets = targetBuilder(selected || []);
+    session.graphCfg.targets = targetBuilder(selected || [], false);
     this.updateSession(session);
   }
 
-  updateSessionRename(session: Session, field: string, val: string) {
-    session.graphCfg.renames[field] = val;
+  updateSessionRenames(session: Session, vals: DisplayNames) {
+    session.graphCfg.renames = vals;
     this.updateSession(session);
   }
 
@@ -132,16 +126,6 @@ export default class SessionViewForm extends FormBase {
       return '---';
     }
     return durationString(session.end - session.start);
-  }
-
-  nodeFilter(node: QuasarNode, filter: string): boolean {
-    return node && node.value.toLowerCase().match(filter.toLowerCase());
-  }
-
-  updateExpanded(filter: string) {
-    if (filter) {
-      this.expandedKeys = expandedNodes(this.nodes, filter);
-    }
   }
 
   created() {
@@ -238,67 +222,10 @@ export default class SessionViewForm extends FormBase {
           <q-expansion-item group="sub-modal" icon="mdi-file-tree" label="Fields">
             <div class="scroll-parent">
               <q-scroll-area>
-                <q-item dark>
-                  <q-item-section>
-                    <q-input
-                      :value="selectFilter"
-                      placeholder="Filter keys"
-                      class="q-ma-none"
-                      dark
-                      clearable
-                      @input="v => { selectFilter = v; updateExpanded(v); }"
-                    >
-                      <template v-slot:append>
-                        <q-btn flat round icon="mdi-close-circle" @click.stop="selectFilter = ''">
-                          <q-tooltip>Clear filter</q-tooltip>
-                        </q-btn>
-                        <q-icon name="search"/>
-                      </template>
-                    </q-input>
-                  </q-item-section>
-                </q-item>
-                <q-item dark>
-                  <q-item-section class="col-auto">
-                    <q-btn
-                      flat
-                      label="Expand"
-                      icon="mdi-expand-all"
-                      @click="$refs.tree[0].expandAll()"
-                    />
-                  </q-item-section>
-                  <q-item-section class="col-auto">
-                    <q-btn
-                      flat
-                      label="Collapse"
-                      icon="mdi-collapse-all"
-                      @click="$refs.tree[0].collapseAll()"
-                    />
-                  </q-item-section>
-                  <q-item-section class="col-auto">
-                    <q-btn
-                      flat
-                      label="clear"
-                      icon="clear"
-                      @click="updateSessionSelected(session, [])"
-                    />
-                  </q-item-section>
-                </q-item>
-                <q-item dark>
-                  <q-item-section>
-                    <q-tree
-                      ref="tree"
-                      :nodes="nodes"
-                      :ticked="sessionSelected(session)"
-                      :filter="selectFilter"
-                      :expanded.sync="expandedKeys"
-                      :filter-method="nodeFilter"
-                      tick-strategy="leaf-filtered"
-                      dark
-                      node-key="value"
-                      @update:ticked="v => updateSessionSelected(session, v)"
-                    />
-                  </q-item-section>
-                </q-item>
+                <MetricSelector
+                  :selected="sessionSelected(session)"
+                  @update:selected="v => updateSessionSelected(session, v)"
+                />
               </q-scroll-area>
             </div>
           </q-expansion-item>
@@ -306,28 +233,11 @@ export default class SessionViewForm extends FormBase {
           <q-expansion-item group="sub-modal" icon="mdi-tag-multiple" label="Legend">
             <div class="scroll-parent">
               <q-scroll-area>
-                <q-list dark>
-                  <q-item dark>
-                    <q-item-section>Metric</q-item-section>
-                    <q-item-section>Display as</q-item-section>
-                  </q-item>
-                  <q-separator dark inset/>
-                  <q-item v-for="field in sessionSelected(session)" :key="field" dark>
-                    <q-item-section>{{ field }}</q-item-section>
-                    <q-item-section>
-                      <InputPopupEdit
-                        :field="session.graphCfg.renames[field]"
-                        :change="v => updateSessionRename(session, field, v)"
-                        label="Legend"
-                        clearable
-                        tag="span"
-                      />
-                    </q-item-section>
-                  </q-item>
-                  <q-item v-if="sessionSelected(session).length === 0" dark>
-                    <q-item-section>No metrics selected</q-item-section>
-                  </q-item>
-                </q-list>
+                <LabelSelector
+                  :selected="sessionSelected(session)"
+                  :renames="session.graphCfg.renames"
+                  @update:renames="v => updateSessionRenames(session, v)"
+                />
               </q-scroll-area>
             </div>
           </q-expansion-item>
