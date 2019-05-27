@@ -16,12 +16,11 @@ import Component from 'vue-class-component';
   },
 })
 export default class LabelSelector extends Vue {
-
   get labels() {
     return { ...this.$props.renames };
   }
 
-  callAndSaveRenames(func: (v: any) => void) {
+  callAndSaveLabels(func: (v: any) => void) {
     return v => { func(v); this.$emit('update:renames', this.labels); };
   }
 }
@@ -39,7 +38,7 @@ export default class LabelSelector extends Vue {
       <q-item-section>
         <InputPopupEdit
           :field="labels[field]"
-          :change="callAndSaveRenames(v => labels[field] = v)"
+          :change="callAndSaveLabels(v => labels[field] = v)"
           label="Legend"
           clearable
           tag="span"

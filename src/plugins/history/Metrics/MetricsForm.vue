@@ -26,14 +26,7 @@ export default class MetricsForm extends FormBase {
   }
 
   set selected(vals: string[] | null) {
-    const targets = targetBuilder(vals || [])
-      .map(target => {
-        const known = historyStore.fieldsByMeasurement(target.measurement);
-        return {
-          ...target,
-          fields: target.fields.filter(f => known.includes(f)),
-        };
-      });
+    const targets = targetBuilder(vals || []);
     this.saveConfig({ ...this.config, targets });
   }
 

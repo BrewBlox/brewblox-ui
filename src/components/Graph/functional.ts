@@ -1,6 +1,7 @@
+import get from 'lodash/get';
 import set from 'lodash/set';
 
-import { QueryTarget } from '@/store/history';
+import historyStore, { QueryTarget } from '@/store/history';
 
 export interface QuasarNode {
   label: string;
@@ -77,13 +78,18 @@ export const targetSplitter =
       );
 
 export const targetBuilder =
-  (vals: string[]): QueryTarget[] =>
-    vals
+  (vals: string[], filterUnknown: boolean = true): QueryTarget[] => {
+    const knownFields = historyStore.fields;
+    return vals
       .reduce(
         (acc: QueryTarget[], v: string) => {
           const [measurement, ...keys] = v.split('/');
           const field = keys.join('/');
-          const existing = acc.find(t => t.measurement == measurement);
+          const existing = acc.find(t => t.measurement === measurement);
+          if (filterUnknown
+            && !get(knownFields, measurement, [] as string[]).includes(field)) {
+            return acc;
+          }
           if (existing) {
             existing.fields.push(field);
             return acc;
@@ -92,3 +98,4 @@ export const targetBuilder =
         },
         [],
       );
+  };

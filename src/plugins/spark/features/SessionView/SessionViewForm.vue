@@ -112,7 +112,7 @@ export default class SessionViewForm extends FormBase {
   }
 
   updateSessionSelected(session: Session, selected: string[]) {
-    session.graphCfg.targets = targetBuilder(selected || []);
+    session.graphCfg.targets = targetBuilder(selected || [], false);
     this.updateSession(session);
   }
 
@@ -226,60 +226,6 @@ export default class SessionViewForm extends FormBase {
                   :selected="sessionSelected(session)"
                   @update:selected="v => updateSessionSelected(session, v)"
                 />
-                <!-- <q-item dark>
-                  <q-item-section>
-                    <q-input
-                      v-model="selectFilter"
-                      placeholder="Filter keys"
-                      class="q-ma-none"
-                      dark
-                      clearable
-                    >
-                      <template v-slot:append>
-                        <q-btn flat round icon="mdi-close-circle" @click.stop="selectFilter = ''">
-                          <q-tooltip>Clear filter</q-tooltip>
-                        </q-btn>
-                        <q-icon name="search"/>
-                      </template>
-                    </q-input>
-                  </q-item-section>
-                </q-item>
-                <q-item dark>
-                  <q-item-section class="col-auto">
-                    <q-btn
-                      flat
-                      label="Expand"
-                      icon="mdi-expand-all"
-                      @click="$refs.tree[0].expandAll()"
-                    />
-                  </q-item-section>
-                  <q-item-section class="col-auto">
-                    <q-btn
-                      flat
-                      label="Collapse"
-                      icon="mdi-collapse-all"
-                      @click="$refs.tree[0].collapseAll()"
-                    />
-                  </q-item-section>
-                  <q-item-section class="col-auto">
-                    <q-btn
-                      flat
-                      label="clear"
-                      icon="clear"
-                      @click="updateSessionSelected(session, [])"
-                    />
-                  </q-item-section>
-                </q-item>
-                <q-item dark>
-                  <q-item-section>
-                    <MetricSelector
-                      ref="tree"
-                      :selected="sessionSelected(session)"
-                      :filter="selectFilter"
-                      @update:selected="v => updateSessionSelected(session, v)"
-                    />
-                  </q-item-section>
-                </q-item>-->
               </q-scroll-area>
             </div>
           </q-expansion-item>

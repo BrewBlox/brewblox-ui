@@ -35,7 +35,7 @@ export default class MetricSelector extends Vue {
     this.$emit('update:selected', vals);
   }
 
-  @Watch('selectFilter', { immediate: true })
+  @Watch('selectFilter')
   updateExpanded(filter: string) {
     if (filter) {
       this.expandedKeys = expandedNodes(this.nodes, filter);
