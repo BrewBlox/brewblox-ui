@@ -1,6 +1,7 @@
 <script lang="ts">
-import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
+
+import WidgetBase from '@/components/Widget/WidgetBase';
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 

@@ -1,5 +1,6 @@
-import ExampleFeature from './ExampleFeature';
 import featureStore from '@/store/features';
+
+import ExampleFeature from './ExampleFeature';
 
 // This function is how our plugin can be added to the application
 // To activate it, import this file in src/main.ts, and add it to the list of plugins

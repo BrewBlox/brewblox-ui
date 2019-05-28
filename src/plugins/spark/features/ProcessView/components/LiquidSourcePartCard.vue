@@ -1,8 +1,9 @@
 <script lang="ts">
-import PartCard from './PartCard';
-import Component from 'vue-class-component';
-import { COLD_WATER, HOT_WATER, BEER, WORT } from '../getters';
 import get from 'lodash/get';
+import Component from 'vue-class-component';
+
+import { BEER, COLD_WATER, HOT_WATER, WORT } from '../getters';
+import PartCard from './PartCard';
 
 @Component
 export default class LiquidSourcePartCard extends PartCard {

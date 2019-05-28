@@ -1,9 +1,10 @@
 <script lang="ts">
-import Component from 'vue-class-component';
-import Vue from 'vue';
-import dashboardStore from '@/store/dashboards';
-import { serialize } from '@/helpers/units/parseObject';
 import FileSaver from 'file-saver';
+import Vue from 'vue';
+import Component from 'vue-class-component';
+
+import { serialize } from '@/helpers/units/parseObject';
+import dashboardStore from '@/store/dashboards';
 
 @Component({
   props: {

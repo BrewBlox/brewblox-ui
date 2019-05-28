@@ -1,6 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+
 import { objectStringSorter } from '@/helpers/functional';
 import dashboardStore from '@/store/dashboards';
 import featureStore from '@/store/features';

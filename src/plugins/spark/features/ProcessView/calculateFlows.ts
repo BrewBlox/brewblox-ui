@@ -1,22 +1,24 @@
+import get from 'lodash/get';
+import has from 'lodash/has';
+import mapKeys from 'lodash/mapKeys';
+import mapValues from 'lodash/mapValues';
+import omit from 'lodash/omit';
+import pickBy from 'lodash/pickBy';
+import set from 'lodash/set';
+
+import { Coordinates } from '@/helpers/coordinates';
+
+import { ACCELERATE_OTHERS,DEFAULT_FRICTION } from './getters';
+import settings from './settings';
 import {
+  CalculatedFlows,
+  ComponentSettings,
+  FlowPart,
+  FlowRoute,
+  LiquidFlow,
   StatePart,
   Transitions,
-  FlowPart,
-  CalculatedFlows,
-  LiquidFlow,
-  FlowRoute,
-  ComponentSettings,
 } from './types';
-import { DEFAULT_FRICTION, ACCELERATE_OTHERS } from './getters';
-import { Coordinates } from '@/helpers/coordinates';
-import settings from './settings';
-import has from 'lodash/has';
-import get from 'lodash/get';
-import set from 'lodash/set';
-import mapValues from 'lodash/mapValues';
-import mapKeys from 'lodash/mapKeys';
-import pickBy from 'lodash/pickBy';
-import omit from 'lodash/omit';
 
 export const removeTransitions =
   (parts: FlowPart[], inCoord: string): FlowPart[] => parts.map(

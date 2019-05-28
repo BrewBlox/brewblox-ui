@@ -1,6 +1,7 @@
 import { ref } from '@/helpers/component-ref';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
-import { Feature } from '@/store/features/types';
+import { Feature } from '@/store/features';
+
 import form from './ActuatorPinForm.vue';
 import widget from './ActuatorPinWidget.vue';
 import { typeName } from './getters';
@@ -9,6 +10,7 @@ const feature: Feature = {
   ...GenericBlock,
   id: typeName,
   displayName: 'Pin Actuator',
+  role: 'Output',
   widget: ref(widget),
   form: ref(form),
   widgetSize: {

@@ -1,12 +1,13 @@
+import { nanoToMilli } from '@/helpers/functional';
 import historyStore from '@/store/history';
 import {
   DisplayNames,
   Listener,
   QueryParams,
   QueryTarget,
-} from '@/store/history/types';
+} from '@/store/history';
+
 import { MetricsResult } from './types';
-import { nanoToMilli } from '@/helpers/functional';
 
 const metricsTransformer =
   (listener: Listener, result: MetricsResult[]): Listener => ({

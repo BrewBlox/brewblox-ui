@@ -1,7 +1,8 @@
 <script lang="ts">
 import Component from 'vue-class-component';
+
 import PartComponent from '../components/PartComponent';
-import { UP, LEFT, RIGHT } from '../getters';
+import { LEFT, RIGHT,UP } from '../getters';
 
 @Component
 export default class TeeTube extends PartComponent {

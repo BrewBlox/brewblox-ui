@@ -1,6 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+
 import { round, truncate } from '@/helpers/functional';
 
 @Component({

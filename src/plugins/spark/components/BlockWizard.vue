@@ -1,12 +1,13 @@
 <script lang="ts">
+import isString from 'lodash/isString';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import isString from 'lodash/isString';
+
+import { objectStringSorter } from '@/helpers/functional';
+import sparkStore from '@/plugins/spark/store';
+import { Block } from '@/plugins/spark/types';
 import featureStore from '@/store/features';
 import providerStore from '@/store/providers';
-import sparkStore from '@/plugins/spark/store';
-import { objectStringSorter } from '@/helpers/functional';
-import { Block } from '@/plugins/spark/types';
 
 @Component({
   props: {
@@ -29,7 +30,7 @@ export default class BlockWizard extends Vue {
       v => !!v || 'Name must not be empty',
       v => !sparkStore.blockIds(this.$props.serviceId).includes(v) || 'Name must be unique',
       v => v.match(/^[a-zA-Z]/) || 'Name must start with a letter',
-      v => v.match(/^[a-zA-Z0-9 \(\)_-\|]*$/) || 'Name may only contain letters, numbers, spaces, and ()-_|',
+      v => v.match(/^[a-zA-Z0-9 \(\)_\-\|]*$/) || 'Name may only contain letters, numbers, spaces, and ()-_|',
       v => v.length < 200 || 'Name must be less than 200 characters',
     ];
   }

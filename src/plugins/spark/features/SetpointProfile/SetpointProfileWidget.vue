@@ -1,10 +1,12 @@
 <script lang="ts">
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import { Layout, PlotData } from 'plotly.js';
 import Component from 'vue-class-component';
+import { Watch } from 'vue-property-decorator';
+
+import BlockWidget from '@/plugins/spark/components/BlockWidget';
+
 import { getById } from './getters';
 import { SetpointProfileBlock } from './types';
-import { Watch } from 'vue-property-decorator';
 
 @Component
 export default class SetpointProfileWidget extends BlockWidget {

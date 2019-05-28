@@ -1,7 +1,9 @@
-import sparkStore from '@/plugins/spark/store';
-import { MutexBlock } from './types';
-import { Block } from '@/plugins/spark/types';
 import get from 'lodash/get';
+
+import sparkStore from '@/plugins/spark/store';
+import { Block } from '@/plugins/spark/types';
+
+import { MutexBlock } from './types';
 
 export const typeName = 'Mutex';
 

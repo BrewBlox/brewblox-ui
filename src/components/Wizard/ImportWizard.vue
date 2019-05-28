@@ -1,11 +1,12 @@
 <script lang="ts">
+import get from 'lodash/get';
+import { uid } from 'quasar';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import featureStore from '@/store/features';
-import { uid } from 'quasar';
-import get from 'lodash/get';
-import dashboardStore from '@/store/dashboards';
+
 import { deserialize } from '@/helpers/units/parseObject';
+import dashboardStore from '@/store/dashboards';
+import featureStore from '@/store/features';
 
 @Component({
   props: {

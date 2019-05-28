@@ -1,10 +1,11 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import serviceStore from '@/store/services';
+
+import { spaceCased } from '@/helpers/functional';
 import sparkStore from '@/plugins/spark/store';
 import { UserUnits } from '@/plugins/spark/types';
-import { spaceCased } from '@/helpers/functional';
+import serviceStore from '@/store/services';
 
 
 @Component({

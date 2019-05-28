@@ -1,7 +1,8 @@
 <script lang="ts">
+import Component from 'vue-class-component';
+
 import { Unit } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import Component from 'vue-class-component';
 
 @Component
 export default class TempSensorMockForm extends BlockForm {

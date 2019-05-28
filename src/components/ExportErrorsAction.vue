@@ -1,9 +1,10 @@
 <script lang="ts">
-import Component from 'vue-class-component';
-import Vue from 'vue';
 import FileSaver from 'file-saver';
-import { getErrors as getFetchErrors } from '@/helpers/fetch';
+import Vue from 'vue';
+import Component from 'vue-class-component';
+
 import { getErrors as getDbErrors } from '@/helpers/database';
+import { getErrors as getFetchErrors } from '@/helpers/fetch';
 
 @Component({
   props: {

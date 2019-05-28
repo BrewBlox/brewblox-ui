@@ -1,10 +1,12 @@
 <script lang="ts">
-import WidgetBase from '@/components/Widget/WidgetBase';
-import Component from 'vue-class-component';
 import { Dialog } from 'quasar';
 import shortid from 'shortid';
-import { SessionViewConfig, Session } from './types';
+import Component from 'vue-class-component';
+
+import WidgetBase from '@/components/Widget/WidgetBase';
 import { shortDateString } from '@/helpers/functional';
+
+import { Session,SessionViewConfig } from './types';
 
 
 @Component

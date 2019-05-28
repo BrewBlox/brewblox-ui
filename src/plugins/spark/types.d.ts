@@ -1,9 +1,10 @@
-import { DashboardItem } from '@/store/dashboards/types';
-import { Service } from '@/store/services/types';
+import { DashboardItem } from '@/store/dashboards';
+import { Service } from '@/store/services';
 
 export interface SparkConfig {
   groupNames: string[];
   expandedBlocks: { [id: string]: boolean };
+  sorting: string;
 }
 
 export interface Spark extends Service {

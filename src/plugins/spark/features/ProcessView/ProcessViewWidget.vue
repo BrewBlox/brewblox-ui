@@ -1,13 +1,15 @@
 <script lang="ts">
-import WidgetBase from '@/components/Widget/WidgetBase';
+import { debounce,uid } from 'quasar';
 import Component from 'vue-class-component';
-import { uid, debounce } from 'quasar';
+
+import WidgetBase from '@/components/Widget/WidgetBase';
+import { spaceCased } from '@/helpers/functional';
+
+import ProcessViewCatalog from './ProcessViewCatalog.vue';
 import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';
-import { PersistentPart, StatePart, ProcessViewConfig, FlowPart, Rect, ClickEvent, PartUpdater } from './types';
-import { spaceCased } from '@/helpers/functional';
-import ProcessViewCatalog from './ProcessViewCatalog.vue';
+import { ClickEvent, FlowPart, PartUpdater,PersistentPart, ProcessViewConfig, Rect, StatePart } from './types';
 
 interface DragAction {
   hide: boolean;

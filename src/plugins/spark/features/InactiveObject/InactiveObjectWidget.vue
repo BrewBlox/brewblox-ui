@@ -1,6 +1,7 @@
 <script lang="ts">
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
+
+import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import featureStore from '@/store/features';
 
 @Component

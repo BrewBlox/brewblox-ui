@@ -1,11 +1,13 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+
+import { clampRotation } from '@/helpers/functional';
 import { partSettings } from '@/plugins/spark/features/ProcessView/calculateFlows';
 import { FlowPart } from '@/plugins/spark/features/ProcessView/types';
+
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';
-import { clampRotation } from '@/helpers/functional';
 
 @Component({
   props: {

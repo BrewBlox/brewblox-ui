@@ -1,10 +1,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import serviceStore from '@/store/services';
+
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
-import { sysInfoType, ticksType, wifiType, isReady } from './getters';
+import serviceStore from '@/store/services';
+
+import { isReady,sysInfoType, ticksType, wifiType } from './getters';
 import { SysInfoBlock, TicksBlock, WiFiSettingsBlock } from './types';
 
 @Component({

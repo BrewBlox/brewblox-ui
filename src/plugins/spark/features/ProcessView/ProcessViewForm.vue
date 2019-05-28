@@ -1,15 +1,17 @@
 <script lang="ts">
-import { uid, Dialog } from 'quasar';
+import { Dialog,uid } from 'quasar';
 import Component from 'vue-class-component';
-import { FlowPart, ClickEvent, PersistentPart, Rect, ProcessViewConfig, StatePart, PartUpdater } from './types';
-import { SQUARE_SIZE } from './getters';
-import settings from './settings';
-import { Coordinates } from '@/helpers/coordinates';
-import { deepCopy } from '@/helpers/shadow-copy';
-import { clampRotation, spaceCased } from '@/helpers/functional';
+
 import FormBase from '@/components/Form/FormBase';
+import { Coordinates } from '@/helpers/coordinates';
+import { clampRotation, spaceCased } from '@/helpers/functional';
+import { deepCopy } from '@/helpers/shadow-copy';
+
 import ProcessViewCatalog from './ProcessViewCatalog.vue';
 import ProcessViewPartMenu from './ProcessViewPartMenu.vue';
+import { SQUARE_SIZE } from './getters';
+import settings from './settings';
+import { ClickEvent, FlowPart, PartUpdater,PersistentPart, ProcessViewConfig, Rect, StatePart } from './types';
 
 interface DragAction {
   hide: boolean;

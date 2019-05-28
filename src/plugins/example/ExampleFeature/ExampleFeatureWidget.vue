@@ -1,8 +1,9 @@
 <script lang="ts">
-import WidgetBase from '@/components/Widget/WidgetBase';
 import Component from 'vue-class-component';
-import exampleStore from '@/plugins/example/store';
+
+import WidgetBase from '@/components/Widget/WidgetBase';
 import { ExampleWidgetConfig } from '@/plugins/example/ExampleFeature/types';
+import exampleStore from '@/plugins/example/store';
 
 /*
   The WidgetBase class inherits from Vue, we inherit the properties from WidgetBase.

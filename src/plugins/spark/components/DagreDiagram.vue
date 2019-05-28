@@ -1,11 +1,14 @@
 <script lang="ts">
+import { select as d3Select } from 'd3-selection';
+import { graphlib, render as dagreRender } from 'dagre-d3';
+import { saveSvgAsPng } from 'save-svg-as-png';
+import { setTimeout } from 'timers';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { graphlib, render as dagreRender } from 'dagre-d3';
-import { select as d3Select } from 'd3-selection';
 import { Watch } from 'vue-property-decorator';
-import { setTimeout } from 'timers';
-import { saveSvgAsPng } from 'save-svg-as-png';
+
+import sparkStore from '@/plugins/spark/store';
+import featureStore from '@/store/features';
 
 interface Edge {
   source: string;
@@ -18,11 +21,21 @@ interface Node {
   type: string;
 }
 
+interface FormData {
+  open: boolean;
+  component: string;
+  props: any;
+}
+
 const LABEL_HEIGHT = 50;
 const LABEL_WIDTH = 150;
 
 @Component({
   props: {
+    serviceId: {
+      type: String,
+      required: true,
+    },
     nodes: {
       type: Array,
       required: true,
@@ -50,6 +63,11 @@ export default class DagreDiagram extends Vue {
     'reference',
     'sensor',
   ];
+  form: FormData = {
+    open: false,
+    component: '',
+    props: null,
+  }
 
   get edges() {
     return this.$props.relations
@@ -85,7 +103,7 @@ export default class DagreDiagram extends Vue {
 
     const nodeTemplate = (id: string, type: string) => {
       return `
-        <div style="width: ${LABEL_WIDTH}px; height: ${LABEL_HEIGHT}px">
+        <div style="width: ${LABEL_WIDTH}px; height: ${LABEL_HEIGHT}px" ">
           <div class="type">${type}</div>
           <div class="id">${id}</div>
         </div>
@@ -145,6 +163,8 @@ export default class DagreDiagram extends Vue {
       // The hacky, but working solution is to override the SVG properties
       this.$el.querySelectorAll('foreignObject')
         .forEach(el => {
+          const id = el.children[0].children[0].children[1].innerHTML;
+          el.addEventListener('click', () => this.openSettings(id));
           el.setAttribute('width', `${LABEL_WIDTH}`);
           el.setAttribute('height', `${LABEL_HEIGHT}`);
           (el.parentElement as HTMLElement)
@@ -159,11 +179,34 @@ export default class DagreDiagram extends Vue {
     saveSvgAsPng(this.$refs.svg, 'block-relations.png', { backgroundColor: '#282c34' })
       .finally(() => this.exportBusy = false);
   }
+
+  openSettings(id: string) {
+    const block = sparkStore.blocks(this.$props.serviceId)[id];
+    if (!block) {
+      return;
+    }
+
+    this.form = {
+      open: true,
+      component: featureStore.formById(block.type) || '',
+      props: {
+        type: block.type,
+        field: block,
+        onChangeField: v => sparkStore.saveBlock([this.$props.serviceId, v]),
+        id: block.id,
+        title: block.id,
+        onChangeBlockId: () => { },
+      },
+    };
+  }
 }
 </script>
 
 <template>
   <q-card dark class="maximized bg-dark-bright">
+    <q-dialog v-model="form.open" no-backdrop-dismiss>
+      <component v-if="form.open" :is="form.component" v-bind="form.props"/>
+    </q-dialog>
     <FormToolbar ref="toolbar">
       Block Relations
       <template v-slot:buttons>
@@ -188,6 +231,7 @@ export default class DagreDiagram extends Vue {
   padding: 10px;
   width: 100%;
   text-align: center;
+  cursor: pointer;
 }
 
 /deep/ .node .type {
@@ -197,9 +241,11 @@ export default class DagreDiagram extends Vue {
   color: green;
   width: 100%;
   text-align: center;
+  cursor: pointer;
 }
 
 /deep/ .node rect {
   fill: #fff;
+  cursor: pointer;
 }
 </style>

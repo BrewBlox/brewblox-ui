@@ -1,22 +1,24 @@
 import Vue from 'vue';
-import providerStore from '@/store/providers';
+
 import { autoRegister } from '@/helpers/component-ref';
-import featureStore from '@/store/features';
-import sparkStore from '@/plugins/spark/store';
 import {
   base64ToHex,
+  dateString,
   durationString,
   hexToBase64,
-  unitDurationString,
-  shortDateString,
-  dateString,
   round,
+  shortDateString,
   truncate,
+  unitDurationString,
 } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
-import { Service } from '@/store/services/types';
-import features from './features';
+import sparkStore from '@/plugins/spark/store';
+import featureStore from '@/store/features';
+import providerStore from '@/store/providers';
+import { Service } from '@/store/services';
+
 import arrangements from './arrangements';
+import features from './features';
 
 
 const onAdd = async (service: Service): Promise<void> => {
