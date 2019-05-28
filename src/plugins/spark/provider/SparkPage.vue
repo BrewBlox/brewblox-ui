@@ -1,14 +1,14 @@
 <script lang="ts">
-import { Dialog,uid } from 'quasar';
-import { clearTimeout,setInterval } from 'timers';
+import { Dialog, uid } from 'quasar';
+import { clearTimeout, setInterval } from 'timers';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Watch } from 'vue-property-decorator';
 
-import { capitalized,objectStringSorter } from '@/helpers/functional';
+import { capitalized, objectStringSorter } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/shadow-copy';
 import sparkStore from '@/plugins/spark/store';
-import { Block, Spark,SystemStatus } from '@/plugins/spark/types';
+import { Block, Spark, SystemStatus } from '@/plugins/spark/types';
 import dashboardStore from '@/store/dashboards';
 import { Dashboard, DashboardItem } from '@/store/dashboards';
 import featureStore, { FeatureRole } from '@/store/features';
@@ -107,9 +107,9 @@ export default class SparkPage extends Vue {
   get roleIcons(): Record<FeatureRole, string> {
     return {
       Display: 'mdi-monitor-dashboard',
-      Process: 'mdi-gauge',
+      Process: 'mdi-thermometer',
       Control: 'mdi-calculator-variant',
-      Output: 'mdi-engine-outline',
+      Output: 'mdi-power-plug',
       Constraint: 'mdi-lock-outline',
       Other: 'mdi-cube',
     };
