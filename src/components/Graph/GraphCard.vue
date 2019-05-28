@@ -8,7 +8,7 @@ import { Watch } from 'vue-property-decorator';
 
 import { defaultPresets } from '@/components/Graph/getters';
 import historyStore from '@/store/history';
-import { DisplayNames, GraphValueAxes, GraphValuesListener,QueryParams, QueryTarget } from '@/store/history';
+import { DisplayNames, GraphValueAxes, GraphValuesListener, QueryParams, QueryTarget } from '@/store/history';
 
 import GraphDisplay from './GraphDisplay.vue';
 import { addPlotlyListener } from './actions';
@@ -138,7 +138,7 @@ export default class GraphCard extends Vue {
     if (newVal && JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
       const downsampling = mapValues(newVal, policy =>
         policy
-          .replace(/autogen/, 'Realtime')
+          .replace(/autogen/, 'No averaging')
           .replace(/downsample_/, ''));
       this.$emit('downsample', downsampling);
     }
