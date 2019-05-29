@@ -716,6 +716,68 @@
         "freshDuration": {},
         "decimals": {}
       }
+    },
+    {
+      "_id": "a06358fc-5499-11e9-8647-d663bd873d95",
+      "title": "Charles",
+      "order": 3,
+      "cols": 4,
+      "rows": 5,
+      "feature": "StepView",
+      "dashboard": "dashboard-home",
+      "config": {
+        "serviceId": "sparkey",
+        "steps": [
+          {
+            "name": "step-10",
+            "changes": [
+              {
+                "blockId": "sensor-1",
+                "data": {
+                  "value[degC]": 10
+                }
+              },
+              {
+                "blockId": "setpoint-sensor-pair-1",
+                "data": {
+                  "storedSetting[degC]": 10,
+                  "settingEnabled": true
+                }
+              },
+              {
+                "blockId": "actuator-pwm-1",
+                "data": {
+                  "setting": 60
+                }
+              }
+            ]
+          },
+          {
+            "name": "step-20",
+            "changes": [
+              {
+                "blockId": "sensor-1",
+                "data": {
+                  "value[degC]": 20
+                }
+              },
+              {
+                "blockId": "setpoint-sensor-pair-1",
+                "data": {
+                  "storedSetting[degC]": 20,
+                  "settingEnabled": true
+                }
+              },
+              {
+                "blockId": "actuator-pwm-1",
+                "data": {
+                  "setting": 60
+                }
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }
