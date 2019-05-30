@@ -1,3 +1,5 @@
+import { Unit } from '@/helpers/units';
+
 import { BlockProperty } from './types';
 
 export const dataProps: Record<string, BlockProperty[]> = {
@@ -6,26 +8,31 @@ export const dataProps: Record<string, BlockProperty[]> = {
       key: 'setting',
       title: 'Setting',
       type: 'number',
+      generate: () => 0,
     },
     {
       key: 'minSetting',
       title: 'Minimum Setting',
       type: 'number',
+      generate: () => 0,
     },
     {
       key: 'maxSetting',
       title: 'Maximum Setting',
       type: 'number',
+      generate: () => 100,
     },
     {
       key: 'minValue',
       title: 'Minimum Value',
       type: 'number',
+      generate: () => 0,
     },
     {
       key: 'maxValue',
       title: 'Maximum Value',
       type: 'number',
+      generate: () => 100,
     },
   ],
   ActuatorDS2413: [
@@ -38,6 +45,7 @@ export const dataProps: Record<string, BlockProperty[]> = {
       key: 'setting',
       title: 'Duty Setting',
       type: 'number',
+      generate: () => 0,
     },
   ],
   Balancer: [],
@@ -51,11 +59,13 @@ export const dataProps: Record<string, BlockProperty[]> = {
       key: 'storedSetting',
       title: 'Setting',
       type: 'Unit',
+      generate: () => new Unit(20, 'degC'),
     },
     {
       key: 'settingEnabled',
       title: 'Enabled',
       type: 'boolean',
+      generate: () => true,
     },
   ],
   TempSensorMock: [
@@ -63,6 +73,7 @@ export const dataProps: Record<string, BlockProperty[]> = {
       key: 'value',
       title: 'Sensor Value',
       type: 'Unit',
+      generate: () => new Unit(20, 'degC'),
     },
   ],
   TempSensorOneWire: [],

@@ -26,6 +26,12 @@ interface StepDisplay extends Step {
 }
 
 @Component({
+  props: {
+    openStep: {
+      type: String,
+      default: '',
+    },
+  },
   components: {
     StepViewValue,
   },
@@ -101,15 +107,8 @@ export default class StepViewForm extends FormBase {
     };
   }
 
-  // unusedData(change: BlockChangeDisplay): { [key: string]: any } {
-  //   return change.props
-  //     .filter(prop => change.data[prop.key] === undefined)
-  //     .reduce((acc, prop) => ({ ...acc, [prop.key]: null }), {});
-  // }
-
-  dataTitle(change: BlockChangeDisplay, key: string) {
-    const prop = change.props.find(prop => prop.key === key) || { title: key };
-    return prop.title;
+  findProp(change: BlockChangeDisplay, key: string): BlockProperty {
+    return change.props.find(prop => prop.key === key) as BlockProperty;
   }
 
   removeChange(step: StepDisplay, key: string) {
@@ -119,6 +118,18 @@ export default class StepViewForm extends FormBase {
 
   removeKey(change: BlockChangeDisplay, key: string) {
     this.$delete(change.data, key);
+    this.saveSteps(this.steps);
+  }
+
+  addStep() {
+    this.steps.push({ name: this.newStepName, changes: [] });
+    this.saveSteps(this.steps);
+    this.newStepName = '';
+  }
+
+  addVal(change: BlockChangeDisplay, key: string) {
+    const prop = this.findProp(change, key);
+    this.$set(change.data, key, prop.generate());
     this.saveSteps(this.steps);
   }
 
@@ -135,20 +146,10 @@ export default class StepViewForm extends FormBase {
     this.saveSteps(this.steps);
   }
 
-  addStep() {
-    this.steps.push({ name: this.newStepName, changes: [] });
+  updateVal(change: BlockChangeDisplay, key: string, val: any) {
+    console.log(change, key, val);
+    this.$set(change.data, key, val);
     this.saveSteps(this.steps);
-    this.newStepName = '';
-  }
-
-  isEditable(stepName: string, blockId: string) {
-    const key = `__${stepName}__${blockId}`;
-    return this.editableChanges[key] || false;
-  }
-
-  toggleEditable(stepName: string, blockId: string) {
-    const key = `__${stepName}__${blockId}`;
-    this.$set(this.editableChanges, key, !this.editableChanges[key]);
   }
 }
 </script>
@@ -160,30 +161,19 @@ export default class StepViewForm extends FormBase {
     <q-card-section>
       <div class="scroll-parent">
         <q-scroll-area>
-          <q-expansion-item label="Configure Steps" group="steps" icon="edit">
-            <q-item v-for="step in steps" :key="step.name" dark>
-              <q-item-section>
-                <InputPopupEdit
-                  :field="step.name"
-                  :change="v => updateStepName(step.name, v)"
-                  label="Step Name"
-                  tag="span"
-                />
-              </q-item-section>
-            </q-item>
-            <q-item dark>
-              <q-item-section>
-                <q-input v-model="newStepName" :rules="stepNameRules" dark label="New Step"/>
-              </q-item-section>
-              <q-item-section class="col-auto">
-                <q-btn :disable="!newStepNameOk" flat label="Add" icon="add" @click="addStep"/>
-              </q-item-section>
-            </q-item>
-          </q-expansion-item>
+          <q-item dark dense>
+            <q-item-section>
+              <q-input v-model="newStepName" :rules="stepNameRules" dark label="New Step"/>
+            </q-item-section>
+            <q-item-section class="col-auto">
+              <q-btn :disable="!newStepNameOk" flat label="Add" icon="add" @click="addStep"/>
+            </q-item-section>
+          </q-item>
           <q-expansion-item
             v-for="step in steps"
             :label="step.name"
             :key="step.name"
+            :default-opened="$props.openStep === step.name"
             group="steps"
             icon="mdi-format-list-checks"
           >
@@ -199,15 +189,15 @@ export default class StepViewForm extends FormBase {
                 <q-item-section class="text-h6">{{ change.blockId }}</q-item-section>
                 <template v-if="editableChanges[change.key]">
                   <q-item-section side>
-                    <q-btn flat round icon="close" @click="removeChange(step, change.key)">
+                    <q-btn flat round icon="delete" @click="removeChange(step, change.key)">
                       <q-tooltip>Remove Block Change from Step</q-tooltip>
                     </q-btn>
                   </q-item-section>
                   <q-item-section side>
                     <q-btn
-                      flat
                       round
-                      icon="mdi-pencil-off"
+                      outline
+                      icon="mdi-check"
                       @click="$set(editableChanges, change.key, false)"
                     />
                   </q-item-section>
@@ -218,21 +208,34 @@ export default class StepViewForm extends FormBase {
                   </q-item-section>
                 </template>
               </q-item>
-              <template v-if="isEditable(step.name, change.blockId)">
+              <template v-if="editableChanges[change.key]">
                 <q-item v-for="(val, key) in allData(change)" :key="key" dark>
-                  <q-item-section>{{ dataTitle(change, key) }}</q-item-section>
-                  <q-item-section>{{ val }}</q-item-section>
-                  <q-item-section>editable</q-item-section>
+                  <q-item-section>{{ findProp(change, key).title }}</q-item-section>
+                  <StepViewValue
+                    v-if="val !== null"
+                    :value="val"
+                    :type="findProp(change, key).type"
+                    @input="v => updateVal(change, key, v)"
+                  />
+                  <q-item-section v-else>
+                    <q-btn flat label="Set value" @click="addVal(change, key)"/>
+                  </q-item-section>
+                  <q-item-section side>
+                    <q-btn flat round icon="mdi-close" @click="removeKey(change, key)"/>
+                  </q-item-section>
                 </q-item>
               </template>
               <template v-else>
                 <q-item v-for="(val, key) in change.data" :key="key" dark>
-                  <q-item-section>{{ dataTitle(change, key) }}</q-item-section>
+                  <q-item-section>{{ findProp(change, key).title }}</q-item-section>
                   <q-item-section>{{ val }}</q-item-section>
                 </q-item>
               </template>
             </q-list>
             <q-item dark>
+              <q-item-section>
+                <q-btn label="Rename Step" outline/>
+              </q-item-section>
               <q-item-section>
                 <q-btn label="Add Block" outline/>
               </q-item-section>

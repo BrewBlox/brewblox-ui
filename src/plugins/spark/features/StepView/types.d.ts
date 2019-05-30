@@ -14,6 +14,7 @@ export interface BlockProperty {
   title: string;
   description?: string;
   type: BlockDataType;
+  generate: () => any;
 }
 
 export interface BlockChange {

@@ -11,6 +11,7 @@ import { Step } from './types';
 @Component
 export default class StepViewWidget extends WidgetBase {
   modalOpen: boolean = false;
+  openStep: string = '';
 
   get serviceId() {
     return this.$props.config.serviceId;
@@ -43,6 +44,16 @@ export default class StepViewWidget extends WidgetBase {
       const block = sparkStore.blockById(this.serviceId, change.blockId);
       await sparkStore.saveBlock([this.serviceId, { ...block, data: { ...block.data, ...change.data } }]);
     }
+    this.$q.notify({
+      icon: 'mdi-check-all',
+      color: 'positive',
+      message: `Applied ${step.name}`,
+    });
+  }
+
+  openModal(stepName: string = '') {
+    this.openStep = stepName;
+    this.modalOpen = true;
   }
 }
 </script>
@@ -54,13 +65,14 @@ export default class StepViewWidget extends WidgetBase {
         v-if="modalOpen"
         v-bind="$props"
         :field="$props.config"
+        :open-step="openStep"
         :on-change-field="saveConfig"
       />
     </q-dialog>
 
     <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
       <q-item-section side>
-        <q-btn-dropdown flat split icon="settings" @click="modalOpen = true">
+        <q-btn-dropdown flat split icon="settings" @click="openModal">
           <q-list dark bordered>
             <ActionItem
               v-if="$props.onCopy"
@@ -91,6 +103,9 @@ export default class StepViewWidget extends WidgetBase {
           {{ step.name }}
           <q-item-label caption>{{ step.changes.length }} Blocks changed</q-item-label>
           <q-tooltip>{{ step.changes.map(change => change.blockId).join(', ') }}</q-tooltip>
+        </q-item-section>
+        <q-item-section class="col-auto">
+          <q-btn flat round icon="settings" @click="openModal(step.name)"/>
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn
