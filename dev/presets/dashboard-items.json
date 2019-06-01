@@ -729,6 +729,7 @@
         "serviceId": "sparkey",
         "steps": [
           {
+            "id": "b92781c7-3a9f-440d-8df6-bd897b4bfa37",
             "name": "step-10",
             "changes": [
               {
@@ -753,6 +754,7 @@
             ]
           },
           {
+            "id": "6ab89a06-6103-4c59-a34c-f5a173cd3ee4",
             "name": "step-20",
             "changes": [
               {

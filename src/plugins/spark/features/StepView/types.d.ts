@@ -25,6 +25,7 @@ export interface BlockChange {
 }
 
 export interface Step {
+  id: string;
   name: string;
   changes: BlockChange[];
 }

@@ -2,6 +2,7 @@
 
 import get from 'lodash/get';
 import isString from 'lodash/isString';
+import { Dialog, uid } from 'quasar';
 import Component from 'vue-class-component';
 
 import FormBase from '@/components/Form/FormBase';
@@ -37,7 +38,6 @@ interface StepDisplay extends Step {
   },
 })
 export default class StepViewForm extends FormBase {
-  newStepName = '';
   editableChanges: Record<string, boolean> = {};
 
   get widgetConfig(): StepViewConfig {
@@ -48,12 +48,12 @@ export default class StepViewForm extends FormBase {
     return this.widgetConfig.serviceId;
   }
 
-  asBlockChangeDisplay(stepName: string, change: BlockChange): BlockChangeDisplay {
+  asBlockChangeDisplay(stepId: string, change: BlockChange): BlockChangeDisplay {
     const block = sparkStore.blocks(this.serviceId)[change.blockId];
     return {
       ...change,
       block,
-      key: `__${stepName}__${change.blockId}`,
+      key: `__${stepId}__${change.blockId}`,
       displayName: block ? featureStore.displayNameById(block.type) : 'Unknown',
       props: block ? dataProps[block.type] : [],
     };
@@ -68,7 +68,7 @@ export default class StepViewForm extends FormBase {
     return deserialize(this.widgetConfig.steps)
       .map(step => ({
         ...step,
-        changes: step.changes.map(change => this.asBlockChangeDisplay(step.name, change)),
+        changes: step.changes.map(change => this.asBlockChangeDisplay(step.id, change)),
       }));
   }
 
@@ -86,17 +86,6 @@ export default class StepViewForm extends FormBase {
     return sparkStore.blockValues(this.serviceId)
       .filter(block => !!get(dataProps, [block.type, 'length']))
       .map(block => block.id);
-  }
-
-  get stepNameRules(): InputRule[] {
-    return [
-      v => !!v || 'Name must not be empty',
-      v => !this.steps.find(step => step.name === v) || 'Name is already in use',
-    ];
-  }
-
-  get newStepNameOk() {
-    return this.stepNameRules.every(rule => !isString(rule(this.newStepName)));
   }
 
   allData(change: BlockChangeDisplay): { [key: string]: any } {
@@ -122,10 +111,47 @@ export default class StepViewForm extends FormBase {
   }
 
   addStep() {
-    this.steps.push({ name: this.newStepName, changes: [] });
-    this.saveSteps(this.steps);
-    this.newStepName = '';
+    let stepName = 'New Step';
+    Dialog.create({
+      title: 'Add a Step',
+      dark: true,
+      cancel: true,
+      prompt: {
+        model: stepName,
+        type: 'text',
+      },
+    })
+      .onOk(name => {
+        this.steps.push({ name, id: uid(), changes: [] });
+        this.saveSteps(this.steps);
+      });
   }
+
+  renameStep(step: StepDisplay) {
+    let stepName = step.name;
+    Dialog.create({
+      title: 'Change Step name',
+      message: `Choose a new name for '${step.name}'`,
+      dark: true,
+      cancel: true,
+      prompt: {
+        model: stepName,
+        type: 'text',
+      },
+    })
+      .onOk(newName => {
+        const updatedStep = this.steps.find(s => s.id === step.id);
+        if (step.name !== newName && updatedStep) {
+          updatedStep.name = newName;
+          this.saveSteps(this.steps);
+        }
+      });
+  }
+
+  removeStep(step: StepDisplay) {
+    this.saveSteps(this.steps.filter(s => s.id !== step.id));
+  }
+
 
   addVal(change: BlockChangeDisplay, key: string) {
     const prop = this.findProp(change, key);
@@ -133,23 +159,27 @@ export default class StepViewForm extends FormBase {
     this.saveSteps(this.steps);
   }
 
-  updateStepName(oldName: string, newName: string) {
-    if (oldName === newName) {
-      return;
-    }
-    if (this.steps.find(step => step.name === newName)) {
-      this.$q.notify({ message: `'${newName}' is already taken`, color: 'negative' });
-      return;
-    }
-    const step = this.steps.find(step => step.name === oldName) as StepDisplay;
-    step.name = newName;
-    this.saveSteps(this.steps);
-  }
-
   updateVal(change: BlockChangeDisplay, key: string, val: any) {
     console.log(change, key, val);
     this.$set(change.data, key, val);
     this.saveSteps(this.steps);
+  }
+
+  addBlock(step: StepDisplay) {
+    Dialog.create({
+      component: 'BlockChoiceDialog',
+      title: 'Choose a Block',
+      filter: block => {
+        return !!dataProps[block.type]
+          && !step.changes.find(change => block.id === change.blockId);
+      },
+      dark: true,
+      root: this.$root,
+      serviceId: this.serviceId,
+    })
+      .onOk(block => {
+        console.log(step, block);
+      });
   }
 }
 </script>
@@ -161,19 +191,11 @@ export default class StepViewForm extends FormBase {
     <q-card-section>
       <div class="scroll-parent">
         <q-scroll-area>
-          <q-item dark dense>
-            <q-item-section>
-              <q-input v-model="newStepName" :rules="stepNameRules" dark label="New Step"/>
-            </q-item-section>
-            <q-item-section class="col-auto">
-              <q-btn :disable="!newStepNameOk" flat label="Add" icon="add" @click="addStep"/>
-            </q-item-section>
-          </q-item>
           <q-expansion-item
             v-for="step in steps"
             :label="step.name"
-            :key="step.name"
-            :default-opened="$props.openStep === step.name"
+            :key="step.id"
+            :default-opened="$props.openStep === step.id"
             group="steps"
             icon="mdi-format-list-checks"
           >
@@ -196,7 +218,8 @@ export default class StepViewForm extends FormBase {
                   <q-item-section side>
                     <q-btn
                       round
-                      outline
+                      flat
+                      color="primary"
                       icon="mdi-check"
                       @click="$set(editableChanges, change.key, false)"
                     />
@@ -221,7 +244,9 @@ export default class StepViewForm extends FormBase {
                     <q-btn flat label="Set value" @click="addVal(change, key)"/>
                   </q-item-section>
                   <q-item-section side>
-                    <q-btn flat round icon="mdi-close" @click="removeKey(change, key)"/>
+                    <q-btn flat round icon="mdi-close" @click="removeKey(change, key)">
+                      <q-tooltip>Remove field from Block Change</q-tooltip>
+                    </q-btn>
                   </q-item-section>
                 </q-item>
               </template>
@@ -234,13 +259,21 @@ export default class StepViewForm extends FormBase {
             </q-list>
             <q-item dark>
               <q-item-section>
-                <q-btn label="Rename Step" outline/>
+                <q-btn label="Remove Step" outline @click="removeStep(step)"/>
               </q-item-section>
               <q-item-section>
-                <q-btn label="Add Block" outline/>
+                <q-btn label="Rename Step" outline @click="renameStep(step)"/>
+              </q-item-section>
+              <q-item-section>
+                <q-btn label="Add Block" outline @click="addBlock(step)"/>
               </q-item-section>
             </q-item>
           </q-expansion-item>
+          <q-item dark>
+            <q-item-section>
+              <q-btn outline label="Add Step" icon="add" @click="addStep"/>
+            </q-item-section>
+          </q-item>
         </q-scroll-area>
       </div>
     </q-card-section>

@@ -34,7 +34,7 @@ export default class StepViewWidget extends WidgetBase {
       .reduce(
         (acc, step) => ({
           ...acc,
-          [step.name]: step.changes.every(change => blockIds.includes(change.blockId)),
+          [step.id]: step.changes.every(change => blockIds.includes(change.blockId)),
         }),
         {});
   }
@@ -51,8 +51,8 @@ export default class StepViewWidget extends WidgetBase {
     });
   }
 
-  openModal(stepName: string = '') {
-    this.openStep = stepName;
+  openModal(stepId: string = '') {
+    this.openStep = stepId;
     this.modalOpen = true;
   }
 }
@@ -98,18 +98,18 @@ export default class StepViewWidget extends WidgetBase {
     </WidgetToolbar>
 
     <q-card-section>
-      <q-item v-for="step in steps" :key="step.name" dark>
+      <q-item v-for="step in steps" :key="step.id" dark>
         <q-item-section>
           {{ step.name }}
           <q-item-label caption>{{ step.changes.length }} Blocks changed</q-item-label>
           <q-tooltip>{{ step.changes.map(change => change.blockId).join(', ') }}</q-tooltip>
         </q-item-section>
         <q-item-section class="col-auto">
-          <q-btn flat round icon="settings" @click="openModal(step.name)"/>
+          <q-btn flat round icon="settings" @click="openModal(step.id)"/>
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn
-            :disable="!applicableSteps[step.name]"
+            :disable="!applicableSteps[step.id]"
             outline
             label="apply"
             @click="applyStep(step)"
