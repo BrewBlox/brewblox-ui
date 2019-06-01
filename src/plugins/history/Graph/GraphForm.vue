@@ -203,7 +203,7 @@ export default class GraphForm extends FormBase {
         </q-item>
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>Actual downsampling rate</q-item-label>
+            <q-item-label caption>Averaging period</q-item-label>
             <div class="row q-mt-sm q-ml-sm">
               <div v-for="(rate, meas) in downsampling" :key="meas" class="q-mr-md">
                 <q-item-label caption>{{ meas }}</q-item-label>
