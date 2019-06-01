@@ -261,13 +261,13 @@ export default class StepViewForm extends FormBase {
             </q-list>
             <q-item dark>
               <q-item-section>
-                <q-btn label="Remove Step" outline @click="removeStep(step)"/>
+                <q-btn label="Remove Step" flat @click="removeStep(step)"/>
               </q-item-section>
               <q-item-section>
-                <q-btn label="Rename Step" outline @click="renameStep(step)"/>
+                <q-btn label="Rename Step" flat @click="renameStep(step)"/>
               </q-item-section>
               <q-item-section>
-                <q-btn label="Add Block" outline @click="addChange(step)"/>
+                <q-btn label="Add Block" flat @click="addChange(step)"/>
               </q-item-section>
             </q-item>
           </q-expansion-item>
