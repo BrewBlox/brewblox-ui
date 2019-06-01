@@ -13,7 +13,7 @@ const feature: Feature = {
   wizard: ref(wizard),
   widgetSize: {
     cols: 4,
-    rows: 5,
+    rows: 2,
   },
 };
 

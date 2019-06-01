@@ -1,7 +1,6 @@
 <script lang="ts">
 
 import get from 'lodash/get';
-import isString from 'lodash/isString';
 import { Dialog, uid } from 'quasar';
 import Component from 'vue-class-component';
 
@@ -100,16 +99,6 @@ export default class StepViewForm extends FormBase {
     return change.props.find(prop => prop.key === key) as BlockProperty;
   }
 
-  removeChange(step: StepDisplay, key: string) {
-    step.changes = step.changes.filter(change => change.key !== key);
-    this.saveSteps(this.steps);
-  }
-
-  removeKey(change: BlockChangeDisplay, key: string) {
-    this.$delete(change.data, key);
-    this.saveSteps(this.steps);
-  }
-
   addStep() {
     let stepName = 'New Step';
     Dialog.create({
@@ -152,20 +141,7 @@ export default class StepViewForm extends FormBase {
     this.saveSteps(this.steps.filter(s => s.id !== step.id));
   }
 
-
-  addVal(change: BlockChangeDisplay, key: string) {
-    const prop = this.findProp(change, key);
-    this.$set(change.data, key, prop.generate());
-    this.saveSteps(this.steps);
-  }
-
-  updateVal(change: BlockChangeDisplay, key: string, val: any) {
-    console.log(change, key, val);
-    this.$set(change.data, key, val);
-    this.saveSteps(this.steps);
-  }
-
-  addBlock(step: StepDisplay) {
+  addChange(step: StepDisplay) {
     Dialog.create({
       component: 'BlockChoiceDialog',
       title: 'Choose a Block',
@@ -178,8 +154,34 @@ export default class StepViewForm extends FormBase {
       serviceId: this.serviceId,
     })
       .onOk(block => {
-        console.log(step, block);
+        const updatedStep = this.steps.find(s => s.id === step.id);
+        if (updatedStep) {
+          updatedStep.changes.push(this.asBlockChangeDisplay(step.id, { blockId: block.id, data: {} }));
+          this.saveSteps(this.steps);
+        }
       });
+  }
+
+  removeChange(step: StepDisplay, key: string) {
+    step.changes = step.changes.filter(change => change.key !== key);
+    this.saveSteps(this.steps);
+  }
+
+  addField(change: BlockChangeDisplay, key: string) {
+    const prop = this.findProp(change, key);
+    this.$set(change.data, key, prop.generate());
+    this.saveSteps(this.steps);
+  }
+
+  updateField(change: BlockChangeDisplay, key: string, val: any) {
+    console.log(change, key, val);
+    this.$set(change.data, key, val);
+    this.saveSteps(this.steps);
+  }
+
+  removeField(change: BlockChangeDisplay, key: string) {
+    this.$delete(change.data, key);
+    this.saveSteps(this.steps);
   }
 }
 </script>
@@ -238,13 +240,13 @@ export default class StepViewForm extends FormBase {
                     v-if="val !== null"
                     :value="val"
                     :type="findProp(change, key).type"
-                    @input="v => updateVal(change, key, v)"
+                    @input="v => updateField(change, key, v)"
                   />
                   <q-item-section v-else>
-                    <q-btn flat label="Set value" @click="addVal(change, key)"/>
+                    <q-btn flat label="Set value" @click="addField(change, key)"/>
                   </q-item-section>
                   <q-item-section side>
-                    <q-btn flat round icon="mdi-close" @click="removeKey(change, key)">
+                    <q-btn flat round icon="mdi-close" @click="removeField(change, key)">
                       <q-tooltip>Remove field from Block Change</q-tooltip>
                     </q-btn>
                   </q-item-section>
@@ -265,13 +267,14 @@ export default class StepViewForm extends FormBase {
                 <q-btn label="Rename Step" outline @click="renameStep(step)"/>
               </q-item-section>
               <q-item-section>
-                <q-btn label="Add Block" outline @click="addBlock(step)"/>
+                <q-btn label="Add Block" outline @click="addChange(step)"/>
               </q-item-section>
             </q-item>
           </q-expansion-item>
           <q-item dark>
-            <q-item-section>
-              <q-btn outline label="Add Step" icon="add" @click="addStep"/>
+            <q-item-section/>
+            <q-item-section side>
+              <q-btn fab outline icon="add" @click="addStep"/>
             </q-item-section>
           </q-item>
         </q-scroll-area>

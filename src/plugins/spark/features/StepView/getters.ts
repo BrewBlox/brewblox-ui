@@ -36,10 +36,47 @@ export const dataProps: Record<string, BlockProperty[]> = {
     },
   ],
   ActuatorDS2413: [
-
+    {
+      key: 'channel',
+      title: 'DS2413 Channel',
+      type: 'number',
+      generate: () => 0,
+    },
+    {
+      key: 'invert',
+      title: 'Invert',
+      type: 'boolean',
+      generate: () => false,
+    },
   ],
-  ActuatorOffset: [],
-  ActuatorPin: [],
+  ActuatorOffset: [
+    {
+      key: 'setting',
+      title: 'Target offset',
+      type: 'number',
+      generate: () => 0,
+    },
+    {
+      key: 'enabled',
+      title: 'Enabled',
+      type: 'boolean',
+      generate: () => true,
+    },
+  ],
+  ActuatorPin: [
+    {
+      key: 'state',
+      title: 'State',
+      type: 'number',
+      generate: () => 0,
+    },
+    {
+      key: 'invert',
+      title: 'Invert',
+      type: 'boolean',
+      generate: () => false,
+    },
+  ],
   ActuatorPwm: [
     {
       key: 'setting',
@@ -48,12 +85,51 @@ export const dataProps: Record<string, BlockProperty[]> = {
       generate: () => 0,
     },
   ],
-  Balancer: [],
-  DisplaySettings: [],
-  DS2413: [],
-  Mutex: [],
-  Pid: [],
-  SetpointProfile: [],
+  // Balancer: [],
+  DisplaySettings: [
+    {
+      key: 'name',
+      title: 'Footer text',
+      type: 'string',
+      generate: () => '',
+    },
+  ],
+  // DS2413: [],
+  // Mutex: [],
+  Pid: [
+    {
+      key: 'filterThreshold',
+      title: 'Fast step threshold',
+      type: 'Unit',
+      generate: () => new Unit(2, 'degC'),
+    },
+    {
+      key: 'kp',
+      title: 'Kp',
+      type: 'Unit',
+      generate: () => new Unit(0, 'degC'),
+    },
+    {
+      key: 'ti',
+      title: 'Ti',
+      type: 'Unit',
+      generate: () => new Unit(0, 'second'),
+    },
+    {
+      key: 'td',
+      title: 'Td',
+      type: 'Unit',
+      generate: () => new Unit(0, 'second'),
+    },
+  ],
+  SetpointProfile: [
+    {
+      key: 'enabled',
+      title: 'Enabled',
+      type: 'boolean',
+      generate: () => true,
+    },
+  ],
   SetpointSensorPair: [
     {
       key: 'storedSetting',
@@ -76,5 +152,5 @@ export const dataProps: Record<string, BlockProperty[]> = {
       generate: () => new Unit(20, 'degC'),
     },
   ],
-  TempSensorOneWire: [],
+  // TempSensorOneWire: [],
 };
