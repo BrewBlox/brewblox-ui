@@ -6,7 +6,7 @@ import Component from 'vue-class-component';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { shortDateString } from '@/helpers/functional';
 
-import { Session,SessionViewConfig } from './types';
+import { Session, SessionViewConfig } from './types';
 
 
 @Component
