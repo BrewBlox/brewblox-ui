@@ -1,9 +1,11 @@
-import { ref } from '@/helpers/component-ref';
+import { autoRegister,ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features';
 
 import form from './StepViewForm.vue';
 import widget from './StepViewWidget.vue';
 import wizard from './StepViewWizard.vue';
+
+autoRegister(require.context('./ValEdit', true, /[A-Z]\w+\.vue$/));
 
 const feature: Feature = {
   id: 'StepView',

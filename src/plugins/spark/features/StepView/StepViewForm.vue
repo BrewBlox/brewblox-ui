@@ -10,15 +10,14 @@ import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import featureStore from '@/store/features';
 
-import StepViewValue from './StepViewValue.vue';
-import { dataProps } from './getters';
-import { BlockChange, BlockProperty, Step, StepViewConfig } from './types';
+import { changeProps } from './getters';
+import { BlockChange, ChangeProperty, Step, StepViewConfig } from './types';
 
 interface BlockChangeDisplay extends BlockChange {
   key: string;
   block: Block;
   displayName: string;
-  props: BlockProperty[];
+  props: ChangeProperty[];
 }
 
 interface StepDisplay extends Step {
@@ -31,9 +30,6 @@ interface StepDisplay extends Step {
       type: String,
       default: '',
     },
-  },
-  components: {
-    StepViewValue,
   },
 })
 export default class StepViewForm extends FormBase {
@@ -54,7 +50,7 @@ export default class StepViewForm extends FormBase {
       block,
       key: `__${stepId}__${change.blockId}`,
       displayName: block ? featureStore.displayNameById(block.type) : 'Unknown',
-      props: block ? dataProps[block.type] : [],
+      props: block ? changeProps[block.type] : [],
     };
   }
 
@@ -83,7 +79,7 @@ export default class StepViewForm extends FormBase {
 
   get blockIdOpts(): string[] {
     return sparkStore.blockValues(this.serviceId)
-      .filter(block => !!get(dataProps, [block.type, 'length']))
+      .filter(block => !!get(changeProps, [block.type, 'length']))
       .map(block => block.id);
   }
 
@@ -95,8 +91,8 @@ export default class StepViewForm extends FormBase {
     };
   }
 
-  findProp(change: BlockChangeDisplay, key: string): BlockProperty {
-    return change.props.find(prop => prop.key === key) as BlockProperty;
+  findProp(change: BlockChangeDisplay, key: string): ChangeProperty {
+    return change.props.find(prop => prop.key === key) as ChangeProperty;
   }
 
   addStep() {
@@ -138,7 +134,14 @@ export default class StepViewForm extends FormBase {
   }
 
   removeStep(step: StepDisplay) {
-    this.saveSteps(this.steps.filter(s => s.id !== step.id));
+    Dialog.create({
+      title: 'Remove Step',
+      message: `Are you sure you want to remove ${step.name}?`,
+      dark: true,
+      ok: 'Confirm',
+      cancel: 'Cancel',
+    })
+      .onOk(() => this.saveSteps(this.steps.filter(s => s.id !== step.id)));
   }
 
   addChange(step: StepDisplay) {
@@ -146,7 +149,7 @@ export default class StepViewForm extends FormBase {
       component: 'BlockChoiceDialog',
       title: 'Choose a Block',
       filter: block => {
-        return !!dataProps[block.type]
+        return !!changeProps[block.type]
           && !step.changes.find(change => block.id === change.blockId);
       },
       dark: true,
@@ -174,7 +177,6 @@ export default class StepViewForm extends FormBase {
   }
 
   updateField(change: BlockChangeDisplay, key: string, val: any) {
-    console.log(change, key, val);
     this.$set(change.data, key, val);
     this.saveSteps(this.steps);
   }
@@ -201,6 +203,18 @@ export default class StepViewForm extends FormBase {
             group="steps"
             icon="mdi-format-list-checks"
           >
+            <q-item dark>
+              <q-item-section class="col-auto">
+                <q-btn size="sm" label="Add Block" flat icon="mdi-cube" @click="addChange(step)"/>
+              </q-item-section>
+              <q-item-section/>
+              <q-item-section class="col-auto">
+                <q-btn size="sm" label="Rename Step" flat icon="edit" @click="renameStep(step)"/>
+              </q-item-section>
+              <q-item-section class="col-auto">
+                <q-btn size="sm" label="Remove Step" flat icon="delete" @click="removeStep(step)"/>
+              </q-item-section>
+            </q-item>
             <q-list
               v-for="change in step.changes"
               :key="change.blockId"
@@ -224,57 +238,76 @@ export default class StepViewForm extends FormBase {
                       color="primary"
                       icon="mdi-check"
                       @click="$set(editableChanges, change.key, false)"
-                    />
+                    >
+                      <q-tooltip>Stop editing</q-tooltip>
+                    </q-btn>
                   </q-item-section>
                 </template>
                 <template v-else>
                   <q-item-section side>
-                    <q-btn flat round icon="edit" @click="$set(editableChanges, change.key, true)"/>
+                    <q-btn flat round icon="edit" @click="$set(editableChanges, change.key, true)">
+                      <q-tooltip>Edit Block Change</q-tooltip>
+                    </q-btn>
                   </q-item-section>
                 </template>
               </q-item>
               <template v-if="editableChanges[change.key]">
                 <q-item v-for="(val, key) in allData(change)" :key="key" dark>
                   <q-item-section>{{ findProp(change, key).title }}</q-item-section>
-                  <StepViewValue
-                    v-if="val !== null"
-                    :value="val"
-                    :type="findProp(change, key).type"
-                    @input="v => updateField(change, key, v)"
-                  />
-                  <q-item-section v-else>
-                    <q-btn flat label="Set value" @click="addField(change, key)"/>
-                  </q-item-section>
-                  <q-item-section side>
-                    <q-btn flat round icon="mdi-close" @click="removeField(change, key)">
-                      <q-tooltip>Remove field from Block Change</q-tooltip>
-                    </q-btn>
-                  </q-item-section>
+                  <template v-if="val === null">
+                    <q-item-section/>
+                    <q-item-section side>
+                      <q-btn flat round icon="add" @click="addField(change, key)">
+                        <q-tooltip>
+                          Add field to Block Change
+                          <br>The field will be changed when the Step is applied.
+                        </q-tooltip>
+                      </q-btn>
+                    </q-item-section>
+                  </template>
+                  <template v-else>
+                    <q-item-section>
+                      <component
+                        :is="findProp(change, key).component"
+                        :service-id="serviceId"
+                        :block-id="change.blockId"
+                        :value="val"
+                        editable
+                        @input="v => updateField(change, key, v)"
+                      />
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-btn flat round icon="mdi-close" @click="removeField(change, key)">
+                        <q-tooltip>
+                          Remove field from Block Change.
+                          <br>The field will not be changed when the Step is applied.
+                        </q-tooltip>
+                      </q-btn>
+                    </q-item-section>
+                  </template>
                 </q-item>
               </template>
               <template v-else>
                 <q-item v-for="(val, key) in change.data" :key="key" dark>
                   <q-item-section>{{ findProp(change, key).title }}</q-item-section>
-                  <q-item-section>{{ val }}</q-item-section>
+                  <q-item-section>
+                    <component
+                      :is="findProp(change, key).component"
+                      :service-id="serviceId"
+                      :block-id="change.blockId"
+                      :value="val"
+                    />
+                  </q-item-section>
                 </q-item>
               </template>
             </q-list>
-            <q-item dark>
-              <q-item-section>
-                <q-btn label="Remove Step" flat @click="removeStep(step)"/>
-              </q-item-section>
-              <q-item-section>
-                <q-btn label="Rename Step" flat @click="renameStep(step)"/>
-              </q-item-section>
-              <q-item-section>
-                <q-btn label="Add Block" flat @click="addChange(step)"/>
-              </q-item-section>
-            </q-item>
           </q-expansion-item>
           <q-item dark>
             <q-item-section/>
             <q-item-section side>
-              <q-btn fab outline icon="add" @click="addStep"/>
+              <q-btn fab outline icon="add" @click="addStep">
+                <q-tooltip>Add Step</q-tooltip>
+              </q-btn>
             </q-item-section>
           </q-item>
         </q-scroll-area>

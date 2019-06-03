@@ -20,6 +20,8 @@ import { Service } from '@/store/services';
 import arrangements from './arrangements';
 import features from './features';
 
+autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
+autoRegister(require.context('./provider', true, /[A-Z]\w+\.vue$/));
 
 const onAdd = async (service: Service): Promise<void> => {
   await sparkStore.addService(service.id);
@@ -39,9 +41,6 @@ const onRemove = async (service: Service): Promise<void> => {
 };
 
 export default () => {
-  autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
-  autoRegister(require.context('./provider', true, /[A-Z]\w+\.vue$/));
-
   Vue.filter(
     'unit',
     (value: Unit | null) =>

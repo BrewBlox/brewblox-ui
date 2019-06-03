@@ -3,17 +3,10 @@ export interface StepViewConfig {
   steps: Step[];
 }
 
-export type BlockDataType =
-  'number' |
-  'string' |
-  'boolean' |
-  'Unit';
-
-export interface BlockProperty {
+export interface ChangeProperty {
   key: string;
   title: string;
-  description?: string;
-  type: BlockDataType;
+  component: string;
   generate: () => any;
 }
 
