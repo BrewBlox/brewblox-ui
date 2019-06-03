@@ -95,6 +95,15 @@ export default class StepViewForm extends FormBase {
     return change.props.find(prop => prop.key === key) as ChangeProperty;
   }
 
+  componentProps(change: BlockChangeDisplay, key: string): any {
+    const prop = this.findProp(change, key);
+    return {
+      serviceId: this.serviceId,
+      blockId: change.blockId,
+      ...prop.componentProps || {},
+    };
+  }
+
   addStep() {
     let stepName = 'New Step';
     Dialog.create({
@@ -269,8 +278,7 @@ export default class StepViewForm extends FormBase {
                     <q-item-section>
                       <component
                         :is="findProp(change, key).component"
-                        :service-id="serviceId"
-                        :block-id="change.blockId"
+                        v-bind="componentProps(change, key)"
                         :value="val"
                         editable
                         @input="v => updateField(change, key, v)"
@@ -293,8 +301,7 @@ export default class StepViewForm extends FormBase {
                   <q-item-section>
                     <component
                       :is="findProp(change, key).component"
-                      :service-id="serviceId"
-                      :block-id="change.blockId"
+                      v-bind="componentProps(change, key)"
                       :value="val"
                     />
                   </q-item-section>

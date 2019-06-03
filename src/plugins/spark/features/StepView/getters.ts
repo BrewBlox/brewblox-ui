@@ -3,7 +3,7 @@ import { Link, Unit } from '@/helpers/units';
 import { ChangeProperty } from './types';
 
 export const changeProps: Record<string, ChangeProperty[]> = {
-  ActuatorAnalog: [
+  ActuatorAnalogMock: [
     {
       key: 'setting',
       title: 'Setting',
@@ -43,12 +43,6 @@ export const changeProps: Record<string, ChangeProperty[]> = {
       generate: () => 0,
     },
     {
-      key: 'channel',
-      title: 'DS2413 Channel',
-      component: 'NumberValEdit',
-      generate: () => 0,
-    },
-    {
       key: 'invert',
       title: 'Invert',
       component: 'BoolValEdit',
@@ -67,6 +61,18 @@ export const changeProps: Record<string, ChangeProperty[]> = {
       title: 'Enabled',
       component: 'BoolValEdit',
       generate: () => true,
+    },
+    {
+      key: 'targetId',
+      title: 'Target',
+      component: 'LinkValEdit',
+      generate: () => new Link(null),
+    },
+    {
+      key: 'referenceId',
+      title: 'Reference',
+      component: 'LinkValEdit',
+      generate: () => new Link(null),
     },
   ],
   ActuatorPin: [
@@ -89,6 +95,24 @@ export const changeProps: Record<string, ChangeProperty[]> = {
       title: 'Duty Setting',
       component: 'NumberValEdit',
       generate: () => 0,
+    },
+    {
+      key: 'period',
+      title: 'Period',
+      component: 'UnitValEdit',
+      generate: () => new Unit(4, 'second'),
+    },
+    {
+      key: 'enabled',
+      title: 'Enabled',
+      component: 'BoolValEdit',
+      generate: () => true,
+    },
+    {
+      key: 'actuatorId',
+      title: 'Target',
+      component: 'LinkValEdit',
+      generate: () => new Link(null),
     },
   ],
   // Balancer: [],
@@ -127,6 +151,24 @@ export const changeProps: Record<string, ChangeProperty[]> = {
       component: 'UnitValEdit',
       generate: () => new Unit(0, 'second'),
     },
+    {
+      key: 'enabled',
+      title: 'Enabled',
+      component: 'BoolValEdit',
+      generate: () => true,
+    },
+    {
+      key: 'inputId',
+      title: 'Input',
+      component: 'LinkValEdit',
+      generate: () => new Link(null),
+    },
+    {
+      key: 'outputId',
+      title: 'Target',
+      component: 'LinkValEdit',
+      generate: () => new Link(null),
+    },
   ],
   SetpointProfile: [
     {
@@ -134,6 +176,19 @@ export const changeProps: Record<string, ChangeProperty[]> = {
       title: 'Enabled',
       component: 'BoolValEdit',
       generate: () => true,
+    },
+    {
+      key: 'start',
+      title: 'Start Time',
+      component: 'DateValEdit',
+      componentProps: { timeScale: 1000 },
+      generate: () => new Date().getTime(),
+    },
+    {
+      key: 'targetId',
+      title: 'Target',
+      component: 'LinkValEdit',
+      generate: () => new Link(null),
     },
   ],
   SetpointSensorPair: [
@@ -162,6 +217,12 @@ export const changeProps: Record<string, ChangeProperty[]> = {
       title: 'Sensor Value',
       component: 'UnitValEdit',
       generate: () => new Unit(20, 'degC'),
+    },
+    {
+      key: 'connected',
+      title: 'Connected',
+      component: 'BoolValEdit',
+      generate: () => true,
     },
   ],
   // TempSensorOneWire: [],

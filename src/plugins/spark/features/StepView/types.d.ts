@@ -7,6 +7,7 @@ export interface ChangeProperty {
   key: string;
   title: string;
   component: string;
+  componentProps?: any;
   generate: () => any;
 }
 
