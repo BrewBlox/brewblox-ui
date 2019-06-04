@@ -1,33 +1,26 @@
 <script lang="ts">
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
+
+import dashboardStore from '@/store/dashboards';
 
 import GridItem from './GridItem.vue';
 
 @Component({
-  props: {
-    editable: {
-      type: Boolean,
-      default: false,
-    },
-    noMove: {
-      type: Boolean,
-      default: false,
-    },
-    onChangeSize: {
-      type: Function,
-      default: () => { },
-    },
-    onChangePositions: {
-      type: Function,
-      default: () => { },
-    },
-  },
   components: { GridItem },
 })
 export default class GridContainer extends Vue {
   activeItem: string | null = null;
   activeItemPos: XYPosition | null = null;
+
+  @Prop({ type: Boolean, default: false })
+  readonly editable!: boolean;
+
+  @Prop({ type: Function, default: () => () => { } })
+  readonly onChangeSize!: (id: string, cols: number, rows: number) => void;
+
+  @Prop({ type: Function, default: () => () => { } })
+  readonly onChangePositions!: (id: string, pinnedPosition: XYPosition | null, order: { id: string }[]) => void;
 
   startInteraction(id: string) {
     this.activeItem = id;
@@ -42,29 +35,30 @@ export default class GridContainer extends Vue {
     this.activeItemPos = null;
   }
 
-  newItemsOrder(): Vue[] {
-    const sortedChildren = [...this.$children].sort((a, b) => {
-      const rectA = a.$el.getBoundingClientRect() as DOMRect;
-      const rectB = b.$el.getBoundingClientRect() as DOMRect;
+  newItemsOrder(): GridItem[] {
+    const sortedChildren = ([...this.$children] as GridItem[])
+      .sort((a, b) => {
+        const rectA = a.$el.getBoundingClientRect() as DOMRect;
+        const rectB = b.$el.getBoundingClientRect() as DOMRect;
 
-      // check y position
-      if (rectA.y !== rectB.y) {
-        return rectA.y - rectB.y;
-      }
+        // check y position
+        if (rectA.y !== rectB.y) {
+          return rectA.y - rectB.y;
+        }
 
-      // check x position
-      if (rectA.x !== rectB.x) {
-        return rectA.x - rectB.x;
-      }
+        // check x position
+        if (rectA.x !== rectB.x) {
+          return rectA.x - rectB.x;
+        }
 
-      // is same position
-      return 0;
-    });
+        // is same position
+        return 0;
+      });
     return sortedChildren;
   }
 
   updateItemPosition(id: string, pos: XYPosition | null) {
-    this.$props.onChangePositions(id, pos, this.newItemsOrder());
+    this.onChangePositions(id, pos, this.newItemsOrder());
   }
 
   slotStyle(slot: any) {
@@ -86,7 +80,7 @@ export default class GridContainer extends Vue {
   }
 
   updateItemSize(id: string, cols: number, rows: number) {
-    this.$props.onChangeSize(id, cols, rows);
+    dashboardStore.updateDashboardItemSize({ id, cols, rows });
   }
 
   render(createElement: Function) {
@@ -114,8 +108,7 @@ export default class GridContainer extends Vue {
                   props: {
                     ...slot.data.attrs,
                     ...slot.componentOptions.propsData,
-                    editable: this.$props.editable,
-                    noMove: this.$props.noMove,
+                    editable: this.editable,
                     onStartInteraction: this.startInteraction,
                     onStopInteraction: this.stopInteraction,
                     onMoveInteraction: this.moveInteraction,
@@ -126,8 +119,7 @@ export default class GridContainer extends Vue {
                 [slot],
               )),
             // show overlay grid if activeItem is happening or in edit mode
-            (this.activeItem || this.$props.editable)
-            && !this.$props.noMove
+            (this.activeItem || this.editable)
             && createElement(
               'div',
               {

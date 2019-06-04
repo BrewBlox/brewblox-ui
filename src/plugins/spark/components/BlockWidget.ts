@@ -10,11 +10,8 @@ import { Block } from '../types';
 
 @Component
 export default class BlockWidget extends WidgetBase {
+  public me!: BlockWidget;
   public modalOpen: boolean = false;
-
-  public get me() {
-    return this;
-  }
 
   public get serviceId(): string {
     return this.widget.config.serviceId;

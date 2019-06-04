@@ -15,7 +15,7 @@ export default class ExampleFeatureWizard extends WidgetWizardBase {
       id: this.widgetId, // inherited from WidgetWizardBase. Defaults to a 128-bit random string.
       title: this.widgetTitle,
       feature: this.typeId,
-      dashboard: this.$props.dashboardId,
+      dashboard: this.dashboardId,
       order: 0,
       config: {
         lastUrl: '/datastore',

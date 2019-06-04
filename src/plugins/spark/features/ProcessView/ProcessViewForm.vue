@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Dialog, uid } from 'quasar';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import FormBase from '@/components/Form/FormBase';
 import { Coordinates } from '@/helpers/coordinates';
@@ -60,6 +60,26 @@ export default class ProcessViewForm extends FormBase {
   configuredPartId: string | null = null;
   catalogPartial: Partial<PersistentPart> | null = null;
 
+  @Emit('parts')
+  updateParts(parts: PersistentPart[]) {
+    return parts;
+  }
+
+  @Emit('part')
+  updatePart(part: PersistentPart) {
+    return part;
+  }
+
+  @Emit('state')
+  updatePartState(part: StatePart) {
+    return part;
+  }
+
+  @Emit('remove')
+  removePart(part: PersistentPart) {
+    return part;
+  }
+
   get widgetConfig(): ProcessViewConfig {
     return this.widget.config;
   }
@@ -77,22 +97,6 @@ export default class ProcessViewForm extends FormBase {
   gridRect(): Rect {
     const { x, y, left, right, top, bottom } = this.$refs.grid.getBoundingClientRect();
     return { x, y, left, right, top, bottom };
-  }
-
-  updateParts(parts: PersistentPart[]) {
-    this.$emit('parts', parts);
-  }
-
-  updatePart(part: PersistentPart) {
-    this.$emit('part', part);
-  }
-
-  updatePartState(part: StatePart) {
-    this.$emit('state', part);
-  }
-
-  removePart(part: PersistentPart) {
-    this.$emit('remove', part);
   }
 
   clearParts() {

@@ -11,7 +11,7 @@ export default class ProcessViewWizard extends WidgetWizardBase {
       id: this.widgetId,
       title: this.widgetTitle,
       feature: this.typeId,
-      dashboard: this.$props.dashboardId,
+      dashboard: this.dashboardId,
       order: 0,
       config: {
         parts: [],

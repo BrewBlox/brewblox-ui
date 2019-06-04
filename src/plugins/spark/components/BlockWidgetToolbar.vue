@@ -5,10 +5,12 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import sparkStore from '@/plugins/spark/store';
 
+import BlockWidget from './BlockWidget';
+
 @Component
 export default class BlockWidgetToolbar extends Vue {
   @Prop({ type: Object, required: true })
-  readonly field!: any;
+  readonly field!: BlockWidget;
 
   @Prop({ type: Boolean, default: false })
   readonly graph!: boolean;
@@ -71,7 +73,7 @@ export default class BlockWidgetToolbar extends Vue {
     <BlockGraph
       v-if="graphModalOpen"
       :value="graphModalOpen"
-      :id="field.widgetId"
+      :id="field.widget.id"
       :config="field.graphCfg"
       :change="v => field.graphCfg = v"
       @input="v => graphModalOpen = v"
@@ -90,14 +92,7 @@ export default class BlockWidgetToolbar extends Vue {
           <ActionItem icon="refresh" label="Refresh" @click="field.refreshBlock"/>
           <slot name="actions"/>
           <!-- Widget Actions -->
-          <q-expansion-item label="Widget Actions">
-            <q-list dark>
-              <slot name="widget-actions"/>
-              <ActionItem icon="file_copy" label="Copy to widget" @click="field.onCopy"/>
-              <ActionItem icon="exit_to_app" label="Move" @click="field.onMove"/>
-              <ActionItem icon="delete" label="Delete" @click="field.onDelete"/>
-            </q-list>
-          </q-expansion-item>
+          <WidgetActions :field="field"/>
           <!-- Block Actions -->
           <q-expansion-item label="Block Actions">
             <q-list dark>

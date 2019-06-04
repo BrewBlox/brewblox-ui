@@ -1,30 +1,23 @@
 <script lang="ts">
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
-@Component({
-  props: {
-    field: {
-      type: String,
-      required: false,
-    },
-    change: {
-      type: Function,
-      required: true,
-    },
-    label: {
-      type: String,
-      required: true,
-    },
-    tag: {
-      type: String,
-      default: 'big',
-    },
-  },
-})
+@Component
 export default class ColorPickerPopupEdit extends Vue {
   placeholder: string = '';
   active: boolean = false;
+
+  @Prop({ type: String, required: false })
+  readonly field!: string;
+
+  @Prop({ type: Function, required: true })
+  readonly change!: (val: string) => void;
+
+  @Prop({ type: String, required: false })
+  readonly label!: string;
+
+  @Prop({ type: String, default: 'big' })
+  readonly tag!: string;
 
   get value(): string {
     return this.active
@@ -37,11 +30,11 @@ export default class ColorPickerPopupEdit extends Vue {
   }
 
   get colorString() {
-    return this.$props.field || '<not set>';
+    return this.field || '<not set>';
   }
 
   get colorStyle() {
-    let color = this.$props.field || 'ffffff';
+    let color = this.field || 'ffffff';
     if (!color.startsWith('#')) {
       color = `#${color}`;
     }
@@ -57,18 +50,18 @@ export default class ColorPickerPopupEdit extends Vue {
   }
 
   save() {
-    this.$props.change(this.placeholder.replace('#', ''));
+    this.change(this.placeholder.replace('#', ''));
   }
 }
 </script>
 
 <template>
   <div>
-    <component :is="$props.tag" class="editable">{{ colorString }}</component>
-    <component :is="$props.tag" :style="colorStyle">[ ]</component>
+    <component :is="tag" class="editable">{{ colorString }}</component>
+    <component :is="tag" :style="colorStyle">[ ]</component>
     <q-popup-edit
       :disable="$attrs.disabled"
-      :title="$props.label"
+      :title="label"
       v-model="value"
       label-set="apply"
       buttons

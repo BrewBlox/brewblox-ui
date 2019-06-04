@@ -28,7 +28,7 @@ export default class StepViewWizard extends WidgetWizardBase {
       id: this.widgetId,
       title: this.widgetTitle,
       feature: this.typeId,
-      dashboard: this.$props.dashboardId,
+      dashboard: this.dashboardId,
       order: 0,
       config: {
         serviceId: this.serviceId,

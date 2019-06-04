@@ -9,7 +9,7 @@ const GAP_SIZE = 20;
 const MIN_COLS = 2;
 const MIN_ROWS = 2;
 
-interface Coordinates { x: number; y: number }
+interface Coordinates { x: number; y: number };
 
 @Component
 export default class GridItem extends Vue {
@@ -54,6 +54,10 @@ export default class GridItem extends Vue {
   currentRows: number | null = null;
   currentStartCols: number | null = null;
   currentStartRows: number | null = null;
+
+  get id(): string {
+    return this.widget.id;
+  }
 
   get style(): Record<string, string> {
     return {

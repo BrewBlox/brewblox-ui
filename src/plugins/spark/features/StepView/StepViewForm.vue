@@ -2,7 +2,7 @@
 
 import get from 'lodash/get';
 import { Dialog, uid } from 'quasar';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import FormBase from '@/components/Form/FormBase';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
@@ -24,19 +24,15 @@ interface StepDisplay extends Step {
   changes: BlockChangeDisplay[];
 }
 
-@Component({
-  props: {
-    openStep: {
-      type: String,
-      default: '',
-    },
-  },
-})
+@Component
 export default class StepViewForm extends FormBase {
   editableChanges: Record<string, boolean> = {};
 
+  @Prop({ type: String, default: '' })
+  readonly openStep!: string;
+
   get widgetConfig(): StepViewConfig {
-    return this.$props.field;
+    return this.widget.config;
   }
 
   get serviceId() {
@@ -207,7 +203,7 @@ export default class StepViewForm extends FormBase {
             v-for="step in steps"
             :label="step.name"
             :key="step.id"
-            :default-opened="$props.openStep === step.id"
+            :default-opened="openStep === step.id"
             group="steps"
             icon="mdi-format-list-checks"
           >

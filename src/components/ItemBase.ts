@@ -16,23 +16,15 @@ export default class ItemBase extends Vue {
     return widget;
   }
 
-  public get displayName(): string {
-    return featureStore.displayNameById(this.widget.feature);
-  }
-
   public saveConfig(config: any) {
     this.saveWidget({ ...this.widget, config });
   }
 
-  public copyWidget() {
-
+  public get displayName(): string {
+    return featureStore.displayNameById(this.widget.feature);
   }
 
-  public moveWidget() {
-
-  }
-
-  public deleteWidget() {
-
+  public get me(): ItemBase {
+    return this;
   }
 }

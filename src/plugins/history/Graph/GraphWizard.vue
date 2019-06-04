@@ -22,7 +22,7 @@ export default class GraphWizard extends WidgetWizardBase {
       title: this.widgetTitle,
       feature: this.typeId,
       order: 0,
-      dashboard: this.$props.dashboardId,
+      dashboard: this.dashboardId,
       config: this.graphCfg,
       ...this.defaultWidgetSize,
     });
@@ -42,7 +42,7 @@ export default class GraphWizard extends WidgetWizardBase {
         :id="widgetId"
         :type="typeId"
         :field="graphCfg"
-        :title="widgetTitle"
+        :title="widget.title"
         :on-change-field="v => graphCfg = v"
         :on-change-title="v => widgetTitle = v"
       />

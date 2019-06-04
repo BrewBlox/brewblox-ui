@@ -1,39 +1,34 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Emit, Prop } from 'vue-property-decorator';
 
-@Component({
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-    blockId: {
-      type: String,
-      required: true,
-    },
-    value: {
-      required: true,
-    },
-    editable: {
-      type: Boolean,
-      default: false,
-    },
-  },
-})
+@Component
 export default class ValEdit extends Vue {
+  @Prop({ type: String, required: true })
+  public readonly serviceId!: string;
+
+  @Prop({ type: String, required: true })
+  public readonly blockId!: string;
+
+  @Prop({ type: Boolean, default: false })
+  public readonly editable!: boolean;
+
+  @Prop({ required: true })
+  public readonly value!: any;
+
+  @Emit('input')
+  public saveField(val: any) {
+    return val;
+  }
+
   public get field() {
-    return this.$props.value;
+    return this.value;
   }
 
   public set field(val: any) {
-    this.$emit('input', val);
-  }
-
-  public saveField(val: any) {
-    this.$emit('input', val);
+    this.saveField(val);
   }
 
   public callAndSaveField(func: (v: any) => void) {
-    return (v: any) => { func(v); this.$emit('input', this.field); };
+    return (v: any) => { func(v); this.saveField(this.field); };
   }
 }

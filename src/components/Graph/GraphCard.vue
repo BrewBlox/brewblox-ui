@@ -3,7 +3,7 @@ import mapValues from 'lodash/mapValues';
 import { Layout, PlotData } from 'plotly.js';
 import { setTimeout } from 'timers';
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { defaultPresets } from '@/components/Graph/getters';
@@ -17,37 +17,28 @@ import { GraphConfig } from './types';
 interface Policies { [measurement: string]: string }
 
 @Component({
-  props: {
-    id: {
-      type: String,
-      required: true,
-    },
-    config: {
-      type: Object, // GraphConfig
-      default: () => ({}),
-    },
-    sharedListeners: {
-      type: Boolean,
-      default: false,
-    },
-  },
   components: {
     GraphDisplay,
   },
 })
 export default class GraphCard extends Vue {
-  revision: number = 0;
-  editing: boolean = false;
   $refs!: {
     display: any;
   }
+  revision: number = 0;
+  editing: boolean = false;
 
-  get graphCfg(): GraphConfig {
-    return this.$props.config;
-  }
+  @Prop({ type: String, required: true })
+  readonly id!: string;
+
+  @Prop({ type: Object, required: true })
+  readonly config!: GraphConfig;
+
+  @Prop({ type: Boolean, default: false })
+  readonly sharedListeners!: boolean;
 
   get params(): QueryParams {
-    return this.graphCfg.params || {};
+    return this.config.params || {};
   }
 
   get presets(): QueryParams[] {
@@ -55,19 +46,19 @@ export default class GraphCard extends Vue {
   }
 
   get targets(): QueryTarget[] {
-    return this.graphCfg.targets || [];
+    return this.config.targets || [];
   }
 
   get renames(): DisplayNames {
-    return this.graphCfg.renames || {};
+    return this.config.renames || {};
   }
 
   get axes(): GraphValueAxes {
-    return this.graphCfg.axes || {};
+    return this.config.axes || {};
   }
 
   listenerId(target: QueryTarget): string {
-    return `${this.$props.id}/${target.measurement}`;
+    return `${this.id}/${target.measurement}`;
   }
 
   get listeners(): GraphValuesListener[] {
@@ -90,7 +81,7 @@ export default class GraphCard extends Vue {
   }
 
   get graphLayout(): Partial<Layout> {
-    return this.graphCfg.layout;
+    return this.config.layout;
   }
 
   get policies(): Policies {
@@ -122,7 +113,7 @@ export default class GraphCard extends Vue {
   }
 
   mounted() {
-    if (!this.$props.sharedListeners) {
+    if (!this.sharedListeners) {
       this.addListeners();
     } else {
       this.$nextTick(() => this.refresh());
@@ -145,7 +136,7 @@ export default class GraphCard extends Vue {
   }
 
   destroyed() {
-    if (!this.$props.sharedListeners) {
+    if (!this.sharedListeners) {
       this.removeListeners();
     }
   }

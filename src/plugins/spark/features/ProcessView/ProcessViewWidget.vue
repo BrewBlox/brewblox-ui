@@ -128,11 +128,10 @@ export default class ProcessViewWidget extends WidgetBase {
       <ProcessViewForm
         v-if="formModalOpen"
         v-bind="$props"
-        :field="$props.config"
-        :on-change-field="saveConfig"
         :widget-grid-rect="widgetGridRect"
         :parts="parts"
         :flow-parts="flowParts"
+        @update:widget="saveWidget"
         @parts="updateParts"
         @part="updatePart"
         @state="updatePartState"
@@ -141,7 +140,7 @@ export default class ProcessViewWidget extends WidgetBase {
       />
     </q-dialog>
 
-    <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
+    <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
         <q-btn-dropdown
           flat
@@ -150,25 +149,8 @@ export default class ProcessViewWidget extends WidgetBase {
           @click="widgetGridRect = gridRect(); formModalOpen = true"
         >
           <q-list dark bordered>
-            <ActionItem
-              v-if="$props.onCopy"
-              icon="file_copy"
-              label="Copy widget"
-              @click="$props.onCopy(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onMove"
-              icon="exit_to_app"
-              label="Move widget"
-              @click="$props.onMove(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onDelete"
-              icon="delete"
-              label="Delete widget"
-              @click="$props.onDelete(widgetId)"
-            />
-            <ExportAction :widget-id="widgetId"/>
+            <ExportAction :widget-id="widget.id"/>
+            <WidgetActions :field="me"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

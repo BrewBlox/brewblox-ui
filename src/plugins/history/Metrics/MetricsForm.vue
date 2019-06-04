@@ -18,7 +18,14 @@ export default class MetricsForm extends FormBase {
   durationString = durationString;
 
   get config(): MetricsConfig {
-    return this.$props.field;
+    return {
+      targets: [],
+      renames: {},
+      params: {},
+      freshDuration: {},
+      decimals: {},
+      ...this.widget.config,
+    };
   }
 
   get selected(): string[] | null {

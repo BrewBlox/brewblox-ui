@@ -121,7 +121,7 @@ export default class MetricsWidget extends WidgetBase {
       <MetricsForm v-if="modalOpen" :widget="widget" @update:widget="saveWidget"/>
     </q-dialog>
 
-    <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
+    <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="modalOpen = true">
           <q-list dark bordered>

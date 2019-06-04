@@ -65,17 +65,16 @@ export default class StepViewWidget extends WidgetBase {
         v-if="modalOpen"
         v-bind="$props"
         :open-step="openStep"
-        :on-change-field="saveConfig"
+        @update:widget="saveWidget"
       />
     </q-dialog>
 
-    <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
+    <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="openModal">
           <q-list dark bordered>
-            <ActionItem icon="file_copy" label="Copy widget" @click="onCopy"/>
-            <ActionItem icon="exit_to_app" label="Move widget" @click="onMove"/>
-            <ActionItem icon="delete" label="Delete widget" @click="onDelete"/>
+            <ExportAction :widget-id="widget.id"/>
+            <WidgetActions :field="me"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

@@ -1,6 +1,6 @@
 import { uid } from 'quasar';
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { DashboardItem } from '@/store/dashboards';
 import dashboardStore from '@/store/dashboards';
@@ -12,24 +12,19 @@ export interface NavAction {
   enabled: Function;
 }
 
-@Component({
-  props: {
-    featureId: {
-      type: String,
-      required: true,
-    },
-    dashboardId: {
-      type: String,
-      required: false,
-    },
-  },
-})
+@Component
 export default class WidgetWizardBase extends Vue {
+  @Prop({ type: String, required: true })
+  public readonly featureId!: string;
+
+  @Prop({ type: String, required: false })
+  public readonly dashboardId!: string;
+
   protected widgetId: string = uid();
   protected widgetTitle: string = '';
 
   protected get typeId(): string {
-    return this.$props.featureId;
+    return this.featureId;
   }
 
   protected get typeDisplayName(): string {

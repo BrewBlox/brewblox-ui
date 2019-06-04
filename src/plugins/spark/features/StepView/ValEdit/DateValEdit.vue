@@ -1,20 +1,16 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import ValEdit from './ValEdit';
 
 
-@Component({
-  props: {
-    timeScale: {
-      type: Number,
-      default: 1,
-    },
-  },
-})
+@Component
 export default class DateValEdit extends ValEdit {
+  @Prop({ type: Number, default: 1 })
+  readonly timeScale!: number;
+
   get scaledField() {
-    return this.field * this.$props.timeScale;
+    return this.field * this.timeScale;
   }
 
   get displayVal() {
@@ -22,7 +18,7 @@ export default class DateValEdit extends ValEdit {
   }
 
   saveScaledField(val: number) {
-    this.saveField(val / this.$props.timeScale);
+    this.saveField(val / this.timeScale);
   }
 }
 </script>

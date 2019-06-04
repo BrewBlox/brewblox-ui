@@ -1,62 +1,52 @@
 <script lang="ts">
 import { date as qdate } from 'quasar';
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
-@Component({
-  props: {
-    field: {
-      type: [Number, String, Object],
-      required: false,
-    },
-    change: {
-      type: Function,
-      required: true,
-    },
-    label: {
-      type: String,
-      required: true,
-    },
-    tag: {
-      type: String,
-      default: 'span',
-    },
-    short: {
-      type: Boolean,
-      default: false,
-    },
-    resetIcon: {
-      type: String,
-      default: 'restore',
-    },
-    clearLabel: {
-      type: String,
-      default: '<not set>',
-    },
-  },
-})
+@Component
 export default class DatetimePopupEdit extends Vue {
   $refs!: {
     qDateProxy: any;
     qTimeProxy: any;
   }
 
+  @Prop({ type: [Number, String, Object], required: false })
+  readonly field!: number | string | Date;
+
+  @Prop({ type: Function, required: true })
+  readonly change!: (val: Date | null) => void;
+
+  @Prop({ type: String, required: false })
+  readonly label!: string;
+
+  @Prop({ type: String, default: 'span' })
+  readonly tag!: string;
+
+  @Prop({ type: Boolean, default: false })
+  readonly short!: boolean;
+
+  @Prop({ type: String, default: 'restore' })
+  readonly resetIcon!: string;
+
+  @Prop({ type: String, default: '<not set>' })
+  readonly clearLabel!: string;
+
   placeholder: Date | null = null;
   timePlaceholder = '';
   datePlaceholder = '';
 
   get dateString() {
-    if (!this.$props.field) {
-      return this.$props.clearLabel;
+    if (!this.field) {
+      return this.clearLabel;
     }
-    const date = new Date(this.$props.field);
-    return this.$props.short
+    const date = new Date(this.field);
+    return this.short
       ? date.toLocaleDateString()
       : date.toLocaleString();
   }
 
   startEdit() {
-    this.setDateValues(this.$props.field);
+    this.setDateValues(this.field);
   }
 
   setDateValues(v: any) {
@@ -69,7 +59,7 @@ export default class DatetimePopupEdit extends Vue {
     const [year, month, date] = this.datePlaceholder.split('/');
     const [hours, minutes] = this.timePlaceholder.split(':');
     this.placeholder = qdate.buildDate({ year, month, hours, minutes, date });
-    this.$props.change(this.placeholder);
+    this.change(this.placeholder);
   }
 
   closeDialog() {
@@ -81,10 +71,10 @@ export default class DatetimePopupEdit extends Vue {
 
 <template>
   <div>
-    <component :is="$props.tag" class="editable">{{ dateString }}</component>
+    <component :is="tag" class="editable">{{ dateString }}</component>
     <q-popup-edit
       :disable="$attrs.disabled"
-      :title="$props.label"
+      :title="label"
       v-model="placeholder"
       label-set="apply"
       buttons
@@ -124,7 +114,7 @@ export default class DatetimePopupEdit extends Vue {
       <q-item dark>
         <q-item-section>
           <q-btn
-            :icon="$props.resetIcon"
+            :icon="resetIcon"
             flat
             dense
             label="now"

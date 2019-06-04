@@ -110,9 +110,8 @@ export default class SessionViewWidget extends WidgetBase {
       <SessionViewForm
         v-if="modalOpen"
         v-bind="$props"
-        :field="widgetConfig"
-        :on-change-field="saveConfig"
         :active-session="modalSession"
+        @update:widget="saveWidget"
       />
     </q-dialog>
     <BlockGraph
@@ -122,16 +121,14 @@ export default class SessionViewWidget extends WidgetBase {
       :config="graphSession.graphCfg"
       :change="callAndSaveConfig(v => graphSession.graphCfg = v)"
       no-duration
-      @input="v => {if(!v) { graphSessionId = null; }}"
+      @input="v => {if(!v) graphSessionId = null;}"
     />
 
-    <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
+    <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="openModal()">
           <q-list dark bordered>
-            <ActionItem icon="file_copy" label="Copy widget" @click="onCopy"/>
-            <ActionItem icon="exit_to_app" label="Move widget" @click="onMove"/>
-            <ActionItem icon="delete" label="Delete widget" @click="onDelete"/>
+            <WidgetActions :field="me"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

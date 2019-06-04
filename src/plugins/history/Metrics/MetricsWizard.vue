@@ -23,7 +23,7 @@ export default class MetricsWizard extends WidgetWizardBase {
       title: this.widgetTitle,
       feature: this.typeId,
       order: 0,
-      dashboard: this.$props.dashboardId,
+      dashboard: this.dashboardId,
       config: this.metricsCfg,
       ...this.defaultWidgetSize,
     });
@@ -43,7 +43,7 @@ export default class MetricsWizard extends WidgetWizardBase {
         :id="widgetId"
         :type="typeId"
         :field="metricsCfg"
-        :title="widgetTitle"
+        :title="widget.title"
         :on-change-field="v => metricsCfg = v"
         :on-change-title="v => widgetTitle = v"
       />

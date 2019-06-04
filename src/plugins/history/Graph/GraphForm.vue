@@ -26,7 +26,14 @@ export default class GraphForm extends FormBase {
   period: PeriodDisplay | null = null;
 
   get config(): GraphConfig {
-    return this.widget.config;
+    return {
+      layout: {},
+      params: {},
+      targets: [],
+      renames: {},
+      axes: {},
+      ...this.widget.config,
+    };
   }
 
   get periodOptions() {
@@ -136,8 +143,7 @@ export default class GraphForm extends FormBase {
   }
 
   updateAxisSide(field: string, isRight: boolean) {
-    this.config.axes[field] = isRight ? 'y2' : 'y';
-    this.saveConfig(this.config);
+    this.saveConfig({ ...this.config, axes: { ...this.axes, [field]: isRight ? 'y2' : 'y' } });
   }
 
   created() {
