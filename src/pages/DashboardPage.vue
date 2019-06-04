@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Dialog,uid } from 'quasar';
+import { Dialog, uid } from 'quasar';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
@@ -51,23 +51,6 @@ export default class DashboardPage extends Vue {
       .sort(objectSorter('order'));
   }
 
-  itemProps(item: DashboardItem): any {
-    return {
-      id: item.id,
-      title: item.title,
-      type: item.feature,
-      pos: item.pinnedPosition,
-      cols: item.cols,
-      rows: item.rows,
-      config: item.config,
-      onChangeConfig: this.onChangeItemConfig,
-      onChangeTitle: this.onChangeItemTitle,
-      onDelete: this.onDeleteItem,
-      onCopy: this.onCopyItem,
-      onMove: this.onMoveItem,
-    };
-  }
-
   get validatedItems(): ValidatedItem[] {
     return this.items
       .map((item: DashboardItem) => {
@@ -93,8 +76,7 @@ export default class DashboardPage extends Vue {
             error: e.toString(),
           };
         }
-      })
-      .map(validated => ({ ...validated, props: this.itemProps(validated.item) }));
+      });
   }
 
   get isMobile(): boolean {
@@ -243,7 +225,7 @@ export default class DashboardPage extends Vue {
             <component
               :disabled="widgetEditable"
               :is="val.component"
-              v-bind="val.props"
+              :widget="val.item"
               class="dashboard-item"
             />
           </q-item-section>
@@ -260,7 +242,7 @@ export default class DashboardPage extends Vue {
           :disabled="widgetEditable"
           :is="val.component"
           :key="val.item.id"
-          v-bind="val.props"
+          :widget="val.item"
           class="dashboard-item"
         />
       </GridContainer>

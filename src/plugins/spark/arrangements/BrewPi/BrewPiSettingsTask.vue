@@ -1,6 +1,6 @@
 <script lang="ts">
 import { uid } from 'quasar';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { Link,Unit } from '@/helpers/units';

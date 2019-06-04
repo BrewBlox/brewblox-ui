@@ -1,31 +1,26 @@
 <script lang="ts">
 import { Dialog } from 'quasar';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import sparkStore from '@/plugins/spark/store';
 
-@Component({
-  props: {
-    field: {
-      type: Object,
-      required: true,
-    },
-    graph: {
-      type: Boolean,
-      default: false,
-    },
-  },
-})
+@Component
 export default class BlockWidgetToolbar extends Vue {
+  @Prop({ type: Object, required: true })
+  readonly field!: any;
+
+  @Prop({ type: Boolean, default: false })
+  readonly graph!: boolean;
+
   graphModalOpen: boolean = false;
 
   get blockId() {
-    return this.$props.field.blockId;
+    return this.field.blockId;
   }
 
   get block() {
-    return this.$props.field.block;
+    return this.field.block;
   }
 
   get blockOptions() {
@@ -46,7 +41,7 @@ export default class BlockWidgetToolbar extends Vue {
         type: 'text',
       },
     })
-      .onOk(this.$props.field.changeBlockId);
+      .onOk(this.field.changeBlockId);
   }
 
   chooseBlock() {
@@ -58,7 +53,7 @@ export default class BlockWidgetToolbar extends Vue {
       root: this.$root,
       serviceId: this.block.serviceId,
     })
-      .onOk(block => this.$props.field.switchBlockId(block.id));
+      .onOk(block => this.field.switchBlockId(block.id));
   }
 
   blockInfo() {
@@ -72,7 +67,7 @@ export default class BlockWidgetToolbar extends Vue {
 </script>
 
 <template>
-  <WidgetToolbar :title="field.widgetTitle" :subtitle="field.displayName">
+  <WidgetToolbar :title="field.widget.title" :subtitle="field.displayName">
     <BlockGraph
       v-if="graphModalOpen"
       :value="graphModalOpen"
@@ -98,24 +93,9 @@ export default class BlockWidgetToolbar extends Vue {
           <q-expansion-item label="Widget Actions">
             <q-list dark>
               <slot name="widget-actions"/>
-              <ActionItem
-                v-if="field.$props.onCopy"
-                icon="file_copy"
-                label="Copy to widget"
-                @click="field.$props.onCopy(field.widgetId)"
-              />
-              <ActionItem
-                v-if="field.$props.onMove"
-                icon="exit_to_app"
-                label="Move"
-                @click="field.$props.onMove(field.widgetId)"
-              />
-              <ActionItem
-                v-if="field.$props.onDelete"
-                icon="delete"
-                label="Delete"
-                @click="field.$props.onDelete(field.widgetId)"
-              />
+              <ActionItem icon="file_copy" label="Copy to widget" @click="field.onCopy"/>
+              <ActionItem icon="exit_to_app" label="Move" @click="field.onMove"/>
+              <ActionItem icon="delete" label="Delete" @click="field.onDelete"/>
             </q-list>
           </q-expansion-item>
           <!-- Block Actions -->

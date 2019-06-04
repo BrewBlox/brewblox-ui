@@ -2,7 +2,7 @@
 
 import get from 'lodash/get';
 import { Dialog, uid } from 'quasar';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import FormBase from '@/components/Form/FormBase';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
@@ -198,7 +198,7 @@ export default class StepViewForm extends FormBase {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
 
     <q-card-section>
       <div class="scroll-parent">

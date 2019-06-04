@@ -1,6 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { clampRotation } from '@/helpers/functional';
 import { partSettings } from '@/plugins/spark/features/ProcessView/calculateFlows';
@@ -9,20 +9,12 @@ import { FlowPart } from '@/plugins/spark/features/ProcessView/types';
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';
 
-@Component({
-  props: {
-    value: {
-      type: Object,
-      required: true,
-    },
-  },
-})
+@Component
 export default class ProcessViewPartMenu extends Vue {
   SQUARE_SIZE: number = SQUARE_SIZE; // make value accessible in template
 
-  get part(): FlowPart {
-    return this.$props.value;
-  }
+  @Prop({ type: Object, required: true })
+  readonly part!: FlowPart;
 
   get cards() {
     return [

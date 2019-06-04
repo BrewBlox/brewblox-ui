@@ -1,5 +1,5 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
@@ -14,16 +14,16 @@ export default class StepViewWidget extends WidgetBase {
   openStep: string = '';
 
   get serviceId() {
-    return this.$props.config.serviceId;
+    return this.widget.config.serviceId;
   }
 
   get steps(): Step[] {
-    return deserialize(this.$props.config.steps);
+    return deserialize(this.widget.config.steps);
   }
 
   set steps(steps: Step[]) {
     this.saveConfig({
-      ...this.$props.config,
+      ...this.widget.config,
       steps: serialize(steps),
     });
   }
@@ -64,7 +64,6 @@ export default class StepViewWidget extends WidgetBase {
       <StepViewForm
         v-if="modalOpen"
         v-bind="$props"
-        :field="$props.config"
         :open-step="openStep"
         :on-change-field="saveConfig"
       />
@@ -74,24 +73,9 @@ export default class StepViewWidget extends WidgetBase {
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="openModal">
           <q-list dark bordered>
-            <ActionItem
-              v-if="$props.onCopy"
-              icon="file_copy"
-              label="Copy widget"
-              @click="$props.onCopy(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onMove"
-              icon="exit_to_app"
-              label="Move widget"
-              @click="$props.onMove(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onDelete"
-              icon="delete"
-              label="Delete widget"
-              @click="$props.onDelete(widgetId)"
-            />
+            <ActionItem icon="file_copy" label="Copy widget" @click="onCopy"/>
+            <ActionItem icon="exit_to_app" label="Move widget" @click="onMove"/>
+            <ActionItem icon="delete" label="Delete widget" @click="onDelete"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

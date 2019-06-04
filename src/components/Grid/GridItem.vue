@@ -1,6 +1,8 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
+
+import { DashboardItem } from '@/store/dashboards';
 
 const GRID_SIZE = 100;
 const GAP_SIZE = 20;
@@ -9,69 +11,30 @@ const MIN_ROWS = 2;
 
 interface Coordinates { x: number; y: number }
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-@Component({
-  props: {
-    id: {
-      type: [String, Number],
-      required: true,
-    },
-    pos: {
-      type: Object,
-      required: false,
-    },
-    cols: {
-      type: Number,
-      default: MIN_COLS,
-    },
-    rows: {
-      type: Number,
-      default: MIN_ROWS,
-    },
-    editable: {
-      type: Boolean,
-      default: false,
-    },
-    noMove: {
-      type: Boolean,
-      default: false,
-    },
-    onStartInteraction: {
-      type: Function,
-      default: () => (id: string) => { },
-    },
-    onMoveInteraction: {
-      type: Function,
-      default: () => (pos: XYPosition) => { },
-    },
-    onStopInteraction: {
-      type: Function,
-      default: () => () => { },
-    },
-    onUpdateItemSize: {
-      type: Function,
-      default: () => (id: string, cols: number, rows: number) => { },
-    },
-    onUpdatePos: {
-      type: Function,
-      default: () => (id: string, pos: XYPosition | null) => { },
-    },
-    onDelete: {
-      type: Function,
-      required: false,
-    },
-    onCopy: {
-      type: Function,
-      required: false,
-    },
-    onMove: {
-      type: Function,
-      required: false,
-    },
-  },
-})
-/* eslint-enable */
+@Component
 export default class GridItem extends Vue {
+
+  @Prop({ type: Object, required: true })
+  readonly widget!: DashboardItem;
+
+  @Prop({ type: Boolean, default: false })
+  readonly editable!: boolean;
+
+  @Prop({ type: Function, default: () => () => { } })
+  readonly onStartInteraction!: (id: string) => void;
+
+  @Prop({ type: Function, default: () => () => { } })
+  readonly onMoveInteraction!: (pos: XYPosition) => void;
+
+  @Prop({ type: Function, default: () => () => { } })
+  readonly onStopInteraction!: () => void;
+
+  @Prop({ type: Function, default: () => () => { } })
+  readonly onUpdateItemSize!: (id: string, cols: number, rows: number) => void;
+
+  @Prop({ type: Function, default: () => () => { } })
+  readonly onUpdatePos!: (id: string, pos: XYPosition | null) => void;
+
   dragging: boolean = false;
   moving: boolean = false;
 
@@ -94,8 +57,8 @@ export default class GridItem extends Vue {
 
   get style(): Record<string, string> {
     return {
-      gridColumnEnd: `span ${this.currentCols || this.$props.cols}`,
-      gridRowEnd: `span ${this.currentRows || this.$props.rows}`,
+      gridColumnEnd: `span ${this.currentCols || this.widget.cols}`,
+      gridRowEnd: `span ${this.currentRows || this.widget.rows}`,
     };
   }
 
@@ -122,7 +85,7 @@ export default class GridItem extends Vue {
     this.dragStartHeight = height;
 
     // communicate start to parent
-    this.$props.onStartInteraction(this.$props.id);
+    this.onStartInteraction(this.widget.id);
   }
 
   stopInteraction() {
@@ -140,7 +103,7 @@ export default class GridItem extends Vue {
     this.dragStartParentY = 0;
 
     // communicate stop to parent
-    this.$props.onStopInteraction();
+    this.onStopInteraction();
   }
 
   updateSize() {
@@ -212,7 +175,7 @@ export default class GridItem extends Vue {
 
     const x = (((this.dragStartX + delta.x) - this.dragStartParentX) / (GRID_SIZE + GAP_SIZE)) + 1;
     const y = (((this.dragStartY + delta.y) - this.dragStartParentY) / (GRID_SIZE + GAP_SIZE)) + 1;
-    const cols = (this.currentCols || this.$props.cols) - 1;
+    const cols = (this.currentCols || this.widget.cols) - 1;
 
     return {
       x: Math.min(Math.max(Math.round(x), 1), this.gridWidth - cols),
@@ -227,7 +190,7 @@ export default class GridItem extends Vue {
     this.currentStartCols = position.x;
     this.currentStartRows = position.y;
 
-    this.$props.onMoveInteraction({ x: this.currentStartCols, y: this.currentStartRows });
+    this.onMoveInteraction({ x: this.currentStartCols, y: this.currentStartRows });
   }
 
   startDrag(e: MouseEvent | TouchEvent) {
@@ -251,15 +214,12 @@ export default class GridItem extends Vue {
 
   stopDrag() {
     this.moving = false;
-    this.$props.onUpdatePos(this.$props.id, { x: this.currentStartCols, y: this.currentStartRows });
+    const pos = { x: this.currentStartCols, y: this.currentStartRows };
+    this.onUpdatePos(this.widget.id, pos as XYPosition);
     this.stopInteraction();
   }
 
   resizePanHandler(args: PanArguments) {
-    if (this.$props.noMove) {
-      return;
-    }
-
     if (args.isFirst) {
       this.startResize(args.evt);
       return;
@@ -288,20 +248,16 @@ export default class GridItem extends Vue {
   stopResize() {
     this.dragging = false;
 
-    this.$props.onUpdateItemSize(
-      this.$props.id,
-      this.currentCols || this.$props.cols,
-      this.currentRows || this.$props.rows,
+    this.onUpdateItemSize(
+      this.widget.id,
+      this.currentCols || this.widget.cols,
+      this.currentRows || this.widget.rows,
     );
 
     this.stopInteraction();
   }
 
   movePanHandler(args: PanArguments) {
-    if (this.$props.noMove) {
-      return;
-    }
-
     if (args.isFirst) {
       this.startDrag(args.evt);
       return;
@@ -316,7 +272,7 @@ export default class GridItem extends Vue {
   }
 
   unpin() {
-    this.$props.onUpdatePos(this.$props.id, null);
+    this.onUpdatePos(this.widget.id, null);
   }
 
   pin() {
@@ -334,7 +290,7 @@ export default class GridItem extends Vue {
       y: ((touchY - parentY) / (GRID_SIZE + GAP_SIZE)) + 1,
     };
 
-    this.$props.onUpdatePos(this.$props.id, pos);
+    this.onUpdatePos(this.widget.id, pos);
   }
 }
 </script>
@@ -351,33 +307,25 @@ export default class GridItem extends Vue {
       class="grid-item-drag-overlay"
     />
     <!-- Item resize button -->
-    <button
-      v-touch-pan.mouse="resizePanHandler"
-      v-if="!$props.noMove && !$props.editable"
-      class="grid-item-resize-handle"
-    >
+    <button v-touch-pan.mouse="resizePanHandler" v-if="!editable" class="grid-item-resize-handle">
       <q-icon name="mdi-resize-bottom-right" size="30px"/>
     </button>
     <!-- Item drag button -->
     <button
       v-touch-pan.mouse="movePanHandler"
-      v-if="!dragging && $props.editable"
-      :class="{
-        ['grid-item-move-handle']: true,
-        ['grid-item-movable']: !$props.noMove,
-      }"
+      v-if="editable"
+      class="grid-item-move-handle grid-item-movable"
     >
       <div class="row">
-        <div v-if="!$props.noMove" class="column">
+        <div class="column">
           <q-icon name="mdi-gesture-swipe-horizontal" size="50px" class="shadowed"/>
           <p class="shadowed">drag</p>
         </div>
         <q-btn
-          v-if="!$props.noMove"
-          :icon="$props.pos ? 'mdi-pin-off' : 'mdi-pin'"
+          :icon="widget.pos ? 'mdi-pin-off' : 'mdi-pin'"
           fab
           color="primary"
-          @click="() => ($props.pos ? unpin : pin)()"
+          @click="() => (widget.pos ? unpin : pin)()"
         />
       </div>
     </button>

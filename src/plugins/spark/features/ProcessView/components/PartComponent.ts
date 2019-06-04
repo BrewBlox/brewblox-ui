@@ -1,11 +1,11 @@
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 
 import { SQUARE_SIZE } from '../getters';
 import partSettings from '../settings';
-import { CalculatedFlows,FlowPart } from '../types';
+import { CalculatedFlows, FlowPart } from '../types';
 
 @Component({
   props: {

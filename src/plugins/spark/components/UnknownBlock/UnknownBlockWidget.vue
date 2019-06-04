@@ -1,5 +1,5 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 import sparkStore from '@/plugins/spark/store';
@@ -15,18 +15,18 @@ export default class UnknownBlockWidget extends WidgetBase {
   modalOpen: boolean = false;
 
   get serviceId(): string {
-    return this.$props.config.serviceId;
+    return this.widget.config.serviceId;
   }
 
   get blockId(): string {
-    return this.$props.config.blockId;
+    return this.widget.config.blockId;
   }
 
   get block(): Block {
     return {
       id: this.blockId,
       serviceId: this.serviceId,
-      type: this.$props.type,
+      type: this.widget.feature,
       groups: [],
       data: {},
     };
@@ -72,7 +72,7 @@ export default class UnknownBlockWidget extends WidgetBase {
 <template>
   <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <UnknownBlockForm v-if="modalOpen" v-bind="formProps"/>
+      <UnknownBlockForm v-if="modalOpen" v-bind="$props" :block="block" @update:block="saveBlock"/>
     </q-dialog>
 
     <WidgetToolbar :title="widgetTitle" :subtitle="displayName">

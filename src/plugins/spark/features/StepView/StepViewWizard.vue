@@ -1,6 +1,6 @@
 <script lang="ts">
 import get from 'lodash/get';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 import serviceStore, { Service } from '@/store/services';

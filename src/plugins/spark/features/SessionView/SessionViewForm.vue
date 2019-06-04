@@ -1,6 +1,6 @@
 <script lang="ts">
 import shortid from 'shortid';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import FormBase from '@/components/Form/FormBase';
 import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
@@ -9,19 +9,16 @@ import { durationString } from '@/helpers/functional';
 import { Session, SessionViewConfig } from '@/plugins/spark/features/SessionView/types';
 import historyStore, { DisplayNames } from '@/store/history';
 
-@Component({
-  props: {
-    activeSession: {
-      default: null,
-    },
-  },
-})
+@Component
 export default class SessionViewForm extends FormBase {
   graphSessionId: string | null = null;
   sessionInput: string = '';
 
+  @Prop({ default: null })
+  readonly activeSession!: Session;
+
   get widgetConfig(): SessionViewConfig {
-    return this.$props.field;
+    return this.widget.config;
   }
 
   get sessions(): Session[] {
@@ -136,7 +133,7 @@ export default class SessionViewForm extends FormBase {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
     <BlockGraph
       v-if="graphModalOpen"
       v-model="graphModalOpen"
@@ -151,7 +148,7 @@ export default class SessionViewForm extends FormBase {
         v-for="session in sessions"
         :key="session.id"
         :label="`Session ${session.name}`"
-        :default-opened="$props.activeSession && $props.activeSession.id === session.id"
+        :default-opened="activeSession && activeSession.id === session.id"
         group="modal"
         icon="help"
       >

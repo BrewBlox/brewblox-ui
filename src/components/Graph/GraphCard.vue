@@ -3,7 +3,7 @@ import mapValues from 'lodash/mapValues';
 import { Layout, PlotData } from 'plotly.js';
 import { setTimeout } from 'timers';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { defaultPresets } from '@/components/Graph/getters';

@@ -1,6 +1,6 @@
 <script lang="ts">
 import get from 'lodash/get';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';

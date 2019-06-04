@@ -1,6 +1,6 @@
 import { uid } from 'quasar';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import { DashboardItem } from '@/store/dashboards';
 import dashboardStore from '@/store/dashboards';

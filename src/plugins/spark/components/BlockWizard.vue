@@ -1,7 +1,7 @@
 <script lang="ts">
 import isString from 'lodash/isString';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
 import sparkStore from '@/plugins/spark/store';

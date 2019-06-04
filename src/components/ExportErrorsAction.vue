@@ -1,7 +1,7 @@
 <script lang="ts">
 import FileSaver from 'file-saver';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import { getErrors as getDbErrors } from '@/helpers/database';
 import { getErrors as getFetchErrors } from '@/helpers/fetch';

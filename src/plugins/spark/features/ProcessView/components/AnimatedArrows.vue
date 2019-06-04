@@ -2,7 +2,7 @@
 /* eslint-disable vue/attribute-hyphenation */
 import { svgPathProperties } from 'svg-path-properties';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 @Component({
   props: {

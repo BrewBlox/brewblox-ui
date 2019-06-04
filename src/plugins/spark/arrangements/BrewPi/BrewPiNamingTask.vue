@@ -1,7 +1,7 @@
 <script lang="ts">
 import mapValues from 'lodash/mapValues';
 import UrlSafeString from 'url-safe-string';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { spaceCased, valOrDefault } from '@/helpers/functional';

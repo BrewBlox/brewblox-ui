@@ -1,16 +1,13 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { getById } from './getters';
 import { ActuatorAnalogMockBlock } from './types';
 
 @Component
 export default class ActuatorAnalogMockWidget extends BlockWidget {
-  get block(): ActuatorAnalogMockBlock {
-    return getById(this.serviceId, this.blockId);
-  }
+  block!: ActuatorAnalogMockBlock;
 
   get renamedTargets() {
     return {
@@ -24,7 +21,12 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
 <template>
   <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <ActuatorAnalogMockForm v-if="modalOpen" v-bind="formProps"/>
+      <ActuatorAnalogMockForm
+        v-if="modalOpen"
+        v-bind="$props"
+        :block="block"
+        @update:block="saveBlock"
+      />
     </q-dialog>
 
     <BlockWidgetToolbar :field="me" graph/>

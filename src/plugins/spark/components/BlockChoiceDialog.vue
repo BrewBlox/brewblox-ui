@@ -1,5 +1,5 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { objectStringSorter } from '@/helpers/functional';

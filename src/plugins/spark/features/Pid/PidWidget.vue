@@ -1,6 +1,6 @@
 <script lang="ts">
 import get from 'lodash/get';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import { Link, postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
@@ -9,7 +9,7 @@ import { BlockLink } from '@/plugins/spark/types';
 import featureStore from '@/store/features';
 
 import PidDisplay from './PidDisplay.vue';
-import { filters, getById, presets } from './getters';
+import { filters, presets } from './getters';
 import { PidBlock } from './types';
 
 @Component({
@@ -18,12 +18,9 @@ import { PidBlock } from './types';
   },
 })
 export default class PidWidget extends BlockWidget {
+  block!: PidBlock;
   inputFormOpen = false;
   relationsOpen = false;
-
-  get block(): PidBlock {
-    return getById(this.serviceId, this.blockId);
-  }
 
   get presets() {
     return presets();
@@ -110,7 +107,7 @@ export default class PidWidget extends BlockWidget {
 <template>
   <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <PidForm v-if="modalOpen" v-bind="formProps"/>
+      <PidForm v-if="modalOpen" v-bind="$props" :block="block" @update:block="saveBlock"/>
     </q-dialog>
     <q-dialog v-model="relationsOpen" no-backdrop-dismiss>
       <DagreDiagram

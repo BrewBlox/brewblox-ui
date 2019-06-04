@@ -1,5 +1,5 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import PartComponent from '../components/PartComponent';
 import { RIGHT } from '../getters';

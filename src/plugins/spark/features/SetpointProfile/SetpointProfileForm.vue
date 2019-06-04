@@ -1,9 +1,9 @@
 <script lang="ts">
 import parseDuration from 'parse-duration';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import { durationString, objectSorter } from '@/helpers/functional';
-import { Link,Unit } from '@/helpers/units';
+import { Link, Unit } from '@/helpers/units';
 import { SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import sparkStore from '@/plugins/spark/store';
@@ -21,9 +21,7 @@ export default class SetpointProfileForm extends BlockForm {
   durationString = durationString;
   parseDuration = parseDuration;
 
-  get block() {
-    return this.blockField as SetpointProfileBlock;
-  }
+  block!: SetpointProfileBlock;
 
   get tempUnit() {
     return sparkStore.units(this.block.serviceId).Temp;
@@ -163,7 +161,7 @@ export default class SetpointProfileForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <BlockEnableToggle
@@ -254,10 +252,6 @@ export default class SetpointProfileForm extends BlockForm {
             <q-btn flat icon="add" label="Add point" @click="addPoint"/>
           </q-item-section>
         </q-item>
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
       </q-expansion-item>
     </q-card-section>
   </q-card>

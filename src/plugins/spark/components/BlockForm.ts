@@ -1,33 +1,26 @@
-import Component from 'vue-class-component';
+import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import FormBase from '@/components/Form/FormBase';
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
-@Component({
-  props: {
-    onChangeBlockId: {
-      type: Function,
-      required: true,
-    },
-    onSwitchBlockId: {
-      type: Function,
-      required: false,
-    },
-  },
-})
+@Component
 export default class BlockForm extends FormBase {
-  public get blockField(): Block {
-    const propBlock: Block = this.$props.field;
-    const actualBlock: Block = { ...propBlock, data: propBlock.data || this.defaultData() };
-    if (!propBlock.data && actualBlock.data) {
-      this.$props.onChangeField(actualBlock);
-    }
-    return actualBlock;
+
+  @Prop({ type: Object, required: true })
+  public readonly block!: Block;
+
+  @Emit('update:block')
+  public saveBlock(block: Block = this.block): Block {
+    return block;
   }
 
-  public get block(): Block {
-    return this.blockField;
+  public get blockData(): any {
+    const actualBlock: Block = { ...this.block, data: this.block.data || this.defaultData() };
+    if (!this.block.data && actualBlock.data) {
+      this.saveBlock(actualBlock);
+    }
+    return actualBlock.data;
   }
 
   public get serviceId(): string {
@@ -45,10 +38,6 @@ export default class BlockForm extends FormBase {
 
   public defaultData(): Record<string, any> | null {
     return null;
-  }
-
-  public saveBlock(block: Block = this.block): void {
-    this.$props.onChangeField({ ...block });
   }
 
   public callAndSaveBlock(func: (v: any) => void): (v: any) => void {

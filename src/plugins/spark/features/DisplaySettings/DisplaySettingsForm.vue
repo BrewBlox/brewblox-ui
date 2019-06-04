@@ -1,5 +1,5 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
@@ -9,9 +9,7 @@ import sparkStore from '@/plugins/spark/store';
 
 @Component
 export default class DisplaySettingsForm extends BlockForm {
-  get block() {
-    return this.blockField as DisplaySettingsBlock;
-  }
+  block!: DisplaySettingsBlock;
 
   defaultData() {
     return {
@@ -114,7 +112,7 @@ export default class DisplaySettingsForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
 
     <q-expansion-item
       v-for="(slot, idx) in displaySlots"
@@ -184,10 +182,6 @@ export default class DisplaySettingsForm extends BlockForm {
           />
         </q-item-section>
       </q-item>
-    </q-expansion-item>
-
-    <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
-      <BlockSettings v-bind="$props" :presets-data="presets()"/>
     </q-expansion-item>
   </q-card>
 </template>

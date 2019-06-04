@@ -1,25 +1,9 @@
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import ItemBase from '../ItemBase';
 
-@Component({
-  props: {
-    field: {
-      type: Object,
-      required: true,
-    },
-    onChangeField: {
-      type: Function,
-      required: false,
-    },
-    embedded: {
-      type: Boolean,
-      default: false,
-    },
-  },
-})
+@Component
 export default class FormBase extends ItemBase {
-  protected async saveConfig(config: any): Promise<void> {
-    await this.$props.onChangeField(config);
-  }
+  @Prop({ type: Boolean, default: false })
+  public readonly embedded!: boolean;
 }

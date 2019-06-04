@@ -1,11 +1,15 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import featureStore from '@/store/features';
 
+import { InactiveObjectBlock } from './types';
+
 @Component
 export default class InactiveObjectWidget extends BlockWidget {
+  block!: InactiveObjectBlock;
+
   get actualDisplayName() {
     return featureStore.displayNameById(this.block.data.actualType);
   }
@@ -15,7 +19,12 @@ export default class InactiveObjectWidget extends BlockWidget {
 <template>
   <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <InactiveObjectForm v-if="modalOpen" v-bind="formProps"/>
+      <InactiveObjectForm
+        v-if="modalOpen"
+        v-bind="$props"
+        :block="block"
+        @update:block="saveBlock"
+      />
     </q-dialog>
 
     <BlockWidgetToolbar :field="me"/>

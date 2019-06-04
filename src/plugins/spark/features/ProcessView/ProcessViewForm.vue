@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Dialog,uid } from 'quasar';
-import Component from 'vue-class-component';
+import { Dialog, uid } from 'quasar';
+import { Component, Prop } from 'vue-property-decorator';
 
 import FormBase from '@/components/Form/FormBase';
 import { Coordinates } from '@/helpers/coordinates';
@@ -11,7 +11,7 @@ import ProcessViewCatalog from './ProcessViewCatalog.vue';
 import ProcessViewPartMenu from './ProcessViewPartMenu.vue';
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';
-import { ClickEvent, FlowPart, PartUpdater,PersistentPart, ProcessViewConfig, Rect, StatePart } from './types';
+import { ClickEvent, FlowPart, PartUpdater, PersistentPart, ProcessViewConfig, Rect, StatePart } from './types';
 
 interface DragAction {
   hide: boolean;
@@ -31,20 +31,6 @@ interface ToolAction {
 }
 
 @Component({
-  props: {
-    widgetGridRect: {
-      type: Object,
-      required: true,
-    },
-    parts: {
-      type: Array,
-      required: true,
-    },
-    flowParts: {
-      type: Array,
-      required: true,
-    },
-  },
   components: {
     ProcessViewCatalog,
     ProcessViewPartMenu,
@@ -58,6 +44,15 @@ export default class ProcessViewForm extends FormBase {
     grid: any;
   }
 
+  @Prop({ type: Object, required: true })
+  readonly widgetGridRect!: any;
+
+  @Prop({ type: Array, required: true })
+  readonly parts!: PersistentPart[];
+
+  @Prop({ type: Array, required: true })
+  readonly flowParts!: FlowPart[];
+
   menuModalOpen: boolean = false;
   catalogModalOpen: boolean = false;
 
@@ -66,16 +61,16 @@ export default class ProcessViewForm extends FormBase {
   catalogPartial: Partial<PersistentPart> | null = null;
 
   get widgetConfig(): ProcessViewConfig {
-    return this.$props.field;
+    return this.widget.config;
   }
 
   get gridHeight() {
-    const { top, bottom } = this.$props.widgetGridRect;
+    const { top, bottom } = this.widgetGridRect;
     return bottom - top;
   }
 
   get gridWidth() {
-    const { left, right } = this.$props.widgetGridRect;
+    const { left, right } = this.widgetGridRect;
     return right - left;
   }
 
@@ -197,7 +192,7 @@ export default class ProcessViewForm extends FormBase {
   }
 
   get configuredPart(): FlowPart | null {
-    return this.$props.flowParts.find(p => p.id === this.configuredPartId) || null;
+    return this.flowParts.find(p => p.id === this.configuredPartId) || null;
   }
 
   clickHandler(evt: ClickEvent, part: FlowPart) {
@@ -327,7 +322,7 @@ export default class ProcessViewForm extends FormBase {
 
     const toCoords: Coordinates[] = this.blockedByPart(to);
     const allBlockedCoords: Coordinates[] =
-      this.$props.parts
+      this.parts
         .filter(part => !from || part.id !== from.id)
         .reduce(
           (acc: Coordinates[], part: PersistentPart) => [...acc, ...this.blockedByPart(part)], []);
@@ -344,7 +339,7 @@ export default class ProcessViewForm extends FormBase {
         }
     }
 
-    await this.updateParts([...this.$props.parts.filter(p => !from || p.id !== from.id), to]);
+    await this.updateParts([...this.parts.filter(p => !from || p.id !== from.id), to]);
   }
 
   tryAddPart(part: PersistentPart) {
@@ -381,7 +376,7 @@ export default class ProcessViewForm extends FormBase {
 
 <template>
   <q-card dark class="maximized bg-dark">
-    <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
 
     <q-dialog v-model="menuModalOpen" no-backdrop-dismiss>
       <ProcessViewPartMenu

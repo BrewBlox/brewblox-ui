@@ -1,7 +1,7 @@
 <script lang="ts">
 import { date as qdate } from 'quasar';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 @Component({
   props: {

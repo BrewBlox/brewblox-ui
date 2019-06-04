@@ -1,7 +1,7 @@
 <script lang="ts">
 import get from 'lodash/get';
 import isString from 'lodash/isString';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 import { objectStringSorter } from '@/helpers/functional';

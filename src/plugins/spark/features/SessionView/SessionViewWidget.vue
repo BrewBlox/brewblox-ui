@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Dialog } from 'quasar';
 import shortid from 'shortid';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { shortDateString } from '@/helpers/functional';
@@ -17,7 +17,7 @@ export default class SessionViewWidget extends WidgetBase {
   sessionFilter: string = '';
 
   get widgetConfig(): SessionViewConfig {
-    return this.$props.config;
+    return this.widget.config;
   }
 
   get sessions(): Session[] {
@@ -129,24 +129,9 @@ export default class SessionViewWidget extends WidgetBase {
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="openModal()">
           <q-list dark bordered>
-            <ActionItem
-              v-if="$props.onCopy"
-              icon="file_copy"
-              label="Copy widget"
-              @click="$props.onCopy(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onMove"
-              icon="exit_to_app"
-              label="Move widget"
-              @click="$props.onMove(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onDelete"
-              icon="delete"
-              label="Delete widget"
-              @click="$props.onDelete(widgetId)"
-            />
+            <ActionItem icon="file_copy" label="Copy widget" @click="onCopy"/>
+            <ActionItem icon="exit_to_app" label="Move widget" @click="onMove"/>
+            <ActionItem icon="delete" label="Delete widget" @click="onDelete"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

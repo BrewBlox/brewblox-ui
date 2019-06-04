@@ -4,7 +4,7 @@ import { graphlib, render as dagreRender } from 'dagre-d3';
 import { saveSvgAsPng } from 'save-svg-as-png';
 import { setTimeout } from 'timers';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import sparkStore from '@/plugins/spark/store';

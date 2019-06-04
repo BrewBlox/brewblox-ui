@@ -2,7 +2,7 @@
 import { Dialog, uid } from 'quasar';
 import { clearTimeout, setInterval } from 'timers';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { capitalized, objectStringSorter } from '@/helpers/functional';
@@ -27,7 +27,6 @@ interface ValidatedItem {
   item: DashboardItem;
   typeName: string;
   role: FeatureRole;
-  props?: any;
   expanded: boolean;
 }
 
@@ -118,7 +117,7 @@ export default class SparkPage extends Vue {
   get allSorters(): { [id: string]: (a: ValidatedItem, b: ValidatedItem) => number } {
     return {
       unsorted: () => 0,
-      name: (a, b) => objectStringSorter('title')(a.props, b.props),
+      name: (a, b) => objectStringSorter('title')(a.item, b.item),
       type: (a: ValidatedItem, b: ValidatedItem): number => {
         const left = featureStore.displayNameById(a.item.feature).toLowerCase();
         const right = featureStore.displayNameById(b.item.feature).toLowerCase();
@@ -234,7 +233,6 @@ export default class SparkPage extends Vue {
       typeName: featureStore.displayNameById(item.feature),
       role: featureStore.roleById(item.feature),
       component: featureStore.widgetById(item.feature, item.config) || 'InvalidWidget',
-      props: this.itemProps(item),
       expanded: this.expandedBlocks[item.id] || false,
     };
   }
@@ -543,13 +541,13 @@ export default class SparkPage extends Vue {
           :class="['non-selectable', val.expanded ? 'text-primary' : 'text-white']"
           clickable
           dark
-          @click.native="updateExpandedBlock(val.props.id, !val.expanded)"
+          @click.native="updateExpandedBlock(val.item.id, !val.expanded)"
         >
           <q-item-section avatar>
             <q-icon :name="roleIcons[val.role]"/>
             <q-tooltip>{{ val.role }}</q-tooltip>
           </q-item-section>
-          <q-item-section>{{ val.props.title }}</q-item-section>
+          <q-item-section>{{ val.item.title }}</q-item-section>
           <q-item-section side>{{ val.typeName }}</q-item-section>
         </q-item>
       </q-list>
@@ -565,7 +563,7 @@ export default class SparkPage extends Vue {
         <!-- Blocks -->
         <q-item v-for="val in expandedItems" :key="val.key" dark>
           <q-item-section>
-            <component :is="val.component" v-bind="val.props" class="bg-dark"/>
+            <component :is="val.component" :widget="val.item" volatile class="bg-dark"/>
           </q-item-section>
         </q-item>
       </q-list>

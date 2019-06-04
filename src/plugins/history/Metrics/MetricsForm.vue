@@ -1,7 +1,7 @@
 <script lang="ts">
 import get from 'lodash/get';
 import parseDuration from 'parse-duration';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import FormBase from '@/components/Form/FormBase';
 import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
@@ -72,7 +72,7 @@ export default class MetricsForm extends FormBase {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="mdi-file-tree" label="Metrics">

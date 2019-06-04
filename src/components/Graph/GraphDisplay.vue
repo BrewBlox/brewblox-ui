@@ -2,7 +2,7 @@
 import merge from 'lodash/merge';
 import { Layout, PlotData } from 'plotly.js';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 Vue.component('PlotlyGraph', () => import('./PlotlyGraph'));
 

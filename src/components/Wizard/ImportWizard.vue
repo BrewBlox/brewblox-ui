@@ -2,7 +2,7 @@
 import get from 'lodash/get';
 import { uid } from 'quasar';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import { deserialize } from '@/helpers/units/parseObject';
 import dashboardStore from '@/store/dashboards';

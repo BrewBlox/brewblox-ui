@@ -1,6 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import { WiFiSettingsBlock } from '@/plugins/spark/provider/types';
 import sparkStore from '@/plugins/spark/store';

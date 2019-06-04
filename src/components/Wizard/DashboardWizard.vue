@@ -1,7 +1,7 @@
 <script lang="ts">
 import isString from 'lodash/isString';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import dashboardStore from '@/store/dashboards';
 import { Dashboard } from '@/store/dashboards';

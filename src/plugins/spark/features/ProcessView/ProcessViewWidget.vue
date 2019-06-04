@@ -1,6 +1,6 @@
 <script lang="ts">
-import { debounce,uid } from 'quasar';
-import Component from 'vue-class-component';
+import { debounce, uid } from 'quasar';
+import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { spaceCased } from '@/helpers/functional';
@@ -9,7 +9,7 @@ import ProcessViewCatalog from './ProcessViewCatalog.vue';
 import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';
-import { ClickEvent, FlowPart, PartUpdater,PersistentPart, ProcessViewConfig, Rect, StatePart } from './types';
+import { ClickEvent, FlowPart, PartUpdater, PersistentPart, ProcessViewConfig, Rect, StatePart } from './types';
 
 interface DragAction {
   hide: boolean;
@@ -49,7 +49,7 @@ export default class ProcessViewWidget extends WidgetBase {
   calculateFlowFunc: Function = () => { };
 
   get widgetConfig(): ProcessViewConfig {
-    return this.$props.config;
+    return this.widget.config;
   }
 
   async updateParts(parts: PersistentPart[]) {
