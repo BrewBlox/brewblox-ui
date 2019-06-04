@@ -161,7 +161,6 @@ export default class StepViewForm extends FormBase {
         return !!changeProps[block.type]
           && !step.changes.find(change => block.id === change.blockId);
       },
-      dark: true,
       root: this.$root,
       serviceId: this.serviceId,
     })

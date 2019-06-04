@@ -9,7 +9,7 @@ import { BlockLink } from '@/plugins/spark/types';
 import featureStore from '@/store/features';
 
 import PidDisplay from './PidDisplay.vue';
-import { filters, getById } from './getters';
+import { filters, getById, presets } from './getters';
 import { PidBlock } from './types';
 
 @Component({
@@ -23,6 +23,10 @@ export default class PidWidget extends BlockWidget {
 
   get block(): PidBlock {
     return getById(this.serviceId, this.blockId);
+  }
+
+  get presets() {
+    return presets();
   }
 
   get renamedTargets() {

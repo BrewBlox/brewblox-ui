@@ -1,7 +1,7 @@
 <script lang="ts">
-import Vue from 'vue';
 import Component from 'vue-class-component';
 
+import DialogBase from '@/components/DialogBase';
 import { objectStringSorter } from '@/helpers/functional';
 import sparkStore from '@/plugins/spark/store';
 
@@ -27,11 +27,7 @@ import { Block } from '../types';
     },
   },
 })
-export default class BlockChoiceDialog extends Vue {
-  $refs!: {
-    dialog: any;
-  }
-
+export default class BlockChoiceDialog extends DialogBase {
   block: Block | null = null
 
   get blockOpts() {
@@ -39,40 +35,6 @@ export default class BlockChoiceDialog extends Vue {
       .filter(this.$props.filter)
       .sort(objectStringSorter('id'));
   }
-
-  // following method is REQUIRED
-  // (don't change its name --> "show")
-  show() {
-    this.$refs.dialog.show();
-  }
-
-  // following method is REQUIRED
-  // (don't change its name --> "hide")
-  hide() {
-    this.$refs.dialog.hide();
-  }
-
-  onDialogHide() {
-    // required to be emitted
-    // when QDialog emits "hide" event
-    this.$emit('hide');
-  }
-
-  onOKClick() {
-    // on OK, it is REQUIRED to
-    // emit "ok" event (with optional payload)
-    // before hiding the QDialog
-    this.$emit('ok', this.block);
-
-    // then hiding dialog
-    this.hide();
-  }
-
-  onCancelClick() {
-    // we just need to hide dialog
-    this.hide();
-  }
-
 }
 </script>
 
@@ -99,8 +61,8 @@ export default class BlockChoiceDialog extends Vue {
         </q-select>
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn flat color="amber" label="Cancel" @click="onCancelClick"/>
-        <q-btn :disable="!block" flat color="amber" label="OK" @click="onOKClick"/>
+        <q-btn flat color="amber" label="Cancel" @click="onDialogCancel"/>
+        <q-btn :disable="!block" flat color="amber" label="OK" @click="onDialogOk(block)"/>
       </q-card-actions>
     </q-card>
   </q-dialog>
