@@ -1,12 +1,14 @@
 <script lang="ts">
-import PartCard from './PartCard';
+import get from 'lodash/get';
 import Component from 'vue-class-component';
-import serviceStore from '@/store/services';
+
+import { objectStringSorter } from '@/helpers/functional';
+import { Link } from '@/helpers/units';
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
-import { objectStringSorter } from '@/helpers/functional';
-import get from 'lodash/get';
-import { Link } from '@/helpers/units';
+import serviceStore from '@/store/services';
+
+import PartCard from './PartCard';
 
 @Component({
   props: {

@@ -1,8 +1,9 @@
 import Vue from 'vue';
+import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+
 import store from '@/store';
 import providerStore from '@/store/providers';
-import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
-import { Service } from './types';
+
 import {
   createService as createServiceInApi,
   deleteService as removeServiceInApi,
@@ -10,6 +11,15 @@ import {
   persistService as persistServiceInApi,
   setup as setupInApi,
 } from './api';
+
+export interface Service {
+  id: string;
+  title: string;
+  order: number;
+  type: string;
+  config: Record<string, any>;
+  _rev?: string;
+}
 
 const initService = async (service: Service): Promise<void> => {
   await providerStore.onAddById(service.type)(service);

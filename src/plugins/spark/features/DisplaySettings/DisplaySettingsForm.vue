@@ -1,10 +1,11 @@
 <script lang="ts">
-import BlockForm from '@/plugins/spark/components/BlockForm';
 import Component from 'vue-class-component';
-import sparkStore from '@/plugins/spark/store';
-import { DisplaySettingsBlock, DisplayWidget } from '@/plugins/spark/features/DisplaySettings/types';
+
 import { Link } from '@/helpers/units';
+import BlockForm from '@/plugins/spark/components/BlockForm';
 import { validDisplayTypes } from '@/plugins/spark/features/DisplaySettings/getters';
+import { DisplaySettingsBlock, DisplayWidget } from '@/plugins/spark/features/DisplaySettings/types';
+import sparkStore from '@/plugins/spark/store';
 
 @Component
 export default class DisplaySettingsForm extends BlockForm {

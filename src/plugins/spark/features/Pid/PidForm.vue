@@ -1,8 +1,10 @@
 <script lang="ts">
+import Component from 'vue-class-component';
+
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
-import Component from 'vue-class-component';
-import { filters, defaultData, presets } from './getters';
+
+import { defaultData, filters, presets } from './getters';
 
 @Component
 export default class PidForm extends BlockForm {

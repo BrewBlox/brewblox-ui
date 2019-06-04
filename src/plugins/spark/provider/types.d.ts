@@ -19,6 +19,14 @@ export interface GroupsBlock extends Block {
 export interface SysInfoBlock extends Block {
   data: {
     deviceId: string;
+    platform: number;
+    hardware: number;
+    voltage5: number;
+    voltage12: number;
+    version: string;
+    releaseDate: string;
+    protocolVersion: string;
+    protocolDate: string;
   };
 }
 

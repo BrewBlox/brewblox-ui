@@ -1,7 +1,8 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
+
 import { GraphConfig } from '@/components/Graph/types';
+import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 
 
 @Component

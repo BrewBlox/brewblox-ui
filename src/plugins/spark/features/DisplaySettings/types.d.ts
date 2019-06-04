@@ -1,5 +1,5 @@
-import { Block } from '@/plugins/spark/types';
 import { Link } from '@/helpers/units';
+import { Block } from '@/plugins/spark/types';
 
 export interface DisplayWidget {
   pos: number;

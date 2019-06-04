@@ -1,11 +1,13 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import PartComponent from '../components/PartComponent';
-import sparkStore from '@/plugins/spark/store';
-import { RIGHT } from '../getters';
-import { Link } from '@/helpers/units';
-import { Block } from '@/plugins/spark/types';
 import { Watch } from 'vue-property-decorator';
+
+import { Link } from '@/helpers/units';
+import sparkStore from '@/plugins/spark/store';
+import { Block } from '@/plugins/spark/types';
+
+import PartComponent from '../components/PartComponent';
+import { RIGHT } from '../getters';
 
 @Component
 export default class ActuatorValve extends PartComponent {

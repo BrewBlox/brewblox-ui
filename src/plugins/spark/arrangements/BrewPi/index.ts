@@ -1,9 +1,10 @@
 import { ref } from '@/helpers/component-ref';
-import { Arrangement } from '@/store/features/types';
-import BrewPiWizard from './BrewPiWizard.vue';
-import BrewPiNamingTask from './BrewPiNamingTask.vue';
+import { Arrangement } from '@/store/features';
+
 import BrewPiHardwareTask from './BrewPiHardwareTask.vue';
+import BrewPiNamingTask from './BrewPiNamingTask.vue';
 import BrewPiSettingsTask from './BrewPiSettingsTask.vue';
+import BrewPiWizard from './BrewPiWizard.vue';
 
 ref(BrewPiNamingTask);
 ref(BrewPiHardwareTask);

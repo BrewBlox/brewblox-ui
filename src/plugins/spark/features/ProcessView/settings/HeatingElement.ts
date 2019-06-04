@@ -1,7 +1,8 @@
-import { ComponentSettings, PersistentPart } from '../types';
-import { defaultSettings } from '../getters';
 import { Coordinates, CoordinatesParam } from '@/helpers/coordinates';
+
+import { defaultSettings } from '../getters';
 import { subSquares } from '../helpers/functional';
+import { ComponentSettings, PersistentPart } from '../types';
 
 const BLOCKED: CoordinatesParam[] = [
   [0, 0, 0],

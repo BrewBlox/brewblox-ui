@@ -1,8 +1,8 @@
 <script lang="ts">
 /* eslint-disable vue/attribute-hyphenation */
+import { svgPathProperties } from 'svg-path-properties';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { svgPathProperties } from 'svg-path-properties';
 
 @Component({
   props: {

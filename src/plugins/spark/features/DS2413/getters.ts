@@ -1,4 +1,5 @@
 import sparkStore from '@/plugins/spark/store';
+
 import { DS2413Block } from './types';
 
 export const typeName = 'DS2413';

@@ -1,23 +1,24 @@
 <script lang="ts">
-import Component from 'vue-class-component';
-import dashboardStore from '@/store/dashboards';
-import featureStore from '@/store/features';
-import sparkStore from '@/plugins/spark/store';
 import { uid } from 'quasar';
+import Component from 'vue-class-component';
+
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
-import { Unit, Link } from '@/helpers/units';
+import { Link,Unit } from '@/helpers/units';
+import { typeName as graphType } from '@/plugins/history/Graph/getters';
 import { BrewPiConfig } from '@/plugins/spark/arrangements/BrewPi/types';
-import { typeName as spProfileType } from '@/plugins/spark/features/SetpointProfile/getters';
-import { typeName as pairType } from '@/plugins/spark/features/SetpointSensorPair/getters';
+import { typeName as offsetType } from '@/plugins/spark/features/ActuatorOffset/getters';
 import { typeName as pwmType } from '@/plugins/spark/features/ActuatorPwm/getters';
 import { typeName as mutexType } from '@/plugins/spark/features/Mutex/getters';
-import { typeName as offsetType } from '@/plugins/spark/features/ActuatorOffset/getters';
-import { typeName as graphType } from '@/plugins/history/Graph/getters';
 import {
-  typeName as pidType,
   defaultData as pidData,
+  typeName as pidType,
 } from '@/plugins/spark/features/Pid/getters';
-import { Dashboard } from '@/store/dashboards/types';
+import { typeName as spProfileType } from '@/plugins/spark/features/SetpointProfile/getters';
+import { typeName as pairType } from '@/plugins/spark/features/SetpointSensorPair/getters';
+import sparkStore from '@/plugins/spark/store';
+import dashboardStore from '@/store/dashboards';
+import { Dashboard } from '@/store/dashboards';
+import featureStore from '@/store/features';
 
 @Component
 export default class BrewPiSettingsTask extends WizardTaskBase {

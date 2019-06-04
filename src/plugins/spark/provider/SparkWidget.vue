@@ -1,10 +1,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import serviceStore from '@/store/services';
+
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
-import { sysInfoType, ticksType, wifiType, isReady } from './getters';
+import serviceStore from '@/store/services';
+
+import { isReady, sysInfoType, ticksType, wifiType } from './getters';
 import { SysInfoBlock, TicksBlock, WiFiSettingsBlock } from './types';
 
 @Component({
@@ -83,12 +85,12 @@ export default class SparkWidget extends Vue {
       <q-list>
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>Version</q-item-label>
+            <q-item-label caption>Firmware version</q-item-label>
             <span>{{ sysInfo.data.version }}</span>
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>IP address</q-item-label>
-            <span>{{ wifi.data.ip }}</span>
+            <q-item-label caption>Firmware release date</q-item-label>
+            <span>{{ sysInfo.data.releaseDate }}</span>
           </q-item-section>
         </q-item>
         <q-item dark>
@@ -105,6 +107,10 @@ export default class SparkWidget extends Vue {
           <q-item-section>
             <q-item-label caption>Device ID</q-item-label>
             <span style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</span>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>IP address</q-item-label>
+            <span>{{ wifi.data.ip }}</span>
           </q-item-section>
         </q-item>
       </q-list>

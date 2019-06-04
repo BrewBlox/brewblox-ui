@@ -1,7 +1,8 @@
+import queryString from 'query-string';
+
 import { get, post, sse } from '@/helpers/fetch';
 import { snakeCased } from '@/helpers/functional';
-import { QueryParams, QueryTarget } from '@/store/history/types';
-import queryString from 'query-string';
+import { QueryParams, QueryTarget } from '@/store/history';
 
 const snakeCasedObj =
   (obj: Record<string, any>): Record<string, any> =>

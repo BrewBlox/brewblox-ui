@@ -1,14 +1,15 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import get from 'lodash/get';
 import isString from 'lodash/isString';
+import Component from 'vue-class-component';
+
+import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
+import { objectStringSorter } from '@/helpers/functional';
+import sparkStore from '@/plugins/spark/store';
+import { Block } from '@/plugins/spark/types';
 import featureStore from '@/store/features';
 import serviceStore from '@/store/services';
-import sparkStore from '@/plugins/spark/store';
-import get from 'lodash/get';
-import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
-import { Block } from '@/plugins/spark/types';
-import { Service } from '@/store/services/types';
-import { objectStringSorter } from '@/helpers/functional';
+import { Service } from '@/store/services';
 
 @Component
 export default class BlockWidgetWizard extends WidgetWizardBase {
@@ -28,7 +29,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
       v => !!v || 'Name must not be empty',
       v => !sparkStore.blockIds(this.serviceId).includes(v) || 'Name must be unique',
       v => v.match(/^[a-zA-Z]/) || 'Name must start with a letter',
-      v => v.match(/^[a-zA-Z0-9 \(\)_-\|]*$/) || 'Name may only contain letters, numbers, spaces, and ()-_|',
+      v => v.match(/^[a-zA-Z0-9 \(\)_\-\|]*$/) || 'Name may only contain letters, numbers, spaces, and ()-_|',
       v => v.length < 200 || 'Name must be less than 200 characters',
     ];
   }

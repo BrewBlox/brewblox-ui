@@ -1,8 +1,10 @@
 <script lang="ts">
-import BlockForm from '@/plugins/spark/components/BlockForm';
 import Component from 'vue-class-component';
+
 import { DS2413Link } from '@/helpers/units/KnownLinks';
+import BlockForm from '@/plugins/spark/components/BlockForm';
 import { ActuatorDS2413Block } from '@/plugins/spark/features/ActuatorDS2413/types';
+
 import { channel } from './getters';
 
 @Component

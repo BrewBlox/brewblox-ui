@@ -1,9 +1,11 @@
 <script lang="ts">
-import Component from 'vue-class-component';
-import PartComponent from '../components/PartComponent';
-import sparkStore from '@/plugins/spark/store';
 import get from 'lodash/get';
+import Component from 'vue-class-component';
+
 import { Link } from '@/helpers/units';
+import sparkStore from '@/plugins/spark/store';
+
+import PartComponent from '../components/PartComponent';
 
 @Component
 export default class HeatingElement extends PartComponent {

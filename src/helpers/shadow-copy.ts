@@ -1,6 +1,7 @@
-import { deserialize, serialize } from '@/helpers/units/parseObject';
 import get from 'lodash/get';
 import set from 'lodash/set';
+
+import { deserialize, serialize } from '@/helpers/units/parseObject';
 
 /**
  * Use ShadowMapping to bind sources of values to inputs used in the component.

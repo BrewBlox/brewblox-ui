@@ -1,6 +1,8 @@
 <script lang="ts">
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import Component from 'vue-class-component';
+
+import BlockWidget from '@/plugins/spark/components/BlockWidget';
+
 import { getById } from './getters';
 import { ActuatorDS2413Block } from './types';
 

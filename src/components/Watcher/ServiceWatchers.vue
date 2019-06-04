@@ -1,6 +1,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+
 import providerStore from '@/store/providers';
 import serviceStore from '@/store/services';
 

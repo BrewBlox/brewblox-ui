@@ -1,18 +1,20 @@
 <script lang="ts">
 import Component from 'vue-class-component';
-import WidgetBase from '@/components/Widget/WidgetBase';
-import { GraphConfig } from '@/components/Graph/types';
-import { defaultPresets } from '@/components/Graph/getters';
 import { Watch } from 'vue-property-decorator';
-import { QueryParams } from '@/store/history/types';
+
+import { defaultPresets } from '@/components/Graph/getters';
+import { GraphConfig } from '@/components/Graph/types';
+import WidgetBase from '@/components/Widget/WidgetBase';
+import { QueryParams } from '@/store/history';
 
 @Component
 export default class GraphWidget extends WidgetBase {
-  settingsModalOpen: boolean = false;
-  graphModalOpen: boolean = false;
   $refs!: {
     widgetGraph: any;
   }
+  settingsModalOpen: boolean = false;
+  graphModalOpen: boolean = false;
+  downsampling: any = {};
 
   get graphCfg(): GraphConfig {
     return {
@@ -61,6 +63,7 @@ export default class GraphWidget extends WidgetBase {
         v-bind="$props"
         :field="graphCfg"
         :on-change-field="saveConfig"
+        :downsampling="downsampling"
       />
     </q-dialog>
 
@@ -134,7 +137,12 @@ export default class GraphWidget extends WidgetBase {
     </WidgetToolbar>
 
     <div class="col">
-      <GraphCard ref="widgetGraph" :id="$props.id" :config="graphCfg"/>
+      <GraphCard
+        ref="widgetGraph"
+        :id="$props.id"
+        :config="graphCfg"
+        @downsample="v => downsampling = v"
+      />
     </div>
   </q-card>
 </template>

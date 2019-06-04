@@ -1,7 +1,8 @@
 <script lang="ts">
-import BlockForm from '@/plugins/spark/components/BlockForm';
 import Component from 'vue-class-component';
+
 import { Unit } from '@/helpers/units';
+import BlockForm from '@/plugins/spark/components/BlockForm';
 
 @Component
 export default class MutexForm extends BlockForm {

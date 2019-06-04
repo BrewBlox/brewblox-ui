@@ -1,14 +1,20 @@
 <script lang="ts">
+import mapValues from 'lodash/mapValues';
+import { Layout, PlotData } from 'plotly.js';
+import { setTimeout } from 'timers';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import historyStore from '@/store/history';
+import { Watch } from 'vue-property-decorator';
+
 import { defaultPresets } from '@/components/Graph/getters';
-import { DisplayNames, Listener, QueryParams, QueryTarget, GraphValueAxes } from '@/store/history/types';
-import { Layout, PlotData } from 'plotly.js';
-import { addPlotlyListener } from './actions';
+import historyStore from '@/store/history';
+import { DisplayNames, GraphValueAxes, GraphValuesListener, QueryParams, QueryTarget } from '@/store/history';
+
 import GraphDisplay from './GraphDisplay.vue';
+import { addPlotlyListener } from './actions';
 import { GraphConfig } from './types';
-import { setTimeout } from 'timers';
+
+interface Policies { [measurement: string]: string }
 
 @Component({
   props: {
@@ -64,10 +70,10 @@ export default class GraphCard extends Vue {
     return `${this.$props.id}/${target.measurement}`;
   }
 
-  get listeners(): Listener[] {
+  get listeners(): GraphValuesListener[] {
     return this.targets
       .map(target => historyStore.tryListenerById(this.listenerId(target)))
-      .filter(listener => listener !== null) as Listener[];
+      .filter(listener => listener !== null) as GraphValuesListener[];
   }
 
   get error() {
@@ -85,6 +91,11 @@ export default class GraphCard extends Vue {
 
   get graphLayout(): Partial<Layout> {
     return this.graphCfg.layout;
+  }
+
+  get policies(): Policies {
+    return this.listeners
+      .reduce((acc, listener) => ({ ...acc, [listener.target.measurement]: listener.usedPolicy || 'No data' }), {});
   }
 
   addListeners() {
@@ -120,6 +131,17 @@ export default class GraphCard extends Vue {
     // The next re-render might take minutes or seconds, depending on the graph data
     // This is the brute force approach to rectifying the problem quickly if it shows
     setTimeout(() => this.refresh(), 1000);
+  }
+
+  @Watch('policies', { immediate: true })
+  publishDownsamplingRate(newVal: Policies, oldVal: Policies) {
+    if (newVal && JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
+      const downsampling = mapValues(newVal, policy =>
+        policy
+          .replace(/autogen/, 'No averaging')
+          .replace(/downsample_/, ''));
+      this.$emit('downsample', downsampling);
+    }
   }
 
   destroyed() {

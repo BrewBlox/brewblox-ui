@@ -47,6 +47,8 @@ services:
       - "traefik.frontend.rule=PathPrefix: /sparkey"
     command: >
       --name=sparkey
+      --device-host=sparksimulator
+
   valves:
     image: brewblox/brewblox-serial:feature-serial
     privileged: true

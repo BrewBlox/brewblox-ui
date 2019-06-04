@@ -1,12 +1,14 @@
 <script lang="ts">
-import Component from 'vue-class-component';
-import sparkStore from '@/plugins/spark/store';
-import { durationString, objectSorter } from '@/helpers/functional';
-import { Unit, Link } from '@/helpers/units';
-import BlockForm from '@/plugins/spark/components/BlockForm';
 import parseDuration from 'parse-duration';
-import { Setpoint, SetpointProfileBlock } from './types';
+import Component from 'vue-class-component';
+
+import { durationString, objectSorter } from '@/helpers/functional';
+import { Link,Unit } from '@/helpers/units';
 import { SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
+import BlockForm from '@/plugins/spark/components/BlockForm';
+import sparkStore from '@/plugins/spark/store';
+
+import { Setpoint, SetpointProfileBlock } from './types';
 
 interface DisplaySetpoint {
   offsetMs: number;

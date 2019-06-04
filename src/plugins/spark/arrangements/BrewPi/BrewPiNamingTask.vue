@@ -1,13 +1,14 @@
 <script lang="ts">
+import mapValues from 'lodash/mapValues';
 import UrlSafeString from 'url-safe-string';
 import Component from 'vue-class-component';
+
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
-import serviceStore from '@/store/services';
-import sparkStore from '@/plugins/spark/store';
-import { typeName } from '@/plugins/spark/getters';
-import { BrewPiConfig, BrewPiConfigNames } from '@/plugins/spark/arrangements/BrewPi/types';
 import { spaceCased, valOrDefault } from '@/helpers/functional';
-import mapValues from 'lodash/mapValues';
+import { BrewPiConfig, BrewPiConfigNames } from '@/plugins/spark/arrangements/BrewPi/types';
+import { typeName } from '@/plugins/spark/getters';
+import sparkStore from '@/plugins/spark/store';
+import serviceStore from '@/store/services';
 
 
 @Component

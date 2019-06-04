@@ -1,23 +1,27 @@
 import Vue from 'vue';
-import providerStore from '@/store/providers';
+
 import { autoRegister } from '@/helpers/component-ref';
-import featureStore from '@/store/features';
-import sparkStore from '@/plugins/spark/store';
 import {
   base64ToHex,
+  dateString,
   durationString,
   hexToBase64,
-  unitDurationString,
-  shortDateString,
-  dateString,
   round,
+  shortDateString,
   truncate,
+  unitDurationString,
 } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
-import { Service } from '@/store/services/types';
-import features from './features';
-import arrangements from './arrangements';
+import sparkStore from '@/plugins/spark/store';
+import featureStore from '@/store/features';
+import providerStore from '@/store/providers';
+import { Service } from '@/store/services';
 
+import arrangements from './arrangements';
+import features from './features';
+
+autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
+autoRegister(require.context('./provider', true, /[A-Z]\w+\.vue$/));
 
 const onAdd = async (service: Service): Promise<void> => {
   await sparkStore.addService(service.id);
@@ -37,9 +41,6 @@ const onRemove = async (service: Service): Promise<void> => {
 };
 
 export default () => {
-  autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
-  autoRegister(require.context('./provider', true, /[A-Z]\w+\.vue$/));
-
   Vue.filter(
     'unit',
     (value: Unit | null) =>

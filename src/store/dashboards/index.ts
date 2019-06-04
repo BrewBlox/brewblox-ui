@@ -1,7 +1,8 @@
 import Vue from 'vue';
+import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+
 import store from '@/store';
-import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
-import { Dashboard, DashboardItem } from './types';
+
 import {
   createDashboard as createDashboardInApi,
   createDashboardItem as createDashboardItemInApi,
@@ -11,9 +12,30 @@ import {
   fetchDashboards as fetchDashboardsInApi,
   persistDashboard as persistDashboardInApi,
   persistDashboardItem as persistDashboardItemInApi,
-  setupDashboards as setupDashboardsInApi,
   setupDashboardItems as setupDashboardItemsInApi,
+  setupDashboards as setupDashboardsInApi,
 } from './api';
+
+export interface Dashboard {
+  id: string;
+  title: string;
+  order: number;
+  primary?: boolean;
+  _rev?: string;
+}
+
+export interface DashboardItem {
+  id: string;
+  title: string;
+  cols: number;
+  rows: number;
+  order: number;
+  dashboard: string;
+  feature: string;
+  config: any;
+  pinnedPosition?: XYPosition | null;
+  _rev?: string;
+}
 
 @Module({ store, namespaced: true, dynamic: true, name: 'dashboards' })
 export class DashboardModule extends VuexModule {
