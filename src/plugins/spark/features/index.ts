@@ -15,6 +15,7 @@ import ProcessView from './ProcessView';
 import SessionView from './SessionView';
 import SetpointProfile from './SetpointProfile';
 import SetpointSensorPair from './SetpointSensorPair';
+import StepView from './StepView';
 import TempSensorMock from './TempSensorMock';
 import TempSensorOneWire from './TempSensorOneWire';
 
@@ -32,6 +33,7 @@ const features: { [id: string]: Feature } = {
   Mutex,
   SetpointProfile,
   SetpointSensorPair,
+  StepView,
   ProcessView,
   TempSensorMock,
   TempSensorOneWire,

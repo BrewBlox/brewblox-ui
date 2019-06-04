@@ -1,4 +1,4 @@
-const prettify = (v: string): string =>
+export const prettify = (v: string): string =>
   v.replace(/delta_/g, '')
     .replace(/(celsius|degC(elsius)?)/gi, '°C')
     .replace(/(fahrenheit|degF(ahrenheit)?)/gi, '°F')
