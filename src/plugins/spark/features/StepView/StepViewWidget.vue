@@ -92,6 +92,7 @@ export default class StepViewWidget extends WidgetBase {
               label="Delete widget"
               @click="$props.onDelete(widgetId)"
             />
+            <ExportAction :widget-id="widgetId"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>
