@@ -8,7 +8,6 @@ import { MetricsConfig } from './types';
 
 @Component
 export default class MetricsWizard extends WidgetWizardBase {
-  modalOpen: boolean = false;
   metricsCfg: MetricsConfig = {
     targets: [],
     renames: {},
@@ -37,18 +36,6 @@ export default class MetricsWizard extends WidgetWizardBase {
 
 <template>
   <div>
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <MetricsForm
-        v-if="modalOpen"
-        :id="widgetId"
-        :type="typeId"
-        :field="metricsCfg"
-        :title="widget.title"
-        :on-change-field="v => metricsCfg = v"
-        :on-change-title="v => widgetTitle = v"
-      />
-    </q-dialog>
-
     <q-card-section>
       <q-item dark>
         <q-item-section>
@@ -59,16 +46,7 @@ export default class MetricsWizard extends WidgetWizardBase {
 
     <q-card-actions class="row justify-between">
       <q-btn unelevated label="Back" @click="back"/>
-      <div class="row">
-        <q-btn
-          unelevated
-          label="Configure"
-          color="primary"
-          class="q-mx-md"
-          @click="modalOpen = true"
-        />
-        <q-btn unelevated label="Create" color="primary" @click="createWidget"/>
-      </div>
+      <q-btn unelevated label="Create" color="primary" @click="createWidget"/>
     </q-card-actions>
   </div>
 </template>

@@ -126,9 +126,7 @@ export default class MetricsWidget extends WidgetBase {
         <q-btn-dropdown flat split icon="settings" @click="modalOpen = true">
           <q-list dark bordered>
             <ActionItem icon="refresh" label="Refresh" @click="resetListeners"/>
-            <ActionItem icon="file_copy" label="Copy widget" @click="copyWidget"/>
-            <ActionItem icon="exit_to_app" label="Move widget" @click="moveWidget"/>
-            <ActionItem icon="delete" label="Delete widget" @click="deleteWidget"/>
+            <WidgetActions :field="me"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

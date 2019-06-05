@@ -67,9 +67,12 @@ export default class ExampleFeatureWidget extends WidgetBase {
   <q-card dark class="text-white scroll">
     <!-- displayName is inherited from ItemBase. The value is defined in the Feature definition (./index.ts) -->
     <WidgetToolbar :title="widget.title" :subtitle="displayName">
-      <q-item-section side>
-        <q-btn flat round icon="mdi-message-alert" @click="alert"/>
-      </q-item-section>
+      <q-btn-dropdown flat label="actions">
+        <q-list dark bordered>
+          <ActionItem icon="mdi-message-alert" label="Alert" @click="alert"/>
+          <WidgetActions :field="me"/>
+        </q-list>
+      </q-btn-dropdown>
     </WidgetToolbar>
 
     <q-card-section>

@@ -14,7 +14,7 @@ export default class BlockPresetsAction extends Vue {
   @Prop({ type: Object, required: true })
   readonly block!: Block;
 
-  @Prop({ type: String, default: 'Apply preset' })
+  @Prop({ type: String, default: 'Choose preset' })
   readonly label!: string;
 
   @Prop({ type: String, default: 'mdi-application-import' })
