@@ -1,23 +1,20 @@
 <script lang="ts">
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import serviceStore from '@/store/services';
 
 
-@Component({
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-})
+@Component
 export default class SparkGroupMenu extends Vue {
+
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
+
   get service() {
-    return serviceStore.serviceById(this.$props.serviceId);
+    return serviceStore.serviceById(this.serviceId);
   }
 
   get groups() {

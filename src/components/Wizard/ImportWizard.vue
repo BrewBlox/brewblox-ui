@@ -2,30 +2,28 @@
 import get from 'lodash/get';
 import { uid } from 'quasar';
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { deserialize } from '@/helpers/units/parseObject';
 import dashboardStore from '@/store/dashboards';
 import featureStore from '@/store/features';
 
-@Component({
-  props: {
-    dashboardId: {
-      type: String,
-      required: false,
-    },
-  },
-})
+@Component
 export default class ImportWizard extends Vue {
+
+  @Prop({ type: String, default: '' })
+  readonly dashboardId!: string;
+
   reader: FileReader = new FileReader();
   serializedWidget: string = '';
 
   localChosenDashboardId: string = '';
 
-  get chosenDashboardId() {
+  get chosenDashboardId(): string {
     return this.localChosenDashboardId
-      || this.$props.dashboardId
-      || dashboardStore.primaryDashboardId;
+      || this.dashboardId
+      || dashboardStore.primaryDashboardId
+      || '';
   }
 
   set chosenDashboardId(id: string) {

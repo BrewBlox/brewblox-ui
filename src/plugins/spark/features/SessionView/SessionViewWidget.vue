@@ -118,7 +118,7 @@ export default class SessionViewWidget extends WidgetBase {
     <BlockGraph
       v-if="graphSession"
       :value="true"
-      :id="`${widgetId}::${graphSession.id}`"
+      :id="`${widget.id}::${graphSession.id}`"
       :config="graphSession.graphCfg"
       :change="callAndSaveConfig(v => graphSession.graphCfg = v)"
       no-duration

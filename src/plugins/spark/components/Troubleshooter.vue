@@ -1,15 +1,14 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
 
-import WidgetBase from '@/components/Widget/WidgetBase';
 import sparkStore from '@/plugins/spark/store';
 import { SystemStatus } from '@/plugins/spark/types';
 
 @Component
-export default class Troubleshooter extends WidgetBase {
-  get serviceId() {
-    return this.$props.config.serviceId;
-  }
+export default class Troubleshooter extends Vue {
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
 
   get lastStatus(): SystemStatus | null {
     return sparkStore.lastStatus(this.serviceId);

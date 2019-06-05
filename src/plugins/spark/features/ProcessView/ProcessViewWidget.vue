@@ -165,7 +165,7 @@ export default class ProcessViewWidget extends WidgetBase {
           :class="{ clickable: isClickable(part) }"
           @click="interact(part)"
         >
-          <ProcessViewItem :value="part" @input="updatePart" @state="updatePartState"/>
+          <ProcessViewItem :part="part" @input="updatePart" @state="updatePartState"/>
         </g>
       </svg>
     </div>

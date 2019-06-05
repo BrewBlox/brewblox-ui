@@ -385,7 +385,7 @@ export default class ProcessViewForm extends FormBase {
     <q-dialog v-model="menuModalOpen" no-backdrop-dismiss>
       <ProcessViewPartMenu
         v-if="menuModalOpen"
-        :value="configuredPart"
+        :part="configuredPart"
         @input="updatePart"
         @remove="removePart"
         @close="menuModalOpen = false"
@@ -428,7 +428,7 @@ export default class ProcessViewForm extends FormBase {
 
         <q-separator dark inset/>
 
-        <ExportAction :widget-id="widgetId" no-close/>
+        <ExportAction :widget-id="widget.id" no-close/>
         <ActionItem icon="delete" label="Delete all parts" no-close @click="clearParts"/>
       </q-list>
 
@@ -446,15 +446,10 @@ export default class ProcessViewForm extends FormBase {
               @click.stop="v => clickHandler(v, part)"
             >
               <text fill="white" x="0" y="8" class="grid-item-coordinates">{{ part.x }},{{ part.y }}</text>
-              <ProcessViewItem
-                :value="part"
-                show-hover
-                @input="updatePart"
-                @state="updatePartState"
-              />
+              <ProcessViewItem :part="part" show-hover @input="updatePart" @state="updatePartState"/>
             </g>
             <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
-              <ProcessViewItem :value="dragAction.part"/>
+              <ProcessViewItem :part="dragAction.part"/>
             </g>
           </svg>
         </div>

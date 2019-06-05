@@ -1,45 +1,37 @@
 <script lang="ts">
 import isString from 'lodash/isString';
+import { uid } from 'quasar';
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import sparkStore from '@/plugins/spark/store';
+import { DashboardItem } from '@/store/dashboards';
 import featureStore from '@/store/features';
 
 import { Block } from '../types';
 
-@Component({
-  props: {
-    blockId: {
-      type: String,
-      validator: v => v === null || isString(v),
-    },
-    serviceId: {
-      type: String,
-      required: true,
-    },
-    btnProps: {
-      type: Object,
-      default: () => ({}),
-    },
-    tag: {
-      type: String,
-      default: 'div',
-    },
-    tagProps: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-})
+@Component
 export default class BlockFormButton extends Vue {
   modalOpen: boolean = false;
 
-  get block(): Block | null {
-    const id = this.$props.blockId;
+  @Prop({ type: String, validator: v => v === null || isString(v) })
+  readonly blockId!: string;
 
-    return !!id
-      ? sparkStore.blocks(this.$props.serviceId)[id] || null
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
+
+  @Prop({ type: Object, default: () => ({}) })
+  readonly btnProps!: any;
+
+  @Prop({ type: String, default: 'div' })
+  readonly tag!: string;
+
+  @Prop({ type: Object, default: () => ({}) })
+  readonly tagProps!: any;
+
+  get block(): Block | null {
+    return !!this.blockId
+      ? sparkStore.blocks(this.serviceId)[this.blockId] || null
       : null;
   }
 
@@ -49,8 +41,25 @@ export default class BlockFormButton extends Vue {
       : null;
   }
 
+  get widget(): DashboardItem | null {
+    return !!this.block
+      ? {
+        id: uid(),
+        title: this.block.id,
+        feature: this.block.type,
+        dashboard: '',
+        order: 0,
+        config: {
+          serviceId: this.serviceId,
+          blockId: this.block.id,
+        },
+        ...featureStore.widgetSizeById(this.block.type),
+      }
+      : null;
+  }
+
   saveBlock(v) {
-    sparkStore.saveBlock([this.$props.serviceId, v])
+    sparkStore.saveBlock([this.serviceId, v])
       .catch(err => this.$q.notify(err.toString()));
   }
 }
@@ -65,12 +74,10 @@ export default class BlockFormButton extends Vue {
       <component
         v-if="modalOpen"
         :is="blockForm"
-        :type="block.type"
-        :field="block"
-        :on-change-field="v => saveBlock(v)"
-        :id="block.id"
-        :title="block.id"
-        :on-change-block-id="() => {}"
+        :widget="widget"
+        :block="block"
+        volatile
+        @update:widget="saveBlock"
       />
     </q-dialog>
   </component>

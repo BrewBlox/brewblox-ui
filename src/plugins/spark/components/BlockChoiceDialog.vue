@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { objectStringSorter } from '@/helpers/functional';
@@ -7,32 +7,26 @@ import sparkStore from '@/plugins/spark/store';
 
 import { Block } from '../types';
 
-@Component({
-  props: {
-    title: {
-      type: String,
-      required: true,
-    },
-    message: {
-      type: String,
-      default: '',
-    },
-    serviceId: {
-      type: String,
-      required: true,
-    },
-    filter: {
-      type: Function,
-      default: () => () => true,
-    },
-  },
-})
+@Component
 export default class BlockChoiceDialog extends DialogBase {
+
+  @Prop({ type: String, required: true })
+  readonly title!: string;
+
+  @Prop({ type: String, default: '' })
+  readonly message!: string;
+
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
+
+  @Prop({ type: Function, default: () => () => true })
+  readonly filter!: (block: Block) => boolean;
+
   block: Block | null = null
 
   get blockOpts() {
-    return sparkStore.blockValues(this.$props.serviceId)
-      .filter(this.$props.filter)
+    return sparkStore.blockValues(this.serviceId)
+      .filter(this.filter)
       .sort(objectStringSorter('id'));
   }
 }

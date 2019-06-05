@@ -151,6 +151,7 @@ export default class DashboardPage extends Vue {
           :is="val.component"
           :key="val.item.id"
           :widget="val.item"
+          :error="val.error"
           class="dashboard-item"
           @update:widget="saveWidget"
         />

@@ -79,14 +79,6 @@ export default class SparkPage extends Vue {
     return sparkStore.blockLinks(this.service.id);
   }
 
-  get sparkWidgetProps() {
-    return {
-      id: this.service.id,
-      serviceId: this.service.id,
-      ...widgetSize,
-    };
-  }
-
   get roleOrder(): Record<FeatureRole, number> {
     return {
       Display: 0,
@@ -387,15 +379,7 @@ export default class SparkPage extends Vue {
     <q-list v-if="statusNok" dark no-border>
       <q-item dark>
         <q-item-section>
-          <Troubleshooter
-            :id="service.id"
-            :config="{serviceId: service.id}"
-            :cols="4"
-            :rows="4"
-            title="Troubleshooter"
-            type="Troubleshooter"
-            class="bg-dark"
-          />
+          <Troubleshooter :service-id="service.id" class="bg-dark"/>
         </q-item-section>
       </q-item>
     </q-list>
@@ -474,7 +458,7 @@ export default class SparkPage extends Vue {
         <!-- Service -->
         <q-item v-if="serviceShown && serviceExpanded" dark>
           <q-item-section>
-            <SparkWidget v-if="isReady" v-bind="sparkWidgetProps" class="bg-dark"/>
+            <SparkWidget v-if="isReady" :service-id="service.id" class="bg-dark"/>
           </q-item-section>
         </q-item>
         <!-- Blocks -->

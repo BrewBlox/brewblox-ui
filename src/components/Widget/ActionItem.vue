@@ -1,53 +1,46 @@
 <script lang="ts">
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
-@Component({
-  props: {
-    label: {
-      type: String,
-      required: false,
-    },
-    icon: {
-      type: String,
-      required: false,
-    },
-    active: {
-      type: Boolean,
-      default: false,
-    },
-    noClose: {
-      type: Boolean,
-      default: false,
-    },
-    itemProps: {
-      type: Object,
-      default: () => ({}),
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-  },
-})
+@Component
 export default class ActionItem extends Vue {
+
+  @Prop({ type: String, required: false })
+  readonly label!: string;
+
+  @Prop({ type: String, required: false })
+  readonly icon!: string;
+
+  @Prop({ type: Boolean, default: false })
+  readonly active!: boolean;
+
+  @Prop({ type: Boolean, default: false })
+  readonly noClose!: boolean;
+
+  @Prop({ type: Object, default: () => ({}) })
+  readonly itemProps!: any;
+
+  @Prop({ type: Boolean, default: false })
+  readonly disabled!: boolean;
+
+
   get combinedProps() {
     return {
       dark: true,
-      clickable: !this.$props.disabled,
-      active: this.$props.active && !this.$props.disabled,
-      ...this.$props.itemProps,
+      clickable: !this.disabled,
+      active: this.active && !this.disabled,
+      ...this.itemProps,
     };
   }
 
   get itemClass() {
     return {
-      darkened: this.$props.disabled,
+      darkened: this.disabled,
     };
   }
 
   onClick() {
-    if (!this.$props.disabled) {
+    if (!this.disabled) {
       this.$emit('click');
     }
   }
@@ -61,10 +54,10 @@ export default class ActionItem extends Vue {
     :class="itemClass"
     @click="onClick"
   >
-    <q-item-section v-if="$props.icon" avatar>
-      <q-icon :name="$props.icon"/>
+    <q-item-section v-if="icon" avatar>
+      <q-icon :name="icon"/>
     </q-item-section>
-    <q-item-section>{{ $props.label }}</q-item-section>
+    <q-item-section>{{ label }}</q-item-section>
     <slot/>
   </q-item>
 </template>

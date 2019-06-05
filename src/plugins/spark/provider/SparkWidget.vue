@@ -1,30 +1,21 @@
 <script lang="ts">
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
-import serviceStore from '@/store/services';
 
 import { isReady, sysInfoType, ticksType, wifiType } from './getters';
 import { SysInfoBlock, TicksBlock, WiFiSettingsBlock } from './types';
 
-@Component({
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-})
+@Component
 export default class SparkWidget extends Vue {
 
-  get service() {
-    return serviceStore.serviceById(this.$props.serviceId);
-  }
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
 
   sysBlock<T extends Block>(blockType: string) {
-    return sparkStore.blockValues(this.service.id)
+    return sparkStore.blockValues(this.serviceId)
       .find(block => block.type === blockType) as T;
   }
 
@@ -41,11 +32,11 @@ export default class SparkWidget extends Vue {
   }
 
   get ready() {
-    return isReady(this.service.id);
+    return isReady(this.serviceId);
   }
 
   get updating() {
-    return sparkStore.updateSource(this.service.id) !== null;
+    return sparkStore.updateSource(this.serviceId) !== null;
   }
 
   get sysDate() {
@@ -53,19 +44,19 @@ export default class SparkWidget extends Vue {
   }
 
   fetchAll() {
-    sparkStore.fetchAll(this.service.id);
+    sparkStore.fetchAll(this.serviceId);
   }
 
   retryUpdateSource() {
-    sparkStore.fetchServiceStatus(this.service.id);
-    sparkStore.createUpdateSource(this.service.id);
+    sparkStore.fetchServiceStatus(this.serviceId);
+    sparkStore.createUpdateSource(this.serviceId);
   }
 }
 </script>
 
 <template>
   <q-card v-if="ready" dark class="text-white scroll">
-    <WidgetToolbar :title="service.id" subtitle="Spark Service">
+    <WidgetToolbar :title="serviceId" subtitle="Spark Service">
       <q-item-section class="dense" side>
         <q-btn flat round dense icon="refresh" @click="fetchAll"/>
       </q-item-section>

@@ -1,5 +1,7 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
+
+import { ConstraintsObj } from './types';
 
 export interface ConstraintInfo {
   key: string;
@@ -16,41 +18,30 @@ const asInfo = (con: any): ConstraintInfo => {
 const asConstraint =
   (cinfo: ConstraintInfo): Record<string, any> => ({ [cinfo.key]: cinfo.value });
 
-@Component({
-  props: {
-    field: {
-      type: Object,
-      default: () => ({ constraints: [] }),
-    },
-    change: {
-      type: Function,
-      default: () => () => { },
-    },
-    serviceId: {
-      type: String,
-      required: true,
-    },
-    readonly: {
-      type: Boolean,
-      default: false,
-    },
-  },
-})
+@Component
 export default class Constraints extends Vue {
-  protected get constraints(): ConstraintInfo[] {
-    const cons = this.$props
-      .field
-      .constraints
-      .map(asInfo);
 
-    return cons;
+  @Prop({ type: Object, default: () => ({ constraints: [], unconstrained: 2 }) })
+  protected readonly field!: ConstraintsObj;
+
+  @Prop({ type: Function, required: true })
+  protected readonly change!: (c: ConstraintsObj) => void;
+
+  @Prop({ type: String, required: true })
+  protected readonly serviceId!: string;
+
+  @Prop({ type: Boolean, default: false })
+  protected readonly readonly!: boolean;
+
+  protected get constraints(): ConstraintInfo[] {
+    return this.field.constraints.map(asInfo);
   }
 
   protected saveConstraints(vals: ConstraintInfo[] = this.constraints): void {
     const constraints = vals
       .filter(info => !!info.key)
       .map(asConstraint);
-    this.$props.change({ constraints });
+    this.change({ ...this.field, constraints });
   }
 
   protected callAndSaveConstraints(func: (v: any) => void): (v: any) => void {

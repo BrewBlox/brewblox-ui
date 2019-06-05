@@ -1,38 +1,29 @@
 <script lang="ts">
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
-@Component({
-  props: {
-    field: {
-      type: Object,
-      required: true,
-    },
-    tag: {
-      type: String,
-      default: 'big',
-    },
-    tagClass: {
-      type: String,
-      default: '',
-    },
-    unitTag: {
-      type: String,
-      default: 'span',
-    },
-  },
-})
+import { Unit } from '../helpers/units';
+
+@Component
 export default class UnitField extends Vue {
+
+  @Prop({ type: Object, required: true })
+  readonly field!: Unit;
+
+  @Prop({ type: String, default: 'big' })
+  readonly tag!: string;
+
+  @Prop({ type: String, default: '' })
+  readonly tagClass!: string;
+
+  @Prop({ type: String, default: 'span' })
+  readonly unitTag!: string;
 }
 </script>
 
 <template>
   <div>
-    <component :is="$props.tag" :class="$props.tagClass">{{ this.$props.field.value | round }}</component>
-    <component
-      v-if="$props.field.value !== null"
-      :is="$props.unitTag"
-      class="q-ml-xs"
-    >{{ this.$props.field.notation }}</component>
+    <component :is="tag" :class="tagClass">{{ field.value | round }}</component>
+    <component v-if="field.value !== null" :is="unitTag" class="q-ml-xs">{{ field.notation }}</component>
   </div>
 </template>

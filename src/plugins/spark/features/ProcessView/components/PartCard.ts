@@ -1,20 +1,13 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { FlowPart } from '../types';
 
-@Component({
-  props: {
-    value: {
-      type: Object,
-      required: true,
-    },
-  },
-})
+@Component
 export default class PartCard extends Vue {
-  protected get part(): FlowPart {
-    return this.$props.value;
-  }
+
+  @Prop({ type: Object, required: true })
+  protected readonly part!: FlowPart;
 
   protected savePart(part: FlowPart = this.part): void {
     this.$emit('input', part);

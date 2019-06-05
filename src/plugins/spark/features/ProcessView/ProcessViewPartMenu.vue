@@ -60,11 +60,11 @@ export default class ProcessViewPartMenu extends Vue {
             :viewBox="`0, 0, ${SQUARE_SIZE * rotatedSize[0]}, ${SQUARE_SIZE * rotatedSize[1]}`"
             class="q-mx-auto"
           >
-            <ProcessViewItem :value="part"/>
+            <ProcessViewItem :part="part"/>
           </svg>
         </q-item-section>
       </q-item>
-      <component v-for="card in cards" :key="card" :is="card" :value="part" v-on="$listeners"/>
+      <component v-for="card in cards" :key="card" :is="card" :part="part" v-on="$listeners"/>
     </q-card-section>
   </q-card>
 </template>

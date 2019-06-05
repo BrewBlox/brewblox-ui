@@ -1,6 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { targetSplitter } from '@/components/Graph/functional';
@@ -9,38 +9,31 @@ import { GraphConfig } from '@/components/Graph/types';
 import { durationString } from '@/helpers/functional';
 import { QueryParams } from '@/store/history';
 
-@Component({
-  props: {
-    value: {
-      type: Boolean,
-      required: true,
-    },
-    id: {
-      type: String,
-      required: true,
-    },
-    config: {
-      type: Object,
-      required: true,
-    },
-    change: {
-      type: Function,
-      required: true,
-    },
-    noDuration: {
-      type: Boolean,
-      default: false,
-    },
-  },
-})
+@Component
 export default class BlockGraph extends Vue {
   $refs!: {
     graph: any;
   }
+
+  @Prop({ type: Boolean, required: true })
+  readonly value!: boolean;
+
+  @Prop({ type: String, required: true })
+  readonly id!: string;
+
+  @Prop({ type: Object, required: true })
+  readonly config!: Partial<GraphConfig>;
+
+  @Prop({ type: Function, required: true })
+  readonly change!: (cfg: GraphConfig) => void;
+
+  @Prop({ type: Boolean, default: false })
+  readonly noDuration!: boolean;
+
   prevStrConfig: string = '';
 
   get modalModel() {
-    return this.$props.value;
+    return this.value;
   }
 
   set modalModel(val: boolean) {
@@ -54,7 +47,7 @@ export default class BlockGraph extends Vue {
       targets: [],
       renames: {},
       axes: {},
-      ...this.$props.config,
+      ...this.config,
     };
   }
 
@@ -72,11 +65,11 @@ export default class BlockGraph extends Vue {
   }
 
   confirmed(func: Function) {
-    return (v: any) => { func(v); this.$props.change({ ...this.graphCfg }); };
+    return (v: any) => { func(v); this.change({ ...this.graphCfg }); };
   }
 
   updateKeySide(key: string, isRight: boolean) {
-    this.$props.change({
+    this.change({
       ...this.graphCfg,
       axes: {
         ...this.graphCfg.axes,
@@ -86,7 +79,7 @@ export default class BlockGraph extends Vue {
   }
 
   applyPreset(preset: QueryParams) {
-    this.$props.change({
+    this.change({
       ...this.graphCfg,
       params: { ...preset },
     });
@@ -116,14 +109,8 @@ export default class BlockGraph extends Vue {
 <template>
   <q-dialog v-model="modalModel" maximized>
     <q-card v-if="modalModel" class="text-white bg-dark-bright" dark>
-      <GraphCard ref="graph" :id="$props.id" :config="graphCfg">
-        <q-btn-dropdown
-          v-if="!$props.noDuration"
-          auto-close
-          flat
-          label="timespan"
-          icon="mdi-timelapse"
-        >
+      <GraphCard ref="graph" :id="id" :config="graphCfg">
+        <q-btn-dropdown v-if="!noDuration" auto-close flat label="timespan" icon="mdi-timelapse">
           <q-item
             v-for="(preset, idx) in presets"
             :key="idx"

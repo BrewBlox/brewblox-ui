@@ -1,39 +1,30 @@
 <script lang="ts">
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { spaceCased } from '@/helpers/functional';
 import sparkStore from '@/plugins/spark/store';
 import { UserUnits } from '@/plugins/spark/types';
-import serviceStore from '@/store/services';
 
 
-@Component({
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-})
+@Component
 export default class SparkUnitMenu extends Vue {
   spaceCased = spaceCased;
 
-  get service() {
-    return serviceStore.serviceById(this.$props.serviceId);
-  }
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
 
   get units(): UserUnits {
-    return sparkStore.units(this.service.id) || {};
+    return sparkStore.units(this.serviceId) || {};
   }
 
   unitAlternativeOptions(name: string): { label: string; value: any }[] {
-    return (sparkStore.unitAlternatives(this.service.id)[name] || [])
+    return (sparkStore.unitAlternatives(this.serviceId)[name] || [])
       .map(v => ({ label: v, value: v }));
   }
 
   saveUnits(vals: UserUnits = this.units) {
-    sparkStore.saveUnits([this.service.id, vals])
+    sparkStore.saveUnits([this.serviceId, vals])
       .catch(reason => this.$q.notify({
         icon: 'error',
         color: 'negative',
@@ -42,7 +33,7 @@ export default class SparkUnitMenu extends Vue {
   }
 
   mounted() {
-    sparkStore.fetchAll(this.service.id);
+    sparkStore.fetchAll(this.serviceId);
   }
 }
 </script>
@@ -51,7 +42,7 @@ export default class SparkUnitMenu extends Vue {
   <q-card dark class="widget-modal">
     <FormToolbar>
       <q-item-section>
-        <q-item-label>{{ service.id }}</q-item-label>
+        <q-item-label>{{ serviceId }}</q-item-label>
         <q-item-label caption>Unit preferences</q-item-label>
       </q-item-section>
     </FormToolbar>

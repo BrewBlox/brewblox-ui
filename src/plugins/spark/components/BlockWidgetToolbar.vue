@@ -100,10 +100,10 @@ export default class BlockWidgetToolbar extends Vue {
             label="Show graph"
             @click="graphModalOpen = true"
           />
-          <ActionItem icon="refresh" label="Refresh" @click="field.refreshBlock"/>
           <slot name="actions"/>
+          <ActionItem icon="refresh" label="Refresh" @click="field.refreshBlock"/>
           <!-- Widget Actions -->
-          <WidgetActions :field="field"/>
+          <WidgetActions :field="field" no-rename/>
           <!-- Block Actions -->
           <q-expansion-item label="Block Actions">
             <q-list dark>

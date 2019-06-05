@@ -19,15 +19,13 @@ import featureStore from '@/store/features';
 
 @Component
 export default class BrewPiSettingsTask extends WizardTaskBase {
+  readonly config!: BrewPiConfig;
+
   fridgeSetting = new Unit(20, 'degC');
   beerSetting = new Unit(20, 'degC');
 
   get userTemp(): string {
-    return sparkStore.units(this.cfg.serviceId).Temp;
-  }
-
-  get cfg(): BrewPiConfig {
-    return this.stagedConfig;
+    return sparkStore.units(this.config.serviceId).Temp;
   }
 
   defaultTemp(): Unit {
@@ -36,82 +34,82 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
   }
 
   blockType(newId: string): string {
-    for (let [from, to] of Object.entries(this.cfg.renamedBlocks)) {
+    for (let [from, to] of Object.entries(this.config.renamedBlocks)) {
       if (to === newId) {
-        return sparkStore.blockById(this.cfg.serviceId, from).type;
+        return sparkStore.blockById(this.config.serviceId, from).type;
       }
     }
     throw new Error('Old block not found');
   }
 
   defineCreatedBlocks() {
-    this.cfg.createdBlocks = [
+    this.config.createdBlocks = [
       // setpoint sensor pair
       {
-        id: this.cfg.names.fridgeSSPair,
-        serviceId: this.cfg.serviceId,
+        id: this.config.names.fridgeSSPair,
+        serviceId: this.config.serviceId,
         type: pairType,
-        groups: this.cfg.groups,
+        groups: this.config.groups,
         data: {
-          sensorId: new Link(this.cfg.names.fridgeSensor),
+          sensorId: new Link(this.config.names.fridgeSensor),
           setting: this.fridgeSetting,
           settingEnabled: true,
         },
       },
       {
-        id: this.cfg.names.beerSSPair,
-        serviceId: this.cfg.serviceId,
+        id: this.config.names.beerSSPair,
+        serviceId: this.config.serviceId,
         type: pairType,
-        groups: this.cfg.groups,
+        groups: this.config.groups,
         data: {
-          sensorId: new Link(this.cfg.names.beerSensor),
+          sensorId: new Link(this.config.names.beerSensor),
           setting: this.beerSetting,
           settingEnabled: true,
         },
       },
       // PWM
       {
-        id: this.cfg.names.coolPwm,
-        serviceId: this.cfg.serviceId,
+        id: this.config.names.coolPwm,
+        serviceId: this.config.serviceId,
         type: pwmType,
-        groups: this.cfg.groups,
+        groups: this.config.groups,
         data: {
           enabled: true,
           period: new Unit(30, 'minute'),
-          actuatorId: new Link(this.cfg.names.coolPin),
+          actuatorId: new Link(this.config.names.coolPin),
         },
       },
       {
-        id: this.cfg.names.heatPwm,
-        serviceId: this.cfg.serviceId,
+        id: this.config.names.heatPwm,
+        serviceId: this.config.serviceId,
         type: pwmType,
-        groups: this.cfg.groups,
+        groups: this.config.groups,
         data: {
           enabled: true,
           period: new Unit(10, 'second'),
-          actuatorId: new Link(this.cfg.names.heatPin),
+          actuatorId: new Link(this.config.names.heatPin),
         },
       },
       // Mutex
       {
-        id: this.cfg.names.mutex,
-        serviceId: this.cfg.serviceId,
+        id: this.config.names.mutex,
+        serviceId: this.config.serviceId,
         type: mutexType,
-        groups: this.cfg.groups,
+        groups: this.config.groups,
         data: {
           differentActuatorWait: new Unit(30, 'minute'),
         },
       },
       // Offset Actuator
       {
-        id: this.cfg.names.fridgeDriver,
-        serviceId: this.cfg.serviceId,
+        id: this.config.names.fridgeDriver,
+        serviceId: this.config.serviceId,
         type: offsetType,
-        groups: this.cfg.groups,
+        groups: this.config.groups,
         data: {
           enabled: false,
-          targetId: new Link(this.cfg.names.fridgeSSPair),
-          referenceId: new Link(this.cfg.names.beerSSPair),
+          targetId: new Link(this.config.names.fridgeSSPair),
+          referenceId: new Link(this.config.names.beerSSPair),
           referenceSettingOrValue: 0,
           constrainedBy: {
             constraints: [
@@ -123,27 +121,27 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       },
       // Setpoint Profile
       {
-        id: this.cfg.names.tempProfile,
-        serviceId: this.cfg.serviceId,
+        id: this.config.names.tempProfile,
+        serviceId: this.config.serviceId,
         type: spProfileType,
-        groups: this.cfg.groups,
+        groups: this.config.groups,
         data: {
           enabled: false,
-          targetId: new Link(this.cfg.names.beerSSPair),
+          targetId: new Link(this.config.names.beerSSPair),
           points: [],
         },
       },
       // PID
       {
-        id: this.cfg.names.coolPid,
-        serviceId: this.cfg.serviceId,
+        id: this.config.names.coolPid,
+        serviceId: this.config.serviceId,
         type: pidType,
-        groups: this.cfg.groups,
+        groups: this.config.groups,
         data: {
           ...sparkStore.specs[pidType].generate(),
           enabled: true,
-          inputId: new Link(this.cfg.names.fridgeSSPair),
-          outputId: new Link(this.cfg.names.coolPwm),
+          inputId: new Link(this.config.names.fridgeSSPair),
+          outputId: new Link(this.config.names.coolPwm),
           filter: 4,
           filterThreshold: new Unit(5, 'delta_degC'),
           kp: new Unit(-10, '1/degC'),
@@ -152,15 +150,15 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         },
       },
       {
-        id: this.cfg.names.heatPid,
-        serviceId: this.cfg.serviceId,
+        id: this.config.names.heatPid,
+        serviceId: this.config.serviceId,
         type: pidType,
-        groups: this.cfg.groups,
+        groups: this.config.groups,
         data: {
           ...sparkStore.specs[pidType].generate(),
           enabled: true,
-          inputId: new Link(this.cfg.names.fridgeSSPair),
-          outputId: new Link(this.cfg.names.heatPwm),
+          inputId: new Link(this.config.names.fridgeSSPair),
+          outputId: new Link(this.config.names.heatPwm),
           filter: 4,
           filterThreshold: new Unit(5, 'delta_degC'),
           kp: new Unit(20, '1/degC'),
@@ -169,15 +167,15 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         },
       },
       {
-        id: this.cfg.names.beerPid,
-        serviceId: this.cfg.serviceId,
+        id: this.config.names.beerPid,
+        serviceId: this.config.serviceId,
         type: pidType,
-        groups: this.cfg.groups,
+        groups: this.config.groups,
         data: {
           ...sparkStore.specs[pidType].generate(),
           enabled: false,
-          inputId: new Link(this.cfg.names.beerSSPair),
-          outputId: new Link(this.cfg.names.fridgeDriver),
+          inputId: new Link(this.config.names.beerSSPair),
+          outputId: new Link(this.config.names.fridgeDriver),
           filter: 4,
           filterThreshold: new Unit(2, 'delta_degC'),
           kp: new Unit(5, '1/degC'),
@@ -189,31 +187,31 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
   }
 
   defineChangedBlocks() {
-    this.cfg.changedBlocks = [
+    this.config.changedBlocks = [
       {
-        id: this.cfg.names.coolPin,
-        serviceId: this.cfg.serviceId,
-        type: this.blockType(this.cfg.names.coolPin),
-        groups: this.cfg.groups,
+        id: this.config.names.coolPin,
+        serviceId: this.config.serviceId,
+        type: this.blockType(this.config.names.coolPin),
+        groups: this.config.groups,
         data: {
           constrainedBy: {
             constraints: [
               { 'minOff[second]': 300 },
               { 'minOn[second]': 180 },
-              { 'mutex<>': this.cfg.names.mutex },
+              { 'mutex<>': this.config.names.mutex },
             ],
           },
         },
       },
       {
-        id: this.cfg.names.heatPin,
-        serviceId: this.cfg.serviceId,
-        type: this.blockType(this.cfg.names.heatPin),
-        groups: this.cfg.groups,
+        id: this.config.names.heatPin,
+        serviceId: this.config.serviceId,
+        type: this.blockType(this.config.names.heatPin),
+        groups: this.config.groups,
         data: {
           constrainedBy: {
             constraints: [
-              { 'mutex<>': this.cfg.names.mutex },
+              { 'mutex<>': this.config.names.mutex },
             ],
           },
         },
@@ -223,17 +221,17 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
 
   defineWidgets() {
     const genericSettings = {
-      dashboard: this.cfg.dashboardId,
+      dashboard: this.config.dashboardId,
       cols: 4,
       rows: 4,
       order: 0,
     };
 
     const variableTypes = {
-      fridge: this.blockType(this.cfg.names.fridgeSensor),
-      beer: this.blockType(this.cfg.names.beerSensor),
-      coolPin: this.blockType(this.cfg.names.coolPin),
-      heatPin: this.blockType(this.cfg.names.heatPin),
+      fridge: this.blockType(this.config.names.fridgeSensor),
+      beer: this.blockType(this.config.names.beerSensor),
+      coolPin: this.blockType(this.config.names.coolPin),
+      heatPin: this.blockType(this.config.names.heatPin),
     };
 
     const createWidget =
@@ -245,7 +243,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         feature: type,
         config: {
           blockId: name,
-          serviceId: this.cfg.serviceId,
+          serviceId: this.config.serviceId,
         },
       });
 
@@ -258,81 +256,81 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
           params: { duration: '10m' },
           targets: [
             {
-              measurement: this.cfg.serviceId,
+              measurement: this.config.serviceId,
               fields: [
-                `${this.cfg.names.fridgeSSPair}/value[${this.userTemp}]`,
-                `${this.cfg.names.fridgeSSPair}/setting[${this.userTemp}]`,
-                `${this.cfg.names.beerSSPair}/value[${this.userTemp}]`,
-                `${this.cfg.names.beerSSPair}/setting[${this.userTemp}]`,
-                `${this.cfg.names.coolPwm}/value`,
-                `${this.cfg.names.heatPwm}/value`,
+                `${this.config.names.fridgeSSPair}/value[${this.userTemp}]`,
+                `${this.config.names.fridgeSSPair}/setting[${this.userTemp}]`,
+                `${this.config.names.beerSSPair}/value[${this.userTemp}]`,
+                `${this.config.names.beerSSPair}/setting[${this.userTemp}]`,
+                `${this.config.names.coolPwm}/value`,
+                `${this.config.names.heatPwm}/value`,
               ],
             },
           ],
         },
       });
 
-    this.cfg.widgets = [
+    this.config.widgets = [
       // PID
-      createWidget(this.cfg.names.coolPid, pidType),
-      createWidget(this.cfg.names.heatPid, pidType),
-      createWidget(this.cfg.names.beerPid, pidType),
+      createWidget(this.config.names.coolPid, pidType),
+      createWidget(this.config.names.heatPid, pidType),
+      createWidget(this.config.names.beerPid, pidType),
       // Setpoint profile
-      createWidget(this.cfg.names.tempProfile, spProfileType),
+      createWidget(this.config.names.tempProfile, spProfileType),
       // Sensors
-      createWidget(this.cfg.names.fridgeSensor, variableTypes.fridge),
-      createWidget(this.cfg.names.beerSensor, variableTypes.beer),
+      createWidget(this.config.names.fridgeSensor, variableTypes.fridge),
+      createWidget(this.config.names.beerSensor, variableTypes.beer),
       // SSPairs are skipped
       // Pins
-      createWidget(this.cfg.names.coolPin, variableTypes.coolPin),
-      createWidget(this.cfg.names.heatPin, variableTypes.heatPin),
+      createWidget(this.config.names.coolPin, variableTypes.coolPin),
+      createWidget(this.config.names.heatPin, variableTypes.heatPin),
       // PWMs
-      createWidget(this.cfg.names.coolPwm, pwmType),
-      createWidget(this.cfg.names.heatPwm, pwmType),
+      createWidget(this.config.names.coolPwm, pwmType),
+      createWidget(this.config.names.heatPwm, pwmType),
       // Mutex
-      createWidget(this.cfg.names.mutex, mutexType),
+      createWidget(this.config.names.mutex, mutexType),
       // Offset
-      createWidget(this.cfg.names.fridgeDriver, offsetType),
+      createWidget(this.config.names.fridgeDriver, offsetType),
       // Graph
-      createGraph(this.cfg.names.graph),
+      createGraph(this.config.names.graph),
     ];
   }
 
   defineActions() {
     this.pushActions([
-      async (cfg: BrewPiConfig): Promise<void> => {
+      async (config: BrewPiConfig): Promise<void> => {
         await Promise.all(
-          Object.entries(cfg.renamedBlocks)
+          Object.entries(config.renamedBlocks)
             .filter(([currVal, newVal]: [string, string]) => currVal !== newVal)
             .map(
               ([currVal, newVal]: [string, string]) =>
-                sparkStore.renameBlock([cfg.serviceId, currVal, newVal])));
+                sparkStore.renameBlock([config.serviceId, currVal, newVal])));
       },
 
-      async (cfg: BrewPiConfig): Promise<void> => {
+      async (config: BrewPiConfig): Promise<void> => {
         // Create synchronously, to ensure dependencies are created first
-        for (let block of cfg.createdBlocks) {
-          await sparkStore.createBlock([cfg.serviceId, block]);
+        for (let block of config.createdBlocks) {
+          await sparkStore.createBlock([config.serviceId, block]);
         }
       },
 
-      async (cfg: BrewPiConfig): Promise<void> => {
+      async (config: BrewPiConfig): Promise<void> => {
         await Promise.all(
-          cfg.changedBlocks
-            .map(block => sparkStore.saveBlock([cfg.serviceId, block])));
+          config.changedBlocks
+            .map(block => sparkStore.saveBlock([config.serviceId, block])));
       },
 
-      async (cfg: BrewPiConfig): Promise<void> => {
-        if (!dashboardStore.dashboardIds.includes(cfg.dashboardId)) {
+      async (config: BrewPiConfig): Promise<void> => {
+        if (!dashboardStore.dashboardIds.includes(config.dashboardId)) {
           const dashboard: Dashboard = {
-            id: cfg.dashboardId,
-            title: cfg.dashboardTitle,
+            id: config.dashboardId,
+            title: config.dashboardTitle,
             order: dashboardStore.dashboardIds.length + 1,
           };
           await dashboardStore.createDashboard(dashboard);
         }
         await Promise.all(
-          cfg.widgets
+          config.widgets
             .map(item => dashboardStore.appendDashboardItem(item)));
       },
     ]);
@@ -344,7 +342,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
     this.defineWidgets();
     this.defineActions();
     // We're updating all at once, to avoid having to wait a tick before the prop changes
-    this.updateConfig(this.cfg);
+    this.updateConfig(this.config);
     this.finish();
   }
 

@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 
@@ -7,22 +7,18 @@ import { SQUARE_SIZE } from '../getters';
 import partSettings from '../settings';
 import { CalculatedFlows, FlowPart } from '../types';
 
-@Component({
-  props: {
-    value: {
-      type: Object,
-      required: true,
-    },
-  },
-})
+@Component
 export default class PartComponent extends Vue {
   protected SQUARE_SIZE: number = SQUARE_SIZE;
+
+  @Prop({ type: Object, required: true })
+  protected readonly value!: FlowPart;
 
   protected get part(): FlowPart {
     return {
       transitions: {},
       flows: {},
-      ...this.$props.value,
+      ...this.value,
     };
   }
 

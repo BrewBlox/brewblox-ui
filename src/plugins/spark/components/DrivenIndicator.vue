@@ -1,25 +1,21 @@
 <script lang="ts">
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import sparkStore from '@/plugins/spark/store';
 
-@Component({
-  props: {
-    blockId: {
-      type: String,
-      required: true,
-    },
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-})
+@Component
 export default class DrivenIndicator extends Vue {
+
+  @Prop({ type: String, required: true })
+  readonly blockId!: string;
+
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
+
   get textChains() {
-    return sparkStore.drivenChains(this.$props.serviceId)
-      .filter(chain => chain[0] === this.$props.blockId)
+    return sparkStore.drivenChains(this.serviceId)
+      .filter(chain => chain[0] === this.blockId)
       .map(chain => chain
         .slice(1)
         .map((id, idx) => {

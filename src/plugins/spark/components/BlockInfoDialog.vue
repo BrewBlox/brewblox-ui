@@ -1,21 +1,20 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import sparkStore from '@/plugins/spark/store';
 
-@Component({
-  props: {
-    block: {
-      type: Object,
-      required: true,
-    },
-  },
-})
+import { Block } from '../types';
+
+@Component
 export default class BlockInfoDialog extends DialogBase {
+
+  @Prop({ type: Object, required: true })
+  readonly block!: Block;
+
   get groupsDisplay() {
-    const names = [...sparkStore.groupNames(this.$props.block.serviceId), 'System Group'];
-    return this.$props.block.groups
+    const names = [...sparkStore.groupNames(this.block.serviceId), 'System Group'];
+    return this.block.groups
       .map(val => names[val])
       .join(', ');
   }
