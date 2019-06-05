@@ -28,7 +28,7 @@ interface StepDisplay extends Step {
 export default class StepViewForm extends FormBase {
   editableChanges: Record<string, boolean> = {};
 
-  @Prop({ type: String, default: '' })
+  @Prop({ type: String })
   readonly openStep!: string;
 
   get widgetConfig(): StepViewConfig {

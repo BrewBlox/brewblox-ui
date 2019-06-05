@@ -112,6 +112,7 @@ export default class SessionViewWidget extends WidgetBase {
         v-bind="$props"
         :active-session="modalSession"
         @update:widget="saveWidget"
+        @create-session="createSession"
       />
     </q-dialog>
     <BlockGraph

@@ -1,4 +1,5 @@
 <script lang="ts">
+import { Dialog } from 'quasar';
 import shortid from 'shortid';
 import { Component, Prop } from 'vue-property-decorator';
 
@@ -249,6 +250,14 @@ export default class SessionViewForm extends FormBase {
           </q-expansion-item>
         </q-list>
       </q-expansion-item>
+      <q-item dark>
+        <q-item-section/>
+        <q-item-section side>
+          <q-btn fab outline icon="add" @click="$emit('create-session')">
+            <q-tooltip>Add Session</q-tooltip>
+          </q-btn>
+        </q-item-section>
+      </q-item>
     </q-scroll-area>
   </q-card>
 </template>

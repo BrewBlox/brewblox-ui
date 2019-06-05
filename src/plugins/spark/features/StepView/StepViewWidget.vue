@@ -11,7 +11,7 @@ import { Step } from './types';
 @Component
 export default class StepViewWidget extends WidgetBase {
   modalOpen: boolean = false;
-  openStep: string = '';
+  openStep: string | null = null;
 
   get serviceId() {
     return this.widget.config.serviceId;
@@ -51,7 +51,7 @@ export default class StepViewWidget extends WidgetBase {
     });
   }
 
-  openModal(stepId: string = '') {
+  openModal(stepId: string | null) {
     this.openStep = stepId;
     this.modalOpen = true;
   }
@@ -71,7 +71,7 @@ export default class StepViewWidget extends WidgetBase {
 
     <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
-        <q-btn-dropdown flat split icon="settings" @click="openModal">
+        <q-btn-dropdown flat split icon="settings" @click="openModal(null)">
           <q-list dark bordered>
             <ExportAction :widget-id="widget.id"/>
             <WidgetActions :field="me"/>
