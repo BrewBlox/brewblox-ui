@@ -7,10 +7,6 @@ import { objectSorter } from '@/helpers/functional';
 import dashboardStore, { DashboardItem } from '@/store/dashboards';
 import featureStore from '@/store/features';
 
-interface VueOrdered extends Vue {
-  id: string;
-}
-
 interface ValidatedItem {
   item: DashboardItem;
   component: string;
@@ -81,14 +77,15 @@ export default class DashboardPage extends Vue {
     return this.$q.platform.is.mobile;
   }
 
-  async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: VueOrdered[]) {
+  async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: string[]) {
     try {
-      // Make a local change to the validated item, to avoid it "jumping" during the store round trip
-      this.validatedItems
-        .filter(valItem => valItem.item.id === id)
-        .forEach(valItem => valItem.item.pinnedPosition = pinnedPosition);
+      // Make a local change to the validated item, to avoid it jumping during the store round trip
+      const local = this.validatedItems.find(valItem => valItem.item.id === id);
+      if (local) {
+        local.item.pinnedPosition = pinnedPosition;
+      }
       await dashboardStore.saveDashboardItem({ ...dashboardStore.dashboardItemById(id), pinnedPosition });
-      await dashboardStore.updateDashboardItemOrder(order.map(item => item.id));
+      await dashboardStore.updateDashboardItemOrder(order);
     } catch (e) {
       throw e;
     }
@@ -145,8 +142,8 @@ export default class DashboardPage extends Vue {
       <GridContainer
         v-else
         :editable="widgetEditable"
-        :on-change-positions="onChangePositions"
-        :on-change-size="onChangeSize"
+        @change-positions="onChangePositions"
+        @change-size="onChangeSize"
       >
         <component
           v-for="val in validatedItems"

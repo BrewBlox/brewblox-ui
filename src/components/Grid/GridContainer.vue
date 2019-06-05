@@ -1,8 +1,6 @@
 <script lang="ts">
-import Vue from 'vue';
+import Vue, { CreateElement, VNode, VNodeComponentOptions } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-
-import dashboardStore from '@/store/dashboards';
 
 import GridItem from './GridItem.vue';
 
@@ -10,68 +8,51 @@ import GridItem from './GridItem.vue';
   components: { GridItem },
 })
 export default class GridContainer extends Vue {
-  activeItem: string | null = null;
+  activeItemId: string | null = null;
   activeItemPos: XYPosition | null = null;
 
   @Prop({ type: Boolean, default: false })
   readonly editable!: boolean;
 
-  @Prop({ type: Function, default: () => () => { } })
-  readonly onChangeSize!: (id: string, cols: number, rows: number) => void;
-
-  @Prop({ type: Function, default: () => () => { } })
-  readonly onChangePositions!: (id: string, pinnedPosition: XYPosition | null, order: { id: string }[]) => void;
-
-  startInteraction(id: string) {
-    this.activeItem = id;
+  get gridItems(): GridItem[] {
+    return this.$children as GridItem[];
   }
 
-  moveInteraction(pos: XYPosition) {
-    this.activeItemPos = pos;
+  startInteraction(id: string) {
+    this.activeItemId = id;
   }
 
   stopInteraction() {
-    this.activeItem = null;
+    this.activeItemId = null;
     this.activeItemPos = null;
   }
 
-  newItemsOrder(): GridItem[] {
-    const sortedChildren = ([...this.$children] as GridItem[])
-      .sort((a, b) => {
-        const rectA = a.$el.getBoundingClientRect() as DOMRect;
-        const rectB = b.$el.getBoundingClientRect() as DOMRect;
-
-        // check y position
-        if (rectA.y !== rectB.y) {
-          return rectA.y - rectB.y;
-        }
-
-        // check x position
-        if (rectA.x !== rectB.x) {
-          return rectA.x - rectB.x;
-        }
-
-        // is same position
-        return 0;
-      });
-    return sortedChildren;
+  moveInteraction(id: string, pos: XYPosition) {
+    this.activeItemPos = pos;
   }
 
   updateItemPosition(id: string, pos: XYPosition | null) {
-    this.onChangePositions(id, pos, this.newItemsOrder());
+    const newItemsOrder = this.gridItems
+      .map(item => [item, item.$el.getBoundingClientRect()] as [GridItem, DOMRect])
+      .sort(([, rectA], [, rectB]) => (rectA.y - rectB.y) || (rectA.x - rectB.x))
+      .map(([item]) => item.id);
+    this.$emit('change-positions', id, pos, newItemsOrder);
   }
 
-  slotStyle(slot: any) {
-    const { propsData } = slot.componentOptions;
-    const style: Record<string, string> = {};
-    const { cols, rows } = propsData;
+  updateItemSize(id: string, cols: number, rows: number) {
+    this.$emit('change-size', id, cols, rows);
+  }
 
-    if (propsData.pos) {
-      const { pos } = propsData;
-      style.gridArea = `${pos.y} / ${pos.x} / span ${rows} / span ${cols}`;
+  slotStyle(slot: VNode) {
+    const style: Record<string, string> = {};
+    const opts = slot.componentOptions as VNodeComponentOptions;
+    const { id, pinnedPosition, cols, rows } = (opts.propsData as any).widget;
+
+    if (pinnedPosition) {
+      style.gridArea = `${pinnedPosition.y} / ${pinnedPosition.x} / span ${rows} / span ${cols}`;
     }
 
-    if (propsData.id === this.activeItem && this.activeItemPos) {
+    if (id === this.activeItemId && this.activeItemPos) {
       const { x, y } = this.activeItemPos;
       style.gridArea = `${y} / ${x} / span ${rows} / span ${cols}`;
     }
@@ -79,48 +60,39 @@ export default class GridContainer extends Vue {
     return style;
   }
 
-  updateItemSize(id: string, cols: number, rows: number) {
-    dashboardStore.updateDashboardItemSize({ id, cols, rows });
-  }
-
-  render(createElement: Function) {
+  render(createElement: CreateElement) {
     return createElement(
       'div',
-      {
-        class: 'grid-container',
-      },
+      { class: 'grid-container' },
       [
         createElement(
           'div',
-          {
-            class: 'grid-main-container',
-          },
+          { class: 'grid-main-container' },
+          // Children
           [
-            // render the passed children
             ...(this.$slots.default || [])
               .filter(slot => slot.tag)
               .map((slot: any) => createElement(
                 GridItem,
                 {
-                  style: {
-                    ...this.slotStyle(slot),
-                  },
+                  style: this.slotStyle(slot),
                   props: {
                     ...slot.data.attrs,
                     ...slot.componentOptions.propsData,
                     editable: this.editable,
-                    onStartInteraction: this.startInteraction,
-                    onStopInteraction: this.stopInteraction,
-                    onMoveInteraction: this.moveInteraction,
-                    onUpdateItemSize: this.updateItemSize,
-                    onUpdatePos: this.updateItemPosition,
+                  },
+                  on: {
+                    'start-edit': this.startInteraction,
+                    'stop-edit': this.stopInteraction,
+                    'move': this.moveInteraction,
+                    'size': this.updateItemSize,
+                    'position': this.updateItemPosition,
                   },
                 },
                 [slot],
               )),
-            // show overlay grid if activeItem is happening or in edit mode
-            (this.activeItem || this.editable)
-            && createElement(
+            // show overlay grid in edit mode
+            this.editable && createElement(
               'div',
               {
                 class: 'grid-container-overlay',

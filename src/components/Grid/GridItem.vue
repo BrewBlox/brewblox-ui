@@ -20,21 +20,6 @@ export default class GridItem extends Vue {
   @Prop({ type: Boolean, default: false })
   readonly editable!: boolean;
 
-  @Prop({ type: Function, default: () => () => { } })
-  readonly onStartInteraction!: (id: string) => void;
-
-  @Prop({ type: Function, default: () => () => { } })
-  readonly onMoveInteraction!: (pos: XYPosition) => void;
-
-  @Prop({ type: Function, default: () => () => { } })
-  readonly onStopInteraction!: () => void;
-
-  @Prop({ type: Function, default: () => () => { } })
-  readonly onUpdateItemSize!: (id: string, cols: number, rows: number) => void;
-
-  @Prop({ type: Function, default: () => () => { } })
-  readonly onUpdatePos!: (id: string, pos: XYPosition | null) => void;
-
   dragging: boolean = false;
   moving: boolean = false;
 
@@ -55,6 +40,7 @@ export default class GridItem extends Vue {
   currentStartCols: number | null = null;
   currentStartRows: number | null = null;
 
+  // Used by GridContainer
   get id(): string {
     return this.widget.id;
   }
@@ -88,8 +74,7 @@ export default class GridItem extends Vue {
     this.dragStartWidth = width;
     this.dragStartHeight = height;
 
-    // communicate start to parent
-    this.onStartInteraction(this.widget.id);
+    this.$emit('start-edit', this.id);
   }
 
   stopInteraction() {
@@ -106,11 +91,31 @@ export default class GridItem extends Vue {
     this.dragStartParentX = 0;
     this.dragStartParentY = 0;
 
-    // communicate stop to parent
-    this.onStopInteraction();
+    this.$emit('stop-edit', this.id);
+  }
+
+  moveInteraction(e: MouseEvent | TouchEvent) {
+    const delta = this.moveDelta(e);
+    const position = this.gridPosition(delta);
+
+    this.currentStartCols = position.x;
+    this.currentStartRows = position.y;
+
+    this.$emit('move', this.id, { x: this.currentStartCols, y: this.currentStartRows });
   }
 
   updateSize() {
+    this.$emit('size',
+      this.id,
+      this.currentCols || this.widget.cols,
+      this.currentRows || this.widget.rows);
+  }
+
+  updatePosition(pos: XYPosition | null) {
+    this.$emit('position', this.id, pos);
+  }
+
+  changeSize() {
     const newCols = Math.round((this.dragWidth + GAP_SIZE) / (GRID_SIZE + GAP_SIZE));
     const newRows = Math.round((this.dragHeight + GAP_SIZE) / (GRID_SIZE + GAP_SIZE));
 
@@ -187,16 +192,6 @@ export default class GridItem extends Vue {
     };
   }
 
-  onDragMove(e: MouseEvent | TouchEvent) {
-    const delta = this.moveDelta(e);
-    const position = this.gridPosition(delta);
-
-    this.currentStartCols = position.x;
-    this.currentStartRows = position.y;
-
-    this.onMoveInteraction({ x: this.currentStartCols, y: this.currentStartRows });
-  }
-
   startDrag(e: MouseEvent | TouchEvent) {
     this.moving = true;
     this.startInteraction(e);
@@ -219,7 +214,7 @@ export default class GridItem extends Vue {
   stopDrag() {
     this.moving = false;
     const pos = { x: this.currentStartCols, y: this.currentStartRows };
-    this.onUpdatePos(this.widget.id, pos as XYPosition);
+    this.updatePosition(pos as XYPosition);
     this.stopInteraction();
   }
 
@@ -246,18 +241,12 @@ export default class GridItem extends Vue {
     const delta = this.moveDelta(e);
     this.dragWidth = this.dragStartWidth + delta.x;
     this.dragHeight = this.dragStartHeight + delta.y;
-    this.updateSize();
+    this.changeSize();
   }
 
   stopResize() {
     this.dragging = false;
-
-    this.onUpdateItemSize(
-      this.widget.id,
-      this.currentCols || this.widget.cols,
-      this.currentRows || this.widget.rows,
-    );
-
+    this.updateSize();
     this.stopInteraction();
   }
 
@@ -272,11 +261,11 @@ export default class GridItem extends Vue {
       return;
     }
 
-    this.onDragMove(args.evt);
+    this.moveInteraction(args.evt);
   }
 
   unpin() {
-    this.onUpdatePos(this.widget.id, null);
+    this.updatePosition(null);
   }
 
   pin() {
@@ -294,7 +283,7 @@ export default class GridItem extends Vue {
       y: ((touchY - parentY) / (GRID_SIZE + GAP_SIZE)) + 1,
     };
 
-    this.onUpdatePos(this.widget.id, pos);
+    this.updatePosition(pos);
   }
 }
 </script>
@@ -326,10 +315,10 @@ export default class GridItem extends Vue {
           <p class="shadowed">drag</p>
         </div>
         <q-btn
-          :icon="widget.pos ? 'mdi-pin-off' : 'mdi-pin'"
+          :icon="widget.pinnedPosition ? 'mdi-pin-off' : 'mdi-pin'"
           fab
           color="primary"
-          @click="() => (widget.pos ? unpin : pin)()"
+          @click="() => (widget.pinnedPosition ? unpin : pin)()"
         />
       </div>
     </button>
