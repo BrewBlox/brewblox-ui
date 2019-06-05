@@ -65,6 +65,17 @@ export default class BlockWidgetToolbar extends Vue {
       root: this.$root,
     });
   }
+
+  removeBlock() {
+    Dialog.create({
+      title: 'Remove Block',
+      message: `Are you sure you want to remove ${this.block.id}?`,
+      cancel: true,
+      dark: true,
+      persistent: true,
+    })
+      .onOk(() => sparkStore.removeBlock([this.block.serviceId, this.block]));
+  }
 }
 </script>
 
@@ -100,7 +111,8 @@ export default class BlockWidgetToolbar extends Vue {
               <ActionItem icon="edit" label="Rename Block" @click="renameBlock"/>
               <ActionItem icon="mdi-cube" label="Choose Block" @click="chooseBlock"/>
               <ActionItem icon="mdi-information" label="Block Info" @click="blockInfo"/>
-              <BlockPresetsAction :block="block" :presets="field.presets"/>
+              <BlockPresetsAction :block="block"/>
+              <ActionItem icon="delete" label="Remove Block" @click="removeBlock"/>
             </q-list>
           </q-expansion-item>
         </q-list>

@@ -1,5 +1,4 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import shortid from 'shortid';
 import { Component, Prop } from 'vue-property-decorator';
 

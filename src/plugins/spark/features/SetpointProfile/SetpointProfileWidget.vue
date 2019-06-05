@@ -1,7 +1,6 @@
 <script lang="ts">
 import { Layout, PlotData } from 'plotly.js';
-import { Component } from 'vue-property-decorator';
-import { Watch } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
@@ -9,7 +8,7 @@ import { SetpointProfileBlock } from './types';
 
 @Component
 export default class SetpointProfileWidget extends BlockWidget {
-  block!: SetpointProfileBlock;
+  readonly block!: SetpointProfileBlock;
   now: Date = new Date();
 
   get startTime(): number {

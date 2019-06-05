@@ -8,7 +8,7 @@ import { TempSensorMockBlock } from './types';
 
 @Component
 export default class TempSensorMockWidget extends BlockWidget {
-  block!: TempSensorMockBlock;
+  readonly block!: TempSensorMockBlock;
 
   get renamedTargets() {
     return postfixedDisplayNames(

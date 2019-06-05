@@ -3,8 +3,7 @@ import parseDuration from 'parse-duration';
 import { Component } from 'vue-property-decorator';
 
 import { durationString, objectSorter } from '@/helpers/functional';
-import { Link, Unit } from '@/helpers/units';
-import { SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
+import { Unit } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import sparkStore from '@/plugins/spark/store';
 
@@ -21,7 +20,7 @@ export default class SetpointProfileForm extends BlockForm {
   durationString = durationString;
   parseDuration = parseDuration;
 
-  block!: SetpointProfileBlock;
+  readonly block!: SetpointProfileBlock;
 
   get tempUnit() {
     return sparkStore.units(this.block.serviceId).Temp;
@@ -39,29 +38,6 @@ export default class SetpointProfileForm extends BlockForm {
         absTimeMs: this.start + (point.time * 1000),
         temperature: point.temperature,
       }));
-  }
-
-  defaultData() {
-    return {
-      start: new Date().getTime() / 1000,
-      points: [],
-      enabled: false,
-      targetId: new SetpointSensorPairLink(null),
-      drivenTargetId: new Link(null),
-    };
-  }
-
-  presets() {
-    return [
-      {
-        label: 'Empty profile',
-        value: {
-          points: [],
-          enabled: true,
-          start: new Date().getTime() / 1000,
-        },
-      },
-    ];
   }
 
   savePoints(points: DisplaySetpoint[] = this.points) {

@@ -7,33 +7,7 @@ import { ActuatorPinBlock } from './types';
 
 @Component
 export default class ActuatorPinForm extends BlockForm {
-  block!: ActuatorPinBlock;
-
-  defaultData() {
-    return {
-      state: 2,
-      invert: false,
-      constrainedBy: { constraints: [], unconstrained: 0 },
-    };
-  }
-
-  presets() {
-    return [
-      {
-        label: 'Fridge compressor',
-        value: {
-          state: 0,
-          invert: false,
-          constrainedBy: {
-            constraints: [
-              { 'minOff[second]': 300 },
-              { 'minOn[second]': 180 },
-            ],
-          },
-        },
-      },
-    ];
-  }
+  readonly block!: ActuatorPinBlock;
 }
 </script>
 

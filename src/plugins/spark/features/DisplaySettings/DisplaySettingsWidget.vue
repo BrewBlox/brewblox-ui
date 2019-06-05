@@ -7,7 +7,7 @@ import { DisplaySettingsBlock } from './types';
 
 @Component
 export default class DisplaySettingsWidget extends BlockWidget {
-  block!: DisplaySettingsBlock;
+  readonly block!: DisplaySettingsBlock;
 
   get displaySlots(): any[][] {
     const slots = Array(6);

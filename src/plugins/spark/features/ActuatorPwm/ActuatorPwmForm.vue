@@ -4,19 +4,9 @@ import { Component } from 'vue-property-decorator';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
 
-import { defaultData, presets } from './getters';
-
 @Component
 export default class ActuatorPwmForm extends BlockForm {
-  block!: ActuatorPwmBlock;
-
-  defaultData() {
-    return defaultData();
-  }
-
-  presets() {
-    return presets();
-  }
+  readonly block!: ActuatorPwmBlock;
 }
 </script>
 

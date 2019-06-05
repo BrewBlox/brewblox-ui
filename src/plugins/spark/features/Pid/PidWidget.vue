@@ -9,7 +9,7 @@ import { BlockLink } from '@/plugins/spark/types';
 import featureStore from '@/store/features';
 
 import PidDisplay from './PidDisplay.vue';
-import { filters, presets } from './getters';
+import { filters } from './getters';
 import { PidBlock } from './types';
 
 @Component({
@@ -18,13 +18,9 @@ import { PidBlock } from './types';
   },
 })
 export default class PidWidget extends BlockWidget {
-  block!: PidBlock;
+  readonly block!: PidBlock;
   inputFormOpen = false;
   relationsOpen = false;
-
-  get presets() {
-    return presets();
-  }
 
   get renamedTargets() {
     return postfixedDisplayNames(

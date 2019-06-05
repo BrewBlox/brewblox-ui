@@ -7,7 +7,7 @@ import { ActuatorPwmBlock } from './types';
 
 @Component
 export default class ActuatorPwmWidget extends BlockWidget {
-  block!: ActuatorPwmBlock;
+  readonly block!: ActuatorPwmBlock;
 
   get renamedTargets() {
     return {

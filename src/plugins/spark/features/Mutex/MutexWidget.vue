@@ -8,7 +8,7 @@ import { MutexBlock } from './types';
 
 @Component
 export default class MutexWidget extends BlockWidget {
-  block!: MutexBlock;
+  readonly block!: MutexBlock;
 
   get mutexClients() {
     return getMutexClients(this.serviceId, this.blockId);

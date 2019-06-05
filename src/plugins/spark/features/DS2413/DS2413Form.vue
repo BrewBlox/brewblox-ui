@@ -7,22 +7,7 @@ import { DS2413Block } from './types';
 
 @Component
 export default class DS2413Form extends BlockForm {
-  block!: DS2413Block;
-
-  defaultData() {
-    return {
-      address: '',
-      state: 2,
-    };
-  }
-
-  presets() {
-    return [];
-  }
-
-  created() {
-    this.block; // ensure getter is evaluated
-  }
+  readonly block!: DS2413Block;
 }
 </script>
 

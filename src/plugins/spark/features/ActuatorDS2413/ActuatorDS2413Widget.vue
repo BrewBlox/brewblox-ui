@@ -7,7 +7,7 @@ import { ActuatorDS2413Block } from './types';
 
 @Component
 export default class ActuatorDS2413Widget extends BlockWidget {
-  block!: ActuatorDS2413Block;
+  readonly block!: ActuatorDS2413Block;
 
   get renamedTargets() {
     return {

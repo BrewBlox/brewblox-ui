@@ -9,18 +9,7 @@ import sparkStore from '@/plugins/spark/store';
 
 @Component
 export default class DisplaySettingsForm extends BlockForm {
-  block!: DisplaySettingsBlock;
-
-  defaultData() {
-    return {
-      name: 'Display settings',
-      widgets: [],
-    };
-  }
-
-  presets() {
-    return [];
-  }
+  readonly block!: DisplaySettingsBlock;
 
   get displaySlots() {
     const slots = Array(6);

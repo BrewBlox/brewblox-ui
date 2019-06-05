@@ -8,7 +8,7 @@ import { TempSensorOneWireBlock } from './types';
 
 @Component
 export default class TempSensorOneWireWidget extends BlockWidget {
-  block!: TempSensorOneWireBlock;
+  readonly block!: TempSensorOneWireBlock;
 
   get renamedTargets() {
     return postfixedDisplayNames(

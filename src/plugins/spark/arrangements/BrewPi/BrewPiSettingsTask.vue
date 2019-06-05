@@ -3,16 +3,13 @@ import { uid } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
-import { Link,Unit } from '@/helpers/units';
+import { Link, Unit } from '@/helpers/units';
 import { typeName as graphType } from '@/plugins/history/Graph/getters';
 import { BrewPiConfig } from '@/plugins/spark/arrangements/BrewPi/types';
 import { typeName as offsetType } from '@/plugins/spark/features/ActuatorOffset/getters';
 import { typeName as pwmType } from '@/plugins/spark/features/ActuatorPwm/getters';
 import { typeName as mutexType } from '@/plugins/spark/features/Mutex/getters';
-import {
-  defaultData as pidData,
-  typeName as pidType,
-} from '@/plugins/spark/features/Pid/getters';
+import { typeName as pidType } from '@/plugins/spark/features/Pid/getters';
 import { typeName as spProfileType } from '@/plugins/spark/features/SetpointProfile/getters';
 import { typeName as pairType } from '@/plugins/spark/features/SetpointSensorPair/getters';
 import sparkStore from '@/plugins/spark/store';
@@ -143,7 +140,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         type: pidType,
         groups: this.cfg.groups,
         data: {
-          ...pidData(),
+          ...sparkStore.specs[pidType].generate(),
           enabled: true,
           inputId: new Link(this.cfg.names.fridgeSSPair),
           outputId: new Link(this.cfg.names.coolPwm),
@@ -160,7 +157,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         type: pidType,
         groups: this.cfg.groups,
         data: {
-          ...pidData(),
+          ...sparkStore.specs[pidType].generate(),
           enabled: true,
           inputId: new Link(this.cfg.names.fridgeSSPair),
           outputId: new Link(this.cfg.names.heatPwm),
@@ -177,7 +174,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         type: pidType,
         groups: this.cfg.groups,
         data: {
-          ...pidData(),
+          ...sparkStore.specs[pidType].generate(),
           enabled: false,
           inputId: new Link(this.cfg.names.beerSSPair),
           outputId: new Link(this.cfg.names.fridgeDriver),

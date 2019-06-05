@@ -4,19 +4,9 @@ import { Component } from 'vue-property-decorator';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { ActuatorOffsetBlock } from '@/plugins/spark/features/ActuatorOffset/types';
 
-import { defaultData, presets } from './getters';
-
 @Component
 export default class ActuatorOffsetForm extends BlockForm {
-  block!: ActuatorOffsetBlock;
-
-  defaultData() {
-    return defaultData();
-  }
-
-  presets() {
-    return presets();
-  }
+  readonly block!: ActuatorOffsetBlock;
 }
 </script>
 

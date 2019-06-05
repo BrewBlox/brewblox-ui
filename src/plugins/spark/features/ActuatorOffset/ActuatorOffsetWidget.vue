@@ -7,7 +7,7 @@ import { ActuatorOffsetBlock } from './types';
 
 @Component
 export default class ActuatorOffsetWidget extends BlockWidget {
-  block!: ActuatorOffsetBlock;
+  readonly block!: ActuatorOffsetBlock;
 
   get warnings() {
     const warn: string[] = [];

@@ -1,16 +1,16 @@
 <script lang="ts">
 
 import get from 'lodash/get';
+import map from 'lodash/map';
 import { Dialog, uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import FormBase from '@/components/Form/FormBase';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import sparkStore from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import { Block, ChangeField } from '@/plugins/spark/types';
 import featureStore from '@/store/features';
 
-import { changeProps } from './getters';
 import { BlockChange, ChangeProperty, Step, StepViewConfig } from './types';
 
 interface BlockChangeDisplay extends BlockChange {
@@ -39,6 +39,18 @@ export default class StepViewForm extends FormBase {
     return this.widgetConfig.serviceId;
   }
 
+  get changeFields(): Record<string, ChangeField[]> {
+    return sparkStore.specValues
+      .reduce(
+        (acc, spec) => {
+          if (spec.changes.length) {
+            acc[spec.id] = spec.changes;
+          }
+          return acc;
+        },
+        {});
+  }
+
   asBlockChangeDisplay(stepId: string, change: BlockChange): BlockChangeDisplay {
     const block = sparkStore.blocks(this.serviceId)[change.blockId];
     return {
@@ -46,7 +58,7 @@ export default class StepViewForm extends FormBase {
       block,
       key: `__${stepId}__${change.blockId}`,
       displayName: block ? featureStore.displayNameById(block.type) : 'Unknown',
-      props: block ? changeProps[block.type] : [],
+      props: block ? this.changeFields[block.type] : [],
     };
   }
 
@@ -75,7 +87,7 @@ export default class StepViewForm extends FormBase {
 
   get blockIdOpts(): string[] {
     return sparkStore.blockValues(this.serviceId)
-      .filter(block => !!get(changeProps, [block.type, 'length']))
+      .filter(block => !!get(this.changeFields, [block.type, 'length']))
       .map(block => block.id);
   }
 
@@ -154,7 +166,7 @@ export default class StepViewForm extends FormBase {
       component: 'BlockChoiceDialog',
       title: 'Choose a Block',
       filter: block => {
-        return !!changeProps[block.type]
+        return !!this.changeFields[block.type]
           && !step.changes.find(change => block.id === change.blockId);
       },
       root: this.$root,

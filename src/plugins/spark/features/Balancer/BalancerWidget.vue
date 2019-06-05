@@ -8,7 +8,7 @@ import { BalancerBlock } from './types';
 
 @Component
 export default class BalancerWidget extends BlockWidget {
-  block!: BalancerBlock;
+  readonly block!: BalancerBlock;
 
   get clientNames() {
     return getClients(this.serviceId, this.blockId);

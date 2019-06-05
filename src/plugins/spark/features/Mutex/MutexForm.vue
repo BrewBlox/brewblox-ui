@@ -1,20 +1,13 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { Unit } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
+
+import { MutexBlock } from './types';
 
 @Component
 export default class MutexForm extends BlockForm {
-  defaultData() {
-    return {
-      differentActuatorWait: new Unit(0, 'second'),
-    };
-  }
-
-  presets() {
-    return [];
-  }
+  readonly block!: MutexBlock;
 }
 </script>
 

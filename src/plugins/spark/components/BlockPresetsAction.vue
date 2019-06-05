@@ -2,43 +2,37 @@
 
 import { Dialog } from 'quasar';
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import sparkStore from '@/plugins/spark/store/';
-import dashboardStore from '@/store/dashboards';
 
-@Component({
-  props: {
-    block: {
-      type: Object,
-      required: true,
-    },
-    presets: {
-      type: Array,
-      default: () => [],
-    },
-    label: {
-      type: String,
-      default: 'Apply preset',
-    },
-    icon: {
-      type: String,
-      default: 'mdi-application-import',
-    },
-    active: {
-      type: Boolean,
-      default: false,
-    },
-    noClose: {
-      type: Boolean,
-      default: false,
-    },
-  },
-})
+import { Block } from '../types';
+
+@Component
 export default class BlockPresetsAction extends Vue {
+
+  @Prop({ type: Object, required: true })
+  readonly block!: Block;
+
+  @Prop({ type: String, default: 'Apply preset' })
+  readonly label!: string;
+
+  @Prop({ type: String, default: 'mdi-application-import' })
+  readonly icon!: string;
+
+  @Prop({ type: Boolean, default: false })
+  readonly active!: boolean;
+
+  @Prop({ type: Boolean, default: false })
+  readonly noClose!: boolean;
+
+  get presets() {
+    return sparkStore.specs[this.block.type].presets;
+  }
+
   choosePreset() {
-    const { id, serviceId } = this.$props.block;
-    const presets = [...this.$props.presets];
+    const { id, serviceId, type } = this.block;
+
     Dialog.create({
       title: 'Apply configuration preset',
       dark: true,
@@ -47,13 +41,16 @@ export default class BlockPresetsAction extends Vue {
         type: 'radio',
         model: null,
         // Classes are not correctly emitted by onOk
-        items: presets.map((p, idx) => ({ label: p.label, value: idx })),
+        items: this.presets.map((p, idx) => ({ label: p.name, value: idx })),
       },
     })
       .onOk(idx => {
-        const preset = presets[idx];
+        if (idx === null) {
+          return;
+        }
+        const preset = this.presets[idx];
         const block = sparkStore.blockById(serviceId, id);
-        block.data = { ...block.data, ...preset.value };
+        block.data = { ...block.data, ...preset.generate() };
         sparkStore.saveBlock([serviceId, block]);
       });
   }

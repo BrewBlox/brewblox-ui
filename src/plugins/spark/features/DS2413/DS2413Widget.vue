@@ -7,7 +7,7 @@ import { DS2413Block } from './types';
 
 @Component
 export default class DS2413Widget extends BlockWidget {
-  block!: DS2413Block;
+  readonly block!: DS2413Block;
 
   get address() {
     return this.block.data.address;

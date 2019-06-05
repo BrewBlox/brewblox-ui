@@ -8,7 +8,7 @@ import { InactiveObjectBlock } from './types';
 
 @Component
 export default class InactiveObjectWidget extends BlockWidget {
-  block!: InactiveObjectBlock;
+  readonly block!: InactiveObjectBlock;
 
   get actualDisplayName() {
     return featureStore.displayNameById(this.block.data.actualType);

@@ -8,7 +8,7 @@ import { SetpointSensorPairBlock } from './types';
 
 @Component
 export default class SetpointSensorPairWidget extends BlockWidget {
-  block!: SetpointSensorPairBlock;
+  readonly block!: SetpointSensorPairBlock;
 
   get renamedTargets() {
     return postfixedDisplayNames(

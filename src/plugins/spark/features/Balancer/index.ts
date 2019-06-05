@@ -2,9 +2,19 @@ import { ref } from '@/helpers/component-ref';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
+import { BlockSpec } from '../../types';
 import form from './BalancerForm.vue';
 import widget from './BalancerWidget.vue';
 import { typeName } from './getters';
+
+const block: BlockSpec = {
+  id: typeName,
+  generate: () => ({
+    clients: [],
+  }),
+  presets: [],
+  changes: [],
+};
 
 const feature: Feature = {
   ...GenericBlock,
@@ -19,4 +29,4 @@ const feature: Feature = {
   },
 };
 
-export default feature;
+export default { feature, block };

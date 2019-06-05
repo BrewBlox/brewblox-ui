@@ -1,10 +1,35 @@
 import { ref } from '@/helpers/component-ref';
+import { Unit } from '@/helpers/units';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
+import { BlockSpec } from '../../types';
 import form from './TempSensorMockForm.vue';
 import widget from './TempSensorMockWidget.vue';
 import { typeName } from './getters';
+
+const block: BlockSpec = {
+  id: typeName,
+  generate: () => ({
+    value: new Unit(20, 'degC'),
+    connected: true,
+  }),
+  changes: [
+    {
+      key: 'value',
+      title: 'Sensor Value',
+      component: 'UnitValEdit',
+      generate: () => new Unit(20, 'degC'),
+    },
+    {
+      key: 'connected',
+      title: 'Connected',
+      component: 'BoolValEdit',
+      generate: () => true,
+    },
+  ],
+  presets: [],
+};
 
 const feature: Feature = {
   ...GenericBlock,
@@ -19,4 +44,4 @@ const feature: Feature = {
   },
 };
 
-export default feature;
+export default { feature, block };

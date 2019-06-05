@@ -1,21 +1,13 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { Unit } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
+
+import { TempSensorMockBlock } from './types';
 
 @Component
 export default class TempSensorMockForm extends BlockForm {
-  defaultData() {
-    return {
-      value: new Unit(20, 'degC'),
-      connected: true,
-    };
-  }
-
-  presets() {
-    return [];
-  }
+  readonly block!: TempSensorMockBlock;
 }
 </script>
 

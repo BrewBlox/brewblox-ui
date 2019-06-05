@@ -7,7 +7,7 @@ import { ActuatorAnalogMockBlock } from './types';
 
 @Component
 export default class ActuatorAnalogMockWidget extends BlockWidget {
-  block!: ActuatorAnalogMockBlock;
+  readonly block!: ActuatorAnalogMockBlock;
 
   get renamedTargets() {
     return {

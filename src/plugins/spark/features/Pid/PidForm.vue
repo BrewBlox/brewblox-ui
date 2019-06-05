@@ -4,19 +4,11 @@ import { Component } from 'vue-property-decorator';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
 
-import { defaultData, filters, presets } from './getters';
+import { filters } from './getters';
 
 @Component
 export default class PidForm extends BlockForm {
-  block!: PidBlock;
-
-  defaultData() {
-    return defaultData();
-  }
-
-  presets() {
-    return presets();
-  }
+  readonly block!: PidBlock;
 
   get filterOpts() {
     return filters.map((filter, idx) => ({ label: filter, value: idx }));

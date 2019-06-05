@@ -10,6 +10,7 @@ import serviceStore from '@/store/services';
 import {
   Block,
   BlockLink,
+  BlockSpec,
   CompatibleBlocks,
   Spark,
   SparkConfig,
@@ -128,6 +129,8 @@ interface SparkServiceState {
 export class SparkModule extends VuexModule {
   private services: Record<string, SparkServiceState> = {};
 
+  public specs: Record<string, BlockSpec> = {};
+
   private get allBlockIds(): Record<string, string[]> {
     return Object.entries(this.services)
       .reduce((acc, [k, v]) => ({ ...acc, [k]: Object.keys(v.blocks) }), {});
@@ -146,6 +149,14 @@ export class SparkModule extends VuexModule {
   private get allBlockLinks(): Record<string, BlockLink[]> {
     return Object.keys(this.services)
       .reduce((acc, id) => ({ ...acc, [id]: calculateBlockLinks(this.allBlockValues[id]) }), {});
+  }
+
+  public get specIds(): string[] {
+    return Object.keys(this.specs);
+  }
+
+  public get specValues(): BlockSpec[] {
+    return Object.values(this.specs);
   }
 
   public get serviceAvailable(): (serviceId: string) => boolean {
@@ -239,6 +250,11 @@ export class SparkModule extends VuexModule {
 
   public get groupNames(): (serviceId: string) => string[] {
     return serviceId => this.allGroupNames[serviceId];
+  }
+
+  @Mutation
+  public commitAllSpecs(specs: BlockSpec[]): void {
+    Vue.set(this, 'specs', specs.reduce((acc, s) => ({ ...acc, [s.id]: s }), {}));
   }
 
   @Mutation

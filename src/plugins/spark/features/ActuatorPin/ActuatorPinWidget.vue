@@ -8,7 +8,7 @@ import { ActuatorPinBlock } from './types';
 
 @Component
 export default class ActuatorPinWidget extends BlockWidget {
-  block!: ActuatorPinBlock;
+  readonly block!: ActuatorPinBlock;
 
   get subtitles() {
     return [

@@ -3,21 +3,11 @@ import { Component } from 'vue-property-decorator';
 
 import BlockForm from '@/plugins/spark/components/BlockForm';
 
+import { BalancerBlock } from './types';
+
 @Component
 export default class BalancerForm extends BlockForm {
-  defaultData() {
-    return {
-      clients: [],
-    };
-  }
-
-  presets() {
-    return [];
-  }
-
-  created() {
-    this.block; // ensure getter is evaluated
-  }
+  readonly block!: BalancerBlock;
 }
 </script>
 

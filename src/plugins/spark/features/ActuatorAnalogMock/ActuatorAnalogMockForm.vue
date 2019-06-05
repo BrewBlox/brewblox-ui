@@ -3,22 +3,11 @@ import { Component } from 'vue-property-decorator';
 
 import BlockForm from '@/plugins/spark/components/BlockForm';
 
+import { ActuatorAnalogMockBlock } from './types';
+
 @Component
 export default class ActuatorAnalogMockForm extends BlockForm {
-  defaultData() {
-    return {
-      setting: 0,
-      minSetting: 0,
-      maxSetting: 100,
-      value: 0,
-      minValue: 0,
-      maxValue: 100,
-    };
-  }
-
-  presets() {
-    return [];
-  }
+  readonly block!: ActuatorAnalogMockBlock;
 }
 </script>
 

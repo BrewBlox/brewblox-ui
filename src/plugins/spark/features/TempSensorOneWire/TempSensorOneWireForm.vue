@@ -1,22 +1,13 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { Unit } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
+
+import { TempSensorOneWireBlock } from './types';
 
 @Component
 export default class TempSensorOneWireForm extends BlockForm {
-  defaultData() {
-    return {
-      value: new Unit(null, 'degC'),
-      offset: new Unit(0, 'delta_degC'),
-      address: '',
-    };
-  }
-
-  presets() {
-    return [];
-  }
+  readonly block!: TempSensorOneWireBlock;
 }
 </script>
 

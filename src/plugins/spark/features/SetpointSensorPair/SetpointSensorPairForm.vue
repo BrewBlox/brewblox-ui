@@ -1,24 +1,13 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { Unit } from '@/helpers/units';
-import { TempSensorLink } from '@/helpers/units/KnownLinks';
 import BlockForm from '@/plugins/spark/components/BlockForm';
+
+import { SetpointSensorPairBlock } from './types';
 
 @Component
 export default class SetpointSensorPairForm extends BlockForm {
-  defaultData() {
-    return {
-      sensorId: new TempSensorLink(null),
-      setting: new Unit(null, 'degC'),
-      value: new Unit(null, 'degC'),
-      settingEnabled: true,
-    };
-  }
-
-  presets() {
-    return [];
-  }
+  readonly block!: SetpointSensorPairBlock;
 }
 </script>
 
