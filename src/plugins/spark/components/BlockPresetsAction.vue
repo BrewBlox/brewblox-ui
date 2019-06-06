@@ -27,7 +27,8 @@ export default class BlockPresetsAction extends Vue {
   readonly noClose!: boolean;
 
   get presets() {
-    return sparkStore.specs[this.block.type].presets;
+    const spec = sparkStore.specs[this.block.type];
+    return [{ name: 'Default values', generate: spec.generate }, ...spec.presets];
   }
 
   choosePreset() {
@@ -58,7 +59,5 @@ export default class BlockPresetsAction extends Vue {
 </script>
 
 <template>
-  <ActionItem :disabled="!presets.length" v-bind="$props" @click="choosePreset">
-    <q-tooltip v-if="!presets.length">No presets available</q-tooltip>
-  </ActionItem>
+  <ActionItem v-bind="$props" @click="choosePreset"/>
 </template>

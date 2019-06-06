@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
@@ -10,6 +10,9 @@ import sparkStore from '@/plugins/spark/store';
 @Component
 export default class DisplaySettingsForm extends BlockForm {
   readonly block!: DisplaySettingsBlock;
+
+  @Prop({ type: Number })
+  public readonly openSlot!: number;
 
   get displaySlots() {
     const slots = Array(6);
@@ -107,6 +110,7 @@ export default class DisplaySettingsForm extends BlockForm {
       v-for="(slot, idx) in displaySlots"
       :key="idx"
       :label="`Slot ${idx + 1}`"
+      :default-opened="openSlot === idx"
       group="modal"
       icon="mdi-widgets"
     >
