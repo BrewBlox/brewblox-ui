@@ -1,34 +1,28 @@
 <script lang="ts">
 import FileSaver from 'file-saver';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { serialize } from '@/helpers/units/parseObject';
 import dashboardStore from '@/store/dashboards';
 
-@Component({
-  props: {
-    widgetId: {
-      type: String,
-      required: true,
-    },
-    icon: {
-      type: String,
-      default: 'mdi-file-export',
-    },
-    label: {
-      type: String,
-      default: 'Export widget',
-    },
-    noClose: {
-      type: Boolean,
-      default: false,
-    },
-  },
-})
+@Component
 export default class ExportAction extends Vue {
+
+  @Prop({ type: String, required: true })
+  readonly widgetId!: string;
+
+  @Prop({ type: String, default: 'mdi-file-export' })
+  readonly icon!: string;
+
+  @Prop({ type: String, default: 'Export widget' })
+  readonly label!: string;
+
+  @Prop({ type: String, default: false })
+  readonly noClose!: boolean;
+
   async showDialog() {
-    const item = dashboardStore.dashboardItemById(this.$props.widgetId);
+    const item = dashboardStore.dashboardItemById(this.widgetId);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, _rev, dashboard, pinnedPosition, ...exported } = item;
     const blob = new Blob([JSON.stringify(serialize(exported))], { type: 'text/plain;charset=utf-8' });

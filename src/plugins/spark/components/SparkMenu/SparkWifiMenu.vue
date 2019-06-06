@@ -1,10 +1,9 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { WiFiSettingsBlock } from '@/plugins/spark/provider/types';
 import sparkStore from '@/plugins/spark/store';
-import serviceStore from '@/store/services';
 
 const WlanSecurityEnum = [
   [0, 'Unsecured'],
@@ -23,14 +22,7 @@ const WlanCipherEnum = [
   [3, 'AES or TKIP'],
 ];
 
-@Component({
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-})
+@Component
 export default class SparkWifiMenu extends Vue {
   isPwd: boolean = true;
   values = {
@@ -42,12 +34,11 @@ export default class SparkWifiMenu extends Vue {
     ip: '',
   }
 
-  get service() {
-    return serviceStore.serviceById(this.$props.serviceId);
-  }
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
 
   get block(): WiFiSettingsBlock {
-    return sparkStore.blockValues(this.service.id)
+    return sparkStore.blockValues(this.serviceId)
       .find(block => block.type === 'WiFiSettings') as WiFiSettingsBlock;
   }
 
@@ -63,7 +54,7 @@ export default class SparkWifiMenu extends Vue {
   }
 
   async save() {
-    await sparkStore.saveBlock([this.service.id, { ...this.block, data: this.values }]);
+    await sparkStore.saveBlock([this.serviceId, { ...this.block, data: this.values }]);
     this.$nextTick(() => this.$emit('close'));
   }
 }
@@ -73,7 +64,7 @@ export default class SparkWifiMenu extends Vue {
   <q-card dark class="widget-modal">
     <FormToolbar>
       <q-item-section>
-        <q-item-label>{{ service.id }}</q-item-label>
+        <q-item-label>{{ serviceId }}</q-item-label>
         <q-item-label caption>Wifi Configuration</q-item-label>
       </q-item-section>
     </FormToolbar>

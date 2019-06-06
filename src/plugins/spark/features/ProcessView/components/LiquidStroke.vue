@@ -1,27 +1,23 @@
 <script lang="ts">
 import { svgPathProperties } from 'svg-path-properties';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
-@Component({
-  props: {
-    colors: {
-      type: Array,
-      required: true,
-    },
-    paths: {
-      type: Array,
-      required: true,
-    },
-  },
-})
+@Component
 export default class LiquidStroke extends Vue {
+
+  @Prop({ type: Array, required: true })
+  readonly colors!: string[];
+
+  @Prop({ type: Array, required: true })
+  readonly paths!: string[];
+
   get pathLengths() {
-    return this.$props.paths.map(v => svgPathProperties(v).getTotalLength());
+    return this.paths.map(v => svgPathProperties(v).getTotalLength());
   }
 
   get dashArrays() {
-    const numColors = this.$props.colors.length;
+    const numColors = this.colors.length;
     if (numColors < 2) {
       return [1];
     }

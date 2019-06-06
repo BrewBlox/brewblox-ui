@@ -2,15 +2,14 @@
 
 import get from 'lodash/get';
 import { Dialog, uid } from 'quasar';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import FormBase from '@/components/Form/FormBase';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import sparkStore from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import { Block, ChangeField } from '@/plugins/spark/types';
 import featureStore from '@/store/features';
 
-import { changeProps } from './getters';
 import { BlockChange, ChangeProperty, Step, StepViewConfig } from './types';
 
 interface BlockChangeDisplay extends BlockChange {
@@ -24,23 +23,31 @@ interface StepDisplay extends Step {
   changes: BlockChangeDisplay[];
 }
 
-@Component({
-  props: {
-    openStep: {
-      type: String,
-      default: '',
-    },
-  },
-})
+@Component
 export default class StepViewForm extends FormBase {
   editableChanges: Record<string, boolean> = {};
 
+  @Prop({ type: String })
+  readonly openStep!: string;
+
   get widgetConfig(): StepViewConfig {
-    return this.$props.field;
+    return this.widget.config;
   }
 
   get serviceId() {
     return this.widgetConfig.serviceId;
+  }
+
+  get changeFields(): Record<string, ChangeField[]> {
+    return sparkStore.specValues
+      .reduce(
+        (acc, spec) => {
+          if (spec.changes.length) {
+            acc[spec.id] = spec.changes;
+          }
+          return acc;
+        },
+        {});
   }
 
   asBlockChangeDisplay(stepId: string, change: BlockChange): BlockChangeDisplay {
@@ -50,7 +57,7 @@ export default class StepViewForm extends FormBase {
       block,
       key: `__${stepId}__${change.blockId}`,
       displayName: block ? featureStore.displayNameById(block.type) : 'Unknown',
-      props: block ? changeProps[block.type] : [],
+      props: block ? this.changeFields[block.type] : [],
     };
   }
 
@@ -79,7 +86,7 @@ export default class StepViewForm extends FormBase {
 
   get blockIdOpts(): string[] {
     return sparkStore.blockValues(this.serviceId)
-      .filter(block => !!get(changeProps, [block.type, 'length']))
+      .filter(block => !!get(this.changeFields, [block.type, 'length']))
       .map(block => block.id);
   }
 
@@ -158,10 +165,9 @@ export default class StepViewForm extends FormBase {
       component: 'BlockChoiceDialog',
       title: 'Choose a Block',
       filter: block => {
-        return !!changeProps[block.type]
+        return !!this.changeFields[block.type]
           && !step.changes.find(change => block.id === change.blockId);
       },
-      dark: true,
       root: this.$root,
       serviceId: this.serviceId,
     })
@@ -199,7 +205,7 @@ export default class StepViewForm extends FormBase {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
 
     <q-card-section>
       <div class="scroll-parent">
@@ -208,7 +214,7 @@ export default class StepViewForm extends FormBase {
             v-for="step in steps"
             :label="step.name"
             :key="step.id"
-            :default-opened="$props.openStep === step.id"
+            :default-opened="openStep === step.id"
             group="steps"
             icon="mdi-format-list-checks"
           >

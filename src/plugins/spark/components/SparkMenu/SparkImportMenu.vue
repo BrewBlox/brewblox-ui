@@ -3,29 +3,26 @@ import FileSaver from 'file-saver';
 import get from 'lodash/get';
 import { Dialog } from 'quasar';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
-import { deserialize,serialize } from '@/helpers/units/parseObject';
+import { deserialize, serialize } from '@/helpers/units/parseObject';
 import sparkStore from '@/plugins/spark/store';
 import serviceStore from '@/store/services';
 
 
-@Component({
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-})
+@Component
 export default class SparkImportMenu extends Vue {
+
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
+
   reader: FileReader = new FileReader();
   serializedData: string = '';
   importBusy: boolean = false;
   messages: string[] = [];
 
   get service() {
-    return serviceStore.serviceById(this.$props.serviceId);
+    return serviceStore.serviceById(this.serviceId);
   }
 
   async exportBlocks() {

@@ -56,7 +56,7 @@ export interface ProcessViewConfig {
   parts: PersistentPart[];
 }
 
-interface Rect {
+export interface Rect {
   x: number;
   y: number;
   left: number;
@@ -65,4 +65,4 @@ interface Rect {
   bottom: number;
 }
 
-type ClickEvent = MouseEvent | TouchEvent;
+export type ClickEvent = MouseEvent | TouchEvent;

@@ -1,20 +1,16 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
 import dashboardStore from '@/store/dashboards';
 import featureStore from '@/store/features';
 
-@Component({
-  props: {
-    dashboardId: {
-      type: String,
-      required: false,
-    },
-  },
-})
+@Component
 export default class WidgetWizardPicker extends Vue {
+  @Prop({ type: String, required: false })
+  readonly dashboardId!: string;
+
   filteredOptions: any[] = [];
   feature: any = null;
   wizardActive: boolean = false;
@@ -23,8 +19,9 @@ export default class WidgetWizardPicker extends Vue {
 
   get chosenDashboardId() {
     return this.localChosenDashboardId
-      || this.$props.dashboardId
-      || dashboardStore.primaryDashboardId;
+      || this.dashboardId
+      || dashboardStore.primaryDashboardId
+      || '';
   }
 
   set chosenDashboardId(id: string) {

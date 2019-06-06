@@ -1,7 +1,7 @@
 <script lang="ts">
 import mapValues from 'lodash/mapValues';
 import UrlSafeString from 'url-safe-string';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { spaceCased, valOrDefault } from '@/helpers/functional';
@@ -13,11 +13,9 @@ import serviceStore from '@/store/services';
 
 @Component
 export default class BrewPiNamingTask extends WizardTaskBase {
-  chosenNames: Partial<BrewPiConfigNames> = {};
+  readonly config!: BrewPiConfig;
 
-  get cfg(): BrewPiConfig {
-    return this.stagedConfig;
-  }
+  chosenNames: Partial<BrewPiConfigNames> = {};
 
   get serviceOpts() {
     return serviceStore.serviceValues
@@ -26,7 +24,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   get serviceId() {
-    let id = this.cfg.serviceId;
+    let id = this.config.serviceId;
     if (!id && this.serviceOpts.length > 0) {
       id = this.serviceOpts[0].value;
     }
@@ -34,39 +32,39 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   set serviceId(id: string) {
-    this.updateConfig<BrewPiConfig>({ ...this.cfg, serviceId: id });
+    this.updateConfig<BrewPiConfig>({ ...this.config, serviceId: id });
   }
 
   get arrangementId() {
-    return valOrDefault(this.cfg.arrangementId, 'Fermentation');
+    return valOrDefault(this.config.arrangementId, 'Fermentation');
   }
 
   set arrangementId(id: string) {
-    this.updateConfig<BrewPiConfig>({ ...this.cfg, arrangementId: id });
+    this.updateConfig<BrewPiConfig>({ ...this.config, arrangementId: id });
   }
 
   get prefix() {
-    return valOrDefault(this.cfg.prefix, this.arrangementId.slice(0, 7));
+    return valOrDefault(this.config.prefix, this.arrangementId.slice(0, 7));
   }
 
   set prefix(prefix: string) {
-    this.updateConfig<BrewPiConfig>({ ...this.cfg, prefix });
+    this.updateConfig<BrewPiConfig>({ ...this.config, prefix });
   }
 
   get dashboardTitle() {
-    return valOrDefault(this.cfg.dashboardTitle, `${this.arrangementId} Dashboard`);
+    return valOrDefault(this.config.dashboardTitle, `${this.arrangementId} Dashboard`);
   }
 
   set dashboardTitle(id: string) {
-    this.updateConfig<BrewPiConfig>({ ...this.cfg, dashboardTitle: id });
+    this.updateConfig<BrewPiConfig>({ ...this.config, dashboardTitle: id });
   }
 
   get groups() {
-    return valOrDefault(this.cfg.groups, [0]);
+    return valOrDefault(this.config.groups, [0]);
   }
 
   set groups(groups: number[]) {
-    this.updateConfig<BrewPiConfig>({ ...this.cfg, groups });
+    this.updateConfig<BrewPiConfig>({ ...this.config, groups });
   }
 
   get defaultNames(): BrewPiConfigNames {
@@ -118,8 +116,8 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   clearKey(key: string) {
-    delete this.cfg[key];
-    this.updateConfig<BrewPiConfig>(this.cfg);
+    delete this.config[key];
+    this.updateConfig<BrewPiConfig>(this.config);
   }
 
   clearName(key: string) {
@@ -132,7 +130,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
 
   next() {
     this.updateConfig<BrewPiConfig>({
-      ...this.cfg,
+      ...this.config,
       serviceId: this.serviceId,
       arrangementId: this.arrangementId,
       dashboardId: new UrlSafeString().generate(this.dashboardTitle),

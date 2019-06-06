@@ -1,6 +1,7 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
+import { Link } from '@/helpers/units';
 import sparkStore from '@/plugins/spark/store';
 
 import ValEdit from './ValEdit';
@@ -8,10 +9,11 @@ import ValEdit from './ValEdit';
 
 @Component
 export default class LinkValEdit extends ValEdit {
+  field!: Link;
   filtered: string[] | null = null;
 
   get blockIdOpts() {
-    return sparkStore.blockIds(this.$props.serviceId);
+    return sparkStore.blockIds(this.serviceId);
   }
 
   get filteredOpts(): string[] {

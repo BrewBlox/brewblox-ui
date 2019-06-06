@@ -1,7 +1,7 @@
 <script lang="ts">
 import { uid } from 'quasar';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { spaceCased } from '@/helpers/functional';
 
@@ -11,17 +11,13 @@ import settings from './settings';
 import { PersistentPart, StatePart } from './types';
 
 
-@Component({
-  props: {
-    partial: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-})
+@Component
 export default class ProcessViewCatalog extends Vue {
   SQUARE_SIZE: number = SQUARE_SIZE;
   spaceCased = spaceCased;
+
+  @Prop({ type: Object, default: () => ({}) })
+  readonly partial!: Partial<PersistentPart>;
 
   get availableParts(): StatePart[] {
     return parts
@@ -42,7 +38,7 @@ export default class ProcessViewCatalog extends Vue {
   }
 
   selectPart(part: PersistentPart) {
-    this.$emit('create', { ...part, ...this.$props.partial });
+    this.$emit('create', { ...part, ...this.partial });
     this.$nextTick(() => this.$emit('close'));
   }
 }
@@ -69,7 +65,7 @@ export default class ProcessViewCatalog extends Vue {
                 :height="`${SQUARE_SIZE}px`"
                 :viewBox="`0 0 ${partViewBox(part)}`"
               >
-                <ProcessViewItem :value="part"/>
+                <ProcessViewItem :part="part"/>
               </svg>
             </q-item-section>
             <q-item-section>{{ spaceCased(part.type) }}</q-item-section>

@@ -1,30 +1,19 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockForm from '@/plugins/spark/components/BlockForm';
 
+import { ActuatorAnalogMockBlock } from './types';
+
 @Component
 export default class ActuatorAnalogMockForm extends BlockForm {
-  defaultData() {
-    return {
-      setting: 0,
-      minSetting: 0,
-      maxSetting: 100,
-      value: 0,
-      minValue: 0,
-      maxValue: 100,
-    };
-  }
-
-  presets() {
-    return [];
-  }
+  readonly block!: ActuatorAnalogMockBlock;
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
@@ -92,10 +81,6 @@ export default class ActuatorAnalogMockForm extends BlockForm {
           :field="block.data.constrainedBy"
           :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
         />
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
       </q-expansion-item>
     </q-card-section>
   </q-card>

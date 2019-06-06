@@ -1,17 +1,17 @@
 <script lang="ts">
 import get from 'lodash/get';
 import parseDuration from 'parse-duration';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { durationString } from '@/helpers/functional';
 import historyStore from '@/store/history';
-import { DisplayNames, Listener, QueryParams,QueryTarget } from '@/store/history';
+import { DisplayNames, Listener, QueryParams, QueryTarget } from '@/store/history';
 
 import { addListener } from './actions';
-import { DEFAULT_DECIMALS,DEFAULT_FRESH_DURATION } from './getters';
-import { MetricsConfig,MetricsResult } from './types';
+import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './getters';
+import { MetricsConfig, MetricsResult } from './types';
 
 interface CurrentValue extends MetricsResult {
   name: string;
@@ -33,7 +33,7 @@ export default class MetricsWidget extends WidgetBase {
       params: {},
       freshDuration: {},
       decimals: {},
-      ...this.$props.config,
+      ...this.widget.config,
     };
   }
 
@@ -75,7 +75,7 @@ export default class MetricsWidget extends WidgetBase {
   }
 
   listenerId(target: QueryTarget): string {
-    return `${this.widgetId}/${target.measurement}`;
+    return `${this.widget.id}/${target.measurement}`;
   }
 
   addListeners() {
@@ -118,37 +118,15 @@ export default class MetricsWidget extends WidgetBase {
 <template>
   <q-card dark class="text-white column scroll no-wrap">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <MetricsForm
-        v-if="modalOpen"
-        v-bind="$props"
-        :field="widgetCfg"
-        :on-change-field="saveConfig"
-      />
+      <MetricsForm v-if="modalOpen" :widget="widget" @update:widget="saveWidget"/>
     </q-dialog>
 
-    <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
+    <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="modalOpen = true">
           <q-list dark bordered>
             <ActionItem icon="refresh" label="Refresh" @click="resetListeners"/>
-            <ActionItem
-              v-if="$props.onCopy"
-              icon="file_copy"
-              label="Copy widget"
-              @click="$props.onCopy(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onMove"
-              icon="exit_to_app"
-              label="Move widget"
-              @click="$props.onMove(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onDelete"
-              icon="delete"
-              label="Delete widget"
-              @click="$props.onDelete(widgetId)"
-            />
+            <WidgetActions :field="me"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

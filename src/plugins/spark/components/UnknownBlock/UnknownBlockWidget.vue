@@ -1,5 +1,5 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 import sparkStore from '@/plugins/spark/store';
@@ -15,32 +15,20 @@ export default class UnknownBlockWidget extends WidgetBase {
   modalOpen: boolean = false;
 
   get serviceId(): string {
-    return this.$props.config.serviceId;
+    return this.widget.config.serviceId;
   }
 
   get blockId(): string {
-    return this.$props.config.blockId;
+    return this.widget.config.blockId;
   }
 
   get block(): Block {
     return {
       id: this.blockId,
       serviceId: this.serviceId,
-      type: this.$props.type,
+      type: this.widget.feature,
       groups: [],
       data: {},
-    };
-  }
-
-  get formProps(): any {
-    return {
-      ...this.$props,
-      field: this.block,
-      onChangeField: () => { },
-      onChangeBlockId: () => { },
-      onSwitchBlockId: this.switchBlockId,
-      // Block widgets can't independently change title - it is set to block ID
-      onChangeTitle: null,
     };
   }
 
@@ -58,10 +46,6 @@ export default class UnknownBlockWidget extends WidgetBase {
     };
   }
 
-  switchBlockId(blockId: string) {
-    this.$props.onChangeConfig(this.$props.id, { ...this.$props.config, blockId });
-  }
-
   fetchAll() {
     sparkStore.fetchAll(this.serviceId);
   }
@@ -72,10 +56,10 @@ export default class UnknownBlockWidget extends WidgetBase {
 <template>
   <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <UnknownBlockForm v-if="modalOpen" v-bind="formProps"/>
+      <UnknownBlockForm v-if="modalOpen" v-bind="$props" :block="block" @update:block="saveBlock"/>
     </q-dialog>
 
-    <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
+    <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section class="dense" side>
         <q-btn flat round dense icon="settings" @click="modalOpen = true"/>
       </q-item-section>

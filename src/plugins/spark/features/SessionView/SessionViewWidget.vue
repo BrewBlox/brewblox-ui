@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Dialog } from 'quasar';
 import shortid from 'shortid';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { shortDateString } from '@/helpers/functional';
@@ -17,7 +17,7 @@ export default class SessionViewWidget extends WidgetBase {
   sessionFilter: string = '';
 
   get widgetConfig(): SessionViewConfig {
-    return this.$props.config;
+    return this.widget.config;
   }
 
   get sessions(): Session[] {
@@ -110,43 +110,26 @@ export default class SessionViewWidget extends WidgetBase {
       <SessionViewForm
         v-if="modalOpen"
         v-bind="$props"
-        :field="widgetConfig"
-        :on-change-field="saveConfig"
         :active-session="modalSession"
+        @update:widget="saveWidget"
+        @create-session="createSession"
       />
     </q-dialog>
     <BlockGraph
       v-if="graphSession"
       :value="true"
-      :id="`${widgetId}::${graphSession.id}`"
+      :id="`${widget.id}::${graphSession.id}`"
       :config="graphSession.graphCfg"
       :change="callAndSaveConfig(v => graphSession.graphCfg = v)"
       no-duration
-      @input="v => {if(!v) { graphSessionId = null; }}"
+      @input="v => {if(!v) graphSessionId = null;}"
     />
 
-    <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
+    <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="openModal()">
           <q-list dark bordered>
-            <ActionItem
-              v-if="$props.onCopy"
-              icon="file_copy"
-              label="Copy widget"
-              @click="$props.onCopy(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onMove"
-              icon="exit_to_app"
-              label="Move widget"
-              @click="$props.onMove(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onDelete"
-              icon="delete"
-              label="Delete widget"
-              @click="$props.onDelete(widgetId)"
-            />
+            <WidgetActions :field="me"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

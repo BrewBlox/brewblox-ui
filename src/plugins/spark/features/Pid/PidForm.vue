@@ -1,24 +1,14 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
 
-import { defaultData, filters, presets } from './getters';
+import { filters } from './getters';
 
 @Component
 export default class PidForm extends BlockForm {
-  defaultData() {
-    return defaultData();
-  }
-
-  presets() {
-    return presets();
-  }
-
-  get block() {
-    return this.blockField as PidBlock;
-  }
+  readonly block!: PidBlock;
 
   get filterOpts() {
     return filters.map((filter, idx) => ({ label: filter, value: idx }));
@@ -28,7 +18,7 @@ export default class PidForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="mdi-calculator-variant" label="Settings">
@@ -261,10 +251,6 @@ export default class PidForm extends BlockForm {
             {{ block.data.p + block.data.i + block.data.d | round }}
           </q-item-section>
         </q-item>
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
       </q-expansion-item>
     </q-card-section>
   </q-card>

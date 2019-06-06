@@ -1,42 +1,63 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
-@Component({
-  props: {
-    label: {
-      type: String,
-      required: false,
-    },
-    icon: {
-      type: String,
-      required: false,
-    },
-    active: {
-      type: Boolean,
-      default: false,
-    },
-    noClose: {
-      type: Boolean,
-      default: false,
-    },
-  },
-})
-export default class ActionItem extends Vue { }
+@Component
+export default class ActionItem extends Vue {
+
+  @Prop({ type: String, required: false })
+  readonly label!: string;
+
+  @Prop({ type: String, required: false })
+  readonly icon!: string;
+
+  @Prop({ type: Boolean, default: false })
+  readonly active!: boolean;
+
+  @Prop({ type: Boolean, default: false })
+  readonly noClose!: boolean;
+
+  @Prop({ type: Object, default: () => ({}) })
+  readonly itemProps!: any;
+
+  @Prop({ type: Boolean, default: false })
+  readonly disabled!: boolean;
+
+
+  get combinedProps() {
+    return {
+      dark: true,
+      clickable: !this.disabled,
+      active: this.active && !this.disabled,
+      ...this.itemProps,
+    };
+  }
+
+  get itemClass() {
+    return {
+      darkened: this.disabled,
+    };
+  }
+
+  onClick() {
+    if (!this.disabled) {
+      this.$emit('click');
+    }
+  }
+}
 </script>
 
 <template>
   <q-item
-    v-close-popup="!$props.noClose"
-    :active="$props.active"
-    dark
-    clickable
-    @click="$emit('click')"
+    v-close-popup="!noClose && !disabled"
+    v-bind="combinedProps"
+    :class="itemClass"
+    @click="onClick"
   >
-    <q-item-section v-if="$props.icon" avatar>
-      <q-icon :name="$props.icon"/>
+    <q-item-section v-if="icon" avatar>
+      <q-icon :name="icon"/>
     </q-item-section>
-    <q-item-section>{{ $props.label }}</q-item-section>
+    <q-item-section>{{ label }}</q-item-section>
     <slot/>
   </q-item>
 </template>

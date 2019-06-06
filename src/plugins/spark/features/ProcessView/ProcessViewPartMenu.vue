@@ -1,6 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { clampRotation } from '@/helpers/functional';
 import { partSettings } from '@/plugins/spark/features/ProcessView/calculateFlows';
@@ -9,20 +9,12 @@ import { FlowPart } from '@/plugins/spark/features/ProcessView/types';
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';
 
-@Component({
-  props: {
-    value: {
-      type: Object,
-      required: true,
-    },
-  },
-})
+@Component
 export default class ProcessViewPartMenu extends Vue {
   SQUARE_SIZE: number = SQUARE_SIZE; // make value accessible in template
 
-  get part(): FlowPart {
-    return this.$props.value;
-  }
+  @Prop({ type: Object, required: true })
+  readonly part!: FlowPart;
 
   get cards() {
     return [
@@ -68,11 +60,11 @@ export default class ProcessViewPartMenu extends Vue {
             :viewBox="`0, 0, ${SQUARE_SIZE * rotatedSize[0]}, ${SQUARE_SIZE * rotatedSize[1]}`"
             class="q-mx-auto"
           >
-            <ProcessViewItem :value="part"/>
+            <ProcessViewItem :part="part"/>
           </svg>
         </q-item-section>
       </q-item>
-      <component v-for="card in cards" :key="card" :is="card" :value="part" v-on="$listeners"/>
+      <component v-for="card in cards" :key="card" :is="card" :part="part" v-on="$listeners"/>
     </q-card-section>
   </q-card>
 </template>

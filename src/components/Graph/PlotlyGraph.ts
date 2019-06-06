@@ -1,6 +1,6 @@
 import Plotly from 'plotly.js';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 interface VueProp {
   type: any;

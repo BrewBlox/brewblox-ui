@@ -1,23 +1,20 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
+
+import { DisplayNames } from '@/store/history';
 
 
-@Component({
-  props: {
-    selected: {
-      type: Array,
-      required: true,
-    },
-    renames: {
-      type: Object,
-      required: true,
-    },
-  },
-})
+@Component
 export default class LabelSelector extends Vue {
+  @Prop({ type: Array, required: true })
+  readonly selected!: string[];
+
+  @Prop({ type: Object, required: true })
+  readonly renames!: DisplayNames;
+
   get labels() {
-    return { ...this.$props.renames };
+    return { ...this.renames };
   }
 
   callAndSaveLabels(func: (v: any) => void) {

@@ -1,16 +1,13 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { getById } from './getters';
 import { ActuatorDS2413Block } from './types';
 
 @Component
 export default class ActuatorDS2413Widget extends BlockWidget {
-  get block(): ActuatorDS2413Block {
-    return getById(this.serviceId, this.blockId);
-  }
+  readonly block!: ActuatorDS2413Block;
 
   get renamedTargets() {
     return {
@@ -23,7 +20,12 @@ export default class ActuatorDS2413Widget extends BlockWidget {
 <template>
   <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <ActuatorDS2413Form v-if="modalOpen" v-bind="formProps"/>
+      <ActuatorDS2413Form
+        v-if="modalOpen"
+        v-bind="$props"
+        :block="block"
+        @update:block="saveBlock"
+      />
     </q-dialog>
 
     <BlockWidgetToolbar :field="me" graph/>

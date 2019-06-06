@@ -1,7 +1,6 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
-import { DS2413Link } from '@/helpers/units/KnownLinks';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { ActuatorDS2413Block } from '@/plugins/spark/features/ActuatorDS2413/types';
 
@@ -9,9 +8,7 @@ import { channel } from './getters';
 
 @Component
 export default class ActuatorDS2413Form extends BlockForm {
-  get block(): ActuatorDS2413Block {
-    return this.blockField as ActuatorDS2413Block;
-  }
+  readonly block!: ActuatorDS2413Block;
 
   get actuatorChannel() {
     return channel[this.block.data.channel];
@@ -21,40 +18,12 @@ export default class ActuatorDS2413Form extends BlockForm {
     return channel
       .map((v, idx) => ({ label: v, value: idx }));
   }
-
-  defaultData() {
-    return {
-      hwDevice: new DS2413Link(null),
-      channel: 0,
-      state: 0,
-      constrainedBy: { constraints: [] },
-    };
-  }
-
-  presets() {
-    return [
-      {
-        label: 'Fridge compressor',
-        value: {
-          hwDevice: new DS2413Link(null),
-          channel: 0,
-          state: 0,
-          constrainedBy: {
-            constraints: [
-              { 'minOff[second]': 300 },
-              { 'minOn[second]': 180 },
-            ],
-          },
-        },
-      },
-    ];
-  }
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <q-item dark>
@@ -108,9 +77,6 @@ export default class ActuatorDS2413Form extends BlockForm {
             />
           </q-item-section>
         </q-item>
-      </q-expansion-item>
-      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
       </q-expansion-item>
     </q-card-section>
   </q-card>

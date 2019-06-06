@@ -1,28 +1,23 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
-@Component({
-  props: {
-    title: {
-      type: String,
-      required: true,
-    },
-    subtitle: {
-      type: String,
-      default: '',
-    },
-  },
-})
-export default class WidgetToolbar extends Vue { }
+@Component
+export default class WidgetToolbar extends Vue {
+  @Prop({ type: String, required: true })
+  readonly title!: string;
+
+  @Prop({ type: String, default: '' })
+  readonly subtitle!: string;
+}
 </script>
 
 <template>
   <q-card-section class="q-pa-xs">
     <q-item dark>
       <q-item-section>
-        <q-item-label class="ellipsis text-h6">{{ $props.title }}</q-item-label>
-        <q-item-label caption class="ellipsis">{{ $props.subtitle }}</q-item-label>
+        <q-item-label class="ellipsis text-h6">{{ title }}</q-item-label>
+        <q-item-label caption class="ellipsis">{{ subtitle }}</q-item-label>
       </q-item-section>
       <slot/>
     </q-item>

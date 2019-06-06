@@ -4,11 +4,13 @@ import { graphlib, render as dagreRender } from 'dagre-d3';
 import { saveSvgAsPng } from 'save-svg-as-png';
 import { setTimeout } from 'timers';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import sparkStore from '@/plugins/spark/store';
 import featureStore from '@/store/features';
+
+import { BlockLink } from '../types';
 
 interface Edge {
   source: string;
@@ -29,40 +31,33 @@ interface FormData {
 
 const LABEL_HEIGHT = 50;
 const LABEL_WIDTH = 150;
+const INVERTED = [
+  'input',
+  'reference',
+  'sensor',
+];
 
-@Component({
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-    nodes: {
-      type: Array,
-      required: true,
-      default: [],
-    },
-    relations: {
-      type: Array,
-      required: true,
-      default: [],
-    },
-  },
-})
+@Component
 export default class DagreDiagram extends Vue {
   $refs!: {
     svg: SVGGraphicsElement;
     diagram: SVGGraphicsElement;
     toolbar: Vue;
   }
+
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
+
+  @Prop({ type: Array, default: [] })
+  readonly nodes!: Node[];
+
+  @Prop({ type: Array, default: [] })
+  readonly relations!: BlockLink[];
+
   exportBusy: boolean = false;
   lastRelationString: string = '';
   graphObj: any = null;
   availableHeight: number = 0;
-  invertedRelations: string[] = [
-    'input',
-    'reference',
-    'sensor',
-  ];
   form: FormData = {
     open: false,
     component: '',
@@ -70,13 +65,13 @@ export default class DagreDiagram extends Vue {
   }
 
   get edges() {
-    return this.$props.relations
+    return this.relations
       .map(rel => ({ source: rel.source, target: rel.target, relation: rel.relation }));
   }
 
   get drawnNodes() {
     const findNode = (id: string): Node =>
-      this.$props.nodes.find(node => node.id === id) || { id, type: '???' };
+      this.nodes.find(node => node.id === id) || { id, type: '???' };
 
     return this.edges
       // Create a list of each ID referenced by an edge
@@ -96,7 +91,7 @@ export default class DagreDiagram extends Vue {
   }
 
   calc(): boolean {
-    const newRelationString = JSON.stringify(this.$props.relations);
+    const newRelationString = JSON.stringify(this.relations);
     if (newRelationString === this.lastRelationString) {
       return false;
     }
@@ -129,7 +124,7 @@ export default class DagreDiagram extends Vue {
 
     this.edges.forEach(val => {
       const label = val.relation[0].replace(/Id$/, '');
-      const [source, target] = this.invertedRelations.includes(label)
+      const [source, target] = INVERTED.includes(label)
         ? [val.target, val.source]
         : [val.source, val.target];
 
@@ -181,7 +176,7 @@ export default class DagreDiagram extends Vue {
   }
 
   openSettings(id: string) {
-    const block = sparkStore.blocks(this.$props.serviceId)[id];
+    const block = sparkStore.blocks(this.serviceId)[id];
     if (!block) {
       return;
     }
@@ -192,7 +187,7 @@ export default class DagreDiagram extends Vue {
       props: {
         type: block.type,
         field: block,
-        onChangeField: v => sparkStore.saveBlock([this.$props.serviceId, v]),
+        onChangeField: v => sparkStore.saveBlock([this.serviceId, v]),
         id: block.id,
         title: block.id,
         onChangeBlockId: () => { },

@@ -1,5 +1,5 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import sparkStore from '@/plugins/spark/store';
@@ -17,11 +17,12 @@ export default class BlockFormToolbar extends BlockForm {
 <template>
   <WidgetFormToolbar v-bind="$props">
     <q-icon name="mdi-cube"/>
+    <span class="text-h6 text-no-wrap">{{ widget.title }}</span>
     <SelectPopupEdit
-      v-if="!$props.volatile && $props.onSwitchBlockId"
+      v-if="!volatile "
       :options="blockOptions"
       :field="block.id"
-      :change="$props.onSwitchBlockId"
+      :change="onSwitchBlockId"
       label="Block"
       tag="span"
       class="text-h6 text-no-wrap"

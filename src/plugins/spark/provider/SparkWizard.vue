@@ -1,6 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { typeName } from '@/plugins/spark/getters';
 import sparkStore from '@/plugins/spark/store';
@@ -9,23 +9,19 @@ import serviceStore from '@/store/services';
 
 import { Spark } from '../types';
 
-@Component({
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-    serviceTitle: {
-      type: String,
-      required: true,
-    },
-  },
-})
+@Component
 export default class SparkWizard extends Vue {
+
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
+
+  @Prop({ type: String, required: true })
+  readonly serviceTitle!: string;
+
   async create() {
     const service: Spark = {
-      id: this.$props.serviceId,
-      title: this.$props.serviceTitle,
+      id: this.serviceId,
+      title: this.serviceTitle,
       order: serviceStore.serviceIds.length + 1,
       config: {
         groupNames: [],
@@ -47,13 +43,13 @@ export default class SparkWizard extends Vue {
     this.$q.notify({
       color: 'negative',
       icon: 'error',
-      message: `Service with ID '${this.$props.serviceId}' invalid or not found`,
+      message: `Service with ID '${this.serviceId}' invalid or not found`,
     });
     this.$emit('back');
   }
 
   async mounted() {
-    const ok = await sparkStore.validateService(this.$props.serviceId);
+    const ok = await sparkStore.validateService(this.serviceId);
     if (ok) {
       this.create();
     } else {

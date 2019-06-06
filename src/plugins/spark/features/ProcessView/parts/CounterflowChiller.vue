@@ -1,5 +1,5 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import PartComponent from '../components/PartComponent';
 import { CFC_BOTTOM_LEFT,CFC_TOP_RIGHT } from '../settings/CounterflowChiller';

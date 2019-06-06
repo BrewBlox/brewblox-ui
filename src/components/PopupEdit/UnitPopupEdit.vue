@@ -1,37 +1,30 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { Unit } from '@/helpers/units';
 
-@Component({
-  props: {
-    field: {
-      type: Object,
-      required: true,
-    },
-    change: {
-      type: Function,
-      required: true,
-    },
-    label: {
-      type: String,
-      required: true,
-    },
-    tag: {
-      type: String,
-      default: 'big',
-    },
-    unitTag: {
-      type: String,
-      default: 'span',
-    },
-  },
-})
+@Component
 export default class UnitPopupEdit extends Vue {
   $refs!: {
     input: any;
   }
+
+  @Prop({ type: Object, required: true })
+  readonly field!: Unit;
+
+  @Prop({ type: Function, required: true })
+  readonly change!: (v: Unit) => void;
+
+  @Prop({ type: String, required: true })
+  readonly label!: string;
+
+  @Prop({ type: String, default: 'big' })
+  readonly tag!: string;
+
+  @Prop({ type: String, default: 'span' })
+  readonly unitTag!: string;
+
   placeholder: number | null = null;
   active: boolean = false;
 
@@ -46,30 +39,25 @@ export default class UnitPopupEdit extends Vue {
   }
 
   onShow() {
-    this.placeholder = !!this.$props.field.val
-      ? +this.$props.field.val.toFixed(2)
-      : this.$props.field.val;
+    this.placeholder = !!this.field.value
+      ? +this.field.value.toFixed(2)
+      : this.field.value;
     this.active = true;
     this.$refs.input.focus();
   }
 
   endEdit() {
-    const fieldCopy = new Unit(this.placeholder, this.$props.field.unit);
-    this.$props.change(fieldCopy);
+    const fieldCopy = new Unit(this.placeholder, this.field.unit);
+    this.change(fieldCopy);
   }
 }
 </script>
 
 <template>
   <div>
-    <UnitField
-      :tag="$props.tag"
-      :unit-tag="$props.unitTag"
-      :field="$props.field"
-      tag-class="editable"
-    />
+    <UnitField :tag="tag" :unit-tag="unitTag" :field="field" tag-class="editable"/>
     <q-popup-edit
-      :title="this.$props.label"
+      :title="label"
       v-model="value"
       label-set="apply"
       buttons

@@ -1,46 +1,43 @@
 <script lang="ts">
 import isString from 'lodash/isString';
+import { uid } from 'quasar';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
+import { DashboardItem } from '@/store/dashboards';
 import featureStore from '@/store/features';
 import providerStore from '@/store/providers';
 
-@Component({
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-})
+
+@Component
 export default class BlockWizard extends Vue {
+
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
+
   filteredOptions: any[] = [];
   modalOpen: boolean = false;
 
   feature: any = null;
   blockId: string = '';
   block: Block | null = null;
+  widget: DashboardItem | null = null;
 
   get blockIdRules() {
     return [
       v => !!v || 'Name must not be empty',
-      v => !sparkStore.blockIds(this.$props.serviceId).includes(v) || 'Name must be unique',
+      v => !sparkStore.blockIds(this.serviceId).includes(v) || 'Name must be unique',
       v => v.match(/^[a-zA-Z]/) || 'Name must start with a letter',
       v => v.match(/^[a-zA-Z0-9 \(\)_\-\|]*$/) || 'Name may only contain letters, numbers, spaces, and ()-_|',
       v => v.length < 200 || 'Name must be less than 200 characters',
     ];
   }
 
-  get configureReady() {
-    return !!this.feature && !this.blockIdRules.some(rule => isString(rule(this.blockId)));
-  }
-
   get createReady() {
-    return this.configureReady && !!this.block && !!this.block.data;
+    return !!this.feature && !this.blockIdRules.some(rule => isString(rule(this.blockId)));
   }
 
   get wizardOptions() {
@@ -68,12 +65,25 @@ export default class BlockWizard extends Vue {
   }
 
   ensureLocalBlock() {
+    const typeId = this.feature.value;
+    this.widget = this.widget || {
+      id: uid(),
+      title: this.blockId,
+      feature: typeId,
+      dashboard: '',
+      order: 0,
+      config: {
+        serviceId: this.serviceId,
+        blockId: this.blockId,
+      },
+      ...featureStore.widgetSizeById(typeId),
+    };
     this.block = this.block || {
       id: this.blockId,
-      serviceId: this.$props.serviceId,
-      type: this.feature.value,
+      serviceId: this.serviceId,
+      type: typeId,
       groups: [0],
-      data: null,
+      data: sparkStore.specs[typeId].generate(),
     };
   }
 
@@ -95,8 +105,9 @@ export default class BlockWizard extends Vue {
   }
 
   async createBlock() {
+    this.ensureLocalBlock();
     try {
-      await sparkStore.createBlock([this.$props.serviceId, this.block as Block]);
+      await sparkStore.createBlock([this.serviceId, this.block as Block]);
       this.$q.notify({
         icon: 'mdi-check-all',
         color: 'positive',
@@ -121,12 +132,9 @@ export default class BlockWizard extends Vue {
       <component
         v-if="modalOpen"
         :is="feature.form"
-        :type="block.type"
-        :field="block"
-        :on-change-field="v => block = v"
-        :id="blockId"
-        :title="blockId"
-        :on-change-block-id="changeBlockId"
+        :widget.sync="widget"
+        :block.sync="block"
+        volatile
       />
     </q-dialog>
 
@@ -142,7 +150,7 @@ export default class BlockWizard extends Vue {
             options-dark
             label="Widget Type"
             @filter="filterFn"
-            @change="block = null"
+            @change="block = null; widget = null;"
           >
             <template v-slot:no-option>
               <q-item dark>
@@ -180,7 +188,7 @@ export default class BlockWizard extends Vue {
 
     <q-card-actions align="right">
       <q-btn
-        :disable="!configureReady"
+        :disable="!createReady"
         unelevated
         label="Configure"
         color="primary"

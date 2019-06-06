@@ -1,5 +1,5 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
@@ -11,19 +11,19 @@ import { Step } from './types';
 @Component
 export default class StepViewWidget extends WidgetBase {
   modalOpen: boolean = false;
-  openStep: string = '';
+  openStep: string | null = null;
 
   get serviceId() {
-    return this.$props.config.serviceId;
+    return this.widget.config.serviceId;
   }
 
   get steps(): Step[] {
-    return deserialize(this.$props.config.steps);
+    return deserialize(this.widget.config.steps);
   }
 
   set steps(steps: Step[]) {
     this.saveConfig({
-      ...this.$props.config,
+      ...this.widget.config,
       steps: serialize(steps),
     });
   }
@@ -51,7 +51,7 @@ export default class StepViewWidget extends WidgetBase {
     });
   }
 
-  openModal(stepId: string = '') {
+  openModal(stepId: string | null) {
     this.openStep = stepId;
     this.modalOpen = true;
   }
@@ -64,35 +64,17 @@ export default class StepViewWidget extends WidgetBase {
       <StepViewForm
         v-if="modalOpen"
         v-bind="$props"
-        :field="$props.config"
         :open-step="openStep"
-        :on-change-field="saveConfig"
+        @update:widget="saveWidget"
       />
     </q-dialog>
 
-    <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
+    <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
-        <q-btn-dropdown flat split icon="settings" @click="openModal">
+        <q-btn-dropdown flat split icon="settings" @click="openModal(null)">
           <q-list dark bordered>
-            <ActionItem
-              v-if="$props.onCopy"
-              icon="file_copy"
-              label="Copy widget"
-              @click="$props.onCopy(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onMove"
-              icon="exit_to_app"
-              label="Move widget"
-              @click="$props.onMove(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onDelete"
-              icon="delete"
-              label="Delete widget"
-              @click="$props.onDelete(widgetId)"
-            />
-            <ExportAction :widget-id="widgetId"/>
+            <ExportAction :widget-id="widget.id"/>
+            <WidgetActions :field="me"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

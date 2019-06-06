@@ -1,12 +1,13 @@
 <script lang="ts">
 import get from 'lodash/get';
 import isString from 'lodash/isString';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 import { objectStringSorter } from '@/helpers/functional';
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
+import { DashboardItem } from '@/store/dashboards';
 import featureStore from '@/store/features';
 import serviceStore from '@/store/services';
 import { Service } from '@/store/services';
@@ -19,6 +20,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
   blockId: string = '';
   service: Service | null = null;
   block: Block | null = null;
+  widget: DashboardItem | null = null;
 
   get serviceId(): string {
     return get(this, ['service', 'id'], '');
@@ -71,11 +73,8 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
     return !!this.service && !!this.block;
   }
 
-  get finishReady() {
-    return !!this.service && !!this.block && !!this.block.data;
-  }
-
   async createWidget() {
+    this.ensureItem();
     const service = this.service as Service;
     const block = this.block as Block;
 
@@ -83,18 +82,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
       await sparkStore.createBlock([service.id, block]);
     }
 
-    this.createItem({
-      id: this.widgetId,
-      title: block.id,
-      feature: this.typeId,
-      dashboard: this.$props.dashboardId,
-      order: 0,
-      config: {
-        serviceId: service.id,
-        blockId: block.id,
-      },
-      ...this.defaultWidgetSize,
-    });
+    this.createItem(this.widget as DashboardItem);
   }
 
   changeBlockId(newId: string) {
@@ -113,13 +101,25 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
     (this.block as Block).id = newId;
   }
 
-  ensureBlock() {
+  ensureItem() {
     this.block = this.block || {
       id: this.blockId,
       serviceId: this.serviceId,
       type: this.typeId,
       groups: [0],
-      data: null,
+      data: sparkStore.specs[this.typeId].generate(),
+    };
+    this.widget = this.widget || {
+      id: this.widgetId,
+      title: this.blockId,
+      feature: this.typeId,
+      dashboard: this.dashboardId,
+      order: 0,
+      config: {
+        serviceId: this.serviceId,
+        blockId: this.blockId,
+      },
+      ...this.defaultWidgetSize,
     };
   }
 
@@ -137,12 +137,9 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
       <component
         v-if="modalOpen"
         :is="blockForm"
-        :type="block.type"
-        :field="block"
-        :on-change-field="v => block = v"
-        :id="widgetId"
-        :title="blockId"
-        :on-change-block-id="changeBlockId"
+        :widget.sync="widget"
+        :block.sync="block"
+        volatile
       />
     </q-dialog>
 
@@ -214,10 +211,10 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
             label="Configure Block"
             color="primary"
             class="q-mx-md"
-            @click="ensureBlock(); modalOpen = true"
+            @click="ensureItem(); modalOpen = true"
           />
           <q-btn
-            :disable="!finishReady"
+            :disable="!createOk"
             unelevated
             label="Create"
             color="primary"
@@ -258,7 +255,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
             @click="modalOpen = true"
           />
           <q-btn
-            :disable="!finishReady"
+            :disable="!existingOk"
             unelevated
             label="Create"
             color="primary"

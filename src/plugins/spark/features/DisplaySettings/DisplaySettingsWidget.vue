@@ -1,16 +1,14 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { getById } from './getters';
 import { DisplaySettingsBlock } from './types';
 
 @Component
 export default class DisplaySettingsWidget extends BlockWidget {
-  get block(): DisplaySettingsBlock {
-    return getById(this.serviceId, this.blockId);
-  }
+  readonly block!: DisplaySettingsBlock;
+  openSlot: number | null = null;
 
   get displaySlots(): any[][] {
     const slots = Array(6);
@@ -27,8 +25,14 @@ export default class DisplaySettingsWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <DisplaySettingsForm v-if="modalOpen" v-bind="formProps"/>
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss @hide="openSlot = null">
+      <DisplaySettingsForm
+        v-if="modalOpen"
+        v-bind="$props"
+        :block="block"
+        :open-slot="openSlot"
+        @update:block="saveBlock"
+      />
     </q-dialog>
 
     <BlockWidgetToolbar :field="me"/>
@@ -36,7 +40,13 @@ export default class DisplaySettingsWidget extends BlockWidget {
     <q-card-section>
       <q-list dark dense>
         <div class="row">
-          <q-item v-for="(slot, idx) in displaySlots" :key="idx" class="col-4">
+          <q-item
+            v-for="(slot, idx) in displaySlots"
+            :key="idx"
+            clickable
+            class="col-4"
+            @click="openSlot = idx; openModal()"
+          >
             <q-item-section>
               <q-item-label caption>Slot {{ idx + 1 }}</q-item-label>
               <span v-if="slot" :style="slotStyle(slot)" class="text-bold">{{ slot.name }}</span>

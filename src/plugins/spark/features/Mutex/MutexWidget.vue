@@ -1,16 +1,14 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { getById, getMutexClients } from './getters';
+import { getMutexClients } from './getters';
 import { MutexBlock } from './types';
 
 @Component
 export default class MutexWidget extends BlockWidget {
-  get block(): MutexBlock {
-    return getById(this.serviceId, this.blockId);
-  }
+  readonly block!: MutexBlock;
 
   get mutexClients() {
     return getMutexClients(this.serviceId, this.blockId);
@@ -21,7 +19,7 @@ export default class MutexWidget extends BlockWidget {
 <template>
   <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <MutexForm v-if="modalOpen" v-bind="formProps"/>
+      <MutexForm v-if="modalOpen" v-bind="$props" :block="block" @update:block="saveBlock"/>
     </q-dialog>
 
     <BlockWidgetToolbar :field="me"/>

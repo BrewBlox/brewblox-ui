@@ -1,16 +1,14 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { getById } from './getters';
 import { ActuatorOffsetBlock } from './types';
 
 @Component
 export default class ActuatorOffsetWidget extends BlockWidget {
-  get block(): ActuatorOffsetBlock {
-    return getById(this.serviceId, this.blockId);
-  }
+  readonly block!: ActuatorOffsetBlock;
+
   get warnings() {
     const warn: string[] = [];
     if (!this.block.data.targetId === null) {
@@ -39,7 +37,12 @@ export default class ActuatorOffsetWidget extends BlockWidget {
 <template>
   <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <ActuatorOffsetForm v-if="modalOpen" v-bind="formProps"/>
+      <ActuatorOffsetForm
+        v-if="modalOpen"
+        v-bind="$props"
+        :block="block"
+        @update:block="saveBlock"
+      />
     </q-dialog>
 
     <BlockWidgetToolbar :field="me" graph/>

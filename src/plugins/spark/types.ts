@@ -1,5 +1,34 @@
 import { DashboardItem } from '@/store/dashboards';
+import { Feature } from '@/store/features';
 import { Service } from '@/store/services';
+
+export interface ChangeField {
+  key: string;
+  title: string;
+  component: string;
+  componentProps?: any;
+  generate: () => any;
+}
+
+export type BlockDataGenerator = () => Record<string, any>;
+
+export interface BlockDataPreset {
+  name: string;
+  generate: BlockDataGenerator;
+}
+
+export interface BlockSpec {
+  id: string;
+  systemObject?: boolean;
+  generate: BlockDataGenerator;
+  presets: BlockDataPreset[];
+  changes: ChangeField[];
+}
+
+export interface SparkFeature {
+  feature: Feature;
+  block?: BlockSpec;
+}
 
 export interface SparkConfig {
   groupNames: string[];

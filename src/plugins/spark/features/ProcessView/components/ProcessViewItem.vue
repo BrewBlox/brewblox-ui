@@ -1,6 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 
@@ -9,24 +9,15 @@ import settings from '../settings';
 import { FlowPart } from '../types';
 
 
-@Component({
-  props: {
-    value: {
-      type: Object,
-      required: true,
-    },
-    showHover: {
-      type: Boolean,
-      default: false,
-    },
-  },
-})
+@Component
 export default class ProcessViewItem extends Vue {
   SQUARE_SIZE = SQUARE_SIZE;
 
-  get part(): FlowPart {
-    return this.$props.value;
-  }
+  @Prop({ type: Object, required: true })
+  readonly part!: FlowPart;
+
+  @Prop({ type: Boolean, default: false })
+  readonly showHover!: boolean;
 
   get settings() {
     return settings[this.part.type];
@@ -66,9 +57,9 @@ export default class ProcessViewItem extends Vue {
 <template>
   <g :transform="transformation">
     <component
-      v-if="value.type"
-      :value="value"
-      :is="value.type"
+      v-if="part.type"
+      :value="part"
+      :is="part.type"
       class="ProcessViewPart"
       v-on="$listeners"
     />
@@ -76,7 +67,7 @@ export default class ProcessViewItem extends Vue {
     <rect
       :width="partSize[0]*SQUARE_SIZE"
       :height="partSize[1]*SQUARE_SIZE"
-      :class="{showhover: $props.showHover}"
+      :class="{showhover: showHover}"
       opacity="0"
     />
   </g>

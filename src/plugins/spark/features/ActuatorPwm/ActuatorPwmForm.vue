@@ -1,30 +1,18 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
 
-import { defaultData, presets } from './getters';
-
 @Component
 export default class ActuatorPwmForm extends BlockForm {
-  get block(): ActuatorPwmBlock {
-    return this.blockField as ActuatorPwmBlock;
-  }
-
-  defaultData() {
-    return defaultData();
-  }
-
-  presets() {
-    return presets();
-  }
+  readonly block!: ActuatorPwmBlock;
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
@@ -84,10 +72,6 @@ export default class ActuatorPwmForm extends BlockForm {
             />
           </q-item-section>
         </q-item>
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
       </q-expansion-item>
     </q-card-section>
   </q-card>

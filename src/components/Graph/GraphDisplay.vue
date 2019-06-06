@@ -2,26 +2,11 @@
 import merge from 'lodash/merge';
 import { Layout, PlotData } from 'plotly.js';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 Vue.component('PlotlyGraph', () => import('./PlotlyGraph'));
 
-@Component({
-  props: {
-    data: {
-      type: Array,
-      required: true,
-    },
-    layout: {
-      type: Object,
-      required: true,
-    },
-    revision: {
-      type: Number,
-      required: false,
-    },
-  },
-})
+@Component
 export default class GraphDisplay extends Vue {
   /* eslint-disable @typescript-eslint/camelcase */
   layoutDefaults: Partial<Layout> = {
@@ -66,14 +51,19 @@ export default class GraphDisplay extends Vue {
   };
   /* eslint-enable */
 
-  get plotlyData(): PlotData[] {
-    return this.$props.data;
-  }
+  @Prop({ type: Array, required: true })
+  readonly data!: PlotData[];
+
+  @Prop({ type: Object, required: true })
+  readonly layout!: Partial<Layout>;
+
+  @Prop({ type: Number, default: 0 })
+  readonly revision!: number;
 
   get plotlyLayout(): Partial<Layout> {
     return merge(
       this.layoutDefaults,
-      this.$props.layout,
+      this.layout,
     );
   }
 
@@ -85,7 +75,7 @@ export default class GraphDisplay extends Vue {
   }
 
   get ready() {
-    return this.plotlyData !== undefined
+    return this.data !== undefined
       && this.plotlyLayout !== undefined
       && this.plotlyConfig !== undefined;
   }
@@ -95,10 +85,10 @@ export default class GraphDisplay extends Vue {
 <template>
   <PlotlyGraph
     v-if="ready"
-    :data="plotlyData"
+    :data="data"
     :layout="plotlyLayout"
     :config="plotlyConfig"
-    :revision="$props.revision"
+    :revision="revision"
     class="maximized"
     fit
   />

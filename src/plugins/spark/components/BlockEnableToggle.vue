@@ -1,29 +1,25 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import BlockForm from '@/plugins/spark/components/BlockForm';
 
-@Component({
-  props: {
-    textEnabled: {
-      type: String,
-      default: 'This block is enabled',
-    },
-    textDisabled: {
-      type: String,
-      default: 'This block is disabled',
-    },
-  },
-})
+@Component
 export default class BlockEnableToggle extends BlockForm {
+
+  @Prop({ type: String, default: 'This block is enabled' })
+  readonly textEnabled!: string;
+
+  @Prop({ type: String, default: 'This block is disabled' })
+  readonly textDisabled!: string;
+
   get enabled() {
     return Boolean(this.block.data.enabled);
   }
 
   get mainText() {
     return this.enabled
-      ? this.$props.textEnabled
-      : this.$props.textDisabled;
+      ? this.textEnabled
+      : this.textDisabled;
   }
 
   toggleEnabled() {

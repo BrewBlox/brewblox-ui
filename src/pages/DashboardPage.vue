@@ -1,17 +1,11 @@
 <script lang="ts">
-import { Dialog,uid } from 'quasar';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
-import { deepCopy } from '@/helpers/shadow-copy';
 import dashboardStore, { DashboardItem } from '@/store/dashboards';
 import featureStore from '@/store/features';
-
-interface VueOrdered extends Vue {
-  id: string;
-}
 
 interface ValidatedItem {
   item: DashboardItem;
@@ -51,23 +45,6 @@ export default class DashboardPage extends Vue {
       .sort(objectSorter('order'));
   }
 
-  itemProps(item: DashboardItem): any {
-    return {
-      id: item.id,
-      title: item.title,
-      type: item.feature,
-      pos: item.pinnedPosition,
-      cols: item.cols,
-      rows: item.rows,
-      config: item.config,
-      onChangeConfig: this.onChangeItemConfig,
-      onChangeTitle: this.onChangeItemTitle,
-      onDelete: this.onDeleteItem,
-      onCopy: this.onCopyItem,
-      onMove: this.onMoveItem,
-    };
-  }
-
   get validatedItems(): ValidatedItem[] {
     return this.items
       .map((item: DashboardItem) => {
@@ -93,26 +70,22 @@ export default class DashboardPage extends Vue {
             error: e.toString(),
           };
         }
-      })
-      .map(validated => ({ ...validated, props: this.itemProps(validated.item) }));
+      });
   }
 
   get isMobile(): boolean {
     return this.$q.platform.is.mobile;
   }
 
-  onChangeDashboardTitle(title: string) {
-    dashboardStore.saveDashboard({ ...this.dashboard, title });
-  }
-
-  async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: VueOrdered[]) {
+  async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: string[]) {
     try {
-      // Make a local change to the validated item, to avoid it "jumping" during the store round trip
-      this.validatedItems
-        .filter(valItem => valItem.item.id === id)
-        .forEach(valItem => valItem.item.pinnedPosition = pinnedPosition);
+      // Make a local change to the validated item, to avoid it jumping during the store round trip
+      const local = this.validatedItems.find(valItem => valItem.item.id === id);
+      if (local) {
+        local.item.pinnedPosition = pinnedPosition;
+      }
       await dashboardStore.saveDashboardItem({ ...dashboardStore.dashboardItemById(id), pinnedPosition });
-      await dashboardStore.updateDashboardItemOrder(order.map(item => item.id));
+      await dashboardStore.updateDashboardItemOrder(order);
     } catch (e) {
       throw e;
     }
@@ -122,92 +95,8 @@ export default class DashboardPage extends Vue {
     await dashboardStore.updateDashboardItemSize({ id, cols, rows });
   }
 
-  async onChangeItemConfig(id: string, config: any) {
-    await dashboardStore.updateDashboardItemConfig({ id, config });
-  }
-
-  async onChangeItemTitle(id: string, title: string) {
-    const item = dashboardStore.dashboardItemById(id);
-    await dashboardStore.saveDashboardItem({ ...item, title });
-  }
-
-  onDeleteItem(itemId: string) {
-    const item = dashboardStore.dashboardItemById(itemId);
-    const deleteItem = () => dashboardStore.removeDashboardItem(item);
-
-    // Quasar dialog can't handle objects as value - they will be returned as null
-    // As workaround, we use array index as value, and add the "action" key to each option
-    const opts = [
-      {
-        label: 'Remove widget from this dashboard',
-        action: deleteItem,
-      },
-      ...featureStore.deletersById(item.feature)
-        .map(del => ({ label: del.description, action: del.action })),
-    ].map((opt, idx) => ({ ...opt, value: idx }));
-
-    Dialog.create({
-      title: 'Delete widget',
-      message: `How do you want to delete widget ${item.title}?`,
-      dark: true,
-      options: {
-        type: 'checkbox',
-        model: [0], // pre-check the default action
-        items: opts,
-      },
-      cancel: true,
-    })
-      .onOk((selected: number[]) => {
-        selected.forEach(idx => opts[idx].action(item.config));
-      });
-  }
-
-  onCopyItem(itemId: string) {
-    const item = dashboardStore.dashboardItemById(itemId);
-    const id = uid();
-    Dialog.create({
-      title: 'Copy widget',
-      message: `To which dashboard do you want to copy widget ${item.title}?`,
-      dark: true,
-      options: {
-        type: 'radio',
-        model: null,
-        items: this.allDashboards
-          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
-      },
-      cancel: true,
-    })
-      .onOk((dashboard: string) => {
-        if (!dashboard) {
-          return;
-        }
-        dashboardStore.appendDashboardItem({ ...deepCopy(item), id, dashboard, pinnedPosition: null });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'file_copy',
-          message: `Copied ${item.title} to ${dashboardStore.dashboardById(dashboard).title}`,
-        });
-      });
-
-  }
-
-  onMoveItem(itemId: string) {
-    const item = dashboardStore.dashboardItemById(itemId);
-    Dialog.create({
-      title: 'Move widget',
-      message: `To which dashboard do you want to move widget ${item.title}?`,
-      dark: true,
-      options: {
-        type: 'radio',
-        model: null,
-        items: this.allDashboards
-          .filter(dashboard => dashboard.id !== this.dashboardId)
-          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
-      },
-      cancel: true,
-    })
-      .onOk((dashboard: string) =>
-        dashboard && dashboardStore.saveDashboardItem({ ...item, dashboard, pinnedPosition: null }));
+  public async saveWidget(widget: DashboardItem) {
+    await dashboardStore.saveDashboardItem(widget);
   }
 }
 </script>
@@ -243,8 +132,9 @@ export default class DashboardPage extends Vue {
             <component
               :disabled="widgetEditable"
               :is="val.component"
-              v-bind="val.props"
+              :widget="val.item"
               class="dashboard-item"
+              @update:widget="saveWidget"
             />
           </q-item-section>
         </q-item>
@@ -252,16 +142,18 @@ export default class DashboardPage extends Vue {
       <GridContainer
         v-else
         :editable="widgetEditable"
-        :on-change-positions="onChangePositions"
-        :on-change-size="onChangeSize"
+        @change-positions="onChangePositions"
+        @change-size="onChangeSize"
       >
         <component
           v-for="val in validatedItems"
           :disabled="widgetEditable"
           :is="val.component"
           :key="val.item.id"
-          v-bind="val.props"
+          :widget="val.item"
+          :error="val.error"
           class="dashboard-item"
+          @update:widget="saveWidget"
         />
       </GridContainer>
     </div>

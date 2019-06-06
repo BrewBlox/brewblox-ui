@@ -1,6 +1,6 @@
 <script lang="ts">
-import { debounce,uid } from 'quasar';
-import Component from 'vue-class-component';
+import { debounce, uid } from 'quasar';
+import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { spaceCased } from '@/helpers/functional';
@@ -9,7 +9,7 @@ import ProcessViewCatalog from './ProcessViewCatalog.vue';
 import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
 import settings from './settings';
-import { ClickEvent, FlowPart, PartUpdater,PersistentPart, ProcessViewConfig, Rect, StatePart } from './types';
+import { ClickEvent, FlowPart, PartUpdater, PersistentPart, ProcessViewConfig, Rect, StatePart } from './types';
 
 interface DragAction {
   hide: boolean;
@@ -49,7 +49,7 @@ export default class ProcessViewWidget extends WidgetBase {
   calculateFlowFunc: Function = () => { };
 
   get widgetConfig(): ProcessViewConfig {
-    return this.$props.config;
+    return this.widget.config;
   }
 
   async updateParts(parts: PersistentPart[]) {
@@ -128,11 +128,10 @@ export default class ProcessViewWidget extends WidgetBase {
       <ProcessViewForm
         v-if="formModalOpen"
         v-bind="$props"
-        :field="$props.config"
-        :on-change-field="saveConfig"
         :widget-grid-rect="widgetGridRect"
         :parts="parts"
         :flow-parts="flowParts"
+        @update:widget="saveWidget"
         @parts="updateParts"
         @part="updatePart"
         @state="updatePartState"
@@ -141,7 +140,7 @@ export default class ProcessViewWidget extends WidgetBase {
       />
     </q-dialog>
 
-    <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
+    <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
         <q-btn-dropdown
           flat
@@ -150,25 +149,8 @@ export default class ProcessViewWidget extends WidgetBase {
           @click="widgetGridRect = gridRect(); formModalOpen = true"
         >
           <q-list dark bordered>
-            <ActionItem
-              v-if="$props.onCopy"
-              icon="file_copy"
-              label="Copy widget"
-              @click="$props.onCopy(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onMove"
-              icon="exit_to_app"
-              label="Move widget"
-              @click="$props.onMove(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onDelete"
-              icon="delete"
-              label="Delete widget"
-              @click="$props.onDelete(widgetId)"
-            />
-            <ExportAction :widget-id="widgetId"/>
+            <ExportAction :widget-id="widget.id"/>
+            <WidgetActions :field="me"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>
@@ -183,7 +165,7 @@ export default class ProcessViewWidget extends WidgetBase {
           :class="{ clickable: isClickable(part) }"
           @click="interact(part)"
         >
-          <ProcessViewItem :value="part" @input="updatePart" @state="updatePartState"/>
+          <ProcessViewItem :part="part" @input="updatePart" @state="updatePartState"/>
         </g>
       </svg>
     </div>

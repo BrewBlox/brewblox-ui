@@ -1,54 +1,43 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { round, truncate } from '@/helpers/functional';
 
-@Component({
-  props: {
-    field: {
-      required: true,
-    },
-    change: {
-      type: Function,
-      required: true,
-    },
-    label: {
-      type: String,
-      required: true,
-    },
-    type: {
-      type: String,
-      default: 'text',
-    },
-    clearable: {
-      type: Boolean,
-      default: false,
-    },
-    tag: {
-      type: String,
-      default: 'big',
-    },
-    decimals: {
-      type: Number,
-      default: 2,
-    },
-    popupProps: {
-      type: Object,
-      default: () => ({}),
-    },
-    inputProps: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-})
+@Component
 export default class InputPopupEdit extends Vue {
   $refs!: {
     input: any;
   }
   placeholder: any = null;
   active: boolean = false;
+
+  @Prop({ required: true })
+  readonly field!: any;
+
+  @Prop({ type: Function, required: true })
+  readonly change!: (v: any) => void;
+
+  @Prop({ type: String, required: true })
+  readonly label!: string;
+
+  @Prop({ type: String, default: 'text' })
+  readonly type!: string;
+
+  @Prop({ type: Boolean, default: false })
+  readonly clearable!: boolean;
+
+  @Prop({ type: String, default: 'big' })
+  readonly tag!: string;
+
+  @Prop({ type: Number, default: 2 })
+  readonly decimals!: number;
+
+  @Prop({ type: Object, default: () => ({}) })
+  readonly popupProps!: any;
+
+  @Prop({ type: Object, default: () => ({}) })
+  readonly inputProps!: any;
 
   get value() {
     return this.active
@@ -57,17 +46,17 @@ export default class InputPopupEdit extends Vue {
   }
 
   set value(v: any) {
-    this.placeholder = this.$props.type === 'number' ? +v : v;
+    this.placeholder = this.type === 'number' ? +v : v;
   }
 
   get displayValue() {
-    const val = this.$props.field;
+    const val = this.field;
 
-    if (this.$props.type === 'number') {
-      return round(val, this.$props.decimals);
+    if (this.type === 'number') {
+      return round(val, this.decimals);
     }
 
-    if (this.$props.type === 'text') {
+    if (this.type === 'text') {
       if (val === null || val === undefined || val === '') {
         return '<not set>';
       }
@@ -78,29 +67,25 @@ export default class InputPopupEdit extends Vue {
   }
 
   onShow() {
-    this.placeholder = this.$props.field;
+    this.placeholder = this.field;
     this.active = true;
     this.$refs.input.focus();
   }
 
   save() {
-    this.$props.change(this.placeholder);
+    this.change(this.placeholder);
   }
 }
 </script>
 
 <template>
   <div>
-    <component
-      :disabled="$props.disable"
-      :is="$props.tag"
-      class="editable ellipsis"
-    >{{ displayValue }}</component>
+    <component :disabled="$attrs.disabled" :is="tag" class="editable ellipsis">{{ displayValue }}</component>
     <q-popup-edit
       :disable="$attrs.disabled"
-      :title="$props.label"
+      :title="label"
       v-model="value"
-      v-bind="$props.popupProps"
+      v-bind="popupProps"
       label-set="apply"
       buttons
       persistent
@@ -113,9 +98,9 @@ export default class InputPopupEdit extends Vue {
       </div>
       <q-input
         ref="input"
-        :clearable="$props.clearable"
-        :type="$props.type"
-        v-bind="$props.inputProps"
+        :clearable="clearable"
+        :type="type"
+        v-bind="inputProps"
         v-model="value"
         step="any"
         dark

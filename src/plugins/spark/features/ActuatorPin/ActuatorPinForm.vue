@@ -1,5 +1,5 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockForm from '@/plugins/spark/components/BlockForm';
 
@@ -7,41 +7,13 @@ import { ActuatorPinBlock } from './types';
 
 @Component
 export default class ActuatorPinForm extends BlockForm {
-  get block(): ActuatorPinBlock {
-    return this.blockField as ActuatorPinBlock;
-  }
-
-  defaultData() {
-    return {
-      state: 2,
-      invert: false,
-      constrainedBy: { constraints: [], unconstrained: 0 },
-    };
-  }
-
-  presets() {
-    return [
-      {
-        label: 'Fridge compressor',
-        value: {
-          state: 0,
-          invert: false,
-          constrainedBy: {
-            constraints: [
-              { 'minOff[second]': 300 },
-              { 'minOn[second]': 180 },
-            ],
-          },
-        },
-      },
-    ];
-  }
+  readonly block!: ActuatorPinBlock;
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
@@ -75,10 +47,6 @@ export default class ActuatorPinForm extends BlockForm {
             />
           </q-item-section>
         </q-item>
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
       </q-expansion-item>
     </q-card-section>
   </q-card>

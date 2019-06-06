@@ -2,9 +2,20 @@ import { ref } from '@/helpers/component-ref';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
+import { BlockSpec } from '../../types';
 import form from './DS2413Form.vue';
 import widget from './DS2413Widget.vue';
 import { typeName } from './getters';
+
+const block: BlockSpec = {
+  id: typeName,
+  generate: () => ({
+    address: '',
+    state: 2,
+  }),
+  presets: [],
+  changes: [],
+};
 
 const feature: Feature = {
   ...GenericBlock,
@@ -22,4 +33,4 @@ const feature: Feature = {
   deleters: undefined,
 };
 
-export default feature;
+export default { feature, block };

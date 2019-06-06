@@ -1,6 +1,6 @@
 <script lang="ts">
 import get from 'lodash/get';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
@@ -10,23 +10,18 @@ import serviceStore from '@/store/services';
 
 import PartCard from './PartCard';
 
-@Component({
-  props: {
-    types: {
-      type: Array,
-      required: true,
-    },
-    blockServiceIdKey: {
-      type: String,
-      default: 'blockServiceId',
-    },
-    blockLinkKey: {
-      type: String,
-      default: 'blockLink',
-    },
-  },
-})
+@Component
 export default class BlockPartCard extends PartCard {
+
+  @Prop({ type: Array, required: true })
+  readonly types!: string[];
+
+  @Prop({ type: String, default: 'blockServiceId' })
+  readonly blockServiceIdKey!: string;
+
+  @Prop({ type: String, default: 'blockLink' })
+  readonly blockLinkKey!: string;
+
   serviceId: string | null = null;
   block: Block | null = null;
 
@@ -40,18 +35,18 @@ export default class BlockPartCard extends PartCard {
     }
 
     return sparkStore.blockValues(this.serviceId)
-      .filter(block => this.$props.types.includes(block.type))
+      .filter(block => this.types.includes(block.type))
       .sort(objectStringSorter('id'));
   }
 
   saveBlock() {
     const updatedSettings = this.block
       ? {
-        [this.$props.blockServiceIdKey]: this.serviceId,
-        [this.$props.blockLinkKey]: new Link(this.block.id, this.block.type),
+        [this.blockServiceIdKey]: this.serviceId,
+        [this.blockLinkKey]: new Link(this.block.id, this.block.type),
       }
       : {
-        [this.$props.blockLinkKey]: null,
+        [this.blockLinkKey]: null,
       };
 
     this.savePart({
@@ -64,8 +59,8 @@ export default class BlockPartCard extends PartCard {
   }
 
   mounted() {
-    this.serviceId = get(this.part.settings, this.$props.blockServiceIdKey, null);
-    const link = get(this.part.settings, this.$props.blockLinkKey, null);
+    this.serviceId = get(this.part.settings, this.blockServiceIdKey, null);
+    const link = get(this.part.settings, this.blockLinkKey, null);
     if (this.serviceId && link) {
       this.block = sparkStore.blocks(this.serviceId as string)[link.id];
     }

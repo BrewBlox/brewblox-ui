@@ -1,23 +1,19 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
-@Component({
-  props: {
-    field: {
-      required: true,
-    },
-    change: {
-      type: Function,
-      required: true,
-    },
-    disable: {
-      type: Boolean,
-      default: false,
-    },
-  },
-})
+@Component
 export default class ActuatorState extends Vue {
+
+  @Prop({ required: true })
+  readonly field!: number;
+
+  @Prop({ type: Function, required: true })
+  readonly change!: (v: number) => void;
+
+  @Prop({ type: Boolean, default: false })
+  readonly disable!: boolean;
+
   get commonOpts() {
     return {
       color: 'grey-9',
@@ -44,16 +40,16 @@ export default class ActuatorState extends Vue {
   }
 
   get state() {
-    return this.$props.field;
+    return this.field;
   }
 
   set state(v: number) {
     // always toggle, regardless of where the element was clicked
     if (this.state === 0 || !this.known) {
-      this.$props.change(1);
+      this.change(1);
     }
     if (this.state === 1) {
-      this.$props.change(0);
+      this.change(0);
     }
   }
 
@@ -65,10 +61,10 @@ export default class ActuatorState extends Vue {
 
 <template>
   <div>
-    <q-btn-toggle v-if="known" v-model="state" :options="options" :disable="$props.disable" dense/>
+    <q-btn-toggle v-if="known" v-model="state" :options="options" :disable="disable" dense/>
     <div v-else>
       <q-btn
-        :disable="$props.disable"
+        :disable="disable"
         class="reset-button"
         dense
         no-caps

@@ -1,6 +1,6 @@
 <script lang="ts">
 import parseDuration from 'parse-duration';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import FormBase from '@/components/Form/FormBase';
 import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
@@ -16,21 +16,24 @@ interface PeriodDisplay {
   end: boolean;
 }
 
-@Component({
-  props: {
-    downsampling: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-})
+@Component
 export default class GraphForm extends FormBase {
   durationString = durationString;
+
+  @Prop({ type: Object, default: () => ({}) })
+  readonly downsampling!: any;
 
   period: PeriodDisplay | null = null;
 
   get config(): GraphConfig {
-    return this.$props.field;
+    return {
+      layout: {},
+      params: {},
+      targets: [],
+      renames: {},
+      axes: {},
+      ...this.widget.config,
+    };
   }
 
   get periodOptions() {
@@ -140,8 +143,7 @@ export default class GraphForm extends FormBase {
   }
 
   updateAxisSide(field: string, isRight: boolean) {
-    this.config.axes[field] = isRight ? 'y2' : 'y';
-    this.saveConfig(this.config);
+    this.saveConfig({ ...this.config, axes: { ...this.axes, [field]: isRight ? 'y2' : 'y' } });
   }
 
   created() {
@@ -156,7 +158,7 @@ export default class GraphForm extends FormBase {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
 
     <q-card-section>
       <q-expansion-item group="modal" icon="mdi-timetable" label="Period settings">

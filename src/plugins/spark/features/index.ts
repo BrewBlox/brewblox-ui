@@ -1,4 +1,4 @@
-import { Feature } from '@/store/features';
+import { SparkFeature } from '@/plugins/spark/types';
 
 import ActuatorAnalogMock from './ActuatorAnalogMock';
 import ActuatorDS2413 from './ActuatorDS2413';
@@ -19,7 +19,7 @@ import StepView from './StepView';
 import TempSensorMock from './TempSensorMock';
 import TempSensorOneWire from './TempSensorOneWire';
 
-const features: { [id: string]: Feature } = {
+const features: { [id: string]: SparkFeature } = {
   ActuatorAnalogMock,
   ActuatorDS2413,
   ActuatorOffset,
