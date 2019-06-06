@@ -56,13 +56,12 @@ export default class DisplaySettingsWidget extends BlockWidget {
         </div>
 
         <q-item dark>
-          <q-item-section side>Footer text</q-item-section>
+          <q-item-section side class="q-pb-xs">Footer text</q-item-section>
           <q-item-section>
-            <InputPopupEdit
-              :field="block.data.name"
-              :change="callAndSaveBlock(v => block.data.name = v)"
-              label="footer text"
-              tag="span"
+            <InputDialogEdit
+              :value="block.data.name"
+              title="footer text"
+              @input="v => {block.data.name = v; saveBlock()}"
             />
           </q-item-section>
         </q-item>

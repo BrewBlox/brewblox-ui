@@ -5,7 +5,6 @@ import { Link } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { validDisplayTypes } from '@/plugins/spark/features/DisplaySettings/getters';
 import { DisplaySettingsBlock, DisplayWidget } from '@/plugins/spark/features/DisplaySettings/types';
-import sparkStore from '@/plugins/spark/store';
 
 @Component
 export default class DisplaySettingsForm extends BlockForm {
@@ -25,7 +24,8 @@ export default class DisplaySettingsForm extends BlockForm {
     if (!slot) {
       return new Link(null);
     }
-    return Object.values(slot).find(v => v instanceof Link) || new Link(null);
+    return Object.values(slot)
+      .find(v => v instanceof Link) || new Link(null);
   }
 
   slotColorStyle(slot) {
@@ -36,45 +36,39 @@ export default class DisplaySettingsForm extends BlockForm {
     };
   }
 
-  get slotLinkOpts() {
-    return sparkStore.blockValues(this.serviceId)
-      .filter(block => validDisplayTypes.includes(block.type))
-      .map(block => ({
-        label: block.id,
-        value: block.id,
-      }));
+  get linkFilter() {
+    return block => validDisplayTypes.includes(block.type);
   }
 
-  updateSlotLink(idx: number, id: string | null) {
+  updateSlotLink(idx: number, link: Link) {
     const pos = idx + 1;
-    if (!id) {
+    if (!link.id) {
       this.block.data.widgets = this.block.data.widgets
         .filter(w => w.pos !== pos);
       return;
     }
 
-    const block = sparkStore.blockById(this.serviceId, id);
-    const link = new Link(block.id, block.type);
+    const type = link.type || '';
     const existing = this.displaySlots[idx] || {};
     const obj: DisplayWidget = {
       pos,
       color: existing.color || '4169E1',
-      name: existing.name || block.id.slice(0, 15),
+      name: existing.name || link.id.slice(0, 15),
     };
 
-    if (['TempSensorInterface', 'TempSensorMock', 'TempSensorOneWire'].includes(block.type)) {
+    if (['TempSensorInterface', 'TempSensorMock', 'TempSensorOneWire'].includes(type)) {
       obj.tempSensor = link;
     }
 
-    if (block.type === 'SetpointSensorPair') {
+    if (type === 'SetpointSensorPair') {
       obj.setpointSensorPair = link;
     }
 
-    if (['ActuatorAnalogInterface', 'ActuatorPwm', 'ActuatorAnalogMock'].includes(block.type)) {
+    if (['ActuatorAnalogInterface', 'ActuatorPwm', 'ActuatorAnalogMock'].includes(type)) {
       obj.actuatorAnalog = link;
     }
 
-    if (block.type === 'Pid') {
+    if (type === 'Pid') {
       obj.pid = link;
     }
 
@@ -82,6 +76,7 @@ export default class DisplaySettingsForm extends BlockForm {
       ...this.block.data.widgets.filter(w => w.pos !== pos),
       obj,
     ];
+    this.saveBlock();
   }
 
   updateSlotName(idx: number, name: string) {
@@ -92,12 +87,14 @@ export default class DisplaySettingsForm extends BlockForm {
     const pos = idx + 1;
     this.block.data.widgets = this.block.data.widgets
       .map(w => (w.pos === pos ? { ...w, name } : w));
+    this.saveBlock();
   }
 
   updateSlotColor(idx: number, color: string) {
     const pos = idx + 1;
     this.block.data.widgets = this.block.data.widgets
       .map(w => (w.pos === pos ? { ...w, color: color.replace('#', '') } : w));
+    this.saveBlock();
   }
 }
 </script>
@@ -117,23 +114,25 @@ export default class DisplaySettingsForm extends BlockForm {
       <q-item dark>
         <q-item-section>Block</q-item-section>
         <q-item-section>
-          <SelectPopupEdit
-            :field="slotLink(slot).id"
-            :options="slotLinkOpts"
-            :change="callAndSaveBlock(v => updateSlotLink(idx, v))"
-            clearable
-            label="block"
+          <LinkDialogEdit
+            :value="slotLink(slot)"
+            :filter="linkFilter"
+            :service-id="serviceId"
+            title="Block"
+            @input="v => updateSlotLink(idx, v)"
           />
         </q-item-section>
       </q-item>
       <q-item dark>
         <q-item-section>Display name</q-item-section>
         <q-item-section>
-          <InputPopupEdit
+          <InputDialogEdit
             v-if="slot"
-            :field="slot.name"
-            :change="callAndSaveBlock(v => updateSlotName(idx, v))"
-            label="name"
+            :value="slot.name"
+            title="Slot name"
+            message="Choose the LCD display name for this block"
+            tag="big"
+            @input="v => updateSlotName(idx, v)"
           />
           <big v-else>-</big>
         </q-item-section>
@@ -141,11 +140,12 @@ export default class DisplaySettingsForm extends BlockForm {
       <q-item dark>
         <q-item-section>Color</q-item-section>
         <q-item-section>
-          <ColorPickerPopupEdit
+          <ColorDialogEdit
             v-if="slot"
-            :field="slot.color"
-            :change="callAndSaveBlock(v => updateSlotColor(idx, v))"
-            label="color"
+            :value="slot.color"
+            title="Color"
+            message="Choose the LCD display background color for this block"
+            @input="v => updateSlotColor(idx, v)"
           />
           <big v-else>-</big>
         </q-item-section>
@@ -155,11 +155,10 @@ export default class DisplaySettingsForm extends BlockForm {
       <q-item dark>
         <q-item-section side>Footer text</q-item-section>
         <q-item-section>
-          <InputPopupEdit
-            :field="block.data.name"
-            :change="callAndSaveBlock(v => block.data.name = v)"
-            label="Footer text"
-            tag="span"
+          <InputDialogEdit
+            :value="block.data.name"
+            title="footer text"
+            @input="v => {block.data.name = v; saveBlock()}"
           />
         </q-item-section>
       </q-item>

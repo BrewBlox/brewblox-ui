@@ -1,20 +1,18 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
-import DialogBase from '@/components/DialogBase';
+import DialogBase from '@/components/Dialog/DialogBase';
 import { objectStringSorter } from '@/helpers/functional';
+import { deepCopy } from '@/helpers/shadow-copy';
 import sparkStore from '@/plugins/spark/store';
-
-import { Block } from '../types';
+import { Block } from '@/plugins/spark/types';
 
 @Component
-export default class BlockChoiceDialog extends DialogBase {
+export default class BlockDialog extends DialogBase {
+  block: Block | null = null
 
-  @Prop({ type: String, required: true })
-  readonly title!: string;
-
-  @Prop({ type: String, default: '' })
-  readonly message!: string;
+  @Prop({ type: Object })
+  public readonly value!: Block;
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
@@ -22,18 +20,28 @@ export default class BlockChoiceDialog extends DialogBase {
   @Prop({ type: Function, default: () => () => true })
   readonly filter!: (block: Block) => boolean;
 
-  block: Block | null = null
+  @Prop({ type: Boolean, default: false })
+  public readonly clearable!: boolean;
 
   get blockOpts() {
     return sparkStore.blockValues(this.serviceId)
       .filter(this.filter)
       .sort(objectStringSorter('id'));
   }
+
+  created() {
+    this.block = deepCopy(this.value);
+  }
 }
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="block && onDialogOk(block)"
+  >
     <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
       <q-card-section class="q-dialog__title">{{ title }}</q-card-section>
       <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
@@ -41,11 +49,12 @@ export default class BlockChoiceDialog extends DialogBase {
         <q-select
           v-model="block"
           :options="blockOpts"
+          :clearable="clearable"
           dark
           options-dark
           option-label="id"
+          option-value="id"
           label="Block"
-          color="amber"
         >
           <template v-slot:no-option>
             <q-item dark>
@@ -55,8 +64,8 @@ export default class BlockChoiceDialog extends DialogBase {
         </q-select>
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn flat color="amber" label="Cancel" @click="onDialogCancel"/>
-        <q-btn :disable="!block" flat color="amber" label="OK" @click="onDialogOk(block)"/>
+        <q-btn flat label="Cancel" @click="onDialogCancel"/>
+        <q-btn :disable="!clearable && !block" flat label="OK" @click="onDialogOk(block)"/>
       </q-card-actions>
     </q-card>
   </q-dialog>

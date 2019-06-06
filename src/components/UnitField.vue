@@ -22,7 +22,7 @@ export default class UnitField extends Vue {
 </script>
 
 <template>
-  <div>
+  <div v-on="$listeners">
     <component :is="tag" :class="tagClass">{{ field.value | round }}</component>
     <component v-if="field.value !== null" :is="unitTag" class="q-ml-xs">{{ field.notation }}</component>
   </div>

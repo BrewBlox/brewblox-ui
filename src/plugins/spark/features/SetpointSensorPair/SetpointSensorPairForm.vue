@@ -40,11 +40,18 @@ export default class SetpointSensorPairForm extends BlockForm {
           </q-item-section>
           <q-item-section class="col-6" style="justify-content: flex-start">
             <q-item-label caption>Sensor</q-item-label>
-            <LinkPopupEdit
+            <!-- <LinkPopupEdit
               :field="block.data.sensorId"
               :service-id="serviceId"
               :change="callAndSaveBlock(v => block.data.sensorId = v)"
               label="Sensor"
+            />-->
+            <LinkDialogEdit
+              :value="block.data.sensorId"
+              :service-id="serviceId"
+              title="Sensor"
+              tag="big"
+              @input="v => { block.data.sensorId = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>

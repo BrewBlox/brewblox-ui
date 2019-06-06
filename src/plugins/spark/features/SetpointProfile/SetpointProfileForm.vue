@@ -150,7 +150,15 @@ export default class SetpointProfileForm extends BlockForm {
         <q-item dark class="q-py-md">
           <q-item-section>
             <q-item-label caption>Start time</q-item-label>
-            <DatetimePopupEdit
+            <DatetimeDialogEdit
+              :value="start"
+              title="Start time"
+              message="This will shift all points.
+              Offset time will remain the same, absolute time values will change.
+              The offset for the first point is always 0s."
+              @input="updateStartTime"
+            />
+            <!-- <DatetimePopupEdit
               :field="start"
               :change="updateStartTime"
               label="Start time"
@@ -159,7 +167,7 @@ export default class SetpointProfileForm extends BlockForm {
               This will shift all points.
               <br>Offset time will remain the same, absolute time values will change.
               <br>The offset for the first point is always 0s.
-            </DatetimePopupEdit>
+            </DatetimePopupEdit>-->
           </q-item-section>
           <q-item-section>
             <q-item-label caption>Driven Setpoint/Sensor pair</q-item-label>

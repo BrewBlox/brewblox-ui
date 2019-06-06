@@ -1,13 +1,15 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
-import DialogBase from '@/components/DialogBase';
+import DialogBase from '@/components/Dialog/DialogBase';
 import sparkStore from '@/plugins/spark/store';
-
-import { Block } from '../types';
+import { Block } from '@/plugins/spark/types';
 
 @Component
 export default class BlockInfoDialog extends DialogBase {
+
+  @Prop({ type: String, default: 'Block info' })
+  public readonly title!: string;
 
   @Prop({ type: Object, required: true })
   readonly block!: Block;
@@ -24,7 +26,8 @@ export default class BlockInfoDialog extends DialogBase {
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
     <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
-      <q-card-section class="q-dialog__title">Block info: {{ block.id }}</q-card-section>
+      <q-card-section class="q-dialog__title">{{ title }}</q-card-section>
+      <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
       <q-card-section class="scroll">
         <q-list dark>
           <q-item dark>

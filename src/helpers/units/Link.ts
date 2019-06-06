@@ -26,4 +26,8 @@ export default class Link {
   public toJSON(): string | null {
     return this.id;
   }
+
+  public copy() {
+    return new Link(this.id, this.type, this.driven);
+  }
 }
