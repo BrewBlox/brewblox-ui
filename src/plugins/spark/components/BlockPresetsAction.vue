@@ -31,7 +31,7 @@ export default class BlockPresetsAction extends Vue {
   }
 
   choosePreset() {
-    const { id, serviceId, type } = this.block;
+    const { id, serviceId } = this.block;
 
     Dialog.create({
       title: 'Apply configuration preset',

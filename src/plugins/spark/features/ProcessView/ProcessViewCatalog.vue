@@ -65,7 +65,7 @@ export default class ProcessViewCatalog extends Vue {
                 :height="`${SQUARE_SIZE}px`"
                 :viewBox="`0 0 ${partViewBox(part)}`"
               >
-                <ProcessViewItem :value="part"/>
+                <ProcessViewItem :part="part"/>
               </svg>
             </q-item-section>
             <q-item-section>{{ spaceCased(part.type) }}</q-item-section>

@@ -1,7 +1,6 @@
 <script lang="ts">
 
 import get from 'lodash/get';
-import map from 'lodash/map';
 import { Dialog, uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 

@@ -13,7 +13,7 @@ import { Dashboard, DashboardItem } from '@/store/dashboards';
 import featureStore, { FeatureRole } from '@/store/features';
 import serviceStore from '@/store/services';
 
-import { isReady, isSystemBlock, widgetSize } from './getters';
+import { isReady, isSystemBlock } from './getters';
 
 interface ModalSettings {
   component: string;
@@ -108,13 +108,7 @@ export default class SparkPage extends Vue {
       type: (a: ValidatedItem, b: ValidatedItem): number => {
         const left = featureStore.displayNameById(a.item.feature).toLowerCase();
         const right = featureStore.displayNameById(b.item.feature).toLowerCase();
-        if (left < right) {
-          return -1;
-        }
-        if (right > left) {
-          return 1;
-        }
-        return 0;
+        return left.localeCompare(right);
       },
       role: (a: ValidatedItem, b: ValidatedItem): number =>
         this.roleOrder[a.role] - this.roleOrder[b.role],
