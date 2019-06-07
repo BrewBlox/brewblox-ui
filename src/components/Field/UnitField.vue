@@ -39,8 +39,15 @@ export default class UnitField extends FieldBase {
 </script>
 
 <template>
-  <div @click="openDialog">
-    <component :is="tag" :class="[{editable: !readonly}, tagClass]">{{ value.value | round }}</component>
+  <component
+    :is="tag"
+    v-bind="tagProps"
+    :class="[{editable: !readonly}, tagClass]"
+    @click="openDialog"
+  >
+    <slot name="pre"/>
+    <slot name="value">{{ value.value | round }}</slot>
     <component v-if="value.value !== null" :is="unitTag" class="q-ml-xs">{{ value.notation }}</component>
-  </div>
+    <slot/>
+  </component>
 </template>

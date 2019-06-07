@@ -27,6 +27,7 @@ module.exports = {
     'object-curly-newline': 0,
     'no-param-reassign': 0,
     'no-mixed-operators': 0,
+    'no-console': 'warn',
     'vue/max-attributes-per-line': 0,
     'comma-dangle': [
       'error',

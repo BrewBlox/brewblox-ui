@@ -46,7 +46,6 @@ export default class SelectField extends FieldBase {
   }
 
   openDialog() {
-    console.log('open');
     if (this.readonly) {
       return;
     }
@@ -81,7 +80,6 @@ export default class SelectField extends FieldBase {
   >
     <slot name="pre"/>
     <slot name="value">{{ displayValue }}</slot>
-    <!-- <q-select :value="value" :options="options" v-bind="selectProps" option readonly dark/> -->
     <slot/>
   </component>
 </template>

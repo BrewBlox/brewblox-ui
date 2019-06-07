@@ -64,11 +64,10 @@ export default class SparkGroupMenu extends Vue {
         <q-item v-for="(name, idx) in groupNames" :key="idx" dark class="col-4">
           <q-item-section>
             <q-item-label caption>{{ `Group ${idx + 1} name` }}</q-item-label>
-            <InputPopupEdit
-              :field="name"
-              :change="v => { groupNames[idx] = v; saveGroupNames(); }"
-              label="Group"
-              tag="span"
+            <InputField
+              :value="name"
+              title="Group name"
+              @input="v => { groupNames[idx] = v; saveGroupNames(); }"
             />
           </q-item-section>
         </q-item>
