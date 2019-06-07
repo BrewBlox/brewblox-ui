@@ -2,10 +2,10 @@
 import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import DialogEditBase from './DialogEditBase';
+import FieldBase from './FieldBase';
 
 @Component
-export default class ColorDialogEdit extends DialogEditBase {
+export default class ColorField extends FieldBase {
 
   @Prop({ type: String, required: true })
   public readonly value!: string;
@@ -32,15 +32,20 @@ export default class ColorDialogEdit extends DialogEditBase {
       height: '1em',
       width: '1em',
       display: 'inline-block',
-      marginEnd: '0.5em',
+      marginStart: '0.5em',
     };
   }
 
   openDialog() {
+    if (this.readonly) {
+      return;
+    }
+
     Dialog.create({
       component: 'ColorDialog',
       title: this.title,
       message: this.message,
+      messageHtml: this.messageHtml,
       root: this.$root,
       value: this.color,
     })
@@ -50,12 +55,17 @@ export default class ColorDialogEdit extends DialogEditBase {
 </script>
 
 <template>
-  <component :is="tag" v-bind="tagProps" :class="tagClass" class="editable" @click="openDialog">
+  <component
+    :is="tag"
+    v-bind="tagProps"
+    :class="[{editable: !readonly},tagClass]"
+    @click="openDialog"
+  >
     <slot name="pre"/>
+    <slot name="value">{{ value }}</slot>
     <slot name="indicator">
       <span :style="colorStyle"/>
     </slot>
-    <slot name="value">{{ value }}</slot>
     <slot/>
   </component>
 </template>

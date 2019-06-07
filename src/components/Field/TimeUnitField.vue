@@ -2,19 +2,15 @@
 import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import { Unit, prettify } from '@/helpers/units';
+import { Unit } from '@/helpers/units';
 
-import DialogEditBase from './DialogEditBase';
+import FieldBase from './FieldBase';
 
 @Component
-export default class UnitDialogEdit extends DialogEditBase {
-  prettify = prettify;
+export default class TimeUnitField extends FieldBase {
 
   @Prop({ type: Object, required: true, validator: v => v instanceof Unit })
   public readonly value!: Unit;
-
-  @Prop({ type: String, default: 'span' })
-  public readonly unitTag!: string;
 
   @Emit('input')
   public change(v: Unit) {
@@ -22,10 +18,15 @@ export default class UnitDialogEdit extends DialogEditBase {
   }
 
   openDialog() {
+    if (this.readonly) {
+      return;
+    }
+
     Dialog.create({
-      component: 'UnitDialog',
+      component: 'TimeUnitDialog',
       title: this.title,
       message: this.message,
+      messageHtml: this.messageHtml,
       root: this.$root,
       value: this.value,
     })
@@ -35,13 +36,14 @@ export default class UnitDialogEdit extends DialogEditBase {
 </script>
 
 <template>
-  <UnitField
-    :tag="tag"
-    :unit-tag="unitTag"
+  <component
+    :is="tag"
     v-bind="tagProps"
-    :class="tagClass"
-    :field="value"
-    tag-class="editable"
+    :class="[{editable: !readonly}, tagClass]"
     @click="openDialog"
-  />
+  >
+    <slot name="pre"/>
+    <slot name="value">{{ value | unitDuration }}</slot>
+    <slot/>
+  </component>
 </template>

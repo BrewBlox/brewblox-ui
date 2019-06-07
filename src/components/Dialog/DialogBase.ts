@@ -11,6 +11,9 @@ export default class DialogBase extends Vue {
   @Prop({ type: String })
   public readonly message!: string;
 
+  @Prop({ type: String })
+  public readonly messageHtml!: string;
+
   // following method is REQUIRED
   // (don't change its name --> "show")
   public show() {

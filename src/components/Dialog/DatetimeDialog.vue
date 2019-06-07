@@ -49,6 +49,7 @@ export default class DatetimeDialog extends DialogBase {
     <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
       <q-card-section class="q-dialog__title">{{ title }}</q-card-section>
       <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
+      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml"/>
       <q-card-section class="scroll">
         <q-item dark>
           <q-item-section>

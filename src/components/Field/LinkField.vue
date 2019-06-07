@@ -2,12 +2,12 @@
 import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import DialogEditBase from '@/components/DialogEdit/DialogEditBase';
+import FieldBase from '@/components/Field/FieldBase';
 import { Link } from '@/helpers/units';
 import { Block } from '@/plugins/spark/types';
 
 @Component
-export default class LinkDialogEdit extends DialogEditBase {
+export default class LinkField extends FieldBase {
 
   @Prop({ type: Object, required: true, validator: v => v instanceof Link })
   public readonly value!: Link;
@@ -28,10 +28,15 @@ export default class LinkDialogEdit extends DialogEditBase {
   }
 
   openDialog() {
+    if (this.readonly) {
+      return;
+    }
+
     Dialog.create({
       component: 'LinkDialog',
       title: this.title,
       message: this.message,
+      messageHtml: this.messageHtml,
       filter: this.filter,
       root: this.$root,
       value: this.value,
@@ -44,7 +49,12 @@ export default class LinkDialogEdit extends DialogEditBase {
 </script>
 
 <template>
-  <component :is="tag" v-bind="tagProps" :class="tagClass" class="editable" @click="openDialog">
+  <component
+    :is="tag"
+    v-bind="tagProps"
+    :class="[{editable: !readonly}, tagClass]"
+    @click="openDialog"
+  >
     <slot name="pre"/>
     <slot name="value">{{ value | truncated }}</slot>
     <slot/>

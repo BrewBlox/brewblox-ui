@@ -150,7 +150,7 @@ export default class SetpointProfileForm extends BlockForm {
         <q-item dark class="q-py-md">
           <q-item-section>
             <q-item-label caption>Start time</q-item-label>
-            <DatetimeDialogEdit
+            <DatetimeField
               :value="start"
               title="Start time"
               message="This will shift all points.
@@ -158,25 +158,14 @@ export default class SetpointProfileForm extends BlockForm {
               The offset for the first point is always 0s."
               @input="updateStartTime"
             />
-            <!-- <DatetimePopupEdit
-              :field="start"
-              :change="updateStartTime"
-              label="Start time"
-              tag="span"
-            >
-              This will shift all points.
-              <br>Offset time will remain the same, absolute time values will change.
-              <br>The offset for the first point is always 0s.
-            </DatetimePopupEdit>-->
           </q-item-section>
           <q-item-section>
             <q-item-label caption>Driven Setpoint/Sensor pair</q-item-label>
-            <LinkPopupEdit
-              :field="block.data.targetId"
-              :service-id="block.serviceId"
-              :change="callAndSaveBlock(v => block.data.targetId = v)"
-              label="Driven Setpoint/Sensor pair"
-              tag="span"
+            <LinkField
+              :value="block.data.targetId"
+              :service-id="serviceId"
+              title="Driven Setpoint/Sensor pair"
+              @input="v => { block.data.targetId = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>
@@ -196,35 +185,34 @@ export default class SetpointProfileForm extends BlockForm {
         </q-item>
         <q-item v-for="(point, idx) in points" :key="idx" dark dense>
           <q-item-section class="col-3">
-            <InputPopupEdit
-              :field="durationString(point.offsetMs)"
-              :change="v => updatePointOffset(idx, parseDuration(v))"
-              label="Offset from start time"
-              tag="span"
-            >
-              This will change the point offset.
+            <InputField
+              :value="durationString(point.offsetMs)"
+              title="Offset from start time"
+              message-html="
+            This will change the point offset.
               <br>The absolute point time will be changed to start time + offset.
               <br>Changing point offset may change point order.
-            </InputPopupEdit>
+            "
+              @input="v => updatePointOffset(idx, parseDuration(v))"
+            />
           </q-item-section>
           <q-item-section class="col-5">
-            <DatetimePopupEdit
-              :field="point.absTimeMs"
-              :change="v => updatePointTime(idx, v)"
-              label="Time"
-              tag="span"
-            >
+            <DatetimeField
+              :value="point.absTimeMs"
+              title="Time"
+              message-html="
               This will change the absolute point time.
               <br>Changing point time may change point order.
               <br>Point offset is changed to point time - start time.
-            </DatetimePopupEdit>
+              "
+              @input="v => updatePointTime(idx, v)"
+            />
           </q-item-section>
           <q-item-section class="col-3">
-            <UnitPopupEdit
-              :field="point.temperature"
-              :change="v => updatePointTemperature(idx, v)"
-              label="Temperature"
-              tag="span"
+            <UnitField
+              :value="point.temperature"
+              title="Temperature"
+              @input="v => updatePointTemperature(idx, v)"
             />
           </q-item-section>
           <q-item-section class="col-1" side>

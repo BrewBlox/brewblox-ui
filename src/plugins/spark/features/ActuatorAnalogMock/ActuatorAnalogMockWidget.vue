@@ -41,20 +41,14 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
       <q-item dark>
         <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Setting</q-item-label>
-          <div>
-            <InputPopupEdit
-              v-if="!isDriven"
-              :field="block.data.setting"
-              :change="callAndSaveBlock(v => block.data.setting = v)"
-              type="number"
-              label="Setting"
-            />
-            <UnitField
-              v-else
-              :field="block.data.setting"
-              :class="{ darkened: block.data.setting.value === null }"
-            />
-          </div>
+          <InputField
+            :value="block.data.setting"
+            :readonly="isDriven"
+            title="Setting"
+            tag="big"
+            type="number"
+            @input="v => { block.data.setting = v; saveBlock(); }"
+          />
           <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
         <q-item-section style="justify-content: flex-start">

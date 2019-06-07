@@ -4,11 +4,17 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/Dialog/DialogBase';
 
 @Component
-export default class ColorDialog extends DialogBase {
-  local: string = '';
+export default class SelectDialog extends DialogBase {
+  local: any = null;
 
-  @Prop({ type: String, required: true })
-  public readonly value!: string;
+  @Prop({ type: [String, Number, Array], required: true })
+  public readonly value!: any;
+
+  @Prop({ type: Array, required: true })
+  public readonly options!: any[];
+
+  @Prop({ type: Object, default: () => ({}) })
+  public readonly selectProps!: any;
 
   created() {
     this.local = this.value;
@@ -23,11 +29,23 @@ export default class ColorDialog extends DialogBase {
       <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml"/>
       <q-card-section class="scroll">
-        <q-color v-model="local" dark format-model="hex"/>
+        <q-select v-model="local" :options="options" v-bind="selectProps" dark options-dark>
+          <template v-slot:no-option>
+            <q-item dark>
+              <q-item-section class="text-grey">No results</q-item-section>
+            </q-item>
+          </template>
+        </q-select>
       </q-card-section>
       <q-card-actions align="right">
         <q-btn color="primary" flat label="Cancel" @click="onDialogCancel"/>
-        <q-btn color="primary" flat label="OK" @click="onDialogOk(local)"/>
+        <q-btn
+          :disable="!selectProps.clearable && local === null"
+          color="primary"
+          flat
+          label="OK"
+          @click="onDialogOk(local)"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>

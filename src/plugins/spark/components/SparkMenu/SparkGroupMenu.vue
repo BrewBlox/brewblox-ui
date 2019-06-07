@@ -49,10 +49,11 @@ export default class SparkGroupMenu extends Vue {
       <q-item dark>
         <q-item-section>
           <q-item-label caption>Active groups</q-item-label>
-          <GroupsPopupEdit
-            :field="groups.data.active"
+          <GroupsField
+            :value="groups.data.active"
             :service-id="service.id"
-            :change="v => { groups.data.active = v; saveBlock(groups); }"
+            title="Active groups"
+            @input="v => { groups.data.active = v; saveBlock(groups); }"
           />
         </q-item-section>
       </q-item>

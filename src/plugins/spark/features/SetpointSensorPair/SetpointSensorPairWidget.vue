@@ -46,15 +46,14 @@ export default class SetpointSensorPairWidget extends BlockWidget {
             :class="{darkened: !block.data.settingEnabled}"
             label="Setting"
           />
-          <UnitDialogEdit
-            v-if="!isDriven"
+          <UnitField
             :class="{darkened: !block.data.settingEnabled}"
             :value="block.data.storedSetting"
+            :readonly="isDriven"
             title="Setting"
             tag="big"
             @input="v => {block.data.storedSetting = v; saveBlock()}"
           />
-          <UnitField v-else :field="block.data.storedSetting"/>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
         <q-item-section class="col-3" style="justify-content: flex-start">

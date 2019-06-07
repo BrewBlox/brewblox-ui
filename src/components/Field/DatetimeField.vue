@@ -2,10 +2,10 @@
 import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import DialogEditBase from './DialogEditBase';
+import FieldBase from './FieldBase';
 
 @Component
-export default class DatetimeDialogEdit extends DialogEditBase {
+export default class DatetimeField extends FieldBase {
 
   @Prop({ type: [Number, String, Object], required: true })
   public readonly value!: number | string | Date;
@@ -35,10 +35,15 @@ export default class DatetimeDialogEdit extends DialogEditBase {
   }
 
   openDialog() {
+    if (this.readonly) {
+      return;
+    }
+
     Dialog.create({
       component: 'DatetimeDialog',
       title: this.title,
       message: this.message,
+      messageHtml: this.messageHtml,
       root: this.$root,
       value: new Date(this.value),
       resetIcon: this.resetIcon,
@@ -49,7 +54,12 @@ export default class DatetimeDialogEdit extends DialogEditBase {
 </script>
 
 <template>
-  <component :is="tag" v-bind="tagProps" :class="tagClass" class="editable" @click="openDialog">
+  <component
+    :is="tag"
+    v-bind="tagProps"
+    :class="[{editable: !readonly},tagClass]"
+    @click="openDialog"
+  >
     <slot name="pre"/>
     <slot name="value">{{ dateString }}</slot>
     <slot/>

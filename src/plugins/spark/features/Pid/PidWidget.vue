@@ -164,11 +164,11 @@ export default class PidWidget extends BlockWidget {
         </q-item-section>
         <q-item-section>
           <q-item-label caption>Target</q-item-label>
-          <UnitField :field="block.data.inputSetting"/>
+          <UnitField :value="block.data.inputSetting" readonly/>
         </q-item-section>
         <q-item-section>
           <q-item-label caption>Measured</q-item-label>
-          <UnitField :field="block.data.inputValue"/>
+          <UnitField :value="block.data.inputValue" readonly/>
         </q-item-section>
         <q-item-section side>
           <BlockFormButton
@@ -210,15 +210,15 @@ export default class PidWidget extends BlockWidget {
         </q-item-section>
         <q-item-section>
           <q-item-label caption>Proportional</q-item-label>
-          <UnitField :field="block.data.error" tag="span" unit-tag="small"/>
+          <UnitField :value="block.data.error" tag="span" unit-tag="small" readonly/>
         </q-item-section>
         <q-item-section>
           <q-item-label caption>Integral</q-item-label>
-          <UnitField :field="block.data.integral" tag="span" unit-tag="small"/>
+          <UnitField :value="block.data.integral" tag="span" unit-tag="small" readonly/>
         </q-item-section>
         <q-item-section>
           <q-item-label caption>Derivative</q-item-label>
-          <UnitField :field="block.data.derivative" tag="span" unit-tag="small"/>
+          <UnitField :value="block.data.derivative" tag="span" unit-tag="small" readonly/>
         </q-item-section>
       </q-item>
 

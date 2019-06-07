@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 @Component
-export default class DialogEditBase extends Vue {
+export default class FieldBase extends Vue {
 
   @Prop({ type: String, default: 'span' })
   public readonly tag!: string;
@@ -12,6 +12,12 @@ export default class DialogEditBase extends Vue {
 
   @Prop({ type: String })
   public readonly message!: string;
+
+  @Prop({ type: String })
+  public readonly messageHtml!: string;
+
+  @Prop({ type: Boolean, default: false })
+  public readonly readonly!: boolean;
 
   @Prop({ type: Object, default: () => ({}) })
   public readonly dialogProps!: Record<string, any>;

@@ -34,11 +34,11 @@ export default class ActuatorPwmForm extends BlockForm {
           </q-item-section>
           <q-item-section>
             <q-item-label caption>Period</q-item-label>
-            <TimeUnitPopupEdit
-              :field="block.data.period"
-              :change="callAndSaveBlock(v => block.data.period = v)"
-              label="Period"
-              type="number"
+            <TimeUnitField
+              :value="block.data.period"
+              title="Period"
+              tag="big"
+              @input="v => { block.data.period = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>
