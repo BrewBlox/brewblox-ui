@@ -62,15 +62,15 @@ export default class ActuatorPwmWidget extends BlockWidget {
         <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Duty setting</q-item-label>
           <div>
-            <InputPopupEdit
-              v-if="!isDriven"
-              :field="block.data.setting"
-              :change="callAndSaveBlock(v => block.data.setting = v)"
+            <InputField
+              :value="block.data.setting"
+              :readonly="isDriven"
               style="display: inline-block"
               type="number"
-              label="Duty Setting"
+              title="Duty Setting"
+              tag="big"
+              @input="v => { block.data.setting = v; saveBlock(); }"
             />
-            <big v-else>{{ block.data.setting | round }}</big>
             <small
               v-if="block.data.setting !== null"
               style="display: inline-block"

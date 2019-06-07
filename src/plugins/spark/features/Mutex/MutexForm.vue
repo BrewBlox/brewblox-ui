@@ -20,11 +20,10 @@ export default class MutexForm extends BlockForm {
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Idle time before allowing a different actuator</q-item-label>
-            <TimeUnitPopupEdit
-              :field="block.data.differentActuatorWait"
-              :change="callAndSaveBlock(v => block.data.differentActuatorWait = v)"
-              type="number"
-              label="Minimum idle time"
+            <TimeUnitField
+              :value="block.data.differentActuatorWait"
+              title="Minimum idle time"
+              @input="v => { block.data.differentActuatorWait = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>

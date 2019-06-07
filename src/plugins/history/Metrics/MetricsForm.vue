@@ -61,10 +61,6 @@ export default class MetricsForm extends FormBase {
     historyStore.fetchKnownKeys();
   }
 
-  callAndSaveConfig(func: (v: any) => void) {
-    return (v: any) => { func(v); this.saveConfig(this.config); };
-  }
-
   resetFreshDuration(field: string) {
     this.$delete(this.config.freshDuration, field);
     this.saveConfig(this.config);
@@ -110,12 +106,10 @@ export default class MetricsForm extends FormBase {
             <q-item v-for="field in selected" :key="field" dark>
               <q-item-section>{{ field }}</q-item-section>
               <q-item-section>
-                <InputPopupEdit
-                  :field="durationString(freshDuration[field] || DEFAULT_FRESH_DURATION)"
-                  :change="callAndSaveConfig(v => freshDuration[field] = parseDuration(v))"
-                  label="Fresh duration"
-                  clearable
-                  tag="span"
+                <InputField
+                  :value="durationString(freshDuration[field] || DEFAULT_FRESH_DURATION)"
+                  title="Fresh duration"
+                  @input="v => { freshDuration[field] = parseDuration(v); saveConfig(config); }"
                 />
               </q-item-section>
               <q-item-section class="col-1">
@@ -138,15 +132,13 @@ export default class MetricsForm extends FormBase {
             <q-item v-for="field in selected" :key="field" dark>
               <q-item-section>{{ field }}</q-item-section>
               <q-item-section>
-                <InputPopupEdit
-                  :field="fieldDecimals(field)"
-                  :change="callAndSaveConfig(v => decimals[field] = v)"
+                <InputField
+                  :value="fieldDecimals(field)"
                   :decimals="0"
-                  :popup-props="{validate: (v) => v >= 0}"
+                  :rules="[v => v >= 0 || 'Must be 0 or more']"
                   type="number"
-                  label="Number of decimals"
-                  clearable
-                  tag="span"
+                  title="Number of decimals"
+                  @input="v => { decimals[field] = v; saveConfig(config); }"
                 />
               </q-item-section>
               <q-item-section class="col-1">

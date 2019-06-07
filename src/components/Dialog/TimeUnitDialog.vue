@@ -36,7 +36,7 @@ export default class TimeUnitDialog extends DialogBase {
       <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml"/>
       <q-card-section class="scroll">
-        <q-input v-model="local" dark @change="normalize"/>
+        <q-input v-model="local" label="Value" dark @change="normalize"/>
       </q-card-section>
       <q-card-actions align="right">
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel"/>

@@ -13,7 +13,7 @@ export default class UnitField extends FieldBase {
   @Prop({ type: Object, required: true, validator: v => v instanceof Unit })
   public readonly value!: Unit;
 
-  @Prop({ type: String, default: 'span' })
+  @Prop({ type: String, default: 'small' })
   public readonly unitTag!: string;
 
   @Emit('input')
@@ -39,14 +39,11 @@ export default class UnitField extends FieldBase {
 </script>
 
 <template>
-  <component
-    :is="tag"
-    v-bind="tagProps"
-    :class="[{editable: !readonly}, tagClass]"
-    @click="openDialog"
-  >
+  <component :is="tag" v-bind="tagProps" :class="tagClass" @click="openDialog">
     <slot name="pre"/>
-    <slot name="value">{{ value.value | round }}</slot>
+    <slot name="value">
+      <span :class="{editable: !readonly}">{{ value.value | round }}</span>
+    </slot>
     <component v-if="value.value !== null" :is="unitTag" class="q-ml-xs">{{ value.notation }}</component>
     <slot/>
   </component>

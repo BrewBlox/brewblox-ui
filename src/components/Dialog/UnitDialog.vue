@@ -29,6 +29,7 @@ export default class UnitDialog extends DialogBase {
           input-style="font-size: 170%"
           type="number"
           step="any"
+          label="Value"
           dark
           clearable
           @input="v => local.value = v"

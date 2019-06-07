@@ -39,13 +39,6 @@ export default class SetpointSensorPairWidget extends BlockWidget {
       <q-item dark>
         <q-item-section class="col-3" style="justify-content: flex-start">
           <q-item-label caption>Setting</q-item-label>
-          <UnitPopupEdit
-            v-if="!isDriven && false"
-            :field="block.data.storedSetting"
-            :change="callAndSaveBlock(v => block.data.storedSetting = v)"
-            :class="{darkened: !block.data.settingEnabled}"
-            label="Setting"
-          />
           <UnitField
             :class="{darkened: !block.data.settingEnabled}"
             :value="block.data.storedSetting"
@@ -66,7 +59,7 @@ export default class SetpointSensorPairWidget extends BlockWidget {
         </q-item-section>
         <q-item-section class="col-6" style="justify-content: flex-start">
           <q-item-label caption>Sensor value</q-item-label>
-          <UnitField :field="block.data.value"/>
+          <UnitField :value="block.data.value" tag="big"/>
         </q-item-section>
       </q-item>
     </q-card-section>

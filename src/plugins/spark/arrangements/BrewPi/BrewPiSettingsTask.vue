@@ -362,23 +362,13 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       <q-item dark>
         <q-item-section>Initial Fridge temperature</q-item-section>
         <q-item-section>
-          <UnitPopupEdit
-            :field="fridgeSetting"
-            :change="v => fridgeSetting = v"
-            label="Fridge setting"
-            tag="span"
-          />
+          <UnitField v-model="fridgeSetting" title="Fridge setting"/>
         </q-item-section>
       </q-item>
       <q-item dark>
         <q-item-section>Initial Beer temperature</q-item-section>
         <q-item-section>
-          <UnitPopupEdit
-            :field="beerSetting"
-            :change="v => beerSetting = v"
-            label="Beer setting"
-            tag="span"
-          />
+          <UnitField v-model="beerSetting" title="Beer setting"/>
         </q-item-section>
       </q-item>
     </q-card-section>

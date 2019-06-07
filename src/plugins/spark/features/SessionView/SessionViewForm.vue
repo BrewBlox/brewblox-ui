@@ -42,10 +42,6 @@ export default class SessionViewForm extends FormBase {
     }
   }
 
-  callAndSaveConfig(func: (v: any) => void) {
-    return (v: any) => { func(v); this.saveConfig(this.widgetConfig); };
-  }
-
   updateSession(session: Session) {
     session.graphCfg.layout.title = session.name;
     this.saveConfig({
@@ -176,11 +172,10 @@ export default class SessionViewForm extends FormBase {
           <q-item dark>
             <q-item-section>
               <q-item-label caption>Session name</q-item-label>
-              <InputPopupEdit
-                :field="session.name"
-                :change="v => { session.name = v; updateSession(session); }"
-                label="Session name"
-                tag="span"
+              <InputField
+                :value="session.name"
+                title="Session name"
+                @input="v => { session.name = v; updateSession(session); }"
               />
             </q-item-section>
             <q-item-section>
@@ -193,25 +188,23 @@ export default class SessionViewForm extends FormBase {
           <q-item dark>
             <q-item-section>
               <q-item-label caption>Start</q-item-label>
-              <DatetimePopupEdit
-                :field="session.start"
-                :change="v => startSession(session, v)"
+              <DatetimeField
+                :value="session.start"
+                title="Start"
                 reset-icon="mdi-clock-start"
-                label="Start"
-                tag="span"
                 clear-label="<click to start>"
+                @input="v => startSession(session, v)"
               />
             </q-item-section>
 
             <q-item-section>
               <q-item-label caption>End</q-item-label>
-              <DatetimePopupEdit
-                :field="session.end"
-                :change="v => endSession(session, v)"
+              <DatetimeField
+                :value="session.end"
+                title="End"
                 reset-icon="mdi-clock-end"
-                label="End"
-                tag="span"
                 clear-label="<click to end>"
+                @input="v => endSession(session, v)"
               />
             </q-item-section>
           </q-item>

@@ -9,17 +9,23 @@ import DialogBase from '@/components/Dialog/DialogBase';
 export default class InputDialog extends DialogBase {
   local: string | number | null = null;
 
-  @Prop({ type: [String, Number], required: true })
+  @Prop({ type: [String, Number] })
   public readonly value!: string | number;
 
   @Prop({ type: String, default: 'text', validator: v => ['text', 'number'].includes(v) })
   public readonly type!: string;
 
-  save() {
-    const val = (this.type === 'number' && isString(this.local))
-      ? parseFloat(this.local as string)
-      : this.local;
+  @Prop({ type: Array, default: () => [] })
+  public readonly rules!: (v: any) => true | string;
 
+  @Prop({ type: Boolean, default: true })
+  public readonly clearable!: boolean;
+
+  save() {
+    const val =
+      (this.type === 'number' && isString(this.local))
+        ? parseFloat(this.local as string)
+        : this.local;
     this.onDialogOk(val);
   }
 
@@ -37,7 +43,15 @@ export default class InputDialog extends DialogBase {
       <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml"/>
       <q-card-section class="scroll">
-        <q-input v-model="local" :type="type" dark step="any"/>
+        <q-input
+          v-model="local"
+          :type="type"
+          :rules="rules"
+          :clearable="clearable"
+          label="Value"
+          dark
+          step="any"
+        />
       </q-card-section>
       <q-card-actions align="right">
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel"/>

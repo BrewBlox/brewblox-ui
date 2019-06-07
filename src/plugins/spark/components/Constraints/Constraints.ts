@@ -44,10 +44,6 @@ export default class Constraints extends Vue {
     this.change({ ...this.field, constraints });
   }
 
-  protected callAndSaveConstraints(func: (v: any) => void): (v: any) => void {
-    return (v: any) => { func(v); this.saveConstraints(); };
-  }
-
   protected removeConstraint(index: number): void {
     this.$delete(this.constraints, index);
   }

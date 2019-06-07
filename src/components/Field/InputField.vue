@@ -2,21 +2,44 @@
 import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { round } from '@/helpers/functional';
+
 import FieldBase from './FieldBase';
 
 
 @Component
 export default class InputField extends FieldBase {
 
-  @Prop({ type: [String, Number], required: true })
+  @Prop({ type: [String, Number] })
   public readonly value!: string | number;
 
-  @Prop({ type: String })
+  @Prop({ type: String, default: 'text' })
   public readonly type!: string;
+
+  @Prop({ type: Number, default: 2 })
+  readonly decimals!: number;
+
+  @Prop({ type: Array, default: () => [] })
+  public readonly rules!: (v: any) => true | string;
+
+  @Prop({ type: Boolean, default: true })
+  public readonly clearable!: boolean;
 
   @Emit('input')
   public change(v: string | number) {
     return v;
+  }
+
+  get displayValue() {
+    if (this.value === ''
+      || this.value === null
+      || this.value === undefined) {
+      return '<not set>';
+    }
+
+    return this.type === 'number'
+      ? round(this.value, this.decimals)
+      : this.value;
   }
 
   openDialog() {
@@ -32,6 +55,8 @@ export default class InputField extends FieldBase {
       root: this.$root,
       value: this.value,
       type: this.type,
+      rules: this.rules,
+      clearable: this.clearable,
     })
       .onOk(this.change);
   }
@@ -46,7 +71,7 @@ export default class InputField extends FieldBase {
     @click="openDialog"
   >
     <slot name="pre"/>
-    <slot name="value">{{ value }}</slot>
-    <slot/>
+    <slot name="value">{{ displayValue }}</slot>
+    <slot name="append"/>
   </component>
 </template>

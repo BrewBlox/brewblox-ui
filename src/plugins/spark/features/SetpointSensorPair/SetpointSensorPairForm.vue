@@ -25,6 +25,7 @@ export default class SetpointSensorPairForm extends BlockForm {
               :readonly="isDriven"
               :class="{darkened: !block.data.settingEnabled}"
               title="Setting"
+              tag="big"
               @input="v => { block.data.storedSetting = v; saveBlock(); }"
             />
             <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>

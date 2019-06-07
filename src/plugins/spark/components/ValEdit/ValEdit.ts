@@ -27,8 +27,4 @@ export default class ValEdit extends Vue {
   public set field(val: any) {
     this.saveField(val);
   }
-
-  public callAndSaveField(func: (v: any) => void) {
-    return (v: any) => { func(v); this.saveField(this.field); };
-  }
 }

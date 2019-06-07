@@ -164,11 +164,11 @@ export default class PidWidget extends BlockWidget {
         </q-item-section>
         <q-item-section>
           <q-item-label caption>Target</q-item-label>
-          <UnitField :value="block.data.inputSetting" readonly/>
+          <UnitField :value="block.data.inputSetting" tag="big" readonly/>
         </q-item-section>
         <q-item-section>
           <q-item-label caption>Measured</q-item-label>
-          <UnitField :value="block.data.inputValue" readonly/>
+          <UnitField :value="block.data.inputValue" tag="big" readonly/>
         </q-item-section>
         <q-item-section side>
           <BlockFormButton
