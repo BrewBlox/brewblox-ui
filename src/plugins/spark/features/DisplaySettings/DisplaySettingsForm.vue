@@ -77,7 +77,7 @@ export default class DisplaySettingsForm extends BlockForm {
   }
 
   updateSlotName(idx: number, name: string) {
-    if (name.length > 15) {
+    if (name && name.length > 15) {
       this.$q.notify({ message: 'Name can only be 15 characters' });
       return;
     }
