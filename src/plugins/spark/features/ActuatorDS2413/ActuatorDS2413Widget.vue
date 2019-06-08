@@ -19,15 +19,6 @@ export default class ActuatorDS2413Widget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <ActuatorDS2413Form
-        v-if="modalOpen"
-        v-bind="$props"
-        :block="block"
-        @update:block="saveBlock"
-      />
-    </q-dialog>
-
     <BlockWidgetToolbar :field="me" graph/>
 
     <q-card-section>

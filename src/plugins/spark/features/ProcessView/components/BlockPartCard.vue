@@ -111,12 +111,15 @@ export default class BlockPartCard extends PartCard {
       </q-item-section>
     </q-item>
     <q-item v-if="block" dark>
-      <BlockFormButton
-        :block-id="block.id"
-        :service-id="block.serviceId"
-        :btn-props="{ color: 'primary', label: 'Configure block', unelevated: true }"
-        tag="q-item-section"
-      />
+      <q-item-section>
+        <BlockFormButton
+          :block-id="block.id"
+          :service-id="block.serviceId"
+          color="primary"
+          label="Configure block"
+          unelevated
+        />
+      </q-item-section>
     </q-item>
   </q-list>
 </template>
