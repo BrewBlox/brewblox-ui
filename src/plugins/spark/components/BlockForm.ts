@@ -1,6 +1,6 @@
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import FormBase from '@/components/Form/FormBase';
+import FormBase from '@/components/Widget/FormBase';
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
@@ -13,8 +14,6 @@ import sparkStore from '@/plugins/spark/store';
 @Component
 export default class BrewPiHardwareTask extends WizardTaskBase {
   readonly config!: BrewPiConfig;
-
-  blockWizardModalOpen: boolean = false;
 
   coolPin: any = null;
   heatPin: any = null;
@@ -68,6 +67,14 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
     sparkStore.fetchDiscoveredBlocks(this.config.serviceId);
   }
 
+  startBlockWizard() {
+    Dialog.create({
+      component: 'BlockWizardDialog',
+      serviceId: this.config.serviceId,
+      root: this.$root,
+    });
+  }
+
   next() {
     Object.assign(
       this.config.renamedBlocks,
@@ -88,13 +95,6 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
 
 <template>
   <div>
-    <q-dialog v-model="blockWizardModalOpen" no-backdrop-dismiss>
-      <BlockWizard
-        v-if="blockWizardModalOpen"
-        :service-id="config.serviceId"
-        @close="blockWizardModalOpen = false"
-      />
-    </q-dialog>
     <q-card-section>
       <q-item>
         <big>Hardware Blocks</big>
@@ -108,12 +108,7 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
           </q-tooltip>
         </q-item-section>
         <q-item-section class="col-auto">
-          <q-btn
-            unelevated
-            label="Create block"
-            color="primary"
-            @click="blockWizardModalOpen = true"
-          />
+          <q-btn unelevated label="Create block" color="primary" @click="startBlockWizard"/>
           <q-tooltip>
             Example cases where a Block must be created and configured manually:
             <ul>

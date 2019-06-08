@@ -12,7 +12,6 @@ import { Block } from '../types';
 
 @Component
 export default class BlockFormButton extends Vue {
-  modalOpen: boolean = false;
 
   @Prop({ type: String, validator: v => v === null || isString(v) })
   readonly blockId!: string;

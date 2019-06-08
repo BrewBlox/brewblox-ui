@@ -27,18 +27,6 @@ export default class BlockFormDialog extends DialogBase {
   get blockForm() {
     return featureStore.formById(this.block.type);
   }
-
-  // saveBlock(block: Block) {
-  //   sparkStore.saveBlock([this.block.serviceId, block])
-  //     .catch(err => this.$q.notify(err.toString()));
-  // }
-
-  // saveWidget(widget: DashboardItem) {
-  //   if (!this.volatile) {
-  //     dashboardStore.saveDashboardItem(widget)
-  //       .catch(err => this.$q.notify(err.toString()));
-  //   }
-  // }
 }
 </script>
 

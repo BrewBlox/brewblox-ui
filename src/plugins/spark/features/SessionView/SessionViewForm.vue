@@ -2,8 +2,8 @@
 import shortid from 'shortid';
 import { Component, Prop } from 'vue-property-decorator';
 
-import FormBase from '@/components/Form/FormBase';
 import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
+import FormBase from '@/components/Widget/FormBase';
 import { objectSorter } from '@/helpers/functional';
 import { durationString } from '@/helpers/functional';
 import { Session, SessionViewConfig } from '@/plugins/spark/features/SessionView/types';

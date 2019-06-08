@@ -9,7 +9,6 @@ import { objectStringSorter } from '@/helpers/functional';
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import { DashboardItem } from '@/store/dashboards';
-import featureStore from '@/store/features';
 import serviceStore from '@/store/services';
 import { Service } from '@/store/services';
 

@@ -2,9 +2,9 @@
 import parseDuration from 'parse-duration';
 import { Component, Prop } from 'vue-property-decorator';
 
-import FormBase from '@/components/Form/FormBase';
 import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
 import { GraphConfig } from '@/components/Graph/types';
+import FormBase from '@/components/Widget/FormBase';
 import { durationString } from '@/helpers/functional';
 import historyStore, { DisplayNames } from '@/store/history';
 import { GraphValueAxes } from '@/store/history';

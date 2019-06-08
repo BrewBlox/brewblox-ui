@@ -2,7 +2,7 @@
 import { Dialog, uid } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import FormBase from '@/components/Form/FormBase';
+import FormBase from '@/components/Widget/FormBase';
 import { Coordinates } from '@/helpers/coordinates';
 import { clampRotation, spaceCased } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/shadow-copy';

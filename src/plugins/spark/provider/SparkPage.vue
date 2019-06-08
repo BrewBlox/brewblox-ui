@@ -267,6 +267,14 @@ export default class SparkPage extends Vue {
     this.modalOpen = true;
   }
 
+  startBlockWizard() {
+    Dialog.create({
+      component: 'BlockWizardDialog',
+      serviceId: this.service.id,
+      root: this.$root,
+    });
+  }
+
   async discoverBlocks() {
     await sparkStore.clearDiscoveredBlocks(this.service.id);
     await sparkStore.fetchDiscoveredBlocks(this.service.id);
@@ -325,7 +333,7 @@ export default class SparkPage extends Vue {
             label="Show Relations"
             @click="relationsModalOpen = true"
           />
-          <ActionItem icon="add" label="New Block" @click="startDialog('BlockWizard')"/>
+          <ActionItem icon="add" label="New Block" @click="startBlockWizard"/>
           <ActionItem
             icon="mdi-magnify-plus-outline"
             label="Discover new OneWire Blocks"

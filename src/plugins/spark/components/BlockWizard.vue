@@ -148,7 +148,7 @@ export default class BlockWizard extends Vue {
             dark
             use-input
             options-dark
-            label="Widget Type"
+            label="Block Type"
             @filter="filterFn"
             @change="block = null; widget = null;"
           >
