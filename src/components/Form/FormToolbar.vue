@@ -14,4 +14,3 @@ export default class FormToolbar extends Vue { }
     <q-btn v-close-popup flat rounded label="close"/>
   </q-bar>
 </template>
-

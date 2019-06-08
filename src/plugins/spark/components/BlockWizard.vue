@@ -1,6 +1,6 @@
 <script lang="ts">
 import isString from 'lodash/isString';
-import { uid } from 'quasar';
+import { Dialog, uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
@@ -14,17 +14,14 @@ import providerStore from '@/store/providers';
 
 @Component
 export default class BlockWizard extends Vue {
-
-  @Prop({ type: String, required: true })
-  readonly serviceId!: string;
-
   filteredOptions: any[] = [];
-  modalOpen: boolean = false;
-
   feature: any = null;
   blockId: string = '';
   block: Block | null = null;
   widget: DashboardItem | null = null;
+
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
 
   get blockIdRules() {
     return [
@@ -45,7 +42,6 @@ export default class BlockWizard extends Vue {
       .map(id => ({
         label: featureStore.displayNameById(id),
         value: id,
-        form: featureStore.formById(id),
       }))
       .filter(opt => featureStore.wizardById(opt.value) === 'BlockWidgetWizard')
       .sort(objectStringSorter('label'));
@@ -104,6 +100,19 @@ export default class BlockWizard extends Vue {
     (this.block as Block).id = newId;
   }
 
+  configureBlock() {
+    this.ensureLocalBlock();
+    Dialog.create({
+      component: 'BlockFormDialog',
+      block: this.block,
+      widget: this.widget,
+      saveBlock: v => this.block = v,
+      saveWidget: v => this.widget = v,
+      volatile: true,
+      root: this.$root,
+    });
+  }
+
   async createBlock() {
     this.ensureLocalBlock();
     try {
@@ -128,15 +137,6 @@ export default class BlockWizard extends Vue {
 <template>
   <q-card dark class="widget-modal">
     <FormToolbar>Block wizard</FormToolbar>
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <component
-        v-if="modalOpen"
-        :is="feature.form"
-        :widget.sync="widget"
-        :block.sync="block"
-        volatile
-      />
-    </q-dialog>
 
     <q-card-section>
       <q-item dark>
@@ -192,7 +192,7 @@ export default class BlockWizard extends Vue {
         unelevated
         label="Configure"
         color="primary"
-        @click="ensureLocalBlock(); modalOpen = true"
+        @click="configureBlock"
       />
       <q-btn
         :disable="!createReady"
