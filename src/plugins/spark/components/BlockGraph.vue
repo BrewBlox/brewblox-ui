@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Dialog } from 'quasar';
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Emit, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { targetSplitter } from '@/components/Graph/functional';
@@ -16,6 +16,7 @@ export default class BlockGraph extends Vue {
   $refs!: {
     graph: any;
   }
+  prevStrConfig: string = '';
 
   @Prop({ type: Boolean, required: true })
   readonly value!: boolean;
@@ -26,19 +27,19 @@ export default class BlockGraph extends Vue {
   @Prop({ type: Object, required: true })
   readonly config!: Partial<GraphConfig>;
 
-  @Prop({ type: Function, required: true })
-  readonly change!: (cfg: GraphConfig) => void;
-
   @Prop({ type: Boolean, default: false })
   readonly noDuration!: boolean;
 
-  prevStrConfig: string = '';
+  @Emit('update:config')
+  change(cfg: GraphConfig = this.graphCfg): GraphConfig {
+    return cfg;
+  }
 
-  get modalModel() {
+  get dialogOpen() {
     return this.value;
   }
 
-  set modalModel(val: boolean) {
+  set dialogOpen(val: boolean) {
     this.$emit('input', val);
   }
 
@@ -114,8 +115,8 @@ export default class BlockGraph extends Vue {
 </script>
 
 <template>
-  <q-dialog v-model="modalModel" maximized>
-    <q-card v-if="modalModel" class="text-white bg-dark-bright" dark>
+  <q-dialog v-model="dialogOpen" maximized>
+    <q-card v-if="dialogOpen" class="text-white bg-dark-bright" dark>
       <GraphCard ref="graph" :id="id" :config="graphCfg">
         <q-btn-dropdown v-if="!noDuration" auto-close flat label="timespan" icon="mdi-timelapse">
           <q-item

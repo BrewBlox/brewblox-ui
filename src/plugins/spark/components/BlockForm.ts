@@ -23,8 +23,4 @@ export default class BlockForm extends FormBase {
     return sparkStore.drivenChains(this.serviceId)
       .some((chain: string[]) => chain[0] === this.block.id);
   }
-
-  public callAndSaveBlock(func: (v: any) => void): (v: any) => void {
-    return v => { func(v); this.saveBlock(); };
-  }
 }

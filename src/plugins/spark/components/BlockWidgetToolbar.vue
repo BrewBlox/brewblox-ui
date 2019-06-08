@@ -85,8 +85,7 @@ export default class BlockWidgetToolbar extends Vue {
       v-if="graphModalOpen"
       :value="graphModalOpen"
       :id="field.widget.id"
-      :config="field.graphCfg"
-      :change="v => field.graphCfg = v"
+      :config.sync="field.graphCfg"
       @input="v => graphModalOpen = v"
     />
 

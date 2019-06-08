@@ -1,18 +1,20 @@
 <script lang="ts">
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Emit, Prop } from 'vue-property-decorator';
 
 @Component
 export default class ActuatorState extends Vue {
 
   @Prop({ required: true })
-  readonly field!: number;
-
-  @Prop({ type: Function, required: true })
-  readonly change!: (v: number) => void;
+  readonly value!: number;
 
   @Prop({ type: Boolean, default: false })
   readonly disable!: boolean;
+
+  @Emit('input')
+  change(val: number) {
+    return val;
+  }
 
   get commonOpts() {
     return {
@@ -39,29 +41,31 @@ export default class ActuatorState extends Vue {
     ];
   }
 
-  get state() {
-    return this.field;
+  get known() {
+    return !!this.options.find(opt => opt.value === this.value);
   }
 
-  set state(v: number) {
-    // always toggle, regardless of where the element was clicked
-    if (this.state === 0 || !this.known) {
+  toggle() {
+    if (this.value === 0 || !this.known) {
       this.change(1);
     }
-    if (this.state === 1) {
+    if (this.value === 1) {
       this.change(0);
     }
-  }
-
-  get known() {
-    return !!this.options.find(opt => opt.value === this.state);
   }
 }
 </script>
 
 <template>
   <div>
-    <q-btn-toggle v-if="known" v-model="state" :options="options" :disable="disable" dense/>
+    <q-btn-toggle
+      v-if="known"
+      :value="value"
+      :options="options"
+      :disable="disable"
+      dense
+      @click="toggle"
+    />
     <div v-else>
       <q-btn
         :disable="disable"
@@ -71,7 +75,7 @@ export default class ActuatorState extends Vue {
         flat
         color="warning"
         style="padding: 0px"
-        @click="state = 0"
+        @click="toggle"
       >
         Unknown state!
         <q-tooltip>

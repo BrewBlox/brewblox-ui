@@ -97,10 +97,6 @@ export default class BlockWidget extends WidgetBase {
       .catch(() => this.$forceUpdate());
   }
 
-  public callAndSaveBlock(func: (v: any) => void): (v: any) => void {
-    return v => { func(v); this.saveBlock(); };
-  }
-
   public changeBlockId(newId: string): void {
     sparkStore.renameBlock([this.serviceId, this.blockId, newId])
       .catch(() => { });

@@ -50,9 +50,9 @@ export default class ActuatorPinWidget extends BlockWidget {
         <q-item-section style="justify-content: flex-start">
           <q-item-label caption>State</q-item-label>
           <ActuatorState
-            :field="block.data.state"
-            :change="callAndSaveBlock(v => block.data.state = v)"
+            :value="block.data.state"
             :disable="isDriven"
+            @input="v => { block.data.state = v; saveBlock(); }"
           />
           <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>

@@ -7,8 +7,8 @@ import FieldBase from './FieldBase';
 @Component
 export default class DatetimeField extends FieldBase {
 
-  @Prop({ type: [Number, String, Object], required: true })
-  public readonly value!: number | string | Date;
+  @Prop({ type: [Number, String, Date] })
+  public readonly value!: number | string | Date | null;
 
   @Prop({ type: Boolean, default: false })
   readonly short!: boolean;
@@ -20,7 +20,7 @@ export default class DatetimeField extends FieldBase {
   readonly clearLabel!: string;
 
   @Emit('input')
-  public change(v: Date) {
+  public change(v: Date | null) {
     return v;
   }
 
@@ -45,7 +45,7 @@ export default class DatetimeField extends FieldBase {
       message: this.message,
       messageHtml: this.messageHtml,
       root: this.$root,
-      value: new Date(this.value),
+      value: new Date(this.value || 0),
       resetIcon: this.resetIcon,
     })
       .onOk(this.change);

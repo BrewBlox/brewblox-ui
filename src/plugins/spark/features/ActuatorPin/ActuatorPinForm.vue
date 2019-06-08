@@ -21,9 +21,9 @@ export default class ActuatorPinForm extends BlockForm {
           <q-item-section style="justify-content: flex-start">
             <q-item-label caption>State</q-item-label>
             <ActuatorState
+              :value="block.data.state"
               :disable="isDriven"
-              :field="block.data.state"
-              :change="callAndSaveBlock(v => block.data.state = v)"
+              @input="v => { block.data.state = v; saveBlock(); }"
             />
             <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>

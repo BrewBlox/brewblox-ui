@@ -135,8 +135,8 @@ export default class SessionViewForm extends FormBase {
       v-model="graphModalOpen"
       :id="`SessionView::form::${graphSession.id}`"
       :config="graphSession.graphCfg"
-      :change="v => { graphSession.graphCfg = v; updateSession(graphSession); }"
       no-duration
+      @update:config="v => { graphSession.graphCfg = v; updateSession(graphSession); }"
     />
 
     <q-scroll-area style="height: 75vh">
