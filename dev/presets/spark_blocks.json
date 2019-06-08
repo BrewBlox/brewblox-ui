@@ -172,6 +172,13 @@
       }
     },
     {
+      "id": "sensor-inactive",
+      "nid": 203,
+      "groups": [],
+      "type": "TempSensorMock",
+      "data": {}
+    },
+    {
       "id": "sensor-1",
       "nid": 204,
       "groups": [

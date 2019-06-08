@@ -110,6 +110,7 @@ export default class BlockWidgetToolbar extends Vue {
               <ActionItem icon="edit" label="Rename Block" @click="renameBlock"/>
               <ActionItem icon="mdi-cube" label="Choose Block" @click="chooseBlock"/>
               <ActionItem icon="mdi-information" label="Block Info" @click="blockInfo"/>
+              <BlockGroupsAction :block="block"/>
               <BlockPresetsAction :block="block"/>
               <ActionItem icon="delete" label="Remove Block" @click="removeBlock"/>
             </q-list>

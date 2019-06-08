@@ -27,9 +27,15 @@ export default class BlockPresetsAction extends Vue {
     };
   }
 
-  get presets() {
-    const spec = sparkStore.specs[this.block.type];
-    return [{ name: 'Default values', generate: spec.generate }, ...spec.presets];
+  get spec() {
+    return sparkStore.specs[this.block.type];
+  }
+
+  presets() {
+    return [
+      { name: 'Default values', generate: this.spec.generate },
+      ...this.spec.presets,
+    ];
   }
 
   choosePreset() {
@@ -43,14 +49,15 @@ export default class BlockPresetsAction extends Vue {
         type: 'radio',
         model: null,
         // Classes are not correctly emitted by onOk
-        items: this.presets.map((p, idx) => ({ label: p.name, value: idx })),
+        items: this.presets()
+          .map((p, idx) => ({ label: p.name, value: idx })),
       },
     })
       .onOk(idx => {
         if (idx === null) {
           return;
         }
-        const preset = this.presets[idx];
+        const preset = this.presets()[idx];
         const block = sparkStore.blockById(serviceId, id);
         block.data = { ...block.data, ...preset.generate() };
         sparkStore.saveBlock([serviceId, block]);
@@ -60,5 +67,7 @@ export default class BlockPresetsAction extends Vue {
 </script>
 
 <template>
-  <ActionItem v-bind="itemProps" @click="choosePreset"/>
+  <ActionItem v-bind="itemProps" :disabled="!spec" @click="choosePreset">
+    <q-tooltip v-if="!spec">No presets available</q-tooltip>
+  </ActionItem>
 </template>

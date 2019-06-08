@@ -35,7 +35,11 @@ export default class AnalogConstraints extends ConstraintsBase {
       case 'balanced':
         return {
           key,
-          value: { balancerId: new BalancerLink(value) },
+          value: {
+            balancerId: new BalancerLink(value),
+            granted: 0,
+            id: 0,
+          },
           limiting: false,
         };
       default:
@@ -79,7 +83,7 @@ export default class AnalogConstraints extends ConstraintsBase {
       <q-item v-for="(editable, idx) in constraints" :key="idx" dark dense>
         <template v-if="readonly">
           <q-item-section :class="{ limiting: editable.limiting }">{{ label(editable.key) }}</q-item-section>
-          <q-item-section>{{ editableValue(editable) | unit }}</q-item-section>
+          <q-item-section>{{ editableValue(editable) | round }}</q-item-section>
         </template>
         <template v-else>
           <q-item-section>
