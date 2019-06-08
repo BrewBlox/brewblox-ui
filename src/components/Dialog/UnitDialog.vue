@@ -31,6 +31,7 @@ export default class UnitDialog extends DialogBase {
           step="any"
           label="Value"
           dark
+          autofocus
           clearable
           @input="v => local.value = v"
         >

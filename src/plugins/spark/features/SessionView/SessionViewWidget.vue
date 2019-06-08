@@ -56,14 +56,9 @@ export default class SessionViewWidget extends WidgetBase {
     return `${shortDateString(session.start)} to ${shortDateString(session.end)}`;
   }
 
-
   openModal(session: Session | null = null) {
     this.modalSession = session;
     this.modalOpen = true;
-  }
-
-  callAndSaveConfig(func: (v: any) => void) {
-    return (v: any) => { func(v); this.saveConfig(this.widgetConfig); };
   }
 
   createSession() {
@@ -120,8 +115,8 @@ export default class SessionViewWidget extends WidgetBase {
       :value="true"
       :id="`${widget.id}::${graphSession.id}`"
       :config="graphSession.graphCfg"
-      :change="callAndSaveConfig(v => graphSession.graphCfg = v)"
       no-duration
+      @update:config="v => { graphSession.graphCfg = v; saveConfig(widgetConfig); }"
       @input="v => {if(!v) graphSessionId = null;}"
     />
 

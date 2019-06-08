@@ -1,6 +1,6 @@
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import FormBase from '@/components/Form/FormBase';
+import FormBase from '@/components/Widget/FormBase';
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
@@ -22,9 +22,5 @@ export default class BlockForm extends FormBase {
   protected get isDriven(): boolean {
     return sparkStore.drivenChains(this.serviceId)
       .some((chain: string[]) => chain[0] === this.block.id);
-  }
-
-  public callAndSaveBlock(func: (v: any) => void): (v: any) => void {
-    return v => { func(v); this.saveBlock(); };
   }
 }

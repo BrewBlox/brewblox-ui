@@ -67,9 +67,9 @@ export default class ActuatorPwmForm extends BlockForm {
         <q-item dark>
           <q-item-section>
             <AnalogConstraints
-              :service-id="block.serviceId"
-              :field="block.data.constrainedBy"
-              :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+              :value="block.data.constrainedBy"
+              :service-id="serviceId"
+              @input="v => { block.data.constrainedBy = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>

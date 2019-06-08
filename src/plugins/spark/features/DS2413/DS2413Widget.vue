@@ -26,10 +26,6 @@ export default class DS2413Widget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <DS2413Form v-if="modalOpen" v-bind="$props" :block="block" @update:block="saveBlock"/>
-    </q-dialog>
-
     <BlockWidgetToolbar :field="me"/>
 
     <q-card-section>

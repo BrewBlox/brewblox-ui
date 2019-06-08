@@ -1,3 +1,4 @@
+import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
@@ -11,7 +12,6 @@ import { Block } from '../types';
 @Component
 export default class BlockWidget extends WidgetBase {
   public me!: BlockWidget;
-  public modalOpen: boolean = false;
 
   public get serviceId(): string {
     return this.widget.config.serviceId;
@@ -84,7 +84,14 @@ export default class BlockWidget extends WidgetBase {
   }
 
   public openModal(): void {
-    this.modalOpen = true;
+    Dialog.create({
+      component: 'BlockFormDialog',
+      block: this.block,
+      widget: this.widget,
+      saveBlock: this.saveBlock,
+      saveWidget: this.saveWidget,
+      root: this.$root,
+    });
   }
 
   public async refreshBlock(): Promise<void> {
@@ -95,10 +102,6 @@ export default class BlockWidget extends WidgetBase {
   public async saveBlock(block: Block = this.block): Promise<void> {
     await sparkStore.saveBlock([this.serviceId, block])
       .catch(() => this.$forceUpdate());
-  }
-
-  public callAndSaveBlock(func: (v: any) => void): (v: any) => void {
-    return v => { func(v); this.saveBlock(); };
   }
 
   public changeBlockId(newId: string): void {

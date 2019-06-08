@@ -8,10 +8,7 @@ import DialogBase from '@/components/Dialog/DialogBase';
 export default class DatetimeDialog extends DialogBase {
   stringValue: string = '';
 
-  @Prop({
-    type: Date,
-    required: true,
-  })
+  @Prop({ type: Date, required: true })
   public readonly value!: Date;
 
   @Prop({ type: String, default: 'restore' })
@@ -59,6 +56,7 @@ export default class DatetimeDialog extends DialogBase {
               label="YYYY/MM/DD hh:mm:ss"
               mask="####/##/## ##:##:##"
               dark
+              autofocus
             />
           </q-item-section>
           <q-item-section class="col-auto">

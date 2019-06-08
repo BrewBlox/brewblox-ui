@@ -39,9 +39,6 @@ export default class SparkPage extends Vue {
   volatileItems: { [blockId: string]: DashboardItem } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
   blockFilter: string = '';
-
-  modalOpen: boolean = false;
-  modalSettings: ModalSettings | null = null;
   relationsModalOpen: boolean = false;
 
   get service(): Spark {
@@ -258,13 +255,15 @@ export default class SparkPage extends Vue {
   }
 
   startDialog(component: string, props: any = null) {
-    this.modalSettings = {
-      component,
-      props: props || {
-        serviceId: this.service.id,
-      },
+    const args = props || {
+      serviceId: this.service.id,
     };
-    this.modalOpen = true;
+    Dialog.create({
+      component,
+      serviceId: this.service.id,
+      root: this.$root,
+      ...args,
+    });
   }
 
   async discoverBlocks() {
@@ -325,7 +324,7 @@ export default class SparkPage extends Vue {
             label="Show Relations"
             @click="relationsModalOpen = true"
           />
-          <ActionItem icon="add" label="New Block" @click="startDialog('BlockWizard')"/>
+          <ActionItem icon="add" label="New Block" @click="startDialog('BlockWizardDialog')"/>
           <ActionItem
             icon="mdi-magnify-plus-outline"
             label="Discover new OneWire Blocks"
@@ -352,14 +351,6 @@ export default class SparkPage extends Vue {
       </q-btn-dropdown>
     </portal>
 
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <component
-        v-if="modalOpen"
-        :is="modalSettings.component"
-        v-bind="modalSettings.props"
-        @close="modalOpen = false"
-      />
-    </q-dialog>
     <q-dialog v-model="relationsModalOpen" no-backdrop-dismiss maximized>
       <DagreDiagram
         v-if="relationsModalOpen"

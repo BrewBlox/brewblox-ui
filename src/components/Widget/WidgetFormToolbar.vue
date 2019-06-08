@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import FormBase from '@/components/Form/FormBase';
+import FormBase from '@/components/Widget/FormBase';
 
 @Component
 export default class WidgetFormToolbar extends FormBase { }

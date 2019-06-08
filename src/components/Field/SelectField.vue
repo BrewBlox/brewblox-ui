@@ -7,7 +7,7 @@ import FieldBase from './FieldBase';
 @Component
 export default class SelectField extends FieldBase {
 
-  @Prop({ type: [String, Number, Array], required: true })
+  @Prop({ type: [String, Number, Array, Object], required: true })
   public readonly value!: any;
 
   @Prop({ type: Array, required: true })

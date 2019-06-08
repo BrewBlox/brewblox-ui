@@ -4,7 +4,6 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import ItemBase from '@/components/ItemBase';
 
-
 @Component
 export default class WidgetActions extends Vue {
   @Prop({ type: Object, required: true })

@@ -34,10 +34,6 @@ export default class BalancerWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <BalancerForm v-if="modalOpen" v-bind="$props" :block="block" @update:block="saveBlock"/>
-    </q-dialog>
-
     <BlockWidgetToolbar :field="me" graph/>
 
     <q-card-section>

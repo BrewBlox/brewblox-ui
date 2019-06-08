@@ -19,15 +19,6 @@ export default class ActuatorDS2413Widget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <ActuatorDS2413Form
-        v-if="modalOpen"
-        v-bind="$props"
-        :block="block"
-        @update:block="saveBlock"
-      />
-    </q-dialog>
-
     <BlockWidgetToolbar :field="me" graph/>
 
     <q-card-section>
@@ -35,21 +26,16 @@ export default class ActuatorDS2413Widget extends BlockWidget {
         <q-item-section>
           <q-item-label caption>State</q-item-label>
           <ActuatorState
-            :field="block.data.state"
-            :change="callAndSaveBlock(v => block.data.state = v)"
+            :value="block.data.state"
             :disable="isDriven"
+            @input="v => { block.data.state = v; saveBlock(); }"
           />
           <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
       </q-item>
       <q-item dark>
         <q-item-section>
-          <DigitalConstraints
-            :service-id="serviceId"
-            :field="block.data.constrainedBy"
-            :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
-            readonly
-          />
+          <DigitalConstraints :value="block.data.constrainedBy" :service-id="serviceId" readonly/>
         </q-item-section>
       </q-item>
     </q-card-section>

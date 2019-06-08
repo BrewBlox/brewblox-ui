@@ -24,15 +24,6 @@ export default class DisplaySettingsWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <DisplaySettingsForm
-        v-if="modalOpen"
-        v-bind="$props"
-        :block="block"
-        @update:block="saveBlock"
-      />
-    </q-dialog>
-
     <BlockWidgetToolbar :field="me"/>
 
     <q-card-section>

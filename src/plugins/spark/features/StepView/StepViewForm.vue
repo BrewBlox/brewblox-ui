@@ -4,7 +4,7 @@ import get from 'lodash/get';
 import { Dialog, uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
-import FormBase from '@/components/Form/FormBase';
+import FormBase from '@/components/Widget/FormBase';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import sparkStore from '@/plugins/spark/store';
 import { Block, ChangeField } from '@/plugins/spark/types';

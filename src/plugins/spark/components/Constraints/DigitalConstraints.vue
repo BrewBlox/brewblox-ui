@@ -5,10 +5,10 @@ import { Component } from 'vue-property-decorator';
 import { Unit } from '@/helpers/units';
 import { MutexLink } from '@/helpers/units/KnownLinks';
 
-import Constraints from './Constraints';
+import ConstraintsBase, { EditableConstraint } from './ConstraintsBase';
 
 @Component
-export default class DigitalConstraints extends Constraints {
+export default class DigitalConstraints extends ConstraintsBase {
   get constraintOptions() {
     return [...this.labels()].map(([k, v]) => ({ label: v, value: k }));
   }
@@ -25,24 +25,20 @@ export default class DigitalConstraints extends Constraints {
     return this.labels().get(k);
   }
 
-  fieldType(key: string) {
-    switch (key) {
-      case 'minOff':
-      case 'minOn':
-        return 'UnitField';
-      case 'mutex':
-        return 'LinkField';
-      default:
-        return null;
-    }
-  }
-
-  createConstraint(key: string, value: any = null) {
+  createConstraint(key: string, value: any = null): EditableConstraint {
     switch (key) {
       case 'mutex':
-        return { key, value: new MutexLink(value) };
+        return {
+          key,
+          value: new MutexLink(value),
+          limiting: false,
+        };
       default:
-        return { key, value: new Unit(0, 'second') };
+        return {
+          key,
+          value: new Unit(0, 'second'),
+          limiting: false,
+        };
     }
   }
 
@@ -57,11 +53,10 @@ export default class DigitalConstraints extends Constraints {
         items: this.constraintOptions,
       },
     })
-      .onOk(keys => keys
-        .forEach(key => {
-          this.constraints.push(this.createConstraint(key));
-          this.saveConstraints();
-        }));
+      .onOk(keys => {
+        this.constraints.push(...keys.map(this.createConstraint));
+        this.saveConstraints();
+      });
   }
 }
 </script>
@@ -76,15 +71,23 @@ export default class DigitalConstraints extends Constraints {
         <q-item-section class="col-1"/>
       </q-item>
       <q-separator v-if="!readonly" dark inset/>
-      <q-item v-for="(cinfo, idx) in constraints" :key="idx" dark>
+      <q-item v-for="(editable, idx) in constraints" :key="idx" dark>
         <template v-if="readonly">
-          <q-item-section :class="{ limiting: cinfo.limiting }">{{ label(cinfo.key) }}</q-item-section>
-          <q-item-section>{{ cinfo.value | unit }}</q-item-section>
+          <q-item-section :class="{ limiting: editable.limiting }">{{ label(editable.key) }}</q-item-section>
+          <q-item-section>
+            <LinkField
+              v-if="editable.key === 'mutex'"
+              :service-id="serviceId"
+              :value="editable.value"
+              readonly
+            />
+            <TimeUnitField v-else :value="editable.value" readonly/>
+          </q-item-section>
         </template>
         <template v-else>
           <q-item-section>
             <SelectField
-              :value="cinfo.key"
+              :value="editable.key"
               :options="constraintOptions"
               clearable
               title="Constraint type"
@@ -92,13 +95,18 @@ export default class DigitalConstraints extends Constraints {
             />
           </q-item-section>
           <q-item-section>
-            <component
-              :is="fieldType(cinfo.key)"
+            <LinkField
+              v-if="editable.key === 'mutex'"
               :service-id="serviceId"
-              :value="cinfo.value"
+              :value="editable.value"
+              title="Mutex"
+              @input="v => { editable.value = v; saveConstraints(); }"
+            />
+            <TimeUnitField
+              v-else
+              :value="editable.value"
               title="Constraint value"
-              type="number"
-              @input="v => { cinfo.value = v; saveConstraints(); }"
+              @input="v => { editable.value = v; saveConstraints(); }"
             />
           </q-item-section>
           <q-item-section class="col-1">

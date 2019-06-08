@@ -1,5 +1,5 @@
 import { Link, Unit } from '@/helpers/units';
-import { ConstraintsObj } from '@/plugins/spark/components/Constraints/types';
+import { ConstraintsObj } from '@/plugins/spark/components/Constraints/ConstraintsBase';
 import { Block } from '@/plugins/spark/types';
 
 export interface ActuatorPwmBlock extends Block {

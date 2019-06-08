@@ -9,6 +9,7 @@ import { SetpointProfileBlock } from './types';
 @Component
 export default class SetpointProfileWidget extends BlockWidget {
   readonly block!: SetpointProfileBlock;
+  modalOpen: boolean = false;
   now: Date = new Date();
 
   get startTime(): number {
@@ -41,6 +42,10 @@ export default class SetpointProfileWidget extends BlockWidget {
         },
       ],
     };
+  }
+
+  openModal() {
+    this.modalOpen = true;
   }
 
   @Watch('block')

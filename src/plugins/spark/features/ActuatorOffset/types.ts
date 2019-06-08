@@ -1,7 +1,6 @@
 import { Link } from '@/helpers/units';
+import { ConstraintsObj } from '@/plugins/spark/components/Constraints/ConstraintsBase';
 import { Block } from '@/plugins/spark/types';
-
-import { ConstraintsObj } from '../../components/Constraints/types';
 
 export interface ActuatorOffsetBlock extends Block {
   data: {

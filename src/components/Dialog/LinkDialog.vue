@@ -75,6 +75,7 @@ export default class LinkDialog extends DialogBase {
           option-label="id"
           option-value="id"
           label="Link"
+          autofocus
           @input="updateLink"
         >
           <template v-slot:no-option>

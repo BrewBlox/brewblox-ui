@@ -1,6 +1,7 @@
 <script lang="ts">
 import { select as d3Select } from 'd3-selection';
 import { graphlib, render as dagreRender } from 'dagre-d3';
+import { Dialog, uid } from 'quasar';
 import { saveSvgAsPng } from 'save-svg-as-png';
 import { setTimeout } from 'timers';
 import Vue from 'vue';
@@ -23,12 +24,6 @@ interface Node {
   type: string;
 }
 
-interface FormData {
-  open: boolean;
-  component: string;
-  props: any;
-}
-
 const LABEL_HEIGHT = 50;
 const LABEL_WIDTH = 150;
 const INVERTED = [
@@ -45,6 +40,12 @@ export default class DagreDiagram extends Vue {
     toolbar: Vue;
   }
 
+  exportBusy: boolean = false;
+  lastRelationString: string = '';
+  graphObj: any = null;
+  availableHeight: number = 0;
+  availableWidth: number = 0;
+
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
@@ -53,16 +54,6 @@ export default class DagreDiagram extends Vue {
 
   @Prop({ type: Array, default: [] })
   readonly relations!: BlockLink[];
-
-  exportBusy: boolean = false;
-  lastRelationString: string = '';
-  graphObj: any = null;
-  availableHeight: number = 0;
-  form: FormData = {
-    open: false,
-    component: '',
-    props: null,
-  }
 
   get edges() {
     return this.relations
@@ -148,6 +139,7 @@ export default class DagreDiagram extends Vue {
     const outGraph = this.graphObj.graph();
     const toolbarHeight = this.$refs.toolbar.$el.clientHeight || 50;
     this.availableHeight = window.innerHeight - toolbarHeight;
+    this.availableWidth = window.innerWidth;
     this.$refs.svg.setAttribute('height', outGraph.height);
     this.$refs.svg.setAttribute('width', outGraph.width);
     this.$refs.svg.setAttribute('viewBox', `0 0 ${outGraph.width} ${outGraph.height}`);
@@ -181,27 +173,34 @@ export default class DagreDiagram extends Vue {
       return;
     }
 
-    this.form = {
-      open: true,
-      component: featureStore.formById(block.type) || '',
-      props: {
-        type: block.type,
-        field: block,
-        onChangeField: v => sparkStore.saveBlock([this.serviceId, v]),
-        id: block.id,
-        title: block.id,
-        onChangeBlockId: () => { },
+    const widget = {
+      id: uid(),
+      title: block.id,
+      feature: block.type,
+      dashboard: '',
+      order: 0,
+      config: {
+        serviceId: this.serviceId,
+        blockId: block.id,
       },
+      ...featureStore.widgetSizeById(block.type),
     };
+
+    Dialog.create({
+      block,
+      widget,
+      component: 'BlockFormDialog',
+      volatile: true,
+      saveBlock: v => sparkStore.saveBlock([this.serviceId, v]),
+      saveWidget: () => { },
+      root: this.$root,
+    });
   }
 }
 </script>
 
 <template>
   <q-card dark class="maximized bg-dark-bright">
-    <q-dialog v-model="form.open" no-backdrop-dismiss>
-      <component v-if="form.open" :is="form.component" v-bind="form.props"/>
-    </q-dialog>
     <FormToolbar ref="toolbar">
       Block Relations
       <template v-slot:buttons>
@@ -209,7 +208,14 @@ export default class DagreDiagram extends Vue {
       </template>
     </FormToolbar>
 
-    <div :style="`overflow-y: scroll; max-height: ${availableHeight}px`" class="row">
+    <div
+      :style="`
+      overflow: scroll;
+      height: ${availableHeight}px;
+      width: ${availableWidth}px;
+      `"
+      class="row"
+    >
       <svg ref="svg" class="diag-svg col-12">
         <g ref="diagram" class="diag-g"/>
       </svg>

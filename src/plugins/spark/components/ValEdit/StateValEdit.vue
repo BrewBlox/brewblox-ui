@@ -13,6 +13,6 @@ export default class StateValEdit extends ValEdit {
 </script>
 
 <template>
-  <ActuatorState v-if="editable" :field="field" :change="saveField"/>
+  <ActuatorState v-if="editable" v-model="field"/>
   <div v-else>{{ fieldString }}</div>
 </template>

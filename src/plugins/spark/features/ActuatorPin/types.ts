@@ -1,4 +1,4 @@
-import { ConstraintsObj } from '@/plugins/spark/components/Constraints/types';
+import { ConstraintsObj } from '@/plugins/spark/components/Constraints/ConstraintsBase';
 import { Block } from '@/plugins/spark/types';
 
 export interface ActuatorPinBlock extends Block {

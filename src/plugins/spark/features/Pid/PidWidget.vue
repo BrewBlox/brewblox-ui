@@ -101,9 +101,6 @@ export default class PidWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <PidForm v-if="modalOpen" v-bind="$props" :block="block" @update:block="saveBlock"/>
-    </q-dialog>
     <q-dialog v-model="relationsOpen" no-backdrop-dismiss>
       <DagreDiagram
         v-if="relationsOpen"
@@ -174,8 +171,12 @@ export default class PidWidget extends BlockWidget {
           <BlockFormButton
             :block-id="block.data.inputId.id"
             :service-id="block.serviceId"
-            :btn-props="{ icon: 'mdi-pencil', flat: true, class:'q-py-xs q-px-sm'}"
-          />
+            icon="mdi-pencil"
+            flat
+            class="q-py-xs q-px-sm"
+          >
+            <q-tooltip>Edit Input Block</q-tooltip>
+          </BlockFormButton>
         </q-item-section>
       </q-item>
 
@@ -197,8 +198,12 @@ export default class PidWidget extends BlockWidget {
           <BlockFormButton
             :block-id="block.data.outputId.id"
             :service-id="block.serviceId"
-            :btn-props="{ icon: 'mdi-pencil', flat: true, class:'q-py-xs q-px-sm'}"
-          />
+            icon="mdi-pencil"
+            flat
+            class="q-py-xs q-px-sm"
+          >
+            <q-tooltip>Edit Output Block</q-tooltip>
+          </BlockFormButton>
         </q-item-section>
       </q-item>
 
