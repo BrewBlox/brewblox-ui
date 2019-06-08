@@ -91,7 +91,6 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
 
   configureBlock() {
     this.ensureItem();
-    console.log(this.block, this.widget);
     Dialog.create({
       component: 'BlockFormDialog',
       block: this.block,
