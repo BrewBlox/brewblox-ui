@@ -83,23 +83,6 @@ export default class BlockWizard extends Vue {
     };
   }
 
-  changeBlockId(newId: string) {
-    const errors = this.blockIdRules
-      .map(rule => rule(newId))
-      .filter(isString);
-
-    if (errors.length > 0) {
-      this.$q.notify({
-        message: errors.join(', '),
-        color: 'negative',
-        icon: 'error',
-      });
-      return;
-    }
-    this.blockId = newId;
-    (this.block as Block).id = newId;
-  }
-
   configureBlock() {
     this.ensureLocalBlock();
     Dialog.create({
