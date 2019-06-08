@@ -44,7 +44,7 @@ export default class TempSensorOneWireWidget extends BlockWidget {
       <q-item v-else dark>
         <q-item-section>
           <q-item-label caption>Value</q-item-label>
-          <UnitField :field="block.data.value"/>
+          <UnitField :value="block.data.value" readonly tag="big"/>
         </q-item-section>
       </q-item>
     </q-card-section>

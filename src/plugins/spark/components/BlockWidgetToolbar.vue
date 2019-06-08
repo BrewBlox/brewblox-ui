@@ -48,7 +48,7 @@ export default class BlockWidgetToolbar extends Vue {
 
   chooseBlock() {
     Dialog.create({
-      component: 'BlockChoiceDialog',
+      component: 'BlockDialog',
       title: 'Choose a Block',
       message: 'You can change the Block that will be displayed by this widget',
       filter: block => block.type === this.block.type,

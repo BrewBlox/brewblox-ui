@@ -25,6 +25,6 @@ export default class BlockForm extends FormBase {
   }
 
   public callAndSaveBlock(func: (v: any) => void): (v: any) => void {
-    return (v: any) => { func(v); this.saveBlock(); };
+    return v => { func(v); this.saveBlock(); };
   }
 }

@@ -49,6 +49,11 @@ export default class UnknownBlockWidget extends WidgetBase {
   fetchAll() {
     sparkStore.fetchAll(this.serviceId);
   }
+
+  public async saveBlock(block: Block = this.block): Promise<void> {
+    await sparkStore.saveBlock([this.serviceId, block])
+      .catch(() => this.$forceUpdate());
+  }
 }
 
 </script>

@@ -29,22 +29,20 @@ export default class ActuatorDS2413Form extends BlockForm {
         <q-item dark>
           <q-item-section>
             <q-item-label caption>DS2413 target Block</q-item-label>
-            <LinkPopupEdit
-              :field="block.data.hwDevice"
+            <LinkField
+              :value="block.data.hwDevice"
               :service-id="serviceId"
-              :change="callAndSaveBlock(v => block.data.hwDevice = v)"
-              label="DS2413 Block"
-              tag="span"
+              title="DS2413 Block"
+              @input="v => { block.data.hwDevice = v; saveBlock(); }"
             />
           </q-item-section>
           <q-item-section>
             <q-item-label caption>DS2413 Channel</q-item-label>
-            <SelectPopupEdit
-              :field="block.data.channel"
+            <SelectField
+              :value="block.data.channel"
               :options="channelOpts"
-              :change="callAndSaveBlock(v => block.data.channel = v)"
-              label="DS2413 Channel"
-              tag="span"
+              title="DS2413 Channel"
+              @input="v => { block.data.channel = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>

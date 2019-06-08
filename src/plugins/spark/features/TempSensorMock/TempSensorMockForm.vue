@@ -20,11 +20,12 @@ export default class TempSensorMockForm extends BlockForm {
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Value</q-item-label>
-            <UnitPopupEdit
-              :field="block.data.value"
-              :disabled="!block.data.connected"
-              :change="callAndSaveBlock(v => block.data.value = v)"
-              label="Value"
+            <UnitField
+              :value="block.data.value"
+              :readonly="!block.data.connected"
+              title="Value"
+              tag="big"
+              @input="v => { block.data.value = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>

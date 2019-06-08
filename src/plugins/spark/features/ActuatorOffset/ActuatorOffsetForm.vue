@@ -25,33 +25,30 @@ export default class ActuatorOffsetForm extends BlockForm {
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Driven block</q-item-label>
-            <LinkPopupEdit
-              :field="block.data.targetId"
-              :service-id="block.serviceId"
-              :change="callAndSaveBlock(v => block.data.targetId = v)"
-              label="Driven block"
-              tag="span"
+            <LinkField
+              :value="block.data.targetId"
+              :service-id="serviceId"
+              title="Driven block"
+              @input="v => { block.data.targetId = v; saveBlock(); }"
             />
           </q-item-section>
           <q-item-section>
             <q-item-label caption>Offset from</q-item-label>
             <div>
-              <LinkPopupEdit
-                :field="block.data.referenceId"
-                :service-id="block.serviceId"
-                :change="callAndSaveBlock(v => block.data.referenceId = v)"
-                label="Reference block"
-                tag="span"
+              <LinkField
+                :value="block.data.referenceId"
+                :service-id="serviceId"
+                title="Reference block"
                 style="display: inline-block"
+                @input="v => { block.data.referenceId = v; saveBlock(); }"
               />
               <span class="q-px-xs">&gt;</span>
-              <SelectPopupEdit
-                :field="block.data.referenceSettingOrValue"
-                :change="callAndSaveBlock(v => block.data.referenceSettingOrValue = v)"
+              <SelectField
+                :value="block.data.referenceSettingOrValue"
                 :options="[{label: 'Setting', value: 0}, {label: 'Measured value', value: 1}]"
-                label="reference field"
-                tag="span"
+                title="Reference field"
                 style="display: inline-block"
+                @input="v => { block.data.referenceSettingOrValue = v; saveBlock(); }"
               />
             </div>
           </q-item-section>
@@ -59,14 +56,14 @@ export default class ActuatorOffsetForm extends BlockForm {
         <q-item dark>
           <q-item-section style="justify-content: flex-start">
             <q-item-label caption>Target Offset</q-item-label>
-            <InputPopupEdit
-              v-if="!isDriven"
-              :field="block.data.setting"
-              :change="callAndSaveBlock(v => block.data.setting = v)"
-              label="Target offset"
+            <InputField
+              :readonly="isDriven"
+              :value="block.data.setting"
+              tag="big"
+              title="Target offset"
               type="number"
+              @input="v => { block.data.setting = v; saveBlock(); }"
             />
-            <big v-else>{{ block.data.setting | round }}</big>
             <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>
           <q-item-section style="justify-content: flex-start">

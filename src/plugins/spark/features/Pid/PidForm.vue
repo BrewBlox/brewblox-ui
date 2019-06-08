@@ -33,20 +33,21 @@ export default class PidForm extends BlockForm {
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Input Block</q-item-label>
-            <LinkPopupEdit
-              :field="block.data.inputId"
-              :service-id="block.serviceId"
-              :change="callAndSaveBlock(v => block.data.inputId = v)"
-              label="Input"
+            <LinkField
+              :value="block.data.inputId"
+              :service-id="serviceId"
+              title="Input"
               tag="div"
-            >
+              message-html="
               <p>A PID block drives its output to regulate its input.</p>
               <p>
                 This input is a process value: something that has a target value and an actual value.
                 In most cases, this will be a sensor and setpoint pair.
               </p>
               <p>The input target minus the input value is called the error</p>
-            </LinkPopupEdit>
+              "
+              @input="v => { block.data.inputId = v; saveBlock(); }"
+            />
           </q-item-section>
 
           <q-item-section>
@@ -63,13 +64,12 @@ export default class PidForm extends BlockForm {
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Output Block</q-item-label>
-            <LinkPopupEdit
-              :field="block.data.outputId"
-              :service-id="block.serviceId"
-              :change="callAndSaveBlock(v => block.data.outputId = v)"
-              label="Output"
+            <LinkField
+              :value="block.data.outputId"
+              :service-id="serviceId"
+              title="Output"
               tag="div"
-            >
+              message-html="
               <p>The PID sets its output block to the result from the PID calculation.</p>
               <p>
                 The output value is the sum of 3 parts derived from the input error:
@@ -79,7 +79,9 @@ export default class PidForm extends BlockForm {
                 The output block is an 'analog' actuator.
                 A digital actuator can be driven indirectly via a PWM actuator.
               </p>
-            </LinkPopupEdit>
+              "
+              @input="v => { block.data.outputId = v; saveBlock(); }"
+            />
           </q-item-section>
 
           <q-item-section>
@@ -97,35 +99,35 @@ export default class PidForm extends BlockForm {
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Filter period</q-item-label>
-            <SelectPopupEdit
-              :field="block.data.filter"
-              :change="callAndSaveBlock(v => block.data.filter = v)"
+            <SelectField
+              :value="block.data.filter"
               :options="filterOpts"
-              label="Filter"
-              tag="span"
-            >
+              title="Filter"
+              message-html="
               <p>
                 The input error is passed through a filter to remove noise, spikes and sudden jumps.
                 This smooths the output of the PID.
               </p>
               <p>The filter should block changes lasting shorter than:</p>
-            </SelectPopupEdit>
+              "
+              @input="v => { block.data.filter = v; saveBlock(); }"
+            />
           </q-item-section>
 
           <q-item-section>
             <q-item-label caption>Fast step threshold</q-item-label>
-            <UnitPopupEdit
-              :field="block.data.filterThreshold"
-              :change="callAndSaveBlock(v => block.data.filterThreshold = v)"
-              label="Filter threshold"
-              tag="span"
-            >
+            <UnitField
+              :value="block.data.filterThreshold"
+              title="Filter threshold"
+              message-html="
               <p>
                 Filtering the input causes a delay in response, because it averages values.
                 The filter can detect when a larger step occurs to which it should respond faster.
               </p>
               <p>If a step exceeds this threshold, respond faster:</p>
-            </UnitPopupEdit>
+              "
+              @input="v => { block.data.filterThreshold = v; saveBlock(); }"
+            />
           </q-item-section>
           <q-item-section/>
         </q-item>
@@ -139,18 +141,18 @@ export default class PidForm extends BlockForm {
           <q-item-section class="text-center">*</q-item-section>
           <q-item-section>
             <q-item-label caption>Kp</q-item-label>
-            <UnitPopupEdit
-              :field="block.data.kp"
-              :change="callAndSaveBlock(v => block.data.kp = v)"
-              label="Proportional gain Kp"
-              tag="span"
-            >
+            <UnitField
+              :value="block.data.kp"
+              title="Proportional gain Kp"
+              message-html="
               <p>
                 Kp is the proportional gain, which is directly mutiplied by the filtered error.
                 For each degree that the beer is too low, Kp is added to the output.
               </p>
               <p>Kp should be negative if the actuator brings down the input, like a cooler.</p>
-            </UnitPopupEdit>
+              "
+              @input="v => { block.data.kp = v; saveBlock(); }"
+            />
           </q-item-section>
           <q-item-section/>
           <q-item-section/>
@@ -174,12 +176,10 @@ export default class PidForm extends BlockForm {
           <q-item-section class="text-center">/</q-item-section>
           <q-item-section>
             <q-item-label caption>Ti</q-item-label>
-            <TimeUnitPopupEdit
-              :field="block.data.ti"
-              :change="callAndSaveBlock(v => block.data.ti = v)"
-              label="Integral time constant Ti"
-              tag="span"
-            >
+            <TimeUnitField
+              :value="block.data.ti"
+              title="Integral time constant Ti"
+              message-html="
               <p>
                 The purpose of the integrator is to remove steady state errors.
                 The integrator slowly builds up when the error is not zero.
@@ -194,7 +194,9 @@ export default class PidForm extends BlockForm {
                 Overshoot due to too much integrator action is usually a sign of Kp being too low.
               </p>
               <p>Setting Ti to zero will disable the integrator.</p>
-            </TimeUnitPopupEdit>
+              "
+              @input="v => { block.data.ti = v; saveBlock(); }"
+            />
           </q-item-section>
           <q-item-section class="text-center">=</q-item-section>
           <q-item-section>
@@ -216,22 +218,22 @@ export default class PidForm extends BlockForm {
           <q-item-section class="text-center">*</q-item-section>
           <q-item-section>
             <q-item-label caption>Td</q-item-label>
-            <TimeUnitPopupEdit
-              :field="block.data.td"
-              :change="callAndSaveBlock(v => block.data.td = v)"
-              label="Derivative time constant Td"
-              tag="span"
-            >
-              <p>
+            <TimeUnitField
+              :value="block.data.td"
+              title="Derivative time constant Td"
+              message-html="
+                <p>
                 When the error is decreasing fast, the derivative action (D) counteracts the proportional action (P).
                 This slows down the approach to avoid overshoot.
-              </p>
-              <p>
+                </p>
+                <p>
                 Td is the derivative time constant.
                 It should be equal how long it takes for the process to stabilize after you turn off the actuator.
                 When there is no overshoot in the system, Td should be set to zero.
-              </p>
-            </TimeUnitPopupEdit>
+                </p>
+                "
+              @input="v => { block.data.td = v; saveBlock(); }"
+            />
           </q-item-section>
           <q-item-section class="text-center">=</q-item-section>
           <q-item-section>

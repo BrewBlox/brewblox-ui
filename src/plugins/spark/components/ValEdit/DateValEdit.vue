@@ -13,23 +13,16 @@ export default class DateValEdit extends ValEdit {
     return this.field * this.timeScale;
   }
 
-  get displayVal() {
-    return new Date(this.scaledField).toLocaleString();
+  set scaledField(val: number) {
+    this.saveField(val / this.timeScale);
   }
 
-  saveScaledField(val: number) {
-    this.saveField(val / this.timeScale);
+  get displayVal() {
+    return new Date(this.scaledField).toLocaleString();
   }
 }
 </script>
 
 <template>
-  <DatetimePopupEdit
-    v-if="editable"
-    :field="scaledField"
-    :change="saveScaledField"
-    label="Start time"
-    tag="span"
-  />
-  <div v-else>{{ displayVal }}</div>
+  <DatetimeField v-model="scaledField" :readonly="!editable" title="Start time"/>
 </template>

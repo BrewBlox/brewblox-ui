@@ -39,14 +39,14 @@ export default class SetpointSensorPairWidget extends BlockWidget {
       <q-item dark>
         <q-item-section class="col-3" style="justify-content: flex-start">
           <q-item-label caption>Setting</q-item-label>
-          <UnitPopupEdit
-            v-if="!isDriven"
-            :field="block.data.storedSetting"
-            :change="callAndSaveBlock(v => block.data.storedSetting = v)"
+          <UnitField
             :class="{darkened: !block.data.settingEnabled}"
-            label="Setting"
+            :value="block.data.storedSetting"
+            :readonly="isDriven"
+            title="Setting"
+            tag="big"
+            @input="v => {block.data.storedSetting = v; saveBlock()}"
           />
-          <UnitField v-else :field="block.data.storedSetting"/>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
         <q-item-section class="col-3" style="justify-content: flex-start">
@@ -59,7 +59,7 @@ export default class SetpointSensorPairWidget extends BlockWidget {
         </q-item-section>
         <q-item-section class="col-6" style="justify-content: flex-start">
           <q-item-label caption>Sensor value</q-item-label>
-          <UnitField :field="block.data.value"/>
+          <UnitField :value="block.data.value" tag="big"/>
         </q-item-section>
       </q-item>
     </q-card-section>

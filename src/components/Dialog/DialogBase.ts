@@ -1,11 +1,18 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 @Component
 export default class DialogBase extends Vue {
-  public $refs!: {
-    dialog: any;
-  }
+  public $refs!: { dialog: any }
+
+  @Prop({ type: String, default: '' })
+  public readonly title!: string;
+
+  @Prop({ type: String })
+  public readonly message!: string;
+
+  @Prop({ type: String })
+  public readonly messageHtml!: string;
 
   // following method is REQUIRED
   // (don't change its name --> "show")

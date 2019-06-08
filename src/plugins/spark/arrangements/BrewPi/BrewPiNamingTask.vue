@@ -210,14 +210,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
               <big>Groups</big>
             </q-item>
             <q-item dark>
-              <GroupsPopupEdit
-                v-if="serviceId"
-                :field="groups"
-                :service-id="serviceId"
-                :change="v => groups = v"
-                tag="span"
-                dark
-              />
+              <GroupsField v-if="serviceId" v-model="groups" :service-id="serviceId"/>
               <q-item-label v-else>No service selected</q-item-label>
             </q-item>
           </q-list>

@@ -8,7 +8,6 @@ import { DisplaySettingsBlock } from './types';
 @Component
 export default class DisplaySettingsWidget extends BlockWidget {
   readonly block!: DisplaySettingsBlock;
-  openSlot: number | null = null;
 
   get displaySlots(): any[][] {
     const slots = Array(6);
@@ -25,12 +24,11 @@ export default class DisplaySettingsWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss @hide="openSlot = null">
+    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <DisplaySettingsForm
         v-if="modalOpen"
         v-bind="$props"
         :block="block"
-        :open-slot="openSlot"
         @update:block="saveBlock"
       />
     </q-dialog>
@@ -45,7 +43,7 @@ export default class DisplaySettingsWidget extends BlockWidget {
             :key="idx"
             clickable
             class="col-4"
-            @click="openSlot = idx; openModal()"
+            @click="openModal"
           >
             <q-item-section>
               <q-item-label caption>Slot {{ idx + 1 }}</q-item-label>
@@ -56,13 +54,12 @@ export default class DisplaySettingsWidget extends BlockWidget {
         </div>
 
         <q-item dark>
-          <q-item-section side>Footer text</q-item-section>
+          <q-item-section side class="q-pb-xs">Footer text</q-item-section>
           <q-item-section>
-            <InputPopupEdit
-              :field="block.data.name"
-              :change="callAndSaveBlock(v => block.data.name = v)"
-              label="footer text"
-              tag="span"
+            <InputField
+              :value="block.data.name"
+              title="footer text"
+              @input="v => { block.data.name = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>

@@ -19,18 +19,20 @@ export default class TempSensorOneWireForm extends BlockForm {
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Address</q-item-label>
-            <InputPopupEdit
-              :field="block.data.address"
-              :change="callAndSaveBlock(v => block.data.address = v)"
-              label="Address"
+            <InputField
+              :value="block.data.address"
+              title="Address"
+              tag="big"
+              @input="v => { block.data.address = v; saveBlock(); }"
             />
           </q-item-section>
           <q-item-section>
             <q-item-label caption>Offset</q-item-label>
-            <UnitPopupEdit
-              :field="block.data.offset"
-              :change="callAndSaveBlock(v => block.data.offset = v)"
-              label="Offset"
+            <UnitField
+              :value="block.data.offset"
+              title="Offset"
+              tag="big"
+              @input="v => { block.data.offset = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>

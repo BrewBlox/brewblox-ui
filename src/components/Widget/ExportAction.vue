@@ -18,7 +18,7 @@ export default class ExportAction extends Vue {
   @Prop({ type: String, default: 'Export widget' })
   readonly label!: string;
 
-  @Prop({ type: String, default: false })
+  @Prop({ type: Boolean, default: false })
   readonly noClose!: boolean;
 
   async showDialog() {

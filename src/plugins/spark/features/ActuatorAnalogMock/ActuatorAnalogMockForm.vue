@@ -20,32 +20,34 @@ export default class ActuatorAnalogMockForm extends BlockForm {
         <q-item dark>
           <q-item-section style="justify-content: flex-start">
             <q-item-label caption>Setting</q-item-label>
-            <InputPopupEdit
-              v-if="!isDriven"
-              :field="block.data.setting"
-              :change="callAndSaveBlock(v => block.data.setting = v)"
+            <InputField
+              :readonly="isDriven"
+              :value="block.data.setting"
               type="number"
-              label="target"
+              title="Target"
+              tag="big"
+              @input="v => { block.data.setting = v; saveBlock(); }"
             />
-            <big v-else>{{ block.data.setting | unit }}</big>
             <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>
           <q-item-section style="justify-content: flex-start">
             <q-item-label caption>Clip to min</q-item-label>
-            <InputPopupEdit
-              :field="block.data.minSetting"
-              :change="callAndSaveBlock(v => block.data.minSetting = v)"
+            <InputField
+              :value="block.data.minSetting"
+              title="Setting min"
               type="number"
-              label="Setting min"
+              tag="big"
+              @input="v => { block.data.minSetting = v; saveBlock(); }"
             />
           </q-item-section>
           <q-item-section style="justify-content: flex-start">
             <q-item-label caption>Clip to max</q-item-label>
-            <InputPopupEdit
-              :field="block.data.maxSetting"
-              :change="callAndSaveBlock(v => block.data.maxSetting = v)"
+            <InputField
+              :value="block.data.maxSetting"
               type="number"
-              label="Setting max"
+              title="Setting max"
+              tag="big"
+              @input="v => { block.data.maxSetting = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>
@@ -56,20 +58,22 @@ export default class ActuatorAnalogMockForm extends BlockForm {
           </q-item-section>
           <q-item-section>
             <q-item-label caption>Clip to min</q-item-label>
-            <InputPopupEdit
-              :field="block.data.minValue"
-              :change="callAndSaveBlock(v => block.data.minValue = v)"
+            <InputField
+              :value="block.data.minValue"
               type="number"
-              label="Value min"
+              title="Value min"
+              tag="big"
+              @input="v => { block.data.minValue = v; saveBlock(); }"
             />
           </q-item-section>
           <q-item-section>
             <q-item-label caption>Clip to max</q-item-label>
-            <InputPopupEdit
-              :field="block.data.maxValue"
-              :change="callAndSaveBlock(v => block.data.maxValue = v)"
+            <InputField
+              :value="block.data.maxValue"
               type="number"
-              label="Value max"
+              title="Value max"
+              tag="big"
+              @input="v => { block.data.maxValue = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>

@@ -1,4 +1,5 @@
 <script lang="ts">
+import { Dialog } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
@@ -11,6 +12,7 @@ import { QueryParams } from '@/store/history';
 
 @Component
 export default class BlockGraph extends Vue {
+  durationString = durationString;
   $refs!: {
     graph: any;
   }
@@ -64,10 +66,6 @@ export default class BlockGraph extends Vue {
     return this.graphCfg.axes[key] === 'y2';
   }
 
-  confirmed(func: Function) {
-    return (v: any) => { func(v); this.change({ ...this.graphCfg }); };
-  }
-
   updateKeySide(key: string, isRight: boolean) {
     this.change({
       ...this.graphCfg,
@@ -85,8 +83,17 @@ export default class BlockGraph extends Vue {
     });
   }
 
-  parseDuration(val: string): string {
-    return durationString(val);
+  updateDuration() {
+    Dialog.create({
+      component: 'InputDialog',
+      title: 'Duration',
+      root: this.$root,
+      value: this.graphCfg.params.duration,
+    })
+      .onOk(val => {
+        this.$set(this.graphCfg.params, 'duration', durationString(val));
+        this.change(this.graphCfg);
+      });
   }
 
   @Watch('graphCfg')
@@ -100,7 +107,7 @@ export default class BlockGraph extends Vue {
     }
   }
 
-  mounted() {
+  created() {
     this.prevStrConfig = JSON.stringify(this.graphCfg);
   }
 }
@@ -117,23 +124,15 @@ export default class BlockGraph extends Vue {
             dark
             link
             clickable
-            @click="() => applyPreset(preset)"
+            @click="applyPreset(preset)"
           >
             <q-item-section>{{ preset.duration }}</q-item-section>
           </q-item>
         </q-btn-dropdown>
         <q-btn-dropdown flat label="settings" icon="settings">
-          <q-item dark link clickable @click="() => $refs.duration.$el.click()">
-            <q-item-section side>Duration</q-item-section>
-            <q-item-section @click="() => $refs.duration.$el.click()">
-              <InputPopupEdit
-                ref="duration"
-                :field="graphCfg.params.duration"
-                :change="confirmed(v => $set(graphCfg.params, 'duration', parseDuration(v)))"
-                label="Duration"
-                tag="span"
-              />
-            </q-item-section>
+          <q-item dark link clickable @click="updateDuration">
+            <q-item-section>Duration</q-item-section>
+            <q-item-section class="col-auto">{{ durationString(graphCfg.params.duration) }}</q-item-section>
           </q-item>
           <q-expansion-item label="Left or right axis">
             <q-item

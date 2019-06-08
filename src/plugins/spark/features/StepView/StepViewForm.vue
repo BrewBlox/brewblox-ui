@@ -162,7 +162,7 @@ export default class StepViewForm extends FormBase {
 
   addChange(step: StepDisplay) {
     Dialog.create({
-      component: 'BlockChoiceDialog',
+      component: 'BlockDialog',
       title: 'Choose a Block',
       filter: block => {
         return !!this.changeFields[block.type]

@@ -98,7 +98,7 @@ export default class BlockWidget extends WidgetBase {
   }
 
   public callAndSaveBlock(func: (v: any) => void): (v: any) => void {
-    return (v: any) => { func(v); this.saveBlock(); };
+    return v => { func(v); this.saveBlock(); };
   }
 
   public changeBlockId(newId: string): void {

@@ -25,34 +25,35 @@ export default class ActuatorPwmForm extends BlockForm {
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Digital Actuator Target</q-item-label>
-            <LinkPopupEdit
-              :field="block.data.actuatorId"
+            <LinkField
+              :value="block.data.actuatorId"
               :service-id="serviceId"
-              :change="callAndSaveBlock(v => block.data.actuatorId = v)"
-              label="target"
+              title="target"
+              tag="big"
+              @input="v => { block.data.actuatorId = v; saveBlock(); }"
             />
           </q-item-section>
           <q-item-section>
             <q-item-label caption>Period</q-item-label>
-            <TimeUnitPopupEdit
-              :field="block.data.period"
-              :change="callAndSaveBlock(v => block.data.period = v)"
-              label="Period"
-              type="number"
+            <TimeUnitField
+              :value="block.data.period"
+              title="Period"
+              tag="big"
+              @input="v => { block.data.period = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>
         <q-item dark>
           <q-item-section style="justify-content: flex-start">
             <q-item-label caption>Duty setting</q-item-label>
-            <InputPopupEdit
-              v-if="!isDriven"
-              :field="block.data.setting"
-              :change="callAndSaveBlock(v => block.data.setting = v)"
-              label="Setting"
+            <InputField
+              :value="block.data.setting"
+              :readonly="isDriven"
+              tag="big"
+              title="Setting"
               type="number"
+              @input="v => { block.data.setting = v; saveBlock(); }"
             />
-            <big v-else>{{ block.data.setting | round }}</big>
             <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>
           <q-item-section style="justify-content: flex-start">
