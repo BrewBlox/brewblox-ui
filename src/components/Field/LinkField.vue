@@ -24,7 +24,7 @@ export default class LinkField extends FieldBase {
   }
 
   get displayValue() {
-    return this.value || 'click to assign';
+    return this.value.id || 'click to assign';
   }
 
   openDialog() {
@@ -56,7 +56,7 @@ export default class LinkField extends FieldBase {
     @click="openDialog"
   >
     <slot name="pre"/>
-    <slot name="value">{{ value | truncated }}</slot>
+    <slot name="value">{{ displayValue | truncated }}</slot>
     <slot/>
   </component>
 </template>

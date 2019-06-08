@@ -63,12 +63,7 @@ export default class ActuatorPinWidget extends BlockWidget {
       </q-item>
       <q-item dark>
         <q-item-section>
-          <DigitalConstraints
-            :service-id="serviceId"
-            :field="block.data.constrainedBy"
-            :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
-            readonly
-          />
+          <DigitalConstraints :value="block.data.constrainedBy" :service-id="serviceId" readonly/>
         </q-item-section>
       </q-item>
     </q-card-section>

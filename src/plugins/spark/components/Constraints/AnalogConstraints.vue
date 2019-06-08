@@ -4,10 +4,10 @@ import { Component } from 'vue-property-decorator';
 
 import { BalancerLink } from '@/helpers/units/KnownLinks';
 
-import Constraints, { ConstraintInfo } from './Constraints';
+import ConstraintsBase, { EditableConstraint } from './ConstraintsBase';
 
 @Component
-export default class AnalogConstraints extends Constraints {
+export default class AnalogConstraints extends ConstraintsBase {
   get constraintOptions() {
     return [...this.labels()].map(([k, v]) => ({ label: v, value: k }));
   }
@@ -24,24 +24,26 @@ export default class AnalogConstraints extends Constraints {
     return this.labels().get(k);
   }
 
-  fieldType(key: string) {
-    switch (key) {
-      case 'min':
-      case 'max':
-        return 'InputField';
-      case 'balanced':
-        return 'LinkField';
-      default:
-        return null;
-    }
+  editableValue(editable: EditableConstraint) {
+    return editable.key === 'balanced'
+      ? editable.value.granted
+      : editable.value;
   }
 
-  createConstraint(key: string, value: any = null): ConstraintInfo {
+  createConstraint(key: string, value: any = null): EditableConstraint {
     switch (key) {
       case 'balanced':
-        return { key, value: { balancerId: new BalancerLink(value) } };
+        return {
+          key,
+          value: { balancerId: new BalancerLink(value) },
+          limiting: false,
+        };
       default:
-        return { key, value: 0 };
+        return {
+          key,
+          value: 0,
+          limiting: false,
+        };
     }
   }
 
@@ -56,11 +58,10 @@ export default class AnalogConstraints extends Constraints {
         items: this.constraintOptions,
       },
     })
-      .onOk(keys => keys
-        .forEach(key => {
-          this.constraints.push(this.createConstraint(key));
-          this.saveConstraints();
-        }));
+      .onOk(keys => {
+        this.constraints.push(...keys.map(this.createConstraint));
+        this.saveConstraints();
+      });
   }
 }
 </script>
@@ -75,15 +76,15 @@ export default class AnalogConstraints extends Constraints {
         <q-item-section class="col-1"/>
       </q-item>
       <q-separator v-if="!readonly" dark inset/>
-      <q-item v-for="(cinfo, idx) in constraints" :key="idx" dark dense>
+      <q-item v-for="(editable, idx) in constraints" :key="idx" dark dense>
         <template v-if="readonly">
-          <q-item-section :class="{ limiting: cinfo.limiting }">{{ label(cinfo.key) }}</q-item-section>
-          <q-item-section>{{ ( cinfo.key === 'balanced' ? cinfo.value.granted : cinfo.value) | unit }}</q-item-section>
+          <q-item-section :class="{ limiting: editable.limiting }">{{ label(editable.key) }}</q-item-section>
+          <q-item-section>{{ editableValue(editable) | unit }}</q-item-section>
         </template>
         <template v-else>
           <q-item-section>
             <SelectField
-              :value="cinfo.key"
+              :value="editable.key"
               :options="constraintOptions"
               clearable
               title="Constraint type"
@@ -91,21 +92,19 @@ export default class AnalogConstraints extends Constraints {
             />
           </q-item-section>
           <q-item-section>
-            <component
-              v-if="cinfo.key === 'balanced'"
-              :is="fieldType(cinfo.key)"
+            <LinkField
+              v-if="editable.key === 'balanced'"
               :service-id="serviceId"
-              :value="cinfo.value.balancerId"
-              title="Constraint value"
-              @input="v => { cinfo.value.balancerId = v; saveConstraints() }"
+              :value="editable.value.balancerId"
+              title="Balancer"
+              @input="v => { editable.value.balancerId = v; saveConstraints() }"
             />
-            <component
+            <InputField
               v-else
-              :is="fieldType(cinfo.key)"
-              :value="cinfo.value"
+              :value="editable.value"
               title="Constraint value"
               type="number"
-              @input="v => { cinfo.value = v; saveConstraints() }"
+              @input="v => { editable.value = v; saveConstraints() }"
             />
           </q-item-section>
           <q-item-section class="col-1">

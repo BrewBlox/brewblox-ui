@@ -69,9 +69,9 @@ export default class ActuatorDS2413Form extends BlockForm {
         <q-item dark>
           <q-item-section>
             <DigitalConstraints
-              :service-id="block.serviceId"
-              :field="block.data.constrainedBy"
-              :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+              :value="block.data.constrainedBy"
+              :service-id="serviceId"
+              @input="v => { block.data.constrainedBy = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>
