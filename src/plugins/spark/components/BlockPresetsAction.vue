@@ -20,11 +20,12 @@ export default class BlockPresetsAction extends Vue {
   @Prop({ type: String, default: 'mdi-application-import' })
   readonly icon!: string;
 
-  @Prop({ type: Boolean, default: false })
-  readonly active!: boolean;
-
-  @Prop({ type: Boolean, default: false })
-  readonly noClose!: boolean;
+  get itemProps() {
+    return {
+      ...this.$attrs,
+      ...this.$props,
+    };
+  }
 
   get presets() {
     const spec = sparkStore.specs[this.block.type];
@@ -59,5 +60,5 @@ export default class BlockPresetsAction extends Vue {
 </script>
 
 <template>
-  <ActionItem v-bind="$props" @click="choosePreset"/>
+  <ActionItem v-bind="itemProps" @click="choosePreset"/>
 </template>

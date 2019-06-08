@@ -18,8 +18,12 @@ export default class ExportAction extends Vue {
   @Prop({ type: String, default: 'Export widget' })
   readonly label!: string;
 
-  @Prop({ type: Boolean, default: false })
-  readonly noClose!: boolean;
+  get itemProps() {
+    return {
+      ...this.$attrs,
+      ...this.$props,
+    };
+  }
 
   async showDialog() {
     const item = dashboardStore.dashboardItemById(this.widgetId);
@@ -32,5 +36,5 @@ export default class ExportAction extends Vue {
 </script>
 
 <template>
-  <ActionItem v-bind="$props" @click="showDialog"/>
+  <ActionItem v-bind="itemProps" @click="showDialog"/>
 </template>

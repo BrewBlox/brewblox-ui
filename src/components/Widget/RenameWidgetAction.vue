@@ -18,17 +18,12 @@ export default class RenameWidgetAction extends Vue {
   @Prop({ type: String, default: 'edit' })
   readonly icon!: string;
 
-  @Prop({ type: Boolean, default: false })
-  readonly active!: boolean;
-
-  @Prop({ type: Boolean, default: false })
-  readonly noClose!: boolean;
-
-  @Prop({ type: Object, default: () => ({}) })
-  readonly itemProps!: any;
-
-  @Prop({ type: Boolean, default: false })
-  readonly disabled!: boolean;
+  get itemProps() {
+    return {
+      ...this.$attrs,
+      ...this.$props,
+    };
+  }
 
   renameWidget() {
     let widgetTitle = dashboardStore.dashboardItemById(this.widgetId).title;
@@ -51,5 +46,5 @@ export default class RenameWidgetAction extends Vue {
 </script>
 
 <template>
-  <ActionItem v-bind="$props" @click="renameWidget"/>
+  <ActionItem v-bind="itemProps" @click="renameWidget"/>
 </template>
