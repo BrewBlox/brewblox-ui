@@ -3,21 +3,17 @@ import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { DisplaySettingsBlock } from './types';
+import { DisplaySettingsBlock, DisplaySlot } from './types';
 
 @Component
 export default class DisplaySettingsWidget extends BlockWidget {
   readonly block!: DisplaySettingsBlock;
 
-  get displaySlots(): any[][] {
-    const slots = Array(6);
+  get slots(): DisplaySlot[] {
+    const slots = Array<DisplaySlot>(6);
     this.block.data.widgets
-      .forEach((w) => { slots[w.pos - 1] = w; });
+      .forEach(w => slots[w.pos - 1] = w);
     return slots;
-  }
-
-  slotStyle(slot) {
-    return `color: #${slot.color} !important`;
   }
 }
 </script>
@@ -30,7 +26,7 @@ export default class DisplaySettingsWidget extends BlockWidget {
       <q-list dark dense>
         <div class="row">
           <q-item
-            v-for="(slot, idx) in displaySlots"
+            v-for="(slot, idx) in slots"
             :key="idx"
             clickable
             class="col-4"
@@ -38,7 +34,11 @@ export default class DisplaySettingsWidget extends BlockWidget {
           >
             <q-item-section>
               <q-item-label caption>Slot {{ idx + 1 }}</q-item-label>
-              <span v-if="slot" :style="slotStyle(slot)" class="text-bold">{{ slot.name }}</span>
+              <span
+                v-if="slot"
+                :style="`color: #${slot.color} !important`"
+                class="text-bold"
+              >{{ slot.name || '---' }}</span>
               <span v-else class="darkened">Not set</span>
             </q-item-section>
           </q-item>

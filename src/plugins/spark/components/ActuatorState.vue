@@ -46,6 +46,9 @@ export default class ActuatorState extends Vue {
   }
 
   toggle() {
+    if (this.disable) {
+      return;
+    }
     if (this.value === 0 || !this.known) {
       this.change(1);
     }
