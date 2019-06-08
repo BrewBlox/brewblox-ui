@@ -56,6 +56,7 @@ export default class DatetimeDialog extends DialogBase {
               label="YYYY/MM/DD hh:mm:ss"
               mask="####/##/## ##:##:##"
               dark
+              autofocus
             />
           </q-item-section>
           <q-item-section class="col-auto">

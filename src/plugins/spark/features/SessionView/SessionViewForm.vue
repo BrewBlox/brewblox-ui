@@ -151,10 +151,14 @@ export default class SessionViewForm extends FormBase {
         <q-list>
           <q-item dark>
             <q-item-section>
-              <q-btn flat rounded icon="mdi-chart-line" @click="graphSessionId = session.id"/>
+              <q-btn flat rounded icon="mdi-chart-line" @click="graphSessionId = session.id">
+                <q-tooltip>Show Graph</q-tooltip>
+              </q-btn>
             </q-item-section>
             <q-item-section>
-              <q-btn flat rounded icon="mdi-content-copy" @click="duplicateSession(session)"/>
+              <q-btn flat rounded icon="mdi-content-copy" @click="duplicateSession(session)">
+                <q-tooltip>Duplicate Session</q-tooltip>
+              </q-btn>
             </q-item-section>
             <q-item-section>
               <q-toggle
@@ -162,10 +166,14 @@ export default class SessionViewForm extends FormBase {
                 checked-icon="visibility"
                 unchecked-icon="visibility_off"
                 @input="v => { session.hidden = !v; updateSession(session); }"
-              />
+              >
+                <q-tooltip>Show/hide Session in widget</q-tooltip>
+              </q-toggle>
             </q-item-section>
             <q-item-section>
-              <q-btn flat rounded icon="delete" @click="deleteSession(session)"/>
+              <q-btn flat rounded icon="delete" @click="deleteSession(session)">
+                <q-tooltip>Delete Session</q-tooltip>
+              </q-btn>
             </q-item-section>
           </q-item>
           <q-separator dark/>

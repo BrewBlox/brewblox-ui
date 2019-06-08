@@ -32,7 +32,6 @@ export default class InputDialog extends DialogBase {
   created() {
     this.local = this.value;
   }
-
 }
 </script>
 
@@ -50,6 +49,7 @@ export default class InputDialog extends DialogBase {
           :clearable="clearable"
           label="Value"
           dark
+          autofocus
           step="any"
         />
       </q-card-section>

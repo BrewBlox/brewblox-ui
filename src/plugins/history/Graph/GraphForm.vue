@@ -154,12 +154,15 @@ export default class GraphForm extends FormBase {
     <q-card-section>
       <q-expansion-item group="modal" icon="mdi-timetable" label="Period settings">
         <q-item dark>
-          <q-item-section>
-            <q-item-label caption>Display type</q-item-label>
-            <SelectField
+          <q-item-section class="col-auto">
+            <q-select
               :value="shownPeriod"
               :options="periodOptions"
-              title="Display type"
+              emit-value
+              map-options
+              dark
+              options-dark
+              label="Display type"
               @input="updateShownPeriod"
             />
           </q-item-section>
@@ -178,7 +181,7 @@ export default class GraphForm extends FormBase {
             <InputField
               :value="config.params.duration"
               title="Duration"
-              @input="v => { v => config.params.duration = durationString(v); saveConfig(config); }"
+              @input="v => { config.params.duration = durationString(v); saveConfig(config); }"
             />
           </q-item-section>
           <q-item-section v-if="shownPeriod.end" class="col-6">
@@ -255,7 +258,7 @@ export default class GraphForm extends FormBase {
   transform: scaleX(-1);
 }
 .scroll-parent {
-  height: 300px;
-  max-height: 30vh;
+  height: 500px;
+  max-height: 60vh;
 }
 </style>

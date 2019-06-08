@@ -52,6 +52,7 @@ export default class BlockDialog extends DialogBase {
           :options="blockOpts"
           :clearable="clearable"
           dark
+          autofocus
           options-dark
           option-label="id"
           option-value="id"
