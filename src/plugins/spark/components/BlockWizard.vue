@@ -172,8 +172,8 @@ export default class BlockWizard extends Vue {
                   <ul>
                     <li>The name must not be empty.</li>
                     <li>The name must be unique.</li>
-                    <li>The name must begin with a letter (a-z).</li>
-                    <li>The name must not contain brackets ([]&lt;&gt;).</li>
+                    <li>The name must begin with a letter.</li>
+                    <li>The name may only contain alphanumeric characters, space, and _-()|.</li>
                     <li>The name must be less than 200 characters.</li>
                   </ul>
                 </q-tooltip>
