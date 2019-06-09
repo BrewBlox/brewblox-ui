@@ -1,7 +1,7 @@
 import { Link } from '@/helpers/units';
 import { Block } from '@/plugins/spark/types';
 
-export interface DisplayWidget {
+export interface DisplaySlot {
   pos: number;
   color: string;
   name: string;
@@ -17,6 +17,6 @@ export interface DisplaySettingsBlock extends Block {
   data: {
     name: string;
     tempUnit: 0 | 1; // 0: Celsius 1: Fahrenheit
-    widgets: DisplayWidget[];
+    widgets: DisplaySlot[];
   };
 }

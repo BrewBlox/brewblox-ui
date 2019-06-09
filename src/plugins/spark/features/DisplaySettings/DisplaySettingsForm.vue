@@ -4,20 +4,26 @@ import { Component } from 'vue-property-decorator';
 import { Link } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { validDisplayTypes } from '@/plugins/spark/features/DisplaySettings/getters';
-import { DisplaySettingsBlock, DisplayWidget } from '@/plugins/spark/features/DisplaySettings/types';
+import { DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/features/DisplaySettings/types';
 
 @Component
 export default class DisplaySettingsForm extends BlockForm {
   readonly block!: DisplaySettingsBlock;
 
-  get displaySlots() {
+  get slots() {
     const slots = Array(6);
     this.block.data.widgets
       .forEach((w) => { slots[w.pos - 1] = w; });
     return slots;
   }
 
-  slotLink(slot) {
+  get slotNameRules() {
+    return [
+      v => !v || v.length <= 15 || 'Name can only be 15 characters',
+    ];
+  }
+
+  slotLink(slot: DisplaySlot): Link {
     if (!slot) {
       return new Link(null);
     }
@@ -25,7 +31,7 @@ export default class DisplaySettingsForm extends BlockForm {
       .find(v => v instanceof Link) || new Link(null);
   }
 
-  slotColorStyle(slot) {
+  slotColorStyle(slot: DisplaySlot): Record<string, string> {
     const color = `#${slot.color || 'ff'}`;
     return {
       color,
@@ -46,8 +52,8 @@ export default class DisplaySettingsForm extends BlockForm {
     }
 
     const type = link.type || '';
-    const existing = this.displaySlots[idx] || {};
-    const obj: DisplayWidget = {
+    const existing = this.slots[idx] || {};
+    const obj: DisplaySlot = {
       pos,
       color: existing.color || '4169E1',
       name: existing.name || link.id.slice(0, 15),
@@ -77,10 +83,6 @@ export default class DisplaySettingsForm extends BlockForm {
   }
 
   updateSlotName(idx: number, name: string) {
-    if (name && name.length > 15) {
-      this.$q.notify({ message: 'Name can only be 15 characters' });
-      return;
-    }
     const pos = idx + 1;
     this.block.data.widgets = this.block.data.widgets
       .map(w => (w.pos === pos ? { ...w, name } : w));
@@ -102,7 +104,7 @@ export default class DisplaySettingsForm extends BlockForm {
 
     <q-scroll-area style="min-height: 400px; height: 80vh">
       <q-card-section>
-        <q-list v-for="(slot, idx) in displaySlots" :key="idx" bordered dark class="q-mb-sm">
+        <q-list v-for="(slot, idx) in slots" :key="idx" bordered dark class="q-mb-sm">
           <q-item dark>
             <q-item-section avatar>
               <q-icon name="mdi-widgets"/>
@@ -125,6 +127,7 @@ export default class DisplaySettingsForm extends BlockForm {
               <InputField
                 v-if="slot"
                 :value="slot.name"
+                :rules="slotNameRules"
                 title="Slot name"
                 message="Choose the LCD display name for this block"
                 @input="v => updateSlotName(idx, v)"

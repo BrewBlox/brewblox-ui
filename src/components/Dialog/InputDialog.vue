@@ -16,12 +16,21 @@ export default class InputDialog extends DialogBase {
   public readonly type!: string;
 
   @Prop({ type: Array, default: () => [] })
-  public readonly rules!: (v: any) => true | string;
+  public readonly rules!: ((v: any) => true | string)[];
 
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
+  get error() {
+    return this.rules
+      .map(f => f(this.local))
+      .find(isString) !== undefined;
+  }
+
   save() {
+    if (this.error) {
+      return;
+    }
     const val =
       (this.type === 'number' && isString(this.local))
         ? parseFloat(this.local as string)
@@ -55,7 +64,7 @@ export default class InputDialog extends DialogBase {
       </q-card-section>
       <q-card-actions align="right">
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel"/>
-        <q-btn flat label="OK" color="primary" @click="save"/>
+        <q-btn :disable="error" flat label="OK" color="primary" @click="save"/>
       </q-card-actions>
     </q-card>
   </q-dialog>
