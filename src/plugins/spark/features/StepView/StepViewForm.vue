@@ -10,13 +10,13 @@ import sparkStore from '@/plugins/spark/store';
 import { Block, ChangeField } from '@/plugins/spark/types';
 import featureStore from '@/store/features';
 
-import { BlockChange, ChangeProperty, Step, StepViewConfig } from './types';
+import { BlockChange, Step, StepViewConfig } from './types';
 
 interface BlockChangeDisplay extends BlockChange {
   key: string;
   block: Block;
   displayName: string;
-  props: ChangeProperty[];
+  props: ChangeField[];
 }
 
 interface StepDisplay extends Step {
@@ -98,8 +98,8 @@ export default class StepViewForm extends FormBase {
     };
   }
 
-  findProp(change: BlockChangeDisplay, key: string): ChangeProperty {
-    return change.props.find(prop => prop.key === key) as ChangeProperty;
+  findProp(change: BlockChangeDisplay, key: string): ChangeField {
+    return change.props.find(prop => prop.key === key) as ChangeField;
   }
 
   componentProps(change: BlockChangeDisplay, key: string): any {

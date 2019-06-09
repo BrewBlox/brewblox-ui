@@ -76,7 +76,7 @@ export default class GraphWidget extends WidgetBase {
                 :key="idx"
                 dark
                 clickable
-                @click="() => applyPreset(preset)"
+                @click="applyPreset(preset)"
               >
                 <q-item-section>{{ preset.duration }}</q-item-section>
               </q-item>

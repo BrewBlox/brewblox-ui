@@ -13,10 +13,7 @@ import { QueryParams } from '@/store/history';
 @Component
 export default class BlockGraph extends Vue {
   durationString = durationString;
-  $refs!: {
-    graph: any;
-  }
-  prevStrConfig: string = '';
+  $refs!: { graph: any }
 
   @Prop({ type: Boolean, required: true })
   readonly value!: boolean;
@@ -98,18 +95,12 @@ export default class BlockGraph extends Vue {
   }
 
   @Watch('graphCfg')
-  onCfgChange() {
+  onCfgChange(newVal, oldVal) {
     // Vue considers configuration "changed" with every block data update
     // To avoid constantly refreshing listeners, we need to do a deep compare
-    const strConfig = JSON.stringify(this.graphCfg);
-    if (strConfig !== this.prevStrConfig) {
-      this.prevStrConfig = strConfig;
+    if (!oldVal || JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
       this.$nextTick(() => this.$refs.graph && this.$refs.graph.resetListeners());
     }
-  }
-
-  created() {
-    this.prevStrConfig = JSON.stringify(this.graphCfg);
   }
 }
 </script>
