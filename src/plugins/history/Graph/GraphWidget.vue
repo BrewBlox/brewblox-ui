@@ -42,6 +42,11 @@ export default class GraphWidget extends WidgetBase {
   regraph() {
     this.$nextTick(() => this.$refs.widgetGraph.resetListeners());
   }
+
+  mounted() {
+    this.$watch('widget.cols', () => this.$refs.widgetGraph.refresh());
+    this.$watch('widget.rows', () => this.$refs.widgetGraph.refresh());
+  }
 }
 </script>
 
@@ -54,8 +59,8 @@ export default class GraphWidget extends WidgetBase {
         class="q-mr-md"
         style="width: 600px"
       >
-        <q-card dark class="q-pa-xs bg-dark-bright">
-          <GraphCard :id="widget.id" :config="graphCfg" shared-listeners/>
+        <q-card dark class="q-pa-xs bg-dark-bright" style="min-height: 100px">
+          <HistoryGraph :id="widget.id" :config="graphCfg" shared-listeners/>
         </q-card>
       </ScreenSizeConstrained>
       <GraphForm
@@ -68,22 +73,24 @@ export default class GraphWidget extends WidgetBase {
 
     <q-dialog v-model="graphModalOpen" maximized>
       <q-card v-if="graphModalOpen" dark>
-        <GraphCard :id="widget.id" :config="graphCfg" shared-listeners>
-          <q-btn-dropdown flat auto-close label="presets" icon="mdi-timelapse">
-            <q-list dark link>
-              <q-item
-                v-for="(preset, idx) in presets"
-                :key="idx"
-                dark
-                clickable
-                @click="() => applyPreset(preset)"
-              >
-                <q-item-section>{{ preset.duration }}</q-item-section>
-              </q-item>
-            </q-list>
-          </q-btn-dropdown>
-          <q-btn v-close-popup flat label="close"/>
-        </GraphCard>
+        <HistoryGraph :id="widget.id" :config="graphCfg" shared-listeners>
+          <template v-slot:controls>
+            <q-btn-dropdown flat auto-close label="presets" icon="mdi-timelapse">
+              <q-list dark link>
+                <q-item
+                  v-for="(preset, idx) in presets"
+                  :key="idx"
+                  dark
+                  clickable
+                  @click="applyPreset(preset)"
+                >
+                  <q-item-section>{{ preset.duration }}</q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+            <q-btn v-close-popup flat label="close"/>
+          </template>
+        </HistoryGraph>
       </q-card>
     </q-dialog>
 
@@ -119,7 +126,7 @@ export default class GraphWidget extends WidgetBase {
     </WidgetToolbar>
 
     <div class="col">
-      <GraphCard
+      <HistoryGraph
         ref="widgetGraph"
         :id="widget.id"
         :config="graphCfg"
