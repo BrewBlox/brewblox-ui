@@ -1,250 +1,86 @@
-import Plotly from 'plotly.js';
+import isNumber from 'lodash/isNumber';
+import Plotly, { Config, Frame, Layout, PlotData } from 'plotly.js';
+import { debounce } from 'quasar';
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
-interface VueProp {
-  type: any;
-  required?: boolean;
-  default: any;
-}
-
-// The naming convention is:
-//   - events are attached as `'plotly_' + eventName.toLowerCase()`
-//   - vue props are `'on' + eventName`
+// This component forwards all events emitted by Plotly
+/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 const eventNames = [
-  'AfterExport',
-  'AfterPlot',
-  'Animated',
-  'AnimatingFrame',
-  'AnimationInterrupted',
-  'AutoSize',
-  'BeforeExport',
-  'ButtonClicked',
-  'Click',
-  'ClickAnnotation',
-  'Deselect',
-  'DoubleClick',
-  'Framework',
-  'Hover',
-  'Relayout',
-  'Restyle',
-  'Redraw',
-  'Selected',
-  'Selecting',
-  'SliderChange',
-  'SliderEnd',
-  'SliderStart',
-  'Transitioning',
-  'TransitionInterrupted',
-  'Unhover',
-];
-
-const updateEvents = [
+  'plotly_afterexport',
+  'plotly_afterplot',
+  'plotly_animated',
+  'plotly_animatingframe',
+  'plotly_animationinterrupted',
+  'plotly_autosize',
+  'plotly_beforeexport',
+  'plotly_buttonclicked',
+  'plotly_click',
+  'plotly_clickannotation',
+  'plotly_deselect',
+  'plotly_doubleclick',
+  'plotly_framework',
+  'plotly_hover',
+  'plotly_relayout',
   'plotly_restyle',
   'plotly_redraw',
-  'plotly_relayout',
-  'plotly_doubleclick',
-  'plotly_animated',
+  'plotly_selected',
+  'plotly_selecting',
+  'plotly_sliderchange',
+  'plotly_sliderend',
+  'plotly_sliderstart',
+  'plotly_transitioning',
+  'plotly_transitioninterrupted',
+  'plotly_unhover',
 ];
 
-const isBrowser = typeof window !== 'undefined';
-const hasReactAPIMethod = !!Plotly.react;
-
-const isNumber =
-  (n: any): boolean => !Number.isNaN(parseFloat(n)) && Number.isFinite(n);
-
-const eventReducer =
-  (acc: { [key: string]: VueProp }, event: string): typeof acc =>
-    ({
-      ...acc,
-      [`on${event}`]: {
-        type: Function,
-        default: () => () => { },
-      },
-    });
-
-@Component({
-  props: {
-    fit: {
-      type: Boolean,
-      default: () => false,
-    },
-    data: {
-      type: Array,
-      default: () => ([]),
-    },
-    layout: {
-      type: Object,
-      default: () => ({}),
-    },
-    config: {
-      type: Object,
-      default: () => ({}),
-    },
-    frames: {
-      type: Array,
-      default: () => ([]),
-    },
-    useResizeHandler: {
-      type: Boolean,
-      default: () => false,
-    },
-    revision: {
-      type: Number,
-      default: () => undefined,
-    },
-    className: {
-      type: String,
-      default: () => undefined,
-    },
-    id: {
-      type: String,
-      default: () => undefined,
-    },
-    onError: {
-      type: Function,
-      default: () => {
-      },
-    },
-    onInitialized: {
-      type: Function,
-      default: () => {
-      },
-    },
-    onUpdate: {
-      type: Function,
-      default: () => {
-      },
-    },
-    onPurge: {
-      type: Function,
-      default: () => {
-      },
-    },
-    ...eventNames.reduce(eventReducer, {}),
-  },
-})
+@Component
 export default class PlotlyGraph extends Vue {
-  private fitHandler: EventListener | null = null;
-  private resizeHandler: EventListener | null = null;
-  private handlers = {};
+
+  @Prop({ type: String, required: true })
+  public readonly id!: string;
+
+  @Prop({ type: Array, default: () => [] })
+  public readonly data!: PlotData[];
+
+  @Prop({ type: Object, default: () => ({}) })
+  public readonly layout!: Layout;
+
+  @Prop({ type: Object, default: () => ({}) })
+  public readonly config!: Partial<Config>;
+
+  @Prop({ type: Array, default: () => [] })
+  public readonly frames!: Frame[];
+
+  @Prop({ type: Boolean, default: false })
+  public readonly autoFit!: boolean;
+
+  @Prop({ type: Boolean, default: false })
+  public readonly autoResize!: boolean;
+
+  @Prop({ type: Number })
+  public readonly revision!: number;
+
+  @Prop({ type: String, default: '100%' })
+  public readonly width!: string;
+
+  @Prop({ type: String, default: '100%' })
+  public readonly height!: string;
+
+  @Prop({ type: [String, Array, Object], default: '' })
+  public readonly plotlyClass!: string | string[] | Record<string, string>;
 
   private get plotlyElement(): any {
     return this.$refs.plotly;
   }
 
-  private handlePropsUpdate(): void {
-    if (!hasReactAPIMethod) {
-      this.handlers = {};
-    }
-
-    const update = hasReactAPIMethod ? Plotly.react : Plotly.newPlot;
-
-    update(
-      this.plotlyElement,
-      this.$props.data,
-      this.resizedLayoutIfFit(this.$props.layout),
-      this.$props.config,
-    )
-      .then(() => this.syncEventHandlers())
-      .then(() => this.syncWindowResize())
-      .then(() => {
-        if (!hasReactAPIMethod) this.attachUpdateEvents();
-      })
-      .then(() => this.handleUpdateWithProps(this.$props))
-      .catch((e) => {
-        console.error('Error while plotting:', e); // eslint-disable-line no-console
-        return this.$props.onError();
-      });
+  private attachListeners() {
+    Object.keys(this.$listeners)
+      .forEach(name => this.plotlyElement.on(name, (...args) => this.$emit(name, ...args)));
   }
 
-  private removeUpdateEvents(): void {
-    if (!this.plotlyElement || !this.plotlyElement.removeListener) return;
-
-    updateEvents.forEach((eventName) => {
-      this.plotlyElement.removeListener(eventName, this.handleUpdate);
-    });
-  }
-
-  private attachUpdateEvents(): void {
-    if (!this.plotlyElement || !this.plotlyElement.removeListener) return;
-
-    updateEvents.forEach((eventName) => {
-      this.plotlyElement.on(eventName, this.handleUpdate);
-    });
-  }
-
-  private handleUpdate(): void {
-    this.handleUpdateWithProps(this.$props);
-  }
-
-  private handleUpdateWithProps(props): void {
-    props.onUpdate(this.plotlyElement);
-  }
-
-  // Attach and remove event handlers as they're added or removed from props:
-  private syncEventHandlers(propsIn = null): void {
-    // Allow use of nextProps if passed explicitly:
-    const props = propsIn || this.$props;
-
-    eventNames.forEach((eventName) => {
-      const prop = props[`on${eventName}`];
-      const hasHandler = !!this.handlers[eventName];
-
-      if (prop && !hasHandler) {
-        this.handlers[eventName] = prop;
-        this.plotlyElement.on(
-          `plotly_${eventName.toLowerCase()}`,
-          this.handlers[eventName],
-        );
-      } else if (!prop && hasHandler) {
-        // Needs to be removed:
-        this.plotlyElement.removeListener(
-          `plotly_${eventName.toLowerCase()}`,
-          this.handlers[eventName],
-        );
-        delete this.handlers[eventName];
-      }
-    });
-  }
-
-  private syncWindowResize(props = this.$props, invoke = false): void {
-    if (!isBrowser) return;
-
-    if (props.fit && !this.fitHandler) {
-      this.fitHandler = () => Plotly.relayout(this.plotlyElement, this.getSize());
-
-      window.addEventListener('resize', this.fitHandler as EventListener);
-
-      if (invoke) {
-        this.fitHandler(new Event('manual-invoke'));
-        return;
-      }
-    } else if (!props.fit && this.fitHandler) {
-      window.removeEventListener('resize', this.fitHandler);
-
-      this.fitHandler = null;
-    }
-
-    if (props.useResizeHandler && !this.resizeHandler) {
-      this.resizeHandler = () => Plotly.Plots.resize(this.plotlyElement);
-
-      window.addEventListener('resize', this.resizeHandler);
-    } else if (!props.useResizeHandler && this.resizeHandler) {
-      window.removeEventListener('resize', this.resizeHandler);
-
-      this.resizeHandler = null;
-    }
-  }
-
-  private resizedLayoutIfFit(layout: Plotly.Layout): Plotly.Layout {
-    if (!this.$props.fit) {
-      return layout;
-    }
-    return Object.assign({}, layout, this.getSize(layout));
-  }
-
-  private getSize(layout = this.$props.layout): { width: number; height: number } {
+  private getSize(): { width: number; height: number } {
+    const layout = this.layout;
     let rect: any = {};
     const layoutWidth = layout ? layout.width : null;
     const layoutHeight = layout ? layout.height : null;
@@ -256,53 +92,67 @@ export default class PlotlyGraph extends Vue {
     }
 
     return {
-      width: hasWidth ? parseInt(layoutWidth, 10) : rect.width,
-      height: hasHeight ? parseInt(layoutHeight, 10) : rect.height,
+      width: hasWidth ? layoutWidth : rect.width,
+      height: hasHeight ? layoutHeight : rect.height,
     };
   }
 
+  private resizedLayout(): Plotly.Layout {
+    return this.autoFit
+      ? Object.assign({}, this.layout, this.getSize())
+      : this.layout;
+  }
+
+  private relayoutPlot() {
+    Plotly.relayout(this.plotlyElement, this.resizedLayout());
+  }
+
+  private resizePlot() {
+    Plotly.Plots.resize(this.plotlyElement);
+  }
+
+  private renderPlot(): void {
+    // According to the Plotly documentation,
+    // Plotly.react() is much faster for updating existing Plots.
+    // The downside is that parent <span> elements get confused, and rerender empty.
+    // https://plot.ly/javascript/plotlyjs-function-reference/#plotlynewplot
+    Plotly.newPlot(
+      this.plotlyElement,
+      this.data,
+      this.resizedLayout(),
+      this.config,
+    )
+      .then(this.attachListeners)
+      .catch((e: Error) => this.$emit('error', e.message));
+  }
+
+  private resizeHandler() {
+    if (this.autoFit) {
+      this.relayoutPlot();
+    }
+    if (this.autoResize) {
+      this.resizePlot();
+    }
+  }
+
   public created(): void {
-    this.handleUpdate = this.handleUpdate.bind(this);
-    this.$watch('$props.config', this.handlePropsUpdate);
-    this.$watch('$props.data', this.handlePropsUpdate);
-    this.$watch('$props.frames', this.handlePropsUpdate);
-    this.$watch('$props.layout', this.handlePropsUpdate);
-    this.$watch('$props.revision', this.handlePropsUpdate);
+    const updateFunc = debounce(this.renderPlot, 50, false);
+
+    this.$watch('config', updateFunc);
+    this.$watch('data', updateFunc);
+    this.$watch('frames', updateFunc);
+    this.$watch('layout', updateFunc);
+    this.$watch('revision', updateFunc);
   }
 
   public mounted(): void {
-    this.$nextTick()
-      .then(() => this.$nextTick())
-      .then(() => Plotly.newPlot(
-        this.plotlyElement,
-        this.$props.data,
-        this.resizedLayoutIfFit(this.$props.layout),
-        this.$props.config,
-      ))
-      .then(() => this.syncWindowResize())
-      .then(() => this.syncEventHandlers())
-      .then(() => this.attachUpdateEvents())
-      .then(() => this.$props.onInitialized(this.plotlyElement))
-      .catch((e) => {
-        console.error('Error while plotting:', e); // eslint-disable-line no-console
-        return this.$props.onError();
-      });
+    this.renderPlot();
+    window.addEventListener('resize', this.resizeHandler);
+    this.$watch('revision', this.resizePlot);
   }
 
   public beforeDestroy(): void {
-    this.$props.onPurge(this.plotlyElement);
-
-    if (this.fitHandler && isBrowser) {
-      window.removeEventListener('resize', this.fitHandler);
-      this.fitHandler = null;
-    }
-    if (this.resizeHandler && isBrowser) {
-      window.removeEventListener('resize', this.resizeHandler);
-      this.resizeHandler = null;
-    }
-
-    this.removeUpdateEvents();
-
+    window.removeEventListener('resize', this.resizeHandler);
     Plotly.purge(this.plotlyElement);
   }
 
@@ -310,13 +160,13 @@ export default class PlotlyGraph extends Vue {
     return createElement(
       'div',
       {
-        props: {
-          id: this.$props.id,
-          class: this.$props.className,
-          width: '100%',
-          height: '100%',
-        },
         ref: 'plotly',
+        props: {
+          id: this.id,
+          class: this.plotlyClass,
+          width: this.width,
+          height: this.height,
+        },
       },
     );
   }

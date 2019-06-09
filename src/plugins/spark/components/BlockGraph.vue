@@ -108,42 +108,44 @@ export default class BlockGraph extends Vue {
 <template>
   <q-dialog v-model="dialogOpen" maximized>
     <q-card v-if="dialogOpen" class="text-white bg-dark-bright" dark>
-      <GraphCard ref="graph" :id="id" :config="graphCfg">
-        <q-btn-dropdown v-if="!noDuration" auto-close flat label="timespan" icon="mdi-timelapse">
-          <q-item
-            v-for="(preset, idx) in presets"
-            :key="idx"
-            dark
-            link
-            clickable
-            @click="applyPreset(preset)"
-          >
-            <q-item-section>{{ preset.duration }}</q-item-section>
-          </q-item>
-        </q-btn-dropdown>
-        <q-btn-dropdown flat label="settings" icon="settings">
-          <q-item dark link clickable @click="updateDuration">
-            <q-item-section>Duration</q-item-section>
-            <q-item-section class="col-auto">{{ durationString(graphCfg.params.duration) }}</q-item-section>
-          </q-item>
-          <q-expansion-item label="Left or right axis">
+      <HistoryGraph ref="graph" :id="id" :config="graphCfg">
+        <template v-slot:controls>
+          <q-btn-dropdown v-if="!noDuration" auto-close flat label="timespan" icon="mdi-timelapse">
             <q-item
-              v-for="[key, renamed] in targetKeys"
-              :key="key"
+              v-for="(preset, idx) in presets"
+              :key="idx"
               dark
               link
               clickable
-              @click="updateKeySide(key, !isRightAxis(key))"
+              @click="applyPreset(preset)"
             >
-              <q-item-section>{{ renamed }}</q-item-section>
-              <q-item-section side>
-                <q-icon :class="{mirrored: isRightAxis(key)}" name="mdi-chart-line"/>
-              </q-item-section>
+              <q-item-section>{{ preset.duration }}</q-item-section>
             </q-item>
-          </q-expansion-item>
-        </q-btn-dropdown>
-        <q-btn v-close-popup flat label="close"/>
-      </GraphCard>
+          </q-btn-dropdown>
+          <q-btn-dropdown flat label="settings" icon="settings">
+            <q-item dark link clickable @click="updateDuration">
+              <q-item-section>Duration</q-item-section>
+              <q-item-section class="col-auto">{{ durationString(graphCfg.params.duration) }}</q-item-section>
+            </q-item>
+            <q-expansion-item label="Left or right axis">
+              <q-item
+                v-for="[key, renamed] in targetKeys"
+                :key="key"
+                dark
+                link
+                clickable
+                @click="updateKeySide(key, !isRightAxis(key))"
+              >
+                <q-item-section>{{ renamed }}</q-item-section>
+                <q-item-section side>
+                  <q-icon :class="{mirrored: isRightAxis(key)}" name="mdi-chart-line"/>
+                </q-item-section>
+              </q-item>
+            </q-expansion-item>
+          </q-btn-dropdown>
+          <q-btn v-close-popup flat label="close"/>
+        </template>
+      </HistoryGraph>
     </q-card>
   </q-dialog>
 </template>

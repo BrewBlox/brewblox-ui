@@ -18,7 +18,9 @@ export default class DatetimeDialog extends DialogBase {
     const args =
       (this.stringValue.match(/^(\d*)\/(\d*)\/(\d*) (\d*):(\d*):(\d*)$/) || [])
         .map(Number);
-    return new Date(args[1], args[2], args[3], args[4], args[5], args[6]);
+    // Months start at 0 in JavaScript
+    // I have no words. At least: none that needn't be censored.
+    return new Date(args[1], args[2] - 1, args[3], args[4], args[5], args[6]);
   }
 
   get valid() {
