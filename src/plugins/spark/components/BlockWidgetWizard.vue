@@ -66,22 +66,6 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
     return !!this.service && !!this.block;
   }
 
-  changeBlockId(newId: string) {
-    const errors = this.blockIdRules
-      .map(rule => rule(newId))
-      .filter(isString);
-
-    if (errors.length > 0) {
-      this.$q.notify({
-        message: errors.join(', '),
-        color: 'negative',
-        icon: 'error',
-      });
-      return;
-    }
-    (this.block as Block).id = newId;
-  }
-
   ensureItem() {
     this.block = this.block || {
       id: this.blockId,
@@ -90,6 +74,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
       groups: [0],
       data: sparkStore.specs[this.typeId].generate(),
     };
+    this.blockId = this.block.id; // for when using existing block
     this.widget = this.widget || {
       id: this.widgetId,
       title: this.blockId,
@@ -221,13 +206,15 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
       <q-item dark>
         <q-item-section>
           <q-select
-            v-model="block"
+            :value="block"
             :options="blockOpts"
             :rules="[v => !!v || 'You must select a Block']"
             dark
             options-dark
             option-label="id"
+            option-value="id"
             label="Block"
+            @input="v => { block = v; widget = null}"
           >
             <template v-slot:no-option>
               <q-item dark>
