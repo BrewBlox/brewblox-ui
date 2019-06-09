@@ -59,7 +59,7 @@ export default class GraphWidget extends WidgetBase {
         class="q-mr-md"
         style="width: 600px"
       >
-        <q-card dark class="q-pa-xs bg-dark-bright">
+        <q-card dark class="q-pa-xs bg-dark-bright" style="min-height: 100px">
           <HistoryGraph :id="widget.id" :config="graphCfg" shared-listeners/>
         </q-card>
       </ScreenSizeConstrained>

@@ -51,7 +51,7 @@ const layoutDefaults: Partial<Layout> = {
 /* eslint-enable */
 
 @Component
-export default class GraphDisplay extends Vue {
+export default class Graph extends Vue {
   id: string = uid();
 
   @Prop({ type: Array, required: true })
@@ -116,6 +116,7 @@ export default class GraphDisplay extends Vue {
     :auto-resize="autoResize"
     class="maximized"
     @error="displayError"
+    v-on="$listeners"
   />
 </template>
 

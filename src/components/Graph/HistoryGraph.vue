@@ -9,17 +9,12 @@ import { defaultPresets } from '@/components/Graph/getters';
 import historyStore from '@/store/history';
 import { DisplayNames, GraphValueAxes, GraphValuesListener, QueryParams, QueryTarget } from '@/store/history';
 
-import GraphDisplay from './GraphDisplay.vue';
 import { addPlotlyListener } from './actions';
 import { GraphConfig } from './types';
 
 interface Policies { [measurement: string]: string }
 
-@Component({
-  components: {
-    GraphDisplay,
-  },
-})
+@Component
 export default class HistoryGraph extends Vue {
   $refs!: {
     display: any;
@@ -144,13 +139,15 @@ export default class HistoryGraph extends Vue {
 
 <template>
   <span>
-    <GraphDisplay
+    <!-- Normal display -->
+    <Graph
       v-if="!error"
       ref="display"
       :data="graphData"
       :layout="graphLayout"
       :revision="revision"
     />
+    <!-- Error message -->
     <q-item v-else dark class="absolute-center">
       <q-item-section avatar>
         <q-icon name="warning"/>

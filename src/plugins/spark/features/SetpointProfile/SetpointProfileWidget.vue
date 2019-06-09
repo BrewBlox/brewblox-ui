@@ -68,7 +68,7 @@ export default class SetpointProfileWidget extends BlockWidget {
         style="width: 600px;"
       >
         <q-card dark class="q-pa-xs bg-dark-bright">
-          <GraphDisplay :data="plotlyData" :layout="plotlyLayout"/>
+          <Graph :data="plotlyData" :layout="plotlyLayout"/>
         </q-card>
       </ScreenSizeConstrained>
       <SetpointProfileForm
@@ -102,7 +102,7 @@ export default class SetpointProfileWidget extends BlockWidget {
       </q-item>
     </div>
     <div class="col">
-      <GraphDisplay :data="plotlyData" :layout="plotlyLayout" :revision="revision"/>
+      <Graph :data="plotlyData" :layout="plotlyLayout" :revision="revision"/>
     </div>
   </q-card>
 </template>
