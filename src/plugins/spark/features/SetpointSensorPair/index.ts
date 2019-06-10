@@ -1,5 +1,5 @@
 import { ref } from '@/helpers/component-ref';
-import { Link,Unit } from '@/helpers/units';
+import { Link, Unit } from '@/helpers/units';
 import { TempSensorLink } from '@/helpers/units/KnownLinks';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
@@ -13,6 +13,7 @@ const block: BlockSpec = {
   id: typeName,
   generate: () => ({
     sensorId: new TempSensorLink(null),
+    storedSetting: new Unit(null, 'degC'),
     setting: new Unit(null, 'degC'),
     value: new Unit(null, 'degC'),
     settingEnabled: true,
