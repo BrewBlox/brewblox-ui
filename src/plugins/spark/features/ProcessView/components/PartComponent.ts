@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 
 import { SQUARE_SIZE } from '../getters';
-import partSettings from '../settings';
+import specs from '../specs';
 import { CalculatedFlows, FlowPart } from '../types';
 
 @Component
@@ -43,7 +43,7 @@ export default class PartComponent extends Vue {
   }
 
   protected get size(): [number, number] {
-    return partSettings[this.part.type].size(this.part);
+    return specs[this.part.type].size(this.part);
   }
 
   protected get sizeX(): number {

@@ -1,8 +1,8 @@
-import { ACCELERATE_OTHERS, DEFAULT_PUMP_PRESSURE, LEFT, RIGHT, defaultSettings } from '../getters';
-import { ComponentSettings, PartUpdater,StatePart } from '../types';
+import { ACCELERATE_OTHERS, DEFAULT_PUMP_PRESSURE, LEFT, RIGHT, defaultSpec } from '../getters';
+import { ComponentSpec, PartUpdater, StatePart } from '../types';
 
-const settings: ComponentSettings = {
-  ...defaultSettings,
+const spec: ComponentSpec = {
+  ...defaultSpec,
   transitions: (part: StatePart) => {
     const p = (part.settings || {}).disabled ? 0 : part.settings.pressure || DEFAULT_PUMP_PRESSURE;
     return {
@@ -16,4 +16,4 @@ const settings: ComponentSettings = {
   },
 };
 
-export default settings;
+export default spec;

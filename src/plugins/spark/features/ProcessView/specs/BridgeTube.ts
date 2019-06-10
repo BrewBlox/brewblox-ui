@@ -1,8 +1,8 @@
-import { DOWN, LEFT, RIGHT, UP, defaultSettings } from '../getters';
-import { ComponentSettings } from '../types';
+import { DOWN, LEFT, RIGHT, UP, defaultSpec } from '../getters';
+import { ComponentSpec } from '../types';
 
-const settings: ComponentSettings = {
-  ...defaultSettings,
+const spec: ComponentSpec = {
+  ...defaultSpec,
   transitions: () => ({
     // bridge (high)
     [LEFT]: [{ outCoords: RIGHT }],
@@ -13,4 +13,4 @@ const settings: ComponentSettings = {
   }),
 };
 
-export default settings;
+export default spec;

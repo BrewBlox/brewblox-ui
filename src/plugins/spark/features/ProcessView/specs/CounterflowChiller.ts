@@ -1,7 +1,7 @@
 import { Coordinates, CoordinatesParam } from '@/helpers/coordinates';
 
-import { defaultSettings } from '../getters';
-import { ComponentSettings, PersistentPart } from '../types';
+import { defaultSpec } from '../getters';
+import { ComponentSpec, PersistentPart } from '../types';
 
 export const CFC_TOP_LEFT = '0,0.5,0';
 export const CFC_TOP_RIGHT = '3,0.5,0';
@@ -18,8 +18,8 @@ const BLOCKED: CoordinatesParam[] = [
 const SIZE_X = 3;
 const SIZE_Y = 2;
 
-const settings: ComponentSettings = {
-  ...defaultSettings,
+const spec: ComponentSpec = {
+  ...defaultSpec,
   size: () => [SIZE_X, SIZE_Y],
   transitions: () => ({
     [CFC_TOP_LEFT]: [{ outCoords: CFC_TOP_RIGHT }],
@@ -32,4 +32,4 @@ const settings: ComponentSettings = {
       .subSquares(BLOCKED, part.rotate, [SIZE_X, SIZE_Y]),
 };
 
-export default settings;
+export default spec;

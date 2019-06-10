@@ -8,11 +8,11 @@ import set from 'lodash/set';
 
 import { Coordinates } from '@/helpers/coordinates';
 
-import { ACCELERATE_OTHERS,DEFAULT_FRICTION } from './getters';
-import settings from './settings';
+import { ACCELERATE_OTHERS, DEFAULT_FRICTION } from './getters';
+import specs from './specs';
 import {
   CalculatedFlows,
-  ComponentSettings,
+  ComponentSpec,
   FlowPart,
   FlowRoute,
   LiquidFlow,
@@ -24,14 +24,14 @@ export const removeTransitions =
   (parts: FlowPart[], inCoord: string): FlowPart[] => parts.map(
     part => ({ ...part, transitions: omit(part.transitions, inCoord) }));
 
-export const partSettings =
-  (part: StatePart): ComponentSettings => settings[part.type];
+export const partSpecs =
+  (part: StatePart): ComponentSpec => specs[part.type];
 
 export const partTransitions =
-  (part: StatePart): Transitions => partSettings(part).transitions(part);
+  (part: StatePart): Transitions => partSpecs(part).transitions(part);
 
 export const partSize =
-  (part: StatePart): [number, number] => partSettings(part).size(part);
+  (part: StatePart): [number, number] => partSpecs(part).size(part);
 
 export const partCenter =
   (part: StatePart): [number, number, number] => {

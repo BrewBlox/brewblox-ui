@@ -1,4 +1,4 @@
-import { ComponentSettings } from '../types';
+import { ComponentSpec } from '../types';
 import ActuatorValve from './ActuatorValve';
 import BridgeTube from './BridgeTube';
 import CheckValve from './CheckValve';
@@ -22,7 +22,7 @@ import TeeTube from './TeeTube';
 import Valve from './Valve';
 import WhirlpoolInlet from './WhirlpoolInlet';
 
-const settings: { [key: string]: ComponentSettings } = {
+const specs: { [key: string]: ComponentSpec } = {
   ActuatorValve,
   BridgeTube,
   CheckValve,
@@ -47,4 +47,4 @@ const settings: { [key: string]: ComponentSettings } = {
   WhirlpoolInlet,
 };
 
-export default settings;
+export default specs;

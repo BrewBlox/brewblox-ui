@@ -43,7 +43,7 @@ export interface PartUpdater {
   updatePartState: (part: StatePart) => void;
 }
 
-export interface ComponentSettings {
+export interface ComponentSpec {
   cards: string[];
   transitions: (part: StatePart) => Transitions;
   size: (part: PersistentPart) => [number, number];

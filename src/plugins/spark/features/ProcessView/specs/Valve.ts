@@ -1,8 +1,8 @@
-import { LEFT, RIGHT, defaultSettings } from '../getters';
-import { ComponentSettings, PartUpdater,StatePart, Transitions } from '../types';
+import { LEFT, RIGHT, defaultSpec } from '../getters';
+import { ComponentSpec, PartUpdater, StatePart, Transitions } from '../types';
 
-const settings: ComponentSettings = {
-  ...defaultSettings,
+const spec: ComponentSpec = {
+  ...defaultSpec,
   transitions: (part: StatePart): Transitions =>
     ((part.settings || {}).closed)
       ? {}
@@ -16,4 +16,4 @@ const settings: ComponentSettings = {
   },
 };
 
-export default settings;
+export default spec;

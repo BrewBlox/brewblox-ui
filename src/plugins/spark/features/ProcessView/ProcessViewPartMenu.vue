@@ -3,11 +3,10 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { clampRotation } from '@/helpers/functional';
-import { partSettings } from '@/plugins/spark/features/ProcessView/calculateFlows';
+import { partSpecs } from '@/plugins/spark/features/ProcessView/calculateFlows';
 import { FlowPart } from '@/plugins/spark/features/ProcessView/types';
 
 import { SQUARE_SIZE } from './getters';
-import settings from './settings';
 
 @Component
 export default class ProcessViewPartMenu extends Vue {
@@ -19,12 +18,12 @@ export default class ProcessViewPartMenu extends Vue {
   get cards() {
     return [
       'PlacementPartCard',
-      ...partSettings(this.part).cards,
+      ...partSpecs(this.part).cards,
     ];
   }
 
   get partSize(): [number, number] {
-    return settings[this.part.type].size(this.part);
+    return partSpecs(this.part).size(this.part);
   }
 
   get rotatedSize(): [number, number] {
