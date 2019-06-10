@@ -1,14 +1,14 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
 
+import { FlowSegment } from '@/plugins/spark/features/ProcessView/FlowSegment';
 import {
-  FlowSegment,
   asFlowParts,
   calculateFlows,
   flowPath,
   partTransitions,
 } from '@/plugins/spark/features/ProcessView/calculateFlows';
-import { COLD_WATER, HOT_WATER,IN_OUT } from '@/plugins/spark/features/ProcessView/getters';
+import { COLD_WATER, HOT_WATER, IN_OUT } from '@/plugins/spark/features/ProcessView/getters';
 import { StatePart } from '@/plugins/spark/features/ProcessView/types';
 
 
