@@ -1,7 +1,6 @@
 import { Coordinates, CoordinatesParam } from '@/helpers/coordinates';
 
 import { defaultSettings } from '../getters';
-import { subSquares } from '../helpers/functional';
 import { ComponentSettings, PersistentPart } from '../types';
 
 const BLOCKED: CoordinatesParam[] = [
@@ -18,7 +17,8 @@ const settings: ComponentSettings = {
   size: () => [SIZE_X, SIZE_Y],
   transitions: () => ({}),
   blockedCoordinates: (part: PersistentPart): Coordinates[] =>
-    subSquares(BLOCKED, [part.x, part.y, 0], part.rotate, [SIZE_X, SIZE_Y]),
+    new Coordinates([part.x, part.y, 0])
+      .subSquares(BLOCKED, part.rotate, [SIZE_X, SIZE_Y]),
 };
 
 export default settings;

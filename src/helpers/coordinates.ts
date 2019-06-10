@@ -216,6 +216,19 @@ export class Coordinates {
     return flippedEdge;
   }
 
+  public subSquares(
+    squares: CoordinatesParam[],
+    shapeRotation: number,
+    shapeSize: [number, number],
+  ): Coordinates[] {
+    return squares
+      .map((square) =>
+        new Coordinates(square)
+          .rotateShapeSquare(shapeRotation, 0, shapeSize)
+          .translate(this)
+      );
+  }
+
   public toString(): string {
     return `${this.x},${this.y},${this.z}`;
   }

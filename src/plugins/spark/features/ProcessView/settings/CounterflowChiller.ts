@@ -1,7 +1,6 @@
 import { Coordinates, CoordinatesParam } from '@/helpers/coordinates';
 
 import { defaultSettings } from '../getters';
-import { subSquares } from '../helpers/functional';
 import { ComponentSettings, PersistentPart } from '../types';
 
 export const CFC_TOP_LEFT = '0,0.5,0';
@@ -29,7 +28,8 @@ const settings: ComponentSettings = {
     [CFC_BOTTOM_RIGHT]: [{ outCoords: CFC_BOTTOM_LEFT }],
   }),
   blockedCoordinates: (part: PersistentPart): Coordinates[] =>
-    subSquares(BLOCKED, [part.x, part.y, 0], part.rotate, [SIZE_X, SIZE_Y]),
+    new Coordinates([part.x, part.y, 0])
+      .subSquares(BLOCKED, part.rotate, [SIZE_X, SIZE_Y]),
 };
 
 export default settings;
