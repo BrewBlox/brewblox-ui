@@ -1,8 +1,7 @@
 import { Coordinates, CoordinatesParam } from '@/helpers/coordinates';
 
-import { defaultSettings } from '../getters';
-import { subSquares } from '../helpers/functional';
-import { ComponentSettings, PersistentPart } from '../types';
+import { defaultSpec } from '../getters';
+import { ComponentSpec, PersistentPart } from '../types';
 
 export const COIL_TOP = '0,0.5,0';
 export const COIL_BOTTOM = '0,1.5,0';
@@ -15,15 +14,16 @@ const BLOCKED: CoordinatesParam[] = [
 const SIZE_X = 3;
 const SIZE_Y = 2;
 
-const settings: ComponentSettings = {
-  ...defaultSettings,
+const spec: ComponentSpec = {
+  ...defaultSpec,
   size: () => [SIZE_X, SIZE_Y],
   transitions: () => ({
     [COIL_TOP]: [{ outCoords: COIL_BOTTOM, friction: 20 }],
     [COIL_BOTTOM]: [{ outCoords: COIL_TOP, friction: 20 }],
   }),
   blockedCoordinates: (part: PersistentPart): Coordinates[] =>
-    subSquares(BLOCKED, [part.x, part.y, 0], part.rotate, [SIZE_X, SIZE_Y]),
+    new Coordinates([part.x, part.y, 0])
+      .subSquares(BLOCKED, part.rotate, [SIZE_X, SIZE_Y]),
 };
 
-export default settings;
+export default spec;

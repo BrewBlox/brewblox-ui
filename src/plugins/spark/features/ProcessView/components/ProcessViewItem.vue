@@ -5,7 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 
 import { SQUARE_SIZE } from '../getters';
-import settings from '../settings';
+import specs from '../specs';
 import { FlowPart } from '../types';
 
 
@@ -19,12 +19,12 @@ export default class ProcessViewItem extends Vue {
   @Prop({ type: Boolean, default: false })
   readonly showHover!: boolean;
 
-  get settings() {
-    return settings[this.part.type];
+  get partSpecs() {
+    return specs[this.part.type];
   }
 
   get partSize() {
-    return this.settings.size(this.part);
+    return this.partSpecs.size(this.part);
   }
 
   get rotateTransform() {

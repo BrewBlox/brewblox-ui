@@ -8,7 +8,7 @@ import { spaceCased } from '@/helpers/functional';
 import ProcessViewCatalog from './ProcessViewCatalog.vue';
 import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
-import settings from './settings';
+import specs from './specs';
 import { ClickEvent, FlowPart, PartUpdater, PersistentPart, ProcessViewConfig, Rect, StatePart } from './types';
 
 interface DragAction {
@@ -103,11 +103,11 @@ export default class ProcessViewWidget extends WidgetBase {
   }
 
   isClickable(part) {
-    return !!settings[part.type].interactHandler;
+    return !!specs[part.type].interactHandler;
   }
 
   interact(part: FlowPart) {
-    const handler = settings[part.type].interactHandler;
+    const handler = specs[part.type].interactHandler;
     handler && handler(part, this.updater);
   }
 

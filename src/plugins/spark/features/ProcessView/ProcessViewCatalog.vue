@@ -7,7 +7,7 @@ import { spaceCased } from '@/helpers/functional';
 
 import { SQUARE_SIZE } from './getters';
 import { parts } from './register';
-import settings from './settings';
+import specs from './specs';
 import { PersistentPart, StatePart } from './types';
 
 
@@ -34,7 +34,7 @@ export default class ProcessViewCatalog extends Vue {
   }
 
   partViewBox(part: PersistentPart): string {
-    return settings[part.type].size(part).map(v => v * SQUARE_SIZE).join(' ');
+    return specs[part.type].size(part).map(v => v * SQUARE_SIZE).join(' ');
   }
 
   selectPart(part: PersistentPart) {

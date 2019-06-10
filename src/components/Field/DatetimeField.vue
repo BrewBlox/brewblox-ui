@@ -2,6 +2,8 @@
 import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { dateString, shortDateString } from '@/helpers/functional';
+
 import FieldBase from './FieldBase';
 
 @Component
@@ -24,14 +26,10 @@ export default class DatetimeField extends FieldBase {
     return v;
   }
 
-  get dateString() {
-    if (!this.value) {
-      return this.clearLabel;
-    }
-    const date = new Date(this.value);
+  get displayString() {
     return this.short
-      ? date.toLocaleDateString()
-      : date.toLocaleString();
+      ? shortDateString(this.value, this.clearLabel)
+      : dateString(this.value, this.clearLabel);
   }
 
   openDialog() {
@@ -61,7 +59,7 @@ export default class DatetimeField extends FieldBase {
     @click="openDialog"
   >
     <slot name="pre"/>
-    <slot name="value">{{ dateString }}</slot>
+    <slot name="value">{{ displayString }}</slot>
     <slot/>
   </component>
 </template>

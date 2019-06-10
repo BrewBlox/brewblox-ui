@@ -1,11 +1,11 @@
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
-import { LEFT, RIGHT, defaultSettings } from '../getters';
-import { ComponentSettings, StatePart,Transitions } from '../types';
+import { LEFT, RIGHT, defaultSpec } from '../getters';
+import { ComponentSpec, StatePart, Transitions } from '../types';
 
-const settings: ComponentSettings = {
-  ...defaultSettings,
+const spec: ComponentSpec = {
+  ...defaultSpec,
   cards: ['ActuatorPartCard'],
   transitions: (part: StatePart): Transitions =>
     ((part.state || {}).closed)
@@ -28,4 +28,4 @@ const settings: ComponentSettings = {
   },
 };
 
-export default settings;
+export default spec;

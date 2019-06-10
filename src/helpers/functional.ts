@@ -16,19 +16,14 @@ export const objectStringSorter =
     (a: any, b: any) => {
       const left = a[key].toLowerCase();
       const right = b[key].toLowerCase();
-      if (left < right) {
-        return -1;
-      }
-      if (right > left) {
-        return 1;
-      }
-      return 0;
+      return left.localeCompare(right);
     };
 
 export const durationString =
   (duration: number | string): string => {
-    const durationMs =
-      typeof duration === 'string' ? parseDuration(duration) : duration;
+    const durationMs = isString(duration)
+      ? parseDuration(duration)
+      : duration;
     const secondsTotal = Number(durationMs) / 1000;
     const days = Math.floor(secondsTotal / 86400);
     const hours = Math.floor((secondsTotal - (days * 86400)) / 3600);
@@ -44,10 +39,12 @@ export const durationString =
       [seconds, 's'],
       [milliseconds, 'ms'],
     ];
-    return values.reduceRight(
-      (acc: string, [val, unit]) => (val ? `${val}${unit} ${acc}` : acc),
-      '') ||
-      '0s';
+
+    const strVal = values
+      .filter(([val]) => !!val)
+      .map(([val, unit]) => `${val}${unit}`)
+      .join(' ');
+    return strVal || '0s';
   };
 
 export const unitDurationString =
@@ -93,7 +90,7 @@ export const clampRotation =
   (val: number): number => (val + 360) % 360;
 
 export const dateString =
-  (value: number | string | null, nullLabel: string = '<not set>'): string => {
+  (value: number | string | Date | null, nullLabel: string = '<not set>'): string => {
     if (value === null || value === undefined) {
       return nullLabel;
     }
@@ -101,7 +98,7 @@ export const dateString =
   };
 
 export const shortDateString =
-  (value: number | string | null, nullLabel: string = '<not set>'): string => {
+  (value: number | string | Date | null, nullLabel: string = '<not set>'): string => {
     if (value === null || value === undefined) {
       return nullLabel;
     }

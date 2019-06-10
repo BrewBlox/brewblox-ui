@@ -10,7 +10,7 @@ import { deepCopy } from '@/helpers/shadow-copy';
 import ProcessViewCatalog from './ProcessViewCatalog.vue';
 import ProcessViewPartMenu from './ProcessViewPartMenu.vue';
 import { SQUARE_SIZE } from './getters';
-import settings from './settings';
+import specs from './specs';
 import { ClickEvent, FlowPart, PartUpdater, PersistentPart, ProcessViewConfig, Rect, StatePart } from './types';
 
 interface DragAction {
@@ -164,7 +164,7 @@ export default class ProcessViewForm extends FormBase {
         value: 'interact',
         icon: 'mdi-cursor-default',
         shortcut: 'i',
-        cursor: part => !!part && !!settings[part.type].interactHandler,
+        cursor: part => !!part && !!specs[part.type].interactHandler,
         onClick: this.interactClickHandler,
       },
       {
@@ -294,7 +294,7 @@ export default class ProcessViewForm extends FormBase {
 
   interactClickHandler(evt: ClickEvent, part: FlowPart) {
     if (part) {
-      const handler = settings[part.type].interactHandler;
+      const handler = specs[part.type].interactHandler;
       handler && handler(part, this.updater);
     }
   }
@@ -313,7 +313,7 @@ export default class ProcessViewForm extends FormBase {
   }
 
   blockedByPart(part: PersistentPart) {
-    return settings[part.type].blockedCoordinates(part);
+    return specs[part.type].blockedCoordinates(part);
   }
 
   async movePart(from: PersistentPart | null, to: PersistentPart) {

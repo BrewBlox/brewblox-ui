@@ -1,8 +1,8 @@
-import { IN_OUT, RIGHT, defaultSettings } from '../getters';
-import { ComponentSettings, PersistentPart } from '../types';
+import { IN_OUT, RIGHT, defaultSpec } from '../getters';
+import { ComponentSpec, PersistentPart } from '../types';
 
-const settings: ComponentSettings = {
-  ...defaultSettings,
+const spec: ComponentSpec = {
+  ...defaultSpec,
   cards: ['LiquidSourcePartCard'],
   transitions: (part: PersistentPart) => ({
     [IN_OUT]: [{
@@ -14,4 +14,4 @@ const settings: ComponentSettings = {
   }),
 };
 
-export default settings;
+export default spec;

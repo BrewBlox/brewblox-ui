@@ -2,7 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import PartComponent from '../components/PartComponent';
-import { CFC_BOTTOM_LEFT,CFC_TOP_RIGHT } from '../settings/CounterflowChiller';
+import { CFC_BOTTOM_LEFT, CFC_TOP_RIGHT } from '../specs/CounterflowChiller';
 
 @Component
 export default class CounterflowChiller extends PartComponent {
