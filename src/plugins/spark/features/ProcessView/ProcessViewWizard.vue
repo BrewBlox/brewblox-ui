@@ -3,19 +3,22 @@ import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 
+import { ProcessViewConfig } from './types';
+
 
 @Component
 export default class ProcessViewWizard extends WidgetWizardBase {
   createWidget() {
+    const config: ProcessViewConfig = {
+      parts: [],
+    };
     this.createItem({
+      config,
       id: this.widgetId,
       title: this.widgetTitle,
       feature: this.typeId,
       dashboard: this.dashboardId,
       order: 0,
-      config: {
-        parts: [],
-      },
       ...this.defaultWidgetSize,
     });
   }

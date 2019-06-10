@@ -2,7 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import PartComponent from '../components/PartComponent';
-import { COIL_BOTTOM } from '../settings/Coil';
+import { COIL_BOTTOM } from '../specs/Coil';
 
 @Component
 export default class Coil extends PartComponent {
