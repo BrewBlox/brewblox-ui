@@ -173,7 +173,7 @@ export default class SetpointProfileForm extends BlockForm {
 
         <q-item dark class="q-pt-md">
           <q-item-section class="col-3 q-py-none">
-            <q-item-label caption>Offset from first</q-item-label>
+            <q-item-label caption>Offset from start</q-item-label>
           </q-item-section>
           <q-item-section class="col-5 q-py-none">
             <q-item-label caption>Time</q-item-label>
