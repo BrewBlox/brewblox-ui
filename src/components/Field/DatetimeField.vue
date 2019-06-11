@@ -18,6 +18,9 @@ export default class DatetimeField extends FieldBase {
   @Prop({ type: String })
   readonly resetIcon!: string;
 
+  @Prop({ type: String })
+  public readonly label!: string;
+
   @Prop({ type: String, default: '<not set>' })
   readonly clearLabel!: string;
 
@@ -44,6 +47,7 @@ export default class DatetimeField extends FieldBase {
       messageHtml: this.messageHtml,
       root: this.$root,
       value: new Date(this.value || 0),
+      label: this.label,
       resetIcon: this.resetIcon,
     })
       .onOk(this.change);

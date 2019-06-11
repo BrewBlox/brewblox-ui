@@ -13,6 +13,9 @@ export default class UnitField extends FieldBase {
   @Prop({ type: Object, required: true, validator: v => v instanceof Unit })
   public readonly value!: Unit;
 
+  @Prop({ type: String })
+  public readonly label!: string;
+
   @Prop({ type: String, default: 'small' })
   public readonly unitTag!: string;
 
@@ -32,6 +35,7 @@ export default class UnitField extends FieldBase {
       messageHtml: this.messageHtml,
       root: this.$root,
       value: this.value,
+      label: this.label,
     })
       .onOk(this.change);
   }

@@ -16,6 +16,9 @@ export default class LinkDialog extends DialogBase {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
+  @Prop({ type: String, default: 'Link' })
+  public readonly label!: string;
+
   @Prop({ type: Function })
   readonly filter!: (link: Link) => boolean;
 
@@ -70,11 +73,11 @@ export default class LinkDialog extends DialogBase {
           :value="link"
           :options="linkOpts"
           :clearable="clearable"
+          :label="label"
           dark
           options-dark
           option-label="id"
           option-value="id"
-          label="Link"
           autofocus
           @input="updateLink"
         >

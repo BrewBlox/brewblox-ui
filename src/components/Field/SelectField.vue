@@ -13,6 +13,9 @@ export default class SelectField extends FieldBase {
   @Prop({ type: Array, required: true })
   public readonly options!: any[];
 
+  @Prop({ type: String })
+  public readonly label!: string;
+
   @Prop({ type: String, default: 'label' })
   public readonly optionsLabel!: string;
 
@@ -59,6 +62,7 @@ export default class SelectField extends FieldBase {
       value: this.value,
       options: this.options,
       selectProps: {
+        label: this.label,
         emitValue: true,
         mapOptions: true,
         optionsLabel: this.optionsLabel,

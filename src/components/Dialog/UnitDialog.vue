@@ -11,6 +11,9 @@ export default class UnitDialog extends DialogBase {
   @Prop({ type: Object, required: true, validator: v => v instanceof Unit })
   public readonly value!: Unit;
 
+  @Prop({ type: String, default: 'Value' })
+  public readonly label!: string;
+
   created() {
     this.local = this.value.copy();
   }
@@ -26,10 +29,10 @@ export default class UnitDialog extends DialogBase {
       <q-card-section class="scroll">
         <q-input
           :value="local.value"
+          :label="label"
           input-style="font-size: 170%"
           type="number"
           step="any"
-          label="Value"
           dark
           autofocus
           clearable
