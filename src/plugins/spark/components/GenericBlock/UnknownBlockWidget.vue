@@ -12,7 +12,6 @@ interface AbsenceReason {
 
 @Component
 export default class UnknownBlockWidget extends WidgetBase {
-  modalOpen: boolean = false;
 
   get serviceId(): string {
     return this.widget.config.serviceId;
@@ -60,16 +59,19 @@ export default class UnknownBlockWidget extends WidgetBase {
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <UnknownBlockForm v-if="modalOpen" v-bind="$props" :block="block" @update:block="saveBlock"/>
-    </q-dialog>
-
     <WidgetToolbar :title="widget.title" :subtitle="displayName">
-      <q-item-section class="dense" side>
-        <q-btn flat round dense icon="settings" @click="modalOpen = true"/>
-      </q-item-section>
-      <q-item-section class="dense" side>
-        <q-btn :disable="!reason.temporary" flat round dense icon="refresh" @click="fetchAll"/>
+      <q-item-section side>
+        <q-btn-dropdown flat label="Menu">
+          <q-list dark bordered>
+            <ActionItem
+              :disable="!reason.temporary"
+              icon="refresh"
+              label="Refresh"
+              @click="fetchAll"
+            />
+            <ActionItem icon="delete" label="Delete widget" @click="deleteWidget"/>
+          </q-list>
+        </q-btn-dropdown>
       </q-item-section>
     </WidgetToolbar>
 
@@ -86,9 +88,3 @@ export default class UnknownBlockWidget extends WidgetBase {
     </q-card-section>
   </q-card>
 </template>
-
-<style scoped>
-.dense {
-  padding: 0px;
-}
-</style>

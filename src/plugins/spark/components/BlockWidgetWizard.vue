@@ -161,7 +161,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
     <q-step name="create" title="Create new Block">
       <q-item dark>
         <q-item-section>
-          <q-input v-model="blockId" :rules="blockIdRules" dark label="Block name">
+          <q-input v-model="blockId" :rules="blockIdRules" autofocus dark label="Block name">
             <template v-slot:append>
               <q-icon name="mdi-information">
                 <q-tooltip>
@@ -214,6 +214,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
             option-label="id"
             option-value="id"
             label="Block"
+            autofocus
             @input="v => { block = v; widget = null}"
           >
             <template v-slot:no-option>
