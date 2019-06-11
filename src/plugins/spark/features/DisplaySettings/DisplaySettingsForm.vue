@@ -31,6 +31,12 @@ export default class DisplaySettingsForm extends BlockForm {
       .find(v => v instanceof Link) || new Link(null);
   }
 
+  slotColor(slot: DisplaySlot) {
+    return slot && slot.color
+      ? `#${slot.color}`
+      : '#ff';
+  }
+
   slotColorStyle(slot: DisplaySlot): Record<string, string> {
     const color = `#${slot.color || 'ff'}`;
     return {
@@ -103,51 +109,53 @@ export default class DisplaySettingsForm extends BlockForm {
     <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
 
     <q-scroll-area style="min-height: 400px; height: 80vh">
-      <q-card-section>
-        <q-list v-for="(slot, idx) in slots" :key="idx" bordered dark class="q-mb-sm">
-          <q-item dark>
-            <q-item-section avatar>
-              <q-icon name="mdi-widgets"/>
-            </q-item-section>
-            <q-item-section>Slot {{ idx + 1 }}</q-item-section>
-          </q-item>
-          <q-item dark>
-            <q-item-section>
-              <q-item-label caption>Block</q-item-label>
-              <LinkField
-                :value="slotLink(slot)"
-                :filter="linkFilter"
-                :service-id="serviceId"
-                title="Block"
-                @input="v => updateSlotLink(idx, v)"
-              />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label caption>Display name</q-item-label>
-              <InputField
-                v-if="slot"
-                :value="slot.name"
-                :rules="slotNameRules"
-                title="Slot name"
-                message="Choose the LCD display name for this block"
-                @input="v => updateSlotName(idx, v)"
-              />
-              <span v-else>-</span>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label caption>Color</q-item-label>
-              <ColorField
-                v-if="slot"
-                :value="slot.color"
-                title="Color"
-                message="Choose the LCD display background color for this block"
-                @input="v => updateSlotColor(idx, v)"
-              />
-              <span v-else>-</span>
-            </q-item-section>
-          </q-item>
-        </q-list>
+      <q-card-section class="row">
+        <q-item v-for="(slot, idx) in slots" :key="idx" dark class="row q-pa-sm col-4">
+          <q-list :style="`border: 2px solid ${slotColor(slot)}`" dark class="col-12">
+            <q-item dark>
+              <q-item-section>
+                <q-item-label caption>Block</q-item-label>
+                <LinkField
+                  :value="slotLink(slot)"
+                  :filter="linkFilter"
+                  :service-id="serviceId"
+                  title="Block"
+                  @input="v => updateSlotLink(idx, v)"
+                />
+              </q-item-section>
+            </q-item>
+            <q-item dark>
+              <q-item-section>
+                <q-item-label caption>Display name</q-item-label>
+                <InputField
+                  v-if="slot"
+                  :value="slot.name"
+                  :rules="slotNameRules"
+                  title="Slot name"
+                  message="Choose the LCD display name for this block"
+                  @input="v => updateSlotName(idx, v)"
+                />
+                <span v-else>-</span>
+              </q-item-section>
+            </q-item>
+            <q-item dark>
+              <q-item-section>
+                <q-item-label caption>Color</q-item-label>
+                <ColorField
+                  v-if="slot"
+                  :value="slot.color"
+                  title="Color"
+                  message="Choose the LCD display background color for this block"
+                  @input="v => updateSlotColor(idx, v)"
+                />
+                <span v-else>-</span>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-item>
+      </q-card-section>
 
+      <q-card-section>
         <q-list dark bordered>
           <q-item dark>
             <q-item-section side>Footer text</q-item-section>
