@@ -3,6 +3,7 @@ import get from 'lodash/get';
 import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
+import { showBlockDialog } from '@/helpers/dialog';
 import { Link, postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import sparkStore from '@/plugins/spark/store';
@@ -42,6 +43,14 @@ export default class PidWidget extends BlockWidget {
 
   get filterOpts() {
     return filters.map((filter, idx) => ({ label: filter, value: idx }));
+  }
+
+  get hasInputBlock() {
+    return !!this.block.data.inputId.id;
+  }
+
+  get hasOutputBlock() {
+    return !!this.block.data.outputId.id;
   }
 
   findLinks(id: string | null): BlockLink[] {
@@ -108,6 +117,20 @@ export default class PidWidget extends BlockWidget {
       root: this.$root,
     });
   }
+
+  showInput() {
+    const blockId = this.block.data.inputId.id;
+    if (blockId) {
+      showBlockDialog(sparkStore.blockById(this.serviceId, blockId), this.$root);
+    }
+  }
+
+  showOutput() {
+    const blockId = this.block.data.outputId.id;
+    if (blockId) {
+      showBlockDialog(sparkStore.blockById(this.serviceId, blockId), this.$root);
+    }
+  }
 }
 </script>
 
@@ -155,7 +178,7 @@ export default class PidWidget extends BlockWidget {
         <q-separator dark inset class="q-mb-md"/>
       </template>
 
-      <q-item dark>
+      <q-item :clickable="hasInputBlock" dark @click="showInput">
         <q-item-section side class="col-3">
           <div class="text-weight-light text-subtitle2 q-mb-xs">Input</div>
         </q-item-section>
@@ -168,21 +191,13 @@ export default class PidWidget extends BlockWidget {
           <UnitField :value="block.data.inputValue" tag="big" readonly/>
         </q-item-section>
         <q-item-section side>
-          <BlockFormButton
-            :block-id="block.data.inputId.id"
-            :service-id="block.serviceId"
-            icon="mdi-pencil"
-            flat
-            class="q-py-xs q-px-sm"
-          >
-            <q-tooltip>Edit Input Block</q-tooltip>
-          </BlockFormButton>
+          <q-icon :name="hasInputBlock ? 'mdi-pencil' : 'mdi-pencil-off'"/>
         </q-item-section>
       </q-item>
 
       <q-separator dark inset/>
 
-      <q-item dark>
+      <q-item :clickable="hasOutputBlock" dark @click="showOutput">
         <q-item-section side class="col-3">
           <div class="text-weight-light text-subtitle2 q-mb-xs">Output</div>
         </q-item-section>
@@ -195,15 +210,7 @@ export default class PidWidget extends BlockWidget {
           <big>{{ block.data.outputValue | round }}</big>
         </q-item-section>
         <q-item-section side>
-          <BlockFormButton
-            :block-id="block.data.outputId.id"
-            :service-id="block.serviceId"
-            icon="mdi-pencil"
-            flat
-            class="q-py-xs q-px-sm"
-          >
-            <q-tooltip>Edit Output Block</q-tooltip>
-          </BlockFormButton>
+          <q-icon :name="hasOutputBlock ? 'mdi-pencil' : 'mdi-pencil-off'"/>
         </q-item-section>
       </q-item>
 
