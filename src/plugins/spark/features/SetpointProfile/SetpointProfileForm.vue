@@ -153,9 +153,9 @@ export default class SetpointProfileForm extends BlockForm {
             <DatetimeField
               :value="start"
               title="Start time"
-              message="This will shift all points.
-              Offset time will remain the same, absolute time values will change.
-              The offset for the first point is always 0s."
+              message-html="This will shift all points.
+              <br>Offset time will remain the same, absolute time values will change.
+              <br>The offset for the first point is always 0s."
               @input="updateStartTime"
             />
           </q-item-section>

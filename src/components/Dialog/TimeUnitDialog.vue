@@ -13,6 +13,9 @@ export default class TimeUnitDialog extends DialogBase {
   @Prop({ type: Object, required: true, validator: v => v instanceof Unit })
   public readonly value!: Unit;
 
+  @Prop({ type: String, default: 'Value' })
+  public readonly label!: string;
+
   normalize() {
     this.local = durationString(parseDuration(this.local));
   }
@@ -36,7 +39,7 @@ export default class TimeUnitDialog extends DialogBase {
       <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml"/>
       <q-card-section class="scroll">
-        <q-input v-model="local" label="Value" autofocus dark @change="normalize"/>
+        <q-input v-model="local" :label="label" autofocus dark @change="normalize"/>
       </q-card-section>
       <q-card-actions align="right">
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel"/>

@@ -16,6 +16,9 @@ export default class InputField extends FieldBase {
   @Prop({ type: String, default: 'text' })
   public readonly type!: string;
 
+  @Prop({ type: String })
+  public readonly label!: string;
+
   @Prop({ type: Number, default: 2 })
   readonly decimals!: number;
 
@@ -55,6 +58,7 @@ export default class InputField extends FieldBase {
       root: this.$root,
       value: this.value,
       type: this.type,
+      label: this.label,
       rules: this.rules,
       clearable: this.clearable,
     })

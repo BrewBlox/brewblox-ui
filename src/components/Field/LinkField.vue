@@ -15,6 +15,9 @@ export default class LinkField extends FieldBase {
   @Prop({ type: String, required: true })
   public readonly serviceId!: string;
 
+  @Prop({ type: String })
+  public readonly label!: string;
+
   @Prop({ type: Function, default: null })
   readonly filter!: (block: Block) => boolean;
 
@@ -41,6 +44,7 @@ export default class LinkField extends FieldBase {
       root: this.$root,
       value: this.value,
       serviceId: this.serviceId,
+      label: this.label,
       clearable: true,
     })
       .onOk(this.change);

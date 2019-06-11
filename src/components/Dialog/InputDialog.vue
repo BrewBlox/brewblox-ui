@@ -15,6 +15,9 @@ export default class InputDialog extends DialogBase {
   @Prop({ type: String, default: 'text', validator: v => ['text', 'number'].includes(v) })
   public readonly type!: string;
 
+  @Prop({ type: String, default: 'Value' })
+  public readonly label!: string;
+
   @Prop({ type: Array, default: () => [] })
   public readonly rules!: ((v: any) => true | string)[];
 
@@ -56,7 +59,7 @@ export default class InputDialog extends DialogBase {
           :type="type"
           :rules="rules"
           :clearable="clearable"
-          label="Value"
+          :label="label"
           dark
           autofocus
           step="any"

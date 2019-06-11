@@ -11,6 +11,9 @@ export default class DatetimeDialog extends DialogBase {
   @Prop({ type: Date, required: true })
   public readonly value!: Date;
 
+  @Prop({ type: String, default: 'Date and time' })
+  public readonly label!: string;
+
   @Prop({ type: String, default: 'restore' })
   readonly resetIcon!: string;
 
@@ -55,7 +58,8 @@ export default class DatetimeDialog extends DialogBase {
             <q-input
               v-model="stringValue"
               :rules="[v => !!valid || 'Invalid date']"
-              label="YYYY/MM/DD hh:mm:ss"
+              :label="label"
+              hint="YYYY/MM/DD hh:mm:ss"
               mask="####/##/## ##:##:##"
               dark
               autofocus

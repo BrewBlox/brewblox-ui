@@ -17,6 +17,9 @@ export default class BlockDialog extends DialogBase {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
+  @Prop({ type: String, default: 'Block' })
+  public readonly label!: string;
+
   @Prop({ type: Function, default: () => () => true })
   readonly filter!: (block: Block) => boolean;
 
@@ -51,12 +54,12 @@ export default class BlockDialog extends DialogBase {
           v-model="block"
           :options="blockOpts"
           :clearable="clearable"
+          :label="label"
           dark
           autofocus
           options-dark
           option-label="id"
           option-value="id"
-          label="Block"
         >
           <template v-slot:no-option>
             <q-item dark>
