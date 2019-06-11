@@ -11,7 +11,7 @@ import widget from './GenericBlock.vue';
 const selector: WidgetSelector =
   (config: BlockConfig): string | undefined => {
     if (!sparkStore.serviceAvailable(config.serviceId)) {
-      throw new Error(`Service "${config.serviceId}" not found`);
+      throw new Error(`Service '${config.serviceId}' not found`);
     }
     const block = sparkStore.blocks(config.serviceId)[config.blockId];
     return block
@@ -23,7 +23,7 @@ const selector: WidgetSelector =
 const validator =
   (config: BlockConfig): boolean => {
     if (!sparkStore.serviceAvailable(config.serviceId)) {
-      throw new Error(`Service "${config.serviceId}" not found`);
+      throw new Error(`Service '${config.serviceId}' not found`);
     }
     if (config.blockId === null || config.blockId === undefined) {
       throw new Error('Block ID is undefined');
