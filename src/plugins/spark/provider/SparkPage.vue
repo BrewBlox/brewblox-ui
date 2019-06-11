@@ -39,7 +39,6 @@ export default class SparkPage extends Vue {
   volatileItems: { [blockId: string]: DashboardItem } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
   blockFilter: string = '';
-  relationsModalOpen: boolean = false;
 
   get service(): Spark {
     return serviceStore.serviceById(this.serviceId) as Spark;
@@ -66,14 +65,6 @@ export default class SparkPage extends Vue {
 
   get statusNok() {
     return this.isAvailable && this.status && !this.status.synchronized;
-  }
-
-  get nodes() {
-    return this.validatedItems.map(v => ({ id: v.item.id, type: v.typeName }));
-  }
-
-  get relations() {
-    return sparkStore.blockLinks(this.service.id);
   }
 
   get roleOrder(): Record<FeatureRole, number> {
@@ -260,9 +251,20 @@ export default class SparkPage extends Vue {
     };
     Dialog.create({
       component,
-      serviceId: this.service.id,
       root: this.$root,
       ...args,
+    });
+  }
+
+  showRelations() {
+    const nodes = this.validatedItems.map(v => ({ id: v.item.id, type: v.typeName }));
+    const relations = sparkStore.blockLinks(this.service.id);
+
+    Dialog.create({
+      component: 'RelationsDialog',
+      serviceId: this.service.id,
+      nodes,
+      relations,
     });
   }
 
@@ -319,11 +321,7 @@ export default class SparkPage extends Vue {
     <portal to="toolbar-buttons">
       <q-btn-dropdown :disable="!isReady || statusNok" color="primary" label="actions">
         <q-list dark link>
-          <ActionItem
-            icon="mdi-ray-start-arrow"
-            label="Show Relations"
-            @click="relationsModalOpen = true"
-          />
+          <ActionItem icon="mdi-ray-start-arrow" label="Show Relations" @click="showRelations"/>
           <ActionItem icon="add" label="New Block" @click="startDialog('BlockWizardDialog')"/>
           <ActionItem
             icon="mdi-magnify-plus-outline"
@@ -350,15 +348,6 @@ export default class SparkPage extends Vue {
         </q-list>
       </q-btn-dropdown>
     </portal>
-
-    <q-dialog v-model="relationsModalOpen" no-backdrop-dismiss maximized>
-      <DagreDiagram
-        v-if="relationsModalOpen"
-        :service-id="service.id"
-        :nodes="nodes"
-        :relations="relations"
-      />
-    </q-dialog>
 
     <!-- Shown if service was found in store, but not ok -->
     <q-list v-if="statusNok" dark no-border>
