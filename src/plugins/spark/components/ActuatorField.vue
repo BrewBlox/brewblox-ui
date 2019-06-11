@@ -2,8 +2,10 @@
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { ActuatorState } from '../types';
+
 @Component
-export default class ActuatorState extends Vue {
+export default class ActuatorField extends Vue {
 
   @Prop({ required: true })
   readonly value!: number;
@@ -12,7 +14,7 @@ export default class ActuatorState extends Vue {
   readonly disable!: boolean;
 
   @Emit('input')
-  change(val: number) {
+  change(val: ActuatorState) {
     return val;
   }
 
@@ -30,13 +32,13 @@ export default class ActuatorState extends Vue {
         ...this.commonOpts,
         toggleTextColor: 'white',
         label: 'Off',
-        value: 0,
+        value: ActuatorState.Inactive,
       },
       {
         ...this.commonOpts,
         toggleTextColor: 'white',
         label: 'On',
-        value: 1,
+        value: ActuatorState.Active,
       },
     ];
   }
@@ -49,11 +51,10 @@ export default class ActuatorState extends Vue {
     if (this.disable) {
       return;
     }
-    if (this.value === 0 || !this.known) {
-      this.change(1);
-    }
-    if (this.value === 1) {
-      this.change(0);
+    if (this.value === ActuatorState.Inactive || !this.known) {
+      this.change(ActuatorState.Active);
+    } else if (this.value === ActuatorState.Active) {
+      this.change(ActuatorState.Inactive);
     }
   }
 }

@@ -1,19 +1,13 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { spaceCased } from '@/helpers/functional';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { ChannelConfig } from '../../types';
-import { DS2413Block } from './types';
+import { DS2408Block } from './types';
 
 @Component
-export default class DS2413Widget extends BlockWidget {
-  readonly block!: DS2413Block;
-
-  configName(cfg: ChannelConfig) {
-    return spaceCased(ChannelConfig[cfg]);
-  }
+export default class DS2408Widget extends BlockWidget {
+  readonly block!: DS2408Block;
 }
 </script>
 

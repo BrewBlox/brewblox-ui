@@ -4,8 +4,7 @@ import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { BrewPiConfig } from '@/plugins/spark/arrangements/BrewPi/types';
-import { typeName as actuatorDS2413Type } from '@/plugins/spark/features/ActuatorDS2413/getters';
-import { typeName as actuatorPinType } from '@/plugins/spark/features/ActuatorPin/getters';
+import { typeName as digitalActuatorType } from '@/plugins/spark/features/DigitalActuator/getters';
 import { typeName as sensorMockType } from '@/plugins/spark/features/TempSensorMock/getters';
 import { typeName as sensorOneWireType } from '@/plugins/spark/features/TempSensorOneWire/getters';
 import sparkStore from '@/plugins/spark/store';
@@ -21,9 +20,8 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
   beerSensor: any = null;
 
   get pinOptions() {
-    const pinTypes = [actuatorPinType, actuatorDS2413Type];
     return sparkStore.blockValues(this.config.serviceId)
-      .filter(block => pinTypes.includes(block.type))
+      .filter(block => block.type === digitalActuatorType)
       .map(block => block.id);
   }
 

@@ -3,29 +3,23 @@ import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { ActuatorDS2413Block } from './types';
+import { DigitalActuatorBlock } from './types';
 
 @Component
-export default class ActuatorDS2413Widget extends BlockWidget {
-  readonly block!: ActuatorDS2413Block;
-
-  get renamedTargets() {
-    return {
-      state: 'State',
-    };
-  }
+export default class DigitalActuatorWidget extends BlockWidget {
+  readonly block!: DigitalActuatorBlock;
 }
 </script>
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :field="me" graph/>
+    <BlockWidgetToolbar :field="me"/>
 
     <q-card-section>
       <q-item dark>
         <q-item-section>
           <q-item-label caption>State</q-item-label>
-          <ActuatorState
+          <ActuatorField
             :value="block.data.state"
             :disable="isDriven"
             @input="v => { block.data.state = v; saveBlock(); }"

@@ -3,11 +3,11 @@ import { Component } from 'vue-property-decorator';
 
 import BlockForm from '@/plugins/spark/components/BlockForm';
 
-import { DS2413Block } from './types';
+import { DS2408Block } from './types';
 
 @Component
-export default class DS2413Form extends BlockForm {
-  readonly block!: DS2413Block;
+export default class DS2408Form extends BlockForm {
+  readonly block!: DS2408Block;
 }
 </script>
 
@@ -19,7 +19,7 @@ export default class DS2413Form extends BlockForm {
         <q-item-section>
           <q-item-label caption>Note</q-item-label>
           <span>
-            This block is the DS2413 chip with 2 channels.
+            This block is the DS2408 chip with 8 channels.
             Please create a Digital Actuator block for each of the channels you want to use.
           </span>
         </q-item-section>

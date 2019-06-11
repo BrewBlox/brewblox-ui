@@ -2,21 +2,35 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockForm from '@/plugins/spark/components/BlockForm';
-import { ActuatorDS2413Block } from '@/plugins/spark/features/ActuatorDS2413/types';
+import sparkStore from '@/plugins/spark/store';
 
+import { Block } from '../../types';
 import { channel } from './getters';
+import { DigitalActuatorBlock } from './types';
 
 @Component
-export default class ActuatorDS2413Form extends BlockForm {
-  readonly block!: ActuatorDS2413Block;
+export default class DigitalActuatorForm extends BlockForm {
+  readonly block!: DigitalActuatorBlock;
 
   get actuatorChannel() {
     return channel[this.block.data.channel];
   }
 
+  get hwBlock(): Block | null {
+    const blockId = this.block.data.hwDevice.id;
+    return !!blockId
+      ? sparkStore.blockById(this.serviceId, blockId)
+      : null;
+  }
+
   get channelOpts() {
-    return channel
-      .map((v, idx) => ({ label: v, value: idx }));
+    const opts = [{ label: 'Not set', value: 0 }];
+    if (this.hwBlock) {
+      opts.push(
+        ...Object.keys(this.hwBlock.data.pins)
+          .map((k, idx) => ({ label: k, value: idx + 1 })));
+    }
+    return opts;
   }
 }
 </script>
@@ -24,24 +38,25 @@ export default class ActuatorDS2413Form extends BlockForm {
 <template>
   <q-card dark class="widget-modal">
     <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
+
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>DS2413 target Block</q-item-label>
+            <q-item-label caption>Target Pin Array</q-item-label>
             <LinkField
               :value="block.data.hwDevice"
               :service-id="serviceId"
-              title="DS2413 Block"
-              @input="v => { block.data.hwDevice = v; saveBlock(); }"
+              title="Pin Array"
+              @input="v => { block.data.hwDevice = v; block.data.channel = 0; saveBlock(); }"
             />
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>DS2413 Channel</q-item-label>
+            <q-item-label caption>Pin Channel</q-item-label>
             <SelectField
               :value="block.data.channel"
               :options="channelOpts"
-              title="DS2413 Channel"
+              title="Pin Channel"
               @input="v => { block.data.channel = v; saveBlock(); }"
             />
           </q-item-section>
@@ -49,7 +64,7 @@ export default class ActuatorDS2413Form extends BlockForm {
         <q-item dark>
           <q-item-section style="justify-content: flex-start">
             <q-item-label caption>State</q-item-label>
-            <ActuatorState
+            <ActuatorField
               :value="block.data.state"
               :disable="isDriven"
               @input="v => { block.data.state = v; saveBlock(); }"

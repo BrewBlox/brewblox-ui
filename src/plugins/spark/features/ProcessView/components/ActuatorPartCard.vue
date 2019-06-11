@@ -8,10 +8,7 @@ export default class ActuatorPartCard extends PartCard {
   get blockCardProps() {
     return {
       ...this.$props,
-      types: [
-        'ActuatorPin',
-        'ActuatorDS2413',
-      ],
+      types: ['DigitalActuator'],
       blockServiceIdKey: 'actuatorServiceId',
       blockLinkKey: 'actuatorLink',
     };

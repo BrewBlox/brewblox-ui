@@ -3,8 +3,8 @@ import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
 import { BlockSpec } from '../../types';
-import form from './DS2413Form.vue';
-import widget from './DS2413Widget.vue';
+import form from './DS2408Form.vue';
+import widget from './DS2408Widget.vue';
 import { typeName } from './getters';
 
 const block: BlockSpec = {
@@ -21,7 +21,7 @@ const block: BlockSpec = {
 const feature: Feature = {
   ...GenericBlock,
   id: typeName,
-  displayName: 'DS2413 Chip',
+  displayName: 'DS2408 Chip',
   role: 'Output',
   widget: ref(widget),
   form: ref(form),

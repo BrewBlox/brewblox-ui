@@ -47,3 +47,9 @@ export class DS2413Link extends Link {
     super(id, 'DS2413');
   }
 }
+
+export class IoArrayLink extends Link {
+  public constructor(id: string | null) {
+    super(id, 'IoArray');
+  }
+}
