@@ -1,5 +1,6 @@
 <script lang="ts">
 import get from 'lodash/get';
+import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import { Link, postfixedDisplayNames } from '@/helpers/units';
@@ -66,7 +67,7 @@ export default class PidWidget extends BlockWidget {
       .reduce((acc: BlockLink[], [, link]) => ([...acc, ...this.findLinks(link.id)]), relations);
   }
 
-  get relations(): BlockLink[] {
+  relations(): BlockLink[] {
     const chain = this.findLinks(this.blockId);
 
     // Setpoints may be driven by something else (profile, setpoint driver, etc)
@@ -84,7 +85,7 @@ export default class PidWidget extends BlockWidget {
     ];
   }
 
-  get nodes() {
+  nodes() {
     return sparkStore.blockValues(this.serviceId)
       .map(block => ({
         id: block.id,
@@ -96,26 +97,25 @@ export default class PidWidget extends BlockWidget {
     this.block.data.enabled = true;
     this.saveBlock();
   }
+
+  showRelations() {
+    Dialog.create({
+      component: 'RelationsDialog',
+      serviceId: this.serviceId,
+      nodes: this.nodes(),
+      relations: this.relations(),
+      title: `${this.block.id} relations`,
+      root: this.$root,
+    });
+  }
 }
 </script>
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="relationsOpen" no-backdrop-dismiss>
-      <DagreDiagram
-        v-if="relationsOpen"
-        :service-id="serviceId"
-        :nodes="nodes"
-        :relations="relations"
-      />
-    </q-dialog>
     <BlockWidgetToolbar :field="me" graph>
       <template v-slot:actions>
-        <ActionItem
-          icon="mdi-ray-start-arrow"
-          label="Show Relations"
-          @click="relationsOpen = true"
-        />
+        <ActionItem icon="mdi-ray-start-arrow" label="Show Relations" @click="showRelations"/>
       </template>
     </BlockWidgetToolbar>
 

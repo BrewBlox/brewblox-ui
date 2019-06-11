@@ -8,10 +8,10 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
+import DialogBase from '@/components/Dialog/DialogBase';
 import sparkStore from '@/plugins/spark/store';
+import { BlockLink } from '@/plugins/spark/types';
 import featureStore from '@/store/features';
-
-import { BlockLink } from '../types';
 
 interface Edge {
   source: string;
@@ -33,8 +33,9 @@ const INVERTED = [
 ];
 
 @Component
-export default class DagreDiagram extends Vue {
+export default class RelationsDialog extends DialogBase {
   $refs!: {
+    dialog: any;
     svg: SVGGraphicsElement;
     diagram: SVGGraphicsElement;
     toolbar: Vue;
@@ -54,6 +55,9 @@ export default class DagreDiagram extends Vue {
 
   @Prop({ type: Array, default: [] })
   readonly relations!: BlockLink[];
+
+  @Prop({ type: String, default: 'Block Relations' })
+  public readonly title!: string;
 
   get edges() {
     return this.relations
@@ -148,7 +152,7 @@ export default class DagreDiagram extends Vue {
       // Here be dragons
       // Dagre incorrectly renders the injected HTML as a "foreignObject" with 0x0 size
       // The hacky, but working solution is to override the SVG properties
-      this.$el.querySelectorAll('foreignObject')
+      this.$refs.svg.querySelectorAll('foreignObject')
         .forEach(el => {
           const id = el.children[0].children[0].children[1].innerHTML;
           el.addEventListener('click', () => this.openSettings(id));
@@ -200,27 +204,37 @@ export default class DagreDiagram extends Vue {
 </script>
 
 <template>
-  <q-card dark class="maximized bg-dark-bright">
-    <FormToolbar ref="toolbar">
-      Block Relations
-      <template v-slot:buttons>
-        <q-btn :loading="exportBusy" flat rounded label="export" @click="exportDiagram"/>
-      </template>
-    </FormToolbar>
+  <q-dialog ref="dialog" maximized no-backdrop-dismiss @hide="onDialogHide">
+    <q-card dark class="maximized bg-dark-bright">
+      <FormToolbar ref="toolbar" @close="onDialogHide">
+        {{ title }}
+        <template v-slot:buttons>
+          <!-- Exporting is bugged right now. See https://github.com/BrewBlox/brewblox-ui/issues/638 -->
+          <q-btn
+            v-if="false"
+            :loading="exportBusy"
+            flat
+            rounded
+            label="export"
+            @click="exportDiagram"
+          />
+        </template>
+      </FormToolbar>
 
-    <div
-      :style="`
-      overflow: scroll;
-      height: ${availableHeight}px;
-      width: ${availableWidth}px;
-      `"
-      class="row"
-    >
-      <svg ref="svg" class="diag-svg col-12">
-        <g ref="diagram" class="diag-g"/>
-      </svg>
-    </div>
-  </q-card>
+      <div
+        :style="`
+        overflow: scroll;
+        height: ${availableHeight}px;
+        width: ${availableWidth}px;
+        `"
+        class="row"
+      >
+        <svg ref="svg" class="diag-svg col-12">
+          <g ref="diagram" class="diag-g"/>
+        </svg>
+      </div>
+    </q-card>
+  </q-dialog>
 </template>
 
 <style lang="stylus" scoped>
