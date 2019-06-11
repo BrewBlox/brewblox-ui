@@ -1,12 +1,10 @@
 <script lang="ts">
 import isString from 'lodash/isString';
-import { Dialog, uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { showBlockDialog } from '@/helpers/dialog';
 import sparkStore from '@/plugins/spark/store';
-import { DashboardItem } from '@/store/dashboards';
-import featureStore from '@/store/features';
 
 import { Block } from '../types';
 
@@ -25,39 +23,10 @@ export default class BlockFormButton extends Vue {
       : null;
   }
 
-  get blockForm() {
-    return !!this.block
-      ? featureStore.formById(this.block.type)
-      : null;
-  }
-
-  get widget(): DashboardItem | null {
-    return !!this.block
-      ? {
-        id: uid(),
-        title: this.block.id,
-        feature: this.block.type,
-        dashboard: '',
-        order: 0,
-        config: {
-          serviceId: this.serviceId,
-          blockId: this.block.id,
-        },
-        ...featureStore.widgetSizeById(this.block.type),
-      }
-      : null;
-  }
-
   openDialog() {
-    Dialog.create({
-      component: 'BlockFormDialog',
-      block: this.block,
-      widget: this.widget,
-      volatile: true,
-      saveBlock: v => sparkStore.saveBlock([this.serviceId, v]),
-      saveWidget: () => { },
-      root: this.$root,
-    });
+    if (this.block) {
+      showBlockDialog(this.block, this.$root);
+    }
   }
 }
 </script>

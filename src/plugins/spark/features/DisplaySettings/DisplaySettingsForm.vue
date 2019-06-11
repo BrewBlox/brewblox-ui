@@ -31,6 +31,12 @@ export default class DisplaySettingsForm extends BlockForm {
       .find(v => v instanceof Link) || new Link(null);
   }
 
+  slotColor(slot: DisplaySlot) {
+    return slot && slot.color
+      ? `#${slot.color}`
+      : '#ff';
+  }
+
   slotColorStyle(slot: DisplaySlot): Record<string, string> {
     const color = `#${slot.color || 'ff'}`;
     return {
@@ -102,15 +108,9 @@ export default class DisplaySettingsForm extends BlockForm {
   <q-card dark class="widget-modal">
     <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
 
-    <q-scroll-area style="min-height: 400px; height: 80vh">
-      <q-card-section>
-        <q-list v-for="(slot, idx) in slots" :key="idx" bordered dark class="q-mb-sm">
-          <q-item dark>
-            <q-item-section avatar>
-              <q-icon name="mdi-widgets"/>
-            </q-item-section>
-            <q-item-section>Slot {{ idx + 1 }}</q-item-section>
-          </q-item>
+    <q-card-section class="row">
+      <q-item v-for="(slot, idx) in slots" :key="idx" dark class="row q-pa-sm col-4">
+        <q-list :style="`border: 2px solid ${slotColor(slot)}`" dark class="col-12">
           <q-item dark>
             <q-item-section>
               <q-item-label caption>Block</q-item-label>
@@ -122,6 +122,8 @@ export default class DisplaySettingsForm extends BlockForm {
                 @input="v => updateSlotLink(idx, v)"
               />
             </q-item-section>
+          </q-item>
+          <q-item dark>
             <q-item-section>
               <q-item-label caption>Display name</q-item-label>
               <InputField
@@ -134,6 +136,8 @@ export default class DisplaySettingsForm extends BlockForm {
               />
               <span v-else>-</span>
             </q-item-section>
+          </q-item>
+          <q-item dark>
             <q-item-section>
               <q-item-label caption>Color</q-item-label>
               <ColorField
@@ -147,31 +151,33 @@ export default class DisplaySettingsForm extends BlockForm {
             </q-item-section>
           </q-item>
         </q-list>
+      </q-item>
+    </q-card-section>
 
-        <q-list dark bordered>
-          <q-item dark>
-            <q-item-section side>Footer text</q-item-section>
-            <q-item-section>
-              <InputField
-                :value="block.data.name"
-                title="footer text"
-                @input="v => {block.data.name = v; saveBlock()}"
-              />
-            </q-item-section>
-          </q-item>
-          <q-item dark>
-            <q-item-section side>Temperature Unit</q-item-section>
-            <q-item-section>
-              <SelectField
-                :value="block.data.tempUnit"
-                :options="[{ label: 'Celsius', value: 0 }, { label: 'Fahrenheit', value: 1 }]"
-                title="Temperature Unit"
-                @input="v => { block.data.tempUnit = v; saveBlock(); }"
-              />
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-card-section>
-    </q-scroll-area>
+    <q-separator dark inset/>
+
+    <q-card-section>
+      <q-list dark>
+        <q-item dark>
+          <q-item-section>
+            <q-item-label caption>Footer text</q-item-label>
+            <InputField
+              :value="block.data.name"
+              title="footer text"
+              @input="v => {block.data.name = v; saveBlock()}"
+            />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>Temperature Unit</q-item-label>
+            <SelectField
+              :value="block.data.tempUnit"
+              :options="[{ label: 'Celsius', value: 0 }, { label: 'Fahrenheit', value: 1 }]"
+              title="Temperature Unit"
+              @input="v => { block.data.tempUnit = v; saveBlock(); }"
+            />
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </q-card-section>
   </q-card>
 </template>

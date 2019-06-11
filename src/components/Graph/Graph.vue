@@ -8,7 +8,7 @@ import { Component, Prop } from 'vue-property-decorator';
 Vue.component('PlotlyGraph', () => import('./PlotlyGraph'));
 
 /* eslint-disable @typescript-eslint/camelcase */
-const layoutDefaults: Partial<Layout> = {
+const layoutDefaults: () => Partial<Layout> = () => ({
   title: '',
   font: {
     color: '#fff',
@@ -47,7 +47,7 @@ const layoutDefaults: Partial<Layout> = {
   },
   paper_bgcolor: '#282c34',
   plot_bgcolor: '#282c34',
-};
+});
 /* eslint-enable */
 
 @Component
@@ -76,7 +76,7 @@ export default class Graph extends Vue {
   public readonly autoResize!: string;
 
   get plotlyLayout(): Partial<Layout> {
-    return merge(layoutDefaults, this.layout);
+    return merge(layoutDefaults(), this.layout);
   }
 
   get plotlyConfig(): Partial<Config> {

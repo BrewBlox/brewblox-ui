@@ -16,12 +16,29 @@ export default class TimeUnitDialog extends DialogBase {
   @Prop({ type: String, default: 'Value' })
   public readonly label!: string;
 
+  findUnit(s: string) {
+    const match = s.match(/^[0-9\.]*([a-z]*)/i);
+    return match && match[1]
+      ? match[1]
+      : '';
+  }
+
+  get defaultUnit() {
+    return !this.findUnit(this.local || '')
+      ? this.findUnit(unitDurationString(this.value))
+      : '';
+  }
+
+  get localNumber() {
+    return parseDuration(`${this.local}${this.defaultUnit}`);
+  }
+
   normalize() {
-    this.local = durationString(parseDuration(this.local));
+    this.local = durationString(this.localNumber);
   }
 
   save() {
-    const val = new Unit(parseDuration(this.local), 'ms');
+    const val = new Unit(this.localNumber, 'ms');
     this.onDialogOk(val);
   }
 
@@ -39,7 +56,14 @@ export default class TimeUnitDialog extends DialogBase {
       <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml"/>
       <q-card-section class="scroll">
-        <q-input v-model="local" :label="label" autofocus dark @change="normalize"/>
+        <q-input
+          v-model="local"
+          :label="label"
+          :suffix="defaultUnit"
+          autofocus
+          dark
+          @change="normalize"
+        />
       </q-card-section>
       <q-card-actions align="right">
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel"/>
