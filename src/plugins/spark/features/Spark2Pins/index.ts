@@ -3,21 +3,18 @@ import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
 import { BlockSpec } from '../../types';
-import form from './Spark3PinsForm.vue';
-import widget from './Spark3PinsWidget.vue';
+import form from './Spark2PinsForm.vue';
+import widget from './Spark2PinsWidget.vue';
 import { typeName } from './getters';
+import { Spark2Hardware } from './types';
 
 const block: BlockSpec = {
   id: typeName,
   systemObject: true,
   generate: () => ({
     pins: [],
-    enableIoSupply5V: false,
-    enableIoSupply12V: false,
-    enableLcdBackLight: false,
     soundAlarm: false,
-    voltage5: 0,
-    voltage12: 0,
+    hardware: Spark2Hardware.Unknown,
   }),
   changes: [],
   presets: [],
@@ -26,7 +23,7 @@ const block: BlockSpec = {
 const feature: Feature = {
   ...GenericBlock,
   id: typeName,
-  displayName: 'Spark 3 Pin Array',
+  displayName: 'Spark 2 Pin Array',
   role: 'Output',
   widget: ref(widget),
   form: ref(form),
@@ -34,7 +31,7 @@ const feature: Feature = {
     cols: 4,
     rows: 4,
   },
-  // Spark3Pins is a static system object, and can't be created or deleted
+  // Spark2Pins is a static system object, and can't be created or deleted
   wizard: undefined,
   deleters: undefined,
 };

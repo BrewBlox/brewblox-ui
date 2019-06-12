@@ -5,25 +5,25 @@ import { Link } from '@/helpers/units';
 import { IoArrayLink } from '@/helpers/units/KnownLinks';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import sparkStore from '@/plugins/spark/store';
-import { ChannelConfig, DigitalState, IoChannel } from '@/plugins/spark/types';
+import { IoChannel } from '@/plugins/spark/types';
 
 import { typeName as actuatorType } from '../DigitalActuator/getters';
 import { DigitalActuatorBlock } from '../DigitalActuator/types';
-import { Spark3PinId, Spark3PinsBlock } from './types';
+import { Spark2PinId, Spark2PinsBlock } from './types';
 
 interface EditableChannel extends IoChannel {
-  id: Spark3PinId;
+  id: Spark2PinId;
 }
 
 @Component
-export default class Spark3PinsWidget extends BlockWidget {
-  readonly block!: Spark3PinsBlock;
+export default class Spark2PinsWidget extends BlockWidget {
+  readonly block!: Spark2PinsBlock;
 
   get channels(): EditableChannel[] {
     return this.block.data.pins
       .map((pin, idx) => {
         const id = idx + 1;
-        return { id, ...pin[Spark3PinId[id]] };
+        return { id, ...pin[Spark2PinId[id]] };
       });
   }
 
@@ -37,17 +37,13 @@ export default class Spark3PinsWidget extends BlockWidget {
     this.block.data.pins = this.channels
       .map(channel => {
         const { id, state, config } = channel;
-        return { [Spark3PinId[id]]: { state, config } };
+        return { [Spark2PinId[id]]: { state, config } };
       });
     this.saveBlock();
   }
 
   channelName(channel) {
-    return Spark3PinId[channel.id];
-  }
-
-  configName(channel) {
-    return ChannelConfig[channel.config];
+    return Spark2PinId[channel.id];
   }
 
   driverLink(channel: EditableChannel): Link {
@@ -72,16 +68,6 @@ export default class Spark3PinsWidget extends BlockWidget {
       sparkStore.saveBlock([this.serviceId, block]);
     }
   }
-
-  saveState(channel: EditableChannel, state: DigitalState) {
-    const link = this.driverLink(channel);
-    if (link.id) {
-      const block: DigitalActuatorBlock = sparkStore.blockById(this.serviceId, link.id);
-      block.data.state = state;
-      channel.state = state;
-      sparkStore.saveBlock([this.serviceId, block]);
-    }
-  }
 }
 </script>
 
@@ -97,11 +83,7 @@ export default class Spark3PinsWidget extends BlockWidget {
       <q-item v-for="channel in channels" :key="channel.id" dark>
         <q-item-section>{{ channelName(channel) }}</q-item-section>
         <q-item-section>
-          <ActuatorField
-            :value="channel.state"
-            :disable="!claimedChannels[channel.id]"
-            @input="v => saveState(channel, v)"
-          />
+          <ActuatorField :value="channel.state" disable/>
         </q-item-section>
         <q-item-section>
           <LinkField
@@ -110,9 +92,6 @@ export default class Spark3PinsWidget extends BlockWidget {
             title="Driver"
             @input="link => saveDriver(channel, link)"
           />
-        </q-item-section>
-        <q-item-section side>
-          <BlockFormButton :block-id="driverLink(channel).id" :service-id="serviceId" flat/>
         </q-item-section>
       </q-item>
     </q-card-section>

@@ -1,19 +1,29 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { spaceCased } from '@/helpers/functional';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
+import { ChannelConfig } from '../../types';
 import { DS2408Block } from './types';
 
 @Component
 export default class DS2408Widget extends BlockWidget {
   readonly block!: DS2408Block;
+
+  configName(cfg: ChannelConfig) {
+    return spaceCased(ChannelConfig[cfg]);
+  }
 }
 </script>
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :field="me"/>
+    <BlockWidgetToolbar :field="me">
+      <template v-slot:actions>
+        <CreateActuatorsAction :block="block"/>
+      </template>
+    </BlockWidgetToolbar>
 
     <q-card-section>
       <q-item dark>

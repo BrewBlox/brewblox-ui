@@ -95,7 +95,7 @@ export enum ChannelConfig {
   Unknown = 255,
 }
 
-export enum ActuatorState {
+export enum DigitalState {
   Inactive = 0,
   Active = 1,
   Unknown = 2,
@@ -103,5 +103,9 @@ export enum ActuatorState {
 
 export interface IoChannel {
   config: ChannelConfig;
-  state: ActuatorState;
+  state: DigitalState;
+}
+
+export interface IoPin {
+  [key: string]: IoChannel;
 }

@@ -15,6 +15,7 @@ import ProcessView from './ProcessView';
 import SessionView from './SessionView';
 import SetpointProfile from './SetpointProfile';
 import SetpointSensorPair from './SetpointSensorPair';
+import Spark2Pins from './Spark2Pins';
 import Spark3Pins from './Spark3Pins';
 import StepView from './StepView';
 import TempSensorMock from './TempSensorMock';
@@ -34,6 +35,7 @@ const features: { [id: string]: SparkFeature } = {
   Mutex,
   SetpointProfile,
   SetpointSensorPair,
+  Spark2Pins,
   Spark3Pins,
   StepView,
   ProcessView,

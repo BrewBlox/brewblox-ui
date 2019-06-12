@@ -27,8 +27,8 @@ export default class DigitalActuatorForm extends BlockForm {
     const opts = [{ label: 'Not set', value: 0 }];
     if (this.hwBlock) {
       opts.push(
-        ...Object.keys(this.hwBlock.data.pins)
-          .map((k, idx) => ({ label: k, value: idx + 1 })));
+        ...Object.keys(this.hwBlock.data.pins || this.hwBlock.data.channels)
+          .map((k, idx) => ({ label: `Pin ${idx + 1}`, value: idx + 1 })));
     }
     return opts;
   }

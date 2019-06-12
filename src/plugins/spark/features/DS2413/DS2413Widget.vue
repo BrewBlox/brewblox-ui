@@ -19,7 +19,11 @@ export default class DS2413Widget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :field="me"/>
+    <BlockWidgetToolbar :field="me">
+      <template v-slot:actions>
+        <CreateActuatorsAction :block="block"/>
+      </template>
+    </BlockWidgetToolbar>
 
     <q-card-section>
       <q-item dark>
@@ -27,10 +31,7 @@ export default class DS2413Widget extends BlockWidget {
           <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
         <q-item-section>
-          <div
-            v-for="(ch, idx) in block.data.channels"
-            :key="idx"
-          >Channel {{ idx + 1 }}: {{ configName(ch.config) }}</div>
+          <div v-for="(ch, idx) in block.data.pins" :key="idx">Channel {{ idx + 1 }}: {{ ch }}</div>
         </q-item-section>
       </q-item>
     </q-card-section>

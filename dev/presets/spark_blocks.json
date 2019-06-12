@@ -21,14 +21,7 @@
         7
       ],
       "type": "SysInfo",
-      "data": {
-        "deviceId": "",
-        "version": "",
-        "platform": 0,
-        "hardware": 0,
-        "voltage5": 0,
-        "voltage12": 0
-      }
+      "data": {}
     },
     {
       "id": "OneWireBus",

@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import { ActuatorState } from '../types';
+import { DigitalState } from '@/plugins/spark/types';
 
 @Component
 export default class ActuatorField extends Vue {
@@ -14,7 +14,7 @@ export default class ActuatorField extends Vue {
   readonly disable!: boolean;
 
   @Emit('input')
-  change(val: ActuatorState) {
+  change(val: DigitalState) {
     return val;
   }
 
@@ -32,13 +32,13 @@ export default class ActuatorField extends Vue {
         ...this.commonOpts,
         toggleTextColor: 'white',
         label: 'Off',
-        value: ActuatorState.Inactive,
+        value: DigitalState.Inactive,
       },
       {
         ...this.commonOpts,
         toggleTextColor: 'white',
         label: 'On',
-        value: ActuatorState.Active,
+        value: DigitalState.Active,
       },
     ];
   }
@@ -51,10 +51,10 @@ export default class ActuatorField extends Vue {
     if (this.disable) {
       return;
     }
-    if (this.value === ActuatorState.Inactive || !this.known) {
-      this.change(ActuatorState.Active);
-    } else if (this.value === ActuatorState.Active) {
-      this.change(ActuatorState.Inactive);
+    if (this.value === DigitalState.Inactive || !this.known) {
+      this.change(DigitalState.Active);
+    } else if (this.value === DigitalState.Active) {
+      this.change(DigitalState.Inactive);
     }
   }
 }
