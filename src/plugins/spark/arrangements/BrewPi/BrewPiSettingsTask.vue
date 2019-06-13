@@ -5,9 +5,10 @@ import { Component } from 'vue-property-decorator';
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { Link, Unit } from '@/helpers/units';
 import { typeName as graphType } from '@/plugins/history/Graph/getters';
-import { BrewPiConfig } from '@/plugins/spark/arrangements/BrewPi/types';
+import { BrewPiConfig, PinChannel } from '@/plugins/spark/arrangements/BrewPi/types';
 import { typeName as offsetType } from '@/plugins/spark/features/ActuatorOffset/getters';
 import { typeName as pwmType } from '@/plugins/spark/features/ActuatorPwm/getters';
+import { typeName as digiActType } from '@/plugins/spark/features/DigitalActuator/getters';
 import { typeName as mutexType } from '@/plugins/spark/features/Mutex/getters';
 import { typeName as pidType } from '@/plugins/spark/features/Pid/getters';
 import { typeName as spProfileType } from '@/plugins/spark/features/SetpointProfile/getters';
@@ -16,6 +17,8 @@ import sparkStore from '@/plugins/spark/store';
 import dashboardStore from '@/store/dashboards';
 import { Dashboard } from '@/store/dashboards';
 import featureStore from '@/store/features';
+
+import { DigitalActuatorBlock } from '../../features/DigitalActuator/types';
 
 @Component
 export default class BrewPiSettingsTask extends WizardTaskBase {
@@ -40,6 +43,22 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       }
     }
     throw new Error('Old block not found');
+  }
+
+  defineChangedBlocks() {
+    this.config.changedBlocks = sparkStore.blockValues(this.config.serviceId)
+      // Find existing drivers of selected pins
+      .filter(block =>
+        block.type === digiActType
+        && [this.config.coolPin, this.config.heatPin]
+          .some((pin: PinChannel) =>
+            pin.arrayId === block.data.hwDevice.id
+            && pin.pinId === block.data.channel))
+      // Unlink them from pin
+      .map((block: DigitalActuatorBlock) => {
+        block.data.channel = 0;
+        return block;
+      });
   }
 
   defineCreatedBlocks() {
@@ -67,6 +86,49 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
           settingEnabled: true,
         },
       },
+      // Mutex
+      {
+        id: this.config.names.mutex,
+        serviceId: this.config.serviceId,
+        type: mutexType,
+        groups: this.config.groups,
+        data: {
+          differentActuatorWait: new Unit(30, 'minute'),
+        },
+      },
+      // Digital Actuator
+      {
+        id: this.config.names.coolAct,
+        serviceId: this.config.serviceId,
+        type: digiActType,
+        groups: this.config.groups,
+        data: {
+          hwDevice: new Link(this.config.coolPin.arrayId),
+          channel: this.config.coolPin.pinId,
+          constrainedBy: {
+            constraints: [
+              { 'minOff[second]': 300 },
+              { 'minOn[second]': 180 },
+              { 'mutex<>': this.config.names.mutex },
+            ],
+          },
+        },
+      },
+      {
+        id: this.config.names.heatAct,
+        serviceId: this.config.serviceId,
+        type: digiActType,
+        groups: this.config.groups,
+        data: {
+          hwDevice: new Link(this.config.heatPin.arrayId),
+          channel: this.config.heatPin.pinId,
+          constrainedBy: {
+            constraints: [
+              { 'mutex<>': this.config.names.mutex },
+            ],
+          },
+        },
+      },
       // PWM
       {
         id: this.config.names.coolPwm,
@@ -76,7 +138,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         data: {
           enabled: true,
           period: new Unit(30, 'minute'),
-          actuatorId: new Link(this.config.names.coolPin),
+          actuatorId: new Link(this.config.names.coolAct),
         },
       },
       {
@@ -87,17 +149,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         data: {
           enabled: true,
           period: new Unit(10, 'second'),
-          actuatorId: new Link(this.config.names.heatPin),
-        },
-      },
-      // Mutex
-      {
-        id: this.config.names.mutex,
-        serviceId: this.config.serviceId,
-        type: mutexType,
-        groups: this.config.groups,
-        data: {
-          differentActuatorWait: new Unit(30, 'minute'),
+          actuatorId: new Link(this.config.names.heatAct),
         },
       },
       // Offset Actuator
@@ -186,39 +238,6 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
     ];
   }
 
-  defineChangedBlocks() {
-    this.config.changedBlocks = [
-      {
-        id: this.config.names.coolPin,
-        serviceId: this.config.serviceId,
-        type: this.blockType(this.config.names.coolPin),
-        groups: this.config.groups,
-        data: {
-          constrainedBy: {
-            constraints: [
-              { 'minOff[second]': 300 },
-              { 'minOn[second]': 180 },
-              { 'mutex<>': this.config.names.mutex },
-            ],
-          },
-        },
-      },
-      {
-        id: this.config.names.heatPin,
-        serviceId: this.config.serviceId,
-        type: this.blockType(this.config.names.heatPin),
-        groups: this.config.groups,
-        data: {
-          constrainedBy: {
-            constraints: [
-              { 'mutex<>': this.config.names.mutex },
-            ],
-          },
-        },
-      },
-    ];
-  }
-
   defineWidgets() {
     const genericSettings = {
       dashboard: this.config.dashboardId,
@@ -230,8 +249,6 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
     const variableTypes = {
       fridge: this.blockType(this.config.names.fridgeSensor),
       beer: this.blockType(this.config.names.beerSensor),
-      coolPin: this.blockType(this.config.names.coolPin),
-      heatPin: this.blockType(this.config.names.heatPin),
     };
 
     const createWidget =
@@ -281,9 +298,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
       createWidget(this.config.names.fridgeSensor, variableTypes.fridge),
       createWidget(this.config.names.beerSensor, variableTypes.beer),
       // SSPairs are skipped
-      // Pins
-      createWidget(this.config.names.coolPin, variableTypes.coolPin),
-      createWidget(this.config.names.heatPin, variableTypes.heatPin),
+      // Digital actuators are skipped
       // PWMs
       createWidget(this.config.names.coolPwm, pwmType),
       createWidget(this.config.names.heatPwm, pwmType),
@@ -298,6 +313,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
 
   defineActions() {
     this.pushActions([
+      // Rename blocks
       async (config: BrewPiConfig): Promise<void> => {
         await Promise.all(
           Object.entries(config.renamedBlocks)
@@ -307,6 +323,14 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
                 sparkStore.renameBlock([config.serviceId, currVal, newVal])));
       },
 
+      // Change blocks
+      async (config: BrewPiConfig): Promise<void> => {
+        await Promise.all(
+          config.changedBlocks
+            .map(block => sparkStore.saveBlock([config.serviceId, block])));
+      },
+
+      // Create blocks
       async (config: BrewPiConfig): Promise<void> => {
         // Create synchronously, to ensure dependencies are created first
         for (let block of config.createdBlocks) {
@@ -314,12 +338,7 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
         }
       },
 
-      async (config: BrewPiConfig): Promise<void> => {
-        await Promise.all(
-          config.changedBlocks
-            .map(block => sparkStore.saveBlock([config.serviceId, block])));
-      },
-
+      // Create dashboards / widgets
       async (config: BrewPiConfig): Promise<void> => {
         if (!dashboardStore.dashboardIds.includes(config.dashboardId)) {
           const dashboard: Dashboard = {
@@ -337,8 +356,8 @@ export default class BrewPiSettingsTask extends WizardTaskBase {
   }
 
   done() {
-    this.defineCreatedBlocks();
     this.defineChangedBlocks();
+    this.defineCreatedBlocks();
     this.defineWidgets();
     this.defineActions();
     // We're updating all at once, to avoid having to wait a tick before the prop changes
