@@ -9,6 +9,7 @@ import DS2413 from './DS2413';
 import DigitalActuator from './DigitalActuator';
 import DisplaySettings from './DisplaySettings';
 import InactiveObject from './InactiveObject';
+import MotorValve from './MotorValve';
 import Mutex from './Mutex';
 import Pid from './Pid';
 import ProcessView from './ProcessView';
@@ -32,6 +33,7 @@ const features: { [id: string]: SparkFeature } = {
   DS2413,
   InactiveObject,
   Pid,
+  MotorValve,
   Mutex,
   SetpointProfile,
   SetpointSensorPair,
