@@ -7,11 +7,19 @@ import DialogBase from '@/components/Dialog/DialogBase';
 export default class BlockWizardDialog extends DialogBase {
   @Prop({ type: String, required: true })
   public readonly serviceId!: string;
+
+  @Prop({ type: String })
+  public readonly initialFeature!: string;
 }
 </script>
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <BlockWizard :service-id="serviceId" @close="onDialogHide"/>
+    <BlockWizard
+      :service-id="serviceId"
+      :initial-feature="initialFeature"
+      @close="onDialogHide"
+      @created="onDialogOk"
+    />
   </q-dialog>
 </template>

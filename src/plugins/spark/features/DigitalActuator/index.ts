@@ -17,7 +17,20 @@ const block: BlockSpec = {
     constrainedBy: { constraints: [] },
   }),
   presets: [],
-  changes: [],
+  changes: [
+    {
+      key: 'state',
+      title: 'State',
+      component: 'StateValEdit',
+      generate: () => 0,
+    },
+    {
+      key: 'invert',
+      title: 'Invert',
+      component: 'BoolValEdit',
+      generate: () => false,
+    },
+  ],
 };
 
 const feature: Feature = {

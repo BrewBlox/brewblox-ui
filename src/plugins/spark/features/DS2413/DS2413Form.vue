@@ -3,10 +3,11 @@ import { Component } from 'vue-property-decorator';
 
 import BlockForm from '@/plugins/spark/components/BlockForm';
 
-import { DS2413Block } from './types';
+import { DS2413Block, DS2413Id } from './types';
 
 @Component
 export default class DS2413Form extends BlockForm {
+  DS2413Id = DS2413Id;
   readonly block!: DS2413Block;
 }
 </script>
@@ -14,14 +15,24 @@ export default class DS2413Form extends BlockForm {
 <template>
   <q-card dark class="widget-modal">
     <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
+
+    <IoArray v-bind="$props" :id-enum="DS2413Id"/>
+    <q-separator dark inset/>
+
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Note</q-item-label>
-          <span>
-            This block is the DS2413 chip with 2 channels.
-            Please create a Digital Actuator block for each of the channels you want to use.
-          </span>
+          <q-item-label caption>Address</q-item-label>
+          <InputField
+            :value="block.data.address"
+            title="Address"
+            tag="big"
+            @input="v => { block.data.address = v; saveBlock(); }"
+          />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>Connected</q-item-label>
+          {{ block.data.connected ? 'Yes' : 'No' }}
         </q-item-section>
       </q-item>
     </q-card-section>

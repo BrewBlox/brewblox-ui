@@ -12,7 +12,7 @@ const block: BlockSpec = {
   generate: () => ({
     address: '',
     connected: false,
-    channels: [],
+    pins: [],
   }),
   presets: [],
   changes: [],

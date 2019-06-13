@@ -16,22 +16,33 @@ export default class DigitalActuatorWidget extends BlockWidget {
     <BlockWidgetToolbar :field="me"/>
 
     <q-card-section>
-      <q-item dark>
-        <q-item-section>
-          <q-item-label caption>State</q-item-label>
-          <ActuatorField
-            :value="block.data.state"
-            :disable="isDriven"
-            @input="v => { block.data.state = v; saveBlock(); }"
-          />
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
-        </q-item-section>
-      </q-item>
-      <q-item dark>
-        <q-item-section>
-          <DigitalConstraints :value="block.data.constrainedBy" :service-id="serviceId" readonly/>
-        </q-item-section>
-      </q-item>
+      <template v-if="!block.data.hwDevice.id || !block.data.channel">
+        <q-item dark>
+          <q-item-section avatar>
+            <q-icon name="warning"/>
+          </q-item-section>
+          <q-item-section>No pin selected</q-item-section>
+        </q-item>
+      </template>
+
+      <template v-else>
+        <q-item dark>
+          <q-item-section>
+            <q-item-label caption>State</q-item-label>
+            <ActuatorField
+              :value="block.data.state"
+              :disable="isDriven"
+              @input="v => { block.data.state = v; saveBlock(); }"
+            />
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section>
+            <DigitalConstraints :value="block.data.constrainedBy" :service-id="serviceId" readonly/>
+          </q-item-section>
+        </q-item>
+      </template>
     </q-card-section>
   </q-card>
 </template>

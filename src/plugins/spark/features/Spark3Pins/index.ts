@@ -19,7 +19,20 @@ const block: BlockSpec = {
     voltage5: 0,
     voltage12: 0,
   }),
-  changes: [],
+  changes: [
+    {
+      key: 'soundAlarm',
+      title: 'Alarm sound',
+      component: 'BoolValEdit',
+      generate: () => false,
+    },
+    {
+      key: 'enableLcdBackLight',
+      title: 'Toggle LCD backlight',
+      component: 'BoolValEdit',
+      generate: () => false,
+    },
+  ],
   presets: [],
 };
 
