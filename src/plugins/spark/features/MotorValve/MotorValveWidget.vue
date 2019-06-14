@@ -1,13 +1,18 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { spaceCased } from '@/helpers/functional';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { MotorValveBlock } from './types';
+import { MotorValveBlock, ValveState } from './types';
 
 @Component
 export default class MotorValveWidget extends BlockWidget {
   readonly block!: MotorValveBlock;
+
+  get valveStateName() {
+    return spaceCased(ValveState[this.block.data.valveState]);
+  }
 }
 </script>
 
@@ -41,16 +46,16 @@ export default class MotorValveWidget extends BlockWidget {
               title="Valve State"
               @input="v => { block.data.valveState = v; saveBlock(); }"
             />
-            <ValveField
-              :value="block.data.valveState"
-              @input="v => { block.data.valveState = v; saveBlock(); }"
-            />
             <!-- <ActuatorField
               :value="block.data.state"
               :disable="isDriven"
               @input="v => { block.data.state = v; saveBlock(); }"
             />-->
             <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>Valve State</q-item-label>
+            {{ valveStateName }}
           </q-item-section>
         </q-item>
         <q-item dark>
