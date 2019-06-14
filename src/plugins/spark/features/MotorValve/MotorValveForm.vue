@@ -1,13 +1,15 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { spaceCased } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
+import { ValveStartId } from '../DS2408/types';
 import { typeName } from './getters';
-import { MotorValveBlock } from './types';
+import { MotorValveBlock, ValveState } from './types';
 
 @Component
 export default class MotorValveForm extends BlockForm {
@@ -20,14 +22,18 @@ export default class MotorValveForm extends BlockForm {
       : null;
   }
 
-  get claimedChannels() {
+  get claimedChannels(): { [channel: number]: string } {
     if (!this.hwBlock) {
-      return [];
+      return {};
     }
     const targetId = this.hwBlock.id;
     return sparkStore.blockValues(this.serviceId)
       .filter(block => block.type === typeName && block.data.hwDevice.id === targetId)
       .reduce((acc, block) => ({ ...acc, [block.data.startChannel]: block.id }), {});
+  }
+
+  get valveStateName() {
+    return spaceCased(ValveState[this.block.data.valveState]);
   }
 
   driverStr(pinId: number) {
@@ -38,13 +44,13 @@ export default class MotorValveForm extends BlockForm {
   }
 
   get channelOpts() {
-    const opts = [{ label: 'Not set', value: 0 }];
-    if (this.hwBlock) {
-      opts.push(
-        ...Object.keys(this.hwBlock.data.pins || this.hwBlock.data.channels)
-          .map((k, idx) => ({ label: `Pin ${idx + 1}${this.driverStr(idx + 1)}`, value: idx + 1 })));
-    }
-    return opts;
+    return [
+      { label: 'Not set', value: 0 },
+      ...Object.keys(ValveStartId)
+        .map(Number)
+        .filter(id => !Number.isNaN(id))
+        .map(id => ({ label: `${ValveStartId[id]}${this.driverStr(id)}`, value: id })),
+    ];
   }
 
   async claimChannel(pinId: number) {
@@ -71,21 +77,21 @@ export default class MotorValveForm extends BlockForm {
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>Target Pin Array</q-item-label>
+            <q-item-label caption>Target DS2408 Chip</q-item-label>
             <LinkField
               :value="block.data.hwDevice"
               :service-id="serviceId"
-              title="Pin Array"
+              title="Target DS2408 Chip"
               @input="v => { block.data.hwDevice = v; block.data.startChannel = 0; saveBlock(); }"
             />
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>Pin Channel</q-item-label>
+            <q-item-label caption>DS2408 Channel</q-item-label>
             <SelectField
               :value="block.data.startChannel"
               :options="channelOpts"
               :readonly="!block.data.hwDevice.id"
-              title="Pin Channel"
+              title="DS2408 Channel"
               @input="claimChannel"
             />
           </q-item-section>
@@ -99,6 +105,10 @@ export default class MotorValveForm extends BlockForm {
               @input="v => { block.data.state = v; saveBlock(); }"
             />
             <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>Valve State</q-item-label>
+            {{ valveStateName }}
           </q-item-section>
         </q-item>
       </q-expansion-item>

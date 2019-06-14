@@ -34,23 +34,11 @@ export default class MotorValveWidget extends BlockWidget {
         <q-item dark>
           <q-item-section>
             <q-item-label caption>State</q-item-label>
-            <InputField
-              :value="block.data.state"
-              title="State"
-              type="number"
-              @input="v => { block.data.state = v; saveBlock(); }"
-            />
-            <InputField
-              :value="block.data.valveState"
-              type="number"
-              title="Valve State"
-              @input="v => { block.data.valveState = v; saveBlock(); }"
-            />
-            <!-- <ActuatorField
+            <ActuatorField
               :value="block.data.state"
               :disable="isDriven"
               @input="v => { block.data.state = v; saveBlock(); }"
-            />-->
+            />
             <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>
           <q-item-section>

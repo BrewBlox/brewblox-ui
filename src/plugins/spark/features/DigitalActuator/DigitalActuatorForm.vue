@@ -24,9 +24,9 @@ export default class DigitalActuatorForm extends BlockForm {
       : null;
   }
 
-  get claimedChannels() {
+  get claimedChannels(): { [channel: number]: string } {
     if (!this.hwBlock) {
-      return [];
+      return {};
     }
     const targetId = this.hwBlock.id;
     return sparkStore.blockValues(this.serviceId)

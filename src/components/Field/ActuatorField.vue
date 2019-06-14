@@ -51,9 +51,9 @@ export default class ActuatorField extends Vue {
     if (this.disable) {
       return;
     }
-    if (this.value === DigitalState.Inactive || !this.known) {
+    if (this.value === DigitalState.Inactive) {
       this.change(DigitalState.Active);
-    } else if (this.value === DigitalState.Active) {
+    } else if (this.value === DigitalState.Active || !this.known) {
       this.change(DigitalState.Inactive);
     }
   }

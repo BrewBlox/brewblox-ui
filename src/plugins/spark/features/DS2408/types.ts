@@ -11,7 +11,7 @@ export enum DS2408Id {
   H = 8,
 }
 
-export enum ValveName {
+export enum ValveStartId {
   A = 1,
   B = 5,
 }
