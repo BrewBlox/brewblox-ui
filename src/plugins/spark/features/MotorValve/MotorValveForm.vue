@@ -27,7 +27,7 @@ export default class MotorValveForm extends BlockForm {
     const targetId = this.hwBlock.id;
     return sparkStore.blockValues(this.serviceId)
       .filter(block => block.type === typeName && block.data.hwDevice.id === targetId)
-      .reduce((acc, block) => ({ ...acc, [block.data.channel]: block.id }), {});
+      .reduce((acc, block) => ({ ...acc, [block.data.startChannel]: block.id }), {});
   }
 
   driverStr(pinId: number) {

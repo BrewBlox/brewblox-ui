@@ -7,38 +7,47 @@ import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import sparkStore from '@/plugins/spark/store';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 
-import { typeName as actuatorType } from '../features/DigitalActuator/getters';
-import { DigitalActuatorBlock } from '../features/DigitalActuator/types';
+import { typeName as valveType } from '../features/MotorValve/getters';
+import { MotorValveBlock } from '../features/MotorValve/types';
 
 interface EditableChannel extends IoChannel {
   id: number;
 }
 
-interface IoArrayBlock extends Block {
+interface ValveArrayBlock extends Block {
   data: {
     pins: IoPin[];
   };
 }
 
 @Component
-export default class IoArray extends BlockWidget {
-  readonly block!: IoArrayBlock;
+export default class ValveArray extends BlockWidget {
+  readonly block!: ValveArrayBlock;
 
   @Prop({ type: Object, required: true })
   public readonly idEnum!: any;
 
+  @Prop({ type: Object, required: true })
+  public readonly nameEnum!: string;
+
   get channels(): EditableChannel[] {
     return this.block.data.pins
-      .map((pin, idx) => {
-        const id = idx + 1;
-        return { id, ...pin[this.idEnum[id]] };
-      });
+      .reduce(
+        (acc: EditableChannel[], pin: IoPin, idx: number) => {
+          const id = idx + 1;
+          if (!this.nameEnum || this.nameEnum[id] !== undefined) {
+            acc.push({ id, ...pin[this.idEnum[id]] });
+          }
+          return acc;
+        },
+        []
+      );
   }
 
   get claimedChannels() {
     return sparkStore.blockValues(this.serviceId)
-      .filter(block => block.type === actuatorType && block.data.hwDevice.id === this.block.id)
-      .reduce((acc, block) => ({ ...acc, [block.data.channel]: block.id }), {});
+      .filter(block => block.type === valveType && block.data.hwDevice.id === this.block.id)
+      .reduce((acc, block: MotorValveBlock) => ({ ...acc, [block.data.startChannel]: block.id }), {});
   }
 
   saveChannels() {
@@ -51,11 +60,11 @@ export default class IoArray extends BlockWidget {
   }
 
   channelName(channel) {
-    return this.idEnum[channel.id];
+    return this.nameEnum[channel.id];
   }
 
   driverLink(channel: EditableChannel): Link {
-    return new Link(this.claimedChannels[channel.id] || null, actuatorType);
+    return new Link(this.claimedChannels[channel.id] || null, valveType);
   }
 
   async saveDriver(channel: EditableChannel, link: Link) {
@@ -64,14 +73,14 @@ export default class IoArray extends BlockWidget {
       return;
     }
     if (currentDriver.id) {
-      const block: DigitalActuatorBlock = sparkStore.blockById(this.serviceId, currentDriver.id);
-      block.data.channel = 0;
+      const block: MotorValveBlock = sparkStore.blockById(this.serviceId, currentDriver.id);
+      block.data.startChannel = 0;
       await sparkStore.saveBlock([this.serviceId, block]);
     }
     if (link.id) {
-      const block: DigitalActuatorBlock = sparkStore.blockById(this.serviceId, link.id);
+      const block: MotorValveBlock = sparkStore.blockById(this.serviceId, link.id);
       block.data.hwDevice.id = this.blockId;
-      block.data.channel = channel.id;
+      block.data.startChannel = channel.id;
       await sparkStore.saveBlock([this.serviceId, block]);
     }
   }
@@ -79,7 +88,7 @@ export default class IoArray extends BlockWidget {
   async saveState(channel: EditableChannel, state: DigitalState) {
     const link = this.driverLink(channel);
     if (link.id) {
-      const block: DigitalActuatorBlock = sparkStore.blockById(this.serviceId, link.id);
+      const block: MotorValveBlock = sparkStore.blockById(this.serviceId, link.id);
       block.data.state = state;
       channel.state = state;
       await sparkStore.saveBlock([this.serviceId, block]);
@@ -91,11 +100,11 @@ export default class IoArray extends BlockWidget {
       component: 'BlockWizardDialog',
       root: this.$root,
       serviceId: this.serviceId,
-      initialFeature: actuatorType,
+      initialFeature: valveType,
     })
       .onOk(block => {
-        if (block.type === actuatorType) {
-          this.saveDriver(channel, new Link(block.id, actuatorType));
+        if (block.type === valveType) {
+          this.saveDriver(channel, new Link(block.id, valveType));
         }
       });
   }
@@ -129,10 +138,10 @@ export default class IoArray extends BlockWidget {
           :service-id="serviceId"
           flat
         >
-          <q-tooltip>Configure Digital Actuator</q-tooltip>
+          <q-tooltip>Configure valve</q-tooltip>
         </BlockFormButton>
         <q-btn v-else flat icon="add" @click="createActuator(channel)">
-          <q-tooltip>Create new Digital Actuator</q-tooltip>
+          <q-tooltip>Create new valve</q-tooltip>
         </q-btn>
       </q-item-section>
     </q-item>

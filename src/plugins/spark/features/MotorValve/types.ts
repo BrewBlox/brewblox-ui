@@ -4,12 +4,12 @@ import { Block, DigitalState } from '@/plugins/spark/types';
 
 export enum ValveState {
   Unknown = 0,
-  Open,
-  Closed,
-  Opening,
-  Closing,
-  HalfOpenIdle,
-  InitIdle,
+  Open = 1,
+  Closed = 2,
+  Opening = 3,
+  Closing = 4,
+  HalfOpenIdle = 5,
+  InitIdle = 6,
 }
 
 export interface MotorValveBlock extends Block {

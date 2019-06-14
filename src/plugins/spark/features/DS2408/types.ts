@@ -1,4 +1,4 @@
-import { Block, IoChannel } from '@/plugins/spark/types';
+import { Block, IoPin } from '@/plugins/spark/types';
 
 export enum DS2408Id {
   A = 1,
@@ -11,10 +11,15 @@ export enum DS2408Id {
   H = 8,
 }
 
+export enum ValveName {
+  A = 1,
+  B = 4,
+}
+
 export interface DS2408Block extends Block {
   data: {
     address: string;
     connected: boolean;
-    pins: IoChannel[];
+    pins: IoPin[];
   };
 }

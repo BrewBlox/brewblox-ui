@@ -50,6 +50,6 @@ export class DS2413Link extends Link {
 
 export class IoArrayLink extends Link {
   public constructor(id: string | null) {
-    super(id, 'IoArray');
+    super(id, 'IoArrayInterface');
   }
 }
