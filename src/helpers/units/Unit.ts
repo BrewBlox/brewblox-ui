@@ -55,7 +55,7 @@ export default class Unit {
     return this.value;
   }
 
-  public copy() {
-    return new Unit(this.val, this.unit);
+  public copy(val: number | null = this.val): Unit {
+    return new Unit(val, this.unit);
   }
 }

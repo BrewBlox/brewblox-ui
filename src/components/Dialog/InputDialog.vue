@@ -60,6 +60,7 @@ export default class InputDialog extends DialogBase {
           :rules="rules"
           :clearable="clearable"
           :label="label"
+          input-style="font-size: 170%"
           dark
           autofocus
           step="any"
