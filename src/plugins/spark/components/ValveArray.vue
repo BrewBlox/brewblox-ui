@@ -1,4 +1,5 @@
 <script lang="ts">
+import get from 'lodash/get';
 import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
@@ -12,6 +13,7 @@ import { MotorValveBlock } from '../features/MotorValve/types';
 
 interface EditableChannel extends IoChannel {
   id: number;
+  driver: MotorValveBlock | null;
 }
 
 interface ValveArrayBlock extends Block {
@@ -30,24 +32,28 @@ export default class ValveArray extends BlockWidget {
   @Prop({ type: Object, required: true })
   public readonly nameEnum!: string;
 
+  get claimedChannels() {
+    return sparkStore.blockValues(this.serviceId)
+      .filter(block => block.type === valveType && block.data.hwDevice.id === this.block.id)
+      .reduce((acc, block: MotorValveBlock) => ({ ...acc, [block.data.startChannel]: block.id }), {});
+  }
+
   get channels(): EditableChannel[] {
     return this.block.data.pins
       .reduce(
         (acc: EditableChannel[], pin: IoPin, idx: number) => {
           const id = idx + 1;
           if (!this.nameEnum || this.nameEnum[id] !== undefined) {
-            acc.push({ id, ...pin[this.idEnum[id]] });
+            const driverId = this.claimedChannels[id];
+            const driver = !!driverId
+              ? sparkStore.blockById(this.serviceId, driverId)
+              : null;
+            acc.push({ ...pin[this.idEnum[id]], id, driver });
           }
           return acc;
         },
         []
       );
-  }
-
-  get claimedChannels() {
-    return sparkStore.blockValues(this.serviceId)
-      .filter(block => block.type === valveType && block.data.hwDevice.id === this.block.id)
-      .reduce((acc, block: MotorValveBlock) => ({ ...acc, [block.data.startChannel]: block.id }), {});
   }
 
   saveChannels() {
@@ -64,40 +70,29 @@ export default class ValveArray extends BlockWidget {
   }
 
   driverLink(channel: EditableChannel): Link {
-    return new Link(this.claimedChannels[channel.id] || null, valveType);
-  }
-
-  driverBlock(channel: EditableChannel): MotorValveBlock | null {
-    const link = this.driverLink(channel);
-    return link.id
-      ? sparkStore.blockById(this.serviceId, link.id)
-      : null;
+    return new Link(get(channel, 'driver.id', null), valveType);
   }
 
   async saveDriver(channel: EditableChannel, link: Link) {
-    const currentDriver = this.driverLink(channel);
-    if (currentDriver.id === link.id) {
+    if (channel.driver && channel.driver.id === link.id) {
       return;
     }
-    if (currentDriver.id) {
-      const block: MotorValveBlock = sparkStore.blockById(this.serviceId, currentDriver.id);
-      block.data.startChannel = 0;
-      await sparkStore.saveBlock([this.serviceId, block]);
+    if (channel.driver) {
+      channel.driver.data.startChannel = 0;
+      await sparkStore.saveBlock([this.serviceId, channel.driver]);
     }
     if (link.id) {
-      const block: MotorValveBlock = sparkStore.blockById(this.serviceId, link.id);
-      block.data.hwDevice.id = this.blockId;
-      block.data.startChannel = channel.id;
-      await sparkStore.saveBlock([this.serviceId, block]);
+      const newDriver: MotorValveBlock = sparkStore.blockById(this.serviceId, link.id);
+      newDriver.data.hwDevice.id = this.blockId;
+      newDriver.data.startChannel = channel.id;
+      await sparkStore.saveBlock([this.serviceId, newDriver]);
     }
   }
 
   async saveState(channel: EditableChannel, state: DigitalState) {
-    const block = this.driverBlock(channel);
-    if (block) {
-      block.data.state = state;
-      channel.state = state;
-      await sparkStore.saveBlock([this.serviceId, block]);
+    if (channel.driver) {
+      channel.driver.data.state = state;
+      await sparkStore.saveBlock([this.serviceId, channel.driver]);
     }
   }
 
@@ -123,8 +118,8 @@ export default class ValveArray extends BlockWidget {
       <q-item-section>{{ channelName(channel) }}</q-item-section>
       <q-item-section>
         <ActuatorField
-          v-if="claimedChannels[channel.id]"
-          :value="driverBlock(channel).data.state"
+          v-if="channel.driver"
+          :value="channel.driver.data.state"
           @input="v => saveState(channel, v)"
         />
         <div v-else>---</div>
@@ -139,8 +134,8 @@ export default class ValveArray extends BlockWidget {
       </q-item-section>
       <q-item-section side>
         <BlockFormButton
-          v-if="driverLink(channel).id"
-          :block-id="driverLink(channel).id"
+          v-if="channel.driver"
+          :block-id="channel.driver.id"
           :service-id="serviceId"
           flat
         >

@@ -1,4 +1,5 @@
 <script lang="ts">
+import get from 'lodash/get';
 import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
@@ -12,6 +13,7 @@ import { DigitalActuatorBlock } from '../features/DigitalActuator/types';
 
 interface EditableChannel extends IoChannel {
   id: number;
+  driver: DigitalActuatorBlock | null;
 }
 
 interface IoArrayBlock extends Block {
@@ -27,18 +29,22 @@ export default class IoArray extends BlockWidget {
   @Prop({ type: Object, required: true })
   public readonly idEnum!: any;
 
-  get channels(): EditableChannel[] {
-    return this.block.data.pins
-      .map((pin, idx) => {
-        const id = idx + 1;
-        return { id, ...pin[this.idEnum[id]] };
-      });
-  }
-
   get claimedChannels() {
     return sparkStore.blockValues(this.serviceId)
       .filter(block => block.type === actuatorType && block.data.hwDevice.id === this.block.id)
       .reduce((acc, block) => ({ ...acc, [block.data.channel]: block.id }), {});
+  }
+
+  get channels(): EditableChannel[] {
+    return this.block.data.pins
+      .map((pin, idx) => {
+        const id = idx + 1;
+        const driverId = this.claimedChannels[id];
+        const driver = !!driverId
+          ? sparkStore.blockById(this.serviceId, driverId)
+          : null;
+        return { ...pin[this.idEnum[id]], id, driver };
+      });
   }
 
   saveChannels() {
@@ -55,34 +61,30 @@ export default class IoArray extends BlockWidget {
   }
 
   driverLink(channel: EditableChannel): Link {
-    return new Link(this.claimedChannels[channel.id] || null, actuatorType);
+    return new Link(get(channel, 'driver.id', null), actuatorType);
   }
 
   async saveDriver(channel: EditableChannel, link: Link) {
-    const currentDriver = this.driverLink(channel);
-    if (currentDriver.id === link.id) {
+    const currentDriver = channel.driver;
+    if (currentDriver && currentDriver.id === link.id) {
       return;
     }
-    if (currentDriver.id) {
-      const block: DigitalActuatorBlock = sparkStore.blockById(this.serviceId, currentDriver.id);
-      block.data.channel = 0;
-      await sparkStore.saveBlock([this.serviceId, block]);
+    if (currentDriver) {
+      currentDriver.data.channel = 0;
+      await sparkStore.saveBlock([this.serviceId, currentDriver]);
     }
     if (link.id) {
-      const block: DigitalActuatorBlock = sparkStore.blockById(this.serviceId, link.id);
-      block.data.hwDevice.id = this.blockId;
-      block.data.channel = channel.id;
-      await sparkStore.saveBlock([this.serviceId, block]);
+      const newDriver: DigitalActuatorBlock = sparkStore.blockById(this.serviceId, link.id);
+      newDriver.data.hwDevice.id = this.blockId;
+      newDriver.data.channel = channel.id;
+      await sparkStore.saveBlock([this.serviceId, newDriver]);
     }
   }
 
   async saveState(channel: EditableChannel, state: DigitalState) {
-    const link = this.driverLink(channel);
-    if (link.id) {
-      const block: DigitalActuatorBlock = sparkStore.blockById(this.serviceId, link.id);
-      block.data.state = state;
-      channel.state = state;
-      await sparkStore.saveBlock([this.serviceId, block]);
+    if (channel.driver) {
+      channel.driver.data.state = state;
+      await sparkStore.saveBlock([this.serviceId, channel.driver]);
     }
   }
 
@@ -108,8 +110,8 @@ export default class IoArray extends BlockWidget {
       <q-item-section>{{ channelName(channel) }}</q-item-section>
       <q-item-section>
         <ActuatorField
-          v-if="claimedChannels[channel.id]"
-          :value="channel.state"
+          v-if="channel.driver"
+          :value="channel.driver.data.state"
           @input="v => saveState(channel, v)"
         />
         <div v-else>---</div>
@@ -124,8 +126,8 @@ export default class IoArray extends BlockWidget {
       </q-item-section>
       <q-item-section side>
         <BlockFormButton
-          v-if="driverLink(channel).id"
-          :block-id="driverLink(channel).id"
+          v-if="channel.driver"
+          :block-id="channel.driver.id"
           :service-id="serviceId"
           flat
         >
