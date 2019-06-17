@@ -69,7 +69,7 @@ export interface UnitAlternatives {
   [key: string]: string[];
 }
 
-export interface CompatibleBlocks {
+export interface CompatibleTypes {
   [key: string]: string[];
 }
 
