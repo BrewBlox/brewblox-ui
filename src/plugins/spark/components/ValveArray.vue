@@ -67,6 +67,13 @@ export default class ValveArray extends BlockWidget {
     return new Link(this.claimedChannels[channel.id] || null, valveType);
   }
 
+  driverBlock(channel: EditableChannel): MotorValveBlock | null {
+    const link = this.driverLink(channel);
+    return link.id
+      ? sparkStore.blockById(this.serviceId, link.id)
+      : null;
+  }
+
   async saveDriver(channel: EditableChannel, link: Link) {
     const currentDriver = this.driverLink(channel);
     if (currentDriver.id === link.id) {
@@ -86,9 +93,8 @@ export default class ValveArray extends BlockWidget {
   }
 
   async saveState(channel: EditableChannel, state: DigitalState) {
-    const link = this.driverLink(channel);
-    if (link.id) {
-      const block: MotorValveBlock = sparkStore.blockById(this.serviceId, link.id);
+    const block = this.driverBlock(channel);
+    if (block) {
       block.data.state = state;
       channel.state = state;
       await sparkStore.saveBlock([this.serviceId, block]);
@@ -118,7 +124,7 @@ export default class ValveArray extends BlockWidget {
       <q-item-section>
         <ActuatorField
           v-if="claimedChannels[channel.id]"
-          :value="channel.state"
+          :value="driverBlock(channel).data.state"
           @input="v => saveState(channel, v)"
         />
         <div v-else>---</div>

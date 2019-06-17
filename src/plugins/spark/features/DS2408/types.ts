@@ -12,8 +12,8 @@ export enum DS2408Id {
 }
 
 export enum ValveStartId {
-  A = 1,
-  B = 5,
+  B = 1,
+  A = 5,
 }
 
 export interface DS2408Block extends Block {

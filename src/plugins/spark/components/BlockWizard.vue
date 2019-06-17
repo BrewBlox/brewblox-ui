@@ -148,6 +148,7 @@ export default class BlockWizard extends Vue {
             v-model="feature"
             :options="filteredOptions"
             :rules="[v => !!v || 'You must select a block type']"
+            :disable="!!initialFeature"
             dark
             use-input
             options-dark
