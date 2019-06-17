@@ -53,7 +53,8 @@ export default class ValveArray extends BlockWidget {
           return acc;
         },
         []
-      );
+      )
+      .reverse();
   }
 
   saveChannels() {
