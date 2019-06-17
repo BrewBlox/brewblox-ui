@@ -7,7 +7,6 @@ import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { BrewPiConfig, PinChannel } from '@/plugins/spark/arrangements/BrewPi/types';
 import { typeName as DS2408Type } from '@/plugins/spark/features/DS2408/getters';
 import { typeName as DS2413Type } from '@/plugins/spark/features/DS2413/getters';
-import { typeName as digitalActuatorType } from '@/plugins/spark/features/DigitalActuator/getters';
 import { typeName as Spark2PinsType } from '@/plugins/spark/features/Spark2Pins/getters';
 import { typeName as Spark3PinsType } from '@/plugins/spark/features/Spark3Pins/getters';
 import { typeName as sensorMockType } from '@/plugins/spark/features/TempSensorMock/getters';

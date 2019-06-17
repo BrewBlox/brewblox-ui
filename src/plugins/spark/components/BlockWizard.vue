@@ -108,6 +108,9 @@ export default class BlockWizard extends Vue {
   }
 
   async createBlock() {
+    if (!this.createReady) {
+      return;
+    }
     this.ensureLocalBlock();
     try {
       await sparkStore.createBlock([this.serviceId, this.block as Block]);
@@ -135,7 +138,7 @@ export default class BlockWizard extends Vue {
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
+  <q-card dark class="widget-modal" @keyup.enter="createBlock">
     <FormToolbar>Block wizard</FormToolbar>
 
     <q-card-section>
