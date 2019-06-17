@@ -2,7 +2,7 @@
 import isString from 'lodash/isString';
 import { Dialog, uid } from 'quasar';
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
 import sparkStore from '@/plugins/spark/store';
@@ -22,6 +22,17 @@ export default class BlockWizard extends Vue {
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
+
+  @Prop({ type: String })
+  public readonly initialFeature!: string;
+
+  @Emit('created')
+  public onCreate(block: Block) {
+    return block;
+  }
+
+  @Emit('close')
+  public close() { }
 
   get blockIdRules() {
     return [
@@ -97,6 +108,9 @@ export default class BlockWizard extends Vue {
   }
 
   async createBlock() {
+    if (!this.createReady) {
+      return;
+    }
     this.ensureLocalBlock();
     try {
       await sparkStore.createBlock([this.serviceId, this.block as Block]);
@@ -105,6 +119,7 @@ export default class BlockWizard extends Vue {
         color: 'positive',
         message: `Created ${featureStore.displayNameById((this.block as Block).type)} Block '${this.blockId}'`,
       });
+      this.onCreate(sparkStore.blockById(this.serviceId, this.blockId));
     } catch (e) {
       this.$q.notify({
         icon: 'error',
@@ -112,13 +127,18 @@ export default class BlockWizard extends Vue {
         message: `Failed to create Block: ${e.toString()}`,
       });
     }
-    this.$emit('close');
+    this.close();
+  }
+
+  created() {
+    this.feature =
+      this.wizardOptions.find(opt => opt.value === this.initialFeature) || null;
   }
 }
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
+  <q-card dark class="widget-modal" @keyup.enter="createBlock">
     <FormToolbar>Block wizard</FormToolbar>
 
     <q-card-section>
@@ -128,6 +148,7 @@ export default class BlockWizard extends Vue {
             v-model="feature"
             :options="filteredOptions"
             :rules="[v => !!v || 'You must select a block type']"
+            :disable="!!initialFeature"
             dark
             use-input
             options-dark

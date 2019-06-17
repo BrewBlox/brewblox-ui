@@ -69,7 +69,7 @@ export interface UnitAlternatives {
   [key: string]: string[];
 }
 
-export interface CompatibleBlocks {
+export interface CompatibleTypes {
   [key: string]: string[];
 }
 
@@ -85,4 +85,27 @@ export interface BlockLink {
   source: string;
   target: string;
   relation: string[];
+}
+
+export enum ChannelConfig {
+  Unused = 0,
+  ActiveLow = 1,
+  ActiveHigh = 2,
+  Input = 10,
+  Unknown = 255,
+}
+
+export enum DigitalState {
+  Inactive = 0,
+  Active = 1,
+  Unknown = 2,
+}
+
+export interface IoChannel {
+  config: ChannelConfig;
+  state: DigitalState;
+}
+
+export interface IoPin {
+  [key: string]: IoChannel;
 }

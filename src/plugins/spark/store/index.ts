@@ -11,7 +11,7 @@ import {
   Block,
   BlockLink,
   BlockSpec,
-  CompatibleBlocks,
+  CompatibleTypes,
   Spark,
   SparkConfig,
   SystemStatus,
@@ -24,7 +24,7 @@ import {
   deleteBlock as deleteBlockInApi,
   fetchBlock as fetchBlockInApi,
   fetchBlocks as fetchBlocksInApi,
-  fetchCompatibleBlocks as fetchCompatibleBlocksInApi,
+  fetchCompatibleTypes as fetchCompatibleTypesInApi,
   fetchDiscoveredBlocks as fetchDiscoveredBlocksInApi,
   fetchSystemStatus as fetchSystemStatusInApi,
   fetchUnitAlternatives as fetchUnitAlternativesInApi,
@@ -119,7 +119,7 @@ interface SparkServiceState {
   blocks: Record<string, Block>;
   units: UserUnits;
   unitAlternatives: UnitAlternatives;
-  compatibleBlocks: CompatibleBlocks;
+  compatibleTypes: Record<string, string[]>;
   discoveredBlocks: string[];
   updateSource: EventSource | null;
   lastStatus: SystemStatus | null;
@@ -183,8 +183,8 @@ export class SparkModule extends VuexModule {
     return serviceId => this.services[serviceId].unitAlternatives;
   }
 
-  public get compatibleBlocks(): (serviceId: string) => CompatibleBlocks {
-    return serviceId => this.services[serviceId].compatibleBlocks;
+  public get compatibleTypes(): (serviceId: string) => CompatibleTypes {
+    return serviceId => this.services[serviceId].compatibleTypes;
   }
 
   public get discoveredBlocks(): (serviceId: string) => string[] {
@@ -296,8 +296,8 @@ export class SparkModule extends VuexModule {
   }
 
   @Mutation
-  public commitCompatibleBlocks([serviceId, type, ids]: [string, string, string[]]): void {
-    Vue.set(this.services[serviceId].compatibleBlocks, type, ids);
+  public commitCompatibleTypes([serviceId, types]: [string, CompatibleTypes]): void {
+    Vue.set(this.services[serviceId], 'compatibleTypes', types);
   }
 
   @Mutation
@@ -324,7 +324,7 @@ export class SparkModule extends VuexModule {
       blocks: {},
       units: {},
       unitAlternatives: {},
-      compatibleBlocks: {},
+      compatibleTypes: {},
       discoveredBlocks: [],
       updateSource: null,
       lastStatus: null,
@@ -418,8 +418,8 @@ export class SparkModule extends VuexModule {
   }
 
   @Action
-  public async fetchCompatibleBlocks([serviceId, type]: [string, string]): Promise<void> {
-    this.commitCompatibleBlocks([serviceId, type, await fetchCompatibleBlocksInApi(serviceId, type)]);
+  public async fetchCompatibleTypes(serviceId: string): Promise<void> {
+    this.commitCompatibleTypes([serviceId, await fetchCompatibleTypesInApi(serviceId)]);
   }
 
   @Action
@@ -441,6 +441,7 @@ export class SparkModule extends VuexModule {
       await Promise.all([
         this.fetchUnits(serviceId),
         this.fetchUnitAlternatives(serviceId),
+        this.fetchCompatibleTypes(serviceId),
       ]);
     }
   }

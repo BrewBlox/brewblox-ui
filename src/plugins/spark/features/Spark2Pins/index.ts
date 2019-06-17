@@ -3,33 +3,35 @@ import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
 import { BlockSpec } from '../../types';
-import form from './DS2413Form.vue';
-import widget from './DS2413Widget.vue';
+import form from './Spark2PinsForm.vue';
+import widget from './Spark2PinsWidget.vue';
 import { typeName } from './getters';
+import { Spark2Hardware } from './types';
 
 const block: BlockSpec = {
   id: typeName,
+  systemObject: true,
   generate: () => ({
-    address: '',
-    connected: false,
     pins: [],
+    soundAlarm: false,
+    hardware: Spark2Hardware.Unknown,
   }),
-  presets: [],
   changes: [],
+  presets: [],
 };
 
 const feature: Feature = {
   ...GenericBlock,
   id: typeName,
-  displayName: 'DS2413 Chip',
+  displayName: 'Spark 2 Pin Array',
   role: 'Output',
   widget: ref(widget),
   form: ref(form),
   widgetSize: {
     cols: 4,
-    rows: 2,
+    rows: 4,
   },
-  // Discovered objects can't be created or deleted
+  // Spark2Pins is a static system object, and can't be created or deleted
   wizard: undefined,
   deleters: undefined,
 };

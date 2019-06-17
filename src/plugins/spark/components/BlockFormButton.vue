@@ -32,7 +32,12 @@ export default class BlockFormButton extends Vue {
 </script>
 
 <template>
-  <q-btn :disable="!block" v-bind="$attrs" @click="openDialog">
+  <q-btn
+    :disable="!block"
+    :icon="block ? 'mdi-pencil' : 'mdi-pencil-off'"
+    v-bind="$attrs"
+    @click="openDialog"
+  >
     <slot/>
   </q-btn>
 </template>

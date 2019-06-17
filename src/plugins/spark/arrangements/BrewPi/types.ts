@@ -1,14 +1,19 @@
 import { Block } from '@/plugins/spark/types';
 import { DashboardItem } from '@/store/dashboards';
 
+export interface PinChannel {
+  arrayId: string;
+  pinId: number;
+}
+
 export interface BrewPiConfigNames {
   fridgeSensor: string;
   beerSensor: string;
   fridgeSSPair: string;
   beerSSPair: string;
   tempProfile: string;
-  coolPin: string;
-  heatPin: string;
+  coolAct: string;
+  heatAct: string;
   coolPwm: string;
   heatPwm: string;
   mutex: string;
@@ -33,4 +38,6 @@ export interface BrewPiConfig {
   renamedBlocks: {
     [old: string]: string;
   };
+  heatPin: PinChannel;
+  coolPin: PinChannel;
 }

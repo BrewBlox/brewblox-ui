@@ -21,14 +21,7 @@
         7
       ],
       "type": "SysInfo",
-      "data": {
-        "deviceId": "",
-        "version": "",
-        "platform": 0,
-        "hardware": 0,
-        "voltage5": 0,
-        "voltage12": 0
-      }
+      "data": {}
     },
     {
       "id": "OneWireBus",
@@ -70,54 +63,6 @@
         "yBitsPerPixelX16": 64,
         "xOffset": 0,
         "yOffset": 0
-      }
-    },
-    {
-      "id": "Pin-Bottom-other",
-      "nid": 11,
-      "groups": [
-        7
-      ],
-      "type": "ActuatorPin",
-      "data": {
-        "state": 0,
-        "invert": false
-      }
-    },
-    {
-      "id": "Pin-Top-1",
-      "nid": 12,
-      "groups": [
-        7
-      ],
-      "type": "ActuatorPin",
-      "data": {
-        "state": 0,
-        "invert": false
-      }
-    },
-    {
-      "id": "Pin-Top-2",
-      "nid": 13,
-      "groups": [
-        7
-      ],
-      "type": "ActuatorPin",
-      "data": {
-        "state": 0,
-        "invert": false
-      }
-    },
-    {
-      "id": "Pin-Top-3",
-      "nid": 14,
-      "groups": [
-        7
-      ],
-      "type": "ActuatorPin",
-      "data": {
-        "state": 0,
-        "invert": false
       }
     },
     {
@@ -321,30 +266,7 @@
         "enabled": false,
         "period[second]": 4,
         "drivenActuatorId<ProcessValueInterface,driven>": null,
-        "actuatorId<ActuatorDigitalInterface>": "Pin-Bottom-other"
-      }
-    },
-    {
-      "id": "actuator-ds2413-1",
-      "nid": 210,
-      "groups": [
-        0
-      ],
-      "type": "ActuatorDS2413",
-      "data": {
-        "channel": 1,
-        "constrainedBy": {
-          "constraints": [
-            {
-              "limiting": false,
-              "mutex<MutexInterface>": "mutex-1"
-            }
-          ],
-          "unconstrained": 0
-        },
-        "state": null,
-        "invert": false,
-        "hwDevice<DS2413,driven>": null
+        "actuatorId<ActuatorDigitalInterface>": "pin-actuator-1"
       }
     },
     {
@@ -362,27 +284,6 @@
         "referenceId<ProcessValueInterface>": "setpoint-sensor-pair-1",
         "drivenTargetId<ProcessValueInterface,driven>": null,
         "targetId<ProcessValueInterface>": "setpoint-sensor-pair-1"
-      }
-    },
-    {
-      "id": "Pin-Bottom-renamed",
-      "nid": 10,
-      "groups": [
-        7
-      ],
-      "type": "ActuatorPin",
-      "data": {
-        "constrainedBy": {
-          "constraints": [
-            {
-              "limiting": false,
-              "minOn[second]": 0
-            }
-          ],
-          "unconstrained": 0
-        },
-        "state": 0,
-        "invert": false
       }
     },
     {
@@ -423,23 +324,35 @@
       ],
       "type": "DS2413",
       "data": {
-        "address": "4444444444444444",
-        "state": 15
+        "address": "4444444444444444"
       }
     },
     {
-      "id": "ow-act",
-      "nid": 214,
+      "id": "pin-actuator-1",
+      "nid": 215,
       "groups": [
         0
       ],
-      "type": "ActuatorDS2413",
-      "data": {
-        "channel": 1,
-        "invert": true,
-        "state": null,
-        "hwDevice<DS2413,driven>": "ds2413-hw-1"
-      }
+      "type": "DigitalActuator",
+      "data": {}
+    },
+    {
+      "id": "pin-actuator-2",
+      "nid": 216,
+      "groups": [
+        0
+      ],
+      "type": "DigitalActuator",
+      "data": {}
+    },
+    {
+      "id": "pin-actuator-3",
+      "nid": 217,
+      "groups": [
+        0
+      ],
+      "type": "DigitalActuator",
+      "data": {}
     }
   ],
   "store": [
@@ -489,62 +402,6 @@
       "keys": [
         "DisplaySettings",
         7
-      ],
-      "data": {}
-    },
-    {
-      "keys": [
-        "Pin-Top-1",
-        12
-      ],
-      "data": {}
-    },
-    {
-      "keys": [
-        "Pin-Top-2",
-        13
-      ],
-      "data": {}
-    },
-    {
-      "keys": [
-        "Pin-Top-3",
-        14
-      ],
-      "data": {}
-    },
-    {
-      "keys": [
-        "Actuator-0",
-        15
-      ],
-      "data": {}
-    },
-    {
-      "keys": [
-        "Actuator-1",
-        16
-      ],
-      "data": {}
-    },
-    {
-      "keys": [
-        "Actuator-2",
-        17
-      ],
-      "data": {}
-    },
-    {
-      "keys": [
-        "Actuator-3",
-        18
-      ],
-      "data": {}
-    },
-    {
-      "keys": [
-        "Pin-Bottom-renamed",
-        10
       ],
       "data": {}
     },
@@ -620,13 +477,6 @@
     },
     {
       "keys": [
-        "actuator-ds2413-1",
-        210
-      ],
-      "data": {}
-    },
-    {
-      "keys": [
         "offset-1",
         211
       ],
@@ -648,15 +498,22 @@
     },
     {
       "keys": [
-        "ow-act",
-        214
+        "pin-actuator-1",
+        215
       ],
       "data": {}
     },
     {
       "keys": [
-        "Pin-Bottom-other",
-        11
+        "pin-actuator-2",
+        216
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "pin-actuator-3",
+        217
       ],
       "data": {}
     }

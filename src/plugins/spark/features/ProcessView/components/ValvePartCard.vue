@@ -4,13 +4,13 @@ import { Component } from 'vue-property-decorator';
 import PartCard from './PartCard';
 
 @Component
-export default class ActuatorPartCard extends PartCard {
+export default class ValvePartCard extends PartCard {
   get blockCardProps() {
     return {
       ...this.$props,
-      types: ['DigitalActuator'],
-      blockServiceIdKey: 'actuatorServiceId',
-      blockLinkKey: 'actuatorLink',
+      types: ['MotorValve'],
+      blockServiceIdKey: 'valveServiceId',
+      blockLinkKey: 'valveLink',
     };
   }
 }

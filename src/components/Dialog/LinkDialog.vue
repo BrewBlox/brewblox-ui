@@ -1,4 +1,5 @@
 <script lang="ts">
+import get from 'lodash/get';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
@@ -29,12 +30,12 @@ export default class LinkDialog extends DialogBase {
     if (this.filter) {
       return this.filter;
     }
-    if (!this.value.type) {
+    if (this.value.type === null) {
       return () => true;
     }
-    const compatibleTable = sparkStore.compatibleBlocks(this.serviceId);
-    const compatible = compatibleTable[this.value.type] || [];
-    return block => compatible.includes(block.id);
+    const compatibleTable = sparkStore.compatibleTypes(this.serviceId);
+    const compatible = [this.value.type, ...get(compatibleTable, this.value.type, [])];
+    return block => compatible.includes(block.type);
   }
 
   get linkOpts(): Link[] {
@@ -49,9 +50,6 @@ export default class LinkDialog extends DialogBase {
   }
 
   created() {
-    if (this.value.type) {
-      sparkStore.fetchCompatibleBlocks([this.serviceId, this.value.type]);
-    }
     this.link = this.value.copy();
   }
 }

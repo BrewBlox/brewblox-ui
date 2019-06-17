@@ -1,35 +1,22 @@
 import { ref } from '@/helpers/component-ref';
-import { Unit } from '@/helpers/units';
+import { IoArrayLink } from '@/helpers/units/KnownLinks';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
 import { BlockSpec } from '../../types';
-import form from './ActuatorPinForm.vue';
-import widget from './ActuatorPinWidget.vue';
+import form from './DigitalActuatorForm.vue';
+import widget from './DigitalActuatorWidget.vue';
 import { typeName } from './getters';
 
 const block: BlockSpec = {
   id: typeName,
   generate: () => ({
-    state: 2,
-    invert: false,
-    constrainedBy: { constraints: [], unconstrained: 0 },
+    hwDevice: new IoArrayLink(null),
+    channel: 0,
+    state: 0,
+    constrainedBy: { constraints: [] },
   }),
-  presets: [
-    {
-      name: 'Fridge Compressor',
-      generate: () => ({
-        state: 0,
-        invert: false,
-        constrainedBy: {
-          constraints: [
-            { minOff: new Unit(300, 'second') },
-            { minOn: new Unit(180, 'second') },
-          ],
-        },
-      }),
-    },
-  ],
+  presets: [],
   changes: [
     {
       key: 'state',
@@ -49,7 +36,7 @@ const block: BlockSpec = {
 const feature: Feature = {
   ...GenericBlock,
   id: typeName,
-  displayName: 'Pin Actuator',
+  displayName: 'Digital Actuator',
   role: 'Output',
   widget: ref(widget),
   form: ref(form),
@@ -57,9 +44,6 @@ const feature: Feature = {
     cols: 4,
     rows: 2,
   },
-  // Pins are static system objects, and can't be created or deleted
-  wizard: undefined,
-  deleters: undefined,
 };
 
 export default { feature, block };

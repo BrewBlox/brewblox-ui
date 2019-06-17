@@ -19,6 +19,7 @@ import { Service } from '@/store/services';
 
 import arrangements from './arrangements';
 import features from './features';
+import { typeName } from './getters';
 import { BlockSpec } from './types';
 
 autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
@@ -72,7 +73,7 @@ export default () => {
   sparkStore.commitAllSpecs(specs);
 
   providerStore.createProvider({
-    id: 'Spark',
+    id: typeName,
     displayName: 'Spark Controller',
     features: Object.keys(features),
     onAdd: onAdd,

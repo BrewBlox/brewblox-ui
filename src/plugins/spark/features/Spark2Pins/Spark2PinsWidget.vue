@@ -3,12 +3,12 @@ import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { DS2413Block, DS2413Id } from './types';
+import { Spark2PinId, Spark2PinsBlock } from './types';
 
 @Component
-export default class DS2413Widget extends BlockWidget {
-  DS2413Id = DS2413Id;
-  readonly block!: DS2413Block;
+export default class Spark2PinsWidget extends BlockWidget {
+  Spark2PinId = Spark2PinId;
+  readonly block!: Spark2PinsBlock;
 }
 </script>
 
@@ -16,6 +16,6 @@ export default class DS2413Widget extends BlockWidget {
   <q-card dark class="text-white scroll">
     <BlockWidgetToolbar :field="me"/>
 
-    <IoArray v-bind="$props" :id-enum="DS2413Id"/>
+    <IoArray v-bind="$props" :id-enum="Spark2PinId"/>
   </q-card>
 </template>
