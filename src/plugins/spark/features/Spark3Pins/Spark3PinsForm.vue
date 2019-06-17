@@ -52,11 +52,11 @@ export default class Spark3PinsForm extends BlockForm {
           {{ block.data.voltage12 | round }}
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Alarm sound</q-item-label>
+          <!-- <q-item-label caption>Alarm sound</q-item-label>
           <q-toggle
             :value="block.data.soundAlarm"
             @input="v => { block.data.soundAlarm = v; saveBlock(); }"
-          />
+          />-->
         </q-item-section>
       </q-item>
     </q-card-section>
