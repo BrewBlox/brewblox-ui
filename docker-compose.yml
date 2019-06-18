@@ -45,6 +45,8 @@ services:
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /sparkey"
+#    volumes:
+#      - "../brewblox-devcon-spark/:/app/"
     command: >
       --name=sparkey
       --device-host=sparksimulator
@@ -58,6 +60,8 @@ services:
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /spock"
+#    volumes:
+#      - "../brewblox-devcon-spark/:/app/"
     command: >
       --name=spock
       --simulation
