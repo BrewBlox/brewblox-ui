@@ -129,7 +129,7 @@ export default class SessionViewForm extends FormBase {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
     <BlockGraph
       v-if="graphModalOpen"
       v-model="graphModalOpen"

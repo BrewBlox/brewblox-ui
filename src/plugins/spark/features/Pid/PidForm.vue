@@ -18,7 +18,7 @@ export default class PidForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="mdi-calculator-variant" label="Settings">
@@ -27,6 +27,7 @@ export default class PidForm extends BlockForm {
           :text-enabled="`PID is enabled: output ${block.data.outputId} will be set to result of PID.`"
           :text-disabled="`PID is disabled: output ${block.data.outputId} will not be set.`"
           class="full-width bordered"
+          v-on="$listeners"
         />
         <q-separator dark inset/>
 

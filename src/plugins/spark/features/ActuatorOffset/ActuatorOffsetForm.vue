@@ -12,7 +12,7 @@ export default class ActuatorOffsetForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
@@ -21,6 +21,7 @@ export default class ActuatorOffsetForm extends BlockForm {
           :text-enabled="`Offset is enabled: ${block.data.targetId} will be offset from the
           ${block.data.referenceSettingOrValue == 0 ? 'setting' : 'value'} of ${block.data.referenceId}.`"
           :text-disabled="`Offset is disabled: ${block.data.targetId} will not be changed.`"
+          v-on="$listeners"
         />
         <q-item dark>
           <q-item-section>

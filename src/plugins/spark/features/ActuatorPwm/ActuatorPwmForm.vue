@@ -12,7 +12,7 @@ export default class ActuatorPwmForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
@@ -20,6 +20,7 @@ export default class ActuatorPwmForm extends BlockForm {
           v-bind="$props"
           :text-enabled="`PWM is enabled: ${block.data.actuatorId} will be toggled automatically.`"
           :text-disabled="`PWM is disabled: ${block.data.actuatorId} will not be toggled.`"
+          v-on="$listeners"
         />
 
         <q-item dark>

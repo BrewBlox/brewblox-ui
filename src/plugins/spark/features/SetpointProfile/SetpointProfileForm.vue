@@ -137,7 +137,7 @@ export default class SetpointProfileForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <BlockEnableToggle
@@ -145,6 +145,7 @@ export default class SetpointProfileForm extends BlockForm {
           v-bind="$props"
           :text-enabled="`Profile is enabled: ${block.data.targetId} will be set by the profile.`"
           :text-disabled="`Profile is disabled: ${block.data.targetId} will not be changed.`"
+          v-on="$listeners"
         />
         <q-separator v-if="block.data.targetId.id !== null" dark/>
         <q-item dark class="q-py-md">
