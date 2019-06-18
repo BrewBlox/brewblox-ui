@@ -9,20 +9,31 @@ import featureStore from '@/store/features';
 @Component
 export default class BlockFormDialog extends DialogBase {
 
-  @Prop({ type: Object, required: true })
-  public readonly widget!: DashboardItem;
+  // Objects directly passed into a dialog lose their reactivity
+  // We can bypass this by passing a function that returns a reactive object
+  @Prop({ type: Function, required: true })
+  public readonly getWidget!: () => DashboardItem;
 
   @Prop({ type: Function, required: true })
   public readonly saveWidget!: (widget: DashboardItem) => void;
 
-  @Prop({ type: Object, required: true })
-  public readonly block!: Block;
+  // Same as getWidget: take a function that returns a reactive object
+  @Prop({ type: Function, required: true })
+  public readonly getBlock!: () => Block;
 
   @Prop({ type: Function, required: true })
   public readonly saveBlock!: (block: Block) => void;
 
   @Prop({ type: Boolean, default: false })
   public readonly volatile!: boolean;
+
+  get widget(): DashboardItem {
+    return this.getWidget();
+  }
+
+  get block(): Block {
+    return this.getBlock();
+  }
 
   get blockForm() {
     return featureStore.formById(this.block.type);

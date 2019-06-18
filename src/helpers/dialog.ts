@@ -21,11 +21,11 @@ export const showBlockDialog = (block: Block, root: Vue) => {
   };
   Dialog.create({
     component: 'BlockFormDialog',
-    block,
-    widget,
-    root,
     volatile: true,
+    root,
+    getBlock: () => block,
     saveBlock: v => sparkStore.saveBlock([block.serviceId, v]),
+    getWidget: () => widget,
     saveWidget: () => { },
   });
 };

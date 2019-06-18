@@ -86,8 +86,8 @@ export default class BlockWidget extends WidgetBase {
   public openModal(): void {
     Dialog.create({
       component: 'BlockFormDialog',
-      block: this.block,
-      widget: this.widget,
+      getBlock: () => this.block,
+      getWidget: () => this.widget,
       saveBlock: this.saveBlock,
       saveWidget: this.saveWidget,
       root: this.$root,
