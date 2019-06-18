@@ -15,6 +15,12 @@ export default class DisplaySettingsWidget extends BlockWidget {
       .forEach(w => slots[w.pos - 1] = w);
     return slots;
   }
+
+  get footerRules() {
+    return [
+      v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
+    ];
+  }
 }
 </script>
 
@@ -49,6 +55,7 @@ export default class DisplaySettingsWidget extends BlockWidget {
           <q-item-section>
             <InputField
               :value="block.data.name"
+              :rules="footerRules"
               title="footer text"
               @input="v => { block.data.name = v; saveBlock(); }"
             />
