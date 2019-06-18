@@ -23,6 +23,12 @@ export default class DisplaySettingsForm extends BlockForm {
     ];
   }
 
+  get footerRules() {
+    return [
+      v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
+    ];
+  }
+
   slotLink(slot: DisplaySlot): Link {
     if (!slot) {
       return new Link(null);
@@ -164,6 +170,7 @@ export default class DisplaySettingsForm extends BlockForm {
             <q-item-label caption>Footer text</q-item-label>
             <InputField
               :value="block.data.name"
+              :rules="footerRules"
               title="footer text"
               @input="v => {block.data.name = v; saveBlock()}"
             />
