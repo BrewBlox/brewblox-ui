@@ -98,10 +98,10 @@ export default class DigitalActuatorForm extends BlockForm {
         <q-item dark>
           <q-item-section style="justify-content: flex-start">
             <q-item-label caption>State</q-item-label>
-            <ActuatorField
-              :value="block.data.state"
+            <DigitalStateField
+              :value="block.data.desiredState"
               :disable="isDriven"
-              @input="v => { block.data.state = v; saveBlock(); }"
+              @input="v => { block.data.desiredState = v; saveBlock(); }"
             />
             <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>

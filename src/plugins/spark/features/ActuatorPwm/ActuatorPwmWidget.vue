@@ -16,20 +16,11 @@ export default class ActuatorPwmWidget extends BlockWidget {
     };
   }
 
-  get pending() {
-    if (!this.block.data.constrainedBy) {
-      return null;
-    }
-    const { unconstrained } = this.block.data.constrainedBy;
-    if (this.block.data.setting === unconstrained) {
-      return null;
-    }
-    return unconstrained;
-  }
-
-  enable() {
-    this.block.data.enabled = true;
-    this.saveBlock();
+  get constrained() {
+    const { setting, desiredSetting } = this.block.data;
+    return setting === desiredSetting
+      ? null
+      : setting;
   }
 }
 </script>
@@ -50,7 +41,12 @@ export default class ActuatorPwmWidget extends BlockWidget {
           </span>
         </q-item-section>
         <q-item-section side>
-          <q-btn text-color="white" flat label="Enable" @click="enable"/>
+          <q-btn
+            text-color="white"
+            flat
+            label="Enable"
+            @click="block.data.enabled = true; saveBlock();"
+          />
         </q-item-section>
       </q-item>
 
@@ -59,16 +55,16 @@ export default class ActuatorPwmWidget extends BlockWidget {
           <q-item-label caption>Duty setting</q-item-label>
           <div>
             <InputField
-              :value="block.data.setting"
+              :value="block.data.desiredSetting"
               :readonly="isDriven"
               style="display: inline-block"
               type="number"
               title="Duty Setting"
               tag="big"
-              @input="v => { block.data.setting = v; saveBlock(); }"
+              @input="v => { block.data.desiredSetting = v; saveBlock(); }"
             />
             <small
-              v-if="block.data.setting !== null"
+              v-if="block.data.desiredSetting !== null"
               style="display: inline-block"
               class="q-ml-xs"
             >%</small>
@@ -84,11 +80,11 @@ export default class ActuatorPwmWidget extends BlockWidget {
         </q-item-section>
       </q-item>
 
-      <q-item v-if="pending !== null" dark>
+      <q-item v-if="constrained !== null" dark>
         <q-item-section>
-          <q-item-label caption>Unconstrained setting</q-item-label>
+          <q-item-label caption>Constrained setting</q-item-label>
           <div>
-            <big>{{ pending | round }}</big>
+            <big>{{ constrained | round }}</big>
             <small class="q-ml-xs">%</small>
           </div>
         </q-item-section>

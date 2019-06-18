@@ -58,11 +58,11 @@ export default class ActuatorOffsetForm extends BlockForm {
             <q-item-label caption>Target Offset</q-item-label>
             <InputField
               :readonly="isDriven"
-              :value="block.data.setting"
+              :value="block.data.desiredSetting"
               tag="big"
               title="Target offset"
               type="number"
-              @input="v => { block.data.setting = v; saveBlock(); }"
+              @input="v => { block.data.desiredSetting = v; saveBlock(); }"
             />
             <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>

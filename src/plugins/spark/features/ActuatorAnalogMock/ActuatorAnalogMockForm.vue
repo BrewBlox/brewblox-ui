@@ -22,11 +22,11 @@ export default class ActuatorAnalogMockForm extends BlockForm {
             <q-item-label caption>Setting</q-item-label>
             <InputField
               :readonly="isDriven"
-              :value="block.data.setting"
+              :value="block.data.desiredSetting"
               type="number"
               title="Target"
               tag="big"
-              @input="v => { block.data.setting = v; saveBlock(); }"
+              @input="v => { block.data.desiredSetting = v; saveBlock(); }"
             />
             <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>

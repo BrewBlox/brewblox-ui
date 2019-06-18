@@ -6,12 +6,12 @@ import { BlockSpec } from '../../types';
 import form from './Spark2PinsForm.vue';
 import widget from './Spark2PinsWidget.vue';
 import { typeName } from './getters';
-import { Spark2Hardware } from './types';
+import { Spark2Hardware, Spark2PinsData } from './types';
 
 const block: BlockSpec = {
   id: typeName,
   systemObject: true,
-  generate: () => ({
+  generate: (): Spark2PinsData => ({
     pins: [],
     soundAlarm: false,
     hardware: Spark2Hardware.Unknown,

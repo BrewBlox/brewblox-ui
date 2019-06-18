@@ -230,7 +230,6 @@
         "minValue": 40,
         "maxValue": 60,
         "constrainedBy": {
-          "unconstrained": 20,
           "constraints": []
         },
         "value": 0
@@ -258,8 +257,7 @@
               },
               "limiting": false
             }
-          ],
-          "unconstrained": 0
+          ]
         },
         "setting": 0,
         "value": 0,

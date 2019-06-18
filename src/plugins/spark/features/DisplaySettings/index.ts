@@ -6,12 +6,14 @@ import { BlockSpec } from '../../types';
 import form from './DisplaySettingsForm.vue';
 import widget from './DisplaySettingsWidget.vue';
 import { typeName } from './getters';
+import { DisplaySettingsData, DisplayTempUnit } from './types';
 
 const block: BlockSpec = {
   id: typeName,
   systemObject: true,
-  generate: () => ({
+  generate: (): DisplaySettingsData => ({
     name: 'Display settings',
+    tempUnit: DisplayTempUnit.Celsius,
     widgets: [],
   }),
   changes: [

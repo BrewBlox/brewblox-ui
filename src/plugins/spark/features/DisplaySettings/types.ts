@@ -13,10 +13,17 @@ export interface DisplaySlot {
   pid?: Link;
 }
 
+export enum DisplayTempUnit {
+  Celsius = 0,
+  Fahrenheit = 1,
+}
+
+export interface DisplaySettingsData {
+  name: string;
+  tempUnit: DisplayTempUnit;
+  widgets: DisplaySlot[];
+}
+
 export interface DisplaySettingsBlock extends Block {
-  data: {
-    name: string;
-    tempUnit: 0 | 1; // 0: Celsius 1: Fahrenheit
-    widgets: DisplaySlot[];
-  };
+  data: DisplaySettingsData;
 }

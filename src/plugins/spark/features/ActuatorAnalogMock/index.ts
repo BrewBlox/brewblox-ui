@@ -6,11 +6,13 @@ import { Feature } from '@/store/features';
 import form from './ActuatorAnalogMockForm.vue';
 import widget from './ActuatorAnalogMockWidget.vue';
 import { typeName } from './getters';
+import { ActuatorAnalogMockData } from './types';
 
 const block: BlockSpec = {
   id: typeName,
-  generate: () => ({
+  generate: (): ActuatorAnalogMockData => ({
     setting: 0,
+    desiredSetting: 0,
     minSetting: 0,
     maxSetting: 100,
     value: 0,

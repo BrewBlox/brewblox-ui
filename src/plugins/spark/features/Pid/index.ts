@@ -8,10 +8,11 @@ import { BlockSpec } from '../../types';
 import form from './PidForm.vue';
 import widget from './PidWidget.vue';
 import { typeName } from './getters';
+import { PidData } from './types';
 
 const block: BlockSpec = {
   id: typeName,
-  generate: () => ({
+  generate: (): PidData => ({
     inputId: new ProcessValueLink(null),
     outputId: new ActuatorAnalogLink(null),
     inputValue: new Unit(0, 'degC'),

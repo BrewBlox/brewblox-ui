@@ -35,7 +35,7 @@ export default class GridContainer extends Vue {
     const newItemsOrder = this.gridItems
       .map(item => [item, item.$el.getBoundingClientRect()] as [GridItem, DOMRect])
       .sort(([, rectA], [, rectB]) => (rectA.y - rectB.y) || (rectA.x - rectB.x))
-      .map(([item]) => item.id);
+      .map(([item]) => item['id']); // manual get, because typescript tends to think Vue.id doesn't work
     this.$emit('change-positions', id, pos, newItemsOrder);
   }
 

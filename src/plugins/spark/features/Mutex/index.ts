@@ -7,10 +7,11 @@ import { BlockSpec } from '../../types';
 import form from './MutexForm.vue';
 import widget from './MutexWidget.vue';
 import { typeName } from './getters';
+import { MutexData } from './types';
 
 const block: BlockSpec = {
   id: typeName,
-  generate: () => ({
+  generate: (): MutexData => ({
     differentActuatorWait: new Unit(0, 'second'),
   }),
   changes: [],

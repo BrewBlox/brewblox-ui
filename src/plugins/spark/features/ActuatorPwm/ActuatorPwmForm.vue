@@ -47,12 +47,12 @@ export default class ActuatorPwmForm extends BlockForm {
           <q-item-section style="justify-content: flex-start">
             <q-item-label caption>Duty setting</q-item-label>
             <InputField
-              :value="block.data.setting"
+              :value="block.data.desiredSetting"
               :readonly="isDriven"
               tag="big"
               title="Setting"
               type="number"
-              @input="v => { block.data.setting = v; saveBlock(); }"
+              @input="v => { block.data.desiredSetting = v; saveBlock(); }"
             />
             <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>

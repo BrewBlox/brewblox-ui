@@ -7,13 +7,16 @@ import { BlockSpec } from '../../types';
 import form from './ActuatorOffsetForm.vue';
 import widget from './ActuatorOffsetWidget.vue';
 import { typeName } from './getters';
+import { ActuatorOffsetData, OffsetSettingOrValue } from './types';
 
 const block: BlockSpec = {
   id: typeName,
-  generate: () => ({
+  generate: (): ActuatorOffsetData => ({
     targetId: new SetpointSensorPairLink(null),
+    drivenTargetId: new SetpointSensorPairLink(null, true),
     referenceId: new SetpointSensorPairLink(null),
-    referenceSettingOrValue: 0,
+    referenceSettingOrValue: OffsetSettingOrValue.Setting,
+    desiredSetting: 0,
     setting: 0,
     value: 0,
     constrainedBy: { constraints: [] },
