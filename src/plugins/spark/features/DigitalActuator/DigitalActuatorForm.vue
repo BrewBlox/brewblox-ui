@@ -80,6 +80,7 @@ export default class DigitalActuatorForm extends BlockForm {
               :value="block.data.hwDevice"
               :service-id="serviceId"
               title="Pin Array"
+              no-create
               @input="v => { block.data.hwDevice = v; block.data.channel = 0; saveBlock(); }"
             />
           </q-item-section>

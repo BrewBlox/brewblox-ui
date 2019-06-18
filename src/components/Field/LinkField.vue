@@ -21,6 +21,9 @@ export default class LinkField extends FieldBase {
   @Prop({ type: Function, default: null })
   readonly filter!: (block: Block) => boolean;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly noCreate!: boolean;
+
   @Emit('input')
   public change(v: Link) {
     return v;
@@ -37,15 +40,16 @@ export default class LinkField extends FieldBase {
 
     Dialog.create({
       component: 'LinkDialog',
+      root: this.$root,
+      clearable: true,
       title: this.title,
       message: this.message,
       messageHtml: this.messageHtml,
       filter: this.filter,
-      root: this.$root,
       value: this.value,
       serviceId: this.serviceId,
       label: this.label,
-      clearable: true,
+      noCreate: this.noCreate,
     })
       .onOk(this.change);
   }
