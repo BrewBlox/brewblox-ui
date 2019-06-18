@@ -118,6 +118,7 @@ export default class DisplaySettingsForm extends BlockForm {
                 :value="slotLink(slot)"
                 :filter="linkFilter"
                 :service-id="serviceId"
+                no-create
                 title="Block"
                 @input="v => updateSlotLink(idx, v)"
               />

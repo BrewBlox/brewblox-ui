@@ -82,6 +82,7 @@ export default class MotorValveForm extends BlockForm {
               :value="block.data.hwDevice"
               :service-id="serviceId"
               title="Target DS2408 Chip"
+              no-create
               @input="v => { block.data.hwDevice = v; block.data.startChannel = 0; saveBlock(); }"
             />
           </q-item-section>

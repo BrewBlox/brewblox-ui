@@ -1,5 +1,6 @@
 <script lang="ts">
 import get from 'lodash/get';
+import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
@@ -26,16 +27,22 @@ export default class LinkDialog extends DialogBase {
   @Prop({ type: Boolean, default: false })
   public readonly clearable!: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly noCreate!: boolean;
+
+  get compatibleTypes() {
+    if (this.value.type === null) {
+      return null;
+    }
+    const compatibleTable = sparkStore.compatibleTypes(this.serviceId);
+    return [this.value.type, ...get(compatibleTable, this.value.type, [])];
+  }
+
   get actualFilter() {
     if (this.filter) {
       return this.filter;
     }
-    if (this.value.type === null) {
-      return () => true;
-    }
-    const compatibleTable = sparkStore.compatibleTypes(this.serviceId);
-    const compatible = [this.value.type, ...get(compatibleTable, this.value.type, [])];
-    return block => compatible.includes(block.type);
+    return block => !this.compatibleTypes || this.compatibleTypes.includes(block.type);
   }
 
   get linkOpts(): Link[] {
@@ -47,6 +54,19 @@ export default class LinkDialog extends DialogBase {
 
   updateLink(link: Link | null) {
     this.link = link || new Link(null, this.value.type);
+  }
+
+  create() {
+    Dialog.create({
+      component: 'BlockWizardDialog',
+      root: this.$root,
+      serviceId: this.serviceId,
+      filter: feat => !this.compatibleTypes || this.compatibleTypes.includes(feat),
+    })
+      .onOk(block => {
+        // Retain original type
+        this.link = new Link(block.id, this.value.type);
+      });
   }
 
   created() {
@@ -83,6 +103,11 @@ export default class LinkDialog extends DialogBase {
             <q-item dark>
               <q-item-section class="text-grey">No results</q-item-section>
             </q-item>
+          </template>
+          <template v-slot:after v-if="!noCreate">
+            <q-btn flat round icon="add" @click="create">
+              <q-tooltip>Create new Block</q-tooltip>
+            </q-btn>
           </template>
         </q-select>
       </q-card-section>

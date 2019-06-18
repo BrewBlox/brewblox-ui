@@ -10,6 +10,9 @@ export default class BlockWizardDialog extends DialogBase {
 
   @Prop({ type: String })
   public readonly initialFeature!: string;
+
+  @Prop({ type: Function })
+  public readonly filter!: (feature: string) => boolean;
 }
 </script>
 
@@ -18,6 +21,7 @@ export default class BlockWizardDialog extends DialogBase {
     <BlockWizard
       :service-id="serviceId"
       :initial-feature="initialFeature"
+      :filter="filter"
       @close="onDialogHide"
       @created="onDialogOk"
     />

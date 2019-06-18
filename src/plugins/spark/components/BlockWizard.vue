@@ -26,6 +26,9 @@ export default class BlockWizard extends Vue {
   @Prop({ type: String })
   public readonly initialFeature!: string;
 
+  @Prop({ type: Function, default: () => () => true })
+  public readonly filter!: (feature: string) => boolean;
+
   @Emit('created')
   public onCreate(block: Block) {
     return block;
@@ -50,11 +53,12 @@ export default class BlockWizard extends Vue {
 
   get wizardOptions() {
     return providerStore.featuresById('Spark')
+      .filter(feat => featureStore.wizardById(feat) === 'BlockWidgetWizard')
+      .filter(this.filter)
       .map(id => ({
         label: featureStore.displayNameById(id),
         value: id,
       }))
-      .filter(opt => featureStore.wizardById(opt.value) === 'BlockWidgetWizard')
       .sort(objectStringSorter('label'));
   }
 
