@@ -3,20 +3,21 @@ import { Component } from 'vue-property-decorator';
 
 import BlockForm from '@/plugins/spark/components/BlockForm';
 
-import { DS2408Block, DS2408Id } from './types';
+import { DS2408Block, DS2408Id, ValveStartId } from './types';
 
 @Component
 export default class DS2408Form extends BlockForm {
-  DS2408Id = DS2408Id
+  DS2408Id = DS2408Id;
+  ValveStartId = ValveStartId;
   readonly block!: DS2408Block;
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
 
-    <IoArray v-bind="$props" :id-enum="DS2408Id"/>
+    <ValveArray v-bind="$props" :id-enum="DS2408Id" :name-enum="ValveStartId" v-on="$listeners"/>
     <q-card-section>
       <q-item dark>
         <q-item-section>

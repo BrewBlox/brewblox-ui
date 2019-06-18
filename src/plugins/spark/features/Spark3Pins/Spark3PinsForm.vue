@@ -13,9 +13,9 @@ export default class Spark3PinsForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
 
-    <IoArray v-bind="$props" :id-enum="Spark3PinId"/>
+    <IoArray v-bind="$props" :id-enum="Spark3PinId" v-on="$listeners"/>
     <q-separator dark inset/>
 
     <q-card-section>

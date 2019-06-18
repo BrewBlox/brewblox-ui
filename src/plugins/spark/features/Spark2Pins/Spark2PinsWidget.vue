@@ -16,6 +16,6 @@ export default class Spark2PinsWidget extends BlockWidget {
   <q-card dark class="text-white scroll">
     <BlockWidgetToolbar :field="me"/>
 
-    <IoArray v-bind="$props" :id-enum="Spark2PinId"/>
+    <IoArray v-bind="$props" :id-enum="Spark2PinId" v-on="$listeners"/>
   </q-card>
 </template>

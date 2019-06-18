@@ -14,9 +14,9 @@ export default class DS2413Form extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
 
-    <IoArray v-bind="$props" :id-enum="DS2413Id"/>
+    <IoArray v-bind="$props" :id-enum="DS2413Id" v-on="$listeners"/>
     <q-separator dark inset/>
 
     <q-card-section>

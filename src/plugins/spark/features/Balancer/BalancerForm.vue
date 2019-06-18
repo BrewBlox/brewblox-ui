@@ -13,7 +13,7 @@ export default class BalancerForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
     <q-card-section>
       <q-item dark>
         <q-item-section>

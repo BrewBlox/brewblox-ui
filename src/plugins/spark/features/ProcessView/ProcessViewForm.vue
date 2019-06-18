@@ -380,7 +380,7 @@ export default class ProcessViewForm extends FormBase {
 
 <template>
   <q-card dark class="maximized bg-dark">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
 
     <q-dialog v-model="menuModalOpen" no-backdrop-dismiss>
       <ProcessViewPartMenu
