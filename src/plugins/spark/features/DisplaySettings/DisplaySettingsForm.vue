@@ -60,6 +60,7 @@ export default class DisplaySettingsForm extends BlockForm {
     if (!link.id) {
       this.block.data.widgets = this.block.data.widgets
         .filter(w => w.pos !== pos);
+      this.saveBlock();
       return;
     }
 
