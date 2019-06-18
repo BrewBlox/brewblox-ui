@@ -1,4 +1,4 @@
-import { Link,Unit } from '@/helpers/units';
+import { Link, Unit } from '@/helpers/units';
 import { Block } from '@/plugins/spark/types';
 
 export interface Setpoint {
@@ -6,12 +6,14 @@ export interface Setpoint {
   temperature: Unit;
 }
 
+export interface SetpointProfileData {
+  start: number;
+  points: Setpoint[];
+  enabled: boolean;
+  targetId: Link;
+  drivenTargetId: Link;
+}
+
 export interface SetpointProfileBlock extends Block {
-  data: {
-    start: number;
-    points: Setpoint[];
-    enabled: boolean;
-    targetId: Link;
-    drivenTargetId: Link;
-  };
+  data: SetpointProfileData;
 }

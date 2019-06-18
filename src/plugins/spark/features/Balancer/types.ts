@@ -6,8 +6,10 @@ export interface BalancedActuator {
   granted: number;
 }
 
+export interface BalancerData {
+  clients: BalancedActuator[];
+}
+
 export interface BalancerBlock extends Block {
-  data: {
-    clients: BalancedActuator[];
-  };
+  data: BalancerData;
 }

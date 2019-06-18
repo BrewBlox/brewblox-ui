@@ -8,13 +8,17 @@ import { BlockSpec } from '../../types';
 import form from './ActuatorPwmForm.vue';
 import widget from './ActuatorPwmWidget.vue';
 import { typeName } from './getters';
+import { ActuatorPwmData } from './types';
 
 const block: BlockSpec = {
   id: typeName,
-  generate: () => ({
+  generate: (): ActuatorPwmData => ({
     actuatorId: new ActuatorDigitalLink(null),
+    drivenActuatorId: new ActuatorDigitalLink(null, true),
     period: new Unit(4, 'second'),
+    desiredSetting: 0,
     setting: 0,
+    value: 0,
     constrainedBy: { constraints: [] },
     enabled: true,
   }),

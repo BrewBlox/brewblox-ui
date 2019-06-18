@@ -6,10 +6,11 @@ import { BlockSpec } from '../../types';
 import form from './DS2413Form.vue';
 import widget from './DS2413Widget.vue';
 import { typeName } from './getters';
+import { DS2413Data } from './types';
 
 const block: BlockSpec = {
   id: typeName,
-  generate: () => ({
+  generate: (): DS2413Data => ({
     address: '',
     connected: false,
     pins: [],

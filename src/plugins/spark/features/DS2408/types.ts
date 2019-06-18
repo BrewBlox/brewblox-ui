@@ -16,10 +16,12 @@ export enum ValveStartId {
   A = 5,
 }
 
+export interface DS2408Data {
+  address: string;
+  connected: boolean;
+  pins: IoPin[];
+}
+
 export interface DS2408Block extends Block {
-  data: {
-    address: string;
-    connected: boolean;
-    pins: IoPin[];
-  };
+  data: DS2408Data;
 }

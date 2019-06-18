@@ -51,6 +51,7 @@ services:
 
   spock:
     image: brewblox/brewblox-devcon-spark:develop
+    privileged: true
     depends_on:
       - eventbus
       - datastore
@@ -60,6 +61,8 @@ services:
     command: >
       --name=spock
       --simulation
+#      --device-host=192.168.0.78
+#      --discovery=usb
 
   ui:
     image: brewblox/brewblox-ui:develop

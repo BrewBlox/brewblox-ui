@@ -50,7 +50,7 @@ export default class SetpointSensorPairWidget extends BlockWidget {
         </q-item-section>
         <q-item-section class="col-6" style="justify-content: flex-start">
           <q-item-label caption>Sensor value</q-item-label>
-          <UnitField :value="block.data.value" tag="big"/>
+          <UnitField :value="block.data.value" tag="big" readonly/>
         </q-item-section>
       </q-item>
     </q-card-section>

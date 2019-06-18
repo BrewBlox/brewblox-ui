@@ -13,10 +13,12 @@ export enum Spark2Hardware {
   SPark2 = 2,
 }
 
+export interface Spark2PinsData {
+  pins: IoPin[];
+  soundAlarm: boolean;
+  hardware: Spark2Hardware;
+}
+
 export interface Spark2PinsBlock extends Block {
-  data: {
-    pins: IoPin[];
-    soundAlarm: boolean;
-    hardware: Spark2Hardware;
-  };
+  data: Spark2PinsData;
 }

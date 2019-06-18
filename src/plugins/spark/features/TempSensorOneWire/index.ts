@@ -7,10 +7,11 @@ import { BlockSpec } from '../../types';
 import form from './TempSensorOneWireForm.vue';
 import widget from './TempSensorOneWireWidget.vue';
 import { typeName } from './getters';
+import { TempSensorOneWireData } from './types';
 
 const block: BlockSpec = {
   id: typeName,
-  generate: () => ({
+  generate: (): TempSensorOneWireData => ({
     value: new Unit(null, 'degC'),
     offset: new Unit(0, 'delta_degC'),
     address: '',

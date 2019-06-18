@@ -24,7 +24,6 @@ export interface DigitalConstraint {
 
 export interface ConstraintsObj {
   constraints: AnalogConstraint[] | DigitalConstraint[];
-  unconstrained: number;
 }
 
 export interface EditableConstraint {
@@ -47,7 +46,7 @@ const asData =
 @Component
 export default class ConstraintsBase extends Vue {
 
-  @Prop({ type: Object, default: () => ({ constraints: [], unconstrained: 2 }) })
+  @Prop({ type: Object, default: () => ({ constraints: [] }) })
   protected readonly value!: ConstraintsObj;
 
   @Prop({ type: String, required: true })

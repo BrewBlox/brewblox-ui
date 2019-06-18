@@ -8,14 +8,16 @@ export enum Spark3PinId {
   bottom2 = 5,
 }
 
+export interface Spark3PinsData {
+  pins: IoPin[];
+  enableIoSupply5V: boolean;
+  enableIoSupply12V: boolean;
+  enableLcdBacklight: boolean;
+  soundAlarm: boolean;
+  voltage5: number;
+  voltage12: number;
+}
+
 export interface Spark3PinsBlock extends Block {
-  data: {
-    pins: IoPin[];
-    enableIoSupply5V: boolean;
-    enableIoSupply12V: boolean;
-    enableLcdBacklight: boolean;
-    soundAlarm: boolean;
-    voltage5: number;
-    voltage12: number;
-  };
+  data: Spark3PinsData;
 }

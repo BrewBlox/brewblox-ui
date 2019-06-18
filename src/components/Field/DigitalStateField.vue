@@ -5,10 +5,13 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 import { DigitalState } from '@/plugins/spark/types';
 
 @Component
-export default class ActuatorField extends Vue {
+export default class DigitalStateField extends Vue {
 
-  @Prop({ required: true })
-  readonly value!: number;
+  @Prop({ type: Number, required: true })
+  readonly value!: DigitalState;
+
+  @Prop({ type: Number })
+  readonly actualValue!: DigitalState;
 
   @Prop({ type: Boolean, default: false })
   readonly disable!: boolean;

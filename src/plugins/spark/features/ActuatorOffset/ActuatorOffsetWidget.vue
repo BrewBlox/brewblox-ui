@@ -57,7 +57,7 @@ export default class ActuatorOffsetWidget extends BlockWidget {
       <q-item dark>
         <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Target offset</q-item-label>
-          <big>{{ block.data.setting | round }}</big>
+          <big>{{ block.data.desiredSetting | round }}</big>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
         <q-item-section style="justify-content: flex-start">

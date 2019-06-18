@@ -8,10 +8,11 @@ import { BlockSpec } from '../../types';
 import form from './SetpointSensorPairForm.vue';
 import widget from './SetpointSensorPairWidget.vue';
 import { typeName } from './getters';
+import { SetpointSensorPairData } from './types';
 
 const block: BlockSpec = {
   id: typeName,
-  generate: () => ({
+  generate: (): SetpointSensorPairData => ({
     sensorId: new TempSensorLink(null),
     storedSetting: new Unit(null, 'degC'),
     setting: new Unit(null, 'degC'),

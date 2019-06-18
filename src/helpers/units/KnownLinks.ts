@@ -1,55 +1,55 @@
 import Link from './Link';
 
 export class ProcessValueLink extends Link {
-  public constructor(id: string | null) {
-    super(id, 'ProcessValueInterface');
+  public constructor(id: string | null, driven?: boolean) {
+    super(id, 'ProcessValueInterface', driven);
   }
 }
 
 export class TempSensorLink extends Link {
-  public constructor(id: string | null) {
-    super(id, 'TempSensorInterface');
+  public constructor(id: string | null, driven?: boolean) {
+    super(id, 'TempSensorInterface', driven);
   }
 }
 
 export class SetpointSensorPairLink extends Link {
-  public constructor(id: string | null) {
-    super(id, 'SetpointSensorPairInterface');
+  public constructor(id: string | null, driven?: boolean) {
+    super(id, 'SetpointSensorPairInterface', driven);
   }
 }
 
 export class ActuatorAnalogLink extends Link {
-  public constructor(id: string | null) {
-    super(id, 'ActuatorAnalogInterface');
+  public constructor(id: string | null, driven?: boolean) {
+    super(id, 'ActuatorAnalogInterface', driven);
   }
 }
 
 export class ActuatorDigitalLink extends Link {
-  public constructor(id: string | null) {
-    super(id, 'ActuatorDigitalInterface');
+  public constructor(id: string | null, driven?: boolean) {
+    super(id, 'ActuatorDigitalInterface', driven);
   }
 }
 
 export class BalancerLink extends Link {
-  public constructor(id: string | null) {
-    super(id, 'BalancerInterface');
+  public constructor(id: string | null, driven?: boolean) {
+    super(id, 'BalancerInterface', driven);
   }
 }
 
 export class MutexLink extends Link {
-  public constructor(id: string | null) {
-    super(id, 'MutexInterface');
+  public constructor(id: string | null, driven?: boolean) {
+    super(id, 'MutexInterface', driven);
   }
 }
 
 export class DS2413Link extends Link {
-  public constructor(id: string | null) {
-    super(id, 'DS2413');
+  public constructor(id: string | null, driven?: boolean) {
+    super(id, 'DS2413', driven);
   }
 }
 
 export class IoArrayLink extends Link {
-  public constructor(id: string | null) {
-    super(id, 'IoArrayInterface');
+  public constructor(id: string | null, driven?: boolean) {
+    super(id, 'IoArrayInterface', driven);
   }
 }

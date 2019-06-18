@@ -5,10 +5,12 @@ export enum DS2413Id {
   B = 2,
 }
 
+export interface DS2413Data {
+  address: string;
+  connected: boolean;
+  pins: IoPin[];
+}
+
 export interface DS2413Block extends Block {
-  data: {
-    address: string;
-    connected: boolean;
-    pins: IoPin[];
-  };
+  data: DS2413Data;
 }

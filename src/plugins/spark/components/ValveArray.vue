@@ -118,7 +118,7 @@ export default class ValveArray extends BlockWidget {
     <q-item v-for="channel in channels" :key="channel.id" dark>
       <q-item-section>{{ channelName(channel) }}</q-item-section>
       <q-item-section>
-        <ActuatorField
+        <DigitalStateField
           v-if="channel.driver"
           :value="channel.driver.data.state"
           @input="v => saveState(channel, v)"

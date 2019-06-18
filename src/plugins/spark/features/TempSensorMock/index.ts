@@ -7,10 +7,11 @@ import { BlockSpec } from '../../types';
 import form from './TempSensorMockForm.vue';
 import widget from './TempSensorMockWidget.vue';
 import { typeName } from './getters';
+import { TempSensorMockData } from './types';
 
 const block: BlockSpec = {
   id: typeName,
-  generate: () => ({
+  generate: (): TempSensorMockData => ({
     value: new Unit(20, 'degC'),
     connected: true,
   }),

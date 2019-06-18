@@ -6,10 +6,11 @@ import { BlockSpec } from '../../types';
 import form from './BalancerForm.vue';
 import widget from './BalancerWidget.vue';
 import { typeName } from './getters';
+import { BalancerData } from './types';
 
 const block: BlockSpec = {
   id: typeName,
-  generate: () => ({
+  generate: (): BalancerData => ({
     clients: [],
   }),
   presets: [],

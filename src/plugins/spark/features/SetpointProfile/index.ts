@@ -8,10 +8,11 @@ import { BlockSpec } from '../../types';
 import form from './SetpointProfileForm.vue';
 import widget from './SetpointProfileWidget.vue';
 import { typeName } from './getters';
+import { SetpointProfileData } from './types';
 
 const block: BlockSpec = {
   id: typeName,
-  generate: () => ({
+  generate: (): SetpointProfileData => ({
     start: new Date().getTime() / 1000,
     points: [],
     enabled: false,
