@@ -191,13 +191,13 @@ export default class RelationsDialog extends DialogBase {
     };
 
     Dialog.create({
-      block,
-      widget,
       component: 'BlockFormDialog',
+      root: this.$root,
       volatile: true,
+      getBlock: () => block,
+      getWidget: () => widget,
       saveBlock: v => sparkStore.saveBlock([this.serviceId, v]),
       saveWidget: () => { },
-      root: this.$root,
     });
   }
 }

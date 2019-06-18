@@ -102,8 +102,8 @@ export default class BlockWizard extends Vue {
     this.ensureLocalBlock();
     Dialog.create({
       component: 'BlockFormDialog',
-      block: this.block,
-      widget: this.widget,
+      getBlock: () => this.block,
+      getWidget: () => this.widget,
       saveBlock: v => this.block = v,
       saveWidget: v => this.widget = v,
       volatile: true,
