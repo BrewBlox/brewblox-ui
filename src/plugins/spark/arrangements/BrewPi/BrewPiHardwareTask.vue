@@ -5,7 +5,6 @@ import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { BrewPiConfig, PinChannel } from '@/plugins/spark/arrangements/BrewPi/types';
-import { typeName as DS2408Type } from '@/plugins/spark/features/DS2408/getters';
 import { typeName as DS2413Type } from '@/plugins/spark/features/DS2413/getters';
 import { typeName as Spark2PinsType } from '@/plugins/spark/features/Spark2Pins/getters';
 import { typeName as Spark3PinsType } from '@/plugins/spark/features/Spark3Pins/getters';
@@ -25,14 +24,17 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
 
   get pinOptions() {
     return sparkStore.blockValues(this.config.serviceId)
-      .filter(block => [Spark2PinsType, Spark3PinsType, DS2408Type, DS2413Type].includes(block.type))
+      .filter(block => [Spark2PinsType, Spark3PinsType, DS2413Type].includes(block.type))
       .reduce(
         (acc, block) => [
           ...acc,
-          ...block.data.pins.map((pin, idx) => ({ arrayId: block.id, pinId: idx + 1 })),
+          ...block.data.pins.map((pin, idx) => {
+            const [pinName] = Object.keys(block.data.pins[idx]);
+            return { pinName, arrayId: block.id, pinId: idx + 1 };
+          }),
         ],
         [] as any[])
-      .map(channel => ({ label: `${channel.arrayId} Pin ${channel.pinId}`, value: channel }));
+      .map(channel => ({ label: `${channel.arrayId} ${channel.pinName}`, value: channel }));
   }
 
   get sensorOptions() {
