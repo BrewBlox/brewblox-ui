@@ -84,7 +84,7 @@ export default class IoArray extends BlockWidget {
 
   async saveState(channel: EditableChannel, state: DigitalState) {
     if (channel.driver) {
-      channel.driver.data.state = state;
+      channel.driver.data.desiredState = state;
       await sparkStore.saveBlock([this.serviceId, channel.driver]);
     }
   }
@@ -112,7 +112,7 @@ export default class IoArray extends BlockWidget {
       <q-item-section>
         <DigitalStateField
           v-if="channel.driver"
-          :value="channel.driver.data.state"
+          :value="channel.driver.data.desiredState"
           @input="v => saveState(channel, v)"
         />
         <div v-else>---</div>
