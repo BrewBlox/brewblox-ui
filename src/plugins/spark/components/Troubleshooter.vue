@@ -26,6 +26,12 @@ export default class Troubleshooter extends Vue {
       : 'Service not connected to controller';
   }
 
+  get textMatched(): string {
+    return this.lastStatus && this.lastStatus.matched
+      ? 'Service compatible with firmware'
+      : 'Service incompatible with firmware';
+  }
+
   get textSynchronized(): string {
     return this.lastStatus && this.lastStatus.synchronized
       ? 'Service synchronized'
@@ -90,6 +96,16 @@ export default class Troubleshooter extends Vue {
         <q-item dark>
           <q-item-section avatar>
             <q-icon
+              :name="iconName(lastStatus.matched)"
+              :color="iconColor(lastStatus.matched)"
+              size="24px"
+            />
+          </q-item-section>
+          <q-item-section>{{ textMatched }}</q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section avatar>
+            <q-icon
               :name="iconName(lastStatus.synchronized)"
               :color="iconColor(lastStatus.synchronized)"
               size="24px"
@@ -124,10 +140,16 @@ export default class Troubleshooter extends Vue {
               <li>USB: Can your service access USB devices? (Mac hosts)</li>
             </ul>
           </span>
+          <!-- not matched -->
+          <span v-else-if="!lastStatus.matched">
+            Your Spark service is connected to your controller, but is not compatible.
+            <br>
+            <b>Run brewblox-ctl update to update your system.</b>
+          </span>
           <!-- not synchronized -->
           <span v-else-if="!lastStatus.synchronized">
             Your Spark service is connected to your controller, but not yet synchronized.
-            <b>This usually only lasts a few seconds.</b>
+            <b>This status is usually temporary.</b>
             <ul>
               <li>Is your datastore container running?</li>
               <li>Are there any error messages in your service container logs?</li>
@@ -136,6 +158,19 @@ export default class Troubleshooter extends Vue {
           </span>
         </q-item-section>
       </q-item>
+      <template v-if="lastStatus.issues.length > 0">
+        <q-separator dark inset/>
+        <q-item dark>
+          <q-item-section>
+            <b>Service issues:</b>
+          </q-item-section>
+        </q-item>
+        <q-list dense>
+          <q-item v-for="(issue, idx) in lastStatus.issues" :key="idx" dark>
+            <q-item-section>{{ issue }}</q-item-section>
+          </q-item>
+        </q-list>
+      </template>
     </q-card-section>
   </q-card>
 </template>

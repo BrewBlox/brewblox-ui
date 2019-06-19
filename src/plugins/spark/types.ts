@@ -77,7 +77,9 @@ export interface SystemStatus {
   checkedAt: Date;
   available: boolean;
   connected: boolean;
+  matched: boolean;
   synchronized: boolean;
+  issues: string[];
   error?: any;
 }
 

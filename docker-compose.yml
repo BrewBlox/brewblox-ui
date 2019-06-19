@@ -50,6 +50,7 @@ services:
     command: >
       --name=sparkey
       --device-host=sparksimulator
+#      --skip-version-check
 
   spock:
     image: brewblox/brewblox-devcon-spark:develop
