@@ -34,11 +34,12 @@ export default class DigitalActuatorForm extends BlockForm {
       .reduce((acc, block) => ({ ...acc, [block.data.channel]: block.id }), {});
   }
 
-  driverStr(pinId: number) {
-    const driver = this.claimedChannels[pinId];
+  pinOptName(idx: number) {
+    const driver = this.claimedChannels[idx + 1];
+    const [name] = Object.keys((this.hwBlock as Block).data.pins[idx]);
     return driver && driver !== this.block.id
-      ? ` (replace '${driver}')`
-      : '';
+      ? `${name} (replace '${driver}')`
+      : name;
   }
 
   get channelOpts() {
@@ -46,7 +47,7 @@ export default class DigitalActuatorForm extends BlockForm {
     if (this.hwBlock) {
       opts.push(
         ...Object.keys(this.hwBlock.data.pins || this.hwBlock.data.channels)
-          .map((k, idx) => ({ label: `Pin ${idx + 1}${this.driverStr(idx + 1)}`, value: idx + 1 })));
+          .map((k, idx) => ({ label: this.pinOptName(idx), value: idx + 1 })));
     }
     return opts;
   }
