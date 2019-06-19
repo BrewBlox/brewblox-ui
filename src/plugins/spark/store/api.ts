@@ -124,9 +124,11 @@ export const fetchSystemStatus = async (serviceId: string): Promise<SystemStatus
     .catch((error) => ({
       error,
       available: false,
-      connected: false,
-      synchronized: false,
       checkedAt: new Date(),
+      connected: false,
+      matched: false,
+      synchronized: false,
+      issues: [],
     }));
 
 export const serviceExport = async (serviceId: string): Promise<any> =>
