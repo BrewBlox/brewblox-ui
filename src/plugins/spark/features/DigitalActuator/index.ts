@@ -1,5 +1,6 @@
 import { ref } from '@/helpers/component-ref';
-import { IoArrayLink } from '@/helpers/units/KnownLinks';
+import { Unit } from '@/helpers/units';
+import { IoArrayLink, MutexLink } from '@/helpers/units/KnownLinks';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
@@ -19,7 +20,32 @@ const block: BlockSpec = {
     invert: false,
     constrainedBy: { constraints: [] },
   }),
-  presets: [],
+  presets: [
+    {
+      name: 'Fridge cooler (compressor)',
+      generate: (): Partial<DigitalActuatorData> => ({
+        invert: false,
+        constrainedBy: {
+          constraints: [
+            { minOff: new Unit(300, 'second'), limiting: false },
+            { minOn: new Unit(180, 'second'), limiting: false },
+            { mutex: new MutexLink(null), limiting: false },
+          ],
+        },
+      }),
+    },
+    {
+      name: 'Fridge heater',
+      generate: (): Partial<DigitalActuatorData> => ({
+        invert: false,
+        constrainedBy: {
+          constraints: [
+            { mutex: new MutexLink(null), limiting: false },
+          ],
+        },
+      }),
+    },
+  ],
   changes: [
     {
       key: 'state',
