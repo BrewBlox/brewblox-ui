@@ -4,6 +4,7 @@ import { DashboardItem } from '@/store/dashboards';
 export interface PinChannel {
   arrayId: string;
   pinId: number;
+  pinName: string;
 }
 
 export interface BrewPiConfigNames {
