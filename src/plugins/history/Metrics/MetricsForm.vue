@@ -1,10 +1,10 @@
 <script lang="ts">
 import get from 'lodash/get';
 import parseDuration from 'parse-duration';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
-import FormBase from '@/components/Form/FormBase';
 import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
+import FormBase from '@/components/Widget/FormBase';
 import { durationString } from '@/helpers/functional';
 import historyStore, { DisplayNames } from '@/store/history';
 
@@ -18,7 +18,14 @@ export default class MetricsForm extends FormBase {
   durationString = durationString;
 
   get config(): MetricsConfig {
-    return this.$props.field;
+    return {
+      targets: [],
+      renames: {},
+      params: {},
+      freshDuration: {},
+      decimals: {},
+      ...this.widget.config,
+    };
   }
 
   get selected(): string[] | null {
@@ -54,10 +61,6 @@ export default class MetricsForm extends FormBase {
     historyStore.fetchKnownKeys();
   }
 
-  callAndSaveConfig(func: (v: any) => void) {
-    return (v: any) => { func(v); this.saveConfig(this.config); };
-  }
-
   resetFreshDuration(field: string) {
     this.$delete(this.config.freshDuration, field);
     this.saveConfig(this.config);
@@ -72,7 +75,7 @@ export default class MetricsForm extends FormBase {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="mdi-file-tree" label="Metrics">
@@ -103,12 +106,10 @@ export default class MetricsForm extends FormBase {
             <q-item v-for="field in selected" :key="field" dark>
               <q-item-section>{{ field }}</q-item-section>
               <q-item-section>
-                <InputPopupEdit
-                  :field="durationString(freshDuration[field] || DEFAULT_FRESH_DURATION)"
-                  :change="callAndSaveConfig(v => freshDuration[field] = parseDuration(v))"
-                  label="Fresh duration"
-                  clearable
-                  tag="span"
+                <InputField
+                  :value="durationString(freshDuration[field] || DEFAULT_FRESH_DURATION)"
+                  title="Fresh duration"
+                  @input="v => { freshDuration[field] = parseDuration(v); saveConfig(config); }"
                 />
               </q-item-section>
               <q-item-section class="col-1">
@@ -131,15 +132,13 @@ export default class MetricsForm extends FormBase {
             <q-item v-for="field in selected" :key="field" dark>
               <q-item-section>{{ field }}</q-item-section>
               <q-item-section>
-                <InputPopupEdit
-                  :field="fieldDecimals(field)"
-                  :change="callAndSaveConfig(v => decimals[field] = v)"
+                <InputField
+                  :value="fieldDecimals(field)"
                   :decimals="0"
-                  :popup-props="{validate: (v) => v >= 0}"
+                  :rules="[v => v >= 0 || 'Must be 0 or more']"
                   type="number"
-                  label="Number of decimals"
-                  clearable
-                  tag="span"
+                  title="Number of decimals"
+                  @input="v => { decimals[field] = v; saveConfig(config); }"
                 />
               </q-item-section>
               <q-item-section class="col-1">

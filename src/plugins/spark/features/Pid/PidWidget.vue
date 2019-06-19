@@ -1,29 +1,23 @@
 <script lang="ts">
 import get from 'lodash/get';
-import Component from 'vue-class-component';
+import { Dialog } from 'quasar';
+import { Component } from 'vue-property-decorator';
 
+import { showBlockDialog } from '@/helpers/dialog';
 import { Link, postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import sparkStore from '@/plugins/spark/store';
 import { BlockLink } from '@/plugins/spark/types';
 import featureStore from '@/store/features';
 
-import PidDisplay from './PidDisplay.vue';
-import { filters, getById } from './getters';
+import { filters } from './getters';
 import { PidBlock } from './types';
 
-@Component({
-  components: {
-    PidDisplay,
-  },
-})
+@Component
 export default class PidWidget extends BlockWidget {
+  readonly block!: PidBlock;
   inputFormOpen = false;
   relationsOpen = false;
-
-  get block(): PidBlock {
-    return getById(this.serviceId, this.blockId);
-  }
 
   get renamedTargets() {
     return postfixedDisplayNames(
@@ -51,6 +45,14 @@ export default class PidWidget extends BlockWidget {
     return filters.map((filter, idx) => ({ label: filter, value: idx }));
   }
 
+  get hasInputBlock() {
+    return !!this.block.data.inputId.id;
+  }
+
+  get hasOutputBlock() {
+    return !!this.block.data.outputId.id;
+  }
+
   findLinks(id: string | null): BlockLink[] {
     const block = sparkStore.blocks(this.serviceId)[id || ''];
     if (!id || !block) {
@@ -74,7 +76,7 @@ export default class PidWidget extends BlockWidget {
       .reduce((acc: BlockLink[], [, link]) => ([...acc, ...this.findLinks(link.id)]), relations);
   }
 
-  get relations(): BlockLink[] {
+  relations(): BlockLink[] {
     const chain = this.findLinks(this.blockId);
 
     // Setpoints may be driven by something else (profile, setpoint driver, etc)
@@ -92,7 +94,7 @@ export default class PidWidget extends BlockWidget {
     ];
   }
 
-  get nodes() {
+  nodes() {
     return sparkStore.blockValues(this.serviceId)
       .map(block => ({
         id: block.id,
@@ -100,32 +102,163 @@ export default class PidWidget extends BlockWidget {
       }));
   }
 
+  enable() {
+    this.block.data.enabled = true;
+    this.saveBlock();
+  }
+
+  showRelations() {
+    Dialog.create({
+      component: 'RelationsDialog',
+      serviceId: this.serviceId,
+      nodes: this.nodes(),
+      relations: this.relations(),
+      title: `${this.block.id} relations`,
+      root: this.$root,
+    });
+  }
+
+  showInput() {
+    const blockId = this.block.data.inputId.id;
+    if (blockId) {
+      showBlockDialog(sparkStore.blockById(this.serviceId, blockId), this.$root);
+    }
+  }
+
+  showOutput() {
+    const blockId = this.block.data.outputId.id;
+    if (blockId) {
+      showBlockDialog(sparkStore.blockById(this.serviceId, blockId), this.$root);
+    }
+  }
 }
 </script>
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <PidForm v-if="modalOpen" v-bind="formProps"/>
-    </q-dialog>
-    <q-dialog v-model="relationsOpen" no-backdrop-dismiss>
-      <DagreDiagram
-        v-if="relationsOpen"
-        :service-id="serviceId"
-        :nodes="nodes"
-        :relations="relations"
-      />
-    </q-dialog>
     <BlockWidgetToolbar :field="me" graph>
       <template v-slot:actions>
-        <ActionItem
-          icon="mdi-ray-start-arrow"
-          label="Show Relations"
-          @click="relationsOpen = true"
-        />
+        <ActionItem icon="mdi-ray-start-arrow" label="Show Relations" @click="showRelations"/>
       </template>
     </BlockWidgetToolbar>
 
-    <PidDisplay :value="block" @input="saveBlock"/>
+    <q-card-section>
+      <slot/>
+
+      <template v-if="!block.data.enabled">
+        <q-item dark>
+          <q-item-section avatar>
+            <q-icon name="warning"/>
+          </q-item-section>
+          <q-item-section>
+            <span>
+              PID is disabled:
+              <i>{{ block.data.outputId }}</i> will not be set.
+            </span>
+          </q-item-section>
+          <q-item-section side>
+            <q-btn text-color="white" flat label="Enable" @click="enable"/>
+          </q-item-section>
+        </q-item>
+        <q-separator dark inset class="q-mb-md"/>
+      </template>
+
+      <template v-else-if="!block.data.active">
+        <q-item dark>
+          <q-item-section avatar>
+            <q-icon name="warning"/>
+          </q-item-section>
+          <q-item-section>
+            <span>
+              PID is inactive:
+              <i>{{ block.data.outputId }}</i> will not be set.
+            </span>
+          </q-item-section>
+        </q-item>
+        <q-separator dark inset class="q-mb-md"/>
+      </template>
+
+      <q-item :clickable="hasInputBlock" dark @click="showInput">
+        <q-item-section side class="col-3">
+          <div class="text-weight-light text-subtitle2 q-mb-xs">Input</div>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>Target</q-item-label>
+          <UnitField :value="block.data.inputSetting" tag="big" readonly/>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>Measured</q-item-label>
+          <UnitField :value="block.data.inputValue" tag="big" readonly/>
+        </q-item-section>
+        <q-item-section side>
+          <q-icon :name="hasInputBlock ? 'mdi-pencil' : 'mdi-pencil-off'"/>
+        </q-item-section>
+      </q-item>
+
+      <q-separator dark inset/>
+
+      <q-item :clickable="hasOutputBlock" dark @click="showOutput">
+        <q-item-section side class="col-3">
+          <div class="text-weight-light text-subtitle2 q-mb-xs">Output</div>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>Target</q-item-label>
+          <big>{{ block.data.outputSetting | round }}</big>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>Measured</q-item-label>
+          <big>{{ block.data.outputValue | round }}</big>
+        </q-item-section>
+        <q-item-section side>
+          <q-icon :name="hasOutputBlock ? 'mdi-pencil' : 'mdi-pencil-off'"/>
+        </q-item-section>
+      </q-item>
+
+      <q-separator dark inset/>
+
+      <q-item dark>
+        <q-item-section side class="col-3">
+          <div class="text-weight-light text-subtitle2 q-my-xs">Error</div>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>Proportional</q-item-label>
+          <UnitField :value="block.data.error" tag="span" unit-tag="small" readonly/>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>Integral</q-item-label>
+          <UnitField :value="block.data.integral" tag="span" unit-tag="small" readonly/>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>Derivative</q-item-label>
+          <UnitField :value="block.data.derivative" tag="span" unit-tag="small" readonly/>
+        </q-item-section>
+      </q-item>
+
+      <q-separator dark inset/>
+
+      <q-item dark>
+        <q-item-section side class="col-3">
+          <div class="text-weight-light text-subtitle2 q-my-xs">Result</div>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>P</q-item-label>
+          <span>{{ block.data.p | round }}</span>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>I</q-item-label>
+          <span>{{ block.data.i | round }}</span>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>D</q-item-label>
+          <span>{{ block.data.d | round }}</span>
+        </q-item-section>
+      </q-item>
+    </q-card-section>
   </q-card>
 </template>
+
+<style lang="stylus" scoped>
+.q-card__section .q-separator {
+  opacity: 0.2;
+}
+</style>

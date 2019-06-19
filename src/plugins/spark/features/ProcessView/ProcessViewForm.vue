@@ -1,8 +1,8 @@
 <script lang="ts">
-import { Dialog,uid } from 'quasar';
-import Component from 'vue-class-component';
+import { Dialog, uid } from 'quasar';
+import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import FormBase from '@/components/Form/FormBase';
+import FormBase from '@/components/Widget/FormBase';
 import { Coordinates } from '@/helpers/coordinates';
 import { clampRotation, spaceCased } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/shadow-copy';
@@ -10,8 +10,8 @@ import { deepCopy } from '@/helpers/shadow-copy';
 import ProcessViewCatalog from './ProcessViewCatalog.vue';
 import ProcessViewPartMenu from './ProcessViewPartMenu.vue';
 import { SQUARE_SIZE } from './getters';
-import settings from './settings';
-import { ClickEvent, FlowPart, PartUpdater,PersistentPart, ProcessViewConfig, Rect, StatePart } from './types';
+import specs from './specs';
+import { ClickEvent, FlowPart, PartUpdater, PersistentPart, ProcessViewConfig, Rect, StatePart } from './types';
 
 interface DragAction {
   hide: boolean;
@@ -31,20 +31,6 @@ interface ToolAction {
 }
 
 @Component({
-  props: {
-    widgetGridRect: {
-      type: Object,
-      required: true,
-    },
-    parts: {
-      type: Array,
-      required: true,
-    },
-    flowParts: {
-      type: Array,
-      required: true,
-    },
-  },
   components: {
     ProcessViewCatalog,
     ProcessViewPartMenu,
@@ -58,6 +44,15 @@ export default class ProcessViewForm extends FormBase {
     grid: any;
   }
 
+  @Prop({ type: Object, required: true })
+  readonly widgetGridRect!: any;
+
+  @Prop({ type: Array, required: true })
+  readonly parts!: PersistentPart[];
+
+  @Prop({ type: Array, required: true })
+  readonly flowParts!: FlowPart[];
+
   menuModalOpen: boolean = false;
   catalogModalOpen: boolean = false;
 
@@ -65,39 +60,43 @@ export default class ProcessViewForm extends FormBase {
   configuredPartId: string | null = null;
   catalogPartial: Partial<PersistentPart> | null = null;
 
+  @Emit('parts')
+  updateParts(parts: PersistentPart[]) {
+    return parts;
+  }
+
+  @Emit('part')
+  updatePart(part: PersistentPart) {
+    return part;
+  }
+
+  @Emit('state')
+  updatePartState(part: StatePart) {
+    return part;
+  }
+
+  @Emit('remove')
+  removePart(part: PersistentPart) {
+    return part;
+  }
+
   get widgetConfig(): ProcessViewConfig {
-    return this.$props.field;
+    return this.widget.config;
   }
 
   get gridHeight() {
-    const { top, bottom } = this.$props.widgetGridRect;
+    const { top, bottom } = this.widgetGridRect;
     return bottom - top;
   }
 
   get gridWidth() {
-    const { left, right } = this.$props.widgetGridRect;
+    const { left, right } = this.widgetGridRect;
     return right - left;
   }
 
   gridRect(): Rect {
     const { x, y, left, right, top, bottom } = this.$refs.grid.getBoundingClientRect();
     return { x, y, left, right, top, bottom };
-  }
-
-  updateParts(parts: PersistentPart[]) {
-    this.$emit('parts', parts);
-  }
-
-  updatePart(part: PersistentPart) {
-    this.$emit('part', part);
-  }
-
-  updatePartState(part: StatePart) {
-    this.$emit('state', part);
-  }
-
-  removePart(part: PersistentPart) {
-    this.$emit('remove', part);
   }
 
   clearParts() {
@@ -165,7 +164,7 @@ export default class ProcessViewForm extends FormBase {
         value: 'interact',
         icon: 'mdi-cursor-default',
         shortcut: 'i',
-        cursor: part => !!part && !!settings[part.type].interactHandler,
+        cursor: part => !!part && !!specs[part.type].interactHandler,
         onClick: this.interactClickHandler,
       },
       {
@@ -197,7 +196,7 @@ export default class ProcessViewForm extends FormBase {
   }
 
   get configuredPart(): FlowPart | null {
-    return this.$props.flowParts.find(p => p.id === this.configuredPartId) || null;
+    return this.flowParts.find(p => p.id === this.configuredPartId) || null;
   }
 
   clickHandler(evt: ClickEvent, part: FlowPart) {
@@ -295,7 +294,7 @@ export default class ProcessViewForm extends FormBase {
 
   interactClickHandler(evt: ClickEvent, part: FlowPart) {
     if (part) {
-      const handler = settings[part.type].interactHandler;
+      const handler = specs[part.type].interactHandler;
       handler && handler(part, this.updater);
     }
   }
@@ -314,7 +313,7 @@ export default class ProcessViewForm extends FormBase {
   }
 
   blockedByPart(part: PersistentPart) {
-    return settings[part.type].blockedCoordinates(part);
+    return specs[part.type].blockedCoordinates(part);
   }
 
   async movePart(from: PersistentPart | null, to: PersistentPart) {
@@ -327,7 +326,7 @@ export default class ProcessViewForm extends FormBase {
 
     const toCoords: Coordinates[] = this.blockedByPart(to);
     const allBlockedCoords: Coordinates[] =
-      this.$props.parts
+      this.parts
         .filter(part => !from || part.id !== from.id)
         .reduce(
           (acc: Coordinates[], part: PersistentPart) => [...acc, ...this.blockedByPart(part)], []);
@@ -344,7 +343,7 @@ export default class ProcessViewForm extends FormBase {
         }
     }
 
-    await this.updateParts([...this.$props.parts.filter(p => !from || p.id !== from.id), to]);
+    await this.updateParts([...this.parts.filter(p => !from || p.id !== from.id), to]);
   }
 
   tryAddPart(part: PersistentPart) {
@@ -381,12 +380,12 @@ export default class ProcessViewForm extends FormBase {
 
 <template>
   <q-card dark class="maximized bg-dark">
-    <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
 
     <q-dialog v-model="menuModalOpen" no-backdrop-dismiss>
       <ProcessViewPartMenu
         v-if="menuModalOpen"
-        :value="configuredPart"
+        :part="configuredPart"
         @input="updatePart"
         @remove="removePart"
         @close="menuModalOpen = false"
@@ -429,7 +428,7 @@ export default class ProcessViewForm extends FormBase {
 
         <q-separator dark inset/>
 
-        <ExportAction :widget-id="widgetId" no-close/>
+        <ExportAction :widget-id="widget.id" no-close/>
         <ActionItem icon="delete" label="Delete all parts" no-close @click="clearParts"/>
       </q-list>
 
@@ -447,15 +446,10 @@ export default class ProcessViewForm extends FormBase {
               @click.stop="v => clickHandler(v, part)"
             >
               <text fill="white" x="0" y="8" class="grid-item-coordinates">{{ part.x }},{{ part.y }}</text>
-              <ProcessViewItem
-                :value="part"
-                show-hover
-                @input="updatePart"
-                @state="updatePartState"
-              />
+              <ProcessViewItem :part="part" show-hover @input="updatePart" @state="updatePartState"/>
             </g>
             <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
-              <ProcessViewItem :value="dragAction.part"/>
+              <ProcessViewItem :part="dragAction.part"/>
             </g>
           </svg>
         </div>

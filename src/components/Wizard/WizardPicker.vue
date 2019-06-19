@@ -1,35 +1,29 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Emit, Prop } from 'vue-property-decorator';
 
-@Component({
-  props: {
-    dashboardId: {
-      type: String,
-      required: false,
-    },
-    initialComponent: {
-      type: String,
-      default: null,
-    },
-  },
-})
+@Component
 export default class WizardPicker extends Vue {
   title: string | null = null;
   wizardComponent: string | null = null;
+
+  @Prop({ type: String, required: false })
+  readonly dashboardId!: string;
+
+  @Prop({ type: String, required: false })
+  readonly initialComponent!: string;
+
+  @Emit()
+  close() { }
 
   reset() {
     this.wizardComponent = null;
     this.title = 'Wizardry';
   }
 
-  close() {
-    this.$emit('close');
-  }
-
   mounted() {
     this.reset();
-    this.wizardComponent = this.$props.initialComponent;
+    this.wizardComponent = this.initialComponent;
   }
 }
 </script>

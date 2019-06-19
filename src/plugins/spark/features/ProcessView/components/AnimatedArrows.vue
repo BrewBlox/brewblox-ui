@@ -2,43 +2,38 @@
 /* eslint-disable vue/attribute-hyphenation */
 import { svgPathProperties } from 'svg-path-properties';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
-@Component({
-  props: {
-    path: {
-      type: String,
-      required: true,
-    },
-    speed: {
-      type: Number,
-      default: 0,
-    },
-    numArrows: {
-      type: Number,
-      default: 2,
-    },
-  },
-})
+@Component
 export default class AnimatedArrows extends Vue {
+
+  @Prop({ type: String, required: true })
+  readonly path!: string;
+
+  @Prop({ type: Number, default: 0 })
+  readonly speed!: number;
+
+  @Prop({ type: Number, default: 2 })
+  readonly numArrows!: number;
+
   get pathLength() {
-    return svgPathProperties(this.$props.path).getTotalLength();
+    return svgPathProperties(this.path).getTotalLength();
   }
 
   get duration() {
-    if (this.$props.speed && this.pathLength) {
-      return this.pathLength / (25 * Math.abs(this.$props.speed));
+    if (this.speed && this.pathLength) {
+      return this.pathLength / (25 * Math.abs(this.speed));
     }
     return 0;
   }
 
   get reversed() {
-    return this.$props.speed < 0;
+    return this.speed < 0;
   }
 
   get starts(): string[] {
-    const interval = this.duration / this.$props.numArrows;
-    return [...Array(this.$props.numArrows).keys()]
+    const interval = this.duration / this.numArrows;
+    return [...Array(this.numArrows).keys()]
       .map(idx => `${idx * interval}s`);
   }
 
@@ -64,7 +59,7 @@ export default class AnimatedArrows extends Vue {
       <path :transform="transform" d="M-4,-4 L0,0 M-4,4 L0,0" class="outline"/>
       <!-- Note: SVG attributes are case-sensitive -->
       <animateMotion
-        :path="$props.path"
+        :path="path"
         :begin="start"
         :keyPoints="keyPoints"
         :dur="`${duration}s`"

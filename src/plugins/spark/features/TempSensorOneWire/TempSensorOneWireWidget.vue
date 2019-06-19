@@ -1,17 +1,14 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import { postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { getById } from './getters';
 import { TempSensorOneWireBlock } from './types';
 
 @Component
 export default class TempSensorOneWireWidget extends BlockWidget {
-  get block(): TempSensorOneWireBlock {
-    return getById(this.serviceId, this.blockId);
-  }
+  readonly block!: TempSensorOneWireBlock;
 
   get renamedTargets() {
     return postfixedDisplayNames(
@@ -26,10 +23,6 @@ export default class TempSensorOneWireWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <TempSensorOneWireForm v-if="modalOpen" v-bind="formProps"/>
-    </q-dialog>
-
     <BlockWidgetToolbar :field="me" graph/>
 
     <q-card-section>
@@ -42,7 +35,7 @@ export default class TempSensorOneWireWidget extends BlockWidget {
       <q-item v-else dark>
         <q-item-section>
           <q-item-label caption>Value</q-item-label>
-          <UnitField :field="block.data.value"/>
+          <UnitField :value="block.data.value" readonly tag="big"/>
         </q-item-section>
       </q-item>
     </q-card-section>

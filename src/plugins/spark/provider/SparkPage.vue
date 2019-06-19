@@ -1,12 +1,11 @@
 <script lang="ts">
-import { Dialog, uid } from 'quasar';
+import { Dialog } from 'quasar';
 import { clearTimeout, setInterval } from 'timers';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { capitalized, objectStringSorter } from '@/helpers/functional';
-import { deepCopy } from '@/helpers/shadow-copy';
 import sparkStore from '@/plugins/spark/store';
 import { Block, Spark, SystemStatus } from '@/plugins/spark/types';
 import dashboardStore from '@/store/dashboards';
@@ -14,7 +13,7 @@ import { Dashboard, DashboardItem } from '@/store/dashboards';
 import featureStore, { FeatureRole } from '@/store/features';
 import serviceStore from '@/store/services';
 
-import { isReady, isSystemBlock, widgetSize } from './getters';
+import { isReady, isSystemBlock } from './getters';
 
 interface ModalSettings {
   component: string;
@@ -27,31 +26,22 @@ interface ValidatedItem {
   item: DashboardItem;
   typeName: string;
   role: FeatureRole;
-  props?: any;
   expanded: boolean;
 }
 
-@Component({
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-})
+@Component
 export default class SparkPage extends Vue {
   capitalized = capitalized;
+
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
 
   volatileItems: { [blockId: string]: DashboardItem } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
   blockFilter: string = '';
 
-  modalOpen: boolean = false;
-  modalSettings: ModalSettings | null = null;
-  relationsModalOpen: boolean = false;
-
   get service(): Spark {
-    return serviceStore.serviceById(this.$props.serviceId) as Spark;
+    return serviceStore.serviceById(this.serviceId) as Spark;
   }
 
   get dashboards(): Dashboard[] {
@@ -75,22 +65,6 @@ export default class SparkPage extends Vue {
 
   get statusNok() {
     return this.isAvailable && this.status && !this.status.synchronized;
-  }
-
-  get nodes() {
-    return this.validatedItems.map(v => ({ id: v.item.id, type: v.typeName }));
-  }
-
-  get relations() {
-    return sparkStore.blockLinks(this.service.id);
-  }
-
-  get sparkWidgetProps() {
-    return {
-      id: this.service.id,
-      serviceId: this.service.id,
-      ...widgetSize,
-    };
   }
 
   get roleOrder(): Record<FeatureRole, number> {
@@ -118,17 +92,11 @@ export default class SparkPage extends Vue {
   get allSorters(): { [id: string]: (a: ValidatedItem, b: ValidatedItem) => number } {
     return {
       unsorted: () => 0,
-      name: (a, b) => objectStringSorter('title')(a.props, b.props),
+      name: (a, b) => objectStringSorter('title')(a.item, b.item),
       type: (a: ValidatedItem, b: ValidatedItem): number => {
         const left = featureStore.displayNameById(a.item.feature).toLowerCase();
         const right = featureStore.displayNameById(b.item.feature).toLowerCase();
-        if (left < right) {
-          return -1;
-        }
-        if (right > left) {
-          return 1;
-        }
-        return 0;
+        return left.localeCompare(right);
       },
       role: (a: ValidatedItem, b: ValidatedItem): number =>
         this.roleOrder[a.role] - this.roleOrder[b.role],
@@ -191,22 +159,6 @@ export default class SparkPage extends Vue {
     return `${this.service.id}/${blockId}`;
   }
 
-  itemProps(item: DashboardItem): any {
-    return {
-      id: item.id,
-      title: item.title,
-      type: item.feature,
-      pos: item.pinnedPosition,
-      cols: item.cols,
-      rows: item.rows,
-      config: item.config,
-      onChangeConfig: this.onWidgetChange,
-      onDelete: this.onDeleteItem,
-      onCopy: this.onCopyItem,
-      volatile: true,
-    };
-  }
-
   validateBlock(block: Block): ValidatedItem {
     const key = this.volatileKey(block.id);
     const existing = this.volatileItems[key];
@@ -234,7 +186,6 @@ export default class SparkPage extends Vue {
       typeName: featureStore.displayNameById(item.feature),
       role: featureStore.roleById(item.feature),
       component: featureStore.widgetById(item.feature, item.config) || 'InvalidWidget',
-      props: this.itemProps(item),
       expanded: this.expandedBlocks[item.id] || false,
     };
   }
@@ -286,70 +237,8 @@ export default class SparkPage extends Vue {
     }
   }
 
-  onChangeBlockId(currentId: string, newId: string) {
-    sparkStore.renameBlock([this.service.id, currentId, newId]);
-  }
-
-  onDeleteItem(itemId: string) {
-    const item = this.volatileItems[this.volatileKey(itemId)];
-    // Quasar dialog can't handle objects as value - they will be returned as null
-    // As workaround, we use array index as value, and add the "action" key to each option
-    const opts = featureStore.deletersById(item.feature)
-      .map((del, idx) => ({ label: del.description, value: idx, action: del.action }));
-
-    if (opts.length === 0) {
-      this.$q.notify({
-        color: 'negative',
-        message: "This block can't be deleted",
-      });
-      return;
-    }
-
-    Dialog.create({
-      title: 'Delete block',
-      message: `How do you want to delete ${item.id}?`,
-      dark: true,
-      options: {
-        type: 'checkbox',
-        model: opts.map(opt => opt.value),
-        items: opts,
-      },
-      cancel: true,
-    })
-      .onOk((selected: number[]) =>
-        selected.forEach(idx => opts[idx].action(item.config)));
-  }
-
-  onCopyItem(itemId: string) {
-    const item = this.volatileItems[this.volatileKey(itemId)];
-    const id = uid();
-    Dialog.create({
-      title: 'Create widget',
-      message: `On which dashboard do you want to create a widget for ${item.id}?`,
-      dark: true,
-      options: {
-        type: 'radio',
-        model: null,
-        items: this.dashboards
-          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
-      },
-      cancel: true,
-    })
-      .onOk((dashboard: string) => {
-        if (!dashboard) {
-          return;
-        }
-        dashboardStore.appendDashboardItem({ ...deepCopy(item), id, dashboard });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'file_copy',
-          message: `Copied ${item.title} to ${dashboardStore.dashboardById(dashboard).title}`,
-        });
-      });
-  }
-
-  onWidgetChange(id: string, config: any) {
-    this.volatileItems[this.volatileKey(id)].config = { ...config };
+  saveWidget(widget: DashboardItem) {
+    this.volatileItems[this.volatileKey(widget.id)] = { ...widget };
     this.$q.notify({
       color: 'warning',
       message: 'Changes will not be persisted',
@@ -357,13 +246,26 @@ export default class SparkPage extends Vue {
   }
 
   startDialog(component: string, props: any = null) {
-    this.modalSettings = {
-      component,
-      props: props || {
-        serviceId: this.service.id,
-      },
+    const args = props || {
+      serviceId: this.service.id,
     };
-    this.modalOpen = true;
+    Dialog.create({
+      component,
+      root: this.$root,
+      ...args,
+    });
+  }
+
+  showRelations() {
+    const nodes = this.validatedItems.map(v => ({ id: v.item.id, type: v.typeName }));
+    const relations = sparkStore.blockLinks(this.service.id);
+
+    Dialog.create({
+      component: 'RelationsDialog',
+      serviceId: this.service.id,
+      nodes,
+      relations,
+    });
   }
 
   async discoverBlocks() {
@@ -419,12 +321,8 @@ export default class SparkPage extends Vue {
     <portal to="toolbar-buttons">
       <q-btn-dropdown :disable="!isReady || statusNok" color="primary" label="actions">
         <q-list dark link>
-          <ActionItem
-            icon="mdi-ray-start-arrow"
-            label="Show Relations"
-            @click="relationsModalOpen = true"
-          />
-          <ActionItem icon="add" label="New Block" @click="startDialog('BlockWizard')"/>
+          <ActionItem icon="mdi-ray-start-arrow" label="Show Relations" @click="showRelations"/>
+          <ActionItem icon="add" label="New Block" @click="startDialog('BlockWizardDialog')"/>
           <ActionItem
             icon="mdi-magnify-plus-outline"
             label="Discover new OneWire Blocks"
@@ -451,36 +349,11 @@ export default class SparkPage extends Vue {
       </q-btn-dropdown>
     </portal>
 
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <component
-        v-if="modalOpen"
-        :is="modalSettings.component"
-        v-bind="modalSettings.props"
-        @close="modalOpen = false"
-      />
-    </q-dialog>
-    <q-dialog v-model="relationsModalOpen" no-backdrop-dismiss maximized>
-      <DagreDiagram
-        v-if="relationsModalOpen"
-        :service-id="service.id"
-        :nodes="nodes"
-        :relations="relations"
-      />
-    </q-dialog>
-
     <!-- Shown if service was found in store, but not ok -->
     <q-list v-if="statusNok" dark no-border>
       <q-item dark>
         <q-item-section>
-          <Troubleshooter
-            :id="service.id"
-            :config="{serviceId: service.id}"
-            :cols="4"
-            :rows="4"
-            title="Troubleshooter"
-            type="Troubleshooter"
-            class="bg-dark"
-          />
+          <Troubleshooter :service-id="service.id" class="bg-dark"/>
         </q-item-section>
       </q-item>
     </q-list>
@@ -533,7 +406,7 @@ export default class SparkPage extends Vue {
             <q-icon name="mdi-cloud"/>
             <q-tooltip>Service</q-tooltip>
           </q-item-section>
-          <q-item-section>{{ $props.serviceId }}</q-item-section>
+          <q-item-section>{{ serviceId }}</q-item-section>
           <q-item-section side>Spark Service</q-item-section>
         </q-item>
         <!-- Blocks -->
@@ -543,13 +416,13 @@ export default class SparkPage extends Vue {
           :class="['non-selectable', val.expanded ? 'text-primary' : 'text-white']"
           clickable
           dark
-          @click.native="updateExpandedBlock(val.props.id, !val.expanded)"
+          @click.native="updateExpandedBlock(val.item.id, !val.expanded)"
         >
           <q-item-section avatar>
             <q-icon :name="roleIcons[val.role]"/>
             <q-tooltip>{{ val.role }}</q-tooltip>
           </q-item-section>
-          <q-item-section>{{ val.props.title }}</q-item-section>
+          <q-item-section>{{ val.item.title }}</q-item-section>
           <q-item-section side>{{ val.typeName }}</q-item-section>
         </q-item>
       </q-list>
@@ -559,13 +432,19 @@ export default class SparkPage extends Vue {
         <!-- Service -->
         <q-item v-if="serviceShown && serviceExpanded" dark>
           <q-item-section>
-            <SparkWidget v-if="isReady" v-bind="sparkWidgetProps" class="bg-dark"/>
+            <SparkWidget v-if="isReady" :service-id="service.id" class="bg-dark"/>
           </q-item-section>
         </q-item>
         <!-- Blocks -->
         <q-item v-for="val in expandedItems" :key="val.key" dark>
           <q-item-section>
-            <component :is="val.component" v-bind="val.props" class="bg-dark"/>
+            <component
+              :is="val.component"
+              :widget="val.item"
+              volatile
+              class="bg-dark"
+              @update:widget="saveWidget"
+            />
           </q-item-section>
         </q-item>
       </q-list>

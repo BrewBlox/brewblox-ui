@@ -1,23 +1,19 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { QuasarNode, expandedNodes, nodeBuilder } from '@/components/Graph/functional';
 import historyStore from '@/store/history';
 
 
-@Component({
-  props: {
-    selected: {
-      type: Array,
-      required: true,
-    },
-  },
-})
+@Component
 export default class MetricSelector extends Vue {
   selectFilter: string | null = null;
   expandedKeys: string[] = [];
+
+  @Prop({ type: Array, required: true })
+  readonly selected!: string[];
 
   get fields(): Record<string, string[]> {
     return historyStore.fields;
@@ -28,7 +24,7 @@ export default class MetricSelector extends Vue {
   }
 
   get ticked(): string[] {
-    return this.$props.selected;
+    return this.selected;
   }
 
   set ticked(vals: string[]) {

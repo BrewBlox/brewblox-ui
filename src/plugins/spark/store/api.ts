@@ -1,10 +1,9 @@
 import { Notify } from 'quasar';
-import queryString from 'query-string';
 
 import { del, get, post, put, sse } from '@/helpers/fetch';
 import { deserialize } from '@/helpers/units/parseObject';
 
-import { Block, DataBlock, SystemStatus,UnitAlternatives, UserUnits } from '../types';
+import { Block, DataBlock, SystemStatus, UnitAlternatives, UserUnits } from '../types';
 
 
 const asDataBlock = (block: Block): DataBlock =>
@@ -85,9 +84,9 @@ export const fetchUnitAlternatives = async (serviceId: string): Promise<UnitAlte
   get(`/${encodeURIComponent(serviceId)}/codec/unit_alternatives`)
     .catch(intercept(`Failed to fetch unit alternatives on ${serviceId}`));
 
-export const fetchCompatibleBlocks = async (serviceId: string, type: string, ): Promise<string[]> =>
-  get(`/${encodeURIComponent(serviceId)}/compatible_objects?${queryString.stringify({ interface: type })}`)
-    .catch(intercept(`Failed to fetch blocks compatible to ${type}`));
+export const fetchCompatibleTypes = async (serviceId: string): Promise<Record<string, string[]>> =>
+  get(`/${encodeURIComponent(serviceId)}/codec/compatible_types`)
+    .catch(intercept(`Failed to fetch compatible types on ${serviceId}`));
 
 export const fetchDiscoveredBlocks = async (serviceId: string): Promise<string[]> =>
   get(`/${encodeURIComponent(serviceId)}/discover_objects`)
@@ -125,9 +124,11 @@ export const fetchSystemStatus = async (serviceId: string): Promise<SystemStatus
     .catch((error) => ({
       error,
       available: false,
-      connected: false,
-      synchronized: false,
       checkedAt: new Date(),
+      connected: false,
+      matched: false,
+      synchronized: false,
+      issues: [],
     }));
 
 export const serviceExport = async (serviceId: string): Promise<any> =>

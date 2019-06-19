@@ -1,20 +1,17 @@
 <script lang="ts">
 import { Layout, PlotData } from 'plotly.js';
-import Component from 'vue-class-component';
-import { Watch } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { getById } from './getters';
 import { SetpointProfileBlock } from './types';
 
 @Component
 export default class SetpointProfileWidget extends BlockWidget {
+  readonly block!: SetpointProfileBlock;
+  revision: number = 0;
+  modalOpen: boolean = false;
   now: Date = new Date();
-
-  get block(): SetpointProfileBlock {
-    return getById(this.serviceId, this.blockId);
-  }
 
   get startTime(): number {
     return this.block.data.start * 1000;
@@ -48,14 +45,15 @@ export default class SetpointProfileWidget extends BlockWidget {
     };
   }
 
-  @Watch('block')
-  refresh() {
-    this.now = new Date();
+  // Overrides BlockWidget
+  openModal() {
+    this.modalOpen = true;
   }
 
-  enable() {
-    this.block.data.enabled = true;
-    this.saveBlock();
+  mounted() {
+    this.$watch('block', () => this.now = new Date());
+    this.$watch('widget.cols', () => this.revision++);
+    this.$watch('widget.rows', () => this.revision++);
   }
 }
 </script>
@@ -67,15 +65,18 @@ export default class SetpointProfileWidget extends BlockWidget {
         v-if="modalOpen"
         :min-width="1500"
         class="q-mr-md"
-        style="width: 600px"
+        style="width: 600px;"
       >
         <q-card dark class="q-pa-xs bg-dark-bright">
-          <div>
-            <GraphDisplay :data="plotlyData" :layout="plotlyLayout"/>
-          </div>
+          <Graph :data="plotlyData" :layout="plotlyLayout"/>
         </q-card>
       </ScreenSizeConstrained>
-      <SetpointProfileForm v-if="modalOpen" v-bind="formProps"/>
+      <SetpointProfileForm
+        v-if="modalOpen"
+        v-bind="$props"
+        :block="block"
+        @update:block="saveBlock"
+      />
     </q-dialog>
 
     <BlockWidgetToolbar :field="me"/>
@@ -91,12 +92,17 @@ export default class SetpointProfileWidget extends BlockWidget {
           </span>
         </q-item-section>
         <q-item-section side>
-          <q-btn text-color="white" flat label="Enable" @click="enable"/>
+          <q-btn
+            text-color="white"
+            flat
+            label="Enable"
+            @click="block.data.enabled = true; saveBlock()"
+          />
         </q-item-section>
       </q-item>
     </div>
     <div class="col">
-      <GraphDisplay v-if="!modalOpen" :data="plotlyData" :layout="plotlyLayout"/>
+      <Graph :data="plotlyData" :layout="plotlyLayout" :revision="revision"/>
     </div>
   </q-card>
 </template>

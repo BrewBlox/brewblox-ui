@@ -56,5 +56,7 @@ export const fromShadow = (
     );
 
 export function deepCopy<T>(obj: T): T {
-  return deserialize(JSON.parse(JSON.stringify(serialize(obj))));
+  return obj
+    ? deserialize(JSON.parse(JSON.stringify(serialize(obj))))
+    : obj;
 }

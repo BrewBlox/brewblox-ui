@@ -1,16 +1,14 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { getById } from './getters';
 import { ActuatorOffsetBlock } from './types';
 
 @Component
 export default class ActuatorOffsetWidget extends BlockWidget {
-  get block(): ActuatorOffsetBlock {
-    return getById(this.serviceId, this.blockId);
-  }
+  readonly block!: ActuatorOffsetBlock;
+
   get warnings() {
     const warn: string[] = [];
     if (!this.block.data.targetId === null) {
@@ -38,10 +36,6 @@ export default class ActuatorOffsetWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <ActuatorOffsetForm v-if="modalOpen" v-bind="formProps"/>
-    </q-dialog>
-
     <BlockWidgetToolbar :field="me" graph/>
 
     <q-card-section>
@@ -63,7 +57,7 @@ export default class ActuatorOffsetWidget extends BlockWidget {
       <q-item dark>
         <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Target offset</q-item-label>
-          <big>{{ block.data.setting | round }}</big>
+          <big>{{ block.data.desiredSetting | round }}</big>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
         <q-item-section style="justify-content: flex-start">
@@ -73,12 +67,7 @@ export default class ActuatorOffsetWidget extends BlockWidget {
       </q-item>
       <q-item dark>
         <q-item-section>
-          <AnalogConstraints
-            :service-id="serviceId"
-            :field="block.data.constrainedBy"
-            :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
-            readonly
-          />
+          <AnalogConstraints :value="block.data.constrainedBy" :service-id="serviceId" readonly/>
         </q-item-section>
       </q-item>
     </q-card-section>

@@ -19,6 +19,8 @@ import { Service } from '@/store/services';
 
 import arrangements from './arrangements';
 import features from './features';
+import { typeName } from './getters';
+import { BlockSpec } from './types';
 
 autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
 autoRegister(require.context('./provider', true, /[A-Z]\w+\.vue$/));
@@ -59,13 +61,19 @@ export default () => {
   Vue.filter('shortDateString', shortDateString);
 
   Object.values(features)
-    .forEach(feature => featureStore.createFeature(feature));
+    .forEach(feature => featureStore.createFeature(feature.feature));
 
   Object.values(arrangements)
     .forEach(arr => featureStore.createArrangement(arr));
 
+  const specs = Object.values(features)
+    .filter(spec => !!spec.block)
+    .map(spec => spec.block) as BlockSpec[];
+
+  sparkStore.commitAllSpecs(specs);
+
   providerStore.createProvider({
-    id: 'Spark',
+    id: typeName,
     displayName: 'Spark Controller',
     features: Object.keys(features),
     onAdd: onAdd,

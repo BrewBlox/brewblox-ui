@@ -1,50 +1,40 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockForm from '@/plugins/spark/components/BlockForm';
 
-import { DS2413Block } from './types';
+import { DS2413Block, DS2413Id } from './types';
 
 @Component
 export default class DS2413Form extends BlockForm {
-  get block(): DS2413Block {
-    return this.blockField as DS2413Block;
-  }
-
-  defaultData() {
-    return {
-      address: '',
-      state: 2,
-    };
-  }
-
-  presets() {
-    return [];
-  }
-
-  created() {
-    this.block; // ensure getter is evaluated
-  }
+  DS2413Id = DS2413Id;
+  readonly block!: DS2413Block;
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+
+    <IoArray v-bind="$props" :id-enum="DS2413Id" v-on="$listeners"/>
+    <q-separator dark inset/>
+
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Note</q-item-label>
-          <span>
-            This block is the DS2413 chip with 2 channels.
-            Please create a DS2413 Actuator block for each of the channels you want to use.
-          </span>
+          <q-item-label caption>Address</q-item-label>
+          <InputField
+            :value="block.data.address"
+            title="Address"
+            tag="big"
+            @input="v => { block.data.address = v; saveBlock(); }"
+          />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>Connected</q-item-label>
+          {{ block.data.connected ? 'Yes' : 'No' }}
         </q-item-section>
       </q-item>
-
-      <q-expansion-item default-opened group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
-      </q-expansion-item>
     </q-card-section>
   </q-card>
 </template>

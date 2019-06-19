@@ -1,5 +1,5 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import WatcherBase from '@/components/Watcher/WatcherBase';
 import sparkStore from '@/plugins/spark/store';

@@ -1,44 +1,32 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
-import { Unit } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
+
+import { MutexBlock } from './types';
 
 @Component
 export default class MutexForm extends BlockForm {
-  defaultData() {
-    return {
-      differentActuatorWait: new Unit(0, 'second'),
-    };
-  }
-
-  presets() {
-    return [];
-  }
+  readonly block!: MutexBlock;
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Idle time before allowing a different actuator</q-item-label>
-            <TimeUnitPopupEdit
-              :field="block.data.differentActuatorWait"
-              :change="callAndSaveBlock(v => block.data.differentActuatorWait = v)"
-              type="number"
-              label="Minimum idle time"
+            <TimeUnitField
+              :value="block.data.differentActuatorWait"
+              title="Minimum idle time"
+              @input="v => { block.data.differentActuatorWait = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
       </q-expansion-item>
     </q-card-section>
   </q-card>

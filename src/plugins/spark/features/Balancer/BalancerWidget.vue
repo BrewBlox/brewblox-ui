@@ -1,16 +1,14 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { getById, getClients } from './getters';
+import { getClients } from './getters';
 import { BalancerBlock } from './types';
 
 @Component
 export default class BalancerWidget extends BlockWidget {
-  get block(): BalancerBlock {
-    return getById(this.serviceId, this.blockId);
-  }
+  readonly block!: BalancerBlock;
 
   get clientNames() {
     return getClients(this.serviceId, this.blockId);
@@ -36,10 +34,6 @@ export default class BalancerWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <BalancerForm v-if="modalOpen" v-bind="formProps"/>
-    </q-dialog>
-
     <BlockWidgetToolbar :field="me" graph/>
 
     <q-card-section>

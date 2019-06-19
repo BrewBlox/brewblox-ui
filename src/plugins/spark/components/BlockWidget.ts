@@ -1,83 +1,50 @@
-import Component from 'vue-class-component';
+import { Dialog } from 'quasar';
+import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { GraphConfig } from '@/components/Graph/types';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import sparkStore from '@/plugins/spark/store';
-import { GraphValueAxes,QueryParams } from '@/store/history';
+import { GraphValueAxes, QueryParams } from '@/store/history';
 
 import { Block } from '../types';
 
 @Component
 export default class BlockWidget extends WidgetBase {
-  protected modalOpen: boolean = false;
+  public me!: BlockWidget;
 
-  protected get me(): BlockWidget {
-    return this;
+  public get serviceId(): string {
+    return this.widget.config.serviceId;
   }
 
-  protected get formProps(): any {
-    return {
-      ...this.$props,
-      field: this.block,
-      onChangeField: this.saveBlock,
-      onChangeBlockId: this.changeBlockId,
-      onSwitchBlockId: this.switchBlockId,
-      // Block widgets can't independently change title - it is set to block ID
-      onChangeTitle: null,
-    };
+  public get blockId(): string {
+    return this.widget.config.blockId;
   }
 
-  protected get serviceId(): string {
-    return this.$props.config.serviceId;
-  }
-
-  protected get blockId(): string {
-    return this.$props.config.blockId;
-  }
-
-  protected get block(): Block {
+  public get block(): Block {
     return sparkStore.blockById(this.serviceId, this.blockId);
   }
 
-  protected get isDriven(): boolean {
+  public get isDriven(): boolean {
     return sparkStore.drivenChains(this.serviceId)
       .some((chain: string[]) => chain[0] === this.blockId);
   }
 
-  protected colMinBlocks(minBlocksForRow: number, colsTrue: number, colsFalse: number): string {
-    const cols = this.$props.cols >= minBlocksForRow ? colsTrue : colsFalse;
-    return `col-${cols.toString()}`;
-  }
-
-  protected gridStyle(items: number): { [key: string]: string } {
-    if (items < 4) {
-      return {};
-    }
-    return {
-      display: 'grid',
-      gridTemplateRows: `repeat(${this.$props.cols >= 4 ? Math.ceil(items / 2) : items}, 1fr)`,
-      gridTemplateColumns: `repeat(${this.$props.cols >= 4 ? 2 : 1}, 1fr)`,
-      gridAutoFlow: 'column',
-      gridGap: '0 5%',
-    };
-  }
-
-  protected get queryParams(): QueryParams {
-    return this.$props.config.queryParams || {
+  public get queryParams(): QueryParams {
+    return this.widget.config.queryParams || {
       duration: '10m',
     };
   }
 
-  protected get graphAxes(): GraphValueAxes {
-    return this.$props.config.graphAxes || {};
+  public get graphAxes(): GraphValueAxes {
+    return this.widget.config.graphAxes || {};
   }
 
-  protected get renamedTargets(): { [key: string]: string } {
+  public get renamedTargets(): { [key: string]: string } {
     return {};
   }
 
-  protected get graphCfg(): GraphConfig {
+  public get graphCfg(): GraphConfig {
     const blockFmt = (val: string): string => [this.blockId, val].join('/');
     const serviceFmt = (val: string): string => [this.serviceId, this.blockId, val].join('/');
 
@@ -87,7 +54,7 @@ export default class BlockWidget extends WidgetBase {
       axes: this.graphAxes,
       // constants
       layout: {
-        title: this.widgetTitle,
+        title: this.widget.title,
       },
       targets: [
         {
@@ -101,9 +68,9 @@ export default class BlockWidget extends WidgetBase {
     };
   }
 
-  protected set graphCfg(config: GraphConfig) {
+  public set graphCfg(config: GraphConfig) {
     this.saveConfig({
-      ...this.$props.config,
+      ...this.widget.config,
       queryParams: { ...config.params },
       graphAxes: { ...config.axes },
     });
@@ -111,35 +78,38 @@ export default class BlockWidget extends WidgetBase {
 
   @Watch('blockId', { immediate: true })
   private fixWidgetTitle(): void {
-    if (this.blockId !== this.widgetTitle && this.$props.onChangeTitle) {
-      this.$props.onChangeTitle(this.$props.id, this.blockId);
+    if (this.blockId !== this.widget.title && !this.volatile) {
+      this.saveWidget({ ...this.widget, title: this.blockId });
     }
   }
 
-  protected openModal(): void {
-    this.modalOpen = true;
+  public openModal(): void {
+    Dialog.create({
+      component: 'BlockFormDialog',
+      getBlock: () => this.block,
+      getWidget: () => this.widget,
+      saveBlock: this.saveBlock,
+      saveWidget: this.saveWidget,
+      root: this.$root,
+    });
   }
 
-  protected async refreshBlock(): Promise<void> {
+  public async refreshBlock(): Promise<void> {
     await sparkStore.fetchBlock([this.serviceId, this.block])
       .catch(() => { });
   }
 
-  protected async saveBlock(block: Block = this.block): Promise<void> {
+  public async saveBlock(block: Block = this.block): Promise<void> {
     await sparkStore.saveBlock([this.serviceId, block])
       .catch(() => this.$forceUpdate());
   }
 
-  protected callAndSaveBlock(func: (v: any) => void): (v: any) => void {
-    return (v: any) => { func(v); this.saveBlock(); };
-  }
-
-  protected changeBlockId(newId: string): void {
+  public changeBlockId(newId: string): void {
     sparkStore.renameBlock([this.serviceId, this.blockId, newId])
       .catch(() => { });
   }
 
-  protected async switchBlockId(blockId: string): Promise<void> {
-    await this.saveConfig({ ...this.$props.config, blockId });
+  public async switchBlockId(blockId: string): Promise<void> {
+    await this.saveConfig({ ...this.widget.config, blockId });
   }
 }

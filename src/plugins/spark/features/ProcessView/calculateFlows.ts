@@ -8,11 +8,12 @@ import set from 'lodash/set';
 
 import { Coordinates } from '@/helpers/coordinates';
 
-import { ACCELERATE_OTHERS,DEFAULT_FRICTION } from './getters';
-import settings from './settings';
+import { FlowSegment } from './FlowSegment';
+import { ACCELERATE_OTHERS } from './getters';
+import specs from './specs';
 import {
   CalculatedFlows,
-  ComponentSettings,
+  ComponentSpec,
   FlowPart,
   FlowRoute,
   LiquidFlow,
@@ -24,14 +25,14 @@ export const removeTransitions =
   (parts: FlowPart[], inCoord: string): FlowPart[] => parts.map(
     part => ({ ...part, transitions: omit(part.transitions, inCoord) }));
 
-export const partSettings =
-  (part: StatePart): ComponentSettings => settings[part.type];
+export const partSpecs =
+  (part: StatePart): ComponentSpec => specs[part.type];
 
 export const partTransitions =
-  (part: StatePart): Transitions => partSettings(part).transitions(part);
+  (part: StatePart): Transitions => partSpecs(part).transitions(part);
 
 export const partSize =
-  (part: StatePart): [number, number] => partSettings(part).size(part);
+  (part: StatePart): [number, number] => partSpecs(part).size(part);
 
 export const partCenter =
   (part: StatePart): [number, number, number] => {
@@ -65,7 +66,6 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
 
   return { ...part, flows: newFlows };
 };
-
 
 const translations = (part: StatePart): Transitions =>
   Object.entries(partTransitions(part))
@@ -108,7 +108,6 @@ const combineFlows =
     }
     return combined;
   };
-
 
 const mergeFlows = (flows: CalculatedFlows): CalculatedFlows =>
   Object.entries(flows)
@@ -177,99 +176,6 @@ const additionalFlow = (
         ? { ...item, flows: combineFlows(item.flows, flowToAdd) }
         : item);
 
-
-export class FlowSegment {
-  public constructor(part: FlowPart, transitions: Transitions) {
-    this.root = part;
-    this.transitions = transitions;
-  }
-
-  public transitions: Transitions;
-  public root: FlowPart;
-  public splits: FlowSegment[] = [];
-  public next: FlowSegment | null = null;
-
-  public addChild(segment: FlowSegment): void {
-    if (this.splits.length == 0) {
-      if (this.next !== null) {
-        this.splits.push(this.next); // move next to splits
-        this.splits.push(segment); // add other segment to splits
-        this.next = null; // set next to null for no shared next
-      }
-      else {
-        this.next = segment;
-      }
-    }
-    else {
-      this.splits.push(segment);
-    }
-  }
-
-  public friction(): number {
-    let series = DEFAULT_FRICTION;
-    let parallel = 0;
-    this.splits.forEach(splitPath => {
-      const splitFriction = splitPath.friction();
-      parallel = (parallel === 0)
-        ? splitFriction
-        : parallel * splitFriction / (parallel + splitFriction);
-    });
-    if (this.next !== null) {
-      series += this.next.friction();
-    }
-    return parallel + series;
-  }
-
-  public reduceSegments(func: (acc: any, segment: FlowSegment) => any, acc: any): any {
-    acc = func(acc, this);
-    this.splits.forEach((child) => {
-      acc = child.reduceSegments(func, acc);
-    });
-    if (this.next !== null) {
-      acc = func(acc, this.next);
-    }
-  };
-
-  public isSameSegment(other: FlowSegment): boolean {
-    return JSON.stringify(this) === JSON.stringify(other);
-  }
-
-  public leafSegments(): FlowSegment[] {
-    if (this.splits.length !== 0) {
-      return this.splits.reduce((acc, child) => [...acc, ...child.leafSegments()], new Array<FlowSegment>());
-    }
-    if (this.next !== null) {
-      return this.next.leafSegments();
-    }
-    return [this];
-  }
-
-  public removeLeafSegment(segment: FlowSegment): void {
-    this.splits.forEach((child) => child.removeLeafSegment(segment));
-    if (this.next !== null) {
-      if (this.next.isSameSegment(segment)) {
-        this.next = null;
-        return;
-      }
-      else {
-        this.next.removeLeafSegment(segment);
-      }
-    }
-  }
-
-  public popDuplicatedLeaves(): FlowSegment | null {
-    const leaves = this.leafSegments();
-    if (leaves.length !== 0 && leaves.every(v => v.isSameSegment(leaves[0]))) {
-      const combinedTransitions = leaves
-        .reduce((acc: Transitions, leaf) => ({ ...acc, ...leaf.transitions }), {});
-      leaves[0].transitions = combinedTransitions;
-      this.removeLeafSegment(leaves[0]);
-      return leaves[0];
-    }
-    return null;
-  }
-}
-
 export const flowPath = (
   parts: FlowPart[],
   start: FlowPart,
@@ -326,7 +232,6 @@ export const flowPath = (
   return path;
 };
 
-
 export const addFlowForSegment = (
   parts: FlowPart[],
   segment: FlowSegment,
@@ -352,7 +257,6 @@ export const addFlowForSegment = (
           ), {});
       }
     });
-
 
   if (segment.splits.length !== 0) {
     // divide flow for split
@@ -420,7 +324,6 @@ export const calculateFlows = (parts: FlowPart[]): FlowPart[] =>
     .reduce(addFlowFromPart, parts)
     .map(part => ({ ...part, flows: mergeFlows(part.flows) }));
 
-
 // can be used to check whether a part has equal in and out flow
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 const unbalancedFlow = (part: FlowPart): number =>
@@ -429,7 +332,6 @@ const unbalancedFlow = (part: FlowPart): number =>
       Object.values(v)
         .reduce((sum2: number, w: number) => sum2 + w, sum),
       0);
-
 
 export const calculateNormalizedFlows = (parts: StatePart[]): FlowPart[] =>
   calculateFlows(asFlowParts(parts)).map(normalizeFlows);

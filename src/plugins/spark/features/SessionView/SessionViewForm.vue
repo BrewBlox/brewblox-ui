@@ -1,27 +1,24 @@
 <script lang="ts">
 import shortid from 'shortid';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
-import FormBase from '@/components/Form/FormBase';
 import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
+import FormBase from '@/components/Widget/FormBase';
 import { objectSorter } from '@/helpers/functional';
 import { durationString } from '@/helpers/functional';
 import { Session, SessionViewConfig } from '@/plugins/spark/features/SessionView/types';
 import historyStore, { DisplayNames } from '@/store/history';
 
-@Component({
-  props: {
-    activeSession: {
-      default: null,
-    },
-  },
-})
+@Component
 export default class SessionViewForm extends FormBase {
   graphSessionId: string | null = null;
   sessionInput: string = '';
 
+  @Prop({ default: null })
+  readonly activeSession!: Session;
+
   get widgetConfig(): SessionViewConfig {
-    return this.$props.field;
+    return this.widget.config;
   }
 
   get sessions(): Session[] {
@@ -43,10 +40,6 @@ export default class SessionViewForm extends FormBase {
     if (!val) {
       this.graphSessionId = null;
     }
-  }
-
-  callAndSaveConfig(func: (v: any) => void) {
-    return (v: any) => { func(v); this.saveConfig(this.widgetConfig); };
   }
 
   updateSession(session: Session) {
@@ -136,14 +129,14 @@ export default class SessionViewForm extends FormBase {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
     <BlockGraph
       v-if="graphModalOpen"
       v-model="graphModalOpen"
       :id="`SessionView::form::${graphSession.id}`"
       :config="graphSession.graphCfg"
-      :change="v => { graphSession.graphCfg = v; updateSession(graphSession); }"
       no-duration
+      @update:config="v => { graphSession.graphCfg = v; updateSession(graphSession); }"
     />
 
     <q-scroll-area style="height: 75vh">
@@ -151,17 +144,21 @@ export default class SessionViewForm extends FormBase {
         v-for="session in sessions"
         :key="session.id"
         :label="`Session ${session.name}`"
-        :default-opened="$props.activeSession && $props.activeSession.id === session.id"
+        :default-opened="activeSession && activeSession.id === session.id"
         group="modal"
         icon="help"
       >
         <q-list>
           <q-item dark>
             <q-item-section>
-              <q-btn flat rounded icon="mdi-chart-line" @click="graphSessionId = session.id"/>
+              <q-btn flat rounded icon="mdi-chart-line" @click="graphSessionId = session.id">
+                <q-tooltip>Show Graph</q-tooltip>
+              </q-btn>
             </q-item-section>
             <q-item-section>
-              <q-btn flat rounded icon="mdi-content-copy" @click="duplicateSession(session)"/>
+              <q-btn flat rounded icon="mdi-content-copy" @click="duplicateSession(session)">
+                <q-tooltip>Duplicate Session</q-tooltip>
+              </q-btn>
             </q-item-section>
             <q-item-section>
               <q-toggle
@@ -169,21 +166,24 @@ export default class SessionViewForm extends FormBase {
                 checked-icon="visibility"
                 unchecked-icon="visibility_off"
                 @input="v => { session.hidden = !v; updateSession(session); }"
-              />
+              >
+                <q-tooltip>Show/hide Session in widget</q-tooltip>
+              </q-toggle>
             </q-item-section>
             <q-item-section>
-              <q-btn flat rounded icon="delete" @click="deleteSession(session)"/>
+              <q-btn flat rounded icon="delete" @click="deleteSession(session)">
+                <q-tooltip>Delete Session</q-tooltip>
+              </q-btn>
             </q-item-section>
           </q-item>
           <q-separator dark/>
           <q-item dark>
             <q-item-section>
               <q-item-label caption>Session name</q-item-label>
-              <InputPopupEdit
-                :field="session.name"
-                :change="v => { session.name = v; updateSession(session); }"
-                label="Session name"
-                tag="span"
+              <InputField
+                :value="session.name"
+                title="Session name"
+                @input="v => { session.name = v; updateSession(session); }"
               />
             </q-item-section>
             <q-item-section>
@@ -196,25 +196,23 @@ export default class SessionViewForm extends FormBase {
           <q-item dark>
             <q-item-section>
               <q-item-label caption>Start</q-item-label>
-              <DatetimePopupEdit
-                :field="session.start"
-                :change="v => startSession(session, v)"
+              <DatetimeField
+                :value="session.start"
+                title="Start"
                 reset-icon="mdi-clock-start"
-                label="Start"
-                tag="span"
                 clear-label="<click to start>"
+                @input="v => startSession(session, v)"
               />
             </q-item-section>
 
             <q-item-section>
               <q-item-label caption>End</q-item-label>
-              <DatetimePopupEdit
-                :field="session.end"
-                :change="v => endSession(session, v)"
+              <DatetimeField
+                :value="session.end"
+                title="End"
                 reset-icon="mdi-clock-end"
-                label="End"
-                tag="span"
                 clear-label="<click to end>"
+                @input="v => endSession(session, v)"
               />
             </q-item-section>
           </q-item>
@@ -252,6 +250,14 @@ export default class SessionViewForm extends FormBase {
           </q-expansion-item>
         </q-list>
       </q-expansion-item>
+      <q-item dark>
+        <q-item-section/>
+        <q-item-section side>
+          <q-btn fab outline icon="add" @click="$emit('create-session')">
+            <q-tooltip>Add Session</q-tooltip>
+          </q-btn>
+        </q-item-section>
+      </q-item>
     </q-scroll-area>
   </q-card>
 </template>

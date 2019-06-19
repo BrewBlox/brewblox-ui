@@ -54,4 +54,8 @@ export default class Unit {
   public toJSON(): number | null {
     return this.value;
   }
+
+  public copy(val: number | null = this.val): Unit {
+    return new Unit(val, this.unit);
+  }
 }

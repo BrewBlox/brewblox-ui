@@ -1,27 +1,25 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Emit,Prop } from 'vue-property-decorator';
+
+import { DisplayNames } from '@/store/history';
 
 
-@Component({
-  props: {
-    selected: {
-      type: Array,
-      required: true,
-    },
-    renames: {
-      type: Object,
-      required: true,
-    },
-  },
-})
+@Component
 export default class LabelSelector extends Vue {
-  get labels() {
-    return { ...this.$props.renames };
+  @Prop({ type: Array, required: true })
+  readonly selected!: string[];
+
+  @Prop({ type: Object, required: true })
+  readonly renames!: DisplayNames;
+
+  @Emit('update:renames')
+  saveLabels() {
+    return this.labels;
   }
 
-  callAndSaveLabels(func: (v: any) => void) {
-    return v => { func(v); this.$emit('update:renames', this.labels); };
+  get labels() {
+    return { ...this.renames };
   }
 }
 </script>
@@ -36,12 +34,10 @@ export default class LabelSelector extends Vue {
     <q-item v-for="field in selected" :key="field" dark>
       <q-item-section>{{ field }}</q-item-section>
       <q-item-section>
-        <InputPopupEdit
-          :field="labels[field]"
-          :change="callAndSaveLabels(v => labels[field] = v)"
-          label="Legend"
-          clearable
-          tag="span"
+        <InputField
+          :value="labels[field]"
+          title="Legend"
+          @input="v => { labels[field] = v; saveLabels(); }"
         />
       </q-item-section>
     </q-item>

@@ -1,62 +1,53 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockForm from '@/plugins/spark/components/BlockForm';
 
+import { ActuatorAnalogMockBlock } from './types';
+
 @Component
 export default class ActuatorAnalogMockForm extends BlockForm {
-  defaultData() {
-    return {
-      setting: 0,
-      minSetting: 0,
-      maxSetting: 100,
-      value: 0,
-      minValue: 0,
-      maxValue: 100,
-    };
-  }
-
-  presets() {
-    return [];
-  }
+  readonly block!: ActuatorAnalogMockBlock;
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <q-item dark>
           <q-item-section style="justify-content: flex-start">
             <q-item-label caption>Setting</q-item-label>
-            <InputPopupEdit
-              v-if="!isDriven"
-              :field="block.data.setting"
-              :change="callAndSaveBlock(v => block.data.setting = v)"
+            <InputField
+              :readonly="isDriven"
+              :value="block.data.desiredSetting"
               type="number"
-              label="target"
+              title="Target"
+              tag="big"
+              @input="v => { block.data.desiredSetting = v; saveBlock(); }"
             />
-            <big v-else>{{ block.data.setting | unit }}</big>
             <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>
           <q-item-section style="justify-content: flex-start">
             <q-item-label caption>Clip to min</q-item-label>
-            <InputPopupEdit
-              :field="block.data.minSetting"
-              :change="callAndSaveBlock(v => block.data.minSetting = v)"
+            <InputField
+              :value="block.data.minSetting"
+              title="Setting min"
               type="number"
-              label="Setting min"
+              tag="big"
+              @input="v => { block.data.minSetting = v; saveBlock(); }"
             />
           </q-item-section>
           <q-item-section style="justify-content: flex-start">
             <q-item-label caption>Clip to max</q-item-label>
-            <InputPopupEdit
-              :field="block.data.maxSetting"
-              :change="callAndSaveBlock(v => block.data.maxSetting = v)"
+            <InputField
+              :value="block.data.maxSetting"
               type="number"
-              label="Setting max"
+              title="Setting max"
+              tag="big"
+              @input="v => { block.data.maxSetting = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>
@@ -67,20 +58,22 @@ export default class ActuatorAnalogMockForm extends BlockForm {
           </q-item-section>
           <q-item-section>
             <q-item-label caption>Clip to min</q-item-label>
-            <InputPopupEdit
-              :field="block.data.minValue"
-              :change="callAndSaveBlock(v => block.data.minValue = v)"
+            <InputField
+              :value="block.data.minValue"
               type="number"
-              label="Value min"
+              title="Value min"
+              tag="big"
+              @input="v => { block.data.minValue = v; saveBlock(); }"
             />
           </q-item-section>
           <q-item-section>
             <q-item-label caption>Clip to max</q-item-label>
-            <InputPopupEdit
-              :field="block.data.maxValue"
-              :change="callAndSaveBlock(v => block.data.maxValue = v)"
+            <InputField
+              :value="block.data.maxValue"
               type="number"
-              label="Value max"
+              title="Value max"
+              tag="big"
+              @input="v => { block.data.maxValue = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>
@@ -88,14 +81,10 @@ export default class ActuatorAnalogMockForm extends BlockForm {
 
       <q-expansion-item group="modal" icon="mdi-less-than-or-equal" label="Constraints">
         <AnalogConstraints
-          :service-id="block.serviceId"
-          :field="block.data.constrainedBy"
-          :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+          :value="block.data.constrainedBy"
+          :service-id="serviceId"
+          @input="v => { block.data.constrainedBy = v; saveBlock(); }"
         />
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
       </q-expansion-item>
     </q-card-section>
   </q-card>

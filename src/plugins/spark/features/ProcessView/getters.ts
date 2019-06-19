@@ -1,6 +1,6 @@
 import { Coordinates } from '@/helpers/coordinates';
 
-import { ComponentSettings, PersistentPart } from './types';
+import { ComponentSpec, PersistentPart } from './types';
 
 export const SQUARE_SIZE = 50;
 export const UP = '0.5,0,0';
@@ -16,7 +16,7 @@ export const HOT_WATER = '#DB0023';
 export const BEER = '#E1AC00';
 export const WORT = '#C78A49';
 
-export const defaultSettings: ComponentSettings = {
+export const defaultSpec: ComponentSpec = {
   cards: [],
   size: () => [1, 1],
   transitions: () => ({}),

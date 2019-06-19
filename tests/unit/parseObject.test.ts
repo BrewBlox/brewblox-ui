@@ -1,6 +1,5 @@
 import Link from '@/helpers/units/Link';
 import Unit from '@/helpers/units/Unit';
-
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 
 describe('deserialize', () => {

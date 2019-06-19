@@ -1,10 +1,10 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
 import sparkStore from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import { Block, DigitalState } from '@/plugins/spark/types';
 
 import PartComponent from '../components/PartComponent';
 import { RIGHT } from '../getters';
@@ -40,19 +40,19 @@ export default class ActuatorValve extends PartComponent {
     };
   }
 
-  get actuatorServiceId(): string {
-    return this.part.settings.actuatorServiceId;
+  get valveServiceId(): string {
+    return this.part.settings.valveServiceId;
   }
 
-  get actuatorLink(): Link {
-    return this.part.settings.actuatorLink;
+  get valveLink(): Link {
+    return this.part.settings.valveLink;
   }
 
   get actuatorBlock(): Block | null {
-    if (!this.actuatorServiceId || !this.actuatorLink || !this.actuatorLink.id) {
+    if (!this.valveServiceId || !this.valveLink || !this.valveLink.id) {
       return null;
     }
-    return sparkStore.blocks(this.actuatorServiceId)[this.actuatorLink.id];
+    return sparkStore.blocks(this.valveServiceId)[this.valveLink.id];
   }
 
   get flowSpeed() {
@@ -70,9 +70,9 @@ export default class ActuatorValve extends PartComponent {
   get valveRotation() {
     if (this.actuatorBlock) {
       switch (this.actuatorBlock.data.state) {
-        case 0:
+        case DigitalState.Inactive:
           return 90;
-        case 1:
+        case DigitalState.Active:
           return 0;
         default:
           return 45;

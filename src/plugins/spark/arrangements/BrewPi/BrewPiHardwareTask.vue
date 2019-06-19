@@ -1,10 +1,14 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import isEqual from 'lodash/isEqual';
+import { Dialog } from 'quasar';
+import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
-import { BrewPiConfig } from '@/plugins/spark/arrangements/BrewPi/types';
-import { typeName as actuatorDS2413Type } from '@/plugins/spark/features/ActuatorDS2413/getters';
-import { typeName as actuatorPinType } from '@/plugins/spark/features/ActuatorPin/getters';
+import { BrewPiConfig, PinChannel } from '@/plugins/spark/arrangements/BrewPi/types';
+import { typeName as DS2408Type } from '@/plugins/spark/features/DS2408/getters';
+import { typeName as DS2413Type } from '@/plugins/spark/features/DS2413/getters';
+import { typeName as Spark2PinsType } from '@/plugins/spark/features/Spark2Pins/getters';
+import { typeName as Spark3PinsType } from '@/plugins/spark/features/Spark3Pins/getters';
 import { typeName as sensorMockType } from '@/plugins/spark/features/TempSensorMock/getters';
 import { typeName as sensorOneWireType } from '@/plugins/spark/features/TempSensorOneWire/getters';
 import sparkStore from '@/plugins/spark/store';
@@ -12,26 +16,27 @@ import sparkStore from '@/plugins/spark/store';
 
 @Component
 export default class BrewPiHardwareTask extends WizardTaskBase {
-  blockWizardModalOpen: boolean = false;
+  readonly config!: BrewPiConfig;
 
-  coolPin: any = null;
-  heatPin: any = null;
+  coolPin: PinChannel | null = null;
+  heatPin: PinChannel | null = null;
   fridgeSensor: any = null;
   beerSensor: any = null;
 
-  get cfg(): BrewPiConfig {
-    return this.stagedConfig;
-  }
-
   get pinOptions() {
-    const pinTypes = [actuatorPinType, actuatorDS2413Type];
-    return sparkStore.blockValues(this.cfg.serviceId)
-      .filter(block => pinTypes.includes(block.type))
-      .map(block => block.id);
+    return sparkStore.blockValues(this.config.serviceId)
+      .filter(block => [Spark2PinsType, Spark3PinsType, DS2408Type, DS2413Type].includes(block.type))
+      .reduce(
+        (acc, block) => [
+          ...acc,
+          ...block.data.pins.map((pin, idx) => ({ arrayId: block.id, pinId: idx + 1 })),
+        ],
+        [] as any[])
+      .map(channel => ({ label: `${channel.arrayId} Pin ${channel.pinId}`, value: channel }));
   }
 
   get sensorOptions() {
-    return sparkStore.blockValues(this.cfg.serviceId)
+    return sparkStore.blockValues(this.config.serviceId)
       .filter(block => block.type === sensorOneWireType || block.type === sensorMockType)
       .map(block => block.id);
   }
@@ -40,7 +45,7 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
     return [
       this.coolPin,
       this.heatPin,
-      this.coolPin !== this.heatPin,
+      !isEqual(this.coolPin, this.heatPin),
       this.fridgeSensor,
       this.beerSensor,
       this.fridgeSensor !== this.beerSensor,
@@ -51,7 +56,7 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
   get pinRules(): InputRule[] {
     return [
       v => !!v || 'Pin must be selected',
-      () => this.coolPin !== this.heatPin || 'Cool pin and Heat pin may not be the same',
+      () => !isEqual(this.coolPin, this.heatPin) || 'Cool pin and Heat pin may not be the same',
     ];
   }
 
@@ -62,26 +67,35 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
     ];
   }
 
-  mounted() {
+  created() {
     this.discover();
   }
 
   discover() {
-    sparkStore.fetchDiscoveredBlocks(this.cfg.serviceId);
+    sparkStore.fetchDiscoveredBlocks(this.config.serviceId);
+  }
+
+  startBlockWizard() {
+    Dialog.create({
+      component: 'BlockWizardDialog',
+      serviceId: this.config.serviceId,
+      root: this.$root,
+    });
   }
 
   next() {
+    this.config.heatPin = this.heatPin as PinChannel;
+    this.config.coolPin = this.coolPin as PinChannel;
+
     Object.assign(
-      this.cfg.renamedBlocks,
+      this.config.renamedBlocks,
       {
-        [this.coolPin]: this.cfg.names.coolPin,
-        [this.heatPin]: this.cfg.names.heatPin,
-        [this.fridgeSensor]: this.cfg.names.fridgeSensor,
-        [this.beerSensor]: this.cfg.names.beerSensor,
+        [this.fridgeSensor]: this.config.names.fridgeSensor,
+        [this.beerSensor]: this.config.names.beerSensor,
       },
     );
 
-    this.updateConfig<BrewPiConfig>(this.cfg);
+    this.updateConfig<BrewPiConfig>(this.config);
     this.pushTask('BrewPiSettingsTask');
     this.finish();
   }
@@ -90,13 +104,6 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
 
 <template>
   <div>
-    <q-dialog v-model="blockWizardModalOpen" no-backdrop-dismiss>
-      <BlockWizard
-        v-if="blockWizardModalOpen"
-        :service-id="cfg.serviceId"
-        @close="blockWizardModalOpen = false"
-      />
-    </q-dialog>
     <q-card-section>
       <q-item>
         <big>Hardware Blocks</big>
@@ -110,19 +117,7 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
           </q-tooltip>
         </q-item-section>
         <q-item-section class="col-auto">
-          <q-btn
-            unelevated
-            label="Create block"
-            color="primary"
-            @click="blockWizardModalOpen = true"
-          />
-          <q-tooltip>
-            Example cases where a Block must be created and configured manually:
-            <ul>
-              <li>When using DS2413 actuators.</li>
-              <li>When using mock temperature sensors.</li>
-            </ul>
-          </q-tooltip>
+          <q-btn unelevated label="Create block" color="primary" @click="startBlockWizard"/>
         </q-item-section>
       </q-item>
       <q-item dark>
@@ -130,8 +125,10 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
           <q-select
             v-model="coolPin"
             :options="pinOptions"
-            :label="cfg.names.coolPin"
             :rules="pinRules"
+            label="Cool pin channel"
+            emit-value
+            map-options
             dark
             options-dark
           />
@@ -140,8 +137,10 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
           <q-select
             v-model="heatPin"
             :options="pinOptions"
-            :label="cfg.names.heatPin"
             :rules="pinRules"
+            label="Heat pin channel"
+            emit-value
+            map-options
             dark
             options-dark
           />
@@ -152,7 +151,7 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
           <q-select
             v-model="fridgeSensor"
             :options="sensorOptions"
-            :label="cfg.names.fridgeSensor"
+            :label="config.names.fridgeSensor"
             :rules="sensorRules"
             dark
             options-dark
@@ -162,7 +161,7 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
           <q-select
             v-model="beerSensor"
             :options="sensorOptions"
-            :label="cfg.names.beerSensor"
+            :label="config.names.beerSensor"
             :rules="sensorRules"
             dark
             options-dark

@@ -1,23 +1,18 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { WizardAction } from '@/components/Wizard/WizardTaskBase';
 
-
-@Component({
-  props: {
-    initialTasks: {
-      type: Array,
-      required: true,
-    },
-    initialConfig: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-})
+@Component
 export default class WizardTaskMaster extends Vue {
+
+  @Prop({ type: Array, required: true })
+  readonly initialTasks!: string[];
+
+  @Prop({ type: Object, default: () => ({}) })
+  readonly initialConfig!: any;
+
   busyExecuting: boolean = false;
   config: any = {};
   actions: WizardAction[] = [];
@@ -56,8 +51,8 @@ export default class WizardTaskMaster extends Vue {
   }
 
   created() {
-    this.tasks = [...this.$props.initialTasks];
-    this.config = { ...this.$props.initialConfig };
+    this.tasks = [...this.initialTasks];
+    this.config = { ...this.initialConfig };
     this.nextTask();
   }
 

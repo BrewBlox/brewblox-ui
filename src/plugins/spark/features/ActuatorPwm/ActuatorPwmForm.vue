@@ -1,30 +1,18 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
 
-import { defaultData, presets } from './getters';
-
 @Component
 export default class ActuatorPwmForm extends BlockForm {
-  get block(): ActuatorPwmBlock {
-    return this.blockField as ActuatorPwmBlock;
-  }
-
-  defaultData() {
-    return defaultData();
-  }
-
-  presets() {
-    return presets();
-  }
+  readonly block!: ActuatorPwmBlock;
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
@@ -32,39 +20,41 @@ export default class ActuatorPwmForm extends BlockForm {
           v-bind="$props"
           :text-enabled="`PWM is enabled: ${block.data.actuatorId} will be toggled automatically.`"
           :text-disabled="`PWM is disabled: ${block.data.actuatorId} will not be toggled.`"
+          v-on="$listeners"
         />
 
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Digital Actuator Target</q-item-label>
-            <LinkPopupEdit
-              :field="block.data.actuatorId"
+            <LinkField
+              :value="block.data.actuatorId"
               :service-id="serviceId"
-              :change="callAndSaveBlock(v => block.data.actuatorId = v)"
-              label="target"
+              title="target"
+              tag="big"
+              @input="v => { block.data.actuatorId = v; saveBlock(); }"
             />
           </q-item-section>
           <q-item-section>
             <q-item-label caption>Period</q-item-label>
-            <TimeUnitPopupEdit
-              :field="block.data.period"
-              :change="callAndSaveBlock(v => block.data.period = v)"
-              label="Period"
-              type="number"
+            <TimeUnitField
+              :value="block.data.period"
+              title="Period"
+              tag="big"
+              @input="v => { block.data.period = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>
         <q-item dark>
           <q-item-section style="justify-content: flex-start">
             <q-item-label caption>Duty setting</q-item-label>
-            <InputPopupEdit
-              v-if="!isDriven"
-              :field="block.data.setting"
-              :change="callAndSaveBlock(v => block.data.setting = v)"
-              label="Setting"
+            <InputField
+              :value="block.data.desiredSetting"
+              :readonly="isDriven"
+              tag="big"
+              title="Setting"
               type="number"
+              @input="v => { block.data.desiredSetting = v; saveBlock(); }"
             />
-            <big v-else>{{ block.data.setting | round }}</big>
             <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>
           <q-item-section style="justify-content: flex-start">
@@ -78,16 +68,12 @@ export default class ActuatorPwmForm extends BlockForm {
         <q-item dark>
           <q-item-section>
             <AnalogConstraints
-              :service-id="block.serviceId"
-              :field="block.data.constrainedBy"
-              :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+              :value="block.data.constrainedBy"
+              :service-id="serviceId"
+              @input="v => { block.data.constrainedBy = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
       </q-expansion-item>
     </q-card-section>
   </q-card>

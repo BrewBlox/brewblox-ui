@@ -1,69 +1,48 @@
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Emit, Prop } from 'vue-property-decorator';
 
 export type WizardAction = (config: any) => Promise<void>;
 
-// emits:
-// - cancel
-// - finish
-// - update:config
-// - update:actions
-// - update:tasks
-
-@Component({
-  props: {
-    config: {
-      type: Object,
-      required: true,
-    },
-    actions: {
-      type: Array,
-      required: true,
-    },
-    tasks: {
-      type: Array,
-      required: true,
-    },
-  },
-})
+@Component
 export default class WizardTaskBase extends Vue {
-  protected get stagedConfig(): any {
-    return this.$props.config;
+
+  @Prop({ type: Object, required: true })
+  protected readonly config!: any;
+
+  @Prop({ type: Array, required: true })
+  protected readonly actions!: WizardAction[];
+
+  @Prop({ type: Array, required: true })
+  protected readonly tasks!: string[];
+
+  @Emit('update:config')
+  protected updateConfig<T>(config: T = this.config): T {
+    return { ...config };
   }
 
-  protected get stagedActions(): WizardAction[] {
-    return this.$props.actions;
+  @Emit('update:actions')
+  protected pushAction(action: WizardAction): WizardAction[] {
+    return [...this.actions, action];
   }
 
-  protected get stagedTasks(): string[] {
-    return this.$props.tasks;
+  @Emit('update:actions')
+  protected pushActions(actions: WizardAction[]): WizardAction[] {
+    return [...this.actions, ...actions];
   }
 
-  protected updateConfig<T>(config: T = this.stagedConfig): void {
-    this.$emit('update:config', { ...config });
+  @Emit('update:tasks')
+  protected pushTask(task: string): string[] {
+    return [...this.tasks, task];
   }
 
-  protected pushAction(action: WizardAction): void {
-    this.$emit('update:actions', [...this.$props.actions, action]);
+  @Emit('update:tasks')
+  protected pushTasks(tasks: string[]): string[] {
+    return [...this.tasks, ...tasks];
   }
 
-  protected pushActions(actions: WizardAction[]): void {
-    this.$emit('update:actions', [...this.$props.actions, ...actions]);
-  }
+  @Emit()
+  protected cancel(): void { }
 
-  protected pushTask(task: string): void {
-    this.$emit('update:tasks', [...this.$props.tasks, task]);
-  }
-
-  protected pushTasks(tasks: string[]): void {
-    this.$emit('update:tasks', [...this.$props.tasks, ...tasks]);
-  }
-
-  protected cancel(): void {
-    this.$emit('cancel');
-  }
-
-  protected finish(): void {
-    this.$emit('finish');
-  }
+  @Emit()
+  protected finish(): void { }
 }

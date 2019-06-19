@@ -1,14 +1,13 @@
 <script lang="ts">
 import parseDuration from 'parse-duration';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
-import FormBase from '@/components/Form/FormBase';
 import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
-import { defaultPresets } from '@/components/Graph/getters';
 import { GraphConfig } from '@/components/Graph/types';
+import FormBase from '@/components/Widget/FormBase';
 import { durationString } from '@/helpers/functional';
 import historyStore, { DisplayNames } from '@/store/history';
-import { GraphValueAxes, QueryParams } from '@/store/history';
+import { GraphValueAxes } from '@/store/history';
 
 interface PeriodDisplay {
   start: boolean;
@@ -16,21 +15,24 @@ interface PeriodDisplay {
   end: boolean;
 }
 
-@Component({
-  props: {
-    downsampling: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-})
+@Component
 export default class GraphForm extends FormBase {
   durationString = durationString;
+
+  @Prop({ type: Object, default: () => ({}) })
+  readonly downsampling!: any;
 
   period: PeriodDisplay | null = null;
 
   get config(): GraphConfig {
-    return this.$props.field;
+    return {
+      layout: {},
+      params: {},
+      targets: [],
+      renames: {},
+      axes: {},
+      ...this.widget.config,
+    };
   }
 
   get periodOptions() {
@@ -131,73 +133,63 @@ export default class GraphForm extends FormBase {
     return this.config.axes;
   }
 
-  get presets(): QueryParams[] {
-    return defaultPresets();
-  }
-
   isRightAxis(field: string) {
     return this.config.axes[field] === 'y2';
   }
 
   updateAxisSide(field: string, isRight: boolean) {
-    this.config.axes[field] = isRight ? 'y2' : 'y';
-    this.saveConfig(this.config);
+    this.saveConfig({ ...this.config, axes: { ...this.axes, [field]: isRight ? 'y2' : 'y' } });
   }
 
   created() {
     historyStore.fetchKnownKeys();
-  }
-
-  callAndSaveConfig(func: (v: any) => void) {
-    return (v: any) => { func(v); this.saveConfig(this.config); };
   }
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
 
     <q-card-section>
       <q-expansion-item group="modal" icon="mdi-timetable" label="Period settings">
         <q-item dark>
-          <q-item-section>
-            <q-item-label caption>Display type</q-item-label>
-            <SelectPopupEdit
-              :field="shownPeriod"
+          <q-item-section class="col-auto">
+            <q-select
+              :value="shownPeriod"
               :options="periodOptions"
-              :change="updateShownPeriod"
+              emit-value
+              map-options
+              dark
+              options-dark
               label="Display type"
+              @input="updateShownPeriod"
             />
           </q-item-section>
         </q-item>
         <q-item dark>
           <q-item-section v-if="shownPeriod.start" class="col-6">
             <q-item-label caption>Start time</q-item-label>
-            <DatetimePopupEdit
-              :field="config.params.start"
-              :change="callAndSaveConfig(v => config.params.start = v.getTime())"
-              label="Start time"
-              tag="span"
+            <DatetimeField
+              :value="config.params.start"
+              title="Start time"
+              @input="v => { config.params.start = v.getTime(); saveConfig(config); }"
             />
           </q-item-section>
           <q-item-section v-if="shownPeriod.duration" class="col-6">
             <q-item-label caption>Duration</q-item-label>
-            <InputPopupEdit
-              :field="config.params.duration"
-              :change="callAndSaveConfig(v => config.params.duration = durationString(v))"
-              clearable
-              label="Duration"
-              tag="span"
+            <InputField
+              :value="config.params.duration"
+              title="Duration"
+              @input="v => { config.params.duration = durationString(v); saveConfig(config); }"
             />
           </q-item-section>
           <q-item-section v-if="shownPeriod.end" class="col-6">
             <q-item-label caption>End time</q-item-label>
-            <DatetimePopupEdit
-              :field="config.params.end"
-              :change="callAndSaveConfig(v => config.params.end = v.getTime())"
-              label="End time"
-              tag="span"
+            <DatetimeField
+              :value="config.params.end"
+              title="End time"
+              @input="v => { config.params.end = v.getTime(); saveConfig(config); }"
             />
           </q-item-section>
         </q-item>
@@ -266,7 +258,7 @@ export default class GraphForm extends FormBase {
   transform: scaleX(-1);
 }
 .scroll-parent {
-  height: 300px;
-  max-height: 30vh;
+  height: 500px;
+  max-height: 60vh;
 }
 </style>

@@ -1,15 +1,14 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
 
-import WidgetBase from '@/components/Widget/WidgetBase';
 import sparkStore from '@/plugins/spark/store';
 import { SystemStatus } from '@/plugins/spark/types';
 
 @Component
-export default class Troubleshooter extends WidgetBase {
-  get serviceId() {
-    return this.$props.config.serviceId;
-  }
+export default class Troubleshooter extends Vue {
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
 
   get lastStatus(): SystemStatus | null {
     return sparkStore.lastStatus(this.serviceId);
@@ -25,6 +24,12 @@ export default class Troubleshooter extends WidgetBase {
     return this.lastStatus && this.lastStatus.connected
       ? 'Service connected to controller'
       : 'Service not connected to controller';
+  }
+
+  get textMatched(): string {
+    return this.lastStatus && this.lastStatus.matched
+      ? 'Service compatible with firmware'
+      : 'Service incompatible with firmware';
   }
 
   get textSynchronized(): string {
@@ -91,6 +96,16 @@ export default class Troubleshooter extends WidgetBase {
         <q-item dark>
           <q-item-section avatar>
             <q-icon
+              :name="iconName(lastStatus.matched)"
+              :color="iconColor(lastStatus.matched)"
+              size="24px"
+            />
+          </q-item-section>
+          <q-item-section>{{ textMatched }}</q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section avatar>
+            <q-icon
               :name="iconName(lastStatus.synchronized)"
               :color="iconColor(lastStatus.synchronized)"
               size="24px"
@@ -125,10 +140,16 @@ export default class Troubleshooter extends WidgetBase {
               <li>USB: Can your service access USB devices? (Mac hosts)</li>
             </ul>
           </span>
+          <!-- not matched -->
+          <span v-else-if="!lastStatus.matched">
+            Your Spark service is connected to your controller, but is not compatible.
+            <br>
+            <b>Run brewblox-ctl update to update your system.</b>
+          </span>
           <!-- not synchronized -->
           <span v-else-if="!lastStatus.synchronized">
             Your Spark service is connected to your controller, but not yet synchronized.
-            <b>This usually only lasts a few seconds.</b>
+            <b>This status is usually temporary.</b>
             <ul>
               <li>Is your datastore container running?</li>
               <li>Are there any error messages in your service container logs?</li>
@@ -137,6 +158,19 @@ export default class Troubleshooter extends WidgetBase {
           </span>
         </q-item-section>
       </q-item>
+      <template v-if="lastStatus.issues.length > 0">
+        <q-separator dark inset/>
+        <q-item dark>
+          <q-item-section>
+            <b>Service issues:</b>
+          </q-item-section>
+        </q-item>
+        <q-list dense>
+          <q-item v-for="(issue, idx) in lastStatus.issues" :key="idx" dark>
+            <q-item-section>{{ issue }}</q-item-section>
+          </q-item>
+        </q-list>
+      </template>
     </q-card-section>
   </q-card>
 </template>

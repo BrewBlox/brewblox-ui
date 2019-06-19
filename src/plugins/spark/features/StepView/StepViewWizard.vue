@@ -1,6 +1,6 @@
 <script lang="ts">
 import get from 'lodash/get';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 import serviceStore, { Service } from '@/store/services';
@@ -28,7 +28,7 @@ export default class StepViewWizard extends WidgetWizardBase {
       id: this.widgetId,
       title: this.widgetTitle,
       feature: this.typeId,
-      dashboard: this.$props.dashboardId,
+      dashboard: this.dashboardId,
       order: 0,
       config: {
         serviceId: this.serviceId,

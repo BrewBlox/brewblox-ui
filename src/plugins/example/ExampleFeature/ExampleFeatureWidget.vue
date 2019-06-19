@@ -1,5 +1,5 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { ExampleWidgetConfig } from '@/plugins/example/ExampleFeature/types';
@@ -16,9 +16,7 @@ export default class ExampleFeatureWidget extends WidgetBase {
   url: string = '';
 
   get widgetCfg(): ExampleWidgetConfig {
-    // Each widget can place its persistent settings in its config object.
-    // These will be saved to the datastore.
-    return this.$props.config;
+    return this.widget.config;
   }
 
   get messages() {
@@ -53,7 +51,7 @@ export default class ExampleFeatureWidget extends WidgetBase {
     this.$q.notify({
       color: 'positive',
       icon: 'mdi-message-alert',
-      message: `Hi! I'm ${this.widgetTitle}.`,
+      message: `Hi! I'm ${this.widget.title}.`,
     });
   }
 
@@ -67,11 +65,14 @@ export default class ExampleFeatureWidget extends WidgetBase {
 
 <template>
   <q-card dark class="text-white scroll">
-    <!-- displayName is inherited from WidgetBase. The value is defined in the Feature definition (./index.ts) -->
-    <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
-      <q-item-section side>
-        <q-btn flat round icon="mdi-message-alert" @click="alert"/>
-      </q-item-section>
+    <!-- displayName is inherited from ItemBase. The value is defined in the Feature definition (./index.ts) -->
+    <WidgetToolbar :title="widget.title" :subtitle="displayName">
+      <q-btn-dropdown flat label="actions">
+        <q-list dark bordered>
+          <ActionItem icon="mdi-message-alert" label="Alert" @click="alert"/>
+          <WidgetActions :field="me"/>
+        </q-list>
+      </q-btn-dropdown>
     </WidgetToolbar>
 
     <q-card-section>

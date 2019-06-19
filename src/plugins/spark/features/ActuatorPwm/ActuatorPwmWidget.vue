@@ -1,16 +1,13 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { getById } from './getters';
 import { ActuatorPwmBlock } from './types';
 
 @Component
 export default class ActuatorPwmWidget extends BlockWidget {
-  get block(): ActuatorPwmBlock {
-    return getById(this.serviceId, this.blockId);
-  }
+  readonly block!: ActuatorPwmBlock;
 
   get renamedTargets() {
     return {
@@ -19,30 +16,17 @@ export default class ActuatorPwmWidget extends BlockWidget {
     };
   }
 
-  get pending() {
-    if (!this.block.data.constrainedBy) {
-      return null;
-    }
-    const { unconstrained } = this.block.data.constrainedBy;
-    if (this.block.data.setting === unconstrained) {
-      return null;
-    }
-    return unconstrained;
-  }
-
-  enable() {
-    this.block.data.enabled = true;
-    this.saveBlock();
+  get constrained() {
+    const { setting, desiredSetting } = this.block.data;
+    return setting === desiredSetting
+      ? null
+      : setting;
   }
 }
 </script>
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <ActuatorPwmForm v-if="modalOpen" v-bind="formProps"/>
-    </q-dialog>
-
     <BlockWidgetToolbar :field="me" graph/>
 
     <q-card-section>
@@ -57,7 +41,12 @@ export default class ActuatorPwmWidget extends BlockWidget {
           </span>
         </q-item-section>
         <q-item-section side>
-          <q-btn text-color="white" flat label="Enable" @click="enable"/>
+          <q-btn
+            text-color="white"
+            flat
+            label="Enable"
+            @click="block.data.enabled = true; saveBlock();"
+          />
         </q-item-section>
       </q-item>
 
@@ -65,17 +54,17 @@ export default class ActuatorPwmWidget extends BlockWidget {
         <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Duty setting</q-item-label>
           <div>
-            <InputPopupEdit
-              v-if="!isDriven"
-              :field="block.data.setting"
-              :change="callAndSaveBlock(v => block.data.setting = v)"
+            <InputField
+              :value="block.data.desiredSetting"
+              :readonly="isDriven"
               style="display: inline-block"
               type="number"
-              label="Duty Setting"
+              title="Duty Setting"
+              tag="big"
+              @input="v => { block.data.desiredSetting = v; saveBlock(); }"
             />
-            <big v-else>{{ block.data.setting | round }}</big>
             <small
-              v-if="block.data.setting !== null"
+              v-if="block.data.desiredSetting !== null"
               style="display: inline-block"
               class="q-ml-xs"
             >%</small>
@@ -91,23 +80,18 @@ export default class ActuatorPwmWidget extends BlockWidget {
         </q-item-section>
       </q-item>
 
-      <q-item v-if="pending !== null" dark>
+      <q-item v-if="constrained !== null" dark>
         <q-item-section>
-          <q-item-label caption>Unconstrained setting</q-item-label>
+          <q-item-label caption>Constrained setting</q-item-label>
           <div>
-            <big>{{ pending | round }}</big>
+            <big>{{ constrained | round }}</big>
             <small class="q-ml-xs">%</small>
           </div>
         </q-item-section>
       </q-item>
       <q-item dark>
         <q-item-section>
-          <AnalogConstraints
-            :service-id="serviceId"
-            :field="block.data.constrainedBy"
-            :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
-            readonly
-          />
+          <AnalogConstraints :value="block.data.constrainedBy" :service-id="serviceId" readonly/>
         </q-item-section>
       </q-item>
     </q-card-section>

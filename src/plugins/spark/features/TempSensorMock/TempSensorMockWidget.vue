@@ -1,17 +1,14 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import { postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { getById } from './getters';
 import { TempSensorMockBlock } from './types';
 
 @Component
 export default class TempSensorMockWidget extends BlockWidget {
-  get block(): TempSensorMockBlock {
-    return getById(this.serviceId, this.blockId);
-  }
+  readonly block!: TempSensorMockBlock;
 
   get renamedTargets() {
     return postfixedDisplayNames(
@@ -26,21 +23,18 @@ export default class TempSensorMockWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <TempSensorMockForm v-if="modalOpen" v-bind="formProps"/>
-    </q-dialog>
-
     <BlockWidgetToolbar :field="me" graph/>
 
     <q-card-section>
       <q-item dark>
         <q-item-section>
           <q-item-label caption>Value</q-item-label>
-          <UnitPopupEdit
-            :field="block.data.value"
-            :disabled="!block.data.connected"
-            :change="callAndSaveBlock(v => block.data.value = v)"
-            label="Value"
+          <UnitField
+            :value="block.data.value"
+            :readonly="!block.data.connected"
+            title="Value"
+            tag="big"
+            @input="v => { block.data.value = v; saveBlock(); }"
           />
         </q-item-section>
         <q-item-section>

@@ -1,5 +1,5 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { defaultPresets } from '@/components/Graph/getters';
@@ -23,7 +23,7 @@ export default class GraphWidget extends WidgetBase {
       targets: [],
       renames: {},
       axes: {},
-      ...this.$props.config,
+      ...this.widget.config,
     };
   }
 
@@ -42,6 +42,11 @@ export default class GraphWidget extends WidgetBase {
   regraph() {
     this.$nextTick(() => this.$refs.widgetGraph.resetListeners());
   }
+
+  mounted() {
+    this.$watch('widget.cols', () => this.$refs.widgetGraph.refresh());
+    this.$watch('widget.rows', () => this.$refs.widgetGraph.refresh());
+  }
 }
 </script>
 
@@ -54,41 +59,42 @@ export default class GraphWidget extends WidgetBase {
         class="q-mr-md"
         style="width: 600px"
       >
-        <q-card dark class="q-pa-xs bg-dark-bright">
-          <GraphCard :id="$props.id" :config="graphCfg" shared-listeners/>
+        <q-card dark class="q-pa-xs bg-dark-bright" style="min-height: 100px">
+          <HistoryGraph :id="widget.id" :config="graphCfg" shared-listeners/>
         </q-card>
       </ScreenSizeConstrained>
       <GraphForm
         v-if="settingsModalOpen"
         v-bind="$props"
-        :field="graphCfg"
-        :on-change-field="saveConfig"
         :downsampling="downsampling"
+        @update:widget="saveWidget"
       />
     </q-dialog>
 
     <q-dialog v-model="graphModalOpen" maximized>
       <q-card v-if="graphModalOpen" dark>
-        <GraphCard :id="$props.id" :config="graphCfg" shared-listeners>
-          <q-btn-dropdown flat auto-close label="presets" icon="mdi-timelapse">
-            <q-list dark link>
-              <q-item
-                v-for="(preset, idx) in presets"
-                :key="idx"
-                dark
-                clickable
-                @click="() => applyPreset(preset)"
-              >
-                <q-item-section>{{ preset.duration }}</q-item-section>
-              </q-item>
-            </q-list>
-          </q-btn-dropdown>
-          <q-btn v-close-popup flat label="close"/>
-        </GraphCard>
+        <HistoryGraph :id="widget.id" :config="graphCfg" shared-listeners>
+          <template v-slot:controls>
+            <q-btn-dropdown flat auto-close label="presets" icon="mdi-timelapse">
+              <q-list dark link>
+                <q-item
+                  v-for="(preset, idx) in presets"
+                  :key="idx"
+                  dark
+                  clickable
+                  @click="applyPreset(preset)"
+                >
+                  <q-item-section>{{ preset.duration }}</q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+            <q-btn v-close-popup flat label="close"/>
+          </template>
+        </HistoryGraph>
       </q-card>
     </q-dialog>
 
-    <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
+    <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="settingsModalOpen = true">
           <q-list dark bordered>
@@ -97,7 +103,8 @@ export default class GraphWidget extends WidgetBase {
               label="Show maximized"
               @click="graphModalOpen = true"
             />
-            <q-expansion-item label="Timespan" icon="mdi-timelapse">
+            <ActionItem icon="refresh" label="Refresh" @click="regraph"/>
+            <q-expansion-item label="Timespan">
               <q-list dark>
                 <q-item
                   v-close-popup
@@ -112,34 +119,16 @@ export default class GraphWidget extends WidgetBase {
                 </q-item>
               </q-list>
             </q-expansion-item>
-            <ActionItem icon="refresh" label="Refresh" @click="regraph"/>
-            <ActionItem
-              v-if="$props.onCopy"
-              icon="file_copy"
-              label="Copy widget"
-              @click="$props.onCopy(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onMove"
-              icon="exit_to_app"
-              label="Move widget"
-              @click="$props.onMove(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onDelete"
-              icon="delete"
-              label="Delete widget"
-              @click="$props.onDelete(widgetId)"
-            />
+            <WidgetActions :field="me"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>
     </WidgetToolbar>
 
     <div class="col">
-      <GraphCard
+      <HistoryGraph
         ref="widgetGraph"
-        :id="$props.id"
+        :id="widget.id"
         :config="graphCfg"
         @downsample="v => downsampling = v"
       />

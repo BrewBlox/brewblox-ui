@@ -1,10 +1,9 @@
 <script lang="ts">
 import parseDuration from 'parse-duration';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import { durationString, objectSorter } from '@/helpers/functional';
-import { Link,Unit } from '@/helpers/units';
-import { SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
+import { Unit } from '@/helpers/units';
 import BlockForm from '@/plugins/spark/components/BlockForm';
 import sparkStore from '@/plugins/spark/store';
 
@@ -21,9 +20,7 @@ export default class SetpointProfileForm extends BlockForm {
   durationString = durationString;
   parseDuration = parseDuration;
 
-  get block() {
-    return this.blockField as SetpointProfileBlock;
-  }
+  readonly block!: SetpointProfileBlock;
 
   get tempUnit() {
     return sparkStore.units(this.block.serviceId).Temp;
@@ -41,29 +38,6 @@ export default class SetpointProfileForm extends BlockForm {
         absTimeMs: this.start + (point.time * 1000),
         temperature: point.temperature,
       }));
-  }
-
-  defaultData() {
-    return {
-      start: new Date().getTime() / 1000,
-      points: [],
-      enabled: false,
-      targetId: new SetpointSensorPairLink(null),
-      drivenTargetId: new Link(null),
-    };
-  }
-
-  presets() {
-    return [
-      {
-        label: 'Empty profile',
-        value: {
-          points: [],
-          enabled: true,
-          start: new Date().getTime() / 1000,
-        },
-      },
-    ];
   }
 
   savePoints(points: DisplaySetpoint[] = this.points) {
@@ -163,7 +137,7 @@ export default class SetpointProfileForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <BlockEnableToggle
@@ -171,30 +145,28 @@ export default class SetpointProfileForm extends BlockForm {
           v-bind="$props"
           :text-enabled="`Profile is enabled: ${block.data.targetId} will be set by the profile.`"
           :text-disabled="`Profile is disabled: ${block.data.targetId} will not be changed.`"
+          v-on="$listeners"
         />
         <q-separator v-if="block.data.targetId.id !== null" dark/>
         <q-item dark class="q-py-md">
           <q-item-section>
             <q-item-label caption>Start time</q-item-label>
-            <DatetimePopupEdit
-              :field="start"
-              :change="updateStartTime"
-              label="Start time"
-              tag="span"
-            >
-              This will shift all points.
+            <DatetimeField
+              :value="start"
+              title="Start time"
+              message-html="This will shift all points.
               <br>Offset time will remain the same, absolute time values will change.
-              <br>The offset for the first point is always 0s.
-            </DatetimePopupEdit>
+              <br>The offset for the first point is always 0s."
+              @input="updateStartTime"
+            />
           </q-item-section>
           <q-item-section>
             <q-item-label caption>Driven Setpoint/Sensor pair</q-item-label>
-            <LinkPopupEdit
-              :field="block.data.targetId"
-              :service-id="block.serviceId"
-              :change="callAndSaveBlock(v => block.data.targetId = v)"
-              label="Driven Setpoint/Sensor pair"
-              tag="span"
+            <LinkField
+              :value="block.data.targetId"
+              :service-id="serviceId"
+              title="Driven Setpoint/Sensor pair"
+              @input="v => { block.data.targetId = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>
@@ -202,7 +174,7 @@ export default class SetpointProfileForm extends BlockForm {
 
         <q-item dark class="q-pt-md">
           <q-item-section class="col-3 q-py-none">
-            <q-item-label caption>Offset from first</q-item-label>
+            <q-item-label caption>Offset from start</q-item-label>
           </q-item-section>
           <q-item-section class="col-5 q-py-none">
             <q-item-label caption>Time</q-item-label>
@@ -214,35 +186,34 @@ export default class SetpointProfileForm extends BlockForm {
         </q-item>
         <q-item v-for="(point, idx) in points" :key="idx" dark dense>
           <q-item-section class="col-3">
-            <InputPopupEdit
-              :field="durationString(point.offsetMs)"
-              :change="v => updatePointOffset(idx, parseDuration(v))"
-              label="Offset from start time"
-              tag="span"
-            >
-              This will change the point offset.
+            <InputField
+              :value="durationString(point.offsetMs)"
+              title="Offset from start time"
+              message-html="
+            This will change the point offset.
               <br>The absolute point time will be changed to start time + offset.
               <br>Changing point offset may change point order.
-            </InputPopupEdit>
+            "
+              @input="v => updatePointOffset(idx, parseDuration(v))"
+            />
           </q-item-section>
           <q-item-section class="col-5">
-            <DatetimePopupEdit
-              :field="point.absTimeMs"
-              :change="v => updatePointTime(idx, v)"
-              label="Time"
-              tag="span"
-            >
+            <DatetimeField
+              :value="point.absTimeMs"
+              title="Time"
+              message-html="
               This will change the absolute point time.
               <br>Changing point time may change point order.
               <br>Point offset is changed to point time - start time.
-            </DatetimePopupEdit>
+              "
+              @input="v => updatePointTime(idx, v)"
+            />
           </q-item-section>
           <q-item-section class="col-3">
-            <UnitPopupEdit
-              :field="point.temperature"
-              :change="v => updatePointTemperature(idx, v)"
-              label="Temperature"
-              tag="span"
+            <UnitField
+              :value="point.temperature"
+              title="Temperature"
+              @input="v => updatePointTemperature(idx, v)"
             />
           </q-item-section>
           <q-item-section class="col-1" side>
@@ -254,10 +225,6 @@ export default class SetpointProfileForm extends BlockForm {
             <q-btn flat icon="add" label="Add point" @click="addPoint"/>
           </q-item-section>
         </q-item>
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
       </q-expansion-item>
     </q-card-section>
   </q-card>
