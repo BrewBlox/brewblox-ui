@@ -8,11 +8,13 @@ import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import sparkStore from '@/plugins/spark/store';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 
+import { objectSorter, objectStringSorter } from '../../../helpers/functional';
 import { typeName as actuatorType } from '../features/DigitalActuator/getters';
 import { DigitalActuatorBlock } from '../features/DigitalActuator/types';
 
 interface EditableChannel extends IoChannel {
   id: number;
+  name: string;
   driver: DigitalActuatorBlock | null;
 }
 
@@ -40,24 +42,23 @@ export default class IoArray extends BlockWidget {
       .map((pin, idx) => {
         const id = idx + 1;
         const driverId = this.claimedChannels[id];
+        const name = this.idEnum[id];
         const driver = !!driverId
           ? sparkStore.blockById(this.serviceId, driverId)
           : null;
-        return { ...pin[this.idEnum[id]], id, driver };
-      });
+        return { ...pin[this.idEnum[id]], id, driver, name };
+      })
+      .sort(objectStringSorter('name'));
   }
 
   saveChannels() {
     this.block.data.pins = this.channels
+      .sort(objectSorter('id'))
       .map(channel => {
         const { id, state, config } = channel;
         return { [this.idEnum[id]]: { state, config } };
       });
     this.saveBlock();
-  }
-
-  channelName(channel) {
-    return this.idEnum[channel.id];
   }
 
   driverLink(channel: EditableChannel): Link {
@@ -107,7 +108,7 @@ export default class IoArray extends BlockWidget {
 <template>
   <q-card-section>
     <q-item v-for="channel in channels" :key="channel.id" dark>
-      <q-item-section>{{ channelName(channel) }}</q-item-section>
+      <q-item-section>{{ channel.name }}</q-item-section>
       <q-item-section>
         <DigitalStateField
           v-if="channel.driver"

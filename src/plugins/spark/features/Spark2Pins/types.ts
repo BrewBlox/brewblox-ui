@@ -4,7 +4,7 @@ export enum Spark2PinId {
   bottom1 = 1,
   bottom2 = 2,
   bottom3 = 3,
-  bottom4 = 4,
+  bottom0 = 4,
 }
 
 export enum Spark2Hardware {
