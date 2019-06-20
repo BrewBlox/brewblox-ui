@@ -275,8 +275,8 @@ export default class SparkPage extends Vue {
 
     const discovered = sparkStore.discoveredBlocks(this.service.id);
     const message = discovered.length > 0
-      ? `Discovered ${discovered.join(', ')}`
-      : 'Discovered no new blocks';
+      ? `Discovered ${discovered.join(', ')}.`
+      : 'Discovered no new blocks.';
 
     this.$q.notify({
       message,
@@ -307,6 +307,16 @@ export default class SparkPage extends Vue {
       });
   }
 
+  async cleanUnusedNames() {
+    const names = await sparkStore.cleanUnusedNames(this.service.id);
+
+    const message = names.length > 0
+      ? `Cleaned ${names.join(', ')}.`
+      : 'No unused names found.';
+
+    this.$q.notify({ message, icon: 'mdi-tag-remove' });
+  }
+
   destroyed() {
     this.statusCheckInterval && clearTimeout(this.statusCheckInterval);
   }
@@ -327,6 +337,11 @@ export default class SparkPage extends Vue {
             icon="mdi-magnify-plus-outline"
             label="Discover new OneWire Blocks"
             @click="discoverBlocks"
+          />
+          <ActionItem
+            icon="mdi-tag-remove"
+            label="Remove unused Block names"
+            @click="cleanUnusedNames"
           />
           <ActionItem icon="wifi" label="Configure Wifi" @click="startDialog('SparkWifiMenu')"/>
           <ActionItem
