@@ -48,7 +48,7 @@ const block: BlockSpec = {
   ],
   changes: [
     {
-      key: 'state',
+      key: 'desiredState',
       title: 'State',
       component: 'StateValEdit',
       generate: () => 0,
