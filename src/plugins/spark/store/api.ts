@@ -72,6 +72,10 @@ export const clearBlocks = async (serviceId: string): Promise<any> =>
   del(`/${encodeURIComponent(serviceId)}/objects`, {})
     .catch(intercept(`Failed to clear blocks on ${serviceId}`));
 
+export const cleanUnusedNames = async (serviceId: string): Promise<string[]> =>
+  del(`/${encodeURIComponent(serviceId)}/unused_names`, {})
+    .catch(intercept(`Failed to clean unused block names on ${serviceId}`));
+
 export const fetchUnits = async (serviceId: string): Promise<UserUnits> =>
   get(`/${encodeURIComponent(serviceId)}/codec/units`)
     .catch(intercept(`Failed to fetch unit settings on ${serviceId}`));

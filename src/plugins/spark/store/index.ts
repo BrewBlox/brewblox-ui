@@ -19,6 +19,7 @@ import {
   UserUnits,
 } from '../types';
 import {
+  cleanUnusedNames as cleanUnusedNamesInApi,
   clearBlocks as clearBlocksInApi,
   createBlock as createBlockInApi,
   deleteBlock as deleteBlockInApi,
@@ -431,6 +432,11 @@ export class SparkModule extends VuexModule {
   @Action
   public async clearDiscoveredBlocks(serviceId: string): Promise<void> {
     this.commitDiscoveredBlocks([serviceId, []]);
+  }
+
+  @Action
+  public async cleanUnusedNames(serviceId: string): Promise<string[]> {
+    return await cleanUnusedNamesInApi(serviceId);
   }
 
   @Action
