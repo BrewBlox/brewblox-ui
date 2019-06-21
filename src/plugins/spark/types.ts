@@ -76,10 +76,11 @@ export interface CompatibleTypes {
 export interface SystemStatus {
   checkedAt: Date;
   available: boolean;
-  connected: boolean;
-  matched: boolean;
-  synchronized: boolean;
-  issues: string[];
+  connect: boolean;
+  handshake: boolean;
+  synchronize: boolean;
+  compatible: boolean;
+  info: string[];
   error?: any;
 }
 

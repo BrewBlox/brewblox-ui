@@ -443,7 +443,7 @@ export class SparkModule extends VuexModule {
   public async fetchAll(serviceId: string): Promise<void> {
     const status = await fetchSystemStatusInApi(serviceId);
     this.commitLastStatus([serviceId, status]);
-    if (status.synchronized) {
+    if (status.synchronize) {
       await Promise.all([
         this.fetchUnits(serviceId),
         this.fetchUnitAlternatives(serviceId),
