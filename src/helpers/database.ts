@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import PouchDB from 'pouchdb';
 
 type ChangeEvent = PouchDB.Core.ChangesResponseChange<{}>;
@@ -68,6 +69,13 @@ const databaseInfo =
     try {
       return await db.info();
     } catch (e) {
+      dbErrors.push({
+        message: 'No remote database available',
+        moduleId: 'all',
+        time: new Date().toString(),
+        content: '',
+        error: e.message,
+      });
       return null;
     }
   };
@@ -96,8 +104,11 @@ export const initDb = (host: string, name: string): void => {
 
         const actualDb = new PouchDB(name);
 
+        if (remoteInfo) {
+          await actualDb.replicate.from(remoteAddress);
+        }
+
         actualDb
-          /* eslint-disable-next-line @typescript-eslint/camelcase */
           .changes({ live: true, include_docs: true, since: 'now' })
           .on('change', (evt: ChangeEvent) => {
             const handler = MODULES.find(m => checkInModule(m.id, evt.id));
@@ -112,7 +123,7 @@ export const initDb = (host: string, name: string): void => {
           });
 
         if (remoteInfo) {
-          actualDb.sync(remoteAddress, { live: true, retry: true });
+          actualDb.sync(remoteAddress, { live: true, retry: true, batch_size: 1000 });
         }
 
         resolve(actualDb);
@@ -141,7 +152,6 @@ export function registerModule(module: Module): void {
 
 export async function fetchAll(moduleId: string): Promise<any[]> {
   const db = await promisedDb();
-  /* eslint-disable-next-line @typescript-eslint/camelcase */
   const resp = await db.allDocs({ include_docs: true })
     .catch(intercept('Fetch all objects', moduleId));
   return resp.rows
