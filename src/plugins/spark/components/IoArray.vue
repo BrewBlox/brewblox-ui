@@ -3,14 +3,14 @@ import get from 'lodash/get';
 import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { objectSorter, objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import sparkStore from '@/plugins/spark/store';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 
-import { objectSorter, objectStringSorter } from '../../../helpers/functional';
 import { typeName as actuatorType } from '../features/DigitalActuator/getters';
 import { DigitalActuatorBlock } from '../features/DigitalActuator/types';
+import BlockCrudComponent from './BlockCrudComponent';
 
 interface EditableChannel extends IoChannel {
   id: number;
@@ -25,11 +25,8 @@ interface IoArrayBlock extends Block {
 }
 
 @Component
-export default class IoArray extends BlockWidget {
+export default class IoArray extends BlockCrudComponent {
   readonly block!: IoArrayBlock;
-
-  @Prop({ type: Object, required: true })
-  public readonly idEnum!: any;
 
   get claimedChannels() {
     return sparkStore.blockValues(this.serviceId)
@@ -42,11 +39,11 @@ export default class IoArray extends BlockWidget {
       .map((pin, idx) => {
         const id = idx + 1;
         const driverId = this.claimedChannels[id];
-        const name = this.idEnum[id];
+        const [name] = Object.keys(pin);
         const driver = !!driverId
           ? sparkStore.blockById(this.serviceId, driverId)
           : null;
-        return { ...pin[this.idEnum[id]], id, driver, name };
+        return { ...pin[name], id, driver, name };
       })
       .sort(objectStringSorter('name'));
   }
@@ -55,8 +52,8 @@ export default class IoArray extends BlockWidget {
     this.block.data.pins = this.channels
       .sort(objectSorter('id'))
       .map(channel => {
-        const { id, state, config } = channel;
-        return { [this.idEnum[id]]: { state, config } };
+        const { state, config, name } = channel;
+        return { [name]: { state, config } };
       });
     this.saveBlock();
   }
