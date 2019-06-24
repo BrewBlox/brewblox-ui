@@ -70,7 +70,6 @@ export default class BlockCrudComponent extends CrudComponent {
 
   public openModal(opts: { formProps?: any; graphProps?: any } = {}): void {
     const { formProps, graphProps } = opts;
-    console.log(formProps, graphProps);
     Dialog.create({
       component: 'FormDialog',
       root: this.$root,

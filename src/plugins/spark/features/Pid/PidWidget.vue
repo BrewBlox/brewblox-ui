@@ -46,11 +46,19 @@ export default class PidWidget extends BlockWidget {
   }
 
   get hasInputBlock() {
-    return !!this.block.data.inputId.id;
+    const id = this.block.data.inputId.id;
+    return id
+      && sparkStore
+        .blockIds(this.serviceId)
+        .includes(id);
   }
 
   get hasOutputBlock() {
-    return !!this.block.data.outputId.id;
+    const id = this.block.data.outputId.id;
+    return id
+      && sparkStore
+        .blockIds(this.serviceId)
+        .includes(id);
   }
 
   findLinks(id: string | null): BlockLink[] {

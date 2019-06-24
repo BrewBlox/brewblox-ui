@@ -8,6 +8,9 @@ import { DashboardItem } from '@/store/dashboards';
 import featureStore from '@/store/features';
 
 export const showBlockDialog = (block: Block, root: Vue, props: any = {}) => {
+  if (!block) {
+    return;
+  }
   let widget: DashboardItem = {
     id: uid(),
     title: block.id,

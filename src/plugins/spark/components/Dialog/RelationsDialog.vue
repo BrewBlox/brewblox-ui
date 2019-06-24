@@ -205,9 +205,11 @@ export default class RelationsDialog extends DialogBase {
         `"
         class="row"
       >
-        <svg ref="svg" class="diag-svg col-12">
-          <g ref="diagram" class="diag-g"/>
+        <q-space/>
+        <svg ref="svg" class="col-auto">
+          <g ref="diagram"/>
         </svg>
+        <q-space/>
       </div>
     </q-card>
   </q-dialog>
