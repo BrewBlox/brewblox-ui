@@ -23,7 +23,7 @@ export default class TempSensorOneWireWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :field="me" graph/>
+    <BlockWidgetToolbar :crud="crud" graph/>
 
     <q-card-section>
       <q-item v-if="block.data.value === null" dark>

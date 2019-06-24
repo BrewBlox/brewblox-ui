@@ -4,7 +4,7 @@ import get from 'lodash/get';
 import { Dialog, uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
-import FormBase from '@/components/Widget/FormBase';
+import CrudComponent from '@/components/Widget/CrudComponent';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import sparkStore from '@/plugins/spark/store';
 import { Block, ChangeField } from '@/plugins/spark/types';
@@ -24,7 +24,7 @@ interface StepDisplay extends Step {
 }
 
 @Component
-export default class StepViewForm extends FormBase {
+export default class StepViewForm extends CrudComponent {
   editableChanges: Record<string, boolean> = {};
 
   @Prop({ type: String })
@@ -205,7 +205,7 @@ export default class StepViewForm extends FormBase {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <FormToolbar :title="widget.title"/>
 
     <q-card-section>
       <div class="scroll-parent">

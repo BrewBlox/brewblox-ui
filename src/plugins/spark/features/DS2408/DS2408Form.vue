@@ -1,12 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 
 import { DS2408Block, DS2408Id, ValveStartId } from './types';
 
 @Component
-export default class DS2408Form extends BlockForm {
+export default class DS2408Form extends BlockCrudComponent {
   DS2408Id = DS2408Id;
   ValveStartId = ValveStartId;
   readonly block!: DS2408Block;
@@ -15,7 +15,7 @@ export default class DS2408Form extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <FormToolbar :title="widget.title"/>
 
     <ValveArray v-bind="$props" :id-enum="DS2408Id" :name-enum="ValveStartId" v-on="$listeners"/>
     <q-card-section>

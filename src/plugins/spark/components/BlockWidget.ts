@@ -8,10 +8,14 @@ import sparkStore from '@/plugins/spark/store';
 import { GraphValueAxes, QueryParams } from '@/store/history';
 
 import { Block } from '../types';
+import { BlockCrud } from './BlockCrudComponent';
 
 @Component
 export default class BlockWidget extends WidgetBase {
-  public me!: BlockWidget;
+
+  public get block(): Block {
+    return sparkStore.blockById(this.serviceId, this.blockId);
+  }
 
   public get serviceId(): string {
     return this.widget.config.serviceId;
@@ -21,8 +25,15 @@ export default class BlockWidget extends WidgetBase {
     return this.widget.config.blockId;
   }
 
-  public get block(): Block {
-    return sparkStore.blockById(this.serviceId, this.blockId);
+  public get crud(): BlockCrud {
+    return {
+      widget: this.widget,
+      isStoreWidget: !this.volatile,
+      saveWidget: this.saveWidget,
+      block: this.block,
+      isStoreBlock: true,
+      saveBlock: this.saveBlock,
+    };
   }
 
   public get isDriven(): boolean {
@@ -85,12 +96,9 @@ export default class BlockWidget extends WidgetBase {
 
   public openModal(): void {
     Dialog.create({
-      component: 'BlockFormDialog',
-      getBlock: () => this.block,
-      getWidget: () => this.widget,
-      saveBlock: this.saveBlock,
-      saveWidget: this.saveWidget,
+      component: 'FormDialog',
       root: this.$root,
+      getCrud: () => this.crud,
     });
   }
 

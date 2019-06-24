@@ -12,6 +12,8 @@ import { DashboardItem } from '@/store/dashboards';
 import serviceStore from '@/store/services';
 import { Service } from '@/store/services';
 
+import { BlockCrud } from './BlockCrudComponent';
+
 @Component
 export default class BlockWidgetWizard extends WidgetWizardBase {
   currentStep: string = 'start';
@@ -19,6 +21,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
   blockId: string = '';
   service: Service | null = null;
   block: Block | null = null;
+  isStoreBlock: boolean = false;
   widget: DashboardItem | null = null;
 
   get serviceId(): string {
@@ -89,15 +92,27 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
     };
   }
 
+  async saveBlock(block: Block) {
+    this.block = block;
+    if (this.isStoreBlock) {
+      await sparkStore.saveBlock([block.serviceId, block]);
+    }
+  }
+
   configureBlock() {
     this.ensureItem();
+    const crud: BlockCrud = {
+      widget: this.widget as DashboardItem,
+      isStoreWidget: false,
+      saveWidget: v => { this.widget = v; },
+      block: this.block as Block,
+      isStoreBlock: this.isStoreBlock,
+      saveBlock: this.saveBlock,
+    };
     Dialog.create({
-      component: 'BlockFormDialog',
-      getBlock: () => this.block,
-      getWidget: () => this.widget,
-      saveBlock: v => this.block = v,
-      saveWidget: v => this.widget = v,
+      component: 'FormDialog',
       root: this.$root,
+      getCrud: () => crud,
     });
   }
 
@@ -146,14 +161,14 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
           label="Create new Block"
           color="primary"
           class="q-mx-md"
-          @click="currentStep = 'create'"
+          @click="isStoreBlock = false; currentStep = 'create'"
         />
         <q-btn
           :disable="!startOk"
           unelevated
           label="Use existing Block"
           color="primary"
-          @click="currentStep = 'existing'"
+          @click="isStoreBlock = true; currentStep = 'existing'"
         />
       </q-stepper-navigation>
     </q-step>

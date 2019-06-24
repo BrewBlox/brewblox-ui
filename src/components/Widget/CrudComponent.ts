@@ -10,7 +10,7 @@ import featureStore from '@/store/features';
 export interface Crud {
   widget: DashboardItem;
   isStoreWidget: boolean;
-  saveWidget: (widget: DashboardItem) => void;
+  saveWidget: (widget: DashboardItem) => unknown | Promise<unknown>;
 }
 
 @Component
@@ -38,7 +38,22 @@ export default class CrudComponent extends Vue {
     this.saveWidget({ ...this.widget, config });
   }
 
-  public copyWidget() {
+  public startChangeWidgetTitle() {
+    let widgetTitle = this.widget.title;
+    Dialog.create({
+      title: 'Change Widget name',
+      message: `Choose a new name for '${widgetTitle}'`,
+      dark: true,
+      cancel: true,
+      prompt: {
+        model: widgetTitle,
+        type: 'text',
+      },
+    })
+      .onOk(title => this.saveWidget({ ...this.widget, title }));
+  }
+
+  public startCopyWidget() {
     const id = uid();
     Dialog.create({
       title: 'Copy widget',
@@ -65,7 +80,7 @@ export default class CrudComponent extends Vue {
       });
   }
 
-  public moveWidget() {
+  public startMoveWidget() {
     Dialog.create({
       title: 'Move widget',
       message: `To which dashboard do you want to move widget ${this.widget.title}?`,
@@ -83,7 +98,7 @@ export default class CrudComponent extends Vue {
         dashboard && this.saveWidget({ ...this.widget, dashboard, pinnedPosition: null }));
   }
 
-  public deleteWidget() {
+  public startRemoveWidget() {
     const deleteItem = () => dashboardStore.removeDashboardItem(this.widget);
 
     // Quasar dialog can't handle objects as value - they will be returned as null

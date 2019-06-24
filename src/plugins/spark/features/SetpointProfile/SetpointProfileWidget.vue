@@ -79,7 +79,7 @@ export default class SetpointProfileWidget extends BlockWidget {
       />
     </q-dialog>
 
-    <BlockWidgetToolbar :field="me"/>
+    <BlockWidgetToolbar :crud="crud"/>
     <div class="col-auto">
       <q-item v-if="!block.data.enabled" dark>
         <q-item-section avatar>

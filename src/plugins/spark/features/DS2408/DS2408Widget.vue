@@ -15,7 +15,7 @@ export default class DS2408Widget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :field="me"/>
+    <BlockWidgetToolbar :crud="crud"/>
     <ValveArray v-bind="$props" :id-enum="DS2408Id" :name-enum="ValveStartId" v-on="$listeners"/>
   </q-card>
 </template>

@@ -63,12 +63,7 @@ export default class GraphWidget extends WidgetBase {
           <HistoryGraph :id="widget.id" :config="graphCfg" shared-listeners/>
         </q-card>
       </ScreenSizeConstrained>
-      <GraphForm
-        v-if="settingsModalOpen"
-        v-bind="$props"
-        :downsampling="downsampling"
-        @update:widget="saveWidget"
-      />
+      <GraphForm v-if="settingsModalOpen" :crud="crud" :downsampling="downsampling"/>
     </q-dialog>
 
     <q-dialog v-model="graphModalOpen" maximized>
@@ -119,7 +114,7 @@ export default class GraphWidget extends WidgetBase {
                 </q-item>
               </q-list>
             </q-expansion-item>
-            <WidgetActions :field="me"/>
+            <WidgetActions :crud="crud"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

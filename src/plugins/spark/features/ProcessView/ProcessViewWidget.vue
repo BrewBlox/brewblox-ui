@@ -127,11 +127,10 @@ export default class ProcessViewWidget extends WidgetBase {
     <q-dialog v-model="formModalOpen" no-backdrop-dismiss maximized>
       <ProcessViewForm
         v-if="formModalOpen"
-        v-bind="$props"
+        :crud="crud"
         :widget-grid-rect="widgetGridRect"
         :parts="parts"
         :flow-parts="flowParts"
-        @update:widget="saveWidget"
         @parts="updateParts"
         @part="updatePart"
         @state="updatePartState"
@@ -149,8 +148,8 @@ export default class ProcessViewWidget extends WidgetBase {
           @click="widgetGridRect = gridRect(); formModalOpen = true"
         >
           <q-list dark bordered>
-            <ExportAction :widget-id="widget.id"/>
-            <WidgetActions :field="me"/>
+            <ExportAction :crud="crud"/>
+            <WidgetActions :crud="crud"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

@@ -39,12 +39,12 @@ export default class SparkGroupMenu extends DialogBase {
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
     <q-card dark class="widget-modal">
-      <FormToolbar @close="onDialogHide">
+      <DialogToolbar @close="onDialogHide">
         <q-item-section>
           <q-item-label>{{ service.id }}</q-item-label>
           <q-item-label caption>Group menu</q-item-label>
         </q-item-section>
-      </FormToolbar>
+      </DialogToolbar>
 
       <q-card-section>
         <q-item dark>

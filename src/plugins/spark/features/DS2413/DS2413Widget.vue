@@ -14,7 +14,7 @@ export default class DS2413Widget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :field="me"/>
+    <BlockWidgetToolbar :crud="crud"/>
 
     <IoArray v-bind="$props" :id-enum="DS2413Id" v-on="$listeners"/>
   </q-card>

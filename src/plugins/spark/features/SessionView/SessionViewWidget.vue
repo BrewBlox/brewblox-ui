@@ -124,7 +124,7 @@ export default class SessionViewWidget extends WidgetBase {
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="openModal()">
           <q-list dark bordered>
-            <WidgetActions :field="me"/>
+            <WidgetActions :crud="crud"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

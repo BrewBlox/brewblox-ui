@@ -4,12 +4,12 @@ import { Component, Prop } from 'vue-property-decorator';
 import CrudComponent from '../Widget/CrudComponent';
 
 @Component
-export default class RenameWidgetAction extends CrudComponent {
+export default class RemoveWidgetAction extends CrudComponent {
 
-  @Prop({ type: String, default: 'Rename Widget' })
+  @Prop({ type: String, default: 'Delete widget' })
   readonly label!: string;
 
-  @Prop({ type: String, default: 'edit' })
+  @Prop({ type: String, default: 'delete' })
   readonly icon!: string;
 
   get itemProps() {
@@ -22,5 +22,5 @@ export default class RenameWidgetAction extends CrudComponent {
 </script>
 
 <template>
-  <ActionItem v-bind="itemProps" @click="startChangeWidgetTitle"/>
+  <ActionItem v-bind="itemProps" @click="startRemoveWidget"/>
 </template>

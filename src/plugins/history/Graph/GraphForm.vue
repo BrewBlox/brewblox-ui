@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
 import { GraphConfig } from '@/components/Graph/types';
-import FormBase from '@/components/Widget/FormBase';
+import CrudComponent from '@/components/Widget/CrudComponent';
 import { durationString } from '@/helpers/functional';
 import historyStore, { DisplayNames } from '@/store/history';
 import { GraphValueAxes } from '@/store/history';
@@ -16,7 +16,7 @@ interface PeriodDisplay {
 }
 
 @Component
-export default class GraphForm extends FormBase {
+export default class GraphForm extends CrudComponent {
   durationString = durationString;
 
   @Prop({ type: Object, default: () => ({}) })
@@ -149,7 +149,7 @@ export default class GraphForm extends FormBase {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <FormToolbar :title="widget.title"/>
 
     <q-card-section>
       <q-expansion-item group="modal" icon="mdi-timetable" label="Period settings">

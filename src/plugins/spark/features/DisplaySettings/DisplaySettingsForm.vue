@@ -2,12 +2,12 @@
 import { Component } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { validDisplayTypes } from '@/plugins/spark/features/DisplaySettings/getters';
 import { DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/features/DisplaySettings/types';
 
 @Component
-export default class DisplaySettingsForm extends BlockForm {
+export default class DisplaySettingsForm extends BlockCrudComponent {
   readonly block!: DisplaySettingsBlock;
 
   get slots() {
@@ -113,7 +113,7 @@ export default class DisplaySettingsForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <FormToolbar :title="widget.title"/>
 
     <q-card-section class="row">
       <q-item v-for="(slot, idx) in slots" :key="idx" dark class="row q-pa-sm col-4">

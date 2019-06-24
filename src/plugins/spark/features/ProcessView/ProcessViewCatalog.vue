@@ -46,7 +46,7 @@ export default class ProcessViewCatalog extends Vue {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar>Part Catalog</FormToolbar>
+    <DialogToolbar>Part Catalog</DialogToolbar>
 
     <q-scroll-area style="min-height: 400px; height: 60vh;">
       <q-card-section>

@@ -1,7 +1,6 @@
 <script lang="ts">
 import { select as d3Select } from 'd3-selection';
 import { graphlib, render as dagreRender } from 'dagre-d3';
-import { Dialog, uid } from 'quasar';
 import { saveSvgAsPng } from 'save-svg-as-png';
 import { setTimeout } from 'timers';
 import Vue from 'vue';
@@ -9,9 +8,9 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
+import { showBlockDialog } from '@/helpers/dialog';
 import sparkStore from '@/plugins/spark/store';
 import { BlockLink } from '@/plugins/spark/types';
-import featureStore from '@/store/features';
 
 interface Edge {
   source: string;
@@ -173,32 +172,9 @@ export default class RelationsDialog extends DialogBase {
 
   openSettings(id: string) {
     const block = sparkStore.blocks(this.serviceId)[id];
-    if (!block) {
-      return;
+    if (block) {
+      showBlockDialog(block, this.$root);
     }
-
-    const widget = {
-      id: uid(),
-      title: block.id,
-      feature: block.type,
-      dashboard: '',
-      order: 0,
-      config: {
-        serviceId: this.serviceId,
-        blockId: block.id,
-      },
-      ...featureStore.widgetSizeById(block.type),
-    };
-
-    Dialog.create({
-      component: 'BlockFormDialog',
-      root: this.$root,
-      volatile: true,
-      getBlock: () => block,
-      getWidget: () => widget,
-      saveBlock: v => sparkStore.saveBlock([this.serviceId, v]),
-      saveWidget: () => { },
-    });
   }
 }
 </script>
@@ -206,7 +182,7 @@ export default class RelationsDialog extends DialogBase {
 <template>
   <q-dialog ref="dialog" maximized no-backdrop-dismiss @hide="onDialogHide">
     <q-card dark class="maximized bg-dark-bright">
-      <FormToolbar ref="toolbar" @close="onDialogHide">
+      <DialogToolbar ref="toolbar" @close="onDialogHide">
         {{ title }}
         <template v-slot:buttons>
           <!-- Exporting is bugged right now. See https://github.com/BrewBlox/brewblox-ui/issues/638 -->
@@ -219,7 +195,7 @@ export default class RelationsDialog extends DialogBase {
             @click="exportDiagram"
           />
         </template>
-      </FormToolbar>
+      </DialogToolbar>
 
       <div
         :style="`

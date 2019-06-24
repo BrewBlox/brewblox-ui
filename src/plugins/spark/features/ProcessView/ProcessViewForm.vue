@@ -2,7 +2,7 @@
 import { Dialog, uid } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import FormBase from '@/components/Widget/FormBase';
+import CrudComponent from '@/components/Widget/CrudComponent';
 import { Coordinates } from '@/helpers/coordinates';
 import { clampRotation, spaceCased } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/shadow-copy';
@@ -36,7 +36,7 @@ interface ToolAction {
     ProcessViewPartMenu,
   },
 })
-export default class ProcessViewForm extends FormBase {
+export default class ProcessViewForm extends CrudComponent {
   SQUARE_SIZE = SQUARE_SIZE;
   spaceCased = spaceCased;
 
@@ -380,7 +380,7 @@ export default class ProcessViewForm extends FormBase {
 
 <template>
   <q-card dark class="maximized bg-dark">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <FormToolbar :title="widget.title"/>
 
     <q-dialog v-model="menuModalOpen" no-backdrop-dismiss>
       <ProcessViewPartMenu
@@ -428,7 +428,7 @@ export default class ProcessViewForm extends FormBase {
 
         <q-separator dark inset/>
 
-        <ExportAction :widget-id="widget.id" no-close/>
+        <ExportAction :crud="crud" no-close/>
         <ActionItem icon="delete" label="Delete all parts" no-close @click="clearParts"/>
       </q-list>
 

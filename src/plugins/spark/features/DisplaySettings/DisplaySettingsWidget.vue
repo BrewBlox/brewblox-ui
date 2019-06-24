@@ -26,7 +26,7 @@ export default class DisplaySettingsWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :field="me"/>
+    <BlockWidgetToolbar :crud="crud"/>
 
     <q-card-section>
       <q-list dark dense>

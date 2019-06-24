@@ -1,11 +1,11 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { Spark3PinId, Spark3PinsBlock } from '@/plugins/spark/features/Spark3Pins/types';
 
 @Component
-export default class Spark3PinsForm extends BlockForm {
+export default class Spark3PinsForm extends BlockCrudComponent {
   Spark3PinId = Spark3PinId;
   readonly block!: Spark3PinsBlock;
 }
@@ -13,7 +13,7 @@ export default class Spark3PinsForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <FormToolbar :title="widget.title"/>
 
     <IoArray v-bind="$props" :id-enum="Spark3PinId" v-on="$listeners"/>
     <q-separator dark inset/>

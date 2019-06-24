@@ -1,16 +1,17 @@
 <script lang="ts">
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 @Component
-export default class FormToolbar extends Vue { }
+export default class FormToolbar extends Vue {
+  @Prop({ type: String, required: true })
+  readonly title!: string;
+}
 </script>
 
 <template>
-  <q-bar class="row items-center bg-primary q-py-lg text-white">
+  <DialogToolbar>
+    <span class="text-h6 q-mr-md">{{ title }}</span>
     <slot/>
-    <q-space/>
-    <slot name="buttons"/>
-    <q-btn v-close-popup flat rounded label="close" @click="$emit('close')"/>
-  </q-bar>
+  </DialogToolbar>
 </template>

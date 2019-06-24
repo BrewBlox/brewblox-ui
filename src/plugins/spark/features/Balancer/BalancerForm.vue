@@ -1,19 +1,19 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 
 import { BalancerBlock } from './types';
 
 @Component
-export default class BalancerForm extends BlockForm {
+export default class BalancerForm extends BlockCrudComponent {
   readonly block!: BalancerBlock;
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <FormToolbar :title="widget.title"/>
     <q-card-section>
       <q-item dark>
         <q-item-section>

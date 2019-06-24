@@ -70,7 +70,7 @@ export default class ExampleFeatureWidget extends WidgetBase {
       <q-btn-dropdown flat label="actions">
         <q-list dark bordered>
           <ActionItem icon="mdi-message-alert" label="Alert" @click="alert"/>
-          <WidgetActions :field="me"/>
+          <WidgetActions :crud="crud"/>
         </q-list>
       </q-btn-dropdown>
     </WidgetToolbar>
