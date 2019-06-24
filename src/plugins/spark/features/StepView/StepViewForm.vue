@@ -99,7 +99,7 @@ export default class StepViewForm extends CrudComponent {
   }
 
   findProp(change: BlockChangeDisplay, key: string): ChangeField {
-    return change.props.find(prop => prop.key === key) as ChangeField;
+    return (change.props.find(prop => prop.key === key) || {}) as ChangeField;
   }
 
   componentProps(change: BlockChangeDisplay, key: string): any {
@@ -243,7 +243,10 @@ export default class StepViewForm extends CrudComponent {
               dense
             >
               <q-item dark>
-                <q-item-section class="text-h6">{{ change.blockId }}</q-item-section>
+                <q-item-section :class="{'text-h6': true, 'text-red': !change.block}">
+                  {{ change.blockId }}
+                  <q-tooltip v-if="!change.block">Block not found</q-tooltip>
+                </q-item-section>
                 <template v-if="editableChanges[change.key]">
                   <q-item-section side>
                     <q-btn flat round icon="delete" @click="removeChange(step, change.key)">

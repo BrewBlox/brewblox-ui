@@ -36,7 +36,7 @@ export default class ActuatorOffsetWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" graph/>
+    <BlockWidgetToolbar :crud="crud" :graph-cfg="graphCfg"/>
 
     <q-card-section>
       <q-item v-if="!block.data.enabled" dark>

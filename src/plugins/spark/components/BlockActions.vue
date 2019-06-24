@@ -21,7 +21,7 @@ export default class BlockActions extends BlockCrudComponent { }
       <ActionItem icon="mdi-information" label="Block Info" @click="startBlockInfo"/>
       <BlockGroupsAction :crud="crud"/>
       <BlockPresetsAction :crud="crud"/>
-      <ActionItem v-if="isStoreBlock" icon="delete" label="Remove Block" @click="startRemoveBlock"/>
+      <RemoveBlockAction :crud="crud"/>
     </q-list>
   </q-expansion-item>
 </template>

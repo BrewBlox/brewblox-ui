@@ -136,7 +136,7 @@ export default class PidWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" graph>
+    <BlockWidgetToolbar :crud="crud" :graph-cfg.sync="graphCfg">
       <template v-slot:actions>
         <ActionItem icon="mdi-ray-start-arrow" label="Show Relations" @click="showRelations"/>
       </template>

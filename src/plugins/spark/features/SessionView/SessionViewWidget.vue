@@ -104,9 +104,8 @@ export default class SessionViewWidget extends WidgetBase {
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
       <SessionViewForm
         v-if="modalOpen"
-        v-bind="$props"
+        :crud="crud"
         :active-session="modalSession"
-        @update:widget="saveWidget"
         @create-session="createSession"
       />
     </q-dialog>

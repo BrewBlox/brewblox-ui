@@ -1,14 +1,10 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 import CrudComponent from './CrudComponent';
 
 @Component
-export default class FormToolbar extends CrudComponent {
-  @Prop({ type: String, required: true })
-  readonly title!: string;
-}
+export default class FormToolbar extends CrudComponent { }
 </script>
 
 <template>

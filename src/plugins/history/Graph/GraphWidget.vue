@@ -31,6 +31,10 @@ export default class GraphWidget extends WidgetBase {
     return defaultPresets();
   }
 
+  isActivePreset(preset: QueryParams) {
+    return JSON.stringify(preset) === JSON.stringify(this.graphCfg.params);
+  }
+
   applyPreset(preset: QueryParams) {
     this.saveConfig({
       ...this.graphCfg,
@@ -74,6 +78,7 @@ export default class GraphWidget extends WidgetBase {
               <q-list dark link>
                 <q-item
                   v-for="(preset, idx) in presets"
+                  :active="isActivePreset(preset)"
                   :key="idx"
                   dark
                   clickable

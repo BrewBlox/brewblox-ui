@@ -201,9 +201,8 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
         <q-space/>
         <q-btn
           :disable="!createOk"
-          unelevated
+          flat
           label="Configure Block"
-          color="primary"
           class="q-mx-md"
           @click="configureBlock"
         />
@@ -245,9 +244,8 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
         <q-space/>
         <q-btn
           :disable="!existingOk"
-          unelevated
+          flat
           label="Configure Block"
-          color="primary"
           class="q-mx-md"
           @click="configureBlock"
         />

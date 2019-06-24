@@ -24,7 +24,7 @@ export default class SetpointSensorPairWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" graph/>
+    <BlockWidgetToolbar :crud="crud" :graph-cfg="graphCfg"/>
 
     <q-card-section>
       <q-item dark>

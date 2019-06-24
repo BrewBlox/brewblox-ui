@@ -5,8 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import sparkStore from '@/plugins/spark/store/';
 
-import { Block } from '../types';
-import BlockCrudComponent from './BlockCrudComponent';
+import BlockCrudComponent from '../BlockCrudComponent';
 
 @Component
 export default class BlockPresetsAction extends BlockCrudComponent {

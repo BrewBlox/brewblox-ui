@@ -1,4 +1,5 @@
 <script lang="ts">
+import { Layout, PlotData } from 'plotly.js';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
@@ -15,15 +16,22 @@ export default class FormDialog extends DialogBase {
   @Prop({ type: Function, required: true })
   public readonly getCrud!: () => Crud;
 
-  @Prop({ type: Function, default: () => ({}) })
-  public readonly getProps!: () => any;
+  @Prop({ type: Function, default: () => null })
+  public readonly getFormProps!: () => any;
+
+  @Prop({ type: Function, default: () => null })
+  public readonly getGraphProps!: () => any;
 
   get crud(): Crud {
     return this.getCrud();
   }
 
   get formProps(): any {
-    return this.getProps();
+    return this.getFormProps() || {};
+  }
+
+  get graphProps(): any {
+    return this.getGraphProps();
   }
 
   get widget(): DashboardItem {
@@ -37,7 +45,17 @@ export default class FormDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
+  <q-dialog ref="dialog" no-backdrop-dismiss class="row" @hide="onDialogHide">
+    <ScreenSizeConstrained
+      v-if="graphProps"
+      :min-width="1500"
+      class="q-mr-md"
+      style="width: 600px;"
+    >
+      <q-card dark class="q-pa-xs bg-dark-bright">
+        <Graph v-bind="graphProps"/>
+      </q-card>
+    </ScreenSizeConstrained>
     <component :is="form" :crud="crud" v-bind="formProps"/>
   </q-dialog>
 </template>

@@ -201,13 +201,7 @@ export default class BlockWizard extends Vue {
     <q-separator dark/>
 
     <q-card-actions align="right">
-      <q-btn
-        :disable="!createReady"
-        unelevated
-        label="Configure"
-        color="primary"
-        @click="configureBlock"
-      />
+      <q-btn :disable="!createReady" flat label="Configure" @click="configureBlock"/>
       <q-btn
         :disable="!createReady"
         unelevated
