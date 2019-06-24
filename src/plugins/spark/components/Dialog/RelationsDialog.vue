@@ -143,9 +143,10 @@ export default class RelationsDialog extends DialogBase {
     const toolbarHeight = this.$refs.toolbar.$el.clientHeight || 50;
     this.availableHeight = window.innerHeight - toolbarHeight;
     this.availableWidth = window.innerWidth;
+    this.$refs.svg.setAttribute('style', `min-width: ${outGraph.width}px;
+                                          min-height: ${outGraph.height};`);
     this.$refs.svg.setAttribute('height', outGraph.height);
     this.$refs.svg.setAttribute('width', outGraph.width);
-    this.$refs.svg.setAttribute('viewBox', `0 0 ${outGraph.width} ${outGraph.height}`);
 
     this.$nextTick(() => {
       // Here be dragons
@@ -199,10 +200,10 @@ export default class RelationsDialog extends DialogBase {
 
       <div
         :style="`
-        overflow: scroll;
-        height: ${availableHeight}px;
-        width: ${availableWidth}px;
-        `"
+          overflow: auto;
+          width: ${availableWidth}px;
+          height: ${availableHeight}px;
+          `"
         class="row"
       >
         <q-space/>
