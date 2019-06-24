@@ -80,35 +80,14 @@ const databaseInfo =
     }
   };
 
-/*
-  We want to synchronize between a client-side local database, and the remote datastore,
-  but avoid contaminating the remote store if it is changed externally.
-
-  On startup, we try to connect to the remote datastore.
-  If it is reachable, we destroy the local store, and enable synchronization between local and remote.
-
-  If the remote datastore is unreachable, we keep the local state, and do not enable synchronization.
-  This scenario is a fallback: it allows users limited functionality if the datastore service is dead.
-*/
 export const initDb = (host: string, name: string): void => {
   sharedDb = new Promise((resolve) => {
     const remoteAddress = `${host}/datastore/${name}`;
-    const localDb: PouchDB.Database = new PouchDB(name);
     const remoteDb: PouchDB.Database = new PouchDB(remoteAddress);
 
     databaseInfo(remoteDb)
-      .then(async (remoteInfo) => {
-        if (remoteInfo) {
-          await localDb.destroy();
-        }
-
-        const actualDb = new PouchDB(name);
-
-        if (remoteInfo) {
-          await actualDb.replicate.from(remoteAddress);
-        }
-
-        actualDb
+      .then(async () => {
+        remoteDb
           .changes({ live: true, include_docs: true, since: 'now' })
           .on('change', (evt: ChangeEvent) => {
             const handler = MODULES.find(m => checkInModule(m.id, evt.id));
@@ -122,11 +101,7 @@ export const initDb = (host: string, name: string): void => {
             }
           });
 
-        if (remoteInfo) {
-          actualDb.sync(remoteAddress, { live: true, retry: true, batch_size: 1000 });
-        }
-
-        resolve(actualDb);
+        resolve(remoteDb);
       });
   });
 };
