@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import PouchDB from 'pouchdb';
 
 type ChangeEvent = PouchDB.Core.ChangesResponseChange<{}>;
@@ -68,36 +69,25 @@ const databaseInfo =
     try {
       return await db.info();
     } catch (e) {
+      dbErrors.push({
+        message: 'No remote database available',
+        moduleId: 'all',
+        time: new Date().toString(),
+        content: '',
+        error: e.message,
+      });
       return null;
     }
   };
 
-/*
-  We want to synchronize between a client-side local database, and the remote datastore,
-  but avoid contaminating the remote store if it is changed externally.
-
-  On startup, we try to connect to the remote datastore.
-  If it is reachable, we destroy the local store, and enable synchronization between local and remote.
-
-  If the remote datastore is unreachable, we keep the local state, and do not enable synchronization.
-  This scenario is a fallback: it allows users limited functionality if the datastore service is dead.
-*/
 export const initDb = (host: string, name: string): void => {
   sharedDb = new Promise((resolve) => {
     const remoteAddress = `${host}/datastore/${name}`;
-    const localDb: PouchDB.Database = new PouchDB(name);
     const remoteDb: PouchDB.Database = new PouchDB(remoteAddress);
 
     databaseInfo(remoteDb)
-      .then(async (remoteInfo) => {
-        if (remoteInfo) {
-          await localDb.destroy();
-        }
-
-        const actualDb = new PouchDB(name);
-
-        actualDb
-          /* eslint-disable-next-line @typescript-eslint/camelcase */
+      .then(async () => {
+        remoteDb
           .changes({ live: true, include_docs: true, since: 'now' })
           .on('change', (evt: ChangeEvent) => {
             const handler = MODULES.find(m => checkInModule(m.id, evt.id));
@@ -111,11 +101,7 @@ export const initDb = (host: string, name: string): void => {
             }
           });
 
-        if (remoteInfo) {
-          actualDb.sync(remoteAddress, { live: true, retry: true });
-        }
-
-        resolve(actualDb);
+        resolve(remoteDb);
       });
   });
 };
@@ -141,7 +127,6 @@ export function registerModule(module: Module): void {
 
 export async function fetchAll(moduleId: string): Promise<any[]> {
   const db = await promisedDb();
-  /* eslint-disable-next-line @typescript-eslint/camelcase */
   const resp = await db.allDocs({ include_docs: true })
     .catch(intercept('Fetch all objects', moduleId));
   return resp.rows
