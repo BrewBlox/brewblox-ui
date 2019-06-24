@@ -34,30 +34,8 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
           />
           <slot name="actions"/>
           <ActionItem icon="refresh" label="Refresh" @click="refreshBlock"/>
-          <!-- Widget Actions -->
           <WidgetActions :crud="crud" no-rename/>
-          <!-- Block Actions -->
-          <q-expansion-item label="Block Actions">
-            <q-list dark>
-              <slot name="block-actions"/>
-              <ActionItem icon="edit" label="Rename Block" @click="startChangeBlockId"/>
-              <ActionItem
-                v-if="isStoreBlock"
-                icon="mdi-cube"
-                label="Choose Block"
-                @click="startSwitchBlock"
-              />
-              <ActionItem icon="mdi-information" label="Block Info" @click="startBlockInfo"/>
-              <BlockGroupsAction :block="block"/>
-              <BlockPresetsAction :block="block"/>
-              <ActionItem
-                v-if="isStoreBlock"
-                icon="delete"
-                label="Remove Block"
-                @click="startRemoveBlock"
-              />
-            </q-list>
-          </q-expansion-item>
+          <BlockActions :crud="crud"/>
         </q-list>
       </q-btn-dropdown>
     </q-item-section>

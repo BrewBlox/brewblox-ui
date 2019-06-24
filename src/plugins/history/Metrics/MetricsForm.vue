@@ -75,7 +75,7 @@ export default class MetricsForm extends CrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :title="widget.title"/>
+    <FormToolbar :crud="crud"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="mdi-file-tree" label="Metrics">

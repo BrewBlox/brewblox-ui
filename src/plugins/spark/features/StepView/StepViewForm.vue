@@ -205,7 +205,11 @@ export default class StepViewForm extends CrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :title="widget.title"/>
+    <FormToolbar :crud="crud">
+      <template v-slot:actions>
+        <ExportAction :crud="crud"/>
+      </template>
+    </FormToolbar>
 
     <q-card-section>
       <div class="scroll-parent">

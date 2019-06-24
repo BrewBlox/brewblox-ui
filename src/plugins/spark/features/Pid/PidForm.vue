@@ -18,7 +18,7 @@ export default class PidForm extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :title="widget.title"/>
+    <BlockFormToolbar :crud="crud"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="mdi-calculator-variant" label="Settings">

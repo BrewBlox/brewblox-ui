@@ -15,7 +15,7 @@ export default class DS2408Form extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :title="widget.title"/>
+    <BlockFormToolbar :crud="crud"/>
 
     <ValveArray v-bind="$props" :id-enum="DS2408Id" :name-enum="ValveStartId" v-on="$listeners"/>
     <q-card-section>

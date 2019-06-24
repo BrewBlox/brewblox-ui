@@ -13,7 +13,7 @@ export default class Spark3PinsForm extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :title="widget.title"/>
+    <BlockFormToolbar :crud="crud"/>
 
     <IoArray v-bind="$props" :id-enum="Spark3PinId" v-on="$listeners"/>
     <q-separator dark inset/>

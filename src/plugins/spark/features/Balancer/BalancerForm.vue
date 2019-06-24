@@ -13,7 +13,7 @@ export default class BalancerForm extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :title="widget.title"/>
+    <BlockFormToolbar :crud="crud"/>
     <q-card-section>
       <q-item dark>
         <q-item-section>

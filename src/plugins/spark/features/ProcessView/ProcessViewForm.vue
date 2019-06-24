@@ -380,7 +380,7 @@ export default class ProcessViewForm extends CrudComponent {
 
 <template>
   <q-card dark class="maximized bg-dark">
-    <FormToolbar :title="widget.title"/>
+    <FormToolbar :crud="crud"/>
 
     <q-dialog v-model="menuModalOpen" no-backdrop-dismiss>
       <ProcessViewPartMenu

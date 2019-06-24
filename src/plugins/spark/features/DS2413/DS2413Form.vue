@@ -14,7 +14,7 @@ export default class DS2413Form extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :title="widget.title"/>
+    <BlockFormToolbar :crud="crud"/>
 
     <IoArray v-bind="$props" :id-enum="DS2413Id" v-on="$listeners"/>
     <q-separator dark inset/>

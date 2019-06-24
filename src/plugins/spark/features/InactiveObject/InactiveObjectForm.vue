@@ -10,6 +10,6 @@ export default class InactiveObjectForm extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :title="widget.title"/>
+    <BlockFormToolbar :crud="crud"/>
   </q-card>
 </template>

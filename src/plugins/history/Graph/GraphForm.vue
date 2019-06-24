@@ -149,7 +149,7 @@ export default class GraphForm extends CrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :title="widget.title"/>
+    <FormToolbar :crud="crud"/>
 
     <q-card-section>
       <q-expansion-item group="modal" icon="mdi-timetable" label="Period settings">

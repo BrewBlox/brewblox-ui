@@ -14,7 +14,7 @@ export default class Spark2PinsForm extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :title="widget.title"/>
+    <BlockFormToolbar :crud="crud"/>
 
     <IoArray v-bind="$props" :id-enum="Spark2PinId" v-on="$listeners"/>
   </q-card>

@@ -113,7 +113,7 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :title="widget.title"/>
+    <BlockFormToolbar :crud="crud"/>
 
     <q-card-section class="row">
       <q-item v-for="(slot, idx) in slots" :key="idx" dark class="row q-pa-sm col-4">
