@@ -20,20 +20,26 @@ export default class Troubleshooter extends Vue {
       : 'Unable to connect to service';
   }
 
-  get textConnected(): string {
-    return this.lastStatus && this.lastStatus.connected
+  get textConnect(): string {
+    return this.lastStatus && this.lastStatus.connect
       ? 'Service connected to controller'
       : 'Service not connected to controller';
   }
 
-  get textMatched(): string {
-    return this.lastStatus && this.lastStatus.matched
-      ? 'Service compatible with firmware'
-      : 'Service incompatible with firmware';
+  get textHandshake(): string {
+    return this.lastStatus && this.lastStatus.handshake
+      ? 'Handshake performed'
+      : 'Handshake not performed';
   }
 
-  get textSynchronized(): string {
-    return this.lastStatus && this.lastStatus.synchronized
+  get textCompatible(): string {
+    return this.lastStatus && this.lastStatus.compatible
+      ? 'Firmware compatible'
+      : 'Firmware not compatible';
+  }
+
+  get textSynchronize(): string {
+    return this.lastStatus && this.lastStatus.synchronize
       ? 'Service synchronized'
       : 'Service not synchronized';
   }
@@ -86,32 +92,43 @@ export default class Troubleshooter extends Vue {
         <q-item dark>
           <q-item-section avatar>
             <q-icon
-              :name="iconName(lastStatus.connected)"
-              :color="iconColor(lastStatus.connected)"
+              :name="iconName(lastStatus.connect)"
+              :color="iconColor(lastStatus.connect)"
               size="24px"
             />
           </q-item-section>
-          <q-item-section>{{ textConnected }}</q-item-section>
+          <q-item-section>{{ textConnect }}</q-item-section>
         </q-item>
         <q-item dark>
           <q-item-section avatar>
             <q-icon
-              :name="iconName(lastStatus.matched)"
-              :color="iconColor(lastStatus.matched)"
+              :name="iconName(lastStatus.handshake)"
+              :color="iconColor(lastStatus.handshake)"
               size="24px"
             />
           </q-item-section>
-          <q-item-section>{{ textMatched }}</q-item-section>
+          <q-item-section>{{ textHandshake }}</q-item-section>
+        </q-item>
+        <!-- Only show after handshake -->
+        <q-item v-if="lastStatus.handshake" dark>
+          <q-item-section avatar>
+            <q-icon
+              :name="iconName(lastStatus.compatible)"
+              :color="iconColor(lastStatus.compatible)"
+              size="24px"
+            />
+          </q-item-section>
+          <q-item-section>{{ textCompatible }}</q-item-section>
         </q-item>
         <q-item dark>
           <q-item-section avatar>
             <q-icon
-              :name="iconName(lastStatus.synchronized)"
-              :color="iconColor(lastStatus.synchronized)"
+              :name="iconName(lastStatus.synchronize)"
+              :color="iconColor(lastStatus.synchronize)"
               size="24px"
             />
           </q-item-section>
-          <q-item-section>{{ textSynchronized }}</q-item-section>
+          <q-item-section>{{ textSynchronize }}</q-item-section>
         </q-item>
       </template>
     </q-card-section>
@@ -129,7 +146,7 @@ export default class Troubleshooter extends Vue {
             </ul>
           </span>
           <!-- not connected -->
-          <span v-else-if="!lastStatus.connected">
+          <span v-else-if="!lastStatus.connect">
             Your Spark service is online, but not connected to your controller.
             <ul>
               <li>Is your controller turned on?</li>
@@ -140,14 +157,20 @@ export default class Troubleshooter extends Vue {
               <li>USB: Can your service access USB devices? (Mac hosts)</li>
             </ul>
           </span>
-          <!-- not matched -->
-          <span v-else-if="!lastStatus.matched">
-            Your Spark service is connected to your controller, but is not compatible.
+          <!-- waiting handshake -->
+          <span v-else-if="!lastStatus.handshake">
+            Your Spark service is waiting for the controller handshake.
             <br>
-            <b>Run brewblox-ctl update to update your system.</b>
+            <b>This status is usually temporary</b>
+          </span>
+          <!-- not compatible -->
+          <span v-else-if="!lastStatus.compatible">
+            Your Spark service is not compatible with the firmware
+            <br>
+            <b>Please run brewblox-ctl update</b>
           </span>
           <!-- not synchronized -->
-          <span v-else-if="!lastStatus.synchronized">
+          <span v-else-if="!lastStatus.synchronize">
             Your Spark service is connected to your controller, but not yet synchronized.
             <b>This status is usually temporary.</b>
             <ul>
@@ -158,16 +181,16 @@ export default class Troubleshooter extends Vue {
           </span>
         </q-item-section>
       </q-item>
-      <template v-if="lastStatus.issues.length > 0">
+      <template v-if="lastStatus.info.length > 0">
         <q-separator dark inset/>
         <q-item dark>
           <q-item-section>
-            <b>Service issues:</b>
+            <b>Service info:</b>
           </q-item-section>
         </q-item>
         <q-list dense>
-          <q-item v-for="(issue, idx) in lastStatus.issues" :key="idx" dark>
-            <q-item-section>{{ issue }}</q-item-section>
+          <q-item v-for="(val, idx) in lastStatus.info" :key="idx" dark>
+            <q-item-section>{{ val }}</q-item-section>
           </q-item>
         </q-list>
       </template>

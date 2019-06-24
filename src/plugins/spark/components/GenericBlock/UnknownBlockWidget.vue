@@ -33,7 +33,7 @@ export default class UnknownBlockWidget extends WidgetBase {
 
   get reason(): AbsenceReason {
     const status = sparkStore.lastStatus(this.serviceId);
-    if (!status || !status.synchronized) {
+    if (!status || !status.synchronize) {
       return {
         message: 'Waiting for service...',
         temporary: true,

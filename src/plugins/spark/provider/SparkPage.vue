@@ -64,7 +64,7 @@ export default class SparkPage extends Vue {
   }
 
   get statusNok() {
-    return this.isAvailable && this.status && !this.status.synchronized;
+    return this.isAvailable && this.status && !this.status.synchronize;
   }
 
   get roleOrder(): Record<FeatureRole, number> {
