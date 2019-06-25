@@ -80,7 +80,6 @@ export default class BlockWidget extends WidgetBase {
   }
 
   public set graphCfg(config: GraphConfig) {
-    console.log('update', config);
     this.saveConfig({
       ...this.widget.config,
       queryParams: { ...config.params },
