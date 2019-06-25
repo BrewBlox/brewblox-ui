@@ -5,6 +5,7 @@ import { Dialog, uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
+import { deepCopy } from '@/helpers/shadow-copy';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import sparkStore from '@/plugins/spark/store';
 import { Block, ChangeField } from '@/plugins/spark/types';
@@ -128,6 +129,12 @@ export default class StepViewForm extends CrudComponent {
       });
   }
 
+  duplicateStep(step: StepDisplay) {
+    const duplicated = deepCopy(step);
+    this.steps.push({ ...duplicated, id: uid(), name: `${duplicated.name} (copy)` });
+    this.saveSteps(this.steps);
+  }
+
   renameStep(step: StepDisplay) {
     let stepName = step.name;
     Dialog.create({
@@ -222,18 +229,6 @@ export default class StepViewForm extends CrudComponent {
             group="steps"
             icon="mdi-format-list-checks"
           >
-            <q-item dark>
-              <q-item-section class="col-auto">
-                <q-btn size="sm" label="Add Block" flat icon="mdi-cube" @click="addChange(step)"/>
-              </q-item-section>
-              <q-item-section/>
-              <q-item-section class="col-auto">
-                <q-btn size="sm" label="Rename Step" flat icon="edit" @click="renameStep(step)"/>
-              </q-item-section>
-              <q-item-section class="col-auto">
-                <q-btn size="sm" label="Remove Step" flat icon="delete" @click="removeStep(step)"/>
-              </q-item-section>
-            </q-item>
             <q-list
               v-for="change in step.changes"
               :key="change.blockId"
@@ -321,6 +316,39 @@ export default class StepViewForm extends CrudComponent {
                 </q-item>
               </template>
             </q-list>
+            <q-item dark>
+              <q-item-section class="col-auto">
+                <q-btn size="sm" label="Add Block" flat icon="mdi-cube" @click="addChange(step)"/>
+                <q-space/>
+              </q-item-section>
+              <q-space/>
+              <q-item-section class="col-auto">
+                <q-btn
+                  size="sm"
+                  label="Copy Step"
+                  icon="file_copy"
+                  align="left"
+                  flat
+                  @click="duplicateStep(step)"
+                />
+                <q-btn
+                  size="sm"
+                  label="Rename Step"
+                  icon="edit"
+                  align="left"
+                  flat
+                  @click="renameStep(step)"
+                />
+                <q-btn
+                  size="sm"
+                  label="Remove Step"
+                  icon="delete"
+                  align="left"
+                  flat
+                  @click="removeStep(step)"
+                />
+              </q-item-section>
+            </q-item>
           </q-expansion-item>
           <q-item dark>
             <q-item-section/>
