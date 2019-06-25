@@ -1,12 +1,12 @@
 <script lang="ts">
 import { date as qdate } from 'quasar';
-import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 
 @Component
-export default class DatetimeDialog extends DialogBase {
+export default class DatepickerDialog extends DialogBase {
+  tab: string = 'date';
   stringValue: string = '';
 
   @Prop({ type: Date, required: true })
@@ -14,9 +14,6 @@ export default class DatetimeDialog extends DialogBase {
 
   @Prop({ type: String, default: 'Date and time' })
   public readonly label!: string;
-
-  @Prop({ type: String, default: 'restore' })
-  readonly resetIcon!: string;
 
   get parsed(): Date {
     const args =
@@ -41,19 +38,6 @@ export default class DatetimeDialog extends DialogBase {
     }
   }
 
-  openPicker() {
-    Dialog.create({
-      component: 'DatepickerDialog',
-      title: this.title,
-      message: this.message,
-      messageHtml: this.messageHtml,
-      root: this.$root,
-      value: this.parsed,
-      label: this.label,
-    })
-      .onOk(this.setStringVal);
-  }
-
   created() {
     this.setStringVal(this.value);
   }
@@ -66,37 +50,25 @@ export default class DatetimeDialog extends DialogBase {
       <q-card-section class="q-dialog__title">{{ title }}</q-card-section>
       <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml"/>
-      <q-card-section class="scroll">
-        <q-item dark>
-          <q-item-section>
-            <q-input
-              v-model="stringValue"
-              :rules="[v => !!valid || 'Invalid date']"
-              :label="label"
-              hint="YYYY/MM/DD hh:mm:ss"
-              mask="####/##/## ##:##:##"
-              dark
-              autofocus
-            />
-          </q-item-section>
-          <q-item-section class="col-auto">
-            <q-btn :disable="!valid" icon="mdi-calendar-edit" flat dense @click="openPicker">
-              <q-tooltip>Pick a date and time</q-tooltip>
-            </q-btn>
-          </q-item-section>
-          <q-item-section class="col-auto">
-            <q-btn
-              :icon="resetIcon"
-              flat
-              dense
-              class="text-white"
-              @click="setStringVal(new Date())"
-            >
-              <q-tooltip>Reset to current date and time</q-tooltip>
-            </q-btn>
-          </q-item-section>
-        </q-item>
-      </q-card-section>
+      <q-tabs v-model="tab" dense active-color="primary" align="justify" narrow-indicator>
+        <q-tab name="date" label="Date"/>
+        <q-tab name="time" label="Time"/>
+      </q-tabs>
+      <q-separator dark/>
+      <q-tab-panels v-model="tab" animated>
+        <q-tab-panel dark name="date" class="q-pa-none">
+          <q-date
+            v-model="stringValue"
+            dark
+            mask="YYYY/MM/DD HH:mm:ss"
+            class="maximized"
+            @input="tab='time'"
+          />
+        </q-tab-panel>
+        <q-tab-panel dark name="time" class="q-pa-none">
+          <q-time v-model="stringValue" dark mask="YYYY/MM/DD HH:mm:ss" class="maximized"/>
+        </q-tab-panel>
+      </q-tab-panels>
       <q-card-actions align="right">
         <q-btn flat color="primary" label="Cancel" @click="onDialogCancel"/>
         <q-btn :disable="!valid" flat color="primary" label="OK" @click="save"/>
