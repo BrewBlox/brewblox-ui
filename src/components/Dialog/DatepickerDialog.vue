@@ -54,7 +54,6 @@ export default class DatepickerDialog extends DialogBase {
         <q-tab name="date" label="Date"/>
         <q-tab name="time" label="Time"/>
       </q-tabs>
-      <q-separator dark/>
       <q-tab-panels v-model="tab" animated>
         <q-tab-panel dark name="date" class="q-pa-none">
           <q-date
