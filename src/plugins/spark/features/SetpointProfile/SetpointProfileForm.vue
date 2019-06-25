@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 
 import { durationString, objectSorter } from '@/helpers/functional';
 import { Unit } from '@/helpers/units';
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import sparkStore from '@/plugins/spark/store';
 
 import { Setpoint, SetpointProfileBlock } from './types';
@@ -16,7 +16,7 @@ interface DisplaySetpoint {
 }
 
 @Component
-export default class SetpointProfileForm extends BlockForm {
+export default class SetpointProfileForm extends BlockCrudComponent {
   durationString = durationString;
   parseDuration = parseDuration;
 
@@ -137,7 +137,7 @@ export default class SetpointProfileForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <BlockFormToolbar :crud="crud"/>
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <BlockEnableToggle

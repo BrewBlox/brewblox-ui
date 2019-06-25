@@ -1,10 +1,10 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 
 @Component
-export default class BlockEnableToggle extends BlockForm {
+export default class BlockEnableToggle extends BlockCrudComponent {
 
   @Prop({ type: String, default: 'This block is enabled' })
   readonly textEnabled!: string;

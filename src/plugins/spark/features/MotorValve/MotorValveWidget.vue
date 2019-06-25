@@ -18,7 +18,7 @@ export default class MotorValveWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :field="me"/>
+    <BlockWidgetToolbar :crud="crud"/>
 
     <q-card-section>
       <template v-if="!block.data.hwDevice.id || !block.data.startChannel">

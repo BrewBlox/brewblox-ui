@@ -118,7 +118,7 @@ export default class MetricsWidget extends WidgetBase {
 <template>
   <q-card dark class="text-white column scroll no-wrap">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <MetricsForm v-if="modalOpen" :widget="widget" @update:widget="saveWidget"/>
+      <MetricsForm v-if="modalOpen" :crud="crud"/>
     </q-dialog>
 
     <WidgetToolbar :title="widget.title" :subtitle="displayName">
@@ -126,7 +126,7 @@ export default class MetricsWidget extends WidgetBase {
         <q-btn-dropdown flat split icon="settings" @click="modalOpen = true">
           <q-list dark bordered>
             <ActionItem icon="refresh" label="Refresh" @click="resetListeners"/>
-            <WidgetActions :field="me"/>
+            <WidgetActions :crud="crud"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

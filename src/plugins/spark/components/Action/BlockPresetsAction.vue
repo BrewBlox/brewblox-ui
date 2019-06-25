@@ -1,18 +1,14 @@
 <script lang="ts">
 
 import { Dialog } from 'quasar';
-import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import sparkStore from '@/plugins/spark/store/';
 
-import { Block } from '../types';
+import BlockCrudComponent from '../BlockCrudComponent';
 
 @Component
-export default class BlockPresetsAction extends Vue {
-
-  @Prop({ type: Object, required: true })
-  readonly block!: Block;
+export default class BlockPresetsAction extends BlockCrudComponent {
 
   @Prop({ type: String, default: 'Choose preset' })
   readonly label!: string;
@@ -39,8 +35,6 @@ export default class BlockPresetsAction extends Vue {
   }
 
   choosePreset() {
-    const { id, serviceId } = this.block;
-
     Dialog.create({
       title: 'Apply configuration preset',
       dark: true,
@@ -58,9 +52,8 @@ export default class BlockPresetsAction extends Vue {
           return;
         }
         const preset = this.presets()[idx];
-        const block = sparkStore.blockById(serviceId, id);
-        block.data = { ...block.data, ...preset.generate() };
-        sparkStore.saveBlock([serviceId, block]);
+        this.block.data = { ...this.block.data, ...preset.generate() };
+        this.saveBlock();
       });
   }
 }

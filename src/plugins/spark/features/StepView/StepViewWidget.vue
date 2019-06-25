@@ -61,20 +61,15 @@ export default class StepViewWidget extends WidgetBase {
 <template>
   <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <StepViewForm
-        v-if="modalOpen"
-        v-bind="$props"
-        :open-step="openStep"
-        @update:widget="saveWidget"
-      />
+      <StepViewForm v-if="modalOpen" :crud="crud" :open-step="openStep"/>
     </q-dialog>
 
     <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="openModal(null)">
           <q-list dark bordered>
-            <ExportAction :widget-id="widget.id"/>
-            <WidgetActions :field="me"/>
+            <ExportAction :crud="crud"/>
+            <WidgetActions :crud="crud"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

@@ -1,19 +1,19 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 
 import { TempSensorMockBlock } from './types';
 
 @Component
-export default class TempSensorMockForm extends BlockForm {
+export default class TempSensorMockForm extends BlockCrudComponent {
   readonly block!: TempSensorMockBlock;
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <BlockFormToolbar :crud="crud"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">

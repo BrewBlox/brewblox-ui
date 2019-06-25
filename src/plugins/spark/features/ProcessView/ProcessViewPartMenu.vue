@@ -48,7 +48,7 @@ export default class ProcessViewPartMenu extends Vue {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar>{{ part.type }} {{ part.x }},{{ part.y }}</FormToolbar>
+    <DialogToolbar>{{ part.type }} {{ part.x }},{{ part.y }}</DialogToolbar>
 
     <q-card-section>
       <q-item dark>

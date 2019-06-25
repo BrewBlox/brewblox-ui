@@ -18,7 +18,7 @@ export default class MutexWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :field="me"/>
+    <BlockWidgetToolbar :crud="crud"/>
 
     <q-card-section>
       <q-item dark>

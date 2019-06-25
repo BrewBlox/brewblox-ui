@@ -1,13 +1,13 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
 
 import { filters } from './getters';
 
 @Component
-export default class PidForm extends BlockForm {
+export default class PidForm extends BlockCrudComponent {
   readonly block!: PidBlock;
 
   get filterOpts() {
@@ -18,7 +18,7 @@ export default class PidForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <BlockFormToolbar :crud="crud"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="mdi-calculator-variant" label="Settings">

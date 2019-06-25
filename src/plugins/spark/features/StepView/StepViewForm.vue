@@ -4,7 +4,7 @@ import get from 'lodash/get';
 import { Dialog, uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
-import FormBase from '@/components/Widget/FormBase';
+import CrudComponent from '@/components/Widget/CrudComponent';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import sparkStore from '@/plugins/spark/store';
 import { Block, ChangeField } from '@/plugins/spark/types';
@@ -24,7 +24,7 @@ interface StepDisplay extends Step {
 }
 
 @Component
-export default class StepViewForm extends FormBase {
+export default class StepViewForm extends CrudComponent {
   editableChanges: Record<string, boolean> = {};
 
   @Prop({ type: String })
@@ -99,7 +99,7 @@ export default class StepViewForm extends FormBase {
   }
 
   findProp(change: BlockChangeDisplay, key: string): ChangeField {
-    return change.props.find(prop => prop.key === key) as ChangeField;
+    return (change.props.find(prop => prop.key === key) || {}) as ChangeField;
   }
 
   componentProps(change: BlockChangeDisplay, key: string): any {
@@ -205,7 +205,11 @@ export default class StepViewForm extends FormBase {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <FormToolbar :crud="crud">
+      <template v-slot:actions>
+        <ExportAction :crud="crud"/>
+      </template>
+    </FormToolbar>
 
     <q-card-section>
       <div class="scroll-parent">
@@ -239,7 +243,10 @@ export default class StepViewForm extends FormBase {
               dense
             >
               <q-item dark>
-                <q-item-section class="text-h6">{{ change.blockId }}</q-item-section>
+                <q-item-section :class="{'text-h6': true, 'text-red': !change.block}">
+                  {{ change.blockId }}
+                  <q-tooltip v-if="!change.block">Block not found</q-tooltip>
+                </q-item-section>
                 <template v-if="editableChanges[change.key]">
                   <q-item-section side>
                     <q-btn flat round icon="delete" @click="removeChange(step, change.key)">

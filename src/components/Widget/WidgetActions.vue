@@ -1,13 +1,10 @@
 <script lang="ts">
-import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import ItemBase from '@/components/ItemBase';
+import CrudComponent from './CrudComponent';
 
 @Component
-export default class WidgetActions extends Vue {
-  @Prop({ type: Object, required: true })
-  readonly field!: ItemBase;
+export default class WidgetActions extends CrudComponent {
 
   @Prop({ type: Boolean, default: false })
   readonly noRename!: boolean;
@@ -18,10 +15,10 @@ export default class WidgetActions extends Vue {
   <q-expansion-item label="Widget Actions">
     <q-list dark>
       <slot name="widget-actions"/>
-      <ActionItem icon="file_copy" label="Copy to widget" @click="field.copyWidget"/>
-      <ActionItem v-if="!field.volatile" icon="exit_to_app" label="Move" @click="field.moveWidget"/>
-      <RenameWidgetAction v-if="!field.volatile && !noRename" :widget-id="field.widget.id"/>
-      <ActionItem v-if="!field.volatile" icon="delete" label="Delete" @click="field.deleteWidget"/>
+      <ActionItem icon="file_copy" label="Copy to widget" @click="startCopyWidget"/>
+      <ActionItem v-if="isStoreWidget" icon="exit_to_app" label="Move" @click="startMoveWidget"/>
+      <RenameWidgetAction v-if="isStoreWidget && !noRename" :crud="crud"/>
+      <ActionItem v-if="isStoreWidget" icon="delete" label="Delete" @click="startRemoveWidget"/>
     </q-list>
   </q-expansion-item>
 </template>

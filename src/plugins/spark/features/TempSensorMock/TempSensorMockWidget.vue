@@ -23,7 +23,7 @@ export default class TempSensorMockWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :field="me" graph/>
+    <BlockWidgetToolbar :crud="crud" :graph-cfg="graphCfg"/>
 
     <q-card-section>
       <q-item dark>
