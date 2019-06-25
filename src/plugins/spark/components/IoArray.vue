@@ -1,7 +1,7 @@
 <script lang="ts">
 import get from 'lodash/get';
 import { Dialog } from 'quasar';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 import { objectSorter, objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';

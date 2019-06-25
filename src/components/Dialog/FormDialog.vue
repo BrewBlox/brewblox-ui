@@ -1,5 +1,4 @@
 <script lang="ts">
-import { Layout, PlotData } from 'plotly.js';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
