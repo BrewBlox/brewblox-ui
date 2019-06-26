@@ -2,12 +2,11 @@
 import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import { Link } from '@/helpers/units';
-import sparkStore from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
 
 import PartComponent from '../components/PartComponent';
 import { RIGHT } from '../getters';
+import { settingsBlock } from '../helpers';
 
 @Component
 export default class ActuatorValve extends PartComponent {
@@ -40,19 +39,8 @@ export default class ActuatorValve extends PartComponent {
     };
   }
 
-  get valveServiceId(): string {
-    return this.part.settings.valveServiceId;
-  }
-
-  get valveLink(): Link {
-    return this.part.settings.valveLink;
-  }
-
-  get actuatorBlock(): Block | null {
-    if (!this.valveServiceId || !this.valveLink || !this.valveLink.id) {
-      return null;
-    }
-    return sparkStore.blocks(this.valveServiceId)[this.valveLink.id];
+  get valveBlock(): Block | null {
+    return settingsBlock(this.part, 'valve');
   }
 
   get flowSpeed() {
@@ -68,8 +56,8 @@ export default class ActuatorValve extends PartComponent {
   }
 
   get valveRotation() {
-    if (this.actuatorBlock) {
-      switch (this.actuatorBlock.data.state) {
+    if (this.valveBlock) {
+      switch (this.valveBlock.data.state) {
         case DigitalState.Inactive:
           return 90;
         case DigitalState.Active:
@@ -81,11 +69,10 @@ export default class ActuatorValve extends PartComponent {
     return this.closed ? 90 : 0;
   }
 
-  @Watch('actuatorBlock', { immediate: true, deep: true })
+  @Watch('valveBlock', { immediate: true, deep: true })
   updateClosed() {
-    const closed = !!this.actuatorBlock
-      ? this.actuatorBlock.data.state !== 1
-      : true;
+    const closed = !this.valveBlock
+      || this.valveBlock.data.state !== DigitalState.Active;
 
     if (closed !== this.part.state.closed) {
       this.state.closed = closed;
@@ -96,8 +83,8 @@ export default class ActuatorValve extends PartComponent {
 </script>
 
 <template>
-  <g class="actuator-valve">
-    <foreignObject v-if="!actuatorBlock" :height="SQUARE_SIZE" :width="SQUARE_SIZE">
+  <g>
+    <foreignObject v-if="!valveBlock" :height="SQUARE_SIZE" :width="SQUARE_SIZE">
       <q-icon name="mdi-link-variant-off" size="sm" class="absolute-right" style="height: 15px;"/>
     </foreignObject>
     <g key="valve-outer" class="outline">

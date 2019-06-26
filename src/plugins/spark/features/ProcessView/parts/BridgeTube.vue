@@ -50,7 +50,7 @@ export default class BridgeTube extends PartComponent {
 </script>
 
 <template>
-  <g class="bridge-tube">
+  <g>
     <!-- low -->
     <g class="outline">
       <path v-for="border in lowPaths.borders" :key="border" :d="border"/>

@@ -9,7 +9,7 @@ export default class LargeKettle extends PartComponent {
 </script>
 
 <template>
-  <g class="large-kettle">
+  <g>
     <g class="text">
       <text x="10" y="30">50L</text>
     </g>

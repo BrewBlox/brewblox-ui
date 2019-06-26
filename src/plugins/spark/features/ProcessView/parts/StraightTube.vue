@@ -27,7 +27,7 @@ export default class StraightTube extends PartComponent {
 </script>
 
 <template>
-  <g class="straight-tube">
+  <g>
     <g class="outline">
       <path :d="paths.borders[0]"/>
       <path :d="paths.borders[1]"/>

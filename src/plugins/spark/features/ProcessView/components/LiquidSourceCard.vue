@@ -6,7 +6,7 @@ import { BEER, COLD_WATER, HOT_WATER, WORT } from '../getters';
 import PartCard from './PartCard';
 
 @Component
-export default class LiquidSourcePartCard extends PartCard {
+export default class LiquidSourceCard extends PartCard {
   get liquidColors() {
     return [
       COLD_WATER,

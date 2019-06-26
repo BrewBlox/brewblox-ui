@@ -12,8 +12,10 @@ import ImmersionCoil from './ImmersionCoil';
 import Kettle from './Kettle';
 import LargeKettle from './LargeKettle';
 import Lauterhexe from './Lauterhexe';
+import PidDisplay from './PidDisplay';
 import Pump from './Pump';
 import SensorDisplay from './SensorDisplay';
+import SetpointDisplay from './SetpointDisplay';
 import SmallKettle from './SmallKettle';
 import StraightInletTube from './StraightInletTube';
 import StraightTube from './StraightTube';
@@ -36,8 +38,10 @@ const specs: { [key: string]: ComponentSpec } = {
   Kettle,
   LargeKettle,
   Lauterhexe,
+  PidDisplay,
   Pump,
   SensorDisplay,
+  SetpointDisplay,
   SmallKettle,
   StraightInletTube,
   StraightTube,
