@@ -172,10 +172,7 @@ export default class RelationsDialog extends DialogBase {
   }
 
   openSettings(id: string) {
-    const block = sparkStore.blocks(this.serviceId)[id];
-    if (block) {
-      showBlockDialog(block, this.$root);
-    }
+    showBlockDialog(sparkStore.blocks(this.serviceId)[id]);
   }
 }
 </script>
