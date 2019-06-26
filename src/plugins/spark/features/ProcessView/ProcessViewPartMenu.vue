@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { clampRotation } from '@/helpers/functional';
+import { clampRotation, spaceCased } from '@/helpers/functional';
 import { partSpecs } from '@/plugins/spark/features/ProcessView/calculateFlows';
 import { FlowPart } from '@/plugins/spark/features/ProcessView/types';
 
@@ -20,6 +20,10 @@ export default class ProcessViewPartMenu extends Vue {
       'PlacementCard',
       ...partSpecs(this.part).cards,
     ];
+  }
+
+  get partTitle(): string {
+    return `${spaceCased(this.part.type)} ${this.part.x},${this.part.y}`;
   }
 
   get partSize(): [number, number] {
@@ -48,7 +52,7 @@ export default class ProcessViewPartMenu extends Vue {
 
 <template>
   <q-card dark class="widget-modal">
-    <DialogToolbar>{{ part.type }} {{ part.x }},{{ part.y }}</DialogToolbar>
+    <DialogToolbar>{{ partTitle }}</DialogToolbar>
 
     <q-card-section>
       <q-item dark>
