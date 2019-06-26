@@ -21,6 +21,9 @@ export default class LinkedBlockCard extends PartCard {
   @Prop({ type: String, required: true })
   public readonly typeName!: string;
 
+  @Prop({ type: String, default: 'Block' })
+  public readonly label!: string;
+
   @Prop({ type: Function })
   readonly filter!: (link: Link) => boolean;
 
@@ -123,10 +126,10 @@ export default class LinkedBlockCard extends PartCard {
         <q-select
           v-model="link"
           :options="linkOpts"
+          :label="label"
           clearable
           dark
           options-dark
-          label="Block"
           option-label="id"
           option-value="id"
         >

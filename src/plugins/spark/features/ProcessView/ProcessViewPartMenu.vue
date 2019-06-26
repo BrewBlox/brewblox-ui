@@ -64,8 +64,8 @@ export default class ProcessViewPartMenu extends Vue {
         </q-item-section>
       </q-item>
       <component
-        v-for="card in cards"
-        :key="card.component"
+        v-for="(card, idx) in cards"
+        :key="idx"
         :is="card.component"
         :part="part"
         v-bind="card.props || {}"

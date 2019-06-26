@@ -48,7 +48,6 @@ export default class SensorDisplay extends PartComponent {
         rx="6"
         ry="6"
         stroke-width="2px"
-        stroke-dasharray="4"
       />
     </g>
   </g>

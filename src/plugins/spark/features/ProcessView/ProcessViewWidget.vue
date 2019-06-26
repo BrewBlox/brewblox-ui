@@ -85,14 +85,21 @@ export default class ProcessViewWidget extends WidgetBase {
 
   get parts(): StatePart[] {
     return this.widgetConfig.parts
-      .map(part => ({
-        id: uid(),
-        rotate: 0,
-        settings: {},
-        flipped: false,
-        ...part,
-        state: this.partState[part.id] || {},
-      }));
+      .map(part => {
+        const statePart = {
+          id: uid(),
+          rotate: 0,
+          settings: {},
+          flipped: false,
+          ...part,
+          state: this.partState[part.id] || {},
+        };
+        const [sizeX, sizeY] = specs[part.type].size(part);
+        statePart.state.area = sizeX * sizeY;
+        return statePart;
+      })
+      // sort parts to render largest first
+      .sort((a, b) => b.state.area - a.state.area);
   }
 
   get updater(): PartUpdater {

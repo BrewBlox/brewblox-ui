@@ -20,6 +20,7 @@ import SmallKettle from './SmallKettle';
 import StraightInletTube from './StraightInletTube';
 import StraightTube from './StraightTube';
 import SystemIO from './SystemIO';
+import TallFridge from './TallFridge';
 import TeeTube from './TeeTube';
 import Valve from './Valve';
 import WhirlpoolInlet from './WhirlpoolInlet';
@@ -46,6 +47,7 @@ const specs: { [key: string]: ComponentSpec } = {
   StraightInletTube,
   StraightTube,
   SystemIO,
+  TallFridge,
   TeeTube,
   Valve,
   WhirlpoolInlet,
