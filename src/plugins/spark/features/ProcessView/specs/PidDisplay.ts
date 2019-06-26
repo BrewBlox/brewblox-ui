@@ -3,7 +3,7 @@ import { typeName } from '@/plugins/spark/features/Pid/getters';
 
 import { defaultSpec } from '../getters';
 import { settingsBlock } from '../helpers';
-import { ComponentSpec, PartUpdater, StatePart } from '../types';
+import { ComponentSpec, StatePart } from '../types';
 ;
 
 const SIZE_X = 1;
