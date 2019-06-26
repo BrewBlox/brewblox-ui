@@ -7,17 +7,21 @@ import { FlowPart } from '../types';
 export default class PartCard extends Vue {
 
   @Prop({ type: Object, required: true })
-  protected readonly part!: FlowPart;
+  public readonly part!: FlowPart;
 
-  protected savePart(part: FlowPart = this.part): void {
-    this.$emit('input', part);
+  public savePart(part: FlowPart = this.part): void {
+    this.$emit('update:part', part);
   }
 
-  protected savePartState(part: FlowPart = this.part): void {
-    this.$emit('state', part);
+  public savePartState(part: FlowPart = this.part): void {
+    this.$emit('update:state', part);
   }
 
-  protected removePart(): void {
-    this.$emit('remove', this.part);
+  public removePart(): void {
+    this.$emit('remove:part', this.part);
+  }
+
+  public savePartSettings(settings: any = this.part.settings): void {
+    this.savePart({ ...this.part, settings });
   }
 }

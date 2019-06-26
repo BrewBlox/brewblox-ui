@@ -34,7 +34,7 @@ export default class SystemIO extends PartComponent {
 </script>
 
 <template>
-  <g class="input-tube">
+  <g>
     <g class="outline">
       <g v-if="flowSpeed > 0">
         <polyline points="1.25,17.5 8.75,25 1.25,32.5"/>

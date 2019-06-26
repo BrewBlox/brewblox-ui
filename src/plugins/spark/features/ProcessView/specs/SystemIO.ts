@@ -3,7 +3,7 @@ import { ComponentSpec, PersistentPart } from '../types';
 
 const spec: ComponentSpec = {
   ...defaultSpec,
-  cards: ['LiquidSourcePartCard'],
+  cards: [{ component: 'LiquidSourceCard' }],
   transitions: (part: PersistentPart) => ({
     [IN_OUT]: [{
       outCoords: RIGHT,

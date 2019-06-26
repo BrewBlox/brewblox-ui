@@ -2,7 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import PartComponent from '../components/PartComponent';
-import { LEFT, RIGHT,UP } from '../getters';
+import { LEFT, RIGHT, UP } from '../getters';
 
 @Component
 export default class TeeTube extends PartComponent {
@@ -41,7 +41,7 @@ export default class TeeTube extends PartComponent {
 </script>
 
 <template>
-  <g class="tee-tube">
+  <g>
     <g class="outline">
       <path d="M0,21H21V0"/>
       <path d="M50,21H29V0"/>

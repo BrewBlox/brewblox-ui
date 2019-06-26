@@ -18,7 +18,7 @@ export default class Pump extends PartComponent {
 </script>
 
 <template>
-  <g class="pump">
+  <g>
     <!-- tube liquid bottom-->
     <LiquidStroke :paths="['M50,25H0']" :colors="liquids"/>
     <!-- ball liquid -->

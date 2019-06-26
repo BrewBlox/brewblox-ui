@@ -56,7 +56,7 @@ export default class ImmersionCoil extends PartComponent {
 </script>
 
 <template>
-  <g class="immersion-coil">
+  <g>
     <LiquidStroke :paths="paths.liquid" :colors="liquids" class="coil-liquid"/>
     <g class="outline">
       <path v-for="border in paths.borders" :key="border" :d="border"/>

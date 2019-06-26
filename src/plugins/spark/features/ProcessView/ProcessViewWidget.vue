@@ -161,10 +161,10 @@ export default class ProcessViewWidget extends WidgetBase {
           v-for="part in flowParts"
           :transform="`translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`"
           :key="part.id"
-          :class="{ clickable: isClickable(part) }"
+          :class="{ clickable: isClickable(part), [part.type]: true }"
           @click="interact(part)"
         >
-          <ProcessViewItem :part="part" @input="updatePart" @state="updatePartState"/>
+          <ProcessViewItem :part="part" @update:part="updatePart" @update:state="updatePartState"/>
         </g>
       </svg>
     </div>

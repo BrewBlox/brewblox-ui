@@ -51,7 +51,7 @@ export default class Coil extends PartComponent {
 </script>
 
 <template>
-  <g class="coil">
+  <g>
     <LiquidStroke :paths="paths.liquid" :colors="liquids" class="coil-liquid"/>
     <g class="outline">
       <rect fill="white" y="12.5" width="8" height="8"/>

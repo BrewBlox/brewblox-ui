@@ -9,17 +9,17 @@ import { settingsBlock } from '../helpers';
 
 
 @Component
-export default class SensorDisplay extends PartComponent {
+export default class SetpointDisplay extends PartComponent {
   get block(): Block | null {
-    return settingsBlock(this.part, 'sensor');
+    return settingsBlock(this.part, 'setpoint');
   }
 
-  get temperature(): number | null {
-    return get(this, 'block.data.value.val', null);
+  get tempSetting(): number | null {
+    return get(this, 'block.data.storedSetting.val', null);
   }
 
   get tempUnit(): string {
-    return get(this, 'block.data.value.notation', '');
+    return get(this, 'block.data.storedSetting.notation', '');
   }
 }
 </script>
@@ -32,11 +32,11 @@ export default class SensorDisplay extends PartComponent {
       :height="SQUARE_SIZE"
     >
       <div class="text-white text-bold text-center">
-        <q-icon name="mdi-thermometer"/>
+        <q-icon name="mdi-bullseye-arrow"/>
         <q-icon v-if="!block" name="mdi-link-variant-off"/>
         <small v-else>{{ tempUnit }}</small>
         <br>
-        {{ temperature | round(1) }}
+        {{ tempSetting | round(1) }}
       </div>
     </foreignObject>
     <g class="outline">
@@ -48,7 +48,6 @@ export default class SensorDisplay extends PartComponent {
         rx="6"
         ry="6"
         stroke-width="2px"
-        stroke-dasharray="4"
       />
     </g>
   </g>

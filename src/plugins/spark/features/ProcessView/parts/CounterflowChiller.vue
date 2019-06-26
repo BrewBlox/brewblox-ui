@@ -70,7 +70,7 @@ export default class CounterflowChiller extends PartComponent {
 </script>
 
 <template>
-  <g class="counterflow-chiller">
+  <g>
     <LiquidStroke :paths="paths.topBulbLiquid" :colors="topLiquids" class="bulbLiquid"/>
     <LiquidStroke :paths="paths.bottomBulbLiquid" :colors="bottomLiquids" class="bulbLiquid"/>
     <g class="outline">

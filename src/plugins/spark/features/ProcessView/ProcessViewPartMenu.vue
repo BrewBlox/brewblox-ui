@@ -17,7 +17,7 @@ export default class ProcessViewPartMenu extends Vue {
 
   get cards() {
     return [
-      'PlacementPartCard',
+      'PlacementCard',
       ...partSpecs(this.part).cards,
     ];
   }
@@ -63,7 +63,14 @@ export default class ProcessViewPartMenu extends Vue {
           </svg>
         </q-item-section>
       </q-item>
-      <component v-for="card in cards" :key="card" :is="card" :part="part" v-on="$listeners"/>
+      <component
+        v-for="card in cards"
+        :key="card.component"
+        :is="card.component"
+        :part="part"
+        v-bind="card.props || {}"
+        v-on="$listeners"
+      />
     </q-card-section>
   </q-card>
 </template>

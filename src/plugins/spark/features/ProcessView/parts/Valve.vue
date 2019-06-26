@@ -43,7 +43,7 @@ export default class Valve extends PartComponent {
 </script>
 
 <template>
-  <g class="valve">
+  <g>
     <g key="valve-outer" class="outline">
       <path :d="paths.outerValve[0]"/>
       <path :d="paths.outerValve[1]"/>

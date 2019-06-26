@@ -2,10 +2,10 @@
 import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
-import { Link } from '@/helpers/units';
-import sparkStore from '@/plugins/spark/store';
+import { Block } from '@/plugins/spark/types';
 
 import PartComponent from '../components/PartComponent';
+import { settingsBlock } from '../helpers';
 
 @Component
 export default class HeatingElement extends PartComponent {
@@ -20,40 +20,29 @@ export default class HeatingElement extends PartComponent {
     };
   }
 
-  get blockServiceId(): string {
-    return this.part.settings.blockServiceId;
-  }
-
-  get blockLink(): Link {
-    return this.part.settings.blockLink;
+  get block(): Block | null {
+    return settingsBlock(this.part, 'pwm');
   }
 
   get blockValue(): number | null {
-    if (!this.blockServiceId || !this.blockLink || !this.blockLink.id) {
-      return null;
-    }
-
-    return get(
-      sparkStore.blocks(this.blockServiceId),
-      [this.blockLink.id, 'data', 'value'],
-      null
-    );
+    return get(this, 'block.data.setting', null);
   }
 }
 </script>
 
 <template>
-  <g class="heating-element">
+  <g>
     <foreignObject
       :transform="textTransformation([1,1])"
       :width="SQUARE_SIZE"
       :height="SQUARE_SIZE"
     >
       <div class="text-white text-bold text-center">
-        <q-icon name="mdi-gauge"/>
-        <q-icon v-if="!blockLink" name="mdi-link-variant-off"/>
+        <q-icon name="mdi-gauge" class="q-mr-xs"/>
+        <q-icon v-if="!block" name="mdi-link-variant-off"/>
+        <small v-else>%</small>
         <br>
-        <span>{{ blockValue | round(0) }}%</span>
+        {{ blockValue | round(0) }}
       </div>
     </foreignObject>
     <g class="outline">

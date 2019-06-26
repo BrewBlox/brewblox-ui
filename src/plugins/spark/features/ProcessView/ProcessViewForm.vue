@@ -386,8 +386,9 @@ export default class ProcessViewForm extends CrudComponent {
       <ProcessViewPartMenu
         v-if="menuModalOpen"
         :part="configuredPart"
-        @input="updatePart"
-        @remove="removePart"
+        @update:part="updatePart"
+        @update:state="updatePartState"
+        @remove:part="removePart"
         @close="menuModalOpen = false"
       />
     </q-dialog>
@@ -442,11 +443,16 @@ export default class ProcessViewForm extends CrudComponent {
               v-show="!beingDragged(part)"
               :transform="`translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`"
               :key="part.id"
-              :class="{ clickable: currentTool.cursor(part) }"
+              :class="{ clickable: currentTool.cursor(part), [part.type]: true }"
               @click.stop="v => clickHandler(v, part)"
             >
               <text fill="white" x="0" y="8" class="grid-item-coordinates">{{ part.x }},{{ part.y }}</text>
-              <ProcessViewItem :part="part" show-hover @input="updatePart" @state="updatePartState"/>
+              <ProcessViewItem
+                :part="part"
+                show-hover
+                @update:part="updatePart"
+                @update:state="updatePartState"
+              />
             </g>
             <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
               <ProcessViewItem :part="dragAction.part"/>

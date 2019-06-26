@@ -26,7 +26,7 @@ export default class CheckValve extends PartComponent {
 </script>
 
 <template>
-  <g class="valve">
+  <g>
     <g key="valve-outer" class="outline">
       <path d="M0,21h10.5c1.4-5.1,5.4-9.1,10.5-10.5C29,8.3,37.2,13,39.4,21h0.1H50"/>
       <path d="M0,29h10.5h0C12.7,37,21,41.6,29,39.4C34,38,38,34,39.4,29h0.1H50"/>
