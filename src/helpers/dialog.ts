@@ -1,5 +1,4 @@
 import { Dialog, uid } from 'quasar';
-import Vue from 'vue';
 
 import { BlockCrud } from '@/plugins/spark/components/BlockCrudComponent';
 import sparkStore from '@/plugins/spark/store';
@@ -7,7 +6,7 @@ import { Block } from '@/plugins/spark/types';
 import { DashboardItem } from '@/store/dashboards';
 import featureStore from '@/store/features';
 
-export const showBlockDialog = (block: Block, root: Vue, props: any = {}) => {
+export const showBlockDialog = (block: Block | null, props: any = {}) => {
   if (!block) {
     return;
   }
@@ -33,7 +32,6 @@ export const showBlockDialog = (block: Block, root: Vue, props: any = {}) => {
   };
   Dialog.create({
     component: 'FormDialog',
-    root,
     getCrud: () => crud,
     getProps: () => props,
   });

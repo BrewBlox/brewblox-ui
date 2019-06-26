@@ -129,14 +129,14 @@ export default class PidWidget extends BlockWidget {
   showInput() {
     const blockId = this.block.data.inputId.id;
     if (blockId) {
-      showBlockDialog(sparkStore.blockById(this.serviceId, blockId), this.$root);
+      showBlockDialog(sparkStore.blockById(this.serviceId, blockId));
     }
   }
 
   showOutput() {
     const blockId = this.block.data.outputId.id;
     if (blockId) {
-      showBlockDialog(sparkStore.blockById(this.serviceId, blockId), this.$root);
+      showBlockDialog(sparkStore.blockById(this.serviceId, blockId));
     }
   }
 }

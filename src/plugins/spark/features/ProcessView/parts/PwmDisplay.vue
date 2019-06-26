@@ -1,29 +1,24 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
-import { Block } from '@/plugins/spark/types';
-
+import { ActuatorPwmBlock } from '../../ActuatorPwm/types';
 import PartComponent from '../components/PartComponent';
 import { settingsBlock } from '../helpers';
 
 
 @Component
-export default class SensorDisplay extends PartComponent {
-  get block(): Block | null {
-    return settingsBlock(this.part, 'sensor');
+export default class PwmDisplay extends PartComponent {
+  get block(): ActuatorPwmBlock | null {
+    return settingsBlock(this.part, 'pwm');
   }
 
-  get temperature(): number | null {
-    return get(this, 'block.data.value.val', null);
-  }
-
-  get tempUnit(): string {
-    return get(this, 'block.data.value.notation', '');
+  get pwmSetting(): number | null {
+    return this.block
+      ? this.block.data.desiredSetting
+      : null;
   }
 }
 </script>
-
 <template>
   <g>
     <foreignObject
@@ -32,11 +27,11 @@ export default class SensorDisplay extends PartComponent {
       :height="SQUARE_SIZE"
     >
       <div class="text-white text-bold text-center">
-        <q-icon name="mdi-thermometer"/>
+        <q-icon name="mdi-gauge" class="q-mr-xs"/>
         <q-icon v-if="!block" name="mdi-link-variant-off"/>
-        <small v-else>{{ tempUnit }}</small>
+        <small v-else>%</small>
         <br>
-        {{ temperature | round(1) }}
+        {{ pwmSetting | round(0) }}
       </div>
     </foreignObject>
     <g class="outline">

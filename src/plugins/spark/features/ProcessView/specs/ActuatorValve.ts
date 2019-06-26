@@ -1,4 +1,4 @@
-import { typeName } from '@/plugins/spark/features/DigitalActuator/getters';
+import { typeName } from '@/plugins/spark/features/MotorValve/getters';
 import sparkStore from '@/plugins/spark/store';
 import { DigitalState } from '@/plugins/spark/types';
 
