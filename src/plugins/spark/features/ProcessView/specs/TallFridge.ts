@@ -4,12 +4,13 @@ import { typeName as setpointType } from '@/plugins/spark/features/SetpointSenso
 import { defaultSpec } from '../getters';
 import { ComponentSpec } from '../types';
 
-const SIZE_X = 5;
+const SIZE_X = 4;
 const SIZE_Y = 12;
 
 const spec: ComponentSpec = {
   ...defaultSpec,
   cards: [
+    { component: 'TextCard' },
     {
       component: 'LinkedBlockCard',
       props: {

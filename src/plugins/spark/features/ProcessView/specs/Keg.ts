@@ -5,11 +5,12 @@ import { setpointDialog } from '../helpers';
 import { ComponentSpec, StatePart } from '../types';
 
 const SIZE_X = 2;
-const SIZE_Y = 4;
+const SIZE_Y = 5;
 
 const spec: ComponentSpec = {
   ...defaultSpec,
   cards: [
+    { component: 'ColorCard' },
     {
       component: 'LinkedBlockCard',
       props: {
@@ -17,9 +18,6 @@ const spec: ComponentSpec = {
         typeName: setpointType,
         label: 'Setpoint',
       },
-    },
-    {
-      component: 'ColorCard',
     },
   ],
   size: () => [SIZE_X, SIZE_Y],

@@ -1,9 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { SetpointSensorPairBlock } from '../../SetpointSensorPair/types';
 import PartComponent from '../components/PartComponent';
-import { settingsBlock } from '../helpers';
 
 @Component
 export default class Carboy extends PartComponent {
@@ -26,35 +24,26 @@ export default class Carboy extends PartComponent {
     `;
   }
 
-  get setpoint(): SetpointSensorPairBlock | null {
-    return settingsBlock(this.part, 'setpoint');
-  }
-
-  get setpointSetting(): number | null {
-    return this.setpoint
-      ? this.setpoint.data.storedSetting.value
-      : null;
-  }
-
-  get setpointValue(): number | null {
-    return this.setpoint
-      ? this.setpoint.data.value.value
-      : null;
-  }
-
-  get setpointUnit(): string {
-    return this.setpoint
-      ? this.setpoint.data.storedSetting.notation
-      : '';
+  get color(): string | null {
+    const color = this.part.settings.color;
+    return color && !color.startsWith('#') ? `#${color}` : color;
   }
 }
 </script>
 
 <template>
   <g>
+    <rect
+      :y="SQUARE_SIZE*1"
+      :width="SQUARE_SIZE*sizeX"
+      :height="SQUARE_SIZE*(sizeY-1)-2"
+      :fill="color"
+      rx="8"
+      ry="8"
+    />
     <g class="outline">
       <path :d="path"/>
-      <SetpointValues :part="part" :start-y="1"/>
+      <SetpointValues :part="part" :start-y="1" :background-color="color" hide-unset/>
     </g>
   </g>
 </template>

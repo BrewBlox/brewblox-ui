@@ -2,6 +2,8 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { contrastColor } from '@/helpers/functional';
+
 import { SetpointSensorPairBlock } from '../../SetpointSensorPair/types';
 import { SQUARE_SIZE } from '../getters';
 import { settingsBlock } from '../helpers';
@@ -22,6 +24,18 @@ export default class SetpointValues extends Vue {
 
   @Prop({ type: Number, default: 0 })
   public readonly startY!: number;
+
+  @Prop({ type: Boolean, default: false })
+  public readonly hideUnset!: boolean;
+
+  @Prop({ type: String })
+  public readonly backgroundColor!: string;
+
+  get textColor() {
+    return this.backgroundColor
+      ? contrastColor(this.backgroundColor)
+      : 'white';
+  }
 
   get setpoint(): SetpointSensorPairBlock | null {
     return settingsBlock(this.part, this.settingsKey);
@@ -48,9 +62,12 @@ export default class SetpointValues extends Vue {
 </script>
 
 <template>
-  <g :transform="`translate(${SQUARE_SIZE*startX}, ${SQUARE_SIZE*startY})`">
+  <g
+    v-if="setpoint || !hideUnset"
+    :transform="`translate(${SQUARE_SIZE*startX}, ${SQUARE_SIZE*startY})`"
+  >
     <foreignObject :width="SQUARE_SIZE*2" :height="SQUARE_SIZE">
-      <div class="text-white text-bold q-ml-md q-mt-xs">
+      <div :class="[`text-${textColor}`, 'text-bold', 'q-ml-md', 'q-mt-xs']">
         <q-icon name="mdi-thermometer" class="q-mr-sm"/>
         {{ setpointValue | round(1) }}
         <q-icon v-if="!setpoint" name="mdi-link-variant-off"/>

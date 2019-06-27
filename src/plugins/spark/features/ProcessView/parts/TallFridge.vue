@@ -13,6 +13,10 @@ export default class TallFridge extends PartComponent {
   HOT_WATER = HOT_WATER;
   COLD_WATER = COLD_WATER;
 
+  get titleText(): string {
+    return this.part.settings.text || '';
+  }
+
   get setpoint(): SetpointSensorPairBlock | null {
     return settingsBlock(this.part, 'setpoint');
   }
@@ -78,11 +82,23 @@ export default class TallFridge extends PartComponent {
         stroke-width="4px"
       />
       <line
+        :x1="2"
+        :y1="SQUARE_SIZE*6"
+        :x2="SQUARE_SIZE*sizeX-4"
+        :y2="SQUARE_SIZE*6"
+        stroke-width="4px"
+      />
+      <line
         :x1="SQUARE_SIZE*(sizeX/2)"
         :y1="SQUARE_SIZE*(sizeY-1)"
         :x2="SQUARE_SIZE*(sizeX/2)"
         :y2="SQUARE_SIZE*sizeY-4"
       />
+      <g>
+        <foreignObject :width="SQUARE_SIZE*sizeX" :height="SQUARE_SIZE">
+          <div class="text-white text-bold text-h6 q-mt-xs q-ml-sm">{{ titleText }}</div>
+        </foreignObject>
+      </g>
       <SetpointValues :part="part" :start-y="sizeY-1"/>
       <g
         :transform="`translate(
