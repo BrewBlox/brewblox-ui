@@ -16,9 +16,7 @@ const spec: ComponentSpec = {
     props: { settingsKey: 'pid', typeName },
   }],
   size: () => [SIZE_X, SIZE_Y],
-  interactHandler: (part: StatePart) => {
-    showBlockDialog(settingsBlock(part, 'pid'));
-  },
+  interactHandler: (part: StatePart) => showBlockDialog(settingsBlock(part, 'pid')),
 };
 
 export default spec;

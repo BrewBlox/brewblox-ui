@@ -2,7 +2,6 @@
 import { Component } from 'vue-property-decorator';
 
 import { ActuatorPwmBlock } from '../../ActuatorPwm/types';
-import { SetpointSensorPairBlock } from '../../SetpointSensorPair/types';
 import PartComponent from '../components/PartComponent';
 import { COLD_WATER, HOT_WATER } from '../getters';
 import { settingsBlock } from '../helpers';
@@ -13,26 +12,8 @@ export default class TallFridge extends PartComponent {
   HOT_WATER = HOT_WATER;
   COLD_WATER = COLD_WATER;
 
-  get setpoint(): SetpointSensorPairBlock | null {
-    return settingsBlock(this.part, 'setpoint');
-  }
-
-  get setpointSetting(): number | null {
-    return this.setpoint
-      ? this.setpoint.data.storedSetting.value
-      : null;
-  }
-
-  get setpointValue(): number | null {
-    return this.setpoint
-      ? this.setpoint.data.value.value
-      : null;
-  }
-
-  get setpointUnit(): string {
-    return this.setpoint
-      ? this.setpoint.data.storedSetting.notation
-      : '';
+  get titleText(): string {
+    return this.part.settings.text || '';
   }
 
   get coolPwm(): ActuatorPwmBlock | null {
@@ -78,24 +59,21 @@ export default class TallFridge extends PartComponent {
         stroke-width="4px"
       />
       <line
+        :x1="2"
+        :y1="SQUARE_SIZE*6"
+        :x2="SQUARE_SIZE*sizeX-4"
+        :y2="SQUARE_SIZE*6"
+        stroke-width="4px"
+      />
+      <line
         :x1="SQUARE_SIZE*(sizeX/2)"
         :y1="SQUARE_SIZE*(sizeY-1)"
         :x2="SQUARE_SIZE*(sizeX/2)"
         :y2="SQUARE_SIZE*sizeY-4"
       />
-      <g :transform="`translate(0, ${SQUARE_SIZE*(sizeY-1)})`">
-        <foreignObject :width="SQUARE_SIZE*2" :height="SQUARE_SIZE">
-          <div class="text-white text-bold q-ml-md q-mt-xs">
-            <q-icon name="mdi-thermometer" class="q-mr-sm"/>
-            {{ setpointValue | round(1) }}
-            <q-icon v-if="!setpoint" name="mdi-link-variant-off"/>
-            <small v-else>{{ setpointUnit }}</small>
-            <br>
-            <q-icon name="mdi-bullseye-arrow" class="q-mr-sm"/>
-            {{ setpointSetting | round(1) }}
-            <q-icon v-if="!setpoint" name="mdi-link-variant-off"/>
-            <small v-else>{{ setpointUnit }}</small>
-          </div>
+      <g>
+        <foreignObject :width="SQUARE_SIZE*sizeX" :height="SQUARE_SIZE">
+          <div class="text-white text-bold text-h6 q-mt-xs q-ml-sm">{{ titleText }}</div>
         </foreignObject>
       </g>
       <g

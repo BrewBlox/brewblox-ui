@@ -1,9 +1,11 @@
 import get from 'lodash/get';
+import { Dialog } from 'quasar';
 
+import { Unit } from '@/helpers/units';
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
-import { LinkedBlock, PersistentPart } from './types';
+import { LinkedBlock, PersistentPart, StatePart } from './types';
 
 export const settingsBlock =
   (part: PersistentPart, key: string): Block | null => {

@@ -34,19 +34,7 @@ export default class SetpointDisplay extends PartComponent {
 
 <template>
   <g>
-    <foreignObject :width="SQUARE_SIZE*2" :height="SQUARE_SIZE">
-      <div class="text-white text-bold q-ml-md q-mt-xs">
-        <q-icon name="mdi-thermometer" class="q-mr-sm"/>
-        {{ setpointValue | round(1) }}
-        <q-icon v-if="!setpoint" name="mdi-link-variant-off"/>
-        <small v-else>{{ setpointUnit }}</small>
-        <br>
-        <q-icon name="mdi-bullseye-arrow" class="q-mr-sm"/>
-        {{ setpointSetting | round(1) }}
-        <q-icon v-if="!setpoint" name="mdi-link-variant-off"/>
-        <small v-else>{{ setpointUnit }}</small>
-      </div>
-    </foreignObject>
+    <SetpointValues :part="part"/>
     <g class="outline">
       <rect
         :width="SQUARE_SIZE*sizeX-2"

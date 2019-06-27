@@ -1,6 +1,8 @@
 import { ComponentSpec } from '../types';
 import ActuatorValve from './ActuatorValve';
+import BeerBottle from './BeerBottle';
 import BridgeTube from './BridgeTube';
+import Carboy from './Carboy';
 import CheckValve from './CheckValve';
 import Coil from './Coil';
 import CounterflowChiller from './CounterflowChiller';
@@ -9,6 +11,7 @@ import DipTube from './DipTube';
 import ElbowTube from './ElbowTube';
 import HeatingElement from './HeatingElement';
 import ImmersionCoil from './ImmersionCoil';
+import Keg from './Keg';
 import Kettle from './Kettle';
 import LargeKettle from './LargeKettle';
 import Lauterhexe from './Lauterhexe';
@@ -28,7 +31,9 @@ import WhirlpoolInlet from './WhirlpoolInlet';
 
 const specs: { [key: string]: ComponentSpec } = {
   ActuatorValve,
+  BeerBottle,
   BridgeTube,
+  Carboy,
   CheckValve,
   Coil,
   CounterflowChiller,
@@ -37,6 +42,7 @@ const specs: { [key: string]: ComponentSpec } = {
   ElbowTube,
   HeatingElement,
   ImmersionCoil,
+  Keg,
   Kettle,
   LargeKettle,
   Lauterhexe,
