@@ -5,7 +5,7 @@ import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 
 import { SQUARE_SIZE } from '../getters';
 import specs from '../specs';
-import { CalculatedFlows, ComponentSpec,FlowPart } from '../types';
+import { CalculatedFlows, ComponentSpec, FlowPart } from '../types';
 
 @Component
 export default class PartComponent extends Vue {
@@ -66,6 +66,10 @@ export default class PartComponent extends Vue {
 
   public get sizeY(): number {
     return this.size[1];
+  }
+
+  public squares(val: number): number {
+    return SQUARE_SIZE * val;
   }
 
   public textTransformation(textSize: [number, number]): string {
