@@ -2,7 +2,6 @@
 import { Component } from 'vue-property-decorator';
 
 import { ActuatorPwmBlock } from '../../ActuatorPwm/types';
-import { SetpointSensorPairBlock } from '../../SetpointSensorPair/types';
 import PartComponent from '../components/PartComponent';
 import { COLD_WATER, HOT_WATER } from '../getters';
 import { settingsBlock } from '../helpers';
@@ -15,28 +14,6 @@ export default class TallFridge extends PartComponent {
 
   get titleText(): string {
     return this.part.settings.text || '';
-  }
-
-  get setpoint(): SetpointSensorPairBlock | null {
-    return settingsBlock(this.part, 'setpoint');
-  }
-
-  get setpointSetting(): number | null {
-    return this.setpoint
-      ? this.setpoint.data.storedSetting.value
-      : null;
-  }
-
-  get setpointValue(): number | null {
-    return this.setpoint
-      ? this.setpoint.data.value.value
-      : null;
-  }
-
-  get setpointUnit(): string {
-    return this.setpoint
-      ? this.setpoint.data.storedSetting.notation
-      : '';
   }
 
   get coolPwm(): ActuatorPwmBlock | null {
@@ -99,7 +76,6 @@ export default class TallFridge extends PartComponent {
           <div class="text-white text-bold text-h6 q-mt-xs q-ml-sm">{{ titleText }}</div>
         </foreignObject>
       </g>
-      <SetpointValues :part="part" :start-y="sizeY-1"/>
       <g
         :transform="`translate(
         ${SQUARE_SIZE*(sizeX/2)},

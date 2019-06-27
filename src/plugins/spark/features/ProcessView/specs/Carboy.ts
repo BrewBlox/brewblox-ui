@@ -1,7 +1,8 @@
+import { showBlockDialog } from '@/helpers/dialog';
 import { typeName as setpointType } from '@/plugins/spark/features/SetpointSensorPair/getters';
 
 import { defaultSpec } from '../getters';
-import { setpointDialog } from '../helpers';
+import { settingsBlock } from '../helpers';
 import { ComponentSpec, StatePart } from '../types';
 
 const SIZE_X = 2;
@@ -23,7 +24,7 @@ const spec: ComponentSpec = {
     },
   ],
   size: () => [SIZE_X, SIZE_Y],
-  interactHandler: (part: StatePart) => setpointDialog(part, 'setpoint'),
+  interactHandler: (part: StatePart) => showBlockDialog(settingsBlock(part, 'setpoint')),
 };
 
 export default spec;

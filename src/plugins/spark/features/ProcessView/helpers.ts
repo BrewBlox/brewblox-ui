@@ -22,20 +22,3 @@ export const settingsLink =
     const blockId = get(part.settings, [key, 'blockId'], null);
     return { serviceId, blockId };
   };
-
-export const setpointDialog = (part: StatePart, settingsKey: string) => {
-  const block = settingsBlock(part, settingsKey);
-  if (block) {
-    Dialog.create({
-      component: 'UnitDialog',
-      title: block.id,
-      message: 'Change Setpoint/Sensor Pair',
-      value: block.data.storedSetting,
-      label: 'Setting',
-    })
-      .onOk((val: Unit) => {
-        block.data.storedSetting = val;
-        sparkStore.saveBlock([block.serviceId, block]);
-      });
-  }
-};
