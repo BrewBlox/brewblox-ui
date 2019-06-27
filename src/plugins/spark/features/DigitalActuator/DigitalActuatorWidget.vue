@@ -31,6 +31,7 @@ export default class DigitalActuatorWidget extends BlockWidget {
             <q-item-label caption>State</q-item-label>
             <DigitalStateField
               :value="block.data.desiredState"
+              :actual-value="block.data.state"
               :disable="isDriven"
               @input="v => { block.data.desiredState = v; saveBlock(); }"
             />
