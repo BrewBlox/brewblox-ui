@@ -1,6 +1,7 @@
 import { ComponentSpec } from '../types';
 import ActuatorValve from './ActuatorValve';
 import BridgeTube from './BridgeTube';
+import Carboy from './Carboy';
 import CheckValve from './CheckValve';
 import Coil from './Coil';
 import CounterflowChiller from './CounterflowChiller';
@@ -29,6 +30,7 @@ import WhirlpoolInlet from './WhirlpoolInlet';
 const specs: { [key: string]: ComponentSpec } = {
   ActuatorValve,
   BridgeTube,
+  Carboy,
   CheckValve,
   Coil,
   CounterflowChiller,
