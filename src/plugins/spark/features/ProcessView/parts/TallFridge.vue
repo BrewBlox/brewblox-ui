@@ -42,48 +42,47 @@ export default class TallFridge extends PartComponent {
   <g>
     <g class="outline">
       <rect
-        :width="SQUARE_SIZE*sizeX-4"
-        :height="SQUARE_SIZE*sizeY-4"
+        :width="squares(sizeX)-4"
+        :height="squares(sizeY)-4"
         x="2"
         y="2"
         rx="8"
         ry="8"
         stroke-width="4px"
       />
-      <line :x1="2" :y1="SQUARE_SIZE" :x2="SQUARE_SIZE*sizeX-4" :y2="SQUARE_SIZE"/>
+      <line :x1="2" :y1="squares(1)" :x2="squares(sizeX)-4" :y2="squares(1)"/>
       <line
         :x1="2"
-        :y1="SQUARE_SIZE*(sizeY-1)"
-        :x2="SQUARE_SIZE*sizeX-4"
-        :y2="SQUARE_SIZE*(sizeY-1)"
+        :y1="squares(sizeY-1)"
+        :x2="squares(sizeX)-4"
+        :y2="squares(sizeY-1)"
         stroke-width="4px"
       />
+      <!-- Bottom divider -->
       <line
+        :x1="squares(sizeX-2)"
+        :y1="squares(sizeY-1)"
+        :x2="squares(sizeX-2)"
+        :y2="squares(sizeY)-4"
+      />
+      <!-- Shelf -->
+      <line
+        v-if="sizeY >= 10"
         :x1="2"
-        :y1="SQUARE_SIZE*6"
-        :x2="SQUARE_SIZE*sizeX-4"
-        :y2="SQUARE_SIZE*6"
+        :y1="squares(sizeY/2)"
+        :x2="squares(sizeX)-4"
+        :y2="squares(sizeY/2)"
         stroke-width="4px"
-      />
-      <line
-        :x1="SQUARE_SIZE*(sizeX/2)"
-        :y1="SQUARE_SIZE*(sizeY-1)"
-        :x2="SQUARE_SIZE*(sizeX/2)"
-        :y2="SQUARE_SIZE*sizeY-4"
       />
       <g>
-        <foreignObject :width="SQUARE_SIZE*sizeX" :height="SQUARE_SIZE">
+        <foreignObject :width="squares(sizeX)" :height="squares(1)">
           <div class="text-white text-bold text-h6 q-mt-xs q-ml-sm">{{ titleText }}</div>
         </foreignObject>
       </g>
-      <g
-        :transform="`translate(
-        ${SQUARE_SIZE*(sizeX/2)},
-        ${SQUARE_SIZE*(sizeY-1)})`"
-      >
+      <g :transform="`translate(${squares(sizeX-2)}, ${squares(sizeY-1)})`">
         <CoolingIcon :stroke="COLD_WATER" x="5" y="2"/>
         <HeatingIcon :stroke="HOT_WATER" x="5" y="22"/>
-        <foreignObject :width="SQUARE_SIZE*2" :height="SQUARE_SIZE">
+        <foreignObject :width="squares(2)" :height="squares(1)">
           <div class="text-white text-bold text-center q-mt-xs">
             {{ coolSetting | round(0) }}
             <q-icon v-if="!coolPwm" name="mdi-link-variant-off"/>
