@@ -160,6 +160,10 @@ export class SparkModule extends VuexModule {
     return Object.values(this.specs);
   }
 
+  public get serviceIds(): string[] {
+    return Object.keys(this.services);
+  }
+
   public get serviceAvailable(): (serviceId: string) => boolean {
     return serviceId => !!this.services[serviceId];
   }

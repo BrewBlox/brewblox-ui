@@ -112,7 +112,13 @@ export default class LinkedBlockCard extends PartCard {
     <q-separator dark/>
     <q-item dark>
       <q-item-section>
-        <q-select v-model="serviceId" :options="serviceOptions" dark options-dark label="Service">
+        <q-select
+          v-model="serviceId"
+          :options="serviceOptions"
+          :label="`${label} Service`"
+          dark
+          options-dark
+        >
           <template v-slot:no-option>
             <q-item dark>
               <q-item-section class="text-grey">No results</q-item-section>
