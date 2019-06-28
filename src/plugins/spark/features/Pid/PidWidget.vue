@@ -45,20 +45,26 @@ export default class PidWidget extends BlockWidget {
     return filters.map((filter, idx) => ({ label: filter, value: idx }));
   }
 
+  get inputId() {
+    return this.block.data.inputId.id;
+  }
+
+  get outputId() {
+    return this.block.data.outputId.id;
+  }
+
   get hasInputBlock() {
-    const id = this.block.data.inputId.id;
-    return id
+    return this.inputId
       && sparkStore
         .blockIds(this.serviceId)
-        .includes(id);
+        .includes(this.inputId);
   }
 
   get hasOutputBlock() {
-    const id = this.block.data.outputId.id;
-    return id
+    return this.outputId
       && sparkStore
         .blockIds(this.serviceId)
-        .includes(id);
+        .includes(this.outputId);
   }
 
   findLinks(id: string | null): BlockLink[] {
@@ -127,17 +133,11 @@ export default class PidWidget extends BlockWidget {
   }
 
   showInput() {
-    const blockId = this.block.data.inputId.id;
-    if (blockId) {
-      showBlockDialog(sparkStore.blockById(this.serviceId, blockId));
-    }
+    showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.inputId));
   }
 
   showOutput() {
-    const blockId = this.block.data.outputId.id;
-    if (blockId) {
-      showBlockDialog(sparkStore.blockById(this.serviceId, blockId));
-    }
+    showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.outputId));
   }
 }
 </script>
@@ -187,6 +187,7 @@ export default class PidWidget extends BlockWidget {
       </template>
 
       <q-item :clickable="hasInputBlock" dark @click="showInput">
+        <q-tooltip v-if="hasInputBlock">Edit {{ inputId }}</q-tooltip>
         <q-item-section side class="col-3">
           <div class="text-weight-light text-subtitle2 q-mb-xs">Input</div>
         </q-item-section>
@@ -206,6 +207,7 @@ export default class PidWidget extends BlockWidget {
       <q-separator dark inset/>
 
       <q-item :clickable="hasOutputBlock" dark @click="showOutput">
+        <q-tooltip v-if="hasOutputBlock">Edit {{ outputId }}</q-tooltip>
         <q-item-section side class="col-3">
           <div class="text-weight-light text-subtitle2 q-mb-xs">Output</div>
         </q-item-section>

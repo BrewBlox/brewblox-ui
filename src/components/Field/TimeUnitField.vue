@@ -12,7 +12,7 @@ export default class TimeUnitField extends FieldBase {
   @Prop({ type: Object, required: true, validator: v => v instanceof Unit })
   public readonly value!: Unit;
 
-  @Prop({ type: String })
+  @Prop({ type: String, default: 'duration' })
   public readonly label!: string;
 
   @Emit('input')
@@ -49,5 +49,6 @@ export default class TimeUnitField extends FieldBase {
     <slot name="pre"/>
     <slot name="value">{{ value | unitDuration }}</slot>
     <slot/>
+    <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
   </component>
 </template>
