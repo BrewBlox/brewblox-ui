@@ -204,19 +204,12 @@ export default class FermentNamingTask extends WizardTaskBase {
                 </template>
               </q-input>
             </q-item>
-            <q-item dark>
-              <big>Groups</big>
-            </q-item>
-            <q-item dark>
-              <GroupsField v-if="serviceId" v-model="groups" :service-id="serviceId"/>
-              <q-item-label v-else>No service selected</q-item-label>
-            </q-item>
           </q-list>
         </div>
         <div>
           <q-list no-border dense>
             <q-item dark>
-              <big>Widget Names</big>
+              <big>Block Names</big>
             </q-item>
             <q-item v-for="(nVal, nKey) in names" :key="nKey">
               <q-input

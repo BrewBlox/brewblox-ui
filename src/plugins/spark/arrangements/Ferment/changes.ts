@@ -241,6 +241,7 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
           rotate: 0,
           flipped: false,
           settings: {
+            color: 'E1AC00',
             setpoint: {
               serviceId: config.serviceId,
               blockId: config.names.beerSSPair,
@@ -275,14 +276,22 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
           measurement: config.serviceId,
           fields: [
             `${config.names.fridgeSensor}/value[${userTemp}]`,
-            `${config.names.fridgeSSPair}/setting[${userTemp}]`,
             `${config.names.beerSensor}/value[${userTemp}]`,
+            `${config.names.fridgeSSPair}/setting[${userTemp}]`,
             `${config.names.beerSSPair}/setting[${userTemp}]`,
             `${config.names.coolPwm}/value`,
             `${config.names.heatPwm}/value`,
           ],
         },
       ],
+      renames: {
+        [`${config.serviceId}/${config.names.fridgeSensor}/value[${userTemp}]`]: 'Fridge temperature',
+        [`${config.serviceId}/${config.names.beerSensor}/value[${userTemp}]`]: 'Beer temperature',
+        [`${config.serviceId}/${config.names.fridgeSSPair}/setting[${userTemp}]`]: 'Fridge setting',
+        [`${config.serviceId}/${config.names.beerSSPair}/setting[${userTemp}]`]: 'Beer setting',
+        [`${config.serviceId}/${config.names.coolPwm}/value`]: 'Cool PWM value',
+        [`${config.serviceId}/${config.names.heatPwm}/value`]: 'Heat PWM value',
+      },
     },
   });
 

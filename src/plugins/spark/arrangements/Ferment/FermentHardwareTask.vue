@@ -128,7 +128,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
             v-model="coolPin"
             :options="pinOptions"
             :rules="pinRules"
-            label="Cool pin channel"
+            label="Cooler output"
             emit-value
             map-options
             dark
@@ -140,7 +140,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
             v-model="heatPin"
             :options="pinOptions"
             :rules="pinRules"
-            label="Heat pin channel"
+            label="Heater output"
             emit-value
             map-options
             dark
