@@ -4,6 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import CrudComponent, { Crud } from '@/components/Widget/CrudComponent';
 import sparkStore from '@/plugins/spark/store';
 
+import { blockIdRules } from '../helpers';
 import { Block } from '../types';
 
 export interface BlockCrud extends Crud {
@@ -82,14 +83,11 @@ export default class BlockCrudComponent extends CrudComponent {
   public startChangeBlockId() {
     let blockId = this.blockId;
     Dialog.create({
+      component: 'InputDialog',
       title: 'Change Block name',
       message: `Choose a new name for '${this.blockId}'`,
-      dark: true,
-      cancel: true,
-      prompt: {
-        model: blockId,
-        type: 'text',
-      },
+      rules: blockIdRules(this.serviceId),
+      value: blockId,
     })
       .onOk(this.changeBlockId);
   }
