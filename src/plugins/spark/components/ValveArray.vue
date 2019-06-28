@@ -121,6 +121,7 @@ export default class ValveArray extends BlockCrudComponent {
         <DigitalStateField
           v-if="channel.driver"
           :value="channel.driver.data.desiredState"
+          :actual-value="channel.driver.data.state"
           @input="v => saveState(channel, v)"
         />
         <div v-else>---</div>
