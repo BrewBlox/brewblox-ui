@@ -1,9 +1,9 @@
 import { Arrangement } from '@/store/features';
 
-import BrewPi from './BrewPi';
+import Ferment from './Ferment';
 
 const arrangements: { [id: string]: Arrangement } = {
-  BrewPi,
+  Ferment,
 };
 
 export default arrangements;

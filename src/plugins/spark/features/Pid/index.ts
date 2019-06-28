@@ -140,13 +140,13 @@ const block: BlockSpec = {
       key: 'inputId',
       title: 'Input',
       component: 'LinkValEdit',
-      generate: () => new Link(null),
+      generate: () => new ProcessValueLink(null),
     },
     {
       key: 'outputId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null),
+      generate: () => new ActuatorAnalogLink(null),
     },
   ],
 };

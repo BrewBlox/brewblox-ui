@@ -37,7 +37,7 @@ const block: BlockSpec = {
       key: 'targetId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null),
+      generate: () => new SetpointSensorPairLink(null),
     },
   ],
   presets: [

@@ -75,8 +75,11 @@ export default class TallFridge extends PartComponent {
         stroke-width="4px"
       />
       <g>
-        <foreignObject :width="squares(sizeX)" :height="squares(1)">
-          <div class="text-white text-bold text-h6 q-mt-xs q-ml-sm">{{ titleText }}</div>
+        <foreignObject :width="squares(sizeX)" :height="squares(sizeY)">
+          <div
+            class="text-white text-bold text-center text-h6 q-mt-xs"
+            style="max-width: 100%"
+          >{{ titleText }}</div>
         </foreignObject>
       </g>
       <g :transform="`translate(${squares(sizeX-2)}, ${squares(sizeY-1)})`">
