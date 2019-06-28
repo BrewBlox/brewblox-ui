@@ -4,10 +4,10 @@ import { Component } from 'vue-property-decorator';
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 
 @Component
-export default class BrewPiWizard extends WidgetWizardBase {
+export default class FermentWizard extends WidgetWizardBase {
   get initialTasks() {
     return [
-      'BrewPiNamingTask',
+      'FermentNamingTask',
     ];
   }
 }

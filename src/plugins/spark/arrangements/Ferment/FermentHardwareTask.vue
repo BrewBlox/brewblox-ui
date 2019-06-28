@@ -4,7 +4,7 @@ import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
-import { BrewPiConfig, PinChannel } from '@/plugins/spark/arrangements/BrewPi/types';
+import { FermentConfig, PinChannel } from '@/plugins/spark/arrangements/Ferment/types';
 import { typeName as DS2413Type } from '@/plugins/spark/features/DS2413/getters';
 import { typeName as Spark2PinsType } from '@/plugins/spark/features/Spark2Pins/getters';
 import { typeName as Spark3PinsType } from '@/plugins/spark/features/Spark3Pins/getters';
@@ -14,8 +14,8 @@ import sparkStore from '@/plugins/spark/store';
 
 
 @Component
-export default class BrewPiHardwareTask extends WizardTaskBase {
-  readonly config!: BrewPiConfig;
+export default class FermentHardwareTask extends WizardTaskBase {
+  readonly config!: FermentConfig;
 
   coolPin: PinChannel | null = null;
   heatPin: PinChannel | null = null;
@@ -97,8 +97,8 @@ export default class BrewPiHardwareTask extends WizardTaskBase {
       },
     );
 
-    this.updateConfig<BrewPiConfig>(this.config);
-    this.pushTask('BrewPiSettingsTask');
+    this.updateConfig<FermentConfig>(this.config);
+    this.pushTask('FermentSettingsTask');
     this.finish();
   }
 }

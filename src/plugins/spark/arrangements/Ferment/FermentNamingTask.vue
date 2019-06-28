@@ -5,17 +5,17 @@ import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { spaceCased, valOrDefault } from '@/helpers/functional';
-import { BrewPiConfig, BrewPiConfigNames } from '@/plugins/spark/arrangements/BrewPi/types';
+import { FermentConfig, FermentConfigNames } from '@/plugins/spark/arrangements/Ferment/types';
 import { typeName } from '@/plugins/spark/getters';
 import sparkStore from '@/plugins/spark/store';
 import serviceStore from '@/store/services';
 
 
 @Component
-export default class BrewPiNamingTask extends WizardTaskBase {
-  readonly config!: BrewPiConfig;
+export default class FermentNamingTask extends WizardTaskBase {
+  readonly config!: FermentConfig;
 
-  chosenNames: Partial<BrewPiConfigNames> = {};
+  chosenNames: Partial<FermentConfigNames> = {};
 
   get serviceOpts() {
     return serviceStore.serviceValues
@@ -32,7 +32,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   set serviceId(id: string) {
-    this.updateConfig<BrewPiConfig>({ ...this.config, serviceId: id });
+    this.updateConfig<FermentConfig>({ ...this.config, serviceId: id });
   }
 
   get arrangementId() {
@@ -40,7 +40,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   set arrangementId(id: string) {
-    this.updateConfig<BrewPiConfig>({ ...this.config, arrangementId: id });
+    this.updateConfig<FermentConfig>({ ...this.config, arrangementId: id });
   }
 
   get prefix() {
@@ -48,7 +48,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   set prefix(prefix: string) {
-    this.updateConfig<BrewPiConfig>({ ...this.config, prefix });
+    this.updateConfig<FermentConfig>({ ...this.config, prefix });
   }
 
   get dashboardTitle() {
@@ -56,7 +56,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   set dashboardTitle(id: string) {
-    this.updateConfig<BrewPiConfig>({ ...this.config, dashboardTitle: id });
+    this.updateConfig<FermentConfig>({ ...this.config, dashboardTitle: id });
   }
 
   get groups() {
@@ -64,10 +64,10 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   set groups(groups: number[]) {
-    this.updateConfig<BrewPiConfig>({ ...this.config, groups });
+    this.updateConfig<FermentConfig>({ ...this.config, groups });
   }
 
-  get defaultNames(): BrewPiConfigNames {
+  get defaultNames(): FermentConfigNames {
     return {
       fridgeSensor: 'Fridge Sensor',
       beerSensor: 'Beer Sensor',
@@ -81,13 +81,10 @@ export default class BrewPiNamingTask extends WizardTaskBase {
       mutex: 'Mutex',
       coolPid: 'Cool PID',
       heatPid: 'Heat PID',
-      beerPid: 'Beer PID',
-      fridgeDriver: 'Fridge Driver',
-      graph: 'Graph',
     };
   }
 
-  get names(): BrewPiConfigNames {
+  get names(): FermentConfigNames {
     return {
       ...mapValues(this.defaultNames, v => `${this.prefix} ${v}`),
       ...this.chosenNames,
@@ -117,7 +114,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
 
   clearKey(key: string) {
     delete this.config[key];
-    this.updateConfig<BrewPiConfig>(this.config);
+    this.updateConfig<FermentConfig>(this.config);
   }
 
   clearName(key: string) {
@@ -129,10 +126,11 @@ export default class BrewPiNamingTask extends WizardTaskBase {
   }
 
   next() {
-    this.updateConfig<BrewPiConfig>({
+    this.updateConfig<FermentConfig>({
       ...this.config,
       serviceId: this.serviceId,
       arrangementId: this.arrangementId,
+      prefix: this.prefix,
       dashboardId: new UrlSafeString().generate(this.dashboardTitle),
       dashboardTitle: this.dashboardTitle,
       groups: this.groups,
@@ -142,7 +140,7 @@ export default class BrewPiNamingTask extends WizardTaskBase {
       changedBlocks: [],
       renamedBlocks: {},
     });
-    this.pushTask('BrewPiHardwareTask');
+    this.pushTask('FermentHardwareTask');
     this.finish();
   }
 }

@@ -4,11 +4,12 @@ import { Feature } from '@/store/features';
 import form from './ProcessViewForm.vue';
 import widget from './ProcessViewWidget.vue';
 import wizard from './ProcessViewWizard.vue';
+import { typeName } from './getters';
 import { parts } from './register';
 import { ProcessViewConfig } from './types';
 
 const feature: Feature = {
-  id: 'ProcessView',
+  id: typeName,
   displayName: 'Process View',
   widget: ref(widget),
   wizard: ref(wizard),

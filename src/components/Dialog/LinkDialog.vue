@@ -34,7 +34,7 @@ export default class LinkDialog extends DialogBase {
   public readonly noCreate!: boolean;
 
   get compatibleTypes() {
-    if (this.value.type === null) {
+    if (!this.value.type) {
       return null;
     }
     const compatibleTable = sparkStore.compatibleTypes(this.serviceId);

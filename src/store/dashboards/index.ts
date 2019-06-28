@@ -183,10 +183,8 @@ export class DashboardModule extends VuexModule {
 
   @Action({ commit: 'commitDashboardItem' })
   public async appendDashboardItem(item: DashboardItem): Promise<DashboardItem> {
-    return await createDashboardItemInApi({
-      ...item,
-      order: this.dashboardIds.length,
-    });
+    const order = this.dashboardItemsByDashboardId(item.dashboard).length;
+    return await createDashboardItemInApi({ ...item, order });
   }
 
   @Action({ commit: 'commitDashboardItem' })

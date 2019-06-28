@@ -59,7 +59,7 @@ const block: BlockSpec = {
       key: 'actuatorId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null),
+      generate: () => new ActuatorDigitalLink(null),
     },
   ],
 };

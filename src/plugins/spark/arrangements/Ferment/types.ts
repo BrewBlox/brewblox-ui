@@ -7,7 +7,7 @@ export interface PinChannel {
   pinName: string;
 }
 
-export interface BrewPiConfigNames {
+export interface FermentConfigNames {
   fridgeSensor: string;
   beerSensor: string;
   fridgeSSPair: string;
@@ -18,21 +18,18 @@ export interface BrewPiConfigNames {
   coolPwm: string;
   heatPwm: string;
   mutex: string;
-  fridgeDriver: string;
   coolPid: string;
   heatPid: string;
-  beerPid: string;
-  graph: string;
 }
 
-export interface BrewPiConfig {
+export interface FermentConfig {
   serviceId: string;
   arrangementId: string;
   prefix: string;
   dashboardId: string;
   dashboardTitle: string;
   groups: number[];
-  names: BrewPiConfigNames;
+  names: FermentConfigNames;
   widgets: DashboardItem[];
   createdBlocks: Block[];
   changedBlocks: Block[];
@@ -41,4 +38,5 @@ export interface BrewPiConfig {
   };
   heatPin: PinChannel;
   coolPin: PinChannel;
+  activeSetpoint: 'beer' | 'fridge';
 }

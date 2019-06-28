@@ -36,7 +36,7 @@ const block: BlockSpec = {
       key: 'sensorId',
       title: 'Linked Sensor',
       component: 'LinkValEdit',
-      generate: () => new Link(null),
+      generate: () => new TempSensorLink(null),
     },
   ],
   presets: [],
