@@ -16,7 +16,7 @@ export default class InputField extends FieldBase {
   @Prop({ type: String, default: 'text' })
   public readonly type!: string;
 
-  @Prop({ type: String })
+  @Prop({ type: String, default: 'value' })
   public readonly label!: string;
 
   @Prop({ type: Number, default: 2 })
@@ -77,5 +77,6 @@ export default class InputField extends FieldBase {
     <slot name="pre"/>
     <slot name="value">{{ displayValue }}</slot>
     <slot name="append"/>
+    <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
   </component>
 </template>

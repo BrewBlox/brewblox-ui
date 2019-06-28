@@ -13,7 +13,7 @@ export default class SelectField extends FieldBase {
   @Prop({ type: Array, required: true })
   public readonly options!: any[];
 
-  @Prop({ type: String })
+  @Prop({ type: String, default: 'value' })
   public readonly label!: string;
 
   @Prop({ type: String, default: 'label' })
@@ -85,5 +85,6 @@ export default class SelectField extends FieldBase {
     <slot name="pre"/>
     <slot name="value">{{ displayValue }}</slot>
     <slot/>
+    <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
   </component>
 </template>

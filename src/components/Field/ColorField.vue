@@ -67,5 +67,6 @@ export default class ColorField extends FieldBase {
       <span :style="colorStyle"/>
     </slot>
     <slot/>
+    <q-tooltip v-if="!readonly">Choose color</q-tooltip>
   </component>
 </template>

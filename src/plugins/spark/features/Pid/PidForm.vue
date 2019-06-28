@@ -1,8 +1,10 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { showBlockDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
+import sparkStore from '@/plugins/spark/store';
 
 import { filters } from './getters';
 
@@ -12,6 +14,36 @@ export default class PidForm extends BlockCrudComponent {
 
   get filterOpts() {
     return filters.map((filter, idx) => ({ label: filter, value: idx }));
+  }
+
+  get inputId() {
+    return this.block.data.inputId.id;
+  }
+
+  get outputId() {
+    return this.block.data.outputId.id;
+  }
+
+  get hasInputBlock() {
+    return this.inputId
+      && sparkStore
+        .blockIds(this.serviceId)
+        .includes(this.inputId);
+  }
+
+  get hasOutputBlock() {
+    return this.outputId
+      && sparkStore
+        .blockIds(this.serviceId)
+        .includes(this.outputId);
+  }
+
+  showInput() {
+    showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.inputId));
+  }
+
+  showOutput() {
+    showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.outputId));
   }
 }
 </script>
@@ -31,6 +63,7 @@ export default class PidForm extends BlockCrudComponent {
         />
         <q-separator dark inset/>
 
+        <!-- Input row -->
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Input Block</q-item-label>
@@ -55,13 +88,22 @@ export default class PidForm extends BlockCrudComponent {
             <q-item-label caption>Target value is</q-item-label>
             <q-item-section class="text-bold">{{ block.data.inputSetting | unit }}</q-item-section>
           </q-item-section>
+
           <q-item-section>
             <q-item-label caption>Current value is</q-item-label>
             <div class="text-bold">{{ block.data.inputValue | unit }}</div>
           </q-item-section>
+
+          <q-item-section class="col-auto">
+            <q-btn v-if="hasInputBlock" flat icon="mdi-pencil" @click="showInput">
+              <q-tooltip>Edit {{ inputId }}</q-tooltip>
+            </q-btn>
+            <q-btn v-else disable flat icon="mdi-pencil-off"/>
+          </q-item-section>
         </q-item>
         <q-separator dark inset/>
 
+        <!-- Output row -->
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Output Block</q-item-label>
@@ -94,9 +136,17 @@ export default class PidForm extends BlockCrudComponent {
             <q-item-label caption>Current value is</q-item-label>
             <div class="text-bold">{{ block.data.outputValue | round }}</div>
           </q-item-section>
+
+          <q-item-section class="col-auto">
+            <q-btn v-if="hasOutputBlock" flat icon="mdi-pencil" @click="showOutput">
+              <q-tooltip>Edit {{ outputId }}</q-tooltip>
+            </q-btn>
+            <q-btn v-else disable flat icon="mdi-pencil-off"/>
+          </q-item-section>
         </q-item>
         <q-separator dark inset/>
 
+        <!-- Filter row -->
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Filter period</q-item-label>
@@ -104,6 +154,7 @@ export default class PidForm extends BlockCrudComponent {
               :value="block.data.filter"
               :options="filterOpts"
               title="Filter"
+              label="Filter period"
               message-html="
               <p>
                 The input error is passed through a filter to remove noise, spikes and sudden jumps.
@@ -134,6 +185,7 @@ export default class PidForm extends BlockCrudComponent {
         </q-item>
         <q-separator dark inset/>
 
+        <!-- Calculations -->
         <q-item dark>
           <q-item-section>
             <q-item-label caption class="text-no-wrap">Filtered error</q-item-label>

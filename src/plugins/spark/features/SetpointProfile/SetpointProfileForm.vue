@@ -153,6 +153,7 @@ export default class SetpointProfileForm extends BlockCrudComponent {
             <q-item-label caption>Start time</q-item-label>
             <DatetimeField
               :value="start"
+              label="Start time"
               title="Start time"
               message-html="This will shift all points.
               <br>Offset time will remain the same, absolute time values will change.
@@ -165,6 +166,7 @@ export default class SetpointProfileForm extends BlockCrudComponent {
             <LinkField
               :value="block.data.targetId"
               :service-id="serviceId"
+              label="target"
               title="Driven Setpoint/Sensor pair"
               @input="v => { block.data.targetId = v; saveBlock(); }"
             />
@@ -189,6 +191,7 @@ export default class SetpointProfileForm extends BlockCrudComponent {
             <InputField
               :value="durationString(point.offsetMs)"
               title="Offset from start time"
+              label="point offset"
               message-html="
             This will change the point offset.
               <br>The absolute point time will be changed to start time + offset.
@@ -201,6 +204,7 @@ export default class SetpointProfileForm extends BlockCrudComponent {
             <DatetimeField
               :value="point.absTimeMs"
               title="Time"
+              label="point time"
               message-html="
               This will change the absolute point time.
               <br>Changing point time may change point order.
@@ -213,11 +217,14 @@ export default class SetpointProfileForm extends BlockCrudComponent {
             <UnitField
               :value="point.temperature"
               title="Temperature"
+              label="point temperature"
               @input="v => updatePointTemperature(idx, v)"
             />
           </q-item-section>
           <q-item-section class="col-1" side>
-            <q-btn flat round dense icon="delete" @click="removePoint(idx)"/>
+            <q-btn flat round dense icon="delete" @click="removePoint(idx)">
+              <q-tooltip>Remove point</q-tooltip>
+            </q-btn>
           </q-item-section>
         </q-item>
         <q-item dark>

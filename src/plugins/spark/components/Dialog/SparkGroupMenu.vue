@@ -67,6 +67,7 @@ export default class SparkGroupMenu extends DialogBase {
               <q-item-label caption>{{ `Group ${idx + 1} name` }}</q-item-label>
               <InputField
                 :value="name"
+                label="name"
                 title="Group name"
                 @input="v => { groupNames[idx] = v; saveGroupNames(); }"
               />
