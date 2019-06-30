@@ -49,16 +49,22 @@ export default class FermentSettingsTask extends WizardTaskBase {
   }
 
   done() {
-    const config: FermentConfig = {
-      ...this.config,
-      changedBlocks: defineChangedBlocks(this.config),
-      createdBlocks: defineCreatedBlocks(this.config, this.fridgeSetting, this.beerSetting),
-      widgets: defineWidgets(this.config),
-      activeSetpoint: this.activeSetpoint,
-    };
+    const createdBlocks = defineCreatedBlocks(
+      this.config,
+      this.fridgeSetting,
+      this.beerSetting,
+      this.activeSetpoint);
+    const changedBlocks = defineChangedBlocks(this.config);
+    const widgets = defineWidgets(this.config);
+
     this.pushActions(createActions());
-    this.updateConfig(config);
-    this.finish();
+    this.updateConfig<FermentConfig>({
+      ...this.config,
+      widgets,
+      changedBlocks,
+      createdBlocks,
+    });
+    this.next();
   }
 
   mounted() {
@@ -104,7 +110,9 @@ export default class FermentSettingsTask extends WizardTaskBase {
     <q-separator dark/>
 
     <q-card-actions>
-      <q-btn unelevated label="Done" color="primary" class="full-width" @click="done"/>
+      <q-btn unelevated label="Back" @click="back"/>
+      <q-space/>
+      <q-btn unelevated label="Done" color="primary" @click="done"/>
     </q-card-actions>
   </div>
 </template>

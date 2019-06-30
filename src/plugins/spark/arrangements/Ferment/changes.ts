@@ -2,7 +2,7 @@ import { uid } from 'quasar';
 
 import { WizardAction } from '@/components/Wizard/WizardTaskBase';
 import { Link, Unit } from '@/helpers/units';
-import { ProcessValueLink, SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
+import { MutexLink, ProcessValueLink, SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
 import { serialize } from '@/helpers/units/parseObject';
 import { FermentConfig, PinChannel } from '@/plugins/spark/arrangements/Ferment/types';
 import sparkStore from '@/plugins/spark/store';
@@ -11,13 +11,18 @@ import { Dashboard } from '@/store/dashboards';
 import featureStore from '@/store/features';
 
 import { typeName as pwmType } from '../../features/ActuatorPwm/getters';
+import { ActuatorPwmBlock } from '../../features/ActuatorPwm/types';
 import { typeName as digiActType } from '../../features/DigitalActuator/getters';
 import { DigitalActuatorBlock } from '../../features/DigitalActuator/types';
 import { typeName as mutexType } from '../../features/Mutex/getters';
+import { MutexBlock } from '../../features/Mutex/types';
 import { typeName as pidType } from '../../features/Pid/getters';
+import { PidBlock, PidData } from '../../features/Pid/types';
 import { typeName as spProfileType } from '../../features/SetpointProfile/getters';
+import { SetpointProfileBlock } from '../../features/SetpointProfile/types';
 import { typeName as pairType } from '../../features/SetpointSensorPair/getters';
-import { Block } from '../../types';
+import { SetpointSensorPairBlock } from '../../features/SetpointSensorPair/types';
+import { Block, DigitalState } from '../../types';
 
 
 export const defineChangedBlocks =
@@ -38,8 +43,12 @@ export const defineChangedBlocks =
   };
 
 export const defineCreatedBlocks =
-  (config: FermentConfig, fridgeSetting: Unit, beerSetting: Unit): Block[] => {
-    const activeSetpointId = config.activeSetpoint === 'beer'
+  (config: FermentConfig,
+    fridgeSetting: Unit,
+    beerSetting: Unit,
+    activeSetpoint: 'beer' | 'fridge',
+  ): Block[] => {
+    const activeSetpointId = activeSetpoint === 'beer'
       ? config.names.beerSSPair
       : config.names.fridgeSSPair;
 
@@ -52,8 +61,10 @@ export const defineCreatedBlocks =
         groups: config.groups,
         data: {
           sensorId: new Link(config.names.fridgeSensor),
-          setting: fridgeSetting,
-          settingEnabled: true,
+          storedSetting: fridgeSetting,
+          settingEnabled: activeSetpoint === 'fridge',
+          setting: new Unit(null, 'degC'),
+          value: new Unit(null, 'degC'),
         },
       },
       {
@@ -63,8 +74,10 @@ export const defineCreatedBlocks =
         groups: config.groups,
         data: {
           sensorId: new Link(config.names.beerSensor),
-          setting: beerSetting,
-          settingEnabled: true,
+          storedSetting: beerSetting,
+          settingEnabled: activeSetpoint === 'beer',
+          setting: new Unit(null, 'degC'),
+          value: new Unit(null, 'degC'),
         },
       },
       // Mutex
@@ -86,11 +99,14 @@ export const defineCreatedBlocks =
         data: {
           hwDevice: new Link(config.coolPin.arrayId),
           channel: config.coolPin.pinId,
+          invert: false,
+          desiredState: DigitalState.Inactive,
+          state: DigitalState.Inactive,
           constrainedBy: {
             constraints: [
-              { 'minOff[second]': 300 },
-              { 'minOn[second]': 180 },
-              { 'mutex<>': config.names.mutex },
+              { minOff: new Unit(300, 'second'), limiting: false },
+              { minOn: new Unit(180, 'second'), limiting: false },
+              { mutex: new MutexLink(config.names.mutex), limiting: false },
             ],
           },
         },
@@ -103,9 +119,12 @@ export const defineCreatedBlocks =
         data: {
           hwDevice: new Link(config.heatPin.arrayId),
           channel: config.heatPin.pinId,
+          desiredState: DigitalState.Inactive,
+          state: DigitalState.Inactive,
+          invert: false,
           constrainedBy: {
             constraints: [
-              { 'mutex<>': config.names.mutex },
+              { mutex: new MutexLink(config.names.mutex), limiting: false },
             ],
           },
         },
@@ -120,6 +139,11 @@ export const defineCreatedBlocks =
           enabled: true,
           period: new Unit(30, 'minute'),
           actuatorId: new Link(config.names.coolAct),
+          drivenActuatorId: new Link(null),
+          setting: 0,
+          desiredSetting: 0,
+          value: 0,
+          constrainedBy: { constraints: [] },
         },
       },
       {
@@ -131,6 +155,11 @@ export const defineCreatedBlocks =
           enabled: true,
           period: new Unit(10, 'second'),
           actuatorId: new Link(config.names.heatAct),
+          drivenActuatorId: new Link(null),
+          setting: 0,
+          desiredSetting: 0,
+          value: 0,
+          constrainedBy: { constraints: [] },
         },
       },
       // Setpoint Profile
@@ -140,9 +169,11 @@ export const defineCreatedBlocks =
         type: spProfileType,
         groups: config.groups,
         data: {
+          start: new Date().getTime() / 1000,
           enabled: false,
           targetId: new Link(activeSetpointId),
           points: [],
+          drivenTargetId: new Link(null),
         },
       },
       // PID
@@ -152,7 +183,7 @@ export const defineCreatedBlocks =
         type: pidType,
         groups: config.groups,
         data: {
-          ...sparkStore.specs[pidType].generate(),
+          ...sparkStore.specs[pidType].generate() as PidData,
           enabled: true,
           inputId: new Link(activeSetpointId),
           outputId: new Link(config.names.coolPwm),
@@ -169,7 +200,7 @@ export const defineCreatedBlocks =
         type: pidType,
         groups: config.groups,
         data: {
-          ...sparkStore.specs[pidType].generate(),
+          ...sparkStore.specs[pidType].generate() as PidData,
           enabled: true,
           inputId: new Link(activeSetpointId),
           outputId: new Link(config.names.heatPwm),
@@ -180,7 +211,18 @@ export const defineCreatedBlocks =
           td: new Unit(3, 'minute'),
         },
       },
-    ];
+    ] as [
+        SetpointSensorPairBlock,
+        SetpointSensorPairBlock,
+        MutexBlock,
+        DigitalActuatorBlock,
+        DigitalActuatorBlock,
+        ActuatorPwmBlock,
+        ActuatorPwmBlock,
+        SetpointProfileBlock,
+        PidBlock,
+        PidBlock,
+      ];
   };
 
 export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
@@ -281,6 +323,8 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
             `${config.names.beerSSPair}/setting[${userTemp}]`,
             `${config.names.coolPwm}/value`,
             `${config.names.heatPwm}/value`,
+            `${config.names.coolAct}/state`,
+            `${config.names.heatAct}/state`,
           ],
         },
       ],
@@ -291,6 +335,12 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
         [`${config.serviceId}/${config.names.beerSSPair}/setting[${userTemp}]`]: 'Beer setting',
         [`${config.serviceId}/${config.names.coolPwm}/value`]: 'Cool PWM value',
         [`${config.serviceId}/${config.names.heatPwm}/value`]: 'Heat PWM value',
+        [`${config.serviceId}/${config.names.coolAct}/state`]: 'Cool Pin state',
+        [`${config.serviceId}/${config.names.heatAct}/state`]: 'Heat Pin state',
+      },
+      axes: {
+        [`${config.serviceId}/${config.names.coolPwm}/value`]: 'y2',
+        [`${config.serviceId}/${config.names.heatPwm}/value`]: 'y2',
       },
     },
   });

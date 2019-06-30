@@ -13,6 +13,7 @@ import serviceStore from '@/store/services';
 
 @Component
 export default class FermentNamingTask extends WizardTaskBase {
+  spaceCased = spaceCased;
   readonly config!: FermentConfig;
 
   chosenNames: Partial<FermentConfigNames> = {};
@@ -121,11 +122,7 @@ export default class FermentNamingTask extends WizardTaskBase {
     this.$delete(this.chosenNames, key);
   }
 
-  spaceCased(s: string) {
-    return spaceCased(s);
-  }
-
-  next() {
+  taskDone() {
     this.updateConfig<FermentConfig>({
       ...this.config,
       serviceId: this.serviceId,
@@ -140,8 +137,7 @@ export default class FermentNamingTask extends WizardTaskBase {
       changedBlocks: [],
       renamedBlocks: {},
     });
-    this.pushTask('FermentHardwareTask');
-    this.finish();
+    this.next();
   }
 }
 </script>
@@ -240,14 +236,9 @@ export default class FermentNamingTask extends WizardTaskBase {
     <q-separator dark/>
 
     <q-card-actions>
-      <q-btn
-        :disable="!valuesOk"
-        unelevated
-        label="Next"
-        color="primary"
-        class="full-width"
-        @click="next"
-      />
+      <q-btn unelevated label="Back" @click="back"/>
+      <q-space/>
+      <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone"/>
     </q-card-actions>
   </div>
 </template>

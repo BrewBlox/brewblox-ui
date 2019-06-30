@@ -2,6 +2,7 @@ import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import CrudComponent, { Crud } from '@/components/Widget/CrudComponent';
+import { showBlockDialog } from '@/helpers/dialog';
 import sparkStore from '@/plugins/spark/store';
 
 import { blockIdRules } from '../helpers';
@@ -15,6 +16,7 @@ export interface BlockCrud extends Crud {
 
 @Component
 export default class BlockCrudComponent extends CrudComponent {
+
   @Prop({ type: Object, required: true })
   public readonly crud!: BlockCrud;
 
@@ -78,6 +80,10 @@ export default class BlockCrudComponent extends CrudComponent {
       getFormProps: () => formProps,
       getGraphProps: () => graphProps,
     });
+  }
+
+  public showOtherBlock(block: Block, props: any = {}) {
+    showBlockDialog(block, props);
   }
 
   public startChangeBlockId() {

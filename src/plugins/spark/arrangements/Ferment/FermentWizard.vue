@@ -8,11 +8,14 @@ export default class FermentWizard extends WidgetWizardBase {
   get initialTasks() {
     return [
       'FermentNamingTask',
-    ];
+      'FermentHardwareTask',
+      'FermentSettingsTask',
+      'FermentManualTask',
+    ].reverse();
   }
 }
 </script>
 
 <template>
-  <WizardTaskMaster :initial-tasks="initialTasks" @close="close"/>
+  <WizardTaskMaster :initial-tasks="initialTasks" @back="back" @close="close"/>
 </template>
