@@ -436,12 +436,13 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
           ],
         },
         {
-          name: 'Enable profile',
+          name: 'Start profile',
           id: uid(),
           changes: [
             {
               blockId: config.names.tempProfile,
-              data: { enabled: true },
+              data: { enabled: true, start: new Date().getTime() / 1000 },
+              confirmed: { start: true },
             },
           ],
         },
