@@ -265,14 +265,6 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
           settings: {
             sizeY: 7,
             text: `${config.prefix} fridge`,
-            coolPwm: {
-              serviceId: config.serviceId,
-              blockId: config.names.coolPwm,
-            },
-            heatPwm: {
-              serviceId: config.serviceId,
-              blockId: config.names.heatPwm,
-            },
           },
         },
         {
@@ -301,6 +293,34 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
             setpoint: {
               serviceId: config.serviceId,
               blockId: config.names.fridgeSSPair,
+            },
+          },
+        },
+        {
+          id: uid(),
+          type: 'PidDisplay',
+          x: 3,
+          y: 7,
+          rotate: 0,
+          flipped: false,
+          settings: {
+            pid: {
+              serviceId: config.serviceId,
+              blockId: config.names.coolPid,
+            },
+          },
+        },
+        {
+          id: uid(),
+          type: 'PidDisplay',
+          x: 4,
+          y: 7,
+          rotate: 0,
+          flipped: false,
+          settings: {
+            pid: {
+              serviceId: config.serviceId,
+              blockId: config.names.heatPid,
             },
           },
         },

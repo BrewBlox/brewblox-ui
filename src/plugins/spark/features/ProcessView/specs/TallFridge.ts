@@ -1,5 +1,3 @@
-import { typeName as pwmType } from '@/plugins/spark/features/ActuatorPwm/getters';
-
 import { defaultSpec } from '../getters';
 import { ComponentSpec, PersistentPart } from '../types';
 
@@ -28,22 +26,6 @@ const spec: ComponentSpec = {
         label: 'Height',
         min: 4,
         max: 15,
-      },
-    },
-    {
-      component: 'LinkedBlockCard',
-      props: {
-        settingsKey: 'coolPwm',
-        typeName: pwmType,
-        label: 'Cooler PWM',
-      },
-    },
-    {
-      component: 'LinkedBlockCard',
-      props: {
-        settingsKey: 'heatPwm',
-        typeName: pwmType,
-        label: 'Heater PWM',
       },
     },
   ],

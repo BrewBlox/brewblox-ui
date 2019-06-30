@@ -5,17 +5,25 @@ import { Component } from 'vue-property-decorator';
 import { Block } from '@/plugins/spark/types';
 
 import PartComponent from '../components/PartComponent';
+import { COLD_WATER, HOT_WATER } from '../getters';
 import { settingsBlock } from '../helpers';
 
 
 @Component
 export default class PidDisplay extends PartComponent {
+  HOT_WATER = HOT_WATER;
+  COLD_WATER = COLD_WATER;
+
   get block(): Block | null {
     return settingsBlock(this.part, 'pid');
   }
 
-  get outputSetting(): number | null {
-    return get(this, 'block.data.outputSetting', null);
+  get outputValue(): number | null {
+    return get(this, 'block.data.outputValue', null);
+  }
+
+  get kp() {
+    return get(this, 'block.data.kp.value', 0);
   }
 }
 </script>
@@ -28,11 +36,16 @@ export default class PidDisplay extends PartComponent {
       :height="SQUARE_SIZE"
     >
       <div class="text-white text-bold text-center">
-        <q-icon name="mdi-calculator-variant" class="q-mr-xs"/>
-        <q-icon v-if="!block" name="mdi-link-variant-off"/>
-        <small v-else>%</small>
-        <br>
-        {{ outputSetting | round(0) }}
+        <svg>
+          <HeatingIcon v-if="kp > 0" :stroke="HOT_WATER" x="10" />
+          <CoolingIcon v-else-if="kp < 0" :stroke="COLD_WATER" x="10" />
+        </svg>
+        <q-space />
+        <q-icon v-if="kp === 0" name="mdi-calculator-variant" class="q-mr-xs" />
+        <q-icon v-if="!block" name="mdi-link-variant-off" />
+        <br >
+        {{ outputValue | round(0) }}
+        <small v-if="!!block">%</small>
       </div>
     </foreignObject>
     <g class="outline">

@@ -48,7 +48,7 @@ export default class FermentManualTask extends WizardTaskBase {
             <b>Action widget</b>.
           </p>
           <p>
-            You can configure setpoints by clicking on them in the
+            You can configure setpoints and PIDs by clicking on them in the
             <b>Ferment Fridge</b>.
           </p>
           <p>
@@ -63,10 +63,10 @@ export default class FermentManualTask extends WizardTaskBase {
       </q-item>
     </q-card-section>
 
-    <q-separator dark/>
+    <q-separator dark />
 
     <q-card-actions>
-      <q-space/>
+      <q-space />
       <q-btn
         :loading="busyExecuting"
         unelevated
