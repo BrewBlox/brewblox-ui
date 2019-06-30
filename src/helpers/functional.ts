@@ -154,3 +154,22 @@ export const contrastColor = (background: string): string => {
   const luma = ((0.299 * rgb.r) + (0.587 * rgb.g) + (0.114 * rgb.b)) / 255;
   return luma > 0.8 ? 'black' : 'white';
 };
+
+export const suggestId =
+  (id: string, validate: (val: string) => boolean, ): string => {
+    if (validate(id)) {
+      return id;
+    }
+
+    const copyName = (i: number): string =>
+      (id.match(/-\d+$/)
+        ? id.replace(/-\d+$/, `-${i}`)
+        : `${id}-${i}`);
+
+    let idx = 2;
+    while (!validate(copyName(idx))) {
+      idx += 1;
+    }
+
+    return copyName(idx);
+  };
