@@ -1,12 +1,12 @@
 <script lang="ts">
 import { Dialog } from 'quasar';
-import UrlSafeString from 'url-safe-string';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
 
 import buildEnv from '@/build-env.json';
 import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
+import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '@/helpers/dashboards';
 import { objectSorter } from '@/helpers/functional';
 import dashboardStore, { Dashboard } from '@/store/dashboards';
 import serviceStore, { Service } from '@/store/services';
@@ -48,134 +48,24 @@ export default class DefaultLayout extends Vue {
     serviceStore.updateServiceOrder(services.map(service => service.id));
   }
 
-  removeDashboard(dashboard: Dashboard) {
-    Dialog.create({
-      title: 'Remove dashboard',
-      message: `Are you sure you want to remove ${dashboard.title}?`,
-      dark: true,
-      ok: 'Confirm',
-      cancel: 'Cancel',
-    })
-      .onOk(() => dashboardStore.removeDashboard(dashboard));
-  }
-
-  changeDashboardId(dashboard: Dashboard) {
-    Dialog.create({
-      title: 'Change dashboard ID',
-      message: "This will change your dashboard's unique ID",
-      dark: true,
-      cancel: true,
-      prompt: {
-        model: dashboard.id,
-        type: 'text',
-      },
-    })
-      .onOk(async newId => {
-        const oldId = dashboard.id;
-        if (!newId || newId === oldId) {
-          return;
-        }
-
-        if (dashboardStore.dashboardIds.includes(newId)) {
-          this.$q.notify({
-            color: 'negative',
-            icon: 'error',
-            message: `Dashboard ${newId} already exists`,
-          });
-          return;
-        }
-
-        this.doChangeDashboardId(oldId, newId);
-      });
-  }
-
-  async doChangeDashboardId(oldId: string, newId: string) {
-    const dashboard = dashboardStore.dashboardById(oldId);
-
-    await dashboardStore.createDashboard({ ...dashboard, id: newId });
-    await Promise.all(
-      dashboardStore.itemValues
-        .filter(item => item.dashboard === oldId)
-        .map(item => dashboardStore.saveDashboardItem({ ...item, dashboard: newId }))
-    );
-    await dashboardStore.removeDashboard({ ...dashboard });
-
-    if (this.defaultDashboard === oldId) {
-      await dashboardStore.updatePrimaryDashboard(newId);
-    }
-
-    if (this.$route.path === `/dashboard/${oldId}`) {
+  onIdChanged(oldId, newId) {
+    if (newId && this.$route.path === `/dashboard/${oldId}`) {
       this.$router.replace(`/dashboard/${newId}`);
     }
-
-    this.$q.notify({
-      color: 'positive',
-      icon: 'edit',
-      message: `Changed dashboard ID '${oldId}' to '${newId}'`,
-    });
   }
 
-  findIdSuggestion(id: string, oldId: string): null | string {
-    if (id === oldId) {
-      return null;
-    }
-    const existingIds = dashboardStore.dashboardIds;
-    if (!existingIds.includes(id)) {
-      return id;
-    }
-
-    const copyName = (i: number): string =>
-      (id.match(/-\d+$/)
-        ? id.replace(/-\d+$/, `-${i}`)
-        : `${id}-${i}`);
-
-    let idx = 2;
-    while (existingIds.includes(copyName(idx))) {
-      idx += 1;
-    }
-
-    return copyName(idx);
+  async changeDashboardId(dashboard: Dashboard) {
+    const oldId = dashboard.id;
+    await startChangeDashboardId(dashboard, newId => this.onIdChanged(oldId, newId));
   }
 
   changeDashboardTitle(dashboard: Dashboard) {
-    Dialog.create({
-      title: 'Change dashboard Title',
-      message: "Change your dashboard's display name",
-      dark: true,
-      cancel: true,
-      prompt: {
-        model: dashboard.title,
-        type: 'text',
-      },
-    })
-      .onOk(async newTitle => {
-        const oldId = dashboard.id;
-        const oldTitle = dashboard.title;
-        if (!newTitle || oldTitle === newTitle) {
-          return;
-        }
+    const oldId = dashboard.id;
+    startChangeDashboardTitle(dashboard, newId => this.onIdChanged(oldId, newId));
+  }
 
-        await dashboardStore.saveDashboard({ ...dashboard, title: newTitle });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'edit',
-          message: `Renamed dashboard '${oldTitle}' to '${newTitle}'`,
-        });
-
-        const defaultId = new UrlSafeString().generate(newTitle);
-        const suggestedId = this.findIdSuggestion(defaultId, oldId);
-        if (!suggestedId) {
-          return; // no change
-        }
-
-        Dialog.create({
-          title: 'Update dashboard URL',
-          message: `Do you want to change the dashboard ID from '${oldId}' to '${suggestedId}'?`,
-          dark: true,
-          cancel: true,
-        })
-          .onOk(() => this.doChangeDashboardId(oldId, suggestedId));
-      });
+  removeDashboard(dashboard: Dashboard) {
+    startRemoveDashboard(dashboard);
   }
 
   removeService(service: Service) {
@@ -215,13 +105,18 @@ export default class DefaultLayout extends Vue {
       });
   }
 
-  updateDefaultDashboard(id: string) {
-    dashboardStore.updatePrimaryDashboard(this.defaultDashboard === id ? null : id);
+  toggleDefaultDashboard(dashboard: Dashboard) {
+    dashboardStore.updatePrimaryDashboard(dashboard.primary ? null : dashboard.id);
   }
 
   openWizard(component: string | null = null) {
     this.wizardComponent = component;
     this.wizardModalOpen = true;
+  }
+
+  stopEditing() {
+    this.dashboardEditing = false;
+    this.serviceEditing = false;
   }
 }
 </script>
@@ -231,12 +126,12 @@ export default class DefaultLayout extends Vue {
     <q-header class="glossy bg-dark">
       <q-toolbar>
         <q-btn flat dense round @click="leftDrawerOpen = !leftDrawerOpen">
-          <q-icon name="menu"/>
+          <q-icon name="menu" />
         </q-btn>
         <q-toolbar-title>
           <portal-target name="toolbar-title">BrewBlox</portal-target>
         </q-toolbar-title>
-        <portal-target name="toolbar-buttons" class="toolbar-buttons"/>
+        <portal-target name="toolbar-buttons" class="toolbar-buttons" />
       </q-toolbar>
     </q-header>
 
@@ -244,25 +139,25 @@ export default class DefaultLayout extends Vue {
       <q-list dark>
         <q-item exact to="/">
           <q-item-section avatar>
-            <q-icon name="mdi-home"/>
+            <q-icon name="mdi-home" />
           </q-item-section>
           <q-item-section>BrewBlox</q-item-section>
         </q-item>
 
-        <q-separator dark/>
+        <q-separator dark />
 
         <q-item clickable @click.native="openWizard(null)">
           <q-item-section avatar>
-            <q-icon name="mdi-creation"/>
+            <q-icon name="mdi-creation" />
           </q-item-section>
           <q-item-section>Wizardry</q-item-section>
         </q-item>
 
-        <q-separator dark/>
+        <q-separator dark />
 
         <q-item dark class="q-pb-none">
           <q-item-section avatar>
-            <q-icon name="dashboard"/>
+            <q-icon name="dashboard" />
           </q-item-section>
           <q-item-section>Dashboards</q-item-section>
           <q-item-section v-if="dashboardEditing" side>
@@ -302,20 +197,17 @@ export default class DefaultLayout extends Vue {
             class="q-pb-sm"
           >
             <q-item-section v-if="dashboardEditing" avatar>
-              <q-icon name="mdi-drag-vertical"/>
+              <q-icon name="mdi-drag-vertical" />
             </q-item-section>
             <q-item-section>{{ dashboard.title }}</q-item-section>
             <q-item-section v-if="dashboardEditing" side>
               <q-btn-dropdown outline icon="edit" size="sm">
                 <q-list dark>
-                  <q-item dark link clickable @click="updateDefaultDashboard(dashboard.id)">
+                  <q-item dark link clickable @click="toggleDefaultDashboard(dashboard)">
                     <q-item-section avatar>
-                      <q-icon
-                        :color="defaultDashboard === dashboard.id ? 'primary' : ''"
-                        name="home"
-                      />
+                      <q-icon :color="dashboard.primary ? 'primary' : ''" name="home" />
                     </q-item-section>
-                    <q-item-section>Default dashboard</q-item-section>
+                    <q-item-section>Toggle default dashboard</q-item-section>
                   </q-item>
                   <ActionItem
                     icon="edit"
@@ -338,11 +230,11 @@ export default class DefaultLayout extends Vue {
           </q-item>
         </draggable>
 
-        <q-separator dark/>
+        <q-separator dark />
 
         <q-item dark class="q-pb-none">
           <q-item-section avatar>
-            <q-icon name="cloud"/>
+            <q-icon name="cloud" />
           </q-item-section>
           <q-item-section>
             <q-item-section>Services</q-item-section>
@@ -384,7 +276,7 @@ export default class DefaultLayout extends Vue {
             class="q-pb-sm"
           >
             <q-item-section v-if="serviceEditing" avatar>
-              <q-icon name="mdi-drag-vertical"/>
+              <q-icon name="mdi-drag-vertical" />
             </q-item-section>
             <q-item-section>{{ service.title }}</q-item-section>
             <q-item-section v-if="serviceEditing" side>
@@ -395,7 +287,7 @@ export default class DefaultLayout extends Vue {
                     label="Change service title"
                     @click="changeServiceTitle(service)"
                   />
-                  <ActionItem icon="delete" label="Delete service" @click="removeService(service)"/>
+                  <ActionItem icon="delete" label="Delete service" @click="removeService(service)" />
                 </q-list>
               </q-btn-dropdown>
             </q-item-section>
@@ -411,7 +303,7 @@ export default class DefaultLayout extends Vue {
               {{ version }}
             </q-item-section>
           </q-item>
-          <ExportErrorsAction/>
+          <ExportErrorsAction />
         </q-list>
       </q-btn-dropdown>
     </q-drawer>
@@ -424,10 +316,10 @@ export default class DefaultLayout extends Vue {
       />
     </q-dialog>
 
-    <ServiceWatchers/>
+    <ServiceWatchers />
 
-    <q-page-container>
-      <router-view/>
+    <q-page-container @click.native="stopEditing">
+      <router-view />
     </q-page-container>
   </q-layout>
 </template>

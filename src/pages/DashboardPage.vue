@@ -7,6 +7,8 @@ import { objectSorter } from '@/helpers/functional';
 import dashboardStore, { DashboardItem } from '@/store/dashboards';
 import featureStore from '@/store/features';
 
+import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '../helpers/dashboards';
+
 interface ValidatedItem {
   item: DashboardItem;
   component: string;
@@ -19,13 +21,21 @@ export default class DashboardPage extends Vue {
   menuModalOpen: boolean = false;
   wizardModalOpen: boolean = false;
 
-  get dashboardId(): string {
-    return this.$route.params.id;
+  @Watch('dashboardId')
+  onChangeDashboardId() {
+    this.widgetEditable = false;
   }
 
-  @Watch('dashboardId')
-  onChangeDashboard() {
-    this.widgetEditable = false;
+  @Watch('dashboard')
+  onChangeDashboard(newDash, oldDash) {
+    if (oldDash && !newDash) {
+      // Dashboard was removed
+      this.$router.replace('/');
+    }
+  }
+
+  get dashboardId(): string {
+    return this.$route.params.id;
   }
 
   get dashboard() {
@@ -98,13 +108,37 @@ export default class DashboardPage extends Vue {
   public async saveWidget(widget: DashboardItem) {
     await dashboardStore.saveDashboardItem(widget);
   }
+
+  onIdChanged(oldId, newId) {
+    if (newId && this.$route.path === `/dashboard/${oldId}`) {
+      this.$router.replace(`/dashboard/${newId}`);
+    }
+  }
+
+  changeDashboardId() {
+    const oldId = this.dashboard.id;
+    startChangeDashboardId(this.dashboard, newId => this.onIdChanged(oldId, newId));
+  }
+
+  changeDashboardTitle() {
+    const oldId = this.dashboard.id;
+    startChangeDashboardTitle(this.dashboard, newId => this.onIdChanged(oldId, newId));
+  }
+
+  toggleDefaultDashboard() {
+    dashboardStore.updatePrimaryDashboard(this.dashboard.primary ? null : this.dashboardId);
+  }
+
+  removeDashboard() {
+    startRemoveDashboard(this.dashboard);
+  }
 }
 </script>
 
 <template>
   <q-page padding>
     <q-inner-loading v-if="!dashboard">
-      <q-spinner size="50px" color="primary"/>
+      <q-spinner size="50px" color="primary" />
     </q-inner-loading>
     <div v-else>
       <portal to="toolbar-title">{{ dashboard.title }}</portal>
@@ -114,7 +148,16 @@ export default class DashboardPage extends Vue {
         </q-toggle>
         <q-btn-dropdown color="primary" label="actions">
           <q-list dark>
-            <ActionItem icon="add" label="New Widget" @click="wizardModalOpen = true"/>
+            <ActionItem icon="add" label="New Widget" @click="wizardModalOpen = true" />
+            <q-item dark link clickable @click="toggleDefaultDashboard">
+              <q-item-section avatar>
+                <q-icon :color="dashboard.primary ? 'primary' : ''" name="home" />
+              </q-item-section>
+              <q-item-section>Toggle default dashboard</q-item-section>
+            </q-item>
+            <ActionItem icon="edit" label="Change dashboard ID" @click="changeDashboardId" />
+            <ActionItem icon="edit" label="Change dashboard Title" @click="changeDashboardTitle" />
+            <ActionItem icon="delete" label="Delete dashboard" @click="removeDashboard" />
           </q-list>
         </q-btn-dropdown>
       </portal>
