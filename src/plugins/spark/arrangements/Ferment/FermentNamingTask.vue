@@ -1,14 +1,16 @@
 <script lang="ts">
+import isString from 'lodash/isString';
 import mapValues from 'lodash/mapValues';
 import UrlSafeString from 'url-safe-string';
 import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
-import { spaceCased, valOrDefault } from '@/helpers/functional';
+import { spaceCased, suggestId, valOrDefault } from '@/helpers/functional';
 import { FermentConfig, FermentConfigNames } from '@/plugins/spark/arrangements/Ferment/types';
 import { typeName } from '@/plugins/spark/getters';
-import sparkStore from '@/plugins/spark/store';
 import serviceStore from '@/store/services';
+
+import { blockIdRules } from '../../helpers';
 
 
 @Component
@@ -86,10 +88,21 @@ export default class FermentNamingTask extends WizardTaskBase {
   }
 
   get names(): FermentConfigNames {
+    const validate = val => !blockIdRules(this.serviceId)
+      .map(rule => rule(val))
+      .some(isString);
     return {
-      ...mapValues(this.defaultNames, v => `${this.prefix} ${v}`),
+      ...mapValues(this.defaultNames, v => suggestId(`${this.prefix} ${v}`, validate)),
       ...this.chosenNames,
     };
+  }
+
+  get nameRules() {
+    return [
+      ...blockIdRules(this.serviceId),
+      v => Object.values(this.names)
+        .filter(n => n === v).length < 2 || "Name can't be a duplicate",
+    ];
   }
 
   get valuesOk() {
@@ -97,16 +110,16 @@ export default class FermentNamingTask extends WizardTaskBase {
       this.serviceId,
       this.dashboardTitle,
       ...Object.values(this.names),
-      ...Object.values(this.names).map(v => !this.nameExists(v)),
+      ...Object.values(this.names).map(v => !this.nameError(v)),
     ]
       .every(Boolean);
   }
 
-  nameExists(val: string) {
-    if (!this.serviceId) {
-      return false;
-    }
-    return sparkStore.blockIds(this.serviceId).includes(val);
+  nameError(val: string): string {
+    const result = this.nameRules
+      .map(rule => rule(val))
+      .find(result => isString(result));
+    return result ? result : '';
   }
 
   updateName(key: string, val: string) {
@@ -144,101 +157,120 @@ export default class FermentNamingTask extends WizardTaskBase {
 
 <template>
   <div>
-    <q-card-section class="row no-wrap" style="height: 80vh">
+    <q-card-section style="height: 60vh">
       <q-scroll-area>
-        <div>
-          <q-list no-border>
-            <q-item dark>
-              <big>Arrangement</big>
-            </q-item>
-            <q-item dark>
-              <q-select
-                v-model="serviceId"
-                :options="serviceOpts"
-                options-dark
-                map-options
-                label="Service"
-                dark
-              />
-            </q-item>
-            <q-item dark>
-              <q-input v-model="arrangementId" label="Arrangement name" dark>
-                <template v-slot:append>
-                  <q-btn
-                    icon="mdi-backup-restore"
-                    flat
-                    size="sm"
-                    color="white"
-                    @click="clearKey('arrangementId')"
-                  />
-                </template>
-              </q-input>
-            </q-item>
-            <q-item dark>
-              <q-input v-model="prefix" label="Widget prefix" dark>
-                <template v-slot:append>
-                  <q-btn
-                    icon="mdi-backup-restore"
-                    flat
-                    size="sm"
-                    color="white"
-                    @click="clearKey('prefix')"
-                  />
-                </template>
-              </q-input>
-            </q-item>
-            <q-item dark>
-              <q-input v-model="dashboardTitle" :error="!dashboardTitle" label="Dashboard" dark>
-                <template v-slot:append>
-                  <q-btn
-                    icon="mdi-backup-restore"
-                    flat
-                    size="sm"
-                    color="white"
-                    @click="clearKey('dashboardTitle')"
-                  />
-                </template>
-              </q-input>
-            </q-item>
-          </q-list>
-        </div>
-        <div>
-          <q-list no-border dense>
-            <q-item dark>
-              <big>Block Names</big>
-            </q-item>
-            <q-item v-for="(nVal, nKey) in names" :key="nKey">
-              <q-input
-                :value="nVal"
-                :error="!nVal || nameExists(nVal)"
-                :label="defaultNames[nKey]"
-                dark
-                bottom-slots
-                @input="v => updateName(nKey, v)"
-              >
-                <template v-slot:append>
-                  <q-btn
-                    icon="mdi-backup-restore"
-                    flat
-                    size="sm"
-                    color="white"
-                    @click="clearName(nKey)"
-                  />
-                </template>
-                <template v-slot:error>Name must not exist, and not be empty</template>
-              </q-input>
-            </q-item>
-          </q-list>
-        </div>
+        <!-- Generic settings -->
+        <q-expansion-item default-opened label="Arrangement settings" icon="settings" dense>
+          <q-item dark>
+            <q-select
+              v-model="serviceId"
+              :options="serviceOpts"
+              options-dark
+              map-options
+              label="Service"
+              dark
+            />
+          </q-item>
+          <q-item dark>
+            <q-input v-model="arrangementId" label="Arrangement name" dark>
+              <template v-slot:append>
+                <q-btn
+                  icon="mdi-backup-restore"
+                  flat
+                  round
+                  size="sm"
+                  color="white"
+                  @click="clearKey('arrangementId')"
+                >
+                  <q-tooltip>Reset to default</q-tooltip>
+                </q-btn>
+                <q-icon name="mdi-information">
+                  <q-tooltip>
+                    The full name of your arrangement.
+                    It will be used as the default dashboard title.
+                    <br >The default prefix is the short version of this.
+                  </q-tooltip>
+                </q-icon>
+              </template>
+            </q-input>
+          </q-item>
+          <q-item dark>
+            <q-input v-model="prefix" label="Prefix" dark>
+              <template v-slot:append>
+                <q-btn
+                  icon="mdi-backup-restore"
+                  flat
+                  round
+                  size="sm"
+                  color="white"
+                  @click="clearKey('prefix')"
+                >
+                  <q-tooltip>Reset to default</q-tooltip>
+                </q-btn>
+                <q-icon name="mdi-information">
+                  <q-tooltip>
+                    By default all block names are prefixed.
+                    You can override this for individual blocks.
+                  </q-tooltip>
+                </q-icon>
+              </template>
+            </q-input>
+          </q-item>
+          <q-item dark>
+            <q-input v-model="dashboardTitle" :error="!dashboardTitle" label="Dashboard" dark>
+              <template v-slot:append>
+                <q-btn
+                  icon="mdi-backup-restore"
+                  flat
+                  round
+                  size="sm"
+                  color="white"
+                  @click="clearKey('dashboardTitle')"
+                >
+                  <q-tooltip>Restore to default</q-tooltip>
+                </q-btn>
+                <q-icon name="mdi-information">
+                  <q-tooltip>The name for the new dashboard</q-tooltip>
+                </q-icon>
+              </template>
+            </q-input>
+          </q-item>
+        </q-expansion-item>
+
+        <!-- Block names -->
+        <q-expansion-item label="Block names" icon="mdi-tag-multiple" dense>
+          <q-item v-for="(nVal, nKey) in names" :key="nKey">
+            <q-input
+              :value="nVal"
+              :error="!!nameError(nVal)"
+              :label="defaultNames[nKey]"
+              dark
+              bottom-slots
+              @input="v => updateName(nKey, v)"
+            >
+              <template v-slot:append>
+                <q-btn
+                  icon="mdi-backup-restore"
+                  flat
+                  round
+                  size="sm"
+                  color="white"
+                  @click="clearName(nKey)"
+                />
+              </template>
+              <template v-slot:error>{{ nameError(nVal) }}</template>
+            </q-input>
+          </q-item>
+        </q-expansion-item>
       </q-scroll-area>
     </q-card-section>
 
-    <q-separator dark/>
+    <q-separator dark />
 
     <q-card-actions>
-      <q-btn unelevated label="Back" @click="back"/>
-      <q-space/>
-      <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone"/>
+      <q-btn unelevated label="Back" @click="back" />
+      <q-space />
+      <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone" />
     </q-card-actions>
   </div>
 </template>
