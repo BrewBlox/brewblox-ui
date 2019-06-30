@@ -380,7 +380,7 @@ export default class ProcessViewForm extends CrudComponent {
 
 <template>
   <q-card dark class="maximized bg-dark">
-    <FormToolbar :crud="crud"/>
+    <FormToolbar :crud="crud" />
 
     <q-dialog v-model="menuModalOpen" no-backdrop-dismiss>
       <ProcessViewPartMenu
@@ -408,7 +408,7 @@ export default class ProcessViewForm extends CrudComponent {
           <q-item-section class="text-h6">Tools</q-item-section>
         </q-item>
 
-        <q-separator dark inset/>
+        <q-separator dark inset />
 
         <ActionItem
           v-for="tool in tools"
@@ -422,15 +422,15 @@ export default class ProcessViewForm extends CrudComponent {
           <q-item-section side class="text-uppercase">{{ tool.shortcut }}</q-item-section>
         </ActionItem>
 
-        <q-item/>
+        <q-item />
         <q-item dark dense>
           <q-item-section class="text-h6">Global Actions</q-item-section>
         </q-item>
 
-        <q-separator dark inset/>
+        <q-separator dark inset />
 
-        <ExportAction :crud="crud" no-close/>
-        <ActionItem icon="delete" label="Delete all parts" no-close @click="clearParts"/>
+        <ExportAction :crud="crud" no-close />
+        <ActionItem icon="delete" label="Delete all parts" no-close @click="clearParts" />
       </q-list>
 
       <div class="col row justify-around">
@@ -446,7 +446,12 @@ export default class ProcessViewForm extends CrudComponent {
               :class="{ clickable: currentTool.cursor(part), [part.type]: true }"
               @click.stop="v => clickHandler(v, part)"
             >
-              <text fill="white" x="0" y="8" class="grid-item-coordinates">{{ part.x }},{{ part.y }}</text>
+              <text
+                fill="white"
+                x="0"
+                y="8"
+                class="grid-item-coordinates"
+              >{{ part.x }},{{ part.y }}</text>
               <ProcessViewItem
                 :part="part"
                 show-hover
@@ -455,7 +460,7 @@ export default class ProcessViewForm extends CrudComponent {
               />
             </g>
             <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
-              <ProcessViewItem :part="dragAction.part"/>
+              <ProcessViewItem :part="dragAction.part" />
             </g>
           </svg>
         </div>

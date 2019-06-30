@@ -31,7 +31,7 @@ const block: BlockSpec = {
       title: 'Start Time',
       component: 'DateValEdit',
       componentProps: { timeScale: 1000 },
-      generate: () => new Date().getTime(),
+      generate: () => new Date().getTime() / 1000,
     },
     {
       key: 'targetId',

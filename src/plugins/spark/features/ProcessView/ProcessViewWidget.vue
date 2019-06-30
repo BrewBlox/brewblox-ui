@@ -155,8 +155,8 @@ export default class ProcessViewWidget extends WidgetBase {
           @click="widgetGridRect = gridRect(); formModalOpen = true"
         >
           <q-list dark bordered>
-            <ExportAction :crud="crud"/>
-            <WidgetActions :crud="crud"/>
+            <ExportAction :crud="crud" />
+            <WidgetActions :crud="crud" />
           </q-list>
         </q-btn-dropdown>
       </q-item-section>
@@ -171,7 +171,7 @@ export default class ProcessViewWidget extends WidgetBase {
           :class="{ clickable: isClickable(part), [part.type]: true }"
           @click="interact(part)"
         >
-          <ProcessViewItem :part="part" @update:part="updatePart" @update:state="updatePartState"/>
+          <ProcessViewItem :part="part" @update:part="updatePart" @update:state="updatePartState" />
         </g>
       </svg>
     </div>

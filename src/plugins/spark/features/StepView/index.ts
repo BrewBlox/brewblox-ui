@@ -1,9 +1,12 @@
 import { ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features';
 
+import ChangeConfirmDialog from './ChangeConfirmDialog.vue';
 import form from './StepViewForm.vue';
 import widget from './StepViewWidget.vue';
 import wizard from './StepViewWizard.vue';
+
+ref(ChangeConfirmDialog);
 
 const feature: Feature = {
   id: 'StepView',

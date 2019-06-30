@@ -62,9 +62,9 @@ export default class DatetimeField extends FieldBase {
     :class="[{editable: !readonly},tagClass]"
     @click="openDialog"
   >
-    <slot name="pre"/>
+    <slot name="pre" />
     <slot name="value">{{ displayString }}</slot>
-    <slot/>
+    <slot />
     <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
   </component>
 </template>
