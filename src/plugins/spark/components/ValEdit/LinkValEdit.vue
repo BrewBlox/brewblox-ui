@@ -1,6 +1,6 @@
 <script lang="ts">
 import get from 'lodash/get';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
 import sparkStore from '@/plugins/spark/store';

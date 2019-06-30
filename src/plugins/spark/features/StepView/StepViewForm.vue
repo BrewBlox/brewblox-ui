@@ -213,6 +213,7 @@ export default class StepViewForm extends CrudComponent {
 
   removeField(change: BlockChangeDisplay, key: string) {
     this.$delete(change.data, key);
+    this.$delete(change.confirmed, key);
     this.saveSteps(this.steps);
   }
 }
