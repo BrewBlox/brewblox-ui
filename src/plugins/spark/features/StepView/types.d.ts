@@ -8,6 +8,9 @@ export interface BlockChange {
   data: {
     [key: string]: any;
   };
+  confirmed: {
+    [key: string]: boolean;
+  };
 }
 
 export interface Step {

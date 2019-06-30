@@ -59,12 +59,14 @@ export default class StepViewForm extends CrudComponent {
       key: `__${stepId}__${change.blockId}`,
       displayName: block ? featureStore.displayNameById(block.type) : 'Unknown',
       props: block ? this.changeFields[block.type] : [],
+      data: change.data || {},
+      confirmed: change.confirmed || {},
     };
   }
 
   asBlockChange(change: BlockChangeDisplay): BlockChange {
-    const { blockId, data } = change;
-    return { blockId, data };
+    const { blockId, data, confirmed } = change;
+    return { blockId, data, confirmed };
   }
 
   get steps(): StepDisplay[] {
@@ -181,7 +183,8 @@ export default class StepViewForm extends CrudComponent {
       .onOk(block => {
         const updatedStep = this.steps.find(s => s.id === step.id);
         if (updatedStep) {
-          updatedStep.changes.push(this.asBlockChangeDisplay(step.id, { blockId: block.id, data: {} }));
+          const newChange = { blockId: block.id, data: {}, confirmed: {} };
+          updatedStep.changes.push(this.asBlockChangeDisplay(step.id, newChange));
           this.saveSteps(this.steps);
         }
       });
@@ -203,6 +206,11 @@ export default class StepViewForm extends CrudComponent {
     this.saveSteps(this.steps);
   }
 
+  toggleConfirmation(change: BlockChangeDisplay, key: string) {
+    this.$set(change.confirmed, key, !change.confirmed[key]);
+    this.saveSteps(this.steps);
+  }
+
   removeField(change: BlockChangeDisplay, key: string) {
     this.$delete(change.data, key);
     this.saveSteps(this.steps);
@@ -214,7 +222,7 @@ export default class StepViewForm extends CrudComponent {
   <q-card dark class="widget-modal">
     <FormToolbar :crud="crud">
       <template v-slot:actions>
-        <ExportAction :crud="crud"/>
+        <ExportAction :crud="crud" />
       </template>
     </FormToolbar>
 
@@ -272,12 +280,12 @@ export default class StepViewForm extends CrudComponent {
                 <q-item v-for="(val, key) in allData(change)" :key="key" dark>
                   <q-item-section>{{ findProp(change, key).title }}</q-item-section>
                   <template v-if="val === null">
-                    <q-item-section/>
+                    <q-item-section />
                     <q-item-section side>
                       <q-btn flat round icon="add" @click="addField(change, key)">
                         <q-tooltip>
                           Add field to Block Change
-                          <br>The field will be changed when the Step is applied.
+                          <br >The field will be changed when the Step is applied.
                         </q-tooltip>
                       </q-btn>
                     </q-item-section>
@@ -293,10 +301,21 @@ export default class StepViewForm extends CrudComponent {
                       />
                     </q-item-section>
                     <q-item-section side>
+                      <q-btn
+                        :color="change.confirmed[key] ? 'primary' : ''"
+                        flat
+                        round
+                        icon="mdi-account-question"
+                        @click="toggleConfirmation(change, key)"
+                      >
+                        <q-tooltip>Edit value when the Step is applied.</q-tooltip>
+                      </q-btn>
+                    </q-item-section>
+                    <q-item-section side>
                       <q-btn flat round icon="mdi-close" @click="removeField(change, key)">
                         <q-tooltip>
                           Remove field from Block Change.
-                          <br>The field will not be changed when the Step is applied.
+                          <br >The field will not be changed when the Step is applied.
                         </q-tooltip>
                       </q-btn>
                     </q-item-section>
@@ -318,10 +337,10 @@ export default class StepViewForm extends CrudComponent {
             </q-list>
             <q-item dark>
               <q-item-section class="col-auto">
-                <q-btn size="sm" label="Add Block" flat icon="mdi-cube" @click="addChange(step)"/>
-                <q-space/>
+                <q-btn size="sm" label="Add Block" flat icon="mdi-cube" @click="addChange(step)" />
+                <q-space />
               </q-item-section>
-              <q-space/>
+              <q-space />
               <q-item-section class="col-auto">
                 <q-btn
                   size="sm"
@@ -351,7 +370,7 @@ export default class StepViewForm extends CrudComponent {
             </q-item>
           </q-expansion-item>
           <q-item dark>
-            <q-item-section/>
+            <q-item-section />
             <q-item-section side>
               <q-btn fab outline icon="add" @click="addStep">
                 <q-tooltip>Add Step</q-tooltip>
