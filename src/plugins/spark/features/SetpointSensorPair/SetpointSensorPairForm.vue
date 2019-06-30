@@ -1,13 +1,24 @@
 <script lang="ts">
+import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import sparkStore from '@/plugins/spark/store';
 
+import { Block } from '../../types';
 import { SetpointSensorPairBlock } from './types';
 
 @Component
 export default class SetpointSensorPairForm extends BlockCrudComponent {
   readonly block!: SetpointSensorPairBlock;
+
+  get usedBy(): Block[] {
+    if (!this.isStoreBlock) {
+      return [];
+    }
+    return sparkStore.blockValues(this.serviceId)
+      .filter(block => get(block, 'data.inputId.id') === this.blockId);
+  }
 }
 </script>
 
@@ -47,6 +58,27 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
             @input="v => { block.data.sensorId = v; saveBlock(); }"
           />
         </q-item-section>
+      </q-item>
+      <q-item v-if="usedBy.length" dark>
+        <q-item-section>
+          <q-item-label caption>This setpoint is used by:</q-item-label>
+          <div class="row">
+            <q-btn
+              v-for="block in usedBy"
+              :key="block.id"
+              :label="block.id"
+              flat
+              no-caps
+              @click="showOtherBlock(block)"
+            />
+          </div>
+        </q-item-section>
+      </q-item>
+      <q-item v-else dark>
+        <q-item-section avatar>
+          <q-icon name="warning"/>
+        </q-item-section>
+        <q-item-section>This setpoint is not used by any PID</q-item-section>
       </q-item>
     </q-card-section>
   </q-card>

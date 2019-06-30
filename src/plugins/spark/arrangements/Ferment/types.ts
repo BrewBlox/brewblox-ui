@@ -38,5 +38,4 @@ export interface FermentConfig {
   };
   heatPin: PinChannel;
   coolPin: PinChannel;
-  activeSetpoint: 'beer' | 'fridge';
 }

@@ -1,11 +1,17 @@
 <script lang="ts">
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import { WizardAction } from '@/components/Wizard/WizardTaskBase';
 
 @Component
 export default class WizardTaskMaster extends Vue {
+  config: any = {};
+  actions: WizardAction[] = [];
+  taskHistory: string[] = [];
+  tasks: string[] = [];
+
+  currentTask: string | null = null;
 
   @Prop({ type: Array, required: true })
   readonly initialTasks!: string[];
@@ -13,41 +19,28 @@ export default class WizardTaskMaster extends Vue {
   @Prop({ type: Object, default: () => ({}) })
   readonly initialConfig!: any;
 
-  busyExecuting: boolean = false;
-  config: any = {};
-  actions: WizardAction[] = [];
-  tasks: string[] = [];
+  @Emit()
+  public back(): void { }
 
-  currentTask: string | null = null;
+  @Emit()
+  public close(): void { }
 
-  nextTask() {
-    this.currentTask = this.tasks.pop() || null;
-    if (!this.currentTask) {
-      this.executePrepared();
+  previousTask() {
+    if (this.taskHistory.length > 0) {
+      this.currentTask = this.taskHistory.pop() || null;
+    } else {
+      this.back();
     }
   }
 
-  async executePrepared() {
-    try {
-      // We're intentionally waiting for each async function
-      // Actions may be async, but may have dependencies
-      this.busyExecuting = true;
-      for (let func of this.actions) {
-        await func(this.config);
-      }
-      this.$q.notify({
-        color: 'positive',
-        icon: 'mdi-check-all',
-        message: 'Done!',
-      });
-    } catch (e) {
-      this.$q.notify({
-        color: 'negative',
-        icon: 'error',
-        message: `Failed to execute actions: ${e.message}`,
-      });
+  nextTask() {
+    if (this.tasks.length === 0) {
+      return;
     }
-    this.close();
+    if (this.currentTask) {
+      this.taskHistory.push(this.currentTask);
+    }
+    this.currentTask = this.tasks.pop() || null;
   }
 
   created() {
@@ -55,25 +48,20 @@ export default class WizardTaskMaster extends Vue {
     this.config = { ...this.initialConfig };
     this.nextTask();
   }
-
-  close() {
-    this.$emit('close');
-  }
 }
 </script>
 
 <template>
   <div>
-    <div v-if="busyExecuting" style="width: 100%; height: 400px;">
-      <q-spinner :size="50" class="absolute-center"/>
-    </div>
     <component
       v-if="currentTask"
       :is="currentTask"
       :config.sync="config"
       :actions.sync="actions"
       :tasks.sync="tasks"
-      @finish="nextTask"
+      @back="previousTask"
+      @next="nextTask"
+      @finish="close"
       @cancel="close"
     />
   </div>

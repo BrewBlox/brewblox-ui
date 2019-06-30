@@ -85,7 +85,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
     });
   }
 
-  next() {
+  taskDone() {
     this.config.heatPin = this.heatPin as PinChannel;
     this.config.coolPin = this.coolPin as PinChannel;
 
@@ -98,8 +98,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
     );
 
     this.updateConfig<FermentConfig>(this.config);
-    this.pushTask('FermentSettingsTask');
-    this.finish();
+    this.next();
   }
 }
 </script>
@@ -175,14 +174,9 @@ export default class FermentHardwareTask extends WizardTaskBase {
     <q-separator dark/>
 
     <q-card-actions>
-      <q-btn
-        :disable="!valuesOk"
-        unelevated
-        label="Next"
-        color="primary"
-        class="full-width"
-        @click="next"
-      />
+      <q-btn unelevated label="Back" @click="back"/>
+      <q-space/>
+      <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone"/>
     </q-card-actions>
   </div>
 </template>
