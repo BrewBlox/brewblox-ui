@@ -25,48 +25,45 @@ export default class FermentManualTask extends WizardTaskBase {
   <div>
     <q-card-section>
       <q-item dark>
-        <big>How to use</big>
+        <big>About your new fermentation dashboard</big>
       </q-item>
       <q-item dark>
         <q-item-section>
           <p>
-            While the wizard is busy creating all your widgets and blocks,
-            here are some pointers on how you can use them.
+            While the wizard is configuring the Spark and your new dashboard,
+            here is a quick explanation of what we set up.
             <span>
               Visit our
               <a
                 href="https://brewblox.netlify.com/user/ferment_guide.html"
                 target="_blank"
+                style="color: white"
               >documentation page</a> for a more in-depth guide.
             </span>
           </p>
           <p>
-            The controller can either use the
-            <b>Fridge Setpoint</b>, or the
-            <b>Beer Setpoint</b>.
-            You can switch between these modes using the
-            <b>Action widget</b>.
+            On the controller we created two PIDs to drive the heater and the cooler.
+            <br>The input to both will either be the
+            <i>Fridge Setpoint</i> or the
+            <i>Beer Setpoint</i>.
           </p>
-          <p>
-            You can configure setpoints and PIDs by clicking on them in the
-            <b>Ferment Fridge</b>.
-          </p>
-          <p>
-            You can use the
-            <b>Temperature Profile</b> to slowly change the setpoint.
-          </p>
-          <p>
-            In the
-            <b>Spark Service page</b> you can view all blocks and how they relate.
+          <p>We did not put every controller block on your new dashboard. You can find all blocks and their relations on the Spark controller service page.</p>
+          <p>On your new dashboard, you will find:
+            <ul>
+              <li>A graphical representation of your fridge. Parts are clickable for quick access to settings.</li>
+              <li>A graph with the most important metrics.</li>
+              <li>A temperature profile that can slowly change a setpoint over time.</li>
+              <li>Actions that reconfigure your blocks for different behavior.</li>
+            </ul>
           </p>
         </q-item-section>
       </q-item>
     </q-card-section>
 
-    <q-separator dark />
+    <q-separator dark/>
 
     <q-card-actions>
-      <q-space />
+      <q-space/>
       <q-btn
         :loading="busyExecuting"
         unelevated
