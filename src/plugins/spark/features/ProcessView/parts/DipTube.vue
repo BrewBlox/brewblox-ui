@@ -27,7 +27,7 @@ export default class DipTube extends PartComponent {
 </script>
 
 <template>
-  <g class="dip-tube">
+  <g>
     <g class="outline">
       <rect fill="white" y="12.5" width="8" height="8"/>
       <rect fill="white" y="30" width="8" height="8"/>

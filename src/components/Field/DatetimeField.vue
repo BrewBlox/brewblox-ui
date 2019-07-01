@@ -18,7 +18,7 @@ export default class DatetimeField extends FieldBase {
   @Prop({ type: String })
   readonly resetIcon!: string;
 
-  @Prop({ type: String })
+  @Prop({ type: String, default: 'date and time' })
   public readonly label!: string;
 
   @Prop({ type: String, default: '<not set>' })
@@ -62,8 +62,9 @@ export default class DatetimeField extends FieldBase {
     :class="[{editable: !readonly},tagClass]"
     @click="openDialog"
   >
-    <slot name="pre"/>
+    <slot name="pre" />
     <slot name="value">{{ displayString }}</slot>
-    <slot/>
+    <slot />
+    <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
   </component>
 </template>

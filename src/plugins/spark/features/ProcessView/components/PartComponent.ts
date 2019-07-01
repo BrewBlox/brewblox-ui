@@ -1,20 +1,30 @@
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 
 import { SQUARE_SIZE } from '../getters';
 import specs from '../specs';
-import { CalculatedFlows, FlowPart } from '../types';
+import { CalculatedFlows, ComponentSpec, FlowPart } from '../types';
 
 @Component
 export default class PartComponent extends Vue {
-  protected SQUARE_SIZE: number = SQUARE_SIZE;
+  public SQUARE_SIZE: number = SQUARE_SIZE;
 
   @Prop({ type: Object, required: true })
-  protected readonly value!: FlowPart;
+  public readonly value!: FlowPart;
 
-  protected get part(): FlowPart {
+  @Emit('update:part')
+  public savePart(part: FlowPart = this.part): FlowPart {
+    return part;
+  }
+
+  @Emit('update:state')
+  public savePartState(part: FlowPart = this.part): FlowPart {
+    return part;
+  }
+
+  public get part(): FlowPart {
     return {
       transitions: {},
       flows: {},
@@ -22,39 +32,47 @@ export default class PartComponent extends Vue {
     };
   }
 
-  protected get flipped(): boolean {
+  public get flipped(): boolean {
     return Boolean(this.part.flipped);
   }
 
-  protected toggleFlipped(): void {
-    this.$emit('input', { ...this.part, flipped: !this.flipped });
+  public toggleFlipped(): void {
+    this.savePart({ ...this.part, flipped: !this.flipped });
   }
 
-  protected get flow(): CalculatedFlows {
+  public get flow(): CalculatedFlows {
     return this.part.flows;
   }
 
-  protected get settings(): Record<string, any> {
+  public get settings(): Record<string, any> {
     return this.part.settings || {};
   }
 
-  protected get state(): Record<string, any> {
+  public get state(): Record<string, any> {
     return this.part.state || {};
   }
 
-  protected get size(): [number, number] {
-    return specs[this.part.type].size(this.part);
+  public get spec(): ComponentSpec {
+    return specs[this.part.type];
   }
 
-  protected get sizeX(): number {
+  public get size(): [number, number] {
+    return this.spec.size(this.part);
+  }
+
+  public get sizeX(): number {
     return this.size[0];
   }
 
-  protected get sizeY(): number {
+  public get sizeY(): number {
     return this.size[1];
   }
 
-  protected textTransformation(textSize: [number, number]): string {
+  public squares(val: number): number {
+    return SQUARE_SIZE * val;
+  }
+
+  public textTransformation(textSize: [number, number]): string {
     const [sizeX] = rotatedSize(this.part.rotate, textSize);
     const rotate = `rotate(${-this.part.rotate},${SQUARE_SIZE / 2},${SQUARE_SIZE / 2})`;
     const flip = `translate(${sizeX * SQUARE_SIZE}, 0) scale(-1,1)`;
@@ -69,20 +87,12 @@ export default class PartComponent extends Vue {
       .toString();
   }
 
-  protected liquidOnCoord(coord: string): string[] {
+  public liquidOnCoord(coord: string): string[] {
     return Object.keys(this.flow[this.rotatedCoord(coord)] || {});
   }
 
-  protected flowOnCoord(coord: string): number {
+  public flowOnCoord(coord: string): number {
     return Object.values(this.flow[this.rotatedCoord(coord)] || {})
       .reduce((sum, v) => sum + v, 0);
-  }
-
-  protected savePart(part: FlowPart = this.part): void {
-    this.$emit('input', part);
-  }
-
-  protected savePartState(part: FlowPart = this.part): void {
-    this.$emit('state', part);
   }
 }

@@ -5,11 +5,14 @@ import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
+import { blockIdRules } from '@/plugins/spark/helpers';
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import { DashboardItem } from '@/store/dashboards';
 import featureStore from '@/store/features';
 import providerStore from '@/store/providers';
+
+import { BlockCrud } from './BlockCrudComponent';
 
 
 @Component
@@ -38,13 +41,7 @@ export default class BlockWizard extends Vue {
   public close() { }
 
   get blockIdRules() {
-    return [
-      v => !!v || 'Name must not be empty',
-      v => !sparkStore.blockIds(this.serviceId).includes(v) || 'Name must be unique',
-      v => v.match(/^[a-zA-Z]/) || 'Name must start with a letter',
-      v => v.match(/^[a-zA-Z0-9 \(\)_\-\|]*$/) || 'Name may only contain letters, numbers, spaces, and ()-_|',
-      v => v.length < 200 || 'Name must be less than 200 characters',
-    ];
+    return blockIdRules(this.serviceId);
   }
 
   get createReady() {
@@ -100,14 +97,18 @@ export default class BlockWizard extends Vue {
 
   configureBlock() {
     this.ensureLocalBlock();
+    const crud: BlockCrud = {
+      widget: this.widget as DashboardItem,
+      isStoreWidget: false,
+      saveWidget: v => { this.widget = v; },
+      block: this.block as Block,
+      isStoreBlock: false,
+      saveBlock: v => { this.block = v; },
+    };
     Dialog.create({
-      component: 'BlockFormDialog',
-      getBlock: () => this.block,
-      getWidget: () => this.widget,
-      saveBlock: v => this.block = v,
-      saveWidget: v => this.widget = v,
-      volatile: true,
+      component: 'FormDialog',
       root: this.$root,
+      getCrud: () => crud,
     });
   }
 
@@ -143,7 +144,7 @@ export default class BlockWizard extends Vue {
 
 <template>
   <q-card dark class="widget-modal" @keyup.enter="createBlock">
-    <FormToolbar>Block wizard</FormToolbar>
+    <DialogToolbar>Block wizard</DialogToolbar>
 
     <q-card-section>
       <q-item dark>
@@ -195,13 +196,7 @@ export default class BlockWizard extends Vue {
     <q-separator dark/>
 
     <q-card-actions align="right">
-      <q-btn
-        :disable="!createReady"
-        unelevated
-        label="Configure"
-        color="primary"
-        @click="configureBlock"
-      />
+      <q-btn :disable="!createReady" flat label="Configure" @click="configureBlock"/>
       <q-btn
         :disable="!createReady"
         unelevated

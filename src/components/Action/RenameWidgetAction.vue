@@ -1,16 +1,10 @@
 <script lang="ts">
-
-import { Dialog } from 'quasar';
-import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import dashboardStore from '@/store/dashboards';
+import CrudComponent from '../Widget/CrudComponent';
 
 @Component
-export default class RenameWidgetAction extends Vue {
-
-  @Prop({ type: String, required: true })
-  readonly widgetId!: string;
+export default class RenameWidgetAction extends CrudComponent {
 
   @Prop({ type: String, default: 'Rename Widget' })
   readonly label!: string;
@@ -24,27 +18,9 @@ export default class RenameWidgetAction extends Vue {
       ...this.$props,
     };
   }
-
-  renameWidget() {
-    let widgetTitle = dashboardStore.dashboardItemById(this.widgetId).title;
-    Dialog.create({
-      title: 'Change Widget name',
-      message: `Choose a new name for '${widgetTitle}'`,
-      dark: true,
-      cancel: true,
-      prompt: {
-        model: widgetTitle,
-        type: 'text',
-      },
-    })
-      .onOk(title => {
-        const item = dashboardStore.dashboardItemById(this.widgetId);
-        dashboardStore.saveDashboardItem({ ...item, title });
-      });
-  }
 }
 </script>
 
 <template>
-  <ActionItem v-bind="itemProps" @click="renameWidget"/>
+  <ActionItem v-bind="itemProps" @click="startChangeWidgetTitle"/>
 </template>

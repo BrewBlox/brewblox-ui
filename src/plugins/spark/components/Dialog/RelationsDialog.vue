@@ -1,7 +1,6 @@
 <script lang="ts">
 import { select as d3Select } from 'd3-selection';
 import { graphlib, render as dagreRender } from 'dagre-d3';
-import { Dialog, uid } from 'quasar';
 import { saveSvgAsPng } from 'save-svg-as-png';
 import { setTimeout } from 'timers';
 import Vue from 'vue';
@@ -9,9 +8,9 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
+import { showBlockDialog } from '@/helpers/dialog';
 import sparkStore from '@/plugins/spark/store';
 import { BlockLink } from '@/plugins/spark/types';
-import featureStore from '@/store/features';
 
 interface Edge {
   source: string;
@@ -144,9 +143,10 @@ export default class RelationsDialog extends DialogBase {
     const toolbarHeight = this.$refs.toolbar.$el.clientHeight || 50;
     this.availableHeight = window.innerHeight - toolbarHeight;
     this.availableWidth = window.innerWidth;
+    this.$refs.svg.setAttribute('style', `min-width: ${outGraph.width}px;
+                                          min-height: ${outGraph.height};`);
     this.$refs.svg.setAttribute('height', outGraph.height);
     this.$refs.svg.setAttribute('width', outGraph.width);
-    this.$refs.svg.setAttribute('viewBox', `0 0 ${outGraph.width} ${outGraph.height}`);
 
     this.$nextTick(() => {
       // Here be dragons
@@ -172,33 +172,7 @@ export default class RelationsDialog extends DialogBase {
   }
 
   openSettings(id: string) {
-    const block = sparkStore.blocks(this.serviceId)[id];
-    if (!block) {
-      return;
-    }
-
-    const widget = {
-      id: uid(),
-      title: block.id,
-      feature: block.type,
-      dashboard: '',
-      order: 0,
-      config: {
-        serviceId: this.serviceId,
-        blockId: block.id,
-      },
-      ...featureStore.widgetSizeById(block.type),
-    };
-
-    Dialog.create({
-      component: 'BlockFormDialog',
-      root: this.$root,
-      volatile: true,
-      getBlock: () => block,
-      getWidget: () => widget,
-      saveBlock: v => sparkStore.saveBlock([this.serviceId, v]),
-      saveWidget: () => { },
-    });
+    showBlockDialog(sparkStore.blocks(this.serviceId)[id]);
   }
 }
 </script>
@@ -206,7 +180,7 @@ export default class RelationsDialog extends DialogBase {
 <template>
   <q-dialog ref="dialog" maximized no-backdrop-dismiss @hide="onDialogHide">
     <q-card dark class="maximized bg-dark-bright">
-      <FormToolbar ref="toolbar" @close="onDialogHide">
+      <DialogToolbar ref="toolbar" @close="onDialogHide">
         {{ title }}
         <template v-slot:buttons>
           <!-- Exporting is bugged right now. See https://github.com/BrewBlox/brewblox-ui/issues/638 -->
@@ -219,19 +193,21 @@ export default class RelationsDialog extends DialogBase {
             @click="exportDiagram"
           />
         </template>
-      </FormToolbar>
+      </DialogToolbar>
 
       <div
         :style="`
-        overflow: scroll;
-        height: ${availableHeight}px;
-        width: ${availableWidth}px;
-        `"
+          overflow: auto;
+          width: ${availableWidth}px;
+          height: ${availableHeight}px;
+          `"
         class="row"
       >
-        <svg ref="svg" class="diag-svg col-12">
-          <g ref="diagram" class="diag-g"/>
+        <q-space/>
+        <svg ref="svg" class="col-auto">
+          <g ref="diagram"/>
         </svg>
+        <q-space/>
       </div>
     </q-card>
   </q-dialog>

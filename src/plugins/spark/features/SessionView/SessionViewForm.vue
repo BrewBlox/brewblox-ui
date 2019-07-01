@@ -3,14 +3,14 @@ import shortid from 'shortid';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
-import FormBase from '@/components/Widget/FormBase';
+import CrudComponent from '@/components/Widget/CrudComponent';
 import { objectSorter } from '@/helpers/functional';
 import { durationString } from '@/helpers/functional';
 import { Session, SessionViewConfig } from '@/plugins/spark/features/SessionView/types';
 import historyStore, { DisplayNames } from '@/store/history';
 
 @Component
-export default class SessionViewForm extends FormBase {
+export default class SessionViewForm extends CrudComponent {
   graphSessionId: string | null = null;
   sessionInput: string = '';
 
@@ -129,7 +129,7 @@ export default class SessionViewForm extends FormBase {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <FormToolbar :crud="crud"/>
     <BlockGraph
       v-if="graphModalOpen"
       v-model="graphModalOpen"

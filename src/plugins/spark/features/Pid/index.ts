@@ -1,5 +1,5 @@
 import { ref } from '@/helpers/component-ref';
-import { Link, Unit } from '@/helpers/units';
+import { Unit } from '@/helpers/units';
 import { ActuatorAnalogLink, ProcessValueLink } from '@/helpers/units/KnownLinks';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
@@ -19,8 +19,6 @@ const block: BlockSpec = {
     inputSetting: new Unit(0, 'degC'),
     outputValue: 0,
     outputSetting: 0,
-    filter: 4,
-    filterThreshold: new Unit(5, 'delta_degC'),
     enabled: false,
     active: true,
     kp: new Unit(20, '1/degC'),
@@ -32,33 +30,29 @@ const block: BlockSpec = {
     error: new Unit(0, 'delta_degC'),
     integral: new Unit(0, 'delta_degC/second'),
     derivative: new Unit(0, 'delta_degC*second'),
+    drivenOutputId: new ActuatorAnalogLink(null),
+    integralReset: 0,
   }),
   presets: [
     {
       name: 'Fridge compressor: (cooling)',
-      generate: () => ({
-        filter: 4,
-        filterThreshold: new Unit(5, 'delta_degC'),
+      generate: (): Partial<PidData> => ({
         kp: new Unit(-10, '1/degC'),
         ti: new Unit(2, 'hour'),
-        td: new Unit(5, 'min'),
+        td: new Unit(0, 'min'),
       }),
     },
     {
       name: 'Fridge heater',
-      generate: () => ({
-        filter: 4,
-        filterThreshold: new Unit(5, 'delta_degC'),
+      generate: (): Partial<PidData> => ({
         kp: new Unit(20, '1/degC'),
         ti: new Unit(2, 'hour'),
-        td: new Unit(3, 'min'),
+        td: new Unit(0, 'min'),
       }),
     },
     {
       name: 'Kettle heating element',
-      generate: () => ({
-        filter: 2,
-        filterThreshold: new Unit(2, 'delta_degC'),
+      generate: (): Partial<PidData> => ({
         kp: new Unit(50, '1/degC'),
         ti: new Unit(10, 'min'),
         td: new Unit(0, 'min'),
@@ -66,9 +60,7 @@ const block: BlockSpec = {
     },
     {
       name: 'HLT setpoint driver',
-      generate: () => ({
-        filter: 2,
-        filterThreshold: new Unit(2, 'delta_degC'),
+      generate: (): Partial<PidData> => ({
         kp: new Unit(1, '1/degC'),
         ti: new Unit(10, 'min'),
         td: new Unit(0, 'min'),
@@ -76,9 +68,7 @@ const block: BlockSpec = {
     },
     {
       name: 'Fridge setpoint driver',
-      generate: () => ({
-        filter: 4,
-        filterThreshold: new Unit(2, 'delta_degC'),
+      generate: (): Partial<PidData> => ({
         kp: new Unit(5, '1/degC'),
         ti: new Unit(2, 'hour'),
         td: new Unit(0, 'min'),
@@ -86,32 +76,22 @@ const block: BlockSpec = {
     },
     {
       name: 'Glycol pump',
-      generate: () => ({
-        filter: 4,
-        filterThreshold: new Unit(2, 'delta_degC'),
+      generate: (): Partial<PidData> => ({
         kp: new Unit(-5, '1/degC'),
         ti: new Unit(2, 'hour'),
-        td: new Unit(5, 'min'),
+        td: new Unit(0, 'min'),
       }),
     },
     {
       name: 'Heating pad',
-      generate: () => ({
-        filter: 4,
-        filterThreshold: new Unit(2, 'delta_degC'),
+      generate: (): Partial<PidData> => ({
         kp: new Unit(30, '1/degC'),
         ti: new Unit(2, 'hour'),
-        td: new Unit(5, 'min'),
+        td: new Unit(0, 'min'),
       }),
     },
   ],
   changes: [
-    {
-      key: 'filterThreshold',
-      title: 'Fast step threshold',
-      component: 'UnitValEdit',
-      generate: () => new Unit(2, 'degC'),
-    },
     {
       key: 'kp',
       title: 'Kp',
@@ -140,13 +120,13 @@ const block: BlockSpec = {
       key: 'inputId',
       title: 'Input',
       component: 'LinkValEdit',
-      generate: () => new Link(null),
+      generate: () => new ProcessValueLink(null),
     },
     {
       key: 'outputId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null),
+      generate: () => new ActuatorAnalogLink(null),
     },
   ],
 };

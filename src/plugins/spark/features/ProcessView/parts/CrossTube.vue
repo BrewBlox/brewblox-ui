@@ -2,7 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import PartComponent from '../components/PartComponent';
-import { DOWN, LEFT, RIGHT,UP } from '../getters';
+import { DOWN, LEFT, RIGHT, UP } from '../getters';
 
 @Component
 export default class CrossTube extends PartComponent {
@@ -36,7 +36,7 @@ export default class CrossTube extends PartComponent {
 </script>
 
 <template>
-  <g class="cross-tube">
+  <g>
     <g class="outline">
       <polyline points="50,21 29,21 29,0"/>
       <polyline points="21,0 21,21 0,21"/>

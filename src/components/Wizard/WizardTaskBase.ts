@@ -5,6 +5,7 @@ export type WizardAction = (config: any) => Promise<void>;
 
 @Component
 export default class WizardTaskBase extends Vue {
+  public busyExecuting: boolean = false;
 
   @Prop({ type: Object, required: true })
   protected readonly config!: any;
@@ -41,8 +42,37 @@ export default class WizardTaskBase extends Vue {
   }
 
   @Emit()
+  protected back(): void { }
+
+  @Emit()
+  public next(): void { }
+
+  @Emit()
   protected cancel(): void { }
 
   @Emit()
   protected finish(): void { }
+
+  public async executePrepared() {
+    try {
+      // We're intentionally waiting for each async function
+      // Actions may be async, but may have dependencies
+      this.busyExecuting = true;
+      for (let func of this.actions) {
+        await func(this.config);
+      }
+      this.$q.notify({
+        color: 'positive',
+        icon: 'mdi-check-all',
+        message: 'Done!',
+      });
+    } catch (e) {
+      this.$q.notify({
+        color: 'negative',
+        icon: 'error',
+        message: `Failed to execute actions: ${e.message}`,
+      });
+    }
+    this.busyExecuting = false;
+  }
 }

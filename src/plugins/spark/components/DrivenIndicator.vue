@@ -2,6 +2,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { showBlockDialog } from '@/helpers/dialog';
 import sparkStore from '@/plugins/spark/store';
 
 @Component
@@ -13,9 +14,13 @@ export default class DrivenIndicator extends Vue {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
-  get textChains() {
+  get driveChains() {
     return sparkStore.drivenChains(this.serviceId)
-      .filter(chain => chain[0] === this.blockId)
+      .filter(chain => chain[0] === this.blockId);
+  }
+
+  get textChains() {
+    return this.driveChains
       .map(chain => chain
         .slice(1)
         .map((id, idx) => {
@@ -27,6 +32,15 @@ export default class DrivenIndicator extends Vue {
 
   get isDriven() {
     return this.textChains.length > 0;
+  }
+
+  bossDriver(chainIdx: number): string {
+    const chain = this.driveChains[chainIdx];
+    return chain[chain.length - 1];
+  }
+
+  showDialog(chainIdx: number) {
+    showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.bossDriver(chainIdx)));
   }
 }
 </script>
@@ -43,6 +57,11 @@ export default class DrivenIndicator extends Vue {
         <div v-for="text in chain" :key="text">
           <small style="opacity: 0.5" v-html="text"/>
         </div>
+      </q-item-section>
+      <q-item-section class="col-auto">
+        <q-btn flat icon="edit" @click="showDialog(chainIdx)">
+          <q-tooltip>Edit {{ bossDriver(chainIdx) }}</q-tooltip>
+        </q-btn>
       </q-item-section>
     </q-item>
   </q-list>

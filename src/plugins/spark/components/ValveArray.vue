@@ -4,12 +4,12 @@ import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import sparkStore from '@/plugins/spark/store';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 
 import { typeName as valveType } from '../features/MotorValve/getters';
 import { MotorValveBlock } from '../features/MotorValve/types';
+import BlockCrudComponent from './BlockCrudComponent';
 
 interface EditableChannel extends IoChannel {
   id: number;
@@ -23,14 +23,14 @@ interface ValveArrayBlock extends Block {
 }
 
 @Component
-export default class ValveArray extends BlockWidget {
+export default class ValveArray extends BlockCrudComponent {
   readonly block!: ValveArrayBlock;
 
   @Prop({ type: Object, required: true })
   public readonly idEnum!: any;
 
   @Prop({ type: Object, required: true })
-  public readonly nameEnum!: string;
+  public readonly nameEnum!: any;
 
   get claimedChannels() {
     return sparkStore.blockValues(this.serviceId)
@@ -121,6 +121,7 @@ export default class ValveArray extends BlockWidget {
         <DigitalStateField
           v-if="channel.driver"
           :value="channel.driver.data.desiredState"
+          :actual-value="channel.driver.data.state"
           @input="v => saveState(channel, v)"
         />
         <div v-else>---</div>

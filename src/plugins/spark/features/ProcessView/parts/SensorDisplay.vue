@@ -2,37 +2,30 @@
 import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
-import { Link } from '@/helpers/units';
-import sparkStore from '@/plugins/spark/store';
+import { Block } from '@/plugins/spark/types';
 
 import PartComponent from '../components/PartComponent';
+import { settingsBlock } from '../helpers';
 
 
 @Component
 export default class SensorDisplay extends PartComponent {
-  get sensorServiceId(): string {
-    return this.part.settings.sensorServiceId;
-  }
-
-  get sensorLink(): Link {
-    return this.part.settings.sensorLink;
+  get block(): Block | null {
+    return settingsBlock(this.part, 'sensor');
   }
 
   get temperature(): number | null {
-    if (!this.sensorServiceId || !this.sensorLink || !this.sensorLink.id) {
-      return null;
-    }
-    return get(
-      sparkStore.blocks(this.sensorServiceId),
-      [this.sensorLink.id, 'data', 'value', 'val'],
-      null
-    );
+    return get(this, 'block.data.value.val', null);
+  }
+
+  get tempUnit(): string {
+    return get(this, 'block.data.value.notation', '');
   }
 }
 </script>
 
 <template>
-  <g class="sensor-display">
+  <g>
     <foreignObject
       :transform="textTransformation([1,1])"
       :width="SQUARE_SIZE"
@@ -40,7 +33,8 @@ export default class SensorDisplay extends PartComponent {
     >
       <div class="text-white text-bold text-center">
         <q-icon name="mdi-thermometer"/>
-        <q-icon v-if="!sensorLink" name="mdi-link-variant-off"/>
+        <q-icon v-if="!block" name="mdi-link-variant-off"/>
+        <small v-else>{{ tempUnit }}</small>
         <br>
         {{ temperature | round(1) }}
       </div>

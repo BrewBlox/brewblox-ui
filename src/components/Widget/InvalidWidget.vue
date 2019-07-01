@@ -16,7 +16,7 @@ export default class InvalidWidget extends WidgetBase {
       <q-item-section side>
         <q-btn-dropdown flat label="Menu">
           <q-list dark bordered>
-            <ActionItem icon="delete" label="Delete widget" @click="deleteWidget"/>
+            <RemoveWidgetAction :crud="crud"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

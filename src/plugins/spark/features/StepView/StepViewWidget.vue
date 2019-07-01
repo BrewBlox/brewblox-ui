@@ -1,11 +1,14 @@
 <script lang="ts">
+import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import sparkStore from '@/plugins/spark/store';
 
-import { Step } from './types';
+import { deepCopy } from '../../../../helpers/shadow-copy';
+import { Block, ChangeField } from '../../types';
+import { BlockChange, Step } from './types';
 
 
 @Component
@@ -39,16 +42,49 @@ export default class StepViewWidget extends WidgetBase {
         {});
   }
 
-  async applyStep(step: Step) {
-    for (let change of step.changes) {
-      const block = sparkStore.blockById(this.serviceId, change.blockId);
-      await sparkStore.saveBlock([this.serviceId, { ...block, data: { ...block.data, ...change.data } }]);
-    }
-    this.$q.notify({
-      icon: 'mdi-check-all',
-      color: 'positive',
-      message: `Applied ${step.name}`,
+  confirmStepChange(block: Block, key: string, value: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const change = sparkStore.specs[block.type].changes
+        .find(change => change.key === key) as ChangeField;
+      if (!change) {
+        resolve(value);
+      }
+      Dialog.create({
+        component: 'ChangeConfirmDialog',
+        title: 'Confirm change',
+        message: `Please confirm the ${change.title} value in ${block.id}.`,
+        serviceId: block.serviceId,
+        blockId: block.id,
+        value,
+        fieldComponent: change.component,
+        componentProps: change.componentProps,
+      })
+        .onOk((updated) => resolve(updated))
+        .onCancel(() => reject('Cancelled by user'));
     });
+  }
+
+  async applyChanges(changes: BlockChange[]) {
+    for (let change of changes) {
+      const block = sparkStore.blockById(this.serviceId, change.blockId);
+      const actualData = deepCopy(change.data);
+      for (let key in change.data) {
+        if (change.confirmed[key]) {
+          actualData[key] = await this.confirmStepChange(block, key, actualData[key]);
+        }
+      }
+      await sparkStore.saveBlock([this.serviceId, { ...block, data: { ...block.data, ...actualData } }]);
+    }
+  }
+
+  applyStep(step: Step) {
+    this.applyChanges(step.changes)
+      .then(() => this.$q.notify({
+        icon: 'mdi-check-all',
+        color: 'positive',
+        message: `Applied ${step.name}`,
+      }))
+      .catch(() => { });
   }
 
   openModal(stepId: string | null) {
@@ -61,20 +97,15 @@ export default class StepViewWidget extends WidgetBase {
 <template>
   <q-card dark class="text-white scroll">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <StepViewForm
-        v-if="modalOpen"
-        v-bind="$props"
-        :open-step="openStep"
-        @update:widget="saveWidget"
-      />
+      <StepViewForm v-if="modalOpen" :crud="crud" :open-step="openStep" />
     </q-dialog>
 
     <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="openModal(null)">
           <q-list dark bordered>
-            <ExportAction :widget-id="widget.id"/>
-            <WidgetActions :field="me"/>
+            <ExportAction :crud="crud" />
+            <WidgetActions :crud="crud" />
           </q-list>
         </q-btn-dropdown>
       </q-item-section>
@@ -88,7 +119,7 @@ export default class StepViewWidget extends WidgetBase {
           <q-tooltip>{{ step.changes.map(change => change.blockId).join(', ') }}</q-tooltip>
         </q-item-section>
         <q-item-section class="col-auto">
-          <q-btn flat round icon="settings" @click="openModal(step.id)"/>
+          <q-btn flat round icon="settings" @click="openModal(step.id)" />
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn

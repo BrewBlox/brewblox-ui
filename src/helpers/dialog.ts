@@ -1,13 +1,16 @@
 import { Dialog, uid } from 'quasar';
-import Vue from 'vue';
 
+import { BlockCrud } from '@/plugins/spark/components/BlockCrudComponent';
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import { DashboardItem } from '@/store/dashboards';
 import featureStore from '@/store/features';
 
-export const showBlockDialog = (block: Block, root: Vue) => {
-  const widget: DashboardItem = {
+export const showBlockDialog = (block: Block | null, props: any = {}) => {
+  if (!block) {
+    return;
+  }
+  let widget: DashboardItem = {
     id: uid(),
     title: block.id,
     feature: block.type,
@@ -19,13 +22,17 @@ export const showBlockDialog = (block: Block, root: Vue) => {
     },
     ...featureStore.widgetSizeById(block.type),
   };
-  Dialog.create({
-    component: 'BlockFormDialog',
-    volatile: true,
-    root,
-    getBlock: () => block,
+  const crud: BlockCrud = {
+    widget,
+    isStoreWidget: false,
+    saveWidget: v => { widget = v; },
+    block,
+    isStoreBlock: true,
     saveBlock: v => sparkStore.saveBlock([block.serviceId, v]),
-    getWidget: () => widget,
-    saveWidget: () => { },
+  };
+  Dialog.create({
+    component: 'FormDialog',
+    getCrud: () => crud,
+    getProps: () => props,
   });
 };

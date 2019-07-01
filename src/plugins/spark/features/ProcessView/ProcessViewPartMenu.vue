@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { clampRotation } from '@/helpers/functional';
+import { clampRotation, spaceCased } from '@/helpers/functional';
 import { partSpecs } from '@/plugins/spark/features/ProcessView/calculateFlows';
 import { FlowPart } from '@/plugins/spark/features/ProcessView/types';
 
@@ -17,9 +17,13 @@ export default class ProcessViewPartMenu extends Vue {
 
   get cards() {
     return [
-      'PlacementPartCard',
+      'PlacementCard',
       ...partSpecs(this.part).cards,
     ];
+  }
+
+  get partTitle(): string {
+    return `${spaceCased(this.part.type)} ${this.part.x},${this.part.y}`;
   }
 
   get partSize(): [number, number] {
@@ -48,7 +52,7 @@ export default class ProcessViewPartMenu extends Vue {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar>{{ part.type }} {{ part.x }},{{ part.y }}</FormToolbar>
+    <DialogToolbar>{{ partTitle }}</DialogToolbar>
 
     <q-card-section>
       <q-item dark>
@@ -63,7 +67,14 @@ export default class ProcessViewPartMenu extends Vue {
           </svg>
         </q-item-section>
       </q-item>
-      <component v-for="card in cards" :key="card" :is="card" :part="part" v-on="$listeners"/>
+      <component
+        v-for="(card, idx) in cards"
+        :key="idx"
+        :is="card.component"
+        :part="part"
+        v-bind="card.props || {}"
+        v-on="$listeners"
+      />
     </q-card-section>
   </q-card>
 </template>

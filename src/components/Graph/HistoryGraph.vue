@@ -80,7 +80,14 @@ export default class HistoryGraph extends Vue {
 
   get policies(): Policies {
     return this.listeners
-      .reduce((acc, listener) => ({ ...acc, [listener.target.measurement]: listener.usedPolicy || 'No data' }), {});
+      .reduce((acc, listener) => {
+        if (listener.target && listener.usedPolicy) {
+          acc[listener.target.measurement] = listener.usedPolicy;
+        }
+        return acc;
+      },
+        {}
+      );
   }
 
   addListeners() {

@@ -27,7 +27,7 @@ export default class StraightInletTube extends PartComponent {
 </script>
 
 <template>
-  <g class="straight-inlet-tube">
+  <g>
     <g class="outline">
       <polyline points="40.5,17.5 48,25 40.5,32.5"/>
       <polyline points="36.4,19.3 42.1,25 36.4,30.8"/>

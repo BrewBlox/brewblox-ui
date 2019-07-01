@@ -27,7 +27,7 @@ export default class ColorField extends FieldBase {
   get colorStyle() {
     return {
       color: this.color,
-      backgroundColor: this.color,
+      backgroundColor: this.value ? this.color : null,
       borderRadius: '50%',
       height: '1em',
       width: '1em',
@@ -62,10 +62,11 @@ export default class ColorField extends FieldBase {
     @click="openDialog"
   >
     <slot name="pre"/>
-    <slot name="value">{{ value }}</slot>
+    <slot name="value">{{ colorString }}</slot>
     <slot name="indicator">
       <span :style="colorStyle"/>
     </slot>
     <slot/>
+    <q-tooltip v-if="!readonly">Choose color</q-tooltip>
   </component>
 </template>

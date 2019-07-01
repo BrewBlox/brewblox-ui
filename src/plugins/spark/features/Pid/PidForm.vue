@@ -1,24 +1,53 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import { showBlockDialog } from '@/helpers/dialog';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
+import sparkStore from '@/plugins/spark/store';
 
-import { filters } from './getters';
+import { Unit } from '../../../../helpers/units';
+
 
 @Component
-export default class PidForm extends BlockForm {
+export default class PidForm extends BlockCrudComponent {
   readonly block!: PidBlock;
 
-  get filterOpts() {
-    return filters.map((filter, idx) => ({ label: filter, value: idx }));
+  get inputId() {
+    return this.block.data.inputId.id;
+  }
+
+  get outputId() {
+    return this.block.data.outputId.id;
+  }
+
+  get hasInputBlock() {
+    return this.inputId
+      && sparkStore
+        .blockIds(this.serviceId)
+        .includes(this.inputId);
+  }
+
+  get hasOutputBlock() {
+    return this.outputId
+      && sparkStore
+        .blockIds(this.serviceId)
+        .includes(this.outputId);
+  }
+
+  showInput() {
+    showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.inputId));
+  }
+
+  showOutput() {
+    showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.outputId));
   }
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <BlockFormToolbar :crud="crud"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="mdi-calculator-variant" label="Settings">
@@ -31,6 +60,7 @@ export default class PidForm extends BlockForm {
         />
         <q-separator dark inset/>
 
+        <!-- Input row -->
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Input Block</q-item-label>
@@ -55,13 +85,22 @@ export default class PidForm extends BlockForm {
             <q-item-label caption>Target value is</q-item-label>
             <q-item-section class="text-bold">{{ block.data.inputSetting | unit }}</q-item-section>
           </q-item-section>
+
           <q-item-section>
             <q-item-label caption>Current value is</q-item-label>
             <div class="text-bold">{{ block.data.inputValue | unit }}</div>
           </q-item-section>
+
+          <q-item-section class="col-auto">
+            <q-btn v-if="hasInputBlock" flat icon="mdi-pencil" @click="showInput">
+              <q-tooltip>Edit {{ inputId }}</q-tooltip>
+            </q-btn>
+            <q-btn v-else disable flat icon="mdi-pencil-off"/>
+          </q-item-section>
         </q-item>
         <q-separator dark inset/>
 
+        <!-- Output row -->
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Output Block</q-item-label>
@@ -94,46 +133,17 @@ export default class PidForm extends BlockForm {
             <q-item-label caption>Current value is</q-item-label>
             <div class="text-bold">{{ block.data.outputValue | round }}</div>
           </q-item-section>
+
+          <q-item-section class="col-auto">
+            <q-btn v-if="hasOutputBlock" flat icon="mdi-pencil" @click="showOutput">
+              <q-tooltip>Edit {{ outputId }}</q-tooltip>
+            </q-btn>
+            <q-btn v-else disable flat icon="mdi-pencil-off"/>
+          </q-item-section>
         </q-item>
         <q-separator dark inset/>
 
-        <q-item dark>
-          <q-item-section>
-            <q-item-label caption>Filter period</q-item-label>
-            <SelectField
-              :value="block.data.filter"
-              :options="filterOpts"
-              title="Filter"
-              message-html="
-              <p>
-                The input error is passed through a filter to remove noise, spikes and sudden jumps.
-                This smooths the output of the PID.
-              </p>
-              <p>The filter should block changes lasting shorter than:</p>
-              "
-              @input="v => { block.data.filter = v; saveBlock(); }"
-            />
-          </q-item-section>
-
-          <q-item-section>
-            <q-item-label caption>Fast step threshold</q-item-label>
-            <UnitField
-              :value="block.data.filterThreshold"
-              title="Filter threshold"
-              message-html="
-              <p>
-                Filtering the input causes a delay in response, because it averages values.
-                The filter can detect when a larger step occurs to which it should respond faster.
-              </p>
-              <p>If a step exceeds this threshold, respond faster:</p>
-              "
-              @input="v => { block.data.filterThreshold = v; saveBlock(); }"
-            />
-          </q-item-section>
-          <q-item-section/>
-        </q-item>
-        <q-separator dark inset/>
-
+        <!-- Calculations -->
         <q-item dark>
           <q-item-section>
             <q-item-label caption class="text-no-wrap">Filtered error</q-item-label>
@@ -202,7 +212,21 @@ export default class PidForm extends BlockForm {
           <q-item-section class="text-center">=</q-item-section>
           <q-item-section>
             <q-item-label caption>I</q-item-label>
-            {{ block.data.i | round }}
+            <InputField
+              :value="block.data.i"
+              type="number"
+              title="Manually set integral"
+              message-html="
+              <p>
+                The integrator slowly builds up when the error is not zero.
+                If you don't want to wait for that, you can manually set the integral part of the output here.
+              </p>
+              <p>
+                It will continue to adjust automatically afterwards.
+              </p>
+              "
+              @input="v => { block.data.integralReset = v || 0.001; saveBlock(); }"
+            />
           </q-item-section>
         </q-item>
 

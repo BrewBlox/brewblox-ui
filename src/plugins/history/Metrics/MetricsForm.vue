@@ -4,7 +4,7 @@ import parseDuration from 'parse-duration';
 import { Component } from 'vue-property-decorator';
 
 import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
-import FormBase from '@/components/Widget/FormBase';
+import CrudComponent from '@/components/Widget/CrudComponent';
 import { durationString } from '@/helpers/functional';
 import historyStore, { DisplayNames } from '@/store/history';
 
@@ -12,7 +12,7 @@ import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './getters';
 import { MetricsConfig } from './types';
 
 @Component
-export default class MetricsForm extends FormBase {
+export default class MetricsForm extends CrudComponent {
   DEFAULT_FRESH_DURATION = DEFAULT_FRESH_DURATION;
   parseDuration = parseDuration;
   durationString = durationString;
@@ -75,7 +75,7 @@ export default class MetricsForm extends FormBase {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <FormToolbar :crud="crud"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="mdi-file-tree" label="Metrics">

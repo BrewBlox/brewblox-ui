@@ -114,6 +114,7 @@ export default class BlockGraph extends Vue {
             <q-item
               v-for="(preset, idx) in presets"
               :key="idx"
+              :active="preset.duration === graphCfg.params.duration"
               dark
               link
               clickable

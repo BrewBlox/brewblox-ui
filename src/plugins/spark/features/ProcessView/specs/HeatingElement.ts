@@ -1,4 +1,5 @@
 import { Coordinates, CoordinatesParam } from '@/helpers/coordinates';
+import { typeName } from '@/plugins/spark/features/ActuatorPwm/getters';
 
 import { defaultSpec } from '../getters';
 import { ComponentSpec, PersistentPart } from '../types';
@@ -13,7 +14,10 @@ const SIZE_Y = 1;
 
 const spec: ComponentSpec = {
   ...defaultSpec,
-  cards: ['PwmPartCard'],
+  cards: [{
+    component: 'LinkedBlockCard',
+    props: { settingsKey: 'pwm', typeName },
+  }],
   size: () => [SIZE_X, SIZE_Y],
   transitions: () => ({}),
   blockedCoordinates: (part: PersistentPart): Coordinates[] =>

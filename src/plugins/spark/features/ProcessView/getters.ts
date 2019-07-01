@@ -2,6 +2,7 @@ import { Coordinates } from '@/helpers/coordinates';
 
 import { ComponentSpec, PersistentPart } from './types';
 
+export const typeName = 'ProcessView';
 export const SQUARE_SIZE = 50;
 export const UP = '0.5,0,0';
 export const RIGHT = '1,0.5,0';

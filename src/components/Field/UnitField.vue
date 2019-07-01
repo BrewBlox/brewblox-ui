@@ -13,7 +13,7 @@ export default class UnitField extends FieldBase {
   @Prop({ type: Object, required: true, validator: v => v instanceof Unit })
   public readonly value!: Unit;
 
-  @Prop({ type: String })
+  @Prop({ type: String, default: 'value' })
   public readonly label!: string;
 
   @Prop({ type: String, default: 'small' })
@@ -50,5 +50,6 @@ export default class UnitField extends FieldBase {
     </slot>
     <component v-if="value.value !== null" :is="unitTag" class="q-ml-xs">{{ value.notation }}</component>
     <slot/>
+    <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
   </component>
 </template>

@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 
 import { spaceCased } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
@@ -12,7 +12,7 @@ import { typeName } from './getters';
 import { MotorValveBlock, ValveState } from './types';
 
 @Component
-export default class MotorValveForm extends BlockForm {
+export default class MotorValveForm extends BlockCrudComponent {
   readonly block!: MotorValveBlock;
 
   get hwBlock(): Block | null {
@@ -71,7 +71,7 @@ export default class MotorValveForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <BlockFormToolbar :crud="crud"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
@@ -102,6 +102,7 @@ export default class MotorValveForm extends BlockForm {
             <q-item-label caption>State</q-item-label>
             <DigitalStateField
               :value="block.data.desiredState"
+              :actual-value="block.data.state"
               :disable="isDriven"
               @input="v => { block.data.desiredState = v; saveBlock(); }"
             />

@@ -85,14 +85,21 @@ export default class ProcessViewWidget extends WidgetBase {
 
   get parts(): StatePart[] {
     return this.widgetConfig.parts
-      .map(part => ({
-        id: uid(),
-        rotate: 0,
-        settings: {},
-        flipped: false,
-        ...part,
-        state: this.partState[part.id] || {},
-      }));
+      .map(part => {
+        const statePart = {
+          id: uid(),
+          rotate: 0,
+          settings: {},
+          flipped: false,
+          ...part,
+          state: this.partState[part.id] || {},
+        };
+        const [sizeX, sizeY] = specs[part.type].size(part);
+        statePart.state.area = sizeX * sizeY;
+        return statePart;
+      })
+      // sort parts to render largest first
+      .sort((a, b) => b.state.area - a.state.area);
   }
 
   get updater(): PartUpdater {
@@ -127,11 +134,10 @@ export default class ProcessViewWidget extends WidgetBase {
     <q-dialog v-model="formModalOpen" no-backdrop-dismiss maximized>
       <ProcessViewForm
         v-if="formModalOpen"
-        v-bind="$props"
+        :crud="crud"
         :widget-grid-rect="widgetGridRect"
         :parts="parts"
         :flow-parts="flowParts"
-        @update:widget="saveWidget"
         @parts="updateParts"
         @part="updatePart"
         @state="updatePartState"
@@ -149,8 +155,8 @@ export default class ProcessViewWidget extends WidgetBase {
           @click="widgetGridRect = gridRect(); formModalOpen = true"
         >
           <q-list dark bordered>
-            <ExportAction :widget-id="widget.id"/>
-            <WidgetActions :field="me"/>
+            <ExportAction :crud="crud" />
+            <WidgetActions :crud="crud" />
           </q-list>
         </q-btn-dropdown>
       </q-item-section>
@@ -162,10 +168,10 @@ export default class ProcessViewWidget extends WidgetBase {
           v-for="part in flowParts"
           :transform="`translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`"
           :key="part.id"
-          :class="{ clickable: isClickable(part) }"
+          :class="{ clickable: isClickable(part), [part.type]: true }"
           @click="interact(part)"
         >
-          <ProcessViewItem :part="part" @input="updatePart" @state="updatePartState"/>
+          <ProcessViewItem :part="part" @update:part="updatePart" @update:state="updatePartState" />
         </g>
       </svg>
     </div>

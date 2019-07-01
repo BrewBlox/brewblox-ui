@@ -10,7 +10,7 @@ export default class DigitalStateField extends Vue {
   @Prop({ type: Number, required: true })
   readonly value!: DigitalState;
 
-  @Prop({ type: Number })
+  @Prop({ type: Number, default: null })
   readonly actualValue!: DigitalState;
 
   @Prop({ type: Boolean, default: false })
@@ -48,6 +48,12 @@ export default class DigitalStateField extends Vue {
 
   get known() {
     return !!this.options.find(opt => opt.value === this.value);
+  }
+
+  get mismatch() {
+    return !this.disable
+      && this.actualValue !== null
+      && this.value !== this.actualValue;
   }
 
   toggle() {
@@ -91,6 +97,7 @@ export default class DigitalStateField extends Vue {
         </q-tooltip>
       </q-btn>
     </div>
+    <q-spinner v-if="mismatch"/>
   </div>
 </template>
 

@@ -48,11 +48,6 @@ export default class UnknownBlockWidget extends WidgetBase {
   fetchAll() {
     sparkStore.fetchAll(this.serviceId);
   }
-
-  public async saveBlock(block: Block = this.block): Promise<void> {
-    await sparkStore.saveBlock([this.serviceId, block])
-      .catch(() => this.$forceUpdate());
-  }
 }
 
 </script>
@@ -69,7 +64,7 @@ export default class UnknownBlockWidget extends WidgetBase {
               label="Refresh"
               @click="fetchAll"
             />
-            <ActionItem icon="delete" label="Delete widget" @click="deleteWidget"/>
+            <RemoveWidgetAction :crud="crud"/>
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

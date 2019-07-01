@@ -30,7 +30,7 @@ export default class WizardPicker extends Vue {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar>{{ title }}</FormToolbar>
+    <DialogToolbar>{{ title }}</DialogToolbar>
     <component
       v-if="wizardComponent"
       :is="wizardComponent"

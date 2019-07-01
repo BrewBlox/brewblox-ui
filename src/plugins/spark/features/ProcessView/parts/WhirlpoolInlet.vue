@@ -27,7 +27,7 @@ export default class WhirlpoolInlet extends PartComponent {
 </script>
 
 <template>
-  <g class="whirlpool-inlet">
+  <g>
     <LiquidStroke :paths="[paths.liquid]" :colors="liquids"/>
     <g class="outline">
       <rect y="12" width="8" height="8" fill="white"/>

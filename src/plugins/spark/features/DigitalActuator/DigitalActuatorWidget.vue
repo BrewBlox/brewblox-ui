@@ -13,7 +13,7 @@ export default class DigitalActuatorWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :field="me"/>
+    <BlockWidgetToolbar :crud="crud"/>
 
     <q-card-section>
       <template v-if="!block.data.hwDevice.id || !block.data.channel">
@@ -31,6 +31,7 @@ export default class DigitalActuatorWidget extends BlockWidget {
             <q-item-label caption>State</q-item-label>
             <DigitalStateField
               :value="block.data.desiredState"
+              :actual-value="block.data.state"
               :disable="isDriven"
               @input="v => { block.data.desiredState = v; saveBlock(); }"
             />

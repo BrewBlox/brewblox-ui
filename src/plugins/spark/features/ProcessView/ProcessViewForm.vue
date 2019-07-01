@@ -2,7 +2,7 @@
 import { Dialog, uid } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import FormBase from '@/components/Widget/FormBase';
+import CrudComponent from '@/components/Widget/CrudComponent';
 import { Coordinates } from '@/helpers/coordinates';
 import { clampRotation, spaceCased } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/shadow-copy';
@@ -36,7 +36,7 @@ interface ToolAction {
     ProcessViewPartMenu,
   },
 })
-export default class ProcessViewForm extends FormBase {
+export default class ProcessViewForm extends CrudComponent {
   SQUARE_SIZE = SQUARE_SIZE;
   spaceCased = spaceCased;
 
@@ -380,14 +380,15 @@ export default class ProcessViewForm extends FormBase {
 
 <template>
   <q-card dark class="maximized bg-dark">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <FormToolbar :crud="crud" />
 
     <q-dialog v-model="menuModalOpen" no-backdrop-dismiss>
       <ProcessViewPartMenu
         v-if="menuModalOpen"
         :part="configuredPart"
-        @input="updatePart"
-        @remove="removePart"
+        @update:part="updatePart"
+        @update:state="updatePartState"
+        @remove:part="removePart"
         @close="menuModalOpen = false"
       />
     </q-dialog>
@@ -407,7 +408,7 @@ export default class ProcessViewForm extends FormBase {
           <q-item-section class="text-h6">Tools</q-item-section>
         </q-item>
 
-        <q-separator dark inset/>
+        <q-separator dark inset />
 
         <ActionItem
           v-for="tool in tools"
@@ -421,15 +422,15 @@ export default class ProcessViewForm extends FormBase {
           <q-item-section side class="text-uppercase">{{ tool.shortcut }}</q-item-section>
         </ActionItem>
 
-        <q-item/>
+        <q-item />
         <q-item dark dense>
           <q-item-section class="text-h6">Global Actions</q-item-section>
         </q-item>
 
-        <q-separator dark inset/>
+        <q-separator dark inset />
 
-        <ExportAction :widget-id="widget.id" no-close/>
-        <ActionItem icon="delete" label="Delete all parts" no-close @click="clearParts"/>
+        <ExportAction :crud="crud" no-close />
+        <ActionItem icon="delete" label="Delete all parts" no-close @click="clearParts" />
       </q-list>
 
       <div class="col row justify-around">
@@ -442,14 +443,24 @@ export default class ProcessViewForm extends FormBase {
               v-show="!beingDragged(part)"
               :transform="`translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`"
               :key="part.id"
-              :class="{ clickable: currentTool.cursor(part) }"
+              :class="{ clickable: currentTool.cursor(part), [part.type]: true }"
               @click.stop="v => clickHandler(v, part)"
             >
-              <text fill="white" x="0" y="8" class="grid-item-coordinates">{{ part.x }},{{ part.y }}</text>
-              <ProcessViewItem :part="part" show-hover @input="updatePart" @state="updatePartState"/>
+              <text
+                fill="white"
+                x="0"
+                y="8"
+                class="grid-item-coordinates"
+              >{{ part.x }},{{ part.y }}</text>
+              <ProcessViewItem
+                :part="part"
+                show-hover
+                @update:part="updatePart"
+                @update:state="updatePartState"
+              />
             </g>
             <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
-              <ProcessViewItem :part="dragAction.part"/>
+              <ProcessViewItem :part="dragAction.part" />
             </g>
           </svg>
         </div>

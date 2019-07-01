@@ -4,7 +4,8 @@ import get from 'lodash/get';
 import { Dialog, uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
-import FormBase from '@/components/Widget/FormBase';
+import CrudComponent from '@/components/Widget/CrudComponent';
+import { deepCopy } from '@/helpers/shadow-copy';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import sparkStore from '@/plugins/spark/store';
 import { Block, ChangeField } from '@/plugins/spark/types';
@@ -24,7 +25,7 @@ interface StepDisplay extends Step {
 }
 
 @Component
-export default class StepViewForm extends FormBase {
+export default class StepViewForm extends CrudComponent {
   editableChanges: Record<string, boolean> = {};
 
   @Prop({ type: String })
@@ -58,12 +59,14 @@ export default class StepViewForm extends FormBase {
       key: `__${stepId}__${change.blockId}`,
       displayName: block ? featureStore.displayNameById(block.type) : 'Unknown',
       props: block ? this.changeFields[block.type] : [],
+      data: change.data || {},
+      confirmed: change.confirmed || {},
     };
   }
 
   asBlockChange(change: BlockChangeDisplay): BlockChange {
-    const { blockId, data } = change;
-    return { blockId, data };
+    const { blockId, data, confirmed } = change;
+    return { blockId, data, confirmed };
   }
 
   get steps(): StepDisplay[] {
@@ -99,7 +102,7 @@ export default class StepViewForm extends FormBase {
   }
 
   findProp(change: BlockChangeDisplay, key: string): ChangeField {
-    return change.props.find(prop => prop.key === key) as ChangeField;
+    return (change.props.find(prop => prop.key === key) || {}) as ChangeField;
   }
 
   componentProps(change: BlockChangeDisplay, key: string): any {
@@ -126,6 +129,12 @@ export default class StepViewForm extends FormBase {
         this.steps.push({ name, id: uid(), changes: [] });
         this.saveSteps(this.steps);
       });
+  }
+
+  duplicateStep(step: StepDisplay) {
+    const duplicated = deepCopy(step);
+    this.steps.push({ ...duplicated, id: uid(), name: `${duplicated.name} (copy)` });
+    this.saveSteps(this.steps);
   }
 
   renameStep(step: StepDisplay) {
@@ -174,7 +183,8 @@ export default class StepViewForm extends FormBase {
       .onOk(block => {
         const updatedStep = this.steps.find(s => s.id === step.id);
         if (updatedStep) {
-          updatedStep.changes.push(this.asBlockChangeDisplay(step.id, { blockId: block.id, data: {} }));
+          const newChange = { blockId: block.id, data: {}, confirmed: {} };
+          updatedStep.changes.push(this.asBlockChangeDisplay(step.id, newChange));
           this.saveSteps(this.steps);
         }
       });
@@ -196,8 +206,14 @@ export default class StepViewForm extends FormBase {
     this.saveSteps(this.steps);
   }
 
+  toggleConfirmation(change: BlockChangeDisplay, key: string) {
+    this.$set(change.confirmed, key, !change.confirmed[key]);
+    this.saveSteps(this.steps);
+  }
+
   removeField(change: BlockChangeDisplay, key: string) {
     this.$delete(change.data, key);
+    this.$delete(change.confirmed, key);
     this.saveSteps(this.steps);
   }
 }
@@ -205,7 +221,11 @@ export default class StepViewForm extends FormBase {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <FormToolbar :crud="crud">
+      <template v-slot:actions>
+        <ExportAction :crud="crud" />
+      </template>
+    </FormToolbar>
 
     <q-card-section>
       <div class="scroll-parent">
@@ -218,18 +238,6 @@ export default class StepViewForm extends FormBase {
             group="steps"
             icon="mdi-format-list-checks"
           >
-            <q-item dark>
-              <q-item-section class="col-auto">
-                <q-btn size="sm" label="Add Block" flat icon="mdi-cube" @click="addChange(step)"/>
-              </q-item-section>
-              <q-item-section/>
-              <q-item-section class="col-auto">
-                <q-btn size="sm" label="Rename Step" flat icon="edit" @click="renameStep(step)"/>
-              </q-item-section>
-              <q-item-section class="col-auto">
-                <q-btn size="sm" label="Remove Step" flat icon="delete" @click="removeStep(step)"/>
-              </q-item-section>
-            </q-item>
             <q-list
               v-for="change in step.changes"
               :key="change.blockId"
@@ -239,7 +247,10 @@ export default class StepViewForm extends FormBase {
               dense
             >
               <q-item dark>
-                <q-item-section class="text-h6">{{ change.blockId }}</q-item-section>
+                <q-item-section :class="{'text-h6': true, 'text-red': !change.block}">
+                  {{ change.blockId }}
+                  <q-tooltip v-if="!change.block">Block not found</q-tooltip>
+                </q-item-section>
                 <template v-if="editableChanges[change.key]">
                   <q-item-section side>
                     <q-btn flat round icon="delete" @click="removeChange(step, change.key)">
@@ -270,12 +281,12 @@ export default class StepViewForm extends FormBase {
                 <q-item v-for="(val, key) in allData(change)" :key="key" dark>
                   <q-item-section>{{ findProp(change, key).title }}</q-item-section>
                   <template v-if="val === null">
-                    <q-item-section/>
+                    <q-item-section />
                     <q-item-section side>
                       <q-btn flat round icon="add" @click="addField(change, key)">
                         <q-tooltip>
                           Add field to Block Change
-                          <br>The field will be changed when the Step is applied.
+                          <br >The field will be changed when the Step is applied.
                         </q-tooltip>
                       </q-btn>
                     </q-item-section>
@@ -291,10 +302,21 @@ export default class StepViewForm extends FormBase {
                       />
                     </q-item-section>
                     <q-item-section side>
+                      <q-btn
+                        :color="change.confirmed[key] ? 'primary' : ''"
+                        flat
+                        round
+                        icon="mdi-account-question"
+                        @click="toggleConfirmation(change, key)"
+                      >
+                        <q-tooltip>Edit value when the Step is applied.</q-tooltip>
+                      </q-btn>
+                    </q-item-section>
+                    <q-item-section side>
                       <q-btn flat round icon="mdi-close" @click="removeField(change, key)">
                         <q-tooltip>
                           Remove field from Block Change.
-                          <br>The field will not be changed when the Step is applied.
+                          <br >The field will not be changed when the Step is applied.
                         </q-tooltip>
                       </q-btn>
                     </q-item-section>
@@ -314,9 +336,42 @@ export default class StepViewForm extends FormBase {
                 </q-item>
               </template>
             </q-list>
+            <q-item dark>
+              <q-item-section class="col-auto">
+                <q-btn size="sm" label="Add Block" flat icon="mdi-cube" @click="addChange(step)" />
+                <q-space />
+              </q-item-section>
+              <q-space />
+              <q-item-section class="col-auto">
+                <q-btn
+                  size="sm"
+                  label="Copy Step"
+                  icon="file_copy"
+                  align="left"
+                  flat
+                  @click="duplicateStep(step)"
+                />
+                <q-btn
+                  size="sm"
+                  label="Rename Step"
+                  icon="edit"
+                  align="left"
+                  flat
+                  @click="renameStep(step)"
+                />
+                <q-btn
+                  size="sm"
+                  label="Remove Step"
+                  icon="delete"
+                  align="left"
+                  flat
+                  @click="removeStep(step)"
+                />
+              </q-item-section>
+            </q-item>
           </q-expansion-item>
           <q-item dark>
-            <q-item-section/>
+            <q-item-section />
             <q-item-section side>
               <q-btn fab outline icon="add" @click="addStep">
                 <q-tooltip>Add Step</q-tooltip>

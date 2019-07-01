@@ -10,9 +10,6 @@ export interface PidData {
   outputValue: number;
   outputSetting: number;
 
-  filter: number;
-  filterThreshold: Unit;
-
   enabled: boolean;
   active: boolean;
 
@@ -27,6 +24,9 @@ export interface PidData {
   error: Unit;
   integral: Unit;
   derivative: Unit;
+
+  drivenOutputId: Link;
+  integralReset: number;
 }
 
 export interface PidBlock extends Block {

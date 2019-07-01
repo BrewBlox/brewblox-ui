@@ -160,6 +160,10 @@ export class SparkModule extends VuexModule {
     return Object.values(this.specs);
   }
 
+  public get serviceIds(): string[] {
+    return Object.keys(this.services);
+  }
+
   public get serviceAvailable(): (serviceId: string) => boolean {
     return serviceId => !!this.services[serviceId];
   }
@@ -218,6 +222,14 @@ export class SparkModule extends VuexModule {
         throw new Error(`Invalid block ${id}: ${block.type} !== ${type}`);
       }
       return block;
+    };
+  }
+
+  public get tryBlockById(): (serviceId: string, id: string | null) => Block | null {
+    return (serviceId: string, id: string | null) => {
+      return id === null
+        ? null
+        : get(this.services, [serviceId, 'blocks', id], null);
     };
   }
 

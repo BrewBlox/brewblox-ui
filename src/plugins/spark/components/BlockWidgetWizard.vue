@@ -6,11 +6,14 @@ import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 import { objectStringSorter } from '@/helpers/functional';
+import { blockIdRules } from '@/plugins/spark/helpers';
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import { DashboardItem } from '@/store/dashboards';
 import serviceStore from '@/store/services';
 import { Service } from '@/store/services';
+
+import { BlockCrud } from './BlockCrudComponent';
 
 @Component
 export default class BlockWidgetWizard extends WidgetWizardBase {
@@ -19,6 +22,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
   blockId: string = '';
   service: Service | null = null;
   block: Block | null = null;
+  isStoreBlock: boolean = false;
   widget: DashboardItem | null = null;
 
   get serviceId(): string {
@@ -26,13 +30,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
   }
 
   get blockIdRules() {
-    return [
-      v => !!v || 'Name must not be empty',
-      v => !sparkStore.blockIds(this.serviceId).includes(v) || 'Name must be unique',
-      v => v.match(/^[a-zA-Z]/) || 'Name must start with a letter',
-      v => v.match(/^[a-zA-Z0-9 \(\)_\-\|]*$/) || 'Name may only contain letters, numbers, spaces, and ()-_|',
-      v => v.length < 200 || 'Name must be less than 200 characters',
-    ];
+    return blockIdRules(this.serviceId);
   }
 
   get blockOpts() {
@@ -89,15 +87,27 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
     };
   }
 
+  async saveBlock(block: Block) {
+    this.block = block;
+    if (this.isStoreBlock) {
+      await sparkStore.saveBlock([block.serviceId, block]);
+    }
+  }
+
   configureBlock() {
     this.ensureItem();
+    const crud: BlockCrud = {
+      widget: this.widget as DashboardItem,
+      isStoreWidget: false,
+      saveWidget: v => { this.widget = v; },
+      block: this.block as Block,
+      isStoreBlock: this.isStoreBlock,
+      saveBlock: this.saveBlock,
+    };
     Dialog.create({
-      component: 'BlockFormDialog',
-      getBlock: () => this.block,
-      getWidget: () => this.widget,
-      saveBlock: v => this.block = v,
-      saveWidget: v => this.widget = v,
+      component: 'FormDialog',
       root: this.$root,
+      getCrud: () => crud,
     });
   }
 
@@ -146,14 +156,14 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
           label="Create new Block"
           color="primary"
           class="q-mx-md"
-          @click="currentStep = 'create'"
+          @click="isStoreBlock = false; currentStep = 'create'"
         />
         <q-btn
           :disable="!startOk"
           unelevated
           label="Use existing Block"
           color="primary"
-          @click="currentStep = 'existing'"
+          @click="isStoreBlock = true; currentStep = 'existing'"
         />
       </q-stepper-navigation>
     </q-step>
@@ -186,9 +196,8 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
         <q-space/>
         <q-btn
           :disable="!createOk"
-          unelevated
+          flat
           label="Configure Block"
-          color="primary"
           class="q-mx-md"
           @click="configureBlock"
         />
@@ -230,9 +239,8 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
         <q-space/>
         <q-btn
           :disable="!existingOk"
-          unelevated
+          flat
           label="Configure Block"
-          color="primary"
           class="q-mx-md"
           @click="configureBlock"
         />

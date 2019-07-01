@@ -43,8 +43,18 @@ export interface PartUpdater {
   updatePartState: (part: StatePart) => void;
 }
 
+export interface LinkedBlock {
+  serviceId: string | null;
+  blockId: string | null;
+}
+
+export interface CardSpec {
+  component: string;
+  props?: Record<string, any>;
+}
+
 export interface ComponentSpec {
-  cards: string[];
+  cards: CardSpec[];
   transitions: (part: StatePart) => Transitions;
   size: (part: PersistentPart) => [number, number];
   blockedCoordinates: (part: PersistentPart) => Coordinates[];

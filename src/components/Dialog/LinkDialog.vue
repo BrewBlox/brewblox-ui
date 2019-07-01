@@ -8,6 +8,9 @@ import { objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
 import sparkStore from '@/plugins/spark/store';
 
+import { showBlockDialog } from '../../helpers/dialog';
+import { Block } from '../../plugins/spark/types';
+
 @Component
 export default class LinkDialog extends DialogBase {
   link: Link | null = null
@@ -31,7 +34,7 @@ export default class LinkDialog extends DialogBase {
   public readonly noCreate!: boolean;
 
   get compatibleTypes() {
-    if (this.value.type === null) {
+    if (!this.value.type) {
       return null;
     }
     const compatibleTable = sparkStore.compatibleTypes(this.serviceId);
@@ -52,8 +55,18 @@ export default class LinkDialog extends DialogBase {
       .sort(objectStringSorter('id'));
   }
 
+  get linkBlock(): Block | null {
+    return this.link && this.link.id
+      ? sparkStore.tryBlockById(this.serviceId, this.link.id)
+      : null;
+  }
+
   updateLink(link: Link | null) {
     this.link = link || new Link(null, this.value.type);
+  }
+
+  edit() {
+    showBlockDialog(this.linkBlock);
   }
 
   create() {
@@ -63,7 +76,7 @@ export default class LinkDialog extends DialogBase {
       serviceId: this.serviceId,
       filter: feat => !this.compatibleTypes || this.compatibleTypes.includes(feat),
     })
-      .onOk(block => {
+      .onOk((block: Block) => {
         // Retain original type
         this.link = new Link(block.id, this.value.type);
       });
@@ -105,6 +118,10 @@ export default class LinkDialog extends DialogBase {
             </q-item>
           </template>
           <template v-slot:after v-if="!noCreate">
+            <q-btn v-if="linkBlock" flat round icon="mdi-pencil" @click="edit">
+              <q-tooltip>Edit {{ link.id }}</q-tooltip>
+            </q-btn>
+            <q-btn v-else disable flat round icon="mdi-pencil-off"/>
             <q-btn flat round icon="add" @click="create">
               <q-tooltip>Create new Block</q-tooltip>
             </q-btn>

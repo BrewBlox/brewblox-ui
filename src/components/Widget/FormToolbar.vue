@@ -1,16 +1,28 @@
 <script lang="ts">
-import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
+import CrudComponent from './CrudComponent';
+
 @Component
-export default class FormToolbar extends Vue { }
+export default class FormToolbar extends CrudComponent { }
 </script>
 
 <template>
-  <q-bar class="row items-center bg-primary q-py-lg text-white">
+  <DialogToolbar>
+    <q-item-section>
+      <q-item-label>{{ widget.title }}</q-item-label>
+      <q-item-label caption>{{ displayName }}</q-item-label>
+    </q-item-section>
     <slot/>
-    <q-space/>
-    <slot name="buttons"/>
-    <q-btn v-close-popup flat rounded label="close" @click="$emit('close')"/>
-  </q-bar>
+    <template v-slot:buttons>
+      <slot name="buttons">
+        <q-btn-dropdown flat icon="mdi-pencil">
+          <q-list dark bordered>
+            <slot name="actions"/>
+            <WidgetActions :crud="crud" no-rename/>
+          </q-list>
+        </q-btn-dropdown>
+      </slot>
+    </template>
+  </DialogToolbar>
 </template>

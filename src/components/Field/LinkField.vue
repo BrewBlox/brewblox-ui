@@ -15,7 +15,7 @@ export default class LinkField extends FieldBase {
   @Prop({ type: String, required: true })
   public readonly serviceId!: string;
 
-  @Prop({ type: String })
+  @Prop({ type: String, default: 'Link' })
   public readonly label!: string;
 
   @Prop({ type: Function, default: null })
@@ -66,5 +66,6 @@ export default class LinkField extends FieldBase {
     <slot name="pre"/>
     <slot name="value">{{ displayValue | truncated }}</slot>
     <slot/>
+    <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
   </component>
 </template>

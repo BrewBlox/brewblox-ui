@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 
 import { durationString, objectSorter } from '@/helpers/functional';
 import { Unit } from '@/helpers/units';
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import sparkStore from '@/plugins/spark/store';
 
 import { Setpoint, SetpointProfileBlock } from './types';
@@ -16,7 +16,7 @@ interface DisplaySetpoint {
 }
 
 @Component
-export default class SetpointProfileForm extends BlockForm {
+export default class SetpointProfileForm extends BlockCrudComponent {
   durationString = durationString;
   parseDuration = parseDuration;
 
@@ -137,7 +137,7 @@ export default class SetpointProfileForm extends BlockForm {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!embedded" v-bind="$props" v-on="$listeners"/>
+    <BlockFormToolbar :crud="crud"/>
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
         <BlockEnableToggle
@@ -153,6 +153,7 @@ export default class SetpointProfileForm extends BlockForm {
             <q-item-label caption>Start time</q-item-label>
             <DatetimeField
               :value="start"
+              label="Start time"
               title="Start time"
               message-html="This will shift all points.
               <br>Offset time will remain the same, absolute time values will change.
@@ -165,6 +166,7 @@ export default class SetpointProfileForm extends BlockForm {
             <LinkField
               :value="block.data.targetId"
               :service-id="serviceId"
+              label="target"
               title="Driven Setpoint/Sensor pair"
               @input="v => { block.data.targetId = v; saveBlock(); }"
             />
@@ -189,6 +191,7 @@ export default class SetpointProfileForm extends BlockForm {
             <InputField
               :value="durationString(point.offsetMs)"
               title="Offset from start time"
+              label="point offset"
               message-html="
             This will change the point offset.
               <br>The absolute point time will be changed to start time + offset.
@@ -201,6 +204,7 @@ export default class SetpointProfileForm extends BlockForm {
             <DatetimeField
               :value="point.absTimeMs"
               title="Time"
+              label="point time"
               message-html="
               This will change the absolute point time.
               <br>Changing point time may change point order.
@@ -213,11 +217,14 @@ export default class SetpointProfileForm extends BlockForm {
             <UnitField
               :value="point.temperature"
               title="Temperature"
+              label="point temperature"
               @input="v => updatePointTemperature(idx, v)"
             />
           </q-item-section>
           <q-item-section class="col-1" side>
-            <q-btn flat round dense icon="delete" @click="removePoint(idx)"/>
+            <q-btn flat round dense icon="delete" @click="removePoint(idx)">
+              <q-tooltip>Remove point</q-tooltip>
+            </q-btn>
           </q-item-section>
         </q-item>
         <q-item dark>

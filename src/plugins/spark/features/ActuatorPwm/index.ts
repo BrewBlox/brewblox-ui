@@ -1,5 +1,5 @@
 import { ref } from '@/helpers/component-ref';
-import { Link, Unit } from '@/helpers/units';
+import { Unit } from '@/helpers/units';
 import { ActuatorDigitalLink } from '@/helpers/units/KnownLinks';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
@@ -59,7 +59,7 @@ const block: BlockSpec = {
       key: 'actuatorId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null),
+      generate: () => new ActuatorDigitalLink(null),
     },
   ],
 };
