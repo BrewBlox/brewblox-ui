@@ -57,6 +57,7 @@ export default class InputField extends FieldBase {
       messageHtml: this.messageHtml,
       root: this.$root,
       value: this.value,
+      decimals: this.decimals,
       type: this.type,
       label: this.label,
       rules: this.rules,
@@ -74,9 +75,9 @@ export default class InputField extends FieldBase {
     :class="[{editable: !readonly}, tagClass]"
     @click="openDialog"
   >
-    <slot name="pre"/>
+    <slot name="pre" />
     <slot name="value">{{ displayValue }}</slot>
-    <slot name="append"/>
+    <slot name="append" />
     <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
   </component>
 </template>

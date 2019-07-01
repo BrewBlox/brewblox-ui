@@ -6,6 +6,8 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
 import sparkStore from '@/plugins/spark/store';
 
+import { Unit } from '../../../../helpers/units';
+
 
 @Component
 export default class PidForm extends BlockCrudComponent {
@@ -39,6 +41,12 @@ export default class PidForm extends BlockCrudComponent {
 
   showOutput() {
     showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.outputId));
+  }
+
+  resetIntegral(val: Unit) {
+    // Don't write 0, as it will be stripped by protobuf
+    this.block.data.integralReset = val.value || 0.001;
+    this.saveBlock();
   }
 }
 </script>
@@ -210,7 +218,19 @@ export default class PidForm extends BlockCrudComponent {
           <q-item-section class="text-center">=</q-item-section>
           <q-item-section>
             <q-item-label caption>I</q-item-label>
-            {{ block.data.i | round }}
+            <!-- {{ block.data.i | round }} -->
+            <InputField
+              :value="block.data.i"
+              type="number"
+              title="Reset Integral"
+              message-html="
+              <p>
+                The slow buildup of the integrator also delays the effect of configuration changes.
+                To skip this adjustment time, you can manually write I.
+              </p>
+              "
+              @input="v => { block.data.integralReset = v || 0.001; saveBlock(); }"
+            />
           </q-item-section>
         </q-item>
 
