@@ -225,7 +225,7 @@ export class SparkModule extends VuexModule {
     };
   }
 
-  public get tryBlockById(): (serviceId: string, id: string | null) => Block {
+  public get tryBlockById(): (serviceId: string, id: string | null) => Block | null {
     return (serviceId: string, id: string | null) => {
       return id === null
         ? null

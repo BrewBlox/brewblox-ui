@@ -73,7 +73,7 @@ export class FeatureModule extends VuexModule {
   }
 
   public get wizardById(): (id: string) => string {
-    return id => get(this.features, [id, 'wizard']);
+    return id => get(this.features, [id, 'wizard'], '');
   }
 
   public get widgetById(): (id: string, config: any, selector?: boolean) => string | undefined {
