@@ -6,15 +6,10 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
 import sparkStore from '@/plugins/spark/store';
 
-import { filters } from './getters';
 
 @Component
 export default class PidForm extends BlockCrudComponent {
   readonly block!: PidBlock;
-
-  get filterOpts() {
-    return filters.map((filter, idx) => ({ label: filter, value: idx }));
-  }
 
   get inputId() {
     return this.block.data.inputId.id;
@@ -50,7 +45,7 @@ export default class PidForm extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud"/>
+    <BlockFormToolbar :crud="crud" />
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="mdi-calculator-variant" label="Settings">
@@ -61,7 +56,7 @@ export default class PidForm extends BlockCrudComponent {
           class="full-width bordered"
           v-on="$listeners"
         />
-        <q-separator dark inset/>
+        <q-separator dark inset />
 
         <!-- Input row -->
         <q-item dark>
@@ -98,10 +93,10 @@ export default class PidForm extends BlockCrudComponent {
             <q-btn v-if="hasInputBlock" flat icon="mdi-pencil" @click="showInput">
               <q-tooltip>Edit {{ inputId }}</q-tooltip>
             </q-btn>
-            <q-btn v-else disable flat icon="mdi-pencil-off"/>
+            <q-btn v-else disable flat icon="mdi-pencil-off" />
           </q-item-section>
         </q-item>
-        <q-separator dark inset/>
+        <q-separator dark inset />
 
         <!-- Output row -->
         <q-item dark>
@@ -141,49 +136,10 @@ export default class PidForm extends BlockCrudComponent {
             <q-btn v-if="hasOutputBlock" flat icon="mdi-pencil" @click="showOutput">
               <q-tooltip>Edit {{ outputId }}</q-tooltip>
             </q-btn>
-            <q-btn v-else disable flat icon="mdi-pencil-off"/>
+            <q-btn v-else disable flat icon="mdi-pencil-off" />
           </q-item-section>
         </q-item>
-        <q-separator dark inset/>
-
-        <!-- Filter row -->
-        <q-item dark>
-          <q-item-section>
-            <q-item-label caption>Filter period</q-item-label>
-            <SelectField
-              :value="block.data.filter"
-              :options="filterOpts"
-              title="Filter"
-              label="Filter period"
-              message-html="
-              <p>
-                The input error is passed through a filter to remove noise, spikes and sudden jumps.
-                This smooths the output of the PID.
-              </p>
-              <p>The filter should block changes lasting shorter than:</p>
-              "
-              @input="v => { block.data.filter = v; saveBlock(); }"
-            />
-          </q-item-section>
-
-          <q-item-section>
-            <q-item-label caption>Fast step threshold</q-item-label>
-            <UnitField
-              :value="block.data.filterThreshold"
-              title="Filter threshold"
-              message-html="
-              <p>
-                Filtering the input causes a delay in response, because it averages values.
-                The filter can detect when a larger step occurs to which it should respond faster.
-              </p>
-              <p>If a step exceeds this threshold, respond faster:</p>
-              "
-              @input="v => { block.data.filterThreshold = v; saveBlock(); }"
-            />
-          </q-item-section>
-          <q-item-section/>
-        </q-item>
-        <q-separator dark inset/>
+        <q-separator dark inset />
 
         <!-- Calculations -->
         <q-item dark>
@@ -207,8 +163,8 @@ export default class PidForm extends BlockCrudComponent {
               @input="v => { block.data.kp = v; saveBlock(); }"
             />
           </q-item-section>
-          <q-item-section/>
-          <q-item-section/>
+          <q-item-section />
+          <q-item-section />
           <q-item-section class="text-center">=</q-item-section>
           <q-item-section>
             <q-item-label caption>P</q-item-label>
@@ -300,7 +256,7 @@ export default class PidForm extends BlockCrudComponent {
           </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section v-for="i in 6" :key="i"/>
+          <q-item-section v-for="i in 6" :key="i" />
           <q-item-section>
             <q-item-label caption>Output</q-item-label>
             {{ block.data.p + block.data.i + block.data.d | round }}

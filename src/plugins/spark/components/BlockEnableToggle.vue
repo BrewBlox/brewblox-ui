@@ -6,6 +6,9 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 @Component
 export default class BlockEnableToggle extends BlockCrudComponent {
 
+  @Prop({ type: String, default: 'enabled' })
+  public readonly dataKey!: string;
+
   @Prop({ type: String, default: 'This block is enabled' })
   readonly textEnabled!: string;
 
@@ -13,7 +16,7 @@ export default class BlockEnableToggle extends BlockCrudComponent {
   readonly textDisabled!: string;
 
   get enabled() {
-    return Boolean(this.block.data.enabled);
+    return Boolean(this.block.data[this.dataKey]);
   }
 
   get mainText() {
@@ -23,7 +26,7 @@ export default class BlockEnableToggle extends BlockCrudComponent {
   }
 
   toggleEnabled() {
-    this.block.data.enabled = !this.enabled;
+    this.block.data[this.dataKey] = !this.enabled;
     this.saveBlock();
   }
 }
