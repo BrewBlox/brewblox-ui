@@ -42,18 +42,12 @@ export default class PidForm extends BlockCrudComponent {
   showOutput() {
     showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.outputId));
   }
-
-  resetIntegral(val: Unit) {
-    // Don't write 0, as it will be stripped by protobuf
-    this.block.data.integralReset = val.value || 0.001;
-    this.saveBlock();
-  }
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud" />
+    <BlockFormToolbar :crud="crud"/>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="mdi-calculator-variant" label="Settings">
@@ -64,7 +58,7 @@ export default class PidForm extends BlockCrudComponent {
           class="full-width bordered"
           v-on="$listeners"
         />
-        <q-separator dark inset />
+        <q-separator dark inset/>
 
         <!-- Input row -->
         <q-item dark>
@@ -101,10 +95,10 @@ export default class PidForm extends BlockCrudComponent {
             <q-btn v-if="hasInputBlock" flat icon="mdi-pencil" @click="showInput">
               <q-tooltip>Edit {{ inputId }}</q-tooltip>
             </q-btn>
-            <q-btn v-else disable flat icon="mdi-pencil-off" />
+            <q-btn v-else disable flat icon="mdi-pencil-off"/>
           </q-item-section>
         </q-item>
-        <q-separator dark inset />
+        <q-separator dark inset/>
 
         <!-- Output row -->
         <q-item dark>
@@ -144,10 +138,10 @@ export default class PidForm extends BlockCrudComponent {
             <q-btn v-if="hasOutputBlock" flat icon="mdi-pencil" @click="showOutput">
               <q-tooltip>Edit {{ outputId }}</q-tooltip>
             </q-btn>
-            <q-btn v-else disable flat icon="mdi-pencil-off" />
+            <q-btn v-else disable flat icon="mdi-pencil-off"/>
           </q-item-section>
         </q-item>
-        <q-separator dark inset />
+        <q-separator dark inset/>
 
         <!-- Calculations -->
         <q-item dark>
@@ -171,8 +165,8 @@ export default class PidForm extends BlockCrudComponent {
               @input="v => { block.data.kp = v; saveBlock(); }"
             />
           </q-item-section>
-          <q-item-section />
-          <q-item-section />
+          <q-item-section/>
+          <q-item-section/>
           <q-item-section class="text-center">=</q-item-section>
           <q-item-section>
             <q-item-label caption>P</q-item-label>
@@ -218,15 +212,17 @@ export default class PidForm extends BlockCrudComponent {
           <q-item-section class="text-center">=</q-item-section>
           <q-item-section>
             <q-item-label caption>I</q-item-label>
-            <!-- {{ block.data.i | round }} -->
             <InputField
               :value="block.data.i"
               type="number"
-              title="Reset Integral"
+              title="Manually set integral"
               message-html="
               <p>
-                The slow buildup of the integrator also delays the effect of configuration changes.
-                To skip this adjustment time, you can manually write I.
+                The integrator slowly builds up when the error is not zero.
+                If you don't want to wait for that, you can manually set the integral part of the output here.
+              </p>
+              <p>
+                It will continue to adjust automatically afterwards.
               </p>
               "
               @input="v => { block.data.integralReset = v || 0.001; saveBlock(); }"
@@ -276,7 +272,7 @@ export default class PidForm extends BlockCrudComponent {
           </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section v-for="i in 6" :key="i" />
+          <q-item-section v-for="i in 6" :key="i"/>
           <q-item-section>
             <q-item-label caption>Output</q-item-label>
             {{ block.data.p + block.data.i + block.data.d | round }}
