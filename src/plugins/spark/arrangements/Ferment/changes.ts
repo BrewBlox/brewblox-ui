@@ -21,7 +21,7 @@ import { PidBlock, PidData } from '../../features/Pid/types';
 import { typeName as spProfileType } from '../../features/SetpointProfile/getters';
 import { SetpointProfileBlock } from '../../features/SetpointProfile/types';
 import { typeName as pairType } from '../../features/SetpointSensorPair/getters';
-import { SetpointSensorPairBlock } from '../../features/SetpointSensorPair/types';
+import { FilterChoice, SetpointSensorPairBlock } from '../../features/SetpointSensorPair/types';
 import { Block, DigitalState } from '../../types';
 
 
@@ -65,6 +65,10 @@ export const defineCreatedBlocks =
           settingEnabled: activeSetpoint === 'fridge',
           setting: new Unit(null, 'degC'),
           value: new Unit(null, 'degC'),
+          valueUnfiltered: new Unit(null, 'degC'),
+          filter: FilterChoice.Filter10m,
+          filterThreshold: new Unit(5, 'delta_degC'),
+          resetFilter: false,
         },
       },
       {
@@ -78,6 +82,10 @@ export const defineCreatedBlocks =
           settingEnabled: activeSetpoint === 'beer',
           setting: new Unit(null, 'degC'),
           value: new Unit(null, 'degC'),
+          valueUnfiltered: new Unit(null, 'degC'),
+          filter: FilterChoice.Filter10m,
+          filterThreshold: new Unit(5, 'delta_degC'),
+          resetFilter: false,
         },
       },
       // Mutex
@@ -187,11 +195,10 @@ export const defineCreatedBlocks =
           enabled: true,
           inputId: new Link(activeSetpointId),
           outputId: new Link(config.names.coolPwm),
-          filter: 4,
-          filterThreshold: new Unit(5, 'delta_degC'),
           kp: new Unit(-10, '1/degC'),
           ti: new Unit(2, 'hour'),
           td: new Unit(5, 'min'),
+          integralReset: 0,
         },
       },
       {
@@ -204,11 +211,10 @@ export const defineCreatedBlocks =
           enabled: true,
           inputId: new Link(activeSetpointId),
           outputId: new Link(config.names.heatPwm),
-          filter: 4,
-          filterThreshold: new Unit(5, 'delta_degC'),
           kp: new Unit(20, '1/degC'),
           ti: new Unit(2, 'hour'),
           td: new Unit(3, 'minute'),
+          integralReset: 0,
         },
       },
     ] as [

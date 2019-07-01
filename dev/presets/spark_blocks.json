@@ -160,7 +160,9 @@
         "storedSetting[degC]": 0,
         "value[degC]": 0,
         "sensorId<TempSensorInterface>": "sensor-1",
-        "setting[degC]": 30
+        "setting[degC]": 30,
+        "filter": 0,
+        "filterThreshold[delta_degC]": 2
       }
     },
     {
@@ -295,12 +297,10 @@
         "enabled": true,
         "outputValue": 0,
         "outputSetting": 0,
-        "filter": 0,
         "active": false,
         "p": 0,
         "i": 0,
         "d": 0,
-        "filterThreshold[delta_degC]": 2,
         "derivative[delta_degC / hour]": 0,
         "inputId<ProcessValueInterface>": "setpoint-sensor-pair-1",
         "td[second]": 60,
