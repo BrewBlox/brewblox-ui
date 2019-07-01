@@ -39,7 +39,7 @@ const block: BlockSpec = {
       generate: (): Partial<PidData> => ({
         kp: new Unit(-10, '1/degC'),
         ti: new Unit(2, 'hour'),
-        td: new Unit(5, 'min'),
+        td: new Unit(0, 'min'),
       }),
     },
     {
@@ -47,7 +47,7 @@ const block: BlockSpec = {
       generate: (): Partial<PidData> => ({
         kp: new Unit(20, '1/degC'),
         ti: new Unit(2, 'hour'),
-        td: new Unit(3, 'min'),
+        td: new Unit(0, 'min'),
       }),
     },
     {
@@ -79,7 +79,7 @@ const block: BlockSpec = {
       generate: (): Partial<PidData> => ({
         kp: new Unit(-5, '1/degC'),
         ti: new Unit(2, 'hour'),
-        td: new Unit(5, 'min'),
+        td: new Unit(0, 'min'),
       }),
     },
     {
@@ -87,7 +87,7 @@ const block: BlockSpec = {
       generate: (): Partial<PidData> => ({
         kp: new Unit(30, '1/degC'),
         ti: new Unit(2, 'hour'),
-        td: new Unit(5, 'min'),
+        td: new Unit(0, 'min'),
       }),
     },
   ],

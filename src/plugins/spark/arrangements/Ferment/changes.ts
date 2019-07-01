@@ -189,13 +189,13 @@ export const defineCreatedBlocks = (
       type: pidType,
       groups: config.groups,
       data: {
-        ...sparkStore.specs[pidType].generate() as PidData,
+        ...(sparkStore.specs[pidType].generate() as PidData),
         enabled: true,
         inputId: new Link(activeSetpointId),
         outputId: new Link(config.names.coolPwm),
         kp: new Unit(-10, '1/degC'),
         ti: new Unit(2, 'hour'),
-        td: new Unit(5, 'min'),
+        td: new Unit(0, 'min'),
         integralReset: 0,
       },
     },
@@ -205,28 +205,28 @@ export const defineCreatedBlocks = (
       type: pidType,
       groups: config.groups,
       data: {
-        ...sparkStore.specs[pidType].generate() as PidData,
+        ...(sparkStore.specs[pidType].generate() as PidData),
         enabled: true,
         inputId: new Link(activeSetpointId),
         outputId: new Link(config.names.heatPwm),
         kp: new Unit(20, '1/degC'),
         ti: new Unit(2, 'hour'),
-        td: new Unit(3, 'minute'),
+        td: new Unit(0, 'minute'),
         integralReset: 0,
       },
     },
   ] as [
-      SetpointSensorPairBlock,
-      SetpointSensorPairBlock,
-      MutexBlock,
-      DigitalActuatorBlock,
-      DigitalActuatorBlock,
-      ActuatorPwmBlock,
-      ActuatorPwmBlock,
-      SetpointProfileBlock,
-      PidBlock,
-      PidBlock
-    ];
+    SetpointSensorPairBlock,
+    SetpointSensorPairBlock,
+    MutexBlock,
+    DigitalActuatorBlock,
+    DigitalActuatorBlock,
+    ActuatorPwmBlock,
+    ActuatorPwmBlock,
+    SetpointProfileBlock,
+    PidBlock,
+    PidBlock
+  ];
 };
 
 export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
