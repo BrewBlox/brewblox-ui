@@ -14,7 +14,8 @@ export default class SetpointSensorPairWidget extends BlockWidget {
     return postfixedDisplayNames(
       {
         setting: 'Setting',
-        value: 'Sensor value',
+        value: 'Sensor',
+        valueUnfiltered: 'Sensor unfiltered',
       },
       this.block.data,
     );
@@ -24,13 +25,13 @@ export default class SetpointSensorPairWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" :graph-cfg="graphCfg" />
+    <BlockWidgetToolbar :crud="crud" :graph-cfg="graphCfg"/>
 
     <q-card-section>
       <template v-if="!block.data.settingEnabled">
         <q-item dark>
           <q-item-section avatar>
-            <q-icon name="warning" />
+            <q-icon name="warning"/>
           </q-item-section>
           <q-item-section>Setpoint is disabled.</q-item-section>
           <q-item-section side>
@@ -42,7 +43,7 @@ export default class SetpointSensorPairWidget extends BlockWidget {
             />
           </q-item-section>
         </q-item>
-        <q-separator dark inset class="q-mb-md" />
+        <q-separator dark inset class="q-mb-md"/>
       </template>
 
       <q-item dark>
@@ -56,15 +57,15 @@ export default class SetpointSensorPairWidget extends BlockWidget {
             tag="big"
             @input="v => {block.data.storedSetting = v; saveBlock()}"
           />
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
         <q-item-section class="q-mr-md">
-          <q-item-label caption>Sensor value</q-item-label>
-          <UnitField :value="block.data.value" tag="big" readonly />
+          <q-item-label caption>Sensor</q-item-label>
+          <UnitField :value="block.data.value" tag="big" readonly/>
         </q-item-section>
         <q-item-section class="col-auto">
-          <q-item-label caption>Reset filter</q-item-label>
-          <q-btn flat icon="refresh" @click="block.data.resetFilter = true; saveBlock()" />
+          <q-item-label caption>Unfiltered sensor</q-item-label>
+          <UnitField :value="block.data.valueUnfiltered" tag="big" readonly/>
         </q-item-section>
       </q-item>
     </q-card-section>

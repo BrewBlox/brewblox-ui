@@ -55,7 +55,7 @@ const block: BlockSpec = {
 const feature: Feature = {
   ...GenericBlock,
   id: typeName,
-  displayName: 'Sensor/Setpoint Pair',
+  displayName: 'Setpoint',
   role: 'Process',
   widget: ref(widget),
   form: ref(form),
