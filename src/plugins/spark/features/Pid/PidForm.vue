@@ -6,15 +6,10 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
 import sparkStore from '@/plugins/spark/store';
 
-import { filters } from './getters';
 
 @Component
 export default class PidForm extends BlockCrudComponent {
   readonly block!: PidBlock;
-
-  get filterOpts() {
-    return filters.map((filter, idx) => ({ label: filter, value: idx }));
-  }
 
   get inputId() {
     return this.block.data.inputId.id;

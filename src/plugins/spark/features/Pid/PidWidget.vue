@@ -10,7 +10,6 @@ import sparkStore from '@/plugins/spark/store';
 import { BlockLink } from '@/plugins/spark/types';
 import featureStore from '@/store/features';
 
-import { filters } from './getters';
 import { PidBlock } from './types';
 
 @Component

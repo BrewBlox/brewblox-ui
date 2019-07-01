@@ -28,6 +28,16 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
     return sparkStore.blockValues(this.serviceId)
       .filter(block => get(block, 'data.inputId.id') === this.blockId);
   }
+
+  get disabledString(): string {
+    if (this.usedBy.length === 0) {
+      return 'Setpoint is disabled, and is not used.';
+    } else if (this.usedBy.length == 1) {
+      return `Setpoint is disabled. '${this.usedBy[0].id}' is inactive.`;
+    } else {
+      return `Setpoint is disabled. ${this.usedBy.map(v => `'${v.id}'`).join(', ')} are inactive.`;
+    }
+  }
 }
 </script>
 
@@ -36,6 +46,14 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
     <BlockFormToolbar :crud="crud" />
 
     <q-card-section>
+      <BlockEnableToggle
+        :crud="crud"
+        :text-disabled="disabledString"
+        text-enabled="Setpoint is enabled."
+        data-key="settingEnabled"
+        class="full-width bordered"
+      />
+      <q-separator dark inset />
       <q-item dark>
         <q-item-section class="col-3" style="justify-content: flex-start">
           <q-item-label caption>Setting</q-item-label>
@@ -50,14 +68,10 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
           <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
         </q-item-section>
         <q-item-section class="col-3" style="justify-content: flex-start">
-          <q-item-label caption>Enabled</q-item-label>
-          <q-toggle
-            :value="block.data.settingEnabled"
-            :disable="isDriven"
-            @input="v => { block.data.settingEnabled = v; saveBlock(); }"
-          />
+          <q-item-label caption>Sensor value</q-item-label>
+          <UnitField :value="block.data.value" tag="big" readonly />
         </q-item-section>
-        <q-item-section class="col-6" style="justify-content: flex-start">
+        <q-item-section class="col-auto" style="justify-content: flex-start">
           <q-item-label caption>Sensor</q-item-label>
           <LinkField
             :value="block.data.sensorId"
@@ -70,7 +84,7 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
       </q-item>
 
       <q-item dark>
-        <q-item-section>
+        <q-item-section class="col-3">
           <q-item-label caption>Filter period</q-item-label>
           <SelectField
             :value="block.data.filter"
@@ -88,7 +102,7 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
           />
         </q-item-section>
 
-        <q-item-section>
+        <q-item-section class="col-3">
           <q-item-label caption>Fast step threshold</q-item-label>
           <UnitField
             :value="block.data.filterThreshold"
@@ -103,7 +117,11 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
             @input="v => { block.data.filterThreshold = v; saveBlock(); }"
           />
         </q-item-section>
-        <q-item-section />
+        <q-item-section side>
+          <q-btn flat round icon="refresh" @click="block.data.resetFilter = true; saveBlock()">
+            <q-tooltip>Reset filter</q-tooltip>
+          </q-btn>
+        </q-item-section>
       </q-item>
 
       <q-item v-if="usedBy.length" dark>
