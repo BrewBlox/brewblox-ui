@@ -66,6 +66,7 @@ export default class StepViewWidget extends WidgetBase {
   }
 
   async applyChanges(changes: BlockChange[]) {
+    const actualChanges: [Block, any][] = [];
     for (let change of changes) {
       const block = sparkStore.blockById(this.serviceId, change.blockId);
       const actualData = deepCopy(change.data);
@@ -74,6 +75,9 @@ export default class StepViewWidget extends WidgetBase {
           actualData[key] = await this.confirmStepChange(block, key, actualData[key]);
         }
       }
+      actualChanges.push([block, actualData]);
+    }
+    for (let [block, actualData] of actualChanges) {
       await sparkStore.saveBlock([this.serviceId, { ...block, data: { ...block.data, ...actualData } }]);
     }
   }
