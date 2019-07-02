@@ -6,8 +6,6 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
 import sparkStore from '@/plugins/spark/store';
 
-import { Unit } from '../../../../helpers/units';
-
 
 @Component
 export default class PidForm extends BlockCrudComponent {
@@ -47,7 +45,7 @@ export default class PidForm extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud"/>
+    <BlockFormToolbar :crud="crud" />
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="mdi-calculator-variant" label="Settings">
@@ -58,7 +56,7 @@ export default class PidForm extends BlockCrudComponent {
           class="full-width bordered"
           v-on="$listeners"
         />
-        <q-separator dark inset/>
+        <q-separator dark inset />
 
         <!-- Input row -->
         <q-item dark>
@@ -95,10 +93,10 @@ export default class PidForm extends BlockCrudComponent {
             <q-btn v-if="hasInputBlock" flat icon="mdi-pencil" @click="showInput">
               <q-tooltip>Edit {{ inputId }}</q-tooltip>
             </q-btn>
-            <q-btn v-else disable flat icon="mdi-pencil-off"/>
+            <q-btn v-else disable flat icon="mdi-pencil-off" />
           </q-item-section>
         </q-item>
-        <q-separator dark inset/>
+        <q-separator dark inset />
 
         <!-- Output row -->
         <q-item dark>
@@ -138,10 +136,10 @@ export default class PidForm extends BlockCrudComponent {
             <q-btn v-if="hasOutputBlock" flat icon="mdi-pencil" @click="showOutput">
               <q-tooltip>Edit {{ outputId }}</q-tooltip>
             </q-btn>
-            <q-btn v-else disable flat icon="mdi-pencil-off"/>
+            <q-btn v-else disable flat icon="mdi-pencil-off" />
           </q-item-section>
         </q-item>
-        <q-separator dark inset/>
+        <q-separator dark inset />
 
         <!-- Calculations -->
         <q-item dark>
@@ -165,8 +163,8 @@ export default class PidForm extends BlockCrudComponent {
               @input="v => { block.data.kp = v; saveBlock(); }"
             />
           </q-item-section>
-          <q-item-section/>
-          <q-item-section/>
+          <q-item-section />
+          <q-item-section />
           <q-item-section class="text-center">=</q-item-section>
           <q-item-section>
             <q-item-label caption>P</q-item-label>
@@ -272,7 +270,7 @@ export default class PidForm extends BlockCrudComponent {
           </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section v-for="i in 6" :key="i"/>
+          <q-item-section v-for="i in 6" :key="i" />
           <q-item-section>
             <q-item-label caption>Output</q-item-label>
             {{ block.data.p + block.data.i + block.data.d | round }}
