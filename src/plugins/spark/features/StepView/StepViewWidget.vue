@@ -15,6 +15,7 @@ import { BlockChange, Step } from './types';
 export default class StepViewWidget extends WidgetBase {
   modalOpen: boolean = false;
   openStep: string | null = null;
+  applying: boolean = false;
 
   get serviceId() {
     return this.widget.config.serviceId;
@@ -60,31 +61,45 @@ export default class StepViewWidget extends WidgetBase {
         componentProps: change.componentProps,
       })
         .onOk((updated) => resolve(updated))
-        .onCancel(() => reject('Cancelled by user'));
+        .onCancel(() => reject());
     });
   }
 
   async applyChanges(changes: BlockChange[]) {
+    const actualChanges: [Block, any][] = [];
     for (let change of changes) {
       const block = sparkStore.blockById(this.serviceId, change.blockId);
       const actualData = deepCopy(change.data);
       for (let key in change.data) {
-        if (change.confirmed[key]) {
+        if (change.confirmed && change.confirmed[key]) {
           actualData[key] = await this.confirmStepChange(block, key, actualData[key]);
         }
       }
+      actualChanges.push([block, actualData]);
+    }
+    for (let [block, actualData] of actualChanges) {
       await sparkStore.saveBlock([this.serviceId, { ...block, data: { ...block.data, ...actualData } }]);
     }
   }
 
   applyStep(step: Step) {
+    this.applying = true;
     this.applyChanges(step.changes)
       .then(() => this.$q.notify({
         icon: 'mdi-check-all',
         color: 'positive',
         message: `Applied ${step.name}`,
       }))
-      .catch(() => { });
+      .catch((e) => {
+        if (e) {
+          this.$q.notify({
+            icon: 'warning',
+            color: 'negative',
+            message: `Failed to apply ${step.name}: ${e.message}`,
+          });
+        }
+      })
+      .finally(() => { this.applying = false; });
   }
 
   openModal(stepId: string | null) {
@@ -124,6 +139,7 @@ export default class StepViewWidget extends WidgetBase {
         <q-item-section class="col-auto">
           <q-btn
             :disable="!applicableSteps[step.id]"
+            :loading="applying"
             outline
             label="apply"
             @click="applyStep(step)"
