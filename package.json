@@ -21,10 +21,8 @@
     "devbuild": "npm run build && mkdir -p ./dev/dist && rm -r ./dev/dist/*; cp -r ./dist/* ./dev/dist/",
     "test": "vue-cli-service test:unit",
     "test:watch": "vue-cli-service test:unit --watchAll",
-    "e2e": "npm run compose:new && vue-cli-service test:e2e --mode development",
     "lint": "eslint \"src/**/*.{js,ts,vue}\"",
     "fix": "npm run lint -- --fix",
-    "e2e:open": "vue-cli-service e2e:open",
     "validate": "tsc --noEmit"
   },
   "engines": {
@@ -72,7 +70,6 @@
     "@typescript-eslint/eslint-plugin": "^1.11.0",
     "@typescript-eslint/parser": "^1.11.0",
     "@vue/cli-plugin-babel": "^3.8.0",
-    "@vue/cli-plugin-e2e-cypress": "^3.8.0",
     "@vue/cli-plugin-eslint": "^3.8.0",
     "@vue/cli-plugin-typescript": "^3.8.1",
     "@vue/cli-plugin-unit-jest": "^3.8.0",
