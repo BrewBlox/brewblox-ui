@@ -216,17 +216,17 @@ export const defineCreatedBlocks = (
       },
     },
   ] as [
-    SetpointSensorPairBlock,
-    SetpointSensorPairBlock,
-    MutexBlock,
-    DigitalActuatorBlock,
-    DigitalActuatorBlock,
-    ActuatorPwmBlock,
-    ActuatorPwmBlock,
-    SetpointProfileBlock,
-    PidBlock,
-    PidBlock
-  ];
+      SetpointSensorPairBlock,
+      SetpointSensorPairBlock,
+      MutexBlock,
+      DigitalActuatorBlock,
+      DigitalActuatorBlock,
+      ActuatorPwmBlock,
+      ActuatorPwmBlock,
+      SetpointProfileBlock,
+      PidBlock,
+      PidBlock
+    ];
 };
 
 export const defineWidgets = (config: FermentConfig): DashboardItem[] => {

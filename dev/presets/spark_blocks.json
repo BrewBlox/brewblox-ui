@@ -53,6 +53,52 @@
       }
     },
     {
+      "id": "SparkPins",
+      "nid": 19,
+      "groups": [7],
+      "type": "Spark3Pins",
+      "data": {
+        "pins": [
+          {
+            "top1": {
+              "config": 0,
+              "state": 0
+            }
+          },
+          {
+            "top2": {
+              "config": 0,
+              "state": 0
+            }
+          },
+          {
+            "top3": {
+              "config": 0,
+              "state": 0
+            }
+          },
+          {
+            "bottom1": {
+              "config": 1,
+              "state": 0
+            }
+          },
+          {
+            "bottom2": {
+              "config": 1,
+              "state": 0
+            }
+          }
+        ],
+        "enableIoSupply5V": true,
+        "enableIoSupply12V": true,
+        "voltage5": 5.0,
+        "voltage12": 12.0,
+        "enableLcdBacklight": false,
+        "soundAlarm": false
+      }
+    },
+    {
       "id": "balancer-1",
       "nid": 200,
       "groups": [0],

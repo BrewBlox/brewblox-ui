@@ -47,7 +47,10 @@ export default class FermentManualTask extends WizardTaskBase {
             <i>Fridge Setpoint</i> or the
             <i>Beer Setpoint</i>.
           </p>
-          <p>We did not put every controller block on your new dashboard. You can find all blocks and their relations on the Spark controller service page.</p>
+          <p>
+            We did not put every controller block on your new dashboard.
+            You can find all blocks and their relations on the Spark controller service page.
+          </p>
           <p>On your new dashboard, you will find:
             <ul>
               <li>A graphical representation of your fridge. Parts are clickable for quick access to settings.</li>
