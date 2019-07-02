@@ -7,6 +7,7 @@ import WidgetBase from '@/components/Widget/WidgetBase';
 import sparkStore from '@/plugins/spark/store';
 import { GraphValueAxes, QueryParams } from '@/store/history';
 
+import { limitingConstraints } from '../helpers';
 import { Block } from '../types';
 import { BlockCrud } from './BlockCrudComponent';
 
@@ -39,6 +40,12 @@ export default class BlockWidget extends WidgetBase {
   public get isDriven(): boolean {
     return sparkStore.drivenChains(this.serviceId)
       .some((chain: string[]) => chain[0] === this.blockId);
+  }
+
+  public get constrainers(): string | null {
+    return this.block.data.constrainedBy
+      ? limitingConstraints(this.block.data.constrainedBy).join(', ')
+      : null;
   }
 
   public get queryParams(): QueryParams {

@@ -70,7 +70,7 @@ export default class DigitalActuatorForm extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud"/>
+    <BlockFormToolbar :crud="crud" />
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
@@ -101,11 +101,12 @@ export default class DigitalActuatorForm extends BlockCrudComponent {
             <q-item-label caption>State</q-item-label>
             <DigitalStateField
               :value="block.data.desiredState"
-              :actual-value="block.data.state"
+              :pending="block.data.state !== block.data.desiredState"
+              :pending-reason="constrainers"
               :disable="isDriven"
               @input="v => { block.data.desiredState = v; saveBlock(); }"
             />
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
           </q-item-section>
           <q-item-section style="justify-content: flex-start">
             <q-item-label caption>Invert</q-item-label>

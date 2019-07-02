@@ -13,13 +13,13 @@ export default class DigitalActuatorWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud"/>
+    <BlockWidgetToolbar :crud="crud" />
 
     <q-card-section>
       <template v-if="!block.data.hwDevice.id || !block.data.channel">
         <q-item dark>
           <q-item-section avatar>
-            <q-icon name="warning"/>
+            <q-icon name="warning" />
           </q-item-section>
           <q-item-section>No pin selected</q-item-section>
         </q-item>
@@ -31,16 +31,17 @@ export default class DigitalActuatorWidget extends BlockWidget {
             <q-item-label caption>State</q-item-label>
             <DigitalStateField
               :value="block.data.desiredState"
-              :actual-value="block.data.state"
+              :pending="block.data.state !== block.data.desiredState"
+              :pending-reason="constrainers"
               :disable="isDriven"
               @input="v => { block.data.desiredState = v; saveBlock(); }"
             />
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
           </q-item-section>
         </q-item>
         <q-item dark>
           <q-item-section>
-            <DigitalConstraints :value="block.data.constrainedBy" :service-id="serviceId" readonly/>
+            <DigitalConstraints :value="block.data.constrainedBy" :service-id="serviceId" readonly />
           </q-item-section>
         </q-item>
       </template>

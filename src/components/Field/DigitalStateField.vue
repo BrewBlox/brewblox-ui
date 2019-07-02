@@ -6,12 +6,17 @@ import { DigitalState } from '@/plugins/spark/types';
 
 @Component
 export default class DigitalStateField extends Vue {
+  on = DigitalState.Active;
+  off = DigitalState.Inactive;
 
   @Prop({ type: Number, required: true })
   readonly value!: DigitalState;
 
-  @Prop({ type: Number, default: null })
-  readonly actualValue!: DigitalState;
+  @Prop({ type: Boolean, default: false })
+  public readonly pending!: boolean;
+
+  @Prop({ type: String })
+  public readonly pendingReason!: string;
 
   @Prop({ type: Boolean, default: false })
   readonly disable!: boolean;
@@ -26,6 +31,7 @@ export default class DigitalStateField extends Vue {
       color: 'grey-9',
       toggleColor: 'primary',
       textColor: 'grey',
+      toggleTextColor: 'white',
     };
   }
 
@@ -33,27 +39,19 @@ export default class DigitalStateField extends Vue {
     return [
       {
         ...this.commonOpts,
-        toggleTextColor: 'white',
-        label: 'Off',
-        value: DigitalState.Inactive,
+        value: this.off,
+        slot: 'off',
       },
       {
         ...this.commonOpts,
-        toggleTextColor: 'white',
-        label: 'On',
-        value: DigitalState.Active,
+        value: this.on,
+        slot: 'on',
       },
     ];
   }
 
   get known() {
     return !!this.options.find(opt => opt.value === this.value);
-  }
-
-  get mismatch() {
-    return !this.disable
-      && this.actualValue !== null
-      && this.value !== this.actualValue;
   }
 
   toggle() {
@@ -78,26 +76,39 @@ export default class DigitalStateField extends Vue {
       :disable="disable"
       dense
       @click="toggle"
-    />
-    <div v-else>
-      <q-btn
-        :disable="disable"
-        class="reset-button"
-        dense
-        no-caps
-        flat
-        color="warning"
-        style="padding: 0px"
-        @click="toggle"
-      >
-        Unknown state!
-        <q-tooltip>
-          Click to try to set to
-          <i>inactive</i>
-        </q-tooltip>
-      </q-btn>
-    </div>
-    <q-spinner v-if="mismatch"/>
+    >
+      <template v-slot:off>
+        <span class="row">
+          <q-tooltip v-if="pending && pendingReason">State pending: {{ pendingReason }}</q-tooltip>
+          <q-spinner v-if="pending && value === off" />
+          <span v-else>Off</span>
+        </span>
+      </template>
+      <template v-slot:on>
+        <span class="row">
+          <q-tooltip v-if="pending && pendingReason">State pending: {{ pendingReason }}</q-tooltip>
+          <q-spinner v-if="pending && value === on" />
+          <span v-else>On</span>
+        </span>
+      </template>
+    </q-btn-toggle>
+    <q-btn
+      v-else
+      :disable="disable"
+      class="reset-button"
+      dense
+      no-caps
+      flat
+      color="warning"
+      style="padding: 0px"
+      @click="toggle"
+    >
+      Unknown state!
+      <q-tooltip>
+        Click to try to set to
+        <i>inactive</i>
+      </q-tooltip>
+    </q-btn>
   </div>
 </template>
 

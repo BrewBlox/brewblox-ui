@@ -5,24 +5,17 @@ import { Component } from 'vue-property-decorator';
 import { Unit } from '@/helpers/units';
 import { MutexLink } from '@/helpers/units/KnownLinks';
 
+import { constraintLabels } from '../../helpers';
 import ConstraintsBase, { EditableConstraint } from './ConstraintsBase';
 
 @Component
 export default class DigitalConstraints extends ConstraintsBase {
   get constraintOptions() {
-    return [...this.labels()].map(([k, v]) => ({ label: v, value: k }));
-  }
-
-  labels() {
-    return new Map([
-      ['minOff', 'Minimum OFF time'],
-      ['minOn', 'Minimum ON time'],
-      ['mutex', 'Mutually exclusive'],
-    ]);
+    return [...constraintLabels].map(([k, v]) => ({ label: v, value: k }));
   }
 
   label(k: string) {
-    return this.labels().get(k);
+    return constraintLabels.get(k);
   }
 
   createConstraint(key: string, value: any = null): EditableConstraint {
@@ -68,9 +61,9 @@ export default class DigitalConstraints extends ConstraintsBase {
       <q-item v-if="!readonly" dark>
         <q-item-section>Constraint Type</q-item-section>
         <q-item-section>Constraint Value</q-item-section>
-        <q-item-section class="col-1"/>
+        <q-item-section class="col-1" />
       </q-item>
-      <q-separator v-if="!readonly" dark inset/>
+      <q-separator v-if="!readonly" dark inset />
       <q-item v-for="(editable, idx) in constraints" :key="idx" dark>
         <template v-if="readonly">
           <q-item-section :class="{ limiting: editable.limiting }">{{ label(editable.key) }}</q-item-section>
@@ -81,7 +74,7 @@ export default class DigitalConstraints extends ConstraintsBase {
               :value="editable.value"
               readonly
             />
-            <TimeUnitField v-else :value="editable.value" readonly/>
+            <TimeUnitField v-else :value="editable.value" readonly />
           </q-item-section>
         </template>
         <template v-else>
@@ -117,7 +110,7 @@ export default class DigitalConstraints extends ConstraintsBase {
         </template>
       </q-item>
       <q-item v-if="!readonly" dark class="q-mt-md">
-        <q-item-section/>
+        <q-item-section />
         <q-item-section class="col-auto">
           <q-btn icon="add" fab outline @click="addConstraint">
             <q-tooltip>Add constraint</q-tooltip>
