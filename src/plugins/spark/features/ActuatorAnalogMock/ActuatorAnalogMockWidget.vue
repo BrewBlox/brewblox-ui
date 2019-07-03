@@ -20,7 +20,7 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" :graph-cfg="graphCfg"/>
+    <BlockWidgetToolbar :crud="crud" :graph-cfg.sync="graphCfg"/>
 
     <q-card-section>
       <q-item v-if="block.value === null" dark>
