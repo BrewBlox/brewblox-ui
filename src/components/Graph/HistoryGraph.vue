@@ -65,6 +65,9 @@ export default class HistoryGraph extends Vue {
     if (!this.listeners || this.listeners.length === 0) {
       return 'No data';
     }
+    if (!this.graphData.some(data => data.x && data.x.length > 0)) {
+      return 'No data (yet) for selected period';
+    }
     return null;
   }
 
@@ -157,13 +160,13 @@ export default class HistoryGraph extends Vue {
     <!-- Error message -->
     <q-item v-else dark class="absolute-center">
       <q-item-section avatar>
-        <q-icon name="warning"/>
+        <q-icon name="warning" />
       </q-item-section>
       <q-item-section>{{ error }}</q-item-section>
     </q-item>
 
     <div class="row graph-controls z-top">
-      <slot name="controls"/>
+      <slot name="controls" />
     </div>
   </span>
 </template>
