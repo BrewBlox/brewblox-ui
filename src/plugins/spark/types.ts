@@ -80,6 +80,7 @@ export interface SystemStatus {
   handshake: boolean;
   synchronize: boolean;
   compatible: boolean;
+  latest: boolean;
   info: string[];
   error?: any;
 }
