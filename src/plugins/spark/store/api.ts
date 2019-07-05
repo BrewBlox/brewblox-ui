@@ -135,6 +135,10 @@ export const fetchSystemStatus = async (serviceId: string): Promise<SystemStatus
       issues: [],
     }));
 
+export const flashFirmware = async (serviceId: string): Promise<any> =>
+  post(`/${encodeURIComponent(serviceId)}/system/flash`, {})
+    .catch(intercept(`Failed to update firmware on ${serviceId}`));
+
 export const serviceExport = async (serviceId: string): Promise<any> =>
   get(`/${encodeURIComponent(serviceId)}/export_objects`)
     .catch(intercept(`Failed to fetch stored blocks from ${serviceId}`));
