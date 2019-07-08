@@ -144,7 +144,7 @@ export default class PidForm extends BlockCrudComponent {
         <!-- Calculations -->
         <q-item dark>
           <q-item-section>
-            <q-item-label caption class="text-no-wrap">Filtered error</q-item-label>
+            <q-item-label caption class="text-no-wrap">Error</q-item-label>
             {{ block.data.error | unit }}
           </q-item-section>
           <q-item-section class="text-center">*</q-item-section>
@@ -153,10 +153,12 @@ export default class PidForm extends BlockCrudComponent {
             <UnitField
               :value="block.data.kp"
               title="Proportional gain Kp"
+              label="Proportional gain"
               message-html="
               <p>
                 Kp is the proportional gain, which is directly mutiplied by the filtered error.
-                For each degree that the beer is too low, Kp is added to the output.
+                The output of the PID is Kp * input error.
+                Set it to what you think the output should be for a 1 degree error.
               </p>
               <p>Kp should be negative if the actuator brings down the input, like a cooler.</p>
               "
@@ -188,6 +190,7 @@ export default class PidForm extends BlockCrudComponent {
             <TimeUnitField
               :value="block.data.ti"
               title="Integral time constant Ti"
+              label="Integral time constant"
               message-html="
               <p>
                 The purpose of the integrator is to remove steady state errors.
@@ -231,7 +234,7 @@ export default class PidForm extends BlockCrudComponent {
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Derivative</q-item-label>
-            {{ block.data.derivative | unit }}
+            <span :class="{darkened: block.data.td.val === 0}">{{ block.data.derivative | unit }}</span>
           </q-item-section>
           <q-item-section class="text-center">*</q-item-section>
           <q-item-section>
@@ -244,14 +247,18 @@ export default class PidForm extends BlockCrudComponent {
             <TimeUnitField
               :value="block.data.td"
               title="Derivative time constant Td"
+              label="Derivative time constant"
               message-html="
                 <p>
-                When the error is decreasing fast, the derivative action (D) counteracts the proportional action (P).
+                When the input is approaching its target fast,
+                the derivative action (D) can counteract the proportional action (P).
                 This slows down the approach to avoid overshoot.
                 </p>
                 <p>
                 Td is the derivative time constant.
-                It should be equal how long it takes for the process to stabilize after you turn off the actuator.
+                It should be equal to how long it takes for the process to stabilize after you turn off the actuator.
+                </p>
+                <p>
                 When there is no overshoot in the system, Td should be set to zero.
                 </p>
                 "

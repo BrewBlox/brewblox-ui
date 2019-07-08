@@ -23,8 +23,8 @@ export default class PidWidget extends BlockWidget {
       {
         inputSetting: 'Input target',
         inputValue: 'Input value',
-        error: 'Error (filtered)',
-        derivative: 'Derivative or error',
+        error: 'Error',
+        derivative: 'Derivative of input',
         integral: 'Integral of error',
         p: 'P',
         i: 'I',
@@ -212,26 +212,6 @@ export default class PidWidget extends BlockWidget {
         </q-item-section>
         <q-item-section side>
           <q-icon :name="hasOutputBlock ? 'mdi-pencil' : 'mdi-pencil-off'" />
-        </q-item-section>
-      </q-item>
-
-      <q-separator dark inset />
-
-      <q-item dark>
-        <q-item-section side class="col-3">
-          <div class="text-weight-light text-subtitle2 q-my-xs">Error</div>
-        </q-item-section>
-        <q-item-section>
-          <q-item-label caption>Proportional</q-item-label>
-          <UnitField :value="block.data.error" tag="span" unit-tag="small" readonly />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label caption>Integral</q-item-label>
-          <UnitField :value="block.data.integral" tag="span" unit-tag="small" readonly />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label caption>Derivative</q-item-label>
-          <UnitField :value="block.data.derivative" tag="span" unit-tag="small" readonly />
         </q-item-section>
       </q-item>
 

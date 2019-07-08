@@ -20,7 +20,7 @@ const block: BlockSpec = {
     valueUnfiltered: new Unit(null, 'degC'),
     resetFilter: false,
     settingEnabled: true,
-    filter: FilterChoice.Filter10m,
+    filter: FilterChoice.Filter15s,
     filterThreshold: new Unit(5, 'delta_degC'),
   }),
   changes: [
