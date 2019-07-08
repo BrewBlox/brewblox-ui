@@ -58,4 +58,10 @@ export default class Unit {
   public copy(val: number | null = this.val): Unit {
     return new Unit(val, this.unit);
   }
+
+  public isEqual(other: Unit) {
+    return other
+      && this.unit === other.unit
+      && this.roundedValue === other.roundedValue;
+  }
 }

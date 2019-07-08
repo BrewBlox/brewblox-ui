@@ -14,38 +14,28 @@ export function propertyNameWithoutUnit(name: string): string {
 }
 
 export function objectUnit(val: any): string | null {
-  if (Array.isArray(val) && val[0] instanceof Unit) {
-    return val[0].notation;
-  }
-  if (val instanceof Unit) {
-    return val.notation;
+  const checked = Array.isArray(val)
+    ? val[0]
+    : val;
+
+  if (checked instanceof Unit) {
+    return checked.notation;
   }
   return null;
 }
 
 export function serializedPropertyName(key: string, inputObject: any): string {
   const input = inputObject[key];
+  const checked = Array.isArray(input)
+    ? input[0]
+    : input;
 
-  if (
-    Array.isArray(input) &&
-    input[0] instanceof Unit
-  ) {
-    return `${key}[${input[0].unit}]`;
+  if (checked instanceof Unit) {
+    return `${key}[${checked.unit}]`;
   }
 
-  if (input instanceof Unit) {
-    return `${key}[${input.unit}]`;
-  }
-
-  if (
-    Array.isArray(input) &&
-    input[0] instanceof Link
-  ) {
-    return `${key}${input[0].postfix}`;
-  }
-
-  if (input instanceof Link) {
-    return `${key}${input.postfix}`;
+  if (checked instanceof Link) {
+    return `${key}${checked.postfix}`;
   }
 
   return key;
@@ -54,14 +44,15 @@ export function serializedPropertyName(key: string, inputObject: any): string {
 interface DisplayNameType { [key: string]: string }
 
 export function postfixedDisplayNames(displayNames: DisplayNameType, inputObject: any): DisplayNameType {
-  const displayNameReducer = (acc: DisplayNameType, [key, displayName]): DisplayNameType => {
+  const retv: DisplayNameType = {};
+
+  for (let key in displayNames) {
     const serializedKey = serializedPropertyName(key, inputObject);
     const unit = objectUnit(inputObject[key]);
-    return { ...acc, [serializedKey]: unit ? `${displayName} [${unit}]` : displayName };
-  };
-
-  return Object.entries(displayNames)
-    .reduce(displayNameReducer, {});
+    const name = displayNames[key];
+    retv[serializedKey] = unit ? `${name} [${unit}]` : name;
+  }
+  return retv;
 }
 
 export function convertToUnit(key: string, value: any): Unit | Link {
@@ -146,4 +137,31 @@ export function serialize(input: any, prevKey: string = ''): any {
       }),
       {},
     );
+}
+
+export function deepCopy<T>(obj: T): T {
+  return obj
+    ? deserialize(JSON.parse(JSON.stringify(serialize(obj))))
+    : obj;
+}
+
+function nullish(val: any): boolean {
+  return val === null || val === undefined;
+}
+
+export function isSubSet(small: Record<string, any>, big: Record<string, any>): boolean {
+  return Object.entries(small)
+    .every(([key, smallV]) => {
+      const bigV = big[key];
+      if (nullish(smallV) !== nullish(bigV)) {
+        return false;
+      }
+      if (smallV instanceof Unit || smallV instanceof Link) {
+        return smallV.isEqual(bigV);
+      }
+      if (typeof smallV === 'number' && typeof bigV === 'number') {
+        return smallV.toFixed(2) === bigV.toFixed(2);
+      }
+      return smallV === bigV;
+    });
 }

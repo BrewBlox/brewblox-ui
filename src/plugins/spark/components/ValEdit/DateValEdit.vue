@@ -14,7 +14,7 @@ export default class DateValEdit extends ValEdit {
   }
 
   set scaledField(val: number) {
-    this.saveField(val / this.timeScale);
+    this.saveField(Math.round(val / this.timeScale));
   }
 
   get displayVal() {
@@ -24,5 +24,5 @@ export default class DateValEdit extends ValEdit {
 </script>
 
 <template>
-  <DatetimeField v-model="scaledField" :readonly="!editable" title="Start time"/>
+  <DatetimeField v-model="scaledField" :readonly="!editable" title="Start time" />
 </template>

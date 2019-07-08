@@ -5,7 +5,7 @@ import { Dialog, uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
-import { deepCopy } from '@/helpers/shadow-copy';
+import { deepCopy } from '@/helpers/units/parseObject';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import sparkStore from '@/plugins/spark/store';
 import { Block, ChangeField } from '@/plugins/spark/types';

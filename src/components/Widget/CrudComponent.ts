@@ -2,7 +2,7 @@ import { Dialog, uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { deepCopy } from '@/helpers/shadow-copy';
+import { deepCopy } from '@/helpers/units/parseObject';
 import { DashboardItem } from '@/store/dashboards';
 import dashboardStore from '@/store/dashboards';
 import featureStore from '@/store/features';
