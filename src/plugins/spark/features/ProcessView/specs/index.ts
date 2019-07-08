@@ -5,6 +5,7 @@ import BridgeTube from './BridgeTube';
 import Carboy from './Carboy';
 import CheckValve from './CheckValve';
 import Coil from './Coil';
+import Conical from './Conical';
 import CounterflowChiller from './CounterflowChiller';
 import CrossTube from './CrossTube';
 import DipTube from './DipTube';
@@ -36,6 +37,7 @@ const specs: { [key: string]: ComponentSpec } = {
   Carboy,
   CheckValve,
   Coil,
+  Conical,
   CounterflowChiller,
   CrossTube,
   DipTube,
