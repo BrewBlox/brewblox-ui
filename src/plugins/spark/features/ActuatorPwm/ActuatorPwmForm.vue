@@ -12,7 +12,7 @@ export default class ActuatorPwmForm extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud"/>
+    <BlockFormToolbar :crud="crud" />
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
@@ -47,15 +47,14 @@ export default class ActuatorPwmForm extends BlockCrudComponent {
         <q-item dark>
           <q-item-section style="justify-content: flex-start">
             <q-item-label caption>Duty setting</q-item-label>
-            <InputField
+            <SliderField
               :value="block.data.desiredSetting"
               :readonly="isDriven"
               tag="big"
               title="Setting"
-              type="number"
               @input="v => { block.data.desiredSetting = v; saveBlock(); }"
             />
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
           </q-item-section>
           <q-item-section style="justify-content: flex-start">
             <q-item-label caption>Duty Achieved</q-item-label>
