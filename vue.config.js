@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { gitDescribeSync } = require('git-describe');
 const fs = require('fs');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 /* eslint-enable */
 
 module.exports = {
@@ -24,12 +25,18 @@ module.exports = {
         .terserOptions
         .keep_fnames = true; // eslint-disable-line @typescript-eslint/camelcase
     }
+    config.plugins.push(
+      new ForkTsCheckerWebpackPlugin({
+        tslint: true,
+        vue: true,
+        tsconfig: './tsconfig.json',
+      })
+    );
   },
   chainWebpack: (config) => {
     // We're only using a subset from plotly
     // Add alias to enable typing regardless
-    config.resolve.alias
-      .set('plotly.js', 'plotly.js-basic-dist');
+    config.resolve.alias.set('plotly.js', 'plotly.js-basic-dist');
 
     // enable ts checking
     config.module
@@ -37,8 +44,7 @@ module.exports = {
       .use('ts-loader')
       .tap(options => ({
         ...options,
-        transpileOnly: false,
-        experimentalWatchApi: true, // speeds up build
+        transpileOnly: true,
       }));
 
     config.module.rules.delete('eslint');
@@ -51,7 +57,7 @@ module.exports = {
         const gitInfo = gitDescribeSync(__dirname, { match: '[0-9]*' });
         const version = gitInfo.semverString;
         fs.writeFileSync('src/build-env.json', JSON.stringify({ version }));
-        return args;
-      });
+      return args;
+    });
   },
 };
