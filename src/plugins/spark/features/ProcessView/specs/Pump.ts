@@ -2,6 +2,7 @@ import { typeName } from '@/plugins/spark/features/DigitalActuator/getters';
 import sparkStore from '@/plugins/spark/store';
 import { DigitalState } from '@/plugins/spark/types';
 
+import { DigitalActuatorBlock } from '../../DigitalActuator/types';
 import { ACCELERATE_OTHERS, DEFAULT_PUMP_PRESSURE, LEFT, RIGHT, defaultSpec } from '../getters';
 import { settingsBlock } from '../helpers';
 import { ComponentSpec, PartUpdater, StatePart } from '../types';
@@ -13,9 +14,9 @@ const spec: ComponentSpec = {
     props: { settingsKey: 'actuator', typeName },
   }],
   transitions: (part: StatePart) => {
-    const block = settingsBlock(part, 'actuator');
+    const block = settingsBlock<DigitalActuatorBlock>(part, 'actuator');
     const enabled = !!block
-      ? part.state.enabled
+      ? block.data.state === DigitalState.Active
       : part.settings.enabled;
 
     const pressure = enabled
@@ -29,7 +30,7 @@ const spec: ComponentSpec = {
   interactHandler: (part: StatePart, updater: PartUpdater) => {
     const block = settingsBlock(part, 'actuator');
     if (block) {
-      block.data.desiredState = !!part.state.enabled
+      block.data.desiredState = block.data.state === DigitalState.Active
         ? DigitalState.Inactive
         : DigitalState.Active;
       sparkStore.saveBlock([block.serviceId, block]);

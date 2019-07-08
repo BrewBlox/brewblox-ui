@@ -54,11 +54,10 @@ export default class ActuatorPwmWidget extends BlockWidget {
         <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Duty setting</q-item-label>
           <div>
-            <InputField
+            <SliderField
               :value="block.data.desiredSetting"
               :readonly="isDriven"
               style="display: inline-block"
-              type="number"
               title="Duty Setting"
               tag="big"
               @input="v => { block.data.desiredSetting = v; saveBlock(); }"

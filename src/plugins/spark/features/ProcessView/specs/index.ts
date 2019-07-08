@@ -19,6 +19,7 @@ import Lauterhexe from './Lauterhexe';
 import PidDisplay from './PidDisplay';
 import Pump from './Pump';
 import PwmDisplay from './PwmDisplay';
+import PwmPump from './PwmPump';
 import SensorDisplay from './SensorDisplay';
 import SetpointDisplay from './SetpointDisplay';
 import SmallKettle from './SmallKettle';
@@ -51,6 +52,7 @@ const specs: { [key: string]: ComponentSpec } = {
   PidDisplay,
   Pump,
   PwmDisplay,
+  PwmPump,
   SensorDisplay,
   SetpointDisplay,
   SmallKettle,

@@ -1,24 +1,22 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { DigitalState } from '@/plugins/spark/types';
-
-import { DigitalActuatorBlock } from '../../DigitalActuator/types';
+import { ActuatorPwmBlock } from '../../ActuatorPwm/types';
 import PartComponent from '../components/PartComponent';
 import { LEFT } from '../getters';
 import { settingsBlock } from '../helpers';
 
 @Component
-export default class Pump extends PartComponent {
+export default class PwmPump extends PartComponent {
 
-  get actuatorBlock(): DigitalActuatorBlock | null {
-    return settingsBlock(this.part, 'actuator');
+  get pwmBlock(): ActuatorPwmBlock | null {
+    return settingsBlock(this.part, 'pwm');
   }
 
-  get enabled() {
-    return !!this.actuatorBlock
-      ? Boolean(this.actuatorBlock.data.state === DigitalState.Active)
-      : Boolean(this.settings.enabled);
+  get pwmSetting(): number {
+    return this.pwmBlock
+      ? this.pwmBlock.data.setting
+      : 0;
   }
 
   get liquids() {
@@ -35,6 +33,7 @@ export default class Pump extends PartComponent {
         l1.7-1.5c0.5-0.4,1-0.9,1.5-1.3c0.5-0.4,1-0.8,1.5-1.3
         C25.6,10.9,26.6,10.2,27.7,9.5z`;
   }
+
 }
 </script>
 
@@ -54,13 +53,13 @@ export default class Pump extends PartComponent {
         <line x1="7" y1="12.1" x2="-7" y2="-12.1" />
         <!-- eslint-disable vue/attribute-hyphenation -->
         <animateTransform
-          v-if="enabled"
+          v-if="pwmSetting > 0"
+          :dur="`${2/(pwmSetting/100+0.0001)}s`"
           attributeName="transform"
           attributeType="XML"
           type="rotate"
           from="0 0 0"
           to="-360 0 0"
-          dur="2s"
           repeatCount="indefinite"
         />
         <!-- eslint-enable -->
@@ -79,7 +78,7 @@ export default class Pump extends PartComponent {
     <rect fill="green" fill-opacity="0" x="0" y="0" width="50" height="50" />
     <!-- Power Icon -->
     <g class="power-icon">
-      <path v-if="actuatorBlock" :d="powerIcon" transform="translate(15,-5)" />
+      <path v-if="pwmBlock" :d="powerIcon" transform="translate(15,-5)" />
     </g>
   </g>
 </template>

@@ -1,6 +1,5 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
-import { Watch } from 'vue-property-decorator';
 
 import { Block, DigitalState } from '@/plugins/spark/types';
 
@@ -52,7 +51,7 @@ export default class ActuatorValve extends PartComponent {
   }
 
   get closed() {
-    return Boolean(this.state.closed);
+    return !this.valveBlock || this.valveBlock.data.state !== DigitalState.Active;
   }
 
   get valveRotation() {
@@ -66,18 +65,7 @@ export default class ActuatorValve extends PartComponent {
           return 45;
       }
     }
-    return this.closed ? 90 : 0;
-  }
-
-  @Watch('valveBlock', { immediate: true, deep: true })
-  updateClosed() {
-    const closed = !this.valveBlock
-      || this.valveBlock.data.state !== DigitalState.Active;
-
-    if (closed !== this.part.state.closed) {
-      this.state.closed = closed;
-      this.savePartState();
-    }
+    return 90;
   }
 }
 </script>
@@ -85,22 +73,22 @@ export default class ActuatorValve extends PartComponent {
 <template>
   <g>
     <foreignObject v-if="!valveBlock" :height="SQUARE_SIZE" :width="SQUARE_SIZE">
-      <q-icon name="mdi-link-variant-off" size="sm" class="absolute-right" style="height: 15px;"/>
+      <q-icon name="mdi-link-variant-off" size="sm" class="absolute-right" style="height: 15px;" />
     </foreignObject>
     <g key="valve-outer" class="outline">
-      <path :d="paths.outerValve[0]"/>
-      <path :d="paths.outerValve[1]"/>
+      <path :d="paths.outerValve[0]" />
+      <path :d="paths.outerValve[1]" />
     </g>
-    <LiquidStroke v-if="closed" :paths="paths.closedLiquid" :colors="liquids"/>
-    <LiquidStroke v-else :paths="paths.openLiquid" :colors="liquids"/>
+    <LiquidStroke v-if="closed" :paths="paths.closedLiquid" :colors="liquids" />
+    <LiquidStroke v-else :paths="paths.openLiquid" :colors="liquids" />
     <g key="valve-inner" :transform="`rotate(${valveRotation}, 25, 25)`" class="fill outline inner">
-      <path :d="paths.innerValve[0]"/>
-      <path :d="paths.innerValve[1]"/>
+      <path :d="paths.innerValve[0]" />
+      <path :d="paths.innerValve[1]" />
       <g class="power-icon">
-        <path :d="paths.powerIcon"/>
+        <path :d="paths.powerIcon" />
       </g>
     </g>
-    <AnimatedArrows key="valve-arrows" :speed="flowSpeed" :path="paths.arrows"/>
+    <AnimatedArrows key="valve-arrows" :speed="flowSpeed" :path="paths.arrows" />
   </g>
 </template>
 
