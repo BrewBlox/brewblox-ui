@@ -86,5 +86,9 @@ export default class SparkWatcher extends WatcherBase {
     this.$watch('updating', this.handleUpdateChange);
     this.cancelStatusWatcher = this.$watch('status', this.handleStatusChange);
   }
+
+  render() {
+    return null;
+  }
 }
 </script>

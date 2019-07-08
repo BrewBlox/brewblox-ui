@@ -5,7 +5,7 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { Coordinates } from '@/helpers/coordinates';
 import { clampRotation, spaceCased } from '@/helpers/functional';
-import { deepCopy } from '@/helpers/shadow-copy';
+import { deepCopy } from '@/helpers/units/parseObject';
 
 import ProcessViewCatalog from './ProcessViewCatalog.vue';
 import ProcessViewPartMenu from './ProcessViewPartMenu.vue';
