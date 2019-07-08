@@ -698,7 +698,7 @@ describe('A single path with a pump', () => {
   describe('Two input tubes with different liquid joining', () => {
     it('Should have a flow of value of 6 when the pump is enabled', () => {
       // (input pressure 6 + pump pressure 12) / friction 3 = 6
-      set(parts[1], ['settings', 'disabled'], false);
+      set(parts[1], ['settings', 'enabled'], true);
       const flowParts = asFlowParts(parts);
       const partsWithFlow = calculateFlows(flowParts);
       expect(partsWithFlow).toMatchObject(
@@ -727,7 +727,7 @@ describe('A single path with a pump', () => {
             '2,2.5,0': { [COLD_WATER]: 6 },
           },
           settings: {
-            disabled: false,
+            enabled: true,
             pressure: 12,
           },
         },
