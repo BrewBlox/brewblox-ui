@@ -5,17 +5,17 @@ import { Component } from 'vue-property-decorator';
 import { Unit } from '@/helpers/units';
 import { MutexLink } from '@/helpers/units/KnownLinks';
 
-import { constraintLabels } from '../../helpers';
+import { digitalConstraintLabels } from '../../helpers';
 import ConstraintsBase, { EditableConstraint } from './ConstraintsBase';
 
 @Component
 export default class DigitalConstraints extends ConstraintsBase {
   get constraintOptions() {
-    return [...constraintLabels].map(([k, v]) => ({ label: v, value: k }));
+    return [...digitalConstraintLabels].map(([k, v]) => ({ label: v, value: k }));
   }
 
   label(k: string) {
-    return constraintLabels.get(k);
+    return digitalConstraintLabels.get(k);
   }
 
   createConstraint(key: string, value: any = null): EditableConstraint {

@@ -5,7 +5,7 @@ import CrudComponent, { Crud } from '@/components/Widget/CrudComponent';
 import { showBlockDialog } from '@/helpers/dialog';
 import sparkStore from '@/plugins/spark/store';
 
-import { blockIdRules, limitingConstraints } from '../helpers';
+import { blockIdRules } from '../helpers';
 import { Block } from '../types';
 
 export interface BlockCrud extends Crud {
@@ -42,9 +42,8 @@ export default class BlockCrudComponent extends CrudComponent {
   }
 
   public get constrainers(): string | null {
-    return this.block.data.constrainedBy
-      ? limitingConstraints(this.block.data.constrainedBy).join(', ')
-      : null;
+    const limiting: string[] = sparkStore.limiters(this.serviceId)[this.blockId];
+    return limiting ? limiting.join(', ') : null;
   }
 
   public async saveBlock(block: Block = this.block) {

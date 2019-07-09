@@ -10,7 +10,6 @@ import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 
 import { typeName as actuatorType } from '../features/DigitalActuator/getters';
 import { DigitalActuatorBlock } from '../features/DigitalActuator/types';
-import { limitingConstraints } from '../helpers';
 import BlockCrudComponent from './BlockCrudComponent';
 
 interface EditableChannel extends IoChannel {
@@ -69,9 +68,8 @@ export default class IoArray extends BlockCrudComponent {
   }
 
   driverLimitedBy(block: Block) {
-    return block.data.constrainedBy
-      ? limitingConstraints(block.data.constrainedBy).join(', ')
-      : '';
+    const limiting: string[] = sparkStore.limiters(this.serviceId)[block.id];
+    return limiting ? limiting.join(', ') : '';
   }
 
   async saveDriver(channel: EditableChannel, link: Link) {

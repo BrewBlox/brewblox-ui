@@ -7,11 +7,14 @@ import store from '@/store';
 import dashboardStore from '@/store/dashboards';
 import serviceStore from '@/store/services';
 
+import { ConstraintsObj } from '../components/Constraints/ConstraintsBase';
+import { constraintLabels } from '../helpers';
 import {
   Block,
   BlockLink,
   BlockSpec,
   CompatibleTypes,
+  Limiters,
   Spark,
   SparkConfig,
   SystemStatus,
@@ -81,9 +84,9 @@ const calculateDrivenChains = (blocks: Block[]): string[][] => {
 };
 
 const calculateBlockLinks = (blocks: Block[]): BlockLink[] => {
-  const linkArray = new Array<{ source: string; target: string; relation: string[] }>();
+  const linkArray: BlockLink[] = [];
   const findRelations =
-    (source: string, relation: string[], val: any): typeof linkArray => {
+    (source: string, relation: string[], val: any): BlockLink[] => {
       if (val instanceof Link) {
         if (val.id === null || source === 'DisplaySettings') {
           return linkArray;
@@ -109,11 +112,29 @@ const calculateBlockLinks = (blocks: Block[]): BlockLink[] => {
       return linkArray;
     };
 
-  const allLinks = blocks
-    .reduce(
-      (rel, block: Block) => ([...rel, ...findRelations(block.id, [], block.data)]),
-      linkArray);
+  const allLinks: BlockLink[] = [];
+  for (let block of blocks) {
+    allLinks.push(...findRelations(block.id, [], block.data));
+  }
+
   return allLinks;
+};
+
+const calculateLimiters = (blocks: Block[]): Limiters => {
+  const limited: Limiters = {};
+
+  for (let block of blocks) {
+    const obj: ConstraintsObj = block.data.constrainedBy;
+    if (!obj || obj.constraints.length === 0) {
+      continue;
+    }
+    limited[block.id] = [...obj.constraints]
+      .filter(c => c.limiting)
+      .map(c => Object.keys(c).find(key => key !== 'limiting') || '??')
+      .map(k => constraintLabels.get(k) as string);
+  }
+
+  return limited;
 };
 
 interface SparkServiceState {
@@ -150,6 +171,11 @@ export class SparkModule extends VuexModule {
   private get allBlockLinks(): Record<string, BlockLink[]> {
     return Object.keys(this.services)
       .reduce((acc, id) => ({ ...acc, [id]: calculateBlockLinks(this.allBlockValues[id]) }), {});
+  }
+
+  private get allLimiters(): Record<string, Limiters> {
+    return Object.keys(this.services)
+      .reduce((acc, id) => ({ ...acc, [id]: calculateLimiters(this.allBlockValues[id]) }), {});
   }
 
   public get specIds(): string[] {
@@ -210,6 +236,10 @@ export class SparkModule extends VuexModule {
 
   public get blockLinks(): (serviceId: string) => BlockLink[] {
     return serviceId => this.allBlockLinks[serviceId];
+  }
+
+  public get limiters(): (serviceId: string) => Limiters {
+    return serviceId => this.allLimiters[serviceId];
   }
 
   public get blockById(): (serviceId: string, id: string, type?: string) => Block {

@@ -4,17 +4,17 @@ import { Component } from 'vue-property-decorator';
 
 import { BalancerLink } from '@/helpers/units/KnownLinks';
 
-import { constraintLabels } from '../../helpers';
+import { analogConstraintLabels } from '../../helpers';
 import ConstraintsBase, { EditableConstraint } from './ConstraintsBase';
 
 @Component
 export default class AnalogConstraints extends ConstraintsBase {
   get constraintOptions() {
-    return [...constraintLabels].map(([k, v]) => ({ label: v, value: k }));
+    return [...analogConstraintLabels].map(([k, v]) => ({ label: v, value: k }));
   }
 
   label(k: string) {
-    return constraintLabels.get(k);
+    return analogConstraintLabels.get(k);
   }
 
   editableValue(editable: EditableConstraint) {
