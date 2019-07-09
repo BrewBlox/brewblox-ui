@@ -182,8 +182,8 @@
         "value[degC]": 0,
         "sensorId<TempSensorInterface>": "sensor-1",
         "setting[degC]": 30,
-        "filter": 0,
-        "filterThreshold[delta_degC]": 2
+        "filter": 1,
+        "filterThreshold[delta_degC]": 4
       }
     },
     {
