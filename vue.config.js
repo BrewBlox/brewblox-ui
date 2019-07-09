@@ -57,7 +57,7 @@ module.exports = {
         const gitInfo = gitDescribeSync(__dirname, { match: '[0-9]*' });
         const version = gitInfo.semverString;
         fs.writeFileSync('src/build-env.json', JSON.stringify({ version }));
-      return args;
-    });
+        return args;
+      });
   },
 };
