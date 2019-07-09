@@ -15,7 +15,7 @@ const spec: ComponentSpec = {
       component: 'LinkedBlockCard',
       props: {
         settingsKey: 'setpoint',
-        typeName: setpointType,
+        types: [setpointType],
         label: 'Setpoint',
       },
     },

@@ -11,7 +11,7 @@ const spec: ComponentSpec = {
   ...defaultSpec,
   cards: [{
     component: 'LinkedBlockCard',
-    props: { settingsKey: 'actuator', typeName },
+    props: { settingsKey: 'actuator', types: [typeName], label: 'Actuator' },
   }],
   transitions: (part: StatePart) => {
     const block = settingsBlock<DigitalActuatorBlock>(part, 'actuator');

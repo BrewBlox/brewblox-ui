@@ -18,8 +18,8 @@ export default class LinkedBlockCard extends PartCard {
   @Prop({ type: String, required: true })
   public readonly settingsKey!: string;
 
-  @Prop({ type: String, required: true })
-  public readonly typeName!: string;
+  @Prop({ type: Array, required: true })
+  public readonly types!: string[];
 
   @Prop({ type: String, default: 'Block' })
   public readonly label!: string;
@@ -53,7 +53,7 @@ export default class LinkedBlockCard extends PartCard {
   }
 
   get link(): Link {
-    return new Link(this.linked.blockId, this.typeName);
+    return new Link(this.linked.blockId);
   }
 
   set link(newVal: Link) {
@@ -72,7 +72,8 @@ export default class LinkedBlockCard extends PartCard {
       return [];
     }
     const compatibleTable = sparkStore.compatibleTypes(this.serviceId);
-    return [this.typeName, ...get(compatibleTable, this.typeName, [])];
+    return this.types
+      .reduce((acc, type) => [...acc, ...get(compatibleTable, type, [])], [...this.types]);
   }
 
   get actualFilter() {
@@ -100,8 +101,7 @@ export default class LinkedBlockCard extends PartCard {
       filter: feat => !this.compatibleTypes || this.compatibleTypes.includes(feat),
     })
       .onOk(block => {
-        // Retain original type
-        this.link = new Link(block.id, this.typeName);
+        this.link = new Link(block.id);
       });
   }
 }
@@ -109,7 +109,7 @@ export default class LinkedBlockCard extends PartCard {
 
 <template>
   <q-list dark>
-    <q-separator dark/>
+    <q-separator dark />
     <q-item dark>
       <q-item-section>
         <q-select
