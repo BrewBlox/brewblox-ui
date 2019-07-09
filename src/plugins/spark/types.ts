@@ -91,6 +91,10 @@ export interface BlockLink {
   relation: string[];
 }
 
+export interface Limiters {
+  [blockId: string]: string[];
+}
+
 export enum ChannelConfig {
   Unused = 0,
   ActiveLow = 1,
