@@ -4,9 +4,9 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { contrastColor } from '@/helpers/functional';
 import { typeName as pidType } from '@/plugins/spark/features/Pid/getters';
+import { SetpointSensorPairBlock } from '@/plugins/spark/features/SetpointSensorPair/types';
 import sparkStore from '@/plugins/spark/store';
 
-import { SetpointSensorPairBlock } from '../../SetpointSensorPair/types';
 import { SQUARE_SIZE } from '../getters';
 import { settingsBlock } from '../helpers';
 import { PersistentPart } from '../types';
@@ -79,14 +79,14 @@ export default class SetpointValues extends Vue {
   >
     <foreignObject :width="SQUARE_SIZE*2" :height="SQUARE_SIZE">
       <div :class="[`text-${textColor}`, 'text-bold', 'q-ml-md', 'q-mt-xs']">
-        <q-icon name="mdi-thermometer" class="q-mr-sm"/>
+        <q-icon name="mdi-thermometer" class="q-mr-sm" />
         {{ setpointValue | round(1) }}
-        <q-icon v-if="!setpoint" name="mdi-link-variant-off"/>
+        <q-icon v-if="!setpoint" name="mdi-link-variant-off" />
         <small v-else>{{ setpointUnit }}</small>
-        <br>
-        <q-icon name="mdi-bullseye-arrow" class="q-mr-sm"/>
+        <br >
+        <q-icon name="mdi-bullseye-arrow" class="q-mr-sm" />
         {{ setpointSetting | round(1) }}
-        <q-icon v-if="!setpoint" name="mdi-link-variant-off"/>
+        <q-icon v-if="!setpoint" name="mdi-link-variant-off" />
         <small v-else>{{ setpointUnit }}</small>
       </div>
     </foreignObject>

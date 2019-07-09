@@ -9,6 +9,7 @@ import { initDb } from './helpers/database';
 import example from './plugins/example';
 import history from './plugins/history';
 import portal from './plugins/portal';
+import schema from './plugins/schema';
 import spark from './plugins/spark';
 import router from './router';
 import store from './store';
@@ -22,8 +23,9 @@ initDb(HOST, DB_NAME);
 
 const plugins = [
   portal,
-  spark,
   history,
+  spark,
+  schema,
   example,
 ];
 

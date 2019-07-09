@@ -1,5 +1,6 @@
 import { ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features';
+import featureStore from '@/store/features';
 
 import form from './ProcessViewForm.vue';
 import widget from './ProcessViewWidget.vue';
@@ -22,4 +23,7 @@ const feature: Feature = {
   },
 };
 
-export default { feature };
+
+export default () => {
+  featureStore.createFeature(feature);
+};

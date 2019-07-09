@@ -3,10 +3,10 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { clampRotation, spaceCased } from '@/helpers/functional';
-import { partSpecs } from '@/plugins/spark/features/ProcessView/calculateFlows';
-import { FlowPart } from '@/plugins/spark/features/ProcessView/types';
 
+import { partSpecs } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
+import { FlowPart } from './types';
 
 @Component
 export default class ProcessViewPartMenu extends Vue {
@@ -63,7 +63,7 @@ export default class ProcessViewPartMenu extends Vue {
             :viewBox="`0, 0, ${SQUARE_SIZE * rotatedSize[0]}, ${SQUARE_SIZE * rotatedSize[1]}`"
             class="q-mx-auto"
           >
-            <ProcessViewItem :part="part"/>
+            <ProcessViewItem :part="part" />
           </svg>
         </q-item-section>
       </q-item>

@@ -1,9 +1,9 @@
 import { Dialog } from 'quasar';
 
 import { typeName } from '@/plugins/spark/features/ActuatorPwm/getters';
+import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
 import sparkStore from '@/plugins/spark/store';
 
-import { ActuatorPwmBlock } from '../../ActuatorPwm/types';
 import { ACCELERATE_OTHERS, DEFAULT_PUMP_PRESSURE, LEFT, RIGHT, defaultSpec } from '../getters';
 import { settingsBlock } from '../helpers';
 import { ComponentSpec, StatePart } from '../types';

@@ -1,9 +1,9 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/types';
 import { DigitalState } from '@/plugins/spark/types';
 
-import { DigitalActuatorBlock } from '../../DigitalActuator/types';
 import PartComponent from '../components/PartComponent';
 import { LEFT } from '../getters';
 import { settingsBlock } from '../helpers';

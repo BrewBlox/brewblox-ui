@@ -1,7 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { ActuatorPwmBlock } from '../../ActuatorPwm/types';
+import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
+
 import PartComponent from '../components/PartComponent';
 import { LEFT } from '../getters';
 import { settingsBlock } from '../helpers';

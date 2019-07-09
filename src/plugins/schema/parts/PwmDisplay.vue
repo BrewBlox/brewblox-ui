@@ -1,7 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { ActuatorPwmBlock } from '../../ActuatorPwm/types';
+import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
+
 import PartComponent from '../components/PartComponent';
 import { settingsBlock } from '../helpers';
 
@@ -27,10 +28,10 @@ export default class PwmDisplay extends PartComponent {
       :height="SQUARE_SIZE"
     >
       <div class="text-white text-bold text-center">
-        <q-icon name="mdi-gauge" class="q-mr-xs"/>
-        <q-icon v-if="!block" name="mdi-link-variant-off"/>
+        <q-icon name="mdi-gauge" class="q-mr-xs" />
+        <q-icon v-if="!block" name="mdi-link-variant-off" />
         <small v-else>%</small>
-        <br>
+        <br >
         {{ pwmSetting | round(0) }}
       </div>
     </foreignObject>
