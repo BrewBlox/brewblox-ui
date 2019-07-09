@@ -50,20 +50,17 @@ const defaultGroupNames = [
 const calculateDrivenChains = (blocks: Block[]): string[][] => {
   const output: string[][] = [];
 
-  const drivenBlocks: { [driven: string]: string[] } =
-    blocks
-      .reduce(
-        (acc, block: Block) => {
-          Object.values(block.data)
-            .filter((obj: any) => obj instanceof Link && obj.driven && obj.id)
-            .forEach((obj: any) => {
-              const existing = acc[obj.id] || [];
-              acc[obj.id] = [...existing, block.id];
-            });
-          return acc;
-        },
-        {},
-      );
+  const drivenBlocks: { [driven: string]: string[] } = {};
+
+  for (let block of blocks) {
+    Object
+      .values(block.data)
+      .filter((obj: any) => obj instanceof Link && obj.driven && obj.id)
+      .forEach((obj: any) => {
+        const existing = drivenBlocks[obj.id] || [];
+        drivenBlocks[obj.id] = [...existing, block.id];
+      });
+  }
 
   const generateChains =
     (chain: string[], latest: string): string[][] => {
@@ -85,6 +82,7 @@ const calculateDrivenChains = (blocks: Block[]): string[][] => {
 
 const calculateBlockLinks = (blocks: Block[]): BlockLink[] => {
   const linkArray: BlockLink[] = [];
+
   const findRelations =
     (source: string, relation: string[], val: any): BlockLink[] => {
       if (val instanceof Link) {
