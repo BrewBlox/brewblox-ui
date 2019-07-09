@@ -118,7 +118,7 @@ export default class FermentNamingTask extends WizardTaskBase {
   nameError(val: string): string {
     const result = this.nameRules
       .map(rule => rule(val))
-      .find(result => isString(result));
+      .find(result => isString(result)) as string;
     return result ? result : '';
   }
 
