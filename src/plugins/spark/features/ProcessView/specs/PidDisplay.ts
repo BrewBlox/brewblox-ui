@@ -13,7 +13,7 @@ const spec: ComponentSpec = {
   ...defaultSpec,
   cards: [{
     component: 'LinkedBlockCard',
-    props: { settingsKey: 'pid', typeName },
+    props: { settingsKey: 'pid', types: [typeName], label: 'PID' },
   }],
   size: () => [SIZE_X, SIZE_Y],
   interactHandler: (part: StatePart) => showBlockDialog(settingsBlock(part, 'pid')),

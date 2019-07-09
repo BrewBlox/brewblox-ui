@@ -13,7 +13,7 @@ const spec: ComponentSpec = {
   ...defaultSpec,
   cards: [{
     component: 'LinkedBlockCard',
-    props: { settingsKey: 'setpoint', typeName },
+    props: { settingsKey: 'setpoint', types: [typeName], label: 'Setpoint' },
   }],
   size: () => [SIZE_X, SIZE_Y],
   interactHandler: (part: StatePart) => showBlockDialog(settingsBlock(part, 'setpoint')),

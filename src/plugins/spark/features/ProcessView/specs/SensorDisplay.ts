@@ -8,7 +8,7 @@ const spec: ComponentSpec = {
   ...defaultSpec,
   cards: [{
     component: 'LinkedBlockCard',
-    props: { settingsKey: 'sensor', typeName: 'TempSensorInterface' },
+    props: { settingsKey: 'sensor', types: ['TempSensorInterface'], label: 'Sensor' },
   }],
   size: () => [SIZE_X, SIZE_Y],
   transitions: () => ({

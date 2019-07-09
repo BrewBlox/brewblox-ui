@@ -12,7 +12,7 @@ const spec: ComponentSpec = {
   ...defaultSpec,
   cards: [{
     component: 'LinkedBlockCard',
-    props: { settingsKey: 'pwm', typeName },
+    props: { settingsKey: 'pwm', types: [typeName], label: 'PWM' },
   }],
   transitions: (part: StatePart) => {
     const block = settingsBlock<ActuatorPwmBlock>(part, 'pwm');

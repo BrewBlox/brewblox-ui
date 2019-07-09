@@ -10,7 +10,7 @@ const spec: ComponentSpec = {
   ...defaultSpec,
   cards: [{
     component: 'LinkedBlockCard',
-    props: { settingsKey: 'pwm', typeName },
+    props: { settingsKey: 'pwm', types: [typeName], label: 'PWM' },
   }],
   size: () => [SIZE_X, SIZE_Y],
 };
