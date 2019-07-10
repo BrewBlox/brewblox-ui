@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 
 import { Block, DigitalState } from '@/plugins/spark/types';
 
@@ -66,6 +66,15 @@ export default class ActuatorValve extends PartComponent {
       }
     }
     return 90;
+  }
+
+  @Watch('valveBlock')
+  triggerUpdate(block, prevBlock) {
+    if (block === null
+      || prevBlock === null
+      || block.data.state !== prevBlock.data.state) {
+      this.savePartState();
+    }
   }
 }
 </script>
