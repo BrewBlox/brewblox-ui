@@ -1,6 +1,6 @@
 import { ref } from '@/helpers/component-ref';
 import { Unit } from '@/helpers/units';
-import { ActuatorAnalogLink, ProcessValueLink } from '@/helpers/units/KnownLinks';
+import { ActuatorAnalogLink, SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
@@ -13,7 +13,7 @@ import { PidData } from './types';
 const block: BlockSpec = {
   id: typeName,
   generate: (): PidData => ({
-    inputId: new ProcessValueLink(null),
+    inputId: new SetpointSensorPairLink(null),
     outputId: new ActuatorAnalogLink(null),
     inputValue: new Unit(0, 'degC'),
     inputSetting: new Unit(0, 'degC'),
@@ -120,7 +120,7 @@ const block: BlockSpec = {
       key: 'inputId',
       title: 'Input',
       component: 'LinkValEdit',
-      generate: () => new ProcessValueLink(null),
+      generate: () => new SetpointSensorPairLink(null),
     },
     {
       key: 'outputId',
