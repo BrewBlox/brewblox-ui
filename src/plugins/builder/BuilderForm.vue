@@ -216,10 +216,10 @@ export default class BuilderForm extends CrudComponent {
   }
 
   findGridSquare(grid: Rect, x: number, y: number) {
-    // The issue that required this correction appears fixed in upstream
-    // Commented in case the problem reappears
-    // x -= window.pageXOffset;
-    // y -= window.pageYOffset;
+    // The page offset in clicks has appeared and disappeared in various quasar releases
+    // Comment or uncomment these lines when required
+    x -= window.pageXOffset;
+    y -= window.pageYOffset;
     if (!this.rectContains(grid, x, y)) {
       return null;
     }
