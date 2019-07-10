@@ -1,12 +1,20 @@
 <script lang="ts">
+import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import WatcherBase from '@/components/Watcher/WatcherBase';
 import sparkStore from '@/plugins/spark/store';
 
+import { SystemStatus } from '../types';
+
 @Component
 export default class SparkWatcher extends WatcherBase {
+  cancelStatusWatcher: Function = () => { };
   dismissFunc: Function | null = null;
+
+  get status() {
+    return sparkStore.lastStatus(this.service.id);
+  }
 
   get updating() {
     return sparkStore.updateSource(this.service.id) !== null;
@@ -46,12 +54,43 @@ export default class SparkWatcher extends WatcherBase {
     }
   }
 
+  handleStatusChange(status: SystemStatus) {
+    if (!status || status.latest) {
+      return;
+    }
+
+    this.cancelStatusWatcher();
+    this.$q.notify({
+      timeout: 0,
+      color: 'positive',
+      icon: 'mdi-download-network',
+      message: `Firmware update available for ${this.service.title}`,
+      actions: [
+        {
+          label: 'Update',
+          textColor: 'white',
+          handler: () => Dialog.create({
+            component: 'FirmwareUpdateDialog',
+            serviceId: this.serviceId,
+          }),
+        },
+        {
+          label: 'Dismiss',
+          textColor: 'white',
+        },
+      ],
+    });
+  }
+
   mounted() {
     this.$watch('updating', this.handleUpdateChange);
+    // TODO(Bob)
+    // Disabled until firmware update feature is ready for release
+    // this.cancelStatusWatcher = this.$watch('status', this.handleStatusChange);
+  }
+
+  render() {
+    return null;
   }
 }
 </script>
-
-<template>
-  <div/>
-</template>

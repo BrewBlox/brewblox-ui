@@ -1,4 +1,5 @@
-import { typeName } from '@/plugins/spark/features/MotorValve/getters';
+import { typeName as actuatorType } from '@/plugins/spark/features/DigitalActuator/getters';
+import { typeName as motorValveType } from '@/plugins/spark/features/MotorValve/getters';
 import sparkStore from '@/plugins/spark/store';
 import { DigitalState } from '@/plugins/spark/types';
 
@@ -10,21 +11,23 @@ const spec: ComponentSpec = {
   ...defaultSpec,
   cards: [{
     component: 'LinkedBlockCard',
-    props: { settingsKey: 'valve', typeName },
+    props: { settingsKey: 'valve', types: [motorValveType, actuatorType], label: 'Valve or Actuator' },
   }],
-  transitions: (part: StatePart): Transitions =>
-    ((part.state || {}).closed)
-      ? {}
-      : {
+  transitions: (part: StatePart): Transitions => {
+    const block = settingsBlock(part, 'valve');
+    return block && block.data.state === DigitalState.Active
+      ? {
         [LEFT]: [{ outCoords: RIGHT }],
         [RIGHT]: [{ outCoords: LEFT }],
-      },
+      }
+      : {};
+  },
   interactHandler: (part: StatePart) => {
     const block = settingsBlock(part, 'valve');
     if (block) {
-      block.data.desiredState = !!part.state.closed
-        ? DigitalState.Active
-        : DigitalState.Inactive;
+      block.data.desiredState = block.data.state === DigitalState.Active
+        ? DigitalState.Inactive
+        : DigitalState.Active;
       sparkStore.saveBlock([block.serviceId, block]);
     }
   },

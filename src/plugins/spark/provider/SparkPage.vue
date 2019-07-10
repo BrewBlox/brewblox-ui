@@ -331,8 +331,8 @@ export default class SparkPage extends Vue {
     <portal to="toolbar-buttons">
       <q-btn-dropdown :disable="!isReady || statusNok" color="primary" label="actions">
         <q-list dark link>
-          <ActionItem icon="mdi-ray-start-arrow" label="Show Relations" @click="showRelations"/>
-          <ActionItem icon="add" label="New Block" @click="startDialog('BlockWizardDialog')"/>
+          <ActionItem icon="mdi-ray-start-arrow" label="Show Relations" @click="showRelations" />
+          <ActionItem icon="add" label="New Block" @click="startDialog('BlockWizardDialog')" />
           <ActionItem
             icon="mdi-magnify-plus-outline"
             label="Discover new OneWire Blocks"
@@ -343,7 +343,14 @@ export default class SparkPage extends Vue {
             label="Remove unused Block names"
             @click="cleanUnusedNames"
           />
-          <ActionItem icon="wifi" label="Configure Wifi" @click="startDialog('SparkWifiMenu')"/>
+          <!-- TODO(Bob) -->
+          <!-- Disabled until ready for release -->
+          <!-- <ActionItem
+            icon="mdi-download-network"
+            label="Update firmware"
+            @click="startDialog('FirmwareUpdateDialog')"
+          />-->
+          <ActionItem icon="wifi" label="Configure Wifi" @click="startDialog('SparkWifiMenu')" />
           <ActionItem
             icon="mdi-checkbox-multiple-marked"
             label="Groups"
@@ -359,7 +366,7 @@ export default class SparkPage extends Vue {
             label="Import/Export Blocks"
             @click="startDialog('SparkImportMenu')"
           />
-          <ActionItem icon="delete" label="Remove all Blocks" @click="resetBlocks"/>
+          <ActionItem icon="delete" label="Remove all Blocks" @click="resetBlocks" />
         </q-list>
       </q-btn-dropdown>
     </portal>
@@ -368,7 +375,7 @@ export default class SparkPage extends Vue {
     <q-list v-if="statusNok" dark no-border>
       <q-item dark>
         <q-item-section>
-          <Troubleshooter :service-id="service.id" class="bg-dark"/>
+          <Troubleshooter :service-id="service.id" class="bg-dark" />
         </q-item-section>
       </q-item>
     </q-list>
@@ -382,7 +389,7 @@ export default class SparkPage extends Vue {
           <q-item-section>
             <q-input v-model="blockFilter" placeholder="Search Blocks" clearable dark>
               <template v-slot:append>
-                <q-icon name="search"/>
+                <q-icon name="search" />
               </template>
             </q-input>
           </q-item-section>
@@ -401,11 +408,11 @@ export default class SparkPage extends Vue {
             <q-tooltip>Sort Blocks</q-tooltip>
           </q-item-section>
           <q-item-section class="col-auto">
-            <q-btn flat round icon="mdi-checkbox-multiple-blank-outline" @click="expandNone"/>
+            <q-btn flat round icon="mdi-checkbox-multiple-blank-outline" @click="expandNone" />
             <q-tooltip>Unselect all</q-tooltip>
           </q-item-section>
           <q-item-section class="col-auto">
-            <q-btn flat round icon="mdi-checkbox-multiple-marked" @click="expandAll"/>
+            <q-btn flat round icon="mdi-checkbox-multiple-marked" @click="expandAll" />
             <q-tooltip>Select all</q-tooltip>
           </q-item-section>
         </q-item>
@@ -418,7 +425,7 @@ export default class SparkPage extends Vue {
           @click.native="serviceExpanded = !serviceExpanded"
         >
           <q-item-section avatar>
-            <q-icon name="mdi-cloud"/>
+            <q-icon name="mdi-cloud" />
             <q-tooltip>Service</q-tooltip>
           </q-item-section>
           <q-item-section>{{ serviceId }}</q-item-section>
@@ -434,7 +441,7 @@ export default class SparkPage extends Vue {
           @click.native="updateExpandedBlock(val.item.id, !val.expanded)"
         >
           <q-item-section avatar>
-            <q-icon :name="roleIcons[val.role]"/>
+            <q-icon :name="roleIcons[val.role]" />
             <q-tooltip>{{ val.role }}</q-tooltip>
           </q-item-section>
           <q-item-section>{{ val.item.title }}</q-item-section>
@@ -447,7 +454,7 @@ export default class SparkPage extends Vue {
         <!-- Service -->
         <q-item v-if="serviceShown && serviceExpanded" dark>
           <q-item-section>
-            <SparkWidget v-if="isReady" :service-id="service.id" class="bg-dark"/>
+            <SparkWidget v-if="isReady" :service-id="service.id" class="bg-dark" />
           </q-item-section>
         </q-item>
         <!-- Blocks -->

@@ -62,6 +62,16 @@ export default class IoArray extends BlockCrudComponent {
     return new Link(get(channel, 'driver.id', null), actuatorType);
   }
 
+  driverDriven(block: Block) {
+    return sparkStore.drivenChains(this.serviceId)
+      .some((chain: string[]) => chain[0] === block.id);
+  }
+
+  driverLimitedBy(block: Block) {
+    const limiting: string[] = sparkStore.limiters(this.serviceId)[block.id];
+    return limiting ? limiting.join(', ') : '';
+  }
+
   async saveDriver(channel: EditableChannel, link: Link) {
     const currentDriver = channel.driver;
     if (currentDriver && currentDriver.id === link.id) {
@@ -109,8 +119,10 @@ export default class IoArray extends BlockCrudComponent {
       <q-item-section>
         <DigitalStateField
           v-if="channel.driver"
+          :disable="driverDriven(channel.driver)"
           :value="channel.driver.data.desiredState"
-          :actual-value="channel.driver.data.state"
+          :pending="channel.driver.data.state !== channel.driver.data.desiredState"
+          :pending-reason="driverLimitedBy(channel.driver)"
           @input="v => saveState(channel, v)"
         />
         <div v-else>---</div>

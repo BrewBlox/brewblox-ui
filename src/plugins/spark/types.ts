@@ -80,6 +80,7 @@ export interface SystemStatus {
   handshake: boolean;
   synchronize: boolean;
   compatible: boolean;
+  latest: boolean;
   info: string[];
   error?: any;
 }
@@ -88,6 +89,10 @@ export interface BlockLink {
   source: string;
   target: string;
   relation: string[];
+}
+
+export interface Limiters {
+  [blockId: string]: string[];
 }
 
 export enum ChannelConfig {

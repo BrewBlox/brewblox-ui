@@ -6,8 +6,6 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
 import sparkStore from '@/plugins/spark/store';
 
-import { Unit } from '../../../../helpers/units';
-
 
 @Component
 export default class PidForm extends BlockCrudComponent {
@@ -47,7 +45,7 @@ export default class PidForm extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud"/>
+    <BlockFormToolbar :crud="crud" />
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="mdi-calculator-variant" label="Settings">
@@ -58,7 +56,7 @@ export default class PidForm extends BlockCrudComponent {
           class="full-width bordered"
           v-on="$listeners"
         />
-        <q-separator dark inset/>
+        <q-separator dark inset />
 
         <!-- Input row -->
         <q-item dark>
@@ -95,10 +93,10 @@ export default class PidForm extends BlockCrudComponent {
             <q-btn v-if="hasInputBlock" flat icon="mdi-pencil" @click="showInput">
               <q-tooltip>Edit {{ inputId }}</q-tooltip>
             </q-btn>
-            <q-btn v-else disable flat icon="mdi-pencil-off"/>
+            <q-btn v-else disable flat icon="mdi-pencil-off" />
           </q-item-section>
         </q-item>
-        <q-separator dark inset/>
+        <q-separator dark inset />
 
         <!-- Output row -->
         <q-item dark>
@@ -138,15 +136,15 @@ export default class PidForm extends BlockCrudComponent {
             <q-btn v-if="hasOutputBlock" flat icon="mdi-pencil" @click="showOutput">
               <q-tooltip>Edit {{ outputId }}</q-tooltip>
             </q-btn>
-            <q-btn v-else disable flat icon="mdi-pencil-off"/>
+            <q-btn v-else disable flat icon="mdi-pencil-off" />
           </q-item-section>
         </q-item>
-        <q-separator dark inset/>
+        <q-separator dark inset />
 
         <!-- Calculations -->
         <q-item dark>
           <q-item-section>
-            <q-item-label caption class="text-no-wrap">Filtered error</q-item-label>
+            <q-item-label caption class="text-no-wrap">Error</q-item-label>
             {{ block.data.error | unit }}
           </q-item-section>
           <q-item-section class="text-center">*</q-item-section>
@@ -155,18 +153,20 @@ export default class PidForm extends BlockCrudComponent {
             <UnitField
               :value="block.data.kp"
               title="Proportional gain Kp"
+              label="Proportional gain"
               message-html="
               <p>
                 Kp is the proportional gain, which is directly mutiplied by the filtered error.
-                For each degree that the beer is too low, Kp is added to the output.
+                The output of the PID is Kp * input error.
+                Set it to what you think the output should be for a 1 degree error.
               </p>
               <p>Kp should be negative if the actuator brings down the input, like a cooler.</p>
               "
               @input="v => { block.data.kp = v; saveBlock(); }"
             />
           </q-item-section>
-          <q-item-section/>
-          <q-item-section/>
+          <q-item-section />
+          <q-item-section />
           <q-item-section class="text-center">=</q-item-section>
           <q-item-section>
             <q-item-label caption>P</q-item-label>
@@ -190,6 +190,7 @@ export default class PidForm extends BlockCrudComponent {
             <TimeUnitField
               :value="block.data.ti"
               title="Integral time constant Ti"
+              label="Integral time constant"
               message-html="
               <p>
                 The purpose of the integrator is to remove steady state errors.
@@ -233,7 +234,7 @@ export default class PidForm extends BlockCrudComponent {
         <q-item dark>
           <q-item-section>
             <q-item-label caption>Derivative</q-item-label>
-            {{ block.data.derivative | unit }}
+            <span :class="{darkened: block.data.td.val === 0}">{{ block.data.derivative | unit }}</span>
           </q-item-section>
           <q-item-section class="text-center">*</q-item-section>
           <q-item-section>
@@ -246,14 +247,18 @@ export default class PidForm extends BlockCrudComponent {
             <TimeUnitField
               :value="block.data.td"
               title="Derivative time constant Td"
+              label="Derivative time constant"
               message-html="
                 <p>
-                When the error is decreasing fast, the derivative action (D) counteracts the proportional action (P).
+                When the input is approaching its target fast,
+                the derivative action (D) can counteract the proportional action (P).
                 This slows down the approach to avoid overshoot.
                 </p>
                 <p>
                 Td is the derivative time constant.
-                It should be equal how long it takes for the process to stabilize after you turn off the actuator.
+                It should be equal to how long it takes for the process to stabilize after you turn off the actuator.
+                </p>
+                <p>
                 When there is no overshoot in the system, Td should be set to zero.
                 </p>
                 "
@@ -272,7 +277,7 @@ export default class PidForm extends BlockCrudComponent {
           </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section v-for="i in 6" :key="i"/>
+          <q-item-section v-for="i in 6" :key="i" />
           <q-item-section>
             <q-item-label caption>Output</q-item-label>
             {{ block.data.p + block.data.i + block.data.d | round }}

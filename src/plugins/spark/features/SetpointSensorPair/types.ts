@@ -2,13 +2,13 @@ import { Link, Unit } from '@/helpers/units';
 import { Block } from '@/plugins/spark/types';
 
 export enum FilterChoice {
-  Filter30s = 0,
-  Filter1m = 1,
-  Filter3m = 2,
-  Filter5m = 3,
-  Filter10m = 4,
-  Filter20m = 5,
-  Filter45m = 6,
+  FilterNoFiltering = 0,
+  Filter15s = 1,
+  Filter45s = 2,
+  Filter90s = 3,
+  Filter3m = 4,
+  Filter10m = 5,
+  Filter30m = 6,
 }
 
 export interface SetpointSensorPairData {

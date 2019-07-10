@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 import { objectStringSorter } from '@/helpers/functional';
-import { deepCopy } from '@/helpers/shadow-copy';
+import { deepCopy } from '@/helpers/units/parseObject';
 import sparkStore from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
@@ -48,7 +48,7 @@ export default class BlockDialog extends DialogBase {
     <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
       <q-card-section class="q-dialog__title">{{ title }}</q-card-section>
       <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
-      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml"/>
+      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
         <q-select
           v-model="block"
@@ -69,7 +69,7 @@ export default class BlockDialog extends DialogBase {
         </q-select>
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn color="primary" flat label="Cancel" @click="onDialogCancel"/>
+        <q-btn color="primary" flat label="Cancel" @click="onDialogCancel" />
         <q-btn
           :disable="!clearable && !block"
           color="primary"

@@ -5,13 +5,12 @@ import { defaultSpec } from '../getters';
 import { settingsBlock } from '../helpers';
 import { ComponentSpec, StatePart } from '../types';
 
-const SIZE_X = 2;
-const SIZE_Y = 5;
+const SIZE_X = 3;
+const SIZE_Y = 9;
 
 const spec: ComponentSpec = {
   ...defaultSpec,
   cards: [
-    { component: 'ColorCard' },
     {
       component: 'LinkedBlockCard',
       props: {

@@ -41,6 +41,11 @@ export default class BlockCrudComponent extends CrudComponent {
       .some((chain: string[]) => chain[0] === this.block.id);
   }
 
+  public get constrainers(): string | null {
+    const limiting: string[] = sparkStore.limiters(this.serviceId)[this.blockId];
+    return limiting ? limiting.join(', ') : null;
+  }
+
   public async saveBlock(block: Block = this.block) {
     await this.crud.saveBlock(block);
   }

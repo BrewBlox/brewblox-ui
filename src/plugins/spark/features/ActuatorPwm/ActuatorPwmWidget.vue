@@ -27,12 +27,12 @@ export default class ActuatorPwmWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" :graph-cfg="graphCfg"/>
+    <BlockWidgetToolbar :crud="crud" :graph-cfg.sync="graphCfg" />
 
     <q-card-section>
       <q-item v-if="!block.data.enabled" dark>
         <q-item-section avatar>
-          <q-icon name="warning"/>
+          <q-icon name="warning" />
         </q-item-section>
         <q-item-section>
           <span>
@@ -54,11 +54,10 @@ export default class ActuatorPwmWidget extends BlockWidget {
         <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Duty setting</q-item-label>
           <div>
-            <InputField
+            <SliderField
               :value="block.data.desiredSetting"
               :readonly="isDriven"
               style="display: inline-block"
-              type="number"
               title="Duty Setting"
               tag="big"
               @input="v => { block.data.desiredSetting = v; saveBlock(); }"
@@ -69,7 +68,7 @@ export default class ActuatorPwmWidget extends BlockWidget {
               class="q-ml-xs"
             >%</small>
           </div>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
         </q-item-section>
         <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Duty achieved</q-item-label>
@@ -91,7 +90,7 @@ export default class ActuatorPwmWidget extends BlockWidget {
       </q-item>
       <q-item dark>
         <q-item-section>
-          <AnalogConstraints :value="block.data.constrainedBy" :service-id="serviceId" readonly/>
+          <AnalogConstraints :value="block.data.constrainedBy" :service-id="serviceId" readonly />
         </q-item-section>
       </q-item>
     </q-card-section>

@@ -53,6 +53,52 @@
       }
     },
     {
+      "id": "SparkPins",
+      "nid": 19,
+      "groups": [7],
+      "type": "Spark3Pins",
+      "data": {
+        "pins": [
+          {
+            "top1": {
+              "config": 0,
+              "state": 0
+            }
+          },
+          {
+            "top2": {
+              "config": 0,
+              "state": 0
+            }
+          },
+          {
+            "top3": {
+              "config": 0,
+              "state": 0
+            }
+          },
+          {
+            "bottom1": {
+              "config": 1,
+              "state": 0
+            }
+          },
+          {
+            "bottom2": {
+              "config": 1,
+              "state": 0
+            }
+          }
+        ],
+        "enableIoSupply5V": true,
+        "enableIoSupply12V": true,
+        "voltage5": 5.0,
+        "voltage12": 12.0,
+        "enableLcdBacklight": false,
+        "soundAlarm": false
+      }
+    },
+    {
       "id": "balancer-1",
       "nid": 200,
       "groups": [0],
@@ -136,8 +182,8 @@
         "value[degC]": 0,
         "sensorId<TempSensorInterface>": "sensor-1",
         "setting[degC]": 30,
-        "filter": 0,
-        "filterThreshold[delta_degC]": 2
+        "filter": 1,
+        "filterThreshold[delta_degC]": 4
       }
     },
     {
@@ -291,14 +337,22 @@
       "nid": 215,
       "groups": [0],
       "type": "DigitalActuator",
-      "data": {}
+      "data": {
+        "channel": 1,
+        "hwDevice<IoArrayInterface,driven>": "SparkPins",
+        "constrainedBy": { "constraints": [{ "limiting": false, "mutex<MutexInterface>": "mutex-1" }] }
+      }
     },
     {
       "id": "pin-actuator-2",
       "nid": 216,
       "groups": [0],
       "type": "DigitalActuator",
-      "data": {}
+      "data": {
+        "channel": 2,
+        "hwDevice<IoArrayInterface,driven>": "SparkPins",
+        "constrainedBy": { "constraints": [{ "limiting": false, "mutex<MutexInterface>": "mutex-1" }] }
+      }
     },
     {
       "id": "pin-actuator-3",

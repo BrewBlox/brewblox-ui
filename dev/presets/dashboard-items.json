@@ -14,9 +14,7 @@
             "id": "cb0bdf02-5cd0-c29e-ddbf-6537762fbc77",
             "rotate": 0,
             "settings": {
-              "liquids": [
-                "#C678DD"
-              ]
+              "liquids": ["#C678DD"]
             },
             "flipped": false,
             "x": 11,
@@ -54,9 +52,7 @@
             "id": "ef649e86-967a-8e81-3139-f7bcc61e462c",
             "rotate": 0,
             "settings": {
-              "liquids": [
-                "#4AA0EF"
-              ],
+              "liquids": ["#4AA0EF"],
               "pressure": 10
             },
             "flipped": false,
@@ -159,9 +155,7 @@
             "id": "f07773c1-bfdd-2b67-5fb0-131a4761ff02",
             "rotate": 180,
             "settings": {
-              "liquids": [
-                "#DB0023"
-              ]
+              "liquids": ["#DB0023"]
             },
             "flipped": false,
             "type": "SystemIO",
@@ -199,7 +193,9 @@
           {
             "id": "0f61648a-e83b-d4a5-12e8-82da479b74fb",
             "rotate": 0,
-            "settings": {},
+            "settings": {
+              "enabled": true
+            },
             "flipped": false,
             "x": 4,
             "y": 2,
@@ -301,7 +297,7 @@
             "id": "d9cfc2bf-ac59-e765-0fbc-7644d44810f1",
             "rotate": 0,
             "settings": {
-              "disabled": false
+              "enabled": true
             },
             "flipped": false,
             "x": 16,
@@ -415,9 +411,7 @@
             "id": "26f7c494-bf52-efcf-401c-5e2a2d9b22b5",
             "rotate": 180,
             "settings": {
-              "liquids": [
-                "#DB0023"
-              ]
+              "liquids": ["#DB0023"]
             },
             "flipped": false,
             "type": "SystemIO",
@@ -464,9 +458,7 @@
             "id": "a009f479-2c09-d8e6-6979-e218ee9cb8f4",
             "rotate": 180,
             "settings": {
-              "liquids": [
-                "#DB0023"
-              ]
+              "liquids": ["#DB0023"]
             },
             "flipped": false,
             "type": "SystemIO",
@@ -504,9 +496,7 @@
             "id": "60563139-095a-1ed0-9cd8-ed27de9def6d",
             "rotate": 90,
             "settings": {
-              "liquids": [
-                "#4AA0EF"
-              ],
+              "liquids": ["#4AA0EF"],
               "pressure": 10
             },
             "flipped": false,
@@ -610,16 +600,11 @@
         "targets": [
           {
             "measurement": "sparkey",
-            "fields": [
-              "actuator-pwm-1/setting",
-              "actuator-pwm-1/value"
-            ]
+            "fields": ["actuator-pwm-1/setting", "actuator-pwm-1/value"]
           },
           {
             "measurement": "spock",
-            "fields": [
-              " Combined Influx points"
-            ]
+            "fields": [" Combined Influx points"]
           }
         ],
         "renames": {
@@ -651,9 +636,7 @@
               "targets": [
                 {
                   "measurement": "sparkey",
-                  "fields": [
-                    "actuator-pwm-1/value"
-                  ]
+                  "fields": ["actuator-pwm-1/value"]
                 }
               ],
               "renames": {
@@ -704,10 +687,7 @@
         "targets": [
           {
             "measurement": "sparkey",
-            "fields": [
-              "actuator-pwm-1/setting",
-              "actuator-pwm-1/value"
-            ]
+            "fields": ["actuator-pwm-1/setting", "actuator-pwm-1/value"]
           }
         ],
         "renames": {

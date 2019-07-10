@@ -41,6 +41,11 @@ export default class BlockWidget extends WidgetBase {
       .some((chain: string[]) => chain[0] === this.blockId);
   }
 
+  public get constrainers(): string | null {
+    const limiting: string[] = sparkStore.limiters(this.serviceId)[this.blockId];
+    return limiting ? limiting.join(', ') : null;
+  }
+
   public get queryParams(): QueryParams {
     return this.widget.config.queryParams || {
       duration: '10m',

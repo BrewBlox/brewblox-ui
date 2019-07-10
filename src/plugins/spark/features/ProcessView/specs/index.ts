@@ -5,6 +5,7 @@ import BridgeTube from './BridgeTube';
 import Carboy from './Carboy';
 import CheckValve from './CheckValve';
 import Coil from './Coil';
+import Conical from './Conical';
 import CounterflowChiller from './CounterflowChiller';
 import CrossTube from './CrossTube';
 import DipTube from './DipTube';
@@ -18,6 +19,7 @@ import Lauterhexe from './Lauterhexe';
 import PidDisplay from './PidDisplay';
 import Pump from './Pump';
 import PwmDisplay from './PwmDisplay';
+import PwmPump from './PwmPump';
 import SensorDisplay from './SensorDisplay';
 import SetpointDisplay from './SetpointDisplay';
 import SmallKettle from './SmallKettle';
@@ -36,6 +38,7 @@ const specs: { [key: string]: ComponentSpec } = {
   Carboy,
   CheckValve,
   Coil,
+  Conical,
   CounterflowChiller,
   CrossTube,
   DipTube,
@@ -49,6 +52,7 @@ const specs: { [key: string]: ComponentSpec } = {
   PidDisplay,
   Pump,
   PwmDisplay,
+  PwmPump,
   SensorDisplay,
   SetpointDisplay,
   SmallKettle,

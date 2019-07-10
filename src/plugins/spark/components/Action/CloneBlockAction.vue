@@ -3,7 +3,7 @@
 import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { deepCopy } from '@/helpers/shadow-copy';
+import { deepCopy } from '@/helpers/units/parseObject';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import sparkStore from '@/plugins/spark/store';
 
@@ -70,5 +70,5 @@ export default class RemoveBlockAction extends BlockCrudComponent {
 </script>
 
 <template>
-  <ActionItem v-bind="itemProps" @click="startCloneBlock"/>
+  <ActionItem v-bind="itemProps" @click="startCloneBlock" />
 </template>

@@ -3,12 +3,12 @@ import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
-import { deserialize, serialize } from '@/helpers/units/parseObject';
+import { deepCopy } from '@/helpers/units/parseObject';
+import { deserialize, isSubSet, serialize } from '@/helpers/units/parseObject';
 import sparkStore from '@/plugins/spark/store';
 
-import { deepCopy } from '../../../../helpers/shadow-copy';
 import { Block, ChangeField } from '../../types';
-import { BlockChange, Step } from './types';
+import { Step } from './types';
 
 
 @Component
@@ -43,6 +43,18 @@ export default class StepViewWidget extends WidgetBase {
         {});
   }
 
+  get activeSteps(): Record<string, boolean> {
+    return this.steps
+      .reduce(
+        (acc, step) => ({
+          ...acc,
+          [step.id]: this.applicableSteps[step.id]
+            && step.changes.every(change =>
+              isSubSet(change.data, sparkStore.blockById(this.serviceId, change.blockId).data)),
+        }),
+        {});
+  }
+
   confirmStepChange(block: Block, key: string, value: any): Promise<any> {
     return new Promise((resolve, reject) => {
       const change = sparkStore.specs[block.type].changes
@@ -65,7 +77,8 @@ export default class StepViewWidget extends WidgetBase {
     });
   }
 
-  async applyChanges(changes: BlockChange[]) {
+  async applyChanges(step: Step) {
+    const changes = step.changes;
     const actualChanges: [Block, any][] = [];
     for (let change of changes) {
       const block = sparkStore.blockById(this.serviceId, change.blockId);
@@ -80,11 +93,13 @@ export default class StepViewWidget extends WidgetBase {
     for (let [block, actualData] of actualChanges) {
       await sparkStore.saveBlock([this.serviceId, { ...block, data: { ...block.data, ...actualData } }]);
     }
+    step.changes = step.changes.map((change, idx) => ({ ...change, data: actualChanges[idx][1] }));
+    this.steps = this.steps.map(s => s.id === step.id ? step : s);
   }
 
   applyStep(step: Step) {
     this.applying = true;
-    this.applyChanges(step.changes)
+    this.applyChanges(step)
       .then(() => this.$q.notify({
         icon: 'mdi-check-all',
         color: 'positive',
@@ -140,10 +155,13 @@ export default class StepViewWidget extends WidgetBase {
           <q-btn
             :disable="!applicableSteps[step.id]"
             :loading="applying"
+            :color="activeSteps[step.id] ? 'positive': ''"
             outline
             label="apply"
             @click="applyStep(step)"
-          />
+          >
+            <q-tooltip v-if="activeSteps[step.id]">Step is applied</q-tooltip>
+          </q-btn>
         </q-item-section>
       </q-item>
     </q-card-section>
