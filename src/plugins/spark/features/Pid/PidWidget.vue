@@ -1,15 +1,12 @@
 <script lang="ts">
-import get from 'lodash/get';
-import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import { showBlockDialog } from '@/helpers/dialog';
-import { Link, postfixedDisplayNames } from '@/helpers/units';
+import { postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import sparkStore from '@/plugins/spark/store';
-import { BlockLink } from '@/plugins/spark/types';
-import featureStore from '@/store/features';
 
+import { startRelationsDialog } from './relations';
 import { PidBlock } from './types';
 
 @Component
@@ -58,69 +55,13 @@ export default class PidWidget extends BlockWidget {
         .includes(this.outputId);
   }
 
-  findLinks(id: string | null): BlockLink[] {
-    const block = sparkStore.blocks(this.serviceId)[id || ''];
-    if (!id || !block) {
-      return [];
-    }
-
-    const links = Object.entries(block.data)
-      .filter(([, v]) => v instanceof Link) as [string, Link][];
-
-    const filtered = links
-      .filter(([, link]) => !link.driven && link.id);
-
-    const relations: BlockLink[] = filtered
-      .map(([k, link]) => ({
-        source: id,
-        target: link.id as string,
-        relation: [k],
-      }));
-
-    return filtered
-      .reduce((acc: BlockLink[], [, link]) => ([...acc, ...this.findLinks(link.id)]), relations);
-  }
-
-  relations(): BlockLink[] {
-    const chain = this.findLinks(this.blockId);
-
-    // Setpoints may be driven by something else (profile, setpoint driver, etc)
-    // Just display the block that's actually driving, ignore any blocks driving the driver
-    const setpointId = this.block.data.inputId.id;
-    if (!setpointId) {
-      return chain;
-    }
-
-    return [
-      ...chain,
-      ...sparkStore.blockValues(this.serviceId)
-        .filter(block => get(block, 'data.targetId.id') === setpointId)
-        .map(block => ({ source: block.id, target: setpointId, relation: ['target'] })),
-    ];
-  }
-
-  nodes() {
-    return sparkStore.blockValues(this.serviceId)
-      .map(block => ({
-        id: block.id,
-        type: featureStore.displayNameById(block.type),
-      }));
-  }
-
   enable() {
     this.block.data.enabled = true;
     this.saveBlock();
   }
 
   showRelations() {
-    Dialog.create({
-      component: 'RelationsDialog',
-      serviceId: this.serviceId,
-      nodes: this.nodes(),
-      relations: this.relations(),
-      title: `${this.block.id} relations`,
-      root: this.$root,
-    });
+    startRelationsDialog(this.block);
   }
 
   showInput() {

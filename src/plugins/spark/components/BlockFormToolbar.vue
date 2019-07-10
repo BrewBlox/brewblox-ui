@@ -15,9 +15,10 @@ export default class BlockFormToolbar extends BlockCrudComponent {
     <template v-slot:buttons>
       <q-btn-dropdown flat icon="mdi-pencil">
         <q-list dark bordered>
-          <ActionItem icon="refresh" label="Refresh" @click="refreshBlock"/>
-          <WidgetActions :crud="crud" no-rename/>
-          <BlockActions :crud="crud"/>
+          <ActionItem icon="refresh" label="Refresh" @click="refreshBlock" />
+          <slot name="actions" />
+          <WidgetActions :crud="crud" no-rename />
+          <BlockActions :crud="crud" />
         </q-list>
       </q-btn-dropdown>
     </template>
