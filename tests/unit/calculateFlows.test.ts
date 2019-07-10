@@ -1,15 +1,15 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
 
-import { FlowSegment } from '@/plugins/spark/features/ProcessView/FlowSegment';
+import { FlowSegment } from '@/plugins/builder/FlowSegment';
 import {
   asFlowParts,
   calculateFlows,
   flowPath,
   partTransitions,
-} from '@/plugins/spark/features/ProcessView/calculateFlows';
-import { COLD_WATER, HOT_WATER, IN_OUT } from '@/plugins/spark/features/ProcessView/getters';
-import { StatePart } from '@/plugins/spark/features/ProcessView/types';
+} from '@/plugins/builder/calculateFlows';
+import { COLD_WATER, HOT_WATER, IN_OUT } from '@/plugins/builder/getters';
+import { StatePart } from '@/plugins/builder/types';
 
 
 const propertyWalker = (acc: any[], next: FlowSegment, prop: string[]): any[] => {

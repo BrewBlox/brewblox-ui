@@ -2,12 +2,12 @@
   "docs": [
     {
       "_id": "a0634d76-5499-11e9-8647-d663bd873d93",
-      "title": "item-process-view",
+      "title": "Gone With the Flow",
       "order": 1,
       "cols": 8,
       "rows": 8,
       "feature": "ProcessView",
-      "dashboard": "process-view",
+      "dashboard": "builder",
       "config": {
         "parts": [
           {

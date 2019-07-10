@@ -6,6 +6,7 @@ import App from './App.vue';
 import createContainer from './create-container';
 import { autoRegister } from './helpers/component-ref';
 import { initDb } from './helpers/database';
+import builder from './plugins/builder';
 import example from './plugins/example';
 import history from './plugins/history';
 import portal from './plugins/portal';
@@ -22,8 +23,9 @@ initDb(HOST, DB_NAME);
 
 const plugins = [
   portal,
-  spark,
   history,
+  spark,
+  builder,
   example,
 ];
 
