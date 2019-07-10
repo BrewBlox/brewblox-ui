@@ -5,7 +5,7 @@ import { DigitalState } from '@/plugins/spark/types';
 
 import { LEFT, RIGHT, defaultSpec } from '../getters';
 import { settingsBlock } from '../helpers';
-import { ComponentSpec, StatePart, Transitions } from '../types';
+import { ComponentSpec, PersistentPart, Transitions } from '../types';
 
 const spec: ComponentSpec = {
   ...defaultSpec,
@@ -13,7 +13,7 @@ const spec: ComponentSpec = {
     component: 'LinkedBlockCard',
     props: { settingsKey: 'valve', types: [motorValveType, actuatorType], label: 'Valve or Actuator' },
   }],
-  transitions: (part: StatePart): Transitions => {
+  transitions: (part: PersistentPart): Transitions => {
     const block = settingsBlock(part, 'valve');
     return block && block.data.state === DigitalState.Active
       ? {
@@ -22,7 +22,7 @@ const spec: ComponentSpec = {
       }
       : {};
   },
-  interactHandler: (part: StatePart) => {
+  interactHandler: (part: PersistentPart) => {
     const block = settingsBlock(part, 'valve');
     if (block) {
       block.data.desiredState = block.data.state === DigitalState.Active

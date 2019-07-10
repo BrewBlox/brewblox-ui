@@ -11,7 +11,7 @@ import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
 import { SQUARE_SIZE } from './getters';
 import specs from './specs';
-import { BuilderConfig, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect, StatePart } from './types';
+import { BuilderConfig, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
 
 interface DragAction {
   hide: boolean;
@@ -70,10 +70,8 @@ export default class BuilderForm extends CrudComponent {
     return part;
   }
 
-  @Emit('state')
-  updatePartState(part: StatePart) {
-    return part;
-  }
+  @Emit('dirty')
+  invalidateFlows() { }
 
   @Emit('remove')
   removePart(part: PersistentPart) {
@@ -113,7 +111,6 @@ export default class BuilderForm extends CrudComponent {
   get updater(): PartUpdater {
     return {
       updatePart: this.updatePart,
-      updatePartState: this.updatePartState,
     };
   }
 
@@ -387,8 +384,8 @@ export default class BuilderForm extends CrudComponent {
         v-if="menuModalOpen"
         :part="configuredPart"
         @update:part="updatePart"
-        @update:state="updatePartState"
         @remove:part="removePart"
+        @dirty="invalidateFlows"
         @close="menuModalOpen = false"
       />
     </q-dialog>

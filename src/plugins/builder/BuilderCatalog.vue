@@ -8,7 +8,7 @@ import { spaceCased } from '@/helpers/functional';
 import { SQUARE_SIZE } from './getters';
 import { parts } from './register';
 import specs from './specs';
-import { PersistentPart, StatePart } from './types';
+import { PersistentPart } from './types';
 
 
 @Component
@@ -19,7 +19,7 @@ export default class BuilderCatalog extends Vue {
   @Prop({ type: Object, default: () => ({}) })
   readonly partial!: Partial<PersistentPart>;
 
-  get availableParts(): StatePart[] {
+  get availableParts(): PersistentPart[] {
     return parts
       .map(type => ({
         type,
@@ -29,7 +29,6 @@ export default class BuilderCatalog extends Vue {
         rotate: 0,
         settings: {},
         flipped: false,
-        state: {},
       }));
   }
 

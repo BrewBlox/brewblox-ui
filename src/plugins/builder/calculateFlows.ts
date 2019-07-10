@@ -17,7 +17,7 @@ import {
   FlowPart,
   FlowRoute,
   LiquidFlow,
-  StatePart,
+  PersistentPart,
   Transitions,
 } from './types';
 
@@ -26,16 +26,16 @@ export const removeTransitions =
     part => ({ ...part, transitions: omit(part.transitions, inCoord) }));
 
 export const partSpecs =
-  (part: StatePart): ComponentSpec => specs[part.type];
+  (part: PersistentPart): ComponentSpec => specs[part.type];
 
 export const partTransitions =
-  (part: StatePart): Transitions => partSpecs(part).transitions(part);
+  (part: PersistentPart): Transitions => partSpecs(part).transitions(part);
 
 export const partSize =
-  (part: StatePart): [number, number] => partSpecs(part).size(part);
+  (part: PersistentPart): [number, number] => partSpecs(part).size(part);
 
 export const partCenter =
-  (part: StatePart): [number, number, number] => {
+  (part: PersistentPart): [number, number, number] => {
     const [sizeX, sizeY] = partSize(part);
     return [sizeX / 2, sizeY / 2, 0];
   };
@@ -67,7 +67,7 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
   return { ...part, flows: newFlows };
 };
 
-const translations = (part: StatePart): Transitions =>
+const translations = (part: PersistentPart): Transitions =>
   Object.entries(partTransitions(part))
     .reduce((acc, [inCoordStr, transition]: [string, any]) => {
       // inCoords are relative from part anchor === [0, 0, 0]
@@ -95,7 +95,7 @@ const translations = (part: StatePart): Transitions =>
       {},
     );
 
-export const asFlowParts = (parts: StatePart[]): FlowPart[] =>
+export const asFlowParts = (parts: PersistentPart[]): FlowPart[] =>
   parts.map(part => ({ ...part, transitions: translations(part), flows: {} }));
 
 const combineFlows =
@@ -333,5 +333,5 @@ const unbalancedFlow = (part: FlowPart): number =>
         .reduce((sum2: number, w: number) => sum2 + w, sum),
       0);
 
-export const calculateNormalizedFlows = (parts: StatePart[]): FlowPart[] =>
+export const calculateNormalizedFlows = (parts: PersistentPart[]): FlowPart[] =>
   calculateFlows(asFlowParts(parts)).map(normalizeFlows);

@@ -3,7 +3,7 @@ import { typeName } from '@/plugins/spark/features/Pid/getters';
 
 import { defaultSpec } from '../getters';
 import { settingsBlock } from '../helpers';
-import { ComponentSpec, StatePart } from '../types';
+import { ComponentSpec, PersistentPart } from '../types';
 ;
 
 const SIZE_X = 1;
@@ -16,7 +16,7 @@ const spec: ComponentSpec = {
     props: { settingsKey: 'pid', types: [typeName], label: 'PID' },
   }],
   size: () => [SIZE_X, SIZE_Y],
-  interactHandler: (part: StatePart) => showBlockDialog(settingsBlock(part, 'pid')),
+  interactHandler: (part: PersistentPart) => showBlockDialog(settingsBlock(part, 'pid')),
 };
 
 export default spec;

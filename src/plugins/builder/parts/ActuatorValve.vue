@@ -73,7 +73,7 @@ export default class ActuatorValve extends PartBase {
     if (block === null
       || prevBlock === null
       || block.data.state !== prevBlock.data.state) {
-      this.savePartState();
+      this.invalidateFlows();
     }
   }
 }

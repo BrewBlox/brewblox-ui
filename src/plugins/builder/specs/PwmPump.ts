@@ -6,7 +6,7 @@ import sparkStore from '@/plugins/spark/store';
 
 import { ACCELERATE_OTHERS, DEFAULT_PUMP_PRESSURE, LEFT, RIGHT, defaultSpec } from '../getters';
 import { settingsBlock } from '../helpers';
-import { ComponentSpec, StatePart } from '../types';
+import { ComponentSpec, PersistentPart } from '../types';
 
 const spec: ComponentSpec = {
   ...defaultSpec,
@@ -14,7 +14,7 @@ const spec: ComponentSpec = {
     component: 'LinkedBlockCard',
     props: { settingsKey: 'pwm', types: [typeName], label: 'PWM' },
   }],
-  transitions: (part: StatePart) => {
+  transitions: (part: PersistentPart) => {
     const block = settingsBlock<ActuatorPwmBlock>(part, 'pwm');
     const pressure = block
       ? (block.data.setting / 100) * DEFAULT_PUMP_PRESSURE
@@ -24,7 +24,7 @@ const spec: ComponentSpec = {
       [RIGHT]: [{ outCoords: LEFT, pressure, liquids: [ACCELERATE_OTHERS] }],
     };
   },
-  interactHandler: (part: StatePart) => {
+  interactHandler: (part: PersistentPart) => {
     const block = settingsBlock(part, 'pwm');
     if (block) {
       Dialog.create({

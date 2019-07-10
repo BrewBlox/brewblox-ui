@@ -9,7 +9,7 @@ import BuilderCatalog from './BuilderCatalog.vue';
 import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
 import specs from './specs';
-import { BuilderConfig, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect, StatePart } from './types';
+import { BuilderConfig, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
 
 interface DragAction {
   hide: boolean;
@@ -55,7 +55,7 @@ export default class BuilderWidget extends WidgetBase {
   async updateParts(parts: PersistentPart[]) {
     const asPersistent = (part: PersistentPart | FlowPart) => {
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      const { state, transitions, flows, ...persistent } = part as FlowPart;
+      const { transitions, flows, ...persistent } = part as FlowPart;
       return persistent;
     };
 
@@ -69,11 +69,6 @@ export default class BuilderWidget extends WidgetBase {
     await this.updateParts(this.parts.map(p => (p.id === part.id ? part : p)));
   }
 
-  updatePartState(part: StatePart) {
-    this.$set(this.partState, part.id, part.state);
-    this.calculateFlowFunc();
-  }
-
   async removePart(part: PersistentPart) {
     await this.updateParts(this.parts.filter(p => p.id !== part.id));
   }
@@ -83,7 +78,7 @@ export default class BuilderWidget extends WidgetBase {
     return { x, y, left, right, top, bottom };
   }
 
-  get parts(): StatePart[] {
+  get parts(): PersistentPart[] {
     return this.widgetConfig.parts
       .map(part => {
         const statePart = {
@@ -105,7 +100,6 @@ export default class BuilderWidget extends WidgetBase {
   get updater(): PartUpdater {
     return {
       updatePart: this.updatePart,
-      updatePartState: this.updatePartState,
     };
   }
 
@@ -140,7 +134,7 @@ export default class BuilderWidget extends WidgetBase {
         :flow-parts="flowParts"
         @parts="updateParts"
         @part="updatePart"
-        @state="updatePartState"
+        @dirty="calculateFlowFunc"
         @remove="removePart"
         @close="formModalOpen = false"
       />
@@ -171,7 +165,7 @@ export default class BuilderWidget extends WidgetBase {
           :class="{ clickable: isClickable(part), [part.type]: true }"
           @click="interact(part)"
         >
-          <PartWrapper :part="part" @update:part="updatePart" @update:state="updatePartState" />
+          <PartWrapper :part="part" @update:part="updatePart" @dirty="calculateFlowFunc" />
         </g>
       </svg>
     </div>
