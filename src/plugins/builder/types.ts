@@ -29,18 +29,13 @@ export interface PersistentPart {
   settings: Record<string, any>;
 }
 
-export interface StatePart extends PersistentPart {
-  state: Record<string, any>;
-}
-
-export interface FlowPart extends StatePart {
+export interface FlowPart extends PersistentPart {
   transitions: Transitions;
   flows: CalculatedFlows;
 }
 
 export interface PartUpdater {
   updatePart: (part: PersistentPart) => void;
-  updatePartState: (part: StatePart) => void;
 }
 
 export interface LinkedBlock {
@@ -55,10 +50,10 @@ export interface CardSpec {
 
 export interface ComponentSpec {
   cards: CardSpec[];
-  transitions: (part: StatePart) => Transitions;
+  transitions: (part: PersistentPart) => Transitions;
   size: (part: PersistentPart) => [number, number];
   blockedCoordinates: (part: PersistentPart) => Coordinates[];
-  interactHandler?: (part: StatePart, updater: PartUpdater) => void;
+  interactHandler?: (part: PersistentPart, updater: PartUpdater) => void;
 }
 
 export interface BuilderConfig {

@@ -40,7 +40,7 @@ export default class PwmPump extends PartBase {
     if (block === null
       || prevBlock === null
       || block.data.setting !== prevBlock.data.setting) {
-      this.savePartState();
+      this.invalidateFlows();
     }
   }
 

@@ -19,10 +19,8 @@ export default class PartBase extends Vue {
     return part;
   }
 
-  @Emit('update:state')
-  public savePartState(part: FlowPart = this.part): FlowPart {
-    return part;
-  }
+  @Emit('dirty')
+  public invalidateFlows() { }
 
   public get part(): FlowPart {
     return {
@@ -46,10 +44,6 @@ export default class PartBase extends Vue {
 
   public get settings(): Record<string, any> {
     return this.part.settings || {};
-  }
-
-  public get state(): Record<string, any> {
-    return this.part.state || {};
   }
 
   public get spec(): ComponentSpec {

@@ -5,7 +5,7 @@ import { DigitalState } from '@/plugins/spark/types';
 
 import { ACCELERATE_OTHERS, DEFAULT_PUMP_PRESSURE, LEFT, RIGHT, defaultSpec } from '../getters';
 import { settingsBlock } from '../helpers';
-import { ComponentSpec, PartUpdater, StatePart } from '../types';
+import { ComponentSpec, PartUpdater, PersistentPart } from '../types';
 
 const spec: ComponentSpec = {
   ...defaultSpec,
@@ -13,7 +13,7 @@ const spec: ComponentSpec = {
     component: 'LinkedBlockCard',
     props: { settingsKey: 'actuator', types: [typeName], label: 'Actuator' },
   }],
-  transitions: (part: StatePart) => {
+  transitions: (part: PersistentPart) => {
     const block = settingsBlock<DigitalActuatorBlock>(part, 'actuator');
     const enabled = !!block
       ? block.data.state === DigitalState.Active
@@ -27,7 +27,7 @@ const spec: ComponentSpec = {
       [RIGHT]: [{ outCoords: LEFT, pressure, liquids: [ACCELERATE_OTHERS] }],
     };
   },
-  interactHandler: (part: StatePart, updater: PartUpdater) => {
+  interactHandler: (part: PersistentPart, updater: PartUpdater) => {
     const block = settingsBlock(part, 'actuator');
     if (block) {
       block.data.desiredState = block.data.state === DigitalState.Active
