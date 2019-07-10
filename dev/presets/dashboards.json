@@ -11,8 +11,8 @@
       "order": 2
     },
     {
-      "_id": "process-view",
-      "title": "ProcessView Dashboard",
+      "_id": "builder",
+      "title": "Brewery Builder Dashboard",
       "order": 3
     },
     {

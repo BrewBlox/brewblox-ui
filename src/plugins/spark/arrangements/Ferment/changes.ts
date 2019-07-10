@@ -252,7 +252,7 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
     },
   });
 
-  const createProcessView = (): DashboardItem => ({
+  const createBuilder = (): DashboardItem => ({
     ...createWidget(`${config.prefix} Fridge`, 'ProcessView'),
     cols: 3,
     rows: 5,
@@ -497,7 +497,7 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
     pinnedPosition: { x: 5, y: 6 },
   });
 
-  return [createProcessView(), createGraph(), createStepView(), createProfile(config.names.tempProfile)];
+  return [createBuilder(), createGraph(), createStepView(), createProfile(config.names.tempProfile)];
 };
 
 export const createActions = (): WizardAction[] => {
