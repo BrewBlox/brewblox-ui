@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 
 import { DigitalState } from '@/plugins/spark/types';
 
@@ -34,6 +34,15 @@ export default class Pump extends PartComponent {
         c0.4-0.5,0.9-1,1.3-1.4l0.7,1.6c-1.8,0.1-3.6,0.1-5.5,0l-2.3-0.1
         l1.7-1.5c0.5-0.4,1-0.9,1.5-1.3c0.5-0.4,1-0.8,1.5-1.3
         C25.6,10.9,26.6,10.2,27.7,9.5z`;
+  }
+
+  @Watch('actuatorBlock')
+  triggerUpdate(block, prevBlock) {
+    if (block === null
+      || prevBlock === null
+      || block.data.state !== prevBlock.data.state) {
+      this.savePartState();
+    }
   }
 }
 </script>
