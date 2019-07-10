@@ -453,7 +453,7 @@ export default class BuilderForm extends CrudComponent {
                 :part="part"
                 show-hover
                 @update:part="updatePart"
-                @update:state="updatePartState"
+                @dirty="invalidateFlows"
               />
             </g>
             <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">

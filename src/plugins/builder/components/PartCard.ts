@@ -13,10 +13,6 @@ export default class PartCard extends Vue {
     this.$emit('update:part', part);
   }
 
-  public savePartState(part: FlowPart = this.part): void {
-    this.$emit('update:state', part);
-  }
-
   public removePart(): void {
     this.$emit('remove:part', this.part);
   }
