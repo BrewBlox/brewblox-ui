@@ -4,6 +4,7 @@ import { WizardAction } from '@/components/Wizard/WizardTaskBase';
 import { Link, Unit } from '@/helpers/units';
 import { MutexLink, ProcessValueLink, SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
 import { serialize } from '@/helpers/units/parseObject';
+import { typeName as builderType } from '@/plugins/builder/getters';
 import { FermentConfig, PinChannel } from '@/plugins/spark/arrangements/Ferment/types';
 import sparkStore from '@/plugins/spark/store';
 import dashboardStore, { DashboardItem } from '@/store/dashboards';
@@ -253,7 +254,7 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
   });
 
   const createBuilder = (): DashboardItem => ({
-    ...createWidget(`${config.prefix} Fridge`, 'ProcessView'),
+    ...createWidget(`${config.prefix} Fridge`, builderType),
     cols: 3,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
