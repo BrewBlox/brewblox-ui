@@ -84,7 +84,9 @@ export default class SparkWatcher extends WatcherBase {
 
   mounted() {
     this.$watch('updating', this.handleUpdateChange);
-    this.cancelStatusWatcher = this.$watch('status', this.handleStatusChange);
+    // TODO(Bob)
+    // Disabled until firmware update feature is ready for release
+    // this.cancelStatusWatcher = this.$watch('status', this.handleStatusChange);
   }
 
   render() {
