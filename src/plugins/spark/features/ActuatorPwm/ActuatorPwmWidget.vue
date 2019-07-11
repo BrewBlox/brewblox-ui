@@ -9,13 +9,6 @@ import { ActuatorPwmBlock } from './types';
 export default class ActuatorPwmWidget extends BlockWidget {
   readonly block!: ActuatorPwmBlock;
 
-  get renamedTargets() {
-    return {
-      setting: 'Duty Setting',
-      value: 'Duty Achieved',
-    };
-  }
-
   get constrained() {
     const { setting, desiredSetting } = this.block.data;
     return setting === desiredSetting

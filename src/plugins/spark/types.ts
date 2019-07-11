@@ -23,6 +23,7 @@ export interface BlockSpec {
   generate: BlockDataGenerator;
   presets: BlockDataPreset[];
   changes: ChangeField[];
+  graphTargets?: Record<string, string>;
 }
 
 export interface SparkFeature {

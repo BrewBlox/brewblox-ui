@@ -1,8 +1,10 @@
 import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { GraphConfig } from '@/components/Graph/types';
 import CrudComponent, { Crud } from '@/components/Widget/CrudComponent';
 import { showBlockDialog } from '@/helpers/dialog';
+import { postfixedDisplayNames } from '@/helpers/units';
 import sparkStore from '@/plugins/spark/store';
 
 import { blockIdRules } from '../helpers';
@@ -44,6 +46,49 @@ export default class BlockCrudComponent extends CrudComponent {
   public get constrainers(): string | null {
     const limiting: string[] = sparkStore.limiters(this.serviceId)[this.blockId];
     return limiting ? limiting.join(', ') : null;
+  }
+
+  public get hasGraph() {
+    return !!sparkStore.specs[this.block.type].graphTargets;
+  }
+
+  public get renamedTargets(): Record<string, string> {
+    const spec = sparkStore.specs[this.block.type];
+    return !!spec.graphTargets
+      ? postfixedDisplayNames(spec.graphTargets, this.block.data)
+      : {};
+  }
+
+  public get graphCfg(): GraphConfig {
+    const blockFmt = (val: string): string => [this.blockId, val].join('/');
+    const serviceFmt = (val: string): string => [this.serviceId, this.blockId, val].join('/');
+
+    return {
+      // persisted in config
+      params: this.widget.config.queryParams || { duration: '10m' },
+      axes: this.widget.config.graphAxes || {},
+      // constants
+      layout: {
+        title: this.widget.title,
+      },
+      targets: [
+        {
+          measurement: this.serviceId,
+          fields: Object.keys(this.renamedTargets)
+            .map(k => blockFmt(k)),
+        },
+      ],
+      renames: Object.entries(this.renamedTargets)
+        .reduce((acc, [k, v]) => ({ ...acc, [serviceFmt(k)]: v }), {}),
+    };
+  }
+
+  public set graphCfg(config: GraphConfig) {
+    this.saveConfig({
+      ...this.widget.config,
+      queryParams: { ...config.params },
+      graphAxes: { ...config.axes },
+    });
   }
 
   public async saveBlock(block: Block = this.block) {

@@ -1,7 +1,6 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
 import { TempSensorMockBlock } from './types';
@@ -9,21 +8,12 @@ import { TempSensorMockBlock } from './types';
 @Component
 export default class TempSensorMockWidget extends BlockWidget {
   readonly block!: TempSensorMockBlock;
-
-  get renamedTargets() {
-    return postfixedDisplayNames(
-      {
-        value: 'Sensor value',
-      },
-      this.block.data,
-    );
-  }
 }
 </script>
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" :graph-cfg.sync="graphCfg"/>
+    <BlockWidgetToolbar :crud="crud" :graph-cfg.sync="graphCfg" />
 
     <q-card-section>
       <q-item dark>

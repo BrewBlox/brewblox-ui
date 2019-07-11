@@ -62,6 +62,10 @@ const block: BlockSpec = {
       generate: () => new ActuatorDigitalLink(null),
     },
   ],
+  graphTargets: {
+    setting: 'Duty Setting',
+    value: 'Duty Achieved',
+  },
 };
 
 const feature: Feature = {

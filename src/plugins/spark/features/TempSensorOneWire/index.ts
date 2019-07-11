@@ -18,6 +18,9 @@ const block: BlockSpec = {
   }),
   presets: [],
   changes: [],
+  graphTargets: {
+    value: 'Sensor value',
+  },
 };
 
 const feature: Feature = {

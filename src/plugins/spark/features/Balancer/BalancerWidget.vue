@@ -18,23 +18,24 @@ export default class BalancerWidget extends BlockWidget {
     return this.clientNames[id] || id || 'unknown';
   }
 
-  get renamedTargets() {
-    return this.block.data.clients
-      .reduce(
-        (acc, client, idx) => ({
-          ...acc,
-          [`clients/${idx}/requested`]: `${this.clientName(client.id)} requested`,
-          [`clients/${idx}/granted`]: `${this.clientName(client.id)} granted`,
-        }),
-        {},
-      );
-  }
+  // TODO: implement
+  // get renamedTargets() {
+  //   return this.block.data.clients
+  //     .reduce(
+  //       (acc, client, idx) => ({
+  //         ...acc,
+  //         [`clients/${idx}/requested`]: `${this.clientName(client.id)} requested`,
+  //         [`clients/${idx}/granted`]: `${this.clientName(client.id)} granted`,
+  //       }),
+  //       {},
+  //     );
+  // }
 }
 </script>
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" :graph-cfg.sync="graphCfg"/>
+    <BlockWidgetToolbar :crud="crud" :graph-cfg.sync="graphCfg" />
 
     <q-card-section>
       <q-item dark dense style="opacity: 0.5">
