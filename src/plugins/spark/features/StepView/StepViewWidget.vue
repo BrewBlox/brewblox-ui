@@ -156,8 +156,8 @@ export default class StepViewWidget extends WidgetBase {
             :disable="!applicableSteps[step.id]"
             :loading="applying"
             :color="activeSteps[step.id] ? 'positive': ''"
+            :label="activeSteps[step.id] ? 'active': 'apply'"
             outline
-            label="apply"
             @click="applyStep(step)"
           >
             <q-tooltip v-if="activeSteps[step.id]">Step is applied</q-tooltip>

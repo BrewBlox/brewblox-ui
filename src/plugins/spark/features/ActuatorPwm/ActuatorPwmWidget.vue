@@ -9,13 +9,6 @@ import { ActuatorPwmBlock } from './types';
 export default class ActuatorPwmWidget extends BlockWidget {
   readonly block!: ActuatorPwmBlock;
 
-  get renamedTargets() {
-    return {
-      setting: 'Duty Setting',
-      value: 'Duty Achieved',
-    };
-  }
-
   get constrained() {
     const { setting, desiredSetting } = this.block.data;
     return setting === desiredSetting
@@ -27,7 +20,7 @@ export default class ActuatorPwmWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" :graph-cfg.sync="graphCfg" />
+    <BlockWidgetToolbar :crud="crud" />
 
     <q-card-section>
       <q-item v-if="!block.data.enabled" dark>

@@ -2,7 +2,6 @@
 import { Component } from 'vue-property-decorator';
 
 import { showBlockDialog } from '@/helpers/dialog';
-import { postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import sparkStore from '@/plugins/spark/store';
 
@@ -14,24 +13,6 @@ export default class PidWidget extends BlockWidget {
   readonly block!: PidBlock;
   inputFormOpen = false;
   relationsOpen = false;
-
-  get renamedTargets() {
-    return postfixedDisplayNames(
-      {
-        inputSetting: 'Input target',
-        inputValue: 'Input value',
-        error: 'Error',
-        derivative: 'Derivative of input',
-        integral: 'Integral of error',
-        p: 'P',
-        i: 'I',
-        d: 'D',
-        outputSetting: 'Output target (P+I+D)',
-        outputValue: 'Output value',
-      },
-      this.block.data,
-    );
-  }
 
   get inputId() {
     return this.block.data.inputId.id;
@@ -76,7 +57,7 @@ export default class PidWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" :graph-cfg.sync="graphCfg">
+    <BlockWidgetToolbar :crud="crud">
       <template v-slot:actions>
         <ActionItem icon="mdi-ray-start-arrow" label="Show Relations" @click="showRelations" />
       </template>

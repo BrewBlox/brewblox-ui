@@ -129,6 +129,18 @@ const block: BlockSpec = {
       generate: () => new ActuatorAnalogLink(null),
     },
   ],
+  graphTargets: {
+    inputSetting: 'Input target',
+    inputValue: 'Input value',
+    error: 'Error',
+    derivative: 'Derivative of input',
+    integral: 'Integral of error',
+    p: 'P',
+    i: 'I',
+    d: 'D',
+    outputSetting: 'Output target (P+I+D)',
+    outputValue: 'Output value',
+  },
 };
 
 const feature: Feature = {

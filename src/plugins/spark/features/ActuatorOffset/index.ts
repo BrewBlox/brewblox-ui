@@ -49,6 +49,10 @@ const block: BlockSpec = {
       generate: () => new SetpointSensorPairLink(null),
     },
   ],
+  graphTargets: {
+    setting: 'Target offset',
+    value: 'Actual offset',
+  },
 };
 
 const feature: Feature = {

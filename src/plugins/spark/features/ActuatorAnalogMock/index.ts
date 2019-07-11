@@ -52,6 +52,10 @@ const block: BlockSpec = {
       generate: () => 100,
     },
   ],
+  graphTargets: {
+    setting: 'Setting',
+    value: 'Value',
+  },
 };
 
 const feature: Feature = {

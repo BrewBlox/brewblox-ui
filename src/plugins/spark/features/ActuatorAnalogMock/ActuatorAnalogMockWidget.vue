@@ -8,24 +8,17 @@ import { ActuatorAnalogMockBlock } from './types';
 @Component
 export default class ActuatorAnalogMockWidget extends BlockWidget {
   readonly block!: ActuatorAnalogMockBlock;
-
-  get renamedTargets() {
-    return {
-      setting: 'Setting',
-      value: 'Value',
-    };
-  }
 }
 </script>
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" :graph-cfg.sync="graphCfg"/>
+    <BlockWidgetToolbar :crud="crud" />
 
     <q-card-section>
       <q-item v-if="block.value === null" dark>
         <q-item-section avatar>
-          <q-icon name="warning"/>
+          <q-icon name="warning" />
         </q-item-section>
         <q-item-section>This Actuator is invalid</q-item-section>
       </q-item>
@@ -40,7 +33,7 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
             type="number"
             @input="v => { block.data.desiredSetting = v; saveBlock(); }"
           />
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
         </q-item-section>
         <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Value</q-item-label>
@@ -49,7 +42,7 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
       </q-item>
       <q-item dark>
         <q-item-section>
-          <AnalogConstraints :value="block.data.constrainedBy" :service-id="serviceId" readonly/>
+          <AnalogConstraints :value="block.data.constrainedBy" :service-id="serviceId" readonly />
         </q-item-section>
       </q-item>
     </q-card-section>
