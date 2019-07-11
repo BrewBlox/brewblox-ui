@@ -11,8 +11,6 @@ import { Session, SessionViewConfig } from './types';
 
 @Component
 export default class SessionViewWidget extends WidgetBase {
-  modalOpen: boolean = false;
-  modalSession: Session | null = null;
   graphSessionId: string | null = null;
   sessionFilter: string = '';
 
@@ -56,9 +54,13 @@ export default class SessionViewWidget extends WidgetBase {
     return `${shortDateString(session.start)} to ${shortDateString(session.end)}`;
   }
 
-  openModal(session: Session | null = null) {
-    this.modalSession = session;
-    this.modalOpen = true;
+  openModal(activeSession: Session | null = null) {
+    this.showForm({
+      getProps: () => ({ activeSession }),
+      listeners: {
+        createSession: this.createSession,
+      },
+    });
   }
 
   createSession() {
@@ -92,8 +94,7 @@ export default class SessionViewWidget extends WidgetBase {
           ...this.widgetConfig,
           sessions: [...this.widgetConfig.sessions, session],
         });
-        this.modalSession = session;
-        this.modalOpen = true;
+        this.openModal(session);
       });
   }
 }
@@ -101,14 +102,6 @@ export default class SessionViewWidget extends WidgetBase {
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <SessionViewForm
-        v-if="modalOpen"
-        :crud="crud"
-        :active-session="modalSession"
-        @create-session="createSession"
-      />
-    </q-dialog>
     <BlockGraph
       v-if="graphSession"
       :value="true"
@@ -121,9 +114,9 @@ export default class SessionViewWidget extends WidgetBase {
 
     <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
-        <q-btn-dropdown flat split icon="settings" @click="openModal()">
+        <q-btn-dropdown flat split icon="settings" @click="openModal">
           <q-list dark bordered>
-            <WidgetActions :crud="crud"/>
+            <WidgetActions :crud="crud" />
           </q-list>
         </q-btn-dropdown>
       </q-item-section>
@@ -134,12 +127,12 @@ export default class SessionViewWidget extends WidgetBase {
         <q-item-section>
           <q-input v-model="sessionFilter" placeholder="Search Session" clearable dark>
             <template v-slot:append>
-              <q-icon name="search"/>
+              <q-icon name="search" />
             </template>
           </q-input>
         </q-item-section>
         <q-item-section side>
-          <q-btn flat rounded icon="add" label="New" class="text-white" @click="createSession"/>
+          <q-btn flat rounded icon="add" label="New" class="text-white" @click="createSession" />
         </q-item-section>
       </q-item>
       <q-item v-for="session in sessions" :key="session.id" dark>
@@ -148,10 +141,10 @@ export default class SessionViewWidget extends WidgetBase {
           <q-item-label caption>{{ periodString(session) }}</q-item-label>
         </q-item-section>
         <q-item-section side>
-          <q-btn flat rounded icon="settings" @click="openModal(session)"/>
+          <q-btn flat rounded icon="settings" @click="openModal(session)" />
         </q-item-section>
         <q-item-section side>
-          <q-btn flat rounded icon="mdi-chart-line" @click="graphSessionId = session.id"/>
+          <q-btn flat rounded icon="mdi-chart-line" @click="graphSessionId = session.id" />
         </q-item-section>
       </q-item>
     </q-card-section>

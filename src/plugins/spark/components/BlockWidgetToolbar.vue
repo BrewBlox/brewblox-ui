@@ -9,7 +9,6 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
 
   @Prop({ type: Object })
   public readonly graphProps!: any;
-
 }
 </script>
 
@@ -34,8 +33,8 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
           />
           <slot name="actions" />
           <ActionItem icon="refresh" label="Refresh" @click="refreshBlock" />
-          <WidgetActions :crud="crud" no-rename />
-          <BlockActions :crud="crud" />
+          <WidgetActions :crud="crud" no-rename @close="close" />
+          <BlockActions :crud="crud" @close="close" />
         </q-list>
       </q-btn-dropdown>
     </q-item-section>

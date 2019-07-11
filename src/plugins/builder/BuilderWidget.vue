@@ -150,7 +150,7 @@ export default class BuilderWidget extends WidgetBase {
         >
           <q-list dark bordered>
             <ExportAction :crud="crud" />
-            <WidgetActions :crud="crud" />
+            <WidgetActions :crud="crud" @close="close" />
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

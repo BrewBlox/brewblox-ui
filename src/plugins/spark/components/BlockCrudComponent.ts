@@ -19,6 +19,7 @@ export interface BlockCrud extends Crud {
 
 @Component
 export default class BlockCrudComponent extends CrudComponent {
+  private activeDialog: any = null;
 
   @Prop({ type: Object, required: true })
   public readonly crud!: BlockCrud;
@@ -99,6 +100,7 @@ export default class BlockCrudComponent extends CrudComponent {
   public async removeBlock() {
     if (this.isStoreBlock) {
       await sparkStore.removeBlock([this.serviceId, this.block]);
+      this.closeDialog();
     }
   }
 
@@ -124,13 +126,21 @@ export default class BlockCrudComponent extends CrudComponent {
 
   public openModal(opts: { formProps?: any; graphProps?: any } = {}): void {
     const { formProps, graphProps } = opts;
-    Dialog.create({
+    this.activeDialog = Dialog.create({
       component: 'FormDialog',
       root: this.$root,
-      getCrud: () => this.crud,
-      getFormProps: () => formProps,
+      getCrud: () => ({ ...this.crud, closeDialog: this.closeDialog }),
+      getProps: () => formProps,
       getGraphProps: () => graphProps,
     });
+  }
+
+  public closeDialog() {
+    if (this.activeDialog) {
+      this.activeDialog.hide();
+      this.activeDialog = null;
+    }
+    this.closeDialog();
   }
 
   public showOtherBlock(block: Block, props: any = {}) {
@@ -146,7 +156,10 @@ export default class BlockCrudComponent extends CrudComponent {
       rules: blockIdRules(this.serviceId),
       value: blockId,
     })
-      .onOk(this.changeBlockId);
+      .onOk(async (newId: string) => {
+        await this.changeBlockId(newId);
+        this.closeDialog();
+      });
   }
 
   public startSwitchBlock() {
