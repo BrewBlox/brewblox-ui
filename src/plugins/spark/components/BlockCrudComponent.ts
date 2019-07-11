@@ -1,3 +1,4 @@
+import get from 'lodash/get';
 import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
@@ -49,13 +50,13 @@ export default class BlockCrudComponent extends CrudComponent {
   }
 
   public get hasGraph() {
-    return !!sparkStore.specs[this.block.type].graphTargets;
+    return !!get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
   }
 
   public get renamedTargets(): Record<string, string> {
-    const spec = sparkStore.specs[this.block.type];
-    return !!spec.graphTargets
-      ? postfixedDisplayNames(spec.graphTargets, this.block.data)
+    const targets = get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
+    return !!targets
+      ? postfixedDisplayNames(targets, this.block.data)
       : {};
   }
 

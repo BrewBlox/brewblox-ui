@@ -35,7 +35,7 @@ export default class BalancerWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" :graph-cfg.sync="graphCfg" />
+    <BlockWidgetToolbar :crud="crud" />
 
     <q-card-section>
       <q-item dark dense style="opacity: 0.5">
