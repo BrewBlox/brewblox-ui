@@ -1,4 +1,3 @@
-import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
@@ -31,6 +30,7 @@ export default class BlockWidget extends WidgetBase {
       block: this.block,
       isStoreBlock: true,
       saveBlock: this.saveBlock,
+      closeDialog: this.closeDialog,
     };
   }
 
@@ -51,12 +51,8 @@ export default class BlockWidget extends WidgetBase {
     }
   }
 
-  public openModal(): void {
-    Dialog.create({
-      component: 'FormDialog',
-      root: this.$root,
-      getCrud: () => this.crud,
-    });
+  public openModal(args: Record<string, any> = {}): void {
+    this.showForm(args);
   }
 
   public async refreshBlock(): Promise<void> {

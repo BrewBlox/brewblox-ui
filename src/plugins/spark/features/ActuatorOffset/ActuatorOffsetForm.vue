@@ -12,7 +12,7 @@ export default class ActuatorOffsetForm extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud"/>
+    <BlockFormToolbar :crud="crud" @close="close" />
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
@@ -65,7 +65,7 @@ export default class ActuatorOffsetForm extends BlockCrudComponent {
               type="number"
               @input="v => { block.data.desiredSetting = v; saveBlock(); }"
             />
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
           </q-item-section>
           <q-item-section style="justify-content: flex-start">
             <q-item-label caption>Current offset</q-item-label>

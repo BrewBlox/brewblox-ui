@@ -16,17 +16,20 @@ export default class FormDialog extends DialogBase {
   public readonly getCrud!: () => Crud;
 
   @Prop({ type: Function, default: () => null })
-  public readonly getFormProps!: () => any;
+  public readonly getProps!: () => any;
 
   @Prop({ type: Function, default: () => null })
   public readonly getGraphProps!: () => any;
+
+  @Prop({ type: Object, default: () => ({}) })
+  public readonly listeners!: any;
 
   get crud(): Crud {
     return this.getCrud();
   }
 
   get formProps(): any {
-    return this.getFormProps() || {};
+    return this.getProps() || {};
   }
 
   get graphProps(): any {
@@ -52,9 +55,9 @@ export default class FormDialog extends DialogBase {
       style="width: 600px;"
     >
       <q-card dark class="q-pa-xs bg-dark-bright">
-        <Graph v-bind="graphProps"/>
+        <Graph v-bind="graphProps" />
       </q-card>
     </ScreenSizeConstrained>
-    <component :is="form" :crud="crud" v-bind="formProps"/>
+    <component :is="form" :crud="crud" v-bind="formProps" v-on="listeners" @close="hide" />
   </q-dialog>
 </template>

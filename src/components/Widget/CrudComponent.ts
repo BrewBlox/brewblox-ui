@@ -10,7 +10,8 @@ import featureStore from '@/store/features';
 export interface Crud {
   widget: DashboardItem;
   isStoreWidget: boolean;
-  saveWidget: (widget: DashboardItem) => unknown | Promise<unknown>;
+  saveWidget(widget: DashboardItem): unknown | Promise<unknown>;
+  closeDialog(): void;
 }
 
 @Component
@@ -28,6 +29,10 @@ export default class CrudComponent extends Vue {
 
   public get displayName(): string {
     return featureStore.displayNameById(this.widget.feature);
+  }
+
+  public closeDialog() {
+    this.crud.closeDialog();
   }
 
   public saveWidget(widget: DashboardItem = this.widget) {
@@ -99,7 +104,10 @@ export default class CrudComponent extends Vue {
   }
 
   public startRemoveWidget() {
-    const deleteItem = () => dashboardStore.removeDashboardItem(this.widget);
+    const deleteItem = async () => {
+      await dashboardStore.removeDashboardItem(this.widget);
+      this.closeDialog();
+    };
 
     // Quasar dialog can't handle objects as value - they will be returned as null
     // As workaround, we use array index as value, and add the "action" key to each option

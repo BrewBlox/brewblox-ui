@@ -1,3 +1,4 @@
+import { Dialog } from 'quasar';
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
@@ -8,6 +9,7 @@ import { Crud } from './CrudComponent';
 
 @Component
 export default class WidgetBase extends Vue {
+  public activeDialog: any = null;
 
   @Prop({ type: Boolean, default: false })
   public readonly volatile!: boolean;
@@ -33,6 +35,23 @@ export default class WidgetBase extends Vue {
       widget: this.widget,
       isStoreWidget: !this.volatile,
       saveWidget: this.saveWidget,
+      closeDialog: this.closeDialog,
     };
+  }
+
+  public showForm(args: Record<string, any> = {}) {
+    this.activeDialog = Dialog.create({
+      component: 'FormDialog',
+      getCrud: () => this.crud,
+      ...args,
+    });
+    return this.activeDialog;
+  }
+
+  public closeDialog() {
+    if (this.activeDialog) {
+      this.activeDialog.hide();
+      this.activeDialog = null;
+    }
   }
 }
