@@ -275,10 +275,14 @@ export default class BuilderForm extends CrudComponent {
     this.movePanHandler(args, part, true);
   }
 
-  addPartClickHandler(evt: ClickEvent, part: FlowPart) {
-    if (!part) {
-      this.catalogPartial = this.findClickSquare(evt);
-      this.catalogModalOpen = true;
+  addPartClickHandler(evt: ClickEvent) {
+    const pos = this.findClickSquare(evt);
+    if (pos) {
+      const coord = new Coordinates({ ...pos, z: 0 });
+      if (this.allBlockedCoords().every(c => !c.equals(coord))) {
+        this.catalogPartial = pos;
+        this.catalogModalOpen = true;
+      }
     }
   }
 
@@ -313,6 +317,13 @@ export default class BuilderForm extends CrudComponent {
     return specs[part.type].blockedCoordinates(part);
   }
 
+  allBlockedCoords(source: PersistentPart | null = null): Coordinates[] {
+    return this.parts
+      .filter(part => !source || part.id !== source.id)
+      .reduce(
+        (acc: Coordinates[], part: PersistentPart) => [...acc, ...this.blockedByPart(part)], []);
+  }
+
   async movePart(from: PersistentPart | null, to: PersistentPart) {
     if (from
       && from.id === to.id
@@ -322,14 +333,10 @@ export default class BuilderForm extends CrudComponent {
     }
 
     const toCoords: Coordinates[] = this.blockedByPart(to);
-    const allBlockedCoords: Coordinates[] =
-      this.parts
-        .filter(part => !from || part.id !== from.id)
-        .reduce(
-          (acc: Coordinates[], part: PersistentPart) => [...acc, ...this.blockedByPart(part)], []);
+    const allBlocked = this.allBlockedCoords(from);
 
     for (let toCoord of toCoords) {
-      for (let blockedCoord of allBlockedCoords)
+      for (let blockedCoord of allBlocked)
         if (blockedCoord.equals(toCoord)) {
           this.$q.notify({
             color: 'negative',
