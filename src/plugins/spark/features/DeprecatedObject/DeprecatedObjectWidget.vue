@@ -11,20 +11,8 @@ import { DeprecatedObjectBlock } from './types';
 @Component
 export default class DeprecatedObjectWidget extends BlockWidget {
   readonly block!: DeprecatedObjectBlock;
-
   actual: Block | null = null;
-  // TODO: implement
-  // get renamedTargets() {
-  //   return this.block.data.clients
-  //     .reduce(
-  //       (acc, client, idx) => ({
-  //         ...acc,
-  //         [`clients/${idx}/requested`]: `${this.clientName(client.id)} requested`,
-  //         [`clients/${idx}/granted`]: `${this.clientName(client.id)} granted`,
-  //       }),
-  //       {},
-  //     );
-  // }
+
   async created() {
     this.actual = await fetchStoredBlock(this.serviceId, this.block.data.actualId);
   }
