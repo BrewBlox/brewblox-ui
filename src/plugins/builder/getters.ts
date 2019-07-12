@@ -17,6 +17,12 @@ export const HOT_WATER = '#DB0023';
 export const BEER = '#E1AC00';
 export const WORT = '#C78A49';
 
+export const deprecatedTypes = {
+  SmallKettle: 'Kettle',
+  LargeKettle: 'Kettle',
+  TallFridge: 'Fridge',
+};
+
 export const defaultSpec: ComponentSpec = {
   cards: [],
   size: () => [1, 1],

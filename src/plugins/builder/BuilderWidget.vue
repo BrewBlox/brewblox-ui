@@ -7,7 +7,7 @@ import { spaceCased } from '@/helpers/functional';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import { calculateNormalizedFlows } from './calculateFlows';
-import { SQUARE_SIZE } from './getters';
+import { SQUARE_SIZE, deprecatedTypes } from './getters';
 import specs from './specs';
 import { BuilderConfig, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
 
@@ -79,22 +79,23 @@ export default class BuilderWidget extends WidgetBase {
   }
 
   get parts(): PersistentPart[] {
+    const sizes: Record<string, number> = {};
     return this.widgetConfig.parts
       .map(part => {
-        const statePart = {
+        const actual: PersistentPart = {
           id: uid(),
           rotate: 0,
           settings: {},
           flipped: false,
           ...part,
-          state: this.partState[part.id] || {},
+          type: deprecatedTypes[part.type] || part.type,
         };
-        const [sizeX, sizeY] = specs[part.type].size(part);
-        statePart.state.area = sizeX * sizeY;
-        return statePart;
+        const [sizeX, sizeY] = specs[actual.type].size(actual);
+        sizes[part.id] = sizeX * sizeY;
+        return actual;
       })
       // sort parts to render largest first
-      .sort((a, b) => b.state.area - a.state.area);
+      .sort((a, b) => sizes[b.id] - sizes[a.id]);
   }
 
   get updater(): PartUpdater {

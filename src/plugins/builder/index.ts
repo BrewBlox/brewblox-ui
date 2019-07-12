@@ -5,7 +5,7 @@ import featureStore from '@/store/features';
 import form from './BuilderForm.vue';
 import widget from './BuilderWidget.vue';
 import wizard from './BuilderWizard.vue';
-import { typeName } from './getters';
+import { deprecatedTypes,typeName } from './getters';
 import { parts } from './register';
 import { BuilderConfig } from './types';
 
@@ -16,7 +16,7 @@ const feature: Feature = {
   wizard: ref(wizard),
   form: ref(form),
   validator: (config: BuilderConfig) =>
-    config.parts.every(part => parts.includes(part.type)),
+    config.parts.every(part => parts.includes(part.type) || !!deprecatedTypes[part.type]),
   widgetSize: {
     cols: 8,
     rows: 8,
