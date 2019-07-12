@@ -12,7 +12,7 @@ export default class BlockFormToolbar extends BlockCrudComponent {
 </script>
 
 <template>
-  <FormToolbar :crud="crud" @close="close">
+  <FormToolbar :crud="crud">
     <BlockGraph
       v-if="graphModalOpen"
       v-model="graphModalOpen"
@@ -30,8 +30,8 @@ export default class BlockFormToolbar extends BlockCrudComponent {
             @click="graphModalOpen = true"
           />
           <slot name="actions" />
-          <WidgetActions :crud="crud" no-rename @close="close" />
-          <BlockActions :crud="crud" @close="close" />
+          <WidgetActions :crud="crud" no-rename />
+          <BlockActions :crud="crud" />
         </q-list>
       </q-btn-dropdown>
     </template>
