@@ -36,6 +36,11 @@ export const fetchBlock = async (block: Block): Promise<Block> =>
     .then(fetched => asBlock(fetched, block.serviceId))
     .catch(intercept(`Failed to fetch ${block.id}`));
 
+export const fetchStoredBlock = async (serviceId: string, id: string | number): Promise<Block> =>
+  get(`/${encodeURIComponent(serviceId)}/stored_objects/${encodeURIComponent(id)}`)
+    .then(fetched => asBlock(fetched, serviceId))
+    .catch(intercept(`Failed to fetch stored block ${id}`));
+
 export const createBlock = async (block: Block): Promise<Block> =>
   post(
     `/${encodeURIComponent(block.serviceId)}/objects`,
