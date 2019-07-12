@@ -19,7 +19,7 @@ export default class FormToolbar extends CrudComponent { }
         <q-btn-dropdown flat icon="mdi-pencil">
           <q-list dark bordered>
             <slot name="actions" />
-            <WidgetActions :crud="crud" @close="close" />
+            <WidgetActions :crud="crud" />
           </q-list>
         </q-btn-dropdown>
       </slot>

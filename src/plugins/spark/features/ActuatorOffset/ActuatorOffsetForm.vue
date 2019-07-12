@@ -12,7 +12,7 @@ export default class ActuatorOffsetForm extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud" @close="close" />
+    <BlockFormToolbar :crud="crud" />
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">

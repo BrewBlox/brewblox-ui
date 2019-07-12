@@ -6,6 +6,7 @@ import ActuatorPwm from './ActuatorPwm';
 import Balancer from './Balancer';
 import DS2408 from './DS2408';
 import DS2413 from './DS2413';
+import DeprecatedObject from './DeprecatedObject';
 import DigitalActuator from './DigitalActuator';
 import DisplaySettings from './DisplaySettings';
 import InactiveObject from './InactiveObject';
@@ -30,6 +31,7 @@ const features: { [id: string]: SparkFeature } = {
   DisplaySettings,
   DS2408,
   DS2413,
+  DeprecatedObject,
   InactiveObject,
   Pid,
   MotorValve,

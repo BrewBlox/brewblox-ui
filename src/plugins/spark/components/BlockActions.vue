@@ -19,10 +19,10 @@ export default class BlockActions extends BlockCrudComponent { }
         @click="startSwitchBlock"
       />
       <ActionItem icon="mdi-information" label="Block Info" @click="startBlockInfo" />
-      <CloneBlockAction :crud="crud" @close="close" />
-      <BlockGroupsAction :crud="crud" @close="close" />
-      <BlockPresetsAction :crud="crud" @close="close" />
-      <RemoveBlockAction :crud="crud" @close="close" />
+      <CloneBlockAction :crud="crud" />
+      <BlockGroupsAction :crud="crud" />
+      <BlockPresetsAction :crud="crud" />
+      <RemoveBlockAction :crud="crud" />
     </q-list>
   </q-expansion-item>
 </template>
