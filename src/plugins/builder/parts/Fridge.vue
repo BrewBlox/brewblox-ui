@@ -5,7 +5,7 @@ import PartBase from '../components/PartBase';
 
 
 @Component
-export default class TallFridge extends PartBase {
+export default class Fridge extends PartBase {
   get titleText(): string {
     return this.part.settings.text || '';
   }
@@ -42,7 +42,11 @@ export default class TallFridge extends PartBase {
         stroke-width="4px"
       />
       <g>
-        <foreignObject :width="squares(sizeX)" :height="squares(sizeY)">
+        <foreignObject
+          :transform="textTransformation([sizeX, sizeY], false)"
+          :width="squares(sizeX)"
+          :height="squares(sizeY)"
+        >
           <div
             class="text-white text-bold text-center text-h6 q-mt-xs"
             style="max-width: 100%"

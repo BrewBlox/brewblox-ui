@@ -263,7 +263,7 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
       parts: [
         {
           id: uid(),
-          type: 'TallFridge',
+          type: 'Fridge',
           x: 1,
           y: 1,
           rotate: 0,
