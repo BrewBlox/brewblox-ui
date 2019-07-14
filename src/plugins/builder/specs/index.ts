@@ -10,6 +10,7 @@ import CounterflowChiller from './CounterflowChiller';
 import CrossTube from './CrossTube';
 import DipTube from './DipTube';
 import ElbowTube from './ElbowTube';
+import FilterBottom from './FilterBottom';
 import Fridge from './Fridge';
 import HeatingElement from './HeatingElement';
 import ImmersionCoil from './ImmersionCoil';
@@ -41,6 +42,7 @@ const specs: { [key: string]: ComponentSpec } = {
   CrossTube,
   DipTube,
   ElbowTube,
+  FilterBottom,
   HeatingElement,
   ImmersionCoil,
   Keg,
