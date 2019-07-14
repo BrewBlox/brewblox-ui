@@ -8,6 +8,7 @@ import {
   ClosePopup,
   Dialog,
   Notify,
+  QAvatar,
   QBanner,
   QBar,
   QBtn,
@@ -69,6 +70,7 @@ import Vue from 'vue';
 
 Vue.use(Quasar, {
   components: {
+    QAvatar,
     QBanner,
     QBar,
     QBtn,

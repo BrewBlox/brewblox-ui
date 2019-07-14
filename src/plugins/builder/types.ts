@@ -52,7 +52,6 @@ export interface ComponentSpec {
   cards: CardSpec[];
   transitions: (part: PersistentPart) => Transitions;
   size: (part: PersistentPart) => [number, number];
-  blockedCoordinates: (part: PersistentPart) => Coordinates[];
   interactHandler?: (part: PersistentPart, updater: PartUpdater) => void;
 }
 

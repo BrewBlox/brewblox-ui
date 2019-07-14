@@ -27,5 +27,4 @@ export const defaultSpec: ComponentSpec = {
   cards: [],
   size: () => [1, 1],
   transitions: () => ({}),
-  blockedCoordinates: (part: PersistentPart): Coordinates[] => [new Coordinates([part.x, part.y, 0])],
 };
