@@ -1,5 +1,3 @@
-import { Coordinates } from '@/helpers/coordinates';
-
 export interface FlowRoute {
   outCoords: string;
   friction?: number;

@@ -1,6 +1,4 @@
-import { Coordinates } from '@/helpers/coordinates';
-
-import { ComponentSpec, PersistentPart } from './types';
+import { ComponentSpec } from './types';
 
 export const typeName = 'Builder';
 export const SQUARE_SIZE = 50;
