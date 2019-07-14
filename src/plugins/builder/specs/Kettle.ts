@@ -8,6 +8,7 @@ const spec: ComponentSpec = {
   ...defaultSpec,
   cards: [
     { component: 'TextCard' },
+    { component: 'ColorCard' },
     {
       component: 'SizeCard',
       props: {
