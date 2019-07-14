@@ -4,7 +4,7 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { Coordinates } from '@/helpers/coordinates';
-import { clampRotation, spaceCased } from '@/helpers/functional';
+import { clampRotation } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/units/parseObject';
 
 import BuilderCatalog from './BuilderCatalog.vue';
@@ -38,7 +38,6 @@ interface ToolAction {
 })
 export default class BuilderForm extends CrudComponent {
   SQUARE_SIZE = SQUARE_SIZE;
-  spaceCased = spaceCased;
 
   $refs!: {
     grid: any;
@@ -196,6 +195,17 @@ export default class BuilderForm extends CrudComponent {
     return this.flowParts.find(p => p.id === this.configuredPartId) || null;
   }
 
+  get overlaps(): [Coordinates, number][] {
+    const counts: Record<string, number> = {};
+    for (let part of this.parts) {
+      const key = new Coordinates([part.x, part.y, 0]).toString();
+      counts[key] = (counts[key] || 0) + 1;
+    }
+    return Object.entries(counts)
+      .filter(([, v]) => v > 1)
+      .map(([k, v]) => [new Coordinates(k), v] as [Coordinates, number]);
+  }
+
   clickHandler(evt: ClickEvent, part: FlowPart) {
     if (this.currentTool.onClick) {
       this.currentTool.onClick(evt, part);
@@ -278,11 +288,8 @@ export default class BuilderForm extends CrudComponent {
   addPartClickHandler(evt: ClickEvent) {
     const pos = this.findClickSquare(evt);
     if (pos) {
-      const coord = new Coordinates({ ...pos, z: 0 });
-      if (this.allBlockedCoords().every(c => !c.equals(coord))) {
-        this.catalogPartial = pos;
-        this.catalogModalOpen = true;
-      }
+      this.catalogPartial = pos;
+      this.catalogModalOpen = true;
     }
   }
 
@@ -313,38 +320,12 @@ export default class BuilderForm extends CrudComponent {
     }
   }
 
-  blockedByPart(part: PersistentPart) {
-    return specs[part.type].blockedCoordinates(part);
-  }
-
-  allBlockedCoords(source: PersistentPart | null = null): Coordinates[] {
-    return this.parts
-      .filter(part => !source || part.id !== source.id)
-      .reduce(
-        (acc: Coordinates[], part: PersistentPart) => [...acc, ...this.blockedByPart(part)], []);
-  }
-
   async movePart(from: PersistentPart | null, to: PersistentPart) {
     if (from
       && from.id === to.id
       && from.x === to.x
       && from.y === to.y) {
       return;
-    }
-
-    const toCoords: Coordinates[] = this.blockedByPart(to);
-    const allBlocked = this.allBlockedCoords(from);
-
-    for (let toCoord of toCoords) {
-      for (let blockedCoord of allBlocked)
-        if (blockedCoord.equals(toCoord)) {
-          this.$q.notify({
-            color: 'negative',
-            icon: 'error',
-            message: "Can't place this part here: location is blocked",
-          });
-          return;
-        }
     }
 
     await this.updateParts([...this.parts.filter(p => !from || p.id !== from.id), to]);
@@ -465,6 +446,14 @@ export default class BuilderForm extends CrudComponent {
             </g>
             <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
               <PartWrapper :part="dragAction.part" />
+            </g>
+            <g
+              v-for="([coord, val], idx) in overlaps"
+              :key="idx"
+              :transform="`translate(${coord.x * SQUARE_SIZE + 40}, ${coord.y * SQUARE_SIZE + 4})`"
+            >
+              <circle r="8" fill="dodgerblue" />
+              <text y="4" text-anchor="middle" fill="white" class="grid-item-coordinates">{{ val }}</text>
             </g>
           </svg>
         </div>
