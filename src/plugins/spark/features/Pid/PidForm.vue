@@ -65,7 +65,7 @@ export default class PidForm extends BlockCrudComponent {
       <q-expansion-item default-opened group="modal" icon="mdi-calculator-variant" label="Settings">
         <BlockEnableToggle
           v-bind="$props"
-          :text-enabled="`PID is enabled: output ${block.data.outputId} will be set to result of PID.`"
+          :text-enabled="`PID is enabled: output ${block.data.outputId} will be set to output of PID.`"
           :text-disabled="`PID is disabled: output ${block.data.outputId} will not be set.`"
           class="full-width bordered"
           v-on="$listeners"

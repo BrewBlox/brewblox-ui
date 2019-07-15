@@ -63,42 +63,28 @@ export default class PidWidget extends BlockWidget {
       </template>
     </BlockWidgetToolbar>
 
+    <CardWarning v-if="!block.data.enabled">
+      <template #message>
+        <span>
+          PID is disabled:
+          <i>{{ block.data.outputId }}</i> will not be set.
+        </span>
+      </template>
+      <template #actions>
+        <q-btn text-color="white" flat label="Enable" @click="enable" />
+      </template>
+    </CardWarning>
+
+    <CardWarning v-else-if="!block.data.active">
+      <template #message>
+        <span>
+          PID is inactive:
+          <i>{{ block.data.outputId }}</i> will not be set.
+        </span>
+      </template>
+    </CardWarning>
+    
     <q-card-section>
-      <slot />
-
-      <template v-if="!block.data.enabled">
-        <q-item dark>
-          <q-item-section avatar>
-            <q-icon name="warning" />
-          </q-item-section>
-          <q-item-section>
-            <span>
-              PID is disabled:
-              <i>{{ block.data.outputId }}</i> will not be set.
-            </span>
-          </q-item-section>
-          <q-item-section side>
-            <q-btn text-color="white" flat label="Enable" @click="enable" />
-          </q-item-section>
-        </q-item>
-        <q-separator dark inset class="q-mb-md" />
-      </template>
-
-      <template v-else-if="!block.data.active">
-        <q-item dark>
-          <q-item-section avatar>
-            <q-icon name="warning" />
-          </q-item-section>
-          <q-item-section>
-            <span>
-              PID is inactive:
-              <i>{{ block.data.outputId }}</i> will not be set.
-            </span>
-          </q-item-section>
-        </q-item>
-        <q-separator dark inset class="q-mb-md" />
-      </template>
-
       <q-item :clickable="hasInputBlock" dark @click="showInput">
         <q-tooltip v-if="hasInputBlock">Edit {{ inputId }}</q-tooltip>
         <q-item-section side class="col-3">

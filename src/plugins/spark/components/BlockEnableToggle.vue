@@ -33,9 +33,14 @@ export default class BlockEnableToggle extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-item dark>
-    <q-item-section>{{ mainText }}</q-item-section>
-    <q-item-section side>
+  <CardWarning
+    :icon="enabled ? 'mdi-link' : 'mdi-link-variant-off'"
+    :color="enabled ? 'positive' : 'negative'"
+  >
+    <template #message>
+      <span>{{ mainText }}</span>
+    </template>
+    <template #actions>
       <q-btn
         :label="enabled ? 'Disable': 'Enable'"
         :color="enabled ? 'negative' : 'positive'"
@@ -43,6 +48,6 @@ export default class BlockEnableToggle extends BlockCrudComponent {
         dense
         @click="toggleEnabled"
       />
-    </q-item-section>
-  </q-item>
+    </template>
+  </CardWarning>
 </template>

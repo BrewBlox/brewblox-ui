@@ -15,25 +15,21 @@ export default class SetpointSensorPairWidget extends BlockWidget {
   <q-card dark class="text-white scroll">
     <BlockWidgetToolbar :crud="crud" />
 
-    <q-card-section>
-      <template v-if="!block.data.settingEnabled">
-        <q-item dark>
-          <q-item-section avatar>
-            <q-icon name="warning" />
-          </q-item-section>
-          <q-item-section>Setpoint is disabled.</q-item-section>
-          <q-item-section side>
-            <q-btn
-              text-color="white"
-              flat
-              label="Enable"
-              @click="block.data.settingEnabled = true; saveBlock()"
-            />
-          </q-item-section>
-        </q-item>
-        <q-separator dark inset class="q-mb-md" />
+    <CardWarning v-if="!block.data.settingEnabled">
+      <template #message>
+        <span>This setpoint is disabled.</span>
       </template>
+      <template #actions>
+        <q-btn
+          text-color="white"
+          flat
+          label="Enable"
+          @click="block.data.settingEnabled = true; saveBlock();"
+        />
+      </template>
+    </CardWarning>
 
+    <q-card-section>
       <q-item dark>
         <q-item-section class="q-mr-md">
           <q-item-label caption>Setting</q-item-label>

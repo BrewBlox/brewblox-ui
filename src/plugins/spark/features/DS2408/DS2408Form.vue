@@ -15,9 +15,11 @@ export default class DS2408Form extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud"/>
-
-    <ValveArray :crud="crud" :id-enum="DS2408Id" :name-enum="ValveStartId"/>
+    <BlockFormToolbar :crud="crud" />
+    <CardWarning v-if="!block.data.connected">
+      <template #message>DS2408 is not connected</template>
+    </CardWarning>
+    <ValveArray :crud="crud" :id-enum="DS2408Id" :name-enum="ValveStartId" />
     <q-card-section>
       <q-item dark>
         <q-item-section>

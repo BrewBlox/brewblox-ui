@@ -16,7 +16,14 @@ export default class ActuatorOffsetForm extends BlockCrudComponent {
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
+        <CardWarning v-if="!block.data.targetId.id">
+          <template #message>Target setpoint is not configured for this setpoint driver.</template>
+        </CardWarning>
+        <CardWarning v-else-if="!block.data.referenceId.id">
+          <template #message>Reference setpoint is not configured for this setpoint driver.</template>
+        </CardWarning>
         <BlockEnableToggle
+          v-else
           v-bind="$props"
           :text-enabled="`Offset is enabled: ${block.data.targetId} will be offset from the
           ${block.data.referenceSettingOrValue == 0 ? 'setting' : 'value'} of ${block.data.referenceId}.`"

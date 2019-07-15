@@ -64,9 +64,14 @@ export default class DigitalConstraints extends ConstraintsBase {
         <q-item-section class="col-1" />
       </q-item>
       <q-separator v-if="!readonly" dark inset />
-      <q-item v-for="(editable, idx) in constraints" :key="idx" dark>
+      <q-item
+        v-for="(editable, idx) in constraints"
+        :key="idx"
+        :class="editable.limiting ? 'limiting' : ''"
+        dark
+      >
         <template v-if="readonly">
-          <q-item-section :class="{ limiting: editable.limiting }">{{ label(editable.key) }}</q-item-section>
+          <q-item-section>{{ label(editable.key) }}</q-item-section>
           <q-item-section>
             <LinkField
               v-if="editable.key === 'mutex'"
@@ -123,6 +128,6 @@ export default class DigitalConstraints extends ConstraintsBase {
 
 <style scoped>
 .limiting {
-  color: red;
+  color: orange;
 }
 </style>
