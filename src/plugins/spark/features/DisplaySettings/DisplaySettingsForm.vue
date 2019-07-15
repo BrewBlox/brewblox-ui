@@ -188,7 +188,7 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
           <q-item-section>
             <q-item-label caption>Display brightness</q-item-label>
             <q-slider
-              :value="block.data.brightness"
+              :value="block.data.brightness || 255"
               :min="20"
               :max="255"
               dark
