@@ -64,7 +64,7 @@ export default class Troubleshooter extends Vue {
   <q-card dark class="text-white scroll" style="max-width: 500px">
     <WidgetToolbar :title="serviceId" subtitle="Troubleshooter">
       <q-item-section class="dense" side>
-        <q-btn unelevated label="force refresh" color="primary" icon="refresh" @click="refresh"/>
+        <q-btn unelevated label="force refresh" color="primary" icon="refresh" @click="refresh" />
       </q-item-section>
     </WidgetToolbar>
 
@@ -72,7 +72,7 @@ export default class Troubleshooter extends Vue {
       <template v-if="lastStatus">
         <q-item dark>
           <q-item-section avatar>
-            <q-spinner size="24px"/>
+            <q-spinner size="24px" />
           </q-item-section>
           <q-item-section>
             <q-item-label caption>Last update</q-item-label>
@@ -160,13 +160,13 @@ export default class Troubleshooter extends Vue {
           <!-- waiting handshake -->
           <span v-else-if="!lastStatus.handshake">
             Your Spark service is waiting for the controller handshake.
-            <br>
+            <br />
             <b>This status is usually temporary</b>
           </span>
           <!-- not compatible -->
           <span v-else-if="!lastStatus.compatible">
             Your Spark service is not compatible with the firmware
-            <br>
+            <br />
             <b>Please run brewblox-ctl update</b>
           </span>
           <!-- not synchronized -->
@@ -181,8 +181,8 @@ export default class Troubleshooter extends Vue {
           </span>
         </q-item-section>
       </q-item>
-      <template v-if="lastStatus.info.length > 0">
-        <q-separator dark inset/>
+      <template v-if="(lastStatus.info || []).length > 0">
+        <q-separator dark inset />
         <q-item dark>
           <q-item-section>
             <b>Service info:</b>

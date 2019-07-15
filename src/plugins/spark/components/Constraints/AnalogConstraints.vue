@@ -73,9 +73,15 @@ export default class AnalogConstraints extends ConstraintsBase {
         <q-item-section class="col-1" />
       </q-item>
       <q-separator v-if="!readonly" dark inset />
-      <q-item v-for="(editable, idx) in constraints" :key="idx" dark dense>
+      <q-item
+        v-for="(editable, idx) in constraints"
+        :key="idx"
+        :class="editable.limiting ? 'limiting' : ''"
+        dark
+        dense
+      >
         <template v-if="readonly">
-          <q-item-section :class="{ limiting: editable.limiting }">{{ label(editable.key) }}</q-item-section>
+          <q-item-section>{{ label(editable.key) }}</q-item-section>
           <q-item-section>{{ editableValue(editable) | round }}</q-item-section>
         </template>
         <template v-else>
@@ -125,6 +131,6 @@ export default class AnalogConstraints extends ConstraintsBase {
 
 <style scoped>
 .limiting {
-  color: red;
+  color: orange;
 }
 </style>

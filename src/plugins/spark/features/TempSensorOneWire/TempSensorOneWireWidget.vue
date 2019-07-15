@@ -14,15 +14,11 @@ export default class TempSensorOneWireWidget extends BlockWidget {
 <template>
   <q-card dark class="text-white scroll">
     <BlockWidgetToolbar :crud="crud" />
-
-    <q-card-section>
-      <q-item v-if="block.data.value === null" dark>
-        <q-item-section avatar>
-          <q-icon name="warning" />
-        </q-item-section>
-        <q-item-section>This sensor is invalid</q-item-section>
-      </q-item>
-      <q-item v-else dark>
+    <CardWarning v-if="block.data.value.val === null">
+      <template #message>OneWire sensor could not be read</template>
+    </CardWarning>
+    <q-card-section v-else>
+      <q-item dark>
         <q-item-section>
           <q-item-label caption>Value</q-item-label>
           <UnitField :value="block.data.value" readonly tag="big" />

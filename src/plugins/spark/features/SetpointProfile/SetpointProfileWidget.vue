@@ -60,31 +60,28 @@ export default class SetpointProfileWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white column">
-    <BlockWidgetToolbar :crud="crud" :graph-props="{data: plotlyData, layout: plotlyLayout}"/>
+    <BlockWidgetToolbar :crud="crud" :graph-props="{data: plotlyData, layout: plotlyLayout}" />
+    <CardWarning v-if="!block.data.targetId.id">
+      <template #message>Target setpoint is not configured for this profile.</template>
+    </CardWarning>
 
-    <div class="col-auto">
-      <q-item v-if="!block.data.enabled" dark>
-        <q-item-section avatar>
-          <q-icon name="warning"/>
-        </q-item-section>
-        <q-item-section>
-          <span>
-            Profile is disabled:
-            <i>{{ block.data.targetId }}</i> will not be changed.
-          </span>
-        </q-item-section>
-        <q-item-section side>
-          <q-btn
-            text-color="white"
-            flat
-            label="Enable"
-            @click="block.data.enabled = true; saveBlock()"
-          />
-        </q-item-section>
-      </q-item>
-    </div>
+    <CardWarning v-else-if="!block.data.enabled">
+      <template #message>
+        <span>
+          Profile is disabled: <i>{{ block.data.targetId }}</i> will not be changed.
+        </span>
+      </template>
+      <template #actions>
+        <q-btn
+          text-color="white"
+          flat
+          label="Enable"
+          @click="block.data.enabled = true; saveBlock()"
+        />
+      </template>
+    </CardWarning>
     <div class="col">
-      <Graph :data="plotlyData" :layout="plotlyLayout" :revision="revision"/>
+      <Graph :data="plotlyData" :layout="plotlyLayout" :revision="revision" />
     </div>
   </q-card>
 </template>

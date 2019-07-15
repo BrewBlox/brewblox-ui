@@ -13,10 +13,12 @@ export default class DS2413Form extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud"/>
-
-    <IoArray :crud="crud"/>
-    <q-separator dark inset/>
+    <BlockFormToolbar :crud="crud" />
+    <CardWarning v-if="!block.data.connected">
+      <template #message>DS2413 is not connected</template>
+    </CardWarning>
+    <IoArray :crud="crud" />
+    <q-separator dark inset />
 
     <q-card-section>
       <q-item dark>

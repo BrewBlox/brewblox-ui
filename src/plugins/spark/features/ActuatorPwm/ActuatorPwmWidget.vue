@@ -22,33 +22,29 @@ export default class ActuatorPwmWidget extends BlockWidget {
   <q-card dark class="text-white scroll">
     <BlockWidgetToolbar :crud="crud" />
 
+    <CardWarning v-if="!block.data.enabled">
+      <template #message>
+        <span>
+          This PWM actuator is disabled:
+          <i>{{ block.data.actuatorId }}</i> will not be toggled.
+        </span>
+      </template>
+      <template #actions>
+        <q-btn
+          text-color="white"
+          flat
+          label="Enable"
+          @click="block.data.enabled = true; saveBlock();"
+        />
+      </template>
+    </CardWarning>
     <q-card-section>
-      <q-item v-if="!block.data.enabled" dark>
-        <q-item-section avatar>
-          <q-icon name="warning" />
-        </q-item-section>
-        <q-item-section>
-          <span>
-            PWM is disabled:
-            <i>{{ block.data.actuatorId }}</i> will not be toggled.
-          </span>
-        </q-item-section>
-        <q-item-section side>
-          <q-btn
-            text-color="white"
-            flat
-            label="Enable"
-            @click="block.data.enabled = true; saveBlock();"
-          />
-        </q-item-section>
-      </q-item>
-
       <q-item dark>
         <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>Duty setting</q-item-label>
-          <div>
+          <q-item-label caption>Setting</q-item-label>
+          <div :style="block.data.setting === block.data.desiredSetting ? '' : 'color: orange'">
             <SliderField
-              :value="block.data.desiredSetting"
+              :value="block.data.setting"
               :readonly="isDriven"
               style="display: inline-block"
               title="Duty Setting"
@@ -56,13 +52,14 @@ export default class ActuatorPwmWidget extends BlockWidget {
               @input="v => { block.data.desiredSetting = v; saveBlock(); }"
             />
             <small
-              v-if="block.data.desiredSetting !== null"
+              v-if="block.data.setting !== null"
               style="display: inline-block"
               class="q-ml-xs"
             >%</small>
           </div>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
         </q-item-section>
+
         <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Duty achieved</q-item-label>
           <div>
@@ -71,20 +68,18 @@ export default class ActuatorPwmWidget extends BlockWidget {
           </div>
         </q-item-section>
       </q-item>
-
-      <q-item v-if="constrained !== null" dark>
-        <q-item-section>
-          <q-item-label caption>Constrained setting</q-item-label>
-          <div>
-            <big>{{ constrained | round }}</big>
-            <small class="q-ml-xs">%</small>
-          </div>
-        </q-item-section>
-      </q-item>
       <q-item dark>
         <q-item-section>
           <AnalogConstraints :value="block.data.constrainedBy" :service-id="serviceId" readonly />
         </q-item-section>
+        <q-item-section v-if="block.data.setting !== block.data.desiredSetting">
+          <q-item-label caption>Unconstrained setting</q-item-label>
+          <div>
+            <big>{{ block.data.desiredSetting | round }}</big>
+            <small class="q-ml-xs">%</small>
+          </div>
+        </q-item-section>
+        <q-item-section v-else></q-item-section>
       </q-item>
     </q-card-section>
   </q-card>

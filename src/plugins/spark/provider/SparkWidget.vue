@@ -58,21 +58,20 @@ export default class SparkWidget extends Vue {
   <q-card v-if="ready" dark class="text-white scroll">
     <WidgetToolbar :title="serviceId" subtitle="Spark Service">
       <q-item-section class="dense" side>
-        <q-btn flat round dense icon="refresh" @click="fetchAll"/>
+        <q-btn flat round dense icon="refresh" @click="fetchAll" />
       </q-item-section>
     </WidgetToolbar>
 
-    <q-card-section>
-      <q-item v-if="!updating" dark>
-        <q-item-section avatar>
-          <q-icon name="warning" color="warning"/>
-        </q-item-section>
-        <q-item-section>Unable to update automatically</q-item-section>
-        <q-item-section side>
-          <q-btn label="Retry" color="warning" outline @click="retryUpdateSource"/>
-        </q-item-section>
-      </q-item>
+    <CardWarning v-if="!updating">
+      <template #message>
+        <span>Unable to update automatically</span>
+      </template>
+      <template #actions>
+        <q-btn label="Retry" color="warning" outline @click="retryUpdateSource" />
+      </template>
+    </CardWarning>
 
+    <q-card-section>
       <q-list>
         <q-item dark>
           <q-item-section>

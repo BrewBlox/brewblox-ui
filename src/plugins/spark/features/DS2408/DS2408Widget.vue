@@ -16,6 +16,9 @@ export default class DS2408Widget extends BlockWidget {
 <template>
   <q-card dark class="text-white scroll">
     <BlockWidgetToolbar :crud="crud" />
+    <CardWarning v-if="!block.data.connected">
+      <template #message>DS2408 is not connected</template>
+    </CardWarning>
     <ValveArray :crud="crud" :id-enum="DS2408Id" :name-enum="ValveStartId" />
   </q-card>
 </template>

@@ -31,11 +31,11 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
 
   get disabledString(): string {
     if (this.usedBy.length === 0) {
-      return 'Setpoint is disabled, and is not used.';
+      return 'This setpoint is disabled and is not used.';
     } else if (this.usedBy.length == 1) {
-      return `Setpoint is disabled. '${this.usedBy[0].id}' is inactive.`;
+      return `This setpoint is disabled and therefore '${this.usedBy[0].id}' is inactive.`;
     } else {
-      return `Setpoint is disabled. ${this.usedBy.map(v => `'${v.id}'`).join(', ')} are inactive.`;
+      return `This setpoint is disabled and therefore ${this.usedBy.map(v => `'${v.id}'`).join(' and ')} are inactive.`;
     }
   }
 }
@@ -45,14 +45,14 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
   <q-card dark class="widget-modal">
     <BlockFormToolbar :crud="crud" />
 
+    <BlockEnableToggle
+      :crud="crud"
+      :text-disabled="disabledString"
+      text-enabled="Setpoint is enabled."
+      data-key="settingEnabled"
+      class="full-width bordered"
+    />
     <q-card-section>
-      <BlockEnableToggle
-        :crud="crud"
-        :text-disabled="disabledString"
-        text-enabled="Setpoint is enabled."
-        data-key="settingEnabled"
-        class="full-width bordered"
-      />
       <q-separator dark inset />
       <q-item dark>
         <q-item-section class="col-4" style="justify-content: flex-start">

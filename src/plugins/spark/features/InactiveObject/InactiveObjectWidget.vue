@@ -18,18 +18,12 @@ export default class InactiveObjectWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud"/>
-
-    <q-card-section>
-      <q-item dark>
-        <q-item-section avatar>
-          <q-icon name="warning"/>
-        </q-item-section>
-        <q-item-section>
-          This {{ actualDisplayName }} block is disabled.
-          <br>To enable it, ensure that it is in an enabled group.
-        </q-item-section>
-      </q-item>
-    </q-card-section>
+    <BlockWidgetToolbar :crud="crud" />
+    <CardWarning v-if="!block.data.connected">
+      <template #message>
+        This {{ actualDisplayName }} block is disabled.
+        <br />To enable it, ensure that it is in an enabled group.
+      </template>
+    </CardWarning>
   </q-card>
 </template>
