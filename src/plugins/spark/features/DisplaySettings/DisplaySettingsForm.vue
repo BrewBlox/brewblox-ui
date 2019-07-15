@@ -166,8 +166,8 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
 
     <q-card-section>
       <q-list dark>
-        <q-item dark>
-          <q-item-section style="justify-content: start">
+        <q-item dark class="aligned-item">
+          <q-item-section>
             <q-item-label caption>Footer text</q-item-label>
             <InputField
               :value="block.data.name"
@@ -176,7 +176,7 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
               @input="v => {block.data.name = v; saveBlock()}"
             />
           </q-item-section>
-          <q-item-section style="justify-content: start">
+          <q-item-section>
             <q-item-label caption>Temperature Unit</q-item-label>
             <SelectField
               :value="block.data.tempUnit"
@@ -185,7 +185,7 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
               @input="v => { block.data.tempUnit = v; saveBlock(); }"
             />
           </q-item-section>
-          <q-item-section style="justify-content: start">
+          <q-item-section>
             <q-item-label caption>Display brightness</q-item-label>
             <q-slider
               :value="block.data.brightness"
@@ -194,7 +194,6 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
               dark
               @change="v => { block.data.brightness = v; saveBlock(); }"
             />
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
           </q-item-section>
         </q-item>
       </q-list>
