@@ -1,15 +1,11 @@
 <script lang="ts">
-import get from 'lodash/get';
-import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import { showBlockDialog } from '@/helpers/dialog';
-import { Link, postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 import sparkStore from '@/plugins/spark/store';
-import { BlockLink } from '@/plugins/spark/types';
-import featureStore from '@/store/features';
 
+import { startRelationsDialog } from './relations';
 import { PidBlock } from './types';
 
 @Component
@@ -17,24 +13,6 @@ export default class PidWidget extends BlockWidget {
   readonly block!: PidBlock;
   inputFormOpen = false;
   relationsOpen = false;
-
-  get renamedTargets() {
-    return postfixedDisplayNames(
-      {
-        inputSetting: 'Input target',
-        inputValue: 'Input value',
-        error: 'Error',
-        derivative: 'Derivative of input',
-        integral: 'Integral of error',
-        p: 'P',
-        i: 'I',
-        d: 'D',
-        outputSetting: 'Output target (P+I+D)',
-        outputValue: 'Output value',
-      },
-      this.block.data,
-    );
-  }
 
   get inputId() {
     return this.block.data.inputId.id;
@@ -58,69 +36,13 @@ export default class PidWidget extends BlockWidget {
         .includes(this.outputId);
   }
 
-  findLinks(id: string | null): BlockLink[] {
-    const block = sparkStore.blocks(this.serviceId)[id || ''];
-    if (!id || !block) {
-      return [];
-    }
-
-    const links = Object.entries(block.data)
-      .filter(([, v]) => v instanceof Link) as [string, Link][];
-
-    const filtered = links
-      .filter(([, link]) => !link.driven && link.id);
-
-    const relations: BlockLink[] = filtered
-      .map(([k, link]) => ({
-        source: id,
-        target: link.id as string,
-        relation: [k],
-      }));
-
-    return filtered
-      .reduce((acc: BlockLink[], [, link]) => ([...acc, ...this.findLinks(link.id)]), relations);
-  }
-
-  relations(): BlockLink[] {
-    const chain = this.findLinks(this.blockId);
-
-    // Setpoints may be driven by something else (profile, setpoint driver, etc)
-    // Just display the block that's actually driving, ignore any blocks driving the driver
-    const setpointId = this.block.data.inputId.id;
-    if (!setpointId) {
-      return chain;
-    }
-
-    return [
-      ...chain,
-      ...sparkStore.blockValues(this.serviceId)
-        .filter(block => get(block, 'data.targetId.id') === setpointId)
-        .map(block => ({ source: block.id, target: setpointId, relation: ['target'] })),
-    ];
-  }
-
-  nodes() {
-    return sparkStore.blockValues(this.serviceId)
-      .map(block => ({
-        id: block.id,
-        type: featureStore.displayNameById(block.type),
-      }));
-  }
-
   enable() {
     this.block.data.enabled = true;
     this.saveBlock();
   }
 
   showRelations() {
-    Dialog.create({
-      component: 'RelationsDialog',
-      serviceId: this.serviceId,
-      nodes: this.nodes(),
-      relations: this.relations(),
-      title: `${this.block.id} relations`,
-      root: this.$root,
-    });
+    startRelationsDialog(this.block);
   }
 
   showInput() {
@@ -135,48 +57,34 @@ export default class PidWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" :graph-cfg.sync="graphCfg">
+    <BlockWidgetToolbar :crud="crud">
       <template v-slot:actions>
         <ActionItem icon="mdi-ray-start-arrow" label="Show Relations" @click="showRelations" />
       </template>
     </BlockWidgetToolbar>
 
+    <CardWarning v-if="!block.data.enabled">
+      <template #message>
+        <span>
+          PID is disabled:
+          <i>{{ block.data.outputId }}</i> will not be set.
+        </span>
+      </template>
+      <template #actions>
+        <q-btn text-color="white" flat label="Enable" @click="enable" />
+      </template>
+    </CardWarning>
+
+    <CardWarning v-else-if="!block.data.active">
+      <template #message>
+        <span>
+          PID is inactive:
+          <i>{{ block.data.outputId }}</i> will not be set.
+        </span>
+      </template>
+    </CardWarning>
+    
     <q-card-section>
-      <slot />
-
-      <template v-if="!block.data.enabled">
-        <q-item dark>
-          <q-item-section avatar>
-            <q-icon name="warning" />
-          </q-item-section>
-          <q-item-section>
-            <span>
-              PID is disabled:
-              <i>{{ block.data.outputId }}</i> will not be set.
-            </span>
-          </q-item-section>
-          <q-item-section side>
-            <q-btn text-color="white" flat label="Enable" @click="enable" />
-          </q-item-section>
-        </q-item>
-        <q-separator dark inset class="q-mb-md" />
-      </template>
-
-      <template v-else-if="!block.data.active">
-        <q-item dark>
-          <q-item-section avatar>
-            <q-icon name="warning" />
-          </q-item-section>
-          <q-item-section>
-            <span>
-              PID is inactive:
-              <i>{{ block.data.outputId }}</i> will not be set.
-            </span>
-          </q-item-section>
-        </q-item>
-        <q-separator dark inset class="q-mb-md" />
-      </template>
-
       <q-item :clickable="hasInputBlock" dark @click="showInput">
         <q-tooltip v-if="hasInputBlock">Edit {{ inputId }}</q-tooltip>
         <q-item-section side class="col-3">

@@ -1,8 +1,11 @@
+import get from 'lodash/get';
 import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { GraphConfig } from '@/components/Graph/types';
 import CrudComponent, { Crud } from '@/components/Widget/CrudComponent';
 import { showBlockDialog } from '@/helpers/dialog';
+import { postfixedDisplayNames } from '@/helpers/units';
 import sparkStore from '@/plugins/spark/store';
 
 import { blockIdRules } from '../helpers';
@@ -16,6 +19,7 @@ export interface BlockCrud extends Crud {
 
 @Component
 export default class BlockCrudComponent extends CrudComponent {
+  private activeDialog: any = null;
 
   @Prop({ type: Object, required: true })
   public readonly crud!: BlockCrud;
@@ -46,6 +50,49 @@ export default class BlockCrudComponent extends CrudComponent {
     return limiting ? limiting.join(', ') : null;
   }
 
+  public get hasGraph() {
+    return !!get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
+  }
+
+  public get renamedTargets(): Record<string, string> {
+    const targets = get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
+    return !!targets
+      ? postfixedDisplayNames(targets, this.block.data)
+      : {};
+  }
+
+  public get graphCfg(): GraphConfig {
+    const blockFmt = (val: string): string => [this.blockId, val].join('/');
+    const serviceFmt = (val: string): string => [this.serviceId, this.blockId, val].join('/');
+
+    return {
+      // persisted in config
+      params: this.widget.config.queryParams || { duration: '10m' },
+      axes: this.widget.config.graphAxes || {},
+      // constants
+      layout: {
+        title: this.widget.title,
+      },
+      targets: [
+        {
+          measurement: this.serviceId,
+          fields: Object.keys(this.renamedTargets)
+            .map(k => blockFmt(k)),
+        },
+      ],
+      renames: Object.entries(this.renamedTargets)
+        .reduce((acc, [k, v]) => ({ ...acc, [serviceFmt(k)]: v }), {}),
+    };
+  }
+
+  public set graphCfg(config: GraphConfig) {
+    this.saveConfig({
+      ...this.widget.config,
+      queryParams: { ...config.params },
+      graphAxes: { ...config.axes },
+    });
+  }
+
   public async saveBlock(block: Block = this.block) {
     await this.crud.saveBlock(block);
   }
@@ -53,6 +100,7 @@ export default class BlockCrudComponent extends CrudComponent {
   public async removeBlock() {
     if (this.isStoreBlock) {
       await sparkStore.removeBlock([this.serviceId, this.block]);
+      this.closeDialog();
     }
   }
 
@@ -78,13 +126,21 @@ export default class BlockCrudComponent extends CrudComponent {
 
   public openModal(opts: { formProps?: any; graphProps?: any } = {}): void {
     const { formProps, graphProps } = opts;
-    Dialog.create({
+    this.activeDialog = Dialog.create({
       component: 'FormDialog',
       root: this.$root,
-      getCrud: () => this.crud,
-      getFormProps: () => formProps,
+      getCrud: () => ({ ...this.crud, closeDialog: this.closeDialog }),
+      getProps: () => formProps,
       getGraphProps: () => graphProps,
     });
+  }
+
+  public closeDialog() {
+    if (this.activeDialog) {
+      this.activeDialog.hide();
+      this.activeDialog = null;
+    }
+    this.closeDialog();
   }
 
   public showOtherBlock(block: Block, props: any = {}) {
@@ -100,7 +156,10 @@ export default class BlockCrudComponent extends CrudComponent {
       rules: blockIdRules(this.serviceId),
       value: blockId,
     })
-      .onOk(this.changeBlockId);
+      .onOk(async (newId: string) => {
+        await this.changeBlockId(newId);
+        this.closeDialog();
+      });
   }
 
   public startSwitchBlock() {

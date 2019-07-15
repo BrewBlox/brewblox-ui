@@ -33,13 +33,6 @@ export default class Spark3PinsForm extends BlockCrudComponent {
             @input="v => { block.data.enableIoSupply12V = v; saveBlock(); }"
           />
         </q-item-section>
-        <q-item-section>
-          <q-item-label caption>Enable LCD backlight</q-item-label>
-          <q-toggle
-            :value="block.data.enableLcdBacklight"
-            @input="v => { block.data.enableLcdBacklight = v; saveBlock(); }"
-          />
-        </q-item-section>
       </q-item>
       <q-item dark>
         <q-item-section>

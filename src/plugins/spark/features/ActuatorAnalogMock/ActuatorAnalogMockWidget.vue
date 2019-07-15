@@ -8,48 +8,34 @@ import { ActuatorAnalogMockBlock } from './types';
 @Component
 export default class ActuatorAnalogMockWidget extends BlockWidget {
   readonly block!: ActuatorAnalogMockBlock;
-
-  get renamedTargets() {
-    return {
-      setting: 'Setting',
-      value: 'Value',
-    };
-  }
 }
 </script>
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" :graph-cfg.sync="graphCfg"/>
-
+    <BlockWidgetToolbar :crud="crud" />
     <q-card-section>
-      <q-item v-if="block.value === null" dark>
-        <q-item-section avatar>
-          <q-icon name="warning"/>
-        </q-item-section>
-        <q-item-section>This Actuator is invalid</q-item-section>
-      </q-item>
       <q-item dark>
         <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Setting</q-item-label>
-          <InputField
-            :value="block.data.desiredSetting"
-            :readonly="isDriven"
-            title="Setting"
-            tag="big"
-            type="number"
-            @input="v => { block.data.desiredSetting = v; saveBlock(); }"
-          />
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+          <div :style="block.data.setting === block.data.desiredSetting ? '' : 'color: orange'">
+            <SliderField
+              :value="block.data.setting"
+              :readonly="isDriven"
+              style="display: inline-block"
+              title="Analog actuator Setting"
+              tag="big"
+              @input="v => { block.data.desiredSetting = v; saveBlock(); }"
+            />
+          </div>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
         </q-item-section>
         <q-item-section style="justify-content: flex-start">
           <q-item-label caption>Value</q-item-label>
           <big>{{ block.data.value | round }}</big>
         </q-item-section>
-      </q-item>
-      <q-item dark>
         <q-item-section>
-          <AnalogConstraints :value="block.data.constrainedBy" :service-id="serviceId" readonly/>
+          <AnalogConstraints :value="block.data.constrainedBy" :service-id="serviceId" readonly />
         </q-item-section>
       </q-item>
     </q-card-section>

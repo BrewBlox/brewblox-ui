@@ -64,22 +64,19 @@ export default class UnknownBlockWidget extends WidgetBase {
               label="Refresh"
               @click="fetchAll"
             />
-            <RemoveWidgetAction :crud="crud"/>
+            <RemoveWidgetAction :crud="crud" />
           </q-list>
         </q-btn-dropdown>
       </q-item-section>
     </WidgetToolbar>
 
-    <q-card-section>
-      <q-item dark>
-        <q-item-section v-if="reason.temporary" avatar>
-          <q-spinner size="25px"/>
-        </q-item-section>
-        <q-item-section v-else avatar>
-          <q-icon name="warning" color="negative"/>
-        </q-item-section>
-        <q-item-section>{{ reason.message }}</q-item-section>
-      </q-item>
-    </q-card-section>
+    <CardWarning color="negative">
+      <template #message>
+        <span>{{ reason.message }}</span>
+      </template>
+      <template v-if="reason.temporary" #actions>
+        <q-spinner size="25px" />
+      </template>
+    </CardWarning>
   </q-card>
 </template>

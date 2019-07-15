@@ -6,6 +6,7 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
 import sparkStore from '@/plugins/spark/store';
 
+import { startRelationsDialog } from './relations';
 
 @Component
 export default class PidForm extends BlockCrudComponent {
@@ -40,18 +41,31 @@ export default class PidForm extends BlockCrudComponent {
   showOutput() {
     showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.outputId));
   }
+
+  showRelations() {
+    startRelationsDialog(this.block);
+  }
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud" />
+    <BlockFormToolbar :crud="crud">
+      <template v-slot:actions>
+        <ActionItem
+          v-if="isStoreBlock"
+          icon="mdi-ray-start-arrow"
+          label="Show Relations"
+          @click="showRelations"
+        />
+      </template>
+    </BlockFormToolbar>
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="mdi-calculator-variant" label="Settings">
         <BlockEnableToggle
           v-bind="$props"
-          :text-enabled="`PID is enabled: output ${block.data.outputId} will be set to result of PID.`"
+          :text-enabled="`PID is enabled: output ${block.data.outputId} will be set to output of PID.`"
           :text-disabled="`PID is disabled: output ${block.data.outputId} will not be set.`"
           class="full-width bordered"
           v-on="$listeners"

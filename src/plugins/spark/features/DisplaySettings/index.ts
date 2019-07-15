@@ -15,6 +15,7 @@ const block: BlockSpec = {
     name: 'Display settings',
     tempUnit: DisplayTempUnit.Celsius,
     widgets: [],
+    brightness: 255,
   }),
   changes: [
     {

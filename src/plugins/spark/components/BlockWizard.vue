@@ -22,6 +22,7 @@ export default class BlockWizard extends Vue {
   blockId: string = '';
   block: Block | null = null;
   widget: DashboardItem | null = null;
+  activeDialog: any = null;
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
@@ -104,12 +105,20 @@ export default class BlockWizard extends Vue {
       block: this.block as Block,
       isStoreBlock: false,
       saveBlock: v => { this.block = v; },
+      closeDialog: this.closeDialog,
     };
-    Dialog.create({
+    this.activeDialog = Dialog.create({
       component: 'FormDialog',
       root: this.$root,
       getCrud: () => crud,
     });
+  }
+
+  closeDialog() {
+    if (this.activeDialog) {
+      this.activeDialog.hide();
+      this.activeDialog = null;
+    }
   }
 
   async createBlock() {
@@ -176,8 +185,8 @@ export default class BlockWizard extends Vue {
               <q-icon name="mdi-information">
                 <q-tooltip>
                   The name of the Spark Controller Block.
-                  <br>Multiple widgets can display the same Block.
-                  <br>Rules:
+                  <br />Multiple widgets can display the same Block.
+                  <br />Rules:
                   <ul>
                     <li>The name must not be empty.</li>
                     <li>The name must be unique.</li>
@@ -193,10 +202,10 @@ export default class BlockWizard extends Vue {
       </q-item>
     </q-card-section>
 
-    <q-separator dark/>
+    <q-separator dark />
 
     <q-card-actions align="right">
-      <q-btn :disable="!createReady" flat label="Configure" @click="configureBlock"/>
+      <q-btn :disable="!createReady" flat label="Configure" @click="configureBlock" />
       <q-btn
         :disable="!createReady"
         unelevated

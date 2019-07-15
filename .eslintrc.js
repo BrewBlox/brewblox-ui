@@ -29,6 +29,7 @@ module.exports = {
     'no-mixed-operators': 0,
     'no-console': 'warn',
     'vue/max-attributes-per-line': 0,
+    'vue/html-self-closing': 0,
     'comma-dangle': [
       'error',
       'always-multiline'

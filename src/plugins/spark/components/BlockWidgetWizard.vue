@@ -24,6 +24,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
   block: Block | null = null;
   isStoreBlock: boolean = false;
   widget: DashboardItem | null = null;
+  activeDialog: any = null;
 
   get serviceId(): string {
     return get(this, ['service', 'id'], '');
@@ -103,12 +104,20 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
       block: this.block as Block,
       isStoreBlock: this.isStoreBlock,
       saveBlock: this.saveBlock,
+      closeDialog: this.closeDialog,
     };
-    Dialog.create({
+    this.activeDialog = Dialog.create({
       component: 'FormDialog',
       root: this.$root,
       getCrud: () => crud,
     });
+  }
+
+  public closeDialog() {
+    if (this.activeDialog) {
+      this.activeDialog.hide();
+      this.activeDialog = null;
+    }
   }
 
   async createWidget() {
@@ -144,12 +153,12 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
       <q-item dark>
         <q-item-section>
           <q-item-label caption>Service</q-item-label>
-          <q-option-group v-model="service" :options="serviceOpts"/>
+          <q-option-group v-model="service" :options="serviceOpts" />
         </q-item-section>
       </q-item>
       <q-stepper-navigation class="row">
-        <q-btn unelevated label="Back" @click="back"/>
-        <q-space/>
+        <q-btn unelevated label="Back" @click="back" />
+        <q-space />
         <q-btn
           :disable="!startOk"
           unelevated
@@ -176,8 +185,8 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
               <q-icon name="mdi-information">
                 <q-tooltip>
                   The name of the Spark Controller Block.
-                  <br>Multiple widgets can display the same Block.
-                  <br>Rules:
+                  <br />Multiple widgets can display the same Block.
+                  <br />Rules:
                   <ul>
                     <li>The name must not be empty.</li>
                     <li>The name must be unique.</li>
@@ -192,8 +201,8 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
         </q-item-section>
       </q-item>
       <q-stepper-navigation class="row">
-        <q-btn unelevated label="Back" @click="block = null; currentStep = 'start'"/>
-        <q-space/>
+        <q-btn unelevated label="Back" @click="block = null; currentStep = 'start'" />
+        <q-space />
         <q-btn
           :disable="!createOk"
           flat
@@ -235,8 +244,8 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
         </q-item-section>
       </q-item>
       <q-stepper-navigation class="row">
-        <q-btn unelevated label="Back" @click="block = null; currentStep = 'start'"/>
-        <q-space/>
+        <q-btn unelevated label="Back" @click="block = null; currentStep = 'start'" />
+        <q-space />
         <q-btn
           :disable="!existingOk"
           flat

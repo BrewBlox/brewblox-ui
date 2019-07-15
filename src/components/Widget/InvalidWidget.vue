@@ -16,19 +16,16 @@ export default class InvalidWidget extends WidgetBase {
       <q-item-section side>
         <q-btn-dropdown flat label="Menu">
           <q-list dark bordered>
-            <RemoveWidgetAction :crud="crud"/>
+            <RemoveWidgetAction :crud="crud" />
           </q-list>
         </q-btn-dropdown>
       </q-item-section>
     </WidgetToolbar>
 
-    <q-card-section>
-      <q-item dark>
-        <q-item-section avatar>
-          <q-icon name="warning" color="negative"/>
-        </q-item-section>
-        <q-item-section>{{ error }}</q-item-section>
-      </q-item>
-    </q-card-section>
+    <CardWarning color="negative">
+      <template #message>
+        <span>{{ error }}</span>
+      </template>
+    </CardWarning>
   </q-card>
 </template>

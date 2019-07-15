@@ -22,6 +22,7 @@ export interface DisplaySettingsData {
   name: string;
   tempUnit: DisplayTempUnit;
   widgets: DisplaySlot[];
+  brightness: number;
 }
 
 export interface DisplaySettingsBlock extends Block {

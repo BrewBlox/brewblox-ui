@@ -50,6 +50,11 @@ const block: BlockSpec = {
     },
   ],
   presets: [],
+  graphTargets: {
+    setting: 'Setting',
+    value: 'Sensor',
+    valueUnfiltered: 'Sensor unfiltered',
+  },
 };
 
 const feature: Feature = {

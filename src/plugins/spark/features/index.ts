@@ -6,13 +6,13 @@ import ActuatorPwm from './ActuatorPwm';
 import Balancer from './Balancer';
 import DS2408 from './DS2408';
 import DS2413 from './DS2413';
+import DeprecatedObject from './DeprecatedObject';
 import DigitalActuator from './DigitalActuator';
 import DisplaySettings from './DisplaySettings';
 import InactiveObject from './InactiveObject';
 import MotorValve from './MotorValve';
 import Mutex from './Mutex';
 import Pid from './Pid';
-import ProcessView from './ProcessView';
 import SessionView from './SessionView';
 import SetpointProfile from './SetpointProfile';
 import SetpointSensorPair from './SetpointSensorPair';
@@ -31,6 +31,7 @@ const features: { [id: string]: SparkFeature } = {
   DisplaySettings,
   DS2408,
   DS2413,
+  DeprecatedObject,
   InactiveObject,
   Pid,
   MotorValve,
@@ -40,7 +41,6 @@ const features: { [id: string]: SparkFeature } = {
   Spark2Pins,
   Spark3Pins,
   StepView,
-  ProcessView,
   TempSensorMock,
   TempSensorOneWire,
   SessionView,

@@ -22,6 +22,7 @@ export const showBlockDialog = (block: Block | null, props: any = {}) => {
     },
     ...featureStore.widgetSizeById(block.type),
   };
+  const wrapper: { dialog: any } = { dialog: null };
   const crud: BlockCrud = {
     widget,
     isStoreWidget: false,
@@ -29,8 +30,9 @@ export const showBlockDialog = (block: Block | null, props: any = {}) => {
     block,
     isStoreBlock: true,
     saveBlock: v => sparkStore.saveBlock([block.serviceId, v]),
+    closeDialog: () => wrapper.dialog && wrapper.dialog.hide(),
   };
-  Dialog.create({
+  wrapper.dialog = Dialog.create({
     component: 'FormDialog',
     getCrud: () => crud,
     getProps: () => props,

@@ -13,8 +13,6 @@ import { Step } from './types';
 
 @Component
 export default class StepViewWidget extends WidgetBase {
-  modalOpen: boolean = false;
-  openStep: string | null = null;
   applying: boolean = false;
 
   get serviceId() {
@@ -117,19 +115,16 @@ export default class StepViewWidget extends WidgetBase {
       .finally(() => { this.applying = false; });
   }
 
-  openModal(stepId: string | null) {
-    this.openStep = stepId;
-    this.modalOpen = true;
+  openModal(openStep: string | null) {
+    this.showForm({
+      getProps: () => ({ openStep }),
+    });
   }
 }
 </script>
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <StepViewForm v-if="modalOpen" :crud="crud" :open-step="openStep" />
-    </q-dialog>
-
     <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="openModal(null)">
@@ -156,8 +151,8 @@ export default class StepViewWidget extends WidgetBase {
             :disable="!applicableSteps[step.id]"
             :loading="applying"
             :color="activeSteps[step.id] ? 'positive': ''"
+            :label="activeSteps[step.id] ? 'active': 'apply'"
             outline
-            label="apply"
             @click="applyStep(step)"
           >
             <q-tooltip v-if="activeSteps[step.id]">Step is applied</q-tooltip>

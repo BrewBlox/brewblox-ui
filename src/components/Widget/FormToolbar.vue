@@ -13,13 +13,13 @@ export default class FormToolbar extends CrudComponent { }
       <q-item-label>{{ widget.title }}</q-item-label>
       <q-item-label caption>{{ displayName }}</q-item-label>
     </q-item-section>
-    <slot/>
+    <slot />
     <template v-slot:buttons>
       <slot name="buttons">
         <q-btn-dropdown flat icon="mdi-pencil">
           <q-list dark bordered>
-            <slot name="actions"/>
-            <WidgetActions :crud="crud" no-rename/>
+            <slot name="actions" />
+            <WidgetActions :crud="crud" />
           </q-list>
         </q-btn-dropdown>
       </slot>

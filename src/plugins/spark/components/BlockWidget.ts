@@ -1,11 +1,8 @@
-import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import { GraphConfig } from '@/components/Graph/types';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import sparkStore from '@/plugins/spark/store';
-import { GraphValueAxes, QueryParams } from '@/store/history';
 
 import { Block } from '../types';
 import { BlockCrud } from './BlockCrudComponent';
@@ -33,6 +30,7 @@ export default class BlockWidget extends WidgetBase {
       block: this.block,
       isStoreBlock: true,
       saveBlock: this.saveBlock,
+      closeDialog: this.closeDialog,
     };
   }
 
@@ -46,52 +44,6 @@ export default class BlockWidget extends WidgetBase {
     return limiting ? limiting.join(', ') : null;
   }
 
-  public get queryParams(): QueryParams {
-    return this.widget.config.queryParams || {
-      duration: '10m',
-    };
-  }
-
-  public get graphAxes(): GraphValueAxes {
-    return this.widget.config.graphAxes || {};
-  }
-
-  public get renamedTargets(): { [key: string]: string } {
-    return {};
-  }
-
-  public get graphCfg(): GraphConfig {
-    const blockFmt = (val: string): string => [this.blockId, val].join('/');
-    const serviceFmt = (val: string): string => [this.serviceId, this.blockId, val].join('/');
-
-    return {
-      // persisted in config
-      params: this.queryParams,
-      axes: this.graphAxes,
-      // constants
-      layout: {
-        title: this.widget.title,
-      },
-      targets: [
-        {
-          measurement: this.serviceId,
-          fields: Object.keys(this.renamedTargets)
-            .map(k => blockFmt(k)),
-        },
-      ],
-      renames: Object.entries(this.renamedTargets)
-        .reduce((acc, [k, v]) => ({ ...acc, [serviceFmt(k)]: v }), {}),
-    };
-  }
-
-  public set graphCfg(config: GraphConfig) {
-    this.saveConfig({
-      ...this.widget.config,
-      queryParams: { ...config.params },
-      graphAxes: { ...config.axes },
-    });
-  }
-
   @Watch('blockId', { immediate: true })
   private fixWidgetTitle(): void {
     if (this.blockId !== this.widget.title && !this.volatile) {
@@ -99,12 +51,8 @@ export default class BlockWidget extends WidgetBase {
     }
   }
 
-  public openModal(): void {
-    Dialog.create({
-      component: 'FormDialog',
-      root: this.$root,
-      getCrud: () => this.crud,
-    });
+  public openModal(args: Record<string, any> = {}): void {
+    this.showForm(args);
   }
 
   public async refreshBlock(): Promise<void> {
