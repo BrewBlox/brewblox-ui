@@ -15,7 +15,6 @@ const block: BlockSpec = {
     pins: [],
     enableIoSupply5V: false,
     enableIoSupply12V: false,
-    enableLcdBacklight: false,
     soundAlarm: false,
     voltage5: 0,
     voltage12: 0,
@@ -24,12 +23,6 @@ const block: BlockSpec = {
     {
       key: 'soundAlarm',
       title: 'Alarm sound',
-      component: 'BoolValEdit',
-      generate: () => false,
-    },
-    {
-      key: 'enableLcdBackLight',
-      title: 'Toggle LCD backlight',
       component: 'BoolValEdit',
       generate: () => false,
     },

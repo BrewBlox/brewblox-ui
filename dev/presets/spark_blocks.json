@@ -94,7 +94,6 @@
         "enableIoSupply12V": true,
         "voltage5": 5.0,
         "voltage12": 12.0,
-        "enableLcdBacklight": false,
         "soundAlarm": false
       }
     },

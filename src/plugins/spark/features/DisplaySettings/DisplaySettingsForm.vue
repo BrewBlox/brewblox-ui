@@ -113,7 +113,7 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud"/>
+    <BlockFormToolbar :crud="crud" />
 
     <q-card-section class="row">
       <q-item v-for="(slot, idx) in slots" :key="idx" dark class="row q-pa-sm col-4">
@@ -162,12 +162,12 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
       </q-item>
     </q-card-section>
 
-    <q-separator dark inset/>
+    <q-separator dark inset />
 
     <q-card-section>
       <q-list dark>
         <q-item dark>
-          <q-item-section>
+          <q-item-section style="justify-content: start">
             <q-item-label caption>Footer text</q-item-label>
             <InputField
               :value="block.data.name"
@@ -176,7 +176,7 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
               @input="v => {block.data.name = v; saveBlock()}"
             />
           </q-item-section>
-          <q-item-section>
+          <q-item-section style="justify-content: start">
             <q-item-label caption>Temperature Unit</q-item-label>
             <SelectField
               :value="block.data.tempUnit"
@@ -184,6 +184,17 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
               title="Temperature Unit"
               @input="v => { block.data.tempUnit = v; saveBlock(); }"
             />
+          </q-item-section>
+          <q-item-section style="justify-content: start">
+            <q-item-label caption>Display brightness</q-item-label>
+            <q-slider
+              :value="block.data.brightness"
+              :min="20"
+              :max="255"
+              dark
+              @change="v => { block.data.brightness = v; saveBlock(); }"
+            />
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
           </q-item-section>
         </q-item>
       </q-list>
