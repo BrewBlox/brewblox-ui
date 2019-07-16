@@ -13,9 +13,9 @@ export default class PwmDisplay extends PartBase {
     return settingsBlock(this.part, 'pwm');
   }
 
-  get pwmSetting(): number | null {
-    return this.block
-      ? this.block.data.desiredSetting
+  get pwmValue(): number | null {
+    return this.block && this.block.data.enabled
+      ? this.block.data.value
       : null;
   }
 }
@@ -28,7 +28,7 @@ export default class PwmDisplay extends PartBase {
         <q-icon v-if="!block" name="mdi-link-variant-off" />
         <small v-else>%</small>
         <br />
-        {{ pwmSetting | round(0) }}
+        {{ pwmValue | round(0) }}
       </div>
     </foreignObject>
     <g class="outline">
