@@ -173,3 +173,6 @@ export const suggestId =
 
     return copyName(idx);
   };
+
+export const isAbsoluteUrl = (val: string) =>
+  new RegExp('^(?:[a-z]+:)?//', 'i').test(val);

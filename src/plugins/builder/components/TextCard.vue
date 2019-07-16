@@ -1,28 +1,35 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import PartCard from './PartCard';
 
 @Component
 export default class TextCard extends PartCard {
 
+  @Prop({ type: String, default: 'text' })
+  public readonly settingsKey!: string;
+
+
+  @Prop({ type: String, default: 'Text field' })
+  public readonly label!: string;
+
   get text(): string {
-    return this.part.settings.text || '';
+    return this.part.settings[this.settingsKey] || '';
   }
 
-  set text(text: string) {
-    this.savePartSettings({ ...this.part.settings, text });
+  set text(val: string) {
+    this.savePartSettings({ ...this.part.settings, [this.settingsKey]: val });
   }
 }
 </script>
 
 <template>
   <q-list dark>
-    <q-separator dark/>
+    <q-separator dark />
     <q-item dark>
       <q-item-section>
-        <q-item-label caption>Text field</q-item-label>
-        <InputField v-model="text" title="Text field"/>
+        <q-item-label caption>{{ label }}</q-item-label>
+        <InputField v-model="text" :title="label" />
       </q-item-section>
     </q-item>
   </q-list>

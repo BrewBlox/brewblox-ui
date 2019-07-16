@@ -33,8 +33,8 @@ export default class PidDisplay extends PartBase {
     <foreignObject :transform="textTransformation([1,1])" :width="squares(1)" :height="squares(1)">
       <div class="text-white text-bold text-center">
         <svg>
-          <HeatingIcon v-if="kp > 0" :stroke="HOT_WATER" x="10" />
-          <CoolingIcon v-else-if="kp < 0" :stroke="COLD_WATER" x="10" />
+          <HeatingIcon v-if="kp > 0" :stroke="HOT_WATER" x="12" />
+          <CoolingIcon v-else-if="kp < 0" :stroke="COLD_WATER" x="12" />
         </svg>
         <q-space />
         <q-icon v-if="kp === 0" name="mdi-calculator-variant" class="q-mr-xs" />
