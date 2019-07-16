@@ -2,7 +2,7 @@ import forEach from 'lodash/forEach';
 import parseDuration from 'parse-duration';
 
 import { nanoToMilli } from '@/helpers/functional';
-import historyStore from '@/store/history';
+import { historyStore } from '@/store/history';
 import {
   DisplayNames,
   GraphValueAxes,

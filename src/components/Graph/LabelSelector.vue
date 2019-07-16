@@ -1,6 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
-import { Component, Emit,Prop } from 'vue-property-decorator';
+import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import { DisplayNames } from '@/store/history';
 
@@ -30,7 +30,7 @@ export default class LabelSelector extends Vue {
       <q-item-section>Metric</q-item-section>
       <q-item-section>Display as</q-item-section>
     </q-item>
-    <q-separator dark inset/>
+    <q-separator dark inset />
     <q-item v-for="field in selected" :key="field" dark>
       <q-item-section>{{ field }}</q-item-section>
       <q-item-section>

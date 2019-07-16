@@ -3,7 +3,7 @@ import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import WatcherBase from '@/components/Watcher/WatcherBase';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import { SystemStatus } from '../types';
 

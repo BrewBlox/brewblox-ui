@@ -2,7 +2,7 @@ import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import { Block } from '../types';
 import { BlockCrud } from './BlockCrudComponent';

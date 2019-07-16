@@ -1,4 +1,4 @@
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import { PidBlock } from './types';
 

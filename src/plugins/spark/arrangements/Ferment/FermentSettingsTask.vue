@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { Unit } from '@/helpers/units';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import { createActions, defineChangedBlocks, defineCreatedBlocks, defineWidgets } from './changes';
 import { FermentConfig } from './types';

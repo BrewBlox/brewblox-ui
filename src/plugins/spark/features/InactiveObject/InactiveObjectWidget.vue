@@ -2,7 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import featureStore from '@/store/features';
+import { featureStore } from '@/store/features';
 
 import { InactiveObjectBlock } from './types';
 

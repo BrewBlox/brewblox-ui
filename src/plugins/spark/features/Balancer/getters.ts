@@ -1,6 +1,6 @@
 import get from 'lodash/get';
 
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import { BalancerBlock } from './types';
 

@@ -4,8 +4,8 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { deepCopy } from '@/helpers/units/parseObject';
 import { DashboardItem } from '@/store/dashboards';
-import dashboardStore from '@/store/dashboards';
-import featureStore from '@/store/features';
+import { dashboardStore } from '@/store/dashboards';
+import { featureStore } from '@/store/features';
 
 export interface Crud {
   widget: DashboardItem;

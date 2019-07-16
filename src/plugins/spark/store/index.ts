@@ -4,8 +4,8 @@ import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-dec
 
 import { Link } from '@/helpers/units';
 import store from '@/store';
-import dashboardStore from '@/store/dashboards';
-import serviceStore from '@/store/services';
+import { dashboardStore } from '@/store/dashboards';
+import { serviceStore } from '@/store/services';
 
 import { ConstraintsObj } from '../components/Constraints/ConstraintsBase';
 import { constraintLabels } from '../helpers';
@@ -41,6 +41,8 @@ import {
   serviceImport as serviceImportInApi,
   validateService as validateServiceInApi,
 } from './api';
+
+const rawError = true;
 
 // Note: we're ignoring the system group (group 8)
 const defaultGroupNames = [
@@ -356,7 +358,7 @@ export class SparkModule extends VuexModule {
     Vue.set(this.services[serviceId], 'lastStatus', status);
   }
 
-  @Action
+  @Action({ rawError })
   public async addService(serviceId: string): Promise<void> {
     if (this.services[serviceId]) {
       throw new Error(`Service ${serviceId} already exists`);
@@ -373,36 +375,36 @@ export class SparkModule extends VuexModule {
     this.commitService([serviceId, empty]);
   }
 
-  @Action
+  @Action({ rawError })
   public async removeService(serviceId: string): Promise<void> {
     this.commitRemoveService(serviceId);
   }
 
-  @Action
+  @Action({ rawError })
   public async fetchBlock([serviceId, block]: [string, Block]): Promise<void> {
     const fetched = await fetchBlockInApi(block);
     this.commitBlock([serviceId, fetched]);
   }
 
-  @Action
+  @Action({ rawError })
   public async createBlock([serviceId, block]: [string, Block]): Promise<void> {
     const created = await createBlockInApi(block);
     this.commitBlock([serviceId, created]);
   }
 
-  @Action
+  @Action({ rawError })
   public async saveBlock([serviceId, block]: [string, Block]): Promise<void> {
     const persisted = await persistBlockInApi(block);
     this.commitBlock([serviceId, persisted]);
   }
 
-  @Action
+  @Action({ rawError })
   public async removeBlock([serviceId, block]: [string, Block]): Promise<void> {
     await deleteBlockInApi(block);
     this.commitRemoveBlock([serviceId, block]);
   }
 
-  @Action
+  @Action({ rawError })
   public async updateGroupNames([serviceId, names]: [string, string[]]): Promise<void> {
     const existing = this.sparkServiceById(serviceId);
     await serviceStore.saveService({
@@ -414,13 +416,13 @@ export class SparkModule extends VuexModule {
     });
   }
 
-  @Action
+  @Action({ rawError })
   public async fetchBlocks(serviceId: string): Promise<void> {
     const blocks = await fetchBlocksInApi(serviceId);
     this.commitAllBlocks([serviceId, blocks]);
   }
 
-  @Action
+  @Action({ rawError })
   public async renameBlock([serviceId, currentId, newId]: [string, string, string]): Promise<void> {
     if (this.blockIds(serviceId).includes(newId)) {
       throw new Error(`Block ${newId} already exists`);
@@ -432,54 +434,54 @@ export class SparkModule extends VuexModule {
       .forEach(item => dashboardStore.commitDashboardItem({ ...item, config: { ...item.config, blockId: newId } }));
   }
 
-  @Action
+  @Action({ rawError })
   public async clearBlocks(serviceId: string): Promise<void> {
     await clearBlocksInApi(serviceId);
     await this.fetchBlocks(serviceId);
   }
 
-  @Action
+  @Action({ rawError })
   public async fetchServiceStatus(serviceId: string): Promise<void> {
     this.commitLastStatus([serviceId, await fetchSystemStatusInApi(serviceId)]);
   }
 
-  @Action
+  @Action({ rawError })
   public async fetchUnits(serviceId: string): Promise<void> {
     this.commitUnits([serviceId, await fetchUnitsInApi(serviceId)]);
   }
 
-  @Action
+  @Action({ rawError })
   public async saveUnits([serviceId, units]: [string, UserUnits]): Promise<void> {
     this.commitUnits([serviceId, await persistUnitsInApi(serviceId, units)]);
   }
 
-  @Action
+  @Action({ rawError })
   public async fetchUnitAlternatives(serviceId: string): Promise<void> {
     this.commitUnitAlternatives([serviceId, await fetchUnitAlternativesInApi(serviceId)]);
   }
 
-  @Action
+  @Action({ rawError })
   public async fetchCompatibleTypes(serviceId: string): Promise<void> {
     this.commitCompatibleTypes([serviceId, await fetchCompatibleTypesInApi(serviceId)]);
   }
 
-  @Action
+  @Action({ rawError })
   public async fetchDiscoveredBlocks(serviceId: string): Promise<void> {
     const newIds = await fetchDiscoveredBlocksInApi(serviceId);
     this.commitDiscoveredBlocks([serviceId, [...this.services[serviceId].discoveredBlocks, ...newIds]]);
   }
 
-  @Action
+  @Action({ rawError })
   public async clearDiscoveredBlocks(serviceId: string): Promise<void> {
     this.commitDiscoveredBlocks([serviceId, []]);
   }
 
-  @Action
+  @Action({ rawError })
   public async cleanUnusedNames(serviceId: string): Promise<string[]> {
     return await cleanUnusedNamesInApi(serviceId);
   }
 
-  @Action
+  @Action({ rawError })
   public async fetchAll(serviceId: string): Promise<void> {
     const status = await fetchSystemStatusInApi(serviceId);
     this.commitLastStatus([serviceId, status]);
@@ -492,7 +494,7 @@ export class SparkModule extends VuexModule {
     }
   }
 
-  @Action
+  @Action({ rawError })
   public async createUpdateSource(serviceId: string): Promise<void> {
     this.commitUpdateSource([
       serviceId,
@@ -504,17 +506,17 @@ export class SparkModule extends VuexModule {
     ]);
   }
 
-  @Action
+  @Action({ rawError })
   public async validateService(serviceId: string): Promise<boolean> {
     return await validateServiceInApi(serviceId);
   }
 
-  @Action
+  @Action({ rawError })
   public async serviceExport(serviceId: string): Promise<any> {
     return await serviceExportInApi(serviceId);
   }
 
-  @Action
+  @Action({ rawError })
   public async serviceImport([serviceId, exported]: [string, any]): Promise<string[]> {
     const importLog = await serviceImportInApi(serviceId, exported);
     await this.fetchBlocks(serviceId);
@@ -522,4 +524,4 @@ export class SparkModule extends VuexModule {
   }
 }
 
-export default getModule(SparkModule);
+export const sparkStore = getModule(SparkModule);

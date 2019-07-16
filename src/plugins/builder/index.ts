@@ -1,11 +1,11 @@
 import { ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features';
-import featureStore from '@/store/features';
+import { featureStore } from '@/store/features';
 
 import form from './BuilderForm.vue';
 import widget from './BuilderWidget.vue';
 import wizard from './BuilderWizard.vue';
-import { deprecatedTypes,typeName } from './getters';
+import { deprecatedTypes, typeName } from './getters';
 import { parts } from './register';
 import { BuilderConfig } from './types';
 

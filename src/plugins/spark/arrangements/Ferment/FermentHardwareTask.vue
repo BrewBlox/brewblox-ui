@@ -10,7 +10,7 @@ import { typeName as Spark2PinsType } from '@/plugins/spark/features/Spark2Pins/
 import { typeName as Spark3PinsType } from '@/plugins/spark/features/Spark3Pins/getters';
 import { typeName as sensorMockType } from '@/plugins/spark/features/TempSensorMock/getters';
 import { typeName as sensorOneWireType } from '@/plugins/spark/features/TempSensorOneWire/getters';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 
 @Component
@@ -111,14 +111,14 @@ export default class FermentHardwareTask extends WizardTaskBase {
       </q-item>
       <q-item dark>
         <q-item-section class="col-auto">
-          <q-btn unelevated label="Discover OneWire objects" color="primary" @click="discover"/>
+          <q-btn unelevated label="Discover OneWire objects" color="primary" @click="discover" />
           <q-tooltip>
             OneWire temperature sensors and DS2413 chips can be discovered:
             the Block will be created automatically.
           </q-tooltip>
         </q-item-section>
         <q-item-section class="col-auto">
-          <q-btn unelevated label="Create block" color="primary" @click="startBlockWizard"/>
+          <q-btn unelevated label="Create block" color="primary" @click="startBlockWizard" />
         </q-item-section>
       </q-item>
       <q-item dark>
@@ -171,12 +171,12 @@ export default class FermentHardwareTask extends WizardTaskBase {
       </q-item>
     </q-card-section>
 
-    <q-separator dark/>
+    <q-separator dark />
 
     <q-card-actions>
-      <q-btn unelevated label="Back" @click="back"/>
-      <q-space/>
-      <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone"/>
+      <q-btn unelevated label="Back" @click="back" />
+      <q-space />
+      <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone" />
     </q-card-actions>
   </div>
 </template>

@@ -2,8 +2,8 @@ import get from 'lodash/get';
 import { Dialog } from 'quasar';
 
 import { Link } from '@/helpers/units';
-import sparkStore from '@/plugins/spark/store';
-import featureStore from '@/store/features';
+import { sparkStore } from '@/plugins/spark/store';
+import { featureStore } from '@/store/features';
 
 import { BlockLink } from '../../types';
 import { PidBlock } from './types';

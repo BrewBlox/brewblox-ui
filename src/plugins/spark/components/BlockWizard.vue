@@ -6,11 +6,11 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
 import { blockIdRules } from '@/plugins/spark/helpers';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import { DashboardItem } from '@/store/dashboards';
-import featureStore from '@/store/features';
-import providerStore from '@/store/providers';
+import { featureStore } from '@/store/features';
+import { providerStore } from '@/store/providers';
 
 import { BlockCrud } from './BlockCrudComponent';
 

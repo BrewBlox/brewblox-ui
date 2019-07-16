@@ -7,9 +7,9 @@ import { Component, Prop } from 'vue-property-decorator';
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 import { Block, ChangeField } from '@/plugins/spark/types';
-import featureStore from '@/store/features';
+import { featureStore } from '@/store/features';
 
 import { BlockChange, Step, StepViewConfig } from './types';
 
@@ -286,7 +286,7 @@ export default class StepViewForm extends CrudComponent {
                       <q-btn flat round icon="add" @click="addField(change, key)">
                         <q-tooltip>
                           Add field to Block Change
-                          <br >The field will be changed when the Step is applied.
+                          <br />The field will be changed when the Step is applied.
                         </q-tooltip>
                       </q-btn>
                     </q-item-section>
@@ -316,7 +316,7 @@ export default class StepViewForm extends CrudComponent {
                       <q-btn flat round icon="mdi-close" @click="removeField(change, key)">
                         <q-tooltip>
                           Remove field from Block Change.
-                          <br >The field will not be changed when the Step is applied.
+                          <br />The field will not be changed when the Step is applied.
                         </q-tooltip>
                       </q-btn>
                     </q-item-section>

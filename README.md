@@ -85,7 +85,7 @@ In order to support the `gizmo` device:
 * Create the `src/plugins/gizmo` directory.
 * In `src/plugins/gizmo/index.ts`, add an initializer:
 ```js
-import providerStore from '@/store/providers';
+import { providerStore } from '@/store/providers';
 
 export default({ store, router }: PluginArguments) => {
   providerStore.createProvider({

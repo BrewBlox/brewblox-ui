@@ -5,7 +5,7 @@ import { Component } from 'vue-property-decorator';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { deserialize, isSubSet, serialize } from '@/helpers/units/parseObject';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import { Block, ChangeField } from '../../types';
 import { Step } from './types';

@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/Dialog/DialogBase';
 import { spaceCased } from '@/helpers/functional';
 import { prettify } from '@/helpers/units';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 import { UserUnits } from '@/plugins/spark/types';
 
 

@@ -2,8 +2,8 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import dashboardStore from '@/store/dashboards';
-import serviceStore from '@/store/services';
+import { dashboardStore } from '@/store/dashboards';
+import { serviceStore } from '@/store/services';
 
 @Component
 export default class App extends Vue {
@@ -18,7 +18,7 @@ export default class App extends Vue {
 
 <template>
   <div id="q-app">
-    <router-view/>
+    <router-view />
   </div>
 </template>
 

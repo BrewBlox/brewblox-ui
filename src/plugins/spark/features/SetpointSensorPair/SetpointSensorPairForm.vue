@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import { Block } from '../../types';
 import { FilterChoice, SetpointSensorPairBlock } from './types';

@@ -1,10 +1,10 @@
 import { Dialog, uid } from 'quasar';
 
 import { BlockCrud } from '@/plugins/spark/components/BlockCrudComponent';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import { DashboardItem } from '@/store/dashboards';
-import featureStore from '@/store/features';
+import { featureStore } from '@/store/features';
 
 export const showBlockDialog = (block: Block | null, props: any = {}) => {
   if (!block) {

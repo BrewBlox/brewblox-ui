@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/Dialog/DialogBase';
 import { objectStringSorter } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/units/parseObject';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
 @Component

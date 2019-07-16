@@ -5,7 +5,7 @@ import { Component } from 'vue-property-decorator';
 import { durationString, objectSorter } from '@/helpers/functional';
 import { Unit } from '@/helpers/units';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import { Setpoint, SetpointProfileBlock } from './types';
 

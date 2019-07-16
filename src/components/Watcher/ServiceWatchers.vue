@@ -2,8 +2,8 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import providerStore from '@/store/providers';
-import serviceStore from '@/store/services';
+import { providerStore } from '@/store/providers';
+import { serviceStore } from '@/store/services';
 
 @Component
 export default class ServiceWatchers extends Vue {
