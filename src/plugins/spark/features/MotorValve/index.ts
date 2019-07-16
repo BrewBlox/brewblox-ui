@@ -28,6 +28,10 @@ const block: BlockSpec = {
       generate: () => 0,
     },
   ],
+  graphTargets: {
+    state: 'Actual state',
+    desiredState: 'Desired state',
+  },
 };
 
 const feature: Feature = {

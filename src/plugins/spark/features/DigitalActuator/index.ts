@@ -60,6 +60,10 @@ const block: BlockSpec = {
       generate: () => false,
     },
   ],
+  graphTargets: {
+    state: 'Actual state',
+    desiredState: 'Desired state',
+  },
 };
 
 const feature: Feature = {
