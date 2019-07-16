@@ -51,6 +51,10 @@ export default class PartWrapper extends Vue {
   get transformation() {
     return `${this.rotateTransform} ${this.flipTransform}`;
   }
+
+  squares(val: number): number {
+    return SQUARE_SIZE * val;
+  }
 }
 </script>
 
@@ -65,8 +69,8 @@ export default class PartWrapper extends Vue {
     />
     <!-- background element, to make the full part clickable -->
     <rect
-      :width="partSize[0]*SQUARE_SIZE"
-      :height="partSize[1]*SQUARE_SIZE"
+      :width="squares(partSize[0])"
+      :height="squares(partSize[1])"
       :class="{showhover: showHover}"
       opacity="0"
     />

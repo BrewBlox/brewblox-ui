@@ -37,8 +37,6 @@ interface ToolAction {
   },
 })
 export default class BuilderForm extends CrudComponent {
-  SQUARE_SIZE = SQUARE_SIZE;
-
   $refs!: {
     grid: any;
   }
@@ -353,6 +351,10 @@ export default class BuilderForm extends CrudComponent {
     }
   }
 
+  squares(val: number): number {
+    return SQUARE_SIZE * val;
+  }
+
   mounted() {
     window.addEventListener('keyup', this.keyHandler);
   }
@@ -426,7 +428,7 @@ export default class BuilderForm extends CrudComponent {
               v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, part)"
               v-for="part in flowParts"
               v-show="!beingDragged(part)"
-              :transform="`translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`"
+              :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
               :key="part.id"
               :class="{ clickable: currentTool.cursor(part), [part.type]: true }"
               @click.stop="v => clickHandler(v, part)"
@@ -450,7 +452,7 @@ export default class BuilderForm extends CrudComponent {
             <g
               v-for="([coord, val], idx) in overlaps"
               :key="idx"
-              :transform="`translate(${coord.x * SQUARE_SIZE + 40}, ${coord.y * SQUARE_SIZE + 4})`"
+              :transform="`translate(${squares(coord.x) + 40}, ${squares(coord.y) + 4})`"
             >
               <circle r="8" fill="dodgerblue" />
               <text y="4" text-anchor="middle" fill="white" class="grid-item-coordinates">{{ val }}</text>

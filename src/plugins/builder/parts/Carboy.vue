@@ -34,16 +34,16 @@ export default class Carboy extends PartBase {
 <template>
   <g>
     <rect
-      :y="SQUARE_SIZE*1"
-      :width="SQUARE_SIZE*sizeX"
-      :height="SQUARE_SIZE*(sizeY-1)-2"
+      :y="squares(1)"
+      :width="squares(sizeX)"
+      :height="squares(sizeY-1)-2"
       :fill="color"
       rx="8"
       ry="8"
     />
     <g class="outline">
-      <path :d="path"/>
-      <SetpointValues :part="part" :start-y="1" :background-color="color" hide-unset/>
+      <path :d="path" />
+      <SetpointValues :part="part" :start-y="1" :background-color="color" hide-unset />
     </g>
   </g>
 </template>

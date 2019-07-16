@@ -33,11 +33,7 @@ export default class HeatingElement extends PartBase {
 
 <template>
   <g>
-    <foreignObject
-      :transform="textTransformation([1,1])"
-      :width="SQUARE_SIZE"
-      :height="SQUARE_SIZE"
-    >
+    <foreignObject :transform="textTransformation([1,1])" :width="squares(1)" :height="squares(1)">
       <div class="text-white text-bold text-center">
         <q-icon name="mdi-gauge" class="q-mr-xs" />
         <q-icon v-if="!block" name="mdi-link-variant-off" />
@@ -49,8 +45,8 @@ export default class HeatingElement extends PartBase {
     <g class="outline">
       <path v-for="border in paths.borders" :key="border" :d="border" />
       <rect
-        :width="SQUARE_SIZE-2"
-        :height="SQUARE_SIZE-2"
+        :width="squares(1)-2"
+        :height="squares(1)-2"
         x="1"
         y="1"
         rx="6"
