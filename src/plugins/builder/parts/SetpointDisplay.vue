@@ -10,11 +10,11 @@ export default class SetpointDisplay extends PartBase { }
 
 <template>
   <g>
-    <SetpointValues :part="part"/>
+    <SetpointValues :part="part" />
     <g class="outline">
       <rect
-        :width="SQUARE_SIZE*sizeX-2"
-        :height="SQUARE_SIZE*sizeY-2"
+        :width="squares(sizeX)-2"
+        :height="squares(sizeY)-2"
         x="1"
         y="1"
         rx="6"

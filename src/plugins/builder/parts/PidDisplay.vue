@@ -30,11 +30,7 @@ export default class PidDisplay extends PartBase {
 
 <template>
   <g>
-    <foreignObject
-      :transform="textTransformation([1,1])"
-      :width="SQUARE_SIZE"
-      :height="SQUARE_SIZE"
-    >
+    <foreignObject :transform="textTransformation([1,1])" :width="squares(1)" :height="squares(1)">
       <div class="text-white text-bold text-center">
         <svg>
           <HeatingIcon v-if="kp > 0" :stroke="HOT_WATER" x="10" />
@@ -43,15 +39,15 @@ export default class PidDisplay extends PartBase {
         <q-space />
         <q-icon v-if="kp === 0" name="mdi-calculator-variant" class="q-mr-xs" />
         <q-icon v-if="!block" name="mdi-link-variant-off" />
-        <br >
+        <br />
         {{ outputValue | round(0) }}
         <small v-if="!!block">%</small>
       </div>
     </foreignObject>
     <g class="outline">
       <rect
-        :width="SQUARE_SIZE-2"
-        :height="SQUARE_SIZE-2"
+        :width="squares(1)-2"
+        :height="squares(1)-2"
         x="1"
         y="1"
         rx="6"

@@ -81,7 +81,7 @@ export default class ActuatorValve extends PartBase {
 
 <template>
   <g>
-    <foreignObject v-if="!valveBlock" :height="SQUARE_SIZE" :width="SQUARE_SIZE">
+    <foreignObject v-if="!valveBlock" :height="squares(1)" :width="squares(1)">
       <q-icon name="mdi-link-variant-off" size="sm" class="absolute-right" style="height: 15px;" />
     </foreignObject>
     <g key="valve-outer" class="outline">
