@@ -41,7 +41,6 @@ export default class PidDisplay extends PartBase {
         <q-icon v-if="!block" name="mdi-link-variant-off" />
         <br />
         {{ outputValue | round(0) }}
-        <small v-if="!!block">%</small>
       </div>
     </foreignObject>
     <g class="outline">
