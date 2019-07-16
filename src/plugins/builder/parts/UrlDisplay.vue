@@ -25,7 +25,7 @@ export default class UrlDisplay extends PartBase {
         y="1"
         rx="6"
         ry="6"
-        stroke-width="2px"
+        stroke="none"
       />
       <g>
         <foreignObject

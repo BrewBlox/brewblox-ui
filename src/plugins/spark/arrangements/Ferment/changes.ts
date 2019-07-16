@@ -333,7 +333,7 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
           id: uid(),
           type: 'UrlDisplay',
           x: 1,
-          y: 8,
+          y: 9,
           rotate: 0,
           flipped: false,
           settings: {
