@@ -2,9 +2,9 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 import { flashFirmware } from '@/plugins/spark/store/api';
-import serviceStore from '@/store/services';
+import { serviceStore } from '@/store/services';
 
 
 

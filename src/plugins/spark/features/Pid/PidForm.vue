@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import { showBlockDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import { startRelationsDialog } from './relations';
 

@@ -35,6 +35,8 @@ export interface Arrangement {
   wizard: string;
 }
 
+const rawError = true;
+
 @Module({ store, namespaced: true, dynamic: true, name: 'features' })
 export class FeatureModule extends VuexModule {
   public features: Record<string, Feature> = {};
@@ -107,15 +109,15 @@ export class FeatureModule extends VuexModule {
     Vue.set(this.arrangements, arrangement.id, arrangement);
   }
 
-  @Action({ commit: 'commitFeature' })
+  @Action({ rawError, commit: 'commitFeature' })
   public async createFeature(feature: Feature): Promise<Feature> {
     return feature;
   }
 
-  @Action({ commit: 'commitArrangement' })
+  @Action({ rawError, commit: 'commitArrangement' })
   public async createArrangement(arrangement: Arrangement): Promise<Arrangement> {
     return arrangement;
   }
 }
 
-export default getModule(FeatureModule);
+export const featureStore = getModule(FeatureModule);

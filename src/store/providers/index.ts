@@ -19,6 +19,8 @@ export interface Provider {
   watcher?: string;
 }
 
+const rawError = true;
+
 @Module({ store, namespaced: true, dynamic: true, name: 'providers' })
 export class ProviderModule extends VuexModule {
   public providers: Record<string, Provider> = {};
@@ -72,10 +74,10 @@ export class ProviderModule extends VuexModule {
     Vue.set(this.providers, provider.id, { ...provider });
   }
 
-  @Action({ commit: 'commitProvider' })
+  @Action({ rawError, commit: 'commitProvider' })
   public async createProvider(provider: Provider): Promise<Provider> {
     return provider;
   }
 }
 
-export default getModule(ProviderModule);
+export const providerStore = getModule(ProviderModule);

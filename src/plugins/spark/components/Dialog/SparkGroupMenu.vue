@@ -2,9 +2,9 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
-import serviceStore from '@/store/services';
+import { serviceStore } from '@/store/services';
 
 
 @Component
@@ -31,7 +31,8 @@ export default class SparkGroupMenu extends DialogBase {
   }
 
   saveGroupNames(vals: string[] = this.groupNames) {
-    sparkStore.updateGroupNames([this.service.id, vals]);
+    sparkStore.updateGroupNames([this.service.id, vals])
+      .catch(() => { });
   }
 }
 </script>
@@ -59,7 +60,7 @@ export default class SparkGroupMenu extends DialogBase {
           </q-item-section>
         </q-item>
 
-        <q-item dense/>
+        <q-item dense />
 
         <div class="row">
           <q-item v-for="(name, idx) in groupNames" :key="idx" dark class="col-4">

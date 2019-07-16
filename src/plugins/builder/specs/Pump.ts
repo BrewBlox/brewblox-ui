@@ -1,6 +1,6 @@
 import { typeName } from '@/plugins/spark/features/DigitalActuator/getters';
 import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/types';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 import { DigitalState } from '@/plugins/spark/types';
 
 import { ACCELERATE_OTHERS, DEFAULT_PUMP_PRESSURE, LEFT, RIGHT, defaultSpec } from '../getters';

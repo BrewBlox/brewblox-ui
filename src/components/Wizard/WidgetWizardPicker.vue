@@ -3,8 +3,8 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
-import dashboardStore from '@/store/dashboards';
-import featureStore from '@/store/features';
+import { dashboardStore } from '@/store/dashboards';
+import { featureStore } from '@/store/features';
 
 @Component
 export default class WidgetWizardPicker extends Vue {
@@ -127,16 +127,16 @@ export default class WidgetWizardPicker extends Vue {
         <q-item dark>
           <q-item-section>
             <q-item-label>Dashboard</q-item-label>
-            <q-option-group v-model="chosenDashboardId" :options="dashboardOptions"/>
+            <q-option-group v-model="chosenDashboardId" :options="dashboardOptions" />
           </q-item-section>
         </q-item>
       </q-card-section>
 
-      <q-separator dark/>
+      <q-separator dark />
 
       <q-card-actions class="row justify-between">
-        <q-btn unelevated label="Back" @click="back"/>
-        <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="next"/>
+        <q-btn unelevated label="Back" @click="back" />
+        <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="next" />
       </q-card-actions>
     </template>
   </div>

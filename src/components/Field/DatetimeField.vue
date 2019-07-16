@@ -59,7 +59,7 @@ export default class DatetimeField extends FieldBase {
   <component
     :is="tag"
     v-bind="tagProps"
-    :class="[{editable: !readonly},tagClass]"
+    :class="[{ editable: !readonly }, tagClass]"
     @click="openDialog"
   >
     <slot name="pre" />

@@ -3,8 +3,7 @@ import isString from 'lodash/isString';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import dashboardStore from '@/store/dashboards';
-import { Dashboard } from '@/store/dashboards';
+import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 @Component
 export default class DashboardWizard extends Vue {
@@ -84,8 +83,8 @@ export default class DashboardWizard extends Vue {
               <q-icon name="information">
                 <q-tooltip>
                   The Dashboard Title is how the dashboard is displayed in the UI.
-                  <br>This choice is purely graphical: pick a name that makes sense to you.
-                  <br>If left empty, the dashboard ID will be used.
+                  <br />This choice is purely graphical: pick a name that makes sense to you.
+                  <br />If left empty, the dashboard ID will be used.
                 </q-tooltip>
               </q-icon>
             </template>
@@ -94,11 +93,11 @@ export default class DashboardWizard extends Vue {
       </q-item>
     </q-card-section>
 
-    <q-separator dark/>
+    <q-separator dark />
 
     <q-card-actions>
-      <q-btn unelevated label="Back" class="full-width" @click="back"/>
-      <q-btn unelevated label="Create" color="primary" class="full-width q-mt-sm" @click="create"/>
+      <q-btn unelevated label="Back" class="full-width" @click="back" />
+      <q-btn unelevated label="Create" color="primary" class="full-width q-mt-sm" @click="create" />
     </q-card-actions>
   </div>
 </template>

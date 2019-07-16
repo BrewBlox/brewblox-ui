@@ -5,7 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { contrastColor } from '@/helpers/functional';
 import { typeName as pidType } from '@/plugins/spark/features/Pid/getters';
 import { SetpointSensorPairBlock } from '@/plugins/spark/features/SetpointSensorPair/types';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import { SQUARE_SIZE } from '../getters';
 import { settingsBlock } from '../helpers';

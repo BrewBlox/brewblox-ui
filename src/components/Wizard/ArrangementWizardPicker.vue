@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
-import featureStore from '@/store/features';
+import { featureStore } from '@/store/features';
 
 @Component
 export default class ArrangementWizardPicker extends Vue {
@@ -84,11 +84,11 @@ export default class ArrangementWizardPicker extends Vue {
         </q-item>
       </q-card-section>
 
-      <q-separator dark/>
+      <q-separator dark />
 
       <q-card-actions class="row justify-between">
-        <q-btn unelevated label="Back" @click="back"/>
-        <q-btn unelevated label="Next" color="primary" @click="next"/>
+        <q-btn unelevated label="Back" @click="back" />
+        <q-btn unelevated label="Next" color="primary" @click="next" />
       </q-card-actions>
     </template>
   </div>

@@ -1,7 +1,7 @@
 import { Dialog, Notify } from 'quasar';
 import UrlSafeString from 'url-safe-string';
 
-import dashboardStore, { Dashboard } from '@/store/dashboards';
+import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 import { suggestId } from './functional';
 

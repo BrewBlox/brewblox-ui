@@ -6,7 +6,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/Dialog/DialogBase';
 import { objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import { showBlockDialog } from '../../helpers/dialog';
 import { Block } from '../../plugins/spark/types';
@@ -98,7 +98,7 @@ export default class LinkDialog extends DialogBase {
     <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
       <q-card-section class="q-dialog__title">{{ title }}</q-card-section>
       <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
-      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml"/>
+      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
         <q-select
           :value="link"
@@ -121,7 +121,7 @@ export default class LinkDialog extends DialogBase {
             <q-btn v-if="linkBlock" flat round icon="mdi-pencil" @click="edit">
               <q-tooltip>Edit {{ link.id }}</q-tooltip>
             </q-btn>
-            <q-btn v-else disable flat round icon="mdi-pencil-off"/>
+            <q-btn v-else disable flat round icon="mdi-pencil-off" />
             <q-btn flat round icon="add" @click="create">
               <q-tooltip>Create new Block</q-tooltip>
             </q-btn>
@@ -129,7 +129,7 @@ export default class LinkDialog extends DialogBase {
         </q-select>
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel"/>
+        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn
           :disable="!clearable && !link"
           flat

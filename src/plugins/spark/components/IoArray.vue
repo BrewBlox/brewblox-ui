@@ -5,7 +5,7 @@ import { Component } from 'vue-property-decorator';
 
 import { objectSorter, objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 
 import { typeName as actuatorType } from '../features/DigitalActuator/getters';

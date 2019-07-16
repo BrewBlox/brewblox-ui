@@ -6,8 +6,8 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
-import sparkStore from '@/plugins/spark/store';
-import serviceStore from '@/store/services';
+import { sparkStore } from '@/plugins/spark/store';
+import { serviceStore } from '@/store/services';
 
 
 @Component
@@ -99,7 +99,7 @@ export default class SparkImportMenu extends DialogBase {
       <q-card-section>
         <q-item dark>
           <q-item-section>
-            <input type="file" @change="handleImportFileSelect">
+            <input type="file" @change="handleImportFileSelect" />
           </q-item-section>
         </q-item>
         <q-item dark>
@@ -115,7 +115,7 @@ export default class SparkImportMenu extends DialogBase {
         </q-item>
         <q-item dark>
           <q-item-section>
-            <q-btn :loading="importBusy" outline label="Export Blocks" @click="exportBlocks"/>
+            <q-btn :loading="importBusy" outline label="Export Blocks" @click="exportBlocks" />
           </q-item-section>
         </q-item>
         <q-item v-if="messages.length > 0" dark>

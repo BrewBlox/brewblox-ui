@@ -4,7 +4,7 @@ import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 
 import { typeName as valveType } from '../features/MotorValve/getters';

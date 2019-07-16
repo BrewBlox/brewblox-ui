@@ -6,8 +6,7 @@ import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
 import { GraphConfig } from '@/components/Graph/types';
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { durationString } from '@/helpers/functional';
-import historyStore, { DisplayNames } from '@/store/history';
-import { GraphValueAxes } from '@/store/history';
+import { DisplayNames, GraphValueAxes, historyStore } from '@/store/history';
 
 interface PeriodDisplay {
   start: boolean;
@@ -149,7 +148,7 @@ export default class GraphForm extends CrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :crud="crud"/>
+    <FormToolbar :crud="crud" />
 
     <q-card-section>
       <q-expansion-item group="modal" icon="mdi-timetable" label="Period settings">
@@ -209,7 +208,7 @@ export default class GraphForm extends CrudComponent {
       <q-expansion-item default-opened group="modal" icon="mdi-file-tree" label="Metrics">
         <div class="scroll-parent">
           <q-scroll-area>
-            <MetricSelector :selected.sync="selected"/>
+            <MetricSelector :selected.sync="selected" />
           </q-scroll-area>
         </div>
       </q-expansion-item>
@@ -217,7 +216,7 @@ export default class GraphForm extends CrudComponent {
       <q-expansion-item group="modal" icon="mdi-tag-multiple" label="Legend">
         <div class="scroll-parent">
           <q-scroll-area>
-            <LabelSelector :selected="selected" :renames.sync="renames"/>
+            <LabelSelector :selected="selected" :renames.sync="renames" />
           </q-scroll-area>
         </div>
       </q-expansion-item>
@@ -229,7 +228,7 @@ export default class GraphForm extends CrudComponent {
               <q-item-section>Metric</q-item-section>
               <q-item-section side>Left or right axis</q-item-section>
             </q-item>
-            <q-separator dark inset/>
+            <q-separator dark inset />
             <q-item
               v-for="field in selected"
               :key="field"
@@ -239,7 +238,7 @@ export default class GraphForm extends CrudComponent {
             >
               <q-item-section>{{ field }}</q-item-section>
               <q-item-section side>
-                <q-icon :class="{mirrored: isRightAxis(field)}" name="mdi-chart-line" size="30px"/>
+                <q-icon :class="{mirrored: isRightAxis(field)}" name="mdi-chart-line" size="30px" />
               </q-item-section>
             </q-item>
             <q-item v-if="!selected || selected.length === 0" dark>

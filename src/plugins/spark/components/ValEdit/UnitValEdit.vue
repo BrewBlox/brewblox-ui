@@ -2,7 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import Unit, { prettify } from '@/helpers/units/Unit';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import ValEdit from './ValEdit';
 

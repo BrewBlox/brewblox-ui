@@ -4,8 +4,8 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
-import providerStore from '@/store/providers';
-import serviceStore from '@/store/services';
+import { providerStore } from '@/store/providers';
+import { serviceStore } from '@/store/services';
 
 @Component
 export default class ServiceWizardPicker extends Vue {
@@ -107,7 +107,7 @@ export default class ServiceWizardPicker extends Vue {
                 <q-icon name="mdi-information">
                   <q-tooltip>
                     The Service ID is how the service is contacted.
-                    <br>This should match the ID in docker-compose.
+                    <br />This should match the ID in docker-compose.
                   </q-tooltip>
                 </q-icon>
               </template>
@@ -121,8 +121,8 @@ export default class ServiceWizardPicker extends Vue {
                 <q-icon name="mdi-information">
                   <q-tooltip>
                     The Service title is how the service is displayed in the UI.
-                    <br>This choice is purely graphical: pick a name that makes sense to you.
-                    <br>If left empty, the service ID will be used.
+                    <br />This choice is purely graphical: pick a name that makes sense to you.
+                    <br />If left empty, the service ID will be used.
                   </q-tooltip>
                 </q-icon>
               </template>
@@ -131,11 +131,11 @@ export default class ServiceWizardPicker extends Vue {
         </q-item>
       </q-card-section>
 
-      <q-separator dark/>
+      <q-separator dark />
 
       <q-card-actions class="row justify-between">
-        <q-btn unelevated label="Back" @click="back"/>
-        <q-btn unelevated label="Next" color="primary" @click="next"/>
+        <q-btn unelevated label="Back" @click="back" />
+        <q-btn unelevated label="Next" color="primary" @click="next" />
       </q-card-actions>
     </template>
   </div>

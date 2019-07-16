@@ -2,8 +2,8 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import providerStore from '@/store/providers';
-import serviceStore from '@/store/services';
+import { providerStore } from '@/store/providers';
+import { serviceStore } from '@/store/services';
 
 
 @Component
@@ -30,7 +30,7 @@ export default class ServicePage extends Vue {
 
 <template>
   <q-page padding>
-    <component v-if="serviceValid && pageComponent" :is="pageComponent" :service-id="serviceId"/>
+    <component v-if="serviceValid && pageComponent" :is="pageComponent" :service-id="serviceId" />
     <div v-else-if="serviceValid" class="flex flex-center">Invalid service page: {{ serviceId }}</div>
     <p v-else>Service {{ serviceId }} not found.</p>
   </q-page>

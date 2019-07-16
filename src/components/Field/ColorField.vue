@@ -58,15 +58,15 @@ export default class ColorField extends FieldBase {
   <component
     :is="tag"
     v-bind="tagProps"
-    :class="[{editable: !readonly},tagClass]"
+    :class="[{ editable: !readonly }, tagClass]"
     @click="openDialog"
   >
-    <slot name="pre"/>
+    <slot name="pre" />
     <slot name="value">{{ colorString }}</slot>
     <slot name="indicator">
-      <span :style="colorStyle"/>
+      <span :style="colorStyle" />
     </slot>
-    <slot/>
+    <slot />
     <q-tooltip v-if="!readonly">Choose color</q-tooltip>
   </component>
 </template>

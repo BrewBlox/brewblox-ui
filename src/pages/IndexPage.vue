@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import dashboardStore from '@/store/dashboards';
+import { dashboardStore } from '@/store/dashboards';
 
 @Component
 export default class IndexPage extends Vue {

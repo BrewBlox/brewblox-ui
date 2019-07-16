@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { showBlockDialog } from '@/helpers/dialog';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 @Component
 export default class DrivenIndicator extends Vue {

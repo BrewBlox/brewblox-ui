@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
 import { channel, typeName } from './getters';

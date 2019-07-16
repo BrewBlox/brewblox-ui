@@ -8,8 +8,8 @@ import buildEnv from '@/build-env.json';
 import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '@/helpers/dashboards';
 import { objectSorter } from '@/helpers/functional';
-import dashboardStore, { Dashboard } from '@/store/dashboards';
-import serviceStore, { Service } from '@/store/services';
+import { Dashboard, dashboardStore } from '@/store/dashboards';
+import { Service, serviceStore } from '@/store/services';
 
 @Component({
   components: {

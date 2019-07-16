@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
 
 import store from '@/store';
-import providerStore from '@/store/providers';
+import { providerStore } from '@/store/providers';
 
 import {
   createService as createServiceInApi,
@@ -20,6 +20,8 @@ export interface Service {
   config: Record<string, any>;
   _rev?: string;
 }
+
+const rawError = true;
 
 const initService = async (service: Service): Promise<void> => {
   await providerStore.onAddById(service.type)(service);
@@ -75,7 +77,7 @@ export class ServiceModule extends VuexModule {
     Vue.delete(this.services, service.id);
   }
 
-  @Action
+  @Action({ rawError })
   public async createService(service: Service): Promise<Service> {
     const created = await createServiceInApi(service);
     this.commitService(created);
@@ -83,18 +85,18 @@ export class ServiceModule extends VuexModule {
     return created;
   }
 
-  @Action({ commit: 'commitService' })
+  @Action({ rawError, commit: 'commitService' })
   public async saveService(service: Service): Promise<Service> {
     return await persistServiceInApi(service);
   }
 
-  @Action({ commit: 'commitRemoveService' })
+  @Action({ rawError, commit: 'commitRemoveService' })
   public async removeService(service: Service): Promise<Service> {
     await providerStore.onRemoveById(service.type)(service);
     return await removeServiceInApi(service);
   }
 
-  @Action
+  @Action({ rawError })
   public async updateServiceOrder(ids: string[]): Promise<void> {
     await Promise.all(
       ids.map(async (id, idx) => {
@@ -103,7 +105,7 @@ export class ServiceModule extends VuexModule {
       }));
   }
 
-  @Action
+  @Action({ rawError })
   public async setup(): Promise<void> {
     /* eslint-disable no-underscore-dangle */
     const onChange = async (service: Service): Promise<void> => {
@@ -131,4 +133,4 @@ export class ServiceModule extends VuexModule {
   }
 }
 
-export default getModule(ServiceModule);
+export const serviceStore = getModule(ServiceModule);

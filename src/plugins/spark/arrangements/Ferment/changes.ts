@@ -6,10 +6,9 @@ import { MutexLink, ProcessValueLink, SetpointSensorPairLink } from '@/helpers/u
 import { serialize } from '@/helpers/units/parseObject';
 import { typeName as builderType } from '@/plugins/builder/getters';
 import { FermentConfig, PinChannel } from '@/plugins/spark/arrangements/Ferment/types';
-import sparkStore from '@/plugins/spark/store';
-import dashboardStore, { DashboardItem } from '@/store/dashboards';
-import { Dashboard } from '@/store/dashboards';
-import featureStore from '@/store/features';
+import { sparkStore } from '@/plugins/spark/store';
+import { Dashboard, DashboardItem, dashboardStore } from '@/store/dashboards';
+import { featureStore } from '@/store/features';
 
 import { typeName as pwmType } from '../../features/ActuatorPwm/getters';
 import { ActuatorPwmBlock } from '../../features/ActuatorPwm/types';

@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import { DashboardItem } from '@/store/dashboards';
-import featureStore from '@/store/features';
+import { featureStore } from '@/store/features';
 
 import { Crud } from './CrudComponent';
 

@@ -9,7 +9,7 @@ import { Watch } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 import { showBlockDialog } from '@/helpers/dialog';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 import { BlockLink } from '@/plugins/spark/types';
 
 interface Edge {

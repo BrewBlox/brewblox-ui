@@ -1,6 +1,6 @@
 import { typeName as actuatorType } from '@/plugins/spark/features/DigitalActuator/getters';
 import { typeName as motorValveType } from '@/plugins/spark/features/MotorValve/getters';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 import { DigitalState } from '@/plugins/spark/types';
 
 import { LEFT, RIGHT, defaultSpec } from '../getters';
