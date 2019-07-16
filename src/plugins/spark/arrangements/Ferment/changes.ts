@@ -330,6 +330,20 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
             },
           },
         },
+        {
+          id: uid(),
+          type: 'UrlDisplay',
+          x: 1,
+          y: 8,
+          rotate: 0,
+          flipped: false,
+          settings: {
+            text: 'User manual',
+            url: 'https://brewblox.netlify.com/user/ferment_guide.html#ferment-fridge-process-view',
+            sizeX: 4,
+            sizeY: 1,
+          },
+        },
       ],
     },
   });
