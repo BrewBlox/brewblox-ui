@@ -6,8 +6,7 @@ import { Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { durationString } from '@/helpers/functional';
-import { historyStore } from '@/store/history';
-import { DisplayNames, Listener, QueryParams, QueryTarget } from '@/store/history';
+import { DisplayNames, Listener, QueryParams, QueryTarget, historyStore } from '@/store/history';
 
 import { addListener } from './actions';
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './getters';

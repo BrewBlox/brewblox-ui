@@ -1,6 +1,5 @@
 import { ref } from '@/helpers/component-ref';
-import { Feature } from '@/store/features';
-import { featureStore } from '@/store/features';
+import { Feature, featureStore } from '@/store/features';
 
 import form from './BuilderForm.vue';
 import widget from './BuilderWidget.vue';

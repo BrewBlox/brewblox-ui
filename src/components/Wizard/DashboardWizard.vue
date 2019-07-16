@@ -3,8 +3,7 @@ import isString from 'lodash/isString';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import { dashboardStore } from '@/store/dashboards';
-import { Dashboard } from '@/store/dashboards';
+import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 @Component
 export default class DashboardWizard extends Vue {

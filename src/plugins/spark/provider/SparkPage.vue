@@ -8,8 +8,7 @@ import { Watch } from 'vue-property-decorator';
 import { capitalized, objectStringSorter } from '@/helpers/functional';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, Spark, SystemStatus } from '@/plugins/spark/types';
-import { dashboardStore } from '@/store/dashboards';
-import { Dashboard, DashboardItem } from '@/store/dashboards';
+import { Dashboard, DashboardItem, dashboardStore } from '@/store/dashboards';
 import { FeatureRole, featureStore } from '@/store/features';
 import { serviceStore } from '@/store/services';
 

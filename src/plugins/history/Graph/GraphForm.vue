@@ -6,8 +6,7 @@ import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
 import { GraphConfig } from '@/components/Graph/types';
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { durationString } from '@/helpers/functional';
-import { DisplayNames, historyStore } from '@/store/history';
-import { GraphValueAxes } from '@/store/history';
+import { DisplayNames, GraphValueAxes, historyStore } from '@/store/history';
 
 interface PeriodDisplay {
   start: boolean;

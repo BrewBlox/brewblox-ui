@@ -10,8 +10,7 @@ import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import { DashboardItem } from '@/store/dashboards';
-import { serviceStore } from '@/store/services';
-import { Service } from '@/store/services';
+import { Service, serviceStore } from '@/store/services';
 
 import { BlockCrud } from './BlockCrudComponent';
 
