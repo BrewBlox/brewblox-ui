@@ -16,11 +16,15 @@ export default class BuilderCatalog extends Vue {
   SQUARE_SIZE: number = SQUARE_SIZE;
   spaceCased = spaceCased;
 
+  partFilter: string | null = null;
+
   @Prop({ type: Object, default: () => ({}) })
   readonly partial!: Partial<PersistentPart>;
 
   get availableParts(): PersistentPart[] {
+    const filter = (this.partFilter || '').toLowerCase();
     return parts
+      .filter(type => `${type}|${spaceCased(type)}`.toLowerCase().match(filter))
       .map(type => ({
         type,
         id: uid(),
@@ -46,6 +50,16 @@ export default class BuilderCatalog extends Vue {
 <template>
   <q-card dark class="widget-modal">
     <DialogToolbar>Part Catalog</DialogToolbar>
+
+    <q-item dark class="q-mb-md">
+      <q-item-section>
+        <q-input v-model="partFilter" placeholder="Search Parts" clearable dark autofocus>
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </q-item-section>
+    </q-item>
 
     <q-scroll-area style="min-height: 400px; height: 60vh;">
       <q-card-section>
