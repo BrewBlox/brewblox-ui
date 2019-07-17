@@ -41,6 +41,8 @@ export default class BuilderForm extends CrudComponent {
     grid: any;
   }
 
+  localToolId: string | null = null;
+
   @Prop({ type: Object, required: true })
   readonly widgetGridRect!: any;
 
@@ -181,12 +183,15 @@ export default class BuilderForm extends CrudComponent {
   }
 
   get currentTool(): ToolAction {
-    const toolId = this.widgetConfig.currentToolId;
+    const toolId = this.localToolId || this.widgetConfig.currentToolId;
     return this.tools.find(tool => tool.value === toolId) || this.tools[0];
   }
 
   set currentTool(tool: ToolAction) {
-    this.saveConfig({ ...this.widgetConfig, currentToolId: tool.value });
+    this.localToolId = tool.value;
+    if (tool.value !== 'delete') {
+      this.saveConfig({ ...this.widgetConfig, currentToolId: tool.value });
+    }
   }
 
   get configuredPart(): FlowPart | null {

@@ -16,6 +16,9 @@ export default class UnitField extends FieldBase {
   @Prop({ type: String, default: 'value' })
   public readonly label!: string;
 
+  @Prop({ type: Number, default: 2 })
+  readonly decimals!: number;
+
   @Prop({ type: String, default: 'small' })
   public readonly unitTag!: string;
 
@@ -44,12 +47,12 @@ export default class UnitField extends FieldBase {
 
 <template>
   <component :is="tag" v-bind="tagProps" :class="tagClass" @click="openDialog">
-    <slot name="pre"/>
+    <slot name="pre" />
     <slot name="value">
       <span :class="{editable: !readonly}">{{ value.value | round }}</span>
     </slot>
     <component v-if="value.value !== null" :is="unitTag" class="q-ml-xs">{{ value.notation }}</component>
-    <slot/>
+    <slot />
     <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
   </component>
 </template>

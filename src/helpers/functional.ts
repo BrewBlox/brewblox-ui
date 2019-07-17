@@ -118,6 +118,10 @@ export const round =
     return (+value).toFixed(digits);
   };
 
+export const roundNumber =
+  (value: number, digits: number = 2): number =>
+    Number((Math.round(Number(value + 'e' + digits)) + 'e-' + digits));
+
 export const truncate =
   (value: string): string => {
     const strVal = value.toString();

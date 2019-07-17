@@ -1,4 +1,5 @@
 <script lang="ts">
+import { debounce } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import PartCard from './PartCard';
@@ -25,22 +26,22 @@ export default class SizeCard extends PartCard {
     return this.part.settings[this.settingsKey] || this.defaultSize;
   }
 
-  set size(val: number) {
-    const size = (val !== null)
-      ? val
-      : this.defaultSize;
+  save(val: number) {
+    const size = val || this.defaultSize;
     this.savePartSettings({ ...this.part.settings, [this.settingsKey]: size });
   }
+
+  debouncedSave = debounce(this.save, 50, true)
 }
 </script>
 
 <template>
   <q-list dark>
-    <q-separator dark/>
+    <q-separator dark />
     <q-item dark>
       <q-item-section>
         <q-item-label caption>{{ label }}</q-item-label>
-        <q-slider v-model="size" :min="min" :max="max" dark label/>
+        <q-slider :value="size" :min="min" :max="max" dark label @change="debouncedSave" />
       </q-item-section>
     </q-item>
   </q-list>
