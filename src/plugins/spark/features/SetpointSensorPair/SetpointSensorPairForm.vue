@@ -54,8 +54,9 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
     />
     <q-card-section>
       <q-separator dark inset />
-      <q-item dark>
-        <q-item-section class="col-4" style="justify-content: flex-start">
+
+      <q-item dark class="aligned-item">
+        <q-item-section class="col-4">
           <q-item-label caption>Setting</q-item-label>
           <UnitField
             :value="block.data.storedSetting"
@@ -65,10 +66,8 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
             tag="big"
             @input="v => { block.data.storedSetting = v; saveBlock(); }"
           />
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
         </q-item-section>
-
-        <q-item-section v-if="usedBy.length" style="justify-content: flex-start">
+        <q-item-section v-if="usedBy.length">
           <q-item-label caption>Input for:</q-item-label>
           <div class="row">
             <q-btn
@@ -87,12 +86,13 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
           <q-item-section>This setpoint is not used as PID input</q-item-section>
         </template>
       </q-item>
-      <q-item dark>
-        <q-item-section class="col-4" style="justify-content: flex-start">
+
+      <q-item dark class="aligned-item">
+        <q-item-section class="col-4">
           <q-item-label caption>Sensor value</q-item-label>
           <UnitField :value="block.data.value" tag="big" readonly />
         </q-item-section>
-        <q-item-section class="col-3" style="justify-content: flex-start">
+        <q-item-section class="col-3">
           <q-item-label caption>Filter period</q-item-label>
           <SelectField
             :value="block.data.filter"
@@ -112,8 +112,7 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
             @input="v => { block.data.filter = v; saveBlock(); }"
           />
         </q-item-section>
-
-        <q-item-section class="col-3" style="justify-content: flex-start">
+        <q-item-section class="col-3">
           <q-item-label caption>Bypass threshold</q-item-label>
           <UnitField
             :value="block.data.filterThreshold"
@@ -128,7 +127,7 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
             @input="v => { block.data.filterThreshold = v; saveBlock(); }"
           />
         </q-item-section>
-        <q-item-section style="justify-content: flex-start">
+        <q-item-section>
           <q-btn
             flat
             round
@@ -139,12 +138,13 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
           </q-btn>
         </q-item-section>
       </q-item>
-      <q-item dark>
-        <q-item-section class="col-4" style="justify-content: flex-start">
+
+      <q-item dark class="aligned-item">
+        <q-item-section class="col-4">
           <q-item-label caption>Unfiltered sensor value</q-item-label>
           <UnitField :value="block.data.valueUnfiltered" tag="big" readonly />
         </q-item-section>
-        <q-item-section class="col-4" style="justify-content: flex-start">
+        <q-item-section class="col-4">
           <q-item-label caption>Sensor block</q-item-label>
           <LinkField
             :value="block.data.sensorId"
@@ -153,6 +153,12 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
             tag="span"
             @input="v => { block.data.sensorId = v; saveBlock(); }"
           />
+        </q-item-section>
+      </q-item>
+
+      <q-item dark>
+        <q-item-section>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
         </q-item-section>
       </q-item>
     </q-card-section>

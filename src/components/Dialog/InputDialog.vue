@@ -4,8 +4,7 @@ import isString from 'lodash/isString';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
-
-import { round } from '../../helpers/functional';
+import { round } from '@/helpers/functional';
 
 @Component
 export default class InputDialog extends DialogBase {

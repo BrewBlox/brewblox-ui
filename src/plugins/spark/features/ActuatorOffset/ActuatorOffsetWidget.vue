@@ -30,6 +30,7 @@ export default class ActuatorOffsetWidget extends BlockWidget {
 <template>
   <q-card dark class="text-white scroll">
     <BlockWidgetToolbar :crud="crud" />
+
     <CardWarning v-if="!block.data.targetId.id">
       <template #message>Target setpoint is not configured for this setpoint driver.</template>
     </CardWarning>
@@ -47,21 +48,28 @@ export default class ActuatorOffsetWidget extends BlockWidget {
         <q-btn text-color="white" flat label="Enable" @click="enable" />
       </template>
     </CardWarning>
+
     <q-card-section>
-      <q-item dark>
-        <q-item-section style="justify-content: flex-start">
+      <q-item dark class="aligned-item">
+        <q-item-section>
           <q-item-label caption>Target offset</q-item-label>
           <big>{{ block.data.desiredSetting | round }}</big>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
         </q-item-section>
-        <q-item-section style="justify-content: flex-start">
+        <q-item-section>
           <q-item-label caption>Actual offset</q-item-label>
           <big>{{ block.data.value | round }}</big>
         </q-item-section>
       </q-item>
+
       <q-item dark>
         <q-item-section>
-          <AnalogConstraints :value="block.data.constrainedBy" :service-id="serviceId" readonly />
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
+          <ConstraintsField
+            :value="block.data.constrainedBy"
+            :service-id="serviceId"
+            type="analog"
+            @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+          />
         </q-item-section>
       </q-item>
     </q-card-section>

@@ -36,7 +36,6 @@ export default class MotorValveWidget extends BlockWidget {
             :disable="isDriven"
             @input="v => { block.data.desiredState = v; saveBlock(); }"
           />
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
         </q-item-section>
         <q-item-section>
           <q-item-label caption>Valve State</q-item-label>
@@ -45,7 +44,13 @@ export default class MotorValveWidget extends BlockWidget {
       </q-item>
       <q-item dark>
         <q-item-section>
-          <DigitalConstraints :value="block.data.constrainedBy" :service-id="serviceId" readonly />
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
+          <ConstraintsField
+            :value="block.data.constrainedBy"
+            :service-id="serviceId"
+            type="digital"
+            @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+          />
         </q-item-section>
       </q-item>
     </q-card-section>
