@@ -4,6 +4,8 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 import { Link, Unit } from '@/helpers/units';
 import { MutexLink } from '@/helpers/units/KnownLinks';
 
+import { constraintLabels } from '../../helpers';
+
 export interface AnalogConstraint {
   limiting: boolean;
   min?: number;
@@ -45,19 +47,19 @@ const asData =
 
 @Component
 export default class ConstraintsBase extends Vue {
-
   @Prop({ type: Object, default: () => ({ constraints: [] }) })
   protected readonly value!: ConstraintsObj;
 
   @Prop({ type: String, required: true })
   protected readonly serviceId!: string;
 
-  @Prop({ type: Boolean, default: false })
-  protected readonly readonly!: boolean;
-
   protected get constraints(): EditableConstraint[] {
     // Typescript loses the plot here
     return (this.value.constraints as any).map(asEditable);
+  }
+
+  protected label(k: string) {
+    return constraintLabels.get(k);
   }
 
   @Emit('input')

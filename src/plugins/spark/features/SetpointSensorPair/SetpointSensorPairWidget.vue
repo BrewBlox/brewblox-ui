@@ -41,7 +41,6 @@ export default class SetpointSensorPairWidget extends BlockWidget {
             tag="big"
             @input="v => {block.data.storedSetting = v; saveBlock()}"
           />
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
         </q-item-section>
         <q-item-section class="q-mr-md">
           <q-item-label caption>Sensor</q-item-label>
@@ -50,6 +49,11 @@ export default class SetpointSensorPairWidget extends BlockWidget {
         <q-item-section class="col-auto">
           <q-item-label caption>Unfiltered sensor</q-item-label>
           <UnitField :value="block.data.valueUnfiltered" tag="big" readonly />
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
         </q-item-section>
       </q-item>
     </q-card-section>
