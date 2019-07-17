@@ -34,6 +34,7 @@ import {
   fetchUnitAlternatives as fetchUnitAlternativesInApi,
   fetchUnits as fetchUnitsInApi,
   fetchUpdateSource as fetchUpdateSourceInApi,
+  flashFirmware as flashFirmwareInApi,
   persistBlock as persistBlockInApi,
   persistUnits as persistUnitsInApi,
   renameBlock as renameBlockInApi,
@@ -509,6 +510,11 @@ export class SparkModule extends VuexModule {
   @Action({ rawError })
   public async validateService(serviceId: string): Promise<boolean> {
     return await validateServiceInApi(serviceId);
+  }
+
+  @Action({ rawError })
+  public async flashFirmware(serviceId: string): Promise<any> {
+    return await flashFirmwareInApi(serviceId);
   }
 
   @Action({ rawError })

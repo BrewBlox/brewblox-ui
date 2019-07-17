@@ -37,6 +37,7 @@ services:
 
   sparkey:
     image: brewblox/brewblox-devcon-spark:develop
+    restart: unless-stopped
     privileged: true
     depends_on:
       - eventbus

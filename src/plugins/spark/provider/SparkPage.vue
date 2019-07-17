@@ -342,13 +342,11 @@ export default class SparkPage extends Vue {
             label="Remove unused Block names"
             @click="cleanUnusedNames"
           />
-          <!-- TODO(Bob) -->
-          <!-- Disabled until ready for release -->
-          <!-- <ActionItem
+          <ActionItem
             icon="mdi-download-network"
             label="Update firmware"
             @click="startDialog('FirmwareUpdateDialog')"
-          />-->
+          />
           <ActionItem icon="wifi" label="Configure Wifi" @click="startDialog('SparkWifiMenu')" />
           <ActionItem
             icon="mdi-checkbox-multiple-marked"
