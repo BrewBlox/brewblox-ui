@@ -10,6 +10,9 @@ import { Notify } from 'quasar';
 *
 * Using a notification reminds the dev why this is happening,
 * and ensures that the new tab doesn't fall afoul of built-in popup blockers.
+*
+* Note: we can't be more specific in our error check.
+* Browsers will not provide any additional details about network exceptions.
 */
 export const checkDevCertificate = () => {
   if (process.env.NODE_ENV === 'development') {
@@ -20,8 +23,8 @@ export const checkDevCertificate = () => {
     request.open('GET', addr, true);
     request.onerror = () => Notify.create({
       timeout: 0,
-      color: 'error',
-      icon: 'warning',
+      color: 'negative',
+      icon: 'error',
       message: 'Backend check failed',
       actions: [
         {
