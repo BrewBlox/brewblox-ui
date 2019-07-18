@@ -55,7 +55,7 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
     <q-card-section>
       <q-separator dark inset />
 
-      <q-item dark class="aligned-item">
+      <q-item dark class="align-children">
         <q-item-section class="col-4">
           <q-item-label caption>Setting</q-item-label>
           <UnitField
@@ -87,7 +87,7 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
         </template>
       </q-item>
 
-      <q-item dark class="aligned-item">
+      <q-item dark class="align-children">
         <q-item-section class="col-4">
           <q-item-label caption>Sensor value</q-item-label>
           <UnitField :value="block.data.value" tag="big" readonly />
@@ -139,7 +139,7 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
         </q-item-section>
       </q-item>
 
-      <q-item dark class="aligned-item">
+      <q-item dark class="align-children">
         <q-item-section class="col-4">
           <q-item-label caption>Unfiltered sensor value</q-item-label>
           <UnitField :value="block.data.valueUnfiltered" tag="big" readonly />

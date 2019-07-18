@@ -7,6 +7,11 @@ import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
 @Component
 export default class ActuatorPwmForm extends BlockCrudComponent {
   readonly block!: ActuatorPwmBlock;
+
+  get isConstrained() {
+    return this.block.data.enabled
+      && this.block.data.setting !== this.block.data.desiredSetting;
+  }
 }
 </script>
 
@@ -24,6 +29,15 @@ export default class ActuatorPwmForm extends BlockCrudComponent {
 
       <q-item dark>
         <q-item-section>
+          <q-item-label caption>Period</q-item-label>
+          <TimeUnitField
+            :value="block.data.period"
+            title="Period"
+            tag="big"
+            @input="v => { block.data.period = v; saveBlock(); }"
+          />
+        </q-item-section>
+        <q-item-section>
           <q-item-label caption>Digital Actuator Target</q-item-label>
           <LinkField
             :value="block.data.actuatorId"
@@ -33,30 +47,33 @@ export default class ActuatorPwmForm extends BlockCrudComponent {
             @input="v => { block.data.actuatorId = v; saveBlock(); }"
           />
         </q-item-section>
-        <q-item-section>
-          <q-item-label caption>Period</q-item-label>
-          <TimeUnitField
-            :value="block.data.period"
-            title="Period"
-            tag="big"
-            @input="v => { block.data.period = v; saveBlock(); }"
-          />
-        </q-item-section>
+        <q-item-section />
       </q-item>
-      <q-item dark>
-        <q-item-section style="justify-content: flex-start">
+      <q-item dark class="align-children">
+        <q-item-section>
           <q-item-label caption>Duty setting</q-item-label>
-          <SliderField
-            :value="block.data.desiredSetting"
-            :readonly="isDriven"
-            tag="big"
-            title="Setting"
-            @input="v => { block.data.desiredSetting = v; saveBlock(); }"
-          />
+          <div :class="{['text-orange']: isConstrained}">
+            <SliderField
+              :value="block.data.setting"
+              :readonly="isDriven"
+              tag="big"
+              title="Setting"
+              @input="v => { block.data.desiredSetting = v; saveBlock(); }"
+            />
+          </div>
         </q-item-section>
-        <q-item-section style="justify-content: flex-start">
+        <q-item-section>
           <q-item-label caption>Duty Achieved</q-item-label>
           <big>{{ block.data.value | round }}</big>
+        </q-item-section>
+        <q-item-section>
+          <template v-if="isConstrained">
+            <q-item-label caption>Unconstrained setting</q-item-label>
+            <div>
+              <big>{{ block.data.desiredSetting | round }}</big>
+              <small class="q-ml-xs">%</small>
+            </div>
+          </template>
         </q-item-section>
       </q-item>
 

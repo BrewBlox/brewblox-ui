@@ -15,7 +15,7 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
   <q-card dark class="text-white scroll">
     <BlockWidgetToolbar :crud="crud" />
     <q-card-section>
-      <q-item dark class="aligned-item">
+      <q-item dark class="align-children">
         <q-item-section>
           <q-item-label caption>Setting</q-item-label>
           <div :style="block.data.setting === block.data.desiredSetting ? '' : 'color: orange'">

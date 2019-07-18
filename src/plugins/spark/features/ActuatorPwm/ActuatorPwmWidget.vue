@@ -37,10 +37,10 @@ export default class ActuatorPwmWidget extends BlockWidget {
       </template>
     </CardWarning>
     <q-card-section>
-      <q-item dark class="aligned-item">
+      <q-item dark class="align-children">
         <q-item-section>
           <q-item-label caption>Setting</q-item-label>
-          <div :style="block.data.setting === block.data.desiredSetting ? '' : 'color: orange'">
+          <div :class="{['text-orange']: isConstrained}">
             <SliderField
               :value="block.data.setting"
               :readonly="isDriven"
@@ -64,6 +64,16 @@ export default class ActuatorPwmWidget extends BlockWidget {
             <small class="q-ml-xs">%</small>
           </div>
         </q-item-section>
+
+        <q-item-section>
+          <template v-if="isConstrained">
+            <q-item-label caption>Unconstrained setting</q-item-label>
+            <div>
+              <big>{{ block.data.desiredSetting | round }}</big>
+              <small class="q-ml-xs">%</small>
+            </div>
+          </template>
+        </q-item-section>
       </q-item>
 
       <q-item dark>
@@ -76,17 +86,6 @@ export default class ActuatorPwmWidget extends BlockWidget {
             @input="v => { block.data.constrainedBy = v; saveBlock(); }"
           />
         </q-item-section>
-      </q-item>
-
-      <q-item v-if="isConstrained" dark>
-        <q-item-section>
-          <q-item-label caption>Unconstrained setting</q-item-label>
-          <div>
-            <big>{{ block.data.desiredSetting | round }}</big>
-            <small class="q-ml-xs">%</small>
-          </div>
-        </q-item-section>
-        <q-space />
       </q-item>
     </q-card-section>
   </q-card>
