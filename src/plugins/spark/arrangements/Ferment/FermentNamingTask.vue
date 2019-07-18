@@ -8,7 +8,7 @@ import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { spaceCased, suggestId, valOrDefault } from '@/helpers/functional';
 import { FermentConfig, FermentConfigNames } from '@/plugins/spark/arrangements/Ferment/types';
 import { typeName } from '@/plugins/spark/getters';
-import serviceStore from '@/store/services';
+import { serviceStore } from '@/store/services';
 
 import { blockIdRules } from '../../helpers';
 

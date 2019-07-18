@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { QuasarNode, expandedNodes, nodeBuilder } from '@/components/Graph/functional';
-import historyStore from '@/store/history';
+import { historyStore } from '@/store/history';
 
 
 @Component
@@ -50,20 +50,20 @@ export default class MetricSelector extends Vue {
       <q-item-section>
         <q-input v-model="selectFilter" placeholder="Filter keys" class="q-ma-none" dark clearable>
           <template v-slot:append>
-            <q-icon name="search"/>
+            <q-icon name="search" />
           </template>
         </q-input>
       </q-item-section>
     </q-item>
     <q-item dark>
       <q-item-section class="col-auto">
-        <q-btn flat label="Expand" icon="mdi-expand-all" @click="$refs.tree.expandAll()"/>
+        <q-btn flat label="Expand" icon="mdi-expand-all" @click="$refs.tree.expandAll()" />
       </q-item-section>
       <q-item-section class="col-auto">
-        <q-btn flat label="Collapse" icon="mdi-collapse-all" @click="$refs.tree.collapseAll()"/>
+        <q-btn flat label="Collapse" icon="mdi-collapse-all" @click="$refs.tree.collapseAll()" />
       </q-item-section>
       <q-item-section class="col-auto">
-        <q-btn flat label="clear" icon="clear" @click="selected = []"/>
+        <q-btn flat label="clear" icon="clear" @click="selected = []" />
       </q-item-section>
     </q-item>
     <q-item dark>

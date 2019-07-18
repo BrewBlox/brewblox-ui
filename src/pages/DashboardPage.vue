@@ -4,8 +4,8 @@ import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
-import dashboardStore, { DashboardItem } from '@/store/dashboards';
-import featureStore from '@/store/features';
+import { DashboardItem, dashboardStore } from '@/store/dashboards';
+import { featureStore } from '@/store/features';
 
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '../helpers/dashboards';
 

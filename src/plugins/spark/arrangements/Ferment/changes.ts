@@ -6,10 +6,9 @@ import { MutexLink, ProcessValueLink, SetpointSensorPairLink } from '@/helpers/u
 import { serialize } from '@/helpers/units/parseObject';
 import { typeName as builderType } from '@/plugins/builder/getters';
 import { FermentConfig, PinChannel } from '@/plugins/spark/arrangements/Ferment/types';
-import sparkStore from '@/plugins/spark/store';
-import dashboardStore, { DashboardItem } from '@/store/dashboards';
-import { Dashboard } from '@/store/dashboards';
-import featureStore from '@/store/features';
+import { sparkStore } from '@/plugins/spark/store';
+import { Dashboard, DashboardItem, dashboardStore } from '@/store/dashboards';
+import { featureStore } from '@/store/features';
 
 import { typeName as pwmType } from '../../features/ActuatorPwm/getters';
 import { ActuatorPwmBlock } from '../../features/ActuatorPwm/types';
@@ -96,7 +95,7 @@ export const defineCreatedBlocks = (
       type: mutexType,
       groups: config.groups,
       data: {
-        differentActuatorWait: new Unit(30, 'minute'),
+        differentActuatorWait: new Unit(45, 'minute'),
       },
     },
     // Digital Actuator
@@ -328,6 +327,20 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
               serviceId: config.serviceId,
               blockId: config.names.heatPid,
             },
+          },
+        },
+        {
+          id: uid(),
+          type: 'UrlDisplay',
+          x: 1,
+          y: 9,
+          rotate: 0,
+          flipped: false,
+          settings: {
+            text: 'User manual',
+            url: 'https://brewblox.netlify.com/user/ferment_guide.html#ferment-fridge-process-view',
+            sizeX: 4,
+            sizeY: 1,
           },
         },
       ],

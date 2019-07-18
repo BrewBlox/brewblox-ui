@@ -5,7 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { contrastColor } from '@/helpers/functional';
 import { typeName as pidType } from '@/plugins/spark/features/Pid/getters';
 import { SetpointSensorPairBlock } from '@/plugins/spark/features/SetpointSensorPair/types';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import { SQUARE_SIZE } from '../getters';
 import { settingsBlock } from '../helpers';
@@ -13,7 +13,6 @@ import { PersistentPart } from '../types';
 
 @Component
 export default class SetpointValues extends Vue {
-  SQUARE_SIZE = SQUARE_SIZE;
 
   @Prop({ type: Object, required: true })
   public readonly part!: PersistentPart;
@@ -69,21 +68,22 @@ export default class SetpointValues extends Vue {
       ? this.setpoint.data.storedSetting.notation
       : '';
   }
+
+  public squares(val: number): number {
+    return SQUARE_SIZE * val;
+  }
 }
 </script>
 
 <template>
-  <g
-    v-if="setpoint || !hideUnset"
-    :transform="`translate(${SQUARE_SIZE*startX}, ${SQUARE_SIZE*startY})`"
-  >
-    <foreignObject :width="SQUARE_SIZE*2" :height="SQUARE_SIZE">
+  <g v-if="setpoint || !hideUnset" :transform="`translate(${squares(startX)}, ${squares(startY)})`">
+    <foreignObject :width="squares(2)" :height="squares(1)">
       <div :class="[`text-${textColor}`, 'text-bold', 'q-ml-md', 'q-mt-xs']">
         <q-icon name="mdi-thermometer" class="q-mr-sm" />
         {{ setpointValue | round(1) }}
         <q-icon v-if="!setpoint" name="mdi-link-variant-off" />
         <small v-else>{{ setpointUnit }}</small>
-        <br >
+        <br />
         <q-icon name="mdi-bullseye-arrow" class="q-mr-sm" />
         {{ setpointSetting | round(1) }}
         <q-icon v-if="!setpoint" name="mdi-link-variant-off" />

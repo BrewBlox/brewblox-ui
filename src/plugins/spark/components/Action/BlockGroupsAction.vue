@@ -3,7 +3,7 @@
 import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
-import sparkStore from '@/plugins/spark/store/';
+import { sparkStore } from '@/plugins/spark/store';
 
 import BlockCrudComponent from '../BlockCrudComponent';
 
@@ -42,5 +42,5 @@ export default class BlockGroupsAction extends BlockCrudComponent {
 </script>
 
 <template>
-  <ActionItem v-bind="itemProps" @click="openDialog"/>
+  <ActionItem v-bind="itemProps" @click="openDialog" />
 </template>

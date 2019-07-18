@@ -2,9 +2,8 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
-import sparkStore from '@/plugins/spark/store';
-import { flashFirmware } from '@/plugins/spark/store/api';
-import serviceStore from '@/store/services';
+import { sparkStore } from '@/plugins/spark/store';
+import { serviceStore } from '@/store/services';
 
 
 
@@ -40,15 +39,17 @@ export default class FirmwareUpdateDialog extends DialogBase {
     this.busy = true;
     this.messages = [];
     this.pushMessage('Starting update...');
-    // Use API to avoid error messages injected by vuex-module-decorators
-    flashFirmware(this.serviceId)
+
+    sparkStore.flashFirmware(this.serviceId)
       .then(() => {
         this.pushMessage('Update complete!');
       })
       .catch(e => {
         this.pushMessage(`Update failed: ${e.toString()}`);
-        this.pushMessage(`If your firmware is older than 2019-07-05,
-                          run 'brewblox-ctl flash' to enable updating from the UI.`);
+        this.pushMessage('This feature is still experimental.');
+        this.pushMessage(`If retrying the update does not work,
+                          or your firmware is older than 2019-07-18,
+                          please run 'brewblox-ctl flash' to enable UI firmware updates.`);
         if (this.status) {
           this.status.info.forEach(this.pushMessage);
         }

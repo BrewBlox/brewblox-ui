@@ -6,8 +6,7 @@ import { Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { durationString } from '@/helpers/functional';
-import historyStore from '@/store/history';
-import { DisplayNames, Listener, QueryParams, QueryTarget } from '@/store/history';
+import { DisplayNames, Listener, QueryParams, QueryTarget, historyStore } from '@/store/history';
 
 import { addListener } from './actions';
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './getters';
@@ -118,15 +117,15 @@ export default class MetricsWidget extends WidgetBase {
 <template>
   <q-card dark class="text-white column scroll no-wrap">
     <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <MetricsForm v-if="modalOpen" :crud="crud"/>
+      <MetricsForm v-if="modalOpen" :crud="crud" />
     </q-dialog>
 
     <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="modalOpen = true">
           <q-list dark bordered>
-            <ActionItem icon="refresh" label="Refresh" @click="resetListeners"/>
-            <WidgetActions :crud="crud"/>
+            <ActionItem icon="refresh" label="Refresh" @click="resetListeners" />
+            <WidgetActions :crud="crud" />
           </q-list>
         </q-btn-dropdown>
       </q-item-section>
@@ -136,11 +135,11 @@ export default class MetricsWidget extends WidgetBase {
       <q-list dark>
         <q-item v-if="values.length === 0" dark>
           <q-item-section avatar>
-            <q-icon name="warning"/>
+            <q-icon name="warning" />
           </q-item-section>
           <q-item-section>No metrics selected.</q-item-section>
           <q-item-section side>
-            <q-btn flat text-color="white" label="Add metrics" @click="modalOpen = true"/>
+            <q-btn flat text-color="white" label="Add metrics" @click="modalOpen = true" />
           </q-item-section>
         </q-item>
         <q-item v-for="val in values" :key="val.field" dark>
@@ -148,11 +147,11 @@ export default class MetricsWidget extends WidgetBase {
             <q-item-label caption>{{ val.name }}</q-item-label>
             <div class="row items-center">
               <big :class="{darkened: val.stale}">{{ val.value | round(fieldDecimals(val.field)) }}</big>
-              <q-icon v-if="val.stale" name="warning" right size="24px"/>
+              <q-icon v-if="val.stale" name="warning" right size="24px" />
             </div>
             <q-tooltip v-if="val.stale">
               {{ val.name }} was updated more than {{ durationString(fieldFreshDuration(val.field)) }} ago.
-              <br>
+              <br />
               Last update: {{ new Date(val.time).toLocaleString() }}.
             </q-tooltip>
           </q-item-section>

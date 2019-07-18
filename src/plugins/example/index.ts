@@ -1,4 +1,4 @@
-import featureStore from '@/store/features';
+import { featureStore } from '@/store/features';
 
 import ExampleFeature from './ExampleFeature';
 

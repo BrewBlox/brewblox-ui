@@ -23,9 +23,9 @@ export default class HeatingElement extends PartBase {
     return settingsBlock(this.part, 'pwm');
   }
 
-  get pwmSetting(): number | null {
-    return this.block
-      ? this.block.data.desiredSetting
+  get pwmValue(): number | null {
+    return this.block && this.block.data.enabled
+      ? this.block.data.value
       : null;
   }
 }
@@ -33,24 +33,20 @@ export default class HeatingElement extends PartBase {
 
 <template>
   <g>
-    <foreignObject
-      :transform="textTransformation([1,1])"
-      :width="SQUARE_SIZE"
-      :height="SQUARE_SIZE"
-    >
+    <foreignObject :transform="textTransformation([1,1])" :width="squares(1)" :height="squares(1)">
       <div class="text-white text-bold text-center">
         <q-icon name="mdi-gauge" class="q-mr-xs" />
         <q-icon v-if="!block" name="mdi-link-variant-off" />
         <small v-else>%</small>
         <br />
-        {{ pwmSetting | round(0) }}
+        {{ pwmValue | round(0) }}
       </div>
     </foreignObject>
     <g class="outline">
       <path v-for="border in paths.borders" :key="border" :d="border" />
       <rect
-        :width="SQUARE_SIZE-2"
-        :height="SQUARE_SIZE-2"
+        :width="squares(1)-2"
+        :height="squares(1)-2"
         x="1"
         y="1"
         rx="6"

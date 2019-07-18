@@ -5,8 +5,8 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
-import sparkStore from '@/plugins/spark/store';
-import serviceStore from '@/store/services';
+import { sparkStore } from '@/plugins/spark/store';
+import { serviceStore } from '@/store/services';
 
 import { settingsLink } from '../helpers';
 import { LinkedBlock } from '../types';

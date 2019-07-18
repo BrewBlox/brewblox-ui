@@ -1,5 +1,5 @@
 
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 
 export const blockIdRules = (serviceId: string): ((v: string) => boolean | string)[] => [

@@ -2,7 +2,7 @@
 
 import { Component, Prop } from 'vue-property-decorator';
 
-import featureStore from '@/store/features';
+import { featureStore } from '@/store/features';
 
 import BlockCrudComponent from '../BlockCrudComponent';
 
@@ -29,5 +29,5 @@ export default class RemoveBlockAction extends BlockCrudComponent {
 </script>
 
 <template>
-  <ActionItem v-if="isStoreBlock && deletable" v-bind="itemProps" @click="startRemoveBlock"/>
+  <ActionItem v-if="isStoreBlock && deletable" v-bind="itemProps" @click="startRemoveBlock" />
 </template>

@@ -5,7 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { deepCopy } from '@/helpers/units/parseObject';
 import { blockIdRules } from '@/plugins/spark/helpers';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import BlockCrudComponent from '../BlockCrudComponent';
 

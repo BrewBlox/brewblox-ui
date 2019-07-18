@@ -10,7 +10,6 @@ import { FlowPart } from './types';
 
 @Component
 export default class BuilderPartMenu extends Vue {
-  SQUARE_SIZE: number = SQUARE_SIZE; // make value accessible in template
 
   @Prop({ type: Object, required: true })
   readonly part!: FlowPart;
@@ -47,6 +46,10 @@ export default class BuilderPartMenu extends Vue {
     }
     return 2;
   }
+
+  squares(val: number): number {
+    return SQUARE_SIZE * val;
+  }
 }
 </script>
 
@@ -58,9 +61,9 @@ export default class BuilderPartMenu extends Vue {
       <q-item dark>
         <q-item-section>
           <svg
-            :width="`${SQUARE_SIZE * displayScale * rotatedSize[0]}px`"
-            :height="`${SQUARE_SIZE * displayScale * rotatedSize[1]}px`"
-            :viewBox="`0, 0, ${SQUARE_SIZE * rotatedSize[0]}, ${SQUARE_SIZE * rotatedSize[1]}`"
+            :width="`${squares(rotatedSize[0]) * displayScale}px`"
+            :height="`${squares(rotatedSize[1] * displayScale)}px`"
+            :viewBox="`0, 0, ${squares(rotatedSize[0])}, ${squares(rotatedSize[1])}`"
             class="q-mx-auto"
           >
             <PartWrapper :part="part" />

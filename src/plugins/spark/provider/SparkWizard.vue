@@ -3,9 +3,9 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { typeName } from '@/plugins/spark/getters';
-import sparkStore from '@/plugins/spark/store';
-import providerStore from '@/store/providers';
-import serviceStore from '@/store/services';
+import { sparkStore } from '@/plugins/spark/store';
+import { providerStore } from '@/store/providers';
+import { serviceStore } from '@/store/services';
 
 import { Spark } from '../types';
 
@@ -62,7 +62,7 @@ export default class SparkWizard extends Vue {
 <template>
   <q-card-section style="min-height: 100px">
     <q-item>
-      <q-spinner :size="30" style="margin: auto"/>
+      <q-spinner :size="30" style="margin: auto" />
     </q-item>
   </q-card-section>
 </template>

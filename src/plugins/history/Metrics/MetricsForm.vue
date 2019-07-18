@@ -6,7 +6,7 @@ import { Component } from 'vue-property-decorator';
 import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { durationString } from '@/helpers/functional';
-import historyStore, { DisplayNames } from '@/store/history';
+import { DisplayNames, historyStore } from '@/store/history';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './getters';
 import { MetricsConfig } from './types';
@@ -75,13 +75,13 @@ export default class MetricsForm extends CrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :crud="crud"/>
+    <FormToolbar :crud="crud" />
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="mdi-file-tree" label="Metrics">
         <div class="scroll-parent">
           <q-scroll-area>
-            <MetricSelector :selected.sync="selected"/>
+            <MetricSelector :selected.sync="selected" />
           </q-scroll-area>
         </div>
       </q-expansion-item>
@@ -89,7 +89,7 @@ export default class MetricsForm extends CrudComponent {
       <q-expansion-item group="modal" icon="mdi-tag-multiple" label="Labels">
         <div class="scroll-parent">
           <q-scroll-area>
-            <LabelSelector :selected="selected" :renames.sync="renames"/>
+            <LabelSelector :selected="selected" :renames.sync="renames" />
           </q-scroll-area>
         </div>
       </q-expansion-item>
@@ -100,9 +100,9 @@ export default class MetricsForm extends CrudComponent {
             <q-item dark>
               <q-item-section>Metric</q-item-section>
               <q-item-section>Warn when older than</q-item-section>
-              <q-item-section class="col-1"/>
+              <q-item-section class="col-1" />
             </q-item>
-            <q-separator dark inset/>
+            <q-separator dark inset />
             <q-item v-for="field in selected" :key="field" dark>
               <q-item-section>{{ field }}</q-item-section>
               <q-item-section>
@@ -113,7 +113,7 @@ export default class MetricsForm extends CrudComponent {
                 />
               </q-item-section>
               <q-item-section class="col-1">
-                <q-btn icon="restore" flat @click="resetFreshDuration(field)"/>
+                <q-btn icon="restore" flat @click="resetFreshDuration(field)" />
               </q-item-section>
             </q-item>
           </q-scroll-area>
@@ -126,9 +126,9 @@ export default class MetricsForm extends CrudComponent {
             <q-item dark>
               <q-item-section>Metric</q-item-section>
               <q-item-section>Number of decimals</q-item-section>
-              <q-item-section class="col-1"/>
+              <q-item-section class="col-1" />
             </q-item>
-            <q-separator dark inset/>
+            <q-separator dark inset />
             <q-item v-for="field in selected" :key="field" dark>
               <q-item-section>{{ field }}</q-item-section>
               <q-item-section>
@@ -142,7 +142,7 @@ export default class MetricsForm extends CrudComponent {
                 />
               </q-item-section>
               <q-item-section class="col-1">
-                <q-btn icon="mdi-undo-variant" flat @click="resetDecimals(field)"/>
+                <q-btn icon="mdi-undo-variant" flat @click="resetDecimals(field)" />
               </q-item-section>
             </q-item>
           </q-scroll-area>

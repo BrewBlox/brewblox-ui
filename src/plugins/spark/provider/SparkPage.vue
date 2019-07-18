@@ -6,12 +6,11 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { capitalized, objectStringSorter } from '@/helpers/functional';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 import { Block, Spark, SystemStatus } from '@/plugins/spark/types';
-import dashboardStore from '@/store/dashboards';
-import { Dashboard, DashboardItem } from '@/store/dashboards';
-import featureStore, { FeatureRole } from '@/store/features';
-import serviceStore from '@/store/services';
+import { Dashboard, DashboardItem, dashboardStore } from '@/store/dashboards';
+import { FeatureRole, featureStore } from '@/store/features';
+import { serviceStore } from '@/store/services';
 
 import { isReady, isSystemBlock } from './getters';
 
@@ -343,13 +342,11 @@ export default class SparkPage extends Vue {
             label="Remove unused Block names"
             @click="cleanUnusedNames"
           />
-          <!-- TODO(Bob) -->
-          <!-- Disabled until ready for release -->
-          <!-- <ActionItem
+          <ActionItem
             icon="mdi-download-network"
             label="Update firmware"
             @click="startDialog('FirmwareUpdateDialog')"
-          />-->
+          />
           <ActionItem icon="wifi" label="Configure Wifi" @click="startDialog('SparkWifiMenu')" />
           <ActionItem
             icon="mdi-checkbox-multiple-marked"

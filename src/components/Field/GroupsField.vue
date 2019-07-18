@@ -2,7 +2,7 @@
 import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import FieldBase from './FieldBase';
 
@@ -60,8 +60,8 @@ export default class GroupsField extends FieldBase {
     :class="[{editable: !readonly}, tagClass]"
     @click="openDialog"
   >
-    <slot name="pre"/>
+    <slot name="pre" />
     <slot name="value">{{ displayValue }}</slot>
-    <slot/>
+    <slot />
   </component>
 </template>

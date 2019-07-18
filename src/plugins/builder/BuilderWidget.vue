@@ -3,7 +3,6 @@ import { debounce, uid } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
-import { spaceCased } from '@/helpers/functional';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import { calculateNormalizedFlows } from './calculateFlows';
@@ -34,10 +33,6 @@ interface ToolAction {
   },
 })
 export default class BuilderWidget extends WidgetBase {
-  // make imported values accessible in template
-  SQUARE_SIZE: number = SQUARE_SIZE;
-  spaceCased = spaceCased;
-
   $refs!: {
     grid: any;
   }
@@ -113,6 +108,10 @@ export default class BuilderWidget extends WidgetBase {
     handler && handler(part, this.updater);
   }
 
+  squares(val: number): number {
+    return SQUARE_SIZE * val;
+  }
+
   mounted() {
     this.calculateFlowFunc =
       debounce(
@@ -161,7 +160,7 @@ export default class BuilderWidget extends WidgetBase {
       <svg v-if="!formModalOpen" ref="grid" class="grid-base">
         <g
           v-for="part in flowParts"
-          :transform="`translate(${part.x * SQUARE_SIZE}, ${part.y * SQUARE_SIZE})`"
+          :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
           :key="part.id"
           :class="{ clickable: isClickable(part), [part.type]: true }"
           @click="interact(part)"

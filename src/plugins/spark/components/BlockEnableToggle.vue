@@ -43,7 +43,7 @@ export default class BlockEnableToggle extends BlockCrudComponent {
     <template #actions>
       <q-btn
         :label="enabled ? 'Disable': 'Enable'"
-        :color="enabled ? 'negative' : 'positive'"
+        color="white"
         outline
         dense
         @click="toggleEnabled"

@@ -2,7 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import { fetchStoredBlock } from '../../store/api';
 import { Block } from '../../types';

@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { showBlockDialog } from '@/helpers/dialog';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 @Component
 export default class DrivenIndicator extends Vue {
@@ -25,8 +25,8 @@ export default class DrivenIndicator extends Vue {
         .slice(1)
         .map((id, idx) => {
           return idx === 0
-            ? `set by <i>${id}</i>`
-            : `&emsp; which is set by <i>${id}</i>`;
+            ? `Driven by <i>${id}</i>`
+            : `&emsp; which is driven by <i>${id}</i>`;
         }));
   }
 
@@ -46,22 +46,32 @@ export default class DrivenIndicator extends Vue {
 </script>
 
 <template>
-  <q-list v-if="isDriven" dark separator no-border class="q-pa-none">
+  <q-list dark no-border>
     <q-item
       v-for="(chain, chainIdx) in textChains"
       :key="chainIdx"
-      class="q-pa-none"
-      style="min-height: 0px;"
+      clickable
+      dark
+      style="padding: 5px 0; min-height: 0"
+      @click="showDialog(chainIdx)"
     >
-      <q-item-section>
+      <q-tooltip>Edit {{ bossDriver(chainIdx) }}</q-tooltip>
+      <q-item-section class="q-mr-md">
         <div v-for="text in chain" :key="text">
-          <small style="opacity: 0.5" v-html="text"/>
+          <small class="darkish" v-html="text" />
         </div>
       </q-item-section>
-      <q-item-section class="col-auto">
-        <q-btn flat icon="edit" @click="showDialog(chainIdx)">
-          <q-tooltip>Edit {{ bossDriver(chainIdx) }}</q-tooltip>
-        </q-btn>
+      <q-item-section side>
+        <q-icon name="mdi-pencil" />
+      </q-item-section>
+    </q-item>
+    <!-- Display message if not driven -->
+    <q-item v-if="!isDriven" dark style="padding: 5px 0; min-height: 0;">
+      <q-item-section>
+        <small class="darkish">Not driven</small>
+      </q-item-section>
+      <q-item-section side>
+        <q-icon name="mdi-pencil-off" />
       </q-item-section>
     </q-item>
   </q-list>

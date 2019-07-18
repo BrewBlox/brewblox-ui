@@ -7,7 +7,7 @@ import CrudComponent from '@/components/Widget/CrudComponent';
 import { objectSorter } from '@/helpers/functional';
 import { durationString } from '@/helpers/functional';
 import { Session, SessionViewConfig } from '@/plugins/spark/features/SessionView/types';
-import historyStore, { DisplayNames } from '@/store/history';
+import { DisplayNames, historyStore } from '@/store/history';
 
 @Component
 export default class SessionViewForm extends CrudComponent {
@@ -129,7 +129,7 @@ export default class SessionViewForm extends CrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :crud="crud"/>
+    <FormToolbar :crud="crud" />
     <BlockGraph
       v-if="graphModalOpen"
       v-model="graphModalOpen"
@@ -176,7 +176,7 @@ export default class SessionViewForm extends CrudComponent {
               </q-btn>
             </q-item-section>
           </q-item>
-          <q-separator dark/>
+          <q-separator dark />
           <q-item dark>
             <q-item-section>
               <q-item-label caption>Session name</q-item-label>
@@ -251,7 +251,7 @@ export default class SessionViewForm extends CrudComponent {
         </q-list>
       </q-expansion-item>
       <q-item dark>
-        <q-item-section/>
+        <q-item-section />
         <q-item-section side>
           <q-btn fab outline icon="add" @click="$emit('create-session')">
             <q-tooltip>Add Session</q-tooltip>

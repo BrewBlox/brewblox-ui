@@ -1,10 +1,10 @@
 import { nanoToMilli } from '@/helpers/functional';
-import historyStore from '@/store/history';
 import {
   DisplayNames,
   Listener,
   QueryParams,
   QueryTarget,
+  historyStore,
 } from '@/store/history';
 
 import { MetricsResult } from './types';

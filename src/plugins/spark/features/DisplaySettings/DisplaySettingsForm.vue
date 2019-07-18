@@ -166,7 +166,7 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
 
     <q-card-section>
       <q-list dark>
-        <q-item dark class="aligned-item">
+        <q-item dark class="align-children">
           <q-item-section>
             <q-item-label caption>Footer text</q-item-label>
             <InputField

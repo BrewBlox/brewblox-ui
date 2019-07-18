@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 import { DashboardItem } from '@/store/dashboards';
-import featureStore from '@/store/features';
+import { featureStore } from '@/store/features';
 
 import { Crud } from '../Widget/CrudComponent';
 

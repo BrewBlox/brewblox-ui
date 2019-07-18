@@ -12,9 +12,9 @@ import {
   unitDurationString,
 } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
-import sparkStore from '@/plugins/spark/store';
-import featureStore from '@/store/features';
-import providerStore from '@/store/providers';
+import { sparkStore } from '@/plugins/spark/store';
+import { featureStore } from '@/store/features';
+import { providerStore } from '@/store/providers';
 import { Service } from '@/store/services';
 
 import arrangements from './arrangements';

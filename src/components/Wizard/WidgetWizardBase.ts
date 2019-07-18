@@ -2,9 +2,8 @@ import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import { DashboardItem } from '@/store/dashboards';
-import dashboardStore from '@/store/dashboards';
-import featureStore from '@/store/features';
+import { DashboardItem, dashboardStore } from '@/store/dashboards';
+import { featureStore } from '@/store/features';
 
 export interface NavAction {
   label: string;

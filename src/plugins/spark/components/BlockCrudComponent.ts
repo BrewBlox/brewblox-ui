@@ -6,7 +6,7 @@ import { GraphConfig } from '@/components/Graph/types';
 import CrudComponent, { Crud } from '@/components/Widget/CrudComponent';
 import { showBlockDialog } from '@/helpers/dialog';
 import { postfixedDisplayNames } from '@/helpers/units';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import { blockIdRules } from '../helpers';
 import { Block } from '../types';

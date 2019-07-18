@@ -3,7 +3,7 @@ import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import WatcherBase from '@/components/Watcher/WatcherBase';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 
 import { SystemStatus } from '../types';
 
@@ -84,9 +84,7 @@ export default class SparkWatcher extends WatcherBase {
 
   mounted() {
     this.$watch('updating', this.handleUpdateChange);
-    // TODO(Bob)
-    // Disabled until firmware update feature is ready for release
-    // this.cancelStatusWatcher = this.$watch('status', this.handleStatusChange);
+    this.cancelStatusWatcher = this.$watch('status', this.handleStatusChange);
   }
 
   render() {
