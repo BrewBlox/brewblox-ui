@@ -50,7 +50,7 @@ export default class ActuatorOffsetWidget extends BlockWidget {
     </CardWarning>
 
     <q-card-section>
-      <q-item dark class="aligned-item">
+      <q-item dark class="align-children">
         <q-item-section>
           <q-item-label caption>Target offset</q-item-label>
           <big>{{ block.data.desiredSetting | round }}</big>
