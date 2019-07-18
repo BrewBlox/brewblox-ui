@@ -12,7 +12,7 @@ export const getById =
     sparkStore.blockById(serviceId, id, typeName);
 
 export interface MutexBlocks {
-  active: string;
+  active: string[];
   waiting: string[];
   idle: string[];
 }
@@ -27,7 +27,7 @@ export const getMutexClients = (serviceId: string, mutexId: string): MutexBlocks
           return mutexed;
         }
         if (block.data.state === 1) {
-          return { ...mutexed, active: block.id };
+          return { ...mutexed, active: [...mutexed.active, block.id] };
         }
         if (constraint.limiting && constraint.mutex) {
           return { ...mutexed, waiting: [...mutexed.waiting, block.id] };
@@ -38,7 +38,7 @@ export const getMutexClients = (serviceId: string, mutexId: string): MutexBlocks
         return mutexed;
       },
       {
-        active: 'None',
+        active: [],
         waiting: [],
         idle: [],
       },

@@ -95,7 +95,7 @@ export const defineCreatedBlocks = (
       type: mutexType,
       groups: config.groups,
       data: {
-        differentActuatorWait: new Unit(30, 'minute'),
+        differentActuatorWait: new Unit(45, 'minute'),
       },
     },
     // Digital Actuator
