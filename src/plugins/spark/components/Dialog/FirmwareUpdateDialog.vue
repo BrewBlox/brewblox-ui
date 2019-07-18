@@ -46,8 +46,10 @@ export default class FirmwareUpdateDialog extends DialogBase {
       })
       .catch(e => {
         this.pushMessage(`Update failed: ${e.toString()}`);
-        this.pushMessage(`If your firmware is older than 2019-07-15,
-                          run 'brewblox-ctl flash' to enable updating from the UI.`);
+        this.pushMessage('This feature is still experimental.');
+        this.pushMessage(`If retrying the update does not work,
+                          or your firmware is older than 2019-07-18,
+                          please run 'brewblox-ctl flash' to enable UI firmware updates.`);
         if (this.status) {
           this.status.info.forEach(this.pushMessage);
         }
