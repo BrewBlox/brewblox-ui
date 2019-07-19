@@ -56,6 +56,8 @@ export interface ComponentSpec {
 export interface BuilderLayout {
   id: string;
   title: string;
+  width: number;
+  height: number;
   parts: PersistentPart[];
   _rev?: string;
 }

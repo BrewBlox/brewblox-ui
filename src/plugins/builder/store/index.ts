@@ -16,6 +16,8 @@ const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'builder' })
 export class BuilderModule extends VuexModule {
+  public editorActive: boolean = false;
+  public editorTool: string = '';
   public layouts: Record<string, BuilderLayout> = {};
 
   public get layoutIds(): string[] {
@@ -28,6 +30,16 @@ export class BuilderModule extends VuexModule {
 
   public get layoutById(): (id: string) => BuilderLayout {
     return id => this.layouts[id] || null;
+  }
+
+  @Mutation
+  public commitEditorActive(active: boolean) {
+    this.editorActive = active;
+  }
+
+  @Mutation
+  public commitEditorTool(tool: string) {
+    this.editorTool = tool;
   }
 
   @Mutation
