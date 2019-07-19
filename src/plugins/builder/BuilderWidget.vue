@@ -1,6 +1,6 @@
 <script lang="ts">
 import { debounce, uid } from 'quasar';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 
@@ -8,7 +8,8 @@ import BuilderCatalog from './BuilderCatalog.vue';
 import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE, deprecatedTypes } from './getters';
 import specs from './specs';
-import { BuilderConfig, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
+import { builderStore } from './store';
+import { BuilderConfig, BuilderStage, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
 
 interface DragAction {
   hide: boolean;
@@ -44,7 +45,21 @@ export default class BuilderWidget extends WidgetBase {
   calculateFlowFunc: Function = () => { };
 
   get widgetConfig(): BuilderConfig {
-    return this.widget.config;
+    return {
+      currentStageId: null,
+      stages: [],
+      ...this.widget.config,
+    };
+  }
+
+  get stages(): BuilderStage[] {
+    return this.widgetConfig.stages
+      .map(builderStore.stageById);
+  }
+
+  get currentStage(): BuilderStage | null {
+    return this.stages
+      .find(s => s && s.id === this.widgetConfig.currentStageId) || null;
   }
 
   async updateParts(parts: PersistentPart[]) {
@@ -54,9 +69,13 @@ export default class BuilderWidget extends WidgetBase {
       return persistent;
     };
 
+    if (!this.currentStage) {
+      return;
+    }
+
     // first set local value, to avoid jitters caused by the period between action and vueX refresh
-    this.widgetConfig.parts = parts.map(asPersistent);
-    await this.saveConfig(this.widgetConfig);
+    this.currentStage.parts = parts.map(asPersistent);
+    await builderStore.saveStage(this.currentStage);
     this.calculateFlowFunc();
   }
 
@@ -74,8 +93,11 @@ export default class BuilderWidget extends WidgetBase {
   }
 
   get parts(): PersistentPart[] {
+    if (!this.currentStage) {
+      return [];
+    }
     const sizes: Record<string, number> = {};
-    return this.widgetConfig.parts
+    return this.currentStage.parts
       .map(part => {
         const actual: PersistentPart = {
           id: uid(),
@@ -112,6 +134,25 @@ export default class BuilderWidget extends WidgetBase {
     return SQUARE_SIZE * val;
   }
 
+  async migrate() {
+    const oldParts: PersistentPart[] = (this.widgetConfig as any).parts;
+    if (oldParts) {
+      const id = uid();
+      await builderStore.createStage({
+        id,
+        title: 'Default',
+        parts: oldParts,
+      });
+      this.saveConfig({
+        ...this.widgetConfig,
+        stages: [...this.widgetConfig.stages, id],
+        currentStageId: id,
+        parts: undefined,
+      });
+      this.calculateFlowFunc();
+    }
+  }
+
   mounted() {
     this.calculateFlowFunc =
       debounce(
@@ -119,6 +160,14 @@ export default class BuilderWidget extends WidgetBase {
         50,
         false);
     this.calculateFlowFunc();
+    this.migrate();
+  }
+
+  @Watch('widgetConfig', { deep: true })
+  watchStage(newCfg: BuilderConfig, oldCfg: BuilderConfig) {
+    if (!oldCfg || newCfg.currentStageId !== oldCfg.currentStageId) {
+      this.calculateFlowFunc();
+    }
   }
 }
 </script>

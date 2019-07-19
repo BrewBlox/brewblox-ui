@@ -10,7 +10,8 @@ import { BuilderConfig } from './types';
 export default class BuilderWizard extends WidgetWizardBase {
   createWidget() {
     const config: BuilderConfig = {
-      parts: [],
+      currentStageId: null,
+      stages: [],
     };
     this.createItem({
       config,
