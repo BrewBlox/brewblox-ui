@@ -3,12 +3,12 @@ import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-dec
 
 import store from '@/store';
 
-import { BuilderStage } from '../types';
+import { BuilderLayout } from '../types';
 import {
-  createStage as createStageInApi,
-  deleteStage as removeStageInApi,
-  fetchStages as fetchStagesInApi,
-  persistStage as persistStageInApi,
+  createLayout as createLayoutInApi,
+  deleteLayout as removeLayoutInApi,
+  fetchLayouts as fetchLayoutsInApi,
+  persistLayout as persistLayoutInApi,
   setup as setupInApi,
 } from './api';
 
@@ -16,70 +16,70 @@ const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'builder' })
 export class BuilderModule extends VuexModule {
-  public stages: Record<string, BuilderStage> = {};
+  public layouts: Record<string, BuilderLayout> = {};
 
-  public get stageIds(): string[] {
-    return Object.keys(this.stages);
+  public get layoutIds(): string[] {
+    return Object.keys(this.layouts);
   }
 
-  public get stageValues(): BuilderStage[] {
-    return Object.values(this.stages);
+  public get layoutValues(): BuilderLayout[] {
+    return Object.values(this.layouts);
   }
 
-  public get stageById(): (id: string) => BuilderStage {
-    return id => this.stages[id] || null;
-  }
-
-  @Mutation
-  public commitStage(stage: BuilderStage) {
-    Vue.set(this.stages, stage.id, { ...stage });
+  public get layoutById(): (id: string) => BuilderLayout {
+    return id => this.layouts[id] || null;
   }
 
   @Mutation
-  public commitAllStages(stages: BuilderStage[]) {
-    this.stages = stages.reduce((acc, stage) => ({ ...acc, [stage.id]: stage }), {});
+  public commitLayout(layout: BuilderLayout) {
+    Vue.set(this.layouts, layout.id, { ...layout });
   }
 
   @Mutation
-  public commitRemoveStage(stage: BuilderStage) {
-    Vue.delete(this.stages, stage.id);
+  public commitAllLayouts(layouts: BuilderLayout[]) {
+    this.layouts = layouts.reduce((acc, layout) => ({ ...acc, [layout.id]: layout }), {});
+  }
+
+  @Mutation
+  public commitRemoveLayout(layout: BuilderLayout) {
+    Vue.delete(this.layouts, layout.id);
   }
 
   @Action({ rawError })
-  public async createStage(stage: BuilderStage) {
-    this.commitStage(await createStageInApi(stage));
+  public async createLayout(layout: BuilderLayout) {
+    this.commitLayout(await createLayoutInApi(layout));
   }
 
   @Action({ rawError })
-  public async saveStage(stage: BuilderStage) {
-    this.commitStage(await persistStageInApi(stage));
+  public async saveLayout(layout: BuilderLayout) {
+    this.commitLayout(await persistLayoutInApi(layout));
   }
 
   @Action({ rawError })
-  public async removeStage(stage: BuilderStage) {
-    await removeStageInApi(stage)
+  public async removeLayout(layout: BuilderLayout) {
+    await removeLayoutInApi(layout)
       .catch(() => { });
-    this.commitRemoveStage(stage);
+    this.commitRemoveLayout(layout);
   }
 
   @Action({ rawError })
   public async setup(): Promise<void> {
     /* eslint-disable no-underscore-dangle */
-    const onChange = async (stage: BuilderStage): Promise<void> => {
-      const existing = this.stageById(stage.id);
-      if (!existing || existing._rev !== stage._rev) {
-        this.commitStage(stage);
+    const onChange = async (layout: BuilderLayout): Promise<void> => {
+      const existing = this.layoutById(layout.id);
+      if (!existing || existing._rev !== layout._rev) {
+        this.commitLayout(layout);
       }
     };
     const onDelete = (id: string): void => {
-      const existing = this.stageById(id);
+      const existing = this.layoutById(id);
       if (existing) {
-        this.removeStage(existing);
+        this.removeLayout(existing);
       }
     };
     /* eslint-enable no-underscore-dangle */
 
-    this.commitAllStages(await fetchStagesInApi());
+    this.commitAllLayouts(await fetchLayoutsInApi());
     setupInApi(onChange, onDelete);
   }
 }

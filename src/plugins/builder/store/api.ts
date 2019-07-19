@@ -1,24 +1,24 @@
 import { create, fetchAll, fetchById, persist, registerModule, remove } from '@/helpers/database';
 
-import { BuilderStage } from '../types';
+import { BuilderLayout } from '../types';
 
-const STAGES = 'stages';
+const LAYOUT = 'layout';
 
 export const setup =
   (onChanged: (doc: any) => void, onDeleted: (id: string) => void, ): void =>
-    registerModule({ onChanged, onDeleted, id: STAGES });
+    registerModule({ onChanged, onDeleted, id: LAYOUT });
 
-export const fetchStages = async (): Promise<BuilderStage[]> =>
-  fetchAll(STAGES);
+export const fetchLayouts = async (): Promise<BuilderLayout[]> =>
+  fetchAll(LAYOUT);
 
-export const fetchStageById = async (id: string): Promise<BuilderStage> =>
-  fetchById(STAGES, id);
+export const fetchLayoutById = async (id: string): Promise<BuilderLayout> =>
+  fetchById(LAYOUT, id);
 
-export const createStage = async (service: BuilderStage): Promise<BuilderStage> =>
-  create(STAGES, service);
+export const createLayout = async (layout: BuilderLayout): Promise<BuilderLayout> =>
+  create(LAYOUT, layout);
 
-export const persistStage = async (service: BuilderStage): Promise<BuilderStage> =>
-  persist(STAGES, service);
+export const persistLayout = async (layout: BuilderLayout): Promise<BuilderLayout> =>
+  persist(LAYOUT, layout);
 
-export const deleteStage = async (service: BuilderStage): Promise<BuilderStage> =>
-  remove(STAGES, service);
+export const deleteLayout = async (layout: BuilderLayout): Promise<BuilderLayout> =>
+  remove(LAYOUT, layout);

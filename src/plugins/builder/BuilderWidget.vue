@@ -9,7 +9,7 @@ import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE, deprecatedTypes } from './getters';
 import specs from './specs';
 import { builderStore } from './store';
-import { BuilderConfig, BuilderStage, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
+import { BuilderConfig, BuilderLayout, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
 
 interface DragAction {
   hide: boolean;
@@ -46,20 +46,20 @@ export default class BuilderWidget extends WidgetBase {
 
   get widgetConfig(): BuilderConfig {
     return {
-      currentStageId: null,
-      stages: [],
-      ...this.widget.config,
+      currentLayoutId: null,
+      layoutIds: [],
+      ...this.widget.config as Partial<BuilderConfig>,
     };
   }
 
-  get stages(): BuilderStage[] {
-    return this.widgetConfig.stages
-      .map(builderStore.stageById);
+  get layouts(): BuilderLayout[] {
+    return this.widgetConfig.layoutIds
+      .map(builderStore.layoutById);
   }
 
-  get currentStage(): BuilderStage | null {
-    return this.stages
-      .find(s => s && s.id === this.widgetConfig.currentStageId) || null;
+  get currentLayout(): BuilderLayout | null {
+    return this.layouts
+      .find(s => s && s.id === this.widgetConfig.currentLayoutId) || null;
   }
 
   async updateParts(parts: PersistentPart[]) {
@@ -69,13 +69,13 @@ export default class BuilderWidget extends WidgetBase {
       return persistent;
     };
 
-    if (!this.currentStage) {
+    if (!this.currentLayout) {
       return;
     }
 
     // first set local value, to avoid jitters caused by the period between action and vueX refresh
-    this.currentStage.parts = parts.map(asPersistent);
-    await builderStore.saveStage(this.currentStage);
+    this.currentLayout.parts = parts.map(asPersistent);
+    await builderStore.saveLayout(this.currentLayout);
     this.calculateFlowFunc();
   }
 
@@ -93,11 +93,11 @@ export default class BuilderWidget extends WidgetBase {
   }
 
   get parts(): PersistentPart[] {
-    if (!this.currentStage) {
+    if (!this.currentLayout) {
       return [];
     }
     const sizes: Record<string, number> = {};
-    return this.currentStage.parts
+    return this.currentLayout.parts
       .map(part => {
         const actual: PersistentPart = {
           id: uid(),
@@ -138,17 +138,15 @@ export default class BuilderWidget extends WidgetBase {
     const oldParts: PersistentPart[] = (this.widgetConfig as any).parts;
     if (oldParts) {
       const id = uid();
-      await builderStore.createStage({
+      await builderStore.createLayout({
         id,
-        title: 'Default',
+        title: `${this.widget.title} layout`,
         parts: oldParts,
       });
-      this.saveConfig({
-        ...this.widgetConfig,
-        stages: [...this.widgetConfig.stages, id],
-        currentStageId: id,
-        parts: undefined,
-      });
+      this.widgetConfig.layoutIds.push(id);
+      this.widgetConfig.currentLayoutId = id;
+      this.$delete(this.widgetConfig, 'parts');
+      this.saveConfig(this.widgetConfig);
       this.calculateFlowFunc();
     }
   }
@@ -164,8 +162,8 @@ export default class BuilderWidget extends WidgetBase {
   }
 
   @Watch('widgetConfig', { deep: true })
-  watchStage(newCfg: BuilderConfig, oldCfg: BuilderConfig) {
-    if (!oldCfg || newCfg.currentStageId !== oldCfg.currentStageId) {
+  watchLayout(newCfg: BuilderConfig, oldCfg: BuilderConfig) {
+    if (!oldCfg || newCfg.currentLayoutId !== oldCfg.currentLayoutId) {
       this.calculateFlowFunc();
     }
   }

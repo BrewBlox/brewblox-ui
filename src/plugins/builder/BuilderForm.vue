@@ -12,7 +12,7 @@ import BuilderPartMenu from './BuilderPartMenu.vue';
 import { SQUARE_SIZE } from './getters';
 import specs from './specs';
 import { builderStore } from './store';
-import { BuilderConfig, BuilderStage, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
+import { BuilderConfig, BuilderLayout, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
 
 interface DragAction {
   hide: boolean;
@@ -80,9 +80,9 @@ export default class BuilderForm extends CrudComponent {
 
   get widgetConfig(): BuilderConfig {
     return {
-      currentStageId: null,
-      stages: [],
-      ...this.widget.config,
+      currentLayoutId: null,
+      layoutIds: [],
+      ...this.widget.config as Partial<BuilderConfig>,
     };
   }
 
@@ -199,18 +199,18 @@ export default class BuilderForm extends CrudComponent {
     }
   }
 
-  get currentStage(): BuilderStage | null {
-    return builderStore.stageById(this.widgetConfig.currentStageId || '');
+  get currentLayout(): BuilderLayout | null {
+    return builderStore.layoutById(this.widgetConfig.currentLayoutId || '');
   }
 
-  set currentStage(stage: BuilderStage | null) {
-    this.widgetConfig.currentStageId = stage ? stage.id : null;
+  set currentLayout(layout: BuilderLayout | null) {
+    this.widgetConfig.currentLayoutId = layout ? layout.id : null;
     this.saveConfig(this.widgetConfig);
   }
 
-  get stages(): BuilderStage[] {
-    return this.widgetConfig.stages
-      .map(builderStore.stageById)
+  get layouts(): BuilderLayout[] {
+    return this.widgetConfig.layoutIds
+      .map(builderStore.layoutById)
       .filter(s => s !== null);
   }
 
@@ -251,8 +251,8 @@ export default class BuilderForm extends CrudComponent {
   findGridSquare(grid: Rect, x: number, y: number) {
     // The page offset in clicks has appeared and disappeared in various quasar releases
     // Comment or uncomment these lines when required
-    x -= window.pageXOffset;
-    y -= window.pageYOffset;
+    // x -= window.pageXOffset;
+    // y -= window.pageYOffset;
     if (!this.rectContains(grid, x, y)) {
       return null;
     }
@@ -380,26 +380,26 @@ export default class BuilderForm extends CrudComponent {
     return SQUARE_SIZE * val;
   }
 
-  startAddStage(copy: boolean) {
+  startAddLayout(copy: boolean) {
     Dialog.create({
-      title: 'Add Stage',
-      message: 'Create a new Brewery Builder stage',
+      title: 'Add Layout',
+      message: 'Create a new Brewery Builder layout',
       dark: true,
       cancel: true,
       prompt: {
-        model: 'Brewery Stage',
+        model: 'Brewery Layout',
         type: 'text',
       },
     })
       .onOk(title => {
         const id = uid();
-        builderStore.createStage({
+        builderStore.createLayout({
           id,
           title,
-          parts: copy && this.currentStage ? [...this.currentStage.parts] : [],
+          parts: copy && this.currentLayout ? [...this.currentLayout.parts] : [],
         });
-        this.widgetConfig.stages.push(id);
-        this.widgetConfig.currentStageId = id;
+        this.widgetConfig.layoutIds.push(id);
+        this.widgetConfig.currentLayoutId = id;
         this.saveConfig(this.widgetConfig);
       });
   }
@@ -472,28 +472,29 @@ export default class BuilderForm extends CrudComponent {
       <div class="col row justify-around">
         <div class="column no-wrap">
           <q-btn-dropdown
-            :label="currentStage ? currentStage.title : 'No active stage'"
+            :label="currentLayout ? currentLayout.title : 'No active layout'"
             flat
+            no-caps
             icon="widgets"
             class="q-mb-sm"
           >
             <q-list dark bordered>
               <ActionItem
-                v-for="stage in stages"
-                :key="stage.id"
-                :label="stage.title"
-                :active="currentStage && currentStage.id === stage.id"
+                v-for="layout in layouts"
+                :key="layout.id"
+                :label="layout.title"
+                :active="currentLayout && currentLayout.id === layout.id"
                 icon="mdi-view-dashboard-outline"
-                @click="currentStage = stage"
+                @click="currentLayout = layout"
               />
               <q-separator dark inset />
               <ActionItem
-                :disable="!currentStage"
-                label="Copy Stage"
+                :disable="!currentLayout"
+                label="Copy Layout"
                 icon="file_copy"
-                @click="startAddStage(true)"
+                @click="startAddLayout(true)"
               />
-              <ActionItem label="New Stage" icon="add" @click="startAddStage(false)" />
+              <ActionItem label="New Layout" icon="add" @click="startAddLayout(false)" />
             </q-list>
           </q-btn-dropdown>
           <div style="height: 80vh" class="scroll column no-wrap">
