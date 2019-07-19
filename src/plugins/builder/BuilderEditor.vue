@@ -1,7 +1,7 @@
 <script lang="ts">
 import { debounce, uid } from 'quasar';
 import { Dialog } from 'quasar';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 import { Coordinates } from '@/helpers/coordinates';
@@ -412,6 +412,30 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
+  startAddLayout(copy: boolean) {
+    Dialog.create({
+      title: 'Add Layout',
+      message: 'Create a new Brewery Builder layout',
+      dark: true,
+      cancel: true,
+      prompt: {
+        model: 'Brewery Layout',
+        type: 'text',
+      },
+    })
+      .onOk(async title => {
+        const id = uid();
+        await builderStore.createLayout({
+          id,
+          title,
+          width: copy ? this.layout.width : defaultLayoutWidth,
+          height: copy ? this.layout.height : defaultLayoutHeight,
+          parts: copy ? deepCopy(this.layout.parts) : [],
+        });
+        this.layoutId = id;
+      });
+  }
+
   created() {
     builderStore.commitEditorActive(true);
     this.debouncedCalculate = debounce(this.calculate, 50, false);
@@ -427,6 +451,10 @@ export default class BuilderEditor extends DialogBase {
     builderStore.commitEditorActive(false);
   }
 
+  @Watch('layout')
+  watchLayout() {
+    this.debouncedCalculate();
+  }
 }
 </script>
 
@@ -516,21 +544,15 @@ export default class BuilderEditor extends DialogBase {
         <div class="col row justify-center no-wrap">
           <div class="col-auto column no-wrap" style="max-height: 90vh">
             <!-- Layout dropdown -->
-            <q-btn-dropdown
-              :label="layout ? layout.title : 'No active layout'"
-              flat
-              no-caps
-              icon="widgets"
-              class="q-mb-sm"
-            >
+            <q-btn-dropdown :label="layout.title" flat no-caps icon="widgets" class="q-mb-sm">
               <q-list dark bordered>
                 <ActionItem
-                  v-for="layout in layouts"
-                  :key="layout.id"
-                  :label="layout.title"
-                  :active="layout && layout.id === layout.id"
+                  v-for="lo in layouts"
+                  :key="lo.id"
+                  :label="lo.title"
+                  :active="lo.id === layout.id"
                   icon="mdi-view-dashboard-outline"
-                  @click="layout = layout"
+                  @click="layoutId = lo.id"
                 />
                 <q-separator dark inset />
                 <ActionItem
