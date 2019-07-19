@@ -11,7 +11,8 @@ import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
 import { SQUARE_SIZE } from './getters';
 import specs from './specs';
-import { BuilderConfig, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
+import { builderStore } from './store';
+import { BuilderConfig, BuilderLayout, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
 
 interface DragAction {
   hide: boolean;
@@ -78,7 +79,11 @@ export default class BuilderForm extends CrudComponent {
   }
 
   get widgetConfig(): BuilderConfig {
-    return this.widget.config;
+    return {
+      currentLayoutId: null,
+      layoutIds: [],
+      ...this.widget.config as Partial<BuilderConfig>,
+    };
   }
 
   get gridHeight() {
@@ -194,6 +199,21 @@ export default class BuilderForm extends CrudComponent {
     }
   }
 
+  get currentLayout(): BuilderLayout | null {
+    return builderStore.layoutById(this.widgetConfig.currentLayoutId || '');
+  }
+
+  set currentLayout(layout: BuilderLayout | null) {
+    this.widgetConfig.currentLayoutId = layout ? layout.id : null;
+    this.saveConfig(this.widgetConfig);
+  }
+
+  get layouts(): BuilderLayout[] {
+    return this.widgetConfig.layoutIds
+      .map(builderStore.layoutById)
+      .filter(s => s !== null);
+  }
+
   get configuredPart(): FlowPart | null {
     return this.flowParts.find(p => p.id === this.configuredPartId) || null;
   }
@@ -231,8 +251,8 @@ export default class BuilderForm extends CrudComponent {
   findGridSquare(grid: Rect, x: number, y: number) {
     // The page offset in clicks has appeared and disappeared in various quasar releases
     // Comment or uncomment these lines when required
-    x -= window.pageXOffset;
-    y -= window.pageYOffset;
+    // x -= window.pageXOffset;
+    // y -= window.pageYOffset;
     if (!this.rectContains(grid, x, y)) {
       return null;
     }
@@ -360,6 +380,30 @@ export default class BuilderForm extends CrudComponent {
     return SQUARE_SIZE * val;
   }
 
+  startAddLayout(copy: boolean) {
+    Dialog.create({
+      title: 'Add Layout',
+      message: 'Create a new Brewery Builder layout',
+      dark: true,
+      cancel: true,
+      prompt: {
+        model: 'Brewery Layout',
+        type: 'text',
+      },
+    })
+      .onOk(title => {
+        const id = uid();
+        builderStore.createLayout({
+          id,
+          title,
+          parts: copy && this.currentLayout ? [...this.currentLayout.parts] : [],
+        });
+        this.widgetConfig.layoutIds.push(id);
+        this.widgetConfig.currentLayoutId = id;
+        this.saveConfig(this.widgetConfig);
+      });
+  }
+
   mounted() {
     window.addEventListener('keyup', this.keyHandler);
   }
@@ -426,43 +470,78 @@ export default class BuilderForm extends CrudComponent {
       </q-list>
 
       <div class="col row justify-around">
-        <div :style="`width: ${gridWidth}px; height: ${gridHeight}px;`">
-          <!-- No tools have a pan handler for non-part grid squares -->
-          <svg ref="grid" class="grid-base grid-editable" @click="v => clickHandler(v, null)">
-            <g
-              v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, part)"
-              v-for="part in flowParts"
-              v-show="!beingDragged(part)"
-              :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
-              :key="part.id"
-              :class="{ clickable: currentTool.cursor(part), [part.type]: true }"
-              @click.stop="v => clickHandler(v, part)"
-            >
-              <text
-                fill="white"
-                x="0"
-                y="8"
-                class="grid-item-coordinates"
-              >{{ part.x }},{{ part.y }}</text>
-              <PartWrapper
-                :part="part"
-                show-hover
-                @update:part="updatePart"
-                @dirty="invalidateFlows"
+        <div class="column no-wrap">
+          <q-btn-dropdown
+            :label="currentLayout ? currentLayout.title : 'No active layout'"
+            flat
+            no-caps
+            icon="widgets"
+            class="q-mb-sm"
+          >
+            <q-list dark bordered>
+              <ActionItem
+                v-for="layout in layouts"
+                :key="layout.id"
+                :label="layout.title"
+                :active="currentLayout && currentLayout.id === layout.id"
+                icon="mdi-view-dashboard-outline"
+                @click="currentLayout = layout"
               />
-            </g>
-            <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
-              <PartWrapper :part="dragAction.part" />
-            </g>
-            <g
-              v-for="([coord, val], idx) in overlaps"
-              :key="idx"
-              :transform="`translate(${squares(coord.x) + 40}, ${squares(coord.y) + 4})`"
-            >
-              <circle r="8" fill="dodgerblue" />
-              <text y="4" text-anchor="middle" fill="white" class="grid-item-coordinates">{{ val }}</text>
-            </g>
-          </svg>
+              <q-separator dark inset />
+              <ActionItem
+                :disable="!currentLayout"
+                label="Copy Layout"
+                icon="file_copy"
+                @click="startAddLayout(true)"
+              />
+              <ActionItem label="New Layout" icon="add" @click="startAddLayout(false)" />
+            </q-list>
+          </q-btn-dropdown>
+          <div style="height: 80vh" class="scroll column no-wrap">
+            <div :style="`width: ${gridWidth}px; height: ${gridHeight}px;`">
+              <!-- No tools have a pan handler for non-part grid squares -->
+              <svg ref="grid" class="grid-base grid-editable" @click="v => clickHandler(v, null)">
+                <g
+                  v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, part)"
+                  v-for="part in flowParts"
+                  v-show="!beingDragged(part)"
+                  :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
+                  :key="part.id"
+                  :class="{ clickable: currentTool.cursor(part), [part.type]: true }"
+                  @click.stop="v => clickHandler(v, part)"
+                >
+                  <text
+                    fill="white"
+                    x="0"
+                    y="8"
+                    class="grid-item-coordinates"
+                  >{{ part.x }},{{ part.y }}</text>
+                  <PartWrapper
+                    :part="part"
+                    show-hover
+                    @update:part="updatePart"
+                    @dirty="invalidateFlows"
+                  />
+                </g>
+                <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
+                  <PartWrapper :part="dragAction.part" />
+                </g>
+                <g
+                  v-for="([coord, val], idx) in overlaps"
+                  :key="idx"
+                  :transform="`translate(${squares(coord.x) + 40}, ${squares(coord.y) + 4})`"
+                >
+                  <circle r="8" fill="dodgerblue" />
+                  <text
+                    y="4"
+                    text-anchor="middle"
+                    fill="white"
+                    class="grid-item-coordinates"
+                  >{{ val }}</text>
+                </g>
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
     </q-card-section>

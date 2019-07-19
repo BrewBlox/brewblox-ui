@@ -1,6 +1,6 @@
 <script lang="ts">
 import { debounce, uid } from 'quasar';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 
@@ -8,7 +8,8 @@ import BuilderCatalog from './BuilderCatalog.vue';
 import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE, deprecatedTypes } from './getters';
 import specs from './specs';
-import { BuilderConfig, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
+import { builderStore } from './store';
+import { BuilderConfig, BuilderLayout, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
 
 interface DragAction {
   hide: boolean;
@@ -44,7 +45,21 @@ export default class BuilderWidget extends WidgetBase {
   calculateFlowFunc: Function = () => { };
 
   get widgetConfig(): BuilderConfig {
-    return this.widget.config;
+    return {
+      currentLayoutId: null,
+      layoutIds: [],
+      ...this.widget.config as Partial<BuilderConfig>,
+    };
+  }
+
+  get layouts(): BuilderLayout[] {
+    return this.widgetConfig.layoutIds
+      .map(builderStore.layoutById);
+  }
+
+  get currentLayout(): BuilderLayout | null {
+    return this.layouts
+      .find(s => s && s.id === this.widgetConfig.currentLayoutId) || null;
   }
 
   async updateParts(parts: PersistentPart[]) {
@@ -54,9 +69,13 @@ export default class BuilderWidget extends WidgetBase {
       return persistent;
     };
 
+    if (!this.currentLayout) {
+      return;
+    }
+
     // first set local value, to avoid jitters caused by the period between action and vueX refresh
-    this.widgetConfig.parts = parts.map(asPersistent);
-    await this.saveConfig(this.widgetConfig);
+    this.currentLayout.parts = parts.map(asPersistent);
+    await builderStore.saveLayout(this.currentLayout);
     this.calculateFlowFunc();
   }
 
@@ -74,8 +93,11 @@ export default class BuilderWidget extends WidgetBase {
   }
 
   get parts(): PersistentPart[] {
+    if (!this.currentLayout) {
+      return [];
+    }
     const sizes: Record<string, number> = {};
-    return this.widgetConfig.parts
+    return this.currentLayout.parts
       .map(part => {
         const actual: PersistentPart = {
           id: uid(),
@@ -112,6 +134,23 @@ export default class BuilderWidget extends WidgetBase {
     return SQUARE_SIZE * val;
   }
 
+  async migrate() {
+    const oldParts: PersistentPart[] = (this.widgetConfig as any).parts;
+    if (oldParts) {
+      const id = uid();
+      await builderStore.createLayout({
+        id,
+        title: `${this.widget.title} layout`,
+        parts: oldParts,
+      });
+      this.widgetConfig.layoutIds.push(id);
+      this.widgetConfig.currentLayoutId = id;
+      this.$delete(this.widgetConfig, 'parts');
+      this.saveConfig(this.widgetConfig);
+      this.calculateFlowFunc();
+    }
+  }
+
   mounted() {
     this.calculateFlowFunc =
       debounce(
@@ -119,6 +158,14 @@ export default class BuilderWidget extends WidgetBase {
         50,
         false);
     this.calculateFlowFunc();
+    this.migrate();
+  }
+
+  @Watch('widgetConfig', { deep: true })
+  watchLayout(newCfg: BuilderConfig, oldCfg: BuilderConfig) {
+    if (!oldCfg || newCfg.currentLayoutId !== oldCfg.currentLayoutId) {
+      this.calculateFlowFunc();
+    }
   }
 }
 </script>

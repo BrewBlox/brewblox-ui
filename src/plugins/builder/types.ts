@@ -53,9 +53,17 @@ export interface ComponentSpec {
   interactHandler?: (part: PersistentPart, updater: PartUpdater) => void;
 }
 
+export interface BuilderLayout {
+  id: string;
+  title: string;
+  parts: PersistentPart[];
+  _rev?: string;
+}
+
 export interface BuilderConfig {
   currentToolId?: string;
-  parts: PersistentPart[];
+  currentLayoutId: string | null;
+  layoutIds: string[];
 }
 
 export interface Rect {
