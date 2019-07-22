@@ -1,12 +1,14 @@
 <script lang="ts">
+import FileSaver from 'file-saver';
 import { debounce, uid } from 'quasar';
 import { Dialog } from 'quasar';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 import { Coordinates } from '@/helpers/coordinates';
+import { showImportDialog } from '@/helpers/dialog';
 import { clampRotation } from '@/helpers/functional';
-import { deepCopy } from '@/helpers/units/parseObject';
+import { deepCopy, serialize } from '@/helpers/units/parseObject';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
@@ -240,6 +242,45 @@ export default class BuilderEditor extends DialogBase {
 
   async removePart(part: PersistentPart) {
     await this.saveParts(this.parts.filter(p => p.id !== part.id));
+  }
+
+  async importLayout() {
+    showImportDialog<BuilderLayout>(async layout => {
+      const id = uid();
+      await builderStore.createLayout({ ...layout, id });
+      this.layoutId = id;
+    });
+  }
+
+  exportLayout() {
+    if (!this.layout) {
+      return;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, _rev, ...exported } = this.layout;
+    const blob = new Blob([JSON.stringify(serialize(exported))], { type: 'text/plain;charset=utf-8' });
+    FileSaver.saveAs(blob, `brewblox-${this.layout.title}-layout.json`);
+  }
+
+  renameLayout() {
+    if (!this.layout) {
+      return;
+    }
+    Dialog.create({
+      title: 'Change Layout title',
+      message: `Choose a new name for ${this.layout.title}`,
+      dark: true,
+      cancel: true,
+      prompt: {
+        model: this.layout.title,
+        type: 'text',
+      },
+    })
+      .onOk(async title => {
+        if (this.layout) {
+          builderStore.saveLayout({ ...this.layout, title });
+        }
+      });
   }
 
   clearParts() {
@@ -562,44 +603,45 @@ export default class BuilderEditor extends DialogBase {
               </q-item-section>
             </q-item>
           </q-expansion-item>
-
-          <q-expansion-item label="Layout actions" header-class="text-h6" default-opened>
-            <q-separator dark inset />
-            <ActionItem icon="delete" label="Delete all parts" no-close @click="clearParts" />
-            <ActionItem icon="delete" label="Delete Layout" no-close @click="removeLayout" />
-          </q-expansion-item>
         </q-list>
 
         <!-- Fills space not taken by the sidebar -->
         <div class="col row justify-center no-wrap">
           <div class="col-auto column no-wrap" style="max-height: 90vh">
             <!-- Layout dropdown -->
-            <q-btn-dropdown
-              :label="layout ? layout.title : 'None'"
-              flat
-              no-caps
-              icon="widgets"
-              class="q-mb-sm"
-            >
-              <q-list dark bordered>
-                <ActionItem
-                  v-for="lo in layouts"
-                  :key="lo.id"
-                  :label="lo.title"
-                  :active="layout && lo.id === layout.id"
-                  icon="mdi-view-dashboard-outline"
-                  @click="layoutId = lo.id"
-                />
-                <q-separator dark inset />
-                <ActionItem
-                  :disabled="!layout"
-                  label="Copy Layout"
-                  icon="file_copy"
-                  @click="startAddLayout(true)"
-                />
-                <ActionItem label="New Layout" icon="add" @click="startAddLayout(false)" />
-              </q-list>
-            </q-btn-dropdown>
+            <div class="row q-mb-sm">
+              <q-btn-dropdown
+                :label="layout ? layout.title : 'None'"
+                flat
+                no-caps
+                icon="widgets"
+                class="col"
+              >
+                <q-list dark bordered>
+                  <ActionItem
+                    v-for="lo in layouts"
+                    :key="lo.id"
+                    :label="lo.title"
+                    :active="layout && lo.id === layout.id"
+                    icon="mdi-view-dashboard-outline"
+                    @click="layoutId = lo.id"
+                  />
+                </q-list>
+              </q-btn-dropdown>
+              <q-btn-dropdown flat icon="settings" class="col-auto">
+                <q-list dark bordered>
+                  <ActionItem label="New Layout" icon="add" @click="startAddLayout(false)" />
+                  <template v-if="!!layout">
+                    <ActionItem label="Copy Layout" icon="file_copy" @click="startAddLayout(true)" />
+                    <ActionItem icon="mdi-file-import" label="Import Layout" @click="importLayout" />
+                    <ActionItem icon="edit" label="Rename Layout" @click="renameLayout" />
+                    <ActionItem icon="mdi-file-export" label="Export Layout" @click="exportLayout" />
+                    <ActionItem icon="delete" label="Delete all parts" @click="clearParts" />
+                    <ActionItem icon="delete" label="Delete Layout" @click="removeLayout" />
+                  </template>
+                </q-list>
+              </q-btn-dropdown>
+            </div>
             <!-- Grid wrapper -->
             <div class="col column no-wrap scroll maximized">
               <div

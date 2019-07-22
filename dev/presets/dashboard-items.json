@@ -9,6 +9,7 @@
       "feature": "ProcessView",
       "dashboard": "builder",
       "config": {
+        "layoutIds": ["ee021f01-fc29-2e06-c903-0c9288eb1bfe"],
         "parts": [
           {
             "id": "cb0bdf02-5cd0-c29e-ddbf-6537762fbc77",

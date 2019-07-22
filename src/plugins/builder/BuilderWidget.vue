@@ -218,7 +218,7 @@ export default class BuilderWidget extends WidgetBase {
       <q-item-section class="col-auto">
         <q-btn
           :disable="currentIdx === activeLayouts.length-1"
-          label="Next"
+          :label="currentIdx >= 0 ? 'Next' : 'First'"
           icon-right="mdi-chevron-right"
           flat
           @click="currentIdx++"
