@@ -1,0 +1,510 @@
+{
+  "docs": [
+    {
+      "_id": "ee021f01-fc29-2e06-c903-0c9288eb1bfe",
+      "title": "Gone With the Layout",
+      "width": 20,
+      "height": 15,
+      "parts": [
+        {
+          "id": "41693288-1161-ef12-bc7c-75d3b067e2f4",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "x": 14,
+          "y": 2,
+          "type": "Coil"
+        },
+        {
+          "id": "203f9fc0-0887-d409-2e58-ba4a070dfabe",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "type": "CounterflowChiller",
+          "x": 13,
+          "y": 11
+        },
+        {
+          "id": "b9b9da24-337c-4d66-e234-46d3688d6d1f",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "type": "HeatingElement",
+          "x": 7,
+          "y": 11
+        },
+        {
+          "id": "3271d456-4cfa-57b2-7172-cfe5ba68de0d",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "type": "ImmersionCoil",
+          "x": 11,
+          "y": 14
+        },
+        {
+          "id": "9b308893-554c-e3c8-e4d8-f948a4da7466",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "type": "Lauterhexe",
+          "x": 13,
+          "y": 13
+        },
+        {
+          "id": "bc2c9d81-18bf-425d-4cf4-2a3d621ee9ee",
+          "rotate": 90,
+          "settings": {},
+          "flipped": false,
+          "type": "WhirlpoolInlet",
+          "x": 7,
+          "y": 14
+        },
+        {
+          "id": "cb0bdf02-5cd0-c29e-ddbf-6537762fbc77",
+          "rotate": 0,
+          "settings": { "liquids": ["#C678DD"] },
+          "flipped": false,
+          "x": 11,
+          "y": 2,
+          "type": "SystemIO"
+        },
+        {
+          "id": "e0929a70-22cd-f34b-ffe9-7060016a0cf2",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "x": 12,
+          "y": 2,
+          "type": "StraightTube"
+        },
+        {
+          "id": "0c506a71-af93-44b6-dbe0-c4ab16f7d80b",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "type": "BridgeTube",
+          "x": 13,
+          "y": 2
+        },
+        {
+          "id": "ef649e86-967a-8e81-3139-f7bcc61e462c",
+          "rotate": 0,
+          "settings": { "liquids": ["#4AA0EF"], "pressure": 10 },
+          "flipped": false,
+          "type": "SystemIO",
+          "x": 0,
+          "y": 2
+        },
+        {
+          "id": "56565652-dba8-b68a-ee0c-66534dfbda20",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "type": "Valve",
+          "x": 1,
+          "y": 2
+        },
+        {
+          "id": "f4b935cd-4ae5-823b-de60-524931bd7a1b",
+          "rotate": 270,
+          "settings": {},
+          "flipped": false,
+          "x": 3,
+          "y": 6,
+          "type": "SystemIO"
+        },
+        {
+          "id": "72163643-aea3-24f0-e898-ac100e1fb0ff",
+          "rotate": 90,
+          "settings": {},
+          "flipped": false,
+          "type": "Valve",
+          "x": 3,
+          "y": 5,
+          "closed": false
+        },
+        {
+          "id": "d42cca9b-1d9c-322c-1456-e2c630bf47d8",
+          "rotate": 180,
+          "settings": {},
+          "flipped": false,
+          "x": 3,
+          "y": 4,
+          "type": "TeeTube"
+        },
+        {
+          "id": "e5561b25-0ace-1590-f9b6-524287b2791f",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "type": "ElbowTube",
+          "x": 2,
+          "y": 4
+        },
+        {
+          "id": "2f27d35e-ed31-8869-26a1-883c2942fab4",
+          "rotate": 90,
+          "settings": {},
+          "flipped": false,
+          "type": "TeeTube",
+          "x": 2,
+          "y": 3
+        },
+        {
+          "id": "8daa8de7-46c1-b3ec-6f6d-d4196dab4d58",
+          "rotate": 180,
+          "settings": {},
+          "flipped": false,
+          "x": 2,
+          "y": 2,
+          "type": "TeeTube"
+        },
+        {
+          "id": "124810ca-69aa-81e0-f770-d0adac8e74a0",
+          "rotate": 270,
+          "settings": {},
+          "flipped": false,
+          "type": "ElbowTube",
+          "x": 3,
+          "y": 3
+        },
+        {
+          "id": "47cf3706-001d-36f0-d079-6ba396c74f57",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "type": "BridgeTube",
+          "x": 3,
+          "y": 2
+        },
+        {
+          "id": "0081f539-a5a1-74dd-5ae3-252c988b46cc",
+          "rotate": 270,
+          "settings": {},
+          "flipped": false,
+          "x": 5,
+          "y": 4,
+          "type": "ElbowTube"
+        },
+        {
+          "id": "f07773c1-bfdd-2b67-5fb0-131a4761ff02",
+          "rotate": 180,
+          "settings": { "liquids": ["#DB0023"] },
+          "flipped": false,
+          "type": "SystemIO",
+          "x": 7,
+          "y": 3
+        },
+        {
+          "id": "7a14dfd2-9883-60ab-c6dc-346a1a4a6ced",
+          "rotate": 180,
+          "settings": {},
+          "flipped": false,
+          "type": "Valve",
+          "x": 6,
+          "y": 3,
+          "closed": false
+        },
+        {
+          "id": "d5294a3c-5c27-5381-9fdb-42e7fd7ea1b3",
+          "rotate": 90,
+          "settings": {},
+          "flipped": false,
+          "type": "TeeTube",
+          "x": 5,
+          "y": 3
+        },
+        {
+          "id": "73620c5c-917a-f58d-324a-bdf279ba32ab",
+          "rotate": 180,
+          "settings": {},
+          "flipped": false,
+          "type": "ElbowTube",
+          "x": 5,
+          "y": 2
+        },
+        {
+          "id": "0f61648a-e83b-d4a5-12e8-82da479b74fb",
+          "rotate": 0,
+          "settings": { "enabled": true },
+          "flipped": false,
+          "x": 4,
+          "y": 2,
+          "type": "Pump",
+          "disabled": false
+        },
+        {
+          "id": "6573658f-087f-277c-f445-faaa18d39556",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "type": "Valve",
+          "x": 4,
+          "y": 4,
+          "closed": true
+        },
+        {
+          "id": "1edc48e0-bb24-23a5-741d-68e996b4f3d9",
+          "rotate": 90,
+          "settings": {},
+          "flipped": false,
+          "type": "SystemIO",
+          "x": 3,
+          "y": 1
+        },
+        {
+          "id": "c7652ea7-923b-7c76-c032-9bcb0411b9d6",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "x": 13,
+          "y": 3,
+          "type": "ElbowTube"
+        },
+        {
+          "id": "b850ea97-4d09-66f6-c8eb-3287baee16c3",
+          "rotate": 90,
+          "settings": {},
+          "flipped": false,
+          "type": "SystemIO",
+          "x": 13,
+          "y": 1
+        },
+        {
+          "id": "e487af86-2886-3dc5-7925-3200a7b7bf03",
+          "rotate": 180,
+          "settings": {},
+          "flipped": false,
+          "type": "TeeTube",
+          "x": 11,
+          "y": 13
+        },
+        {
+          "id": "34355c2d-5dd0-aa1f-6708-92f085bfd42a",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "type": "CrossTube",
+          "x": 12,
+          "y": 13
+        },
+        {
+          "id": "7ce17e1b-1784-4502-a449-d665479392a3",
+          "rotate": 90,
+          "settings": {},
+          "flipped": false,
+          "type": "ElbowTube",
+          "x": 12,
+          "y": 12
+        },
+        {
+          "id": "d9cfc2bf-ac59-e765-0fbc-7644d44810f1",
+          "rotate": 0,
+          "settings": { "enabled": true },
+          "flipped": false,
+          "x": 16,
+          "y": 12,
+          "type": "Pump",
+          "disabled": false
+        },
+        {
+          "id": "44f308d1-1d04-f65e-c89d-e7318ec05786",
+          "rotate": 270,
+          "settings": {},
+          "flipped": false,
+          "type": "ElbowTube",
+          "x": 17,
+          "y": 12
+        },
+        {
+          "id": "529b1781-1d94-cdd6-40b6-2023739cf67a",
+          "rotate": 180,
+          "settings": {},
+          "flipped": false,
+          "type": "ElbowTube",
+          "x": 17,
+          "y": 11
+        },
+        {
+          "id": "5b70b4c9-5851-ed39-9358-752fc1186c6a",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "x": 16,
+          "y": 11,
+          "type": "StraightTube"
+        },
+        {
+          "id": "9fa9e091-2fb1-9732-7683-deb741ce044f",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "type": "ElbowTube",
+          "x": 12,
+          "y": 11
+        },
+        {
+          "id": "1d26dd0b-4876-d624-e80c-d9c2a723303f",
+          "rotate": 180,
+          "settings": {},
+          "flipped": false,
+          "type": "TeeTube",
+          "x": 10,
+          "y": 13
+        },
+        {
+          "id": "ed6adaf3-3889-04eb-1855-8dc48b78cfd7",
+          "rotate": 0,
+          "settings": { "closed": true, "actuatorLink": null },
+          "flipped": false,
+          "type": "ActuatorValve",
+          "x": 9,
+          "y": 13
+        },
+        {
+          "id": "6fb9403b-4174-cc32-27b8-355c3071473f",
+          "rotate": 180,
+          "settings": {},
+          "flipped": false,
+          "type": "DipTube",
+          "x": 8,
+          "y": 13
+        },
+        {
+          "id": "3f3b54c8-7fee-e0f1-4eb7-ed083a313674",
+          "rotate": 90,
+          "settings": {},
+          "flipped": false,
+          "type": "TeeTube",
+          "x": 12,
+          "y": 10
+        },
+        {
+          "id": "e967b812-63dc-87f6-75c9-9b6d39d3919c",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "type": "CheckValve",
+          "x": 13,
+          "y": 10
+        },
+        {
+          "id": "4c957508-a8c6-f899-360d-ee2e434d2708",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "x": 14,
+          "y": 10,
+          "type": "StraightTube"
+        },
+        {
+          "id": "26f7c494-bf52-efcf-401c-5e2a2d9b22b5",
+          "rotate": 180,
+          "settings": { "liquids": ["#DB0023"] },
+          "flipped": false,
+          "type": "SystemIO",
+          "x": 15,
+          "y": 10
+        },
+        {
+          "id": "4cfac8d4-e613-faae-4819-2409d597d7e1",
+          "rotate": 90,
+          "settings": {},
+          "flipped": false,
+          "type": "TeeTube",
+          "x": 12,
+          "y": 9
+        },
+        {
+          "id": "e349cdd1-73f8-4a51-e8ee-bc593707d5c7",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "type": "StraightInletTube",
+          "x": 13,
+          "y": 9
+        },
+        {
+          "id": "11383259-3d68-8143-3737-5cd390f258b8",
+          "rotate": 90,
+          "settings": {},
+          "flipped": false,
+          "type": "TeeTube",
+          "x": 12,
+          "y": 8
+        },
+        {
+          "id": "35aeca63-e1db-b49a-830c-356fc31a0bdc",
+          "rotate": 180,
+          "settings": {},
+          "flipped": false,
+          "type": "CheckValve",
+          "x": 13,
+          "y": 8
+        },
+        {
+          "id": "a009f479-2c09-d8e6-6979-e218ee9cb8f4",
+          "rotate": 180,
+          "settings": { "liquids": ["#DB0023"] },
+          "flipped": false,
+          "type": "SystemIO",
+          "x": 14,
+          "y": 8
+        },
+        {
+          "id": "257f8b02-c8cf-eb7d-361e-64353976588c",
+          "rotate": 90,
+          "settings": {},
+          "flipped": false,
+          "type": "ElbowTube",
+          "x": 12,
+          "y": 7
+        },
+        {
+          "id": "6bbb153e-12dc-7ee5-516d-0cc365da8e26",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "type": "ElbowTube",
+          "x": 12,
+          "y": 6
+        },
+        {
+          "id": "60563139-095a-1ed0-9cd8-ed27de9def6d",
+          "rotate": 90,
+          "settings": { "liquids": ["#4AA0EF"], "pressure": 10 },
+          "flipped": false,
+          "x": 12,
+          "y": 5,
+          "type": "SystemIO"
+        },
+        {
+          "id": "4751b204-56b8-f26d-d894-6b845e73e71a",
+          "rotate": 0,
+          "settings": {
+            "sensorServiceId": "sparkey",
+            "sensorLink": {
+              "id": "sensor-1",
+              "type": "TempSensorMock",
+              "driven": false
+            }
+          },
+          "flipped": false,
+          "type": "SensorDisplay",
+          "x": 17,
+          "y": 9
+        },
+        {
+          "id": "0907e793-bc39-7c63-c22a-6ee15a535aed",
+          "rotate": 0,
+          "settings": {},
+          "flipped": false,
+          "type": "Coil",
+          "x": 13,
+          "y": 6
+        }
+      ]
+    }
+  ]
+}

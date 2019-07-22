@@ -2,23 +2,23 @@ import { create, fetchAll, fetchById, persist, registerModule, remove } from '@/
 
 import { BuilderLayout } from '../types';
 
-const LAYOUT = 'layout';
+const LAYOUTS = 'layouts';
 
 export const setup =
   (onChanged: (doc: any) => void, onDeleted: (id: string) => void, ): void =>
-    registerModule({ onChanged, onDeleted, id: LAYOUT });
+    registerModule({ onChanged, onDeleted, id: LAYOUTS });
 
 export const fetchLayouts = async (): Promise<BuilderLayout[]> =>
-  fetchAll(LAYOUT);
+  fetchAll(LAYOUTS);
 
 export const fetchLayoutById = async (id: string): Promise<BuilderLayout> =>
-  fetchById(LAYOUT, id);
+  fetchById(LAYOUTS, id);
 
 export const createLayout = async (layout: BuilderLayout): Promise<BuilderLayout> =>
-  create(LAYOUT, layout);
+  create(LAYOUTS, layout);
 
 export const persistLayout = async (layout: BuilderLayout): Promise<BuilderLayout> =>
-  persist(LAYOUT, layout);
+  persist(LAYOUTS, layout);
 
 export const deleteLayout = async (layout: BuilderLayout): Promise<BuilderLayout> =>
-  remove(LAYOUT, layout);
+  remove(LAYOUTS, layout);

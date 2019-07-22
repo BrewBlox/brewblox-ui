@@ -35,7 +35,8 @@ export default class MutexForm extends BlockCrudComponent {
           </p>
           <p>
             The Mutex can also prevent switching between two actuators too quickly.<br/>
-            If you set the minimum idle time to 45 minutes, a heater can only go active after the cooler has been inactive for 45 minutes.<br/>
+            If you set the minimum idle time to 45 minutes,
+            a heater can only go active after the cooler has been inactive for 45 minutes.<br/>
             We recommend setting the idle time to 1.5x your longest PWM period.
           </p>
         </q-item-section>
