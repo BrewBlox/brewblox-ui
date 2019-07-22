@@ -1,12 +1,17 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
+import draggable from 'vuedraggable';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
 
 import { builderStore } from './store';
 import { BuilderConfig, BuilderLayout } from './types';
 
-@Component
+@Component({
+  components: {
+    draggable,
+  },
+})
 export default class BuilderForm extends CrudComponent {
 
   get layouts(): BuilderLayout[] {
@@ -21,45 +26,107 @@ export default class BuilderForm extends CrudComponent {
     };
   }
 
+  get currentId(): string | null {
+    return this.widgetConfig.currentLayoutId;
+  }
+
   get activeLayoutIds(): string[] {
     return this.widgetConfig.layoutIds;
   }
 
-  toggleLayoutActive(layout: BuilderLayout) {
-    if (this.activeLayoutIds.includes(layout.id)) {
-      this.saveConfig({
-        ...this.widgetConfig,
-        layoutIds: this.widgetConfig.layoutIds.filter(id => id !== layout.id),
-      });
-    }
+  get activeLayouts(): BuilderLayout[] {
+    return this.activeLayoutIds
+      .map(builderStore.layoutById)
+      .filter(v => !!v);
   }
 
+  set activeLayouts(layouts: BuilderLayout[]) {
+    const currentLayoutId = layouts.find(lay => lay.id === this.currentId)
+      ? this.currentId
+      : null;
+    this.saveConfig({
+      ...this.widgetConfig,
+      currentLayoutId,
+      layoutIds: layouts.map(lay => lay.id),
+    });
+  }
+
+  get inactiveLayouts(): BuilderLayout[] {
+    return this.layouts.filter(lay => !this.activeLayoutIds.includes(lay.id));
+  }
+
+  get currentLayout(): BuilderLayout | null {
+    return builderStore.layoutById(this.widgetConfig.currentLayoutId || '');
+  }
+
+  set currentLayout(layout: BuilderLayout | null) {
+    this.saveConfig({
+      ...this.widgetConfig,
+      currentLayoutId: layout ? layout.id : null,
+    });
+  }
 }
 </script>
 
 <template>
-  <q-card dark class="maximized bg-dark">
+  <q-card dark class="widget-modal">
     <FormToolbar :crud="crud" />
 
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-btn-dropdown label="Selected layouts" flat no-caps icon="widgets">
-            <q-list dark bordered>
-              <ActionItem
-                v-for="layout in layouts"
-                :key="layout.id"
-                :label="layout.title"
-                :active="activeLayoutIds.includes(layout.id)"
-                icon="mdi-view-dashboard-outline"
-                @click="toggleLayoutActive(layout)"
-              />
-            </q-list>
-          </q-btn-dropdown>
+          <q-select
+            v-model="currentLayout"
+            :options="activeLayouts"
+            label="Currently displayed layout"
+            option-label="title"
+            option-value="id"
+            dark
+            options-dark
+            clearable
+          />
         </q-item-section>
       </q-item>
-      <!-- Set active layout -->
-      <!-- Select and sort layouts -->
+    </q-card-section>
+
+    <q-card-section>
+      <q-item dark>
+        <q-item-section class="darkened">
+          This widget can display one or multiple layouts.
+          Drag to select them or change the display order.
+        </q-item-section>
+      </q-item>
+    </q-card-section>
+    <q-card-section class="row">
+      <div class="col column">
+        <span class="text-italic text-h6 q-ml-md">In this Widget</span>
+        <draggable v-model="activeLayouts" class="col" group="layout-selector">
+          <q-item v-for="lay in activeLayouts" :key="lay.id" dark dense>
+            <q-item-section
+              :class="{grabbable: true, ['text-primary']: lay.id === currentId}"
+            >{{ lay.title }}</q-item-section>
+          </q-item>
+        </draggable>
+      </div>
+      <div class="col column">
+        <span class="text-italic text-h6 q-ml-md">Available</span>
+        <draggable :list="inactiveLayouts" class="col" group="layout-selector">
+          <q-item v-for="lay in inactiveLayouts" :key="lay.id" dark dense>
+            <q-item-section class="grabbable">{{ lay.title }}</q-item-section>
+          </q-item>
+        </draggable>
+      </div>
     </q-card-section>
   </q-card>
 </template>
+
+<style scoped>
+.grabbable {
+  cursor: grab;
+  border: 1px solid gray;
+  padding-left: 0.5em;
+}
+.grabbable:active {
+  cursor: grabbing;
+}
+</style>

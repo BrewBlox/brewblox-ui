@@ -133,24 +133,27 @@ export default class BuilderEditor extends DialogBase {
     return builderStore.layoutValues;
   }
 
-  get layout(): BuilderLayout {
+  get layout(): BuilderLayout | null {
     const layout: BuilderLayout =
       builderStore.layoutById(
         this.layoutId
         || this.initialLayout
         || builderStore.layoutIds[0]
-        || '')
-      || {
-        id: '',
-        title: 'New layout',
-        width: defaultLayoutWidth,
-        height: defaultLayoutHeight,
-        parts: [],
-      };
+        || '');
+    // || {
+    //   id: '',
+    //   title: 'New layout',
+    //   width: defaultLayoutWidth,
+    //   height: defaultLayoutHeight,
+    //   parts: [],
+    // };
     return layout;
   }
 
   get parts(): PersistentPart[] {
+    if (!this.layout) {
+      return [];
+    }
     const sizes: Record<string, number> = {};
     return this.layout.parts
       .map(part => {
@@ -200,7 +203,7 @@ export default class BuilderEditor extends DialogBase {
     builderStore.commitEditorTool(tool.value);
   }
 
-  async saveLayout(layout: BuilderLayout = this.layout) {
+  async saveLayout(layout: BuilderLayout) {
     if (layout.id) {
       await builderStore.saveLayout(layout);
     } else {
@@ -211,6 +214,10 @@ export default class BuilderEditor extends DialogBase {
   }
 
   async saveParts(parts: PersistentPart[]) {
+    if (!this.layout) {
+      return;
+    }
+
     const asPersistent = (part: PersistentPart | FlowPart) => {
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
       const { transitions, flows, ...persistent } = part as FlowPart;
@@ -219,7 +226,7 @@ export default class BuilderEditor extends DialogBase {
 
     // first set local value, to avoid jitters caused by the period between action and VueX refresh
     this.layout.parts = parts.map(asPersistent);
-    await this.saveLayout();
+    await this.saveLayout(this.layout);
     this.debouncedCalculate();
   }
 
@@ -237,13 +244,35 @@ export default class BuilderEditor extends DialogBase {
 
   clearParts() {
     Dialog.create({
-      title: 'Remove all',
+      title: 'Remove parts',
       message: 'Are you sure you wish to remove all parts?',
       dark: true,
       noBackdropDismiss: true,
       cancel: true,
     })
       .onOk(() => this.saveParts([]));
+  }
+
+  removeLayout() {
+    if (!this.layout) {
+      return;
+    }
+    Dialog.create({
+      title: 'Remove layout',
+      message: `Are you sure you wish to remove ${this.layout.title}?`,
+      dark: true,
+      noBackdropDismiss: true,
+      cancel: true,
+    })
+      .onOk(async () => {
+        if (this.layout) {
+          await builderStore.removeLayout(this.layout)
+            .catch(() => { });
+        }
+        this.layoutId = this.layouts.length > 0
+          ? this.layouts[0].id
+          : null;
+      });
   }
 
   async calculate() {
@@ -428,9 +457,9 @@ export default class BuilderEditor extends DialogBase {
         await builderStore.createLayout({
           id,
           title,
-          width: copy ? this.layout.width : defaultLayoutWidth,
-          height: copy ? this.layout.height : defaultLayoutHeight,
-          parts: copy ? deepCopy(this.layout.parts) : [],
+          width: copy && this.layout ? this.layout.width : defaultLayoutWidth,
+          height: copy && this.layout ? this.layout.height : defaultLayoutHeight,
+          parts: copy && this.layout ? deepCopy(this.layout.parts) : [],
         });
         this.layoutId = id;
       });
@@ -488,7 +517,7 @@ export default class BuilderEditor extends DialogBase {
       </q-dialog>
 
       <q-card-section class="row no-wrap">
-        <q-list dark bordered class="col-auto scroll">
+        <q-list v-if="!!layout" dark bordered class="col-auto scroll">
           <q-expansion-item label="Tools" header-class="text-h6" default-opened>
             <q-separator dark inset />
             <ActionItem
@@ -537,6 +566,7 @@ export default class BuilderEditor extends DialogBase {
           <q-expansion-item label="Layout actions" header-class="text-h6" default-opened>
             <q-separator dark inset />
             <ActionItem icon="delete" label="Delete all parts" no-close @click="clearParts" />
+            <ActionItem icon="delete" label="Delete Layout" no-close @click="removeLayout" />
           </q-expansion-item>
         </q-list>
 
@@ -544,19 +574,25 @@ export default class BuilderEditor extends DialogBase {
         <div class="col row justify-center no-wrap">
           <div class="col-auto column no-wrap" style="max-height: 90vh">
             <!-- Layout dropdown -->
-            <q-btn-dropdown :label="layout.title" flat no-caps icon="widgets" class="q-mb-sm">
+            <q-btn-dropdown
+              :label="layout ? layout.title : 'None'"
+              flat
+              no-caps
+              icon="widgets"
+              class="q-mb-sm"
+            >
               <q-list dark bordered>
                 <ActionItem
                   v-for="lo in layouts"
                   :key="lo.id"
                   :label="lo.title"
-                  :active="lo.id === layout.id"
+                  :active="layout && lo.id === layout.id"
                   icon="mdi-view-dashboard-outline"
                   @click="layoutId = lo.id"
                 />
                 <q-separator dark inset />
                 <ActionItem
-                  :disable="!layout"
+                  :disabled="!layout"
                   label="Copy Layout"
                   icon="file_copy"
                   @click="startAddLayout(true)"
@@ -567,6 +603,7 @@ export default class BuilderEditor extends DialogBase {
             <!-- Grid wrapper -->
             <div class="col column no-wrap scroll maximized">
               <div
+                v-if="!!layout"
                 :style="`
                 width: ${squares(layout.width)}px;
                 height: ${squares(layout.height)}px;`"

@@ -34,8 +34,33 @@ export default class BuilderWidget extends WidgetBase {
     return builderStore.layoutById(this.widgetConfig.currentLayoutId || '');
   }
 
+  set layout(layout: BuilderLayout | null) {
+    this.saveConfig({
+      ...this.widgetConfig,
+      currentLayoutId: layout ? layout.id : null,
+    });
+  }
+
+  get activeLayouts(): BuilderLayout[] {
+    return this.widgetConfig
+      .layoutIds
+      .map(builderStore.layoutById)
+      .filter(v => !!v);
+  }
+
   get editorActive(): boolean {
     return builderStore.editorActive;
+  }
+
+  get currentIdx(): number {
+    return this.widgetConfig.layoutIds.findIndex(id => !!this.layout && id === this.layout.id);
+  }
+
+  set currentIdx(idx: number) {
+    this.saveConfig({
+      ...this.widgetConfig,
+      currentLayoutId: idx >= 0 ? this.activeLayouts[idx].id : null,
+    });
   }
 
   async saveParts(parts: PersistentPart[]) {
@@ -166,9 +191,43 @@ export default class BuilderWidget extends WidgetBase {
         </q-btn-dropdown>
       </q-item-section>
     </WidgetToolbar>
+    <q-item dark>
+      <q-item-section class="col-auto">
+        <q-btn
+          :disable="currentIdx <= 0"
+          label="Previous"
+          icon="mdi-chevron-left"
+          flat
+          @click="currentIdx--"
+        />
+      </q-item-section>
+      <q-item-section>
+        <q-btn-dropdown :label="layout ? layout.title : 'None'" flat no-caps icon="widgets">
+          <q-list dark bordered>
+            <ActionItem
+              v-for="lay in activeLayouts"
+              :key="lay.id"
+              :label="lay.title"
+              :active="layout && lay.id === layout.id"
+              icon="mdi-view-dashboard-outline"
+              @click="layout = lay"
+            />
+          </q-list>
+        </q-btn-dropdown>
+      </q-item-section>
+      <q-item-section class="col-auto">
+        <q-btn
+          :disable="currentIdx === activeLayouts.length-1"
+          label="Next"
+          icon-right="mdi-chevron-right"
+          flat
+          @click="currentIdx++"
+        />
+      </q-item-section>
+    </q-item>
 
     <div class="col">
-      <svg v-if="!editorActive" ref="grid" class="grid-base">
+      <svg ref="grid" class="grid-base">
         <g
           v-for="part in flowParts"
           :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
