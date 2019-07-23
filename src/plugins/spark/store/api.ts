@@ -123,22 +123,28 @@ export const fetchUpdateSource = async (
   return source;
 };
 
-export const fetchSystemStatus = async (serviceId: string): Promise<SystemStatus> =>
-  get(`/${encodeURIComponent(serviceId)}/system/status`)
-    .then(retv => ({
+export const fetchSystemStatus = async (serviceId: string): Promise<SystemStatus> => {
+  try {
+    const retv: SystemStatus = await get(`/${encodeURIComponent(serviceId)}/system/status`);
+    return {
       ...retv,
       available: true,
       checkedAt: new Date(),
-    }))
-    .catch((error) => ({
-      error,
-      available: false,
+    };
+  } catch (error) {
+    return {
       checkedAt: new Date(),
-      connected: false,
-      matched: false,
-      synchronized: false,
-      issues: [],
-    }));
+      available: false,
+      connect: false,
+      handshake: false,
+      synchronize: false,
+      compatible: true, // no idea - assume yes
+      latest: true, // no idea - assume yes
+      info: [],
+      error,
+    };
+  }
+};
 
 export const flashFirmware = async (serviceId: string): Promise<any> =>
   post(`/${encodeURIComponent(serviceId)}/system/flash`, {})
