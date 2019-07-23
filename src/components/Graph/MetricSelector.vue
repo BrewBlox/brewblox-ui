@@ -1,6 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { QuasarNode, expandedNodes, nodeBuilder } from '@/components/Graph/functional';
@@ -11,6 +11,9 @@ import { historyStore } from '@/store/history';
 export default class MetricSelector extends Vue {
   selectFilter: string | null = null;
   expandedKeys: string[] = [];
+
+  @Ref()
+  readonly tree!: any;
 
   @Prop({ type: Array, required: true })
   readonly selected!: string[];
@@ -57,10 +60,10 @@ export default class MetricSelector extends Vue {
     </q-item>
     <q-item dark>
       <q-item-section class="col-auto">
-        <q-btn flat label="Expand" icon="mdi-expand-all" @click="$refs.tree.expandAll()" />
+        <q-btn flat label="Expand" icon="mdi-expand-all" @click="tree.expandAll()" />
       </q-item-section>
       <q-item-section class="col-auto">
-        <q-btn flat label="Collapse" icon="mdi-collapse-all" @click="$refs.tree.collapseAll()" />
+        <q-btn flat label="Collapse" icon="mdi-collapse-all" @click="tree.collapseAll()" />
       </q-item-section>
       <q-item-section class="col-auto">
         <q-btn flat label="clear" icon="clear" @click="selected = []" />
