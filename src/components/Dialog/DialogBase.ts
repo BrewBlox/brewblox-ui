@@ -1,9 +1,11 @@
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Ref } from 'vue-property-decorator';
+
 
 @Component
 export default class DialogBase extends Vue {
-  public $refs!: { dialog: any }
+  @Ref()
+  public readonly dialog!: any;
 
   @Prop({ type: String, default: '' })
   public readonly title!: string;
@@ -17,13 +19,13 @@ export default class DialogBase extends Vue {
   // following method is REQUIRED
   // (don't change its name --> "show")
   public show() {
-    this.$refs.dialog.show();
+    this.dialog.show();
   }
 
   // following method is REQUIRED
   // (don't change its name --> "hide")
   public hide() {
-    this.$refs.dialog.hide();
+    this.dialog.hide();
   }
 
   public onDialogHide() {

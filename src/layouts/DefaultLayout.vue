@@ -7,6 +7,7 @@ import draggable from 'vuedraggable';
 import buildEnv from '@/build-env.json';
 import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '@/helpers/dashboards';
+import { checkDevCertificate } from '@/helpers/development';
 import { objectSorter } from '@/helpers/functional';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { Service, serviceStore } from '@/store/services';
@@ -117,6 +118,10 @@ export default class DefaultLayout extends Vue {
   stopEditing() {
     this.dashboardEditing = false;
     this.serviceEditing = false;
+  }
+
+  created() {
+    checkDevCertificate();
   }
 }
 </script>

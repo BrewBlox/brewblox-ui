@@ -4,9 +4,8 @@ import { Feature, featureStore } from '@/store/features';
 import form from './BuilderForm.vue';
 import widget from './BuilderWidget.vue';
 import wizard from './BuilderWizard.vue';
-import { deprecatedTypes, typeName } from './getters';
-import { parts } from './register';
-import { BuilderConfig } from './types';
+import { typeName } from './getters';
+import { builderStore } from './store';
 
 const feature: Feature = {
   id: typeName,
@@ -14,8 +13,6 @@ const feature: Feature = {
   widget: ref(widget),
   wizard: ref(wizard),
   form: ref(form),
-  validator: (config: BuilderConfig) =>
-    config.parts.every(part => parts.includes(part.type) || !!deprecatedTypes[part.type]),
   widgetSize: {
     cols: 8,
     rows: 8,
@@ -31,6 +28,8 @@ const deprecated: Feature = {
 };
 
 export default () => {
+  builderStore.setup();
+
   featureStore.createFeature(feature);
   featureStore.createFeature(deprecated);
 };

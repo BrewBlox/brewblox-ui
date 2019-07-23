@@ -1,3 +1,5 @@
+import { DashboardItem } from '@/store/dashboards';
+
 export interface FlowRoute {
   outCoords: string;
   friction?: number;
@@ -53,9 +55,23 @@ export interface ComponentSpec {
   interactHandler?: (part: PersistentPart, updater: PartUpdater) => void;
 }
 
+export interface BuilderLayout {
+  id: string;
+  title: string;
+  width: number;
+  height: number;
+  parts: PersistentPart[];
+  _rev?: string;
+}
+
 export interface BuilderConfig {
   currentToolId?: string;
-  parts: PersistentPart[];
+  currentLayoutId: string | null;
+  layoutIds: string[];
+}
+
+export interface BuilderItem extends DashboardItem {
+  config: BuilderConfig;
 }
 
 export interface Rect {

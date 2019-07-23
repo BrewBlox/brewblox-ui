@@ -1,7 +1,8 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { Component, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
+import HistoryGraph from '@/components/Graph/HistoryGraph.vue';
 import { defaultPresets } from '@/components/Graph/getters';
 import { GraphConfig } from '@/components/Graph/types';
 import WidgetBase from '@/components/Widget/WidgetBase';
@@ -9,12 +10,12 @@ import { QueryParams } from '@/store/history';
 
 @Component
 export default class GraphWidget extends WidgetBase {
-  $refs!: {
-    widgetGraph: any;
-  }
   settingsModalOpen: boolean = false;
   graphModalOpen: boolean = false;
   downsampling: any = {};
+
+  @Ref()
+  readonly widgetGraph!: HistoryGraph;
 
   get graphCfg(): GraphConfig {
     return {
@@ -44,12 +45,12 @@ export default class GraphWidget extends WidgetBase {
 
   @Watch('graphCfg', { deep: true })
   regraph() {
-    this.$nextTick(() => this.$refs.widgetGraph.resetListeners());
+    this.$nextTick(() => this.widgetGraph.resetListeners());
   }
 
   mounted() {
-    this.$watch('widget.cols', () => this.$refs.widgetGraph.refresh());
-    this.$watch('widget.rows', () => this.$refs.widgetGraph.refresh());
+    this.$watch('widget.cols', () => this.widgetGraph.refresh());
+    this.$watch('widget.rows', () => this.widgetGraph.refresh());
   }
 }
 </script>
@@ -64,10 +65,10 @@ export default class GraphWidget extends WidgetBase {
         style="width: 600px"
       >
         <q-card dark class="q-pa-xs bg-dark-bright" style="min-height: 100px">
-          <HistoryGraph :id="widget.id" :config="graphCfg" shared-listeners/>
+          <HistoryGraph :id="widget.id" :config="graphCfg" shared-listeners />
         </q-card>
       </ScreenSizeConstrained>
-      <GraphForm v-if="settingsModalOpen" :crud="crud" :downsampling="downsampling"/>
+      <GraphForm v-if="settingsModalOpen" :crud="crud" :downsampling="downsampling" />
     </q-dialog>
 
     <q-dialog v-model="graphModalOpen" maximized>
@@ -88,7 +89,7 @@ export default class GraphWidget extends WidgetBase {
                 </q-item>
               </q-list>
             </q-btn-dropdown>
-            <q-btn v-close-popup flat label="close"/>
+            <q-btn v-close-popup flat label="close" />
           </template>
         </HistoryGraph>
       </q-card>
@@ -103,7 +104,7 @@ export default class GraphWidget extends WidgetBase {
               label="Show maximized"
               @click="graphModalOpen = true"
             />
-            <ActionItem icon="refresh" label="Refresh" @click="regraph"/>
+            <ActionItem icon="refresh" label="Refresh" @click="regraph" />
             <q-expansion-item label="Timespan">
               <q-list dark>
                 <q-item
@@ -119,7 +120,7 @@ export default class GraphWidget extends WidgetBase {
                 </q-item>
               </q-list>
             </q-expansion-item>
-            <WidgetActions :crud="crud"/>
+            <WidgetActions :crud="crud" />
           </q-list>
         </q-btn-dropdown>
       </q-item-section>

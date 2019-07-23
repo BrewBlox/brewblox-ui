@@ -1,6 +1,8 @@
 import { ComponentSpec } from './types';
 
 export const typeName = 'Builder';
+export const defaultLayoutWidth = 20;
+export const defaultLayoutHeight = 15;
 export const SQUARE_SIZE = 50;
 export const UP = '0.5,0,0';
 export const RIGHT = '1,0.5,0';
