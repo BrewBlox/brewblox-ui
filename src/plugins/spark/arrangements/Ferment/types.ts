@@ -1,3 +1,4 @@
+import { BuilderLayout } from '@/plugins/builder/types';
 import { Block } from '@/plugins/spark/types';
 import { DashboardItem } from '@/store/dashboards';
 
@@ -30,6 +31,7 @@ export interface FermentConfig {
   dashboardTitle: string;
   groups: number[];
   names: FermentConfigNames;
+  layouts: BuilderLayout[];
   widgets: DashboardItem[];
   createdBlocks: Block[];
   changedBlocks: Block[];
