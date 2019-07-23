@@ -2,7 +2,7 @@
 import mapValues from 'lodash/mapValues';
 import { Layout, PlotData } from 'plotly.js';
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { defaultPresets } from '@/components/Graph/getters';
@@ -22,11 +22,10 @@ interface Policies { [measurement: string]: string }
 
 @Component
 export default class HistoryGraph extends Vue {
-  $refs!: {
-    display: any;
-  }
   revision: number = 0;
   editing: boolean = false;
+
+  @Ref() readonly display!: any;
 
   @Prop({ type: String, required: true })
   readonly id!: string;

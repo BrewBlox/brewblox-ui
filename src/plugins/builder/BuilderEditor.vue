@@ -2,7 +2,7 @@
 import FileSaver from 'file-saver';
 import { debounce, uid } from 'quasar';
 import { Dialog } from 'quasar';
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 import { Coordinates } from '@/helpers/coordinates';
@@ -42,13 +42,11 @@ interface ToolAction {
   },
 })
 export default class BuilderEditor extends DialogBase {
-  $refs!: {
-    dialog: any;
-    grid: any;
-  }
-
   readonly gridWidth = 1000;
   readonly gridHeight = 800;
+
+  @Ref()
+  readonly grid!: any;
 
   layoutId: string | null = null;
   debouncedCalculate: Function = () => { };
@@ -322,7 +320,7 @@ export default class BuilderEditor extends DialogBase {
   }
 
   gridRect(): Rect {
-    const { x, y, left, right, top, bottom } = this.$refs.grid.getBoundingClientRect();
+    const { x, y, left, right, top, bottom } = this.grid.getBoundingClientRect();
     return { x, y, left, right, top, bottom };
   }
 

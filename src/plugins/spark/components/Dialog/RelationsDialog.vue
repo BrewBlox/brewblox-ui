@@ -4,7 +4,7 @@ import { graphlib, render as dagreRender } from 'dagre-d3';
 import { saveSvgAsPng } from 'save-svg-as-png';
 import { setTimeout } from 'timers';
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
@@ -33,18 +33,20 @@ const INVERTED = [
 
 @Component
 export default class RelationsDialog extends DialogBase {
-  $refs!: {
-    dialog: any;
-    svg: SVGGraphicsElement;
-    diagram: SVGGraphicsElement;
-    toolbar: Vue;
-  }
-
   exportBusy: boolean = false;
   lastRelationString: string = '';
   graphObj: any = null;
   availableHeight: number = 0;
   availableWidth: number = 0;
+
+  @Ref()
+  readonly svg!: SVGGraphicsElement;
+
+  @Ref()
+  readonly diagram!: SVGGraphicsElement;
+
+  @Ref()
+  readonly toolbar!: Vue;
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
@@ -203,11 +205,11 @@ export default class RelationsDialog extends DialogBase {
           `"
         class="row"
       >
-        <q-space/>
+        <q-space />
         <svg ref="svg" class="col-auto">
-          <g ref="diagram"/>
+          <g ref="diagram" />
         </svg>
-        <q-space/>
+        <q-space />
       </div>
     </q-card>
   </q-dialog>
