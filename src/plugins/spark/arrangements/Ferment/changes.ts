@@ -5,6 +5,9 @@ import { Link, Unit } from '@/helpers/units';
 import { MutexLink, ProcessValueLink, SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
 import { serialize } from '@/helpers/units/parseObject';
 import { typeName as builderType } from '@/plugins/builder/getters';
+import { builderStore } from '@/plugins/builder/store';
+import { BuilderItem, BuilderLayout } from '@/plugins/builder/types';
+import { HistoryItem } from '@/plugins/history/Graph/types';
 import { FermentConfig, PinChannel } from '@/plugins/spark/arrangements/Ferment/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Dashboard, DashboardItem, dashboardStore } from '@/store/dashboards';
@@ -22,6 +25,7 @@ import { typeName as spProfileType } from '../../features/SetpointProfile/getter
 import { SetpointProfileBlock } from '../../features/SetpointProfile/types';
 import { typeName as pairType } from '../../features/SetpointSensorPair/getters';
 import { FilterChoice, SetpointSensorPairBlock } from '../../features/SetpointSensorPair/types';
+import { StepViewItem } from '../../features/StepView/types';
 import { Block, DigitalState } from '../../types';
 
 export const defineChangedBlocks = (config: FermentConfig): Block[] => {
@@ -229,7 +233,103 @@ export const defineCreatedBlocks = (
     ];
 };
 
-export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
+export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
+  return [
+    {
+      id: uid(),
+      title: `${config.prefix} Fridge Layout`,
+      width: 6,
+      height: 10,
+      parts: [
+        {
+          id: uid(),
+          type: 'Fridge',
+          x: 2,
+          y: 1,
+          rotate: 0,
+          flipped: false,
+          settings: {
+            sizeY: 7,
+            text: `${config.prefix} fridge`,
+          },
+        },
+        {
+          id: uid(),
+          type: 'Carboy',
+          x: 3,
+          y: 3,
+          rotate: 0,
+          flipped: false,
+          settings: {
+            color: 'E1AC00',
+            setpoint: {
+              serviceId: config.serviceId,
+              blockId: config.names.beerSSPair,
+            },
+          },
+        },
+        {
+          id: uid(),
+          type: 'SetpointDisplay',
+          x: 2,
+          y: 7,
+          rotate: 0,
+          flipped: false,
+          settings: {
+            setpoint: {
+              serviceId: config.serviceId,
+              blockId: config.names.fridgeSSPair,
+            },
+          },
+        },
+        {
+          id: uid(),
+          type: 'PidDisplay',
+          x: 4,
+          y: 7,
+          rotate: 0,
+          flipped: false,
+          settings: {
+            pid: {
+              serviceId: config.serviceId,
+              blockId: config.names.coolPid,
+            },
+          },
+        },
+        {
+          id: uid(),
+          type: 'PidDisplay',
+          x: 5,
+          y: 7,
+          rotate: 0,
+          flipped: false,
+          settings: {
+            pid: {
+              serviceId: config.serviceId,
+              blockId: config.names.heatPid,
+            },
+          },
+        },
+        {
+          id: uid(),
+          type: 'UrlDisplay',
+          x: 2,
+          y: 0,
+          rotate: 0,
+          flipped: false,
+          settings: {
+            text: 'User manual',
+            url: 'https://brewblox.netlify.com/user/ferment_guide.html#ferment-fridge-process-view',
+            sizeX: 4,
+            sizeY: 1,
+          },
+        },
+      ],
+    },
+  ];
+};
+
+export const defineWidgets = (config: FermentConfig, layouts: BuilderLayout[]): DashboardItem[] => {
   const genericSettings = {
     dashboard: config.dashboardId,
     cols: 4,
@@ -252,106 +352,23 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
     },
   });
 
-  const createBuilder = (): DashboardItem => ({
+  const createBuilder = (): BuilderItem => ({
     ...createWidget(`${config.prefix} Fridge`, builderType),
-    cols: 3,
+    cols: 4,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
     config: {
       currentToolId: 'config',
-      parts: [
-        {
-          id: uid(),
-          type: 'Fridge',
-          x: 1,
-          y: 1,
-          rotate: 0,
-          flipped: false,
-          settings: {
-            sizeY: 7,
-            text: `${config.prefix} fridge`,
-          },
-        },
-        {
-          id: uid(),
-          type: 'Carboy',
-          x: 2,
-          y: 3,
-          rotate: 0,
-          flipped: false,
-          settings: {
-            color: 'E1AC00',
-            setpoint: {
-              serviceId: config.serviceId,
-              blockId: config.names.beerSSPair,
-            },
-          },
-        },
-        {
-          id: uid(),
-          type: 'SetpointDisplay',
-          x: 1,
-          y: 7,
-          rotate: 0,
-          flipped: false,
-          settings: {
-            setpoint: {
-              serviceId: config.serviceId,
-              blockId: config.names.fridgeSSPair,
-            },
-          },
-        },
-        {
-          id: uid(),
-          type: 'PidDisplay',
-          x: 3,
-          y: 7,
-          rotate: 0,
-          flipped: false,
-          settings: {
-            pid: {
-              serviceId: config.serviceId,
-              blockId: config.names.coolPid,
-            },
-          },
-        },
-        {
-          id: uid(),
-          type: 'PidDisplay',
-          x: 4,
-          y: 7,
-          rotate: 0,
-          flipped: false,
-          settings: {
-            pid: {
-              serviceId: config.serviceId,
-              blockId: config.names.heatPid,
-            },
-          },
-        },
-        {
-          id: uid(),
-          type: 'UrlDisplay',
-          x: 1,
-          y: 9,
-          rotate: 0,
-          flipped: false,
-          settings: {
-            text: 'User manual',
-            url: 'https://brewblox.netlify.com/user/ferment_guide.html#ferment-fridge-process-view',
-            sizeX: 4,
-            sizeY: 1,
-          },
-        },
-      ],
+      currentLayoutId: layouts[0].id,
+      layoutIds: layouts.map(l => l.id),
     },
   });
 
-  const createGraph = (): DashboardItem => ({
+  const createGraph = (): HistoryItem => ({
     ...createWidget(`${config.prefix} Graph`, 'Graph'),
     cols: 6,
     rows: 5,
-    pinnedPosition: { x: 4, y: 1 },
+    pinnedPosition: { x: 5, y: 1 },
     config: {
       layout: {},
       params: { duration: '10m' },
@@ -387,7 +404,7 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
     },
   });
 
-  const createStepView = (): DashboardItem => ({
+  const createStepView = (): StepViewItem => ({
     ...createWidget(`${config.prefix} Actions`, 'StepView'),
     cols: 4,
     rows: 4,
@@ -506,7 +523,7 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
 
   const createProfile = (name: string): DashboardItem => ({
     ...createWidget(name, spProfileType),
-    cols: 5,
+    cols: 6,
     rows: 4,
     pinnedPosition: { x: 5, y: 6 },
   });
@@ -517,7 +534,7 @@ export const defineWidgets = (config: FermentConfig): DashboardItem[] => {
 export const createActions = (): WizardAction[] => {
   return [
     // Rename blocks
-    async (config: FermentConfig): Promise<void> => {
+    async (config: FermentConfig) => {
       await Promise.all(
         Object.entries(config.renamedBlocks)
           .filter(([currVal, newVal]: [string, string]) => currVal !== newVal)
@@ -526,20 +543,30 @@ export const createActions = (): WizardAction[] => {
     },
 
     // Change blocks
-    async (config: FermentConfig): Promise<void> => {
-      await Promise.all(config.changedBlocks.map(block => sparkStore.saveBlock([config.serviceId, block])));
+    async (config: FermentConfig) => {
+      await Promise.all(
+        config.changedBlocks
+          .map(block => sparkStore.saveBlock([config.serviceId, block])));
     },
 
     // Create blocks
-    async (config: FermentConfig): Promise<void> => {
+    async (config: FermentConfig) => {
       // Create synchronously, to ensure dependencies are created first
       for (let block of config.createdBlocks) {
         await sparkStore.createBlock([config.serviceId, block]);
       }
     },
 
+    // Create layouts
+    async (config: FermentConfig) => {
+      await Promise.all(
+        config.layouts
+          .map(builderStore.createLayout)
+      );
+    },
+
     // Create dashboards / widgets
-    async (config: FermentConfig): Promise<void> => {
+    async (config: FermentConfig) => {
       if (!dashboardStore.dashboardIds.includes(config.dashboardId)) {
         const dashboard: Dashboard = {
           id: config.dashboardId,

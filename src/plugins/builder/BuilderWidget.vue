@@ -193,13 +193,7 @@ export default class BuilderWidget extends WidgetBase {
     </WidgetToolbar>
     <q-item dark>
       <q-item-section class="col-auto">
-        <q-btn
-          :disable="currentIdx <= 0"
-          label="Previous"
-          icon="mdi-chevron-left"
-          flat
-          @click="currentIdx--"
-        />
+        <q-btn :disable="currentIdx <= 0" icon="mdi-chevron-left" flat @click="currentIdx--" />
       </q-item-section>
       <q-item-section>
         <q-btn-dropdown :label="layout ? layout.title : 'None'" flat no-caps icon="widgets">
@@ -215,10 +209,9 @@ export default class BuilderWidget extends WidgetBase {
           </q-list>
         </q-btn-dropdown>
       </q-item-section>
-      <q-item-section class="col-auto">
+      <q-item-section class="col-shrink ellipsis">
         <q-btn
           :disable="currentIdx === activeLayouts.length-1"
-          :label="currentIdx >= 0 ? 'Next' : 'First'"
           icon-right="mdi-chevron-right"
           flat
           @click="currentIdx++"

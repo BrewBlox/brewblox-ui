@@ -5,7 +5,7 @@ import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
-import { createActions, defineChangedBlocks, defineCreatedBlocks, defineWidgets } from './changes';
+import { createActions, defineChangedBlocks, defineCreatedBlocks, defineLayouts, defineWidgets } from './changes';
 import { FermentConfig } from './types';
 
 
@@ -55,11 +55,13 @@ export default class FermentSettingsTask extends WizardTaskBase {
       this.beerSetting,
       this.activeSetpoint);
     const changedBlocks = defineChangedBlocks(this.config);
-    const widgets = defineWidgets(this.config);
+    const layouts = defineLayouts(this.config);
+    const widgets = defineWidgets(this.config, layouts);
 
     this.pushActions(createActions());
     this.updateConfig<FermentConfig>({
       ...this.config,
+      layouts,
       widgets,
       changedBlocks,
       createdBlocks,
@@ -86,11 +88,11 @@ export default class FermentSettingsTask extends WizardTaskBase {
       <q-item dark>
         <q-item-section>
           <q-item-label caption>Fridge setpoint</q-item-label>
-          <UnitField v-model="fridgeSetting" title="Fridge setting"/>
+          <UnitField v-model="fridgeSetting" title="Fridge setting" />
         </q-item-section>
         <q-item-section>
           <q-item-label caption>Beer setpoint</q-item-label>
-          <UnitField v-model="beerSetting" title="Beer setting"/>
+          <UnitField v-model="beerSetting" title="Beer setting" />
         </q-item-section>
         <q-item-section class="col-auto">
           <q-item-label caption>Setpoint used by control</q-item-label>
@@ -107,12 +109,12 @@ export default class FermentSettingsTask extends WizardTaskBase {
       </q-item>
     </q-card-section>
 
-    <q-separator dark/>
+    <q-separator dark />
 
     <q-card-actions>
-      <q-btn unelevated label="Back" @click="back"/>
-      <q-space/>
-      <q-btn unelevated label="Done" color="primary" @click="done"/>
+      <q-btn unelevated label="Back" @click="back" />
+      <q-space />
+      <q-btn unelevated label="Done" color="primary" @click="done" />
     </q-card-actions>
   </div>
 </template>

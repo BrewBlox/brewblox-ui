@@ -1,3 +1,5 @@
+import { DashboardItem } from '@/store/dashboards';
+
 export interface FlowRoute {
   outCoords: string;
   friction?: number;
@@ -66,6 +68,10 @@ export interface BuilderConfig {
   currentToolId?: string;
   currentLayoutId: string | null;
   layoutIds: string[];
+}
+
+export interface BuilderItem extends DashboardItem {
+  config: BuilderConfig;
 }
 
 export interface Rect {
