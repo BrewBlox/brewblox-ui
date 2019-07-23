@@ -146,6 +146,7 @@ interface SparkServiceState {
   discoveredBlocks: string[];
   updateSource: EventSource | null;
   lastStatus: SystemStatus | null;
+  lastUpdate: Date | null;
 }
 
 @Module({ store, namespaced: true, dynamic: true, name: 'spark' })
@@ -229,6 +230,10 @@ export class SparkModule extends VuexModule {
 
   public get lastStatus(): (serviceId: string) => SystemStatus | null {
     return serviceId => this.services[serviceId].lastStatus;
+  }
+
+  public get lastUpdate(): (serviceId: string) => Date | null {
+    return serviceId => this.services[serviceId].lastUpdate;
   }
 
   public get drivenChains(): (serviceId: string) => string[][] {
@@ -359,6 +364,11 @@ export class SparkModule extends VuexModule {
     Vue.set(this.services[serviceId], 'lastStatus', status);
   }
 
+  @Mutation
+  public commitLastUpdate([serviceId, date]: [string, Date | null]): void {
+    Vue.set(this.services[serviceId], 'lastUpdate', date);
+  }
+
   @Action({ rawError })
   public async addService(serviceId: string): Promise<void> {
     if (this.services[serviceId]) {
@@ -372,6 +382,7 @@ export class SparkModule extends VuexModule {
       discoveredBlocks: [],
       updateSource: null,
       lastStatus: null,
+      lastUpdate: null,
     };
     this.commitService([serviceId, empty]);
   }
@@ -442,8 +453,10 @@ export class SparkModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async fetchServiceStatus(serviceId: string): Promise<void> {
-    this.commitLastStatus([serviceId, await fetchSystemStatusInApi(serviceId)]);
+  public async fetchServiceStatus(serviceId: string): Promise<SystemStatus> {
+    const status = await fetchSystemStatusInApi(serviceId);
+    this.commitLastStatus([serviceId, status]);
+    return status;
   }
 
   @Action({ rawError })
@@ -501,8 +514,14 @@ export class SparkModule extends VuexModule {
       serviceId,
       await fetchUpdateSourceInApi(
         serviceId,
-        blocks => this.commitAllBlocks([serviceId, blocks]),
-        () => this.commitUpdateSource([serviceId, null]),
+        blocks => {
+          this.commitAllBlocks([serviceId, blocks]);
+          this.commitLastUpdate([serviceId, new Date()]);
+        },
+        () => {
+          this.commitUpdateSource([serviceId, null]);
+          this.commitLastUpdate([serviceId, null]);
+        },
       ),
     ]);
   }
