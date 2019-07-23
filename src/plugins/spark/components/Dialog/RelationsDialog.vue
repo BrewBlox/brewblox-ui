@@ -4,7 +4,7 @@ import { graphlib, render as dagreRender } from 'dagre-d3';
 import { saveSvgAsPng } from 'save-svg-as-png';
 import { setTimeout } from 'timers';
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
@@ -33,18 +33,20 @@ const INVERTED = [
 
 @Component
 export default class RelationsDialog extends DialogBase {
-  $refs!: {
-    dialog: any;
-    svg: SVGGraphicsElement;
-    diagram: SVGGraphicsElement;
-    toolbar: Vue;
-  }
-
   exportBusy: boolean = false;
   lastRelationString: string = '';
   graphObj: any = null;
   availableHeight: number = 0;
   availableWidth: number = 0;
+
+  @Ref()
+  readonly svg!: SVGGraphicsElement;
+
+  @Ref()
+  readonly diagram!: SVGGraphicsElement;
+
+  @Ref()
+  readonly toolbar!: Vue;
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
@@ -138,21 +140,21 @@ export default class RelationsDialog extends DialogBase {
 
   draw() {
     const renderFunc = new dagreRender();
-    renderFunc(d3Select(this.$refs.diagram), this.graphObj);
+    renderFunc(d3Select(this.diagram), this.graphObj);
     const outGraph = this.graphObj.graph();
-    const toolbarHeight = this.$refs.toolbar.$el.clientHeight || 50;
+    const toolbarHeight = this.toolbar.$el.clientHeight || 50;
     this.availableHeight = window.innerHeight - toolbarHeight;
     this.availableWidth = window.innerWidth;
-    this.$refs.svg.setAttribute('style', `min-width: ${outGraph.width}px;
+    this.svg.setAttribute('style', `min-width: ${outGraph.width}px;
                                           min-height: ${outGraph.height};`);
-    this.$refs.svg.setAttribute('height', outGraph.height);
-    this.$refs.svg.setAttribute('width', outGraph.width);
+    this.svg.setAttribute('height', outGraph.height);
+    this.svg.setAttribute('width', outGraph.width);
 
     this.$nextTick(() => {
       // Here be dragons
       // Dagre incorrectly renders the injected HTML as a "foreignObject" with 0x0 size
       // The hacky, but working solution is to override the SVG properties
-      this.$refs.svg.querySelectorAll('foreignObject')
+      this.svg.querySelectorAll('foreignObject')
         .forEach(el => {
           const id = el.children[0].children[0].children[1].innerHTML;
           el.addEventListener('click', () => this.openSettings(id));
@@ -167,7 +169,7 @@ export default class RelationsDialog extends DialogBase {
   exportDiagram() {
     this.exportBusy = true;
     // uses quasar "dark" as background color
-    saveSvgAsPng(this.$refs.svg, 'block-relations.png', { backgroundColor: '#282c34' })
+    saveSvgAsPng(this.svg, 'block-relations.png', { backgroundColor: '#282c34' })
       .finally(() => this.exportBusy = false);
   }
 
@@ -203,11 +205,11 @@ export default class RelationsDialog extends DialogBase {
           `"
         class="row"
       >
-        <q-space/>
+        <q-space />
         <svg ref="svg" class="col-auto">
-          <g ref="diagram"/>
+          <g ref="diagram" />
         </svg>
-        <q-space/>
+        <q-space />
       </div>
     </q-card>
   </q-dialog>

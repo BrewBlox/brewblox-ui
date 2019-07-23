@@ -2,7 +2,7 @@ import isNumber from 'lodash/isNumber';
 import Plotly, { Config, Frame, Layout, PlotData } from 'plotly.js';
 import { debounce } from 'quasar';
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Ref } from 'vue-property-decorator';
 
 // This component forwards all events emitted by Plotly
 /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
@@ -37,6 +37,9 @@ const eventNames = [
 @Component
 export default class PlotlyGraph extends Vue {
 
+  @Ref()
+  public readonly plotlyElement!: any;
+
   @Prop({ type: String, required: true })
   public readonly id!: string;
 
@@ -69,10 +72,6 @@ export default class PlotlyGraph extends Vue {
 
   @Prop({ type: [String, Array, Object], default: '' })
   public readonly plotlyClass!: string | string[] | Record<string, string>;
-
-  private get plotlyElement(): any {
-    return this.$refs.plotly;
-  }
 
   private attachListeners() {
     Object.keys(this.$listeners)
@@ -160,7 +159,7 @@ export default class PlotlyGraph extends Vue {
     return createElement(
       'div',
       {
-        ref: 'plotly',
+        ref: 'plotlyElement',
         props: {
           id: this.id,
           class: this.plotlyClass,

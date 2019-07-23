@@ -1,9 +1,10 @@
 <script lang="ts">
 import { Dialog } from 'quasar';
 import Vue from 'vue';
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { Component, Emit, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
+import HistoryGraph from '@/components/Graph/HistoryGraph.vue';
 import { targetSplitter } from '@/components/Graph/functional';
 import { defaultPresets } from '@/components/Graph/getters';
 import { GraphConfig } from '@/components/Graph/types';
@@ -13,7 +14,9 @@ import { QueryParams } from '@/store/history';
 @Component
 export default class BlockGraph extends Vue {
   durationString = durationString;
-  $refs!: { graph: any }
+
+  @Ref()
+  readonly graph!: HistoryGraph;
 
   @Prop({ type: Boolean, required: true })
   readonly value!: boolean;
@@ -99,7 +102,7 @@ export default class BlockGraph extends Vue {
     // Vue considers configuration "changed" with every block data update
     // To avoid constantly refreshing listeners, we need to do a deep compare
     if (!oldVal || JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
-      this.$nextTick(() => this.$refs.graph && this.$refs.graph.resetListeners());
+      this.$nextTick(() => this.graph && this.graph.resetListeners());
     }
   }
 }
@@ -139,12 +142,12 @@ export default class BlockGraph extends Vue {
               >
                 <q-item-section>{{ renamed }}</q-item-section>
                 <q-item-section side>
-                  <q-icon :class="{mirrored: isRightAxis(key)}" name="mdi-chart-line"/>
+                  <q-icon :class="{mirrored: isRightAxis(key)}" name="mdi-chart-line" />
                 </q-item-section>
               </q-item>
             </q-expansion-item>
           </q-btn-dropdown>
-          <q-btn v-close-popup flat label="close"/>
+          <q-btn v-close-popup flat label="close" />
         </template>
       </HistoryGraph>
     </q-card>

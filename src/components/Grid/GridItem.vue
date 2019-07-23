@@ -1,6 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Ref } from 'vue-property-decorator';
 
 import { DashboardItem } from '@/store/dashboards';
 
@@ -13,6 +13,12 @@ interface Coordinates { x: number; y: number };
 
 @Component
 export default class GridItem extends Vue {
+
+  @Ref()
+  readonly container!: Vue;
+
+  @Ref()
+  readonly dragOverlay!: Vue;
 
   @Prop({ type: Object, required: true })
   readonly widget!: DashboardItem;
@@ -147,11 +153,11 @@ export default class GridItem extends Vue {
 
   containerParentSize(): DOMRect {
     if (
-      this.$refs.container instanceof Element &&
-      this.$refs.container.parentNode &&
-      this.$refs.container.parentNode instanceof Element
+      this.container instanceof Element &&
+      this.container.parentNode &&
+      this.container.parentNode instanceof Element
     ) {
-      return this.$refs.container.parentNode.getBoundingClientRect() as DOMRect;
+      return this.container.parentNode.getBoundingClientRect() as DOMRect;
     }
 
     throw new Error('Container parent is not a valid Element');
@@ -159,20 +165,20 @@ export default class GridItem extends Vue {
 
   containerFirstChildSize(): DOMRect {
     if (
-      this.$refs.container instanceof Element &&
-      this.$refs.container.parentNode &&
-      this.$refs.container.parentNode.firstChild &&
-      this.$refs.container.parentNode.firstChild instanceof Element
+      this.container instanceof Element &&
+      this.container.parentNode &&
+      this.container.parentNode.firstChild &&
+      this.container.parentNode.firstChild instanceof Element
     ) {
-      return this.$refs.container.parentNode.firstChild.getBoundingClientRect() as DOMRect;
+      return this.container.parentNode.firstChild.getBoundingClientRect() as DOMRect;
     }
 
     throw new Error('Container parent is not a valid Element');
   }
 
   containerSize(): DOMRect {
-    if (this.$refs.container instanceof Element) {
-      return this.$refs.container.getBoundingClientRect() as DOMRect;
+    if (this.container instanceof Element) {
+      return this.container.getBoundingClientRect() as DOMRect;
     }
     throw new Error('Container is not a valid Element');
   }
@@ -291,7 +297,7 @@ export default class GridItem extends Vue {
 <template>
   <div ref="container" :style="style" class="grid-item">
     <!-- Actual item -->
-    <slot/>
+    <slot />
     <!-- Drag effects -->
     <div
       v-if="dragging || moving"
@@ -301,7 +307,7 @@ export default class GridItem extends Vue {
     />
     <!-- Item resize button -->
     <button v-touch-pan.mouse="resizePanHandler" v-if="!editable" class="grid-item-resize-handle">
-      <q-icon name="mdi-resize-bottom-right" size="30px"/>
+      <q-icon name="mdi-resize-bottom-right" size="30px" />
     </button>
     <!-- Item drag button -->
     <button
@@ -311,7 +317,7 @@ export default class GridItem extends Vue {
     >
       <div class="row">
         <div class="column">
-          <q-icon name="mdi-gesture-swipe-horizontal" size="50px" class="shadowed"/>
+          <q-icon name="mdi-gesture-swipe-horizontal" size="50px" class="shadowed" />
           <p class="shadowed">drag</p>
         </div>
         <q-btn

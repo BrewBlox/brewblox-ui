@@ -1,7 +1,7 @@
 <script lang="ts">
 import { debounce, uid } from 'quasar';
 import { Dialog } from 'quasar';
-import { Component, Watch } from 'vue-property-decorator';
+import { Component, Ref, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 
@@ -15,10 +15,6 @@ import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart } f
 
 @Component
 export default class BuilderWidget extends WidgetBase {
-  $refs!: {
-    grid: any;
-  }
-
   flowParts: FlowPart[] = [];
   debouncedCalculate: Function = () => { };
 
