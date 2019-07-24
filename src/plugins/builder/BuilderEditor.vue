@@ -8,7 +8,7 @@ import { Coordinates } from '@/helpers/coordinates';
 import { showImportDialog } from '@/helpers/dialog';
 import { clampRotation } from '@/helpers/functional';
 import { saveJsonFile } from '@/helpers/import-export';
-import { deepCopy } from '@/helpers/units/parseObject';
+import { deepCopy, deserialize, serialize } from '@/helpers/units/parseObject';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
@@ -59,6 +59,7 @@ export default class BuilderEditor extends DialogBase {
   layoutId: string | null = null;
   debouncedCalculate: Function = () => { };
   flowParts: FlowPart[] = [];
+  history: string[] = [];
 
   menuModalOpen: boolean = false;
   catalogModalOpen: boolean = false;
@@ -227,7 +228,7 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  async saveParts(parts: PersistentPart[]) {
+  async saveParts(parts: PersistentPart[], saveHistory: boolean = true) {
     if (!this.layout) {
       return;
     }
@@ -237,6 +238,13 @@ export default class BuilderEditor extends DialogBase {
       const { transitions, flows, ...persistent } = part as FlowPart;
       return persistent;
     };
+
+    if (saveHistory) {
+      const stored = builderStore.layoutById(this.layout.id);
+      if (stored) {
+        this.history.push(JSON.stringify(serialize(stored.parts)));
+      }
+    }
 
     // first set local value, to avoid jitters caused by the period between action and VueX refresh
     this.layout.parts = parts.map(asPersistent);
@@ -254,6 +262,14 @@ export default class BuilderEditor extends DialogBase {
 
   async removePart(part: PersistentPart) {
     await this.saveParts(this.parts.filter(p => p.id !== part.id));
+  }
+
+  async undo() {
+    if (this.history.length > 0) {
+      this.cancelSelection();
+      const parts = deserialize(JSON.parse(this.history.pop() as string));
+      await this.saveParts(parts, false);
+    }
   }
 
   async importLayout() {
@@ -632,7 +648,7 @@ export default class BuilderEditor extends DialogBase {
     builderStore.commitEditorActive(true);
     window.addEventListener('keyup', this.keyHandler);
 
-    this.debouncedCalculate = debounce(this.calculate, 200, false);
+    this.debouncedCalculate = debounce(this.calculate, 50, false);
     this.debouncedCalculate();
   }
 
@@ -642,14 +658,17 @@ export default class BuilderEditor extends DialogBase {
   }
 
   @Watch('layout')
-  watchLayout() {
+  watchLayout(newV: BuilderLayout, oldV: BuilderLayout) {
+    if (newV === null || (oldV !== null && oldV.id !== newV.id)) {
+      this.history = [];
+    }
     this.debouncedCalculate();
   }
 }
 </script>
 
 <template>
-  <q-dialog ref="dialog" maximized @hide="onDialogHide">
+  <q-dialog ref="dialog" maximized no-esc-dismiss @hide="onDialogHide">
     <q-card class="maximized bg-dark" dark>
       <DialogToolbar>
         <q-item-section>
@@ -748,6 +767,13 @@ export default class BuilderEditor extends DialogBase {
                   />
                 </q-list>
               </q-btn-dropdown>
+              <q-btn
+                :disable="!history.length"
+                flat
+                icon="mdi-undo"
+                class="col-auto"
+                @click="undo"
+              />
               <q-btn-dropdown flat icon="settings" class="col-auto">
                 <q-list dark bordered>
                   <ActionItem label="New Layout" icon="add" @click="startAddLayout(false)" />
@@ -821,7 +847,7 @@ export default class BuilderEditor extends DialogBase {
                     :key="`selected-${part.id}`"
                     :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
                   >
-                    <PartWrapper :part="part" show-select />
+                    <PartWrapper :part="part" selected />
                   </g>
                   <rect
                     v-if="selectArea"
