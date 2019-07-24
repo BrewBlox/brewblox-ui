@@ -1,11 +1,11 @@
 <script lang="ts">
-import FileSaver from 'file-saver';
 import get from 'lodash/get';
 import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
-import { deserialize, serialize } from '@/helpers/units/parseObject';
+import { saveJsonFile } from '@/helpers/import-export';
+import { deserialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
 import { serviceStore } from '@/store/services';
 
@@ -27,9 +27,7 @@ export default class SparkImportMenu extends DialogBase {
 
   async exportBlocks() {
     const exported = await sparkStore.serviceExport(this.service.id);
-    const serialized = JSON.stringify(serialize(exported));
-    const blob = new Blob([serialized], { type: 'text/plain;charset=utf-8' });
-    FileSaver.saveAs(blob, `brewblox-blocks-${this.service.id}.json`);
+    saveJsonFile(exported, `brewblox-blocks-${this.service.id}.json`);
   }
 
   handleImportFileSelect(evt) {

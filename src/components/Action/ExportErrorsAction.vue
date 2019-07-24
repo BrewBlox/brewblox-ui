@@ -1,10 +1,10 @@
 <script lang="ts">
-import FileSaver from 'file-saver';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { getErrors as getDbErrors } from '@/helpers/database';
 import { getErrors as getFetchErrors } from '@/helpers/fetch';
+import { saveJsonFile } from '@/helpers/import-export';
 
 @Component
 export default class ExportErrorsAction extends Vue {
@@ -24,12 +24,11 @@ export default class ExportErrorsAction extends Vue {
 
   async showDialog() {
     const errors = { fetch: getFetchErrors(), db: getDbErrors() };
-    const blob = new Blob([JSON.stringify(errors, null, 2)], { type: 'text/plain;charset=utf-8' });
-    FileSaver.saveAs(blob, 'brewblox-errors.json');
+    saveJsonFile(JSON.stringify(errors, null, 2), 'brewblox-errors.json', true);
   }
 }
 </script>
 
 <template>
-  <ActionItem v-bind="itemProps" @click="showDialog"/>
+  <ActionItem v-bind="itemProps" @click="showDialog" />
 </template>

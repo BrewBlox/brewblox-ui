@@ -1,5 +1,4 @@
 <script lang="ts">
-import FileSaver from 'file-saver';
 import { debounce, uid } from 'quasar';
 import { Dialog } from 'quasar';
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
@@ -8,7 +7,8 @@ import DialogBase from '@/components/Dialog/DialogBase';
 import { Coordinates } from '@/helpers/coordinates';
 import { showImportDialog } from '@/helpers/dialog';
 import { clampRotation } from '@/helpers/functional';
-import { deepCopy, serialize } from '@/helpers/units/parseObject';
+import { saveJsonFile } from '@/helpers/import-export';
+import { deepCopy } from '@/helpers/units/parseObject';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
@@ -18,11 +18,19 @@ import specs from './specs';
 import { builderStore } from './store';
 import { BuilderLayout, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
 
-interface DragAction {
-  hide: boolean;
-  part: PersistentPart;
+interface XYVals {
   x: number;
   y: number;
+}
+
+interface DragAction extends XYVals {
+  hide: boolean;
+  part: PersistentPart;
+}
+
+interface SelectArea extends XYVals {
+  width: number;
+  height: number;
 }
 
 interface ToolAction {
@@ -56,6 +64,11 @@ export default class BuilderEditor extends DialogBase {
   catalogModalOpen: boolean = false;
   catalogPartial: Partial<PersistentPart> | null = null;
 
+  selectedTime: number = 0;
+  selectArea: SelectArea | null = null;
+  selectDragDelta: XYVals | null = null
+  selectedParts: FlowPart[] = [];
+
   dragAction: DragAction | null = null;
   configuredPartId: string | null = null;
 
@@ -67,6 +80,15 @@ export default class BuilderEditor extends DialogBase {
       shortcut: 'n',
       cursor: () => false,
       onClick: this.addPartClickHandler,
+    },
+    {
+      label: 'Select & Move (Drag)',
+      value: 'select',
+      icon: 'mdi-select-drag',
+      shortcut: 's',
+      cursor: () => false,
+      onPan: this.selectPanHandler,
+      onClick: this.selectClickHandler,
     },
     {
       label: 'Move (Drag)',
@@ -134,20 +156,11 @@ export default class BuilderEditor extends DialogBase {
   }
 
   get layout(): BuilderLayout | null {
-    const layout: BuilderLayout =
-      builderStore.layoutById(
-        this.layoutId
-        || this.initialLayout
-        || builderStore.layoutIds[0]
-        || '');
-    // || {
-    //   id: '',
-    //   title: 'New layout',
-    //   width: defaultLayoutWidth,
-    //   height: defaultLayoutHeight,
-    //   parts: [],
-    // };
-    return layout;
+    return builderStore.layoutById(
+      this.layoutId
+      || this.initialLayout
+      || builderStore.layoutIds[0]
+      || '');
   }
 
   get parts(): PersistentPart[] {
@@ -200,6 +213,7 @@ export default class BuilderEditor extends DialogBase {
   }
 
   set currentTool(tool: ToolAction) {
+    this.cancelSelection();
     builderStore.commitEditorTool(tool.value);
   }
 
@@ -226,8 +240,8 @@ export default class BuilderEditor extends DialogBase {
 
     // first set local value, to avoid jitters caused by the period between action and VueX refresh
     this.layout.parts = parts.map(asPersistent);
-    await this.saveLayout(this.layout);
     this.debouncedCalculate();
+    await this.saveLayout(this.layout);
   }
 
   async savePart(part: PersistentPart) {
@@ -256,8 +270,7 @@ export default class BuilderEditor extends DialogBase {
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, _rev, ...exported } = this.layout;
-    const blob = new Blob([JSON.stringify(serialize(exported))], { type: 'text/plain;charset=utf-8' });
-    FileSaver.saveAs(blob, `brewblox-${this.layout.title}-layout.json`);
+    saveJsonFile(exported, `brewblox-${this.layout.title}-layout.json`);
   }
 
   renameLayout() {
@@ -377,6 +390,116 @@ export default class BuilderEditor extends DialogBase {
       : this.findGridSquare(grid, evt.touches[0].pageX, evt.touches[0].pageY);
   }
 
+  unflippedArea(area: SelectArea): SelectArea {
+    return {
+      x: area.width >= 0 ? area.x : area.x + area.width,
+      y: area.height >= 0 ? area.y : area.y + area.height,
+      width: Math.abs(area.width),
+      height: Math.abs(area.height),
+    };
+  }
+
+  selectPanHandler(args: PanArguments) {
+    if (this.selectedTime) {
+      this.selectDragPanHandler(args);
+      return;
+    }
+
+    if (args.isFirst) {
+      const grid = this.gridRect();
+      this.selectArea = {
+        x: args.position.left - grid.x,
+        y: args.position.top - grid.y,
+        width: 0,
+        height: 0,
+      };
+    }
+
+    if (this.selectArea) {
+      const { x, y } = args.delta;
+      this.selectArea.width += x;
+      this.selectArea.height += y;
+    }
+
+    if (args.isFinal && this.selectArea) {
+      this.selectedTime = new Date().getTime();
+
+      const { x, y, width, height } = this.unflippedArea(this.selectArea);
+      const startX = x / SQUARE_SIZE;
+      const startY = y / SQUARE_SIZE;
+      const endX = startX + (width / SQUARE_SIZE);
+      const endY = startY + (height / SQUARE_SIZE);
+
+      this.selectedParts = this.flowParts
+        .filter(part =>
+          part.x >= startX - 1
+          && part.x <= endX
+          && part.y >= startY - 1
+          && part.y <= endY)
+        .map(deepCopy);
+    }
+  }
+
+  selectDragPanHandler(args: PanArguments) {
+    if (args.isFirst) {
+      this.selectDragDelta = { x: 0, y: 0 };
+    }
+
+    if (this.selectDragDelta && this.selectArea) {
+      const prevDelta = { ...this.selectDragDelta };
+
+      this.selectDragDelta.x += args.delta.x;
+      this.selectDragDelta.y += args.delta.y;
+      this.selectArea.x += args.delta.x;
+      this.selectArea.y += args.delta.y;
+
+      const prevSnapDelta = {
+        x: Math.ceil(prevDelta.x / SQUARE_SIZE),
+        y: Math.ceil(prevDelta.y / SQUARE_SIZE),
+      };
+      const snapDelta = {
+        x: Math.ceil(this.selectDragDelta.x / SQUARE_SIZE),
+        y: Math.ceil(this.selectDragDelta.y / SQUARE_SIZE),
+      };
+
+      // We want to snap to grid on every update
+      // Subtract the previous values to avoid drift
+      this.selectedParts
+        .forEach(part => {
+          part.x = part.x - prevSnapDelta.x + snapDelta.x;
+          part.y = part.y - prevSnapDelta.y + snapDelta.y;
+        });
+    }
+
+    if (args.isFinal && this.selectDragDelta && this.selectArea) {
+      this.selectedTime = new Date().getTime();
+
+      // Now also snap select area to grid
+      const delta = this.selectDragDelta;
+      const snapDelta = {
+        x: Math.ceil(delta.x / SQUARE_SIZE) * SQUARE_SIZE,
+        y: Math.ceil(delta.y / SQUARE_SIZE) * SQUARE_SIZE,
+      };
+      this.selectArea.x += snapDelta.x - delta.x;
+      this.selectArea.y += snapDelta.y - delta.y;
+
+      const ids = this.selectedParts.map(part => part.id);
+      this.saveParts([...this.parts.filter(p => !ids.includes(p.id)), ...this.selectedParts]);
+    }
+  }
+
+  cancelSelection() {
+    this.selectedTime = 0;
+    this.selectArea = null;
+    this.selectedParts = [];
+  }
+
+  selectClickHandler() {
+    if (new Date().getTime() - this.selectedTime > 200) {
+      this.cancelSelection();
+    }
+  }
+
   movePanHandler(args: PanArguments, part: FlowPart, copy: boolean = false) {
     if (!part) {
       return;
@@ -463,9 +586,10 @@ export default class BuilderEditor extends DialogBase {
   }
 
   beingDragged(part: PersistentPart) {
-    return this.dragAction
+    const singleDrag = this.dragAction
       && this.dragAction.hide
       && this.dragAction.part.id === part.id;
+    return singleDrag || this.selectedParts.find(p => p.id === part.id);
   }
 
   keyHandler(evt: KeyboardEvent) {
@@ -506,12 +630,10 @@ export default class BuilderEditor extends DialogBase {
 
   created() {
     builderStore.commitEditorActive(true);
-    this.debouncedCalculate = debounce(this.calculate, 50, false);
-    this.debouncedCalculate();
-  }
-
-  mounted() {
     window.addEventListener('keyup', this.keyHandler);
+
+    this.debouncedCalculate = debounce(this.calculate, 200, false);
+    this.debouncedCalculate();
   }
 
   destroyed() {
@@ -643,6 +765,7 @@ export default class BuilderEditor extends DialogBase {
             <!-- Grid wrapper -->
             <div class="col column no-wrap scroll maximized">
               <div
+                v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, null)"
                 v-if="!!layout"
                 :style="`
                 width: ${squares(layout.width)}px;
@@ -693,6 +816,21 @@ export default class BuilderEditor extends DialogBase {
                       class="grid-item-coordinates"
                     >{{ val }}</text>
                   </g>
+                  <g
+                    v-for="part in selectedParts"
+                    :key="`selected-${part.id}`"
+                    :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
+                  >
+                    <PartWrapper :part="part" show-select />
+                  </g>
+                  <rect
+                    v-if="selectArea"
+                    v-bind="unflippedArea(selectArea)"
+                    stroke="white"
+                    fill="dodgerblue"
+                    opacity="0.3"
+                    style="cursor: grab"
+                  />
                 </svg>
               </div>
             </div>
