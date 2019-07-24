@@ -13,7 +13,7 @@ export default class CardWarning extends Vue {
 </script>
 
 <template>
-  <q-card-section>
+  <q-card-section class="q-mx-auto" style="max-width: 500px">
     <q-item dark>
       <q-item-section avatar>
         <q-icon :name="icon" :color="color" />
