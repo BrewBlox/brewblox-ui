@@ -4,6 +4,9 @@ import { Component } from 'vue-property-decorator';
 import { spaceCased } from '@/helpers/functional';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
+import { sparkStore } from '../../store';
+import { typeName as spark3PinType } from '../Spark3Pins/getters';
+import { Spark3PinsBlock } from '../Spark3Pins/types';
 import { MotorValveBlock, ValveState } from './types';
 
 @Component
@@ -13,13 +16,35 @@ export default class MotorValveWidget extends BlockWidget {
   get valveStateName() {
     return spaceCased(ValveState[this.block.data.valveState]);
   }
+
+  get disabled12V() {
+    const pins: Spark3PinsBlock | undefined = sparkStore.blockValues(this.serviceId)
+      .find(block => block.type === spark3PinType);
+    return pins && !pins.data.enableIoSupply12V;
+  }
+
+  enable12V() {
+    const pins: Spark3PinsBlock | undefined = sparkStore.blockValues(this.serviceId)
+      .find(block => block.type === spark3PinType);
+    if (pins) {
+      pins.data.enableIoSupply12V = true;
+      sparkStore.saveBlock([this.serviceId, pins]);
+    }
+  }
 }
 </script>
 
 <template>
   <q-card dark class="text-white scroll">
     <BlockWidgetToolbar :crud="crud" />
-
+    <CardWarning v-if="disabled12V">
+      <template #message>
+        <span>12V is disabled.</span>
+      </template>
+      <template #actions>
+        <q-btn text-color="white" flat label="Enable 12V" @click="enable12V" />
+      </template>
+    </CardWarning>
     <CardWarning v-if="!block.data.hwDevice.id || !block.data.startChannel">
       <template #message>
         <span>No channel selected</span>
