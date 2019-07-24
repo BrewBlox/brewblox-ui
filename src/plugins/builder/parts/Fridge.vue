@@ -9,6 +9,10 @@ export default class Fridge extends PartBase {
   get titleText(): string {
     return this.part.settings.text || '';
   }
+
+  get shelfY(): number {
+    return this.part.settings.dividerY || 1;
+  }
 }
 </script>
 
@@ -24,23 +28,12 @@ export default class Fridge extends PartBase {
         ry="8"
         stroke-width="4px"
       />
+      <!-- Top divider -->
       <line :x1="2" :y1="squares(1)" :x2="squares(sizeX)-4" :y2="squares(1)" />
-      <line
-        :x1="2"
-        :y1="squares(sizeY-1)"
-        :x2="squares(sizeX)-4"
-        :y2="squares(sizeY-1)"
-        stroke-width="4px"
-      />
-      <!-- Shelf -->
-      <line
-        v-if="sizeY >= 10"
-        :x1="2"
-        :y1="squares(sizeY/2)"
-        :x2="squares(sizeX)-4"
-        :y2="squares(sizeY/2)"
-        stroke-width="4px"
-      />
+      <!-- Bottom divider -->
+      <line :x1="2" :y1="squares(sizeY-1)" :x2="squares(sizeX)-4" :y2="squares(sizeY-1)" />
+      <!-- Shelf divider-->
+      <line :x1="2" :y1="squares(shelfY)" :x2="squares(sizeX)-4" :y2="squares(shelfY)" />
       <g>
         <foreignObject
           :transform="textTransformation([sizeX, sizeY], false)"

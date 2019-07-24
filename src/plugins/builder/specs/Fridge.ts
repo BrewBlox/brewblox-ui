@@ -11,6 +11,16 @@ const spec: ComponentSpec = {
     {
       component: 'SizeCard',
       props: {
+        settingsKey: 'shelfY',
+        defaultSize: 1,
+        label: 'Shelf position (from top)',
+        min: 1,
+        max: 14,
+      },
+    },
+    {
+      component: 'SizeCard',
+      props: {
         settingsKey: 'sizeX',
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
