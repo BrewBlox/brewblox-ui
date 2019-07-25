@@ -1,9 +1,18 @@
+import isString from 'lodash/isString';
 import { Dialog, Notify } from 'quasar';
 import UrlSafeString from 'url-safe-string';
 
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 import { suggestId } from './functional';
+
+const urlGenerator = new UrlSafeString();
+
+export const dashboardIdRules = (): InputRule[] => [
+  v => !!v || 'ID is required',
+  v => !dashboardStore.dashboardIds.includes(v) || 'ID must be unique',
+  v => v === urlGenerator.generate(v) || 'ID must be URL-safe',
+];
 
 export const changeDashboardId =
   async (oldId: string, newId: string, onIdChanged: (id: string) => void) => {
@@ -33,31 +42,17 @@ export const changeDashboardId =
 export const startChangeDashboardId =
   (dashboard: Dashboard, onIdChanged: (id: string) => void = (() => { })) => {
     Dialog.create({
+      component: 'InputDialog',
+      value: dashboard.id,
       title: 'Change dashboard ID',
       message: "This will change your dashboard's unique ID",
-      dark: true,
-      cancel: true,
-      prompt: {
-        model: dashboard.id,
-        type: 'text',
-      },
+      rules: dashboardIdRules(),
     })
-      .onOk(async newId => {
+      .onOk(async (newId: string) => {
         const oldId = dashboard.id;
-        if (!newId || newId === oldId) {
-          return;
+        if (newId !== oldId) {
+          await changeDashboardId(oldId, newId, onIdChanged);
         }
-
-        if (dashboardStore.dashboardIds.includes(newId)) {
-          Notify.create({
-            color: 'negative',
-            icon: 'error',
-            message: `Dashboard ${newId} already exists`,
-          });
-          return;
-        }
-
-        await changeDashboardId(oldId, newId, onIdChanged);
       });
   };
 
@@ -87,11 +82,12 @@ export const startChangeDashboardTitle =
           message: `Renamed dashboard '${oldTitle}' to '${newTitle}'`,
         });
 
-        const defaultId = new UrlSafeString().generate(newTitle);
+        const defaultId = urlGenerator.generate(newTitle);
         if (oldId == defaultId) {
           return; // no change
         }
-        const suggestedId = suggestId(defaultId, val => !dashboardStore.dashboardIds.includes(val));
+        const rules = dashboardIdRules();
+        const suggestedId = suggestId(defaultId, val => !rules.some(f => isString(f(val))));
 
         Dialog.create({
           title: 'Update dashboard URL',

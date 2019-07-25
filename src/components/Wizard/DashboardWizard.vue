@@ -3,6 +3,7 @@ import isString from 'lodash/isString';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
+import { dashboardIdRules } from '@/helpers/dashboards';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 @Component
@@ -10,11 +11,8 @@ export default class DashboardWizard extends Vue {
   dashboardId: string = '';
   dashboardTitle: string = '';
 
-  get dashboardIdRules(): InputRule[] {
-    return [
-      v => !!v || 'ID is required',
-      v => !dashboardStore.dashboardIds.includes(v) || 'ID must be unique',
-    ];
+  get idRules(): InputRule[] {
+    return dashboardIdRules();
   }
 
   back() {
@@ -22,7 +20,7 @@ export default class DashboardWizard extends Vue {
   }
 
   async create() {
-    const errors = this.dashboardIdRules
+    const errors = this.idRules
       .map(rule => rule(this.dashboardId))
       .filter(isString);
 
@@ -61,13 +59,7 @@ export default class DashboardWizard extends Vue {
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-input
-            v-model="dashboardId"
-            :rules="dashboardIdRules"
-            label="Dashboard ID"
-            dark
-            lazy-rules
-          >
+          <q-input v-model="dashboardId" :rules="idRules" label="Dashboard ID" dark lazy-rules>
             <template v-slot:after>
               <q-icon name="information">
                 <q-tooltip>The unique identifier for this dashboard.</q-tooltip>

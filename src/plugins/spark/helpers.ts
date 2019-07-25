@@ -2,7 +2,7 @@
 import { sparkStore } from '@/plugins/spark/store';
 
 
-export const blockIdRules = (serviceId: string): ((v: string) => boolean | string)[] => [
+export const blockIdRules = (serviceId: string): InputRule[] => [
   v => !!v || 'Name must not be empty',
   v => !sparkStore.blockIds(serviceId).includes(v) || 'Name must be unique',
   v => !!v.match(/^[a-zA-Z]/) || 'Name must start with a letter',
