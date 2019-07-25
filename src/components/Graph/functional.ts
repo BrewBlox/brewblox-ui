@@ -1,6 +1,8 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
 
+import { prettify } from '@/helpers/units';
+import { propertyNameWithUnit } from '@/helpers/units/parseObject';
 import { QueryTarget, historyStore } from '@/store/history';
 
 export interface QuasarNode {
@@ -99,3 +101,10 @@ export const targetBuilder =
         [],
       );
   };
+
+export const defaultLabel = (key: string): string => {
+  const [name, postfix] = propertyNameWithUnit(key);
+  const prettyName = name.split('/').slice(1).join(' ');
+  const prettyUnit = prettify(postfix || '');
+  return `${prettyName} ${prettyUnit}`;
+};

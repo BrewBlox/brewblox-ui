@@ -110,19 +110,25 @@ export default class PlotlyGraph extends Vue {
     Plotly.Plots.resize(this.plotlyElement);
   }
 
-  private renderPlot(): void {
+  private async renderPlot() {
+    if (!this.plotlyElement) {
+      return;
+    }
     // According to the Plotly documentation,
     // Plotly.react() is much faster for updating existing Plots.
     // The downside is that parent <span> elements get confused, and rerender empty.
     // https://plot.ly/javascript/plotlyjs-function-reference/#plotlynewplot
-    Plotly.newPlot(
-      this.plotlyElement,
-      this.data,
-      this.resizedLayout(),
-      this.config,
-    )
-      .then(this.attachListeners)
-      .catch((e: Error) => this.$emit('error', e.message));
+    try {
+      await Plotly.newPlot(
+        this.plotlyElement,
+        this.data,
+        this.resizedLayout(),
+        this.config,
+      );
+      this.attachListeners();
+    } catch (e) {
+      this.$emit('error', e.message);
+    }
   }
 
   private resizeHandler() {
