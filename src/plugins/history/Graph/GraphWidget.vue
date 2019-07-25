@@ -24,6 +24,7 @@ export default class GraphWidget extends WidgetBase {
       targets: [],
       renames: {},
       axes: {},
+      colors: {},
       ...this.widget.config,
     };
   }

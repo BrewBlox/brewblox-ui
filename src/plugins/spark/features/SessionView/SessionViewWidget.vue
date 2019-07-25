@@ -87,6 +87,7 @@ export default class SessionViewWidget extends WidgetBase {
             targets: [],
             renames: {},
             axes: {},
+            colors: {},
           },
           notes: '',
         };
