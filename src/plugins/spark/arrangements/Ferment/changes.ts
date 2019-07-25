@@ -401,6 +401,7 @@ export const defineWidgets = (config: FermentConfig, layouts: BuilderLayout[]): 
         [`${config.serviceId}/${config.names.coolPwm}/value`]: 'y2',
         [`${config.serviceId}/${config.names.heatPwm}/value`]: 'y2',
       },
+      colors: {},
     },
   });
 

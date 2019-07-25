@@ -82,6 +82,7 @@ export default class BlockCrudComponent extends CrudComponent {
       ],
       renames: Object.entries(this.renamedTargets)
         .reduce((acc, [k, v]) => ({ ...acc, [serviceFmt(k)]: v }), {}),
+      colors: {},
     };
   }
 

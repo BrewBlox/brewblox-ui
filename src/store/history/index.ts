@@ -33,6 +33,10 @@ export interface GraphValueAxes {
   [key: string]: 'y' | 'y2';
 }
 
+export interface LineColors {
+  [key: string]: string;
+}
+
 export type Slice = number[];
 
 export interface QueryResult {
@@ -55,6 +59,7 @@ export interface Listener {
 
 export interface GraphValuesListener extends Listener {
   axes: GraphValueAxes;
+  colors: LineColors;
   usedPolicy?: string;
 }
 

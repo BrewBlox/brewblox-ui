@@ -13,6 +13,7 @@ export default class GraphWizard extends WidgetWizardBase {
     targets: [],
     renames: {},
     axes: {},
+    colors: {},
   };
 
   createWidget() {
@@ -38,14 +39,14 @@ export default class GraphWizard extends WidgetWizardBase {
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-input v-model="widgetTitle" dark label="Widget name"/>
+          <q-input v-model="widgetTitle" dark label="Widget name" />
         </q-item-section>
       </q-item>
     </q-card-section>
 
     <q-card-actions class="row justify-between">
-      <q-btn unelevated label="Back" @click="back"/>
-      <q-btn unelevated label="Create" color="primary" @click="createWidget"/>
+      <q-btn unelevated label="Back" @click="back" />
+      <q-btn unelevated label="Create" color="primary" @click="createWidget" />
     </q-card-actions>
   </div>
 </template>

@@ -50,6 +50,7 @@ export default class BlockGraph extends Vue {
       targets: [],
       renames: {},
       axes: {},
+      colors: {},
       ...this.config,
     };
   }
