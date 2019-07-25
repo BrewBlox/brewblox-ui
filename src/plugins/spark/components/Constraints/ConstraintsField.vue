@@ -28,6 +28,10 @@ export default class ConstraintsField extends FieldBase {
     return v;
   }
 
+  get hasConstraints() {
+    return this.value.constraints.length > 0;
+  }
+
   get limiters() {
     const names: string[] = [];
     for (let constraint of this.value.constraints) {
@@ -62,7 +66,8 @@ export default class ConstraintsField extends FieldBase {
           Limited by:
           <i>{{ limiters.join(', ') }}</i>
         </small>
-        <small v-else>Not limited</small>
+        <small v-else-if="hasConstraints">Not limited</small>
+        <small v-else>No constraints configured</small>
       </q-item-section>
       <q-space />
       <q-item-section side>
