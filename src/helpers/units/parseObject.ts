@@ -13,6 +13,11 @@ export function propertyNameWithoutUnit(name: string): string {
   return matched ? matched[1] : name;
 }
 
+export function propertyNameWithUnit(name: string): [string, string | null] {
+  const matched = name.match(extractUnit);
+  return matched ? [matched[1], matched[3]] : [name, null];
+}
+
 export function objectUnit(val: any): string | null {
   const checked = Array.isArray(val)
     ? val[0]

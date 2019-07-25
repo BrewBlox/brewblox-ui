@@ -2,7 +2,7 @@
 import parseDuration from 'parse-duration';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
+import { defaultLabel, targetBuilder, targetSplitter } from '@/components/Graph/functional';
 import { GraphConfig } from '@/components/Graph/types';
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { durationString } from '@/helpers/functional';
@@ -111,13 +111,21 @@ export default class GraphForm extends CrudComponent {
     this.saveConfig(this.config);
   }
 
-  get selected(): string[] | null {
+  get selected(): string[] {
     return targetSplitter(this.config.targets);
   }
 
-  set selected(vals: string[] | null) {
+  set selected(vals: string[]) {
     const targets = targetBuilder(vals || []);
-    this.saveConfig({ ...this.config, targets });
+    const renames = vals
+      .reduce(
+        (acc, key) => ({
+          ...acc,
+          [key]: this.config.renames[key] || defaultLabel(key),
+        }),
+        {});
+
+    this.saveConfig({ ...this.config, targets, renames });
   }
 
   get renames(): DisplayNames {

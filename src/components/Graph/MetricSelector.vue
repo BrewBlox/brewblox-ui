@@ -18,20 +18,20 @@ export default class MetricSelector extends Vue {
   @Prop({ type: Array, required: true })
   readonly selected!: string[];
 
-  get fields(): Record<string, string[]> {
-    return historyStore.fields;
-  }
-
-  get nodes() {
-    return nodeBuilder(this.fields);
-  }
-
   get ticked(): string[] {
     return this.selected;
   }
 
   set ticked(vals: string[]) {
     this.$emit('update:selected', vals);
+  }
+
+  get fields(): Record<string, string[]> {
+    return historyStore.fields;
+  }
+
+  get nodes() {
+    return nodeBuilder(this.fields);
   }
 
   @Watch('selectFilter')
@@ -66,7 +66,7 @@ export default class MetricSelector extends Vue {
         <q-btn flat label="Collapse" icon="mdi-collapse-all" @click="tree.collapseAll()" />
       </q-item-section>
       <q-item-section class="col-auto">
-        <q-btn flat label="clear" icon="clear" @click="selected = []" />
+        <q-btn flat label="clear" icon="clear" @click="ticked = []" />
       </q-item-section>
     </q-item>
     <q-item dark>
