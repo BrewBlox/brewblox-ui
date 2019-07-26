@@ -24,7 +24,6 @@ interface XYVals {
 }
 
 interface DragAction extends XYVals {
-  hide: boolean;
   part: PersistentPart;
 }
 
@@ -83,11 +82,11 @@ export default class BuilderEditor extends DialogBase {
       onClick: this.addPartClickHandler,
     },
     {
-      label: 'Select & Move (Drag)',
+      label: 'Select (Drag or Click)',
       value: 'select',
       icon: 'mdi-select-drag',
       shortcut: 's',
-      cursor: () => false,
+      cursor: part => !!part,
       onPan: this.selectPanHandler,
       onClick: this.selectClickHandler,
     },
@@ -145,12 +144,16 @@ export default class BuilderEditor extends DialogBase {
       icon: 'delete',
       shortcut: 'd',
       cursor: part => !!part,
-      onClick: (evt, part) => this.removePart(part),
+      onClick: this.deleteClickHandler,
     },
   ];
 
   @Prop({ type: String })
   public readonly initialLayout!: string | null;
+
+  get editorActive() {
+    return builderStore.editorActive;
+  }
 
   get layouts(): BuilderLayout[] {
     return builderStore.layoutValues;
@@ -214,7 +217,7 @@ export default class BuilderEditor extends DialogBase {
   }
 
   set currentTool(tool: ToolAction) {
-    this.cancelSelection();
+    // this.cancelSelection();
     builderStore.commitEditorTool(tool.value);
   }
 
@@ -349,8 +352,7 @@ export default class BuilderEditor extends DialogBase {
   }
 
   gridRect(): Rect {
-    const { x, y, left, right, top, bottom } = this.grid.getBoundingClientRect();
-    return { x, y, left, right, top, bottom };
+    return { ...this.grid.getBoundingClientRect() };
   }
 
   isClickable(part) {
@@ -416,11 +418,6 @@ export default class BuilderEditor extends DialogBase {
   }
 
   selectPanHandler(args: PanArguments) {
-    if (this.selectedTime) {
-      this.selectDragPanHandler(args);
-      return;
-    }
-
     if (args.isFirst) {
       const grid = this.gridRect();
       this.selectArea = {
@@ -456,7 +453,7 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  selectDragPanHandler(args: PanArguments) {
+  selectDragPanHandler(args: PanArguments, copy: boolean) {
     if (args.isFirst) {
       this.selectDragDelta = { x: 0, y: 0 };
     }
@@ -499,8 +496,13 @@ export default class BuilderEditor extends DialogBase {
       this.selectArea.x += snapDelta.x - delta.x;
       this.selectArea.y += snapDelta.y - delta.y;
 
-      const ids = this.selectedParts.map(part => part.id);
-      this.saveParts([...this.parts.filter(p => !ids.includes(p.id)), ...this.selectedParts]);
+      if (copy) {
+        this.selectedParts.forEach(p => p.id = uid());
+        this.saveParts([...this.parts, ...this.selectedParts]);
+      } else {
+        const ids = this.selectedParts.map(part => part.id);
+        this.saveParts([...this.parts.filter(p => !ids.includes(p.id)), ...this.selectedParts]);
+      }
     }
   }
 
@@ -510,13 +512,31 @@ export default class BuilderEditor extends DialogBase {
     this.selectedParts = [];
   }
 
-  selectClickHandler() {
-    if (new Date().getTime() - this.selectedTime > 200) {
+  selectClickHandler(evt: ClickEvent, part: FlowPart) {
+    if (new Date().getTime() - this.selectedTime < 200) {
+      // The mouseup at the end of a pan also generates a click event - skip this
+      return;
+    }
+
+    if (!part) {
       this.cancelSelection();
+      return;
+    }
+
+    const selectedIdx = this.selectedParts.findIndex(p => p.id === part.id);
+    if (selectedIdx >= 0) {
+      this.selectedParts.splice(selectedIdx, 1);
+    } else {
+      this.selectedParts.push(deepCopy(part));
     }
   }
 
   movePanHandler(args: PanArguments, part: FlowPart, copy: boolean = false) {
+    if (this.selectedTime) {
+      this.selectDragPanHandler(args, copy);
+      return;
+    }
+
     if (!part) {
       return;
     }
@@ -524,7 +544,6 @@ export default class BuilderEditor extends DialogBase {
     if (args.isFirst) {
       this.dragAction = {
         part,
-        hide: !copy,
         x: 0,
         y: 0,
       };
@@ -590,6 +609,19 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
+  deleteClickHandler(evt: ClickEvent, part: FlowPart) {
+    if (!part) {
+      return;
+    }
+    if (this.selectedParts.find(p => p.id === part.id)) {
+      const ids = this.selectedParts.map(p => p.id);
+      this.saveParts([...this.parts.filter(p => !ids.includes(p.id))]);
+      this.cancelSelection();
+    } else {
+      this.removePart(part);
+    }
+  }
+
   async movePart(from: PersistentPart | null, to: PersistentPart) {
     if (from
       && from.id === to.id
@@ -602,10 +634,11 @@ export default class BuilderEditor extends DialogBase {
   }
 
   beingDragged(part: PersistentPart) {
-    const singleDrag = this.dragAction
-      && this.dragAction.hide
-      && this.dragAction.part.id === part.id;
-    return singleDrag || this.selectedParts.find(p => p.id === part.id);
+    return this.currentTool.value !== 'copy'
+      && (
+        this.dragAction && this.dragAction.part.id === part.id
+        || this.selectedParts.find(p => p.id === part.id)
+      );
   }
 
   keyHandler(evt: KeyboardEvent) {
@@ -663,6 +696,15 @@ export default class BuilderEditor extends DialogBase {
       this.history = [];
     }
     this.debouncedCalculate();
+  }
+
+  @Watch('editorActive')
+  watchActive(active) {
+    // A workaround for a hot reloading bug
+    // where the editor is not destroyed when the dialog closes
+    if (!active) {
+      this.onDialogHide();
+    }
   }
 }
 </script>
@@ -846,6 +888,8 @@ export default class BuilderEditor extends DialogBase {
                     v-for="part in selectedParts"
                     :key="`selected-${part.id}`"
                     :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
+                    :class="{ clickable: currentTool.cursor(part), [part.type]: true }"
+                    @click.stop="v => clickHandler(v, part)"
                   >
                     <PartWrapper :part="part" selected />
                   </g>
@@ -855,7 +899,7 @@ export default class BuilderEditor extends DialogBase {
                     stroke="white"
                     fill="dodgerblue"
                     opacity="0.3"
-                    style="cursor: grab"
+                    style="pointer-events: none;"
                   />
                 </svg>
               </div>

@@ -122,7 +122,7 @@ export default class PartWrapper extends Vue {
 }
 
 .selected {
-  fill: silver;
+  fill: dodgerblue;
   fill-opacity: 0.5;
   opacity: 0.5;
 }
