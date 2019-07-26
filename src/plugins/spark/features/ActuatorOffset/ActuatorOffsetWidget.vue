@@ -32,15 +32,15 @@ export default class ActuatorOffsetWidget extends BlockWidget {
     <BlockWidgetToolbar :crud="crud" />
 
     <CardWarning v-if="!block.data.targetId.id">
-      <template #message>Target setpoint is not configured for this setpoint driver.</template>
+      <template #message>Setpoint Driver has no target Setpoint configured.</template>
     </CardWarning>
     <CardWarning v-else-if="!block.data.referenceId.id">
-      <template #message>Reference setpoint is not configured for this setpoint driver.</template>
+      <template #message>Setpoint Driver has no reference Setpoint configured.</template>
     </CardWarning>
     <CardWarning v-else-if="!block.data.enabled">
       <template #message>
         <span>
-          This setpoint driver is disabled:
+          Setpoint Driver is disabled:
           <i>{{ block.data.targetId }}</i> will not be changed.
         </span>
       </template>

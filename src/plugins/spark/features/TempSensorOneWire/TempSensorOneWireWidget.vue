@@ -15,7 +15,7 @@ export default class TempSensorOneWireWidget extends BlockWidget {
   <q-card dark class="text-white scroll">
     <BlockWidgetToolbar :crud="crud" />
     <CardWarning v-if="block.data.value.val === null">
-      <template #message>OneWire sensor could not be read</template>
+      <template #message>OneWire Sensor could not be read.</template>
     </CardWarning>
     <q-card-section v-else>
       <q-item dark>

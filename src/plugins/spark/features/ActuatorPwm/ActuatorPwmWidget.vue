@@ -20,10 +20,13 @@ export default class ActuatorPwmWidget extends BlockWidget {
   <q-card dark class="text-white scroll">
     <BlockWidgetToolbar :crud="crud" />
 
-    <CardWarning v-if="!block.data.enabled">
+    <CardWarning v-if="!block.data.actuatorId.id">
+      <template #message>PWM has no target actuator configured.</template>
+    </CardWarning>
+    <CardWarning v-else-if="!block.data.enabled">
       <template #message>
         <span>
-          This PWM actuator is disabled:
+          PWM is disabled:
           <i>{{ block.data.actuatorId }}</i> will not be toggled.
         </span>
       </template>
