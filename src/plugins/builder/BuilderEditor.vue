@@ -49,8 +49,6 @@ interface ToolAction {
   },
 })
 export default class BuilderEditor extends DialogBase {
-  readonly gridWidth = 1000;
-  readonly gridHeight = 800;
 
   @Ref()
   readonly grid!: any;
@@ -466,7 +464,7 @@ export default class BuilderEditor extends DialogBase {
       this.selectArea.x += args.delta.x;
       this.selectArea.y += args.delta.y;
 
-      const prevSnapDelta = {
+      const snapDeltaPrev = {
         x: Math.ceil(prevDelta.x / SQUARE_SIZE),
         y: Math.ceil(prevDelta.y / SQUARE_SIZE),
       };
@@ -475,13 +473,15 @@ export default class BuilderEditor extends DialogBase {
         y: Math.ceil(this.selectDragDelta.y / SQUARE_SIZE),
       };
 
-      // We want to snap to grid on every update
-      // Subtract the previous values to avoid drift
-      this.selectedParts
-        .forEach(part => {
-          part.x = part.x - prevSnapDelta.x + snapDelta.x;
-          part.y = part.y - prevSnapDelta.y + snapDelta.y;
-        });
+      if (snapDeltaPrev.x !== snapDelta.x || snapDeltaPrev.y !== snapDelta.y) {
+        // We want to snap to grid during the move
+        // Subtract the previous values to avoid drift
+        this.selectedParts
+          .forEach(part => {
+            part.x = part.x + snapDelta.x - snapDeltaPrev.x;
+            part.y = part.y + snapDelta.y - snapDeltaPrev.y;
+          });
+      }
     }
 
     if (args.isFinal && this.selectDragDelta && this.selectArea) {
@@ -495,6 +495,10 @@ export default class BuilderEditor extends DialogBase {
       };
       this.selectArea.x += snapDelta.x - delta.x;
       this.selectArea.y += snapDelta.y - delta.y;
+
+      if (snapDelta.x === 0 && snapDelta.y === 0) {
+        return;
+      }
 
       if (copy) {
         this.selectedParts.forEach(p => p.id = uid());
@@ -846,6 +850,22 @@ export default class BuilderEditor extends DialogBase {
                   class="grid-base grid-editable"
                   @click="v => clickHandler(v, null)"
                 >
+                  <text
+                    v-for="x in layout.width"
+                    :key="`edge-x-${x}`"
+                    :x="squares(x-1)+20"
+                    :y="8"
+                    fill="white"
+                    class="grid-square-text"
+                  >{{ x-1 }}</text>
+                  <text
+                    v-for="y in layout.height"
+                    :key="`edge-y-${y}`"
+                    :x="0"
+                    :y="squares(y-1)+28"
+                    fill="white"
+                    class="grid-square-text"
+                  >{{ y-1 }}</text>
                   <g
                     v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, part)"
                     v-for="part in flowParts"
@@ -855,12 +875,6 @@ export default class BuilderEditor extends DialogBase {
                     :class="{ clickable: currentTool.cursor(part), [part.type]: true }"
                     @click.stop="v => clickHandler(v, part)"
                   >
-                    <text
-                      fill="white"
-                      x="0"
-                      y="8"
-                      class="grid-item-coordinates"
-                    >{{ part.x }},{{ part.y }}</text>
                     <PartWrapper
                       :part="part"
                       show-hover
@@ -881,7 +895,7 @@ export default class BuilderEditor extends DialogBase {
                       y="4"
                       text-anchor="middle"
                       fill="white"
-                      class="grid-item-coordinates"
+                      class="grid-square-text"
                     >{{ val }}</text>
                   </g>
                   <g
