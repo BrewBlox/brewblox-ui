@@ -217,7 +217,6 @@ export default class BuilderEditor extends DialogBase {
   }
 
   set currentTool(tool: ToolAction) {
-    // this.cancelSelection();
     builderStore.commitEditorTool(tool.value);
   }
 
@@ -352,7 +351,8 @@ export default class BuilderEditor extends DialogBase {
   }
 
   gridRect(): Rect {
-    return { ...this.grid.getBoundingClientRect() };
+    const { x, y, left, right, top, bottom } = this.grid.getBoundingClientRect();
+    return { x, y, left, right, top, bottom };
   }
 
   isClickable(part) {
