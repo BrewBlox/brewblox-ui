@@ -47,7 +47,7 @@ export default class MotorValveWidget extends BlockWidget {
     </CardWarning>
     <CardWarning v-if="!block.data.hwDevice.id || !block.data.startChannel">
       <template #message>
-        <span>No channel selected</span>
+        <span>This Motor Valve has no channel selected.</span>
       </template>
     </CardWarning>
     <q-card-section v-else>

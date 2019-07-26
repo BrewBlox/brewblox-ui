@@ -62,13 +62,14 @@ export default class SetpointProfileWidget extends BlockWidget {
   <q-card dark class="text-white column">
     <BlockWidgetToolbar :crud="crud" :graph-props="{data: plotlyData, layout: plotlyLayout}" />
     <CardWarning v-if="!block.data.targetId.id">
-      <template #message>Target setpoint is not configured for this profile.</template>
+      <template #message>Setpoint Profile has no target Setpoint configured.</template>
     </CardWarning>
 
     <CardWarning v-else-if="!block.data.enabled">
       <template #message>
         <span>
-          Profile is disabled: <i>{{ block.data.targetId }}</i> will not be changed.
+          Setpoint Profile is disabled:
+          <i>{{ block.data.targetId }}</i> will not be changed.
         </span>
       </template>
       <template #actions>

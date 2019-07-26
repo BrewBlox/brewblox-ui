@@ -241,4 +241,8 @@ export default class RelationsDialog extends DialogBase {
   fill: #fff;
   cursor: pointer;
 }
+
+/deep/ .node:hover rect {
+  fill-opacity: 0.8;
+}
 </style>

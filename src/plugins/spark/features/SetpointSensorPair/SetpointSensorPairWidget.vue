@@ -1,13 +1,20 @@
 <script lang="ts">
+import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
+import { sparkStore } from '../../store';
 import { SetpointSensorPairBlock } from './types';
 
 @Component
 export default class SetpointSensorPairWidget extends BlockWidget {
   readonly block!: SetpointSensorPairBlock;
+
+  get isUsed(): boolean {
+    return sparkStore.blockValues(this.serviceId)
+      .some(block => get(block, 'data.inputId.id') === this.blockId);
+  }
 }
 </script>
 
@@ -15,7 +22,10 @@ export default class SetpointSensorPairWidget extends BlockWidget {
   <q-card dark class="text-white scroll">
     <BlockWidgetToolbar :crud="crud" />
 
-    <CardWarning v-if="!block.data.settingEnabled">
+    <CardWarning v-if="!isUsed">
+      <template #message>This Setpoint is not used as PID input.</template>
+    </CardWarning>
+    <CardWarning v-else-if="!block.data.settingEnabled">
       <template #message>
         <span>This setpoint is disabled.</span>
       </template>
