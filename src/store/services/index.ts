@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
 
+import { objReducer } from '@/helpers/functional';
 import store from '@/store';
 import { providerStore } from '@/store/providers';
 
@@ -69,7 +70,7 @@ export class ServiceModule extends VuexModule {
 
   @Mutation
   public commitAllServices(services: Service[]): void {
-    this.services = services.reduce((acc, service) => ({ ...acc, [service.id]: service }), {});
+    this.services = services.reduce(objReducer('id'), {});
   }
 
   @Mutation

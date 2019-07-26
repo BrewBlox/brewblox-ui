@@ -180,3 +180,10 @@ export const suggestId =
 
 export const isAbsoluteUrl = (val: string) =>
   new RegExp('^(?:[a-z]+:)?//', 'i').test(val);
+
+export const entryReducer =
+  (acc: Record<string, any>, [key, val]: [string, any]) =>
+    ({ ...acc, [key]: val });
+
+export const objReducer = (key: string) =>
+  (acc: Record<string, any>, obj: any) => ({ ...acc, [obj[key]]: obj });
