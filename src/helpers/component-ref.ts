@@ -8,7 +8,7 @@ export const ref =
 
 // Globally register all vue components in the RequireContext
 export const autoRegister =
-  (context: any): string[] =>
+  (context: __WebpackModuleApi.RequireContext): string[] =>
     context
       .keys()
       .reduce(
@@ -17,7 +17,7 @@ export const autoRegister =
           if (match) {
             const componentConfig = context(fileName);
             Vue.component(match[1], componentConfig.default || componentConfig);
-            return [...acc, match[1].toString()];
+            acc.push(match[1].toString());
           }
           return acc;
         },

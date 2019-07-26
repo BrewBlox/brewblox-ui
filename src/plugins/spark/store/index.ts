@@ -2,6 +2,7 @@ import get from 'lodash/get';
 import Vue from 'vue';
 import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
 
+import { objReducer } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
 import store from '@/store';
 import { dashboardStore } from '@/store/dashboards';
@@ -303,7 +304,7 @@ export class SparkModule extends VuexModule {
 
   @Mutation
   public commitAllSpecs(specs: BlockSpec[]): void {
-    Vue.set(this, 'specs', specs.reduce((acc, s) => ({ ...acc, [s.id]: s }), {}));
+    Vue.set(this, 'specs', specs.reduce(objReducer('id'), {}));
   }
 
   @Mutation
@@ -331,7 +332,7 @@ export class SparkModule extends VuexModule {
     Vue.set(
       this.services[serviceId],
       'blocks',
-      blocks.reduce((acc, block) => ({ ...acc, [block.id]: block }), {}));
+      blocks.reduce(objReducer('id'), {}));
   }
 
   @Mutation

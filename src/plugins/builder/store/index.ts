@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
 
+import { objReducer } from '@/helpers/functional';
 import store from '@/store';
 
 import { BuilderLayout } from '../types';
@@ -49,7 +50,7 @@ export class BuilderModule extends VuexModule {
 
   @Mutation
   public commitAllLayouts(layouts: BuilderLayout[]) {
-    this.layouts = layouts.reduce((acc, layout) => ({ ...acc, [layout.id]: layout }), {});
+    this.layouts = layouts.reduce(objReducer('id'), {});
   }
 
   @Mutation
