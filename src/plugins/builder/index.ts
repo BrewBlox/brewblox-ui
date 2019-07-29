@@ -30,9 +30,11 @@ const deprecated: Feature = {
   widget: 'DeprecatedWidget',
 };
 
-export default () => {
-  builderStore.setup();
+export default {
+  install() {
+    builderStore.setup();
 
-  featureStore.createFeature(feature);
-  featureStore.createFeature(deprecated);
+    featureStore.createFeature(feature);
+    featureStore.createFeature(deprecated);
+  },
 };

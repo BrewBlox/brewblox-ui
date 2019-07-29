@@ -42,45 +42,47 @@ const onRemove = async (service: Service): Promise<void> => {
   }
 };
 
-export default () => {
-  Vue.filter(
-    'unit',
-    (value: Unit | null) =>
-      (value !== null && value !== undefined ? value.toString() : '-'));
-  Vue.filter(
-    'link',
-    (value: Link | null) =>
-      (value !== null && value !== undefined ? value.toString() : '-'));
-  Vue.filter('round', round);
-  Vue.filter('hexToBase64', hexToBase64);
-  Vue.filter('base64ToHex', base64ToHex);
-  Vue.filter('duration', durationString);
-  Vue.filter('truncated', truncate);
-  Vue.filter('unitDuration', unitDurationString);
-  Vue.filter('dateString', dateString);
-  Vue.filter('shortDateString', shortDateString);
+export default {
+  install() {
+    Vue.filter(
+      'unit',
+      (value: Unit | null) =>
+        (value !== null && value !== undefined ? value.toString() : '-'));
+    Vue.filter(
+      'link',
+      (value: Link | null) =>
+        (value !== null && value !== undefined ? value.toString() : '-'));
+    Vue.filter('round', round);
+    Vue.filter('hexToBase64', hexToBase64);
+    Vue.filter('base64ToHex', base64ToHex);
+    Vue.filter('duration', durationString);
+    Vue.filter('truncated', truncate);
+    Vue.filter('unitDuration', unitDurationString);
+    Vue.filter('dateString', dateString);
+    Vue.filter('shortDateString', shortDateString);
 
-  Object.values(features)
-    .forEach(feature => featureStore.createFeature(feature.feature));
+    Object.values(features)
+      .forEach(feature => featureStore.createFeature(feature.feature));
 
-  Object.values(arrangements)
-    .forEach(arr => featureStore.createArrangement(arr));
+    Object.values(arrangements)
+      .forEach(arr => featureStore.createArrangement(arr));
 
-  const specs = Object.values(features)
-    .filter(spec => !!spec.block)
-    .map(spec => spec.block) as BlockSpec[];
+    const specs = Object.values(features)
+      .filter(spec => !!spec.block)
+      .map(spec => spec.block) as BlockSpec[];
 
-  sparkStore.commitAllSpecs(specs);
+    sparkStore.commitAllSpecs(specs);
 
-  providerStore.createProvider({
-    id: typeName,
-    displayName: 'Spark Controller',
-    features: Object.keys(features),
-    onAdd: onAdd,
-    onRemove: onRemove,
-    onFetch: (service: Service) => sparkStore.fetchAll(service.id),
-    wizard: 'SparkWizard',
-    page: 'SparkPage',
-    watcher: 'SparkWatcher',
-  });
+    providerStore.createProvider({
+      id: typeName,
+      displayName: 'Spark Controller',
+      features: Object.keys(features),
+      onAdd: onAdd,
+      onRemove: onRemove,
+      onFetch: (service: Service) => sparkStore.fetchAll(service.id),
+      wizard: 'SparkWizard',
+      page: 'SparkPage',
+      watcher: 'SparkWatcher',
+    });
+  },
 };
