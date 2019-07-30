@@ -5,7 +5,7 @@ import Vue, { PluginObject } from 'vue';
 
 import App from './App.vue';
 import createContainer from './create-container';
-import { autoRegister } from './helpers/component-ref';
+import { autoRegister, externalComponent } from './helpers/component-ref';
 import { initDb } from './helpers/database';
 import builder from './plugins/builder';
 import example from './plugins/example';
@@ -29,11 +29,27 @@ const plugins: PluginObject<any>[] = [
   example,
 ];
 
-plugins.forEach(plugin => Vue.use(plugin));
+const external = [
+  'brewblox-plugin',
+];
 
-new Vue({
-  router,
-  store,
-  el: createContainer('q-app'),
-  render: h => h(App),
-});
+const run = async () => {
+  const loaded = await Promise
+    .all(
+      external
+        .map(n => `http://localhost:8200/${n}.umd.js`)
+        .map(externalComponent)
+    );
+
+  [...plugins, ...loaded]
+    .forEach(plugin => Vue.use(plugin, { store }));
+
+  new Vue({
+    router,
+    store,
+    el: createContainer('q-app'),
+    render: h => h(App),
+  });
+};
+
+run();
