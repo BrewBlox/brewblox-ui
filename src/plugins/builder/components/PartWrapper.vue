@@ -19,6 +19,9 @@ export default class PartWrapper extends Vue {
   @Prop({ type: Boolean, default: false })
   readonly showHover!: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly selected!: boolean;
+
   get partSpecs() {
     return specs[this.part.type];
   }
@@ -71,7 +74,7 @@ export default class PartWrapper extends Vue {
     <rect
       :width="squares(partSize[0])"
       :height="squares(partSize[1])"
-      :class="{showhover: showHover}"
+      :class="{showhover: showHover, selected}"
       opacity="0"
     />
   </g>
@@ -114,6 +117,12 @@ export default class PartWrapper extends Vue {
 
 .showhover:hover {
   fill: silver;
+  fill-opacity: 0.5;
+  opacity: 0.5;
+}
+
+.selected {
+  fill: dodgerblue;
   fill-opacity: 0.5;
   opacity: 0.5;
 }

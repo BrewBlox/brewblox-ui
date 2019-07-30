@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
 
+import { objReducer } from '@/helpers/functional';
 import store from '@/store';
 
 import {
@@ -99,7 +100,7 @@ export class DashboardModule extends VuexModule {
 
   @Mutation
   public commitAllDashboards(dashboards: Dashboard[]): void {
-    this.dashboards = dashboards.reduce((acc, db) => ({ ...acc, [db.id]: db }), {});
+    this.dashboards = dashboards.reduce(objReducer('id'), {});
   }
 
   @Mutation
@@ -119,7 +120,7 @@ export class DashboardModule extends VuexModule {
 
   @Mutation
   public commitAllDashboardItems(items: DashboardItem[]): void {
-    this.items = items.reduce((acc, item) => ({ ...acc, [item.id]: item }), {});
+    this.items = items.reduce(objReducer('id'), {});
   }
 
   @Mutation

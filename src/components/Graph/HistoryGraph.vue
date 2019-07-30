@@ -10,6 +10,7 @@ import {
   DisplayNames,
   GraphValueAxes,
   GraphValuesListener,
+  LineColors,
   QueryParams,
   QueryTarget,
   historyStore,
@@ -50,6 +51,10 @@ export default class HistoryGraph extends Vue {
 
   get axes(): GraphValueAxes {
     return this.config.axes || {};
+  }
+
+  get colors(): LineColors {
+    return this.config.colors || {};
   }
 
   get presets(): QueryParams[] {
@@ -106,6 +111,7 @@ export default class HistoryGraph extends Vue {
           this.params,
           this.renames,
           this.axes,
+          this.colors,
           target,
         ));
   }

@@ -17,7 +17,7 @@ export default class DigitalActuatorWidget extends BlockWidget {
 
     <CardWarning v-if="!block.data.hwDevice.id || !block.data.channel">
       <template #message>
-        <span>No channel selected</span>
+        <span>Digital Actuator has no channel selected.</span>
       </template>
     </CardWarning>
     <q-card-section v-else>

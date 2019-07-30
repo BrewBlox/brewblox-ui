@@ -9,7 +9,6 @@ export default class TextCard extends PartCard {
   @Prop({ type: String, default: 'text' })
   public readonly settingsKey!: string;
 
-
   @Prop({ type: String, default: 'Text field' })
   public readonly label!: string;
 

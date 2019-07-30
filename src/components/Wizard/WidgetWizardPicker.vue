@@ -17,9 +17,16 @@ export default class WidgetWizardPicker extends Vue {
 
   localChosenDashboardId: string = '';
 
+  get currentDashboard() {
+    return this.$route.path.startsWith('/dashboard')
+      ? this.$route.params.id
+      : null;
+  }
+
   get chosenDashboardId() {
     return this.localChosenDashboardId
       || this.dashboardId
+      || this.currentDashboard
       || dashboardStore.primaryDashboardId
       || '';
   }

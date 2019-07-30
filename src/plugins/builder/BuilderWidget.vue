@@ -1,11 +1,10 @@
 <script lang="ts">
 import { debounce, uid } from 'quasar';
 import { Dialog } from 'quasar';
-import { Component, Ref, Watch } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 
-import BuilderEditor from './BuilderEditor.vue';
 import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes } from './getters';
 import specs from './specs';
@@ -124,8 +123,9 @@ export default class BuilderWidget extends WidgetBase {
 
   startEditor() {
     Dialog.create({
-      component: BuilderEditor,
+      component: 'BuilderEditor',
       initialLayout: this.widgetConfig.currentLayoutId,
+      root: this.$root,
     });
   }
 
@@ -156,7 +156,7 @@ export default class BuilderWidget extends WidgetBase {
 
   created() {
     this.migrate();
-    this.debouncedCalculate = debounce(this.calculate, 50, false);
+    this.debouncedCalculate = debounce(this.calculate, 200, false);
     this.debouncedCalculate();
   }
 

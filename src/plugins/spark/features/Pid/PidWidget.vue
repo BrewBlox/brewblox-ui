@@ -63,7 +63,10 @@ export default class PidWidget extends BlockWidget {
       </template>
     </BlockWidgetToolbar>
 
-    <CardWarning v-if="!block.data.enabled">
+    <CardWarning v-if="!block.data.outputId.id">
+      <template #message>PID has no output Block configured.</template>
+    </CardWarning>
+    <CardWarning v-else-if="!block.data.enabled">
       <template #message>
         <span>
           PID is disabled:
@@ -83,7 +86,7 @@ export default class PidWidget extends BlockWidget {
         </span>
       </template>
     </CardWarning>
-    
+
     <q-card-section>
       <q-item :clickable="hasInputBlock" dark @click="showInput">
         <q-tooltip v-if="hasInputBlock">Edit {{ inputId }}</q-tooltip>

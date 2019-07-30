@@ -14,6 +14,7 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
 <template>
   <q-card dark class="text-white scroll">
     <BlockWidgetToolbar :crud="crud" />
+
     <q-card-section>
       <q-item dark class="align-children">
         <q-item-section>

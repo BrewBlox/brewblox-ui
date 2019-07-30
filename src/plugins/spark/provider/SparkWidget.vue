@@ -45,6 +45,7 @@ export default class SparkWidget extends Vue {
 
   fetchAll() {
     sparkStore.fetchAll(this.serviceId);
+    sparkStore.fetchBlocks(this.serviceId);
   }
 
   retryUpdateSource() {

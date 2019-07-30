@@ -2,11 +2,11 @@
 import parseDuration from 'parse-duration';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
+import { defaultLabel, targetBuilder, targetSplitter } from '@/components/Graph/functional';
 import { GraphConfig } from '@/components/Graph/types';
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { durationString } from '@/helpers/functional';
-import { DisplayNames, GraphValueAxes, historyStore } from '@/store/history';
+import { DisplayNames, GraphValueAxes, LineColors, historyStore } from '@/store/history';
 
 interface PeriodDisplay {
   start: boolean;
@@ -29,6 +29,7 @@ export default class GraphForm extends CrudComponent {
       params: {},
       targets: [],
       renames: {},
+      colors: {},
       axes: {},
       ...this.widget.config,
     };
@@ -111,13 +112,21 @@ export default class GraphForm extends CrudComponent {
     this.saveConfig(this.config);
   }
 
-  get selected(): string[] | null {
+  get selected(): string[] {
     return targetSplitter(this.config.targets);
   }
 
-  set selected(vals: string[] | null) {
+  set selected(vals: string[]) {
     const targets = targetBuilder(vals || []);
-    this.saveConfig({ ...this.config, targets });
+    const renames = vals
+      .reduce(
+        (acc, key) => ({
+          ...acc,
+          [key]: this.config.renames[key] || defaultLabel(key),
+        }),
+        {});
+
+    this.saveConfig({ ...this.config, targets, renames });
   }
 
   get renames(): DisplayNames {
@@ -138,6 +147,19 @@ export default class GraphForm extends CrudComponent {
 
   updateAxisSide(field: string, isRight: boolean) {
     this.saveConfig({ ...this.config, axes: { ...this.axes, [field]: isRight ? 'y2' : 'y' } });
+  }
+
+  get colors(): LineColors {
+    return this.config.colors;
+  }
+
+  updateColor(field: string, color: string) {
+    if (color) {
+      this.$set(this.colors, field, color);
+    } else {
+      this.$delete(this.colors, field);
+    }
+    this.saveConfig({ ...this.config, colors: this.colors });
   }
 
   created() {
@@ -239,6 +261,35 @@ export default class GraphForm extends CrudComponent {
               <q-item-section>{{ field }}</q-item-section>
               <q-item-section side>
                 <q-icon :class="{mirrored: isRightAxis(field)}" name="mdi-chart-line" size="30px" />
+              </q-item-section>
+            </q-item>
+            <q-item v-if="!selected || selected.length === 0" dark>
+              <q-item-section side>No metrics selected</q-item-section>
+            </q-item>
+          </q-scroll-area>
+        </div>
+      </q-expansion-item>
+
+      <q-expansion-item group="modal" icon="mdi-format-color-fill" label="Line Colors">
+        <div class="scroll-parent">
+          <q-scroll-area>
+            <q-item dark>
+              <q-item-section>Metric</q-item-section>
+              <q-item-section side>Choose a custom color</q-item-section>
+            </q-item>
+            <q-separator dark inset />
+            <q-item v-for="field in selected" :key="field" dark clickable>
+              <q-item-section>{{ field }}</q-item-section>
+              <q-item-section side>
+                <ColorField
+                  :value="colors[field] || ''"
+                  title="Line color"
+                  @input="v => updateColor(field, v)"
+                />
+              </q-item-section>
+              <q-item-section side>
+                <q-btn icon="clear" flat round @click="updateColor(field, null)" />
+                <q-tooltip>Use randomly generated color</q-tooltip>
               </q-item-section>
             </q-item>
             <q-item v-if="!selected || selected.length === 0" dark>
