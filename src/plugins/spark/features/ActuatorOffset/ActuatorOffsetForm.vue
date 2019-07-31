@@ -23,11 +23,10 @@ export default class ActuatorOffsetForm extends BlockCrudComponent {
       </CardWarning>
       <BlockEnableToggle
         v-else
-        v-bind="$props"
+        :crud="crud"
         :text-enabled="`Offset is enabled: ${block.data.targetId} will be offset from the
           ${block.data.referenceSettingOrValue == 0 ? 'setting' : 'value'} of ${block.data.referenceId}.`"
         :text-disabled="`Offset is disabled: ${block.data.targetId} will not be changed.`"
-        v-on="$listeners"
       />
       <q-item dark>
         <q-item-section>

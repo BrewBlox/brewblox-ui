@@ -63,11 +63,10 @@ export default class PidForm extends BlockCrudComponent {
 
     <q-card-section>
       <BlockEnableToggle
-        v-bind="$props"
+        :crud="crud"
         :text-enabled="`PID is enabled: output ${block.data.outputId} will be set to output of PID.`"
         :text-disabled="`PID is disabled: output ${block.data.outputId} will not be set.`"
         class="full-width bordered"
-        v-on="$listeners"
       />
       <q-separator dark inset />
 

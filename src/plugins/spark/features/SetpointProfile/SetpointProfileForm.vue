@@ -4,6 +4,7 @@ import { Component } from 'vue-property-decorator';
 
 import { durationString, objectSorter } from '@/helpers/functional';
 import { Unit } from '@/helpers/units';
+import { deepCopy } from '@/helpers/units/parseObject';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
 
@@ -59,33 +60,22 @@ export default class SetpointProfileForm extends BlockCrudComponent {
     };
   }
 
-  copyPoint(point: DisplaySetpoint): DisplaySetpoint {
-    return {
-      ...point,
-      temperature: new Unit(point.temperature.value, point.temperature.unit),
-    };
-  }
-
   addPoint() {
-    const newPoints = this.points.length > 0
-      ? [...this.points, this.copyPoint(this.points[this.points.length - 1])]
-      : [this.defaultPoint()];
-    this.savePoints(newPoints);
+    const newPoint = this.points.length > 0
+      ? deepCopy(this.points[this.points.length - 1])
+      : this.defaultPoint();
+    this.points.push(newPoint);
+    this.savePoints();
   }
 
   removePoint(index: number) {
-    this.savePoints(this.points.filter((_: any, idx: number) => idx !== index));
+    this.points.splice(index, 1);
+    this.savePoints();
   }
 
   updateStartTime(startDate: Date) {
-    const startTime = startDate.getTime();
-    this.block.data.start = startTime / 1000;
-    const newPoints = this.points
-      .map((point: DisplaySetpoint) => ({
-        ...point,
-        absTimeMs: startTime + point.offsetMs,
-      }));
-    this.savePoints(newPoints);
+    this.block.data.start = startDate.getTime() / 1000;
+    this.saveBlock();
   }
 
   notifyInvalidTime() {
@@ -122,16 +112,6 @@ export default class SetpointProfileForm extends BlockCrudComponent {
     };
     this.savePoints();
   }
-
-  updatePointTemperature(index: number, temp: Unit) {
-    this.points[index].temperature = temp;
-    this.savePoints();
-  }
-
-  enable() {
-    this.block.data.enabled = true;
-    this.saveBlock();
-  }
 }
 </script>
 
@@ -141,10 +121,9 @@ export default class SetpointProfileForm extends BlockCrudComponent {
     <q-card-section>
       <BlockEnableToggle
         v-if="block.data.targetId.id !== null"
-        v-bind="$props"
-        :text-enabled="`Profile is enabled: ${block.data.targetId} will be set by the profile.`"
+        :crud="crud"
+        :text-enabled="`Profile is enabled and driving ${block.data.targetId}.`"
         :text-disabled="`Profile is disabled: ${block.data.targetId} will not be changed.`"
-        v-on="$listeners"
       />
       <q-separator v-if="block.data.targetId.id !== null" dark />
       <q-item dark class="q-py-md">
@@ -173,6 +152,7 @@ export default class SetpointProfileForm extends BlockCrudComponent {
       </q-item>
       <q-separator dark />
 
+      <!-- Headers -->
       <q-item dark class="q-pt-md">
         <q-item-section class="col-3 q-py-none">
           <q-item-label caption>Offset from start</q-item-label>
@@ -185,6 +165,8 @@ export default class SetpointProfileForm extends BlockCrudComponent {
         </q-item-section>
         <q-item-section class="col-1 q-py-none" side />
       </q-item>
+
+      <!-- Points -->
       <q-item v-for="(point, idx) in points" :key="idx" dark dense>
         <q-item-section class="col-3">
           <InputField
@@ -217,18 +199,26 @@ export default class SetpointProfileForm extends BlockCrudComponent {
             :value="point.temperature"
             title="Temperature"
             label="point temperature"
-            @input="v => updatePointTemperature(idx, v)"
+            @input="v => { point.temperature = v; savePoints(); }"
           />
         </q-item-section>
         <q-item-section class="col-1" side>
-          <q-btn flat round dense icon="delete" @click="removePoint(idx)">
+          <q-btn flat dense icon="delete" @click="removePoint(idx)">
             <q-tooltip>Remove point</q-tooltip>
           </q-btn>
         </q-item-section>
       </q-item>
-      <q-item dark>
-        <q-item-section>
-          <q-btn flat icon="add" label="Add point" @click="addPoint" />
+
+      <!-- Add point button -->
+      <q-item dark dense>
+        <!-- Use multiple elements to also natively get padding -->
+        <q-item-section class="col-3" />
+        <q-item-section class="col-5" />
+        <q-item-section class="col-3" />
+        <q-item-section class="col-1" side>
+          <q-btn flat dense icon="add" @click="addPoint">
+            <q-tooltip>Add point</q-tooltip>
+          </q-btn>
         </q-item-section>
       </q-item>
     </q-card-section>
