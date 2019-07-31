@@ -100,7 +100,6 @@ export class BrewBloxDatabase {
 
     // Add as global Vue property to allow it to be used by external plugins
     (Vue as any).database = this;
-    console.log('test');
   }
 
   private async checkRemote(db: PouchDB.Database) {
