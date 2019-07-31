@@ -2,9 +2,9 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { getErrors as getDbErrors } from '@/helpers/database';
 import { getErrors as getFetchErrors } from '@/helpers/fetch';
 import { saveJsonFile } from '@/helpers/import-export';
+import database from '@/plugins/database';
 
 @Component
 export default class ExportErrorsAction extends Vue {
@@ -23,7 +23,7 @@ export default class ExportErrorsAction extends Vue {
   }
 
   async showDialog() {
-    const errors = { fetch: getFetchErrors(), db: getDbErrors() };
+    const errors = { fetch: getFetchErrors(), database: database.getErrors() };
     saveJsonFile(JSON.stringify(errors, null, 2), 'brewblox-errors.json', true);
   }
 }
