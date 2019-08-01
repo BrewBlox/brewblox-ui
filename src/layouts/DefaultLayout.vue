@@ -5,9 +5,8 @@ import { Component } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
 
 import buildEnv from '@/build-env.json';
-import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '@/helpers/dashboards';
-import { checkDevCertificate } from '@/helpers/development';
+import { checkDatastore } from '@/helpers/datastore';
 import { objectSorter } from '@/helpers/functional';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { pluginStore } from '@/store/plugins';
@@ -16,7 +15,6 @@ import { Service, serviceStore } from '@/store/services';
 @Component({
   components: {
     draggable,
-    ServiceWizardPicker,
   },
 })
 export default class DefaultLayout extends Vue {
@@ -136,7 +134,7 @@ export default class DefaultLayout extends Vue {
   }
 
   created() {
-    checkDevCertificate();
+    checkDatastore();
   }
 }
 </script>

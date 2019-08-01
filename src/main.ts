@@ -4,29 +4,17 @@ import PortalVue from 'portal-vue';
 import Vue, { PluginObject } from 'vue';
 
 import App from './App.vue';
-import createContainer from './create-container';
 import { autoRegister, externalComponent } from './helpers/component-ref';
-import { initDb } from './helpers/database';
 import builder from './plugins/builder';
+import database from './plugins/database';
 import history from './plugins/history';
 import spark from './plugins/spark';
 import router from './router';
 import store from './store';
 import { UIPlugin, pluginStore } from './store/plugins';
 
-const HOST = process.env.VUE_APP_API_URI || window.location.origin;
-const DB_NAME = 'brewblox-ui-store';
-
 Vue.config.performance = (process.env.NODE_ENV === 'development');
 autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
-initDb(HOST, DB_NAME);
-
-const localPlugins: PluginObject<any>[] = [
-  PortalVue,
-  history,
-  spark,
-  builder,
-];
 
 const loadRemotePlugin = async (plugin: UIPlugin): Promise<PluginObject<any>> => {
   try {
@@ -40,22 +28,43 @@ const loadRemotePlugin = async (plugin: UIPlugin): Promise<PluginObject<any>> =>
   }
 };
 
-const run = async () => {
-  await pluginStore.setup();
-  const remotePlugins = await pluginStore.fetchPlugins();
+const container = (id: string): HTMLElement =>
+  document.getElementById(id) || function () {
+    const div = document.createElement('div');
+    div.setAttribute('id', id);
+    document.body.appendChild(div);
+    return div;
+  }();
 
-  const loaded = await Promise
-    .all(remotePlugins.map(loadRemotePlugin));
+const setup = async () => {
+  Vue.use(database, {
+    host: process.env.VUE_APP_API_URI || window.location.origin,
+    name: 'brewblox-ui-store',
+  });
 
-  [...localPlugins, ...loaded]
-    .forEach(plugin => Vue.use(plugin, { store }));
+  const plugins: PluginObject<any>[] = [
+    PortalVue,
+    history,
+    spark,
+    builder,
+  ];
 
+  try {
+    await pluginStore.setup();
+    const remotePlugins = await pluginStore.fetchPlugins();
+    const loaded = await Promise
+      .all(remotePlugins.map(loadRemotePlugin));
+    plugins.push(...loaded);
+  } catch (e) { }
+
+  plugins.forEach(plugin => Vue.use(plugin, { store }));
+};
+
+setup().then(() => {
   new Vue({
     router,
     store,
-    el: createContainer('q-app'),
+    el: container('q-app'),
     render: h => h(App),
   });
-};
-
-run();
+});
