@@ -2,7 +2,6 @@
 const { gitDescribeSync } = require('git-describe');
 const fs = require('fs');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-/* eslint-enable */
 
 module.exports = {
   pluginOptions: {
@@ -11,6 +10,13 @@ module.exports = {
     },
     quasar: {
       treeShake: true,
+    },
+  },
+  devServer: {
+    public: 'localhost',
+    https: {
+      key: fs.readFileSync('dev/traefik/brewblox.key'),
+      cert: fs.readFileSync('dev/traefik/brewblox.crt'),
     },
   },
   transpileDependencies: [/[\\\/]node_modules[\\\/]quasar[\\\/]/],

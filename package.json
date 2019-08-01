@@ -94,8 +94,7 @@
     "vue-cli-plugin-webpack-bundle-analyzer": "^1.4.0",
     "vue-eslint-parser": "^4.0.3",
     "vue-template-compiler": "^2.6.10",
-    "vuex-module-decorators": "^0.9.9",
-    "webpack": "^4.38.0"
+    "vuex-module-decorators": "^0.9.9"
   },
   "browserslist": [
     "> 1%",
