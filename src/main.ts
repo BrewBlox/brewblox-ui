@@ -13,6 +13,7 @@ import router from './router';
 import store from './store';
 import { UIPlugin, pluginStore } from './store/plugins';
 
+window['Vue'] = Vue; // Make Vue accessible as global variable in plugins
 Vue.config.performance = (process.env.NODE_ENV === 'development');
 autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
 
