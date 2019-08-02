@@ -6,7 +6,6 @@ import { sparkStore } from '@/plugins/spark/store';
 import { serviceStore } from '@/store/services';
 
 
-
 @Component
 export default class FirmwareUpdateDialog extends DialogBase {
   busy: boolean = false;
