@@ -12,7 +12,7 @@ import { deepCopy, deserialize, serialize } from '@/helpers/units/parseObject';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
-import CalcWorker from 'worker-loader!./BuilderWorker';
+import CalcWorker from 'worker-loader!./calculator.worker';
 import { SQUARE_SIZE, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes } from './getters';
 import specs from './specs';
 import { builderStore } from './store';

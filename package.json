@@ -18,7 +18,7 @@
     "serve": "vue-cli-service serve",
     "start": "npm run compose:new && npm run serve",
     "build": "vue-cli-service build --modern",
-    "devbuild": "npm run build && mkdir -p ./dev/dist && rm -r ./dev/dist/*; cp -r ./dist/* ./dev/dist/",
+    "devbuild": "rm -r dev/dist/*; vue-cli-service build --dest dev/dist/ --no-clean --watch",
     "test": "npm run cert:check && vue-cli-service test:unit",
     "test:watch": "vue-cli-service test:unit --watchAll",
     "lint": "eslint \"src/**/*.{js,ts,vue}\"",

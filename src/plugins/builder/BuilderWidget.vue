@@ -5,7 +5,7 @@ import { Component, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 
-import CalcWorker from 'worker-loader!./BuilderWorker';
+import CalcWorker from 'worker-loader!./calculator.worker';
 import { SQUARE_SIZE, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes } from './getters';
 import specs from './specs';
 import { builderStore } from './store';
