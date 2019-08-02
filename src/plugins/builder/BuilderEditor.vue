@@ -12,7 +12,7 @@ import { deepCopy, deserialize, serialize } from '@/helpers/units/parseObject';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
-import { calculateNormalizedFlows } from './calculateFlows';
+import CalcWorker from 'worker-loader!./BuilderWorker';
 import { SQUARE_SIZE, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes } from './getters';
 import specs from './specs';
 import { builderStore } from './store';
@@ -57,6 +57,7 @@ export default class BuilderEditor extends DialogBase {
   debouncedCalculate: Function = () => { };
   flowParts: FlowPart[] = [];
   history: string[] = [];
+  worker: CalcWorker = new CalcWorker();
 
   menuModalOpen: boolean = false;
   catalogModalOpen: boolean = false;
@@ -345,7 +346,7 @@ export default class BuilderEditor extends DialogBase {
 
   async calculate() {
     await this.$nextTick();
-    this.flowParts = calculateNormalizedFlows(this.parts);
+    this.worker.postMessage(this.parts);
   }
 
   gridRect(): Rect {
@@ -370,12 +371,14 @@ export default class BuilderEditor extends DialogBase {
     if (this.currentTool.onClick) {
       this.currentTool.onClick(evt, part);
     }
+    evt.stopPropagation();
   }
 
   panHandler(args: PanArguments, part: FlowPart) {
     if (this.currentTool.onPan) {
       this.currentTool.onPan(args, part);
     }
+    args.evt.stopPropagation();
   }
 
   rectContains(rect: Rect, x: number, y: number) {
@@ -684,14 +687,15 @@ export default class BuilderEditor extends DialogBase {
   created() {
     builderStore.commitEditorActive(true);
     window.addEventListener('keyup', this.keyHandler);
-
-    this.debouncedCalculate = debounce(this.calculate, 50, false);
+    this.worker.onmessage = (evt: MessageEvent) => this.flowParts = evt.data;
+    this.debouncedCalculate = debounce(this.calculate, 150, false);
     this.debouncedCalculate();
   }
 
   destroyed() {
     window.removeEventListener('keyup', this.keyHandler);
     builderStore.commitEditorActive(false);
+    this.worker.terminate();
   }
 
   @Watch('layout')

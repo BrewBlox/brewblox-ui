@@ -1,3 +1,5 @@
+import cloneDeep from 'lodash/cloneDeep';
+
 import Link from './Link';
 import Unit from './Unit';
 
@@ -146,7 +148,7 @@ export function serialize(input: any, prevKey: string = ''): any {
 
 export function deepCopy<T>(obj: T): T {
   return obj
-    ? deserialize(JSON.parse(JSON.stringify(serialize(obj))))
+    ? cloneDeep(obj)
     : obj;
 }
 
