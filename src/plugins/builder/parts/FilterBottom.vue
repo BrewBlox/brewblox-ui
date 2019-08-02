@@ -6,15 +6,13 @@ import { LEFT } from '../getters';
 
 @Component
 export default class FilterBottom extends PartBase {
-  get paths() {
-    return {
-      borders: [
-        'M29,40V30a9,9,0,0,0-9-9H1',
-        'M21,40V32a3,3,0,0,0-3-3H1',
-      ],
-      liquid: 'M0,25H20a5,5,0,0,1,5,5V40',
-    };
-  }
+  readonly paths = {
+    borders: [
+      'M29,40V30a9,9,0,0,0-9-9H1',
+      'M21,40V32a3,3,0,0,0-3-3H1',
+    ],
+    liquid: 'M0,25H20a5,5,0,0,1,5,5V40',
+  };
 
   get flowSpeed() {
     return -this.flowOnCoord(LEFT);
