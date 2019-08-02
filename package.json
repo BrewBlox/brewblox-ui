@@ -17,7 +17,7 @@
     "compose:setup": "npm run spark:blocks && npm run couchdb:docs && npm run history:config",
     "serve": "vue-cli-service serve",
     "start": "npm run compose:new && npm run serve",
-    "build": "vue-cli-service build --modern",
+    "build": "vue-cli-service build",
     "devbuild": "rm -r dev/dist/*; vue-cli-service build --dest dev/dist/ --no-clean --watch",
     "test": "npm run cert:check && vue-cli-service test:unit",
     "test:watch": "vue-cli-service test:unit --watchAll",
