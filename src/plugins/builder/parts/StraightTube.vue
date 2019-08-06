@@ -6,15 +6,13 @@ import { RIGHT } from '../getters';
 
 @Component
 export default class StraightTube extends PartBase {
-  get paths() {
-    return {
-      borders: [
-        'M 0,21 H 50',
-        'M 0,29 H 50',
-      ],
-      liquid: 'M 0,25 H 50',
-    };
-  }
+  readonly paths = {
+    borders: [
+      'M 0,21 H 50',
+      'M 0,29 H 50',
+    ],
+    liquid: 'M 0,25 H 50',
+  };
 
   get flowSpeed() {
     return this.flowOnCoord(RIGHT);

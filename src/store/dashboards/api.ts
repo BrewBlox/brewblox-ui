@@ -1,5 +1,6 @@
 import database from '@/plugins/database';
-import { Dashboard, DashboardItem } from '@/store/dashboards';
+
+import { Dashboard, DashboardItem } from './types';
 
 const DASHBOARDS = 'dashboards';
 const ITEMS = 'dashboard-items';

@@ -346,6 +346,7 @@ export default class BuilderEditor extends DialogBase {
   async calculate() {
     await this.$nextTick();
     this.flowParts = calculateNormalizedFlows(this.parts);
+    // this.worker.postMessage(this.parts);
   }
 
   gridRect(): Rect {
@@ -370,12 +371,14 @@ export default class BuilderEditor extends DialogBase {
     if (this.currentTool.onClick) {
       this.currentTool.onClick(evt, part);
     }
+    evt.stopPropagation();
   }
 
   panHandler(args: PanArguments, part: FlowPart) {
     if (this.currentTool.onPan) {
       this.currentTool.onPan(args, part);
     }
+    args.evt.stopPropagation();
   }
 
   rectContains(rect: Rect, x: number, y: number) {
@@ -684,8 +687,7 @@ export default class BuilderEditor extends DialogBase {
   created() {
     builderStore.commitEditorActive(true);
     window.addEventListener('keyup', this.keyHandler);
-
-    this.debouncedCalculate = debounce(this.calculate, 50, false);
+    this.debouncedCalculate = debounce(this.calculate, 150, false);
     this.debouncedCalculate();
   }
 

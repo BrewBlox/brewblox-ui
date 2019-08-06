@@ -28,6 +28,7 @@ module.exports = {
     'no-param-reassign': 0,
     'no-mixed-operators': 0,
     'no-console': 'warn',
+    'no-multiple-empty-lines': 'error',
     'vue/max-attributes-per-line': 0,
     'vue/html-self-closing': 0,
     'comma-dangle': [
@@ -36,7 +37,7 @@ module.exports = {
     ],
     'semi': 'error',
     'max-len': [
-      1,
+      'error',
       120,
       2,
       {
