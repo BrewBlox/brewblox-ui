@@ -27,14 +27,6 @@ const loadRemotePlugin = async (plugin: UIPlugin): Promise<PluginObject<any>> =>
   }
 };
 
-const container = (id: string): HTMLElement =>
-  document.getElementById(id) || function () {
-    const div = document.createElement('div');
-    div.setAttribute('id', id);
-    document.body.appendChild(div);
-    return div;
-  }();
-
 const setup = async () => {
   // Make Vue accessible as global variable in plugins
   Object.defineProperty(window, 'Vue', { value: Vue });
@@ -70,7 +62,8 @@ setup().then(() => {
   new Vue({
     router,
     store,
-    el: container('q-app'),
-    render: h => h(App),
+    // q-app is defined by public/index.html
+    el: document.getElementById('q-app') as HTMLElement,
+    render: f => f(App),
   });
 });
