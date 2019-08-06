@@ -13,8 +13,6 @@ import router from './router';
 import store from './store';
 import { UIPlugin, pluginStore } from './store/plugins';
 
-window['Vue'] = Vue; // Make Vue accessible as global variable in plugins
-Vue.config.performance = (process.env.NODE_ENV === 'development');
 autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
 
 const loadRemotePlugin = async (plugin: UIPlugin): Promise<PluginObject<any>> => {
@@ -38,6 +36,13 @@ const container = (id: string): HTMLElement =>
   }();
 
 const setup = async () => {
+  // Make Vue accessible as global variable in plugins
+  Object.defineProperty(window, 'Vue', { value: Vue });
+
+  // Enable the Vue devtools performance tab
+  Vue.config.performance = (process.env.NODE_ENV === 'development');
+
+  // Install the database. We need it to fetch remote plugins
   Vue.use(database, {
     host: process.env.VUE_APP_API_URI || window.location.origin,
     name: 'brewblox-ui-store',

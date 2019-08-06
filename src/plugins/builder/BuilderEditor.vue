@@ -12,7 +12,7 @@ import { deepCopy, deserialize, serialize } from '@/helpers/units/parseObject';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
-import CalcWorker from 'worker-loader!./calculator.worker';
+import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes } from './getters';
 import specs from './specs';
 import { builderStore } from './store';
@@ -57,7 +57,6 @@ export default class BuilderEditor extends DialogBase {
   debouncedCalculate: Function = () => { };
   flowParts: FlowPart[] = [];
   history: string[] = [];
-  worker: CalcWorker = new CalcWorker();
 
   menuModalOpen: boolean = false;
   catalogModalOpen: boolean = false;
@@ -346,7 +345,8 @@ export default class BuilderEditor extends DialogBase {
 
   async calculate() {
     await this.$nextTick();
-    this.worker.postMessage(this.parts);
+    this.flowParts = calculateNormalizedFlows(this.parts);
+    // this.worker.postMessage(this.parts);
   }
 
   gridRect(): Rect {
@@ -687,7 +687,6 @@ export default class BuilderEditor extends DialogBase {
   created() {
     builderStore.commitEditorActive(true);
     window.addEventListener('keyup', this.keyHandler);
-    this.worker.onmessage = (evt: MessageEvent) => this.flowParts = evt.data;
     this.debouncedCalculate = debounce(this.calculate, 150, false);
     this.debouncedCalculate();
   }
@@ -695,7 +694,6 @@ export default class BuilderEditor extends DialogBase {
   destroyed() {
     window.removeEventListener('keyup', this.keyHandler);
     builderStore.commitEditorActive(false);
-    this.worker.terminate();
   }
 
   @Watch('layout')

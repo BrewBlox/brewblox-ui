@@ -15,11 +15,3 @@ declare module 'url-safe-string';
 declare module 'parse-duration';
 
 declare module '*.svg';
-
-declare module 'worker-loader!*' {
-  class WebpackWorker extends Worker {
-    public constructor();
-  }
-
-  export default WebpackWorker;
-}

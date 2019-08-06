@@ -65,6 +65,7 @@
     "@types/pouchdb": "^6.4.0",
     "@types/shortid": "0.0.29",
     "@types/webpack": "^4.32.1",
+    "@types/webpack-chain": "^5.2.0",
     "@types/webpack-env": "^1.14.0",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
@@ -94,8 +95,7 @@
     "vue-cli-plugin-webpack-bundle-analyzer": "^1.4.0",
     "vue-eslint-parser": "^4.0.3",
     "vue-template-compiler": "^2.6.10",
-    "vuex-module-decorators": "^0.9.9",
-    "worker-loader": "^2.0.0"
+    "vuex-module-decorators": "^0.9.9"
   },
   "browserslist": [
     "> 1%",
