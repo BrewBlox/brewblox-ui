@@ -15,7 +15,6 @@ module.exports = {
   //
   // Vue configuration
   //
-  parallel: false,
   transpileDependencies: [/[\\\/]node_modules[\\\/]quasar[\\\/]/],
   pluginOptions: {
     webpackBundleAnalyzer: {
