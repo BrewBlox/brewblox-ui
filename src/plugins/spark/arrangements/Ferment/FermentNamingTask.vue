@@ -34,8 +34,8 @@ export default class FermentNamingTask extends WizardTaskBase {
     return id;
   }
 
-  set serviceId(id: string) {
-    this.updateConfig<FermentConfig>({ ...this.config, serviceId: id });
+  set serviceId(serviceId: string) {
+    this.updateConfig<FermentConfig>({ ...this.config, serviceId });
   }
 
   get arrangementId() {
@@ -167,6 +167,7 @@ export default class FermentNamingTask extends WizardTaskBase {
               :options="serviceOpts"
               options-dark
               map-options
+              emit-value
               label="Service"
               dark
             />
@@ -188,7 +189,7 @@ export default class FermentNamingTask extends WizardTaskBase {
                   <q-tooltip>
                     The full name of your arrangement.
                     It will be used as the default dashboard title.
-                    <br >The default prefix is the short version of this.
+                    <br />The default prefix is the short version of this.
                   </q-tooltip>
                 </q-icon>
               </template>

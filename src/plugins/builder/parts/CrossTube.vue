@@ -6,14 +6,12 @@ import { DOWN, LEFT, RIGHT, UP } from '../getters';
 
 @Component
 export default class CrossTube extends PartBase {
-  get paths() {
-    return {
-      up: 'M25,25 V0',
-      down: 'M25,25 V50',
-      left: 'M25,25 H0',
-      right: 'M25,25 H50',
-    };
-  }
+  readonly paths = {
+    up: 'M25,25 V0',
+    down: 'M25,25 V50',
+    left: 'M25,25 H0',
+    right: 'M25,25 H50',
+  };
 
   get speed() {
     return {
@@ -38,20 +36,20 @@ export default class CrossTube extends PartBase {
 <template>
   <g>
     <g class="outline">
-      <polyline points="50,21 29,21 29,0"/>
-      <polyline points="21,0 21,21 0,21"/>
-      <polyline points="0,29 21,29 21,50"/>
-      <polyline points="29,50 29,29 50,29"/>
+      <polyline points="50,21 29,21 29,0" />
+      <polyline points="21,0 21,21 0,21" />
+      <polyline points="0,29 21,29 21,50" />
+      <polyline points="29,50 29,29 50,29" />
     </g>
-    <LiquidStroke :paths="[paths.up]" :colors="liquids.up"/>
-    <LiquidStroke :paths="[paths.down]" :colors="liquids.down"/>
-    <LiquidStroke :paths="[paths.left]" :colors="liquids.left"/>
-    <LiquidStroke :paths="[paths.right]" :colors="liquids.right"/>
+    <LiquidStroke :paths="[paths.up]" :colors="liquids.up" />
+    <LiquidStroke :paths="[paths.down]" :colors="liquids.down" />
+    <LiquidStroke :paths="[paths.left]" :colors="liquids.left" />
+    <LiquidStroke :paths="[paths.right]" :colors="liquids.right" />
     <g class="outline">
-      <AnimatedArrows :path="paths.up" :num-arrows="1" :speed="speed.up"/>
-      <AnimatedArrows :path="paths.down" :num-arrows="1" :speed="speed.down"/>
-      <AnimatedArrows :path="paths.left" :num-arrows="1" :speed="speed.left"/>
-      <AnimatedArrows :path="paths.right" :num-arrows="1" :speed="speed.right"/>
+      <AnimatedArrows :path="paths.up" :num-arrows="1" :speed="speed.up" />
+      <AnimatedArrows :path="paths.down" :num-arrows="1" :speed="speed.down" />
+      <AnimatedArrows :path="paths.left" :num-arrows="1" :speed="speed.left" />
+      <AnimatedArrows :path="paths.right" :num-arrows="1" :speed="speed.right" />
     </g>
   </g>
 </template>

@@ -1,10 +1,21 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/camelcase */
+
 const { gitDescribeSync } = require('git-describe');
 const fs = require('fs');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-/* eslint-enable */
 
+const production = process.env.NODE_ENV === 'production';
+
+/**
+ * @type { import("@vue/cli-service").ProjectOptions }
+ */
 module.exports = {
+
+  //
+  // Vue configuration
+  //
+  transpileDependencies: [/[\\\/]node_modules[\\\/]quasar[\\\/]/],
   pluginOptions: {
     webpackBundleAnalyzer: {
       openAnalyzer: false,
@@ -13,27 +24,51 @@ module.exports = {
       treeShake: true,
     },
   },
-  transpileDependencies: [/[\\\/]node_modules[\\\/]quasar[\\\/]/],
-  configureWebpack: (config) => {
-    config.devtool = 'source-map';
-    if (process.env.NODE_ENV === 'production') {
+  devServer: {
+    public: 'localhost',
+    https: {
+      key: fs.readFileSync('dev/traefik/brewblox.key'),
+      cert: fs.readFileSync('dev/traefik/brewblox.crt'),
+    },
+  },
+
+  //
+  // Webpack configuration
+  //
+  configureWebpack: config => {
+    if (production) {
       // Function names are required to set up functions for VueX functionality
       config
         .optimization
         .minimizer[0] // Terser
         .options
         .terserOptions
-        .keep_fnames = true; // eslint-disable-line @typescript-eslint/camelcase
+        .keep_fnames = true;
     }
-    config.plugins.push(
-      new ForkTsCheckerWebpackPlugin({
-        tslint: true,
-        vue: true,
-        tsconfig: './tsconfig.json',
-      })
-    );
+
+    // This is merged into the webpack config
+    return {
+      devtool: 'source-map',
+      output: {
+        globalObject: 'this',
+      },
+      plugins: [
+        new ForkTsCheckerWebpackPlugin({
+          tslint: true,
+          vue: true,
+          tsconfig: './tsconfig.json',
+          checkSyntacticErrors: true,
+        }),
+      ],
+    };
   },
-  chainWebpack: (config) => {
+
+  //
+  // ChainWebpack configuration
+  //
+  /** @type { import("webpack-chain") } */
+  chainWebpack: config => {
+
     // We're only using a subset from plotly
     // Add alias to enable typing regardless
     config.resolve.alias.set('plotly.js', 'plotly.js-basic-dist');

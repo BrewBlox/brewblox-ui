@@ -8,16 +8,14 @@ import { settingsBlock } from '../helpers';
 
 @Component
 export default class HeatingElement extends PartBase {
-  get paths() {
-    return {
-      fixture: [
-        'M0,10l0,30h19v-7h-6.5c0,0,0,0,0,0c-4.1,0.1-7.4-3.2-7.5-7.2c0-4.7,2.8-7.8,7.5-7.8H19v-8H0z',
-      ],
-      borders: [
-        'M50,24.7h24c7.1,0,6.6-6.7,14-6.7h126.9c0,0,7,0.1,7,7c0,7-7,7-7,7H90',
-      ],
-    };
-  }
+  readonly paths = {
+    fixture: [
+      'M0,10l0,30h19v-7h-6.5c0,0,0,0,0,0c-4.1,0.1-7.4-3.2-7.5-7.2c0-4.7,2.8-7.8,7.5-7.8H19v-8H0z',
+    ],
+    borders: [
+      'M50,24.7h24c7.1,0,6.6-6.7,14-6.7h126.9c0,0,7,0.1,7,7c0,7-7,7-7,7H90',
+    ],
+  };
 
   get block(): ActuatorPwmBlock | null {
     return settingsBlock(this.part, 'pwm');

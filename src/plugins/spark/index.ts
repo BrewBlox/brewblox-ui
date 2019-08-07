@@ -1,17 +1,6 @@
-import Vue from 'vue';
+import { VueConstructor } from 'vue';
 
 import { autoRegister } from '@/helpers/component-ref';
-import {
-  base64ToHex,
-  dateString,
-  durationString,
-  hexToBase64,
-  round,
-  shortDateString,
-  truncate,
-  unitDurationString,
-} from '@/helpers/functional';
-import { Link, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { featureStore } from '@/store/features';
 import { providerStore } from '@/store/providers';
@@ -20,10 +9,8 @@ import { Service } from '@/store/services';
 import arrangements from './arrangements';
 import features from './features';
 import { typeName } from './getters';
+import { installFilters } from './helpers';
 import { BlockSpec } from './types';
-
-autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
-autoRegister(require.context('./provider', true, /[A-Z]\w+\.vue$/));
 
 const onAdd = async (service: Service): Promise<void> => {
   await sparkStore.addService(service.id);
@@ -42,45 +29,35 @@ const onRemove = async (service: Service): Promise<void> => {
   }
 };
 
-export default () => {
-  Vue.filter(
-    'unit',
-    (value: Unit | null) =>
-      (value !== null && value !== undefined ? value.toString() : '-'));
-  Vue.filter(
-    'link',
-    (value: Link | null) =>
-      (value !== null && value !== undefined ? value.toString() : '-'));
-  Vue.filter('round', round);
-  Vue.filter('hexToBase64', hexToBase64);
-  Vue.filter('base64ToHex', base64ToHex);
-  Vue.filter('duration', durationString);
-  Vue.filter('truncated', truncate);
-  Vue.filter('unitDuration', unitDurationString);
-  Vue.filter('dateString', dateString);
-  Vue.filter('shortDateString', shortDateString);
+export default {
+  install(Vue: VueConstructor) {
+    installFilters(Vue);
 
-  Object.values(features)
-    .forEach(feature => featureStore.createFeature(feature.feature));
+    autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
+    autoRegister(require.context('./provider', true, /[A-Z]\w+\.vue$/));
 
-  Object.values(arrangements)
-    .forEach(arr => featureStore.createArrangement(arr));
+    Object.values(features)
+      .forEach(feature => featureStore.createFeature(feature.feature));
 
-  const specs = Object.values(features)
-    .filter(spec => !!spec.block)
-    .map(spec => spec.block) as BlockSpec[];
+    Object.values(arrangements)
+      .forEach(arr => featureStore.createArrangement(arr));
 
-  sparkStore.commitAllSpecs(specs);
+    const specs = Object.values(features)
+      .filter(spec => !!spec.block)
+      .map(spec => spec.block) as BlockSpec[];
 
-  providerStore.createProvider({
-    id: typeName,
-    displayName: 'Spark Controller',
-    features: Object.keys(features),
-    onAdd: onAdd,
-    onRemove: onRemove,
-    onFetch: (service: Service) => sparkStore.fetchAll(service.id),
-    wizard: 'SparkWizard',
-    page: 'SparkPage',
-    watcher: 'SparkWatcher',
-  });
+    sparkStore.commitAllSpecs(specs);
+
+    providerStore.createProvider({
+      id: typeName,
+      displayName: 'Spark Controller',
+      features: Object.keys(features),
+      onAdd: onAdd,
+      onRemove: onRemove,
+      onFetch: (service: Service) => sparkStore.fetchAll(service.id),
+      wizard: 'SparkWizard',
+      page: 'SparkPage',
+      watcher: 'SparkWatcher',
+    });
+  },
 };

@@ -1,6 +1,17 @@
+import { VueConstructor } from 'vue';
 
+import {
+  base64ToHex,
+  dateString,
+  durationString,
+  hexToBase64,
+  round,
+  shortDateString,
+  truncate,
+  unitDurationString,
+} from '@/helpers/functional';
+import { Link, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
-
 
 export const blockIdRules = (serviceId: string): InputRule[] => [
   v => !!v || 'Name must not be empty',
@@ -26,3 +37,22 @@ export const constraintLabels = new Map([
   ...digitalConstraintLabels.entries(),
   ...analogConstraintLabels.entries(),
 ]);
+
+export const installFilters = (Vue: VueConstructor) => {
+  Vue.filter(
+    'unit',
+    (value: Unit | null) =>
+      (value !== null && value !== undefined ? value.toString() : '-'));
+  Vue.filter(
+    'link',
+    (value: Link | null) =>
+      (value !== null && value !== undefined ? value.toString() : '-'));
+  Vue.filter('round', round);
+  Vue.filter('hexToBase64', hexToBase64);
+  Vue.filter('base64ToHex', base64ToHex);
+  Vue.filter('duration', durationString);
+  Vue.filter('truncated', truncate);
+  Vue.filter('unitDuration', unitDurationString);
+  Vue.filter('dateString', dateString);
+  Vue.filter('shortDateString', shortDateString);
+};

@@ -5,8 +5,7 @@ import PartBase from '../components/PartBase';
 
 @Component
 export default class Carboy extends PartBase {
-  get path() {
-    return `
+  readonly path = `
     M89.2,199
     H10.8
     c-5.4,0-9.8-4.4-9.8-9.9
@@ -20,9 +19,7 @@ export default class Carboy extends PartBase {
     c4.2,1.2,7,5.1,7,9.5
     v145.2
     C99,194.6,94.6,199,89.2,199
-    z
-    `;
-  }
+    z`;
 
   get color(): string | null {
     const color = this.part.settings.color;

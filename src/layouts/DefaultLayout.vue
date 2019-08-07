@@ -5,17 +5,16 @@ import { Component } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
 
 import buildEnv from '@/build-env.json';
-import ServiceWizardPicker from '@/components/Wizard/ServiceWizardPicker.vue';
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '@/helpers/dashboards';
-import { checkDevCertificate } from '@/helpers/development';
+import { checkDatastore } from '@/helpers/datastore';
 import { objectSorter } from '@/helpers/functional';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
+import { pluginStore } from '@/store/plugins';
 import { Service, serviceStore } from '@/store/services';
 
 @Component({
   components: {
     draggable,
-    ServiceWizardPicker,
   },
 })
 export default class DefaultLayout extends Vue {
@@ -115,13 +114,27 @@ export default class DefaultLayout extends Vue {
     this.wizardModalOpen = true;
   }
 
+  showPlugins() {
+    Dialog.create({
+      component: 'PluginDialog',
+    });
+  }
+
+  addPlugin() {
+    pluginStore.createPlugin({
+      id: 'pluggy',
+      title: 'pluggy',
+      url: 'http://localhost:8200/brewblox-plugin.umd.js',
+    });
+  }
+
   stopEditing() {
     this.dashboardEditing = false;
     this.serviceEditing = false;
   }
 
   created() {
-    checkDevCertificate();
+    checkDatastore();
   }
 }
 </script>
@@ -156,6 +169,15 @@ export default class DefaultLayout extends Vue {
             <q-icon name="mdi-creation" />
           </q-item-section>
           <q-item-section>Wizardry</q-item-section>
+        </q-item>
+
+        <q-separator dark />
+
+        <q-item clickable @click.native="showPlugins">
+          <q-item-section avatar>
+            <q-icon name="mdi-puzzle" />
+          </q-item-section>
+          <q-item-section>Plugins</q-item-section>
         </q-item>
 
         <q-separator dark />

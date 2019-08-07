@@ -21,10 +21,9 @@ export default class ActuatorPwmForm extends BlockCrudComponent {
 
     <q-card-section>
       <BlockEnableToggle
-        v-bind="$props"
+        :crud="crud"
         :text-enabled="`PWM is enabled: ${block.data.actuatorId} will be toggled automatically.`"
         :text-disabled="`PWM is disabled: ${block.data.actuatorId} will not be toggled.`"
-        v-on="$listeners"
       />
 
       <q-item dark>
