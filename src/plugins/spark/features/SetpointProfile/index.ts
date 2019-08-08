@@ -32,6 +32,7 @@ const block: BlockSpec = {
       component: 'DateValEdit',
       componentProps: { timeScale: 1000 },
       generate: () => new Date().getTime() / 1000,
+      pretty: val => new Date((val || 0) * 1000).toLocaleString(),
     },
     {
       key: 'targetId',
