@@ -10,9 +10,14 @@ export default class ColorField extends FieldBase {
   @Prop({ type: String, required: true })
   public readonly value!: string;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly clearable!: boolean;
+
   @Emit('input')
-  public change(v: string) {
-    return v;
+  public change(v: string | null) {
+    return v === null
+      ? v
+      : v.replace('#', '');
   }
 
   get color() {
@@ -48,8 +53,9 @@ export default class ColorField extends FieldBase {
       messageHtml: this.messageHtml,
       root: this.$root,
       value: this.color,
+      clearable: this.clearable,
     })
-      .onOk(v => this.change(v.replace('#', '')));
+      .onOk(this.change);
   }
 }
 </script>

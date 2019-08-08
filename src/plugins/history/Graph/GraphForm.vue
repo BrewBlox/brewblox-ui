@@ -18,10 +18,11 @@ interface PeriodDisplay {
 export default class GraphForm extends CrudComponent {
   durationString = durationString;
 
+  tab: string = 'metrics';
+  period: PeriodDisplay | null = null;
+
   @Prop({ type: Object, default: () => ({}) })
   readonly downsampling!: any;
-
-  period: PeriodDisplay | null = null;
 
   get config(): GraphConfig {
     return {
@@ -141,12 +142,21 @@ export default class GraphForm extends CrudComponent {
     return this.config.axes;
   }
 
-  isRightAxis(field: string) {
-    return this.config.axes[field] === 'y2';
+  get axisOpts() {
+    return [
+      {
+        value: 'y',
+        label: 'Y1',
+      },
+      {
+        value: 'y2',
+        label: 'Y2',
+      },
+    ];
   }
 
-  updateAxisSide(field: string, isRight: boolean) {
-    this.saveConfig({ ...this.config, axes: { ...this.axes, [field]: isRight ? 'y2' : 'y' } });
+  updateAxis(field: string, value: string) {
+    this.saveConfig({ ...this.config, axes: { ...this.axes, [field]: value } });
   }
 
   get colors(): LineColors {
@@ -172,141 +182,138 @@ export default class GraphForm extends CrudComponent {
   <q-card dark class="widget-modal">
     <FormToolbar :crud="crud" />
 
-    <q-card-section>
-      <q-expansion-item group="modal" icon="mdi-timetable" label="Period settings">
-        <q-item dark>
-          <q-item-section class="col-auto">
-            <q-select
-              :value="shownPeriod"
-              :options="periodOptions"
-              emit-value
-              map-options
-              dark
-              options-dark
-              label="Display type"
-              @input="updateShownPeriod"
-            />
-          </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section v-if="shownPeriod.start" class="col-6">
-            <q-item-label caption>Start time</q-item-label>
-            <DatetimeField
-              :value="config.params.start"
-              title="Start time"
-              @input="v => { config.params.start = v.getTime(); saveConfig(config); }"
-            />
-          </q-item-section>
-          <q-item-section v-if="shownPeriod.duration" class="col-6">
-            <q-item-label caption>Duration</q-item-label>
-            <InputField
-              :value="config.params.duration"
-              title="Duration"
-              @input="v => { config.params.duration = durationString(v); saveConfig(config); }"
-            />
-          </q-item-section>
-          <q-item-section v-if="shownPeriod.end" class="col-6">
-            <q-item-label caption>End time</q-item-label>
-            <DatetimeField
-              :value="config.params.end"
-              title="End time"
-              @input="v => { config.params.end = v.getTime(); saveConfig(config); }"
-            />
-          </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>
-            <q-item-label caption>Averaging period</q-item-label>
-            <div class="row q-mt-sm q-ml-sm">
-              <div v-for="(rate, meas) in downsampling" :key="meas" class="q-mr-md">
-                <q-item-label caption>{{ meas }}</q-item-label>
-                {{ rate }}
-              </div>
-            </div>
-          </q-item-section>
-        </q-item>
-      </q-expansion-item>
+    <!-- <q-card-section dark> -->
+    <q-tabs v-model="tab" dense active-color="primary" align="justify">
+      <q-tab name="metrics" label="Metrics" />
+      <q-tab name="period" label="Period" />
+      <q-tab name="legend" label="Legend" />
+      <q-tab name="display" label="Display" />
+    </q-tabs>
 
-      <q-expansion-item default-opened group="modal" icon="mdi-file-tree" label="Metrics">
-        <div class="scroll-parent">
-          <q-scroll-area>
+    <div class="scroll-parent">
+      <q-scroll-area>
+        <q-tab-panels v-model="tab" animated class="bg-dark-bright">
+          <!-- Metrics -->
+          <q-tab-panel dark name="metrics" class="q-pt-none">
             <MetricSelector :selected.sync="selected" />
-          </q-scroll-area>
-        </div>
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-tag-multiple" label="Legend">
-        <div class="scroll-parent">
-          <q-scroll-area>
-            <LabelSelector :selected="selected" :renames.sync="renames" />
-          </q-scroll-area>
-        </div>
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-chart-line" label="Axes">
-        <div class="scroll-parent">
-          <q-scroll-area>
+          </q-tab-panel>
+          <!-- Period -->
+          <q-tab-panel dark name="period" class="q-pt-none">
             <q-item dark>
-              <q-item-section>Metric</q-item-section>
-              <q-item-section side>Left or right axis</q-item-section>
-            </q-item>
-            <q-separator dark inset />
-            <q-item
-              v-for="field in selected"
-              :key="field"
-              dark
-              clickable
-              @click="updateAxisSide(field, !isRightAxis(field))"
-            >
-              <q-item-section>{{ field }}</q-item-section>
-              <q-item-section side>
-                <q-icon :class="{mirrored: isRightAxis(field)}" name="mdi-chart-line" size="30px" />
-              </q-item-section>
-            </q-item>
-            <q-item v-if="!selected || selected.length === 0" dark>
-              <q-item-section side>No metrics selected</q-item-section>
-            </q-item>
-          </q-scroll-area>
-        </div>
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-format-color-fill" label="Line Colors">
-        <div class="scroll-parent">
-          <q-scroll-area>
-            <q-item dark>
-              <q-item-section>Metric</q-item-section>
-              <q-item-section side>Choose a custom color</q-item-section>
-            </q-item>
-            <q-separator dark inset />
-            <q-item v-for="field in selected" :key="field" dark clickable>
-              <q-item-section>{{ field }}</q-item-section>
-              <q-item-section side>
-                <ColorField
-                  :value="colors[field] || ''"
-                  title="Line color"
-                  @input="v => updateColor(field, v)"
+              <q-item-section class="col-auto">
+                <q-select
+                  :value="shownPeriod"
+                  :options="periodOptions"
+                  emit-value
+                  map-options
+                  dark
+                  options-dark
+                  label="Display type"
+                  @input="updateShownPeriod"
                 />
               </q-item-section>
-              <q-item-section side>
-                <q-btn icon="clear" flat round @click="updateColor(field, null)" />
-                <q-tooltip>Use randomly generated color</q-tooltip>
+            </q-item>
+            <q-item dark>
+              <q-item-section v-if="shownPeriod.start" class="col-6">
+                <q-item-label caption>Start time</q-item-label>
+                <DatetimeField
+                  :value="config.params.start"
+                  title="Start time"
+                  @input="v => { config.params.start = v.getTime(); saveConfig(config); }"
+                />
+              </q-item-section>
+              <q-item-section v-if="shownPeriod.duration" class="col-6">
+                <q-item-label caption>Duration</q-item-label>
+                <InputField
+                  :value="config.params.duration"
+                  title="Duration"
+                  @input="v => { config.params.duration = durationString(v); saveConfig(config); }"
+                />
+              </q-item-section>
+              <q-item-section v-if="shownPeriod.end" class="col-6">
+                <q-item-label caption>End time</q-item-label>
+                <DatetimeField
+                  :value="config.params.end"
+                  title="End time"
+                  @input="v => { config.params.end = v.getTime(); saveConfig(config); }"
+                />
+              </q-item-section>
+            </q-item>
+            <q-item dark>
+              <q-item-section class="col-auto">
+                <q-item-label caption>Averaging period</q-item-label>
+                <div class="row q-mt-sm q-ml-sm">
+                  <div v-for="(rate, meas) in downsampling" :key="meas" class="q-mr-md">
+                    <q-item-label caption>{{ meas }}</q-item-label>
+                    {{ rate }}
+                  </div>
+                </div>
+                <q-tooltip>
+                  To improve performance, the history service automatically selects an averaging period.
+                  <br />One point is returned per period, with the average value of all points in that period.
+                </q-tooltip>
+              </q-item-section>
+            </q-item>
+          </q-tab-panel>
+          <!-- Legend -->
+          <q-tab-panel dark name="legend" class="q-pt-none">
+            <LabelSelector :selected="selected" :renames.sync="renames" />
+          </q-tab-panel>
+          <!-- Display -->
+          <q-tab-panel dark name="display" class="q-pt-none">
+            <q-item dark>
+              <q-item-section>Metric</q-item-section>
+              <q-item-section>Display settings</q-item-section>
+            </q-item>
+            <q-separator dark inset />
+
+            <q-item v-for="field in selected" :key="field" dark class="align-children">
+              <q-item-section class="col-5">{{ field }}</q-item-section>
+              <q-space />
+              <q-item-section class="col-6">
+                <q-list dark dense>
+                  <q-item dark>
+                    <q-item-section>
+                      <q-item-label caption>Y-axis</q-item-label>
+                    </q-item-section>
+                    <q-item-section class="col-auto">
+                      <q-btn-toggle
+                        :value="axes[field] || 'y'"
+                        :options="axisOpts"
+                        flat
+                        outline
+                        @input="v => updateAxis(field, v)"
+                      ></q-btn-toggle>
+                    </q-item-section>
+                  </q-item>
+                  <q-item dark>
+                    <q-item-section>
+                      <q-item-label caption>Line color</q-item-label>
+                    </q-item-section>
+                    <q-item-section class="col-auto">
+                      <ColorField
+                        :value="colors[field] || ''"
+                        title="Line color"
+                        clearable
+                        @input="v => updateColor(field, v)"
+                      />
+                    </q-item-section>
+                  </q-item>
+                  <q-separator dark />
+                </q-list>
               </q-item-section>
             </q-item>
             <q-item v-if="!selected || selected.length === 0" dark>
               <q-item-section side>No metrics selected</q-item-section>
             </q-item>
-          </q-scroll-area>
-        </div>
-      </q-expansion-item>
-    </q-card-section>
+          </q-tab-panel>
+        </q-tab-panels>
+      </q-scroll-area>
+    </div>
   </q-card>
 </template>
 
 <style scoped>
-.mirrored {
-  -webkit-transform: scaleX(-1);
-  transform: scaleX(-1);
-}
 .scroll-parent {
   height: 500px;
   max-height: 60vh;
