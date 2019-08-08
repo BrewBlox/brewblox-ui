@@ -444,60 +444,64 @@ export default class BuilderEditor extends DialogBase {
       const endX = startX + (width / SQUARE_SIZE);
       const endY = startY + (height / SQUARE_SIZE);
 
-      this.selectedParts = this.flowParts
-        .filter(part =>
-          part.x >= startX - 1
-          && part.x <= endX
-          && part.y >= startY - 1
-          && part.y <= endY)
-        .map(deepCopy);
+      const ids = this.selectedParts.map(part => part.id);
+
+      this.selectedParts.push(
+        ...this.flowParts
+          .filter(part =>
+            !ids.includes(part.id)
+            && part.x >= startX - 1
+            && part.x <= endX
+            && part.y >= startY - 1
+            && part.y <= endY)
+          .map(deepCopy));
+
+      this.selectArea = null;
     }
   }
 
-  selectDragPanHandler(args: PanArguments, copy: boolean) {
+  moveSelectedPanHandler(args: PanArguments, copy: boolean) {
     if (args.isFirst) {
       this.selectDragDelta = { x: 0, y: 0 };
     }
 
-    if (this.selectDragDelta && this.selectArea) {
-      const prevDelta = { ...this.selectDragDelta };
-
-      this.selectDragDelta.x += args.delta.x;
-      this.selectDragDelta.y += args.delta.y;
-      this.selectArea.x += args.delta.x;
-      this.selectArea.y += args.delta.y;
-
-      const snapDeltaPrev = {
-        x: Math.ceil(prevDelta.x / SQUARE_SIZE),
-        y: Math.ceil(prevDelta.y / SQUARE_SIZE),
-      };
-      const snapDelta = {
-        x: Math.ceil(this.selectDragDelta.x / SQUARE_SIZE),
-        y: Math.ceil(this.selectDragDelta.y / SQUARE_SIZE),
-      };
-
-      if (snapDeltaPrev.x !== snapDelta.x || snapDeltaPrev.y !== snapDelta.y) {
-        // We want to snap to grid during the move
-        // Subtract the previous values to avoid drift
-        this.selectedParts
-          .forEach(part => {
-            part.x = part.x + snapDelta.x - snapDeltaPrev.x;
-            part.y = part.y + snapDelta.y - snapDeltaPrev.y;
-          });
-      }
+    if (!this.selectDragDelta) {
+      return;
     }
 
-    if (args.isFinal && this.selectDragDelta && this.selectArea) {
+    const prevDelta = { ...this.selectDragDelta };
+
+    this.selectDragDelta.x += args.delta.x;
+    this.selectDragDelta.y += args.delta.y;
+
+    const snapDeltaPrev = {
+      x: Math.ceil(prevDelta.x / SQUARE_SIZE),
+      y: Math.ceil(prevDelta.y / SQUARE_SIZE),
+    };
+    const snapDelta = {
+      x: Math.ceil(this.selectDragDelta.x / SQUARE_SIZE),
+      y: Math.ceil(this.selectDragDelta.y / SQUARE_SIZE),
+    };
+
+    if (snapDeltaPrev.x !== snapDelta.x || snapDeltaPrev.y !== snapDelta.y) {
+      // We want to snap to grid during the move
+      // Subtract the previous values to avoid drift
+      this.selectedParts
+        .forEach(part => {
+          part.x = part.x + snapDelta.x - snapDeltaPrev.x;
+          part.y = part.y + snapDelta.y - snapDeltaPrev.y;
+        });
+    }
+
+    if (args.isFinal) {
       this.selectedTime = new Date().getTime();
 
       // Now also snap select area to grid
-      const delta = this.selectDragDelta;
       const snapDelta = {
-        x: Math.ceil(delta.x / SQUARE_SIZE) * SQUARE_SIZE,
-        y: Math.ceil(delta.y / SQUARE_SIZE) * SQUARE_SIZE,
+        x: Math.ceil(this.selectDragDelta.x / SQUARE_SIZE) * SQUARE_SIZE,
+        y: Math.ceil(this.selectDragDelta.y / SQUARE_SIZE) * SQUARE_SIZE,
       };
-      this.selectArea.x += snapDelta.x - delta.x;
-      this.selectArea.y += snapDelta.y - delta.y;
+      this.selectDragDelta = null;
 
       if (snapDelta.x === 0 && snapDelta.y === 0) {
         return;
@@ -539,9 +543,8 @@ export default class BuilderEditor extends DialogBase {
   }
 
   movePanHandler(args: PanArguments, part: FlowPart, copy: boolean = false) {
-    if (this.selectedTime) {
-      this.selectDragPanHandler(args, copy);
-      return;
+    if (this.selectedParts.length) {
+      return this.moveSelectedPanHandler(args, copy);
     }
 
     if (!part) {
