@@ -6,10 +6,17 @@ import WidgetBase from '@/components/Widget/WidgetBase';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { deserialize, isSubSet, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
+import { Block, ChangeField } from '@/plugins/spark/types';
 
-import { Block, ChangeField } from '../../types';
-import { Step } from './types';
+import { BlockChange, Step } from './types';
 
+interface ChangeDiff {
+  id: string;
+  diff: {
+    key: string;
+    val: string;
+  }[];
+}
 
 @Component
 export default class StepViewWidget extends WidgetBase {
@@ -120,6 +127,26 @@ export default class StepViewWidget extends WidgetBase {
       getProps: () => ({ openStep }),
     });
   }
+
+  changeDiff(change: BlockChange) {
+    const block = sparkStore.blockById(this.serviceId, change.blockId);
+    const spec = sparkStore.specs[block.type];
+    return Object.entries(change.data)
+      .map(([key, val]) => {
+        const specChange: any = spec.changes.find(s => s.key === key) || {};
+        const pretty = specChange.pretty || (v => v);
+        return {
+          key: specChange.title || key,
+          val: `${pretty(block.data[key])} => ${pretty(val)}`,
+        };
+      });
+  }
+
+  stepDiff(step: Step): ChangeDiff[] {
+    return step.changes.map(change => {
+      return { id: change.blockId, diff: this.changeDiff(change) };
+    });
+  }
 }
 </script>
 
@@ -141,7 +168,22 @@ export default class StepViewWidget extends WidgetBase {
         <q-item-section>
           {{ step.name }}
           <q-item-label caption>{{ step.changes.length }} Blocks changed</q-item-label>
-          <q-tooltip>{{ step.changes.map(change => change.blockId).join(', ') }}</q-tooltip>
+          <q-tooltip v-if="applicableSteps[step.id]">
+            <q-list dark dense>
+              <q-item v-for="cdiff in stepDiff(step)" :key="`cdiff-${cdiff.id}`" dark>
+                <q-item-section class="col-3">{{ cdiff.id }}</q-item-section>
+                <q-item-section>
+                  <ul>
+                    <li
+                      v-for="item in cdiff.diff"
+                      :key="`diff-item-${item.key}`"
+                    >{{ item.key }}: {{ item.val }}</li>
+                  </ul>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-tooltip>
+          <q-tooltip v-else>Step is not applicable. Do all changed blocks exist?</q-tooltip>
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn flat round icon="settings" @click="openModal(step.id)" />

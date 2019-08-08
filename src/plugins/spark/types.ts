@@ -8,6 +8,7 @@ export interface ChangeField {
   component: string;
   componentProps?: any;
   generate: () => any;
+  pretty?: (val: any) => string;
 }
 
 export type BlockDataGenerator = () => Record<string, any>;
