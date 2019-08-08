@@ -35,7 +35,7 @@ export default class LabelSelector extends Vue {
   <q-list dark>
     <q-item dark>
       <q-item-section>Metric</q-item-section>
-      <q-item-section>Display as</q-item-section>
+      <q-item-section>Label</q-item-section>
     </q-item>
     <q-separator dark inset />
     <q-item v-for="field in selected" :key="field" dark>
