@@ -683,10 +683,20 @@ export default class BuilderEditor extends DialogBase {
       });
   }
 
+  updateFlowParts({ data }: { data: FlowPart[] }) {
+    this.flowParts = data;
+    if (this.selectedParts.length > 0) {
+      const selectedIds = this.selectedParts.map(p => p.id);
+      this.selectedParts = this.flowParts
+        .filter(p => selectedIds.includes(p.id))
+        .map(deepCopy);
+    }
+  }
+
   created() {
     builderStore.commitEditorActive(true);
     window.addEventListener('keyup', this.keyHandler);
-    this.worker.onmessage = (evt: MessageEvent) => this.flowParts = evt.data;
+    this.worker.onmessage = this.updateFlowParts;
     this.debouncedCalculate = debounce(this.calculate, 150, false);
     this.debouncedCalculate();
   }
