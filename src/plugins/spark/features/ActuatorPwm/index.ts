@@ -38,7 +38,7 @@ const block: BlockSpec = {
   ],
   changes: [
     {
-      key: 'setting',
+      key: 'desiredSetting',
       title: 'Duty Setting',
       component: 'NumberValEdit',
       generate: () => 0,
