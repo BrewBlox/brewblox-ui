@@ -5,8 +5,9 @@ import { Component, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 
-import { calculateNormalizedFlows } from './calculateFlows';
+import CalcWorker from 'worker-loader!./calculator.worker';
 import { SQUARE_SIZE, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes } from './getters';
+import { asPersistentPart, asStatePart } from './helpers';
 import specs from './specs';
 import { builderStore } from './store';
 import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart } from './types';
@@ -14,6 +15,7 @@ import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart } f
 
 @Component
 export default class BuilderWidget extends WidgetBase {
+  worker: CalcWorker = new CalcWorker();
   flowParts: FlowPart[] = [];
   debouncedCalculate: Function = () => { };
 
@@ -59,18 +61,12 @@ export default class BuilderWidget extends WidgetBase {
   }
 
   async saveParts(parts: PersistentPart[]) {
-    const asPersistent = (part: PersistentPart | FlowPart) => {
-      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      const { transitions, flows, ...persistent } = part as FlowPart;
-      return persistent;
-    };
-
     if (!this.layout) {
       return;
     }
 
     // first set local value, to avoid jitters caused by the period between action and vueX refresh
-    this.layout.parts = parts.map(asPersistent);
+    this.layout.parts = parts.map(asPersistentPart);
     await builderStore.saveLayout(this.layout);
     this.debouncedCalculate();
   }
@@ -132,7 +128,7 @@ export default class BuilderWidget extends WidgetBase {
   async calculate() {
     await this.$nextTick();
     if (!this.editorActive) {
-      this.flowParts = calculateNormalizedFlows(this.parts);
+      this.worker.postMessage(this.parts.map(asStatePart));
     }
   }
 
@@ -156,8 +152,13 @@ export default class BuilderWidget extends WidgetBase {
 
   created() {
     this.migrate();
+    this.worker.onmessage = (evt: MessageEvent) => this.flowParts = evt.data;
     this.debouncedCalculate = debounce(this.calculate, 200, false);
     this.debouncedCalculate();
+  }
+
+  destroyed() {
+    this.worker.terminate();
   }
 
   @Watch('layout')

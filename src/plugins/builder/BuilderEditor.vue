@@ -12,8 +12,9 @@ import { deepCopy, deserialize, serialize } from '@/helpers/units/parseObject';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
-import { calculateNormalizedFlows } from './calculateFlows';
+import CalcWorker from 'worker-loader!./calculator.worker';
 import { SQUARE_SIZE, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes } from './getters';
+import { asPersistentPart, asStatePart } from './helpers';
 import specs from './specs';
 import { builderStore } from './store';
 import { BuilderLayout, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
@@ -52,6 +53,8 @@ export default class BuilderEditor extends DialogBase {
 
   @Ref()
   readonly grid!: any;
+
+  worker: CalcWorker = new CalcWorker();
 
   layoutId: string | null = null;
   debouncedCalculate: Function = () => { };
@@ -233,12 +236,6 @@ export default class BuilderEditor extends DialogBase {
       return;
     }
 
-    const asPersistent = (part: PersistentPart | FlowPart) => {
-      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      const { transitions, flows, ...persistent } = part as FlowPart;
-      return persistent;
-    };
-
     if (saveHistory) {
       const stored = builderStore.layoutById(this.layout.id);
       if (stored) {
@@ -247,7 +244,7 @@ export default class BuilderEditor extends DialogBase {
     }
 
     // first set local value, to avoid jitters caused by the period between action and VueX refresh
-    this.layout.parts = parts.map(asPersistent);
+    this.layout.parts = parts.map(asPersistentPart);
     this.debouncedCalculate();
     await this.saveLayout(this.layout);
   }
@@ -345,8 +342,7 @@ export default class BuilderEditor extends DialogBase {
 
   async calculate() {
     await this.$nextTick();
-    this.flowParts = calculateNormalizedFlows(this.parts);
-    // this.worker.postMessage(this.parts);
+    this.worker.postMessage(this.parts.map(asStatePart));
   }
 
   gridRect(): Rect {
@@ -690,11 +686,13 @@ export default class BuilderEditor extends DialogBase {
   created() {
     builderStore.commitEditorActive(true);
     window.addEventListener('keyup', this.keyHandler);
+    this.worker.onmessage = (evt: MessageEvent) => this.flowParts = evt.data;
     this.debouncedCalculate = debounce(this.calculate, 150, false);
     this.debouncedCalculate();
   }
 
   destroyed() {
+    this.worker.terminate();
     window.removeEventListener('keyup', this.keyHandler);
     builderStore.commitEditorActive(false);
   }

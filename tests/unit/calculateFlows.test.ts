@@ -6,11 +6,10 @@ import {
   asFlowParts,
   calculateFlows,
   flowPath,
-  partTransitions,
 } from '@/plugins/builder/calculateFlows';
 import { COLD_WATER, HOT_WATER, IN_OUT } from '@/plugins/builder/getters';
+import { asStatePart } from '@/plugins/builder/helpers';
 import { PersistentPart } from '@/plugins/builder/types';
-
 
 const propertyWalker = (acc: any[], next: FlowSegment, prop: string[]): any[] => {
   acc = [...acc, get(next, prop)];
@@ -44,7 +43,7 @@ describe('Data describing an input tube', () => {
   };
 
   it('can resolve to transitions', () => {
-    expect(partTransitions(part)).toEqual(
+    expect(asStatePart(part).transitions).toEqual(
       {
         [IN_OUT]: [{ outCoords: '1,0.5,0', pressure: 11, liquids: [COLD_WATER] }],
         '1,0.5,0': [{ outCoords: IN_OUT }],
@@ -84,7 +83,7 @@ describe('asFlowParts', () => {
   ];
 
   it('it adds transitions', () => {
-    asFlowParts(path).forEach(part => {
+    asFlowParts(path.map(asStatePart)).forEach(part => {
       expect(part).toHaveProperty('transitions');
     });
   });
@@ -122,7 +121,7 @@ describe('A single path without splits', () => {
     },
   ];
 
-  const flowParts = asFlowParts(parts);
+  const flowParts = asFlowParts(parts.map(asStatePart));
   const start = flowParts[0];
 
   const path = flowPath(flowParts, start, IN_OUT);
@@ -249,7 +248,7 @@ describe('A path with a split, but no joins', () => {
     },
   ];
 
-  const flowParts = asFlowParts(parts);
+  const flowParts = asFlowParts(parts.map(asStatePart));
   const start = flowParts[0];
 
   const path = flowPath(flowParts, start, IN_OUT);
@@ -454,7 +453,7 @@ describe('A path that forks and rejoins', () => {
     },
   ];
 
-  const flowParts = asFlowParts(parts);
+  const flowParts = asFlowParts(parts.map(asStatePart));
   const start = flowParts[0];
 
   const path = flowPath(flowParts, start, IN_OUT);
@@ -623,7 +622,7 @@ describe('A single path with a pump', () => {
 
 
   it('Should have a flow of value of 2 for all parts with the pump disabled', () => {
-    const flowParts = asFlowParts(parts);
+    const flowParts = asFlowParts(parts.map(asStatePart));
     const partsWithFlow = calculateFlows(flowParts);
     expect(partsWithFlow).toMatchObject(
       [{
@@ -675,7 +674,7 @@ describe('A single path with a pump', () => {
     it('Should have a flow of value of 6 when the pump is enabled', () => {
       // (input pressure 6 + pump pressure 12) / friction 3 = 6
       set(parts[1], ['settings', 'enabled'], true);
-      const flowParts = asFlowParts(parts);
+      const flowParts = asFlowParts(parts.map(asStatePart));
       const partsWithFlow = calculateFlows(flowParts);
       expect(partsWithFlow).toMatchObject(
         [{
@@ -784,7 +783,7 @@ describe('Two sources joining', () => {
   ];
 
   it('Should have the correct flow and liquids in all paths', () => {
-    const partsWithFlow = calculateFlows(asFlowParts(parts));
+    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
     expect(partsWithFlow).toMatchObject(
       [
         {
@@ -877,7 +876,6 @@ describe('Two sources joining', () => {
 });
 
 
-
 describe('A path with a bridge', () => {
   const parts: PersistentPart[] = [
     {
@@ -942,7 +940,7 @@ describe('A path with a bridge', () => {
   ];
 
   it('Should have the correct flow and liquids in all paths', () => {
-    const partsWithFlow = calculateFlows(asFlowParts(parts));
+    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
     expect(partsWithFlow).toMatchObject(
       [
         {
