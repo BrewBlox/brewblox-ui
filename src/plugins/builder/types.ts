@@ -29,8 +29,12 @@ export interface PersistentPart {
   settings: Record<string, any>;
 }
 
-export interface FlowPart extends PersistentPart {
+export interface StatePart extends PersistentPart {
   transitions: Transitions;
+  size: [number, number];
+}
+
+export interface FlowPart extends StatePart {
   flows: CalculatedFlows;
 }
 

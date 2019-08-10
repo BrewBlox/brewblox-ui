@@ -4,8 +4,8 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { clampRotation, spaceCased } from '@/helpers/functional';
 
-import { partSpecs } from './calculateFlows';
 import { SQUARE_SIZE } from './getters';
+import specs from './specs';
 import { FlowPart } from './types';
 
 @Component
@@ -17,7 +17,7 @@ export default class BuilderPartMenu extends Vue {
   get cards() {
     return [
       'PlacementCard',
-      ...partSpecs(this.part).cards,
+      ...specs[this.part.type].cards,
     ];
   }
 
@@ -26,7 +26,7 @@ export default class BuilderPartMenu extends Vue {
   }
 
   get partSize(): [number, number] {
-    return partSpecs(this.part).size(this.part);
+    return specs[this.part.type].size(this.part);
   }
 
   get rotatedSize(): [number, number] {
