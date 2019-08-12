@@ -19,7 +19,15 @@ const loadRemotePlugin = async (plugin: UIPlugin): Promise<PluginObject<any>> =>
   try {
     const obj = await externalComponent(plugin.url);
     pluginStore.commitResult({ id: plugin.id, loaded: true, error: null });
-    return obj;
+    return {
+      install: (Vue, { store }) => {
+        try {
+          Vue.use(obj, { store });
+        } catch (e) {
+          pluginStore.commitResult({ id: plugin.id, loaded: false, error: e.toString() });
+        }
+      },
+    };
   } catch (e) {
     pluginStore.commitResult({ id: plugin.id, loaded: false, error: e.toString() });
     // return a dummy so we don't have to filter the list before calling Vue.use()

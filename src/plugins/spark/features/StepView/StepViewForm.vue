@@ -1,8 +1,8 @@
 <script lang="ts">
-
 import get from 'lodash/get';
 import { Dialog, uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
+import draggable from 'vuedraggable';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { deepCopy } from '@/helpers/units/parseObject';
@@ -24,8 +24,13 @@ interface StepDisplay extends Step {
   changes: BlockChangeDisplay[];
 }
 
-@Component
+@Component({
+  components: {
+    draggable,
+  },
+})
 export default class StepViewForm extends CrudComponent {
+  draggingStep: boolean = false;
   editableChanges: Record<string, boolean> = {};
 
   @Prop({ type: String })
@@ -169,6 +174,11 @@ export default class StepViewForm extends CrudComponent {
       .onOk(() => this.saveSteps(this.steps.filter(s => s.id !== step.id)));
   }
 
+  saveChanges(step: StepDisplay, changes: BlockChangeDisplay[]) {
+    step.changes = changes;
+    this.saveSteps(this.steps);
+  }
+
   addChange(step: StepDisplay) {
     Dialog.create({
       component: 'BlockDialog',
@@ -230,146 +240,163 @@ export default class StepViewForm extends CrudComponent {
     <q-card-section>
       <div class="scroll-parent">
         <q-scroll-area>
-          <q-expansion-item
-            v-for="step in steps"
-            :label="step.name"
-            :key="step.id"
-            :default-opened="openStep === step.id"
-            group="steps"
-            icon="mdi-format-list-checks"
+          <draggable
+            :value="steps"
+            @input="saveSteps"
+            @start="draggingStep=true"
+            @end="draggingStep=false"
           >
-            <q-list
-              v-for="change in step.changes"
-              :key="change.blockId"
-              dark
-              bordered
-              class="q-mb-sm"
-              dense
+            <q-expansion-item
+              v-for="step in steps"
+              :label="step.name"
+              :key="step.id"
+              :default-opened="openStep === step.id"
+              :disable="draggingStep"
+              group="steps"
+              icon="mdi-format-list-checks"
             >
-              <q-item dark>
-                <q-item-section :class="{'text-h6': true, 'text-red': !change.block}">
-                  {{ change.blockId }}
-                  <q-tooltip v-if="!change.block">Block not found</q-tooltip>
-                </q-item-section>
-                <template v-if="editableChanges[change.key]">
-                  <q-item-section side>
-                    <q-btn flat round icon="delete" @click="removeChange(step, change.key)">
-                      <q-tooltip>Remove Block Change from Step</q-tooltip>
-                    </q-btn>
-                  </q-item-section>
-                  <q-item-section side>
-                    <q-btn
-                      round
-                      flat
-                      color="primary"
-                      icon="mdi-check"
-                      @click="$set(editableChanges, change.key, false)"
+              <draggable :value="step.changes" @input="v => saveChanges(step, v)">
+                <q-list
+                  v-for="change in step.changes"
+                  :key="change.blockId"
+                  dark
+                  bordered
+                  class="q-mb-sm"
+                  dense
+                >
+                  <q-item dark>
+                    <q-item-section
+                      :class="{'text-h6': true, grabbable: true, 'text-red': !change.block}"
                     >
-                      <q-tooltip>Stop editing</q-tooltip>
-                    </q-btn>
-                  </q-item-section>
-                </template>
-                <template v-else>
-                  <q-item-section side>
-                    <q-btn flat round icon="edit" @click="$set(editableChanges, change.key, true)">
-                      <q-tooltip>Edit Block Change</q-tooltip>
-                    </q-btn>
-                  </q-item-section>
-                </template>
-              </q-item>
-              <template v-if="editableChanges[change.key]">
-                <q-item v-for="(val, key) in allData(change)" :key="key" dark>
-                  <q-item-section>{{ findProp(change, key).title }}</q-item-section>
-                  <template v-if="val === null">
-                    <q-item-section />
-                    <q-item-section side>
-                      <q-btn flat round icon="add" @click="addField(change, key)">
-                        <q-tooltip>
-                          Add field to Block Change
-                          <br />The field will be changed when the Step is applied.
-                        </q-tooltip>
-                      </q-btn>
+                      {{ change.blockId }}
+                      <q-tooltip v-if="!change.block">Block not found</q-tooltip>
                     </q-item-section>
+                    <template v-if="editableChanges[change.key]">
+                      <q-item-section side>
+                        <q-btn flat round icon="delete" @click="removeChange(step, change.key)">
+                          <q-tooltip>Remove Block Change from Step</q-tooltip>
+                        </q-btn>
+                      </q-item-section>
+                      <q-item-section side>
+                        <q-btn
+                          round
+                          flat
+                          color="primary"
+                          icon="mdi-check"
+                          @click="$set(editableChanges, change.key, false)"
+                        >
+                          <q-tooltip>Stop editing</q-tooltip>
+                        </q-btn>
+                      </q-item-section>
+                    </template>
+                    <template v-else>
+                      <q-item-section side>
+                        <q-btn
+                          flat
+                          round
+                          icon="edit"
+                          @click="$set(editableChanges, change.key, true)"
+                        >
+                          <q-tooltip>Edit Block Change</q-tooltip>
+                        </q-btn>
+                      </q-item-section>
+                    </template>
+                  </q-item>
+                  <template v-if="editableChanges[change.key]">
+                    <q-item v-for="(val, key) in allData(change)" :key="key" dark>
+                      <q-item-section>{{ findProp(change, key).title }}</q-item-section>
+                      <template v-if="val === null">
+                        <q-item-section />
+                        <q-item-section side>
+                          <q-btn flat round icon="add" @click="addField(change, key)">
+                            <q-tooltip>
+                              Add field to Block Change
+                              <br />The field will be changed when the Step is applied.
+                            </q-tooltip>
+                          </q-btn>
+                        </q-item-section>
+                      </template>
+                      <template v-else>
+                        <q-item-section>
+                          <component
+                            :is="findProp(change, key).component"
+                            v-bind="componentProps(change, key)"
+                            :value="val"
+                            editable
+                            @input="v => updateField(change, key, v)"
+                          />
+                        </q-item-section>
+                        <q-item-section side>
+                          <q-btn
+                            :color="change.confirmed[key] ? 'primary' : ''"
+                            flat
+                            round
+                            icon="mdi-account-question"
+                            @click="toggleConfirmation(change, key)"
+                          >
+                            <q-tooltip>Edit value when the Step is applied.</q-tooltip>
+                          </q-btn>
+                        </q-item-section>
+                        <q-item-section side>
+                          <q-btn flat round icon="mdi-close" @click="removeField(change, key)">
+                            <q-tooltip>
+                              Remove field from Block Change.
+                              <br />The field will not be changed when the Step is applied.
+                            </q-tooltip>
+                          </q-btn>
+                        </q-item-section>
+                      </template>
+                    </q-item>
                   </template>
                   <template v-else>
-                    <q-item-section>
-                      <component
-                        :is="findProp(change, key).component"
-                        v-bind="componentProps(change, key)"
-                        :value="val"
-                        editable
-                        @input="v => updateField(change, key, v)"
-                      />
-                    </q-item-section>
-                    <q-item-section side>
-                      <q-btn
-                        :color="change.confirmed[key] ? 'primary' : ''"
-                        flat
-                        round
-                        icon="mdi-account-question"
-                        @click="toggleConfirmation(change, key)"
-                      >
-                        <q-tooltip>Edit value when the Step is applied.</q-tooltip>
-                      </q-btn>
-                    </q-item-section>
-                    <q-item-section side>
-                      <q-btn flat round icon="mdi-close" @click="removeField(change, key)">
-                        <q-tooltip>
-                          Remove field from Block Change.
-                          <br />The field will not be changed when the Step is applied.
-                        </q-tooltip>
-                      </q-btn>
-                    </q-item-section>
+                    <q-item v-for="(val, key) in change.data" :key="key" dark>
+                      <q-item-section>{{ findProp(change, key).title }}</q-item-section>
+                      <q-item-section>
+                        <component
+                          :is="findProp(change, key).component"
+                          v-bind="componentProps(change, key)"
+                          :value="val"
+                        />
+                      </q-item-section>
+                    </q-item>
                   </template>
-                </q-item>
-              </template>
-              <template v-else>
-                <q-item v-for="(val, key) in change.data" :key="key" dark>
-                  <q-item-section>{{ findProp(change, key).title }}</q-item-section>
-                  <q-item-section>
-                    <component
-                      :is="findProp(change, key).component"
-                      v-bind="componentProps(change, key)"
-                      :value="val"
-                    />
-                  </q-item-section>
-                </q-item>
-              </template>
-            </q-list>
-            <q-item dark>
-              <q-item-section class="col-auto">
-                <q-btn size="sm" label="Add Block" flat icon="mdi-cube" @click="addChange(step)" />
+                </q-list>
+              </draggable>
+              <q-item dark>
+                <q-item-section class="col-auto">
+                  <q-btn size="sm" label="Add Block" flat icon="mdi-cube" @click="addChange(step)" />
+                  <q-space />
+                </q-item-section>
                 <q-space />
-              </q-item-section>
-              <q-space />
-              <q-item-section class="col-auto">
-                <q-btn
-                  size="sm"
-                  label="Copy Step"
-                  icon="file_copy"
-                  align="left"
-                  flat
-                  @click="duplicateStep(step)"
-                />
-                <q-btn
-                  size="sm"
-                  label="Rename Step"
-                  icon="edit"
-                  align="left"
-                  flat
-                  @click="renameStep(step)"
-                />
-                <q-btn
-                  size="sm"
-                  label="Remove Step"
-                  icon="delete"
-                  align="left"
-                  flat
-                  @click="removeStep(step)"
-                />
-              </q-item-section>
-            </q-item>
-          </q-expansion-item>
+                <q-item-section class="col-auto">
+                  <q-btn
+                    size="sm"
+                    label="Copy Step"
+                    icon="file_copy"
+                    align="left"
+                    flat
+                    @click="duplicateStep(step)"
+                  />
+                  <q-btn
+                    size="sm"
+                    label="Rename Step"
+                    icon="edit"
+                    align="left"
+                    flat
+                    @click="renameStep(step)"
+                  />
+                  <q-btn
+                    size="sm"
+                    label="Remove Step"
+                    icon="delete"
+                    align="left"
+                    flat
+                    @click="removeStep(step)"
+                  />
+                </q-item-section>
+              </q-item>
+            </q-expansion-item>
+          </draggable>
           <q-item dark>
             <q-item-section />
             <q-item-section side>
@@ -388,5 +415,8 @@ export default class StepViewForm extends CrudComponent {
 .scroll-parent {
   height: 600px;
   max-height: 80vh;
+}
+.grabbable {
+  cursor: grab;
 }
 </style>

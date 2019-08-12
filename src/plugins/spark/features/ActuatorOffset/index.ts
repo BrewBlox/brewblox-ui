@@ -25,7 +25,7 @@ const block: BlockSpec = {
   presets: [],
   changes: [
     {
-      key: 'setting',
+      key: 'desiredSetting',
       title: 'Target offset',
       component: 'NumberValEdit',
       generate: () => 0,

@@ -22,7 +22,7 @@ const block: BlockSpec = {
   presets: [],
   changes: [
     {
-      key: 'setting',
+      key: 'desiredSetting',
       title: 'Setting',
       component: 'NumberValEdit',
       generate: () => 0,

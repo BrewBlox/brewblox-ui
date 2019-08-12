@@ -1,3 +1,9 @@
+/**
+ * IMPORTANT: this file is used by a web worker.
+ * It can't import any modules with a dependency on a VueX store.
+ * You'll notice it went wrong if your Webpack build fails with 0 errors.
+ */
+
 import get from 'lodash/get';
 import has from 'lodash/has';
 import mapKeys from 'lodash/mapKeys';
@@ -10,14 +16,12 @@ import { Coordinates } from '@/helpers/coordinates';
 
 import { FlowSegment } from './FlowSegment';
 import { ACCELERATE_OTHERS } from './getters';
-import specs from './specs';
 import {
   CalculatedFlows,
-  ComponentSpec,
   FlowPart,
   FlowRoute,
   LiquidFlow,
-  PersistentPart,
+  StatePart,
   Transitions,
 } from './types';
 
@@ -25,18 +29,9 @@ export const removeTransitions =
   (parts: FlowPart[], inCoord: string): FlowPart[] => parts.map(
     part => ({ ...part, transitions: omit(part.transitions, inCoord) }));
 
-export const partSpecs =
-  (part: PersistentPart): ComponentSpec => specs[part.type];
-
-export const partTransitions =
-  (part: PersistentPart): Transitions => partSpecs(part).transitions(part);
-
-export const partSize =
-  (part: PersistentPart): [number, number] => partSpecs(part).size(part);
-
 export const partCenter =
-  (part: PersistentPart): [number, number, number] => {
-    const [sizeX, sizeY] = partSize(part);
+  (part: StatePart): [number, number, number] => {
+    const [sizeX, sizeY] = part.size;
     return [sizeX / 2, sizeY / 2, 0];
   };
 
@@ -54,39 +49,36 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
   if (!part.flows) {
     return { ...part, flows: {} };
   }
-  const size = partSize(part);
 
   const newFlows = mapKeys(part.flows,
     (flow, inCoord) =>
       new Coordinates(inCoord)
         .translate([-part.x, -part.y, 0])
-        .flipShapeEdge(!!part.flipped, part.rotate, size)
+        .flipShapeEdge(!!part.flipped, part.rotate, part.size)
         .toString()
   );
 
   return { ...part, flows: newFlows };
 };
 
-const translations = (part: PersistentPart): Transitions =>
-  Object.entries(partTransitions(part))
+const translations = (part: StatePart): Transitions =>
+  Object.entries(part.transitions)
     .reduce((acc, [inCoordStr, transition]: [string, any]) => {
       // inCoords are relative from part anchor === [0, 0, 0]
 
-      const size = partSize(part);
-
       const updatedKey = new Coordinates(inCoordStr)
-        .flipShapeEdge(!!part.flipped, 0, size)
+        .flipShapeEdge(!!part.flipped, 0, part.size)
         .translate([part.x, part.y, 0])
-        .rotateShapeEdge(part.rotate, 0, size, [part.x, part.y, 0])
+        .rotateShapeEdge(part.rotate, 0, part.size, [part.x, part.y, 0])
         .toString();
 
       const updatedTransition = transition
         .map((route: FlowRoute) => ({
           ...route,
           outCoords: new Coordinates(route.outCoords)
-            .flipShapeEdge(!!part.flipped, 0, size)
+            .flipShapeEdge(!!part.flipped, 0, part.size)
             .translate([part.x, part.y, 0])
-            .rotateShapeEdge(part.rotate, 0, size, [part.x, part.y, 0])
+            .rotateShapeEdge(part.rotate, 0, part.size, [part.x, part.y, 0])
             .toString(),
         }));
 
@@ -95,7 +87,7 @@ const translations = (part: PersistentPart): Transitions =>
       {},
     );
 
-export const asFlowParts = (parts: PersistentPart[]): FlowPart[] =>
+export const asFlowParts = (parts: StatePart[]): FlowPart[] =>
   parts.map(part => ({ ...part, transitions: translations(part), flows: {} }));
 
 const combineFlows =
@@ -333,5 +325,5 @@ const unbalancedFlow = (part: FlowPart): number =>
         .reduce((sum2: number, w: number) => sum2 + w, sum),
       0);
 
-export const calculateNormalizedFlows = (parts: PersistentPart[]): FlowPart[] =>
+export const calculateNormalizedFlows = (parts: StatePart[]): FlowPart[] =>
   calculateFlows(asFlowParts(parts)).map(normalizeFlows);

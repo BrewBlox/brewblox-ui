@@ -58,6 +58,14 @@ export default class MetricSelector extends Vue {
         </q-input>
       </q-item-section>
     </q-item>
+    <q-item dark dense>
+      <q-item-section>
+        <small>
+          Only fields that have been updated the last 24 hours are shown.
+          <br />This includes renamed or deleted blocks.
+        </small>
+      </q-item-section>
+    </q-item>
     <q-item dark>
       <q-item-section class="col-auto">
         <q-btn flat label="Expand" icon="mdi-expand-all" @click="tree.expandAll()" />
