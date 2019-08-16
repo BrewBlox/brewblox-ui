@@ -14,7 +14,9 @@ interface ChangeDiff {
   id: string;
   diff: {
     key: string;
-    val: string;
+    oldV: string;
+    newV: string;
+    changed: boolean;
   }[];
 }
 
@@ -134,10 +136,14 @@ export default class StepViewWidget extends WidgetBase {
     return Object.entries(change.data)
       .map(([key, val]) => {
         const specChange: any = spec.changes.find(s => s.key === key) || {};
-        const pretty = specChange.pretty || (v => v);
+        const pretty = specChange.pretty || (v => `${v}`);
+        const oldV = pretty(block.data[key]);
+        const newV = pretty(val);
         return {
           key: specChange.title || key,
-          val: `${pretty(block.data[key])} => ${pretty(val)}`,
+          oldV,
+          newV,
+          changed: oldV !== newV,
         };
       });
   }
@@ -174,10 +180,15 @@ export default class StepViewWidget extends WidgetBase {
                 <q-item-section class="col-3">{{ cdiff.id }}</q-item-section>
                 <q-item-section>
                   <ul>
-                    <li
-                      v-for="item in cdiff.diff"
-                      :key="`diff-item-${item.key}`"
-                    >{{ item.key }}: {{ item.val }}</li>
+                    <li v-for="item in cdiff.diff" :key="`diff-item-${item.key}`">
+                      {{ item.key }}:
+                      <template v-if="item.changed">
+                        <span style="color: red">{{ item.oldV }}</span>
+                        =>
+                        <span style="color: lime">{{ item.newV }}</span>
+                      </template>
+                      <template v-else>{{ item.newV }}</template>
+                    </li>
                   </ul>
                 </q-item-section>
               </q-item>
