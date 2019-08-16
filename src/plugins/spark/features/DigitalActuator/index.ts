@@ -52,6 +52,7 @@ const block: BlockSpec = {
       title: 'State',
       component: 'StateValEdit',
       generate: () => 0,
+      pretty: v => DigitalState[v],
     },
     {
       key: 'invert',
