@@ -6,6 +6,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { spaceCased } from '@/helpers/functional';
 
 import { SQUARE_SIZE } from './getters';
+import { asStatePart } from './helpers';
 import { parts } from './register';
 import specs from './specs';
 import { PersistentPart } from './types';
@@ -33,7 +34,8 @@ export default class BuilderCatalog extends Vue {
         rotate: 0,
         settings: {},
         flipped: false,
-      }));
+      }))
+      .map(asStatePart);
   }
 
   partViewBox(part: PersistentPart): string {
