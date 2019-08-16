@@ -51,7 +51,7 @@ export default class PartBase extends Vue {
   }
 
   public get size(): [number, number] {
-    return this.spec.size(this.part);
+    return this.part.size;
   }
 
   public get sizeX(): number {

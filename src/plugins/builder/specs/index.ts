@@ -23,6 +23,7 @@ import PwmDisplay from './PwmDisplay';
 import PwmPump from './PwmPump';
 import SensorDisplay from './SensorDisplay';
 import SetpointDisplay from './SetpointDisplay';
+import ShiftedSystemIO from './ShiftedSystemIO';
 import StraightInletTube from './StraightInletTube';
 import StraightTube from './StraightTube';
 import SystemIO from './SystemIO';
@@ -55,6 +56,7 @@ const specs: { [key: string]: ComponentSpec } = {
   PwmPump,
   SensorDisplay,
   SetpointDisplay,
+  ShiftedSystemIO,
   StraightInletTube,
   StraightTube,
   SystemIO,
