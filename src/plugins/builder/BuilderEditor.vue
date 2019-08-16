@@ -401,8 +401,8 @@ export default class BuilderEditor extends DialogBase {
   findClickSquare(evt: ClickEvent) {
     const grid = this.gridRect();
     return (evt instanceof MouseEvent)
-      ? this.findGridSquare(grid, evt.pageX, evt.pageY)
-      : this.findGridSquare(grid, evt.touches[0].pageX, evt.touches[0].pageY);
+      ? this.findGridSquare(grid, evt.clientX, evt.clientY)
+      : this.findGridSquare(grid, evt.touches[0].clientX, evt.touches[0].clientY);
   }
 
   unflippedArea(area: SelectArea): SelectArea {
