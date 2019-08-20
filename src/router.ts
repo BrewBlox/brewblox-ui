@@ -17,11 +17,6 @@ const router = new VueRouter({
         { path: '/service/:id/display', component: () => import('@/pages/RemoteDisplay.vue') },
       ],
     },
-
-    { // Always leave this as last one
-      path: '*',
-      component: () => import('@/pages/404.vue'),
-    },
   ],
   mode: 'history',
   base: '',
