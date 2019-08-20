@@ -45,6 +45,10 @@ export default class BuilderWidget extends WidgetBase {
       .filter(v => !!v);
   }
 
+  get wrongBrowser() {
+    return /(Edge|MSIE)/.test(window.navigator.userAgent);
+  }
+
   get editorActive(): boolean {
     return builderStore.editorActive;
   }
@@ -177,7 +181,15 @@ export default class BuilderWidget extends WidgetBase {
   <q-card dark class="text-white column">
     <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
-        <q-btn unelevated color="primary" label="Editor" @click="startEditor" />
+        <q-btn
+          :disable="wrongBrowser"
+          unelevated
+          color="primary"
+          label="Editor"
+          @click="startEditor"
+        >
+          <q-tooltip v-if="wrongBrowser">The Builder Editor is not supported by IE/Edge browsers.</q-tooltip>
+        </q-btn>
       </q-item-section>
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="showForm">
