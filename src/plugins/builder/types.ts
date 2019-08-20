@@ -52,7 +52,9 @@ export interface CardSpec {
   props?: Record<string, any>;
 }
 
-export interface ComponentSpec {
+export interface PartSpec {
+  id: string;
+  component?: string; // ID is used by default
   cards: CardSpec[];
   transitions: (part: PersistentPart) => Transitions;
   size: (part: PersistentPart) => [number, number];

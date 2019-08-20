@@ -5,7 +5,6 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 
 import { SQUARE_SIZE } from '../getters';
-import specs from '../specs';
 import { FlowPart } from '../types';
 
 
@@ -22,17 +21,9 @@ export default class PartWrapper extends Vue {
   @Prop({ type: Boolean, default: false })
   public readonly selected!: boolean;
 
-  get partSpecs() {
-    return specs[this.part.type];
-  }
-
-  get partSize() {
-    return this.partSpecs.size(this.part);
-  }
-
   get rotateTransform() {
-    const [partSizeX, partSizeY] = this.partSize;
-    const [renderSizeX, renderSizeY] = rotatedSize(this.part.rotate, this.partSize);
+    const [partSizeX, partSizeY] = this.part.size;
+    const [renderSizeX, renderSizeY] = rotatedSize(this.part.rotate, this.part.size);
 
     const farEdge = new Coordinates([partSizeX, partSizeY, 0])
       .rotate(this.part.rotate, [0, 0, 0]);
@@ -47,7 +38,7 @@ export default class PartWrapper extends Vue {
     if (!this.part.flipped) {
       return '';
     }
-    const sizeX = this.partSize[0];
+    const sizeX = this.part.size[0];
     return `translate(${sizeX * SQUARE_SIZE}, 0) scale(-1, 1)`;
   }
 
@@ -72,8 +63,8 @@ export default class PartWrapper extends Vue {
     />
     <!-- background element, to make the full part clickable -->
     <rect
-      :width="squares(partSize[0])"
-      :height="squares(partSize[1])"
+      :width="squares(part.size[0])"
+      :height="squares(part.size[1])"
       :class="{showhover: showHover, selected}"
       opacity="0"
     />

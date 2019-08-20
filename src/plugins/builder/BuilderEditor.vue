@@ -15,7 +15,6 @@ import BuilderPartMenu from './BuilderPartMenu.vue';
 import CalcWorker from 'worker-loader!./calculator.worker';
 import { SQUARE_SIZE, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes } from './getters';
 import { asPersistentPart, asStatePart } from './helpers';
-import specs from './specs';
 import { builderStore } from './store';
 import { BuilderLayout, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
 
@@ -55,6 +54,7 @@ export default class BuilderEditor extends DialogBase {
   readonly grid!: any;
 
   worker: CalcWorker = new CalcWorker();
+  specs = builderStore.specs;
 
   layoutId: string | null = null;
   debouncedCalculate: Function = () => { };
@@ -128,7 +128,7 @@ export default class BuilderEditor extends DialogBase {
       value: 'interact',
       icon: 'mdi-cursor-default',
       shortcut: 'i',
-      cursor: part => !!part && !!specs[part.type].interactHandler,
+      cursor: part => !!part && !!this.specs[part.type].interactHandler,
       onClick: this.interactClickHandler,
     },
     {
@@ -183,7 +183,7 @@ export default class BuilderEditor extends DialogBase {
           ...part,
           type: deprecatedTypes[part.type] || part.type,
         };
-        const [sizeX, sizeY] = specs[actual.type].size(actual);
+        const [sizeX, sizeY] = this.specs[actual.type].size(actual);
         sizes[part.id] = sizeX * sizeY;
         return actual;
       })
@@ -351,11 +351,11 @@ export default class BuilderEditor extends DialogBase {
   }
 
   isClickable(part) {
-    return !!specs[part.type].interactHandler;
+    return !!this.specs[part.type].interactHandler;
   }
 
   interact(part: FlowPart) {
-    const handler = specs[part.type].interactHandler;
+    const handler = this.specs[part.type].interactHandler;
     handler && handler(part, this.updater);
   }
 
@@ -597,7 +597,7 @@ export default class BuilderEditor extends DialogBase {
 
   interactClickHandler(evt: ClickEvent, part: FlowPart) {
     if (part) {
-      const handler = specs[part.type].interactHandler;
+      const handler = this.specs[part.type].interactHandler;
       handler && handler(part, this.updater);
     }
   }

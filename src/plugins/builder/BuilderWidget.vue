@@ -8,14 +8,14 @@ import WidgetBase from '@/components/Widget/WidgetBase';
 import CalcWorker from 'worker-loader!./calculator.worker';
 import { SQUARE_SIZE, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes } from './getters';
 import { asPersistentPart, asStatePart } from './helpers';
-import specs from './specs';
 import { builderStore } from './store';
-import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart } from './types';
+import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart, StatePart } from './types';
 
 
 @Component
 export default class BuilderWidget extends WidgetBase {
   worker: CalcWorker = new CalcWorker();
+  specs = builderStore.specs;
   flowParts: FlowPart[] = [];
   debouncedCalculate: Function = () => { };
 
@@ -98,7 +98,7 @@ export default class BuilderWidget extends WidgetBase {
           ...part,
           type: deprecatedTypes[part.type] || part.type,
         };
-        const [sizeX, sizeY] = specs[actual.type].size(actual);
+        const [sizeX, sizeY] = this.specs[actual.type].size(actual);
         sizes[part.id] = sizeX * sizeY;
         return actual;
       })
@@ -113,11 +113,11 @@ export default class BuilderWidget extends WidgetBase {
   }
 
   isClickable(part) {
-    return !!specs[part.type].interactHandler;
+    return !!this.specs[part.type].interactHandler;
   }
 
   interact(part: FlowPart) {
-    const handler = specs[part.type].interactHandler;
+    const handler = this.specs[part.type].interactHandler;
     handler && handler(part, this.updater);
   }
 

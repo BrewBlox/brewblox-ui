@@ -1,8 +1,10 @@
-import { IN_OUT, LEFT, defaultSpec } from '../getters';
-import { ComponentSpec } from '../types';
+import { IN_OUT, LEFT } from '../getters';
+import { PartSpec } from '../types';
 
-const spec: ComponentSpec = {
-  ...defaultSpec,
+const spec: PartSpec = {
+  id: 'StraightInletTube',
+  cards: [],
+  size: () => [1, 1],
   transitions: () => ({
     [LEFT]: [{ outCoords: IN_OUT }],
     [IN_OUT]: [{ outCoords: LEFT }],

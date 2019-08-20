@@ -4,7 +4,7 @@ import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-dec
 import { objReducer } from '@/helpers/functional';
 import store from '@/store';
 
-import { BuilderLayout } from '../types';
+import { BuilderLayout, PartSpec } from '../types';
 import {
   createLayout as createLayoutInApi,
   deleteLayout as removeLayoutInApi,
@@ -17,6 +17,7 @@ const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'builder' })
 export class BuilderModule extends VuexModule {
+  public specs: Record<string, PartSpec> = {};
   public editorActive: boolean = false;
   public editorTool: string = '';
   public layouts: Record<string, BuilderLayout> = {};
@@ -31,6 +32,30 @@ export class BuilderModule extends VuexModule {
 
   public get layoutById(): (id: string) => BuilderLayout {
     return id => this.layouts[id] || null;
+  }
+
+  public get specIds(): string[] {
+    return Object.keys(this.specs);
+  }
+
+  public get specValues(): PartSpec[] {
+    return Object.values(this.specs);
+  }
+
+  public get specById(): (id: string) => PartSpec {
+    return id => this.specs[id] || null;
+  }
+
+  public get componentById(): (id: string) => string {
+    return id => {
+      const spec = this.specs[id] || { id: null };
+      return spec.component || spec.id;
+    };
+  }
+
+  @Mutation
+  public registerPart(spec: PartSpec) {
+    Vue.set(this.specs, spec.id, { ...spec });
   }
 
   @Mutation

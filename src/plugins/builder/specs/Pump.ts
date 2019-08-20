@@ -3,12 +3,13 @@ import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/t
 import { sparkStore } from '@/plugins/spark/store';
 import { DigitalState } from '@/plugins/spark/types';
 
-import { ACCELERATE_OTHERS, DEFAULT_PUMP_PRESSURE, LEFT, RIGHT, defaultSpec } from '../getters';
+import { ACCELERATE_OTHERS, DEFAULT_PUMP_PRESSURE, LEFT, RIGHT } from '../getters';
 import { settingsBlock } from '../helpers';
-import { ComponentSpec, PartUpdater, PersistentPart } from '../types';
+import { PartSpec, PartUpdater, PersistentPart } from '../types';
 
-const spec: ComponentSpec = {
-  ...defaultSpec,
+const spec: PartSpec = {
+  id: 'Pump',
+  size: () => [1, 1],
   cards: [{
     component: 'LinkedBlockCard',
     props: { settingsKey: 'actuator', types: [typeName], label: 'Actuator' },

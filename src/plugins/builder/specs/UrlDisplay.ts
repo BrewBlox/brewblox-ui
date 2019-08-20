@@ -1,14 +1,13 @@
 import { isAbsoluteUrl } from '@/helpers/functional';
 import router from '@/router';
 
-import { defaultSpec } from '../getters';
-import { ComponentSpec, PersistentPart } from '../types';
+import { PartSpec, PersistentPart } from '../types';
 
 const DEFAULT_SIZE_X = 4;
 const DEFAULT_SIZE_Y = 1;
 
-const spec: ComponentSpec = {
-  ...defaultSpec,
+const spec: PartSpec = {
+  id: 'UrlDisplay',
   cards: [
     {
       component: 'TextCard',
