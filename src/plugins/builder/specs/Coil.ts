@@ -1,5 +1,4 @@
-import { defaultSpec } from '../getters';
-import { ComponentSpec } from '../types';
+import { PartSpec } from '../types';
 
 export const COIL_TOP = '0,0.5,0';
 export const COIL_BOTTOM = '0,1.5,0';
@@ -7,8 +6,9 @@ export const COIL_BOTTOM = '0,1.5,0';
 const SIZE_X = 3;
 const SIZE_Y = 2;
 
-const spec: ComponentSpec = {
-  ...defaultSpec,
+const spec: PartSpec = {
+  id: 'Coil',
+  cards: [],
   size: () => [SIZE_X, SIZE_Y],
   transitions: () => ({
     [COIL_TOP]: [{ outCoords: COIL_BOTTOM, friction: 20 }],

@@ -8,8 +8,17 @@ import {
   flowPath,
 } from '@/plugins/builder/calculateFlows';
 import { COLD_WATER, HOT_WATER, IN_OUT } from '@/plugins/builder/getters';
-import { asStatePart } from '@/plugins/builder/helpers';
-import { PersistentPart } from '@/plugins/builder/types';
+import specs from '@/plugins/builder/specs';
+import { PersistentPart, StatePart } from '@/plugins/builder/types';
+
+function asStatePart(part: PersistentPart): StatePart {
+  const spec = specs[part.type];
+  return {
+    ...part,
+    transitions: spec.transitions(part),
+    size: spec.size(part),
+  };
+}
 
 const propertyWalker = (acc: any[], next: FlowSegment, prop: string[]): any[] => {
   acc = [...acc, get(next, prop)];

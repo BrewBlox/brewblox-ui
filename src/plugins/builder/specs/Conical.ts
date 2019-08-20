@@ -1,15 +1,15 @@
 import { showBlockDialog } from '@/helpers/dialog';
 import { typeName as setpointType } from '@/plugins/spark/features/SetpointSensorPair/getters';
 
-import { defaultSpec } from '../getters';
 import { settingsBlock } from '../helpers';
-import { ComponentSpec, PersistentPart } from '../types';
+import { PartSpec, PersistentPart } from '../types';
 
 const SIZE_X = 3;
 const SIZE_Y = 9;
 
-const spec: ComponentSpec = {
-  ...defaultSpec,
+const spec: PartSpec = {
+  id: 'Conical',
+  transitions: () => ({}),
   cards: [
     {
       component: 'LinkedBlockCard',

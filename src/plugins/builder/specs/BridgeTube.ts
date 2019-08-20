@@ -1,8 +1,10 @@
-import { DOWN, LEFT, RIGHT, UP, defaultSpec } from '../getters';
-import { ComponentSpec } from '../types';
+import { DOWN, LEFT, RIGHT, UP } from '../getters';
+import { PartSpec } from '../types';
 
-const spec: ComponentSpec = {
-  ...defaultSpec,
+const spec: PartSpec = {
+  id: 'BridgeTube',
+  cards: [],
+  size: () => [1, 1],
   transitions: () => ({
     // bridge (high)
     [LEFT]: [{ outCoords: RIGHT }],

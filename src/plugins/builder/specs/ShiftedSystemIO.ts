@@ -1,11 +1,11 @@
-import { IN_OUT, UP, defaultSpec } from '../getters';
-import { ComponentSpec, PersistentPart } from '../types';
+import { IN_OUT, UP } from '../getters';
+import { PartSpec, PersistentPart } from '../types';
 
 const SIZE_X = 2;
 const SIZE_Y = 2;
 
-const spec: ComponentSpec = {
-  ...defaultSpec,
+const spec: PartSpec = {
+  id: 'ShiftedSystemIO',
   size: () => [SIZE_X, SIZE_Y],
   cards: [{ component: 'LiquidSourceCard' }],
   transitions: (part: PersistentPart) => ({

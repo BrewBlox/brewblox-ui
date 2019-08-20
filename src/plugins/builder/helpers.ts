@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
-import specs from './specs';
+import { builderStore } from './store';
 import { FlowPart, LinkedBlock, PersistentPart, StatePart } from './types';
 
 export function settingsBlock<T extends Block>(part: PersistentPart, key: string): T | null {
@@ -27,7 +27,7 @@ export function asPersistentPart(part: PersistentPart | FlowPart): PersistentPar
 }
 
 export function asStatePart(part: PersistentPart): StatePart {
-  const spec = specs[part.type];
+  const spec = builderStore.specById(part.type);
   return {
     ...part,
     transitions: spec.transitions(part),

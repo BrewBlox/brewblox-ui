@@ -1,4 +1,4 @@
-import { ComponentSpec } from './types';
+// import { PartSpec } from './types';
 
 export const typeName = 'Builder';
 export const defaultLayoutWidth = 20;
@@ -23,8 +23,8 @@ export const deprecatedTypes = {
   TallFridge: 'Fridge',
 };
 
-export const defaultSpec: ComponentSpec = {
-  cards: [],
-  size: () => [1, 1],
-  transitions: () => ({}),
-};
+// export const defaultSpec: PartSpec = {
+  // cards: [],
+  // size: () => [1, 1],
+  // transitions: () => ({}),
+// };

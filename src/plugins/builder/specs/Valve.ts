@@ -1,8 +1,10 @@
-import { LEFT, RIGHT, defaultSpec } from '../getters';
-import { ComponentSpec, PartUpdater, PersistentPart, Transitions } from '../types';
+import { LEFT, RIGHT } from '../getters';
+import { PartSpec, PartUpdater, PersistentPart, Transitions } from '../types';
 
-const spec: ComponentSpec = {
-  ...defaultSpec,
+const spec: PartSpec = {
+  id: 'Valve',
+  cards: [],
+  size: () => [1, 1],
   transitions: (part: PersistentPart): Transitions =>
     ((part.settings || {}).closed)
       ? {}

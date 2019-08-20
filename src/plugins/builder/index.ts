@@ -1,4 +1,4 @@
-import { ref } from '@/helpers/component-ref';
+import { autoRegister, ref } from '@/helpers/component-ref';
 import { Feature, featureStore } from '@/store/features';
 
 import BuilderEditor from './BuilderEditor.vue';
@@ -6,6 +6,7 @@ import form from './BuilderForm.vue';
 import widget from './BuilderWidget.vue';
 import wizard from './BuilderWizard.vue';
 import { typeName } from './getters';
+import specs from './specs';
 import { builderStore } from './store';
 
 ref(BuilderEditor);
@@ -33,6 +34,12 @@ const deprecated: Feature = {
 export default {
   install() {
     builderStore.setup();
+
+    autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
+    autoRegister(require.context('./parts', true, /[A-Z]\w+\.vue$/));
+
+    Object.values(specs)
+      .forEach(builderStore.registerPart);
 
     featureStore.createFeature(feature);
     featureStore.createFeature(deprecated);

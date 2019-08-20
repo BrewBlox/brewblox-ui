@@ -1,8 +1,10 @@
-import { LEFT, RIGHT, UP, defaultSpec } from '../getters';
-import { ComponentSpec } from '../types';
+import { LEFT, RIGHT, UP } from '../getters';
+import { PartSpec } from '../types';
 
-const spec: ComponentSpec = {
-  ...defaultSpec,
+const spec: PartSpec = {
+  id: 'TeeTube',
+  cards: [],
+  size: () => [1, 1],
   transitions: () => ({
     [UP]: [{ outCoords: RIGHT }, { outCoords: LEFT }],
     [RIGHT]: [{ outCoords: UP }, { outCoords: LEFT }],

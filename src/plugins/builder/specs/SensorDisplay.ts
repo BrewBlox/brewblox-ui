@@ -1,11 +1,11 @@
-import { DOWN, LEFT, RIGHT, UP, defaultSpec } from '../getters';
-import { ComponentSpec } from '../types';
+import { DOWN, LEFT, RIGHT, UP } from '../getters';
+import { PartSpec } from '../types';
 
 const SIZE_X = 1;
 const SIZE_Y = 1;
 
-const spec: ComponentSpec = {
-  ...defaultSpec,
+const spec: PartSpec = {
+  id: 'SensorDisplay',
   cards: [{
     component: 'LinkedBlockCard',
     props: { settingsKey: 'sensor', types: ['TempSensorInterface'], label: 'Sensor' },

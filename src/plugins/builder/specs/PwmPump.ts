@@ -4,12 +4,13 @@ import { typeName } from '@/plugins/spark/features/ActuatorPwm/getters';
 import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
 import { sparkStore } from '@/plugins/spark/store';
 
-import { ACCELERATE_OTHERS, DEFAULT_PUMP_PRESSURE, LEFT, RIGHT, defaultSpec } from '../getters';
+import { ACCELERATE_OTHERS, DEFAULT_PUMP_PRESSURE, LEFT, RIGHT } from '../getters';
 import { settingsBlock } from '../helpers';
-import { ComponentSpec, PersistentPart } from '../types';
+import { PartSpec, PersistentPart } from '../types';
 
-const spec: ComponentSpec = {
-  ...defaultSpec,
+const spec: PartSpec = {
+  id: 'PwmPump',
+  size: () => [1, 1],
   cards: [{
     component: 'LinkedBlockCard',
     props: { settingsKey: 'pwm', types: [typeName], label: 'PWM' },

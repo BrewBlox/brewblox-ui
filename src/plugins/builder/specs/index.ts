@@ -1,4 +1,4 @@
-import { ComponentSpec } from '../types';
+import { PartSpec } from '../types';
 import ActuatorValve from './ActuatorValve';
 import BeerBottle from './BeerBottle';
 import BridgeTube from './BridgeTube';
@@ -32,7 +32,7 @@ import UrlDisplay from './UrlDisplay';
 import Valve from './Valve';
 import WhirlpoolInlet from './WhirlpoolInlet';
 
-const specs: { [key: string]: ComponentSpec } = {
+const specs: { [key: string]: PartSpec } = {
   ActuatorValve,
   BeerBottle,
   BridgeTube,
