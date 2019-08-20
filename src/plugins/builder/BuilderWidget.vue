@@ -38,6 +38,10 @@ export default class BuilderWidget extends WidgetBase {
     });
   }
 
+  get allLayouts(): BuilderLayout[] {
+    return builderStore.layoutValues;
+  }
+
   get activeLayouts(): BuilderLayout[] {
     return this.widgetConfig
       .layoutIds
@@ -229,6 +233,16 @@ export default class BuilderWidget extends WidgetBase {
     </q-item>
 
     <div class="col">
+      <span v-if="parts.length === 0" class="absolute-center column">
+        <q-btn
+          v-if="activeLayouts.length === 0"
+          outline
+          label="Choose layouts"
+          class="q-mb-md"
+          @click="showForm"
+        />
+        <q-btn v-if="!wrongBrowser" outline label="Edit Layout" @click="startEditor" />
+      </span>
       <svg ref="grid" class="grid-base">
         <g
           v-for="part in flowParts"
