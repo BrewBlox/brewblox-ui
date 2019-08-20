@@ -89,17 +89,16 @@ export default class BuilderForm extends CrudComponent {
       </q-item>
     </q-card-section>
 
-    <q-card-section>
-      <q-item dark>
-        <q-item-section class="darkened">
-          This widget can display one or multiple layouts.
-          Drag to select them or change the display order.
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-    <q-card-section class="row">
+    <q-card-section
+      v-if="layouts.length === 0"
+      class="text-italic q-ml-md"
+    >There are no layouts. Use the Editor to create a new layout.</q-card-section>
+    <q-card-section v-else class="row">
       <div class="col column">
         <span class="text-italic text-h6 q-ml-md">In this Widget</span>
+        <small
+          class="text-italic q-ml-md"
+        >These are the displayed layouts. Drag to add, remove, or change the display order.</small>
         <draggable v-model="activeLayouts" class="col" group="layout-selector">
           <q-item v-for="lay in activeLayouts" :key="lay.id" dark dense>
             <q-item-section
@@ -110,6 +109,9 @@ export default class BuilderForm extends CrudComponent {
       </div>
       <div class="col column">
         <span class="text-italic text-h6 q-ml-md">Available</span>
+        <small
+          class="text-italic q-ml-md"
+        >These are all available layouts. They can be displayed by any Builder Widget.</small>
         <draggable :list="inactiveLayouts" class="col" group="layout-selector">
           <q-item v-for="lay in inactiveLayouts" :key="lay.id" dark dense>
             <q-item-section class="grabbable">{{ lay.title }}</q-item-section>
