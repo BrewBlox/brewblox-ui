@@ -15,6 +15,8 @@ import { QueryParams } from '@/store/history';
 export default class BlockGraph extends Vue {
   durationString = durationString;
 
+  configString: string = '';
+
   @Ref()
   readonly graph!: HistoryGraph;
 
@@ -68,6 +70,10 @@ export default class BlockGraph extends Vue {
     return this.graphCfg.axes[key] === 'y2';
   }
 
+  axisLabel(key: string) {
+    return this.isRightAxis(key) ? 'Y2' : 'Y1';
+  }
+
   updateKeySide(key: string, isRight: boolean) {
     this.change({
       ...this.graphCfg,
@@ -93,18 +99,24 @@ export default class BlockGraph extends Vue {
       value: this.graphCfg.params.duration,
     })
       .onOk(val => {
-        this.$set(this.graphCfg.params, 'duration', durationString(val));
+        this.graphCfg.params.duration = durationString(val);
+        // this.$set(this.graphCfg.params, 'duration', durationString(val));
         this.change(this.graphCfg);
       });
   }
 
   @Watch('graphCfg')
-  onCfgChange(newVal, oldVal) {
+  onCfgChange(newVal) {
     // Vue considers configuration "changed" with every block data update
     // To avoid constantly refreshing listeners, we need to do a deep compare
-    if (!oldVal || JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
+    if (JSON.stringify(newVal) !== this.configString) {
+      this.configString = JSON.stringify(newVal);
       this.$nextTick(() => this.graph && this.graph.resetListeners());
     }
+  }
+
+  created() {
+    this.configString = JSON.stringify(this.graphCfg);
   }
 }
 </script>
@@ -132,7 +144,7 @@ export default class BlockGraph extends Vue {
               <q-item-section>Duration</q-item-section>
               <q-item-section class="col-auto">{{ durationString(graphCfg.params.duration) }}</q-item-section>
             </q-item>
-            <q-expansion-item label="Left or right axis">
+            <q-expansion-item label="Display Axis">
               <q-item
                 v-for="[key, renamed] in targetKeys"
                 :key="key"
@@ -142,9 +154,7 @@ export default class BlockGraph extends Vue {
                 @click="updateKeySide(key, !isRightAxis(key))"
               >
                 <q-item-section>{{ renamed }}</q-item-section>
-                <q-item-section side>
-                  <q-icon :class="{mirrored: isRightAxis(key)}" name="mdi-chart-line" />
-                </q-item-section>
+                <q-item-section side>{{ axisLabel(key) }}</q-item-section>
               </q-item>
             </q-expansion-item>
           </q-btn-dropdown>
