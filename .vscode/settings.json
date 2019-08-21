@@ -23,7 +23,21 @@
     }
   ],
   "editor.formatOnSave": true,
+  "jest.debugMode": true,
+  "jest.pathToJest": "node_modules/@vue/cli-service/bin/vue-cli-service.js test:unit",
+  "jest.pathToConfig": "jest.config.js",
+  "jestTestExplorer.pathToJest": "node_modules/@vue/cli-service/bin/vue-cli-service.js test:unit",
+  "jestTestExplorer.pathToJestConfig": "jest.config.js",
   "[typescript]": {
     "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }
