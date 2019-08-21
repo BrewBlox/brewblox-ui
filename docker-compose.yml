@@ -5,12 +5,12 @@ services:
     image: rabbitmq:alpine
 
   influx:
-    image: influxdb
+    image: influxdb:1.7
     volumes:
       - ./dev/influxdb/:/var/lib/influxdb/
 
   datastore:
-    image: treehouses/couchdb
+    image: treehouses/couchdb:2.3.1
     labels:
       - "traefik.port=5984"
       - "traefik.frontend.rule=PathPrefixStrip: /datastore"
@@ -81,7 +81,7 @@ services:
       - "traefik.frontend.rule=PathPrefix: /"
 
   traefik:
-    image: traefik
+    image: traefik:v1.7
     ports:
       - "9000:9000"
       - "9001:9001"
