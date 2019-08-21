@@ -204,7 +204,7 @@ export default class BuilderWidget extends WidgetBase {
         </q-btn-dropdown>
       </q-item-section>
     </WidgetToolbar>
-    <q-item dark>
+    <q-item v-if="activeLayouts.length > 1" dark>
       <q-item-section class="col-auto">
         <q-btn :disable="currentIdx <= 0" icon="mdi-chevron-left" flat @click="currentIdx--" />
       </q-item-section>
