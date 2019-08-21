@@ -100,7 +100,6 @@ export default class BlockGraph extends Vue {
     })
       .onOk(val => {
         this.graphCfg.params.duration = durationString(val);
-        // this.$set(this.graphCfg.params, 'duration', durationString(val));
         this.change(this.graphCfg);
       });
   }
