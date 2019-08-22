@@ -8,7 +8,6 @@ import get from 'lodash/get';
 import has from 'lodash/has';
 import mapKeys from 'lodash/mapKeys';
 import mapValues from 'lodash/mapValues';
-import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
 import set from 'lodash/set';
 
@@ -173,7 +172,8 @@ export const flowPath = (
   const outFlows: FlowRoute[] = get(start, ['transitions', inCoord], []);
   const path = new FlowSegment(start, {});
 
-  let candidateParts: FlowPart[] = cloneDeep(parts);
+  let candidateParts: FlowPart[] = parts.map(part =>
+    ({ ...part, transitions: { ...part.transitions } }));
 
   candidateParts.forEach((p: FlowPart) => {
     delete p.transitions[inCoord];
@@ -284,7 +284,7 @@ export const addFlowForSegment = (
 
 const addFlowFromPart = (parts, part): FlowPart[] => {
   for (let inCoords in part.transitions) {
-    const outFlows = part.transitions[inCoords];
+    const outFlows = part.transitions[inCoords] || [];
     for (let outFlow of outFlows) {
       const pressure: number = outFlow.pressure || 0;
       const liquids: string[] | undefined = outFlow.liquids;
