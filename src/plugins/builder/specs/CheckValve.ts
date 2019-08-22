@@ -1,8 +1,10 @@
-import { LEFT, RIGHT, defaultSpec } from '../getters';
-import { ComponentSpec, Transitions } from '../types';
+import { LEFT, RIGHT } from '../getters';
+import { PartSpec, Transitions } from '../types';
 
-const spec: ComponentSpec = {
-  ...defaultSpec,
+const spec: PartSpec = {
+  id: 'CheckValve',
+  cards: [],
+  size: () => [1, 1],
   transitions: (): Transitions => ({
     [LEFT]: [{ outCoords: RIGHT }],
   }),

@@ -24,7 +24,7 @@ const router = new VueRouter({
     },
   ],
   mode: 'history',
-  base: '',
+  base: '/ui/',
 });
 
 export default router;

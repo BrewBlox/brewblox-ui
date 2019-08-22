@@ -4,8 +4,7 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 
 import { SQUARE_SIZE } from '../getters';
-import specs from '../specs';
-import { CalculatedFlows, ComponentSpec, FlowPart } from '../types';
+import { CalculatedFlows, FlowPart } from '../types';
 
 @Component
 export default class PartBase extends Vue {
@@ -46,12 +45,8 @@ export default class PartBase extends Vue {
     return this.part.settings || {};
   }
 
-  public get spec(): ComponentSpec {
-    return specs[this.part.type];
-  }
-
   public get size(): [number, number] {
-    return this.spec.size(this.part);
+    return this.part.size;
   }
 
   public get sizeX(): number {
@@ -70,10 +65,10 @@ export default class PartBase extends Vue {
     const [sizeX] = rotatedSize(this.part.rotate, textSize);
     const transforms: string[] = [];
     if (this.flipped) {
-      transforms.push(`translate(${sizeX * SQUARE_SIZE}, 0) scale(-1,1)`);
+      transforms.push(`translate(${this.squares(sizeX)}, 0) scale(-1,1)`);
     }
     if (this.part.rotate && counterRotate) {
-      transforms.push(`rotate(${-this.part.rotate},${SQUARE_SIZE / 2},${SQUARE_SIZE / 2})`);
+      transforms.push(`rotate(${-this.part.rotate},${this.squares(0.5)},${this.squares(0.5)})`);
     }
     return transforms.join(' ');
   }

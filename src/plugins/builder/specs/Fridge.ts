@@ -1,11 +1,10 @@
-import { defaultSpec } from '../getters';
-import { ComponentSpec, PersistentPart } from '../types';
+import { PartSpec, PersistentPart } from '../types';
 
 const DEFAULT_SIZE_X = 4;
 const DEFAULT_SIZE_Y = 12;
 
-const spec: ComponentSpec = {
-  ...defaultSpec,
+const spec: PartSpec = {
+  id: 'Fridge',
   cards: [
     { component: 'TextCard' },
     {

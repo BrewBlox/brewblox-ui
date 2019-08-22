@@ -21,8 +21,8 @@ export const getErrors =
   };
 
 const fetch =
-  async (info: RequestInfo, init?: RequestInit): Promise<Response> =>
-    window.fetch(info, init)
+  async (info: RequestInfo, init: RequestInit = {}): Promise<Response> =>
+    window.fetch(info, { cache: 'no-store', ...init })
       .catch(e => {
         fetchErrors.push({ info, init, time: new Date().toString(), body: e.message, status: -1 });
         throw e;

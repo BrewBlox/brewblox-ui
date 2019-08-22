@@ -1,5 +1,4 @@
-import { defaultSpec } from '../getters';
-import { ComponentSpec } from '../types';
+import { PartSpec } from '../types';
 
 export const CFC_TOP_LEFT = '0,0.5,0';
 export const CFC_TOP_RIGHT = '3,0.5,0';
@@ -9,8 +8,9 @@ export const CFC_BOTTOM_RIGHT = '3,1.5,0';
 const SIZE_X = 3;
 const SIZE_Y = 2;
 
-const spec: ComponentSpec = {
-  ...defaultSpec,
+const spec: PartSpec = {
+  id: 'CounterflowChiller',
+  cards: [],
   size: () => [SIZE_X, SIZE_Y],
   transitions: () => ({
     [CFC_TOP_LEFT]: [{ outCoords: CFC_TOP_RIGHT }],

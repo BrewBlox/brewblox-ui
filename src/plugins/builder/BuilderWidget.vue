@@ -8,14 +8,14 @@ import WidgetBase from '@/components/Widget/WidgetBase';
 import CalcWorker from 'worker-loader!./calculator.worker';
 import { SQUARE_SIZE, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes } from './getters';
 import { asPersistentPart, asStatePart } from './helpers';
-import specs from './specs';
 import { builderStore } from './store';
-import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart } from './types';
+import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart, StatePart } from './types';
 
 
 @Component
 export default class BuilderWidget extends WidgetBase {
   worker: CalcWorker = new CalcWorker();
+  specs = builderStore.specs;
   flowParts: FlowPart[] = [];
   debouncedCalculate: Function = () => { };
 
@@ -38,11 +38,19 @@ export default class BuilderWidget extends WidgetBase {
     });
   }
 
+  get allLayouts(): BuilderLayout[] {
+    return builderStore.layoutValues;
+  }
+
   get activeLayouts(): BuilderLayout[] {
     return this.widgetConfig
       .layoutIds
       .map(builderStore.layoutById)
       .filter(v => !!v);
+  }
+
+  get wrongBrowser() {
+    return /(Edge|MSIE)/.test(window.navigator.userAgent);
   }
 
   get editorActive(): boolean {
@@ -90,7 +98,7 @@ export default class BuilderWidget extends WidgetBase {
           ...part,
           type: deprecatedTypes[part.type] || part.type,
         };
-        const [sizeX, sizeY] = specs[actual.type].size(actual);
+        const [sizeX, sizeY] = this.specs[actual.type].size(actual);
         sizes[part.id] = sizeX * sizeY;
         return actual;
       })
@@ -105,11 +113,11 @@ export default class BuilderWidget extends WidgetBase {
   }
 
   isClickable(part) {
-    return !!specs[part.type].interactHandler;
+    return !!this.specs[part.type].interactHandler;
   }
 
   interact(part: FlowPart) {
-    const handler = specs[part.type].interactHandler;
+    const handler = this.specs[part.type].interactHandler;
     handler && handler(part, this.updater);
   }
 
@@ -177,7 +185,15 @@ export default class BuilderWidget extends WidgetBase {
   <q-card dark class="text-white column">
     <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
-        <q-btn unelevated color="primary" label="Editor" @click="startEditor" />
+        <q-btn
+          :disable="wrongBrowser"
+          unelevated
+          color="primary"
+          label="Editor"
+          @click="startEditor"
+        >
+          <q-tooltip v-if="wrongBrowser">The Builder Editor is not supported by IE/Edge browsers.</q-tooltip>
+        </q-btn>
       </q-item-section>
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="showForm">
@@ -188,7 +204,7 @@ export default class BuilderWidget extends WidgetBase {
         </q-btn-dropdown>
       </q-item-section>
     </WidgetToolbar>
-    <q-item dark>
+    <q-item v-if="activeLayouts.length > 1" dark>
       <q-item-section class="col-auto">
         <q-btn :disable="currentIdx <= 0" icon="mdi-chevron-left" flat @click="currentIdx--" />
       </q-item-section>
@@ -217,6 +233,16 @@ export default class BuilderWidget extends WidgetBase {
     </q-item>
 
     <div class="col">
+      <span v-if="parts.length === 0" class="absolute-center column">
+        <q-btn
+          v-if="activeLayouts.length === 0"
+          outline
+          label="Choose layouts"
+          class="q-mb-md"
+          @click="showForm"
+        />
+        <q-btn v-if="!wrongBrowser" outline label="Edit Layout" @click="startEditor" />
+      </span>
       <svg ref="grid" class="grid-base">
         <g
           v-for="part in flowParts"

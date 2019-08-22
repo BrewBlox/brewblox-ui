@@ -6,9 +6,9 @@ import { Component, Prop } from 'vue-property-decorator';
 import { spaceCased } from '@/helpers/functional';
 
 import { SQUARE_SIZE } from './getters';
-import { parts } from './register';
-import specs from './specs';
-import { PersistentPart } from './types';
+import { asStatePart } from './helpers';
+import { builderStore } from './store';
+import { PersistentPart, StatePart } from './types';
 
 
 @Component
@@ -21,9 +21,9 @@ export default class BuilderCatalog extends Vue {
   @Prop({ type: Object, default: () => ({}) })
   readonly partial!: Partial<PersistentPart>;
 
-  get availableParts(): PersistentPart[] {
+  get availableParts(): StatePart[] {
     const filter = (this.partFilter || '').toLowerCase();
-    return parts
+    return builderStore.specIds
       .filter(type => `${type}|${spaceCased(type)}`.toLowerCase().match(filter))
       .map(type => ({
         type,
@@ -33,14 +33,15 @@ export default class BuilderCatalog extends Vue {
         rotate: 0,
         settings: {},
         flipped: false,
-      }));
+      }))
+      .map(asStatePart);
   }
 
-  partViewBox(part: PersistentPart): string {
-    return specs[part.type].size(part).map(v => v * SQUARE_SIZE).join(' ');
+  partViewBox(part: StatePart): string {
+    return part.size.map(v => v * SQUARE_SIZE).join(' ');
   }
 
-  selectPart(part: PersistentPart) {
+  selectPart(part: StatePart) {
     this.$emit('create', { ...part, ...this.partial });
     this.$nextTick(() => this.$emit('close'));
   }

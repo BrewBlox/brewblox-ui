@@ -1,15 +1,15 @@
 import { showBlockDialog } from '@/helpers/dialog';
 import { typeName as setpointType } from '@/plugins/spark/features/SetpointSensorPair/getters';
 
-import { defaultSpec } from '../getters';
 import { settingsBlock } from '../helpers';
-import { ComponentSpec, PersistentPart } from '../types';
+import { PartSpec, PersistentPart } from '../types';
 
 const SIZE_X = 2;
 const SIZE_Y = 5;
 
-const spec: ComponentSpec = {
-  ...defaultSpec,
+const spec: PartSpec = {
+  id: 'Keg',
+  transitions: () => ({}),
   cards: [
     { component: 'ColorCard' },
     {

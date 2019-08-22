@@ -18,11 +18,12 @@ autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
 const loadRemotePlugin = async (plugin: UIPlugin): Promise<PluginObject<any>> => {
   try {
     const obj = await externalComponent(plugin.url);
-    pluginStore.commitResult({ id: plugin.id, loaded: true, error: null });
+    pluginStore.commitResult({ id: plugin.id, loaded: false, error: null });
     return {
       install: (Vue, { store }) => {
         try {
           Vue.use(obj, { store });
+          pluginStore.commitResult({ id: plugin.id, loaded: true, error: null });
         } catch (e) {
           pluginStore.commitResult({ id: plugin.id, loaded: false, error: e.toString() });
         }
@@ -57,10 +58,18 @@ const setup = async () => {
 
   try {
     await pluginStore.setup();
+
     const remotePlugins = await pluginStore.fetchPlugins();
     const loaded = await Promise
       .all(remotePlugins.map(loadRemotePlugin));
-    plugins.push(...loaded);
+
+    // Append '?safe' to the URL to disable installing remote plugins
+    const url = new URL(window.location.href);
+    const arg = url.searchParams.get('safe');
+
+    if (arg === null) {
+      plugins.push(...loaded);
+    }
   } catch (e) { }
 
   plugins.forEach(plugin => Vue.use(plugin, { store }));

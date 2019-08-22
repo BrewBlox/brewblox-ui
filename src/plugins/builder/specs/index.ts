@@ -1,4 +1,4 @@
-import { ComponentSpec } from '../types';
+import { PartSpec } from '../types';
 import ActuatorValve from './ActuatorValve';
 import BeerBottle from './BeerBottle';
 import BridgeTube from './BridgeTube';
@@ -23,6 +23,7 @@ import PwmDisplay from './PwmDisplay';
 import PwmPump from './PwmPump';
 import SensorDisplay from './SensorDisplay';
 import SetpointDisplay from './SetpointDisplay';
+import ShiftedSystemIO from './ShiftedSystemIO';
 import StraightInletTube from './StraightInletTube';
 import StraightTube from './StraightTube';
 import SystemIO from './SystemIO';
@@ -31,7 +32,7 @@ import UrlDisplay from './UrlDisplay';
 import Valve from './Valve';
 import WhirlpoolInlet from './WhirlpoolInlet';
 
-const specs: { [key: string]: ComponentSpec } = {
+const specs: { [key: string]: PartSpec } = {
   ActuatorValve,
   BeerBottle,
   BridgeTube,
@@ -55,6 +56,7 @@ const specs: { [key: string]: ComponentSpec } = {
   PwmPump,
   SensorDisplay,
   SetpointDisplay,
+  ShiftedSystemIO,
   StraightInletTube,
   StraightTube,
   SystemIO,

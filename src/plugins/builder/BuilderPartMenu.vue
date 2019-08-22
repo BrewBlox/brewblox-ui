@@ -5,11 +5,12 @@ import { Component, Prop } from 'vue-property-decorator';
 import { clampRotation, spaceCased } from '@/helpers/functional';
 
 import { SQUARE_SIZE } from './getters';
-import specs from './specs';
+import { builderStore } from './store';
 import { FlowPart } from './types';
 
 @Component
 export default class BuilderPartMenu extends Vue {
+  specs = builderStore.specs;
 
   @Prop({ type: Object, required: true })
   readonly part!: FlowPart;
@@ -17,7 +18,7 @@ export default class BuilderPartMenu extends Vue {
   get cards() {
     return [
       'PlacementCard',
-      ...specs[this.part.type].cards,
+      ...this.specs[this.part.type].cards,
     ];
   }
 
@@ -25,19 +26,16 @@ export default class BuilderPartMenu extends Vue {
     return `${spaceCased(this.part.type)} ${this.part.x},${this.part.y}`;
   }
 
-  get partSize(): [number, number] {
-    return specs[this.part.type].size(this.part);
-  }
 
   get rotatedSize(): [number, number] {
-    const [x, y] = this.partSize;
+    const [x, y] = this.part.size;
     return clampRotation(this.part.rotate) % 180
       ? [y, x]
       : [x, y];
   }
 
   get displayScale() {
-    const maxSize = Math.max(...this.partSize);
+    const maxSize = Math.max(...this.part.size);
     if (maxSize >= 6) {
       return 0.5;
     }
