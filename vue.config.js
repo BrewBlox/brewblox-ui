@@ -15,6 +15,7 @@ module.exports = {
   //
   // Vue configuration
   //
+  publicPath: '/ui/',
   transpileDependencies: [/[\\\/]node_modules[\\\/]quasar[\\\/]/],
   pluginOptions: {
     webpackBundleAnalyzer: {
