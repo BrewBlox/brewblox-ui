@@ -172,12 +172,13 @@ export const flowPath = (
   const outFlows: FlowRoute[] = get(start, ['transitions', inCoord], []);
   const path = new FlowSegment(start, {});
 
-  let candidateParts: FlowPart[] = parts.map(part =>
-    ({ ...part, transitions: { ...part.transitions } }));
-
-  candidateParts.forEach((p: FlowPart) => {
-    delete p.transitions[inCoord];
-  });
+  let candidateParts: FlowPart[] = parts.reduce((acc: FlowPart[], part: FlowPart) => {
+    const { [inCoord]: _, ...filteredTransitions } = part.transitions; // make a copy of transitions excluding inCoord
+    if (Object.getOwnPropertyNames(filteredTransitions).length !== 0) { // exclude parts without transitions
+      acc.push({ ...part, transitions: filteredTransitions });
+    }
+    return acc;
+  }, []);
 
   for (let outFlow of outFlows) {
     while (true) {
