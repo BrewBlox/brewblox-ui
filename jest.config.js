@@ -11,7 +11,6 @@ module.exports = {
     '\\.(styl|css)$': '<rootDir>/tests/mocks/styleMock.js',
     '^tests/(.*)': '<rootDir>/tests/$1',
   },
-  transformIgnorePatterns: ['<rootDir>/node_modules/(?!(query-string)/)'],
   snapshotSerializers: ['jest-serializer-vue'],
   modulePathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/dev/'],
 };
