@@ -6,10 +6,10 @@ import { Component, Watch } from 'vue-property-decorator';
 import WidgetBase from '@/components/Widget/WidgetBase';
 
 import CalcWorker from 'worker-loader!./calculator.worker';
-import { SQUARE_SIZE, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes } from './getters';
+import { defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes, SQUARE_SIZE } from './getters';
 import { asPersistentPart, asStatePart } from './helpers';
 import { builderStore } from './store';
-import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart, StatePart } from './types';
+import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart } from './types';
 
 
 @Component
@@ -192,7 +192,9 @@ export default class BuilderWidget extends WidgetBase {
           label="Editor"
           @click="startEditor"
         >
-          <q-tooltip v-if="wrongBrowser">The Builder Editor is not supported by IE/Edge browsers.</q-tooltip>
+          <q-tooltip v-if="wrongBrowser">
+            The Builder Editor is not supported by IE/Edge browsers.
+          </q-tooltip>
         </q-btn>
       </q-item-section>
       <q-item-section side>
@@ -246,8 +248,8 @@ export default class BuilderWidget extends WidgetBase {
       <svg ref="grid" class="grid-base">
         <g
           v-for="part in flowParts"
-          :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
           :key="part.id"
+          :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
           :class="{ clickable: isClickable(part), [part.type]: true }"
           @click="interact(part)"
         >

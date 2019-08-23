@@ -56,7 +56,7 @@ export default class AnimatedArrows extends Vue {
 <template>
   <g v-if="speed">
     <g v-for="start in starts" :key="start" visibility="hidden">
-      <path :transform="transform" d="M-4,-4 L0,0 M-4,4 L0,0" class="outline"/>
+      <path :transform="transform" d="M-4,-4 L0,0 M-4,4 L0,0" class="outline" />
       <!-- Note: SVG attributes are case-sensitive -->
       <animateMotion
         :path="path"
@@ -69,7 +69,7 @@ export default class AnimatedArrows extends Vue {
         calcMode="linear"
         keyTimes="0;1"
       />
-      <set :begin="start" attributeName="visibility" from="hidden" to="visible"/>
+      <set :begin="start" attributeName="visibility" from="hidden" to="visible" />
     </g>
   </g>
 </template>

@@ -6,7 +6,7 @@ import { defaultLabel, targetBuilder, targetSplitter } from '@/components/Graph/
 import { GraphConfig } from '@/components/Graph/types';
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { durationString } from '@/helpers/functional';
-import { DisplayNames, GraphValueAxes, LineColors, historyStore } from '@/store/history';
+import { DisplayNames, GraphValueAxes, historyStore,LineColors } from '@/store/history';
 
 interface PeriodDisplay {
   start: boolean;
@@ -18,7 +18,7 @@ interface PeriodDisplay {
 export default class GraphForm extends CrudComponent {
   durationString = durationString;
 
-  tab: string = 'metrics';
+  tab = 'metrics';
   period: PeriodDisplay | null = null;
 
   @Prop({ type: Object, default: () => ({}) })
@@ -215,7 +215,9 @@ export default class GraphForm extends CrudComponent {
             </q-item>
             <q-item dark>
               <q-item-section v-if="shownPeriod.start" class="col-6">
-                <q-item-label caption>Start time</q-item-label>
+                <q-item-label caption>
+                  Start time
+                </q-item-label>
                 <DatetimeField
                   :value="config.params.start"
                   title="Start time"
@@ -223,7 +225,9 @@ export default class GraphForm extends CrudComponent {
                 />
               </q-item-section>
               <q-item-section v-if="shownPeriod.duration" class="col-6">
-                <q-item-label caption>Duration</q-item-label>
+                <q-item-label caption>
+                  Duration
+                </q-item-label>
                 <InputField
                   :value="config.params.duration"
                   title="Duration"
@@ -231,7 +235,9 @@ export default class GraphForm extends CrudComponent {
                 />
               </q-item-section>
               <q-item-section v-if="shownPeriod.end" class="col-6">
-                <q-item-label caption>End time</q-item-label>
+                <q-item-label caption>
+                  End time
+                </q-item-label>
                 <DatetimeField
                   :value="config.params.end"
                   title="End time"
@@ -241,10 +247,14 @@ export default class GraphForm extends CrudComponent {
             </q-item>
             <q-item dark>
               <q-item-section class="col-auto">
-                <q-item-label caption>Averaging period</q-item-label>
+                <q-item-label caption>
+                  Averaging period
+                </q-item-label>
                 <div class="row q-mt-sm q-ml-sm">
                   <div v-for="(rate, meas) in downsampling" :key="meas" class="q-mr-md">
-                    <q-item-label caption>{{ meas }}</q-item-label>
+                    <q-item-label caption>
+                      {{ meas }}
+                    </q-item-label>
                     {{ rate }}
                   </div>
                 </div>
@@ -268,13 +278,17 @@ export default class GraphForm extends CrudComponent {
             <q-separator dark inset />
 
             <q-item v-for="field in selected" :key="field" dark class="align-children">
-              <q-item-section class="col-5">{{ field }}</q-item-section>
+              <q-item-section class="col-5">
+                {{ field }}
+              </q-item-section>
               <q-space />
               <q-item-section class="col-6">
                 <q-list dark dense>
                   <q-item dark>
                     <q-item-section>
-                      <q-item-label caption>Y-axis</q-item-label>
+                      <q-item-label caption>
+                        Y-axis
+                      </q-item-label>
                     </q-item-section>
                     <q-item-section class="col-auto">
                       <q-btn-toggle
@@ -288,7 +302,9 @@ export default class GraphForm extends CrudComponent {
                   </q-item>
                   <q-item dark>
                     <q-item-section>
-                      <q-item-label caption>Line color</q-item-label>
+                      <q-item-label caption>
+                        Line color
+                      </q-item-label>
                     </q-item-section>
                     <q-item-section class="col-auto">
                       <ColorField
@@ -304,7 +320,9 @@ export default class GraphForm extends CrudComponent {
               </q-item-section>
             </q-item>
             <q-item v-if="!selected || selected.length === 0" dark>
-              <q-item-section side>No metrics selected</q-item-section>
+              <q-item-section side>
+                No metrics selected
+              </q-item-section>
             </q-item>
           </q-tab-panel>
         </q-tab-panels>

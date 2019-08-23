@@ -30,7 +30,7 @@ interface StepDisplay extends Step {
   },
 })
 export default class StepViewForm extends CrudComponent {
-  draggingStep: boolean = false;
+  draggingStep = false;
   editableChanges: Record<string, boolean> = {};
 
   @Prop({ type: String })
@@ -120,7 +120,7 @@ export default class StepViewForm extends CrudComponent {
   }
 
   addStep() {
-    let stepName = 'New Step';
+    const stepName = 'New Step';
     Dialog.create({
       title: 'Add a Step',
       dark: true,
@@ -143,7 +143,7 @@ export default class StepViewForm extends CrudComponent {
   }
 
   renameStep(step: StepDisplay) {
-    let stepName = step.name;
+    const stepName = step.name;
     Dialog.create({
       title: 'Change Step name',
       message: `Choose a new name for '${step.name}'`,
@@ -248,8 +248,8 @@ export default class StepViewForm extends CrudComponent {
           >
             <q-expansion-item
               v-for="step in steps"
-              :label="step.name"
               :key="step.id"
+              :label="step.name"
               :default-opened="openStep === step.id"
               :disable="draggingStep"
               group="steps"
@@ -269,7 +269,9 @@ export default class StepViewForm extends CrudComponent {
                       :class="{'text-h6': true, grabbable: true, 'text-red': !change.block}"
                     >
                       {{ change.blockId }}
-                      <q-tooltip v-if="!change.block">Block not found</q-tooltip>
+                      <q-tooltip v-if="!change.block">
+                        Block not found
+                      </q-tooltip>
                     </q-item-section>
                     <template v-if="editableChanges[change.key]">
                       <q-item-section side>

@@ -13,7 +13,7 @@ export default class Spark2PinsWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud"/>
-    <IoArray :crud="crud"/>
+    <BlockWidgetToolbar :crud="crud" />
+    <IoArray :crud="crud" />
   </q-card>
 </template>

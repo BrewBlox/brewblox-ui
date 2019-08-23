@@ -91,7 +91,7 @@ export const clampRotation =
   (val: number): number => (val + 360) % 360;
 
 export const dateString =
-  (value: number | string | Date | null, nullLabel: string = '<not set>'): string => {
+  (value: number | string | Date | null, nullLabel = '<not set>'): string => {
     if (value === null || value === undefined) {
       return nullLabel;
     }
@@ -99,7 +99,7 @@ export const dateString =
   };
 
 export const shortDateString =
-  (value: number | string | Date | null, nullLabel: string = '<not set>'): string => {
+  (value: number | string | Date | null, nullLabel = '<not set>'): string => {
     if (value === null || value === undefined) {
       return nullLabel;
     }
@@ -111,7 +111,7 @@ export const shortDateString =
   };
 
 export const round =
-  (value: any, digits: number = 2): string | number => {
+  (value: any, digits = 2): string | number => {
     if (value === null || value === undefined) {
       return '--.--';
     }
@@ -119,7 +119,7 @@ export const round =
   };
 
 export const roundNumber =
-  (value: number, digits: number = 2): number =>
+  (value: number, digits = 2): number =>
     Number((Math.round(Number(value + 'e' + digits)) + 'e-' + digits));
 
 export const truncate =
@@ -135,7 +135,7 @@ export function valOrDefault<T>(val: T, defaultVal: T): T {
 }
 
 export function chunked<T>(arr: T[], chunkSize: number): T[][] {
-  let chunks: T[][] = [];
+  const chunks: T[][] = [];
   let i = 0;
   const n = arr.length;
   while (i < n) {

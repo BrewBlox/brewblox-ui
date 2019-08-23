@@ -553,7 +553,7 @@ export const createActions = (): WizardAction[] => {
     // Create blocks
     async (config: FermentConfig) => {
       // Create synchronously, to ensure dependencies are created first
-      for (let block of config.createdBlocks) {
+      for (const block of config.createdBlocks) {
         await sparkStore.createBlock([config.serviceId, block]);
       }
     },
@@ -576,7 +576,7 @@ export const createActions = (): WizardAction[] => {
         };
         await dashboardStore.createDashboard(dashboard);
       }
-      for (let widget of config.widgets) {
+      for (const widget of config.widgets) {
         await dashboardStore.appendDashboardItem(widget);
       }
     },

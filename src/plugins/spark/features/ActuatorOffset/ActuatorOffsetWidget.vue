@@ -32,10 +32,14 @@ export default class ActuatorOffsetWidget extends BlockWidget {
     <BlockWidgetToolbar :crud="crud" />
 
     <CardWarning v-if="!block.data.targetId.id">
-      <template #message>Setpoint Driver has no target Setpoint configured.</template>
+      <template #message>
+        Setpoint Driver has no target Setpoint configured.
+      </template>
     </CardWarning>
     <CardWarning v-else-if="!block.data.referenceId.id">
-      <template #message>Setpoint Driver has no reference Setpoint configured.</template>
+      <template #message>
+        Setpoint Driver has no reference Setpoint configured.
+      </template>
     </CardWarning>
     <CardWarning v-else-if="!block.data.enabled">
       <template #message>
@@ -52,11 +56,15 @@ export default class ActuatorOffsetWidget extends BlockWidget {
     <q-card-section>
       <q-item dark class="align-children">
         <q-item-section>
-          <q-item-label caption>Target offset</q-item-label>
+          <q-item-label caption>
+            Target offset
+          </q-item-label>
           <big>{{ block.data.desiredSetting | round }}</big>
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Actual offset</q-item-label>
+          <q-item-label caption>
+            Actual offset
+          </q-item-label>
           <big>{{ block.data.value | round }}</big>
         </q-item-section>
       </q-item>

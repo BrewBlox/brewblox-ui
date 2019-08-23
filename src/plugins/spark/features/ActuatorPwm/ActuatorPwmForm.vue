@@ -28,7 +28,9 @@ export default class ActuatorPwmForm extends BlockCrudComponent {
 
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Period</q-item-label>
+          <q-item-label caption>
+            Period
+          </q-item-label>
           <TimeUnitField
             :value="block.data.period"
             title="Period"
@@ -37,7 +39,9 @@ export default class ActuatorPwmForm extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Digital Actuator Target</q-item-label>
+          <q-item-label caption>
+            Digital Actuator Target
+          </q-item-label>
           <LinkField
             :value="block.data.actuatorId"
             :service-id="serviceId"
@@ -50,7 +54,9 @@ export default class ActuatorPwmForm extends BlockCrudComponent {
       </q-item>
       <q-item dark class="align-children">
         <q-item-section>
-          <q-item-label caption>Duty setting</q-item-label>
+          <q-item-label caption>
+            Duty setting
+          </q-item-label>
           <div :class="{['text-orange']: isConstrained}">
             <SliderField
               :value="block.data.setting"
@@ -62,12 +68,16 @@ export default class ActuatorPwmForm extends BlockCrudComponent {
           </div>
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Duty Achieved</q-item-label>
+          <q-item-label caption>
+            Duty Achieved
+          </q-item-label>
           <big>{{ block.data.value | round }}</big>
         </q-item-section>
         <q-item-section>
           <template v-if="isConstrained">
-            <q-item-label caption>Unconstrained setting</q-item-label>
+            <q-item-label caption>
+              Unconstrained setting
+            </q-item-label>
             <div>
               <big>{{ block.data.desiredSetting | round }}</big>
               <small class="q-ml-xs">%</small>

@@ -76,8 +76,12 @@ export default class InputField extends FieldBase {
     @click="openDialog"
   >
     <slot name="pre" />
-    <slot name="value">{{ displayValue }}</slot>
+    <slot name="value">
+      {{ displayValue }}
+    </slot>
     <slot name="append" />
-    <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
+    <q-tooltip v-if="!readonly">
+      Set {{ label }}
+    </q-tooltip>
   </component>
 </template>

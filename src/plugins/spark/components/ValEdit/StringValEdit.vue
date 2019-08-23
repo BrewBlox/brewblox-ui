@@ -9,6 +9,8 @@ export default class StringValEdit extends ValEdit { }
 </script>
 
 <template>
-  <q-input v-if="editable" v-model="field" dark dense/>
-  <div v-else>{{ field }}</div>
+  <q-input v-if="editable" v-model="field" dark dense />
+  <div v-else>
+    {{ field }}
+  </div>
 </template>

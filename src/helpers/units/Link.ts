@@ -3,7 +3,7 @@ export default class Link {
   public type: string | null;
   public driven: boolean;
 
-  public constructor(id: string | null, type: string | null = null, driven: boolean = false) {
+  public constructor(id: string | null, type: string | null = null, driven = false) {
     this.id = id;
     this.type = type;
     this.driven = driven;

@@ -17,5 +17,5 @@ export default class FermentWizard extends WidgetWizardBase {
 </script>
 
 <template>
-  <WizardTaskMaster :initial-tasks="initialTasks" @back="back" @close="close"/>
+  <WizardTaskMaster :initial-tasks="initialTasks" @back="back" @close="close" />
 </template>

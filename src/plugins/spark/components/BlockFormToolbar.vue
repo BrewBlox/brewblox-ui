@@ -6,7 +6,7 @@ import BlockCrudComponent from './BlockCrudComponent';
 
 @Component
 export default class BlockFormToolbar extends BlockCrudComponent {
-  graphModalOpen: boolean = false;
+  graphModalOpen = false;
 
 }
 </script>
@@ -15,8 +15,8 @@ export default class BlockFormToolbar extends BlockCrudComponent {
   <FormToolbar :crud="crud">
     <BlockGraph
       v-if="graphModalOpen"
-      v-model="graphModalOpen"
       :id="widget.id"
+      v-model="graphModalOpen"
       :config.sync="graphCfg"
     />
     <template v-slot:buttons>

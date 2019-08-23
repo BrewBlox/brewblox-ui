@@ -13,7 +13,7 @@ import { deepCopy, deserialize, serialize } from '@/helpers/units/parseObject';
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
 import CalcWorker from 'worker-loader!./calculator.worker';
-import { SQUARE_SIZE, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes } from './getters';
+import { defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes,SQUARE_SIZE } from './getters';
 import { asPersistentPart, asStatePart } from './helpers';
 import { builderStore } from './store';
 import { BuilderLayout, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
@@ -61,11 +61,11 @@ export default class BuilderEditor extends DialogBase {
   flowParts: FlowPart[] = [];
   history: string[] = [];
 
-  menuModalOpen: boolean = false;
-  catalogModalOpen: boolean = false;
+  menuModalOpen = false;
+  catalogModalOpen = false;
   catalogPartial: Partial<PersistentPart> | null = null;
 
-  selectedTime: number = 0;
+  selectedTime = 0;
   selectArea: SelectArea | null = null;
   selectDragDelta: XYVals | null = null
   selectedParts: FlowPart[] = [];
@@ -203,7 +203,7 @@ export default class BuilderEditor extends DialogBase {
 
   get overlaps(): [Coordinates, number][] {
     const counts: Record<string, number> = {};
-    for (let part of this.parts) {
+    for (const part of this.parts) {
       const key = new Coordinates([part.x, part.y, 0]).toString();
       counts[key] = (counts[key] || 0) + 1;
     }
@@ -231,7 +231,7 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  async saveParts(parts: PersistentPart[], saveHistory: boolean = true) {
+  async saveParts(parts: PersistentPart[], saveHistory = true) {
     if (!this.layout) {
       return;
     }
@@ -538,7 +538,7 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  movePanHandler(args: PanArguments, part: FlowPart, copy: boolean = false) {
+  movePanHandler(args: PanArguments, part: FlowPart, copy = false) {
     if (this.selectedParts.length) {
       return this.moveSelectedPanHandler(args, copy);
     }
@@ -602,7 +602,7 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  rotateClickHandler(evt: ClickEvent, part: FlowPart, rotation: number = 90) {
+  rotateClickHandler(evt: ClickEvent, part: FlowPart, rotation = 90) {
     if (part) {
       const rotate = clampRotation(part.rotate + rotation);
       this.savePart({ ...part, rotate });
@@ -768,7 +768,9 @@ export default class BuilderEditor extends DialogBase {
               no-close
               @click="currentTool = tool"
             >
-              <q-item-section side class="text-uppercase">{{ tool.shortcut }}</q-item-section>
+              <q-item-section side class="text-uppercase">
+                {{ tool.shortcut }}
+              </q-item-section>
             </ActionItem>
           </q-expansion-item>
 
@@ -776,7 +778,9 @@ export default class BuilderEditor extends DialogBase {
             <q-separator dark inset />
             <q-item dark>
               <q-item-section>
-                <q-item-label caption>Width</q-item-label>
+                <q-item-label caption>
+                  Width
+                </q-item-label>
                 <q-slider
                   :value="layout.width"
                   :min="5"
@@ -789,7 +793,9 @@ export default class BuilderEditor extends DialogBase {
             </q-item>
             <q-item dark>
               <q-item-section>
-                <q-item-label caption>Height</q-item-label>
+                <q-item-label caption>
+                  Height
+                </q-item-label>
                 <q-slider
                   :value="layout.height"
                   :min="5"
@@ -850,8 +856,8 @@ export default class BuilderEditor extends DialogBase {
             <!-- Grid wrapper -->
             <div class="col column no-wrap scroll maximized">
               <div
-                v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, null)"
                 v-if="!!layout"
+                v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, null)"
                 :style="`
                 width: ${squares(layout.width)}px;
                 height: ${squares(layout.height)}px;`"
@@ -880,11 +886,11 @@ export default class BuilderEditor extends DialogBase {
                     class="grid-square-text"
                   >{{ y-1 }}</text>
                   <g
-                    v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, part)"
                     v-for="part in flowParts"
                     v-show="!beingDragged(part)"
-                    :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
                     :key="part.id"
+                    v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, part)"
+                    :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
                     :class="{ clickable: currentTool.cursor(part), [part.type]: true }"
                     @click.stop="v => clickHandler(v, part)"
                   >

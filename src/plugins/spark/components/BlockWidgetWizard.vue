@@ -16,12 +16,12 @@ import { BlockCrud } from './BlockCrudComponent';
 
 @Component
 export default class BlockWidgetWizard extends WidgetWizardBase {
-  currentStep: string = 'start';
+  currentStep = 'start';
 
-  blockId: string = '';
+  blockId = '';
   service: Service | null = null;
   block: Block | null = null;
-  isStoreBlock: boolean = false;
+  isStoreBlock = false;
   widget: DashboardItem | null = null;
   activeDialog: any = null;
 
@@ -151,7 +151,9 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
     <q-step name="start" title="Select Service">
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Service</q-item-label>
+          <q-item-label caption>
+            Service
+          </q-item-label>
           <q-option-group v-model="service" :options="serviceOpts" />
         </q-item-section>
       </q-item>
@@ -236,7 +238,9 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
           >
             <template v-slot:no-option>
               <q-item dark>
-                <q-item-section class="text-grey">No results</q-item-section>
+                <q-item-section class="text-grey">
+                  No results
+                </q-item-section>
               </q-item>
             </template>
           </q-select>

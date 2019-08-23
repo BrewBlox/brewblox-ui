@@ -15,9 +15,9 @@ export default class ImportWizard extends Vue {
   readonly dashboardId!: string;
 
   reader: FileReader = new FileReader();
-  serializedWidget: string = '';
+  serializedWidget = '';
 
-  localChosenDashboardId: string = '';
+  localChosenDashboardId = '';
 
   get chosenDashboardId(): string {
     return this.localChosenDashboardId

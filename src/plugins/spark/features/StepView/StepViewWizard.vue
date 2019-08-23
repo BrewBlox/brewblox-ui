@@ -54,7 +54,9 @@ export default class StepViewWizard extends WidgetWizardBase {
       </q-item>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Service</q-item-label>
+          <q-item-label caption>
+            Service
+          </q-item-label>
           <q-option-group v-model="service" :options="serviceOpts" />
         </q-item-section>
       </q-item>

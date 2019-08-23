@@ -57,7 +57,9 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
 
       <q-item dark class="align-children">
         <q-item-section class="col-4">
-          <q-item-label caption>Setting</q-item-label>
+          <q-item-label caption>
+            Setting
+          </q-item-label>
           <UnitField
             :value="block.data.storedSetting"
             :readonly="isDriven"
@@ -68,7 +70,9 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section v-if="usedBy.length">
-          <q-item-label caption>Input for:</q-item-label>
+          <q-item-label caption>
+            Input for:
+          </q-item-label>
           <div class="row">
             <q-btn
               v-for="block in usedBy"
@@ -89,11 +93,15 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
 
       <q-item dark class="align-children">
         <q-item-section class="col-4">
-          <q-item-label caption>Sensor value</q-item-label>
+          <q-item-label caption>
+            Sensor value
+          </q-item-label>
           <UnitField :value="block.data.value" tag="big" readonly />
         </q-item-section>
         <q-item-section class="col-3">
-          <q-item-label caption>Filter period</q-item-label>
+          <q-item-label caption>
+            Filter period
+          </q-item-label>
           <SelectField
             :value="block.data.filter"
             :options="filterOpts"
@@ -113,7 +121,9 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section class="col-3">
-          <q-item-label caption>Bypass threshold</q-item-label>
+          <q-item-label caption>
+            Bypass threshold
+          </q-item-label>
           <UnitField
             :value="block.data.filterThreshold"
             title="Filter bypass threshold"
@@ -141,11 +151,15 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
 
       <q-item dark class="align-children">
         <q-item-section class="col-4">
-          <q-item-label caption>Unfiltered sensor value</q-item-label>
+          <q-item-label caption>
+            Unfiltered sensor value
+          </q-item-label>
           <UnitField :value="block.data.valueUnfiltered" tag="big" readonly />
         </q-item-section>
         <q-item-section class="col-4">
-          <q-item-label caption>Sensor block</q-item-label>
+          <q-item-label caption>
+            Sensor block
+          </q-item-label>
           <LinkField
             :value="block.data.sensorId"
             :service-id="serviceId"

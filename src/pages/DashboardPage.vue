@@ -17,9 +17,9 @@ interface ValidatedItem {
 
 @Component
 export default class DashboardPage extends Vue {
-  widgetEditable: boolean = false;
-  menuModalOpen: boolean = false;
-  wizardModalOpen: boolean = false;
+  widgetEditable = false;
+  menuModalOpen = false;
+  wizardModalOpen = false;
 
   @Watch('dashboardId')
   onChangeDashboardId() {
@@ -141,7 +141,9 @@ export default class DashboardPage extends Vue {
       <q-spinner size="50px" color="primary" />
     </q-inner-loading>
     <div v-else>
-      <portal to="toolbar-title">{{ dashboard.title }}</portal>
+      <portal to="toolbar-title">
+        {{ dashboard.title }}
+      </portal>
       <portal to="toolbar-buttons">
         <q-toggle v-model="widgetEditable" checked-icon="mdi-lock-open" unchecked-icon="mdi-lock">
           <q-tooltip>{{ widgetEditable ? 'Lock widgets' : 'Move widgets' }}</q-tooltip>
@@ -173,8 +175,8 @@ export default class DashboardPage extends Vue {
         <q-item v-for="val in validatedItems" :key="val.item.id">
           <q-item-section>
             <component
-              :disabled="widgetEditable"
               :is="val.component"
+              :disabled="widgetEditable"
               :widget="val.item"
               class="dashboard-item"
               @update:widget="saveWidget"
@@ -189,10 +191,10 @@ export default class DashboardPage extends Vue {
         @change-size="onChangeSize"
       >
         <component
-          v-for="val in validatedItems"
-          :disabled="widgetEditable"
           :is="val.component"
+          v-for="val in validatedItems"
           :key="val.item.id"
+          :disabled="widgetEditable"
           :widget="val.item"
           :error="val.error"
           class="dashboard-item"

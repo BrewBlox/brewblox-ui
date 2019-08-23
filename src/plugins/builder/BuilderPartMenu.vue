@@ -69,9 +69,9 @@ export default class BuilderPartMenu extends Vue {
         </q-item-section>
       </q-item>
       <component
+        :is="card.component"
         v-for="(card, idx) in cards"
         :key="idx"
-        :is="card.component"
         :part="part"
         v-bind="card.props || {}"
         v-on="$listeners"

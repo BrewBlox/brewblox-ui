@@ -38,11 +38,13 @@ export default class LiquidSourceCard extends PartCard {
 
 <template>
   <q-list dark>
-    <q-separator dark/>
+    <q-separator dark />
     <q-item dark>
       <q-item-section>
-        <q-item-label caption>Pressure</q-item-label>
-        <q-toggle :value="pressured" @input="togglePressure"/>
+        <q-item-label caption>
+          Pressure
+        </q-item-label>
+        <q-toggle :value="pressured" @input="togglePressure" />
       </q-item-section>
       <q-item-section v-for="color in liquidColors" :key="color">
         <q-btn

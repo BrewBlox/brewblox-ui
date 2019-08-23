@@ -75,7 +75,9 @@ export default class DigitalActuatorForm extends BlockCrudComponent {
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Target Pin Array</q-item-label>
+          <q-item-label caption>
+            Target Pin Array
+          </q-item-label>
           <LinkField
             :value="block.data.hwDevice"
             :service-id="serviceId"
@@ -85,7 +87,9 @@ export default class DigitalActuatorForm extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Pin Channel</q-item-label>
+          <q-item-label caption>
+            Pin Channel
+          </q-item-label>
           <SelectField
             :value="block.data.channel"
             :options="channelOpts"
@@ -97,7 +101,9 @@ export default class DigitalActuatorForm extends BlockCrudComponent {
       </q-item>
       <q-item dark>
         <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>State</q-item-label>
+          <q-item-label caption>
+            State
+          </q-item-label>
           <DigitalStateField
             :value="block.data.desiredState"
             :pending="block.data.state !== block.data.desiredState"
@@ -107,7 +113,9 @@ export default class DigitalActuatorForm extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>Invert</q-item-label>
+          <q-item-label caption>
+            Invert
+          </q-item-label>
           <q-toggle
             :value="block.data.invert"
             @input="v => { block.data.invert = v; saveBlock(); }"

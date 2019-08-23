@@ -8,7 +8,7 @@ import { serviceStore } from '@/store/services';
 
 @Component
 export default class FirmwareUpdateDialog extends DialogBase {
-  busy: boolean = false;
+  busy = false;
   messages: string[] = [];
 
   @Prop({ type: String, required: true })
@@ -67,7 +67,9 @@ export default class FirmwareUpdateDialog extends DialogBase {
       <DialogToolbar @close="onDialogHide">
         <q-item-section>
           <q-item-label>{{ service.id }}</q-item-label>
-          <q-item-label caption>Firmware update</q-item-label>
+          <q-item-label caption>
+            Firmware update
+          </q-item-label>
         </q-item-section>
       </DialogToolbar>
 

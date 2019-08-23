@@ -5,9 +5,9 @@ import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
 import { BlockSpec } from '../../types';
+import { typeName } from './getters';
 import form from './SetpointSensorPairForm.vue';
 import widget from './SetpointSensorPairWidget.vue';
-import { typeName } from './getters';
 import { FilterChoice, SetpointSensorPairData } from './types';
 
 const block: BlockSpec = {

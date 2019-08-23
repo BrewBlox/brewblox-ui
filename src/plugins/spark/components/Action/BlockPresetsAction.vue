@@ -61,6 +61,8 @@ export default class BlockPresetsAction extends BlockCrudComponent {
 
 <template>
   <ActionItem v-bind="itemProps" :disabled="!spec" @click="choosePreset">
-    <q-tooltip v-if="!spec">No presets available</q-tooltip>
+    <q-tooltip v-if="!spec">
+      No presets available
+    </q-tooltip>
   </ActionItem>
 </template>

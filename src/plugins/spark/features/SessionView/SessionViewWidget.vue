@@ -12,7 +12,7 @@ import { Session, SessionViewConfig } from './types';
 @Component
 export default class SessionViewWidget extends WidgetBase {
   graphSessionId: string | null = null;
-  sessionFilter: string = '';
+  sessionFilter = '';
 
   get widgetConfig(): SessionViewConfig {
     return this.widget.config;
@@ -105,8 +105,8 @@ export default class SessionViewWidget extends WidgetBase {
   <q-card dark class="text-white scroll">
     <BlockGraph
       v-if="graphSession"
-      :value="true"
       :id="`${widget.id}::${graphSession.id}`"
+      :value="true"
       :config="graphSession.graphCfg"
       no-duration
       @update:config="v => { graphSession.graphCfg = v; saveConfig(widgetConfig); }"
@@ -139,7 +139,9 @@ export default class SessionViewWidget extends WidgetBase {
       <q-item v-for="session in sessions" :key="session.id" dark>
         <q-item-section>
           {{ session.name }}
-          <q-item-label caption>{{ periodString(session) }}</q-item-label>
+          <q-item-label caption>
+            {{ periodString(session) }}
+          </q-item-label>
         </q-item-section>
         <q-item-section side>
           <q-btn flat rounded icon="settings" @click="openModal(session)" />

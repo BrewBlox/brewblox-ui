@@ -82,9 +82,13 @@ export default class SelectField extends FieldBase {
     :class="[{editable: !readonly}, tagClass]"
     @click="openDialog"
   >
-    <slot name="pre"/>
-    <slot name="value">{{ displayValue }}</slot>
-    <slot/>
-    <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
+    <slot name="pre" />
+    <slot name="value">
+      {{ displayValue }}
+    </slot>
+    <slot />
+    <q-tooltip v-if="!readonly">
+      Set {{ label }}
+    </q-tooltip>
   </component>
 </template>

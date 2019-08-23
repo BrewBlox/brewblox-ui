@@ -36,7 +36,9 @@ export default class UrlDisplay extends PartBase {
           <div
             class="text-white text-bold text-center text-h6 q-mt-xs"
             style="max-width: 100%; text-decoration: underline"
-          >{{ titleText }}</div>
+          >
+            {{ titleText }}
+          </div>
         </foreignObject>
       </g>
     </g>

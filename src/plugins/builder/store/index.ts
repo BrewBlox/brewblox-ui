@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+import { Action, getModule,Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
 import { objReducer } from '@/helpers/functional';
 import store from '@/store';
@@ -18,8 +18,8 @@ const rawError = true;
 @Module({ store, namespaced: true, dynamic: true, name: 'builder' })
 export class BuilderModule extends VuexModule {
   public specs: Record<string, PartSpec> = {};
-  public editorActive: boolean = false;
-  public editorTool: string = '';
+  public editorActive = false;
+  public editorTool = '';
   public layouts: Record<string, BuilderLayout> = {};
 
   public get layoutIds(): string[] {

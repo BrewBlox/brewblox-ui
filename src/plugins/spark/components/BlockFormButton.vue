@@ -36,6 +36,6 @@ export default class BlockFormButton extends Vue {
     v-bind="$attrs"
     @click="openDialog"
   >
-    <slot/>
+    <slot />
   </q-btn>
 </template>

@@ -17,7 +17,9 @@ export default class BalancerForm extends BlockCrudComponent {
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Note</q-item-label>
+          <q-item-label caption>
+            Note
+          </q-item-label>
           <span>
             To power balance multiple analog actuators,
             set a balanced constraint on them with this block as target.

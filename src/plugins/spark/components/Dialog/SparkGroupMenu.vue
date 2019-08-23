@@ -43,14 +43,18 @@ export default class SparkGroupMenu extends DialogBase {
       <DialogToolbar @close="onDialogHide">
         <q-item-section>
           <q-item-label>{{ service.id }}</q-item-label>
-          <q-item-label caption>Group menu</q-item-label>
+          <q-item-label caption>
+            Group menu
+          </q-item-label>
         </q-item-section>
       </DialogToolbar>
 
       <q-card-section>
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>Active groups</q-item-label>
+            <q-item-label caption>
+              Active groups
+            </q-item-label>
             <GroupsField
               :value="groups.data.active"
               :service-id="service.id"
@@ -65,7 +69,9 @@ export default class SparkGroupMenu extends DialogBase {
         <div class="row">
           <q-item v-for="(name, idx) in groupNames" :key="idx" dark class="col-4">
             <q-item-section>
-              <q-item-label caption>{{ `Group ${idx + 1} name` }}</q-item-label>
+              <q-item-label caption>
+                {{ `Group ${idx + 1} name` }}
+              </q-item-label>
               <InputField
                 :value="name"
                 label="name"

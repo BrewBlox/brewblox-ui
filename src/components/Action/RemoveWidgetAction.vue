@@ -22,5 +22,5 @@ export default class RemoveWidgetAction extends CrudComponent {
 </script>
 
 <template>
-  <ActionItem v-bind="itemProps" @click="startRemoveWidget"/>
+  <ActionItem v-bind="itemProps" @click="startRemoveWidget" />
 </template>

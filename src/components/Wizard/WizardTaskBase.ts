@@ -5,7 +5,7 @@ export type WizardAction = (config: any) => Promise<void>;
 
 @Component
 export default class WizardTaskBase extends Vue {
-  public busyExecuting: boolean = false;
+  public busyExecuting = false;
 
   @Prop({ type: Object, required: true })
   protected readonly config!: any;
@@ -58,7 +58,7 @@ export default class WizardTaskBase extends Vue {
       // We're intentionally waiting for each async function
       // Actions may be async, but may have dependencies
       this.busyExecuting = true;
-      for (let func of this.actions) {
+      for (const func of this.actions) {
         await func(this.config);
       }
       this.$q.notify({

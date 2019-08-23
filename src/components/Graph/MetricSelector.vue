@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import { QuasarNode, expandedNodes, nodeBuilder } from '@/components/Graph/functional';
+import { expandedNodes, nodeBuilder,QuasarNode } from '@/components/Graph/functional';
 import { historyStore } from '@/store/history';
 
 

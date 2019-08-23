@@ -96,8 +96,12 @@ export default class LinkDialog extends DialogBase {
     @keyup.enter="(link || clearable) && onDialogOk(link)"
   >
     <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
-      <q-card-section class="q-dialog__title">{{ title }}</q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
+      <q-card-section class="q-dialog__title">
+        {{ title }}
+      </q-card-section>
+      <q-card-section v-if="message" class="q-dialog__message scroll">
+        {{ message }}
+      </q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
         <q-select
@@ -114,10 +118,12 @@ export default class LinkDialog extends DialogBase {
         >
           <template v-slot:no-option>
             <q-item dark>
-              <q-item-section class="text-grey">No results</q-item-section>
+              <q-item-section class="text-grey">
+                No results
+              </q-item-section>
             </q-item>
           </template>
-          <template v-slot:after v-if="!noCreate">
+          <template v-if="!noCreate" v-slot:after>
             <q-btn v-if="linkBlock" flat round icon="mdi-pencil" @click="edit">
               <q-tooltip>Edit {{ link.id }}</q-tooltip>
             </q-btn>

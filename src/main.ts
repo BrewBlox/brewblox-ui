@@ -11,7 +11,7 @@ import history from './plugins/history';
 import spark from './plugins/spark';
 import router from './router';
 import store from './store';
-import { UIPlugin, pluginStore } from './store/plugins';
+import { pluginStore,UIPlugin } from './store/plugins';
 
 autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
 

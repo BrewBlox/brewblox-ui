@@ -128,7 +128,9 @@ export default class SetpointProfileForm extends BlockCrudComponent {
       <q-separator v-if="block.data.targetId.id !== null" dark />
       <q-item dark class="q-py-md">
         <q-item-section>
-          <q-item-label caption>Start time</q-item-label>
+          <q-item-label caption>
+            Start time
+          </q-item-label>
           <DatetimeField
             :value="start"
             label="Start time"
@@ -140,7 +142,9 @@ export default class SetpointProfileForm extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Driven Setpoint/Sensor pair</q-item-label>
+          <q-item-label caption>
+            Driven Setpoint/Sensor pair
+          </q-item-label>
           <LinkField
             :value="block.data.targetId"
             :service-id="serviceId"
@@ -155,13 +159,19 @@ export default class SetpointProfileForm extends BlockCrudComponent {
       <!-- Headers -->
       <q-item dark class="q-pt-md">
         <q-item-section class="col-3 q-py-none">
-          <q-item-label caption>Offset from start</q-item-label>
+          <q-item-label caption>
+            Offset from start
+          </q-item-label>
         </q-item-section>
         <q-item-section class="col-5 q-py-none">
-          <q-item-label caption>Time</q-item-label>
+          <q-item-label caption>
+            Time
+          </q-item-label>
         </q-item-section>
         <q-item-section class="col-3 q-py-none">
-          <q-item-label caption>Temperature</q-item-label>
+          <q-item-label caption>
+            Temperature
+          </q-item-label>
         </q-item-section>
         <q-item-section class="col-1 q-py-none" side />
       </q-item>

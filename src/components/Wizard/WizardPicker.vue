@@ -32,8 +32,8 @@ export default class WizardPicker extends Vue {
   <q-card dark class="widget-modal">
     <DialogToolbar>{{ title }}</DialogToolbar>
     <component
-      v-if="wizardComponent"
       :is="wizardComponent"
+      v-if="wizardComponent"
       @title="v => title = v"
       @back="reset"
       @close="close"
@@ -43,8 +43,12 @@ export default class WizardPicker extends Vue {
       <q-card-section>
         <q-item link clickable dark @click="wizardComponent = 'ServiceWizardPicker'">
           <q-item-section side class="col-3">
-            <q-item-label class="text-h6">Service</q-item-label>
-            <q-item-label caption>Click to start</q-item-label>
+            <q-item-label class="text-h6">
+              Service
+            </q-item-label>
+            <q-item-label caption>
+              Click to start
+            </q-item-label>
           </q-item-section>
           <q-item-section>
             <ul>
@@ -56,13 +60,17 @@ export default class WizardPicker extends Vue {
         </q-item>
       </q-card-section>
 
-      <q-separator dark inset/>
+      <q-separator dark inset />
 
       <q-card-section>
         <q-item link clickable dark @click="wizardComponent = 'DashboardWizard'">
           <q-item-section side class="col-3">
-            <q-item-label class="text-h6">Dashboard</q-item-label>
-            <q-item-label caption>Click to start</q-item-label>
+            <q-item-label class="text-h6">
+              Dashboard
+            </q-item-label>
+            <q-item-label caption>
+              Click to start
+            </q-item-label>
           </q-item-section>
           <q-item-section>
             <ul>
@@ -74,13 +82,17 @@ export default class WizardPicker extends Vue {
         </q-item>
       </q-card-section>
 
-      <q-separator dark inset/>
+      <q-separator dark inset />
 
       <q-card-section>
         <q-item link clickable dark @click="wizardComponent = 'WidgetWizardPicker'">
           <q-item-section side class="col-3">
-            <q-item-label class="text-h6">Widget</q-item-label>
-            <q-item-label caption>Click to start</q-item-label>
+            <q-item-label class="text-h6">
+              Widget
+            </q-item-label>
+            <q-item-label caption>
+              Click to start
+            </q-item-label>
           </q-item-section>
           <q-item-section>
             <ul>
@@ -92,13 +104,17 @@ export default class WizardPicker extends Vue {
         </q-item>
       </q-card-section>
 
-      <q-separator dark inset/>
+      <q-separator dark inset />
 
       <q-card-section>
         <q-item link clickable dark @click="wizardComponent = 'ArrangementWizardPicker'">
           <q-item-section side class="col-3">
-            <q-item-label class="text-h6">Arrangement</q-item-label>
-            <q-item-label caption>Click to start</q-item-label>
+            <q-item-label class="text-h6">
+              Arrangement
+            </q-item-label>
+            <q-item-label caption>
+              Click to start
+            </q-item-label>
           </q-item-section>
           <q-item-section>
             <ul>
@@ -109,13 +125,17 @@ export default class WizardPicker extends Vue {
         </q-item>
       </q-card-section>
 
-      <q-separator dark inset/>
+      <q-separator dark inset />
 
       <q-card-section>
         <q-item link clickable dark @click="wizardComponent = 'ImportWizard'">
           <q-item-section side class="col-3">
-            <q-item-label class="text-h6">Import</q-item-label>
-            <q-item-label caption>Click to start</q-item-label>
+            <q-item-label class="text-h6">
+              Import
+            </q-item-label>
+            <q-item-label caption>
+              Click to start
+            </q-item-label>
           </q-item-section>
           <q-item-section>
             <ul>

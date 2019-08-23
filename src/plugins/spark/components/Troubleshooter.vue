@@ -75,7 +75,9 @@ export default class Troubleshooter extends Vue {
             <q-spinner size="24px" />
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>Last update</q-item-label>
+            <q-item-label caption>
+              Last update
+            </q-item-label>
             <big>{{ lastStatus.checkedAt.toLocaleString() }}</big>
           </q-item-section>
         </q-item>

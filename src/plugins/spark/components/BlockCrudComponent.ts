@@ -149,7 +149,7 @@ export default class BlockCrudComponent extends CrudComponent {
   }
 
   public startChangeBlockId() {
-    let blockId = this.blockId;
+    const blockId = this.blockId;
     Dialog.create({
       component: 'InputDialog',
       title: 'Change Block name',

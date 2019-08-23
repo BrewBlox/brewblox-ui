@@ -2,7 +2,7 @@
 import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import { Unit, prettify } from '@/helpers/units';
+import { prettify,Unit } from '@/helpers/units';
 
 import FieldBase from './FieldBase';
 
@@ -51,8 +51,12 @@ export default class UnitField extends FieldBase {
     <slot name="value">
       <span :class="{editable: !readonly}">{{ value.value | round }}</span>
     </slot>
-    <component v-if="value.value !== null" :is="unitTag" class="q-ml-xs">{{ value.notation }}</component>
+    <component :is="unitTag" v-if="value.value !== null" class="q-ml-xs">
+      {{ value.notation }}
+    </component>
     <slot />
-    <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
+    <q-tooltip v-if="!readonly">
+      Set {{ label }}
+    </q-tooltip>
   </component>
 </template>

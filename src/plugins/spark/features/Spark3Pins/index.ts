@@ -3,9 +3,9 @@ import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
 import { BlockSpec } from '../../types';
+import { typeName } from './getters';
 import form from './Spark3PinsForm.vue';
 import widget from './Spark3PinsWidget.vue';
-import { typeName } from './getters';
 import { Spark3PinsData } from './types';
 
 const block: BlockSpec = {

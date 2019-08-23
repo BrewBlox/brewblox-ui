@@ -21,9 +21,9 @@ export default class ServiceWatchers extends Vue {
 <template>
   <div style="height: 0px; width: 0px;">
     <component
+      :is="watcher.component"
       v-for="watcher in watchers"
       :key="watcher.serviceId"
-      :is="watcher.component"
       :service-id="watcher.serviceId"
     />
   </div>

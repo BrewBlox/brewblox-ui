@@ -9,8 +9,8 @@ import { SetpointProfileBlock } from './types';
 @Component
 export default class SetpointProfileWidget extends BlockWidget {
   readonly block!: SetpointProfileBlock;
-  revision: number = 0;
-  modalOpen: boolean = false;
+  revision = 0;
+  modalOpen = false;
   now: Date = new Date();
 
   get startTime(): number {
@@ -62,7 +62,9 @@ export default class SetpointProfileWidget extends BlockWidget {
   <q-card dark class="text-white column">
     <BlockWidgetToolbar :crud="crud" :graph-props="{data: plotlyData, layout: plotlyLayout}" />
     <CardWarning v-if="!block.data.targetId.id">
-      <template #message>Setpoint Profile has no target Setpoint configured.</template>
+      <template #message>
+        Setpoint Profile has no target Setpoint configured.
+      </template>
     </CardWarning>
 
     <CardWarning v-else-if="!block.data.enabled">

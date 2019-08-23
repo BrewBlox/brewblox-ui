@@ -4,9 +4,9 @@ import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
 import { BlockSpec } from '../../types';
+import { typeName } from './getters';
 import form from './TempSensorOneWireForm.vue';
 import widget from './TempSensorOneWireWidget.vue';
-import { typeName } from './getters';
 import { TempSensorOneWireData } from './types';
 
 const block: BlockSpec = {

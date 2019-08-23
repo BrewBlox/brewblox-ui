@@ -15,7 +15,7 @@ export default class HeatingIcon extends Vue {
 
 <template>
   <svg v-bind="{...$attrs, ...$props}" viewBox="0,0,50,50">
-    <circle cx="25" cy="25" r="15"/>
+    <circle cx="25" cy="25" r="15" />
     <path
       d="M23.7,35.9
       c0,0,1.6-2.9,1.6-5.7

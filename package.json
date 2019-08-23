@@ -94,7 +94,7 @@
     "tsutils": "^3.14.1",
     "vue-cli-plugin-quasar": "^1.0.0",
     "vue-cli-plugin-webpack-bundle-analyzer": "^1.4.0",
-    "vue-eslint-parser": "^6.0.4",
+    "vue-eslint-parser": "^5.0.0",
     "vue-template-compiler": "^2.6.10",
     "vuex-module-decorators": "^0.9.9",
     "worker-loader": "^2.0.0"

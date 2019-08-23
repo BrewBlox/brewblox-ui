@@ -2,16 +2,16 @@
 import { Component, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import HistoryGraph from '@/components/Graph/HistoryGraph.vue';
 import { defaultPresets } from '@/components/Graph/getters';
+import HistoryGraph from '@/components/Graph/HistoryGraph.vue';
 import { GraphConfig } from '@/components/Graph/types';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { QueryParams } from '@/store/history';
 
 @Component
 export default class GraphWidget extends WidgetBase {
-  settingsModalOpen: boolean = false;
-  graphModalOpen: boolean = false;
+  settingsModalOpen = false;
+  graphModalOpen = false;
   downsampling: any = {};
 
   @Ref()
@@ -80,8 +80,8 @@ export default class GraphWidget extends WidgetBase {
               <q-list dark link>
                 <q-item
                   v-for="(preset, idx) in presets"
-                  :active="isActivePreset(preset)"
                   :key="idx"
+                  :active="isActivePreset(preset)"
                   dark
                   clickable
                   @click="applyPreset(preset)"
@@ -109,9 +109,9 @@ export default class GraphWidget extends WidgetBase {
             <q-expansion-item label="Timespan">
               <q-list dark>
                 <q-item
-                  v-close-popup
                   v-for="(preset, idx) in presets"
                   :key="idx"
+                  v-close-popup
                   :inset-level="1"
                   dark
                   clickable
@@ -129,8 +129,8 @@ export default class GraphWidget extends WidgetBase {
 
     <div class="col">
       <HistoryGraph
-        ref="widgetGraph"
         :id="widget.id"
+        ref="widgetGraph"
         :config="graphCfg"
         @downsample="v => downsampling = v"
       />

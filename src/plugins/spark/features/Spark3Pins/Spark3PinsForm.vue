@@ -12,22 +12,26 @@ export default class Spark3PinsForm extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud"/>
+    <BlockFormToolbar :crud="crud" />
 
-    <IoArray :crud="crud"/>
-    <q-separator dark inset/>
+    <IoArray :crud="crud" />
+    <q-separator dark inset />
 
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Enable 5V</q-item-label>
+          <q-item-label caption>
+            Enable 5V
+          </q-item-label>
           <q-toggle
             :value="block.data.enableIoSupply5V"
             @input="v => { block.data.enableIoSupply5V = v; saveBlock(); }"
           />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Enable 12V</q-item-label>
+          <q-item-label caption>
+            Enable 12V
+          </q-item-label>
           <q-toggle
             :value="block.data.enableIoSupply12V"
             @input="v => { block.data.enableIoSupply12V = v; saveBlock(); }"
@@ -36,11 +40,15 @@ export default class Spark3PinsForm extends BlockCrudComponent {
       </q-item>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>5V Voltage</q-item-label>
+          <q-item-label caption>
+            5V Voltage
+          </q-item-label>
           {{ block.data.voltage5 | round }}
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>12V Voltage</q-item-label>
+          <q-item-label caption>
+            12V Voltage
+          </q-item-label>
           {{ block.data.voltage12 | round }}
         </q-item-section>
         <q-item-section>

@@ -121,7 +121,9 @@ export default class LinkedBlockCard extends PartCard {
         >
           <template v-slot:no-option>
             <q-item dark>
-              <q-item-section class="text-grey">No results</q-item-section>
+              <q-item-section class="text-grey">
+                No results
+              </q-item-section>
             </q-item>
           </template>
         </q-select>
@@ -141,11 +143,15 @@ export default class LinkedBlockCard extends PartCard {
         >
           <template v-slot:no-option>
             <q-item dark>
-              <q-item-section v-if="serviceId" class="text-grey">No results</q-item-section>
-              <q-item-section v-else class="text-grey">Please select a service</q-item-section>
+              <q-item-section v-if="serviceId" class="text-grey">
+                No results
+              </q-item-section>
+              <q-item-section v-else class="text-grey">
+                Please select a service
+              </q-item-section>
             </q-item>
           </template>
-          <template v-slot:after v-if="!noCreate">
+          <template v-if="!noCreate" v-slot:after>
             <BlockFormButton
               :disable="!link.id"
               :block-id="link.id"

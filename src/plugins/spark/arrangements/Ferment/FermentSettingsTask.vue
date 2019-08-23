@@ -40,7 +40,7 @@ export default class FermentSettingsTask extends WizardTaskBase {
   }
 
   blockType(newId: string): string {
-    for (let [from, to] of Object.entries(this.config.renamedBlocks)) {
+    for (const [from, to] of Object.entries(this.config.renamedBlocks)) {
       if (to === newId) {
         return sparkStore.blockById(this.config.serviceId, from).type;
       }
@@ -87,15 +87,21 @@ export default class FermentSettingsTask extends WizardTaskBase {
       </q-item>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Fridge setpoint</q-item-label>
+          <q-item-label caption>
+            Fridge setpoint
+          </q-item-label>
           <UnitField v-model="fridgeSetting" title="Fridge setting" />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Beer setpoint</q-item-label>
+          <q-item-label caption>
+            Beer setpoint
+          </q-item-label>
           <UnitField v-model="beerSetting" title="Beer setting" />
         </q-item-section>
         <q-item-section class="col-auto">
-          <q-item-label caption>Setpoint used by control</q-item-label>
+          <q-item-label caption>
+            Setpoint used by control
+          </q-item-label>
           <div class="row">
             <q-btn-toggle
               v-model="activeSetpoint"

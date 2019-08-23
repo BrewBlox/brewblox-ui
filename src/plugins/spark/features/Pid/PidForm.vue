@@ -73,7 +73,9 @@ export default class PidForm extends BlockCrudComponent {
       <!-- Input row -->
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Input Block</q-item-label>
+          <q-item-label caption>
+            Input Block
+          </q-item-label>
           <LinkField
             :value="block.data.inputId"
             :service-id="serviceId"
@@ -92,13 +94,21 @@ export default class PidForm extends BlockCrudComponent {
         </q-item-section>
 
         <q-item-section>
-          <q-item-label caption>Target value is</q-item-label>
-          <q-item-section class="text-bold">{{ block.data.inputSetting | unit }}</q-item-section>
+          <q-item-label caption>
+            Target value is
+          </q-item-label>
+          <q-item-section class="text-bold">
+            {{ block.data.inputSetting | unit }}
+          </q-item-section>
         </q-item-section>
 
         <q-item-section>
-          <q-item-label caption>Current value is</q-item-label>
-          <div class="text-bold">{{ block.data.inputValue | unit }}</div>
+          <q-item-label caption>
+            Current value is
+          </q-item-label>
+          <div class="text-bold">
+            {{ block.data.inputValue | unit }}
+          </div>
         </q-item-section>
 
         <q-item-section class="col-auto">
@@ -113,7 +123,9 @@ export default class PidForm extends BlockCrudComponent {
       <!-- Output row -->
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Output Block</q-item-label>
+          <q-item-label caption>
+            Output Block
+          </q-item-label>
           <LinkField
             :value="block.data.outputId"
             :service-id="serviceId"
@@ -135,13 +147,21 @@ export default class PidForm extends BlockCrudComponent {
         </q-item-section>
 
         <q-item-section>
-          <q-item-label caption>Target value is</q-item-label>
-          <div class="text-bold">{{ block.data.outputSetting | round }}</div>
+          <q-item-label caption>
+            Target value is
+          </q-item-label>
+          <div class="text-bold">
+            {{ block.data.outputSetting | round }}
+          </div>
         </q-item-section>
 
         <q-item-section>
-          <q-item-label caption>Current value is</q-item-label>
-          <div class="text-bold">{{ block.data.outputValue | round }}</div>
+          <q-item-label caption>
+            Current value is
+          </q-item-label>
+          <div class="text-bold">
+            {{ block.data.outputValue | round }}
+          </div>
         </q-item-section>
 
         <q-item-section class="col-auto">
@@ -156,12 +176,18 @@ export default class PidForm extends BlockCrudComponent {
       <!-- Calculations -->
       <q-item dark>
         <q-item-section>
-          <q-item-label caption class="text-no-wrap">Error</q-item-label>
+          <q-item-label caption class="text-no-wrap">
+            Error
+          </q-item-label>
           {{ block.data.error | unit }}
         </q-item-section>
-        <q-item-section class="text-center">*</q-item-section>
+        <q-item-section class="text-center">
+          *
+        </q-item-section>
         <q-item-section>
-          <q-item-label caption>Kp</q-item-label>
+          <q-item-label caption>
+            Kp
+          </q-item-label>
           <UnitField
             :value="block.data.kp"
             title="Proportional gain Kp"
@@ -179,26 +205,42 @@ export default class PidForm extends BlockCrudComponent {
         </q-item-section>
         <q-item-section />
         <q-item-section />
-        <q-item-section class="text-center">=</q-item-section>
+        <q-item-section class="text-center">
+          =
+        </q-item-section>
         <q-item-section>
-          <q-item-label caption>P</q-item-label>
+          <q-item-label caption>
+            P
+          </q-item-label>
           {{ block.data.p | round }}
         </q-item-section>
       </q-item>
 
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Integral</q-item-label>
+          <q-item-label caption>
+            Integral
+          </q-item-label>
           {{ block.data.integral | unit }}
         </q-item-section>
-        <q-item-section class="text-center">*</q-item-section>
-        <q-item-section>
-          <q-item-label caption>Kp</q-item-label>
-          <div class="darkened">{{ block.data.kp | unit }}</div>
+        <q-item-section class="text-center">
+          *
         </q-item-section>
-        <q-item-section class="text-center">/</q-item-section>
         <q-item-section>
-          <q-item-label caption>Ti</q-item-label>
+          <q-item-label caption>
+            Kp
+          </q-item-label>
+          <div class="darkened">
+            {{ block.data.kp | unit }}
+          </div>
+        </q-item-section>
+        <q-item-section class="text-center">
+          /
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>
+            Ti
+          </q-item-label>
           <TimeUnitField
             :value="block.data.ti"
             title="Integral time constant Ti"
@@ -222,9 +264,13 @@ export default class PidForm extends BlockCrudComponent {
             @input="v => { block.data.ti = v; saveBlock(); }"
           />
         </q-item-section>
-        <q-item-section class="text-center">=</q-item-section>
+        <q-item-section class="text-center">
+          =
+        </q-item-section>
         <q-item-section>
-          <q-item-label caption>I</q-item-label>
+          <q-item-label caption>
+            I
+          </q-item-label>
           <InputField
             :value="block.data.i"
             type="number"
@@ -245,17 +291,29 @@ export default class PidForm extends BlockCrudComponent {
 
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Derivative</q-item-label>
+          <q-item-label caption>
+            Derivative
+          </q-item-label>
           <span :class="{darkened: block.data.td.val === 0}">{{ block.data.derivative | unit }}</span>
         </q-item-section>
-        <q-item-section class="text-center">*</q-item-section>
-        <q-item-section>
-          <q-item-label caption>Kp</q-item-label>
-          <div class="darkened">{{ block.data.kp | unit }}</div>
+        <q-item-section class="text-center">
+          *
         </q-item-section>
-        <q-item-section class="text-center">*</q-item-section>
         <q-item-section>
-          <q-item-label caption>Td</q-item-label>
+          <q-item-label caption>
+            Kp
+          </q-item-label>
+          <div class="darkened">
+            {{ block.data.kp | unit }}
+          </div>
+        </q-item-section>
+        <q-item-section class="text-center">
+          *
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>
+            Td
+          </q-item-label>
           <TimeUnitField
             :value="block.data.td"
             title="Derivative time constant Td"
@@ -277,9 +335,13 @@ export default class PidForm extends BlockCrudComponent {
             @input="v => { block.data.td = v; saveBlock(); }"
           />
         </q-item-section>
-        <q-item-section class="text-center">=</q-item-section>
+        <q-item-section class="text-center">
+          =
+        </q-item-section>
         <q-item-section>
-          <q-item-label caption>D</q-item-label>
+          <q-item-label caption>
+            D
+          </q-item-label>
           <div style="border-bottom: solid 2px white; min-width: 60px;">
             {{ block.data.d | round }}
             <span style="float: right;">
@@ -291,7 +353,9 @@ export default class PidForm extends BlockCrudComponent {
       <q-item dark>
         <q-item-section v-for="i in 6" :key="i" />
         <q-item-section>
-          <q-item-label caption>Output</q-item-label>
+          <q-item-label caption>
+            Output
+          </q-item-label>
           {{ block.data.p + block.data.i + block.data.d | round }}
         </q-item-section>
       </q-item>

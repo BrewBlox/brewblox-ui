@@ -76,7 +76,9 @@ export default class MotorValveForm extends BlockCrudComponent {
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Target DS2408 Chip</q-item-label>
+          <q-item-label caption>
+            Target DS2408 Chip
+          </q-item-label>
           <LinkField
             :value="block.data.hwDevice"
             :service-id="serviceId"
@@ -86,7 +88,9 @@ export default class MotorValveForm extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>DS2408 Channel</q-item-label>
+          <q-item-label caption>
+            DS2408 Channel
+          </q-item-label>
           <SelectField
             :value="block.data.startChannel"
             :options="channelOpts"
@@ -98,7 +102,9 @@ export default class MotorValveForm extends BlockCrudComponent {
       </q-item>
       <q-item dark>
         <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>State</q-item-label>
+          <q-item-label caption>
+            State
+          </q-item-label>
           <DigitalStateField
             :value="block.data.desiredState"
             :pending="block.data.state !== block.data.desiredState"
@@ -108,7 +114,9 @@ export default class MotorValveForm extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Valve State</q-item-label>
+          <q-item-label caption>
+            Valve State
+          </q-item-label>
           {{ valveStateName }}
         </q-item-section>
       </q-item>

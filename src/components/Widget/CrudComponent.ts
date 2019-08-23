@@ -43,7 +43,7 @@ export default class CrudComponent extends Vue {
   }
 
   public startChangeWidgetTitle() {
-    let widgetTitle = this.widget.title;
+    const widgetTitle = this.widget.title;
     Dialog.create({
       title: 'Change Widget name',
       message: `Choose a new name for '${widgetTitle}'`,

@@ -17,13 +17,17 @@ export default class DS2408Form extends BlockCrudComponent {
   <q-card dark class="widget-modal">
     <BlockFormToolbar :crud="crud" />
     <CardWarning v-if="!block.data.connected">
-      <template #message>DS2408 is not connected.</template>
+      <template #message>
+        DS2408 is not connected.
+      </template>
     </CardWarning>
     <ValveArray :crud="crud" :id-enum="DS2408Id" :name-enum="ValveStartId" />
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Address</q-item-label>
+          <q-item-label caption>
+            Address
+          </q-item-label>
           <InputField
             :value="block.data.address"
             title="Address"
@@ -32,7 +36,9 @@ export default class DS2408Form extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Connected</q-item-label>
+          <q-item-label caption>
+            Connected
+          </q-item-label>
           {{ block.data.connected ? 'Yes' : 'No' }}
         </q-item-section>
       </q-item>

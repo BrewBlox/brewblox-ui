@@ -1,6 +1,6 @@
 import get from 'lodash/get';
 import Vue from 'vue';
-import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
 import { objReducer } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
@@ -56,7 +56,7 @@ const calculateDrivenChains = (blocks: Block[]): string[][] => {
 
   const drivenBlocks: { [driven: string]: string[] } = {};
 
-  for (let block of blocks) {
+  for (const block of blocks) {
     Object
       .values(block.data)
       .filter((obj: any) => obj instanceof Link && obj.driven && obj.id)
@@ -115,7 +115,7 @@ const calculateBlockLinks = (blocks: Block[]): BlockLink[] => {
     };
 
   const allLinks: BlockLink[] = [];
-  for (let block of blocks) {
+  for (const block of blocks) {
     allLinks.push(...findRelations(block.id, [], block.data));
   }
 
@@ -125,7 +125,7 @@ const calculateBlockLinks = (blocks: Block[]): BlockLink[] => {
 const calculateLimiters = (blocks: Block[]): Limiters => {
   const limited: Limiters = {};
 
-  for (let block of blocks) {
+  for (const block of blocks) {
     const obj: ConstraintsObj = block.data.constrainedBy;
     if (!obj || obj.constraints.length === 0) {
       continue;

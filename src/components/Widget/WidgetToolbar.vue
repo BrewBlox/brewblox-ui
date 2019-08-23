@@ -16,8 +16,12 @@ export default class WidgetToolbar extends Vue {
   <q-card-section class="q-pa-xs" style="max-width: 100%">
     <q-item dark>
       <q-item-section>
-        <q-item-label class="ellipsis text-h6">{{ title }}</q-item-label>
-        <q-item-label caption class="ellipsis">{{ subtitle }}</q-item-label>
+        <q-item-label class="ellipsis text-h6">
+          {{ title }}
+        </q-item-label>
+        <q-item-label caption class="ellipsis">
+          {{ subtitle }}
+        </q-item-label>
       </q-item-section>
       <slot />
     </q-item>

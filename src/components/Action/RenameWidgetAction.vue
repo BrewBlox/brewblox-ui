@@ -22,5 +22,5 @@ export default class RenameWidgetAction extends CrudComponent {
 </script>
 
 <template>
-  <ActionItem v-bind="itemProps" @click="startChangeWidgetTitle"/>
+  <ActionItem v-bind="itemProps" @click="startChangeWidgetTitle" />
 </template>

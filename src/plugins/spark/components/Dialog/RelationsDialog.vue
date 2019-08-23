@@ -33,11 +33,11 @@ const INVERTED = [
 
 @Component
 export default class RelationsDialog extends DialogBase {
-  exportBusy: boolean = false;
-  lastRelationString: string = '';
+  exportBusy = false;
+  lastRelationString = '';
   graphObj: any = null;
-  availableHeight: number = 0;
-  availableWidth: number = 0;
+  availableHeight = 0;
+  availableWidth = 0;
 
   @Ref()
   readonly svg!: SVGGraphicsElement;

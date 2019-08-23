@@ -43,7 +43,9 @@ export default class Fridge extends PartBase {
           <div
             class="text-white text-bold text-center text-h6 q-mt-xs"
             style="max-width: 100%"
-          >{{ titleText }}</div>
+          >
+            {{ titleText }}
+          </div>
         </foreignObject>
       </g>
     </g>

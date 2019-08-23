@@ -14,8 +14,8 @@ export default class Spark3PinsWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud"/>
+    <BlockWidgetToolbar :crud="crud" />
 
-    <IoArray :crud="crud" :id-enum="Spark3PinId"/>
+    <IoArray :crud="crud" :id-enum="Spark3PinId" />
   </q-card>
 </template>

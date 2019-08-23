@@ -37,7 +37,7 @@ export default class SparkPage extends Vue {
 
   volatileItems: { [blockId: string]: DashboardItem } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
-  blockFilter: string = '';
+  blockFilter = '';
 
   get service(): Spark {
     return serviceStore.serviceById(this.serviceId) as Spark;
@@ -426,7 +426,9 @@ export default class SparkPage extends Vue {
             <q-tooltip>Service</q-tooltip>
           </q-item-section>
           <q-item-section>{{ serviceId }}</q-item-section>
-          <q-item-section side>Spark Service</q-item-section>
+          <q-item-section side>
+            Spark Service
+          </q-item-section>
         </q-item>
         <!-- Blocks -->
         <q-item
@@ -442,7 +444,9 @@ export default class SparkPage extends Vue {
             <q-tooltip>{{ val.role }}</q-tooltip>
           </q-item-section>
           <q-item-section>{{ val.item.title }}</q-item-section>
-          <q-item-section side>{{ val.typeName }}</q-item-section>
+          <q-item-section side>
+            {{ val.typeName }}
+          </q-item-section>
         </q-item>
       </q-list>
 

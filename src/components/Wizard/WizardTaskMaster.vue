@@ -54,8 +54,8 @@ export default class WizardTaskMaster extends Vue {
 <template>
   <div>
     <component
-      v-if="currentTask"
       :is="currentTask"
+      v-if="currentTask"
       :config.sync="config"
       :actions.sync="actions"
       :tasks.sync="tasks"

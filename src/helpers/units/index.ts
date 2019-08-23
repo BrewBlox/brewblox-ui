@@ -1,6 +1,6 @@
 import Link from './Link';
-import Unit, { prettify } from './Unit';
 import { postfixedDisplayNames, serializedPropertyName } from './parseObject';
+import Unit, { prettify } from './Unit';
 
 export {
   Unit,

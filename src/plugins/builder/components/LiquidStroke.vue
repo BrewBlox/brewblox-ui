@@ -32,7 +32,7 @@ export default class LiquidStroke extends Vue {
 <template>
   <g v-if="colors.length == 1">
     <template v-for="(path, pidx) in paths">
-      <path :d="path" :key="`${pidx}`" :stroke="colors[0]" stroke-linecap="butt" class="liquid"/>
+      <path :key="`${pidx}`" :d="path" :stroke="colors[0]" stroke-linecap="butt" class="liquid" />
     </template>
   </g>
   <g v-else-if="colors.length > 1">

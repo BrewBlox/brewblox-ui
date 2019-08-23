@@ -18,7 +18,9 @@ export default class TempSensorMockForm extends BlockCrudComponent {
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Value</q-item-label>
+          <q-item-label caption>
+            Value
+          </q-item-label>
           <UnitField
             :value="block.data.value"
             :readonly="!block.data.connected"
@@ -30,7 +32,9 @@ export default class TempSensorMockForm extends BlockCrudComponent {
       </q-item>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Connected</q-item-label>
+          <q-item-label caption>
+            Connected
+          </q-item-label>
           <q-toggle
             :value="block.data.connected"
             @input="v => { block.data.connected = v; saveBlock(); }"
