@@ -6,36 +6,21 @@ import { Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
 import { createActions, defineChangedBlocks, defineCreatedBlocks, defineLayouts, defineWidgets } from './changes';
-import { FermentConfig } from './types';
+import { HermsConfig } from './types';
 
 
 @Component
-export default class FermentSettingsTask extends WizardTaskBase {
-  readonly config!: FermentConfig;
+export default class HermsSettingsTask extends WizardTaskBase {
+  readonly config!: HermsConfig;
 
-  fridgeSetting = new Unit(20, 'degC');
-  beerSetting = new Unit(20, 'degC');
-  activeSetpoint: 'beer' | 'fridge' = 'beer';
+  mtSetting = new Unit(20, 'degC');
+  bkSetting = new Unit(20, 'degC');
 
   get userTemp(): string {
     return sparkStore.units(this.config.serviceId).Temp;
   }
 
-  get targetOpts() {
-    return [
-      {
-        label: 'Beer',
-        value: 'beer',
-      },
-      {
-        label: 'Fridge',
-        value: 'fridge',
-      },
-    ];
-  }
-
-  defaultTemp(): Unit {
-    const degC = 20;
+  defaultTemp(degC: number): Unit {
     const defaultTempValues = { degC, degF: (degC * 9 / 5) + 32, degK: degC + 273.15 };
     return new Unit(defaultTempValues[this.userTemp] || 20, this.userTemp);
   }
@@ -43,15 +28,14 @@ export default class FermentSettingsTask extends WizardTaskBase {
   done() {
     const createdBlocks = defineCreatedBlocks(
       this.config,
-      this.fridgeSetting,
-      this.beerSetting,
-      this.activeSetpoint);
+      this.mtSetting,
+      this.bkSetting);
     const changedBlocks = defineChangedBlocks(this.config);
     const layouts = defineLayouts(this.config);
     const widgets = defineWidgets(this.config, layouts);
 
     this.pushActions(createActions());
-    this.updateConfig<FermentConfig>({
+    this.updateConfig<HermsConfig>({
       ...this.config,
       layouts,
       widgets,
@@ -62,8 +46,8 @@ export default class FermentSettingsTask extends WizardTaskBase {
   }
 
   mounted() {
-    this.fridgeSetting = this.defaultTemp();
-    this.beerSetting = this.defaultTemp();
+    this.mtSetting = this.defaultTemp(20);
+    this.bkSetting = this.defaultTemp(20);
   }
 }
 </script>
@@ -75,34 +59,23 @@ export default class FermentSettingsTask extends WizardTaskBase {
         <big>Settings</big>
       </q-item>
       <q-item dark>
-        <q-item-section>These are initial settings, and can also be configured later.</q-item-section>
+        <q-item-section>
+          These are initial settings, and can also be configured later.
+          <br />Elements will be disabled when created.
+        </q-item-section>
       </q-item>
       <q-item dark>
         <q-item-section>
           <q-item-label caption>
-            Fridge setpoint
+            MT setting
           </q-item-label>
-          <UnitField v-model="fridgeSetting" title="Fridge setting" />
+          <UnitField v-model="mtSetting" title="MT setting" />
         </q-item-section>
         <q-item-section>
           <q-item-label caption>
-            Beer setpoint
+            BK setting
           </q-item-label>
-          <UnitField v-model="beerSetting" title="Beer setting" />
-        </q-item-section>
-        <q-item-section class="col-auto">
-          <q-item-label caption>
-            Setpoint used by control
-          </q-item-label>
-          <div class="row">
-            <q-btn-toggle
-              v-model="activeSetpoint"
-              :options="targetOpts"
-              dark
-              dense
-              class="col-auto"
-            />
-          </div>
+          <UnitField v-model="bkSetting" title="BK setting" />
         </q-item-section>
       </q-item>
     </q-card-section>

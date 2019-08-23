@@ -77,6 +77,7 @@ export default class ArrangementWizardPicker extends Vue {
               :options="wizardOptions"
               label="Arrangement type"
               option-label="displayName"
+              option-value="id"
               dark
               options-dark
             />

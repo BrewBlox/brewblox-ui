@@ -182,8 +182,13 @@ export const isAbsoluteUrl = (val: string) =>
   new RegExp('^(?:[a-z]+:)?//', 'i').test(val);
 
 export const entryReducer =
-  (acc: Record<string, any>, [key, val]: [string, any]) =>
-    ({ ...acc, [key]: val });
+  (acc: Record<string, any>, [key, val]: [string, any]) => {
+    acc[key] = val;
+    return acc;
+  };
 
 export const objReducer = (key: string) =>
-  (acc: Record<string, any>, obj: any) => ({ ...acc, [obj[key]]: obj });
+  (acc: Record<string, any>, obj: any) => {
+    acc[obj[key]] = obj;
+    return acc;
+  };
