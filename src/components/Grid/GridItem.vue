@@ -65,7 +65,7 @@ export default class GridItem extends Vue {
     };
   }
 
-  startInteraction(e: MouseEvent | TouchEvent) {
+  startInteraction(e: MouseEvent | TouchEvent): void {
     this.setMouseStartPosition(e);
 
     // set initial values of item
@@ -83,7 +83,7 @@ export default class GridItem extends Vue {
     this.$emit('start-edit', this.id);
   }
 
-  stopInteraction() {
+  stopInteraction(): void {
     // reset values of item
     this.currentCols = null;
     this.currentRows = null;
@@ -100,7 +100,7 @@ export default class GridItem extends Vue {
     this.$emit('stop-edit', this.id);
   }
 
-  moveInteraction(e: MouseEvent | TouchEvent) {
+  moveInteraction(e: MouseEvent | TouchEvent): void {
     const delta = this.moveDelta(e);
     const position = this.gridPosition(delta);
 
@@ -110,18 +110,18 @@ export default class GridItem extends Vue {
     this.$emit('move', this.id, { x: this.currentStartCols, y: this.currentStartRows });
   }
 
-  updateSize() {
+  updateSize(): void {
     this.$emit('size',
       this.id,
       this.currentCols || this.widget.cols,
       this.currentRows || this.widget.rows);
   }
 
-  updatePosition(pos: XYPosition | null) {
+  updatePosition(pos: XYPosition | null): void {
     this.$emit('position', this.id, pos);
   }
 
-  changeSize() {
+  changeSize(): void {
     const newCols = Math.round((this.dragWidth + GAP_SIZE) / (GRID_SIZE + GAP_SIZE));
     const newRows = Math.round((this.dragHeight + GAP_SIZE) / (GRID_SIZE + GAP_SIZE));
 
@@ -134,7 +134,7 @@ export default class GridItem extends Vue {
     }
   }
 
-  setMouseStartPosition(e: MouseEvent | TouchEvent) {
+  setMouseStartPosition(e: MouseEvent | TouchEvent): void {
     if (e instanceof MouseEvent) {
       this.startX = e.pageX;
       this.startY = e.pageY;
@@ -198,7 +198,7 @@ export default class GridItem extends Vue {
     };
   }
 
-  startDrag(e: MouseEvent | TouchEvent) {
+  startDrag(e: MouseEvent | TouchEvent): void {
     this.moving = true;
     this.startInteraction(e);
 
@@ -217,14 +217,14 @@ export default class GridItem extends Vue {
     this.currentStartRows = position.y;
   }
 
-  stopDrag() {
+  stopDrag(): void {
     this.moving = false;
     const pos = { x: this.currentStartCols, y: this.currentStartRows };
     this.updatePosition(pos as XYPosition);
     this.stopInteraction();
   }
 
-  resizePanHandler(args: PanArguments) {
+  resizePanHandler(args: PanArguments): void {
     if (args.isFirst) {
       this.startResize(args.evt);
       return;
@@ -238,25 +238,25 @@ export default class GridItem extends Vue {
     this.onResizeMove(args.evt);
   }
 
-  startResize(e: MouseEvent | TouchEvent) {
+  startResize(e: MouseEvent | TouchEvent): void {
     this.dragging = true;
     this.startInteraction(e);
   }
 
-  onResizeMove(e: MouseEvent | TouchEvent) {
+  onResizeMove(e: MouseEvent | TouchEvent): void {
     const delta = this.moveDelta(e);
     this.dragWidth = this.dragStartWidth + delta.x;
     this.dragHeight = this.dragStartHeight + delta.y;
     this.changeSize();
   }
 
-  stopResize() {
+  stopResize(): void {
     this.dragging = false;
     this.updateSize();
     this.stopInteraction();
   }
 
-  movePanHandler(args: PanArguments) {
+  movePanHandler(args: PanArguments): void {
     if (args.isFirst) {
       this.startDrag(args.evt);
       return;
@@ -270,11 +270,11 @@ export default class GridItem extends Vue {
     this.moveInteraction(args.evt);
   }
 
-  unpin() {
+  unpin(): void {
     this.updatePosition(null);
   }
 
-  pin() {
+  pin(): void {
     const rects = this.containerSize();
     const firstChildRects = this.containerFirstChildSize();
 

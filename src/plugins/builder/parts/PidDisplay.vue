@@ -23,7 +23,7 @@ export default class PidDisplay extends PartBase {
       : null;
   }
 
-  get kp() {
+  get kp(): number | null {
     return this.block
       ? this.block.data.kp.value
       : null;

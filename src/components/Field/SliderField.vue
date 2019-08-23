@@ -29,15 +29,15 @@ export default class SliderField extends FieldBase {
   readonly decimals!: number;
 
   @Emit('input')
-  public change(v: number) {
+  public change(v: number): number {
     return v;
   }
 
-  get displayValue() {
+  get displayValue(): string | number {
     return round(this.value, this.decimals);
   }
 
-  openDialog() {
+  openDialog(): void {
     if (this.readonly) {
       return;
     }

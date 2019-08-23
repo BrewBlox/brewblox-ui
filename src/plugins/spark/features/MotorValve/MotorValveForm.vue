@@ -32,18 +32,18 @@ export default class MotorValveForm extends BlockCrudComponent {
       .reduce((acc, block) => ({ ...acc, [block.data.startChannel]: block.id }), {});
   }
 
-  get valveStateName() {
+  get valveStateName(): string {
     return spaceCased(ValveState[this.block.data.valveState]);
   }
 
-  driverStr(pinId: number) {
+  driverStr(pinId: number): string {
     const driver = this.claimedChannels[pinId];
     return driver && driver !== this.block.id
       ? ` (replace '${driver}')`
       : '';
   }
 
-  get channelOpts() {
+  get channelOpts(): SelectOption[] {
     return [
       { label: 'Not set', value: 0 },
       ...Object.keys(ValveStartId)
@@ -53,7 +53,7 @@ export default class MotorValveForm extends BlockCrudComponent {
     ];
   }
 
-  async claimChannel(pinId: number) {
+  async claimChannel(pinId: number): Promise<void> {
     if (this.block.data.startChannel === pinId) {
       return;
     }

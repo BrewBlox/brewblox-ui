@@ -6,7 +6,7 @@ import { defaultLabel, targetBuilder, targetSplitter } from '@/components/Graph/
 import { GraphConfig } from '@/components/Graph/types';
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { durationString } from '@/helpers/functional';
-import { DisplayNames, GraphValueAxes, historyStore,LineColors } from '@/store/history';
+import { DisplayNames, GraphValueAxes, historyStore, LineColors, QueryParams } from '@/store/history';
 
 interface PeriodDisplay {
   start: boolean;
@@ -36,7 +36,7 @@ export default class GraphForm extends CrudComponent {
     };
   }
 
-  get periodOptions() {
+  get periodOptions(): SelectOption[] {
     return [
       {
         label: 'Live: [duration] to now',
@@ -61,22 +61,23 @@ export default class GraphForm extends CrudComponent {
     ];
   }
 
-  get paramDefaults() {
+  paramDefaults(): QueryParams {
     return {
-      start: () => new Date().getTime() - parseDuration('1d'),
-      duration: () => '1d',
-      end: () => new Date().getTime(),
+      start: new Date().getTime() - parseDuration('1d'),
+      duration: '1d',
+      end: new Date().getTime(),
     };
   }
 
-  sanitizeParams(period: PeriodDisplay) {
+  sanitizeParams(period: PeriodDisplay): void {
+    const defaults = this.paramDefaults();
     Object.entries(period)
       .forEach(([key, isPresent]: [string, boolean]) =>
         this.$set(
           this.config.params,
           key,
           (isPresent
-            ? this.config.params[key] || this.paramDefaults[key]()
+            ? this.config.params[key] || defaults[key]
             : undefined)
         ));
   }
@@ -84,7 +85,7 @@ export default class GraphForm extends CrudComponent {
   get shownPeriod(): PeriodDisplay {
     if (this.period === null) {
       const keys = ['start', 'duration', 'end'];
-      const compare = (opt, k) => {
+      const compare = (opt, k): boolean => {
         const val = this.config.params[k];
         return opt.value[k] === (val !== null && val !== undefined);
       };
@@ -98,16 +99,16 @@ export default class GraphForm extends CrudComponent {
 
       // if no match was found, params must be sanitized
       if (!matching) {
-        this.sanitizeParams(this.period);
+        this.sanitizeParams(this.period as PeriodDisplay);
         this.saveConfig(this.config);
       }
 
     }
 
-    return this.period;
+    return this.period as PeriodDisplay;
   }
 
-  updateShownPeriod(val: PeriodDisplay) {
+  updateShownPeriod(val: PeriodDisplay): void {
     this.period = val;
     this.sanitizeParams(val);
     this.saveConfig(this.config);
@@ -142,7 +143,7 @@ export default class GraphForm extends CrudComponent {
     return this.config.axes;
   }
 
-  get axisOpts() {
+  get axisOpts(): SelectOption[] {
     return [
       {
         value: 'y',
@@ -155,7 +156,7 @@ export default class GraphForm extends CrudComponent {
     ];
   }
 
-  updateAxis(field: string, value: string) {
+  updateAxis(field: string, value: string): void {
     this.saveConfig({ ...this.config, axes: { ...this.axes, [field]: value } });
   }
 
@@ -163,7 +164,7 @@ export default class GraphForm extends CrudComponent {
     return this.config.colors;
   }
 
-  updateColor(field: string, color: string) {
+  updateColor(field: string, color: string): void {
     if (color) {
       this.$set(this.colors, field, color);
     } else {
@@ -172,7 +173,7 @@ export default class GraphForm extends CrudComponent {
     this.saveConfig({ ...this.config, colors: this.colors });
   }
 
-  created() {
+  created(): void {
     historyStore.fetchKnownKeys();
   }
 }

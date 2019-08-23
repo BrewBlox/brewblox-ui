@@ -10,11 +10,11 @@ import { HermsConfig } from './types';
 export default class HermsManualTask extends WizardTaskBase {
   readonly config!: HermsConfig;
 
-  mounted() {
+  mounted(): void {
     this.executePrepared();
   }
 
-  done() {
+  done(): void {
     this.$router.push(`/dashboard/${this.config.dashboardId}`);
     this.finish();
   }

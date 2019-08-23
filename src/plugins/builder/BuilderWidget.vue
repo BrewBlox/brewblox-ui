@@ -49,7 +49,7 @@ export default class BuilderWidget extends WidgetBase {
       .filter(v => !!v);
   }
 
-  get wrongBrowser() {
+  get wrongBrowser(): boolean {
     return /(Edge|MSIE)/.test(window.navigator.userAgent);
   }
 
@@ -68,7 +68,7 @@ export default class BuilderWidget extends WidgetBase {
     });
   }
 
-  async saveParts(parts: PersistentPart[]) {
+  async saveParts(parts: PersistentPart[]): Promise<void> {
     if (!this.layout) {
       return;
     }
@@ -79,7 +79,7 @@ export default class BuilderWidget extends WidgetBase {
     this.debouncedCalculate();
   }
 
-  async savePart(part: PersistentPart) {
+  async savePart(part: PersistentPart): Promise<void> {
     await this.saveParts(this.parts.map(p => (p.id === part.id ? part : p)));
   }
 
@@ -112,11 +112,11 @@ export default class BuilderWidget extends WidgetBase {
     };
   }
 
-  isClickable(part) {
+  isClickable(part): boolean {
     return !!this.specs[part.type].interactHandler;
   }
 
-  interact(part: FlowPart) {
+  interact(part: FlowPart): void {
     const handler = this.specs[part.type].interactHandler;
     handler && handler(part, this.updater);
   }
@@ -125,7 +125,7 @@ export default class BuilderWidget extends WidgetBase {
     return SQUARE_SIZE * val;
   }
 
-  startEditor() {
+  startEditor(): void {
     Dialog.create({
       component: 'BuilderEditor',
       initialLayout: this.widgetConfig.currentLayoutId,
@@ -133,14 +133,14 @@ export default class BuilderWidget extends WidgetBase {
     });
   }
 
-  async calculate() {
+  async calculate(): Promise<void> {
     await this.$nextTick();
     if (!this.editorActive) {
       this.worker.postMessage(this.parts.map(asStatePart));
     }
   }
 
-  async migrate() {
+  async migrate(): Promise<void> {
     const oldParts: PersistentPart[] = (this.widgetConfig as any).parts;
     if (oldParts) {
       const id = uid();
@@ -158,24 +158,24 @@ export default class BuilderWidget extends WidgetBase {
     }
   }
 
-  created() {
+  created(): void {
     this.migrate();
     this.worker.onmessage = (evt: MessageEvent) => this.flowParts = evt.data;
     this.debouncedCalculate = debounce(this.calculate, 200, false);
     this.debouncedCalculate();
   }
 
-  destroyed() {
+  destroyed(): void {
     this.worker.terminate();
   }
 
   @Watch('layout')
-  watchLayout() {
+  watchLayout(): void {
     this.debouncedCalculate();
   }
 
   @Watch('editorActive')
-  watchActive() {
+  watchActive(): void {
     this.debouncedCalculate();
   }
 }

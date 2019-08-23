@@ -12,7 +12,7 @@ import { FilterChoice, SetpointSensorPairBlock } from './types';
 export default class SetpointSensorPairForm extends BlockCrudComponent {
   readonly block!: SetpointSensorPairBlock;
 
-  get filterOpts() {
+  get filterOpts(): SelectOption[] {
     return Object.keys(FilterChoice)
       .filter(val => !Number.isNaN(Number(val)))
       .map(value => ({

@@ -59,7 +59,7 @@ export default class Unit {
     return new Unit(val, this.unit);
   }
 
-  public isEqual(other: Unit) {
+  public isEqual(other: Unit): boolean {
     return other
       && this.unit === other.unit
       && this.roundedValue === other.roundedValue;

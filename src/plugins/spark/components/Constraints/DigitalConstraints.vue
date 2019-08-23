@@ -10,7 +10,7 @@ import ConstraintsBase, { EditableConstraint } from './ConstraintsBase';
 
 @Component
 export default class DigitalConstraints extends ConstraintsBase {
-  get constraintOptions() {
+  get constraintOptions(): SelectOption[] {
     return [...digitalConstraintLabels].map(([k, v]) => ({ label: v, value: k }));
   }
 
@@ -31,7 +31,7 @@ export default class DigitalConstraints extends ConstraintsBase {
     }
   }
 
-  addConstraint() {
+  addConstraint(): void {
     Dialog.create({
       title: 'Add constraint',
       dark: true,

@@ -26,7 +26,7 @@ export default class SizeCard extends PartCard {
     return this.part.settings[this.settingsKey] || this.defaultSize;
   }
 
-  save(val: number) {
+  save(val: number): void {
     const size = val || this.defaultSize;
     this.savePartSettings({ ...this.part.settings, [this.settingsKey]: size });
   }

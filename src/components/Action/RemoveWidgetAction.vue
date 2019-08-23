@@ -12,7 +12,7 @@ export default class RemoveWidgetAction extends CrudComponent {
   @Prop({ type: String, default: 'delete' })
   readonly icon!: string;
 
-  get itemProps() {
+  get itemProps(): Record<string, any> {
     return {
       ...this.$attrs,
       ...this.$props,

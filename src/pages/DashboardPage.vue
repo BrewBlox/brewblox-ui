@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
-import { DashboardItem, dashboardStore } from '@/store/dashboards';
+import { Dashboard, DashboardItem, dashboardStore } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '../helpers/dashboards';
@@ -22,12 +22,12 @@ export default class DashboardPage extends Vue {
   wizardModalOpen = false;
 
   @Watch('dashboardId')
-  onChangeDashboardId() {
+  onChangeDashboardId(): void {
     this.widgetEditable = false;
   }
 
   @Watch('dashboard')
-  onChangeDashboard(newDash, oldDash) {
+  onChangeDashboard(newDash, oldDash): void {
     if (oldDash && !newDash) {
       // Dashboard was removed
       this.$router.replace('/');
@@ -38,19 +38,19 @@ export default class DashboardPage extends Vue {
     return this.$route.params.id;
   }
 
-  get dashboard() {
+  get dashboard(): Dashboard {
     return dashboardStore.dashboardById(this.dashboardId);
   }
 
-  get allDashboards() {
+  get allDashboards(): Dashboard[] {
     return dashboardStore.dashboardValues;
   }
 
-  get allItems() {
+  get allItems(): DashboardItem[] {
     return dashboardStore.itemValues;
   }
 
-  get items() {
+  get items(): DashboardItem[] {
     return dashboardStore.dashboardItemsByDashboardId(this.dashboardId)
       .sort(objectSorter('order'));
   }
@@ -87,7 +87,7 @@ export default class DashboardPage extends Vue {
     return this.$q.platform.is.mobile;
   }
 
-  async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: string[]) {
+  async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: string[]): Promise<void> {
     try {
       // Make a local change to the validated item, to avoid it jumping during the store round trip
       const local = this.validatedItems.find(valItem => valItem.item.id === id);
@@ -101,35 +101,35 @@ export default class DashboardPage extends Vue {
     }
   }
 
-  async onChangeSize(id: string, cols: number, rows: number) {
+  async onChangeSize(id: string, cols: number, rows: number): Promise<void> {
     await dashboardStore.updateDashboardItemSize({ id, cols, rows });
   }
 
-  public async saveWidget(widget: DashboardItem) {
+  public async saveWidget(widget: DashboardItem): Promise<void> {
     await dashboardStore.saveDashboardItem(widget);
   }
 
-  onIdChanged(oldId, newId) {
+  onIdChanged(oldId, newId): void {
     if (newId && this.$route.path === `/dashboard/${oldId}`) {
       this.$router.replace(`/dashboard/${newId}`);
     }
   }
 
-  changeDashboardId() {
+  changeDashboardId(): void {
     const oldId = this.dashboard.id;
     startChangeDashboardId(this.dashboard, newId => this.onIdChanged(oldId, newId));
   }
 
-  changeDashboardTitle() {
+  changeDashboardTitle(): void {
     const oldId = this.dashboard.id;
     startChangeDashboardTitle(this.dashboard, newId => this.onIdChanged(oldId, newId));
   }
 
-  toggleDefaultDashboard() {
+  toggleDefaultDashboard(): void {
     dashboardStore.updatePrimaryDashboard(this.dashboard.primary ? null : this.dashboardId);
   }
 
-  removeDashboard() {
+  removeDashboard(): void {
     startRemoveDashboard(this.dashboard);
   }
 }

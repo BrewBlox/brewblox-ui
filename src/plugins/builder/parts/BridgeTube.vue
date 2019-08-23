@@ -26,19 +26,19 @@ export default class BridgeTube extends PartBase {
         H21.69 a7.69,7.69,0,0,0-6,3.46 l-1,1.73 a7.69,7.69,0,0,1-6,3.46 H0`,
   };
 
-  get lowLiquid() {
+  get lowLiquid(): string[] {
     return this.liquidOnCoord(UP);
   }
 
-  get highLiquid() {
+  get highLiquid(): string[] {
     return this.liquidOnCoord(LEFT);
   }
 
-  get lowFlowSpeed() {
+  get lowFlowSpeed(): number {
     return this.flowOnCoord(UP);
   }
 
-  get highFlowSpeed() {
+  get highFlowSpeed(): number {
     return this.flowOnCoord(LEFT);
   }
 }

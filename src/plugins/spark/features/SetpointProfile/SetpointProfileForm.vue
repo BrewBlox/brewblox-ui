@@ -23,7 +23,7 @@ export default class SetpointProfileForm extends BlockCrudComponent {
 
   readonly block!: SetpointProfileBlock;
 
-  get tempUnit() {
+  get tempUnit(): string {
     return sparkStore.units(this.block.serviceId).Temp;
   }
 
@@ -41,7 +41,7 @@ export default class SetpointProfileForm extends BlockCrudComponent {
       }));
   }
 
-  savePoints(points: DisplaySetpoint[] = this.points) {
+  savePoints(points: DisplaySetpoint[] = this.points): void {
     this.block.data.points = points
       .sort(objectSorter('offsetMs'))
       .map((point: DisplaySetpoint) => ({
@@ -60,7 +60,7 @@ export default class SetpointProfileForm extends BlockCrudComponent {
     };
   }
 
-  addPoint() {
+  addPoint(): void {
     const newPoint = this.points.length > 0
       ? deepCopy(this.points[this.points.length - 1])
       : this.defaultPoint();
@@ -68,17 +68,17 @@ export default class SetpointProfileForm extends BlockCrudComponent {
     this.savePoints();
   }
 
-  removePoint(index: number) {
+  removePoint(index: number): void {
     this.points.splice(index, 1);
     this.savePoints();
   }
 
-  updateStartTime(startDate: Date) {
+  updateStartTime(startDate: Date): void {
     this.block.data.start = startDate.getTime() / 1000;
     this.saveBlock();
   }
 
-  notifyInvalidTime() {
+  notifyInvalidTime(): void {
     this.$q.notify({
       icon: 'error',
       color: 'negative',
@@ -86,7 +86,7 @@ export default class SetpointProfileForm extends BlockCrudComponent {
     });
   }
 
-  updatePointTime(index: number, date: Date) {
+  updatePointTime(index: number, date: Date): void {
     const absTimeMs = date.getTime();
     if (absTimeMs < this.start) {
       this.notifyInvalidTime();
@@ -100,7 +100,7 @@ export default class SetpointProfileForm extends BlockCrudComponent {
     this.savePoints();
   }
 
-  updatePointOffset(index: number, offsetMs: number) {
+  updatePointOffset(index: number, offsetMs: number): void {
     if (offsetMs < 0) {
       this.notifyInvalidTime();
       return;

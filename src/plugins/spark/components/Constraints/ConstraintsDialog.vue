@@ -19,17 +19,17 @@ export default class InputDialog extends DialogBase {
   @Prop({ type: String, required: true, validator: v => ['analog', 'digital'].includes(v) })
   public readonly type!: string;
 
-  get component() {
+  get component(): string {
     return this.type === 'analog'
       ? 'AnalogConstraints'
       : 'DigitalConstraints';
   }
 
-  save() {
+  save(): void {
     this.onDialogOk(this.local);
   }
 
-  created() {
+  created(): void {
     this.local = deepCopy(this.value);
   }
 }

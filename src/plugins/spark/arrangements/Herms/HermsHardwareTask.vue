@@ -24,7 +24,7 @@ export default class HermsHardwareTask extends WizardTaskBase {
   mtSensor: any = null;
   bkSensor: any = null;
 
-  get pinOptions() {
+  get pinOptions(): SelectOption[] {
     return sparkStore.blockValues(this.config.serviceId)
       .filter(block => [Spark2PinsType, Spark3PinsType, DS2413Type].includes(block.type))
       .reduce(
@@ -39,13 +39,13 @@ export default class HermsHardwareTask extends WizardTaskBase {
       .map(channel => ({ label: `${channel.arrayId} ${channel.pinName}`, value: channel }));
   }
 
-  get sensorOptions() {
+  get sensorOptions(): string[] {
     return sparkStore.blockValues(this.config.serviceId)
       .filter(block => block.type === sensorOneWireType || block.type === sensorMockType)
       .map(block => block.id);
   }
 
-  get valuesOk() {
+  get valuesOk(): boolean {
     return [
       this.hltPin,
       this.bkPin,
@@ -84,15 +84,15 @@ export default class HermsHardwareTask extends WizardTaskBase {
     ].some(Boolean);
   }
 
-  created() {
+  created(): void {
     this.discover();
   }
 
-  discover() {
+  discover(): void {
     sparkStore.fetchDiscoveredBlocks(this.config.serviceId);
   }
 
-  startBlockWizard() {
+  startBlockWizard(): void {
     Dialog.create({
       component: 'BlockWizardDialog',
       serviceId: this.config.serviceId,
@@ -100,7 +100,7 @@ export default class HermsHardwareTask extends WizardTaskBase {
     });
   }
 
-  taskDone() {
+  taskDone(): void {
     this.config.bkPin = this.bkPin as PinChannel;
     this.config.hltPin = this.hltPin as PinChannel;
 

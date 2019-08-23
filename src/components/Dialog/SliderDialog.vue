@@ -27,11 +27,11 @@ export default class SliderDialog extends DialogBase {
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
-  save() {
+  save(): void {
     this.onDialogOk(this.local);
   }
 
-  created() {
+  created(): void {
     this.local = this.value;
   }
 }

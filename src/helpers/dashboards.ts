@@ -15,7 +15,7 @@ export const dashboardIdRules = (): InputRule[] => [
 ];
 
 export const changeDashboardId =
-  async (oldId: string, newId: string, onIdChanged: (id: string) => void) => {
+  async (oldId: string, newId: string, onIdChanged: (id: string) => void): Promise<void> => {
     const dashboard = dashboardStore.dashboardById(oldId);
 
     await dashboardStore.createDashboard({ ...dashboard, id: newId });
@@ -40,7 +40,7 @@ export const changeDashboardId =
   };
 
 export const startChangeDashboardId =
-  (dashboard: Dashboard, onIdChanged: (id: string) => void = (() => { })) => {
+  (dashboard: Dashboard, onIdChanged: (id: string) => void = (() => { })): void => {
     Dialog.create({
       component: 'InputDialog',
       value: dashboard.id,
@@ -57,7 +57,7 @@ export const startChangeDashboardId =
   };
 
 export const startChangeDashboardTitle =
-  (dashboard: Dashboard, onIdChanged: (id: string) => void = (() => { })) => {
+  (dashboard: Dashboard, onIdChanged: (id: string) => void = (() => { })): void => {
     Dialog.create({
       title: 'Change dashboard Title',
       message: "Change your dashboard's display name",
@@ -100,7 +100,7 @@ export const startChangeDashboardTitle =
   };
 
 export const startRemoveDashboard =
-  (dashboard: Dashboard) => {
+  (dashboard: Dashboard): void => {
     Dialog.create({
       title: 'Remove dashboard',
       message: `Are you sure you want to remove ${dashboard.title}?`,

@@ -9,14 +9,8 @@ import ConstraintsBase, { EditableConstraint } from './ConstraintsBase';
 
 @Component
 export default class AnalogConstraints extends ConstraintsBase {
-  get constraintOptions() {
+  get constraintOptions(): SelectOption[] {
     return [...analogConstraintLabels].map(([k, v]) => ({ label: v, value: k }));
-  }
-
-  editableValue(editable: EditableConstraint) {
-    return editable.key === 'balanced'
-      ? editable.value.granted
-      : editable.value;
   }
 
   createConstraint(key: string, value: any = null): EditableConstraint {
@@ -40,7 +34,7 @@ export default class AnalogConstraints extends ConstraintsBase {
     }
   }
 
-  addConstraint() {
+  addConstraint(): void {
     Dialog.create({
       title: 'Add constraint',
       dark: true,

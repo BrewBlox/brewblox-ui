@@ -13,25 +13,25 @@ export default class ScreenSizeConstrained extends Vue {
   @Prop({ type: Number, required: false })
   readonly minHeight!: number;
 
-  get widthOk() {
+  get widthOk(): boolean {
     return !this.minWidth || this.windowWidth >= this.minWidth;
   }
 
-  get heightOk() {
+  get heightOk(): boolean {
     return !this.minHeight || this.windowHeight >= this.minHeight;
   }
 
-  updateSize() {
+  updateSize(): void {
     this.windowWidth = window.innerWidth;
     this.windowHeight = window.innerHeight;
   }
 
-  mounted() {
+  mounted(): void {
     this.updateSize();
     this.$nextTick(() => window.addEventListener('resize', this.updateSize));
   }
 
-  beforeDestroy() {
+  beforeDestroy(): void {
     window.removeEventListener('resize', this.updateSize);
   }
 }

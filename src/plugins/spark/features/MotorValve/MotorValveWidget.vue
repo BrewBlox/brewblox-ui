@@ -13,17 +13,17 @@ import { MotorValveBlock, ValveState } from './types';
 export default class MotorValveWidget extends BlockWidget {
   readonly block!: MotorValveBlock;
 
-  get valveStateName() {
+  get valveStateName(): string {
     return spaceCased(ValveState[this.block.data.valveState]);
   }
 
-  get disabled12V() {
+  get disabled12V(): boolean {
     const pins: Spark3PinsBlock | undefined = sparkStore.blockValues(this.serviceId)
       .find(block => block.type === spark3PinType);
-    return pins && !pins.data.enableIoSupply12V;
+    return !!pins && !pins.data.enableIoSupply12V;
   }
 
-  enable12V() {
+  enable12V(): void {
     const pins: Spark3PinsBlock | undefined = sparkStore.blockValues(this.serviceId)
       .find(block => block.type === spark3PinType);
     if (pins) {

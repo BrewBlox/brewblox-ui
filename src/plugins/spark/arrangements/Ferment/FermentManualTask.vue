@@ -10,11 +10,11 @@ import { FermentConfig } from './types';
 export default class FermentManualTask extends WizardTaskBase {
   readonly config!: FermentConfig;
 
-  mounted() {
+  mounted(): void {
     this.executePrepared();
   }
 
-  done() {
+  done(): void {
     this.$router.push(`/dashboard/${this.config.dashboardId}`);
     this.finish();
   }

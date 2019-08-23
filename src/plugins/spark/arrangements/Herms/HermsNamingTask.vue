@@ -20,13 +20,13 @@ export default class HermsNamingTask extends WizardTaskBase {
 
   chosenNames: Partial<HermsBlockNames> = {};
 
-  get serviceOpts() {
+  get serviceOpts(): SelectOption[] {
     return serviceStore.serviceValues
       .filter(svc => svc.type === typeName)
       .map(svc => ({ label: svc.title, value: svc.id }));
   }
 
-  get serviceId() {
+  get serviceId(): string {
     let id = this.config.serviceId;
     if (!id && this.serviceOpts.length > 0) {
       id = this.serviceOpts[0].value;
@@ -38,7 +38,7 @@ export default class HermsNamingTask extends WizardTaskBase {
     this.updateConfig<HermsConfig>({ ...this.config, serviceId });
   }
 
-  get arrangementId() {
+  get arrangementId(): string {
     return valOrDefault(this.config.arrangementId, 'HERMS');
   }
 
@@ -46,7 +46,7 @@ export default class HermsNamingTask extends WizardTaskBase {
     this.updateConfig<HermsConfig>({ ...this.config, arrangementId: id });
   }
 
-  get prefix() {
+  get prefix(): string {
     return valOrDefault(this.config.prefix, this.arrangementId.slice(0, 5));
   }
 
@@ -54,7 +54,7 @@ export default class HermsNamingTask extends WizardTaskBase {
     this.updateConfig<HermsConfig>({ ...this.config, prefix });
   }
 
-  get dashboardTitle() {
+  get dashboardTitle(): string {
     return valOrDefault(this.config.dashboardTitle, `${this.arrangementId} Dashboard`);
   }
 
@@ -82,7 +82,7 @@ export default class HermsNamingTask extends WizardTaskBase {
   }
 
   get names(): HermsBlockNames {
-    const validate = val => !blockIdRules(this.serviceId)
+    const validate = (val): boolean => !blockIdRules(this.serviceId)
       .map(rule => rule(val))
       .some(isString);
     return {
@@ -91,7 +91,7 @@ export default class HermsNamingTask extends WizardTaskBase {
     };
   }
 
-  get nameRules() {
+  get nameRules(): InputRule[] {
     return [
       ...blockIdRules(this.serviceId),
       v => Object.values(this.names)
@@ -99,7 +99,7 @@ export default class HermsNamingTask extends WizardTaskBase {
     ];
   }
 
-  get valuesOk() {
+  get valuesOk(): boolean {
     return [
       this.serviceId,
       this.dashboardTitle,
@@ -116,20 +116,20 @@ export default class HermsNamingTask extends WizardTaskBase {
     return result ? result : '';
   }
 
-  updateName(key: string, val: string) {
+  updateName(key: string, val: string): void {
     this.$set(this.chosenNames, key, val.trim());
   }
 
-  clearKey(key: string) {
+  clearKey(key: string): void {
     delete this.config[key];
     this.updateConfig<HermsConfig>(this.config);
   }
 
-  clearName(key: string) {
+  clearName(key: string): void {
     this.$delete(this.chosenNames, key);
   }
 
-  taskDone() {
+  taskDone(): void {
     this.updateConfig<HermsConfig>({
       ...this.config,
       serviceId: this.serviceId,

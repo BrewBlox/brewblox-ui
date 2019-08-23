@@ -25,7 +25,7 @@ export default class HermsSettingsTask extends WizardTaskBase {
     return new Unit(defaultTempValues[this.userTemp] || 20, this.userTemp);
   }
 
-  done() {
+  done(): void {
     const createdBlocks = defineCreatedBlocks(
       this.config,
       this.mtSetting,
@@ -45,7 +45,7 @@ export default class HermsSettingsTask extends WizardTaskBase {
     this.next();
   }
 
-  mounted() {
+  mounted(): void {
     this.mtSetting = this.defaultTemp(20);
     this.bkSetting = this.defaultTemp(20);
   }

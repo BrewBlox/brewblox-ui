@@ -6,16 +6,12 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
-import { channel, typeName } from './getters';
+import { typeName } from './getters';
 import { DigitalActuatorBlock } from './types';
 
 @Component
 export default class DigitalActuatorForm extends BlockCrudComponent {
   readonly block!: DigitalActuatorBlock;
-
-  get actuatorChannel() {
-    return channel[this.block.data.channel];
-  }
 
   get hwBlock(): Block | null {
     const blockId = this.block.data.hwDevice.id;
@@ -34,7 +30,7 @@ export default class DigitalActuatorForm extends BlockCrudComponent {
       .reduce((acc, block) => ({ ...acc, [block.data.channel]: block.id }), {});
   }
 
-  pinOptName(idx: number) {
+  pinOptName(idx: number): string {
     const driver = this.claimedChannels[idx + 1];
     const [name] = Object.keys((this.hwBlock as Block).data.pins[idx]);
     return driver && driver !== this.block.id
@@ -42,7 +38,7 @@ export default class DigitalActuatorForm extends BlockCrudComponent {
       : name;
   }
 
-  get channelOpts() {
+  get channelOpts(): SelectOption[] {
     const opts = [{ label: 'Not set', value: 0 }];
     if (this.hwBlock) {
       opts.push(
@@ -52,7 +48,7 @@ export default class DigitalActuatorForm extends BlockCrudComponent {
     return opts;
   }
 
-  async claimChannel(pinId: number) {
+  async claimChannel(pinId: number): Promise<void> {
     if (this.block.data.channel === pinId) {
       return;
     }

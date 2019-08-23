@@ -20,15 +20,15 @@ export default class SystemIO extends PartBase {
   readonly chevrons = chevrons;
   readonly paths = paths;
 
-  get flowSpeed() {
+  get flowSpeed(): number {
     return this.flowOnCoord(RIGHT);
   }
 
-  get liquids() {
+  get liquids(): string[] {
     return this.liquidOnCoord(RIGHT);
   }
 
-  get arrowTransform() {
+  get arrowTransform(): string {
     if (this.flowSpeed < 0) {
       return 'rotate(180)';
     }

@@ -20,12 +20,12 @@ export default class PwmPump extends PartBase {
       : 0;
   }
 
-  get liquids() {
+  get liquids(): string[] {
     return this.liquidOnCoord(LEFT);
   }
 
   @Watch('pwmBlock')
-  triggerUpdate(block, prevBlock) {
+  triggerUpdate(block, prevBlock): void {
     if (block === null
       || prevBlock === null
       || block.data.setting !== prevBlock.data.setting) {

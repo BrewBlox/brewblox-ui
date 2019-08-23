@@ -28,7 +28,7 @@ export default class SelectField extends FieldBase {
   @Prop({ type: Object, default: () => ({}) })
   public readonly selectProps!: any;
 
-  get displayValue() {
+  get displayValue(): string {
     if (this.selectProps.multiple) {
       const text = this.value
         .map((v: any) => this.options.find((opt: any) => opt[this.optionsValue] === v))
@@ -44,11 +44,11 @@ export default class SelectField extends FieldBase {
   }
 
   @Emit('input')
-  public change(v: any) {
+  public change(v: any): any {
     return v;
   }
 
-  openDialog() {
+  openDialog(): void {
     if (this.readonly) {
       return;
     }

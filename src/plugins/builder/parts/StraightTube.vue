@@ -14,11 +14,11 @@ export default class StraightTube extends PartBase {
     liquid: 'M 0,25 H 50',
   };
 
-  get flowSpeed() {
+  get flowSpeed(): number {
     return this.flowOnCoord(RIGHT);
   }
 
-  get liquids() {
+  get liquids(): string[] {
     return this.liquidOnCoord(RIGHT);
   }
 }

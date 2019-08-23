@@ -5,14 +5,12 @@ import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 
 @Component
 export default class HermsWizard extends WidgetWizardBase {
-  get initialTasks() {
-    return [
-      'HermsNamingTask',
-      'HermsHardwareTask',
-      'HermsSettingsTask',
-      'HermsManualTask',
-    ].reverse();
-  }
+  initialTasks = [
+    'HermsNamingTask',
+    'HermsHardwareTask',
+    'HermsSettingsTask',
+    'HermsManualTask',
+  ].reverse();
 }
 </script>
 

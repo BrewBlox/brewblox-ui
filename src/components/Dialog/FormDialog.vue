@@ -40,7 +40,7 @@ export default class FormDialog extends DialogBase {
     return this.crud.widget;
   }
 
-  get form() {
+  get form(): string | undefined {
     return featureStore.formById(this.crud.widget.feature);
   }
 }

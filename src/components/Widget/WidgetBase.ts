@@ -18,11 +18,11 @@ export default class WidgetBase extends Vue {
   public readonly widget!: DashboardItem;
 
   @Emit('update:widget')
-  public saveWidget(widget: DashboardItem = this.widget) {
+  public saveWidget(widget: DashboardItem = this.widget): DashboardItem {
     return widget;
   }
 
-  public saveConfig(config: any) {
+  public saveConfig(config: any): void {
     this.saveWidget({ ...this.widget, config });
   }
 
@@ -39,7 +39,7 @@ export default class WidgetBase extends Vue {
     };
   }
 
-  public showForm(args: Record<string, any> = {}) {
+  public showForm(args: Record<string, any> = {}): void {
     this.activeDialog = Dialog.create({
       component: 'FormDialog',
       getCrud: () => this.crud,
@@ -48,7 +48,7 @@ export default class WidgetBase extends Vue {
     return this.activeDialog;
   }
 
-  public closeDialog() {
+  public closeDialog(): void {
     if (this.activeDialog) {
       this.activeDialog.hide();
       this.activeDialog = null;

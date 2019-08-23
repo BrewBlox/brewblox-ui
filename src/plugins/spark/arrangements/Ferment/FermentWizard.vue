@@ -5,14 +5,12 @@ import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 
 @Component
 export default class FermentWizard extends WidgetWizardBase {
-  get initialTasks() {
-    return [
-      'FermentNamingTask',
-      'FermentHardwareTask',
-      'FermentSettingsTask',
-      'FermentManualTask',
-    ].reverse();
-  }
+  initialTasks = [
+    'FermentNamingTask',
+    'FermentHardwareTask',
+    'FermentSettingsTask',
+    'FermentManualTask',
+  ].reverse();
 }
 </script>
 

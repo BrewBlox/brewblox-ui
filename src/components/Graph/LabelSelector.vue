@@ -16,15 +16,15 @@ export default class LabelSelector extends Vue {
   readonly renames!: DisplayNames;
 
   @Emit('update:renames')
-  saveLabels() {
+  saveLabels(): DisplayNames {
     return this.labels;
   }
 
-  get labels() {
+  get labels(): DisplayNames {
     return { ...this.renames };
   }
 
-  saveLabel(key: string, val: string | null) {
+  saveLabel(key: string, val: string | null): void {
     this.labels[key] = val || defaultLabel(key);
     this.saveLabels();
   }

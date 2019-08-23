@@ -3,7 +3,9 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 import { sparkStore } from '@/plugins/spark/store';
-import { serviceStore } from '@/store/services';
+import { Service, serviceStore } from '@/store/services';
+
+import { SystemStatus } from '../../types';
 
 
 @Component
@@ -14,15 +16,15 @@ export default class FirmwareUpdateDialog extends DialogBase {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
-  get service() {
+  get service(): Service {
     return serviceStore.serviceById(this.serviceId);
   }
 
-  get status() {
+  get status(): SystemStatus | null {
     return sparkStore.lastStatus(this.serviceId);
   }
 
-  get updateAvailableText() {
+  get updateAvailableText(): string {
     return !this.status
       ? 'Current firmware version is unknown.'
       : !this.status.latest
@@ -30,11 +32,11 @@ export default class FirmwareUpdateDialog extends DialogBase {
         : "You're using the latest firmware.";
   }
 
-  pushMessage(msg: string) {
+  pushMessage(msg: string): void {
     this.$set(this.messages, this.messages.length, msg);
   }
 
-  updateFirmware() {
+  updateFirmware(): void {
     this.busy = true;
     this.messages = [];
     this.pushMessage('Starting update...');

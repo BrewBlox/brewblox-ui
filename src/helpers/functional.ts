@@ -178,11 +178,11 @@ export const suggestId =
     return copyName(idx);
   };
 
-export const isAbsoluteUrl = (val: string) =>
+export const isAbsoluteUrl = (val: string): boolean =>
   new RegExp('^(?:[a-z]+:)?//', 'i').test(val);
 
 export const entryReducer =
-  (acc: Record<string, any>, [key, val]: [string, any]) => {
+  (acc: Record<string, any>, [key, val]: [string, any]): Record<string, any> => {
     acc[key] = val;
     return acc;
   };

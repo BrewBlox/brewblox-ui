@@ -7,7 +7,7 @@ import DialogBase from '@/components/Dialog/DialogBase';
 import { saveJsonFile } from '@/helpers/import-export';
 import { deserialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
-import { serviceStore } from '@/store/services';
+import { Service, serviceStore } from '@/store/services';
 
 
 @Component
@@ -21,16 +21,16 @@ export default class SparkImportMenu extends DialogBase {
   importBusy = false;
   messages: string[] = [];
 
-  get service() {
+  get service(): Service {
     return serviceStore.serviceById(this.serviceId);
   }
 
-  async exportBlocks() {
+  async exportBlocks(): Promise<void> {
     const exported = await sparkStore.serviceExport(this.service.id);
     saveJsonFile(exported, `brewblox-blocks-${this.service.id}.json`);
   }
 
-  handleImportFileSelect(evt) {
+  handleImportFileSelect(evt): void {
     const file = evt.target.files[0];
     if (file) {
       this.reader.readAsText(file);
@@ -39,7 +39,7 @@ export default class SparkImportMenu extends DialogBase {
     }
   }
 
-  startImportBlocks() {
+  startImportBlocks(): void {
     Dialog.create({
       title: 'Reset Blocks',
       message: 'This will remove all Blocks, and import new ones from file. Are you sure?',
@@ -50,7 +50,7 @@ export default class SparkImportMenu extends DialogBase {
       .onOk(async () => this.importBlocks());
   }
 
-  async importBlocks() {
+  async importBlocks(): Promise<void> {
     try {
       this.importBusy = true;
       this.messages = [];
@@ -78,7 +78,7 @@ export default class SparkImportMenu extends DialogBase {
     this.importBusy = false;
   }
 
-  mounted() {
+  mounted(): void {
     this.reader.onload = e => this.serializedData = get(e, 'target.result', '');
   }
 }

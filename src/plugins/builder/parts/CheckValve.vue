@@ -13,11 +13,11 @@ export default class CheckValve extends PartBase {
     ],
   };
 
-  get flowSpeed() {
+  get flowSpeed(): number {
     return this.flowOnCoord(RIGHT);
   }
 
-  get liquids() {
+  get liquids(): string[] {
     return this.liquidOnCoord(RIGHT);
   }
 }

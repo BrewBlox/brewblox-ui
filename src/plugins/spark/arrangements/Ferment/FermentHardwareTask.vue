@@ -22,7 +22,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
   fridgeSensor: any = null;
   beerSensor: any = null;
 
-  get pinOptions() {
+  get pinOptions(): SelectOption[] {
     return sparkStore.blockValues(this.config.serviceId)
       .filter(block => [Spark2PinsType, Spark3PinsType, DS2413Type].includes(block.type))
       .reduce(
@@ -37,13 +37,13 @@ export default class FermentHardwareTask extends WizardTaskBase {
       .map(channel => ({ label: `${channel.arrayId} ${channel.pinName}`, value: channel }));
   }
 
-  get sensorOptions() {
+  get sensorOptions(): string[] {
     return sparkStore.blockValues(this.config.serviceId)
       .filter(block => block.type === sensorOneWireType || block.type === sensorMockType)
       .map(block => block.id);
   }
 
-  get valuesOk() {
+  get valuesOk(): boolean {
     return [
       this.coolPin,
       this.heatPin,
@@ -69,15 +69,15 @@ export default class FermentHardwareTask extends WizardTaskBase {
     ];
   }
 
-  created() {
+  created(): void {
     this.discover();
   }
 
-  discover() {
+  discover(): void {
     sparkStore.fetchDiscoveredBlocks(this.config.serviceId);
   }
 
-  startBlockWizard() {
+  startBlockWizard(): void {
     Dialog.create({
       component: 'BlockWizardDialog',
       serviceId: this.config.serviceId,
@@ -85,7 +85,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
     });
   }
 
-  taskDone() {
+  taskDone(): void {
     this.config.heatPin = this.heatPin as PinChannel;
     this.config.coolPin = this.coolPin as PinChannel;
 

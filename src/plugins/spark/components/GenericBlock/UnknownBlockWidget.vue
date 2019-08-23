@@ -45,7 +45,7 @@ export default class UnknownBlockWidget extends WidgetBase {
     };
   }
 
-  fetchAll() {
+  fetchAll(): void {
     sparkStore.fetchAll(this.serviceId);
   }
 }

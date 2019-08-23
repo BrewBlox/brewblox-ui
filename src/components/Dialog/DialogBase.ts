@@ -18,23 +18,23 @@ export default class DialogBase extends Vue {
 
   // following method is REQUIRED
   // (don't change its name --> "show")
-  public show() {
+  public show(): void {
     this.dialog.show();
   }
 
   // following method is REQUIRED
   // (don't change its name --> "hide")
-  public hide() {
+  public hide(): void {
     this.dialog.hide();
   }
 
-  public onDialogHide() {
+  public onDialogHide(): void {
     // required to be emitted
     // when QDialog emits "hide" event
     this.$emit('hide');
   }
 
-  public onDialogOk(...arg: any[]) {
+  public onDialogOk(...arg: any[]): void {
     // on OK, it is REQUIRED to
     // emit "ok" event (with optional payload)
     // before hiding the QDialog
@@ -44,7 +44,7 @@ export default class DialogBase extends Vue {
     this.hide();
   }
 
-  public onDialogCancel() {
+  public onDialogCancel(): void {
     // we just need to hide dialog
     this.hide();
   }

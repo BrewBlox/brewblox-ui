@@ -7,12 +7,12 @@ import { dashboardStore } from '@/store/dashboards';
 
 @Component
 export default class IndexPage extends Vue {
-  get primaryDashboardId() {
+  get primaryDashboardId(): string | null {
     return dashboardStore.primaryDashboardId;
   }
 
   @Watch('primaryDashboardId', { immediate: true })
-  onPrimaryDashboardFound() {
+  onPrimaryDashboardFound(): void {
     if (this.primaryDashboardId !== null) {
       this.$router.replace(`/dashboard/${this.primaryDashboardId}`);
     }

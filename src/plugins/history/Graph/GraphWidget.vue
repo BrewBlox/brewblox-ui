@@ -33,11 +33,11 @@ export default class GraphWidget extends WidgetBase {
     return defaultPresets();
   }
 
-  isActivePreset(preset: QueryParams) {
+  isActivePreset(preset: QueryParams): boolean {
     return JSON.stringify(preset) === JSON.stringify(this.graphCfg.params);
   }
 
-  applyPreset(preset: QueryParams) {
+  applyPreset(preset: QueryParams): void {
     this.saveConfig({
       ...this.graphCfg,
       params: { ...preset },
@@ -45,11 +45,11 @@ export default class GraphWidget extends WidgetBase {
   }
 
   @Watch('graphCfg', { deep: true })
-  regraph() {
+  regraph(): void {
     this.$nextTick(() => this.widgetGraph.resetListeners());
   }
 
-  mounted() {
+  mounted(): void {
     this.$watch('widget.cols', () => this.widgetGraph.refresh());
     this.$watch('widget.rows', () => this.widgetGraph.refresh());
   }

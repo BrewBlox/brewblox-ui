@@ -16,7 +16,7 @@ export default class MetricsWizard extends WidgetWizardBase {
     decimals: {},
   }
 
-  createWidget() {
+  createWidget(): void {
     this.createItem({
       id: this.widgetId,
       title: this.widgetTitle,
@@ -28,7 +28,7 @@ export default class MetricsWizard extends WidgetWizardBase {
     });
   }
 
-  mounted() {
+  mounted(): void {
     this.widgetTitle = this.typeDisplayName;
   }
 }

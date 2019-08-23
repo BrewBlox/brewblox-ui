@@ -12,30 +12,30 @@ export default class ArrangementWizardPicker extends Vue {
   wizardModel: any = null;
   wizardActive = false;
 
-  get wizardOptions() {
+  get wizardOptions(): { id: string; displayName: string }[] {
     return featureStore.arrangementValues
       .filter(arr => !!arr.wizard)
       .sort(objectStringSorter('displayName'));
   }
 
-  setTitle(title: string) {
+  setTitle(title: string): void {
     this.$emit('title', title);
   }
 
-  reset() {
+  reset(): void {
     this.wizardActive = false;
     this.setTitle('Arrangement wizard');
   }
 
-  back() {
+  back(): void {
     this.$emit('back');
   }
 
-  close() {
+  close(): void {
     this.$emit('close');
   }
 
-  next() {
+  next(): void {
     if (!this.wizardModel) {
       this.$q.notify({
         message: 'Please select a wizard',
@@ -48,7 +48,7 @@ export default class ArrangementWizardPicker extends Vue {
     this.wizardActive = true;
   }
 
-  mounted() {
+  mounted(): void {
     this.reset();
     this.wizardModel = this.wizardOptions[0];
   }

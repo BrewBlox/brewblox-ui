@@ -6,7 +6,7 @@ import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 
 @Component
 export default class SessionViewWizard extends WidgetWizardBase {
-  createWidget() {
+  createWidget(): void {
     this.createItem({
       id: this.widgetId,
       title: this.widgetTitle,
@@ -20,7 +20,7 @@ export default class SessionViewWizard extends WidgetWizardBase {
     });
   }
 
-  mounted() {
+  mounted(): void {
     this.widgetTitle = this.typeDisplayName;
   }
 }

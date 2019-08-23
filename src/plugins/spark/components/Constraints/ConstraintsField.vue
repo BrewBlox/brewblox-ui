@@ -24,25 +24,25 @@ export default class ConstraintsField extends FieldBase {
   public readonly type!: string;
 
   @Emit('input')
-  public change(v: ConstraintsObj) {
+  public change(v: ConstraintsObj): ConstraintsObj {
     return v;
   }
 
-  get hasConstraints() {
+  get hasConstraints(): boolean {
     return this.value.constraints.length > 0;
   }
 
-  get limiters() {
+  get limiters(): string[] {
     const names: string[] = [];
     for (const constraint of this.value.constraints) {
       if (constraint.limiting) {
         names.push(Object.keys(constraint).find(k => k !== 'limiting') || 'Unknown');
       }
     }
-    return names.map(k => constraintLabels.get(k));
+    return names.map(k => constraintLabels.get(k) || k);
   }
 
-  openDialog() {
+  openDialog(): void {
     Dialog.create({
       component: 'ConstraintsDialog',
       title: this.title,
