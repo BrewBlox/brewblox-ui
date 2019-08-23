@@ -38,16 +38,20 @@ export default class ChangeConfirmDialog extends DialogBase {
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
     <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
-      <q-card-section class="q-dialog__title">{{ title }}</q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
+      <q-card-section class="q-dialog__title">
+        {{ title }}
+      </q-card-section>
+      <q-card-section v-if="message" class="q-dialog__message scroll">
+        {{ message }}
+      </q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
         <component
           :is="fieldComponent"
+          v-model="local"
           :service-id="serviceId"
           :block-id="blockId"
           v-bind="componentProps"
-          v-model="local"
           editable
         />
       </q-card-section>

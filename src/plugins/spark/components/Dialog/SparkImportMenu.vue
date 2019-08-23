@@ -17,8 +17,8 @@ export default class SparkImportMenu extends DialogBase {
   readonly serviceId!: string;
 
   reader: FileReader = new FileReader();
-  serializedData: string = '';
-  importBusy: boolean = false;
+  serializedData = '';
+  importBusy = false;
   messages: string[] = [];
 
   get service() {
@@ -90,7 +90,9 @@ export default class SparkImportMenu extends DialogBase {
       <DialogToolbar @close="onDialogHide">
         <q-item-section>
           <q-item-label>{{ service.id }}</q-item-label>
-          <q-item-label caption>Import/Export Blocks</q-item-label>
+          <q-item-label caption>
+            Import/Export Blocks
+          </q-item-label>
         </q-item-section>
       </DialogToolbar>
 
@@ -120,7 +122,9 @@ export default class SparkImportMenu extends DialogBase {
           <q-item-section>
             Reported problems during last import:
             <ul>
-              <li v-for="(msg, idx) in messages" :key="idx">{{ msg }}</li>
+              <li v-for="(msg, idx) in messages" :key="idx">
+                {{ msg }}
+              </li>
             </ul>
           </q-item-section>
         </q-item>

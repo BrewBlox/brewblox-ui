@@ -26,20 +26,20 @@ export default class GridItem extends Vue {
   @Prop({ type: Boolean, default: false })
   readonly editable!: boolean;
 
-  dragging: boolean = false;
-  moving: boolean = false;
+  dragging = false;
+  moving = false;
 
-  gridWidth: number = 0;
-  startX: number = 0;
-  startY: number = 0;
-  dragWidth: number = 0;
-  dragHeight: number = 0;
-  dragStartWidth: number = 0;
-  dragStartHeight: number = 0;
-  dragStartX: number = 0;
-  dragStartY: number = 0;
-  dragStartParentX: number = 0;
-  dragStartParentY: number = 0;
+  gridWidth = 0;
+  startX = 0;
+  startY = 0;
+  dragWidth = 0;
+  dragHeight = 0;
+  dragStartWidth = 0;
+  dragStartHeight = 0;
+  dragStartX = 0;
+  dragStartY = 0;
+  dragStartParentX = 0;
+  dragStartParentY = 0;
 
   currentCols: number | null = null;
   currentRows: number | null = null;
@@ -306,19 +306,21 @@ export default class GridItem extends Vue {
       class="grid-item-drag-overlay"
     />
     <!-- Item resize button -->
-    <button v-touch-pan.mouse="resizePanHandler" v-if="!editable" class="grid-item-resize-handle">
+    <button v-if="!editable" v-touch-pan.mouse="resizePanHandler" class="grid-item-resize-handle">
       <q-icon name="mdi-resize-bottom-right" size="30px" />
     </button>
     <!-- Item drag button -->
     <button
-      v-touch-pan.mouse="movePanHandler"
       v-if="editable"
+      v-touch-pan.mouse="movePanHandler"
       class="grid-item-move-handle grid-item-movable"
     >
       <div class="row">
         <div class="column">
           <q-icon name="mdi-gesture-swipe-horizontal" size="50px" class="shadowed" />
-          <p class="shadowed">drag</p>
+          <p class="shadowed">
+            drag
+          </p>
         </div>
         <q-btn
           :icon="widget.pinnedPosition ? 'mdi-pin-off' : 'mdi-pin'"

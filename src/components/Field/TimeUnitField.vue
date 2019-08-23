@@ -46,9 +46,13 @@ export default class TimeUnitField extends FieldBase {
     :class="[{editable: !readonly}, tagClass]"
     @click="openDialog"
   >
-    <slot name="pre"/>
-    <slot name="value">{{ value | unitDuration }}</slot>
-    <slot/>
-    <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
+    <slot name="pre" />
+    <slot name="value">
+      {{ value | unitDuration }}
+    </slot>
+    <slot />
+    <q-tooltip v-if="!readonly">
+      Set {{ label }}
+    </q-tooltip>
   </component>
 </template>

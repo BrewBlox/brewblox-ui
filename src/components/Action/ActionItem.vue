@@ -55,9 +55,9 @@ export default class ActionItem extends Vue {
     @click="onClick"
   >
     <q-item-section v-if="icon" avatar>
-      <q-icon :name="icon"/>
+      <q-icon :name="icon" />
     </q-item-section>
     <q-item-section>{{ label }}</q-item-section>
-    <slot/>
+    <slot />
   </q-item>
 </template>

@@ -5,7 +5,7 @@ import BlockCrudComponent from './BlockCrudComponent';
 
 @Component
 export default class BlockWidgetToolbar extends BlockCrudComponent {
-  graphModalOpen: boolean = false;
+  graphModalOpen = false;
 
   @Prop({ type: Object })
   public readonly graphProps!: any;
@@ -16,8 +16,8 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
   <WidgetToolbar :title="widget.title" :subtitle="displayName">
     <BlockGraph
       v-if="graphModalOpen"
-      v-model="graphModalOpen"
       :id="widget.id"
+      v-model="graphModalOpen"
       :config.sync="graphCfg"
     />
 

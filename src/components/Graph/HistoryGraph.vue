@@ -10,10 +10,10 @@ import {
   DisplayNames,
   GraphValueAxes,
   GraphValuesListener,
+  historyStore,
   LineColors,
   QueryParams,
   QueryTarget,
-  historyStore,
 } from '@/store/history';
 
 import { addPlotlyListener } from './actions';
@@ -23,8 +23,8 @@ interface Policies { [measurement: string]: string }
 
 @Component
 export default class HistoryGraph extends Vue {
-  revision: number = 0;
-  editing: boolean = false;
+  revision = 0;
+  editing = false;
 
   @Ref() readonly display!: any;
 

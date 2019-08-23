@@ -18,7 +18,9 @@ export default class ActuatorAnalogMockForm extends BlockCrudComponent {
     <q-card-section>
       <q-item dark>
         <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>Setting</q-item-label>
+          <q-item-label caption>
+            Setting
+          </q-item-label>
           <InputField
             :readonly="isDriven"
             :value="block.data.setting"
@@ -29,7 +31,9 @@ export default class ActuatorAnalogMockForm extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>Clip to min</q-item-label>
+          <q-item-label caption>
+            Clip to min
+          </q-item-label>
           <InputField
             :value="block.data.minSetting"
             title="Setting min"
@@ -39,7 +43,9 @@ export default class ActuatorAnalogMockForm extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>Clip to max</q-item-label>
+          <q-item-label caption>
+            Clip to max
+          </q-item-label>
           <InputField
             :value="block.data.maxSetting"
             type="number"
@@ -51,11 +57,15 @@ export default class ActuatorAnalogMockForm extends BlockCrudComponent {
       </q-item>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Value</q-item-label>
+          <q-item-label caption>
+            Value
+          </q-item-label>
           <big>{{ block.data.value | round }}</big>
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Clip to min</q-item-label>
+          <q-item-label caption>
+            Clip to min
+          </q-item-label>
           <InputField
             :value="block.data.minValue"
             type="number"
@@ -65,7 +75,9 @@ export default class ActuatorAnalogMockForm extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Clip to max</q-item-label>
+          <q-item-label caption>
+            Clip to max
+          </q-item-label>
           <InputField
             :value="block.data.maxValue"
             type="number"

@@ -63,5 +63,7 @@ export default class LinkValEdit extends ValEdit {
     @input="v => { field.id = v; saveField(field); }"
     @filter="filterFn"
   />
-  <div v-else>{{ displayVal }}</div>
+  <div v-else>
+    {{ displayVal }}
+  </div>
 </template>

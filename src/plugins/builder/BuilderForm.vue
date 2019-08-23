@@ -92,7 +92,9 @@ export default class BuilderForm extends CrudComponent {
     <q-card-section
       v-if="layouts.length === 0"
       class="text-italic q-ml-md"
-    >There are no layouts. Use the Editor to create a new layout.</q-card-section>
+    >
+      There are no layouts. Use the Editor to create a new layout.
+    </q-card-section>
     <q-card-section v-else class="row">
       <div class="col column">
         <span class="text-italic text-h6 q-ml-md">In this Widget</span>
@@ -103,7 +105,9 @@ export default class BuilderForm extends CrudComponent {
           <q-item v-for="lay in activeLayouts" :key="lay.id" dark dense>
             <q-item-section
               :class="{grabbable: true, ['text-primary']: lay.id === currentId}"
-            >{{ lay.title }}</q-item-section>
+            >
+              {{ lay.title }}
+            </q-item-section>
           </q-item>
         </draggable>
       </div>
@@ -114,7 +118,9 @@ export default class BuilderForm extends CrudComponent {
         >These are all available layouts. They can be displayed by any Builder Widget.</small>
         <draggable :list="inactiveLayouts" class="col" group="layout-selector">
           <q-item v-for="lay in inactiveLayouts" :key="lay.id" dark dense>
-            <q-item-section class="grabbable">{{ lay.title }}</q-item-section>
+            <q-item-section class="grabbable">
+              {{ lay.title }}
+            </q-item-section>
           </q-item>
         </draggable>
       </div>

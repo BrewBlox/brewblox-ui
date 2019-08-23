@@ -22,7 +22,7 @@ interface ChangeDiff {
 
 @Component
 export default class StepViewWidget extends WidgetBase {
-  applying: boolean = false;
+  applying = false;
 
   get serviceId() {
     return this.widget.config.serviceId;
@@ -87,17 +87,17 @@ export default class StepViewWidget extends WidgetBase {
   async applyChanges(step: Step) {
     const changes = step.changes;
     const actualChanges: [Block, any][] = [];
-    for (let change of changes) {
+    for (const change of changes) {
       const block = sparkStore.blockById(this.serviceId, change.blockId);
       const actualData = deepCopy(change.data);
-      for (let key in change.data) {
+      for (const key in change.data) {
         if (change.confirmed && change.confirmed[key]) {
           actualData[key] = await this.confirmStepChange(block, key, actualData[key]);
         }
       }
       actualChanges.push([block, actualData]);
     }
-    for (let [block, actualData] of actualChanges) {
+    for (const [block, actualData] of actualChanges) {
       await sparkStore.saveBlock([this.serviceId, { ...block, data: { ...block.data, ...actualData } }]);
     }
     step.changes = step.changes.map((change, idx) => ({ ...change, data: actualChanges[idx][1] }));
@@ -173,11 +173,15 @@ export default class StepViewWidget extends WidgetBase {
       <q-item v-for="step in steps" :key="step.id" dark>
         <q-item-section>
           {{ step.name }}
-          <q-item-label caption>{{ step.changes.length }} Blocks changed</q-item-label>
+          <q-item-label caption>
+            {{ step.changes.length }} Blocks changed
+          </q-item-label>
           <q-tooltip v-if="applicableSteps[step.id]">
             <q-list dark dense>
               <q-item v-for="cdiff in stepDiff(step)" :key="`cdiff-${cdiff.id}`" dark>
-                <q-item-section class="col-3">{{ cdiff.id }}</q-item-section>
+                <q-item-section class="col-3">
+                  {{ cdiff.id }}
+                </q-item-section>
                 <q-item-section>
                   <ul>
                     <li v-for="item in cdiff.diff" :key="`diff-item-${item.key}`">
@@ -187,14 +191,18 @@ export default class StepViewWidget extends WidgetBase {
                         =>
                         <span style="color: lime">{{ item.newV }}</span>
                       </template>
-                      <template v-else>{{ item.newV }}</template>
+                      <template v-else>
+                        {{ item.newV }}
+                      </template>
                     </li>
                   </ul>
                 </q-item-section>
               </q-item>
             </q-list>
           </q-tooltip>
-          <q-tooltip v-else>Step is not applicable. Do all changed blocks exist?</q-tooltip>
+          <q-tooltip v-else>
+            Step is not applicable. Do all changed blocks exist?
+          </q-tooltip>
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn flat round icon="settings" @click="openModal(step.id)" />
@@ -208,7 +216,9 @@ export default class StepViewWidget extends WidgetBase {
             outline
             @click="applyStep(step)"
           >
-            <q-tooltip v-if="activeSteps[step.id]">Step is applied</q-tooltip>
+            <q-tooltip v-if="activeSteps[step.id]">
+              Step is applied
+            </q-tooltip>
           </q-btn>
         </q-item-section>
       </q-item>

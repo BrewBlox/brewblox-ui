@@ -21,7 +21,9 @@ export default class ActuatorPwmWidget extends BlockWidget {
     <BlockWidgetToolbar :crud="crud" />
 
     <CardWarning v-if="!block.data.actuatorId.id">
-      <template #message>PWM has no target actuator configured.</template>
+      <template #message>
+        PWM has no target actuator configured.
+      </template>
     </CardWarning>
     <CardWarning v-else-if="!block.data.enabled">
       <template #message>
@@ -42,7 +44,9 @@ export default class ActuatorPwmWidget extends BlockWidget {
     <q-card-section>
       <q-item dark class="align-children">
         <q-item-section>
-          <q-item-label caption>Setting</q-item-label>
+          <q-item-label caption>
+            Setting
+          </q-item-label>
           <div :class="{['text-orange']: isConstrained}">
             <SliderField
               :value="block.data.setting"
@@ -61,7 +65,9 @@ export default class ActuatorPwmWidget extends BlockWidget {
         </q-item-section>
 
         <q-item-section>
-          <q-item-label caption>Duty achieved</q-item-label>
+          <q-item-label caption>
+            Duty achieved
+          </q-item-label>
           <div>
             <big>{{ block.data.value | round }}</big>
             <small class="q-ml-xs">%</small>
@@ -70,7 +76,9 @@ export default class ActuatorPwmWidget extends BlockWidget {
 
         <q-item-section>
           <template v-if="isConstrained">
-            <q-item-label caption>Unconstrained setting</q-item-label>
+            <q-item-label caption>
+              Unconstrained setting
+            </q-item-label>
             <div>
               <big>{{ block.data.desiredSetting | round }}</big>
               <small class="q-ml-xs">%</small>

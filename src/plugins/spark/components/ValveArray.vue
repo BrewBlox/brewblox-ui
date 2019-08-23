@@ -136,7 +136,9 @@ export default class ValveArray extends BlockCrudComponent {
           :pending-reason="driverLimitedBy(channel.driver)"
           @input="v => saveState(channel, v)"
         />
-        <div v-else>---</div>
+        <div v-else>
+          ---
+        </div>
       </q-item-section>
       <q-item-section>
         <LinkField

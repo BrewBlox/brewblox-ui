@@ -63,8 +63,12 @@ export default class DatetimeField extends FieldBase {
     @click="openDialog"
   >
     <slot name="pre" />
-    <slot name="value">{{ displayString }}</slot>
+    <slot name="value">
+      {{ displayString }}
+    </slot>
     <slot />
-    <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
+    <q-tooltip v-if="!readonly">
+      Set {{ label }}
+    </q-tooltip>
   </component>
 </template>

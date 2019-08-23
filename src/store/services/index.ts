@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+import { Action, getModule,Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
 import { objReducer } from '@/helpers/functional';
 import store from '@/store';
@@ -31,7 +31,7 @@ const initService = async (service: Service): Promise<void> => {
 
 @Module({ store, namespaced: true, dynamic: true, name: 'services' })
 export class ServiceModule extends VuexModule {
-  public replicating: boolean = false;
+  public replicating = false;
   public services: Record<string, Service> = {};
 
   public get serviceIds(): string[] {

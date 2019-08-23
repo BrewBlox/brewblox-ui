@@ -18,10 +18,10 @@ import { Service, serviceStore } from '@/store/services';
   },
 })
 export default class DefaultLayout extends Vue {
-  leftDrawerOpen: boolean = true;
-  dashboardEditing: boolean = false;
-  serviceEditing: boolean = false;
-  wizardModalOpen: boolean = false;
+  leftDrawerOpen = true;
+  dashboardEditing = false;
+  serviceEditing = false;
+  wizardModalOpen = false;
   wizardComponent: string | null = null;
 
   get version() {
@@ -147,7 +147,9 @@ export default class DefaultLayout extends Vue {
           <q-icon name="menu" />
         </q-btn>
         <q-toolbar-title>
-          <portal-target name="toolbar-title">BrewBlox</portal-target>
+          <portal-target name="toolbar-title">
+            BrewBlox
+          </portal-target>
         </q-toolbar-title>
         <portal-target name="toolbar-buttons" class="toolbar-buttons" />
       </q-toolbar>
@@ -326,7 +328,9 @@ export default class DefaultLayout extends Vue {
         <q-list dark bordered>
           <q-item dark>
             <q-item-section>
-              <q-item-label caption>Version</q-item-label>
+              <q-item-label caption>
+                Version
+              </q-item-label>
               {{ version }}
             </q-item-section>
           </q-item>

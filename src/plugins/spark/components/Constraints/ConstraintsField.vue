@@ -34,7 +34,7 @@ export default class ConstraintsField extends FieldBase {
 
   get limiters() {
     const names: string[] = [];
-    for (let constraint of this.value.constraints) {
+    for (const constraint of this.value.constraints) {
       if (constraint.limiting) {
         names.push(Object.keys(constraint).find(k => k !== 'limiting') || 'Unknown');
       }

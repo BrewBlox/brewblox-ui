@@ -61,7 +61,7 @@ export default class PartBase extends Vue {
     return SQUARE_SIZE * val;
   }
 
-  public textTransformation(textSize: [number, number], counterRotate: boolean = true): string {
+  public textTransformation(textSize: [number, number], counterRotate = true): string {
     const [sizeX] = rotatedSize(this.part.rotate, textSize);
     const transforms: string[] = [];
     if (this.flipped) {

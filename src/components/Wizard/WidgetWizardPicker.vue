@@ -13,9 +13,9 @@ export default class WidgetWizardPicker extends Vue {
 
   filteredOptions: any[] = [];
   feature: any = null;
-  wizardActive: boolean = false;
+  wizardActive = false;
 
-  localChosenDashboardId: string = '';
+  localChosenDashboardId = '';
 
   get currentDashboard() {
     return this.$route.path.startsWith('/dashboard')
@@ -100,8 +100,8 @@ export default class WidgetWizardPicker extends Vue {
 <template>
   <div>
     <component
-      v-if="wizardActive"
       :is="feature.component"
+      v-if="wizardActive"
       :feature-id="feature.value"
       :dashboard-id="chosenDashboardId"
       @title="setTitle"
@@ -125,7 +125,9 @@ export default class WidgetWizardPicker extends Vue {
             >
               <template v-slot:no-option>
                 <q-item dark>
-                  <q-item-section class="text-grey">No results</q-item-section>
+                  <q-item-section class="text-grey">
+                    No results
+                  </q-item-section>
                 </q-item>
               </template>
             </q-select>

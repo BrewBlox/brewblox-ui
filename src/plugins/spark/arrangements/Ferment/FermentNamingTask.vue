@@ -259,7 +259,9 @@ export default class FermentNamingTask extends WizardTaskBase {
                   @click="clearName(nKey)"
                 />
               </template>
-              <template v-slot:error>{{ nameError(nVal) }}</template>
+              <template v-slot:error>
+                {{ nameError(nVal) }}
+              </template>
             </q-input>
           </q-item>
         </q-expansion-item>

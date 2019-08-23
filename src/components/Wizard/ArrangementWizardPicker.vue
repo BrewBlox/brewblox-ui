@@ -7,10 +7,10 @@ import { featureStore } from '@/store/features';
 
 @Component
 export default class ArrangementWizardPicker extends Vue {
-  arrangementId: string = '';
-  searchModel: string = '';
+  arrangementId = '';
+  searchModel = '';
   wizardModel: any = null;
-  wizardActive: boolean = false;
+  wizardActive = false;
 
   get wizardOptions() {
     return featureStore.arrangementValues
@@ -59,8 +59,8 @@ export default class ArrangementWizardPicker extends Vue {
   <div>
     <!-- Display selected wizard -->
     <component
-      v-if="wizardActive"
       :is="wizardModel.wizard"
+      v-if="wizardActive"
       :feature-id="wizardModel.id"
       @title="setTitle"
       @back="reset"
@@ -73,8 +73,8 @@ export default class ArrangementWizardPicker extends Vue {
         <q-item dark>
           <q-item-section>
             <q-select
-              :options="wizardOptions"
               v-model="wizardModel"
+              :options="wizardOptions"
               label="Arrangement type"
               option-label="displayName"
               dark

@@ -18,7 +18,9 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
     <q-card-section>
       <q-item dark class="align-children">
         <q-item-section>
-          <q-item-label caption>Setting</q-item-label>
+          <q-item-label caption>
+            Setting
+          </q-item-label>
           <div :style="block.data.setting === block.data.desiredSetting ? '' : 'color: orange'">
             <SliderField
               :value="block.data.setting"
@@ -31,7 +33,9 @@ export default class ActuatorAnalogMockWidget extends BlockWidget {
           </div>
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Value</q-item-label>
+          <q-item-label caption>
+            Value
+          </q-item-label>
           <big>{{ block.data.value | round }}</big>
         </q-item-section>
       </q-item>

@@ -55,9 +55,9 @@ export default class PartWrapper extends Vue {
 <template>
   <g :transform="transformation">
     <component
+      :is="part.type"
       v-if="part.type"
       :value="part"
-      :is="part.type"
       class="BuilderPart"
       v-on="$listeners"
     />

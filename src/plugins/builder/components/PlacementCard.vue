@@ -20,7 +20,7 @@ export default class PlacementCard extends PartCard {
 
 <template>
   <q-list dark>
-    <q-separator dark/>
+    <q-separator dark />
     <q-item dark>
       <q-item-section>
         <q-btn
@@ -49,7 +49,7 @@ export default class PlacementCard extends PartCard {
         />
       </q-item-section>
       <q-item-section>
-        <q-btn color="primary" icon="delete" label="delete" @click="removePart"/>
+        <q-btn color="primary" icon="delete" label="delete" @click="removePart" />
       </q-item-section>
     </q-item>
   </q-list>

@@ -81,7 +81,7 @@ const translations = (part: StatePart): Transitions => {
       result[updatedKey] = updatedTransition;
     });
   return result;
-}
+};
 
 export const asFlowParts = (parts: StatePart[]): FlowPart[] =>
   parts.map(part => ({ ...part, transitions: translations(part), flows: {} }));
@@ -89,8 +89,8 @@ export const asFlowParts = (parts: StatePart[]): FlowPart[] =>
 const combineFlows =
   (left: CalculatedFlows = {}, right: CalculatedFlows = {}): CalculatedFlows => {
     const combined: CalculatedFlows = left;
-    for (let coord in right) {
-      for (let liquid in right[coord]) {
+    for (const coord in right) {
+      for (const liquid in right[coord]) {
         set(combined, [coord, liquid], get(combined, [coord, liquid], 0) + right[coord][liquid]);
       }
     }
@@ -104,8 +104,8 @@ const mergeFlows = (flows: CalculatedFlows): CalculatedFlows => {
       const splitPosNeg = (toSplit: LiquidFlow): [LiquidFlow, LiquidFlow, number, number] => {
         const positive = pickBy(toSplit, flow => flow >= 0);
         const negative = pickBy(toSplit, flow => flow < 0);
-        let posTotal = Object.values(positive).reduce((sum, v) => sum + v, 0);
-        let negTotal = Object.values(negative).reduce((sum, v) => sum + v, 0);
+        const posTotal = Object.values(positive).reduce((sum, v) => sum + v, 0);
+        const negTotal = Object.values(negative).reduce((sum, v) => sum + v, 0);
         return [positive, negative, posTotal, negTotal];
       };
 
@@ -128,7 +128,7 @@ const mergeFlows = (flows: CalculatedFlows): CalculatedFlows => {
         [positive, negative, posTotal, negTotal] = splitPosNeg(toMerge);
       }
 
-      let total = posTotal + negTotal;
+      const total = posTotal + negTotal;
       // if flow exists in both directions, only keep the biggest and scale it down to the net flow
       if (posTotal !== 0 && negTotal !== 0) {
         toMerge = (posTotal >= -negTotal)
@@ -149,7 +149,7 @@ const mergeFlows = (flows: CalculatedFlows): CalculatedFlows => {
       }
     });
   return mergedFlows;
-}
+};
 /*
   Find the part in allParts, and then merge the new flow into allParts.
 */
@@ -173,6 +173,7 @@ export const flowPath = (
   const path = new FlowSegment(start, {});
 
   let candidateParts: FlowPart[] = parts.reduce((acc: FlowPart[], part: FlowPart) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { [inCoord]: _, ...filteredTransitions } = part.transitions; // make a copy of transitions excluding inCoord
     if (Object.getOwnPropertyNames(filteredTransitions).length !== 0) { // exclude parts without transitions
       acc.push({ ...part, transitions: filteredTransitions });
@@ -180,7 +181,7 @@ export const flowPath = (
     return acc;
   }, []);
 
-  for (let outFlow of outFlows) {
+  for (const outFlow of outFlows) {
     while (true) {
       const nextPart = adjacentPart(candidateParts, outFlow.outCoords, start);
       let nextPath: FlowSegment | null = null;
@@ -231,8 +232,8 @@ export const addFlowForSegment = (
   flows: LiquidFlow,
 ): FlowPart[] => {
 
-  let inFlow: CalculatedFlows = {};
-  let outFlow: CalculatedFlows = {};
+  const inFlow: CalculatedFlows = {};
+  const outFlow: CalculatedFlows = {};
 
   // add flow for root part
   Object.entries(segment.transitions)
@@ -258,7 +259,7 @@ export const addFlowForSegment = (
 
         const childInCoords = Object.keys(child.transitions)[0];
 
-        for (let liquid in splitFlows) {
+        for (const liquid in splitFlows) {
           set(outFlow, [childInCoords, liquid], get(outFlow, [childInCoords, liquid], 0) + splitFlows[liquid]);
         };
 
@@ -284,9 +285,9 @@ export const addFlowForSegment = (
 };
 
 const addFlowFromPart = (parts, part): FlowPart[] => {
-  for (let inCoords in part.transitions) {
+  for (const inCoords in part.transitions) {
     const outFlows = part.transitions[inCoords] || [];
-    for (let outFlow of outFlows) {
+    for (const outFlow of outFlows) {
       const pressure: number = outFlow.pressure || 0;
       const liquids: string[] | undefined = outFlow.liquids;
       if (pressure && Array.isArray(liquids)) {

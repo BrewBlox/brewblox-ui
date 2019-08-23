@@ -6,11 +6,11 @@ import {
   DisplayNames,
   GraphValueAxes,
   GraphValuesListener,
+  historyStore,
   LineColors,
   QueryParams,
   QueryResult,
   QueryTarget,
-  historyStore,
 } from '@/store/history';
 
 const MAX_POINTS = 5000;

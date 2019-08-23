@@ -14,7 +14,7 @@ export interface NavAction {
 @Component
 export default class WidgetWizardBase extends Vue {
   protected widgetId: string = uid();
-  protected widgetTitle: string = '';
+  protected widgetTitle = '';
 
   @Prop({ type: String, required: true })
   public readonly featureId!: string;

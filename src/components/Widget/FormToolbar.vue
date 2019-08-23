@@ -11,7 +11,9 @@ export default class FormToolbar extends CrudComponent { }
   <DialogToolbar>
     <q-item-section>
       <q-item-label>{{ widget.title }}</q-item-label>
-      <q-item-label caption>{{ displayName }}</q-item-label>
+      <q-item-label caption>
+        {{ displayName }}
+      </q-item-label>
     </q-item-section>
     <slot />
     <template v-slot:buttons>

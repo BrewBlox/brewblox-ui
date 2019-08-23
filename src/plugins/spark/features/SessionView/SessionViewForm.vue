@@ -12,7 +12,7 @@ import { DisplayNames, historyStore } from '@/store/history';
 @Component
 export default class SessionViewForm extends CrudComponent {
   graphSessionId: string | null = null;
-  sessionInput: string = '';
+  sessionInput = '';
 
   @Prop({ default: null })
   readonly activeSession!: Session;
@@ -132,8 +132,8 @@ export default class SessionViewForm extends CrudComponent {
     <FormToolbar :crud="crud" />
     <BlockGraph
       v-if="graphModalOpen"
-      v-model="graphModalOpen"
       :id="`SessionView::form::${graphSession.id}`"
+      v-model="graphModalOpen"
       :config="graphSession.graphCfg"
       no-duration
       @update:config="v => { graphSession.graphCfg = v; updateSession(graphSession); }"
@@ -179,7 +179,9 @@ export default class SessionViewForm extends CrudComponent {
           <q-separator dark />
           <q-item dark>
             <q-item-section>
-              <q-item-label caption>Session name</q-item-label>
+              <q-item-label caption>
+                Session name
+              </q-item-label>
               <InputField
                 :value="session.name"
                 title="Session name"
@@ -187,7 +189,9 @@ export default class SessionViewForm extends CrudComponent {
               />
             </q-item-section>
             <q-item-section>
-              <q-item-label caption>Duration</q-item-label>
+              <q-item-label caption>
+                Duration
+              </q-item-label>
               <span v-if="session.start && session.end">{{ sessionDuration(session) }}</span>
               <span v-else-if="session.start">In progress...</span>
               <span v-else>Not yet started</span>
@@ -195,7 +199,9 @@ export default class SessionViewForm extends CrudComponent {
           </q-item>
           <q-item dark>
             <q-item-section>
-              <q-item-label caption>Start</q-item-label>
+              <q-item-label caption>
+                Start
+              </q-item-label>
               <DatetimeField
                 :value="session.start"
                 title="Start"
@@ -206,7 +212,9 @@ export default class SessionViewForm extends CrudComponent {
             </q-item-section>
 
             <q-item-section>
-              <q-item-label caption>End</q-item-label>
+              <q-item-label caption>
+                End
+              </q-item-label>
               <DatetimeField
                 :value="session.end"
                 title="End"

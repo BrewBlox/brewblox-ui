@@ -68,11 +68,15 @@ export default class ColorField extends FieldBase {
     @click="openDialog"
   >
     <slot name="pre" />
-    <slot name="value">{{ colorString }}</slot>
+    <slot name="value">
+      {{ colorString }}
+    </slot>
     <slot name="indicator">
       <span :style="colorStyle" />
     </slot>
     <slot />
-    <q-tooltip v-if="!readonly">Choose color</q-tooltip>
+    <q-tooltip v-if="!readonly">
+      Choose color
+    </q-tooltip>
   </component>
 </template>

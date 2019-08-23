@@ -16,10 +16,14 @@ export default class ActuatorOffsetForm extends BlockCrudComponent {
 
     <q-card-section>
       <CardWarning v-if="!block.data.targetId.id">
-        <template #message>Target setpoint is not configured for this setpoint driver.</template>
+        <template #message>
+          Target setpoint is not configured for this setpoint driver.
+        </template>
       </CardWarning>
       <CardWarning v-else-if="!block.data.referenceId.id">
-        <template #message>Reference setpoint is not configured for this setpoint driver.</template>
+        <template #message>
+          Reference setpoint is not configured for this setpoint driver.
+        </template>
       </CardWarning>
       <BlockEnableToggle
         v-else
@@ -30,7 +34,9 @@ export default class ActuatorOffsetForm extends BlockCrudComponent {
       />
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Driven block</q-item-label>
+          <q-item-label caption>
+            Driven block
+          </q-item-label>
           <LinkField
             :value="block.data.targetId"
             :service-id="serviceId"
@@ -39,7 +45,9 @@ export default class ActuatorOffsetForm extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Offset from</q-item-label>
+          <q-item-label caption>
+            Offset from
+          </q-item-label>
           <div>
             <LinkField
               :value="block.data.referenceId"
@@ -61,7 +69,9 @@ export default class ActuatorOffsetForm extends BlockCrudComponent {
       </q-item>
       <q-item dark>
         <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>Target Offset</q-item-label>
+          <q-item-label caption>
+            Target Offset
+          </q-item-label>
           <InputField
             :readonly="isDriven"
             :value="block.data.desiredSetting"
@@ -72,7 +82,9 @@ export default class ActuatorOffsetForm extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>Current offset</q-item-label>
+          <q-item-label caption>
+            Current offset
+          </q-item-label>
           <big>{{ block.data.value | round }}</big>
         </q-item-section>
       </q-item>

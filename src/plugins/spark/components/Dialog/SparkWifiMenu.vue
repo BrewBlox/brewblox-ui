@@ -24,7 +24,7 @@ const WlanCipherEnum = [
 
 @Component
 export default class SparkWifiMenu extends DialogBase {
-  isPwd: boolean = true;
+  isPwd = true;
   values = {
     ssid: '',
     password: '',
@@ -66,7 +66,9 @@ export default class SparkWifiMenu extends DialogBase {
       <DialogToolbar @close="onDialogHide">
         <q-item-section>
           <q-item-label>{{ serviceId }}</q-item-label>
-          <q-item-label caption>Wifi Configuration</q-item-label>
+          <q-item-label caption>
+            Wifi Configuration
+          </q-item-label>
         </q-item-section>
       </DialogToolbar>
 
@@ -74,7 +76,7 @@ export default class SparkWifiMenu extends DialogBase {
         <q-item dark>
           <q-item-section>SSID</q-item-section>
           <q-item-section>
-            <q-input v-model="values.ssid" dark/>
+            <q-input v-model="values.ssid" dark />
           </q-item-section>
         </q-item>
         <q-item dark>
@@ -123,9 +125,9 @@ export default class SparkWifiMenu extends DialogBase {
           </q-item-section>
         </q-item>
         <q-item dark>
-          <q-item-section/>
+          <q-item-section />
           <q-item-section side>
-            <q-btn v-close-popup color="primary" label="connect" @click="save"/>
+            <q-btn v-close-popup color="primary" label="connect" @click="save" />
           </q-item-section>
         </q-item>
       </q-card-section>

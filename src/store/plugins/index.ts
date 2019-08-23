@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
 import { objReducer } from '@/helpers/functional';
 import store from '@/store';
@@ -40,13 +40,13 @@ export class PluginModule extends VuexModule {
   }
 
   @Mutation
-  public commitPlugin(plugin: UIPlugin) {
+  public commitPlugin(plugin: UIPlugin): void {
     Vue.set(this.plugins, plugin.id, plugin);
     Vue.set(this.results, plugin.id, defaultResult(plugin));
   }
 
   @Mutation
-  public commitAllPlugins(plugins: UIPlugin[]) {
+  public commitAllPlugins(plugins: UIPlugin[]): void {
     this.plugins = plugins.reduce(objReducer('id'), {});
     this.results = plugins
       .map(defaultResult)
@@ -54,13 +54,13 @@ export class PluginModule extends VuexModule {
   }
 
   @Mutation
-  public commitRemovePlugin(plugin: UIPlugin) {
+  public commitRemovePlugin(plugin: UIPlugin): void {
     Vue.delete(this.plugins, plugin.id);
     Vue.delete(this.results, plugin.id);
   }
 
   @Mutation
-  public commitResult(result: UIPluginResult) {
+  public commitResult(result: UIPluginResult): void {
     Vue.set(this.results, result.id, result);
   }
 
@@ -72,23 +72,23 @@ export class PluginModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async createPlugin(plugin: UIPlugin) {
+  public async createPlugin(plugin: UIPlugin): Promise<void> {
     this.commitPlugin(await createPluginInApi(plugin));
   }
 
   @Action({ rawError })
-  public async savePlugin(plugin: UIPlugin) {
+  public async savePlugin(plugin: UIPlugin): Promise<void> {
     this.commitPlugin(await persistPluginInApi(plugin));
   }
 
   @Action({ rawError })
-  public async removePlugin(plugin: UIPlugin) {
+  public async removePlugin(plugin: UIPlugin): Promise<void> {
     await removePluginInApi(plugin);
     this.commitRemovePlugin(plugin);
   }
 
   @Action({ rawError })
-  public async setup() {
+  public async setup(): Promise<void> {
     setupInApi(() => { }, () => { });
   }
 }

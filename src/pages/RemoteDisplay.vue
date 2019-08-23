@@ -11,12 +11,12 @@ export default class RemoteDisplayPage extends Vue {
   width = 320;
   height = 240;
 
-  connected: boolean = true;
-  connecting: boolean = false;
-  preventReconnection: boolean = true;
+  connected = true;
+  connecting = false;
+  preventReconnection = true;
 
-  url: string = 'ws://localhost:7376';
-  debug: boolean = true;
+  url = 'ws://localhost:7376';
+  debug = true;
 
   // initialize to undefined so they are not reactive
   context: CanvasRenderingContext2D | undefined = undefined;
@@ -25,9 +25,9 @@ export default class RemoteDisplayPage extends Vue {
   buf: ArrayBuffer | undefined = undefined;
   buf8: Uint8ClampedArray | undefined = undefined;
   data: Uint32Array | undefined = undefined;
-  rerender: boolean = true;
+  rerender = true;
 
-  pressed: number = 0;
+  pressed = 0;
 
   get serviceId(): string {
     return this.$route.params.id;
@@ -216,7 +216,9 @@ export default class RemoteDisplayPage extends Vue {
 
 <template>
   <div class="page">
-    <div class="header">Remote display for {{ serviceId }}</div>
+    <div class="header">
+      Remote display for {{ serviceId }}
+    </div>
     <div class="container">
       <div class="background">
         <div class="display">
@@ -227,7 +229,7 @@ export default class RemoteDisplayPage extends Vue {
             :height="height"
             class="view"
           />
-          <div :hidden="connected" :width="width" :height="height" class="glass"/>
+          <div :hidden="connected" :width="width" :height="height" class="glass" />
         </div>
       </div>
     </div>

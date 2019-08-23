@@ -18,10 +18,12 @@ export default class ColorCard extends PartCard {
 
 <template>
   <q-list dark>
-    <q-separator dark/>
+    <q-separator dark />
     <q-item dark>
       <q-item-section>
-        <q-item-label caption>Liquid color</q-item-label>
+        <q-item-label caption>
+          Liquid color
+        </q-item-label>
         <ColorField
           v-model="color"
           title="Liquid color"

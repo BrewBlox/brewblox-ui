@@ -76,31 +76,43 @@ export default class SparkWidget extends Vue {
       <q-list>
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>Firmware version</q-item-label>
+            <q-item-label caption>
+              Firmware version
+            </q-item-label>
             <span>{{ sysInfo.data.version }}</span>
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>Firmware release date</q-item-label>
+            <q-item-label caption>
+              Firmware release date
+            </q-item-label>
             <span>{{ sysInfo.data.releaseDate }}</span>
           </q-item-section>
         </q-item>
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>Device time</q-item-label>
+            <q-item-label caption>
+              Device time
+            </q-item-label>
             <span>{{ sysDate }}</span>
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>Time since boot</q-item-label>
+            <q-item-label caption>
+              Time since boot
+            </q-item-label>
             <span>{{ ticks.data.millisSinceBoot | duration }}</span>
           </q-item-section>
         </q-item>
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>Device ID</q-item-label>
+            <q-item-label caption>
+              Device ID
+            </q-item-label>
             <span style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</span>
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>IP address</q-item-label>
+            <q-item-label caption>
+              IP address
+            </q-item-label>
             <span>{{ wifi.data.ip }}</span>
           </q-item-section>
         </q-item>

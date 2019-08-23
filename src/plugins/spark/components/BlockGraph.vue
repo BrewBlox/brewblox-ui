@@ -4,9 +4,9 @@ import Vue from 'vue';
 import { Component, Emit, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import HistoryGraph from '@/components/Graph/HistoryGraph.vue';
 import { targetSplitter } from '@/components/Graph/functional';
 import { defaultPresets } from '@/components/Graph/getters';
+import HistoryGraph from '@/components/Graph/HistoryGraph.vue';
 import { GraphConfig } from '@/components/Graph/types';
 import { durationString } from '@/helpers/functional';
 import { QueryParams } from '@/store/history';
@@ -15,7 +15,7 @@ import { QueryParams } from '@/store/history';
 export default class BlockGraph extends Vue {
   durationString = durationString;
 
-  configString: string = '';
+  configString = '';
 
   @Ref()
   readonly graph!: HistoryGraph;
@@ -123,7 +123,7 @@ export default class BlockGraph extends Vue {
 <template>
   <q-dialog v-model="dialogOpen" maximized>
     <q-card v-if="dialogOpen" class="text-white bg-dark-bright" dark>
-      <HistoryGraph ref="graph" :id="id" :config="graphCfg">
+      <HistoryGraph :id="id" ref="graph" :config="graphCfg">
         <template v-slot:controls>
           <q-btn-dropdown v-if="!noDuration" auto-close flat label="timespan" icon="mdi-timelapse">
             <q-item
@@ -141,7 +141,9 @@ export default class BlockGraph extends Vue {
           <q-btn-dropdown flat label="settings" icon="settings">
             <q-item dark link clickable @click="updateDuration">
               <q-item-section>Duration</q-item-section>
-              <q-item-section class="col-auto">{{ durationString(graphCfg.params.duration) }}</q-item-section>
+              <q-item-section class="col-auto">
+                {{ durationString(graphCfg.params.duration) }}
+              </q-item-section>
             </q-item>
             <q-expansion-item label="Display Axis">
               <q-item
@@ -153,7 +155,9 @@ export default class BlockGraph extends Vue {
                 @click="updateKeySide(key, !isRightAxis(key))"
               >
                 <q-item-section>{{ renamed }}</q-item-section>
-                <q-item-section side>{{ axisLabel(key) }}</q-item-section>
+                <q-item-section side>
+                  {{ axisLabel(key) }}
+                </q-item-section>
               </q-item>
             </q-expansion-item>
           </q-btn-dropdown>

@@ -23,7 +23,9 @@ export default class DigitalActuatorWidget extends BlockWidget {
     <q-card-section v-else>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>State</q-item-label>
+          <q-item-label caption>
+            State
+          </q-item-label>
           <DigitalStateField
             :value="block.data.desiredState"
             :pending="block.data.state !== block.data.desiredState"

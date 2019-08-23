@@ -4,8 +4,8 @@ import { Component, Prop } from 'vue-property-decorator';
 
 @Component
 export default class ScreenSizeConstrained extends Vue {
-  windowWidth: number = 0;
-  windowHeight: number = 0;
+  windowWidth = 0;
+  windowHeight = 0;
 
   @Prop({ type: Number, required: false })
   readonly minWidth!: number;
@@ -39,6 +39,6 @@ export default class ScreenSizeConstrained extends Vue {
 
 <template>
   <div v-if="widthOk && heightOk">
-    <slot/>
+    <slot />
   </div>
 </template>

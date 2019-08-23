@@ -4,9 +4,9 @@ import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
 import { BlockSpec, DigitalState } from '../../types';
+import { typeName } from './getters';
 import form from './MotorValveForm.vue';
 import widget from './MotorValveWidget.vue';
-import { typeName } from './getters';
 import { MotorValveData, ValveState } from './types';
 
 const block: BlockSpec = {

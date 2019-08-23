@@ -47,9 +47,14 @@ module.exports = {
     ],
     '@typescript-eslint/indent': 0,
     '@typescript-eslint/no-explicit-any': 0,
-    '@typescript-eslint/explicit-function-return-type': {
+    '@typescript-eslint/explicit-function-return-type': [0, {
       allowExpressions: true,
       allowTypedFunctionExpressions: true
-    }
+    }],
+    // temporary disabled because of incompatibility issues between vue-eslint-plugin and eslint 6:
+    // see https://github.com/vuejs/eslint-plugin-vue/issues/944
+    'vue-require-component-is': 0,
+    '@typescript-eslint/no-empty-function': 0,
+    'vue/no-v-html': 0
   }
 }

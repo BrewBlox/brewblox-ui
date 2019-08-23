@@ -3,11 +3,11 @@ import { Dialog, uid } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
-import { UIPlugin, UIPluginResult, pluginStore } from '@/store/plugins';
+import { pluginStore,UIPlugin, UIPluginResult } from '@/store/plugins';
 
 @Component
 export default class PluginDialog extends DialogBase {
-  changed: boolean = false;
+  changed = false;
 
   get combos(): [UIPlugin, UIPluginResult][] {
     return pluginStore.pluginValues

@@ -19,7 +19,7 @@ import { BlockCrud } from './BlockCrudComponent';
 export default class BlockWizard extends Vue {
   filteredOptions: any[] = [];
   feature: any = null;
-  blockId: string = '';
+  blockId = '';
   block: Block | null = null;
   widget: DashboardItem | null = null;
   activeDialog: any = null;
@@ -172,7 +172,9 @@ export default class BlockWizard extends Vue {
           >
             <template v-slot:no-option>
               <q-item dark>
-                <q-item-section class="text-grey">No results</q-item-section>
+                <q-item-section class="text-grey">
+                  No results
+                </q-item-section>
               </q-item>
             </template>
           </q-select>

@@ -129,7 +129,7 @@ export class BrewBloxDatabase {
     };
   }
 
-  public getErrors(clear: boolean = false): DBError[] {
+  public getErrors(clear = false): DBError[] {
     const retval = [...this.dbErrors];
     if (clear) {
       this.dbErrors = [];

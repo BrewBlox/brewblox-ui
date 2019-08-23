@@ -8,8 +8,8 @@ import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 @Component
 export default class DashboardWizard extends Vue {
-  dashboardId: string = '';
-  dashboardTitle: string = '';
+  dashboardId = '';
+  dashboardTitle = '';
 
   get idRules(): InputRule[] {
     return dashboardIdRules();

@@ -15,7 +15,9 @@ export default class DS2413Widget extends BlockWidget {
   <q-card dark class="text-white scroll">
     <BlockWidgetToolbar :crud="crud" />
     <CardWarning v-if="!block.data.connected">
-      <template #message>DS2413 is not connected.</template>
+      <template #message>
+        DS2413 is not connected.
+      </template>
     </CardWarning>
     <IoArray :crud="crud" />
   </q-card>

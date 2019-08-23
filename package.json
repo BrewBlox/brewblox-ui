@@ -81,6 +81,7 @@
     "dotenv": "^6.2.0",
     "eslint": "^6.2.1",
     "eslint-plugin-simple-import-sort": "^4.0.0",
+    "eslint-plugin-vue": "^5.2.3",
     "fork-ts-checker-webpack-plugin": "^1.5.0",
     "git-describe": "^4.0.4",
     "jest": "^23.6.0",
@@ -93,7 +94,7 @@
     "tsutils": "^3.14.1",
     "vue-cli-plugin-quasar": "^1.0.0",
     "vue-cli-plugin-webpack-bundle-analyzer": "^1.4.0",
-    "vue-eslint-parser": "^4.0.3",
+    "vue-eslint-parser": "^5.0.0",
     "vue-template-compiler": "^2.6.10",
     "vuex-module-decorators": "^0.9.9",
     "worker-loader": "^2.0.0"

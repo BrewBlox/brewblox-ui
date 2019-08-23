@@ -30,11 +30,15 @@ export default class DeprecatedObjectWidget extends BlockWidget {
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Id</q-item-label>
+          <q-item-label caption>
+            Id
+          </q-item-label>
           {{ actual ? actual.id : 'Unknown' }}
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Type</q-item-label>
+          <q-item-label caption>
+            Type
+          </q-item-label>
           {{ actual ? actual.type : 'Unknown' }}
         </q-item-section>
         <q-item-section class="col-auto">

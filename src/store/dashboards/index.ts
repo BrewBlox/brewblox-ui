@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+import { Action, getModule,Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
 import { objReducer } from '@/helpers/functional';
 import store from '@/store';
@@ -23,10 +23,10 @@ const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'dashboards' })
 export class DashboardModule extends VuexModule {
-  public replicatingDashboards: boolean = false;
+  public replicatingDashboards = false;
   public dashboards: Record<string, Dashboard> = {};
 
-  public replicatingItems: boolean = false;
+  public replicatingItems = false;
   public items: Record<string, DashboardItem> = {};
 
   public get dashboardIds(): string[] {

@@ -61,7 +61,9 @@ export default class GroupsField extends FieldBase {
     @click="openDialog"
   >
     <slot name="pre" />
-    <slot name="value">{{ displayValue }}</slot>
+    <slot name="value">
+      {{ displayValue }}
+    </slot>
     <slot />
   </component>
 </template>

@@ -7,7 +7,7 @@ import DialogBase from '@/components/Dialog/DialogBase';
 
 @Component
 export default class DatetimeDialog extends DialogBase {
-  stringValue: string = '';
+  stringValue = '';
 
   @Prop({ type: Date, required: true })
   public readonly value!: Date;
@@ -63,9 +63,13 @@ export default class DatetimeDialog extends DialogBase {
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
     <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
-      <q-card-section class="q-dialog__title">{{ title }}</q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
-      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml"/>
+      <q-card-section class="q-dialog__title">
+        {{ title }}
+      </q-card-section>
+      <q-card-section v-if="message" class="q-dialog__message scroll">
+        {{ message }}
+      </q-card-section>
+      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
         <q-item dark>
           <q-item-section>
@@ -98,8 +102,8 @@ export default class DatetimeDialog extends DialogBase {
         </q-item>
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn flat color="primary" label="Cancel" @click="onDialogCancel"/>
-        <q-btn :disable="!valid" flat color="primary" label="OK" @click="save"/>
+        <q-btn flat color="primary" label="Cancel" @click="onDialogCancel" />
+        <q-btn :disable="!valid" flat color="primary" label="OK" @click="save" />
       </q-card-actions>
     </q-card>
   </q-dialog>

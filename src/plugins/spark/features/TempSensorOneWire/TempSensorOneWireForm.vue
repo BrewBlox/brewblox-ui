@@ -15,13 +15,17 @@ export default class TempSensorOneWireForm extends BlockCrudComponent {
   <q-card dark class="widget-modal">
     <BlockFormToolbar :crud="crud" />
     <CardWarning v-if="block.data.value.val === null">
-      <template #message>OneWire Sensor could not be read.</template>
+      <template #message>
+        OneWire Sensor could not be read.
+      </template>
     </CardWarning>
 
     <q-card-section>
       <q-item dark>
         <q-item-section class="col-6">
-          <q-item-label caption>Address</q-item-label>
+          <q-item-label caption>
+            Address
+          </q-item-label>
           <InputField
             :value="block.data.address"
             title="Address"
@@ -30,7 +34,9 @@ export default class TempSensorOneWireForm extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Offset</q-item-label>
+          <q-item-label caption>
+            Offset
+          </q-item-label>
           <UnitField
             :value="block.data.offset"
             title="Offset"
@@ -39,7 +45,9 @@ export default class TempSensorOneWireForm extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Value</q-item-label>
+          <q-item-label caption>
+            Value
+          </q-item-label>
           <UnitField :value="block.data.value" readonly tag="big" />
         </q-item-section>
       </q-item>

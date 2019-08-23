@@ -1,4 +1,4 @@
-import { Wrapper, shallowMount } from '@vue/test-utils';
+import { shallowMount,Wrapper } from '@vue/test-utils';
 import { setupSpark } from 'tests/setup';
 import Vue from 'vue';
 
