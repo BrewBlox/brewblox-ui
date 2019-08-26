@@ -141,9 +141,6 @@ export default class StepViewWidget extends WidgetBase {
         const pretty = specChange.pretty || (v => `${v}`);
         const oldV = pretty(block.data[key]);
         const newV = pretty(val);
-        if (oldV !== newV) {
-          console.log(block.data[key], val);
-        }
         return {
           key: specChange.title || key,
           oldV,
