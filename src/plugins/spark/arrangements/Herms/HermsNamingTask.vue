@@ -78,6 +78,8 @@ export default class HermsNamingTask extends WizardTaskBase {
       bkPid: 'BK PID',
       bkPwm: 'BK PWM',
       bkAct: 'BK Actuator',
+      mutex: 'Mutex',
+      balancer: 'Balancer',
     };
   }
 

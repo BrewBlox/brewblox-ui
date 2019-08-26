@@ -13,8 +13,9 @@ import { HermsConfig } from './types';
 export default class HermsSettingsTask extends WizardTaskBase {
   readonly config!: HermsConfig;
 
-  mtSetting = new Unit(20, 'degC');
-  bkSetting = new Unit(20, 'degC');
+  mtSetting = new Unit(60, 'degC');
+  bkSetting = new Unit(90, 'degC');
+  balanced = true;
 
   get userTemp(): string {
     return sparkStore.units(this.config.serviceId).Temp;
@@ -29,7 +30,8 @@ export default class HermsSettingsTask extends WizardTaskBase {
     const createdBlocks = defineCreatedBlocks(
       this.config,
       this.mtSetting,
-      this.bkSetting);
+      this.bkSetting,
+      this.balanced);
     const changedBlocks = defineChangedBlocks(this.config);
     const layouts = defineLayouts(this.config);
     const widgets = defineWidgets(this.config, layouts);
@@ -64,7 +66,7 @@ export default class HermsSettingsTask extends WizardTaskBase {
           <br />Elements will be disabled when created.
         </q-item-section>
       </q-item>
-      <q-item dark>
+      <q-item dark class="align-children">
         <q-item-section>
           <q-item-label caption>
             MT setting
@@ -76,6 +78,16 @@ export default class HermsSettingsTask extends WizardTaskBase {
             BK setting
           </q-item-label>
           <UnitField v-model="bkSetting" title="BK setting" />
+        </q-item-section>
+        <q-item-section class="col-auto">
+          <q-item-label caption>
+            Balanced actuators
+          </q-item-label>
+          <q-toggle v-model="balanced" />
+          <q-tooltip>
+            Actuators are never turned on at the same time,
+            but fairly share time turned on.
+          </q-tooltip>
         </q-item-section>
       </q-item>
     </q-card-section>

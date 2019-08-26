@@ -25,6 +25,9 @@ export interface HermsBlockNames {
   bkPid: string;
   bkPwm: string;
   bkAct: string;
+
+  mutex: string;
+  balancer: string;
 }
 
 export interface HermsConfig {

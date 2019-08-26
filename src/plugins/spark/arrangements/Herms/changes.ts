@@ -2,6 +2,7 @@ import { uid } from 'quasar';
 
 import { WizardAction } from '@/components/Wizard/WizardTaskBase';
 import { Link, Unit } from '@/helpers/units';
+import { BalancerLink, MutexLink } from '@/helpers/units/KnownLinks';
 import { serialize } from '@/helpers/units/parseObject';
 import { typeName as builderType } from '@/plugins/builder/getters';
 import { builderStore } from '@/plugins/builder/store';
@@ -11,12 +12,17 @@ import { sparkStore } from '@/plugins/spark/store';
 import { Dashboard, DashboardItem, dashboardStore } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
+import { AnalogConstraint, DigitalConstraint } from '../../components/Constraints/ConstraintsBase';
 import { typeName as driverType } from '../../features/ActuatorOffset/getters';
 import { ActuatorOffsetBlock, OffsetSettingOrValue } from '../../features/ActuatorOffset/types';
 import { typeName as pwmType } from '../../features/ActuatorPwm/getters';
 import { ActuatorPwmBlock } from '../../features/ActuatorPwm/types';
+import { typeName as balancerType } from '../../features/Balancer/getters';
+import { BalancerBlock } from '../../features/Balancer/types';
 import { typeName as digiActType } from '../../features/DigitalActuator/getters';
 import { DigitalActuatorBlock } from '../../features/DigitalActuator/types';
+import { typeName as mutexType } from '../../features/Mutex/getters';
+import { MutexBlock } from '../../features/Mutex/types';
 import { typeName as pidType } from '../../features/Pid/getters';
 import { PidBlock, PidData } from '../../features/Pid/types';
 import { typeName as setpointType } from '../../features/SetpointSensorPair/getters';
@@ -45,11 +51,55 @@ export function defineChangedBlocks(config: HermsConfig): Block[] {
   );
 };
 
-export function defineCreatedBlocks(config: HermsConfig, mtSetting: Unit, bkSetting: Unit): Block[] {
+export function defineCreatedBlocks(
+  config: HermsConfig,
+  mtSetting: Unit,
+  bkSetting: Unit,
+  balanced: boolean,
+): Block[] {
   const groups = [0];
   const serviceId = config.serviceId;
 
-  return [
+  const pwmConstraints: AnalogConstraint[] = [];
+  const actuatorConstraints: DigitalConstraint[] = [];
+
+  if (balanced) {
+    pwmConstraints.push({
+      balanced: {
+        balancerId: new BalancerLink(config.names.balancer),
+        granted: 0,
+        id: 0,
+      },
+      limiting: false,
+    });
+    actuatorConstraints.push(
+      { mutex: new MutexLink(config.names.mutex), limiting: false }
+    );
+  }
+
+  const balancerBlocks = [
+    {
+      id: config.names.balancer,
+      type: balancerType,
+      serviceId,
+      groups,
+      data: { clients: [] },
+    },
+    {
+      id: config.names.mutex,
+      type: mutexType,
+      serviceId,
+      groups,
+      data: {
+        differentActuatorWait: new Unit(0, 'second'),
+      },
+    },
+  ] as [
+      BalancerBlock,
+      MutexBlock,
+    ];
+
+  const baseBlocks = [
     // Setpoints
     {
       id: config.names.hltSetpoint,
@@ -132,7 +182,9 @@ export function defineCreatedBlocks(config: HermsConfig, mtSetting: Unit, bkSett
         desiredState: DigitalState.Inactive,
         state: DigitalState.Inactive,
         invert: false,
-        constrainedBy: { constraints: [] },
+        constrainedBy: {
+          constraints: actuatorConstraints,
+        },
       },
     },
     {
@@ -146,7 +198,9 @@ export function defineCreatedBlocks(config: HermsConfig, mtSetting: Unit, bkSett
         desiredState: DigitalState.Inactive,
         state: DigitalState.Inactive,
         invert: false,
-        constrainedBy: { constraints: [] },
+        constrainedBy: {
+          constraints: actuatorConstraints,
+        },
       },
     },
     // PWM
@@ -163,7 +217,9 @@ export function defineCreatedBlocks(config: HermsConfig, mtSetting: Unit, bkSett
         setting: 0,
         desiredSetting: 0,
         value: 0,
-        constrainedBy: { constraints: [] },
+        constrainedBy: {
+          constraints: pwmConstraints,
+        },
       },
     },
     {
@@ -179,7 +235,9 @@ export function defineCreatedBlocks(config: HermsConfig, mtSetting: Unit, bkSett
         setting: 0,
         desiredSetting: 0,
         value: 0,
-        constrainedBy: { constraints: [] },
+        constrainedBy: {
+          constraints: pwmConstraints,
+        },
       },
     },
     // PID
@@ -190,7 +248,7 @@ export function defineCreatedBlocks(config: HermsConfig, mtSetting: Unit, bkSett
       groups,
       data: {
         ...(sparkStore.specs[pidType].generate() as PidData),
-        enabled: true,
+        enabled: false,
         inputId: new Link(config.names.hltSetpoint),
         outputId: new Link(config.names.hltPwm),
         kp: new Unit(20, '1/degC'),
@@ -206,7 +264,7 @@ export function defineCreatedBlocks(config: HermsConfig, mtSetting: Unit, bkSett
       groups,
       data: {
         ...(sparkStore.specs[pidType].generate() as PidData),
-        enabled: true,
+        enabled: false,
         inputId: new Link(config.names.mtSetpoint),
         outputId: new Link(config.names.hltDriver),
         kp: new Unit(20, '1/degC'),
@@ -222,7 +280,7 @@ export function defineCreatedBlocks(config: HermsConfig, mtSetting: Unit, bkSett
       groups,
       data: {
         ...(sparkStore.specs[pidType].generate() as PidData),
-        enabled: true,
+        enabled: false,
         inputId: new Link(config.names.bkSetpoint),
         outputId: new Link(config.names.bkPwm),
         kp: new Unit(20, '1/degC'),
@@ -244,6 +302,10 @@ export function defineCreatedBlocks(config: HermsConfig, mtSetting: Unit, bkSett
       PidBlock,
       PidBlock,
     ];
+
+  return balanced
+    ? [...balancerBlocks, ...baseBlocks]
+    : baseBlocks;
 }
 
 export function defineLayouts(config: HermsConfig): BuilderLayout[] {
@@ -344,7 +406,56 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
     pinnedPosition: { x: 7, y: 6 },
     config: {
       serviceId: config.serviceId,
-      steps: serialize([]),
+      steps: serialize([
+        {
+          name: 'Disable all',
+          id: uid(),
+          changes: [
+            {
+              blockId: config.names.hltPid,
+              data: { enabled: false },
+            },
+            {
+              blockId: config.names.mtPid,
+              data: { enabled: false },
+            },
+            {
+              blockId: config.names.bkPid,
+              data: { enabled: false },
+            },
+          ],
+        },
+        {
+          name: 'Enable HLT',
+          id: uid(),
+          changes: [
+            {
+              blockId: config.names.hltPid,
+              data: { enabled: true },
+            },
+          ],
+        },
+        {
+          name: 'Enable MT',
+          id: uid(),
+          changes: [
+            {
+              blockId: config.names.mtPid,
+              data: { enabled: true },
+            },
+          ],
+        },
+        {
+          name: 'Enable BK',
+          id: uid(),
+          changes: [
+            {
+              blockId: config.names.bkPid,
+              data: { enabled: true },
+            },
+          ],
+        },
+      ]),
     },
   });
 

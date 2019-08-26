@@ -35,7 +35,7 @@ export default class HermsManualTask extends WizardTaskBase {
             <span>
               Visit our
               <a
-                href="https://brewblox.netlify.com/user/ferment_guide.html"
+                href="https://brewblox.netlify.com/user/herms_guide.html"
                 target="_blank"
                 style="color: white"
               >documentation page</a> for a more in-depth guide.
