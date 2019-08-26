@@ -69,6 +69,42 @@ export default class FermentHardwareTask extends WizardTaskBase {
     ];
   }
 
+  sensorTemp(id: string | null): string {
+    if (!id) {
+      return '';
+    }
+    return sparkStore.blockById(this.config.serviceId, id).data.value.toString();
+  }
+
+  get fridgeSensorTemp(): string {
+    return this.sensorTemp(this.fridgeSensor);
+  }
+
+  get beerSensorTemp(): string {
+    return this.sensorTemp(this.beerSensor);
+  }
+
+  pinConnectedStatus(channel: PinChannel | null): string {
+    if (!channel) {
+      return '';
+    }
+    const block = sparkStore.blockById(this.config.serviceId, channel.arrayId);
+    if ([Spark2PinsType, Spark3PinsType].includes(block.type)) {
+      return '';
+    }
+    return block.data.connected
+      ? 'OneWire extension board is connected'
+      : 'OneWire extension board is not connected';
+  }
+
+  get coolPinStatus(): string {
+    return this.pinConnectedStatus(this.coolPin);
+  }
+
+  get heatPinStatus(): string {
+    return this.pinConnectedStatus(this.heatPin);
+  }
+
   created(): void {
     this.discover();
   }
@@ -127,6 +163,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
             v-model="coolPin"
             :options="pinOptions"
             :rules="pinRules"
+            :hint="coolPinStatus"
             label="Cooler output"
             emit-value
             map-options
@@ -139,6 +176,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
             v-model="heatPin"
             :options="pinOptions"
             :rules="pinRules"
+            :hint="heatPinStatus"
             label="Heater output"
             emit-value
             map-options
@@ -154,6 +192,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
             :options="sensorOptions"
             :label="config.names.fridgeSensor"
             :rules="sensorRules"
+            :hint="fridgeSensorTemp"
             dark
             options-dark
           />
@@ -164,6 +203,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
             :options="sensorOptions"
             :label="config.names.beerSensor"
             :rules="sensorRules"
+            :hint="beerSensorTemp"
             dark
             options-dark
           />

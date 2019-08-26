@@ -20,9 +20,9 @@ export default class HermsHardwareTask extends WizardTaskBase {
 
   hltPin: PinChannel | null = null;
   bkPin: PinChannel | null = null;
-  hltSensor: any = null;
-  mtSensor: any = null;
-  bkSensor: any = null;
+  hltSensor: string | null = null;
+  mtSensor: string | null = null;
+  bkSensor: string | null = null;
 
   get pinOptions(): SelectOption[] {
     return sparkStore.blockValues(this.config.serviceId)
@@ -84,6 +84,50 @@ export default class HermsHardwareTask extends WizardTaskBase {
     ].some(Boolean);
   }
 
+  get userTemp(): string {
+    return sparkStore.units(this.config.serviceId).Temp;
+  }
+
+  sensorTemp(id: string | null): string {
+    if (!id) {
+      return '';
+    }
+    return sparkStore.blockById(this.config.serviceId, id).data.value.toString();
+  }
+
+  get hltSensorTemp(): string {
+    return this.sensorTemp(this.hltSensor);
+  }
+
+  get bkSensorTemp(): string {
+    return this.sensorTemp(this.bkSensor);
+  }
+
+  get mtSensorTemp(): string {
+    return this.sensorTemp(this.mtSensor);
+  }
+
+  pinConnectedStatus(channel: PinChannel | null): string {
+    if (!channel) {
+      return '';
+    }
+    const block = sparkStore.blockById(this.config.serviceId, channel.arrayId);
+    if ([Spark2PinsType, Spark3PinsType].includes(block.type)) {
+      return '';
+    }
+    return block.data.connected
+      ? 'OneWire extension board is connected'
+      : 'OneWire extension board is not connected';
+  }
+
+  get hltPinStatus(): string {
+    return this.pinConnectedStatus(this.hltPin);
+  }
+
+  get bkPinStatus(): string {
+    return this.pinConnectedStatus(this.bkPin);
+  }
+
   created(): void {
     this.discover();
   }
@@ -107,9 +151,9 @@ export default class HermsHardwareTask extends WizardTaskBase {
     Object.assign(
       this.config.renamedBlocks,
       {
-        [this.hltSensor]: this.config.names.hltSensor,
-        [this.mtSensor]: this.config.names.mtSensor,
-        [this.bkSensor]: this.config.names.bkSensor,
+        [this.hltSensor as string]: this.config.names.hltSensor,
+        [this.mtSensor as string]: this.config.names.mtSensor,
+        [this.bkSensor as string]: this.config.names.bkSensor,
       },
     );
 
@@ -143,6 +187,7 @@ export default class HermsHardwareTask extends WizardTaskBase {
             v-model="hltPin"
             :options="pinOptions"
             :rules="pinRules"
+            :hint="hltPinStatus"
             label="HLT output"
             emit-value
             map-options
@@ -155,6 +200,7 @@ export default class HermsHardwareTask extends WizardTaskBase {
             v-model="bkPin"
             :options="pinOptions"
             :rules="pinRules"
+            :hint="bkPinStatus"
             label="BK output"
             emit-value
             map-options
@@ -168,8 +214,9 @@ export default class HermsHardwareTask extends WizardTaskBase {
           <q-select
             v-model="hltSensor"
             :options="sensorOptions"
-            label="HLT sensor"
             :rules="sensorRules"
+            :hint="hltSensorTemp"
+            label="HLT sensor"
             dark
             options-dark
           />
@@ -178,8 +225,9 @@ export default class HermsHardwareTask extends WizardTaskBase {
           <q-select
             v-model="bkSensor"
             :options="sensorOptions"
-            label="BK sensor"
             :rules="sensorRules"
+            :hint="bkSensorTemp"
+            label="BK sensor"
             dark
             options-dark
           />
@@ -195,6 +243,7 @@ export default class HermsHardwareTask extends WizardTaskBase {
             dark
             options-dark
           />
+          <small>{{ mtSensorTemp }}</small>
         </q-item-section>
         <q-item-section />
       </q-item>
