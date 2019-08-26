@@ -96,7 +96,7 @@ const block: BlockSpec = {
       key: 'kp',
       title: 'Kp',
       component: 'UnitValEdit',
-      generate: () => new Unit(0, 'degC'),
+      generate: () => new Unit(0, '1/degC'),
     },
     {
       key: 'ti',
