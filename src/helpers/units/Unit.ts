@@ -8,9 +8,9 @@ export const prettify = (v: string): string =>
     .replace(/minutes?/gi, 'm')
     .replace(/hours?/gi, 'h')
     .replace(/days?/gi, 'd')
-    .replace(/1 \/ /gi, '/')
-    .replace(/ \/ /gi, '/')
-    .replace(/ \* /gi, '·');
+    .replace(/1 ?\/ ?/gi, '/')
+    .replace(/ ?\/ ?/gi, '/')
+    .replace(/ ?\* ?/gi, '·');
 
 export default class Unit {
   private val: number | null;

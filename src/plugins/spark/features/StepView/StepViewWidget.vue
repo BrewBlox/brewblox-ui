@@ -74,7 +74,7 @@ export default class StepViewWidget extends WidgetBase {
       Dialog.create({
         component: 'ChangeConfirmDialog',
         title: 'Confirm change',
-        message: `Please confirm the ${change.title} value in ${block.id}.`,
+        message: `Please confirm the ${change.title} value in ${block.id}. Current value is '${block.data[key]}'.`,
         serviceId: block.serviceId,
         blockId: block.id,
         value,
@@ -141,6 +141,9 @@ export default class StepViewWidget extends WidgetBase {
         const pretty = specChange.pretty || (v => `${v}`);
         const oldV = pretty(block.data[key]);
         const newV = pretty(val);
+        if (oldV !== newV) {
+          console.log(block.data[key], val);
+        }
         return {
           key: specChange.title || key,
           oldV,
