@@ -54,7 +54,7 @@ describe('Data describing an input tube', () => {
   it('can resolve to transitions', () => {
     expect(asStatePart(part).transitions).toEqual(
       {
-        [IN_OUT]: [{ outCoords: '1,0.5,0', pressure: 11, liquids: [COLD_WATER] }],
+        [IN_OUT]: [{ outCoords: ['1,0.5,0'], pressure: 11, liquids: [COLD_WATER] }],
         '1,0.5,0': [{ outCoords: IN_OUT }],
       });
   });
@@ -287,13 +287,13 @@ describe('A path with a split, but no joins', () => {
     expect(transitions).toEqual(
       [
         {
-          [IN_OUT]: [{ outCoords: '2,2.5,0', pressure: 14, liquids: [COLD_WATER] }],
+          [IN_OUT]: [{ outCoords: ['2,2.5,0'], pressure: 14, liquids: [COLD_WATER] }],
         },
         {
-          '2,2.5,0': [{ outCoords: '3,2.5,0' }],
+          '2,2.5,0': [{ outCoords: ['3,2.5,0'] }],
         },
         {
-          '3,2.5,0': [{ outCoords: '3.5,2,0' }, { outCoords: '3.5,3,0' }],
+          '3,2.5,0': [{ outCoords: ['3.5,2,0', '3.5,3,0'] }],
         },
         [
           [
@@ -497,19 +497,19 @@ describe('A path that forks and rejoins', () => {
     const transitions = propertyWalker([], path, ['transitions']);
     expect(transitions).toEqual(
       [
-        { [IN_OUT]: [{ outCoords: '2,2.5,0', pressure: 11, liquids: [COLD_WATER] }] },
-        { '2,2.5,0': [{ outCoords: '3,2.5,0' }] },
-        { '3,2.5,0': [{ outCoords: '3.5,2,0' }, { outCoords: '3.5,3,0' }] },
+        { [IN_OUT]: [{ outCoords: ['2,2.5,0'], pressure: 11, liquids: [COLD_WATER] }] },
+        { '2,2.5,0': [{ outCoords: ['3,2.5,0'], }] },
+        { '3,2.5,0': [{ outCoords: ['3.5,2,0', '3.5,3,0'], }] },
         [
           [
-            { '3.5,2,0': [{ outCoords: '4,1.5,0' }] },
-            { '4,1.5,0': [{ outCoords: '4.5,2,0' }] },
-            { '4.5,2,0': [{ outCoords: '5,2.5,0' }] },
+            { '3.5,2,0': [{ outCoords: ['4,1.5,0'], }] },
+            { '4,1.5,0': [{ outCoords: ['4.5,2,0'], }] },
+            { '4.5,2,0': [{ outCoords: ['5,2.5,0'], }] },
           ],
           [
-            { '3.5,3,0': [{ outCoords: '4,3.5,0' }] },
-            { '4,3.5,0': [{ outCoords: '4.5,3,0' }] },
-            { '4.5,3,0': [{ outCoords: '5,2.5,0' }] },
+            { '3.5,3,0': [{ outCoords: ['4,3.5,0'], }] },
+            { '4,3.5,0': [{ outCoords: ['4.5,3,0'], }] },
+            { '4.5,3,0': [{ outCoords: ['5,2.5,0'], }] },
           ],
         ],
         { '5,2.5,0': [{ outCoords: IN_OUT }] },
@@ -1069,3 +1069,119 @@ describe('A path with a bridge', () => {
       ]);
   });
 });
+
+
+describe('A filled Kettle', () => {
+  const parts: PersistentPart[] = [
+    {
+      'id': '1',
+      'rotate': 0,
+      'settings': { 'color': 'ff0000' },
+      'flipped': false,
+      'type': 'Kettle',
+      'x': 1,
+      'y': 1,
+    },
+    {
+      'id': '2',
+      'rotate': 0,
+      'settings': {},
+      'flipped': true,
+      'type': 'DipTube',
+      'x': 4,
+      'y': 6,
+    },
+    {
+      'id': '3',
+      'rotate': 0,
+      'settings': {},
+      'flipped': false,
+      'type': 'StraightTube',
+      'x': 5,
+      'y': 6,
+    },
+    {
+      'id': '4',
+      'rotate': 0,
+      'settings': {},
+      'flipped': true,
+      'type': 'SystemIO',
+      'x': 6,
+      'y': 6,
+    },
+  ];
+
+  it('Should have flow through the straight tube and dip tube', () => {
+    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
+    const straight = partsWithFlow.find((part) => part.type === 'StraightTube');
+    expect(straight).toMatchObject(
+      {
+        'id': '3',
+        flows: {
+          '5,6.5,0': {
+            '#ff0000': -6,
+          },
+          '6,6.5,0': {
+            '#ff0000': 6,
+          },
+        },
+      });
+
+    const dip = partsWithFlow.find((part) => part.type === 'DipTube');
+    expect(dip).toMatchObject(
+      {
+        'id': '2',
+        flows: {
+          '5,6.5,0': {
+            '#ff0000': 6,
+          },
+          '5.5,6.5,0': {
+            '#ff0000': -6,
+          },
+        },
+      });
+  });
+});
+
+
+describe('A stray tube', () => {
+  const parts: PersistentPart[] = [
+    { "id": "1", "rotate": 0, "settings": {}, "flipped": false, "type": "Kettle", "x": 3, "y": 3 },
+    { "id": "2", "rotate": 0, "settings": {}, "flipped": false, "type": "DipTube", "x": 4, "y": 6 },
+    { "id": "3", "rotate": 0, "settings": {}, "flipped": false, "type": "SystemIO", "x": 3, "y": 6 },
+    { "type": "StraightTube", "id": "4", "x": 8, "y": 6, "rotate": 0, "settings": {}, "flipped": false }
+  ];
+
+  it('Should have flow through the straight tube and dip tube', () => {
+    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
+    const straight = partsWithFlow.find((part) => part.type === 'DipTube');
+    expect(straight).toMatchObject(
+      {
+        'id': '2',
+        flows: {
+          '5,6.5,0': {
+            '#ff0000': -6,
+          },
+          '6,6.5,0': {
+            '#ff0000': 6,
+          },
+        },
+      });
+
+    const dip = partsWithFlow.find((part) => part.type === 'DipTube');
+    expect(dip).toMatchObject(
+      {
+        'id': '2',
+        flows: {
+          '5,6.5,0': {
+            '#ff0000': 6,
+          },
+          '5.5,6.5,0': {
+            '#ff0000': -6,
+          },
+        },
+      });
+  });
+});
+
+

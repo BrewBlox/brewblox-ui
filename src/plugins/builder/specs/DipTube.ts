@@ -1,4 +1,4 @@
-import { IN_OUT, LEFT } from '../getters';
+import { LEFT, CENTER } from '../getters';
 import { PartSpec } from '../types';
 
 const spec: PartSpec = {
@@ -6,8 +6,8 @@ const spec: PartSpec = {
   cards: [],
   size: () => [1, 1],
   transitions: () => ({
-    [LEFT]: [{ outCoords: IN_OUT }],
-    [IN_OUT]: [{ outCoords: LEFT }],
+    [LEFT]: [{ outCoords: CENTER }],
+    [CENTER]: [{ outCoords: LEFT }],
   }),
 };
 

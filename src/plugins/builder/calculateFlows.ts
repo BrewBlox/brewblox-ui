@@ -14,7 +14,7 @@ import set from 'lodash/set';
 import { Coordinates } from '@/helpers/coordinates';
 
 import { FlowSegment } from './FlowSegment';
-import { ACCELERATE_OTHERS } from './getters';
+import { ACCELERATE_OTHERS, INTERNAL } from './getters';
 import {
   CalculatedFlows,
   FlowPart,
@@ -181,9 +181,13 @@ export const flowPath = (
     return acc;
   }, []);
 
+  if (candidateParts.length === 0) {
+    return path;
+  }
+
   for (const outFlow of outFlows) {
     while (true) {
-      const nextPart = adjacentPart(candidateParts, outFlow.outCoords, start);
+      const nextPart = outFlow.outCoords === INTERNAL ? start : adjacentPart(candidateParts, outFlow.outCoords, start);
       let nextPath: FlowSegment | null = null;
       if (nextPart !== undefined && outFlow.outCoords !== startCoord) {
         nextPath = flowPath(candidateParts, nextPart, outFlow.outCoords, startCoord);
@@ -199,7 +203,7 @@ export const flowPath = (
           path.transitions[inCoord].push(outFlow);
         }
       }
-      if (!nextPart) {
+      if (!nextPart || outFlow.outCoords === INTERNAL) {
         break;
       }
       candidateParts = candidateParts

@@ -1,3 +1,6 @@
+import { Coordinates } from '@/helpers/coordinates';
+
+import { IN_OUT, INTERNAL } from '../getters';
 import { PartSpec, PersistentPart } from '../types';
 
 const DEFAULT_SIZE_X = 4;
@@ -33,7 +36,33 @@ const spec: PartSpec = {
     part.settings.sizeX || DEFAULT_SIZE_X,
     part.settings.sizeY || DEFAULT_SIZE_Y,
   ],
-  transitions: () => ({}),
+  transitions: (part: PersistentPart) => {
+    const sizeX: number = DEFAULT_SIZE_X;
+    const sizeY: number = DEFAULT_SIZE_Y;
+
+    const middleCoords = Array(sizeX * sizeY).fill(0).map((v, n) => {
+      const coord = new Coordinates({ x: (n % sizeX) + 0.5, y: Math.floor(n / sizeX) + 0.5, z: 0 });
+      return coord.toString();
+    });
+
+    const result = {
+      [IN_OUT]: [{
+        outCoords: INTERNAL,
+        pressure: 10,
+        liquids: part.settings.color ? [`#${part.settings.color}`] : [],
+      }],
+      [INTERNAL]: middleCoords.map(item => ({
+        outCoords: item,
+      })),
+    };
+
+    /*    middleCoords.forEach(item => (
+          result[item] = [{
+            outCoords: IN_OUT,
+            pressureDiff: 10,
+          }]));*/
+    return result;
+  },
 };
 
 export default spec;
