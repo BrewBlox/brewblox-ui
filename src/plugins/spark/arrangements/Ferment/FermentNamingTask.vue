@@ -8,9 +8,10 @@ import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { spaceCased, suggestId, valOrDefault } from '@/helpers/functional';
 import { FermentConfig, FermentConfigNames } from '@/plugins/spark/arrangements/Ferment/types';
 import { typeName } from '@/plugins/spark/getters';
+import { blockIdRules } from '@/plugins/spark/helpers';
+import { GroupsBlock } from '@/plugins/spark/provider/types';
+import { sparkStore } from '@/plugins/spark/store';
 import { serviceStore } from '@/store/services';
-
-import { blockIdRules } from '../../helpers';
 
 
 @Component
@@ -36,6 +37,16 @@ export default class FermentNamingTask extends WizardTaskBase {
 
   set serviceId(serviceId: string) {
     this.updateConfig<FermentConfig>({ ...this.config, serviceId });
+  }
+
+  get groupError(): string | null {
+    const block: GroupsBlock | undefined =
+      sparkStore.blockValues(this.serviceId)
+        .find(block => block.type === 'Groups');
+    const names = sparkStore.groupNames(this.serviceId);
+    return block && block.data.active.includes(0)
+      ? null
+      : `Group '${names[0]}' is disabled. Created blocks will be inactive.`;
   }
 
   get arrangementId(): string {
@@ -151,6 +162,11 @@ export default class FermentNamingTask extends WizardTaskBase {
   <div>
     <q-card-section style="height: 60vh">
       <q-scroll-area>
+        <CardWarning v-if="groupError">
+          <template #message>
+            {{ groupError }}
+          </template>
+        </CardWarning>
         <!-- Generic settings -->
         <q-expansion-item default-opened label="Arrangement settings" icon="settings" dense>
           <q-item dark>

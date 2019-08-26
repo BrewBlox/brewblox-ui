@@ -90,7 +90,7 @@ export default class HermsHardwareTask extends WizardTaskBase {
 
   sensorTemp(id: string | null): string {
     if (!id) {
-      return '';
+      return 'Select a sensor to show current value';
     }
     return sparkStore.blockById(this.config.serviceId, id).data.value.toString();
   }
@@ -109,15 +109,15 @@ export default class HermsHardwareTask extends WizardTaskBase {
 
   pinConnectedStatus(channel: PinChannel | null): string {
     if (!channel) {
-      return '';
+      return 'Select a channel to show status';
     }
     const block = sparkStore.blockById(this.config.serviceId, channel.arrayId);
     if ([Spark2PinsType, Spark3PinsType].includes(block.type)) {
       return '';
     }
     return block.data.connected
-      ? 'OneWire extension board is connected'
-      : 'OneWire extension board is not connected';
+      ? `${channel.arrayId} is connected`
+      : `${channel.arrayId} is not connected`;
   }
 
   get hltPinStatus(): string {
@@ -167,18 +167,24 @@ export default class HermsHardwareTask extends WizardTaskBase {
   <div>
     <q-card-section>
       <q-item>
-        <big>Hardware Blocks</big>
-      </q-item>
-      <q-item dark>
-        <q-item-section class="col-auto">
-          <q-btn unelevated label="Discover OneWire objects" color="primary" @click="discover" />
-          <q-tooltip>
-            OneWire temperature sensors and DS2413 chips can be discovered:
-            the Block will be created automatically.
-          </q-tooltip>
+        <q-item-section>
+          <big>Hardware Blocks</big>
         </q-item-section>
         <q-item-section class="col-auto">
-          <q-btn unelevated label="Create block" color="primary" @click="startBlockWizard" />
+          <q-btn flat round icon="refresh" @click="discover">
+            <q-tooltip>Discover OneWire Blocks</q-tooltip>
+          </q-btn>
+        </q-item-section>
+        <q-item-section class="col-auto">
+          <q-btn flat round icon="add" @click="startBlockWizard">
+            <q-tooltip>Create new Block</q-tooltip>
+          </q-btn>
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section class="text-italic">
+          You can unplug or heat sensors to identify them.
+          The current value will be shown under each dropdown menu.
         </q-item-section>
       </q-item>
       <q-item dark>
@@ -238,12 +244,12 @@ export default class HermsHardwareTask extends WizardTaskBase {
           <q-select
             v-model="mtSensor"
             :options="sensorOptions"
-            label="MT sensor"
             :rules="sensorRules"
+            :hint="mtSensorTemp"
+            label="MT sensor"
             dark
             options-dark
           />
-          <small>{{ mtSensorTemp }}</small>
         </q-item-section>
         <q-item-section />
       </q-item>
