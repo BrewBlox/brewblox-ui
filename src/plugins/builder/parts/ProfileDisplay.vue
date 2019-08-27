@@ -3,8 +3,6 @@ import { Component } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
 import { Setpoint, SetpointProfileBlock } from '@/plugins/spark/features/SetpointProfile/types';
-import { SetpointSensorPairBlock } from '@/plugins/spark/features/SetpointSensorPair/types';
-import { sparkStore } from '@/plugins/spark/store';
 
 import PartBase from '../components/PartBase';
 import { settingsBlock } from '../helpers';
@@ -16,16 +14,30 @@ export default class ProfileDisplay extends PartBase {
     return settingsBlock(this.part, 'profile');
   }
 
-  get currentValue(): number | null {
+  get points(): Setpoint[] {
     if (!this.block) {
+      return [];
+    }
+    return [...this.block.data.points]
+      .sort(objectSorter('time'));
+  }
+
+  get currentValue(): number | null {
+    if (!this.block || !this.block.data.enabled) {
       return null;
     }
-    const targetId = this.block.data.drivenTargetId.id;
-    if (!targetId) {
+    const now = new Date().getTime() / 1000;
+    const start = this.block.data.start || 0;
+    const idx = this.points.findIndex(point => start + point.time > now);
+    if (idx < 1) {
       return null;
     }
-    const target: SetpointSensorPairBlock = sparkStore.blockById(this.block.serviceId, targetId);
-    return target.data.setting.value;
+    const prev = this.points[idx - 1];
+    const next = this.points[idx];
+    const prevVal = prev.temperature.value as number;
+    const nextVal = next.temperature.value as number;
+    const duration = (next.time - prev.time) || 1;
+    return prevVal + (now - start + prev.time) * (nextVal - prevVal) / duration;
   }
 
   get nextValue(): number | null {
@@ -38,8 +50,7 @@ export default class ProfileDisplay extends PartBase {
       return null;
     }
     // Sorting modifies the list. Make a copy to prevent this.
-    const point: Setpoint | undefined = [...this.block.data.points]
-      .sort(objectSorter('time'))
+    const point: Setpoint | undefined = this.points
       .find(point => start + point.time > now);
     return point ? point.temperature.value : null;
   }
@@ -52,11 +63,11 @@ export default class ProfileDisplay extends PartBase {
       <div :class="['text-white', 'text-bold', 'q-ml-sm', 'q-mt-xs']">
         <small>Setpoint Profile</small>
         <q-space />
-        <div v-if="block" class="row q-ml-sm">
-          <div class="col-auto q-mr-sm">
+        <div v-if="block" class="row q-ml-xs">
+          <div class="col-auto q-mr-xs no-wrap">
             {{ currentValue | round(0) }}
           </div>
-          <div class="col-auto q-mr-sm">
+          <div class="col-auto q-mr-xs">
             <q-icon name="mdi-arrow-right-bold" />
           </div>
           <div class="col-auto">
