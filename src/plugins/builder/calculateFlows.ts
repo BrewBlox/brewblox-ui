@@ -34,11 +34,11 @@ const adjacentPart = (
   allParts: FlowPart[],
   outCoords: string,
   currentPart: FlowPart | null = null,
-): FlowPart | undefined =>
+): FlowPart | null =>
   allParts
     .find((part: FlowPart) =>
       !(currentPart && part.id === currentPart.id)
-      && has(part, ['transitions', outCoords]));
+      && has(part, ['transitions', outCoords])) || null;
 
 const normalizeFlows = (part: FlowPart): FlowPart => {
   if (!part.flows) {
@@ -181,20 +181,20 @@ export const flowPath = (
     return acc;
   }, []);
 
-  if (candidateParts.length === 0) {
-    return path;
-  }
-
   for (const outFlow of outFlows) {
     while (true) {
-      const nextPart = outFlow.outCoords === INTERNAL ? start : adjacentPart(candidateParts, outFlow.outCoords, start);
+      const nextPart =
+        (candidateParts.length === 0) ? null :
+          outFlow.outCoords === INTERNAL ? start : adjacentPart(candidateParts, outFlow.outCoords, start);
+
       let nextPath: FlowSegment | null = null;
-      if (nextPart !== undefined && outFlow.outCoords !== startCoord) {
+      if (nextPart !== null && outFlow.outCoords !== startCoord) {
         nextPath = flowPath(candidateParts, nextPart, outFlow.outCoords, startCoord);
         if (nextPath !== null) {
           path.addChild(nextPath);
         }
       }
+
       if (nextPath !== null || outFlow.outCoords === startCoord) {
         if (path.transitions[inCoord] === undefined) {
           path.transitions[inCoord] = [outFlow];
@@ -279,6 +279,7 @@ export const addFlowForSegment = (
       ...outFlow,
     }
   );
+
 
   // add flow for next
   if (segment.next) {

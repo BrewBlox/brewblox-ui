@@ -54,7 +54,7 @@ describe('Data describing an input tube', () => {
   it('can resolve to transitions', () => {
     expect(asStatePart(part).transitions).toEqual(
       {
-        [IN_OUT]: [{ outCoords: ['1,0.5,0'], pressure: 11, liquids: [COLD_WATER] }],
+        [IN_OUT]: [{ outCoords: '1,0.5,0', pressure: 11, liquids: [COLD_WATER] }],
         '1,0.5,0': [{ outCoords: IN_OUT }],
       });
   });
@@ -287,13 +287,13 @@ describe('A path with a split, but no joins', () => {
     expect(transitions).toEqual(
       [
         {
-          [IN_OUT]: [{ outCoords: ['2,2.5,0'], pressure: 14, liquids: [COLD_WATER] }],
+          [IN_OUT]: [{ outCoords: '2,2.5,0', pressure: 14, liquids: [COLD_WATER] }],
         },
         {
-          '2,2.5,0': [{ outCoords: ['3,2.5,0'] }],
+          '2,2.5,0': [{ outCoords: '3,2.5,0' }],
         },
         {
-          '3,2.5,0': [{ outCoords: ['3.5,2,0', '3.5,3,0'] }],
+          '3,2.5,0': [{ outCoords: '3.5,2,0' }, { outCoords: '3.5,3,0' }],
         },
         [
           [
@@ -497,19 +497,19 @@ describe('A path that forks and rejoins', () => {
     const transitions = propertyWalker([], path, ['transitions']);
     expect(transitions).toEqual(
       [
-        { [IN_OUT]: [{ outCoords: ['2,2.5,0'], pressure: 11, liquids: [COLD_WATER] }] },
-        { '2,2.5,0': [{ outCoords: ['3,2.5,0'], }] },
-        { '3,2.5,0': [{ outCoords: ['3.5,2,0', '3.5,3,0'], }] },
+        { [IN_OUT]: [{ outCoords: '2,2.5,0', pressure: 11, liquids: [COLD_WATER] }] },
+        { '2,2.5,0': [{ outCoords: '3,2.5,0' }] },
+        { '3,2.5,0': [{ outCoords: '3.5,2,0' }, { outCoords: '3.5,3,0' }] },
         [
           [
-            { '3.5,2,0': [{ outCoords: ['4,1.5,0'], }] },
-            { '4,1.5,0': [{ outCoords: ['4.5,2,0'], }] },
-            { '4.5,2,0': [{ outCoords: ['5,2.5,0'], }] },
+            { '3.5,2,0': [{ outCoords: '4,1.5,0' }] },
+            { '4,1.5,0': [{ outCoords: '4.5,2,0' }] },
+            { '4.5,2,0': [{ outCoords: '5,2.5,0' }] },
           ],
           [
-            { '3.5,3,0': [{ outCoords: ['4,3.5,0'], }] },
-            { '4,3.5,0': [{ outCoords: ['4.5,3,0'], }] },
-            { '4.5,3,0': [{ outCoords: ['5,2.5,0'], }] },
+            { '3.5,3,0': [{ outCoords: '4,3.5,0' }] },
+            { '4,3.5,0': [{ outCoords: '4.5,3,0' }] },
+            { '4.5,3,0': [{ outCoords: '5,2.5,0' }] },
           ],
         ],
         { '5,2.5,0': [{ outCoords: IN_OUT }] },

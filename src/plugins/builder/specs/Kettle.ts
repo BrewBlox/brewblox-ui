@@ -45,22 +45,27 @@ const spec: PartSpec = {
       return coord.toString();
     });
 
+    const pressure = 10;
     const result = {
       [IN_OUT]: [{
         outCoords: INTERNAL,
-        pressure: 10,
+        pressure,
+        friction: 0,
         liquids: part.settings.color ? [`#${part.settings.color}`] : [],
+      }],
+      [INTERNAL]: [{
+        outCoords: IN_OUT,
+        friction: 0,
       }],
       [INTERNAL]: middleCoords.map(item => ({
         outCoords: item,
       })),
     };
 
-    /*    middleCoords.forEach(item => (
-          result[item] = [{
-            outCoords: IN_OUT,
-            pressureDiff: 10,
-          }]));*/
+    middleCoords.forEach(item => (
+      result[item] = [{
+        outCoords: INTERNAL,
+      }]));
     return result;
   },
 };
