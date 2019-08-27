@@ -1,6 +1,5 @@
 <script lang="ts">
 import parseDuration from 'parse-duration';
-import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import { durationString, objectSorter } from '@/helpers/functional';
@@ -126,7 +125,7 @@ export default class SetpointProfileForm extends BlockCrudComponent {
       && this.points[index].absTimeMs > now
       && this.points[index - 1].absTimeMs < now
     ) {
-      Dialog.create({
+      this.$q.dialog({
         title: 'Insert point',
         message: `
         Insert a point at current time and setting?
