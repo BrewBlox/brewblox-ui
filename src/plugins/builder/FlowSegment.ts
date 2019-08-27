@@ -29,7 +29,7 @@ export class FlowSegment {
   }
 
   public friction(): number {
-    let series = DEFAULT_FRICTION;
+    let series = this.root.type !== "Kettle" ? DEFAULT_FRICTION : 0;
     let parallel = 0;
     this.splits.forEach(splitPath => {
       const splitFriction = splitPath.friction();
@@ -55,6 +55,20 @@ export class FlowSegment {
 
   public isSameSegment(other: FlowSegment): boolean {
     return JSON.stringify(this) === JSON.stringify(other);
+  }
+
+  public removeInternalFlows() {
+    if (this.splits.length !== 0) {
+      return;
+    }
+
+    if (this.next) {
+      this.next.removeInternalFlows();
+      if (this.next.root.id === this.root.id) {
+        this.splits = this.next.splits;
+        this.next = this.next.next;
+      }
+    }
   }
 
   public leafSegments(): FlowSegment[] {

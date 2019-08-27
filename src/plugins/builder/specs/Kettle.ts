@@ -1,6 +1,6 @@
 import { Coordinates } from '@/helpers/coordinates';
 
-import { IN_OUT, INTERNAL } from '../getters';
+import { IN_OUT } from '../getters';
 import { PartSpec, PersistentPart } from '../types';
 
 const DEFAULT_SIZE_X = 4;
@@ -48,23 +48,21 @@ const spec: PartSpec = {
     const pressure = 10;
     const result = {
       [IN_OUT]: [{
-        outCoords: INTERNAL,
+        outCoords: "0,0,-2",
         pressure,
-        friction: 0,
         liquids: part.settings.color ? [`#${part.settings.color}`] : [],
+        internal: true,
+        source: true,
       }],
-      [INTERNAL]: [{
-        outCoords: IN_OUT,
-        friction: 0,
-      }],
-      [INTERNAL]: middleCoords.map(item => ({
+      "0,0,-2": middleCoords.map(item => ({
         outCoords: item,
       })),
     };
 
     middleCoords.forEach(item => (
       result[item] = [{
-        outCoords: INTERNAL,
+        outCoords: IN_OUT,
+        internal: true,
       }]));
     return result;
   },

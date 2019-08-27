@@ -14,7 +14,7 @@ import set from 'lodash/set';
 import { Coordinates } from '@/helpers/coordinates';
 
 import { FlowSegment } from './FlowSegment';
-import { ACCELERATE_OTHERS, INTERNAL } from './getters';
+import { ACCELERATE_OTHERS } from './getters';
 import {
   CalculatedFlows,
   FlowPart,
@@ -185,7 +185,7 @@ export const flowPath = (
     while (true) {
       const nextPart =
         (candidateParts.length === 0) ? null :
-          outFlow.outCoords === INTERNAL ? start : adjacentPart(candidateParts, outFlow.outCoords, start);
+          outFlow.internal ? start : adjacentPart(candidateParts, outFlow.outCoords, start);
 
       let nextPath: FlowSegment | null = null;
       if (nextPart !== null && outFlow.outCoords !== startCoord) {
@@ -203,7 +203,7 @@ export const flowPath = (
           path.transitions[inCoord].push(outFlow);
         }
       }
-      if (!nextPart || outFlow.outCoords === INTERNAL) {
+      if (!nextPart || outFlow.internal) {
         break;
       }
       candidateParts = candidateParts
@@ -213,6 +213,9 @@ export const flowPath = (
   if (path.transitions[inCoord] === undefined) {
     return null;
   }
+
+  path.removeInternalFlows();
+
   path.transitions[inCoord] = [...new Set(path.transitions[inCoord])]; // remove duplicates
 
   let duplicated: FlowSegment | null = null;
@@ -227,6 +230,8 @@ export const flowPath = (
       }
     }
   } while (duplicated !== null);
+
+
   return path;
 };
 

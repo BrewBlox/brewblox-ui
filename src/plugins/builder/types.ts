@@ -5,6 +5,9 @@ export interface FlowRoute {
   friction?: number;
   pressure?: number;
   liquids?: string[];
+  internal?: boolean;
+  sink?: boolean;
+  source?: boolean;
 }
 
 export interface Transitions {
