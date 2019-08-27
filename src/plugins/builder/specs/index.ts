@@ -18,6 +18,7 @@ import Keg from './Keg';
 import Kettle from './Kettle';
 import Lauterhexe from './Lauterhexe';
 import PidDisplay from './PidDisplay';
+import ProfileDisplay from './ProfileDisplay';
 import Pump from './Pump';
 import PwmDisplay from './PwmDisplay';
 import PwmPump from './PwmPump';
@@ -51,6 +52,7 @@ const specs: { [key: string]: PartSpec } = {
   Kettle,
   Lauterhexe,
   PidDisplay,
+  ProfileDisplay,
   Pump,
   PwmDisplay,
   PwmPump,

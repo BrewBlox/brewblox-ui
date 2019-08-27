@@ -117,6 +117,48 @@ export default class SetpointProfileForm extends BlockCrudComponent {
     };
     this.savePoints();
   }
+
+  updatePointTemperature(index: number, value: Unit): void {
+    const now = new Date().getTime();
+    if (
+      index > 0
+      && this.points[index].absTimeMs > now
+      && this.points[index - 1].absTimeMs < now
+    ) {
+      this.$q.dialog({
+        title: 'Insert point',
+        message: `
+        Insert a point at current time and setting?
+        This prevents instant jumps in temperature setting.`,
+        cancel: 'No',
+        dark: true,
+        persistent: true,
+      })
+        .onOk(() => {
+          const prev = this.points[index - 1];
+          const next = this.points[index];
+          const prevVal = prev.temperature.value as number;
+          const nextVal = next.temperature.value as number;
+          const duration = (next.absTimeMs - prev.absTimeMs) || 1;
+          const interpolated = prevVal + (now - prev.absTimeMs) * (nextVal - prevVal) / duration;
+          const newPoint: DisplaySetpoint = {
+            offsetMs: now - this.start,
+            absTimeMs: now,
+            temperature: prev.temperature.copy(interpolated),
+          };
+          this.points[index].temperature = value;
+          this.points.splice(index, 0, newPoint);
+          this.savePoints();
+        })
+        .onCancel(() => {
+          this.points[index].temperature = value;
+          this.savePoints();
+        });
+    } else {
+      this.points[index].temperature = value;
+      this.savePoints();
+    }
+  }
 }
 </script>
 
@@ -219,7 +261,7 @@ export default class SetpointProfileForm extends BlockCrudComponent {
               :value="point.temperature"
               title="Temperature"
               label="point temperature"
-              @input="v => { point.temperature = v; savePoints(); }"
+              @input="v => updatePointTemperature(idx, v)"
             />
           </q-item-section>
           <q-item-section class="col-1" side>
