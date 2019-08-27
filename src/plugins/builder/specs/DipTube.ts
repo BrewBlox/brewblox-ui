@@ -1,4 +1,4 @@
-import { LEFT, CENTER } from '../getters';
+import { CENTER,LEFT } from '../getters';
 import { PartSpec } from '../types';
 
 const spec: PartSpec = {

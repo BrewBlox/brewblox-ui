@@ -29,7 +29,7 @@ export class FlowSegment {
   }
 
   public friction(): number {
-    let series = this.root.type !== "Kettle" ? DEFAULT_FRICTION : 0;
+    let series = this.root.type !== 'Kettle' ? DEFAULT_FRICTION : 0;
     let parallel = 0;
     this.splits.forEach(splitPath => {
       const splitFriction = splitPath.friction();

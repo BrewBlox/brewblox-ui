@@ -1,12 +1,12 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
 
-import { FlowSegment } from '@/plugins/builder/FlowSegment';
 import {
   asFlowParts,
   calculateFlows,
   flowPath,
 } from '@/plugins/builder/calculateFlows';
+import { FlowSegment } from '@/plugins/builder/FlowSegment';
 import { COLD_WATER, HOT_WATER, IN_OUT } from '@/plugins/builder/getters';
 import specs from '@/plugins/builder/specs';
 import { PersistentPart, StatePart } from '@/plugins/builder/types';
@@ -24,7 +24,7 @@ const propertyWalker = (acc: any[], next: FlowSegment, prop: string[]): any[] =>
   acc = [...acc, get(next, prop)];
 
   type StringList = string | any[];
-  let subtree: StringList[] = [];
+  const subtree: StringList[] = [];
 
   next.splits.forEach((child) => {
     subtree.push(propertyWalker([], child, prop)); // splits
@@ -140,7 +140,7 @@ describe('A single path without splits', () => {
 
   it('Should have no splits', () => {
     let walker: FlowSegment = path;
-    let pathTypes: string[] = ['SystemIO'];
+    const pathTypes: string[] = ['SystemIO'];
     while (true) {
       if (walker.next === null) {
         break; // end of path
@@ -1154,9 +1154,9 @@ describe('A filled Kettle', () => {
         'id': '2',
         flows:
         {
-          "4.5,6.5,0": { "#ff0000": -10 / 3 },
-          "5,6.5,0": { "#ff0000": 10 / 3 }
-        }
+          '4.5,6.5,0': { '#ff0000': -10 / 3 },
+          '5,6.5,0': { '#ff0000': 10 / 3 },
+        },
       });
   });
 });
@@ -1252,10 +1252,10 @@ describe('A pressurized kettle and SystemIO with equal pressure', () => {
       {
         'id': '3',
         'flows': {
-          "5,6.5,0": {
+          '5,6.5,0': {
             [COLD_WATER]: 0,
           },
-          "6,6.5,0": {
+          '6,6.5,0': {
             '#ff0000': 0,
           },
         },
@@ -1349,7 +1349,7 @@ describe('A kettle with 2 outflows', () => {
           'SystemIO'],
         ['DipTube',
           'StraightTube',
-          'SystemIO']]
+          'SystemIO']],
       ]);
   });
   it('Each branch should have flow 10/3', () => {
@@ -1359,11 +1359,11 @@ describe('A kettle with 2 outflows', () => {
       {
         'id': '3',
         'flows': {
-          "5,6.5,0": {
-            "#ff0000": -10 / 3,
+          '5,6.5,0': {
+            '#ff0000': -10 / 3,
           },
-          "6,6.5,0": {
-            "#ff0000": 10 / 3,
+          '6,6.5,0': {
+            '#ff0000': 10 / 3,
           },
         },
       });
@@ -1373,14 +1373,99 @@ describe('A kettle with 2 outflows', () => {
       {
         'id': '6',
         'flows': {
-          "5,5.5,0": {
-            "#ff0000": -10 / 3,
+          '5,5.5,0': {
+            '#ff0000': -10 / 3,
           },
-          "6,5.5,0": {
-            "#ff0000": 10 / 3,
+          '6,5.5,0': {
+            '#ff0000': 10 / 3,
           },
         },
       });
   });
 });
 
+describe('A kettle with flow back to itself', () => {
+  const parts: PersistentPart[] = [
+    {
+      'id': '1',
+      'rotate': 0,
+      'settings': { 'color': 'ff0000', 'pressure': 10 },
+      'type': 'Kettle',
+      'x': 1,
+      'y': 1,
+    },
+    {
+      'id': '2',
+      'rotate': 0,
+      'settings': {},
+      'flipped': true,
+      'type': 'DipTube',
+      'x': 4,
+      'y': 5,
+    },
+    {
+      'id': '3',
+      'rotate': 180,
+      'settings': {},
+      'type': 'ElbowTube',
+      'x': 5,
+      'y': 5,
+    },
+    {
+      'id': '4',
+      'rotate': 270,
+      'settings': {},
+      'type': 'ElbowTube',
+      'x': 5,
+      'y': 6,
+    },
+    {
+      'id': '5',
+      'rotate': 0,
+      'settings': {},
+      'flipped': true,
+      'type': 'DipTube',
+      'x': 4,
+      'y': 6,
+    },
+  ];
+  const flowParts = asFlowParts(parts.map(asStatePart));
+  it('Should return the right path starting at the kettle', () => {
+    const start = flowParts[0];
+
+    const path = flowPath(flowParts, start, IN_OUT);
+    if (path === null) {
+      throw ('no path found');
+    }
+
+    const visitedTypes = propertyWalker([], path, ['root', 'type']);
+    expect(visitedTypes).toEqual(
+      [
+        'Kettle',
+        'DipTube',
+        'ElbowTube',
+        'ElbowTube',
+        'DipTube',
+        'Kettle',
+      ]);
+
+    expect(path.friction()).toEqual(4);
+  });
+
+  it('Should have zero flow', () => {
+    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
+    const straight = partsWithFlow.find((part) => part.id === '3');
+    expect(straight).toMatchObject(
+      {
+        'id': '3',
+        'flows': {
+          '5,5.5,0': {
+            '#ff0000': 0,
+          },
+          '5.5,6,0': {
+            '#ff0000': 0,
+          },
+        },
+      });
+  });
+});

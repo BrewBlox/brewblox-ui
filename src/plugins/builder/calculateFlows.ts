@@ -172,9 +172,23 @@ export const flowPath = (
   const outFlows: FlowRoute[] = get(start, ['transitions', inCoord], []);
   const path = new FlowSegment(start, {});
 
+  if (outFlows.length === 0) {
+    return null;
+  }
+
   let candidateParts: FlowPart[] = parts.reduce((acc: FlowPart[], part: FlowPart) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { [inCoord]: _, ...filteredTransitions } = part.transitions; // make a copy of transitions excluding inCoord
+
+    if (inCoord !== startCoord) {
+      Object.keys(filteredTransitions).forEach(k => {
+        // filter out any transitions that go back to the inCoord to remove loops
+        filteredTransitions[k] = filteredTransitions[k].filter(
+          route => (route.outCoords != inCoord)
+        );
+      });
+    }
+
     if (Object.getOwnPropertyNames(filteredTransitions).length !== 0) { // exclude parts without transitions
       acc.push({ ...part, transitions: filteredTransitions });
     }
@@ -188,7 +202,7 @@ export const flowPath = (
           outFlow.internal ? start : adjacentPart(candidateParts, outFlow.outCoords, start);
 
       let nextPath: FlowSegment | null = null;
-      if (nextPart !== null && outFlow.outCoords !== startCoord) {
+      if (nextPart !== null) {
         nextPath = flowPath(candidateParts, nextPart, outFlow.outCoords, startCoord);
         if (nextPath !== null) {
           path.addChild(nextPath);
@@ -210,6 +224,7 @@ export const flowPath = (
         .filter(part => nextPart && !(nextPart.id === part.id));
     }
   };
+
   if (path.transitions[inCoord] === undefined) {
     return null;
   }
@@ -230,7 +245,6 @@ export const flowPath = (
       }
     }
   } while (duplicated !== null);
-
 
   return path;
 };
