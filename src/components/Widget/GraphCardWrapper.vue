@@ -50,7 +50,7 @@ export default class GraphCardWrapper extends Vue {
       style="width: 600px;"
       @sizeok="v => sizeok = v"
     >
-      <q-card v-if="!collapsed" dark class="q-pa-xs bg-dark-bright">
+      <q-card v-if="!collapsed" dark class="q-pa-xs bg-dark-bright" style="min-height: 100px;">
         <slot name="graph" />
       </q-card>
     </ScreenSizeConstrained>

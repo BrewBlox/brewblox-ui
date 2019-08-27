@@ -59,17 +59,12 @@ export default class GraphWidget extends WidgetBase {
 <template>
   <q-card dark class="text-white column">
     <q-dialog v-model="settingsModalOpen" no-backdrop-dismiss class="row">
-      <ScreenSizeConstrained
-        v-if="settingsModalOpen"
-        :min-width="1500"
-        class="q-mr-md"
-        style="width: 600px"
-      >
-        <q-card dark class="q-pa-xs bg-dark-bright" style="min-height: 100px">
+      <GraphCardWrapper show-initial>
+        <template #graph>
           <HistoryGraph :id="widget.id" :config="graphCfg" shared-listeners />
-        </q-card>
-      </ScreenSizeConstrained>
-      <GraphForm v-if="settingsModalOpen" :crud="crud" :downsampling="downsampling" />
+        </template>
+        <GraphForm v-if="settingsModalOpen" :crud="crud" :downsampling="downsampling" />
+      </GraphCardWrapper>
     </q-dialog>
 
     <q-dialog v-model="graphModalOpen" maximized>
