@@ -29,11 +29,11 @@ export default class InputField extends FieldBase {
   public readonly clearable!: boolean;
 
   @Emit('input')
-  public change(v: string | number) {
+  public change(v: string | number): string | number {
     return v;
   }
 
-  get displayValue() {
+  get displayValue(): string | number {
     if (this.value === ''
       || this.value === null
       || this.value === undefined) {
@@ -45,7 +45,7 @@ export default class InputField extends FieldBase {
       : this.value;
   }
 
-  openDialog() {
+  openDialog(): void {
     if (this.readonly) {
       return;
     }

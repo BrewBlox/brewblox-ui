@@ -14,42 +14,42 @@ export default class PidWidget extends BlockWidget {
   inputFormOpen = false;
   relationsOpen = false;
 
-  get inputId() {
+  get inputId(): string | null {
     return this.block.data.inputId.id;
   }
 
-  get outputId() {
+  get outputId(): string | null {
     return this.block.data.outputId.id;
   }
 
-  get hasInputBlock() {
-    return this.inputId
+  get hasInputBlock(): boolean {
+    return !!this.inputId
       && sparkStore
         .blockIds(this.serviceId)
         .includes(this.inputId);
   }
 
-  get hasOutputBlock() {
-    return this.outputId
+  get hasOutputBlock(): boolean {
+    return !!this.outputId
       && sparkStore
         .blockIds(this.serviceId)
         .includes(this.outputId);
   }
 
-  enable() {
+  enable(): void {
     this.block.data.enabled = true;
     this.saveBlock();
   }
 
-  showRelations() {
+  showRelations(): void {
     startRelationsDialog(this.block);
   }
 
-  showInput() {
+  showInput(): void {
     showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.inputId));
   }
 
-  showOutput() {
+  showOutput(): void {
     showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.outputId));
   }
 }

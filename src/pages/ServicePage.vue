@@ -12,7 +12,7 @@ export default class ServicePage extends Vue {
     return this.$route.params.id;
   }
 
-  get serviceValid() {
+  get serviceValid(): boolean {
     return serviceStore.serviceExists(this.serviceId);
   }
 

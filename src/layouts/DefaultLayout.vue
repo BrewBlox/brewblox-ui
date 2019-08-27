@@ -9,7 +9,6 @@ import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard
 import { checkDatastore } from '@/helpers/datastore';
 import { objectSorter } from '@/helpers/functional';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
-import { pluginStore } from '@/store/plugins';
 import { Service, serviceStore } from '@/store/services';
 
 @Component({
@@ -24,11 +23,11 @@ export default class DefaultLayout extends Vue {
   wizardModalOpen = false;
   wizardComponent: string | null = null;
 
-  get version() {
+  get version(): string {
     return buildEnv.version || 'UNKNOWN';
   }
 
-  get dashboards() {
+  get dashboards(): Dashboard[] {
     return dashboardStore.dashboardValues.sort(objectSorter('order'));
   }
 
@@ -36,11 +35,7 @@ export default class DefaultLayout extends Vue {
     dashboardStore.updateDashboardOrder(dashboards.map(dashboard => dashboard.id));
   }
 
-  get defaultDashboard() {
-    return dashboardStore.primaryDashboardId;
-  }
-
-  get services() {
+  get services(): Service[] {
     return serviceStore.serviceValues.sort(objectSorter('order'));
   }
 
@@ -48,27 +43,27 @@ export default class DefaultLayout extends Vue {
     serviceStore.updateServiceOrder(services.map(service => service.id));
   }
 
-  onIdChanged(oldId, newId) {
+  onIdChanged(oldId, newId): void {
     if (newId && this.$route.path === `/dashboard/${oldId}`) {
       this.$router.replace(`/dashboard/${newId}`);
     }
   }
 
-  async changeDashboardId(dashboard: Dashboard) {
+  async changeDashboardId(dashboard: Dashboard): Promise<void> {
     const oldId = dashboard.id;
     await startChangeDashboardId(dashboard, newId => this.onIdChanged(oldId, newId));
   }
 
-  changeDashboardTitle(dashboard: Dashboard) {
+  changeDashboardTitle(dashboard: Dashboard): void {
     const oldId = dashboard.id;
     startChangeDashboardTitle(dashboard, newId => this.onIdChanged(oldId, newId));
   }
 
-  removeDashboard(dashboard: Dashboard) {
+  removeDashboard(dashboard: Dashboard): void {
     startRemoveDashboard(dashboard);
   }
 
-  removeService(service: Service) {
+  removeService(service: Service): void {
     Dialog.create({
       title: 'Remove service',
       message: `Are you sure you want to remove ${service.title}?`,
@@ -79,7 +74,7 @@ export default class DefaultLayout extends Vue {
       .onOk(() => serviceStore.removeService(service));
   }
 
-  changeServiceTitle(service: Service) {
+  changeServiceTitle(service: Service): void {
     Dialog.create({
       title: 'Change service Title',
       message: "Change your service's display name",
@@ -105,35 +100,27 @@ export default class DefaultLayout extends Vue {
       });
   }
 
-  toggleDefaultDashboard(dashboard: Dashboard) {
+  toggleDefaultDashboard(dashboard: Dashboard): void {
     dashboardStore.updatePrimaryDashboard(dashboard.primary ? null : dashboard.id);
   }
 
-  openWizard(component: string | null = null) {
+  openWizard(component: string | null = null): void {
     this.wizardComponent = component;
     this.wizardModalOpen = true;
   }
 
-  showPlugins() {
+  showPlugins(): void {
     Dialog.create({
       component: 'PluginDialog',
     });
   }
 
-  addPlugin() {
-    pluginStore.createPlugin({
-      id: 'pluggy',
-      title: 'pluggy',
-      url: 'http://localhost:8200/brewblox-plugin.umd.js',
-    });
-  }
-
-  stopEditing() {
+  stopEditing(): void {
     this.dashboardEditing = false;
     this.serviceEditing = false;
   }
 
-  created() {
+  created(): void {
     checkDatastore();
   }
 }

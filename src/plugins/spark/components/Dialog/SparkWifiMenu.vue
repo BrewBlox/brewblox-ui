@@ -42,18 +42,18 @@ export default class SparkWifiMenu extends DialogBase {
       .find(block => block.type === 'WiFiSettings') as WiFiSettingsBlock;
   }
 
-  get securityOpts() {
+  get securityOpts(): SelectOption[] {
     return WlanSecurityEnum
       .filter(([i]) => i !== 255) // not set
-      .map(([value, label]) => ({ label, value }));
+      .map(([value, label]) => ({ label: `${label}`, value }));
   }
 
-  get cipherOpts() {
+  get cipherOpts(): SelectOption[] {
     return WlanCipherEnum
-      .map(([value, label]) => ({ label, value }));
+      .map(([value, label]) => ({ label: `${label}`, value }));
   }
 
-  async save() {
+  async save(): Promise<void> {
     await sparkStore.saveBlock([this.serviceId, { ...this.block, data: this.values }]);
     this.$nextTick(() => this.$emit('close'));
   }

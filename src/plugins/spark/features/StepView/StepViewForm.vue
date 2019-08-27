@@ -40,7 +40,7 @@ export default class StepViewForm extends CrudComponent {
     return this.widget.config;
   }
 
-  get serviceId() {
+  get serviceId(): string {
     return this.widgetConfig.serviceId;
   }
 
@@ -82,7 +82,7 @@ export default class StepViewForm extends CrudComponent {
       }));
   }
 
-  saveSteps(steps: StepDisplay[]) {
+  saveSteps(steps: StepDisplay[]): void {
     this.saveConfig({
       ...this.widgetConfig,
       steps: serialize(steps.map(step => ({
@@ -119,7 +119,7 @@ export default class StepViewForm extends CrudComponent {
     };
   }
 
-  addStep() {
+  addStep(): void {
     const stepName = 'New Step';
     Dialog.create({
       title: 'Add a Step',
@@ -136,13 +136,13 @@ export default class StepViewForm extends CrudComponent {
       });
   }
 
-  duplicateStep(step: StepDisplay) {
+  duplicateStep(step: StepDisplay): void {
     const duplicated = deepCopy(step);
     this.steps.push({ ...duplicated, id: uid(), name: `${duplicated.name} (copy)` });
     this.saveSteps(this.steps);
   }
 
-  renameStep(step: StepDisplay) {
+  renameStep(step: StepDisplay): void {
     const stepName = step.name;
     Dialog.create({
       title: 'Change Step name',
@@ -163,7 +163,7 @@ export default class StepViewForm extends CrudComponent {
       });
   }
 
-  removeStep(step: StepDisplay) {
+  removeStep(step: StepDisplay): void {
     Dialog.create({
       title: 'Remove Step',
       message: `Are you sure you want to remove ${step.name}?`,
@@ -174,12 +174,12 @@ export default class StepViewForm extends CrudComponent {
       .onOk(() => this.saveSteps(this.steps.filter(s => s.id !== step.id)));
   }
 
-  saveChanges(step: StepDisplay, changes: BlockChangeDisplay[]) {
+  saveChanges(step: StepDisplay, changes: BlockChangeDisplay[]): void {
     step.changes = changes;
     this.saveSteps(this.steps);
   }
 
-  addChange(step: StepDisplay) {
+  addChange(step: StepDisplay): void {
     Dialog.create({
       component: 'BlockDialog',
       title: 'Choose a Block',
@@ -200,28 +200,28 @@ export default class StepViewForm extends CrudComponent {
       });
   }
 
-  removeChange(step: StepDisplay, key: string) {
+  removeChange(step: StepDisplay, key: string): void {
     step.changes = step.changes.filter(change => change.key !== key);
     this.saveSteps(this.steps);
   }
 
-  addField(change: BlockChangeDisplay, key: string) {
+  addField(change: BlockChangeDisplay, key: string): void {
     const prop = this.findProp(change, key);
     this.$set(change.data, key, prop.generate());
     this.saveSteps(this.steps);
   }
 
-  updateField(change: BlockChangeDisplay, key: string, val: any) {
+  updateField(change: BlockChangeDisplay, key: string, val: any): void {
     this.$set(change.data, key, val);
     this.saveSteps(this.steps);
   }
 
-  toggleConfirmation(change: BlockChangeDisplay, key: string) {
+  toggleConfirmation(change: BlockChangeDisplay, key: string): void {
     this.$set(change.confirmed, key, !change.confirmed[key]);
     this.saveSteps(this.steps);
   }
 
-  removeField(change: BlockChangeDisplay, key: string) {
+  removeField(change: BlockChangeDisplay, key: string): void {
     this.$delete(change.data, key);
     this.$delete(change.confirmed, key);
     this.saveSteps(this.steps);

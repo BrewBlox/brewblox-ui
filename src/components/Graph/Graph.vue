@@ -86,13 +86,13 @@ export default class Graph extends Vue {
     };
   }
 
-  get ready() {
+  get ready(): boolean {
     return this.data !== undefined
       && this.plotlyLayout !== undefined
       && this.plotlyConfig !== undefined;
   }
 
-  displayError(msg: string) {
+  displayError(msg: string): void {
     this.$q.notify({
       icon: 'warning',
       color: 'warning',

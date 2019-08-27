@@ -41,7 +41,7 @@ export default class BuilderCatalog extends Vue {
     return part.size.map(v => v * SQUARE_SIZE).join(' ');
   }
 
-  selectPart(part: StatePart) {
+  selectPart(part: StatePart): void {
     this.$emit('create', { ...part, ...this.partial });
     this.$nextTick(() => this.$emit('close'));
   }

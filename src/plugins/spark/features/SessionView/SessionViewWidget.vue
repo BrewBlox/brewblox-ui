@@ -38,13 +38,13 @@ export default class SessionViewWidget extends WidgetBase {
       });
   }
 
-  get graphSession() {
+  get graphSession(): Session | null {
     return this.graphSessionId
-      ? this.widgetConfig.sessions.find(session => session.id === this.graphSessionId)
+      ? this.widgetConfig.sessions.find(session => session.id === this.graphSessionId) || null
       : null;
   }
 
-  periodString(session: Session) {
+  periodString(session: Session): string {
     if (!session.start && !session.end) {
       return '<not yet started>';
     }
@@ -54,7 +54,7 @@ export default class SessionViewWidget extends WidgetBase {
     return `${shortDateString(session.start)} to ${shortDateString(session.end)}`;
   }
 
-  openModal(activeSession: Session | null = null) {
+  openModal(activeSession: Session | null = null): void {
     this.showForm({
       getProps: () => ({ activeSession }),
       listeners: {
@@ -63,7 +63,7 @@ export default class SessionViewWidget extends WidgetBase {
     });
   }
 
-  createSession() {
+  createSession(): void {
     Dialog.create({
       title: 'Create session',
       dark: true,

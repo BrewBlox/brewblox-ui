@@ -16,11 +16,11 @@ export default class TimeUnitField extends FieldBase {
   public readonly label!: string;
 
   @Emit('input')
-  public change(v: Unit) {
+  public change(v: Unit): Unit {
     return v;
   }
 
-  openDialog() {
+  openDialog(): void {
     if (this.readonly) {
       return;
     }

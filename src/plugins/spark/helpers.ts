@@ -38,7 +38,7 @@ export const constraintLabels = new Map([
   ...analogConstraintLabels.entries(),
 ]);
 
-export const installFilters = (Vue: VueConstructor) => {
+export const installFilters = (Vue: VueConstructor): void => {
   Vue.filter(
     'unit',
     (value: Unit | null) =>

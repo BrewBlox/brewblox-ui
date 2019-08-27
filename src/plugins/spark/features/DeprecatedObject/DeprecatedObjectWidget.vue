@@ -13,11 +13,11 @@ export default class DeprecatedObjectWidget extends BlockWidget {
   readonly block!: DeprecatedObjectBlock;
   actual: Block | null = null;
 
-  async created() {
+  async created(): Promise<void> {
     this.actual = await fetchStoredBlock(this.serviceId, this.block.data.actualId);
   }
 
-  removeBlock() {
+  removeBlock(): void {
     sparkStore.removeBlock([this.block.serviceId, this.block]);
   }
 }

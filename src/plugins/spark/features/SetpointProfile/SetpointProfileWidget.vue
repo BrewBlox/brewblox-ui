@@ -46,11 +46,11 @@ export default class SetpointProfileWidget extends BlockWidget {
   }
 
   // Overrides BlockWidget
-  openModal() {
+  openModal(): void {
     this.modalOpen = true;
   }
 
-  mounted() {
+  mounted(): void {
     this.$watch('block', () => this.now = new Date());
     this.$watch('widget.cols', () => this.revision++);
     this.$watch('widget.rows', () => this.revision++);

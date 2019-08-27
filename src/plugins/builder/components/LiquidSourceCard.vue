@@ -7,7 +7,7 @@ import PartCard from './PartCard';
 
 @Component
 export default class LiquidSourceCard extends PartCard {
-  get liquidColors() {
+  get liquidColors(): string[] {
     return [
       COLD_WATER,
       HOT_WATER,
@@ -16,20 +16,20 @@ export default class LiquidSourceCard extends PartCard {
     ];
   }
 
-  get pressured() {
+  get pressured(): boolean {
     return Boolean(this.part.settings.pressure);
   }
 
-  get currentLiquids() {
+  get currentLiquids(): string[] {
     return get(this.part.settings, 'liquids', []);
   }
 
-  changeLiquidSource(liquidSource: string) {
+  changeLiquidSource(liquidSource: string): void {
     const liquids = [liquidSource];
     this.savePart({ ...this.part, settings: { ...this.part.settings, liquids } });
   }
 
-  togglePressure(enabled: boolean) {
+  togglePressure(enabled: boolean): void {
     const pressure = enabled ? 10 : 0;
     this.savePart({ ...this.part, settings: { ...this.part.settings, pressure } });
   }

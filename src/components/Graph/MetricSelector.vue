@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import { expandedNodes, nodeBuilder,QuasarNode } from '@/components/Graph/functional';
+import { expandedNodes, nodeBuilder, QuasarNode } from '@/components/Graph/functional';
 import { historyStore } from '@/store/history';
 
 
@@ -30,12 +30,12 @@ export default class MetricSelector extends Vue {
     return historyStore.fields;
   }
 
-  get nodes() {
+  get nodes(): QuasarNode[] {
     return nodeBuilder(this.fields);
   }
 
   @Watch('selectFilter')
-  updateExpanded(filter: string) {
+  updateExpanded(filter: string): void {
     if (filter) {
       this.expandedKeys = expandedNodes(this.nodes, filter);
     }

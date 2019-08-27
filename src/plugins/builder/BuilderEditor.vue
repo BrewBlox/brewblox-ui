@@ -13,7 +13,7 @@ import { deepCopy, deserialize, serialize } from '@/helpers/units/parseObject';
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
 import CalcWorker from 'worker-loader!./calculator.worker';
-import { defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes,SQUARE_SIZE } from './getters';
+import { defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes, SQUARE_SIZE } from './getters';
 import { asPersistentPart, asStatePart } from './helpers';
 import { builderStore } from './store';
 import { BuilderLayout, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
@@ -152,7 +152,7 @@ export default class BuilderEditor extends DialogBase {
   @Prop({ type: String })
   public readonly initialLayout!: string | null;
 
-  get editorActive() {
+  get editorActive(): boolean {
     return builderStore.editorActive;
   }
 
@@ -221,7 +221,7 @@ export default class BuilderEditor extends DialogBase {
     builderStore.commitEditorTool(tool.value);
   }
 
-  async saveLayout(layout: BuilderLayout) {
+  async saveLayout(layout: BuilderLayout): Promise<void> {
     if (layout.id) {
       await builderStore.saveLayout(layout);
     } else {
@@ -231,7 +231,7 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  async saveParts(parts: PersistentPart[], saveHistory = true) {
+  async saveParts(parts: PersistentPart[], saveHistory = true): Promise<void> {
     if (!this.layout) {
       return;
     }
@@ -249,19 +249,19 @@ export default class BuilderEditor extends DialogBase {
     await this.saveLayout(this.layout);
   }
 
-  async savePart(part: PersistentPart) {
+  async savePart(part: PersistentPart): Promise<void> {
     await this.saveParts(this.parts.map(p => (p.id === part.id ? part : p)));
   }
 
-  async addPart(part: PersistentPart) {
+  async addPart(part: PersistentPart): Promise<void> {
     await this.saveParts([...this.parts, part]);
   }
 
-  async removePart(part: PersistentPart) {
+  async removePart(part: PersistentPart): Promise<void> {
     await this.saveParts(this.parts.filter(p => p.id !== part.id));
   }
 
-  async undo() {
+  async undo(): Promise<void> {
     if (this.history.length > 0) {
       this.cancelSelection();
       const parts = deserialize(JSON.parse(this.history.pop() as string));
@@ -269,7 +269,7 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  async importLayout() {
+  async importLayout(): Promise<void> {
     showImportDialog<BuilderLayout>(async layout => {
       const id = uid();
       await builderStore.createLayout({ ...layout, id });
@@ -277,7 +277,7 @@ export default class BuilderEditor extends DialogBase {
     });
   }
 
-  exportLayout() {
+  exportLayout(): void {
     if (!this.layout) {
       return;
     }
@@ -286,7 +286,7 @@ export default class BuilderEditor extends DialogBase {
     saveJsonFile(exported, `brewblox-${this.layout.title}-layout.json`);
   }
 
-  renameLayout() {
+  renameLayout(): void {
     if (!this.layout) {
       return;
     }
@@ -307,7 +307,7 @@ export default class BuilderEditor extends DialogBase {
       });
   }
 
-  clearParts() {
+  clearParts(): void {
     Dialog.create({
       title: 'Remove parts',
       message: 'Are you sure you wish to remove all parts?',
@@ -318,7 +318,7 @@ export default class BuilderEditor extends DialogBase {
       .onOk(() => this.saveParts([]));
   }
 
-  removeLayout() {
+  removeLayout(): void {
     if (!this.layout) {
       return;
     }
@@ -340,7 +340,7 @@ export default class BuilderEditor extends DialogBase {
       });
   }
 
-  async calculate() {
+  async calculate(): Promise<void> {
     await this.$nextTick();
     this.worker.postMessage(this.parts.map(asStatePart));
   }
@@ -350,11 +350,11 @@ export default class BuilderEditor extends DialogBase {
     return { x, y, left, right, top, bottom };
   }
 
-  isClickable(part) {
+  isClickable(part): boolean {
     return !!this.specs[part.type].interactHandler;
   }
 
-  interact(part: FlowPart) {
+  interact(part: FlowPart): void {
     const handler = this.specs[part.type].interactHandler;
     handler && handler(part, this.updater);
   }
@@ -363,28 +363,28 @@ export default class BuilderEditor extends DialogBase {
     return SQUARE_SIZE * val;
   }
 
-  clickHandler(evt: ClickEvent, part: FlowPart) {
+  clickHandler(evt: ClickEvent, part: FlowPart): void {
     if (this.currentTool.onClick) {
       this.currentTool.onClick(evt, part);
     }
     evt.stopPropagation();
   }
 
-  panHandler(args: PanArguments, part: FlowPart) {
+  panHandler(args: PanArguments, part: FlowPart): void {
     if (this.currentTool.onPan) {
       this.currentTool.onPan(args, part);
     }
     args.evt.stopPropagation();
   }
 
-  rectContains(rect: Rect, x: number, y: number) {
+  rectContains(rect: Rect, x: number, y: number): boolean {
     return x >= rect.left
       && x <= rect.right
       && y >= rect.top
       && y <= rect.bottom;
   }
 
-  findGridSquare(grid: Rect, x: number, y: number) {
+  findGridSquare(grid: Rect, x: number, y: number): XYPosition | null {
     // The page offset in clicks has appeared and disappeared in various quasar releases
     // Comment or uncomment these lines when required
     // x -= window.pageXOffset;
@@ -398,7 +398,7 @@ export default class BuilderEditor extends DialogBase {
     };
   }
 
-  findClickSquare(evt: ClickEvent) {
+  findClickSquare(evt: ClickEvent): XYPosition | null {
     const grid = this.gridRect();
     return (evt instanceof MouseEvent)
       ? this.findGridSquare(grid, evt.clientX, evt.clientY)
@@ -414,7 +414,7 @@ export default class BuilderEditor extends DialogBase {
     };
   }
 
-  selectPanHandler(args: PanArguments) {
+  selectPanHandler(args: PanArguments): void {
     if (args.isFirst) {
       const grid = this.gridRect();
       this.selectArea = {
@@ -456,7 +456,7 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  moveSelectedPanHandler(args: PanArguments, copy: boolean) {
+  moveSelectedPanHandler(args: PanArguments, copy: boolean): void {
     if (args.isFirst) {
       this.selectDragDelta = { x: 0, y: 0 };
     }
@@ -513,13 +513,13 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  cancelSelection() {
+  cancelSelection(): void {
     this.selectedTime = 0;
     this.selectArea = null;
     this.selectedParts = [];
   }
 
-  selectClickHandler(evt: ClickEvent, part: FlowPart) {
+  selectClickHandler(evt: ClickEvent, part: FlowPart): void {
     if (new Date().getTime() - this.selectedTime < 200) {
       // The mouseup at the end of a pan also generates a click event - skip this
       return;
@@ -538,7 +538,7 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  movePanHandler(args: PanArguments, part: FlowPart, copy = false) {
+  movePanHandler(args: PanArguments, part: FlowPart, copy = false): void {
     if (this.selectedParts.length) {
       return this.moveSelectedPanHandler(args, copy);
     }
@@ -576,11 +576,11 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  copyPanHandler(args: PanArguments, part: FlowPart) {
+  copyPanHandler(args: PanArguments, part: FlowPart): void {
     this.movePanHandler(args, part, true);
   }
 
-  addPartClickHandler(evt: ClickEvent) {
+  addPartClickHandler(evt: ClickEvent): void {
     const pos = this.findClickSquare(evt);
     if (pos) {
       this.catalogPartial = pos;
@@ -588,34 +588,34 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  configurePartClickHandler(evt: ClickEvent, part: FlowPart) {
+  configurePartClickHandler(evt: ClickEvent, part: FlowPart): void {
     if (part) {
       this.configuredPartId = part.id;
       this.menuModalOpen = true;
     }
   }
 
-  interactClickHandler(evt: ClickEvent, part: FlowPart) {
+  interactClickHandler(evt: ClickEvent, part: FlowPart): void {
     if (part) {
       const handler = this.specs[part.type].interactHandler;
       handler && handler(part, this.updater);
     }
   }
 
-  rotateClickHandler(evt: ClickEvent, part: FlowPart, rotation = 90) {
+  rotateClickHandler(evt: ClickEvent, part: FlowPart, rotation = 90): void {
     if (part) {
       const rotate = clampRotation(part.rotate + rotation);
       this.savePart({ ...part, rotate });
     }
   }
 
-  flipClickHandler(evt: ClickEvent, part: FlowPart) {
+  flipClickHandler(evt: ClickEvent, part: FlowPart): void {
     if (part) {
       this.savePart({ ...part, flipped: !part.flipped });
     }
   }
 
-  deleteClickHandler(evt: ClickEvent, part: FlowPart) {
+  deleteClickHandler(evt: ClickEvent, part: FlowPart): void {
     if (!part) {
       return;
     }
@@ -628,7 +628,7 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  async movePart(from: PersistentPart | null, to: PersistentPart) {
+  async movePart(from: PersistentPart | null, to: PersistentPart): Promise<void> {
     if (from
       && from.id === to.id
       && from.x === to.x
@@ -639,15 +639,15 @@ export default class BuilderEditor extends DialogBase {
     await this.saveParts([...this.parts.filter(p => !from || p.id !== from.id), to]);
   }
 
-  beingDragged(part: PersistentPart) {
+  beingDragged(part: PersistentPart): boolean {
     return this.currentTool.value !== 'copy'
       && (
-        this.dragAction && this.dragAction.part.id === part.id
-        || this.selectedParts.find(p => p.id === part.id)
+        !!this.dragAction && this.dragAction.part.id === part.id
+        || this.selectedParts.some(p => p.id === part.id)
       );
   }
 
-  keyHandler(evt: KeyboardEvent) {
+  keyHandler(evt: KeyboardEvent): void {
     if (this.menuModalOpen || this.catalogModalOpen || this.dragAction) {
       return;
     }
@@ -659,7 +659,7 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  startAddLayout(copy: boolean) {
+  startAddLayout(copy: boolean): void {
     Dialog.create({
       title: 'Add Layout',
       message: 'Create a new Brewery Builder layout',
@@ -683,7 +683,7 @@ export default class BuilderEditor extends DialogBase {
       });
   }
 
-  updateFlowParts({ data }: { data: FlowPart[] }) {
+  updateFlowParts({ data }: { data: FlowPart[] }): void {
     this.flowParts = data;
     if (this.selectedParts.length > 0) {
       const selectedIds = this.selectedParts.map(p => p.id);
@@ -693,7 +693,7 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  created() {
+  created(): void {
     builderStore.commitEditorActive(true);
     window.addEventListener('keyup', this.keyHandler);
     this.worker.onmessage = this.updateFlowParts;
@@ -701,14 +701,14 @@ export default class BuilderEditor extends DialogBase {
     this.debouncedCalculate();
   }
 
-  destroyed() {
+  destroyed(): void {
     this.worker.terminate();
     window.removeEventListener('keyup', this.keyHandler);
     builderStore.commitEditorActive(false);
   }
 
   @Watch('layout')
-  watchLayout(newV: BuilderLayout, oldV: BuilderLayout) {
+  watchLayout(newV: BuilderLayout, oldV: BuilderLayout): void {
     if (newV === null || (oldV !== null && oldV.id !== newV.id)) {
       this.history = [];
     }
@@ -716,7 +716,7 @@ export default class BuilderEditor extends DialogBase {
   }
 
   @Watch('editorActive')
-  watchActive(active) {
+  watchActive(active): void {
     // A workaround for a hot reloading bug
     // where the editor is not destroyed when the dialog closes
     if (!active) {

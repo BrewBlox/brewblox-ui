@@ -6,7 +6,7 @@ import ValEdit from './ValEdit';
 
 @Component
 export default class StateValEdit extends ValEdit {
-  get fieldString() {
+  get fieldString(): string {
     return this.field === 1 ? 'ON' : 'OFF';
   }
 }

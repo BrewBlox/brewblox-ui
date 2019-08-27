@@ -25,17 +25,17 @@ export default class DatetimeField extends FieldBase {
   readonly clearLabel!: string;
 
   @Emit('input')
-  public change(v: Date | null) {
+  public change(v: Date | null): Date | null {
     return v;
   }
 
-  get displayString() {
+  get displayString(): string {
     return this.short
       ? shortDateString(this.value, this.clearLabel)
       : dateString(this.value, this.clearLabel);
   }
 
-  openDialog() {
+  openDialog(): void {
     if (this.readonly) {
       return;
     }

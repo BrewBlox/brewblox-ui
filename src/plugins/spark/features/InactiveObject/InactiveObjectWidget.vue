@@ -10,7 +10,7 @@ import { InactiveObjectBlock } from './types';
 export default class InactiveObjectWidget extends BlockWidget {
   readonly block!: InactiveObjectBlock;
 
-  get actualDisplayName() {
+  get actualDisplayName(): string {
     return featureStore.displayNameById(this.block.data.actualType);
   }
 }

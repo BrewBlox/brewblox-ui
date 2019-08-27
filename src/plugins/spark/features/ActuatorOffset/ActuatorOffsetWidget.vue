@@ -9,7 +9,7 @@ import { ActuatorOffsetBlock } from './types';
 export default class ActuatorOffsetWidget extends BlockWidget {
   readonly block!: ActuatorOffsetBlock;
 
-  get warnings() {
+  get warnings(): string {
     const warn: string[] = [];
     if (!this.block.data.targetId === null) {
       warn.push('Driven process value invalid');
@@ -20,7 +20,7 @@ export default class ActuatorOffsetWidget extends BlockWidget {
     return warn.join(', ');
   }
 
-  enable() {
+  enable(): void {
     this.block.data.enabled = true;
     this.saveBlock();
   }

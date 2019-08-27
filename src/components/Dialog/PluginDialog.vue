@@ -3,7 +3,7 @@ import { Dialog, uid } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
-import { pluginStore,UIPlugin, UIPluginResult } from '@/store/plugins';
+import { pluginStore, UIPlugin, UIPluginResult } from '@/store/plugins';
 
 @Component
 export default class PluginDialog extends DialogBase {
@@ -14,7 +14,7 @@ export default class PluginDialog extends DialogBase {
       .map(plugin => [plugin, pluginStore.results[plugin.id]] as [UIPlugin, UIPluginResult]);
   }
 
-  async addPlugin() {
+  async addPlugin(): Promise<void> {
     Dialog.create({
       component: 'InputDialog',
       title: 'New Plugin',
@@ -25,18 +25,18 @@ export default class PluginDialog extends DialogBase {
       .onOk(url => pluginStore.createPlugin({ id: uid(), title: '', url }));
   }
 
-  async saveUrl(plugin: UIPlugin, url: string) {
+  async saveUrl(plugin: UIPlugin, url: string): Promise<void> {
     if (plugin.url !== url) {
       await pluginStore.savePlugin({ ...plugin, url });
       pluginStore.commitResult({ id: plugin.id, loaded: false, error: null });
     }
   }
 
-  async removePlugin(plugin: UIPlugin) {
+  async removePlugin(plugin: UIPlugin): Promise<void> {
     await pluginStore.removePlugin(plugin);
   }
 
-  reloadPage() {
+  reloadPage(): void {
     location.reload();
   }
 }

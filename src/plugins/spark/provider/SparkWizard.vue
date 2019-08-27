@@ -18,7 +18,7 @@ export default class SparkWizard extends Vue {
   @Prop({ type: String, required: true })
   readonly serviceTitle!: string;
 
-  async create(): Promise<void> {
+  async created(): Promise<void> {
     const service: Spark = {
       id: this.serviceId,
       title: this.serviceTitle,
@@ -51,7 +51,7 @@ export default class SparkWizard extends Vue {
   async mounted(): Promise<void> {
     const ok = await sparkStore.validateService(this.serviceId);
     if (ok) {
-      this.create();
+      this.created();
     } else {
       this.cancel();
     }

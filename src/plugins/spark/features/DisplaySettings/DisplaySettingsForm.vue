@@ -10,20 +10,20 @@ import { DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/features/Disp
 export default class DisplaySettingsForm extends BlockCrudComponent {
   readonly block!: DisplaySettingsBlock;
 
-  get slots() {
+  get slots(): Array<any> {
     const slots = Array(6);
     this.block.data.widgets
       .forEach((w) => { slots[w.pos - 1] = w; });
     return slots;
   }
 
-  get slotNameRules() {
+  get slotNameRules(): InputRule[] {
     return [
       v => !v || v.length <= 15 || 'Name can only be 15 characters',
     ];
   }
 
-  get footerRules() {
+  get footerRules(): InputRule[] {
     return [
       v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
     ];
@@ -37,7 +37,7 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
       .find(v => v instanceof Link) || new Link(null);
   }
 
-  slotColor(slot: DisplaySlot) {
+  slotColor(slot: DisplaySlot): string {
     return slot && slot.color
       ? `#${slot.color}`
       : '#ff';
@@ -55,7 +55,7 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
     return block => validDisplayTypes.includes(block.type);
   }
 
-  updateSlotLink(idx: number, link: Link) {
+  updateSlotLink(idx: number, link: Link): void {
     const pos = idx + 1;
     if (!link.id) {
       this.block.data.widgets = this.block.data.widgets
@@ -95,14 +95,14 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
     this.saveBlock();
   }
 
-  updateSlotName(idx: number, name: string) {
+  updateSlotName(idx: number, name: string): void {
     const pos = idx + 1;
     this.block.data.widgets = this.block.data.widgets
       .map(w => (w.pos === pos ? { ...w, name } : w));
     this.saveBlock();
   }
 
-  updateSlotColor(idx: number, color: string) {
+  updateSlotColor(idx: number, color: string): void {
     const pos = idx + 1;
     this.block.data.widgets = this.block.data.widgets
       .map(w => (w.pos === pos ? { ...w, color: color.replace('#', '') } : w));

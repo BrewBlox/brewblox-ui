@@ -1,4 +1,5 @@
 import { ref } from '@/helpers/component-ref';
+import { unitDurationString } from '@/helpers/functional';
 import { Unit } from '@/helpers/units';
 import { ActuatorAnalogLink, SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
@@ -96,19 +97,21 @@ const block: BlockSpec = {
       key: 'kp',
       title: 'Kp',
       component: 'UnitValEdit',
-      generate: () => new Unit(0, 'degC'),
+      generate: () => new Unit(0, '1/degC'),
     },
     {
       key: 'ti',
       title: 'Ti',
       component: 'UnitValEdit',
       generate: () => new Unit(0, 'second'),
+      pretty: unitDurationString,
     },
     {
       key: 'td',
       title: 'Td',
       component: 'UnitValEdit',
       generate: () => new Unit(0, 'second'),
+      pretty: unitDurationString,
     },
     {
       key: 'enabled',

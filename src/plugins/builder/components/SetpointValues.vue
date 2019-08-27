@@ -32,7 +32,7 @@ export default class SetpointValues extends Vue {
   @Prop({ type: String })
   public readonly backgroundColor!: string;
 
-  get textColor() {
+  get textColor(): string {
     return this.backgroundColor
       ? contrastColor(this.backgroundColor)
       : 'white';

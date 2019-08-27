@@ -23,7 +23,7 @@ export default class BlockFormButton extends Vue {
       : null;
   }
 
-  openDialog() {
+  openDialog(): void {
     showBlockDialog(this.block);
   }
 }

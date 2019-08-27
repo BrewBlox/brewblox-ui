@@ -7,12 +7,12 @@ import PartCard from './PartCard';
 
 @Component
 export default class PlacementCard extends PartCard {
-  rotate(rotation: number) {
+  rotate(rotation: number): void {
     const rotate = clampRotation(this.part.rotate + rotation);
     this.savePart({ ...this.part, rotate });
   }
 
-  flip() {
+  flip(): void {
     this.savePart({ ...this.part, flipped: !this.part.flipped });
   }
 }

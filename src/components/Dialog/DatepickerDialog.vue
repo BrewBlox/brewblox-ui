@@ -24,21 +24,21 @@ export default class DatepickerDialog extends DialogBase {
     return new Date(args[1], args[2] - 1, args[3], args[4], args[5], args[6]);
   }
 
-  get valid() {
+  get valid(): boolean {
     return !Number.isNaN(this.parsed.getTime());
   }
 
-  setStringVal(dateVal: Date) {
+  setStringVal(dateVal: Date): void {
     this.stringValue = qdate.formatDate(dateVal, 'YYYY/MM/DD HH:mm:ss');
   }
 
-  save() {
+  save(): void {
     if (this.valid) {
       this.onDialogOk(this.parsed);
     }
   }
 
-  created() {
+  created(): void {
     this.setStringVal(this.value);
   }
 }

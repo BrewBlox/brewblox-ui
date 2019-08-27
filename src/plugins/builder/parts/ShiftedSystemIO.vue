@@ -20,11 +20,11 @@ export default class ShiftedSystemIO extends PartBase {
   readonly chevrons = chevrons;
   readonly paths = paths;
 
-  get flowSpeed() {
+  get flowSpeed(): number {
     return this.flowOnCoord(IN_OUT);
   }
 
-  get liquids() {
+  get liquids(): string[] {
     return this.liquidOnCoord(IN_OUT);
   }
 }

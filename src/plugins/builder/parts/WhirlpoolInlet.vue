@@ -4,21 +4,23 @@ import { Component } from 'vue-property-decorator';
 import PartBase from '../components/PartBase';
 import { LEFT } from '../getters';
 
+const paths = {
+  borders: [
+    'M0,21h20c5,0,9,4,9,9v144.1c0,0,0.1,4.9-4,4.9c-4.3,0-4-4.9-4-4.9V32c0-1.7-1.3-3-3-3H0',
+    'M25,178.5L25,178.5c-1.1,0-2-0.9-2-2v-12c0-1.1,0.9-2,2-2l0,0c1.1,0,2,0.9,2,2v12C27,177.6,26.1,178.5,25,178.5z',
+  ],
+  liquid: 'M0,25H20a5,5,0,0,1,5,5V175',
+};
+
 @Component
 export default class WhirlpoolInlet extends PartBase {
-  readonly paths = {
-    borders: [
-      'M0,21h20c5,0,9,4,9,9v144.1c0,0,0.1,4.9-4,4.9c-4.3,0-4-4.9-4-4.9V32c0-1.7-1.3-3-3-3H0',
-      'M25,178.5L25,178.5c-1.1,0-2-0.9-2-2v-12c0-1.1,0.9-2,2-2l0,0c1.1,0,2,0.9,2,2v12C27,177.6,26.1,178.5,25,178.5z',
-    ],
-    liquid: 'M0,25H20a5,5,0,0,1,5,5V175',
-  };
+  readonly paths = paths;
 
-  get flowSpeed() {
+  get flowSpeed(): number {
     return -this.flowOnCoord(LEFT);
   }
 
-  get liquids() {
+  get liquids(): string[] {
     return this.liquidOnCoord(LEFT);
   }
 }

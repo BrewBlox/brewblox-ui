@@ -12,14 +12,14 @@ export default class LiquidStroke extends Vue {
   @Prop({ type: Array, required: true })
   readonly paths!: string[];
 
-  get pathLengths() {
+  get pathLengths(): number[] {
     return this.paths.map(v => svgPathProperties(v).getTotalLength());
   }
 
-  get dashArrays() {
+  get dashArrays(): number[][] {
     const numColors = this.colors.length;
     if (numColors < 2) {
-      return [1];
+      return [[1]];
     }
     return this.pathLengths.map(v => {
       const colorLength = v / numColors;

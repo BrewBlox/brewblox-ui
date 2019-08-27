@@ -14,11 +14,11 @@ export default class ElbowTube extends PartBase {
     liquid: 'M25,0V20a5,5,0,0,0,5,5H50',
   };
 
-  get flowSpeed() {
+  get flowSpeed(): number {
     return this.flowOnCoord(RIGHT);
   }
 
-  get liquids() {
+  get liquids(): string[] {
     return this.liquidOnCoord(RIGHT);
   }
 }

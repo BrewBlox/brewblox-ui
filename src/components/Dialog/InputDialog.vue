@@ -28,13 +28,13 @@ export default class InputDialog extends DialogBase {
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
-  get error() {
+  get error(): boolean {
     return this.rules
       .map(f => f(this.local))
-      .find(isString) !== undefined;
+      .some(isString);
   }
 
-  save() {
+  save(): void {
     if (this.error) {
       return;
     }
@@ -45,7 +45,7 @@ export default class InputDialog extends DialogBase {
     this.onDialogOk(val);
   }
 
-  created() {
+  created(): void {
     if (this.type === 'number') {
       this.local = round(this.value, this.decimals);
     } else {

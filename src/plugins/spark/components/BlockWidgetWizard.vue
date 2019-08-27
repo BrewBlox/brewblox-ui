@@ -29,11 +29,11 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
     return get(this, ['service', 'id'], '');
   }
 
-  get blockIdRules() {
+  get blockIdRules(): InputRule[] {
     return blockIdRules(this.serviceId);
   }
 
-  get blockOpts() {
+  get blockOpts(): { id: string }[] {
     if (!this.service) {
       return [];
     }
@@ -42,7 +42,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
       .sort(objectStringSorter('id'));
   }
 
-  get serviceOpts() {
+  get serviceOpts(): SelectOption[] {
     return serviceStore.serviceValues
       .filter(service => service.type === 'Spark')
       .map(service => ({
@@ -51,20 +51,20 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
       }));
   }
 
-  get startOk() {
+  get startOk(): boolean {
     return !!this.service;
   }
 
-  get createOk() {
+  get createOk(): boolean {
     return !!this.service
       && !this.blockIdRules.some(rule => isString(rule(this.blockId)));
   }
 
-  get existingOk() {
+  get existingOk(): boolean {
     return !!this.service && !!this.block;
   }
 
-  ensureItem() {
+  ensureItem(): void {
     this.block = this.block || {
       id: this.blockId,
       serviceId: this.serviceId,
@@ -87,14 +87,14 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
     };
   }
 
-  async saveBlock(block: Block) {
+  async saveBlock(block: Block): Promise<void> {
     this.block = block;
     if (this.isStoreBlock) {
       await sparkStore.saveBlock([block.serviceId, block]);
     }
   }
 
-  configureBlock() {
+  configureBlock(): void {
     this.ensureItem();
     const crud: BlockCrud = {
       widget: this.widget as DashboardItem,
@@ -112,14 +112,14 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
     });
   }
 
-  public closeDialog() {
+  public closeDialog(): void {
     if (this.activeDialog) {
       this.activeDialog.hide();
       this.activeDialog = null;
     }
   }
 
-  async createWidget() {
+  async createWidget(): Promise<void> {
     this.ensureItem();
     const service = this.service as Service;
     const block = this.block as Block;
@@ -131,7 +131,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
     this.createItem(this.widget as DashboardItem);
   }
 
-  mounted() {
+  mounted(): void {
     if (this.serviceOpts.length > 0) {
       this.service = this.serviceOpts[0].value;
     }

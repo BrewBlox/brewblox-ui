@@ -30,19 +30,19 @@ export default class CrudComponent extends Vue {
     return featureStore.displayNameById(this.widget.feature);
   }
 
-  public closeDialog() {
+  public closeDialog(): void {
     this.crud.closeDialog();
   }
 
-  public saveWidget(widget: DashboardItem = this.widget) {
+  public saveWidget(widget: DashboardItem = this.widget): void {
     this.crud.saveWidget(widget);
   }
 
-  public saveConfig(config: any = this.widget.config) {
+  public saveConfig(config: any = this.widget.config): void {
     this.saveWidget({ ...this.widget, config });
   }
 
-  public startChangeWidgetTitle() {
+  public startChangeWidgetTitle(): void {
     const widgetTitle = this.widget.title;
     Dialog.create({
       title: 'Change Widget name',
@@ -57,7 +57,7 @@ export default class CrudComponent extends Vue {
       .onOk(title => this.saveWidget({ ...this.widget, title }));
   }
 
-  public startCopyWidget() {
+  public startCopyWidget(): void {
     const id = uid();
     Dialog.create({
       title: 'Copy widget',
@@ -84,7 +84,7 @@ export default class CrudComponent extends Vue {
       });
   }
 
-  public startMoveWidget() {
+  public startMoveWidget(): void {
     Dialog.create({
       title: 'Move widget',
       message: `To which dashboard do you want to move widget ${this.widget.title}?`,
@@ -102,8 +102,8 @@ export default class CrudComponent extends Vue {
         dashboard && this.saveWidget({ ...this.widget, dashboard, pinnedPosition: null }));
   }
 
-  public startRemoveWidget() {
-    const deleteItem = async () => {
+  public startRemoveWidget(): void {
+    const deleteItem = async (): Promise<void> => {
       await dashboardStore.removeDashboardItem(this.widget);
       this.closeDialog();
     };

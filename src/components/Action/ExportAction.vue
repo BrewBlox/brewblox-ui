@@ -14,14 +14,14 @@ export default class ExportAction extends CrudComponent {
   @Prop({ type: String, default: 'Export widget' })
   readonly label!: string;
 
-  get itemProps() {
+  get itemProps(): Record<string, any> {
     return {
       ...this.$attrs,
       ...this.$props,
     };
   }
 
-  async showDialog() {
+  async showDialog(): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, _rev, dashboard, pinnedPosition, ...exported } = this.widget;
     saveJsonFile(exported, `brewblox-${this.widget.title}-${this.widget.feature}.json`);
