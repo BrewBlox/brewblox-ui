@@ -8,6 +8,7 @@ import { deepCopy } from '@/helpers/units/parseObject';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
 
+import { profileGraphProps } from './helpers';
 import { Setpoint, SetpointProfileBlock } from './types';
 
 interface DisplaySetpoint {
@@ -39,6 +40,10 @@ export default class SetpointProfileForm extends BlockCrudComponent {
         absTimeMs: this.start + (point.time * 1000),
         temperature: point.temperature,
       }));
+  }
+
+  get graphProps(): any {
+    return profileGraphProps(this.block);
   }
 
   savePoints(points: DisplaySetpoint[] = this.points): void {
@@ -116,121 +121,127 @@ export default class SetpointProfileForm extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud" />
-    <q-card-section>
-      <BlockEnableToggle
-        v-if="block.data.targetId.id !== null"
-        :crud="crud"
-        :text-enabled="`Profile is enabled and driving ${block.data.targetId}.`"
-        :text-disabled="`Profile is disabled: ${block.data.targetId} will not be changed.`"
-      />
-      <q-separator v-if="block.data.targetId.id !== null" dark />
-      <q-item dark class="q-py-md">
-        <q-item-section>
-          <q-item-label caption>
-            Start time
-          </q-item-label>
-          <DatetimeField
-            :value="start"
-            label="Start time"
-            title="Start time"
-            message-html="This will shift all points.
+  <GraphCardWrapper show-initial>
+    <template #graph>
+      <Graph v-bind="graphProps" />
+    </template>
+
+    <q-card dark class="widget-modal">
+      <BlockFormToolbar :crud="crud" />
+      <q-card-section>
+        <BlockEnableToggle
+          v-if="block.data.targetId.id !== null"
+          :crud="crud"
+          :text-enabled="`Profile is enabled and driving ${block.data.targetId}.`"
+          :text-disabled="`Profile is disabled: ${block.data.targetId} will not be changed.`"
+        />
+        <q-separator v-if="block.data.targetId.id !== null" dark />
+        <q-item dark class="q-py-md">
+          <q-item-section>
+            <q-item-label caption>
+              Start time
+            </q-item-label>
+            <DatetimeField
+              :value="start"
+              label="Start time"
+              title="Start time"
+              message-html="This will shift all points.
               <br>Offset time will remain the same, absolute time values will change.
               <br>The offset for the first point is always 0s."
-            @input="updateStartTime"
-          />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label caption>
-            Driven Setpoint/Sensor pair
-          </q-item-label>
-          <LinkField
-            :value="block.data.targetId"
-            :service-id="serviceId"
-            label="target"
-            title="Driven Setpoint/Sensor pair"
-            @input="v => { block.data.targetId = v; saveBlock(); }"
-          />
-        </q-item-section>
-      </q-item>
-      <q-separator dark />
+              @input="updateStartTime"
+            />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>
+              Driven Setpoint/Sensor pair
+            </q-item-label>
+            <LinkField
+              :value="block.data.targetId"
+              :service-id="serviceId"
+              label="target"
+              title="Driven Setpoint/Sensor pair"
+              @input="v => { block.data.targetId = v; saveBlock(); }"
+            />
+          </q-item-section>
+        </q-item>
+        <q-separator dark />
 
-      <!-- Headers -->
-      <q-item dark class="q-pt-md">
-        <q-item-section class="col-3 q-py-none">
-          <q-item-label caption>
-            Offset from start
-          </q-item-label>
-        </q-item-section>
-        <q-item-section class="col-5 q-py-none">
-          <q-item-label caption>
-            Time
-          </q-item-label>
-        </q-item-section>
-        <q-item-section class="col-3 q-py-none">
-          <q-item-label caption>
-            Temperature
-          </q-item-label>
-        </q-item-section>
-        <q-item-section class="col-1 q-py-none" side />
-      </q-item>
+        <!-- Headers -->
+        <q-item dark class="q-pt-md">
+          <q-item-section class="col-3 q-py-none">
+            <q-item-label caption>
+              Offset from start
+            </q-item-label>
+          </q-item-section>
+          <q-item-section class="col-5 q-py-none">
+            <q-item-label caption>
+              Time
+            </q-item-label>
+          </q-item-section>
+          <q-item-section class="col-3 q-py-none">
+            <q-item-label caption>
+              Temperature
+            </q-item-label>
+          </q-item-section>
+          <q-item-section class="col-1 q-py-none" side />
+        </q-item>
 
-      <!-- Points -->
-      <q-item v-for="(point, idx) in points" :key="idx" dark dense>
-        <q-item-section class="col-3">
-          <InputField
-            :value="durationString(point.offsetMs)"
-            title="Offset from start time"
-            label="point offset"
-            message-html="
+        <!-- Points -->
+        <q-item v-for="(point, idx) in points" :key="idx" dark dense>
+          <q-item-section class="col-3">
+            <InputField
+              :value="durationString(point.offsetMs)"
+              title="Offset from start time"
+              label="point offset"
+              message-html="
             This will change the point offset.
               <br>The absolute point time will be changed to start time + offset.
               <br>Changing point offset may change point order.
             "
-            @input="v => updatePointOffset(idx, parseDuration(v))"
-          />
-        </q-item-section>
-        <q-item-section class="col-5">
-          <DatetimeField
-            :value="point.absTimeMs"
-            title="Time"
-            label="point time"
-            message-html="
+              @input="v => updatePointOffset(idx, parseDuration(v))"
+            />
+          </q-item-section>
+          <q-item-section class="col-5">
+            <DatetimeField
+              :value="point.absTimeMs"
+              title="Time"
+              label="point time"
+              message-html="
               This will change the absolute point time.
               <br>Changing point time may change point order.
               <br>Point offset is changed to point time - start time.
               "
-            @input="v => updatePointTime(idx, v)"
-          />
-        </q-item-section>
-        <q-item-section class="col-3">
-          <UnitField
-            :value="point.temperature"
-            title="Temperature"
-            label="point temperature"
-            @input="v => { point.temperature = v; savePoints(); }"
-          />
-        </q-item-section>
-        <q-item-section class="col-1" side>
-          <q-btn flat dense icon="delete" @click="removePoint(idx)">
-            <q-tooltip>Remove point</q-tooltip>
-          </q-btn>
-        </q-item-section>
-      </q-item>
+              @input="v => updatePointTime(idx, v)"
+            />
+          </q-item-section>
+          <q-item-section class="col-3">
+            <UnitField
+              :value="point.temperature"
+              title="Temperature"
+              label="point temperature"
+              @input="v => { point.temperature = v; savePoints(); }"
+            />
+          </q-item-section>
+          <q-item-section class="col-1" side>
+            <q-btn flat dense icon="delete" @click="removePoint(idx)">
+              <q-tooltip>Remove point</q-tooltip>
+            </q-btn>
+          </q-item-section>
+        </q-item>
 
-      <!-- Add point button -->
-      <q-item dark dense>
-        <!-- Use multiple elements to also natively get padding -->
-        <q-item-section class="col-3" />
-        <q-item-section class="col-5" />
-        <q-item-section class="col-3" />
-        <q-item-section class="col-1" side>
-          <q-btn flat dense icon="add" @click="addPoint">
-            <q-tooltip>Add point</q-tooltip>
-          </q-btn>
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-  </q-card>
+        <!-- Add point button -->
+        <q-item dark dense>
+          <!-- Use multiple elements to also natively get padding -->
+          <q-item-section class="col-3" />
+          <q-item-section class="col-5" />
+          <q-item-section class="col-3" />
+          <q-item-section class="col-1" side>
+            <q-btn flat dense icon="add" @click="addPoint">
+              <q-tooltip>Add point</q-tooltip>
+            </q-btn>
+          </q-item-section>
+        </q-item>
+      </q-card-section>
+    </q-card>
+  </GraphCardWrapper>
 </template>

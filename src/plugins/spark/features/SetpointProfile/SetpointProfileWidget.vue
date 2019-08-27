@@ -1,57 +1,25 @@
 <script lang="ts">
-import { Layout, PlotData } from 'plotly.js';
 import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
+import { GraphProps, profileGraphProps } from './helpers';
 import { SetpointProfileBlock } from './types';
 
 @Component
 export default class SetpointProfileWidget extends BlockWidget {
   readonly block!: SetpointProfileBlock;
   revision = 0;
-  modalOpen = false;
-  now: Date = new Date();
 
   get startTime(): number {
     return this.block.data.start * 1000;
   }
 
-  get plotlyData(): Partial<PlotData>[] {
-    return [{
-      name: 'Setpoints',
-      type: 'scatter',
-      x: this.block.data.points.map(p => this.startTime + (p.time * 1000)),
-      y: this.block.data.points.map(p => p.temperature.value),
-    }];
-  }
-
-  get plotlyLayout(): Partial<Layout> {
-    return {
-      shapes: [
-        {
-          type: 'line',
-          yref: 'paper',
-          x0: this.now,
-          x1: this.now,
-          y0: 0,
-          y1: 1,
-          line: {
-            color: 'rgb(0, 200, 0)',
-            dash: 'dot',
-          },
-        },
-      ],
-    };
-  }
-
-  // Overrides BlockWidget
-  openModal(): void {
-    this.modalOpen = true;
+  get graphProps(): GraphProps {
+    return profileGraphProps(this.block);
   }
 
   mounted(): void {
-    this.$watch('block', () => this.now = new Date());
     this.$watch('widget.cols', () => this.revision++);
     this.$watch('widget.rows', () => this.revision++);
   }
@@ -60,7 +28,7 @@ export default class SetpointProfileWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white column">
-    <BlockWidgetToolbar :crud="crud" :graph-props="{data: plotlyData, layout: plotlyLayout}" />
+    <BlockWidgetToolbar :crud="crud" />
     <CardWarning v-if="!block.data.targetId.id">
       <template #message>
         Setpoint Profile has no target Setpoint configured.
@@ -84,7 +52,7 @@ export default class SetpointProfileWidget extends BlockWidget {
       </template>
     </CardWarning>
     <div class="col">
-      <Graph :data="plotlyData" :layout="plotlyLayout" :revision="revision" />
+      <Graph :data="graphProps.data" :layout="graphProps.layout" :revision="revision" />
     </div>
   </q-card>
 </template>
