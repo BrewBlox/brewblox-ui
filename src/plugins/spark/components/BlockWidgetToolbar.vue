@@ -1,14 +1,11 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from './BlockCrudComponent';
 
 @Component
 export default class BlockWidgetToolbar extends BlockCrudComponent {
   graphModalOpen = false;
-
-  @Prop({ type: Object })
-  public readonly graphProps!: any;
 }
 </script>
 
@@ -22,7 +19,7 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
     />
 
     <q-item-section side>
-      <q-btn-dropdown flat split icon="settings" @click="openModal({graphProps})">
+      <q-btn-dropdown flat split icon="settings" @click="openModal">
         <q-list dark bordered>
           <!-- Global Actions -->
           <ActionItem

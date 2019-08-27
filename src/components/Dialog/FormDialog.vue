@@ -18,9 +18,6 @@ export default class FormDialog extends DialogBase {
   @Prop({ type: Function, default: () => null })
   public readonly getProps!: () => any;
 
-  @Prop({ type: Function, default: () => null })
-  public readonly getGraphProps!: () => any;
-
   @Prop({ type: Object, default: () => ({}) })
   public readonly listeners!: any;
 
@@ -30,10 +27,6 @@ export default class FormDialog extends DialogBase {
 
   get formProps(): any {
     return this.getProps() || {};
-  }
-
-  get graphProps(): any {
-    return this.getGraphProps();
   }
 
   get widget(): DashboardItem {
@@ -48,16 +41,6 @@ export default class FormDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss class="row" @hide="onDialogHide">
-    <ScreenSizeConstrained
-      v-if="graphProps"
-      :min-width="1500"
-      class="q-mr-md"
-      style="width: 600px;"
-    >
-      <q-card dark class="q-pa-xs bg-dark-bright">
-        <Graph v-bind="graphProps" />
-      </q-card>
-    </ScreenSizeConstrained>
     <component :is="form" :crud="crud" v-bind="formProps" v-on="listeners" @close="hide" />
   </q-dialog>
 </template>

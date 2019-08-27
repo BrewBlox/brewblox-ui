@@ -125,14 +125,13 @@ export default class BlockCrudComponent extends CrudComponent {
     await this.saveConfig({ ...this.widget.config, blockId });
   }
 
-  public openModal(opts: { formProps?: any; graphProps?: any } = {}): void {
-    const { formProps, graphProps } = opts;
+  public openModal(opts: { formProps?: any } = {}): void {
+    const { formProps } = opts;
     this.activeDialog = Dialog.create({
       component: 'FormDialog',
       root: this.$root,
       getCrud: () => ({ ...this.crud, closeDialog: this.closeDialog }),
       getProps: () => formProps,
-      getGraphProps: () => graphProps,
     });
   }
 

@@ -4,8 +4,8 @@ import { Component, Prop } from 'vue-property-decorator';
 
 @Component
 export default class ScreenSizeConstrained extends Vue {
-  windowWidth = 0;
-  windowHeight = 0;
+  widthOk = false;
+  heightOk = false;
 
   @Prop({ type: Number, required: false })
   readonly minWidth!: number;
@@ -13,17 +13,10 @@ export default class ScreenSizeConstrained extends Vue {
   @Prop({ type: Number, required: false })
   readonly minHeight!: number;
 
-  get widthOk(): boolean {
-    return !this.minWidth || this.windowWidth >= this.minWidth;
-  }
-
-  get heightOk(): boolean {
-    return !this.minHeight || this.windowHeight >= this.minHeight;
-  }
-
   updateSize(): void {
-    this.windowWidth = window.innerWidth;
-    this.windowHeight = window.innerHeight;
+    this.widthOk = !this.minWidth || window.innerWidth >= this.minWidth;
+    this.heightOk = !this.minHeight || window.innerHeight >= this.minHeight;
+    this.$emit('sizeok', this.widthOk && this.heightOk);
   }
 
   mounted(): void {
