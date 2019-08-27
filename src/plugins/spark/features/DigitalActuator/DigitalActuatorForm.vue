@@ -65,71 +65,77 @@ export default class DigitalActuatorForm extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud" />
+  <GraphCardWrapper>
+    <template #graph>
+      <HistoryGraph :id="widget.id" :config="graphCfg" />
+    </template>
 
-    <q-card-section>
-      <q-item dark>
-        <q-item-section>
-          <q-item-label caption>
-            Target Pin Array
-          </q-item-label>
-          <LinkField
-            :value="block.data.hwDevice"
-            :service-id="serviceId"
-            title="Pin Array"
-            no-create
-            @input="v => { block.data.hwDevice = v; block.data.channel = 0; saveBlock(); }"
-          />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label caption>
-            Pin Channel
-          </q-item-label>
-          <SelectField
-            :value="block.data.channel"
-            :options="channelOpts"
-            :readonly="!block.data.hwDevice.id"
-            title="Pin Channel"
-            @input="claimChannel"
-          />
-        </q-item-section>
-      </q-item>
-      <q-item dark>
-        <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>
-            State
-          </q-item-label>
-          <DigitalStateField
-            :value="block.data.desiredState"
-            :pending="block.data.state !== block.data.desiredState"
-            :pending-reason="constrainers"
-            :disable="isDriven"
-            @input="v => { block.data.desiredState = v; saveBlock(); }"
-          />
-        </q-item-section>
-        <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>
-            Invert
-          </q-item-label>
-          <q-toggle
-            :value="block.data.invert"
-            @input="v => { block.data.invert = v; saveBlock(); }"
-          />
-        </q-item-section>
-      </q-item>
+    <q-card dark class="widget-modal">
+      <BlockFormToolbar :crud="crud" />
 
-      <q-item dark>
-        <q-item-section>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
-          <ConstraintsField
-            :value="block.data.constrainedBy"
-            :service-id="serviceId"
-            type="digital"
-            @input="v => { block.data.constrainedBy = v; saveBlock(); }"
-          />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-  </q-card>
+      <q-card-section>
+        <q-item dark>
+          <q-item-section>
+            <q-item-label caption>
+              Target Pin Array
+            </q-item-label>
+            <LinkField
+              :value="block.data.hwDevice"
+              :service-id="serviceId"
+              title="Pin Array"
+              no-create
+              @input="v => { block.data.hwDevice = v; block.data.channel = 0; saveBlock(); }"
+            />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>
+              Pin Channel
+            </q-item-label>
+            <SelectField
+              :value="block.data.channel"
+              :options="channelOpts"
+              :readonly="!block.data.hwDevice.id"
+              title="Pin Channel"
+              @input="claimChannel"
+            />
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section style="justify-content: flex-start">
+            <q-item-label caption>
+              State
+            </q-item-label>
+            <DigitalStateField
+              :value="block.data.desiredState"
+              :pending="block.data.state !== block.data.desiredState"
+              :pending-reason="constrainers"
+              :disable="isDriven"
+              @input="v => { block.data.desiredState = v; saveBlock(); }"
+            />
+          </q-item-section>
+          <q-item-section style="justify-content: flex-start">
+            <q-item-label caption>
+              Invert
+            </q-item-label>
+            <q-toggle
+              :value="block.data.invert"
+              @input="v => { block.data.invert = v; saveBlock(); }"
+            />
+          </q-item-section>
+        </q-item>
+
+        <q-item dark>
+          <q-item-section>
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
+            <ConstraintsField
+              :value="block.data.constrainedBy"
+              :service-id="serviceId"
+              type="digital"
+              @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+            />
+          </q-item-section>
+        </q-item>
+      </q-card-section>
+    </q-card>
+  </graphcardwrapper>
 </template>

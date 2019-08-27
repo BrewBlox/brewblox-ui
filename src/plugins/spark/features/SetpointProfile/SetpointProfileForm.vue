@@ -121,8 +121,8 @@ export default class SetpointProfileForm extends BlockCrudComponent {
 </script>
 
 <template>
-  <WrapperCard>
-    <template #constrained>
+  <GraphCardWrapper show-initial>
+    <template #graph>
       <Graph v-bind="graphProps" />
     </template>
 
@@ -243,5 +243,5 @@ export default class SetpointProfileForm extends BlockCrudComponent {
         </q-item>
       </q-card-section>
     </q-card>
-  </WrapperCard>
+  </GraphCardWrapper>
 </template>

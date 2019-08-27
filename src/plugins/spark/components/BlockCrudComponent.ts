@@ -67,7 +67,7 @@ export default class BlockCrudComponent extends CrudComponent {
 
     return {
       // persisted in config
-      params: this.widget.config.queryParams || { duration: '10m' },
+      params: this.widget.config.queryParams || { duration: '1h' },
       axes: this.widget.config.graphAxes || {},
       // constants
       layout: {

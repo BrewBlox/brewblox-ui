@@ -1,12 +1,19 @@
 <script lang="ts">
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 
 @Component
-export default class WrapperCard extends Vue {
-  collapsed = false;
+export default class GraphCardWrapper extends Vue {
+  collapsed = true;
   sizeok = false;
+
+  @Prop({ type: Boolean, default: false })
+  public readonly showInitial!: boolean;
+
+  created(): void {
+    this.collapsed = !this.showInitial;
+  }
 }
 </script>
 
@@ -38,12 +45,13 @@ export default class WrapperCard extends Vue {
       </q-btn>
     </div>
     <ScreenSizeConstrained
+      v-show="!collapsed"
       :min-width="1500"
       style="width: 600px;"
       @sizeok="v => sizeok = v"
     >
       <q-card v-if="!collapsed" dark class="q-pa-xs bg-dark-bright">
-        <slot name="constrained" />
+        <slot name="graph" />
       </q-card>
     </ScreenSizeConstrained>
   </q-card>
@@ -56,6 +64,7 @@ export default class WrapperCard extends Vue {
   max-width: 95vw;
   background-color: rgba(0, 0, 0, 0);
 }
+
 .tab-show {
   border: 1px solid gray;
   border-left: 0;

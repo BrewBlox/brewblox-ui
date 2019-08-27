@@ -93,7 +93,7 @@ export default class LinkedBlockCard extends PartCard {
       .sort(objectStringSorter('id'));
   }
 
-  created(): void {
+  create(): void {
     Dialog.create({
       component: 'BlockWizardDialog',
       root: this.$root,
