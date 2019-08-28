@@ -11,6 +11,7 @@ export class FlowSegment {
   public root: FlowPart;
   public splits: FlowSegment[] = [];
   public next: FlowSegment | null = null;
+  public flowing = true;
 
   public addChild(segment: FlowSegment): void {
     if (this.splits.length == 0) {

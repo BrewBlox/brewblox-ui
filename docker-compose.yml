@@ -49,8 +49,7 @@ services:
     #      - "../brewblox-devcon-spark/:/app/"
     command: >
       --name=sparkey
-      --device-host=172.17.0.1
-  #      --device-host=sparksimulator
+      --device-host=sparksimulator
   #      --skip-version-check
 
   spock:

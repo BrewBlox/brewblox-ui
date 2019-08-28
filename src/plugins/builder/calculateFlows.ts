@@ -109,22 +109,34 @@ const mergeFlows = (flows: CalculatedFlows): CalculatedFlows => {
         return [positive, negative, posTotal, negTotal];
       };
 
-      const scale = (unscaledFlows: LiquidFlow, factor: number): LiquidFlow =>
-        mapValues(unscaledFlows, v => v * factor);
+      const scale = (unscaledFlows: LiquidFlow, factor: number): LiquidFlow => {
+        const entries = Object.entries(unscaledFlows);
+        const qty = entries.length;
+        if (qty && entries.every(([, v]) => v === 0)) {
+          return mapValues(unscaledFlows, () => factor / qty);
+        }
+        return mapValues(unscaledFlows, v => v * factor);
+      };
 
       let toMerge = coordFlows;
-      let acceleration = coordFlows[ACCELERATE_OTHERS]; // special liquid type set by pumps
+      let acceleration = coordFlows[ACCELERATE_OTHERS] || 0; // special liquid type set by pumps
 
 
       let [positive, negative, posTotal, negTotal] = splitPosNeg(toMerge);
       const liquidsTotal = posTotal + negTotal - acceleration;
 
-      // if acceleration is bigger than other flows combined and opposite sign, the flow is reversed
-      if (liquidsTotal && acceleration / liquidsTotal < -1) {
+      if (liquidsTotal === 0 && acceleration) {
+        // without acceleration there would be no flow
+        delete toMerge[ACCELERATE_OTHERS];
+        toMerge = scale(toMerge, acceleration);
+        [positive, negative, posTotal, negTotal] = splitPosNeg(toMerge);
+      }
+      else if (liquidsTotal && acceleration / liquidsTotal < -1) {
+        // if acceleration is bigger than other flows combined and opposite sign, the flow is reversed
         const newTotal = acceleration + liquidsTotal;
         toMerge = scale(toMerge, newTotal / liquidsTotal);
-        delete toMerge[ACCELERATE_OTHERS];
         acceleration = 0;
+        delete toMerge[ACCELERATE_OTHERS];
         [positive, negative, posTotal, negTotal] = splitPosNeg(toMerge);
       }
 
@@ -136,15 +148,15 @@ const mergeFlows = (flows: CalculatedFlows): CalculatedFlows => {
           : scale(negative, total / negTotal);
       }
 
-      // check again, could be discard as part of positive or negative
+      // check again, could be discarded as part of positive or negative
       acceleration = toMerge[ACCELERATE_OTHERS];
       if (acceleration) {
         if (total !== acceleration) {
           toMerge = scale(toMerge, total / (total - acceleration));
-          delete toMerge[ACCELERATE_OTHERS];
         }
       }
       if (toMerge) {
+        delete toMerge[ACCELERATE_OTHERS];
         mergedFlows[coord] = toMerge;
       }
     });
@@ -194,7 +206,7 @@ export const flowPath = (
     }
     return acc;
   }, []);
-
+  let flowing = false;
   for (const outFlow of outFlows) {
     while (true) {
       const nextPart =
@@ -206,16 +218,19 @@ export const flowPath = (
         nextPath = flowPath(candidateParts, nextPart, outFlow.outCoords, startCoord);
         if (nextPath !== null) {
           path.addChild(nextPath);
+          flowing = flowing || nextPath.flowing;
         }
       }
 
-      if (nextPath !== null || outFlow.outCoords === startCoord) {
-        if (path.transitions[inCoord] === undefined) {
-          path.transitions[inCoord] = [outFlow];
-        }
-        else {
-          path.transitions[inCoord].push(outFlow);
-        }
+      if (path.transitions[inCoord] === undefined) {
+        path.transitions[inCoord] = [outFlow];
+      }
+      else {
+        path.transitions[inCoord].push(outFlow);
+      }
+
+      if (nextPath === null && outFlow.outCoords !== startCoord) {
+        path.flowing = flowing;
       }
       if (!nextPart || outFlow.internal) {
         break;
@@ -276,7 +291,7 @@ export const addFlowForSegment = (
     const frictionInvTotal = segment.splits.reduce((acc, split) => acc + 1 / split.friction(), 0);
     segment.splits
       .forEach((child) => {
-        const invFriction = 1 / child.friction();
+        const invFriction = child.flowing ? 1 / child.friction() : 0;
         const splitFlows: LiquidFlow = mapValues(flows,
           flowVal => flowVal * invFriction / frictionInvTotal);
 
@@ -316,10 +331,11 @@ const addFlowFromPart = (parts, part): FlowPart[] => {
       const liquids: string[] | undefined = outFlow.liquids;
       if (pressure && Array.isArray(liquids)) {
         const path = flowPath(parts, part, inCoords);
-        if (path !== null) {
+        if (path !== null && path.flowing) {
           const startFlow: LiquidFlow = {};
           liquids.forEach((liquid: string) => {
-            startFlow[liquid] = pressure / path.friction();
+            const flow = path.flowing ? pressure / path.friction() : 0;
+            startFlow[liquid] = flow;
           });
           parts = addFlowForSegment(parts, path, startFlow);
         }

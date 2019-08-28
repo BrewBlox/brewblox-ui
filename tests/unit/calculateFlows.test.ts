@@ -516,7 +516,7 @@ describe('A path that forks and rejoins', () => {
       ]);
   });
 
-  it('Should have a friction value of 6', () => {
+  it('Should have a friction value of 5.5', () => {
     expect(path.friction()).toEqual(5.5);
   });
 

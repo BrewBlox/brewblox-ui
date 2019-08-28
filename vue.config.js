@@ -49,7 +49,7 @@ module.exports = {
 
     // This is merged into the webpack config
     return {
-      devtool: 'source-map',
+      devtool: 'cheap-module-eval-source-map',
       output: {
         globalObject: 'this',
       },
