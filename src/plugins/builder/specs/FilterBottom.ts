@@ -1,4 +1,4 @@
-import { IN_OUT, LEFT } from '../getters';
+import { CENTER, LEFT } from '../getters';
 import { PartSpec, PersistentPart } from '../types';
 
 const DEFAULT_SIZE_X = 4;
@@ -24,8 +24,8 @@ const spec: PartSpec = {
     SIZE_Y,
   ],
   transitions: () => ({
-    [LEFT]: [{ outCoords: IN_OUT }],
-    [IN_OUT]: [{ outCoords: LEFT }],
+    [LEFT]: [{ outCoords: CENTER }],
+    [CENTER]: [{ outCoords: LEFT }],
   }),
 };
 

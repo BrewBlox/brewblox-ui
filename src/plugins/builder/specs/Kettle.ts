@@ -57,7 +57,7 @@ const spec: PartSpec = {
       '0,0,-2': [...middleCoords.map(item => ({
         outCoords: item,
       })),
-      { outCoords: IN_OUT }],
+      { outCoords: IN_OUT, sink: true }],
     };
 
     middleCoords.forEach(item => (

@@ -210,7 +210,7 @@ export const flowPath = (
   for (const outFlow of outFlows) {
     while (true) {
       const nextPart =
-        (candidateParts.length === 0) ? null :
+        (outFlow.sink || candidateParts.length === 0) ? null :
           outFlow.internal ? start : adjacentPart(candidateParts, outFlow.outCoords, start);
 
       let nextPath: FlowSegment | null = null;
@@ -279,6 +279,14 @@ export const addFlowForSegment = (
       inFlow[inCoords] = mapValues(flows, v => -v);
       if (segment.splits.length === 0) { // for split path, outflow is handled below to split it
         outFlows.forEach((route: FlowRoute) => {
+          if (route.liquids && segment.flowing) {
+            // liquids encountered on the path are added.
+            // when a sink is encountered, all except acceleration are dropped
+            // this is because acceleration
+            route.liquids.forEach(liquid => {
+              flows[liquid] = flows[liquid] === undefined ? 0 : flows[liquid];
+            });
+          }
           outFlow[route.outCoords] = outFlow[route.outCoords] ?
             { ...outFlow[route.outCoords], ...flows }
             : flows;
@@ -328,8 +336,8 @@ const addFlowFromPart = (parts, part): FlowPart[] => {
     const outFlows = part.transitions[inCoords] || [];
     for (const outFlow of outFlows) {
       const pressure: number = outFlow.pressure || 0;
-      const liquids: string[] | undefined = outFlow.liquids;
-      if (pressure && Array.isArray(liquids)) {
+      const liquids: string[] = outFlow.liquids || [];
+      if (outFlow.source && liquids.length > 0) {
         const path = flowPath(parts, part, inCoords);
         if (path !== null && path.flowing) {
           const startFlow: LiquidFlow = {};
