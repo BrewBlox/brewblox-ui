@@ -53,18 +53,31 @@ const spec: PartSpec = {
         liquids: part.settings.color ? [`#${part.settings.color}`] : [],
         internal: true,
         source: true,
-      }],
-      '0,0,-2': [...middleCoords.map(item => ({
-        outCoords: item,
-      })),
-      { outCoords: IN_OUT, sink: true }],
+      },
+      ],
+      '0,0,-2': [
+        ...middleCoords.map(item => ({
+          outCoords: item,
+          liquids: part.settings.color ? [`#${part.settings.color}`] : [],
+        })),
+      ],
+      '0,0,-3': [
+        {
+          outCoords: IN_OUT,
+          sink: true,
+          internal: true,
+        },
+
+      ],
     };
+
 
     middleCoords.forEach(item => (
       result[item] = [{
-        outCoords: '0,0,-2',
+        outCoords: '0,0,-3',
         internal: true,
-      }]));
+      },
+      ]));
     return result;
   },
 };
