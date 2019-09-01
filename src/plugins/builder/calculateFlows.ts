@@ -166,8 +166,8 @@ const mergeFlows = (flows: CalculatedFlows): CalculatedFlows => {
         }
       }
 
+      delete toMerge[ACCELERATE_OTHERS];
       if (toMerge) {
-        delete toMerge[ACCELERATE_OTHERS];
         mergedFlows[coord] = toMerge;
       }
     });
@@ -339,11 +339,11 @@ const addFlowFromPart = (parts, part): FlowPart[] => {
   for (const inCoords in part.transitions) {
     const outFlows = part.transitions[inCoords] || [];
     for (const outFlow of outFlows) {
-      const pressure: number = outFlow.pressure || 0;
       const liquids: string[] = outFlow.liquids || [];
       if (outFlow.source && liquids.length > 0) {
         const path = flowPath(parts, part, inCoords);
         if (path !== null && path.flowing) {
+          const pressure: number = outFlow.pressure || 0;
           const startFlow: LiquidFlow = {};
           liquids.forEach((liquid: string) => {
             const flow = path.flowing ? pressure / path.friction() : 0;

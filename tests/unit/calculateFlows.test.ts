@@ -615,7 +615,7 @@ describe('A single path with a pump', () => {
       rotate: 0,
       type: 'Pump',
       settings: {
-        disabled: true,
+        enabled: false,
         pressure: 12,
       },
     },
@@ -660,7 +660,7 @@ describe('A single path with a pump', () => {
           '2,2.5,0': { [COLD_WATER]: 2 },
         },
         settings: {
-          disabled: true,
+          enabled: false,
           pressure: 12,
         },
       },
@@ -1069,207 +1069,12 @@ describe('A path with a bridge', () => {
   });
 });
 
-
-describe('A filled Kettle', () => {
-  const parts: PersistentPart[] = [
-    {
-      'id': '1',
-      'rotate': 0,
-      'settings': { 'color': 'ff0000' },
-      'flipped': false,
-      'type': 'Kettle',
-      'x': 1,
-      'y': 1,
-    },
-    {
-      'id': '2',
-      'rotate': 0,
-      'settings': {},
-      'flipped': true,
-      'type': 'DipTube',
-      'x': 4,
-      'y': 6,
-    },
-    {
-      'id': '3',
-      'rotate': 0,
-      'settings': {},
-      'flipped': false,
-      'type': 'StraightTube',
-      'x': 5,
-      'y': 6,
-    },
-    {
-      'id': '4',
-      'rotate': 0,
-      'settings': {},
-      'flipped': true,
-      'type': 'SystemIO',
-      'x': 6,
-      'y': 6,
-    },
-  ];
-
-  it('Should return the right path starting at the kettle', () => {
-    const flowParts = asFlowParts(parts.map(asStatePart));
-    const start = flowParts[0];
-
-    const path = flowPath(flowParts, start, IN_OUT);
-    if (path === null) {
-      throw ('no path found');
-    }
-
-    const visitedTypes = propertyWalker([], path, ['root', 'type']);
-    expect(visitedTypes).toEqual(
-      [
-        'Kettle',
-        'DipTube',
-        'StraightTube',
-        'SystemIO',
-      ]);
-
-    expect(path.friction()).toEqual(3);
-
-  });
-
-  it('Should have flow of 2.5 through the straight tube and dip tube', () => {
-    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
-    const straight = partsWithFlow.find((part) => part.type === 'StraightTube');
-    expect(straight).toMatchObject(
-      {
-        'id': '3',
-        flows: {
-          '5,6.5,0': {
-            '#ff0000': -10 / 3,
-          },
-          '6,6.5,0': {
-            '#ff0000': 10 / 3,
-          },
-        },
-      });
-
-    const dip = partsWithFlow.find((part) => part.type === 'DipTube');
-    expect(dip).toMatchObject(
-      {
-        'id': '2',
-        flows:
-        {
-          '4.5,6.5,0': { '#ff0000': -10 / 3 },
-          '5,6.5,0': { '#ff0000': 10 / 3 },
-        },
-      });
-  });
-});
-
-
-describe('A pressurized kettle and SystemIO with equal pressure', () => {
-  const parts: PersistentPart[] = [
-    {
-      'id': '1',
-      'rotate': 0,
-      'settings': { 'color': 'ff0000', 'pressure': 10 },
-      'flipped': false,
-      'type': 'Kettle',
-      'x': 1,
-      'y': 1,
-    },
-    {
-      'id': '2',
-      'rotate': 0,
-      'settings': {},
-      'flipped': true,
-      'type': 'DipTube',
-      'x': 4,
-      'y': 6,
-    },
-    {
-      'id': '3',
-      'rotate': 0,
-      'settings': {},
-      'flipped': false,
-      'type': 'StraightTube',
-      'x': 5,
-      'y': 6,
-    },
-    {
-      'id': '4',
-      'rotate': 0,
-      'settings': {
-        liquids: [COLD_WATER],
-        pressure: 10,
-      },
-      'flipped': true,
-      'type': 'SystemIO',
-      'x': 6,
-      'y': 6,
-    },
-  ];
-  const flowParts = asFlowParts(parts.map(asStatePart));
-  it('Should return the right path starting at the kettle', () => {
-    const start = flowParts[0];
-
-    const path = flowPath(flowParts, start, IN_OUT);
-    if (path === null) {
-      throw ('no path found');
-    }
-
-    const visitedTypes = propertyWalker([], path, ['root', 'type']);
-    expect(visitedTypes).toEqual(
-      [
-        'Kettle',
-        'DipTube',
-        'StraightTube',
-        'SystemIO',
-      ]);
-
-    expect(path.friction()).toEqual(3);
-  });
-
-  it('Should return the right path starting at SystemIO', () => {
-    const start = flowParts[3];
-
-    const path = flowPath(flowParts, start, IN_OUT);
-    if (path === null) {
-      throw ('no path found');
-    }
-
-    const visitedTypes = propertyWalker([], path, ['root', 'type']);
-    expect(visitedTypes).toEqual(
-      [
-        'SystemIO',
-        'StraightTube',
-        'DipTube',
-        'Kettle',
-      ]);
-
-    expect(path.friction()).toEqual(3);
-  });
-
-  it('Should have zero flow', () => {
-    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
-    const straight = partsWithFlow.find((part) => part.type === 'StraightTube');
-    expect(straight).toMatchObject(
-      {
-        'id': '3',
-        'flows': {
-          '5,6.5,0': {
-            [COLD_WATER]: 0,
-          },
-          '6,6.5,0': {
-            '#ff0000': 0,
-          },
-        },
-      });
-  });
-});
-
-
 describe('A kettle with 2 outflows', () => {
   const parts: PersistentPart[] = [
     {
       'id': '1',
       'rotate': 0,
-      'settings': { 'color': 'ff0000' },
+      'settings': { color: '#ff0000' },
       'flipped': false,
       'type': 'Kettle',
       'x': 1,
@@ -1287,9 +1092,12 @@ describe('A kettle with 2 outflows', () => {
     {
       'id': '3',
       'rotate': 0,
-      'settings': {},
-      'flipped': false,
-      'type': 'StraightTube',
+      settings: {
+        enabled: true,
+        pressure: 10,
+      },
+      'flipped': true,
+      'type': 'Pump',
       'x': 5,
       'y': 6,
     },
@@ -1314,9 +1122,12 @@ describe('A kettle with 2 outflows', () => {
     {
       'id': '6',
       'rotate': 0,
-      'settings': {},
-      'flipped': false,
-      'type': 'StraightTube',
+      'type': 'Pump',
+      settings: {
+        enabled: true,
+        pressure: 10,
+      },
+      'flipped': true,
       'x': 5,
       'y': 5,
     },
@@ -1345,10 +1156,10 @@ describe('A kettle with 2 outflows', () => {
       [
         'Kettle',
         [['DipTube',
-          'StraightTube',
+          'Pump',
           'SystemIO'],
         ['DipTube',
-          'StraightTube',
+          'Pump',
           'SystemIO']],
       ]);
   });
@@ -1384,12 +1195,13 @@ describe('A kettle with 2 outflows', () => {
   });
 });
 
+
 describe('A kettle with flow back to itself', () => {
-  const parts: PersistentPart[] = [
+  let parts: PersistentPart[] = [
     {
       'id': '1',
       'rotate': 0,
-      'settings': { 'color': 'ff0000', 'pressure': 10 },
+      'settings': { color: '#ff0000' },
       'type': 'Kettle',
       'x': 1,
       'y': 1,
@@ -1401,7 +1213,7 @@ describe('A kettle with flow back to itself', () => {
       'flipped': true,
       'type': 'DipTube',
       'x': 4,
-      'y': 5,
+      'y': 4,
     },
     {
       'id': '3',
@@ -1409,10 +1221,10 @@ describe('A kettle with flow back to itself', () => {
       'settings': {},
       'type': 'ElbowTube',
       'x': 5,
-      'y': 5,
+      'y': 4,
     },
     {
-      'id': '4',
+      'id': '5',
       'rotate': 270,
       'settings': {},
       'type': 'ElbowTube',
@@ -1420,7 +1232,7 @@ describe('A kettle with flow back to itself', () => {
       'y': 6,
     },
     {
-      'id': '5',
+      'id': '6',
       'rotate': 0,
       'settings': {},
       'flipped': true,
@@ -1429,43 +1241,115 @@ describe('A kettle with flow back to itself', () => {
       'y': 6,
     },
   ];
-  const flowParts = asFlowParts(parts.map(asStatePart));
-  it('Should return the right path starting at the kettle', () => {
-    const start = flowParts[0];
 
-    const path = flowPath(flowParts, start, IN_OUT);
-    if (path === null) {
-      throw ('no path found');
-    }
 
-    const visitedTypes = propertyWalker([], path, ['root', 'type']);
-    expect(visitedTypes).toEqual(
-      [
-        'Kettle',
-        'DipTube',
-        'ElbowTube',
-        'ElbowTube',
-        'DipTube',
-        'Kettle',
-      ]);
+  describe('with a disabled pump', () => {
+    parts = [...parts, {
+      'id': '4',
+      'rotate': 270,
+      settings: {
+        enabled: false,
+      },
+      'type': 'Pump',
+      'x': 5,
+      'y': 5,
+    }];
 
-    expect(path.friction()).toEqual(4);
+    const flowParts = asFlowParts(parts.map(asStatePart));
+    it('Should return the right path starting at the kettle', () => {
+      const start = flowParts[0];
+
+      const path = flowPath(flowParts, start, IN_OUT);
+      if (path === null) {
+        throw ('no path found');
+      }
+
+      const visitedTypes = propertyWalker([], path, ['root', 'type']);
+      expect(visitedTypes).toEqual(
+        [
+          'Kettle',
+          'DipTube',
+          'ElbowTube',
+          'Pump',
+          'ElbowTube',
+          'DipTube',
+          'Kettle',
+        ]);
+
+
+      expect(path.friction()).toEqual(5);
+    });
+
+
+    it('Should have zero flow with the pump disabled', () => {
+      const partsWithFlow = calculateFlows(flowParts);
+      const part = partsWithFlow.find((part) => part.id === '3');
+      expect(part).toMatchObject(
+        {
+          'id': '3',
+          'flows': {
+            '5,4.5,0': {
+              '#ff0000': 0,
+            },
+            '5.5,5,0': {
+              '#ff0000': 0,
+            },
+          },
+        });
+    });
   });
 
-  it('Should have zero flow', () => {
-    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
-    const straight = partsWithFlow.find((part) => part.id === '3');
-    expect(straight).toMatchObject(
-      {
-        'id': '3',
-        'flows': {
-          '5,5.5,0': {
-            '#ff0000': 0,
+  describe('with an enabled pump', () => {
+    parts = [...parts, {
+      'id': '4',
+      'rotate': 270,
+      settings: {
+        enabled: true,
+      },
+      'type': 'Pump',
+      'x': 5,
+      'y': 5,
+    }];
+    const flowParts = asFlowParts(parts.map(asStatePart));
+    it('Should return the right path starting at the kettle', () => {
+      const start = flowParts[0];
+
+      const path = flowPath(flowParts, start, IN_OUT);
+      if (path === null) {
+        throw ('no path found');
+      }
+
+      const visitedTypes = propertyWalker([], path, ['root', 'type']);
+      expect(visitedTypes).toEqual(
+        [
+          'Kettle',
+          'DipTube',
+          'ElbowTube',
+          'Pump',
+          'ElbowTube',
+          'DipTube',
+          'Kettle',
+        ]);
+
+      expect(path.friction()).toEqual(5);
+    });
+
+    it('Should have flow 2', () => {
+      const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
+      const part = partsWithFlow.find((part) => part.id === '3');
+      expect(part).toMatchObject(
+        {
+          'id': '3',
+          'flows': {
+            '5,4.5,0': {
+              '#ff0000': -2,
+            },
+            '5.5,5,0': {
+              '#ff0000': 2,
+            },
           },
-          '5.5,6,0': {
-            '#ff0000': 0,
-          },
-        },
-      });
+        });
+    });
   });
 });
+

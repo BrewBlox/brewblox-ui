@@ -45,12 +45,11 @@ const spec: PartSpec = {
       return coord.toString();
     });
 
-    const pressure = 0;
     const result = {
       [IN_OUT]: [{
         outCoords: '0,0,-2',
-        pressure,
-        liquids: part.settings.color ? [`#${part.settings.color}`] : [],
+        pressure: 0,
+        liquids: part.settings.color ? [part.settings.color] : [],
         internal: true,
         source: true,
       },
@@ -58,7 +57,6 @@ const spec: PartSpec = {
       '0,0,-2': [
         ...middleCoords.map(item => ({
           outCoords: item,
-          liquids: part.settings.color ? [`#${part.settings.color}`] : [],
         })),
       ],
       '0,0,-3': [
@@ -67,7 +65,6 @@ const spec: PartSpec = {
           sink: true,
           internal: true,
         },
-
       ],
     };
 

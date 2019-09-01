@@ -8,18 +8,13 @@ export default class Kettle extends PartBase {
   get titleText(): string {
     return this.part.settings.text || '';
   }
-
-  get color(): string | null {
-    const color = this.part.settings.color;
-    return color && !color.startsWith('#') ? `#${color}` : color;
-  }
 }
 </script>
 
 <template>
   <g>
     <rect
-      :fill="color"
+      :fill="part.settings.color"
       :x="2"
       :y="squares(1)+2"
       :width="squares(sizeX)-4"

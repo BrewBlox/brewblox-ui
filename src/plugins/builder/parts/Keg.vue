@@ -6,8 +6,7 @@ import PartBase from '../components/PartBase';
 @Component
 export default class Keg extends PartBase {
   get color(): string | null {
-    const color = this.part.settings.color;
-    return color && !color.startsWith('#') ? `#${color}` : color;
+    return this.part.settings.color || '';
   }
 }
 </script>
