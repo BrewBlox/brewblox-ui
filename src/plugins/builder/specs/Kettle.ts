@@ -45,7 +45,7 @@ const spec: PartSpec = {
       return coord.toString();
     });
 
-    const pressure = 10;
+    const pressure = 0;
     const result = {
       [IN_OUT]: [{
         outCoords: '0,0,-2',
