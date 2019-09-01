@@ -148,6 +148,16 @@ const mergeFlows = (flows: CalculatedFlows): CalculatedFlows => {
           : scale(negative, total / negTotal);
       }
 
+      // remove flows of zero if there is net flow
+      if (total !== 0) {
+        Object.entries(toMerge).forEach(([k, v]) => {
+          if (v === 0) {
+            delete toMerge[k];
+          }
+        });
+      }
+
+
       // check again, could be discarded as part of positive or negative
       acceleration = toMerge[ACCELERATE_OTHERS];
       if (acceleration) {
@@ -155,6 +165,7 @@ const mergeFlows = (flows: CalculatedFlows): CalculatedFlows => {
           toMerge = scale(toMerge, total / (total - acceleration));
         }
       }
+
       if (toMerge) {
         delete toMerge[ACCELERATE_OTHERS];
         mergedFlows[coord] = toMerge;
@@ -280,12 +291,6 @@ export const addFlowForSegment = (
       inFlow[inCoords] = mapValues(flows, v => -v);
       if (segment.splits.length === 0) { // for split path, outflow is handled below to split it
         outFlows.forEach((route: FlowRoute) => {
-          if (route.liquids && segment.flowing) {
-            // liquids encountered on the path are added.
-            route.liquids.forEach(liquid => {
-              flows[liquid] = flows[liquid] === undefined ? 0 : flows[liquid];
-            });
-          }
           outFlow[route.outCoords] = outFlow[route.outCoords] ?
             { ...outFlow[route.outCoords], ...flows }
             : flows;
