@@ -22,8 +22,7 @@ export default class Carboy extends PartBase {
     z`;
 
   get color(): string | null {
-    const color = this.part.settings.color;
-    return color && !color.startsWith('#') ? `#${color}` : color;
+    return this.part.settings.color || '';
   }
 }
 </script>

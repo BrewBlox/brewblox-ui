@@ -34,11 +34,11 @@ const adjacentPart = (
   allParts: FlowPart[],
   outCoords: string,
   currentPart: FlowPart | null = null,
-): FlowPart | undefined =>
+): FlowPart | null =>
   allParts
     .find((part: FlowPart) =>
       !(currentPart && part.id === currentPart.id)
-      && has(part, ['transitions', outCoords]));
+      && has(part, ['transitions', outCoords])) || null;
 
 const normalizeFlows = (part: FlowPart): FlowPart => {
   if (!part.flows) {
@@ -109,22 +109,34 @@ const mergeFlows = (flows: CalculatedFlows): CalculatedFlows => {
         return [positive, negative, posTotal, negTotal];
       };
 
-      const scale = (unscaledFlows: LiquidFlow, factor: number): LiquidFlow =>
-        mapValues(unscaledFlows, v => v * factor);
+      const scale = (unscaledFlows: LiquidFlow, factor: number): LiquidFlow => {
+        const entries = Object.entries(unscaledFlows);
+        const qty = entries.length;
+        if (qty && entries.every(([, v]) => v === 0)) {
+          return mapValues(unscaledFlows, () => factor / qty);
+        }
+        return mapValues(unscaledFlows, v => v * factor);
+      };
 
       let toMerge = coordFlows;
-      let acceleration = coordFlows[ACCELERATE_OTHERS]; // special liquid type set by pumps
+      let acceleration = coordFlows[ACCELERATE_OTHERS] || 0; // special liquid type set by pumps
 
 
       let [positive, negative, posTotal, negTotal] = splitPosNeg(toMerge);
       const liquidsTotal = posTotal + negTotal - acceleration;
 
-      // if acceleration is bigger than other flows combined and opposite sign, the flow is reversed
-      if (liquidsTotal && acceleration / liquidsTotal < -1) {
+      if (liquidsTotal === 0 && acceleration) {
+        // without acceleration there would be no flow
+        delete toMerge[ACCELERATE_OTHERS];
+        toMerge = scale(toMerge, acceleration);
+        [positive, negative, posTotal, negTotal] = splitPosNeg(toMerge);
+      }
+      else if (liquidsTotal && acceleration / liquidsTotal < -1) {
+        // if acceleration is bigger than other flows combined and opposite sign, the flow is reversed
         const newTotal = acceleration + liquidsTotal;
         toMerge = scale(toMerge, newTotal / liquidsTotal);
-        delete toMerge[ACCELERATE_OTHERS];
         acceleration = 0;
+        delete toMerge[ACCELERATE_OTHERS];
         [positive, negative, posTotal, negTotal] = splitPosNeg(toMerge);
       }
 
@@ -136,14 +148,25 @@ const mergeFlows = (flows: CalculatedFlows): CalculatedFlows => {
           : scale(negative, total / negTotal);
       }
 
-      // check again, could be discard as part of positive or negative
+      // remove flows of zero if there is net flow
+      if (total !== 0) {
+        Object.entries(toMerge).forEach(([k, v]) => {
+          if (v === 0) {
+            delete toMerge[k];
+          }
+        });
+      }
+
+
+      // check again, could be discarded as part of positive or negative
       acceleration = toMerge[ACCELERATE_OTHERS];
       if (acceleration) {
         if (total !== acceleration) {
           toMerge = scale(toMerge, total / (total - acceleration));
-          delete toMerge[ACCELERATE_OTHERS];
         }
       }
+
+      delete toMerge[ACCELERATE_OTHERS];
       if (toMerge) {
         mergedFlows[coord] = toMerge;
       }
@@ -172,23 +195,41 @@ export const flowPath = (
   const outFlows: FlowRoute[] = get(start, ['transitions', inCoord], []);
   const path = new FlowSegment(start, {});
 
+  if (outFlows.length === 0) {
+    return null;
+  }
+
   let candidateParts: FlowPart[] = parts.reduce((acc: FlowPart[], part: FlowPart) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { [inCoord]: _, ...filteredTransitions } = part.transitions; // make a copy of transitions excluding inCoord
+
+    if (inCoord !== startCoord) {
+      Object.keys(filteredTransitions).forEach(k => {
+        // filter out any transitions that go back to the inCoord to remove loops
+        filteredTransitions[k] = filteredTransitions[k].filter(
+          route => (route.outCoords != inCoord)
+        );
+      });
+    }
+
     if (Object.getOwnPropertyNames(filteredTransitions).length !== 0) { // exclude parts without transitions
       acc.push({ ...part, transitions: filteredTransitions });
     }
     return acc;
   }, []);
-
+  let flowing = false;
   for (const outFlow of outFlows) {
     while (true) {
-      const nextPart = adjacentPart(candidateParts, outFlow.outCoords, start);
+      const nextPart =
+        (candidateParts.length === 0) ? null :
+          outFlow.internal ? start : adjacentPart(candidateParts, outFlow.outCoords, start);
+
       let nextPath: FlowSegment | null = null;
-      if (nextPart !== undefined && outFlow.outCoords !== startCoord) {
+      if (nextPart !== null) {
         nextPath = flowPath(candidateParts, nextPart, outFlow.outCoords, startCoord);
         if (nextPath !== null) {
           path.addChild(nextPath);
+          flowing = flowing || nextPath.flowing;
         }
       }
       if (nextPath !== null || outFlow.outCoords === startCoord) {
@@ -199,16 +240,24 @@ export const flowPath = (
           path.transitions[inCoord].push(outFlow);
         }
       }
-      if (!nextPart) {
+
+      if (nextPath === null && outFlow.outCoords !== startCoord) {
+        path.flowing = flowing;
+      }
+      if (!nextPart || outFlow.internal) {
         break;
       }
       candidateParts = candidateParts
         .filter(part => nextPart && !(nextPart.id === part.id));
     }
   };
+
   if (path.transitions[inCoord] === undefined) {
     return null;
   }
+
+  path.removeInternalFlows();
+
   path.transitions[inCoord] = [...new Set(path.transitions[inCoord])]; // remove duplicates
 
   let duplicated: FlowSegment | null = null;
@@ -223,6 +272,7 @@ export const flowPath = (
       }
     }
   } while (duplicated !== null);
+
   return path;
 };
 
@@ -253,7 +303,7 @@ export const addFlowForSegment = (
     const frictionInvTotal = segment.splits.reduce((acc, split) => acc + 1 / split.friction(), 0);
     segment.splits
       .forEach((child) => {
-        const invFriction = 1 / child.friction();
+        const invFriction = child.flowing ? 1 / child.friction() : 0;
         const splitFlows: LiquidFlow = mapValues(flows,
           flowVal => flowVal * invFriction / frictionInvTotal);
 
@@ -276,6 +326,7 @@ export const addFlowForSegment = (
     }
   );
 
+
   // add flow for next
   if (segment.next) {
     parts = addFlowForSegment(parts, segment.next, flows);
@@ -288,14 +339,15 @@ const addFlowFromPart = (parts, part): FlowPart[] => {
   for (const inCoords in part.transitions) {
     const outFlows = part.transitions[inCoords] || [];
     for (const outFlow of outFlows) {
-      const pressure: number = outFlow.pressure || 0;
-      const liquids: string[] | undefined = outFlow.liquids;
-      if (pressure && Array.isArray(liquids)) {
+      const liquids: string[] = outFlow.liquids || [];
+      if (outFlow.source && liquids.length > 0) {
         const path = flowPath(parts, part, inCoords);
-        if (path !== null) {
+        if (path !== null && path.flowing) {
+          const pressure: number = outFlow.pressure || 0;
           const startFlow: LiquidFlow = {};
           liquids.forEach((liquid: string) => {
-            startFlow[liquid] = pressure / path.friction();
+            const flow = path.flowing ? pressure / path.friction() : 0;
+            startFlow[liquid] = flow;
           });
           parts = addFlowForSegment(parts, path, startFlow);
         }

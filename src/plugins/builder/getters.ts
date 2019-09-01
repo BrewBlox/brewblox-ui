@@ -6,6 +6,7 @@ export const UP = '0.5,0,0';
 export const RIGHT = '1,0.5,0';
 export const DOWN = '0.5,1,0';
 export const LEFT = '0,0.5,0';
+export const CENTER = '0.5,0.5,0';
 export const IN_OUT = '0.5,0.5,-1';
 export const ACCELERATE_OTHERS = '*ACCELERATE_OTHERS*';
 export const DEFAULT_FRICTION = 1;

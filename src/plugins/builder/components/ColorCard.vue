@@ -5,12 +5,16 @@ import PartCard from './PartCard';
 
 @Component
 export default class ColorCard extends PartCard {
-
   get color(): string {
-    return this.part.settings.color || '';
+    return this.part.settings.color;
   }
 
-  set color(color: string) {
+  set color(val: string) {
+    const color = val ?
+      !val.startsWith('#') ?
+        `#${val}`
+        : val
+      : '';
     this.savePartSettings({ ...this.part.settings, color });
   }
 }
