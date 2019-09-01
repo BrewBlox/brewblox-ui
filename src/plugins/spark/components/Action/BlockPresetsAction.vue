@@ -4,6 +4,7 @@ import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { sparkStore } from '@/plugins/spark/store';
+import { BlockDataPreset,BlockSpec } from '@/plugins/spark/types';
 
 import BlockCrudComponent from '../BlockCrudComponent';
 
@@ -16,25 +17,25 @@ export default class BlockPresetsAction extends BlockCrudComponent {
   @Prop({ type: String, default: 'mdi-application-import' })
   readonly icon!: string;
 
-  get itemProps() {
+  get itemProps(): Record<string, any> {
     return {
       ...this.$attrs,
       ...this.$props,
     };
   }
 
-  get spec() {
+  get spec(): BlockSpec {
     return sparkStore.specs[this.block.type];
   }
 
-  presets() {
+  presets(): BlockDataPreset[] {
     return [
       { name: 'Default values', generate: this.spec.generate },
       ...this.spec.presets,
     ];
   }
 
-  choosePreset() {
+  choosePreset(): void {
     Dialog.create({
       title: 'Apply configuration preset',
       dark: true,

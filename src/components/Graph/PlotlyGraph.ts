@@ -73,7 +73,7 @@ export default class PlotlyGraph extends Vue {
   @Prop({ type: [String, Array, Object], default: '' })
   public readonly plotlyClass!: string | string[] | Record<string, string>;
 
-  private attachListeners() {
+  private attachListeners(): void {
     Object.keys(this.$listeners)
       .forEach(name => this.plotlyElement.on(name, (...args) => this.$emit(name, ...args)));
   }
@@ -102,15 +102,15 @@ export default class PlotlyGraph extends Vue {
       : this.layout;
   }
 
-  private relayoutPlot() {
+  private relayoutPlot(): void {
     Plotly.relayout(this.plotlyElement, this.resizedLayout());
   }
 
-  private resizePlot() {
+  private resizePlot(): void {
     Plotly.Plots.resize(this.plotlyElement);
   }
 
-  private async renderPlot() {
+  private async renderPlot(): Promise<void> {
     if (!this.plotlyElement) {
       return;
     }
@@ -131,7 +131,7 @@ export default class PlotlyGraph extends Vue {
     }
   }
 
-  private resizeHandler() {
+  private resizeHandler(): void {
     if (this.autoFit) {
       this.relayoutPlot();
     }

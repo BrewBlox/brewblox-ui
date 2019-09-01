@@ -14,7 +14,7 @@ export default class BlockInfoDialog extends DialogBase {
   @Prop({ type: Object, required: true })
   readonly block!: Block;
 
-  get groupsDisplay() {
+  get groupsDisplay(): string {
     const names = [...sparkStore.groupNames(this.block.serviceId), 'System Group'];
     return this.block.groups
       .map(val => names[val])

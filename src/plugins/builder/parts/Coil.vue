@@ -38,11 +38,11 @@ export default class Coil extends PartBase {
     ],
   };
 
-  get flowSpeed() {
+  get flowSpeed(): number {
     return this.flowOnCoord(COIL_BOTTOM);
   }
 
-  get liquids() {
+  get liquids(): string[] {
     return this.liquidOnCoord(COIL_BOTTOM);
   }
 }

@@ -26,13 +26,13 @@ export default class BlockDialog extends DialogBase {
   @Prop({ type: Boolean, default: false })
   public readonly clearable!: boolean;
 
-  get blockOpts() {
+  get blockOpts(): Block[] {
     return sparkStore.blockValues(this.serviceId)
       .filter(this.filter)
       .sort(objectStringSorter('id'));
   }
 
-  created() {
+  created(): void {
     this.block = deepCopy(this.value);
   }
 }

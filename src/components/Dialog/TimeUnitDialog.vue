@@ -16,33 +16,33 @@ export default class TimeUnitDialog extends DialogBase {
   @Prop({ type: String, default: 'Value' })
   public readonly label!: string;
 
-  findUnit(s: string) {
+  findUnit(s: string): string {
     const match = s.match(/^[0-9\.]*([a-z]*)/i);
     return match && match[1]
       ? match[1]
       : '';
   }
 
-  get defaultUnit() {
+  get defaultUnit(): string {
     return !this.findUnit(this.local || '')
       ? this.findUnit(unitDurationString(this.value))
       : '';
   }
 
-  get localNumber() {
+  get localNumber(): number {
     return parseDuration(`${this.local}${this.defaultUnit}`);
   }
 
-  normalize() {
+  normalize(): void {
     this.local = durationString(this.localNumber);
   }
 
-  save() {
+  save(): void {
     const val = new Unit(this.localNumber, 'ms');
     this.onDialogOk(val);
   }
 
-  created() {
+  created(): void {
     this.local = unitDurationString(this.value);
   }
 

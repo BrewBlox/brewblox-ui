@@ -14,22 +14,22 @@ export default class ColorField extends FieldBase {
   public readonly clearable!: boolean;
 
   @Emit('input')
-  public change(v: string | null) {
+  public change(v: string | null): string | null {
     return v === null
       ? v
       : v.replace('#', '');
   }
 
-  get color() {
+  get color(): string {
     const color = this.value || '#ffffff';
     return color.startsWith('#') ? color : `#${color}`;
   }
 
-  get colorString() {
+  get colorString(): string {
     return this.value || '<not set>';
   }
 
-  get colorStyle() {
+  get colorStyle(): Record<string, any> {
     return {
       color: this.color,
       backgroundColor: this.value ? this.color : null,
@@ -41,7 +41,7 @@ export default class ColorField extends FieldBase {
     };
   }
 
-  openDialog() {
+  openDialog(): void {
     if (this.readonly) {
       return;
     }

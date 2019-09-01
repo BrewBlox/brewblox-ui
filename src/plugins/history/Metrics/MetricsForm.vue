@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import parseDuration from 'parse-duration';
 import { Component } from 'vue-property-decorator';
 
-import { defaultLabel,targetBuilder, targetSplitter } from '@/components/Graph/functional';
+import { defaultLabel, targetBuilder, targetSplitter } from '@/components/Graph/functional';
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { durationString } from '@/helpers/functional';
 import { DisplayNames, historyStore } from '@/store/history';
@@ -52,28 +52,28 @@ export default class MetricsForm extends CrudComponent {
     this.saveConfig({ ...this.config, renames });
   }
 
-  get freshDuration() {
+  get freshDuration(): Record<string, number> {
     return this.config.freshDuration;
   }
 
-  get decimals() {
+  get decimals(): Record<string, number> {
     return this.config.decimals;
   }
 
-  fieldDecimals(field: string) {
+  fieldDecimals(field: string): number {
     return get(this.config.decimals, field, DEFAULT_DECIMALS);
   }
 
-  created() {
+  created(): void {
     historyStore.fetchKnownKeys();
   }
 
-  resetFreshDuration(field: string) {
+  resetFreshDuration(field: string): void {
     this.$delete(this.config.freshDuration, field);
     this.saveConfig(this.config);
   }
 
-  resetDecimals(field: string) {
+  resetDecimals(field: string): void {
     this.$delete(this.config.decimals, field);
     this.saveConfig(this.config);
   }

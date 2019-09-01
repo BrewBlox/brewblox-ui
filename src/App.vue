@@ -7,7 +7,7 @@ import { serviceStore } from '@/store/services';
 
 @Component
 export default class App extends Vue {
-  async created() {
+  async created(): Promise<void> {
     await Promise.all([
       serviceStore.setup(),
       dashboardStore.setup(),

@@ -53,7 +53,7 @@ export default class WizardTaskBase extends Vue {
   @Emit()
   protected finish(): void { }
 
-  public async executePrepared() {
+  public async executePrepared(): Promise<void> {
     try {
       // We're intentionally waiting for each async function
       // Actions may be async, but may have dependencies

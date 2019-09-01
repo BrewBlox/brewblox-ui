@@ -14,11 +14,11 @@ export default class DipTube extends PartBase {
     liquid: 'M0,25H20a5,5,0,0,1,5,5V40',
   };
 
-  get flowSpeed() {
+  get flowSpeed(): number {
     return -this.flowOnCoord(LEFT);
   }
 
-  get liquids() {
+  get liquids(): string[] {
     return this.liquidOnCoord(LEFT);
   }
 }

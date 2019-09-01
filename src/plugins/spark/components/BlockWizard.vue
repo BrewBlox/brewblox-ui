@@ -34,22 +34,22 @@ export default class BlockWizard extends Vue {
   public readonly filter!: (feature: string) => boolean;
 
   @Emit('created')
-  public onCreate(block: Block) {
+  public onCreate(block: Block): Block {
     return block;
   }
 
   @Emit('close')
-  public close() { }
+  public close(): void { }
 
-  get blockIdRules() {
+  get blockIdRules(): InputRule[] {
     return blockIdRules(this.serviceId);
   }
 
-  get createReady() {
+  get createReady(): boolean {
     return !!this.feature && !this.blockIdRules.some(rule => isString(rule(this.blockId)));
   }
 
-  get wizardOptions() {
+  get wizardOptions(): SelectOption[] {
     return providerStore.featuresById('Spark')
       .filter(feat => featureStore.wizardById(feat) === 'BlockWidgetWizard')
       .filter(this.filter)
@@ -60,7 +60,7 @@ export default class BlockWizard extends Vue {
       .sort(objectStringSorter('label'));
   }
 
-  filterFn(val, update) {
+  filterFn(val, update): void {
     if (val === '') {
       update(() => this.filteredOptions = this.wizardOptions);
       return;
@@ -73,7 +73,7 @@ export default class BlockWizard extends Vue {
     });
   }
 
-  ensureLocalBlock() {
+  ensureLocalBlock(): void {
     const typeId = this.feature.value;
     this.widget = this.widget || {
       id: uid(),
@@ -96,7 +96,7 @@ export default class BlockWizard extends Vue {
     };
   }
 
-  configureBlock() {
+  configureBlock(): void {
     this.ensureLocalBlock();
     const crud: BlockCrud = {
       widget: this.widget as DashboardItem,
@@ -114,14 +114,14 @@ export default class BlockWizard extends Vue {
     });
   }
 
-  closeDialog() {
+  closeDialog(): void {
     if (this.activeDialog) {
       this.activeDialog.hide();
       this.activeDialog = null;
     }
   }
 
-  async createBlock() {
+  async createBlock(): Promise<void> {
     if (!this.createReady) {
       return;
     }
@@ -144,7 +144,7 @@ export default class BlockWizard extends Vue {
     this.close();
   }
 
-  created() {
+  created(): void {
     this.feature =
       this.wizardOptions.find(opt => opt.value === this.initialFeature) || null;
   }

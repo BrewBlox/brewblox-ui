@@ -2,7 +2,7 @@
 import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import { prettify,Unit } from '@/helpers/units';
+import { prettify, Unit } from '@/helpers/units';
 
 import FieldBase from './FieldBase';
 
@@ -23,11 +23,11 @@ export default class UnitField extends FieldBase {
   public readonly unitTag!: string;
 
   @Emit('input')
-  public change(v: Unit) {
+  public change(v: Unit): Unit {
     return v;
   }
 
-  openDialog() {
+  openDialog(): void {
     if (this.readonly) {
       return;
     }

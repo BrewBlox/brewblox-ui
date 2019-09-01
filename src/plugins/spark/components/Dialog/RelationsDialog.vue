@@ -60,12 +60,12 @@ export default class RelationsDialog extends DialogBase {
   @Prop({ type: String, default: 'Block Relations' })
   public readonly title!: string;
 
-  get edges() {
+  get edges(): Edge[] {
     return this.relations
       .map(rel => ({ source: rel.source, target: rel.target, relation: rel.relation }));
   }
 
-  get drawnNodes() {
+  get drawnNodes(): Node[] {
     const findNode = (id: string): Node =>
       this.nodes.find(node => node.id === id) || { id, type: '???' };
 
@@ -82,7 +82,7 @@ export default class RelationsDialog extends DialogBase {
   }
 
   @Watch('relations', { immediate: true })
-  display() {
+  display(): void {
     setTimeout(() => this.calc() && setTimeout(() => this.draw(), 100), 100);
   }
 
@@ -92,7 +92,7 @@ export default class RelationsDialog extends DialogBase {
       return false;
     }
 
-    const nodeTemplate = (id: string, type: string) => {
+    const nodeTemplate = (id: string, type: string): string => {
       return `
         <div style="width: ${LABEL_WIDTH}px; height: ${LABEL_HEIGHT}px" ">
           <div class="type">${type}</div>
@@ -138,7 +138,7 @@ export default class RelationsDialog extends DialogBase {
     return true;
   }
 
-  draw() {
+  draw(): void {
     const renderFunc = new dagreRender();
     renderFunc(d3Select(this.diagram), this.graphObj);
     const outGraph = this.graphObj.graph();
@@ -166,14 +166,14 @@ export default class RelationsDialog extends DialogBase {
     });
   }
 
-  exportDiagram() {
+  exportDiagram(): void {
     this.exportBusy = true;
     // uses quasar "dark" as background color
     saveSvgAsPng(this.svg, 'block-relations.png', { backgroundColor: '#282c34' })
       .finally(() => this.exportBusy = false);
   }
 
-  openSettings(id: string) {
+  openSettings(id: string): void {
     showBlockDialog(sparkStore.blocks(this.serviceId)[id]);
   }
 }

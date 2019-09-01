@@ -63,11 +63,11 @@ export default class LinkedBlockCard extends PartCard {
     this.linked = { serviceId: this.serviceId, blockId };
   }
 
-  get serviceOptions() {
+  get serviceOptions(): string[] {
     return serviceStore.serviceIds;
   }
 
-  get compatibleTypes() {
+  get compatibleTypes(): string[] {
     if (!this.serviceId) {
       return [];
     }
@@ -76,11 +76,11 @@ export default class LinkedBlockCard extends PartCard {
       .reduce((acc, type) => [...acc, ...get(compatibleTable, type, [])], [...this.types]);
   }
 
-  get actualFilter() {
+  get actualFilter(): (link: Link) => boolean {
     if (this.filter) {
       return this.filter;
     }
-    return block => !this.compatibleTypes || this.compatibleTypes.includes(block.type);
+    return block => !this.compatibleTypes || this.compatibleTypes.includes(block.type || '');
   }
 
   get linkOpts(): Link[] {
@@ -93,7 +93,7 @@ export default class LinkedBlockCard extends PartCard {
       .sort(objectStringSorter('id'));
   }
 
-  create() {
+  create(): void {
     Dialog.create({
       component: 'BlockWizardDialog',
       root: this.$root,

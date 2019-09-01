@@ -21,7 +21,7 @@ export default class FermentSettingsTask extends WizardTaskBase {
     return sparkStore.units(this.config.serviceId).Temp;
   }
 
-  get targetOpts() {
+  get targetOpts(): SelectOption[] {
     return [
       {
         label: 'Beer',
@@ -35,20 +35,12 @@ export default class FermentSettingsTask extends WizardTaskBase {
   }
 
   defaultTemp(): Unit {
-    const defaultTempValues = { degC: 20, degF: 68, degK: 293 };
+    const degC = 20;
+    const defaultTempValues = { degC, degF: (degC * 9 / 5) + 32, degK: degC + 273.15 };
     return new Unit(defaultTempValues[this.userTemp] || 20, this.userTemp);
   }
 
-  blockType(newId: string): string {
-    for (const [from, to] of Object.entries(this.config.renamedBlocks)) {
-      if (to === newId) {
-        return sparkStore.blockById(this.config.serviceId, from).type;
-      }
-    }
-    throw new Error('Old block not found');
-  }
-
-  done() {
+  done(): void {
     const createdBlocks = defineCreatedBlocks(
       this.config,
       this.fridgeSetting,
@@ -69,7 +61,7 @@ export default class FermentSettingsTask extends WizardTaskBase {
     this.next();
   }
 
-  mounted() {
+  mounted(): void {
     this.fridgeSetting = this.defaultTemp();
     this.beerSetting = this.defaultTemp();
   }

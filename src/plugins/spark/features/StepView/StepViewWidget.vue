@@ -11,20 +11,22 @@ import { Block, ChangeField } from '@/plugins/spark/types';
 import { BlockChange, Step } from './types';
 
 interface ChangeDiff {
+  key: string;
+  oldV: string;
+  newV: string;
+  changed: boolean;
+}
+
+interface StepDiff {
   id: string;
-  diff: {
-    key: string;
-    oldV: string;
-    newV: string;
-    changed: boolean;
-  }[];
+  diff: ChangeDiff[];
 }
 
 @Component
 export default class StepViewWidget extends WidgetBase {
   applying = false;
 
-  get serviceId() {
+  get serviceId(): string {
     return this.widget.config.serviceId;
   }
 
@@ -72,7 +74,7 @@ export default class StepViewWidget extends WidgetBase {
       Dialog.create({
         component: 'ChangeConfirmDialog',
         title: 'Confirm change',
-        message: `Please confirm the ${change.title} value in ${block.id}.`,
+        message: `Please confirm the ${change.title} value in ${block.id}. Current value is '${block.data[key]}'.`,
         serviceId: block.serviceId,
         blockId: block.id,
         value,
@@ -84,7 +86,7 @@ export default class StepViewWidget extends WidgetBase {
     });
   }
 
-  async applyChanges(step: Step) {
+  async applyChanges(step: Step): Promise<void> {
     const changes = step.changes;
     const actualChanges: [Block, any][] = [];
     for (const change of changes) {
@@ -104,7 +106,7 @@ export default class StepViewWidget extends WidgetBase {
     this.steps = this.steps.map(s => s.id === step.id ? step : s);
   }
 
-  applyStep(step: Step) {
+  applyStep(step: Step): void {
     this.applying = true;
     this.applyChanges(step)
       .then(() => this.$q.notify({
@@ -124,13 +126,13 @@ export default class StepViewWidget extends WidgetBase {
       .finally(() => { this.applying = false; });
   }
 
-  openModal(openStep: string | null) {
+  openModal(openStep: string | null): void {
     this.showForm({
       getProps: () => ({ openStep }),
     });
   }
 
-  changeDiff(change: BlockChange) {
+  changeDiff(change: BlockChange): ChangeDiff[] {
     const block = sparkStore.blockById(this.serviceId, change.blockId);
     const spec = sparkStore.specs[block.type];
     return Object.entries(change.data)
@@ -148,7 +150,7 @@ export default class StepViewWidget extends WidgetBase {
       });
   }
 
-  stepDiff(step: Step): ChangeDiff[] {
+  stepDiff(step: Step): StepDiff[] {
     return step.changes.map(change => {
       return { id: change.blockId, diff: this.changeDiff(change) };
     });

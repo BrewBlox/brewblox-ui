@@ -16,14 +16,14 @@ export default class BlockGroupsAction extends BlockCrudComponent {
   @Prop({ type: String, default: 'mdi-checkbox-multiple-marked' })
   readonly icon!: string;
 
-  get itemProps() {
+  get itemProps(): Record<string, any> {
     return {
       ...this.$attrs,
       ...this.$props,
     };
   }
 
-  openDialog() {
+  openDialog(): void {
     Dialog.create({
       title: this.label,
       message: 'Choose Block groups. The Block will become inactive if it is not part of any active groups.',

@@ -27,11 +27,11 @@ export default class Link {
     return this.id;
   }
 
-  public copy() {
+  public copy(): Link {
     return new Link(this.id, this.type, this.driven);
   }
 
-  public isEqual(other: Link) {
+  public isEqual(other: Link): boolean {
     // Type does not have to be equal
     return other
       && this.id === other.id

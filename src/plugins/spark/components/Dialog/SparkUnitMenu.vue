@@ -24,7 +24,7 @@ export default class SparkUnitMenu extends DialogBase {
       .map(v => ({ label: prettify(v), value: v }));
   }
 
-  saveUnits(vals: UserUnits = this.units) {
+  saveUnits(vals: UserUnits = this.units): void {
     sparkStore.saveUnits([this.serviceId, vals])
       .catch(reason => this.$q.notify({
         icon: 'error',
@@ -33,7 +33,7 @@ export default class SparkUnitMenu extends DialogBase {
       }));
   }
 
-  mounted() {
+  mounted(): void {
     sparkStore.fetchAll(this.serviceId);
   }
 }

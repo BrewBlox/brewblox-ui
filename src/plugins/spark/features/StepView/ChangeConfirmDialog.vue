@@ -25,11 +25,11 @@ export default class ChangeConfirmDialog extends DialogBase {
   @Prop({ type: String, default: 'Value' })
   public readonly label!: string;
 
-  created() {
+  created(): void {
     this.local = this.value;
   }
 
-  save() {
+  save(): void {
     this.onDialogOk(this.local);
   }
 }

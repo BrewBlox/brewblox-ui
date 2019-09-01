@@ -25,15 +25,15 @@ export default class LinkField extends FieldBase {
   public readonly noCreate!: boolean;
 
   @Emit('input')
-  public change(v: Link) {
+  public change(v: Link): Link {
     return v;
   }
 
-  get displayValue() {
+  get displayValue(): string {
     return this.value.id || 'click to assign';
   }
 
-  openDialog() {
+  openDialog(): void {
     if (this.readonly) {
       return;
     }

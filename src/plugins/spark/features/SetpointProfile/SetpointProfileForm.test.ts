@@ -1,4 +1,4 @@
-import { shallowMount,Wrapper } from '@vue/test-utils';
+import { shallowMount, Wrapper } from '@vue/test-utils';
 import { setupSpark } from 'tests/setup';
 import Vue from 'vue';
 
@@ -93,7 +93,7 @@ describe('SetpointProfileForm.vue', () => {
       },
     ]);
 
-    const sync = () => {
+    const sync = (): void => {
       const { calls } = crud.saveBlock.mock;
       block = calls[calls.length - 1][0];
       crud = { ...crud, block };

@@ -22,7 +22,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
   fridgeSensor: any = null;
   beerSensor: any = null;
 
-  get pinOptions() {
+  get pinOptions(): SelectOption[] {
     return sparkStore.blockValues(this.config.serviceId)
       .filter(block => [Spark2PinsType, Spark3PinsType, DS2413Type].includes(block.type))
       .reduce(
@@ -37,13 +37,13 @@ export default class FermentHardwareTask extends WizardTaskBase {
       .map(channel => ({ label: `${channel.arrayId} ${channel.pinName}`, value: channel }));
   }
 
-  get sensorOptions() {
+  get sensorOptions(): string[] {
     return sparkStore.blockValues(this.config.serviceId)
       .filter(block => block.type === sensorOneWireType || block.type === sensorMockType)
       .map(block => block.id);
   }
 
-  get valuesOk() {
+  get valuesOk(): boolean {
     return [
       this.coolPin,
       this.heatPin,
@@ -69,15 +69,51 @@ export default class FermentHardwareTask extends WizardTaskBase {
     ];
   }
 
-  created() {
+  sensorTemp(id: string | null): string {
+    if (!id) {
+      return '';
+    }
+    return sparkStore.blockById(this.config.serviceId, id).data.value.toString();
+  }
+
+  get fridgeSensorTemp(): string {
+    return this.sensorTemp(this.fridgeSensor);
+  }
+
+  get beerSensorTemp(): string {
+    return this.sensorTemp(this.beerSensor);
+  }
+
+  pinConnectedStatus(channel: PinChannel | null): string {
+    if (!channel) {
+      return '';
+    }
+    const block = sparkStore.blockById(this.config.serviceId, channel.arrayId);
+    if ([Spark2PinsType, Spark3PinsType].includes(block.type)) {
+      return '';
+    }
+    return block.data.connected
+      ? `${channel.arrayId} is connected`
+      : `${channel.arrayId} is not connected`;
+  }
+
+  get coolPinStatus(): string {
+    return this.pinConnectedStatus(this.coolPin);
+  }
+
+  get heatPinStatus(): string {
+    return this.pinConnectedStatus(this.heatPin);
+  }
+
+  created(): void {
     this.discover();
   }
 
-  discover() {
+  discover(): void {
     sparkStore.fetchDiscoveredBlocks(this.config.serviceId);
   }
 
-  startBlockWizard() {
+  startBlockWizard(): void {
     Dialog.create({
       component: 'BlockWizardDialog',
       serviceId: this.config.serviceId,
@@ -85,7 +121,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
     });
   }
 
-  taskDone() {
+  taskDone(): void {
     this.config.heatPin = this.heatPin as PinChannel;
     this.config.coolPin = this.coolPin as PinChannel;
 
@@ -107,18 +143,24 @@ export default class FermentHardwareTask extends WizardTaskBase {
   <div>
     <q-card-section>
       <q-item>
-        <big>Hardware Blocks</big>
-      </q-item>
-      <q-item dark>
-        <q-item-section class="col-auto">
-          <q-btn unelevated label="Discover OneWire objects" color="primary" @click="discover" />
-          <q-tooltip>
-            OneWire temperature sensors and DS2413 chips can be discovered:
-            the Block will be created automatically.
-          </q-tooltip>
+        <q-item-section>
+          <big>Hardware Blocks</big>
         </q-item-section>
         <q-item-section class="col-auto">
-          <q-btn unelevated label="Create block" color="primary" @click="startBlockWizard" />
+          <q-btn flat round icon="refresh" @click="discover">
+            <q-tooltip>Discover OneWire Blocks</q-tooltip>
+          </q-btn>
+        </q-item-section>
+        <q-item-section class="col-auto">
+          <q-btn flat round icon="add" @click="startBlockWizard">
+            <q-tooltip>Create new Block</q-tooltip>
+          </q-btn>
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section class="text-italic">
+          You can unplug or heat sensors to identify them.
+          The current value will be shown under each dropdown menu.
         </q-item-section>
       </q-item>
       <q-item dark>
@@ -127,6 +169,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
             v-model="coolPin"
             :options="pinOptions"
             :rules="pinRules"
+            :hint="coolPinStatus"
             label="Cooler output"
             emit-value
             map-options
@@ -139,6 +182,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
             v-model="heatPin"
             :options="pinOptions"
             :rules="pinRules"
+            :hint="heatPinStatus"
             label="Heater output"
             emit-value
             map-options
@@ -154,6 +198,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
             :options="sensorOptions"
             :label="config.names.fridgeSensor"
             :rules="sensorRules"
+            :hint="fridgeSensorTemp"
             dark
             options-dark
           />
@@ -164,6 +209,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
             :options="sensorOptions"
             :label="config.names.beerSensor"
             :rules="sensorRules"
+            :hint="beerSensorTemp"
             dark
             options-dark
           />

@@ -16,7 +16,7 @@ export default class DisplaySettingsWidget extends BlockWidget {
     return slots;
   }
 
-  get footerRules() {
+  get footerRules(): InputRule[] {
     return [
       v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
     ];

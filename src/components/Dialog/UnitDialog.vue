@@ -18,13 +18,13 @@ export default class UnitDialog extends DialogBase {
   @Prop({ type: String, default: 'Value' })
   public readonly label!: string;
 
-  created() {
+  created(): void {
     this.local = this.value.value !== null
       ? roundNumber(this.value.value, this.decimals)
       : null;
   }
 
-  save() {
+  save(): void {
     this.onDialogOk(this.value.copy(this.local));
   }
 }

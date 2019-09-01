@@ -71,7 +71,7 @@ export default class HistoryGraph extends Vue {
       .filter(listener => listener !== null) as GraphValuesListener[];
   }
 
-  get error() {
+  get error(): string | null {
     if (!this.listeners || this.listeners.length === 0) {
       return 'No data';
     }
@@ -103,7 +103,7 @@ export default class HistoryGraph extends Vue {
       );
   }
 
-  addListeners() {
+  addListeners(): void {
     this.targets
       .forEach(target =>
         addPlotlyListener(
@@ -116,18 +116,18 @@ export default class HistoryGraph extends Vue {
         ));
   }
 
-  removeListeners() {
+  removeListeners(): void {
     this.listeners
       .forEach(listener =>
         historyStore.removeListener(listener));
   }
 
-  resetListeners() {
+  resetListeners(): void {
     this.removeListeners();
     this.addListeners();
   }
 
-  mounted() {
+  mounted(): void {
     if (!this.sharedListeners) {
       this.addListeners();
     } else {
@@ -136,7 +136,7 @@ export default class HistoryGraph extends Vue {
   }
 
   @Watch('policies', { immediate: true })
-  publishDownsamplingRate(newVal: Policies, oldVal: Policies) {
+  publishDownsamplingRate(newVal: Policies, oldVal: Policies): void {
     if (newVal && JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
       const downsampling = mapValues(newVal, policy =>
         policy
@@ -146,13 +146,13 @@ export default class HistoryGraph extends Vue {
     }
   }
 
-  destroyed() {
+  destroyed(): void {
     if (!this.sharedListeners) {
       this.removeListeners();
     }
   }
 
-  public refresh() {
+  public refresh(): void {
     this.revision += 1;
   }
 }

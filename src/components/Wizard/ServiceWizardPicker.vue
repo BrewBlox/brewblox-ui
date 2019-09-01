@@ -14,7 +14,7 @@ export default class ServiceWizardPicker extends Vue {
   serviceTypeModel: any = null;
   serviceWizardActive = false;
 
-  get wizardOptions() {
+  get wizardOptions(): SelectOption[] {
     return providerStore.providerIds
       .map(id => ({
         label: providerStore.displayNameById(id),
@@ -31,24 +31,24 @@ export default class ServiceWizardPicker extends Vue {
     ];
   }
 
-  setTitle(title: string) {
+  setTitle(title: string): void {
     this.$emit('title', title);
   }
 
-  reset() {
+  reset(): void {
     this.serviceWizardActive = false;
     this.setTitle('Service wizard');
   }
 
-  back() {
+  back(): void {
     this.$emit('back');
   }
 
-  close() {
+  close(): void {
     this.$emit('close');
   }
 
-  next() {
+  next(): void {
     const errors = this.serviceIdRules
       .map(rule => rule(this.serviceId))
       .filter(isString);
@@ -66,7 +66,7 @@ export default class ServiceWizardPicker extends Vue {
     this.serviceWizardActive = true;
   }
 
-  mounted() {
+  mounted(): void {
     this.reset();
     this.serviceTypeModel = this.wizardOptions[0];
   }

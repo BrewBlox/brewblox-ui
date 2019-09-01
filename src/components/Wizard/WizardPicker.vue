@@ -14,14 +14,14 @@ export default class WizardPicker extends Vue {
   readonly initialComponent!: string;
 
   @Emit()
-  close() { }
+  close(): void { }
 
-  reset() {
+  reset(): void {
     this.wizardComponent = null;
     this.title = 'Wizardry';
   }
 
-  mounted() {
+  mounted(): void {
     this.reset();
     this.wizardComponent = this.initialComponent;
   }

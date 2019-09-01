@@ -8,9 +8,10 @@ import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { spaceCased, suggestId, valOrDefault } from '@/helpers/functional';
 import { FermentConfig, FermentConfigNames } from '@/plugins/spark/arrangements/Ferment/types';
 import { typeName } from '@/plugins/spark/getters';
+import { blockIdRules } from '@/plugins/spark/helpers';
+import { GroupsBlock } from '@/plugins/spark/provider/types';
+import { sparkStore } from '@/plugins/spark/store';
 import { serviceStore } from '@/store/services';
-
-import { blockIdRules } from '../../helpers';
 
 
 @Component
@@ -20,13 +21,13 @@ export default class FermentNamingTask extends WizardTaskBase {
 
   chosenNames: Partial<FermentConfigNames> = {};
 
-  get serviceOpts() {
+  get serviceOpts(): SelectOption[] {
     return serviceStore.serviceValues
       .filter(svc => svc.type === typeName)
       .map(svc => ({ label: svc.title, value: svc.id }));
   }
 
-  get serviceId() {
+  get serviceId(): string {
     let id = this.config.serviceId;
     if (!id && this.serviceOpts.length > 0) {
       id = this.serviceOpts[0].value;
@@ -38,7 +39,17 @@ export default class FermentNamingTask extends WizardTaskBase {
     this.updateConfig<FermentConfig>({ ...this.config, serviceId });
   }
 
-  get arrangementId() {
+  get groupError(): string | null {
+    const block: GroupsBlock | undefined =
+      sparkStore.blockValues(this.serviceId)
+        .find(block => block.type === 'Groups');
+    const names = sparkStore.groupNames(this.serviceId);
+    return block && block.data.active.includes(0)
+      ? null
+      : `Group '${names[0]}' is disabled. Created blocks will be inactive.`;
+  }
+
+  get arrangementId(): string {
     return valOrDefault(this.config.arrangementId, 'Fermentation');
   }
 
@@ -46,7 +57,7 @@ export default class FermentNamingTask extends WizardTaskBase {
     this.updateConfig<FermentConfig>({ ...this.config, arrangementId: id });
   }
 
-  get prefix() {
+  get prefix(): string {
     return valOrDefault(this.config.prefix, this.arrangementId.slice(0, 7));
   }
 
@@ -54,20 +65,12 @@ export default class FermentNamingTask extends WizardTaskBase {
     this.updateConfig<FermentConfig>({ ...this.config, prefix });
   }
 
-  get dashboardTitle() {
+  get dashboardTitle(): string {
     return valOrDefault(this.config.dashboardTitle, `${this.arrangementId} Dashboard`);
   }
 
   set dashboardTitle(id: string) {
     this.updateConfig<FermentConfig>({ ...this.config, dashboardTitle: id });
-  }
-
-  get groups() {
-    return valOrDefault(this.config.groups, [0]);
-  }
-
-  set groups(groups: number[]) {
-    this.updateConfig<FermentConfig>({ ...this.config, groups });
   }
 
   get defaultNames(): FermentConfigNames {
@@ -88,7 +91,7 @@ export default class FermentNamingTask extends WizardTaskBase {
   }
 
   get names(): FermentConfigNames {
-    const validate = val => !blockIdRules(this.serviceId)
+    const validate = (val): boolean => !blockIdRules(this.serviceId)
       .map(rule => rule(val))
       .some(isString);
     return {
@@ -97,7 +100,7 @@ export default class FermentNamingTask extends WizardTaskBase {
     };
   }
 
-  get nameRules() {
+  get nameRules(): InputRule[] {
     return [
       ...blockIdRules(this.serviceId),
       v => Object.values(this.names)
@@ -105,7 +108,7 @@ export default class FermentNamingTask extends WizardTaskBase {
     ];
   }
 
-  get valuesOk() {
+  get valuesOk(): boolean {
     return [
       this.serviceId,
       this.dashboardTitle,
@@ -122,20 +125,20 @@ export default class FermentNamingTask extends WizardTaskBase {
     return result ? result : '';
   }
 
-  updateName(key: string, val: string) {
+  updateName(key: string, val: string): void {
     this.$set(this.chosenNames, key, val.trim());
   }
 
-  clearKey(key: string) {
+  clearKey(key: string): void {
     delete this.config[key];
     this.updateConfig<FermentConfig>(this.config);
   }
 
-  clearName(key: string) {
+  clearName(key: string): void {
     this.$delete(this.chosenNames, key);
   }
 
-  taskDone() {
+  taskDone(): void {
     this.updateConfig<FermentConfig>({
       ...this.config,
       serviceId: this.serviceId,
@@ -143,7 +146,7 @@ export default class FermentNamingTask extends WizardTaskBase {
       prefix: this.prefix,
       dashboardId: new UrlSafeString().generate(this.dashboardTitle),
       dashboardTitle: this.dashboardTitle,
-      groups: this.groups,
+      groups: [0],
       names: this.names,
       widgets: [],
       createdBlocks: [],
@@ -159,6 +162,11 @@ export default class FermentNamingTask extends WizardTaskBase {
   <div>
     <q-card-section style="height: 60vh">
       <q-scroll-area>
+        <CardWarning v-if="groupError">
+          <template #message>
+            {{ groupError }}
+          </template>
+        </CardWarning>
         <!-- Generic settings -->
         <q-expansion-item default-opened label="Arrangement settings" icon="settings" dense>
           <q-item dark>

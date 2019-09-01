@@ -16,18 +16,18 @@ export default class AnimatedArrows extends Vue {
   @Prop({ type: Number, default: 2 })
   readonly numArrows!: number;
 
-  get pathLength() {
+  get pathLength(): number {
     return svgPathProperties(this.path).getTotalLength();
   }
 
-  get duration() {
+  get duration(): number {
     if (this.speed && this.pathLength) {
       return this.pathLength / (25 * Math.abs(this.speed));
     }
     return 0;
   }
 
-  get reversed() {
+  get reversed(): boolean {
     return this.speed < 0;
   }
 
@@ -37,14 +37,14 @@ export default class AnimatedArrows extends Vue {
       .map(idx => `${idx * interval}s`);
   }
 
-  get transform() {
+  get transform(): string {
     // Flips the arrow
     return this.reversed
       ? 'scale (-1, 1)'
       : '';
   }
 
-  get keyPoints() {
+  get keyPoints(): string {
     // Makes the arrow travel end-to-start
     return this.reversed
       ? '1;0'

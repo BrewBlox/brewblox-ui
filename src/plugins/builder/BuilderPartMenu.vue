@@ -6,7 +6,7 @@ import { clampRotation, spaceCased } from '@/helpers/functional';
 
 import { SQUARE_SIZE } from './getters';
 import { builderStore } from './store';
-import { FlowPart } from './types';
+import { CardSpec, FlowPart } from './types';
 
 @Component
 export default class BuilderPartMenu extends Vue {
@@ -15,9 +15,9 @@ export default class BuilderPartMenu extends Vue {
   @Prop({ type: Object, required: true })
   readonly part!: FlowPart;
 
-  get cards() {
+  get cards(): CardSpec[] {
     return [
-      'PlacementCard',
+      { component: 'PlacementCard' },
       ...this.specs[this.part.type].cards,
     ];
   }
@@ -34,7 +34,7 @@ export default class BuilderPartMenu extends Vue {
       : [x, y];
   }
 
-  get displayScale() {
+  get displayScale(): number {
     const maxSize = Math.max(...this.part.size);
     if (maxSize >= 6) {
       return 0.5;

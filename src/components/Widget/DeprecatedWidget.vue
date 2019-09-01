@@ -9,11 +9,11 @@ const replacements = {
 
 @Component
 export default class DeprecatedWidget extends WidgetBase {
-  created() {
+  created(): void {
     this.saveWidget({ ...this.widget, feature: replacements[this.widget.feature] || 'Unknown' });
   }
 
-  render() {
+  render(): null {
     return null;
   }
 }

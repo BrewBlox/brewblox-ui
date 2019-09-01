@@ -2,9 +2,10 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
+import { GroupsBlock } from '@/plugins/spark/provider/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
-import { serviceStore } from '@/store/services';
+import { Service, serviceStore } from '@/store/services';
 
 
 @Component
@@ -13,24 +14,24 @@ export default class SparkGroupMenu extends DialogBase {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
-  get service() {
+  get service(): Service {
     return serviceStore.serviceById(this.serviceId);
   }
 
-  get groups() {
+  get groups(): GroupsBlock | null {
     return sparkStore.blockValues(this.service.id)
-      .find(block => block.type === 'Groups');
+      .find(block => block.type === 'Groups') || null;
   }
 
   get groupNames(): string[] {
     return sparkStore.groupNames(this.service.id);
   }
 
-  saveBlock(block: Block) {
+  saveBlock(block: Block): void {
     sparkStore.saveBlock([this.service.id, block]);
   }
 
-  saveGroupNames(vals: string[] = this.groupNames) {
+  saveGroupNames(vals: string[] = this.groupNames): void {
     sparkStore.updateGroupNames([this.service.id, vals])
       .catch(() => { });
   }

@@ -18,7 +18,7 @@ export default class RemoveBlockAction extends BlockCrudComponent {
   @Prop({ type: String, default: 'mdi-file-replace' })
   readonly icon!: string;
 
-  get itemProps() {
+  get itemProps(): Record<string, any> {
     return {
       ...this.$attrs,
       ...this.$props,
@@ -41,7 +41,7 @@ export default class RemoveBlockAction extends BlockCrudComponent {
     return copyName(idx);
   }
 
-  public startCloneBlock() {
+  public startCloneBlock(): void {
     Dialog.create({
       component: 'InputDialog',
       title: 'Clone Block',

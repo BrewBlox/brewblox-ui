@@ -7,11 +7,11 @@ import { serviceStore } from '@/store/services';
 
 @Component
 export default class ServiceWatchers extends Vue {
-  get watchers() {
+  get watchers(): { serviceId: string; component: string }[] {
     return serviceStore.serviceValues
       .map(service => ({
         serviceId: service.id,
-        component: providerStore.watcherById(service.type),
+        component: providerStore.watcherById(service.type) || '',
       }))
       .filter(w => !!w.component);
   }

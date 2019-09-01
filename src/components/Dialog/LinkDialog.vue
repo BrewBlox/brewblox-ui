@@ -33,7 +33,7 @@ export default class LinkDialog extends DialogBase {
   @Prop({ type: Boolean, default: false })
   public readonly noCreate!: boolean;
 
-  get compatibleTypes() {
+  get compatibleTypes(): string[] | null {
     if (!this.value.type) {
       return null;
     }
@@ -41,11 +41,11 @@ export default class LinkDialog extends DialogBase {
     return [this.value.type, ...get(compatibleTable, this.value.type, [])];
   }
 
-  get actualFilter() {
+  get actualFilter(): (link: Link) => boolean {
     if (this.filter) {
       return this.filter;
     }
-    return block => !this.compatibleTypes || this.compatibleTypes.includes(block.type);
+    return block => !this.compatibleTypes || this.compatibleTypes.includes(block.type || '');
   }
 
   get linkOpts(): Link[] {
@@ -61,15 +61,15 @@ export default class LinkDialog extends DialogBase {
       : null;
   }
 
-  updateLink(link: Link | null) {
+  updateLink(link: Link | null): void {
     this.link = link || new Link(null, this.value.type);
   }
 
-  edit() {
+  edit(): void {
     showBlockDialog(this.linkBlock);
   }
 
-  create() {
+  create(): void {
     Dialog.create({
       component: 'BlockWizardDialog',
       root: this.$root,
@@ -82,7 +82,7 @@ export default class LinkDialog extends DialogBase {
       });
   }
 
-  created() {
+  created(): void {
     this.link = this.value.copy();
   }
 }

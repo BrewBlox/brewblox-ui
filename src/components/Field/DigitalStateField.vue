@@ -22,11 +22,11 @@ export default class DigitalStateField extends Vue {
   readonly disable!: boolean;
 
   @Emit('input')
-  change(val: DigitalState) {
+  change(val: DigitalState): DigitalState {
     return val;
   }
 
-  get commonOpts() {
+  get commonOpts(): Record<string, string> {
     return {
       color: 'grey-9',
       toggleColor: 'primary',
@@ -35,7 +35,7 @@ export default class DigitalStateField extends Vue {
     };
   }
 
-  get options() {
+  get options(): Record<string, any> {
     return [
       {
         ...this.commonOpts,
@@ -50,11 +50,11 @@ export default class DigitalStateField extends Vue {
     ];
   }
 
-  get known() {
+  get known(): boolean {
     return !!this.options.find(opt => opt.value === this.value);
   }
 
-  toggle() {
+  toggle(): void {
     if (this.disable) {
       return;
     }

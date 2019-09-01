@@ -16,7 +16,7 @@ export default class SelectDialog extends DialogBase {
   @Prop({ type: Object, default: () => ({}) })
   public readonly selectProps!: any;
 
-  created() {
+  created(): void {
     this.local = this.value;
   }
 }

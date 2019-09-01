@@ -10,12 +10,12 @@ import { BalancerBlock } from './types';
 export default class BalancerWidget extends BlockWidget {
   readonly block!: BalancerBlock;
 
-  get clientNames() {
+  get clientNames(): Record<string, string> {
     return getClients(this.serviceId, this.blockId);
   }
 
-  clientName(id: number) {
-    return this.clientNames[id] || id || 'unknown';
+  clientName(id: number): string {
+    return this.clientNames[id] || `${id}` || 'unknown';
   }
 
   // TODO: implement

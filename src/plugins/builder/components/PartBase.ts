@@ -19,7 +19,7 @@ export default class PartBase extends Vue {
   }
 
   @Emit('dirty')
-  public invalidateFlows() { }
+  public invalidateFlows(): void { }
 
   public get part(): FlowPart {
     return {

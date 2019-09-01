@@ -58,8 +58,8 @@ export default class ConstraintsBase extends Vue {
     return (this.value.constraints as any).map(asEditable);
   }
 
-  protected label(k: string) {
-    return constraintLabels.get(k);
+  protected label(k: string): string {
+    return constraintLabels.get(k) || k;
   }
 
   @Emit('input')

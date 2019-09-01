@@ -6,7 +6,7 @@ import { Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { durationString } from '@/helpers/functional';
-import { DisplayNames, historyStore,Listener, QueryParams, QueryTarget } from '@/store/history';
+import { DisplayNames, historyStore, Listener, QueryParams, QueryTarget } from '@/store/history';
 
 import { addListener } from './actions';
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './getters';
@@ -54,11 +54,11 @@ export default class MetricsWidget extends WidgetBase {
       .filter(listener => listener !== null && !!listener.values) as Listener[];
   }
 
-  fieldFreshDuration(field: string) {
+  fieldFreshDuration(field: string): number {
     return get(this.widgetCfg.freshDuration, field, DEFAULT_FRESH_DURATION);
   }
 
-  fieldDecimals(field: string) {
+  fieldDecimals(field: string): number {
     return get(this.widgetCfg.decimals, field, DEFAULT_DECIMALS);
   }
 
@@ -77,7 +77,7 @@ export default class MetricsWidget extends WidgetBase {
     return `${this.widget.id}/${target.measurement}`;
   }
 
-  addListeners() {
+  addListeners(): void {
     this.targets
       .forEach(target =>
         addListener(
@@ -88,27 +88,27 @@ export default class MetricsWidget extends WidgetBase {
         ));
   }
 
-  removeListeners() {
+  removeListeners(): void {
     this.listeners
       .forEach(listener =>
         historyStore.removeListener(listener));
   }
 
-  resetListeners() {
+  resetListeners(): void {
     this.removeListeners();
     this.addListeners();
   }
 
   @Watch('widgetCfg', { deep: true })
-  regraph() {
+  regraph(): void {
     this.$nextTick(() => this.resetListeners());
   }
 
-  mounted() {
+  mounted(): void {
     this.addListeners();
   }
 
-  destroyed() {
+  destroyed(): void {
     this.removeListeners();
   }
 }

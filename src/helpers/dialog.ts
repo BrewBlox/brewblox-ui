@@ -9,7 +9,7 @@ import { featureStore } from '@/store/features';
 
 import { deserialize } from './units/parseObject';
 
-export const showBlockDialog = (block: Block | null, props: any = {}) => {
+export function showBlockDialog(block: Block | null, props: any = {}): void {
   if (!block) {
     return;
   }
@@ -42,7 +42,7 @@ export const showBlockDialog = (block: Block | null, props: any = {}) => {
   });
 };
 
-export function showImportDialog<T>(onSelected: (val: T) => void) {
+export function showImportDialog<T>(onSelected: (val: T) => void): void {
   const reader: FileReader = new FileReader();
   const input: HTMLInputElement = document.createElement('input');
 

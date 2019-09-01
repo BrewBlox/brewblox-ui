@@ -26,13 +26,13 @@ export default class SessionViewForm extends CrudComponent {
       .sort(objectSorter('name'));
   }
 
-  get graphSession() {
+  get graphSession(): Session | null {
     return this.graphSessionId
-      ? this.sessions.find(session => session.id === this.graphSessionId)
+      ? this.sessions.find(session => session.id === this.graphSessionId) || null
       : null;
   }
 
-  get graphModalOpen() {
+  get graphModalOpen(): boolean {
     return this.graphSessionId !== null;
   }
 
@@ -42,7 +42,7 @@ export default class SessionViewForm extends CrudComponent {
     }
   }
 
-  updateSession(session: Session) {
+  updateSession(session: Session): void {
     session.graphCfg.layout.title = session.name;
     this.saveConfig({
       ...this.widgetConfig,
@@ -51,7 +51,7 @@ export default class SessionViewForm extends CrudComponent {
     });
   }
 
-  startSession(session: Session, time: number) {
+  startSession(session: Session, time: number): void {
     if (time && session.end && time > session.end) {
       this.$q.notify({ message: 'Session start must be before its end' });
       return;
@@ -61,7 +61,7 @@ export default class SessionViewForm extends CrudComponent {
     this.updateSession(session);
   }
 
-  endSession(session: Session, time: number) {
+  endSession(session: Session, time: number): void {
     if (time && session.start && time < session.start) {
       this.$q.notify({ message: 'Session end must be after its start' });
       return;
@@ -71,7 +71,7 @@ export default class SessionViewForm extends CrudComponent {
     this.updateSession(session);
   }
 
-  deleteSession(session: Session) {
+  deleteSession(session: Session): void {
     this.saveConfig({
       ...this.widgetConfig,
       sessions: this.sessions
@@ -79,7 +79,7 @@ export default class SessionViewForm extends CrudComponent {
     });
   }
 
-  duplicateSession(session: Session) {
+  duplicateSession(session: Session): void {
     const name = session.name;
     const existingNames = this.sessions.map(s => s.name);
 
@@ -100,28 +100,28 @@ export default class SessionViewForm extends CrudComponent {
     });
   }
 
-  sessionSelected(session: Session) {
+  sessionSelected(session: Session): string[] {
     return targetSplitter(session.graphCfg.targets);
   }
 
-  updateSessionSelected(session: Session, selected: string[]) {
+  updateSessionSelected(session: Session, selected: string[]): void {
     session.graphCfg.targets = targetBuilder(selected || [], false);
     this.updateSession(session);
   }
 
-  updateSessionRenames(session: Session, vals: DisplayNames) {
+  updateSessionRenames(session: Session, vals: DisplayNames): void {
     session.graphCfg.renames = vals;
     this.updateSession(session);
   }
 
-  sessionDuration(session: Session) {
+  sessionDuration(session: Session): string {
     if (session.start === null || session.end === null) {
       return '---';
     }
     return durationString(session.end - session.start);
   }
 
-  created() {
+  created(): void {
     historyStore.fetchKnownKeys();
   }
 }

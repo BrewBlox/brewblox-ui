@@ -9,7 +9,7 @@ import { ActuatorPwmBlock } from './types';
 export default class ActuatorPwmWidget extends BlockWidget {
   readonly block!: ActuatorPwmBlock;
 
-  get isConstrained() {
+  get isConstrained(): boolean {
     return this.block.data.enabled
       && this.block.data.setting !== this.block.data.desiredSetting;
   }

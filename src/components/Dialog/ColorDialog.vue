@@ -13,7 +13,7 @@ export default class ColorDialog extends DialogBase {
   @Prop({ type: Boolean, default: false })
   public readonly clearable!: boolean;
 
-  created() {
+  created(): void {
     this.local = this.value;
   }
 }

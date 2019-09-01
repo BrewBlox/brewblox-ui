@@ -14,12 +14,12 @@ export default class DrivenIndicator extends Vue {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
-  get driveChains() {
+  get driveChains(): string[][] {
     return sparkStore.drivenChains(this.serviceId)
       .filter(chain => chain[0] === this.blockId);
   }
 
-  get textChains() {
+  get textChains(): string[][] {
     return this.driveChains
       .map(chain => chain
         .slice(1)
@@ -30,7 +30,7 @@ export default class DrivenIndicator extends Vue {
         }));
   }
 
-  get isDriven() {
+  get isDriven(): boolean {
     return this.textChains.length > 0;
   }
 
@@ -39,7 +39,7 @@ export default class DrivenIndicator extends Vue {
     return chain[chain.length - 1];
   }
 
-  showDialog(chainIdx: number) {
+  showDialog(chainIdx: number): void {
     showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.bossDriver(chainIdx)));
   }
 }

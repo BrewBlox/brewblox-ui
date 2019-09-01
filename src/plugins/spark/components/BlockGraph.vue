@@ -37,7 +37,7 @@ export default class BlockGraph extends Vue {
     return cfg;
   }
 
-  get dialogOpen() {
+  get dialogOpen(): boolean {
     return this.value;
   }
 
@@ -57,7 +57,7 @@ export default class BlockGraph extends Vue {
     };
   }
 
-  get targetKeys() {
+  get targetKeys(): string[][] {
     return targetSplitter(this.graphCfg.targets)
       .map(key => [key, this.graphCfg.renames[key] || key]);
   }
@@ -66,15 +66,15 @@ export default class BlockGraph extends Vue {
     return defaultPresets();
   }
 
-  isRightAxis(key: string) {
+  isRightAxis(key: string): boolean {
     return this.graphCfg.axes[key] === 'y2';
   }
 
-  axisLabel(key: string) {
+  axisLabel(key: string): string {
     return this.isRightAxis(key) ? 'Y2' : 'Y1';
   }
 
-  updateKeySide(key: string, isRight: boolean) {
+  updateKeySide(key: string, isRight: boolean): void {
     this.change({
       ...this.graphCfg,
       axes: {
@@ -84,14 +84,14 @@ export default class BlockGraph extends Vue {
     });
   }
 
-  applyPreset(preset: QueryParams) {
+  applyPreset(preset: QueryParams): void {
     this.change({
       ...this.graphCfg,
       params: { ...preset },
     });
   }
 
-  updateDuration() {
+  updateDuration(): void {
     Dialog.create({
       component: 'InputDialog',
       title: 'Duration',
@@ -105,7 +105,7 @@ export default class BlockGraph extends Vue {
   }
 
   @Watch('graphCfg')
-  onCfgChange(newVal) {
+  onCfgChange(newVal): void {
     // Vue considers configuration "changed" with every block data update
     // To avoid constantly refreshing listeners, we need to do a deep compare
     if (JSON.stringify(newVal) !== this.configString) {
@@ -114,7 +114,7 @@ export default class BlockGraph extends Vue {
     }
   }
 
-  created() {
+  created(): void {
     this.configString = JSON.stringify(this.graphCfg);
   }
 }

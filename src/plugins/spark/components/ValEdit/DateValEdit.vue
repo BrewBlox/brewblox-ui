@@ -9,7 +9,7 @@ export default class DateValEdit extends ValEdit {
   @Prop({ type: Number, default: 1 })
   readonly timeScale!: number;
 
-  get scaledField() {
+  get scaledField(): number {
     return this.field * this.timeScale;
   }
 
@@ -17,7 +17,7 @@ export default class DateValEdit extends ValEdit {
     this.saveField(Math.round(val / this.timeScale));
   }
 
-  get displayVal() {
+  get displayVal(): string {
     return new Date(this.scaledField).toLocaleString();
   }
 }

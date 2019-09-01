@@ -14,18 +14,18 @@ export default class Pump extends PartBase {
     return settingsBlock(this.part, 'actuator');
   }
 
-  get enabled() {
+  get enabled(): boolean {
     return !!this.actuatorBlock
       ? Boolean(this.actuatorBlock.data.state === DigitalState.Active)
       : Boolean(this.settings.enabled);
   }
 
-  get liquids() {
+  get liquids(): string[] {
     return this.liquidOnCoord(LEFT);
   }
 
   @Watch('actuatorBlock')
-  triggerUpdate(block, prevBlock) {
+  triggerUpdate(block, prevBlock): void {
     if (block === null
       || prevBlock === null
       || block.data.state !== prevBlock.data.state) {
