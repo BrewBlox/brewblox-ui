@@ -153,7 +153,8 @@ describe('A single path without splits', () => {
   });
 
   it('Should have a friction value of 3', () => {
-    expect(path.friction()).toEqual(3);
+    const { friction, pressureDiff } = path.friction();
+    expect(friction).toEqual(3);
   });
 
   it('Should have a flow of value of 2 for all parts', () => {
@@ -311,7 +312,8 @@ describe('A path with a split, but no joins', () => {
   });
 
   it('Should have a friction value of 3.5', () => {
-    expect(path.friction()).toEqual(3.5);
+    const { friction, pressureDiff } = path.friction();
+    expect(friction).toEqual(3.5);
   });
 
   it('Should have a flow of value of 4 total and 2 for each split', () => {
@@ -517,7 +519,8 @@ describe('A path that forks and rejoins', () => {
   });
 
   it('Should have a friction value of 5.5', () => {
-    expect(path.friction()).toEqual(5.5);
+    const { friction, pressureDiff } = path.friction();
+    expect(friction).toEqual(5.5);
   });
 
   it('Should have a flow of value of 2 total and 1 for each split', () => {
@@ -1277,7 +1280,8 @@ describe('A kettle with flow back to itself', () => {
         ]);
 
 
-      expect(path.friction()).toEqual(5);
+      const { friction, pressureDiff } = path.friction();
+      expect(friction).toEqual(5);
     });
 
 
@@ -1331,7 +1335,8 @@ describe('A kettle with flow back to itself', () => {
           'Kettle',
         ]);
 
-      expect(path.friction()).toEqual(5);
+      const { friction, pressureDiff } = path.friction();
+      expect(friction).toEqual(5);
     });
 
     it('Should have flow 2', () => {

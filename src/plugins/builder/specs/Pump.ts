@@ -24,8 +24,8 @@ const spec: PartSpec = {
       ? part.settings.pressure || DEFAULT_PUMP_PRESSURE
       : 0;
     return {
-      [LEFT]: [{ outCoords: RIGHT, sink: true }],
-      [RIGHT]: [{ outCoords: LEFT, pressure, source: true, liquids: [ACCELERATE_OTHERS] }],
+      [LEFT]: [{ outCoords: RIGHT, pressure: -pressure }],
+      [RIGHT]: [{ outCoords: LEFT, pressure }],
     };
   },
   interactHandler: (part: PersistentPart, updater: PartUpdater) => {

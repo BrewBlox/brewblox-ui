@@ -1,5 +1,6 @@
 import { DEFAULT_FRICTION } from './getters';
-import { FlowPart, Transitions } from './types';
+import { FlowPart, Transitions, PathFriction } from './types';
+import { path } from 'd3';
 
 export class FlowSegment {
   public constructor(part: FlowPart, transitions: Transitions) {
@@ -29,19 +30,33 @@ export class FlowSegment {
     }
   }
 
-  public friction(): number {
+  public friction(): PathFriction {
     let series = this.root.type !== 'Kettle' ? DEFAULT_FRICTION : 0;
     let parallel = 0;
+    let totalPressureDiff = 0;
+
+    Object.values(this.transitions).forEach(route => {
+      route.forEach(outFlow => {
+        if (outFlow.pressure) {
+          totalPressureDiff += outFlow.pressure;
+        }
+      });
+    });
+
+    console.log(this);
     this.splits.forEach(splitPath => {
-      const splitFriction = splitPath.friction();
+      const { friction, pressureDiff } = splitPath.friction();
       parallel = (parallel === 0)
-        ? splitFriction
-        : parallel * splitFriction / (parallel + splitFriction);
+        ? friction
+        : parallel * friction / (parallel + friction);
     });
     if (this.next !== null) {
-      series += this.next.friction();
+      const { friction, pressureDiff } = this.next.friction();
+      series += friction;
+      totalPressureDiff += pressureDiff;
+      console.log(pressureDiff);
     }
-    return parallel + series;
+    return { pressureDiff: totalPressureDiff, friction: parallel + series };
   }
 
   public reduceSegments(func: (acc: any, segment: FlowSegment) => any, acc: any): any {
