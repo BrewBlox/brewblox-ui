@@ -73,14 +73,22 @@ export class FlowSegment {
     return JSON.stringify(this) === JSON.stringify(other);
   }
 
-  public removeInternalFlows() {
+  public removeInternalFlows(): void {
     if (this.splits.length !== 0) {
       return;
     }
 
     if (this.next) {
       this.next.removeInternalFlows();
-      if (this.next.root.id === this.root.id) {
+      if (this.next && this.next.root.id === this.root.id) {
+        const nextTransitions = { ...this.next.transitions };
+        Object.entries(this.transitions).forEach(([k, v]) => {
+          v.forEach(outFlow => {
+            if (nextTransitions[outFlow.outCoords]) {
+              this.transitions[k] = nextTransitions[outFlow.outCoords];
+            }
+          });
+        });
         this.splits = this.next.splits;
         this.next = this.next.next;
       }
