@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { Unit } from '@/helpers/units';
 import { MutexLink } from '@/helpers/units/KnownLinks';
 
@@ -32,7 +32,7 @@ export default class DigitalConstraints extends ConstraintsBase {
   }
 
   addConstraint(): void {
-    Dialog.create({
+    createDialog({
       title: 'Add constraint',
       dark: true,
       cancel: true,

@@ -141,7 +141,7 @@ export default class PlotlyGraph extends Vue {
   }
 
   public created(): void {
-    const updateFunc = debounce(this.renderPlot, 50, false);
+    const updateFunc = debounce(this.renderPlot, 50, false) as (this: this, n: any, o: any) => void;
 
     this.$watch('config', updateFunc);
     this.$watch('data', updateFunc);

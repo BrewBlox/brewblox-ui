@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { dateString, shortDateString } from '@/helpers/functional';
 
 import FieldBase from './FieldBase';
@@ -40,7 +40,7 @@ export default class DatetimeField extends FieldBase {
       return;
     }
 
-    Dialog.create({
+    createDialog({
       component: 'DatetimeDialog',
       title: this.title,
       message: this.message,

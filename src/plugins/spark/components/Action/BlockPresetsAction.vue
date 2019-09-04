@@ -1,10 +1,10 @@
 <script lang="ts">
 
-import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockDataPreset,BlockSpec } from '@/plugins/spark/types';
+import { BlockDataPreset, BlockSpec } from '@/plugins/spark/types';
 
 import BlockCrudComponent from '../BlockCrudComponent';
 
@@ -36,20 +36,20 @@ export default class BlockPresetsAction extends BlockCrudComponent {
   }
 
   choosePreset(): void {
-    Dialog.create({
+    createDialog({
       title: 'Apply configuration preset',
       dark: true,
       cancel: true,
       options: {
         type: 'radio',
-        model: null,
+        model: undefined,
         // Classes are not correctly emitted by onOk
         items: this.presets()
           .map((p, idx) => ({ label: p.name, value: idx })),
       },
     })
       .onOk(idx => {
-        if (idx === null) {
+        if (idx === undefined) {
           return;
         }
         const preset = this.presets()[idx];

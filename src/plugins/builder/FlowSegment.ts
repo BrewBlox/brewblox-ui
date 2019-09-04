@@ -58,7 +58,7 @@ export class FlowSegment {
     return JSON.stringify(this) === JSON.stringify(other);
   }
 
-  public removeInternalFlows() {
+  public removeInternalFlows(): void {
     if (this.splits.length !== 0) {
       return;
     }

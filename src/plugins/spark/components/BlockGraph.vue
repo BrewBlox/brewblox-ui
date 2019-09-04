@@ -1,5 +1,4 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import Vue from 'vue';
 import { Component, Emit, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
@@ -8,6 +7,7 @@ import { targetSplitter } from '@/components/Graph/functional';
 import { defaultPresets } from '@/components/Graph/getters';
 import HistoryGraph from '@/components/Graph/HistoryGraph.vue';
 import { GraphConfig } from '@/components/Graph/types';
+import { createDialog } from '@/helpers/dialog';
 import { durationString } from '@/helpers/functional';
 import { QueryParams } from '@/store/history';
 
@@ -92,7 +92,7 @@ export default class BlockGraph extends Vue {
   }
 
   updateDuration(): void {
-    Dialog.create({
+    createDialog({
       component: 'InputDialog',
       title: 'Duration',
       root: this.$root,

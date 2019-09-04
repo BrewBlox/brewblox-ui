@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
 import FieldBase from './FieldBase';
@@ -37,7 +37,7 @@ export default class GroupsField extends FieldBase {
       return;
     }
 
-    Dialog.create({
+    createDialog({
       title: this.title,
       message: this.message,
       dark: true,

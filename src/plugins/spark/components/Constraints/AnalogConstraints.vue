@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { BalancerLink } from '@/helpers/units/KnownLinks';
 
 import { analogConstraintLabels } from '../../helpers';
@@ -35,7 +35,7 @@ export default class AnalogConstraints extends ConstraintsBase {
   }
 
   addConstraint(): void {
-    Dialog.create({
+    createDialog({
       title: 'Add constraint',
       dark: true,
       cancel: true,

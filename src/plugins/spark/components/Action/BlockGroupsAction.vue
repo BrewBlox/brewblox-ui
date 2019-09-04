@@ -1,8 +1,8 @@
 <script lang="ts">
 
-import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
 import BlockCrudComponent from '../BlockCrudComponent';
@@ -24,7 +24,7 @@ export default class BlockGroupsAction extends BlockCrudComponent {
   }
 
   openDialog(): void {
-    Dialog.create({
+    createDialog({
       title: this.label,
       message: 'Choose Block groups. The Block will become inactive if it is not part of any active groups.',
       dark: true,

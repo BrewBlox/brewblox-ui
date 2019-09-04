@@ -1,8 +1,8 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/Field/FieldBase';
+import { createDialog } from '@/helpers/dialog';
 import { constraintLabels } from '@/plugins/spark/helpers';
 
 import { ConstraintsObj } from './ConstraintsBase';
@@ -43,7 +43,7 @@ export default class ConstraintsField extends FieldBase {
   }
 
   openDialog(): void {
-    Dialog.create({
+    createDialog({
       component: 'ConstraintsDialog',
       title: this.title,
       message: this.message,

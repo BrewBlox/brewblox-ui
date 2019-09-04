@@ -1,9 +1,9 @@
 <script lang="ts">
 import get from 'lodash/get';
-import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
+import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
@@ -70,7 +70,7 @@ export default class LinkDialog extends DialogBase {
   }
 
   create(): void {
-    Dialog.create({
+    createDialog({
       component: 'BlockWizardDialog',
       root: this.$root,
       serviceId: this.serviceId,

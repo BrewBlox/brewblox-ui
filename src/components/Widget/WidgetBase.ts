@@ -1,7 +1,7 @@
-import { Dialog } from 'quasar';
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { DashboardItem } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -40,7 +40,7 @@ export default class WidgetBase extends Vue {
   }
 
   public showForm(args: Record<string, any> = {}): void {
-    this.activeDialog = Dialog.create({
+    this.activeDialog = createDialog({
       component: 'FormDialog',
       getCrud: () => this.crud,
       ...args,

@@ -1,9 +1,9 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import shortid from 'shortid';
 import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
+import { createDialog } from '@/helpers/dialog';
 import { shortDateString } from '@/helpers/functional';
 
 import { Session, SessionViewConfig } from './types';
@@ -64,7 +64,7 @@ export default class SessionViewWidget extends WidgetBase {
   }
 
   createSession(): void {
-    Dialog.create({
+    createDialog({
       title: 'Create session',
       dark: true,
       ok: 'Create',
