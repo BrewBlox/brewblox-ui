@@ -14,7 +14,6 @@ import set from 'lodash/set';
 import { Coordinates } from '@/helpers/coordinates';
 
 import { FlowSegment } from './FlowSegment';
-
 import {
   CalculatedFlows,
   FlowPart,
@@ -120,7 +119,7 @@ const mergeFlows = (flows: CalculatedFlows): CalculatedFlows => {
 
       let toMerge = coordFlows;
 
-      let [positive, negative, posTotal, negTotal] = splitPosNeg(toMerge);
+      const [positive, negative, posTotal, negTotal] = splitPosNeg(toMerge);
 
       const total = posTotal + negTotal;
       // if flow exists in both directions, only keep the biggest and scale it down to the net flow

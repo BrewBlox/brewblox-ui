@@ -1,6 +1,7 @@
+import { entryReducer } from '@/helpers/functional';
+
 import { DEFAULT_FRICTION } from './getters';
-import { FlowPart, Transitions, PathFriction } from './types';
-import { path } from 'd3';
+import { FlowPart, PathFriction, Transitions } from './types';
 
 export class FlowSegment {
   public constructor(part: FlowPart, transitions: Transitions) {
@@ -30,33 +31,37 @@ export class FlowSegment {
     }
   }
 
-  public friction(): PathFriction {
-    let series = this.root.type !== 'Kettle' ? DEFAULT_FRICTION : 0;
-    let parallel = 0;
-    let totalPressureDiff = 0;
+  public friction(input: PathFriction): PathFriction {
+    const equivalentFriction = (toTransform: PathFriction[], splitInput: PathFriction): number => {
+      // Apply Millman’s Theorem Equation to calculate node pressure on the split
+      const allPaths = [splitInput, ...toTransform.map(entry => ({
+        pressureDiff: -entry.pressureDiff,
+        friction: entry.friction,
+      }))];
+      const num = allPaths.reduce((acc, p) => p.friction ? acc + p.pressureDiff / p.friction : acc, 0);
+      const denum = allPaths.reduce((acc, p) => p.friction ? acc + 1 / p.friction : acc, 0);
+      const nodePressure = num / denum;
 
-    Object.values(this.transitions).forEach(route => {
-      route.forEach(outFlow => {
-        if (outFlow.pressure) {
-          totalPressureDiff += outFlow.pressure;
-        }
-      });
-    });
+      // convert pressure difference + friction on each split to only an equivalent (possibly negative) friction
+      const equivalentSplitFrictions = toTransform.map((entry): number =>
+        nodePressure * entry.friction / (nodePressure + entry.pressureDiff));
+      const eqFriction = 1 / equivalentSplitFrictions.reduce((acc, entry) => acc + 1 / entry, 0);
+      return eqFriction;
+    };
 
-    console.log(this);
-    this.splits.forEach(splitPath => {
-      const { friction, pressureDiff } = splitPath.friction();
-      parallel = (parallel === 0)
-        ? friction
-        : parallel * friction / (parallel + friction);
-    });
-    if (this.next !== null) {
-      const { friction, pressureDiff } = this.next.friction();
-      series += friction;
-      totalPressureDiff += pressureDiff;
-      console.log(pressureDiff);
+    const series: PathFriction = this.next ? this.next.friction(input) : input;
+    if (Object(this.transitions).values > 1) {
+      // split
+      if (this.splits.length > 0) {
+        const splitPF = this.splits.map(split => split.friction(series));
+        const splitFriction = equivalentFriction(splitPF, { pressureDiff: 10, friction: 10 });
+        series.friction = series.friction + splitFriction;
+      }
+      else {
+        throw ('Found multiple transitions but no split path');
+      }
     }
-    return { pressureDiff: totalPressureDiff, friction: parallel + series };
+    return series;
   }
 
   public reduceSegments(func: (acc: any, segment: FlowSegment) => any, acc: any): any {
