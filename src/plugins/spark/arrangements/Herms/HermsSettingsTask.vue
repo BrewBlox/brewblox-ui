@@ -5,7 +5,8 @@ import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
-import { createActions, defineChangedBlocks, defineCreatedBlocks, defineLayouts, defineWidgets } from './changes';
+import { createActions, defineChangedBlocks, defineCreatedBlocks, defineWidgets } from './changes';
+import { defineLayouts } from './changes-layout';
 import { HermsConfig } from './types';
 
 
