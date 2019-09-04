@@ -1,8 +1,9 @@
 import Vue from 'vue';
-import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+import { Action, getModule,Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
+import { objReducer } from '@/helpers/functional';
 import store from '@/store';
-import providerStore from '@/store/providers';
+import { providerStore } from '@/store/providers';
 
 import {
   createService as createServiceInApi,
@@ -21,6 +22,8 @@ export interface Service {
   _rev?: string;
 }
 
+const rawError = true;
+
 const initService = async (service: Service): Promise<void> => {
   await providerStore.onAddById(service.type)(service);
   await providerStore.onFetchById(service.type)(service);
@@ -28,7 +31,7 @@ const initService = async (service: Service): Promise<void> => {
 
 @Module({ store, namespaced: true, dynamic: true, name: 'services' })
 export class ServiceModule extends VuexModule {
-  public replicating: boolean = false;
+  public replicating = false;
   public services: Record<string, Service> = {};
 
   public get serviceIds(): string[] {
@@ -67,7 +70,7 @@ export class ServiceModule extends VuexModule {
 
   @Mutation
   public commitAllServices(services: Service[]): void {
-    this.services = services.reduce((acc, service) => ({ ...acc, [service.id]: service }), {});
+    this.services = services.reduce(objReducer('id'), {});
   }
 
   @Mutation
@@ -75,7 +78,7 @@ export class ServiceModule extends VuexModule {
     Vue.delete(this.services, service.id);
   }
 
-  @Action
+  @Action({ rawError })
   public async createService(service: Service): Promise<Service> {
     const created = await createServiceInApi(service);
     this.commitService(created);
@@ -83,18 +86,18 @@ export class ServiceModule extends VuexModule {
     return created;
   }
 
-  @Action({ commit: 'commitService' })
+  @Action({ rawError, commit: 'commitService' })
   public async saveService(service: Service): Promise<Service> {
     return await persistServiceInApi(service);
   }
 
-  @Action({ commit: 'commitRemoveService' })
+  @Action({ rawError, commit: 'commitRemoveService' })
   public async removeService(service: Service): Promise<Service> {
     await providerStore.onRemoveById(service.type)(service);
     return await removeServiceInApi(service);
   }
 
-  @Action
+  @Action({ rawError })
   public async updateServiceOrder(ids: string[]): Promise<void> {
     await Promise.all(
       ids.map(async (id, idx) => {
@@ -103,7 +106,7 @@ export class ServiceModule extends VuexModule {
       }));
   }
 
-  @Action
+  @Action({ rawError })
   public async setup(): Promise<void> {
     /* eslint-disable no-underscore-dangle */
     const onChange = async (service: Service): Promise<void> => {
@@ -131,4 +134,4 @@ export class ServiceModule extends VuexModule {
   }
 }
 
-export default getModule(ServiceModule);
+export const serviceStore = getModule(ServiceModule);

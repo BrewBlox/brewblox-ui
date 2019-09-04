@@ -1,55 +1,51 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
-import { Unit } from '@/helpers/units';
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+
+import { TempSensorMockBlock } from './types';
 
 @Component
-export default class TempSensorMockForm extends BlockForm {
-  defaultData() {
-    return {
-      value: new Unit(20, 'degC'),
-      connected: true,
-    };
-  }
-
-  presets() {
-    return [];
-  }
+export default class TempSensorMockForm extends BlockCrudComponent {
+  readonly block!: TempSensorMockBlock;
 }
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
+  <GraphCardWrapper>
+    <template #graph>
+      <HistoryGraph :id="widget.id" :config="graphCfg" />
+    </template>
 
-    <q-card-section>
-      <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
+    <q-card dark class="widget-modal">
+      <BlockFormToolbar :crud="crud" />
+
+      <q-card-section>
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>Value</q-item-label>
-            <UnitPopupEdit
-              :field="block.data.value"
-              :disabled="!block.data.connected"
-              :change="callAndSaveBlock(v => block.data.value = v)"
-              label="Value"
+            <q-item-label caption>
+              Value
+            </q-item-label>
+            <UnitField
+              :value="block.data.value"
+              :readonly="!block.data.connected"
+              title="Value"
+              tag="big"
+              @input="v => { block.data.value = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>Connected</q-item-label>
+            <q-item-label caption>
+              Connected
+            </q-item-label>
             <q-toggle
               :value="block.data.connected"
               @input="v => { block.data.connected = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
-      </q-expansion-item>
-    </q-card-section>
-  </q-card>
-</template>
+      </q-card-section>
+    </q-card>
+</graphcardwrapper></template>

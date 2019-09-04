@@ -1,49 +1,53 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 
-@Component({
-  props: {
-    textEnabled: {
-      type: String,
-      default: 'This block is enabled',
-    },
-    textDisabled: {
-      type: String,
-      default: 'This block is disabled',
-    },
-  },
-})
-export default class BlockEnableToggle extends BlockForm {
-  get enabled() {
-    return Boolean(this.block.data.enabled);
+@Component
+export default class BlockEnableToggle extends BlockCrudComponent {
+
+  @Prop({ type: String, default: 'enabled' })
+  public readonly dataKey!: string;
+
+  @Prop({ type: String, default: 'This block is enabled' })
+  readonly textEnabled!: string;
+
+  @Prop({ type: String, default: 'This block is disabled' })
+  readonly textDisabled!: string;
+
+  get enabled(): boolean {
+    return Boolean(this.block.data[this.dataKey]);
   }
 
-  get mainText() {
+  get mainText(): string {
     return this.enabled
-      ? this.$props.textEnabled
-      : this.$props.textDisabled;
+      ? this.textEnabled
+      : this.textDisabled;
   }
 
-  toggleEnabled() {
-    this.block.data.enabled = !this.enabled;
+  toggleEnabled(): void {
+    this.block.data[this.dataKey] = !this.enabled;
     this.saveBlock();
   }
 }
 </script>
 
 <template>
-  <q-item dark>
-    <q-item-section>{{ mainText }}</q-item-section>
-    <q-item-section side>
+  <CardWarning
+    :icon="enabled ? 'mdi-link' : 'mdi-link-variant-off'"
+    :color="enabled ? 'positive' : 'negative'"
+  >
+    <template #message>
+      <span>{{ mainText }}</span>
+    </template>
+    <template #actions>
       <q-btn
         :label="enabled ? 'Disable': 'Enable'"
-        :color="enabled ? 'negative' : 'positive'"
+        color="white"
         outline
         dense
         @click="toggleEnabled"
       />
-    </q-item-section>
-  </q-item>
+    </template>
+  </CardWarning>
 </template>

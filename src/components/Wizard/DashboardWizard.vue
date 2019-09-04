@@ -1,29 +1,26 @@
 <script lang="ts">
 import isString from 'lodash/isString';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
-import dashboardStore from '@/store/dashboards';
-import { Dashboard } from '@/store/dashboards';
+import { dashboardIdRules } from '@/helpers/dashboards';
+import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 @Component
 export default class DashboardWizard extends Vue {
-  dashboardId: string = '';
-  dashboardTitle: string = '';
+  dashboardId = '';
+  dashboardTitle = '';
 
-  get dashboardIdRules(): InputRule[] {
-    return [
-      v => !!v || 'ID is required',
-      v => !dashboardStore.dashboardIds.includes(v) || 'ID must be unique',
-    ];
+  get idRules(): InputRule[] {
+    return dashboardIdRules();
   }
 
-  back() {
+  back(): void {
     this.$emit('back');
   }
 
-  async create() {
-    const errors = this.dashboardIdRules
+  async created(): Promise<void> {
+    const errors = this.idRules
       .map(rule => rule(this.dashboardId))
       .filter(isString);
 
@@ -51,7 +48,7 @@ export default class DashboardWizard extends Vue {
     this.$emit('close');
   }
 
-  mounted() {
+  mounted(): void {
     this.$emit('title', 'Dashboard wizard');
   }
 }
@@ -62,13 +59,7 @@ export default class DashboardWizard extends Vue {
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-input
-            v-model="dashboardId"
-            :rules="dashboardIdRules"
-            label="Dashboard ID"
-            dark
-            lazy-rules
-          >
+          <q-input v-model="dashboardId" :rules="idRules" label="Dashboard ID" dark lazy-rules>
             <template v-slot:after>
               <q-icon name="information">
                 <q-tooltip>The unique identifier for this dashboard.</q-tooltip>
@@ -84,8 +75,8 @@ export default class DashboardWizard extends Vue {
               <q-icon name="information">
                 <q-tooltip>
                   The Dashboard Title is how the dashboard is displayed in the UI.
-                  <br>This choice is purely graphical: pick a name that makes sense to you.
-                  <br>If left empty, the dashboard ID will be used.
+                  <br />This choice is purely graphical: pick a name that makes sense to you.
+                  <br />If left empty, the dashboard ID will be used.
                 </q-tooltip>
               </q-icon>
             </template>
@@ -94,11 +85,11 @@ export default class DashboardWizard extends Vue {
       </q-item>
     </q-card-section>
 
-    <q-separator dark/>
+    <q-separator dark />
 
     <q-card-actions>
-      <q-btn unelevated label="Back" class="full-width" @click="back"/>
-      <q-btn unelevated label="Create" color="primary" class="full-width q-mt-sm" @click="create"/>
+      <q-btn unelevated label="Back" class="full-width" @click="back" />
+      <q-btn unelevated label="Create" color="primary" class="full-width q-mt-sm" @click="create" />
     </q-card-actions>
   </div>
 </template>

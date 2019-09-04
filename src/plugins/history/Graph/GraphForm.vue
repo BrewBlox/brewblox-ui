@@ -1,14 +1,12 @@
 <script lang="ts">
 import parseDuration from 'parse-duration';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
-import FormBase from '@/components/Form/FormBase';
-import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
-import { defaultPresets } from '@/components/Graph/getters';
+import { defaultLabel, targetBuilder, targetSplitter } from '@/components/Graph/functional';
 import { GraphConfig } from '@/components/Graph/types';
+import CrudComponent from '@/components/Widget/CrudComponent';
 import { durationString } from '@/helpers/functional';
-import historyStore, { DisplayNames } from '@/store/history';
-import { GraphValueAxes, QueryParams } from '@/store/history';
+import { DisplayNames, GraphValueAxes, historyStore, LineColors, QueryParams } from '@/store/history';
 
 interface PeriodDisplay {
   start: boolean;
@@ -16,24 +14,29 @@ interface PeriodDisplay {
   end: boolean;
 }
 
-@Component({
-  props: {
-    downsampling: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-})
-export default class GraphForm extends FormBase {
+@Component
+export default class GraphForm extends CrudComponent {
   durationString = durationString;
 
+  tab = 'metrics';
   period: PeriodDisplay | null = null;
 
+  @Prop({ type: Object, default: () => ({}) })
+  readonly downsampling!: any;
+
   get config(): GraphConfig {
-    return this.$props.field;
+    return {
+      layout: {},
+      params: {},
+      targets: [],
+      renames: {},
+      colors: {},
+      axes: {},
+      ...this.widget.config,
+    };
   }
 
-  get periodOptions() {
+  get periodOptions(): SelectOption[] {
     return [
       {
         label: 'Live: [duration] to now',
@@ -58,22 +61,23 @@ export default class GraphForm extends FormBase {
     ];
   }
 
-  get paramDefaults() {
+  paramDefaults(): QueryParams {
     return {
-      start: () => new Date().getTime() - parseDuration('1d'),
-      duration: () => '1d',
-      end: () => new Date().getTime(),
+      start: new Date().getTime() - parseDuration('1d'),
+      duration: '1d',
+      end: new Date().getTime(),
     };
   }
 
-  sanitizeParams(period: PeriodDisplay) {
+  sanitizeParams(period: PeriodDisplay): void {
+    const defaults = this.paramDefaults();
     Object.entries(period)
       .forEach(([key, isPresent]: [string, boolean]) =>
         this.$set(
           this.config.params,
           key,
           (isPresent
-            ? this.config.params[key] || this.paramDefaults[key]()
+            ? this.config.params[key] || defaults[key]
             : undefined)
         ));
   }
@@ -81,7 +85,7 @@ export default class GraphForm extends FormBase {
   get shownPeriod(): PeriodDisplay {
     if (this.period === null) {
       const keys = ['start', 'duration', 'end'];
-      const compare = (opt, k) => {
+      const compare = (opt, k): boolean => {
         const val = this.config.params[k];
         return opt.value[k] === (val !== null && val !== undefined);
       };
@@ -95,28 +99,36 @@ export default class GraphForm extends FormBase {
 
       // if no match was found, params must be sanitized
       if (!matching) {
-        this.sanitizeParams(this.period);
+        this.sanitizeParams(this.period as PeriodDisplay);
         this.saveConfig(this.config);
       }
 
     }
 
-    return this.period;
+    return this.period as PeriodDisplay;
   }
 
-  updateShownPeriod(val: PeriodDisplay) {
+  updateShownPeriod(val: PeriodDisplay): void {
     this.period = val;
     this.sanitizeParams(val);
     this.saveConfig(this.config);
   }
 
-  get selected(): string[] | null {
+  get selected(): string[] {
     return targetSplitter(this.config.targets);
   }
 
-  set selected(vals: string[] | null) {
+  set selected(vals: string[]) {
     const targets = targetBuilder(vals || []);
-    this.saveConfig({ ...this.config, targets });
+    const renames = vals
+      .reduce(
+        (acc, key) => ({
+          ...acc,
+          [key]: this.config.renames[key] || defaultLabel(key),
+        }),
+        {});
+
+    this.saveConfig({ ...this.config, targets, renames });
   }
 
   get renames(): DisplayNames {
@@ -131,142 +143,198 @@ export default class GraphForm extends FormBase {
     return this.config.axes;
   }
 
-  get presets(): QueryParams[] {
-    return defaultPresets();
+  get axisOpts(): SelectOption[] {
+    return [
+      {
+        value: 'y',
+        label: 'Y1',
+      },
+      {
+        value: 'y2',
+        label: 'Y2',
+      },
+    ];
   }
 
-  isRightAxis(field: string) {
-    return this.config.axes[field] === 'y2';
+  updateAxis(field: string, value: string): void {
+    this.saveConfig({ ...this.config, axes: { ...this.axes, [field]: value } });
   }
 
-  updateAxisSide(field: string, isRight: boolean) {
-    this.config.axes[field] = isRight ? 'y2' : 'y';
-    this.saveConfig(this.config);
+  get colors(): LineColors {
+    return this.config.colors;
   }
 
-  created() {
+  updateColor(field: string, color: string): void {
+    if (color) {
+      this.$set(this.colors, field, color);
+    } else {
+      this.$delete(this.colors, field);
+    }
+    this.saveConfig({ ...this.config, colors: this.colors });
+  }
+
+  created(): void {
     historyStore.fetchKnownKeys();
-  }
-
-  callAndSaveConfig(func: (v: any) => void) {
-    return (v: any) => { func(v); this.saveConfig(this.config); };
   }
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
+    <FormToolbar :crud="crud" />
 
-    <q-card-section>
-      <q-expansion-item group="modal" icon="mdi-timetable" label="Period settings">
-        <q-item dark>
-          <q-item-section>
-            <q-item-label caption>Display type</q-item-label>
-            <SelectPopupEdit
-              :field="shownPeriod"
-              :options="periodOptions"
-              :change="updateShownPeriod"
-              label="Display type"
-            />
-          </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section v-if="shownPeriod.start" class="col-6">
-            <q-item-label caption>Start time</q-item-label>
-            <DatetimePopupEdit
-              :field="config.params.start"
-              :change="callAndSaveConfig(v => config.params.start = v.getTime())"
-              label="Start time"
-              tag="span"
-            />
-          </q-item-section>
-          <q-item-section v-if="shownPeriod.duration" class="col-6">
-            <q-item-label caption>Duration</q-item-label>
-            <InputPopupEdit
-              :field="config.params.duration"
-              :change="callAndSaveConfig(v => config.params.duration = durationString(v))"
-              clearable
-              label="Duration"
-              tag="span"
-            />
-          </q-item-section>
-          <q-item-section v-if="shownPeriod.end" class="col-6">
-            <q-item-label caption>End time</q-item-label>
-            <DatetimePopupEdit
-              :field="config.params.end"
-              :change="callAndSaveConfig(v => config.params.end = v.getTime())"
-              label="End time"
-              tag="span"
-            />
-          </q-item-section>
-        </q-item>
-        <q-item dark>
-          <q-item-section>
-            <q-item-label caption>Averaging period</q-item-label>
-            <div class="row q-mt-sm q-ml-sm">
-              <div v-for="(rate, meas) in downsampling" :key="meas" class="q-mr-md">
-                <q-item-label caption>{{ meas }}</q-item-label>
-                {{ rate }}
-              </div>
-            </div>
-          </q-item-section>
-        </q-item>
-      </q-expansion-item>
+    <!-- <q-card-section dark> -->
+    <q-tabs v-model="tab" dense active-color="primary" align="justify">
+      <q-tab name="metrics" label="Metrics" />
+      <q-tab name="period" label="Period" />
+      <q-tab name="legend" label="Legend" />
+      <q-tab name="display" label="Display" />
+    </q-tabs>
 
-      <q-expansion-item default-opened group="modal" icon="mdi-file-tree" label="Metrics">
-        <div class="scroll-parent">
-          <q-scroll-area>
-            <MetricSelector :selected.sync="selected"/>
-          </q-scroll-area>
-        </div>
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-tag-multiple" label="Legend">
-        <div class="scroll-parent">
-          <q-scroll-area>
-            <LabelSelector :selected="selected" :renames.sync="renames"/>
-          </q-scroll-area>
-        </div>
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-chart-line" label="Axes">
-        <div class="scroll-parent">
-          <q-scroll-area>
+    <div class="scroll-parent">
+      <q-scroll-area>
+        <q-tab-panels v-model="tab" animated class="bg-dark-bright">
+          <!-- Metrics -->
+          <q-tab-panel dark name="metrics" class="q-pt-none">
+            <MetricSelector :selected.sync="selected" />
+          </q-tab-panel>
+          <!-- Period -->
+          <q-tab-panel dark name="period" class="q-pt-none">
+            <q-item dark>
+              <q-item-section class="col-auto">
+                <q-select
+                  :value="shownPeriod"
+                  :options="periodOptions"
+                  emit-value
+                  map-options
+                  dark
+                  options-dark
+                  label="Display type"
+                  @input="updateShownPeriod"
+                />
+              </q-item-section>
+            </q-item>
+            <q-item dark>
+              <q-item-section v-if="shownPeriod.start" class="col-6">
+                <q-item-label caption>
+                  Start time
+                </q-item-label>
+                <DatetimeField
+                  :value="config.params.start"
+                  title="Start time"
+                  @input="v => { config.params.start = v.getTime(); saveConfig(config); }"
+                />
+              </q-item-section>
+              <q-item-section v-if="shownPeriod.duration" class="col-6">
+                <q-item-label caption>
+                  Duration
+                </q-item-label>
+                <InputField
+                  :value="config.params.duration"
+                  title="Duration"
+                  @input="v => { config.params.duration = durationString(v); saveConfig(config); }"
+                />
+              </q-item-section>
+              <q-item-section v-if="shownPeriod.end" class="col-6">
+                <q-item-label caption>
+                  End time
+                </q-item-label>
+                <DatetimeField
+                  :value="config.params.end"
+                  title="End time"
+                  @input="v => { config.params.end = v.getTime(); saveConfig(config); }"
+                />
+              </q-item-section>
+            </q-item>
+            <q-item dark>
+              <q-item-section class="col-auto">
+                <q-item-label caption>
+                  Averaging period
+                </q-item-label>
+                <div class="row q-mt-sm q-ml-sm">
+                  <div v-for="(rate, meas) in downsampling" :key="meas" class="q-mr-md">
+                    <q-item-label caption>
+                      {{ meas }}
+                    </q-item-label>
+                    {{ rate }}
+                  </div>
+                </div>
+                <q-tooltip>
+                  To improve performance, the history service automatically selects an averaging period.
+                  <br />One point is returned per period, with the average value of all points in that period.
+                </q-tooltip>
+              </q-item-section>
+            </q-item>
+          </q-tab-panel>
+          <!-- Legend -->
+          <q-tab-panel dark name="legend" class="q-pt-none">
+            <LabelSelector :selected="selected" :renames.sync="renames" />
+          </q-tab-panel>
+          <!-- Display -->
+          <q-tab-panel dark name="display" class="q-pt-none">
             <q-item dark>
               <q-item-section>Metric</q-item-section>
-              <q-item-section side>Left or right axis</q-item-section>
+              <q-item-section>Display settings</q-item-section>
             </q-item>
-            <q-separator dark inset/>
-            <q-item
-              v-for="field in selected"
-              :key="field"
-              dark
-              clickable
-              @click="updateAxisSide(field, !isRightAxis(field))"
-            >
-              <q-item-section>{{ field }}</q-item-section>
-              <q-item-section side>
-                <q-icon :class="{mirrored: isRightAxis(field)}" name="mdi-chart-line" size="30px"/>
+            <q-separator dark inset />
+
+            <q-item v-for="field in selected" :key="field" dark class="align-children">
+              <q-item-section class="col-5">
+                {{ field }}
+              </q-item-section>
+              <q-space />
+              <q-item-section class="col-6">
+                <q-list dark dense>
+                  <q-item dark>
+                    <q-item-section>
+                      <q-item-label caption>
+                        Y-axis
+                      </q-item-label>
+                    </q-item-section>
+                    <q-item-section class="col-auto">
+                      <q-btn-toggle
+                        :value="axes[field] || 'y'"
+                        :options="axisOpts"
+                        flat
+                        outline
+                        @input="v => updateAxis(field, v)"
+                      ></q-btn-toggle>
+                    </q-item-section>
+                  </q-item>
+                  <q-item dark>
+                    <q-item-section>
+                      <q-item-label caption>
+                        Line color
+                      </q-item-label>
+                    </q-item-section>
+                    <q-item-section class="col-auto">
+                      <ColorField
+                        :value="colors[field] || ''"
+                        title="Line color"
+                        clearable
+                        @input="v => updateColor(field, v)"
+                      />
+                    </q-item-section>
+                  </q-item>
+                  <q-separator dark />
+                </q-list>
               </q-item-section>
             </q-item>
             <q-item v-if="!selected || selected.length === 0" dark>
-              <q-item-section side>No metrics selected</q-item-section>
+              <q-item-section side>
+                No metrics selected
+              </q-item-section>
             </q-item>
-          </q-scroll-area>
-        </div>
-      </q-expansion-item>
-    </q-card-section>
+          </q-tab-panel>
+        </q-tab-panels>
+      </q-scroll-area>
+    </div>
   </q-card>
 </template>
 
 <style scoped>
-.mirrored {
-  -webkit-transform: scaleX(-1);
-  transform: scaleX(-1);
-}
 .scroll-parent {
-  height: 300px;
-  max-height: 30vh;
+  height: 500px;
+  max-height: 60vh;
 }
 </style>

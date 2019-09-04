@@ -1,13 +1,14 @@
 <script lang="ts">
 import parseDuration from 'parse-duration';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import { durationString, objectSorter } from '@/helpers/functional';
-import { Link,Unit } from '@/helpers/units';
-import { SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
-import BlockForm from '@/plugins/spark/components/BlockForm';
-import sparkStore from '@/plugins/spark/store';
+import { Unit } from '@/helpers/units';
+import { deepCopy } from '@/helpers/units/parseObject';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { sparkStore } from '@/plugins/spark/store';
 
+import { profileGraphProps } from './helpers';
 import { Setpoint, SetpointProfileBlock } from './types';
 
 interface DisplaySetpoint {
@@ -17,15 +18,13 @@ interface DisplaySetpoint {
 }
 
 @Component
-export default class SetpointProfileForm extends BlockForm {
+export default class SetpointProfileForm extends BlockCrudComponent {
   durationString = durationString;
   parseDuration = parseDuration;
 
-  get block() {
-    return this.blockField as SetpointProfileBlock;
-  }
+  readonly block!: SetpointProfileBlock;
 
-  get tempUnit() {
+  get tempUnit(): string {
     return sparkStore.units(this.block.serviceId).Temp;
   }
 
@@ -43,30 +42,11 @@ export default class SetpointProfileForm extends BlockForm {
       }));
   }
 
-  defaultData() {
-    return {
-      start: new Date().getTime() / 1000,
-      points: [],
-      enabled: false,
-      targetId: new SetpointSensorPairLink(null),
-      drivenTargetId: new Link(null),
-    };
+  get graphProps(): any {
+    return profileGraphProps(this.block);
   }
 
-  presets() {
-    return [
-      {
-        label: 'Empty profile',
-        value: {
-          points: [],
-          enabled: true,
-          start: new Date().getTime() / 1000,
-        },
-      },
-    ];
-  }
-
-  savePoints(points: DisplaySetpoint[] = this.points) {
+  savePoints(points: DisplaySetpoint[] = this.points): void {
     this.block.data.points = points
       .sort(objectSorter('offsetMs'))
       .map((point: DisplaySetpoint) => ({
@@ -85,36 +65,25 @@ export default class SetpointProfileForm extends BlockForm {
     };
   }
 
-  copyPoint(point: DisplaySetpoint): DisplaySetpoint {
-    return {
-      ...point,
-      temperature: new Unit(point.temperature.value, point.temperature.unit),
-    };
+  addPoint(): void {
+    const newPoint = this.points.length > 0
+      ? deepCopy(this.points[this.points.length - 1])
+      : this.defaultPoint();
+    this.points.push(newPoint);
+    this.savePoints();
   }
 
-  addPoint() {
-    const newPoints = this.points.length > 0
-      ? [...this.points, this.copyPoint(this.points[this.points.length - 1])]
-      : [this.defaultPoint()];
-    this.savePoints(newPoints);
+  removePoint(index: number): void {
+    this.points.splice(index, 1);
+    this.savePoints();
   }
 
-  removePoint(index: number) {
-    this.savePoints(this.points.filter((_: any, idx: number) => idx !== index));
+  updateStartTime(startDate: Date): void {
+    this.block.data.start = startDate.getTime() / 1000;
+    this.saveBlock();
   }
 
-  updateStartTime(startDate: Date) {
-    const startTime = startDate.getTime();
-    this.block.data.start = startTime / 1000;
-    const newPoints = this.points
-      .map((point: DisplaySetpoint) => ({
-        ...point,
-        absTimeMs: startTime + point.offsetMs,
-      }));
-    this.savePoints(newPoints);
-  }
-
-  notifyInvalidTime() {
+  notifyInvalidTime(): void {
     this.$q.notify({
       icon: 'error',
       color: 'negative',
@@ -122,7 +91,7 @@ export default class SetpointProfileForm extends BlockForm {
     });
   }
 
-  updatePointTime(index: number, date: Date) {
+  updatePointTime(index: number, date: Date): void {
     const absTimeMs = date.getTime();
     if (absTimeMs < this.start) {
       this.notifyInvalidTime();
@@ -136,7 +105,7 @@ export default class SetpointProfileForm extends BlockForm {
     this.savePoints();
   }
 
-  updatePointOffset(index: number, offsetMs: number) {
+  updatePointOffset(index: number, offsetMs: number): void {
     if (offsetMs < 0) {
       this.notifyInvalidTime();
       return;
@@ -149,116 +118,172 @@ export default class SetpointProfileForm extends BlockForm {
     this.savePoints();
   }
 
-  updatePointTemperature(index: number, temp: Unit) {
-    this.points[index].temperature = temp;
-    this.savePoints();
-  }
-
-  enable() {
-    this.block.data.enabled = true;
-    this.saveBlock();
+  updatePointTemperature(index: number, value: Unit): void {
+    const now = new Date().getTime();
+    if (
+      index > 0
+      && this.points[index].absTimeMs > now
+      && this.points[index - 1].absTimeMs < now
+    ) {
+      this.$q.dialog({
+        title: 'Insert point',
+        message: `
+        Insert a point at current time and setting?
+        This prevents instant jumps in temperature setting.`,
+        cancel: 'No',
+        dark: true,
+        persistent: true,
+      })
+        .onOk(() => {
+          const prev = this.points[index - 1];
+          const next = this.points[index];
+          const prevVal = prev.temperature.value as number;
+          const nextVal = next.temperature.value as number;
+          const duration = (next.absTimeMs - prev.absTimeMs) || 1;
+          const interpolated = prevVal + (now - prev.absTimeMs) * (nextVal - prevVal) / duration;
+          const newPoint: DisplaySetpoint = {
+            offsetMs: now - this.start,
+            absTimeMs: now,
+            temperature: prev.temperature.copy(interpolated),
+          };
+          this.points[index].temperature = value;
+          this.points.splice(index, 0, newPoint);
+          this.savePoints();
+        })
+        .onCancel(() => {
+          this.points[index].temperature = value;
+          this.savePoints();
+        });
+    } else {
+      this.points[index].temperature = value;
+      this.savePoints();
+    }
   }
 }
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
-    <q-card-section>
-      <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
+  <GraphCardWrapper show-initial>
+    <template #graph>
+      <Graph v-bind="graphProps" />
+    </template>
+
+    <q-card dark class="widget-modal">
+      <BlockFormToolbar :crud="crud" />
+      <q-card-section>
         <BlockEnableToggle
           v-if="block.data.targetId.id !== null"
-          v-bind="$props"
-          :text-enabled="`Profile is enabled: ${block.data.targetId} will be set by the profile.`"
+          :crud="crud"
+          :text-enabled="`Profile is enabled and driving ${block.data.targetId}.`"
           :text-disabled="`Profile is disabled: ${block.data.targetId} will not be changed.`"
         />
-        <q-separator v-if="block.data.targetId.id !== null" dark/>
+        <q-separator v-if="block.data.targetId.id !== null" dark />
         <q-item dark class="q-py-md">
           <q-item-section>
-            <q-item-label caption>Start time</q-item-label>
-            <DatetimePopupEdit
-              :field="start"
-              :change="updateStartTime"
+            <q-item-label caption>
+              Start time
+            </q-item-label>
+            <DatetimeField
+              :value="start"
               label="Start time"
-              tag="span"
-            >
-              This will shift all points.
+              title="Start time"
+              message-html="This will shift all points.
               <br>Offset time will remain the same, absolute time values will change.
-              <br>The offset for the first point is always 0s.
-            </DatetimePopupEdit>
+              <br>The offset for the first point is always 0s."
+              @input="updateStartTime"
+            />
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>Driven Setpoint/Sensor pair</q-item-label>
-            <LinkPopupEdit
-              :field="block.data.targetId"
-              :service-id="block.serviceId"
-              :change="callAndSaveBlock(v => block.data.targetId = v)"
-              label="Driven Setpoint/Sensor pair"
-              tag="span"
+            <q-item-label caption>
+              Driven Setpoint/Sensor pair
+            </q-item-label>
+            <LinkField
+              :value="block.data.targetId"
+              :service-id="serviceId"
+              label="target"
+              title="Driven Setpoint/Sensor pair"
+              @input="v => { block.data.targetId = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>
-        <q-separator dark/>
+        <q-separator dark />
 
+        <!-- Headers -->
         <q-item dark class="q-pt-md">
           <q-item-section class="col-3 q-py-none">
-            <q-item-label caption>Offset from first</q-item-label>
+            <q-item-label caption>
+              Offset from start
+            </q-item-label>
           </q-item-section>
           <q-item-section class="col-5 q-py-none">
-            <q-item-label caption>Time</q-item-label>
+            <q-item-label caption>
+              Time
+            </q-item-label>
           </q-item-section>
           <q-item-section class="col-3 q-py-none">
-            <q-item-label caption>Temperature</q-item-label>
+            <q-item-label caption>
+              Temperature
+            </q-item-label>
           </q-item-section>
-          <q-item-section class="col-1 q-py-none" side/>
+          <q-item-section class="col-1 q-py-none" side />
         </q-item>
+
+        <!-- Points -->
         <q-item v-for="(point, idx) in points" :key="idx" dark dense>
           <q-item-section class="col-3">
-            <InputPopupEdit
-              :field="durationString(point.offsetMs)"
-              :change="v => updatePointOffset(idx, parseDuration(v))"
-              label="Offset from start time"
-              tag="span"
-            >
-              This will change the point offset.
+            <InputField
+              :value="durationString(point.offsetMs)"
+              title="Offset from start time"
+              label="point offset"
+              message-html="
+            This will change the point offset.
               <br>The absolute point time will be changed to start time + offset.
               <br>Changing point offset may change point order.
-            </InputPopupEdit>
+            "
+              @input="v => updatePointOffset(idx, parseDuration(v))"
+            />
           </q-item-section>
           <q-item-section class="col-5">
-            <DatetimePopupEdit
-              :field="point.absTimeMs"
-              :change="v => updatePointTime(idx, v)"
-              label="Time"
-              tag="span"
-            >
+            <DatetimeField
+              :value="point.absTimeMs"
+              title="Time"
+              label="point time"
+              message-html="
               This will change the absolute point time.
               <br>Changing point time may change point order.
               <br>Point offset is changed to point time - start time.
-            </DatetimePopupEdit>
+              "
+              @input="v => updatePointTime(idx, v)"
+            />
           </q-item-section>
           <q-item-section class="col-3">
-            <UnitPopupEdit
-              :field="point.temperature"
-              :change="v => updatePointTemperature(idx, v)"
-              label="Temperature"
-              tag="span"
+            <UnitField
+              :value="point.temperature"
+              title="Temperature"
+              label="point temperature"
+              @input="v => updatePointTemperature(idx, v)"
             />
           </q-item-section>
           <q-item-section class="col-1" side>
-            <q-btn flat round dense icon="delete" @click="removePoint(idx)"/>
+            <q-btn flat dense icon="delete" @click="removePoint(idx)">
+              <q-tooltip>Remove point</q-tooltip>
+            </q-btn>
           </q-item-section>
         </q-item>
-        <q-item dark>
-          <q-item-section>
-            <q-btn flat icon="add" label="Add point" @click="addPoint"/>
-          </q-item-section>
-        </q-item>
-      </q-expansion-item>
 
-      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
-      </q-expansion-item>
-    </q-card-section>
-  </q-card>
+        <!-- Add point button -->
+        <q-item dark dense>
+          <!-- Use multiple elements to also natively get padding -->
+          <q-item-section class="col-3" />
+          <q-item-section class="col-5" />
+          <q-item-section class="col-3" />
+          <q-item-section class="col-1" side>
+            <q-btn flat dense icon="add" @click="addPoint">
+              <q-tooltip>Add point</q-tooltip>
+            </q-btn>
+          </q-item-section>
+        </q-item>
+      </q-card-section>
+    </q-card>
+  </GraphCardWrapper>
 </template>

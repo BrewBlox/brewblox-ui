@@ -1,15 +1,14 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
 
-import WidgetBase from '@/components/Widget/WidgetBase';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 import { SystemStatus } from '@/plugins/spark/types';
 
 @Component
-export default class Troubleshooter extends WidgetBase {
-  get serviceId() {
-    return this.$props.config.serviceId;
-  }
+export default class Troubleshooter extends Vue {
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
 
   get lastStatus(): SystemStatus | null {
     return sparkStore.lastStatus(this.serviceId);
@@ -21,29 +20,41 @@ export default class Troubleshooter extends WidgetBase {
       : 'Unable to connect to service';
   }
 
-  get textConnected(): string {
-    return this.lastStatus && this.lastStatus.connected
+  get textConnect(): string {
+    return this.lastStatus && this.lastStatus.connect
       ? 'Service connected to controller'
       : 'Service not connected to controller';
   }
 
-  get textSynchronized(): string {
-    return this.lastStatus && this.lastStatus.synchronized
+  get textHandshake(): string {
+    return this.lastStatus && this.lastStatus.handshake
+      ? 'Handshake performed'
+      : 'Handshake not performed';
+  }
+
+  get textCompatible(): string {
+    return this.lastStatus && this.lastStatus.compatible
+      ? 'Firmware compatible'
+      : 'Firmware not compatible';
+  }
+
+  get textSynchronize(): string {
+    return this.lastStatus && this.lastStatus.synchronize
       ? 'Service synchronized'
       : 'Service not synchronized';
   }
 
-  refresh() {
+  refresh(): void {
     sparkStore.fetchServiceStatus(this.serviceId)
       .then(() => sparkStore.createUpdateSource(this.serviceId))
       .catch(() => { });
   }
 
-  iconName(val: boolean) {
+  iconName(val: boolean): string {
     return val ? 'mdi-check-circle-outline' : 'mdi-alert-circle-outline';
   }
 
-  iconColor(val: boolean) {
+  iconColor(val: boolean): string {
     return val ? 'positive' : 'negative';
   }
 }
@@ -53,7 +64,7 @@ export default class Troubleshooter extends WidgetBase {
   <q-card dark class="text-white scroll" style="max-width: 500px">
     <WidgetToolbar :title="serviceId" subtitle="Troubleshooter">
       <q-item-section class="dense" side>
-        <q-btn unelevated label="force refresh" color="primary" icon="refresh" @click="refresh"/>
+        <q-btn unelevated label="force refresh" color="primary" icon="refresh" @click="refresh" />
       </q-item-section>
     </WidgetToolbar>
 
@@ -61,10 +72,12 @@ export default class Troubleshooter extends WidgetBase {
       <template v-if="lastStatus">
         <q-item dark>
           <q-item-section avatar>
-            <q-spinner size="24px"/>
+            <q-spinner size="24px" />
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>Last update</q-item-label>
+            <q-item-label caption>
+              Last update
+            </q-item-label>
             <big>{{ lastStatus.checkedAt.toLocaleString() }}</big>
           </q-item-section>
         </q-item>
@@ -81,22 +94,43 @@ export default class Troubleshooter extends WidgetBase {
         <q-item dark>
           <q-item-section avatar>
             <q-icon
-              :name="iconName(lastStatus.connected)"
-              :color="iconColor(lastStatus.connected)"
+              :name="iconName(lastStatus.connect)"
+              :color="iconColor(lastStatus.connect)"
               size="24px"
             />
           </q-item-section>
-          <q-item-section>{{ textConnected }}</q-item-section>
+          <q-item-section>{{ textConnect }}</q-item-section>
         </q-item>
         <q-item dark>
           <q-item-section avatar>
             <q-icon
-              :name="iconName(lastStatus.synchronized)"
-              :color="iconColor(lastStatus.synchronized)"
+              :name="iconName(lastStatus.handshake)"
+              :color="iconColor(lastStatus.handshake)"
               size="24px"
             />
           </q-item-section>
-          <q-item-section>{{ textSynchronized }}</q-item-section>
+          <q-item-section>{{ textHandshake }}</q-item-section>
+        </q-item>
+        <!-- Only show after handshake -->
+        <q-item v-if="lastStatus.handshake" dark>
+          <q-item-section avatar>
+            <q-icon
+              :name="iconName(lastStatus.compatible)"
+              :color="iconColor(lastStatus.compatible)"
+              size="24px"
+            />
+          </q-item-section>
+          <q-item-section>{{ textCompatible }}</q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section avatar>
+            <q-icon
+              :name="iconName(lastStatus.synchronize)"
+              :color="iconColor(lastStatus.synchronize)"
+              size="24px"
+            />
+          </q-item-section>
+          <q-item-section>{{ textSynchronize }}</q-item-section>
         </q-item>
       </template>
     </q-card-section>
@@ -114,7 +148,7 @@ export default class Troubleshooter extends WidgetBase {
             </ul>
           </span>
           <!-- not connected -->
-          <span v-else-if="!lastStatus.connected">
+          <span v-else-if="!lastStatus.connect">
             Your Spark service is online, but not connected to your controller.
             <ul>
               <li>Is your controller turned on?</li>
@@ -125,10 +159,22 @@ export default class Troubleshooter extends WidgetBase {
               <li>USB: Can your service access USB devices? (Mac hosts)</li>
             </ul>
           </span>
+          <!-- waiting handshake -->
+          <span v-else-if="!lastStatus.handshake">
+            Your Spark service is waiting for the controller handshake.
+            <br />
+            <b>This status is usually temporary</b>
+          </span>
+          <!-- not compatible -->
+          <span v-else-if="!lastStatus.compatible">
+            Your Spark service is not compatible with the firmware
+            <br />
+            <b>Please run brewblox-ctl update</b>
+          </span>
           <!-- not synchronized -->
-          <span v-else-if="!lastStatus.synchronized">
+          <span v-else-if="!lastStatus.synchronize">
             Your Spark service is connected to your controller, but not yet synchronized.
-            <b>This usually only lasts a few seconds.</b>
+            <b>This status is usually temporary.</b>
             <ul>
               <li>Is your datastore container running?</li>
               <li>Are there any error messages in your service container logs?</li>
@@ -137,6 +183,19 @@ export default class Troubleshooter extends WidgetBase {
           </span>
         </q-item-section>
       </q-item>
+      <template v-if="(lastStatus.info || []).length > 0">
+        <q-separator dark inset />
+        <q-item dark>
+          <q-item-section>
+            <b>Service info:</b>
+          </q-item-section>
+        </q-item>
+        <q-list dense>
+          <q-item v-for="(val, idx) in lastStatus.info" :key="idx" dark>
+            <q-item-section>{{ val }}</q-item-section>
+          </q-item>
+        </q-list>
+      </template>
     </q-card-section>
   </q-card>
 </template>

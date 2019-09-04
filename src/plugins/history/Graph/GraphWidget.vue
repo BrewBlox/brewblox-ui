@@ -1,20 +1,21 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { defaultPresets } from '@/components/Graph/getters';
+import HistoryGraph from '@/components/Graph/HistoryGraph.vue';
 import { GraphConfig } from '@/components/Graph/types';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { QueryParams } from '@/store/history';
 
 @Component
 export default class GraphWidget extends WidgetBase {
-  $refs!: {
-    widgetGraph: any;
-  }
-  settingsModalOpen: boolean = false;
-  graphModalOpen: boolean = false;
+  settingsModalOpen = false;
+  graphModalOpen = false;
   downsampling: any = {};
+
+  @Ref()
+  readonly widgetGraph!: HistoryGraph;
 
   get graphCfg(): GraphConfig {
     return {
@@ -23,7 +24,8 @@ export default class GraphWidget extends WidgetBase {
       targets: [],
       renames: {},
       axes: {},
-      ...this.$props.config,
+      colors: {},
+      ...this.widget.config,
     };
   }
 
@@ -31,7 +33,11 @@ export default class GraphWidget extends WidgetBase {
     return defaultPresets();
   }
 
-  applyPreset(preset: QueryParams) {
+  isActivePreset(preset: QueryParams): boolean {
+    return JSON.stringify(preset) === JSON.stringify(this.graphCfg.params);
+  }
+
+  applyPreset(preset: QueryParams): void {
     this.saveConfig({
       ...this.graphCfg,
       params: { ...preset },
@@ -39,8 +45,13 @@ export default class GraphWidget extends WidgetBase {
   }
 
   @Watch('graphCfg', { deep: true })
-  regraph() {
-    this.$nextTick(() => this.$refs.widgetGraph.resetListeners());
+  regraph(): void {
+    this.$nextTick(() => this.widgetGraph.resetListeners());
+  }
+
+  mounted(): void {
+    this.$watch('widget.cols', () => this.widgetGraph.refresh());
+    this.$watch('widget.rows', () => this.widgetGraph.refresh());
   }
 }
 </script>
@@ -48,47 +59,39 @@ export default class GraphWidget extends WidgetBase {
 <template>
   <q-card dark class="text-white column">
     <q-dialog v-model="settingsModalOpen" no-backdrop-dismiss class="row">
-      <ScreenSizeConstrained
-        v-if="settingsModalOpen"
-        :min-width="1500"
-        class="q-mr-md"
-        style="width: 600px"
-      >
-        <q-card dark class="q-pa-xs bg-dark-bright">
-          <GraphCard :id="$props.id" :config="graphCfg" shared-listeners/>
-        </q-card>
-      </ScreenSizeConstrained>
-      <GraphForm
-        v-if="settingsModalOpen"
-        v-bind="$props"
-        :field="graphCfg"
-        :on-change-field="saveConfig"
-        :downsampling="downsampling"
-      />
+      <GraphCardWrapper show-initial>
+        <template #graph>
+          <HistoryGraph :id="widget.id" :config="graphCfg" shared-listeners />
+        </template>
+        <GraphForm v-if="settingsModalOpen" :crud="crud" :downsampling="downsampling" />
+      </GraphCardWrapper>
     </q-dialog>
 
     <q-dialog v-model="graphModalOpen" maximized>
       <q-card v-if="graphModalOpen" dark>
-        <GraphCard :id="$props.id" :config="graphCfg" shared-listeners>
-          <q-btn-dropdown flat auto-close label="presets" icon="mdi-timelapse">
-            <q-list dark link>
-              <q-item
-                v-for="(preset, idx) in presets"
-                :key="idx"
-                dark
-                clickable
-                @click="() => applyPreset(preset)"
-              >
-                <q-item-section>{{ preset.duration }}</q-item-section>
-              </q-item>
-            </q-list>
-          </q-btn-dropdown>
-          <q-btn v-close-popup flat label="close"/>
-        </GraphCard>
+        <HistoryGraph :id="widget.id" :config="graphCfg" shared-listeners>
+          <template v-slot:controls>
+            <q-btn-dropdown flat auto-close label="presets" icon="mdi-timelapse">
+              <q-list dark link>
+                <q-item
+                  v-for="(preset, idx) in presets"
+                  :key="idx"
+                  :active="isActivePreset(preset)"
+                  dark
+                  clickable
+                  @click="applyPreset(preset)"
+                >
+                  <q-item-section>{{ preset.duration }}</q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+            <q-btn v-close-popup flat label="close" />
+          </template>
+        </HistoryGraph>
       </q-card>
     </q-dialog>
 
-    <WidgetToolbar :title="widgetTitle" :subtitle="displayName">
+    <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="settingsModalOpen = true">
           <q-list dark bordered>
@@ -97,12 +100,13 @@ export default class GraphWidget extends WidgetBase {
               label="Show maximized"
               @click="graphModalOpen = true"
             />
-            <q-expansion-item label="Timespan" icon="mdi-timelapse">
+            <ActionItem icon="refresh" label="Refresh" @click="regraph" />
+            <q-expansion-item label="Timespan">
               <q-list dark>
                 <q-item
-                  v-close-popup
                   v-for="(preset, idx) in presets"
                   :key="idx"
+                  v-close-popup
                   :inset-level="1"
                   dark
                   clickable
@@ -112,34 +116,16 @@ export default class GraphWidget extends WidgetBase {
                 </q-item>
               </q-list>
             </q-expansion-item>
-            <ActionItem icon="refresh" label="Refresh" @click="regraph"/>
-            <ActionItem
-              v-if="$props.onCopy"
-              icon="file_copy"
-              label="Copy widget"
-              @click="$props.onCopy(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onMove"
-              icon="exit_to_app"
-              label="Move widget"
-              @click="$props.onMove(widgetId)"
-            />
-            <ActionItem
-              v-if="$props.onDelete"
-              icon="delete"
-              label="Delete widget"
-              @click="$props.onDelete(widgetId)"
-            />
+            <WidgetActions :crud="crud" />
           </q-list>
         </q-btn-dropdown>
       </q-item-section>
     </WidgetToolbar>
 
     <div class="col">
-      <GraphCard
+      <HistoryGraph
+        :id="widget.id"
         ref="widgetGraph"
-        :id="$props.id"
         :config="graphCfg"
         @downsample="v => downsampling = v"
       />

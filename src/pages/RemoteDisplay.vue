@@ -1,7 +1,7 @@
 <script lang="ts">
 /* eslint no-bitwise: 0 */
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 @Component({
   props: {
@@ -11,12 +11,12 @@ export default class RemoteDisplayPage extends Vue {
   width = 320;
   height = 240;
 
-  connected: boolean = true;
-  connecting: boolean = false;
-  preventReconnection: boolean = true;
+  connected = true;
+  connecting = false;
+  preventReconnection = true;
 
-  url: string = 'ws://localhost:7376';
-  debug: boolean = true;
+  url = 'ws://localhost:7376';
+  debug = true;
 
   // initialize to undefined so they are not reactive
   context: CanvasRenderingContext2D | undefined = undefined;
@@ -25,25 +25,25 @@ export default class RemoteDisplayPage extends Vue {
   buf: ArrayBuffer | undefined = undefined;
   buf8: Uint8ClampedArray | undefined = undefined;
   data: Uint32Array | undefined = undefined;
-  rerender: boolean = true;
+  rerender = true;
 
-  pressed: number = 0;
+  pressed = 0;
 
   get serviceId(): string {
     return this.$route.params.id;
   }
 
-  log(logline) {
+  log(logline): void {
     if (this.debug === true) {
       console.log(logline); // eslint-disable-line
     }
   }
 
-  beforeMount() {
+  beforeMount(): void {
     this.preventReconnection = false;
   }
 
-  renderCanvas() {
+  renderCanvas(): void {
     if (this.context !== undefined && this.buf8 !== undefined) {
       const imagedata = this.context.createImageData(this.width, this.height);
       imagedata.data.set(this.buf8);
@@ -52,7 +52,7 @@ export default class RemoteDisplayPage extends Vue {
     }
   }
 
-  mounted() {
+  mounted(): void {
     this.canvas = this.$refs['screen-canvas'] as HTMLCanvasElement;
     this.context = this.canvas.getContext('2d') || undefined;
 
@@ -77,14 +77,14 @@ export default class RemoteDisplayPage extends Vue {
     window.setInterval(this.renderCanvas, 100); // 10 frames per second max
   }
 
-  beforeDestroy() {
+  beforeDestroy(): void {
     this.preventReconnection = true;
     this.closeSocket();
     this.context = undefined;
     this.canvas = undefined;
   }
 
-  closeSocket() {
+  closeSocket(): void {
     if (this.ws) {
       this.ws.close();
       this.ws = undefined;
@@ -93,7 +93,7 @@ export default class RemoteDisplayPage extends Vue {
     }
   }
 
-  getMousePos(evt) {
+  getMousePos(evt): XYPosition {
     if (this.canvas !== undefined) {
       return {
         x: evt.clientX - this.canvas.offsetLeft,
@@ -106,7 +106,7 @@ export default class RemoteDisplayPage extends Vue {
     };
   }
 
-  onMouseDown(evt) {
+  onMouseDown(evt): void {
     this.log(`mousedown ${evt} ${evt.button}`);
     if (evt.button === 0) {
       this.pressed += 1;
@@ -114,7 +114,7 @@ export default class RemoteDisplayPage extends Vue {
     }
   }
 
-  onMouseUp(evt) {
+  onMouseUp(evt): void {
     this.log(`mouseup ${evt} ${evt.button}`);
     if (evt.button === 0) {
       this.pressed -= 1;
@@ -122,13 +122,13 @@ export default class RemoteDisplayPage extends Vue {
     }
   }
 
-  onMouseMove(evt) {
+  onMouseMove(evt): void {
     if (this.pressed > 0) {
       this.touchscreen(evt);
     }
   }
 
-  touchscreen(evt) {
+  touchscreen(evt): void {
     const { x, y } = this.getMousePos(evt);
     if (this.connected && this.ws !== undefined) {
       this.log(`sending touch ${x},${y},${this.pressed}`);
@@ -143,7 +143,7 @@ export default class RemoteDisplayPage extends Vue {
     }
   }
 
-  setupSocket() {
+  setupSocket(): void {
     try {
       this.createSocket();
     } catch (e) {
@@ -152,7 +152,7 @@ export default class RemoteDisplayPage extends Vue {
     }
   }
 
-  createSocket() {
+  createSocket(): void {
     const ws = new WebSocket(this.url);
     this.log('connecting');
     ws.binaryType = 'arraybuffer';
@@ -176,7 +176,7 @@ export default class RemoteDisplayPage extends Vue {
     };
   }
 
-  rescheduleSetup() {
+  rescheduleSetup(): void {
     if (!this.preventReconnection) {
       this.log('rescheduling socket connect in 1000 ms');
 
@@ -188,7 +188,7 @@ export default class RemoteDisplayPage extends Vue {
     }
   }
 
-  handleScreenUpdate(buffer: DataView, length: number) {
+  handleScreenUpdate(buffer: DataView, length: number): void {
     let index = 0;
     while (index < length && this.data !== undefined) {
       const addr = buffer.getUint32(index, true);
@@ -216,7 +216,9 @@ export default class RemoteDisplayPage extends Vue {
 
 <template>
   <div class="page">
-    <div class="header">Remote display for {{ serviceId }}</div>
+    <div class="header">
+      Remote display for {{ serviceId }}
+    </div>
     <div class="container">
       <div class="background">
         <div class="display">
@@ -227,7 +229,7 @@ export default class RemoteDisplayPage extends Vue {
             :height="height"
             class="view"
           />
-          <div :hidden="connected" :width="width" :height="height" class="glass"/>
+          <div :hidden="connected" :width="width" :height="height" class="glass" />
         </div>
       </div>
     </div>

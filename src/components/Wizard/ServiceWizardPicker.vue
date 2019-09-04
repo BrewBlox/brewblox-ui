@@ -1,20 +1,20 @@
 <script lang="ts">
 import isString from 'lodash/isString';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
-import providerStore from '@/store/providers';
-import serviceStore from '@/store/services';
+import { providerStore } from '@/store/providers';
+import { serviceStore } from '@/store/services';
 
 @Component
 export default class ServiceWizardPicker extends Vue {
   serviceId: string | null = null;
   serviceTitle: string | null = null;
   serviceTypeModel: any = null;
-  serviceWizardActive: boolean = false;
+  serviceWizardActive = false;
 
-  get wizardOptions() {
+  get wizardOptions(): SelectOption[] {
     return providerStore.providerIds
       .map(id => ({
         label: providerStore.displayNameById(id),
@@ -31,24 +31,24 @@ export default class ServiceWizardPicker extends Vue {
     ];
   }
 
-  setTitle(title: string) {
+  setTitle(title: string): void {
     this.$emit('title', title);
   }
 
-  reset() {
+  reset(): void {
     this.serviceWizardActive = false;
     this.setTitle('Service wizard');
   }
 
-  back() {
+  back(): void {
     this.$emit('back');
   }
 
-  close() {
+  close(): void {
     this.$emit('close');
   }
 
-  next() {
+  next(): void {
     const errors = this.serviceIdRules
       .map(rule => rule(this.serviceId))
       .filter(isString);
@@ -66,7 +66,7 @@ export default class ServiceWizardPicker extends Vue {
     this.serviceWizardActive = true;
   }
 
-  mounted() {
+  mounted(): void {
     this.reset();
     this.serviceTypeModel = this.wizardOptions[0];
   }
@@ -77,8 +77,8 @@ export default class ServiceWizardPicker extends Vue {
   <div>
     <!-- Display selected wizard -->
     <component
-      v-if="serviceWizardActive"
       :is="serviceTypeModel.value"
+      v-if="serviceWizardActive"
       :service-id="serviceId"
       :service-title="serviceTitle"
       @title="setTitle"
@@ -92,8 +92,8 @@ export default class ServiceWizardPicker extends Vue {
         <q-item dark>
           <q-item-section>
             <q-select
-              :options="wizardOptions"
               v-model="serviceTypeModel"
+              :options="wizardOptions"
               label="Service type"
               dark
               options-dark
@@ -107,7 +107,7 @@ export default class ServiceWizardPicker extends Vue {
                 <q-icon name="mdi-information">
                   <q-tooltip>
                     The Service ID is how the service is contacted.
-                    <br>This should match the ID in docker-compose.
+                    <br />This should match the ID in docker-compose.
                   </q-tooltip>
                 </q-icon>
               </template>
@@ -121,8 +121,8 @@ export default class ServiceWizardPicker extends Vue {
                 <q-icon name="mdi-information">
                   <q-tooltip>
                     The Service title is how the service is displayed in the UI.
-                    <br>This choice is purely graphical: pick a name that makes sense to you.
-                    <br>If left empty, the service ID will be used.
+                    <br />This choice is purely graphical: pick a name that makes sense to you.
+                    <br />If left empty, the service ID will be used.
                   </q-tooltip>
                 </q-icon>
               </template>
@@ -131,11 +131,11 @@ export default class ServiceWizardPicker extends Vue {
         </q-item>
       </q-card-section>
 
-      <q-separator dark/>
+      <q-separator dark />
 
       <q-card-actions class="row justify-between">
-        <q-btn unelevated label="Back" @click="back"/>
-        <q-btn unelevated label="Next" color="primary" @click="next"/>
+        <q-btn unelevated label="Back" @click="back" />
+        <q-btn unelevated label="Next" color="primary" @click="next" />
       </q-card-actions>
     </template>
   </div>

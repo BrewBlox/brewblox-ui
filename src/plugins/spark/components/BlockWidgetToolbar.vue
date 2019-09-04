@@ -1,64 +1,37 @@
 <script lang="ts">
-import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
-@Component({
-  props: {
-    field: {
-      type: Object,
-      required: true,
-    },
-    graph: {
-      type: Boolean,
-      default: false,
-    },
-  },
-})
-export default class BlockWidgetToolbar extends Vue {
-  graphModalOpen: boolean = false;
+import BlockCrudComponent from './BlockCrudComponent';
+
+@Component
+export default class BlockWidgetToolbar extends BlockCrudComponent {
+  graphModalOpen = false;
 }
 </script>
 
 <template>
-  <WidgetToolbar :title="field.widgetTitle" :subtitle="field.displayName">
+  <WidgetToolbar :title="widget.title" :subtitle="displayName">
     <BlockGraph
       v-if="graphModalOpen"
-      :value="graphModalOpen"
-      :id="field.widgetId"
-      :config="field.graphCfg"
-      :change="v => field.graphCfg = v"
-      @input="v => graphModalOpen = v"
+      :id="widget.id"
+      v-model="graphModalOpen"
+      :config.sync="graphCfg"
     />
 
     <q-item-section side>
-      <q-btn-dropdown flat split icon="settings" @click="field.openModal">
+      <q-btn-dropdown flat split icon="settings" @click="openModal">
         <q-list dark bordered>
+          <!-- Global Actions -->
           <ActionItem
-            v-if="graph"
+            v-if="hasGraph"
             icon="mdi-chart-line"
             label="Show graph"
             @click="graphModalOpen = true"
           />
-          <ActionItem icon="refresh" label="Refresh" @click="field.refreshBlock"/>
-          <slot name="actions"/>
-          <ActionItem
-            v-if="field.$props.onCopy"
-            icon="file_copy"
-            label="Copy to widget"
-            @click="field.$props.onCopy(field.widgetId)"
-          />
-          <ActionItem
-            v-if="field.$props.onMove"
-            icon="exit_to_app"
-            label="Move"
-            @click="field.$props.onMove(field.widgetId)"
-          />
-          <ActionItem
-            v-if="field.$props.onDelete"
-            icon="delete"
-            label="Delete"
-            @click="field.$props.onDelete(field.widgetId)"
-          />
+          <slot name="actions" />
+          <ActionItem icon="refresh" label="Refresh" @click="refreshBlock" />
+          <WidgetActions :crud="crud" no-rename />
+          <BlockActions :crud="crud" />
         </q-list>
       </q-btn-dropdown>
     </q-item-section>

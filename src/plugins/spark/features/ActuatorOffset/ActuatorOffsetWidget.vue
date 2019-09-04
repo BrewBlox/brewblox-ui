@@ -1,17 +1,15 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { getById } from './getters';
 import { ActuatorOffsetBlock } from './types';
 
 @Component
 export default class ActuatorOffsetWidget extends BlockWidget {
-  get block(): ActuatorOffsetBlock {
-    return getById(this.serviceId, this.blockId);
-  }
-  get warnings() {
+  readonly block!: ActuatorOffsetBlock;
+
+  get warnings(): string {
     const warn: string[] = [];
     if (!this.block.data.targetId === null) {
       warn.push('Driven process value invalid');
@@ -22,14 +20,7 @@ export default class ActuatorOffsetWidget extends BlockWidget {
     return warn.join(', ');
   }
 
-  get renamedTargets() {
-    return {
-      setting: 'Target offset',
-      value: 'Actual offset',
-    };
-  }
-
-  enable() {
+  enable(): void {
     this.block.data.enabled = true;
     this.saveBlock();
   }
@@ -38,46 +29,54 @@ export default class ActuatorOffsetWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <ActuatorOffsetForm v-if="modalOpen" v-bind="formProps"/>
-    </q-dialog>
+    <BlockWidgetToolbar :crud="crud" />
 
-    <BlockWidgetToolbar :field="me" graph/>
+    <CardWarning v-if="!block.data.targetId.id">
+      <template #message>
+        Setpoint Driver has no target Setpoint configured.
+      </template>
+    </CardWarning>
+    <CardWarning v-else-if="!block.data.referenceId.id">
+      <template #message>
+        Setpoint Driver has no reference Setpoint configured.
+      </template>
+    </CardWarning>
+    <CardWarning v-else-if="!block.data.enabled">
+      <template #message>
+        <span>
+          Setpoint Driver is disabled:
+          <i>{{ block.data.targetId }}</i> will not be changed.
+        </span>
+      </template>
+      <template #actions>
+        <q-btn text-color="white" flat label="Enable" @click="enable" />
+      </template>
+    </CardWarning>
 
     <q-card-section>
-      <q-item v-if="!block.data.enabled" dark>
-        <q-item-section avatar>
-          <q-icon name="warning"/>
+      <q-item dark class="align-children">
+        <q-item-section>
+          <q-item-label caption>
+            Target offset
+          </q-item-label>
+          <big>{{ block.data.desiredSetting | round }}</big>
         </q-item-section>
         <q-item-section>
-          <span>
-            Offset is disabled:
-            <i>{{ block.data.targetId }}</i> will not be changed.
-          </span>
-        </q-item-section>
-        <q-item-section side>
-          <q-btn text-color="white" flat label="Enable" @click="enable"/>
-        </q-item-section>
-      </q-item>
-
-      <q-item dark>
-        <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>Target offset</q-item-label>
-          <big>{{ block.data.setting | round }}</big>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
-        </q-item-section>
-        <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>Actual offset</q-item-label>
+          <q-item-label caption>
+            Actual offset
+          </q-item-label>
           <big>{{ block.data.value | round }}</big>
         </q-item-section>
       </q-item>
+
       <q-item dark>
         <q-item-section>
-          <AnalogConstraints
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
+          <ConstraintsField
+            :value="block.data.constrainedBy"
             :service-id="serviceId"
-            :field="block.data.constrainedBy"
-            :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
-            readonly
+            type="analog"
+            @input="v => { block.data.constrainedBy = v; saveBlock(); }"
           />
         </q-item-section>
       </q-item>

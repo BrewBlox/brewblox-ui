@@ -1,46 +1,41 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { getById, getClients } from './getters';
+import { getClients } from './getters';
 import { BalancerBlock } from './types';
 
 @Component
 export default class BalancerWidget extends BlockWidget {
-  get block(): BalancerBlock {
-    return getById(this.serviceId, this.blockId);
-  }
+  readonly block!: BalancerBlock;
 
-  get clientNames() {
+  get clientNames(): Record<string, string> {
     return getClients(this.serviceId, this.blockId);
   }
 
-  clientName(id: number) {
-    return this.clientNames[id] || id || 'unknown';
+  clientName(id: number): string {
+    return this.clientNames[id] || `${id}` || 'unknown';
   }
 
-  get renamedTargets() {
-    return this.block.data.clients
-      .reduce(
-        (acc, client, idx) => ({
-          ...acc,
-          [`clients/${idx}/requested`]: `${this.clientName(client.id)} requested`,
-          [`clients/${idx}/granted`]: `${this.clientName(client.id)} granted`,
-        }),
-        {},
-      );
-  }
+  // TODO: implement
+  // get renamedTargets() {
+  //   return this.block.data.clients
+  //     .reduce(
+  //       (acc, client, idx) => ({
+  //         ...acc,
+  //         [`clients/${idx}/requested`]: `${this.clientName(client.id)} requested`,
+  //         [`clients/${idx}/granted`]: `${this.clientName(client.id)} granted`,
+  //       }),
+  //       {},
+  //     );
+  // }
 }
 </script>
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <BalancerForm v-if="modalOpen" v-bind="formProps"/>
-    </q-dialog>
-
-    <BlockWidgetToolbar :field="me" graph/>
+    <BlockWidgetToolbar :crud="crud" />
 
     <q-card-section>
       <q-item dark dense style="opacity: 0.5">

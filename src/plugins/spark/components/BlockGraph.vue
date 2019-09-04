@@ -1,49 +1,47 @@
 <script lang="ts">
+import { Dialog } from 'quasar';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Emit, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { targetSplitter } from '@/components/Graph/functional';
 import { defaultPresets } from '@/components/Graph/getters';
+import HistoryGraph from '@/components/Graph/HistoryGraph.vue';
 import { GraphConfig } from '@/components/Graph/types';
 import { durationString } from '@/helpers/functional';
 import { QueryParams } from '@/store/history';
 
-@Component({
-  props: {
-    value: {
-      type: Boolean,
-      required: true,
-    },
-    id: {
-      type: String,
-      required: true,
-    },
-    config: {
-      type: Object,
-      required: true,
-    },
-    change: {
-      type: Function,
-      required: true,
-    },
-    noDuration: {
-      type: Boolean,
-      default: false,
-    },
-  },
-})
+@Component
 export default class BlockGraph extends Vue {
-  $refs!: {
-    graph: any;
-  }
-  prevStrConfig: string = '';
+  durationString = durationString;
 
-  get modalModel() {
-    return this.$props.value;
+  configString = '';
+
+  @Ref()
+  readonly graph!: HistoryGraph;
+
+  @Prop({ type: Boolean, required: true })
+  readonly value!: boolean;
+
+  @Prop({ type: String, required: true })
+  readonly id!: string;
+
+  @Prop({ type: Object, required: true })
+  readonly config!: Partial<GraphConfig>;
+
+  @Prop({ type: Boolean, default: false })
+  readonly noDuration!: boolean;
+
+  @Emit('update:config')
+  change(cfg: GraphConfig = this.graphCfg): GraphConfig {
+    return cfg;
   }
 
-  set modalModel(val: boolean) {
+  get dialogOpen(): boolean {
+    return this.value;
+  }
+
+  set dialogOpen(val: boolean) {
     this.$emit('input', val);
   }
 
@@ -54,11 +52,12 @@ export default class BlockGraph extends Vue {
       targets: [],
       renames: {},
       axes: {},
-      ...this.$props.config,
+      colors: {},
+      ...this.config,
     };
   }
 
-  get targetKeys() {
+  get targetKeys(): string[][] {
     return targetSplitter(this.graphCfg.targets)
       .map(key => [key, this.graphCfg.renames[key] || key]);
   }
@@ -67,16 +66,16 @@ export default class BlockGraph extends Vue {
     return defaultPresets();
   }
 
-  isRightAxis(key: string) {
+  isRightAxis(key: string): boolean {
     return this.graphCfg.axes[key] === 'y2';
   }
 
-  confirmed(func: Function) {
-    return (v: any) => { func(v); this.$props.change({ ...this.graphCfg }); };
+  axisLabel(key: string): string {
+    return this.isRightAxis(key) ? 'Y2' : 'Y1';
   }
 
-  updateKeySide(key: string, isRight: boolean) {
-    this.$props.change({
+  updateKeySide(key: string, isRight: boolean): void {
+    this.change({
       ...this.graphCfg,
       axes: {
         ...this.graphCfg.axes,
@@ -85,87 +84,86 @@ export default class BlockGraph extends Vue {
     });
   }
 
-  applyPreset(preset: QueryParams) {
-    this.$props.change({
+  applyPreset(preset: QueryParams): void {
+    this.change({
       ...this.graphCfg,
       params: { ...preset },
     });
   }
 
-  parseDuration(val: string): string {
-    return durationString(val);
+  updateDuration(): void {
+    Dialog.create({
+      component: 'InputDialog',
+      title: 'Duration',
+      root: this.$root,
+      value: this.graphCfg.params.duration,
+    })
+      .onOk(val => {
+        this.graphCfg.params.duration = durationString(val);
+        this.change(this.graphCfg);
+      });
   }
 
   @Watch('graphCfg')
-  onCfgChange() {
+  onCfgChange(newVal): void {
     // Vue considers configuration "changed" with every block data update
     // To avoid constantly refreshing listeners, we need to do a deep compare
-    const strConfig = JSON.stringify(this.graphCfg);
-    if (strConfig !== this.prevStrConfig) {
-      this.prevStrConfig = strConfig;
-      this.$nextTick(() => this.$refs.graph && this.$refs.graph.resetListeners());
+    if (JSON.stringify(newVal) !== this.configString) {
+      this.configString = JSON.stringify(newVal);
+      this.$nextTick(() => this.graph && this.graph.resetListeners());
     }
   }
 
-  mounted() {
-    this.prevStrConfig = JSON.stringify(this.graphCfg);
+  created(): void {
+    this.configString = JSON.stringify(this.graphCfg);
   }
 }
 </script>
 
 <template>
-  <q-dialog v-model="modalModel" maximized>
-    <q-card v-if="modalModel" class="text-white bg-dark-bright" dark>
-      <GraphCard ref="graph" :id="$props.id" :config="graphCfg">
-        <q-btn-dropdown
-          v-if="!$props.noDuration"
-          auto-close
-          flat
-          label="timespan"
-          icon="mdi-timelapse"
-        >
-          <q-item
-            v-for="(preset, idx) in presets"
-            :key="idx"
-            dark
-            link
-            clickable
-            @click="() => applyPreset(preset)"
-          >
-            <q-item-section>{{ preset.duration }}</q-item-section>
-          </q-item>
-        </q-btn-dropdown>
-        <q-btn-dropdown flat label="settings" icon="settings">
-          <q-item dark link clickable @click="() => $refs.duration.$el.click()">
-            <q-item-section side>Duration</q-item-section>
-            <q-item-section @click="() => $refs.duration.$el.click()">
-              <InputPopupEdit
-                ref="duration"
-                :field="graphCfg.params.duration"
-                :change="confirmed(v => $set(graphCfg.params, 'duration', parseDuration(v)))"
-                label="Duration"
-                tag="span"
-              />
-            </q-item-section>
-          </q-item>
-          <q-expansion-item label="Left or right axis">
+  <q-dialog v-model="dialogOpen" maximized>
+    <q-card v-if="dialogOpen" class="text-white bg-dark-bright" dark>
+      <HistoryGraph :id="id" ref="graph" :config="graphCfg">
+        <template v-slot:controls>
+          <q-btn-dropdown v-if="!noDuration" auto-close flat label="timespan" icon="mdi-timelapse">
             <q-item
-              v-for="[key, renamed] in targetKeys"
-              :key="key"
+              v-for="(preset, idx) in presets"
+              :key="idx"
+              :active="preset.duration === graphCfg.params.duration"
               dark
               link
               clickable
-              @click="updateKeySide(key, !isRightAxis(key))"
+              @click="applyPreset(preset)"
             >
-              <q-item-section>{{ renamed }}</q-item-section>
-              <q-item-section side>
-                <q-icon :class="{mirrored: isRightAxis(key)}" name="mdi-chart-line"/>
+              <q-item-section>{{ preset.duration }}</q-item-section>
+            </q-item>
+          </q-btn-dropdown>
+          <q-btn-dropdown flat label="settings" icon="settings">
+            <q-item dark link clickable @click="updateDuration">
+              <q-item-section>Duration</q-item-section>
+              <q-item-section class="col-auto">
+                {{ durationString(graphCfg.params.duration) }}
               </q-item-section>
             </q-item>
-          </q-expansion-item>
-        </q-btn-dropdown>
-        <q-btn v-close-popup flat label="close"/>
-      </GraphCard>
+            <q-expansion-item label="Display Axis">
+              <q-item
+                v-for="[key, renamed] in targetKeys"
+                :key="key"
+                dark
+                link
+                clickable
+                @click="updateKeySide(key, !isRightAxis(key))"
+              >
+                <q-item-section>{{ renamed }}</q-item-section>
+                <q-item-section side>
+                  {{ axisLabel(key) }}
+                </q-item-section>
+              </q-item>
+            </q-expansion-item>
+          </q-btn-dropdown>
+          <q-btn v-close-popup flat label="close" />
+        </template>
+      </HistoryGraph>
     </q-card>
   </q-dialog>
 </template>

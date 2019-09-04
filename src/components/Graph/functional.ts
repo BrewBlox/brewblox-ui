@@ -1,7 +1,9 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
 
-import historyStore, { QueryTarget } from '@/store/history';
+import { prettify } from '@/helpers/units';
+import { propertyNameWithUnit } from '@/helpers/units/parseObject';
+import { historyStore,QueryTarget } from '@/store/history';
 
 export interface QuasarNode {
   label: string;
@@ -78,7 +80,7 @@ export const targetSplitter =
       );
 
 export const targetBuilder =
-  (vals: string[], filterUnknown: boolean = true): QueryTarget[] => {
+  (vals: string[], filterUnknown = true): QueryTarget[] => {
     const knownFields = historyStore.fields;
     return vals
       .reduce(
@@ -99,3 +101,10 @@ export const targetBuilder =
         [],
       );
   };
+
+export const defaultLabel = (key: string): string => {
+  const [name, postfix] = propertyNameWithUnit(key);
+  const prettyName = name.split('/').slice(1).join(' ');
+  const prettyUnit = prettify(postfix || '');
+  return `${prettyName} ${prettyUnit}`;
+};

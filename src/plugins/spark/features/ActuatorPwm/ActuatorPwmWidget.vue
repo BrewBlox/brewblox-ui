@@ -1,112 +1,100 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { getById } from './getters';
 import { ActuatorPwmBlock } from './types';
 
 @Component
 export default class ActuatorPwmWidget extends BlockWidget {
-  get block(): ActuatorPwmBlock {
-    return getById(this.serviceId, this.blockId);
-  }
+  readonly block!: ActuatorPwmBlock;
 
-  get renamedTargets() {
-    return {
-      setting: 'Duty Setting',
-      value: 'Duty Achieved',
-    };
-  }
-
-  get pending() {
-    if (!this.block.data.constrainedBy) {
-      return null;
-    }
-    const { unconstrained } = this.block.data.constrainedBy;
-    if (this.block.data.setting === unconstrained) {
-      return null;
-    }
-    return unconstrained;
-  }
-
-  enable() {
-    this.block.data.enabled = true;
-    this.saveBlock();
+  get isConstrained(): boolean {
+    return this.block.data.enabled
+      && this.block.data.setting !== this.block.data.desiredSetting;
   }
 }
 </script>
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <ActuatorPwmForm v-if="modalOpen" v-bind="formProps"/>
-    </q-dialog>
+    <BlockWidgetToolbar :crud="crud" />
 
-    <BlockWidgetToolbar :field="me" graph/>
-
+    <CardWarning v-if="!block.data.actuatorId.id">
+      <template #message>
+        PWM has no target actuator configured.
+      </template>
+    </CardWarning>
+    <CardWarning v-else-if="!block.data.enabled">
+      <template #message>
+        <span>
+          PWM is disabled:
+          <i>{{ block.data.actuatorId }}</i> will not be toggled.
+        </span>
+      </template>
+      <template #actions>
+        <q-btn
+          text-color="white"
+          flat
+          label="Enable"
+          @click="block.data.enabled = true; saveBlock();"
+        />
+      </template>
+    </CardWarning>
     <q-card-section>
-      <q-item v-if="!block.data.enabled" dark>
-        <q-item-section avatar>
-          <q-icon name="warning"/>
-        </q-item-section>
+      <q-item dark class="align-children">
         <q-item-section>
-          <span>
-            PWM is disabled:
-            <i>{{ block.data.actuatorId }}</i> will not be toggled.
-          </span>
-        </q-item-section>
-        <q-item-section side>
-          <q-btn text-color="white" flat label="Enable" @click="enable"/>
-        </q-item-section>
-      </q-item>
-
-      <q-item dark>
-        <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>Duty setting</q-item-label>
-          <div>
-            <InputPopupEdit
-              v-if="!isDriven"
-              :field="block.data.setting"
-              :change="callAndSaveBlock(v => block.data.setting = v)"
+          <q-item-label caption>
+            Setting
+          </q-item-label>
+          <div :class="{['text-orange']: isConstrained}">
+            <SliderField
+              :value="block.data.setting"
+              :readonly="isDriven"
               style="display: inline-block"
-              type="number"
-              label="Duty Setting"
+              title="Duty Setting"
+              tag="big"
+              @input="v => { block.data.desiredSetting = v; saveBlock(); }"
             />
-            <big v-else>{{ block.data.setting | round }}</big>
             <small
               v-if="block.data.setting !== null"
               style="display: inline-block"
               class="q-ml-xs"
             >%</small>
           </div>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
         </q-item-section>
-        <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>Duty achieved</q-item-label>
+
+        <q-item-section>
+          <q-item-label caption>
+            Duty achieved
+          </q-item-label>
           <div>
             <big>{{ block.data.value | round }}</big>
             <small class="q-ml-xs">%</small>
           </div>
         </q-item-section>
-      </q-item>
 
-      <q-item v-if="pending !== null" dark>
         <q-item-section>
-          <q-item-label caption>Unconstrained setting</q-item-label>
-          <div>
-            <big>{{ pending | round }}</big>
-            <small class="q-ml-xs">%</small>
-          </div>
+          <template v-if="isConstrained">
+            <q-item-label caption>
+              Unconstrained setting
+            </q-item-label>
+            <div>
+              <big>{{ block.data.desiredSetting | round }}</big>
+              <small class="q-ml-xs">%</small>
+            </div>
+          </template>
         </q-item-section>
       </q-item>
+
       <q-item dark>
         <q-item-section>
-          <AnalogConstraints
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
+          <ConstraintsField
+            :value="block.data.constrainedBy"
             :service-id="serviceId"
-            :field="block.data.constrainedBy"
-            :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
-            readonly
+            type="analog"
+            @input="v => { block.data.constrainedBy = v; saveBlock(); }"
           />
         </q-item-section>
       </q-item>

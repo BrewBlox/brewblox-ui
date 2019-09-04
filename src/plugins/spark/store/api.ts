@@ -1,10 +1,9 @@
 import { Notify } from 'quasar';
-import queryString from 'query-string';
 
 import { del, get, post, put, sse } from '@/helpers/fetch';
 import { deserialize } from '@/helpers/units/parseObject';
 
-import { Block, DataBlock, SystemStatus,UnitAlternatives, UserUnits } from '../types';
+import { Block, DataBlock, SystemStatus, UnitAlternatives, UserUnits } from '../types';
 
 
 const asDataBlock = (block: Block): DataBlock =>
@@ -36,6 +35,11 @@ export const fetchBlock = async (block: Block): Promise<Block> =>
   get(`/${encodeURIComponent(block.serviceId)}/objects/${encodeURIComponent(block.id)}`)
     .then(fetched => asBlock(fetched, block.serviceId))
     .catch(intercept(`Failed to fetch ${block.id}`));
+
+export const fetchStoredBlock = async (serviceId: string, id: string | number): Promise<Block> =>
+  get(`/${encodeURIComponent(serviceId)}/stored_objects/${encodeURIComponent(id)}`)
+    .then(fetched => asBlock(fetched, serviceId))
+    .catch(intercept(`Failed to fetch stored block ${id}`));
 
 export const createBlock = async (block: Block): Promise<Block> =>
   post(
@@ -73,6 +77,10 @@ export const clearBlocks = async (serviceId: string): Promise<any> =>
   del(`/${encodeURIComponent(serviceId)}/objects`, {})
     .catch(intercept(`Failed to clear blocks on ${serviceId}`));
 
+export const cleanUnusedNames = async (serviceId: string): Promise<string[]> =>
+  del(`/${encodeURIComponent(serviceId)}/unused_names`, {})
+    .catch(intercept(`Failed to clean unused block names on ${serviceId}`));
+
 export const fetchUnits = async (serviceId: string): Promise<UserUnits> =>
   get(`/${encodeURIComponent(serviceId)}/codec/units`)
     .catch(intercept(`Failed to fetch unit settings on ${serviceId}`));
@@ -85,9 +93,9 @@ export const fetchUnitAlternatives = async (serviceId: string): Promise<UnitAlte
   get(`/${encodeURIComponent(serviceId)}/codec/unit_alternatives`)
     .catch(intercept(`Failed to fetch unit alternatives on ${serviceId}`));
 
-export const fetchCompatibleBlocks = async (serviceId: string, type: string, ): Promise<string[]> =>
-  get(`/${encodeURIComponent(serviceId)}/compatible_objects?${queryString.stringify({ interface: type })}`)
-    .catch(intercept(`Failed to fetch blocks compatible to ${type}`));
+export const fetchCompatibleTypes = async (serviceId: string): Promise<Record<string, string[]>> =>
+  get(`/${encodeURIComponent(serviceId)}/codec/compatible_types`)
+    .catch(intercept(`Failed to fetch compatible types on ${serviceId}`));
 
 export const fetchDiscoveredBlocks = async (serviceId: string): Promise<string[]> =>
   get(`/${encodeURIComponent(serviceId)}/discover_objects`)
@@ -115,20 +123,32 @@ export const fetchUpdateSource = async (
   return source;
 };
 
-export const fetchSystemStatus = async (serviceId: string): Promise<SystemStatus> =>
-  get(`/${encodeURIComponent(serviceId)}/system/status`)
-    .then(retv => ({
+export const fetchSystemStatus = async (serviceId: string): Promise<SystemStatus> => {
+  try {
+    const retv: SystemStatus = await get(`/${encodeURIComponent(serviceId)}/system/status`);
+    return {
       ...retv,
       available: true,
       checkedAt: new Date(),
-    }))
-    .catch((error) => ({
-      error,
-      available: false,
-      connected: false,
-      synchronized: false,
+    };
+  } catch (error) {
+    return {
       checkedAt: new Date(),
-    }));
+      available: false,
+      connect: false,
+      handshake: false,
+      synchronize: false,
+      compatible: true, // no idea - assume yes
+      latest: true, // no idea - assume yes
+      info: [],
+      error,
+    };
+  }
+};
+
+export const flashFirmware = async (serviceId: string): Promise<any> =>
+  post(`/${encodeURIComponent(serviceId)}/system/flash`, {})
+    .catch(intercept(`Failed to update firmware on ${serviceId}`));
 
 export const serviceExport = async (serviceId: string): Promise<any> =>
   get(`/${encodeURIComponent(serviceId)}/export_objects`)

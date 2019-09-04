@@ -1,13 +1,13 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
-import dashboardStore from '@/store/dashboards';
-import serviceStore from '@/store/services';
+import { dashboardStore } from '@/store/dashboards';
+import { serviceStore } from '@/store/services';
 
 @Component
 export default class App extends Vue {
-  async created() {
+  async created(): Promise<void> {
     await Promise.all([
       serviceStore.setup(),
       dashboardStore.setup(),
@@ -18,7 +18,7 @@ export default class App extends Vue {
 
 <template>
   <div id="q-app">
-    <router-view/>
+    <router-view />
   </div>
 </template>
 

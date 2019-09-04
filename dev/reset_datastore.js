@@ -27,6 +27,14 @@ const retry = async (desc, func) => {
 
 const resetSettings = async () => {
   const resp = await retry('settings', async () => {
+
+    // Create system database files
+    await Promise.all([
+      request.put(`${host}/_users`),
+      request.put(`${host}/_replicator`),
+      request.put(`${host}/_global_changes`),
+    ].map(p => p.catch(() => { })));
+
     await request.put({
       uri: `${host}/_node/_local/_config/httpd/enable_cors`,
       body: '"true"',

@@ -139,13 +139,11 @@ export class Coordinates {
     }
 
     // Step 1 - start
-    const squareAnchor = this;
     const shapeAnchor = new Coordinates(shapeCoordinates);
     const [newSizeX, newSizeY] = rotatedSize(totalRotation, shapeSize);
 
-    const rotatedSquareCenter = squareAnchor
-      // Step 2 - shift from square anchor to center
-      .translate([0.5, 0.5, 0])
+    // Step 2 - shift from square anchor (this) to center
+    const rotatedSquareCenter = this.translate([0.5, 0.5, 0])
       // Step 3 - rotate around shape anchor
       .rotate(rotation, shapeAnchor);
 
@@ -174,22 +172,19 @@ export class Coordinates {
       return new Coordinates(this);
     }
 
-    // Step 1 - start
-    const edge = this;
+    // Step 1 - Shift left/up to square anchor
+    const squareAnchor = new Coordinates([Math.floor(this.x), Math.floor(this.y), 0]);
+    const shiftX = squareAnchor.x - this.x;
+    const shiftY = squareAnchor.y - this.y;
 
-    // Step 2 - Shift left/up to square anchor
-    const squareAnchor = new Coordinates([Math.floor(edge.x), Math.floor(edge.y), 0]);
-    const shiftX = squareAnchor.x - edge.x;
-    const shiftY = squareAnchor.y - edge.y;
-
-    // Step 3 - Rotate square around shape anchor
+    // Step 2 - Rotate square around shape anchor
     const rotatedSquareAnchor = squareAnchor
       .rotateShapeSquare(rotation, shapeRotation, shapeSize, shapeCoordinates);
 
-    // Step 4 - Unshift from square anchor
+    // Step 3 - Unshift from square anchor
     const rotatedEdge = rotatedSquareAnchor
       .translate([-shiftX, -shiftY, 0])
-      // Step 5 - Rotate around square center
+      // Step 4 - Rotate around square center
       .rotate(rotation, rotatedSquareAnchor.translate([0.5, 0.5, 0]));
 
     return rotatedEdge;
@@ -214,6 +209,19 @@ export class Coordinates {
     const flippedEdge = this.translate([shiftX, 0, 0]);
 
     return flippedEdge;
+  }
+
+  public subSquares(
+    squares: CoordinatesParam[],
+    shapeRotation: number,
+    shapeSize: [number, number],
+  ): Coordinates[] {
+    return squares
+      .map((square) =>
+        new Coordinates(square)
+          .rotateShapeSquare(shapeRotation, 0, shapeSize)
+          .translate(this)
+      );
   }
 
   public toString(): string {

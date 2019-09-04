@@ -1,10 +1,9 @@
 import { uid } from 'quasar';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import { DashboardItem } from '@/store/dashboards';
-import dashboardStore from '@/store/dashboards';
-import featureStore from '@/store/features';
+import { DashboardItem, dashboardStore } from '@/store/dashboards';
+import { featureStore } from '@/store/features';
 
 export interface NavAction {
   label: string;
@@ -12,24 +11,25 @@ export interface NavAction {
   enabled: Function;
 }
 
-@Component({
-  props: {
-    featureId: {
-      type: String,
-      required: true,
-    },
-    dashboardId: {
-      type: String,
-      required: false,
-    },
-  },
-})
+@Component
 export default class WidgetWizardBase extends Vue {
   protected widgetId: string = uid();
-  protected widgetTitle: string = '';
+  protected widgetTitle = '';
+
+  @Prop({ type: String, required: true })
+  public readonly featureId!: string;
+
+  @Prop({ type: String, required: false })
+  public readonly dashboardId!: string;
+
+  @Emit()
+  public back(): void { }
+
+  @Emit()
+  public close(): void { }
 
   protected get typeId(): string {
-    return this.$props.featureId;
+    return this.featureId;
   }
 
   protected get typeDisplayName(): string {
@@ -41,28 +41,17 @@ export default class WidgetWizardBase extends Vue {
   }
 
   protected async createItem(item: DashboardItem): Promise<void> {
-    try {
-      await dashboardStore.appendDashboardItem(item);
-      this.$q.notify({
+    await dashboardStore.appendDashboardItem(item)
+      .then(() => this.$q.notify({
         icon: 'mdi-check-all',
         color: 'positive',
         message: `Created ${featureStore.displayNameById(item.feature)} '${item.title}'`,
-      });
-    } catch (e) {
-      this.$q.notify({
+      }))
+      .catch(e => this.$q.notify({
         icon: 'error',
         color: 'negative',
         message: `Failed to create widget: ${e.toString()}`,
-      });
-    }
-    this.$emit('close');
-  }
-
-  protected back(): void {
-    this.$emit('back');
-  }
-
-  protected close(): void {
-    this.$emit('close');
+      }))
+      .finally(this.close);
   }
 }

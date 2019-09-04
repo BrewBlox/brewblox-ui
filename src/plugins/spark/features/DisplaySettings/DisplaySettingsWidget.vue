@@ -1,58 +1,67 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { getById } from './getters';
-import { DisplaySettingsBlock } from './types';
+import { DisplaySettingsBlock, DisplaySlot } from './types';
 
 @Component
 export default class DisplaySettingsWidget extends BlockWidget {
-  get block(): DisplaySettingsBlock {
-    return getById(this.serviceId, this.blockId);
-  }
+  readonly block!: DisplaySettingsBlock;
 
-  get displaySlots(): any[][] {
-    const slots = Array(6);
+  get slots(): DisplaySlot[] {
+    const slots = Array<DisplaySlot>(6);
     this.block.data.widgets
-      .forEach((w) => { slots[w.pos - 1] = w; });
+      .forEach(w => slots[w.pos - 1] = w);
     return slots;
   }
 
-  slotStyle(slot) {
-    return `color: #${slot.color} !important`;
+  get footerRules(): InputRule[] {
+    return [
+      v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
+    ];
   }
 }
 </script>
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <DisplaySettingsForm v-if="modalOpen" v-bind="formProps"/>
-    </q-dialog>
-
-    <BlockWidgetToolbar :field="me"/>
+    <BlockWidgetToolbar :crud="crud" />
 
     <q-card-section>
       <q-list dark dense>
         <div class="row">
-          <q-item v-for="(slot, idx) in displaySlots" :key="idx" class="col-4">
+          <q-item
+            v-for="(slot, idx) in slots"
+            :key="idx"
+            clickable
+            class="col-4"
+            @click="openModal"
+          >
             <q-item-section>
-              <q-item-label caption>Slot {{ idx + 1 }}</q-item-label>
-              <span v-if="slot" :style="slotStyle(slot)" class="text-bold">{{ slot.name }}</span>
+              <q-item-label caption>
+                Slot {{ idx + 1 }}
+              </q-item-label>
+              <span
+                v-if="slot"
+                :style="`color: #${slot.color} !important`"
+                class="text-bold"
+              >{{ slot.name || '---' }}</span>
               <span v-else class="darkened">Not set</span>
             </q-item-section>
           </q-item>
         </div>
 
         <q-item dark>
-          <q-item-section side>Footer text</q-item-section>
+          <q-item-section side class="q-pb-xs">
+            Footer text
+          </q-item-section>
           <q-item-section>
-            <InputPopupEdit
-              :field="block.data.name"
-              :change="callAndSaveBlock(v => block.data.name = v)"
-              label="footer text"
-              tag="span"
+            <InputField
+              :value="block.data.name"
+              :rules="footerRules"
+              title="footer text"
+              @input="v => { block.data.name = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>

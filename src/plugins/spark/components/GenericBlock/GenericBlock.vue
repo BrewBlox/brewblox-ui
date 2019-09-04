@@ -1,5 +1,5 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
@@ -10,11 +10,13 @@ export default class GenericBlock extends BlockWidget { }
 <template>
   <q-card dark class="column">
     <q-card-title class="title-bar">
-      <div class="ellipsis">{{ widgetId }}</div>
+      <div class="ellipsis">
+        {{ widget.id }}
+      </div>
       <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
-      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock"/>
+      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock" />
     </q-card-title>
-    <q-card-separator/>
+    <q-card-separator />
 
     <q-card-main>
       <q-item dark>

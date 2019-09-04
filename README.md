@@ -17,7 +17,7 @@ $ npm install
 $ docker-compose pull
 
 
-# serve with hot reload at localhost:8080
+# serve with hot reload at localhost:8080/ui/
 $ npm start
 ```
 
@@ -46,6 +46,8 @@ The BrewBlox UI is centered around the concept of it being a dashboard that can 
 Each device or service supported by the BrewBlox UI is implemented as a provider. All interaction with those supported devices or services is encapsulated here.
 
 Providers are modular, and placed in the `plugins` directory.
+
+If you only want to add a single widget, you don't need to add a provider.
 
 ### Service
 
@@ -85,39 +87,42 @@ In order to support the `gizmo` device:
 * Create the `src/plugins/gizmo` directory.
 * In `src/plugins/gizmo/index.ts`, add an initializer:
 ```js
-import providerStore from '@/store/providers';
+import { providerStore } from '@/store/providers';
 
-export default({ store, router }: PluginArguments) => {
-  providerStore.createProvider({
-    id: 'Gizmo',
-    displayName: 'Totally Awesome Gizmo Device',
+export default {
+  install(Vue: VueConstructor, { store }) {
+    providerStore.createProvider({
+        id: 'Gizmo',
+        displayName: 'Totally Awesome Gizmo Device',
 
-    // IDs of separately created features
-    features: [],
+        // IDs of separately created features
+        features: [],
 
-    // Called whenever a new service is created
-    onAdd: async (service) => {},
+        // Called whenever a new service is created
+        onAdd: async (service) => {},
 
-    // Called whenever a service is removed
-    onRemove: async (service) => {},
+        // Called whenever a service is removed
+        onRemove: async (service) => {},
 
-    // Called after a service is created
-    onFetch: async (service) => {},
+        // Called after a service is created
+        onFetch: async (service) => {},
 
-    // Globally registered Vue components
-    wizard: 'GizmoWizard',
-    page: 'GizmoPage',
-  });
+        // Globally registered Vue components
+        wizard: 'GizmoWizard',
+        page: 'GizmoPage',
+      });
+  }
 }
 ```
-* Add your plugin to the list of known plugins in `src/main.ts`.
+* Add your plugin to the list of local plugins in `src/main.ts`.
 ```js
 import gizmo from './plugins/gizmo'
 
-const plugins = [
-  portal,
-  spark,
+const plugins: PluginObject<any>[] = [
+  PortalVue,
   history,
+  spark,
+  builder,
   gizmo, // new
 ];
 ```

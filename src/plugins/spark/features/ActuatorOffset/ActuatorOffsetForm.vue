@@ -1,108 +1,111 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { ActuatorOffsetBlock } from '@/plugins/spark/features/ActuatorOffset/types';
 
-import { defaultData, presets } from './getters';
-
 @Component
-export default class ActuatorOffsetForm extends BlockForm {
-  get block(): ActuatorOffsetBlock {
-    return this.blockField as ActuatorOffsetBlock;
-  }
-
-  defaultData() {
-    return defaultData();
-  }
-
-  presets() {
-    return presets();
-  }
+export default class ActuatorOffsetForm extends BlockCrudComponent {
+  readonly block!: ActuatorOffsetBlock;
 }
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
+  <GraphCardWrapper>
+    <template #graph>
+      <HistoryGraph :id="widget.id" :config="graphCfg" />
+    </template>
 
-    <q-card-section>
-      <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
+    <q-card dark class="widget-modal">
+      <BlockFormToolbar :crud="crud" />
+
+      <q-card-section>
+        <CardWarning v-if="!block.data.targetId.id">
+          <template #message>
+            Target setpoint is not configured for this setpoint driver.
+          </template>
+        </CardWarning>
+        <CardWarning v-else-if="!block.data.referenceId.id">
+          <template #message>
+            Reference setpoint is not configured for this setpoint driver.
+          </template>
+        </CardWarning>
         <BlockEnableToggle
-          v-bind="$props"
+          v-else
+          :crud="crud"
           :text-enabled="`Offset is enabled: ${block.data.targetId} will be offset from the
           ${block.data.referenceSettingOrValue == 0 ? 'setting' : 'value'} of ${block.data.referenceId}.`"
           :text-disabled="`Offset is disabled: ${block.data.targetId} will not be changed.`"
         />
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>Driven block</q-item-label>
-            <LinkPopupEdit
-              :field="block.data.targetId"
-              :service-id="block.serviceId"
-              :change="callAndSaveBlock(v => block.data.targetId = v)"
-              label="Driven block"
-              tag="span"
+            <q-item-label caption>
+              Driven block
+            </q-item-label>
+            <LinkField
+              :value="block.data.targetId"
+              :service-id="serviceId"
+              title="Driven block"
+              @input="v => { block.data.targetId = v; saveBlock(); }"
             />
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>Offset from</q-item-label>
+            <q-item-label caption>
+              Offset from
+            </q-item-label>
             <div>
-              <LinkPopupEdit
-                :field="block.data.referenceId"
-                :service-id="block.serviceId"
-                :change="callAndSaveBlock(v => block.data.referenceId = v)"
-                label="Reference block"
-                tag="span"
+              <LinkField
+                :value="block.data.referenceId"
+                :service-id="serviceId"
+                title="Reference block"
                 style="display: inline-block"
+                @input="v => { block.data.referenceId = v; saveBlock(); }"
               />
               <span class="q-px-xs">&gt;</span>
-              <SelectPopupEdit
-                :field="block.data.referenceSettingOrValue"
-                :change="callAndSaveBlock(v => block.data.referenceSettingOrValue = v)"
+              <SelectField
+                :value="block.data.referenceSettingOrValue"
                 :options="[{label: 'Setting', value: 0}, {label: 'Measured value', value: 1}]"
-                label="reference field"
-                tag="span"
+                title="Reference field"
                 style="display: inline-block"
+                @input="v => { block.data.referenceSettingOrValue = v; saveBlock(); }"
               />
             </div>
           </q-item-section>
         </q-item>
         <q-item dark>
           <q-item-section style="justify-content: flex-start">
-            <q-item-label caption>Target Offset</q-item-label>
-            <InputPopupEdit
-              v-if="!isDriven"
-              :field="block.data.setting"
-              :change="callAndSaveBlock(v => block.data.setting = v)"
-              label="Target offset"
+            <q-item-label caption>
+              Target Offset
+            </q-item-label>
+            <InputField
+              :readonly="isDriven"
+              :value="block.data.desiredSetting"
+              tag="big"
+              title="Target offset"
               type="number"
+              @input="v => { block.data.desiredSetting = v; saveBlock(); }"
             />
-            <big v-else>{{ block.data.setting | round }}</big>
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
           </q-item-section>
           <q-item-section style="justify-content: flex-start">
-            <q-item-label caption>Current offset</q-item-label>
+            <q-item-label caption>
+              Current offset
+            </q-item-label>
             <big>{{ block.data.value | round }}</big>
           </q-item-section>
         </q-item>
-      </q-expansion-item>
 
-      <q-expansion-item group="modal" icon="mdi-less-than-or-equal" label="Constraints">
         <q-item dark>
           <q-item-section>
-            <AnalogConstraints
-              :service-id="block.serviceId"
-              :field="block.data.constrainedBy"
-              :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
+            <ConstraintsField
+              :value="block.data.constrainedBy"
+              :service-id="serviceId"
+              type="analog"
+              @input="v => { block.data.constrainedBy = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
-      </q-expansion-item>
-    </q-card-section>
-  </q-card>
+      </q-card-section>
+    </q-card>
+  </graphcardwrapper>
 </template>

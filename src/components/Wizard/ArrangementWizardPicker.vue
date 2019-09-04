@@ -1,41 +1,41 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
-import featureStore from '@/store/features';
+import { featureStore } from '@/store/features';
 
 @Component
 export default class ArrangementWizardPicker extends Vue {
-  arrangementId: string = '';
-  searchModel: string = '';
+  arrangementId = '';
+  searchModel = '';
   wizardModel: any = null;
-  wizardActive: boolean = false;
+  wizardActive = false;
 
-  get wizardOptions() {
+  get wizardOptions(): { id: string; displayName: string }[] {
     return featureStore.arrangementValues
       .filter(arr => !!arr.wizard)
       .sort(objectStringSorter('displayName'));
   }
 
-  setTitle(title: string) {
+  setTitle(title: string): void {
     this.$emit('title', title);
   }
 
-  reset() {
+  reset(): void {
     this.wizardActive = false;
     this.setTitle('Arrangement wizard');
   }
 
-  back() {
+  back(): void {
     this.$emit('back');
   }
 
-  close() {
+  close(): void {
     this.$emit('close');
   }
 
-  next() {
+  next(): void {
     if (!this.wizardModel) {
       this.$q.notify({
         message: 'Please select a wizard',
@@ -48,7 +48,7 @@ export default class ArrangementWizardPicker extends Vue {
     this.wizardActive = true;
   }
 
-  mounted() {
+  mounted(): void {
     this.reset();
     this.wizardModel = this.wizardOptions[0];
   }
@@ -59,8 +59,8 @@ export default class ArrangementWizardPicker extends Vue {
   <div>
     <!-- Display selected wizard -->
     <component
-      v-if="wizardActive"
       :is="wizardModel.wizard"
+      v-if="wizardActive"
       :feature-id="wizardModel.id"
       @title="setTitle"
       @back="reset"
@@ -73,10 +73,11 @@ export default class ArrangementWizardPicker extends Vue {
         <q-item dark>
           <q-item-section>
             <q-select
-              :options="wizardOptions"
               v-model="wizardModel"
+              :options="wizardOptions"
               label="Arrangement type"
               option-label="displayName"
+              option-value="id"
               dark
               options-dark
             />
@@ -84,11 +85,11 @@ export default class ArrangementWizardPicker extends Vue {
         </q-item>
       </q-card-section>
 
-      <q-separator dark/>
+      <q-separator dark />
 
       <q-card-actions class="row justify-between">
-        <q-btn unelevated label="Back" @click="back"/>
-        <q-btn unelevated label="Next" color="primary" @click="next"/>
+        <q-btn unelevated label="Back" @click="back" />
+        <q-btn unelevated label="Next" color="primary" @click="next" />
       </q-card-actions>
     </template>
   </div>

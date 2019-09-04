@@ -1,53 +1,62 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
-import { Unit } from '@/helpers/units';
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+
+import { TempSensorOneWireBlock } from './types';
 
 @Component
-export default class TempSensorOneWireForm extends BlockForm {
-  defaultData() {
-    return {
-      value: new Unit(null, 'degC'),
-      offset: new Unit(0, 'delta_degC'),
-      address: '',
-    };
-  }
-
-  presets() {
-    return [];
-  }
+export default class TempSensorOneWireForm extends BlockCrudComponent {
+  readonly block!: TempSensorOneWireBlock;
 }
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
-    <q-card-section>
-      <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
+  <GraphCardWrapper>
+    <template #graph>
+      <HistoryGraph :id="widget.id" :config="graphCfg" />
+    </template>
+
+    <q-card dark class="widget-modal">
+      <BlockFormToolbar :crud="crud" />
+      <CardWarning v-if="block.data.value.val === null">
+        <template #message>
+          OneWire Sensor could not be read.
+        </template>
+      </CardWarning>
+
+      <q-card-section>
         <q-item dark>
-          <q-item-section>
-            <q-item-label caption>Address</q-item-label>
-            <InputPopupEdit
-              :field="block.data.address"
-              :change="callAndSaveBlock(v => block.data.address = v)"
-              label="Address"
+          <q-item-section class="col-6">
+            <q-item-label caption>
+              Address
+            </q-item-label>
+            <InputField
+              :value="block.data.address"
+              title="Address"
+              tag="big"
+              @input="v => { block.data.address = v; saveBlock(); }"
             />
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>Offset</q-item-label>
-            <UnitPopupEdit
-              :field="block.data.offset"
-              :change="callAndSaveBlock(v => block.data.offset = v)"
-              label="Offset"
+            <q-item-label caption>
+              Offset
+            </q-item-label>
+            <UnitField
+              :value="block.data.offset"
+              title="Offset"
+              tag="big"
+              @input="v => { block.data.offset = v; saveBlock(); }"
             />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>
+              Value
+            </q-item-label>
+            <UnitField :value="block.data.value" readonly tag="big" />
           </q-item-section>
         </q-item>
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
-      </q-expansion-item>
-    </q-card-section>
-  </q-card>
+      </q-card-section>
+    </q-card>
+  </graphcardwrapper>
 </template>

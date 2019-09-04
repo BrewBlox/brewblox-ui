@@ -8,9 +8,9 @@ export const prettify = (v: string): string =>
     .replace(/minutes?/gi, 'm')
     .replace(/hours?/gi, 'h')
     .replace(/days?/gi, 'd')
-    .replace(/1 \/ /gi, '/')
-    .replace(/ \/ /gi, '/')
-    .replace(/ \* /gi, '·');
+    .replace(/1 ?\/ ?/gi, '/')
+    .replace(/ ?\/ ?/gi, '/')
+    .replace(/ ?\* ?/gi, '·');
 
 export default class Unit {
   private val: number | null;
@@ -53,5 +53,15 @@ export default class Unit {
 
   public toJSON(): number | null {
     return this.value;
+  }
+
+  public copy(val: number | null = this.val): Unit {
+    return new Unit(val, this.unit);
+  }
+
+  public isEqual(other: Unit): boolean {
+    return other
+      && this.unit === other.unit
+      && this.roundedValue === other.roundedValue;
   }
 }

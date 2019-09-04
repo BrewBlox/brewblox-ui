@@ -1,63 +1,77 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import get from 'lodash/get';
+import { Component } from 'vue-property-decorator';
 
-import { postfixedDisplayNames } from '@/helpers/units';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
-import { getById } from './getters';
+import { sparkStore } from '../../store';
 import { SetpointSensorPairBlock } from './types';
 
 @Component
 export default class SetpointSensorPairWidget extends BlockWidget {
-  get block(): SetpointSensorPairBlock {
-    return getById(this.serviceId, this.blockId);
-  }
+  readonly block!: SetpointSensorPairBlock;
 
-  get renamedTargets() {
-    return postfixedDisplayNames(
-      {
-        setting: 'Setting',
-        value: 'Sensor value',
-      },
-      this.block.data,
-    );
+  get isUsed(): boolean {
+    return sparkStore.blockValues(this.serviceId)
+      .some(block => get(block, 'data.inputId.id') === this.blockId);
   }
 }
 </script>
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <SetpointSensorPairForm v-if="modalOpen" v-bind="formProps"/>
-    </q-dialog>
+    <BlockWidgetToolbar :crud="crud" />
 
-    <BlockWidgetToolbar :field="me" graph/>
+    <CardWarning v-if="!isUsed">
+      <template #message>
+        This Setpoint is not used as PID input.
+      </template>
+    </CardWarning>
+    <CardWarning v-else-if="!block.data.settingEnabled">
+      <template #message>
+        <span>This setpoint is disabled.</span>
+      </template>
+      <template #actions>
+        <q-btn
+          text-color="white"
+          flat
+          label="Enable"
+          @click="block.data.settingEnabled = true; saveBlock();"
+        />
+      </template>
+    </CardWarning>
 
     <q-card-section>
       <q-item dark>
-        <q-item-section class="col-3" style="justify-content: flex-start">
-          <q-item-label caption>Setting</q-item-label>
-          <UnitPopupEdit
-            v-if="!isDriven"
-            :field="block.data.storedSetting"
-            :change="callAndSaveBlock(v => block.data.storedSetting = v)"
+        <q-item-section class="q-mr-md">
+          <q-item-label caption>
+            Setting
+          </q-item-label>
+          <UnitField
             :class="{darkened: !block.data.settingEnabled}"
-            label="Setting"
-          />
-          <UnitField v-else :field="block.data.storedSetting"/>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
-        </q-item-section>
-        <q-item-section class="col-3" style="justify-content: flex-start">
-          <q-item-label caption>Enabled</q-item-label>
-          <q-toggle
-            :value="block.data.settingEnabled"
-            :disable="isDriven"
-            @input="v => { block.data.settingEnabled = v; saveBlock(); }"
+            :value="block.data.storedSetting"
+            :readonly="isDriven"
+            title="Setting"
+            tag="big"
+            @input="v => {block.data.storedSetting = v; saveBlock()}"
           />
         </q-item-section>
-        <q-item-section class="col-6" style="justify-content: flex-start">
-          <q-item-label caption>Sensor value</q-item-label>
-          <UnitField :field="block.data.value"/>
+        <q-item-section class="q-mr-md">
+          <q-item-label caption>
+            Sensor
+          </q-item-label>
+          <UnitField :value="block.data.value" tag="big" readonly />
+        </q-item-section>
+        <q-item-section class="col-auto">
+          <q-item-label caption>
+            Unfiltered sensor
+          </q-item-label>
+          <UnitField :value="block.data.valueUnfiltered" tag="big" readonly />
+        </q-item-section>
+      </q-item>
+      <q-item dark>
+        <q-item-section>
+          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
         </q-item-section>
       </q-item>
     </q-card-section>

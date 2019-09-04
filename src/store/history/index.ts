@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
 import store from '@/store';
 
@@ -9,55 +9,10 @@ import {
   subscribeValues,
   validateService as validateServiceInApi,
 } from './api';
+import { Listener, QueryParams, QueryResult, QueryTarget } from './types';
+export * from './types';
 
-export interface QueryParams {
-  database?: string;
-  start?: string | number;
-  duration?: string;
-  end?: string | number;
-  limit?: number;
-  orderBy?: string;
-  approxPoints?: number;
-}
-
-export interface QueryTarget {
-  measurement: string;
-  fields: string[];
-}
-
-export interface DisplayNames {
-  [key: string]: string;
-}
-
-export interface GraphValueAxes {
-  [key: string]: 'y' | 'y2';
-}
-
-export type Slice = number[];
-
-export interface QueryResult {
-  name: string;
-  columns: string[];
-  values: Slice[];
-  database: string;
-  policy: string;
-}
-
-export interface Listener {
-  id: string;
-  transformer: (listener: any, result: any) => Listener;
-  params: QueryParams;
-  target: QueryTarget;
-  renames: DisplayNames;
-  source?: EventSource;
-  values?: any;
-}
-
-export interface GraphValuesListener extends Listener {
-  axes: GraphValueAxes;
-  usedPolicy?: string;
-}
-
+const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'history' })
 export class HistoryModule extends VuexModule {
@@ -117,7 +72,7 @@ export class HistoryModule extends VuexModule {
     this.fields = { ...fields };
   }
 
-  @Action
+  @Action({ rawError })
   public async addListener(args: {
     listener: Listener;
     fetcher: (p: QueryParams, t: QueryTarget) => Promise<EventSource>;
@@ -135,19 +90,19 @@ export class HistoryModule extends VuexModule {
     this.commitListener({ ...this.listeners[id], id, source });
   }
 
-  @Action
+  @Action({ rawError })
   public async addValuesListener(listener: Listener): Promise<Listener> {
     await this.addListener({ listener, fetcher: subscribeValues });
     return this.listeners[listener.id];
   }
 
-  @Action
+  @Action({ rawError })
   public async addMetricsListener(listener: Listener): Promise<Listener> {
     await this.addListener({ listener, fetcher: subscribeMetrics });
     return this.listeners[listener.id];
   }
 
-  @Action
+  @Action({ rawError })
   public async removeListener(listener: Listener): Promise<void> {
     this.commitRemoveListener(listener);
     if (listener.source) {
@@ -155,15 +110,15 @@ export class HistoryModule extends VuexModule {
     }
   }
 
-  @Action({ commit: 'commitAllFields' })
+  @Action({ rawError, commit: 'commitAllFields' })
   public async fetchKnownKeys(): Promise<Record<string, string[]>> {
     return await fetchKnownKeysInApi();
   }
 
-  @Action
+  @Action({ rawError })
   public async validateService(): Promise<boolean> {
     return await validateServiceInApi();
   }
 }
 
-export default getModule(HistoryModule);
+export const historyStore = getModule(HistoryModule);

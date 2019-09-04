@@ -2,11 +2,12 @@ import forEach from 'lodash/forEach';
 import parseDuration from 'parse-duration';
 
 import { nanoToMilli } from '@/helpers/functional';
-import historyStore from '@/store/history';
 import {
   DisplayNames,
   GraphValueAxes,
   GraphValuesListener,
+  historyStore,
+  LineColors,
   QueryParams,
   QueryResult,
   QueryTarget,
@@ -55,6 +56,7 @@ const valuesTransformer =
             ...value,
             name: valueName(listener, key),
             yaxis: listener.axes[key] || 'y',
+            line: { color: listener.colors[key] },
             x: boundedConcat(value.x, time),
             y: boundedConcat(value.y, resultCols[idx]),
           };
@@ -85,6 +87,7 @@ export const addPlotlyListener =
     params: QueryParams,
     renames: DisplayNames,
     axes: GraphValueAxes,
+    colors: LineColors,
     target: QueryTarget,
   ): Promise<void> => {
     const filteredTarget = {
@@ -99,6 +102,7 @@ export const addPlotlyListener =
       params,
       renames,
       axes,
+      colors,
       transformer: valuesTransformer,
       target: filteredTarget,
       values: {},

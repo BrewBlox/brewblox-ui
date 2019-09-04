@@ -1,31 +1,39 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
-import BlockForm from '@/plugins/spark/components/BlockForm';
-import sparkStore from '@/plugins/spark/store';
+import BlockCrudComponent from './BlockCrudComponent';
+
 
 @Component
-export default class BlockFormToolbar extends BlockForm {
-  get blockOptions() {
-    return sparkStore.blockValues(this.block.serviceId)
-      .filter(block => block.type === this.block.type)
-      .map(block => ({ label: block.id, value: block.id }));
-  }
+export default class BlockFormToolbar extends BlockCrudComponent {
+  graphModalOpen = false;
+
 }
 </script>
 
 <template>
-  <WidgetFormToolbar v-bind="$props">
-    <q-icon name="mdi-cube"/>
-    <SelectPopupEdit
-      v-if="!$props.volatile && $props.onSwitchBlockId"
-      :options="blockOptions"
-      :field="block.id"
-      :change="$props.onSwitchBlockId"
-      label="Block"
-      tag="span"
-      class="text-h6 text-no-wrap"
-    >Select a different block to be displayed by this widget.</SelectPopupEdit>
-    <div v-else class="ellipsis text-no-wrap">{{ block.id }}</div>
-  </WidgetFormToolbar>
+  <FormToolbar :crud="crud">
+    <BlockGraph
+      v-if="graphModalOpen"
+      :id="widget.id"
+      v-model="graphModalOpen"
+      :config.sync="graphCfg"
+    />
+    <template v-slot:buttons>
+      <q-btn-dropdown flat icon="mdi-pencil">
+        <q-list dark bordered>
+          <ActionItem icon="refresh" label="Refresh" @click="refreshBlock" />
+          <ActionItem
+            v-if="hasGraph"
+            icon="mdi-chart-line"
+            label="Show graph"
+            @click="graphModalOpen = true"
+          />
+          <slot name="actions" />
+          <WidgetActions :crud="crud" no-rename />
+          <BlockActions :crud="crud" />
+        </q-list>
+      </q-btn-dropdown>
+    </template>
+  </FormToolbar>
 </template>

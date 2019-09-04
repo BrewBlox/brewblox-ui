@@ -1,42 +1,31 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+
+import { BalancerBlock } from './types';
 
 @Component
-export default class BalancerForm extends BlockForm {
-  defaultData() {
-    return {
-      clients: [],
-    };
-  }
-
-  presets() {
-    return [];
-  }
-
-  created() {
-    this.block; // ensure getter is evaluated
-  }
+export default class BalancerForm extends BlockCrudComponent {
+  readonly block!: BalancerBlock;
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
+    <BlockFormToolbar :crud="crud" />
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Note</q-item-label>
+          <q-item-label caption>
+            Note
+          </q-item-label>
           <span>
             To power balance multiple analog actuators,
             set a balanced constraint on them with this block as target.
           </span>
         </q-item-section>
       </q-item>
-      <q-expansion-item default-opened group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
-      </q-expansion-item>
     </q-card-section>
   </q-card>
 </template>

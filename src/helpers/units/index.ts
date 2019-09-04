@@ -1,10 +1,11 @@
 import Link from './Link';
-import Unit from './Unit';
-import { postfixedDisplayNames,serializedPropertyName } from './parseObject';
+import { postfixedDisplayNames, serializedPropertyName } from './parseObject';
+import Unit, { prettify } from './Unit';
 
 export {
   Unit,
   Link,
+  prettify,
   serializedPropertyName,
   postfixedDisplayNames,
 };

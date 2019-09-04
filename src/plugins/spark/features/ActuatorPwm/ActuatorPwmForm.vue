@@ -1,94 +1,108 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
 
-import { defaultData, presets } from './getters';
-
 @Component
-export default class ActuatorPwmForm extends BlockForm {
-  get block(): ActuatorPwmBlock {
-    return this.blockField as ActuatorPwmBlock;
-  }
+export default class ActuatorPwmForm extends BlockCrudComponent {
+  readonly block!: ActuatorPwmBlock;
 
-  defaultData() {
-    return defaultData();
-  }
-
-  presets() {
-    return presets();
+  get isConstrained(): boolean {
+    return this.block.data.enabled
+      && this.block.data.setting !== this.block.data.desiredSetting;
   }
 }
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
+  <GraphCardWrapper>
+    <template #graph>
+      <HistoryGraph :id="widget.id" :config="graphCfg" />
+    </template>
 
-    <q-card-section>
-      <q-expansion-item default-opened group="modal" icon="settings" label="Settings">
+    <q-card dark class="widget-modal">
+      <BlockFormToolbar :crud="crud" />
+
+      <q-card-section>
         <BlockEnableToggle
-          v-bind="$props"
+          :crud="crud"
           :text-enabled="`PWM is enabled: ${block.data.actuatorId} will be toggled automatically.`"
           :text-disabled="`PWM is disabled: ${block.data.actuatorId} will not be toggled.`"
         />
 
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>Digital Actuator Target</q-item-label>
-            <LinkPopupEdit
-              :field="block.data.actuatorId"
-              :service-id="serviceId"
-              :change="callAndSaveBlock(v => block.data.actuatorId = v)"
-              label="target"
+            <q-item-label caption>
+              Period
+            </q-item-label>
+            <TimeUnitField
+              :value="block.data.period"
+              title="Period"
+              tag="big"
+              @input="v => { block.data.period = v; saveBlock(); }"
             />
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>Period</q-item-label>
-            <TimeUnitPopupEdit
-              :field="block.data.period"
-              :change="callAndSaveBlock(v => block.data.period = v)"
-              label="Period"
-              type="number"
+            <q-item-label caption>
+              Digital Actuator Target
+            </q-item-label>
+            <LinkField
+              :value="block.data.actuatorId"
+              :service-id="serviceId"
+              title="target"
+              tag="big"
+              @input="v => { block.data.actuatorId = v; saveBlock(); }"
             />
           </q-item-section>
+          <q-item-section />
         </q-item>
-        <q-item dark>
-          <q-item-section style="justify-content: flex-start">
-            <q-item-label caption>Duty setting</q-item-label>
-            <InputPopupEdit
-              v-if="!isDriven"
-              :field="block.data.setting"
-              :change="callAndSaveBlock(v => block.data.setting = v)"
-              label="Setting"
-              type="number"
-            />
-            <big v-else>{{ block.data.setting | round }}</big>
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId"/>
+        <q-item dark class="align-children">
+          <q-item-section>
+            <q-item-label caption>
+              Duty setting
+            </q-item-label>
+            <div :class="{['text-orange']: isConstrained}">
+              <SliderField
+                :value="block.data.setting"
+                :readonly="isDriven"
+                tag="big"
+                title="Setting"
+                @input="v => { block.data.desiredSetting = v; saveBlock(); }"
+              />
+            </div>
           </q-item-section>
-          <q-item-section style="justify-content: flex-start">
-            <q-item-label caption>Duty Achieved</q-item-label>
+          <q-item-section>
+            <q-item-label caption>
+              Duty Achieved
+            </q-item-label>
             <big>{{ block.data.value | round }}</big>
           </q-item-section>
+          <q-item-section>
+            <template v-if="isConstrained">
+              <q-item-label caption>
+                Unconstrained setting
+              </q-item-label>
+              <div>
+                <big>{{ block.data.desiredSetting | round }}</big>
+                <small class="q-ml-xs">%</small>
+              </div>
+            </template>
+          </q-item-section>
         </q-item>
-      </q-expansion-item>
 
-      <q-expansion-item group="modal" icon="mdi-less-than-or-equal" label="Constraints">
         <q-item dark>
           <q-item-section>
-            <AnalogConstraints
-              :service-id="block.serviceId"
-              :field="block.data.constrainedBy"
-              :change="callAndSaveBlock(v => block.data.constrainedBy = v)"
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
+            <ConstraintsField
+              :value="block.data.constrainedBy"
+              :service-id="serviceId"
+              type="analog"
+              @input="v => { block.data.constrainedBy = v; saveBlock(); }"
             />
           </q-item-section>
         </q-item>
-      </q-expansion-item>
-
-      <q-expansion-item group="modal" icon="mdi-cube" label="Block Settings">
-        <BlockSettings v-bind="$props" :presets-data="presets()"/>
-      </q-expansion-item>
-    </q-card-section>
-  </q-card>
+      </q-card-section>
+    </q-card>
+  </graphcardwrapper>
 </template>

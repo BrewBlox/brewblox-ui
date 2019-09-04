@@ -1,18 +1,18 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import dashboardStore from '@/store/dashboards';
+import { dashboardStore } from '@/store/dashboards';
 
 @Component
 export default class IndexPage extends Vue {
-  get primaryDashboardId() {
+  get primaryDashboardId(): string | null {
     return dashboardStore.primaryDashboardId;
   }
 
   @Watch('primaryDashboardId', { immediate: true })
-  onPrimaryDashboardFound() {
+  onPrimaryDashboardFound(): void {
     if (this.primaryDashboardId !== null) {
       this.$router.replace(`/dashboard/${this.primaryDashboardId}`);
     }
@@ -22,5 +22,7 @@ export default class IndexPage extends Vue {
 </script>
 
 <template>
-  <q-page class="flex flex-center">Home</q-page>
+  <q-page class="flex flex-center">
+    Home
+  </q-page>
 </template>

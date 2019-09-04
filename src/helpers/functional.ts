@@ -1,5 +1,6 @@
 import isString from 'lodash/isString';
 import parseDuration from 'parse-duration';
+import { colors } from 'quasar';
 
 import { Unit } from './units';
 
@@ -16,19 +17,14 @@ export const objectStringSorter =
     (a: any, b: any) => {
       const left = a[key].toLowerCase();
       const right = b[key].toLowerCase();
-      if (left < right) {
-        return -1;
-      }
-      if (right > left) {
-        return 1;
-      }
-      return 0;
+      return left.localeCompare(right);
     };
 
 export const durationString =
   (duration: number | string): string => {
-    const durationMs =
-      typeof duration === 'string' ? parseDuration(duration) : duration;
+    const durationMs = isString(duration)
+      ? parseDuration(duration)
+      : duration;
     const secondsTotal = Number(durationMs) / 1000;
     const days = Math.floor(secondsTotal / 86400);
     const hours = Math.floor((secondsTotal - (days * 86400)) / 3600);
@@ -44,10 +40,12 @@ export const durationString =
       [seconds, 's'],
       [milliseconds, 'ms'],
     ];
-    return values.reduceRight(
-      (acc: string, [val, unit]) => (val ? `${val}${unit} ${acc}` : acc),
-      '') ||
-      '0s';
+
+    const strVal = values
+      .filter(([val]) => !!val)
+      .map(([val, unit]) => `${val}${unit}`)
+      .join(' ');
+    return strVal || '0s';
   };
 
 export const unitDurationString =
@@ -93,7 +91,7 @@ export const clampRotation =
   (val: number): number => (val + 360) % 360;
 
 export const dateString =
-  (value: number | string | null, nullLabel: string = '<not set>'): string => {
+  (value: number | string | Date | null, nullLabel = '<not set>'): string => {
     if (value === null || value === undefined) {
       return nullLabel;
     }
@@ -101,7 +99,7 @@ export const dateString =
   };
 
 export const shortDateString =
-  (value: number | string | null, nullLabel: string = '<not set>'): string => {
+  (value: number | string | Date | null, nullLabel = '<not set>'): string => {
     if (value === null || value === undefined) {
       return nullLabel;
     }
@@ -113,12 +111,16 @@ export const shortDateString =
   };
 
 export const round =
-  (value: any, digits: number = 2): string | number => {
+  (value: any, digits = 2): string | number => {
     if (value === null || value === undefined) {
       return '--.--';
     }
     return (+value).toFixed(digits);
   };
+
+export const roundNumber =
+  (value: number, digits = 2): number =>
+    Number((Math.round(Number(value + 'e' + digits)) + 'e-' + digits));
 
 export const truncate =
   (value: string): string => {
@@ -133,7 +135,7 @@ export function valOrDefault<T>(val: T, defaultVal: T): T {
 }
 
 export function chunked<T>(arr: T[], chunkSize: number): T[][] {
-  let chunks: T[][] = [];
+  const chunks: T[][] = [];
   let i = 0;
   const n = arr.length;
   while (i < n) {
@@ -148,3 +150,45 @@ export const capitalized = (s: string): string =>
   isString(s)
     ? s.charAt(0).toUpperCase() + s.slice(1)
     : s;
+
+// Algorithm copied from StackOverflow at 2019/06/27
+// https://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color
+export const contrastColor = (background: string): string => {
+  const rgb = colors.hexToRgb(background);
+  const luma = ((0.299 * rgb.r) + (0.587 * rgb.g) + (0.114 * rgb.b)) / 255;
+  return luma > 0.8 ? 'black' : 'white';
+};
+
+export const suggestId =
+  (id: string, validate: (val: string) => boolean, ): string => {
+    if (validate(id)) {
+      return id;
+    }
+
+    const copyName = (i: number): string =>
+      (id.match(/-\d+$/)
+        ? id.replace(/-\d+$/, `-${i}`)
+        : `${id}-${i}`);
+
+    let idx = 2;
+    while (!validate(copyName(idx))) {
+      idx += 1;
+    }
+
+    return copyName(idx);
+  };
+
+export const isAbsoluteUrl = (val: string): boolean =>
+  new RegExp('^(?:[a-z]+:)?//', 'i').test(val);
+
+export const entryReducer =
+  (acc: Record<string, any>, [key, val]: [string, any]): Record<string, any> => {
+    acc[key] = val;
+    return acc;
+  };
+
+export const objReducer = (key: string) =>
+  (acc: Record<string, any>, obj: any) => {
+    acc[obj[key]] = obj;
+    return acc;
+  };

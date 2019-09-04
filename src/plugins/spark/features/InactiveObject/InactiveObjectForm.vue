@@ -1,19 +1,15 @@
 <script lang="ts">
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
-import BlockForm from '@/plugins/spark/components/BlockForm';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 
 @Component
-export default class InactiveObjectForm extends BlockForm {
+export default class InactiveObjectForm extends BlockCrudComponent {
 }
 </script>
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar v-if="!$props.embedded" v-bind="$props" :block="block"/>
-
-    <q-expansion-item default-opened group="modal" icon="mdi-cube" label="Block Settings">
-      <BlockSettings v-bind="$props" :presets-data="presets()"/>
-    </q-expansion-item>
+    <BlockFormToolbar :crud="crud" />
   </q-card>
 </template>

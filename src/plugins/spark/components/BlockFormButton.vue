@@ -1,77 +1,41 @@
 <script lang="ts">
 import isString from 'lodash/isString';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
-import sparkStore from '@/plugins/spark/store';
-import featureStore from '@/store/features';
+import { showBlockDialog } from '@/helpers/dialog';
+import { sparkStore } from '@/plugins/spark/store';
 
 import { Block } from '../types';
 
-@Component({
-  props: {
-    blockId: {
-      type: String,
-      validator: v => v === null || isString(v),
-    },
-    serviceId: {
-      type: String,
-      required: true,
-    },
-    btnProps: {
-      type: Object,
-      default: () => ({}),
-    },
-    tag: {
-      type: String,
-      default: 'div',
-    },
-    tagProps: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-})
+@Component
 export default class BlockFormButton extends Vue {
-  modalOpen: boolean = false;
+
+  @Prop({ type: String, validator: v => v === null || isString(v) })
+  readonly blockId!: string;
+
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
 
   get block(): Block | null {
-    const id = this.$props.blockId;
-
-    return !!id
-      ? sparkStore.blocks(this.$props.serviceId)[id] || null
+    return !!this.blockId
+      ? sparkStore.blocks(this.serviceId)[this.blockId] || null
       : null;
   }
 
-  get blockForm() {
-    return !!this.block
-      ? featureStore.formById(this.block.type)
-      : null;
-  }
-
-  saveBlock(v) {
-    sparkStore.saveBlock([this.$props.serviceId, v])
-      .catch(err => this.$q.notify(err.toString()));
+  openDialog(): void {
+    showBlockDialog(this.block);
   }
 }
 </script>
 
 <template>
-  <component :is="tag" v-bind="tagProps">
-    <q-btn :disable="!block" v-bind="btnProps" @click="modalOpen = true">
-      <slot/>
-    </q-btn>
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <component
-        v-if="modalOpen"
-        :is="blockForm"
-        :type="block.type"
-        :field="block"
-        :on-change-field="v => saveBlock(v)"
-        :id="block.id"
-        :title="block.id"
-        :on-change-block-id="() => {}"
-      />
-    </q-dialog>
-  </component>
+  <q-btn
+    :disable="!block"
+    :icon="block ? 'mdi-pencil' : 'mdi-pencil-off'"
+    v-bind="$attrs"
+    @click="openDialog"
+  >
+    <slot />
+  </q-btn>
 </template>

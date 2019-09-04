@@ -1,6 +1,6 @@
 import get from 'lodash/get';
 import Vue from 'vue';
-import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
 import store from '@/store';
 import { Service } from '@/store/services';
@@ -18,6 +18,8 @@ export interface Provider {
   page?: string;
   watcher?: string;
 }
+
+const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'providers' })
 export class ProviderModule extends VuexModule {
@@ -72,10 +74,10 @@ export class ProviderModule extends VuexModule {
     Vue.set(this.providers, provider.id, { ...provider });
   }
 
-  @Action({ commit: 'commitProvider' })
+  @Action({ rawError, commit: 'commitProvider' })
   public async createProvider(provider: Provider): Promise<Provider> {
     return provider;
   }
 }
 
-export default getModule(ProviderModule);
+export const providerStore = getModule(ProviderModule);

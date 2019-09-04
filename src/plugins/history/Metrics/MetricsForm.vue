@@ -1,33 +1,47 @@
 <script lang="ts">
 import get from 'lodash/get';
 import parseDuration from 'parse-duration';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
-import FormBase from '@/components/Form/FormBase';
-import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
+import { defaultLabel, targetBuilder, targetSplitter } from '@/components/Graph/functional';
+import CrudComponent from '@/components/Widget/CrudComponent';
 import { durationString } from '@/helpers/functional';
-import historyStore, { DisplayNames } from '@/store/history';
+import { DisplayNames, historyStore } from '@/store/history';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './getters';
 import { MetricsConfig } from './types';
 
 @Component
-export default class MetricsForm extends FormBase {
+export default class MetricsForm extends CrudComponent {
   DEFAULT_FRESH_DURATION = DEFAULT_FRESH_DURATION;
   parseDuration = parseDuration;
   durationString = durationString;
 
   get config(): MetricsConfig {
-    return this.$props.field;
+    return {
+      targets: [],
+      renames: {},
+      params: {},
+      freshDuration: {},
+      decimals: {},
+      ...this.widget.config,
+    };
   }
 
-  get selected(): string[] | null {
+  get selected(): string[] {
     return targetSplitter(this.config.targets);
   }
 
-  set selected(vals: string[] | null) {
+  set selected(vals: string[]) {
     const targets = targetBuilder(vals || []);
-    this.saveConfig({ ...this.config, targets });
+    const renames = vals
+      .reduce(
+        (acc, key) => ({
+          ...acc,
+          [key]: this.config.renames[key] || defaultLabel(key),
+        }),
+        {});
+    this.saveConfig({ ...this.config, targets, renames });
   }
 
   get renames(): DisplayNames {
@@ -38,32 +52,28 @@ export default class MetricsForm extends FormBase {
     this.saveConfig({ ...this.config, renames });
   }
 
-  get freshDuration() {
+  get freshDuration(): Record<string, number> {
     return this.config.freshDuration;
   }
 
-  get decimals() {
+  get decimals(): Record<string, number> {
     return this.config.decimals;
   }
 
-  fieldDecimals(field: string) {
+  fieldDecimals(field: string): number {
     return get(this.config.decimals, field, DEFAULT_DECIMALS);
   }
 
-  created() {
+  created(): void {
     historyStore.fetchKnownKeys();
   }
 
-  callAndSaveConfig(func: (v: any) => void) {
-    return (v: any) => { func(v); this.saveConfig(this.config); };
-  }
-
-  resetFreshDuration(field: string) {
+  resetFreshDuration(field: string): void {
     this.$delete(this.config.freshDuration, field);
     this.saveConfig(this.config);
   }
 
-  resetDecimals(field: string) {
+  resetDecimals(field: string): void {
     this.$delete(this.config.decimals, field);
     this.saveConfig(this.config);
   }
@@ -72,13 +82,13 @@ export default class MetricsForm extends FormBase {
 
 <template>
   <q-card dark class="widget-modal">
-    <WidgetFormToolbar v-if="!$props.embedded" v-bind="$props"/>
+    <FormToolbar :crud="crud" />
 
     <q-card-section>
       <q-expansion-item default-opened group="modal" icon="mdi-file-tree" label="Metrics">
         <div class="scroll-parent">
           <q-scroll-area>
-            <MetricSelector :selected.sync="selected"/>
+            <MetricSelector :selected.sync="selected" />
           </q-scroll-area>
         </div>
       </q-expansion-item>
@@ -86,7 +96,7 @@ export default class MetricsForm extends FormBase {
       <q-expansion-item group="modal" icon="mdi-tag-multiple" label="Labels">
         <div class="scroll-parent">
           <q-scroll-area>
-            <LabelSelector :selected="selected" :renames.sync="renames"/>
+            <LabelSelector :selected="selected" :renames.sync="renames" />
           </q-scroll-area>
         </div>
       </q-expansion-item>
@@ -97,22 +107,20 @@ export default class MetricsForm extends FormBase {
             <q-item dark>
               <q-item-section>Metric</q-item-section>
               <q-item-section>Warn when older than</q-item-section>
-              <q-item-section class="col-1"/>
+              <q-item-section class="col-1" />
             </q-item>
-            <q-separator dark inset/>
+            <q-separator dark inset />
             <q-item v-for="field in selected" :key="field" dark>
               <q-item-section>{{ field }}</q-item-section>
               <q-item-section>
-                <InputPopupEdit
-                  :field="durationString(freshDuration[field] || DEFAULT_FRESH_DURATION)"
-                  :change="callAndSaveConfig(v => freshDuration[field] = parseDuration(v))"
-                  label="Fresh duration"
-                  clearable
-                  tag="span"
+                <InputField
+                  :value="durationString(freshDuration[field] || DEFAULT_FRESH_DURATION)"
+                  title="Fresh duration"
+                  @input="v => { freshDuration[field] = parseDuration(v); saveConfig(config); }"
                 />
               </q-item-section>
               <q-item-section class="col-1">
-                <q-btn icon="restore" flat @click="resetFreshDuration(field)"/>
+                <q-btn icon="restore" flat @click="resetFreshDuration(field)" />
               </q-item-section>
             </q-item>
           </q-scroll-area>
@@ -125,25 +133,23 @@ export default class MetricsForm extends FormBase {
             <q-item dark>
               <q-item-section>Metric</q-item-section>
               <q-item-section>Number of decimals</q-item-section>
-              <q-item-section class="col-1"/>
+              <q-item-section class="col-1" />
             </q-item>
-            <q-separator dark inset/>
+            <q-separator dark inset />
             <q-item v-for="field in selected" :key="field" dark>
               <q-item-section>{{ field }}</q-item-section>
               <q-item-section>
-                <InputPopupEdit
-                  :field="fieldDecimals(field)"
-                  :change="callAndSaveConfig(v => decimals[field] = v)"
+                <InputField
+                  :value="fieldDecimals(field)"
                   :decimals="0"
-                  :popup-props="{validate: (v) => v >= 0}"
+                  :rules="[v => v >= 0 || 'Must be 0 or more']"
                   type="number"
-                  label="Number of decimals"
-                  clearable
-                  tag="span"
+                  title="Number of decimals"
+                  @input="v => { decimals[field] = v; saveConfig(config); }"
                 />
               </q-item-section>
               <q-item-section class="col-1">
-                <q-btn icon="mdi-undo-variant" flat @click="resetDecimals(field)"/>
+                <q-btn icon="mdi-undo-variant" flat @click="resetDecimals(field)" />
               </q-item-section>
             </q-item>
           </q-scroll-area>

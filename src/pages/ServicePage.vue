@@ -1,9 +1,9 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
-import providerStore from '@/store/providers';
-import serviceStore from '@/store/services';
+import { providerStore } from '@/store/providers';
+import { serviceStore } from '@/store/services';
 
 
 @Component
@@ -12,7 +12,7 @@ export default class ServicePage extends Vue {
     return this.$route.params.id;
   }
 
-  get serviceValid() {
+  get serviceValid(): boolean {
     return serviceStore.serviceExists(this.serviceId);
   }
 
@@ -30,8 +30,12 @@ export default class ServicePage extends Vue {
 
 <template>
   <q-page padding>
-    <component v-if="serviceValid && pageComponent" :is="pageComponent" :service-id="serviceId"/>
-    <div v-else-if="serviceValid" class="flex flex-center">Invalid service page: {{ serviceId }}</div>
-    <p v-else>Service {{ serviceId }} not found.</p>
+    <component :is="pageComponent" v-if="serviceValid && pageComponent" :service-id="serviceId" />
+    <div v-else-if="serviceValid" class="flex flex-center">
+      Invalid service page: {{ serviceId }}
+    </div>
+    <p v-else>
+      Service {{ serviceId }} not found.
+    </p>
   </q-page>
 </template>

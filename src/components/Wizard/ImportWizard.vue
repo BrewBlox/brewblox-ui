@@ -2,46 +2,44 @@
 import get from 'lodash/get';
 import { uid } from 'quasar';
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { deserialize } from '@/helpers/units/parseObject';
-import dashboardStore from '@/store/dashboards';
-import featureStore from '@/store/features';
+import { dashboardStore } from '@/store/dashboards';
+import { featureStore } from '@/store/features';
 
-@Component({
-  props: {
-    dashboardId: {
-      type: String,
-      required: false,
-    },
-  },
-})
+@Component
 export default class ImportWizard extends Vue {
+
+  @Prop({ type: String, default: '' })
+  readonly dashboardId!: string;
+
   reader: FileReader = new FileReader();
-  serializedWidget: string = '';
+  serializedWidget = '';
 
-  localChosenDashboardId: string = '';
+  localChosenDashboardId = '';
 
-  get chosenDashboardId() {
+  get chosenDashboardId(): string {
     return this.localChosenDashboardId
-      || this.$props.dashboardId
-      || dashboardStore.primaryDashboardId;
+      || this.dashboardId
+      || dashboardStore.primaryDashboardId
+      || '';
   }
 
   set chosenDashboardId(id: string) {
     this.localChosenDashboardId = id;
   }
 
-  get dashboardOptions() {
+  get dashboardOptions(): SelectOption[] {
     return dashboardStore.dashboardValues
       .map(dash => ({ label: dash.title, value: dash.id }));
   }
 
-  get valuesOk() {
+  get valuesOk(): boolean {
     return !!this.chosenDashboardId && !!this.serializedWidget;
   }
 
-  async create() {
+  async created(): Promise<void> {
     try {
       const item = {
         ...deserialize(JSON.parse(this.serializedWidget)),
@@ -64,11 +62,11 @@ export default class ImportWizard extends Vue {
     }
   }
 
-  back() {
+  back(): void {
     this.$emit('back');
   }
 
-  handleFileSelect(evt) {
+  handleFileSelect(evt): void {
     const file = evt.target.files[0];
     if (file) {
       this.reader.readAsText(file);
@@ -77,7 +75,7 @@ export default class ImportWizard extends Vue {
     }
   }
 
-  mounted() {
+  mounted(): void {
     this.$emit('title', 'Import wizard');
     this.reader.onload = e => this.serializedWidget = get(e, 'target.result', '');
   }
@@ -90,19 +88,19 @@ export default class ImportWizard extends Vue {
       <q-item dark>
         <q-item-section>
           <q-item-label>Dashboard</q-item-label>
-          <q-option-group v-model="chosenDashboardId" :options="dashboardOptions"/>
+          <q-option-group v-model="chosenDashboardId" :options="dashboardOptions" />
         </q-item-section>
       </q-item>
       <q-item dark>
-        <input type="file" @change="handleFileSelect">
+        <input type="file" @change="handleFileSelect" />
       </q-item>
     </q-card-section>
 
-    <q-separator dark/>
+    <q-separator dark />
 
     <q-card-actions class="row justify-between">
-      <q-btn unelevated label="Back" @click="back"/>
-      <q-btn :disable="!valuesOk" unelevated label="Create" color="primary" @click="create"/>
+      <q-btn unelevated label="Back" @click="back" />
+      <q-btn :disable="!valuesOk" unelevated label="Create" color="primary" @click="create" />
     </q-card-actions>
   </div>
 </template>

@@ -1,39 +1,13 @@
 import get from 'lodash/get';
 import Vue from 'vue';
-import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
 import store from '@/store';
 
-export type Validator = (config: any) => boolean;
-export type WidgetSelector = (config: any) => string | undefined;
-export type FeatureRole = 'Process' | 'Control' | 'Output' | 'Constraint' | 'Display' | 'Other';
+import { Arrangement, Deleter, Feature, FeatureRole, Validator } from './types';
+export * from './types';
 
-export interface Deleter {
-  description: string;
-  action: (config: any) => void;
-}
-
-export interface Feature {
-  id: string;
-  displayName: string;
-  role?: FeatureRole;
-  validator?: Validator;
-  deleters?: Deleter[];
-  widgetSize?: {
-    cols: number;
-    rows: number;
-  };
-  widget?: string;
-  selector?: WidgetSelector;
-  wizard?: string;
-  form?: string;
-}
-
-export interface Arrangement {
-  id: string;
-  displayName: string;
-  wizard: string;
-}
+const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'features' })
 export class FeatureModule extends VuexModule {
@@ -73,11 +47,11 @@ export class FeatureModule extends VuexModule {
   }
 
   public get wizardById(): (id: string) => string {
-    return id => get(this.features, [id, 'wizard']);
+    return id => get(this.features, [id, 'wizard'], '');
   }
 
   public get widgetById(): (id: string, config: any, selector?: boolean) => string | undefined {
-    return (id: string, config: any, selector: boolean = true) => {
+    return (id: string, config: any, selector = true) => {
       const feature = this.features[id] || {};
       return selector && feature.selector
         ? feature.selector(config)
@@ -107,15 +81,15 @@ export class FeatureModule extends VuexModule {
     Vue.set(this.arrangements, arrangement.id, arrangement);
   }
 
-  @Action({ commit: 'commitFeature' })
+  @Action({ rawError, commit: 'commitFeature' })
   public async createFeature(feature: Feature): Promise<Feature> {
     return feature;
   }
 
-  @Action({ commit: 'commitArrangement' })
+  @Action({ rawError, commit: 'commitArrangement' })
   public async createArrangement(arrangement: Arrangement): Promise<Arrangement> {
     return arrangement;
   }
 }
 
-export default getModule(FeatureModule);
+export const featureStore = getModule(FeatureModule);

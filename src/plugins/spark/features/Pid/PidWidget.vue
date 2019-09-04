@@ -1,131 +1,182 @@
 <script lang="ts">
-import get from 'lodash/get';
-import Component from 'vue-class-component';
+import { Component } from 'vue-property-decorator';
 
-import { Link, postfixedDisplayNames } from '@/helpers/units';
+import { showBlockDialog } from '@/helpers/dialog';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
-import sparkStore from '@/plugins/spark/store';
-import { BlockLink } from '@/plugins/spark/types';
-import featureStore from '@/store/features';
+import { sparkStore } from '@/plugins/spark/store';
 
-import PidDisplay from './PidDisplay.vue';
-import { filters, getById } from './getters';
+import { startRelationsDialog } from './relations';
 import { PidBlock } from './types';
 
-@Component({
-  components: {
-    PidDisplay,
-  },
-})
+@Component
 export default class PidWidget extends BlockWidget {
+  readonly block!: PidBlock;
   inputFormOpen = false;
   relationsOpen = false;
 
-  get block(): PidBlock {
-    return getById(this.serviceId, this.blockId);
+  get inputId(): string | null {
+    return this.block.data.inputId.id;
   }
 
-  get renamedTargets() {
-    return postfixedDisplayNames(
-      {
-        inputSetting: 'Input target',
-        inputValue: 'Input value',
-        error: 'Error (filtered)',
-        derivative: 'Derivative or error',
-        integral: 'Integral of error',
-        p: 'P',
-        i: 'I',
-        d: 'D',
-        outputSetting: 'Output target (P+I+D)',
-        outputValue: 'Output value',
-      },
-      this.block.data,
-    );
+  get outputId(): string | null {
+    return this.block.data.outputId.id;
   }
 
-  get filterName() {
-    return filters[this.block.data.filter];
+  get hasInputBlock(): boolean {
+    return !!this.inputId
+      && sparkStore
+        .blockIds(this.serviceId)
+        .includes(this.inputId);
   }
 
-  get filterOpts() {
-    return filters.map((filter, idx) => ({ label: filter, value: idx }));
+  get hasOutputBlock(): boolean {
+    return !!this.outputId
+      && sparkStore
+        .blockIds(this.serviceId)
+        .includes(this.outputId);
   }
 
-  findLinks(id: string | null): BlockLink[] {
-    const block = sparkStore.blocks(this.serviceId)[id || ''];
-    if (!id || !block) {
-      return [];
-    }
-
-    const links = Object.entries(block.data)
-      .filter(([, v]) => v instanceof Link) as [string, Link][];
-
-    const filtered = links
-      .filter(([, link]) => !link.driven && link.id);
-
-    const relations: BlockLink[] = filtered
-      .map(([k, link]) => ({
-        source: id,
-        target: link.id as string,
-        relation: [k],
-      }));
-
-    return filtered
-      .reduce((acc: BlockLink[], [, link]) => ([...acc, ...this.findLinks(link.id)]), relations);
+  enable(): void {
+    this.block.data.enabled = true;
+    this.saveBlock();
   }
 
-  get relations(): BlockLink[] {
-    const chain = this.findLinks(this.blockId);
-
-    // Setpoints may be driven by something else (profile, setpoint driver, etc)
-    // Just display the block that's actually driving, ignore any blocks driving the driver
-    const setpointId = this.block.data.inputId.id;
-    if (!setpointId) {
-      return chain;
-    }
-
-    return [
-      ...chain,
-      ...sparkStore.blockValues(this.serviceId)
-        .filter(block => get(block, 'data.targetId.id') === setpointId)
-        .map(block => ({ source: block.id, target: setpointId, relation: ['target'] })),
-    ];
+  showRelations(): void {
+    startRelationsDialog(this.block);
   }
 
-  get nodes() {
-    return sparkStore.blockValues(this.serviceId)
-      .map(block => ({
-        id: block.id,
-        type: featureStore.displayNameById(block.type),
-      }));
+  showInput(): void {
+    showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.inputId));
   }
 
+  showOutput(): void {
+    showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.outputId));
+  }
 }
 </script>
 
 <template>
   <q-card dark class="text-white scroll">
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss>
-      <PidForm v-if="modalOpen" v-bind="formProps"/>
-    </q-dialog>
-    <q-dialog v-model="relationsOpen" no-backdrop-dismiss>
-      <DagreDiagram
-        v-if="relationsOpen"
-        :service-id="serviceId"
-        :nodes="nodes"
-        :relations="relations"
-      />
-    </q-dialog>
-    <BlockWidgetToolbar :field="me" graph>
+    <BlockWidgetToolbar :crud="crud">
       <template v-slot:actions>
-        <ActionItem
-          icon="mdi-ray-start-arrow"
-          label="Show Relations"
-          @click="relationsOpen = true"
-        />
+        <ActionItem icon="mdi-ray-start-arrow" label="Show Relations" @click="showRelations" />
       </template>
     </BlockWidgetToolbar>
 
-    <PidDisplay :value="block" @input="saveBlock"/>
+    <CardWarning v-if="!block.data.outputId.id">
+      <template #message>
+        PID has no output Block configured.
+      </template>
+    </CardWarning>
+    <CardWarning v-else-if="!block.data.enabled">
+      <template #message>
+        <span>
+          PID is disabled:
+          <i>{{ block.data.outputId }}</i> will not be set.
+        </span>
+      </template>
+      <template #actions>
+        <q-btn text-color="white" flat label="Enable" @click="enable" />
+      </template>
+    </CardWarning>
+
+    <CardWarning v-else-if="!block.data.active">
+      <template #message>
+        <span>
+          PID is inactive:
+          <i>{{ block.data.outputId }}</i> will not be set.
+        </span>
+      </template>
+    </CardWarning>
+
+    <q-card-section>
+      <q-item :clickable="hasInputBlock" dark @click="showInput">
+        <q-tooltip v-if="hasInputBlock">
+          Edit {{ inputId }}
+        </q-tooltip>
+        <q-item-section side class="col-3">
+          <div class="text-weight-light text-subtitle2 q-mb-xs">
+            Input
+          </div>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>
+            Target
+          </q-item-label>
+          <UnitField :value="block.data.inputSetting" tag="big" readonly />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>
+            Measured
+          </q-item-label>
+          <UnitField :value="block.data.inputValue" tag="big" readonly />
+        </q-item-section>
+        <q-item-section side>
+          <q-icon :name="hasInputBlock ? 'mdi-pencil' : 'mdi-pencil-off'" />
+        </q-item-section>
+      </q-item>
+
+      <q-separator dark inset />
+
+      <q-item :clickable="hasOutputBlock" dark @click="showOutput">
+        <q-tooltip v-if="hasOutputBlock">
+          Edit {{ outputId }}
+        </q-tooltip>
+        <q-item-section side class="col-3">
+          <div class="text-weight-light text-subtitle2 q-mb-xs">
+            Output
+          </div>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>
+            Target
+          </q-item-label>
+          <big>{{ block.data.outputSetting | round }}</big>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>
+            Measured
+          </q-item-label>
+          <big>{{ block.data.outputValue | round }}</big>
+        </q-item-section>
+        <q-item-section side>
+          <q-icon :name="hasOutputBlock ? 'mdi-pencil' : 'mdi-pencil-off'" />
+        </q-item-section>
+      </q-item>
+
+      <q-separator dark inset />
+
+      <q-item dark>
+        <q-item-section side class="col-3">
+          <div class="text-weight-light text-subtitle2 q-my-xs">
+            Result
+          </div>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>
+            P
+          </q-item-label>
+          <span>{{ block.data.p | round }}</span>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>
+            I
+          </q-item-label>
+          <span>{{ block.data.i | round }}</span>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label caption>
+            D
+          </q-item-label>
+          <span>{{ block.data.d | round }}</span>
+        </q-item-section>
+      </q-item>
+    </q-card-section>
   </q-card>
 </template>
+
+<style lang="stylus" scoped>
+.q-card__section .q-separator {
+  opacity: 0.2;
+}
+</style>

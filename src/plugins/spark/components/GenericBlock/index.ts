@@ -1,8 +1,7 @@
 import { ref } from '@/helpers/component-ref';
-import sparkStore from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
 import { BlockConfig } from '@/plugins/spark/types';
-import featureStore from '@/store/features';
-import { Feature, WidgetSelector } from '@/store/features';
+import { Feature, featureStore,WidgetSelector } from '@/store/features';
 
 import wizard from '../BlockWidgetWizard.vue';
 import widget from './GenericBlock.vue';
@@ -11,7 +10,7 @@ import widget from './GenericBlock.vue';
 const selector: WidgetSelector =
   (config: BlockConfig): string | undefined => {
     if (!sparkStore.serviceAvailable(config.serviceId)) {
-      throw new Error(`Service "${config.serviceId}" not found`);
+      throw new Error(`Service '${config.serviceId}' not found`);
     }
     const block = sparkStore.blocks(config.serviceId)[config.blockId];
     return block
@@ -23,7 +22,7 @@ const selector: WidgetSelector =
 const validator =
   (config: BlockConfig): boolean => {
     if (!sparkStore.serviceAvailable(config.serviceId)) {
-      throw new Error(`Service "${config.serviceId}" not found`);
+      throw new Error(`Service '${config.serviceId}' not found`);
     }
     if (config.blockId === null || config.blockId === undefined) {
       throw new Error('Block ID is undefined');

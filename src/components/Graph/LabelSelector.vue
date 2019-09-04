@@ -1,27 +1,32 @@
 <script lang="ts">
 import Vue from 'vue';
-import Component from 'vue-class-component';
+import { Component, Emit, Prop } from 'vue-property-decorator';
+
+import { DisplayNames } from '@/store/history';
+
+import { defaultLabel } from './functional';
 
 
-@Component({
-  props: {
-    selected: {
-      type: Array,
-      required: true,
-    },
-    renames: {
-      type: Object,
-      required: true,
-    },
-  },
-})
+@Component
 export default class LabelSelector extends Vue {
-  get labels() {
-    return { ...this.$props.renames };
+  @Prop({ type: Array, required: true })
+  readonly selected!: string[];
+
+  @Prop({ type: Object, required: true })
+  readonly renames!: DisplayNames;
+
+  @Emit('update:renames')
+  saveLabels(): DisplayNames {
+    return this.labels;
   }
 
-  callAndSaveLabels(func: (v: any) => void) {
-    return v => { func(v); this.$emit('update:renames', this.labels); };
+  get labels(): DisplayNames {
+    return { ...this.renames };
+  }
+
+  saveLabel(key: string, val: string | null): void {
+    this.labels[key] = val || defaultLabel(key);
+    this.saveLabels();
   }
 }
 </script>
@@ -30,19 +35,13 @@ export default class LabelSelector extends Vue {
   <q-list dark>
     <q-item dark>
       <q-item-section>Metric</q-item-section>
-      <q-item-section>Display as</q-item-section>
+      <q-item-section>Label</q-item-section>
     </q-item>
-    <q-separator dark inset/>
+    <q-separator dark inset />
     <q-item v-for="field in selected" :key="field" dark>
       <q-item-section>{{ field }}</q-item-section>
       <q-item-section>
-        <InputPopupEdit
-          :field="labels[field]"
-          :change="callAndSaveLabels(v => labels[field] = v)"
-          label="Legend"
-          clearable
-          tag="span"
-        />
+        <InputField :value="labels[field]" title="Legend" @input="v => saveLabel(field, v)" />
       </q-item-section>
     </q-item>
     <q-item v-if="!selected.length" dark>

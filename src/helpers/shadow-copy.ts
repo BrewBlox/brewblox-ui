@@ -1,8 +1,6 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
 
-import { deserialize, serialize } from '@/helpers/units/parseObject';
-
 /**
  * Use ShadowMapping to bind sources of values to inputs used in the component.
  *
@@ -54,7 +52,3 @@ export const fromShadow = (
       },
       { ...output },
     );
-
-export function deepCopy<T>(obj: T): T {
-  return deserialize(JSON.parse(JSON.stringify(serialize(obj))));
-}

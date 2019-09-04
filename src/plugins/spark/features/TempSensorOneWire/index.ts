@@ -1,10 +1,27 @@
 import { ref } from '@/helpers/component-ref';
+import { Unit } from '@/helpers/units';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
+import { BlockSpec } from '../../types';
+import { typeName } from './getters';
 import form from './TempSensorOneWireForm.vue';
 import widget from './TempSensorOneWireWidget.vue';
-import { typeName } from './getters';
+import { TempSensorOneWireData } from './types';
+
+const block: BlockSpec = {
+  id: typeName,
+  generate: (): TempSensorOneWireData => ({
+    value: new Unit(null, 'degC'),
+    offset: new Unit(0, 'delta_degC'),
+    address: '',
+  }),
+  presets: [],
+  changes: [],
+  graphTargets: {
+    value: 'Sensor value',
+  },
+};
 
 const feature: Feature = {
   ...GenericBlock,
@@ -19,4 +36,4 @@ const feature: Feature = {
   },
 };
 
-export default feature;
+export default { feature, block };

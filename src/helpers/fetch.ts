@@ -12,7 +12,7 @@ const host = process.env.VUE_APP_API_URI;
 const fetchErrors: FetchError[] = [];
 
 export const getErrors =
-  (clear: boolean = false): FetchError[] => {
+  (clear = false): FetchError[] => {
     const retval = [...fetchErrors];
     if (clear) {
       fetchErrors.length = 0;
@@ -21,8 +21,8 @@ export const getErrors =
   };
 
 const fetch =
-  async (info: RequestInfo, init?: RequestInit): Promise<Response> =>
-    window.fetch(info, init)
+  async (info: RequestInfo, init: RequestInit = {}): Promise<Response> =>
+    window.fetch(info, { cache: 'no-store', ...init })
       .catch(e => {
         fetchErrors.push({ info, init, time: new Date().toString(), body: e.message, status: -1 });
         throw e;
