@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { round } from '@/helpers/functional';
 
 import FieldBase from './FieldBase';
@@ -50,7 +50,7 @@ export default class InputField extends FieldBase {
       return;
     }
 
-    Dialog.create({
+    createDialog({
       component: 'InputDialog',
       title: this.title,
       message: this.message,

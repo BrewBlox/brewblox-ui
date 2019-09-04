@@ -1,5 +1,4 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
@@ -7,6 +6,7 @@ import draggable from 'vuedraggable';
 import buildEnv from '@/build-env.json';
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '@/helpers/dashboards';
 import { checkDatastore } from '@/helpers/datastore';
+import { createDialog } from '@/helpers/dialog';
 import { objectSorter } from '@/helpers/functional';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { Service, serviceStore } from '@/store/services';
@@ -64,7 +64,7 @@ export default class DefaultLayout extends Vue {
   }
 
   removeService(service: Service): void {
-    Dialog.create({
+    createDialog({
       title: 'Remove service',
       message: `Are you sure you want to remove ${service.title}?`,
       dark: true,
@@ -75,7 +75,7 @@ export default class DefaultLayout extends Vue {
   }
 
   changeServiceTitle(service: Service): void {
-    Dialog.create({
+    createDialog({
       title: 'Change service Title',
       message: "Change your service's display name",
       dark: true,
@@ -110,7 +110,7 @@ export default class DefaultLayout extends Vue {
   }
 
   showPlugins(): void {
-    Dialog.create({
+    createDialog({
       component: 'PluginDialog',
     });
   }

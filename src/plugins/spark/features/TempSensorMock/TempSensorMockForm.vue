@@ -48,4 +48,5 @@ export default class TempSensorMockForm extends BlockCrudComponent {
         </q-item>
       </q-card-section>
     </q-card>
-</graphcardwrapper></template>
+  </graphcardwrapper>
+</template>

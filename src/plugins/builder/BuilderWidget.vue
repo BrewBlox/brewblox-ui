@@ -1,9 +1,9 @@
 <script lang="ts">
 import { debounce, uid } from 'quasar';
-import { Dialog } from 'quasar';
 import { Component, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
+import { createDialog } from '@/helpers/dialog';
 
 import CalcWorker from 'worker-loader!./calculator.worker';
 import { defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes, SQUARE_SIZE } from './getters';
@@ -126,7 +126,7 @@ export default class BuilderWidget extends WidgetBase {
   }
 
   startEditor(): void {
-    Dialog.create({
+    createDialog({
       component: 'BuilderEditor',
       initialLayout: this.widgetConfig.currentLayoutId,
       root: this.$root,

@@ -1,9 +1,10 @@
 <script lang="ts">
 import isString from 'lodash/isString';
-import { Dialog, uid } from 'quasar';
+import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
@@ -107,7 +108,7 @@ export default class BlockWizard extends Vue {
       saveBlock: v => { this.block = v; },
       closeDialog: this.closeDialog,
     };
-    this.activeDialog = Dialog.create({
+    this.activeDialog = createDialog({
       component: 'FormDialog',
       root: this.$root,
       getCrud: () => crud,

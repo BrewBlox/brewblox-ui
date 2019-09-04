@@ -1,8 +1,9 @@
 <script lang="ts">
-import { Dialog, uid } from 'quasar';
+import { uid } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
+import { createDialog } from '@/helpers/dialog';
 import { pluginStore, UIPlugin, UIPluginResult } from '@/store/plugins';
 
 @Component
@@ -15,7 +16,7 @@ export default class PluginDialog extends DialogBase {
   }
 
   async addPlugin(): Promise<void> {
-    Dialog.create({
+    createDialog({
       component: 'InputDialog',
       title: 'New Plugin',
       label: 'Package URL',

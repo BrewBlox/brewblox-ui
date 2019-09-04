@@ -1,9 +1,9 @@
 <script lang="ts">
 import isEqual from 'lodash/isEqual';
-import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
+import { createDialog } from '@/helpers/dialog';
 import { FermentConfig, PinChannel } from '@/plugins/spark/arrangements/Ferment/types';
 import { typeName as DS2413Type } from '@/plugins/spark/features/DS2413/getters';
 import { typeName as Spark2PinsType } from '@/plugins/spark/features/Spark2Pins/getters';
@@ -114,7 +114,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
   }
 
   startBlockWizard(): void {
-    Dialog.create({
+    createDialog({
       component: 'BlockWizardDialog',
       serviceId: this.config.serviceId,
       root: this.$root,

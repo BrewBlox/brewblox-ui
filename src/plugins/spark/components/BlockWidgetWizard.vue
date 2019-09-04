@@ -1,10 +1,10 @@
 <script lang="ts">
 import get from 'lodash/get';
 import isString from 'lodash/isString';
-import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
+import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
@@ -105,7 +105,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
       saveBlock: this.saveBlock,
       closeDialog: this.closeDialog,
     };
-    this.activeDialog = Dialog.create({
+    this.activeDialog = createDialog({
       component: 'FormDialog',
       root: this.$root,
       getCrud: () => crud,

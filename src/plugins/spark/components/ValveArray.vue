@@ -1,8 +1,8 @@
 <script lang="ts">
 import get from 'lodash/get';
-import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
@@ -108,7 +108,7 @@ export default class ValveArray extends BlockCrudComponent {
   }
 
   createActuator(channel: EditableChannel): void {
-    Dialog.create({
+    createDialog({
       component: 'BlockWizardDialog',
       root: this.$root,
       serviceId: this.serviceId,

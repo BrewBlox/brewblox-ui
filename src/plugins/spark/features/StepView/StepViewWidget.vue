@@ -1,8 +1,8 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
+import { createDialog } from '@/helpers/dialog';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { deserialize, isSubSet, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
@@ -71,7 +71,7 @@ export default class StepViewWidget extends WidgetBase {
       if (!change) {
         resolve(value);
       }
-      Dialog.create({
+      createDialog({
         component: 'ChangeConfirmDialog',
         title: 'Confirm change',
         message: `Please confirm the ${change.title} value in ${block.id}. Current value is '${block.data[key]}'.`,

@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { prettify, Unit } from '@/helpers/units';
 
 import FieldBase from './FieldBase';
@@ -31,7 +31,7 @@ export default class UnitField extends FieldBase {
     if (this.readonly) {
       return;
     }
-    Dialog.create({
+    createDialog({
       component: 'UnitDialog',
       title: this.title,
       message: this.message,

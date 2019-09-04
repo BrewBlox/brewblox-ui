@@ -1,9 +1,9 @@
 <script lang="ts">
 import get from 'lodash/get';
-import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
+import { createDialog } from '@/helpers/dialog';
 import { saveJsonFile } from '@/helpers/import-export';
 import { deserialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
@@ -40,7 +40,7 @@ export default class SparkImportMenu extends DialogBase {
   }
 
   startImportBlocks(): void {
-    Dialog.create({
+    createDialog({
       title: 'Reset Blocks',
       message: 'This will remove all Blocks, and import new ones from file. Are you sure?',
       dark: true,

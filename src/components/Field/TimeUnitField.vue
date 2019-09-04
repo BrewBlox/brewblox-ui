@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { Unit } from '@/helpers/units';
 
 import FieldBase from './FieldBase';
@@ -25,7 +25,7 @@ export default class TimeUnitField extends FieldBase {
       return;
     }
 
-    Dialog.create({
+    createDialog({
       component: 'TimeUnitDialog',
       title: this.title,
       message: this.message,

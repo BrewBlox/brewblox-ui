@@ -1,10 +1,11 @@
 <script lang="ts">
 import get from 'lodash/get';
-import { Dialog, uid } from 'quasar';
+import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
+import { createDialog } from '@/helpers/dialog';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
@@ -121,7 +122,7 @@ export default class StepViewForm extends CrudComponent {
 
   addStep(): void {
     const stepName = 'New Step';
-    Dialog.create({
+    createDialog({
       title: 'Add a Step',
       dark: true,
       cancel: true,
@@ -144,7 +145,7 @@ export default class StepViewForm extends CrudComponent {
 
   renameStep(step: StepDisplay): void {
     const stepName = step.name;
-    Dialog.create({
+    createDialog({
       title: 'Change Step name',
       message: `Choose a new name for '${step.name}'`,
       dark: true,
@@ -164,7 +165,7 @@ export default class StepViewForm extends CrudComponent {
   }
 
   removeStep(step: StepDisplay): void {
-    Dialog.create({
+    createDialog({
       title: 'Remove Step',
       message: `Are you sure you want to remove ${step.name}?`,
       dark: true,
@@ -180,7 +181,7 @@ export default class StepViewForm extends CrudComponent {
   }
 
   addChange(step: StepDisplay): void {
-    Dialog.create({
+    createDialog({
       component: 'BlockDialog',
       title: 'Choose a Block',
       filter: block => {

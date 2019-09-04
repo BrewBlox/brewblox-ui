@@ -1,6 +1,7 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
+
+import { createDialog } from '@/helpers/dialog';
 
 import FieldBase from './FieldBase';
 
@@ -53,7 +54,7 @@ export default class SelectField extends FieldBase {
       return;
     }
 
-    Dialog.create({
+    createDialog({
       component: 'SelectDialog',
       title: this.title,
       message: this.message,

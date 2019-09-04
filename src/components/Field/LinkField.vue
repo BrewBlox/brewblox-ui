@@ -1,8 +1,8 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/Field/FieldBase';
+import { createDialog } from '@/helpers/dialog';
 import { Link } from '@/helpers/units';
 import { Block } from '@/plugins/spark/types';
 
@@ -38,7 +38,7 @@ export default class LinkField extends FieldBase {
       return;
     }
 
-    Dialog.create({
+    createDialog({
       component: 'LinkDialog',
       root: this.$root,
       clearable: true,

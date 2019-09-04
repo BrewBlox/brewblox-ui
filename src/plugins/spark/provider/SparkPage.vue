@@ -1,10 +1,10 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { clearTimeout, setInterval } from 'timers';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { capitalized, objectStringSorter } from '@/helpers/functional';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, Spark, SystemStatus } from '@/plugins/spark/types';
@@ -248,7 +248,7 @@ export default class SparkPage extends Vue {
     const args = props || {
       serviceId: this.service.id,
     };
-    Dialog.create({
+    createDialog({
       component,
       root: this.$root,
       ...args,
@@ -259,7 +259,7 @@ export default class SparkPage extends Vue {
     const nodes = this.validatedItems.map(v => ({ id: v.item.id, type: v.typeName }));
     const relations = sparkStore.blockLinks(this.service.id);
 
-    Dialog.create({
+    createDialog({
       component: 'RelationsDialog',
       serviceId: this.service.id,
       nodes,
@@ -284,7 +284,7 @@ export default class SparkPage extends Vue {
   }
 
   resetBlocks(): void {
-    Dialog.create({
+    createDialog({
       title: 'Reset Blocks',
       message: `This will remove all Blocks on ${this.service.id}. Are you sure?`,
       dark: true,
