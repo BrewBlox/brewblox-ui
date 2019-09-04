@@ -64,7 +64,9 @@ export default class LinkedBlockCard extends PartCard {
   }
 
   get serviceOptions(): string[] {
-    return serviceStore.serviceIds;
+    return serviceStore.serviceValues
+      .filter(svc => svc.type === 'Spark')
+      .map(svc => svc.id);
   }
 
   get compatibleTypes(): string[] {
