@@ -140,7 +140,16 @@ export default class RelationsDialog extends DialogBase {
 
   draw(): void {
     const renderFunc = new dagreRender();
-    renderFunc(d3Select(this.diagram), this.graphObj);
+    try {
+      renderFunc(d3Select(this.diagram), this.graphObj);
+    } catch (e) {
+      // Workaround for a bug in FireFox where getScreenCTM() returns null for hidden or 0x0 elements
+      if (e.name === 'TypeError') {
+        renderFunc(d3Select(this.diagram), this.graphObj);
+      } else {
+        throw e;
+      }
+    }
     const outGraph = this.graphObj.graph();
     const toolbarHeight = this.toolbar.$el.clientHeight || 50;
     this.availableHeight = window.innerHeight - toolbarHeight;
