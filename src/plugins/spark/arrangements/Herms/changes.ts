@@ -334,7 +334,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
   const createBuilder = (): BuilderItem => ({
     ...createWidget(`${config.prefix} Diagram`, builderType),
     cols: 11,
-    rows: 6,
+    rows: 5,
     pinnedPosition: { x: 1, y: 1 },
     config: {
       currentToolId: 'config',
@@ -347,7 +347,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
     ...createWidget(`${config.prefix} Graph`, 'Graph'),
     cols: 7,
     rows: 5,
-    pinnedPosition: { x: 1, y: 7 },
+    pinnedPosition: { x: 1, y: 6 },
     config: {
       layout: {},
       params: { duration: '10m' },
@@ -392,7 +392,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
     ...createWidget(`${config.prefix} Actions`, 'StepView'),
     cols: 4,
     rows: 5,
-    pinnedPosition: { x: 8, y: 7 },
+    pinnedPosition: { x: 8, y: 6 },
     config: {
       serviceId: config.serviceId,
       steps: serialize([
