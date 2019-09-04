@@ -36,19 +36,35 @@ const block: BlockSpec = {
   }),
   presets: [
     {
-      name: 'Fridge compressor: (cooling)',
+      name: 'Fridge cooling compressor (beer constant)',
       generate: (): Partial<PidData> => ({
-        kp: new Unit(-10, '1/degC'),
-        ti: new Unit(2, 'hour'),
-        td: new Unit(0, 'min'),
+        kp: new Unit(-50, '1/degC'),
+        ti: new Unit(6, 'hour'),
+        td: new Unit(30, 'min'),
       }),
     },
     {
-      name: 'Fridge heater',
+      name: 'Fridge heating element (beer constant)',
+      generate: (): Partial<PidData> => ({
+        kp: new Unit(100, '1/degC'),
+        ti: new Unit(6, 'hour'),
+        td: new Unit(30, 'min'),
+      }),
+    },
+    {
+      name: 'Fridge cooling compressor (fridge constant)',
+      generate: (): Partial<PidData> => ({
+        kp: new Unit(-50, '1/degC'),
+        ti: new Unit(2, 'hour'),
+        td: new Unit(10, 'min'),
+      }),
+    },
+    {
+      name: 'Fridge heating element (fridge constant)',
       generate: (): Partial<PidData> => ({
         kp: new Unit(20, '1/degC'),
         ti: new Unit(2, 'hour'),
-        td: new Unit(0, 'min'),
+        td: new Unit(10, 'min'),
       }),
     },
     {

@@ -432,8 +432,6 @@ export default class BuilderEditor extends DialogBase {
     }
 
     if (args.isFinal && this.selectArea) {
-      this.selectedTime = new Date().getTime();
-
       const { x, y, width, height } = this.unflippedArea(this.selectArea);
       const startX = x / SQUARE_SIZE;
       const startY = y / SQUARE_SIZE;
@@ -453,6 +451,7 @@ export default class BuilderEditor extends DialogBase {
           .map(deepCopy));
 
       this.selectArea = null;
+      this.selectedTime = new Date().getTime();
     }
   }
 
@@ -520,7 +519,7 @@ export default class BuilderEditor extends DialogBase {
   }
 
   selectClickHandler(evt: ClickEvent, part: FlowPart): void {
-    if (new Date().getTime() - this.selectedTime < 200) {
+    if (new Date().getTime() - this.selectedTime < 500) {
       // The mouseup at the end of a pan also generates a click event - skip this
       return;
     }

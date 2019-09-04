@@ -8,14 +8,11 @@ import { settingsBlock } from '../helpers';
 
 @Component
 export default class HeatingElement extends PartBase {
-  readonly paths = {
-    fixture: [
-      'M0,10l0,30h19v-7h-6.5c0,0,0,0,0,0c-4.1,0.1-7.4-3.2-7.5-7.2c0-4.7,2.8-7.8,7.5-7.8H19v-8H0z',
-    ],
-    borders: [
-      'M50,24.7h24c7.1,0,6.6-6.7,14-6.7h126.9c0,0,7,0.1,7,7c0,7-7,7-7,7H90',
-    ],
-  };
+
+  get path(): string {
+    const straight = this.squares(this.sizeX - 2);
+    return `M50,24.7h24c7.1,0,6.6-6.7,14-6.7 h${straight} c0,0,7,0.1,7,7 c0,7-7,7-7,7 H90`;
+  }
 
   get block(): ActuatorPwmBlock | null {
     return settingsBlock(this.part, 'pwm');
@@ -41,7 +38,7 @@ export default class HeatingElement extends PartBase {
       </div>
     </foreignObject>
     <g class="outline">
-      <path v-for="border in paths.borders" :key="border" :d="border" />
+      <path :d="path" />
       <rect
         :width="squares(1)-2"
         :height="squares(1)-2"
