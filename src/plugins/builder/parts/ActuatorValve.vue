@@ -1,11 +1,9 @@
 <script lang="ts">
-import { Component, Watch } from 'vue-property-decorator';
-
-import { Block, DigitalState } from '@/plugins/spark/types';
+import { Component } from 'vue-property-decorator';
 
 import PartBase from '../components/PartBase';
 import { RIGHT } from '../getters';
-import { settingsBlock } from '../helpers';
+
 
 const paths = {
   outerValve: [
@@ -38,10 +36,6 @@ const paths = {
 export default class ActuatorValve extends PartBase {
   readonly paths = paths;
 
-  get valveBlock(): Block | null {
-    return settingsBlock(this.part, 'valve');
-  }
-
   get flowSpeed(): number {
     return this.flowOnCoord(RIGHT);
   }
@@ -51,39 +45,17 @@ export default class ActuatorValve extends PartBase {
   }
 
   get closed(): boolean {
-    return !this.valveBlock || this.valveBlock.data.state !== DigitalState.Active;
+    return Boolean(this.part.settings.closed);
   }
 
   get valveRotation(): number {
-    if (this.valveBlock) {
-      switch (this.valveBlock.data.state) {
-        case DigitalState.Inactive:
-          return 90;
-        case DigitalState.Active:
-          return 0;
-        default:
-          return 45;
-      }
-    }
-    return 90;
-  }
-
-  @Watch('valveBlock')
-  triggerUpdate(block, prevBlock): void {
-    if (block === null
-      || prevBlock === null
-      || block.data.state !== prevBlock.data.state) {
-      this.invalidateFlows();
-    }
+    return this.closed ? 90 : 0;
   }
 }
 </script>
 
 <template>
   <g>
-    <foreignObject v-if="!valveBlock" :height="squares(1)" :width="squares(1)">
-      <q-icon name="mdi-link-variant-off" size="sm" class="absolute-right" style="height: 15px;" />
-    </foreignObject>
     <g key="valve-outer" class="outline">
       <path :d="paths.outerValve[0]" />
       <path :d="paths.outerValve[1]" />

@@ -1,35 +1,65 @@
-import { typeName as actuatorType } from '@/plugins/spark/features/DigitalActuator/getters';
-import { typeName as motorValveType } from '@/plugins/spark/features/MotorValve/getters';
-import { sparkStore } from '@/plugins/spark/store';
-import { DigitalState } from '@/plugins/spark/types';
+import { Notify } from 'quasar';
+
+import { fetchJson } from '@/helpers/fetch';
+import { serialize } from '@/helpers/units/parseObject';
 
 import { LEFT, RIGHT } from '../getters';
-import { settingsBlock } from '../helpers';
-import { PartSpec, PersistentPart, Transitions } from '../types';
+import { PartSpec, PartUpdater, PersistentPart, Transitions } from '../types';
+
+const intercept = (message: string): (e: Error) => never =>
+  (e: Error) => {
+    Notify.create({
+      icon: 'warning',
+      message: `${message}: ${e.message}`,
+    });
+    throw e;
+  };
 
 const spec: PartSpec = {
   id: 'ActuatorValve',
   size: () => [1, 1],
   cards: [{
-    component: 'LinkedBlockCard',
-    props: { settingsKey: 'valve', types: [motorValveType, actuatorType], label: 'Valve or Actuator' },
+    component: 'TextCard',
+    props: {
+      settingsKey: 'valveid',
+      defaultSize: 1,
+      label: 'ID',
+    },
   }],
   transitions: (part: PersistentPart): Transitions => {
-    const block = settingsBlock(part, 'valve');
-    return block && block.data.state === DigitalState.Active
+    return !part.settings.closed
       ? {
         [LEFT]: [{ outCoords: RIGHT }],
         [RIGHT]: [{ outCoords: LEFT }],
       }
       : {};
   },
-  interactHandler: (part: PersistentPart) => {
-    const block = settingsBlock(part, 'valve');
-    if (block) {
-      block.data.desiredState = block.data.state === DigitalState.Active
-        ? DigitalState.Inactive
-        : DigitalState.Active;
-      sparkStore.saveBlock([block.serviceId, block]);
+  interactHandler: (part: PersistentPart, updater: PartUpdater) => {
+    updater.updatePart(part);
+    if (part.settings.valveid !== undefined) {
+      const message = part.settings.valveid + (part.settings.closed ? '1' : '0');
+      console.log(message);
+
+      const post =
+        async (data: any, method = 'POST'): Promise<any> =>
+          fetchJson(
+            'https://localhost:9001/valves/write',
+            {
+              method,
+              body: JSON.stringify(serialize(data)),
+              headers: new Headers({
+                'Content-Type': 'application/json',
+              }),
+            },
+          );
+
+      post(
+        {
+          message,
+        },
+      ).catch(intercept(`Failed to write valves: ${0}`));
+
+      part.settings.closed = !part.settings.closed;
     }
   },
 };
