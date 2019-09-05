@@ -1,5 +1,4 @@
-import { Dialog } from 'quasar';
-
+import { createDialog } from '@/helpers/dialog';
 import { typeName } from '@/plugins/spark/features/ActuatorPwm/getters';
 import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
 import { sparkStore } from '@/plugins/spark/store';
@@ -28,7 +27,7 @@ const spec: PartSpec = {
   interactHandler: (part: PersistentPart) => {
     const block = settingsBlock(part, 'pwm');
     if (block) {
-      Dialog.create({
+      createDialog({
         component: 'SliderDialog',
         title: 'Pump speed',
         value: block.data.setting,

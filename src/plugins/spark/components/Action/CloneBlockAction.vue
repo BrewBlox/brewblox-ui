@@ -1,8 +1,8 @@
 <script lang="ts">
 
-import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
@@ -42,7 +42,7 @@ export default class RemoveBlockAction extends BlockCrudComponent {
   }
 
   public startCloneBlock(): void {
-    Dialog.create({
+    createDialog({
       component: 'InputDialog',
       title: 'Clone Block',
       message: `This will create an additional Block

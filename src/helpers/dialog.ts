@@ -1,5 +1,5 @@
 import get from 'lodash/get';
-import { Dialog, uid } from 'quasar';
+import { Dialog, DialogChainObject, QDialogOptions, uid } from 'quasar';
 
 import { BlockCrud } from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
@@ -8,6 +8,14 @@ import { DashboardItem } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { deserialize } from './units/parseObject';
+
+export interface DialogOptions extends QDialogOptions {
+  [prop: string]: any;
+}
+
+export function createDialog(opts: DialogOptions): DialogChainObject {
+  return Dialog.create(opts);
+}
 
 export function showBlockDialog(block: Block | null, props: any = {}): void {
   if (!block) {
@@ -35,7 +43,7 @@ export function showBlockDialog(block: Block | null, props: any = {}): void {
     saveBlock: v => sparkStore.saveBlock([block.serviceId, v]),
     closeDialog: () => wrapper.dialog && wrapper.dialog.hide(),
   };
-  wrapper.dialog = Dialog.create({
+  wrapper.dialog = createDialog({
     component: 'FormDialog',
     getCrud: () => crud,
     getProps: () => props,

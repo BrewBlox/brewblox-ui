@@ -1,7 +1,8 @@
-import { Dialog, uid } from 'quasar';
+import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { DashboardItem, dashboardStore } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
@@ -44,7 +45,7 @@ export default class CrudComponent extends Vue {
 
   public startChangeWidgetTitle(): void {
     const widgetTitle = this.widget.title;
-    Dialog.create({
+    createDialog({
       title: 'Change Widget name',
       message: `Choose a new name for '${widgetTitle}'`,
       dark: true,
@@ -59,13 +60,13 @@ export default class CrudComponent extends Vue {
 
   public startCopyWidget(): void {
     const id = uid();
-    Dialog.create({
+    createDialog({
       title: 'Copy widget',
       message: `To which dashboard do you want to copy widget ${this.widget.title}?`,
       dark: true,
       options: {
         type: 'radio',
-        model: null,
+        model: undefined,
         items: dashboardStore.dashboardValues
           .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
       },
@@ -85,13 +86,13 @@ export default class CrudComponent extends Vue {
   }
 
   public startMoveWidget(): void {
-    Dialog.create({
+    createDialog({
       title: 'Move widget',
       message: `To which dashboard do you want to move widget ${this.widget.title}?`,
       dark: true,
       options: {
         type: 'radio',
-        model: null,
+        model: undefined,
         items: dashboardStore.dashboardValues
           .filter(dashboard => dashboard.id !== this.widget.dashboard)
           .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
@@ -119,7 +120,7 @@ export default class CrudComponent extends Vue {
         .map(del => ({ label: del.description, action: del.action })),
     ].map((opt, idx) => ({ ...opt, value: idx }));
 
-    Dialog.create({
+    createDialog({
       title: 'Delete widget',
       message: `How do you want to delete widget ${this.widget.title}?`,
       dark: true,

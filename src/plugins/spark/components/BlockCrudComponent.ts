@@ -1,9 +1,9 @@
 import get from 'lodash/get';
-import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { GraphConfig } from '@/components/Graph/types';
 import CrudComponent, { Crud } from '@/components/Widget/CrudComponent';
+import { createDialog } from '@/helpers/dialog';
 import { showBlockDialog } from '@/helpers/dialog';
 import { postfixedDisplayNames } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
@@ -127,7 +127,7 @@ export default class BlockCrudComponent extends CrudComponent {
 
   public openModal(opts: { formProps?: any } = {}): void {
     const { formProps } = opts;
-    this.activeDialog = Dialog.create({
+    this.activeDialog = createDialog({
       component: 'FormDialog',
       root: this.$root,
       getCrud: () => ({ ...this.crud, closeDialog: this.closeDialog }),
@@ -149,7 +149,7 @@ export default class BlockCrudComponent extends CrudComponent {
 
   public startChangeBlockId(): void {
     const blockId = this.blockId;
-    Dialog.create({
+    createDialog({
       component: 'InputDialog',
       title: 'Change Block name',
       message: `Choose a new name for '${this.blockId}'`,
@@ -163,7 +163,7 @@ export default class BlockCrudComponent extends CrudComponent {
   }
 
   public startSwitchBlock(): void {
-    Dialog.create({
+    createDialog({
       component: 'BlockDialog',
       title: 'Choose a Block',
       message: 'You can change the Block that will be displayed by this widget',
@@ -175,7 +175,7 @@ export default class BlockCrudComponent extends CrudComponent {
   }
 
   public startBlockInfo(): void {
-    Dialog.create({
+    createDialog({
       component: 'BlockInfoDialog',
       block: this.block,
       root: this.$root,
@@ -183,7 +183,7 @@ export default class BlockCrudComponent extends CrudComponent {
   }
 
   public startRemoveBlock(): void {
-    Dialog.create({
+    createDialog({
       title: 'Remove Block',
       message: `Are you sure you want to remove ${this.block.id}?`,
       cancel: true,

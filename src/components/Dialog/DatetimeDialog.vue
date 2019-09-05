@@ -1,9 +1,9 @@
 <script lang="ts">
 import { date as qdate } from 'quasar';
-import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
+import { createDialog } from '@/helpers/dialog';
 
 @Component
 export default class DatetimeDialog extends DialogBase {
@@ -42,7 +42,7 @@ export default class DatetimeDialog extends DialogBase {
   }
 
   openPicker(): void {
-    Dialog.create({
+    createDialog({
       component: 'DatepickerDialog',
       title: this.title,
       message: this.message,

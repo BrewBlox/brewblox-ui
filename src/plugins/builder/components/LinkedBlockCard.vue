@@ -1,8 +1,8 @@
 <script lang="ts">
 import get from 'lodash/get';
-import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
@@ -64,7 +64,9 @@ export default class LinkedBlockCard extends PartCard {
   }
 
   get serviceOptions(): string[] {
-    return serviceStore.serviceIds;
+    return serviceStore.serviceValues
+      .filter(svc => svc.type === 'Spark')
+      .map(svc => svc.id);
   }
 
   get compatibleTypes(): string[] {
@@ -94,7 +96,7 @@ export default class LinkedBlockCard extends PartCard {
   }
 
   create(): void {
-    Dialog.create({
+    createDialog({
       component: 'BlockWizardDialog',
       root: this.$root,
       serviceId: this.serviceId,

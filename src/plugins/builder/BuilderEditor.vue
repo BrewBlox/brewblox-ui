@@ -1,10 +1,10 @@
 <script lang="ts">
 import { debounce, uid } from 'quasar';
-import { Dialog } from 'quasar';
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 import { Coordinates } from '@/helpers/coordinates';
+import { createDialog } from '@/helpers/dialog';
 import { showImportDialog } from '@/helpers/dialog';
 import { clampRotation } from '@/helpers/functional';
 import { saveJsonFile } from '@/helpers/import-export';
@@ -290,7 +290,7 @@ export default class BuilderEditor extends DialogBase {
     if (!this.layout) {
       return;
     }
-    Dialog.create({
+    createDialog({
       title: 'Change Layout title',
       message: `Choose a new name for ${this.layout.title}`,
       dark: true,
@@ -308,7 +308,7 @@ export default class BuilderEditor extends DialogBase {
   }
 
   clearParts(): void {
-    Dialog.create({
+    createDialog({
       title: 'Remove parts',
       message: 'Are you sure you wish to remove all parts?',
       dark: true,
@@ -322,7 +322,7 @@ export default class BuilderEditor extends DialogBase {
     if (!this.layout) {
       return;
     }
-    Dialog.create({
+    createDialog({
       title: 'Remove layout',
       message: `Are you sure you wish to remove ${this.layout.title}?`,
       dark: true,
@@ -432,8 +432,6 @@ export default class BuilderEditor extends DialogBase {
     }
 
     if (args.isFinal && this.selectArea) {
-      this.selectedTime = new Date().getTime();
-
       const { x, y, width, height } = this.unflippedArea(this.selectArea);
       const startX = x / SQUARE_SIZE;
       const startY = y / SQUARE_SIZE;
@@ -453,6 +451,7 @@ export default class BuilderEditor extends DialogBase {
           .map(deepCopy));
 
       this.selectArea = null;
+      this.selectedTime = new Date().getTime();
     }
   }
 
@@ -520,7 +519,7 @@ export default class BuilderEditor extends DialogBase {
   }
 
   selectClickHandler(evt: ClickEvent, part: FlowPart): void {
-    if (new Date().getTime() - this.selectedTime < 200) {
+    if (new Date().getTime() - this.selectedTime < 500) {
       // The mouseup at the end of a pan also generates a click event - skip this
       return;
     }
@@ -660,7 +659,7 @@ export default class BuilderEditor extends DialogBase {
   }
 
   startAddLayout(copy: boolean): void {
-    Dialog.create({
+    createDialog({
       title: 'Add Layout',
       message: 'Create a new Brewery Builder layout',
       dark: true,

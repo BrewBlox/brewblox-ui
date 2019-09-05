@@ -308,17 +308,6 @@ export function defineCreatedBlocks(
     : baseBlocks;
 }
 
-export function defineLayouts(config: HermsConfig): BuilderLayout[] {
-  return [
-    {
-      id: uid(),
-      title: `${config.prefix} HERMS Layout`,
-      width: 10,
-      height: 10,
-      parts: [],
-    },
-  ];
-}
 
 export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): DashboardItem[] {
   const userTemp = sparkStore.units(config.serviceId).Temp;
@@ -344,7 +333,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
 
   const createBuilder = (): BuilderItem => ({
     ...createWidget(`${config.prefix} Diagram`, builderType),
-    cols: 10,
+    cols: 11,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
     config: {
@@ -356,7 +345,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
 
   const createGraph = (): HistoryItem => ({
     ...createWidget(`${config.prefix} Graph`, 'Graph'),
-    cols: 6,
+    cols: 7,
     rows: 5,
     pinnedPosition: { x: 1, y: 6 },
     config: {
@@ -403,7 +392,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
     ...createWidget(`${config.prefix} Actions`, 'StepView'),
     cols: 4,
     rows: 5,
-    pinnedPosition: { x: 7, y: 6 },
+    pinnedPosition: { x: 8, y: 6 },
     config: {
       serviceId: config.serviceId,
       steps: serialize([

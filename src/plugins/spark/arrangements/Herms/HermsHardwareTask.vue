@@ -1,9 +1,9 @@
 <script lang="ts">
 import isEqual from 'lodash/isEqual';
-import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
+import { createDialog } from '@/helpers/dialog';
 import { typeName as DS2413Type } from '@/plugins/spark/features/DS2413/getters';
 import { typeName as Spark2PinsType } from '@/plugins/spark/features/Spark2Pins/getters';
 import { typeName as Spark3PinsType } from '@/plugins/spark/features/Spark3Pins/getters';
@@ -137,7 +137,7 @@ export default class HermsHardwareTask extends WizardTaskBase {
   }
 
   startBlockWizard(): void {
-    Dialog.create({
+    createDialog({
       component: 'BlockWizardDialog',
       serviceId: this.config.serviceId,
       root: this.$root,

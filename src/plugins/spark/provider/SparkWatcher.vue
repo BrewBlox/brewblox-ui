@@ -1,8 +1,8 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Watch } from 'vue-property-decorator';
 
 import WatcherBase from '@/components/Watcher/WatcherBase';
+import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
 import { SystemStatus } from '../types';
@@ -90,7 +90,7 @@ export default class SparkWatcher extends WatcherBase {
         {
           label: 'Update',
           textColor: 'white',
-          handler: () => Dialog.create({
+          handler: () => createDialog({
             component: 'FirmwareUpdateDialog',
             serviceId: this.serviceId,
           }),
