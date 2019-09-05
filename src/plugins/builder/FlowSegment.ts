@@ -1,33 +1,37 @@
 import { entryReducer } from '@/helpers/functional';
 
 import { DEFAULT_FRICTION } from './getters';
-import { FlowPart, PathFriction, Transitions } from './types';
+import { FlowPart, FlowRoute, PathFriction, Transitions } from './types';
+
+
+export interface PathLink {
+  path: FlowSegment;
+  route: FlowRoute;
+}
 
 export class FlowSegment {
-  public constructor(part: FlowPart, transitions: Transitions) {
+  public constructor(part: FlowPart) {
     this.root = part;
-    this.transitions = transitions;
   }
 
-  public transitions: Transitions;
   public root: FlowPart;
-  public splits: FlowSegment[] = [];
-  public next: FlowSegment | null = null;
+  public splits: PathLink[] = [];
+  public next: PathLink | null = null;
   public flowing = true;
 
-  public addChild(segment: FlowSegment): void {
+  public addChild(link: PathLink): void {
     if (this.splits.length == 0) {
       if (this.next !== null) {
         this.splits.push(this.next); // move next to splits
-        this.splits.push(segment); // add other segment to splits
+        this.splits.push(link); // add other segment to splits
         this.next = null; // set next to null for no shared next
       }
       else {
-        this.next = segment;
+        this.next = link;
       }
     }
     else {
-      this.splits.push(segment);
+      this.splits.push(link);
     }
   }
 
@@ -49,28 +53,34 @@ export class FlowSegment {
       return eqFriction;
     };
 
-    const series: PathFriction = this.next ? this.next.friction(input) : input;
-    if (Object(this.transitions).values > 1) {
-      // split
-      if (this.splits.length > 0) {
-        const splitPF = this.splits.map(split => split.friction(series));
-        const splitFriction = equivalentFriction(splitPF, { pressureDiff: 10, friction: 10 });
-        series.friction = series.friction + splitFriction;
-      }
-      else {
-        throw ('Found multiple transitions but no split path');
-      }
+    let series = input;
+
+    if (this.next) {
+      // add next before processing split (can be moved to front because all parts are in series)
+      series.friction += this.next.route.friction || DEFAULT_FRICTION;
+      series.pressureDiff += this.next.route.pressure || 0;
+      series = this.next.path.friction(series);
     }
+    if (this.splits.length > 1) {
+      // splitting path. Convert the combined paths into an equivalent series friction
+      const splitPF = this.splits.map(split => split.path.friction({
+        pressureDiff: split.route.pressure || 0,
+        friction: split.route.friction || DEFAULT_FRICTION,
+      }));
+      const splitFriction = equivalentFriction(splitPF, series);
+      series.friction = series.friction + splitFriction;
+    }
+
     return series;
   }
 
   public reduceSegments(func: (acc: any, segment: FlowSegment) => any, acc: any): any {
     acc = func(acc, this);
     this.splits.forEach((child) => {
-      acc = child.reduceSegments(func, acc);
+      acc = child.path.reduceSegments(func, acc);
     });
     if (this.next !== null) {
-      acc = func(acc, this.next);
+      acc = func(acc, this.next.path);
     }
   };
 
@@ -84,52 +94,44 @@ export class FlowSegment {
     }
 
     if (this.next) {
-      this.next.removeInternalFlows();
-      if (this.next && this.next.root.id === this.root.id) {
-        const nextTransitions = { ...this.next.transitions };
-        Object.entries(this.transitions).forEach(([k, v]) => {
-          v.forEach(outFlow => {
-            if (nextTransitions[outFlow.outCoords]) {
-              this.transitions[k] = nextTransitions[outFlow.outCoords];
-            }
-          });
-        });
-        this.splits = this.next.splits;
-        this.next = this.next.next;
+      this.next.path.removeInternalFlows();
+      if (this.next && this.next.path.root.id === this.root.id) {
+        this.splits = this.next.path.splits;
+        this.next = this.next.path.next;
       }
     }
   }
 
-  public leafSegments(): FlowSegment[] {
+  public leafLinks(): PathLink[] {
     if (this.splits.length !== 0) {
-      return this.splits.reduce((acc, child) => [...acc, ...child.leafSegments()], new Array<FlowSegment>());
+      return this.splits.reduce((acc, child) => [...acc, ...child.path.leafLinks()], new Array<PathLink>());
     }
     if (this.next !== null) {
-      return this.next.leafSegments();
+      const nextLeaves = this.next.path.leafLinks();
+      if (nextLeaves.length === 0) {
+        return [this.next]; // if my next has no leaves, it is the leaf itself
+      }
     }
-    return [this];
+    return [];
   }
 
-  public removeLeafSegment(segment: FlowSegment): void {
-    this.splits.forEach((child) => child.removeLeafSegment(segment));
+  public removeLeafLink(segment: FlowSegment): void {
+    this.splits.forEach((child) => child.path.removeLeafLink(segment));
     if (this.next !== null) {
-      if (this.next.isSameSegment(segment)) {
+      if (this.next.path.isSameSegment(segment)) {
         this.next = null;
         return;
       }
       else {
-        this.next.removeLeafSegment(segment);
+        this.next.path.removeLeafLink(segment);
       }
     }
   }
 
-  public popDuplicatedLeaves(): FlowSegment | null {
-    const leaves = this.leafSegments();
-    if (leaves.length !== 0 && leaves.every(v => v.isSameSegment(leaves[0]))) {
-      const combinedTransitions = leaves
-        .reduce((acc: Transitions, leaf) => ({ ...acc, ...leaf.transitions }), {});
-      leaves[0].transitions = combinedTransitions;
-      this.removeLeafSegment(leaves[0]);
+  public popDuplicatedLeaf(): PathLink | null {
+    const leaves = this.leafLinks();
+    if (leaves.length !== 0 && leaves.every(v => v.path.isSameSegment(leaves[0].path))) {
+      this.removeLeafLink(leaves[0].path);
       return leaves[0];
     }
     return null;

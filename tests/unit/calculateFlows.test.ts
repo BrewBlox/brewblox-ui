@@ -6,10 +6,10 @@ import {
   calculateFlows,
   flowPath,
 } from '@/plugins/builder/calculateFlows';
-import { FlowSegment } from '@/plugins/builder/FlowSegment';
+import { FlowSegment, PathLink } from '@/plugins/builder/FlowSegment';
 import { COLD_WATER, HOT_WATER, IN_OUT } from '@/plugins/builder/getters';
 import specs from '@/plugins/builder/specs';
-import { PersistentPart, StatePart } from '@/plugins/builder/types';
+import { FlowPart, FlowRoute, PersistentPart, StatePart } from '@/plugins/builder/types';
 
 function asStatePart(part: PersistentPart): StatePart {
   const spec = specs[part.type];
@@ -20,23 +20,53 @@ function asStatePart(part: PersistentPart): StatePart {
   };
 }
 
-const propertyWalker = (acc: any[], next: FlowSegment, prop: string[]): any[] => {
-  acc = [...acc, get(next, prop)];
-
+const propertyWalker = (acc: any[], item: FlowSegment, prop: string[]): any[] => {
   type StringList = string | any[];
   const subtree: StringList[] = [];
 
-  next.splits.forEach((child) => {
-    subtree.push(propertyWalker([], child, prop)); // splits
+  acc = [...acc, get(item, prop)];
+  item.splits.forEach((child) => {
+    subtree.push(propertyWalker([], child.path, prop)); // splits
   });
   if (subtree.length !== 0) {
     acc = [...acc, subtree];
   }
-  if (next.next !== null) {
-    acc = [...acc, ...propertyWalker([], next.next, prop)];
+  if (item.next !== null) {
+    acc = [...acc, ...propertyWalker([], item.next.path, prop)];
   }
   return acc;
 };
+
+const routeWalker = (acc: any[], item: FlowSegment, inRoute: FlowRoute | null = null): any[] => {
+  type StringList = string | any[];
+  const subtree: StringList[] = [];
+
+  if (inRoute) {
+    acc = [...acc, inRoute];
+  }
+
+  item.splits.forEach((child) => {
+    subtree.push(routeWalker([], child.path, child.route)); // splits
+  });
+  if (subtree.length !== 0) {
+    acc = [...acc, subtree];
+  }
+  if (item.next !== null) {
+    acc = [...acc, ...routeWalker([], item.next.path, item.next.route)];
+  }
+  return acc;
+};
+
+const findPath = (
+  parts: FlowPart[],
+  start: FlowPart): FlowSegment => {
+  const link = flowPath(parts, start, { outCoords: IN_OUT });
+  if (link === null) {
+    throw ('no path found');
+  }
+  return link.path;
+};
+
 
 describe('Data describing an input tube', () => {
   const part: PersistentPart = {
@@ -55,7 +85,7 @@ describe('Data describing an input tube', () => {
     expect(asStatePart(part).transitions).toEqual(
       {
         [IN_OUT]: [{ outCoords: '1,0.5,0', pressure: 11, liquids: [COLD_WATER], source: true }],
-        '1,0.5,0': [{ outCoords: IN_OUT, sink: true }],
+        '1,0.5,0': [{ outCoords: IN_OUT, pressure: -11, sink: true }],
       });
   });
 });
@@ -108,7 +138,7 @@ describe('A single path without splits', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        pressure: 6,
+        pressure: 4,
         liquids: [HOT_WATER],
       },
     },
@@ -133,28 +163,16 @@ describe('A single path without splits', () => {
   const flowParts = asFlowParts(parts.map(asStatePart));
   const start = flowParts[0];
 
-  const path = flowPath(flowParts, start, IN_OUT);
-  if (path === null) {
-    throw ('no path found');
-  }
+  const path = findPath(flowParts, start);
 
   it('Should have no splits', () => {
-    let walker: FlowSegment = path;
-    const pathTypes: string[] = ['SystemIO'];
-    while (true) {
-      if (walker.next === null) {
-        break; // end of path
-      }
-      expect(walker.splits).toHaveLength(0);
-      pathTypes.push(walker.next.root.type);
-      walker = walker.next;
-    }
-    expect(pathTypes).toEqual(['SystemIO', 'StraightTube', 'SystemIO']);
+    const visitedTypes = propertyWalker([], path, ['root', 'type']);
+    expect(visitedTypes).toEqual(['SystemIO', 'StraightTube', 'SystemIO']);
   });
 
-  it('Should have a friction value of 3', () => {
-    const { friction, pressureDiff } = path.friction();
-    expect(friction).toEqual(3);
+  it('Should have a friction value of 2', () => {
+    const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
+    expect(friction).toEqual(2);
   });
 
   it('Should have a flow of value of 2 for all parts', () => {
@@ -166,15 +184,12 @@ describe('A single path without splits', () => {
         rotate: 0,
         type: 'SystemIO',
         flows: {
-          [IN_OUT]: {
-            [HOT_WATER]: -2,
-          },
           '2,2.5,0': {
             [HOT_WATER]: 2,
           },
         },
         settings: {
-          pressure: 6,
+          pressure: 4,
           liquids: [HOT_WATER],
         },
       },
@@ -186,9 +201,6 @@ describe('A single path without splits', () => {
         flows: {
           '3,2.5,0': {
             [HOT_WATER]: -2,
-          },
-          [IN_OUT]: {
-            [HOT_WATER]: 2,
           },
         },
       },
@@ -220,7 +232,7 @@ describe('A path with a split, but no joins', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        pressure: 14,
+        pressure: 10,
         liquids: [COLD_WATER],
       },
     },
@@ -261,10 +273,7 @@ describe('A path with a split, but no joins', () => {
   const flowParts = asFlowParts(parts.map(asStatePart));
   const start = flowParts[0];
 
-  const path = flowPath(flowParts, start, IN_OUT);
-  if (path === null) {
-    throw ('no path found');
-  }
+  const path = findPath(flowParts, start);
 
   it('Should return a forking path', () => {
 
@@ -284,36 +293,18 @@ describe('A path with a split, but no joins', () => {
         ],
       ]);
 
-    const transitions = propertyWalker([], path, ['transitions']);
-    expect(transitions).toEqual(
+    const route = routeWalker([], path);
+    expect(route).toEqual(
       [
-        {
-          [IN_OUT]: [{ outCoords: '2,2.5,0', pressure: 14, liquids: [COLD_WATER], source: true }],
-        },
-        {
-          '2,2.5,0': [{ outCoords: '3,2.5,0' }],
-        },
-        {
-          '3,2.5,0': [{ outCoords: '3.5,2,0' }, { outCoords: '3.5,3,0' }],
-        },
-        [
-          [
-            {
-              '3.5,2,0': [{ outCoords: IN_OUT, sink: true }],
-            },
-          ],
-          [
-            {
-              '3.5,3,0': [{ outCoords: IN_OUT, sink: true }],
-            },
-          ],
-        ],
+        { outCoords: '2,2.5,0', pressure: 10, liquids: [COLD_WATER], source: true },
+        { outCoords: '3,2.5,0' },
+        [[{ outCoords: '3.5,2,0' }], [{ outCoords: '3.5,3,0' }]],
       ]);
   });
 
-  it('Should have a friction value of 3.5', () => {
-    const { friction, pressureDiff } = path.friction();
-    expect(friction).toEqual(3.5);
+  it('Should have a friction value of 2.5', () => {
+    const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
+    expect(friction).toEqual(2.5);
   });
 
   it('Should have a flow of value of 4 total and 2 for each split', () => {
@@ -322,9 +313,6 @@ describe('A path with a split, but no joins', () => {
       [
         {
           flows: {
-            [IN_OUT]: {
-              [COLD_WATER]: -4,
-            },
             '2,2.5,0': {
               [COLD_WATER]: 4,
             },
@@ -371,9 +359,6 @@ describe('A path with a split, but no joins', () => {
         },
         {
           flows: {
-            [IN_OUT]: {
-              [COLD_WATER]: 2,
-            },
             '3.5,3,0': {
               [COLD_WATER]: -2,
             },
@@ -467,10 +452,7 @@ describe('A path that forks and rejoins', () => {
   const flowParts = asFlowParts(parts.map(asStatePart));
   const start = flowParts[0];
 
-  const path = flowPath(flowParts, start, IN_OUT);
-  if (path === null) {
-    throw ('no path found');
-  }
+  const path = findPath(flowParts, start);
 
   it('Should return a forking and rejoining path', () => {
 
@@ -519,7 +501,7 @@ describe('A path that forks and rejoins', () => {
   });
 
   it('Should have a friction value of 5.5', () => {
-    const { friction, pressureDiff } = path.friction();
+    const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
     expect(friction).toEqual(5.5);
   });
 
@@ -1149,10 +1131,7 @@ describe('A kettle with 2 outflows', () => {
   it('Should have 2 outlfow paths', () => {
     const start = flowParts[0];
 
-    const path = flowPath(flowParts, start, IN_OUT);
-    if (path === null) {
-      throw ('no path found');
-    }
+    const path = findPath(flowParts, start);
 
     const visitedTypes = propertyWalker([], path, ['root', 'type']);
     expect(visitedTypes).toEqual(
@@ -1262,10 +1241,7 @@ describe('A kettle with flow back to itself', () => {
     it('Should return the right path starting at the kettle', () => {
       const start = flowParts[0];
 
-      const path = flowPath(flowParts, start, IN_OUT);
-      if (path === null) {
-        throw ('no path found');
-      }
+      const path = findPath(flowParts, start);
 
       const visitedTypes = propertyWalker([], path, ['root', 'type']);
       expect(visitedTypes).toEqual(
@@ -1280,7 +1256,7 @@ describe('A kettle with flow back to itself', () => {
         ]);
 
 
-      const { friction, pressureDiff } = path.friction();
+      const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
       expect(friction).toEqual(5);
     });
 
@@ -1317,11 +1293,7 @@ describe('A kettle with flow back to itself', () => {
     const flowParts = asFlowParts(parts.map(asStatePart));
     it('Should return the right path starting at the kettle', () => {
       const start = flowParts[0];
-
-      const path = flowPath(flowParts, start, IN_OUT);
-      if (path === null) {
-        throw ('no path found');
-      }
+      const path = findPath(flowParts, start);
 
       const visitedTypes = propertyWalker([], path, ['root', 'type']);
       expect(visitedTypes).toEqual(
@@ -1335,7 +1307,7 @@ describe('A kettle with flow back to itself', () => {
           'Kettle',
         ]);
 
-      const { friction, pressureDiff } = path.friction();
+      const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
       expect(friction).toEqual(5);
     });
 
