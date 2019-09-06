@@ -190,7 +190,7 @@ export const flowPath = (
     }
     return acc;
   }, []);
-  // let flowing = false;
+
   for (const outFlow of outFlows) {
     while (true) {
       const nextPart =
@@ -202,12 +202,8 @@ export const flowPath = (
         nextPath = flowPath(candidateParts, nextPart, outFlow, startCoord);
         if (nextPath !== null) {
           path.addChild(nextPath);
-          // flowing = flowing || nextPath.flowing;
         }
       }
-      //if (nextPath === null && !outFlow.sink) {
-      //  path.flowing = flowing;
-      //}
       if (!nextPart || outFlow.internal) {
         break;
       }
@@ -216,23 +212,9 @@ export const flowPath = (
     }
   };
 
-  if (path.next !== null || path.splits.length === 0) {
-    // path was expanded
+  if (path.next !== null) {
+    // path was finished
     path.removeInternalFlows();
-
-
-    let duplicated: PathLink | null = null;
-    do {
-      if (path.splits.length !== 0) {
-        duplicated = path.popDuplicatedLeaf();
-        if (duplicated !== null) {
-          if (path.next !== null) {
-            duplicated.path.addChild(path.next);
-          }
-          path.next = duplicated;
-        }
-      }
-    } while (duplicated !== null);
   }
 
   return { path, route: inRoute };
@@ -293,14 +275,14 @@ const addFlowFromPart = (parts: FlowPart[], part: FlowPart): FlowPart[] => {
       const liquids: string[] = outFlow.liquids || [];
       if (outFlow.source && liquids.length > 0) {
         const pathLink = flowPath(parts, part, { outCoords: inCoords, internal: true });
-        if (pathLink !== null) {// && path.flowing) {
+        if (pathLink !== null) {
           const { friction, pressureDiff } = pathLink.path.friction({ pressureDiff: 0, friction: 0 });
           if (pressureDiff >= 0) {
             // only handle positive or zero flows
             // negative flows will have a positive counterpart we do handle
             const startFlow: LiquidFlow = {};
             liquids.forEach((liquid: string) => {
-              const flow = /*path.flowing ? */ pressureDiff / friction;// : 0;
+              const flow = pressureDiff / friction;
               startFlow[liquid] = flow;
             });
             parts = addFlowForPathLink(parts, pathLink, startFlow);

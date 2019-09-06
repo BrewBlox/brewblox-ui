@@ -19,7 +19,6 @@ export class FlowSegment {
 
   public splitDivide: number[] = [];
   public next: PathLink | null = null;
-  public flowing = true;
 
   public addChild(link: PathLink): void {
     if (this.splits.length == 0) {
@@ -104,6 +103,68 @@ export class FlowSegment {
         this.splits = this.next.path.splits;
         this.next = this.next.path.next;
       }
+    }
+  }
+
+  public trimAtRoute(route: FlowRoute): PathLink | null {
+    if (this.next) {
+      if (this.next.route.outCoords === route.outCoords) {
+        const end = this.next;
+        this.next = null;
+        return end;
+      }
+      return this.next.path.trimAtRoute(route);
+    }
+    return null;
+  }
+
+  public lastRoutes(): FlowRoute[] {
+    if (this.next) {
+      const last = this.next.path.lastRoutes();
+      if (last.length === 0) {
+        return [this.next.route];
+      }
+    }
+    const routes: FlowRoute[] = [];
+    this.splits.forEach(split => {
+      const r = split.path.lastRoutes();
+      if (r.length === 0) {
+        routes.push(split.route);
+      }
+      else {
+        r.forEach(v => { routes.push(v); });
+      }
+    });
+    return routes;
+  };
+
+
+  public joinDuplicateSplits(): void {
+    if (this.next !== null) {
+      this.next.path.joinDuplicateSplits();
+    }
+    if (this.splits.length !== 0) {
+      let duplicated: PathLink | null = null;
+      this.splits.forEach((link, idx1) => {
+        // find if any of the segments on a different split have the same next part
+        let walker = link;
+        while (walker.path.next !== null) {
+          console.log(walker.route);
+          const sharedInCoord = walker.path.next.route;
+          this.splits.forEach((link2, idx2) => {
+            if (idx1 > idx2) {
+
+              const end = link2.path.trimAtRoute(walker.route);
+              if (end !== null) {
+
+                duplicated = end;
+              }
+            }
+          });
+          walker = walker.path.next;
+        }
+        this.next = duplicated;
+      });
     }
   }
 

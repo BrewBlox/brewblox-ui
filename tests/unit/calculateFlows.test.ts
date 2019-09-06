@@ -220,6 +220,17 @@ describe('A single path without splits', () => {
       }]
     );
   });
+
+  it('The end can be cut of at a specified route', () => {
+    const end = path.trimAtRoute({ outCoords: '3,2.5,0' });
+    expect(end).not.toBeNull();
+    if (end !== null) {
+      expect(end.path.root.x).toBe(3);
+
+      expect(propertyWalker([], path, ['root', 'type'])).toEqual(['SystemIO', 'StraightTube']);
+      expect(propertyWalker([], end.path, ['root', 'type'])).toEqual(['SystemIO']);
+    }
+  });
 });
 
 
@@ -450,6 +461,11 @@ describe('A path that forks and rejoins', () => {
   const start = flowParts[0];
 
   const path = findPath(flowParts, start);
+  console.log(path.lastRoutes());
+  path.joinDuplicateSplits();
+
+
+  throw ('stop');
 
   it('Should return a forking and rejoining path', () => {
 
@@ -464,14 +480,13 @@ describe('A path that forks and rejoins', () => {
           [
             'ElbowTube',
             'ElbowTube',
-            'TeeTube',
           ],
           [
             'ElbowTube',
             'ElbowTube',
-            'TeeTube',
           ],
         ],
+        'TeeTube',
         'SystemIO',
       ]);
 
