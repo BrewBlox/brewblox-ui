@@ -119,13 +119,14 @@ export class FlowSegment {
   }
 
   public lastRoutes(): FlowRoute[] {
+    const routes: FlowRoute[] = [];
     if (this.next) {
       const last = this.next.path.lastRoutes();
       if (last.length === 0) {
         return [this.next.route];
       }
+      return last;
     }
-    const routes: FlowRoute[] = [];
     this.splits.forEach(split => {
       const r = split.path.lastRoutes();
       if (r.length === 0) {
