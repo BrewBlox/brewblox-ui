@@ -16,6 +16,8 @@ export class FlowSegment {
 
   public root: FlowPart;
   public splits: PathLink[] = [];
+
+  public splitDivide: number[] = [];
   public next: PathLink | null = null;
   public flowing = true;
 
@@ -36,22 +38,24 @@ export class FlowSegment {
   }
 
   public friction(input: PathFriction): PathFriction {
-    const equivalentFriction = (toTransform: PathFriction[], splitInput: PathFriction): number => {
-      // Apply Millman’s Theorem Equation to calculate node pressure on the split
-      const allPaths = [splitInput, ...toTransform.map(entry => ({
-        pressureDiff: -entry.pressureDiff,
-        friction: entry.friction,
-      }))];
-      const num = allPaths.reduce((acc, p) => p.friction ? acc + p.pressureDiff / p.friction : acc, 0);
-      const denum = allPaths.reduce((acc, p) => p.friction ? acc + 1 / p.friction : acc, 0);
-      const nodePressure = num / denum;
+    const equivalentFriction =
+      (toTransform: PathFriction[], splitInput: PathFriction): { total: number; split: number[] } => {
+        // Apply Millman’s Theorem Equation to calculate node pressure on the split
+        const allPaths = [splitInput, ...toTransform.map(entry => ({
+          pressureDiff: -entry.pressureDiff,
+          friction: entry.friction,
+        }))];
+        const num = allPaths.reduce((acc, p) => p.friction ? acc + p.pressureDiff / p.friction : acc, 0);
+        const denum = allPaths.reduce((acc, p) => p.friction ? acc + 1 / p.friction : acc, 0);
+        const nodePressure = num / denum;
 
-      // convert pressure difference + friction on each split to only an equivalent (possibly negative) friction
-      const equivalentSplitFrictions = toTransform.map((entry): number =>
-        nodePressure * entry.friction / (nodePressure + entry.pressureDiff));
-      const eqFriction = 1 / equivalentSplitFrictions.reduce((acc, entry) => acc + 1 / entry, 0);
-      return eqFriction;
-    };
+        // convert pressure difference + friction on each split to only an equivalent (possibly negative) friction
+        const equivalentSplitFrictions = toTransform.map((entry): number =>
+          nodePressure * entry.friction / (nodePressure + entry.pressureDiff));
+        const eqInv = equivalentSplitFrictions.map(v => 1 / v);
+        const eqFriction = 1 / eqInv.reduce((acc, entry) => acc + entry, 0);
+        return { total: eqFriction, split: eqInv.map(v => v * eqFriction) };
+      };
 
     let series = input;
 
@@ -68,7 +72,8 @@ export class FlowSegment {
         friction: split.route.friction || DEFAULT_FRICTION,
       }));
       const splitFriction = equivalentFriction(splitPF, series);
-      series.friction = series.friction + splitFriction;
+      series.friction = series.friction + splitFriction.total;
+      this.splitDivide = splitFriction.split;
     }
 
     return series;

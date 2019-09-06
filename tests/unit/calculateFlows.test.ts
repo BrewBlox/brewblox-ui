@@ -346,9 +346,6 @@ describe('A path with a split, but no joins', () => {
         },
         {
           flows: {
-            [IN_OUT]: {
-              [COLD_WATER]: 2,
-            },
             '3.5,2,0': {
               [COLD_WATER]: -2,
             },
@@ -511,7 +508,6 @@ describe('A path that forks and rejoins', () => {
       [
         {
           flows: {
-            [IN_OUT]: { [COLD_WATER]: -2 },
             '2,2.5,0': { [COLD_WATER]: 2 },
           },
           type: 'SystemIO',
@@ -570,7 +566,6 @@ describe('A path that forks and rejoins', () => {
         },
         {
           flows: {
-            [IN_OUT]: { [COLD_WATER]: 2 },
             '5,2.5,0': { [COLD_WATER]: -2 },
           },
           type: 'SystemIO',
@@ -615,7 +610,7 @@ describe('A single path with a pump', () => {
   ];
 
 
-  it('Should have a flow of value of 2 for all parts with the pump disabled', () => {
+  it('Should have a flow of value of 3 for all parts with the pump disabled', () => {
     const flowParts = asFlowParts(parts.map(asStatePart));
     const partsWithFlow = calculateFlows(flowParts);
     expect(partsWithFlow).toMatchObject(
@@ -626,8 +621,7 @@ describe('A single path with a pump', () => {
         rotate: 180,
         type: 'SystemIO',
         flows: {
-          [IN_OUT]: { [COLD_WATER]: -2 },
-          '3,2.5,0': { [COLD_WATER]: 2 },
+          '3,2.5,0': { [COLD_WATER]: 3 },
         },
         settings: {
           pressure: 6,
@@ -641,8 +635,8 @@ describe('A single path with a pump', () => {
         rotate: 0,
         type: 'Pump',
         flows: {
-          '3,2.5,0': { [COLD_WATER]: -2 },
-          '2,2.5,0': { [COLD_WATER]: 2 },
+          '3,2.5,0': { [COLD_WATER]: -3 },
+          '2,2.5,0': { [COLD_WATER]: 3 },
         },
         settings: {
           enabled: false,
@@ -656,8 +650,7 @@ describe('A single path with a pump', () => {
         rotate: 0,
         type: 'SystemIO',
         flows: {
-          '2,2.5,0': { [COLD_WATER]: -2 },
-          [IN_OUT]: { [COLD_WATER]: 2 },
+          '2,2.5,0': { [COLD_WATER]: -3 },
         },
       },
       ]
@@ -665,8 +658,8 @@ describe('A single path with a pump', () => {
   });
 
   describe('Two input tubes with different liquid joining', () => {
-    it('Should have a flow of value of 6 when the pump is enabled', () => {
-      // (input pressure 6 + pump pressure 12) / friction 3 = 6
+    it('Should have a flow of value of 9 when the pump is enabled', () => {
+      // (input pressure 6 + pump pressure 12) / friction 2 = 9
       set(parts[1], ['settings', 'enabled'], true);
       const flowParts = asFlowParts(parts.map(asStatePart));
       const partsWithFlow = calculateFlows(flowParts);
@@ -678,7 +671,7 @@ describe('A single path with a pump', () => {
           rotate: 180,
           type: 'SystemIO',
           flows: {
-            [IN_OUT]: { [COLD_WATER]: -6 },
+            '3,2.5,0': { [COLD_WATER]: 9 },
           },
           settings: {
             pressure: 6,
@@ -691,8 +684,8 @@ describe('A single path with a pump', () => {
           rotate: 0,
           type: 'Pump',
           flows: {
-            '3,2.5,0': { [COLD_WATER]: -6 },
-            '2,2.5,0': { [COLD_WATER]: 6 },
+            '3,2.5,0': { [COLD_WATER]: -9 },
+            '2,2.5,0': { [COLD_WATER]: 9 },
           },
           settings: {
             enabled: true,
@@ -706,8 +699,7 @@ describe('A single path with a pump', () => {
           rotate: 0,
           type: 'SystemIO',
           flows: {
-            '2,2.5,0': { [COLD_WATER]: -6 },
-            [IN_OUT]: { [COLD_WATER]: 6 },
+            '2,2.5,0': { [COLD_WATER]: -9 },
           },
         },
         ]
@@ -726,7 +718,7 @@ describe('Two sources joining', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        pressure: 11,
+        pressure: 8,
         liquids: [COLD_WATER],
       },
     },
@@ -737,7 +729,7 @@ describe('Two sources joining', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        pressure: 11,
+        pressure: 8,
         liquids: [HOT_WATER],
       },
     },
@@ -781,9 +773,6 @@ describe('Two sources joining', () => {
       [
         {
           'flows': {
-            [IN_OUT]: {
-              [COLD_WATER]: -2,
-            },
             '2,1.5,0': {
               [COLD_WATER]: 2,
             },
@@ -794,9 +783,6 @@ describe('Two sources joining', () => {
         },
         {
           'flows': {
-            [IN_OUT]: {
-              [HOT_WATER]: -2,
-            },
             '2,3.5,0': {
               [HOT_WATER]: 2,
             },
@@ -850,10 +836,6 @@ describe('Two sources joining', () => {
         },
         {
           'flows': {
-            [IN_OUT]: {
-              [COLD_WATER]: 2,
-              [HOT_WATER]: 2,
-            },
             '3,2.5,0': {
               [COLD_WATER]: -2,
               [HOT_WATER]: -2,
@@ -870,6 +852,7 @@ describe('Two sources joining', () => {
 
 
 describe('A path with a bridge', () => {
+  // 7 transitions long, passes the bridge twice
   const parts: PersistentPart[] = [
     {
       id: '1',
@@ -879,7 +862,7 @@ describe('A path with a bridge', () => {
       rotate: 0,
       settings: {
         liquids: [COLD_WATER],
-        pressure: 8,
+        pressure: 7,
       },
     },
     {
@@ -943,12 +926,9 @@ describe('A path with a bridge', () => {
           rotate: 0,
           settings: {
             liquids: [COLD_WATER],
-            pressure: 8,
+            pressure: 7,
           },
           flows: {
-            [IN_OUT]: {
-              [COLD_WATER]: -1,
-            },
             '12,2.5,0': {
               [COLD_WATER]: 1,
             },
@@ -999,9 +979,6 @@ describe('A path with a bridge', () => {
           flows: {
             '13.5,2,0': {
               [COLD_WATER]: -1,
-            },
-            [IN_OUT]: {
-              [COLD_WATER]: 1,
             },
           },
         },

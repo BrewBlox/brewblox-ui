@@ -14,6 +14,7 @@ import set from 'lodash/set';
 import { Coordinates } from '@/helpers/coordinates';
 
 import { FlowSegment, PathLink } from './FlowSegment';
+import { DEFAULT_FRICTION } from './getters';
 import {
   CalculatedFlows,
   FlowPart,
@@ -245,6 +246,7 @@ export const addFlowForPathLink = (
 
   const inFlow: CalculatedFlows = {};
   const outFlow: CalculatedFlows = {};
+  const splitFlow: CalculatedFlows = {};
 
   // add flow for incoming transition (if not source)
   if (!link.route.internal) {
@@ -258,24 +260,11 @@ export const addFlowForPathLink = (
 
   // divide flow for splits in between
   if (link.path.splits.length !== 0) {
-    const frictionInvTotal = link.path.splits.reduce((acc, split) => {
-      const { friction, pressureDiff } = split.path.friction({ pressureDiff: 0, friction: 0 });
-      return acc + 1 / friction;
-    }, 0);
     link.path.splits
-      .forEach((child) => {
-        const { friction, pressureDiff } = child.path.friction({ pressureDiff: 0, friction: 0 });
-        const invFriction = 1 / friction;
-        const splitFlows: LiquidFlow = mapValues(flows,
-          flowVal => flowVal * invFriction / frictionInvTotal);
-
-        const childInCoords = link.route.outCoords;
-
-        for (const liquid in splitFlows) {
-          set(outFlow, [childInCoords, liquid], get(outFlow, [childInCoords, liquid], 0) + splitFlows[liquid]);
-        };
-
-        parts = addFlowForPathLink(parts, child, splitFlows);
+      .forEach((child, idx) => {
+        const scaledFlow = mapValues(flows, v => v * link.path.splitDivide[idx]);
+        splitFlow[child.route.outCoords] = scaledFlow;
+        parts = addFlowForPathLink(parts, child, scaledFlow);
       });
   }
 
@@ -285,6 +274,7 @@ export const addFlowForPathLink = (
     {
       ...inFlow,
       ...outFlow,
+      ...splitFlow,
     }
   );
 
