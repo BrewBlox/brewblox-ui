@@ -6,7 +6,7 @@ import {
   calculateFlows,
   flowPath,
 } from '@/plugins/builder/calculateFlows';
-import { FlowSegment, PathLink } from '@/plugins/builder/FlowSegment';
+import { FlowSegment } from '@/plugins/builder/FlowSegment';
 import { COLD_WATER, HOT_WATER, IN_OUT } from '@/plugins/builder/getters';
 import specs from '@/plugins/builder/specs';
 import { FlowPart, FlowRoute, PersistentPart, StatePart } from '@/plugins/builder/types';
@@ -60,6 +60,7 @@ const routeWalker = (acc: any[], item: FlowSegment, inRoute: FlowRoute | null = 
 const findPath = (
   parts: FlowPart[],
   start: FlowPart): FlowSegment => {
+
   const link = flowPath(parts, start, { outCoords: IN_OUT });
   if (link === null) {
     throw ('no path found');
@@ -462,10 +463,6 @@ describe('A path that forks and rejoins', () => {
 
   const path = findPath(flowParts, start);
   console.log(path.lastRoutes());
-  path.joinDuplicateSplits();
-
-
-  throw ('stop');
 
   it('Should return a forking and rejoining path', () => {
 

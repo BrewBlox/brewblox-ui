@@ -4,6 +4,7 @@
  * You'll notice it went wrong if your Webpack build fails with 0 errors.
  */
 
+import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import has from 'lodash/has';
 import mapKeys from 'lodash/mapKeys';
@@ -12,6 +13,7 @@ import pickBy from 'lodash/pickBy';
 import set from 'lodash/set';
 
 import { Coordinates } from '@/helpers/coordinates';
+import router from '@/router';
 
 import { FlowSegment, PathLink } from './FlowSegment';
 import { DEFAULT_FRICTION } from './getters';
@@ -159,66 +161,67 @@ const additionalFlow = (
         ? { ...item, flows: combineFlows(item.flows, flowToAdd) }
         : item);
 
-export const flowPath = (
+const innerFlowPath = (
   parts: FlowPart[],
   start: FlowPart,
   inRoute: FlowRoute,
-  startCoord: string = inRoute.outCoords): PathLink | null => {
+  startCoord: string = inRoute.outCoords): { link: PathLink | null; reachesSink: boolean } => {
   const inCoord = inRoute.outCoords;
   const outFlows: FlowRoute[] = get(start, ['transitions', inCoord], []);
   const path = new FlowSegment(start);
 
   if (outFlows.length === 0) {
-    return null;
+    return { link: null, reachesSink: false };
   }
 
-  let candidateParts: FlowPart[] = parts.reduce((acc: FlowPart[], part: FlowPart) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { [inCoord]: _, ...filteredTransitions } = part.transitions; // make a copy of transitions excluding inCoord
-
-    if (inCoord !== startCoord) {
-      Object.keys(filteredTransitions).forEach(k => {
-        // filter out any transitions that go back to the inCoord to remove loops
-        filteredTransitions[k] = filteredTransitions[k].filter(
-          route => (route.outCoords != inCoord)
-        );
-      });
-    }
-
-    if (Object.getOwnPropertyNames(filteredTransitions).length !== 0) { // exclude parts without transitions
-      acc.push({ ...part, transitions: filteredTransitions });
-    }
-    return acc;
-  }, []);
-
-  for (const outFlow of outFlows) {
-    while (true) {
-      const nextPart =
-        (outFlow.sink || candidateParts.length === 0) ? null :
-          outFlow.internal ? start : adjacentPart(candidateParts, outFlow.outCoords, start);
-
-      let nextPath: PathLink | null = null;
-      if (nextPart !== null) {
-        nextPath = flowPath(candidateParts, nextPart, outFlow, startCoord);
-        if (nextPath !== null) {
-          path.addChild(nextPath);
+  const filterTransitions = (partsToFilter: FlowPart[], inCoord: string, outCoord: string): void => {
+    for (const part of partsToFilter) {
+      // filter out transition with same source and destination
+      if (part.transitions[inCoord]) {
+        part.transitions[inCoord] = part.transitions[inCoord].filter(outFlow => outFlow.outCoords !== outCoord);
+        if (part.transitions[inCoord].length === 0) {
+          delete part.transitions[inCoord];
         }
       }
-      if (!nextPart || outFlow.internal) {
-        break;
-      }
-      candidateParts = candidateParts
-        .filter(part => nextPart && !(nextPart.id === part.id));
     }
   };
-
-  if (path.next !== null) {
-    // path was finished
-    path.removeInternalFlows();
+  let candidateParts = parts; //filterTransitions(parts, inCoord);
+  if (outFlows.length > 1) {
+    // for a split, make a copy of candidates to process both ends independently
+    candidateParts = cloneDeep(candidateParts);
   }
 
-  return { path, route: inRoute };
+  let reachesSink = false;
+  for (const outFlow of outFlows) {
+    if (outFlow.sink) {
+      reachesSink = true;
+    }
+    else {
+      const nextPart = outFlow.internal ? start : adjacentPart(candidateParts, outFlow.outCoords, start);
+      if (nextPart !== null) {
+        // find a new path
+        filterTransitions(candidateParts, outFlow.outCoords, inCoord); // filter out reverse transition
+        filterTransitions(candidateParts, inCoord, outFlow.outCoords); // filter out same transition
+        const next = innerFlowPath(candidateParts, nextPart, outFlow, startCoord);
+        if (next.link !== null && next.reachesSink) {
+          path.addChild(next.link);
+          reachesSink = reachesSink || next.reachesSink;
+        }
+        if (!reachesSink) {
+          return { link: null, reachesSink: false };
+        }
+      }
+    };
+  }
+  return { link: { path, route: inRoute }, reachesSink };
 };
+
+export const flowPath = (
+  parts: FlowPart[],
+  start: FlowPart,
+  inRoute: FlowRoute,
+  startCoord: string = inRoute.outCoords): PathLink | null =>
+  innerFlowPath(cloneDeep(parts), start, inRoute, startCoord).link;
 
 export const addFlowForPathLink = (
   parts: FlowPart[],

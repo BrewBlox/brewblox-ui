@@ -115,6 +115,16 @@ export class FlowSegment {
       }
       return this.next.path.trimAtRoute(route);
     }
+    for (const [i, v] of this.splits.entries()) {
+      if (v.route === route) {
+        const end = this.splits.splice(i, 1)[0];
+        return end;
+      }
+      const end = v.path.trimAtRoute(route);
+      if (end !== null) {
+        return end;
+      }
+    }
     return null;
   }
 
@@ -139,19 +149,50 @@ export class FlowSegment {
     return routes;
   };
 
+  public endsInSink(): boolean {
+    if (this.next) {
+      if (this.next.route.sink) {
+        return true;
+      }
+      return this.next.path.endsInSink();
+    }
+    return false;
+  }
 
   public joinDuplicateSplits(): void {
     if (this.next !== null) {
       this.next.path.joinDuplicateSplits();
     }
     if (this.splits.length !== 0) {
+      while (true) {
+        // get last route in each branch of splits their children
+        const endRoutes = this.splits.reduce((acc: FlowRoute[], item) => {
+          item.path.lastRoutes().forEach(v => { acc.push(v); });
+          return acc;
+        }, []);
+        // check if a route has been visited twice
+        const duplicateRoutes = endRoutes.filter(
+          (item, idx) => endRoutes.findIndex(other => other.outCoords == item.outCoords) !== idx);
+        // cut off for duplicated coordinates
+        const trimmed: PathLink[] = [];
+        if (duplicateRoutes.length !== 0) {
+          duplicateRoutes.forEach(route => this.splits.forEach(split => {
+            const end = split.path.trimAtRoute(route);
+            if (end !== null) {
+              trimmed.push(end);
+            }
+          }));
+        }
+        else {
+          break;
+        }
+      }
+
       let duplicated: PathLink | null = null;
       this.splits.forEach((link, idx1) => {
         // find if any of the segments on a different split have the same next part
         let walker = link;
         while (walker.path.next !== null) {
-          console.log(walker.route);
-          const sharedInCoord = walker.path.next.route;
           this.splits.forEach((link2, idx2) => {
             if (idx1 > idx2) {
 
