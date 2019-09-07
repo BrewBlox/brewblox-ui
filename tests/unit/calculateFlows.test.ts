@@ -388,7 +388,7 @@ describe('A path that forks and rejoins', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        pressure: 11,
+        pressure: 9,
         liquids: [COLD_WATER],
       },
     },
@@ -462,8 +462,6 @@ describe('A path that forks and rejoins', () => {
   const start = flowParts[0];
 
   const path = findPath(flowParts, start);
-  console.log(path.lastRoutes());
-
   it('Should return a forking and rejoining path', () => {
 
     const visitedTypes = propertyWalker([], path, ['root', 'type']);
@@ -477,41 +475,42 @@ describe('A path that forks and rejoins', () => {
           [
             'ElbowTube',
             'ElbowTube',
+            'TeeTube',
           ],
           [
             'ElbowTube',
             'ElbowTube',
+            'TeeTube',
           ],
         ],
-        'TeeTube',
         'SystemIO',
       ]);
-
-    const transitions = propertyWalker([], path, ['transitions']);
-    expect(transitions).toEqual(
+  });
+  it('It should should have the correct routes', () => {
+    const routes = routeWalker([], path);
+    expect(routes).toEqual(
       [
-        { [IN_OUT]: [{ outCoords: '2,2.5,0', pressure: 11, liquids: [COLD_WATER], source: true }] },
-        { '2,2.5,0': [{ outCoords: '3,2.5,0' }] },
-        { '3,2.5,0': [{ outCoords: '3.5,2,0' }, { outCoords: '3.5,3,0' }] },
+        { outCoords: '2,2.5,0', pressure: 9, liquids: [COLD_WATER], source: true },
+        { outCoords: '3,2.5,0' },
         [
           [
-            { '3.5,2,0': [{ outCoords: '4,1.5,0' }] },
-            { '4,1.5,0': [{ outCoords: '4.5,2,0' }] },
-            { '4.5,2,0': [{ outCoords: '5,2.5,0' }] },
+            { outCoords: '3.5,2,0' },
+            { outCoords: '4,1.5,0' },
+            { outCoords: '4.5,2,0' },
           ],
           [
-            { '3.5,3,0': [{ outCoords: '4,3.5,0' }] },
-            { '4,3.5,0': [{ outCoords: '4.5,3,0' }] },
-            { '4.5,3,0': [{ outCoords: '5,2.5,0' }] },
+            { outCoords: '3.5,3,0' },
+            { outCoords: '4,3.5,0' },
+            { outCoords: '4.5,3,0' },
           ],
         ],
-        { '5,2.5,0': [{ outCoords: IN_OUT, sink: true }] },
+        { outCoords: '5,2.5,0' },
       ]);
   });
 
-  it('Should have a friction value of 5.5', () => {
-    const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
-    expect(friction).toEqual(5.5);
+  it('Should have a friction value of 4.5', () => {
+    const { friction } = path.friction({ pressureDiff: 0, friction: 0 });
+    expect(friction).toEqual(4.5);
   });
 
   it('Should have a flow of value of 2 total and 1 for each split', () => {

@@ -165,13 +165,13 @@ const innerFlowPath = (
   parts: FlowPart[],
   start: FlowPart,
   inRoute: FlowRoute,
-  startCoord: string = inRoute.outCoords): { link: PathLink | null; reachesSink: boolean } => {
+  startCoord: string = inRoute.outCoords): PathLink | null => {
   const inCoord = inRoute.outCoords;
   const outFlows: FlowRoute[] = get(start, ['transitions', inCoord], []);
   const path = new FlowSegment(start);
 
   if (outFlows.length === 0) {
-    return { link: null, reachesSink: false };
+    return null;
   }
 
   const filterTransitions = (partsToFilter: FlowPart[], inCoord: string, outCoord: string): void => {
@@ -191,29 +191,32 @@ const innerFlowPath = (
     candidateParts = cloneDeep(candidateParts);
   }
 
-  let reachesSink = false;
+  const link: PathLink = { path, route: inRoute };
+
   for (const outFlow of outFlows) {
     if (outFlow.sink) {
-      reachesSink = true;
+      link.sink = outFlow;
     }
     else {
       const nextPart = outFlow.internal ? start : adjacentPart(candidateParts, outFlow.outCoords, start);
       if (nextPart !== null) {
         // find a new path
-        filterTransitions(candidateParts, outFlow.outCoords, inCoord); // filter out reverse transition
         filterTransitions(candidateParts, inCoord, outFlow.outCoords); // filter out same transition
+        filterTransitions(candidateParts, outFlow.outCoords, inCoord); // filter out reverse transition
         const next = innerFlowPath(candidateParts, nextPart, outFlow, startCoord);
-        if (next.link !== null && next.reachesSink) {
-          path.addChild(next.link);
-          reachesSink = reachesSink || next.reachesSink;
+        if (next !== null && next.sink) {
+          path.addChild(next);
+          link.sink = next.sink;
         }
-        if (!reachesSink) {
-          return { link: null, reachesSink: false };
-        }
+        if (next && link.sink === undefined)
+          return null;
       }
     };
   }
-  return { link: { path, route: inRoute }, reachesSink };
+  if (link.path.splits.length !== 0) {
+    link.path.mergeOverlappingSplits();
+  }
+  return link;
 };
 
 export const flowPath = (
@@ -221,7 +224,7 @@ export const flowPath = (
   start: FlowPart,
   inRoute: FlowRoute,
   startCoord: string = inRoute.outCoords): PathLink | null =>
-  innerFlowPath(cloneDeep(parts), start, inRoute, startCoord).link;
+  innerFlowPath(cloneDeep(parts), start, inRoute, startCoord);
 
 export const addFlowForPathLink = (
   parts: FlowPart[],
@@ -233,12 +236,13 @@ export const addFlowForPathLink = (
   const outFlow: CalculatedFlows = {};
   const splitFlow: CalculatedFlows = {};
 
-  // add flow for incoming transition (if not source)
+  // add flow for incoming transition
   if (!link.route.internal) {
     inFlow[link.route.outCoords] = mapValues(flows, v => -v);
   }
 
-  // add flow for outgoing transition
+  // add flow for outgoing flow
+  // TODO: outgoing flow of a tee that joins 2 flows in missed
   if (link.path.next) {
     outFlow[link.path.next.route.outCoords] = flows;
   }

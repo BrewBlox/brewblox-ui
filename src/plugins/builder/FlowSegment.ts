@@ -1,3 +1,5 @@
+import { EvalSourceMapDevToolPlugin } from 'webpack';
+
 import { entryReducer } from '@/helpers/functional';
 
 import { DEFAULT_FRICTION } from './getters';
@@ -7,6 +9,7 @@ import { FlowPart, FlowRoute, PathFriction, Transitions } from './types';
 export interface PathLink {
   path: FlowSegment;
   route: FlowRoute;
+  sink?: FlowRoute;
 }
 
 export class FlowSegment {
@@ -157,6 +160,87 @@ export class FlowSegment {
       return this.next.path.endsInSink();
     }
     return false;
+  }
+
+  public mergeOverlappingSplits(): void {
+    const sortedBySink: { [coords: string]: { splits: PathLink[]; end: PathLink | null } } = {};
+    for (const split of this.splits) {
+      if (split.sink) {
+        if (sortedBySink[split.sink.outCoords] !== undefined) {
+          sortedBySink[split.sink.outCoords].splits.push(split);
+        }
+        else {
+          sortedBySink[split.sink.outCoords] = { splits: [split], end: null };
+        }
+      }
+    };
+    const mergeEnds = (splits: PathLink[]): { splits: PathLink[]; end: PathLink | null } => {
+      if (splits.length < 2) {
+        return { splits, end: null };
+      }
+      // walk over first path to find overlap with second
+      let walker: PathLink = splits[0];
+      let end: PathLink | null = null;
+      const sharedEndIdx: number[] = [0];
+      while (true) {
+        splits.forEach((other, idx) => {
+          if (idx != 0) {
+            end = other.path.trimAtRoute(walker.route);
+            if (end) {
+              sharedEndIdx.push(idx);
+            }
+          }
+        });
+        if (end) {
+          // all splits have this particular end removed if they have it
+          splits[0].path.trimAtRoute(walker.route); // also remove from first
+          // combine splits with shared end in a new path
+          const unTouchedSplits: PathLink[] = [];
+          const combinedSplits: PathLink[] = [];
+          for (const [idx, split] of splits.entries()) {
+            if (sharedEndIdx.indexOf(idx) !== -1) {
+              combinedSplits.push(split);
+            }
+            else {
+              unTouchedSplits.push(split);
+            }
+          }
+          if (unTouchedSplits.length !== 0) {
+            throw ('Not implemented');
+          }
+          else {
+            return { splits: combinedSplits, end: end };
+          }
+        }
+        if (walker.path.next) {
+          walker = walker.path.next;
+        }
+        else {
+          return { splits, end: null };
+        }
+      }
+    };
+
+    for (const sink in sortedBySink) {
+      while (sortedBySink[sink].splits.length > 1) {
+        // found an overlapping path
+        // merge until number of splits stays the same
+        const oldLength = sortedBySink[sink].splits.length;
+        sortedBySink[sink] = mergeEnds(sortedBySink[sink].splits);
+        const newLength = sortedBySink[sink].splits.length;
+        if (newLength === oldLength) {
+          break;
+        }
+      }
+    }
+    const merged = Object.values(sortedBySink);
+    if (merged.length === 1) {
+      this.splits = merged[0].splits;
+      this.next = merged[0].end;
+    }
+    else {
+      throw ('not yet implemented');
+    }
   }
 
   public joinDuplicateSplits(): void {
