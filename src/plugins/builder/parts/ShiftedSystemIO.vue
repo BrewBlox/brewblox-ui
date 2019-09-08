@@ -2,7 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import PartBase from '../components/PartBase';
-import { IN_OUT } from '../getters';
+import { CENTER } from '../getters';
 import { verticalChevrons } from '../helpers';
 
 const chevrons = verticalChevrons(50, 86.4);
@@ -21,11 +21,11 @@ export default class ShiftedSystemIO extends PartBase {
   readonly paths = paths;
 
   get flowSpeed(): number {
-    return this.flowOnCoord(IN_OUT);
+    return this.flowOnCoord(CENTER);
   }
 
   get liquids(): string[] {
-    return this.liquidOnCoord(IN_OUT);
+    return this.liquidOnCoord(CENTER);
   }
 }
 </script>

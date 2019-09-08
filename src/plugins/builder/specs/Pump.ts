@@ -3,7 +3,7 @@ import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/t
 import { sparkStore } from '@/plugins/spark/store';
 import { DigitalState } from '@/plugins/spark/types';
 
-import { ACCELERATE_OTHERS, DEFAULT_PUMP_PRESSURE, LEFT, RIGHT } from '../getters';
+import { DEFAULT_PUMP_PRESSURE, LEFT, RIGHT } from '../getters';
 import { settingsBlock } from '../helpers';
 import { PartSpec, PartUpdater, PersistentPart } from '../types';
 

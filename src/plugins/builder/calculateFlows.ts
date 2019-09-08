@@ -4,6 +4,7 @@
  * You'll notice it went wrong if your Webpack build fails with 0 errors.
  */
 
+import { interpolateHue } from 'd3';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import has from 'lodash/has';
@@ -13,8 +14,9 @@ import pickBy from 'lodash/pickBy';
 import set from 'lodash/set';
 
 import { Coordinates } from '@/helpers/coordinates';
+import router from '@/router';
 
-import { FlowSegment } from './FlowSegment';
+import { FlowSegment, mergeOverlappingSplits } from './FlowSegment';
 import {
   CalculatedFlows,
   FlowPart,
@@ -189,11 +191,11 @@ const innerFlowPath = (
     candidateParts = cloneDeep(candidateParts);
   }
 
-  const nextPaths: FlowSegment[] = [];
+  let nextPaths: FlowSegment[] = [];
 
   for (const outFlow of outFlows) {
     if (outFlow.sink) {
-      path.sinksTo.add(outFlow);
+      path.sinksTo.add(outFlow.outCoords);
     }
     else {
       const nextPart = outFlow.internal ? start : adjacentPart(candidateParts, outFlow.outCoords, start);
@@ -204,25 +206,27 @@ const innerFlowPath = (
         const next = innerFlowPath(candidateParts, nextPart, outFlow, startCoord);
         if (next !== null && next.sinksTo.size) {
           nextPaths.push(next);
-          path.sinksTo = next.sinksTo;
+          next.sinksTo.forEach(sink => { path.sinksTo.add(sink); });
         }
-        if (next && path.sinksTo.size === 0)
-          return null;
       }
     };
   }
 
+  if (nextPaths.length > 1) {
+    nextPaths = mergeOverlappingSplits(nextPaths, start, inRoute);
+  }
+
+  if (nextPaths.length > 1) {
+    path.splits = nextPaths;
+    return path;
+  }
   if (nextPaths.length === 1) {
     path.next = nextPaths[0];
   }
-  else {
-    path.splits = nextPaths;
+  if (path.sinksTo.size !== 0) {
+    return path;
   }
-
-  if (path.splits.length !== 0) {
-    path.mergeOverlappingSplits();
-  }
-  return path;
+  return null;
 };
 
 export const flowPath = (
@@ -279,26 +283,32 @@ export const addFlowForPath = (
   return parts;
 };
 
+export const findPathsFromSources = (parts: FlowPart[], part: FlowPart): FlowSegment[] => {
+  const paths: FlowSegment[] = [];
+  for (const [inCoord, outCoords] of Object.entries(part.transitions)) {
+    const startFlow = outCoords.find(route => route.source && route.liquids);
+    if (startFlow) {
+      const path = flowPath(parts, part, { outCoords: inCoord, liquids: startFlow.liquids });
+      if (path !== null) {
+        paths.push(path);
+      }
+    }
+  }
+  return paths;
+};
+
 const addFlowFromPart = (parts: FlowPart[], part: FlowPart): FlowPart[] => {
-  for (const inCoords in part.transitions) {
-    const outFlows = part.transitions[inCoords] || [];
-    for (const outFlow of outFlows) {
-      const liquids: string[] = outFlow.liquids || [];
-      if (outFlow.source && liquids.length > 0) {
-        const path = flowPath(parts, part, { outCoords: inCoords, internal: true });
-        if (path !== null) {
-          const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
-          if (pressureDiff >= 0) {
-            // only handle positive or zero flows
-            // negative flows will have a positive counterpart we do handle
-            const startFlow: LiquidFlow = {};
-            liquids.forEach((liquid: string) => {
-              const flow = pressureDiff / friction;
-              startFlow[liquid] = flow;
-            });
-            parts = addFlowForPath(parts, path, startFlow);
-          }
-        }
+  for (const path of findPathsFromSources(parts, part)) {
+    const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
+    if (pressureDiff >= 0) {
+      // only handle positive or zero flows
+      // negative flows will have a positive counterpart we do handle
+      if (path.inRoute.liquids) {
+        const startFlow: LiquidFlow = {};
+        for (const liquid of path.inRoute.liquids) {
+          startFlow[liquid] = pressureDiff / friction;
+        };
+        parts = addFlowForPath(parts, path, startFlow);
       }
     }
   }

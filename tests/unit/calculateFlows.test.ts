@@ -4,10 +4,11 @@ import set from 'lodash/set';
 import {
   asFlowParts,
   calculateFlows,
+  findPathsFromSources,
   flowPath,
 } from '@/plugins/builder/calculateFlows';
 import { FlowSegment } from '@/plugins/builder/FlowSegment';
-import { COLD_WATER, HOT_WATER, IN_OUT } from '@/plugins/builder/getters';
+import { CENTER, COLD_WATER, HOT_WATER } from '@/plugins/builder/getters';
 import specs from '@/plugins/builder/specs';
 import { FlowPart, FlowRoute, PersistentPart, StatePart } from '@/plugins/builder/types';
 
@@ -61,11 +62,14 @@ const findPath = (
   parts: FlowPart[],
   start: FlowPart): FlowSegment => {
 
-  const path = flowPath(parts, start, { outCoords: IN_OUT });
-  if (path === null) {
+  const paths = findPathsFromSources(parts, start);
+  if (paths.length > 1) {
+    throw ('Multiple paths found');
+  }
+  if (paths.length === 0) {
     throw ('no path found');
   }
-  return path;
+  return paths[0];
 };
 
 
@@ -85,8 +89,8 @@ describe('Data describing an input tube', () => {
   it('can resolve to transitions', () => {
     expect(asStatePart(part).transitions).toEqual(
       {
-        [IN_OUT]: [{ outCoords: '1,0.5,0', pressure: 11, liquids: [COLD_WATER], source: true }],
-        '1,0.5,0': [{ outCoords: IN_OUT, pressure: -11, sink: true }],
+        [CENTER]: [{ outCoords: '1,0.5,0', pressure: 11, liquids: [COLD_WATER], source: true }],
+        '1,0.5,0': [{ outCoords: CENTER, pressure: -11, sink: true }],
       });
   });
 });

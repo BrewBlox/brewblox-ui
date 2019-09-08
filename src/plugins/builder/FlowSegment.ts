@@ -10,7 +10,7 @@ export class FlowSegment {
   public root: FlowPart;
   public inRoute: FlowRoute;
   public splits: FlowSegment[] = [];
-  public sinksTo: Set<FlowRoute> = new Set<FlowRoute>();
+  public sinksTo: Set<string> = new Set<string>();
 
   public splitDivide: number[] = [];
   public next: FlowSegment | null = null;
@@ -111,86 +111,95 @@ export class FlowSegment {
     });
     return routes;
   };
+}
 
-  public mergeOverlappingSplits(): void {
-    const sortedBySink: { [coords: string]: { splits: FlowSegment[]; end: FlowSegment | null } } = {};
-    for (const split of this.splits) {
-      if (split.sinksTo.size) {
-        const sortName = JSON.stringify(split.sinksTo);
-        if (sortedBySink[sortName] !== undefined) {
-          sortedBySink[sortName].splits.push(split);
-        }
-        else {
-          sortedBySink[sortName] = { splits: [split], end: null };
-        }
-      }
-    };
-    const mergeEnds = (splits: FlowSegment[]): { splits: FlowSegment[]; end: FlowSegment | null } => {
-      if (splits.length < 2) {
-        return { splits, end: null };
-      }
-      // walk over first path to find overlap with second
-      let walker: FlowSegment = splits[0];
-      let end: FlowSegment | null = null;
-      const sharedEndIdx: number[] = [0];
-      while (true) {
-        splits.forEach((other, idx) => {
-          if (idx != 0) {
-            end = other.trimAtRoute(walker.inRoute);
-            if (end) {
-              sharedEndIdx.push(idx);
-            }
-          }
-        });
+const mergeEnds = (splits: FlowSegment[]): { splits: FlowSegment[]; end: FlowSegment | null } => {
+  if (splits.length < 2) {
+    return { splits, end: null };
+  }
+  // walk over first path to find overlap with second
+  let walker: FlowSegment = splits[0];
+  let end: FlowSegment | null = null;
+  const sharedEndIdx: number[] = [0];
+  while (true) {
+    splits.forEach((other, idx) => {
+      if (idx != 0) {
+        end = other.trimAtRoute(walker.inRoute);
         if (end) {
-          // all splits have this particular end removed if they have it
-          splits[0].trimAtRoute(walker.inRoute); // also remove from first
-          // combine splits with shared end in a new path
-          const unTouchedSplits: FlowSegment[] = [];
-          const combinedSplits: FlowSegment[] = [];
-          for (const [idx, split] of splits.entries()) {
-            if (sharedEndIdx.indexOf(idx) !== -1) {
-              combinedSplits.push(split);
-            }
-            else {
-              unTouchedSplits.push(split);
-            }
-          }
-          if (unTouchedSplits.length !== 0) {
-            throw ('Not implemented');
-          }
-          else {
-            return { splits: combinedSplits, end: end };
-          }
-        }
-        if (walker.next) {
-          walker = walker.next;
-        }
-        else {
-          return { splits, end: null };
+          sharedEndIdx.push(idx);
         }
       }
-    };
-
-    for (const sink in sortedBySink) {
-      while (sortedBySink[sink].splits.length > 1) {
-        // found an overlapping path
-        // merge until number of splits stays the same
-        const oldLength = sortedBySink[sink].splits.length;
-        sortedBySink[sink] = mergeEnds(sortedBySink[sink].splits);
-        const newLength = sortedBySink[sink].splits.length;
-        if (newLength === oldLength) {
-          break;
+    });
+    if (end) {
+      // all splits have this particular end removed if they have it
+      splits[0].trimAtRoute(walker.inRoute); // also remove from first
+      // combine splits with shared end in a new path
+      const unTouchedSplits: FlowSegment[] = [];
+      const combinedSplits: FlowSegment[] = [];
+      for (const [idx, split] of splits.entries()) {
+        if (sharedEndIdx.indexOf(idx) !== -1) {
+          combinedSplits.push(split);
         }
+        else {
+          unTouchedSplits.push(split);
+        }
+      }
+      if (unTouchedSplits.length !== 0) {
+        throw ('Not implemented');
+      }
+      else {
+        return { splits: combinedSplits, end: end };
       }
     }
-    const merged = Object.values(sortedBySink);
-    if (merged.length === 1) {
-      this.splits = merged[0].splits;
-      this.next = merged[0].end;
+    if (walker.next) {
+      walker = walker.next;
     }
     else {
-      throw ('not yet implemented');
+      return { splits, end: null };
     }
   }
-}
+};
+
+export const mergeOverlappingSplits = (splits: FlowSegment[], root: FlowPart, inRoute: FlowRoute): FlowSegment[] => {
+  const sortedBySink: { [coords: string]: { splits: FlowSegment[]; end: FlowSegment | null } } = {};
+  for (const split of splits) {
+    if (split.sinksTo.size) {
+      const sortName = JSON.stringify(split.sinksTo);
+      if (sortedBySink[sortName] !== undefined) {
+        sortedBySink[sortName].splits.push(split);
+      }
+      else {
+        sortedBySink[sortName] = { splits: [split], end: null };
+      }
+    }
+  };
+
+
+  for (const sink in sortedBySink) {
+    while (sortedBySink[sink].splits.length > 1) {
+      // found an overlapping path
+      // merge until number of splits stays the same
+      const oldLength = sortedBySink[sink].splits.length;
+      sortedBySink[sink] = mergeEnds(sortedBySink[sink].splits);
+      const newLength = sortedBySink[sink].splits.length;
+      if (newLength === oldLength) {
+        break;
+      }
+    }
+  }
+
+  const merged = Object.values(sortedBySink);
+  const returnedSplits: FlowSegment[] = [];
+  for (const newSegment of merged) {
+    const segment = new FlowSegment(root, inRoute);
+    if (newSegment.splits.length > 1) {
+      segment.splits = newSegment.splits;
+      segment.next = newSegment.end;
+    }
+    else {
+      segment.next = splits[0];
+    }
+    returnedSplits.push(segment);
+  }
+  return returnedSplits;
+};

@@ -9,7 +9,11 @@ const spec: PartSpec = {
     [UP]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
     [RIGHT]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
     [LEFT]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
-    [CENTER]: [{ outCoords: UP, friction: 0.5 }, { outCoords: LEFT, friction: 0.5 }, { outCoords: RIGHT, friction: 0.5 }],
+    [CENTER]: [
+      { outCoords: UP, friction: 0.5 },
+      { outCoords: LEFT, friction: 0.5 },
+      { outCoords: RIGHT, friction: 0.5 },
+    ],
   }),
 };
 
