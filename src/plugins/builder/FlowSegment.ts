@@ -1,43 +1,19 @@
-import { EvalSourceMapDevToolPlugin } from 'webpack';
-
-import { entryReducer } from '@/helpers/functional';
-
 import { DEFAULT_FRICTION } from './getters';
-import { FlowPart, FlowRoute, PathFriction, Transitions } from './types';
-
-
-export interface PathLink {
-  path: FlowSegment;
-  route: FlowRoute;
-  sink?: FlowRoute;
-}
+import { FlowPart, FlowRoute, PathFriction } from './types';
 
 export class FlowSegment {
-  public constructor(part: FlowPart) {
+  public constructor(part: FlowPart, route: FlowRoute) {
     this.root = part;
+    this.inRoute = route;
   }
 
   public root: FlowPart;
-  public splits: PathLink[] = [];
+  public inRoute: FlowRoute;
+  public splits: FlowSegment[] = [];
+  public sinksTo: Set<FlowRoute> = new Set<FlowRoute>();
 
   public splitDivide: number[] = [];
-  public next: PathLink | null = null;
-
-  public addChild(link: PathLink): void {
-    if (this.splits.length == 0) {
-      if (this.next !== null) {
-        this.splits.push(this.next); // move next to splits
-        this.splits.push(link); // add other segment to splits
-        this.next = null; // set next to null for no shared next
-      }
-      else {
-        this.next = link;
-      }
-    }
-    else {
-      this.splits.push(link);
-    }
-  }
+  public next: FlowSegment | null = null;
 
   public friction(input: PathFriction): PathFriction {
     const equivalentFriction =
@@ -60,19 +36,17 @@ export class FlowSegment {
       };
 
     let series = input;
+    // for a split, the friction is handled in each split. The root part can be ignored.
+    series.friction += this.inRoute.friction || DEFAULT_FRICTION;
+    series.pressureDiff += this.inRoute.pressure || 0;
 
     if (this.next) {
       // add next before processing split (can be moved to front because all parts are in series)
-      series.friction += this.next.route.friction || DEFAULT_FRICTION;
-      series.pressureDiff += this.next.route.pressure || 0;
-      series = this.next.path.friction(series);
+      series = this.next.friction(series);
     }
     if (this.splits.length > 1) {
-      // splitting path. Convert the combined paths into an equivalent series friction
-      const splitPF = this.splits.map(split => split.path.friction({
-        pressureDiff: split.route.pressure || 0,
-        friction: split.route.friction || DEFAULT_FRICTION,
-      }));
+      // splitting. Convert the combined paths into an equivalent series friction
+      const splitPF = this.splits.map(split => split.friction({ pressureDiff: 0, friction: 0 }));
       const splitFriction = equivalentFriction(splitPF, series);
       series.friction = series.friction + splitFriction.total;
       this.splitDivide = splitFriction.split;
@@ -84,10 +58,10 @@ export class FlowSegment {
   public reduceSegments(func: (acc: any, segment: FlowSegment) => any, acc: any): any {
     acc = func(acc, this);
     this.splits.forEach((child) => {
-      acc = child.path.reduceSegments(func, acc);
+      acc = child.reduceSegments(func, acc);
     });
     if (this.next !== null) {
-      acc = func(acc, this.next.path);
+      acc = func(acc, this.next);
     }
   };
 
@@ -95,35 +69,21 @@ export class FlowSegment {
     return JSON.stringify(this) === JSON.stringify(other);
   }
 
-  public removeInternalFlows(): void {
-    if (this.splits.length !== 0) {
-      return;
-    }
-
+  public trimAtRoute(route: FlowRoute): FlowSegment | null {
     if (this.next) {
-      this.next.path.removeInternalFlows();
-      if (this.next && this.next.path.root.id === this.root.id) {
-        this.splits = this.next.path.splits;
-        this.next = this.next.path.next;
-      }
-    }
-  }
-
-  public trimAtRoute(route: FlowRoute): PathLink | null {
-    if (this.next) {
-      if (this.next.route.outCoords === route.outCoords) {
+      if (this.next.inRoute.outCoords === route.outCoords) {
         const end = this.next;
         this.next = null;
         return end;
       }
-      return this.next.path.trimAtRoute(route);
+      return this.next.trimAtRoute(route);
     }
     for (const [i, v] of this.splits.entries()) {
-      if (v.route === route) {
+      if (v.inRoute === route) {
         const end = this.splits.splice(i, 1)[0];
         return end;
       }
-      const end = v.path.trimAtRoute(route);
+      const end = v.trimAtRoute(route);
       if (end !== null) {
         return end;
       }
@@ -134,16 +94,16 @@ export class FlowSegment {
   public lastRoutes(): FlowRoute[] {
     const routes: FlowRoute[] = [];
     if (this.next) {
-      const last = this.next.path.lastRoutes();
+      const last = this.next.lastRoutes();
       if (last.length === 0) {
-        return [this.next.route];
+        return [this.next.inRoute];
       }
       return last;
     }
     this.splits.forEach(split => {
-      const r = split.path.lastRoutes();
+      const r = split.lastRoutes();
       if (r.length === 0) {
-        routes.push(split.route);
+        routes.push(split.inRoute);
       }
       else {
         r.forEach(v => { routes.push(v); });
@@ -152,40 +112,31 @@ export class FlowSegment {
     return routes;
   };
 
-  public endsInSink(): boolean {
-    if (this.next) {
-      if (this.next.route.sink) {
-        return true;
-      }
-      return this.next.path.endsInSink();
-    }
-    return false;
-  }
-
   public mergeOverlappingSplits(): void {
-    const sortedBySink: { [coords: string]: { splits: PathLink[]; end: PathLink | null } } = {};
+    const sortedBySink: { [coords: string]: { splits: FlowSegment[]; end: FlowSegment | null } } = {};
     for (const split of this.splits) {
-      if (split.sink) {
-        if (sortedBySink[split.sink.outCoords] !== undefined) {
-          sortedBySink[split.sink.outCoords].splits.push(split);
+      if (split.sinksTo.size) {
+        const sortName = JSON.stringify(split.sinksTo);
+        if (sortedBySink[sortName] !== undefined) {
+          sortedBySink[sortName].splits.push(split);
         }
         else {
-          sortedBySink[split.sink.outCoords] = { splits: [split], end: null };
+          sortedBySink[sortName] = { splits: [split], end: null };
         }
       }
     };
-    const mergeEnds = (splits: PathLink[]): { splits: PathLink[]; end: PathLink | null } => {
+    const mergeEnds = (splits: FlowSegment[]): { splits: FlowSegment[]; end: FlowSegment | null } => {
       if (splits.length < 2) {
         return { splits, end: null };
       }
       // walk over first path to find overlap with second
-      let walker: PathLink = splits[0];
-      let end: PathLink | null = null;
+      let walker: FlowSegment = splits[0];
+      let end: FlowSegment | null = null;
       const sharedEndIdx: number[] = [0];
       while (true) {
         splits.forEach((other, idx) => {
           if (idx != 0) {
-            end = other.path.trimAtRoute(walker.route);
+            end = other.trimAtRoute(walker.inRoute);
             if (end) {
               sharedEndIdx.push(idx);
             }
@@ -193,10 +144,10 @@ export class FlowSegment {
         });
         if (end) {
           // all splits have this particular end removed if they have it
-          splits[0].path.trimAtRoute(walker.route); // also remove from first
+          splits[0].trimAtRoute(walker.inRoute); // also remove from first
           // combine splits with shared end in a new path
-          const unTouchedSplits: PathLink[] = [];
-          const combinedSplits: PathLink[] = [];
+          const unTouchedSplits: FlowSegment[] = [];
+          const combinedSplits: FlowSegment[] = [];
           for (const [idx, split] of splits.entries()) {
             if (sharedEndIdx.indexOf(idx) !== -1) {
               combinedSplits.push(split);
@@ -212,8 +163,8 @@ export class FlowSegment {
             return { splits: combinedSplits, end: end };
           }
         }
-        if (walker.path.next) {
-          walker = walker.path.next;
+        if (walker.next) {
+          walker = walker.next;
         }
         else {
           return { splits, end: null };
@@ -241,91 +192,5 @@ export class FlowSegment {
     else {
       throw ('not yet implemented');
     }
-  }
-
-  public joinDuplicateSplits(): void {
-    if (this.next !== null) {
-      this.next.path.joinDuplicateSplits();
-    }
-    if (this.splits.length !== 0) {
-      while (true) {
-        // get last route in each branch of splits their children
-        const endRoutes = this.splits.reduce((acc: FlowRoute[], item) => {
-          item.path.lastRoutes().forEach(v => { acc.push(v); });
-          return acc;
-        }, []);
-        // check if a route has been visited twice
-        const duplicateRoutes = endRoutes.filter(
-          (item, idx) => endRoutes.findIndex(other => other.outCoords == item.outCoords) !== idx);
-        // cut off for duplicated coordinates
-        const trimmed: PathLink[] = [];
-        if (duplicateRoutes.length !== 0) {
-          duplicateRoutes.forEach(route => this.splits.forEach(split => {
-            const end = split.path.trimAtRoute(route);
-            if (end !== null) {
-              trimmed.push(end);
-            }
-          }));
-        }
-        else {
-          break;
-        }
-      }
-
-      let duplicated: PathLink | null = null;
-      this.splits.forEach((link, idx1) => {
-        // find if any of the segments on a different split have the same next part
-        let walker = link;
-        while (walker.path.next !== null) {
-          this.splits.forEach((link2, idx2) => {
-            if (idx1 > idx2) {
-
-              const end = link2.path.trimAtRoute(walker.route);
-              if (end !== null) {
-
-                duplicated = end;
-              }
-            }
-          });
-          walker = walker.path.next;
-        }
-        this.next = duplicated;
-      });
-    }
-  }
-
-  public leafLinks(): PathLink[] {
-    if (this.splits.length !== 0) {
-      return this.splits.reduce((acc, child) => [...acc, ...child.path.leafLinks()], new Array<PathLink>());
-    }
-    if (this.next !== null) {
-      const nextLeaves = this.next.path.leafLinks();
-      if (nextLeaves.length === 0) {
-        return [this.next]; // if my next has no leaves, it is the leaf itself
-      }
-    }
-    return [];
-  }
-
-  public removeLeafLink(segment: FlowSegment): void {
-    this.splits.forEach((child) => child.path.removeLeafLink(segment));
-    if (this.next !== null) {
-      if (this.next.path.isSameSegment(segment)) {
-        this.next = null;
-        return;
-      }
-      else {
-        this.next.path.removeLeafLink(segment);
-      }
-    }
-  }
-
-  public popDuplicatedLeaf(): PathLink | null {
-    const leaves = this.leafLinks();
-    if (leaves.length !== 0 && leaves.every(v => v.path.isSameSegment(leaves[0].path))) {
-      this.removeLeafLink(leaves[0].path);
-      return leaves[0];
-    }
-    return null;
   }
 }

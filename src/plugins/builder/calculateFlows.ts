@@ -13,10 +13,8 @@ import pickBy from 'lodash/pickBy';
 import set from 'lodash/set';
 
 import { Coordinates } from '@/helpers/coordinates';
-import router from '@/router';
 
-import { FlowSegment, PathLink } from './FlowSegment';
-import { DEFAULT_FRICTION } from './getters';
+import { FlowSegment } from './FlowSegment';
 import {
   CalculatedFlows,
   FlowPart,
@@ -165,10 +163,10 @@ const innerFlowPath = (
   parts: FlowPart[],
   start: FlowPart,
   inRoute: FlowRoute,
-  startCoord: string = inRoute.outCoords): PathLink | null => {
+  startCoord: string = inRoute.outCoords): FlowSegment | null => {
   const inCoord = inRoute.outCoords;
   const outFlows: FlowRoute[] = get(start, ['transitions', inCoord], []);
-  const path = new FlowSegment(start);
+  const path = new FlowSegment(start, inRoute);
 
   if (outFlows.length === 0) {
     return null;
@@ -191,11 +189,11 @@ const innerFlowPath = (
     candidateParts = cloneDeep(candidateParts);
   }
 
-  const link: PathLink = { path, route: inRoute };
+  const nextPaths: FlowSegment[] = [];
 
   for (const outFlow of outFlows) {
     if (outFlow.sink) {
-      link.sink = outFlow;
+      path.sinksTo.add(outFlow);
     }
     else {
       const nextPart = outFlow.internal ? start : adjacentPart(candidateParts, outFlow.outCoords, start);
@@ -204,31 +202,39 @@ const innerFlowPath = (
         filterTransitions(candidateParts, inCoord, outFlow.outCoords); // filter out same transition
         filterTransitions(candidateParts, outFlow.outCoords, inCoord); // filter out reverse transition
         const next = innerFlowPath(candidateParts, nextPart, outFlow, startCoord);
-        if (next !== null && next.sink) {
-          path.addChild(next);
-          link.sink = next.sink;
+        if (next !== null && next.sinksTo.size) {
+          nextPaths.push(next);
+          path.sinksTo = next.sinksTo;
         }
-        if (next && link.sink === undefined)
+        if (next && path.sinksTo.size === 0)
           return null;
       }
     };
   }
-  if (link.path.splits.length !== 0) {
-    link.path.mergeOverlappingSplits();
+
+  if (nextPaths.length === 1) {
+    path.next = nextPaths[0];
   }
-  return link;
+  else {
+    path.splits = nextPaths;
+  }
+
+  if (path.splits.length !== 0) {
+    path.mergeOverlappingSplits();
+  }
+  return path;
 };
 
 export const flowPath = (
   parts: FlowPart[],
   start: FlowPart,
   inRoute: FlowRoute,
-  startCoord: string = inRoute.outCoords): PathLink | null =>
+  startCoord: string = inRoute.outCoords): FlowSegment | null =>
   innerFlowPath(cloneDeep(parts), start, inRoute, startCoord);
 
-export const addFlowForPathLink = (
+export const addFlowForPath = (
   parts: FlowPart[],
-  link: PathLink,
+  path: FlowSegment,
   flows: LiquidFlow,
 ): FlowPart[] => {
 
@@ -237,28 +243,26 @@ export const addFlowForPathLink = (
   const splitFlow: CalculatedFlows = {};
 
   // add flow for incoming transition
-  if (!link.route.internal) {
-    inFlow[link.route.outCoords] = mapValues(flows, v => -v);
-  }
+  inFlow[path.inRoute.outCoords] = mapValues(flows, v => -v);
 
   // add flow for outgoing flow
   // TODO: outgoing flow of a tee that joins 2 flows in missed
-  if (link.path.next) {
-    outFlow[link.path.next.route.outCoords] = flows;
+  if (path.next) {
+    outFlow[path.next.inRoute.outCoords] = flows;
   }
 
   // divide flow for splits in between
-  if (link.path.splits.length !== 0) {
-    link.path.splits
+  if (path.splits.length !== 0) {
+    path.splits
       .forEach((child, idx) => {
-        const scaledFlow = mapValues(flows, v => v * link.path.splitDivide[idx]);
-        splitFlow[child.route.outCoords] = scaledFlow;
-        parts = addFlowForPathLink(parts, child, scaledFlow);
+        const scaledFlow = mapValues(flows, v => v * path.splitDivide[idx]);
+        splitFlow[child.inRoute.outCoords] = scaledFlow;
+        parts = addFlowForPath(parts, child, scaledFlow);
       });
   }
 
   parts = additionalFlow(
-    link.path.root,
+    path.root,
     parts,
     {
       ...inFlow,
@@ -268,8 +272,8 @@ export const addFlowForPathLink = (
   );
 
   // continue path
-  if (link.path.next) {
-    parts = addFlowForPathLink(parts, link.path.next, flows);
+  if (path.next) {
+    parts = addFlowForPath(parts, path.next, flows);
   }
 
   return parts;
@@ -281,9 +285,9 @@ const addFlowFromPart = (parts: FlowPart[], part: FlowPart): FlowPart[] => {
     for (const outFlow of outFlows) {
       const liquids: string[] = outFlow.liquids || [];
       if (outFlow.source && liquids.length > 0) {
-        const pathLink = flowPath(parts, part, { outCoords: inCoords, internal: true });
-        if (pathLink !== null) {
-          const { friction, pressureDiff } = pathLink.path.friction({ pressureDiff: 0, friction: 0 });
+        const path = flowPath(parts, part, { outCoords: inCoords, internal: true });
+        if (path !== null) {
+          const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
           if (pressureDiff >= 0) {
             // only handle positive or zero flows
             // negative flows will have a positive counterpart we do handle
@@ -292,7 +296,7 @@ const addFlowFromPart = (parts: FlowPart[], part: FlowPart): FlowPart[] => {
               const flow = pressureDiff / friction;
               startFlow[liquid] = flow;
             });
-            parts = addFlowForPathLink(parts, pathLink, startFlow);
+            parts = addFlowForPath(parts, path, startFlow);
           }
         }
       }
