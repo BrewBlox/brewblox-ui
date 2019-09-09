@@ -156,7 +156,7 @@ const mergeEnds = (splits: FlowSegment[]): { splits: FlowSegment[]; end: FlowSeg
         }
       }
       if (unTouchedSplits.length !== 0) {
-        throw ('Not implemented');
+        throw ('Calculating current flow path is not supported. Cannot merge friction and pressures of a multi-sink split.');
       }
       else {
         return { splits: combinedSplits, end: end };
