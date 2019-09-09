@@ -21,7 +21,7 @@ const spec: PartSpec = {
       : part.settings.enabled;
 
     const pressure = enabled
-      ? part.settings.pressure || DEFAULT_PUMP_PRESSURE
+      ? part.settings.pressure !== undefined ? part.settings.pressure : DEFAULT_PUMP_PRESSURE
       : 0;
     return {
       [LEFT]: [{ outCoords: RIGHT }],

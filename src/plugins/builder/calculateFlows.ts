@@ -187,8 +187,10 @@ const innerFlowPath = (
   };
   let candidateParts = parts; //filterTransitions(parts, inCoord);
   if (outFlows.length > 1) {
-    // for a split, make a copy of candidates to process both ends independently
-    candidateParts = cloneDeep(candidateParts);
+    // for a split, make a copy of transitions to process both ends independently
+    candidateParts = candidateParts.map(part => ({
+      ...part, transitions: { ...part.transitions },
+    }));
   }
 
   const nextPaths: FlowSegment[] = [];
@@ -234,7 +236,7 @@ export const flowPath = (
   parts: FlowPart[],
   start: FlowPart,
   inRoute: FlowRoute): FlowSegment | null =>
-  innerFlowPath(cloneDeep(parts), start, inRoute);
+  innerFlowPath(parts.map(part => ({ ...part, transitions: { ...part.transitions } })), start, inRoute);
 
 export const addFlowForPath = (
   parts: FlowPart[],

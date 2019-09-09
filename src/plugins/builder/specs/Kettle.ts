@@ -46,7 +46,7 @@ const spec: PartSpec = {
 
     const result = {
       '0.1,0.1,0': [{
-        outCoords: '0,0,-2',
+        outCoords: '0.2,0.2,0',
         pressure: 0,
         friction: 0,
         liquids: part.settings.color ? [part.settings.color] : [],
@@ -54,7 +54,7 @@ const spec: PartSpec = {
         source: true,
       },
       ],
-      '0,0,-2': middleCoords.map(item => ({
+      '0.2,0.2,0': middleCoords.map(item => ({
         outCoords: item,
         friction: 0,
       })),
@@ -62,7 +62,7 @@ const spec: PartSpec = {
 
     middleCoords.forEach(item => (
       result[item] = [{
-        outCoords: '0.2,0.2,0',
+        outCoords: '0.3,0.3,0',
         friction: 0,
         sink: true,
         internal: true,

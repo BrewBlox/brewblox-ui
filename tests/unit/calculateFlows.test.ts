@@ -1199,7 +1199,7 @@ describe('A kettle with 2 outflows', () => {
       'rotate': 0,
       'type': 'Pump',
       settings: {
-        enabled: true,
+        enabled: false,
         pressure: 10,
       },
       'flipped': true,
