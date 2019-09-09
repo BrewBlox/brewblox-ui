@@ -1,5 +1,3 @@
-import { min } from 'd3';
-
 import { DEFAULT_FRICTION } from './getters';
 import { FlowPart, FlowRoute, PathFriction } from './types';
 
@@ -81,10 +79,6 @@ export class FlowSegment {
       acc = func(acc, this.next);
     }
   };
-
-  public isSameSegment(other: FlowSegment): boolean {
-    return JSON.stringify(this) === JSON.stringify(other);
-  }
 
   public trimAtRoute(route: FlowRoute): FlowSegment | null {
     if (this.next) {

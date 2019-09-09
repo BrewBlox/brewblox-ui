@@ -4,8 +4,6 @@
  * You'll notice it went wrong if your Webpack build fails with 0 errors.
  */
 
-import { interpolateHue } from 'd3';
-import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import has from 'lodash/has';
 import mapKeys from 'lodash/mapKeys';
@@ -14,7 +12,6 @@ import pickBy from 'lodash/pickBy';
 import set from 'lodash/set';
 
 import { Coordinates } from '@/helpers/coordinates';
-import router from '@/router';
 
 import { FlowSegment, mergeOverlappingSplits } from './FlowSegment';
 import {
@@ -25,12 +22,6 @@ import {
   StatePart,
   Transitions,
 } from './types';
-
-export const partCenter =
-  (part: StatePart): [number, number, number] => {
-    const [sizeX, sizeY] = part.size;
-    return [sizeX / 2, sizeY / 2, 0];
-  };
 
 const adjacentPart = (
   allParts: FlowPart[],
@@ -314,7 +305,7 @@ const addFlowFromPart = (parts: FlowPart[], part: FlowPart): FlowPart[] => {
   return parts;
 };
 
-// total flow is a superposition of all pressure sources in the system
+// total flow is a superposition of all sources in the system
 // for each part, add the flow it adds to the global list of parts
 // merge the flows afterwards
 export const calculateFlows = (parts: FlowPart[]): FlowPart[] =>
