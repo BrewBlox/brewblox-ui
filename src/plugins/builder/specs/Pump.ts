@@ -24,7 +24,7 @@ const spec: PartSpec = {
       ? part.settings.pressure || DEFAULT_PUMP_PRESSURE
       : 0;
     return {
-      [LEFT]: [{ outCoords: RIGHT, pressure: -pressure }],
+      [LEFT]: [{ outCoords: RIGHT }],
       [RIGHT]: [{ outCoords: LEFT, pressure }],
     };
   },
