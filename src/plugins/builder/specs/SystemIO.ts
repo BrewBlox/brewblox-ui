@@ -12,7 +12,7 @@ const spec: PartSpec = {
       liquids: part.settings.pressure ? part.settings.liquids || [] : [],
       source: true,
     }],
-    [RIGHT]: [{ outCoords: CENTER, sink: true, pressure: -(part.settings.pressure || 0) }],
+    [RIGHT]: [{ outCoords: CENTER, sink: true }],
   }),
 };
 

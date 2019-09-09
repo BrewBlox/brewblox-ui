@@ -36,17 +36,20 @@ export class FlowSegment {
       };
 
     let series = input;
-    // for a split, the friction is handled in each split. The root part can be ignored.
-    series.friction += this.inRoute.friction || DEFAULT_FRICTION;
-    series.pressureDiff += this.inRoute.pressure || 0;
 
     if (this.next) {
       // add next before processing split (can be moved to front because all parts are in series)
+      series.friction += this.next.inRoute.friction !== undefined ? this.next.inRoute.friction : DEFAULT_FRICTION;
+      series.pressureDiff += this.next.inRoute.pressure || 0;
       series = this.next.friction(series);
     }
+
     if (this.splits.length > 1) {
       // splitting. Convert the combined paths into an equivalent series friction
-      const splitPF = this.splits.map(split => split.friction({ pressureDiff: 0, friction: 0 }));
+      const splitPF = this.splits.map(split => split.friction({
+        pressureDiff: split.inRoute.pressure || 0,
+        friction: split.inRoute.friction !== undefined ? split.inRoute.friction : DEFAULT_FRICTION,
+      }));
       const splitFriction = equivalentFriction(splitPF, series);
       series.friction = series.friction + splitFriction.total;
       this.splitDivide = splitFriction.split;
@@ -160,9 +163,9 @@ const mergeEnds = (splits: FlowSegment[]): { splits: FlowSegment[]; end: FlowSeg
   }
 };
 
-export const mergeOverlappingSplits = (splits: FlowSegment[], root: FlowPart, inRoute: FlowRoute): FlowSegment[] => {
+export const mergeOverlappingSplits = (path: FlowSegment): FlowSegment => {
   const sortedBySink: { [coords: string]: { splits: FlowSegment[]; end: FlowSegment | null } } = {};
-  for (const split of splits) {
+  for (const split of path.splits) {
     if (split.sinksTo.size) {
       const sortName = JSON.stringify(split.sinksTo);
       if (sortedBySink[sortName] !== undefined) {
@@ -188,18 +191,13 @@ export const mergeOverlappingSplits = (splits: FlowSegment[], root: FlowPart, in
     }
   }
 
-  const merged = Object.values(sortedBySink);
-  const returnedSplits: FlowSegment[] = [];
-  for (const newSegment of merged) {
-    const segment = new FlowSegment(root, inRoute);
-    if (newSegment.splits.length > 1) {
-      segment.splits = newSegment.splits;
-      segment.next = newSegment.end;
-    }
-    else {
-      segment.next = splits[0];
-    }
-    returnedSplits.push(segment);
+  const mergedSplits = Object.values(sortedBySink);
+  if (mergedSplits.length === 1) {
+    path.splits = mergedSplits[0].splits;
+    path.next = mergedSplits[0].end;
+    return path;
   }
-  return returnedSplits;
+  path.splits = mergedSplits[0].splits;
+  path.next = mergedSplits[0].end;
+  return path;
 };

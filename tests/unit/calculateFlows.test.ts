@@ -5,7 +5,6 @@ import {
   asFlowParts,
   calculateFlows,
   findPathsFromSources,
-  flowPath,
 } from '@/plugins/builder/calculateFlows';
 import { FlowSegment } from '@/plugins/builder/FlowSegment';
 import { CENTER, COLD_WATER, HOT_WATER } from '@/plugins/builder/getters';
@@ -32,7 +31,7 @@ const propertyWalker = (acc: any[], item: FlowSegment, prop: string[]): any[] =>
   if (subtree.length !== 0) {
     acc = [...acc, subtree];
   }
-  if (item.next !== null) {
+  if (item.next !== null && !item.next.inRoute.sink) {
     acc = [...acc, ...propertyWalker([], item.next, prop)];
   }
   return acc;
@@ -248,7 +247,7 @@ describe('A path with a split, but no joins', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        pressure: 15,
+        pressure: 13,
         liquids: [COLD_WATER],
       },
     },
@@ -313,18 +312,26 @@ describe('A path with a split, but no joins', () => {
     const route = routeWalker([], path);
     expect(route).toEqual(
       [
-        { outCoords: '2,2.5,0', pressure: 15, liquids: [COLD_WATER], source: true },
+        { outCoords: '2,2.5,0', pressure: 13, liquids: [COLD_WATER], source: true },
         { outCoords: '3,2.5,0' },
         { outCoords: '3.5,2.5,0', friction: 0.5, internal: true },
         [
-          [{ outCoords: '3.5,3,0', friction: 0.5 }],
-          [{ outCoords: '3.5,2,0', friction: 0.5 }]],
+          [
+            { outCoords: '3.5,3,0', friction: 0.5 },
+            { outCoords: '3.5,3.5,0', sink: true },
+          ],
+          [
+            { outCoords: '3.5,2,0', friction: 0.5 },
+            { outCoords: '3.5,1.5,0', sink: true },
+          ],
+        ],
+
       ]);
   });
 
-  it('Should have a friction value of 3.75', () => {
+  it('Should have a friction value of 3.25', () => {
     const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
-    expect(friction).toEqual(3.75);
+    expect(friction).toEqual(3.25);
   });
 
   it('Should have a flow of value of 4 total and 2 for each split', () => {
@@ -508,7 +515,8 @@ describe('A path that forks and rejoins', () => {
           [{ 'friction': 0.5, 'outCoords': '3.5,2,0' }, { 'outCoords': '4,1.5,0' }, { 'outCoords': '4.5,2,0' }],
         ],
         { 'friction': 0.5, 'internal': true, 'outCoords': '4.5,2.5,0' },
-        { 'friction': 0.5, 'outCoords': '5,2.5,0' }]
+        { 'friction': 0.5, 'outCoords': '5,2.5,0' },
+        { outCoords: '5.5,2.5,0', 'sink': true }]
     );
   });
 
@@ -733,7 +741,7 @@ describe('Two sources joining', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        pressure: 7.5,
+        pressure: 15,
         liquids: [COLD_WATER],
       },
     },
@@ -744,7 +752,7 @@ describe('Two sources joining', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        pressure: 7.5,
+        pressure: 15,
         liquids: [HOT_WATER],
       },
     },
@@ -813,7 +821,8 @@ describe('Two sources joining', () => {
   });
 
   it('Should have the expected friction for that path', () => {
-    expect(path.friction({ friction: 0, pressureDiff: 0 })).toBe(3.75);
+    const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
+    expect(friction).toBe(3.75);
   });
 
   it('It should should have the correct routes', () => {
@@ -822,13 +831,12 @@ describe('Two sources joining', () => {
       [{
         'liquids': ['#4AA0EF'],
         'outCoords': '2,1.5,0',
-        'pressure': 7.5,
+        'pressure': 15,
         'source': true,
       }, {
         'outCoords': '2.5,2,0',
       }, {
         'friction': 0.5,
-        'pressure': 7.5,
         'internal': true,
         'outCoords': '2.5,2.5,0',
       },
@@ -838,15 +846,22 @@ describe('Two sources joining', () => {
           'outCoords': '3,2.5,0',
         }, {
           'outCoords': '4,2.5,0',
+        },
+        {
+          'outCoords': '4.5,2.5,0',
+          'sink': true,
         }],
         [{
           'friction': 0.5,
           'outCoords': '2.5,3,0',
         }, {
           'outCoords': '2,3.5,0',
+        },
+        {
+          'outCoords': '1.5,3.5,0',
+          'sink': true,
         }],
-      ],
-      ]
+      ]]
     );
   });
 
@@ -960,7 +975,7 @@ describe('A path with a bridge', () => {
       rotate: 0,
       settings: {
         liquids: [COLD_WATER],
-        pressure: 7,
+        pressure: 8,
       },
     },
     {
@@ -1024,7 +1039,7 @@ describe('A path with a bridge', () => {
           rotate: 0,
           settings: {
             liquids: [COLD_WATER],
-            pressure: 7,
+            pressure: 8,
           },
           flows: {
             '12,2.5,0': {
@@ -1211,6 +1226,7 @@ describe('A kettle with 2 outflows', () => {
     const visitedTypes = propertyWalker([], path, ['root', 'type']);
     expect(visitedTypes).toEqual(
       [
+        'Kettle',
         'Kettle',
         [['DipTube',
           'Pump',

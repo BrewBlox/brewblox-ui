@@ -164,8 +164,8 @@ const additionalFlow = (
 const innerFlowPath = (
   parts: FlowPart[],
   start: FlowPart,
-  inRoute: FlowRoute,
-  startCoord: string = inRoute.outCoords): FlowSegment | null => {
+  inRoute: FlowRoute): FlowSegment | null => {
+
   const inCoord = inRoute.outCoords;
   const outFlows: FlowRoute[] = get(start, ['transitions', inCoord], []);
   const path = new FlowSegment(start, inRoute);
@@ -191,11 +191,14 @@ const innerFlowPath = (
     candidateParts = cloneDeep(candidateParts);
   }
 
-  let nextPaths: FlowSegment[] = [];
+  const nextPaths: FlowSegment[] = [];
 
   for (const outFlow of outFlows) {
     if (outFlow.sink) {
+      path.next = new FlowSegment(start, outFlow);
+      path.next.sinksTo.add(outFlow.outCoords);
       path.sinksTo.add(outFlow.outCoords);
+      return path;
     }
     else {
       const nextPart = outFlow.internal ? start : adjacentPart(candidateParts, outFlow.outCoords, start);
@@ -203,7 +206,7 @@ const innerFlowPath = (
         // find a new path
         filterTransitions(candidateParts, inCoord, outFlow.outCoords); // filter out same transition
         filterTransitions(candidateParts, outFlow.outCoords, inCoord); // filter out reverse transition
-        const next = innerFlowPath(candidateParts, nextPart, outFlow, startCoord);
+        const next = innerFlowPath(candidateParts, nextPart, outFlow);
         if (next !== null && next.sinksTo.size) {
           nextPaths.push(next);
           next.sinksTo.forEach(sink => { path.sinksTo.add(sink); });
@@ -212,17 +215,15 @@ const innerFlowPath = (
     };
   }
 
-  if (nextPaths.length > 1) {
-    nextPaths = mergeOverlappingSplits(nextPaths, start, inRoute);
+  if (nextPaths.length === 1) {
+    path.next = nextPaths[0];
   }
 
   if (nextPaths.length > 1) {
     path.splits = nextPaths;
-    return path;
+    return mergeOverlappingSplits(path);
   }
-  if (nextPaths.length === 1) {
-    path.next = nextPaths[0];
-  }
+
   if (path.sinksTo.size !== 0) {
     return path;
   }
@@ -232,9 +233,8 @@ const innerFlowPath = (
 export const flowPath = (
   parts: FlowPart[],
   start: FlowPart,
-  inRoute: FlowRoute,
-  startCoord: string = inRoute.outCoords): FlowSegment | null =>
-  innerFlowPath(cloneDeep(parts), start, inRoute, startCoord);
+  inRoute: FlowRoute): FlowSegment | null =>
+  innerFlowPath(cloneDeep(parts), start, inRoute);
 
 export const addFlowForPath = (
   parts: FlowPart[],
@@ -250,7 +250,6 @@ export const addFlowForPath = (
   inFlow[path.inRoute.outCoords] = mapValues(flows, v => -v);
 
   // add flow for outgoing flow
-  // TODO: outgoing flow of a tee that joins 2 flows in missed
   if (path.next) {
     outFlow[path.next.inRoute.outCoords] = flows;
   }
