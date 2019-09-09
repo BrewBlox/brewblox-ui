@@ -7,7 +7,6 @@ export const RIGHT = '1,0.5,0';
 export const DOWN = '0.5,1,0';
 export const LEFT = '0,0.5,0';
 export const CENTER = '0.5,0.5,0';;
-export const ACCELERATE_OTHERS = '*ACCELERATE_OTHERS*';
 export const DEFAULT_FRICTION = 1;
 export const DEFAULT_PUMP_PRESSURE = 10;
 export const COLD_WATER = '#4AA0EF';
