@@ -1,3 +1,5 @@
+import { min } from 'd3';
+
 import { DEFAULT_FRICTION } from './getters';
 import { FlowPart, FlowRoute, PathFriction } from './types';
 
@@ -17,7 +19,7 @@ export class FlowSegment {
 
   public friction(input: PathFriction): PathFriction {
     const equivalentFriction =
-      (toTransform: PathFriction[], splitInput: PathFriction): { total: number; split: number[] } => {
+      (toTransform: PathFriction[], splitInput: PathFriction): { total: PathFriction; split: number[] } => {
         // Apply Millman’s Theorem Equation to calculate node pressure on the split
         const allPaths = [splitInput, ...toTransform.map(entry => ({
           pressureDiff: -entry.pressureDiff,
@@ -27,12 +29,24 @@ export class FlowSegment {
         const denum = allPaths.reduce((acc, p) => p.friction ? acc + 1 / p.friction : acc, 0);
         const nodePressure = num / denum;
 
-        // convert pressure difference + friction on each split to only an equivalent (possibly negative) friction
-        const equivalentSplitFrictions = toTransform.map((entry): number =>
-          nodePressure * entry.friction / (nodePressure + entry.pressureDiff));
+        let equivalentSplitFrictions = toTransform.map(v => v.friction);
+        let totalPressureDiff = input.pressureDiff;
+
+        if (input.pressureDiff !== 0) {
+          // convert pressure difference + friction on each split to only an equivalent (possibly negative) friction
+          equivalentSplitFrictions = toTransform.map((entry): number =>
+            nodePressure * entry.friction / (nodePressure + entry.pressureDiff));
+        }
+        else {
+          totalPressureDiff = nodePressure;
+        }
+
         const eqInv = equivalentSplitFrictions.map(v => 1 / v);
         const eqFriction = 1 / eqInv.reduce((acc, entry) => acc + entry, 0);
-        return { total: eqFriction, split: eqInv.map(v => v * eqFriction) };
+        return {
+          total: { pressureDiff: totalPressureDiff, friction: input.friction + eqFriction },
+          split: eqInv.map(v => v * eqFriction),
+        };
       };
 
     let series = input;
@@ -51,7 +65,7 @@ export class FlowSegment {
         friction: split.inRoute.friction !== undefined ? split.inRoute.friction : DEFAULT_FRICTION,
       }));
       const splitFriction = equivalentFriction(splitPF, series);
-      series.friction = series.friction + splitFriction.total;
+      series = splitFriction.total;
       this.splitDivide = splitFriction.split;
     }
 

@@ -89,7 +89,7 @@ describe('Data describing an input tube', () => {
     expect(asStatePart(part).transitions).toEqual(
       {
         [CENTER]: [{ outCoords: '1,0.5,0', pressure: 11, liquids: [COLD_WATER], source: true }],
-        '1,0.5,0': [{ outCoords: CENTER, pressure: -11, sink: true }],
+        '1,0.5,0': [{ outCoords: CENTER, sink: true }],
       });
   });
 });
@@ -1218,7 +1218,7 @@ describe('A kettle with 2 outflows', () => {
   ];
 
   const flowParts = asFlowParts(parts.map(asStatePart));
-  it('Should have 2 outlfow paths', () => {
+  it('Should have 2 outflow paths', () => {
     const start = flowParts[0];
 
     const path = findPath(flowParts, start);
@@ -1244,10 +1244,10 @@ describe('A kettle with 2 outflows', () => {
         'id': '3',
         'flows': {
           '5,6.5,0': {
-            '#ff0000': -10 / 3,
+            '#ff0000': 3.333333333333334,
           },
           '6,6.5,0': {
-            '#ff0000': 10 / 3,
+            '#ff0000': -3.333333333333334,
           },
         },
       });
@@ -1258,10 +1258,10 @@ describe('A kettle with 2 outflows', () => {
         'id': '6',
         'flows': {
           '5,5.5,0': {
-            '#ff0000': -10 / 3,
+            '#ff0000': 3.333333333333334,
           },
           '6,5.5,0': {
-            '#ff0000': 10 / 3,
+            '#ff0000': -3.333333333333334,
           },
         },
       });
@@ -1322,6 +1322,7 @@ describe('A kettle with flow back to itself', () => {
       'rotate': 270,
       settings: {
         enabled: false,
+        pressure: 10,
       },
       'type': 'Pump',
       'x': 5,
@@ -1338,6 +1339,7 @@ describe('A kettle with flow back to itself', () => {
       expect(visitedTypes).toEqual(
         [
           'Kettle',
+          'Kettle',
           'DipTube',
           'ElbowTube',
           'Pump',
@@ -1349,6 +1351,7 @@ describe('A kettle with flow back to itself', () => {
 
       const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
       expect(friction).toEqual(5);
+      expect(pressureDiff).toEqual(0);
     });
 
 
@@ -1371,11 +1374,12 @@ describe('A kettle with flow back to itself', () => {
   });
 
   describe('with an enabled pump', () => {
-    parts = [...parts, {
+    parts = [...parts.filter(p => p.type !== 'Pump'), {
       'id': '4',
       'rotate': 270,
       settings: {
         enabled: true,
+        pressure: 10,
       },
       'type': 'Pump',
       'x': 5,
@@ -1390,6 +1394,7 @@ describe('A kettle with flow back to itself', () => {
       expect(visitedTypes).toEqual(
         [
           'Kettle',
+          'Kettle',
           'DipTube',
           'ElbowTube',
           'Pump',
@@ -1400,6 +1405,7 @@ describe('A kettle with flow back to itself', () => {
 
       const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
       expect(friction).toEqual(5);
+      expect(pressureDiff).toEqual(10);
     });
 
     it('Should have flow 2', () => {

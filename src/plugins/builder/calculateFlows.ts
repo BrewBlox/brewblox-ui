@@ -299,17 +299,15 @@ export const findPathsFromSources = (parts: FlowPart[], part: FlowPart): FlowSeg
 const addFlowFromPart = (parts: FlowPart[], part: FlowPart): FlowPart[] => {
   for (const path of findPathsFromSources(parts, part)) {
     const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
-    if (pressureDiff >= 0) {
-      // only handle positive or zero flows
-      // negative flows will have a positive counterpart we do handle
-      if (path.inRoute.liquids) {
-        const startFlow: LiquidFlow = {};
-        for (const liquid of path.inRoute.liquids) {
-          startFlow[liquid] = pressureDiff / friction;
-        };
-        parts = addFlowForPath(parts, path, startFlow);
-      }
+
+    if (path.inRoute.liquids) {
+      const startFlow: LiquidFlow = {};
+      for (const liquid of path.inRoute.liquids) {
+        startFlow[liquid] = pressureDiff / friction;
+      };
+      parts = addFlowForPath(parts, path, startFlow);
     }
+
   }
   return parts;
 };
