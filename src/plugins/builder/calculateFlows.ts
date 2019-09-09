@@ -169,6 +169,8 @@ const innerFlowPath = (
     for (const part of partsToFilter) {
       // filter out transition with same source and destination
       if (part.transitions[inCoord]) {
+        // Use filter, not splice, because the loop below is looping over the outFlows.
+        // Mutating the original array will cause the iterator to shift
         part.transitions[inCoord] = part.transitions[inCoord].filter(outFlow => outFlow.outCoords !== outCoord);
         if (part.transitions[inCoord].length === 0) {
           delete part.transitions[inCoord];
@@ -176,13 +178,17 @@ const innerFlowPath = (
       }
     }
   };
-  let candidateParts = parts; //filterTransitions(parts, inCoord);
-  if (outFlows.length > 1) {
+
+  const candidateParts = parts.reduce((acc: FlowPart[], part: FlowPart): FlowPart[] => {
+    // only include parts with transitions remaining
     // for a split, make a copy of transitions to process both ends independently
-    candidateParts = candidateParts.map(part => ({
-      ...part, transitions: { ...part.transitions },
-    }));
-  }
+    if (Object.keys(part.transitions).length !== 0) {
+      acc.push((outFlows.length > 1) ?
+        { ...part, transitions: { ...part.transitions } }
+        : part);
+    }
+    return acc;
+  }, []);
 
   const nextPaths: FlowSegment[] = [];
 
