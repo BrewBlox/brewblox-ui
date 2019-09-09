@@ -72,6 +72,14 @@ const findPath = (
 };
 
 
+const findPaths = (
+  parts: FlowPart[],
+  start: FlowPart): FlowSegment[] => {
+
+  return findPathsFromSources(parts, start);
+};
+
+
 describe('Data describing an input tube', () => {
   const part: PersistentPart = {
     id: '',
@@ -1199,7 +1207,7 @@ describe('A kettle with 2 outflows', () => {
       'rotate': 0,
       'type': 'Pump',
       settings: {
-        enabled: false,
+        enabled: true,
         pressure: 10,
       },
       'flipped': true,
@@ -1221,19 +1229,24 @@ describe('A kettle with 2 outflows', () => {
   it('Should have 2 outflow paths', () => {
     const start = flowParts[0];
 
-    const path = findPath(flowParts, start);
+    const paths = findPaths(flowParts, start);
 
-    const visitedTypes = propertyWalker([], path, ['root', 'type']);
+    let visitedTypes = propertyWalker([], paths[0], ['root', 'type']);
     expect(visitedTypes).toEqual(
       [
         'Kettle',
+        'DipTube',
+        'Pump',
+        'SystemIO',
+      ]);
+
+    visitedTypes = propertyWalker([], paths[1], ['root', 'type']);
+    expect(visitedTypes).toEqual(
+      [
         'Kettle',
-        [['DipTube',
-          'Pump',
-          'SystemIO'],
-        ['DipTube',
-          'Pump',
-          'SystemIO']],
+        'DipTube',
+        'Pump',
+        'SystemIO',
       ]);
   });
   it('Each branch should have flow 10/3', () => {
@@ -1244,10 +1257,10 @@ describe('A kettle with 2 outflows', () => {
         'id': '3',
         'flows': {
           '5,6.5,0': {
-            '#ff0000': 3.333333333333334,
+            '#ff0000': -3.3333333333333335,
           },
           '6,6.5,0': {
-            '#ff0000': -3.333333333333334,
+            '#ff0000': 3.3333333333333335,
           },
         },
       });
@@ -1258,10 +1271,10 @@ describe('A kettle with 2 outflows', () => {
         'id': '6',
         'flows': {
           '5,5.5,0': {
-            '#ff0000': 3.333333333333334,
+            '#ff0000': -3.3333333333333335,
           },
           '6,5.5,0': {
-            '#ff0000': -3.333333333333334,
+            '#ff0000': 3.3333333333333335,
           },
         },
       });
@@ -1333,12 +1346,11 @@ describe('A kettle with flow back to itself', () => {
     it('Should return the right path starting at the kettle', () => {
       const start = flowParts[0];
 
-      const path = findPath(flowParts, start);
+      const path = findPaths(flowParts, start)[0];
 
       const visitedTypes = propertyWalker([], path, ['root', 'type']);
       expect(visitedTypes).toEqual(
         [
-          'Kettle',
           'Kettle',
           'DipTube',
           'ElbowTube',
@@ -1388,12 +1400,11 @@ describe('A kettle with flow back to itself', () => {
     const flowParts = asFlowParts(parts.map(asStatePart));
     it('Should return the right path starting at the kettle', () => {
       const start = flowParts[0];
-      const path = findPath(flowParts, start);
+      const path = findPaths(flowParts, start)[0];
 
       const visitedTypes = propertyWalker([], path, ['root', 'type']);
       expect(visitedTypes).toEqual(
         [
-          'Kettle',
           'Kettle',
           'DipTube',
           'ElbowTube',

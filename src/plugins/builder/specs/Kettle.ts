@@ -39,35 +39,29 @@ const spec: PartSpec = {
     const sizeX: number = DEFAULT_SIZE_X;
     const sizeY: number = DEFAULT_SIZE_Y;
 
-    const middleCoords = Array(sizeX * sizeY).fill(0).map((v, n) => {
-      const coord = new Coordinates({ x: (n % sizeX) + 0.5, y: Math.floor(n / sizeX) + 0.5, z: 0 });
-      return coord.toString();
+    const coords = Array(sizeX * sizeY).fill(0).map((v, n) => {
+      const outFlow = new Coordinates({ x: (n % sizeX) + 0.5, y: Math.floor(n / sizeX) + 0.5, z: 0 });
+      const inFlow = new Coordinates({ x: (n % sizeX) + 0.1, y: Math.floor(n / sizeX) + 0.1, z: 0 });
+      return { in: inFlow.toString(), out: outFlow.toString() };
     });
 
-    const result = {
-      '0.1,0.1,0': [{
-        outCoords: '0.2,0.2,0',
+    const result = {};
+
+    coords.forEach(item => {
+      result[item.out] = [{
+        outCoords: item.in,
+        friction: 0,
+        sink: true,
+      }];
+
+      result[item.in] = [{
+        outCoords: item.out,
         pressure: 0,
         friction: 0,
         liquids: part.settings.color ? [part.settings.color] : [],
-        internal: true,
         source: true,
-      },
-      ],
-      '0.2,0.2,0': middleCoords.map(item => ({
-        outCoords: item,
-        friction: 0,
-      })),
-    };
-
-    middleCoords.forEach(item => (
-      result[item] = [{
-        outCoords: '0.3,0.3,0',
-        friction: 0,
-        sink: true,
-        internal: true,
-      },
-      ]));
+      }];
+    });
     return result;
   },
 };
