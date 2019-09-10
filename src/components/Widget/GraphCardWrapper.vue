@@ -47,7 +47,7 @@ export default class GraphCardWrapper extends Vue {
         </q-btn>
       </div>
       <div v-if="!collapsed" style="width: 600px;">
-        <q-card dark class="q-pa-xs bg-dark-bright" style="min-height: 100px;">
+        <q-card dark class="q-pa-none bg-dark-bright graph-container">
           <slot name="graph" />
         </q-card>
       </div>
@@ -71,5 +71,11 @@ export default class GraphCardWrapper extends Vue {
 .tab-hide {
   border: 2px solid white;
   border-right: 0;
+}
+
+.graph-container {
+  height: calc(100% - 4px);
+  width: calc(100% - 4px);
+  border: 2px solid gray;
 }
 </style>
