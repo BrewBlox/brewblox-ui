@@ -22,6 +22,11 @@ export interface CalculatedFlows {
   [inCoords: string]: LiquidFlow;
 }
 
+export interface PathFriction {
+  friction: number;
+  pressureDiff: number;
+}
+
 export interface PersistentPart {
   id: string;
   type: string;

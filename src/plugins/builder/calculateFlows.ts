@@ -13,8 +13,7 @@ import set from 'lodash/set';
 
 import { Coordinates } from '@/helpers/coordinates';
 
-import { FlowSegment } from './FlowSegment';
-import { ACCELERATE_OTHERS } from './getters';
+import { FlowSegment, mergeOverlappingSplits } from './FlowSegment';
 import {
   CalculatedFlows,
   FlowPart,
@@ -23,12 +22,6 @@ import {
   StatePart,
   Transitions,
 } from './types';
-
-export const partCenter =
-  (part: StatePart): [number, number, number] => {
-    const [sizeX, sizeY] = part.size;
-    return [sizeX / 2, sizeY / 2, 0];
-  };
 
 const adjacentPart = (
   allParts: FlowPart[],
@@ -119,26 +112,8 @@ const mergeFlows = (flows: CalculatedFlows): CalculatedFlows => {
       };
 
       let toMerge = coordFlows;
-      let acceleration = coordFlows[ACCELERATE_OTHERS] || 0; // special liquid type set by pumps
 
-
-      let [positive, negative, posTotal, negTotal] = splitPosNeg(toMerge);
-      const liquidsTotal = posTotal + negTotal - acceleration;
-
-      if (liquidsTotal === 0 && acceleration) {
-        // without acceleration there would be no flow
-        delete toMerge[ACCELERATE_OTHERS];
-        toMerge = scale(toMerge, acceleration);
-        [positive, negative, posTotal, negTotal] = splitPosNeg(toMerge);
-      }
-      else if (liquidsTotal && acceleration / liquidsTotal < -1) {
-        // if acceleration is bigger than other flows combined and opposite sign, the flow is reversed
-        const newTotal = acceleration + liquidsTotal;
-        toMerge = scale(toMerge, newTotal / liquidsTotal);
-        acceleration = 0;
-        delete toMerge[ACCELERATE_OTHERS];
-        [positive, negative, posTotal, negTotal] = splitPosNeg(toMerge);
-      }
+      const [positive, negative, posTotal, negTotal] = splitPosNeg(toMerge);
 
       const total = posTotal + negTotal;
       // if flow exists in both directions, only keep the biggest and scale it down to the net flow
@@ -157,16 +132,6 @@ const mergeFlows = (flows: CalculatedFlows): CalculatedFlows => {
         });
       }
 
-
-      // check again, could be discarded as part of positive or negative
-      acceleration = toMerge[ACCELERATE_OTHERS];
-      if (acceleration) {
-        if (total !== acceleration) {
-          toMerge = scale(toMerge, total / (total - acceleration));
-        }
-      }
-
-      delete toMerge[ACCELERATE_OTHERS];
       if (toMerge) {
         mergedFlows[coord] = toMerge;
       }
@@ -187,177 +152,166 @@ const additionalFlow = (
         ? { ...item, flows: combineFlows(item.flows, flowToAdd) }
         : item);
 
-export const flowPath = (
+const innerFlowPath = (
   parts: FlowPart[],
   start: FlowPart,
-  inCoord: string,
-  startCoord: string = inCoord): FlowSegment | null => {
+  inRoute: FlowRoute): FlowSegment | null => {
+
+  const inCoord = inRoute.outCoords;
   const outFlows: FlowRoute[] = get(start, ['transitions', inCoord], []);
-  const path = new FlowSegment(start, {});
+  const path = new FlowSegment(start, inRoute);
 
   if (outFlows.length === 0) {
     return null;
   }
 
-  let candidateParts: FlowPart[] = parts.reduce((acc: FlowPart[], part: FlowPart) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { [inCoord]: _, ...filteredTransitions } = part.transitions; // make a copy of transitions excluding inCoord
-
-    if (inCoord !== startCoord) {
-      Object.keys(filteredTransitions).forEach(k => {
-        // filter out any transitions that go back to the inCoord to remove loops
-        filteredTransitions[k] = filteredTransitions[k].filter(
-          route => (route.outCoords != inCoord)
-        );
-      });
-    }
-
-    if (Object.getOwnPropertyNames(filteredTransitions).length !== 0) { // exclude parts without transitions
-      acc.push({ ...part, transitions: filteredTransitions });
-    }
-    return acc;
-  }, []);
-  let flowing = false;
-  for (const outFlow of outFlows) {
-    while (true) {
-      const nextPart =
-        (candidateParts.length === 0) ? null :
-          outFlow.internal ? start : adjacentPart(candidateParts, outFlow.outCoords, start);
-
-      let nextPath: FlowSegment | null = null;
-      if (nextPart !== null) {
-        nextPath = flowPath(candidateParts, nextPart, outFlow.outCoords, startCoord);
-        if (nextPath !== null) {
-          path.addChild(nextPath);
-          flowing = flowing || nextPath.flowing;
+  const filterTransitions = (partsToFilter: FlowPart[], inCoord: string, outCoord: string): void => {
+    for (const part of partsToFilter) {
+      // filter out transition with same source and destination
+      if (part.transitions[inCoord]) {
+        // Use filter, not splice, because the loop below is looping over the outFlows.
+        // Mutating the original array will cause the iterator to shift
+        part.transitions[inCoord] = part.transitions[inCoord].filter(outFlow => outFlow.outCoords !== outCoord);
+        if (part.transitions[inCoord].length === 0) {
+          delete part.transitions[inCoord];
         }
       }
-      if (nextPath !== null || outFlow.outCoords === startCoord) {
-        if (path.transitions[inCoord] === undefined) {
-          path.transitions[inCoord] = [outFlow];
-        }
-        else {
-          path.transitions[inCoord].push(outFlow);
-        }
-      }
-
-      if (nextPath === null && outFlow.outCoords !== startCoord) {
-        path.flowing = flowing;
-      }
-      if (!nextPart || outFlow.internal) {
-        break;
-      }
-      candidateParts = candidateParts
-        .filter(part => nextPart && !(nextPart.id === part.id));
     }
   };
 
-  if (path.transitions[inCoord] === undefined) {
-    return null;
+  const candidateParts = parts.reduce((acc: FlowPart[], part: FlowPart): FlowPart[] => {
+    // only include parts with transitions remaining
+    // for a split, make a copy of transitions to process both ends independently
+    if (Object.keys(part.transitions).length !== 0) {
+      acc.push((outFlows.length > 1) ?
+        { ...part, transitions: { ...part.transitions } }
+        : part);
+    }
+    return acc;
+  }, []);
+
+  const nextPaths: FlowSegment[] = [];
+
+  for (const outFlow of outFlows) {
+    if (outFlow.sink) {
+      path.next = new FlowSegment(start, outFlow);
+      path.next.sinksTo.add(outFlow.outCoords);
+      path.sinksTo.add(outFlow.outCoords);
+      return path;
+    }
+    else {
+      const nextPart = outFlow.internal ? start : adjacentPart(candidateParts, outFlow.outCoords, start);
+      if (nextPart !== null) {
+        // find a new path
+        filterTransitions(candidateParts, inCoord, outFlow.outCoords); // filter out same transition
+        filterTransitions(candidateParts, outFlow.outCoords, inCoord); // filter out reverse transition
+        const next = innerFlowPath(candidateParts, nextPart, outFlow);
+        if (next !== null && next.sinksTo.size) {
+          nextPaths.push(next);
+          next.sinksTo.forEach(sink => { path.sinksTo.add(sink); });
+        }
+      }
+    };
   }
 
-  path.removeInternalFlows();
+  if (nextPaths.length === 1) {
+    path.next = nextPaths[0];
+  }
 
-  path.transitions[inCoord] = [...new Set(path.transitions[inCoord])]; // remove duplicates
+  if (nextPaths.length > 1) {
+    path.splits = nextPaths;
+    return mergeOverlappingSplits(path);
+  }
 
-  let duplicated: FlowSegment | null = null;
-  do {
-    if (path.splits.length !== 0) {
-      duplicated = path.popDuplicatedLeaves();
-      if (duplicated !== null) {
-        if (path.next !== null) {
-          duplicated.addChild(path.next);
-        }
-        path.next = duplicated;
-      }
-    }
-  } while (duplicated !== null);
-
-  return path;
+  if (path.sinksTo.size !== 0) {
+    return path;
+  }
+  return null;
 };
 
-export const addFlowForSegment = (
+export const flowPath = (
   parts: FlowPart[],
-  segment: FlowSegment,
+  start: FlowPart,
+  inRoute: FlowRoute): FlowSegment | null =>
+  innerFlowPath(parts.map(part => ({ ...part, transitions: { ...part.transitions } })), start, inRoute);
+
+export const addFlowForPath = (
+  parts: FlowPart[],
+  path: FlowSegment,
   flows: LiquidFlow,
 ): FlowPart[] => {
 
   const inFlow: CalculatedFlows = {};
   const outFlow: CalculatedFlows = {};
+  const splitFlow: CalculatedFlows = {};
 
-  // add flow for root part
-  Object.entries(segment.transitions)
-    .forEach(([inCoords, outFlows]) => {
-      inFlow[inCoords] = mapValues(flows, v => -v);
-      if (segment.splits.length === 0) { // for split path, outflow is handled below to split it
-        outFlows.forEach((route: FlowRoute) => {
-          outFlow[route.outCoords] = outFlow[route.outCoords] ?
-            { ...outFlow[route.outCoords], ...flows }
-            : flows;
-        });
-      };
-    });
+  // add flow for incoming transition
+  inFlow[path.inRoute.outCoords] = mapValues(flows, v => -v);
 
-  if (segment.splits.length !== 0) {
-    // divide flow for split
-    const frictionInvTotal = segment.splits.reduce((acc, split) => acc + 1 / split.friction(), 0);
-    segment.splits
-      .forEach((child) => {
-        const invFriction = child.flowing ? 1 / child.friction() : 0;
-        const splitFlows: LiquidFlow = mapValues(flows,
-          flowVal => flowVal * invFriction / frictionInvTotal);
+  // add flow for outgoing flow
+  if (path.next) {
+    outFlow[path.next.inRoute.outCoords] = flows;
+  }
 
-        const childInCoords = Object.keys(child.transitions)[0];
-
-        for (const liquid in splitFlows) {
-          set(outFlow, [childInCoords, liquid], get(outFlow, [childInCoords, liquid], 0) + splitFlows[liquid]);
-        };
-
-        parts = addFlowForSegment(parts, child, splitFlows);
+  // divide flow for splits in between
+  if (path.splits.length !== 0) {
+    path.splits
+      .forEach((child, idx) => {
+        const scaledFlow = mapValues(flows, v => v * path.splitDivide[idx]);
+        splitFlow[child.inRoute.outCoords] = scaledFlow;
+        parts = addFlowForPath(parts, child, scaledFlow);
       });
   }
 
   parts = additionalFlow(
-    segment.root,
+    path.root,
     parts,
     {
       ...inFlow,
       ...outFlow,
+      ...splitFlow,
     }
   );
 
-
-  // add flow for next
-  if (segment.next) {
-    parts = addFlowForSegment(parts, segment.next, flows);
+  // continue path
+  if (path.next) {
+    parts = addFlowForPath(parts, path.next, flows);
   }
 
   return parts;
 };
 
-const addFlowFromPart = (parts, part): FlowPart[] => {
-  for (const inCoords in part.transitions) {
-    const outFlows = part.transitions[inCoords] || [];
-    for (const outFlow of outFlows) {
-      const liquids: string[] = outFlow.liquids || [];
-      if (outFlow.source && liquids.length > 0) {
-        const path = flowPath(parts, part, inCoords);
-        if (path !== null && path.flowing) {
-          const pressure: number = outFlow.pressure || 0;
-          const startFlow: LiquidFlow = {};
-          liquids.forEach((liquid: string) => {
-            const flow = path.flowing ? pressure / path.friction() : 0;
-            startFlow[liquid] = flow;
-          });
-          parts = addFlowForSegment(parts, path, startFlow);
-        }
+export const findPathsFromSources = (parts: FlowPart[], part: FlowPart): FlowSegment[] => {
+  const paths: FlowSegment[] = [];
+  for (const [inCoord, outCoords] of Object.entries(part.transitions)) {
+    const startFlow = outCoords.find(route => route.source && route.liquids);
+    if (startFlow) {
+      const path = flowPath(parts, part, { outCoords: inCoord, liquids: startFlow.liquids });
+      if (path !== null) {
+        paths.push(path);
       }
     }
   }
+  return paths;
+};
+
+const addFlowFromPart = (parts: FlowPart[], part: FlowPart): FlowPart[] => {
+  for (const path of findPathsFromSources(parts, part)) {
+    const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
+
+    if (path.inRoute.liquids) {
+      const startFlow: LiquidFlow = {};
+      for (const liquid of path.inRoute.liquids) {
+        startFlow[liquid] = pressureDiff / friction;
+      };
+      parts = addFlowForPath(parts, path, startFlow);
+    }
+
+  }
   return parts;
 };
 
-// total flow is a superposition of all pressure sources in the system
+// total flow is a superposition of all sources in the system
 // for each part, add the flow it adds to the global list of parts
 // merge the flows afterwards
 export const calculateFlows = (parts: FlowPart[]): FlowPart[] =>

@@ -3,7 +3,7 @@ import { typeName } from '@/plugins/spark/features/ActuatorPwm/getters';
 import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
 import { sparkStore } from '@/plugins/spark/store';
 
-import { ACCELERATE_OTHERS, DEFAULT_PUMP_PRESSURE, LEFT, RIGHT } from '../getters';
+import { DEFAULT_PUMP_PRESSURE, LEFT, RIGHT } from '../getters';
 import { settingsBlock } from '../helpers';
 import { PartSpec, PersistentPart } from '../types';
 
@@ -20,8 +20,8 @@ const spec: PartSpec = {
       ? (block.data.setting / 100) * DEFAULT_PUMP_PRESSURE
       : 0;
     return {
-      [LEFT]: [{ outCoords: RIGHT, source: true, pressure: -pressure, liquids: [ACCELERATE_OTHERS] }],
-      [RIGHT]: [{ outCoords: LEFT, pressure, source: true, liquids: [ACCELERATE_OTHERS] }],
+      [LEFT]: [{ outCoords: RIGHT, source: true }],
+      [RIGHT]: [{ outCoords: LEFT, pressure, source: true }],
     };
   },
   interactHandler: (part: PersistentPart) => {

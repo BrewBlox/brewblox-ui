@@ -3,7 +3,7 @@ import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/t
 import { sparkStore } from '@/plugins/spark/store';
 import { DigitalState } from '@/plugins/spark/types';
 
-import { ACCELERATE_OTHERS, DEFAULT_PUMP_PRESSURE, LEFT, RIGHT } from '../getters';
+import { DEFAULT_PUMP_PRESSURE, LEFT, RIGHT } from '../getters';
 import { settingsBlock } from '../helpers';
 import { PartSpec, PartUpdater, PersistentPart } from '../types';
 
@@ -21,11 +21,11 @@ const spec: PartSpec = {
       : part.settings.enabled;
 
     const pressure = enabled
-      ? part.settings.pressure || DEFAULT_PUMP_PRESSURE
+      ? part.settings.pressure !== undefined ? part.settings.pressure : DEFAULT_PUMP_PRESSURE
       : 0;
     return {
-      [LEFT]: [{ outCoords: RIGHT, sink: true }],
-      [RIGHT]: [{ outCoords: LEFT, pressure, source: true, liquids: [ACCELERATE_OTHERS] }],
+      [LEFT]: [{ outCoords: RIGHT }],
+      [RIGHT]: [{ outCoords: LEFT, pressure }],
     };
   },
   interactHandler: (part: PersistentPart, updater: PartUpdater) => {
