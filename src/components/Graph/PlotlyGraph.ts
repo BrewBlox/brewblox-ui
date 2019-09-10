@@ -36,6 +36,7 @@ const eventNames = [
 
 @Component
 export default class PlotlyGraph extends Vue {
+  private firstRender = false;
   private zoomed = false;
   private skippedRender = false;
 
@@ -78,8 +79,8 @@ export default class PlotlyGraph extends Vue {
   private attachListeners(): void {
     Object.keys(this.$listeners)
       .forEach(name => this.plotlyElement.on(name, (...args) => this.$emit(name, ...args)));
-    this.plotlyElement.on('plotly_relayout', this.pauseRender);
-    this.plotlyElement.on('plotly_doubleclick', this.resumeRender);
+    this.plotlyElement.on('plotly_relayout', this.onRelayout);
+    this.plotlyElement.on('plotly_doubleclick', this.onDoubleClick);
   }
 
   private getSize(): { width: number; height: number } {
@@ -114,11 +115,13 @@ export default class PlotlyGraph extends Vue {
     Plotly.Plots.resize(this.plotlyElement);
   }
 
-  private pauseRender(): void {
-    this.zoomed = true;
+  private onRelayout(eventdata: Mapped<any>): void {
+    if (eventdata['xaxis.range[0]'] || eventdata['xaxis.range[1]']) {
+      this.zoomed = true;
+    }
   }
 
-  private resumeRender(): void {
+  private onDoubleClick(): void {
     this.zoomed = false;
     if (this.skippedRender) {
       this.skippedRender = false;
