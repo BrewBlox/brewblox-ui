@@ -84,3 +84,9 @@ export function horizontalChevrons(cX: number, cY: number): { left: string[]; ri
     ],
   };
 }
+
+export function colorString(val: string | null): string {
+  return val
+    ? (val.startsWith('#') ? val : `#${val}`)
+    : '';
+}
