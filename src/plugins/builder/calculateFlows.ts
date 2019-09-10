@@ -1,9 +1,3 @@
-/**
- * IMPORTANT: this file is used by a web worker.
- * It can't import any modules with a dependency on a VueX store.
- * You'll notice it went wrong if your Webpack build fails with 0 errors.
- */
-
 import get from 'lodash/get';
 import has from 'lodash/has';
 import mapKeys from 'lodash/mapKeys';

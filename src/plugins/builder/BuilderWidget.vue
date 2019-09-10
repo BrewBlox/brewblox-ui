@@ -5,7 +5,7 @@ import { Component, Watch } from 'vue-property-decorator';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 
-import CalcWorker from 'worker-loader!./calculator.worker';
+import { calculateNormalizedFlows } from './calculateFlows';
 import { defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes, SQUARE_SIZE } from './getters';
 import { asPersistentPart, asStatePart } from './helpers';
 import { builderStore } from './store';
@@ -14,7 +14,6 @@ import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart } f
 
 @Component
 export default class BuilderWidget extends WidgetBase {
-  worker: CalcWorker = new CalcWorker();
   specs = builderStore.specs;
   flowParts: FlowPart[] = [];
   debouncedCalculate: Function = () => { };
@@ -136,7 +135,7 @@ export default class BuilderWidget extends WidgetBase {
   async calculate(): Promise<void> {
     await this.$nextTick();
     if (!this.editorActive) {
-      this.worker.postMessage(this.parts.map(asStatePart));
+      this.flowParts = calculateNormalizedFlows(this.parts.map(asStatePart));
     }
   }
 
@@ -160,13 +159,8 @@ export default class BuilderWidget extends WidgetBase {
 
   created(): void {
     this.migrate();
-    this.worker.onmessage = (evt: MessageEvent) => this.flowParts = evt.data;
     this.debouncedCalculate = debounce(this.calculate, 200, false);
     this.debouncedCalculate();
-  }
-
-  destroyed(): void {
-    this.worker.terminate();
   }
 
   @Watch('layout')
