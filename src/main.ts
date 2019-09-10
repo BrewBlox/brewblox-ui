@@ -9,6 +9,7 @@ import builder from './plugins/builder';
 import database from './plugins/database';
 import history from './plugins/history';
 import spark from './plugins/spark';
+import stepper from './plugins/stepper';
 import router from './router';
 import store from './store';
 import { pluginStore, UIPlugin } from './store/plugins';
@@ -51,6 +52,7 @@ async function setup(): Promise<void> {
 
   const plugins: PluginObject<any>[] = [
     PortalVue,
+    stepper,
     history,
     spark,
     builder,
