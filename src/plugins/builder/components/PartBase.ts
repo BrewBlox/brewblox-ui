@@ -75,6 +75,7 @@ export default class PartBase extends Vue {
 
   private rotatedCoord(coord: string): string {
     return new Coordinates(coord)
+      .flipShapeEdge(!!this.flipped, 0, this.size)
       .rotateShapeEdge(this.part.rotate, 0, this.size)
       .toString();
   }

@@ -2,7 +2,7 @@
 import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
-import { BEER, COLD_WATER, HOT_WATER, WORT } from '../getters';
+import { BEER, COLD_WATER, DEFAULT_IO_PRESSURE, HOT_WATER, WORT } from '../getters';
 import PartCard from './PartCard';
 
 @Component
@@ -30,7 +30,7 @@ export default class LiquidSourceCard extends PartCard {
   }
 
   togglePressure(enabled: boolean): void {
-    const pressure = enabled ? 10 : 0;
+    const pressure = enabled ? DEFAULT_IO_PRESSURE : 0;
     this.savePart({ ...this.part, settings: { ...this.part.settings, pressure } });
   }
 }

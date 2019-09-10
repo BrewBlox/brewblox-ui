@@ -2,11 +2,16 @@
 import { Component } from 'vue-property-decorator';
 
 import PartBase from '../components/PartBase';
+import { colorString } from '../helpers';
 
 @Component
 export default class Kettle extends PartBase {
   get titleText(): string {
     return this.part.settings.text || '';
+  }
+
+  get color(): string {
+    return colorString(this.part.settings.color);
   }
 }
 </script>
@@ -14,7 +19,7 @@ export default class Kettle extends PartBase {
 <template>
   <g>
     <rect
-      :fill="part.settings.color"
+      :fill="color"
       :x="2"
       :y="squares(1)+2"
       :width="squares(sizeX)-4"

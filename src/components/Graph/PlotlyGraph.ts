@@ -36,6 +36,9 @@ const eventNames = [
 
 @Component
 export default class PlotlyGraph extends Vue {
+  private firstRender = false;
+  private zoomed = false;
+  private skippedRender = false;
 
   @Ref()
   public readonly plotlyElement!: any;
@@ -76,6 +79,8 @@ export default class PlotlyGraph extends Vue {
   private attachListeners(): void {
     Object.keys(this.$listeners)
       .forEach(name => this.plotlyElement.on(name, (...args) => this.$emit(name, ...args)));
+    this.plotlyElement.on('plotly_relayout', this.onRelayout);
+    this.plotlyElement.on('plotly_doubleclick', this.onDoubleClick);
   }
 
   private getSize(): { width: number; height: number } {
@@ -110,15 +115,26 @@ export default class PlotlyGraph extends Vue {
     Plotly.Plots.resize(this.plotlyElement);
   }
 
-  private async renderPlot(): Promise<void> {
+  private onRelayout(eventdata: Mapped<any>): void {
+    if (eventdata['xaxis.range[0]'] || eventdata['xaxis.range[1]']) {
+      this.zoomed = true;
+    }
+  }
+
+  private onDoubleClick(): void {
+    this.zoomed = false;
+    if (this.skippedRender) {
+      this.skippedRender = false;
+      this.renderPlot();
+    }
+  }
+
+  private async createPlot(): Promise<void> {
     if (!this.plotlyElement) {
       return;
     }
-    // According to the Plotly documentation,
-    // Plotly.react() is much faster for updating existing Plots.
-    // The downside is that parent <span> elements get confused, and rerender empty.
-    // https://plot.ly/javascript/plotlyjs-function-reference/#plotlynewplot
     try {
+      // https://plot.ly/javascript/plotlyjs-function-reference/#plotlynewplot
       await Plotly.newPlot(
         this.plotlyElement,
         this.data,
@@ -126,6 +142,26 @@ export default class PlotlyGraph extends Vue {
         this.config,
       );
       this.attachListeners();
+    } catch (e) {
+      this.$emit('error', e.message);
+    }
+  }
+
+  private async renderPlot(): Promise<void> {
+    if (!this.plotlyElement) {
+      return;
+    }
+    if (this.zoomed) {
+      this.skippedRender = true;
+      return;
+    }
+    try {
+      await Plotly.react(
+        this.plotlyElement,
+        this.data,
+        this.resizedLayout(),
+        this.config,
+      );
     } catch (e) {
       this.$emit('error', e.message);
     }
@@ -151,7 +187,7 @@ export default class PlotlyGraph extends Vue {
   }
 
   public mounted(): void {
-    this.renderPlot();
+    this.createPlot();
     window.addEventListener('resize', this.resizeHandler);
     this.$watch('revision', this.resizePlot);
   }

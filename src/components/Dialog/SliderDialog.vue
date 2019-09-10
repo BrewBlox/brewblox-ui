@@ -27,6 +27,9 @@ export default class SliderDialog extends DialogBase {
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
+  @Prop({ type: Array, default: () => [] })
+  public readonly quickActions!: SelectOption[];
+
   save(): void {
     this.onDialogOk(this.local);
   }
@@ -54,6 +57,11 @@ export default class SliderDialog extends DialogBase {
               {{ label }}
             </q-item-label>
             <q-slider v-model="local" :min="min" :max="max" dark label-always />
+          </q-item-section>
+        </q-item>
+        <q-item v-if="quickActions.length" dark>
+          <q-item-section v-for="q in quickActions" :key="'quick'+q.value">
+            <q-btn unelevated :label="q.label" @click="local = q.value" />
           </q-item-section>
         </q-item>
       </q-card-section>

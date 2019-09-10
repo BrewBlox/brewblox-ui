@@ -12,7 +12,7 @@ import { deepCopy, deserialize, serialize } from '@/helpers/units/parseObject';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
-import CalcWorker from 'worker-loader!./calculator.worker';
+import { calculateNormalizedFlows } from './calculateFlows';
 import { defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes, SQUARE_SIZE } from './getters';
 import { asPersistentPart, asStatePart } from './helpers';
 import { builderStore } from './store';
@@ -53,7 +53,6 @@ export default class BuilderEditor extends DialogBase {
   @Ref()
   readonly grid!: any;
 
-  worker: CalcWorker = new CalcWorker();
   specs = builderStore.specs;
 
   layoutId: string | null = null;
@@ -342,7 +341,7 @@ export default class BuilderEditor extends DialogBase {
 
   async calculate(): Promise<void> {
     await this.$nextTick();
-    this.worker.postMessage(this.parts.map(asStatePart));
+    this.updateFlowParts(calculateNormalizedFlows(this.parts.map(asStatePart)));
   }
 
   gridRect(): Rect {
@@ -682,8 +681,8 @@ export default class BuilderEditor extends DialogBase {
       });
   }
 
-  updateFlowParts({ data }: { data: FlowPart[] }): void {
-    this.flowParts = data;
+  updateFlowParts(parts: FlowPart[]): void {
+    this.flowParts = parts;
     if (this.selectedParts.length > 0) {
       const selectedIds = this.selectedParts.map(p => p.id);
       this.selectedParts = this.flowParts
@@ -695,13 +694,11 @@ export default class BuilderEditor extends DialogBase {
   created(): void {
     builderStore.commitEditorActive(true);
     window.addEventListener('keyup', this.keyHandler);
-    this.worker.onmessage = this.updateFlowParts;
     this.debouncedCalculate = debounce(this.calculate, 150, false);
     this.debouncedCalculate();
   }
 
   destroyed(): void {
-    this.worker.terminate();
     window.removeEventListener('keyup', this.keyHandler);
     builderStore.commitEditorActive(false);
   }
