@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { colorString } from '../helpers';
 import PartCard from './PartCard';
 
 @Component
@@ -10,12 +11,7 @@ export default class ColorCard extends PartCard {
   }
 
   set color(val: string) {
-    const color = val ?
-      !val.startsWith('#') ?
-        `#${val}`
-        : val
-      : '';
-    this.savePartSettings({ ...this.part.settings, color });
+    this.savePartSettings({ ...this.part.settings, color: colorString(val) });
   }
 }
 </script>

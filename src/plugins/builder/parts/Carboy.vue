@@ -2,6 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import PartBase from '../components/PartBase';
+import { colorString } from '../helpers';
 
 @Component
 export default class Carboy extends PartBase {
@@ -21,8 +22,8 @@ export default class Carboy extends PartBase {
     C99,194.6,94.6,199,89.2,199
     z`;
 
-  get color(): string | null {
-    return this.part.settings.color || '';
+  get color(): string {
+    return colorString(this.part.settings.color);
   }
 }
 </script>

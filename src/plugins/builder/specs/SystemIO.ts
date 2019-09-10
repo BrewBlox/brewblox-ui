@@ -1,4 +1,4 @@
-import { IN_OUT, RIGHT } from '../getters';
+import { CENTER, RIGHT } from '../getters';
 import { PartSpec, PersistentPart } from '../types';
 
 const spec: PartSpec = {
@@ -6,13 +6,13 @@ const spec: PartSpec = {
   size: () => [1, 1],
   cards: [{ component: 'LiquidSourceCard' }],
   transitions: (part: PersistentPart) => ({
-    [IN_OUT]: [{
+    [CENTER]: [{
       outCoords: RIGHT,
       pressure: part.settings.pressure || 0,
       liquids: part.settings.pressure ? part.settings.liquids || [] : [],
       source: true,
     }],
-    [RIGHT]: [{ outCoords: IN_OUT, sink: true }],
+    [RIGHT]: [{ outCoords: CENTER, sink: true }],
   }),
 };
 

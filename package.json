@@ -85,6 +85,7 @@
     "fork-ts-checker-webpack-plugin": "^1.5.0",
     "git-describe": "^4.0.4",
     "jest": "^23.6.0",
+    "prettier-eslint": "^9.0.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
     "semver": "^5.7.0",
