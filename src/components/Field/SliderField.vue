@@ -28,6 +28,9 @@ export default class SliderField extends FieldBase {
   @Prop({ type: Number, default: 2 })
   readonly decimals!: number;
 
+  @Prop({ type: Array, default: () => [] })
+  public readonly quickActions!: SelectOption[];
+
   @Emit('input')
   public change(v: number): number {
     return v;
@@ -53,6 +56,7 @@ export default class SliderField extends FieldBase {
       min: this.min,
       max: this.max,
       step: this.step,
+      quickActions: this.quickActions,
     })
       .onOk(this.change);
   }

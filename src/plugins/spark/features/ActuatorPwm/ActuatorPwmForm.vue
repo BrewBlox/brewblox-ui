@@ -8,6 +8,12 @@ import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
 export default class ActuatorPwmForm extends BlockCrudComponent {
   readonly block!: ActuatorPwmBlock;
 
+  quickValues = [
+    { label: '0%', value: 0 },
+    { label: '50%', value: 50 },
+    { label: '100%', value: 100 },
+  ]
+
   get isConstrained(): boolean {
     return this.block.data.enabled
       && this.block.data.setting !== this.block.data.desiredSetting;
@@ -66,6 +72,7 @@ export default class ActuatorPwmForm extends BlockCrudComponent {
               <SliderField
                 :value="block.data.setting"
                 :readonly="isDriven"
+                :quick-actions="quickValues"
                 tag="big"
                 title="Setting"
                 @input="v => { block.data.desiredSetting = v; saveBlock(); }"
