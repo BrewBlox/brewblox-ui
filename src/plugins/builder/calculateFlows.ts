@@ -36,7 +36,6 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
     (flow, inCoord) =>
       new Coordinates(inCoord)
         .translate([-part.x, -part.y, 0])
-        .flipShapeEdge(!!part.flipped, part.rotate, part.size)
         .toString()
   );
 
