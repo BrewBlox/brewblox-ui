@@ -55,7 +55,7 @@ const beerCoolConfig: Partial<PidData> = {
 };
 
 const fridgeCoolConfig: Partial<PidData> = {
-  kp: new Unit(-50, '1/degC'),
+  kp: new Unit(-20, '1/degC'),
   ti: new Unit(2, 'hour'),
   td: new Unit(10, 'min'),
 };

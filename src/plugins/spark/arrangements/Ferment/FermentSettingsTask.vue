@@ -77,7 +77,11 @@ export default class FermentSettingsTask extends WizardTaskBase {
             Initial setpoints
           </q-item-label>
           <p>The setup creates 2 setpoints, one for your beer and one for your fridge.</p>
-          <p>To change which temperature is actively controlled, you will change which setpoint is used as input for your PIDs.</p>
+          <p>
+            To change which temperature is actively controlled,
+            you will change which setpoint is used as input by the PIDs.
+            The quick actions on your dashboard will help you switch and reconfigure the PIDs.<br />
+          </p>
           <p>You can set the initial values now.</p>
         </q-item-section>
       </q-item>
@@ -96,7 +100,7 @@ export default class FermentSettingsTask extends WizardTaskBase {
         </q-item-section>
         <q-item-section class="col-auto">
           <q-item-label caption>
-            Setpoint used by control
+            Setpoint used for control
           </q-item-label>
           <div class="row">
             <q-btn-toggle
