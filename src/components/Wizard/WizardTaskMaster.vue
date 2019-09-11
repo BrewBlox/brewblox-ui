@@ -27,6 +27,9 @@ export default class WizardTaskMaster extends Vue {
 
   previousTask(): void {
     if (this.taskHistory.length > 0) {
+      if (this.currentTask !== null) {
+        this.tasks.push(this.currentTask);
+      }
       this.currentTask = this.taskHistory.pop() || null;
     } else {
       this.back();

@@ -142,9 +142,11 @@ export default class FermentHardwareTask extends WizardTaskBase {
 <template>
   <div>
     <q-card-section>
-      <q-item>
+      <q-item dark>
         <q-item-section>
-          <big>Hardware Blocks</big>
+          <q-item-label class="text-subtitle1 text-primary">
+            Assign Hardware Blocks
+          </q-item-label>
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn flat round icon="refresh" @click="discover">
@@ -157,8 +159,9 @@ export default class FermentHardwareTask extends WizardTaskBase {
           </q-btn>
         </q-item-section>
       </q-item>
-      <q-item dark>
-        <q-item-section class="text-italic">
+      <q-item dark class="text-weight-light">
+        <q-item-section>
+          Select which hardware should be used for each function.<br />
           You can unplug or heat sensors to identify them.
           The current value will be shown under each dropdown menu.
         </q-item-section>

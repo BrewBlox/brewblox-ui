@@ -162,13 +162,26 @@ export default class FermentNamingTask extends WizardTaskBase {
   <div>
     <q-card-section style="height: 60vh">
       <q-scroll-area>
+        <q-item dark class="text-weight-light">
+          <q-item-section>
+            <q-item-label class="text-subtitle1 text-primary">
+              Name your blocks and dashboards
+            </q-item-label>
+            <p>
+              Enter a name for your new process below. The prefix will be used to suggest names for your new blocks.
+            </p>
+          </q-item-section>
+        </q-item>
+
+
         <CardWarning v-if="groupError">
           <template #message>
             {{ groupError }}
           </template>
         </CardWarning>
         <!-- Generic settings -->
-        <q-expansion-item default-opened label="Arrangement settings" icon="settings" dense>
+
+        <q-expansion-item default-opened label="Setup name" icon="settings" dense>
           <q-item dark>
             <q-select
               v-model="serviceId"
@@ -181,7 +194,7 @@ export default class FermentNamingTask extends WizardTaskBase {
             />
           </q-item>
           <q-item dark>
-            <q-input v-model="arrangementId" label="Arrangement name" dark>
+            <q-input v-model="arrangementId" label="Process name" dark>
               <template v-slot:append>
                 <q-btn
                   icon="mdi-backup-restore"
