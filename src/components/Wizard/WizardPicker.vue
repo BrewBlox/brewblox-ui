@@ -30,7 +30,7 @@ export default class WizardPicker extends Vue {
 
 <template>
   <q-card dark class="widget-modal">
-    <DialogToolbar>{{ title }}</DialogToolbar>
+    <DialogToolbar><q-icon name="mdi-creation" class="q-mx-sm" />{{ title }}</DialogToolbar>
     <component
       :is="wizardComponent"
       v-if="wizardComponent"
@@ -41,21 +41,21 @@ export default class WizardPicker extends Vue {
 
     <q-scroll-area v-else style="height: 80vh;">
       <q-card-section>
-        <q-item link clickable dark @click="wizardComponent = 'ServiceWizardPicker'">
-          <q-item-section side class="col-3">
-            <q-item-label class="text-h6">
-              Service
+        <q-item link clickable dark @click="wizardComponent = 'ArrangementWizardPicker'">
+          <q-item-section side class="col-4">
+            <q-item-label class="text-h6 text-primary">
+              Quick Start
             </q-item-label>
             <q-item-label caption>
-              Click to start
+              Add a brewing process
             </q-item-label>
           </q-item-section>
           <q-item-section>
-            <ul>
-              <li>Services communicate with containers in docker-compose.</li>
-              <li>There should be one service per container.</li>
-              <li>There can be multiple services of the same type.</li>
-            </ul>
+            <p>This wizard helps to set up common brewing setups, like a fermentation fridge or a HERMS.</p>
+            <p>
+              It will create all required blocks on the controller
+              and a new dashboard for quick access to settings and graphs.
+            </p>
           </q-item-section>
         </q-item>
       </q-card-section>
@@ -64,20 +64,16 @@ export default class WizardPicker extends Vue {
 
       <q-card-section>
         <q-item link clickable dark @click="wizardComponent = 'DashboardWizard'">
-          <q-item-section side class="col-3">
-            <q-item-label class="text-h6">
-              Dashboard
+          <q-item-section side class="col-4">
+            <q-item-label class="text-h6 text-primary">
+              New Dashboard
             </q-item-label>
             <q-item-label caption>
-              Click to start
+              Add an empty dashboard
             </q-item-label>
           </q-item-section>
           <q-item-section>
-            <ul>
-              <li>Dashboards display widgets.</li>
-              <li>You can have as many dashboards as you want.</li>
-              <li>Deleting a dashboard will delete all widgets on the dashboard.</li>
-            </ul>
+            <p>You can then add widgets to a dashboard to create a custom UI for your brewery.</p>
           </q-item-section>
         </q-item>
       </q-card-section>
@@ -86,41 +82,19 @@ export default class WizardPicker extends Vue {
 
       <q-card-section>
         <q-item link clickable dark @click="wizardComponent = 'WidgetWizardPicker'">
-          <q-item-section side class="col-3">
-            <q-item-label class="text-h6">
-              Widget
+          <q-item-section side class="col-4">
+            <q-item-label class="text-h6 text-primary">
+              New Widget
             </q-item-label>
             <q-item-label caption>
-              Click to start
+              Add a widget to a dashboard
             </q-item-label>
           </q-item-section>
           <q-item-section>
-            <ul>
-              <li>A Widget is a card on a dashboard.</li>
-              <li>Widgets can be anything, but usually display something from a service.</li>
-              <li>Multiple block widgets can be linked to the same block on a Spark controller.</li>
-            </ul>
-          </q-item-section>
-        </q-item>
-      </q-card-section>
-
-      <q-separator dark inset />
-
-      <q-card-section>
-        <q-item link clickable dark @click="wizardComponent = 'ArrangementWizardPicker'">
-          <q-item-section side class="col-3">
-            <q-item-label class="text-h6">
-              Arrangement
-            </q-item-label>
-            <q-item-label caption>
-              Click to start
-            </q-item-label>
-          </q-item-section>
-          <q-item-section>
-            <ul>
-              <li>An arrangement creates and configures a group of widgets.</li>
-              <li>This is a quick way to set up default configurations.</li>
-            </ul>
+            <p>A widget is a card on dashboard with a specific function. Many different widget types are available.</p>
+            <p>
+              There are widgets for each block type on the controller, graph widgets, brewery overview widgets and more.
+            </p>
           </q-item-section>
         </q-item>
       </q-card-section>
@@ -129,19 +103,41 @@ export default class WizardPicker extends Vue {
 
       <q-card-section>
         <q-item link clickable dark @click="wizardComponent = 'ImportWizard'">
-          <q-item-section side class="col-3">
-            <q-item-label class="text-h6">
-              Import
+          <q-item-section side class="col-4">
+            <q-item-label class="text-h6 text-primary">
+              Import Widget
             </q-item-label>
             <q-item-label caption>
-              Click to start
+              Add a widget from a file
             </q-item-label>
           </q-item-section>
           <q-item-section>
-            <ul>
-              <li>Import widget from JSON string</li>
-              <li>Use widgets shared by other users</li>
-            </ul>
+            <p>
+              Import a previously exported widget from a file.
+            </p>
+          </q-item-section>
+        </q-item>
+      </q-card-section>
+
+      <q-separator dark inset />
+
+      <q-card-section>
+        <q-item link clickable dark @click="wizardComponent = 'ServiceWizardPicker'">
+          <q-item-section side class="col-4">
+            <q-item-label class="text-h6 text-primary">
+              New service
+            </q-item-label>
+            <q-item-label caption>
+              Add a service to the UI
+            </q-item-label>
+          </q-item-section>
+          <q-item-section>
+            <p>
+              If you have multiple BrewBlox Sparks, you will have a separate service to connect each one.
+            </p>
+            <p>
+              You should add them to the UI here, after you have added them in your docker-compose file.
+            </p>
           </q-item-section>
         </q-item>
       </q-card-section>
