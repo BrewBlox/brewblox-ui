@@ -30,7 +30,7 @@ const spec: PartSpec = {
       [CENTER]: [{
         outCoords: UP,
         pressure,
-        liquids: part.settings.liquids || [],
+        liquids: enabled ? part.settings.liquids || [] : [],
         source: true,
       }],
       [UP]: [{ outCoords: CENTER, sink: true }],
