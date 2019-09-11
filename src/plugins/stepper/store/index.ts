@@ -137,23 +137,28 @@ export class StepperModule extends VuexModule {
   }
 
   @Action({ rawError })
+  public async fetchRuntime(process: Process | Runtime): Promise<void> {
+    this.commitRuntime(await api.fetchRuntime(process));
+  }
+
+  @Action({ rawError })
+  public async fetchStatus(process: Process | Runtime): Promise<void> {
+    this.commitStatus(await api.fetchStatus(process));
+  }
+
+  @Action({ rawError })
   public async startProcess(process: Process): Promise<void> {
     this.commitRuntime(await api.startProcess(process));
   }
 
   @Action({ rawError })
-  public async fetchRuntime({ id }: { id: string }): Promise<void> {
-    this.commitRuntime(await api.fetchRuntime({ id }));
+  public async advanceProcess(process: Runtime | Process): Promise<void> {
+    this.commitRuntime(await api.advanceProcess(process));
   }
 
   @Action({ rawError })
-  public async fetchStatus({ id }: { id: string }): Promise<void> {
-    this.commitStatus(await api.fetchStatus({ id }));
-  }
-
-  @Action({ rawError })
-  public async exitProcess(runtime: Runtime): Promise<void> {
-    this.commitRemoveRuntime(await api.exitRuntime(runtime));
+  public async exitProcess(process: Process | Runtime): Promise<void> {
+    this.commitRemoveRuntime(await api.exitRuntime(process));
   }
 }
 

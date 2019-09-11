@@ -64,9 +64,9 @@ export const startProcess =
 
 
 export const advanceProcess =
-  async (process: Process): Promise<Runtime> =>
-    post(`/stepper/advance/${encodeURIComponent(process.id)}`, {})
-      .catch(intercept(`Failed to advance process ${process.id}`));
+  async ({ id }: { id: string }): Promise<Runtime> =>
+    post(`/stepper/advance/${encodeURIComponent(id)}`, {})
+      .catch(intercept(`Failed to advance process ${id}`));
 
 
 export const fetchRuntimes =
