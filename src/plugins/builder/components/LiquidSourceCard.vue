@@ -7,30 +7,29 @@ import PartCard from './PartCard';
 
 @Component
 export default class LiquidSourceCard extends PartCard {
-  get liquidColors(): string[] {
-    return [
-      COLD_WATER,
-      HOT_WATER,
-      BEER,
-      WORT,
-    ];
-  }
+  presetColors = [
+    COLD_WATER,
+    HOT_WATER,
+    BEER,
+    WORT,
+  ];
 
   get pressured(): boolean {
     return get(this.part.settings, 'enabled', !!this.part.settings.pressure);
   }
 
-  get currentLiquids(): string[] {
-    return get(this.part.settings, 'liquids', []);
-  }
-
-  changeLiquidSource(liquidSource: string): void {
-    const liquids = [liquidSource];
-    this.savePart({ ...this.part, settings: { ...this.part.settings, liquids } });
-  }
-
-  toggle(enabled: boolean): void {
+  set pressured(enabled: boolean) {
     this.savePart({ ...this.part, settings: { ...this.part.settings, enabled } });
+  }
+
+  get color(): string | null {
+    const [val] = this.part.settings.liquids || [null];
+    return val || null;
+  }
+
+  set color(val: string | null) {
+    const liquids = val ? [val] : [];
+    this.savePart({ ...this.part, settings: { ...this.part.settings, liquids } });
   }
 }
 </script>
@@ -43,17 +42,26 @@ export default class LiquidSourceCard extends PartCard {
         <q-item-label caption>
           Enabled
         </q-item-label>
-        <q-toggle :value="pressured" @input="toggle" />
+        <q-toggle v-model="pressured" />
       </q-item-section>
-      <q-item-section v-for="color in liquidColors" :key="color">
+      <q-item-section>
+        <q-item-label caption>
+          Liquid color
+        </q-item-label>
+        <ColorField
+          v-model="color"
+          title="Liquid color"
+          message="Choose a fill color for this source."
+        />
+      </q-item-section>
+      <q-item-section v-for="colorOpt in presetColors" :key="colorOpt">
         <q-btn
-          :style="`background-color: ${color}`"
-          :size="currentLiquids.includes(color) ? 'lg' : 'md'"
-          :disable="!pressured"
+          :style="`background-color: ${colorOpt}`"
+          :size="color == colorOpt ? 'lg' : 'md'"
           round
           icon="format_color_fill"
           class="q-mx-auto"
-          @click="changeLiquidSource(color)"
+          @click="color = colorOpt"
         />
       </q-item-section>
     </q-item>
