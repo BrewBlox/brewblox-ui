@@ -46,4 +46,5 @@ export interface HermsConfig {
   };
   hltPin: PinChannel;
   bkPin: PinChannel;
+  mutex: boolean;
 }

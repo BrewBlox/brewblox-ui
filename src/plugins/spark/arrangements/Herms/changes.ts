@@ -53,9 +53,6 @@ export function defineChangedBlocks(config: HermsConfig): Block[] {
 
 export function defineCreatedBlocks(
   config: HermsConfig,
-  mtSetting: Unit,
-  bkSetting: Unit,
-  balanced: boolean,
 ): Block[] {
   const groups = [0];
   const serviceId = config.serviceId;
@@ -63,7 +60,7 @@ export function defineCreatedBlocks(
   const pwmConstraints: AnalogConstraint[] = [];
   const actuatorConstraints: DigitalConstraint[] = [];
 
-  if (balanced) {
+  if (config.mutex) {
     pwmConstraints.push({
       balanced: {
         balancerId: new BalancerLink(config.names.balancer),
@@ -108,7 +105,7 @@ export function defineCreatedBlocks(
       groups,
       data: {
         sensorId: new Link(config.names.hltSensor),
-        storedSetting: mtSetting,
+        storedSetting: new Unit(70, 'degC'),
         settingEnabled: true,
         setting: new Unit(null, 'degC'),
         value: new Unit(null, 'degC'),
@@ -125,7 +122,7 @@ export function defineCreatedBlocks(
       groups,
       data: {
         sensorId: new Link(config.names.mtSensor),
-        storedSetting: mtSetting,
+        storedSetting: new Unit(72, 'degC'),
         settingEnabled: true,
         setting: new Unit(null, 'degC'),
         value: new Unit(null, 'degC'),
@@ -142,7 +139,7 @@ export function defineCreatedBlocks(
       groups,
       data: {
         sensorId: new Link(config.names.bkSensor),
-        storedSetting: bkSetting,
+        storedSetting: new Unit(67, 'degC'),
         settingEnabled: true,
         setting: new Unit(null, 'degC'),
         value: new Unit(null, 'degC'),
@@ -303,7 +300,7 @@ export function defineCreatedBlocks(
       PidBlock,
     ];
 
-  return balanced
+  return config.mutex
     ? [...balancerBlocks, ...baseBlocks]
     : baseBlocks;
 }
