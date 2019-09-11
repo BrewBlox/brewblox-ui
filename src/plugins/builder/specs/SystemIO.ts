@@ -21,13 +21,13 @@ const spec: PartSpec = {
   transitions: (part: PersistentPart) => {
     const enabled = get(part.settings, 'enabled', !!part.settings.pressure);
     const pressure = enabled
-      ? get(part.settings, 'onPressure', DEFAULT_IO_PRESSURE)
+      ? part.settings.onPressure || DEFAULT_IO_PRESSURE
       : 0;
     return {
       [CENTER]: [{
         outCoords: RIGHT,
         pressure,
-        liquids: part.settings.pressure ? part.settings.liquids || [] : [],
+        liquids: enabled ? part.settings.liquids || [] : [],
         source: true,
       }],
       [RIGHT]: [{ outCoords: CENTER, sink: true }],
