@@ -2,7 +2,7 @@
 import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
-import { BEER, COLD_WATER, DEFAULT_IO_PRESSURE, HOT_WATER, WORT } from '../getters';
+import { BEER, COLD_WATER, HOT_WATER, WORT } from '../getters';
 import PartCard from './PartCard';
 
 @Component
@@ -17,7 +17,7 @@ export default class LiquidSourceCard extends PartCard {
   }
 
   get pressured(): boolean {
-    return Boolean(this.part.settings.pressure);
+    return get(this.part.settings, 'enabled', !!this.part.settings.pressure);
   }
 
   get currentLiquids(): string[] {
@@ -29,9 +29,8 @@ export default class LiquidSourceCard extends PartCard {
     this.savePart({ ...this.part, settings: { ...this.part.settings, liquids } });
   }
 
-  togglePressure(enabled: boolean): void {
-    const pressure = enabled ? DEFAULT_IO_PRESSURE : 0;
-    this.savePart({ ...this.part, settings: { ...this.part.settings, pressure } });
+  toggle(enabled: boolean): void {
+    this.savePart({ ...this.part, settings: { ...this.part.settings, enabled } });
   }
 }
 </script>
@@ -42,9 +41,9 @@ export default class LiquidSourceCard extends PartCard {
     <q-item dark>
       <q-item-section>
         <q-item-label caption>
-          Pressure
+          Enabled
         </q-item-label>
-        <q-toggle :value="pressured" @input="togglePressure" />
+        <q-toggle :value="pressured" @input="toggle" />
       </q-item-section>
       <q-item-section v-for="color in liquidColors" :key="color">
         <q-btn
