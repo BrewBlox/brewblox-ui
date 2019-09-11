@@ -5,7 +5,7 @@ import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/t
 import { DigitalState } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
-import { LEFT } from '../getters';
+import { DEFAULT_PUMP_PRESSURE, LEFT } from '../getters';
 import { settingsBlock } from '../helpers';
 
 @Component
@@ -22,6 +22,11 @@ export default class Pump extends PartBase {
 
   get liquids(): string[] {
     return this.liquidOnCoord(LEFT);
+  }
+
+  get duration(): number {
+    const calculated = 60 / (this.settings.onPressure || DEFAULT_PUMP_PRESSURE);
+    return Math.max(calculated, 0.5); // Max out animation speed at 120 pressure
   }
 
   @Watch('actuatorBlock')
@@ -57,7 +62,7 @@ export default class Pump extends PartBase {
           type="rotate"
           from="0 0 0"
           to="-360 0 0"
-          dur="2s"
+          :dur="`${duration}s`"
           repeatCount="indefinite"
         />
         <!-- eslint-enable -->
