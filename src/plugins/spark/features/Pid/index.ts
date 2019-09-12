@@ -33,6 +33,9 @@ const block: BlockSpec = {
     derivative: new Unit(0, 'delta_degC*second'),
     drivenOutputId: new ActuatorAnalogLink(null),
     integralReset: 0,
+    boilPointAdjust: new Unit(0, 'delta_degC'),
+    boilMinOutput: 0,
+    boilModeActive: false,
   }),
   presets: [
     {
