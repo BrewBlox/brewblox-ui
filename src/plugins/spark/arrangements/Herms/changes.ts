@@ -145,7 +145,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
       data: {
         sensorId: new Link(config.names.bkSensor),
         storedSetting: new Unit(70, 'degC'),
-        settingEnabled: true,
+        settingEnabled: false,
         setting: new Unit(null, 'degC'),
         value: new Unit(null, 'degC'),
         valueUnfiltered: new Unit(null, 'degC'),
@@ -257,13 +257,14 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
       groups,
       data: {
         ...(sparkStore.specs[pidType].generate() as PidData),
-        enabled: false,
+        enabled: true,
         inputId: new Link(config.names.hltSetpoint),
         outputId: new Link(config.names.hltPwm),
         kp: opts.hltKp,
         ti: new Unit(10, 'min'),
         td: new Unit(10, 'second'),
         integralReset: 0,
+        boilMinOutput: 25,
       },
     },
     {
@@ -273,7 +274,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
       groups,
       data: {
         ...(sparkStore.specs[pidType].generate() as PidData),
-        enabled: false,
+        enabled: true,
         inputId: new Link(config.names.mtSetpoint),
         outputId: new Link(config.names.hltDriver),
         kp: opts.mtKp,
@@ -289,13 +290,14 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
       groups,
       data: {
         ...(sparkStore.specs[pidType].generate() as PidData),
-        enabled: false,
+        enabled: true,
         inputId: new Link(config.names.bkSetpoint),
         outputId: new Link(config.names.bkPwm),
         kp: opts.bkKp,
         ti: new Unit(5, 'min'),
         td: new Unit(10, 'min'),
         integralReset: 0,
+        boilMinOutput: 25,
       },
     },
   ] as [
@@ -402,50 +404,78 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
       serviceId: config.serviceId,
       steps: serialize([
         {
-          name: 'Disable all',
+          name: 'Disable all setpoints',
           id: uid(),
           changes: [
             {
               blockId: config.names.hltSetpoint,
-              data: { enabled: false },
+              data: { settingEnabled: false },
             },
             {
               blockId: config.names.mtSetpoint,
-              data: { enabled: false },
+              data: { settingEnabled: false },
             },
             {
               blockId: config.names.bkSetpoint,
-              data: { enabled: false },
+              data: { settingEnabled: false },
             },
           ],
         },
         {
-          name: 'Enable HLT',
+          name: 'Constant HLT Temp',
           id: uid(),
           changes: [
+            {
+              blockId: config.names.mtSetpoint,
+              data: { settingEnabled: false },
+            },
             {
               blockId: config.names.hltSetpoint,
-              data: { enabled: true },
+              data: {
+                settingEnabled: true,
+                storedSetting: new Unit(70, 'degC'),
+              },
+              confirmed: {
+                storedSetting: true,
+              },
             },
           ],
         },
         {
-          name: 'Enable MT',
+          name: 'Constant MT Temp',
           id: uid(),
           changes: [
             {
               blockId: config.names.mtSetpoint,
-              data: { enabled: true },
+              data: {
+                settingEnabled: true,
+                storedSetting: new Unit(66.7, 'degC'),
+              },
+              confirmed: {
+                storedSetting: true,
+              },
+            },
+            {
+              blockId: config.names.hltDriver,
+              data: {
+                enabled: true,
+              },
             },
           ],
         },
         {
-          name: 'Enable BK',
+          name: 'Constant BK Temp',
           id: uid(),
           changes: [
             {
               blockId: config.names.bkSetpoint,
-              data: { enabled: true },
+              data: {
+                settingEnabled: true,
+                storedSetting: new Unit(100, 'degC'),
+              },
+              confirmed: {
+                storedSetting: true,
+              },
             },
           ],
         },

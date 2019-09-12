@@ -124,10 +124,10 @@ export const truncateRound =
       return '---';
     }
     const v = +value;
-    if (Math.abs(v) > 100) {
+    if (Math.abs(v) >= 100) {
       return v.toFixed(0);
     }
-    if (Math.abs(v) > 10) {
+    if (Math.abs(v) >= 10) {
       return v.toFixed(1);
     }
     return v.toFixed(2);
