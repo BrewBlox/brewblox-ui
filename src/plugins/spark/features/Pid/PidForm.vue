@@ -207,7 +207,6 @@ export default class PidForm extends BlockCrudComponent {
             </q-item-label>
             <SliderField
               :value="block.data.boilMinOutput"
-              :quick-actions="quickValues"
               title="Minimum output"
               @input="v => { block.data.boilMinOutput = v; saveBlock(); }"
             />
