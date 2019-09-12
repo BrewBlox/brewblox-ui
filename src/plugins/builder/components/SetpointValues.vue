@@ -51,6 +51,12 @@ export default class SetpointValues extends Vue {
           && block.data.inputId.id === (this.setpoint as SetpointSensorPairBlock).id);
   }
 
+  get isDriven(): boolean {
+    return !!this.setpoint
+      && sparkStore.drivenChains(this.setpoint.serviceId)
+        .some(chain => chain[0] === (this.setpoint as SetpointSensorPairBlock).id);
+  }
+
   get setpointSetting(): number | null {
     return this.setpoint && this.isUsed
       ? this.setpoint.data.storedSetting.value
@@ -84,7 +90,7 @@ export default class SetpointValues extends Vue {
         <q-icon v-if="!setpoint" name="mdi-link-variant-off" />
         <small v-else>{{ setpointUnit }}</small>
         <br />
-        <q-icon name="mdi-bullseye-arrow" class="q-mr-sm" />
+        <q-icon :name="isDriven ? 'mdi-swap-vertical-bold' : 'mdi-bullseye-arrow'" class="q-mr-sm" />
         {{ setpointSetting | round(1) }}
         <q-icon v-if="!setpoint" name="mdi-link-variant-off" />
         <small v-else>{{ setpointUnit }}</small>

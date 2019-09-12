@@ -73,7 +73,7 @@ export default class FermentSettingsTask extends WizardTaskBase {
     <q-card-section>
       <q-item dark class="text-weight-light">
         <q-item-section>
-          <q-item-label class="text-subtitle1 text-primary">
+          <q-item-label class="text-subtitle1">
             Initial setpoints
           </q-item-label>
           <p>The setup creates 2 setpoints, one for your beer and one for your fridge.</p>

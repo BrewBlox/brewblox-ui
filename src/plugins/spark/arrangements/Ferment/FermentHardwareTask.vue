@@ -144,7 +144,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-item-label class="text-subtitle1 text-primary">
+          <q-item-label class="text-subtitle1">
             Assign Hardware Blocks
           </q-item-label>
         </q-item-section>

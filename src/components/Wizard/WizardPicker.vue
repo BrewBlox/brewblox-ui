@@ -43,7 +43,7 @@ export default class WizardPicker extends Vue {
       <q-card-section>
         <q-item link clickable dark @click="wizardComponent = 'ArrangementWizardPicker'">
           <q-item-section side class="col-4">
-            <q-item-label class="text-h6 text-primary">
+            <q-item-label class="text-h6">
               Quick Start
             </q-item-label>
             <q-item-label caption>
@@ -65,7 +65,7 @@ export default class WizardPicker extends Vue {
       <q-card-section>
         <q-item link clickable dark @click="wizardComponent = 'DashboardWizard'">
           <q-item-section side class="col-4">
-            <q-item-label class="text-h6 text-primary">
+            <q-item-label class="text-h6">
               New Dashboard
             </q-item-label>
             <q-item-label caption>
@@ -83,7 +83,7 @@ export default class WizardPicker extends Vue {
       <q-card-section>
         <q-item link clickable dark @click="wizardComponent = 'WidgetWizardPicker'">
           <q-item-section side class="col-4">
-            <q-item-label class="text-h6 text-primary">
+            <q-item-label class="text-h6">
               New Widget
             </q-item-label>
             <q-item-label caption>
@@ -104,7 +104,7 @@ export default class WizardPicker extends Vue {
       <q-card-section>
         <q-item link clickable dark @click="wizardComponent = 'ImportWizard'">
           <q-item-section side class="col-4">
-            <q-item-label class="text-h6 text-primary">
+            <q-item-label class="text-h6">
               Import Widget
             </q-item-label>
             <q-item-label caption>
@@ -124,7 +124,7 @@ export default class WizardPicker extends Vue {
       <q-card-section>
         <q-item link clickable dark @click="wizardComponent = 'ServiceWizardPicker'">
           <q-item-section side class="col-4">
-            <q-item-label class="text-h6 text-primary">
+            <q-item-label class="text-h6">
               New service
             </q-item-label>
             <q-item-label caption>

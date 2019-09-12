@@ -8,8 +8,8 @@ import FieldBase from './FieldBase';
 @Component
 export default class ColorField extends FieldBase {
 
-  @Prop({ type: String, required: true })
-  public readonly value!: string;
+  @Prop({ type: String, required: false })
+  public readonly value!: string | null;
 
   @Prop({ type: Boolean, default: false })
   public readonly clearable!: boolean;

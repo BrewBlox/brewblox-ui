@@ -3,14 +3,16 @@ import { Arrangement } from '@/store/features';
 
 import HermsHardwareTask from './HermsHardwareTask.vue';
 import HermsManualTask from './HermsManualTask.vue';
+import HermsMutexTask from './HermsMutexTask.vue';
 import HermsNamingTask from './HermsNamingTask.vue';
-import HermsSettingsTask from './HermsSettingsTask.vue';
+import HermsPidTask from './HermsPidTask.vue';
 import HermsWizard from './HermsWizard.vue';
 
 ref(HermsNamingTask);
 ref(HermsHardwareTask);
-ref(HermsSettingsTask);
+ref(HermsMutexTask);
 ref(HermsManualTask);
+ref(HermsPidTask);
 
 const arrangement: Arrangement = {
   id: 'Herms',
