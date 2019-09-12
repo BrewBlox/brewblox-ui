@@ -23,6 +23,12 @@ export default class PidDisplay extends PartBase {
       : null;
   }
 
+  get outputSetting(): number | null {
+    return this.block && this.block.data.enabled
+      ? this.block.data.outputSetting
+      : null;
+  }
+
   get kp(): number | null {
     return this.block
       ? this.block.data.kp.value
@@ -36,14 +42,14 @@ export default class PidDisplay extends PartBase {
     <foreignObject :transform="textTransformation([1,1])" :width="squares(1)" :height="squares(1)">
       <div class="text-white text-bold text-center">
         <svg>
-          <HeatingIcon v-if="kp && kp > 0" :stroke="HOT_WATER" x="12" />
-          <CoolingIcon v-else-if="kp && kp < 0" :stroke="COLD_WATER" x="12" />
+          <HeatingIcon v-if="kp && kp > 0" :stroke="outputValue ? HOT_WATER : 'white'" x="12" />
+          <CoolingIcon v-else-if="kp && kp < 0" :stroke="outputValue ? COLD_WATER : 'white'" x="12" />
         </svg>
         <q-space />
         <q-icon v-if="!kp" name="mdi-calculator-variant" class="q-mr-xs" />
         <q-icon v-if="!block" name="mdi-link-variant-off" />
         <br />
-        {{ outputValue | round(0) }}
+        {{ outputSetting | truncateRound }}
       </div>
     </foreignObject>
     <g class="outline">
