@@ -172,7 +172,7 @@ export default class PidForm extends BlockCrudComponent {
 
           <q-item-section>
             <q-item-label caption>
-              Current value is
+              Achieved value is
             </q-item-label>
             <div class="text-bold">
               {{ block.data.outputValue | round }}
