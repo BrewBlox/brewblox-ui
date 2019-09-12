@@ -164,7 +164,7 @@ export default class FermentNamingTask extends WizardTaskBase {
       <q-scroll-area>
         <q-item dark class="text-weight-light">
           <q-item-section>
-            <q-item-label class="text-subtitle1 text-primary">
+            <q-item-label class="text-subtitle1">
               Name your blocks and dashboards
             </q-item-label>
             <p>

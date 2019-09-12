@@ -27,7 +27,7 @@ export default class HermsMutexTask extends WizardTaskBase {
     <q-card-section>
       <q-item dark class="text-weight-light">
         <q-item-section>
-          <q-item-label class="text-subtitle1 text-primary">
+          <q-item-label class="text-subtitle1">
             Heating elements configuration
           </q-item-label>
           <p>We will create PWM blocks to modulate the power of your heating elements.</p>

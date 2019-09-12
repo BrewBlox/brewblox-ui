@@ -72,7 +72,7 @@ export default class ArrangementWizardPicker extends Vue {
       <q-card-section>
         <q-item dark>
           <q-item-section class="text-weight-light">
-            <q-item-label class="text-subtitle1 text-primary">
+            <q-item-label class="text-subtitle1">
               Control blocks
             </q-item-label>
             <p>
@@ -83,7 +83,7 @@ export default class ArrangementWizardPicker extends Vue {
               We have pre-configured sets of control blocks for common brewing setups.
               This wizard creates new blocks and sets up relations between them.
             </p>
-            <q-item-label class="text-subtitle1 text-primary">
+            <q-item-label class="text-subtitle1">
               Tuning
             </q-item-label>
             <p>
@@ -93,7 +93,7 @@ export default class ArrangementWizardPicker extends Vue {
             <p>
               Do some test runs, look at the PID graphs and make adjustments to tune them to your hardware.
             </p>
-            <q-item-label class="text-subtitle1 text-primary">
+            <q-item-label class="text-subtitle1">
               Dashboard
             </q-item-label>
             <p>

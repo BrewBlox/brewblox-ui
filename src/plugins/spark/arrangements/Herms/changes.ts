@@ -31,6 +31,12 @@ import { StepViewItem } from '../../features/StepView/types';
 import { Block, DigitalState } from '../../types';
 import { HermsConfig, PinChannel } from './types';
 
+export interface PidOpts {
+  hltKp: Unit;
+  bkKp: Unit;
+  mtKp: Unit;
+}
+
 export function defineChangedBlocks(config: HermsConfig): Block[] {
   return (
     sparkStore
@@ -51,9 +57,7 @@ export function defineChangedBlocks(config: HermsConfig): Block[] {
   );
 };
 
-export function defineCreatedBlocks(
-  config: HermsConfig,
-): Block[] {
+export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[] {
   const groups = [0];
   const serviceId = config.serviceId;
 
@@ -248,7 +252,7 @@ export function defineCreatedBlocks(
         enabled: false,
         inputId: new Link(config.names.hltSetpoint),
         outputId: new Link(config.names.hltPwm),
-        kp: new Unit(40, '1/degC'),
+        kp: opts.hltKp,
         ti: new Unit(10, 'min'),
         td: new Unit(10, 'second'),
         integralReset: 0,
@@ -264,7 +268,7 @@ export function defineCreatedBlocks(
         enabled: false,
         inputId: new Link(config.names.mtSetpoint),
         outputId: new Link(config.names.hltDriver),
-        kp: new Unit(1, '1/degC'),
+        kp: opts.mtKp,
         ti: new Unit(5, 'min'),
         td: new Unit(10, 'min'),
         integralReset: 0,
@@ -280,7 +284,7 @@ export function defineCreatedBlocks(
         enabled: false,
         inputId: new Link(config.names.bkSetpoint),
         outputId: new Link(config.names.bkPwm),
-        kp: new Unit(40, '1/degC'),
+        kp: opts.bkKp,
         ti: new Unit(5, 'min'),
         td: new Unit(10, 'min'),
         integralReset: 0,
@@ -398,15 +402,15 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
           id: uid(),
           changes: [
             {
-              blockId: config.names.hltPid,
+              blockId: config.names.hltSetpoint,
               data: { enabled: false },
             },
             {
-              blockId: config.names.mtPid,
+              blockId: config.names.mtSetpoint,
               data: { enabled: false },
             },
             {
-              blockId: config.names.bkPid,
+              blockId: config.names.bkSetpoint,
               data: { enabled: false },
             },
           ],
@@ -416,7 +420,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
           id: uid(),
           changes: [
             {
-              blockId: config.names.hltPid,
+              blockId: config.names.hltSetpoint,
               data: { enabled: true },
             },
           ],
@@ -426,7 +430,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
           id: uid(),
           changes: [
             {
-              blockId: config.names.mtPid,
+              blockId: config.names.mtSetpoint,
               data: { enabled: true },
             },
           ],
@@ -436,7 +440,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
           id: uid(),
           changes: [
             {
-              blockId: config.names.bkPid,
+              blockId: config.names.bkSetpoint,
               data: { enabled: true },
             },
           ],
