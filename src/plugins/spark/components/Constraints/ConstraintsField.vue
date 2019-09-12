@@ -28,8 +28,8 @@ export default class ConstraintsField extends FieldBase {
     return v;
   }
 
-  get hasConstraints(): boolean {
-    return this.value.constraints.length > 0;
+  get numConstraints(): number {
+    return this.value.constraints.length;
   }
 
   get limiters(): string[] {
@@ -66,7 +66,7 @@ export default class ConstraintsField extends FieldBase {
           Limited by:
           <i>{{ limiters.join(', ') }}</i>
         </small>
-        <small v-else-if="hasConstraints">Not limited</small>
+        <small v-else-if="numConstraints > 0">{{ numConstraints }} constraint(s), not limited</small>
         <small v-else>No constraints configured</small>
       </q-item-section>
       <q-space />

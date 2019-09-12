@@ -88,7 +88,8 @@ describe('Data describing an input tube', () => {
     rotate: 0,
     type: 'SystemIO',
     settings: {
-      pressure: 11,
+      onPressure: 11,
+      enabled: true,
       liquids: [COLD_WATER],
     },
   };
@@ -150,7 +151,8 @@ describe('A single path without splits', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        pressure: 6,
+        onPressure: 6,
+        enabled: true,
         liquids: [HOT_WATER],
       },
     },
@@ -201,7 +203,8 @@ describe('A single path without splits', () => {
           },
         },
         settings: {
-          pressure: 6,
+          onPressure: 6,
+          enabled: true,
           liquids: [HOT_WATER],
         },
       },
@@ -255,7 +258,8 @@ describe('A path with a split, but no joins', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        pressure: 13,
+        onPressure: 13,
+        enabled: true,
         liquids: [COLD_WATER],
       },
     },
@@ -411,7 +415,8 @@ describe('A path that forks and rejoins', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        pressure: 11.5,
+        enabled: true,
+        onPressure: 11.5,
         liquids: [COLD_WATER],
       },
     },
@@ -615,7 +620,8 @@ describe('A single path with a pump', () => {
       rotate: 180,
       type: 'SystemIO',
       settings: {
-        pressure: 9,
+        enabled: true,
+        onPressure: 9,
         liquids: [COLD_WATER],
       },
     },
@@ -627,7 +633,7 @@ describe('A single path with a pump', () => {
       type: 'Pump',
       settings: {
         enabled: false,
-        pressure: 12,
+        onPressure: 12,
       },
     },
     {
@@ -655,7 +661,8 @@ describe('A single path with a pump', () => {
           '3,2.5,0': { [COLD_WATER]: 3 },
         },
         settings: {
-          pressure: 9,
+          enabled: true,
+          onPressure: 9,
           liquids: [COLD_WATER],
         },
       },
@@ -671,7 +678,7 @@ describe('A single path with a pump', () => {
         },
         settings: {
           enabled: false,
-          pressure: 12,
+          onPressure: 12,
         },
       },
       {
@@ -705,7 +712,8 @@ describe('A single path with a pump', () => {
             '3,2.5,0': { [COLD_WATER]: 7 },
           },
           settings: {
-            pressure: 9,
+            enabled: true,
+            onPressure: 9,
           },
         },
         {
@@ -720,7 +728,7 @@ describe('A single path with a pump', () => {
           },
           settings: {
             enabled: true,
-            pressure: 12,
+            onPressure: 12,
           },
         },
         {
@@ -749,7 +757,8 @@ describe('Two sources joining', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        pressure: 15,
+        enabled: true,
+        onPressure: 15,
         liquids: [COLD_WATER],
       },
     },
@@ -760,7 +769,8 @@ describe('Two sources joining', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        pressure: 15,
+        enabled: true,
+        onPressure: 15,
         liquids: [HOT_WATER],
       },
     },
@@ -983,7 +993,8 @@ describe('A path with a bridge', () => {
       rotate: 0,
       settings: {
         liquids: [COLD_WATER],
-        pressure: 8,
+        enabled: true,
+        onPressure: 8,
       },
     },
     {
@@ -1047,7 +1058,8 @@ describe('A path with a bridge', () => {
           rotate: 0,
           settings: {
             liquids: [COLD_WATER],
-            pressure: 8,
+            enabled: true,
+            onPressure: 8,
           },
           flows: {
             '12,2.5,0': {
@@ -1177,7 +1189,7 @@ describe('A kettle with 2 outflows', () => {
       'rotate': 0,
       settings: {
         enabled: true,
-        pressure: 10,
+        onPressure: 10,
       },
       'flipped': true,
       'type': 'Pump',
@@ -1208,7 +1220,7 @@ describe('A kettle with 2 outflows', () => {
       'type': 'Pump',
       settings: {
         enabled: true,
-        pressure: 10,
+        onPressure: 10,
       },
       'flipped': true,
       'x': 5,
@@ -1335,7 +1347,7 @@ describe('A kettle with flow back to itself', () => {
       'rotate': 270,
       settings: {
         enabled: false,
-        pressure: 10,
+        onPressure: 10,
       },
       'type': 'Pump',
       'x': 5,
@@ -1391,7 +1403,7 @@ describe('A kettle with flow back to itself', () => {
       'rotate': 270,
       settings: {
         enabled: true,
-        pressure: 10,
+        onPressure: 10,
       },
       'type': 'Pump',
       'x': 5,
