@@ -372,8 +372,6 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
             `${config.names.bkSetpoint}/setting[${userTemp}]`,
             `${config.names.hltPwm}/value`,
             `${config.names.bkPwm}/value`,
-            `${config.names.hltAct}/state`,
-            `${config.names.bkAct}/state`,
           ],
         },
       ],
@@ -386,8 +384,6 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
         [`${config.serviceId}/${config.names.bkSetpoint}/setting[${userTemp}]`]: 'BK setting',
         [`${config.serviceId}/${config.names.hltPwm}/value`]: 'HLT PWM value',
         [`${config.serviceId}/${config.names.bkPwm}/value`]: 'BK PWM value',
-        [`${config.serviceId}/${config.names.hltAct}/state`]: 'HLT Pin state',
-        [`${config.serviceId}/${config.names.bkAct}/state`]: 'BK Pin state',
       },
       axes: {
         [`${config.serviceId}/${config.names.hltPwm}/value`]: 'y2',

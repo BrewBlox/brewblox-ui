@@ -203,7 +203,7 @@ export default class PidForm extends BlockCrudComponent {
           </q-item-section>
           <q-item-section>
             <q-item-label caption>
-              Minimum boiling output
+              Minimum output when boiling
             </q-item-label>
             <SliderField
               :value="block.data.boilMinOutput"
