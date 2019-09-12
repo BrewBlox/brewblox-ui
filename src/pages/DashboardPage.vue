@@ -145,9 +145,16 @@ export default class DashboardPage extends Vue {
         {{ dashboard.title }}
       </portal>
       <portal to="toolbar-buttons">
-        <q-toggle v-model="widgetEditable" checked-icon="mdi-lock-open" unchecked-icon="mdi-lock">
-          <q-tooltip>{{ widgetEditable ? 'Lock widgets' : 'Move widgets' }}</q-tooltip>
-        </q-toggle>
+        <q-btn-toggle
+          v-model="widgetEditable"
+          class="q-mr-md"
+          outline
+          dark
+          :options="[
+            {icon:'mdi-arrow-all', value: true},
+            {icon:'mdi-lock', value: false},
+          ]"
+        />
         <q-btn-dropdown color="primary" label="actions">
           <q-list dark>
             <ActionItem icon="add" label="New Widget" @click="wizardModalOpen = true" />
