@@ -1,35 +1,35 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Watch } from 'vue-property-decorator';
 
 import WatcherBase from '@/components/Watcher/WatcherBase';
+import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
 import { SystemStatus } from '../types';
 
 @Component
 export default class SparkWatcher extends WatcherBase {
-  notifiedUpdate: boolean = false;
+  notifiedUpdate = false;
   dismissFunc: Function | null = null;
 
-  get status() {
+  get status(): SystemStatus | null {
     return sparkStore.lastStatus(this.service.id);
   }
 
-  get lastUpdate() {
+  get lastUpdate(): Date | null {
     return sparkStore.lastUpdate(this.service.id);
   }
 
-  notifying() {
+  notifying(): boolean {
     return !!this.dismissFunc;
   }
 
-  retryUpdateSource() {
+  retryUpdateSource(): void {
     sparkStore.fetchServiceStatus(this.service.id);
     sparkStore.createUpdateSource(this.service.id);
   }
 
-  tryDismiss() {
+  tryDismiss(): void {
     if (this.dismissFunc) {
       this.dismissFunc();
       this.dismissFunc = null;
@@ -37,7 +37,7 @@ export default class SparkWatcher extends WatcherBase {
   }
 
   @Watch('lastUpdate')
-  async handleUpdateChange(date: Date | null) {
+  async handleUpdateChange(date: Date | null): Promise<void> {
     // Update received from source -> dismiss prompt
     if (date) {
       this.tryDismiss();
@@ -75,7 +75,7 @@ export default class SparkWatcher extends WatcherBase {
   }
 
   @Watch('status')
-  handleStatusChange(status: SystemStatus) {
+  handleStatusChange(status: SystemStatus): void {
     if (this.notifiedUpdate || !status || status.latest) {
       return;
     }
@@ -90,7 +90,7 @@ export default class SparkWatcher extends WatcherBase {
         {
           label: 'Update',
           textColor: 'white',
-          handler: () => Dialog.create({
+          handler: () => createDialog({
             component: 'FirmwareUpdateDialog',
             serviceId: this.serviceId,
           }),
@@ -103,7 +103,7 @@ export default class SparkWatcher extends WatcherBase {
     });
   }
 
-  render() {
+  render(): null {
     return null;
   }
 }

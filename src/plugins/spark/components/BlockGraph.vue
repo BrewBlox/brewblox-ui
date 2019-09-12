@@ -1,13 +1,13 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import Vue from 'vue';
 import { Component, Emit, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import HistoryGraph from '@/components/Graph/HistoryGraph.vue';
 import { targetSplitter } from '@/components/Graph/functional';
 import { defaultPresets } from '@/components/Graph/getters';
+import HistoryGraph from '@/components/Graph/HistoryGraph.vue';
 import { GraphConfig } from '@/components/Graph/types';
+import { createDialog } from '@/helpers/dialog';
 import { durationString } from '@/helpers/functional';
 import { QueryParams } from '@/store/history';
 
@@ -15,7 +15,7 @@ import { QueryParams } from '@/store/history';
 export default class BlockGraph extends Vue {
   durationString = durationString;
 
-  configString: string = '';
+  configString = '';
 
   @Ref()
   readonly graph!: HistoryGraph;
@@ -37,7 +37,7 @@ export default class BlockGraph extends Vue {
     return cfg;
   }
 
-  get dialogOpen() {
+  get dialogOpen(): boolean {
     return this.value;
   }
 
@@ -57,7 +57,7 @@ export default class BlockGraph extends Vue {
     };
   }
 
-  get targetKeys() {
+  get targetKeys(): string[][] {
     return targetSplitter(this.graphCfg.targets)
       .map(key => [key, this.graphCfg.renames[key] || key]);
   }
@@ -66,15 +66,15 @@ export default class BlockGraph extends Vue {
     return defaultPresets();
   }
 
-  isRightAxis(key: string) {
+  isRightAxis(key: string): boolean {
     return this.graphCfg.axes[key] === 'y2';
   }
 
-  axisLabel(key: string) {
+  axisLabel(key: string): string {
     return this.isRightAxis(key) ? 'Y2' : 'Y1';
   }
 
-  updateKeySide(key: string, isRight: boolean) {
+  updateKeySide(key: string, isRight: boolean): void {
     this.change({
       ...this.graphCfg,
       axes: {
@@ -84,15 +84,15 @@ export default class BlockGraph extends Vue {
     });
   }
 
-  applyPreset(preset: QueryParams) {
+  applyPreset(preset: QueryParams): void {
     this.change({
       ...this.graphCfg,
       params: { ...preset },
     });
   }
 
-  updateDuration() {
-    Dialog.create({
+  updateDuration(): void {
+    createDialog({
       component: 'InputDialog',
       title: 'Duration',
       root: this.$root,
@@ -105,7 +105,7 @@ export default class BlockGraph extends Vue {
   }
 
   @Watch('graphCfg')
-  onCfgChange(newVal) {
+  onCfgChange(newVal): void {
     // Vue considers configuration "changed" with every block data update
     // To avoid constantly refreshing listeners, we need to do a deep compare
     if (JSON.stringify(newVal) !== this.configString) {
@@ -114,7 +114,7 @@ export default class BlockGraph extends Vue {
     }
   }
 
-  created() {
+  created(): void {
     this.configString = JSON.stringify(this.graphCfg);
   }
 }
@@ -123,7 +123,7 @@ export default class BlockGraph extends Vue {
 <template>
   <q-dialog v-model="dialogOpen" maximized>
     <q-card v-if="dialogOpen" class="text-white bg-dark-bright" dark>
-      <HistoryGraph ref="graph" :id="id" :config="graphCfg">
+      <HistoryGraph :id="id" ref="graph" :config="graphCfg">
         <template v-slot:controls>
           <q-btn-dropdown v-if="!noDuration" auto-close flat label="timespan" icon="mdi-timelapse">
             <q-item
@@ -141,7 +141,9 @@ export default class BlockGraph extends Vue {
           <q-btn-dropdown flat label="settings" icon="settings">
             <q-item dark link clickable @click="updateDuration">
               <q-item-section>Duration</q-item-section>
-              <q-item-section class="col-auto">{{ durationString(graphCfg.params.duration) }}</q-item-section>
+              <q-item-section class="col-auto">
+                {{ durationString(graphCfg.params.duration) }}
+              </q-item-section>
             </q-item>
             <q-expansion-item label="Display Axis">
               <q-item
@@ -153,7 +155,9 @@ export default class BlockGraph extends Vue {
                 @click="updateKeySide(key, !isRightAxis(key))"
               >
                 <q-item-section>{{ renamed }}</q-item-section>
-                <q-item-section side>{{ axisLabel(key) }}</q-item-section>
+                <q-item-section side>
+                  {{ axisLabel(key) }}
+                </q-item-section>
               </q-item>
             </q-expansion-item>
           </q-btn-dropdown>

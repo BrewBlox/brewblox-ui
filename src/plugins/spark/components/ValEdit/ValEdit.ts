@@ -16,11 +16,11 @@ export default class ValEdit extends Vue {
   public readonly value!: any;
 
   @Emit('input')
-  public saveField(val: any) {
+  public saveField(val: any): any {
     return val;
   }
 
-  public get field() {
+  public get field(): any {
     return this.value;
   }
 

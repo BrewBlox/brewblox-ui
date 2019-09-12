@@ -21,7 +21,7 @@ export default class FermentSettingsTask extends WizardTaskBase {
     return sparkStore.units(this.config.serviceId).Temp;
   }
 
-  get targetOpts() {
+  get targetOpts(): SelectOption[] {
     return [
       {
         label: 'Beer',
@@ -35,20 +35,12 @@ export default class FermentSettingsTask extends WizardTaskBase {
   }
 
   defaultTemp(): Unit {
-    const defaultTempValues = { degC: 20, degF: 68, degK: 293 };
+    const degC = 20;
+    const defaultTempValues = { degC, degF: (degC * 9 / 5) + 32, degK: degC + 273.15 };
     return new Unit(defaultTempValues[this.userTemp] || 20, this.userTemp);
   }
 
-  blockType(newId: string): string {
-    for (let [from, to] of Object.entries(this.config.renamedBlocks)) {
-      if (to === newId) {
-        return sparkStore.blockById(this.config.serviceId, from).type;
-      }
-    }
-    throw new Error('Old block not found');
-  }
-
-  done() {
+  done(): void {
     const createdBlocks = defineCreatedBlocks(
       this.config,
       this.fridgeSetting,
@@ -69,7 +61,7 @@ export default class FermentSettingsTask extends WizardTaskBase {
     this.next();
   }
 
-  mounted() {
+  mounted(): void {
     this.fridgeSetting = this.defaultTemp();
     this.beerSetting = this.defaultTemp();
   }
@@ -79,23 +71,37 @@ export default class FermentSettingsTask extends WizardTaskBase {
 <template>
   <div>
     <q-card-section>
-      <q-item dark>
-        <big>Settings</big>
-      </q-item>
-      <q-item dark>
-        <q-item-section>These are initial settings, and can also be configured later.</q-item-section>
+      <q-item dark class="text-weight-light">
+        <q-item-section>
+          <q-item-label class="text-subtitle1">
+            Initial setpoints
+          </q-item-label>
+          <p>The setup creates 2 setpoints, one for your beer and one for your fridge.</p>
+          <p>
+            To change which temperature is actively controlled,
+            you will change which setpoint is used as input by the PIDs.
+            The quick actions on your dashboard will help you switch and reconfigure the PIDs.<br />
+          </p>
+          <p>You can set the initial values now.</p>
+        </q-item-section>
       </q-item>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Fridge setpoint</q-item-label>
+          <q-item-label caption>
+            Fridge setpoint
+          </q-item-label>
           <UnitField v-model="fridgeSetting" title="Fridge setting" />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Beer setpoint</q-item-label>
+          <q-item-label caption>
+            Beer setpoint
+          </q-item-label>
           <UnitField v-model="beerSetting" title="Beer setting" />
         </q-item-section>
         <q-item-section class="col-auto">
-          <q-item-label caption>Setpoint used by control</q-item-label>
+          <q-item-label caption>
+            Setpoint used for control
+          </q-item-label>
           <div class="row">
             <q-btn-toggle
               v-model="activeSetpoint"

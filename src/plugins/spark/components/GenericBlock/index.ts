@@ -1,7 +1,7 @@
 import { ref } from '@/helpers/component-ref';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockConfig } from '@/plugins/spark/types';
-import { Feature, WidgetSelector, featureStore } from '@/store/features';
+import { Feature, featureStore,WidgetSelector } from '@/store/features';
 
 import wizard from '../BlockWidgetWizard.vue';
 import widget from './GenericBlock.vue';

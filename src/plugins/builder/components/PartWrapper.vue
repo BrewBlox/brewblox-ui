@@ -21,7 +21,7 @@ export default class PartWrapper extends Vue {
   @Prop({ type: Boolean, default: false })
   public readonly selected!: boolean;
 
-  get rotateTransform() {
+  get rotateTransform(): string {
     const [partSizeX, partSizeY] = this.part.size;
     const [renderSizeX, renderSizeY] = rotatedSize(this.part.rotate, this.part.size);
 
@@ -34,7 +34,7 @@ export default class PartWrapper extends Vue {
     return `translate(${trX}, ${trY}) rotate(${this.part.rotate})`;
   }
 
-  get flipTransform() {
+  get flipTransform(): string {
     if (!this.part.flipped) {
       return '';
     }
@@ -42,7 +42,7 @@ export default class PartWrapper extends Vue {
     return `translate(${sizeX * SQUARE_SIZE}, 0) scale(-1, 1)`;
   }
 
-  get transformation() {
+  get transformation(): string {
     return `${this.rotateTransform} ${this.flipTransform}`;
   }
 
@@ -55,9 +55,9 @@ export default class PartWrapper extends Vue {
 <template>
   <g :transform="transformation">
     <component
+      :is="part.type"
       v-if="part.type"
       :value="part"
-      :is="part.type"
       class="BuilderPart"
       v-on="$listeners"
     />

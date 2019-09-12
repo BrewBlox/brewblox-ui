@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
 import FieldBase from './FieldBase';
@@ -15,11 +15,11 @@ export default class GroupsField extends FieldBase {
   @Prop({ type: String, required: true })
   public readonly serviceId!: string;
 
-  get groupNames() {
+  get groupNames(): string[] {
     return sparkStore.groupNames(this.serviceId);
   }
 
-  get displayValue() {
+  get displayValue(): string {
     const actual = this.value
       .map(groupIdx => this.groupNames[groupIdx])
       .filter(name => name !== undefined)
@@ -28,16 +28,16 @@ export default class GroupsField extends FieldBase {
   }
 
   @Emit('input')
-  public change(v: string[]) {
+  public change(v: string[]): string[] {
     return v;
   }
 
-  openDialog() {
+  openDialog(): void {
     if (this.readonly) {
       return;
     }
 
-    Dialog.create({
+    createDialog({
       title: this.title,
       message: this.message,
       dark: true,
@@ -61,7 +61,9 @@ export default class GroupsField extends FieldBase {
     @click="openDialog"
   >
     <slot name="pre" />
-    <slot name="value">{{ displayValue }}</slot>
+    <slot name="value">
+      {{ displayValue }}
+    </slot>
     <slot />
   </component>
 </template>

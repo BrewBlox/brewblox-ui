@@ -16,7 +16,7 @@ export default class DisplaySettingsWidget extends BlockWidget {
     return slots;
   }
 
-  get footerRules() {
+  get footerRules(): InputRule[] {
     return [
       v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
     ];
@@ -26,7 +26,7 @@ export default class DisplaySettingsWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud"/>
+    <BlockWidgetToolbar :crud="crud" />
 
     <q-card-section>
       <q-list dark dense>
@@ -39,7 +39,9 @@ export default class DisplaySettingsWidget extends BlockWidget {
             @click="openModal"
           >
             <q-item-section>
-              <q-item-label caption>Slot {{ idx + 1 }}</q-item-label>
+              <q-item-label caption>
+                Slot {{ idx + 1 }}
+              </q-item-label>
               <span
                 v-if="slot"
                 :style="`color: #${slot.color} !important`"
@@ -51,7 +53,9 @@ export default class DisplaySettingsWidget extends BlockWidget {
         </div>
 
         <q-item dark>
-          <q-item-section side class="q-pb-xs">Footer text</q-item-section>
+          <q-item-section side class="q-pb-xs">
+            Footer text
+          </q-item-section>
           <q-item-section>
             <InputField
               :value="block.data.name"

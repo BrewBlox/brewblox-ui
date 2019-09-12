@@ -1,5 +1,4 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
@@ -7,9 +6,9 @@ import draggable from 'vuedraggable';
 import buildEnv from '@/build-env.json';
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '@/helpers/dashboards';
 import { checkDatastore } from '@/helpers/datastore';
+import { createDialog } from '@/helpers/dialog';
 import { objectSorter } from '@/helpers/functional';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
-import { pluginStore } from '@/store/plugins';
 import { Service, serviceStore } from '@/store/services';
 
 @Component({
@@ -18,17 +17,17 @@ import { Service, serviceStore } from '@/store/services';
   },
 })
 export default class DefaultLayout extends Vue {
-  leftDrawerOpen: boolean = true;
-  dashboardEditing: boolean = false;
-  serviceEditing: boolean = false;
-  wizardModalOpen: boolean = false;
+  leftDrawerOpen = true;
+  dashboardEditing = false;
+  serviceEditing = false;
+  wizardModalOpen = false;
   wizardComponent: string | null = null;
 
-  get version() {
+  get version(): string {
     return buildEnv.version || 'UNKNOWN';
   }
 
-  get dashboards() {
+  get dashboards(): Dashboard[] {
     return dashboardStore.dashboardValues.sort(objectSorter('order'));
   }
 
@@ -36,11 +35,7 @@ export default class DefaultLayout extends Vue {
     dashboardStore.updateDashboardOrder(dashboards.map(dashboard => dashboard.id));
   }
 
-  get defaultDashboard() {
-    return dashboardStore.primaryDashboardId;
-  }
-
-  get services() {
+  get services(): Service[] {
     return serviceStore.serviceValues.sort(objectSorter('order'));
   }
 
@@ -48,28 +43,28 @@ export default class DefaultLayout extends Vue {
     serviceStore.updateServiceOrder(services.map(service => service.id));
   }
 
-  onIdChanged(oldId, newId) {
+  onIdChanged(oldId, newId): void {
     if (newId && this.$route.path === `/dashboard/${oldId}`) {
       this.$router.replace(`/dashboard/${newId}`);
     }
   }
 
-  async changeDashboardId(dashboard: Dashboard) {
+  async changeDashboardId(dashboard: Dashboard): Promise<void> {
     const oldId = dashboard.id;
     await startChangeDashboardId(dashboard, newId => this.onIdChanged(oldId, newId));
   }
 
-  changeDashboardTitle(dashboard: Dashboard) {
+  changeDashboardTitle(dashboard: Dashboard): void {
     const oldId = dashboard.id;
     startChangeDashboardTitle(dashboard, newId => this.onIdChanged(oldId, newId));
   }
 
-  removeDashboard(dashboard: Dashboard) {
+  removeDashboard(dashboard: Dashboard): void {
     startRemoveDashboard(dashboard);
   }
 
-  removeService(service: Service) {
-    Dialog.create({
+  removeService(service: Service): void {
+    createDialog({
       title: 'Remove service',
       message: `Are you sure you want to remove ${service.title}?`,
       dark: true,
@@ -79,8 +74,8 @@ export default class DefaultLayout extends Vue {
       .onOk(() => serviceStore.removeService(service));
   }
 
-  changeServiceTitle(service: Service) {
-    Dialog.create({
+  changeServiceTitle(service: Service): void {
+    createDialog({
       title: 'Change service Title',
       message: "Change your service's display name",
       dark: true,
@@ -105,35 +100,27 @@ export default class DefaultLayout extends Vue {
       });
   }
 
-  toggleDefaultDashboard(dashboard: Dashboard) {
+  toggleDefaultDashboard(dashboard: Dashboard): void {
     dashboardStore.updatePrimaryDashboard(dashboard.primary ? null : dashboard.id);
   }
 
-  openWizard(component: string | null = null) {
+  openWizard(component: string | null = null): void {
     this.wizardComponent = component;
     this.wizardModalOpen = true;
   }
 
-  showPlugins() {
-    Dialog.create({
+  showPlugins(): void {
+    createDialog({
       component: 'PluginDialog',
     });
   }
 
-  addPlugin() {
-    pluginStore.createPlugin({
-      id: 'pluggy',
-      title: 'pluggy',
-      url: 'http://localhost:8200/brewblox-plugin.umd.js',
-    });
-  }
-
-  stopEditing() {
+  stopEditing(): void {
     this.dashboardEditing = false;
     this.serviceEditing = false;
   }
 
-  created() {
+  created(): void {
     checkDatastore();
   }
 }
@@ -147,7 +134,9 @@ export default class DefaultLayout extends Vue {
           <q-icon name="menu" />
         </q-btn>
         <q-toolbar-title>
-          <portal-target name="toolbar-title">BrewBlox</portal-target>
+          <portal-target name="toolbar-title">
+            BrewBlox
+          </portal-target>
         </q-toolbar-title>
         <portal-target name="toolbar-buttons" class="toolbar-buttons" />
       </q-toolbar>
@@ -326,7 +315,9 @@ export default class DefaultLayout extends Vue {
         <q-list dark bordered>
           <q-item dark>
             <q-item-section>
-              <q-item-label caption>Version</q-item-label>
+              <q-item-label caption>
+                Version
+              </q-item-label>
               {{ version }}
             </q-item-section>
           </q-item>

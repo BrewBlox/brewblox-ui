@@ -2,6 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import PartBase from '../components/PartBase';
+import { colorString } from '../helpers';
 
 @Component
 export default class BeerBottle extends PartBase {
@@ -34,9 +35,8 @@ export default class BeerBottle extends PartBase {
             z`,
   };
 
-  get color(): string | null {
-    const color = this.part.settings.color;
-    return color && !color.startsWith('#') ? `#${color}` : color;
+  get color(): string {
+    return colorString(this.part.settings.color);
   }
 }
 </script>

@@ -16,7 +16,7 @@ export default class GraphWizard extends WidgetWizardBase {
     colors: {},
   };
 
-  createWidget() {
+  createWidget(): void {
     this.createItem({
       id: this.widgetId,
       title: this.widgetTitle,
@@ -28,7 +28,7 @@ export default class GraphWizard extends WidgetWizardBase {
     });
   }
 
-  mounted() {
+  mounted(): void {
     this.widgetTitle = this.typeDisplayName;
   }
 }

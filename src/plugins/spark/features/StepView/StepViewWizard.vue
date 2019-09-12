@@ -14,7 +14,7 @@ export default class StepViewWizard extends WidgetWizardBase {
     return get(this, ['service', 'id'], '');
   }
 
-  get serviceOpts() {
+  get serviceOpts(): SelectOption[] {
     return serviceStore.serviceValues
       .filter(service => service.type === 'Spark')
       .map(service => ({
@@ -23,7 +23,7 @@ export default class StepViewWizard extends WidgetWizardBase {
       }));
   }
 
-  createWidget() {
+  createWidget(): void {
     this.createItem({
       id: this.widgetId,
       title: this.widgetTitle,
@@ -38,7 +38,7 @@ export default class StepViewWizard extends WidgetWizardBase {
     });
   }
 
-  mounted() {
+  mounted(): void {
     this.widgetTitle = this.typeDisplayName;
   }
 }
@@ -54,7 +54,9 @@ export default class StepViewWizard extends WidgetWizardBase {
       </q-item>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Service</q-item-label>
+          <q-item-label caption>
+            Service
+          </q-item-label>
           <q-option-group v-model="service" :options="serviceOpts" />
         </q-item-section>
       </q-item>

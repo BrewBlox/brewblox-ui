@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { round } from '@/helpers/functional';
 
 import FieldBase from './FieldBase';
@@ -29,11 +29,11 @@ export default class InputField extends FieldBase {
   public readonly clearable!: boolean;
 
   @Emit('input')
-  public change(v: string | number) {
+  public change(v: string | number): string | number {
     return v;
   }
 
-  get displayValue() {
+  get displayValue(): string | number {
     if (this.value === ''
       || this.value === null
       || this.value === undefined) {
@@ -45,12 +45,12 @@ export default class InputField extends FieldBase {
       : this.value;
   }
 
-  openDialog() {
+  openDialog(): void {
     if (this.readonly) {
       return;
     }
 
-    Dialog.create({
+    createDialog({
       component: 'InputDialog',
       title: this.title,
       message: this.message,
@@ -76,8 +76,12 @@ export default class InputField extends FieldBase {
     @click="openDialog"
   >
     <slot name="pre" />
-    <slot name="value">{{ displayValue }}</slot>
+    <slot name="value">
+      {{ displayValue }}
+    </slot>
     <slot name="append" />
-    <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
+    <q-tooltip v-if="!readonly">
+      Set {{ label }}
+    </q-tooltip>
   </component>
 </template>

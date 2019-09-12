@@ -10,11 +10,11 @@ import { FermentConfig } from './types';
 export default class FermentManualTask extends WizardTaskBase {
   readonly config!: FermentConfig;
 
-  mounted() {
+  mounted(): void {
     this.executePrepared();
   }
 
-  done() {
+  done(): void {
     this.$router.push(`/dashboard/${this.config.dashboardId}`);
     this.finish();
   }
@@ -27,7 +27,7 @@ export default class FermentManualTask extends WizardTaskBase {
       <q-item dark>
         <big>About your new fermentation dashboard</big>
       </q-item>
-      <q-item dark>
+      <q-item dark class="text-weight-light">
         <q-item-section>
           <p>
             While the wizard is configuring the Spark and your new dashboard,
@@ -51,7 +51,8 @@ export default class FermentManualTask extends WizardTaskBase {
             We did not put every controller block on your new dashboard.
             You can find all blocks and their relations on the Spark controller service page.
           </p>
-          <p>On your new dashboard, you will find:
+          <p>
+            On your new dashboard, you will find:
             <ul>
               <li>A graphical representation of your fridge. Parts are clickable for quick access to settings.</li>
               <li>A graph with the most important metrics.</li>
@@ -63,10 +64,10 @@ export default class FermentManualTask extends WizardTaskBase {
       </q-item>
     </q-card-section>
 
-    <q-separator dark/>
+    <q-separator dark />
 
     <q-card-actions>
-      <q-space/>
+      <q-space />
       <q-btn
         :loading="busyExecuting"
         unelevated
@@ -74,7 +75,9 @@ export default class FermentManualTask extends WizardTaskBase {
         color="primary"
         @click="done"
       >
-        <q-tooltip v-if="busyExecuting">Creating everything...</q-tooltip>
+        <q-tooltip v-if="busyExecuting">
+          Creating everything...
+        </q-tooltip>
       </q-btn>
     </q-card-actions>
   </div>

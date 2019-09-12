@@ -16,33 +16,33 @@ export default class TimeUnitDialog extends DialogBase {
   @Prop({ type: String, default: 'Value' })
   public readonly label!: string;
 
-  findUnit(s: string) {
+  findUnit(s: string): string {
     const match = s.match(/^[0-9\.]*([a-z]*)/i);
     return match && match[1]
       ? match[1]
       : '';
   }
 
-  get defaultUnit() {
+  get defaultUnit(): string {
     return !this.findUnit(this.local || '')
       ? this.findUnit(unitDurationString(this.value))
       : '';
   }
 
-  get localNumber() {
+  get localNumber(): number {
     return parseDuration(`${this.local}${this.defaultUnit}`);
   }
 
-  normalize() {
+  normalize(): void {
     this.local = durationString(this.localNumber);
   }
 
-  save() {
+  save(): void {
     const val = new Unit(this.localNumber, 'ms');
     this.onDialogOk(val);
   }
 
-  created() {
+  created(): void {
     this.local = unitDurationString(this.value);
   }
 
@@ -52,9 +52,13 @@ export default class TimeUnitDialog extends DialogBase {
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
     <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
-      <q-card-section class="q-dialog__title">{{ title }}</q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
-      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml"/>
+      <q-card-section class="q-dialog__title">
+        {{ title }}
+      </q-card-section>
+      <q-card-section v-if="message" class="q-dialog__message scroll">
+        {{ message }}
+      </q-card-section>
+      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
         <q-input
           v-model="local"
@@ -66,8 +70,8 @@ export default class TimeUnitDialog extends DialogBase {
         />
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel"/>
-        <q-btn flat label="OK" color="primary" @click="save"/>
+        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
+        <q-btn flat label="OK" color="primary" @click="save" />
       </q-card-actions>
     </q-card>
   </q-dialog>

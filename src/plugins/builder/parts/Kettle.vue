@@ -2,6 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import PartBase from '../components/PartBase';
+import { colorString } from '../helpers';
 
 @Component
 export default class Kettle extends PartBase {
@@ -9,9 +10,8 @@ export default class Kettle extends PartBase {
     return this.part.settings.text || '';
   }
 
-  get color(): string | null {
-    const color = this.part.settings.color;
-    return color && !color.startsWith('#') ? `#${color}` : color;
+  get color(): string {
+    return colorString(this.part.settings.color);
   }
 }
 </script>
@@ -46,7 +46,9 @@ export default class Kettle extends PartBase {
           <div
             class="text-white text-bold text-center text-h6 q-mt-xs"
             style="max-width: 100%"
-          >{{ titleText }}</div>
+          >
+            {{ titleText }}
+          </div>
         </foreignObject>
       </g>
     </g>

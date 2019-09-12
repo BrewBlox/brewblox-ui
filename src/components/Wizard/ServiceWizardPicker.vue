@@ -12,9 +12,9 @@ export default class ServiceWizardPicker extends Vue {
   serviceId: string | null = null;
   serviceTitle: string | null = null;
   serviceTypeModel: any = null;
-  serviceWizardActive: boolean = false;
+  serviceWizardActive = false;
 
-  get wizardOptions() {
+  get wizardOptions(): SelectOption[] {
     return providerStore.providerIds
       .map(id => ({
         label: providerStore.displayNameById(id),
@@ -31,24 +31,24 @@ export default class ServiceWizardPicker extends Vue {
     ];
   }
 
-  setTitle(title: string) {
+  setTitle(title: string): void {
     this.$emit('title', title);
   }
 
-  reset() {
+  reset(): void {
     this.serviceWizardActive = false;
     this.setTitle('Service wizard');
   }
 
-  back() {
+  back(): void {
     this.$emit('back');
   }
 
-  close() {
+  close(): void {
     this.$emit('close');
   }
 
-  next() {
+  next(): void {
     const errors = this.serviceIdRules
       .map(rule => rule(this.serviceId))
       .filter(isString);
@@ -66,7 +66,7 @@ export default class ServiceWizardPicker extends Vue {
     this.serviceWizardActive = true;
   }
 
-  mounted() {
+  mounted(): void {
     this.reset();
     this.serviceTypeModel = this.wizardOptions[0];
   }
@@ -77,8 +77,8 @@ export default class ServiceWizardPicker extends Vue {
   <div>
     <!-- Display selected wizard -->
     <component
-      v-if="serviceWizardActive"
       :is="serviceTypeModel.value"
+      v-if="serviceWizardActive"
       :service-id="serviceId"
       :service-title="serviceTitle"
       @title="setTitle"
@@ -92,8 +92,8 @@ export default class ServiceWizardPicker extends Vue {
         <q-item dark>
           <q-item-section>
             <q-select
-              :options="wizardOptions"
               v-model="serviceTypeModel"
+              :options="wizardOptions"
               label="Service type"
               dark
               options-dark

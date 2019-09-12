@@ -3,7 +3,7 @@ import set from 'lodash/set';
 
 import { prettify } from '@/helpers/units';
 import { propertyNameWithUnit } from '@/helpers/units/parseObject';
-import { QueryTarget, historyStore } from '@/store/history';
+import { historyStore,QueryTarget } from '@/store/history';
 
 export interface QuasarNode {
   label: string;
@@ -80,7 +80,7 @@ export const targetSplitter =
       );
 
 export const targetBuilder =
-  (vals: string[], filterUnknown: boolean = true): QueryTarget[] => {
+  (vals: string[], filterUnknown = true): QueryTarget[] => {
     const knownFields = historyStore.fields;
     return vals
       .reduce(

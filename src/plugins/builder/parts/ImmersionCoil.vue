@@ -43,11 +43,11 @@ export default class ImmersionCoil extends PartBase {
     ],
   };
 
-  get flowSpeed() {
+  get flowSpeed(): number {
     return this.flowOnCoord(COIL_TOP_RIGHT);
   }
 
-  get liquids() {
+  get liquids(): string[] {
     return this.liquidOnCoord(COIL_TOP_RIGHT);
   }
 }

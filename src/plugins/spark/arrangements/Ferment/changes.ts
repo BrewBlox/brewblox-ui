@@ -48,13 +48,47 @@ export const defineChangedBlocks = (config: FermentConfig): Block[] => {
   );
 };
 
+const beerCoolConfig: Partial<PidData> = {
+  kp: new Unit(-50, '1/degC'),
+  ti: new Unit(6, 'hour'),
+  td: new Unit(30, 'min'),
+};
+
+const fridgeCoolConfig: Partial<PidData> = {
+  kp: new Unit(-20, '1/degC'),
+  ti: new Unit(2, 'hour'),
+  td: new Unit(10, 'min'),
+};
+
+const beerHeatConfig: Partial<PidData> = {
+  kp: new Unit(100, '1/degC'),
+  ti: new Unit(6, 'hour'),
+  td: new Unit(30, 'min'),
+};
+
+const fridgeHeatConfig: Partial<PidData> = {
+  kp: new Unit(20, '1/degC'),
+  ti: new Unit(2, 'hour'),
+  td: new Unit(10, 'min'),
+};
+
+
 export const defineCreatedBlocks = (
   config: FermentConfig,
   fridgeSetting: Unit,
   beerSetting: Unit,
   activeSetpoint: 'beer' | 'fridge'
 ): Block[] => {
-  const activeSetpointId = activeSetpoint === 'beer' ? config.names.beerSSPair : config.names.fridgeSSPair;
+  const isBeer = activeSetpoint === 'beer';
+  const activeSetpointId = isBeer ? config.names.beerSSPair : config.names.fridgeSSPair;
+
+  const coolPidConfig: Partial<PidData> = isBeer
+    ? beerCoolConfig
+    : fridgeCoolConfig;
+
+  const heatPidConfig: Partial<PidData> = isBeer
+    ? beerHeatConfig
+    : fridgeHeatConfig;
 
   return [
     // setpoint sensor pair
@@ -194,12 +228,10 @@ export const defineCreatedBlocks = (
       groups: config.groups,
       data: {
         ...(sparkStore.specs[pidType].generate() as PidData),
+        ...coolPidConfig,
         enabled: true,
         inputId: new Link(activeSetpointId),
         outputId: new Link(config.names.coolPwm),
-        kp: new Unit(-10, '1/degC'),
-        ti: new Unit(2, 'hour'),
-        td: new Unit(10, 'min'),
         integralReset: 0,
       },
     },
@@ -210,12 +242,10 @@ export const defineCreatedBlocks = (
       groups: config.groups,
       data: {
         ...(sparkStore.specs[pidType].generate() as PidData),
+        ...heatPidConfig,
         enabled: true,
         inputId: new Link(activeSetpointId),
         outputId: new Link(config.names.heatPwm),
-        kp: new Unit(20, '1/degC'),
-        ti: new Unit(2, 'hour'),
-        td: new Unit(10, 'min'),
         integralReset: 0,
       },
     },
@@ -459,11 +489,27 @@ export const defineWidgets = (config: FermentConfig, layouts: BuilderLayout[]): 
             },
             {
               blockId: config.names.coolPid,
-              data: { inputId: new ProcessValueLink(config.names.fridgeSSPair) },
+              data: {
+                inputId: new ProcessValueLink(config.names.fridgeSSPair),
+                ...fridgeCoolConfig,
+              },
+              confirmed: {
+                kp: true,
+                ti: true,
+                td: true,
+              },
             },
             {
               blockId: config.names.heatPid,
-              data: { inputId: new ProcessValueLink(config.names.fridgeSSPair) },
+              data: {
+                inputId: new ProcessValueLink(config.names.fridgeSSPair),
+                ...fridgeHeatConfig,
+              },
+              confirmed: {
+                kp: true,
+                ti: true,
+                td: true,
+              },
             },
             {
               blockId: config.names.tempProfile,
@@ -485,11 +531,27 @@ export const defineWidgets = (config: FermentConfig, layouts: BuilderLayout[]): 
             },
             {
               blockId: config.names.coolPid,
-              data: { inputId: new ProcessValueLink(config.names.beerSSPair) },
+              data: {
+                inputId: new ProcessValueLink(config.names.beerSSPair),
+                ...beerCoolConfig,
+              },
+              confirmed: {
+                kp: true,
+                ti: true,
+                td: true,
+              },
             },
             {
               blockId: config.names.heatPid,
-              data: { inputId: new ProcessValueLink(config.names.beerSSPair) },
+              data: {
+                inputId: new ProcessValueLink(config.names.beerSSPair),
+                ...beerHeatConfig,
+              },
+              confirmed: {
+                kp: true,
+                ti: true,
+                td: true,
+              },
             },
             {
               blockId: config.names.tempProfile,
@@ -553,7 +615,7 @@ export const createActions = (): WizardAction[] => {
     // Create blocks
     async (config: FermentConfig) => {
       // Create synchronously, to ensure dependencies are created first
-      for (let block of config.createdBlocks) {
+      for (const block of config.createdBlocks) {
         await sparkStore.createBlock([config.serviceId, block]);
       }
     },
@@ -576,7 +638,7 @@ export const createActions = (): WizardAction[] => {
         };
         await dashboardStore.createDashboard(dashboard);
       }
-      for (let widget of config.widgets) {
+      for (const widget of config.widgets) {
         await dashboardStore.appendDashboardItem(widget);
       }
     },

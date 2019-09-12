@@ -3,7 +3,7 @@ export default class Link {
   public type: string | null;
   public driven: boolean;
 
-  public constructor(id: string | null, type: string | null = null, driven: boolean = false) {
+  public constructor(id: string | null, type: string | null = null, driven = false) {
     this.id = id;
     this.type = type;
     this.driven = driven;
@@ -27,11 +27,11 @@ export default class Link {
     return this.id;
   }
 
-  public copy() {
+  public copy(): Link {
     return new Link(this.id, this.type, this.driven);
   }
 
-  public isEqual(other: Link) {
+  public isEqual(other: Link): boolean {
     // Type does not have to be equal
     return other
       && this.id === other.id

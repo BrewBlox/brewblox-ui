@@ -13,17 +13,17 @@ import { MotorValveBlock, ValveState } from './types';
 export default class MotorValveWidget extends BlockWidget {
   readonly block!: MotorValveBlock;
 
-  get valveStateName() {
+  get valveStateName(): string {
     return spaceCased(ValveState[this.block.data.valveState]);
   }
 
-  get disabled12V() {
+  get disabled12V(): boolean {
     const pins: Spark3PinsBlock | undefined = sparkStore.blockValues(this.serviceId)
       .find(block => block.type === spark3PinType);
-    return pins && !pins.data.enableIoSupply12V;
+    return !!pins && !pins.data.enableIoSupply12V;
   }
 
-  enable12V() {
+  enable12V(): void {
     const pins: Spark3PinsBlock | undefined = sparkStore.blockValues(this.serviceId)
       .find(block => block.type === spark3PinType);
     if (pins) {
@@ -53,7 +53,9 @@ export default class MotorValveWidget extends BlockWidget {
     <q-card-section v-else>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>State</q-item-label>
+          <q-item-label caption>
+            State
+          </q-item-label>
           <DigitalStateField
             :value="block.data.desiredState"
             :pending="block.data.state !== block.data.desiredState"
@@ -63,7 +65,9 @@ export default class MotorValveWidget extends BlockWidget {
           />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Valve State</q-item-label>
+          <q-item-label caption>
+            Valve State
+          </q-item-label>
           {{ valveStateName }}
         </q-item-section>
       </q-item>

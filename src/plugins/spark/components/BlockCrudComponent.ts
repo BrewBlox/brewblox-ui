@@ -1,9 +1,9 @@
 import get from 'lodash/get';
-import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { GraphConfig } from '@/components/Graph/types';
 import CrudComponent, { Crud } from '@/components/Widget/CrudComponent';
+import { createDialog } from '@/helpers/dialog';
 import { showBlockDialog } from '@/helpers/dialog';
 import { postfixedDisplayNames } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
@@ -50,7 +50,7 @@ export default class BlockCrudComponent extends CrudComponent {
     return limiting ? limiting.join(', ') : null;
   }
 
-  public get hasGraph() {
+  public get hasGraph(): boolean {
     return !!get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
   }
 
@@ -67,7 +67,7 @@ export default class BlockCrudComponent extends CrudComponent {
 
     return {
       // persisted in config
-      params: this.widget.config.queryParams || { duration: '10m' },
+      params: this.widget.config.queryParams || { duration: '1h' },
       axes: this.widget.config.graphAxes || {},
       // constants
       layout: {
@@ -94,25 +94,25 @@ export default class BlockCrudComponent extends CrudComponent {
     });
   }
 
-  public async saveBlock(block: Block = this.block) {
+  public async saveBlock(block: Block = this.block): Promise<void> {
     await this.crud.saveBlock(block);
   }
 
-  public async removeBlock() {
+  public async removeBlock(): Promise<void> {
     if (this.isStoreBlock) {
       await sparkStore.removeBlock([this.serviceId, this.block]);
       this.closeDialog();
     }
   }
 
-  public async refreshBlock() {
+  public async refreshBlock(): Promise<void> {
     if (this.isStoreBlock) {
       await sparkStore.fetchBlock([this.serviceId, this.block])
         .catch(() => { });
     }
   }
 
-  public async changeBlockId(newId: string) {
+  public async changeBlockId(newId: string): Promise<void> {
     if (this.isStoreBlock) {
       await sparkStore.renameBlock([this.serviceId, this.blockId, newId])
         .catch(() => { });
@@ -121,22 +121,21 @@ export default class BlockCrudComponent extends CrudComponent {
     }
   }
 
-  public async switchBlock(blockId: string) {
+  public async switchBlock(blockId: string): Promise<void> {
     await this.saveConfig({ ...this.widget.config, blockId });
   }
 
-  public openModal(opts: { formProps?: any; graphProps?: any } = {}): void {
-    const { formProps, graphProps } = opts;
-    this.activeDialog = Dialog.create({
+  public openModal(opts: { formProps?: any } = {}): void {
+    const { formProps } = opts;
+    this.activeDialog = createDialog({
       component: 'FormDialog',
       root: this.$root,
       getCrud: () => ({ ...this.crud, closeDialog: this.closeDialog }),
       getProps: () => formProps,
-      getGraphProps: () => graphProps,
     });
   }
 
-  public closeDialog() {
+  public closeDialog(): void {
     if (this.activeDialog) {
       this.activeDialog.hide();
       this.activeDialog = null;
@@ -144,13 +143,13 @@ export default class BlockCrudComponent extends CrudComponent {
     this.closeDialog();
   }
 
-  public showOtherBlock(block: Block, props: any = {}) {
+  public showOtherBlock(block: Block, props: any = {}): void {
     showBlockDialog(block, props);
   }
 
-  public startChangeBlockId() {
-    let blockId = this.blockId;
-    Dialog.create({
+  public startChangeBlockId(): void {
+    const blockId = this.blockId;
+    createDialog({
       component: 'InputDialog',
       title: 'Change Block name',
       message: `Choose a new name for '${this.blockId}'`,
@@ -163,8 +162,8 @@ export default class BlockCrudComponent extends CrudComponent {
       });
   }
 
-  public startSwitchBlock() {
-    Dialog.create({
+  public startSwitchBlock(): void {
+    createDialog({
       component: 'BlockDialog',
       title: 'Choose a Block',
       message: 'You can change the Block that will be displayed by this widget',
@@ -175,16 +174,16 @@ export default class BlockCrudComponent extends CrudComponent {
       .onOk(block => this.switchBlock(block.id));
   }
 
-  public startBlockInfo() {
-    Dialog.create({
+  public startBlockInfo(): void {
+    createDialog({
       component: 'BlockInfoDialog',
       block: this.block,
       root: this.$root,
     });
   }
 
-  public startRemoveBlock() {
-    Dialog.create({
+  public startRemoveBlock(): void {
+    createDialog({
       title: 'Remove Block',
       message: `Are you sure you want to remove ${this.block.id}?`,
       cancel: true,

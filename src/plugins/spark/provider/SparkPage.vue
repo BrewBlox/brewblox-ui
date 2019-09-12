@@ -1,10 +1,10 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { clearTimeout, setInterval } from 'timers';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { capitalized, objectStringSorter } from '@/helpers/functional';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, Spark, SystemStatus } from '@/plugins/spark/types';
@@ -37,7 +37,7 @@ export default class SparkPage extends Vue {
 
   volatileItems: { [blockId: string]: DashboardItem } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
-  blockFilter: string = '';
+  blockFilter = '';
 
   get service(): Spark {
     return serviceStore.serviceById(this.serviceId) as Spark;
@@ -47,11 +47,11 @@ export default class SparkPage extends Vue {
     return dashboardStore.dashboardValues;
   }
 
-  get isAvailable() {
+  get isAvailable(): boolean {
     return sparkStore.serviceAvailable(this.service.id);
   }
 
-  get isReady() {
+  get isReady(): boolean {
     return this.isAvailable && isReady(this.service.id);
   }
 
@@ -62,8 +62,8 @@ export default class SparkPage extends Vue {
     return sparkStore.lastStatus(this.service.id);
   }
 
-  get statusNok() {
-    return this.isAvailable && this.status && !this.status.synchronize;
+  get statusNok(): boolean {
+    return Boolean(this.isAvailable && this.status && !this.status.synchronize);
   }
 
   get roleOrder(): Record<FeatureRole, number> {
@@ -115,7 +115,7 @@ export default class SparkPage extends Vue {
     return this.allSorters[this.sorting] || (() => 0);
   }
 
-  get expandedBlocks() {
+  get expandedBlocks(): { [id: string]: boolean } {
     return this.service.config.expandedBlocks || {};
   }
 
@@ -133,7 +133,7 @@ export default class SparkPage extends Vue {
     this.saveServiceConfig();
   }
 
-  get serviceExpanded() {
+  get serviceExpanded(): boolean {
     return this.expandedBlocks['_service'] || false;
   }
 
@@ -141,16 +141,16 @@ export default class SparkPage extends Vue {
     this.expandedBlocks = { ...this.expandedBlocks, ['_service']: val };
   }
 
-  get serviceShown() {
+  get serviceShown(): boolean {
     return !this.blockFilter ||
-      this.service.id.toLowerCase().match(this.blockFilter.toLowerCase());
+      !!this.service.id.toLowerCase().match(this.blockFilter.toLowerCase());
   }
 
-  saveServiceConfig() {
+  saveServiceConfig(): void {
     serviceStore.saveService({ ...this.service });
   }
 
-  updateExpandedBlock(id: string, val: boolean) {
+  updateExpandedBlock(id: string, val: boolean): void {
     this.expandedBlocks = { ...this.expandedBlocks, [id]: val };
   }
 
@@ -210,17 +210,17 @@ export default class SparkPage extends Vue {
     return this.filteredItems.filter(item => item.expanded);
   }
 
-  expandAll() {
+  expandAll(): void {
     this.expandedBlocks = [...sparkStore.blockIds(this.service.id), '_service']
       .reduce((acc, id) => ({ ...acc, [id]: true }), {});
   }
 
-  expandNone() {
+  expandNone(): void {
     this.expandedBlocks = {};
   }
 
   @Watch('statusNok', { immediate: true })
-  autoRecheck() {
+  autoRecheck(): void {
     if (this.statusNok && !this.statusCheckInterval) {
       this.statusCheckInterval = setInterval(
         () => sparkStore.fetchServiceStatus(this.service.id),
@@ -236,7 +236,7 @@ export default class SparkPage extends Vue {
     }
   }
 
-  saveWidget(widget: DashboardItem) {
+  saveWidget(widget: DashboardItem): void {
     this.volatileItems[this.volatileKey(widget.id)] = { ...widget };
     this.$q.notify({
       color: 'warning',
@@ -244,22 +244,22 @@ export default class SparkPage extends Vue {
     });
   }
 
-  startDialog(component: string, props: any = null) {
+  startDialog(component: string, props: any = null): void {
     const args = props || {
       serviceId: this.service.id,
     };
-    Dialog.create({
+    createDialog({
       component,
       root: this.$root,
       ...args,
     });
   }
 
-  showRelations() {
+  showRelations(): void {
     const nodes = this.validatedItems.map(v => ({ id: v.item.id, type: v.typeName }));
     const relations = sparkStore.blockLinks(this.service.id);
 
-    Dialog.create({
+    createDialog({
       component: 'RelationsDialog',
       serviceId: this.service.id,
       nodes,
@@ -267,7 +267,7 @@ export default class SparkPage extends Vue {
     });
   }
 
-  async discoverBlocks() {
+  async discoverBlocks(): Promise<void> {
     await sparkStore.clearDiscoveredBlocks(this.service.id);
     await sparkStore.fetchDiscoveredBlocks(this.service.id);
     await this.$nextTick();
@@ -283,8 +283,8 @@ export default class SparkPage extends Vue {
     });
   }
 
-  async resetBlocks() {
-    Dialog.create({
+  resetBlocks(): void {
+    createDialog({
       title: 'Reset Blocks',
       message: `This will remove all Blocks on ${this.service.id}. Are you sure?`,
       dark: true,
@@ -306,7 +306,7 @@ export default class SparkPage extends Vue {
       });
   }
 
-  async cleanUnusedNames() {
+  async cleanUnusedNames(): Promise<void> {
     const names = await sparkStore.cleanUnusedNames(this.service.id);
 
     const message = names.length > 0
@@ -316,7 +316,7 @@ export default class SparkPage extends Vue {
     this.$q.notify({ message, icon: 'mdi-tag-remove' });
   }
 
-  destroyed() {
+  destroyed(): void {
     this.statusCheckInterval && clearTimeout(this.statusCheckInterval);
   }
 }
@@ -426,7 +426,9 @@ export default class SparkPage extends Vue {
             <q-tooltip>Service</q-tooltip>
           </q-item-section>
           <q-item-section>{{ serviceId }}</q-item-section>
-          <q-item-section side>Spark Service</q-item-section>
+          <q-item-section side>
+            Spark Service
+          </q-item-section>
         </q-item>
         <!-- Blocks -->
         <q-item
@@ -442,7 +444,9 @@ export default class SparkPage extends Vue {
             <q-tooltip>{{ val.role }}</q-tooltip>
           </q-item-section>
           <q-item-section>{{ val.item.title }}</q-item-section>
-          <q-item-section side>{{ val.typeName }}</q-item-section>
+          <q-item-section side>
+            {{ val.typeName }}
+          </q-item-section>
         </q-item>
       </q-list>
 

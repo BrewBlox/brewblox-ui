@@ -8,7 +8,6 @@ declare module '*.json' {
   export default value;
 }
 
-declare module 'quasar';
 declare module 'portal-vue';
 declare module 'vuedraggable';
 declare module 'url-safe-string';

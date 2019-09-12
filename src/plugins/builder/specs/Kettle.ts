@@ -1,3 +1,5 @@
+import { Coordinates } from '@/helpers/coordinates';
+
 import { PartSpec, PersistentPart } from '../types';
 
 const DEFAULT_SIZE_X = 4;
@@ -33,7 +35,35 @@ const spec: PartSpec = {
     part.settings.sizeX || DEFAULT_SIZE_X,
     part.settings.sizeY || DEFAULT_SIZE_Y,
   ],
-  transitions: () => ({}),
+  transitions: (part: PersistentPart) => {
+    const sizeX: number = DEFAULT_SIZE_X;
+    const sizeY: number = DEFAULT_SIZE_Y;
+
+    const coords = Array(sizeX * sizeY).fill(0).map((v, n) => {
+      const outFlow = new Coordinates({ x: (n % sizeX) + 0.5, y: Math.floor(n / sizeX) + 0.5, z: 0 });
+      const inFlow = new Coordinates({ x: (n % sizeX) + 0.1, y: Math.floor(n / sizeX) + 0.1, z: 0 });
+      return { in: inFlow.toString(), out: outFlow.toString() };
+    });
+
+    const result = {};
+
+    coords.forEach(item => {
+      result[item.out] = [{
+        outCoords: item.in,
+        friction: 0,
+        sink: true,
+      }];
+
+      result[item.in] = [{
+        outCoords: item.out,
+        pressure: 0,
+        friction: 0,
+        liquids: part.settings.color ? [part.settings.color] : [],
+        source: true,
+      }];
+    });
+    return result;
+  },
 };
 
 export default spec;

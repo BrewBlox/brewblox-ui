@@ -12,27 +12,27 @@ export default class TeeTube extends PartBase {
     right: 'M25,25 H50',
   };
 
-  get topSpeed() {
+  get topSpeed(): number {
     return this.flowOnCoord(UP);
   }
 
-  get leftSpeed() {
+  get leftSpeed(): number {
     return this.flowOnCoord(LEFT);
   }
 
-  get rightSpeed() {
+  get rightSpeed(): number {
     return this.flowOnCoord(RIGHT);
   }
 
-  get topLiquids() {
+  get topLiquids(): string[] {
     return this.liquidOnCoord(UP);
   }
 
-  get leftLiquids() {
+  get leftLiquids(): string[] {
     return this.liquidOnCoord(LEFT);
   }
 
-  get rightLiquids() {
+  get rightLiquids(): string[] {
     return this.liquidOnCoord(RIGHT);
   }
 }

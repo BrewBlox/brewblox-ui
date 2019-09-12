@@ -6,7 +6,7 @@ import { Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { durationString } from '@/helpers/functional';
-import { DisplayNames, Listener, QueryParams, QueryTarget, historyStore } from '@/store/history';
+import { DisplayNames, historyStore, Listener, QueryParams, QueryTarget } from '@/store/history';
 
 import { addListener } from './actions';
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './getters';
@@ -23,7 +23,7 @@ export default class MetricsWidget extends WidgetBase {
   durationString = durationString;
   DEFAULT_FRESH_DURATION = DEFAULT_FRESH_DURATION;
 
-  modalOpen: boolean = false;
+  modalOpen = false;
 
   get widgetCfg(): MetricsConfig {
     return {
@@ -54,11 +54,11 @@ export default class MetricsWidget extends WidgetBase {
       .filter(listener => listener !== null && !!listener.values) as Listener[];
   }
 
-  fieldFreshDuration(field: string) {
+  fieldFreshDuration(field: string): number {
     return get(this.widgetCfg.freshDuration, field, DEFAULT_FRESH_DURATION);
   }
 
-  fieldDecimals(field: string) {
+  fieldDecimals(field: string): number {
     return get(this.widgetCfg.decimals, field, DEFAULT_DECIMALS);
   }
 
@@ -77,7 +77,7 @@ export default class MetricsWidget extends WidgetBase {
     return `${this.widget.id}/${target.measurement}`;
   }
 
-  addListeners() {
+  addListeners(): void {
     this.targets
       .forEach(target =>
         addListener(
@@ -88,27 +88,27 @@ export default class MetricsWidget extends WidgetBase {
         ));
   }
 
-  removeListeners() {
+  removeListeners(): void {
     this.listeners
       .forEach(listener =>
         historyStore.removeListener(listener));
   }
 
-  resetListeners() {
+  resetListeners(): void {
     this.removeListeners();
     this.addListeners();
   }
 
   @Watch('widgetCfg', { deep: true })
-  regraph() {
+  regraph(): void {
     this.$nextTick(() => this.resetListeners());
   }
 
-  mounted() {
+  mounted(): void {
     this.addListeners();
   }
 
-  destroyed() {
+  destroyed(): void {
     this.removeListeners();
   }
 }
@@ -144,9 +144,13 @@ export default class MetricsWidget extends WidgetBase {
         </q-item>
         <q-item v-for="val in values" :key="val.field" dark>
           <q-item-section>
-            <q-item-label caption>{{ val.name }}</q-item-label>
+            <q-item-label caption>
+              {{ val.name }}
+            </q-item-label>
             <div class="row items-center">
-              <big :class="{darkened: val.stale}">{{ val.value | round(fieldDecimals(val.field)) }}</big>
+              <big :class="{darkened: val.stale}">
+                {{ val.value | round(fieldDecimals(val.field)) }}
+              </big>
               <q-icon v-if="val.stale" name="warning" right size="24px" />
             </div>
             <q-tooltip v-if="val.stale">

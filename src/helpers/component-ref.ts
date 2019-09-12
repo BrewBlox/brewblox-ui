@@ -25,8 +25,12 @@ export const autoRegister =
       );
 
 
-export async function externalComponent(url) {
-  const name = url.split('/').reverse()[0].match(/^(.*?)\.umd/)[1];
+export async function externalComponent(url: string): Promise<any> {
+  const match = url.split('/').reverse()[0].match(/^(.*?)\.umd/);
+  if (match === null) {
+    throw new Error('Invalid URL');
+  }
+  const name = match[1];
   const win: any = window;
 
   if (win[name]) {

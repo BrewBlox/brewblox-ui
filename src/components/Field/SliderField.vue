@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { round } from '@/helpers/functional';
 
 import FieldBase from './FieldBase';
@@ -28,21 +28,24 @@ export default class SliderField extends FieldBase {
   @Prop({ type: Number, default: 2 })
   readonly decimals!: number;
 
+  @Prop({ type: Array, default: () => [] })
+  public readonly quickActions!: SelectOption[];
+
   @Emit('input')
-  public change(v: number) {
+  public change(v: number): number {
     return v;
   }
 
-  get displayValue() {
+  get displayValue(): string | number {
     return round(this.value, this.decimals);
   }
 
-  openDialog() {
+  openDialog(): void {
     if (this.readonly) {
       return;
     }
 
-    Dialog.create({
+    createDialog({
       component: 'SliderDialog',
       title: this.title,
       message: this.message,
@@ -53,6 +56,7 @@ export default class SliderField extends FieldBase {
       min: this.min,
       max: this.max,
       step: this.step,
+      quickActions: this.quickActions,
     })
       .onOk(this.change);
   }
@@ -67,8 +71,12 @@ export default class SliderField extends FieldBase {
     @click="openDialog"
   >
     <slot name="pre" />
-    <slot name="value">{{ displayValue }}</slot>
+    <slot name="value">
+      {{ displayValue }}
+    </slot>
     <slot name="append" />
-    <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
+    <q-tooltip v-if="!readonly">
+      Set {{ label }}
+    </q-tooltip>
   </component>
 </template>

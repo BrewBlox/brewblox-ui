@@ -24,7 +24,7 @@ export default class SparkUnitMenu extends DialogBase {
       .map(v => ({ label: prettify(v), value: v }));
   }
 
-  saveUnits(vals: UserUnits = this.units) {
+  saveUnits(vals: UserUnits = this.units): void {
     sparkStore.saveUnits([this.serviceId, vals])
       .catch(reason => this.$q.notify({
         icon: 'error',
@@ -33,7 +33,7 @@ export default class SparkUnitMenu extends DialogBase {
       }));
   }
 
-  mounted() {
+  mounted(): void {
     sparkStore.fetchAll(this.serviceId);
   }
 }
@@ -45,14 +45,18 @@ export default class SparkUnitMenu extends DialogBase {
       <DialogToolbar @close="onDialogHide">
         <q-item-section>
           <q-item-label>{{ serviceId }}</q-item-label>
-          <q-item-label caption>Unit preferences</q-item-label>
+          <q-item-label caption>
+            Unit preferences
+          </q-item-label>
         </q-item-section>
       </DialogToolbar>
 
       <q-card-section>
         <q-item dark>
           <q-item-section v-for="(val, name) in units" :key="name">
-            <q-item-label caption>{{ `${spaceCased(name)} unit` }}</q-item-label>
+            <q-item-label caption>
+              {{ `${spaceCased(name)} unit` }}
+            </q-item-label>
             <SelectField
               :value="val"
               :options="unitAlternativeOptions(name)"

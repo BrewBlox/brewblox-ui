@@ -1,14 +1,11 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from './BlockCrudComponent';
 
 @Component
 export default class BlockWidgetToolbar extends BlockCrudComponent {
-  graphModalOpen: boolean = false;
-
-  @Prop({ type: Object })
-  public readonly graphProps!: any;
+  graphModalOpen = false;
 }
 </script>
 
@@ -16,13 +13,13 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
   <WidgetToolbar :title="widget.title" :subtitle="displayName">
     <BlockGraph
       v-if="graphModalOpen"
-      v-model="graphModalOpen"
       :id="widget.id"
+      v-model="graphModalOpen"
       :config.sync="graphCfg"
     />
 
     <q-item-section side>
-      <q-btn-dropdown flat split icon="settings" @click="openModal({graphProps})">
+      <q-btn-dropdown flat split icon="settings" @click="openModal">
         <q-list dark bordered>
           <!-- Global Actions -->
           <ActionItem

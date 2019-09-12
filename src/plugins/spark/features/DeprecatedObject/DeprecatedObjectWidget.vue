@@ -13,11 +13,11 @@ export default class DeprecatedObjectWidget extends BlockWidget {
   readonly block!: DeprecatedObjectBlock;
   actual: Block | null = null;
 
-  async created() {
+  async created(): Promise<void> {
     this.actual = await fetchStoredBlock(this.serviceId, this.block.data.actualId);
   }
 
-  removeBlock() {
+  removeBlock(): void {
     sparkStore.removeBlock([this.block.serviceId, this.block]);
   }
 }
@@ -30,11 +30,15 @@ export default class DeprecatedObjectWidget extends BlockWidget {
     <q-card-section>
       <q-item dark>
         <q-item-section>
-          <q-item-label caption>Id</q-item-label>
+          <q-item-label caption>
+            Id
+          </q-item-label>
           {{ actual ? actual.id : 'Unknown' }}
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>Type</q-item-label>
+          <q-item-label caption>
+            Type
+          </q-item-label>
           {{ actual ? actual.type : 'Unknown' }}
         </q-item-section>
         <q-item-section class="col-auto">

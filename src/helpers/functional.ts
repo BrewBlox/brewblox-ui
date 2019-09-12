@@ -91,7 +91,7 @@ export const clampRotation =
   (val: number): number => (val + 360) % 360;
 
 export const dateString =
-  (value: number | string | Date | null, nullLabel: string = '<not set>'): string => {
+  (value: number | string | Date | null, nullLabel = '<not set>'): string => {
     if (value === null || value === undefined) {
       return nullLabel;
     }
@@ -99,7 +99,7 @@ export const dateString =
   };
 
 export const shortDateString =
-  (value: number | string | Date | null, nullLabel: string = '<not set>'): string => {
+  (value: number | string | Date | null, nullLabel = '<not set>'): string => {
     if (value === null || value === undefined) {
       return nullLabel;
     }
@@ -111,15 +111,30 @@ export const shortDateString =
   };
 
 export const round =
-  (value: any, digits: number = 2): string | number => {
+  (value: any, digits = 2): string | number => {
     if (value === null || value === undefined) {
       return '--.--';
     }
     return (+value).toFixed(digits);
   };
 
+export const truncateRound =
+  (value: any): string | number => {
+    if (value === null || value === undefined) {
+      return '---';
+    }
+    const v = +value;
+    if (Math.abs(v) > 100) {
+      return v.toFixed(0);
+    }
+    if (Math.abs(v) > 10) {
+      return v.toFixed(1);
+    }
+    return v.toFixed(2);
+  };
+
 export const roundNumber =
-  (value: number, digits: number = 2): number =>
+  (value: number, digits = 2): number =>
     Number((Math.round(Number(value + 'e' + digits)) + 'e-' + digits));
 
 export const truncate =
@@ -135,7 +150,7 @@ export function valOrDefault<T>(val: T, defaultVal: T): T {
 }
 
 export function chunked<T>(arr: T[], chunkSize: number): T[][] {
-  let chunks: T[][] = [];
+  const chunks: T[][] = [];
   let i = 0;
   const n = arr.length;
   while (i < n) {
@@ -178,12 +193,17 @@ export const suggestId =
     return copyName(idx);
   };
 
-export const isAbsoluteUrl = (val: string) =>
+export const isAbsoluteUrl = (val: string): boolean =>
   new RegExp('^(?:[a-z]+:)?//', 'i').test(val);
 
 export const entryReducer =
-  (acc: Record<string, any>, [key, val]: [string, any]) =>
-    ({ ...acc, [key]: val });
+  (acc: Record<string, any>, [key, val]: [string, any]): Record<string, any> => {
+    acc[key] = val;
+    return acc;
+  };
 
 export const objReducer = (key: string) =>
-  (acc: Record<string, any>, obj: any) => ({ ...acc, [obj[key]]: obj });
+  (acc: Record<string, any>, obj: any) => {
+    acc[obj[key]] = obj;
+    return acc;
+  };

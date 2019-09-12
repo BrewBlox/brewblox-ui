@@ -1,8 +1,8 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/Field/FieldBase';
+import { createDialog } from '@/helpers/dialog';
 import { Link } from '@/helpers/units';
 import { Block } from '@/plugins/spark/types';
 
@@ -25,20 +25,20 @@ export default class LinkField extends FieldBase {
   public readonly noCreate!: boolean;
 
   @Emit('input')
-  public change(v: Link) {
+  public change(v: Link): Link {
     return v;
   }
 
-  get displayValue() {
+  get displayValue(): string {
     return this.value.id || 'click to assign';
   }
 
-  openDialog() {
+  openDialog(): void {
     if (this.readonly) {
       return;
     }
 
-    Dialog.create({
+    createDialog({
       component: 'LinkDialog',
       root: this.$root,
       clearable: true,
@@ -63,9 +63,13 @@ export default class LinkField extends FieldBase {
     :class="[{editable: !readonly}, tagClass]"
     @click="openDialog"
   >
-    <slot name="pre"/>
-    <slot name="value">{{ displayValue | truncated }}</slot>
-    <slot/>
-    <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
+    <slot name="pre" />
+    <slot name="value">
+      {{ displayValue | truncated }}
+    </slot>
+    <slot />
+    <q-tooltip v-if="!readonly">
+      Set {{ label }}
+    </q-tooltip>
   </component>
 </template>

@@ -12,7 +12,7 @@ const host = process.env.VUE_APP_API_URI;
 const fetchErrors: FetchError[] = [];
 
 export const getErrors =
-  (clear: boolean = false): FetchError[] => {
+  (clear = false): FetchError[] => {
     const retval = [...fetchErrors];
     if (clear) {
       fetchErrors.length = 0;

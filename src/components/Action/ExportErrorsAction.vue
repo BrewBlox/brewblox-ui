@@ -15,14 +15,14 @@ export default class ExportErrorsAction extends Vue {
   @Prop({ type: String, default: 'Export API errors' })
   public readonly label!: string;
 
-  get itemProps() {
+  get itemProps(): Record<string, any> {
     return {
       ...this.$attrs,
       ...this.$props,
     };
   }
 
-  async showDialog() {
+  async showDialog(): Promise<void> {
     const errors = { fetch: getFetchErrors(), database: database.getErrors() };
     saveJsonFile(JSON.stringify(errors, null, 2), 'brewblox-errors.json', true);
   }

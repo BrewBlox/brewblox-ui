@@ -53,7 +53,7 @@ interface DisplayNameType { [key: string]: string }
 export function postfixedDisplayNames(displayNames: DisplayNameType, inputObject: any): DisplayNameType {
   const retv: DisplayNameType = {};
 
-  for (let key in displayNames) {
+  for (const key in displayNames) {
     const serializedKey = serializedPropertyName(key, inputObject);
     const unit = objectUnit(inputObject[key]);
     const name = displayNames[key];
@@ -96,7 +96,7 @@ function deserializeProperty(key: string, inputObject: any, input = inputObject[
   return convertToUnit(key, input);
 }
 
-export function deserialize(input: any, prevKey: string = ''): any {
+export function deserialize(input: any, prevKey = ''): any {
   if (Array.isArray(input)) {
     return input.map(item => deserializeProperty(prevKey, null, item));
   }
@@ -131,7 +131,7 @@ function serializeProperty(key: string, inputObject: any, input = inputObject[ke
   return input;
 }
 
-export function serialize(input: any, prevKey: string = ''): any {
+export function serialize(input: any, prevKey = ''): any {
   if (Array.isArray(input)) {
     return input.map(item => serializeProperty(prevKey, null, item));
   }

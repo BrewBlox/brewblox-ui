@@ -10,20 +10,20 @@ import { DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/features/Disp
 export default class DisplaySettingsForm extends BlockCrudComponent {
   readonly block!: DisplaySettingsBlock;
 
-  get slots() {
+  get slots(): Array<any> {
     const slots = Array(6);
     this.block.data.widgets
       .forEach((w) => { slots[w.pos - 1] = w; });
     return slots;
   }
 
-  get slotNameRules() {
+  get slotNameRules(): InputRule[] {
     return [
       v => !v || v.length <= 15 || 'Name can only be 15 characters',
     ];
   }
 
-  get footerRules() {
+  get footerRules(): InputRule[] {
     return [
       v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
     ];
@@ -37,7 +37,7 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
       .find(v => v instanceof Link) || new Link(null);
   }
 
-  slotColor(slot: DisplaySlot) {
+  slotColor(slot: DisplaySlot): string {
     return slot && slot.color
       ? `#${slot.color}`
       : '#ff';
@@ -55,7 +55,7 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
     return block => validDisplayTypes.includes(block.type);
   }
 
-  updateSlotLink(idx: number, link: Link) {
+  updateSlotLink(idx: number, link: Link): void {
     const pos = idx + 1;
     if (!link.id) {
       this.block.data.widgets = this.block.data.widgets
@@ -95,14 +95,14 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
     this.saveBlock();
   }
 
-  updateSlotName(idx: number, name: string) {
+  updateSlotName(idx: number, name: string): void {
     const pos = idx + 1;
     this.block.data.widgets = this.block.data.widgets
       .map(w => (w.pos === pos ? { ...w, name } : w));
     this.saveBlock();
   }
 
-  updateSlotColor(idx: number, color: string) {
+  updateSlotColor(idx: number, color: string): void {
     const pos = idx + 1;
     this.block.data.widgets = this.block.data.widgets
       .map(w => (w.pos === pos ? { ...w, color: color.replace('#', '') } : w));
@@ -120,7 +120,9 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
         <q-list :style="`border: 2px solid ${slotColor(slot)}`" dark class="col-12">
           <q-item dark>
             <q-item-section>
-              <q-item-label caption>Block</q-item-label>
+              <q-item-label caption>
+                Block
+              </q-item-label>
               <LinkField
                 :value="slotLink(slot)"
                 :filter="linkFilter"
@@ -133,7 +135,9 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
           </q-item>
           <q-item dark>
             <q-item-section>
-              <q-item-label caption>Display name</q-item-label>
+              <q-item-label caption>
+                Display name
+              </q-item-label>
               <InputField
                 v-if="slot"
                 :value="slot.name"
@@ -147,7 +151,9 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
           </q-item>
           <q-item dark>
             <q-item-section>
-              <q-item-label caption>Color</q-item-label>
+              <q-item-label caption>
+                Color
+              </q-item-label>
               <ColorField
                 v-if="slot"
                 :value="slot.color"
@@ -168,7 +174,9 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
       <q-list dark>
         <q-item dark class="align-children">
           <q-item-section>
-            <q-item-label caption>Footer text</q-item-label>
+            <q-item-label caption>
+              Footer text
+            </q-item-label>
             <InputField
               :value="block.data.name"
               :rules="footerRules"
@@ -177,7 +185,9 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
             />
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>Temperature Unit</q-item-label>
+            <q-item-label caption>
+              Temperature Unit
+            </q-item-label>
             <SelectField
               :value="block.data.tempUnit"
               :options="[{ label: 'Celsius', value: 0 }, { label: 'Fahrenheit', value: 1 }]"
@@ -186,7 +196,9 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
             />
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>Display brightness</q-item-label>
+            <q-item-label caption>
+              Display brightness
+            </q-item-label>
             <q-slider
               :value="block.data.brightness || 255"
               :min="20"

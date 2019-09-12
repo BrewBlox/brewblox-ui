@@ -14,11 +14,11 @@ export default class StraightInletTube extends PartBase {
     liquid: 'M0,25 H25',
   };
 
-  get flowSpeed() {
+  get flowSpeed(): number {
     return -this.flowOnCoord(LEFT);
   }
 
-  get liquids() {
+  get liquids(): string[] {
     return this.liquidOnCoord(LEFT);
   }
 }

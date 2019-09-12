@@ -1,8 +1,8 @@
 <script lang="ts">
 
-import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
@@ -18,7 +18,7 @@ export default class RemoveBlockAction extends BlockCrudComponent {
   @Prop({ type: String, default: 'mdi-file-replace' })
   readonly icon!: string;
 
-  get itemProps() {
+  get itemProps(): Record<string, any> {
     return {
       ...this.$attrs,
       ...this.$props,
@@ -41,8 +41,8 @@ export default class RemoveBlockAction extends BlockCrudComponent {
     return copyName(idx);
   }
 
-  public startCloneBlock() {
-    Dialog.create({
+  public startCloneBlock(): void {
+    createDialog({
       component: 'InputDialog',
       title: 'Clone Block',
       message: `This will create an additional Block

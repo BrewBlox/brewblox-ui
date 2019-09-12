@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { Unit } from '@/helpers/units';
 
 import FieldBase from './FieldBase';
@@ -16,16 +16,16 @@ export default class TimeUnitField extends FieldBase {
   public readonly label!: string;
 
   @Emit('input')
-  public change(v: Unit) {
+  public change(v: Unit): Unit {
     return v;
   }
 
-  openDialog() {
+  openDialog(): void {
     if (this.readonly) {
       return;
     }
 
-    Dialog.create({
+    createDialog({
       component: 'TimeUnitDialog',
       title: this.title,
       message: this.message,
@@ -46,9 +46,13 @@ export default class TimeUnitField extends FieldBase {
     :class="[{editable: !readonly}, tagClass]"
     @click="openDialog"
   >
-    <slot name="pre"/>
-    <slot name="value">{{ value | unitDuration }}</slot>
-    <slot/>
-    <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
+    <slot name="pre" />
+    <slot name="value">
+      {{ value | unitDuration }}
+    </slot>
+    <slot />
+    <q-tooltip v-if="!readonly">
+      Set {{ label }}
+    </q-tooltip>
   </component>
 </template>

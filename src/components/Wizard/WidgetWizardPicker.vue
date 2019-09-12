@@ -13,17 +13,17 @@ export default class WidgetWizardPicker extends Vue {
 
   filteredOptions: any[] = [];
   feature: any = null;
-  wizardActive: boolean = false;
+  wizardActive = false;
 
-  localChosenDashboardId: string = '';
+  localChosenDashboardId = '';
 
-  get currentDashboard() {
+  get currentDashboard(): string | null {
     return this.$route.path.startsWith('/dashboard')
       ? this.$route.params.id
       : null;
   }
 
-  get chosenDashboardId() {
+  get chosenDashboardId(): string {
     return this.localChosenDashboardId
       || this.dashboardId
       || this.currentDashboard
@@ -35,12 +35,12 @@ export default class WidgetWizardPicker extends Vue {
     this.localChosenDashboardId = id;
   }
 
-  get dashboardOptions() {
+  get dashboardOptions(): SelectOption[] {
     return dashboardStore.dashboardValues
       .map(dash => ({ label: dash.title, value: dash.id }));
   }
 
-  get wizardOptions() {
+  get wizardOptions(): SelectOption[] {
     return featureStore.featureIds
       .map(id => ({
         label: featureStore.displayNameById(id),
@@ -51,11 +51,11 @@ export default class WidgetWizardPicker extends Vue {
       .sort(objectStringSorter('label'));
   }
 
-  get valuesOk() {
+  get valuesOk(): boolean {
     return !!this.chosenDashboardId && !!this.feature;
   }
 
-  filterFn(val, update) {
+  filterFn(val, update): void {
     if (val === '') {
       update(() => this.filteredOptions = this.wizardOptions);
       return;
@@ -68,30 +68,30 @@ export default class WidgetWizardPicker extends Vue {
     });
   }
 
-  setTitle(title: string) {
+  setTitle(title: string): void {
     this.$emit('title', title);
   }
 
-  reset() {
+  reset(): void {
     this.wizardActive = false;
     this.setTitle('Widget wizard');
     this.filteredOptions = this.wizardOptions;
   }
 
-  back() {
+  back(): void {
     this.$emit('back');
   }
 
-  close() {
+  close(): void {
     this.$emit('close');
   }
 
-  next() {
+  next(): void {
     this.wizardActive = true;
     this.setTitle(`${this.feature.label} wizard`);
   }
 
-  mounted() {
+  mounted(): void {
     this.reset();
   }
 }
@@ -100,8 +100,8 @@ export default class WidgetWizardPicker extends Vue {
 <template>
   <div>
     <component
-      v-if="wizardActive"
       :is="feature.component"
+      v-if="wizardActive"
       :feature-id="feature.value"
       :dashboard-id="chosenDashboardId"
       @title="setTitle"
@@ -125,7 +125,9 @@ export default class WidgetWizardPicker extends Vue {
             >
               <template v-slot:no-option>
                 <q-item dark>
-                  <q-item-section class="text-grey">No results</q-item-section>
+                  <q-item-section class="text-grey">
+                    No results
+                  </q-item-section>
                 </q-item>
               </template>
             </q-select>

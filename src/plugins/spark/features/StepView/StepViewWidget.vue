@@ -1,8 +1,8 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
+import { createDialog } from '@/helpers/dialog';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { deserialize, isSubSet, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
@@ -11,20 +11,22 @@ import { Block, ChangeField } from '@/plugins/spark/types';
 import { BlockChange, Step } from './types';
 
 interface ChangeDiff {
+  key: string;
+  oldV: string;
+  newV: string;
+  changed: boolean;
+}
+
+interface StepDiff {
   id: string;
-  diff: {
-    key: string;
-    oldV: string;
-    newV: string;
-    changed: boolean;
-  }[];
+  diff: ChangeDiff[];
 }
 
 @Component
 export default class StepViewWidget extends WidgetBase {
-  applying: boolean = false;
+  applying = false;
 
-  get serviceId() {
+  get serviceId(): string {
     return this.widget.config.serviceId;
   }
 
@@ -69,10 +71,10 @@ export default class StepViewWidget extends WidgetBase {
       if (!change) {
         resolve(value);
       }
-      Dialog.create({
+      createDialog({
         component: 'ChangeConfirmDialog',
         title: 'Confirm change',
-        message: `Please confirm the ${change.title} value in ${block.id}.`,
+        message: `Please confirm the ${change.title} value in ${block.id}. Current value is '${block.data[key]}'.`,
         serviceId: block.serviceId,
         blockId: block.id,
         value,
@@ -84,27 +86,27 @@ export default class StepViewWidget extends WidgetBase {
     });
   }
 
-  async applyChanges(step: Step) {
+  async applyChanges(step: Step): Promise<void> {
     const changes = step.changes;
     const actualChanges: [Block, any][] = [];
-    for (let change of changes) {
+    for (const change of changes) {
       const block = sparkStore.blockById(this.serviceId, change.blockId);
       const actualData = deepCopy(change.data);
-      for (let key in change.data) {
+      for (const key in change.data) {
         if (change.confirmed && change.confirmed[key]) {
           actualData[key] = await this.confirmStepChange(block, key, actualData[key]);
         }
       }
       actualChanges.push([block, actualData]);
     }
-    for (let [block, actualData] of actualChanges) {
+    for (const [block, actualData] of actualChanges) {
       await sparkStore.saveBlock([this.serviceId, { ...block, data: { ...block.data, ...actualData } }]);
     }
     step.changes = step.changes.map((change, idx) => ({ ...change, data: actualChanges[idx][1] }));
     this.steps = this.steps.map(s => s.id === step.id ? step : s);
   }
 
-  applyStep(step: Step) {
+  applyStep(step: Step): void {
     this.applying = true;
     this.applyChanges(step)
       .then(() => this.$q.notify({
@@ -124,13 +126,13 @@ export default class StepViewWidget extends WidgetBase {
       .finally(() => { this.applying = false; });
   }
 
-  openModal(openStep: string | null) {
+  openModal(openStep: string | null): void {
     this.showForm({
       getProps: () => ({ openStep }),
     });
   }
 
-  changeDiff(change: BlockChange) {
+  changeDiff(change: BlockChange): ChangeDiff[] {
     const block = sparkStore.blockById(this.serviceId, change.blockId);
     const spec = sparkStore.specs[block.type];
     return Object.entries(change.data)
@@ -148,7 +150,7 @@ export default class StepViewWidget extends WidgetBase {
       });
   }
 
-  stepDiff(step: Step): ChangeDiff[] {
+  stepDiff(step: Step): StepDiff[] {
     return step.changes.map(change => {
       return { id: change.blockId, diff: this.changeDiff(change) };
     });
@@ -173,11 +175,15 @@ export default class StepViewWidget extends WidgetBase {
       <q-item v-for="step in steps" :key="step.id" dark>
         <q-item-section>
           {{ step.name }}
-          <q-item-label caption>{{ step.changes.length }} Blocks changed</q-item-label>
+          <q-item-label caption>
+            {{ step.changes.length }} Blocks changed
+          </q-item-label>
           <q-tooltip v-if="applicableSteps[step.id]">
             <q-list dark dense>
               <q-item v-for="cdiff in stepDiff(step)" :key="`cdiff-${cdiff.id}`" dark>
-                <q-item-section class="col-3">{{ cdiff.id }}</q-item-section>
+                <q-item-section class="col-3">
+                  {{ cdiff.id }}
+                </q-item-section>
                 <q-item-section>
                   <ul>
                     <li v-for="item in cdiff.diff" :key="`diff-item-${item.key}`">
@@ -187,14 +193,18 @@ export default class StepViewWidget extends WidgetBase {
                         =>
                         <span style="color: lime">{{ item.newV }}</span>
                       </template>
-                      <template v-else>{{ item.newV }}</template>
+                      <template v-else>
+                        {{ item.newV }}
+                      </template>
                     </li>
                   </ul>
                 </q-item-section>
               </q-item>
             </q-list>
           </q-tooltip>
-          <q-tooltip v-else>Step is not applicable. Do all changed blocks exist?</q-tooltip>
+          <q-tooltip v-else>
+            Step is not applicable. Do all changed blocks exist?
+          </q-tooltip>
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn flat round icon="settings" @click="openModal(step.id)" />
@@ -208,7 +218,9 @@ export default class StepViewWidget extends WidgetBase {
             outline
             @click="applyStep(step)"
           >
-            <q-tooltip v-if="activeSteps[step.id]">Step is applied</q-tooltip>
+            <q-tooltip v-if="activeSteps[step.id]">
+              Step is applied
+            </q-tooltip>
           </q-btn>
         </q-item-section>
       </q-item>

@@ -1,7 +1,7 @@
-import { Dialog } from 'quasar';
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { DashboardItem } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -18,11 +18,11 @@ export default class WidgetBase extends Vue {
   public readonly widget!: DashboardItem;
 
   @Emit('update:widget')
-  public saveWidget(widget: DashboardItem = this.widget) {
+  public saveWidget(widget: DashboardItem = this.widget): DashboardItem {
     return widget;
   }
 
-  public saveConfig(config: any) {
+  public saveConfig(config: any): void {
     this.saveWidget({ ...this.widget, config });
   }
 
@@ -39,8 +39,8 @@ export default class WidgetBase extends Vue {
     };
   }
 
-  public showForm(args: Record<string, any> = {}) {
-    this.activeDialog = Dialog.create({
+  public showForm(args: Record<string, any> = {}): void {
+    this.activeDialog = createDialog({
       component: 'FormDialog',
       getCrud: () => this.crud,
       ...args,
@@ -48,7 +48,7 @@ export default class WidgetBase extends Vue {
     return this.activeDialog;
   }
 
-  public closeDialog() {
+  public closeDialog(): void {
     if (this.activeDialog) {
       this.activeDialog.hide();
       this.activeDialog = null;

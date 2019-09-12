@@ -15,14 +15,14 @@ export default class RemoveBlockAction extends BlockCrudComponent {
   @Prop({ type: String, default: 'delete' })
   readonly icon!: string;
 
-  get itemProps() {
+  get itemProps(): Record<string, any> {
     return {
       ...this.$attrs,
       ...this.$props,
     };
   }
 
-  get deletable() {
+  get deletable(): boolean {
     return featureStore.deletersById(this.widget.feature).length > 0;
   }
 }

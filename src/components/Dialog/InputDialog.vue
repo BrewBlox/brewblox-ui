@@ -28,13 +28,13 @@ export default class InputDialog extends DialogBase {
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
-  get error() {
+  get error(): boolean {
     return this.rules
       .map(f => f(this.local))
-      .find(isString) !== undefined;
+      .some(isString);
   }
 
-  save() {
+  save(): void {
     if (this.error) {
       return;
     }
@@ -45,7 +45,7 @@ export default class InputDialog extends DialogBase {
     this.onDialogOk(val);
   }
 
-  created() {
+  created(): void {
     if (this.type === 'number') {
       this.local = round(this.value, this.decimals);
     } else {
@@ -58,8 +58,12 @@ export default class InputDialog extends DialogBase {
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
     <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
-      <q-card-section class="q-dialog__title">{{ title }}</q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
+      <q-card-section class="q-dialog__title">
+        {{ title }}
+      </q-card-section>
+      <q-card-section v-if="message" class="q-dialog__message scroll">
+        {{ message }}
+      </q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
         <q-input

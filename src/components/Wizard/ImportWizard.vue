@@ -15,9 +15,9 @@ export default class ImportWizard extends Vue {
   readonly dashboardId!: string;
 
   reader: FileReader = new FileReader();
-  serializedWidget: string = '';
+  serializedWidget = '';
 
-  localChosenDashboardId: string = '';
+  localChosenDashboardId = '';
 
   get chosenDashboardId(): string {
     return this.localChosenDashboardId
@@ -30,16 +30,16 @@ export default class ImportWizard extends Vue {
     this.localChosenDashboardId = id;
   }
 
-  get dashboardOptions() {
+  get dashboardOptions(): SelectOption[] {
     return dashboardStore.dashboardValues
       .map(dash => ({ label: dash.title, value: dash.id }));
   }
 
-  get valuesOk() {
+  get valuesOk(): boolean {
     return !!this.chosenDashboardId && !!this.serializedWidget;
   }
 
-  async create() {
+  async created(): Promise<void> {
     try {
       const item = {
         ...deserialize(JSON.parse(this.serializedWidget)),
@@ -62,11 +62,11 @@ export default class ImportWizard extends Vue {
     }
   }
 
-  back() {
+  back(): void {
     this.$emit('back');
   }
 
-  handleFileSelect(evt) {
+  handleFileSelect(evt): void {
     const file = evt.target.files[0];
     if (file) {
       this.reader.readAsText(file);
@@ -75,7 +75,7 @@ export default class ImportWizard extends Vue {
     }
   }
 
-  mounted() {
+  mounted(): void {
     this.$emit('title', 'Import wizard');
     this.reader.onload = e => this.serializedWidget = get(e, 'target.result', '');
   }

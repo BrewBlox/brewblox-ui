@@ -13,7 +13,7 @@ export default class LinkValEdit extends ValEdit {
   field!: Link;
   filtered: string[] | null = null;
 
-  get compatibleTypes() {
+  get compatibleTypes(): string[] | null {
     if (!this.field.type) {
       return null;
     }
@@ -21,7 +21,7 @@ export default class LinkValEdit extends ValEdit {
     return [this.field.type, ...get(compatibleTable, this.field.type, [])];
   }
 
-  get blockIdOpts() {
+  get blockIdOpts(): string[] {
     return sparkStore.blockValues(this.serviceId)
       .filter(block => !this.compatibleTypes || this.compatibleTypes.includes(block.type))
       .map(block => block.id);
@@ -31,11 +31,11 @@ export default class LinkValEdit extends ValEdit {
     return this.filtered || this.blockIdOpts;
   }
 
-  get displayVal() {
+  get displayVal(): string {
     return this.field.id || '<None>';
   }
 
-  filterFn(val, update) {
+  filterFn(val, update): void {
     if (val === '') {
       update(() => this.filtered = this.blockIdOpts);
       return;
@@ -63,5 +63,7 @@ export default class LinkValEdit extends ValEdit {
     @input="v => { field.id = v; saveField(field); }"
     @filter="filterFn"
   />
-  <div v-else>{{ displayVal }}</div>
+  <div v-else>
+    {{ displayVal }}
+  </div>
 </template>

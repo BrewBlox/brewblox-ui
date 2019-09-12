@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { dateString, shortDateString } from '@/helpers/functional';
 
 import FieldBase from './FieldBase';
@@ -25,22 +25,22 @@ export default class DatetimeField extends FieldBase {
   readonly clearLabel!: string;
 
   @Emit('input')
-  public change(v: Date | null) {
+  public change(v: Date | null): Date | null {
     return v;
   }
 
-  get displayString() {
+  get displayString(): string {
     return this.short
       ? shortDateString(this.value, this.clearLabel)
       : dateString(this.value, this.clearLabel);
   }
 
-  openDialog() {
+  openDialog(): void {
     if (this.readonly) {
       return;
     }
 
-    Dialog.create({
+    createDialog({
       component: 'DatetimeDialog',
       title: this.title,
       message: this.message,
@@ -63,8 +63,12 @@ export default class DatetimeField extends FieldBase {
     @click="openDialog"
   >
     <slot name="pre" />
-    <slot name="value">{{ displayString }}</slot>
+    <slot name="value">
+      {{ displayString }}
+    </slot>
     <slot />
-    <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
+    <q-tooltip v-if="!readonly">
+      Set {{ label }}
+    </q-tooltip>
   </component>
 </template>

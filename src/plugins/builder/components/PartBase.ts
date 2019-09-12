@@ -19,7 +19,7 @@ export default class PartBase extends Vue {
   }
 
   @Emit('dirty')
-  public invalidateFlows() { }
+  public invalidateFlows(): void { }
 
   public get part(): FlowPart {
     return {
@@ -61,7 +61,7 @@ export default class PartBase extends Vue {
     return SQUARE_SIZE * val;
   }
 
-  public textTransformation(textSize: [number, number], counterRotate: boolean = true): string {
+  public textTransformation(textSize: [number, number], counterRotate = true): string {
     const [sizeX] = rotatedSize(this.part.rotate, textSize);
     const transforms: string[] = [];
     if (this.flipped) {
@@ -75,6 +75,7 @@ export default class PartBase extends Vue {
 
   private rotatedCoord(coord: string): string {
     return new Coordinates(coord)
+      .flipShapeEdge(!!this.flipped, 0, this.size)
       .rotateShapeEdge(this.part.rotate, 0, this.size)
       .toString();
   }

@@ -21,12 +21,10 @@ module.exports = {
     'import/first': 0,
     'import/extensions': 0,
     'import/no-unresolved': 0,
-    'import/no-extraneous-dependencies': 0,
     'import/prefer-default-export': 0,
     'import/newline-after-import': 0,
     'object-curly-newline': 0,
     'no-param-reassign': 0,
-    'no-mixed-operators': 0,
     'no-console': 'warn',
     'no-multiple-empty-lines': 'error',
     'vue/max-attributes-per-line': 0,
@@ -47,9 +45,15 @@ module.exports = {
     ],
     '@typescript-eslint/indent': 0,
     '@typescript-eslint/no-explicit-any': 0,
-    '@typescript-eslint/explicit-function-return-type': {
+    '@typescript-eslint/explicit-function-return-type': ['warn', {
       allowExpressions: true,
-      allowTypedFunctionExpressions: true
-    }
+      allowTypedFunctionExpressions: true,
+      allowHigherOrderFunctions: true,
+    }],
+    // temporary disabled because of incompatibility issues between vue-eslint-plugin and eslint 6:
+    // see https://github.com/vuejs/eslint-plugin-vue/issues/944
+    'vue-require-component-is': 0,
+    '@typescript-eslint/no-empty-function': 0,
+    'vue/no-v-html': 0
   }
 }

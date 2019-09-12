@@ -18,7 +18,7 @@ export default class SparkWizard extends Vue {
   @Prop({ type: String, required: true })
   readonly serviceTitle!: string;
 
-  async create() {
+  async created(): Promise<void> {
     const service: Spark = {
       id: this.serviceId,
       title: this.serviceTitle,
@@ -39,7 +39,7 @@ export default class SparkWizard extends Vue {
     this.$emit('close');
   }
 
-  async cancel() {
+  async cancel(): Promise<void> {
     this.$q.notify({
       color: 'negative',
       icon: 'error',
@@ -48,10 +48,10 @@ export default class SparkWizard extends Vue {
     this.$emit('back');
   }
 
-  async mounted() {
+  async mounted(): Promise<void> {
     const ok = await sparkStore.validateService(this.serviceId);
     if (ok) {
-      this.create();
+      this.created();
     } else {
       this.cancel();
     }

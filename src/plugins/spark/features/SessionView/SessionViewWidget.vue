@@ -1,9 +1,9 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import shortid from 'shortid';
 import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
+import { createDialog } from '@/helpers/dialog';
 import { shortDateString } from '@/helpers/functional';
 
 import { Session, SessionViewConfig } from './types';
@@ -12,7 +12,7 @@ import { Session, SessionViewConfig } from './types';
 @Component
 export default class SessionViewWidget extends WidgetBase {
   graphSessionId: string | null = null;
-  sessionFilter: string = '';
+  sessionFilter = '';
 
   get widgetConfig(): SessionViewConfig {
     return this.widget.config;
@@ -38,13 +38,13 @@ export default class SessionViewWidget extends WidgetBase {
       });
   }
 
-  get graphSession() {
+  get graphSession(): Session | null {
     return this.graphSessionId
-      ? this.widgetConfig.sessions.find(session => session.id === this.graphSessionId)
+      ? this.widgetConfig.sessions.find(session => session.id === this.graphSessionId) || null
       : null;
   }
 
-  periodString(session: Session) {
+  periodString(session: Session): string {
     if (!session.start && !session.end) {
       return '<not yet started>';
     }
@@ -54,7 +54,7 @@ export default class SessionViewWidget extends WidgetBase {
     return `${shortDateString(session.start)} to ${shortDateString(session.end)}`;
   }
 
-  openModal(activeSession: Session | null = null) {
+  openModal(activeSession: Session | null = null): void {
     this.showForm({
       getProps: () => ({ activeSession }),
       listeners: {
@@ -63,8 +63,8 @@ export default class SessionViewWidget extends WidgetBase {
     });
   }
 
-  createSession() {
-    Dialog.create({
+  createSession(): void {
+    createDialog({
       title: 'Create session',
       dark: true,
       ok: 'Create',
@@ -105,8 +105,8 @@ export default class SessionViewWidget extends WidgetBase {
   <q-card dark class="text-white scroll">
     <BlockGraph
       v-if="graphSession"
-      :value="true"
       :id="`${widget.id}::${graphSession.id}`"
+      :value="true"
       :config="graphSession.graphCfg"
       no-duration
       @update:config="v => { graphSession.graphCfg = v; saveConfig(widgetConfig); }"
@@ -139,7 +139,9 @@ export default class SessionViewWidget extends WidgetBase {
       <q-item v-for="session in sessions" :key="session.id" dark>
         <q-item-section>
           {{ session.name }}
-          <q-item-label caption>{{ periodString(session) }}</q-item-label>
+          <q-item-label caption>
+            {{ periodString(session) }}
+          </q-item-label>
         </q-item-section>
         <q-item-section side>
           <q-btn flat rounded icon="settings" @click="openModal(session)" />

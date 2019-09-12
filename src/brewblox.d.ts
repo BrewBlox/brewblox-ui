@@ -21,3 +21,10 @@ interface XYPosition {
 }
 
 type InputRule = (val: any) => boolean | string;
+
+interface SelectOption {
+  label: string;
+  value: any;
+}
+
+type Mapped<T> = { [id: string]: T };

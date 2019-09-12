@@ -23,7 +23,9 @@ export default class SetpointSensorPairWidget extends BlockWidget {
     <BlockWidgetToolbar :crud="crud" />
 
     <CardWarning v-if="!isUsed">
-      <template #message>This Setpoint is not used as PID input.</template>
+      <template #message>
+        This Setpoint is not used as PID input.
+      </template>
     </CardWarning>
     <CardWarning v-else-if="!block.data.settingEnabled">
       <template #message>
@@ -42,7 +44,9 @@ export default class SetpointSensorPairWidget extends BlockWidget {
     <q-card-section>
       <q-item dark>
         <q-item-section class="q-mr-md">
-          <q-item-label caption>Setting</q-item-label>
+          <q-item-label caption>
+            Setting
+          </q-item-label>
           <UnitField
             :class="{darkened: !block.data.settingEnabled}"
             :value="block.data.storedSetting"
@@ -53,11 +57,15 @@ export default class SetpointSensorPairWidget extends BlockWidget {
           />
         </q-item-section>
         <q-item-section class="q-mr-md">
-          <q-item-label caption>Sensor</q-item-label>
+          <q-item-label caption>
+            Sensor
+          </q-item-label>
           <UnitField :value="block.data.value" tag="big" readonly />
         </q-item-section>
         <q-item-section class="col-auto">
-          <q-item-label caption>Unfiltered sensor</q-item-label>
+          <q-item-label caption>
+            Unfiltered sensor
+          </q-item-label>
           <UnitField :value="block.data.valueUnfiltered" tag="big" readonly />
         </q-item-section>
       </q-item>

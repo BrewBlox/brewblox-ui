@@ -7,35 +7,35 @@ import { featureStore } from '@/store/features';
 
 @Component
 export default class ArrangementWizardPicker extends Vue {
-  arrangementId: string = '';
-  searchModel: string = '';
+  arrangementId = '';
+  searchModel = '';
   wizardModel: any = null;
-  wizardActive: boolean = false;
+  wizardActive = false;
 
-  get wizardOptions() {
+  get wizardOptions(): { id: string; displayName: string }[] {
     return featureStore.arrangementValues
       .filter(arr => !!arr.wizard)
       .sort(objectStringSorter('displayName'));
   }
 
-  setTitle(title: string) {
+  setTitle(title: string): void {
     this.$emit('title', title);
   }
 
-  reset() {
+  reset(): void {
     this.wizardActive = false;
-    this.setTitle('Arrangement wizard');
+    this.setTitle('Quick start wizard');
   }
 
-  back() {
+  back(): void {
     this.$emit('back');
   }
 
-  close() {
+  close(): void {
     this.$emit('close');
   }
 
-  next() {
+  next(): void {
     if (!this.wizardModel) {
       this.$q.notify({
         message: 'Please select a wizard',
@@ -48,7 +48,7 @@ export default class ArrangementWizardPicker extends Vue {
     this.wizardActive = true;
   }
 
-  mounted() {
+  mounted(): void {
     this.reset();
     this.wizardModel = this.wizardOptions[0];
   }
@@ -59,8 +59,8 @@ export default class ArrangementWizardPicker extends Vue {
   <div>
     <!-- Display selected wizard -->
     <component
-      v-if="wizardActive"
       :is="wizardModel.wizard"
+      v-if="wizardActive"
       :feature-id="wizardModel.id"
       @title="setTitle"
       @back="reset"
@@ -71,12 +71,48 @@ export default class ArrangementWizardPicker extends Vue {
     <template v-else>
       <q-card-section>
         <q-item dark>
+          <q-item-section class="text-weight-light">
+            <q-item-label class="text-subtitle1">
+              Control blocks
+            </q-item-label>
+            <p>
+              Control blocks small elements that run on the BrewBlox Spark that are combined into a control system.
+              Examples of control blocks are setpoints, sensors, actuators and PIDs.
+            </p>
+            <p>
+              We have pre-configured sets of control blocks for common brewing setups.
+              This wizard creates new blocks and sets up relations between them.
+            </p>
+            <q-item-label class="text-subtitle1">
+              Tuning
+            </q-item-label>
+            <p>
+              This wizard uses settings that we think will work for the average setup.
+              You might have a more powerful heater, a smaller kettle or a bigger fridge.
+            </p>
+            <p>
+              Do some test runs, look at the PID graphs and make adjustments to tune them to your hardware.
+            </p>
+            <q-item-label class="text-subtitle1">
+              Dashboard
+            </q-item-label>
+            <p>
+              This wizard will create a new dashboard to show the most relevant values in your setup.
+              The dashboard will have a graph, a graphical overview of your system
+              and some quick actions to change multiple blocks at once.
+            </p>
+          </q-item-section>
+        </q-item>
+      </q-card-section>
+      <q-card-section>
+        <q-item dark>
           <q-item-section>
             <q-select
-              :options="wizardOptions"
               v-model="wizardModel"
-              label="Arrangement type"
+              :options="wizardOptions"
+              label="Please select a brewing process"
               option-label="displayName"
+              option-value="id"
               dark
               options-dark
             />

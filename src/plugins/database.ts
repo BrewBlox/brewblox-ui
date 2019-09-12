@@ -72,7 +72,7 @@ export class BrewBloxDatabase {
   }
 
   // install(Vue, options) is a required entrypoint for a Vue plugin
-  public install(Vue: VueConstructor, opts: InstallOpts) {
+  public install(Vue: VueConstructor, opts: InstallOpts): void {
     this._db = new Promise((resolve) => {
       const { host, name } = opts;
       const remoteAddress = `${host}/datastore/${name}`;
@@ -102,7 +102,7 @@ export class BrewBloxDatabase {
     (Vue as any).database = this;
   }
 
-  private async checkRemote(db: PouchDB.Database) {
+  private async checkRemote(db: PouchDB.Database): Promise<void> {
     try {
       await db.info();
     } catch (e) {
@@ -129,7 +129,7 @@ export class BrewBloxDatabase {
     };
   }
 
-  public getErrors(clear: boolean = false): DBError[] {
+  public getErrors(clear = false): DBError[] {
     const retval = [...this.dbErrors];
     if (clear) {
       this.dbErrors = [];

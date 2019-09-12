@@ -8,7 +8,7 @@ import { BuilderConfig } from './types';
 
 @Component
 export default class BuilderWizard extends WidgetWizardBase {
-  createWidget() {
+  createWidget(): void {
     const config: BuilderConfig = {
       currentLayoutId: null,
       layoutIds: [],
@@ -24,7 +24,7 @@ export default class BuilderWizard extends WidgetWizardBase {
     });
   }
 
-  mounted() {
+  mounted(): void {
     this.widgetTitle = this.typeDisplayName;
   }
 }

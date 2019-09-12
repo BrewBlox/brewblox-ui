@@ -6,11 +6,11 @@ import { SQUARE_SIZE } from '../getters';
 
 @Component
 export default class SVGRoot extends Vue {
-  get width() {
+  get width(): number {
     return SQUARE_SIZE;
   }
 
-  get height() {
+  get height(): number {
     return SQUARE_SIZE;
   }
 }
@@ -18,6 +18,6 @@ export default class SVGRoot extends Vue {
 
 <template>
   <svg :width="width" :height="height">
-    <slot/>
+    <slot />
   </svg>
 </template>

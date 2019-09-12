@@ -1,7 +1,8 @@
-import { Dialog, uid } from 'quasar';
+import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { DashboardItem, dashboardStore } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
@@ -30,21 +31,21 @@ export default class CrudComponent extends Vue {
     return featureStore.displayNameById(this.widget.feature);
   }
 
-  public closeDialog() {
+  public closeDialog(): void {
     this.crud.closeDialog();
   }
 
-  public saveWidget(widget: DashboardItem = this.widget) {
+  public saveWidget(widget: DashboardItem = this.widget): void {
     this.crud.saveWidget(widget);
   }
 
-  public saveConfig(config: any = this.widget.config) {
+  public saveConfig(config: any = this.widget.config): void {
     this.saveWidget({ ...this.widget, config });
   }
 
-  public startChangeWidgetTitle() {
-    let widgetTitle = this.widget.title;
-    Dialog.create({
+  public startChangeWidgetTitle(): void {
+    const widgetTitle = this.widget.title;
+    createDialog({
       title: 'Change Widget name',
       message: `Choose a new name for '${widgetTitle}'`,
       dark: true,
@@ -57,15 +58,15 @@ export default class CrudComponent extends Vue {
       .onOk(title => this.saveWidget({ ...this.widget, title }));
   }
 
-  public startCopyWidget() {
+  public startCopyWidget(): void {
     const id = uid();
-    Dialog.create({
+    createDialog({
       title: 'Copy widget',
       message: `To which dashboard do you want to copy widget ${this.widget.title}?`,
       dark: true,
       options: {
         type: 'radio',
-        model: null,
+        model: undefined,
         items: dashboardStore.dashboardValues
           .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
       },
@@ -84,14 +85,14 @@ export default class CrudComponent extends Vue {
       });
   }
 
-  public startMoveWidget() {
-    Dialog.create({
+  public startMoveWidget(): void {
+    createDialog({
       title: 'Move widget',
       message: `To which dashboard do you want to move widget ${this.widget.title}?`,
       dark: true,
       options: {
         type: 'radio',
-        model: null,
+        model: undefined,
         items: dashboardStore.dashboardValues
           .filter(dashboard => dashboard.id !== this.widget.dashboard)
           .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
@@ -102,8 +103,8 @@ export default class CrudComponent extends Vue {
         dashboard && this.saveWidget({ ...this.widget, dashboard, pinnedPosition: null }));
   }
 
-  public startRemoveWidget() {
-    const deleteItem = async () => {
+  public startRemoveWidget(): void {
+    const deleteItem = async (): Promise<void> => {
       await dashboardStore.removeDashboardItem(this.widget);
       this.closeDialog();
     };
@@ -119,7 +120,7 @@ export default class CrudComponent extends Vue {
         .map(del => ({ label: del.description, action: del.action })),
     ].map((opt, idx) => ({ ...opt, value: idx }));
 
-    Dialog.create({
+    createDialog({
       title: 'Delete widget',
       message: `How do you want to delete widget ${this.widget.title}?`,
       dark: true,

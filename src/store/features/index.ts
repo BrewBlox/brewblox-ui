@@ -1,6 +1,6 @@
 import get from 'lodash/get';
 import Vue from 'vue';
-import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
 import store from '@/store';
 
@@ -51,7 +51,7 @@ export class FeatureModule extends VuexModule {
   }
 
   public get widgetById(): (id: string, config: any, selector?: boolean) => string | undefined {
-    return (id: string, config: any, selector: boolean = true) => {
+    return (id: string, config: any, selector = true) => {
       const feature = this.features[id] || {};
       return selector && feature.selector
         ? feature.selector(config)

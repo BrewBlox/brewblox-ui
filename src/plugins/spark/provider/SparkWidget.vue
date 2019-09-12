@@ -14,41 +14,41 @@ export default class SparkWidget extends Vue {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
-  sysBlock<T extends Block>(blockType: string) {
+  sysBlock<T extends Block>(blockType: string): T {
     return sparkStore.blockValues(this.serviceId)
       .find(block => block.type === blockType) as T;
   }
 
-  get sysInfo() {
-    return this.sysBlock<SysInfoBlock>(sysInfoType);
+  get sysInfo(): SysInfoBlock {
+    return this.sysBlock(sysInfoType);
   }
 
-  get ticks() {
-    return this.sysBlock<TicksBlock>(ticksType);
+  get ticks(): TicksBlock {
+    return this.sysBlock(ticksType);
   }
 
-  get wifi() {
-    return this.sysBlock<WiFiSettingsBlock>(wifiType);
+  get wifi(): WiFiSettingsBlock {
+    return this.sysBlock(wifiType);
   }
 
-  get ready() {
+  get ready(): boolean {
     return isReady(this.serviceId);
   }
 
-  get updating() {
+  get updating(): boolean {
     return sparkStore.updateSource(this.serviceId) !== null;
   }
 
-  get sysDate() {
+  get sysDate(): string {
     return new Date(this.ticks.data.secondsSinceEpoch * 1000).toLocaleString();
   }
 
-  fetchAll() {
+  fetchAll(): void {
     sparkStore.fetchAll(this.serviceId);
     sparkStore.fetchBlocks(this.serviceId);
   }
 
-  retryUpdateSource() {
+  retryUpdateSource(): void {
     sparkStore.fetchServiceStatus(this.serviceId);
     sparkStore.createUpdateSource(this.serviceId);
   }
@@ -76,31 +76,43 @@ export default class SparkWidget extends Vue {
       <q-list>
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>Firmware version</q-item-label>
+            <q-item-label caption>
+              Firmware version
+            </q-item-label>
             <span>{{ sysInfo.data.version }}</span>
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>Firmware release date</q-item-label>
+            <q-item-label caption>
+              Firmware release date
+            </q-item-label>
             <span>{{ sysInfo.data.releaseDate }}</span>
           </q-item-section>
         </q-item>
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>Device time</q-item-label>
+            <q-item-label caption>
+              Device time
+            </q-item-label>
             <span>{{ sysDate }}</span>
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>Time since boot</q-item-label>
+            <q-item-label caption>
+              Time since boot
+            </q-item-label>
             <span>{{ ticks.data.millisSinceBoot | duration }}</span>
           </q-item-section>
         </q-item>
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>Device ID</q-item-label>
+            <q-item-label caption>
+              Device ID
+            </q-item-label>
             <span style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</span>
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>IP address</q-item-label>
+            <q-item-label caption>
+              IP address
+            </q-item-label>
             <span>{{ wifi.data.ip }}</span>
           </q-item-section>
         </q-item>

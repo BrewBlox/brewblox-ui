@@ -1,8 +1,8 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/Field/FieldBase';
+import { createDialog } from '@/helpers/dialog';
 import { constraintLabels } from '@/plugins/spark/helpers';
 
 import { ConstraintsObj } from './ConstraintsBase';
@@ -24,26 +24,26 @@ export default class ConstraintsField extends FieldBase {
   public readonly type!: string;
 
   @Emit('input')
-  public change(v: ConstraintsObj) {
+  public change(v: ConstraintsObj): ConstraintsObj {
     return v;
   }
 
-  get hasConstraints() {
-    return this.value.constraints.length > 0;
+  get numConstraints(): number {
+    return this.value.constraints.length;
   }
 
-  get limiters() {
+  get limiters(): string[] {
     const names: string[] = [];
-    for (let constraint of this.value.constraints) {
+    for (const constraint of this.value.constraints) {
       if (constraint.limiting) {
         names.push(Object.keys(constraint).find(k => k !== 'limiting') || 'Unknown');
       }
     }
-    return names.map(k => constraintLabels.get(k));
+    return names.map(k => constraintLabels.get(k) || k);
   }
 
-  openDialog() {
-    Dialog.create({
+  openDialog(): void {
+    createDialog({
       component: 'ConstraintsDialog',
       title: this.title,
       message: this.message,
@@ -66,7 +66,7 @@ export default class ConstraintsField extends FieldBase {
           Limited by:
           <i>{{ limiters.join(', ') }}</i>
         </small>
-        <small v-else-if="hasConstraints">Not limited</small>
+        <small v-else-if="numConstraints > 0">{{ numConstraints }} constraint(s), not limited</small>
         <small v-else>No constraints configured</small>
       </q-item-section>
       <q-space />

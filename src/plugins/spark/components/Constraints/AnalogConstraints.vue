@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { BalancerLink } from '@/helpers/units/KnownLinks';
 
 import { analogConstraintLabels } from '../../helpers';
@@ -9,14 +9,8 @@ import ConstraintsBase, { EditableConstraint } from './ConstraintsBase';
 
 @Component
 export default class AnalogConstraints extends ConstraintsBase {
-  get constraintOptions() {
+  get constraintOptions(): SelectOption[] {
     return [...analogConstraintLabels].map(([k, v]) => ({ label: v, value: k }));
-  }
-
-  editableValue(editable: EditableConstraint) {
-    return editable.key === 'balanced'
-      ? editable.value.granted
-      : editable.value;
   }
 
   createConstraint(key: string, value: any = null): EditableConstraint {
@@ -40,8 +34,8 @@ export default class AnalogConstraints extends ConstraintsBase {
     }
   }
 
-  addConstraint() {
-    Dialog.create({
+  addConstraint(): void {
+    createDialog({
       title: 'Add constraint',
       dark: true,
       cancel: true,

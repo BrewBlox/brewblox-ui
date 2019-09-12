@@ -44,5 +44,7 @@ export default class UnitValEdit extends ValEdit {
       @input="v => { field.unit = v; saveField(field); }"
     />
   </q-item>
-  <div v-else>{{ field }}</div>
+  <div v-else>
+    {{ field }}
+  </div>
 </template>

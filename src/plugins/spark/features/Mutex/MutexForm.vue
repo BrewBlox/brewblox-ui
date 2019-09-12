@@ -27,16 +27,17 @@ export default class MutexForm extends BlockCrudComponent {
             If you add a Mutex constraint to multiple digital actuators,
             they will never be active at the same time if they share the same Mutex block.
           </p>
-          <p>This can be used to:
+          <p>
+            This can be used to:
             <ul>
               <li>Prevent heating and cooling at the same time.</li>
               <li>Prevent two or more heating elements from exceeding your maximum available power.</li>
             </ul>
           </p>
           <p>
-            The Mutex can also prevent switching between two actuators too quickly.<br/>
+            The Mutex can also prevent switching between two actuators too quickly.<br />
             If you set the minimum idle time to 45 minutes,
-            a heater can only go active after the cooler has been inactive for 45 minutes.<br/>
+            a heater can only go active after the cooler has been inactive for 45 minutes.<br />
             We recommend setting the idle time to 1.5x your longest PWM period.
           </p>
         </q-item-section>

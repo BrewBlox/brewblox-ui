@@ -1,35 +1,36 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
+
+import { createDialog } from '@/helpers/dialog';
 
 import FieldBase from './FieldBase';
 
 @Component
 export default class ColorField extends FieldBase {
 
-  @Prop({ type: String, required: true })
-  public readonly value!: string;
+  @Prop({ type: String, required: false })
+  public readonly value!: string | null;
 
   @Prop({ type: Boolean, default: false })
   public readonly clearable!: boolean;
 
   @Emit('input')
-  public change(v: string | null) {
+  public change(v: string | null): string | null {
     return v === null
       ? v
       : v.replace('#', '');
   }
 
-  get color() {
+  get color(): string {
     const color = this.value || '#ffffff';
     return color.startsWith('#') ? color : `#${color}`;
   }
 
-  get colorString() {
+  get colorString(): string {
     return this.value || '<not set>';
   }
 
-  get colorStyle() {
+  get colorStyle(): Record<string, any> {
     return {
       color: this.color,
       backgroundColor: this.value ? this.color : null,
@@ -41,12 +42,12 @@ export default class ColorField extends FieldBase {
     };
   }
 
-  openDialog() {
+  openDialog(): void {
     if (this.readonly) {
       return;
     }
 
-    Dialog.create({
+    createDialog({
       component: 'ColorDialog',
       title: this.title,
       message: this.message,
@@ -68,11 +69,15 @@ export default class ColorField extends FieldBase {
     @click="openDialog"
   >
     <slot name="pre" />
-    <slot name="value">{{ colorString }}</slot>
+    <slot name="value">
+      {{ colorString }}
+    </slot>
     <slot name="indicator">
       <span :style="colorStyle" />
     </slot>
     <slot />
-    <q-tooltip v-if="!readonly">Choose color</q-tooltip>
+    <q-tooltip v-if="!readonly">
+      Choose color
+    </q-tooltip>
   </component>
 </template>

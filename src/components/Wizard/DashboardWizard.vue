@@ -8,18 +8,18 @@ import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 @Component
 export default class DashboardWizard extends Vue {
-  dashboardId: string = '';
-  dashboardTitle: string = '';
+  dashboardId = '';
+  dashboardTitle = '';
 
   get idRules(): InputRule[] {
     return dashboardIdRules();
   }
 
-  back() {
+  back(): void {
     this.$emit('back');
   }
 
-  async create() {
+  async created(): Promise<void> {
     const errors = this.idRules
       .map(rule => rule(this.dashboardId))
       .filter(isString);
@@ -48,7 +48,7 @@ export default class DashboardWizard extends Vue {
     this.$emit('close');
   }
 
-  mounted() {
+  mounted(): void {
     this.$emit('title', 'Dashboard wizard');
   }
 }

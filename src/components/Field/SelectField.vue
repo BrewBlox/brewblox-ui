@@ -1,6 +1,7 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
+
+import { createDialog } from '@/helpers/dialog';
 
 import FieldBase from './FieldBase';
 
@@ -28,7 +29,7 @@ export default class SelectField extends FieldBase {
   @Prop({ type: Object, default: () => ({}) })
   public readonly selectProps!: any;
 
-  get displayValue() {
+  get displayValue(): string {
     if (this.selectProps.multiple) {
       const text = this.value
         .map((v: any) => this.options.find((opt: any) => opt[this.optionsValue] === v))
@@ -44,23 +45,23 @@ export default class SelectField extends FieldBase {
   }
 
   @Emit('input')
-  public change(v: any) {
+  public change(v: any): any {
     return v;
   }
 
-  openDialog() {
+  openDialog(): void {
     if (this.readonly) {
       return;
     }
 
-    Dialog.create({
+    createDialog({
       component: 'SelectDialog',
       title: this.title,
       message: this.message,
       messageHtml: this.messageHtml,
       root: this.$root,
       value: this.value,
-      options: this.options,
+      selectOptions: this.options,
       selectProps: {
         label: this.label,
         emitValue: true,
@@ -82,9 +83,13 @@ export default class SelectField extends FieldBase {
     :class="[{editable: !readonly}, tagClass]"
     @click="openDialog"
   >
-    <slot name="pre"/>
-    <slot name="value">{{ displayValue }}</slot>
-    <slot/>
-    <q-tooltip v-if="!readonly">Set {{ label }}</q-tooltip>
+    <slot name="pre" />
+    <slot name="value">
+      {{ displayValue }}
+    </slot>
+    <slot />
+    <q-tooltip v-if="!readonly">
+      Set {{ label }}
+    </q-tooltip>
   </component>
 </template>

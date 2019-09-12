@@ -1,6 +1,6 @@
 import get from 'lodash/get';
-import { Dialog } from 'quasar';
 
+import { createDialog } from '@/helpers/dialog';
 import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { featureStore } from '@/store/features';
@@ -49,7 +49,7 @@ function relations(block: PidBlock): BlockLink[] {
   ];
 }
 
-function nodes(serviceId: string) {
+function nodes(serviceId: string): { id: string; type: string }[] {
   return sparkStore.blockValues(serviceId)
     .map(block => ({
       id: block.id,
@@ -57,11 +57,11 @@ function nodes(serviceId: string) {
     }));
 }
 
-export function startRelationsDialog(block: PidBlock) {
+export function startRelationsDialog(block: PidBlock): void {
   if (!block) {
     return;
   }
-  Dialog.create({
+  createDialog({
     component: 'RelationsDialog',
     serviceId: block.serviceId,
     nodes: nodes(block.serviceId),

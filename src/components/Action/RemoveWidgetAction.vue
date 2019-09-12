@@ -12,7 +12,7 @@ export default class RemoveWidgetAction extends CrudComponent {
   @Prop({ type: String, default: 'delete' })
   readonly icon!: string;
 
-  get itemProps() {
+  get itemProps(): Record<string, any> {
     return {
       ...this.$attrs,
       ...this.$props,
@@ -22,5 +22,5 @@ export default class RemoveWidgetAction extends CrudComponent {
 </script>
 
 <template>
-  <ActionItem v-bind="itemProps" @click="startRemoveWidget"/>
+  <ActionItem v-bind="itemProps" @click="startRemoveWidget" />
 </template>

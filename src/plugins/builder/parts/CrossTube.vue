@@ -13,7 +13,7 @@ export default class CrossTube extends PartBase {
     right: 'M25,25 H50',
   };
 
-  get speed() {
+  get speed(): Record<string, number> {
     return {
       up: this.flowOnCoord(UP),
       down: this.flowOnCoord(DOWN),
@@ -22,7 +22,7 @@ export default class CrossTube extends PartBase {
     };
   }
 
-  get liquids() {
+  get liquids(): Record<string, string[]> {
     return {
       up: this.liquidOnCoord(UP),
       down: this.liquidOnCoord(DOWN),

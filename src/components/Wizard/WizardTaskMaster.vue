@@ -25,15 +25,18 @@ export default class WizardTaskMaster extends Vue {
   @Emit()
   public close(): void { }
 
-  previousTask() {
+  previousTask(): void {
     if (this.taskHistory.length > 0) {
+      if (this.currentTask !== null) {
+        this.tasks.push(this.currentTask);
+      }
       this.currentTask = this.taskHistory.pop() || null;
     } else {
       this.back();
     }
   }
 
-  nextTask() {
+  nextTask(): void {
     if (this.tasks.length === 0) {
       return;
     }
@@ -43,7 +46,7 @@ export default class WizardTaskMaster extends Vue {
     this.currentTask = this.tasks.pop() || null;
   }
 
-  created() {
+  created(): void {
     this.tasks = [...this.initialTasks];
     this.config = { ...this.initialConfig };
     this.nextTask();
@@ -54,8 +57,8 @@ export default class WizardTaskMaster extends Vue {
 <template>
   <div>
     <component
-      v-if="currentTask"
       :is="currentTask"
+      v-if="currentTask"
       :config.sync="config"
       :actions.sync="actions"
       :tasks.sync="tasks"

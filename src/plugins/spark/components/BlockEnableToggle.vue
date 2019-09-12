@@ -15,17 +15,17 @@ export default class BlockEnableToggle extends BlockCrudComponent {
   @Prop({ type: String, default: 'This block is disabled' })
   readonly textDisabled!: string;
 
-  get enabled() {
+  get enabled(): boolean {
     return Boolean(this.block.data[this.dataKey]);
   }
 
-  get mainText() {
+  get mainText(): string {
     return this.enabled
       ? this.textEnabled
       : this.textDisabled;
   }
 
-  toggleEnabled() {
+  toggleEnabled(): void {
     this.block.data[this.dataKey] = !this.enabled;
     this.saveBlock();
   }

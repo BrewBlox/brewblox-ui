@@ -18,20 +18,20 @@ export default class GridContainer extends Vue {
     return this.$children as GridItem[];
   }
 
-  startInteraction(id: string) {
+  startInteraction(id: string): void {
     this.activeItemId = id;
   }
 
-  stopInteraction() {
+  stopInteraction(): void {
     this.activeItemId = null;
     this.activeItemPos = null;
   }
 
-  moveInteraction(id: string, pos: XYPosition) {
+  moveInteraction(id: string, pos: XYPosition): void {
     this.activeItemPos = pos;
   }
 
-  updateItemPosition(id: string, pos: XYPosition | null) {
+  updateItemPosition(id: string, pos: XYPosition | null): void {
     const newItemsOrder = this.gridItems
       .map(item => [item, item.$el.getBoundingClientRect()] as [GridItem, DOMRect])
       .sort(([, rectA], [, rectB]) => (rectA.y - rectB.y) || (rectA.x - rectB.x))
@@ -39,11 +39,11 @@ export default class GridContainer extends Vue {
     this.$emit('change-positions', id, pos, newItemsOrder);
   }
 
-  updateItemSize(id: string, cols: number, rows: number) {
+  updateItemSize(id: string, cols: number, rows: number): void {
     this.$emit('change-size', id, cols, rows);
   }
 
-  slotStyle(slot: VNode) {
+  slotStyle(slot: VNode): Record<string, string> {
     const style: Record<string, string> = {};
     const opts = slot.componentOptions as VNodeComponentOptions;
     const { id, pinnedPosition, cols, rows } = (opts.propsData as any).widget;
@@ -60,7 +60,7 @@ export default class GridContainer extends Vue {
     return style;
   }
 
-  render(createElement: CreateElement) {
+  render(createElement: CreateElement): VNode {
     return createElement(
       'div',
       { class: 'grid-container' },

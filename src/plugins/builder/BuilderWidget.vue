@@ -1,20 +1,19 @@
 <script lang="ts">
 import { debounce, uid } from 'quasar';
-import { Dialog } from 'quasar';
 import { Component, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
+import { createDialog } from '@/helpers/dialog';
 
-import CalcWorker from 'worker-loader!./calculator.worker';
-import { SQUARE_SIZE, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes } from './getters';
+import { calculateNormalizedFlows } from './calculateFlows';
+import { defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes, SQUARE_SIZE } from './getters';
 import { asPersistentPart, asStatePart } from './helpers';
 import { builderStore } from './store';
-import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart, StatePart } from './types';
+import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart } from './types';
 
 
 @Component
 export default class BuilderWidget extends WidgetBase {
-  worker: CalcWorker = new CalcWorker();
   specs = builderStore.specs;
   flowParts: FlowPart[] = [];
   debouncedCalculate: Function = () => { };
@@ -49,7 +48,7 @@ export default class BuilderWidget extends WidgetBase {
       .filter(v => !!v);
   }
 
-  get wrongBrowser() {
+  get wrongBrowser(): boolean {
     return /(Edge|MSIE)/.test(window.navigator.userAgent);
   }
 
@@ -68,7 +67,7 @@ export default class BuilderWidget extends WidgetBase {
     });
   }
 
-  async saveParts(parts: PersistentPart[]) {
+  async saveParts(parts: PersistentPart[]): Promise<void> {
     if (!this.layout) {
       return;
     }
@@ -79,7 +78,7 @@ export default class BuilderWidget extends WidgetBase {
     this.debouncedCalculate();
   }
 
-  async savePart(part: PersistentPart) {
+  async savePart(part: PersistentPart): Promise<void> {
     await this.saveParts(this.parts.map(p => (p.id === part.id ? part : p)));
   }
 
@@ -112,11 +111,11 @@ export default class BuilderWidget extends WidgetBase {
     };
   }
 
-  isClickable(part) {
+  isClickable(part): boolean {
     return !!this.specs[part.type].interactHandler;
   }
 
-  interact(part: FlowPart) {
+  interact(part: FlowPart): void {
     const handler = this.specs[part.type].interactHandler;
     handler && handler(part, this.updater);
   }
@@ -125,22 +124,22 @@ export default class BuilderWidget extends WidgetBase {
     return SQUARE_SIZE * val;
   }
 
-  startEditor() {
-    Dialog.create({
+  startEditor(): void {
+    createDialog({
       component: 'BuilderEditor',
       initialLayout: this.widgetConfig.currentLayoutId,
       root: this.$root,
     });
   }
 
-  async calculate() {
+  async calculate(): Promise<void> {
     await this.$nextTick();
     if (!this.editorActive) {
-      this.worker.postMessage(this.parts.map(asStatePart));
+      this.flowParts = calculateNormalizedFlows(this.parts.map(asStatePart));
     }
   }
 
-  async migrate() {
+  async migrate(): Promise<void> {
     const oldParts: PersistentPart[] = (this.widgetConfig as any).parts;
     if (oldParts) {
       const id = uid();
@@ -158,24 +157,19 @@ export default class BuilderWidget extends WidgetBase {
     }
   }
 
-  created() {
+  created(): void {
     this.migrate();
-    this.worker.onmessage = (evt: MessageEvent) => this.flowParts = evt.data;
     this.debouncedCalculate = debounce(this.calculate, 200, false);
     this.debouncedCalculate();
   }
 
-  destroyed() {
-    this.worker.terminate();
-  }
-
   @Watch('layout')
-  watchLayout() {
+  watchLayout(): void {
     this.debouncedCalculate();
   }
 
   @Watch('editorActive')
-  watchActive() {
+  watchActive(): void {
     this.debouncedCalculate();
   }
 }
@@ -192,7 +186,9 @@ export default class BuilderWidget extends WidgetBase {
           label="Editor"
           @click="startEditor"
         >
-          <q-tooltip v-if="wrongBrowser">The Builder Editor is not supported by IE/Edge browsers.</q-tooltip>
+          <q-tooltip v-if="wrongBrowser">
+            The Builder Editor is not supported by IE/Edge browsers.
+          </q-tooltip>
         </q-btn>
       </q-item-section>
       <q-item-section side>
@@ -246,8 +242,8 @@ export default class BuilderWidget extends WidgetBase {
       <svg ref="grid" class="grid-base">
         <g
           v-for="part in flowParts"
-          :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
           :key="part.id"
+          :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
           :class="{ clickable: isClickable(part), [part.type]: true }"
           @click="interact(part)"
         >

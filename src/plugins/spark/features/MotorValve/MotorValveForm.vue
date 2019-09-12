@@ -32,18 +32,18 @@ export default class MotorValveForm extends BlockCrudComponent {
       .reduce((acc, block) => ({ ...acc, [block.data.startChannel]: block.id }), {});
   }
 
-  get valveStateName() {
+  get valveStateName(): string {
     return spaceCased(ValveState[this.block.data.valveState]);
   }
 
-  driverStr(pinId: number) {
+  driverStr(pinId: number): string {
     const driver = this.claimedChannels[pinId];
     return driver && driver !== this.block.id
       ? ` (replace '${driver}')`
       : '';
   }
 
-  get channelOpts() {
+  get channelOpts(): SelectOption[] {
     return [
       { label: 'Not set', value: 0 },
       ...Object.keys(ValveStartId)
@@ -53,7 +53,7 @@ export default class MotorValveForm extends BlockCrudComponent {
     ];
   }
 
-  async claimChannel(pinId: number) {
+  async claimChannel(pinId: number): Promise<void> {
     if (this.block.data.startChannel === pinId) {
       return;
     }
@@ -70,60 +70,74 @@ export default class MotorValveForm extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud" />
+  <GraphCardWrapper>
+    <template #graph>
+      <HistoryGraph :id="widget.id" :config="graphCfg" />
+    </template>
 
-    <q-card-section>
-      <q-item dark>
-        <q-item-section>
-          <q-item-label caption>Target DS2408 Chip</q-item-label>
-          <LinkField
-            :value="block.data.hwDevice"
-            :service-id="serviceId"
-            title="Target DS2408 Chip"
-            no-create
-            @input="v => { block.data.hwDevice = v; block.data.startChannel = 0; saveBlock(); }"
-          />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label caption>DS2408 Channel</q-item-label>
-          <SelectField
-            :value="block.data.startChannel"
-            :options="channelOpts"
-            :readonly="!block.data.hwDevice.id"
-            title="DS2408 Channel"
-            @input="claimChannel"
-          />
-        </q-item-section>
-      </q-item>
-      <q-item dark>
-        <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>State</q-item-label>
-          <DigitalStateField
-            :value="block.data.desiredState"
-            :pending="block.data.state !== block.data.desiredState"
-            :pending-reason="constrainers"
-            :disable="isDriven"
-            @input="v => { block.data.desiredState = v; saveBlock(); }"
-          />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label caption>Valve State</q-item-label>
-          {{ valveStateName }}
-        </q-item-section>
-      </q-item>
+    <q-card dark class="widget-modal">
+      <BlockFormToolbar :crud="crud" />
 
-      <q-item dark>
-        <q-item-section>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
-          <ConstraintsField
-            :value="block.data.constrainedBy"
-            :service-id="serviceId"
-            type="digital"
-            @input="v => { block.data.constrainedBy = v; saveBlock(); }"
-          />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-  </q-card>
+      <q-card-section>
+        <q-item dark>
+          <q-item-section>
+            <q-item-label caption>
+              Target DS2408 Chip
+            </q-item-label>
+            <LinkField
+              :value="block.data.hwDevice"
+              :service-id="serviceId"
+              title="Target DS2408 Chip"
+              no-create
+              @input="v => { block.data.hwDevice = v; block.data.startChannel = 0; saveBlock(); }"
+            />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>
+              DS2408 Channel
+            </q-item-label>
+            <SelectField
+              :value="block.data.startChannel"
+              :options="channelOpts"
+              :readonly="!block.data.hwDevice.id"
+              title="DS2408 Channel"
+              @input="claimChannel"
+            />
+          </q-item-section>
+        </q-item>
+        <q-item dark>
+          <q-item-section style="justify-content: flex-start">
+            <q-item-label caption>
+              State
+            </q-item-label>
+            <DigitalStateField
+              :value="block.data.desiredState"
+              :pending="block.data.state !== block.data.desiredState"
+              :pending-reason="constrainers"
+              :disable="isDriven"
+              @input="v => { block.data.desiredState = v; saveBlock(); }"
+            />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>
+              Valve State
+            </q-item-label>
+            {{ valveStateName }}
+          </q-item-section>
+        </q-item>
+
+        <q-item dark>
+          <q-item-section>
+            <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
+            <ConstraintsField
+              :value="block.data.constrainedBy"
+              :service-id="serviceId"
+              type="digital"
+              @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+            />
+          </q-item-section>
+        </q-item>
+      </q-card-section>
+    </q-card>
+  </graphcardwrapper>
 </template>

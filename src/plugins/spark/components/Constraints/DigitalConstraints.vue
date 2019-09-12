@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Dialog } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { Unit } from '@/helpers/units';
 import { MutexLink } from '@/helpers/units/KnownLinks';
 
@@ -10,7 +10,7 @@ import ConstraintsBase, { EditableConstraint } from './ConstraintsBase';
 
 @Component
 export default class DigitalConstraints extends ConstraintsBase {
-  get constraintOptions() {
+  get constraintOptions(): SelectOption[] {
     return [...digitalConstraintLabels].map(([k, v]) => ({ label: v, value: k }));
   }
 
@@ -31,8 +31,8 @@ export default class DigitalConstraints extends ConstraintsBase {
     }
   }
 
-  addConstraint() {
-    Dialog.create({
+  addConstraint(): void {
+    createDialog({
       title: 'Add constraint',
       dark: true,
       cancel: true,

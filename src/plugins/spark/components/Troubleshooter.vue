@@ -44,17 +44,17 @@ export default class Troubleshooter extends Vue {
       : 'Service not synchronized';
   }
 
-  refresh() {
+  refresh(): void {
     sparkStore.fetchServiceStatus(this.serviceId)
       .then(() => sparkStore.createUpdateSource(this.serviceId))
       .catch(() => { });
   }
 
-  iconName(val: boolean) {
+  iconName(val: boolean): string {
     return val ? 'mdi-check-circle-outline' : 'mdi-alert-circle-outline';
   }
 
-  iconColor(val: boolean) {
+  iconColor(val: boolean): string {
     return val ? 'positive' : 'negative';
   }
 }
@@ -75,7 +75,9 @@ export default class Troubleshooter extends Vue {
             <q-spinner size="24px" />
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>Last update</q-item-label>
+            <q-item-label caption>
+              Last update
+            </q-item-label>
             <big>{{ lastStatus.checkedAt.toLocaleString() }}</big>
           </q-item-section>
         </q-item>

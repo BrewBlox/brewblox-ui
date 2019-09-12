@@ -1,9 +1,10 @@
 <script lang="ts">
 
-import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
+import { BlockDataPreset, BlockSpec } from '@/plugins/spark/types';
 
 import BlockCrudComponent from '../BlockCrudComponent';
 
@@ -16,39 +17,39 @@ export default class BlockPresetsAction extends BlockCrudComponent {
   @Prop({ type: String, default: 'mdi-application-import' })
   readonly icon!: string;
 
-  get itemProps() {
+  get itemProps(): Record<string, any> {
     return {
       ...this.$attrs,
       ...this.$props,
     };
   }
 
-  get spec() {
+  get spec(): BlockSpec {
     return sparkStore.specs[this.block.type];
   }
 
-  presets() {
+  presets(): BlockDataPreset[] {
     return [
       { name: 'Default values', generate: this.spec.generate },
       ...this.spec.presets,
     ];
   }
 
-  choosePreset() {
-    Dialog.create({
+  choosePreset(): void {
+    createDialog({
       title: 'Apply configuration preset',
       dark: true,
       cancel: true,
       options: {
         type: 'radio',
-        model: null,
+        model: undefined,
         // Classes are not correctly emitted by onOk
         items: this.presets()
           .map((p, idx) => ({ label: p.name, value: idx })),
       },
     })
       .onOk(idx => {
-        if (idx === null) {
+        if (idx === undefined) {
           return;
         }
         const preset = this.presets()[idx];
@@ -61,6 +62,8 @@ export default class BlockPresetsAction extends BlockCrudComponent {
 
 <template>
   <ActionItem v-bind="itemProps" :disabled="!spec" @click="choosePreset">
-    <q-tooltip v-if="!spec">No presets available</q-tooltip>
+    <q-tooltip v-if="!spec">
+      No presets available
+    </q-tooltip>
   </ActionItem>
 </template>

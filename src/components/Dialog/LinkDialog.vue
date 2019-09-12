@@ -1,9 +1,9 @@
 <script lang="ts">
 import get from 'lodash/get';
-import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
+import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
@@ -33,7 +33,7 @@ export default class LinkDialog extends DialogBase {
   @Prop({ type: Boolean, default: false })
   public readonly noCreate!: boolean;
 
-  get compatibleTypes() {
+  get compatibleTypes(): string[] | null {
     if (!this.value.type) {
       return null;
     }
@@ -41,11 +41,11 @@ export default class LinkDialog extends DialogBase {
     return [this.value.type, ...get(compatibleTable, this.value.type, [])];
   }
 
-  get actualFilter() {
+  get actualFilter(): (link: Link) => boolean {
     if (this.filter) {
       return this.filter;
     }
-    return block => !this.compatibleTypes || this.compatibleTypes.includes(block.type);
+    return block => !this.compatibleTypes || this.compatibleTypes.includes(block.type || '');
   }
 
   get linkOpts(): Link[] {
@@ -61,16 +61,16 @@ export default class LinkDialog extends DialogBase {
       : null;
   }
 
-  updateLink(link: Link | null) {
+  updateLink(link: Link | null): void {
     this.link = link || new Link(null, this.value.type);
   }
 
-  edit() {
+  edit(): void {
     showBlockDialog(this.linkBlock);
   }
 
-  create() {
-    Dialog.create({
+  create(): void {
+    createDialog({
       component: 'BlockWizardDialog',
       root: this.$root,
       serviceId: this.serviceId,
@@ -82,7 +82,7 @@ export default class LinkDialog extends DialogBase {
       });
   }
 
-  created() {
+  created(): void {
     this.link = this.value.copy();
   }
 }
@@ -96,8 +96,12 @@ export default class LinkDialog extends DialogBase {
     @keyup.enter="(link || clearable) && onDialogOk(link)"
   >
     <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
-      <q-card-section class="q-dialog__title">{{ title }}</q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
+      <q-card-section class="q-dialog__title">
+        {{ title }}
+      </q-card-section>
+      <q-card-section v-if="message" class="q-dialog__message scroll">
+        {{ message }}
+      </q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
         <q-select
@@ -114,10 +118,12 @@ export default class LinkDialog extends DialogBase {
         >
           <template v-slot:no-option>
             <q-item dark>
-              <q-item-section class="text-grey">No results</q-item-section>
+              <q-item-section class="text-grey">
+                No results
+              </q-item-section>
             </q-item>
           </template>
-          <template v-slot:after v-if="!noCreate">
+          <template v-if="!noCreate" v-slot:after>
             <q-btn v-if="linkBlock" flat round icon="mdi-pencil" @click="edit">
               <q-tooltip>Edit {{ link.id }}</q-tooltip>
             </q-btn>

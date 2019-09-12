@@ -32,7 +32,7 @@ export default class SetpointValues extends Vue {
   @Prop({ type: String })
   public readonly backgroundColor!: string;
 
-  get textColor() {
+  get textColor(): string {
     return this.backgroundColor
       ? contrastColor(this.backgroundColor)
       : 'white';
@@ -49,6 +49,12 @@ export default class SetpointValues extends Vue {
         .some(block =>
           block.type === pidType
           && block.data.inputId.id === (this.setpoint as SetpointSensorPairBlock).id);
+  }
+
+  get isDriven(): boolean {
+    return !!this.setpoint
+      && sparkStore.drivenChains(this.setpoint.serviceId)
+        .some(chain => chain[0] === (this.setpoint as SetpointSensorPairBlock).id);
   }
 
   get setpointSetting(): number | null {
@@ -84,7 +90,7 @@ export default class SetpointValues extends Vue {
         <q-icon v-if="!setpoint" name="mdi-link-variant-off" />
         <small v-else>{{ setpointUnit }}</small>
         <br />
-        <q-icon name="mdi-bullseye-arrow" class="q-mr-sm" />
+        <q-icon :name="isDriven ? 'mdi-swap-vertical-bold' : 'mdi-bullseye-arrow'" class="q-mr-sm" />
         {{ setpointSetting | round(1) }}
         <q-icon v-if="!setpoint" name="mdi-link-variant-off" />
         <small v-else>{{ setpointUnit }}</small>

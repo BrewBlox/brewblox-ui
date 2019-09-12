@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
-import { DashboardItem, dashboardStore } from '@/store/dashboards';
+import { Dashboard, DashboardItem, dashboardStore } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '../helpers/dashboards';
@@ -17,17 +17,17 @@ interface ValidatedItem {
 
 @Component
 export default class DashboardPage extends Vue {
-  widgetEditable: boolean = false;
-  menuModalOpen: boolean = false;
-  wizardModalOpen: boolean = false;
+  widgetEditable = false;
+  menuModalOpen = false;
+  wizardModalOpen = false;
 
   @Watch('dashboardId')
-  onChangeDashboardId() {
+  onChangeDashboardId(): void {
     this.widgetEditable = false;
   }
 
   @Watch('dashboard')
-  onChangeDashboard(newDash, oldDash) {
+  onChangeDashboard(newDash, oldDash): void {
     if (oldDash && !newDash) {
       // Dashboard was removed
       this.$router.replace('/');
@@ -38,19 +38,19 @@ export default class DashboardPage extends Vue {
     return this.$route.params.id;
   }
 
-  get dashboard() {
+  get dashboard(): Dashboard {
     return dashboardStore.dashboardById(this.dashboardId);
   }
 
-  get allDashboards() {
+  get allDashboards(): Dashboard[] {
     return dashboardStore.dashboardValues;
   }
 
-  get allItems() {
+  get allItems(): DashboardItem[] {
     return dashboardStore.itemValues;
   }
 
-  get items() {
+  get items(): DashboardItem[] {
     return dashboardStore.dashboardItemsByDashboardId(this.dashboardId)
       .sort(objectSorter('order'));
   }
@@ -87,7 +87,7 @@ export default class DashboardPage extends Vue {
     return this.$q.platform.is.mobile;
   }
 
-  async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: string[]) {
+  async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: string[]): Promise<void> {
     try {
       // Make a local change to the validated item, to avoid it jumping during the store round trip
       const local = this.validatedItems.find(valItem => valItem.item.id === id);
@@ -101,35 +101,35 @@ export default class DashboardPage extends Vue {
     }
   }
 
-  async onChangeSize(id: string, cols: number, rows: number) {
+  async onChangeSize(id: string, cols: number, rows: number): Promise<void> {
     await dashboardStore.updateDashboardItemSize({ id, cols, rows });
   }
 
-  public async saveWidget(widget: DashboardItem) {
+  public async saveWidget(widget: DashboardItem): Promise<void> {
     await dashboardStore.saveDashboardItem(widget);
   }
 
-  onIdChanged(oldId, newId) {
+  onIdChanged(oldId, newId): void {
     if (newId && this.$route.path === `/dashboard/${oldId}`) {
       this.$router.replace(`/dashboard/${newId}`);
     }
   }
 
-  changeDashboardId() {
+  changeDashboardId(): void {
     const oldId = this.dashboard.id;
     startChangeDashboardId(this.dashboard, newId => this.onIdChanged(oldId, newId));
   }
 
-  changeDashboardTitle() {
+  changeDashboardTitle(): void {
     const oldId = this.dashboard.id;
     startChangeDashboardTitle(this.dashboard, newId => this.onIdChanged(oldId, newId));
   }
 
-  toggleDefaultDashboard() {
+  toggleDefaultDashboard(): void {
     dashboardStore.updatePrimaryDashboard(this.dashboard.primary ? null : this.dashboardId);
   }
 
-  removeDashboard() {
+  removeDashboard(): void {
     startRemoveDashboard(this.dashboard);
   }
 }
@@ -141,11 +141,20 @@ export default class DashboardPage extends Vue {
       <q-spinner size="50px" color="primary" />
     </q-inner-loading>
     <div v-else>
-      <portal to="toolbar-title">{{ dashboard.title }}</portal>
+      <portal to="toolbar-title">
+        {{ dashboard.title }}
+      </portal>
       <portal to="toolbar-buttons">
-        <q-toggle v-model="widgetEditable" checked-icon="mdi-lock-open" unchecked-icon="mdi-lock">
-          <q-tooltip>{{ widgetEditable ? 'Lock widgets' : 'Move widgets' }}</q-tooltip>
-        </q-toggle>
+        <q-btn-toggle
+          v-model="widgetEditable"
+          class="q-mr-md"
+          outline
+          dark
+          :options="[
+            {icon:'mdi-arrow-all', value: true},
+            {icon:'mdi-lock', value: false},
+          ]"
+        />
         <q-btn-dropdown color="primary" label="actions">
           <q-list dark>
             <ActionItem icon="add" label="New Widget" @click="wizardModalOpen = true" />
@@ -173,8 +182,8 @@ export default class DashboardPage extends Vue {
         <q-item v-for="val in validatedItems" :key="val.item.id">
           <q-item-section>
             <component
-              :disabled="widgetEditable"
               :is="val.component"
+              :disabled="widgetEditable"
               :widget="val.item"
               class="dashboard-item"
               @update:widget="saveWidget"
@@ -189,10 +198,10 @@ export default class DashboardPage extends Vue {
         @change-size="onChangeSize"
       >
         <component
-          v-for="val in validatedItems"
-          :disabled="widgetEditable"
           :is="val.component"
+          v-for="val in validatedItems"
           :key="val.item.id"
+          :disabled="widgetEditable"
           :widget="val.item"
           :error="val.error"
           class="dashboard-item"

@@ -1,5 +1,5 @@
 import get from 'lodash/get';
-import { Dialog, uid } from 'quasar';
+import { Dialog, DialogChainObject, QDialogOptions, uid } from 'quasar';
 
 import { BlockCrud } from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
@@ -9,7 +9,15 @@ import { featureStore } from '@/store/features';
 
 import { deserialize } from './units/parseObject';
 
-export const showBlockDialog = (block: Block | null, props: any = {}) => {
+export interface DialogOptions extends QDialogOptions {
+  [prop: string]: any;
+}
+
+export function createDialog(opts: DialogOptions): DialogChainObject {
+  return Dialog.create(opts);
+}
+
+export function showBlockDialog(block: Block | null, props: any = {}): void {
   if (!block) {
     return;
   }
@@ -35,14 +43,14 @@ export const showBlockDialog = (block: Block | null, props: any = {}) => {
     saveBlock: v => sparkStore.saveBlock([block.serviceId, v]),
     closeDialog: () => wrapper.dialog && wrapper.dialog.hide(),
   };
-  wrapper.dialog = Dialog.create({
+  wrapper.dialog = createDialog({
     component: 'FormDialog',
     getCrud: () => crud,
     getProps: () => props,
   });
 };
 
-export function showImportDialog<T>(onSelected: (val: T) => void) {
+export function showImportDialog<T>(onSelected: (val: T) => void): void {
   const reader: FileReader = new FileReader();
   const input: HTMLInputElement = document.createElement('input');
 

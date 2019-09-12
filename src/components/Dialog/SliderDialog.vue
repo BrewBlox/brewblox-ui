@@ -7,7 +7,7 @@ import DialogBase from '@/components/Dialog/DialogBase';
 
 @Component
 export default class SliderDialog extends DialogBase {
-  local: number = 0;
+  local = 0;
 
   @Prop({ type: Number })
   public readonly value!: number;
@@ -27,11 +27,14 @@ export default class SliderDialog extends DialogBase {
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
-  save() {
+  @Prop({ type: Array, default: () => [] })
+  public readonly quickActions!: SelectOption[];
+
+  save(): void {
     this.onDialogOk(this.local);
   }
 
-  created() {
+  created(): void {
     this.local = this.value;
   }
 }
@@ -40,14 +43,25 @@ export default class SliderDialog extends DialogBase {
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
     <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
-      <q-card-section class="q-dialog__title">{{ title }}</q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">{{ message }}</q-card-section>
+      <q-card-section class="q-dialog__title">
+        {{ title }}
+      </q-card-section>
+      <q-card-section v-if="message" class="q-dialog__message scroll">
+        {{ message }}
+      </q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section>
         <q-item dark>
           <q-item-section>
-            <q-item-label caption>{{ label }}</q-item-label>
+            <q-item-label caption>
+              {{ label }}
+            </q-item-label>
             <q-slider v-model="local" :min="min" :max="max" dark label-always />
+          </q-item-section>
+        </q-item>
+        <q-item v-if="quickActions.length" dark>
+          <q-item-section v-for="q in quickActions" :key="'quick'+q.value">
+            <q-btn unelevated :label="q.label" @click="local = q.value" />
           </q-item-section>
         </q-item>
       </q-card-section>

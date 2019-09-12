@@ -1,10 +1,11 @@
 <script lang="ts">
 import get from 'lodash/get';
-import { Dialog, uid } from 'quasar';
+import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
+import { createDialog } from '@/helpers/dialog';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
@@ -30,7 +31,7 @@ interface StepDisplay extends Step {
   },
 })
 export default class StepViewForm extends CrudComponent {
-  draggingStep: boolean = false;
+  draggingStep = false;
   editableChanges: Record<string, boolean> = {};
 
   @Prop({ type: String })
@@ -40,7 +41,7 @@ export default class StepViewForm extends CrudComponent {
     return this.widget.config;
   }
 
-  get serviceId() {
+  get serviceId(): string {
     return this.widgetConfig.serviceId;
   }
 
@@ -82,7 +83,7 @@ export default class StepViewForm extends CrudComponent {
       }));
   }
 
-  saveSteps(steps: StepDisplay[]) {
+  saveSteps(steps: StepDisplay[]): void {
     this.saveConfig({
       ...this.widgetConfig,
       steps: serialize(steps.map(step => ({
@@ -119,9 +120,9 @@ export default class StepViewForm extends CrudComponent {
     };
   }
 
-  addStep() {
-    let stepName = 'New Step';
-    Dialog.create({
+  addStep(): void {
+    const stepName = 'New Step';
+    createDialog({
       title: 'Add a Step',
       dark: true,
       cancel: true,
@@ -136,15 +137,15 @@ export default class StepViewForm extends CrudComponent {
       });
   }
 
-  duplicateStep(step: StepDisplay) {
+  duplicateStep(step: StepDisplay): void {
     const duplicated = deepCopy(step);
     this.steps.push({ ...duplicated, id: uid(), name: `${duplicated.name} (copy)` });
     this.saveSteps(this.steps);
   }
 
-  renameStep(step: StepDisplay) {
-    let stepName = step.name;
-    Dialog.create({
+  renameStep(step: StepDisplay): void {
+    const stepName = step.name;
+    createDialog({
       title: 'Change Step name',
       message: `Choose a new name for '${step.name}'`,
       dark: true,
@@ -163,8 +164,8 @@ export default class StepViewForm extends CrudComponent {
       });
   }
 
-  removeStep(step: StepDisplay) {
-    Dialog.create({
+  removeStep(step: StepDisplay): void {
+    createDialog({
       title: 'Remove Step',
       message: `Are you sure you want to remove ${step.name}?`,
       dark: true,
@@ -174,13 +175,13 @@ export default class StepViewForm extends CrudComponent {
       .onOk(() => this.saveSteps(this.steps.filter(s => s.id !== step.id)));
   }
 
-  saveChanges(step: StepDisplay, changes: BlockChangeDisplay[]) {
+  saveChanges(step: StepDisplay, changes: BlockChangeDisplay[]): void {
     step.changes = changes;
     this.saveSteps(this.steps);
   }
 
-  addChange(step: StepDisplay) {
-    Dialog.create({
+  addChange(step: StepDisplay): void {
+    createDialog({
       component: 'BlockDialog',
       title: 'Choose a Block',
       filter: block => {
@@ -200,28 +201,28 @@ export default class StepViewForm extends CrudComponent {
       });
   }
 
-  removeChange(step: StepDisplay, key: string) {
+  removeChange(step: StepDisplay, key: string): void {
     step.changes = step.changes.filter(change => change.key !== key);
     this.saveSteps(this.steps);
   }
 
-  addField(change: BlockChangeDisplay, key: string) {
+  addField(change: BlockChangeDisplay, key: string): void {
     const prop = this.findProp(change, key);
     this.$set(change.data, key, prop.generate());
     this.saveSteps(this.steps);
   }
 
-  updateField(change: BlockChangeDisplay, key: string, val: any) {
+  updateField(change: BlockChangeDisplay, key: string, val: any): void {
     this.$set(change.data, key, val);
     this.saveSteps(this.steps);
   }
 
-  toggleConfirmation(change: BlockChangeDisplay, key: string) {
+  toggleConfirmation(change: BlockChangeDisplay, key: string): void {
     this.$set(change.confirmed, key, !change.confirmed[key]);
     this.saveSteps(this.steps);
   }
 
-  removeField(change: BlockChangeDisplay, key: string) {
+  removeField(change: BlockChangeDisplay, key: string): void {
     this.$delete(change.data, key);
     this.$delete(change.confirmed, key);
     this.saveSteps(this.steps);
@@ -248,8 +249,8 @@ export default class StepViewForm extends CrudComponent {
           >
             <q-expansion-item
               v-for="step in steps"
-              :label="step.name"
               :key="step.id"
+              :label="step.name"
               :default-opened="openStep === step.id"
               :disable="draggingStep"
               group="steps"
@@ -269,7 +270,9 @@ export default class StepViewForm extends CrudComponent {
                       :class="{'text-h6': true, grabbable: true, 'text-red': !change.block}"
                     >
                       {{ change.blockId }}
-                      <q-tooltip v-if="!change.block">Block not found</q-tooltip>
+                      <q-tooltip v-if="!change.block">
+                        Block not found
+                      </q-tooltip>
                     </q-item-section>
                     <template v-if="editableChanges[change.key]">
                       <q-item-section side>

@@ -5,6 +5,9 @@ export interface FlowRoute {
   friction?: number;
   pressure?: number;
   liquids?: string[];
+  internal?: boolean;
+  sink?: boolean;
+  source?: boolean;
 }
 
 export interface Transitions {
@@ -17,6 +20,11 @@ export interface LiquidFlow {
 
 export interface CalculatedFlows {
   [inCoords: string]: LiquidFlow;
+}
+
+export interface PathFriction {
+  friction: number;
+  pressureDiff: number;
 }
 
 export interface PersistentPart {

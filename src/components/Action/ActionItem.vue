@@ -24,7 +24,7 @@ export default class ActionItem extends Vue {
   readonly disabled!: boolean;
 
 
-  get combinedProps() {
+  get combinedProps(): Record<string, any> {
     return {
       dark: true,
       clickable: !this.disabled,
@@ -33,13 +33,13 @@ export default class ActionItem extends Vue {
     };
   }
 
-  get itemClass() {
+  get itemClass(): Record<string, boolean> {
     return {
       darkened: this.disabled,
     };
   }
 
-  onClick() {
+  onClick(): void {
     if (!this.disabled) {
       this.$emit('click');
     }
@@ -55,9 +55,9 @@ export default class ActionItem extends Vue {
     @click="onClick"
   >
     <q-item-section v-if="icon" avatar>
-      <q-icon :name="icon"/>
+      <q-icon :name="icon" />
     </q-item-section>
     <q-item-section>{{ label }}</q-item-section>
-    <slot/>
+    <slot />
   </q-item>
 </template>

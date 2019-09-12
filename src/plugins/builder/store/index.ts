@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Action, Module, Mutation, VuexModule, getModule } from 'vuex-module-decorators';
+import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
 import { objReducer } from '@/helpers/functional';
 import store from '@/store';
@@ -18,8 +18,8 @@ const rawError = true;
 @Module({ store, namespaced: true, dynamic: true, name: 'builder' })
 export class BuilderModule extends VuexModule {
   public specs: Record<string, PartSpec> = {};
-  public editorActive: boolean = false;
-  public editorTool: string = '';
+  public editorActive = false;
+  public editorTool = '';
   public layouts: Record<string, BuilderLayout> = {};
 
   public get layoutIds(): string[] {
@@ -54,47 +54,47 @@ export class BuilderModule extends VuexModule {
   }
 
   @Mutation
-  public registerPart(spec: PartSpec) {
+  public registerPart(spec: PartSpec): void {
     Vue.set(this.specs, spec.id, { ...spec });
   }
 
   @Mutation
-  public commitEditorActive(active: boolean) {
+  public commitEditorActive(active: boolean): void {
     this.editorActive = active;
   }
 
   @Mutation
-  public commitEditorTool(tool: string) {
+  public commitEditorTool(tool: string): void {
     this.editorTool = tool;
   }
 
   @Mutation
-  public commitLayout(layout: BuilderLayout) {
+  public commitLayout(layout: BuilderLayout): void {
     Vue.set(this.layouts, layout.id, { ...layout });
   }
 
   @Mutation
-  public commitAllLayouts(layouts: BuilderLayout[]) {
+  public commitAllLayouts(layouts: BuilderLayout[]): void {
     this.layouts = layouts.reduce(objReducer('id'), {});
   }
 
   @Mutation
-  public commitRemoveLayout(layout: BuilderLayout) {
+  public commitRemoveLayout(layout: BuilderLayout): void {
     Vue.delete(this.layouts, layout.id);
   }
 
   @Action({ rawError })
-  public async createLayout(layout: BuilderLayout) {
+  public async createLayout(layout: BuilderLayout): Promise<void> {
     this.commitLayout(await createLayoutInApi(layout));
   }
 
   @Action({ rawError })
-  public async saveLayout(layout: BuilderLayout) {
+  public async saveLayout(layout: BuilderLayout): Promise<void> {
     this.commitLayout(await persistLayoutInApi(layout));
   }
 
   @Action({ rawError })
-  public async removeLayout(layout: BuilderLayout) {
+  public async removeLayout(layout: BuilderLayout): Promise<void> {
     await removeLayoutInApi(layout)
       .catch(() => { });
     this.commitRemoveLayout(layout);

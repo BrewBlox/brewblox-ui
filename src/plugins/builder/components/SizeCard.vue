@@ -26,7 +26,7 @@ export default class SizeCard extends PartCard {
     return this.part.settings[this.settingsKey] || this.defaultSize;
   }
 
-  save(val: number) {
+  save(val: number): void {
     const size = val || this.defaultSize;
     this.savePartSettings({ ...this.part.settings, [this.settingsKey]: size });
   }
@@ -40,7 +40,9 @@ export default class SizeCard extends PartCard {
     <q-separator dark />
     <q-item dark>
       <q-item-section>
-        <q-item-label caption>{{ label }}</q-item-label>
+        <q-item-label caption>
+          {{ label }}
+        </q-item-label>
         <q-slider :value="size" :min="min" :max="max" dark label @change="debouncedSave" />
       </q-item-section>
     </q-item>

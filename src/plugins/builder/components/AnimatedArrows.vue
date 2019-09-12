@@ -16,18 +16,18 @@ export default class AnimatedArrows extends Vue {
   @Prop({ type: Number, default: 2 })
   readonly numArrows!: number;
 
-  get pathLength() {
+  get pathLength(): number {
     return svgPathProperties(this.path).getTotalLength();
   }
 
-  get duration() {
+  get duration(): number {
     if (this.speed && this.pathLength) {
       return this.pathLength / (25 * Math.abs(this.speed));
     }
     return 0;
   }
 
-  get reversed() {
+  get reversed(): boolean {
     return this.speed < 0;
   }
 
@@ -37,14 +37,14 @@ export default class AnimatedArrows extends Vue {
       .map(idx => `${idx * interval}s`);
   }
 
-  get transform() {
+  get transform(): string {
     // Flips the arrow
     return this.reversed
       ? 'scale (-1, 1)'
       : '';
   }
 
-  get keyPoints() {
+  get keyPoints(): string {
     // Makes the arrow travel end-to-start
     return this.reversed
       ? '1;0'
@@ -56,7 +56,7 @@ export default class AnimatedArrows extends Vue {
 <template>
   <g v-if="speed">
     <g v-for="start in starts" :key="start" visibility="hidden">
-      <path :transform="transform" d="M-4,-4 L0,0 M-4,4 L0,0" class="outline"/>
+      <path :transform="transform" d="M-4,-4 L0,0 M-4,4 L0,0" class="outline" />
       <!-- Note: SVG attributes are case-sensitive -->
       <animateMotion
         :path="path"
@@ -69,7 +69,7 @@ export default class AnimatedArrows extends Vue {
         calcMode="linear"
         keyTimes="0;1"
       />
-      <set :begin="start" attributeName="visibility" from="hidden" to="visible"/>
+      <set :begin="start" attributeName="visibility" from="hidden" to="visible" />
     </g>
   </g>
 </template>
