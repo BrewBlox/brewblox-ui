@@ -142,9 +142,11 @@ export default class FermentHardwareTask extends WizardTaskBase {
 <template>
   <div>
     <q-card-section>
-      <q-item>
+      <q-item dark>
         <q-item-section>
-          <big>Hardware Blocks</big>
+          <q-item-label class="text-subtitle1">
+            Assign Hardware Blocks
+          </q-item-label>
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn flat round icon="refresh" @click="discover">
@@ -157,10 +159,23 @@ export default class FermentHardwareTask extends WizardTaskBase {
           </q-btn>
         </q-item-section>
       </q-item>
-      <q-item dark>
-        <q-item-section class="text-italic">
-          You can unplug or heat sensors to identify them.
-          The current value will be shown under each dropdown menu.
+      <q-item dark class="text-weight-light">
+        <q-item-section>
+          <p>
+            Select which hardware should be used for each function.<br />
+            You can unplug or heat sensors to identify them.
+            The current value will be shown under each dropdown menu.
+          </p>
+          <p>
+            Use the buttons above to discover new OneWire blocks or manually create a block.
+          </p>
+          <p>
+            We will also set some constraints on the heater and cooler:
+            <ul>
+              <li>Minimum ON and OFF times to protect the compressor</li>
+              <li>Minimum wait times for switching between heating and cooling</li>
+            </ul>
+          </p>
         </q-item-section>
       </q-item>
       <q-item dark>
@@ -196,7 +211,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
           <q-select
             v-model="fridgeSensor"
             :options="sensorOptions"
-            :label="config.names.fridgeSensor"
+            label="Fridge Sensor"
             :rules="sensorRules"
             :hint="fridgeSensorTemp"
             dark
@@ -207,7 +222,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
           <q-select
             v-model="beerSensor"
             :options="sensorOptions"
-            :label="config.names.beerSensor"
+            label="Beer Sensor"
             :rules="sensorRules"
             :hint="beerSensorTemp"
             dark

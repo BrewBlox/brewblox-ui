@@ -166,6 +166,22 @@ export default class HermsNamingTask extends WizardTaskBase {
   <div>
     <q-card-section style="height: 60vh">
       <q-scroll-area>
+        <q-item dark class="text-weight-light">
+          <q-item-section>
+            <q-item-label class="text-subtitle1">
+              Name your blocks and dashboards
+            </q-item-label>
+            <p>
+              Enter a name for your new process below. The prefix will be used to suggest names for your new blocks.
+            </p>
+          </q-item-section>
+        </q-item>
+
+        <CardWarning v-if="groupError">
+          <template #message>
+            {{ groupError }}
+          </template>
+        </CardWarning>
         <!-- Generic settings -->
         <q-expansion-item default-opened label="Arrangement settings" icon="settings" dense>
           <q-item dark>

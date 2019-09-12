@@ -27,7 +27,7 @@ export default class FermentManualTask extends WizardTaskBase {
       <q-item dark>
         <big>About your new fermentation dashboard</big>
       </q-item>
-      <q-item dark>
+      <q-item dark class="text-weight-light">
         <q-item-section>
           <p>
             While the wizard is configuring the Spark and your new dashboard,

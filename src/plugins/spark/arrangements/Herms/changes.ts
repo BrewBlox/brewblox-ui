@@ -31,6 +31,12 @@ import { StepViewItem } from '../../features/StepView/types';
 import { Block, DigitalState } from '../../types';
 import { HermsConfig, PinChannel } from './types';
 
+export interface PidOpts {
+  hltKp: Unit;
+  bkKp: Unit;
+  mtKp: Unit;
+}
+
 export function defineChangedBlocks(config: HermsConfig): Block[] {
   return (
     sparkStore
@@ -51,19 +57,14 @@ export function defineChangedBlocks(config: HermsConfig): Block[] {
   );
 };
 
-export function defineCreatedBlocks(
-  config: HermsConfig,
-  mtSetting: Unit,
-  bkSetting: Unit,
-  balanced: boolean,
-): Block[] {
+export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[] {
   const groups = [0];
   const serviceId = config.serviceId;
 
   const pwmConstraints: AnalogConstraint[] = [];
   const actuatorConstraints: DigitalConstraint[] = [];
 
-  if (balanced) {
+  if (config.mutex) {
     pwmConstraints.push({
       balanced: {
         balancerId: new BalancerLink(config.names.balancer),
@@ -108,8 +109,8 @@ export function defineCreatedBlocks(
       groups,
       data: {
         sensorId: new Link(config.names.hltSensor),
-        storedSetting: mtSetting,
-        settingEnabled: true,
+        storedSetting: new Unit(70, 'degC'),
+        settingEnabled: false,
         setting: new Unit(null, 'degC'),
         value: new Unit(null, 'degC'),
         valueUnfiltered: new Unit(null, 'degC'),
@@ -125,8 +126,8 @@ export function defineCreatedBlocks(
       groups,
       data: {
         sensorId: new Link(config.names.mtSensor),
-        storedSetting: mtSetting,
-        settingEnabled: true,
+        storedSetting: new Unit(67, 'degC'),
+        settingEnabled: false,
         setting: new Unit(null, 'degC'),
         value: new Unit(null, 'degC'),
         valueUnfiltered: new Unit(null, 'degC'),
@@ -142,7 +143,7 @@ export function defineCreatedBlocks(
       groups,
       data: {
         sensorId: new Link(config.names.bkSensor),
-        storedSetting: bkSetting,
+        storedSetting: new Unit(70, 'degC'),
         settingEnabled: true,
         setting: new Unit(null, 'degC'),
         value: new Unit(null, 'degC'),
@@ -163,7 +164,7 @@ export function defineCreatedBlocks(
         drivenTargetId: new Link(config.names.hltSetpoint),
         referenceId: new Link(config.names.mtSetpoint),
         referenceSettingOrValue: OffsetSettingOrValue.Setting,
-        enabled: true,
+        enabled: false,
         desiredSetting: 0,
         setting: 0,
         value: 0,
@@ -211,7 +212,7 @@ export function defineCreatedBlocks(
       groups,
       data: {
         enabled: true,
-        period: new Unit(10, 'second'),
+        period: new Unit(2, 'second'),
         actuatorId: new Link(config.names.hltAct),
         drivenActuatorId: new Link(null),
         setting: 0,
@@ -229,7 +230,7 @@ export function defineCreatedBlocks(
       groups,
       data: {
         enabled: true,
-        period: new Unit(10, 'second'),
+        period: new Unit(2, 'second'),
         actuatorId: new Link(config.names.bkAct),
         drivenActuatorId: new Link(null),
         setting: 0,
@@ -251,9 +252,9 @@ export function defineCreatedBlocks(
         enabled: false,
         inputId: new Link(config.names.hltSetpoint),
         outputId: new Link(config.names.hltPwm),
-        kp: new Unit(20, '1/degC'),
-        ti: new Unit(2, 'hour'),
-        td: new Unit(10, 'min'),
+        kp: opts.hltKp,
+        ti: new Unit(10, 'min'),
+        td: new Unit(10, 'second'),
         integralReset: 0,
       },
     },
@@ -267,8 +268,8 @@ export function defineCreatedBlocks(
         enabled: false,
         inputId: new Link(config.names.mtSetpoint),
         outputId: new Link(config.names.hltDriver),
-        kp: new Unit(20, '1/degC'),
-        ti: new Unit(2, 'hour'),
+        kp: opts.mtKp,
+        ti: new Unit(5, 'min'),
         td: new Unit(10, 'min'),
         integralReset: 0,
       },
@@ -283,8 +284,8 @@ export function defineCreatedBlocks(
         enabled: false,
         inputId: new Link(config.names.bkSetpoint),
         outputId: new Link(config.names.bkPwm),
-        kp: new Unit(20, '1/degC'),
-        ti: new Unit(2, 'hour'),
+        kp: opts.bkKp,
+        ti: new Unit(5, 'min'),
         td: new Unit(10, 'min'),
         integralReset: 0,
       },
@@ -303,7 +304,7 @@ export function defineCreatedBlocks(
       PidBlock,
     ];
 
-  return balanced
+  return config.mutex
     ? [...balancerBlocks, ...baseBlocks]
     : baseBlocks;
 }
@@ -401,15 +402,15 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
           id: uid(),
           changes: [
             {
-              blockId: config.names.hltPid,
+              blockId: config.names.hltSetpoint,
               data: { enabled: false },
             },
             {
-              blockId: config.names.mtPid,
+              blockId: config.names.mtSetpoint,
               data: { enabled: false },
             },
             {
-              blockId: config.names.bkPid,
+              blockId: config.names.bkSetpoint,
               data: { enabled: false },
             },
           ],
@@ -419,7 +420,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
           id: uid(),
           changes: [
             {
-              blockId: config.names.hltPid,
+              blockId: config.names.hltSetpoint,
               data: { enabled: true },
             },
           ],
@@ -429,7 +430,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
           id: uid(),
           changes: [
             {
-              blockId: config.names.mtPid,
+              blockId: config.names.mtSetpoint,
               data: { enabled: true },
             },
           ],
@@ -439,7 +440,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
           id: uid(),
           changes: [
             {
-              blockId: config.names.bkPid,
+              blockId: config.names.bkSetpoint,
               data: { enabled: true },
             },
           ],

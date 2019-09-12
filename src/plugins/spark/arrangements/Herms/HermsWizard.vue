@@ -8,7 +8,8 @@ export default class HermsWizard extends WidgetWizardBase {
   initialTasks = [
     'HermsNamingTask',
     'HermsHardwareTask',
-    'HermsSettingsTask',
+    'HermsMutexTask',
+    'HermsPidTask',
     'HermsManualTask',
   ].reverse();
 }
