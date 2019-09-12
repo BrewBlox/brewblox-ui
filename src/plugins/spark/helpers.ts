@@ -8,6 +8,7 @@ import {
   round,
   shortDateString,
   truncate,
+  truncateRound,
   unitDurationString,
 } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
@@ -48,6 +49,7 @@ export const installFilters = (Vue: VueConstructor): void => {
     (value: Link | null) =>
       (value !== null && value !== undefined ? value.toString() : '-'));
   Vue.filter('round', round);
+  Vue.filter('truncateRound', truncateRound);
   Vue.filter('hexToBase64', hexToBase64);
   Vue.filter('base64ToHex', base64ToHex);
   Vue.filter('duration', durationString);
