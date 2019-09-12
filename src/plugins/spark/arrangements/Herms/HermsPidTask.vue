@@ -18,7 +18,7 @@ export default class HermsPidTask extends WizardTaskBase {
   bkFullPowerDelta = new Unit(2, 'delta_degC');
   hltVolume = 25;
   mashVolume = 25;
-  limit = new Unit(10, 'delta_degC');
+  driverMax = new Unit(10, 'delta_degC');
   mashTarget = new Unit(67, 'delta_degC');
   mashActual = new Unit(65, 'delta_degC');
 
@@ -39,9 +39,9 @@ export default class HermsPidTask extends WizardTaskBase {
   }
 
   get hltSetting(): Unit {
-    if (this.mashTarget.value && this.mtKp.value && this.mashActual.value && this.limit.value) {
-      const upperLimit = this.mashTarget.value + this.limit.value;
-      const lowerLimit = this.mashTarget.value - this.limit.value;
+    if (this.mashTarget.value && this.mtKp.value && this.mashActual.value && this.driverMax.value) {
+      const upperLimit = this.mashTarget.value + this.driverMax.value;
+      const lowerLimit = this.mashTarget.value - this.driverMax.value;
       const setting = this.mashTarget.value + (this.mashTarget.value - this.mashActual.value) * this.mtKp.value;
 
       return new Unit(
@@ -66,6 +66,7 @@ export default class HermsPidTask extends WizardTaskBase {
       hltKp: this.hltKp,
       bkKp: this.bkKp,
       mtKp: this.mtKp,
+      driverMax: this.driverMax,
     };
 
     const createdBlocks = defineCreatedBlocks(this.config, opts);
@@ -162,9 +163,9 @@ export default class HermsPidTask extends WizardTaskBase {
             <q-input v-model="mashVolume" :rules="volumeRules" type="number" step="any" label="HLT volume" dark />
           </q-item-section>
           <q-item-section>
-            <q-input v-model.number="limit.value" type="number" step="any" label="Limit difference to" dark>
+            <q-input v-model.number="driverMax.value" type="number" step="any" label="Limit difference to" dark>
               <template v-slot:append>
-                <small class="self-end q-pb-sm">{{ limit.notation }}</small>
+                <small class="self-end q-pb-sm">{{ driverMax.notation }}</small>
               </template>
             </q-input>
           </q-item-section>

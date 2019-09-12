@@ -35,6 +35,7 @@ export interface PidOpts {
   hltKp: Unit;
   bkKp: Unit;
   mtKp: Unit;
+  driverMax: Unit;
 }
 
 export function defineChangedBlocks(config: HermsConfig): Block[] {
@@ -168,7 +169,14 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
         desiredSetting: 0,
         setting: 0,
         value: 0,
-        constrainedBy: { constraints: [] },
+        constrainedBy: {
+          constraints: [
+            {
+              max: opts.driverMax.value,
+              limiting: false,
+            },
+          ],
+        },
       },
     },
     // Digital Actuators
