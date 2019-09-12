@@ -168,7 +168,7 @@ export default class StepperWidget extends WidgetBase {
       </q-item-section>
     </WidgetToolbar>
     <q-card-section v-for="group in groups" :key="group.id">
-      <q-item dark>
+      <q-item dark class="row no-wrap">
         <q-item-section>
           <template v-if="group.runtime">
             <q-select
@@ -222,6 +222,11 @@ export default class StepperWidget extends WidgetBase {
         </q-item-section>
         <template v-if="group.runtime">
           <q-item-section class="col-auto">
+            <q-btn flat icon="mdi-format-list-checks">
+              <q-tooltip>{{ conditionsString(group.status) }}</q-tooltip>
+            </q-btn>
+          </q-item-section>
+          <q-item-section class="col-auto">
             <q-btn
               :disable="group.current.index + 1 >= group.process.steps.length"
               flat
@@ -236,6 +241,11 @@ export default class StepperWidget extends WidgetBase {
           </q-item-section>
         </template>
         <template v-else>
+          <q-item-section class="col-auto">
+            <q-btn flat icon="edit">
+              <q-tooltip>Edit Process</q-tooltip>
+            </q-btn>
+          </q-item-section>
           <q-item-section class="col-auto">
             <q-btn flat icon="mdi-play" @click="start(group.process)" />
             <q-tooltip>Start Proces</q-tooltip>

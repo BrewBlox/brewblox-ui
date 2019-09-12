@@ -29,6 +29,7 @@ export interface Process {
 export interface RuntimeLog {
   timestamp: number;
   source: string;
+  ref: string;
   message: string;
 }
 
@@ -57,3 +58,5 @@ export interface RuntimeStatus {
   responses: ResponseResult[];
   conditions: boolean[];
 }
+
+export type CompareOperator = 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt';
