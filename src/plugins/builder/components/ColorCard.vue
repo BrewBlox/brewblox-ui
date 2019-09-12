@@ -14,12 +14,16 @@ export default class ColorCard extends PartCard {
     WORT,
   ];
 
-  get color(): string {
+  get color(): string | null {
     return this.part.settings.color;
   }
 
-  set color(val: string) {
+  set color(val: string | null) {
     this.savePartSettings({ ...this.part.settings, color: colorString(val) });
+  }
+
+  toggle(color: string): void {
+    this.color = color !== this.color ? color : null;
   }
 }
 </script>
@@ -28,12 +32,13 @@ export default class ColorCard extends PartCard {
   <q-list dark>
     <q-separator dark />
     <q-item dark>
-      <q-item-section>
+      <q-item-section class="col-auto">
         <q-item-label caption>
           Liquid color
         </q-item-label>
         <ColorField
           v-model="color"
+          clearable
           title="Liquid color"
           message="Select the fill color for this part."
         />
@@ -45,7 +50,7 @@ export default class ColorCard extends PartCard {
           round
           icon="format_color_fill"
           class="q-mx-auto"
-          @click="color = colorOpt"
+          @click="toggle(colorOpt)"
         />
       </q-item-section>
     </q-item>

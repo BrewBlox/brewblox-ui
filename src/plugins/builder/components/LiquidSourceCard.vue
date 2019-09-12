@@ -3,6 +3,7 @@ import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import { BEER, COLD_WATER, HOT_WATER, WORT } from '../getters';
+import { colorString } from '../helpers';
 import PartCard from './PartCard';
 
 @Component
@@ -23,13 +24,16 @@ export default class LiquidSourceCard extends PartCard {
   }
 
   get color(): string | null {
-    const [val] = this.part.settings.liquids || [null];
-    return val || null;
+    return get(this.part.settings, ['liquids', 0], null);
   }
 
   set color(val: string | null) {
-    const liquids = val ? [val] : [];
+    const liquids = val ? [colorString(val)] : [];
     this.savePart({ ...this.part, settings: { ...this.part.settings, liquids } });
+  }
+
+  toggle(color: string): void {
+    this.color = color !== this.color ? color : null;
   }
 }
 </script>
@@ -44,12 +48,13 @@ export default class LiquidSourceCard extends PartCard {
         </q-item-label>
         <q-toggle v-model="pressured" />
       </q-item-section>
-      <q-item-section>
+      <q-item-section class="col-auto">
         <q-item-label caption>
           Liquid color
         </q-item-label>
         <ColorField
           v-model="color"
+          clearable
           title="Liquid color"
           message="Choose a fill color for this source."
         />
@@ -61,7 +66,7 @@ export default class LiquidSourceCard extends PartCard {
           round
           icon="format_color_fill"
           class="q-mx-auto"
-          @click="color = colorOpt"
+          @click="toggle(colorOpt)"
         />
       </q-item-section>
     </q-item>
