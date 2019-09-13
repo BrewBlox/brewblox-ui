@@ -34,6 +34,16 @@ export default class PidForm extends BlockCrudComponent {
         .includes(this.outputId);
   }
 
+  get baseOutput(): number {
+    return this.block.data.p + this.block.data.i + this.block.data.d;
+  }
+
+  get boilAdjustment(): number {
+    return this.block.data.boilModeActive
+      ? this.block.data.boilMinOutput - this.baseOutput
+      : 0;
+  }
+
   showInput(): void {
     showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.inputId));
   }
@@ -116,7 +126,7 @@ export default class PidForm extends BlockCrudComponent {
             </div>
           </q-item-section>
 
-          <q-item-section class="col-auto">
+          <q-item-section class="col-1">
             <q-btn v-if="hasInputBlock" flat icon="mdi-pencil" @click="showInput">
               <q-tooltip>Edit {{ inputId }}</q-tooltip>
             </q-btn>
@@ -162,19 +172,47 @@ export default class PidForm extends BlockCrudComponent {
 
           <q-item-section>
             <q-item-label caption>
-              Current value is
+              Achieved value is
             </q-item-label>
             <div class="text-bold">
               {{ block.data.outputValue | round }}
             </div>
           </q-item-section>
 
-          <q-item-section class="col-auto">
+          <q-item-section class="col-1">
             <q-btn v-if="hasOutputBlock" flat icon="mdi-pencil" @click="showOutput">
               <q-tooltip>Edit {{ outputId }}</q-tooltip>
             </q-btn>
             <q-btn v-else disable flat icon="mdi-pencil-off" />
           </q-item-section>
+        </q-item>
+        <q-separator dark inset />
+
+        <!-- Boil mode settings -->
+        <q-item dark>
+          <q-item-section>
+            <q-item-label caption>
+              Boil temperature
+            </q-item-label>
+            100 °C + <UnitField
+              :value="block.data.boilPointAdjust"
+              title="Boil point adjustment"
+              label="Adjustment"
+              @input="v => { block.data.boilPointAdjust = v; saveBlock(); }"
+            />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label caption>
+              Minimum boiling output
+            </q-item-label>
+            <SliderField
+              :value="block.data.boilMinOutput"
+              title="Minimum output"
+              @input="v => { block.data.boilMinOutput = v; saveBlock(); }"
+            />
+          </q-item-section>
+          <q-item-section />
+          <q-item-section class="col-1" />
         </q-item>
         <q-separator dark inset />
 
@@ -349,19 +387,36 @@ export default class PidForm extends BlockCrudComponent {
             </q-item-label>
             <div style="border-bottom: solid 2px white; min-width: 60px;">
               {{ block.data.d | round }}
+              <!-- {{ boilAdjustment | round }} -->
               <span style="float: right;">
                 <sub>+</sub>
               </span>
             </div>
           </q-item-section>
         </q-item>
+
+        <q-item v-if="block.data.boilModeActive" dark>
+          <q-item-section v-for="i in 6" :key="'boil'+i" />
+          <q-item-section>
+            <q-item-label caption>
+              Boil mode
+            </q-item-label>
+            <div style="border-bottom: solid 2px white; min-width: 60px;">
+              {{ boilAdjustment | round }}
+              <span style="float: right;">
+                <sub>+</sub>
+              </span>
+            </div>
+          </q-item-section>
+        </q-item>
+
         <q-item dark>
-          <q-item-section v-for="i in 6" :key="i" />
+          <q-item-section v-for="i in 6" :key="`output-${i}`" />
           <q-item-section>
             <q-item-label caption>
               Output
             </q-item-label>
-            {{ block.data.p + block.data.i + block.data.d | round }}
+            {{ baseOutput + boilAdjustment | round }}
           </q-item-section>
         </q-item>
       </q-card-section>
