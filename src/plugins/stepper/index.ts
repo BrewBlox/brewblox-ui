@@ -8,5 +8,6 @@ export default {
     autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
 
     featureStore.createFeature(Stepper.feature);
+    featureStore.createWatcher({ component: 'StepperWatcher', props: {} });
   },
 };

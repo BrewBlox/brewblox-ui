@@ -1,9 +1,9 @@
 import { Notify } from 'quasar';
 
-import { del, get, post } from '@/helpers/fetch';
+import { del, get, post, sse } from '@/helpers/fetch';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 
-import { Process, Runtime, RuntimeStatus } from '../types';
+import { Process, Runtime } from '../types';
 
 
 const intercept = (message: string): (e: Error) => never =>
@@ -83,18 +83,9 @@ export const fetchRuntime =
       .catch(intercept(`Failed to fetch process runtime ${id}`));
 
 
-export const fetchStatus =
-  async ({ id }: { id: string }): Promise<RuntimeStatus> =>
-    get(`/stepper/status/${encodeURIComponent(id)}`)
-      .then(res => deserialize(res))
-      .catch(intercept(`Failed to fetch status for process ${id}`));
-
-
-export const fetchStatuses =
-  async (): Promise<RuntimeStatus[]> =>
-    get('/stepper/status')
-      .then(vals => deserialize(vals))
-      .catch(intercept('Failed to fetch all process statuses'));
+export const subscribe =
+  async (): Promise<EventSource> =>
+    sse('/stepper/sse/runtime');
 
 
 export const exitRuntime =

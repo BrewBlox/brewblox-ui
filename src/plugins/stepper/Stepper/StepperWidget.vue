@@ -5,13 +5,12 @@ import WidgetBase from '@/components/Widget/WidgetBase';
 import { Unit } from '@/helpers/units';
 
 import { stepperStore } from '../store';
-import { Process, Runtime, RuntimeResult, RuntimeStatus } from '../types';
+import { Process, Runtime, RuntimeResult } from '../types';
 
 interface ProcessGroup {
   id: string;
   process: Process;
   runtime: Runtime | null;
-  status: RuntimeStatus | null;
   current: RuntimeResult | null;
 }
 
@@ -24,10 +23,6 @@ export default class StepperWidget extends WidgetBase {
 
   get runtimes(): Runtime[] {
     return stepperStore.runtimeValues;
-  }
-
-  get statuses(): RuntimeStatus[] {
-    return stepperStore.statusValues;
   }
 
   get groups(): ProcessGroup[] {
@@ -48,14 +43,16 @@ export default class StepperWidget extends WidgetBase {
           process,
           runtime,
           current,
-          status: stepperStore.statuses[process.id] || null,
         };
       });
   }
 
-  conditionsString(status: RuntimeStatus): string {
-    const numOk = status.conditions.filter(Boolean).length;
-    return `${numOk} / ${status.conditions.length} conditions satisfied`;
+  conditionsString(runtime: Runtime | null): string {
+    if (runtime === null || runtime.conditions === undefined) {
+      return 'No active status';
+    }
+    const numOk = runtime.conditions.filter(Boolean).length;
+    return `${numOk} / ${runtime.conditions.length} conditions satisfied`;
   }
 
   stepOptions(process: Process): SelectOption[] {
@@ -69,7 +66,6 @@ export default class StepperWidget extends WidgetBase {
   async start(process: Process): Promise<void> {
     await stepperStore.startProcess(process);
     await stepperStore.fetchRuntime(process);
-    await stepperStore.fetchStatus(process);
   }
 
   async advance(runtime: Runtime): Promise<void> {
@@ -147,10 +143,6 @@ export default class StepperWidget extends WidgetBase {
       ],
     });
   }
-
-  created(): void {
-    this.fetch();
-  }
 }
 </script>
 
@@ -161,7 +153,7 @@ export default class StepperWidget extends WidgetBase {
         <q-btn-dropdown flat split icon="settings" @click="openModal(null)">
           <q-list dark bordered>
             <ActionItem icon="add" label="New" @click="make" />
-            <ActionItem icon="refresh" label="fetch" @click="fetch" />
+            <ActionItem icon="refresh" label="Refresh" @click="fetch" />
             <WidgetActions :crud="crud" />
           </q-list>
         </q-btn-dropdown>
@@ -196,9 +188,9 @@ export default class StepperWidget extends WidgetBase {
                     : '---'
                 }}
               </div>
-              <template v-if="group.status && group.status.conditions.length">
+              <template v-if="group.runtime">
                 <div class="col-auto">
-                  {{ conditionsString(group.status) }}
+                  {{ conditionsString(group.runtime) }}
                 </div>
               </template>
               <template v-if="group.current.logs.length">
@@ -223,7 +215,7 @@ export default class StepperWidget extends WidgetBase {
         <template v-if="group.runtime">
           <q-item-section class="col-auto">
             <q-btn flat icon="mdi-format-list-checks">
-              <q-tooltip>{{ conditionsString(group.status) }}</q-tooltip>
+              <q-tooltip>{{ conditionsString(group.runtime) }}</q-tooltip>
             </q-btn>
           </q-item-section>
           <q-item-section class="col-auto">

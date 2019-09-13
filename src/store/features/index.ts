@@ -4,7 +4,7 @@ import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-dec
 
 import store from '@/store';
 
-import { Arrangement, Deleter, Feature, FeatureRole, Validator } from './types';
+import { Arrangement, Deleter, Feature, FeatureRole, Validator, Watcher } from './types';
 export * from './types';
 
 const rawError = true;
@@ -13,6 +13,7 @@ const rawError = true;
 export class FeatureModule extends VuexModule {
   public features: Record<string, Feature> = {};
   public arrangements: Record<string, Arrangement> = {};
+  public watchers: Watcher[] = [];
 
   public get featureIds(): string[] {
     return Object.keys(this.features);
@@ -47,7 +48,7 @@ export class FeatureModule extends VuexModule {
   }
 
   public get wizardById(): (id: string) => string {
-    return id => get(this.features, [id, 'wizard'], '');
+    return id => get(this.features, [id, 'wizard'], '') as string;
   }
 
   public get widgetById(): (id: string, config: any, selector?: boolean) => string | undefined {
@@ -81,6 +82,11 @@ export class FeatureModule extends VuexModule {
     Vue.set(this.arrangements, arrangement.id, arrangement);
   }
 
+  @Mutation
+  public commitWatcher(watcher: Watcher): void {
+    this.watchers.push({ ...watcher });
+  }
+
   @Action({ rawError, commit: 'commitFeature' })
   public async createFeature(feature: Feature): Promise<Feature> {
     return feature;
@@ -89,6 +95,11 @@ export class FeatureModule extends VuexModule {
   @Action({ rawError, commit: 'commitArrangement' })
   public async createArrangement(arrangement: Arrangement): Promise<Arrangement> {
     return arrangement;
+  }
+
+  @Action({ rawError, commit: 'commitWatcher' })
+  public async createWatcher(watcher: Watcher): Promise<Watcher> {
+    return watcher;
   }
 }
 

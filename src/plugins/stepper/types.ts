@@ -51,12 +51,8 @@ export interface Runtime {
   start: number | null;
   end: number | null;
   results: RuntimeResult[];
-}
-
-export interface RuntimeStatus {
-  id: string;
-  responses: ResponseResult[];
-  conditions: boolean[];
+  responses?: ResponseResult[];
+  conditions?: boolean[];
 }
 
 export type CompareOperator = 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt';

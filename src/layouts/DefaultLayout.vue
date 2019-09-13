@@ -334,6 +334,7 @@ export default class DefaultLayout extends Vue {
       />
     </q-dialog>
 
+    <Watchers />
     <ServiceWatchers />
 
     <q-page-container @click.native="stopEditing">

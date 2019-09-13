@@ -4,7 +4,7 @@ import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-dec
 import { objReducer } from '@/helpers/functional';
 import store from '@/store';
 
-import { Process, Runtime, RuntimeStatus } from '../types';
+import { Process, Runtime } from '../types';
 import * as api from './api';
 
 const rawError = true;
@@ -13,7 +13,9 @@ const rawError = true;
 export class StepperModule extends VuexModule {
   public processes: Mapped<Process> = {};
   public runtimes: Mapped<Runtime> = {};
-  public statuses: Mapped<RuntimeStatus> = {};
+
+  public source: EventSource | null = null;
+  public lastUpdate = 0;
 
   public get processIds(): string[] {
     return Object.keys(this.processes);
@@ -31,14 +33,6 @@ export class StepperModule extends VuexModule {
     return Object.values(this.runtimes);
   }
 
-  public get statusIds(): string[] {
-    return Object.keys(this.statuses);
-  }
-
-  public get statusValues(): RuntimeStatus[] {
-    return Object.values(this.statuses);
-  }
-
   @Mutation
   public commitProcess(process: Process): void {
     Vue.set(this.processes, process.id, process);
@@ -48,7 +42,6 @@ export class StepperModule extends VuexModule {
   public commitRemoveProcess(process: Process): void {
     Vue.delete(this.processes, process.id);
     Vue.delete(this.runtimes, process.id);
-    Vue.delete(this.statuses, process.id);
   }
 
   @Mutation
@@ -61,17 +54,13 @@ export class StepperModule extends VuexModule {
     this.runtimes = Object.values(this.runtimes)
       .filter(r => ids.includes(r.id))
       .reduce(reducer, {});
-    this.statuses = Object.values(this.statuses)
-      .filter(s => ids.includes(s.id))
-      .reduce(reducer, {});
   }
 
   @Mutation
-  public commitAll([processes, runtimes, statuses]): void {
+  public commitAll([processes, runtimes]): void {
     const reducer = objReducer('id');
     this.processes = processes.reduce(reducer, {});
     this.runtimes = runtimes.reduce(reducer, {});
-    this.statuses = statuses.reduce(reducer, {});
   }
 
   @Mutation
@@ -80,9 +69,8 @@ export class StepperModule extends VuexModule {
   }
 
   @Mutation
-  public commitRemoveRuntime(runtime: Runtime): void {
+  public commitRemoveRuntime(runtime: Process | Runtime): void {
     Vue.delete(this.runtimes, runtime.id);
-    Vue.delete(this.statuses, runtime.id);
   }
 
   @Mutation
@@ -91,13 +79,16 @@ export class StepperModule extends VuexModule {
   }
 
   @Mutation
-  public commitStatus(status: RuntimeStatus): void {
-    Vue.set(this.statuses, status.id, status);
+  public commitSource(source: EventSource | null): void {
+    this.source = source;
+    if (source === null) {
+      this.lastUpdate = this.lastUpdate <= 0 ? this.lastUpdate - 1 : 0;
+    }
   }
 
   @Mutation
-  public commitAllStatuses(statuses: RuntimeStatus[]): void {
-    this.statuses = statuses.reduce(objReducer('id'), {});
+  public commitLastUpdate(): void {
+    this.lastUpdate = new Date().getTime();
   }
 
   @Action({ rawError })
@@ -106,9 +97,13 @@ export class StepperModule extends VuexModule {
       await Promise.all([
         api.fetchProcesses(),
         api.fetchRuntimes(),
-        api.fetchStatuses(),
       ])
     );
+  }
+
+  @Action({ rawError })
+  public async fetchProcesses(): Promise<void> {
+    this.commitAllProcesses(await api.fetchProcesses());
   }
 
   @Action({ rawError })
@@ -142,8 +137,29 @@ export class StepperModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async fetchStatus(process: Process | Runtime): Promise<void> {
-    this.commitStatus(await api.fetchStatus(process));
+  public async subscribe(): Promise<void> {
+    try {
+      await this.fetchProcesses();
+      const source = await api.subscribe();
+
+      source.onmessage = (event: MessageEvent) => {
+        const runtimes: Runtime[] = JSON.parse(event.data);
+        this.commitAllRuntimes(runtimes);
+        this.commitLastUpdate();
+        runtimes
+          .filter(runtime => !this.processes[runtime.id])
+          .forEach(runtime => api.fetchProcess(runtime).then(this.commitProcess));
+      };
+
+      source.onerror = () => {
+        source.close();
+        this.commitSource(null);
+      };
+
+      this.commitSource(source);
+    } catch (e) {
+      this.commitSource(null);
+    }
   }
 
   @Action({ rawError })
@@ -158,7 +174,8 @@ export class StepperModule extends VuexModule {
 
   @Action({ rawError })
   public async exitProcess(process: Process | Runtime): Promise<void> {
-    this.commitRemoveRuntime(await api.exitRuntime(process));
+    await api.exitRuntime(process);
+    this.commitRemoveRuntime(process);
   }
 }
 

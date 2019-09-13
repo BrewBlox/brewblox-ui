@@ -1,5 +1,4 @@
 <script lang="ts">
-import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
