@@ -392,7 +392,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: uid(),
           rotate: 270,
-          settings: { enabled: true },
+          settings: { enabled: false },
           flipped: false,
           type: 'Pump',
           x: 17,
@@ -617,7 +617,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: uid(),
           rotate: 270,
-          settings: { enabled: true },
+          settings: { enabled: false },
           flipped: false,
           type: 'Pump',
           x: 7,
