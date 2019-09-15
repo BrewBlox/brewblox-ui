@@ -39,7 +39,7 @@ export default class ImportWizard extends Vue {
     return !!this.chosenDashboardId && !!this.serializedWidget;
   }
 
-  async created(): Promise<void> {
+  async createWidget(): Promise<void> {
     try {
       const item = {
         ...deserialize(JSON.parse(this.serializedWidget)),
@@ -100,7 +100,7 @@ export default class ImportWizard extends Vue {
 
     <q-card-actions class="row justify-between">
       <q-btn unelevated label="Back" @click="back" />
-      <q-btn :disable="!valuesOk" unelevated label="Create" color="primary" @click="create" />
+      <q-btn :disable="!valuesOk" unelevated label="Create" color="primary" @click="createWidget" />
     </q-card-actions>
   </div>
 </template>

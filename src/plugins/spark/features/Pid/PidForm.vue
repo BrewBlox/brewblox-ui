@@ -2,6 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import { showBlockDialog } from '@/helpers/dialog';
+import { Unit } from '@/helpers/units';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
 import { sparkStore } from '@/plugins/spark/store';
@@ -42,6 +43,12 @@ export default class PidForm extends BlockCrudComponent {
     return this.block.data.boilModeActive
       ? this.block.data.boilMinOutput - this.baseOutput
       : 0;
+  }
+
+  get waterBoilTemp(): Unit {
+    return this.block.data.boilPointAdjust.unit === 'delta_degF'
+      ? new Unit(212, 'degF')
+      : new Unit(100, 'degC');
   }
 
   showInput(): void {
@@ -194,16 +201,18 @@ export default class PidForm extends BlockCrudComponent {
             <q-item-label caption>
               Boil temperature
             </q-item-label>
-            100 °C + <UnitField
-              :value="block.data.boilPointAdjust"
-              title="Boil point adjustment"
-              label="Adjustment"
-              @input="v => { block.data.boilPointAdjust = v; saveBlock(); }"
-            />
+            <span>
+              {{ waterBoilTemp.value | round(0) }} + <UnitField
+                :value="block.data.boilPointAdjust"
+                title="Boil point adjustment"
+                label="Adjustment"
+                @input="v => { block.data.boilPointAdjust = v; saveBlock(); }"
+              />
+            </span>
           </q-item-section>
           <q-item-section>
             <q-item-label caption>
-              Minimum boiling output
+              Minimum output when boiling
             </q-item-label>
             <SliderField
               :value="block.data.boilMinOutput"
