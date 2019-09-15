@@ -49,9 +49,9 @@ export default class HermsPidTask extends WizardTaskBase {
 
   get hltSetting(): Unit {
     if (this.mashTarget.value && this.mtKp.value && this.mashActual.value && this.driverMax.value) {
-      const correctedMax = this.userTemp === 'degF' ? this.driverMax.value *9/5 : this.driverMax.value;
+      const correctedMax = this.userTemp === 'degF' ? this.driverMax.value * 9 / 5 : this.driverMax.value;
       const upperLimit = this.mashTarget.value + correctedMax;
-  
+
       const setting = this.mashTarget.value + (this.mashTarget.value - this.mashActual.value) * this.mtKp.value;
 
       return new Unit(
@@ -165,7 +165,7 @@ export default class HermsPidTask extends WizardTaskBase {
             <q-input v-model="hltVolume" :rules="volumeRules" type="number" step="any" label="HLT volume" dark />
           </q-item-section>
           <q-item-section>
-            <q-input v-model="mashVolume" :rules="volumeRules" type="number" step="any" label="HLT volume" dark />
+            <q-input v-model="mashVolume" :rules="volumeRules" type="number" step="any" label="Mash volume" dark />
           </q-item-section>
           <q-item-section>
             <q-input v-model.number="driverMax.value" type="number" step="any" label="Limit difference to" dark>
