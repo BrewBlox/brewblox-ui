@@ -140,7 +140,7 @@ export default class BlockCrudComponent extends CrudComponent {
       this.activeDialog.hide();
       this.activeDialog = null;
     }
-    this.closeDialog();
+    this.crud.closeDialog();
   }
 
   public showOtherBlock(block: Block, props: any = {}): void {
