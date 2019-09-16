@@ -32,6 +32,12 @@ export default class FirmwareUpdateDialog extends DialogBase {
         : "You're using the latest firmware.";
   }
 
+  get buttonColor(): string {
+    return (this.status && this.status.latest)
+      ? ''
+      : 'primary';
+  }
+
   pushMessage(msg: string): void {
     this.$set(this.messages, this.messages.length, msg);
   }
@@ -87,7 +93,13 @@ export default class FirmwareUpdateDialog extends DialogBase {
       </q-card-section>
       <q-separator dark />
       <q-card-actions align="right">
-        <q-btn :loading="busy" unelevated color="primary" label="Flash" @click="updateFirmware" />
+        <q-btn
+          :loading="busy"
+          :color="buttonColor"
+          unelevated
+          label="Flash"
+          @click="updateFirmware"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
