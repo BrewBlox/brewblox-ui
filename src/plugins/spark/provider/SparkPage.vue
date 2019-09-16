@@ -363,6 +363,11 @@ export default class SparkPage extends Vue {
             label="Import/Export Blocks"
             @click="startDialog('SparkImportMenu')"
           />
+          <ActionItem
+            icon="mdi-test-tube"
+            label="Create Mock Blocks"
+            @click="startDialog('CreateMockMenu')"
+          />
           <ActionItem icon="delete" label="Remove all Blocks" @click="resetBlocks" />
         </q-list>
       </q-btn-dropdown>
