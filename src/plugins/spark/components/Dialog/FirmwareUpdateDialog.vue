@@ -32,6 +32,10 @@ export default class FirmwareUpdateDialog extends DialogBase {
         : "You're using the latest firmware.";
   }
 
+  get buttonEnabled(): boolean {
+    return !!this.status && this.status.connect;
+  }
+
   get buttonColor(): string {
     return (this.status && this.status.latest)
       ? ''
@@ -94,6 +98,7 @@ export default class FirmwareUpdateDialog extends DialogBase {
       <q-separator dark />
       <q-card-actions align="right">
         <q-btn
+          :disable="!buttonEnabled"
           :loading="busy"
           :color="buttonColor"
           unelevated
