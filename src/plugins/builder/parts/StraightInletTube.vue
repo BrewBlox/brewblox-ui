@@ -27,9 +27,6 @@ export default class StraightInletTube extends PartBase {
 <template>
   <g>
     <g class="outline">
-      <polyline points="40.5,17.5 48,25 40.5,32.5" />
-      <polyline points="36.4,19.3 42.1,25 36.4,30.8" />
-      <polyline points="32.3,21 36.3,25 32.3,29" />
       <rect fill="white" y="12.5" width="8" height="8" />
       <rect fill="white" y="30" width="8" height="8" />
       <path v-for="border in paths.borders" :key="border" :d="border" />

@@ -76,14 +76,14 @@ export default class SparkWatcher extends WatcherBase {
 
   @Watch('status')
   handleStatusChange(status: SystemStatus): void {
-    if (this.notifiedUpdate || !status || status.latest) {
+    if (this.notifiedUpdate || !status || !status.connect || status.latest) {
       return;
     }
 
     this.notifiedUpdate = true;
     this.$q.notify({
       timeout: 0,
-      color: 'positive',
+      color: 'info',
       icon: 'mdi-download-network',
       message: `Firmware update available for ${this.service.title}`,
       actions: [
