@@ -5,6 +5,11 @@ import { PartSpec, PersistentPart } from '../types';
 const DEFAULT_SIZE_X = 4;
 const DEFAULT_SIZE_Y = 6;
 
+const size = (part: PersistentPart): [number, number] => [
+  part.settings.sizeX || DEFAULT_SIZE_X,
+  part.settings.sizeY || DEFAULT_SIZE_Y,
+];
+
 const spec: PartSpec = {
   id: 'Kettle',
   cards: [
@@ -31,13 +36,9 @@ const spec: PartSpec = {
       },
     },
   ],
-  size: (part: PersistentPart) => [
-    part.settings.sizeX || DEFAULT_SIZE_X,
-    part.settings.sizeY || DEFAULT_SIZE_Y,
-  ],
+  size,
   transitions: (part: PersistentPart) => {
-    const sizeX: number = DEFAULT_SIZE_X;
-    const sizeY: number = DEFAULT_SIZE_Y;
+    const [sizeX, sizeY] = size(part);
 
     const coords = Array(sizeX * sizeY).fill(0).map((v, n) => {
       const outFlow = new Coordinates({ x: (n % sizeX) + 0.5, y: Math.floor(n / sizeX) + 0.5, z: 0 });
