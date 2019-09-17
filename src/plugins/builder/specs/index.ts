@@ -12,6 +12,7 @@ import DipTube from './DipTube';
 import ElbowTube from './ElbowTube';
 import FilterBottom from './FilterBottom';
 import Fridge from './Fridge';
+import GravityTube from './GravityTube';
 import HeatingElement from './HeatingElement';
 import ImmersionCoil from './ImmersionCoil';
 import Keg from './Keg';
@@ -46,6 +47,7 @@ const specs: { [key: string]: PartSpec } = {
   DipTube,
   ElbowTube,
   FilterBottom,
+  GravityTube,
   HeatingElement,
   ImmersionCoil,
   Keg,

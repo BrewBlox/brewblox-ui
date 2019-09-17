@@ -19,12 +19,21 @@ export default class HermsPidTask extends WizardTaskBase {
   hltVolume = 25;
   mashVolume = 25;
   driverMax = new Unit(10, 'delta_degC');
-  mashTarget = new Unit(67, 'delta_degC');
-  mashActual = new Unit(65, 'delta_degC');
+  mashTarget = new Unit(67, 'degC');
+  mashActual = new Unit(65, 'degC');
 
   volumeRules: InputRule[] = [
     v => v !== 0 || 'Volume can\'t be 0',
   ]
+
+  created(): void {
+    if (this.userTemp === 'degF') {
+      this.hltFullPowerDelta = new Unit(3, 'delta_degF');
+      this.bkFullPowerDelta = new Unit(3, 'delta_degF');
+      this.mashTarget = new Unit(155, 'degF');
+      this.mashActual = new Unit(152, 'degF');
+    }
+  }
 
   get hltKp(): Unit {
     return new Unit(100 / (this.hltFullPowerDelta.value || 2), `1/${this.userTemp}`);
@@ -40,12 +49,13 @@ export default class HermsPidTask extends WizardTaskBase {
 
   get hltSetting(): Unit {
     if (this.mashTarget.value && this.mtKp.value && this.mashActual.value && this.driverMax.value) {
-      const upperLimit = this.mashTarget.value + this.driverMax.value;
-      const lowerLimit = this.mashTarget.value - this.driverMax.value;
+      const correctedMax = this.userTemp === 'degF' ? this.driverMax.value * 9 / 5 : this.driverMax.value;
+      const upperLimit = this.mashTarget.value + correctedMax;
+
       const setting = this.mashTarget.value + (this.mashTarget.value - this.mashActual.value) * this.mtKp.value;
 
       return new Unit(
-        Math.min(upperLimit, Math.max(lowerLimit, setting)),
+        Math.min(upperLimit, setting),
         this.userTemp);
     }
     return new Unit(null, this.userTemp);
@@ -55,11 +65,6 @@ export default class HermsPidTask extends WizardTaskBase {
     return sparkStore.units(this.config.serviceId).Temp;
   }
 
-  defaultDelta(): Unit {
-    const degC = 2;
-    const defaultTempValues = { degC, degF: (degC * 9 / 5), degK: degC + 273.15 };
-    return new Unit(defaultTempValues[this.userTemp] || 2, `delta_${this.userTemp}`);
-  }
 
   done(): void {
     const opts: PidOpts = {
@@ -160,12 +165,14 @@ export default class HermsPidTask extends WizardTaskBase {
             <q-input v-model="hltVolume" :rules="volumeRules" type="number" step="any" label="HLT volume" dark />
           </q-item-section>
           <q-item-section>
-            <q-input v-model="mashVolume" :rules="volumeRules" type="number" step="any" label="HLT volume" dark />
+            <q-input v-model="mashVolume" :rules="volumeRules" type="number" step="any" label="Mash volume" dark />
           </q-item-section>
           <q-item-section>
             <q-input v-model.number="driverMax.value" type="number" step="any" label="Limit difference to" dark>
               <template v-slot:append>
-                <small class="self-end q-pb-sm">{{ driverMax.notation }}</small>
+                <small class="self-end q-pb-sm">{{ driverMax.notation }}
+                  <q-tooltip>Setpoint Driver in &deg; F will come soon</q-tooltip>
+                </small>
               </template>
             </q-input>
           </q-item-section>

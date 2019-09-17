@@ -19,7 +19,7 @@ export default class DashboardWizard extends Vue {
     this.$emit('back');
   }
 
-  async created(): Promise<void> {
+  async createDashboard(): Promise<void> {
     const errors = this.idRules
       .map(rule => rule(this.dashboardId))
       .filter(isString);
@@ -89,7 +89,7 @@ export default class DashboardWizard extends Vue {
 
     <q-card-actions>
       <q-btn unelevated label="Back" class="full-width" @click="back" />
-      <q-btn unelevated label="Create" color="primary" class="full-width q-mt-sm" @click="create" />
+      <q-btn unelevated label="Create" color="primary" class="full-width q-mt-sm" @click="createDashboard" />
     </q-card-actions>
   </div>
 </template>

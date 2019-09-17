@@ -148,8 +148,9 @@ export default class DashboardPage extends Vue {
         <q-btn-toggle
           v-model="widgetEditable"
           class="q-mr-md"
-          outline
           dark
+          flat
+          dense
           :options="[
             {icon:'mdi-arrow-all', value: true},
             {icon:'mdi-lock', value: false},
