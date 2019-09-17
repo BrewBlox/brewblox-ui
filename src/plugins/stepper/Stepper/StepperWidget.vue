@@ -2,17 +2,11 @@
 import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
+import { createDialog } from '@/helpers/dialog';
 import { Unit } from '@/helpers/units';
 
 import { stepperStore } from '../store';
-import { Process, Runtime, RuntimeResult } from '../types';
-
-interface ProcessGroup {
-  id: string;
-  process: Process;
-  runtime: Runtime | null;
-  current: RuntimeResult | null;
-}
+import { Process, ProcessGroup, Runtime } from '../types';
 
 
 @Component
@@ -80,9 +74,17 @@ export default class StepperWidget extends WidgetBase {
     await stepperStore.removeProcess(process);
   }
 
+  startEditor(): void {
+    createDialog({
+      component: 'StepperEditor',
+      root: this.$root,
+    });
+  }
+
   make(): void {
     stepperStore.createProcess({
       id: 'test-process',
+      title: 'Test Process',
       steps: [
         {
           name: 'step-one',
@@ -150,6 +152,14 @@ export default class StepperWidget extends WidgetBase {
   <q-card dark class="text-white scroll">
     <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
+        <q-btn
+          unelevated
+          color="primary"
+          label="Editor"
+          @click="startEditor"
+        />
+      </q-item-section>
+      <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="openModal(null)">
           <q-list dark bordered>
             <ActionItem icon="add" label="New" @click="make" />
@@ -164,7 +174,7 @@ export default class StepperWidget extends WidgetBase {
         <q-item-section>
           <template v-if="group.runtime">
             <q-select
-              :label="group.id"
+              :label="group.process.title"
               :value="group.current.index"
               :options="stepOptions(group.process)"
               emit-value
@@ -204,7 +214,7 @@ export default class StepperWidget extends WidgetBase {
             </q-tooltip>
           </template>
           <template v-else>
-            {{ group.id }}
+            {{ group.process.title }}
             <q-tooltip class="column">
               <div v-for="(step, idx) in group.process.steps" :key="`${group.id}-step-${idx}`" class="col-auto">
                 {{ step.name }}

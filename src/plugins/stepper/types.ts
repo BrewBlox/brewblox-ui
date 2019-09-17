@@ -23,6 +23,7 @@ export interface Step {
 
 export interface Process {
   id: string;
+  title: string;
   steps: Step[];
 }
 
@@ -53,6 +54,13 @@ export interface Runtime {
   results: RuntimeResult[];
   responses?: ResponseResult[];
   conditions?: boolean[];
+}
+
+export interface ProcessGroup {
+  id: string;
+  process: Process;
+  runtime: Runtime | null;
+  current: RuntimeResult | null;
 }
 
 export type CompareOperator = 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt';
