@@ -7,7 +7,7 @@ import { Coordinates } from '@/helpers/coordinates';
 import { createDialog } from '@/helpers/dialog';
 import { showImportDialog } from '@/helpers/dialog';
 import { clampRotation } from '@/helpers/functional';
-import { saveJsonFile } from '@/helpers/import-export';
+import { saveFile } from '@/helpers/import-export';
 import { deepCopy, deserialize, serialize } from '@/helpers/units/parseObject';
 
 import BuilderCatalog from './BuilderCatalog.vue';
@@ -282,7 +282,7 @@ export default class BuilderEditor extends DialogBase {
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, _rev, ...exported } = this.layout;
-    saveJsonFile(exported, `brewblox-${this.layout.title}-layout.json`);
+    saveFile(exported, `brewblox-${this.layout.title}-layout.json`);
   }
 
   renameLayout(): void {
