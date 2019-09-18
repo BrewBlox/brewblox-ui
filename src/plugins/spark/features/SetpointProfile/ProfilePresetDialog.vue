@@ -55,9 +55,26 @@ export default class ProfilePresetDialog extends DialogBase {
       return;
     }
     const preset = sparkStore.presets[this.selected.value];
-    this.value.data.points = deserialize(cloneDeep(preset.data.points));
-    await sparkStore.saveBlock([this.value.serviceId, this.value]);
-    this.onDialogOk();
+    const points = deserialize(cloneDeep(preset.data.points));
+
+    createDialog({
+      title: 'Profile start',
+      message: `Do you want to change '${this.value.id}' start time to now?`,
+      dark: true,
+      ok: 'Yes',
+      cancel: 'No',
+    })
+      .onOk(async () => {
+        this.value.data.start = new Date().getTime() / 1000;
+        this.value.data.points = points;
+        await sparkStore.saveBlock([this.value.serviceId, this.value]);
+        this.onDialogOk();
+      })
+      .onCancel(async () => {
+        this.value.data.points = points;
+        await sparkStore.saveBlock([this.value.serviceId, this.value]);
+        this.onDialogOk();
+      });
   }
 
   async saveSelected(): Promise<void> {
