@@ -2,6 +2,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
+import { sparkStore } from '@/plugins/spark/store';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 
@@ -11,6 +12,7 @@ export default class App extends Vue {
     await Promise.all([
       serviceStore.setup(),
       dashboardStore.setup(),
+      sparkStore.setup(),
     ]);
   }
 }

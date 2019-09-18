@@ -28,7 +28,11 @@ export default class SetpointProfileWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white column">
-    <BlockWidgetToolbar :crud="crud" />
+    <BlockWidgetToolbar :crud="crud">
+      <template v-slot:actions>
+        <ProfilePresetAction :crud="crud" />
+      </template>
+    </BlockWidgetToolbar>
     <CardWarning v-if="!block.data.targetId.id">
       <template #message>
         Setpoint Profile has no target Setpoint configured.
