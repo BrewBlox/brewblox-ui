@@ -55,7 +55,7 @@ export interface DataBlock {
   nid?: number;
   type: string;
   groups: number[];
-  data: Mapped<any>;
+  data: any;
 }
 
 export interface Block extends DataBlock {

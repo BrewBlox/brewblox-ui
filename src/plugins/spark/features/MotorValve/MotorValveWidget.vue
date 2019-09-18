@@ -17,18 +17,20 @@ export default class MotorValveWidget extends BlockWidget {
     return spaceCased(ValveState[this.block.data.valveState]);
   }
 
-  get disabled12V(): boolean {
-    const pins: Spark3PinsBlock | undefined = sparkStore.blockValues(this.serviceId)
+  get pins(): Spark3PinsBlock | null {
+    const block = sparkStore.blockValues(this.serviceId)
       .find(block => block.type === spark3PinType);
-    return !!pins && !pins.data.enableIoSupply12V;
+    return block ? block as Spark3PinsBlock : null;
+  }
+
+  get disabled12V(): boolean {
+    return !!this.pins && !this.pins.data.enableIoSupply12V;
   }
 
   enable12V(): void {
-    const pins: Spark3PinsBlock | undefined = sparkStore.blockValues(this.serviceId)
-      .find(block => block.type === spark3PinType);
-    if (pins) {
-      pins.data.enableIoSupply12V = true;
-      sparkStore.saveBlock([this.serviceId, pins]);
+    if (this.pins) {
+      this.pins.data.enableIoSupply12V = true;
+      sparkStore.saveBlock([this.serviceId, this.pins]);
     }
   }
 }
