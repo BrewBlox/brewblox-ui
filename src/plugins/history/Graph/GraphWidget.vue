@@ -68,7 +68,7 @@ export default class GraphWidget extends WidgetBase {
     </q-dialog>
 
     <q-dialog v-model="graphModalOpen" maximized>
-      <q-card v-if="graphModalOpen" dark>
+      <q-card v-if="graphModalOpen" dark class="bg-dark">
         <HistoryGraph :id="widget.id" :config="graphCfg" shared-listeners>
           <template v-slot:controls>
             <q-btn-dropdown flat auto-close label="presets" icon="mdi-timelapse">
@@ -99,6 +99,10 @@ export default class GraphWidget extends WidgetBase {
               icon="mdi-chart-line"
               label="Show maximized"
               @click="graphModalOpen = true"
+            />
+            <ExportGraphAction
+              :config="graphCfg"
+              :header="widget.title"
             />
             <ActionItem icon="refresh" label="Refresh" @click="regraph" />
             <q-expansion-item label="Timespan">

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
-import { saveJsonFile } from '@/helpers/import-export';
+import { saveFile } from '@/helpers/import-export';
 
 import CrudComponent from '../Widget/CrudComponent';
 
@@ -24,7 +24,7 @@ export default class ExportAction extends CrudComponent {
   async showDialog(): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, _rev, dashboard, pinnedPosition, ...exported } = this.widget;
-    saveJsonFile(exported, `brewblox-${this.widget.title}-${this.widget.feature}.json`);
+    saveFile(exported, `brewblox-${this.widget.title}-${this.widget.feature}.json`);
   }
 }
 </script>

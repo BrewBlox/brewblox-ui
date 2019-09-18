@@ -1,14 +1,15 @@
+import mapKeys from 'lodash/mapKeys';
 import queryString from 'query-string';
 
 import { get, post, sse } from '@/helpers/fetch';
 import { snakeCased } from '@/helpers/functional';
 import { QueryParams, QueryTarget } from '@/store/history';
 
+import { QueryResult } from './types';
+
 const snakeCasedObj =
-  (obj: Record<string, any>): Record<string, any> =>
-    Object.keys(obj)
-      .filter(key => !!obj[key])
-      .reduce((acc: any, key: string) => ({ ...acc, [snakeCased(key)]: obj[key] }), {});
+  (obj: Mapped<any>): Mapped<any> =>
+    mapKeys(obj, (_, key) => snakeCased(key));
 
 const formatTime =
   (val?: string | number): string | undefined =>
@@ -39,7 +40,15 @@ export const subscribeMetrics =
     })}`);
 
 export const fetchKnownKeys =
-  async (): Promise<Record<string, any>> => post('/history/query/objects', {});
+  async (): Promise<Record<string, any>> =>
+    post('/history/query/objects', {});
+
+export const fetchValues =
+  async (params: QueryParams, target: QueryTarget): Promise<QueryResult> =>
+    post('/history/query/values', {
+      ...snakeCasedObj(timeFormatted(params)),
+      ...snakeCasedObj(target),
+    });
 
 export const validateService =
   async (): Promise<boolean> =>
