@@ -6,6 +6,8 @@ import { Feature } from '@/store/features';
 
 import { BlockSpec } from '../../types';
 import { typeName } from './getters';
+import ProfilePresetAction from './ProfilePresetAction.vue';
+import ProfilePresetDialog from './ProfilePresetDialog.vue';
 import form from './SetpointProfileForm.vue';
 import widget from './SetpointProfileWidget.vue';
 import { SetpointProfileData } from './types';
@@ -52,6 +54,9 @@ const block: BlockSpec = {
     },
   ],
 };
+
+ref(ProfilePresetAction);
+ref(ProfilePresetDialog);
 
 const feature: Feature = {
   ...GenericBlock,

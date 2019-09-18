@@ -9,7 +9,6 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
 
 import { profileGraphProps } from './helpers';
-import ProfilePresetAction from './ProfilePresetAction.vue';
 import { Setpoint, SetpointProfileBlock } from './types';
 
 interface DisplaySetpoint {
@@ -18,11 +17,7 @@ interface DisplaySetpoint {
   temperature: Unit;
 }
 
-@Component({
-  components: {
-    ProfilePresetAction,
-  },
-})
+@Component
 export default class SetpointProfileForm extends BlockCrudComponent {
   durationString = durationString;
   parseDuration = parseDuration;

@@ -4,14 +4,9 @@ import { Component, Prop } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 
 import BlockCrudComponent from '../../components/BlockCrudComponent';
-import ProfilePresetDialog from './ProfilePresetDialog.vue';
 
 
-@Component({
-  components: {
-    ProfilePresetDialog,
-  },
-})
+@Component
 export default class ProfilePresetAction extends BlockCrudComponent {
 
   @Prop({ type: String, default: 'mdi-file' })
@@ -22,7 +17,7 @@ export default class ProfilePresetAction extends BlockCrudComponent {
 
   async showDialog(): Promise<void> {
     createDialog({
-      component: ProfilePresetDialog,
+      component: 'ProfilePresetDialog',
       value: this.block,
       root: this.$root,
       title: 'Load/Save Profile',

@@ -4,14 +4,9 @@ import { Component } from 'vue-property-decorator';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
 import { GraphProps, profileGraphProps } from './helpers';
-import ProfilePresetAction from './ProfilePresetAction.vue';
 import { SetpointProfileBlock } from './types';
 
-@Component({
-  components: {
-    ProfilePresetAction,
-  },
-})
+@Component
 export default class SetpointProfileWidget extends BlockWidget {
   readonly block!: SetpointProfileBlock;
   revision = 0;
