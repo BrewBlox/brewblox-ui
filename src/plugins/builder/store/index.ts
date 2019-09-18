@@ -5,13 +5,7 @@ import { objReducer } from '@/helpers/functional';
 import store from '@/store';
 
 import { BuilderLayout, PartSpec } from '../types';
-import {
-  createLayout as createLayoutInApi,
-  deleteLayout as removeLayoutInApi,
-  fetchLayouts as fetchLayoutsInApi,
-  persistLayout as persistLayoutInApi,
-  setup as setupInApi,
-} from './api';
+import api from './api';
 
 const rawError = true;
 
@@ -85,24 +79,23 @@ export class BuilderModule extends VuexModule {
 
   @Action({ rawError })
   public async createLayout(layout: BuilderLayout): Promise<void> {
-    this.commitLayout(await createLayoutInApi(layout));
+    this.commitLayout(await api.create(layout));
   }
 
   @Action({ rawError })
   public async saveLayout(layout: BuilderLayout): Promise<void> {
-    this.commitLayout(await persistLayoutInApi(layout));
+    this.commitLayout(await api.persist(layout));
   }
 
   @Action({ rawError })
   public async removeLayout(layout: BuilderLayout): Promise<void> {
-    await removeLayoutInApi(layout)
+    await api.remove(layout)
       .catch(() => { });
     this.commitRemoveLayout(layout);
   }
 
   @Action({ rawError })
   public async setup(): Promise<void> {
-    /* eslint-disable no-underscore-dangle */
     const onChange = async (layout: BuilderLayout): Promise<void> => {
       const existing = this.layoutById(layout.id);
       if (!existing || existing._rev !== layout._rev) {
@@ -115,10 +108,9 @@ export class BuilderModule extends VuexModule {
         this.removeLayout(existing);
       }
     };
-    /* eslint-enable no-underscore-dangle */
 
-    this.commitAllLayouts(await fetchLayoutsInApi());
-    setupInApi(onChange, onDelete);
+    this.commitAllLayouts(await api.fetch());
+    api.setup(onChange, onDelete);
   }
 }
 

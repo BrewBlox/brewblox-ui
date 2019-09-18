@@ -4,9 +4,14 @@ import { Component } from 'vue-property-decorator';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
 import { GraphProps, profileGraphProps } from './helpers';
+import ProfilePresetAction from './ProfilePresetAction.vue';
 import { SetpointProfileBlock } from './types';
 
-@Component
+@Component({
+  components: {
+    ProfilePresetAction,
+  },
+})
 export default class SetpointProfileWidget extends BlockWidget {
   readonly block!: SetpointProfileBlock;
   revision = 0;
@@ -28,7 +33,11 @@ export default class SetpointProfileWidget extends BlockWidget {
 
 <template>
   <q-card dark class="text-white column">
-    <BlockWidgetToolbar :crud="crud" />
+    <BlockWidgetToolbar :crud="crud">
+      <template v-slot:actions>
+        <ProfilePresetAction :crud="crud" />
+      </template>
+    </BlockWidgetToolbar>
     <CardWarning v-if="!block.data.targetId.id">
       <template #message>
         Setpoint Profile has no target Setpoint configured.

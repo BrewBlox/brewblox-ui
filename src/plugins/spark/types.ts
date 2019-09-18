@@ -18,6 +18,14 @@ export interface BlockDataPreset {
   generate: BlockDataGenerator;
 }
 
+export interface StoredDataPreset {
+  id: string;
+  type: string;
+  name: string;
+  data: Mapped<any>;
+  _rev?: string;
+}
+
 export interface BlockSpec {
   id: string;
   systemObject?: boolean;
@@ -47,7 +55,7 @@ export interface DataBlock {
   nid?: number;
   type: string;
   groups: number[];
-  data: any;
+  data: Mapped<any>;
 }
 
 export interface Block extends DataBlock {
