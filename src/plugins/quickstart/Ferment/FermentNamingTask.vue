@@ -1,5 +1,4 @@
 <script lang="ts">
-import isString from 'lodash/isString';
 import mapValues from 'lodash/mapValues';
 import UrlSafeString from 'url-safe-string';
 import { Component } from 'vue-property-decorator';
@@ -18,8 +17,24 @@ import { FermentConfig, FermentConfigNames } from './types';
 @Component
 export default class FermentNamingTask extends WizardTaskBase {
   readonly config!: FermentConfig;
-
   chosenNames: Partial<FermentConfigNames> = {};
+
+  get defaultNames(): FermentConfigNames {
+    return {
+      fridgeSensor: 'Fridge Sensor',
+      beerSensor: 'Beer Sensor',
+      fridgeSSPair: 'Fridge Setting',
+      beerSSPair: 'Beer Setting',
+      tempProfile: 'Temperature Profile',
+      coolAct: 'Cool Actuator',
+      heatAct: 'Heat Actuator',
+      coolPwm: 'Cool PWM',
+      heatPwm: 'Heat PWM',
+      mutex: 'Mutex',
+      coolPid: 'Cool PID',
+      heatPid: 'Heat PID',
+    };
+  }
 
   get services(): Service[] {
     return serviceStore.typedServices(sparkType);
@@ -65,23 +80,6 @@ export default class FermentNamingTask extends WizardTaskBase {
 
   set dashboardTitle(id: string) {
     this.updateConfig<FermentConfig>({ ...this.config, dashboardTitle: id });
-  }
-
-  get defaultNames(): FermentConfigNames {
-    return {
-      fridgeSensor: 'Fridge Sensor',
-      beerSensor: 'Beer Sensor',
-      fridgeSSPair: 'Fridge Setting',
-      beerSSPair: 'Beer Setting',
-      tempProfile: 'Temperature Profile',
-      coolAct: 'Cool Actuator',
-      heatAct: 'Heat Actuator',
-      coolPwm: 'Cool PWM',
-      heatPwm: 'Heat PWM',
-      mutex: 'Mutex',
-      coolPid: 'Cool PID',
-      heatPid: 'Heat PID',
-    };
   }
 
   get names(): FermentConfigNames {

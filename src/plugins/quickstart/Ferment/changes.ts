@@ -8,25 +8,26 @@ import { typeName as builderType } from '@/plugins/builder/getters';
 import { builderStore } from '@/plugins/builder/store';
 import { BuilderItem, BuilderLayout } from '@/plugins/builder/types';
 import { HistoryItem } from '@/plugins/history/Graph/types';
-import { FermentConfig, PinChannel } from '@/plugins/quickstart/Ferment/types';
+import { FermentConfig } from '@/plugins/quickstart/Ferment/types';
+import { typeName as pwmType } from '@/plugins/spark/features/ActuatorPwm/getters';
+import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
+import { typeName as digiActType } from '@/plugins/spark/features/DigitalActuator/getters';
+import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/types';
+import { typeName as mutexType } from '@/plugins/spark/features/Mutex/getters';
+import { MutexBlock } from '@/plugins/spark/features/Mutex/types';
+import { typeName as pidType } from '@/plugins/spark/features/Pid/getters';
+import { PidBlock, PidData } from '@/plugins/spark/features/Pid/types';
+import { typeName as spProfileType } from '@/plugins/spark/features/SetpointProfile/getters';
+import { SetpointProfileBlock } from '@/plugins/spark/features/SetpointProfile/types';
+import { typeName as pairType } from '@/plugins/spark/features/SetpointSensorPair/getters';
+import { FilterChoice, SetpointSensorPairBlock } from '@/plugins/spark/features/SetpointSensorPair/types';
+import { StepViewItem } from '@/plugins/spark/features/StepView/types';
 import { sparkStore } from '@/plugins/spark/store';
+import { Block, DigitalState } from '@/plugins/spark/types';
 import { Dashboard, DashboardItem, dashboardStore } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
-import { typeName as pwmType } from '../../spark/features/ActuatorPwm/getters';
-import { ActuatorPwmBlock } from '../../spark/features/ActuatorPwm/types';
-import { typeName as digiActType } from '../../spark/features/DigitalActuator/getters';
-import { DigitalActuatorBlock } from '../../spark/features/DigitalActuator/types';
-import { typeName as mutexType } from '../../spark/features/Mutex/getters';
-import { MutexBlock } from '../../spark/features/Mutex/types';
-import { typeName as pidType } from '../../spark/features/Pid/getters';
-import { PidBlock, PidData } from '../../spark/features/Pid/types';
-import { typeName as spProfileType } from '../../spark/features/SetpointProfile/getters';
-import { SetpointProfileBlock } from '../../spark/features/SetpointProfile/types';
-import { typeName as pairType } from '../../spark/features/SetpointSensorPair/getters';
-import { FilterChoice, SetpointSensorPairBlock } from '../../spark/features/SetpointSensorPair/types';
-import { StepViewItem } from '../../spark/features/StepView/types';
-import { Block, DigitalState } from '../../spark/types';
+import { PinChannel } from '../types';
 
 export const defineChangedBlocks = (config: FermentConfig): Block[] => {
   return (

@@ -1,5 +1,4 @@
 <script lang="ts">
-import isString from 'lodash/isString';
 import mapValues from 'lodash/mapValues';
 import UrlSafeString from 'url-safe-string';
 import { Component } from 'vue-property-decorator';
@@ -18,8 +17,28 @@ import { HermsBlockNames, HermsConfig } from './types';
 @Component
 export default class HermsNamingTask extends WizardTaskBase {
   readonly config!: HermsConfig;
-
   chosenNames: Partial<HermsBlockNames> = {};
+
+  get defaultNames(): HermsBlockNames {
+    return {
+      hltSensor: 'HLT Sensor',
+      hltDriver: 'HLT Setpoint Driver',
+      hltSetpoint: 'HLT Setpoint',
+      hltPid: 'HLT PID',
+      hltPwm: 'HLT PWM',
+      hltAct: 'HLT Actuator',
+      mtSensor: 'MT Sensor',
+      mtSetpoint: 'MT Setpoint',
+      mtPid: 'MT PID',
+      bkSensor: 'BK Sensor',
+      bkSetpoint: 'BK Setpoint',
+      bkPid: 'BK PID',
+      bkPwm: 'BK PWM',
+      bkAct: 'BK Actuator',
+      mutex: 'Mutex',
+      balancer: 'Balancer',
+    };
+  }
 
   get services(): Service[] {
     return serviceStore.typedServices(sparkType);
@@ -68,27 +87,6 @@ export default class HermsNamingTask extends WizardTaskBase {
 
   set dashboardTitle(id: string) {
     this.updateConfig<HermsConfig>({ ...this.config, dashboardTitle: id });
-  }
-
-  get defaultNames(): HermsBlockNames {
-    return {
-      hltSensor: 'HLT Sensor',
-      hltDriver: 'HLT Setpoint Driver',
-      hltSetpoint: 'HLT Setpoint',
-      hltPid: 'HLT PID',
-      hltPwm: 'HLT PWM',
-      hltAct: 'HLT Actuator',
-      mtSensor: 'MT Sensor',
-      mtSetpoint: 'MT Setpoint',
-      mtPid: 'MT PID',
-      bkSensor: 'BK Sensor',
-      bkSetpoint: 'BK Setpoint',
-      bkPid: 'BK PID',
-      bkPwm: 'BK PWM',
-      bkAct: 'BK Actuator',
-      mutex: 'Mutex',
-      balancer: 'Balancer',
-    };
   }
 
   get names(): HermsBlockNames {
