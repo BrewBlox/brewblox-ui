@@ -78,8 +78,8 @@ services:
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /stepper"
-    volumes:
-      - "../brewblox-stepper/:/app/"
+    # volumes:
+    #   - "../brewblox-stepper/:/app/"
 
   ui:
     image: brewblox/brewblox-ui:develop
