@@ -65,3 +65,8 @@ export default class Unit {
       && this.roundedValue === other.roundedValue;
   }
 }
+
+export const convertedTemp = (degC: number, userTemp: string): Unit => {
+  const defaultTempValues = { degC, degF: (degC * 9 / 5) + 32, degK: degC + 273.15 };
+  return new Unit(defaultTempValues[userTemp] || degC, userTemp);
+};

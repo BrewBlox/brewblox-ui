@@ -21,6 +21,7 @@ interface DisplaySetpoint {
 export default class SetpointProfileForm extends BlockCrudComponent {
   durationString = durationString;
   parseDuration = parseDuration;
+  defaultTempValues = { degC: 20, degF: 68, degK: 293 };
 
   readonly block!: SetpointProfileBlock;
 
@@ -57,11 +58,10 @@ export default class SetpointProfileForm extends BlockCrudComponent {
   }
 
   defaultPoint(): DisplaySetpoint {
-    const defaultTempValues = { degC: 20, degF: 68, degK: 293 };
     return {
       offsetMs: 0,
       absTimeMs: new Date(this.start).getTime(),
-      temperature: new Unit(defaultTempValues[this.tempUnit] || 20, this.tempUnit),
+      temperature: new Unit(this.defaultTempValues[this.tempUnit] || 20, this.tempUnit),
     };
   }
 

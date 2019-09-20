@@ -65,7 +65,6 @@ export default class HermsPidTask extends WizardTaskBase {
     return sparkStore.units(this.config.serviceId).Temp;
   }
 
-
   done(): void {
     const opts: PidOpts = {
       hltKp: this.hltKp,
