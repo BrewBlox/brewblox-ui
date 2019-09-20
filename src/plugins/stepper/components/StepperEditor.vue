@@ -10,6 +10,8 @@ import { Process } from '../types';
 @Component
 export default class StepperEditor extends DialogBase {
   processId: string | null = null;
+  splitterModel = 30;
+  selected = 'one';
 
   @Prop({ type: String })
   public readonly initialProcess!: string;
@@ -27,8 +29,32 @@ export default class StepperEditor extends DialogBase {
     return stepperStore.processValues;
   }
 
-  startAddProcess(copy: boolean): void {
+  get tree(): any {
+    return this.processes
+      .map(proc => ({
+        label: proc.title,
+        children: proc.steps.map(step => ({
+          label: step.name,
+          children: [
+            {
+              label: 'Actions',
+              children: step.actions.map(action => ({
+                label: action.type,
+              })),
+            },
+            {
+              label: 'Conditions',
+              children: step.conditions.map(cond => ({
+                label: cond.type,
+              })),
+            },
+          ],
+        })),
+      }));
+  }
 
+  startAddProcess(copy: boolean): void {
+    (copy);
   }
 
   importProcess(): void {
@@ -55,7 +81,7 @@ export default class StepperEditor extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" maximized no-esc-dismiss @hide="onDialogHide">
-    <q-card class="maximized bg-dark" dark>
+    <q-card class="maximized bg-dark column" dark>
       <DialogToolbar>
         <q-item-section>
           <q-item-label>Step Editor</q-item-label>
@@ -100,78 +126,23 @@ export default class StepperEditor extends DialogBase {
         </q-item-section>
       </q-item>
 
-      <div class="col row">
-        <!-- Process steps  -->
-        <q-card-section class="col" dark>
-          <template v-if="!!process">
-            <q-item dark dense>
-              <q-space />
-              <q-item-section class="col-auto">
-                <q-btn flat label="none" />
-              </q-item-section>
-              <q-item-section class="col-auto">
-                <q-btn flat label="all" />
-              </q-item-section>
-            </q-item>
-            <q-expansion-item
-              v-for="(step, stepIdx) in process.steps"
-              :key="`step-${stepIdx}-${step.name}-header`"
-              :label="step.name"
-              header-class="text-h6"
-              content-inset-level="0.3"
-            >
-              <!-- Actions -->
-              <q-item dark>
-                <q-item-section class="text-h6 text-italic">
-                  Actions
-                </q-item-section>
-                <q-item-section class="col-auto">
-                  <q-btn flat round icon="add" />
-                </q-item-section>
-              </q-item>
-              <q-item
-                v-for="(action, actionIdx) in step.actions"
-                :key="`step-${stepIdx}-action-${actionIdx}-${action.type}`"
-                dark
-                inset-level="0.3"
-              >
-                {{ action.type }}
-              </q-item>
-              <!-- Conditions -->
-              <q-item dark>
-                <q-item-section class="text-h6 text-italic">
-                  Conditions
-                </q-item-section>
-                <q-item-section class="col-auto">
-                  <q-btn flat round icon="add" />
-                </q-item-section>
-              </q-item>
-              <q-item
-                v-for="(cond, condIdx) in step.conditions"
-                :key="`step-${stepIdx}-action-${condIdx}-${cond.type}`"
-                dark
-                inset-level="0.3"
-              >
-                {{ cond.type }}
-              </q-item>
-            </q-expansion-item>
-          </template>
-        </q-card-section>
-        <!-- Element editor -->
-        <q-card-section class="col">
-          <q-item dark>
-            <q-item-section>edit field</q-item-section>
-          </q-item>
-        </q-card-section>
-      </div>
+      <q-splitter v-model="splitterModel" dark class="col" style="border-top: 1px solid gray">
+        <template #before>
+          <div class="q-pa-md">
+            <q-tree :nodes="tree" default-expand-all node-key="label" dark :selected.sync="selected" />
+          </div>
+        </template>
+        <template #after>
+          <q-tab-panels v-model="selected" class="bg-dark">
+            <q-tab-panel name="one">
+              one
+            </q-tab-panel>
+            <q-tab-panel name="two">
+              two
+            </q-tab-panel>
+          </q-tab-panels>
+        </template>
+      </q-splitter>
     </q-card>
   </q-dialog>
 </template>
-
-
-<style scoped>
-.editor-section {
-  max-height: 80vh;
-  border: 1px solid gray;
-}
-</style>
