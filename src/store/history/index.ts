@@ -3,12 +3,7 @@ import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-dec
 
 import store from '@/store';
 
-import {
-  fetchKnownKeys as fetchKnownKeysInApi,
-  subscribeMetrics,
-  subscribeValues,
-  validateService as validateServiceInApi,
-} from './api';
+import * as api from './api';
 import { Listener, QueryParams, QueryResult, QueryTarget } from './types';
 export * from './types';
 
@@ -92,13 +87,13 @@ export class HistoryModule extends VuexModule {
 
   @Action({ rawError })
   public async addValuesListener(listener: Listener): Promise<Listener> {
-    await this.addListener({ listener, fetcher: subscribeValues });
+    await this.addListener({ listener, fetcher: api.subscribeValues });
     return this.listeners[listener.id];
   }
 
   @Action({ rawError })
   public async addMetricsListener(listener: Listener): Promise<Listener> {
-    await this.addListener({ listener, fetcher: subscribeMetrics });
+    await this.addListener({ listener, fetcher: api.subscribeMetrics });
     return this.listeners[listener.id];
   }
 
@@ -110,14 +105,19 @@ export class HistoryModule extends VuexModule {
     }
   }
 
-  @Action({ rawError, commit: 'commitAllFields' })
-  public async fetchKnownKeys(): Promise<Record<string, string[]>> {
-    return await fetchKnownKeysInApi();
+  @Action({ rawError })
+  public async fetchKnownKeys(): Promise<void> {
+    this.commitAllFields(await api.fetchKnownKeys());
+  }
+
+  @Action({ rawError })
+  public async fetchValues([params, target]: [QueryParams, QueryTarget]): Promise<QueryResult> {
+    return await api.fetchValues(params, target);
   }
 
   @Action({ rawError })
   public async validateService(): Promise<boolean> {
-    return await validateServiceInApi();
+    return await api.validateService();
   }
 }
 

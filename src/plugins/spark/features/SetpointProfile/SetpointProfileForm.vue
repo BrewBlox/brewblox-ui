@@ -169,7 +169,11 @@ export default class SetpointProfileForm extends BlockCrudComponent {
     </template>
 
     <q-card dark class="widget-modal">
-      <BlockFormToolbar :crud="crud" />
+      <BlockFormToolbar :crud="crud">
+        <template v-slot:actions>
+          <ProfilePresetAction :crud="crud" />
+        </template>
+      </BlockFormToolbar>
       <q-card-section>
         <BlockEnableToggle
           v-if="block.data.targetId.id !== null"

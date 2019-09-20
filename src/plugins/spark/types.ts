@@ -18,6 +18,14 @@ export interface BlockDataPreset {
   generate: BlockDataGenerator;
 }
 
+export interface StoredDataPreset {
+  id: string;
+  type: string;
+  name: string;
+  data: Mapped<any>;
+  _rev?: string;
+}
+
 export interface BlockSpec {
   id: string;
   systemObject?: boolean;

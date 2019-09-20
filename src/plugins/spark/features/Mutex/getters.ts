@@ -3,13 +3,7 @@ import get from 'lodash/get';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
-import { MutexBlock } from './types';
-
 export const typeName = 'Mutex';
-
-export const getById =
-  (serviceId: string, id: string): MutexBlock =>
-    sparkStore.blockById(serviceId, id, typeName);
 
 export interface MutexBlocks {
   active: string[];

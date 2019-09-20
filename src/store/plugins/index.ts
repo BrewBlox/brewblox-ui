@@ -4,13 +4,7 @@ import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-dec
 import { objReducer } from '@/helpers/functional';
 import store from '@/store';
 
-import {
-  createPlugin as createPluginInApi,
-  deletePlugin as removePluginInApi,
-  fetchPlugins as fetchPluginsInApi,
-  persistPlugin as persistPluginInApi,
-  setup as setupInApi,
-} from './api';
+import api from './api';
 
 export interface UIPlugin {
   id: string;
@@ -66,30 +60,30 @@ export class PluginModule extends VuexModule {
 
   @Action({ rawError })
   public async fetchPlugins(): Promise<UIPlugin[]> {
-    const plugins = await fetchPluginsInApi();
+    const plugins = await api.fetch();
     this.commitAllPlugins(plugins);
     return plugins;
   }
 
   @Action({ rawError })
   public async createPlugin(plugin: UIPlugin): Promise<void> {
-    this.commitPlugin(await createPluginInApi(plugin));
+    this.commitPlugin(await api.create(plugin));
   }
 
   @Action({ rawError })
   public async savePlugin(plugin: UIPlugin): Promise<void> {
-    this.commitPlugin(await persistPluginInApi(plugin));
+    this.commitPlugin(await api.persist(plugin));
   }
 
   @Action({ rawError })
   public async removePlugin(plugin: UIPlugin): Promise<void> {
-    await removePluginInApi(plugin);
+    await api.remove(plugin);
     this.commitRemovePlugin(plugin);
   }
 
   @Action({ rawError })
   public async setup(): Promise<void> {
-    setupInApi(() => { }, () => { });
+    api.setup(() => { }, () => { });
   }
 }
 
