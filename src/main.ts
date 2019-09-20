@@ -8,6 +8,7 @@ import { autoRegister, externalComponent } from './helpers/component-ref';
 import builder from './plugins/builder';
 import database from './plugins/database';
 import history from './plugins/history';
+import quickstart from './plugins/quickstart';
 import spark from './plugins/spark';
 import stepper from './plugins/stepper';
 import router from './router';
@@ -56,6 +57,7 @@ async function setup(): Promise<void> {
     history,
     spark,
     builder,
+    quickstart,
   ];
 
   try {

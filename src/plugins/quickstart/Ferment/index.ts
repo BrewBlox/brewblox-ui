@@ -1,5 +1,5 @@
 import { ref } from '@/helpers/component-ref';
-import { Arrangement } from '@/store/features';
+import { QuickStart } from '@/store/features';
 
 import FermentHardwareTask from './FermentHardwareTask.vue';
 import FermentManualTask from './FermentManualTask.vue';
@@ -12,10 +12,10 @@ ref(FermentHardwareTask);
 ref(FermentSettingsTask);
 ref(FermentManualTask);
 
-const arrangement: Arrangement = {
+const quickStart: QuickStart = {
   id: 'Ferment',
   displayName: 'Fermentation Fridge',
   wizard: ref(FermentWizard),
 };
 
-export default arrangement;
+export default quickStart;

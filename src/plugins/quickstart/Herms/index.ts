@@ -1,5 +1,5 @@
 import { ref } from '@/helpers/component-ref';
-import { Arrangement } from '@/store/features';
+import { QuickStart } from '@/store/features';
 
 import HermsHardwareTask from './HermsHardwareTask.vue';
 import HermsManualTask from './HermsManualTask.vue';
@@ -14,10 +14,10 @@ ref(HermsMutexTask);
 ref(HermsManualTask);
 ref(HermsPidTask);
 
-const arrangement: Arrangement = {
+const quickStart: QuickStart = {
   id: 'Herms',
   displayName: 'HERMS',
   wizard: ref(HermsWizard),
 };
 
-export default arrangement;
+export default quickStart;

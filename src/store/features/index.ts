@@ -4,15 +4,15 @@ import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-dec
 
 import store from '@/store';
 
-import { Arrangement, Deleter, Feature, FeatureRole, Validator, Watcher } from './types';
+import { Deleter, Feature, FeatureRole, QuickStart, Validator, Watcher } from './types';
 export * from './types';
 
 const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'features' })
 export class FeatureModule extends VuexModule {
-  public features: Record<string, Feature> = {};
-  public arrangements: Record<string, Arrangement> = {};
+  public features: Mapped<Feature> = {};
+  public quickStarts: Mapped<QuickStart> = {};
   public watchers: Watcher[] = [];
 
   public get featureIds(): string[] {
@@ -23,12 +23,12 @@ export class FeatureModule extends VuexModule {
     return Object.values(this.features);
   }
 
-  public get arrangementIds(): string[] {
-    return Object.keys(this.arrangements);
+  public get quickStartIds(): string[] {
+    return Object.keys(this.quickStarts);
   }
 
-  public get arrangementValues(): Arrangement[] {
-    return Object.values(this.arrangements);
+  public get quickStartValues(): QuickStart[] {
+    return Object.values(this.quickStarts);
   }
 
   public get featureById(): (id: string) => Feature {
@@ -78,8 +78,8 @@ export class FeatureModule extends VuexModule {
   }
 
   @Mutation
-  public commitArrangement(arrangement: Arrangement): void {
-    Vue.set(this.arrangements, arrangement.id, arrangement);
+  public commitQuickStart(quickStart: QuickStart): void {
+    Vue.set(this.quickStarts, quickStart.id, quickStart);
   }
 
   @Mutation
@@ -87,19 +87,19 @@ export class FeatureModule extends VuexModule {
     this.watchers.push({ ...watcher });
   }
 
-  @Action({ rawError, commit: 'commitFeature' })
-  public async createFeature(feature: Feature): Promise<Feature> {
-    return feature;
+  @Action({ rawError })
+  public async createFeature(feature: Feature): Promise<void> {
+    this.commitFeature(feature);
   }
 
-  @Action({ rawError, commit: 'commitArrangement' })
-  public async createArrangement(arrangement: Arrangement): Promise<Arrangement> {
-    return arrangement;
+  @Action({ rawError })
+  public async createQuickStart(quickStart: QuickStart): Promise<void> {
+    this.commitQuickStart(quickStart);
   }
 
-  @Action({ rawError, commit: 'commitWatcher' })
-  public async createWatcher(watcher: Watcher): Promise<Watcher> {
-    return watcher;
+  @Action({ rawError })
+  public async createWatcher(watcher: Watcher): Promise<void> {
+    this.commitWatcher(watcher);
   }
 }
 

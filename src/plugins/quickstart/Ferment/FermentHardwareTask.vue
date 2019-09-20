@@ -4,13 +4,14 @@ import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { createDialog } from '@/helpers/dialog';
-import { FermentConfig, PinChannel } from '@/plugins/spark/arrangements/Ferment/types';
 import { typeName as DS2413Type } from '@/plugins/spark/features/DS2413/getters';
 import { typeName as Spark2PinsType } from '@/plugins/spark/features/Spark2Pins/getters';
 import { typeName as Spark3PinsType } from '@/plugins/spark/features/Spark3Pins/getters';
 import { typeName as sensorMockType } from '@/plugins/spark/features/TempSensorMock/getters';
 import { typeName as sensorOneWireType } from '@/plugins/spark/features/TempSensorOneWire/getters';
 import { sparkStore } from '@/plugins/spark/store';
+
+import { FermentConfig, PinChannel } from './types';
 
 
 @Component
