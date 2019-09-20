@@ -28,3 +28,8 @@ export interface Arrangement {
   displayName: string;
   wizard: string;
 }
+
+export interface Watcher {
+  component: string;
+  props: Mapped<any>;
+}

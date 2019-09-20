@@ -11,8 +11,8 @@ const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'history' })
 export class HistoryModule extends VuexModule {
-  public fields: Record<string, string[]> = {};
-  public listeners: Record<string, Listener> = {};
+  public fields: Mapped<string[]> = {};
+  public listeners: Mapped<Listener> = {};
 
   public get listenerIds(): string[] {
     return Object.keys(this.listeners);
@@ -63,7 +63,7 @@ export class HistoryModule extends VuexModule {
   }
 
   @Mutation
-  public commitAllFields(fields: Record<string, string[]>): void {
+  public commitAllFields(fields: Mapped<string[]>): void {
     this.fields = { ...fields };
   }
 
