@@ -10,7 +10,7 @@ export default class FermentWizard extends WidgetWizardBase {
     'FermentHardwareTask',
     'FermentSettingsTask',
     'FermentManualTask',
-  ].reverse();
+  ];
 }
 </script>
 

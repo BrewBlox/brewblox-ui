@@ -15,8 +15,7 @@ import { FermentConfig, FermentConfigNames } from './types';
 
 
 @Component
-export default class FermentNamingTask extends WizardTaskBase {
-  readonly config!: FermentConfig;
+export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
   chosenNames: Partial<FermentConfigNames> = {};
 
   get defaultNames(): FermentConfigNames {
@@ -45,7 +44,7 @@ export default class FermentNamingTask extends WizardTaskBase {
   }
 
   set serviceId(serviceId: string) {
-    this.updateConfig<FermentConfig>({ ...this.config, serviceId });
+    this.updateConfig({ ...this.config, serviceId });
   }
 
   get groupError(): string | null {
@@ -63,7 +62,7 @@ export default class FermentNamingTask extends WizardTaskBase {
   }
 
   set arrangementId(id: string) {
-    this.updateConfig<FermentConfig>({ ...this.config, arrangementId: id });
+    this.updateConfig({ ...this.config, arrangementId: id });
   }
 
   get prefix(): string {
@@ -71,7 +70,7 @@ export default class FermentNamingTask extends WizardTaskBase {
   }
 
   set prefix(prefix: string) {
-    this.updateConfig<FermentConfig>({ ...this.config, prefix });
+    this.updateConfig({ ...this.config, prefix });
   }
 
   get dashboardTitle(): string {
@@ -79,7 +78,7 @@ export default class FermentNamingTask extends WizardTaskBase {
   }
 
   set dashboardTitle(id: string) {
-    this.updateConfig<FermentConfig>({ ...this.config, dashboardTitle: id });
+    this.updateConfig({ ...this.config, dashboardTitle: id });
   }
 
   get names(): FermentConfigNames {
@@ -113,7 +112,7 @@ export default class FermentNamingTask extends WizardTaskBase {
 
   clearKey(key: string): void {
     delete this.config[key];
-    this.updateConfig<FermentConfig>(this.config);
+    this.updateConfig(this.config);
   }
 
   clearName(key: string): void {
@@ -121,7 +120,7 @@ export default class FermentNamingTask extends WizardTaskBase {
   }
 
   taskDone(): void {
-    this.updateConfig<FermentConfig>({
+    this.updateConfig({
       ...this.config,
       serviceId: this.serviceId,
       arrangementId: this.arrangementId,

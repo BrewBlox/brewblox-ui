@@ -11,7 +11,7 @@ import { FermentConfig } from './types';
 
 
 @Component
-export default class FermentHardwareTask extends WizardTaskBase {
+export default class FermentHardwareTask extends WizardTaskBase<FermentConfig> {
   readonly config!: FermentConfig;
 
   coolPin: PinChannel | null = null;
@@ -73,7 +73,7 @@ export default class FermentHardwareTask extends WizardTaskBase {
       },
     );
 
-    this.updateConfig<FermentConfig>(this.config);
+    this.updateConfig(this.config);
     this.next();
   }
 }

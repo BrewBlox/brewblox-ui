@@ -11,9 +11,7 @@ import { HermsConfig } from './types';
 
 
 @Component
-export default class HermsPidTask extends WizardTaskBase {
-  readonly config!: HermsConfig;
-
+export default class HermsPidTask extends WizardTaskBase<HermsConfig> {
   hltFullPowerDelta = new Unit(2, 'delta_degC');
   bkFullPowerDelta = new Unit(2, 'delta_degC');
   hltVolume = 25;
@@ -79,7 +77,7 @@ export default class HermsPidTask extends WizardTaskBase {
     const widgets = defineWidgets(this.config, layouts);
 
     this.pushActions(createActions());
-    this.updateConfig<HermsConfig>({
+    this.updateConfig({
       ...this.config,
       layouts,
       widgets,

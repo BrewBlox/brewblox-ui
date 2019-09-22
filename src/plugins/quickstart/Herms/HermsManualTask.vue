@@ -7,9 +7,7 @@ import { HermsConfig } from './types';
 
 
 @Component
-export default class HermsManualTask extends WizardTaskBase {
-  readonly config!: HermsConfig;
-
+export default class HermsManualTask extends WizardTaskBase<HermsConfig> {
   mounted(): void {
     this.executePrepared();
   }

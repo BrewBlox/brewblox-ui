@@ -7,9 +7,7 @@ import { FermentConfig } from './types';
 
 
 @Component
-export default class FermentManualTask extends WizardTaskBase {
-  readonly config!: FermentConfig;
-
+export default class FermentManualTask extends WizardTaskBase<FermentConfig> {
   mounted(): void {
     this.executePrepared();
   }

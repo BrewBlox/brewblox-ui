@@ -4,11 +4,11 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 export type WizardAction = (config: any) => Promise<void>;
 
 @Component
-export default class WizardTaskBase extends Vue {
+export default class WizardTaskBase<ConfigT> extends Vue {
   public busyExecuting = false;
 
   @Prop({ type: Object, required: true })
-  protected readonly config!: any;
+  protected readonly config!: ConfigT;
 
   @Prop({ type: Array, required: true })
   protected readonly actions!: WizardAction[];
@@ -17,7 +17,7 @@ export default class WizardTaskBase extends Vue {
   protected readonly tasks!: string[];
 
   @Emit('update:config')
-  protected updateConfig<T>(config: T = this.config): T {
+  protected updateConfig(config: ConfigT = this.config): ConfigT {
     return { ...config };
   }
 

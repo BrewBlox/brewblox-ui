@@ -15,8 +15,7 @@ import { HermsBlockNames, HermsConfig } from './types';
 
 
 @Component
-export default class HermsNamingTask extends WizardTaskBase {
-  readonly config!: HermsConfig;
+export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
   chosenNames: Partial<HermsBlockNames> = {};
 
   get defaultNames(): HermsBlockNames {
@@ -49,7 +48,7 @@ export default class HermsNamingTask extends WizardTaskBase {
   }
 
   set serviceId(serviceId: string) {
-    this.updateConfig<HermsConfig>({ ...this.config, serviceId });
+    this.updateConfig({ ...this.config, serviceId });
   }
 
   get groupError(): string | null {
@@ -70,7 +69,7 @@ export default class HermsNamingTask extends WizardTaskBase {
   }
 
   set arrangementId(id: string) {
-    this.updateConfig<HermsConfig>({ ...this.config, arrangementId: id });
+    this.updateConfig({ ...this.config, arrangementId: id });
   }
 
   get prefix(): string {
@@ -78,7 +77,7 @@ export default class HermsNamingTask extends WizardTaskBase {
   }
 
   set prefix(prefix: string) {
-    this.updateConfig<HermsConfig>({ ...this.config, prefix });
+    this.updateConfig({ ...this.config, prefix });
   }
 
   get dashboardTitle(): string {
@@ -86,7 +85,7 @@ export default class HermsNamingTask extends WizardTaskBase {
   }
 
   set dashboardTitle(id: string) {
-    this.updateConfig<HermsConfig>({ ...this.config, dashboardTitle: id });
+    this.updateConfig({ ...this.config, dashboardTitle: id });
   }
 
   get names(): HermsBlockNames {
@@ -120,7 +119,7 @@ export default class HermsNamingTask extends WizardTaskBase {
 
   clearKey(key: string): void {
     this.$delete(this.config, key);
-    this.updateConfig<HermsConfig>(this.config);
+    this.updateConfig(this.config);
   }
 
   clearName(key: string): void {
@@ -128,7 +127,7 @@ export default class HermsNamingTask extends WizardTaskBase {
   }
 
   taskDone(): void {
-    this.updateConfig<HermsConfig>({
+    this.updateConfig({
       ...this.config,
       serviceId: this.serviceId,
       arrangementId: this.arrangementId,

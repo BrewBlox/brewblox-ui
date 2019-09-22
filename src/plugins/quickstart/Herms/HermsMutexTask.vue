@@ -7,16 +7,12 @@ import { HermsConfig } from './types';
 
 
 @Component
-export default class HermsMutexTask extends WizardTaskBase {
-  readonly config!: HermsConfig;
-
+export default class HermsMutexTask extends WizardTaskBase<HermsConfig> {
   mutex = true;
-
 
   done(): void {
     this.config.mutex = this.mutex;
-
-    this.updateConfig<HermsConfig>(this.config);
+    this.updateConfig(this.config);
     this.next();
   }
 }

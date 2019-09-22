@@ -11,9 +11,7 @@ import { HermsConfig } from './types';
 
 
 @Component
-export default class HermsHardwareTask extends WizardTaskBase {
-  readonly config!: HermsConfig;
-
+export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
   hltPin: PinChannel | null = null;
   bkPin: PinChannel | null = null;
   hltSensor: string | null = null;
@@ -87,7 +85,7 @@ export default class HermsHardwareTask extends WizardTaskBase {
       },
     );
 
-    this.updateConfig<HermsConfig>(this.config);
+    this.updateConfig(this.config);
     this.next();
   }
 }

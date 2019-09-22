@@ -10,9 +10,7 @@ import { FermentConfig } from './types';
 
 
 @Component
-export default class FermentSettingsTask extends WizardTaskBase {
-  readonly config!: FermentConfig;
-
+export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
   fridgeSetting = new Unit(20, 'degC');
   beerSetting = new Unit(20, 'degC');
   activeSetpoint: 'beer' | 'fridge' = 'beer';
@@ -41,7 +39,7 @@ export default class FermentSettingsTask extends WizardTaskBase {
     const widgets = defineWidgets(this.config, layouts);
 
     this.pushActions(createActions());
-    this.updateConfig<FermentConfig>({
+    this.updateConfig({
       ...this.config,
       layouts,
       widgets,
