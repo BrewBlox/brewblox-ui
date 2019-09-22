@@ -207,3 +207,6 @@ export const objReducer = (key: string) =>
     acc[obj[key]] = obj;
     return acc;
   };
+
+export const validator = (rules: InputRule[]): ((val: any) => boolean) =>
+  val => rules.every(rule => !isString(rule(val)));

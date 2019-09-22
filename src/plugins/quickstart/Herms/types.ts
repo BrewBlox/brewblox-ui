@@ -2,11 +2,7 @@ import { BuilderLayout } from '@/plugins/builder/types';
 import { Block } from '@/plugins/spark/types';
 import { DashboardItem } from '@/store/dashboards';
 
-export interface PinChannel {
-  arrayId: string;
-  pinId: number;
-  pinName: string;
-}
+import { PinChannel } from '../types';
 
 export interface HermsBlockNames {
   hltSensor: string;

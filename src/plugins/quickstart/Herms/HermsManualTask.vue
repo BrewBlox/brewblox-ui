@@ -3,13 +3,11 @@ import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 
-import { FermentConfig } from './types';
+import { HermsConfig } from './types';
 
 
 @Component
-export default class FermentManualTask extends WizardTaskBase {
-  readonly config!: FermentConfig;
-
+export default class HermsManualTask extends WizardTaskBase<HermsConfig> {
   mounted(): void {
     this.executePrepared();
   }
@@ -25,9 +23,9 @@ export default class FermentManualTask extends WizardTaskBase {
   <div>
     <q-card-section>
       <q-item dark>
-        <big>About your new fermentation dashboard</big>
+        <big>About your new HERMS dashboard</big>
       </q-item>
-      <q-item dark class="text-weight-light">
+      <q-item dark>
         <q-item-section>
           <p>
             While the wizard is configuring the Spark and your new dashboard,
@@ -35,17 +33,11 @@ export default class FermentManualTask extends WizardTaskBase {
             <span>
               Visit our
               <a
-                href="https://brewblox.netlify.com/user/ferment_guide.html"
+                href="https://brewblox.netlify.com/user/herms_guide.html"
                 target="_blank"
                 style="color: white"
               >documentation page</a> for a more in-depth guide.
             </span>
-          </p>
-          <p>
-            On the controller we created two PIDs to drive the heater and the cooler.
-            <br>The input to both will either be the
-            <i>Fridge Setpoint</i> or the
-            <i>Beer Setpoint</i>.
           </p>
           <p>
             We did not put every controller block on your new dashboard.
@@ -54,9 +46,8 @@ export default class FermentManualTask extends WizardTaskBase {
           <p>
             On your new dashboard, you will find:
             <ul>
-              <li>A graphical representation of your fridge. Parts are clickable for quick access to settings.</li>
+              <li>A graphical representation of your setup. Parts are clickable for quick access to settings.</li>
               <li>A graph with the most important metrics.</li>
-              <li>A temperature profile that can slowly change a setpoint over time.</li>
               <li>Actions that reconfigure your blocks for different behavior.</li>
             </ul>
           </p>

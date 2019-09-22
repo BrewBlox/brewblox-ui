@@ -11,7 +11,7 @@ export default class HermsWizard extends WidgetWizardBase {
     'HermsMutexTask',
     'HermsPidTask',
     'HermsManualTask',
-  ].reverse();
+  ];
 }
 </script>
 

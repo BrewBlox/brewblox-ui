@@ -49,6 +49,10 @@ export class ServiceModule extends VuexModule {
     };
   }
 
+  public get typedServices(): (type: string) => Service[] {
+    return type => this.serviceValues.filter(svc => svc.type === type);
+  }
+
   public get tryServiceById(): (id: string) => Service | null {
     return id => this.services[id] || null;
   }

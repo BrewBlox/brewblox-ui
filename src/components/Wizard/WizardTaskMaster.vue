@@ -47,7 +47,7 @@ export default class WizardTaskMaster extends Vue {
   }
 
   created(): void {
-    this.tasks = [...this.initialTasks];
+    this.tasks = [...this.initialTasks].reverse();
     this.config = { ...this.initialConfig };
     this.nextTask();
   }

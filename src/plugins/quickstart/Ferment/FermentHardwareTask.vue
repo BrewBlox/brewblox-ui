@@ -4,44 +4,20 @@ import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { createDialog } from '@/helpers/dialog';
-import { FermentConfig, PinChannel } from '@/plugins/spark/arrangements/Ferment/types';
-import { typeName as DS2413Type } from '@/plugins/spark/features/DS2413/getters';
-import { typeName as Spark2PinsType } from '@/plugins/spark/features/Spark2Pins/getters';
-import { typeName as Spark3PinsType } from '@/plugins/spark/features/Spark3Pins/getters';
-import { typeName as sensorMockType } from '@/plugins/spark/features/TempSensorMock/getters';
-import { typeName as sensorOneWireType } from '@/plugins/spark/features/TempSensorOneWire/getters';
 import { sparkStore } from '@/plugins/spark/store';
+
+import { PinChannel } from '../types';
+import { FermentConfig } from './types';
 
 
 @Component
-export default class FermentHardwareTask extends WizardTaskBase {
+export default class FermentHardwareTask extends WizardTaskBase<FermentConfig> {
   readonly config!: FermentConfig;
 
   coolPin: PinChannel | null = null;
   heatPin: PinChannel | null = null;
-  fridgeSensor: any = null;
-  beerSensor: any = null;
-
-  get pinOptions(): SelectOption[] {
-    return sparkStore.blockValues(this.config.serviceId)
-      .filter(block => [Spark2PinsType, Spark3PinsType, DS2413Type].includes(block.type))
-      .reduce(
-        (acc, block) => [
-          ...acc,
-          ...block.data.pins.map((pin, idx) => {
-            const [pinName] = Object.keys(block.data.pins[idx]);
-            return { pinName, arrayId: block.id, pinId: idx + 1 };
-          }),
-        ],
-        [] as any[])
-      .map(channel => ({ label: `${channel.arrayId} ${channel.pinName}`, value: channel }));
-  }
-
-  get sensorOptions(): string[] {
-    return sparkStore.blockValues(this.config.serviceId)
-      .filter(block => block.type === sensorOneWireType || block.type === sensorMockType)
-      .map(block => block.id);
-  }
+  fridgeSensor: string | null = null;
+  beerSensor: string | null = null;
 
   get valuesOk(): boolean {
     return [
@@ -69,42 +45,6 @@ export default class FermentHardwareTask extends WizardTaskBase {
     ];
   }
 
-  sensorTemp(id: string | null): string {
-    if (!id) {
-      return '';
-    }
-    return sparkStore.blockById(this.config.serviceId, id).data.value.toString();
-  }
-
-  get fridgeSensorTemp(): string {
-    return this.sensorTemp(this.fridgeSensor);
-  }
-
-  get beerSensorTemp(): string {
-    return this.sensorTemp(this.beerSensor);
-  }
-
-  pinConnectedStatus(channel: PinChannel | null): string {
-    if (!channel) {
-      return '';
-    }
-    const block = sparkStore.blockById(this.config.serviceId, channel.arrayId);
-    if ([Spark2PinsType, Spark3PinsType].includes(block.type)) {
-      return '';
-    }
-    return block.data.connected
-      ? `${channel.arrayId} is connected`
-      : `${channel.arrayId} is not connected`;
-  }
-
-  get coolPinStatus(): string {
-    return this.pinConnectedStatus(this.coolPin);
-  }
-
-  get heatPinStatus(): string {
-    return this.pinConnectedStatus(this.heatPin);
-  }
-
   created(): void {
     this.discover();
   }
@@ -128,12 +68,12 @@ export default class FermentHardwareTask extends WizardTaskBase {
     Object.assign(
       this.config.renamedBlocks,
       {
-        [this.fridgeSensor]: this.config.names.fridgeSensor,
-        [this.beerSensor]: this.config.names.beerSensor,
+        [this.fridgeSensor as string]: this.config.names.fridgeSensor,
+        [this.beerSensor as string]: this.config.names.beerSensor,
       },
     );
 
-    this.updateConfig<FermentConfig>(this.config);
+    this.updateConfig(this.config);
     this.next();
   }
 }
@@ -180,53 +120,37 @@ export default class FermentHardwareTask extends WizardTaskBase {
       </q-item>
       <q-item dark>
         <q-item-section>
-          <q-select
+          <QuickStartPinField
             v-model="coolPin"
-            :options="pinOptions"
+            :service-id="config.serviceId"
             :rules="pinRules"
-            :hint="coolPinStatus"
             label="Cooler output"
-            emit-value
-            map-options
-            dark
-            options-dark
           />
         </q-item-section>
         <q-item-section>
-          <q-select
+          <QuickStartPinField
             v-model="heatPin"
-            :options="pinOptions"
+            :service-id="config.serviceId"
             :rules="pinRules"
-            :hint="heatPinStatus"
             label="Heater output"
-            emit-value
-            map-options
-            dark
-            options-dark
           />
         </q-item-section>
       </q-item>
       <q-item dark>
         <q-item-section>
-          <q-select
+          <QuickStartSensorField
             v-model="fridgeSensor"
-            :options="sensorOptions"
+            :service-id="config.serviceId"
             label="Fridge Sensor"
             :rules="sensorRules"
-            :hint="fridgeSensorTemp"
-            dark
-            options-dark
           />
         </q-item-section>
         <q-item-section>
-          <q-select
+          <QuickStartSensorField
             v-model="beerSensor"
-            :options="sensorOptions"
+            :service-id="config.serviceId"
             label="Beer Sensor"
             :rules="sensorRules"
-            :hint="beerSensorTemp"
-            dark
-            options-dark
           />
         </q-item-section>
       </q-item>

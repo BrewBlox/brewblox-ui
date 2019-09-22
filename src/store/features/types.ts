@@ -23,7 +23,7 @@ export interface Feature {
   form?: string;
 }
 
-export interface Arrangement {
+export interface QuickStart {
   id: string;
   displayName: string;
   wizard: string;

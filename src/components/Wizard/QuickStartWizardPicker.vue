@@ -6,14 +6,14 @@ import { objectStringSorter } from '@/helpers/functional';
 import { featureStore } from '@/store/features';
 
 @Component
-export default class ArrangementWizardPicker extends Vue {
+export default class QuickStartWizardPicker extends Vue {
   arrangementId = '';
   searchModel = '';
   wizardModel: any = null;
   wizardActive = false;
 
   get wizardOptions(): { id: string; displayName: string }[] {
-    return featureStore.arrangementValues
+    return featureStore.quickStartValues
       .filter(arr => !!arr.wizard)
       .sort(objectStringSorter('displayName'));
   }

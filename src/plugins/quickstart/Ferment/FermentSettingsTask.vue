@@ -2,7 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
-import { Unit } from '@/helpers/units';
+import { convertedTemp, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
 import { createActions, defineChangedBlocks, defineCreatedBlocks, defineLayouts, defineWidgets } from './changes';
@@ -10,16 +10,10 @@ import { FermentConfig } from './types';
 
 
 @Component
-export default class FermentSettingsTask extends WizardTaskBase {
-  readonly config!: FermentConfig;
-
+export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
   fridgeSetting = new Unit(20, 'degC');
   beerSetting = new Unit(20, 'degC');
   activeSetpoint: 'beer' | 'fridge' = 'beer';
-
-  get userTemp(): string {
-    return sparkStore.units(this.config.serviceId).Temp;
-  }
 
   get targetOpts(): SelectOption[] {
     return [
@@ -34,12 +28,6 @@ export default class FermentSettingsTask extends WizardTaskBase {
     ];
   }
 
-  defaultTemp(): Unit {
-    const degC = 20;
-    const defaultTempValues = { degC, degF: (degC * 9 / 5) + 32, degK: degC + 273.15 };
-    return new Unit(defaultTempValues[this.userTemp] || 20, this.userTemp);
-  }
-
   done(): void {
     const createdBlocks = defineCreatedBlocks(
       this.config,
@@ -51,7 +39,7 @@ export default class FermentSettingsTask extends WizardTaskBase {
     const widgets = defineWidgets(this.config, layouts);
 
     this.pushActions(createActions());
-    this.updateConfig<FermentConfig>({
+    this.updateConfig({
       ...this.config,
       layouts,
       widgets,
@@ -62,8 +50,9 @@ export default class FermentSettingsTask extends WizardTaskBase {
   }
 
   mounted(): void {
-    this.fridgeSetting = this.defaultTemp();
-    this.beerSetting = this.defaultTemp();
+    const defaultTemp = convertedTemp(20, sparkStore.units(this.config.serviceId).Temp);
+    this.fridgeSetting = defaultTemp.copy();
+    this.beerSetting = defaultTemp.copy();
   }
 }
 </script>
