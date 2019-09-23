@@ -5,9 +5,9 @@ import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { convertedTemp, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
-import { createActions, defineChangedBlocks, defineCreatedBlocks, defineLayouts, defineWidgets } from './changes';
+import { createOutputActions } from '../helpers';
+import { defineChangedBlocks, defineCreatedBlocks, defineLayouts, defineWidgets } from './changes';
 import { FermentConfig } from './types';
-
 
 @Component
 export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
@@ -38,7 +38,7 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
     const layouts = defineLayouts(this.config);
     const widgets = defineWidgets(this.config, layouts);
 
-    this.pushActions(createActions());
+    this.pushActions(createOutputActions());
     this.updateConfig({
       ...this.config,
       layouts,
@@ -49,7 +49,7 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
     this.next();
   }
 
-  mounted(): void {
+  created(): void {
     const defaultTemp = convertedTemp(20, sparkStore.units(this.config.serviceId).Temp);
     this.fridgeSetting = defaultTemp.copy();
     this.beerSetting = defaultTemp.copy();

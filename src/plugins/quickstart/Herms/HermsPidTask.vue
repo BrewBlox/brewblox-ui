@@ -5,7 +5,8 @@ import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
-import { createActions, defineChangedBlocks, defineCreatedBlocks, defineWidgets, PidOpts } from './changes';
+import { createOutputActions } from '../helpers';
+import { defineChangedBlocks, defineCreatedBlocks, defineWidgets, PidOpts } from './changes';
 import { defineLayouts } from './changes-layout';
 import { HermsConfig } from './types';
 
@@ -76,7 +77,7 @@ export default class HermsPidTask extends WizardTaskBase<HermsConfig> {
     const layouts = defineLayouts(this.config);
     const widgets = defineWidgets(this.config, layouts);
 
-    this.pushActions(createActions());
+    this.pushActions(createOutputActions());
     this.updateConfig({
       ...this.config,
       layouts,

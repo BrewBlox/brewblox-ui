@@ -3,6 +3,7 @@ import { featureStore } from '@/store/features';
 
 import Ferment from './Ferment';
 import Herms from './Herms';
+import Rims from './Rims';
 
 export default {
   install() {
@@ -11,6 +12,7 @@ export default {
     [
       Ferment,
       Herms,
+      Rims,
     ]
       .forEach(featureStore.createQuickStart);
   },

@@ -7,7 +7,6 @@ import { featureStore } from '@/store/features';
 
 @Component
 export default class QuickStartWizardPicker extends Vue {
-  arrangementId = '';
   searchModel = '';
   wizardModel: any = null;
   wizardActive = false;

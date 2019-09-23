@@ -11,31 +11,25 @@ import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Service, serviceStore } from '@/store/services';
 
-import { HermsBlockNames, HermsConfig } from './types';
+import { RimsBlockNames, RimsConfig } from './types';
 
 
 @Component
-export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
-  chosenNames: Partial<HermsBlockNames> = {};
+export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
+  chosenNames: Partial<RimsBlockNames> = {};
 
-  get defaultNames(): HermsBlockNames {
+  get defaultNames(): RimsBlockNames {
     return {
-      hltSensor: 'HLT Sensor',
-      hltDriver: 'HLT Setpoint Driver',
-      hltSetpoint: 'HLT Setpoint',
-      hltPid: 'HLT PID',
-      hltPwm: 'HLT PWM',
-      hltAct: 'HLT Actuator',
-      mtSensor: 'MT Sensor',
-      mtSetpoint: 'MT Setpoint',
-      mtPid: 'MT PID',
-      bkSensor: 'BK Sensor',
-      bkSetpoint: 'BK Setpoint',
-      bkPid: 'BK PID',
-      bkPwm: 'BK PWM',
-      bkAct: 'BK Actuator',
-      mutex: 'Mutex',
-      balancer: 'Balancer',
+      kettleSensor: 'Kettle Sensor',
+      kettleSetpoint: 'Kettle Setpoint',
+      kettlePid: 'Kettle PID',
+      kettlePwm: 'Kettle PWM',
+      kettleAct: 'Kettle Actuator',
+      mashSetpoint: 'Mash Setpoint',
+      mashPid: 'Mash PID',
+      mashPwm: 'Mash PWM',
+      mashAct: 'Mash Actuator',
+      pumpAct: 'Pump Actuator',
     };
   }
 
@@ -59,7 +53,7 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
   }
 
   get title(): string {
-    return valOrDefault(this.config.title, 'HERMS');
+    return valOrDefault(this.config.title, 'RIMS');
   }
 
   set title(title: string) {
@@ -78,11 +72,11 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
     return valOrDefault(this.config.dashboardTitle, `${this.title} Dashboard`);
   }
 
-  set dashboardTitle(id: string) {
-    this.updateConfig({ ...this.config, dashboardTitle: id });
+  set dashboardTitle(dashboardTitle: string) {
+    this.updateConfig({ ...this.config, dashboardTitle });
   }
 
-  get names(): HermsBlockNames {
+  get names(): RimsBlockNames {
     return {
       ...mapValues(this.defaultNames,
         v => suggestId(`${this.prefix} ${v}`, validator(blockIdRules(this.serviceId)))),

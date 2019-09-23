@@ -7,24 +7,23 @@ import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
 import { PinChannel } from '../types';
-import { FermentConfig } from './types';
+import { RimsConfig } from './types';
 
 
 @Component
-export default class FermentHardwareTask extends WizardTaskBase<FermentConfig> {
-  coolPin: PinChannel | null = null;
-  heatPin: PinChannel | null = null;
-  fridgeSensor: string | null = null;
-  beerSensor: string | null = null;
+export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
+  kettlePin: PinChannel | null = null;
+  mashPin: PinChannel | null = null;
+  pumpPin: PinChannel | null = null;
+  kettleSensor: string | null = null;
 
   get valuesOk(): boolean {
     return [
-      this.coolPin,
-      this.heatPin,
-      !isEqual(this.coolPin, this.heatPin),
-      this.fridgeSensor,
-      this.beerSensor,
-      this.fridgeSensor !== this.beerSensor,
+      this.kettlePin,
+      this.mashPin,
+      this.pumpPin,
+      this.kettleSensor,
+      !this.pinSame,
     ]
       .every(Boolean);
   }
@@ -32,15 +31,25 @@ export default class FermentHardwareTask extends WizardTaskBase<FermentConfig> {
   get pinRules(): InputRule[] {
     return [
       v => !!v || 'Pin must be selected',
-      () => !isEqual(this.coolPin, this.heatPin) || 'Cool pin and Heat pin may not be the same',
     ];
   }
 
   get sensorRules(): InputRule[] {
     return [
       v => !!v || 'Sensor must be selected',
-      () => this.fridgeSensor !== this.beerSensor || 'Fridge sensor and Beer sensor may not be the same',
     ];
+  }
+
+  get pinSame(): boolean {
+    if (!this.kettlePin || !this.mashPin || !this.pumpPin) {
+      return false;
+    }
+    return [
+      isEqual(this.kettlePin, this.mashPin),
+      isEqual(this.kettlePin, this.pumpPin),
+      isEqual(this.mashPin, this.pumpPin),
+    ]
+      .some(Boolean);
   }
 
   created(): void {
@@ -60,14 +69,14 @@ export default class FermentHardwareTask extends WizardTaskBase<FermentConfig> {
   }
 
   taskDone(): void {
-    this.config.heatPin = this.heatPin as PinChannel;
-    this.config.coolPin = this.coolPin as PinChannel;
+    this.config.kettlePin = this.kettlePin as PinChannel;
+    this.config.mashPin = this.mashPin as PinChannel;
+    this.config.pumpPin = this.pumpPin as PinChannel;
 
     Object.assign(
       this.config.renamedBlocks,
       {
-        [this.fridgeSensor as string]: this.config.names.fridgeSensor,
-        [this.beerSensor as string]: this.config.names.beerSensor,
+        [this.kettleSensor as string]: this.config.names.kettleSensor,
       },
     );
 
@@ -107,51 +116,53 @@ export default class FermentHardwareTask extends WizardTaskBase<FermentConfig> {
           <p>
             Use the buttons above to discover new OneWire blocks or manually create a block.
           </p>
-          <p>
-            We will also set some constraints on the heater and cooler:
-            <ul>
-              <li>Minimum ON and OFF times to protect the compressor</li>
-              <li>Minimum wait times for switching between heating and cooling</li>
-            </ul>
-          </p>
         </q-item-section>
       </q-item>
       <q-item dark>
         <q-item-section>
           <QuickStartPinField
-            v-model="coolPin"
+            v-model="kettlePin"
             :service-id="config.serviceId"
             :rules="pinRules"
-            label="Cooler output"
+            label="Kettle heater"
           />
         </q-item-section>
         <q-item-section>
           <QuickStartPinField
-            v-model="heatPin"
+            v-model="mashPin"
             :service-id="config.serviceId"
             :rules="pinRules"
-            label="Heater output"
+            label="Mash heater"
           />
         </q-item-section>
       </q-item>
       <q-item dark>
         <q-item-section>
-          <QuickStartSensorField
-            v-model="fridgeSensor"
+          <QuickStartPinField
+            v-model="pumpPin"
             :service-id="config.serviceId"
-            label="Fridge Sensor"
-            :rules="sensorRules"
+            :rules="pinRules"
+            label="Pump"
           />
         </q-item-section>
+        <q-item-section />
+      </q-item>
+      <q-item dark>
         <q-item-section>
           <QuickStartSensorField
-            v-model="beerSensor"
+            v-model="kettleSensor"
             :service-id="config.serviceId"
-            label="Beer Sensor"
+            label="Kettle Sensor"
             :rules="sensorRules"
           />
         </q-item-section>
+        <q-item-section />
       </q-item>
+      <CardWarning v-if="pinSame">
+        <template #message>
+          One or more outputs are using the same Pin.
+        </template>
+      </CardWarning>
     </q-card-section>
 
     <q-separator dark />

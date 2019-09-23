@@ -1,11 +1,9 @@
 import { uid } from 'quasar';
 
-import { WizardAction } from '@/components/Wizard/WizardTaskBase';
 import { Link, Unit } from '@/helpers/units';
 import { BalancerLink, MutexLink } from '@/helpers/units/KnownLinks';
 import { serialize } from '@/helpers/units/parseObject';
 import { typeName as builderType } from '@/plugins/builder/getters';
-import { builderStore } from '@/plugins/builder/store';
 import { BuilderItem, BuilderLayout } from '@/plugins/builder/types';
 import { HistoryItem } from '@/plugins/history/Graph/types';
 import { AnalogConstraint, DigitalConstraint } from '@/plugins/spark/components/Constraints/ConstraintsBase';
@@ -26,10 +24,10 @@ import { FilterChoice, SetpointSensorPairBlock } from '@/plugins/spark/features/
 import { StepViewItem } from '@/plugins/spark/features/StepView/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
-import { Dashboard, DashboardItem, dashboardStore } from '@/store/dashboards';
+import { DashboardItem } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
-import { PinChannel } from '../types';
+import { unlinkedActuators } from '../helpers';
 import { HermsConfig } from './types';
 
 export interface PidOpts {
@@ -40,23 +38,7 @@ export interface PidOpts {
 }
 
 export function defineChangedBlocks(config: HermsConfig): Block[] {
-  return (
-    sparkStore
-      .blockValues(config.serviceId)
-      // Find existing drivers of selected pins
-      .filter(
-        block =>
-          block.type === digiActType &&
-          [config.hltPin, config.bkPin].some(
-            (pin: PinChannel) => pin.arrayId === block.data.hwDevice.id && pin.pinId === block.data.channel
-          )
-      )
-      // Unlink them from pin
-      .map((block: DigitalActuatorBlock) => {
-        block.data.channel = 0;
-        return block;
-      })
-  );
+  return unlinkedActuators(config.serviceId, [config.hltPin, config.bkPin]);
 };
 
 export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[] {
@@ -485,55 +467,4 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
   });
 
   return [createBuilder(), createGraph(), createStepView()];
-}
-
-export function createActions(): WizardAction[] {
-  return [
-    // Rename blocks
-    async (config: HermsConfig) => {
-      await Promise.all(
-        Object.entries(config.renamedBlocks)
-          .filter(([currVal, newVal]: [string, string]) => currVal !== newVal)
-          .map(([currVal, newVal]: [string, string]) => sparkStore.renameBlock([config.serviceId, currVal, newVal]))
-      );
-    },
-
-    // Change blocks
-    async (config: HermsConfig) => {
-      await Promise.all(
-        config.changedBlocks
-          .map(block => sparkStore.saveBlock([config.serviceId, block])));
-    },
-
-    // Create blocks
-    async (config: HermsConfig) => {
-      // Create synchronously, to ensure dependencies are created first
-      for (const block of config.createdBlocks) {
-        await sparkStore.createBlock([config.serviceId, block]);
-      }
-    },
-
-    // Create layouts
-    async (config: HermsConfig) => {
-      await Promise.all(
-        config.layouts
-          .map(builderStore.createLayout)
-      );
-    },
-
-    // Create dashboards / widgets
-    async (config: HermsConfig) => {
-      if (!dashboardStore.dashboardIds.includes(config.dashboardId)) {
-        const dashboard: Dashboard = {
-          id: config.dashboardId,
-          title: config.dashboardTitle,
-          order: dashboardStore.dashboardIds.length + 1,
-        };
-        await dashboardStore.createDashboard(dashboard);
-      }
-      for (const widget of config.widgets) {
-        await dashboardStore.appendDashboardItem(widget);
-      }
-    },
-  ];
 }
