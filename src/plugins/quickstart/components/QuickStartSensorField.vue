@@ -45,9 +45,10 @@ export default class QuickStartSensorField extends Vue {
 <template>
   <q-select
     v-model="local"
-    v-bind="$attrs"
     :options="opts"
     :hint="sensorTemp"
+    :rules="[v => !!v || 'Sensor must be selected']"
+    v-bind="$attrs"
     dark
     options-dark
   />

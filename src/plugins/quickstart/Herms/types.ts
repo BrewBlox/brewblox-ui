@@ -29,4 +29,7 @@ export interface HermsConfig extends QuickStartOutput {
   hltPin: PinChannel;
   bkPin: PinChannel;
   mutex: boolean;
+  hltSensor: string;
+  mtSensor: string;
+  bkSensor: string;
 }

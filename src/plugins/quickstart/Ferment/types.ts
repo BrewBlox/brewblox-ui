@@ -22,4 +22,6 @@ export interface FermentConfig extends QuickStartOutput {
   names: FermentConfigNames;
   heatPin: PinChannel;
   coolPin: PinChannel;
+  fridgeSensor: string;
+  beerSensor: string;
 }

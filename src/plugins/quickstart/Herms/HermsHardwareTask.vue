@@ -1,11 +1,11 @@
 <script lang="ts">
-import isEqual from 'lodash/isEqual';
 import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
+import { hasShared } from '../helpers';
 import { PinChannel } from '../types';
 import { HermsConfig } from './types';
 
@@ -22,7 +22,7 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
     return [
       this.hltPin,
       this.bkPin,
-      !isEqual(this.hltPin, this.bkPin),
+      !this.pinSame,
       this.hltSensor,
       this.mtSensor,
       this.bkSensor,
@@ -31,33 +31,22 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
       .every(Boolean);
   }
 
-  get pinRules(): InputRule[] {
-    return [
-      v => !!v || 'Pin must be selected',
-      () => !isEqual(this.hltPin, this.bkPin) || 'HLT pin and BK pin may not be the same',
-    ];
-  }
-
-  get sensorRules(): InputRule[] {
-    return [
-      v => !!v || 'Sensor must be selected',
-    ];
+  get pinSame(): boolean {
+    return hasShared([this.hltPin, this.bkPin]);
   }
 
   get sensorSame(): boolean {
-    if (!this.hltSensor || !this.mtSensor || !this.bkSensor) {
-      return false;
-    }
-    return [
-      this.hltSensor === this.mtSensor,
-      this.hltSensor === this.bkSensor,
-      this.mtSensor === this.bkSensor,
-    ]
-      .some(Boolean);
+    return hasShared([this.hltSensor, this.mtSensor, this.bkSensor]);
   }
 
   created(): void {
     this.discover();
+
+    this.hltPin = this.config.hltPin || null;
+    this.bkPin = this.config.bkPin || null;
+    this.hltSensor = this.config.hltSensor || null;
+    this.mtSensor = this.config.mtSensor || null;
+    this.bkSensor = this.config.bkSensor || null;
   }
 
   discover(): void {
@@ -73,17 +62,17 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
   }
 
   taskDone(): void {
-    this.config.bkPin = this.bkPin as PinChannel;
-    this.config.hltPin = this.hltPin as PinChannel;
+    this.config.bkPin = this.bkPin!;
+    this.config.hltPin = this.hltPin!;
+    this.config.hltSensor = this.hltSensor!;
+    this.config.mtSensor = this.mtSensor!;
+    this.config.bkSensor = this.bkSensor!;
 
-    Object.assign(
-      this.config.renamedBlocks,
-      {
-        [this.hltSensor as string]: this.config.names.hltSensor,
-        [this.mtSensor as string]: this.config.names.mtSensor,
-        [this.bkSensor as string]: this.config.names.bkSensor,
-      },
-    );
+    this.config.renamedBlocks = {
+      [this.hltSensor!]: this.config.names.hltSensor,
+      [this.mtSensor!]: this.config.names.mtSensor,
+      [this.bkSensor!]: this.config.names.bkSensor,
+    };
 
     this.updateConfig(this.config);
     this.next();
@@ -128,7 +117,7 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
           <QuickStartPinField
             v-model="hltPin"
             :service-id="config.serviceId"
-            :rules="pinRules"
+            :error="pinSame"
             label="HLT output"
           />
         </q-item-section>
@@ -136,7 +125,7 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
           <QuickStartPinField
             v-model="bkPin"
             :service-id="config.serviceId"
-            :rules="pinRules"
+            :error="pinSame"
             label="BK output"
           />
         </q-item-section>
@@ -146,16 +135,16 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
           <QuickStartSensorField
             v-model="hltSensor"
             :service-id="config.serviceId"
+            :error="sensorSame"
             label="HLT Sensor"
-            :rules="sensorRules"
           />
         </q-item-section>
         <q-item-section>
           <QuickStartSensorField
             v-model="bkSensor"
             :service-id="config.serviceId"
+            :error="sensorSame"
             label="BK Sensor"
-            :rules="sensorRules"
           />
         </q-item-section>
       </q-item>
@@ -164,15 +153,20 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
           <QuickStartSensorField
             v-model="mtSensor"
             :service-id="config.serviceId"
+            :error="sensorSame"
             label="MT Sensor"
-            :rules="sensorRules"
           />
         </q-item-section>
         <q-item-section />
       </q-item>
+      <CardWarning v-if="pinSame">
+        <template #message>
+          Multiple outputs are using the same Pin.
+        </template>
+      </CardWarning>
       <CardWarning v-if="sensorSame">
         <template #message>
-          One or more sensors are using the same Block.
+          Multiple sensors are using the same Block.
         </template>
       </CardWarning>
     </q-card-section>

@@ -1,3 +1,5 @@
+import isEqual from 'lodash/isEqual';
+
 import { WizardAction } from '@/components/Wizard/WizardTaskBase';
 import { builderStore } from '@/plugins/builder/store';
 import { typeName as digiActType } from '@/plugins/spark/features/DigitalActuator/getters';
@@ -74,4 +76,20 @@ export function createOutputActions(): WizardAction[] {
       }
     },
   ];
+}
+
+function combinations<T>(arr: T[]): [T, T][] {
+  const results: [T, T][] = [];
+  // last element is skipped
+  for (let i = 0; i < arr.length - 1; i++) {
+    // Capture the second part of the combination
+    for (let j = i + 1; j < arr.length; j++) {
+      results.push([arr[i], arr[j]]);
+    }
+  }
+  return results;
+}
+
+export function hasShared<T>(arr: Array<T | null>): boolean {
+  return combinations(arr.filter(v => v !== null)).some(([v1, v2]) => isEqual(v1, v2));
 }

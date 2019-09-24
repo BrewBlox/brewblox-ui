@@ -9,7 +9,6 @@ import { sparkStore } from '@/plugins/spark/store';
 
 import { PinChannel } from '../types';
 
-
 @Component
 export default class QuickStartPinField extends Vue {
   readonly validTypes = [
@@ -68,9 +67,10 @@ export default class QuickStartPinField extends Vue {
 <template>
   <q-select
     v-model="local"
-    v-bind="$attrs"
     :options="opts"
     :hint="status"
+    :rules="[v => !!v || 'Pin must be selected']"
+    v-bind="$attrs"
     emit-value
     map-options
     dark

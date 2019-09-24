@@ -1,11 +1,12 @@
 <script lang="ts">
-import isEqual from 'lodash/isEqual';
+import pick from 'lodash/pick';
 import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
+import { hasShared } from '../helpers';
 import { PinChannel } from '../types';
 import { RimsConfig } from './types';
 
@@ -13,47 +14,40 @@ import { RimsConfig } from './types';
 @Component
 export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
   kettlePin: PinChannel | null = null;
-  mashPin: PinChannel | null = null;
+  tubePin: PinChannel | null = null;
   pumpPin: PinChannel | null = null;
   kettleSensor: string | null = null;
+  tubeSensor: string | null = null;
 
   get valuesOk(): boolean {
     return [
       this.kettlePin,
-      this.mashPin,
+      this.tubePin,
       this.pumpPin,
-      this.kettleSensor,
       !this.pinSame,
+      this.kettleSensor,
+      this.tubeSensor,
+      !this.sensorSame,
     ]
       .every(Boolean);
   }
 
-  get pinRules(): InputRule[] {
-    return [
-      v => !!v || 'Pin must be selected',
-    ];
-  }
-
-  get sensorRules(): InputRule[] {
-    return [
-      v => !!v || 'Sensor must be selected',
-    ];
-  }
-
   get pinSame(): boolean {
-    if (!this.kettlePin || !this.mashPin || !this.pumpPin) {
-      return false;
-    }
-    return [
-      isEqual(this.kettlePin, this.mashPin),
-      isEqual(this.kettlePin, this.pumpPin),
-      isEqual(this.mashPin, this.pumpPin),
-    ]
-      .some(Boolean);
+    return hasShared([this.kettlePin, this.tubePin, this.pumpPin]);
+  }
+
+  get sensorSame(): boolean {
+    return hasShared([this.kettleSensor, this.tubeSensor]);
   }
 
   created(): void {
     this.discover();
+
+    this.kettlePin = this.config.kettlePin || null;
+    this.tubePin = this.config.tubePin || null;
+    this.pumpPin = this.config.pumpPin || null;
+    this.kettleSensor = this.config.kettleSensor || null;
+    this.tubeSensor = this.config.tubeSensor || null;
   }
 
   discover(): void {
@@ -69,16 +63,16 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
   }
 
   taskDone(): void {
-    this.config.kettlePin = this.kettlePin as PinChannel;
-    this.config.mashPin = this.mashPin as PinChannel;
-    this.config.pumpPin = this.pumpPin as PinChannel;
+    this.config.kettlePin = this.kettlePin!;
+    this.config.tubePin = this.tubePin!;
+    this.config.pumpPin = this.pumpPin!;
+    this.config.kettleSensor = this.kettleSensor!;
+    this.config.tubeSensor = this.tubeSensor!;
 
-    Object.assign(
-      this.config.renamedBlocks,
-      {
-        [this.kettleSensor as string]: this.config.names.kettleSensor,
-      },
-    );
+    this.config.renamedBlocks = {
+      [this.kettleSensor!]: this.config.names.kettleSensor,
+      [this.tubeSensor!]: this.config.names.tubeSensor,
+    };
 
     this.updateConfig(this.config);
     this.next();
@@ -123,16 +117,16 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
           <QuickStartPinField
             v-model="kettlePin"
             :service-id="config.serviceId"
-            :rules="pinRules"
+            :error="pinSame"
             label="Kettle heater"
           />
         </q-item-section>
         <q-item-section>
           <QuickStartPinField
-            v-model="mashPin"
+            v-model="tubePin"
             :service-id="config.serviceId"
-            :rules="pinRules"
-            label="Mash heater"
+            :error="pinSame"
+            label="Tube heater"
           />
         </q-item-section>
       </q-item>
@@ -141,7 +135,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
           <QuickStartPinField
             v-model="pumpPin"
             :service-id="config.serviceId"
-            :rules="pinRules"
+            :error="pinSame"
             label="Pump"
           />
         </q-item-section>
@@ -152,15 +146,27 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
           <QuickStartSensorField
             v-model="kettleSensor"
             :service-id="config.serviceId"
+            :error="sensorSame"
             label="Kettle Sensor"
-            :rules="sensorRules"
           />
         </q-item-section>
-        <q-item-section />
+        <q-item-section>
+          <QuickStartSensorField
+            v-model="tubeSensor"
+            :service-id="config.serviceId"
+            :error="sensorSame"
+            label="Tube Sensor"
+          />
+        </q-item-section>
       </q-item>
       <CardWarning v-if="pinSame">
         <template #message>
-          One or more outputs are using the same Pin.
+          Multiple outputs are using the same Pin.
+        </template>
+      </CardWarning>
+      <CardWarning v-if="sensorSame">
+        <template #message>
+          Multiple sensors are using the same Block.
         </template>
       </CardWarning>
     </q-card-section>

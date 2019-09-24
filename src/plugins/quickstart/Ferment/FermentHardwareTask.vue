@@ -1,11 +1,11 @@
 <script lang="ts">
-import isEqual from 'lodash/isEqual';
 import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
+import { hasShared } from '../helpers';
 import { PinChannel } from '../types';
 import { FermentConfig } from './types';
 
@@ -21,30 +21,29 @@ export default class FermentHardwareTask extends WizardTaskBase<FermentConfig> {
     return [
       this.coolPin,
       this.heatPin,
-      !isEqual(this.coolPin, this.heatPin),
+      !this.pinSame,
       this.fridgeSensor,
       this.beerSensor,
-      this.fridgeSensor !== this.beerSensor,
+      !this.sensorSame,
     ]
       .every(Boolean);
   }
 
-  get pinRules(): InputRule[] {
-    return [
-      v => !!v || 'Pin must be selected',
-      () => !isEqual(this.coolPin, this.heatPin) || 'Cool pin and Heat pin may not be the same',
-    ];
+  get pinSame(): boolean {
+    return hasShared([this.coolPin, this.heatPin]);
   }
 
-  get sensorRules(): InputRule[] {
-    return [
-      v => !!v || 'Sensor must be selected',
-      () => this.fridgeSensor !== this.beerSensor || 'Fridge sensor and Beer sensor may not be the same',
-    ];
+  get sensorSame(): boolean {
+    return hasShared([this.fridgeSensor, this.beerSensor]);
   }
 
   created(): void {
     this.discover();
+
+    this.coolPin = this.config.coolPin || null;
+    this.heatPin = this.config.heatPin || null;
+    this.fridgeSensor = this.config.fridgeSensor || null;
+    this.beerSensor = this.config.beerSensor || null;
   }
 
   discover(): void {
@@ -60,16 +59,15 @@ export default class FermentHardwareTask extends WizardTaskBase<FermentConfig> {
   }
 
   taskDone(): void {
-    this.config.heatPin = this.heatPin as PinChannel;
-    this.config.coolPin = this.coolPin as PinChannel;
+    this.config.heatPin = this.heatPin!;
+    this.config.coolPin = this.coolPin!;
+    this.config.fridgeSensor = this.fridgeSensor!;
+    this.config.beerSensor = this.beerSensor!;
 
-    Object.assign(
-      this.config.renamedBlocks,
-      {
-        [this.fridgeSensor as string]: this.config.names.fridgeSensor,
-        [this.beerSensor as string]: this.config.names.beerSensor,
-      },
-    );
+    this.config.renamedBlocks = {
+      [this.fridgeSensor!]: this.config.names.fridgeSensor,
+      [this.beerSensor!]: this.config.names.beerSensor,
+    };
 
     this.updateConfig(this.config);
     this.next();
@@ -121,7 +119,7 @@ export default class FermentHardwareTask extends WizardTaskBase<FermentConfig> {
           <QuickStartPinField
             v-model="coolPin"
             :service-id="config.serviceId"
-            :rules="pinRules"
+            :error="pinSame"
             label="Cooler output"
           />
         </q-item-section>
@@ -129,7 +127,7 @@ export default class FermentHardwareTask extends WizardTaskBase<FermentConfig> {
           <QuickStartPinField
             v-model="heatPin"
             :service-id="config.serviceId"
-            :rules="pinRules"
+            :error="pinSame"
             label="Heater output"
           />
         </q-item-section>
@@ -139,19 +137,29 @@ export default class FermentHardwareTask extends WizardTaskBase<FermentConfig> {
           <QuickStartSensorField
             v-model="fridgeSensor"
             :service-id="config.serviceId"
+            :error="sensorSame"
             label="Fridge Sensor"
-            :rules="sensorRules"
           />
         </q-item-section>
         <q-item-section>
           <QuickStartSensorField
             v-model="beerSensor"
             :service-id="config.serviceId"
+            :error="sensorSame"
             label="Beer Sensor"
-            :rules="sensorRules"
           />
         </q-item-section>
       </q-item>
+      <CardWarning v-if="pinSame">
+        <template #message>
+          Multiple outputs are using the same Pin.
+        </template>
+      </CardWarning>
+      <CardWarning v-if="sensorSame">
+        <template #message>
+          Multiple sensors are using the same Block.
+        </template>
+      </CardWarning>
     </q-card-section>
 
     <q-separator dark />

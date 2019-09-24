@@ -9,10 +9,12 @@ export interface RimsBlockNames {
   kettlePwm: string;
   kettleAct: string;
 
-  mashSetpoint: string;
-  mashPid: string;
-  mashPwm: string;
-  mashAct: string;
+  tubeDriver: string;
+  tubeSensor: string;
+  tubeSetpoint: string;
+  tubePid: string;
+  tubePwm: string;
+  tubeAct: string;
 
   pumpAct: string;
 }
@@ -22,11 +24,13 @@ export interface RimsConfig extends QuickStartOutput {
   prefix: string;
   names: RimsBlockNames;
   kettlePin: PinChannel;
-  mashPin: PinChannel;
+  tubePin: PinChannel;
   pumpPin: PinChannel;
+  kettleSensor: string;
+  tubeSensor: string;
 }
 
 export interface RimsOpts {
   kettleSetting: Unit;
-  mashSetting: Unit;
+  tubeSetting: Unit;
 }

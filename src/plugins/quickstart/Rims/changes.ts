@@ -5,6 +5,8 @@ import { serialize } from '@/helpers/units/parseObject';
 import { typeName as builderType } from '@/plugins/builder/getters';
 import { BuilderItem, BuilderLayout } from '@/plugins/builder/types';
 import { HistoryItem } from '@/plugins/history/Graph/types';
+import { typeName as driverType } from '@/plugins/spark/features/ActuatorOffset/getters';
+import { ActuatorOffsetBlock, OffsetSettingOrValue } from '@/plugins/spark/features/ActuatorOffset/types';
 import { typeName as pwmType } from '@/plugins/spark/features/ActuatorPwm/getters';
 import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
 import { typeName as digiActType } from '@/plugins/spark/features/DigitalActuator/getters';
@@ -25,7 +27,7 @@ import { RimsConfig, RimsOpts } from './types';
 export function defineChangedBlocks(config: RimsConfig): Block[] {
   return unlinkedActuators(config.serviceId, [
     config.kettlePin,
-    config.mashPin,
+    config.tubePin,
     config.pumpPin,
   ]);
 }
@@ -54,13 +56,13 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
       },
     },
     {
-      id: config.names.mashSetpoint,
+      id: config.names.tubeSetpoint,
       type: setpointType,
       serviceId,
       groups,
       data: {
-        sensorId: new Link(config.names.kettleSensor),
-        storedSetting: opts.mashSetting,
+        sensorId: new Link(config.names.tubeSensor),
+        storedSetting: opts.tubeSetting,
         settingEnabled: false,
         setting: new Unit(null, 'degC'),
         value: new Unit(null, 'degC'),
@@ -68,6 +70,24 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
         filter: FilterChoice.Filter15s,
         filterThreshold: new Unit(5, 'delta_degC'),
         resetFilter: false,
+      },
+    },
+    // Setpoint Driver
+    {
+      id: config.names.tubeDriver,
+      type: driverType,
+      serviceId,
+      groups,
+      data: {
+        targetId: new Link(config.names.tubeSetpoint),
+        drivenTargetId: new Link(config.names.tubeSetpoint),
+        referenceId: new Link(config.names.kettleSetpoint),
+        referenceSettingOrValue: OffsetSettingOrValue.Setting,
+        enabled: false,
+        desiredSetting: 0,
+        setting: 0,
+        value: 0,
+        constrainedBy: { constraints: [] },
       },
     },
     // Digital Actuators
@@ -86,13 +106,13 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
       },
     },
     {
-      id: config.names.mashAct,
+      id: config.names.tubeAct,
       type: digiActType,
       serviceId,
       groups,
       data: {
-        hwDevice: new Link(config.mashPin.arrayId),
-        channel: config.mashPin.pinId,
+        hwDevice: new Link(config.tubePin.arrayId),
+        channel: config.tubePin.pinId,
         invert: false,
         desiredState: DigitalState.Inactive,
         state: DigitalState.Inactive,
@@ -131,14 +151,14 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
       },
     },
     {
-      id: config.names.mashPwm,
+      id: config.names.tubePwm,
       type: pwmType,
       serviceId,
       groups,
       data: {
         enabled: true,
         period: new Unit(10, 'second'),
-        actuatorId: new Link(config.names.mashAct),
+        actuatorId: new Link(config.names.tubeAct),
         drivenActuatorId: new Link(null),
         setting: 0,
         desiredSetting: 0,
@@ -163,7 +183,7 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
       },
     },
     {
-      id: config.names.mashPid,
+      id: config.names.tubePid,
       type: pidType,
       serviceId,
       groups,
@@ -173,13 +193,14 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
         ti: new Unit(6, 'hour'),
         td: new Unit(30, 'min'),
         enabled: true,
-        inputId: new Link(config.names.mashSetpoint),
-        outputId: new Link(config.names.mashPwm),
+        inputId: new Link(config.names.tubeSetpoint),
+        outputId: new Link(config.names.tubePwm),
       },
     },
   ] as [
       SetpointSensorPairBlock,
       SetpointSensorPairBlock,
+      ActuatorOffsetBlock,
       DigitalActuatorBlock,
       DigitalActuatorBlock,
       DigitalActuatorBlock,
@@ -243,29 +264,31 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Das
           measurement: config.serviceId,
           fields: [
             `${config.names.kettleSensor}/value[${userTemp}]`,
+            `${config.names.tubeSensor}/value[${userTemp}]`,
             `${config.names.kettleSetpoint}/setting[${userTemp}]`,
-            `${config.names.mashSetpoint}/setting[${userTemp}]`,
+            `${config.names.tubeSetpoint}/setting[${userTemp}]`,
             `${config.names.kettlePwm}/value`,
-            `${config.names.mashPwm}/value`,
+            `${config.names.tubePwm}/value`,
             `${config.names.kettleAct}/state`,
-            `${config.names.mashAct}/state`,
+            `${config.names.tubeAct}/state`,
             `${config.names.pumpAct}/state`,
           ],
         },
       ],
       renames: {
-        [`${config.serviceId}/${config.names.kettleSensor}/value[${userTemp}]`]: 'Wort temperature',
+        [`${config.serviceId}/${config.names.kettleSensor}/value[${userTemp}]`]: 'Kettle temperature',
+        [`${config.serviceId}/${config.names.tubeSensor}/value[${userTemp}]`]: 'Tube temperature',
         [`${config.serviceId}/${config.names.kettleSetpoint}/setting[${userTemp}]`]: 'Kettle setting',
-        [`${config.serviceId}/${config.names.mashSetpoint}/setting[${userTemp}]`]: 'Mash setting',
+        [`${config.serviceId}/${config.names.tubeSetpoint}/setting[${userTemp}]`]: 'Tube setting',
         [`${config.serviceId}/${config.names.kettlePwm}/value`]: 'Kettle PWM value',
-        [`${config.serviceId}/${config.names.mashPwm}/value`]: 'Mash PWM value',
+        [`${config.serviceId}/${config.names.tubePwm}/value`]: 'Tube PWM value',
         [`${config.serviceId}/${config.names.kettleAct}/state`]: 'Kettle Pin state',
-        [`${config.serviceId}/${config.names.mashAct}/state`]: 'Mash Pin state',
+        [`${config.serviceId}/${config.names.tubeAct}/state`]: 'Tube Pin state',
         [`${config.serviceId}/${config.names.pumpAct}/state`]: 'Pump Pin state',
       },
       axes: {
         [`${config.serviceId}/${config.names.kettlePwm}/value`]: 'y2',
-        [`${config.serviceId}/${config.names.mashPwm}/value`]: 'y2',
+        [`${config.serviceId}/${config.names.tubePwm}/value`]: 'y2',
       },
       colors: {},
     },
@@ -284,7 +307,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Das
           id: uid(),
           changes: [
             {
-              blockId: config.names.mashSetpoint,
+              blockId: config.names.tubeSetpoint,
               data: { settingEnabled: false },
             },
             {
@@ -294,7 +317,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Das
           ],
         },
         {
-          name: 'Enable mash heater',
+          name: 'Enable tube heater',
           id: uid(),
           changes: [
             {
@@ -302,7 +325,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Das
               data: { settingEnabled: false },
             },
             {
-              blockId: config.names.mashSetpoint,
+              blockId: config.names.tubeSetpoint,
               data: { settingEnabled: true },
             },
           ],
@@ -312,7 +335,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Das
           id: uid(),
           changes: [
             {
-              blockId: config.names.mashSetpoint,
+              blockId: config.names.tubeSetpoint,
               data: { settingEnabled: false },
             },
             {

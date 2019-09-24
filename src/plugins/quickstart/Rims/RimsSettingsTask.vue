@@ -12,12 +12,12 @@ import { RimsConfig, RimsOpts } from './types';
 @Component
 export default class RimsSettingsTask extends WizardTaskBase<RimsConfig> {
   kettleSetting = new Unit(67, 'degC');
-  mashSetting = new Unit(67, 'degC');
+  tubeSetting = new Unit(67, 'degC');
 
   done(): void {
     const opts: RimsOpts = {
       kettleSetting: this.kettleSetting,
-      mashSetting: this.mashSetting,
+      tubeSetting: this.tubeSetting,
     };
     const createdBlocks = defineCreatedBlocks(this.config, opts);
     const changedBlocks = defineChangedBlocks(this.config);
@@ -38,7 +38,7 @@ export default class RimsSettingsTask extends WizardTaskBase<RimsConfig> {
   created(): void {
     const defaultTemp = convertedTemp(67, sparkStore.units(this.config.serviceId).Temp);
     this.kettleSetting = defaultTemp.copy();
-    this.mashSetting = defaultTemp.copy();
+    this.tubeSetting = defaultTemp.copy();
   }
 }
 </script>
@@ -69,7 +69,7 @@ export default class RimsSettingsTask extends WizardTaskBase<RimsConfig> {
           <q-item-label caption>
             Mash out setpoint
           </q-item-label>
-          <UnitField v-model="mashSetting" title="Mash out setting" />
+          <UnitField v-model="tubeSetting" title="Mash out setting" />
         </q-item-section>
       </q-item>
     </q-card-section>
