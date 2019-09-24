@@ -11,28 +11,25 @@ import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Service, serviceStore } from '@/store/services';
 
-import { blockTypes } from '../../spark/block-types';
-import { FermentConfig, FermentConfigNames } from './types';
+import { GlycolBlockNames, GlycolConfig } from './types';
 
 
 @Component
-export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
-  chosenNames: Partial<FermentConfigNames> = {};
+export default class GlycolNamingTask extends WizardTaskBase<GlycolConfig> {
+  chosenNames: Partial<GlycolBlockNames> = {};
 
-  get defaultNames(): FermentConfigNames {
+  get defaultNames(): GlycolBlockNames {
     return {
-      fridgeSensor: 'Fridge Sensor',
       beerSensor: 'Beer Sensor',
-      fridgeSSPair: 'Fridge Setting',
-      beerSSPair: 'Beer Setting',
-      tempProfile: 'Temperature Profile',
-      coolAct: 'Cool Actuator',
-      heatAct: 'Heat Actuator',
-      coolPwm: 'Cool PWM',
-      heatPwm: 'Heat PWM',
-      mutex: 'Mutex',
+      beerSetpoint: 'Beer Setpoint',
+      beerProfile: 'Beer Profile',
       coolPid: 'Cool PID',
+      coolPwm: 'Cool PWM',
+      coolAct: 'Cool Actuator',
       heatPid: 'Heat PID',
+      heatPwm: 'Heat PWM',
+      heatAct: 'Heat Actuator',
+      mutex: 'Mutex',
     };
   }
 
@@ -56,7 +53,7 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
   }
 
   get title(): string {
-    return valOrDefault(this.config.title, 'Fermentation');
+    return valOrDefault(this.config.title, 'Glycol');
   }
 
   set title(title: string) {
@@ -64,7 +61,7 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
   }
 
   get prefix(): string {
-    return valOrDefault(this.config.prefix, this.title.slice(0, 7));
+    return valOrDefault(this.config.prefix, this.title.slice(0, 6));
   }
 
   set prefix(prefix: string) {
@@ -79,7 +76,7 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
     this.updateConfig({ ...this.config, dashboardTitle: id });
   }
 
-  get names(): FermentConfigNames {
+  get names(): GlycolBlockNames {
     return {
       ...mapValues(this.defaultNames,
         v => suggestId(`${this.prefix} ${v}`, validator(blockIdRules(this.serviceId)))),

@@ -2,11 +2,11 @@ import isEqual from 'lodash/isEqual';
 
 import { WizardAction } from '@/components/Wizard/WizardTaskBase';
 import { builderStore } from '@/plugins/builder/store';
-import { typeName as digiActType } from '@/plugins/spark/features/DigitalActuator/getters';
 import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
+import { blockTypes } from '../spark/block-types';
 import { PinChannel, QuickStartOutput } from './types';
 
 export function unlinkedActuators(serviceId: string, pins: PinChannel[]): DigitalActuatorBlock[] {
@@ -15,11 +15,9 @@ export function unlinkedActuators(serviceId: string, pins: PinChannel[]): Digita
     // Find existing drivers
     .filter(
       block =>
-        block.type === digiActType &&
-        pins.some(
-          (pin: PinChannel) => pin.arrayId === block.data.hwDevice.id && pin.pinId === block.data.channel
-        )
-    )
+        block.type === blockTypes.DigitalActuator
+        && pins.some(
+          (pin: PinChannel) => pin.arrayId === block.data.hwDevice.id && pin.pinId === block.data.channel))
     // Unlink them from pin
     .map((block: DigitalActuatorBlock) => {
       block.data.channel = 0;

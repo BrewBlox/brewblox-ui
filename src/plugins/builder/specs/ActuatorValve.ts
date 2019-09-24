@@ -1,5 +1,4 @@
-import { typeName as actuatorType } from '@/plugins/spark/features/DigitalActuator/getters';
-import { typeName as motorValveType } from '@/plugins/spark/features/MotorValve/getters';
+import { blockTypes } from '@/plugins/spark/block-types';
 import { sparkStore } from '@/plugins/spark/store';
 import { DigitalState } from '@/plugins/spark/types';
 
@@ -12,7 +11,11 @@ const spec: PartSpec = {
   size: () => [1, 1],
   cards: [{
     component: 'LinkedBlockCard',
-    props: { settingsKey: 'valve', types: [motorValveType, actuatorType], label: 'Valve or Actuator' },
+    props: {
+      settingsKey: 'valve',
+      types: [blockTypes.MotorValve, blockTypes.DigitalActuator],
+      label: 'Valve or Actuator',
+    },
   }],
   transitions: (part: PersistentPart): Transitions => {
     const block = settingsBlock(part, 'valve');

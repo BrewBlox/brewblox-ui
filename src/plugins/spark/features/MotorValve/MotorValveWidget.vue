@@ -2,10 +2,10 @@
 import { Component } from 'vue-property-decorator';
 
 import { spaceCased } from '@/helpers/functional';
+import { blockTypes } from '@/plugins/spark/block-types';
 import BlockWidget from '@/plugins/spark/components/BlockWidget';
 
 import { sparkStore } from '../../store';
-import { typeName as spark3PinType } from '../Spark3Pins/getters';
 import { Spark3PinsBlock } from '../Spark3Pins/types';
 import { MotorValveBlock, ValveState } from './types';
 
@@ -19,7 +19,7 @@ export default class MotorValveWidget extends BlockWidget {
 
   get pins(): Spark3PinsBlock | null {
     const block = sparkStore.blockValues(this.serviceId)
-      .find(block => block.type === spark3PinType);
+      .find(block => block.type === blockTypes.Spark3Pins);
     return block ? block as Spark3PinsBlock : null;
   }
 

@@ -2,19 +2,19 @@ import { uid } from 'quasar';
 
 import { Link, Unit } from '@/helpers/units';
 import { serialize } from '@/helpers/units/parseObject';
-import { typeName as builderType } from '@/plugins/builder/getters';
 import { BuilderItem, BuilderLayout } from '@/plugins/builder/types';
 import { HistoryItem } from '@/plugins/history/Graph/types';
-import { typeName as driverType } from '@/plugins/spark/features/ActuatorOffset/getters';
-import { ActuatorOffsetBlock, OffsetSettingOrValue } from '@/plugins/spark/features/ActuatorOffset/types';
-import { typeName as pwmType } from '@/plugins/spark/features/ActuatorPwm/getters';
-import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
-import { typeName as digiActType } from '@/plugins/spark/features/DigitalActuator/getters';
-import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/types';
-import { typeName as pidType } from '@/plugins/spark/features/Pid/getters';
-import { PidBlock, PidData } from '@/plugins/spark/features/Pid/types';
-import { typeName as setpointType } from '@/plugins/spark/features/SetpointSensorPair/getters';
-import { FilterChoice, SetpointSensorPairBlock } from '@/plugins/spark/features/SetpointSensorPair/types';
+import {
+  ActuatorOffsetBlock,
+  ActuatorPwmBlock,
+  blockTypes,
+  DigitalActuatorBlock,
+  FilterChoice,
+  OffsetSettingOrValue,
+  PidBlock,
+  PidData,
+  SetpointSensorPairBlock,
+} from '@/plugins/spark/block-types';
 import { StepViewItem } from '@/plugins/spark/features/StepView/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
@@ -40,7 +40,7 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
     // setpoints
     {
       id: config.names.kettleSetpoint,
-      type: setpointType,
+      type: blockTypes.SetpointSensorPair,
       serviceId,
       groups,
       data: {
@@ -57,7 +57,7 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
     },
     {
       id: config.names.tubeSetpoint,
-      type: setpointType,
+      type: blockTypes.SetpointSensorPair,
       serviceId,
       groups,
       data: {
@@ -75,7 +75,7 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
     // Setpoint Driver
     {
       id: config.names.tubeDriver,
-      type: driverType,
+      type: blockTypes.SetpointDriver,
       serviceId,
       groups,
       data: {
@@ -93,7 +93,7 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
     // Digital Actuators
     {
       id: config.names.kettleAct,
-      type: digiActType,
+      type: blockTypes.DigitalActuator,
       serviceId,
       groups,
       data: {
@@ -107,7 +107,7 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
     },
     {
       id: config.names.tubeAct,
-      type: digiActType,
+      type: blockTypes.DigitalActuator,
       serviceId,
       groups,
       data: {
@@ -121,7 +121,7 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
     },
     {
       id: config.names.pumpAct,
-      type: digiActType,
+      type: blockTypes.DigitalActuator,
       serviceId,
       groups,
       data: {
@@ -136,7 +136,7 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
     // PWM
     {
       id: config.names.kettlePwm,
-      type: pwmType,
+      type: blockTypes.ActuatorPwm,
       serviceId,
       groups,
       data: {
@@ -152,7 +152,7 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
     },
     {
       id: config.names.tubePwm,
-      type: pwmType,
+      type: blockTypes.ActuatorPwm,
       serviceId,
       groups,
       data: {
@@ -169,11 +169,11 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
     // PID
     {
       id: config.names.kettlePid,
-      type: pidType,
+      type: blockTypes.Pid,
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[pidType].generate() as PidData),
+        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
         kp: new Unit(100, '1/degC'),
         ti: new Unit(6, 'hour'),
         td: new Unit(30, 'min'),
@@ -184,11 +184,11 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
     },
     {
       id: config.names.tubePid,
-      type: pidType,
+      type: blockTypes.Pid,
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[pidType].generate() as PidData),
+        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
         kp: new Unit(100, '1/degC'),
         ti: new Unit(6, 'hour'),
         td: new Unit(30, 'min'),
@@ -240,7 +240,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Das
   });
 
   const builder: BuilderItem = {
-    ...createWidget(config.title, builderType),
+    ...createWidget(config.title, 'Builder'),
     cols: 10,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },

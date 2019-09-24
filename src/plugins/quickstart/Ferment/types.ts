@@ -1,3 +1,5 @@
+import { Unit } from '@/helpers/units';
+
 import { PinChannel, QuickStartOutput } from '../types';
 
 export interface FermentConfigNames {
@@ -18,10 +20,15 @@ export interface FermentConfigNames {
 export interface FermentConfig extends QuickStartOutput {
   title: string;
   prefix: string;
-  groups: number[];
   names: FermentConfigNames;
   heatPin: PinChannel;
   coolPin: PinChannel;
   fridgeSensor: string;
   beerSensor: string;
+}
+
+export interface FermentOpts {
+  fridgeSetting: Unit;
+  beerSetting: Unit;
+  activeSetpoint: 'beer' | 'fridge';
 }

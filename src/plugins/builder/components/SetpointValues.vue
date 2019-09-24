@@ -3,10 +3,10 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { contrastColor } from '@/helpers/functional';
-import { typeName as pidType } from '@/plugins/spark/features/Pid/getters';
 import { SetpointSensorPairBlock } from '@/plugins/spark/features/SetpointSensorPair/types';
 import { sparkStore } from '@/plugins/spark/store';
 
+import { blockTypes } from '../../spark/block-types';
 import { SQUARE_SIZE } from '../getters';
 import { settingsBlock } from '../helpers';
 import { PersistentPart } from '../types';
@@ -47,7 +47,7 @@ export default class SetpointValues extends Vue {
       && this.setpoint.data.settingEnabled
       && sparkStore.blockValues(this.setpoint.serviceId)
         .some(block =>
-          block.type === pidType
+          block.type === blockTypes.Pid
           && block.data.inputId.id === (this.setpoint as SetpointSensorPairBlock).id);
   }
 

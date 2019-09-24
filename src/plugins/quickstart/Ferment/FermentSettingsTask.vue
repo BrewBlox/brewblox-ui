@@ -7,7 +7,7 @@ import { sparkStore } from '@/plugins/spark/store';
 
 import { createOutputActions } from '../helpers';
 import { defineChangedBlocks, defineCreatedBlocks, defineLayouts, defineWidgets } from './changes';
-import { FermentConfig } from './types';
+import { FermentConfig, FermentOpts } from './types';
 
 @Component
 export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
@@ -29,11 +29,12 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
   }
 
   done(): void {
-    const createdBlocks = defineCreatedBlocks(
-      this.config,
-      this.fridgeSetting,
-      this.beerSetting,
-      this.activeSetpoint);
+    const opts: FermentOpts = {
+      fridgeSetting: this.fridgeSetting!,
+      beerSetting: this.beerSetting!,
+      activeSetpoint: this.activeSetpoint,
+    };
+    const createdBlocks = defineCreatedBlocks(this.config, opts);
     const changedBlocks = defineChangedBlocks(this.config);
     const layouts = defineLayouts(this.config);
     const widgets = defineWidgets(this.config, layouts);
