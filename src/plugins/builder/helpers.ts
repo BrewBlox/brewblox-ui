@@ -27,7 +27,7 @@ export function asPersistentPart(part: PersistentPart | FlowPart): PersistentPar
 }
 
 export function asStatePart(part: PersistentPart): StatePart {
-  const spec = builderStore.specById(part.type);
+  const spec = builderStore.spec(part);
   return {
     ...part,
     transitions: spec.transitions(part),

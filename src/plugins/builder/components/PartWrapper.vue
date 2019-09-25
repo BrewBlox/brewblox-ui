@@ -5,6 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 
 import { SQUARE_SIZE } from '../getters';
+import { builderStore } from '../store';
 import { FlowPart } from '../types';
 
 
@@ -20,6 +21,10 @@ export default class PartWrapper extends Vue {
 
   @Prop({ type: Boolean, default: false })
   public readonly selected!: boolean;
+
+  get component(): string {
+    return builderStore.component(this.part);
+  }
 
   get rotateTransform(): string {
     const [partSizeX, partSizeY] = this.part.size;
@@ -55,8 +60,8 @@ export default class PartWrapper extends Vue {
 <template>
   <g :transform="transformation">
     <component
-      :is="part.type"
-      v-if="part.type"
+      :is="component"
+      v-if="component"
       :value="part"
       class="BuilderPart"
       v-on="$listeners"
