@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 
 import PartBase from '../components/PartBase';
 import { colorString } from '../helpers';
-import { DEFAULT_EMPTY } from '../specs/Kettle';
+import { DEFAULT_FILL_PCT } from '../specs/Kettle';
 
 @Component
 export default class Kettle extends PartBase {
@@ -12,9 +12,9 @@ export default class Kettle extends PartBase {
     return this.part.settings.text || '';
   }
 
-  get emptySpace(): number {
-    const val = get(this.part.settings, 'emptySpace', DEFAULT_EMPTY);
-    return Math.min(val, this.sizeY - 1);
+  get filledSquares(): number {
+    const pct = get(this.part.settings, 'fillPct', DEFAULT_FILL_PCT);
+    return pct * (this.sizeY / 100);
   }
 
   get color(): string {
@@ -28,9 +28,9 @@ export default class Kettle extends PartBase {
     <rect
       :fill="color"
       :x="2"
-      :y="squares(emptySpace)+2"
+      :y="squares(sizeY-filledSquares)+2"
       :width="squares(sizeX)-4"
-      :height="squares(sizeY-emptySpace)-4"
+      :height="squares(filledSquares)-4"
       rx="2"
       ry="2"
     />

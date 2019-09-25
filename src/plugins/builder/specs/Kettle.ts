@@ -1,7 +1,7 @@
 import { containerTransitions } from '../helpers';
 import { PartSpec, PersistentPart } from '../types';
 
-export const DEFAULT_EMPTY = 1;
+export const DEFAULT_FILL_PCT = 85;
 export const DEFAULT_SIZE_X = 4;
 export const DEFAULT_SIZE_Y = 6;
 
@@ -38,11 +38,11 @@ const spec: PartSpec = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: 'emptySpace',
-        defaultSize: DEFAULT_EMPTY,
-        label: 'Empty space',
+        settingsKey: 'fillPct',
+        defaultSize: DEFAULT_FILL_PCT,
+        label: 'Liquid level (%)',
         min: 0,
-        max: 9,
+        max: 100,
       },
     },
   ],
