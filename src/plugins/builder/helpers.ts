@@ -1,10 +1,11 @@
 import get from 'lodash/get';
 
+import { Coordinates } from '@/helpers/coordinates';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
 import { builderStore } from './store';
-import { FlowPart, LinkedBlock, PersistentPart, StatePart } from './types';
+import { FlowPart, LinkedBlock, PersistentPart, StatePart, Transitions } from './types';
 
 export function settingsBlock<T extends Block>(part: PersistentPart, key: string): T | null {
   const serviceId = get(part.settings, [key, 'serviceId'], null);
@@ -89,4 +90,33 @@ export function colorString(val: string | null): string {
   return val
     ? (val.startsWith('#') ? val : `#${val}`)
     : '';
+}
+
+export function containerTransitions([sizeX, sizeY]: [number, number], color?: string): Transitions {
+  const coords = Array(sizeX * sizeY)
+    .fill(0)
+    .map((_, n) => {
+      const outFlow = new Coordinates({ x: (n % sizeX) + 0.5, y: Math.floor(n / sizeX) + 0.5, z: 0 });
+      const inFlow = new Coordinates({ x: (n % sizeX) + 0.1, y: Math.floor(n / sizeX) + 0.1, z: 0 });
+      return { in: inFlow.toString(), out: outFlow.toString() };
+    });
+
+  const result = {};
+
+  coords.forEach(item => {
+    result[item.out] = [{
+      outCoords: item.in,
+      friction: 0,
+      sink: true,
+    }];
+    result[item.in] = [{
+      outCoords: item.out,
+      pressure: 0,
+      friction: 0,
+      liquids: color ? [color] : [],
+      source: true,
+    }];
+  });
+
+  return result;
 }
