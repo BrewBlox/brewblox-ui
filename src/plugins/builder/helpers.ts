@@ -1,9 +1,10 @@
 import get from 'lodash/get';
 
-import { Coordinates } from '@/helpers/coordinates';
+import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
+import { SQUARE_SIZE } from './getters';
 import { builderStore } from './store';
 import { FlowPart, LinkedBlock, PersistentPart, StatePart, Transitions } from './types';
 
@@ -119,4 +120,28 @@ export function containerTransitions([sizeX, sizeY]: [number, number], color?: s
   });
 
   return result;
+}
+
+export function squares(val: number): number {
+  return SQUARE_SIZE * val;
+}
+
+export function textTransformation(part: PersistentPart, textSize: [number, number], counterRotate = true): string {
+  const [sizeX] = rotatedSize(part.rotate, textSize);
+  const transforms: string[] = [];
+  if (part.flipped) {
+    transforms.push(`translate(${squares(sizeX)}, 0) scale(-1,1)`);
+  }
+  if (part.rotate && counterRotate) {
+    transforms.push(`rotate(${-part.rotate},${squares(0.5 * textSize[0])},${squares(0.5 * textSize[1])})`);
+  }
+  return transforms.join(' ');
+}
+
+export function elbow(dX: number, dY: number, horizontal: boolean): string {
+  const dx1 = horizontal ? 0.5 * dX : 0;
+  const dy1 = horizontal ? 0 : 0.5 * dY;
+  const dx2 = horizontal ? dX : 0.5 * dX;
+  const dy2 = horizontal ? 0.5 * dY : dY;
+  return `c${dx1},${dy1} ${dx2},${dy2} ${dX},${dY}`;
 }

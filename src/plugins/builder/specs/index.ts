@@ -23,6 +23,7 @@ import ProfileDisplay from './ProfileDisplay';
 import Pump from './Pump';
 import PwmDisplay from './PwmDisplay';
 import PwmPump from './PwmPump';
+import RimsTube from './RimsTube';
 import SensorDisplay from './SensorDisplay';
 import SetpointDisplay from './SetpointDisplay';
 import ShiftedSystemIO from './ShiftedSystemIO';
@@ -58,6 +59,7 @@ const specs: { [key: string]: PartSpec } = {
   Pump,
   PwmDisplay,
   PwmPump,
+  RimsTube,
   SensorDisplay,
   SetpointDisplay,
   ShiftedSystemIO,

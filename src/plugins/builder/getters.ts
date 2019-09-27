@@ -19,6 +19,14 @@ export const HOT_WATER = '#DB0023';
 export const BEER = '#E1AC00';
 export const WORT = '#C78A49';
 
+export const INNER_LINE = 21;
+export const OUTER_LINE = 29;
+export const LIQUID_LINE = 25;
+
+export const INNER_CORNER = 4;
+export const OUTER_CORNER = 12;
+export const LIQUID_CORNER = 8;
+
 export const deprecatedTypes = {
   SmallKettle: 'Kettle',
   LargeKettle: 'Kettle',
