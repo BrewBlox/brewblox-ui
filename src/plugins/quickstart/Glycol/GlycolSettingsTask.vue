@@ -6,8 +6,9 @@ import { convertedTemp, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
 import { createOutputActions } from '../helpers';
-// import { defineChangedBlocks, defineCreatedBlocks, defineLayouts, defineWidgets } from './changes';
-import { GlycolConfig } from './types';
+import { defineChangedBlocks, defineCreatedBlocks, defineWidgets } from './changes';
+import { defineLayouts } from './changes-layout';
+import { GlycolConfig, GlycolOpts } from './types';
 
 @Component
 export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
@@ -15,23 +16,20 @@ export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
 
 
   done(): void {
-    // const createdBlocks = defineCreatedBlocks(
-    //   this.config,
-    //   this.fridgeSetting,
-    //   this.beerSetting,
-    //   this.activeSetpoint);
-    // const changedBlocks = defineChangedBlocks(this.config);
-    // const layouts = defineLayouts(this.config);
-    // const widgets = defineWidgets(this.config, layouts);
+    const opts: GlycolOpts = { setting: this.beerSetting };
+    const createdBlocks = defineCreatedBlocks(this.config, opts);
+    const changedBlocks = defineChangedBlocks(this.config);
+    const layouts = defineLayouts(this.config);
+    const widgets = defineWidgets(this.config, layouts);
 
     this.pushActions(createOutputActions());
-    // this.updateConfig({
-    //   ...this.config,
-    //   layouts,
-    //   widgets,
-    //   changedBlocks,
-    //   createdBlocks,
-    // });
+    this.updateConfig({
+      ...this.config,
+      layouts,
+      widgets,
+      changedBlocks,
+      createdBlocks,
+    });
     this.next();
   }
 

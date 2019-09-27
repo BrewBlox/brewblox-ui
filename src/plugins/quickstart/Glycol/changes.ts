@@ -109,8 +109,8 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       serviceId,
       groups,
       data: {
-        hwDevice: new Link(config.heatPin!.arrayId),
-        channel: config.heatPin!.pinId,
+        hwDevice: new Link(config.heatPin ? config.heatPin!.arrayId : null),
+        channel: config.heatPin ? config.heatPin!.pinId : 0,
         invert: false,
         desiredState: DigitalState.Inactive,
         state: DigitalState.Inactive,
@@ -201,18 +201,6 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
     : blocks.filter(block => !heatingBlocks.includes(block.id));
 }
 
-export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
-  return [
-    {
-      id: uid(),
-      title: `${config.prefix} Layout`,
-      width: 6,
-      height: 10,
-      parts: [],
-    },
-  ];
-}
-
 export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): DashboardItem[] {
   const userTemp = sparkStore.units(config.serviceId).Temp;
 
@@ -231,7 +219,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): D
 
   const builder: BuilderItem = {
     ...createWidget(config.title, 'Builder'),
-    cols: 10,
+    cols: 4,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
     config: {
@@ -245,7 +233,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): D
     ...createWidget(`${config.prefix} Graph`, 'Graph'),
     cols: 6,
     rows: 5,
-    pinnedPosition: { x: 5, y: 6 },
+    pinnedPosition: { x: 5, y: 1 },
     config: {
       layout: {},
       params: { duration: '10m' },
@@ -295,7 +283,28 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): D
     pinnedPosition: { x: 1, y: 6 },
     config: {
       serviceId: config.serviceId,
-      steps: serialize([]),
+      steps: serialize([
+        {
+          name: 'Enable',
+          id: uid(),
+          changes: [
+            {
+              blockId: config.names.beerSetpoint,
+              data: { settingEnabled: true },
+            },
+          ],
+        },
+        {
+          name: 'Disable',
+          id: uid(),
+          changes: [
+            {
+              blockId: config.names.beerSetpoint,
+              data: { settingEnabled: false },
+            },
+          ],
+        },
+      ]),
     },
   };
 
