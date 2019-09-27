@@ -11,7 +11,6 @@ import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Service, serviceStore } from '@/store/services';
 
-import { blockTypes } from '../../spark/block-types';
 import { FermentConfig, FermentConfigNames } from './types';
 
 

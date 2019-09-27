@@ -9,6 +9,7 @@ export interface RimsBlockNames {
   kettlePwm: string;
   kettleAct: string;
 
+  tubeDriverPid: string;
   tubeDriver: string;
   tubeSensor: string;
   tubeSetpoint: string;
@@ -17,6 +18,9 @@ export interface RimsBlockNames {
   tubeAct: string;
 
   pumpAct: string;
+
+  mutex: string;
+  balancer: string;
 }
 
 export interface RimsConfig extends QuickStartOutput {
@@ -32,5 +36,4 @@ export interface RimsConfig extends QuickStartOutput {
 
 export interface RimsOpts {
   kettleSetting: Unit;
-  tubeSetting: Unit;
 }

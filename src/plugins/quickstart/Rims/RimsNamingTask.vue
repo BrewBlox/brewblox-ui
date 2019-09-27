@@ -25,6 +25,7 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
       kettlePid: 'Kettle PID',
       kettlePwm: 'Kettle PWM',
       kettleAct: 'Kettle Actuator',
+      tubeDriverPid: 'Tube Driver PID',
       tubeDriver: 'Tube Setpoint Driver',
       tubeSensor: 'Tube Sensor',
       tubeSetpoint: 'Tube Setpoint',
@@ -32,6 +33,8 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
       tubePwm: 'Tube PWM',
       tubeAct: 'Tube Actuator',
       pumpAct: 'Pump Actuator',
+      mutex: 'Heater Mutex',
+      balancer: 'Heater Balancer',
     };
   }
 

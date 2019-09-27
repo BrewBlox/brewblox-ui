@@ -7,14 +7,17 @@ import { HistoryItem } from '@/plugins/history/Graph/types';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
+  BalancerBlock,
   blockTypes,
   DigitalActuatorBlock,
   FilterChoice,
+  MutexBlock,
   OffsetSettingOrValue,
   PidBlock,
   PidData,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
+import { AnalogConstraint, DigitalConstraint } from '@/plugins/spark/components/Constraints/ConstraintsBase';
 import { StepViewItem } from '@/plugins/spark/features/StepView/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
@@ -36,7 +39,40 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
   const groups = [0];
   const serviceId = config.serviceId;
 
+  const pwmConstraints: AnalogConstraint[] = [
+    {
+      balanced: {
+        balancerId: new Link(config.names.balancer, blockTypes.Balancer),
+        granted: 0,
+        id: 0,
+      },
+      limiting: false,
+    },
+  ];
+
+  const heaterConstraints: DigitalConstraint[] = [
+    { mutex: new Link(config.names.mutex, blockTypes.Mutex), limiting: false },
+  ];
+
   return [
+    // Mutex
+    {
+      id: config.names.mutex,
+      type: blockTypes.Mutex,
+      serviceId,
+      groups,
+      data: {
+        differentActuatorWait: new Unit(0, 'second'),
+      },
+    },
+    // Balancer
+    {
+      id: config.names.balancer,
+      type: blockTypes.Balancer,
+      serviceId,
+      groups,
+      data: { clients: [] },
+    },
     // setpoints
     {
       id: config.names.kettleSetpoint,
@@ -46,7 +82,7 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
       data: {
         sensorId: new Link(config.names.kettleSensor),
         storedSetting: opts.kettleSetting,
-        settingEnabled: false,
+        settingEnabled: true,
         setting: new Unit(null, 'degC'),
         value: new Unit(null, 'degC'),
         valueUnfiltered: new Unit(null, 'degC'),
@@ -62,8 +98,8 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
       groups,
       data: {
         sensorId: new Link(config.names.tubeSensor),
-        storedSetting: opts.tubeSetting,
-        settingEnabled: false,
+        storedSetting: opts.kettleSetting,
+        settingEnabled: true,
         setting: new Unit(null, 'degC'),
         value: new Unit(null, 'degC'),
         valueUnfiltered: new Unit(null, 'degC'),
@@ -83,7 +119,7 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
         drivenTargetId: new Link(config.names.tubeSetpoint),
         referenceId: new Link(config.names.kettleSetpoint),
         referenceSettingOrValue: OffsetSettingOrValue.Setting,
-        enabled: false,
+        enabled: true,
         desiredSetting: 0,
         setting: 0,
         value: 0,
@@ -102,7 +138,7 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
         invert: false,
         desiredState: DigitalState.Inactive,
         state: DigitalState.Inactive,
-        constrainedBy: { constraints: [] },
+        constrainedBy: { constraints: heaterConstraints },
       },
     },
     {
@@ -116,7 +152,7 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
         invert: false,
         desiredState: DigitalState.Inactive,
         state: DigitalState.Inactive,
-        constrainedBy: { constraints: [] },
+        constrainedBy: { constraints: heaterConstraints },
       },
     },
     {
@@ -147,7 +183,7 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
         setting: 0,
         desiredSetting: 0,
         value: 0,
-        constrainedBy: { constraints: [] },
+        constrainedBy: { constraints: pwmConstraints },
       },
     },
     {
@@ -163,7 +199,7 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
         setting: 0,
         desiredSetting: 0,
         value: 0,
-        constrainedBy: { constraints: [] },
+        constrainedBy: { constraints: pwmConstraints },
       },
     },
     // PID
@@ -177,9 +213,24 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
         kp: new Unit(100, '1/degC'),
         ti: new Unit(6, 'hour'),
         td: new Unit(30, 'min'),
-        enabled: true,
+        enabled: false,
         inputId: new Link(config.names.kettleSetpoint),
         outputId: new Link(config.names.kettlePwm),
+      },
+    },
+    {
+      id: config.names.tubeDriverPid,
+      type: blockTypes.Pid,
+      serviceId,
+      groups,
+      data: {
+        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
+        kp: new Unit(100, '1/degC'),
+        ti: new Unit(6, 'hour'),
+        td: new Unit(30, 'min'),
+        enabled: false,
+        inputId: new Link(config.names.kettleSetpoint),
+        outputId: new Link(config.names.tubeDriver),
       },
     },
     {
@@ -192,12 +243,14 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
         kp: new Unit(100, '1/degC'),
         ti: new Unit(6, 'hour'),
         td: new Unit(30, 'min'),
-        enabled: true,
+        enabled: false,
         inputId: new Link(config.names.tubeSetpoint),
         outputId: new Link(config.names.tubePwm),
       },
     },
   ] as [
+      MutexBlock,
+      BalancerBlock,
       SetpointSensorPairBlock,
       SetpointSensorPairBlock,
       ActuatorOffsetBlock,
@@ -208,19 +261,8 @@ export function defineCreatedBlocks(config: RimsConfig, opts: RimsOpts): Block[]
       ActuatorPwmBlock,
       PidBlock,
       PidBlock,
+      PidBlock,
     ];
-}
-
-export function defineLayouts(config: RimsConfig): BuilderLayout[] {
-  return [
-    {
-      id: uid(),
-      title: `${config.prefix} Kettle`,
-      width: 28,
-      height: 15,
-      parts: [],
-    },
-  ];
 }
 
 export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): DashboardItem[] {
@@ -241,7 +283,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Das
 
   const builder: BuilderItem = {
     ...createWidget(config.title, 'Builder'),
-    cols: 10,
+    cols: 5,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
     config: {
@@ -255,7 +297,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Das
     ...createWidget(`${config.prefix} Graph`, 'Graph'),
     cols: 6,
     rows: 5,
-    pinnedPosition: { x: 5, y: 6 },
+    pinnedPosition: { x: 6, y: 1 },
     config: {
       layout: {},
       params: { duration: '10m' },
@@ -307,26 +349,58 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Das
           id: uid(),
           changes: [
             {
-              blockId: config.names.tubeSetpoint,
-              data: { settingEnabled: false },
+              blockId: config.names.tubePid,
+              data: { enabled: false },
             },
             {
-              blockId: config.names.kettleSetpoint,
-              data: { settingEnabled: true },
+              blockId: config.names.tubeDriverPid,
+              data: { enabled: false },
+            },
+            {
+              blockId: config.names.kettlePid,
+              data: { enabled: true },
             },
           ],
         },
         {
-          name: 'Enable tube heater',
+          name: 'Enable tube heater + pump',
           id: uid(),
           changes: [
             {
-              blockId: config.names.kettleSetpoint,
-              data: { settingEnabled: false },
+              blockId: config.names.pumpAct,
+              data: { desiredState: DigitalState.Active },
             },
             {
-              blockId: config.names.tubeSetpoint,
-              data: { settingEnabled: true },
+              blockId: config.names.tubePid,
+              data: { enabled: true },
+            },
+            {
+              blockId: config.names.tubeDriverPid,
+              data: { enabled: true },
+            },
+            {
+              blockId: config.names.kettlePid,
+              data: { enabled: false },
+            },
+          ],
+        },
+        {
+          name: 'Enable pump',
+          id: uid(),
+          changes: [
+            {
+              blockId: config.names.pumpAct,
+              data: { desiredState: DigitalState.Active },
+            },
+          ],
+        },
+        {
+          name: 'Disable pump',
+          id: uid(),
+          changes: [
+            {
+              blockId: config.names.pumpAct,
+              data: { desiredState: DigitalState.Inactive },
             },
           ],
         },
@@ -335,12 +409,20 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Das
           id: uid(),
           changes: [
             {
-              blockId: config.names.tubeSetpoint,
-              data: { settingEnabled: false },
+              blockId: config.names.tubePid,
+              data: { enabled: false },
             },
             {
-              blockId: config.names.kettleSetpoint,
-              data: { settingEnabled: false },
+              blockId: config.names.tubeDriverPid,
+              data: { enabled: false },
+            },
+            {
+              blockId: config.names.kettlePid,
+              data: { enabled: false },
+            },
+            {
+              blockId: config.names.pumpAct,
+              data: { desiredState: DigitalState.Inactive },
             },
           ],
         },

@@ -1,5 +1,4 @@
 <script lang="ts">
-import pick from 'lodash/pick';
 import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
