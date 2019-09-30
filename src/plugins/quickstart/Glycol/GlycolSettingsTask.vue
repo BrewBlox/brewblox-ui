@@ -13,10 +13,11 @@ import { GlycolConfig, GlycolOpts } from './types';
 @Component
 export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
   beerSetting = new Unit(20, 'degC');
+  glycolSetting = new Unit(4, 'degC');
 
 
   done(): void {
-    const opts: GlycolOpts = { setting: this.beerSetting };
+    const opts: GlycolOpts = { beerSetting: this.beerSetting, glycolSetting: this.glycolSetting };
     const createdBlocks = defineCreatedBlocks(this.config, opts);
     const changedBlocks = defineChangedBlocks(this.config);
     const layouts = defineLayouts(this.config);
@@ -34,7 +35,9 @@ export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
   }
 
   created(): void {
-    this.beerSetting = convertedTemp(20, sparkStore.units(this.config.serviceId).Temp);
+    const unit = sparkStore.units(this.config.serviceId).Temp;
+    this.beerSetting = convertedTemp(20, unit);
+    this.glycolSetting = convertedTemp(4, unit);
   }
 }
 </script>
@@ -45,19 +48,31 @@ export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
       <q-item dark class="text-weight-light">
         <q-item-section>
           <q-item-label class="text-subtitle1">
-            Initial setpoint
+            Initial setpoints
           </q-item-label>
-          <p>The setup creates a setpoint to control your beer temperature</p>
-          <p>You can set the initial value now.</p>
+          <p v-if="config.glycolControl === 'Control'">
+            The setup creates a setpoint for your beer temperature and your glycol temperature.
+          </p>
+          <p v-else>
+            The setup creates a setpoint for your beer temperature.
+          </p>
+          <p>You can set the initial values now.</p>
         </q-item-section>
       </q-item>
       <q-item dark>
-        <q-item-section class="col-auto">
+        <q-item-section>
           <q-item-label caption>
             Beer setpoint
           </q-item-label>
           <UnitField v-model="beerSetting" title="Beer setting" />
         </q-item-section>
+        <q-item-section v-if="config.glycolControl==='Control'">
+          <q-item-label caption>
+            Glycol setpoint
+          </q-item-label>
+          <UnitField v-model="glycolSetting" title="Glycol setting" />
+        </q-item-section>
+        <q-item-section v-else />
       </q-item>
     </q-card-section>
 

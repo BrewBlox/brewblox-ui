@@ -29,6 +29,11 @@ export default class GlycolNamingTask extends WizardTaskBase<GlycolConfig> {
       heatPid: 'Heat PID',
       heatPwm: 'Heat PWM',
       heatAct: 'Heat Actuator',
+      glycolSensor: 'Glycol Sensor',
+      glycolSetpoint: 'Glycol Setpoint',
+      glycolPid: 'Glycol PID',
+      glycolPwm: 'Glycol PWM',
+      glycolAct: 'Glycol Actuator',
       mutex: 'Mutex',
     };
   }
@@ -53,7 +58,7 @@ export default class GlycolNamingTask extends WizardTaskBase<GlycolConfig> {
   }
 
   get title(): string {
-    return valOrDefault(this.config.title, 'Glycol');
+    return valOrDefault(this.config.title, 'Fermentation');
   }
 
   set title(title: string) {
@@ -61,7 +66,7 @@ export default class GlycolNamingTask extends WizardTaskBase<GlycolConfig> {
   }
 
   get prefix(): string {
-    return valOrDefault(this.config.prefix, this.title.slice(0, 6));
+    return valOrDefault(this.config.prefix, this.title.slice(0, 7));
   }
 
   set prefix(prefix: string) {

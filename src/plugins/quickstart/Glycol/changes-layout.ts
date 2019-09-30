@@ -1,6 +1,6 @@
 import { uid } from 'quasar';
 
-import { BuilderLayout } from '@/plugins/builder/types';
+import { BuilderLayout, PersistentPart } from '@/plugins/builder/types';
 
 import { GlycolConfig } from './types';
 
@@ -28,10 +28,37 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
         flipped: false,
         type: 'PwmDisplay',
         x: 2,
-        y: 5,
+        y: 6,
       },
     ]
     : [];
+
+  const glycolParts: PersistentPart[] = [];
+  if (config.glycolControl === 'Control') {
+    glycolParts.push(
+      {
+        id: uid(),
+        rotate: 0,
+        settings: { setpoint: { serviceId: config.serviceId, blockId: config.names.glycolSetpoint } },
+        flipped: false,
+        type: 'SetpointDisplay',
+        x: 6,
+        y: 8,
+      });
+  }
+  else if (config.glycolControl === 'Measure') {
+    glycolParts.push(
+      {
+        id: uid(),
+        rotate: 0,
+        settings: { sensor: { serviceId: config.serviceId, blockId: config.names.glycolSensor } },
+        flipped: false,
+        type: 'SensorDisplay',
+        x: 7,
+        y: 7,
+      });
+  }
+
 
   return [
     {
@@ -41,6 +68,7 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
       height: 15,
       parts: [
         ...heatingParts,
+        ...glycolParts,
         {
           id: uid(),
           rotate: 0,
@@ -68,7 +96,7 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
             sizeX: 2,
             sizeY: 3,
             emptySpace: 0,
-            color: '#afcfed',
+            color: '#69bcff',
             fillPct: 100,
           },
           flipped: false,
@@ -201,17 +229,6 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 5,
           y: 4,
-        },
-        {
-          id: uid(),
-          rotate: 0,
-          settings: {
-            pwm: { serviceId: config.serviceId, blockId: config.names.coolPwm },
-          },
-          flipped: false,
-          type: 'PwmDisplay',
-          x: 6,
-          y: 6,
         },
         {
           id: uid(),

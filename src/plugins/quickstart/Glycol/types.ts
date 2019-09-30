@@ -16,6 +16,14 @@ export interface GlycolBlockNames {
   heatAct: string;
 
   mutex: string;
+
+  glycolSensor: string;
+
+  glycolSetpoint: string;
+  glycolPid: string;
+  glycolPwm: string;
+
+  glycolAct: string;
 }
 
 export interface GlycolConfig extends QuickStartOutput {
@@ -25,9 +33,15 @@ export interface GlycolConfig extends QuickStartOutput {
   heated: boolean;
   coolPin: PinChannel;
   heatPin: PinChannel | null;
+
+  glycolPin: PinChannel | null;
+  glycolSensor: string;
   beerSensor: string;
+
+  glycolControl: 'No' | 'Measure' | 'Control';
 }
 
 export interface GlycolOpts {
-  setting: Unit;
+  beerSetting: Unit;
+  glycolSetting: Unit;
 }
