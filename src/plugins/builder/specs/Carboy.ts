@@ -1,7 +1,6 @@
-import { showBlockDialog } from '@/helpers/dialog';
-import { typeName as setpointType } from '@/plugins/spark/features/SetpointSensorPair/getters';
+import { blockTypes } from '@/plugins/spark/block-types';
 
-import { settingsBlock } from '../helpers';
+import { showLinkedBlockDialog } from '../helpers';
 import { PartSpec, PersistentPart } from '../types';
 
 const SIZE_X = 2;
@@ -15,7 +14,7 @@ const spec: PartSpec = {
       component: 'LinkedBlockCard',
       props: {
         settingsKey: 'setpoint',
-        types: [setpointType],
+        types: [blockTypes.SetpointSensorPair],
         label: 'Setpoint',
       },
     },
@@ -24,7 +23,7 @@ const spec: PartSpec = {
     },
   ],
   size: () => [SIZE_X, SIZE_Y],
-  interactHandler: (part: PersistentPart) => showBlockDialog(settingsBlock(part, 'setpoint')),
+  interactHandler: (part: PersistentPart) => showLinkedBlockDialog(part, 'setpoint'),
 };
 
 export default spec;
