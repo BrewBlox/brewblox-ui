@@ -46,6 +46,12 @@ export default class LinkedBlockCard extends PartCard {
     });
   }
 
+  get broken(): boolean {
+    return !!this.linked.serviceId
+      && !!this.linked.blockId
+      && !sparkStore.tryBlockById(this.linked.serviceId, this.linked.blockId);
+  }
+
   get linkedOpts(): { label: string; value: LinkedBlock }[] {
     const sorter = objectStringSorter('id');
     return this.sparkServices
@@ -124,6 +130,7 @@ export default class LinkedBlockCard extends PartCard {
           v-model="linked"
           :options="linkedOpts"
           :label="label"
+          :error="broken"
           clearable
           dark
           options-dark
@@ -136,6 +143,9 @@ export default class LinkedBlockCard extends PartCard {
                 No results
               </q-item-section>
             </q-item>
+          </template>
+          <template v-slot:error>
+            <div>Link broken: {{ linked.blockId }} not found</div>
           </template>
           <template v-if="!noCreate" v-slot:after>
             <BlockFormButton

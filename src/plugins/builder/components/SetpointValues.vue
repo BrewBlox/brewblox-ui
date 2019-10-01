@@ -8,7 +8,7 @@ import { sparkStore } from '@/plugins/spark/store';
 
 import { blockTypes } from '../../spark/block-types';
 import { SQUARE_SIZE } from '../getters';
-import { settingsBlock } from '../helpers';
+import { settingsBlock, settingsLink } from '../helpers';
 import { PersistentPart } from '../types';
 
 @Component
@@ -38,40 +38,48 @@ export default class SetpointValues extends Vue {
       : 'white';
   }
 
-  get setpoint(): SetpointSensorPairBlock | null {
+  get block(): SetpointSensorPairBlock | null {
     return settingsBlock(this.part, this.settingsKey);
   }
 
   get isUsed(): boolean {
-    return !!this.setpoint
-      && this.setpoint.data.settingEnabled
-      && sparkStore.blockValues(this.setpoint.serviceId)
+    return !!this.block
+      && this.block.data.settingEnabled
+      && sparkStore.blockValues(this.block.serviceId)
         .some(block =>
           block.type === blockTypes.Pid
-          && block.data.inputId.id === (this.setpoint as SetpointSensorPairBlock).id);
+          && block.data.inputId.id === (this.block as SetpointSensorPairBlock).id);
   }
 
   get isDriven(): boolean {
-    return !!this.setpoint
-      && sparkStore.drivenChains(this.setpoint.serviceId)
-        .some(chain => chain[0] === (this.setpoint as SetpointSensorPairBlock).id);
+    return !!this.block
+      && sparkStore.drivenChains(this.block.serviceId)
+        .some(chain => chain[0] === (this.block as SetpointSensorPairBlock).id);
+  }
+
+  get isBroken(): boolean {
+    if (this.block) {
+      return false;
+    }
+    const link = settingsLink(this.part, this.settingsKey);
+    return !!link.serviceId && !!link.blockId;
   }
 
   get setpointSetting(): number | null {
-    return this.setpoint && this.isUsed
-      ? this.setpoint.data.storedSetting.value
+    return this.block && this.isUsed
+      ? this.block.data.storedSetting.value
       : null;
   }
 
   get setpointValue(): number | null {
-    return this.setpoint
-      ? this.setpoint.data.value.value
+    return this.block
+      ? this.block.data.value.value
       : null;
   }
 
   get setpointUnit(): string {
-    return this.setpoint
-      ? this.setpoint.data.storedSetting.notation
+    return this.block
+      ? this.block.data.storedSetting.notation
       : '';
   }
 
@@ -82,17 +90,18 @@ export default class SetpointValues extends Vue {
 </script>
 
 <template>
-  <g v-if="setpoint || !hideUnset" :transform="`translate(${squares(startX)}, ${squares(startY)})`">
+  <g v-if="block || !hideUnset" :transform="`translate(${squares(startX)}, ${squares(startY)})`">
     <foreignObject :width="squares(2)" :height="squares(1)">
-      <div :class="[`text-${textColor}`, 'text-bold', 'q-ml-md', 'q-mt-xs']">
+      <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
+      <div v-else :class="[`text-${textColor}`, 'text-bold', 'q-ml-md', 'q-mt-xs']">
         <q-icon name="mdi-thermometer" class="q-mr-sm" />
         {{ setpointValue | round(1) }}
-        <q-icon v-if="!setpoint" name="mdi-link-variant-off" />
+        <q-icon v-if="!block" name="mdi-link-variant-off" />
         <small v-else>{{ setpointUnit }}</small>
         <br />
         <q-icon :name="isDriven ? 'mdi-swap-vertical-bold' : 'mdi-bullseye-arrow'" class="q-mr-sm" />
         {{ setpointSetting | round(1) }}
-        <q-icon v-if="!setpoint" name="mdi-link-variant-off" />
+        <q-icon v-if="!block" name="mdi-link-variant-off" />
         <small v-else>{{ setpointUnit }}</small>
       </div>
     </foreignObject>

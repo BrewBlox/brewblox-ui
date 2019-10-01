@@ -1,7 +1,6 @@
-import { showBlockDialog } from '@/helpers/dialog';
-import { typeName } from '@/plugins/spark/features/ActuatorPwm/getters';
+import { blockTypes } from '@/plugins/spark/block-types';
 
-import { settingsBlock } from '../helpers';
+import { showLinkedBlockDialog } from '../helpers';
 import { PartSpec, PersistentPart } from '../types';
 
 const DEFAULT_SIZE_X = 5;
@@ -22,7 +21,7 @@ const spec: PartSpec = {
     },
     {
       component: 'LinkedBlockCard',
-      props: { settingsKey: 'pwm', types: [typeName], label: 'PWM' },
+      props: { settingsKey: 'pwm', types: [blockTypes.ActuatorPwm], label: 'PWM' },
     },
   ],
   size: (part: PersistentPart) => [
@@ -30,7 +29,7 @@ const spec: PartSpec = {
     SIZE_Y,
   ],
   transitions: () => ({}),
-  interactHandler: (part: PersistentPart) => showBlockDialog(settingsBlock(part, 'pwm')),
+  interactHandler: (part: PersistentPart) => showLinkedBlockDialog(part, 'pwm'),
 };
 
 export default spec;

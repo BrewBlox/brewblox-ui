@@ -1,6 +1,7 @@
 import get from 'lodash/get';
 
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
+import { createDialog, showBlockDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
@@ -144,4 +145,21 @@ export function elbow(dX: number, dY: number, horizontal: boolean): string {
   const dx2 = horizontal ? dX : 0.5 * dX;
   const dy2 = horizontal ? 0.5 * dY : dY;
   return `c${dx1},${dy1} ${dx2},${dy2} ${dX},${dY}`;
+}
+
+export function showLinkedBlockDialog(part: PersistentPart, key: string): void {
+  const block = settingsBlock(part, key);
+  if (block) {
+    showBlockDialog(block);
+  }
+  else {
+    const link = settingsLink(part, key);
+    if (!!link.serviceId && !!link.blockId) {
+      createDialog({
+        dark: true,
+        title: 'Broken Link',
+        message: `Block '${link.blockId}' was not found. Use the editor to change the link.`,
+      });
+    }
+  }
 }
