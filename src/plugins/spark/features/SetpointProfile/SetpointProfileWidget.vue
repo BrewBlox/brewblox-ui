@@ -20,8 +20,11 @@ export default class SetpointProfileWidget extends BlockWidget {
   }
 
   mounted(): void {
-    this.$watch('widget.cols', () => this.revision++);
-    this.$watch('widget.rows', () => this.revision++);
+    const updateGraph = (): any => this.revision++;
+    this.$watch('block.data.targetId.id', updateGraph);
+    this.$watch('block.data.enabled', updateGraph);
+    this.$watch('widget.cols', updateGraph);
+    this.$watch('widget.rows', updateGraph);
   }
 }
 </script>
