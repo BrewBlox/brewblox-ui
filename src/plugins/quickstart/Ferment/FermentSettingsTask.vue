@@ -37,7 +37,7 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
     const createdBlocks = defineCreatedBlocks(this.config, opts);
     const changedBlocks = defineChangedBlocks(this.config);
     const layouts = defineLayouts(this.config);
-    const widgets = defineWidgets(this.config, layouts);
+    const widgets = defineWidgets(this.config, opts, layouts);
 
     this.pushActions(createOutputActions());
     this.updateConfig({

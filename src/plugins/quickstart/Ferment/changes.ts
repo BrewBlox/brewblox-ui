@@ -1,5 +1,6 @@
 import { uid } from 'quasar';
 
+import { durationMs } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
 import { ProcessValueLink } from '@/helpers/units/KnownLinks';
 import { serialize } from '@/helpers/units/parseObject';
@@ -60,6 +61,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
   const { fridgeSetting, beerSetting, activeSetpoint } = opts;
   const isBeer = activeSetpoint === 'beer';
   const activeSetpointId = isBeer ? config.names.beerSSPair : config.names.fridgeSSPair;
+  const initialSetting = isBeer ? beerSetting : fridgeSetting;
 
   const coolPidConfig: Partial<PidData> = isBeer
     ? beerCoolConfig
@@ -195,8 +197,12 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
         start: new Date().getTime() / 1000,
         enabled: false,
         targetId: new Link(activeSetpointId),
-        points: [],
         drivenTargetId: new Link(null),
+        points: [
+          { time: 0, temperature: initialSetting },
+          { time: durationMs('7d') / 1000, temperature: initialSetting },
+          { time: durationMs('10d') / 1000, temperature: initialSetting.copy(initialSetting.value! + 3) },
+        ],
       },
     },
     // PID
@@ -337,7 +343,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
   ];
 };
 
-export const defineWidgets = (config: FermentConfig, layouts: BuilderLayout[]): DashboardItem[] => {
+export const defineWidgets = (config: FermentConfig, opts: FermentOpts, layouts: BuilderLayout[]): DashboardItem[] => {
   const genericSettings = {
     dashboard: config.dashboardId,
     cols: 4,
@@ -462,7 +468,11 @@ export const defineWidgets = (config: FermentConfig, layouts: BuilderLayout[]): 
           changes: [
             {
               blockId: config.names.fridgeSSPair,
-              data: { settingEnabled: true },
+              data: {
+                settingEnabled: true,
+                storedSetting: opts.fridgeSetting,
+              },
+              confirmed: { storedSetting: true },
             },
             {
               blockId: config.names.beerSSPair,
@@ -474,22 +484,12 @@ export const defineWidgets = (config: FermentConfig, layouts: BuilderLayout[]): 
                 inputId: new ProcessValueLink(config.names.fridgeSSPair),
                 ...fridgeCoolConfig,
               },
-              confirmed: {
-                kp: true,
-                ti: true,
-                td: true,
-              },
             },
             {
               blockId: config.names.heatPid,
               data: {
                 inputId: new ProcessValueLink(config.names.fridgeSSPair),
                 ...fridgeHeatConfig,
-              },
-              confirmed: {
-                kp: true,
-                ti: true,
-                td: true,
               },
             },
             {
@@ -508,7 +508,11 @@ export const defineWidgets = (config: FermentConfig, layouts: BuilderLayout[]): 
             },
             {
               blockId: config.names.beerSSPair,
-              data: { settingEnabled: true },
+              data: {
+                settingEnabled: true,
+                storedSetting: opts.beerSetting,
+              },
+              confirmed: { storedSetting: true },
             },
             {
               blockId: config.names.coolPid,
@@ -516,22 +520,12 @@ export const defineWidgets = (config: FermentConfig, layouts: BuilderLayout[]): 
                 inputId: new ProcessValueLink(config.names.beerSSPair),
                 ...beerCoolConfig,
               },
-              confirmed: {
-                kp: true,
-                ti: true,
-                td: true,
-              },
             },
             {
               blockId: config.names.heatPid,
               data: {
                 inputId: new ProcessValueLink(config.names.beerSSPair),
                 ...beerHeatConfig,
-              },
-              confirmed: {
-                kp: true,
-                ti: true,
-                td: true,
               },
             },
             {
@@ -546,7 +540,7 @@ export const defineWidgets = (config: FermentConfig, layouts: BuilderLayout[]): 
           changes: [
             {
               blockId: config.names.tempProfile,
-              data: { enabled: true, start: new Date().getTime() / 1000 },
+              data: { enabled: true, start: 0 },
               confirmed: { start: true },
             },
           ],

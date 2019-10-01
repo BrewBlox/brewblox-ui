@@ -25,20 +25,13 @@ import { DashboardItem } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { unlinkedActuators } from '../helpers';
-import { HermsConfig } from './types';
-
-export interface PidOpts {
-  hltKp: Unit;
-  bkKp: Unit;
-  mtKp: Unit;
-  driverMax: Unit;
-}
+import { HermsConfig, HermsOpts } from './types';
 
 export function defineChangedBlocks(config: HermsConfig): Block[] {
   return unlinkedActuators(config.serviceId, [config.hltPin, config.bkPin]);
 };
 
-export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[] {
+export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block[] {
   const groups = [0];
   const serviceId = config.serviceId;
 
@@ -242,8 +235,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
         outputId: new Link(config.names.hltPwm),
         kp: opts.hltKp,
         ti: new Unit(10, 'min'),
-        td: new Unit(10, 'second'),
-        integralReset: 0,
+        td: new Unit(30, 'second'),
         boilMinOutput: 25,
       },
     },
@@ -260,7 +252,6 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
         kp: opts.mtKp,
         ti: new Unit(5, 'min'),
         td: new Unit(10, 'min'),
-        integralReset: 0,
       },
     },
     {
@@ -276,7 +267,6 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
         kp: opts.bkKp,
         ti: new Unit(5, 'min'),
         td: new Unit(10, 'min'),
-        integralReset: 0,
         boilMinOutput: 25,
       },
     },

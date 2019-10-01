@@ -71,10 +71,14 @@ export default class StepViewWidget extends WidgetBase {
       if (!change) {
         resolve(value);
       }
+      const pretty = change.pretty || (v => `${v}`);
       createDialog({
         component: 'ChangeConfirmDialog',
         title: 'Confirm change',
-        message: `Please confirm the ${change.title} value in ${block.id}. Current value is '${block.data[key]}'.`,
+        message: `
+        Please confirm the ${change.title} value in ${block.id}.
+        Current value is '${pretty(block.data[key])}'.
+        `,
         serviceId: block.serviceId,
         blockId: block.id,
         value,

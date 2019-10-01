@@ -8,7 +8,6 @@ export default class RimsWizard extends WidgetWizardBase {
   initialTasks = [
     'RimsNamingTask',
     'RimsHardwareTask',
-    'RimsSettingsTask',
     'RimsManualTask',
   ];
 }

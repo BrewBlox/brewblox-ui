@@ -26,18 +26,6 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
         {
           id: uid(),
           rotate: 0,
-          settings: {
-            sizeX: 4,
-            pwm: { serviceId: config.serviceId, blockId: config.names.kettlePwm },
-          },
-          flipped: true,
-          type: 'HeatingElement',
-          x: 5,
-          y: 6,
-        },
-        {
-          id: uid(),
-          rotate: 0,
           settings: {},
           flipped: false,
           type: 'FilterBottom',
@@ -171,17 +159,6 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
         {
           id: uid(),
           rotate: 0,
-          settings: {
-            pid: { serviceId: config.serviceId, blockId: config.names.kettlePid },
-          },
-          flipped: false,
-          type: 'PidDisplay',
-          x: 8,
-          y: 5,
-        },
-        {
-          id: uid(),
-          rotate: 0,
           settings: {},
           flipped: false,
           type: 'ElbowTube',
@@ -260,7 +237,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
-            pid: { serviceId: config.serviceId, blockId: config.names.tubeDriverPid },
+            pid: { serviceId: config.serviceId, blockId: config.names.kettlePid },
           },
           flipped: false,
           type: 'PidDisplay',

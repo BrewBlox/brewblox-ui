@@ -1,3 +1,5 @@
+import { Unit } from '@/helpers/units';
+
 import { PinChannel, QuickStartOutput } from '../types';
 
 export interface HermsBlockNames {
@@ -32,4 +34,11 @@ export interface HermsConfig extends QuickStartOutput {
   hltSensor: string;
   mtSensor: string;
   bkSensor: string;
+}
+
+export interface HermsOpts {
+  hltKp: Unit;
+  bkKp: Unit;
+  mtKp: Unit;
+  driverMax: Unit;
 }

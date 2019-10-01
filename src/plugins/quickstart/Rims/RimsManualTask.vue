@@ -40,7 +40,7 @@ export default class RimsManualTask extends WizardTaskBase<RimsConfig> {
             </span> -->
           </p>
           <p>
-            On the controller we created two PIDs to control the kettle heater and the mash heater.
+            On the controller we created two PIDs to dynamically control the tube heater element.
           </p>
           <p>
             We did not put every controller block on your new dashboard.

@@ -5,14 +5,15 @@ import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
-import { hasShared } from '../helpers';
+import { createOutputActions, hasShared } from '../helpers';
 import { PinChannel } from '../types';
+import { defineChangedBlocks, defineCreatedBlocks, defineWidgets } from './changes';
+import { defineLayouts } from './changes-layout';
 import { RimsConfig } from './types';
 
 
 @Component
 export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
-  kettlePin: PinChannel | null = null;
   tubePin: PinChannel | null = null;
   pumpPin: PinChannel | null = null;
   kettleSensor: string | null = null;
@@ -20,7 +21,6 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
 
   get valuesOk(): boolean {
     return [
-      this.kettlePin,
       this.tubePin,
       this.pumpPin,
       !this.pinSame,
@@ -32,7 +32,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
   }
 
   get pinSame(): boolean {
-    return hasShared([this.kettlePin, this.tubePin, this.pumpPin]);
+    return hasShared([this.tubePin, this.pumpPin]);
   }
 
   get sensorSame(): boolean {
@@ -42,7 +42,6 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
   created(): void {
     this.discover();
 
-    this.kettlePin = this.config.kettlePin || null;
     this.tubePin = this.config.tubePin || null;
     this.pumpPin = this.config.pumpPin || null;
     this.kettleSensor = this.config.kettleSensor || null;
@@ -62,7 +61,6 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
   }
 
   taskDone(): void {
-    this.config.kettlePin = this.kettlePin!;
     this.config.tubePin = this.tubePin!;
     this.config.pumpPin = this.pumpPin!;
     this.config.kettleSensor = this.kettleSensor!;
@@ -73,7 +71,19 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
       [this.tubeSensor!]: this.config.names.tubeSensor,
     };
 
-    this.updateConfig(this.config);
+    const createdBlocks = defineCreatedBlocks(this.config);
+    const changedBlocks = defineChangedBlocks(this.config);
+    const layouts = defineLayouts(this.config);
+    const widgets = defineWidgets(this.config, layouts);
+
+    this.pushActions(createOutputActions());
+    this.updateConfig({
+      ...this.config,
+      layouts,
+      widgets,
+      changedBlocks,
+      createdBlocks,
+    });
     this.next();
   }
 }
@@ -114,10 +124,10 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
       <q-item dark>
         <q-item-section>
           <QuickStartPinField
-            v-model="kettlePin"
+            v-model="pumpPin"
             :service-id="config.serviceId"
             :error="pinSame"
-            label="Kettle heater"
+            label="Pump"
           />
         </q-item-section>
         <q-item-section>
@@ -128,17 +138,6 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
             label="Tube heater"
           />
         </q-item-section>
-      </q-item>
-      <q-item dark>
-        <q-item-section>
-          <QuickStartPinField
-            v-model="pumpPin"
-            :service-id="config.serviceId"
-            :error="pinSame"
-            label="Pump"
-          />
-        </q-item-section>
-        <q-item-section />
       </q-item>
       <q-item dark>
         <q-item-section>

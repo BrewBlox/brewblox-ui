@@ -6,13 +6,13 @@ import { Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
 import { createOutputActions } from '../helpers';
-import { defineChangedBlocks, defineCreatedBlocks, defineWidgets, PidOpts } from './changes';
+import { defineChangedBlocks, defineCreatedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
-import { HermsConfig } from './types';
+import { HermsConfig, HermsOpts } from './types';
 
 
 @Component
-export default class HermsPidTask extends WizardTaskBase<HermsConfig> {
+export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
   hltFullPowerDelta = new Unit(2, 'delta_degC');
   bkFullPowerDelta = new Unit(2, 'delta_degC');
   hltVolume = 25;
@@ -25,13 +25,8 @@ export default class HermsPidTask extends WizardTaskBase<HermsConfig> {
     v => v !== 0 || 'Volume can\'t be 0',
   ]
 
-  created(): void {
-    if (this.userTemp === 'degF') {
-      this.hltFullPowerDelta = new Unit(3, 'delta_degF');
-      this.bkFullPowerDelta = new Unit(3, 'delta_degF');
-      this.mashTarget = new Unit(155, 'degF');
-      this.mashActual = new Unit(152, 'degF');
-    }
+  get userTemp(): string {
+    return sparkStore.units(this.config.serviceId).Temp;
   }
 
   get hltKp(): Unit {
@@ -48,24 +43,26 @@ export default class HermsPidTask extends WizardTaskBase<HermsConfig> {
 
   get hltSetting(): Unit {
     if (this.mashTarget.value && this.mtKp.value && this.mashActual.value && this.driverMax.value) {
-      const correctedMax = this.userTemp === 'degF' ? this.driverMax.value * 9 / 5 : this.driverMax.value;
-      const upperLimit = this.mashTarget.value + correctedMax;
-
+      const upperLimit = this.mashTarget.value + this.driverMax.value;
       const setting = this.mashTarget.value + (this.mashTarget.value - this.mashActual.value) * this.mtKp.value;
 
-      return new Unit(
-        Math.min(upperLimit, setting),
-        this.userTemp);
+      return new Unit(Math.min(upperLimit, setting), this.userTemp);
     }
     return new Unit(null, this.userTemp);
   }
 
-  get userTemp(): string {
-    return sparkStore.units(this.config.serviceId).Temp;
+  created(): void {
+    if (this.userTemp === 'degF') {
+      this.hltFullPowerDelta = new Unit(3, 'delta_degF');
+      this.bkFullPowerDelta = new Unit(3, 'delta_degF');
+      this.mashTarget = new Unit(155, 'degF');
+      this.mashActual = new Unit(152, 'degF');
+      this.driverMax = new Unit(18, 'delta_degF');
+    }
   }
 
   done(): void {
-    const opts: PidOpts = {
+    const opts: HermsOpts = {
       hltKp: this.hltKp,
       bkKp: this.bkKp,
       mtKp: this.mtKp,
@@ -112,7 +109,7 @@ export default class HermsPidTask extends WizardTaskBase<HermsConfig> {
             </q-item-label>
             <p>
               If the temperature is more than
-              <UnitField v-model="hltFullPowerDelta" title="Fridge setting" tag="span" /> too low,
+              <UnitField v-model="hltFullPowerDelta" title="Full power delta" tag="span" /> too low,
               run at full power (100%).
             </p>
             <p class="text-italic">
@@ -127,7 +124,7 @@ export default class HermsPidTask extends WizardTaskBase<HermsConfig> {
             </q-item-label>
             <p>
               If the temperature is more than
-              <UnitField v-model="bkFullPowerDelta" title="Fridge setting" tag="span" /> too low,
+              <UnitField v-model="bkFullPowerDelta" title="Full power delta" tag="span" /> too low,
               run at full power (100%).
             </p>
             <p class="text-italic">
@@ -168,8 +165,8 @@ export default class HermsPidTask extends WizardTaskBase<HermsConfig> {
           <q-item-section>
             <q-input v-model.number="driverMax.value" type="number" step="any" label="Limit difference to" dark>
               <template v-slot:append>
-                <small class="self-end q-pb-sm">{{ driverMax.notation }}
-                  <q-tooltip>Setpoint Driver in &deg; F will come soon</q-tooltip>
+                <small class="self-end q-pb-sm">
+                  {{ driverMax.notation }}
                 </small>
               </template>
             </q-input>

@@ -1,5 +1,6 @@
 import { uid } from 'quasar';
 
+import { durationMs } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
 import { serialize } from '@/helpers/units/parseObject';
 import { BuilderItem, BuilderLayout } from '@/plugins/builder/types';
@@ -70,7 +71,11 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         start: new Date().getTime() / 1000,
         enabled: false,
         targetId: new Link(config.names.beerSetpoint),
-        points: [],
+        points: [
+          { time: 0, temperature: beerSetting },
+          { time: durationMs('7d') / 1000, temperature: beerSetting },
+          { time: durationMs('10d') / 1000, temperature: beerSetting.copy(beerSetting.value! + 3) },
+        ],
         drivenTargetId: new Link(null),
       },
     },

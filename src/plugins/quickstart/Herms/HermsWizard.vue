@@ -9,7 +9,7 @@ export default class HermsWizard extends WidgetWizardBase {
     'HermsNamingTask',
     'HermsHardwareTask',
     'HermsMutexTask',
-    'HermsPidTask',
+    'HermsSettingsTask',
     'HermsManualTask',
   ];
 }
