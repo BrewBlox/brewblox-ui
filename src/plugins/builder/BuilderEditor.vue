@@ -7,7 +7,7 @@ import { Coordinates } from '@/helpers/coordinates';
 import { createDialog } from '@/helpers/dialog';
 import { showImportDialog } from '@/helpers/dialog';
 import { clampRotation } from '@/helpers/functional';
-import { saveJsonFile } from '@/helpers/import-export';
+import { saveFile } from '@/helpers/import-export';
 import { deepCopy, deserialize, serialize } from '@/helpers/units/parseObject';
 
 import BuilderCatalog from './BuilderCatalog.vue';
@@ -52,8 +52,6 @@ export default class BuilderEditor extends DialogBase {
 
   @Ref()
   readonly grid!: any;
-
-  specs = builderStore.specs;
 
   layoutId: string | null = null;
   debouncedCalculate: Function = () => { };
@@ -127,7 +125,7 @@ export default class BuilderEditor extends DialogBase {
       value: 'interact',
       icon: 'mdi-cursor-default',
       shortcut: 'i',
-      cursor: part => !!part && !!this.specs[part.type].interactHandler,
+      cursor: part => !!part && !!builderStore.spec(part).interactHandler,
       onClick: this.interactClickHandler,
     },
     {
@@ -182,7 +180,7 @@ export default class BuilderEditor extends DialogBase {
           ...part,
           type: deprecatedTypes[part.type] || part.type,
         };
-        const [sizeX, sizeY] = this.specs[actual.type].size(actual);
+        const [sizeX, sizeY] = builderStore.spec(actual).size(actual);
         sizes[part.id] = sizeX * sizeY;
         return actual;
       })
@@ -282,7 +280,7 @@ export default class BuilderEditor extends DialogBase {
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, _rev, ...exported } = this.layout;
-    saveJsonFile(exported, `brewblox-${this.layout.title}-layout.json`);
+    saveFile(exported, `brewblox-${this.layout.title}-layout.json`);
   }
 
   renameLayout(): void {
@@ -350,11 +348,11 @@ export default class BuilderEditor extends DialogBase {
   }
 
   isClickable(part): boolean {
-    return !!this.specs[part.type].interactHandler;
+    return !!builderStore.spec(part).interactHandler;
   }
 
   interact(part: FlowPart): void {
-    const handler = this.specs[part.type].interactHandler;
+    const handler = builderStore.spec(part).interactHandler;
     handler && handler(part, this.updater);
   }
 
@@ -595,7 +593,7 @@ export default class BuilderEditor extends DialogBase {
 
   interactClickHandler(evt: ClickEvent, part: FlowPart): void {
     if (part) {
-      const handler = this.specs[part.type].interactHandler;
+      const handler = builderStore.spec(part).interactHandler;
       handler && handler(part, this.updater);
     }
   }

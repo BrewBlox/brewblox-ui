@@ -12,6 +12,7 @@ import DipTube from './DipTube';
 import ElbowTube from './ElbowTube';
 import FilterBottom from './FilterBottom';
 import Fridge from './Fridge';
+import GravityTube from './GravityTube';
 import HeatingElement from './HeatingElement';
 import ImmersionCoil from './ImmersionCoil';
 import Keg from './Keg';
@@ -22,6 +23,7 @@ import ProfileDisplay from './ProfileDisplay';
 import Pump from './Pump';
 import PwmDisplay from './PwmDisplay';
 import PwmPump from './PwmPump';
+import RimsTube from './RimsTube';
 import SensorDisplay from './SensorDisplay';
 import SetpointDisplay from './SetpointDisplay';
 import ShiftedSystemIO from './ShiftedSystemIO';
@@ -46,6 +48,7 @@ const specs: { [key: string]: PartSpec } = {
   DipTube,
   ElbowTube,
   FilterBottom,
+  GravityTube,
   HeatingElement,
   ImmersionCoil,
   Keg,
@@ -56,6 +59,7 @@ const specs: { [key: string]: PartSpec } = {
   Pump,
   PwmDisplay,
   PwmPump,
+  RimsTube,
   SensorDisplay,
   SetpointDisplay,
   ShiftedSystemIO,

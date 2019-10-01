@@ -41,7 +41,7 @@ export default class WizardPicker extends Vue {
 
     <q-scroll-area v-else style="height: 80vh;">
       <q-card-section>
-        <q-item link clickable dark @click="wizardComponent = 'ArrangementWizardPicker'">
+        <q-item link clickable dark @click="wizardComponent = 'QuickStartWizardPicker'">
           <q-item-section side class="col-4">
             <q-item-label class="text-h6">
               Quick Start

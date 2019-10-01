@@ -3,15 +3,16 @@ import { Component } from 'vue-property-decorator';
 
 import PartBase from '../components/PartBase';
 import { RIGHT } from '../getters';
+import { elbow } from '../helpers';
 
 @Component
 export default class ElbowTube extends PartBase {
   readonly paths = {
     borders: [
-      'M21,0v20c0,5,4,9,9,9h20',
-      'M29,0v18c0,1.7,1.3,3,3,3h18',
+      `M21,0 v17 ${elbow(12, 12, false)} H50`,
+      `M29,0 v17 ${elbow(4, 4, false)} H50`,
     ],
-    liquid: 'M25,0V20a5,5,0,0,0,5,5H50',
+    liquid: `M25,0 v17 ${elbow(8, 8, false)} H50`,
   };
 
   get flowSpeed(): number {
@@ -26,11 +27,11 @@ export default class ElbowTube extends PartBase {
 
 <template>
   <g>
+    <LiquidStroke :paths="[paths.liquid]" :colors="liquids" />
+    <AnimatedArrows :speed="flowSpeed" :path="paths.liquid" />
     <g class="outline">
       <path :d="paths.borders[0]" />
       <path :d="paths.borders[1]" />
     </g>
-    <LiquidStroke :paths="[paths.liquid]" :colors="liquids" />
-    <AnimatedArrows :speed="flowSpeed" :path="'M25,0V16a9,9,0,0,0,9,9H50'" />
   </g>
 </template>

@@ -139,6 +139,10 @@ export default class BlockGraph extends Vue {
             </q-item>
           </q-btn-dropdown>
           <q-btn-dropdown flat label="settings" icon="settings">
+            <ExportGraphAction
+              :config="graphCfg"
+              :header="graphCfg.layout.title"
+            />
             <q-item dark link clickable @click="updateDuration">
               <q-item-section>Duration</q-item-section>
               <q-item-section class="col-auto">

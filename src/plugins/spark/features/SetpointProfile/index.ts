@@ -6,6 +6,8 @@ import { Feature } from '@/store/features';
 
 import { BlockSpec } from '../../types';
 import { typeName } from './getters';
+import ProfilePresetAction from './ProfilePresetAction.vue';
+import ProfilePresetDialog from './ProfilePresetDialog.vue';
 import form from './SetpointProfileForm.vue';
 import widget from './SetpointProfileWidget.vue';
 import { SetpointProfileData } from './types';
@@ -32,7 +34,11 @@ const block: BlockSpec = {
       component: 'DateValEdit',
       componentProps: { timeScale: 1000 },
       generate: () => new Date().getTime() / 1000,
-      pretty: val => new Date((val || 0) * 1000).toLocaleString(),
+      pretty: (val: number): string => {
+        if (val === 0) { return 'now'; }
+        if (!val) { return 'invalid date'; }
+        return new Date(val * 1000).toLocaleString();
+      },
     },
     {
       key: 'targetId',
@@ -52,6 +58,9 @@ const block: BlockSpec = {
     },
   ],
 };
+
+ref(ProfilePresetAction);
+ref(ProfilePresetDialog);
 
 const feature: Feature = {
   ...GenericBlock,

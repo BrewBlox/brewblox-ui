@@ -23,8 +23,13 @@ export interface Feature {
   form?: string;
 }
 
-export interface Arrangement {
+export interface QuickStart {
   id: string;
   displayName: string;
   wizard: string;
+}
+
+export interface Watcher {
+  component: string;
+  props: Mapped<any>;
 }

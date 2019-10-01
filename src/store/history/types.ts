@@ -6,6 +6,7 @@ export interface QueryParams {
   end?: string | number;
   limit?: number;
   orderBy?: string;
+  policy?: string;
   approxPoints?: number;
 }
 

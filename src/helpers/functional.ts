@@ -20,12 +20,15 @@ export const objectStringSorter =
       return left.localeCompare(right);
     };
 
+export const durationMs = (duration: number | string): number =>
+  isString(duration)
+    ? parseDuration(duration)
+    : duration;
+
 export const durationString =
   (duration: number | string): string => {
-    const durationMs = isString(duration)
-      ? parseDuration(duration)
-      : duration;
-    const secondsTotal = Number(durationMs) / 1000;
+    const ms = durationMs(duration);
+    const secondsTotal = Number(ms) / 1000;
     const days = Math.floor(secondsTotal / 86400);
     const hours = Math.floor((secondsTotal - (days * 86400)) / 3600);
     const minutes =
@@ -207,3 +210,6 @@ export const objReducer = (key: string) =>
     acc[obj[key]] = obj;
     return acc;
   };
+
+export const validator = (rules: InputRule[]): ((val: any) => boolean) =>
+  val => rules.every(rule => !isString(rule(val)));

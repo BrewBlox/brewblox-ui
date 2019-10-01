@@ -46,10 +46,12 @@ module.exports = {
         .terserOptions
         .keep_fnames = true;
     }
+    else {
+      config.devtool = 'cheap-module-eval-source-map';
+    }
 
     // This is merged into the webpack config
     return {
-      devtool: 'cheap-module-eval-source-map',
       output: {
         globalObject: 'this',
       },
@@ -69,6 +71,9 @@ module.exports = {
   //
   /** @type { import("webpack-chain") } */
   chainWebpack: config => {
+
+    // This setting is useless for a SPA that loads most of its code on startup
+    config.plugins.delete('prefetch');
 
     // We're only using a subset from plotly
     // Add alias to enable typing regardless

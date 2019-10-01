@@ -14,7 +14,6 @@ import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart } f
 
 @Component
 export default class BuilderWidget extends WidgetBase {
-  specs = builderStore.specs;
   flowParts: FlowPart[] = [];
   debouncedCalculate: Function = () => { };
 
@@ -97,7 +96,7 @@ export default class BuilderWidget extends WidgetBase {
           ...part,
           type: deprecatedTypes[part.type] || part.type,
         };
-        const [sizeX, sizeY] = this.specs[actual.type].size(actual);
+        const [sizeX, sizeY] = builderStore.spec(actual).size(actual);
         sizes[part.id] = sizeX * sizeY;
         return actual;
       })
@@ -112,11 +111,11 @@ export default class BuilderWidget extends WidgetBase {
   }
 
   isClickable(part): boolean {
-    return !!this.specs[part.type].interactHandler;
+    return !!builderStore.spec(part).interactHandler;
   }
 
   interact(part: FlowPart): void {
-    const handler = this.specs[part.type].interactHandler;
+    const handler = builderStore.spec(part).interactHandler;
     handler && handler(part, this.updater);
   }
 

@@ -20,6 +20,12 @@ export default class DateValEdit extends ValEdit {
   get displayVal(): string {
     return new Date(this.scaledField).toLocaleString();
   }
+
+  created(): void {
+    if (this.field === 0) {
+      this.scaledField = new Date().getTime();
+    }
+  }
 }
 </script>
 

@@ -26,11 +26,11 @@ export default class StraightTube extends PartBase {
 
 <template>
   <g>
+    <LiquidStroke :paths="[paths.liquid]" :colors="liquids" />
+    <AnimatedArrows :speed="flowSpeed" path="M0,25H50" />
     <g class="outline">
       <path :d="paths.borders[0]" />
       <path :d="paths.borders[1]" />
     </g>
-    <LiquidStroke :paths="[paths.liquid]" :colors="liquids" />
-    <AnimatedArrows :speed="flowSpeed" path="M0,25H50" />
   </g>
 </template>

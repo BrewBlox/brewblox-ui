@@ -1,21 +1,10 @@
 import Vue from 'vue';
-import { Action, getModule,Module, Mutation, VuexModule } from 'vuex-module-decorators';
+import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
 import { objReducer } from '@/helpers/functional';
 import store from '@/store';
 
-import {
-  createDashboard as createDashboardInApi,
-  createDashboardItem as createDashboardItemInApi,
-  deleteDashboard as removeDashboardInApi,
-  deleteDashboardItem as removeDashboardItemInApi,
-  fetchDashboardItems as fetchDashboardItemsInApi,
-  fetchDashboards as fetchDashboardsInApi,
-  persistDashboard as persistDashboardInApi,
-  persistDashboardItem as persistDashboardItemInApi,
-  setupDashboardItems as setupDashboardItemsInApi,
-  setupDashboards as setupDashboardsInApi,
-} from './api';
+import { dashboardApi, itemApi } from './api';
 import { Dashboard, DashboardItem } from './types';
 export * from './types';
 
@@ -116,12 +105,12 @@ export class DashboardModule extends VuexModule {
 
   @Action({ rawError, commit: 'commitDashboard' })
   public async createDashboard(dashboard: Dashboard): Promise<Dashboard> {
-    return await createDashboardInApi(dashboard);
+    return await dashboardApi.create(dashboard);
   }
 
   @Action({ rawError, commit: 'commitDashboard' })
   public async saveDashboard(dashboard: Dashboard): Promise<Dashboard> {
-    return await persistDashboardInApi(dashboard);
+    return await dashboardApi.persist(dashboard);
   }
 
   @Action({ rawError })
@@ -156,24 +145,24 @@ export class DashboardModule extends VuexModule {
   public async removeDashboard(dashboard: Dashboard): Promise<Dashboard> {
     this.dashboardItemsByDashboardId(dashboard.id)
       .forEach(item => this.context.dispatch('removeDashboardItem', item));
-    await removeDashboardInApi(dashboard).catch(() => { });
+    await dashboardApi.remove(dashboard).catch(() => { });
     return dashboard;
   }
 
   @Action({ rawError, commit: 'commitDashboardItem' })
   public async createDashboardItem(item: DashboardItem): Promise<DashboardItem> {
-    return await createDashboardItemInApi(item);
+    return await itemApi.create(item);
   }
 
   @Action({ rawError, commit: 'commitDashboardItem' })
   public async appendDashboardItem(item: DashboardItem): Promise<DashboardItem> {
     const order = this.dashboardItemsByDashboardId(item.dashboard).length + 1;
-    return await createDashboardItemInApi({ ...item, order });
+    return await itemApi.create({ ...item, order });
   }
 
   @Action({ rawError, commit: 'commitDashboardItem' })
   public async saveDashboardItem(item: DashboardItem): Promise<DashboardItem> {
-    return await persistDashboardItemInApi(item);
+    return await itemApi.persist(item);
   }
 
   @Action({ rawError })
@@ -209,8 +198,7 @@ export class DashboardModule extends VuexModule {
 
   @Action({ rawError, commit: 'commitRemoveDashboardItem' })
   public async removeDashboardItem(item: DashboardItem): Promise<DashboardItem> {
-    await removeDashboardItemInApi(item)
-      .catch(() => { });
+    await itemApi.remove(item).catch(() => { });
     return item;
   }
 
@@ -243,11 +231,11 @@ export class DashboardModule extends VuexModule {
     };
     /* eslint-enable no-underscore-dangle */
 
-    this.commitAllDashboards(await fetchDashboardsInApi());
-    this.commitAllDashboardItems(await fetchDashboardItemsInApi());
+    this.commitAllDashboards(await dashboardApi.fetch());
+    this.commitAllDashboardItems(await itemApi.fetch());
 
-    setupDashboardsInApi(onDashboardChange, onDashboardDelete);
-    setupDashboardItemsInApi(onItemChange, onItemDelete);
+    dashboardApi.setup(onDashboardChange, onDashboardDelete);
+    itemApi.setup(onItemChange, onItemDelete);
   }
 }
 

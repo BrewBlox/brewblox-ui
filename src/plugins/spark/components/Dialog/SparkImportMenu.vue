@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 import { createDialog } from '@/helpers/dialog';
-import { saveJsonFile } from '@/helpers/import-export';
+import { saveFile } from '@/helpers/import-export';
 import { deserialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
 import { Service, serviceStore } from '@/store/services';
@@ -27,7 +27,7 @@ export default class SparkImportMenu extends DialogBase {
 
   async exportBlocks(): Promise<void> {
     const exported = await sparkStore.serviceExport(this.service.id);
-    saveJsonFile(exported, `brewblox-blocks-${this.service.id}.json`);
+    saveFile(exported, `brewblox-blocks-${this.service.id}.json`);
   }
 
   handleImportFileSelect(evt): void {

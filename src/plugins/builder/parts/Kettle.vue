@@ -1,13 +1,20 @@
 <script lang="ts">
+import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import PartBase from '../components/PartBase';
 import { colorString } from '../helpers';
+import { DEFAULT_FILL_PCT } from '../specs/Kettle';
 
 @Component
 export default class Kettle extends PartBase {
   get titleText(): string {
     return this.part.settings.text || '';
+  }
+
+  get filledSquares(): number {
+    const pct = get(this.part.settings, 'fillPct', DEFAULT_FILL_PCT);
+    return pct * (this.sizeY / 100);
   }
 
   get color(): string {
@@ -21,9 +28,9 @@ export default class Kettle extends PartBase {
     <rect
       :fill="color"
       :x="2"
-      :y="squares(1)+2"
+      :y="squares(sizeY-filledSquares)+2"
       :width="squares(sizeX)-4"
-      :height="squares(sizeY-1)-4"
+      :height="squares(filledSquares)-4"
       rx="2"
       ry="2"
     />

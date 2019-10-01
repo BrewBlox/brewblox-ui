@@ -181,7 +181,14 @@ export default class GraphForm extends CrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :crud="crud" />
+    <FormToolbar :crud="crud">
+      <template v-slot:actions>
+        <ExportGraphAction
+          :config="config"
+          :header="widget.title"
+        />
+      </template>
+    </FormToolbar>
 
     <!-- <q-card-section dark> -->
     <q-tabs v-model="tab" dense active-color="primary" align="justify">

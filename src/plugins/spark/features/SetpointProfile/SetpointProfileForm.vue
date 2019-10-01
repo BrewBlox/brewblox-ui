@@ -21,6 +21,7 @@ interface DisplaySetpoint {
 export default class SetpointProfileForm extends BlockCrudComponent {
   durationString = durationString;
   parseDuration = parseDuration;
+  defaultTempValues = { degC: 20, degF: 68, degK: 293 };
 
   readonly block!: SetpointProfileBlock;
 
@@ -57,11 +58,10 @@ export default class SetpointProfileForm extends BlockCrudComponent {
   }
 
   defaultPoint(): DisplaySetpoint {
-    const defaultTempValues = { degC: 20, degF: 68, degK: 293 };
     return {
       offsetMs: 0,
       absTimeMs: new Date(this.start).getTime(),
-      temperature: new Unit(defaultTempValues[this.tempUnit] || 20, this.tempUnit),
+      temperature: new Unit(this.defaultTempValues[this.tempUnit] || 20, this.tempUnit),
     };
   }
 
@@ -169,7 +169,11 @@ export default class SetpointProfileForm extends BlockCrudComponent {
     </template>
 
     <q-card dark class="widget-modal">
-      <BlockFormToolbar :crud="crud" />
+      <BlockFormToolbar :crud="crud">
+        <template v-slot:actions>
+          <ProfilePresetAction :crud="crud" />
+        </template>
+      </BlockFormToolbar>
       <q-card-section>
         <BlockEnableToggle
           v-if="block.data.targetId.id !== null"
