@@ -5,14 +5,14 @@ import HermsHardwareTask from './HermsHardwareTask.vue';
 import HermsManualTask from './HermsManualTask.vue';
 import HermsMutexTask from './HermsMutexTask.vue';
 import HermsNamingTask from './HermsNamingTask.vue';
-import HermsPidTask from './HermsPidTask.vue';
+import HermsSettingsTask from './HermsSettingsTask.vue';
 import HermsWizard from './HermsWizard.vue';
 
 ref(HermsNamingTask);
 ref(HermsHardwareTask);
 ref(HermsMutexTask);
 ref(HermsManualTask);
-ref(HermsPidTask);
+ref(HermsSettingsTask);
 
 const quickStart: QuickStart = {
   id: 'Herms',

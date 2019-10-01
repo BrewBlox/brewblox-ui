@@ -53,8 +53,6 @@ export default class BuilderEditor extends DialogBase {
   @Ref()
   readonly grid!: any;
 
-  specs = builderStore.specs;
-
   layoutId: string | null = null;
   debouncedCalculate: Function = () => { };
   flowParts: FlowPart[] = [];
@@ -127,7 +125,7 @@ export default class BuilderEditor extends DialogBase {
       value: 'interact',
       icon: 'mdi-cursor-default',
       shortcut: 'i',
-      cursor: part => !!part && !!this.specs[part.type].interactHandler,
+      cursor: part => !!part && !!builderStore.spec(part).interactHandler,
       onClick: this.interactClickHandler,
     },
     {
@@ -182,7 +180,7 @@ export default class BuilderEditor extends DialogBase {
           ...part,
           type: deprecatedTypes[part.type] || part.type,
         };
-        const [sizeX, sizeY] = this.specs[actual.type].size(actual);
+        const [sizeX, sizeY] = builderStore.spec(actual).size(actual);
         sizes[part.id] = sizeX * sizeY;
         return actual;
       })
@@ -350,11 +348,11 @@ export default class BuilderEditor extends DialogBase {
   }
 
   isClickable(part): boolean {
-    return !!this.specs[part.type].interactHandler;
+    return !!builderStore.spec(part).interactHandler;
   }
 
   interact(part: FlowPart): void {
-    const handler = this.specs[part.type].interactHandler;
+    const handler = builderStore.spec(part).interactHandler;
     handler && handler(part, this.updater);
   }
 
@@ -595,7 +593,7 @@ export default class BuilderEditor extends DialogBase {
 
   interactClickHandler(evt: ClickEvent, part: FlowPart): void {
     if (part) {
-      const handler = this.specs[part.type].interactHandler;
+      const handler = builderStore.spec(part).interactHandler;
       handler && handler(part, this.updater);
     }
   }

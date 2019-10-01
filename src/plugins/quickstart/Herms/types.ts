@@ -1,8 +1,6 @@
-import { BuilderLayout } from '@/plugins/builder/types';
-import { Block } from '@/plugins/spark/types';
-import { DashboardItem } from '@/store/dashboards';
+import { Unit } from '@/helpers/units';
 
-import { PinChannel } from '../types';
+import { PinChannel, QuickStartOutput } from '../types';
 
 export interface HermsBlockNames {
   hltSensor: string;
@@ -26,21 +24,21 @@ export interface HermsBlockNames {
   balancer: string;
 }
 
-export interface HermsConfig {
-  serviceId: string;
-  arrangementId: string;
+export interface HermsConfig extends QuickStartOutput {
+  title: string;
   prefix: string;
-  dashboardId: string;
-  dashboardTitle: string;
   names: HermsBlockNames;
-  layouts: BuilderLayout[];
-  widgets: DashboardItem[];
-  createdBlocks: Block[];
-  changedBlocks: Block[];
-  renamedBlocks: {
-    [old: string]: string;
-  };
   hltPin: PinChannel;
   bkPin: PinChannel;
   mutex: boolean;
+  hltSensor: string;
+  mtSensor: string;
+  bkSensor: string;
+}
+
+export interface HermsOpts {
+  hltKp: Unit;
+  bkKp: Unit;
+  mtKp: Unit;
+  driverMax: Unit;
 }

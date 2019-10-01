@@ -7,6 +7,7 @@ import store from '@/store';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 
+import { GroupsBlock } from '../provider/types';
 import {
   Block,
   BlockLink,
@@ -189,6 +190,7 @@ export class SparkModule extends VuexModule {
       .reduce(
         (acc, key) => {
           const configNames = this.sparkConfigById(key).groupNames || [];
+
           const names = [
             ...configNames.slice(0, defaultGroupNames.length),
             ...defaultGroupNames.slice(configNames.length),
@@ -197,6 +199,18 @@ export class SparkModule extends VuexModule {
         },
         {}
       );
+  }
+
+  public get groupState(): Mapped<[string, boolean][]> {
+    const entries = Object.entries(this.allGroupNames)
+      .map(([serviceId, names]) => {
+        const block: GroupsBlock | undefined =
+          this.blockValues(serviceId)
+            .find(block => block.type === 'Groups');
+        const active = block ? block.data.active : [];
+        return [serviceId, names.map((name, idx) => ([name, active.includes(idx)]))];
+      });
+    return Object.fromEntries(entries);
   }
 
   public get groupNames(): (serviceId: string) => string[] {

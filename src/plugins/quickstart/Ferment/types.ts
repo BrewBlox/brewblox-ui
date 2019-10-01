@@ -1,9 +1,6 @@
-import { BuilderLayout } from '@/plugins/builder/types';
-import { Block } from '@/plugins/spark/types';
-import { DashboardItem } from '@/store/dashboards';
+import { Unit } from '@/helpers/units';
 
-import { PinChannel } from '../types';
-
+import { PinChannel, QuickStartOutput } from '../types';
 
 export interface FermentConfigNames {
   fridgeSensor: string;
@@ -20,21 +17,18 @@ export interface FermentConfigNames {
   heatPid: string;
 }
 
-export interface FermentConfig {
-  serviceId: string;
-  arrangementId: string;
+export interface FermentConfig extends QuickStartOutput {
+  title: string;
   prefix: string;
-  dashboardId: string;
-  dashboardTitle: string;
-  groups: number[];
   names: FermentConfigNames;
-  layouts: BuilderLayout[];
-  widgets: DashboardItem[];
-  createdBlocks: Block[];
-  changedBlocks: Block[];
-  renamedBlocks: {
-    [old: string]: string;
-  };
   heatPin: PinChannel;
   coolPin: PinChannel;
+  fridgeSensor: string;
+  beerSensor: string;
+}
+
+export interface FermentOpts {
+  fridgeSetting: Unit;
+  beerSetting: Unit;
+  activeSetpoint: 'beer' | 'fridge';
 }

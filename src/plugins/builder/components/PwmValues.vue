@@ -1,0 +1,75 @@
+<script lang="ts">
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
+
+import { ActuatorPwmBlock } from '@/plugins/spark/block-types';
+
+import { settingsBlock, squares, textTransformation } from '../helpers';
+import { PersistentPart } from '../types';
+
+
+@Component
+export default class PwmValues extends Vue {
+  squares = squares;
+
+  @Prop({ type: Object, required: true })
+  public readonly part!: PersistentPart;
+
+  @Prop({ type: String, default: 'pwm' })
+  public readonly settingsKey!: string;
+
+  @Prop({ type: Boolean, default: false })
+  public readonly noBorder!: boolean;
+
+  @Prop({ type: Number, default: 0 })
+  public readonly startX!: number;
+
+  @Prop({ type: Number, default: 0 })
+  public readonly startY!: number;
+
+  get block(): ActuatorPwmBlock | null {
+    return settingsBlock(this.part, this.settingsKey);
+  }
+
+  get pwmValue(): number | null {
+    return this.block && this.block.data.enabled
+      ? this.block.data.value
+      : null;
+  }
+
+  get transform(): string {
+    return textTransformation(this.part, [1, 1]);
+  }
+}
+</script>
+
+<template>
+  <g>
+    <foreignObject
+      :x="squares(startX)"
+      :y="squares(startY)"
+      :transform="transform"
+      :width="squares(1)"
+      :height="squares(1)"
+    >
+      <div class="text-white text-bold text-center">
+        <q-icon name="mdi-gauge" class="q-mr-xs" />
+        <q-icon v-if="!block" name="mdi-link-variant-off" />
+        <small v-else>%</small>
+        <br />
+        {{ pwmValue | truncateRound }}
+      </div>
+    </foreignObject>
+    <rect
+      v-if="!noBorder"
+      class="outline"
+      :width="squares(1)-2"
+      :height="squares(1)-2"
+      :x="squares(startX)+1"
+      :y="squares(startY)+1"
+      rx="6"
+      ry="6"
+      stroke-width="2px"
+    />
+  </g>
+</template>

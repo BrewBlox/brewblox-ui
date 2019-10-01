@@ -10,7 +10,6 @@ import { CardSpec, FlowPart } from './types';
 
 @Component
 export default class BuilderPartMenu extends Vue {
-  specs = builderStore.specs;
 
   @Prop({ type: Object, required: true })
   readonly part!: FlowPart;
@@ -18,7 +17,7 @@ export default class BuilderPartMenu extends Vue {
   get cards(): CardSpec[] {
     return [
       { component: 'PlacementCard' },
-      ...this.specs[this.part.type].cards,
+      ...builderStore.spec(this.part).cards,
     ];
   }
 

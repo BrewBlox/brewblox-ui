@@ -2,20 +2,17 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { typeName as DS2413Type } from '@/plugins/spark/features/DS2413/getters';
-import { typeName as Spark2PinsType } from '@/plugins/spark/features/Spark2Pins/getters';
-import { typeName as Spark3PinsType } from '@/plugins/spark/features/Spark3Pins/getters';
+import { blockTypes } from '@/plugins/spark/block-types';
 import { sparkStore } from '@/plugins/spark/store';
 
 import { PinChannel } from '../types';
 
-
 @Component
 export default class QuickStartPinField extends Vue {
   readonly validTypes = [
-    Spark2PinsType,
-    Spark3PinsType,
-    DS2413Type,
+    blockTypes.Spark2Pins,
+    blockTypes.Spark3Pins,
+    blockTypes.DS2413,
   ];
 
   @Prop({ type: Object, required: false })
@@ -55,7 +52,7 @@ export default class QuickStartPinField extends Vue {
       return '';
     }
     const block = sparkStore.blockById(this.serviceId, this.local.arrayId);
-    if ([Spark2PinsType, Spark3PinsType].includes(block.type)) {
+    if ([blockTypes.Spark2Pins, blockTypes.Spark3Pins].includes(block.type)) {
       return '';
     }
     return block.data.connected
@@ -68,9 +65,10 @@ export default class QuickStartPinField extends Vue {
 <template>
   <q-select
     v-model="local"
-    v-bind="$attrs"
     :options="opts"
     :hint="status"
+    :rules="[v => !!v || 'Pin must be selected']"
+    v-bind="$attrs"
     emit-value
     map-options
     dark

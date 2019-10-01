@@ -1,65 +1,37 @@
 import { uid } from 'quasar';
 
-import { WizardAction } from '@/components/Wizard/WizardTaskBase';
 import { Link, Unit } from '@/helpers/units';
-import { BalancerLink, MutexLink } from '@/helpers/units/KnownLinks';
 import { serialize } from '@/helpers/units/parseObject';
-import { typeName as builderType } from '@/plugins/builder/getters';
-import { builderStore } from '@/plugins/builder/store';
 import { BuilderItem, BuilderLayout } from '@/plugins/builder/types';
 import { HistoryItem } from '@/plugins/history/Graph/types';
+import {
+  ActuatorOffsetBlock,
+  ActuatorPwmBlock,
+  BalancerBlock,
+  blockTypes,
+  DigitalActuatorBlock,
+  FilterChoice,
+  MutexBlock,
+  OffsetSettingOrValue,
+  PidBlock,
+  PidData,
+  SetpointSensorPairBlock,
+} from '@/plugins/spark/block-types';
 import { AnalogConstraint, DigitalConstraint } from '@/plugins/spark/components/Constraints/ConstraintsBase';
-import { typeName as driverType } from '@/plugins/spark/features/ActuatorOffset/getters';
-import { ActuatorOffsetBlock, OffsetSettingOrValue } from '@/plugins/spark/features/ActuatorOffset/types';
-import { typeName as pwmType } from '@/plugins/spark/features/ActuatorPwm/getters';
-import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
-import { typeName as balancerType } from '@/plugins/spark/features/Balancer/getters';
-import { BalancerBlock } from '@/plugins/spark/features/Balancer/types';
-import { typeName as digiActType } from '@/plugins/spark/features/DigitalActuator/getters';
-import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/types';
-import { typeName as mutexType } from '@/plugins/spark/features/Mutex/getters';
-import { MutexBlock } from '@/plugins/spark/features/Mutex/types';
-import { typeName as pidType } from '@/plugins/spark/features/Pid/getters';
-import { PidBlock, PidData } from '@/plugins/spark/features/Pid/types';
-import { typeName as setpointType } from '@/plugins/spark/features/SetpointSensorPair/getters';
-import { FilterChoice, SetpointSensorPairBlock } from '@/plugins/spark/features/SetpointSensorPair/types';
 import { StepViewItem } from '@/plugins/spark/features/StepView/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
-import { Dashboard, DashboardItem, dashboardStore } from '@/store/dashboards';
+import { DashboardItem } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
-import { PinChannel } from '../types';
-import { HermsConfig } from './types';
-
-export interface PidOpts {
-  hltKp: Unit;
-  bkKp: Unit;
-  mtKp: Unit;
-  driverMax: Unit;
-}
+import { unlinkedActuators } from '../helpers';
+import { HermsConfig, HermsOpts } from './types';
 
 export function defineChangedBlocks(config: HermsConfig): Block[] {
-  return (
-    sparkStore
-      .blockValues(config.serviceId)
-      // Find existing drivers of selected pins
-      .filter(
-        block =>
-          block.type === digiActType &&
-          [config.hltPin, config.bkPin].some(
-            (pin: PinChannel) => pin.arrayId === block.data.hwDevice.id && pin.pinId === block.data.channel
-          )
-      )
-      // Unlink them from pin
-      .map((block: DigitalActuatorBlock) => {
-        block.data.channel = 0;
-        return block;
-      })
-  );
+  return unlinkedActuators(config.serviceId, [config.hltPin, config.bkPin]);
 };
 
-export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[] {
+export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block[] {
   const groups = [0];
   const serviceId = config.serviceId;
 
@@ -69,28 +41,28 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
   if (config.mutex) {
     pwmConstraints.push({
       balanced: {
-        balancerId: new BalancerLink(config.names.balancer),
+        balancerId: new Link(config.names.balancer, blockTypes.Balancer),
         granted: 0,
         id: 0,
       },
       limiting: false,
     });
     actuatorConstraints.push(
-      { mutex: new MutexLink(config.names.mutex), limiting: false }
+      { mutex: new Link(config.names.mutex, blockTypes.Mutex), limiting: false }
     );
   }
 
   const balancerBlocks = [
     {
       id: config.names.balancer,
-      type: balancerType,
+      type: blockTypes.Balancer,
       serviceId,
       groups,
       data: { clients: [] },
     },
     {
       id: config.names.mutex,
-      type: mutexType,
+      type: blockTypes.Mutex,
       serviceId,
       groups,
       data: {
@@ -106,7 +78,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
     // Setpoints
     {
       id: config.names.hltSetpoint,
-      type: setpointType,
+      type: blockTypes.SetpointSensorPair,
       serviceId,
       groups,
       data: {
@@ -123,7 +95,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
     },
     {
       id: config.names.mtSetpoint,
-      type: setpointType,
+      type: blockTypes.SetpointSensorPair,
       serviceId,
       groups,
       data: {
@@ -140,7 +112,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
     },
     {
       id: config.names.bkSetpoint,
-      type: setpointType,
+      type: blockTypes.SetpointSensorPair,
       serviceId,
       groups,
       data: {
@@ -158,7 +130,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
     // Setpoint Driver
     {
       id: config.names.hltDriver,
-      type: driverType,
+      type: blockTypes.SetpointDriver,
       serviceId,
       groups,
       data: {
@@ -183,7 +155,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
     // Digital Actuators
     {
       id: config.names.hltAct,
-      type: digiActType,
+      type: blockTypes.DigitalActuator,
       serviceId,
       groups,
       data: {
@@ -199,7 +171,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
     },
     {
       id: config.names.bkAct,
-      type: digiActType,
+      type: blockTypes.DigitalActuator,
       serviceId,
       groups,
       data: {
@@ -216,7 +188,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
     // PWM
     {
       id: config.names.hltPwm,
-      type: pwmType,
+      type: blockTypes.ActuatorPwm,
       serviceId,
       groups,
       data: {
@@ -234,7 +206,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
     },
     {
       id: config.names.bkPwm,
-      type: pwmType,
+      type: blockTypes.ActuatorPwm,
       serviceId,
       groups,
       data: {
@@ -253,51 +225,48 @@ export function defineCreatedBlocks(config: HermsConfig, opts: PidOpts): Block[]
     // PID
     {
       id: config.names.hltPid,
-      type: pidType,
+      type: blockTypes.Pid,
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[pidType].generate() as PidData),
+        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
         enabled: true,
         inputId: new Link(config.names.hltSetpoint),
         outputId: new Link(config.names.hltPwm),
         kp: opts.hltKp,
         ti: new Unit(10, 'min'),
-        td: new Unit(10, 'second'),
-        integralReset: 0,
+        td: new Unit(30, 'second'),
         boilMinOutput: 25,
       },
     },
     {
       id: config.names.mtPid,
-      type: pidType,
+      type: blockTypes.Pid,
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[pidType].generate() as PidData),
+        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
         enabled: true,
         inputId: new Link(config.names.mtSetpoint),
         outputId: new Link(config.names.hltDriver),
         kp: opts.mtKp,
         ti: new Unit(5, 'min'),
         td: new Unit(10, 'min'),
-        integralReset: 0,
       },
     },
     {
       id: config.names.bkPid,
-      type: pidType,
+      type: blockTypes.Pid,
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[pidType].generate() as PidData),
+        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
         enabled: true,
         inputId: new Link(config.names.bkSetpoint),
         outputId: new Link(config.names.bkPwm),
         kp: opts.bkKp,
         ti: new Unit(5, 'min'),
         td: new Unit(10, 'min'),
-        integralReset: 0,
         boilMinOutput: 25,
       },
     },
@@ -344,7 +313,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
   });
 
   const createBuilder = (): BuilderItem => ({
-    ...createWidget(`${config.prefix} Diagram`, builderType),
+    ...createWidget(`${config.prefix} Diagram`, 'Builder'),
     cols: 11,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
@@ -485,55 +454,4 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
   });
 
   return [createBuilder(), createGraph(), createStepView()];
-}
-
-export function createActions(): WizardAction[] {
-  return [
-    // Rename blocks
-    async (config: HermsConfig) => {
-      await Promise.all(
-        Object.entries(config.renamedBlocks)
-          .filter(([currVal, newVal]: [string, string]) => currVal !== newVal)
-          .map(([currVal, newVal]: [string, string]) => sparkStore.renameBlock([config.serviceId, currVal, newVal]))
-      );
-    },
-
-    // Change blocks
-    async (config: HermsConfig) => {
-      await Promise.all(
-        config.changedBlocks
-          .map(block => sparkStore.saveBlock([config.serviceId, block])));
-    },
-
-    // Create blocks
-    async (config: HermsConfig) => {
-      // Create synchronously, to ensure dependencies are created first
-      for (const block of config.createdBlocks) {
-        await sparkStore.createBlock([config.serviceId, block]);
-      }
-    },
-
-    // Create layouts
-    async (config: HermsConfig) => {
-      await Promise.all(
-        config.layouts
-          .map(builderStore.createLayout)
-      );
-    },
-
-    // Create dashboards / widgets
-    async (config: HermsConfig) => {
-      if (!dashboardStore.dashboardIds.includes(config.dashboardId)) {
-        const dashboard: Dashboard = {
-          id: config.dashboardId,
-          title: config.dashboardTitle,
-          order: dashboardStore.dashboardIds.length + 1,
-        };
-        await dashboardStore.createDashboard(dashboard);
-      }
-      for (const widget of config.widgets) {
-        await dashboardStore.appendDashboardItem(widget);
-      }
-    },
-  ];
 }

@@ -1,4 +1,5 @@
 <script lang="ts">
+import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
 import UrlSafeString from 'url-safe-string';
 import { Component } from 'vue-property-decorator';
@@ -7,7 +8,6 @@ import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { suggestId, validator, valOrDefault } from '@/helpers/functional';
 import { typeName as sparkType } from '@/plugins/spark/getters';
 import { blockIdRules } from '@/plugins/spark/helpers';
-import { GroupsBlock } from '@/plugins/spark/provider/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Service, serviceStore } from '@/store/services';
 
@@ -52,28 +52,22 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
   }
 
   get groupError(): string | null {
-    if (!this.serviceId) {
-      return null;
-    }
-    const block: GroupsBlock | undefined =
-      sparkStore.blockValues(this.serviceId)
-        .find(block => block.type === 'Groups');
-    const names = sparkStore.groupNames(this.serviceId);
-    return block && block.data.active.includes(0)
+    const [name, active] = get(sparkStore.groupState, [this.serviceId, 0], ['Unknown', false]);
+    return active
       ? null
-      : `Group '${names[0]}' is disabled. Created blocks will be inactive.`;
+      : `Group '${name}' is disabled. Created blocks will be inactive.`;
   }
 
-  get arrangementId(): string {
-    return valOrDefault(this.config.arrangementId, 'HERMS');
+  get title(): string {
+    return valOrDefault(this.config.title, 'HERMS');
   }
 
-  set arrangementId(id: string) {
-    this.updateConfig({ ...this.config, arrangementId: id });
+  set title(title: string) {
+    this.updateConfig({ ...this.config, title });
   }
 
   get prefix(): string {
-    return valOrDefault(this.config.prefix, this.arrangementId.slice(0, 5));
+    return valOrDefault(this.config.prefix, this.title.slice(0, 5));
   }
 
   set prefix(prefix: string) {
@@ -81,7 +75,7 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
   }
 
   get dashboardTitle(): string {
-    return valOrDefault(this.config.dashboardTitle, `${this.arrangementId} Dashboard`);
+    return valOrDefault(this.config.dashboardTitle, `${this.title} Dashboard`);
   }
 
   set dashboardTitle(id: string) {
@@ -130,7 +124,7 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
     this.updateConfig({
       ...this.config,
       serviceId: this.serviceId,
-      arrangementId: this.arrangementId,
+      title: this.title,
       prefix: this.prefix,
       dashboardId: new UrlSafeString().generate(this.dashboardTitle),
       dashboardTitle: this.dashboardTitle,
@@ -170,9 +164,9 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
         <q-expansion-item default-opened label="Settings" icon="settings" dense>
           <QuickStartServiceField v-model="serviceId" :services="services" />
           <QuickStartNameField
-            v-model="arrangementId"
+            v-model="title"
             label="Arrangement name"
-            @clear="clearKey('arrangementId')"
+            @clear="clearKey('title')"
           >
             <template #help>
               The full name of your arrangement.

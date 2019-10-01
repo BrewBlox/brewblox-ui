@@ -4,12 +4,12 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 import { suggestId } from '@/helpers/functional';
-import { typeName as tempSensorMockType } from '@/plugins/spark/features/TempSensorMock/getters';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
+import { featureStore } from '@/store/features';
 import { Service, serviceStore } from '@/store/services';
 
-import { featureStore } from '../../../../store/features';
+import { blockTypes } from '../../block-types';
 import { blockIdRules } from '../../helpers';
 
 
@@ -53,9 +53,9 @@ export default class CreateMockMenu extends DialogBase {
     const block: Block = {
       id: suggestId('temp-sensor-mock', this.validateBlockId),
       serviceId: this.serviceId,
-      type: tempSensorMockType,
+      type: blockTypes.TempSensorMock,
       groups: [0],
-      data: sparkStore.specs[tempSensorMockType].generate(),
+      data: sparkStore.specs[blockTypes.TempSensorMock].generate(),
     };
     this.createBlock(block);
   }

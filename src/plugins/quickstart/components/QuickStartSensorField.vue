@@ -2,16 +2,15 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { typeName as sensorMockType } from '@/plugins/spark/features/TempSensorMock/getters';
-import { typeName as sensorOneWireType } from '@/plugins/spark/features/TempSensorOneWire/getters';
+import { blockTypes } from '@/plugins/spark/block-types';
 import { sparkStore } from '@/plugins/spark/store';
 
 
 @Component
 export default class QuickStartSensorField extends Vue {
   readonly validTypes = [
-    sensorOneWireType,
-    sensorMockType,
+    blockTypes.TempSensorOneWire,
+    blockTypes.TempSensorMock,
   ];
 
   @Prop({ type: String, required: false })
@@ -45,9 +44,10 @@ export default class QuickStartSensorField extends Vue {
 <template>
   <q-select
     v-model="local"
-    v-bind="$attrs"
     :options="opts"
     :hint="sensorTemp"
+    :rules="[v => !!v || 'Sensor must be selected']"
+    v-bind="$attrs"
     dark
     options-dark
   />

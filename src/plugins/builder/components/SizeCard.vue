@@ -23,11 +23,12 @@ export default class SizeCard extends PartCard {
   public readonly label!: string;
 
   get size(): number {
-    return this.part.settings[this.settingsKey] || this.defaultSize;
+    const val = this.part.settings[this.settingsKey];
+    return (typeof val === 'number') ? val : this.defaultSize;
   }
 
   save(val: number): void {
-    const size = val || this.defaultSize;
+    const size = (typeof val === 'number') ? val : this.defaultSize;
     this.savePartSettings({ ...this.part.settings, [this.settingsKey]: size });
   }
 
