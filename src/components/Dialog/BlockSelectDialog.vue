@@ -8,7 +8,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
 @Component
-export default class BlockDialog extends DialogBase {
+export default class BlockSelectDialog extends DialogBase {
   block: Block | null = null
 
   @Prop({ type: Object })

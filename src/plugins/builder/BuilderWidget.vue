@@ -191,7 +191,7 @@ export default class BuilderWidget extends WidgetBase {
         </q-btn>
       </q-item-section>
       <q-item-section side>
-        <q-btn-dropdown flat split icon="settings" @click="showForm">
+        <q-btn-dropdown flat split icon="settings" @click="showDialog">
           <q-list dark bordered>
             <ExportAction :crud="crud" />
             <WidgetActions :crud="crud" />
@@ -234,7 +234,7 @@ export default class BuilderWidget extends WidgetBase {
           outline
           label="Choose layouts"
           class="q-mb-md"
-          @click="showForm"
+          @click="showDialog"
         />
         <q-btn v-if="!wrongBrowser" outline label="Edit Layout" @click="startEditor" />
       </span>

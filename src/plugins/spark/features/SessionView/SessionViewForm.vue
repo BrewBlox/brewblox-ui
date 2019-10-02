@@ -129,7 +129,7 @@ export default class SessionViewForm extends CrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :crud="crud" />
+    <WidgetDialogToolbar :crud="crud" />
     <BlockGraph
       v-if="graphModalOpen"
       :id="`SessionView::form::${graphSession.id}`"

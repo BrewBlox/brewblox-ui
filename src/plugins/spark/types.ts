@@ -1,4 +1,4 @@
-import { DashboardItem } from '@/store/dashboards';
+import { PersistentWidget } from '@/store/dashboards';
 import { Feature } from '@/store/features';
 import { Service } from '@/store/services';
 
@@ -67,7 +67,7 @@ export interface BlockConfig {
   blockId: string;
 }
 
-export interface DashboardBlock extends DashboardItem {
+export interface DashboardBlock extends PersistentWidget {
   config: BlockConfig;
 }
 

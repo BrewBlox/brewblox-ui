@@ -70,7 +70,7 @@ export function createOutputActions(): WizardAction[] {
         await dashboardStore.createDashboard(dashboard);
       }
       for (const widget of config.widgets) {
-        await dashboardStore.appendDashboardItem(widget);
+        await dashboardStore.appendPersistentWidget(widget);
       }
     },
   ];

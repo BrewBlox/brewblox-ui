@@ -15,7 +15,7 @@ export default class DS2408Form extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud" />
+    <BlockWidgetDialogToolbar :crud="crud" />
     <CardWarning v-if="!block.data.connected">
       <template #message>
         DS2408 is not connected.

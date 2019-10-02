@@ -138,14 +138,14 @@ export default class IoArray extends BlockCrudComponent {
         />
       </q-item-section>
       <q-item-section side>
-        <BlockFormButton
+        <BlockDialogButton
           v-if="channel.driver"
           :block-id="channel.driver.id"
           :service-id="serviceId"
           flat
         >
           <q-tooltip>Configure Digital Actuator</q-tooltip>
-        </BlockFormButton>
+        </BlockDialogButton>
         <q-btn v-else flat icon="add" @click="createActuator(channel)">
           <q-tooltip>Create new Digital Actuator</q-tooltip>
         </q-btn>

@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 
-import { DashboardItem } from '@/store/dashboards';
+import { PersistentWidget } from '@/store/dashboards';
 
 import { Crud } from '../Widget/CrudComponent';
 
@@ -48,7 +48,7 @@ export default class GridItem extends Vue {
   currentStartCols: number | null = null;
   currentStartRows: number | null = null;
 
-  get widget(): DashboardItem {
+  get widget(): PersistentWidget {
     return this.initialCrud.widget;
   }
 

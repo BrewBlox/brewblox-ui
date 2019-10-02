@@ -72,7 +72,7 @@ export default class PidForm extends BlockCrudComponent {
     </template>
 
     <q-card dark class="widget-modal">
-      <BlockFormToolbar :crud="crud">
+      <BlockWidgetDialogToolbar :crud="crud">
         <template v-slot:actions>
           <ActionItem
             v-if="isStoreBlock"
@@ -81,7 +81,7 @@ export default class PidForm extends BlockCrudComponent {
             @click="showRelations"
           />
         </template>
-      </BlockFormToolbar>
+      </BlockWidgetDialogToolbar>
 
       <q-card-section>
         <BlockEnableToggle

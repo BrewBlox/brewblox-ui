@@ -56,10 +56,6 @@ export default class BlockWidgetBase extends WidgetBase {
     }
   }
 
-  public openModal(args: Record<string, any> = {}): void {
-    this.showForm(args);
-  }
-
   public async refreshBlock(): Promise<void> {
     await sparkStore.fetchBlock([this.serviceId, this.block])
       .catch(() => { });

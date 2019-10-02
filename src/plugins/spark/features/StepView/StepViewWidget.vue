@@ -130,8 +130,8 @@ export default class StepViewWidget extends WidgetBase {
       .finally(() => { this.applying = false; });
   }
 
-  openModal(openStep: string | null): void {
-    this.showForm({
+  showDialog(openStep: string | null): void {
+    this.showDialog({
       getProps: () => ({ openStep }),
     });
   }
@@ -166,7 +166,7 @@ export default class StepViewWidget extends WidgetBase {
   <q-card dark class="text-white scroll">
     <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
-        <q-btn-dropdown flat split icon="settings" @click="openModal(null)">
+        <q-btn-dropdown flat split icon="settings" @click="showDialog(null)">
           <q-list dark bordered>
             <ExportAction :crud="crud" />
             <WidgetActions :crud="crud" />
@@ -211,7 +211,7 @@ export default class StepViewWidget extends WidgetBase {
           </q-tooltip>
         </q-item-section>
         <q-item-section class="col-auto">
-          <q-btn flat round icon="settings" @click="openModal(step.id)" />
+          <q-btn flat round icon="settings" @click="showDialog(step.id)" />
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn

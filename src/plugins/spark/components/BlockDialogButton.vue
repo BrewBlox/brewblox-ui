@@ -9,7 +9,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '../types';
 
 @Component
-export default class BlockFormButton extends Vue {
+export default class BlockDialogButton extends Vue {
 
   @Prop({ type: String, validator: v => v === null || isString(v) })
   readonly blockId!: string;

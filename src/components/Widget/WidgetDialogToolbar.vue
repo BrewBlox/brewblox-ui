@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import CrudComponent from './CrudComponent';
 
 @Component
-export default class FormToolbar extends CrudComponent { }
+export default class WidgetDialogToolbar extends CrudComponent { }
 </script>
 
 <template>

@@ -17,8 +17,8 @@ export default class ServiceWizardPicker extends Vue {
   get wizardOptions(): SelectOption[] {
     return providerStore.providerIds
       .map(id => ({
-        label: providerStore.displayNameById(id),
-        value: providerStore.wizardById(id),
+        label: providerStore.displayName(id),
+        value: providerStore.wizard(id),
       }))
       .filter(opt => opt.value)
       .sort(objectStringSorter('label'));

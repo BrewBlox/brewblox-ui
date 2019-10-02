@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
-import { Dashboard, DashboardItem, dashboardStore } from '@/store/dashboards';
+import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards';
 import { featureStore, WidgetContext } from '@/store/features';
 
 import { Crud } from '../components/Widget/CrudComponent';
@@ -53,29 +53,29 @@ export default class DashboardPage extends Vue {
     return dashboardStore.dashboardValues;
   }
 
-  get allItems(): DashboardItem[] {
-    return dashboardStore.itemValues;
+  get allItems(): PersistentWidget[] {
+    return dashboardStore.widgetValues;
   }
 
-  get items(): DashboardItem[] {
+  get items(): PersistentWidget[] {
     return dashboardStore.dashboardItemsByDashboardId(this.dashboardId)
       .sort(objectSorter('order'));
   }
 
   get validatedItems(): ValidatedItem[] {
     return this.items
-      .map((item: DashboardItem) => {
+      .map((item: PersistentWidget) => {
         try {
           if (item.title === undefined) {
             // ensure backwards compatibility
             // older items may not have a title
             item.title = item.id;
           }
-          const component = featureStore.widgetById(item.feature, item.config);
+          const component = featureStore.widget(item.feature, item.config);
           if (!component) {
             throw new Error(`No widget found for ${item.feature}`);
           }
-          const validator = featureStore.validatorById(item.feature);
+          const validator = featureStore.validator(item.feature);
           if (!validator(item.config)) {
             throw new Error(`${item.feature} validation failed`);
           }
@@ -122,19 +122,19 @@ export default class DashboardPage extends Vue {
       if (local) {
         local.crud.widget.pinnedPosition = pinnedPosition;
       }
-      await dashboardStore.saveDashboardItem({ ...dashboardStore.dashboardItemById(id), pinnedPosition });
-      await dashboardStore.updateDashboardItemOrder(order);
+      await dashboardStore.savePersistentWidget({ ...dashboardStore.dashboardItemById(id), pinnedPosition });
+      await dashboardStore.updatePersistentWidgetOrder(order);
     } catch (e) {
       throw e;
     }
   }
 
   async onChangeSize(id: string, cols: number, rows: number): Promise<void> {
-    await dashboardStore.updateDashboardItemSize({ id, cols, rows });
+    await dashboardStore.updatePersistentWidgetSize({ id, cols, rows });
   }
 
-  public async saveWidget(widget: DashboardItem): Promise<void> {
-    await dashboardStore.saveDashboardItem(widget);
+  public async saveWidget(widget: PersistentWidget): Promise<void> {
+    await dashboardStore.savePersistentWidget(widget);
   }
 
   onIdChanged(oldId, newId): void {

@@ -19,8 +19,8 @@ export interface Feature {
     cols: number;
     rows: number;
   };
-  widget: string | WidgetSelector;
-  wizard?: string;
+  widgetComponent: string | WidgetSelector;
+  wizardComponent?: string;
   form?: string;
 }
 

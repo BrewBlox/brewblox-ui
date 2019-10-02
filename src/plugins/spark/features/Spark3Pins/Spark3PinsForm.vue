@@ -12,7 +12,7 @@ export default class Spark3PinsForm extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud" />
+    <BlockWidgetDialogToolbar :crud="crud" />
 
     <IoArray :crud="crud" />
     <q-separator dark inset />

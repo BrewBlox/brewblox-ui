@@ -19,10 +19,10 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
     />
 
     <q-item-section side>
-      <q-btn icon="edit" @click="openModal({mode: 0})" />
+      <q-btn icon="edit" @click="showDialog({mode: 0})" />
     </q-item-section>
     <q-item-section side>
-      <q-btn-dropdown flat split icon="settings" @click="openModal">
+      <q-btn-dropdown flat split icon="settings" @click="showDialog">
         <q-list dark bordered>
           <!-- Global Actions -->
           <ActionItem

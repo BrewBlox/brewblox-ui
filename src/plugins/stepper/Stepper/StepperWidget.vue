@@ -160,7 +160,7 @@ export default class StepperWidget extends WidgetBase {
         />
       </q-item-section>
       <q-item-section side>
-        <q-btn-dropdown flat split icon="settings" @click="openModal(null)">
+        <q-btn-dropdown flat split icon="settings" @click="showDialog(null)">
           <q-list dark bordered>
             <ActionItem icon="add" label="New" @click="make" />
             <ActionItem icon="refresh" label="Refresh" @click="fetch" />

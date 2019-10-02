@@ -5,14 +5,14 @@ import BlockCrudComponent from './BlockCrudComponent';
 
 
 @Component
-export default class BlockFormToolbar extends BlockCrudComponent {
+export default class BlockWidgetDialogToolbar extends BlockCrudComponent {
   graphModalOpen = false;
 
 }
 </script>
 
 <template>
-  <FormToolbar :crud="crud">
+  <WidgetDialogToolbar :crud="crud">
     <BlockGraph
       v-if="graphModalOpen"
       :id="widget.id"
@@ -35,5 +35,5 @@ export default class BlockFormToolbar extends BlockCrudComponent {
         </q-list>
       </q-btn-dropdown>
     </template>
-  </FormToolbar>
+  </WidgetDialogToolbar>
 </template>

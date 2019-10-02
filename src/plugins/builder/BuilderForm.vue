@@ -70,7 +70,7 @@ export default class BuilderForm extends CrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :crud="crud" />
+    <WidgetDialogToolbar :crud="crud" />
 
     <q-card-section>
       <q-item dark>

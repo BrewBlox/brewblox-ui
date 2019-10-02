@@ -6,13 +6,13 @@ import DialogBase from '@/components/Dialog/DialogBase';
 import { BlockCrud } from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
-import { DashboardItem } from '@/store/dashboards';
+import { PersistentWidget } from '@/store/dashboards';
 import { featureStore, WidgetContext, WidgetMode } from '@/store/features';
 
 @Component
 export default class BlockWidgetDialog extends DialogBase {
   id = uid()
-  localWidget: DashboardItem | null = null;
+  localWidget: PersistentWidget | null = null;
 
   @Prop({ type: String, required: true })
   public readonly serviceId!: string;
@@ -34,7 +34,7 @@ export default class BlockWidgetDialog extends DialogBase {
     return this.block ? this.block.type : '';
   }
 
-  get widget(): DashboardItem {
+  get widget(): PersistentWidget {
     return this.localWidget || {
       id: uid(),
       title: this.blockId,
@@ -45,7 +45,7 @@ export default class BlockWidgetDialog extends DialogBase {
         serviceId: this.serviceId,
         blockId: this.blockId,
       },
-      ...featureStore.widgetSizeById(this.blockType),
+      ...featureStore.widgetSize(this.blockType),
     };
   }
 
@@ -69,7 +69,7 @@ export default class BlockWidgetDialog extends DialogBase {
   }
 
   get widgetComponent(): string | null {
-    return featureStore.widgetById(this.blockType, this.widget.config);
+    return featureStore.widget(this.blockType, this.widget.config);
   }
 
   get widgetProps(): any {

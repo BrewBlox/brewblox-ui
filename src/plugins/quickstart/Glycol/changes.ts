@@ -19,7 +19,7 @@ import {
 import { StepViewItem } from '@/plugins/spark/features/StepView/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
-import { DashboardItem } from '@/store/dashboards';
+import { PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { unlinkedActuators } from '../helpers';
@@ -283,11 +283,11 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
     : blocks.filter(block => !heatingBlocks.includes(block.id));
 }
 
-export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): DashboardItem[] {
+export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): PersistentWidget[] {
   const userTemp = sparkStore.units(config.serviceId).Temp;
 
-  const createWidget = (name: string, type: string): DashboardItem => ({
-    ...featureStore.widgetSizeById(type),
+  const createWidget = (name: string, type: string): PersistentWidget => ({
+    ...featureStore.widgetSize(type),
     dashboard: config.dashboardId,
     id: uid(),
     title: name,
@@ -421,7 +421,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): D
     },
   };
 
-  const profile: DashboardItem = {
+  const profile: PersistentWidget = {
     ...createWidget(config.names.beerProfile, blockTypes.SetpointProfile),
     cols: 6,
     rows: 4,

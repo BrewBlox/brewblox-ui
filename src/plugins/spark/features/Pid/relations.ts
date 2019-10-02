@@ -53,7 +53,7 @@ function nodes(serviceId: string): { id: string; type: string }[] {
   return sparkStore.blockValues(serviceId)
     .map(block => ({
       id: block.id,
-      type: featureStore.displayNameById(block.type),
+      type: featureStore.displayName(block.type),
     }));
 }
 

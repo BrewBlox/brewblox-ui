@@ -126,7 +126,7 @@ export default class BlockCrudComponent extends CrudComponent {
     await this.saveConfig({ ...this.widget.config, blockId });
   }
 
-  public openModal(opts: { formProps?: any; mode?: WidgetMode } = {}): void {
+  public showDialog(opts: { formProps?: any; mode?: WidgetMode } = {}): void {
     const { formProps, mode } = opts;
     this.activeDialog = createDialog({
       component: 'WidgetDialog',
@@ -165,7 +165,7 @@ export default class BlockCrudComponent extends CrudComponent {
 
   public startSwitchBlock(): void {
     createDialog({
-      component: 'BlockDialog',
+      component: 'BlockSelectDialog',
       title: 'Choose a Block',
       message: 'You can change the Block that will be displayed by this widget',
       filter: block => block.type === this.block.type,

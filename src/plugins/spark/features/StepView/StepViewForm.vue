@@ -63,7 +63,7 @@ export default class StepViewForm extends CrudComponent {
       ...change,
       block,
       key: `__${stepId}__${change.blockId}`,
-      displayName: block ? featureStore.displayNameById(block.type) : 'Unknown',
+      displayName: block ? featureStore.displayName(block.type) : 'Unknown',
       props: block ? this.changeFields[block.type] : [],
       data: change.data || {},
       confirmed: change.confirmed || {},
@@ -182,7 +182,7 @@ export default class StepViewForm extends CrudComponent {
 
   addChange(step: StepDisplay): void {
     createDialog({
-      component: 'BlockDialog',
+      component: 'BlockSelectDialog',
       title: 'Choose a Block',
       filter: block => {
         return !!this.changeFields[block.type]
@@ -232,11 +232,11 @@ export default class StepViewForm extends CrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :crud="crud">
+    <WidgetDialogToolbar :crud="crud">
       <template v-slot:actions>
         <ExportAction :crud="crud" />
       </template>
-    </FormToolbar>
+    </WidgetDialogToolbar>
 
     <q-card-section>
       <div class="scroll-parent">

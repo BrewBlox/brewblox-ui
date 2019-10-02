@@ -149,14 +149,14 @@ export default class ValveArray extends BlockCrudComponent {
         />
       </q-item-section>
       <q-item-section side>
-        <BlockFormButton
+        <BlockDialogButton
           v-if="channel.driver"
           :block-id="channel.driver.id"
           :service-id="serviceId"
           flat
         >
           <q-tooltip>Configure valve</q-tooltip>
-        </BlockFormButton>
+        </BlockDialogButton>
         <q-btn v-else flat icon="add" @click="createActuator(channel)">
           <q-tooltip>Create new valve</q-tooltip>
         </q-btn>

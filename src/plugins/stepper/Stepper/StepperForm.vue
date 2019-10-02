@@ -13,7 +13,7 @@ export default class StepperForm extends CrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <FormToolbar :crud="crud" />
+    <WidgetDialogToolbar :crud="crud" />
     <q-card-section>
       TODO
     </q-card-section>

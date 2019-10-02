@@ -44,7 +44,7 @@ export default class PidWidget extends BlockWidgetBase {
 
   get toolbarComponent(): string {
     return this.context.container === 'Dialog'
-      ? 'BlockFormToolbar'
+      ? 'BlockWidgetDialogToolbar'
       : 'BlockWidgetToolbar';
   }
 

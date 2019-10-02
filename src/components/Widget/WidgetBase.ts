@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { DashboardItem } from '@/store/dashboards';
+import { PersistentWidget } from '@/store/dashboards';
 import { featureStore, WidgetContext } from '@/store/features';
 
 import { Crud } from './CrudComponent';
@@ -22,7 +22,7 @@ export default class WidgetBase extends Vue {
     return this.initialCrud;
   }
 
-  public get widget(): DashboardItem {
+  public get widget(): PersistentWidget {
     return this.crud.widget;
   }
 
@@ -31,10 +31,10 @@ export default class WidgetBase extends Vue {
   }
 
   public get displayName(): string {
-    return featureStore.displayNameById(this.widget.feature);
+    return featureStore.displayName(this.widget.feature);
   }
 
-  public saveWidget(widget: DashboardItem = this.crud.widget): void {
+  public saveWidget(widget: PersistentWidget = this.crud.widget): void {
     this.crud.saveWidget(widget);
   }
 
@@ -42,7 +42,7 @@ export default class WidgetBase extends Vue {
     this.saveWidget({ ...this.widget, config });
   }
 
-  public showForm(args: Record<string, any> = {}): void {
+  public showDialog(args: Record<string, any> = {}): void {
     this.activeDialog = createDialog({
       component: 'WidgetDialog',
       getCrud: () => ({ ...this.crud, closeDialog: this.closeDialog }),

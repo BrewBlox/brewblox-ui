@@ -13,7 +13,7 @@ export default class DS2413Form extends BlockCrudComponent {
 
 <template>
   <q-card dark class="widget-modal">
-    <BlockFormToolbar :crud="crud" />
+    <BlockWidgetDialogToolbar :crud="crud" />
     <CardWarning v-if="!block.data.connected">
       <template #message>
         DS2413 is not connected.

@@ -32,42 +32,38 @@ export class FeatureModule extends VuexModule {
     return Object.values(this.quickStarts);
   }
 
-  public get featureById(): (id: string) => Feature {
-    return id => this.features[id] || null;
-  }
-
-  public get displayNameById(): (id: string) => string {
+  public get displayName(): (id: string) => string {
     return id => get(this.features, [id, 'displayName']);
   }
 
-  public get roleById(): (id: string) => FeatureRole {
+  public get role(): (id: string) => FeatureRole {
     return id => get(this.features, [id, 'role']) || 'Other';
   }
 
-  public get validatorById(): (id: string) => Validator {
+  public get validator(): (id: string) => Validator {
     return id => get(this.features, [id, 'validator']) || (() => true);
   }
 
-  public get wizardById(): (id: string) => string {
+  public get wizard(): (id: string) => string {
     return id => get(this.features, [id, 'wizard'], '') as string;
   }
 
-  public get widgetById(): (id: string, config: any) => string | null {
+  public get widget(): (id: string, config: any) => string | null {
     return (id: string, config: any) => {
       const obj = get(this.features, [id, 'widget'], null);
       return typeof obj === 'function' ? obj(config) : obj;
     };
   }
 
-  public get widgetSizeById(): (id: string) => { cols: number; rows: number } {
+  public get widgetSize(): (id: string) => { cols: number; rows: number } {
     return id => get(this.features, [id, 'widgetSize']);
   }
 
-  public get formById(): (id: string) => string | undefined {
+  public get form(): (id: string) => string | undefined {
     return id => get(this.features, [id, 'form']);
   }
 
-  public get deletersById(): (id: string) => Deleter[] {
+  public get deleters(): (id: string) => Deleter[] {
     return id => get(this.features, [id, 'deleters']) || [];
   }
 

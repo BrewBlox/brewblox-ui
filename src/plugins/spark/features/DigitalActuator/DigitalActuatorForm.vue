@@ -71,7 +71,7 @@ export default class DigitalActuatorForm extends BlockCrudComponent {
     </template>
 
     <q-card dark class="widget-modal">
-      <BlockFormToolbar :crud="crud" />
+      <BlockWidgetDialogToolbar :crud="crud" />
 
       <q-card-section>
         <q-item dark>

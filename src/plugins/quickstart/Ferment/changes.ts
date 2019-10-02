@@ -20,7 +20,7 @@ import {
 import { StepViewItem } from '@/plugins/spark/features/StepView/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
-import { DashboardItem } from '@/store/dashboards';
+import { PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { unlinkedActuators } from '../helpers';
@@ -343,7 +343,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
   ];
 };
 
-export const defineWidgets = (config: FermentConfig, opts: FermentOpts, layouts: BuilderLayout[]): DashboardItem[] => {
+export const defineWidgets = (config: FermentConfig, opts: FermentOpts, layouts: BuilderLayout[]): PersistentWidget[] => {
   const genericSettings = {
     dashboard: config.dashboardId,
     cols: 4,
@@ -354,9 +354,9 @@ export const defineWidgets = (config: FermentConfig, opts: FermentOpts, layouts:
   const userTemp = sparkStore.units(config.serviceId).Temp;
   const serviceId = config.serviceId;
 
-  const createWidget = (name: string, type: string): DashboardItem => ({
+  const createWidget = (name: string, type: string): PersistentWidget => ({
     ...genericSettings,
-    ...featureStore.widgetSizeById(type),
+    ...featureStore.widgetSize(type),
     id: uid(),
     title: name,
     feature: type,
@@ -559,7 +559,7 @@ export const defineWidgets = (config: FermentConfig, opts: FermentOpts, layouts:
     },
   });
 
-  const createProfile = (name: string): DashboardItem => ({
+  const createProfile = (name: string): PersistentWidget => ({
     ...createWidget(name, blockTypes.SetpointProfile),
     cols: 6,
     rows: 4,

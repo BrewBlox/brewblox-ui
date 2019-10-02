@@ -4,13 +4,13 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { deepCopy } from '@/helpers/units/parseObject';
-import { DashboardItem, dashboardStore } from '@/store/dashboards';
+import { dashboardStore, PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 export interface Crud {
-  widget: DashboardItem;
+  widget: PersistentWidget;
   isStoreWidget: boolean;
-  saveWidget(widget: DashboardItem): unknown | Promise<unknown>;
+  saveWidget(widget: PersistentWidget): unknown | Promise<unknown>;
   closeDialog(): void;
 }
 
@@ -19,7 +19,7 @@ export default class CrudComponent extends Vue {
   @Prop({ type: Object, required: true })
   public readonly crud!: Crud;
 
-  public get widget(): DashboardItem {
+  public get widget(): PersistentWidget {
     return this.crud.widget;
   }
 
@@ -28,19 +28,19 @@ export default class CrudComponent extends Vue {
   }
 
   public get displayName(): string {
-    return featureStore.displayNameById(this.widget.feature);
+    return featureStore.displayName(this.widget.feature);
   }
 
   public closeDialog(): void {
     this.crud.closeDialog();
   }
 
-  public saveWidget(widget: DashboardItem = this.widget): void {
-    this.crud.saveWidget(widget);
+  public async saveWidget(widget: PersistentWidget = this.widget): Promise<void> {
+    await this.crud.saveWidget(widget);
   }
 
-  public saveConfig(config: any = this.widget.config): void {
-    this.saveWidget({ ...this.widget, config });
+  public async saveConfig(config: any = this.widget.config): Promise<void> {
+    await this.saveWidget({ ...this.widget, config });
   }
 
   public startChangeWidgetTitle(): void {
@@ -76,7 +76,7 @@ export default class CrudComponent extends Vue {
         if (!dashboard) {
           return;
         }
-        dashboardStore.appendDashboardItem({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
+        dashboardStore.appendPersistentWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
         this.$q.notify({
           color: 'positive',
           icon: 'file_copy',
@@ -105,7 +105,7 @@ export default class CrudComponent extends Vue {
 
   public startRemoveWidget(): void {
     const deleteItem = async (): Promise<void> => {
-      await dashboardStore.removeDashboardItem(this.widget);
+      await dashboardStore.removePersistentWidget(this.widget);
       this.closeDialog();
     };
 
@@ -116,7 +116,7 @@ export default class CrudComponent extends Vue {
         label: 'Remove widget from this dashboard',
         action: deleteItem,
       },
-      ...featureStore.deletersById(this.widget.feature)
+      ...featureStore.deleters(this.widget.feature)
         .map(del => ({ label: del.description, action: del.action })),
     ].map((opt, idx) => ({ ...opt, value: idx }));
 

@@ -18,7 +18,7 @@ export default class TempSensorOneWireForm extends BlockCrudComponent {
     </template>
 
     <q-card dark class="widget-modal">
-      <BlockFormToolbar :crud="crud" />
+      <BlockWidgetDialogToolbar :crud="crud" />
       <CardWarning v-if="block.data.value.val === null">
         <template #message>
           OneWire Sensor could not be read.

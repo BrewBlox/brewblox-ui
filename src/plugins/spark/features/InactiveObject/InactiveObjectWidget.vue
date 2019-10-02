@@ -11,7 +11,7 @@ export default class InactiveObjectWidget extends BlockWidgetBase {
   readonly block!: InactiveObjectBlock;
 
   get actualDisplayName(): string {
-    return featureStore.displayNameById(this.block.data.actualType);
+    return featureStore.displayName(this.block.data.actualType);
   }
 }
 </script>

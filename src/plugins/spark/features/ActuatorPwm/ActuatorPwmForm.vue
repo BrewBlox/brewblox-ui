@@ -28,7 +28,7 @@ export default class ActuatorPwmForm extends BlockCrudComponent {
     </template>
 
     <q-card dark class="widget-modal">
-      <BlockFormToolbar :crud="crud" />
+      <BlockWidgetDialogToolbar :crud="crud" />
 
       <q-card-section>
         <BlockEnableToggle

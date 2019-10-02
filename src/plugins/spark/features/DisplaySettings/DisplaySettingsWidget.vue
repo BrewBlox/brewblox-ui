@@ -36,7 +36,7 @@ export default class DisplaySettingsWidget extends BlockWidgetBase {
             :key="idx"
             clickable
             class="col-4"
-            @click="openModal"
+            @click="showDialog"
           >
             <q-item-section>
               <q-item-label caption>
