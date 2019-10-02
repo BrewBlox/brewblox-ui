@@ -469,7 +469,7 @@ export default class SparkPage extends Vue {
             <component
               :is="val.component"
               :widget="val.item"
-              volatile
+              volatile-widget
               class="bg-dark"
               @update:widget="saveWidget"
             />

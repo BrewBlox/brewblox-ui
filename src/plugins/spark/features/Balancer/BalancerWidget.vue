@@ -1,13 +1,13 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 import { getClients } from './getters';
 import { BalancerBlock } from './types';
 
 @Component
-export default class BalancerWidget extends BlockWidget {
+export default class BalancerWidget extends BlockWidgetBase {
   readonly block!: BalancerBlock;
 
   get clientNames(): Record<string, string> {

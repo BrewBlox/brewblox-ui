@@ -7,6 +7,7 @@ import store from '@/store';
 import { Deleter, Feature, FeatureRole, QuickStart, Validator, Watcher } from './types';
 export * from './types';
 
+
 const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'features' })
@@ -51,17 +52,15 @@ export class FeatureModule extends VuexModule {
     return id => get(this.features, [id, 'wizard'], '') as string;
   }
 
-  public get widgetById(): (id: string, config: any, selector?: boolean) => string | undefined {
-    return (id: string, config: any, selector = true) => {
-      const feature = this.features[id] || {};
-      return selector && feature.selector
-        ? feature.selector(config)
-        : feature.widget;
+  public get widgetById(): (id: string, config: any) => string | null {
+    return (id: string, config: any) => {
+      const obj = get(this.features, [id, 'widget'], null);
+      return typeof obj === 'function' ? obj(config) : obj;
     };
   }
 
   public get widgetSizeById(): (id: string) => { cols: number; rows: number } {
-    return id => get(this.features, [id, 'widgetSize']) || Object.assign({}, { cols: 3, rows: 2 });
+    return id => get(this.features, [id, 'widgetSize']);
   }
 
   public get formById(): (id: string) => string | undefined {

@@ -3,14 +3,14 @@ import { Component } from 'vue-property-decorator';
 
 import { spaceCased } from '@/helpers/functional';
 import { blockTypes } from '@/plugins/spark/block-types';
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 import { sparkStore } from '../../store';
 import { Spark3PinsBlock } from '../Spark3Pins/types';
 import { MotorValveBlock, ValveState } from './types';
 
 @Component
-export default class MotorValveWidget extends BlockWidget {
+export default class MotorValveWidget extends BlockWidgetBase {
   readonly block!: MotorValveBlock;
 
   get valveStateName(): string {

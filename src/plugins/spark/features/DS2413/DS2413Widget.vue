@@ -1,12 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 import { DS2413Block } from './types';
 
 @Component
-export default class DS2413Widget extends BlockWidget {
+export default class DS2413Widget extends BlockWidgetBase {
   readonly block!: DS2413Block;
 }
 </script>

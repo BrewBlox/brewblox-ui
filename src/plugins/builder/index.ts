@@ -29,6 +29,7 @@ const deprecated: Feature = {
   id: 'ProcessView',
   displayName: 'Process View',
   widget: 'DeprecatedWidget',
+  widgetSize: { cols: 0, rows: 0 },
 };
 
 export default {

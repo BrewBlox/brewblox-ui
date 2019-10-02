@@ -1,12 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 import { TempSensorOneWireBlock } from './types';
 
 @Component
-export default class TempSensorOneWireWidget extends BlockWidget {
+export default class TempSensorOneWireWidget extends BlockWidgetBase {
   readonly block!: TempSensorOneWireBlock;
 }
 </script>

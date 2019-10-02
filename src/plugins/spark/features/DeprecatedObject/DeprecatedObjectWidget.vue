@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { sparkStore } from '@/plugins/spark/store';
 
 import { fetchStoredBlock } from '../../store/api';
@@ -9,7 +9,7 @@ import { Block } from '../../types';
 import { DeprecatedObjectBlock } from './types';
 
 @Component
-export default class DeprecatedObjectWidget extends BlockWidget {
+export default class DeprecatedObjectWidget extends BlockWidgetBase {
   readonly block!: DeprecatedObjectBlock;
   actual: Block | null = null;
 

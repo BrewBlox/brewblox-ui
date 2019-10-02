@@ -13,6 +13,9 @@ import {
 } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
+import { WidgetSelector } from '@/store/features';
+
+import { BlockConfig } from './types';
 
 export const blockIdRules = (serviceId: string): InputRule[] => [
   v => !!v || 'Name must not be empty',
@@ -58,3 +61,12 @@ export const installFilters = (Vue: VueConstructor): void => {
   Vue.filter('dateString', dateString);
   Vue.filter('shortDateString', shortDateString);
 };
+
+export const blockWidgetSelector = (widget: string): WidgetSelector =>
+  (config: BlockConfig) => {
+    if (!sparkStore.serviceAvailable(config.serviceId)) {
+      throw new Error(`Service '${config.serviceId}' not found`);
+    }
+    const block = sparkStore.blocks(config.serviceId)[config.blockId];
+    return block ? widget : 'UnknownBlockWidget';
+  };

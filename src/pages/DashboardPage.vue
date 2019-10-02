@@ -5,14 +5,16 @@ import { Watch } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
 import { Dashboard, DashboardItem, dashboardStore } from '@/store/dashboards';
-import { featureStore } from '@/store/features';
+import { featureStore, WidgetContext } from '@/store/features';
 
+import { Crud } from '../components/Widget/CrudComponent';
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '../helpers/dashboards';
 
 interface ValidatedItem {
-  item: DashboardItem;
+  id: string;
   component: string;
-  error?: Error;
+  crud: Crud;
+  error?: string;
 }
 
 @Component
@@ -20,6 +22,11 @@ export default class DashboardPage extends Vue {
   widgetEditable = false;
   menuModalOpen = false;
   wizardModalOpen = false;
+
+  context: WidgetContext = {
+    mode: 'Basic',
+    container: 'Dashboard',
+  }
 
   @Watch('dashboardId')
   onChangeDashboardId(): void {
@@ -72,13 +79,34 @@ export default class DashboardPage extends Vue {
           if (!validator(item.config)) {
             throw new Error(`${item.feature} validation failed`);
           }
-          return { item, component };
+          // return { item, component };
+          return {
+            id: item.id,
+            component,
+            crud: {
+              widget: item,
+              isStoreWidget: true,
+              saveWidget: this.saveWidget,
+              closeDialog: () => { },
+            },
+          };
         } catch (e) {
           return {
-            item,
+            id: item.id,
             component: 'InvalidWidget',
-            error: e.toString(),
+            crud: {
+              widget: item,
+              isStoreWidget: true,
+              saveWidget: this.saveWidget,
+              closeDialog: () => { },
+              error: e.toString(),
+            },
           };
+          // return {
+          //   widget: item,
+          //   component: 'InvalidWidget',
+          //   error: e.toString(),
+          // };
         }
       });
   }
@@ -90,9 +118,9 @@ export default class DashboardPage extends Vue {
   async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: string[]): Promise<void> {
     try {
       // Make a local change to the validated item, to avoid it jumping during the store round trip
-      const local = this.validatedItems.find(valItem => valItem.item.id === id);
+      const local = this.validatedItems.find(valItem => valItem.id === id);
       if (local) {
-        local.item.pinnedPosition = pinnedPosition;
+        local.crud.widget.pinnedPosition = pinnedPosition;
       }
       await dashboardStore.saveDashboardItem({ ...dashboardStore.dashboardItemById(id), pinnedPosition });
       await dashboardStore.updateDashboardItemOrder(order);
@@ -180,14 +208,14 @@ export default class DashboardPage extends Vue {
         />
       </q-dialog>
       <q-list v-if="isMobile" no-border>
-        <q-item v-for="val in validatedItems" :key="val.item.id">
+        <q-item v-for="val in validatedItems" :key="val.id">
           <q-item-section>
             <component
               :is="val.component"
               :disabled="widgetEditable"
-              :widget="val.item"
+              :initial-crud="val.crud"
+              :context="context"
               class="dashboard-item"
-              @update:widget="saveWidget"
             />
           </q-item-section>
         </q-item>
@@ -201,12 +229,12 @@ export default class DashboardPage extends Vue {
         <component
           :is="val.component"
           v-for="val in validatedItems"
-          :key="val.item.id"
+          :key="val.id"
           :disabled="widgetEditable"
-          :widget="val.item"
+          :initial-crud="val.crud"
+          :context="context"
           :error="val.error"
           class="dashboard-item"
-          @update:widget="saveWidget"
         />
       </GridContainer>
     </div>

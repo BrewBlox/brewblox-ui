@@ -9,6 +9,9 @@ export default class GraphCardWrapper extends Vue {
   sizeok = window.innerWidth >= 1500;
 
   @Prop({ type: Boolean, default: false })
+  public readonly show!: boolean;
+
+  @Prop({ type: Boolean, default: false })
   public readonly showInitial!: boolean;
 
   created(): void {
@@ -18,7 +21,10 @@ export default class GraphCardWrapper extends Vue {
 </script>
 
 <template>
-  <q-card dark class="row wrapper-card">
+  <q-card v-if="!show" class="passthrough-card">
+    <slot />
+  </q-card>
+  <q-card v-else dark class="row wrapper-card">
     <slot />
     <template v-if="sizeok">
       <div class="col column justify-center" style="min-height: 100%">
@@ -56,6 +62,12 @@ export default class GraphCardWrapper extends Vue {
 </template>
 
 <style scoped>
+.passthrough-card {
+  padding: 0;
+  margin: 0;
+  overflow: auto;
+}
+
 .wrapper-card {
   padding: 0;
   margin: 0;

@@ -1,4 +1,4 @@
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
@@ -8,10 +8,23 @@ import { Block } from '../types';
 import { BlockCrud } from './BlockCrudComponent';
 
 @Component
-export default class BlockWidget extends WidgetBase {
+export default class BlockWidgetBase extends WidgetBase {
 
-  public get block(): Block {
-    return sparkStore.blockById(this.serviceId, this.blockId);
+  @Prop({ type: Boolean, default: false })
+  public readonly volatileBlock!: boolean;
+
+  public get crud(): BlockCrud {
+    const initial = this.initialCrud as BlockCrud;
+    // We want to avoid calling member getters, as this may create circular lookups
+    const { serviceId, blockId } = initial.widget.config;
+    return initial.block !== undefined
+      ? initial
+      : {
+        ...this.initialCrud,
+        isStoreBlock: true,
+        block: sparkStore.blockById(serviceId, blockId),
+        saveBlock: async (block: Block) => sparkStore.saveBlock([serviceId, block]),
+      };
   }
 
   public get serviceId(): string {
@@ -22,16 +35,8 @@ export default class BlockWidget extends WidgetBase {
     return this.widget.config.blockId;
   }
 
-  public get crud(): BlockCrud {
-    return {
-      widget: this.widget,
-      isStoreWidget: !this.volatile,
-      saveWidget: this.saveWidget,
-      block: this.block,
-      isStoreBlock: true,
-      saveBlock: this.saveBlock,
-      closeDialog: this.closeDialog,
-    };
+  public get block(): Block {
+    return this.crud.block;
   }
 
   public get isDriven(): boolean {
@@ -46,7 +51,7 @@ export default class BlockWidget extends WidgetBase {
 
   @Watch('blockId', { immediate: true })
   private fixWidgetTitle(): void {
-    if (this.blockId !== this.widget.title && !this.volatile) {
+    if (this.blockId !== this.widget.title && this.isStoreWidget) {
       this.saveWidget({ ...this.widget, title: this.blockId });
     }
   }
@@ -61,8 +66,11 @@ export default class BlockWidget extends WidgetBase {
   }
 
   public async saveBlock(block: Block = this.block): Promise<void> {
-    await sparkStore.saveBlock([this.serviceId, block])
-      .catch(() => this.$forceUpdate());
+    try {
+      await this.crud.saveBlock(block);
+    } catch {
+      this.$forceUpdate();
+    }
   }
 
   public changeBlockId(newId: string): void {

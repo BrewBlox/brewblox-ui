@@ -1,12 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 import { ActuatorAnalogMockBlock } from './types';
 
 @Component
-export default class ActuatorAnalogMockWidget extends BlockWidget {
+export default class ActuatorAnalogMockWidget extends BlockWidgetBase {
   readonly block!: ActuatorAnalogMockBlock;
 }
 </script>

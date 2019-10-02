@@ -1,13 +1,13 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 import { GraphProps, profileGraphProps } from './helpers';
 import { SetpointProfileBlock } from './types';
 
 @Component
-export default class SetpointProfileWidget extends BlockWidget {
+export default class SetpointProfileWidget extends BlockWidgetBase {
   readonly block!: SetpointProfileBlock;
   revision = 0;
 

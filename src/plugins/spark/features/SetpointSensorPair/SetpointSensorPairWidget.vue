@@ -2,13 +2,13 @@
 import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 import { sparkStore } from '../../store';
 import { SetpointSensorPairBlock } from './types';
 
 @Component
-export default class SetpointSensorPairWidget extends BlockWidget {
+export default class SetpointSensorPairWidget extends BlockWidgetBase {
   readonly block!: SetpointSensorPairBlock;
 
   get isUsed(): boolean {

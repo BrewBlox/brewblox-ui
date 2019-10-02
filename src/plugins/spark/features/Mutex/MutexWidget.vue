@@ -1,13 +1,13 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 import { getMutexClients, MutexBlocks } from './getters';
 import { MutexBlock } from './types';
 
 @Component
-export default class MutexWidget extends BlockWidget {
+export default class MutexWidget extends BlockWidgetBase {
   readonly block!: MutexBlock;
 
   get mutexClients(): MutexBlocks {

@@ -46,7 +46,7 @@ export default class GridContainer extends Vue {
   slotStyle(slot: VNode): Record<string, string> {
     const style: Record<string, string> = {};
     const opts = slot.componentOptions as VNodeComponentOptions;
-    const { id, pinnedPosition, cols, rows } = (opts.propsData as any).widget;
+    const { id, pinnedPosition, cols, rows } = (opts.propsData as any).initialCrud.widget;
 
     if (pinnedPosition) {
       style.gridArea = `${pinnedPosition.y} / ${pinnedPosition.x} / span ${rows} / span ${cols}`;

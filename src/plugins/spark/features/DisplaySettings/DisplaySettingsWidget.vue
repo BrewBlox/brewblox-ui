@@ -1,12 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 import { DisplaySettingsBlock, DisplaySlot } from './types';
 
 @Component
-export default class DisplaySettingsWidget extends BlockWidget {
+export default class DisplaySettingsWidget extends BlockWidgetBase {
   readonly block!: DisplaySettingsBlock;
 
   get slots(): DisplaySlot[] {

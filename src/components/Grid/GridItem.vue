@@ -4,6 +4,8 @@ import { Component, Prop, Ref } from 'vue-property-decorator';
 
 import { DashboardItem } from '@/store/dashboards';
 
+import { Crud } from '../Widget/CrudComponent';
+
 const GRID_SIZE = 100;
 const GAP_SIZE = 20;
 const MIN_COLS = 2;
@@ -21,7 +23,7 @@ export default class GridItem extends Vue {
   readonly dragOverlay!: Vue;
 
   @Prop({ type: Object, required: true })
-  readonly widget!: DashboardItem;
+  readonly initialCrud!: Crud;
 
   @Prop({ type: Boolean, default: false })
   readonly editable!: boolean;
@@ -45,6 +47,10 @@ export default class GridItem extends Vue {
   currentRows: number | null = null;
   currentStartCols: number | null = null;
   currentStartRows: number | null = null;
+
+  get widget(): DashboardItem {
+    return this.initialCrud.widget;
+  }
 
   // Used by GridContainer
   get id(): string {

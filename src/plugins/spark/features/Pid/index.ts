@@ -5,11 +5,17 @@ import { ActuatorAnalogLink, SetpointSensorPairLink } from '@/helpers/units/Know
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
+import { blockWidgetSelector } from '../../helpers';
 import { BlockSpec } from '../../types';
 import { typeName } from './getters';
+import basic from './PidCardBasic.vue';
+import full from './PidCardFull.vue';
 import form from './PidForm.vue';
 import widget from './PidWidget.vue';
 import { PidData } from './types';
+
+ref(basic);
+ref(full);
 
 const block: BlockSpec = {
   id: typeName,
@@ -170,7 +176,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'PID',
   role: 'Control',
-  widget: ref(widget),
+  widget: blockWidgetSelector(ref(widget)),
   form: ref(form),
   widgetSize: {
     cols: 4,

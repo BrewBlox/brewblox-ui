@@ -1,12 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 import { ActuatorOffsetBlock } from './types';
 
 @Component
-export default class ActuatorOffsetWidget extends BlockWidget {
+export default class ActuatorOffsetWidget extends BlockWidgetBase {
   readonly block!: ActuatorOffsetBlock;
 
   get warnings(): string {

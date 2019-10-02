@@ -7,6 +7,7 @@ import { createDialog } from '@/helpers/dialog';
 import { showBlockDialog } from '@/helpers/dialog';
 import { postfixedDisplayNames } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
+import { WidgetMode } from '@/store/features';
 
 import { blockIdRules } from '../helpers';
 import { Block } from '../types';
@@ -125,12 +126,12 @@ export default class BlockCrudComponent extends CrudComponent {
     await this.saveConfig({ ...this.widget.config, blockId });
   }
 
-  public openModal(opts: { formProps?: any } = {}): void {
-    const { formProps } = opts;
+  public openModal(opts: { formProps?: any; mode?: WidgetMode } = {}): void {
+    const { formProps, mode } = opts;
     this.activeDialog = createDialog({
-      component: 'FormDialog',
-      root: this.$root,
+      component: 'WidgetDialog',
       getCrud: () => ({ ...this.crud, closeDialog: this.closeDialog }),
+      mode,
       getProps: () => formProps,
     });
   }
@@ -144,7 +145,7 @@ export default class BlockCrudComponent extends CrudComponent {
   }
 
   public showOtherBlock(block: Block, props: any = {}): void {
-    showBlockDialog(block, props);
+    showBlockDialog(block, { props });
   }
 
   public startChangeBlockId(): void {

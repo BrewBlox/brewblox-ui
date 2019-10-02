@@ -1,12 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 import { ActuatorPwmBlock } from './types';
 
 @Component
-export default class ActuatorPwmWidget extends BlockWidget {
+export default class ActuatorPwmWidget extends BlockWidgetBase {
   readonly block!: ActuatorPwmBlock;
 
   get isConstrained(): boolean {
