@@ -14,6 +14,7 @@ export default class ActuatorAnalogMockFull extends BlockCrudComponent {
 <template>
   <q-card dark v-bind="$attrs">
     <slot name="toolbar" />
+    <slot name="warnings" />
 
     <q-card-section>
       <q-item dark>

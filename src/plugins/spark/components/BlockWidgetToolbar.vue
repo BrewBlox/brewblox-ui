@@ -9,8 +9,8 @@ import BlockCrudComponent from './BlockCrudComponent';
 export default class BlockWidgetToolbar extends BlockCrudComponent {
   graphModalOpen = false;
 
-  @Prop({ type: String, default: 'Basic' })
-  public readonly mode!: WidgetMode;
+  @Prop({ type: String, required: false })
+  public readonly mode!: WidgetMode | null;
 
   @Emit('update:mode')
   public toggleMode(): WidgetMode {
@@ -28,7 +28,7 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
       :config.sync="graphCfg"
     />
 
-    <q-item-section side>
+    <q-item-section v-if="!!mode" side>
       <q-btn flat icon="mdi-account-switch" @click="toggleMode" />
     </q-item-section>
     <q-item-section side>

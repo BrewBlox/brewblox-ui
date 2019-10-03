@@ -65,7 +65,6 @@ export const installFilters = (Vue: VueConstructor): void => {
 
 export const blockWidgetSelector = (component: VueConstructor): WidgetSelector => {
   const widget = ref(component);
-  console.log(widget, 'block widget');
   return (config: BlockConfig) => {
     if (!sparkStore.serviceAvailable(config.serviceId)) {
       throw new Error(`Service '${config.serviceId}' not found`);

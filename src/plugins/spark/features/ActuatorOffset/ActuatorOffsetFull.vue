@@ -13,7 +13,6 @@ export default class ActuatorOffsetFull extends BlockCrudComponent {
 <template>
   <q-card dark v-bind="$attrs">
     <slot name="toolbar" />
-
     <slot name="warnings">
       <BlockEnableToggle
         :crud="crud"

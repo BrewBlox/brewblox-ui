@@ -24,7 +24,6 @@ export default class ActuatorPwmFull extends BlockCrudComponent {
 <template>
   <q-card dark v-bind="$attrs">
     <slot name="toolbar" />
-
     <slot name="warnings">
       <BlockEnableToggle
         :crud="crud"
