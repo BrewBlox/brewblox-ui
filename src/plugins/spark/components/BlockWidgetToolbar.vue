@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { WidgetMode } from '@/store/features';
 
@@ -12,21 +12,14 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
   @Prop({ type: String, required: false })
   public readonly mode!: WidgetMode | null;
 
-  @Emit('update:mode')
-  public toggleMode(): WidgetMode {
-    return this.mode === 'Basic' ? 'Full' : 'Basic';
-  }
-
-  get modeIcon(): string {
-    return this.mode === 'Basic'
-      ? 'mdi-unfold-more-horizontal'
-      : 'mdi-unfold-less-horizontal';
+  updateMode(val: WidgetMode): void {
+    this.$emit('update:mode', val);
   }
 }
 </script>
 
 <template>
-  <WidgetToolbar :title="widget.title" :subtitle="displayName">
+  <WidgetToolbar :crud="crud" :mode="mode" @update:mode="updateMode">
     <BlockGraph
       v-if="graphModalOpen"
       :id="widget.id"
@@ -34,9 +27,6 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
       :config.sync="graphCfg"
     />
 
-    <q-item-section v-if="!!mode" side>
-      <q-btn flat :icon="modeIcon" @click="toggleMode" />
-    </q-item-section>
     <q-item-section side>
       <q-btn-dropdown flat split icon="settings" @click="showDialog">
         <q-list dark bordered>

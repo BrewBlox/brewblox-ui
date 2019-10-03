@@ -2,13 +2,11 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '../../components/BlockCrudComponent';
-import { D2413Block, D2413Id, ValveStartId } from './types';
+import { DS2413Block } from './types';
 
 @Component
 export default class D2413Basic extends BlockCrudComponent {
-  D2413Id = D2413Id;
-  ValveStartId = ValveStartId;
-  readonly block!: D2413Block;
+  readonly block!: DS2413Block;
 }
 </script>
 

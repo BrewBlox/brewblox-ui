@@ -5,7 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { dashboardStore, PersistentWidget } from '@/store/dashboards';
-import { featureStore } from '@/store/features';
+import { featureStore, WidgetMode } from '@/store/features';
 
 export interface Crud {
   widget: PersistentWidget;
@@ -14,8 +14,16 @@ export interface Crud {
   closeDialog(): void;
 }
 
+export interface DialogOpts {
+  widgetProps?: any;
+  mode?: WidgetMode;
+  listeners?: Mapped<Function>;
+}
+
 @Component
 export default class CrudComponent extends Vue {
+  private activeDialog: any = null;
+
   @Prop({ type: Object, required: true })
   public readonly crud!: Crud;
 
@@ -31,7 +39,22 @@ export default class CrudComponent extends Vue {
     return featureStore.displayName(this.widget.feature);
   }
 
+  public showDialog(opts: DialogOpts = {}): void {
+    const { widgetProps, mode, listeners } = opts;
+    this.activeDialog = createDialog({
+      component: 'WidgetDialog',
+      getCrud: () => ({ ...this.crud, closeDialog: this.closeDialog }),
+      getProps: () => widgetProps,
+      mode,
+      listeners,
+    });
+  }
+
   public closeDialog(): void {
+    if (this.activeDialog) {
+      this.activeDialog.hide();
+      this.activeDialog = null;
+    }
     this.crud.closeDialog();
   }
 

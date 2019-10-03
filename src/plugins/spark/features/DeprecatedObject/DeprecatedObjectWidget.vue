@@ -33,7 +33,7 @@ export default class DeprecatedObjectWidget extends BlockWidgetBase {
         </q-item-label>
       </q-item-section>
     </DialogToolbar>
-    <WidgetToolbar v-else :title="widget.title" :subtitle="displayName" />
+    <WidgetToolbar v-else :crud="crud" />
 
     <q-card-section>
       <q-item dark>

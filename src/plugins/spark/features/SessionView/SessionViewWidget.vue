@@ -6,10 +6,17 @@ import WidgetBase from '@/components/Widget/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { shortDateString } from '@/helpers/functional';
 
+import SessionViewBasic from './SessionViewBasic.vue';
+import SessionViewFull from './SessionViewFull.vue';
 import { Session, SessionViewConfig } from './types';
 
 
-@Component
+@Component({
+  components: {
+    Basic: SessionViewBasic,
+    Full: SessionViewFull,
+  },
+})
 export default class SessionViewWidget extends WidgetBase {
   graphSessionId: string | null = null;
   sessionFilter = '';
@@ -57,10 +64,11 @@ export default class SessionViewWidget extends WidgetBase {
   showSessionDialog(activeSession: Session | null = null): void {
     this.showDialog({
       getProps: () => ({ activeSession }),
-      listeners: {
-        createSession: this.createSession,
-      },
     });
+  }
+
+  showSessionGraph(id: string): void {
+    this.graphSessionId = id;
   }
 
   createSession(): void {
@@ -95,61 +103,42 @@ export default class SessionViewWidget extends WidgetBase {
           ...this.widgetConfig,
           sessions: [...this.widgetConfig.sessions, session],
         });
-        this.showDialog(session);
+        this.showSessionDialog(session);
       });
   }
 }
 </script>
 
 <template>
-  <q-card dark class="text-white scroll">
-    <BlockGraph
-      v-if="graphSession"
-      :id="`${widget.id}::${graphSession.id}`"
-      :value="true"
-      :config="graphSession.graphCfg"
-      no-duration
-      @update:config="v => { graphSession.graphCfg = v; saveConfig(widgetConfig); }"
-      @input="v => {if(!v) graphSessionId = null;}"
-    />
-
-    <WidgetToolbar :title="widget.title" :subtitle="displayName">
-      <q-item-section side>
-        <q-btn-dropdown flat split icon="settings" @click="showSessionDialog">
-          <q-list dark bordered>
-            <WidgetActions :crud="crud" />
-          </q-list>
-        </q-btn-dropdown>
-      </q-item-section>
-    </WidgetToolbar>
-
-    <q-card-section>
-      <q-item dark>
-        <q-item-section>
-          <q-input v-model="sessionFilter" placeholder="Search Session" clearable dark>
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </q-item-section>
+  <component
+    :is="mode"
+    :crud="crud"
+    :class="cardClass"
+    @create="createSession"
+    @graph="showSessionGraph"
+  >
+    <template #toolbar>
+      <WidgetDialogToolbar v-if="inDialog" :crud="crud" :mode.sync="mode" />
+      <WidgetToolbar v-else :crud="crud" :mode.sync="mode">
         <q-item-section side>
-          <q-btn flat rounded icon="add" label="New" class="text-white" @click="createSession" />
+          <q-btn-dropdown flat split icon="settings" @click="showSessionDialog">
+            <q-list dark bordered>
+              <WidgetActions :crud="crud" />
+            </q-list>
+          </q-btn-dropdown>
         </q-item-section>
-      </q-item>
-      <q-item v-for="session in sessions" :key="session.id" dark>
-        <q-item-section>
-          {{ session.name }}
-          <q-item-label caption>
-            {{ periodString(session) }}
-          </q-item-label>
-        </q-item-section>
-        <q-item-section side>
-          <q-btn flat rounded icon="settings" @click="showSessionDialog(session)" />
-        </q-item-section>
-        <q-item-section side>
-          <q-btn flat rounded icon="mdi-chart-line" @click="graphSessionId = session.id" />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-  </q-card>
+      </WidgetToolbar>
+    </template>
+    <template #graph>
+      <BlockGraph
+        v-if="graphSession"
+        :id="`${widget.id}::${graphSession.id}`"
+        :value="true"
+        :config="graphSession.graphCfg"
+        no-duration
+        @update:config="v => { graphSession.graphCfg = v; saveConfig(widgetConfig); }"
+        @input="v => {if(!v) graphSessionId = null;}"
+      />
+    </template>
+  </component>
 </template>

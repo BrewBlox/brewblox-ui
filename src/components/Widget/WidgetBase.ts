@@ -43,6 +43,16 @@ export default class WidgetBase extends Vue {
     return featureStore.displayName(this.widget.feature);
   }
 
+  public get inDialog(): boolean {
+    return this.context.container === 'Dialog';
+  }
+
+  public get cardClass(): string[] {
+    return this.inDialog
+      ? ['widget-modal']
+      : ['text-white', 'scroll', 'widget-dashboard'];
+  }
+
   public saveWidget(widget: PersistentWidget = this.crud.widget): void {
     this.crud.saveWidget(widget);
   }

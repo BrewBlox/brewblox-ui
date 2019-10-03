@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 @Component
-export default class WidgetToolbar extends Vue {
+export default class Toolbar extends Vue {
   @Prop({ type: String, required: true })
   readonly title!: string;
 

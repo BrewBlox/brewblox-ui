@@ -57,11 +57,11 @@ export default class SparkWidget extends Vue {
 
 <template>
   <q-card v-if="ready" dark class="text-white scroll">
-    <WidgetToolbar :title="serviceId" subtitle="Spark Service">
+    <Toolbar :title="serviceId" subtitle="Spark Service">
       <q-item-section class="dense" side>
         <q-btn flat round dense icon="refresh" @click="fetchAll" />
       </q-item-section>
-    </WidgetToolbar>
+    </Toolbar>
 
     <CardWarning v-if="!updating">
       <template #message>

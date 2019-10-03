@@ -96,20 +96,10 @@ export default class BlockWidgetBase extends WidgetBase {
     });
   }
 
-  public get inDialog(): boolean {
-    return this.context.container === 'Dialog';
-  }
-
   public get toolbarComponent(): string {
     return this.inDialog
       ? 'BlockWidgetDialogToolbar'
       : 'BlockWidgetToolbar';
-  }
-
-  public get cardClass(): string[] {
-    return this.inDialog
-      ? ['widget-modal']
-      : ['text-white', 'scroll', 'widget-dashboard'];
   }
 
   @Watch('blockId', { immediate: true })

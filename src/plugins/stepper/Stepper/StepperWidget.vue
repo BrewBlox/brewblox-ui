@@ -150,7 +150,7 @@ export default class StepperWidget extends WidgetBase {
 
 <template>
   <q-card dark class="text-white scroll">
-    <WidgetToolbar :title="widget.title" :subtitle="displayName">
+    <WidgetToolbar :crud="crud">
       <q-item-section side>
         <q-btn
           unelevated

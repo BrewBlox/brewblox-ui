@@ -164,7 +164,7 @@ export default class StepViewWidget extends WidgetBase {
 
 <template>
   <q-card dark class="text-white scroll">
-    <WidgetToolbar :title="widget.title" :subtitle="displayName">
+    <WidgetToolbar :crud="crud">
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="showStepDialog(null)">
           <q-list dark bordered>

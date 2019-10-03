@@ -13,21 +13,14 @@ export default class BlockWidgetDialogToolbar extends BlockCrudComponent {
   @Prop({ type: String, default: 'Basic' })
   public readonly mode!: WidgetMode;
 
-  @Emit('update:mode')
-  public toggleMode(): WidgetMode {
-    return this.mode === 'Basic' ? 'Full' : 'Basic';
-  }
-
-  get modeIcon(): string {
-    return this.mode === 'Basic'
-      ? 'mdi-unfold-more-horizontal'
-      : 'mdi-unfold-less-horizontal';
+  updateMode(val: WidgetMode): void {
+    this.$emit('update:mode', val);
   }
 }
 </script>
 
 <template>
-  <WidgetDialogToolbar :crud="crud">
+  <WidgetDialogToolbar :crud="crud" :mode="mode" @update:mode="updateMode">
     <BlockGraph
       v-if="graphModalOpen"
       :id="widget.id"
@@ -35,7 +28,6 @@ export default class BlockWidgetDialogToolbar extends BlockCrudComponent {
       :config.sync="graphCfg"
     />
     <template v-slot:buttons>
-      <q-btn flat :icon="modeIcon" @click="toggleMode" />
       <q-btn-dropdown flat icon="mdi-pencil">
         <q-list dark bordered>
           <ActionItem icon="refresh" label="Refresh" @click="refreshBlock" />

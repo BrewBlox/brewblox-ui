@@ -91,7 +91,7 @@ export default class GraphWidget extends WidgetBase {
       </q-card>
     </q-dialog>
 
-    <WidgetToolbar :title="widget.title" :subtitle="displayName">
+    <WidgetToolbar :crud="crud">
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="settingsModalOpen = true">
           <q-list dark bordered>

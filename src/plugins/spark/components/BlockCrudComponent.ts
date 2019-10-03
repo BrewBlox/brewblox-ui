@@ -7,7 +7,6 @@ import { createDialog } from '@/helpers/dialog';
 import { showBlockDialog } from '@/helpers/dialog';
 import { postfixedDisplayNames } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
-import { WidgetMode } from '@/store/features';
 
 import { blockIdRules } from '../helpers';
 import { Block } from '../types';
@@ -20,7 +19,6 @@ export interface BlockCrud extends Crud {
 
 @Component
 export default class BlockCrudComponent extends CrudComponent {
-  private activeDialog: any = null;
 
   @Prop({ type: Object, required: true })
   public readonly crud!: BlockCrud;
@@ -124,24 +122,6 @@ export default class BlockCrudComponent extends CrudComponent {
 
   public async switchBlock(blockId: string): Promise<void> {
     await this.saveConfig({ ...this.widget.config, blockId });
-  }
-
-  public showDialog(opts: { formProps?: any; mode?: WidgetMode } = {}): void {
-    const { formProps, mode } = opts;
-    this.activeDialog = createDialog({
-      component: 'WidgetDialog',
-      getCrud: () => ({ ...this.crud, closeDialog: this.closeDialog }),
-      getProps: () => formProps,
-      mode,
-    });
-  }
-
-  public closeDialog(): void {
-    if (this.activeDialog) {
-      this.activeDialog.hide();
-      this.activeDialog = null;
-    }
-    this.crud.closeDialog();
   }
 
   public showOtherBlock(block: Block, props: any = {}): void {

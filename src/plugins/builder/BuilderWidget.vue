@@ -176,7 +176,7 @@ export default class BuilderWidget extends WidgetBase {
 
 <template>
   <q-card dark class="text-white column">
-    <WidgetToolbar :title="widget.title" :subtitle="displayName">
+    <WidgetToolbar :crud="crud">
       <q-item-section side>
         <q-btn
           :disable="wrongBrowser"
