@@ -6,7 +6,7 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { DS2408Block, DS2408Id, ValveStartId } from './types';
 
 @Component
-export default class DS2408Form extends BlockCrudComponent {
+export default class DS2408Full extends BlockCrudComponent {
   DS2408Id = DS2408Id;
   ValveStartId = ValveStartId;
   readonly block!: DS2408Block;
@@ -14,17 +14,14 @@ export default class DS2408Form extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <BlockWidgetDialogToolbar :crud="crud" />
-    <CardWarning v-if="!block.data.connected">
-      <template #message>
-        DS2408 is not connected.
-      </template>
-    </CardWarning>
+  <q-card dark v-bind="$attrs">
+    <slot name="toolbar" />
+    <slot name="warnings" />
+
     <ValveArray :crud="crud" :id-enum="DS2408Id" :name-enum="ValveStartId" />
     <q-card-section>
       <q-item dark>
-        <q-item-section>
+        <q-item-section class="col-grow">
           <q-item-label caption>
             Address
           </q-item-label>
