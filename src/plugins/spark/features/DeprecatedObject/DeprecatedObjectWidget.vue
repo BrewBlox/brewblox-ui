@@ -3,8 +3,8 @@ import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { sparkStore } from '@/plugins/spark/store';
+import { fetchStoredBlock } from '@/plugins/spark/store/api';
 
-import { fetchStoredBlock } from '../../store/api';
 import { Block } from '../../types';
 import { DeprecatedObjectBlock } from './types';
 
@@ -24,8 +24,16 @@ export default class DeprecatedObjectWidget extends BlockWidgetBase {
 </script>
 
 <template>
-  <q-card dark class="text-white scroll">
-    <WidgetToolbar :title="widget.title" :subtitle="displayName" />
+  <q-card dark :class="cardClass">
+    <DialogToolbar v-if="inDialog">
+      <q-item-section>
+        <q-item-label>{{ widget.title }}</q-item-label>
+        <q-item-label caption>
+          {{ displayName }}
+        </q-item-label>
+      </q-item-section>
+    </DialogToolbar>
+    <WidgetToolbar v-else :title="widget.title" :subtitle="displayName" />
 
     <q-card-section>
       <q-item dark>
