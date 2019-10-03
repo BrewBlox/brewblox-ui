@@ -17,8 +17,8 @@ export default class InactiveObjectWidget extends BlockWidgetBase {
 </script>
 
 <template>
-  <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" />
+  <q-card dark :class="cardClass">
+    <component :is="toolbarComponent" :crud="crud" />
     <CardWarning v-if="!block.data.connected">
       <template #message>
         This {{ actualDisplayName }} block is disabled.
