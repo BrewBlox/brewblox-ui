@@ -3,74 +3,25 @@ import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
-import { getMutexClients, MutexBlocks } from './getters';
+import MutexBasic from './MutexBasic.vue';
+import MutexFull from './MutexFull.vue';
 import { MutexBlock } from './types';
 
-@Component
+@Component({
+  components: {
+    Basic: MutexBasic,
+    Full: MutexFull,
+  },
+})
 export default class MutexWidget extends BlockWidgetBase {
   readonly block!: MutexBlock;
-
-  get mutexClients(): MutexBlocks {
-    return getMutexClients(this.serviceId, this.blockId);
-  }
 }
 </script>
 
 <template>
-  <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" />
-
-    <q-card-section>
-      <q-item dark class="align-children">
-        <q-item-section>
-          <q-item-label caption>
-            Held by
-          </q-item-label>
-          <div v-for="client in mutexClients.active" :key="client">
-            {{ client }}
-          </div>
-          <div v-if="mutexClients.active.length === 0">
-            --
-          </div>
-        </q-item-section>
-        <q-item-section>
-          <div>
-            <q-item-label caption>
-              Waiting
-            </q-item-label>
-            <div v-for="client in mutexClients.waiting" :key="client">
-              {{ client }}
-            </div>
-            <div v-if="mutexClients.waiting.length === 0">
-              --
-            </div>
-          </div>
-          <div class="q-mt-md">
-            <q-item-label caption>
-              Wait time remaining
-            </q-item-label>
-            <div
-              v-if="mutexClients.waiting.length > 0 && block.data.waitRemaining.value"
-            >
-              {{ block.data.waitRemaining | unitDuration }}
-            </div>
-            <div v-else>
-              --
-            </div>
-          </div>
-        </q-item-section>
-        <q-item-section>
-          <q-item-label caption>
-            Idle
-          </q-item-label>
-          <div v-for="client in mutexClients.idle" :key="client">
-            {{ client }}
-          </div>
-          <div v-if="mutexClients.idle.length === 0">
-            --
-          </div>
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-  </q-card>
+  <component :is="mode" :crud="crud" :class="cardClass">
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+    </template>
+  </component>
 </template>

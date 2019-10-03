@@ -6,14 +6,15 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { MutexBlock } from './types';
 
 @Component
-export default class MutexForm extends BlockCrudComponent {
+export default class MutexFull extends BlockCrudComponent {
   readonly block!: MutexBlock;
 }
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <BlockWidgetDialogToolbar :crud="crud" />
+  <q-card dark v-bind="$attrs">
+    <slot name="toolbar" />
+    <slot name="warnings" />
 
     <q-card-section>
       <q-item dark>

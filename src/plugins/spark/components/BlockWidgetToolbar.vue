@@ -16,6 +16,12 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
   public toggleMode(): WidgetMode {
     return this.mode === 'Basic' ? 'Full' : 'Basic';
   }
+
+  get modeIcon(): string {
+    return this.mode === 'Basic'
+      ? 'mdi-unfold-more-horizontal'
+      : 'mdi-unfold-less-horizontal';
+  }
 }
 </script>
 
@@ -29,7 +35,7 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
     />
 
     <q-item-section v-if="!!mode" side>
-      <q-btn flat icon="mdi-account-switch" @click="toggleMode" />
+      <q-btn flat :icon="modeIcon" @click="toggleMode" />
     </q-item-section>
     <q-item-section side>
       <q-btn-dropdown flat split icon="settings" @click="showDialog">

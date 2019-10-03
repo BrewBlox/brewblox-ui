@@ -17,6 +17,12 @@ export default class BlockWidgetDialogToolbar extends BlockCrudComponent {
   public toggleMode(): WidgetMode {
     return this.mode === 'Basic' ? 'Full' : 'Basic';
   }
+
+  get modeIcon(): string {
+    return this.mode === 'Basic'
+      ? 'mdi-unfold-more-horizontal'
+      : 'mdi-unfold-less-horizontal';
+  }
 }
 </script>
 
@@ -29,7 +35,7 @@ export default class BlockWidgetDialogToolbar extends BlockCrudComponent {
       :config.sync="graphCfg"
     />
     <template v-slot:buttons>
-      <q-btn flat icon="mdi-account-switch" @click="toggleMode" />
+      <q-btn flat :icon="modeIcon" @click="toggleMode" />
       <q-btn-dropdown flat icon="mdi-pencil">
         <q-list dark bordered>
           <ActionItem icon="refresh" label="Refresh" @click="refreshBlock" />
