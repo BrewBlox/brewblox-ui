@@ -1,10 +1,9 @@
-import { ref } from '@/helpers/component-ref';
 import { SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
+import { blockWidgetSelector } from '../../helpers';
 import { BlockSpec } from '../../types';
-import form from './ActuatorOffsetForm.vue';
 import widget from './ActuatorOffsetWidget.vue';
 import { typeName } from './getters';
 import { ActuatorOffsetData, OffsetSettingOrValue } from './types';
@@ -60,7 +59,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'Setpoint Driver',
   role: 'Output',
-  widgetComponent: ref(widget),
+  widgetComponent: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 3,
