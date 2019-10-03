@@ -26,8 +26,8 @@ export default class SetpointProfileWidget extends BlockWidgetBase {
     }
     else {
       return this.mode === 'Full'
-        ? ['text-white', 'scroll', 'widget-dashboard', 'overflow-auto']
-        : ['text-white', 'col', 'column', 'bg-dark'];
+        ? ['widget-dashboard', 'overflow-auto', 'scroll']
+        : ['widget-dashboard', 'overflow-none', 'col', 'column'];
     }
   }
 
@@ -91,7 +91,7 @@ export default class SetpointProfileWidget extends BlockWidgetBase {
       </template>
 
       <template #graph>
-        <Graph v-bind="graphProps" :revision="revision" />
+        <Graph v-bind="graphProps" :revision="revision" auto-fit auto-resize />
       </template>
     </component>
   </GraphCardWrapper>
