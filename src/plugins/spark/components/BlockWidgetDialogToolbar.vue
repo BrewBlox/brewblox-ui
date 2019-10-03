@@ -10,7 +10,7 @@ import BlockCrudComponent from './BlockCrudComponent';
 export default class BlockWidgetDialogToolbar extends BlockCrudComponent {
   graphModalOpen = false;
 
-  @Prop({ type: String, default: 'Basic' })
+  @Prop({ type: String, required: false })
   public readonly mode!: WidgetMode;
 
   updateMode(val: WidgetMode): void {
