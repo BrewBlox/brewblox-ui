@@ -24,6 +24,8 @@ export default class Toolbar extends Vue {
         </q-item-label>
       </q-item-section>
       <slot />
+      <q-space />
+      <slot name="buttons" />
     </q-item>
     <q-separator dark inset />
   </q-card-section>

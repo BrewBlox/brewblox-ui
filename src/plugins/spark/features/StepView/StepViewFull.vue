@@ -30,7 +30,7 @@ interface StepDisplay extends Step {
     draggable,
   },
 })
-export default class StepViewForm extends CrudComponent {
+export default class StepViewFull extends CrudComponent {
   draggingStep = false;
   editableChanges: Record<string, boolean> = {};
 
@@ -231,12 +231,9 @@ export default class StepViewForm extends CrudComponent {
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <WidgetDialogToolbar :crud="crud">
-      <template v-slot:actions>
-        <ExportAction :crud="crud" />
-      </template>
-    </WidgetDialogToolbar>
+  <q-card dark v-bind="$attrs">
+    <slot name="toolbar" />
+    <slot name="warnings" />
 
     <q-card-section>
       <div class="scroll-parent">

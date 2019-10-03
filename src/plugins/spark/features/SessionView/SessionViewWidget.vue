@@ -119,15 +119,7 @@ export default class SessionViewWidget extends WidgetBase {
   >
     <template #toolbar>
       <WidgetDialogToolbar v-if="inDialog" :crud="crud" :mode.sync="mode" />
-      <WidgetToolbar v-else :crud="crud" :mode.sync="mode">
-        <q-item-section side>
-          <q-btn-dropdown flat split icon="settings" @click="showSessionDialog">
-            <q-list dark bordered>
-              <WidgetActions :crud="crud" />
-            </q-list>
-          </q-btn-dropdown>
-        </q-item-section>
-      </WidgetToolbar>
+      <WidgetToolbar v-else :crud="crud" :mode.sync="mode" />
     </template>
     <template #graph>
       <BlockGraph

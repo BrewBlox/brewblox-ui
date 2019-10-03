@@ -25,9 +25,20 @@ export default class WidgetToolbar extends CrudComponent {
 
 <template>
   <Toolbar :title="widget.title" :subtitle="displayName">
+    <slot />
     <q-item-section v-if="!!mode" side>
       <q-btn flat :icon="modeIcon" @click="toggleMode" />
     </q-item-section>
-    <slot />
+    <template v-slot:buttons>
+      <slot name="buttons">
+        <q-btn-dropdown flat split icon="settings" @click="showDialog">
+          <q-list dark bordered>
+            <slot name="actions">
+              <WidgetActions :crud="crud" />
+            </slot>
+          </q-list>
+        </q-btn-dropdown>
+      </slot>
+    </template>
   </Toolbar>
 </template>
