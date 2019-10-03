@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 import { showBlockDialog } from '@/helpers/dialog';
 import { Unit } from '@/helpers/units';
@@ -7,10 +7,8 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
 import { sparkStore } from '@/plugins/spark/store';
 
-import { startRelationsDialog } from './relations';
-
 @Component
-export default class PidCardFull extends BlockCrudComponent {
+export default class PidFull extends BlockCrudComponent {
   readonly block!: PidBlock;
 
   get inputId(): string | null {
@@ -57,10 +55,6 @@ export default class PidCardFull extends BlockCrudComponent {
 
   showOutput(): void {
     showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.outputId));
-  }
-
-  showRelations(): void {
-    startRelationsDialog(this.block);
   }
 }
 </script>

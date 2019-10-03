@@ -130,7 +130,7 @@ export default class StepViewWidget extends WidgetBase {
       .finally(() => { this.applying = false; });
   }
 
-  showDialog(openStep: string | null): void {
+  showStepDialog(openStep: string | null): void {
     this.showDialog({
       getProps: () => ({ openStep }),
     });
@@ -166,7 +166,7 @@ export default class StepViewWidget extends WidgetBase {
   <q-card dark class="text-white scroll">
     <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
-        <q-btn-dropdown flat split icon="settings" @click="showDialog(null)">
+        <q-btn-dropdown flat split icon="settings" @click="showStepDialog(null)">
           <q-list dark bordered>
             <ExportAction :crud="crud" />
             <WidgetActions :crud="crud" />

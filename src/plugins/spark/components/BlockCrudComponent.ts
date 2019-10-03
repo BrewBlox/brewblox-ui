@@ -131,8 +131,8 @@ export default class BlockCrudComponent extends CrudComponent {
     this.activeDialog = createDialog({
       component: 'WidgetDialog',
       getCrud: () => ({ ...this.crud, closeDialog: this.closeDialog }),
-      mode,
       getProps: () => formProps,
+      mode,
     });
   }
 

@@ -54,7 +54,7 @@ export default class SessionViewWidget extends WidgetBase {
     return `${shortDateString(session.start)} to ${shortDateString(session.end)}`;
   }
 
-  showDialog(activeSession: Session | null = null): void {
+  showSessionDialog(activeSession: Session | null = null): void {
     this.showDialog({
       getProps: () => ({ activeSession }),
       listeners: {
@@ -115,7 +115,7 @@ export default class SessionViewWidget extends WidgetBase {
 
     <WidgetToolbar :title="widget.title" :subtitle="displayName">
       <q-item-section side>
-        <q-btn-dropdown flat split icon="settings" @click="showDialog">
+        <q-btn-dropdown flat split icon="settings" @click="showSessionDialog">
           <q-list dark bordered>
             <WidgetActions :crud="crud" />
           </q-list>
@@ -144,7 +144,7 @@ export default class SessionViewWidget extends WidgetBase {
           </q-item-label>
         </q-item-section>
         <q-item-section side>
-          <q-btn flat rounded icon="settings" @click="showDialog(session)" />
+          <q-btn flat rounded icon="settings" @click="showSessionDialog(session)" />
         </q-item-section>
         <q-item-section side>
           <q-btn flat rounded icon="mdi-chart-line" @click="graphSessionId = session.id" />

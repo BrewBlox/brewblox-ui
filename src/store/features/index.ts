@@ -45,22 +45,18 @@ export class FeatureModule extends VuexModule {
   }
 
   public get wizard(): (id: string) => string {
-    return id => get(this.features, [id, 'wizard'], '') as string;
+    return id => get(this.features, [id, 'wizardComponent'], '') as string;
   }
 
   public get widget(): (id: string, config: any) => string | null {
     return (id: string, config: any) => {
-      const obj = get(this.features, [id, 'widget'], null);
+      const obj = get(this.features, [id, 'widgetComponent'], null);
       return typeof obj === 'function' ? obj(config) : obj;
     };
   }
 
   public get widgetSize(): (id: string) => { cols: number; rows: number } {
     return id => get(this.features, [id, 'widgetSize']);
-  }
-
-  public get form(): (id: string) => string | undefined {
-    return id => get(this.features, [id, 'form']);
   }
 
   public get deleters(): (id: string) => Deleter[] {

@@ -9,9 +9,10 @@ import { capitalized, objectStringSorter } from '@/helpers/functional';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, Spark, SystemStatus } from '@/plugins/spark/types';
 import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards';
-import { FeatureRole, featureStore } from '@/store/features';
+import { FeatureRole, featureStore, WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
 
+import { BlockCrud } from '../components/BlockCrudComponent';
 import { isReady, isSystemBlock } from './getters';
 
 interface ModalSettings {
@@ -19,12 +20,12 @@ interface ModalSettings {
   props: any;
 }
 
-interface ValidatedItem {
+interface ValidatedWidget {
   id: string;
   key: string;
   component: string;
-  widget: PersistentWidget;
-  typeName: string;
+  crud: BlockCrud;
+  displayName: string;
   role: FeatureRole;
   expanded: boolean;
 }
@@ -33,12 +34,17 @@ interface ValidatedItem {
 export default class SparkPage extends Vue {
   capitalized = capitalized;
 
-  @Prop({ type: String, required: true })
-  readonly serviceId!: string;
-
   volatileWidgets: { [blockId: string]: PersistentWidget } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
   blockFilter = '';
+
+  context: WidgetContext = {
+    mode: 'Basic',
+    container: 'Dashboard',
+  }
+
+  @Prop({ type: String, required: true })
+  readonly serviceId!: string;
 
   get service(): Spark {
     return serviceStore.serviceById(this.serviceId) as Spark;
@@ -89,16 +95,16 @@ export default class SparkPage extends Vue {
     };
   }
 
-  get allSorters(): { [id: string]: (a: ValidatedItem, b: ValidatedItem) => number } {
+  get allSorters(): { [id: string]: (a: ValidatedWidget, b: ValidatedWidget) => number } {
     return {
       unsorted: () => 0,
-      name: (a, b) => objectStringSorter('title')(a.widget, b.widget),
-      type: (a: ValidatedItem, b: ValidatedItem): number => {
-        const left = featureStore.displayName(a.widget.feature).toLowerCase();
-        const right = featureStore.displayName(b.widget.feature).toLowerCase();
+      name: (a, b) => objectStringSorter('id')(a, b),
+      type: (a, b): number => {
+        const left = a.displayName.toLowerCase();
+        const right = b.displayName.toLowerCase();
         return left.localeCompare(right);
       },
-      role: (a: ValidatedItem, b: ValidatedItem): number =>
+      role: (a, b): number =>
         this.roleOrder[a.role] - this.roleOrder[b.role],
     };
   }
@@ -112,7 +118,7 @@ export default class SparkPage extends Vue {
     this.saveServiceConfig();
   }
 
-  get sorter(): (a: ValidatedItem, b: ValidatedItem) => number {
+  get sorter(): (a: ValidatedWidget, b: ValidatedWidget) => number {
     return this.allSorters[this.sorting] || (() => 0);
   }
 
@@ -159,7 +165,7 @@ export default class SparkPage extends Vue {
     return `${this.service.id}/${blockId}`;
   }
 
-  validateBlock(block: Block): ValidatedItem {
+  validateBlock(block: Block): ValidatedWidget {
     const key = this.volatileKey(block.id);
     const existing = this.volatileWidgets[key];
     if (!existing || existing.feature !== block.type) {
@@ -183,15 +189,23 @@ export default class SparkPage extends Vue {
     return {
       id: widget.id,
       key,
-      widget,
-      typeName: featureStore.displayName(widget.feature),
+      displayName: featureStore.displayName(widget.feature),
       role: featureStore.role(widget.feature),
       component: featureStore.widget(widget.feature, widget.config) || 'InvalidWidget',
       expanded: this.expandedBlocks[widget.id] || false,
+      crud: {
+        widget,
+        saveWidget: this.saveWidget,
+        isStoreWidget: false,
+        closeDialog: () => { },
+        block,
+        saveBlock: this.saveBlock,
+        isStoreBlock: true,
+      },
     };
   }
 
-  get validatedItems(): ValidatedItem[] {
+  get validatedItems(): ValidatedWidget[] {
     return [
       ...sparkStore.blockValues(this.service.id)
         .filter(block => !isSystemBlock(block))
@@ -199,16 +213,16 @@ export default class SparkPage extends Vue {
     ];
   }
 
-  get filteredItems(): ValidatedItem[] {
+  get filteredItems(): ValidatedWidget[] {
     const filter = (this.blockFilter || '').toLowerCase();
     return this.validatedItems
       .filter(val => !filter
         || val.id.toLowerCase().match(filter)
-        || val.typeName.toLowerCase().match(filter))
+        || val.displayName.toLowerCase().match(filter))
       .sort(this.sorter);
   }
 
-  get expandedItems(): ValidatedItem[] {
+  get expandedItems(): ValidatedWidget[] {
     return this.filteredItems.filter(item => item.expanded);
   }
 
@@ -246,6 +260,10 @@ export default class SparkPage extends Vue {
     });
   }
 
+  async saveBlock(block: Block): Promise<void> {
+    sparkStore.saveBlock([block.serviceId, block]);
+  }
+
   startDialog(component: string, props: any = null): void {
     const args = props || {
       serviceId: this.service.id,
@@ -258,7 +276,7 @@ export default class SparkPage extends Vue {
   }
 
   showRelations(): void {
-    const nodes = this.validatedItems.map(v => ({ id: v.widget.id, type: v.typeName }));
+    const nodes = this.validatedItems.map(v => ({ id: v.id, type: v.displayName }));
     const relations = sparkStore.blockLinks(this.service.id);
 
     createDialog({
@@ -450,9 +468,9 @@ export default class SparkPage extends Vue {
             <q-icon :name="roleIcons[val.role]" />
             <q-tooltip>{{ val.role }}</q-tooltip>
           </q-item-section>
-          <q-item-section>{{ val.widget.title }}</q-item-section>
+          <q-item-section>{{ val.id }}</q-item-section>
           <q-item-section side>
-            {{ val.typeName }}
+            {{ val.displayName }}
           </q-item-section>
         </q-item>
       </q-list>
@@ -470,10 +488,9 @@ export default class SparkPage extends Vue {
           <q-item-section>
             <component
               :is="val.component"
-              :widget="val.item"
-              volatile-widget
+              :initial-crud="val.crud"
+              :context="context"
               class="bg-dark"
-              @update:widget="saveWidget"
             />
           </q-item-section>
         </q-item>

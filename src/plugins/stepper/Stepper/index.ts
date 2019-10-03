@@ -1,4 +1,4 @@
-import { ref, selector } from '@/helpers/component-ref';
+import { ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features';
 
 import form from './StepperForm.vue';
@@ -9,9 +9,8 @@ import wizard from './StepperWizard.vue';
 const feature: Feature = {
   id: 'Stepper',
   displayName: 'Stepper',
-  form: ref(form),
-  widget: selector(widget),
-  wizard: ref(wizard),
+  widgetComponent: ref(widget),
+  wizardComponent: ref(wizard),
   widgetSize: {
     cols: 4,
     rows: 2,

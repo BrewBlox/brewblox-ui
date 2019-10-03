@@ -11,9 +11,8 @@ ref(ChangeConfirmDialog);
 const feature: Feature = {
   id: 'StepView',
   displayName: 'Step View',
-  form: ref(form),
-  widget: ref(widget),
-  wizard: ref(wizard),
+  widgetComponent: ref(widget),
+  wizardComponent: ref(wizard),
   widgetSize: {
     cols: 4,
     rows: 2,

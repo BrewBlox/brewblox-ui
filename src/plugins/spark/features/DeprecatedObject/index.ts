@@ -9,12 +9,12 @@ const feature: Feature = {
   id: 'DeprecatedObject',
   displayName: 'Deprecated Object',
   role: 'Other',
-  widget: ref(widget),
+  widgetComponent: ref(widget),
+  wizardComponent: undefined,
   widgetSize: {
     cols: 4,
     rows: 2,
   },
-  wizard: undefined,
 };
 
 export default { feature };

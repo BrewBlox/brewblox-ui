@@ -25,14 +25,13 @@ const feature: Feature = {
   id: typeName,
   displayName: 'Spark 2 Pin Array',
   role: 'Output',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: ref(widget),
   widgetSize: {
     cols: 4,
     rows: 4,
   },
   // Spark2Pins is a static system object, and can't be created or deleted
-  wizard: undefined,
+  wizardComponent: undefined,
   deleters: undefined,
 };
 

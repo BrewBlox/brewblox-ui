@@ -9,9 +9,8 @@ import { SessionViewConfig } from './types';
 const feature: Feature = {
   id: 'SessionView',
   displayName: 'Session View',
-  widget: ref(widget),
-  form: ref(form),
-  wizard: ref(wizard),
+  widgetComponent: ref(widget),
+  wizardComponent: ref(wizard),
   validator: (config: SessionViewConfig) => !!config.sessions,
   widgetSize: {
     cols: 4,

@@ -10,7 +10,7 @@ import { featureStore, WidgetContext } from '@/store/features';
 import { Crud } from '../components/Widget/CrudComponent';
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '../helpers/dashboards';
 
-interface ValidatedItem {
+interface ValidatedWidget {
   id: string;
   component: string;
   crud: Crud;
@@ -57,34 +57,33 @@ export default class DashboardPage extends Vue {
     return dashboardStore.widgetValues;
   }
 
-  get items(): PersistentWidget[] {
+  get widgets(): PersistentWidget[] {
     return dashboardStore.dashboardItemsByDashboardId(this.dashboardId)
       .sort(objectSorter('order'));
   }
 
-  get validatedItems(): ValidatedItem[] {
-    return this.items
-      .map((item: PersistentWidget) => {
+  get validatedWidgets(): ValidatedWidget[] {
+    return this.widgets
+      .map((widget: PersistentWidget) => {
         try {
-          if (item.title === undefined) {
+          if (widget.title === undefined) {
             // ensure backwards compatibility
             // older items may not have a title
-            item.title = item.id;
+            widget.title = widget.id;
           }
-          const component = featureStore.widget(item.feature, item.config);
+          const component = featureStore.widget(widget.feature, widget.config);
           if (!component) {
-            throw new Error(`No widget found for ${item.feature}`);
+            throw new Error(`No widget found for ${widget.feature}`);
           }
-          const validator = featureStore.validator(item.feature);
-          if (!validator(item.config)) {
-            throw new Error(`${item.feature} validation failed`);
+          const validator = featureStore.validator(widget.feature);
+          if (!validator(widget.config)) {
+            throw new Error(`${widget.feature} validation failed`);
           }
-          // return { item, component };
           return {
-            id: item.id,
+            id: widget.id,
             component,
             crud: {
-              widget: item,
+              widget,
               isStoreWidget: true,
               saveWidget: this.saveWidget,
               closeDialog: () => { },
@@ -92,21 +91,16 @@ export default class DashboardPage extends Vue {
           };
         } catch (e) {
           return {
-            id: item.id,
+            id: widget.id,
             component: 'InvalidWidget',
+            error: e.message,
             crud: {
-              widget: item,
+              widget,
               isStoreWidget: true,
               saveWidget: this.saveWidget,
               closeDialog: () => { },
-              error: e.toString(),
             },
           };
-          // return {
-          //   widget: item,
-          //   component: 'InvalidWidget',
-          //   error: e.toString(),
-          // };
         }
       });
   }
@@ -118,7 +112,7 @@ export default class DashboardPage extends Vue {
   async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: string[]): Promise<void> {
     try {
       // Make a local change to the validated item, to avoid it jumping during the store round trip
-      const local = this.validatedItems.find(valItem => valItem.id === id);
+      const local = this.validatedWidgets.find(valItem => valItem.id === id);
       if (local) {
         local.crud.widget.pinnedPosition = pinnedPosition;
       }
@@ -208,14 +202,14 @@ export default class DashboardPage extends Vue {
         />
       </q-dialog>
       <q-list v-if="isMobile" no-border>
-        <q-item v-for="val in validatedItems" :key="val.id">
+        <q-item v-for="val in validatedWidgets" :key="val.id">
           <q-item-section>
             <component
               :is="val.component"
               :disabled="widgetEditable"
               :initial-crud="val.crud"
               :context="context"
-              class="dashboard-item"
+              class="dashboard-widget"
             />
           </q-item-section>
         </q-item>
@@ -228,13 +222,13 @@ export default class DashboardPage extends Vue {
       >
         <component
           :is="val.component"
-          v-for="val in validatedItems"
+          v-for="val in validatedWidgets"
           :key="val.id"
           :disabled="widgetEditable"
           :initial-crud="val.crud"
           :context="context"
           :error="val.error"
-          class="dashboard-item"
+          class="dashboard-widget"
         />
       </GridContainer>
     </div>
@@ -245,7 +239,7 @@ export default class DashboardPage extends Vue {
 @import '../styles/quasar.variables.styl';
 @import '../styles/quasar.styl';
 
-.dashboard-item {
+.dashboard-widget {
   background: $block-background;
   height: 100%;
   width: 100%;

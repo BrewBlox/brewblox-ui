@@ -72,8 +72,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'Digital Actuator',
   role: 'Output',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: ref(widget),
   widgetSize: {
     cols: 4,
     rows: 2,

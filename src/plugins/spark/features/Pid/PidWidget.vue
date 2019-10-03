@@ -1,18 +1,21 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { showBlockDialog } from '@/helpers/dialog';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { sparkStore } from '@/plugins/spark/store';
 
+import PidBasic from './PidBasic.vue';
+import PidFull from './PidFull.vue';
 import { startRelationsDialog } from './relations';
 import { PidBlock } from './types';
 
-@Component
+@Component({
+  components: {
+    Basic: PidBasic,
+    Full: PidFull,
+  },
+})
 export default class PidWidget extends BlockWidgetBase {
   readonly block!: PidBlock;
-  inputFormOpen = false;
-  relationsOpen = false;
 
   get inputId(): string | null {
     return this.block.data.inputId.id;
@@ -20,42 +23,6 @@ export default class PidWidget extends BlockWidgetBase {
 
   get outputId(): string | null {
     return this.block.data.outputId.id;
-  }
-
-  get hasInputBlock(): boolean {
-    return !!this.inputId
-      && sparkStore
-        .blockIds(this.serviceId)
-        .includes(this.inputId);
-  }
-
-  get hasOutputBlock(): boolean {
-    return !!this.outputId
-      && sparkStore
-        .blockIds(this.serviceId)
-        .includes(this.outputId);
-  }
-
-  get cardComponent(): string {
-    return this.context.mode === 'Basic'
-      ? 'PidCardBasic'
-      : 'PidCardFull';
-  }
-
-  get toolbarComponent(): string {
-    return this.context.container === 'Dialog'
-      ? 'BlockWidgetDialogToolbar'
-      : 'BlockWidgetToolbar';
-  }
-
-  get renderClass(): string[] {
-    return this.context.container === 'Dialog'
-      ? ['widget-modal']
-      : ['text-white', 'scroll', 'widget-dashboard'];
-  }
-
-  get wrapped(): boolean {
-    return this.context.container === 'Dialog';
   }
 
   enable(): void {
@@ -66,38 +33,33 @@ export default class PidWidget extends BlockWidgetBase {
   showRelations(): void {
     startRelationsDialog(this.block);
   }
-
-  showInput(): void {
-    showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.inputId));
-  }
-
-  showOutput(): void {
-    showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.outputId));
-  }
 }
 </script>
 
 <template>
-  <GraphCardWrapper :show="wrapped">
+  <GraphCardWrapper :show="inDialog">
     <template #graph>
       <HistoryGraph :id="widget.id" :config="graphCfg" />
     </template>
-    <component :is="cardComponent" :crud="crud" :class="renderClass">
+
+    <component :is="mode" :crud="crud" :class="cardClass">
       <template #toolbar>
-        <component :is="toolbarComponent" :crud="crud">
+        <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
           <template v-slot:actions>
-            <ActionItem
-              icon="mdi-ray-start-arrow"
-              label="Show Relations"
-              @click="showRelations"
-            />
+            <ActionItem icon="mdi-ray-start-arrow" label="Show Relations" @click="showRelations" />
           </template>
         </component>
       </template>
+
       <template #warnings>
-        <CardWarning v-if="!block.data.outputId.id">
+        <CardWarning v-if="!outputId">
           <template #message>
             PID has no output Block configured.
+          </template>
+        </CardWarning>
+        <CardWarning v-if="!inputId">
+          <template #message>
+            PID has no input Block configured.
           </template>
         </CardWarning>
         <CardWarning v-else-if="!block.data.enabled">
@@ -111,7 +73,6 @@ export default class PidWidget extends BlockWidgetBase {
             <q-btn text-color="white" flat label="Enable" @click="enable" />
           </template>
         </CardWarning>
-
         <CardWarning v-else-if="!block.data.active">
           <template #message>
             <span>

@@ -1,5 +1,6 @@
 import { VueConstructor } from 'vue';
 
+import { ref } from '@/helpers/component-ref';
 import {
   base64ToHex,
   dateString,
@@ -62,11 +63,15 @@ export const installFilters = (Vue: VueConstructor): void => {
   Vue.filter('shortDateString', shortDateString);
 };
 
-export const blockWidgetSelector = (widget: string): WidgetSelector =>
-  (config: BlockConfig) => {
+export const blockWidgetSelector = (component: VueConstructor): WidgetSelector => {
+  const widget = ref(component);
+  console.log(widget, 'block widget');
+  return (config: BlockConfig) => {
     if (!sparkStore.serviceAvailable(config.serviceId)) {
       throw new Error(`Service '${config.serviceId}' not found`);
     }
-    const block = sparkStore.blocks(config.serviceId)[config.blockId];
+    const block = sparkStore.tryBlockById(config.serviceId, config.blockId);
     return block ? widget : 'UnknownBlockWidget';
   };
+};
+

@@ -17,7 +17,7 @@ ref(HermsSettingsTask);
 const quickStart: QuickStart = {
   id: 'Herms',
   displayName: 'HERMS',
-  wizard: ref(HermsWizard),
+  wizardComponent: ref(HermsWizard),
 };
 
 export default quickStart;

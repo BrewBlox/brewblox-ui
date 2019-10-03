@@ -22,8 +22,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'Balancer',
   role: 'Constraint',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: ref(widget),
   widgetSize: {
     cols: 4,
     rows: 2,

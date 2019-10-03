@@ -6,14 +6,14 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { ActuatorAnalogMockBlock } from './types';
 
 @Component
-export default class ActuatorAnalogMockForm extends BlockCrudComponent {
+export default class ActuatorAnalogMockFull extends BlockCrudComponent {
   readonly block!: ActuatorAnalogMockBlock;
 }
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <BlockWidgetDialogToolbar :crud="crud" />
+  <q-card dark v-bind="$attrs">
+    <slot name="toolbar" />
 
     <q-card-section>
       <q-item dark>

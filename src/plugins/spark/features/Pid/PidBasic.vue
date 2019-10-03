@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 import { showBlockDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
@@ -9,7 +9,7 @@ import { startRelationsDialog } from './relations';
 import { PidBlock } from './types';
 
 @Component
-export default class PidCardBasic extends BlockCrudComponent {
+export default class PidBasic extends BlockCrudComponent {
   readonly block!: PidBlock;
   inputFormOpen = false;
   relationsOpen = false;

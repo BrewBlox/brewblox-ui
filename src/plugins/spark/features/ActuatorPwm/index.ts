@@ -75,8 +75,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'PWM',
   role: 'Output',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: ref(widget),
   widgetSize: {
     cols: 4,
     rows: 3,

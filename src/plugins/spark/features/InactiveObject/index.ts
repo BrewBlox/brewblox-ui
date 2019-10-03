@@ -10,9 +10,8 @@ const feature: Feature = {
   ...GenericBlock,
   id: typeName,
   displayName: 'Inactive Block',
-  widget: ref(widget),
-  form: ref(form),
-  wizard: undefined,
+  widgetComponent: ref(widget),
+  wizardComponent: undefined,
   widgetSize: {
     cols: 4,
     rows: 2,

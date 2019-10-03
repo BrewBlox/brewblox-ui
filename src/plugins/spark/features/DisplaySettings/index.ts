@@ -33,14 +33,13 @@ const feature: Feature = {
   id: typeName,
   displayName: 'Display Settings',
   role: 'Display',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: ref(widget),
   widgetSize: {
     cols: 4,
     rows: 2,
   },
   // DisplaySettings is a static system object, and can't be created or deleted
-  wizard: undefined,
+  wizardComponent: undefined,
   deleters: undefined,
 };
 

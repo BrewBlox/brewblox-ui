@@ -1,7 +1,10 @@
+import get from 'lodash/get';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
+import { GraphConfig } from '@/components/Graph/types';
 import WidgetBase from '@/components/Widget/WidgetBase';
+import { postfixedDisplayNames } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
 import { Block } from '../types';
@@ -47,6 +50,66 @@ export default class BlockWidgetBase extends WidgetBase {
   public get constrainers(): string | null {
     const limiting: string[] = sparkStore.limiters(this.serviceId)[this.blockId];
     return limiting ? limiting.join(', ') : null;
+  }
+
+  public get hasGraph(): boolean {
+    return !!get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
+  }
+
+  public get renamedTargets(): Record<string, string> {
+    const targets = get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
+    return !!targets
+      ? postfixedDisplayNames(targets, this.block.data)
+      : {};
+  }
+
+  public get graphCfg(): GraphConfig {
+    const blockFmt = (val: string): string => [this.blockId, val].join('/');
+    const serviceFmt = (val: string): string => [this.serviceId, this.blockId, val].join('/');
+
+    return {
+      // persisted in config
+      params: this.widget.config.queryParams || { duration: '1h' },
+      axes: this.widget.config.graphAxes || {},
+      // constants
+      layout: {
+        title: this.widget.title,
+      },
+      targets: [
+        {
+          measurement: this.serviceId,
+          fields: Object.keys(this.renamedTargets)
+            .map(k => blockFmt(k)),
+        },
+      ],
+      renames: Object.entries(this.renamedTargets)
+        .reduce((acc, [k, v]) => ({ ...acc, [serviceFmt(k)]: v }), {}),
+      colors: {},
+    };
+  }
+
+  public set graphCfg(config: GraphConfig) {
+    this.saveConfig({
+      ...this.widget.config,
+      queryParams: { ...config.params },
+      graphAxes: { ...config.axes },
+    });
+  }
+
+  public get inDialog(): boolean {
+    return this.context.container === 'Dialog';
+  }
+
+  public get toolbarComponent(): string {
+    return this.inDialog
+      ? 'BlockWidgetDialogToolbar'
+      : 'BlockWidgetToolbar';
+  }
+
+  public get cardClass(): string[] {
+    return this.inDialog
+      ? ['widget-modal']
+      : ['text-white', 'scroll', 'widget-dashboard'];
   }
 
   @Watch('blockId', { immediate: true })

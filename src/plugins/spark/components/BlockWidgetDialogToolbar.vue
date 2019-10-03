@@ -1,5 +1,7 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { Component, Emit, Prop } from 'vue-property-decorator';
+
+import { WidgetMode } from '@/store/features';
 
 import BlockCrudComponent from './BlockCrudComponent';
 
@@ -8,6 +10,13 @@ import BlockCrudComponent from './BlockCrudComponent';
 export default class BlockWidgetDialogToolbar extends BlockCrudComponent {
   graphModalOpen = false;
 
+  @Prop({ type: String, default: 'Basic' })
+  public readonly mode!: WidgetMode;
+
+  @Emit('update:mode')
+  public toggleMode(): WidgetMode {
+    return this.mode === 'Basic' ? 'Full' : 'Basic';
+  }
 }
 </script>
 
@@ -20,6 +29,7 @@ export default class BlockWidgetDialogToolbar extends BlockCrudComponent {
       :config.sync="graphCfg"
     />
     <template v-slot:buttons>
+      <q-btn flat icon="mdi-account-switch" @click="toggleMode" />
       <q-btn-dropdown flat icon="mdi-pencil">
         <q-list dark bordered>
           <ActionItem icon="refresh" label="Refresh" @click="refreshBlock" />

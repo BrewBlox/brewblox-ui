@@ -14,9 +14,8 @@ ref(BuilderEditor);
 const feature: Feature = {
   id: typeName,
   displayName: 'Brewery Builder',
-  widget: ref(widget),
-  wizard: ref(wizard),
-  form: ref(form),
+  widgetComponent: ref(widget),
+  wizardComponent: ref(wizard),
   widgetSize: {
     cols: 8,
     rows: 8,
@@ -28,7 +27,7 @@ const feature: Feature = {
 const deprecated: Feature = {
   id: 'ProcessView',
   displayName: 'Process View',
-  widget: 'DeprecatedWidget',
+  widgetComponent: 'DeprecatedWidget',
   widgetSize: { cols: 0, rows: 0 },
 };
 

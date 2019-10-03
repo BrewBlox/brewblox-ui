@@ -1,4 +1,3 @@
-import { ref } from '@/helpers/component-ref';
 import { unitDurationString } from '@/helpers/functional';
 import { Unit } from '@/helpers/units';
 import { ActuatorAnalogLink, SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
@@ -8,14 +7,9 @@ import { Feature } from '@/store/features';
 import { blockWidgetSelector } from '../../helpers';
 import { BlockSpec } from '../../types';
 import { typeName } from './getters';
-import basic from './PidCardBasic.vue';
-import full from './PidCardFull.vue';
-import form from './PidForm.vue';
-import widget from './PidWidget.vue';
+import PidWidget from './PidWidget.vue';
 import { PidData } from './types';
 
-ref(basic);
-ref(full);
 
 const block: BlockSpec = {
   id: typeName,
@@ -176,8 +170,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'PID',
   role: 'Control',
-  widget: blockWidgetSelector(ref(widget)),
-  form: ref(form),
+  widgetComponent: blockWidgetSelector(PidWidget),
   widgetSize: {
     cols: 4,
     rows: 3,

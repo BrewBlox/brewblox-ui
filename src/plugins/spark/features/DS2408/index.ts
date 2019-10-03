@@ -24,14 +24,13 @@ const feature: Feature = {
   id: typeName,
   displayName: 'DS2408 Chip',
   role: 'Output',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: ref(widget),
   widgetSize: {
     cols: 4,
     rows: 2,
   },
   // Discovered objects can't be created or deleted
-  wizard: undefined,
+  wizardComponent: undefined,
   deleters: undefined,
 };
 

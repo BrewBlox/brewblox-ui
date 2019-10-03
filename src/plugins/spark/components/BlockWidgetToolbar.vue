@@ -1,11 +1,21 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { Component, Emit, Prop } from 'vue-property-decorator';
+
+import { WidgetMode } from '@/store/features';
 
 import BlockCrudComponent from './BlockCrudComponent';
 
 @Component
 export default class BlockWidgetToolbar extends BlockCrudComponent {
   graphModalOpen = false;
+
+  @Prop({ type: String, default: 'Basic' })
+  public readonly mode!: WidgetMode;
+
+  @Emit('update:mode')
+  public toggleMode(): WidgetMode {
+    return this.mode === 'Basic' ? 'Full' : 'Basic';
+  }
 }
 </script>
 
@@ -19,7 +29,7 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
     />
 
     <q-item-section side>
-      <q-btn icon="edit" @click="showDialog({mode: 0})" />
+      <q-btn flat icon="mdi-account-switch" @click="toggleMode" />
     </q-item-section>
     <q-item-section side>
       <q-btn-dropdown flat split icon="settings" @click="showDialog">

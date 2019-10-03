@@ -28,8 +28,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'OneWire Temp Sensor',
   role: 'Process',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: ref(widget),
   widgetSize: {
     cols: 4,
     rows: 2,

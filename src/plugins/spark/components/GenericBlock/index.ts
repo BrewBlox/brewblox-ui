@@ -27,7 +27,7 @@ const deleteBlock =
 
 const feature: Partial<Feature> = {
   validator,
-  wizard: ref(wizard),
+  wizardComponent: ref(wizard),
   widgetSize: {
     cols: 4,
     rows: 4,

@@ -40,8 +40,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'Temp Sensor (Mock)',
   role: 'Process',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: ref(widget),
   widgetSize: {
     cols: 4,
     rows: 2,

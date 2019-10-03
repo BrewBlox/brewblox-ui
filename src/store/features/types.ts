@@ -21,13 +21,12 @@ export interface Feature {
   };
   widgetComponent: string | WidgetSelector;
   wizardComponent?: string;
-  form?: string;
 }
 
 export interface QuickStart {
   id: string;
   displayName: string;
-  wizard: string;
+  wizardComponent: string;
 }
 
 export interface Watcher {

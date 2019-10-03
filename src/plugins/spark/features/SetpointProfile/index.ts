@@ -67,8 +67,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'Setpoint profile',
   role: 'Process',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: ref(widget),
   widgetSize: {
     cols: 4,
     rows: 3,

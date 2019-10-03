@@ -3,13 +3,14 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { PersistentWidget } from '@/store/dashboards';
-import { featureStore, WidgetContext } from '@/store/features';
+import { featureStore, WidgetContext, WidgetMode } from '@/store/features';
 
 import { Crud } from './CrudComponent';
 
 @Component
 export default class WidgetBase extends Vue {
   public activeDialog: any = null;
+  public activeMode: WidgetMode | null = null;
 
   @Prop({ type: Object, required: true })
   public readonly initialCrud!: Crud;
@@ -20,6 +21,14 @@ export default class WidgetBase extends Vue {
   public get crud(): Crud {
     // Allows overriding by child classes that use an extended Crud
     return this.initialCrud;
+  }
+
+  public get mode(): WidgetMode {
+    return this.activeMode || this.context.mode;
+  }
+
+  public set mode(val: WidgetMode) {
+    this.activeMode = val;
   }
 
   public get widget(): PersistentWidget {
