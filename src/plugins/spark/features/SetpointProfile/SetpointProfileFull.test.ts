@@ -2,13 +2,13 @@ import { shallowMount, Wrapper } from '@vue/test-utils';
 import { setupSpark } from 'tests/setup';
 import Vue from 'vue';
 
-import { Link,Unit } from '@/helpers/units';
+import { Link, Unit } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { BlockCrud } from '@/plugins/spark/components/BlockCrudComponent';
 import { SetpointProfileBlock } from '@/plugins/spark/features/SetpointProfile/types';
 
 import { interfaceTypes } from '../../block-types';
-import SetpointProfileForm from './SetpointProfileForm.vue';
+import SetpointProfileFull from './SetpointProfileFull.vue';
 
 interface ProfileCrud extends BlockCrud {
   block: SetpointProfileBlock;
@@ -62,7 +62,7 @@ beforeAll(() => {
   setupSpark(Vue);
 });
 
-describe('SetpointProfileForm.vue', () => {
+describe('SetpointProfileFull.vue', () => {
   let crud: ProfileCrud;
   let block: SetpointProfileBlock;
   let wrapper: Wrapper<any>;
@@ -70,7 +70,7 @@ describe('SetpointProfileForm.vue', () => {
   beforeEach(() => {
     crud = crudMock();
     block = crud.block;
-    wrapper = shallowMount(SetpointProfileForm, {
+    wrapper = shallowMount(SetpointProfileFull, {
       propsData: { crud },
     });
   });

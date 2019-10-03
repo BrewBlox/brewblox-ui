@@ -21,7 +21,7 @@ export default class GraphCardWrapper extends Vue {
 </script>
 
 <template>
-  <q-card v-if="!show" class="passthrough-card">
+  <q-card v-if="!show" class="passthrough-card column">
     <slot />
   </q-card>
   <q-card v-else dark class="row wrapper-card">
@@ -65,7 +65,6 @@ export default class GraphCardWrapper extends Vue {
 .passthrough-card {
   padding: 0;
   margin: 0;
-  overflow: auto;
 }
 
 .wrapper-card {

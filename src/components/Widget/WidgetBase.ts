@@ -49,8 +49,8 @@ export default class WidgetBase extends Vue {
 
   public get cardClass(): string[] {
     return this.inDialog
-      ? ['widget-modal']
-      : ['text-white', 'scroll', 'widget-dashboard'];
+      ? ['widget-modal', 'overflow-auto']
+      : ['text-white', 'scroll', 'widget-dashboard', 'overflow-auto'];
   }
 
   public saveWidget(widget: PersistentWidget = this.crud.widget): void {

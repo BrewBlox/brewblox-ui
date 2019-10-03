@@ -1,11 +1,11 @@
 import { ref } from '@/helpers/component-ref';
 import { Link } from '@/helpers/units';
+import { interfaceTypes } from '@/plugins/spark/block-types';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
+import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { BlockSpec } from '@/plugins/spark/types';
 import { Feature } from '@/store/features';
 
-import { interfaceTypes } from '../../block-types';
-import { blockWidgetSelector } from '../../helpers';
-import { BlockSpec } from '../../types';
 import { typeName } from './getters';
 import ProfilePresetAction from './ProfilePresetAction.vue';
 import ProfilePresetDialog from './ProfilePresetDialog.vue';

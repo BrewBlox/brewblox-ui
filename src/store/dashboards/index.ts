@@ -55,11 +55,11 @@ export class DashboardModule extends VuexModule {
     return id => this.dashboards[id];
   }
 
-  public get dashboardItemById(): (id: string) => PersistentWidget {
+  public get persistentWidgetById(): (id: string) => PersistentWidget {
     return id => this.widgets[id];
   }
 
-  public get dashboardItemsByDashboardId(): (id: string) => PersistentWidget[] {
+  public get persistentWidgetsByDashboardId(): (id: string) => PersistentWidget[] {
     return id => this.widgetValues.filter(widget => widget.dashboard === id);
   }
 
@@ -143,7 +143,7 @@ export class DashboardModule extends VuexModule {
 
   @Action({ rawError, commit: 'commitRemoveDashboard' })
   public async removeDashboard(dashboard: Dashboard): Promise<Dashboard> {
-    this.dashboardItemsByDashboardId(dashboard.id)
+    this.persistentWidgetsByDashboardId(dashboard.id)
       .forEach(widget => this.context.dispatch('removePersistentWidget', widget));
     await dashboardApi.remove(dashboard).catch(() => { });
     return dashboard;
@@ -156,7 +156,7 @@ export class DashboardModule extends VuexModule {
 
   @Action({ rawError, commit: 'commitPersistentWidget' })
   public async appendPersistentWidget(widget: PersistentWidget): Promise<PersistentWidget> {
-    const order = this.dashboardItemsByDashboardId(widget.dashboard).length + 1;
+    const order = this.persistentWidgetsByDashboardId(widget.dashboard).length + 1;
     return await widgetApi.create({ ...widget, order });
   }
 
@@ -171,7 +171,7 @@ export class DashboardModule extends VuexModule {
       widgetIds
         .reduce(
           (promises: Promise<void>[], id, index) => {
-            const widget = this.dashboardItemById(id);
+            const widget = this.persistentWidgetById(id);
             const order = index + 1;
             if (widget.order !== order) {
               promises.push(this.context.dispatch('savePersistentWidget', { ...widget, order }));
@@ -186,13 +186,13 @@ export class DashboardModule extends VuexModule {
   public async updatePersistentWidgetSize(
     { id, cols, rows }: { id: string; cols: number; rows: number }
   ): Promise<PersistentWidget> {
-    const widget = this.dashboardItemById(id);
+    const widget = this.persistentWidgetById(id);
     return await this.context.dispatch('savePersistentWidget', { ...widget, cols, rows });
   }
 
   @Action({ rawError })
   public async updatePersistentWidgetConfig({ id, config }: { id: string; config: any }): Promise<PersistentWidget> {
-    const widget = this.dashboardItemById(id);
+    const widget = this.persistentWidgetById(id);
     return await this.context.dispatch('savePersistentWidget', { ...widget, config });
   }
 
@@ -218,13 +218,13 @@ export class DashboardModule extends VuexModule {
       }
     };
     const onItemChange = (widget: PersistentWidget): void => {
-      const existing = this.dashboardItemById(widget.id);
+      const existing = this.persistentWidgetById(widget.id);
       if (!existing || existing._rev !== widget._rev) {
         this.commitPersistentWidget(widget);
       }
     };
     const onItemDelete = (id: string): void => {
-      const existing = this.dashboardItemById(id);
+      const existing = this.persistentWidgetById(id);
       if (existing) {
         this.commitRemovePersistentWidget(existing);
       }
