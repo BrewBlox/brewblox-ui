@@ -1,10 +1,9 @@
-import { ref } from '@/helpers/component-ref';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
+import { blockWidgetSelector } from '../../helpers';
 import { BlockSpec } from '../../types';
 import { typeName } from './getters';
-import form from './Spark2PinsForm.vue';
 import widget from './Spark2PinsWidget.vue';
 import { Spark2Hardware, Spark2PinsData } from './types';
 
@@ -25,7 +24,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'Spark 2 Pin Array',
   role: 'Output',
-  widgetComponent: ref(widget),
+  widgetComponent: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 4,

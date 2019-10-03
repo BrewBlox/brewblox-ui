@@ -2,12 +2,12 @@ import { shallowMount, Wrapper } from '@vue/test-utils';
 import { setupSpark } from 'tests/setup';
 import Vue from 'vue';
 
-import { Unit } from '@/helpers/units';
-import { SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
+import { Link,Unit } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { BlockCrud } from '@/plugins/spark/components/BlockCrudComponent';
 import { SetpointProfileBlock } from '@/plugins/spark/features/SetpointProfile/types';
 
+import { interfaceTypes } from '../../block-types';
 import SetpointProfileForm from './SetpointProfileForm.vue';
 
 interface ProfileCrud extends BlockCrud {
@@ -40,8 +40,8 @@ const crudMock = (): ProfileCrud => ({
     groups: [0],
     data: {
       enabled: true,
-      targetId: new SetpointSensorPairLink('pair'),
-      drivenTargetId: new SetpointSensorPairLink('pair', true),
+      targetId: new Link('pair', interfaceTypes.SetpointSensorPair),
+      drivenTargetId: new Link('pair', interfaceTypes.SetpointSensorPair, true),
       start: 1564578548,
       points: [{
         time: 0,

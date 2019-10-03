@@ -1,10 +1,9 @@
-import { ref } from '@/helpers/component-ref';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
+import { blockWidgetSelector } from '../../helpers';
 import { BlockSpec } from '../../types';
 import { typeName } from './getters';
-import form from './Spark3PinsForm.vue';
 import widget from './Spark3PinsWidget.vue';
 import { Spark3PinsData } from './types';
 
@@ -35,7 +34,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'Spark 3 Pin Array',
   role: 'Output',
-  widgetComponent: ref(widget),
+  widgetComponent: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 4,

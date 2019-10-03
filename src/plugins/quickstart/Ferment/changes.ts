@@ -2,7 +2,6 @@ import { uid } from 'quasar';
 
 import { durationMs } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
-import { ProcessValueLink } from '@/helpers/units/KnownLinks';
 import { serialize } from '@/helpers/units/parseObject';
 import { BuilderItem, BuilderLayout } from '@/plugins/builder/types';
 import { HistoryItem } from '@/plugins/history/Graph/types';
@@ -11,6 +10,7 @@ import {
   blockTypes,
   DigitalActuatorBlock,
   FilterChoice,
+  interfaceTypes,
   MutexBlock,
   PidBlock,
   PidData,
@@ -343,7 +343,11 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
   ];
 };
 
-export const defineWidgets = (config: FermentConfig, opts: FermentOpts, layouts: BuilderLayout[]): PersistentWidget[] => {
+export const defineWidgets = (
+  config: FermentConfig,
+  opts: FermentOpts,
+  layouts: BuilderLayout[]
+): PersistentWidget[] => {
   const genericSettings = {
     dashboard: config.dashboardId,
     cols: 4,
@@ -481,14 +485,14 @@ export const defineWidgets = (config: FermentConfig, opts: FermentOpts, layouts:
             {
               blockId: config.names.coolPid,
               data: {
-                inputId: new ProcessValueLink(config.names.fridgeSSPair),
+                inputId: new Link(config.names.fridgeSSPair, interfaceTypes.ProcessValue),
                 ...fridgeCoolConfig,
               },
             },
             {
               blockId: config.names.heatPid,
               data: {
-                inputId: new ProcessValueLink(config.names.fridgeSSPair),
+                inputId: new Link(config.names.fridgeSSPair, interfaceTypes.ProcessValue),
                 ...fridgeHeatConfig,
               },
             },
@@ -517,14 +521,14 @@ export const defineWidgets = (config: FermentConfig, opts: FermentOpts, layouts:
             {
               blockId: config.names.coolPid,
               data: {
-                inputId: new ProcessValueLink(config.names.beerSSPair),
+                inputId: new Link(config.names.beerSSPair, interfaceTypes.ProcessValue),
                 ...beerCoolConfig,
               },
             },
             {
               blockId: config.names.heatPid,
               data: {
-                inputId: new ProcessValueLink(config.names.beerSSPair),
+                inputId: new Link(config.names.beerSSPair, interfaceTypes.ProcessValue),
                 ...beerHeatConfig,
               },
             },

@@ -1,9 +1,8 @@
-import { ref } from '@/helpers/component-ref';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
+import { blockWidgetSelector } from '../../helpers';
 import { BlockSpec } from '../../types';
-import form from './DS2413Form.vue';
 import widget from './DS2413Widget.vue';
 import { typeName } from './getters';
 import { DS2413Data } from './types';
@@ -24,7 +23,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'DS2413 Chip',
   role: 'Output',
-  widgetComponent: ref(widget),
+  widgetComponent: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 2,

@@ -1,9 +1,9 @@
 import { unitDurationString } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
-import { ActuatorAnalogLink, SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
+import { Link, Unit } from '@/helpers/units';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
+import { interfaceTypes } from '../../block-types';
 import { blockWidgetSelector } from '../../helpers';
 import { BlockSpec } from '../../types';
 import { typeName } from './getters';
@@ -14,8 +14,8 @@ import { PidData } from './types';
 const block: BlockSpec = {
   id: typeName,
   generate: (): PidData => ({
-    inputId: new SetpointSensorPairLink(null),
-    outputId: new ActuatorAnalogLink(null),
+    inputId: new Link(null, interfaceTypes.SetpointSensorPair),
+    outputId: new Link(null, interfaceTypes.ActuatorAnalog),
     inputValue: new Unit(0, 'degC'),
     inputSetting: new Unit(0, 'degC'),
     outputValue: 0,
@@ -31,7 +31,7 @@ const block: BlockSpec = {
     error: new Unit(0, 'delta_degC'),
     integral: new Unit(0, 'delta_degC/second'),
     derivative: new Unit(0, 'delta_degC*second'),
-    drivenOutputId: new ActuatorAnalogLink(null),
+    drivenOutputId: new Link(null, interfaceTypes.ActuatorAnalog),
     integralReset: 0,
     boilPointAdjust: new Unit(0, 'delta_degC'),
     boilMinOutput: 0,
@@ -142,13 +142,13 @@ const block: BlockSpec = {
       key: 'inputId',
       title: 'Input',
       component: 'LinkValEdit',
-      generate: () => new SetpointSensorPairLink(null),
+      generate: () => new Link(null, interfaceTypes.SetpointSensorPair),
     },
     {
       key: 'outputId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new ActuatorAnalogLink(null),
+      generate: () => new Link(null, interfaceTypes.ActuatorAnalog),
     },
   ],
   graphTargets: {
