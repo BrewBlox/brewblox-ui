@@ -19,6 +19,8 @@ export default class DS2408Full extends BlockCrudComponent {
     <slot name="warnings" />
 
     <ValveArray :crud="crud" :id-enum="DS2408Id" :name-enum="ValveStartId" />
+    <q-separator dark inset />
+
     <q-card-section>
       <q-item dark>
         <q-item-section class="col-grow">

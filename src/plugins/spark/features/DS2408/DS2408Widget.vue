@@ -5,7 +5,7 @@ import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 import DS2408Basic from './DS2408Basic.vue';
 import DS2408Full from './DS2408Full.vue';
-import { DS2408Block, DS2408Id, ValveStartId } from './types';
+import { DS2408Block } from './types';
 
 @Component({
   components: {
@@ -14,8 +14,6 @@ import { DS2408Block, DS2408Id, ValveStartId } from './types';
   },
 })
 export default class DS2408Widget extends BlockWidgetBase {
-  DS2408Id = DS2408Id;
-  ValveStartId = ValveStartId;
   readonly block!: DS2408Block;
 }
 </script>

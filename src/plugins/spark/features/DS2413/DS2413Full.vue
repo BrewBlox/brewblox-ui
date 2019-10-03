@@ -6,25 +6,22 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { DS2413Block } from './types';
 
 @Component
-export default class DS2413Form extends BlockCrudComponent {
+export default class DS2413Full extends BlockCrudComponent {
   readonly block!: DS2413Block;
 }
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <BlockWidgetDialogToolbar :crud="crud" />
-    <CardWarning v-if="!block.data.connected">
-      <template #message>
-        DS2413 is not connected.
-      </template>
-    </CardWarning>
+  <q-card dark v-bind="$attrs">
+    <slot name="toolbar" />
+    <slot name="warnings" />
+
     <IoArray :crud="crud" />
     <q-separator dark inset />
 
     <q-card-section>
       <q-item dark>
-        <q-item-section>
+        <q-item-section class="col-grow">
           <q-item-label caption>
             Address
           </q-item-label>
