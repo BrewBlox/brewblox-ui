@@ -2,13 +2,22 @@
 import { Component } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
+import { blockTypes } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { validDisplayTypes } from '@/plugins/spark/features/DisplaySettings/getters';
 import { DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/features/DisplaySettings/types';
 
 @Component
-export default class DisplaySettingsForm extends BlockCrudComponent {
+export default class DisplaySettingsFull extends BlockCrudComponent {
   readonly block!: DisplaySettingsBlock;
+
+  validDisplayTypes = [
+    blockTypes.TempSensorMock,
+    blockTypes.TempSensorOneWire,
+    blockTypes.SetpointSensorPair,
+    blockTypes.ActuatorPwm,
+    blockTypes.ActuatorAnalogMock,
+    blockTypes.Pid,
+  ];
 
   get slots(): Array<any> {
     const slots = Array(6);
@@ -52,7 +61,7 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
   }
 
   get linkFilter() {
-    return block => validDisplayTypes.includes(block.type);
+    return block => this.validDisplayTypes.includes(block.type);
   }
 
   updateSlotLink(idx: number, link: Link): void {
@@ -112,8 +121,9 @@ export default class DisplaySettingsForm extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <BlockWidgetDialogToolbar :crud="crud" />
+  <q-card dark v-bind="$attrs">
+    <slot name="toolbar" />
+    <slot name="warnings" />
 
     <q-card-section class="row">
       <q-item v-for="(slot, idx) in slots" :key="idx" dark class="row q-pa-sm col-4">
