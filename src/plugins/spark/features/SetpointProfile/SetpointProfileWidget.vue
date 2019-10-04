@@ -27,7 +27,7 @@ export default class SetpointProfileWidget extends BlockWidgetBase {
     else {
       return this.mode === 'Full'
         ? ['widget-dashboard', 'overflow-auto', 'scroll']
-        : ['widget-dashboard', 'overflow-none', 'col', 'column'];
+        : ['widget-dashboard', 'overflow-unset', 'col', 'column'];
     }
   }
 

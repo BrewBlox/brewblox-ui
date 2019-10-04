@@ -118,8 +118,7 @@ export default class SessionViewWidget extends WidgetBase {
     @graph="showSessionGraph"
   >
     <template #toolbar>
-      <WidgetDialogToolbar v-if="inDialog" :crud="crud" :mode.sync="mode" />
-      <WidgetToolbar v-else :crud="crud" :mode.sync="mode" />
+      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
     </template>
     <template #graph>
       <BlockGraph

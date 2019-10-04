@@ -47,6 +47,12 @@ export default class WidgetBase extends Vue {
     return this.context.container === 'Dialog';
   }
 
+  public get toolbarComponent(): string {
+    return this.inDialog
+      ? 'WidgetDialogToolbar'
+      : 'WidgetToolbar';
+  }
+
   public get cardClass(): string[] {
     return this.inDialog
       ? ['widget-modal', 'overflow-auto']
@@ -64,6 +70,7 @@ export default class WidgetBase extends Vue {
   public showDialog(args: Record<string, any> = {}): void {
     this.activeDialog = createDialog({
       component: 'WidgetDialog',
+      root: this.$root,
       getCrud: () => ({ ...this.crud, closeDialog: this.closeDialog }),
       ...args,
     });

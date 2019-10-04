@@ -65,6 +65,7 @@ export default class DefaultLayout extends Vue {
 
   removeService(service: Service): void {
     createDialog({
+      root: this.$root,
       title: 'Remove service',
       message: `Are you sure you want to remove ${service.title}?`,
       dark: true,
@@ -76,6 +77,7 @@ export default class DefaultLayout extends Vue {
 
   changeServiceTitle(service: Service): void {
     createDialog({
+      root: this.$root,
       title: 'Change service Title',
       message: "Change your service's display name",
       dark: true,
@@ -111,7 +113,15 @@ export default class DefaultLayout extends Vue {
 
   showPlugins(): void {
     createDialog({
+      root: this.$root,
       component: 'PluginDialog',
+    });
+  }
+
+  showBuilderEditor(): void {
+    createDialog({
+      root: this.$root,
+      component: 'BuilderEditor',
     });
   }
 
@@ -127,7 +137,7 @@ export default class DefaultLayout extends Vue {
 </script>
 
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="lHh Lpr lFf" class="bg-dark-bright">
     <q-header class="glossy bg-dark">
       <q-toolbar>
         <q-btn flat dense round @click="leftDrawerOpen = !leftDrawerOpen">
@@ -152,23 +162,11 @@ export default class DefaultLayout extends Vue {
         </q-item>
 
         <q-separator dark />
-
-        <q-item clickable @click.native="openWizard(null)">
-          <q-item-section avatar>
-            <q-icon name="mdi-creation" />
-          </q-item-section>
-          <q-item-section>Wizardry</q-item-section>
-        </q-item>
-
+        <ActionItem icon="mdi-creation" label="Wizardry" @click="openWizard(null)" />
         <q-separator dark />
-
-        <q-item clickable @click.native="showPlugins">
-          <q-item-section avatar>
-            <q-icon name="mdi-puzzle" />
-          </q-item-section>
-          <q-item-section>Plugins</q-item-section>
-        </q-item>
-
+        <ActionItem icon="mdi-puzzle" label="Plugins" @click="showPlugins" />
+        <q-separator dark />
+        <ActionItem icon="mdi-pipe" label="Brewery Builder" @click="showBuilderEditor" />
         <q-separator dark />
 
         <q-item dark class="q-pb-none">
@@ -354,5 +352,9 @@ export default class DefaultLayout extends Vue {
 .bottomed {
   bottom: 0;
   position: absolute;
+}
+
+.q-layout {
+  overflow-x: auto;
 }
 </style>
