@@ -7,6 +7,11 @@ import { featureStore, WidgetContext, WidgetMode } from '@/store/features';
 
 import { Crud } from './CrudComponent';
 
+export interface WidgetProps {
+  initialCrud: Crud;
+  context: WidgetContext;
+}
+
 @Component
 export default class WidgetBase extends Vue {
   public activeDialog: any = null;

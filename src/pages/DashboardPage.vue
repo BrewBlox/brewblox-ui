@@ -206,7 +206,6 @@ export default class DashboardPage extends Vue {
           <q-item-section>
             <component
               :is="val.component"
-              :disabled="widgetEditable"
               :initial-crud="val.crud"
               :context="context"
               class="dashboard-widget"
@@ -224,11 +223,10 @@ export default class DashboardPage extends Vue {
           :is="val.component"
           v-for="val in validatedWidgets"
           :key="val.id"
-          :disabled="widgetEditable"
           :initial-crud="val.crud"
           :context="context"
           :error="val.error"
-          class="dashboard-widget"
+          class="bg-dark maximized"
         />
       </GridContainer>
     </div>
@@ -238,10 +236,4 @@ export default class DashboardPage extends Vue {
 <style lang="stylus" scoped>
 @import '../styles/quasar.variables.styl';
 @import '../styles/quasar.styl';
-
-.dashboard-widget {
-  background: $block-background;
-  height: 100%;
-  width: 100%;
-}
 </style>
