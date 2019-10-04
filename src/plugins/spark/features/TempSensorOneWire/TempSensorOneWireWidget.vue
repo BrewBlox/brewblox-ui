@@ -43,7 +43,7 @@ export default class TempSensorOneWireWidget extends BlockWidgetBase {
 
         <template v-if="mode === 'Full'">
           <q-item dark>
-            <q-item-section class="col-6">
+            <q-item-section class="col-grow">
               <q-item-label caption>
                 Address
               </q-item-label>

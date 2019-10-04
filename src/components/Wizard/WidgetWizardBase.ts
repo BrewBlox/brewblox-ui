@@ -2,7 +2,7 @@ import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import { PersistentWidget, dashboardStore } from '@/store/dashboards';
+import { dashboardStore, PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 export interface NavAction {
