@@ -15,7 +15,7 @@ interface PeriodDisplay {
 }
 
 @Component
-export default class GraphForm extends CrudComponent {
+export default class GraphEditor extends CrudComponent {
   durationString = durationString;
 
   tab = 'metrics';
@@ -23,6 +23,9 @@ export default class GraphForm extends CrudComponent {
 
   @Prop({ type: Object, default: () => ({}) })
   readonly downsampling!: any;
+
+  @Prop({ type: Boolean, default: false })
+  public readonly inDialog!: boolean;
 
   get config(): GraphConfig {
     return {
@@ -180,15 +183,9 @@ export default class GraphForm extends CrudComponent {
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <WidgetDialogToolbar :crud="crud">
-      <template v-slot:actions>
-        <ExportGraphAction
-          :config="config"
-          :header="widget.title"
-        />
-      </template>
-    </WidgetDialogToolbar>
+  <q-card dark v-bind="$attrs">
+    <slot name="toolbar" />
+    <slot name="warnings" />
 
     <!-- <q-card-section dark> -->
     <q-tabs v-model="tab" dense active-color="primary" align="justify">
@@ -198,9 +195,9 @@ export default class GraphForm extends CrudComponent {
       <q-tab name="display" label="Display" />
     </q-tabs>
 
-    <div class="scroll-parent">
-      <q-scroll-area>
-        <q-tab-panels v-model="tab" animated class="bg-dark-bright">
+    <div :class="{'col-grow': true, 'scroll-parent': inDialog}">
+      <component :is="inDialog ? 'q-scroll-area' : 'div'">
+        <q-tab-panels v-model="tab" animated :class="inDialog ? 'bg-dark-bright' : 'bg-dark'">
           <!-- Metrics -->
           <q-tab-panel dark name="metrics" class="q-pt-none">
             <MetricSelector :selected.sync="selected" />
@@ -334,7 +331,7 @@ export default class GraphForm extends CrudComponent {
             </q-item>
           </q-tab-panel>
         </q-tab-panels>
-      </q-scroll-area>
+      </component>
     </div>
   </q-card>
 </template>
