@@ -187,7 +187,6 @@ export default class GraphEditor extends CrudComponent {
     <slot name="toolbar" />
     <slot name="warnings" />
 
-    <!-- <q-card-section dark> -->
     <q-tabs v-model="tab" dense active-color="primary" align="justify">
       <q-tab name="metrics" label="Metrics" />
       <q-tab name="period" label="Period" />

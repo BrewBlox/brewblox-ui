@@ -1,7 +1,6 @@
 import { ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features';
 
-import form from './MetricsForm.vue';
 import widget from './MetricsWidget.vue';
 import wizard from './MetricsWizard.vue';
 

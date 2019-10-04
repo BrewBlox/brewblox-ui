@@ -2,7 +2,6 @@ import { ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features';
 
 import { typeName } from './getters';
-import form from './GraphForm.vue';
 import widget from './GraphWidget.vue';
 import wizard from './GraphWizard.vue';
 
