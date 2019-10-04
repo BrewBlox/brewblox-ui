@@ -1,7 +1,6 @@
 import { ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features';
 
-import form from './StepperForm.vue';
 import widget from './StepperWidget.vue';
 import wizard from './StepperWizard.vue';
 
