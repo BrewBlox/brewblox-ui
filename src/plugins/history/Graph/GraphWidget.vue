@@ -77,14 +77,15 @@ export default class GraphWidget extends WidgetBase {
     });
   }
 
-  async regraph(): void {
+  async regraph(): Promise<void> {
     await this.$nextTick();
     if (this.widgetGraph !== undefined) {
       this.widgetGraph.resetListeners();
     }
   }
 
-  refresh(): void {
+  async refresh(): Promise<void> {
+    await this.$nextTick();
     if (this.widgetGraph !== undefined) {
       this.widgetGraph.refresh();
     }

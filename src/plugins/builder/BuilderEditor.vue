@@ -218,7 +218,8 @@ export default class BuilderEditor extends DialogBase {
     builderStore.commitEditorTool(tool.value);
   }
 
-  async saveLayout(layout: BuilderLayout = this.layout): Promise<void> {
+  async saveLayout(layout: BuilderLayout | null = this.layout): Promise<void> {
+    if (layout === null) { return; }
     if (layout.id) {
       await builderStore.saveLayout(layout);
     } else {
