@@ -44,13 +44,13 @@ export default class MetricsFull extends CrudComponent {
   }
 
   set selected(vals: string[]) {
-    const targets = targetBuilder(vals || []);
+    const targets = targetBuilder(vals);
     const renames = vals
       .reduce(
-        (acc, key) => ({
-          ...acc,
-          [key]: this.config.renames[key] || defaultLabel(key),
-        }),
+        (acc, key) => {
+          acc[key] = this.config.renames[key] || defaultLabel(key);
+          return acc;
+        },
         {});
     this.saveConfig({ ...this.config, targets, renames });
   }

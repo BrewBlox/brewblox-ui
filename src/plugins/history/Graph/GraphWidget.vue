@@ -24,6 +24,13 @@ export default class GraphWidget extends WidgetBase {
   @Ref()
   readonly widgetGraph!: HistoryGraph;
 
+  @Watch('graphCfg', { deep: true })
+  updateWatcher(newVal: GraphConfig, oldVal: GraphConfig): void {
+    if (newVal && JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
+      this.regraph();
+    }
+  }
+
   get graphCfg(): GraphConfig {
     return {
       layout: {},
@@ -70,9 +77,17 @@ export default class GraphWidget extends WidgetBase {
     });
   }
 
-  @Watch('graphCfg', { deep: true })
-  regraph(): void {
-    this.$nextTick(() => this.widgetGraph && this.widgetGraph.resetListeners());
+  async regraph(): void {
+    await this.$nextTick();
+    if (this.widgetGraph !== undefined) {
+      this.widgetGraph.resetListeners();
+    }
+  }
+
+  refresh(): void {
+    if (this.widgetGraph !== undefined) {
+      this.widgetGraph.refresh();
+    }
   }
 
   created(): void {
@@ -80,9 +95,8 @@ export default class GraphWidget extends WidgetBase {
   }
 
   mounted(): void {
-    const refresh = (): any => this.widgetGraph && this.widgetGraph.refresh();
-    this.$watch('widget.cols', refresh);
-    this.$watch('widget.rows', refresh);
+    this.$watch('widget.cols', this.refresh);
+    this.$watch('widget.rows', this.refresh);
   }
 }
 </script>
@@ -90,7 +104,12 @@ export default class GraphWidget extends WidgetBase {
 <template>
   <GraphCardWrapper show-initial :show="inDialog && mode ==='Full'">
     <template #graph>
-      <HistoryGraph :id="graphId" ref="widgetGraph" :config="graphCfg" />
+      <HistoryGraph
+        :id="graphId"
+        ref="widgetGraph"
+        :config="graphCfg"
+        @downsample="v => downsampling = v"
+      />
     </template>
 
     <!-- Full -->
@@ -100,6 +119,7 @@ export default class GraphWidget extends WidgetBase {
       :class="graphCardClass"
       :style="graphCardStyle"
       :in-dialog="inDialog"
+      :downsampling="downsampling"
     >
       <template #toolbar>
         <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">

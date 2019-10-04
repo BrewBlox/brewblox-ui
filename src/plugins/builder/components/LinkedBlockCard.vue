@@ -78,8 +78,10 @@ export default class LinkedBlockCard extends PartCard {
       return [];
     }
     const compatibleTable = sparkStore.compatibleTypes(this.sparkServices[0].id);
-    return this.types
-      .reduce((acc, type) => [...acc, ...get(compatibleTable, type, [])], [...this.types]);
+    return [
+      ...this.types,
+      ...this.types.flatMap(type => get(compatibleTable, type, [])),
+    ];
   }
 
   get actualFilter(): (link: Link) => boolean {

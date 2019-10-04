@@ -68,7 +68,7 @@ export default class HistoryGraph extends Vue {
   get listeners(): GraphValuesListener[] {
     return this.targets
       .map(target => historyStore.tryListenerById(this.listenerId(target)))
-      .filter(listener => listener !== null) as GraphValuesListener[];
+      .filter(listener => listener !== null && !!listener.values) as GraphValuesListener[];
   }
 
   get error(): string | null {
@@ -82,9 +82,8 @@ export default class HistoryGraph extends Vue {
   }
 
   get graphData(): PlotData[] {
-    return Object
-      .values(this.listeners
-        .reduce((acc, listener) => ({ ...acc, ...listener.values }), {}));
+    return this.listeners
+      .flatMap(listener => Object.values(listener.values));
   }
 
   get graphLayout(): Partial<Layout> {

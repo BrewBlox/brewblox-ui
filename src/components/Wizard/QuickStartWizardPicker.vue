@@ -58,7 +58,7 @@ export default class QuickStartWizardPicker extends Vue {
   <div>
     <!-- Display selected wizard -->
     <component
-      :is="wizardModel.wizard"
+      :is="wizardModel.wizardComponent"
       v-if="wizardActive"
       :feature-id="wizardModel.id"
       @title="setTitle"

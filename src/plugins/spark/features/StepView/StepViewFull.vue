@@ -12,6 +12,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { Block, ChangeField } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 
+import { mutate } from '../../../../helpers/functional';
 import { BlockChange, Step, StepViewConfig } from './types';
 
 interface BlockChangeDisplay extends BlockChange {
@@ -100,7 +101,7 @@ export default class StepViewFull extends CrudComponent {
   }
 
   allData(change: BlockChangeDisplay): { [key: string]: any } {
-    const propVals = change.props.reduce((acc, p) => ({ ...acc, [p.key]: null }), {});
+    const propVals = change.props.reduce((acc, p) => mutate(acc, p.key, null), {});
     return {
       ...propVals,
       ...change.data,

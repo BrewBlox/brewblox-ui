@@ -45,22 +45,22 @@ export default class StepViewBasic extends CrudComponent {
     const blockIds = sparkStore.blockIds(this.serviceId);
     return this.steps
       .reduce(
-        (acc, step) => ({
-          ...acc,
-          [step.id]: step.changes.every(change => blockIds.includes(change.blockId)),
-        }),
+        (acc, step) => {
+          acc[step.id] = step.changes.every(change => blockIds.includes(change.blockId));
+          return acc;
+        },
         {});
   }
 
   get activeSteps(): Record<string, boolean> {
     return this.steps
       .reduce(
-        (acc, step) => ({
-          ...acc,
-          [step.id]: this.applicableSteps[step.id]
+        (acc, step) => {
+          acc[step.id] = this.applicableSteps[step.id]
             && step.changes.every(change =>
-              isSubSet(change.data, sparkStore.blockById(this.serviceId, change.blockId).data)),
-        }),
+              isSubSet(change.data, sparkStore.blockById(this.serviceId, change.blockId).data));
+          return acc;
+        },
         {});
   }
 

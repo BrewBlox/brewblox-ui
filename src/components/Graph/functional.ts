@@ -3,7 +3,7 @@ import set from 'lodash/set';
 
 import { prettify } from '@/helpers/units';
 import { propertyNameWithUnit } from '@/helpers/units/parseObject';
-import { historyStore,QueryTarget } from '@/store/history';
+import { historyStore, QueryTarget } from '@/store/history';
 
 export interface QuasarNode {
   label: string;
@@ -59,7 +59,7 @@ export const expandedNodes =
     const checkNode = (node: QuasarNode): string[] => {
       const children = node.children || [];
       const vals: string[] = children
-        .reduce((acc: string[], n: QuasarNode) => [...acc, ...checkNode(n)], []);
+        .reduce((acc: string[], n: QuasarNode) => { acc.push(...checkNode(n)); return acc; }, []);
       if (vals.length > 0 || children.some(compare)) {
         vals.push(node.value);
       }
@@ -67,15 +67,17 @@ export const expandedNodes =
     };
 
     return nodes
-      .reduce((acc: string[], n: QuasarNode) => [...acc, ...checkNode(n)], []);
+      .reduce((acc: string[], n: QuasarNode) => { acc.push(...checkNode(n)); return acc; }, []);
   };
 
 export const targetSplitter =
   (targets: QueryTarget[]): string[] =>
     targets
       .reduce(
-        (acc: string[], tar: QueryTarget) =>
-          ([...acc, ...tar.fields.map(f => `${tar.measurement}/${f}`)]),
+        (acc: string[], tar: QueryTarget) => {
+          acc.push(...tar.fields.map(f => `${tar.measurement}/${f}`));
+          return acc;
+        },
         []
       );
 
@@ -96,7 +98,8 @@ export const targetBuilder =
             existing.fields.push(field);
             return acc;
           }
-          return [...acc, { measurement, fields: [field] }];
+          acc.push({ measurement, fields: [field] });
+          return acc;
         },
         [],
       );

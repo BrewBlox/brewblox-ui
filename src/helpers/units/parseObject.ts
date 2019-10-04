@@ -103,10 +103,10 @@ export function deserialize(input: any, prevKey = ''): any {
 
   return Object.keys(input)
     .reduce(
-      (acc, key) => ({
-        ...acc,
-        [propertyNameWithoutUnit(key)]: deserializeProperty(key, input),
-      }),
+      (acc, key) => {
+        acc[propertyNameWithoutUnit(key)] = deserializeProperty(key, input);
+        return acc;
+      },
       {},
     );
 }
@@ -138,10 +138,10 @@ export function serialize(input: any, prevKey = ''): any {
 
   return Object.keys(input)
     .reduce(
-      (acc, key) => ({
-        ...acc,
-        [serializedPropertyName(key, input)]: serializeProperty(key, input),
-      }),
+      (acc, key) => {
+        acc[serializedPropertyName(key, input)] = serializeProperty(key, input);
+        return acc;
+      },
       {},
     );
 }

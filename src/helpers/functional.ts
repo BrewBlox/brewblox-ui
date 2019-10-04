@@ -20,10 +20,11 @@ export const objectStringSorter =
       return left.localeCompare(right);
     };
 
-export const durationMs = (duration: number | string): number =>
-  isString(duration)
-    ? parseDuration(duration)
-    : duration;
+export const durationMs =
+  (duration: number | string): number =>
+    isString(duration)
+      ? parseDuration(duration)
+      : duration;
 
 export const durationString =
   (duration: number | string): string => {
@@ -162,20 +163,23 @@ export function chunked<T>(arr: T[], chunkSize: number): T[][] {
   return chunks;
 }
 
-export const nanoToMilli = (nano: number): number => Math.floor(nano / 1e6);
+export const nanoToMilli =
+  (nano: number): number => Math.floor(nano / 1e6);
 
-export const capitalized = (s: string): string =>
-  isString(s)
-    ? s.charAt(0).toUpperCase() + s.slice(1)
-    : s;
+export const capitalized =
+  (s: string): string =>
+    isString(s)
+      ? s.charAt(0).toUpperCase() + s.slice(1)
+      : s;
 
-// Algorithm copied from StackOverflow at 2019/06/27
-// https://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color
-export const contrastColor = (background: string): string => {
-  const rgb = colors.hexToRgb(background);
-  const luma = ((0.299 * rgb.r) + (0.587 * rgb.g) + (0.114 * rgb.b)) / 255;
-  return luma > 0.8 ? 'black' : 'white';
-};
+export const contrastColor =
+  (background: string): string => {
+    // Algorithm copied from StackOverflow at 2019/06/27
+    // https://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color
+    const rgb = colors.hexToRgb(background);
+    const luma = ((0.299 * rgb.r) + (0.587 * rgb.g) + (0.114 * rgb.b)) / 255;
+    return luma > 0.8 ? 'black' : 'white';
+  };
 
 export const suggestId =
   (id: string, validate: (val: string) => boolean, ): string => {
@@ -196,20 +200,20 @@ export const suggestId =
     return copyName(idx);
   };
 
-export const isAbsoluteUrl = (val: string): boolean =>
-  new RegExp('^(?:[a-z]+:)?//', 'i').test(val);
+export const isAbsoluteUrl =
+  (val: string): boolean =>
+    new RegExp('^(?:[a-z]+:)?//', 'i').test(val);
 
-export const entryReducer =
-  (acc: Record<string, any>, [key, val]: [string, any]): Record<string, any> => {
+export const validator =
+  (rules: InputRule[]): ((val: any) => boolean) =>
+    val => rules.every(rule => !isString(rule(val)));
+
+export const mutate =
+  (acc, key: keyof any, val: any): typeof acc => {
     acc[key] = val;
     return acc;
   };
 
-export const objReducer = (key: string) =>
-  (acc: Record<string, any>, obj: any) => {
-    acc[obj[key]] = obj;
-    return acc;
-  };
-
-export const validator = (rules: InputRule[]): ((val: any) => boolean) =>
-  val => rules.every(rule => !isString(rule(val)));
+export const objReducer =
+  (key: string) =>
+    (acc: Mapped<any>, obj: any) => mutate(acc, obj[key], obj);

@@ -27,6 +27,18 @@ export default class MetricsBasic extends CrudComponent {
   @Prop({ type: Number, required: true })
   public readonly revision!: number;
 
+  @Watch('widgetCfg', { immediate: true, deep: true })
+  updateWatcher(newVal: MetricsConfig, oldVal: MetricsConfig): void {
+    if (newVal && JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
+      this.resetListeners();
+    }
+  }
+
+  @Watch('revision')
+  triggerUpdate(): void {
+    this.resetListeners();
+  }
+
   get widgetCfg(): MetricsConfig {
     return {
       targets: [],
@@ -65,10 +77,9 @@ export default class MetricsBasic extends CrudComponent {
   }
 
   get values(): CurrentValue[] {
-    // console.log(this.listeners[0].values);
     const now = new Date().getTime();
     return this.listeners
-      .reduce((acc: MetricsResult[], listener: Listener) => { acc.push(...listener.values); return acc; }, [])
+      .flatMap(listener => listener.values)
       .map(result => ({
         ...result,
         name: this.renames[result.field] || result.field,
@@ -103,18 +114,6 @@ export default class MetricsBasic extends CrudComponent {
   resetListeners(): void {
     this.removeListeners();
     this.addListeners();
-  }
-
-  @Watch('widgetCfg', { immediate: true, deep: true })
-  updateWatcher(newVal: MetricsConfig, oldVal: MetricsConfig): void {
-    if (newVal && JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
-      this.resetListeners();
-    }
-  }
-
-  @Watch('revision')
-  triggerUpdate(): void {
-    this.resetListeners();
   }
 
   destroyed(): void {

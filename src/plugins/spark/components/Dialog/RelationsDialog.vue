@@ -71,12 +71,15 @@ export default class RelationsDialog extends DialogBase {
 
     return this.edges
       // Create a list of each ID referenced by an edge
-      .reduce((acc: string[], edge: Edge) => [...acc, edge.target, edge.source], [])
+      .reduce((acc: string[], edge: Edge) => { acc.push(edge.target, edge.source); return acc; }, [])
       // Find a node for each unique ID
-      .reduce((acc: Node[], id: string) =>
-        acc.find(node => node.id === id)
-          ? acc
-          : [...acc, findNode(id)],
+      .reduce(
+        (acc: Node[], id: string) => {
+          if (acc.find(node => node.id === id)) {
+            acc.push(findNode(id));
+          }
+          return acc;
+        },
         [],
       );
   }

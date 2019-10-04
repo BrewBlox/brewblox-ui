@@ -2,7 +2,7 @@ import { Link } from '@/helpers/units';
 
 import { ConstraintsObj } from '../components/Constraints/ConstraintsBase';
 import { constraintLabels } from '../helpers';
-import { Block, BlockLink,Limiters } from '../types';
+import { Block, BlockLink, Limiters } from '../types';
 
 export const calculateDrivenChains = (blocks: Block[]): string[][] => {
   const output: string[][] = [];
@@ -33,8 +33,10 @@ export const calculateDrivenChains = (blocks: Block[]): string[][] => {
         );
     };
 
-  return Object.keys(drivenBlocks)
-    .reduce((acc, k) => ([...acc, ...generateChains([], k)]), output);
+  Object.keys(drivenBlocks)
+    .forEach(key => { output.push(...generateChains([], key)); });
+
+  return output;
 };
 
 export const calculateBlockLinks = (blocks: Block[]): BlockLink[] => {
@@ -59,6 +61,7 @@ export const calculateBlockLinks = (blocks: Block[]): BlockLink[] => {
               if (child[0].startsWith('driven')) {
                 return acc;
               }
+              // intentional copy of acc
               return [...acc, ...findRelations(source, [...relation, child[0]], child[1])];
             },
             linkArray

@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { mutate } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
@@ -27,7 +28,7 @@ export default class DigitalActuatorForm extends BlockCrudComponent {
     const targetId = this.hwBlock.id;
     return sparkStore.blockValues(this.serviceId)
       .filter(block => block.type === typeName && block.data.hwDevice.id === targetId)
-      .reduce((acc, block) => ({ ...acc, [block.data.channel]: block.id }), {});
+      .reduce((acc, block) => mutate(acc, block.data.channel, block.id), {});
   }
 
   pinOptName(idx: number): string {

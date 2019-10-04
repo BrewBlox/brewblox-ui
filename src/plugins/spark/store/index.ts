@@ -2,7 +2,7 @@ import get from 'lodash/get';
 import Vue from 'vue';
 import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
-import { objReducer } from '@/helpers/functional';
+import { mutate, objReducer } from '@/helpers/functional';
 import store from '@/store';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
@@ -52,27 +52,27 @@ export class SparkModule extends VuexModule {
 
   private get allBlockIds(): Mapped<string[]> {
     return Object.entries(this.services)
-      .reduce((acc, [k, v]) => ({ ...acc, [k]: Object.keys(v.blocks) }), {});
+      .reduce((acc, [k, v]) => mutate(acc, k, Object.keys(v.blocks)), {});
   }
 
   private get allBlockValues(): Mapped<Block[]> {
     return Object.entries(this.services)
-      .reduce((acc, [k, v]) => ({ ...acc, [k]: Object.values(v.blocks) }), {});
+      .reduce((acc, [k, v]) => mutate(acc, k, Object.values(v.blocks)), {});
   }
 
   private get allDrivenChains(): Mapped<string[][]> {
     return Object.keys(this.services)
-      .reduce((acc, id) => ({ ...acc, [id]: calculateDrivenChains(this.allBlockValues[id]) }), {});
+      .reduce((acc, id) => mutate(acc, id, calculateDrivenChains(this.allBlockValues[id])), {});
   }
 
   private get allBlockLinks(): Mapped<BlockLink[]> {
     return Object.keys(this.services)
-      .reduce((acc, id) => ({ ...acc, [id]: calculateBlockLinks(this.allBlockValues[id]) }), {});
+      .reduce((acc, id) => mutate(acc, id, calculateBlockLinks(this.allBlockValues[id])), {});
   }
 
   private get allLimiters(): Mapped<Limiters> {
     return Object.keys(this.services)
-      .reduce((acc, id) => ({ ...acc, [id]: calculateLimiters(this.allBlockValues[id]) }), {});
+      .reduce((acc, id) => mutate(acc, id, calculateLimiters(this.allBlockValues[id])), {});
   }
 
   public get presetIds(): string[] {
@@ -190,12 +190,11 @@ export class SparkModule extends VuexModule {
       .reduce(
         (acc, key) => {
           const configNames = this.sparkConfigById(key).groupNames || [];
-
-          const names = [
+          acc[key] = [
             ...configNames.slice(0, defaultGroupNames.length),
             ...defaultGroupNames.slice(configNames.length),
           ];
-          return { ...acc, [key]: names };
+          return acc;
         },
         {}
       );

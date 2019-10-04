@@ -1,4 +1,5 @@
 import get from 'lodash/get';
+import mapKeys from 'lodash/mapKeys';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { GraphConfig } from '@/components/Graph/types';
@@ -75,12 +76,10 @@ export default class BlockCrudComponent extends CrudComponent {
       targets: [
         {
           measurement: this.serviceId,
-          fields: Object.keys(this.renamedTargets)
-            .map(k => blockFmt(k)),
+          fields: Object.keys(this.renamedTargets).map(k => blockFmt(k)),
         },
       ],
-      renames: Object.entries(this.renamedTargets)
-        .reduce((acc, [k, v]) => ({ ...acc, [serviceFmt(k)]: v }), {}),
+      renames: mapKeys(this.renamedTargets, (_, k) => serviceFmt(k)),
       colors: {},
     };
   }

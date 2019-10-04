@@ -5,7 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { capitalized, objectStringSorter } from '@/helpers/functional';
+import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, Spark, SystemStatus } from '@/plugins/spark/types';
 import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards';
@@ -131,9 +131,8 @@ export default class SparkPage extends Vue {
     this.service.config.expandedBlocks = Object.entries(expanded)
       .reduce(
         (acc, [k, v]) => {
-          return ids.includes(k)
-            ? { ...acc, [k]: v }
-            : acc;
+          if (ids.includes(k)) { acc[k] = v; };
+          return acc;
         },
         {},
       );
@@ -228,7 +227,7 @@ export default class SparkPage extends Vue {
 
   expandAll(): void {
     this.expandedBlocks = [...sparkStore.blockIds(this.service.id), '_service']
-      .reduce((acc, id) => ({ ...acc, [id]: true }), {});
+      .reduce((acc, id) => mutate(acc, id, true), {});
   }
 
   expandNone(): void {

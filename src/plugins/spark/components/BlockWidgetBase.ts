@@ -1,4 +1,5 @@
 import get from 'lodash/get';
+import mapKeys from 'lodash/mapKeys';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
@@ -82,8 +83,7 @@ export default class BlockWidgetBase extends WidgetBase {
             .map(k => blockFmt(k)),
         },
       ],
-      renames: Object.entries(this.renamedTargets)
-        .reduce((acc, [k, v]) => ({ ...acc, [serviceFmt(k)]: v }), {}),
+      renames: mapKeys(this.renamedTargets, (_, key) => serviceFmt(key)),
       colors: {},
     };
   }
