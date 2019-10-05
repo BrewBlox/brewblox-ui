@@ -2,21 +2,17 @@ import get from 'lodash/get';
 import mapKeys from 'lodash/mapKeys';
 import { Component, Prop } from 'vue-property-decorator';
 
-import CrudComponent, { Crud } from '@/components/Widget/CrudComponent';
+import CrudComponent from '@/components/Widget/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { showBlockDialog } from '@/helpers/dialog';
 import { postfixedDisplayNames } from '@/helpers/units';
 import { GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
+import { BlockCrud } from '@/plugins/spark/types';
 
 import { blockIdRules } from '../helpers';
 import { Block } from '../types';
 
-export interface BlockCrud extends Crud {
-  block: Block;
-  isStoreBlock: boolean;
-  saveBlock: (block: Block) => unknown | Promise<unknown>;
-}
 
 @Component
 export default class BlockCrudComponent extends CrudComponent {

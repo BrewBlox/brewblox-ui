@@ -2,9 +2,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
-import { featureStore, WidgetContext, WidgetMode } from '@/store/features';
-
-import { Crud } from '../Widget/CrudComponent';
+import { Crud, featureStore, WidgetContext, WidgetMode } from '@/store/features';
 
 @Component
 export default class WidgetDialog extends DialogBase {
@@ -38,8 +36,8 @@ export default class WidgetDialog extends DialogBase {
     return this.getProps() || {};
   }
 
-  get widgetComponent(): string | null {
-    return featureStore.widget(this.crud.widget.feature, this.crud.widget.config);
+  get widgetComponent(): string {
+    return featureStore.widget(this.crud);
   }
 }
 </script>

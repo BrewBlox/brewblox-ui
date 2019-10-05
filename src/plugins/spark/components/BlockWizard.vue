@@ -8,12 +8,10 @@ import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import { Block, BlockCrud } from '@/plugins/spark/types';
 import { PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { providerStore } from '@/store/providers';
-
-import { BlockCrud } from './BlockCrudComponent';
 
 
 @Component

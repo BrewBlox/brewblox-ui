@@ -3,9 +3,8 @@ import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
-import { BlockCrud } from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import { Block, BlockCrud } from '@/plugins/spark/types';
 import { PersistentWidget } from '@/store/dashboards';
 import { featureStore, WidgetContext, WidgetMode } from '@/store/features';
 
@@ -68,8 +67,8 @@ export default class BlockWidgetDialog extends DialogBase {
     };
   }
 
-  get widgetComponent(): string | null {
-    return featureStore.widget(this.blockType, this.widget.config);
+  get widgetComponent(): string {
+    return featureStore.widget(this.crud);
   }
 
   get widgetProps(): any {
@@ -82,7 +81,7 @@ export default class BlockWidgetDialog extends DialogBase {
   <q-dialog ref="dialog" no-backdrop-dismiss class="row" @hide="onDialogHide">
     <component
       :is="widgetComponent"
-      v-if="!!block && !!widgetComponent"
+      v-if="!!block"
       :initial-crud="crud"
       :context="context"
       v-bind="widgetProps"

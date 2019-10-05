@@ -8,11 +8,9 @@ import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import { Block, BlockCrud } from '@/plugins/spark/types';
 import { PersistentWidget } from '@/store/dashboards';
 import { Service, serviceStore } from '@/store/services';
-
-import { BlockCrud } from './BlockCrudComponent';
 
 @Component
 export default class BlockWidgetWizard extends WidgetWizardBase {

@@ -5,9 +5,8 @@ import { Watch } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
 import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards';
-import { featureStore, WidgetContext } from '@/store/features';
+import { Crud, featureStore, WidgetContext } from '@/store/features';
 
-import { Crud } from '../components/Widget/CrudComponent';
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '../helpers/dashboards';
 
 interface ValidatedWidget {
@@ -65,41 +64,30 @@ export default class DashboardPage extends Vue {
   get validatedWidgets(): ValidatedWidget[] {
     return this.widgets
       .map((widget: PersistentWidget) => {
+        const crud: Crud = {
+          widget,
+          isStoreWidget: true,
+          saveWidget: this.saveWidget,
+          closeDialog: () => { },
+        };
         try {
           if (widget.title === undefined) {
             // ensure backwards compatibility
             // older items may not have a title
             widget.title = widget.id;
           }
-          const component = featureStore.widget(widget.feature, widget.config);
-          if (!component) {
-            throw new Error(`No widget found for ${widget.feature}`);
-          }
-          const validator = featureStore.validator(widget.feature);
-          if (!validator(widget.config)) {
-            throw new Error(`${widget.feature} validation failed`);
-          }
+          const component = featureStore.widget(crud, true);
           return {
             id: widget.id,
             component,
-            crud: {
-              widget,
-              isStoreWidget: true,
-              saveWidget: this.saveWidget,
-              closeDialog: () => { },
-            },
+            crud,
           };
         } catch (e) {
           return {
             id: widget.id,
             component: 'InvalidWidget',
+            crud,
             error: e.message,
-            crud: {
-              widget,
-              isStoreWidget: true,
-              saveWidget: this.saveWidget,
-              closeDialog: () => { },
-            },
           };
         }
       });

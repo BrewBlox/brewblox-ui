@@ -4,7 +4,7 @@ import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-dec
 
 import store from '@/store';
 
-import { Deleter, Feature, FeatureRole, QuickStart, Validator, Watcher } from './types';
+import { Crud, Deleter, Feature, FeatureRole, QuickStart, Watcher } from './types';
 export * from './types';
 
 
@@ -40,18 +40,22 @@ export class FeatureModule extends VuexModule {
     return id => get(this.features, [id, 'role']) || 'Other';
   }
 
-  public get validator(): (id: string) => Validator {
-    return id => get(this.features, [id, 'validator']) || (() => true);
-  }
-
   public get wizard(): (id: string) => string {
     return id => get(this.features, [id, 'wizardComponent'], '') as string;
   }
 
-  public get widget(): (id: string, config: any) => string | null {
-    return (id: string, config: any) => {
-      const obj = get(this.features, [id, 'widgetComponent'], null);
-      return typeof obj === 'function' ? obj(config) : obj;
+  public get widget(): (crud: Crud, throwInvalid?: boolean) => string {
+    return (crud: Crud, throwInvalid = false) => {
+      try {
+        const obj = get(this.features, [crud.widget.feature, 'widgetComponent'], null);
+        if (obj === null) {
+          throw new Error(`No feature found for '${crud.widget.feature}'`);
+        }
+        return typeof obj === 'function' ? obj(crud) : obj;
+      } catch (e) {
+        if (throwInvalid) { throw e; }
+        return 'InvalidWidget';
+      }
     };
   }
 

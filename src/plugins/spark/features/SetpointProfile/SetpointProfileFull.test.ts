@@ -4,10 +4,10 @@ import Vue from 'vue';
 
 import { Link, Unit } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
-import { BlockCrud } from '@/plugins/spark/components/BlockCrudComponent';
+import { interfaceTypes } from '@/plugins/spark/block-types';
 import { SetpointProfileBlock } from '@/plugins/spark/features/SetpointProfile/types';
+import { BlockCrud } from '@/plugins/spark/types';
 
-import { interfaceTypes } from '../../block-types';
 import SetpointProfileFull from './SetpointProfileFull.vue';
 
 interface ProfileCrud extends BlockCrud {

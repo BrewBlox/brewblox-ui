@@ -3,9 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { PersistentWidget } from '@/store/dashboards';
-import { featureStore, WidgetContext, WidgetMode } from '@/store/features';
-
-import { Crud } from './CrudComponent';
+import { Crud, featureStore, WidgetContext, WidgetMode } from '@/store/features';
 
 export interface WidgetProps {
   initialCrud: Crud;

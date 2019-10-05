@@ -7,12 +7,11 @@ import { Watch } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, Spark, SystemStatus } from '@/plugins/spark/types';
+import { Block, BlockCrud, Spark, SystemStatus } from '@/plugins/spark/types';
 import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards';
 import { FeatureRole, featureStore, WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
 
-import { BlockCrud } from '../components/BlockCrudComponent';
 import { isReady, isSystemBlock } from './getters';
 
 interface ModalSettings {
@@ -28,6 +27,7 @@ interface ValidatedWidget {
   displayName: string;
   role: FeatureRole;
   expanded: boolean;
+  error?: string;
 }
 
 @Component
@@ -185,23 +185,37 @@ export default class SparkPage extends Vue {
         });
     }
     const widget = this.volatileWidgets[key];
-    return {
-      id: widget.id,
-      key,
-      displayName: featureStore.displayName(widget.feature),
-      role: featureStore.role(widget.feature),
-      component: featureStore.widget(widget.feature, widget.config) || 'InvalidWidget',
-      expanded: this.expandedBlocks[widget.id] || false,
-      crud: {
-        widget,
-        saveWidget: this.saveWidget,
-        isStoreWidget: false,
-        closeDialog: () => { },
-        block,
-        saveBlock: this.saveBlock,
-        isStoreBlock: true,
-      },
+    const crud: BlockCrud = {
+      widget,
+      saveWidget: this.saveWidget,
+      isStoreWidget: false,
+      closeDialog: () => { },
+      block,
+      saveBlock: this.saveBlock,
+      isStoreBlock: true,
     };
+    try {
+      return {
+        id: widget.id,
+        key,
+        crud,
+        displayName: featureStore.displayName(widget.feature),
+        role: featureStore.role(widget.feature),
+        component: featureStore.widget(crud, true),
+        expanded: this.expandedBlocks[widget.id] || false,
+      };
+    } catch (e) {
+      return {
+        id: widget.id,
+        key,
+        crud,
+        displayName: 'Invalid Widget',
+        role: 'Other',
+        component: 'InvalidWidget',
+        expanded: this.expandedBlocks[widget.id] || false,
+        error: e.message,
+      };
+    }
   }
 
   get validatedItems(): ValidatedWidget[] {
@@ -489,6 +503,7 @@ export default class SparkPage extends Vue {
               :is="val.component"
               :initial-crud="val.crud"
               :context="context"
+              :error="val.error"
               class="bg-dark"
             />
           </q-item-section>

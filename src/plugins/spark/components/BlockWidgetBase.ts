@@ -8,8 +8,7 @@ import { postfixedDisplayNames } from '@/helpers/units';
 import { GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
 
-import { Block } from '../types';
-import { BlockCrud } from './BlockCrudComponent';
+import { Block, BlockCrud } from '../types';
 
 @Component
 export default class BlockWidgetBase extends WidgetBase {

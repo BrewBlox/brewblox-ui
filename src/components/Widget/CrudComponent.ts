@@ -5,14 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { dashboardStore, PersistentWidget } from '@/store/dashboards';
-import { featureStore, WidgetMode } from '@/store/features';
-
-export interface Crud {
-  widget: PersistentWidget;
-  isStoreWidget: boolean;
-  saveWidget(widget: PersistentWidget): unknown | Promise<unknown>;
-  closeDialog(): void;
-}
+import { Crud, featureStore, WidgetMode } from '@/store/features';
 
 export interface DialogOpts {
   widgetProps?: any;
