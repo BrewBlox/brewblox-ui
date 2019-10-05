@@ -1,4 +1,4 @@
-import { GraphConfig } from '@/components/Graph/types';
+import { GraphConfig } from '@/plugins/history/types';
 
 export interface Session {
   id: string;

@@ -2,10 +2,10 @@
 import shortid from 'shortid';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import { targetBuilder, targetSplitter } from '@/components/Graph/functional';
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { objectSorter } from '@/helpers/functional';
 import { durationString } from '@/helpers/functional';
+import { targetBuilder, targetSplitter } from '@/plugins/history/nodes';
 import { Session, SessionViewConfig } from '@/plugins/spark/features/SessionView/types';
 import { DisplayNames, historyStore } from '@/store/history';
 

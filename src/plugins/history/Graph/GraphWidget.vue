@@ -3,10 +3,10 @@ import { uid } from 'quasar';
 import { Component, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import { defaultPresets } from '@/components/Graph/getters';
-import HistoryGraph from '@/components/Graph/HistoryGraph.vue';
-import { GraphConfig } from '@/components/Graph/types';
 import WidgetBase from '@/components/Widget/WidgetBase';
+import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
+import { defaultPresets } from '@/plugins/history/getters';
+import { GraphConfig } from '@/plugins/history/types';
 import { QueryParams } from '@/store/history';
 
 import GraphEditor from './GraphEditor.vue';

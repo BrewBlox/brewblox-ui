@@ -2,11 +2,17 @@
 import parseDuration from 'parse-duration';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { defaultLabel, targetBuilder, targetSplitter } from '@/components/Graph/functional';
-import { GraphConfig } from '@/components/Graph/types';
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { durationString } from '@/helpers/functional';
-import { DisplayNames, GraphValueAxes, historyStore, LineColors, QueryParams } from '@/store/history';
+import { defaultLabel, targetBuilder, targetSplitter } from '@/plugins/history/nodes';
+import { GraphConfig } from '@/plugins/history/types';
+import {
+  DisplayNames,
+  GraphValueAxes,
+  historyStore,
+  LineColors,
+  QueryParams,
+} from '@/store/history';
 
 interface PeriodDisplay {
   start: boolean;

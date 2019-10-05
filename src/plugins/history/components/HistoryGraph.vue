@@ -5,7 +5,8 @@ import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import { defaultPresets } from '@/components/Graph/getters';
+import { defaultPresets } from '@/plugins/history/getters';
+import { GraphConfig } from '@/plugins/history/types';
 import {
   DisplayNames,
   GraphValueAxes,
@@ -16,8 +17,7 @@ import {
   QueryTarget,
 } from '@/store/history';
 
-import { addPlotlyListener } from './actions';
-import { GraphConfig } from './types';
+import { addPlotlyListener } from './listener';
 
 interface Policies { [measurement: string]: string }
 
@@ -160,7 +160,7 @@ export default class HistoryGraph extends Vue {
 <template>
   <span>
     <!-- Normal display -->
-    <Graph
+    <GenericGraph
       v-if="!error"
       ref="display"
       :data="graphData"

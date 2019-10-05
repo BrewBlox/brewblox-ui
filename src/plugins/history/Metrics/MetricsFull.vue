@@ -3,9 +3,9 @@ import get from 'lodash/get';
 import parseDuration from 'parse-duration';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { defaultLabel, targetBuilder, targetSplitter } from '@/components/Graph/functional';
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { durationString } from '@/helpers/functional';
+import { defaultLabel, targetBuilder, targetSplitter } from '@/plugins/history/nodes';
 import { DisplayNames, historyStore } from '@/store/history';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './getters';

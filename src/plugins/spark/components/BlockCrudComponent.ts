@@ -2,11 +2,11 @@ import get from 'lodash/get';
 import mapKeys from 'lodash/mapKeys';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { GraphConfig } from '@/components/Graph/types';
 import CrudComponent, { Crud } from '@/components/Widget/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { showBlockDialog } from '@/helpers/dialog';
 import { postfixedDisplayNames } from '@/helpers/units';
+import { GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
 
 import { blockIdRules } from '../helpers';

@@ -2,9 +2,8 @@
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { defaultLabel } from '@/plugins/history/nodes';
 import { DisplayNames } from '@/store/history';
-
-import { defaultLabel } from './functional';
 
 
 @Component

@@ -51,7 +51,7 @@ const layoutDefaults: () => Partial<Layout> = () => ({
 /* eslint-enable */
 
 @Component
-export default class Graph extends Vue {
+export default class GenericGraph extends Vue {
   id: string = uid();
 
   @Prop({ type: Array, required: true })

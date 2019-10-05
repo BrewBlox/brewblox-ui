@@ -8,8 +8,8 @@ import CrudComponent from '@/components/Widget/CrudComponent';
 import { durationString } from '@/helpers/functional';
 import { DisplayNames, historyStore, Listener, QueryParams, QueryTarget } from '@/store/history';
 
-import { addListener } from './actions';
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './getters';
+import { addListener } from './listener';
 import { MetricsConfig, MetricsResult } from './types';
 
 interface CurrentValue extends MetricsResult {

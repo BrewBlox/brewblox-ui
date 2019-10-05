@@ -3,9 +3,9 @@ import mapKeys from 'lodash/mapKeys';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import { GraphConfig } from '@/components/Graph/types';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { postfixedDisplayNames } from '@/helpers/units';
+import { GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
 
 import { Block } from '../types';

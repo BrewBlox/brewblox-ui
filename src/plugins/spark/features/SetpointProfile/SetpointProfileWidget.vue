@@ -54,7 +54,7 @@ export default class SetpointProfileWidget extends BlockWidgetBase {
 <template>
   <GraphCardWrapper :show="inDialog && mode ==='Full'">
     <template #graph>
-      <Graph v-bind="graphProps" :revision="revision" />
+      <GenericGraph v-bind="graphProps" :revision="revision" />
     </template>
 
     <component :is="mode" :crud="crud" :class="cardClass" :style="cardStyle">
@@ -91,7 +91,7 @@ export default class SetpointProfileWidget extends BlockWidgetBase {
       </template>
 
       <template #graph>
-        <Graph v-bind="graphProps" :revision="revision" auto-fit auto-resize />
+        <GenericGraph v-bind="graphProps" :revision="revision" auto-fit auto-resize />
       </template>
     </component>
   </GraphCardWrapper>
