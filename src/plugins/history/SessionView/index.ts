@@ -17,4 +17,4 @@ const feature: Feature = {
   },
 };
 
-export default { feature };
+export default feature;

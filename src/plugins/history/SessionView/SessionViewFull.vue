@@ -6,8 +6,9 @@ import CrudComponent from '@/components/Widget/CrudComponent';
 import { objectSorter } from '@/helpers/functional';
 import { durationString } from '@/helpers/functional';
 import { targetBuilder, targetSplitter } from '@/plugins/history/nodes';
-import { Session, SessionViewConfig } from '@/plugins/spark/features/SessionView/types';
 import { DisplayNames, historyStore } from '@/store/history';
+
+import { Session, SessionViewConfig } from './types';
 
 @Component
 export default class SessionViewFull extends CrudComponent {
