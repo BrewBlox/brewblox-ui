@@ -9,6 +9,10 @@
 * Docker
 * Docker-compose
 
+Due to limitations in the way Docker is handled on Windows and Mac, a Linux-based OS is required for development.
+
+If you're determined to make it work on either Windows or Mac, feel free to contact us for a more detailed explanation.
+
 ## Run
 
 ``` bash
@@ -39,140 +43,51 @@ BrewBlox mostly adheres to the [Vue application structure][vue-structure], but d
 
 ### Dashboard
 
-The BrewBlox UI is centered around the concept of it being a dashboard that can be filled by whatever is relevant to the user. Dashboards are agnostic displays of widgets.
+To ensure flexibility, one of the core display elements in the UI is the dashboard.
+
+A dashboard can display anything that implements the `Widget` component interface. This allows the user to display the most relevant items, regardless of whether they are core BrewBlox components, or added by a third-party plugin.
+
+### Plugin
+
+To allow runtime extension of the UI, users can load plugins. For more information on how Vue plugins work, see the [Vue documentation page](https://vuejs.org/v2/guide/plugins.html). For an example of how to create a BrewBlox plugin, see the [brewblox-plugin](https://github.com/BrewBlox/brewblox-plugin) repository.
 
 ### Provider
 
 Each device or service supported by the BrewBlox UI is implemented as a provider. All interaction with those supported devices or services is encapsulated here.
 
-Providers are modular, and placed in the `plugins` directory.
-
-If you only want to add a single widget, you don't need to add a provider.
+Providers can be registered by third-party plugins.
+If you only want to add independent widgets, you don't need to add a provider.
 
 ### Service
 
 Services are instances of Providers. If you have two connected Sparks, you'll be using two separate services as created by the `Spark` provider.
+Service configuration is persisted in the datastore.
 
 ### Feature
 
-Providers offer one or more features. Features provide the Vue components required to render and support dashboard items.
+Plugins can register one or more features. Features define the Vue components required to create and render individual widgets.
 
-### Dashboard Item
+### PersistentWidget
 
-Comparable to how services are instances of providers, dashboard items are instances of features.
+Comparable to how `Service` is an instance of `Provider`, `PersistentWidget` is an instance of `Feature`.
+Just as with Services, the configuration for each PersistentWidget is stored in the datastore.
 
-### Widget, Wizard, Form
+### Widget, Wizard
 
-To implement specific functionality, features can offer various Vue components, inheriting from a generic base class.
+To implement functionality, features have to register various Vue components. These components are expected to implement common interfaces, as they will be instantiated by generic components (dashboard for widgets, wizard picker for wizards).
 
-* To be displayed on a dashboard, a feature must have a widget.
-* To allow the user to create new dashboard items, a feature must have a wizard.
-* For more extensive configuration, features can provide a Form. These are rendered in modal windows.
+* A feature must implement a `Widget` component to be displayed on a dashboard or in a modal dialog.
+* To allow creation of `PersistentWidget`s, the feature can implement a `Wizard` component.
+  * The wizard is optional: some features are created or discovered automatically.
 
 ## Datastore
 
-Local application state is kept using [VueX][vuex]. Settings that are not session-specific (dashboards, dashboard items, services) are persisted to the BrewBlox [datastore].
+Local application state is kept using [VueX][vuex]. Settings that are not session-specific (`Dashboard`, `PersistentWidget`, `Service`) are persisted to the BrewBlox [datastore](https://pouchdb.com/).
 
 The full datastore state is loaded on startup, and all changes are persisted here.
 
 
----
 
-# How do I....
-
-## Support a new device (add a provider)
-
-In order to support the `gizmo` device:
-
-* Create the `src/plugins/gizmo` directory.
-* In `src/plugins/gizmo/index.ts`, add an initializer:
-```js
-import { providerStore } from '@/store/providers';
-
-export default {
-  install(Vue: VueConstructor, { store }) {
-    providerStore.createProvider({
-        id: 'Gizmo',
-        displayName: 'Totally Awesome Gizmo Device',
-
-        // IDs of separately created features
-        features: [],
-
-        // Called whenever a new service is created
-        onAdd: async (service) => {},
-
-        // Called whenever a service is removed
-        onRemove: async (service) => {},
-
-        // Called after a service is created
-        onFetch: async (service) => {},
-
-        // Globally registered Vue components
-        wizard: 'GizmoWizard',
-        page: 'GizmoPage',
-      });
-  }
-}
-```
-* Add your plugin to the list of local plugins in `src/main.ts`.
-```js
-import gizmo from './plugins/gizmo'
-
-const plugins: PluginObject<any>[] = [
-  PortalVue,
-  history,
-  spark,
-  builder,
-  gizmo, // new
-];
-```
-
-## Add a separate store for my provider
-
-Plugins can define and register their own store modules.
-
-```js
-import Vue from 'vue';
-import store from '@/store';
-import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators';
-
-@Module({ store, namespaced: true, dynamic: true, name: 'gizmos' })
-export class GizmoModule extends VuexModule {
-  public gizmos: Record<String, any> = {};
-  public gadgets: any[] = [];
-
-  public get awesome(): boolean {
-    return true;
-  }
-
-  @Mutation
-  public setGizmo(gizmo: Gizmo): void {
-    // Using Vue.set ensures the new gizmo is picked up by reactive getters
-    Vue.set(this.gizmos, gizmo.id, gizmo);
-  }
-
-  @Mutation
-  public addGadget(gadget: Gadget): void {
-    // Array.prototype.push is watched by Vue, and will be reactive
-    this.gadgets.push(gadget);
-  }
-
-  // the commit will be automatically called with the return value
-  @Action({ commit: 'addGadget' })
-  public async createGadget() {
-    return { name: 'new gadget' };
-  }
-}
-
-// Allows directly calling getters and functions in components
-export default getModule(GizmoModule)
-```
-
-
-
-
-
-[datastore]: https://github.com/BrewBlox/brewblox-datastore
 [vuex]: https://vuex.vuejs.org/guide/
 [vue-structure]: https://vuex.vuejs.org/guide/structure.html
 [dynamic-vuex]: https://vuex.vuejs.org/guide/modules.html#dynamic-module-registration
