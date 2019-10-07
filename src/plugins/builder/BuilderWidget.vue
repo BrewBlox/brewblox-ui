@@ -35,7 +35,9 @@ export default class BuilderWidget extends WidgetBase {
   }
 
   get builderCardClass(): string[] {
-    return [...this.cardClass, 'column'];
+    return this.inDialog
+      ? ['widget-modal', 'column']
+      : ['widget-dashboard', 'column', 'overflow-unset'];
   }
 
   get builderCardStyle(): Mapped<string> {
