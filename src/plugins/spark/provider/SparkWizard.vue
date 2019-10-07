@@ -34,7 +34,7 @@ export default class SparkWizard extends Vue {
     this.$q.notify({
       icon: 'mdi-check-all',
       color: 'positive',
-      message: `Added ${providerStore.displayNameById(service.type)} ${service.title}`,
+      message: `Added ${providerStore.displayName(service.type)} ${service.title}`,
     });
     this.$emit('close');
   }

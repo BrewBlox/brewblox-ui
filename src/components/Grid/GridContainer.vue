@@ -1,41 +1,23 @@
 <script lang="ts">
-import Vue, { CreateElement, VNode, VNodeComponentOptions } from 'vue';
+import Vue, { CreateElement, VNode } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { WidgetProps } from '../Widget/WidgetBase';
 import GridItem from './GridItem.vue';
 
 @Component({
   components: { GridItem },
 })
 export default class GridContainer extends Vue {
-  activeItemId: string | null = null;
-  activeItemPos: XYPosition | null = null;
 
   @Prop({ type: Boolean, default: false })
   readonly editable!: boolean;
 
-  get gridItems(): GridItem[] {
-    return this.$children as GridItem[];
-  }
-
-  startInteraction(id: string): void {
-    this.activeItemId = id;
-  }
-
-  stopInteraction(): void {
-    this.activeItemId = null;
-    this.activeItemPos = null;
-  }
-
-  moveInteraction(id: string, pos: XYPosition): void {
-    this.activeItemPos = pos;
-  }
-
   updateItemPosition(id: string, pos: XYPosition | null): void {
-    const newItemsOrder = this.gridItems
+    const newItemsOrder = this.$children
       .map(item => [item, item.$el.getBoundingClientRect()] as [GridItem, DOMRect])
       .sort(([, rectA], [, rectB]) => (rectA.y - rectB.y) || (rectA.x - rectB.x))
-      .map(([item]) => item['id']); // manual get, because typescript tends to think Vue.id doesn't work
+      .map(([item]) => item.id);
     this.$emit('change-positions', id, pos, newItemsOrder);
   }
 
@@ -43,72 +25,48 @@ export default class GridContainer extends Vue {
     this.$emit('change-size', id, cols, rows);
   }
 
-  slotStyle(slot: VNode): Record<string, string> {
-    const style: Record<string, string> = {};
-    const opts = slot.componentOptions as VNodeComponentOptions;
-    const { id, pinnedPosition, cols, rows } = (opts.propsData as any).widget;
+  slotProps(slot: VNode): WidgetProps {
+    return slot.componentOptions!.propsData as WidgetProps;
+  }
 
-    if (pinnedPosition) {
-      style.gridArea = `${pinnedPosition.y} / ${pinnedPosition.x} / span ${rows} / span ${cols}`;
+  renderOverlay(createElement: CreateElement): VNode {
+    return createElement('div',
+      { class: 'grid-container-overlay' },
+      [createElement('div', { class: 'grid-container-overlay-grid' })],
+    );
+  }
+
+  renderWidgets(createElement: CreateElement): VNode[] {
+    const children = (this.$slots.default || [])
+      .filter(slot => !!slot.tag)
+      .map((slot: VNode) =>
+        createElement(
+          GridItem, // Wrap each widget in a GridItem to handle dragging / moving
+          {
+            props: {
+              widget: this.slotProps(slot).initialCrud.widget,
+              editable: this.editable,
+            },
+            on: {
+              'size': this.updateItemSize,
+              'position': this.updateItemPosition,
+            },
+          },
+          [slot], // The actual widget
+        ));
+
+    if (this.editable) {
+      children.push(this.renderOverlay(createElement));
     }
 
-    if (id === this.activeItemId && this.activeItemPos) {
-      const { x, y } = this.activeItemPos;
-      style.gridArea = `${y} / ${x} / span ${rows} / span ${cols}`;
-    }
-
-    return style;
+    return children;
   }
 
   render(createElement: CreateElement): VNode {
     return createElement(
       'div',
-      { class: 'grid-container' },
-      [
-        createElement(
-          'div',
-          { class: 'grid-main-container' },
-          // Children
-          [
-            ...(this.$slots.default || [])
-              .filter(slot => slot.tag)
-              .map((slot: any) => createElement(
-                GridItem,
-                {
-                  style: this.slotStyle(slot),
-                  props: {
-                    ...slot.data.attrs,
-                    ...slot.componentOptions.propsData,
-                    editable: this.editable,
-                  },
-                  on: {
-                    'start-edit': this.startInteraction,
-                    'stop-edit': this.stopInteraction,
-                    'move': this.moveInteraction,
-                    'size': this.updateItemSize,
-                    'position': this.updateItemPosition,
-                  },
-                },
-                [slot],
-              )),
-            // show overlay grid in edit mode
-            this.editable && createElement(
-              'div',
-              {
-                class: 'grid-container-overlay',
-              },
-              [
-                createElement(
-                  'div',
-                  {
-                    class: 'grid-container-overlay-grid',
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-      ],
+      { class: ['grid-container', 'grid-main-container'] },
+      this.renderWidgets(createElement)
     );
   }
 }

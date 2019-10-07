@@ -2,6 +2,7 @@ import get from 'lodash/get';
 import { Dialog, DialogChainObject, QDialogOptions } from 'quasar';
 
 import { Block } from '@/plugins/spark/types';
+import { WidgetMode } from '@/store/features';
 
 import { deserialize } from './units/parseObject';
 
@@ -13,15 +14,17 @@ export function createDialog(opts: DialogOptions): DialogChainObject {
   return Dialog.create(opts);
 }
 
-export function showBlockDialog(block: Block | null, props: any = {}): void {
+export function showBlockDialog(block: Block | null, opts: { props?: any; mode?: WidgetMode } = {}): void {
   if (!block) {
     return;
   }
+  const { props, mode } = opts;
   createDialog({
-    component: 'BlockFormDialog',
+    component: 'BlockWidgetDialog',
     serviceId: block.serviceId,
     blockId: block.id,
-    getProps: () => props,
+    mode,
+    getProps: () => props || {},
   });
 };
 

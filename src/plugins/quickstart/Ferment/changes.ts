@@ -2,7 +2,6 @@ import { uid } from 'quasar';
 
 import { durationMs } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
-import { ProcessValueLink } from '@/helpers/units/KnownLinks';
 import { serialize } from '@/helpers/units/parseObject';
 import { BuilderItem, BuilderLayout } from '@/plugins/builder/types';
 import { HistoryItem } from '@/plugins/history/Graph/types';
@@ -11,6 +10,7 @@ import {
   blockTypes,
   DigitalActuatorBlock,
   FilterChoice,
+  interfaceTypes,
   MutexBlock,
   PidBlock,
   PidData,
@@ -20,7 +20,7 @@ import {
 import { StepViewItem } from '@/plugins/spark/features/StepView/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
-import { DashboardItem } from '@/store/dashboards';
+import { PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { unlinkedActuators } from '../helpers';
@@ -343,7 +343,11 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
   ];
 };
 
-export const defineWidgets = (config: FermentConfig, opts: FermentOpts, layouts: BuilderLayout[]): DashboardItem[] => {
+export const defineWidgets = (
+  config: FermentConfig,
+  opts: FermentOpts,
+  layouts: BuilderLayout[]
+): PersistentWidget[] => {
   const genericSettings = {
     dashboard: config.dashboardId,
     cols: 4,
@@ -354,9 +358,9 @@ export const defineWidgets = (config: FermentConfig, opts: FermentOpts, layouts:
   const userTemp = sparkStore.units(config.serviceId).Temp;
   const serviceId = config.serviceId;
 
-  const createWidget = (name: string, type: string): DashboardItem => ({
+  const createWidget = (name: string, type: string): PersistentWidget => ({
     ...genericSettings,
-    ...featureStore.widgetSizeById(type),
+    ...featureStore.widgetSize(type),
     id: uid(),
     title: name,
     feature: type,
@@ -481,14 +485,14 @@ export const defineWidgets = (config: FermentConfig, opts: FermentOpts, layouts:
             {
               blockId: config.names.coolPid,
               data: {
-                inputId: new ProcessValueLink(config.names.fridgeSSPair),
+                inputId: new Link(config.names.fridgeSSPair, interfaceTypes.ProcessValue),
                 ...fridgeCoolConfig,
               },
             },
             {
               blockId: config.names.heatPid,
               data: {
-                inputId: new ProcessValueLink(config.names.fridgeSSPair),
+                inputId: new Link(config.names.fridgeSSPair, interfaceTypes.ProcessValue),
                 ...fridgeHeatConfig,
               },
             },
@@ -517,14 +521,14 @@ export const defineWidgets = (config: FermentConfig, opts: FermentOpts, layouts:
             {
               blockId: config.names.coolPid,
               data: {
-                inputId: new ProcessValueLink(config.names.beerSSPair),
+                inputId: new Link(config.names.beerSSPair, interfaceTypes.ProcessValue),
                 ...beerCoolConfig,
               },
             },
             {
               blockId: config.names.heatPid,
               data: {
-                inputId: new ProcessValueLink(config.names.beerSSPair),
+                inputId: new Link(config.names.beerSSPair, interfaceTypes.ProcessValue),
                 ...beerHeatConfig,
               },
             },
@@ -559,7 +563,7 @@ export const defineWidgets = (config: FermentConfig, opts: FermentOpts, layouts:
     },
   });
 
-  const createProfile = (name: string): DashboardItem => ({
+  const createProfile = (name: string): PersistentWidget => ({
     ...createWidget(name, blockTypes.SetpointProfile),
     cols: 6,
     rows: 4,

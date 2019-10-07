@@ -57,3 +57,13 @@ export const blockTypes = {
   TempSensorMock,
   TempSensorOneWire,
 };
+
+export const interfaceTypes = {
+  ProcessValue: 'ProcessValueInterface',
+  TempSensor: 'TempSensorInterface',
+  SetpointSensorPair: 'SetpointSensorPairInterface',
+  ActuatorAnalog: 'ActuatorAnalogInterface',
+  ActuatorDigital: 'ActuatorDigitalInterface',
+  Balancer: 'BalancerInterface',
+  IoArray: 'IoArrayInterface',
+};

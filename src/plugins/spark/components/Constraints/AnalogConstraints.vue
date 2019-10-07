@@ -2,8 +2,9 @@
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { BalancerLink } from '@/helpers/units/KnownLinks';
+import { Link } from '@/helpers/units';
 
+import { interfaceTypes } from '../../block-types';
 import { analogConstraintLabels } from '../../helpers';
 import ConstraintsBase, { EditableConstraint } from './ConstraintsBase';
 
@@ -19,7 +20,7 @@ export default class AnalogConstraints extends ConstraintsBase {
         return {
           key,
           value: {
-            balancerId: new BalancerLink(value),
+            balancerId: new Link(value, interfaceTypes.Balancer),
             granted: 0,
             id: 0,
           },

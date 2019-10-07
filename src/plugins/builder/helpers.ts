@@ -150,7 +150,7 @@ export function elbow(dX: number, dY: number, horizontal: boolean): string {
 export function showLinkedBlockDialog(part: PersistentPart, key: string): void {
   const block = settingsBlock(part, key);
   if (block) {
-    showBlockDialog(block);
+    showBlockDialog(block, { mode: 'Basic' });
   }
   else {
     const link = settingsLink(part, key);

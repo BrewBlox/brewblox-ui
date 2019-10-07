@@ -1,6 +1,6 @@
 import { generate } from '@/helpers/database-api';
 
-import { Dashboard, DashboardItem } from './types';
+import { Dashboard, PersistentWidget } from './types';
 
 export const dashboardApi = generate<Dashboard>('dashboards');
-export const itemApi = generate<DashboardItem>('dashboard-items');
+export const widgetApi = generate<PersistentWidget>('dashboard-items');

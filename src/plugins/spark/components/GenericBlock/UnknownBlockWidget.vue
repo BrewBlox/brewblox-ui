@@ -53,22 +53,17 @@ export default class UnknownBlockWidget extends WidgetBase {
 </script>
 
 <template>
-  <q-card dark class="text-white scroll">
-    <WidgetToolbar :title="widget.title" :subtitle="displayName">
-      <q-item-section side>
-        <q-btn-dropdown flat label="Menu">
-          <q-list dark bordered>
-            <ActionItem
-              :disable="!reason.temporary"
-              icon="refresh"
-              label="Refresh"
-              @click="fetchAll"
-            />
-            <RemoveWidgetAction :crud="crud" />
-          </q-list>
-        </q-btn-dropdown>
-      </q-item-section>
-    </WidgetToolbar>
+  <q-card dark :class="cardClass">
+    <component :is="toolbarComponent" :crud="crud">
+      <template v-slot:actions>
+        <ActionItem
+          :disable="!reason.temporary"
+          icon="refresh"
+          label="Refresh"
+          @click="fetchAll"
+        />
+      </template>
+    </component>
 
     <CardWarning color="negative">
       <template #message>

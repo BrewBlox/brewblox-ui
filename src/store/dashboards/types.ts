@@ -7,7 +7,7 @@ export interface Dashboard {
   _rev?: string;
 }
 
-export interface DashboardItem {
+export interface PersistentWidget {
   id: string;
   title: string;
   cols: number;

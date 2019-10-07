@@ -1,10 +1,10 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 @Component
-export default class GenericBlock extends BlockWidget { }
+export default class GenericBlock extends BlockWidgetBase { }
 </script>
 
 <template>

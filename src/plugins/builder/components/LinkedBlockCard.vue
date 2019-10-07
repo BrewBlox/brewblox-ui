@@ -78,8 +78,10 @@ export default class LinkedBlockCard extends PartCard {
       return [];
     }
     const compatibleTable = sparkStore.compatibleTypes(this.sparkServices[0].id);
-    return this.types
-      .reduce((acc, type) => [...acc, ...get(compatibleTable, type, [])], [...this.types]);
+    return [
+      ...this.types,
+      ...this.types.flatMap(type => get(compatibleTable, type, [])),
+    ];
   }
 
   get actualFilter(): (link: Link) => boolean {
@@ -148,14 +150,14 @@ export default class LinkedBlockCard extends PartCard {
             <div>Link broken: {{ linked.blockId }} not found</div>
           </template>
           <template v-if="!noCreate" v-slot:after>
-            <BlockFormButton
+            <BlockDialogButton
               :block-id="linked.blockId"
               :service-id="serviceId || ''"
               flat
               round
             >
               <q-tooltip>Edit Block</q-tooltip>
-            </BlockFormButton>
+            </BlockDialogButton>
             <q-btn :disable="!sparkServices.length" flat round icon="add" @click="startCreate">
               <q-tooltip>Create new Block</q-tooltip>
             </q-btn>

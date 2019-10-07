@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { objectSorter, objectStringSorter } from '@/helpers/functional';
+import { mutate,objectSorter, objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
@@ -31,7 +31,7 @@ export default class IoArray extends BlockCrudComponent {
   get claimedChannels(): { [channel: number]: string } {
     return sparkStore.blockValues(this.serviceId)
       .filter(block => block.type === actuatorType && block.data.hwDevice.id === this.block.id)
-      .reduce((acc, block) => ({ ...acc, [block.data.channel]: block.id }), {});
+      .reduce((acc, block) => mutate(acc, block.data.channel, block.id), {});
   }
 
   get channels(): EditableChannel[] {
@@ -138,14 +138,14 @@ export default class IoArray extends BlockCrudComponent {
         />
       </q-item-section>
       <q-item-section side>
-        <BlockFormButton
+        <BlockDialogButton
           v-if="channel.driver"
           :block-id="channel.driver.id"
           :service-id="serviceId"
           flat
         >
           <q-tooltip>Configure Digital Actuator</q-tooltip>
-        </BlockFormButton>
+        </BlockDialogButton>
         <q-btn v-else flat icon="add" @click="createActuator(channel)">
           <q-tooltip>Create new Digital Actuator</q-tooltip>
         </q-btn>

@@ -1,5 +1,6 @@
 import { VueConstructor } from 'vue';
 
+import { ref } from '@/helpers/component-ref';
 import {
   base64ToHex,
   dateString,
@@ -13,6 +14,9 @@ import {
 } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
+import { Crud, WidgetSelector } from '@/store/features';
+
+import { BlockConfig, BlockCrud } from './types';
 
 export const blockIdRules = (serviceId: string): InputRule[] => [
   v => !!v || 'Name must not be empty',
@@ -57,4 +61,20 @@ export const installFilters = (Vue: VueConstructor): void => {
   Vue.filter('unitDuration', unitDurationString);
   Vue.filter('dateString', dateString);
   Vue.filter('shortDateString', shortDateString);
+};
+
+export const blockWidgetSelector = (component: VueConstructor): WidgetSelector => {
+  const widget = ref(component);
+  return (crud: Crud) => {
+    const { config }: { config: BlockConfig } = crud.widget;
+    if (!sparkStore.serviceAvailable(config.serviceId)) {
+      throw new Error(`Spark service '${config.serviceId}' not found`);
+    }
+    const bCrud = crud as BlockCrud;
+    if ((bCrud.isStoreBlock || bCrud.isStoreBlock === undefined)
+      && !sparkStore.blockIds(config.serviceId).includes(config.blockId)) {
+      throw new Error(`Block '${config.blockId}' not found in store`);
+    }
+    return widget;
+  };
 };

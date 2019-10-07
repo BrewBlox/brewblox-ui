@@ -13,7 +13,7 @@ export default class QuickStartWizardPicker extends Vue {
 
   get wizardOptions(): { id: string; displayName: string }[] {
     return featureStore.quickStartValues
-      .filter(arr => !!arr.wizard)
+      .filter(qs => !!qs.wizardComponent)
       .sort(objectStringSorter('displayName'));
   }
 
@@ -58,7 +58,7 @@ export default class QuickStartWizardPicker extends Vue {
   <div>
     <!-- Display selected wizard -->
     <component
-      :is="wizardModel.wizard"
+      :is="wizardModel.wizardComponent"
       v-if="wizardActive"
       :feature-id="wizardModel.id"
       @title="setTitle"

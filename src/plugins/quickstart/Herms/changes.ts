@@ -21,7 +21,7 @@ import { AnalogConstraint, DigitalConstraint } from '@/plugins/spark/components/
 import { StepViewItem } from '@/plugins/spark/features/StepView/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
-import { DashboardItem } from '@/store/dashboards';
+import { PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { unlinkedActuators } from '../helpers';
@@ -290,7 +290,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
 }
 
 
-export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): DashboardItem[] {
+export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): PersistentWidget[] {
   const userTemp = sparkStore.units(config.serviceId).Temp;
   const genericSettings = {
     dashboard: config.dashboardId,
@@ -299,9 +299,9 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Da
     order: 0,
   };
 
-  const createWidget = (name: string, type: string): DashboardItem => ({
+  const createWidget = (name: string, type: string): PersistentWidget => ({
     ...genericSettings,
-    ...featureStore.widgetSizeById(type),
+    ...featureStore.widgetSize(type),
     id: uid(),
     title: name,
     feature: type,

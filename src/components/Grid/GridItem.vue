@@ -2,17 +2,32 @@
 import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 
-import { DashboardItem } from '@/store/dashboards';
+import { PersistentWidget } from '@/store/dashboards';
 
 const GRID_SIZE = 100;
 const GAP_SIZE = 20;
 const MIN_COLS = 2;
 const MIN_ROWS = 2;
 
-interface Coordinates { x: number; y: number };
+const zeroPos = (): XYPosition => ({ x: 0, y: 0 });
 
 @Component
 export default class GridItem extends Vue {
+  resizing = false;
+  moving = false;
+
+  gridWidth = 0;
+  start: XYPosition = zeroPos();
+  dragWidth = 0;
+  dragHeight = 0;
+  dragStartWidth = 0;
+  dragStartHeight = 0;
+  dragStart: XYPosition = zeroPos();
+  dragStartParent: XYPosition = zeroPos();
+
+  currentCols: number | null = null;
+  currentRows: number | null = null;
+  current: XYPosition = zeroPos();
 
   @Ref()
   readonly container!: Vue;
@@ -21,44 +36,29 @@ export default class GridItem extends Vue {
   readonly dragOverlay!: Vue;
 
   @Prop({ type: Object, required: true })
-  readonly widget!: DashboardItem;
+  readonly widget!: PersistentWidget;
 
   @Prop({ type: Boolean, default: false })
   readonly editable!: boolean;
-
-  dragging = false;
-  moving = false;
-
-  gridWidth = 0;
-  startX = 0;
-  startY = 0;
-  dragWidth = 0;
-  dragHeight = 0;
-  dragStartWidth = 0;
-  dragStartHeight = 0;
-  dragStartX = 0;
-  dragStartY = 0;
-  dragStartParentX = 0;
-  dragStartParentY = 0;
-
-  currentCols: number | null = null;
-  currentRows: number | null = null;
-  currentStartCols: number | null = null;
-  currentStartRows: number | null = null;
 
   // Used by GridContainer
   get id(): string {
     return this.widget.id;
   }
 
-  get style(): Record<string, string> {
+  get style(): Mapped<string> {
+    const { pinnedPosition, cols, rows } = this.widget;
+    const pinned = pinnedPosition || zeroPos();
+
     return {
-      gridColumnEnd: `span ${this.currentCols || this.widget.cols}`,
-      gridRowEnd: `span ${this.currentRows || this.widget.rows}`,
+      gridColumnStart: `${this.current.x || pinned.x || 'auto'}`,
+      gridRowStart: `${this.current.y || pinned.y || 'auto'}`,
+      gridColumnEnd: `span ${this.currentCols || cols}`,
+      gridRowEnd: `span ${this.currentRows || rows}`,
     };
   }
 
-  get dragStyle(): Record<string, string> {
+  get dragStyle(): Mapped<string> {
     return {
       width: `${this.dragWidth}px`,
       height: `${this.dragHeight}px`,
@@ -79,8 +79,6 @@ export default class GridItem extends Vue {
 
     this.dragStartWidth = width;
     this.dragStartHeight = height;
-
-    this.$emit('start-edit', this.id);
   }
 
   stopInteraction(): void {
@@ -88,26 +86,14 @@ export default class GridItem extends Vue {
     this.currentCols = null;
     this.currentRows = null;
 
-    this.currentStartCols = null;
-    this.currentStartRows = null;
-
-    this.dragStartX = 0;
-    this.dragStartY = 0;
-
-    this.dragStartParentX = 0;
-    this.dragStartParentY = 0;
-
-    this.$emit('stop-edit', this.id);
+    this.current = zeroPos();
+    this.dragStart = zeroPos();
+    this.dragStartParent = zeroPos();
   }
 
   moveInteraction(e: MouseEvent | TouchEvent): void {
     const delta = this.moveDelta(e);
-    const position = this.gridPosition(delta);
-
-    this.currentStartCols = position.x;
-    this.currentStartRows = position.y;
-
-    this.$emit('move', this.id, { x: this.currentStartCols, y: this.currentStartRows });
+    this.current = this.gridPosition(delta);
   }
 
   updateSize(): void {
@@ -135,20 +121,19 @@ export default class GridItem extends Vue {
   }
 
   setMouseStartPosition(e: MouseEvent | TouchEvent): void {
-    if (e instanceof MouseEvent) {
-      this.startX = e.pageX;
-      this.startY = e.pageY;
-    } else {
-      this.startX = e.touches[0].pageX;
-      this.startY = e.touches[0].pageY;
-    }
+    const touch = (e instanceof MouseEvent) ? e : e.touches[0];
+    this.start = {
+      x: touch.pageX,
+      y: touch.pageY,
+    };
   }
 
-  moveDelta(e: MouseEvent | TouchEvent): Coordinates {
-    if (e instanceof MouseEvent) {
-      return { x: e.pageX - this.startX, y: e.pageY - this.startY };
-    }
-    return { x: e.touches[0].pageX - this.startX, y: e.touches[0].pageY - this.startY };
+  moveDelta(e: MouseEvent | TouchEvent): XYPosition {
+    const touch = (e instanceof MouseEvent) ? e : e.touches[0];
+    return {
+      x: touch.pageX - this.start.x,
+      y: touch.pageY - this.start.y,
+    };
   }
 
   containerParentSize(): DOMRect {
@@ -183,13 +168,13 @@ export default class GridItem extends Vue {
     throw new Error('Container is not a valid Element');
   }
 
-  gridPosition(delta: Coordinates = { x: 0, y: 0 }): { x: number; y: number } {
-    if (!this.dragStartX || !this.dragStartY || !this.dragStartParentX || !this.dragStartParentY) {
-      throw new Error('No starting drag positions know');
+  gridPosition(delta: XYPosition = zeroPos()): XYPosition {
+    if (!this.dragStart.x || !this.dragStart.y || !this.dragStartParent.x || !this.dragStartParent.y) {
+      throw new Error('No starting drag positions known');
     }
 
-    const x = (((this.dragStartX + delta.x) - this.dragStartParentX) / (GRID_SIZE + GAP_SIZE)) + 1;
-    const y = (((this.dragStartY + delta.y) - this.dragStartParentY) / (GRID_SIZE + GAP_SIZE)) + 1;
+    const x = (((this.dragStart.x + delta.x) - this.dragStartParent.x) / (GRID_SIZE + GAP_SIZE)) + 1;
+    const y = (((this.dragStart.y + delta.y) - this.dragStartParent.y) / (GRID_SIZE + GAP_SIZE)) + 1;
     const cols = (this.currentCols || this.widget.cols) - 1;
 
     return {
@@ -205,22 +190,15 @@ export default class GridItem extends Vue {
     const rects = this.containerSize();
     const firstChildRects = this.containerFirstChildSize();
 
-    this.dragStartX = rects.x;
-    this.dragStartY = rects.y;
+    this.dragStart = { x: rects.x, y: rects.y };
+    this.dragStartParent = { x: firstChildRects.x, y: firstChildRects.y };
 
-    this.dragStartParentX = firstChildRects.x;
-    this.dragStartParentY = firstChildRects.y;
-
-    const position = this.gridPosition();
-
-    this.currentStartCols = position.x;
-    this.currentStartRows = position.y;
+    this.current = this.gridPosition();
   }
 
   stopDrag(): void {
     this.moving = false;
-    const pos = { x: this.currentStartCols, y: this.currentStartRows };
-    this.updatePosition(pos as XYPosition);
+    this.updatePosition({ ...this.current });
     this.stopInteraction();
   }
 
@@ -239,7 +217,7 @@ export default class GridItem extends Vue {
   }
 
   startResize(e: MouseEvent | TouchEvent): void {
-    this.dragging = true;
+    this.resizing = true;
     this.startInteraction(e);
   }
 
@@ -251,7 +229,7 @@ export default class GridItem extends Vue {
   }
 
   stopResize(): void {
-    this.dragging = false;
+    this.resizing = false;
     this.updateSize();
     this.stopInteraction();
   }
@@ -300,7 +278,7 @@ export default class GridItem extends Vue {
     <slot />
     <!-- Drag effects -->
     <div
-      v-if="dragging || moving"
+      v-if="resizing || moving"
       ref="dragOverlay"
       :style="dragStyle"
       class="grid-item-drag-overlay"

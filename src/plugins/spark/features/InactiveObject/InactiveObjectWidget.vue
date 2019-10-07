@@ -1,24 +1,24 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { featureStore } from '@/store/features';
 
 import { InactiveObjectBlock } from './types';
 
 @Component
-export default class InactiveObjectWidget extends BlockWidget {
+export default class InactiveObjectWidget extends BlockWidgetBase {
   readonly block!: InactiveObjectBlock;
 
   get actualDisplayName(): string {
-    return featureStore.displayNameById(this.block.data.actualType);
+    return featureStore.displayName(this.block.data.actualType);
   }
 }
 </script>
 
 <template>
-  <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" />
+  <q-card dark :class="cardClass">
+    <component :is="toolbarComponent" :crud="crud" />
     <CardWarning v-if="!block.data.connected">
       <template #message>
         This {{ actualDisplayName }} block is disabled.

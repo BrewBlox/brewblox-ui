@@ -21,13 +21,13 @@ export const getMutexClients = (serviceId: string, mutexId: string): MutexBlocks
           return mutexed;
         }
         if (block.data.state === 1) {
-          return { ...mutexed, active: [...mutexed.active, block.id] };
+          mutexed.active.push(block.id);
         }
-        if (constraint.limiting && constraint.mutex) {
-          return { ...mutexed, waiting: [...mutexed.waiting, block.id] };
+        else if (constraint.limiting && constraint.mutex) {
+          mutexed.waiting.push(block.id);
         }
-        if (!constraint.limiting && constraint.mutex && block.data.state !== 1) {
-          return { ...mutexed, idle: [...mutexed.idle, block.id] };
+        else if (!constraint.limiting && constraint.mutex && block.data.state !== 1) {
+          mutexed.idle.push(block.id);
         }
         return mutexed;
       },

@@ -37,7 +37,7 @@ export default class CreateMockMenu extends DialogBase {
       this.$q.notify({
         icon: 'mdi-check-all',
         color: 'positive',
-        message: `Created ${featureStore.displayNameById(block.type)} '${block.id}'`,
+        message: `Created ${featureStore.displayName(block.type)} '${block.id}'`,
       });
     } catch (e) {
       this.$q.notify({

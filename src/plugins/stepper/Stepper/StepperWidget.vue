@@ -149,8 +149,16 @@ export default class StepperWidget extends WidgetBase {
 </script>
 
 <template>
-  <q-card dark class="text-white scroll">
-    <WidgetToolbar :title="widget.title" :subtitle="displayName">
+  <q-card dark :class="cardClass">
+    <component :is="toolbarComponent" :crud="crud">
+      <template #actions>
+        <ActionItem icon="add" label="New" @click="make" />
+        <ActionItem icon="refresh" label="Refresh" @click="fetch" />
+        <WidgetActions :crud="crud" />
+      </template>
+    </component>
+
+    <!-- <WidgetToolbar :crud="crud">
       <q-item-section side>
         <q-btn
           unelevated
@@ -160,7 +168,7 @@ export default class StepperWidget extends WidgetBase {
         />
       </q-item-section>
       <q-item-section side>
-        <q-btn-dropdown flat split icon="settings" @click="openModal(null)">
+        <q-btn-dropdown flat split icon="settings" @click="showDialog(null)">
           <q-list dark bordered>
             <ActionItem icon="add" label="New" @click="make" />
             <ActionItem icon="refresh" label="Refresh" @click="fetch" />
@@ -168,7 +176,7 @@ export default class StepperWidget extends WidgetBase {
           </q-list>
         </q-btn-dropdown>
       </q-item-section>
-    </WidgetToolbar>
+    </WidgetToolbar> -->
     <q-card-section v-for="group in groups" :key="group.id">
       <q-item dark class="row no-wrap">
         <q-item-section>

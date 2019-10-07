@@ -13,7 +13,7 @@ ref(RimsNamingTask);
 const quickStart: QuickStart = {
   id: 'Rims',
   displayName: 'RIMS Brew-in-a-Bag',
-  wizard: ref(RimsWizard),
+  wizardComponent: ref(RimsWizard),
 };
 
 export default quickStart;

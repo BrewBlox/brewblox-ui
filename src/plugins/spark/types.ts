@@ -1,5 +1,5 @@
-import { DashboardItem } from '@/store/dashboards';
-import { Feature } from '@/store/features';
+import { PersistentWidget } from '@/store/dashboards';
+import { Crud, Feature } from '@/store/features';
 import { Service } from '@/store/services';
 
 export interface ChangeField {
@@ -24,6 +24,12 @@ export interface StoredDataPreset {
   name: string;
   data: Mapped<any>;
   _rev?: string;
+}
+
+export interface BlockCrud extends Crud {
+  block: Block;
+  isStoreBlock: boolean;
+  saveBlock: (block: Block) => unknown | Promise<unknown>;
 }
 
 export interface BlockSpec {
@@ -67,7 +73,7 @@ export interface BlockConfig {
   blockId: string;
 }
 
-export interface DashboardBlock extends DashboardItem {
+export interface DashboardBlock extends PersistentWidget {
   config: BlockConfig;
 }
 

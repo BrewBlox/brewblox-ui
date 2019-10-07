@@ -1,8 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { GraphConfig } from '@/components/Graph/types';
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
+import { GraphConfig } from '@/plugins/history/types';
 
 
 @Component

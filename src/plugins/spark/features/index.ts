@@ -13,7 +13,6 @@ import InactiveObject from './InactiveObject';
 import MotorValve from './MotorValve';
 import Mutex from './Mutex';
 import Pid from './Pid';
-import SessionView from './SessionView';
 import SetpointProfile from './SetpointProfile';
 import SetpointSensorPair from './SetpointSensorPair';
 import Spark2Pins from './Spark2Pins';
@@ -43,7 +42,6 @@ const features: { [id: string]: SparkFeature } = {
   StepView,
   TempSensorMock,
   TempSensorOneWire,
-  SessionView,
 };
 
 export default features;

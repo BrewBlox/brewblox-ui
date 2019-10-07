@@ -27,8 +27,10 @@ function findLinks(serviceId: string, id: string | null): BlockLink[] {
       relation: [k],
     }));
 
-  return filtered
-    .reduce((acc: BlockLink[], [, link]) => ([...acc, ...findLinks(serviceId, link.id)]), relations);
+  filtered
+    .forEach(([, link]) => relations.push(...findLinks(serviceId, link.id)));
+
+  return relations;
 }
 
 function relations(block: PidBlock): BlockLink[] {
@@ -53,7 +55,7 @@ function nodes(serviceId: string): { id: string; type: string }[] {
   return sparkStore.blockValues(serviceId)
     .map(block => ({
       id: block.id,
-      type: featureStore.displayNameById(block.type),
+      type: featureStore.displayName(block.type),
     }));
 }
 
