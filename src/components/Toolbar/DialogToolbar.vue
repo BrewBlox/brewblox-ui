@@ -7,10 +7,10 @@ export default class DialogToolbar extends Vue { }
 </script>
 
 <template>
-  <q-bar class="row items-center bg-secondary q-py-lg text-white" style="max-width: 100%">
+  <q-bar class="row items-center bg-secondary q-py-lg text-white q-pr-none" style="max-width: 100%">
     <slot />
     <q-space />
     <slot name="buttons" />
-    <q-btn v-close-popup flat label="close" @click="$emit('close')" />
+    <q-btn v-close-popup flat icon="mdi-close-circle" size="md" @click="$emit('close')" />
   </q-bar>
 </template>
