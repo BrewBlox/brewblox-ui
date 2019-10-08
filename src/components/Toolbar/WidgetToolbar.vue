@@ -10,15 +10,30 @@ export default class WidgetToolbar extends CrudComponent {
   @Prop({ type: String, required: false })
   public readonly mode!: WidgetMode | null;
 
-  @Emit('update:mode')
-  public toggleMode(): WidgetMode {
-    return this.mode === 'Basic' ? 'Full' : 'Basic';
+  get moreIcon(): string {
+    if (!this.mode) {
+      return 'mdi-menu';
+    }
+    return this.mode === 'Full'
+      ? 'mdi-launch'
+      : 'settings';
   }
 
-  get modeIcon(): string {
-    return this.mode === 'Basic'
-      ? 'mdi-unfold-more-horizontal'
-      : 'mdi-unfold-less-horizontal';
+  public more(): void {
+    if (!this.mode) {
+      return;
+    }
+    else if (this.mode === 'Basic') {
+      this.$emit('update:mode', 'Full');
+    }
+    else {
+      this.$emit('update:mode', 'Basic');
+      this.showDialog();
+    }
+  }
+
+  public less(): void {
+    this.$emit('update:mode', 'Basic');
   }
 }
 </script>
@@ -26,12 +41,12 @@ export default class WidgetToolbar extends CrudComponent {
 <template>
   <Toolbar :title="widget.title" :subtitle="displayName">
     <slot />
-    <q-item-section v-if="!!mode" side>
-      <q-btn flat :icon="modeIcon" @click="toggleMode" />
+    <q-item-section v-if="mode === 'Full'" side>
+      <q-btn flat icon="mdi-arrow-left-circle" color="white" @click="less" />
     </q-item-section>
     <template v-slot:buttons>
       <slot name="buttons">
-        <q-btn-dropdown flat split icon="settings" @click="showDialog">
+        <q-btn-dropdown :split="!!mode" flat :icon="moreIcon" @click="more">
           <q-list dark bordered>
             <slot name="actions">
               <WidgetActions :crud="crud" />
