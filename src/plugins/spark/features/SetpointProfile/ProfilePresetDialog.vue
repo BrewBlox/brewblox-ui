@@ -139,14 +139,14 @@ export default class ProfilePresetDialog extends DialogBase {
               autofocus
               options-dark
             >
-              <template v-slot:no-option>
+              <template #no-option>
                 <q-item dark>
                   <q-item-section class="text-grey">
                     No results
                   </q-item-section>
                 </q-item>
               </template>
-              <template v-if="!!selected" v-slot:after>
+              <template v-if="!!selected" #after>
                 <q-btn flat round icon="edit" @click="editSelected">
                   <q-tooltip>Rename profile</q-tooltip>
                 </q-btn>

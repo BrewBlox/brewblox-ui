@@ -71,7 +71,7 @@ export default class SessionViewBasic extends CrudComponent {
       <q-item dark>
         <q-item-section>
           <q-input v-model="sessionFilter" placeholder="Search Session" clearable dark>
-            <template v-slot:append>
+            <template #append>
               <q-icon name="search" />
             </template>
           </q-input>

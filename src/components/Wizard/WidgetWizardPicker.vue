@@ -123,7 +123,7 @@ export default class WidgetWizardPicker extends Vue {
               label="Widget Type"
               @filter="filterFn"
             >
-              <template v-slot:no-option>
+              <template #no-option>
                 <q-item dark>
                   <q-item-section class="text-grey">
                     No results

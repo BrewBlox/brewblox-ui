@@ -44,7 +44,7 @@ export default class WidgetToolbar extends CrudComponent {
     <q-item-section v-if="mode === 'Full'" side>
       <q-btn flat icon="mdi-arrow-left-circle" color="white" @click="less" />
     </q-item-section>
-    <template v-slot:buttons>
+    <template #buttons>
       <slot name="buttons">
         <q-btn-dropdown :split="!!mode" flat :icon="moreIcon" @click="more">
           <q-list dark bordered>

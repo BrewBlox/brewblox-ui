@@ -65,7 +65,7 @@ export default class BlockSelectDialog extends DialogBase {
           option-label="id"
           option-value="id"
         >
-          <template v-slot:no-option>
+          <template #no-option>
             <q-item dark>
               <q-item-section class="text-grey">
                 No results

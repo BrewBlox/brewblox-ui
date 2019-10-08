@@ -181,7 +181,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
       <q-item dark>
         <q-item-section>
           <q-input v-model="blockId" :rules="blockIdRules" autofocus dark label="Block name">
-            <template v-slot:append>
+            <template #append>
               <q-icon name="mdi-information">
                 <q-tooltip>
                   The name of the Spark Controller Block.
@@ -235,7 +235,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
             autofocus
             @input="v => { block = v; widget = null}"
           >
-            <template v-slot:no-option>
+            <template #no-option>
               <q-item dark>
                 <q-item-section class="text-grey">
                   No results
