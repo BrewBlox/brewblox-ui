@@ -60,7 +60,7 @@ export default class DashboardWizard extends Vue {
       <q-item dark>
         <q-item-section>
           <q-input v-model="dashboardId" :rules="idRules" label="Dashboard ID" dark lazy-rules>
-            <template v-slot:after>
+            <template #after>
               <q-icon name="information">
                 <q-tooltip>The unique identifier for this dashboard.</q-tooltip>
               </q-icon>
@@ -71,7 +71,7 @@ export default class DashboardWizard extends Vue {
       <q-item dark>
         <q-item-section>
           <q-input v-model="dashboardTitle" label="Dashboard Title" dark>
-            <template v-slot:after>
+            <template #after>
               <q-icon name="information">
                 <q-tooltip>
                   The Dashboard Title is how the dashboard is displayed in the UI.

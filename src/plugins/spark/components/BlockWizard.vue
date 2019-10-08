@@ -170,7 +170,7 @@ export default class BlockWizard extends Vue {
             @filter="filterFn"
             @change="block = null; widget = null;"
           >
-            <template v-slot:no-option>
+            <template #no-option>
               <q-item dark>
                 <q-item-section class="text-grey">
                   No results
@@ -183,7 +183,7 @@ export default class BlockWizard extends Vue {
       <q-item dark>
         <q-item-section>
           <q-input v-model="blockId" :rules="blockIdRules" dark label="Block name">
-            <template v-slot:append>
+            <template #append>
               <q-icon name="mdi-information">
                 <q-tooltip>
                   The name of the Spark Controller Block.

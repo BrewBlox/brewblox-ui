@@ -52,7 +52,7 @@ export default class MetricSelector extends Vue {
     <q-item dark>
       <q-item-section>
         <q-input v-model="selectFilter" placeholder="Filter keys" class="q-ma-none" dark clearable>
-          <template v-slot:append>
+          <template #append>
             <q-icon name="search" />
           </template>
         </q-input>

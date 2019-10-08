@@ -34,7 +34,7 @@ export default class SelectDialog extends DialogBase {
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
         <q-select v-model="local" :options="selectOptions" v-bind="selectProps" dark options-dark>
-          <template v-slot:no-option>
+          <template #no-option>
             <q-item dark>
               <q-item-section class="text-grey">
                 No results

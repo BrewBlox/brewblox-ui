@@ -162,7 +162,7 @@ export default class GraphWidget extends WidgetBase {
       <q-dialog v-model="graphModalOpen" maximized>
         <q-card v-if="graphModalOpen" dark class="bg-dark">
           <HistoryGraph :id="graphId" :config="graphCfg" shared-listeners>
-            <template v-slot:controls>
+            <template #controls>
               <q-btn-dropdown flat auto-close label="presets" icon="mdi-timelapse">
                 <q-list dark link>
                   <q-item

@@ -51,7 +51,7 @@ export default class UnitDialog extends DialogBase {
           autofocus
           clearable
         >
-          <template v-slot:append>
+          <template #append>
             {{ value.notation }}
           </template>
         </q-input>

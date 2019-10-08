@@ -162,7 +162,7 @@ export default class RelationsDialog extends DialogBase {
     <q-card dark class="maximized bg-dark-bright">
       <DialogToolbar ref="toolbar" @close="onDialogHide">
         {{ title }}
-        <template v-slot:buttons>
+        <template #buttons>
           <!-- Exporting is bugged right now. See https://github.com/BrewBlox/brewblox-ui/issues/638 -->
           <q-btn
             v-if="false"

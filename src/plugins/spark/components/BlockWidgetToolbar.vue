@@ -39,23 +39,6 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
       <WidgetActions :crud="crud" no-rename />
       <BlockActions :crud="crud" />
     </template>
-
-    <!-- <q-item-section side>
-      <q-btn-dropdown flat split icon="settings" @click="showDialog">
-        <q-list dark bordered>
-          <ActionItem
-            v-if="hasGraph"
-            icon="mdi-chart-line"
-            label="Show graph"
-            @click="graphModalOpen = true"
-          />
-          <slot name="actions" />
-          <ActionItem icon="refresh" label="Refresh" @click="refreshBlock" />
-          <WidgetActions :crud="crud" no-rename />
-          <BlockActions :crud="crud" />
-        </q-list>
-      </q-btn-dropdown>
-    </q-item-section> -->
   </WidgetToolbar>
 </template>
 

@@ -55,7 +55,7 @@ export default class UnknownBlockWidget extends WidgetBase {
 <template>
   <q-card dark :class="cardClass">
     <component :is="toolbarComponent" :crud="crud">
-      <template v-slot:actions>
+      <template #actions>
         <ActionItem
           :disable="!reason.temporary"
           icon="refresh"

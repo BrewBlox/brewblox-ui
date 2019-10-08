@@ -139,17 +139,17 @@ export default class LinkedBlockCard extends PartCard {
           map-options
           emit-value
         >
-          <template v-slot:no-option>
+          <template #no-option>
             <q-item dark>
               <q-item-section class="text-grey">
                 No results
               </q-item-section>
             </q-item>
           </template>
-          <template v-slot:error>
+          <template #error>
             <div>Link broken: {{ linked.blockId }} not found</div>
           </template>
-          <template v-if="!noCreate" v-slot:after>
+          <template v-if="!noCreate" #after>
             <BlockDialogButton
               :block-id="linked.blockId"
               :service-id="serviceId || ''"

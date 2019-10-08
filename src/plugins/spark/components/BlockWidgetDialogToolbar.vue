@@ -27,21 +27,17 @@ export default class BlockWidgetDialogToolbar extends BlockCrudComponent {
       v-model="graphModalOpen"
       :config.sync="graphCfg"
     />
-    <template v-slot:buttons>
-      <q-btn-dropdown flat icon="mdi-pencil">
-        <q-list dark bordered>
-          <ActionItem icon="refresh" label="Refresh" @click="refreshBlock" />
-          <ActionItem
-            v-if="hasGraph"
-            icon="mdi-chart-line"
-            label="Show graph"
-            @click="graphModalOpen = true"
-          />
-          <slot name="actions" />
-          <WidgetActions :crud="crud" no-rename />
-          <BlockActions :crud="crud" />
-        </q-list>
-      </q-btn-dropdown>
+    <template v-if="isStoreBlock" #actions>
+      <ActionItem icon="refresh" label="Refresh" @click="refreshBlock" />
+      <ActionItem
+        v-if="hasGraph"
+        icon="mdi-chart-line"
+        label="Show graph"
+        @click="graphModalOpen = true"
+      />
+      <slot name="actions" />
+      <WidgetActions :crud="crud" no-rename />
+      <BlockActions :crud="crud" />
     </template>
   </WidgetDialogToolbar>
 </template>

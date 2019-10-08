@@ -190,7 +190,7 @@ export default class StepperWidget extends WidgetBase {
               dark
               options-dark
             >
-              <template v-slot:no-option>
+              <template #no-option>
                 <q-item dark>
                   <q-item-section class="text-grey">
                     No results

@@ -60,7 +60,7 @@ export default class SetpointProfileWidget extends BlockWidgetBase {
     <component :is="mode" :crud="crud" :class="cardClass" :style="cardStyle">
       <template #toolbar>
         <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
-          <template v-slot:actions>
+          <template #actions>
             <ProfilePresetAction :crud="crud" />
           </template>
         </component>

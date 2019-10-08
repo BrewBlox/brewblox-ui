@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { WidgetMode } from '@/store/features';
@@ -10,15 +10,14 @@ export default class WidgetDialogToolbar extends CrudComponent {
   @Prop({ type: String, required: false })
   public readonly mode!: WidgetMode | null;
 
-  @Emit('update:mode')
-  public toggleMode(): WidgetMode {
-    return this.mode === 'Basic' ? 'Full' : 'Basic';
+  get toggleIcon(): string {
+    return this.mode === 'Basic'
+      ? 'mdi-arrow-expand-all'
+      : 'mdi-arrow-collapse-all';
   }
 
-  get modeIcon(): string {
-    return this.mode === 'Basic'
-      ? 'mdi-unfold-more-horizontal'
-      : 'mdi-unfold-less-horizontal';
+  public toggle(): void {
+    this.$emit('update:mode', this.mode === 'Basic' ? 'Full' : 'Basic');
   }
 }
 </script>
@@ -32,19 +31,15 @@ export default class WidgetDialogToolbar extends CrudComponent {
       </q-item-label>
     </q-item-section>
     <slot />
-    <q-item-section v-if="!!mode" side>
-      <q-btn flat color="white" :icon="modeIcon" @click="toggleMode" />
-    </q-item-section>
-    <template v-slot:buttons>
-      <slot name="buttons">
-        <q-btn-dropdown flat icon="mdi-pencil">
-          <q-list dark bordered>
-            <slot name="actions">
-              <WidgetActions :crud="crud" />
-            </slot>
-          </q-list>
-        </q-btn-dropdown>
-      </slot>
+    <template #buttons>
+      <q-btn v-if="!!mode" flat :icon="toggleIcon" size="md" @click="toggle" />
+      <q-btn-dropdown flat size="md" icon="mdi-menu">
+        <q-list dark bordered>
+          <slot name="actions">
+            <WidgetActions :crud="crud" />
+          </slot>
+        </q-list>
+      </q-btn-dropdown>
     </template>
   </DialogToolbar>
 </template>

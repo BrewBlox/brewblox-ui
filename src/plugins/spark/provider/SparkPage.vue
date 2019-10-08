@@ -423,7 +423,7 @@ export default class SparkPage extends Vue {
         <q-item dark class="q-mb-md">
           <q-item-section>
             <q-input v-model="blockFilter" placeholder="Search Blocks" clearable dark>
-              <template v-slot:append>
+              <template #append>
                 <q-icon name="search" />
               </template>
             </q-input>
