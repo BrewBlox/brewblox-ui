@@ -27,7 +27,7 @@ export default class BlockWidgetDialogToolbar extends BlockCrudComponent {
       v-model="graphModalOpen"
       :config.sync="graphCfg"
     />
-    <template #actions>
+    <template v-if="isStoreBlock" #actions>
       <ActionItem icon="refresh" label="Refresh" @click="refreshBlock" />
       <ActionItem
         v-if="hasGraph"
