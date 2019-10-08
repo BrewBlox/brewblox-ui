@@ -3,12 +3,12 @@ import get from 'lodash/get';
 import { createDialog } from '@/helpers/dialog';
 import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
+import { RelationEdge, RelationNode } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 
-import { BlockLink } from '../../types';
 import { PidBlock } from './types';
 
-function findLinks(serviceId: string, id: string | null): BlockLink[] {
+function findLinks(serviceId: string, id: string | null): RelationEdge[] {
   const block = sparkStore.blocks(serviceId)[id || ''];
   if (!id || !block) {
     return [];
@@ -20,7 +20,7 @@ function findLinks(serviceId: string, id: string | null): BlockLink[] {
   const filtered = links
     .filter(([, link]) => !link.driven && link.id);
 
-  const relations: BlockLink[] = filtered
+  const relations: RelationEdge[] = filtered
     .map(([k, link]) => ({
       source: id,
       target: link.id as string,
@@ -33,7 +33,7 @@ function findLinks(serviceId: string, id: string | null): BlockLink[] {
   return relations;
 }
 
-function relations(block: PidBlock): BlockLink[] {
+function relations(block: PidBlock): RelationEdge[] {
   const chain = findLinks(block.serviceId, block.id);
 
   // Setpoints may be driven by something else (profile, setpoint driver, etc)
@@ -51,7 +51,7 @@ function relations(block: PidBlock): BlockLink[] {
   ];
 }
 
-function nodes(serviceId: string): { id: string; type: string }[] {
+function nodes(serviceId: string): RelationNode[] {
   return sparkStore.blockValues(serviceId)
     .map(block => ({
       id: block.id,
@@ -67,7 +67,7 @@ export function startRelationsDialog(block: PidBlock): void {
     component: 'RelationsDialog',
     serviceId: block.serviceId,
     nodes: nodes(block.serviceId),
-    relations: relations(block),
+    edges: relations(block),
     title: `${block.id} relations`,
   });
 }

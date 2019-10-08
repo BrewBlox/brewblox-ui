@@ -10,10 +10,10 @@ import { serviceStore } from '@/store/services';
 import { GroupsBlock } from '../provider/types';
 import {
   Block,
-  BlockLink,
   BlockSpec,
   CompatibleTypes,
   Limiters,
+  RelationEdge,
   Spark,
   SparkConfig,
   StoredDataPreset,
@@ -22,7 +22,7 @@ import {
   UserUnits,
 } from '../types';
 import * as api from './api';
-import { calculateBlockLinks, calculateDrivenChains, calculateLimiters } from './helpers';
+import { calculateDrivenChains, calculateLimiters, calculateRelations } from './helpers';
 import presetsApi from './presets-api';
 
 const rawError = true;
@@ -65,9 +65,9 @@ export class SparkModule extends VuexModule {
       .reduce((acc, id) => mutate(acc, id, calculateDrivenChains(this.allBlockValues[id])), {});
   }
 
-  private get allBlockLinks(): Mapped<BlockLink[]> {
+  private get allRelations(): Mapped<RelationEdge[]> {
     return Object.keys(this.services)
-      .reduce((acc, id) => mutate(acc, id, calculateBlockLinks(this.allBlockValues[id])), {});
+      .reduce((acc, id) => mutate(acc, id, calculateRelations(this.allBlockValues[id])), {});
   }
 
   private get allLimiters(): Mapped<Limiters> {
@@ -143,8 +143,8 @@ export class SparkModule extends VuexModule {
     return serviceId => this.allDrivenChains[serviceId];
   }
 
-  public get blockLinks(): (serviceId: string) => BlockLink[] {
-    return serviceId => this.allBlockLinks[serviceId];
+  public get relations(): (serviceId: string) => RelationEdge[] {
+    return serviceId => this.allRelations[serviceId];
   }
 
   public get limiters(): (serviceId: string) => Limiters {

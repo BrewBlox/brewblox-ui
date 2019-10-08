@@ -7,7 +7,7 @@ import { Watch } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockCrud, Spark, SystemStatus } from '@/plugins/spark/types';
+import { Block, BlockCrud, RelationNode, Spark, SystemStatus } from '@/plugins/spark/types';
 import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards';
 import { FeatureRole, featureStore, WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
@@ -289,14 +289,14 @@ export default class SparkPage extends Vue {
   }
 
   showRelations(): void {
-    const nodes = this.validatedItems.map(v => ({ id: v.id, type: v.displayName }));
-    const relations = sparkStore.blockLinks(this.service.id);
+    const nodes: RelationNode[] = this.validatedItems.map(v => ({ id: v.id, type: v.displayName }));
+    const edges = sparkStore.relations(this.service.id);
 
     createDialog({
       component: 'RelationsDialog',
       serviceId: this.service.id,
       nodes,
-      relations,
+      edges,
     });
   }
 

@@ -101,10 +101,15 @@ export interface SystemStatus {
   error?: any;
 }
 
-export interface BlockLink {
+export interface RelationEdge {
   source: string;
   target: string;
   relation: string[];
+}
+
+export interface RelationNode {
+  id: string;
+  type: string;
 }
 
 export interface Limiters {
