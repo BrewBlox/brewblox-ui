@@ -65,7 +65,7 @@ ref(ProfilePresetDialog);
 const feature: Feature = {
   ...GenericBlock,
   id: typeName,
-  displayName: 'Setpoint profile',
+  displayName: 'Setpoint Profile',
   role: 'Process',
   widgetComponent: blockWidgetSelector(widget),
   widgetSize: {
