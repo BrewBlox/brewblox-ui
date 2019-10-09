@@ -49,9 +49,16 @@ export default class RelationsDialog extends DialogBase {
   @Prop({ type: String, default: 'Block Relations' })
   public readonly title!: string;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly hideUnrelated!: boolean;
+
   get drawnNodes(): RelationNode[] {
     return [...new Set(this.edges.flatMap(edge => [edge.target, edge.source]))]
       .map(id => this.nodes.find(node => node.id === id) || { id, type: '???' });
+  }
+
+  get loneNodes(): RelationNode[] {
+    return this.nodes.filter(node => !this.drawnNodes.find(n => n.id === node.id));
   }
 
   @Watch('edges', { immediate: true })
@@ -72,27 +79,30 @@ export default class RelationsDialog extends DialogBase {
     };
 
     const obj = new graphlib
-      .Graph({ multigraph: true })
+      .Graph({ multigraph: true, compound: true })
       .setGraph({ marginx: 20, marginy: 20 });
 
-    this.drawnNodes.forEach(val => {
-      obj.setNode(val.id, {
-        id: val.id,
-        label: nodeTemplate(val.id, val.type),
+    const nodes = this.hideUnrelated
+      ? this.drawnNodes
+      : [...this.loneNodes, ...this.drawnNodes];
+
+    nodes.forEach(node => {
+      obj.setNode(node.id, {
+        id: node.id,
+        label: nodeTemplate(node.id, node.type),
         labelType: 'html',
         width: LABEL_WIDTH,
         height: LABEL_HEIGHT,
         rx: 5,
         ry: 5,
-        class: 'test-label',
       });
     });
 
-    this.edges.forEach(val => {
-      const label = val.relation[0].replace(/Id$/, '');
+    this.edges.forEach(edge => {
+      const label = edge.relation[0].replace(/Id$/, '');
       const [source, target] = INVERTED.includes(label)
-        ? [val.target, val.source]
-        : [val.source, val.target];
+        ? [edge.target, edge.source]
+        : [edge.source, edge.target];
 
       obj.setEdge(source, target, {
         label,
@@ -100,8 +110,23 @@ export default class RelationsDialog extends DialogBase {
         style: 'fill: none; stroke: red; stroke-width: 1.5px;',
         arrowheadStyle: 'fill: red; stroke: red;',
       },
-        val.relation[0]);
+        edge.relation[0]);
     });
+
+    if (!this.hideUnrelated) {
+      const invisible = 'fill: transparent; stroke: none;';
+      const stackHeight = 6;
+
+      this.loneNodes.forEach((node, idx) => {
+        if (idx % stackHeight === 0) { return; }
+        obj.setEdge(node.id, this.loneNodes[idx - 1].id, {
+          label: '',
+          labelStyle: invisible,
+          style: invisible,
+          arrowheadStyle: invisible,
+        });
+      });
+    }
 
     this.graphObj = obj;
     return true;
