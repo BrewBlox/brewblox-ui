@@ -481,25 +481,18 @@ export default class SparkPage extends Vue {
             </q-item>
             <!-- Service -->
             <q-item v-if="serviceShown" dark class="text-white widget-index">
-              <q-item-section side>
-                <q-toggle v-model="serviceExpanded" />
-                <!-- <q-checkbox v-model="serviceExpanded" dark size="lg" /> -->
-                <!-- <q-btn
-                  icon="mdi-checked"
-                  flat
-                  :color="serviceExpanded ? 'primary': 'white'"
-                  @click="serviceExpanded = !serviceExpanded"
-                /> -->
+              <q-item-section side class="q-mx-none q-px-none">
+                <ToggleButton v-model="serviceExpanded" />
               </q-item-section>
               <q-item-section>
                 <q-item class="non-selectable" clickable dark @click="selectService">
                   <q-item-section avatar>
-                    <q-icon name="mdi-cloud" />
-                    <q-tooltip>Service</q-tooltip>
+                    <q-icon name="mdi-information-variant" />
+                    <q-tooltip>Device Info</q-tooltip>
                   </q-item-section>
                   <q-item-section>{{ serviceId }}</q-item-section>
                   <q-item-section side>
-                    Spark Service
+                    Device Info
                   </q-item-section>
                 </q-item>
               </q-item-section>
@@ -511,8 +504,8 @@ export default class SparkPage extends Vue {
               dark
               class="non-selectable text-white widget-index"
             >
-              <q-item-section side>
-                <q-toggle :value="val.expanded" @input="v => updateExpandedBlock(val.id, v)" />
+              <q-item-section side class="q-mx-none q-px-none">
+                <ToggleButton :value="val.expanded" @input="v => updateExpandedBlock(val.id, v)" />
               </q-item-section>
               <q-item-section>
                 <q-item

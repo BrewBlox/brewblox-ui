@@ -22,7 +22,7 @@ const block: BlockSpec = {
 const feature: Feature = {
   ...GenericBlock,
   id: typeName,
-  displayName: 'Spark 2 Pin Array',
+  displayName: 'Spark 2 Pins',
   role: 'Output',
   widgetComponent: blockWidgetSelector(widget),
   widgetSize: {

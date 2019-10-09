@@ -32,7 +32,7 @@ const block: BlockSpec = {
 const feature: Feature = {
   ...GenericBlock,
   id: typeName,
-  displayName: 'Spark 3 Pin Array',
+  displayName: 'Spark 3 Pins',
   role: 'Output',
   widgetComponent: blockWidgetSelector(widget),
   widgetSize: {
