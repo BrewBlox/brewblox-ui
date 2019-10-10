@@ -207,7 +207,6 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Per
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
     config: {
-      currentToolId: 'config',
       currentLayoutId: layouts[0].id,
       layoutIds: layouts.map(l => l.id),
     },

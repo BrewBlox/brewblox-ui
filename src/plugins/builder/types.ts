@@ -79,7 +79,6 @@ export interface BuilderLayout {
 }
 
 export interface BuilderConfig {
-  currentToolId?: string;
   currentLayoutId: string | null;
   layoutIds: string[];
 }

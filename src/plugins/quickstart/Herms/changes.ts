@@ -318,7 +318,6 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
     config: {
-      currentToolId: 'config',
       currentLayoutId: layouts[0].id,
       layoutIds: layouts.map(l => l.id),
     },
