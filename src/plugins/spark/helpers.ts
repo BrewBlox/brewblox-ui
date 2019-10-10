@@ -1,6 +1,8 @@
+import { Notify } from 'quasar';
 import { VueConstructor } from 'vue';
 
 import { ref } from '@/helpers/component-ref';
+import { createDialog } from '@/helpers/dialog';
 import {
   base64ToHex,
   dateString,
@@ -16,6 +18,7 @@ import { Link, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { Crud, WidgetSelector } from '@/store/features';
 
+import { blockTypes } from './block-types';
 import { BlockConfig, BlockCrud } from './types';
 
 export const blockIdRules = (serviceId: string): InputRule[] => [
@@ -77,4 +80,60 @@ export const blockWidgetSelector = (component: VueConstructor): WidgetSelector =
     }
     return widget;
   };
+};
+
+export const resetBlocks = async (serviceId: string, restoreDiscovered: boolean): Promise<void> => {
+  try {
+    const addresses: Mapped<string> = {};
+    const addressedTypes = [
+      blockTypes.TempSensorOneWire,
+      blockTypes.DS2408,
+      blockTypes.DS2413,
+    ];
+
+    if (restoreDiscovered) {
+      sparkStore.blockValues(serviceId)
+        .filter(block => addressedTypes.includes(block.type) && !block.id.startsWith('New|'))
+        .forEach(block => addresses[block.data.address] = block.id);
+    }
+
+    await sparkStore.clearBlocks(serviceId);
+    await sparkStore.fetchDiscoveredBlocks(serviceId);
+    await sparkStore.fetchBlocks(serviceId);
+
+    if (restoreDiscovered) {
+      const renameArgs: [string, string, string][] = sparkStore.blockValues(serviceId)
+        .filter(block => addressedTypes.includes(block.type) && !!addresses[block.data.address])
+        .map(block => [serviceId, block.id, addresses[block.data.address]]);
+      await Promise.all(renameArgs.map(sparkStore.renameBlock));
+    }
+
+    Notify.create({
+      icon: 'mdi-check-all',
+      color: 'positive',
+      message: 'Removed all Blocks' + (restoreDiscovered ? ', and restored discovered blocks' : ''),
+    });
+  } catch (e) {
+    Notify.create({
+      icon: 'error',
+      color: 'negative',
+      message: `Failed to remove Blocks: ${e.toString()}`,
+    });
+  }
+};
+
+export const startResetBlocks = (serviceId: string): void => {
+  createDialog({
+    title: 'Reset Blocks',
+    message: `This will remove all Blocks on ${serviceId}. Are you sure?`,
+    dark: true,
+    noBackdropDismiss: true,
+    cancel: true,
+    options: {
+      type: 'checkbox',
+      items: [{ label: 'Restore names of discovered blocks', value: 0 }],
+      model: [0], // pre-check default actions
+    },
+  })
+    .onOk((selected: number[]) => resetBlocks(serviceId, selected.includes(0)));
 };
