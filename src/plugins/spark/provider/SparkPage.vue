@@ -543,6 +543,7 @@ export default class SparkPage extends Vue {
                 />
               </q-item-section>
             </q-item>
+            <q-item dark :style="{height: contentStyle.height}" />
           </q-list>
         </q-scroll-area>
       </div>
