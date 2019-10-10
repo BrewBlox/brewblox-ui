@@ -6,13 +6,13 @@ import draggable from 'vuedraggable';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
+import { mutate } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, ChangeField } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 
-import { mutate } from '../../../../helpers/functional';
 import { BlockChange, Step, StepViewConfig } from './types';
 
 interface BlockChangeDisplay extends BlockChange {
@@ -187,7 +187,7 @@ export default class StepViewFull extends CrudComponent {
       title: 'Choose a Block',
       filter: block => {
         return !!this.changeFields[block.type]
-          && !step.changes.find(change => block.id === change.blockId);
+          && !step.changes.some(change => block.id === change.blockId);
       },
       root: this.$root,
       serviceId: this.serviceId,
@@ -195,10 +195,36 @@ export default class StepViewFull extends CrudComponent {
       .onOk(block => {
         const updatedStep = this.steps.find(s => s.id === step.id);
         if (updatedStep) {
-          const newChange = { blockId: block.id, data: {}, confirmed: {} };
+          const newChange: BlockChange = { blockId: block.id, data: {}, confirmed: {} };
           updatedStep.changes.push(this.asBlockChangeDisplay(step.id, newChange));
           this.saveSteps(this.steps);
         }
+      });
+  }
+
+  editChangeBlock(step: StepDisplay, key: string): void {
+    const idx = step.changes.findIndex(change => change.key === key);
+    if (idx < 0) { return; }
+
+    const current = step.changes[idx];
+    createDialog({
+      component: 'BlockSelectDialog',
+      title: `Switch target Block '${current.blockId}'`,
+      filter: block => {
+        return block.type === current.block.type
+          && !step.changes.some(change => block.id === change.blockId);
+      },
+      root: this.$root,
+      serviceId: this.serviceId,
+    })
+      .onOk(block => {
+        const updatedChange: BlockChange = {
+          blockId: block.id,
+          data: { ...current.data },
+          confirmed: { ...current.confirmed },
+        };
+        step.changes.splice(idx, 1, this.asBlockChangeDisplay(step.id, updatedChange));
+        this.saveSteps(this.steps);
       });
   }
 
@@ -276,6 +302,11 @@ export default class StepViewFull extends CrudComponent {
                       <q-item-section side>
                         <q-btn flat round icon="delete" @click="removeChange(step, change.key)">
                           <q-tooltip>Remove Block Change from Step</q-tooltip>
+                        </q-btn>
+                      </q-item-section>
+                      <q-item-section side>
+                        <q-btn flat round icon="mdi-rename-box" @click="editChangeBlock(step, change.key)">
+                          <q-tooltip>Switch target Block</q-tooltip>
                         </q-btn>
                       </q-item-section>
                       <q-item-section side>
