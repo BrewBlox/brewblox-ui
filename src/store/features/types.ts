@@ -1,35 +1,48 @@
-export type Validator = (config: any) => boolean;
-export type WidgetSelector = (config: any) => string | undefined;
+import { PersistentWidget } from '@/store/dashboards';
+
 export type FeatureRole = 'Process' | 'Control' | 'Output' | 'Constraint' | 'Display' | 'Other';
+export type WidgetMode = 'Basic' | 'Full';
+export type WidgetContainer = 'Dashboard' | 'Dialog';
+
+export interface Crud {
+  widget: PersistentWidget;
+  isStoreWidget: boolean;
+  saveWidget(widget: PersistentWidget): unknown | Promise<unknown>;
+  closeDialog(): void;
+}
 
 export interface Deleter {
   description: string;
-  action: (config: any) => void;
+  action: (crud: Crud) => void;
 }
+
+export type WidgetSelector = (crud: Crud) => string;
 
 export interface Feature {
   id: string;
   displayName: string;
   role?: FeatureRole;
-  validator?: Validator;
   deleters?: Deleter[];
-  widgetSize?: {
+  widgetSize: {
     cols: number;
     rows: number;
   };
-  widget?: string;
-  selector?: WidgetSelector;
-  wizard?: string;
-  form?: string;
+  widgetComponent: string | WidgetSelector;
+  wizardComponent?: string;
 }
 
 export interface QuickStart {
   id: string;
   displayName: string;
-  wizard: string;
+  wizardComponent: string;
 }
 
 export interface Watcher {
   component: string;
   props: Mapped<any>;
+}
+
+export interface WidgetContext {
+  mode: WidgetMode;
+  container: WidgetContainer;
 }

@@ -164,7 +164,7 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
           </q-item-section>
           <q-item-section>
             <q-input v-model.number="driverMax.value" type="number" step="any" label="Limit difference to" dark>
-              <template v-slot:append>
+              <template #append>
                 <small class="self-end q-pb-sm">
                   {{ driverMax.notation }}
                 </small>

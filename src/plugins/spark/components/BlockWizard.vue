@@ -8,12 +8,10 @@ import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
-import { DashboardItem } from '@/store/dashboards';
+import { Block, BlockCrud } from '@/plugins/spark/types';
+import { PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { providerStore } from '@/store/providers';
-
-import { BlockCrud } from './BlockCrudComponent';
 
 
 @Component
@@ -22,7 +20,7 @@ export default class BlockWizard extends Vue {
   feature: any = null;
   blockId = '';
   block: Block | null = null;
-  widget: DashboardItem | null = null;
+  widget: PersistentWidget | null = null;
   activeDialog: any = null;
 
   @Prop({ type: String, required: true })
@@ -52,10 +50,10 @@ export default class BlockWizard extends Vue {
 
   get wizardOptions(): SelectOption[] {
     return providerStore.featuresById('Spark')
-      .filter(feat => featureStore.wizardById(feat) === 'BlockWidgetWizard')
+      .filter(feat => featureStore.wizard(feat) === 'BlockWidgetWizard')
       .filter(this.filter)
       .map(id => ({
-        label: featureStore.displayNameById(id),
+        label: featureStore.displayName(id),
         value: id,
       }))
       .sort(objectStringSorter('label'));
@@ -86,7 +84,7 @@ export default class BlockWizard extends Vue {
         serviceId: this.serviceId,
         blockId: this.blockId,
       },
-      ...featureStore.widgetSizeById(typeId),
+      ...featureStore.widgetSize(typeId),
     };
     this.block = this.block || {
       id: this.blockId,
@@ -100,7 +98,7 @@ export default class BlockWizard extends Vue {
   configureBlock(): void {
     this.ensureLocalBlock();
     const crud: BlockCrud = {
-      widget: this.widget as DashboardItem,
+      widget: this.widget as PersistentWidget,
       isStoreWidget: false,
       saveWidget: v => { this.widget = v; },
       block: this.block as Block,
@@ -109,9 +107,10 @@ export default class BlockWizard extends Vue {
       closeDialog: this.closeDialog,
     };
     this.activeDialog = createDialog({
-      component: 'FormDialog',
+      component: 'WidgetDialog',
       root: this.$root,
       getCrud: () => crud,
+      mode: 'Full',
     });
   }
 
@@ -132,7 +131,7 @@ export default class BlockWizard extends Vue {
       this.$q.notify({
         icon: 'mdi-check-all',
         color: 'positive',
-        message: `Created ${featureStore.displayNameById((this.block as Block).type)} Block '${this.blockId}'`,
+        message: `Created ${featureStore.displayName((this.block as Block).type)} Block '${this.blockId}'`,
       });
       this.onCreate(sparkStore.blockById(this.serviceId, this.blockId));
     } catch (e) {
@@ -171,7 +170,7 @@ export default class BlockWizard extends Vue {
             @filter="filterFn"
             @change="block = null; widget = null;"
           >
-            <template v-slot:no-option>
+            <template #no-option>
               <q-item dark>
                 <q-item-section class="text-grey">
                   No results
@@ -184,7 +183,7 @@ export default class BlockWizard extends Vue {
       <q-item dark>
         <q-item-section>
           <q-input v-model="blockId" :rules="blockIdRules" dark label="Block name">
-            <template v-slot:append>
+            <template #append>
               <q-icon name="mdi-information">
                 <q-tooltip>
                   The name of the Spark Controller Block.

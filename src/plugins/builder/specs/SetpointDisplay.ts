@@ -1,10 +1,8 @@
-
 import { Coordinates } from '@/helpers/coordinates';
-import { showBlockDialog } from '@/helpers/dialog';
-import { typeName } from '@/plugins/spark/features/SetpointSensorPair/getters';
+import { blockTypes } from '@/plugins/spark/block-types';
 
 import { CENTER, DOWN, LEFT, RIGHT, UP } from '../getters';
-import { settingsBlock } from '../helpers';
+import { showLinkedBlockDialog } from '../helpers';
 import { PartSpec, PersistentPart } from '../types';
 
 
@@ -19,10 +17,14 @@ const spec: PartSpec = {
   id: 'SetpointDisplay',
   cards: [{
     component: 'LinkedBlockCard',
-    props: { settingsKey: 'setpoint', types: [typeName], label: 'Setpoint' },
+    props: {
+      settingsKey: 'setpoint',
+      types: [blockTypes.SetpointSensorPair],
+      label: 'Setpoint',
+    },
   }],
   size: () => [SIZE_X, SIZE_Y],
-  interactHandler: (part: PersistentPart) => showBlockDialog(settingsBlock(part, 'setpoint')),
+  interactHandler: (part: PersistentPart) => showLinkedBlockDialog(part, 'setpoint'),
   transitions: () => ({
     [UP]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
     [LEFT]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],

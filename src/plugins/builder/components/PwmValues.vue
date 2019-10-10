@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { ActuatorPwmBlock } from '@/plugins/spark/block-types';
 
-import { settingsBlock, squares, textTransformation } from '../helpers';
+import { settingsBlock, settingsLink, squares, textTransformation } from '../helpers';
 import { PersistentPart } from '../types';
 
 
@@ -31,6 +31,14 @@ export default class PwmValues extends Vue {
     return settingsBlock(this.part, this.settingsKey);
   }
 
+  get isBroken(): boolean {
+    if (this.block) {
+      return false;
+    }
+    const link = settingsLink(this.part, this.settingsKey);
+    return !!link.serviceId && !!link.blockId;
+  }
+
   get pwmValue(): number | null {
     return this.block && this.block.data.enabled
       ? this.block.data.value
@@ -52,7 +60,8 @@ export default class PwmValues extends Vue {
       :width="squares(1)"
       :height="squares(1)"
     >
-      <div class="text-white text-bold text-center">
+      <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
+      <div v-else class="text-white text-bold text-center">
         <q-icon name="mdi-gauge" class="q-mr-xs" />
         <q-icon v-if="!block" name="mdi-link-variant-off" />
         <small v-else>%</small>

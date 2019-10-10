@@ -77,14 +77,14 @@ export default class DigitalStateField extends Vue {
       dense
       @click="toggle"
     >
-      <template v-slot:off>
+      <template #off>
         <span class="row">
           <q-tooltip v-if="pending && pendingReason">State pending: {{ pendingReason }}</q-tooltip>
           <q-spinner v-if="pending && value === off" />
           <span v-else>Off</span>
         </span>
       </template>
-      <template v-slot:on>
+      <template #on>
         <span class="row">
           <q-tooltip v-if="pending && pendingReason">State pending: {{ pendingReason }}</q-tooltip>
           <q-spinner v-if="pending && value === on" />

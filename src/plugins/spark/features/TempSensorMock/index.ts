@@ -1,11 +1,10 @@
-import { ref } from '@/helpers/component-ref';
 import { Unit } from '@/helpers/units';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
+import { blockWidgetSelector } from '../../helpers';
 import { BlockSpec } from '../../types';
 import { typeName } from './getters';
-import form from './TempSensorMockForm.vue';
 import widget from './TempSensorMockWidget.vue';
 import { TempSensorMockData } from './types';
 
@@ -40,8 +39,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'Temp Sensor (Mock)',
   role: 'Process',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 2,

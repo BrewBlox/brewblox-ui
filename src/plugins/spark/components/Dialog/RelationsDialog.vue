@@ -10,18 +10,8 @@ import { Watch } from 'vue-property-decorator';
 import DialogBase from '@/components/Dialog/DialogBase';
 import { showBlockDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockLink } from '@/plugins/spark/types';
+import { RelationEdge, RelationNode } from '@/plugins/spark/types';
 
-interface Edge {
-  source: string;
-  target: string;
-  relation: string[];
-}
-
-interface Node {
-  id: string;
-  type: string;
-}
 
 const LABEL_HEIGHT = 50;
 const LABEL_WIDTH = 150;
@@ -34,7 +24,6 @@ const INVERTED = [
 @Component
 export default class RelationsDialog extends DialogBase {
   exportBusy = false;
-  lastRelationString = '';
   graphObj: any = null;
   availableHeight = 0;
   availableWidth = 0;
@@ -52,46 +41,34 @@ export default class RelationsDialog extends DialogBase {
   readonly serviceId!: string;
 
   @Prop({ type: Array, default: [] })
-  readonly nodes!: Node[];
+  readonly nodes!: RelationNode[];
 
   @Prop({ type: Array, default: [] })
-  readonly relations!: BlockLink[];
+  readonly edges!: RelationEdge[];
 
   @Prop({ type: String, default: 'Block Relations' })
   public readonly title!: string;
 
-  get edges(): Edge[] {
-    return this.relations
-      .map(rel => ({ source: rel.source, target: rel.target, relation: rel.relation }));
+  @Prop({ type: Boolean, default: false })
+  public readonly hideUnrelated!: boolean;
+
+  get drawnNodes(): RelationNode[] {
+    return [...new Set(this.edges.flatMap(edge => [edge.target, edge.source]))]
+      .map(id => this.nodes.find(node => node.id === id) || { id, type: '???' });
   }
 
-  get drawnNodes(): Node[] {
-    const findNode = (id: string): Node =>
-      this.nodes.find(node => node.id === id) || { id, type: '???' };
-
-    return this.edges
-      // Create a list of each ID referenced by an edge
-      .reduce((acc: string[], edge: Edge) => [...acc, edge.target, edge.source], [])
-      // Find a node for each unique ID
-      .reduce((acc: Node[], id: string) =>
-        acc.find(node => node.id === id)
-          ? acc
-          : [...acc, findNode(id)],
-        [],
-      );
+  get loneNodes(): RelationNode[] {
+    return this.nodes.filter(node => !this.drawnNodes.find(n => n.id === node.id));
   }
 
-  @Watch('relations', { immediate: true })
-  display(): void {
-    setTimeout(() => this.calc() && setTimeout(() => this.draw(), 100), 100);
+  @Watch('edges', { immediate: true })
+  display(newV: RelationEdge[], oldV: RelationEdge[] | null): void {
+    if (newV && JSON.stringify(newV) !== JSON.stringify(oldV)) {
+      setTimeout(() => this.calc() && setTimeout(() => this.draw(), 100), 100);
+    }
   }
 
   calc(): boolean {
-    const newRelationString = JSON.stringify(this.relations);
-    if (newRelationString === this.lastRelationString) {
-      return false;
-    }
-
     const nodeTemplate = (id: string, type: string): string => {
       return `
         <div style="width: ${LABEL_WIDTH}px; height: ${LABEL_HEIGHT}px" ">
@@ -102,27 +79,30 @@ export default class RelationsDialog extends DialogBase {
     };
 
     const obj = new graphlib
-      .Graph({ multigraph: true })
+      .Graph({ multigraph: true, compound: true })
       .setGraph({ marginx: 20, marginy: 20 });
 
-    this.drawnNodes.forEach(val => {
-      obj.setNode(val.id, {
-        id: val.id,
-        label: nodeTemplate(val.id, val.type),
+    const nodes = this.hideUnrelated
+      ? this.drawnNodes
+      : [...this.loneNodes, ...this.drawnNodes];
+
+    nodes.forEach(node => {
+      obj.setNode(node.id, {
+        id: node.id,
+        label: nodeTemplate(node.id, node.type),
         labelType: 'html',
         width: LABEL_WIDTH,
         height: LABEL_HEIGHT,
         rx: 5,
         ry: 5,
-        class: 'test-label',
       });
     });
 
-    this.edges.forEach(val => {
-      const label = val.relation[0].replace(/Id$/, '');
+    this.edges.forEach(edge => {
+      const label = edge.relation[0].replace(/Id$/, '');
       const [source, target] = INVERTED.includes(label)
-        ? [val.target, val.source]
-        : [val.source, val.target];
+        ? [edge.target, edge.source]
+        : [edge.source, edge.target];
 
       obj.setEdge(source, target, {
         label,
@@ -130,11 +110,25 @@ export default class RelationsDialog extends DialogBase {
         style: 'fill: none; stroke: red; stroke-width: 1.5px;',
         arrowheadStyle: 'fill: red; stroke: red;',
       },
-        val.relation[0]);
+        edge.relation[0]);
     });
 
+    if (!this.hideUnrelated) {
+      const invisible = 'fill: transparent; stroke: none;';
+      const stackHeight = 6;
+
+      this.loneNodes.forEach((node, idx) => {
+        if (idx % stackHeight === 0) { return; }
+        obj.setEdge(node.id, this.loneNodes[idx - 1].id, {
+          label: '',
+          labelStyle: invisible,
+          style: invisible,
+          arrowheadStyle: invisible,
+        });
+      });
+    }
+
     this.graphObj = obj;
-    this.lastRelationString = newRelationString;
     return true;
   }
 
@@ -193,7 +187,7 @@ export default class RelationsDialog extends DialogBase {
     <q-card dark class="maximized bg-dark-bright">
       <DialogToolbar ref="toolbar" @close="onDialogHide">
         {{ title }}
-        <template v-slot:buttons>
+        <template #buttons>
           <!-- Exporting is bugged right now. See https://github.com/BrewBlox/brewblox-ui/issues/638 -->
           <q-btn
             v-if="false"

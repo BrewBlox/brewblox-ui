@@ -2,9 +2,9 @@
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { Unit } from '@/helpers/units';
-import { MutexLink } from '@/helpers/units/KnownLinks';
+import { Link, Unit } from '@/helpers/units';
 
+import { blockTypes } from '../../block-types';
 import { digitalConstraintLabels } from '../../helpers';
 import ConstraintsBase, { EditableConstraint } from './ConstraintsBase';
 
@@ -19,7 +19,7 @@ export default class DigitalConstraints extends ConstraintsBase {
       case 'mutex':
         return {
           key,
-          value: new MutexLink(value),
+          value: new Link(value, blockTypes.Mutex),
           limiting: false,
         };
       default:

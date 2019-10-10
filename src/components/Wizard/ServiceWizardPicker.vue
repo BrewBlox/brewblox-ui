@@ -17,8 +17,8 @@ export default class ServiceWizardPicker extends Vue {
   get wizardOptions(): SelectOption[] {
     return providerStore.providerIds
       .map(id => ({
-        label: providerStore.displayNameById(id),
-        value: providerStore.wizardById(id),
+        label: providerStore.displayName(id),
+        value: providerStore.wizard(id),
       }))
       .filter(opt => opt.value)
       .sort(objectStringSorter('label'));
@@ -103,7 +103,7 @@ export default class ServiceWizardPicker extends Vue {
         <q-item dark>
           <q-item-section>
             <q-input v-model="serviceId" :rules="serviceIdRules" label="Service ID" dark lazy-rules>
-              <template v-slot:append>
+              <template #append>
                 <q-icon name="mdi-information">
                   <q-tooltip>
                     The Service ID is how the service is contacted.
@@ -117,7 +117,7 @@ export default class ServiceWizardPicker extends Vue {
         <q-item dark>
           <q-item-section>
             <q-input v-model="serviceTitle" label="Service title" dark>
-              <template v-slot:append>
+              <template #append>
                 <q-icon name="mdi-information">
                   <q-tooltip>
                     The Service title is how the service is displayed in the UI.

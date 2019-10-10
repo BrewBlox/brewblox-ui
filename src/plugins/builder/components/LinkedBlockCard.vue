@@ -46,6 +46,12 @@ export default class LinkedBlockCard extends PartCard {
     });
   }
 
+  get broken(): boolean {
+    return !!this.linked.serviceId
+      && !!this.linked.blockId
+      && !sparkStore.tryBlockById(this.linked.serviceId, this.linked.blockId);
+  }
+
   get linkedOpts(): { label: string; value: LinkedBlock }[] {
     const sorter = objectStringSorter('id');
     return this.sparkServices
@@ -72,8 +78,10 @@ export default class LinkedBlockCard extends PartCard {
       return [];
     }
     const compatibleTable = sparkStore.compatibleTypes(this.sparkServices[0].id);
-    return this.types
-      .reduce((acc, type) => [...acc, ...get(compatibleTable, type, [])], [...this.types]);
+    return [
+      ...this.types,
+      ...this.types.flatMap(type => get(compatibleTable, type, [])),
+    ];
   }
 
   get actualFilter(): (link: Link) => boolean {
@@ -124,28 +132,32 @@ export default class LinkedBlockCard extends PartCard {
           v-model="linked"
           :options="linkedOpts"
           :label="label"
+          :error="broken"
           clearable
           dark
           options-dark
           map-options
           emit-value
         >
-          <template v-slot:no-option>
+          <template #no-option>
             <q-item dark>
               <q-item-section class="text-grey">
                 No results
               </q-item-section>
             </q-item>
           </template>
-          <template v-if="!noCreate" v-slot:after>
-            <BlockFormButton
+          <template #error>
+            <div>Link broken: {{ linked.blockId }} not found</div>
+          </template>
+          <template v-if="!noCreate" #after>
+            <BlockDialogButton
               :block-id="linked.blockId"
               :service-id="serviceId || ''"
               flat
               round
             >
               <q-tooltip>Edit Block</q-tooltip>
-            </BlockFormButton>
+            </BlockDialogButton>
             <q-btn :disable="!sparkServices.length" flat round icon="add" @click="startCreate">
               <q-tooltip>Create new Block</q-tooltip>
             </q-btn>

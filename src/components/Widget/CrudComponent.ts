@@ -4,22 +4,23 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { deepCopy } from '@/helpers/units/parseObject';
-import { DashboardItem, dashboardStore } from '@/store/dashboards';
-import { featureStore } from '@/store/features';
+import { dashboardStore, PersistentWidget } from '@/store/dashboards';
+import { Crud, featureStore, WidgetMode } from '@/store/features';
 
-export interface Crud {
-  widget: DashboardItem;
-  isStoreWidget: boolean;
-  saveWidget(widget: DashboardItem): unknown | Promise<unknown>;
-  closeDialog(): void;
+export interface DialogOpts {
+  widgetProps?: any;
+  mode?: WidgetMode;
+  listeners?: Mapped<Function>;
 }
 
 @Component
 export default class CrudComponent extends Vue {
+  private activeDialog: any = null;
+
   @Prop({ type: Object, required: true })
   public readonly crud!: Crud;
 
-  public get widget(): DashboardItem {
+  public get widget(): PersistentWidget {
     return this.crud.widget;
   }
 
@@ -28,24 +29,41 @@ export default class CrudComponent extends Vue {
   }
 
   public get displayName(): string {
-    return featureStore.displayNameById(this.widget.feature);
+    return featureStore.displayName(this.widget.feature);
+  }
+
+  public showDialog(opts: DialogOpts = {}): void {
+    const { widgetProps, mode, listeners } = opts;
+    this.activeDialog = createDialog({
+      root: this.$root,
+      component: 'WidgetDialog',
+      getCrud: () => ({ ...this.crud, closeDialog: this.closeDialog }),
+      getProps: () => widgetProps,
+      mode,
+      listeners,
+    });
   }
 
   public closeDialog(): void {
+    if (this.activeDialog) {
+      this.activeDialog.hide();
+      this.activeDialog = null;
+    }
     this.crud.closeDialog();
   }
 
-  public saveWidget(widget: DashboardItem = this.widget): void {
-    this.crud.saveWidget(widget);
+  public async saveWidget(widget: PersistentWidget = this.widget): Promise<void> {
+    await this.crud.saveWidget(widget);
   }
 
-  public saveConfig(config: any = this.widget.config): void {
-    this.saveWidget({ ...this.widget, config });
+  public async saveConfig(config: any = this.widget.config): Promise<void> {
+    await this.saveWidget({ ...this.widget, config });
   }
 
   public startChangeWidgetTitle(): void {
     const widgetTitle = this.widget.title;
     createDialog({
+      root: this.$root,
       title: 'Change Widget name',
       message: `Choose a new name for '${widgetTitle}'`,
       dark: true,
@@ -61,6 +79,7 @@ export default class CrudComponent extends Vue {
   public startCopyWidget(): void {
     const id = uid();
     createDialog({
+      root: this.$root,
       title: 'Copy widget',
       message: `To which dashboard do you want to copy widget ${this.widget.title}?`,
       dark: true,
@@ -76,7 +95,7 @@ export default class CrudComponent extends Vue {
         if (!dashboard) {
           return;
         }
-        dashboardStore.appendDashboardItem({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
+        dashboardStore.appendPersistentWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
         this.$q.notify({
           color: 'positive',
           icon: 'file_copy',
@@ -87,6 +106,7 @@ export default class CrudComponent extends Vue {
 
   public startMoveWidget(): void {
     createDialog({
+      root: this.$root,
       title: 'Move widget',
       message: `To which dashboard do you want to move widget ${this.widget.title}?`,
       dark: true,
@@ -105,7 +125,7 @@ export default class CrudComponent extends Vue {
 
   public startRemoveWidget(): void {
     const deleteItem = async (): Promise<void> => {
-      await dashboardStore.removeDashboardItem(this.widget);
+      await dashboardStore.removePersistentWidget(this.widget);
       this.closeDialog();
     };
 
@@ -116,11 +136,12 @@ export default class CrudComponent extends Vue {
         label: 'Remove widget from this dashboard',
         action: deleteItem,
       },
-      ...featureStore.deletersById(this.widget.feature)
+      ...featureStore.deleters(this.widget.feature)
         .map(del => ({ label: del.description, action: del.action })),
     ].map((opt, idx) => ({ ...opt, value: idx }));
 
     createDialog({
+      root: this.$root,
       title: 'Delete widget',
       message: `How do you want to delete widget ${this.widget.title}?`,
       dark: true,

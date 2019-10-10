@@ -65,6 +65,7 @@ export default class DefaultLayout extends Vue {
 
   removeService(service: Service): void {
     createDialog({
+      root: this.$root,
       title: 'Remove service',
       message: `Are you sure you want to remove ${service.title}?`,
       dark: true,
@@ -76,6 +77,7 @@ export default class DefaultLayout extends Vue {
 
   changeServiceTitle(service: Service): void {
     createDialog({
+      root: this.$root,
       title: 'Change service Title',
       message: "Change your service's display name",
       dark: true,
@@ -111,7 +113,15 @@ export default class DefaultLayout extends Vue {
 
   showPlugins(): void {
     createDialog({
+      root: this.$root,
       component: 'PluginDialog',
+    });
+  }
+
+  showBuilderEditor(): void {
+    createDialog({
+      root: this.$root,
+      component: 'BuilderEditor',
     });
   }
 
@@ -127,7 +137,7 @@ export default class DefaultLayout extends Vue {
 </script>
 
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="lHh Lpr lFf" class="bg-dark-bright">
     <q-header class="glossy bg-dark">
       <q-toolbar>
         <q-btn flat dense round @click="leftDrawerOpen = !leftDrawerOpen">
@@ -149,24 +159,6 @@ export default class DefaultLayout extends Vue {
             <q-icon name="mdi-home" />
           </q-item-section>
           <q-item-section>BrewBlox</q-item-section>
-        </q-item>
-
-        <q-separator dark />
-
-        <q-item clickable @click.native="openWizard(null)">
-          <q-item-section avatar>
-            <q-icon name="mdi-creation" />
-          </q-item-section>
-          <q-item-section>Wizardry</q-item-section>
-        </q-item>
-
-        <q-separator dark />
-
-        <q-item clickable @click.native="showPlugins">
-          <q-item-section avatar>
-            <q-icon name="mdi-puzzle" />
-          </q-item-section>
-          <q-item-section>Plugins</q-item-section>
         </q-item>
 
         <q-separator dark />
@@ -311,19 +303,35 @@ export default class DefaultLayout extends Vue {
         </draggable>
       </q-list>
 
-      <q-btn-dropdown text-color="white" icon="mdi-bug-outline" class="bottomed">
-        <q-list dark bordered>
-          <q-item dark>
-            <q-item-section>
-              <q-item-label caption>
-                Version
-              </q-item-label>
-              {{ version }}
-            </q-item-section>
-          </q-item>
-          <ExportErrorsAction />
-        </q-list>
-      </q-btn-dropdown>
+      <q-separator dark />
+      <ActionItem icon="mdi-creation" label="Wizardry" @click="openWizard(null)" />
+      <q-separator dark />
+      <ActionItem icon="mdi-pipe" label="Brewery Builder" @click="showBuilderEditor" />
+
+      <q-item class="bottomed">
+        <q-item-section class="col-auto">
+          <q-btn flat text-color="white" icon="mdi-puzzle" @click="showPlugins">
+            <q-tooltip>
+              Plugins
+            </q-tooltip>
+          </q-btn>
+        </q-item-section>
+        <q-item-section class="col-auto">
+          <q-btn-dropdown text-color="white" icon="mdi-bug-outline">
+            <q-list dark bordered>
+              <q-item dark>
+                <q-item-section>
+                  <q-item-label caption>
+                    Version
+                  </q-item-label>
+                  {{ version }}
+                </q-item-section>
+              </q-item>
+              <ExportErrorsAction />
+            </q-list>
+          </q-btn-dropdown>
+        </q-item-section>
+      </q-item>
     </q-drawer>
 
     <q-dialog v-model="wizardModalOpen" no-backdrop-dismiss>
@@ -354,5 +362,9 @@ export default class DefaultLayout extends Vue {
 .bottomed {
   bottom: 0;
   position: absolute;
+}
+
+.q-layout {
+  overflow-x: auto;
 }
 </style>

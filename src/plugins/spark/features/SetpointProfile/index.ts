@@ -1,14 +1,14 @@
 import { ref } from '@/helpers/component-ref';
 import { Link } from '@/helpers/units';
-import { SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
+import { interfaceTypes } from '@/plugins/spark/block-types';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
+import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { BlockSpec } from '@/plugins/spark/types';
 import { Feature } from '@/store/features';
 
-import { BlockSpec } from '../../types';
 import { typeName } from './getters';
 import ProfilePresetAction from './ProfilePresetAction.vue';
 import ProfilePresetDialog from './ProfilePresetDialog.vue';
-import form from './SetpointProfileForm.vue';
 import widget from './SetpointProfileWidget.vue';
 import { SetpointProfileData } from './types';
 
@@ -18,7 +18,7 @@ const block: BlockSpec = {
     start: new Date().getTime() / 1000,
     points: [],
     enabled: false,
-    targetId: new SetpointSensorPairLink(null),
+    targetId: new Link(null, interfaceTypes.SetpointSensorPair),
     drivenTargetId: new Link(null),
   }),
   changes: [
@@ -44,7 +44,7 @@ const block: BlockSpec = {
       key: 'targetId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new SetpointSensorPairLink(null),
+      generate: () => new Link(null, interfaceTypes.SetpointSensorPair),
     },
   ],
   presets: [
@@ -65,10 +65,9 @@ ref(ProfilePresetDialog);
 const feature: Feature = {
   ...GenericBlock,
   id: typeName,
-  displayName: 'Setpoint profile',
+  displayName: 'Setpoint Profile',
   role: 'Process',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 3,

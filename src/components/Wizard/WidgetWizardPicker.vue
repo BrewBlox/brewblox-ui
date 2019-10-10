@@ -43,9 +43,9 @@ export default class WidgetWizardPicker extends Vue {
   get wizardOptions(): SelectOption[] {
     return featureStore.featureIds
       .map(id => ({
-        label: featureStore.displayNameById(id),
+        label: featureStore.displayName(id),
         value: id,
-        component: featureStore.wizardById(id),
+        component: featureStore.wizard(id),
       }))
       .filter(opt => !!opt.component)
       .sort(objectStringSorter('label'));
@@ -123,7 +123,7 @@ export default class WidgetWizardPicker extends Vue {
               label="Widget Type"
               @filter="filterFn"
             >
-              <template v-slot:no-option>
+              <template #no-option>
                 <q-item dark>
                   <q-item-section class="text-grey">
                     No results

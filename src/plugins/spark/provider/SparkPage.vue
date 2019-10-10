@@ -1,15 +1,17 @@
 <script lang="ts">
 import { clearTimeout, setInterval } from 'timers';
+import { isArray } from 'util';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { capitalized, objectStringSorter } from '@/helpers/functional';
+import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
+import { startResetBlocks } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, Spark, SystemStatus } from '@/plugins/spark/types';
-import { Dashboard, DashboardItem, dashboardStore } from '@/store/dashboards';
-import { FeatureRole, featureStore } from '@/store/features';
+import { Block, BlockCrud, RelationNode, Spark, SystemStatus } from '@/plugins/spark/types';
+import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards';
+import { FeatureRole, featureStore, WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
 
 import { isReady, isSystemBlock } from './getters';
@@ -19,25 +21,33 @@ interface ModalSettings {
   props: any;
 }
 
-interface ValidatedItem {
+interface ValidatedWidget {
+  id: string;
   key: string;
   component: string;
-  item: DashboardItem;
-  typeName: string;
+  crud: BlockCrud;
+  displayName: string;
   role: FeatureRole;
   expanded: boolean;
+  error?: string;
 }
 
 @Component
 export default class SparkPage extends Vue {
   capitalized = capitalized;
+  startResetBlocks = startResetBlocks;
+
+  volatileWidgets: { [blockId: string]: PersistentWidget } = {};
+  statusCheckInterval: NodeJS.Timeout | null = null;
+  blockFilter = '';
+
+  context: WidgetContext = {
+    mode: 'Basic',
+    container: 'Dashboard',
+  };
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
-
-  volatileItems: { [blockId: string]: DashboardItem } = {};
-  statusCheckInterval: NodeJS.Timeout | null = null;
-  blockFilter = '';
 
   get service(): Spark {
     return serviceStore.serviceById(this.serviceId) as Spark;
@@ -88,16 +98,16 @@ export default class SparkPage extends Vue {
     };
   }
 
-  get allSorters(): { [id: string]: (a: ValidatedItem, b: ValidatedItem) => number } {
+  get allSorters(): { [id: string]: (a: ValidatedWidget, b: ValidatedWidget) => number } {
     return {
       unsorted: () => 0,
-      name: (a, b) => objectStringSorter('title')(a.item, b.item),
-      type: (a: ValidatedItem, b: ValidatedItem): number => {
-        const left = featureStore.displayNameById(a.item.feature).toLowerCase();
-        const right = featureStore.displayNameById(b.item.feature).toLowerCase();
+      name: (a, b) => objectStringSorter('id')(a, b),
+      type: (a, b): number => {
+        const left = a.displayName.toLowerCase();
+        const right = b.displayName.toLowerCase();
         return left.localeCompare(right);
       },
-      role: (a: ValidatedItem, b: ValidatedItem): number =>
+      role: (a, b): number =>
         this.roleOrder[a.role] - this.roleOrder[b.role],
     };
   }
@@ -111,7 +121,7 @@ export default class SparkPage extends Vue {
     this.saveServiceConfig();
   }
 
-  get sorter(): (a: ValidatedItem, b: ValidatedItem) => number {
+  get sorter(): (a: ValidatedWidget, b: ValidatedWidget) => number {
     return this.allSorters[this.sorting] || (() => 0);
   }
 
@@ -124,9 +134,8 @@ export default class SparkPage extends Vue {
     this.service.config.expandedBlocks = Object.entries(expanded)
       .reduce(
         (acc, [k, v]) => {
-          return ids.includes(k)
-            ? { ...acc, [k]: v }
-            : acc;
+          if (ids.includes(k)) { acc[k] = v; };
+          return acc;
         },
         {},
       );
@@ -146,24 +155,50 @@ export default class SparkPage extends Vue {
       !!this.service.id.toLowerCase().match(this.blockFilter.toLowerCase());
   }
 
+  get contentStyle(): Mapped<string> {
+    return {
+      height: `${window.innerHeight - 100}px`,
+    };
+  }
+
   saveServiceConfig(): void {
     serviceStore.saveService({ ...this.service });
   }
 
+  scrollTo(id: string): void {
+    let item: any = this.$refs[`widget-${this.volatileKey(id)}`];
+    item = isArray(item) ? item[0] : item;
+    if (item !== undefined) {
+      item.$el.scrollIntoView();
+    }
+  }
+
+  selectService(): void {
+    this.serviceExpanded = true;
+    let item: any = this.$refs['widget-spark-service'];
+    item = isArray(item) ? item[0] : item;
+    if (item !== undefined) {
+      item.$el.scrollIntoView();
+    }
+  }
+
   updateExpandedBlock(id: string, val: boolean): void {
     this.expandedBlocks = { ...this.expandedBlocks, [id]: val };
+    if (val) {
+      this.$nextTick(() => this.scrollTo(id));
+    }
   }
 
   volatileKey(blockId: string): string {
     return `${this.service.id}/${blockId}`;
   }
 
-  validateBlock(block: Block): ValidatedItem {
+  validateBlock(block: Block): ValidatedWidget {
     const key = this.volatileKey(block.id);
-    const existing = this.volatileItems[key];
+    const existing = this.volatileWidgets[key];
     if (!existing || existing.feature !== block.type) {
       this.$set(
-        this.volatileItems,
+        this.volatileWidgets,
         key,
         {
           id: block.id,
@@ -175,21 +210,44 @@ export default class SparkPage extends Vue {
             serviceId: block.serviceId,
             blockId: block.id,
           },
-          ...featureStore.widgetSizeById(block.type),
+          ...featureStore.widgetSize(block.type),
         });
     }
-    const item = this.volatileItems[key];
-    return {
-      key,
-      item,
-      typeName: featureStore.displayNameById(item.feature),
-      role: featureStore.roleById(item.feature),
-      component: featureStore.widgetById(item.feature, item.config) || 'InvalidWidget',
-      expanded: this.expandedBlocks[item.id] || false,
+    const widget = this.volatileWidgets[key];
+    const crud: BlockCrud = {
+      widget,
+      saveWidget: this.saveWidget,
+      isStoreWidget: false,
+      closeDialog: () => { },
+      block,
+      saveBlock: this.saveBlock,
+      isStoreBlock: true,
     };
+    try {
+      return {
+        id: widget.id,
+        key,
+        crud,
+        displayName: featureStore.displayName(widget.feature),
+        role: featureStore.role(widget.feature),
+        component: featureStore.widget(crud, true),
+        expanded: this.expandedBlocks[widget.id] || false,
+      };
+    } catch (e) {
+      return {
+        id: widget.id,
+        key,
+        crud,
+        displayName: 'Invalid Widget',
+        role: 'Other',
+        component: 'InvalidWidget',
+        expanded: this.expandedBlocks[widget.id] || false,
+        error: e.message,
+      };
+    }
   }
 
-  get validatedItems(): ValidatedItem[] {
+  get validatedItems(): ValidatedWidget[] {
     return [
       ...sparkStore.blockValues(this.service.id)
         .filter(block => !isSystemBlock(block))
@@ -197,22 +255,22 @@ export default class SparkPage extends Vue {
     ];
   }
 
-  get filteredItems(): ValidatedItem[] {
+  get filteredItems(): ValidatedWidget[] {
     const filter = (this.blockFilter || '').toLowerCase();
     return this.validatedItems
       .filter(val => !filter
-        || val.item.id.toLowerCase().match(filter)
-        || val.typeName.toLowerCase().match(filter))
+        || val.id.toLowerCase().match(filter)
+        || val.displayName.toLowerCase().match(filter))
       .sort(this.sorter);
   }
 
-  get expandedItems(): ValidatedItem[] {
+  get expandedItems(): ValidatedWidget[] {
     return this.filteredItems.filter(item => item.expanded);
   }
 
   expandAll(): void {
     this.expandedBlocks = [...sparkStore.blockIds(this.service.id), '_service']
-      .reduce((acc, id) => ({ ...acc, [id]: true }), {});
+      .reduce((acc, id) => mutate(acc, id, true), {});
   }
 
   expandNone(): void {
@@ -236,12 +294,16 @@ export default class SparkPage extends Vue {
     }
   }
 
-  saveWidget(widget: DashboardItem): void {
-    this.volatileItems[this.volatileKey(widget.id)] = { ...widget };
+  saveWidget(widget: PersistentWidget): void {
+    this.volatileWidgets[this.volatileKey(widget.id)] = { ...widget };
     this.$q.notify({
       color: 'warning',
       message: 'Changes will not be persisted',
     });
+  }
+
+  async saveBlock(block: Block): Promise<void> {
+    sparkStore.saveBlock([block.serviceId, block]);
   }
 
   startDialog(component: string, props: any = null): void {
@@ -256,14 +318,14 @@ export default class SparkPage extends Vue {
   }
 
   showRelations(): void {
-    const nodes = this.validatedItems.map(v => ({ id: v.item.id, type: v.typeName }));
-    const relations = sparkStore.blockLinks(this.service.id);
+    const nodes: RelationNode[] = this.validatedItems.map(v => ({ id: v.id, type: v.displayName }));
+    const edges = sparkStore.relations(this.service.id);
 
     createDialog({
       component: 'RelationsDialog',
       serviceId: this.service.id,
       nodes,
-      relations,
+      edges,
     });
   }
 
@@ -281,29 +343,6 @@ export default class SparkPage extends Vue {
       message,
       icon: 'mdi-magnify-plus-outline',
     });
-  }
-
-  resetBlocks(): void {
-    createDialog({
-      title: 'Reset Blocks',
-      message: `This will remove all Blocks on ${this.service.id}. Are you sure?`,
-      dark: true,
-      noBackdropDismiss: true,
-      cancel: true,
-    })
-      .onOk(async () => {
-        await sparkStore.clearBlocks(this.service.id)
-          .then(() => this.$q.notify({
-            icon: 'mdi-check-all',
-            color: 'positive',
-            message: 'Removed all Blocks',
-          }))
-          .catch((e) => this.$q.notify({
-            icon: 'error',
-            color: 'negative',
-            message: `Failed to remove Blocks: ${e.toString()}`,
-          }));
-      });
   }
 
   async cleanUnusedNames(): Promise<void> {
@@ -330,8 +369,16 @@ export default class SparkPage extends Vue {
     <portal to="toolbar-buttons">
       <q-btn-dropdown :disable="!isReady || statusNok" color="primary" label="actions">
         <q-list dark link>
-          <ActionItem icon="mdi-ray-start-arrow" label="Show Relations" @click="showRelations" />
-          <ActionItem icon="add" label="New Block" @click="startDialog('BlockWizardDialog')" />
+          <ActionItem
+            icon="mdi-ray-start-arrow"
+            label="Show Relations"
+            @click="showRelations"
+          />
+          <ActionItem
+            icon="add"
+            label="New Block"
+            @click="startDialog('BlockWizardDialog')"
+          />
           <ActionItem
             icon="mdi-magnify-plus-outline"
             label="Discover new OneWire Blocks"
@@ -347,7 +394,11 @@ export default class SparkPage extends Vue {
             label="Update firmware"
             @click="startDialog('FirmwareUpdateDialog')"
           />
-          <ActionItem icon="wifi" label="Configure Wifi" @click="startDialog('SparkWifiMenu')" />
+          <ActionItem
+            icon="wifi"
+            label="Configure Wifi"
+            @click="startDialog('SparkWifiMenu')"
+          />
           <ActionItem
             icon="mdi-checkbox-multiple-marked"
             label="Groups"
@@ -368,7 +419,11 @@ export default class SparkPage extends Vue {
             label="Create Mock Blocks"
             @click="startDialog('CreateMockMenu')"
           />
-          <ActionItem icon="delete" label="Remove all Blocks" @click="resetBlocks" />
+          <ActionItem
+            icon="delete"
+            label="Remove all Blocks"
+            @click="startResetBlocks(service.id)"
+          />
         </q-list>
       </q-btn-dropdown>
     </portal>
@@ -382,105 +437,125 @@ export default class SparkPage extends Vue {
       </q-item>
     </q-list>
 
-    <!-- Normal display -->
-    <div v-else class="row justify-start">
-      <!-- Minimized widgets -->
-      <q-list class="col-auto" dark no-border style="min-width: 400px">
-        <!-- Selection controls -->
-        <q-item dark class="q-mb-md">
-          <q-item-section>
-            <q-input v-model="blockFilter" placeholder="Search Blocks" clearable dark>
-              <template v-slot:append>
-                <q-icon name="search" />
-              </template>
-            </q-input>
-          </q-item-section>
-          <q-item-section class="col-auto">
-            <q-btn-dropdown :label="sorting" icon="mdi-sort" flat>
-              <q-list dark>
-                <ActionItem
-                  v-for="(func, name) in allSorters"
-                  :key="name"
-                  :active="sorting === name"
-                  :label="capitalized(name)"
-                  @click="sorting = name"
-                />
-              </q-list>
-            </q-btn-dropdown>
-            <q-tooltip>Sort Blocks</q-tooltip>
-          </q-item-section>
-          <q-item-section class="col-auto">
-            <q-btn flat round icon="mdi-checkbox-multiple-blank-outline" @click="expandNone" />
-            <q-tooltip>Unselect all</q-tooltip>
-          </q-item-section>
-          <q-item-section class="col-auto">
-            <q-btn flat round icon="mdi-checkbox-multiple-marked" @click="expandAll" />
-            <q-tooltip>Select all</q-tooltip>
-          </q-item-section>
-        </q-item>
-        <!-- Service -->
-        <q-item
-          v-if="serviceShown"
-          :class="['non-selectable', serviceExpanded ? 'text-primary' : 'text-white']"
-          clickable
-          dark
-          @click.native="serviceExpanded = !serviceExpanded"
-        >
-          <q-item-section avatar>
-            <q-icon name="mdi-cloud" />
-            <q-tooltip>Service</q-tooltip>
-          </q-item-section>
-          <q-item-section>{{ serviceId }}</q-item-section>
-          <q-item-section side>
-            Spark Service
-          </q-item-section>
-        </q-item>
-        <!-- Blocks -->
-        <q-item
-          v-for="val in filteredItems"
-          :key="val.key"
-          :class="['non-selectable', val.expanded ? 'text-primary' : 'text-white']"
-          clickable
-          dark
-          @click.native="updateExpandedBlock(val.item.id, !val.expanded)"
-        >
-          <q-item-section avatar>
-            <q-icon :name="roleIcons[val.role]" />
-            <q-tooltip>{{ val.role }}</q-tooltip>
-          </q-item-section>
-          <q-item-section>{{ val.item.title }}</q-item-section>
-          <q-item-section side>
-            {{ val.typeName }}
-          </q-item-section>
-        </q-item>
-      </q-list>
+    <template v-else>
+      <!-- Normal display -->
+      <div class="row no-wrap justify-start" :style="contentStyle">
+        <q-scroll-area class="row no-wrap col-auto" style="width: 500px">
+          <q-list dark no-border class="col">
+            <!-- Selection controls -->
+            <q-item dark class="q-mb-md">
+              <q-item-section>
+                <q-input v-model="blockFilter" placeholder="Search Blocks" clearable dark>
+                  <template #append>
+                    <q-icon name="search" />
+                  </template>
+                </q-input>
+              </q-item-section>
+              <q-item-section class="col-auto">
+                <q-btn-dropdown :label="sorting" icon="mdi-sort" flat>
+                  <q-list dark>
+                    <ActionItem
+                      v-for="(func, name) in allSorters"
+                      :key="name"
+                      :active="sorting === name"
+                      :label="capitalized(name)"
+                      @click="sorting = name"
+                    />
+                  </q-list>
+                </q-btn-dropdown>
+                <q-tooltip>Sort Blocks</q-tooltip>
+              </q-item-section>
+              <q-item-section class="col-auto">
+                <q-btn flat round icon="mdi-checkbox-multiple-blank-outline" @click="expandNone" />
+                <q-tooltip>Unselect all</q-tooltip>
+              </q-item-section>
+              <q-item-section class="col-auto">
+                <q-btn flat round icon="mdi-checkbox-multiple-marked" @click="expandAll" />
+                <q-tooltip>Select all</q-tooltip>
+              </q-item-section>
+            </q-item>
+            <!-- Service -->
+            <q-item v-if="serviceShown" dark class="text-white widget-index">
+              <q-item-section side class="q-mx-none q-px-none">
+                <ToggleButton v-model="serviceExpanded" />
+              </q-item-section>
+              <q-item-section>
+                <q-item class="non-selectable" clickable dark @click="selectService">
+                  <q-item-section avatar>
+                    <q-icon name="mdi-information-variant" />
+                    <q-tooltip>Device Info</q-tooltip>
+                  </q-item-section>
+                  <q-item-section>{{ serviceId }}</q-item-section>
+                  <q-item-section side>
+                    Device Info
+                  </q-item-section>
+                </q-item>
+              </q-item-section>
+            </q-item>
+            <!-- Blocks -->
+            <q-item
+              v-for="val in filteredItems"
+              :key="val.key"
+              dark
+              class="non-selectable text-white widget-index"
+            >
+              <q-item-section side class="q-mx-none q-px-none">
+                <ToggleButton :value="val.expanded" @input="v => updateExpandedBlock(val.id, v)" />
+              </q-item-section>
+              <q-item-section>
+                <q-item
+                  clickable
+                  dark
+                  @click="val.expanded ? scrollTo(val.id) : updateExpandedBlock(val.id, true)"
+                >
+                  <q-item-section avatar>
+                    <q-icon :name="roleIcons[val.role]" />
+                    <q-tooltip>{{ val.role }}</q-tooltip>
+                  </q-item-section>
+                  <q-item-section>{{ val.id }}</q-item-section>
+                  <q-item-section side>
+                    {{ val.displayName }}
+                  </q-item-section>
+                </q-item>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-scroll-area>
 
-      <!-- Widget List -->
-      <q-list class="col-auto q-ml-xl" dark no-border style="min-width: 500px">
-        <!-- Service -->
-        <q-item v-if="serviceShown && serviceExpanded" dark>
-          <q-item-section>
-            <SparkWidget v-if="isReady" :service-id="service.id" class="bg-dark" />
-          </q-item-section>
-        </q-item>
-        <!-- Blocks -->
-        <q-item v-for="val in expandedItems" :key="val.key" dark>
-          <q-item-section>
-            <component
-              :is="val.component"
-              :widget="val.item"
-              volatile
-              class="bg-dark"
-              @update:widget="saveWidget"
-            />
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </div>
+        <!-- Widget List -->
+        <q-scroll-area class="col-auto q-ml-xl" style="min-width: 500px; max-width: 500px">
+          <q-list dark no-border>
+            <!-- Service -->
+            <q-item v-if="serviceShown && serviceExpanded" ref="widget-spark-service" dark>
+              <q-item-section>
+                <SparkWidget v-if="isReady" :service-id="service.id" class="bg-dark" />
+              </q-item-section>
+            </q-item>
+            <!-- Blocks -->
+            <q-item v-for="val in expandedItems" :ref="`widget-${val.key}`" :key="val.key" dark>
+              <q-item-section>
+                <component
+                  :is="val.component"
+                  :initial-crud="val.crud"
+                  :context="context"
+                  :error="val.error"
+                  class="bg-dark"
+                />
+              </q-item-section>
+            </q-item>
+            <q-item dark :style="{height: contentStyle.height}" />
+          </q-list>
+        </q-scroll-area>
+      </div>
+    </template>
   </div>
 </template>
 
 <style lang="stylus" scoped>
 @import '../../../styles/quasar.styl';
 @import '../../../styles/quasar.variables.styl';
+
+.widget-index {
+  padding: 0;
+}
 </style>

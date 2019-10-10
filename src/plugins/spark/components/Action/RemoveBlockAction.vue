@@ -23,7 +23,7 @@ export default class RemoveBlockAction extends BlockCrudComponent {
   }
 
   get deletable(): boolean {
-    return featureStore.deletersById(this.widget.feature).length > 0;
+    return featureStore.deleters(this.widget.feature).length > 0;
   }
 }
 </script>

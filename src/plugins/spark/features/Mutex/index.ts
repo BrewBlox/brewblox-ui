@@ -1,11 +1,10 @@
-import { ref } from '@/helpers/component-ref';
 import { Unit } from '@/helpers/units';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
+import { blockWidgetSelector } from '../../helpers';
 import { BlockSpec } from '../../types';
 import { typeName } from './getters';
-import form from './MutexForm.vue';
 import widget from './MutexWidget.vue';
 import { MutexData } from './types';
 
@@ -23,8 +22,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'Mutex',
   role: 'Constraint',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 2,

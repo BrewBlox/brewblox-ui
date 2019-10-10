@@ -23,7 +23,6 @@ export default class ServicePage extends Vue {
     } catch (e) {
       return null;
     }
-
   }
 }
 </script>

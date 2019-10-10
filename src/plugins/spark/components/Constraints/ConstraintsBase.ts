@@ -2,7 +2,6 @@ import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import { Link, Unit } from '@/helpers/units';
-import { MutexLink } from '@/helpers/units/KnownLinks';
 
 import { constraintLabels } from '../../helpers';
 
@@ -21,7 +20,7 @@ export interface DigitalConstraint {
   limiting: boolean;
   minOn?: Unit;
   minOff?: Unit;
-  mutex?: MutexLink;
+  mutex?: Link; // Mutex
 }
 
 export interface ConstraintsObj {

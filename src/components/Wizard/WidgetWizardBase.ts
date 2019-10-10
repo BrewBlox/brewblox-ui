@@ -2,7 +2,7 @@ import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import { DashboardItem, dashboardStore } from '@/store/dashboards';
+import { dashboardStore, PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 export interface NavAction {
@@ -33,19 +33,19 @@ export default class WidgetWizardBase extends Vue {
   }
 
   protected get typeDisplayName(): string {
-    return featureStore.displayNameById(this.typeId);
+    return featureStore.displayName(this.typeId);
   }
 
   protected get defaultWidgetSize(): { cols: number; rows: number } {
-    return featureStore.widgetSizeById(this.typeId);
+    return featureStore.widgetSize(this.typeId);
   }
 
-  protected async createItem(item: DashboardItem): Promise<void> {
-    await dashboardStore.appendDashboardItem(item)
+  protected async createItem(item: PersistentWidget): Promise<void> {
+    await dashboardStore.appendPersistentWidget(item)
       .then(() => this.$q.notify({
         icon: 'mdi-check-all',
         color: 'positive',
-        message: `Created ${featureStore.displayNameById(item.feature)} '${item.title}'`,
+        message: `Created ${featureStore.displayName(item.feature)} '${item.title}'`,
       }))
       .catch(e => this.$q.notify({
         icon: 'error',

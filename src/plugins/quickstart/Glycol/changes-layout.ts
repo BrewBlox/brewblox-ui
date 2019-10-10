@@ -63,7 +63,7 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
   return [
     {
       id: uid(),
-      title: 'Glycol',
+      title: `${config.title} Layout`,
       width: 20,
       height: 15,
       parts: [

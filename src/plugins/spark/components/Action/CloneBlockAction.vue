@@ -15,15 +15,8 @@ export default class RemoveBlockAction extends BlockCrudComponent {
   @Prop({ type: String, default: 'Clone Block' })
   readonly label!: string;
 
-  @Prop({ type: String, default: 'mdi-file-replace' })
+  @Prop({ type: String, default: 'file_copy' })
   readonly icon!: string;
-
-  get itemProps(): Record<string, any> {
-    return {
-      ...this.$attrs,
-      ...this.$props,
-    };
-  }
 
   suggestedId(): string {
     const existingIds = sparkStore.blockIds(this.serviceId);
@@ -70,5 +63,5 @@ export default class RemoveBlockAction extends BlockCrudComponent {
 </script>
 
 <template>
-  <ActionItem v-bind="itemProps" @click="startCloneBlock" />
+  <ActionItem v-bind="{...$attrs, ...$props}" @click="startCloneBlock" />
 </template>

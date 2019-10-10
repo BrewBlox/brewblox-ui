@@ -1,19 +1,18 @@
-import { ref } from '@/helpers/component-ref';
-import { Unit } from '@/helpers/units';
-import { TempSensorLink } from '@/helpers/units/KnownLinks';
+import { Link, Unit } from '@/helpers/units';
+import { interfaceTypes } from '@/plugins/spark/block-types';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
+import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { BlockSpec } from '@/plugins/spark/types';
 import { Feature } from '@/store/features';
 
-import { BlockSpec } from '../../types';
 import { typeName } from './getters';
-import form from './SetpointSensorPairForm.vue';
 import widget from './SetpointSensorPairWidget.vue';
 import { FilterChoice, SetpointSensorPairData } from './types';
 
 const block: BlockSpec = {
   id: typeName,
   generate: (): SetpointSensorPairData => ({
-    sensorId: new TempSensorLink(null),
+    sensorId: new Link(null, interfaceTypes.TempSensor),
     storedSetting: new Unit(null, 'degC'),
     setting: new Unit(null, 'degC'),
     value: new Unit(null, 'degC'),
@@ -46,7 +45,7 @@ const block: BlockSpec = {
       key: 'sensorId',
       title: 'Linked Sensor',
       component: 'LinkValEdit',
-      generate: () => new TempSensorLink(null),
+      generate: () => new Link(null, interfaceTypes.TempSensor),
     },
   ],
   presets: [],
@@ -62,8 +61,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'Setpoint',
   role: 'Process',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 2,

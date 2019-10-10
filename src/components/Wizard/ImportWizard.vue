@@ -46,11 +46,11 @@ export default class ImportWizard extends Vue {
         id: uid(),
         dashboard: this.chosenDashboardId,
       };
-      await dashboardStore.appendDashboardItem(item);
+      await dashboardStore.appendPersistentWidget(item);
       this.$q.notify({
         icon: 'mdi-check-all',
         color: 'positive',
-        message: `Created ${featureStore.displayNameById(item.feature)} '${item.title}'`,
+        message: `Created ${featureStore.displayName(item.feature)} '${item.title}'`,
       });
       this.$emit('close');
     } catch (e) {

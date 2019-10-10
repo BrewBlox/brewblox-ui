@@ -62,11 +62,11 @@ export default class Troubleshooter extends Vue {
 
 <template>
   <q-card dark class="text-white scroll" style="max-width: 500px">
-    <WidgetToolbar :title="serviceId" subtitle="Troubleshooter">
+    <Toolbar :title="serviceId" subtitle="Troubleshooter">
       <q-item-section class="dense" side>
         <q-btn unelevated label="force refresh" color="primary" icon="refresh" @click="refresh" />
       </q-item-section>
-    </WidgetToolbar>
+    </Toolbar>
 
     <q-card-section>
       <template v-if="lastStatus">

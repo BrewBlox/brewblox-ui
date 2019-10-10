@@ -6,6 +6,12 @@ export const ref =
     return component.name;
   };
 
+export const selector =
+  (component: VueConstructor): (() => string) => {
+    Vue.component(component.name, component);
+    return () => component.name;
+  };
+
 // Globally register all vue components in the RequireContext
 export const autoRegister =
   (context: __WebpackModuleApi.RequireContext): string[] =>

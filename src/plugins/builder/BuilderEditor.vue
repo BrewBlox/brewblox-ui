@@ -9,6 +9,7 @@ import { showImportDialog } from '@/helpers/dialog';
 import { clampRotation } from '@/helpers/functional';
 import { saveFile } from '@/helpers/import-export';
 import { deepCopy, deserialize, serialize } from '@/helpers/units/parseObject';
+import { dashboardStore } from '@/store/dashboards';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
@@ -16,7 +17,7 @@ import { calculateNormalizedFlows } from './calculateFlows';
 import { defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes, SQUARE_SIZE } from './getters';
 import { asPersistentPart, asStatePart } from './helpers';
 import { builderStore } from './store';
-import { BuilderLayout, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
+import { BuilderItem, BuilderLayout, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
 
 interface XYVals {
   x: number;
@@ -218,7 +219,8 @@ export default class BuilderEditor extends DialogBase {
     builderStore.commitEditorTool(tool.value);
   }
 
-  async saveLayout(layout: BuilderLayout): Promise<void> {
+  async saveLayout(layout: BuilderLayout | null = this.layout): Promise<void> {
+    if (layout === null) { return; }
     if (layout.id) {
       await builderStore.saveLayout(layout);
     } else {
@@ -334,6 +336,46 @@ export default class BuilderEditor extends DialogBase {
         this.layoutId = this.layouts.length > 0
           ? this.layouts[0].id
           : null;
+      });
+  }
+
+  createLayoutWidget(): void {
+    if (!this.layout) { return; }
+
+    createDialog({
+      root: this.$root,
+      title: 'Copy widget',
+      message: `On which dashboard do you want to create a widget for ${this.layout.title}?`,
+      dark: true,
+      options: {
+        type: 'radio',
+        model: undefined,
+        items: dashboardStore.dashboardValues
+          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
+      },
+      cancel: true,
+    })
+      .onOk(async (dashboard: string) => {
+        const layout = this.layout!;
+        const widget: BuilderItem = {
+          id: uid(),
+          title: layout.title,
+          order: 0,
+          dashboard,
+          feature: 'Builder',
+          cols: Math.max(2, Math.ceil(layout.width * (50 / 120))),
+          rows: Math.max(2, Math.ceil(layout.height * (50 / 120))),
+          config: {
+            currentLayoutId: layout.id,
+            layoutIds: [layout.id],
+          },
+        };
+        await dashboardStore.appendPersistentWidget(widget);
+        this.$q.notify({
+          color: 'positive',
+          icon: 'file_copy',
+          message: `Created ${layout.title} widget on ${dashboardStore.dashboardById(dashboard).title}`,
+        });
       });
   }
 
@@ -837,9 +879,10 @@ export default class BuilderEditor extends DialogBase {
                 <q-list dark bordered>
                   <ActionItem label="New Layout" icon="add" @click="startAddLayout(false)" />
                   <template v-if="!!layout">
-                    <ActionItem label="Copy Layout" icon="file_copy" @click="startAddLayout(true)" />
+                    <ActionItem icon="file_copy" label="Copy Layout" @click="startAddLayout(true)" />
                     <ActionItem icon="mdi-file-import" label="Import Layout" @click="importLayout" />
                     <ActionItem icon="edit" label="Rename Layout" @click="renameLayout" />
+                    <ActionItem icon="dashboard" label="Show Layout on dashboard" @click="createLayoutWidget" />
                     <ActionItem icon="mdi-file-export" label="Export Layout" @click="exportLayout" />
                     <ActionItem icon="delete" label="Delete all parts" @click="clearParts" />
                     <ActionItem icon="delete" label="Delete Layout" @click="removeLayout" />

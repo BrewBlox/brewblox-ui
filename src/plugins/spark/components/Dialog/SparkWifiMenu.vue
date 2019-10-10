@@ -101,7 +101,7 @@ export default class SparkWifiMenu extends DialogBase {
               :type="isPwd ? 'password' : 'text'"
               dark
             >
-              <template v-slot:append>
+              <template #append>
                 <q-icon
                   :name="isPwd ? 'visibility_off' : 'visibility'"
                   class="cursor-pointer"

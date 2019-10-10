@@ -3,12 +3,12 @@ import Vue from 'vue';
 import { Component, Emit, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import { targetSplitter } from '@/components/Graph/functional';
-import { defaultPresets } from '@/components/Graph/getters';
-import HistoryGraph from '@/components/Graph/HistoryGraph.vue';
-import { GraphConfig } from '@/components/Graph/types';
 import { createDialog } from '@/helpers/dialog';
 import { durationString } from '@/helpers/functional';
+import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
+import { defaultPresets } from '@/plugins/history/getters';
+import { targetSplitter } from '@/plugins/history/nodes';
+import { GraphConfig } from '@/plugins/history/types';
 import { QueryParams } from '@/store/history';
 
 @Component
@@ -124,7 +124,7 @@ export default class BlockGraph extends Vue {
   <q-dialog v-model="dialogOpen" maximized>
     <q-card v-if="dialogOpen" class="text-white bg-dark-bright" dark>
       <HistoryGraph :id="id" ref="graph" :config="graphCfg">
-        <template v-slot:controls>
+        <template #controls>
           <q-btn-dropdown v-if="!noDuration" auto-close flat label="timespan" icon="mdi-timelapse">
             <q-item
               v-for="(preset, idx) in presets"

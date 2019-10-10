@@ -130,3 +130,8 @@ Vue.use(Quasar, {
   directives: { Ripple, ClosePopup, TouchHold, TouchPan },
   plugins: { Notify, Dialog },
 });
+
+Notify.setDefaults({
+  message: '',
+  color: 'info',
+});

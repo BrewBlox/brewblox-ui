@@ -1,4 +1,4 @@
-import { DashboardItem } from '@/store/dashboards';
+import { PersistentWidget } from '@/store/dashboards';
 
 export interface FlowRoute {
   outCoords: string;
@@ -79,12 +79,11 @@ export interface BuilderLayout {
 }
 
 export interface BuilderConfig {
-  currentToolId?: string;
   currentLayoutId: string | null;
   layoutIds: string[];
 }
 
-export interface BuilderItem extends DashboardItem {
+export interface BuilderItem extends PersistentWidget {
   config: BuilderConfig;
 }
 

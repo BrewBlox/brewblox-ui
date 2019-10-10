@@ -5,7 +5,7 @@ import { PidBlock } from '@/plugins/spark/features/Pid/types';
 
 import PartBase from '../components/PartBase';
 import { COLD_WATER, HOT_WATER } from '../getters';
-import { settingsBlock } from '../helpers';
+import { settingsBlock, settingsLink } from '../helpers';
 
 
 @Component
@@ -15,6 +15,14 @@ export default class PidDisplay extends PartBase {
 
   get block(): PidBlock | null {
     return settingsBlock(this.part, 'pid');
+  }
+
+  get isBroken(): boolean {
+    if (this.block) {
+      return false;
+    }
+    const link = settingsLink(this.part, 'pid');
+    return !!link.serviceId && !!link.blockId;
   }
 
   get outputValue(): number | null {
@@ -40,7 +48,8 @@ export default class PidDisplay extends PartBase {
 <template>
   <g>
     <foreignObject :transform="textTransformation([1,1])" :width="squares(1)" :height="squares(1)">
-      <div class="text-white text-bold text-center">
+      <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
+      <div v-else class="text-white text-bold text-center">
         <svg>
           <HeatingIcon v-if="kp && kp > 0" :stroke="outputValue ? HOT_WATER : 'white'" x="12" />
           <CoolingIcon v-else-if="kp && kp < 0" :stroke="outputValue ? COLD_WATER : 'white'" x="12" />

@@ -15,7 +15,7 @@ ref(FermentManualTask);
 const quickStart: QuickStart = {
   id: 'Ferment',
   displayName: 'Fermentation Fridge',
-  wizard: ref(FermentWizard),
+  wizardComponent: ref(FermentWizard),
 };
 
 export default quickStart;

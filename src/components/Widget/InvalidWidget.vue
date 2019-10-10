@@ -12,7 +12,7 @@ export default class InvalidWidget extends WidgetBase {
 
 <template>
   <q-card dark class="text-white scroll">
-    <WidgetToolbar :title="widget.title" :subtitle="displayName">
+    <WidgetToolbar :crud="crud">
       <q-item-section side>
         <q-btn-dropdown flat label="Menu">
           <q-list dark bordered>

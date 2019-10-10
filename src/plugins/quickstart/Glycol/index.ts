@@ -15,7 +15,7 @@ ref(GlycolManualTask);
 const quickStart: QuickStart = {
   id: 'Glycol',
   displayName: 'Glycol-cooled fermenter',
-  wizard: ref(GlycolWizard),
+  wizardComponent: ref(GlycolWizard),
 };
 
 export default quickStart;

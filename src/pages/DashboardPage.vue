@@ -4,15 +4,16 @@ import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
-import { Dashboard, DashboardItem, dashboardStore } from '@/store/dashboards';
-import { featureStore } from '@/store/features';
+import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards';
+import { Crud, featureStore, WidgetContext } from '@/store/features';
 
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '../helpers/dashboards';
 
-interface ValidatedItem {
-  item: DashboardItem;
+interface ValidatedWidget {
+  id: string;
   component: string;
-  error?: Error;
+  crud: Crud;
+  error?: string;
 }
 
 @Component
@@ -20,6 +21,11 @@ export default class DashboardPage extends Vue {
   widgetEditable = false;
   menuModalOpen = false;
   wizardModalOpen = false;
+
+  context: WidgetContext = {
+    mode: 'Basic',
+    container: 'Dashboard',
+  }
 
   @Watch('dashboardId')
   onChangeDashboardId(): void {
@@ -46,38 +52,42 @@ export default class DashboardPage extends Vue {
     return dashboardStore.dashboardValues;
   }
 
-  get allItems(): DashboardItem[] {
-    return dashboardStore.itemValues;
+  get allItems(): PersistentWidget[] {
+    return dashboardStore.widgetValues;
   }
 
-  get items(): DashboardItem[] {
-    return dashboardStore.dashboardItemsByDashboardId(this.dashboardId)
+  get widgets(): PersistentWidget[] {
+    return dashboardStore.persistentWidgetsByDashboardId(this.dashboardId)
       .sort(objectSorter('order'));
   }
 
-  get validatedItems(): ValidatedItem[] {
-    return this.items
-      .map((item: DashboardItem) => {
+  get validatedWidgets(): ValidatedWidget[] {
+    return this.widgets
+      .map((widget: PersistentWidget) => {
+        const crud: Crud = {
+          widget,
+          isStoreWidget: true,
+          saveWidget: this.saveWidget,
+          closeDialog: () => { },
+        };
         try {
-          if (item.title === undefined) {
+          if (widget.title === undefined) {
             // ensure backwards compatibility
             // older items may not have a title
-            item.title = item.id;
+            widget.title = widget.id;
           }
-          const component = featureStore.widgetById(item.feature, item.config);
-          if (!component) {
-            throw new Error(`No widget found for ${item.feature}`);
-          }
-          const validator = featureStore.validatorById(item.feature);
-          if (!validator(item.config)) {
-            throw new Error(`${item.feature} validation failed`);
-          }
-          return { item, component };
+          const component = featureStore.widget(crud, true);
+          return {
+            id: widget.id,
+            component,
+            crud,
+          };
         } catch (e) {
           return {
-            item,
+            id: widget.id,
             component: 'InvalidWidget',
-            error: e.toString(),
+            crud,
+            error: e.message,
           };
         }
       });
@@ -90,23 +100,23 @@ export default class DashboardPage extends Vue {
   async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: string[]): Promise<void> {
     try {
       // Make a local change to the validated item, to avoid it jumping during the store round trip
-      const local = this.validatedItems.find(valItem => valItem.item.id === id);
+      const local = this.validatedWidgets.find(valItem => valItem.id === id);
       if (local) {
-        local.item.pinnedPosition = pinnedPosition;
+        local.crud.widget.pinnedPosition = pinnedPosition;
       }
-      await dashboardStore.saveDashboardItem({ ...dashboardStore.dashboardItemById(id), pinnedPosition });
-      await dashboardStore.updateDashboardItemOrder(order);
+      await dashboardStore.savePersistentWidget({ ...dashboardStore.persistentWidgetById(id), pinnedPosition });
+      await dashboardStore.updatePersistentWidgetOrder(order);
     } catch (e) {
       throw e;
     }
   }
 
   async onChangeSize(id: string, cols: number, rows: number): Promise<void> {
-    await dashboardStore.updateDashboardItemSize({ id, cols, rows });
+    await dashboardStore.updatePersistentWidgetSize({ id, cols, rows });
   }
 
-  public async saveWidget(widget: DashboardItem): Promise<void> {
-    await dashboardStore.saveDashboardItem(widget);
+  public async saveWidget(widget: PersistentWidget): Promise<void> {
+    await dashboardStore.savePersistentWidget(widget);
   }
 
   onIdChanged(oldId, newId): void {
@@ -180,14 +190,13 @@ export default class DashboardPage extends Vue {
         />
       </q-dialog>
       <q-list v-if="isMobile" no-border>
-        <q-item v-for="val in validatedItems" :key="val.item.id">
+        <q-item v-for="val in validatedWidgets" :key="val.id">
           <q-item-section>
             <component
               :is="val.component"
-              :disabled="widgetEditable"
-              :widget="val.item"
-              class="dashboard-item"
-              @update:widget="saveWidget"
+              :initial-crud="val.crud"
+              :context="context"
+              class="dashboard-widget"
             />
           </q-item-section>
         </q-item>
@@ -200,13 +209,12 @@ export default class DashboardPage extends Vue {
       >
         <component
           :is="val.component"
-          v-for="val in validatedItems"
-          :key="val.item.id"
-          :disabled="widgetEditable"
-          :widget="val.item"
+          v-for="val in validatedWidgets"
+          :key="val.id"
+          :initial-crud="val.crud"
+          :context="context"
           :error="val.error"
-          class="dashboard-item"
-          @update:widget="saveWidget"
+          class="bg-dark maximized"
         />
       </GridContainer>
     </div>
@@ -216,10 +224,4 @@ export default class DashboardPage extends Vue {
 <style lang="stylus" scoped>
 @import '../styles/quasar.variables.styl';
 @import '../styles/quasar.styl';
-
-.dashboard-item {
-  background: $block-background;
-  height: 100%;
-  width: 100%;
-}
 </style>

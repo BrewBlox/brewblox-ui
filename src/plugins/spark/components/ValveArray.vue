@@ -7,6 +7,7 @@ import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 
+import { mutate } from '../../../helpers/functional';
 import { typeName as valveType } from '../features/MotorValve/getters';
 import { MotorValveBlock } from '../features/MotorValve/types';
 import BlockCrudComponent from './BlockCrudComponent';
@@ -35,7 +36,7 @@ export default class ValveArray extends BlockCrudComponent {
   get claimedChannels(): { [channel: number]: string } {
     return sparkStore.blockValues(this.serviceId)
       .filter(block => block.type === valveType && block.data.hwDevice.id === this.block.id)
-      .reduce((acc, block: MotorValveBlock) => ({ ...acc, [block.data.startChannel]: block.id }), {});
+      .reduce((acc, block: MotorValveBlock) => mutate(acc, block.data.startChannel, block.id), {});
   }
 
   get channels(): EditableChannel[] {
@@ -149,14 +150,14 @@ export default class ValveArray extends BlockCrudComponent {
         />
       </q-item-section>
       <q-item-section side>
-        <BlockFormButton
+        <BlockDialogButton
           v-if="channel.driver"
           :block-id="channel.driver.id"
           :service-id="serviceId"
           flat
         >
           <q-tooltip>Configure valve</q-tooltip>
-        </BlockFormButton>
+        </BlockDialogButton>
         <q-btn v-else flat icon="add" @click="createActuator(channel)">
           <q-tooltip>Create new valve</q-tooltip>
         </q-btn>

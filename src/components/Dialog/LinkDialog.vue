@@ -116,14 +116,14 @@ export default class LinkDialog extends DialogBase {
           autofocus
           @input="updateLink"
         >
-          <template v-slot:no-option>
+          <template #no-option>
             <q-item dark>
               <q-item-section class="text-grey">
                 No results
               </q-item-section>
             </q-item>
           </template>
-          <template v-if="!noCreate" v-slot:after>
+          <template v-if="!noCreate" #after>
             <q-btn v-if="linkBlock" flat round icon="mdi-pencil" @click="edit">
               <q-tooltip>Edit {{ link.id }}</q-tooltip>
             </q-btn>

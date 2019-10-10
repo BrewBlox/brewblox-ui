@@ -55,7 +55,7 @@ export default class BuilderCatalog extends Vue {
     <q-item dark class="q-mb-md">
       <q-item-section>
         <q-input v-model="partFilter" placeholder="Search Parts" clearable dark autofocus>
-          <template v-slot:append>
+          <template #append>
             <q-icon name="search" />
           </template>
         </q-input>

@@ -2,7 +2,7 @@ import { Link } from '@/helpers/units';
 
 import { ConstraintsObj } from '../components/Constraints/ConstraintsBase';
 import { constraintLabels } from '../helpers';
-import { Block, BlockLink,Limiters } from '../types';
+import { Block, Limiters, RelationEdge } from '../types';
 
 export const calculateDrivenChains = (blocks: Block[]): string[][] => {
   const output: string[][] = [];
@@ -33,15 +33,17 @@ export const calculateDrivenChains = (blocks: Block[]): string[][] => {
         );
     };
 
-  return Object.keys(drivenBlocks)
-    .reduce((acc, k) => ([...acc, ...generateChains([], k)]), output);
+  Object.keys(drivenBlocks)
+    .forEach(key => { output.push(...generateChains([], key)); });
+
+  return output;
 };
 
-export const calculateBlockLinks = (blocks: Block[]): BlockLink[] => {
-  const linkArray: BlockLink[] = [];
+export const calculateRelations = (blocks: Block[]): RelationEdge[] => {
+  const linkArray: RelationEdge[] = [];
 
   const findRelations =
-    (source: string, relation: string[], val: any): BlockLink[] => {
+    (source: string, relation: string[], val: any): RelationEdge[] => {
       if (val instanceof Link) {
         if (val.id === null || source === 'DisplaySettings') {
           return linkArray;
@@ -59,6 +61,7 @@ export const calculateBlockLinks = (blocks: Block[]): BlockLink[] => {
               if (child[0].startsWith('driven')) {
                 return acc;
               }
+              // intentional copy of acc
               return [...acc, ...findRelations(source, [...relation, child[0]], child[1])];
             },
             linkArray
@@ -67,7 +70,7 @@ export const calculateBlockLinks = (blocks: Block[]): BlockLink[] => {
       return linkArray;
     };
 
-  const allLinks: BlockLink[] = [];
+  const allLinks: RelationEdge[] = [];
   for (const block of blocks) {
     allLinks.push(...findRelations(block.id, [], block.data));
   }

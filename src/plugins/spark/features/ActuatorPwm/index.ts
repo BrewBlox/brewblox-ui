@@ -1,12 +1,11 @@
-import { ref } from '@/helpers/component-ref';
 import { unitDurationString } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
-import { ActuatorDigitalLink } from '@/helpers/units/KnownLinks';
+import { Link, Unit } from '@/helpers/units';
 import GenericBlock from '@/plugins/spark/components/GenericBlock';
 import { Feature } from '@/store/features';
 
+import { interfaceTypes } from '../../block-types';
+import { blockWidgetSelector } from '../../helpers';
 import { BlockSpec } from '../../types';
-import form from './ActuatorPwmForm.vue';
 import widget from './ActuatorPwmWidget.vue';
 import { typeName } from './getters';
 import { ActuatorPwmData } from './types';
@@ -14,8 +13,8 @@ import { ActuatorPwmData } from './types';
 const block: BlockSpec = {
   id: typeName,
   generate: (): ActuatorPwmData => ({
-    actuatorId: new ActuatorDigitalLink(null),
-    drivenActuatorId: new ActuatorDigitalLink(null, true),
+    actuatorId: new Link(null, interfaceTypes.ActuatorDigital),
+    drivenActuatorId: new Link(null, interfaceTypes.ActuatorDigital, true),
     period: new Unit(4, 'second'),
     desiredSetting: 0,
     setting: 0,
@@ -61,7 +60,7 @@ const block: BlockSpec = {
       key: 'actuatorId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new ActuatorDigitalLink(null),
+      generate: () => new Link(null, interfaceTypes.ActuatorDigital),
     },
   ],
   graphTargets: {
@@ -75,8 +74,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'PWM',
   role: 'Output',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 3,
