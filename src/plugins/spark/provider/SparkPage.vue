@@ -7,6 +7,7 @@ import { Watch } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
+import { startResetBlocks } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockCrud, RelationNode, Spark, SystemStatus } from '@/plugins/spark/types';
 import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards';
@@ -34,6 +35,7 @@ interface ValidatedWidget {
 @Component
 export default class SparkPage extends Vue {
   capitalized = capitalized;
+  startResetBlocks = startResetBlocks;
 
   volatileWidgets: { [blockId: string]: PersistentWidget } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
@@ -343,29 +345,6 @@ export default class SparkPage extends Vue {
     });
   }
 
-  resetBlocks(): void {
-    createDialog({
-      title: 'Reset Blocks',
-      message: `This will remove all Blocks on ${this.service.id}. Are you sure?`,
-      dark: true,
-      noBackdropDismiss: true,
-      cancel: true,
-    })
-      .onOk(async () => {
-        await sparkStore.clearBlocks(this.service.id)
-          .then(() => this.$q.notify({
-            icon: 'mdi-check-all',
-            color: 'positive',
-            message: 'Removed all Blocks',
-          }))
-          .catch((e) => this.$q.notify({
-            icon: 'error',
-            color: 'negative',
-            message: `Failed to remove Blocks: ${e.toString()}`,
-          }));
-      });
-  }
-
   async cleanUnusedNames(): Promise<void> {
     const names = await sparkStore.cleanUnusedNames(this.service.id);
 
@@ -390,8 +369,16 @@ export default class SparkPage extends Vue {
     <portal to="toolbar-buttons">
       <q-btn-dropdown :disable="!isReady || statusNok" color="primary" label="actions">
         <q-list dark link>
-          <ActionItem icon="mdi-ray-start-arrow" label="Show Relations" @click="showRelations" />
-          <ActionItem icon="add" label="New Block" @click="startDialog('BlockWizardDialog')" />
+          <ActionItem
+            icon="mdi-ray-start-arrow"
+            label="Show Relations"
+            @click="showRelations"
+          />
+          <ActionItem
+            icon="add"
+            label="New Block"
+            @click="startDialog('BlockWizardDialog')"
+          />
           <ActionItem
             icon="mdi-magnify-plus-outline"
             label="Discover new OneWire Blocks"
@@ -407,7 +394,11 @@ export default class SparkPage extends Vue {
             label="Update firmware"
             @click="startDialog('FirmwareUpdateDialog')"
           />
-          <ActionItem icon="wifi" label="Configure Wifi" @click="startDialog('SparkWifiMenu')" />
+          <ActionItem
+            icon="wifi"
+            label="Configure Wifi"
+            @click="startDialog('SparkWifiMenu')"
+          />
           <ActionItem
             icon="mdi-checkbox-multiple-marked"
             label="Groups"
@@ -428,7 +419,11 @@ export default class SparkPage extends Vue {
             label="Create Mock Blocks"
             @click="startDialog('CreateMockMenu')"
           />
-          <ActionItem icon="delete" label="Remove all Blocks" @click="resetBlocks" />
+          <ActionItem
+            icon="delete"
+            label="Remove all Blocks"
+            @click="startResetBlocks(service.id)"
+          />
         </q-list>
       </q-btn-dropdown>
     </portal>
