@@ -251,7 +251,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
   return [
     {
       id: uid(),
-      title: `${config.prefix} Fridge Layout`,
+      title: `${config.title} Layout`,
       width: 6,
       height: 10,
       parts: [
@@ -377,7 +377,6 @@ export const defineWidgets = (
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
     config: {
-      currentToolId: 'config',
       currentLayoutId: layouts[0].id,
       layoutIds: layouts.map(l => l.id),
     },

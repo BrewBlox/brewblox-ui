@@ -14,6 +14,7 @@ import {
   truncateRound,
   unitDurationString,
 } from '@/helpers/functional';
+import { saveFile } from '@/helpers/import-export';
 import { Link, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { Crud, WidgetSelector } from '@/store/features';
@@ -82,16 +83,51 @@ export const blockWidgetSelector = (component: VueConstructor): WidgetSelector =
   };
 };
 
-export const resetBlocks = async (serviceId: string, restoreDiscovered: boolean): Promise<void> => {
+export const resetBlocks = async (serviceId: string, opts: { restore: boolean; download: boolean }): Promise<void> => {
   try {
     const addresses: Mapped<string> = {};
+    const linkedTypes = [
+      blockTypes.DigitalActuator,
+      blockTypes.MotorValve,
+    ];
     const addressedTypes = [
       blockTypes.TempSensorOneWire,
       blockTypes.DS2408,
       blockTypes.DS2413,
     ];
 
-    if (restoreDiscovered) {
+    if (opts.download) {
+      const linked: string[] = [];
+      const addressed: string[] = [];
+
+      sparkStore.blockValues(serviceId)
+        .forEach(block => {
+          if (linkedTypes.includes(block.type)) {
+            const { hwDevice, channel } = block.data;
+            if (!hwDevice.id || !channel) { return; }
+            const target = sparkStore.blockById(serviceId, block.data.hwDevice.id);
+            const [name] = Object.keys(target.data.pins[channel]);
+            linked.push(`${block.id}: ${target.id} ${name}`);
+          }
+
+          if (addressedTypes.includes(block.type)) {
+            addressed.push(`${block.id}: ${block.data.address}`);
+          }
+
+        });
+
+      const lines = [
+        `Service: ${serviceId}`,
+        `Date: ${new Date().toLocaleString()}`,
+        '\n[Actuators]',
+        ...linked,
+        '\n[OneWire addresses]',
+        ...addressed,
+      ];
+      saveFile(lines.join('\n'), `spark-hardware-${serviceId}.txt`, true);
+    }
+
+    if (opts.restore) {
       sparkStore.blockValues(serviceId)
         .filter(block => addressedTypes.includes(block.type) && !block.id.startsWith('New|'))
         .forEach(block => addresses[block.data.address] = block.id);
@@ -101,7 +137,7 @@ export const resetBlocks = async (serviceId: string, restoreDiscovered: boolean)
     await sparkStore.fetchDiscoveredBlocks(serviceId);
     await sparkStore.fetchBlocks(serviceId);
 
-    if (restoreDiscovered) {
+    if (opts.restore) {
       const renameArgs: [string, string, string][] = sparkStore.blockValues(serviceId)
         .filter(block => addressedTypes.includes(block.type) && !!addresses[block.data.address])
         .map(block => [serviceId, block.id, addresses[block.data.address]]);
@@ -111,7 +147,7 @@ export const resetBlocks = async (serviceId: string, restoreDiscovered: boolean)
     Notify.create({
       icon: 'mdi-check-all',
       color: 'positive',
-      message: 'Removed all Blocks' + (restoreDiscovered ? ', and restored discovered blocks' : ''),
+      message: 'Removed all Blocks' + (opts.restore ? ', and restored discovered blocks' : ''),
     });
   } catch (e) {
     Notify.create({
@@ -131,9 +167,15 @@ export const startResetBlocks = (serviceId: string): void => {
     cancel: true,
     options: {
       type: 'checkbox',
-      items: [{ label: 'Restore names of discovered blocks', value: 0 }],
-      model: [0], // pre-check default actions
+      items: [
+        { label: 'Remember names of discovered blocks', value: 0 },
+        { label: 'Create text file with actuator/sensor info', value: 1 },
+      ],
+      model: [0, 1], // pre-check default actions
     },
   })
-    .onOk((selected: number[]) => resetBlocks(serviceId, selected.includes(0)));
+    .onOk((selected: number[]) => resetBlocks(serviceId, {
+      restore: selected.includes(0),
+      download: selected.includes(1),
+    }));
 };

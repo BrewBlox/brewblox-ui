@@ -362,8 +362,7 @@ export default class StepViewFull extends CrudComponent {
                           <q-btn
                             :color="change.confirmed[key] ? 'primary' : ''"
                             flat
-                            round
-                            icon="mdi-account-question"
+                            icon="mdi-comment-question"
                             @click="toggleConfirmation(change, key)"
                           >
                             <q-tooltip>Edit value when the Step is applied.</q-tooltip>

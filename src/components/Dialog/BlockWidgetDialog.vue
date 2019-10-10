@@ -35,7 +35,7 @@ export default class BlockWidgetDialog extends DialogBase {
 
   get widget(): PersistentWidget {
     return this.localWidget || {
-      id: uid(),
+      id: this.id,
       title: this.blockId,
       feature: this.blockType,
       dashboard: '',

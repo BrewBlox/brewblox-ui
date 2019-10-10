@@ -162,12 +162,6 @@ export default class DefaultLayout extends Vue {
         </q-item>
 
         <q-separator dark />
-        <ActionItem icon="mdi-creation" label="Wizardry" @click="openWizard(null)" />
-        <q-separator dark />
-        <ActionItem icon="mdi-puzzle" label="Plugins" @click="showPlugins" />
-        <q-separator dark />
-        <ActionItem icon="mdi-pipe" label="Brewery Builder" @click="showBuilderEditor" />
-        <q-separator dark />
 
         <q-item dark class="q-pb-none">
           <q-item-section avatar>
@@ -309,19 +303,35 @@ export default class DefaultLayout extends Vue {
         </draggable>
       </q-list>
 
-      <q-btn-dropdown text-color="white" icon="mdi-bug-outline" class="bottomed">
-        <q-list dark bordered>
-          <q-item dark>
-            <q-item-section>
-              <q-item-label caption>
-                Version
-              </q-item-label>
-              {{ version }}
-            </q-item-section>
-          </q-item>
-          <ExportErrorsAction />
-        </q-list>
-      </q-btn-dropdown>
+      <q-separator dark />
+      <ActionItem icon="mdi-creation" label="Wizardry" @click="openWizard(null)" />
+      <q-separator dark />
+      <ActionItem icon="mdi-pipe" label="Brewery Builder" @click="showBuilderEditor" />
+
+      <q-item class="bottomed">
+        <q-item-section class="col-auto">
+          <q-btn flat text-color="white" icon="mdi-puzzle" @click="showPlugins">
+            <q-tooltip>
+              Plugins
+            </q-tooltip>
+          </q-btn>
+        </q-item-section>
+        <q-item-section class="col-auto">
+          <q-btn-dropdown text-color="white" icon="mdi-bug-outline">
+            <q-list dark bordered>
+              <q-item dark>
+                <q-item-section>
+                  <q-item-label caption>
+                    Version
+                  </q-item-label>
+                  {{ version }}
+                </q-item-section>
+              </q-item>
+              <ExportErrorsAction />
+            </q-list>
+          </q-btn-dropdown>
+        </q-item-section>
+      </q-item>
     </q-drawer>
 
     <q-dialog v-model="wizardModalOpen" no-backdrop-dismiss>
