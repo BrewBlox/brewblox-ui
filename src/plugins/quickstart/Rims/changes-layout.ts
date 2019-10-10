@@ -8,7 +8,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
   return [
     {
       id: uid(),
-      title: 'RIMS Kettle',
+      title: `${config.title} Layout`,
       width: 12,
       height: 12,
       parts: [
