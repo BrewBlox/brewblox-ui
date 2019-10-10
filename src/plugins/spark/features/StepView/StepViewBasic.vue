@@ -4,22 +4,28 @@ import { Component } from 'vue-property-decorator';
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { deepCopy } from '@/helpers/units/parseObject';
-import { deserialize, isSubSet, serialize } from '@/helpers/units/parseObject';
+import { deserialize, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, ChangeField } from '@/plugins/spark/types';
 
 import { BlockChange, Step } from './types';
 
-interface ChangeDiff {
+interface FieldDiff {
   key: string;
   oldV: string;
   newV: string;
   changed: boolean;
 }
 
-interface StepDiff {
-  id: string;
-  diff: ChangeDiff[];
+interface BlockDiff {
+  blockId: string;
+  diffs: FieldDiff[];
+}
+
+interface StepDisplay extends Step {
+  applicable: boolean;
+  active: boolean;
+  diffs: BlockDiff[];
 }
 
 @Component
@@ -52,16 +58,20 @@ export default class StepViewBasic extends CrudComponent {
         {});
   }
 
-  get activeSteps(): Record<string, boolean> {
+  get stepDisplays(): StepDisplay[] {
+    const blockIds = sparkStore.blockIds(this.serviceId);
     return this.steps
-      .reduce(
-        (acc, step) => {
-          acc[step.id] = this.applicableSteps[step.id]
-            && step.changes.every(change =>
-              isSubSet(change.data, sparkStore.blockById(this.serviceId, change.blockId).data));
-          return acc;
-        },
-        {});
+      .map(step => {
+        const applicable = step.changes.every(change => blockIds.includes(change.blockId));
+        const diffs = applicable ? step.changes.map(this.blockDiff) : [];
+        const active = applicable && diffs.every(bdiff => bdiff.diffs.every(fdiff => !fdiff.changed));
+        return {
+          ...step,
+          applicable,
+          diffs,
+          active,
+        };
+      });
   }
 
   confirmStepChange(block: Block, key: string, value: any): Promise<any> {
@@ -136,28 +146,25 @@ export default class StepViewBasic extends CrudComponent {
     });
   }
 
-  changeDiff(change: BlockChange): ChangeDiff[] {
+  blockDiff(change: BlockChange): BlockDiff {
     const block = sparkStore.blockById(this.serviceId, change.blockId);
     const spec = sparkStore.specs[block.type];
-    return Object.entries(change.data)
-      .map(([key, val]) => {
-        const specChange: any = spec.changes.find(s => s.key === key) || {};
-        const pretty = specChange.pretty || (v => `${v}`);
-        const oldV = pretty(block.data[key]);
-        const newV = pretty(val);
-        return {
-          key: specChange.title || key,
-          oldV,
-          newV,
-          changed: oldV !== newV,
-        };
-      });
-  }
+    const diffs =
+      Object.entries(change.data)
+        .map(([key, val]) => {
+          const specChange: any = spec.changes.find(s => s.key === key) || {};
+          const pretty = specChange.pretty || (v => `${v}`);
+          const oldV = pretty(block.data[key]);
+          const newV = pretty(val);
+          return {
+            key: specChange.title || key,
+            oldV,
+            newV,
+            changed: oldV !== newV,
+          };
+        });
 
-  stepDiff(step: Step): StepDiff[] {
-    return step.changes.map(change => {
-      return { id: change.blockId, diff: this.changeDiff(change) };
-    });
+    return { blockId: change.blockId, diffs };
   }
 }
 </script>
@@ -168,29 +175,29 @@ export default class StepViewBasic extends CrudComponent {
     <slot name="warnings" />
 
     <q-card-section>
-      <q-item v-for="step in steps" :key="step.id" dark>
+      <q-item v-for="step in stepDisplays" :key="step.id" dark>
         <q-item-section>
           {{ step.name }}
           <q-item-label caption>
             {{ step.changes.length }} Blocks changed
           </q-item-label>
-          <q-tooltip v-if="applicableSteps[step.id]">
+          <q-tooltip v-if="step.applicable">
             <q-list dark dense>
-              <q-item v-for="cdiff in stepDiff(step)" :key="`cdiff-${cdiff.id}`" dark>
+              <q-item v-for="bdiff in step.diffs" :key="`bdiff-${step.id}-${bdiff.blockId}`" dark>
                 <q-item-section class="col-3">
-                  {{ cdiff.id }}
+                  {{ bdiff.blockId }}
                 </q-item-section>
                 <q-item-section>
                   <ul>
-                    <li v-for="item in cdiff.diff" :key="`diff-item-${item.key}`">
-                      {{ item.key }}:
-                      <template v-if="item.changed">
-                        <span style="color: red">{{ item.oldV }}</span>
+                    <li v-for="fdiff in bdiff.diffs" :key="`fdiff-${step.id}-${bdiff.blockId}-${fdiff.key}`">
+                      {{ fdiff.key }}:
+                      <template v-if="fdiff.changed">
+                        <span style="color: red">{{ fdiff.oldV }}</span>
                         =>
-                        <span style="color: lime">{{ item.newV }}</span>
+                        <span style="color: lime">{{ fdiff.newV }}</span>
                       </template>
                       <template v-else>
-                        {{ item.newV }}
+                        {{ fdiff.newV }}
                       </template>
                     </li>
                   </ul>
@@ -207,14 +214,14 @@ export default class StepViewBasic extends CrudComponent {
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn
-            :disable="!applicableSteps[step.id]"
+            :disable="!step.applicable"
             :loading="applying"
-            :color="activeSteps[step.id] ? 'positive': ''"
-            :label="activeSteps[step.id] ? 'active': 'apply'"
+            :color="step.active ? 'positive': ''"
+            :label="step.active ? 'active': 'apply'"
             outline
             @click="applyStep(step)"
           >
-            <q-tooltip v-if="activeSteps[step.id]">
+            <q-tooltip v-if="step.active">
               Step is applied
             </q-tooltip>
           </q-btn>

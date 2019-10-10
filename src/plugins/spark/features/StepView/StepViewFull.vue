@@ -359,13 +359,14 @@ export default class StepViewFull extends CrudComponent {
                           />
                         </q-item-section>
                         <q-item-section side>
-                          <ToggleButton
-                            :colored="false"
-                            :value="change.confirmed[key]"
-                            @input="toggleConfirmation(change, key)"
+                          <q-btn
+                            :color="change.confirmed[key] ? 'primary' : ''"
+                            flat
+                            icon="mdi-comment-question"
+                            @click="toggleConfirmation(change, key)"
                           >
                             <q-tooltip>Edit value when the Step is applied.</q-tooltip>
-                          </ToggleButton>
+                          </q-btn>
                         </q-item-section>
                         <q-item-section side>
                           <q-btn flat round icon="mdi-close" @click="removeField(change, key)">
