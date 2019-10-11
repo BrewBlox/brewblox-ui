@@ -56,7 +56,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
     createDialog({
       component: 'BlockWizardDialog',
       serviceId: this.config.serviceId,
-      root: this.$root,
+      parent: this,
     });
   }
 

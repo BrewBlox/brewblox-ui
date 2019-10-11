@@ -312,7 +312,7 @@ export default class SparkPage extends Vue {
     };
     createDialog({
       component,
-      root: this.$root,
+      parent: this,
       ...args,
     });
   }

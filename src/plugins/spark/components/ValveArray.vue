@@ -111,7 +111,7 @@ export default class ValveArray extends BlockCrudComponent {
   createActuator(channel: EditableChannel): void {
     createDialog({
       component: 'BlockWizardDialog',
-      root: this.$root,
+      parent: this,
       serviceId: this.serviceId,
       initialFeature: valveType,
     })

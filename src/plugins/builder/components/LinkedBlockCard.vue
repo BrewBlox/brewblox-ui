@@ -94,7 +94,7 @@ export default class LinkedBlockCard extends PartCard {
   createBlock(serviceId: string): void {
     createDialog({
       component: 'BlockWizardDialog',
-      root: this.$root,
+      parent: this,
       serviceId,
       filter: feat => !this.compatibleTypes || this.compatibleTypes.includes(feat),
     })
@@ -109,7 +109,7 @@ export default class LinkedBlockCard extends PartCard {
     } else {
       createDialog({
         component: 'SelectDialog',
-        root: this.$root,
+        parent: this,
         title: 'Pick a Service',
         value: this.sparkServices[0].id,
         selectOptions: this.sparkServices.map(svc => svc.id),

@@ -65,7 +65,7 @@ export default class DefaultLayout extends Vue {
 
   removeService(service: Service): void {
     createDialog({
-      root: this.$root,
+      parent: this,
       title: 'Remove service',
       message: `Are you sure you want to remove ${service.title}?`,
       dark: true,
@@ -77,7 +77,7 @@ export default class DefaultLayout extends Vue {
 
   changeServiceTitle(service: Service): void {
     createDialog({
-      root: this.$root,
+      parent: this,
       title: 'Change service Title',
       message: "Change your service's display name",
       dark: true,
@@ -113,14 +113,14 @@ export default class DefaultLayout extends Vue {
 
   showPlugins(): void {
     createDialog({
-      root: this.$root,
+      parent: this,
       component: 'PluginDialog',
     });
   }
 
   showBuilderEditor(): void {
     createDialog({
-      root: this.$root,
+      parent: this,
       component: 'BuilderEditor',
     });
   }

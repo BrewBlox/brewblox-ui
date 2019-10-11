@@ -126,7 +126,7 @@ export default class BlockCrudComponent extends CrudComponent {
   public startChangeBlockId(): void {
     const blockId = this.blockId;
     createDialog({
-      root: this.$root,
+      parent: this,
       component: 'InputDialog',
       title: 'Change Block name',
       message: `Choose a new name for '${this.blockId}'`,
@@ -141,7 +141,7 @@ export default class BlockCrudComponent extends CrudComponent {
 
   public startSwitchBlock(): void {
     createDialog({
-      root: this.$root,
+      parent: this,
       component: 'BlockSelectDialog',
       title: 'Choose a Block',
       message: 'You can change the Block that will be displayed by this widget',
@@ -153,7 +153,7 @@ export default class BlockCrudComponent extends CrudComponent {
 
   public startBlockInfo(): void {
     createDialog({
-      root: this.$root,
+      parent: this,
       component: 'BlockInfoDialog',
       block: this.block,
     });
@@ -161,7 +161,7 @@ export default class BlockCrudComponent extends CrudComponent {
 
   public startRemoveBlock(): void {
     createDialog({
-      root: this.$root,
+      parent: this,
       title: 'Remove Block',
       message: `Are you sure you want to remove ${this.block.id}?`,
       cancel: true,
