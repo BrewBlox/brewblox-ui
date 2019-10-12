@@ -8,9 +8,9 @@ import { saveFile } from '@/helpers/import-export';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { dashboardStore } from '@/store/dashboards';
 
-import { defaultLayoutHeight, defaultLayoutWidth } from './getters';
-import { builderStore } from './store';
-import { BuilderItem, BuilderLayout, PersistentPart } from './types';
+import { defaultLayoutHeight, defaultLayoutWidth } from '../getters';
+import { builderStore } from '../store';
+import { BuilderItem, BuilderLayout, PersistentPart } from '../types';
 
 
 @Component
@@ -19,12 +19,14 @@ export default class LayoutActions extends Vue {
   @Prop({ type: Object, default: null })
   public readonly layout!: BuilderLayout | null;
 
-  changeActiveId(layoutId: string | null): void {
-    this.$emit('change-id', layoutId);
-  }
+  @Prop({ type: Function, required: true })
+  public readonly saveParts!: (parts: PersistentPart[]) => Promise<void>;
 
-  saveParts(parts: PersistentPart[]): void {
-    this.$emit('parts', parts);
+  @Prop({ type: Function, required: true })
+  public readonly selectLayout!: (id: string | null) => void;
+
+  get layoutIds(): string[] {
+    return builderStore.layoutIds;
   }
 
   startAddLayout(copy: boolean): void {
@@ -47,7 +49,7 @@ export default class LayoutActions extends Vue {
           height: copy && this.layout ? this.layout.height : defaultLayoutHeight,
           parts: copy && this.layout ? deepCopy(this.layout.parts) : [],
         });
-        this.changeActiveId(id);
+        this.selectLayout(id);
       });
   }
 
@@ -56,7 +58,7 @@ export default class LayoutActions extends Vue {
     showImportDialog<BuilderLayout>(async layout => {
       const id = uid();
       await builderStore.createLayout({ ...layout, id });
-      this.changeActiveId(id);
+      this.selectLayout(id);
     });
   }
 
@@ -117,10 +119,8 @@ export default class LayoutActions extends Vue {
           await builderStore.removeLayout(this.layout)
             .catch(() => { });
         }
-        this.changeActiveId(null);
-        // this.layoutId = this.layouts.length > 0
-        //   ? this.layouts[0].id
-        //   : null;
+        const [id] = this.layoutIds;
+        this.selectLayout(id || null);
       });
   }
 

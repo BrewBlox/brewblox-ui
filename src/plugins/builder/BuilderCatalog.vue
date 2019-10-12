@@ -1,6 +1,5 @@
 <script lang="ts">
 import { uid } from 'quasar';
-import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
@@ -29,8 +28,8 @@ export default class BuilderCatalog extends DialogBase {
       .map(type => ({
         type,
         id: uid(),
-        x: -100,
-        y: -100,
+        x: 0,
+        y: 0,
         rotate: 0,
         settings: {},
         flipped: false,
