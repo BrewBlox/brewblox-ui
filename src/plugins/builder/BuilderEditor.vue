@@ -26,21 +26,21 @@ interface SelectArea extends XYPosition {
   height: number;
 }
 
-interface UserAction {
+interface EditorAction {
   label: string;
   value: string;
   icon: string;
 }
 
-interface ActionMode extends UserAction {
+interface ActionMode extends EditorAction {
   cursor: (part: FlowPart) => boolean;
   onClick?: (evt: ClickEvent, part: FlowPart) => void;
   onPan?: (args: PanArguments, part: FlowPart) => void;
 }
 
-interface ActionTool extends UserAction {
+interface ActionTool extends EditorAction {
   shortcut: string;
-  onActivate: (parts: PersistentPart[]) => void;
+  use: (parts: PersistentPart[]) => void;
 }
 
 @Component({
@@ -66,6 +66,7 @@ export default class BuilderEditor extends DialogBase {
   floatingSelection = false;
   selectedParts: FlowPart[] = [];
   hoverPos: XYPosition | null = null;
+  cardFocused = true;
 
   floater: Floater | null = null;
   configuredPartId: string | null = null;
@@ -74,6 +75,9 @@ export default class BuilderEditor extends DialogBase {
 
   @Ref()
   readonly grid!: any;
+
+  @Ref()
+  readonly card!: any;
 
   @Prop({ type: String })
   public readonly initialLayout!: string | null;
@@ -119,56 +123,56 @@ export default class BuilderEditor extends DialogBase {
       value: 'add',
       icon: 'add',
       shortcut: 'n',
-      onActivate: this.startAddPart,
+      use: this.useAdd,
     },
     {
       label: 'Move',
       value: 'move',
       icon: 'mdi-cursor-move',
       shortcut: 'm',
-      onActivate: this.startMove,
+      use: this.useMove,
     },
     {
       label: 'Copy',
       value: 'copy',
       icon: 'file_copy',
       shortcut: 'c',
-      onActivate: this.startCopy,
+      use: this.useCopy,
     },
     {
       label: 'Rotate',
       value: 'rotate-right',
       icon: 'mdi-rotate-right-variant',
       shortcut: 'r',
-      onActivate: this.startRotate,
+      use: this.useRotate,
     },
     {
       label: 'Flip',
       value: 'flip',
       icon: 'mdi-swap-horizontal-bold',
       shortcut: 'f',
-      onActivate: this.startFlip,
+      use: this.useFlip,
     },
     {
       label: 'Edit Settings',
       value: 'config',
       icon: 'settings',
       shortcut: 'e',
-      onActivate: this.startEdit,
+      use: this.useEdit,
     },
     {
       label: 'Interact',
       value: 'interact',
       icon: 'mdi-cursor-default',
       shortcut: 'i',
-      onActivate: this.startInteract,
+      use: this.useInteract,
     },
     {
       label: 'Delete',
       value: 'delete',
       icon: 'delete',
       shortcut: 'd',
-      onActivate: this.startDelete,
+      use: this.useDelete,
     },
   ]
 
@@ -508,7 +512,7 @@ export default class BuilderEditor extends DialogBase {
   // Tools
   ////////////////////////////////////////////////////////////////
 
-  startAddPart(): void {
+  useAdd(): void {
     if (!this.floater) {
       createDialog({
         parent: this,
@@ -524,7 +528,7 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  startMove(parts: PersistentPart[]): void {
+  useMove(parts: PersistentPart[]): void {
     if (this.floater) {
       this.dropFloater(this.hoverPos, false);
     }
@@ -543,7 +547,7 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  startCopy(parts: PersistentPart[]): void {
+  useCopy(parts: PersistentPart[]): void {
     if (this.floater) {
       this.dropFloater(this.hoverPos, false);
     }
@@ -563,7 +567,7 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  startRotate(parts: PersistentPart[]): void {
+  useRotate(parts: PersistentPart[]): void {
     if (this.floater) {
       if (this.floater.parts.length === 1) {
         const [part] = this.floater.parts;
@@ -576,7 +580,7 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  startFlip(parts: PersistentPart[]): void {
+  useFlip(parts: PersistentPart[]): void {
     if (this.floater) {
       if (this.floater.parts.length === 1) {
         const [part] = this.floater.parts;
@@ -589,14 +593,14 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  startEdit(parts: PersistentPart[]): void {
+  useEdit(parts: PersistentPart[]): void {
     if (!this.floater && parts.length === 1) {
       this.configuredPartId = parts[0].id;
       this.menuDialogOpen = true;
     }
   }
 
-  startInteract(parts: PersistentPart[]): void {
+  useInteract(parts: PersistentPart[]): void {
     if (!this.floater && parts.length === 1) {
       const [part] = parts;
       const handler = builderStore.spec(part).interactHandler;
@@ -604,7 +608,7 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  startDelete(parts: PersistentPart[]): void {
+  useDelete(parts: PersistentPart[]): void {
     if (!this.floater && parts.length) {
       const ids = parts.map(p => p.id);
       this.saveParts([...this.parts.filter(p => !ids.includes(p.id))]);
@@ -642,8 +646,6 @@ export default class BuilderEditor extends DialogBase {
   }
 
   keyHandler(evt: KeyboardEvent): void {
-    if (this.menuDialogOpen) { return; }
-
     const key = evt.key.toLowerCase();
     const tool = this.tools.find(t => t.shortcut === key);
 
@@ -656,7 +658,7 @@ export default class BuilderEditor extends DialogBase {
       if (key === 'y') { this.redo(); };
     }
     else if (tool) {
-      tool.onActivate(this.findActionParts());
+      tool.use(this.findActionParts());
     }
     else {
       return; // not handled - don't stop propagation
@@ -677,7 +679,6 @@ export default class BuilderEditor extends DialogBase {
 
   created(): void {
     builderStore.commitEditorActive(true);
-    window.addEventListener('keyup', this.keyHandler);
     this.debouncedCalculate = debounce(this.calculate, 150, false);
     this.debouncedCalculate();
   }
@@ -688,12 +689,15 @@ export default class BuilderEditor extends DialogBase {
         this.grid.addEventListener('mouseenter', this.onGridMove);
         this.grid.addEventListener('mousemove', this.onGridMove);
         this.grid.addEventListener('mouseleave', this.onGridLeave);
+        this.card.$el.addEventListener('keyup', this.keyHandler);
+        this.card.$el.addEventListener('blur', () => { this.cardFocused = false; });
+        this.card.$el.addEventListener('focus', () => { this.cardFocused = true; });
+        this.card.$el.focus();
       }
     });
   }
 
   destroyed(): void {
-    window.removeEventListener('keyup', this.keyHandler);
     builderStore.commitEditorActive(false);
   }
 }
@@ -701,11 +705,60 @@ export default class BuilderEditor extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" maximized no-esc-dismiss @hide="onDialogHide">
-    <q-card ref="card" class="maximized bg-dark" dark>
+    <q-card ref="card" class="maximized bg-dark editor-card" tabindex="-1" dark>
       <DialogToolbar>
-        <q-item-section>
-          <q-item-label>Brewery Builder Editor</q-item-label>
-        </q-item-section>
+        Brewery Builder Editor
+        <q-space />
+        <div class="row">
+          <q-btn-dropdown
+            :label="layout ? layout.title : 'None'"
+            flat
+            no-caps
+            icon="widgets"
+            class="col"
+            size="md"
+          >
+            <q-list dark bordered>
+              <q-list dark>
+                <ActionItem
+                  v-for="lo in layouts"
+                  :key="lo.id"
+                  :label="lo.title"
+                  :active="layout && lo.id === layout.id"
+                  icon="mdi-view-dashboard-outline"
+                  @click="layoutId = lo.id"
+                />
+              </q-list>
+            </q-list>
+          </q-btn-dropdown>
+        </div>
+        <template #buttons>
+          <q-btn
+            :disable="!history.length"
+            flat
+            icon="mdi-undo"
+            class="col-auto"
+            @click="undo"
+          >
+            <q-tooltip v-if="history.length">
+              Undo (ctrl-Z)
+            </q-tooltip>
+          </q-btn>
+          <q-btn
+            :disable="!undoneHistory.length"
+            flat
+            icon="mdi-redo"
+            class="col-auto"
+            @click="redo"
+          >
+            <q-tooltip v-if="undoneHistory.length">
+              Redo (ctrl-Y)
+            </q-tooltip>
+          </q-btn>
+          <q-btn-dropdown flat icon="mdi-menu" class="col-auto">
+            <LayoutActions :layout="layout" :select-layout="v => layoutId = v" :save-parts="saveParts" />
+          </q-btn-dropdown>
+        </template>
       </DialogToolbar>
 
       <q-dialog v-model="menuDialogOpen" no-backdrop-dismiss>
@@ -742,7 +795,7 @@ export default class BuilderEditor extends DialogBase {
               :icon="tool.icon"
               :label="tool.label"
               no-close
-              @click="tool.onActivate(findActionParts())"
+              @click="tool.use(findActionParts())"
             >
               <q-item-section side class="text-uppercase">
                 {{ tool.shortcut }}
@@ -788,68 +841,23 @@ export default class BuilderEditor extends DialogBase {
         <!-- Fills space not taken by the sidebar -->
         <div class="col row justify-center no-wrap">
           <div class="col-auto column no-wrap" style="max-height: 90vh">
-            <!-- Layout dropdown -->
-            <div class="row q-mb-sm">
-              <q-btn-dropdown
-                :label="layout ? layout.title : 'None'"
-                flat
-                no-caps
-                icon="widgets"
-                class="col"
-              >
-                <q-list dark bordered>
-                  <ActionItem
-                    v-for="lo in layouts"
-                    :key="lo.id"
-                    :label="lo.title"
-                    :active="layout && lo.id === layout.id"
-                    icon="mdi-view-dashboard-outline"
-                    @click="layoutId = lo.id"
-                  />
-                </q-list>
-              </q-btn-dropdown>
-              <q-btn
-                :disable="!history.length"
-                flat
-                icon="mdi-undo"
-                class="col-auto"
-                @click="undo"
-              >
-                <q-tooltip v-if="history.length">
-                  Undo (ctrl-Z)
-                </q-tooltip>
-              </q-btn>
-              <q-btn
-                :disable="!undoneHistory.length"
-                flat
-                icon="mdi-redo"
-                class="col-auto"
-                @click="redo"
-              >
-                <q-tooltip v-if="undoneHistory.length">
-                  Redo (ctrl-Y)
-                </q-tooltip>
-              </q-btn>
-              <q-btn-dropdown flat icon="settings" class="col-auto">
-                <LayoutActions :layout="layout" :select-layout="v => layoutId = v" :save-parts="saveParts" />
-              </q-btn-dropdown>
-            </div>
             <!-- Grid wrapper -->
             <div class="col column no-wrap scroll maximized">
               <div
                 v-if="!!layout"
                 v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, null)"
-                :style="`
-                width: ${squares(layout.width)}px;
-                height: ${squares(layout.height)}px;`"
+                :style="{
+                  width: `${squares(layout.width)}px`,
+                  height: `${squares(layout.height)}px`,
+                }"
                 class="q-mb-md"
               >
-                <!-- No modes have a pan handler for non-part grid squares -->
                 <svg
                   ref="grid"
                   class="grid-base grid-editable"
                   @click="v => clickHandler(v, null)"
                 >
+                  <!-- Coordinate numbers -->
                   <text
                     v-for="x in layout.width"
                     :key="`edge-x-${x}`"
@@ -866,6 +874,7 @@ export default class BuilderEditor extends DialogBase {
                     fill="white"
                     class="grid-square-text"
                   >{{ y-1 }}</text>
+                  <!-- All parts, hidden if selected or floating -->
                   <g
                     v-for="part in flowParts"
                     v-show="!isBusy(part)"
@@ -882,6 +891,7 @@ export default class BuilderEditor extends DialogBase {
                       @dirty="debouncedCalculate"
                     />
                   </g>
+                  <!-- Floating parts -->
                   <g v-if="floater" :transform="`translate(${squares(floater.x)}, ${squares(floater.y)})`">
                     <g
                       v-for="part in floater.parts"
@@ -892,6 +902,7 @@ export default class BuilderEditor extends DialogBase {
                       <PartWrapper :part="part" selected />
                     </g>
                   </g>
+                  <!-- Selected parts -->
                   <template v-else>
                     <g
                       v-for="part in selectedParts"
@@ -903,6 +914,7 @@ export default class BuilderEditor extends DialogBase {
                       <PartWrapper :part="part" selected />
                     </g>
                   </template>
+                  <!-- Overlap indicators -->
                   <g
                     v-for="([coord, val], idx) in overlaps"
                     :key="idx"
@@ -916,6 +928,7 @@ export default class BuilderEditor extends DialogBase {
                       class="grid-square-text"
                     >{{ val }}</text>
                   </g>
+                  <!-- Selection area -->
                   <rect
                     v-if="selectArea"
                     v-bind="unflippedArea(selectArea)"
@@ -927,6 +940,9 @@ export default class BuilderEditor extends DialogBase {
                 </svg>
               </div>
             </div>
+            <div v-if="!cardFocused" class="text-center text-h6 text-red">
+              Click anywhere to enable keyboard shortcuts.
+            </div>
           </div>
         </div>
       </q-card-section>
@@ -936,4 +952,13 @@ export default class BuilderEditor extends DialogBase {
 
 <style lang="stylus" scoped>
 @import './grid.styl';
+
+.editor-card {
+  border: 2px solid red;
+  outline: none;
+}
+
+.editor-card:focus-within {
+  border: 0;
+}
 </style>
