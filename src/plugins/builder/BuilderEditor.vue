@@ -239,6 +239,20 @@ export default class BuilderEditor extends DialogBase {
     builderStore.commitEditorMode(tool.value);
   }
 
+  async selectLayout(id: string | null): Promise<void> {
+    this.layoutId = id;
+    await this.$nextTick();
+    this.card.$el.focus();
+    this.checkFocus();
+  }
+
+  checkFocus(): void {
+    this.$nextTick(() => {
+      const el = document.querySelector('.editor-card:focus-within');
+      this.cardFocused = (el !== null);
+    });
+  }
+
   async saveLayout(layout: BuilderLayout | null = this.layout): Promise<void> {
     if (layout === null) { return; }
     if (layout.id) {
@@ -683,18 +697,16 @@ export default class BuilderEditor extends DialogBase {
     this.debouncedCalculate();
   }
 
-  mounted(): void {
-    this.$nextTick(() => {
-      if (this.grid !== undefined) {
-        this.grid.addEventListener('mouseenter', this.onGridMove);
-        this.grid.addEventListener('mousemove', this.onGridMove);
-        this.grid.addEventListener('mouseleave', this.onGridLeave);
-        this.card.$el.addEventListener('keyup', this.keyHandler);
-        this.card.$el.addEventListener('blur', () => { this.cardFocused = false; });
-        this.card.$el.addEventListener('focus', () => { this.cardFocused = true; });
-        this.card.$el.focus();
-      }
-    });
+  async mounted(): Promise<void> {
+    await this.$nextTick();
+    if (this.grid === undefined) { return; }
+    this.grid.addEventListener('mouseenter', this.onGridMove);
+    this.grid.addEventListener('mousemove', this.onGridMove);
+    this.grid.addEventListener('mouseleave', this.onGridLeave);
+    this.card.$el.addEventListener('keyup', this.keyHandler);
+    this.card.$el.addEventListener('focusin', this.checkFocus);
+    this.card.$el.addEventListener('focusout', this.checkFocus);
+    this.card.$el.focus();
   }
 
   destroyed(): void {
@@ -726,7 +738,7 @@ export default class BuilderEditor extends DialogBase {
                   :label="lo.title"
                   :active="layout && lo.id === layout.id"
                   icon="mdi-view-dashboard-outline"
-                  @click="layoutId = lo.id"
+                  @click="selectLayout(lo.id)"
                 />
               </q-list>
             </q-list>
@@ -756,7 +768,7 @@ export default class BuilderEditor extends DialogBase {
             </q-tooltip>
           </q-btn>
           <q-btn-dropdown flat icon="mdi-menu" class="col-auto">
-            <LayoutActions :layout="layout" :select-layout="v => layoutId = v" :save-parts="saveParts" />
+            <LayoutActions :layout="layout" :select-layout="selectLayout" :save-parts="saveParts" />
           </q-btn-dropdown>
         </template>
       </DialogToolbar>
