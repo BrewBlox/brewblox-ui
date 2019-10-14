@@ -11,6 +11,7 @@ export default class BlockActions extends BlockCrudComponent { }
   <q-expansion-item label="Block Actions">
     <q-list dark>
       <slot name="block-actions" />
+      <ActionItem icon="mdi-widgets" label="Make widget" @click="startCopyWidget" />
       <ActionItem icon="edit" label="Rename Block" @click="startChangeBlockId" />
       <ActionItem
         v-if="isStoreWidget"
