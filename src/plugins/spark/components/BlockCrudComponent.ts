@@ -1,14 +1,17 @@
 import get from 'lodash/get';
 import mapKeys from 'lodash/mapKeys';
+import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { showBlockDialog } from '@/helpers/dialog';
 import { postfixedDisplayNames } from '@/helpers/units';
+import { deepCopy } from '@/helpers/units/parseObject';
 import { GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockCrud } from '@/plugins/spark/types';
+import { dashboardStore } from '@/store/dashboards';
 
 import { blockIdRules } from '../helpers';
 import { Block } from '../types';
@@ -121,6 +124,34 @@ export default class BlockCrudComponent extends CrudComponent {
 
   public showOtherBlock(block: Block, props: any = {}): void {
     showBlockDialog(block, { props });
+  }
+
+  public startMakeWidget(): void {
+    const id = uid();
+    createDialog({
+      parent: this,
+      title: 'Make widget',
+      message: `On which dashboard do you want to create a widget for '${this.widget.title}'?`,
+      dark: true,
+      options: {
+        type: 'radio',
+        model: undefined,
+        items: dashboardStore.dashboardValues
+          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
+      },
+      cancel: true,
+    })
+      .onOk((dashboard: string) => {
+        if (!dashboard) {
+          return;
+        }
+        dashboardStore.appendPersistentWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
+        this.$q.notify({
+          color: 'positive',
+          icon: 'file_copy',
+          message: `Created ${this.widget.title} on ${dashboardStore.dashboardById(dashboard).title}`,
+        });
+      });
   }
 
   public startChangeBlockId(): void {
