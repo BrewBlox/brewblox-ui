@@ -73,7 +73,10 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
   }
 
   get dashboardId(): string {
-    return valOrDefault(this.config.dashboardId, this.idGenerator.generate(this.dashboardTitle));
+    return valOrDefault(
+      this.config.dashboardId,
+      suggestId(this.idGenerator.generate(this.dashboardTitle), validator(this.dashboardIdRules))
+    );
   }
 
   set dashboardId(dashboardId: string) {
@@ -178,14 +181,17 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
           </QuickStartNameField>
           <QuickStartNameField
             v-model="dashboardTitle"
-            label="Dashboard Title"
+            label="Dashboard"
             @clear="clearKey('dashboardTitle')"
           >
             <template #help>
-              The Dashboard Title is how the dashboard is displayed in the UI.
-              <br />This choice is purely graphical: pick a name that makes sense to you.
+              The name for the new dashboard.
             </template>
           </QuickStartNameField>
+        </q-expansion-item>
+
+        <!-- Block names -->
+        <q-expansion-item label="Generated names" icon="mdi-tag-multiple" dense>
           <QuickStartNameField
             v-model="dashboardId"
             label="Dashboard ID"
@@ -197,10 +203,6 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
               <br /> By default, this is an URL-safe version of the dashboard title.
             </template>
           </QuickStartNameField>
-        </q-expansion-item>
-
-        <!-- Block names -->
-        <q-expansion-item label="Generated names" icon="mdi-tag-multiple" dense>
           <QuickStartNameField
             v-for="(nVal, nKey) in names" :key="nKey"
             :value="nVal"

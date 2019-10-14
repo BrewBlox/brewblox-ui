@@ -276,7 +276,7 @@ export const defineWidgets = (
   });
 
   const createBuilder = (): BuilderItem => ({
-    ...createWidget(`${config.prefix} Fridge`, 'Builder'),
+    ...createWidget(`${config.prefix} Process`, 'Builder'),
     cols: 4,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },

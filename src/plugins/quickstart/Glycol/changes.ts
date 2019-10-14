@@ -300,7 +300,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
   });
 
   const builder: BuilderItem = {
-    ...createWidget(config.title, 'Builder'),
+    ...createWidget(`${config.prefix} Process`, 'Builder'),
     cols: 4,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },

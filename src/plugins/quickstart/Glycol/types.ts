@@ -27,7 +27,6 @@ export interface GlycolBlockNames {
 }
 
 export interface GlycolConfig extends QuickStartOutput {
-  title: string;
   prefix: string;
   names: GlycolBlockNames;
   heated: boolean;
