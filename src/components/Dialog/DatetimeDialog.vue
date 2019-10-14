@@ -47,7 +47,7 @@ export default class DatetimeDialog extends DialogBase {
       title: this.title,
       message: this.message,
       messageHtml: this.messageHtml,
-      root: this.$root,
+      parent: this,
       value: this.parsed,
       label: this.label,
     })

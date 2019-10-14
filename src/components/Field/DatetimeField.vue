@@ -45,7 +45,7 @@ export default class DatetimeField extends FieldBase {
       title: this.title,
       message: this.message,
       messageHtml: this.messageHtml,
-      root: this.$root,
+      parent: this,
       value: new Date(this.value || 0),
       label: this.label,
       resetIcon: this.resetIcon,

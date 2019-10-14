@@ -72,7 +72,7 @@ export default class LinkDialog extends DialogBase {
   create(): void {
     createDialog({
       component: 'BlockWizardDialog',
-      root: this.$root,
+      parent: this,
       serviceId: this.serviceId,
       filter: feat => !this.compatibleTypes || this.compatibleTypes.includes(feat),
     })

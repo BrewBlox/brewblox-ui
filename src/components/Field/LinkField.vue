@@ -40,7 +40,7 @@ export default class LinkField extends FieldBase {
 
     createDialog({
       component: 'LinkDialog',
-      root: this.$root,
+      parent: this,
       clearable: true,
       title: this.title,
       message: this.message,

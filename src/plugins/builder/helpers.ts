@@ -7,7 +7,7 @@ import { Block } from '@/plugins/spark/types';
 
 import { SQUARE_SIZE } from './getters';
 import { builderStore } from './store';
-import { FlowPart, LinkedBlock, PersistentPart, StatePart, Transitions } from './types';
+import { FlowPart, LinkedBlock, PersistentPart, Rect,StatePart, Transitions } from './types';
 
 export function settingsBlock<T extends Block>(part: PersistentPart, key: string): T | null {
   const serviceId = get(part.settings, [key, 'serviceId'], null);
@@ -162,4 +162,11 @@ export function showLinkedBlockDialog(part: PersistentPart, key: string): void {
       });
     }
   }
+}
+
+export function rectContains(rect: Rect, x: number, y: number): boolean {
+  return x >= rect.left
+    && x <= rect.right
+    && y >= rect.top
+    && y <= rect.bottom;
 }

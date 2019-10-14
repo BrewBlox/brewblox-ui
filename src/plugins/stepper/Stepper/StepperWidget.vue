@@ -77,7 +77,7 @@ export default class StepperWidget extends WidgetBase {
   startEditor(): void {
     createDialog({
       component: 'StepperEditor',
-      root: this.$root,
+      parent: this,
     });
   }
 

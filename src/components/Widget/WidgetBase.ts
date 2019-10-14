@@ -73,7 +73,7 @@ export default class WidgetBase extends Vue {
   public showDialog(args: Record<string, any> = {}): void {
     this.activeDialog = createDialog({
       component: 'WidgetDialog',
-      root: this.$root,
+      parent: this,
       getCrud: () => ({ ...this.crud, closeDialog: this.closeDialog }),
       ...args,
     });

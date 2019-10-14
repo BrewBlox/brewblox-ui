@@ -55,7 +55,7 @@ export default class InputField extends FieldBase {
       title: this.title,
       message: this.message,
       messageHtml: this.messageHtml,
-      root: this.$root,
+      parent: this,
       value: this.value,
       decimals: this.decimals,
       type: this.type,

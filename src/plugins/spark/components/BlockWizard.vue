@@ -108,7 +108,7 @@ export default class BlockWizard extends Vue {
     };
     this.activeDialog = createDialog({
       component: 'WidgetDialog',
-      root: this.$root,
+      parent: this,
       getCrud: () => crud,
       mode: 'Full',
     });

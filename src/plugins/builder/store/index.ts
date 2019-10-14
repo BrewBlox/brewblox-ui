@@ -22,7 +22,7 @@ export class BuilderModule extends VuexModule {
   private specs: Record<string, PartSpec> = {};
 
   public editorActive = false;
-  public editorTool = '';
+  public editorMode = '';
   public layouts: Record<string, BuilderLayout> = {};
 
   public get layoutIds(): string[] {
@@ -67,8 +67,8 @@ export class BuilderModule extends VuexModule {
   }
 
   @Mutation
-  public commitEditorTool(tool: string): void {
-    this.editorTool = tool;
+  public commitEditorMode(tool: string): void {
+    this.editorMode = tool;
   }
 
   @Mutation
