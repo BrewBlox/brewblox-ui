@@ -704,7 +704,6 @@ export default class BuilderEditor extends DialogBase {
     this.grid.addEventListener('mousemove', this.onGridMove);
     this.grid.addEventListener('mouseleave', this.onGridLeave);
     this.card.$el.addEventListener('keyup', this.keyHandler);
-    this.card.$el.addEventListener('focusin', this.checkFocus);
     this.card.$el.addEventListener('focusout', this.checkFocus);
     this.card.$el.focus();
   }
@@ -952,10 +951,18 @@ export default class BuilderEditor extends DialogBase {
                 </svg>
               </div>
             </div>
-            <div v-if="!cardFocused" class="text-center text-h6 text-red">
-              Click anywhere to enable keyboard shortcuts.
-            </div>
           </div>
+        </div>
+        <div
+          v-if="!cardFocused"
+          class="unfocus-overlay"
+          @click.stop="checkFocus"
+        >
+          <transition appear name="fade">
+            <div class="text-h5 text-white fixed-center q-pa-lg resume-message">
+              Click to resume editing
+            </div>
+          </transition>
         </div>
       </q-card-section>
     </q-card>
@@ -966,11 +973,34 @@ export default class BuilderEditor extends DialogBase {
 @import './grid.styl';
 
 .editor-card {
-  border: 2px solid red;
   outline: none;
 }
 
-.editor-card:focus-within {
-  border: 0;
+.unfocus-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: 1s;
+}
+
+.resume-message {
+  border-radius: 40px;
+  border: 2px solid silver;
+  background: $dark_bright;
+}
+
+.fade-enter-active {
+  transition: opacity 4s ease;
+}
+
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-to {
+  opacity: 1;
 }
 </style>
