@@ -18,7 +18,6 @@ export interface FermentConfigNames {
 }
 
 export interface FermentConfig extends QuickStartOutput {
-  title: string;
   prefix: string;
   names: FermentConfigNames;
   heatPin: PinChannel;
