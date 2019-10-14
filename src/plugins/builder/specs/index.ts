@@ -2,6 +2,7 @@ import { PartSpec } from '../types';
 import ActuatorValve from './ActuatorValve';
 import BeerBottle from './BeerBottle';
 import BridgeTube from './BridgeTube';
+import BuilderLabel from './BuilderLabel';
 import Carboy from './Carboy';
 import CheckValve from './CheckValve';
 import Coil from './Coil';
@@ -39,6 +40,7 @@ const specs: { [key: string]: PartSpec } = {
   ActuatorValve,
   BeerBottle,
   BridgeTube,
+  BuilderLabel,
   Carboy,
   CheckValve,
   Coil,
