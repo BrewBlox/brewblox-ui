@@ -23,7 +23,7 @@ import { Block, DigitalState } from '@/plugins/spark/types';
 import { PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
-import { unlinkedActuators } from '../helpers';
+import { maybeSpace,unlinkedActuators } from '../helpers';
 import { FermentConfig, FermentOpts } from './types';
 
 
@@ -60,7 +60,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
   const serviceId = config.serviceId;
   const { fridgeSetting, beerSetting, activeSetpoint } = opts;
   const isBeer = activeSetpoint === 'beer';
-  const activeSetpointId = isBeer ? config.names.beerSSPair : config.names.fridgeSSPair;
+  const activeSetpointId = isBeer ? config.names.beerSetpoint : config.names.fridgeSetpoint;
   const initialSetting = isBeer ? beerSetting : fridgeSetting;
 
   const coolPidConfig: Partial<PidData> = isBeer
@@ -74,7 +74,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
   return [
     // setpoint sensor pair
     {
-      id: config.names.fridgeSSPair,
+      id: config.names.fridgeSetpoint,
       type: blockTypes.SetpointSensorPair,
       serviceId,
       groups,
@@ -91,7 +91,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
       },
     },
     {
-      id: config.names.beerSSPair,
+      id: config.names.beerSetpoint,
       type: blockTypes.SetpointSensorPair,
       serviceId,
       groups,
@@ -246,102 +246,6 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
     ];
 };
 
-export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
-  const serviceId = config.serviceId;
-  return [
-    {
-      id: uid(),
-      title: `${config.title} Layout`,
-      width: 6,
-      height: 10,
-      parts: [
-        {
-          id: uid(),
-          type: 'Fridge',
-          x: 2,
-          y: 1,
-          rotate: 0,
-          flipped: false,
-          settings: {
-            sizeY: 7,
-            text: `${config.prefix} fridge`,
-          },
-        },
-        {
-          id: uid(),
-          type: 'Carboy',
-          x: 3,
-          y: 3,
-          rotate: 0,
-          flipped: false,
-          settings: {
-            color: 'E1AC00',
-            setpoint: {
-              serviceId,
-              blockId: config.names.beerSSPair,
-            },
-          },
-        },
-        {
-          id: uid(),
-          type: 'SetpointDisplay',
-          x: 2,
-          y: 7,
-          rotate: 0,
-          flipped: false,
-          settings: {
-            setpoint: {
-              serviceId,
-              blockId: config.names.fridgeSSPair,
-            },
-          },
-        },
-        {
-          id: uid(),
-          type: 'PidDisplay',
-          x: 4,
-          y: 7,
-          rotate: 0,
-          flipped: false,
-          settings: {
-            pid: {
-              serviceId,
-              blockId: config.names.coolPid,
-            },
-          },
-        },
-        {
-          id: uid(),
-          type: 'PidDisplay',
-          x: 5,
-          y: 7,
-          rotate: 0,
-          flipped: false,
-          settings: {
-            pid: {
-              serviceId,
-              blockId: config.names.heatPid,
-            },
-          },
-        },
-        {
-          id: uid(),
-          type: 'UrlDisplay',
-          x: 2,
-          y: 0,
-          rotate: 0,
-          flipped: false,
-          settings: {
-            text: 'User manual',
-            url: 'https://brewblox.netlify.com/user/ferment_guide.html#ferment-fridge-process-view',
-            sizeX: 4,
-            sizeY: 1,
-          },
-        },
-      ],
-    },
-  ];
-};
 
 export const defineWidgets = (
   config: FermentConfig,
@@ -372,7 +276,7 @@ export const defineWidgets = (
   });
 
   const createBuilder = (): BuilderItem => ({
-    ...createWidget(`${config.prefix} Fridge`, 'Builder'),
+    ...createWidget(maybeSpace(config.prefix, 'Process'), 'Builder'),
     cols: 4,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
@@ -383,7 +287,7 @@ export const defineWidgets = (
   });
 
   const createGraph = (): HistoryItem => ({
-    ...createWidget(`${config.prefix} Graph`, 'Graph'),
+    ...createWidget(maybeSpace(config.prefix, 'Graph'), 'Graph'),
     cols: 6,
     rows: 5,
     pinnedPosition: { x: 5, y: 1 },
@@ -396,8 +300,8 @@ export const defineWidgets = (
           fields: [
             `${config.names.fridgeSensor}/value[${userTemp}]`,
             `${config.names.beerSensor}/value[${userTemp}]`,
-            `${config.names.fridgeSSPair}/setting[${userTemp}]`,
-            `${config.names.beerSSPair}/setting[${userTemp}]`,
+            `${config.names.fridgeSetpoint}/setting[${userTemp}]`,
+            `${config.names.beerSetpoint}/setting[${userTemp}]`,
             `${config.names.coolPwm}/value`,
             `${config.names.heatPwm}/value`,
             `${config.names.coolAct}/state`,
@@ -408,8 +312,8 @@ export const defineWidgets = (
       renames: {
         [`${config.serviceId}/${config.names.fridgeSensor}/value[${userTemp}]`]: 'Fridge temperature',
         [`${config.serviceId}/${config.names.beerSensor}/value[${userTemp}]`]: 'Beer temperature',
-        [`${config.serviceId}/${config.names.fridgeSSPair}/setting[${userTemp}]`]: 'Fridge setting',
-        [`${config.serviceId}/${config.names.beerSSPair}/setting[${userTemp}]`]: 'Beer setting',
+        [`${config.serviceId}/${config.names.fridgeSetpoint}/setting[${userTemp}]`]: 'Fridge setting',
+        [`${config.serviceId}/${config.names.beerSetpoint}/setting[${userTemp}]`]: 'Beer setting',
         [`${config.serviceId}/${config.names.coolPwm}/value`]: 'Cool PWM value',
         [`${config.serviceId}/${config.names.heatPwm}/value`]: 'Heat PWM value',
         [`${config.serviceId}/${config.names.coolAct}/state`]: 'Cool Pin state',
@@ -426,7 +330,7 @@ export const defineWidgets = (
   });
 
   const createStepView = (): StepViewItem => ({
-    ...createWidget(`${config.prefix} Actions`, 'StepView'),
+    ...createWidget(maybeSpace(config.prefix, 'Actions'), 'StepView'),
     cols: 4,
     rows: 4,
     pinnedPosition: { x: 1, y: 6 },
@@ -438,11 +342,11 @@ export const defineWidgets = (
           id: uid(),
           changes: [
             {
-              blockId: config.names.beerSSPair,
+              blockId: config.names.beerSetpoint,
               data: { settingEnabled: true },
             },
             {
-              blockId: config.names.fridgeSSPair,
+              blockId: config.names.fridgeSetpoint,
               data: { settingEnabled: true },
             },
           ],
@@ -456,11 +360,11 @@ export const defineWidgets = (
               data: { enabled: false },
             },
             {
-              blockId: config.names.beerSSPair,
+              blockId: config.names.beerSetpoint,
               data: { settingEnabled: false },
             },
             {
-              blockId: config.names.fridgeSSPair,
+              blockId: config.names.fridgeSetpoint,
               data: { settingEnabled: false },
             },
           ],
@@ -470,7 +374,7 @@ export const defineWidgets = (
           id: uid(),
           changes: [
             {
-              blockId: config.names.fridgeSSPair,
+              blockId: config.names.fridgeSetpoint,
               data: {
                 settingEnabled: true,
                 storedSetting: opts.fridgeSetting,
@@ -478,26 +382,26 @@ export const defineWidgets = (
               confirmed: { storedSetting: true },
             },
             {
-              blockId: config.names.beerSSPair,
+              blockId: config.names.beerSetpoint,
               data: { settingEnabled: false },
             },
             {
               blockId: config.names.coolPid,
               data: {
-                inputId: new Link(config.names.fridgeSSPair, interfaceTypes.ProcessValue),
+                inputId: new Link(config.names.fridgeSetpoint, interfaceTypes.ProcessValue),
                 ...fridgeCoolConfig,
               },
             },
             {
               blockId: config.names.heatPid,
               data: {
-                inputId: new Link(config.names.fridgeSSPair, interfaceTypes.ProcessValue),
+                inputId: new Link(config.names.fridgeSetpoint, interfaceTypes.ProcessValue),
                 ...fridgeHeatConfig,
               },
             },
             {
               blockId: config.names.tempProfile,
-              data: { targetId: new Link(config.names.fridgeSSPair) },
+              data: { targetId: new Link(config.names.fridgeSetpoint) },
             },
           ],
         },
@@ -506,11 +410,11 @@ export const defineWidgets = (
           id: uid(),
           changes: [
             {
-              blockId: config.names.fridgeSSPair,
+              blockId: config.names.fridgeSetpoint,
               data: { settingEnabled: false },
             },
             {
-              blockId: config.names.beerSSPair,
+              blockId: config.names.beerSetpoint,
               data: {
                 settingEnabled: true,
                 storedSetting: opts.beerSetting,
@@ -520,20 +424,20 @@ export const defineWidgets = (
             {
               blockId: config.names.coolPid,
               data: {
-                inputId: new Link(config.names.beerSSPair, interfaceTypes.ProcessValue),
+                inputId: new Link(config.names.beerSetpoint, interfaceTypes.ProcessValue),
                 ...beerCoolConfig,
               },
             },
             {
               blockId: config.names.heatPid,
               data: {
-                inputId: new Link(config.names.beerSSPair, interfaceTypes.ProcessValue),
+                inputId: new Link(config.names.beerSetpoint, interfaceTypes.ProcessValue),
                 ...beerHeatConfig,
               },
             },
             {
               blockId: config.names.tempProfile,
-              data: { targetId: new Link(config.names.beerSSPair) },
+              data: { targetId: new Link(config.names.beerSetpoint) },
             },
           ],
         },

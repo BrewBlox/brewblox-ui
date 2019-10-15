@@ -5,8 +5,8 @@ import { PinChannel, QuickStartOutput } from '../types';
 export interface FermentConfigNames {
   fridgeSensor: string;
   beerSensor: string;
-  fridgeSSPair: string;
-  beerSSPair: string;
+  fridgeSetpoint: string;
+  beerSetpoint: string;
   tempProfile: string;
   coolAct: string;
   heatAct: string;
@@ -18,7 +18,6 @@ export interface FermentConfigNames {
 }
 
 export interface FermentConfig extends QuickStartOutput {
-  title: string;
   prefix: string;
   names: FermentConfigNames;
   heatPin: PinChannel;

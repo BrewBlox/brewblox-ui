@@ -27,7 +27,7 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
       this.glycolPin || this.glycolControl !== 'Control',
       !this.pinSame,
       this.beerSensor,
-      this.glycolSensor,
+      this.glycolSensor || this.glycolControl === 'No',
       !this.sensorSame,
     ]
       .every(Boolean);

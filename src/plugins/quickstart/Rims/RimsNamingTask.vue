@@ -5,6 +5,7 @@ import UrlSafeString from 'url-safe-string';
 import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
+import { dashboardIdRules } from '@/helpers/dashboards';
 import { suggestId, validator, valOrDefault } from '@/helpers/functional';
 import { typeName as sparkType } from '@/plugins/spark/getters';
 import { blockIdRules } from '@/plugins/spark/helpers';
@@ -17,6 +18,7 @@ import { RimsBlockNames, RimsConfig } from './types';
 @Component
 export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
   chosenNames: Partial<RimsBlockNames> = {};
+  idGenerator = new UrlSafeString();
 
   get defaultNames(): RimsBlockNames {
     return {
@@ -52,16 +54,8 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
       : `Group '${name}' is disabled. Created blocks will be inactive.`;
   }
 
-  get title(): string {
-    return valOrDefault(this.config.title, 'RIMS');
-  }
-
-  set title(title: string) {
-    this.updateConfig({ ...this.config, title });
-  }
-
   get prefix(): string {
-    return valOrDefault(this.config.prefix, this.title.slice(0, 5));
+    return valOrDefault(this.config.prefix, 'RIMS');
   }
 
   set prefix(prefix: string) {
@@ -69,11 +63,26 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
   }
 
   get dashboardTitle(): string {
-    return valOrDefault(this.config.dashboardTitle, `${this.title} Dashboard`);
+    return valOrDefault(this.config.dashboardTitle, 'RIMS');
   }
 
   set dashboardTitle(dashboardTitle: string) {
     this.updateConfig({ ...this.config, dashboardTitle });
+  }
+
+  get dashboardId(): string {
+    return valOrDefault(
+      this.config.dashboardId,
+      suggestId(this.idGenerator.generate(this.dashboardTitle), validator(this.dashboardIdRules))
+    );
+  }
+
+  set dashboardId(dashboardId: string) {
+    this.updateConfig({ ...this.config, dashboardId });
+  }
+
+  get dashboardIdRules(): InputRule[] {
+    return dashboardIdRules();
   }
 
   get names(): RimsBlockNames {
@@ -96,6 +105,7 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
     return [
       this.serviceId,
       this.dashboardTitle,
+      validator(this.dashboardIdRules)(this.dashboardId),
       Object.values(this.names).every(validator(this.nameRules)),
     ]
       .every(Boolean);
@@ -118,7 +128,6 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
     this.updateConfig({
       ...this.config,
       serviceId: this.serviceId,
-      title: this.title,
       prefix: this.prefix,
       dashboardId: new UrlSafeString().generate(this.dashboardTitle),
       dashboardTitle: this.dashboardTitle,
@@ -158,17 +167,6 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
         <q-expansion-item default-opened label="Settings" icon="settings" dense>
           <QuickStartServiceField v-model="serviceId" :services="services" />
           <QuickStartNameField
-            v-model="title"
-            label="Arrangement name"
-            @clear="clearKey('title')"
-          >
-            <template #help>
-              The full name of your arrangement.
-              It will be used as the default dashboard title.
-              <br />The default prefix is the short version of this.
-            </template>
-          </QuickStartNameField>
-          <QuickStartNameField
             v-model="prefix"
             optional
             label="Prefix"
@@ -191,7 +189,18 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
         </q-expansion-item>
 
         <!-- Block names -->
-        <q-expansion-item label="Block names" icon="mdi-tag-multiple" dense>
+        <q-expansion-item label="Generated names" icon="mdi-tag-multiple" dense>
+          <QuickStartNameField
+            v-model="dashboardId"
+            label="Dashboard ID"
+            :rules="dashboardIdRules"
+            @clear="clearKey('dashboardId')"
+          >
+            <template #help>
+              The unique identifier for your dashboard.
+              <br /> By default, this is an URL-safe version of the dashboard title.
+            </template>
+          </QuickStartNameField>
           <QuickStartNameField
             v-for="(nVal, nKey) in names" :key="nKey"
             :value="nVal"
