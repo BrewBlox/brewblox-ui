@@ -91,3 +91,7 @@ function combinations<T>(arr: T[]): [T, T][] {
 export function hasShared<T>(arr: Array<T | null>): boolean {
   return combinations(arr.filter(v => v !== null)).some(([v1, v2]) => isEqual(v1, v2));
 }
+
+export function maybeSpace(prefix: string, val: string): string {
+  return !!prefix ? `${prefix} ${val}` : val;
+}

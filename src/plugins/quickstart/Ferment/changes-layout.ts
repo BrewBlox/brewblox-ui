@@ -2,6 +2,7 @@ import { uid } from 'quasar';
 
 import { BuilderLayout } from '@/plugins/builder/types';
 
+import { maybeSpace } from '../helpers';
 import { FermentConfig } from './types';
 
 export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
@@ -9,7 +10,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
   return [
     {
       id: uid(),
-      title: `${config.prefix} Layout`,
+      title: maybeSpace(config.prefix, 'Layout'),
       width: 6,
       height: 10,
       parts: [
@@ -22,7 +23,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           flipped: false,
           settings: {
             sizeY: 7,
-            text: `${config.prefix} fridge`,
+            text: maybeSpace(config.prefix, 'fridge'),
           },
         },
         {

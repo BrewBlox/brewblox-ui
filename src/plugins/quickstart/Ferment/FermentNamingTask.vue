@@ -12,6 +12,7 @@ import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Service, serviceStore } from '@/store/services';
 
+import { maybeSpace } from '../helpers';
 import { FermentConfig, FermentConfigNames } from './types';
 
 
@@ -90,7 +91,7 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
   get names(): FermentConfigNames {
     return {
       ...mapValues(this.defaultNames,
-        v => suggestId(`${this.prefix} ${v}`, validator(blockIdRules(this.serviceId)))),
+        v => suggestId(maybeSpace(this.prefix, v), validator(blockIdRules(this.serviceId)))),
       ...this.chosenNames,
     };
   }

@@ -22,7 +22,7 @@ import { Block, DigitalState } from '@/plugins/spark/types';
 import { PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
-import { unlinkedActuators } from '../helpers';
+import { maybeSpace, unlinkedActuators } from '../helpers';
 import { GlycolConfig, GlycolOpts } from './types';
 
 
@@ -300,7 +300,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
   });
 
   const builder: BuilderItem = {
-    ...createWidget(`${config.prefix} Process`, 'Builder'),
+    ...createWidget(maybeSpace(config.prefix, 'Process'), 'Builder'),
     cols: 4,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
@@ -311,7 +311,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
   };
 
   const graph: HistoryItem = {
-    ...createWidget(`${config.prefix} Graph`, 'Graph'),
+    ...createWidget(maybeSpace(config.prefix, 'Graph'), 'Graph'),
     cols: 6,
     rows: 5,
     pinnedPosition: { x: 5, y: 1 },
@@ -360,7 +360,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
   }
 
   const stepView: StepViewItem = {
-    ...createWidget(`${config.prefix} Actions`, 'StepView'),
+    ...createWidget(maybeSpace(config.prefix, 'Actions'), 'StepView'),
     cols: 4,
     rows: 4,
     pinnedPosition: { x: 1, y: 6 },

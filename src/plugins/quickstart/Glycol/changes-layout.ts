@@ -2,6 +2,7 @@ import { uid } from 'quasar';
 
 import { BuilderLayout, PersistentPart } from '@/plugins/builder/types';
 
+import { maybeSpace } from '../helpers';
 import { GlycolConfig } from './types';
 
 
@@ -63,7 +64,7 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
   return [
     {
       id: uid(),
-      title: `${config.prefix} Layout`,
+      title: maybeSpace(config.prefix, 'Layout'),
       width: 20,
       height: 15,
       parts: [
