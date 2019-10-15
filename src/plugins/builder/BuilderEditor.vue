@@ -242,8 +242,14 @@ export default class BuilderEditor extends DialogBase {
   async selectLayout(id: string | null): Promise<void> {
     this.layoutId = id;
     await this.$nextTick();
-    this.card.$el.focus();
-    this.checkFocus();
+    this.setFocus();
+  }
+
+  setFocus(): void {
+    if (this.card !== undefined) {
+      this.card.$el.focus();
+      this.checkFocus();
+    }
   }
 
   checkFocus(): void {
@@ -445,6 +451,11 @@ export default class BuilderEditor extends DialogBase {
     };
   }
 
+  closeMenu(): void {
+    this.menuDialogOpen = false;
+    this.$nextTick(this.setFocus);
+  }
+
   ////////////////////////////////////////////////////////////////
   // Modes
   ////////////////////////////////////////////////////////////////
@@ -532,12 +543,13 @@ export default class BuilderEditor extends DialogBase {
         parent: this,
         component: BuilderCatalog,
       })
-        .onOk(async (part: PersistentPart) => {
+        .onOk((part: PersistentPart) => {
           this.floater = {
             x: 0,
             y: 0,
             parts: [part],
           };
+          this.setFocus();
         });
     }
   }
@@ -705,7 +717,7 @@ export default class BuilderEditor extends DialogBase {
     this.grid.addEventListener('mouseleave', this.onGridLeave);
     this.card.$el.addEventListener('keyup', this.keyHandler);
     this.card.$el.addEventListener('focusout', this.checkFocus);
-    this.card.$el.focus();
+    this.setFocus();
   }
 
   destroyed(): void {
@@ -772,14 +784,14 @@ export default class BuilderEditor extends DialogBase {
         </template>
       </DialogToolbar>
 
-      <q-dialog v-model="menuDialogOpen" no-backdrop-dismiss>
+      <q-dialog v-model="menuDialogOpen" no-backdrop-dismiss @keyup.esc="closeMenu">
         <BuilderPartMenu
           v-if="menuDialogOpen"
           :part="configuredPart"
           @update:part="savePart"
           @remove:part="removePart"
           @dirty="debouncedCalculate"
-          @close="menuDialogOpen = false"
+          @close="closeMenu"
         />
       </q-dialog>
 

@@ -52,7 +52,9 @@ export default class BuilderPartMenu extends Vue {
 
 <template>
   <q-card dark class="widget-modal">
-    <DialogToolbar>{{ partTitle }}</DialogToolbar>
+    <DialogToolbar @close="$emit('close')">
+      {{ partTitle }}
+    </DialogToolbar>
 
     <q-card-section>
       <q-item dark>
