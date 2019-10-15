@@ -12,6 +12,7 @@ const size = (part: PersistentPart): [number, number] => [
 
 const spec: PartSpec = {
   id: 'Kettle',
+  title: 'Kettle',
   cards: [
     { component: 'TextCard' },
     { component: 'ColorCard' },

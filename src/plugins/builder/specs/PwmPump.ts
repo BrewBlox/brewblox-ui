@@ -9,6 +9,7 @@ import { PartSpec, PersistentPart } from '../types';
 
 const spec: PartSpec = {
   id: 'PwmPump',
+  title: 'Pump: PWM',
   size: () => [1, 1],
   cards: [
     {

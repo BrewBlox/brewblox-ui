@@ -8,6 +8,7 @@ const SIZE_Y = 5;
 
 const spec: PartSpec = {
   id: 'Keg',
+  title: 'Keg',
   transitions: () => ({}),
   cards: [
     { component: 'ColorCard' },

@@ -3,46 +3,53 @@ import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
-import { spaceCased } from '@/helpers/functional';
+import { objectStringSorter } from '@/helpers/functional';
 
 import { SQUARE_SIZE } from './getters';
 import { asStatePart } from './helpers';
 import { builderStore } from './store';
-import { PersistentPart, StatePart } from './types';
+import { PartSpec, PersistentPart, StatePart } from './types';
+
+interface PartDisplay {
+  part: StatePart;
+  spec: PartSpec;
+}
 
 
 @Component
 export default class BuilderCatalog extends DialogBase {
   SQUARE_SIZE: number = SQUARE_SIZE;
-  spaceCased = spaceCased;
 
   partFilter: string | null = null;
 
   @Prop({ type: Object, default: () => ({}) })
   readonly partial!: Partial<PersistentPart>;
 
-  get availableParts(): StatePart[] {
+  get available(): PartDisplay[] {
     const filter = (this.partFilter || '').toLowerCase();
-    return builderStore.specIds
-      .filter(type => `${type}|${spaceCased(type)}`.toLowerCase().match(filter))
-      .map(type => ({
-        type,
-        id: uid(),
-        x: 0,
-        y: 0,
-        rotate: 0,
-        settings: {},
-        flipped: false,
-      }))
-      .map(asStatePart);
+    return builderStore.specValues
+      .filter(spec => `${spec.id}|${spec.title}`.toLowerCase().match(filter))
+      .sort(objectStringSorter('title'))
+      .map(spec => ({
+        spec,
+        part: asStatePart({
+          type: spec.id,
+          id: uid(),
+          x: 0,
+          y: 0,
+          rotate: 0,
+          settings: {},
+          flipped: false,
+        }),
+      }));
   }
 
-  partViewBox(part: StatePart): string {
-    return part.size.map(v => v * SQUARE_SIZE).join(' ');
+  partViewBox(display: PartDisplay): string {
+    return display.part.size.map(v => v * SQUARE_SIZE).join(' ');
   }
 
-  selectPart(part: StatePart): void {
-    this.onDialogOk({ ...part, ...this.partial });
+  selectPart(display: PartDisplay): void {
+    this.onDialogOk({ ...display.part, ...this.partial });
   }
 }
 </script>
@@ -66,23 +73,23 @@ export default class BuilderCatalog extends DialogBase {
         <q-card-section>
           <div class="row">
             <q-item
-              v-for="part in availableParts"
-              :key="part.type"
+              v-for="v in available"
+              :key="v.spec.id"
               dark
               clickable
               class="col-6"
-              @click="selectPart(part)"
+              @click="selectPart(v)"
             >
               <q-item-section side>
                 <svg
                   :width="`${SQUARE_SIZE}px`"
                   :height="`${SQUARE_SIZE}px`"
-                  :viewBox="`0 0 ${partViewBox(part)}`"
+                  :viewBox="`0 0 ${partViewBox(v)}`"
                 >
-                  <PartWrapper :part="part" />
+                  <PartWrapper :part="v.part" />
                 </svg>
               </q-item-section>
-              <q-item-section>{{ spaceCased(part.type) }}</q-item-section>
+              <q-item-section>{{ v.spec.title }}</q-item-section>
             </q-item>
           </div>
         </q-card-section>

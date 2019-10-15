@@ -15,6 +15,7 @@ const SIZE_Y = 1;
 
 const spec: PartSpec = {
   id: 'SetpointDisplay',
+  title: 'Display: setpoint',
   cards: [{
     component: 'LinkedBlockCard',
     props: {

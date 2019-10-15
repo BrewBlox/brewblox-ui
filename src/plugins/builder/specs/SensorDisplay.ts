@@ -7,6 +7,7 @@ const SIZE_Y = 1;
 
 const spec: PartSpec = {
   id: 'SensorDisplay',
+  title: 'Display: sensor',
   cards: [{
     component: 'LinkedBlockCard',
     props: { settingsKey: 'sensor', types: ['TempSensorInterface'], label: 'Sensor' },

@@ -5,6 +5,7 @@ import { PartSpec, PersistentPart } from '../types';
 
 const spec: PartSpec = {
   id: 'SystemIO',
+  title: 'Global inlet',
   size: () => [1, 1],
   cards: [
     {

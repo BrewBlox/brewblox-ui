@@ -8,6 +8,7 @@ const SIZE_Y = 9;
 
 const spec: PartSpec = {
   id: 'Conical',
+  title: 'Conical',
   transitions: () => ({}),
   cards: [
     {

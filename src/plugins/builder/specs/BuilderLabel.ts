@@ -5,6 +5,7 @@ const DEFAULT_SIZE_Y = 1;
 
 const spec: PartSpec = {
   id: 'BuilderLabel',
+  title: 'Label: text',
   cards: [
     {
       component: 'TextCard',

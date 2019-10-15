@@ -10,6 +10,7 @@ const ENTRY = '1.5,0,0';
 
 const spec: PartSpec = {
   id: 'RimsTube',
+  title: 'RIMS',
   cards: [
     {
       component: 'SizeCard',

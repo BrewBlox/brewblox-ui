@@ -62,6 +62,7 @@ export interface CardSpec {
 
 export interface PartSpec {
   id: string;
+  title: string;
   component?: string; // ID is used by default
   cards: CardSpec[];
   transitions: (part: PersistentPart) => Transitions;
