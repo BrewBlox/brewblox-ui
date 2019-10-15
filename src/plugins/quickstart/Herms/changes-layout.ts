@@ -8,7 +8,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
   return [
     {
       id: uid(),
-      title: `${config.title} Layout`,
+      title: `${config.prefix} Layout`,
       width: 28,
       height: 15,
       parts: [

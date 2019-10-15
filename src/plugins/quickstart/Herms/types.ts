@@ -25,7 +25,6 @@ export interface HermsBlockNames {
 }
 
 export interface HermsConfig extends QuickStartOutput {
-  title: string;
   prefix: string;
   names: HermsBlockNames;
   hltPin: PinChannel;
