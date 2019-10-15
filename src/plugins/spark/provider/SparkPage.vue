@@ -9,7 +9,7 @@ import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import { startResetBlocks } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockCrud, RelationEdge, RelationNode, Spark, SystemStatus } from '@/plugins/spark/types';
+import { Block, BlockCrud, PageMode, RelationEdge, RelationNode, Spark, SystemStatus } from '@/plugins/spark/types';
 import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards';
 import { FeatureRole, featureStore, WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
@@ -40,7 +40,6 @@ export default class SparkPage extends Vue {
   volatileWidgets: { [blockId: string]: PersistentWidget } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
   blockFilter = '';
-  pageMode: 'Relations' | 'Widgets' = 'Widgets';
 
   context: WidgetContext = {
     mode: 'Basic',
@@ -97,6 +96,15 @@ export default class SparkPage extends Vue {
       Constraint: 'mdi-lock-outline',
       Other: 'mdi-cube',
     };
+  }
+
+  get pageMode(): PageMode {
+    return this.service.config.pageMode || 'List';
+  }
+
+  set pageMode(mode: PageMode) {
+    this.service.config.pageMode = mode;
+    this.saveServiceConfig();
   }
 
   get allSorters(): { [id: string]: (a: ValidatedWidget, b: ValidatedWidget) => number } {
@@ -319,21 +327,13 @@ export default class SparkPage extends Vue {
   }
 
   get nodes(): RelationNode[] {
-    return this.validatedItems.map(v => ({ id: v.id, type: v.displayName }));
+    return this.validatedItems
+      .map(v => ({ id: v.id, type: v.displayName }))
+      .sort(objectStringSorter('type'));
   }
 
   get edges(): RelationEdge[] {
     return sparkStore.relations(this.service.id);
-  }
-
-  showRelations(): void {
-    createDialog({
-      parent: this,
-      component: 'RelationsDialog',
-      serviceId: this.service.id,
-      nodes: this.nodes,
-      edges: this.edges,
-    });
   }
 
   async discoverBlocks(): Promise<void> {
@@ -377,18 +377,14 @@ export default class SparkPage extends Vue {
         dark
         flat
         dense
+        no-caps
         :options="[
-          {icon:'mdi-widgets', value: 'Widgets'},
-          {icon:'mdi-lan', value: 'Relations'},
+          {icon:'mdi-format-list-checkbox', value: 'List', label: 'List view'},
+          {icon:'mdi-vector-line', value: 'Relations', label: 'Relation view'},
         ]"
       />
       <q-btn-dropdown :disable="!isReady || statusNok" color="primary" label="actions">
         <q-list dark link>
-          <ActionItem
-            icon="mdi-ray-start-arrow"
-            label="Show Relations"
-            @click="showRelations"
-          />
           <ActionItem
             icon="add"
             label="New Block"

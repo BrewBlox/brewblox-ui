@@ -79,7 +79,7 @@ export default class RelationsDiagram extends Vue {
 
     const nodes = this.hideUnrelated
       ? this.drawnNodes
-      : [...this.loneNodes, ...this.drawnNodes];
+      : [...this.drawnNodes, ...this.loneNodes];
 
     nodes.forEach(node => {
       obj.setNode(node.id, {
@@ -115,7 +115,7 @@ export default class RelationsDiagram extends Vue {
 
       this.loneNodes.forEach((node, idx) => {
         if (idx % stackHeight === 0) { return; }
-        obj.setEdge(node.id, this.loneNodes[idx - 1].id, {
+        obj.setEdge(this.loneNodes[idx - 1].id, node.id, {
           label: '',
           labelStyle: invisible,
           style: invisible,
