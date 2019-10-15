@@ -202,7 +202,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Per
   });
 
   const builder: BuilderItem = {
-    ...createWidget(config.title, 'Builder'),
+    ...createWidget(`${config.prefix} Process`, 'Builder'),
     cols: 5,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },

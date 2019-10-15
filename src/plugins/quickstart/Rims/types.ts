@@ -16,7 +16,6 @@ export interface RimsBlockNames {
 }
 
 export interface RimsConfig extends QuickStartOutput {
-  title: string;
   prefix: string;
   names: RimsBlockNames;
   tubePin: PinChannel;

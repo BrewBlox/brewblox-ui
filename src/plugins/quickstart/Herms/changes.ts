@@ -313,7 +313,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
   });
 
   const createBuilder = (): BuilderItem => ({
-    ...createWidget(`${config.prefix} Diagram`, 'Builder'),
+    ...createWidget(`${config.prefix} Process`, 'Builder'),
     cols: 11,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
