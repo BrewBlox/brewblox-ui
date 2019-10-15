@@ -18,6 +18,7 @@ import { HermsBlockNames, HermsConfig } from './types';
 @Component
 export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
   chosenNames: Partial<HermsBlockNames> = {};
+  idGenerator = new UrlSafeString();
 
   get defaultNames(): HermsBlockNames {
     return {
@@ -68,7 +69,7 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
   }
 
   get dashboardTitle(): string {
-    return valOrDefault(this.config.dashboardTitle, `${this.title} Dashboard`);
+    return valOrDefault(this.config.dashboardTitle, 'HERMS');
   }
 
   set dashboardTitle(id: string) {
@@ -133,7 +134,6 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
     this.updateConfig({
       ...this.config,
       serviceId: this.serviceId,
-      title: this.title,
       prefix: this.prefix,
       dashboardId: this.dashboardId,
       dashboardTitle: this.dashboardTitle,
