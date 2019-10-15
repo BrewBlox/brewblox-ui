@@ -27,6 +27,10 @@ export default class DefaultLayout extends Vue {
     return buildEnv.version || 'UNKNOWN';
   }
 
+  get buildDate(): string {
+    return buildEnv.date || 'UNKNOWN';
+  }
+
   get dashboards(): Dashboard[] {
     return dashboardStore.dashboardValues.sort(objectSorter('order'));
   }
@@ -317,7 +321,7 @@ export default class DefaultLayout extends Vue {
           </q-btn>
         </q-item-section>
         <q-item-section class="col-auto">
-          <q-btn-dropdown text-color="white" icon="mdi-bug-outline">
+          <q-btn-dropdown flat text-color="white" icon="mdi-bug-outline">
             <q-list dark bordered>
               <q-item dark>
                 <q-item-section>
@@ -325,6 +329,14 @@ export default class DefaultLayout extends Vue {
                     Version
                   </q-item-label>
                   {{ version }}
+                </q-item-section>
+              </q-item>
+              <q-item dark>
+                <q-item-section>
+                  <q-item-label caption>
+                    Build date
+                  </q-item-label>
+                  {{ buildDate }}
                 </q-item-section>
               </q-item>
               <ExportErrorsAction />
