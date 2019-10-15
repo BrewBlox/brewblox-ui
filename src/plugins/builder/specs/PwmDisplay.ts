@@ -8,6 +8,7 @@ const SIZE_Y = 1;
 
 const spec: PartSpec = {
   id: 'PwmDisplay',
+  title: 'Display: PWM',
   transitions: () => ({}),
   cards: [{
     component: 'LinkedBlockCard',

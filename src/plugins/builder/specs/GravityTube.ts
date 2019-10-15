@@ -5,6 +5,7 @@ import { PartSpec, PersistentPart } from '../types';
 
 const spec: PartSpec = {
   id: 'GravityTube',
+  title: 'Tube: gravity',
   size: () => [1, 1],
   cards: [
     {

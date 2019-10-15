@@ -8,6 +8,7 @@ const SIZE_Y = 1;
 
 const spec: PartSpec = {
   id: 'ProfileDisplay',
+  title: 'Display: setpoint profile',
   transitions: () => ({}),
   cards: [{
     component: 'LinkedBlockCard',

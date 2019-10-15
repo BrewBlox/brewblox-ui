@@ -8,6 +8,7 @@ const SIZE_Y = 2;
 
 const spec: PartSpec = {
   id: 'ShiftedSystemIO',
+  title: 'Global inlet: shifted',
   size: () => [SIZE_X, SIZE_Y],
   cards: [
     {

@@ -9,6 +9,7 @@ const SIZE_Y = 1;
 
 const spec: PartSpec = {
   id: 'PidDisplay',
+  title: 'Display: PID',
   transitions: () => ({}),
   cards: [{
     component: 'LinkedBlockCard',

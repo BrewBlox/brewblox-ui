@@ -19,7 +19,7 @@ export default class SparkUnitMenu extends DialogBase {
     return sparkStore.units(this.serviceId) || {};
   }
 
-  unitAlternativeOptions(name: string): { label: string; value: any }[] {
+  unitAlternativeOptions(name: string): SelectOption[] {
     return (sparkStore.unitAlternatives(this.serviceId)[name] || [])
       .map(v => ({ label: prettify(v), value: v }));
   }

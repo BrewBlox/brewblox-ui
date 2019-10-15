@@ -5,6 +5,7 @@ const DEFAULT_SIZE_Y = 12;
 
 const spec: PartSpec = {
   id: 'Fridge',
+  title: 'Fridge',
   cards: [
     { component: 'TextCard' },
     {

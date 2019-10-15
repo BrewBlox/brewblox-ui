@@ -3,6 +3,7 @@ import { PartSpec, PartUpdater, PersistentPart, Transitions } from '../types';
 
 const spec: PartSpec = {
   id: 'Valve',
+  title: 'Valve: manual',
   cards: [],
   size: () => [1, 1],
   transitions: (part: PersistentPart): Transitions =>

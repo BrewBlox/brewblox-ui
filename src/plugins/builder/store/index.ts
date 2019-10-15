@@ -9,6 +9,7 @@ import api from './api';
 
 const fallbackSpec: PartSpec = {
   id: '',
+  title: 'Unknown Part',
   component: 'UnknownPart',
   cards: [],
   size: () => [1, 1],

@@ -8,6 +8,7 @@ const DEFAULT_SIZE_Y = 1;
 
 const spec: PartSpec = {
   id: 'UrlDisplay',
+  title: 'Label: URL',
   cards: [
     {
       component: 'TextCard',

@@ -11,6 +11,7 @@ const OUT = new Coordinates(CENTER)
 
 const spec: PartSpec = {
   id: 'WhirlpoolInlet',
+  title: 'Kettle inlet: whirlpool',
   cards: [],
   size: () => [SIZE_X, SIZE_Y],
   transitions: () => ({
