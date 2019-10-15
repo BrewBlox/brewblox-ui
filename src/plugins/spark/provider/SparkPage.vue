@@ -9,7 +9,7 @@ import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import { startResetBlocks } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockCrud, RelationNode, Spark, SystemStatus } from '@/plugins/spark/types';
+import { Block, BlockCrud, RelationEdge, RelationNode, Spark, SystemStatus } from '@/plugins/spark/types';
 import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards';
 import { FeatureRole, featureStore, WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
@@ -40,6 +40,7 @@ export default class SparkPage extends Vue {
   volatileWidgets: { [blockId: string]: PersistentWidget } = {};
   statusCheckInterval: NodeJS.Timeout | null = null;
   blockFilter = '';
+  pageMode: 'Relations' | 'Widgets' = 'Widgets';
 
   context: WidgetContext = {
     mode: 'Basic',
@@ -317,15 +318,20 @@ export default class SparkPage extends Vue {
     });
   }
 
-  showRelations(): void {
-    const nodes: RelationNode[] = this.validatedItems.map(v => ({ id: v.id, type: v.displayName }));
-    const edges = sparkStore.relations(this.service.id);
+  get nodes(): RelationNode[] {
+    return this.validatedItems.map(v => ({ id: v.id, type: v.displayName }));
+  }
 
+  get edges(): RelationEdge[] {
+    return sparkStore.relations(this.service.id);
+  }
+
+  showRelations(): void {
     createDialog({
       component: 'RelationsDialog',
       serviceId: this.service.id,
-      nodes,
-      edges,
+      nodes: this.nodes,
+      edges: this.edges,
     });
   }
 
@@ -367,6 +373,17 @@ export default class SparkPage extends Vue {
       <div>Blocks</div>
     </portal>
     <portal to="toolbar-buttons">
+      <q-btn-toggle
+        v-model="pageMode"
+        class="q-mr-md"
+        dark
+        flat
+        dense
+        :options="[
+          {icon:'mdi-widgets', value: 'Widgets'},
+          {icon:'mdi-lan', value: 'Relations'},
+        ]"
+      />
       <q-btn-dropdown :disable="!isReady || statusNok" color="primary" label="actions">
         <q-list dark link>
           <ActionItem
@@ -436,6 +453,15 @@ export default class SparkPage extends Vue {
         </q-item-section>
       </q-item>
     </q-list>
+
+    <template v-else-if="pageMode === 'Relations'">
+      <RelationsDiagram
+        :service-id="service.id"
+        :nodes="nodes"
+        :edges="edges"
+        :content-style="contentStyle"
+      />
+    </template>
 
     <template v-else>
       <!-- Normal display -->
