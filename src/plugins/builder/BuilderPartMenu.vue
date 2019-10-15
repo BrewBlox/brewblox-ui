@@ -6,7 +6,7 @@ import { clampRotation } from '@/helpers/functional';
 
 import { SQUARE_SIZE } from './getters';
 import { builderStore } from './store';
-import { CardSpec, FlowPart } from './types';
+import { CardSpec, FlowPart, PartSpec } from './types';
 
 @Component
 export default class BuilderPartMenu extends Vue {
