@@ -24,8 +24,8 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
     return {
       fridgeSensor: 'Fridge Sensor',
       beerSensor: 'Beer Sensor',
-      fridgeSSPair: 'Fridge Setting',
-      beerSSPair: 'Beer Setting',
+      fridgeSetpoint: 'Fridge Setting',
+      beerSetpoint: 'Beer Setting',
       tempProfile: 'Temperature Profile',
       coolAct: 'Cool Actuator',
       heatAct: 'Heat Actuator',

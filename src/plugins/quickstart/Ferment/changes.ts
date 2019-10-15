@@ -60,7 +60,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
   const serviceId = config.serviceId;
   const { fridgeSetting, beerSetting, activeSetpoint } = opts;
   const isBeer = activeSetpoint === 'beer';
-  const activeSetpointId = isBeer ? config.names.beerSSPair : config.names.fridgeSSPair;
+  const activeSetpointId = isBeer ? config.names.beerSetpoint : config.names.fridgeSetpoint;
   const initialSetting = isBeer ? beerSetting : fridgeSetting;
 
   const coolPidConfig: Partial<PidData> = isBeer
@@ -74,7 +74,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
   return [
     // setpoint sensor pair
     {
-      id: config.names.fridgeSSPair,
+      id: config.names.fridgeSetpoint,
       type: blockTypes.SetpointSensorPair,
       serviceId,
       groups,
@@ -91,7 +91,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
       },
     },
     {
-      id: config.names.beerSSPair,
+      id: config.names.beerSetpoint,
       type: blockTypes.SetpointSensorPair,
       serviceId,
       groups,
@@ -300,8 +300,8 @@ export const defineWidgets = (
           fields: [
             `${config.names.fridgeSensor}/value[${userTemp}]`,
             `${config.names.beerSensor}/value[${userTemp}]`,
-            `${config.names.fridgeSSPair}/setting[${userTemp}]`,
-            `${config.names.beerSSPair}/setting[${userTemp}]`,
+            `${config.names.fridgeSetpoint}/setting[${userTemp}]`,
+            `${config.names.beerSetpoint}/setting[${userTemp}]`,
             `${config.names.coolPwm}/value`,
             `${config.names.heatPwm}/value`,
             `${config.names.coolAct}/state`,
@@ -312,8 +312,8 @@ export const defineWidgets = (
       renames: {
         [`${config.serviceId}/${config.names.fridgeSensor}/value[${userTemp}]`]: 'Fridge temperature',
         [`${config.serviceId}/${config.names.beerSensor}/value[${userTemp}]`]: 'Beer temperature',
-        [`${config.serviceId}/${config.names.fridgeSSPair}/setting[${userTemp}]`]: 'Fridge setting',
-        [`${config.serviceId}/${config.names.beerSSPair}/setting[${userTemp}]`]: 'Beer setting',
+        [`${config.serviceId}/${config.names.fridgeSetpoint}/setting[${userTemp}]`]: 'Fridge setting',
+        [`${config.serviceId}/${config.names.beerSetpoint}/setting[${userTemp}]`]: 'Beer setting',
         [`${config.serviceId}/${config.names.coolPwm}/value`]: 'Cool PWM value',
         [`${config.serviceId}/${config.names.heatPwm}/value`]: 'Heat PWM value',
         [`${config.serviceId}/${config.names.coolAct}/state`]: 'Cool Pin state',
@@ -342,11 +342,11 @@ export const defineWidgets = (
           id: uid(),
           changes: [
             {
-              blockId: config.names.beerSSPair,
+              blockId: config.names.beerSetpoint,
               data: { settingEnabled: true },
             },
             {
-              blockId: config.names.fridgeSSPair,
+              blockId: config.names.fridgeSetpoint,
               data: { settingEnabled: true },
             },
           ],
@@ -360,11 +360,11 @@ export const defineWidgets = (
               data: { enabled: false },
             },
             {
-              blockId: config.names.beerSSPair,
+              blockId: config.names.beerSetpoint,
               data: { settingEnabled: false },
             },
             {
-              blockId: config.names.fridgeSSPair,
+              blockId: config.names.fridgeSetpoint,
               data: { settingEnabled: false },
             },
           ],
@@ -374,7 +374,7 @@ export const defineWidgets = (
           id: uid(),
           changes: [
             {
-              blockId: config.names.fridgeSSPair,
+              blockId: config.names.fridgeSetpoint,
               data: {
                 settingEnabled: true,
                 storedSetting: opts.fridgeSetting,
@@ -382,26 +382,26 @@ export const defineWidgets = (
               confirmed: { storedSetting: true },
             },
             {
-              blockId: config.names.beerSSPair,
+              blockId: config.names.beerSetpoint,
               data: { settingEnabled: false },
             },
             {
               blockId: config.names.coolPid,
               data: {
-                inputId: new Link(config.names.fridgeSSPair, interfaceTypes.ProcessValue),
+                inputId: new Link(config.names.fridgeSetpoint, interfaceTypes.ProcessValue),
                 ...fridgeCoolConfig,
               },
             },
             {
               blockId: config.names.heatPid,
               data: {
-                inputId: new Link(config.names.fridgeSSPair, interfaceTypes.ProcessValue),
+                inputId: new Link(config.names.fridgeSetpoint, interfaceTypes.ProcessValue),
                 ...fridgeHeatConfig,
               },
             },
             {
               blockId: config.names.tempProfile,
-              data: { targetId: new Link(config.names.fridgeSSPair) },
+              data: { targetId: new Link(config.names.fridgeSetpoint) },
             },
           ],
         },
@@ -410,11 +410,11 @@ export const defineWidgets = (
           id: uid(),
           changes: [
             {
-              blockId: config.names.fridgeSSPair,
+              blockId: config.names.fridgeSetpoint,
               data: { settingEnabled: false },
             },
             {
-              blockId: config.names.beerSSPair,
+              blockId: config.names.beerSetpoint,
               data: {
                 settingEnabled: true,
                 storedSetting: opts.beerSetting,
@@ -424,20 +424,20 @@ export const defineWidgets = (
             {
               blockId: config.names.coolPid,
               data: {
-                inputId: new Link(config.names.beerSSPair, interfaceTypes.ProcessValue),
+                inputId: new Link(config.names.beerSetpoint, interfaceTypes.ProcessValue),
                 ...beerCoolConfig,
               },
             },
             {
               blockId: config.names.heatPid,
               data: {
-                inputId: new Link(config.names.beerSSPair, interfaceTypes.ProcessValue),
+                inputId: new Link(config.names.beerSetpoint, interfaceTypes.ProcessValue),
                 ...beerHeatConfig,
               },
             },
             {
               blockId: config.names.tempProfile,
-              data: { targetId: new Link(config.names.beerSSPair) },
+              data: { targetId: new Link(config.names.beerSetpoint) },
             },
           ],
         },

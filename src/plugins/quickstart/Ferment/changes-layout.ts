@@ -36,7 +36,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
             color: 'E1AC00',
             setpoint: {
               serviceId,
-              blockId: config.names.beerSSPair,
+              blockId: config.names.beerSetpoint,
             },
           },
         },
@@ -50,7 +50,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           settings: {
             setpoint: {
               serviceId,
-              blockId: config.names.fridgeSSPair,
+              blockId: config.names.fridgeSetpoint,
             },
           },
         },
