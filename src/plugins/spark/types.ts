@@ -46,10 +46,13 @@ export interface SparkFeature {
   block?: BlockSpec;
 }
 
+export type PageMode = 'Relations' | 'List';
+
 export interface SparkConfig {
   groupNames: string[];
   expandedBlocks: { [id: string]: boolean };
   sorting: string;
+  pageMode: PageMode;
 }
 
 export interface Spark extends Service {

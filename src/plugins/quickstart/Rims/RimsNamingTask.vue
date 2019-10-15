@@ -149,11 +149,8 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
         <q-item dark class="text-weight-light">
           <q-item-section>
             <q-item-label class="text-subtitle1">
-              Name your blocks and dashboards
+              Name your new dashboard and blocks
             </q-item-label>
-            <p>
-              Enter a name for your new process below. The prefix will be used to suggest names for your new blocks.
-            </p>
           </q-item-section>
         </q-item>
 
@@ -164,29 +161,27 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
         </CardWarning>
 
         <!-- Generic settings -->
-        <q-expansion-item default-opened label="Settings" icon="settings" dense>
-          <QuickStartServiceField v-model="serviceId" :services="services" />
-          <QuickStartNameField
-            v-model="prefix"
-            optional
-            label="Prefix"
-            @clear="clearKey('prefix')"
-          >
-            <template #help>
-              By default all block names are prefixed.
-              You can override this for individual blocks.
-            </template>
-          </QuickStartNameField>
-          <QuickStartNameField
-            v-model="dashboardTitle"
-            label="Dashboard"
-            @clear="clearKey('dashboardTitle')"
-          >
-            <template #help>
-              The name for the new dashboard
-            </template>
-          </QuickStartNameField>
-        </q-expansion-item>
+        <QuickStartServiceField v-model="serviceId" :services="services" />
+        <QuickStartNameField
+          v-model="dashboardTitle"
+          label="Dashboard name"
+          @clear="clearKey('dashboardTitle')"
+        >
+          <template #help>
+            The name for the new dashboard.
+          </template>
+        </QuickStartNameField>
+        <QuickStartNameField
+          v-model="prefix"
+          optional
+          label="Prefix for names"
+          @clear="clearKey('prefix')"
+        >
+          <template #help>
+            By default all block names are prefixed.
+            You can override this for individual blocks.
+          </template>
+        </QuickStartNameField>
 
         <!-- Block names -->
         <q-expansion-item label="Generated names" icon="mdi-tag-multiple" dense>

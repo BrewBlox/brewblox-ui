@@ -46,7 +46,7 @@ export default class PidWidget extends BlockWidgetBase {
       <template #toolbar>
         <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
           <template #actions>
-            <ActionItem icon="mdi-ray-start-arrow" label="Show Relations" @click="showRelations" />
+            <ActionItem icon="mdi-vector-line" label="Show Relations" @click="showRelations" />
           </template>
         </component>
       </template>
