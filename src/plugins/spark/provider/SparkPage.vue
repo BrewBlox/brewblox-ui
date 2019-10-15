@@ -328,6 +328,7 @@ export default class SparkPage extends Vue {
 
   showRelations(): void {
     createDialog({
+      parent: this,
       component: 'RelationsDialog',
       serviceId: this.service.id,
       nodes: this.nodes,
@@ -345,10 +346,7 @@ export default class SparkPage extends Vue {
       ? `Discovered ${discovered.join(', ')}.`
       : 'Discovered no new blocks.';
 
-    this.$q.notify({
-      message,
-      icon: 'mdi-magnify-plus-outline',
-    });
+    this.$q.notify({ message, icon: 'mdi-magnify-plus-outline' });
   }
 
   async cleanUnusedNames(): Promise<void> {
