@@ -97,7 +97,8 @@ module.exports = {
       .tap((args) => {
         const gitInfo = gitDescribeSync(__dirname, { match: '[0-9]*' });
         const version = gitInfo.semverString;
-        fs.writeFileSync('src/build-env.json', JSON.stringify({ version }));
+        const date = new Date().toString();
+        fs.writeFileSync('src/build-env.json', JSON.stringify({ version, date }));
         return args;
       });
   },
