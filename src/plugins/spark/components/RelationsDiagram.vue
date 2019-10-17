@@ -150,10 +150,18 @@ export default class RelationsDiagram extends Vue {
     this.svg.setAttribute('width', outGraph.width);
 
     this.$nextTick(() => {
-      this.svg.querySelectorAll('.node .block-label')
+      this.svg.querySelectorAll('foreignObject')
         .forEach(el => {
-          const id = el.children[1].innerHTML;
+          const id = el.children[0].children[0].children[1].innerHTML;
+          // Add click listeners
           el.addEventListener('click', () => this.openSettings(id));
+          // Dagre has issues setting the correct height/width on the generated ForeignObject elements
+          // This seems fixed on Linux, but still present on Windows
+          // Enforce values here to guarantee correctness
+          el.setAttribute('width', `${LABEL_WIDTH}`);
+          el.setAttribute('height', `${LABEL_HEIGHT}`);
+          (el.parentElement as HTMLElement)
+            .setAttribute('transform', `translate(-${LABEL_WIDTH / 2}, -${LABEL_HEIGHT / 2})`);
         });
     });
   }
@@ -182,7 +190,6 @@ export default class RelationsDiagram extends Vue {
 
 /deep/ .node .id {
   font-weight: 300;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 14px;
   color: black;
   padding: 10px;
@@ -193,7 +200,6 @@ export default class RelationsDiagram extends Vue {
 
 /deep/ .node .type {
   font-weight: 300;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 12px;
   color: green;
   width: 100%;
