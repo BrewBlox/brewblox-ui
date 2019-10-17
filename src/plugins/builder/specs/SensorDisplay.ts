@@ -1,4 +1,5 @@
 import { CENTER, DOWN, LEFT, RIGHT, UP } from '../getters';
+import { showLinkedBlockDialog } from '../helpers';
 import { PartSpec } from '../types';
 
 const SIZE_X = 1;
@@ -6,6 +7,7 @@ const SIZE_Y = 1;
 
 const spec: PartSpec = {
   id: 'SensorDisplay',
+  title: 'Display: sensor',
   cards: [{
     component: 'LinkedBlockCard',
     props: { settingsKey: 'sensor', types: ['TempSensorInterface'], label: 'Sensor' },
@@ -23,6 +25,7 @@ const spec: PartSpec = {
       { outCoords: DOWN, friction: 0.5 },
     ],
   }),
+  interactHandler: part => showLinkedBlockDialog(part, 'sensor'),
 };
 
 export default spec;

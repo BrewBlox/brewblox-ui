@@ -189,7 +189,7 @@ export default class StepViewFull extends CrudComponent {
         return !!this.changeFields[block.type]
           && !step.changes.some(change => block.id === change.blockId);
       },
-      root: this.$root,
+      parent: this,
       serviceId: this.serviceId,
     })
       .onOk(block => {
@@ -214,7 +214,7 @@ export default class StepViewFull extends CrudComponent {
         return block.type === current.block.type
           && !step.changes.some(change => block.id === change.blockId);
       },
-      root: this.$root,
+      parent: this,
       serviceId: this.serviceId,
     })
       .onOk(block => {

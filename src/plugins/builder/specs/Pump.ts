@@ -11,6 +11,7 @@ import { PartSpec, PartUpdater, PersistentPart } from '../types';
 
 const spec: PartSpec = {
   id: 'Pump',
+  title: 'Pump',
   size: () => [1, 1],
   cards: [
     {

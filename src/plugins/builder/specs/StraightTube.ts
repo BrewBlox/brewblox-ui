@@ -3,6 +3,7 @@ import { PartSpec } from '../types';
 
 const spec: PartSpec = {
   id: 'StraightTube',
+  title: 'Tube: straight',
   cards: [],
   size: () => [1, 1],
   transitions: () => ({

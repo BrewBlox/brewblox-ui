@@ -5,25 +5,28 @@ import UrlSafeString from 'url-safe-string';
 import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
+import { dashboardIdRules } from '@/helpers/dashboards';
 import { suggestId, validator, valOrDefault } from '@/helpers/functional';
 import { typeName as sparkType } from '@/plugins/spark/getters';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Service, serviceStore } from '@/store/services';
 
+import { maybeSpace } from '../helpers';
 import { FermentConfig, FermentConfigNames } from './types';
 
 
 @Component
 export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
   chosenNames: Partial<FermentConfigNames> = {};
+  idGenerator = new UrlSafeString();
 
   get defaultNames(): FermentConfigNames {
     return {
       fridgeSensor: 'Fridge Sensor',
       beerSensor: 'Beer Sensor',
-      fridgeSSPair: 'Fridge Setting',
-      beerSSPair: 'Beer Setting',
+      fridgeSetpoint: 'Fridge Setting',
+      beerSetpoint: 'Beer Setting',
       tempProfile: 'Temperature Profile',
       coolAct: 'Cool Actuator',
       heatAct: 'Heat Actuator',
@@ -54,16 +57,8 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
       : `Group '${name}' is disabled. Created blocks will be inactive.`;
   }
 
-  get title(): string {
-    return valOrDefault(this.config.title, 'Fermentation');
-  }
-
-  set title(title: string) {
-    this.updateConfig({ ...this.config, title });
-  }
-
   get prefix(): string {
-    return valOrDefault(this.config.prefix, this.title.slice(0, 7));
+    return valOrDefault(this.config.prefix, 'Ferment');
   }
 
   set prefix(prefix: string) {
@@ -71,17 +66,32 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
   }
 
   get dashboardTitle(): string {
-    return valOrDefault(this.config.dashboardTitle, `${this.title} Dashboard`);
+    return valOrDefault(this.config.dashboardTitle, 'Fermentation');
   }
 
-  set dashboardTitle(id: string) {
-    this.updateConfig({ ...this.config, dashboardTitle: id });
+  set dashboardTitle(dashboardTitle: string) {
+    this.updateConfig({ ...this.config, dashboardTitle });
+  }
+
+  get dashboardId(): string {
+    return valOrDefault(
+      this.config.dashboardId,
+      suggestId(this.idGenerator.generate(this.dashboardTitle), validator(this.dashboardIdRules))
+    );
+  }
+
+  set dashboardId(dashboardId: string) {
+    this.updateConfig({ ...this.config, dashboardId });
+  }
+
+  get dashboardIdRules(): InputRule[] {
+    return dashboardIdRules();
   }
 
   get names(): FermentConfigNames {
     return {
       ...mapValues(this.defaultNames,
-        v => suggestId(`${this.prefix} ${v}`, validator(blockIdRules(this.serviceId)))),
+        v => suggestId(maybeSpace(this.prefix, v), validator(blockIdRules(this.serviceId)))),
       ...this.chosenNames,
     };
   }
@@ -98,6 +108,7 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
     return [
       this.serviceId,
       this.dashboardTitle,
+      validator(this.dashboardIdRules)(this.dashboardId),
       Object.values(this.names).every(validator(this.nameRules)),
     ]
       .every(Boolean);
@@ -120,9 +131,8 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
     this.updateConfig({
       ...this.config,
       serviceId: this.serviceId,
-      title: this.title,
       prefix: this.prefix,
-      dashboardId: new UrlSafeString().generate(this.dashboardTitle),
+      dashboardId: this.dashboardId,
       dashboardTitle: this.dashboardTitle,
       names: this.names,
       widgets: [],
@@ -142,11 +152,8 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
         <q-item dark class="text-weight-light">
           <q-item-section>
             <q-item-label class="text-subtitle1">
-              Name your blocks and dashboards
+              Name your new dashboard and blocks
             </q-item-label>
-            <p>
-              Enter a name for your new process below. The prefix will be used to suggest names for your new blocks.
-            </p>
           </q-item-section>
         </q-item>
 
@@ -157,43 +164,41 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
         </CardWarning>
 
         <!-- Generic settings -->
-        <q-expansion-item default-opened label="Setup name" icon="settings" dense>
-          <QuickStartServiceField v-model="serviceId" :services="services" />
-          <QuickStartNameField
-            v-model="title"
-            label="Arrangement name"
-            @clear="clearKey('title')"
-          >
-            <template #help>
-              The full name of your arrangement.
-              It will be used as the default dashboard title.
-              <br />The default prefix is the short version of this.
-            </template>
-          </QuickStartNameField>
-          <QuickStartNameField
-            v-model="prefix"
-            optional
-            label="Prefix"
-            @clear="clearKey('prefix')"
-          >
-            <template #help>
-              By default all block names are prefixed.
-              You can override this for individual blocks.
-            </template>
-          </QuickStartNameField>
-          <QuickStartNameField
-            v-model="dashboardTitle"
-            label="Dashboard"
-            @clear="clearKey('dashboardTitle')"
-          >
-            <template #help>
-              The name for the new dashboard
-            </template>
-          </QuickStartNameField>
-        </q-expansion-item>
+        <QuickStartServiceField v-model="serviceId" :services="services" />
+        <QuickStartNameField
+          v-model="dashboardTitle"
+          label="Dashboard name"
+          @clear="clearKey('dashboardTitle')"
+        >
+          <template #help>
+            The name for the new dashboard.
+          </template>
+        </QuickStartNameField>
+        <QuickStartNameField
+          v-model="prefix"
+          optional
+          label="Prefix for names"
+          @clear="clearKey('prefix')"
+        >
+          <template #help>
+            By default all block names are prefixed.
+            You can override this for individual blocks.
+          </template>
+        </QuickStartNameField>
 
         <!-- Block names -->
-        <q-expansion-item label="Block names" icon="mdi-tag-multiple" dense>
+        <q-expansion-item label="Generated names" icon="mdi-tag-multiple" dense>
+          <QuickStartNameField
+            v-model="dashboardId"
+            label="Dashboard ID"
+            :rules="dashboardIdRules"
+            @clear="clearKey('dashboardId')"
+          >
+            <template #help>
+              The unique identifier for your dashboard.
+              <br /> By default, this is an URL-safe version of the dashboard title.
+            </template>
+          </QuickStartNameField>
           <QuickStartNameField
             v-for="(nVal, nKey) in names" :key="nKey"
             :value="nVal"

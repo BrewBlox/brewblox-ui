@@ -19,7 +19,7 @@ export default class ProfilePresetAction extends BlockCrudComponent {
     createDialog({
       component: 'ProfilePresetDialog',
       value: this.block,
-      root: this.$root,
+      parent: this,
       title: 'Load/Save Profile',
     });
   }

@@ -127,7 +127,7 @@ export default class BuilderBasic extends CrudComponent {
     createDialog({
       component: 'BuilderEditor',
       initialLayout: this.widgetConfig.currentLayoutId,
-      root: this.$root,
+      parent: this,
     });
   }
 

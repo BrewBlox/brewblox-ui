@@ -35,7 +35,7 @@ export default class CrudComponent extends Vue {
   public showDialog(opts: DialogOpts = {}): void {
     const { widgetProps, mode, listeners } = opts;
     this.activeDialog = createDialog({
-      root: this.$root,
+      parent: this,
       component: 'WidgetDialog',
       getCrud: () => ({ ...this.crud, closeDialog: this.closeDialog }),
       getProps: () => widgetProps,
@@ -63,7 +63,7 @@ export default class CrudComponent extends Vue {
   public startChangeWidgetTitle(): void {
     const widgetTitle = this.widget.title;
     createDialog({
-      root: this.$root,
+      parent: this,
       title: 'Change Widget name',
       message: `Choose a new name for '${widgetTitle}'`,
       dark: true,
@@ -79,7 +79,7 @@ export default class CrudComponent extends Vue {
   public startCopyWidget(): void {
     const id = uid();
     createDialog({
-      root: this.$root,
+      parent: this,
       title: 'Copy widget',
       message: `To which dashboard do you want to copy widget ${this.widget.title}?`,
       dark: true,
@@ -106,7 +106,7 @@ export default class CrudComponent extends Vue {
 
   public startMoveWidget(): void {
     createDialog({
-      root: this.$root,
+      parent: this,
       title: 'Move widget',
       message: `To which dashboard do you want to move widget ${this.widget.title}?`,
       dark: true,
@@ -141,7 +141,7 @@ export default class CrudComponent extends Vue {
     ].map((opt, idx) => ({ ...opt, value: idx }));
 
     createDialog({
-      root: this.$root,
+      parent: this,
       title: 'Delete widget',
       message: `How do you want to delete widget ${this.widget.title}?`,
       dark: true,

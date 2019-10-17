@@ -6,6 +6,7 @@ const SIZE_Y = 1;
 
 const spec: PartSpec = {
   id: 'FilterBottom',
+  title: 'Filter: bottom',
   cards: [
     {
       component: 'SizeCard',

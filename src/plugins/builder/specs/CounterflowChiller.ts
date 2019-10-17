@@ -10,6 +10,7 @@ const SIZE_Y = 2;
 
 const spec: PartSpec = {
   id: 'CounterflowChiller',
+  title: 'Counterflow chiller',
   cards: [],
   size: () => [SIZE_X, SIZE_Y],
   transitions: () => ({

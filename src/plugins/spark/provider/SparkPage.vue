@@ -9,7 +9,7 @@ import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import { startResetBlocks } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockCrud, RelationNode, Spark, SystemStatus } from '@/plugins/spark/types';
+import { Block, BlockCrud, PageMode, RelationEdge, RelationNode, Spark, SystemStatus } from '@/plugins/spark/types';
 import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards';
 import { FeatureRole, featureStore, WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
@@ -96,6 +96,15 @@ export default class SparkPage extends Vue {
       Constraint: 'mdi-lock-outline',
       Other: 'mdi-cube',
     };
+  }
+
+  get pageMode(): PageMode {
+    return this.service.config.pageMode || 'List';
+  }
+
+  set pageMode(mode: PageMode) {
+    this.service.config.pageMode = mode;
+    this.saveServiceConfig();
   }
 
   get allSorters(): { [id: string]: (a: ValidatedWidget, b: ValidatedWidget) => number } {
@@ -312,21 +321,19 @@ export default class SparkPage extends Vue {
     };
     createDialog({
       component,
-      root: this.$root,
+      parent: this,
       ...args,
     });
   }
 
-  showRelations(): void {
-    const nodes: RelationNode[] = this.validatedItems.map(v => ({ id: v.id, type: v.displayName }));
-    const edges = sparkStore.relations(this.service.id);
+  get nodes(): RelationNode[] {
+    return this.validatedItems
+      .map(v => ({ id: v.id, type: v.displayName }))
+      .sort(objectStringSorter('type'));
+  }
 
-    createDialog({
-      component: 'RelationsDialog',
-      serviceId: this.service.id,
-      nodes,
-      edges,
-    });
+  get edges(): RelationEdge[] {
+    return sparkStore.relations(this.service.id);
   }
 
   async discoverBlocks(): Promise<void> {
@@ -339,10 +346,7 @@ export default class SparkPage extends Vue {
       ? `Discovered ${discovered.join(', ')}.`
       : 'Discovered no new blocks.';
 
-    this.$q.notify({
-      message,
-      icon: 'mdi-magnify-plus-outline',
-    });
+    this.$q.notify({ message, icon: 'mdi-magnify-plus-outline' });
   }
 
   async cleanUnusedNames(): Promise<void> {
@@ -367,13 +371,20 @@ export default class SparkPage extends Vue {
       <div>Blocks</div>
     </portal>
     <portal to="toolbar-buttons">
+      <q-btn-toggle
+        v-model="pageMode"
+        class="q-mr-md"
+        dark
+        flat
+        dense
+        no-caps
+        :options="[
+          {icon:'mdi-format-list-checkbox', value: 'List', label: 'List view'},
+          {icon:'mdi-vector-line', value: 'Relations', label: 'Relation view'},
+        ]"
+      />
       <q-btn-dropdown :disable="!isReady || statusNok" color="primary" label="actions">
         <q-list dark link>
-          <ActionItem
-            icon="mdi-ray-start-arrow"
-            label="Show Relations"
-            @click="showRelations"
-          />
           <ActionItem
             icon="add"
             label="New Block"
@@ -436,6 +447,15 @@ export default class SparkPage extends Vue {
         </q-item-section>
       </q-item>
     </q-list>
+
+    <template v-else-if="pageMode === 'Relations'">
+      <RelationsDiagram
+        :service-id="service.id"
+        :nodes="nodes"
+        :edges="edges"
+        :content-style="contentStyle"
+      />
+    </template>
 
     <template v-else>
       <!-- Normal display -->

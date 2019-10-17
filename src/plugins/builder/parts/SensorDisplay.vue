@@ -5,13 +5,21 @@ import { Component } from 'vue-property-decorator';
 import { Block } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
-import { settingsBlock } from '../helpers';
+import { settingsBlock, settingsLink } from '../helpers';
 
 
 @Component
 export default class SensorDisplay extends PartBase {
   get block(): Block | null {
     return settingsBlock(this.part, 'sensor');
+  }
+
+  get isBroken(): boolean {
+    if (this.block) {
+      return false;
+    }
+    const link = settingsLink(this.part, 'sensor');
+    return !!link.serviceId && !!link.blockId;
   }
 
   get temperature(): number | null {
@@ -27,7 +35,8 @@ export default class SensorDisplay extends PartBase {
 <template>
   <g>
     <foreignObject :transform="textTransformation([1,1])" :width="squares(1)" :height="squares(1)">
-      <div class="text-white text-bold text-center">
+      <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
+      <div v-else class="text-white text-bold text-center">
         <q-icon name="mdi-thermometer" />
         <q-icon v-if="!block" name="mdi-link-variant-off" />
         <small v-else>{{ tempUnit }}</small>

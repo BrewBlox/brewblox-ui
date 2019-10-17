@@ -95,7 +95,7 @@ export default class BlockGraph extends Vue {
     createDialog({
       component: 'InputDialog',
       title: 'Duration',
-      root: this.$root,
+      parent: this,
       value: this.graphCfg.params.duration,
     })
       .onOk(val => {

@@ -6,6 +6,7 @@ const SIZE_Y = 1;
 
 const spec: PartSpec = {
   id: 'Lauterhexe',
+  title: 'Filter: lauterhexe',
   cards: [],
   size: () => [SIZE_X, SIZE_Y],
   transitions: () => ({

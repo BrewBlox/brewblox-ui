@@ -8,6 +8,7 @@ import { PartSpec, PersistentPart, Transitions } from '../types';
 
 const spec: PartSpec = {
   id: 'ActuatorValve',
+  title: 'Valve: actuator',
   size: () => [1, 1],
   cards: [{
     component: 'LinkedBlockCard',

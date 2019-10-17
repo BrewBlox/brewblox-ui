@@ -19,7 +19,7 @@ import { BuilderConfig, BuilderLayout } from './types';
 export default class BuilderWidget extends WidgetBase {
   startEditor(): void {
     createDialog({
-      root: this.$root,
+      parent: this,
       component: 'BuilderEditor',
       initialLayout: this.widget.config.currentLayoutId,
     });

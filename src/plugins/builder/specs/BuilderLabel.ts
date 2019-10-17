@@ -1,21 +1,27 @@
 import { PartSpec, PersistentPart } from '../types';
 
 const DEFAULT_SIZE_X = 4;
-const DEFAULT_SIZE_Y = 12;
+const DEFAULT_SIZE_Y = 1;
 
 const spec: PartSpec = {
-  id: 'Fridge',
-  title: 'Fridge',
+  id: 'BuilderLabel',
+  title: 'Label: text',
   cards: [
-    { component: 'TextCard' },
+    {
+      component: 'TextCard',
+      props: {
+        settingsKey: 'text',
+        label: 'Displayed text',
+      },
+    },
     {
       component: 'SizeCard',
       props: {
-        settingsKey: 'shelfY',
-        defaultSize: 1,
-        label: 'Shelf position (from top)',
-        min: 1,
-        max: 14,
+        settingsKey: 'fontSize',
+        label: 'Font size',
+        defaultSize: 16,
+        min: 8,
+        max: 40,
       },
     },
     {
@@ -24,8 +30,8 @@ const spec: PartSpec = {
         settingsKey: 'sizeX',
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
-        min: 4,
-        max: 15,
+        min: 2,
+        max: 10,
       },
     },
     {
@@ -34,8 +40,8 @@ const spec: PartSpec = {
         settingsKey: 'sizeY',
         defaultSize: DEFAULT_SIZE_Y,
         label: 'Height',
-        min: 4,
-        max: 15,
+        min: 1,
+        max: 10,
       },
     },
   ],

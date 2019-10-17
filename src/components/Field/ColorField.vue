@@ -52,7 +52,7 @@ export default class ColorField extends FieldBase {
       title: this.title,
       message: this.message,
       messageHtml: this.messageHtml,
-      root: this.$root,
+      parent: this,
       value: this.color,
       clearable: this.clearable,
     })

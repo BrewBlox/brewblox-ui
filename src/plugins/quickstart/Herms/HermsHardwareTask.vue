@@ -57,7 +57,7 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
     createDialog({
       component: 'BlockWizardDialog',
       serviceId: this.config.serviceId,
-      root: this.$root,
+      parent: this,
     });
   }
 

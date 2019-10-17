@@ -6,7 +6,8 @@ import { convertedTemp, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
 import { createOutputActions } from '../helpers';
-import { defineChangedBlocks, defineCreatedBlocks, defineLayouts, defineWidgets } from './changes';
+import { defineChangedBlocks, defineCreatedBlocks, defineWidgets } from './changes';
+import { defineLayouts } from './changes-layout';
 import { FermentConfig, FermentOpts } from './types';
 
 @Component
