@@ -129,6 +129,13 @@ export default class DefaultLayout extends Vue {
     });
   }
 
+  showStepperEditor(): void {
+    createDialog({
+      component: 'StepperEditor',
+      parent: this,
+    });
+  }
+
   stopEditing(): void {
     this.dashboardEditing = false;
     this.serviceEditing = false;
@@ -311,6 +318,8 @@ export default class DefaultLayout extends Vue {
       <ActionItem icon="mdi-creation" label="Wizardry" @click="openWizard(null)" />
       <q-separator dark />
       <ActionItem icon="mdi-pipe" label="Brewery Builder" @click="showBuilderEditor" />
+      <q-separator dark />
+      <ActionItem icon="settings" label="Stepper" @click="showStepperEditor" />
 
       <q-item class="bottomed">
         <q-item-section class="col-auto">

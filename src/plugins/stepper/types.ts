@@ -4,21 +4,22 @@ export interface Action {
   opts: Mapped<any>;
 }
 
-export interface Response {
-  type: string;
-  opts: Mapped<any>;
-}
-
 export interface Condition {
   type: string;
   opts: Mapped<any>;
 }
 
+export interface Annotation {
+  type: string;
+  title: string;
+  message: string;
+}
+
 export interface Step {
   name: string;
   actions: Action[];
-  responses: Response[];
   conditions: Condition[];
+  annotations: Annotation[];
 }
 
 export interface Process {
@@ -52,7 +53,6 @@ export interface Runtime {
   start: number | null;
   end: number | null;
   results: RuntimeResult[];
-  responses?: ResponseResult[];
   conditions?: boolean[];
 }
 

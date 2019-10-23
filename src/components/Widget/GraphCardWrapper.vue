@@ -6,7 +6,6 @@ import { Component, Prop } from 'vue-property-decorator';
 @Component
 export default class GraphCardWrapper extends Vue {
   collapsed = true;
-  sizeok = window.innerWidth >= 1500;
 
   @Prop({ type: Boolean, default: false })
   public readonly show!: boolean;
@@ -26,7 +25,7 @@ export default class GraphCardWrapper extends Vue {
   </q-card>
   <q-card v-else dark class="row wrapper-card">
     <slot />
-    <template v-if="sizeok">
+    <template v-if="$q.screen.gt.md">
       <div class="col column justify-center" style="min-height: 100%">
         <q-btn
           v-if="collapsed"

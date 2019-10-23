@@ -48,6 +48,12 @@ export default class StepperEditor extends DialogBase {
                 label: cond.type,
               })),
             },
+            {
+              label: 'Annotations',
+              children: step.annotations.map(anno => ({
+                label: anno.title,
+              })),
+            },
           ],
         })),
       }));
@@ -83,19 +89,17 @@ export default class StepperEditor extends DialogBase {
   <q-dialog ref="dialog" maximized no-esc-dismiss @hide="onDialogHide">
     <q-card class="maximized bg-dark column" dark>
       <DialogToolbar>
-        <q-item-section>
-          <q-item-label>Step Editor</q-item-label>
-        </q-item-section>
-      </DialogToolbar>
+        Step Editor
+        <q-space />
 
-      <q-item dark>
-        <q-item-section>
+        <div class="row">
           <q-btn-dropdown
             :label="process ? process.title : 'None'"
             flat
             no-caps
             icon="widgets"
-            class="col-auto"
+            class="col"
+            size="md"
           >
             <q-list dark bordered>
               <ActionItem
@@ -108,9 +112,9 @@ export default class StepperEditor extends DialogBase {
               />
             </q-list>
           </q-btn-dropdown>
-        </q-item-section>
-        <q-item-section class="col-auto">
-          <q-btn-dropdown flat icon="settings" class="col-auto">
+        </div>
+        <template #buttons>
+          <q-btn-dropdown flat icon="menu" class="col-auto">
             <q-list dark bordered>
               <ActionItem label="New Process" icon="add" @click="startAddProcess(false)" />
               <template v-if="!!process">
@@ -123,21 +127,22 @@ export default class StepperEditor extends DialogBase {
               </template>
             </q-list>
           </q-btn-dropdown>
-        </q-item-section>
-      </q-item>
+        </template>
+      </DialogToolbar>
 
-      <q-splitter v-model="splitterModel" dark class="col" style="border-top: 1px solid gray">
+      <q-splitter v-model="splitterModel" dark class="col">
         <template #before>
-          <div class="q-pa-md">
-            <q-tree :nodes="tree" default-expand-all node-key="label" dark :selected.sync="selected" />
+          <div class="q-pa-sm">
+            <ProcessTower v-if="!!process" :process="process" />
+            <!-- <q-tree :nodes="tree" default-expand-all node-key="label" dark :selected.sync="selected" /> -->
           </div>
         </template>
         <template #after>
           <q-tab-panels v-model="selected" class="bg-dark">
-            <q-tab-panel name="one">
+            <q-tab-panel name="step-one">
               one
             </q-tab-panel>
-            <q-tab-panel name="two">
+            <q-tab-panel name="step-two">
               two
             </q-tab-panel>
           </q-tab-panels>

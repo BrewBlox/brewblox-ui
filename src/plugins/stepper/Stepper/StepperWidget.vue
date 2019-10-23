@@ -1,4 +1,5 @@
 <script lang="ts">
+import { uid } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
@@ -6,7 +7,7 @@ import { createDialog } from '@/helpers/dialog';
 import { Unit } from '@/helpers/units';
 
 import { stepperStore } from '../store';
-import { Process, ProcessGroup, Runtime } from '../types';
+import { Process, ProcessGroup, Runtime, Step } from '../types';
 
 
 @Component
@@ -81,67 +82,77 @@ export default class StepperWidget extends WidgetBase {
     });
   }
 
-  make(): void {
+  clear(): void {
+    stepperStore.processValues.forEach(stepperStore.removeProcess);
+  }
+
+  async make(): Promise<void> {
+    const mkSteps = (): Step[] => ([
+      {
+        name: 'step-one',
+        actions: [
+          {
+            type: 'BlockPatch',
+            opts: {
+              block: 'sensor-1',
+              service: 'sparkey',
+              data: {
+                value: new Unit(5, 'degC'),
+              },
+            },
+          },
+        ],
+        conditions: [
+          {
+            type: 'BlockValue',
+            opts: {
+              block: 'sensor-1',
+              service: 'sparkey',
+              key: 'value[degC]',
+              operator: 'ge',
+              value: 10,
+            },
+          },
+        ],
+        annotations: [],
+      },
+      {
+        name: 'step-two',
+        actions: [
+          {
+            type: 'BlockPatch',
+            opts: {
+              block: 'sensor-1',
+              service: 'sparkey',
+              data: {
+                value: new Unit(5, 'degC'),
+              },
+            },
+          },
+        ],
+        conditions: [
+          {
+            type: 'BlockValue',
+            opts: {
+              block: 'sensor-1',
+              service: 'sparkey',
+              key: 'value[degC]',
+              operator: 'ge',
+              value: 10,
+            },
+          },
+        ],
+        annotations: [],
+      },
+    ]);
+
     stepperStore.createProcess({
-      id: 'test-process',
+      id: uid(),
       title: 'Test Process',
       steps: [
-        {
-          name: 'step-one',
-          actions: [
-            {
-              type: 'BlockPatch',
-              opts: {
-                block: 'sensor-1',
-                service: 'sparkey',
-                data: {
-                  value: new Unit(5, 'degC'),
-                },
-              },
-            },
-          ],
-          responses: [],
-          conditions: [
-            {
-              type: 'BlockValue',
-              opts: {
-                block: 'sensor-1',
-                service: 'sparkey',
-                key: 'value[degC]',
-                operator: 'ge',
-                value: 10,
-              },
-            },
-          ],
-        },
-        {
-          name: 'step-two',
-          actions: [
-            {
-              type: 'BlockPatch',
-              opts: {
-                block: 'sensor-1',
-                service: 'sparkey',
-                data: {
-                  value: new Unit(5, 'degC'),
-                },
-              },
-            },
-          ],
-          responses: [],
-          conditions: [
-            {
-              type: 'BlockValue',
-              opts: {
-                block: 'sensor-1',
-                service: 'sparkey',
-                key: 'value[degC]',
-                operator: 'ge',
-                value: 10,
-              },
-            },
-          ],
-        },
+        ...mkSteps(),
+        ...mkSteps(),
+        ...mkSteps(),
       ],
     });
   }
@@ -152,7 +163,9 @@ export default class StepperWidget extends WidgetBase {
   <q-card dark :class="cardClass">
     <component :is="toolbarComponent" :crud="crud">
       <template #actions>
+        <ActionItem icon="settings" label="Editor" @click="startEditor" />
         <ActionItem icon="add" label="New" @click="make" />
+        <ActionItem icon="delete" label="Clear" @click="clear" />
         <ActionItem icon="refresh" label="Refresh" @click="fetch" />
         <WidgetActions :crud="crud" />
       </template>
