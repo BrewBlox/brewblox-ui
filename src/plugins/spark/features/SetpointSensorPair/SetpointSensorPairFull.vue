@@ -4,8 +4,8 @@ import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
+import { Block } from '@/plugins/spark/types';
 
-import { Block } from '../../types';
 import { FilterChoice, SetpointSensorPairBlock } from './types';
 
 @Component
@@ -28,16 +28,6 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
     return sparkStore.blockValues(this.serviceId)
       .filter(block => get(block, 'data.inputId.id') === this.blockId);
   }
-
-  get disabledString(): string {
-    if (this.usedBy.length === 0) {
-      return 'This setpoint is disabled and is not used.';
-    } else if (this.usedBy.length == 1) {
-      return `This setpoint is disabled and therefore '${this.usedBy[0].id}' is inactive.`;
-    } else {
-      return `This setpoint is disabled and therefore ${this.usedBy.map(v => `'${v.id}'`).join(' and ')} are inactive.`;
-    }
-  }
 }
 </script>
 
@@ -46,13 +36,6 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
     <slot name="toolbar" />
     <slot name="warnings" />
 
-    <BlockEnableToggle
-      :crud="crud"
-      :text-disabled="disabledString"
-      text-enabled="Setpoint is enabled."
-      data-key="settingEnabled"
-      class="full-width bordered"
-    />
     <q-card-section>
       <q-separator dark inset />
 
