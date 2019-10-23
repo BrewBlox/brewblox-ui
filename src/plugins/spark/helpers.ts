@@ -106,8 +106,11 @@ export const resetBlocks = async (serviceId: string, opts: { restore: boolean; d
             const { hwDevice, channel } = block.data;
             if (!hwDevice.id || !channel) { return; }
             const target = sparkStore.blockById(serviceId, block.data.hwDevice.id);
-            const [name] = Object.keys(target.data.pins[channel]);
-            linked.push(`${block.id}: ${target.id} ${name}`);
+            const pin = target.data.pins[channel];
+            if (pin !== undefined) {
+              const [name] = Object.keys(pin);
+              linked.push(`${block.id}: ${target.id} ${name}`);
+            }
           }
 
           if (addressedTypes.includes(block.type)) {
