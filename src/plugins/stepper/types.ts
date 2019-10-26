@@ -1,31 +1,31 @@
 
-export interface Action {
+export interface StepAction {
   type: string;
   opts: Mapped<any>;
 }
 
-export interface Condition {
+export interface StepCondition {
   type: string;
   opts: Mapped<any>;
 }
 
-export interface Annotation {
-  type: string;
+export interface StepNote {
   title: string;
   message: string;
 }
 
-export interface Step {
-  name: string;
-  actions: Action[];
-  conditions: Condition[];
-  annotations: Annotation[];
+export interface ProcessStep {
+  id: string;
+  title: string;
+  actions: StepAction[];
+  conditions: StepCondition[];
+  notes: StepNote[];
 }
 
 export interface Process {
   id: string;
   title: string;
-  steps: Step[];
+  steps: ProcessStep[];
 }
 
 export interface RuntimeLog {
@@ -35,14 +35,17 @@ export interface RuntimeLog {
   message: string;
 }
 
-export interface ResponseResult {
+export interface RuntimeTask {
+  ref: string;
   title: string;
   message: string;
+  done: boolean;
 }
 
 export interface RuntimeResult {
-  name: string;
-  index: number;
+  id: string;
+  title: string;
+  step: string;
   start: number | null;
   end: number | null;
   logs: RuntimeLog[];
@@ -50,17 +53,13 @@ export interface RuntimeResult {
 
 export interface Runtime {
   id: string;
+  title: string;
   start: number | null;
   end: number | null;
+  process: Process;
+  tasks: RuntimeTask[];
   results: RuntimeResult[];
   conditions?: boolean[];
-}
-
-export interface ProcessGroup {
-  id: string;
-  process: Process;
-  runtime: Runtime | null;
-  current: RuntimeResult | null;
 }
 
 export type CompareOperator = 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt';

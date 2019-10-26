@@ -2,6 +2,7 @@ import Vue from 'vue';
 import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
 import { objReducer } from '@/helpers/functional';
+import { deserialize } from '@/helpers/units/parseObject';
 import store from '@/store';
 
 import { Process, Runtime } from '../types';
@@ -41,19 +42,11 @@ export class StepperModule extends VuexModule {
   @Mutation
   public commitRemoveProcess(process: Process): void {
     Vue.delete(this.processes, process.id);
-    Vue.delete(this.runtimes, process.id);
   }
 
   @Mutation
   public commitAllProcesses(processes: Process[]): void {
-    const ids = processes.map(p => p.id);
-    const reducer = objReducer('id');
-
-    this.processes = processes
-      .reduce(reducer, {});
-    this.runtimes = Object.values(this.runtimes)
-      .filter(r => ids.includes(r.id))
-      .reduce(reducer, {});
+    this.processes = processes.reduce(objReducer('id'), {});
   }
 
   @Mutation
@@ -132,8 +125,8 @@ export class StepperModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async fetchRuntime(process: Process | Runtime): Promise<void> {
-    this.commitRuntime(await api.fetchRuntime(process));
+  public async fetchRuntime(runtime: Runtime): Promise<void> {
+    this.commitRuntime(await api.fetchRuntime(runtime));
   }
 
   @Action({ rawError })
@@ -143,12 +136,9 @@ export class StepperModule extends VuexModule {
       const source = await api.subscribe();
 
       source.onmessage = (event: MessageEvent) => {
-        const runtimes: Runtime[] = JSON.parse(event.data);
+        const runtimes: Runtime[] = deserialize(JSON.parse(event.data));
         this.commitAllRuntimes(runtimes);
         this.commitLastUpdate();
-        runtimes
-          .filter(runtime => !this.processes[runtime.id])
-          .forEach(runtime => api.fetchProcess(runtime).then(this.commitProcess));
       };
 
       source.onerror = () => {
@@ -163,19 +153,24 @@ export class StepperModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async startProcess(process: Process): Promise<void> {
-    this.commitRuntime(await api.startProcess(process));
+  public async start(process: Process): Promise<void> {
+    this.commitRuntime(await api.start(process));
   }
 
   @Action({ rawError })
-  public async advanceProcess(process: Runtime | Process): Promise<void> {
-    this.commitRuntime(await api.advanceProcess(process));
+  public async stop(runtime: Runtime): Promise<void> {
+    this.commitRuntime(await api.stop(runtime));
   }
 
   @Action({ rawError })
-  public async exitProcess(process: Process | Runtime): Promise<void> {
-    await api.exitRuntime(process);
-    this.commitRemoveRuntime(process);
+  public async advance(runtime: Runtime): Promise<void> {
+    this.commitRuntime(await api.advance(runtime));
+  }
+
+  @Action({ rawError })
+  public async exit(runtime: Runtime): Promise<void> {
+    await api.exit(runtime);
+    this.commitRemoveRuntime(runtime);
   }
 }
 

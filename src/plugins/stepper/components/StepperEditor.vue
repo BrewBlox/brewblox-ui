@@ -1,17 +1,20 @@
 <script lang="ts">
+import { VueConstructor } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 
+import { actionComponents } from '../actions';
 import { stepperStore } from '../store';
-import { Process } from '../types';
+import { Process, ProcessStep, StepAction } from '../types';
 
 
 @Component
 export default class StepperEditor extends DialogBase {
   processId: string | null = null;
-  splitterModel = 30;
-  selected = 'one';
+  stepId: string | null = null;
+  outerSplitter = 30;
+  innerSplitter = 50;
 
   @Prop({ type: String })
   public readonly initialProcess!: string;
@@ -29,34 +32,25 @@ export default class StepperEditor extends DialogBase {
     return stepperStore.processValues;
   }
 
-  get tree(): any {
-    return this.processes
-      .map(proc => ({
-        label: proc.title,
-        children: proc.steps.map(step => ({
-          label: step.name,
-          children: [
-            {
-              label: 'Actions',
-              children: step.actions.map(action => ({
-                label: action.type,
-              })),
-            },
-            {
-              label: 'Conditions',
-              children: step.conditions.map(cond => ({
-                label: cond.type,
-              })),
-            },
-            {
-              label: 'Annotations',
-              children: step.annotations.map(anno => ({
-                label: anno.title,
-              })),
-            },
-          ],
-        })),
-      }));
+  saveProcess(process: Process): void {
+    stepperStore.saveProcess(process);
+  }
+
+  get step(): ProcessStep | null {
+    return (this.process === null || this.stepId === null)
+      ? null
+      : this.process.steps.find(s => s.id === this.stepId) || null;
+  }
+
+  actionComponent(action: StepAction): VueConstructor {
+    return actionComponents[action.type];
+  }
+
+  saveAction(idx: number, action: StepAction): void {
+    if (this.process !== null && this.step !== null) {
+      this.step.actions[idx] = action;
+      this.saveProcess(this.process);
+    }
   }
 
   startAddProcess(copy: boolean): void {
@@ -130,22 +124,39 @@ export default class StepperEditor extends DialogBase {
         </template>
       </DialogToolbar>
 
-      <q-splitter v-model="splitterModel" dark class="col">
+      <q-splitter v-model="outerSplitter" dark class="col">
         <template #before>
-          <div class="q-pa-sm">
-            <ProcessTower v-if="!!process" :process="process" />
-            <!-- <q-tree :nodes="tree" default-expand-all node-key="label" dark :selected.sync="selected" /> -->
-          </div>
+          <q-card-section>
+            <ProcessTower
+              v-if="!!process"
+              :process="process"
+              :selected.sync="stepId"
+            />
+          </q-card-section>
         </template>
-        <template #after>
-          <q-tab-panels v-model="selected" class="bg-dark">
-            <q-tab-panel name="step-one">
-              one
-            </q-tab-panel>
-            <q-tab-panel name="step-two">
-              two
-            </q-tab-panel>
-          </q-tab-panels>
+        <template v-if="step" #after>
+          <q-item dark>
+            <q-item-section class="text-h5 text-center">
+              {{ step.title }}
+            </q-item-section>
+          </q-item>
+          <q-splitter v-model="innerSplitter" dark style="border-top: 1px solid gray">
+            <template #before>
+              <q-card-section>
+                <q-list dark>
+                  <component
+                    :is="actionComponent(action)"
+                    v-for="(action, idx) in step.actions"
+                    :key="'action-'+idx"
+                    :action="action"
+                    @update:action="v => saveAction(idx, v)"
+                  />
+                </q-list>
+              </q-card-section>
+            </template>
+            <template #after>
+            </template>
+          </q-splitter>
         </template>
       </q-splitter>
     </q-card>

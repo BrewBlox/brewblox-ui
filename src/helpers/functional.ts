@@ -217,3 +217,8 @@ export const mutate =
 export const objReducer =
   (key: string) =>
     (acc: Mapped<any>, obj: any) => mutate(acc, obj[key], obj);
+
+
+export const mapEntries =
+  (obj: Record<keyof any, any>, callback: ([k, v]) => [keyof any, any]): typeof obj =>
+    Object.fromEntries(Object.entries(obj).map(callback));

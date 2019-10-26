@@ -2,7 +2,7 @@
 import Vue, { CreateElement, VNode } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { Action, Condition, Process, Step } from '../types';
+import { Process, ProcessStep, StepNote } from '../types';
 
 @Component
 export default class ProcessTower extends Vue {
@@ -10,87 +10,36 @@ export default class ProcessTower extends Vue {
   @Prop({ type: Object, required: true })
   public readonly process!: Process;
 
+  @Prop({ required: true })
+  public readonly selected!: string | null;
+
   get layout(): string {
     return this.$q.screen.lt.md
       ? 'dense'
-      : (this.$q.screen.lt.lg ? 'comfortable' : 'loose');
+      : 'comfortable';
   }
 
-  private renderAction(h: CreateElement, action: Action | Condition): VNode {
-    return h('ActionItem',
-      {
-        props: {
-          // icon: 'mdi-circle-edit-outline',
-          label: action.type,
-          noClose: true,
-          itemProps: {
-            // insetLevel: 0.2,
-            // dense: true,
-          },
-        },
-        on: {
-          click: () => { console.log(action.type); },
-        },
-        // class: 'q-ma-none q-pa-none',
-        // style: 'border-left: 2px solid red',
-      });
+  private renderNote(h: CreateElement, note: StepNote): VNode {
+    return h('div', [
+      h('div', { class: 'text-bold' }, [note.title]),
+      h('div', { class: 'ellipsis-2-lines' }, [note.message]),
+    ]);
   }
 
-  private renderCondition(h: CreateElement, cond: Condition): VNode {
-    return h('ActionItem',
-      {
-        props: {
-          // icon: 'mdi-progress-check',
-          label: cond.type,
-          noClose: true,
-          itemProps: {
-            // insetLevel: 0.2,
-            // dense: true,
-          },
-        },
-        on: {
-          click: () => { console.log(cond.type); },
-        },
-        // style: 'border-left: 2px solid dodgerblue',
-      });
-  }
-
-  private renderStep(h: CreateElement, step: Step): VNode {
+  private renderStep(h: CreateElement, step: ProcessStep): VNode {
     return h('q-timeline-entry',
       {
         props: {
-          subtitle: step.name,
-          title: step.name,
-          // icon: 'mdi-playlist-check',
+          subtitle: step.title,
+          title: step.title,
+          color: step.id === this.selected ? 'info' : 'silver',
         },
-        scopedSlots: {
-          title: () => h('div',
-            { class: 'row' },
-            [
-              // step.name,
-              h('q-btn', {
-                props: {
-                  label: 'start',
-                  flat: true,
-                  stretch: true,
-                },
-              }),
-              h('q-space'),
-              h('q-btn', {
-                props: {
-                  flat: true,
-                  stretch: true,
-                  icon: 'mdi-chevron-down',
-                },
-              }),
-            ]
-          ),
+        class: 'hoverable',
+        nativeOn: {
+          click: () => this.$emit('update:selected', step.id),
         },
       },
-      [
-        ...step.actions.map(action => this.renderAction(h, action)),
-        ...step.conditions.map(cond => this.renderCondition(h, cond)),
-      ]
+      step.notes.map(note => this.renderNote(h, note)),
     );
   }
 
@@ -98,28 +47,11 @@ export default class ProcessTower extends Vue {
     return h('q-timeline',
       {
         props: {
-          color: 'info',
           dark: true,
           layout: this.layout,
-          // bordered: true,
         },
       },
-      [
-        ...this.process.steps.map(step => this.renderStep(h, step)),
-        h('q-timeline-entry',
-          {
-            props: {
-              title: 'Finished!',
-              color: 'positive',
-            },
-          }),
-      ]);
+      this.process.steps.map(step => this.renderStep(h, step)));
   }
 }
 </script>
-
-<style>
-.q-timeline__title {
-  margin-bottom: 5px;
-}
-</style>

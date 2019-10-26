@@ -1,6 +1,10 @@
 import cloneDeep from 'lodash/cloneDeep';
+import isArray from 'lodash/isArray';
+import isObject from 'lodash/isObject';
 
+import { mapEntries } from '../functional';
 import Link from './Link';
+import PostFixed from './PostFixed';
 import Unit from './Unit';
 
 // "not brackets",
@@ -8,167 +12,94 @@ import Unit from './Unit';
 // then more "not brackets, not comma",
 // then optional comma + "not brackets"
 // then right bracket
-const extractUnit = /^([^[<]+)([[<])([^\]>,]*),?([^\]>]*)[\]>]$/;
+const unitExp = /^([^[<]+)([[<])([^\]>,]*),?([^\]>]*)[\]>]$/;
 
 export function propertyNameWithoutUnit(name: string): string {
-  const matched = name.match(extractUnit);
+  const matched = name.match(unitExp);
   return matched ? matched[1] : name;
 }
 
 export function propertyNameWithUnit(name: string): [string, string | null] {
-  const matched = name.match(extractUnit);
+  const matched = name.match(unitExp);
   return matched ? [matched[1], matched[3]] : [name, null];
 }
 
 export function objectUnit(val: any): string | null {
-  const checked = Array.isArray(val)
-    ? val[0]
-    : val;
-
-  if (checked instanceof Unit) {
-    return checked.notation;
-  }
-  return null;
+  return (val instanceof Unit)
+    ? val.notation
+    : null;
 }
 
-export function serializedPropertyName(key: string, inputObject: any): string {
-  const input = inputObject[key];
-  const checked = Array.isArray(input)
-    ? input[0]
-    : input;
+export function serializedPropertyName(key: string, obj: any): string {
+  const val = obj[key];
 
-  if (checked instanceof Unit) {
-    return `${key}[${checked.unit}]`;
+  if (val instanceof Unit) {
+    return `${key}[${val.unit}]`;
   }
 
-  if (checked instanceof Link) {
-    return `${key}${checked.postfix}`;
+  if (val instanceof Link) {
+    return `${key}${val.postfix}`;
   }
 
   return key;
 }
 
-interface DisplayNameType { [key: string]: string }
-
-export function postfixedDisplayNames(displayNames: DisplayNameType, inputObject: any): DisplayNameType {
-  const retv: DisplayNameType = {};
+export function postfixedDisplayNames(displayNames: Mapped<string>, obj: any): Mapped<string> {
+  const retv: Mapped<string> = {};
 
   for (const key in displayNames) {
-    const serializedKey = serializedPropertyName(key, inputObject);
-    const unit = objectUnit(inputObject[key]);
+    const serializedKey = serializedPropertyName(key, obj);
+    const unit = objectUnit(obj[key]);
     const name = displayNames[key];
     retv[serializedKey] = unit ? `${name} [${unit}]` : name;
   }
   return retv;
 }
 
-export function convertToUnit(key: string, value: any): Unit | Link {
-  const matched = key.match(extractUnit);
-
+function parsePostFixed(key: string, val: any): [string, PostFixed] | null {
+  const matched = key.match(unitExp);
   if (matched) {
-    const [, , leftBracket, bracketed, driven] = matched;
+    const [, name, leftBracket, bracketed, driven] = matched;
     try {
       if (leftBracket === '<') {
-        return new Link(value, bracketed, !!driven);
+        return [name, new Link(val, bracketed, !!driven)];
       }
-
-      if (leftBracket === '[') {
-        return new Unit(value, bracketed);
+      else if (leftBracket === '[') {
+        return [name, new Unit(val, bracketed)];
       }
-
-      return value;
-    } catch (e) {
-      return value;
-    }
+    } catch (e) { }
   }
-
-  return value;
+  return null;
 }
 
-function deserializeProperty(key: string, inputObject: any, input = inputObject[key]): any {
-  if (
-    input !== null &&
-    typeof input === 'object'
-  ) {
-    return deserialize(input, key); // eslint-disable-line
+export function deserialize(obj: any): typeof obj {
+  if (isArray(obj)) {
+    return obj.map(deserialize);
   }
-
-  return convertToUnit(key, input);
+  if (isObject(obj)) {
+    return (obj instanceof PostFixed)
+      ? obj
+      : mapEntries(obj, ([key, val]) =>
+        parsePostFixed(key, val) || [key, deserialize(val)]);
+  }
+  return obj;
 }
 
-export function deserialize(input: any, prevKey = ''): any {
-  if (Array.isArray(input)) {
-    return input.map(item => deserializeProperty(prevKey, null, item));
+export function serialize(obj: any): typeof obj {
+  if (isArray(obj)) {
+    return obj.map(serialize);
   }
-
-  return Object.keys(input)
-    .reduce(
-      (acc, key) => {
-        acc[propertyNameWithoutUnit(key)] = deserializeProperty(key, input);
-        return acc;
-      },
-      {},
-    );
-}
-
-function serializeProperty(key: string, inputObject: any, input = inputObject[key]): any {
-  if (input instanceof Unit) {
-    return input.value;
+  if (isObject(obj)) {
+    return mapEntries(obj, ([key, val]) =>
+      (val instanceof PostFixed)
+        ? val.serialized(key)
+        : [key, serialize(val)]);
   }
-
-  if (input instanceof Link) {
-    return input.id;
-  }
-
-  if (input === null) {
-    return input;
-  }
-
-  if (typeof input === 'object') {
-    return serialize(input, key); // eslint-disable-line
-  }
-
-  return input;
-}
-
-export function serialize(input: any, prevKey = ''): any {
-  if (Array.isArray(input)) {
-    return input.map(item => serializeProperty(prevKey, null, item));
-  }
-
-  return Object.keys(input)
-    .reduce(
-      (acc, key) => {
-        acc[serializedPropertyName(key, input)] = serializeProperty(key, input);
-        return acc;
-      },
-      {},
-    );
+  return obj;
 }
 
 export function deepCopy<T>(obj: T): T {
   return obj
     ? cloneDeep(obj)
     : obj;
-}
-
-function nullish(val: any): boolean {
-  return val === null || val === undefined;
-}
-
-export function isSubSet(small: Record<string, any>, big: Record<string, any>): boolean {
-  return Object.entries(small)
-    .every(([key, smallV]) => {
-      const bigV = big[key];
-      if (nullish(smallV) !== nullish(bigV)) {
-        return false;
-      }
-      if (smallV instanceof Unit || smallV instanceof Link) {
-        return smallV.isEqual(bigV);
-      }
-      if (typeof smallV === 'number' && typeof bigV === 'number') {
-        return smallV.toFixed(2) === bigV.toFixed(2);
-      }
-      return smallV === bigV;
-    });
 }
