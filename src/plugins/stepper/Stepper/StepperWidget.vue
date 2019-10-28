@@ -46,20 +46,16 @@ export default class StepperWidget extends WidgetBase {
     return process.steps.map(s => ({ label: s.title, value: s.id }));
   }
 
-  fetch(): void {
-    stepperStore.fetchAll();
-  }
-
   async start(process: Process): Promise<void> {
-    await stepperStore.start(process);
+    await stepperStore.startRuntime(process);
   }
 
   async advance(runtime: Runtime): Promise<void> {
-    await stepperStore.advance(runtime);
+    await stepperStore.advanceRuntime(runtime);
   }
 
   async stop(runtime: Runtime): Promise<void> {
-    await stepperStore.stop(runtime);
+    await stepperStore.stopRuntime(runtime);
   }
 
   async remove(process: Process): Promise<void> {
@@ -73,12 +69,10 @@ export default class StepperWidget extends WidgetBase {
     });
   }
 
-  created(): void {
-    this.fetch();
-  }
-
-  clear(): void {
-    stepperStore.processValues.forEach(stepperStore.removeProcess);
+  async clear(): Promise<void> {
+    for (const process of stepperStore.processValues) {
+      await stepperStore.removeProcess(process);
+    }
   }
 
   async make(): Promise<void> {
@@ -182,7 +176,6 @@ export default class StepperWidget extends WidgetBase {
         <ActionItem icon="settings" label="Editor" @click="startEditor" />
         <ActionItem icon="add" label="New" @click="make" />
         <ActionItem icon="delete" label="Clear" @click="clear" />
-        <ActionItem icon="refresh" label="Refresh" @click="fetch" />
         <WidgetActions :crud="crud" />
       </template>
     </component>

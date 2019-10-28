@@ -6,6 +6,7 @@ import '@quasar/extras/roboto-font/roboto-font.css';
 
 import {
   ClosePopup,
+  Cookies,
   Dialog,
   Notify,
   QBar,
@@ -120,7 +121,7 @@ Vue.use(Quasar, {
     QTree,
   },
   directives: { Ripple, ClosePopup, TouchHold, TouchPan },
-  plugins: { Notify, Dialog },
+  plugins: { Cookies, Notify, Dialog },
 });
 
 Notify.setDefaults({

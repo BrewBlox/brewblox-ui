@@ -26,6 +26,7 @@ export interface Process {
   id: string;
   title: string;
   steps: ProcessStep[];
+  _rev?: string;
 }
 
 export interface RuntimeLog {

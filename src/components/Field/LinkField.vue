@@ -24,6 +24,9 @@ export default class LinkField extends FieldBase {
   @Prop({ type: Boolean, default: false })
   public readonly noCreate!: boolean;
 
+  @Prop({ type: Boolean, default: true })
+  public readonly clearable!: boolean;
+
   @Emit('input')
   public change(v: Link): Link {
     return v;
@@ -41,7 +44,7 @@ export default class LinkField extends FieldBase {
     createDialog({
       component: 'LinkDialog',
       parent: this,
-      clearable: true,
+      clearable: this.clearable,
       title: this.title,
       message: this.message,
       messageHtml: this.messageHtml,

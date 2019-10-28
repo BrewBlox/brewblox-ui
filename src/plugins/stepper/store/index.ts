@@ -6,7 +6,7 @@ import { deserialize } from '@/helpers/units/parseObject';
 import store from '@/store';
 
 import { Process, Runtime } from '../types';
-import * as api from './api';
+import { processApi, runtimeApi } from './api';
 
 const rawError = true;
 
@@ -26,12 +26,20 @@ export class StepperModule extends VuexModule {
     return Object.values(this.processes);
   }
 
+  public get processById(): (id: string) => Process {
+    return id => this.processes[id] || null;
+  }
+
   public get runtimeIds(): string[] {
     return Object.keys(this.runtimes);
   }
 
   public get runtimeValues(): Runtime[] {
     return Object.values(this.runtimes);
+  }
+
+  public get runtimeById(): (id: string) => Runtime {
+    return id => this.runtimes[id] || null;
   }
 
   @Mutation
@@ -47,13 +55,6 @@ export class StepperModule extends VuexModule {
   @Mutation
   public commitAllProcesses(processes: Process[]): void {
     this.processes = processes.reduce(objReducer('id'), {});
-  }
-
-  @Mutation
-  public commitAll([processes, runtimes]): void {
-    const reducer = objReducer('id');
-    this.processes = processes.reduce(reducer, {});
-    this.runtimes = runtimes.reduce(reducer, {});
   }
 
   @Mutation
@@ -85,55 +86,30 @@ export class StepperModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async fetchAll(): Promise<void> {
-    this.commitAll(
-      await Promise.all([
-        api.fetchProcesses(),
-        api.fetchRuntimes(),
-      ])
-    );
-  }
-
-  @Action({ rawError })
   public async fetchProcesses(): Promise<void> {
-    this.commitAllProcesses(await api.fetchProcesses());
+    this.commitAllProcesses(await processApi.fetch());
   }
 
   @Action({ rawError })
   public async createProcess(process: Process): Promise<void> {
-    if (this.processes[process.id]) {
-      throw new Error((`Process ${process.id} already exists`));
-    }
-    this.commitProcess(await api.createProcess(process));
+    this.commitProcess(await processApi.create(process));
   }
 
   @Action({ rawError })
   public async saveProcess(process: Process): Promise<void> {
-    this.commitProcess(await api.persistProcess(process));
+    this.commitProcess(await processApi.persist(process));
   }
 
   @Action({ rawError })
   public async removeProcess(process: Process): Promise<void> {
-    await api.removeProcess(process);
+    await processApi.remove(process);
     this.commitRemoveProcess(process);
-  }
-
-  @Action({ rawError })
-  public async clearProcesses(): Promise<void> {
-    await api.clearProcesses();
-    this.commitAllProcesses([]);
-  }
-
-  @Action({ rawError })
-  public async fetchRuntime(runtime: Runtime): Promise<void> {
-    this.commitRuntime(await api.fetchRuntime(runtime));
   }
 
   @Action({ rawError })
   public async subscribe(): Promise<void> {
     try {
-      await this.fetchProcesses();
-      const source = await api.subscribe();
+      const source = await runtimeApi.subscribe();
 
       source.onmessage = (event: MessageEvent) => {
         const runtimes: Runtime[] = deserialize(JSON.parse(event.data));
@@ -153,24 +129,50 @@ export class StepperModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async start(process: Process): Promise<void> {
-    this.commitRuntime(await api.start(process));
+  public async fetchRuntimes(): Promise<void> {
+    this.commitAllRuntimes(await runtimeApi.fetch());
   }
 
   @Action({ rawError })
-  public async stop(runtime: Runtime): Promise<void> {
-    this.commitRuntime(await api.stop(runtime));
+  public async startRuntime(process: Process): Promise<void> {
+    this.commitRuntime(await runtimeApi.start(process));
   }
 
   @Action({ rawError })
-  public async advance(runtime: Runtime): Promise<void> {
-    this.commitRuntime(await api.advance(runtime));
+  public async stopRuntime(runtime: Runtime): Promise<void> {
+    this.commitRuntime(await runtimeApi.stop(runtime));
   }
 
   @Action({ rawError })
-  public async exit(runtime: Runtime): Promise<void> {
-    await api.exit(runtime);
+  public async advanceRuntime(runtime: Runtime): Promise<void> {
+    this.commitRuntime(await runtimeApi.advance(runtime));
+  }
+
+  @Action({ rawError })
+  public async exitRuntime(runtime: Runtime): Promise<void> {
+    await runtimeApi.exit(runtime);
     this.commitRemoveRuntime(runtime);
+  }
+
+  @Action({ rawError })
+  public async setup(): Promise<void> {
+    const onChange = (process: Process): void => {
+      const existing = this.processById(process.id);
+      if (!existing || existing._rev !== process._rev) {
+        this.commitProcess(process);
+      }
+    };
+    const onDelete = (id: string): void => {
+      const existing = this.processById(id);
+      if (existing) {
+        this.commitRemoveProcess(existing);
+      }
+    };
+
+    this.commitAllProcesses(await processApi.fetch());
+    this.commitAllRuntimes(await runtimeApi.fetch());
+
+    processApi.setup(onChange, onDelete);
   }
 }
 

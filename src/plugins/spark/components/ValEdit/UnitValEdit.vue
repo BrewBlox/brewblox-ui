@@ -13,6 +13,16 @@ export default class UnitValEdit extends ValEdit {
 
   field!: Unit;
 
+  get inputListeners(): Mapped<Function> {
+    const func = (v: any): void => {
+      this.field.value = v;
+      this.saveField(this.field);
+    };
+    return this.lazy
+      ? { change: func }
+      : { input: func };
+  }
+
   get unitOpts(): { label: string; value: string }[] {
     const vals = Object.values(sparkStore.unitAlternatives(this.serviceId))
       .find(vals => vals.includes(this.field.unit)) || [];
@@ -31,7 +41,7 @@ export default class UnitValEdit extends ValEdit {
       dense
       type="number"
       class="q-mr-md"
-      @input="v => { field.value = v; saveField(field); }"
+      v-on="inputListeners"
     />
     <q-select
       :value="field.unit"

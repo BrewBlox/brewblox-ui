@@ -1,13 +1,12 @@
 <script lang="ts">
-import { debounce } from 'quasar';
-import Vue, { CreateElement, VNode } from 'vue';
+import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockSpec, ChangeField } from '@/plugins/spark/types';
+import { featureStore } from '@/store/features';
 
-import { featureStore } from '../../../store/features';
 import { StepAction } from '../types';
 
 interface BlockPatchOpts {
@@ -42,106 +41,95 @@ export default class BlockPatch extends Vue {
     return new Link(this.opts.block, this.opts.type);
   }
 
+  set link(val: Link) {
+    if (val.id !== null) {
+      this.opts.block = val.id;
+      this.saveAction();
+    }
+  }
+
   get displayName(): string {
     return featureStore.displayName(this.opts.type);
   }
 
-  renderChange(h: CreateElement, change: ChangeField): VNode {
-    return h('q-item',
-      { props: { dark: true } },
-      [
-        h('q-item-section', [change.title]),
-        h('q-item-section', [
-          this.opts.data[change.key] !== undefined
-          && h(change.component, {
-            props: {
-              ...change.componentProps,
-              blockId: this.opts.block,
-              serviceId: this.opts.service,
-              value: this.opts.data[change.key],
-              editable: true,
-            },
-            on: {
-              input: debounce((v: any) => {
-                this.$set(this.opts.data, change.key, v);
-                this.saveAction();
-              }, 500, false),
-            },
-          }),
-        ]),
-        h('q-item-section',
-          { class: 'col-auto' },
-          [
-            this.opts.data[change.key] !== undefined
-              ? h('q-btn',
-                {
-                  props: {
-                    flat: true,
-                    round: true,
-                    icon: 'delete',
-                  },
-                  on: {
-                    click: () => {
-                      this.$delete(this.opts.data, change.key);
-                      this.saveAction();
-                    },
-                  },
-                },
-                [h('q-tooltip', ['Remove field from action'])])
-              : h('q-btn',
-                {
-                  props: {
-                    flat: true,
-                    round: true,
-                    icon: 'add',
-                  },
-                  on: {
-                    click: () => {
-                      this.$set(this.opts.data, change.key, change.generate());
-                      this.saveAction();
-                    },
-                  },
-                },
-                [h('q-tooltip', ['Add field change to action'])]),
-          ]),
-      ]);
+  isActive(key: string): boolean {
+    return this.opts.data[key] !== undefined;
   }
 
-  render(h: CreateElement): VNode {
-    return h('q-list',
-      { props: { dark: true, dense: true } },
-      [
-        h('q-item',
-          { props: { dark: true } },
-          [
-            // h('q-item-section', ['Block']),
-            h('q-item-section',
-              { class: 'col-auto' },
-              [
-                h('LinkField', {
-                  props: {
-                    value: this.link,
-                    serviceId: this.opts.service,
-                    tag: 'big',
-                  },
-                  on: {
-                    input: v => {
-                      this.opts.block = v.id;
-                      this.saveAction();
-                    },
-                  },
-                  // class: 'q-ml-md',
-                }),
-              ]),
-            h('q-space'),
-            h('q-item-section',
-              { props: { side: true }, class: 'text-h6 text-italic' },
-              [this.displayName]),
-          ]),
-        ...this.spec.changes.map(change => this.renderChange(h, change)),
-        h('q-separator', { props: { dark: true, inset: true } }),
-      ]
-    );
+  fieldData(change: ChangeField): any {
+    return this.opts.data[change.key];
+  }
+
+  addChange(change: ChangeField): void {
+    this.$set(this.opts.data, change.key, change.generate());
+    this.saveAction();
+  }
+
+  saveChange(change: ChangeField, value: any): void {
+    this.$set(this.opts.data, change.key, value);
+    this.saveAction();
+  }
+
+  removeChange(change: ChangeField): void {
+    this.$delete(this.opts.data, change.key);
+    this.saveAction();
   }
 }
 </script>
+
+<template>
+  <q-list dark dense>
+    <q-item dark>
+      <q-item-section>
+        <LinkField
+          v-model="link"
+          :service-id="opts.service"
+          :clearable="false"
+          tag="big"
+        />
+      </q-item-section>
+      <q-space />
+      <q-item-section side class="text-h6 text-italic">
+        {{ displayName }}
+      </q-item-section>
+    </q-item>
+    <q-item
+      v-for="change in spec.changes"
+      :key="change.key"
+      dark
+    >
+      <q-item-section :class="{darkened: !isActive(change.key)}">
+        {{ change.title }}
+      </q-item-section>
+      <q-item-section v-if="isActive(change.key)">
+        <component
+          :is="change.component"
+          v-bind="change.componentProps"
+          :block-id="opts.block"
+          :service-id="opts.service"
+          :value="fieldData(change)"
+          editable
+          lazy
+          @input="v => saveChange(change, v)"
+        />
+      </q-item-section>
+      <q-item-section class="col-auto">
+        <template v-if="isActive(change.key)">
+          <q-btn flat round icon="delete" @click="removeChange(change)">
+            <q-tooltip>
+              Remove field change from action
+            </q-tooltip>
+          </q-btn>
+        </template>
+        <template v-else>
+          <q-btn flat round icon="add" @click="addChange(change)">
+            <q-tooltip>
+              Add field change to action
+            </q-tooltip>
+          </q-btn>
+        </template>
+      </q-item-section>
+    </q-item>
+    <q-separator dark inset />
+  </q-list>
+</template>

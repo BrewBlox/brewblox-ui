@@ -12,6 +12,9 @@ export default class ValEdit extends Vue {
   @Prop({ type: Boolean, default: false })
   public readonly editable!: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly lazy!: boolean;
+
   @Prop({ required: true })
   public readonly value!: any;
 

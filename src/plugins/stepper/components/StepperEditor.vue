@@ -5,8 +5,9 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/Dialog/DialogBase';
 
 import { actionComponents } from '../actions';
+import { conditionComponents } from '../conditions';
 import { stepperStore } from '../store';
-import { Process, ProcessStep, StepAction } from '../types';
+import { Process, ProcessStep, StepAction, StepCondition } from '../types';
 
 
 @Component
@@ -20,12 +21,12 @@ export default class StepperEditor extends DialogBase {
   public readonly initialProcess!: string;
 
   get process(): Process | null {
-    return stepperStore.processes[
+    return stepperStore.processById(
       this.processId
       || this.initialProcess
       || stepperStore.processIds[0]
       || ''
-    ];
+    );
   }
 
   get processes(): Process[] {
@@ -49,6 +50,17 @@ export default class StepperEditor extends DialogBase {
   saveAction(idx: number, action: StepAction): void {
     if (this.process !== null && this.step !== null) {
       this.step.actions[idx] = action;
+      this.saveProcess(this.process);
+    }
+  }
+
+  conditionComponent(condition: StepCondition): VueConstructor {
+    return conditionComponents[condition.type];
+  }
+
+  saveCondition(idx: number, condition: StepCondition): void {
+    if (this.process !== null && this.step !== null) {
+      this.step.conditions[idx] = condition;
       this.saveProcess(this.process);
     }
   }
@@ -155,6 +167,17 @@ export default class StepperEditor extends DialogBase {
               </q-card-section>
             </template>
             <template #after>
+              <q-card-section>
+                <q-list dark>
+                  <component
+                    :is="conditionComponent(condition)"
+                    v-for="(condition, idx) in step.conditions"
+                    :key="'condition-'+idx"
+                    :condition="condition"
+                    @update:condition="v => saveCondition(idx, v)"
+                  />
+                </q-list>
+              </q-card-section>
             </template>
           </q-splitter>
         </template>
