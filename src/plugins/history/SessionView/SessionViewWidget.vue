@@ -1,11 +1,11 @@
 <script lang="ts">
-import shortid from 'shortid';
 import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { shortDateString } from '@/helpers/functional';
 
+import SessionCreateDialog from './SessionCreateDialog.vue';
 import SessionViewBasic from './SessionViewBasic.vue';
 import SessionViewFull from './SessionViewFull.vue';
 import { Session, SessionViewConfig } from './types';
@@ -15,6 +15,7 @@ import { Session, SessionViewConfig } from './types';
   components: {
     Basic: SessionViewBasic,
     Full: SessionViewFull,
+    SessionCreateDialog,
   },
 })
 export default class SessionViewWidget extends WidgetBase {
@@ -73,32 +74,10 @@ export default class SessionViewWidget extends WidgetBase {
 
   createSession(): void {
     createDialog({
-      title: 'Create session',
-      dark: true,
-      ok: 'Create',
-      cancel: 'Cancel',
-      prompt: {
-        model: '',
-        type: 'text',
-      },
+      parent: this,
+      component: SessionCreateDialog,
     })
-      .onOk((name) => {
-        const session = {
-          name,
-          id: shortid.generate(),
-          hidden: false,
-          start: null,
-          end: null,
-          graphCfg: {
-            layout: { title: name },
-            params: {},
-            targets: [],
-            renames: {},
-            axes: {},
-            colors: {},
-          },
-          notes: '',
-        };
+      .onOk(session => {
         this.saveConfig({
           ...this.widgetConfig,
           sessions: [...this.widgetConfig.sessions, session],
