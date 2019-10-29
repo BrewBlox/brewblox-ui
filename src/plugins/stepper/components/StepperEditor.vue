@@ -16,6 +16,7 @@ export default class StepperEditor extends DialogBase {
   stepId: string | null = null;
   outerSplitter = 30;
   innerSplitter = 50;
+  conditionEditMode = false;
 
   @Prop({ type: String })
   public readonly initialProcess!: string;
@@ -148,34 +149,76 @@ export default class StepperEditor extends DialogBase {
         </template>
         <template v-if="step" #after>
           <q-item dark>
+            <q-item-section class="col-auto">
+              <q-btn flat round icon="add">
+                <q-tooltip>Add Action</q-tooltip>
+              </q-btn>
+            </q-item-section>
             <q-item-section class="text-h5 text-center">
-              {{ step.title }}
+              <span>Apply <b class="text-info">Actions</b> and then wait for <b class="text-info">Conditions</b></span>
+            </q-item-section>
+            <q-item-section class="col-auto">
+              <q-btn flat round icon="add">
+                <q-tooltip>Add Condition</q-tooltip>
+              </q-btn>
             </q-item-section>
           </q-item>
           <q-splitter v-model="innerSplitter" dark style="border-top: 1px solid gray">
             <template #before>
               <q-card-section>
-                <q-list dark>
-                  <component
-                    :is="actionComponent(action)"
+                <q-list dark class="inner-container">
+                  <div
                     v-for="(action, idx) in step.actions"
                     :key="'action-'+idx"
-                    :action="action"
-                    @update:action="v => saveAction(idx, v)"
-                  />
+                    class="row q-mb-md"
+                  >
+                    <div class="col-auto column">
+                      <q-btn icon="menu">
+                        <q-menu>
+                          <q-list dark bordered>
+                            <ActionItem label="clicky" icon="add" />
+                          </q-list>
+                        </q-menu>
+                      </q-btn>
+                      <q-btn icon="mdi-chevron-up" />
+                      <q-btn icon="mdi-chevron-down" />
+                    </div>
+                    <component
+                      :is="actionComponent(action)"
+                      :action="action"
+                      class="col"
+                      @update:action="v => saveAction(idx, v)"
+                    />
+                  </div>
                 </q-list>
               </q-card-section>
             </template>
             <template #after>
               <q-card-section>
-                <q-list dark>
-                  <component
-                    :is="conditionComponent(condition)"
+                <q-list dark class="inner-container">
+                  <div
                     v-for="(condition, idx) in step.conditions"
                     :key="'condition-'+idx"
-                    :condition="condition"
-                    @update:condition="v => saveCondition(idx, v)"
-                  />
+                    class="row q-mb-md"
+                  >
+                    <div class="col-auto column">
+                      <q-btn icon="menu">
+                        <q-menu>
+                          <q-list dark bordered>
+                            <ActionItem label="clicky" icon="add" />
+                          </q-list>
+                        </q-menu>
+                      </q-btn>
+                      <q-btn icon="mdi-chevron-up" />
+                      <q-btn icon="mdi-chevron-down" />
+                    </div>
+                    <component
+                      :is="conditionComponent(condition)"
+                      :condition="condition"
+                      class="col"
+                      @update:condition="v => saveCondition(idx, v)"
+                    />
+                  </div>
                 </q-list>
               </q-card-section>
             </template>
@@ -185,3 +228,21 @@ export default class StepperEditor extends DialogBase {
     </q-card>
   </q-dialog>
 </template>
+
+<style scoped>
+.inner-container > div:nth-child(odd) {
+  border-left: 2px solid dodgerblue;
+}
+.inner-container > div:nth-child(even) {
+  border-left: 2px solid red;
+}
+.button-bar > * {
+  border-left: 1px solid silver;
+}
+.button-bar > *:nth-child(1) {
+  border-left: none;
+}
+.inner-editable {
+  background-color: rgba(255, 255, 255, 0.18);
+}
+</style>

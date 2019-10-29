@@ -80,17 +80,16 @@ export default class BlockPatch extends Vue {
 <template>
   <q-list dark dense>
     <q-item dark>
-      <q-item-section>
+      <q-item-section class="text-h6 text-italic">
+        Change Block
+      </q-item-section>
+      <q-item-section class="col-auto">
         <LinkField
           v-model="link"
           :service-id="opts.service"
           :clearable="false"
           tag="big"
         />
-      </q-item-section>
-      <q-space />
-      <q-item-section side class="text-h6 text-italic">
-        {{ displayName }}
       </q-item-section>
     </q-item>
     <q-item
@@ -130,6 +129,5 @@ export default class BlockPatch extends Vue {
         </template>
       </q-item-section>
     </q-item>
-    <q-separator dark inset />
   </q-list>
 </template>

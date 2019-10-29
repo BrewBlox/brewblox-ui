@@ -92,6 +92,17 @@ export default class StepperWidget extends WidgetBase {
               },
             },
           },
+          {
+            type: 'BlockPatch',
+            opts: {
+              block: 'sensor-1',
+              service: 'sparkey',
+              type: blockTypes.TempSensorMock,
+              data: {
+                value: new Unit(5, 'degC'),
+              },
+            },
+          },
         ],
         conditions: [
           {
@@ -103,6 +114,18 @@ export default class StepperWidget extends WidgetBase {
               key: 'value[degC]',
               operator: 'ge',
               value: 10,
+            },
+          },
+          {
+            type: 'TimeAbsolute',
+            opts: {
+              time: 1572342354937,
+            },
+          },
+          {
+            type: 'TimeElapsed',
+            opts: {
+              duration: 12345,
             },
           },
         ],

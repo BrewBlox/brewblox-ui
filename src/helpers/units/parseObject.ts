@@ -56,7 +56,7 @@ export function postfixedDisplayNames(displayNames: Mapped<string>, obj: any): M
   return retv;
 }
 
-function parsePostFixed(key: string, val: any): [string, PostFixed] | null {
+export function parsePostfixed(key: string, val: any): [string, PostFixed] | null {
   const matched = key.match(unitExp);
   if (matched) {
     const [, name, leftBracket, bracketed, driven] = matched;
@@ -80,7 +80,7 @@ export function deserialize(obj: any): typeof obj {
     return (obj instanceof PostFixed)
       ? obj
       : mapEntries(obj, ([key, val]) =>
-        parsePostFixed(key, val) || [key, deserialize(val)]);
+        parsePostfixed(key, val) || [key, deserialize(val)]);
   }
   return obj;
 }
