@@ -4,8 +4,8 @@ export type FeatureRole = 'Process' | 'Control' | 'Output' | 'Constraint' | 'Dis
 export type WidgetMode = 'Basic' | 'Full';
 export type WidgetContainer = 'Dashboard' | 'Dialog';
 
-export interface Crud {
-  widget: PersistentWidget;
+export interface Crud<ConfigT = any> {
+  widget: PersistentWidget<ConfigT>;
   isStoreWidget: boolean;
   saveWidget(widget: PersistentWidget): unknown | Promise<unknown>;
   closeDialog(): void;

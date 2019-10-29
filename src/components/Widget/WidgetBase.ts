@@ -11,17 +11,17 @@ export interface WidgetProps {
 }
 
 @Component
-export default class WidgetBase extends Vue {
+export default class WidgetBase<ConfigT = any> extends Vue {
   public activeDialog: any = null;
   public activeMode: WidgetMode | null = null;
 
   @Prop({ type: Object, required: true })
-  public readonly initialCrud!: Crud;
+  public readonly initialCrud!: Crud<ConfigT>;
 
   @Prop({ type: Object, required: true })
   public readonly context!: WidgetContext;
 
-  public get crud(): Crud {
+  public get crud(): Crud<ConfigT> {
     // Allows overriding by child classes that use an extended Crud
     return this.initialCrud;
   }
@@ -34,7 +34,7 @@ export default class WidgetBase extends Vue {
     this.activeMode = val;
   }
 
-  public get widget(): PersistentWidget {
+  public get widget(): PersistentWidget<ConfigT> {
     return this.crud.widget;
   }
 
@@ -66,7 +66,7 @@ export default class WidgetBase extends Vue {
     this.crud.saveWidget(widget);
   }
 
-  public saveConfig(config: any): void {
+  public saveConfig(config: ConfigT): void {
     this.saveWidget({ ...this.widget, config });
   }
 

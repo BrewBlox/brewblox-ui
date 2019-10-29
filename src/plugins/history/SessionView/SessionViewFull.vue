@@ -11,7 +11,7 @@ import { DisplayNames, historyStore } from '@/store/history';
 import { Session, SessionViewConfig } from './types';
 
 @Component
-export default class SessionViewFull extends CrudComponent {
+export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
   sessionInput = '';
 
   @Prop({ default: null })
@@ -25,20 +25,16 @@ export default class SessionViewFull extends CrudComponent {
     return session.id;
   }
 
-  get widgetConfig(): SessionViewConfig {
-    return this.widget.config;
-  }
-
   get sessions(): Session[] {
     // copy the array first to avoid mutating the original
-    return [...this.widgetConfig.sessions]
+    return [...this.widget.config.sessions]
       .sort(objectSorter('name'));
   }
 
   updateSession(session: Session): void {
     session.graphCfg.layout.title = session.name;
     this.saveConfig({
-      ...this.widgetConfig,
+      ...this.widget.config,
       sessions: this.sessions
         .map(s => (s.id === session.id ? session : s)),
     });
@@ -66,7 +62,7 @@ export default class SessionViewFull extends CrudComponent {
 
   deleteSession(session: Session): void {
     this.saveConfig({
-      ...this.widgetConfig,
+      ...this.widget.config,
       sessions: this.sessions
         .filter(s => s.id !== session.id),
     });
@@ -88,7 +84,7 @@ export default class SessionViewFull extends CrudComponent {
 
     const newSession = { ...session, name: copyName(idx), id: shortid.generate() };
     this.saveConfig({
-      ...this.widgetConfig,
+      ...this.widget.config,
       sessions: [...this.sessions, newSession],
     });
   }

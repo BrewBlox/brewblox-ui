@@ -12,7 +12,7 @@ import { BuilderConfig, BuilderLayout } from './types';
     draggable,
   },
 })
-export default class BuilderFull extends CrudComponent {
+export default class BuilderFull extends CrudComponent<BuilderConfig> {
 
   get layouts(): BuilderLayout[] {
     return builderStore.layoutValues;

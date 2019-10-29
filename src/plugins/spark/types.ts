@@ -1,5 +1,6 @@
 import { PersistentWidget } from '@/store/dashboards';
 import { Crud, Feature } from '@/store/features';
+import { GraphValueAxes, QueryParams } from '@/store/history';
 import { Service } from '@/store/services';
 
 export interface ChangeField {
@@ -24,12 +25,6 @@ export interface StoredDataPreset {
   name: string;
   data: Mapped<any>;
   _rev?: string;
-}
-
-export interface BlockCrud extends Crud {
-  block: Block;
-  isStoreBlock: boolean;
-  saveBlock: (block: Block) => unknown | Promise<unknown>;
 }
 
 export interface BlockSpec {
@@ -74,10 +69,16 @@ export interface Block extends DataBlock {
 export interface BlockConfig {
   serviceId: string;
   blockId: string;
+  queryParams?: QueryParams;
+  graphAxes?: GraphValueAxes;
 }
 
-export interface DashboardBlock extends PersistentWidget {
-  config: BlockConfig;
+export type DashboardBlock = PersistentWidget<BlockConfig>;
+
+export interface BlockCrud extends Crud<BlockConfig> {
+  block: Block;
+  isStoreBlock: boolean;
+  saveBlock: (block: Block) => unknown | Promise<unknown>;
 }
 
 export interface UserUnits {

@@ -12,7 +12,7 @@ import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './getters';
 import { MetricsConfig } from './types';
 
 @Component
-export default class MetricsFull extends CrudComponent {
+export default class MetricsFull extends CrudComponent<MetricsConfig> {
   DEFAULT_FRESH_DURATION = DEFAULT_FRESH_DURATION;
   parseDuration = parseDuration;
   durationString = durationString;

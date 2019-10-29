@@ -5,6 +5,7 @@ import Stepper from './Stepper';
 
 export default {
   install() {
+    return;
     if (process.env.NODE_ENV !== 'development') {
       return;
     }
