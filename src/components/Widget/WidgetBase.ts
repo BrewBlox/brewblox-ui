@@ -66,7 +66,7 @@ export default class WidgetBase<ConfigT = any> extends Vue {
     this.crud.saveWidget(widget);
   }
 
-  public saveConfig(config: ConfigT): void {
+  public saveConfig(config: ConfigT = this.widget.config): void {
     this.saveWidget({ ...this.widget, config });
   }
 

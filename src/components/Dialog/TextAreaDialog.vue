@@ -23,7 +23,7 @@ export default class TextAreaDialog extends DialogBase {
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
     <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
-      <q-card-section class="q-dialog__title">
+      <q-card-section class="q-dialog__title ellipsis">
         {{ title }}
       </q-card-section>
       <q-card-section v-if="message" class="q-dialog__message scroll">
@@ -35,6 +35,7 @@ export default class TextAreaDialog extends DialogBase {
           :value="local"
           class="full-width"
           style="min-height: 200px;"
+          autofocus
           @change="ev => { local = ev.target.value; }"
         />
       </q-card-section>

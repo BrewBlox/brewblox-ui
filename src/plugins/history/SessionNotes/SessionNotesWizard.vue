@@ -1,4 +1,5 @@
 <script lang="ts">
+import { uid } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
@@ -10,7 +11,20 @@ import { SessionNotesConfig } from './types';
 export default class SessionNotesWizard extends WidgetWizardBase {
   createWidget(): void {
     const config: SessionNotesConfig = {
-      notes: [],
+      notes: [
+        {
+          id: uid(),
+          title: 'Text note',
+          type: 'text',
+          value: '',
+        },
+        {
+          id: uid(),
+          title: 'Date note',
+          type: 'date',
+          value: '',
+        },
+      ],
     };
     this.createItem({
       id: this.widgetId,

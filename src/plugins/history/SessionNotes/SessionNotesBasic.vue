@@ -28,9 +28,9 @@ export default class SessionNotesBasic extends CrudComponent<SessionNotesConfig>
         component: 'DatetimeDialog',
         title: note.title,
         parent: this,
-        value: new Date(Date.parse(note.value || '')),
+        value: !!note.value ? new Date(Date.parse(note.value!)) : new Date(),
       })
-        .onOk((date: Date) => this.saveNote({ ...note, value: date.toUTCString() }));
+        .onOk((date: Date) => this.saveNote({ ...note, value: date.toLocaleString() }));
     }
     else {
       createDialog({
