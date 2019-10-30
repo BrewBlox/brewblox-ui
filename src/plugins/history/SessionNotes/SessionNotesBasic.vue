@@ -4,14 +4,23 @@ import { Component } from 'vue-property-decorator';
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 
-import { SessionNote, SessionNotesConfig } from './types';
+import SessionNoteDialog from './SessionNoteDialog.vue';
+import { Session, SessionNote, SessionNotesConfig } from './types';
 
 
-@Component
+@Component({
+  components: {
+    SessionNoteDialog,
+  },
+})
 export default class SessionNotesBasic extends CrudComponent<SessionNotesConfig> {
 
+  get session(): Session | null {
+    return this.widget.config.sessions.find(s => s.id === this.widget.config.currentSession) || null;
+  }
+
   get notes(): SessionNote[] {
-    return this.widget.config.notes;
+    return this.session ? this.session.notes : [];
   }
 
   saveNote(note: SessionNote): void {
@@ -23,26 +32,15 @@ export default class SessionNotesBasic extends CrudComponent<SessionNotesConfig>
   }
 
   editNote(note: SessionNote): void {
-    if (note.type === 'date') {
-      createDialog({
-        component: 'DatetimeDialog',
-        title: note.title,
-        parent: this,
-        value: !!note.value ? new Date(Date.parse(note.value!)) : new Date(),
-      })
-        .onOk((date: Date) => this.saveNote({ ...note, value: date.toLocaleString() }));
-    }
-    else {
-      createDialog({
-        component: 'TextAreaDialog',
-        title: note.title,
-        parent: this,
-        value: note.value,
-        type: 'text',
-        label: 'Content',
-      })
-        .onOk(value => this.saveNote({ ...note, value }));
-    }
+    createDialog({
+      component: SessionNoteDialog,
+      title: note.title,
+      parent: this,
+      value: note.value,
+      type: 'text',
+      label: 'Content',
+    })
+      .onOk(value => this.saveNote({ ...note, value }));
   }
 }
 </script>
@@ -55,12 +53,22 @@ export default class SessionNotesBasic extends CrudComponent<SessionNotesConfig>
     <slot name="graph" />
 
     <q-card-section>
-      <q-list dark>
+      <q-item v-if="!!session" dark>
+        <q-item-section class="col-auto text-h6">
+          {{ session.title }}
+        </q-item-section>
+        <q-space />
+        <q-item-section class="col-auto">
+          {{ new Date(session.date).toLocaleString() }}
+        </q-item-section>
+      </q-item>
+      <div class="row">
         <q-item
           v-for="note in notes"
           :key="note.id"
           dark
           clickable
+          :class="[`col-${note.col}`, 'align-children']"
           @click="editNote(note)"
         >
           <q-item-section>
@@ -75,7 +83,7 @@ export default class SessionNotesBasic extends CrudComponent<SessionNotesConfig>
             </div>
           </q-item-section>
         </q-item>
-      </q-list>
+      </div>
     </q-card-section>
   </q-card>
 </template>

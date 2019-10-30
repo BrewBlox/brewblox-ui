@@ -1,6 +1,7 @@
 <script lang="ts">
 import { VueConstructor } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
+import draggable from 'vuedraggable';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 
@@ -10,13 +11,18 @@ import { stepperStore } from '../store';
 import { Process, ProcessStep, StepAction, StepCondition } from '../types';
 
 
-@Component
+@Component({
+  components: {
+    draggable,
+  },
+})
 export default class StepperEditor extends DialogBase {
   processId: string | null = null;
   stepId: string | null = null;
   outerSplitter = 30;
   innerSplitter = 50;
   conditionEditMode = false;
+  draggingConditions = false;
 
   @Prop({ type: String })
   public readonly initialProcess!: string;
@@ -88,6 +94,16 @@ export default class StepperEditor extends DialogBase {
 
   clearSteps(): void {
 
+  }
+
+  created(): void {
+    if (this.process && this.process.steps.length) {
+      this.stepId = this.process.steps[0].id;
+    }
+  }
+
+  say(...args): void {
+    console.log(...args);
   }
 }
 </script>
@@ -173,15 +189,13 @@ export default class StepperEditor extends DialogBase {
                     class="row q-mb-md"
                   >
                     <div class="col-auto column">
-                      <q-btn icon="menu">
+                      <q-btn flat icon="mdi-dots-vertical">
                         <q-menu>
                           <q-list dark bordered>
                             <ActionItem label="clicky" icon="add" />
                           </q-list>
                         </q-menu>
                       </q-btn>
-                      <q-btn icon="mdi-chevron-up" />
-                      <q-btn icon="mdi-chevron-down" />
                     </div>
                     <component
                       :is="actionComponent(action)"
@@ -196,29 +210,36 @@ export default class StepperEditor extends DialogBase {
             <template #after>
               <q-card-section>
                 <q-list dark class="inner-container">
-                  <div
-                    v-for="(condition, idx) in step.conditions"
-                    :key="'condition-'+idx"
-                    class="row q-mb-md"
+                  <draggable
+                    :value="step.conditions"
+                    @input="() => {}"
+                    @start="draggingConditions=true"
+                    @end="draggingConditions=false"
                   >
-                    <div class="col-auto column">
-                      <q-btn icon="menu">
-                        <q-menu>
-                          <q-list dark bordered>
-                            <ActionItem label="clicky" icon="add" />
-                          </q-list>
-                        </q-menu>
-                      </q-btn>
-                      <q-btn icon="mdi-chevron-up" />
-                      <q-btn icon="mdi-chevron-down" />
+                    <div
+                      v-for="(condition, idx) in step.conditions"
+                      :key="'condition-'+idx"
+                      class="row q-mb-md"
+                    >
+                      <div class="col-auto column">
+                        <q-btn flat icon="mdi-dots-vertical">
+                          <q-menu>
+                            <q-list dark bordered>
+                              <ActionItem label="clicky" icon="add" />
+                            </q-list>
+                          </q-menu>
+                        </q-btn>
+                      </div>
+                      <div @mousedown="evt => {say('mousey', evt); evt.stopPropagation()}">
+                        <component
+                          :is="conditionComponent(condition)"
+                          :condition="condition"
+                          class="col"
+                          @update:condition="v => saveCondition(idx, v)"
+                        />
+                      </div>
                     </div>
-                    <component
-                      :is="conditionComponent(condition)"
-                      :condition="condition"
-                      class="col"
-                      @update:condition="v => saveCondition(idx, v)"
-                    />
-                  </div>
+                  </draggable>
                 </q-list>
               </q-card-section>
             </template>

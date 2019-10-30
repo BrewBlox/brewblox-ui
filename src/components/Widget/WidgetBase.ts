@@ -38,6 +38,10 @@ export default class WidgetBase<ConfigT = any> extends Vue {
     return this.crud.widget;
   }
 
+  public get config(): ConfigT {
+    return this.widget.config;
+  }
+
   public get isStoreWidget(): boolean {
     return this.crud.isStoreWidget;
   }

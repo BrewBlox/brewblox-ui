@@ -10,19 +10,22 @@ import { SessionNotesConfig } from './types';
 @Component
 export default class SessionNotesWizard extends WidgetWizardBase {
   createWidget(): void {
+    const sessionId = uid();
     const config: SessionNotesConfig = {
-      notes: [
+      currentSession: sessionId,
+      sessions: [
         {
-          id: uid(),
-          title: 'Text note',
-          type: 'text',
-          value: '',
-        },
-        {
-          id: uid(),
-          title: 'Date note',
-          type: 'date',
-          value: '',
+          id: sessionId,
+          title: 'New Session',
+          date: new Date().getTime(),
+          notes: [
+            {
+              id: uid(),
+              title: 'Text note',
+              value: '',
+              col: 12,
+            },
+          ],
         },
       ],
     };

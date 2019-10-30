@@ -1,24 +1,59 @@
 <script lang="ts">
-import { uid } from 'quasar';
+import { debounce, uid } from 'quasar';
 import { Component } from 'vue-property-decorator';
+import draggable from 'vuedraggable';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
 
-import { SessionNote, SessionNotesConfig } from './types';
+import { Session, SessionNote, SessionNotesConfig } from './types';
 
 
-@Component
+@Component({
+  components: {
+    draggable,
+  },
+})
 export default class SessionNotesFull extends CrudComponent<SessionNotesConfig> {
+  colSizes = [3, 4, 6, 8, 9, 12];
 
-  get notes(): SessionNote[] {
-    return this.widget.config.notes;
+  get session(): Session | null {
+    return this.widget.config.sessions
+      .find(s => s.id === this.widget.config.currentSession) || null;
   }
 
-  get typeOpts(): SelectOption[] {
-    return [
-      { label: 'Text', value: 'text' },
-      { label: 'Date', value: 'date' },
-    ];
+  get notes(): SessionNote[] {
+    return this.session ? this.session.notes : [];
+  }
+
+  set notes(notes: SessionNote[]) {
+    if (this.session) {
+      this.session.notes = notes;
+      this.saveConfig();
+    }
+  }
+
+  saveSessionTitle(title: string): void {
+    if (this.session) {
+      this.session.title = title;
+      this.saveConfig();
+    }
+  }
+
+  saveSessionDate(date: Date): void {
+    if (this.session) {
+      this.session.date = date.getTime();
+      this.saveConfig();
+    }
+  }
+
+  debouncedSave = debounce(this.saveConfig, 1000);
+
+  saveSize(note: SessionNote, idx: number): void {
+    const col = this.colSizes[idx];
+    if (col && col !== note.col) {
+      note.col = col;
+      this.debouncedSave();
+    }
   }
 
   saveTitle(note: SessionNote, title: string): void {
@@ -28,16 +63,8 @@ export default class SessionNotesFull extends CrudComponent<SessionNotesConfig> 
     }
   }
 
-  saveType(note: SessionNote, type: typeof note.type): void {
-    if (type !== note.type) {
-      note.value = null;
-      note.type = type;
-      this.saveConfig();
-    }
-  }
-
   clearNote(note: SessionNote): void {
-    note.value = null;
+    note.value = '';
     this.saveConfig();
   }
 
@@ -50,11 +77,12 @@ export default class SessionNotesFull extends CrudComponent<SessionNotesConfig> 
   }
 
   addNote(): void {
+    // Todo: input dialog
     this.notes.push({
       id: uid(),
-      title: 'New note',
-      type: 'text',
-      value: null,
+      title: 'New field',
+      value: '',
+      col: 12,
     });
   }
 }
@@ -69,38 +97,74 @@ export default class SessionNotesFull extends CrudComponent<SessionNotesConfig> 
 
     <q-card-section>
       <q-list dark>
-        <q-item v-for="note in notes" :key="note.id" dark>
-          <q-item-section>
+        <q-item v-if="!!session" dark>
+          <q-item-section class="col-auto">
             <InputField
-              :value="note.title"
-              title="Note title"
-              label="title"
-              tag="div"
-              tag-class="ellipsis-3-lines"
-              :tag-props="{style: 'max-width: 100%'}"
-              @input="v => saveTitle(note, v)"
+              :value="session.title"
+              title="Session title"
+              label="Session title"
+              @input="saveSessionTitle"
             />
           </q-item-section>
+          <q-space />
           <q-item-section class="col-auto">
-            <q-btn-toggle outline :value="note.type" :options="typeOpts" dense @input="v => saveType(note, v)" />
-          </q-item-section>
-          <q-item-section class="col-auto">
-            <q-btn icon="mdi-dots-vertical" flat dense>
-              <q-menu>
-                <q-list dark bordered>
-                  <ActionItem label="Clear content" icon="clear" @click="clearNote(note)" />
-                  <ActionItem label="Remove note" icon="delete" @click="removeNote(note)" />
-                </q-list>
-              </q-menu>
-            </q-btn>
+            <DatetimeField :value="session.date" title="Session date" @input="saveSessionDate" />
           </q-item-section>
         </q-item>
+        <draggable v-model="notes" class="row q-gutter-xs">
+          <div
+            v-for="note in notes"
+            :key="note.id"
+            :class="[`col-${note.col}`, 'q-pa-xs', 'q-ma-none']"
+          >
+            <q-item
+              style="border: 1px solid silver"
+              dark
+            >
+              <q-item-section class="col-auto">
+                <InputField
+                  :value="note.title"
+                  title="Note title"
+                  label="title"
+                  tag="div"
+                  tag-class="ellipsis-3-lines"
+                  :tag-props="{style: 'max-width: 100%'}"
+                  @input="v => saveTitle(note, v)"
+                />
+              </q-item-section>
+              <q-space />
+              <q-item-section class="col-auto">
+                <q-btn icon="mdi-dots-vertical" flat dense>
+                  <q-menu>
+                    <q-list dark bordered>
+                      <ActionItem label="Clear content" icon="clear" @click="clearNote(note)" />
+                      <ActionItem label="Remove note" icon="delete" @click="removeNote(note)" />
+                      <q-item dark>
+                        <q-item-section avatar>
+                          <q-icon name="mdi-arrow-expand-horizontal" />
+                        </q-item-section>
+                        <q-item-section>
+                          <q-slider
+                            :min="0"
+                            :max="colSizes.length-1"
+                            :value="colSizes.indexOf(note.col)"
+                            dark
+                            snap
+                            @input="v => saveSize(note, v)"
+                          />
+                        </q-item-section>
+                      </q-item>
+                    </q-list>
+                  </q-menu>
+                </q-btn>
+              </q-item-section>
+            </q-item>
+          </div>
+        </draggable>
         <q-item dark>
           <q-space />
           <q-item-section class="col-auto">
-            <q-btn outline round icon="add" @click="addNote">
-              <q-tooltip>Add note</q-tooltip>
-            </q-btn>
+            <q-btn outline round icon="add" @click="addNote" />
           </q-item-section>
         </q-item>
       </q-list>
