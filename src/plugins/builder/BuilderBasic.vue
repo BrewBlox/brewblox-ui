@@ -13,7 +13,7 @@ import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart } f
 
 
 @Component
-export default class BuilderBasic extends CrudComponent {
+export default class BuilderBasic extends CrudComponent<BuilderConfig> {
   flowParts: FlowPart[] = [];
   debouncedCalculate: Function = () => { };
 

@@ -19,6 +19,7 @@ import ImmersionCoil from './ImmersionCoil';
 import Keg from './Keg';
 import Kettle from './Kettle';
 import Lauterhexe from './Lauterhexe';
+import NotesDisplay from './NotesDisplay';
 import PidDisplay from './PidDisplay';
 import ProfileDisplay from './ProfileDisplay';
 import Pump from './Pump';
@@ -56,6 +57,7 @@ const specs: { [key: string]: PartSpec } = {
   Keg,
   Kettle,
   Lauterhexe,
+  NotesDisplay,
   PidDisplay,
   ProfileDisplay,
   Pump,
