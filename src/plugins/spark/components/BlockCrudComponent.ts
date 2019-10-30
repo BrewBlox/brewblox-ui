@@ -10,7 +10,7 @@ import { postfixedDisplayNames } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockCrud } from '@/plugins/spark/types';
+import { BlockConfig, BlockCrud } from '@/plugins/spark/types';
 import { dashboardStore } from '@/store/dashboards';
 
 import { blockIdRules } from '../helpers';
@@ -18,7 +18,7 @@ import { Block } from '../types';
 
 
 @Component
-export default class BlockCrudComponent extends CrudComponent {
+export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
 
   @Prop({ type: Object, required: true })
   public readonly crud!: BlockCrud;

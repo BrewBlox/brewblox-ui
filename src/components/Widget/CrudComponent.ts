@@ -14,13 +14,13 @@ export interface DialogOpts {
 }
 
 @Component
-export default class CrudComponent extends Vue {
+export default class CrudComponent<ConfigT = any> extends Vue {
   private activeDialog: any = null;
 
   @Prop({ type: Object, required: true })
   public readonly crud!: Crud;
 
-  public get widget(): PersistentWidget {
+  public get widget(): PersistentWidget<ConfigT> {
     return this.crud.widget;
   }
 
@@ -56,7 +56,7 @@ export default class CrudComponent extends Vue {
     await this.crud.saveWidget(widget);
   }
 
-  public async saveConfig(config: any = this.widget.config): Promise<void> {
+  public async saveConfig(config: ConfigT = this.widget.config): Promise<void> {
     await this.saveWidget({ ...this.widget, config });
   }
 
@@ -153,7 +153,7 @@ export default class CrudComponent extends Vue {
       cancel: true,
     })
       .onOk((selected: number[]) => {
-        selected.forEach(idx => opts[idx].action(this.widget.config));
+        selected.forEach(idx => opts[idx].action(this.crud));
       });
   }
 }

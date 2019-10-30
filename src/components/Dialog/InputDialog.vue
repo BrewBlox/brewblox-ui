@@ -28,6 +28,9 @@ export default class InputDialog extends DialogBase {
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
+  @Prop({ type: Boolean, default: true })
+  public readonly autogrow!: boolean;
+
   get error(): boolean {
     return this.rules
       .map(f => f(this.local))
@@ -72,6 +75,7 @@ export default class InputDialog extends DialogBase {
           :rules="rules"
           :clearable="clearable"
           :label="label"
+          :autogrow="autogrow"
           input-style="font-size: 170%"
           dark
           autofocus

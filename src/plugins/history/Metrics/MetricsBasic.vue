@@ -18,7 +18,7 @@ interface CurrentValue extends MetricsResult {
 }
 
 @Component
-export default class MetricsBasic extends CrudComponent {
+export default class MetricsBasic extends CrudComponent<MetricsConfig> {
   parseDuration = parseDuration;
   durationString = durationString;
   DEFAULT_FRESH_DURATION = DEFAULT_FRESH_DURATION;
