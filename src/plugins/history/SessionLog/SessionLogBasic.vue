@@ -53,13 +53,10 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
     <slot name="graph" />
 
     <q-card-section>
-      <q-item v-if="!!session" dark>
-        <q-item-section class="col-auto text-h6">
-          {{ session.title }}
-        </q-item-section>
-        <q-space />
-        <q-item-section class="col-auto">
-          {{ new Date(session.date).toLocaleString() }}
+      <q-item v-if="!!session" dark dense>
+        <q-item-section class="col-auto text-grey-2">
+          <span class="text-italic">{{ session.title }}</span>
+          <span>{{ new Date(session.date).toLocaleString() }}</span>
         </q-item-section>
       </q-item>
       <div class="row">
