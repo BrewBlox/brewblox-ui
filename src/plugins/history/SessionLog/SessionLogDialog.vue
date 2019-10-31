@@ -20,7 +20,7 @@ export default class SessionNoteDialog extends DialogBase {
 
   created(): void {
     this.local = this.value;
-    if (this.local.charAt(this.local.length - 1) !== '\n') {
+    if (this.local.length && this.local.charAt(this.local.length - 1) !== '\n') {
       this.local += '\n';
     }
   }

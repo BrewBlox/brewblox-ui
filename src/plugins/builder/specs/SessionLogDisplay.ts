@@ -1,14 +1,12 @@
-import { createDialog } from '@/helpers/dialog';
-import { dashboardStore } from '@/store/dashboards';
-
+import { showLinkedWidgetDialog } from '../helpers';
 import { PartSpec, PersistentPart } from '../types';
 
 const DEFAULT_SIZE_X = 3;
 const DEFAULT_SIZE_Y = 5;
 
 const spec: PartSpec = {
-  id: 'NotesDisplay',
-  title: 'Session Notes',
+  id: 'SessionLogDisplay',
+  title: 'Display: Session Log',
   cards: [
     {
       component: 'SizeCard',
@@ -34,7 +32,7 @@ const spec: PartSpec = {
       component: 'LinkedWidgetCard',
       props: {
         settingsKey: 'widgetId',
-        types: ['SessionNotes'],
+        types: ['SessionLog'],
       },
     },
   ],
@@ -43,26 +41,7 @@ const spec: PartSpec = {
     part.settings.sizeY || DEFAULT_SIZE_Y,
   ],
   transitions: () => ({}),
-  interactHandler: (part: PersistentPart) => {
-    const { widgetId } = part.settings;
-    if (!widgetId) {
-      return;
-    }
-    else if (dashboardStore.widgetIds.includes(widgetId)) {
-      createDialog({
-        component: 'StoreWidgetDialog',
-        mode: 'Basic',
-        widgetId,
-      });
-    }
-    else {
-      createDialog({
-        dark: true,
-        title: 'Broken Link',
-        message: 'Widget was not found. Use the editor to change the link.',
-      });
-    }
-  },
+  interactHandler: (part: PersistentPart) => showLinkedWidgetDialog(part, 'widgetId'),
 };
 
 export default spec;

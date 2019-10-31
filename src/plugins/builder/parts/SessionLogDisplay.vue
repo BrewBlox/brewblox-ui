@@ -1,21 +1,26 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { SessionNote, SessionNotesConfig } from '@/plugins/history/SessionNotes/types';
+import { Session, SessionLogConfig, SessionNote } from '@/plugins/history/SessionLog/types';
 import { dashboardStore, PersistentWidget } from '@/store/dashboards';
 
 import PartBase from '../components/PartBase';
 
 @Component
-export default class NotesDisplay extends PartBase {
-  get widget(): PersistentWidget<SessionNotesConfig> | null {
+export default class SessionLogDisplay extends PartBase {
+  get widget(): PersistentWidget<SessionLogConfig> | null {
     if (!this.settings.widgetId) { return null; }
     return dashboardStore.persistentWidgetById(this.settings.widgetId);
   }
 
+  get session(): Session | null {
+    if (this.widget === null) { return null; }
+    const widget = this.widget;
+    return widget.config.sessions.find(s => s.id === widget.config.currentSession) || null;
+  }
+
   get notes(): SessionNote[] {
-    if (!this.widget) { return []; }
-    return this.widget.config.notes;
+    return this.session ? this.session.notes : [];
   }
 }
 </script>
@@ -24,9 +29,9 @@ export default class NotesDisplay extends PartBase {
   <g>
     <foreignObject :transform="textTransformation([sizeX, sizeY])" :width="squares(sizeX)" :height="squares(sizeY)">
       <div style="width: 100%; height: 100%" class="q-pa-sm">
-        <template v-if="widget">
+        <template v-if="session">
           <div class="text-center">
-            <b>{{ widget.title.slice(0, 5*sizeX) }}</b>
+            <b>{{ session.title.slice(0, 5*sizeX) }}</b>
           </div>
           <div v-for="note in notes" :key="note.id" class="q-mb-sm">
             <i><b>{{ note.title.slice(0, 5*sizeX) }}{{ note.title.length > 5*sizeX ? '...' : '' }}</b></i>

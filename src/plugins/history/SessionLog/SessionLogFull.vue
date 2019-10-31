@@ -5,7 +5,7 @@ import draggable from 'vuedraggable';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
 
-import { Session, SessionNote, SessionNotesConfig } from './types';
+import { Session, SessionLogConfig, SessionNote } from './types';
 
 
 @Component({
@@ -13,7 +13,7 @@ import { Session, SessionNote, SessionNotesConfig } from './types';
     draggable,
   },
 })
-export default class SessionNotesFull extends CrudComponent<SessionNotesConfig> {
+export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
   colSizes = [3, 4, 6, 8, 9, 12];
 
   get session(): Session | null {

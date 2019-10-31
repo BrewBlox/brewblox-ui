@@ -14,11 +14,11 @@ export interface Session {
   notes: SessionNote[];
 }
 
-export interface SessionNotesConfig {
+export interface SessionLogConfig {
   currentSession: string | null;
   sessions: Session[];
 }
 
-export interface SessionNotesWidget extends PersistentWidget {
-  config: SessionNotesConfig;
+export interface SessionLogWidget extends PersistentWidget {
+  config: SessionLogConfig;
 }

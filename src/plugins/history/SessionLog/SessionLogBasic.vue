@@ -5,7 +5,7 @@ import CrudComponent from '@/components/Widget/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 
 import SessionNoteDialog from './SessionNoteDialog.vue';
-import { Session, SessionNote, SessionNotesConfig } from './types';
+import { Session, SessionLogConfig, SessionNote } from './types';
 
 
 @Component({
@@ -13,7 +13,7 @@ import { Session, SessionNote, SessionNotesConfig } from './types';
     SessionNoteDialog,
   },
 })
-export default class SessionNotesBasic extends CrudComponent<SessionNotesConfig> {
+export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
 
   get session(): Session | null {
     return this.widget.config.sessions.find(s => s.id === this.widget.config.currentSession) || null;

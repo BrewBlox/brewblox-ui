@@ -4,14 +4,14 @@ import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 
-import { SessionNotesConfig } from './types';
+import { SessionLogConfig } from './types';
 
 
 @Component
-export default class SessionNotesWizard extends WidgetWizardBase {
+export default class SessionLogWizard extends WidgetWizardBase {
   createWidget(): void {
     const sessionId = uid();
-    const config: SessionNotesConfig = {
+    const config: SessionLogConfig = {
       currentSession: sessionId,
       sessions: [
         {

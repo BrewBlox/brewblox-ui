@@ -4,10 +4,11 @@ import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 import { createDialog, showBlockDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
+import { dashboardStore } from '@/store/dashboards';
 
 import { SQUARE_SIZE } from './getters';
 import { builderStore } from './store';
-import { FlowPart, LinkedBlock, PersistentPart, Rect,StatePart, Transitions } from './types';
+import { FlowPart, LinkedBlock, PersistentPart, Rect, StatePart, Transitions } from './types';
 
 export function settingsBlock<T extends Block>(part: PersistentPart, key: string): T | null {
   const serviceId = get(part.settings, [key, 'serviceId'], null);
@@ -161,6 +162,27 @@ export function showLinkedBlockDialog(part: PersistentPart, key: string): void {
         message: `Block '${link.blockId}' was not found. Use the editor to change the link.`,
       });
     }
+  }
+}
+
+export function showLinkedWidgetDialog(part: PersistentPart, key: string): void {
+  const widgetId = part.settings[key];
+  if (!widgetId) {
+    return;
+  }
+  else if (dashboardStore.widgetIds.includes(widgetId)) {
+    createDialog({
+      component: 'StoreWidgetDialog',
+      mode: 'Basic',
+      widgetId,
+    });
+  }
+  else {
+    createDialog({
+      dark: true,
+      title: 'Broken Link',
+      message: 'Widget was not found. Use the editor to change the link.',
+    });
   }
 }
 

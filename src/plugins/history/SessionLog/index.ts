@@ -1,12 +1,12 @@
 import { ref, selector } from '@/helpers/component-ref';
 import { Feature } from '@/store/features';
 
-import widget from './SessionNotesWidget.vue';
-import wizard from './SessionNotesWizard.vue';
+import widget from './SessionLogWidget.vue';
+import wizard from './SessionLogWizard.vue';
 
 const feature: Feature = {
-  id: 'SessionNotes',
-  displayName: 'Session Notes',
+  id: 'SessionLog',
+  displayName: 'Session Log',
   widgetComponent: selector(widget),
   wizardComponent: ref(wizard),
   widgetSize: {
