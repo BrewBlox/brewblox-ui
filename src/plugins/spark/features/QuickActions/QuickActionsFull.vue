@@ -13,7 +13,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { Block, ChangeField } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 
-import { BlockChange, Step, StepViewConfig } from './types';
+import { BlockChange, QuickActionsConfig, Step } from './types';
 
 interface BlockChangeDisplay extends BlockChange {
   key: string;
@@ -31,14 +31,14 @@ interface StepDisplay extends Step {
     draggable,
   },
 })
-export default class StepViewFull extends CrudComponent {
+export default class QuickActionsFull extends CrudComponent {
   draggingStep = false;
   editableChanges: Record<string, boolean> = {};
 
   @Prop({ type: String })
   readonly openStep!: string;
 
-  get widgetConfig(): StepViewConfig {
+  get widgetConfig(): QuickActionsConfig {
     return this.widget.config;
   }
 

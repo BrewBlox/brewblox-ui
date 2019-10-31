@@ -5,6 +5,7 @@ import WidgetBase from '@/components/Widget/WidgetBase';
 
 const replacements = {
   ProcessView: 'Builder',
+  StepView: 'QuickActions',
 };
 
 @Component
