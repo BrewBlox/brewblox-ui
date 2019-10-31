@@ -6,6 +6,8 @@ import { sparkStore } from '@/plugins/spark/store';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 
+import { stepperStore } from './plugins/stepper/store';
+
 @Component
 export default class App extends Vue {
   async created(): Promise<void> {
@@ -13,6 +15,7 @@ export default class App extends Vue {
       serviceStore.setup(),
       dashboardStore.setup(),
       sparkStore.setup(),
+      stepperStore.setup(),
     ]);
   }
 }

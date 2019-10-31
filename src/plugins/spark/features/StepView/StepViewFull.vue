@@ -101,9 +101,9 @@ export default class StepViewFull extends CrudComponent {
   }
 
   allData(change: BlockChangeDisplay): { [key: string]: any } {
-    const propVals = change.props.reduce((acc, p) => mutate(acc, p.key, null), {});
+    const placeholders = change.props.reduce((acc, p) => mutate(acc, p.key, null), {});
     return {
-      ...propVals,
+      ...placeholders,
       ...change.data,
     };
   }

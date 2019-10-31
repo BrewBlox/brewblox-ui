@@ -29,18 +29,18 @@ export default class GridContainer extends Vue {
     return slot.componentOptions!.propsData as WidgetProps;
   }
 
-  renderOverlay(createElement: CreateElement): VNode {
-    return createElement('div',
+  renderOverlay(h: CreateElement): VNode {
+    return h('div',
       { class: 'grid-container-overlay' },
-      [createElement('div', { class: 'grid-container-overlay-grid' })],
+      [h('div', { class: 'grid-container-overlay-grid' })],
     );
   }
 
-  renderWidgets(createElement: CreateElement): VNode[] {
+  renderWidgets(h: CreateElement): VNode[] {
     const children = (this.$slots.default || [])
       .filter(slot => !!slot.tag)
       .map((slot: VNode) =>
-        createElement(
+        h(
           GridItem, // Wrap each widget in a GridItem to handle dragging / moving
           {
             props: {
@@ -56,17 +56,16 @@ export default class GridContainer extends Vue {
         ));
 
     if (this.editable) {
-      children.push(this.renderOverlay(createElement));
+      children.push(this.renderOverlay(h));
     }
 
     return children;
   }
 
-  render(createElement: CreateElement): VNode {
-    return createElement(
-      'div',
-      { class: ['grid-container', 'grid-main-container'] },
-      this.renderWidgets(createElement)
+  render(h: CreateElement): VNode {
+    return h('div',
+      { class: 'grid-container grid-main-container' },
+      this.renderWidgets(h)
     );
   }
 }

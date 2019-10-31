@@ -23,6 +23,9 @@ export default class DefaultLayout extends Vue {
   wizardModalOpen = false;
   wizardComponent: string | null = null;
 
+  // env flag
+  stepperFeatureEnabled = process.env.VUE_APP_STEPPER_FEATURE === 'true';
+
   get version(): string {
     return buildEnv.version || 'UNKNOWN';
   }
@@ -126,6 +129,13 @@ export default class DefaultLayout extends Vue {
     createDialog({
       parent: this,
       component: 'BuilderEditor',
+    });
+  }
+
+  showStepperEditor(): void {
+    createDialog({
+      component: 'StepperEditor',
+      parent: this,
     });
   }
 
@@ -311,6 +321,10 @@ export default class DefaultLayout extends Vue {
       <ActionItem icon="mdi-creation" label="Wizardry" @click="openWizard(null)" />
       <q-separator dark />
       <ActionItem icon="mdi-pipe" label="Brewery Builder" @click="showBuilderEditor" />
+      <template v-if="stepperFeatureEnabled">
+        <q-separator dark />
+        <ActionItem icon="mdi-calendar-check" label="Stepper" @click="showStepperEditor" />
+      </template>
 
       <q-item class="bottomed">
         <q-item-section class="col-auto">

@@ -19,7 +19,6 @@ import ImmersionCoil from './ImmersionCoil';
 import Keg from './Keg';
 import Kettle from './Kettle';
 import Lauterhexe from './Lauterhexe';
-import NotesDisplay from './NotesDisplay';
 import PidDisplay from './PidDisplay';
 import ProfileDisplay from './ProfileDisplay';
 import Pump from './Pump';
@@ -27,6 +26,7 @@ import PwmDisplay from './PwmDisplay';
 import PwmPump from './PwmPump';
 import RimsTube from './RimsTube';
 import SensorDisplay from './SensorDisplay';
+import SessionLogDisplay from './SessionLogDisplay';
 import SetpointDisplay from './SetpointDisplay';
 import ShiftedSystemIO from './ShiftedSystemIO';
 import StraightInletTube from './StraightInletTube';
@@ -57,7 +57,6 @@ const specs: { [key: string]: PartSpec } = {
   Keg,
   Kettle,
   Lauterhexe,
-  NotesDisplay,
   PidDisplay,
   ProfileDisplay,
   Pump,
@@ -65,6 +64,7 @@ const specs: { [key: string]: PartSpec } = {
   PwmPump,
   RimsTube,
   SensorDisplay,
+  SessionLogDisplay,
   SetpointDisplay,
   ShiftedSystemIO,
   StraightInletTube,
