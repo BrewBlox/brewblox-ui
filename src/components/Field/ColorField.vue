@@ -34,6 +34,7 @@ export default class ColorField extends FieldBase {
     return {
       color: this.color,
       backgroundColor: this.value ? this.color : null,
+      border: `1px ${this.value ? 'solid' : 'dashed'} ${this.color}`,
       borderRadius: '50%',
       height: '1em',
       width: '1em',

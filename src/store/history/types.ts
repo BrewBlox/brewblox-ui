@@ -19,6 +19,12 @@ export interface DisplayNames {
   [key: string]: string;
 }
 
+export interface QueryConfig {
+  params: QueryParams;
+  targets: QueryTarget[];
+  renames: DisplayNames;
+}
+
 export interface GraphValueAxes {
   [key: string]: 'y' | 'y2';
 }

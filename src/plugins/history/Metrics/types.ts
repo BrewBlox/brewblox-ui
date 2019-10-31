@@ -1,4 +1,4 @@
-import { DisplayNames, QueryParams, QueryTarget } from '@/store/history';
+import { QueryConfig } from '@/store/history';
 
 export interface MetricsResult {
   field: string;
@@ -6,10 +6,7 @@ export interface MetricsResult {
   value: number | null;
 }
 
-export interface MetricsConfig {
-  params: QueryParams;
-  targets: QueryTarget[];
-  renames: DisplayNames;
+export interface MetricsConfig extends QueryConfig {
   freshDuration: Record<string, number>;
   decimals: Record<string, number>;
 }
