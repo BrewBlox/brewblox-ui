@@ -1,3 +1,4 @@
+import fromEntries from 'fromentries';
 import isString from 'lodash/isString';
 import parseDuration from 'parse-duration';
 import { colors } from 'quasar';
@@ -221,4 +222,4 @@ export const objReducer =
 
 export const mapEntries =
   (obj: Record<keyof any, any>, callback: ([k, v]) => [keyof any, any]): typeof obj =>
-    Object.fromEntries(Object.entries(obj).map(callback));
+    fromEntries(Object.entries(obj).map(callback));

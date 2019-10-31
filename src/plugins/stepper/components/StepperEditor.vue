@@ -102,9 +102,6 @@ export default class StepperEditor extends DialogBase {
     }
   }
 
-  say(...args): void {
-    console.log(...args);
-  }
 }
 </script>
 
@@ -230,7 +227,7 @@ export default class StepperEditor extends DialogBase {
                           </q-menu>
                         </q-btn>
                       </div>
-                      <div @mousedown="evt => {say('mousey', evt); evt.stopPropagation()}">
+                      <div>
                         <component
                           :is="conditionComponent(condition)"
                           :condition="condition"
