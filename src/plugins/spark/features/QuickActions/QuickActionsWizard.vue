@@ -7,7 +7,7 @@ import { Service, serviceStore } from '@/store/services';
 
 
 @Component
-export default class StepViewWizard extends WidgetWizardBase {
+export default class QuickActionsWizard extends WidgetWizardBase {
   service: Service | null = null;
 
   get serviceId(): string {

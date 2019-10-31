@@ -2,7 +2,7 @@ import { VueConstructor } from 'vue';
 
 import { autoRegister } from '@/helpers/component-ref';
 import { sparkStore } from '@/plugins/spark/store';
-import { featureStore } from '@/store/features';
+import { Feature, featureStore } from '@/store/features';
 import { providerStore } from '@/store/providers';
 import { Service } from '@/store/services';
 
@@ -28,12 +28,25 @@ const onRemove = async (service: Service): Promise<void> => {
   }
 };
 
+// Allows lookups based on the old type ID
+// DeprecatedWidget will update the widget in the datastore
+const deprecated: Feature[] = [
+  {
+    id: 'StepView',
+    displayName: 'Step View',
+    widgetComponent: 'DeprecatedWidget',
+    widgetSize: { cols: 0, rows: 0 },
+  },
+];
+
 export default {
   install(Vue: VueConstructor) {
     installFilters(Vue);
 
     autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
     autoRegister(require.context('./provider', true, /[A-Z]\w+\.vue$/));
+
+    deprecated.forEach(featureStore.createFeature);
 
     Object.values(features)
       .forEach(feature => featureStore.createFeature(feature.feature));

@@ -29,7 +29,7 @@ interface StepDisplay extends Step {
 }
 
 @Component
-export default class StepViewBasic extends CrudComponent {
+export default class QuickActionsBasic extends CrudComponent {
   applying = false;
 
   get serviceId(): string {

@@ -1,12 +1,12 @@
 import { PersistentWidget } from '@/store/dashboards';
 
-export interface StepViewConfig {
+export interface QuickActionsConfig {
   serviceId: string;
   steps: Step[];
 }
 
-export interface StepViewItem extends PersistentWidget {
-  config: StepViewConfig;
+export interface QuickActionsItem extends PersistentWidget {
+  config: QuickActionsConfig;
 }
 
 export interface BlockChange {

@@ -16,7 +16,7 @@ import {
   SetpointProfileBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
-import { StepViewItem } from '@/plugins/spark/features/StepView/types';
+import { QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
 import { PersistentWidget } from '@/store/dashboards';
@@ -359,8 +359,8 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
     });
   }
 
-  const stepView: StepViewItem = {
-    ...createWidget(maybeSpace(config.prefix, 'Actions'), 'StepView'),
+  const QuickActions: QuickActionsItem = {
+    ...createWidget(maybeSpace(config.prefix, 'Actions'), 'QuickActions'),
     cols: 4,
     rows: 4,
     pinnedPosition: { x: 1, y: 6 },
@@ -430,7 +430,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
   return [
     builder,
     graph,
-    stepView,
+    QuickActions,
     profile,
   ];
 }

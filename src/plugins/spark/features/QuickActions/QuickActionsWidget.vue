@@ -3,16 +3,16 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 
-import StepViewBasic from './StepViewBasic.vue';
-import StepViewFull from './StepViewFull.vue';
+import QuickActionsBasic from './QuickActionsBasic.vue';
+import QuickActionsFull from './QuickActionsFull.vue';
 
 @Component({
   components: {
-    Basic: StepViewBasic,
-    Full: StepViewFull,
+    Basic: QuickActionsBasic,
+    Full: QuickActionsFull,
   },
 })
-export default class StepViewWidget extends WidgetBase {
+export default class QuickActionsWidget extends WidgetBase {
   @Prop({ type: String, required: false })
   public readonly openStep!: string;
 }

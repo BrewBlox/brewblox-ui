@@ -197,7 +197,7 @@
       "order": 3,
       "cols": 4,
       "rows": 2,
-      "feature": "StepView",
+      "feature": "QuickActions",
       "dashboard": "dashboard-home",
       "config": {
         "serviceId": "sparkey",
