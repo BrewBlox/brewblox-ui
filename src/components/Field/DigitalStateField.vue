@@ -26,7 +26,7 @@ export default class DigitalStateField extends Vue {
     return val;
   }
 
-  get commonOpts(): Record<string, string> {
+  get commonOpts(): Mapped<string> {
     return {
       color: 'grey-9',
       toggleColor: 'primary',
@@ -35,7 +35,7 @@ export default class DigitalStateField extends Vue {
     };
   }
 
-  get options(): Record<string, any> {
+  get options(): Mapped<any> {
     return [
       {
         ...this.commonOpts,

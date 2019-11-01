@@ -20,11 +20,11 @@ export default class FieldBase extends Vue {
   public readonly readonly!: boolean;
 
   @Prop({ type: Object, default: () => ({}) })
-  public readonly dialogProps!: Record<string, any>;
+  public readonly dialogProps!: Mapped<any>;
 
   @Prop({ type: Object, default: () => ({}) })
-  public readonly tagProps!: Record<string, any>;
+  public readonly tagProps!: Mapped<any>;
 
   @Prop({ type: [Array, Object, String] })
-  public readonly tagClass!: string[] | Record<string, string> | string;
+  public readonly tagClass!: string[] | Mapped<string> | string;
 }

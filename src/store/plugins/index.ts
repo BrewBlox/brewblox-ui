@@ -26,8 +26,8 @@ const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'plugins' })
 export class PluginModule extends VuexModule {
-  public plugins: Record<string, UIPlugin> = {};
-  public results: Record<string, UIPluginResult> = {};
+  public plugins: Mapped<UIPlugin> = {};
+  public results: Mapped<UIPluginResult> = {};
 
   public get pluginValues(): UIPlugin[] {
     return Object.values(this.plugins);

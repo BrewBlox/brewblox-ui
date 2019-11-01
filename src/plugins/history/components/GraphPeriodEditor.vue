@@ -87,19 +87,24 @@ export default class GraphPeriodEditor extends Vue {
 
       // if no match was found, params must be sanitized
       if (!matching) {
-        this.sanitizeParams(this.period as PeriodDisplay);
+        this.sanitizeParams(this.period!);
         this.saveConfig(this.config);
       }
-
     }
+    return this.period!;
+  }
 
-    return this.period as PeriodDisplay;
+  updateShownPeriod(val: PeriodDisplay): void {
+    this.period = val;
+    this.sanitizeParams(val);
+    this.saveConfig(this.config);
   }
 }
 </script>
 
 <template>
-  <q-list dark>
+  <!-- <div class="row align-children"> -->
+  <q-list dark class="col">
     <q-item dark>
       <q-item-section class="col-auto">
         <q-select
@@ -146,7 +151,8 @@ export default class GraphPeriodEditor extends Vue {
         />
       </q-item-section>
     </q-item>
-    <q-item dark>
+  </q-list>
+  <!-- <q-item dark class="col-auto">
       <q-item-section class="col-auto">
         <q-item-label caption>
           Averaging period
@@ -165,5 +171,5 @@ export default class GraphPeriodEditor extends Vue {
         </q-tooltip>
       </q-item-section>
     </q-item>
-  </q-list>
+  </div> -->
 </template>

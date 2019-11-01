@@ -7,6 +7,6 @@ export interface MetricsResult {
 }
 
 export interface MetricsConfig extends QueryConfig {
-  freshDuration: Record<string, number>;
-  decimals: Record<string, number>;
+  freshDuration: Mapped<number>;
+  decimals: Mapped<number>;
 }

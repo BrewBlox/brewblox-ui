@@ -65,27 +65,30 @@ export default class GraphDisplayEditor extends Vue {
 
 <template>
   <q-list dark>
-    <q-item dark>
+    <!-- <q-item dark>
       <q-item-section>Metric</q-item-section>
       <q-item-section>Display settings</q-item-section>
     </q-item>
-    <q-separator dark inset />
+    <q-separator dark inset /> -->
 
-    <q-item v-for="field in selected" :key="field" dark class="align-children">
+
+    <!-- <GraphPeriodEditor :config="config" @update:config="saveConfig" /> -->
+
+    <div v-for="field in selected" :key="field" dark class="align-children row wrap q-pa-sm">
       <q-item-section class="col-5">
-        {{ field }}
+        <InputField :value="fieldRename(field)" title="Legend" @input="v => saveRename(field, v)" />
       </q-item-section>
       <q-space />
-      <q-item-section class="col-6">
+      <q-item-section class="col-grow">
         <q-list dark dense>
           <q-item dark>
             <q-item-section>
               <q-item-label caption>
-                Label
+                Key
               </q-item-label>
             </q-item-section>
             <q-item-section class="col-auto">
-              <InputField :value="fieldRename(field)" title="Legend" @input="v => saveRename(field, v)" />
+              {{ field }}
             </q-item-section>
           </q-item>
           <q-item dark>
@@ -122,10 +125,18 @@ export default class GraphDisplayEditor extends Vue {
           <q-separator dark />
         </q-list>
       </q-item-section>
-    </q-item>
+    </div>
     <q-item v-if="!selected || selected.length === 0" dark>
       <q-item-section side>
         No metrics selected
+      </q-item-section>
+    </q-item>
+    <q-item dark>
+      <q-space />
+      <q-item-section class="col-auto">
+        <q-btn outline round icon="edit">
+          <q-tooltip>Edit targets</q-tooltip>
+        </q-btn>
       </q-item-section>
     </q-item>
   </q-list>

@@ -13,10 +13,10 @@ const rawError = true;
 @Module({ store, namespaced: true, dynamic: true, name: 'dashboards' })
 export class DashboardModule extends VuexModule {
   public replicatingDashboards = false;
-  public dashboards: Record<string, Dashboard> = {};
+  public dashboards: Mapped<Dashboard> = {};
 
   public replicatingItems = false;
-  public widgets: Record<string, PersistentWidget> = {};
+  public widgets: Mapped<PersistentWidget> = {};
 
   public get dashboardIds(): string[] {
     return Object.keys(this.dashboards);

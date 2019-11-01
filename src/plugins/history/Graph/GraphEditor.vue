@@ -44,17 +44,20 @@ export default class GraphEditor extends CrudComponent {
     <slot name="toolbar" />
     <slot name="warnings" />
 
-    <q-tabs v-model="tab" dense active-color="primary" align="justify">
+    <!-- <q-tabs v-model="tab" dense active-color="primary" align="justify">
       <q-tab name="metrics" label="Metrics" />
       <q-tab name="period" label="Period" />
       <q-tab name="display" label="Display" />
-    </q-tabs>
+    </q-tabs> -->
 
     <div :class="{'col-grow': true, 'scroll-parent': inDialog}">
       <component :is="inDialog ? 'q-scroll-area' : 'div'">
-        <q-tab-panels v-model="tab" animated :class="inDialog ? 'bg-dark-bright' : 'bg-dark'">
+        <GraphTargetsEditor :config="config" @update:config="saveConfig" />
+
+        <q-tab-panels v-if="false" v-model="tab" animated :class="inDialog ? 'bg-dark-bright' : 'bg-dark'">
           <q-tab-panel dark name="metrics" class="q-pt-none">
             <GraphTargetsEditor :config="config" @update:config="saveConfig" />
+            <!-- <GraphTargetsSimpleEditor :config="config" @update:config="saveConfig" /> -->
           </q-tab-panel>
           <q-tab-panel dark name="period" class="q-pt-none">
             <GraphPeriodEditor :config="config" @update:config="saveConfig" />

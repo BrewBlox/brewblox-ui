@@ -93,7 +93,7 @@ export const fetchUnitAlternatives = async (serviceId: string): Promise<UnitAlte
   get(`/${encodeURIComponent(serviceId)}/codec/unit_alternatives`)
     .catch(intercept(`Failed to fetch unit alternatives on ${serviceId}`));
 
-export const fetchCompatibleTypes = async (serviceId: string): Promise<Record<string, string[]>> =>
+export const fetchCompatibleTypes = async (serviceId: string): Promise<Mapped<string[]>> =>
   get(`/${encodeURIComponent(serviceId)}/codec/compatible_types`)
     .catch(intercept(`Failed to fetch compatible types on ${serviceId}`));
 

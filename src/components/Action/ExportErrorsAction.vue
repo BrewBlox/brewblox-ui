@@ -15,7 +15,7 @@ export default class ExportErrorsAction extends Vue {
   @Prop({ type: String, default: 'Export API errors' })
   public readonly label!: string;
 
-  get itemProps(): Record<string, any> {
+  get itemProps(): Mapped<any> {
     return {
       ...this.$attrs,
       ...this.$props,

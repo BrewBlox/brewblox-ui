@@ -40,7 +40,7 @@ export const subscribeMetrics =
     })}`);
 
 export const fetchKnownKeys =
-  async (): Promise<Record<string, any>> =>
+  async (): Promise<Mapped<any>> =>
     post('/history/query/objects', {});
 
 export const fetchValues =

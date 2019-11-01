@@ -74,7 +74,7 @@ export default class PlotlyGraph extends Vue {
   public readonly height!: string;
 
   @Prop({ type: [String, Array, Object], default: '' })
-  public readonly plotlyClass!: string | string[] | Record<string, string>;
+  public readonly plotlyClass!: string | string[] | Mapped<string>;
 
   private attachListeners(): void {
     Object.keys(this.$listeners)

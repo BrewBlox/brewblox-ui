@@ -33,7 +33,7 @@ interface StepDisplay extends Step {
 })
 export default class QuickActionsFull extends CrudComponent {
   draggingStep = false;
-  editableChanges: Record<string, boolean> = {};
+  editableChanges: Mapped<boolean> = {};
 
   @Prop({ type: String })
   readonly openStep!: string;
@@ -46,7 +46,7 @@ export default class QuickActionsFull extends CrudComponent {
     return this.widgetConfig.serviceId;
   }
 
-  get changeFields(): Record<string, ChangeField[]> {
+  get changeFields(): Mapped<ChangeField[]> {
     return sparkStore.specValues
       .reduce(
         (acc, spec) => {

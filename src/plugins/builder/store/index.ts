@@ -20,11 +20,11 @@ const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'builder' })
 export class BuilderModule extends VuexModule {
-  private specs: Record<string, PartSpec> = {};
+  private specs: Mapped<PartSpec> = {};
 
   public editorActive = false;
   public editorMode = '';
-  public layouts: Record<string, BuilderLayout> = {};
+  public layouts: Mapped<BuilderLayout> = {};
 
   public get layoutIds(): string[] {
     return Object.keys(this.layouts);

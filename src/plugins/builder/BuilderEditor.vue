@@ -196,7 +196,7 @@ export default class BuilderEditor extends DialogBase {
     if (!this.layout) {
       return [];
     }
-    const sizes: Record<string, number> = {};
+    const sizes: Mapped<number> = {};
     return this.layout.parts
       .map(part => {
         const actual: PersistentPart = {
@@ -220,7 +220,7 @@ export default class BuilderEditor extends DialogBase {
   }
 
   get overlaps(): [Coordinates, number][] {
-    const counts: Record<string, number> = {};
+    const counts: Mapped<number> = {};
     for (const part of this.parts) {
       const key = new Coordinates([part.x, part.y, 0]).toString();
       counts[key] = (counts[key] || 0) + 1;

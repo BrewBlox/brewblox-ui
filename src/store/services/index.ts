@@ -12,7 +12,7 @@ export interface Service {
   title: string;
   order: number;
   type: string;
-  config: Record<string, any>;
+  config: Mapped<any>;
   _rev?: string;
 }
 
@@ -26,7 +26,7 @@ const initService = async (service: Service): Promise<void> => {
 @Module({ store, namespaced: true, dynamic: true, name: 'services' })
 export class ServiceModule extends VuexModule {
   public replicating = false;
-  public services: Record<string, Service> = {};
+  public services: Mapped<Service> = {};
 
   public get serviceIds(): string[] {
     return Object.keys(this.services);

@@ -74,7 +74,7 @@ export default class WidgetBase<ConfigT = any> extends Vue {
     this.saveWidget({ ...this.widget, config });
   }
 
-  public showDialog(args: Record<string, any> = {}): void {
+  public showDialog(args: Mapped<any> = {}): void {
     this.activeDialog = createDialog({
       component: 'WidgetDialog',
       parent: this,

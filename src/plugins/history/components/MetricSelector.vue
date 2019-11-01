@@ -26,7 +26,7 @@ export default class MetricSelector extends Vue {
     this.$emit('update:selected', vals);
   }
 
-  get fields(): Record<string, string[]> {
+  get fields(): Mapped<string[]> {
     return historyStore.fields;
   }
 

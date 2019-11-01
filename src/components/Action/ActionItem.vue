@@ -24,7 +24,7 @@ export default class ActionItem extends Vue {
   readonly disabled!: boolean;
 
 
-  get combinedProps(): Record<string, any> {
+  get combinedProps(): Mapped<any> {
     return {
       dark: true,
       clickable: !this.disabled,
@@ -33,7 +33,7 @@ export default class ActionItem extends Vue {
     };
   }
 
-  get itemClass(): Record<string, boolean> {
+  get itemClass(): Mapped<boolean> {
     return {
       darkened: this.disabled,
     };

@@ -12,7 +12,7 @@ export interface ChangeField {
   pretty?: (val: any) => string;
 }
 
-export type BlockDataGenerator = () => Record<string, any>;
+export type BlockDataGenerator = () => Mapped<any>;
 
 export interface BlockDataPreset {
   name: string;
@@ -33,7 +33,7 @@ export interface BlockSpec {
   generate: BlockDataGenerator;
   presets: BlockDataPreset[];
   changes: ChangeField[];
-  graphTargets?: Record<string, string>;
+  graphTargets?: Mapped<string>;
 }
 
 export interface SparkFeature {

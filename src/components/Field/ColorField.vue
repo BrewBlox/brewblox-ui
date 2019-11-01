@@ -14,6 +14,9 @@ export default class ColorField extends FieldBase {
   @Prop({ type: Boolean, default: false })
   public readonly clearable!: boolean;
 
+  @Prop({ type: String, default: '<not set>' })
+  public readonly nullText!: string;
+
   @Emit('input')
   public change(v: string | null): string | null {
     return v === null
@@ -27,10 +30,10 @@ export default class ColorField extends FieldBase {
   }
 
   get colorString(): string {
-    return this.value || '<not set>';
+    return this.value || this.nullText;
   }
 
-  get colorStyle(): Record<string, any> {
+  get colorStyle(): Mapped<any> {
     return {
       color: this.color,
       backgroundColor: this.value ? this.color : null,

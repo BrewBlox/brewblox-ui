@@ -17,7 +17,7 @@ export default class BlockPresetsAction extends BlockCrudComponent {
   @Prop({ type: String, default: 'mdi-application-import' })
   readonly icon!: string;
 
-  get itemProps(): Record<string, any> {
+  get itemProps(): Mapped<any> {
     return {
       ...this.$attrs,
       ...this.$props,

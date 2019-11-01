@@ -47,7 +47,7 @@ export default class QuickActionsBasic extends CrudComponent {
     });
   }
 
-  get applicableSteps(): Record<string, boolean> {
+  get applicableSteps(): Mapped<boolean> {
     const blockIds = sparkStore.blockIds(this.serviceId);
     return this.steps
       .reduce(

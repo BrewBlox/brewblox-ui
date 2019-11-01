@@ -12,7 +12,7 @@ export default class RenameWidgetAction extends CrudComponent {
   @Prop({ type: String, default: 'edit' })
   readonly icon!: string;
 
-  get itemProps(): Record<string, any> {
+  get itemProps(): Mapped<any> {
     return {
       ...this.$attrs,
       ...this.$props,

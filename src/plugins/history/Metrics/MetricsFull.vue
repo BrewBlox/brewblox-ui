@@ -63,11 +63,11 @@ export default class MetricsFull extends CrudComponent<MetricsConfig> {
     this.saveConfig({ ...this.config, renames });
   }
 
-  get freshDuration(): Record<string, number> {
+  get freshDuration(): Mapped<number> {
     return this.config.freshDuration;
   }
 
-  get decimals(): Record<string, number> {
+  get decimals(): Mapped<number> {
     return this.config.decimals;
   }
 
