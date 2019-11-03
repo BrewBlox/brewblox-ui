@@ -9,13 +9,7 @@ import { defaultPresets } from '@/plugins/history/getters';
 import { GraphConfig } from '@/plugins/history/types';
 import { QueryParams } from '@/store/history';
 
-import GraphEditor from './GraphEditor.vue';
-
-@Component({
-  components: {
-    GraphEditor,
-  },
-})
+@Component
 export default class GraphWidget extends WidgetBase {
   graphModalOpen = false;
   downsampling: any = {};
@@ -24,14 +18,23 @@ export default class GraphWidget extends WidgetBase {
   @Ref()
   readonly widgetGraph!: HistoryGraph;
 
-  @Watch('graphCfg', { deep: true })
+  @Watch('config', { deep: true })
   updateWatcher(newVal: GraphConfig, oldVal: GraphConfig): void {
     if (newVal && JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
       this.regraph();
     }
   }
 
-  get graphCfg(): GraphConfig {
+  created(): void {
+    this.graphId = uid();
+  }
+
+  mounted(): void {
+    this.$watch('widget.cols', this.refresh);
+    this.$watch('widget.rows', this.refresh);
+  }
+
+  get config(): GraphConfig {
     return {
       layout: {},
       params: {},
@@ -67,12 +70,12 @@ export default class GraphWidget extends WidgetBase {
   }
 
   isActivePreset(preset: QueryParams): boolean {
-    return JSON.stringify(preset) === JSON.stringify(this.graphCfg.params);
+    return JSON.stringify(preset) === JSON.stringify(this.config.params);
   }
 
   applyPreset(preset: QueryParams): void {
     this.saveConfig({
-      ...this.graphCfg,
+      ...this.config,
       params: { ...preset },
     });
   }
@@ -90,54 +93,41 @@ export default class GraphWidget extends WidgetBase {
       this.widgetGraph.refresh();
     }
   }
-
-  created(): void {
-    this.graphId = uid();
-  }
-
-  mounted(): void {
-    this.$watch('widget.cols', this.refresh);
-    this.$watch('widget.rows', this.refresh);
-  }
 }
 </script>
 
 <template>
-  <GraphCardWrapper show-initial :show="inDialog && mode ==='Full'">
+  <GraphCardWrapper show-initial :show="inDialog && mode === 'Full'">
     <template #graph>
       <HistoryGraph
         :id="graphId"
         ref="widgetGraph"
-        :config="graphCfg"
+        :config="config"
         @downsample="v => downsampling = v"
       />
     </template>
 
     <!-- Full -->
-    <GraphEditor
-      v-if="mode === 'Full'"
-      :crud="crud"
-      :class="graphCardClass"
-      :style="graphCardStyle"
-      :in-dialog="inDialog"
-      :downsampling="downsampling"
-    >
-      <template #toolbar>
-        <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
-          <template #actions>
-            <ExportGraphAction :config="graphCfg" :header="widget.title" />
-            <WidgetActions :crud="crud" />
-          </template>
+    <q-card v-if="mode === 'Full'" :class="graphCardClass" :style="graphCardStyle" dark>
+      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
+        <template #actions>
+          <ExportGraphAction :config="config" :header="widget.title" />
+          <WidgetActions :crud="crud" />
+        </template>
+      </component>
+      <div :class="{'col-grow': true, 'scroll-parent': inDialog}">
+        <component :is="inDialog ? 'q-scroll-area' : 'div'">
+          <GraphEditor :config="config" @update:config="saveConfig" />
         </component>
-      </template>
-    </GraphEditor>
+      </div>
+    </q-card>
 
     <!-- Basic -->
     <q-card v-else dark :class="graphCardClass" :style="graphCardStyle">
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
           <ActionItem icon="mdi-chart-line" label="Show maximized" @click="graphModalOpen = true" />
-          <ExportGraphAction :config="graphCfg" :header="widget.title" />
+          <ExportGraphAction :config="config" :header="widget.title" />
           <ActionItem icon="refresh" label="Refresh" @click="regraph" />
           <q-expansion-item label="Timespan">
             <q-list dark>
@@ -161,7 +151,7 @@ export default class GraphWidget extends WidgetBase {
 
       <q-dialog v-model="graphModalOpen" maximized>
         <q-card v-if="graphModalOpen" dark class="bg-dark">
-          <HistoryGraph :id="graphId" :config="graphCfg" shared-listeners>
+          <HistoryGraph :id="graphId" :config="config" shared-listeners>
             <template #controls>
               <q-btn-dropdown flat auto-close label="presets" icon="mdi-timelapse">
                 <q-list dark link>
@@ -187,10 +177,17 @@ export default class GraphWidget extends WidgetBase {
         <HistoryGraph
           :id="graphId"
           ref="widgetGraph"
-          :config="graphCfg"
+          :config="config"
           @downsample="v => downsampling = v"
         />
       </div>
     </q-card>
   </GraphCardWrapper>
 </template>
+
+<style scoped>
+.scroll-parent {
+  height: 500px;
+  max-height: 60vh;
+}
+</style>

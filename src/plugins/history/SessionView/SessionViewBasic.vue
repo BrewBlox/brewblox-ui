@@ -49,9 +49,9 @@ export default class SessionViewBasic extends CrudComponent<SessionViewConfig> {
     return `${shortDateString(session.start)} to ${shortDateString(session.end)}`;
   }
 
-  showSessionDialog(activeSession: Session | null = null): void {
+  showSessionDialog(initialSession: Session | null = null): void {
     this.showDialog({
-      widgetProps: { activeSession },
+      widgetProps: { initialSession },
     });
   }
 }

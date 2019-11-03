@@ -4,8 +4,6 @@ import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
-import { mutate } from '@/helpers/functional';
 import {
   defaultLabel,
   expandedNodes,
@@ -14,13 +12,11 @@ import {
   targetBuilder,
   targetSplitter,
 } from '@/plugins/history/nodes';
-import { historyStore } from '@/store/history';
-
-import { GraphConfig } from '../types';
+import { historyStore, QueryConfig } from '@/store/history';
 
 
 @Component
-export default class GraphTargetsEditor extends Vue {
+export default class QueryEditor extends Vue {
   selectFilter: string | null = null;
   expandedKeys: string[] = [];
 
@@ -28,7 +24,7 @@ export default class GraphTargetsEditor extends Vue {
   readonly tree!: QTree;
 
   @Prop({ type: Object, required: true })
-  public readonly config!: GraphConfig;
+  public readonly config!: QueryConfig;
 
   @Watch('selectFilter')
   updateExpanded(filter: string): void {
@@ -37,15 +33,35 @@ export default class GraphTargetsEditor extends Vue {
     }
   }
 
-  expandTicked(): void {
-    this.expandedKeys = this.ticked.map(s => s.replace(/\/[^\/]+$/, ''));
+  created(): void {
+    historyStore.fetchKnownKeys();
   }
 
   mounted(): void {
     this.expandTicked();
   }
 
-  saveConfig(config: GraphConfig = this.config): void {
+  expandTicked(): void {
+    /**
+     * Expanded keys must include parent elements
+     * If we selected sparkey/blocky/value,
+     * we must expand the following keys:
+     * - sparkey
+     * - sparkey/blocky
+     */
+    this.expandedKeys = [...new Set(
+      this.ticked
+        .flatMap(s => s
+          // Remove leaf node -> 'sparkey/blocky'
+          .replace(/\/[^\/]+$/, '')
+          // Split in sections -> ['sparkey', 'blocky']
+          .split('/')
+          // Gradually build parents -> ['sparkey', 'sparkey/blocky']
+          .map((v, idx, arr) => arr.slice(0, idx + 1).join('/')))
+    )];
+  }
+
+  saveConfig(config: QueryConfig = this.config): void {
     this.$emit('update:config', config);
   }
 
@@ -77,14 +93,6 @@ export default class GraphTargetsEditor extends Vue {
     if (!this.tree.isTicked(node.value)) {
       this.tree.setTicked([node.value], true);
     }
-    createDialog({
-      component: 'GraphDisplayDialog',
-      title: node.value,
-      parent: this,
-      config: this.config,
-      field: node.value,
-    })
-      .onOk(config => this.saveConfig(config));
   }
 
   nodeFilter(node: QuasarNode, filter: string): boolean {
@@ -147,21 +155,9 @@ export default class GraphTargetsEditor extends Vue {
         dark
         node-key="value"
       >
-        <template #header-leaf="prop">
+        <template #header-leaf="{node}">
           <div class="editable q-py-xs leaf-node-header">
-            {{ prop.node.label }}
-            <q-tooltip>
-              <i>Click to edit</i> <br />
-              Label: <span>{{ config.renames[prop.node.value] || prop.node.label }}</span> <br />
-              Color: <span>
-                <ColorField
-                  :value="config.colors[prop.node.value] || ''"
-                  null-text="automatic"
-                  readonly
-                />
-              </span> <br />
-              Axis: <span>{{ config.axes[prop.node.value] === 'y2' ? 'Y2' : 'Y1' }}</span>
-            </q-tooltip>
+            <slot name="leaf" :node="node" />
           </div>
         </template>
       </q-tree>

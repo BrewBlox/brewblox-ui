@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
@@ -21,6 +21,9 @@ import { Session, SessionViewConfig } from './types';
 export default class SessionViewWidget extends WidgetBase {
   graphSessionId: string | null = null;
   sessionFilter = '';
+
+  @Prop({ default: null })
+  readonly initialSession!: Session | null;
 
   get widgetConfig(): SessionViewConfig {
     return this.widget.config;
@@ -62,9 +65,9 @@ export default class SessionViewWidget extends WidgetBase {
     return `${shortDateString(session.start)} to ${shortDateString(session.end)}`;
   }
 
-  showSessionDialog(activeSession: Session | null = null): void {
+  showSessionDialog(initialSession: Session | null = null): void {
     this.showDialog({
-      getProps: () => ({ activeSession }),
+      getProps: () => ({ initialSession }),
     });
   }
 
@@ -93,6 +96,7 @@ export default class SessionViewWidget extends WidgetBase {
     :is="mode"
     :crud="crud"
     :class="cardClass"
+    :initial-session="initialSession"
     @create="createSession"
     @graph="showSessionGraph"
   >

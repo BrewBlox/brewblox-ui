@@ -1,29 +1,22 @@
 <script lang="ts">
+import get from 'lodash/get';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 import { deepCopy } from '@/helpers/units/parseObject';
 
+import { durationMs, durationString } from '../../../helpers/functional';
+import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from '../Metrics/getters';
+import { MetricsConfig } from '../Metrics/types';
 import { defaultLabel } from '../nodes';
-import { GraphConfig } from '../types';
 
 
 @Component
-export default class GraphDisplayDialog extends DialogBase {
-  local: GraphConfig | null = null;
-  axisOpts: SelectOption[] = [
-    {
-      value: 'y',
-      label: 'Y1',
-    },
-    {
-      value: 'y2',
-      label: 'Y2',
-    },
-  ];
+export default class MetricsDisplayDialog extends DialogBase {
+  local: MetricsConfig | null = null;
 
   @Prop({ type: Object, required: true })
-  public readonly config!: GraphConfig;
+  public readonly config!: MetricsConfig;
 
   @Prop({ type: String, required: true })
   public readonly field!: string;
@@ -40,20 +33,23 @@ export default class GraphDisplayDialog extends DialogBase {
     this.$set(this.local!.renames, this.field, val || defaultLabel(this.field));
   }
 
-  get axis(): GraphConfig['axes'][''] {
-    return this.local!.axes[this.field] || 'y';
+  get fresh(): string {
+    return durationString(
+      this.local!.freshDuration[this.field] || DEFAULT_FRESH_DURATION);
   }
 
-  set axis(val: GraphConfig['axes']['']) {
-    this.$set(this.local!.axes, this.field, val);
+  set fresh(val: string) {
+    const ms = durationMs(val) || DEFAULT_FRESH_DURATION;
+    this.$set(this.local!.freshDuration, this.field, ms);
   }
 
-  get color(): string {
-    return this.local!.colors[this.field] || '';
+  get decimals(): number {
+    return get(this.local!.decimals, this.field, DEFAULT_DECIMALS);
   }
 
-  set color(val: string) {
-    this.$set(this.local!.colors, this.field, val);
+  set decimals(val: number) {
+    const numVal = val !== null ? val : DEFAULT_DECIMALS;
+    this.$set(this.local!.decimals, this.field, numVal);
   }
 
   save(): void {
@@ -88,30 +84,26 @@ export default class GraphDisplayDialog extends DialogBase {
           <q-item dark>
             <q-item-section>
               <q-item-label caption>
-                Line color
+                Warn when older than
               </q-item-label>
             </q-item-section>
             <q-item-section class="col-auto">
-              <ColorField
-                v-model="color"
-                title="Line color"
-                null-text="automatic"
-                clearable
-              />
+              <InputField v-model="fresh" title="Warn when older than" />
             </q-item-section>
           </q-item>
           <q-item dark>
             <q-item-section>
               <q-item-label caption>
-                Y-axis
+                Number of decimals
               </q-item-label>
             </q-item-section>
             <q-item-section class="col-auto">
-              <q-btn-toggle
-                v-model="axis"
-                :options="axisOpts"
-                flat
-                stretch
+              <InputField
+                v-model="decimals"
+                :decimals="0"
+                :rules="[v => v >= 0 || 'Must be 0 or more']"
+                type="number"
+                title="Number of decimals"
               />
             </q-item-section>
           </q-item>
