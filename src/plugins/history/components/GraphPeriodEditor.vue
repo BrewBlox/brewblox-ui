@@ -1,4 +1,6 @@
 <script lang="ts">
+import find from 'lodash/find';
+import matches from 'lodash/matches';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
@@ -94,6 +96,11 @@ export default class GraphPeriodEditor extends Vue {
     return this.period!;
   }
 
+  get isLive(): boolean {
+    const opt = find(this.periodOptions, matches({ value: this.shownPeriod }));
+    return opt !== undefined && opt.label.startsWith('Live');
+  }
+
   updateShownPeriod(val: PeriodDisplay): void {
     this.period = val;
     this.sanitizeParams(val);
@@ -103,9 +110,8 @@ export default class GraphPeriodEditor extends Vue {
 </script>
 
 <template>
-  <!-- <div class="row align-children"> -->
-  <q-list dark class="col">
-    <q-item dark>
+  <div class="row wrap q-px-sm">
+    <q-item dark class="col-auto">
       <q-item-section class="col-auto">
         <q-select
           :value="shownPeriod"
@@ -119,39 +125,48 @@ export default class GraphPeriodEditor extends Vue {
         />
       </q-item-section>
     </q-item>
-    <q-item dark>
-      <q-item-section v-if="shownPeriod.start" class="col-6">
-        <q-item-label caption>
-          Start time
-        </q-item-label>
+    <q-item dark class="col-auto column justify-around">
+      <q-item-label caption>
+        Settings
+      </q-item-label>
+      <div v-if="shownPeriod.start" class="col row no-wrap">
+        <span class="q-pr-sm text-italic col-auto">Start time</span>
         <DatetimeField
           :value="config.params.start"
           title="Start time"
+          label="Start date and time"
+          tag="div"
+          tag-class="col"
           @input="v => { config.params.start = v.getTime(); saveConfig(); }"
         />
-      </q-item-section>
-      <q-item-section v-if="shownPeriod.duration" class="col-6">
-        <q-item-label caption>
-          Duration
-        </q-item-label>
+      </div>
+      <div v-if="shownPeriod.duration" class="col row no-wrap">
+        <span class="q-pr-sm text-italic col-auto">Duration</span>
         <InputField
           :value="config.params.duration"
           title="Duration"
+          label="Duration"
+          tag="div"
+          tag-class="col"
           @input="v => { config.params.duration = durationString(v); saveConfig(); }"
         />
-      </q-item-section>
-      <q-item-section v-if="shownPeriod.end" class="col-6">
-        <q-item-label caption>
-          End time
-        </q-item-label>
+      </div>
+      <div v-if="shownPeriod.end" class="col row no-wrap">
+        <span class="q-pr-sm text-italic col-auto">End time</span>
         <DatetimeField
           :value="config.params.end"
           title="End time"
+          label="End date and time"
+          tag="div"
+          tag-class="col"
           @input="v => { config.params.end = v.getTime(); saveConfig(); }"
         />
-      </q-item-section>
+      </div>
+      <div v-if="isLive" class="col q-pr-sm text-italic">
+        Graph is Live
+      </div>
     </q-item>
-  </q-list>
+  </div>
   <!-- <q-item dark class="col-auto">
       <q-item-section class="col-auto">
         <q-item-label caption>

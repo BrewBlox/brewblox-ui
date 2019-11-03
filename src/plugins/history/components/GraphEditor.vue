@@ -32,23 +32,26 @@ export default class GraphEditor extends Vue {
 </script>
 
 <template>
-  <QueryEditor :config="config" @update:config="saveConfig">
-    <template #leaf="{node}">
-      <div @click="editLeaf(node)">
-        {{ node.label }}
-        <q-tooltip>
-          <i>Click to edit</i> <br />
-          Label: <span>{{ config.renames[node.value] || node.label }}</span> <br />
-          Color: <span>
-            <ColorField
-              :value="config.colors[node.value] || ''"
-              null-text="automatic"
-              readonly
-            />
-          </span> <br />
-          Axis: <span>{{ config.axes[node.value] === 'y2' ? 'Y2' : 'Y1' }}</span>
-        </q-tooltip>
-      </div>
-    </template>
-  </QueryEditor>
+  <div>
+    <GraphPeriodEditor :config="config" @update:config="saveConfig" />
+    <QueryEditor :config="config" @update:config="saveConfig">
+      <template #leaf="{node}">
+        <div @click="editLeaf(node)">
+          {{ node.label }}
+          <q-tooltip>
+            <i>Click to edit</i> <br />
+            Label: <span>{{ config.renames[node.value] || node.label }}</span> <br />
+            Color: <span>
+              <ColorField
+                :value="config.colors[node.value] || ''"
+                null-text="automatic"
+                readonly
+              />
+            </span> <br />
+            Axis: <span>{{ config.axes[node.value] === 'y2' ? 'Y2' : 'Y1' }}</span>
+          </q-tooltip>
+        </div>
+      </template>
+    </QueryEditor>
+  </div>
 </template>
