@@ -113,10 +113,11 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
 
   editSession(session: Session): void {
     createDialog({
-      component: 'GraphTargetsDialog',
+      component: 'GraphEditorDialog',
       title: session.name,
       parent: this,
       config: session.graphCfg,
+      noPeriod: true,
     })
       .onOk(graphCfg => this.updateSession({ ...session, graphCfg }));
   }
@@ -146,16 +147,16 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
             </q-btn>
           </q-item-section>
           <q-item-section class="col-auto">
-            <q-btn flat icon="mdi-content-copy" @click="duplicateSession(session)">
-              <q-tooltip>Duplicate session</q-tooltip>
-            </q-btn>
-          </q-item-section>
-          <q-item-section class="col-auto">
             <q-btn flat icon="edit" @click="editSession(session)">
               <q-tooltip>Edit graph field</q-tooltip>
             </q-btn>
           </q-item-section>
           <q-space />
+          <q-item-section class="col-auto">
+            <q-btn flat icon="mdi-content-copy" @click="duplicateSession(session)">
+              <q-tooltip>Duplicate session</q-tooltip>
+            </q-btn>
+          </q-item-section>
           <q-item-section class="col-auto">
             <q-toggle
               :value="!session.hidden"

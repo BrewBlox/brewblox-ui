@@ -11,6 +11,9 @@ import { GraphConfig } from '../types';
 export default class GraphEditorDialog extends DialogBase {
   local: GraphConfig | null = null;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly noPeriod!: boolean;
+
   @Prop({ type: Object, required: true })
   public readonly config!: GraphConfig;
 
@@ -37,8 +40,10 @@ export default class GraphEditorDialog extends DialogBase {
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
     <q-card class="widget-modal" dark>
       <DialogToolbar>{{ title }}</DialogToolbar>
-      <q-card-section class="scroll" style="max-height: 80vh">
-        <GraphEditor :config.sync="local" />
+      <q-card-section class="scroll-parent">
+        <q-scroll-area>
+          <GraphEditor :config.sync="local" :no-period="noPeriod" />
+        </q-scroll-area>
       </q-card-section>
       <q-separator dark />
       <q-card-actions>
@@ -49,3 +54,11 @@ export default class GraphEditorDialog extends DialogBase {
     </q-card>
   </q-dialog>
 </template>
+
+
+<style scoped>
+.scroll-parent {
+  height: 700px;
+  max-height: 80vh;
+}
+</style>

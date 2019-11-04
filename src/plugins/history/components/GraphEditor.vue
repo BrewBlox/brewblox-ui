@@ -14,6 +14,9 @@ export default class GraphEditor extends Vue {
   @Prop({ type: Object, default: () => ({}) })
   readonly downsampling!: Mapped<string>;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly noPeriod!: boolean;
+
   @Prop({ type: Object, required: true })
   public readonly config!: GraphConfig;
 
@@ -36,7 +39,12 @@ export default class GraphEditor extends Vue {
 
 <template>
   <div>
-    <GraphPeriodEditor :config="config" :downsampling="downsampling" @update:config="saveConfig" />
+    <GraphPeriodEditor
+      v-if="!noPeriod"
+      :config="config"
+      :downsampling="downsampling"
+      @update:config="saveConfig"
+    />
     <QueryEditor :config="config" @update:config="saveConfig">
       <template #leaf="{node}">
         <div @click="editLeaf(node)">
