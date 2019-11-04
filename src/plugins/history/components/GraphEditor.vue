@@ -11,6 +11,9 @@ import { GraphConfig } from '../types';
 @Component
 export default class GraphEditor extends Vue {
 
+  @Prop({ type: Object, default: () => ({}) })
+  readonly downsampling!: Mapped<string>;
+
   @Prop({ type: Object, required: true })
   public readonly config!: GraphConfig;
 
@@ -33,7 +36,7 @@ export default class GraphEditor extends Vue {
 
 <template>
   <div>
-    <GraphPeriodEditor :config="config" @update:config="saveConfig" />
+    <GraphPeriodEditor :config="config" :downsampling="downsampling" @update:config="saveConfig" />
     <QueryEditor :config="config" @update:config="saveConfig">
       <template #leaf="{node}">
         <div @click="editLeaf(node)">
