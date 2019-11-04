@@ -6,7 +6,7 @@ import { Watch } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { durationString } from '@/helpers/functional';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
-import { defaultPresets } from '@/plugins/history/getters';
+import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { targetSplitter } from '@/plugins/history/nodes';
 import { GraphConfig } from '@/plugins/history/types';
 import { QueryParams } from '@/store/history';
@@ -47,12 +47,7 @@ export default class BlockGraph extends Vue {
 
   get graphCfg(): GraphConfig {
     return {
-      layout: {},
-      params: {},
-      targets: [],
-      renames: {},
-      axes: {},
-      colors: {},
+      ...emptyGraphConfig(),
       ...this.config,
     };
   }

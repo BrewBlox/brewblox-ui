@@ -6,7 +6,9 @@ import { Component } from 'vue-property-decorator';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { saveFile } from '@/helpers/import-export';
+import { deepCopy } from '@/helpers/units/parseObject';
 
+import { emptyGraphConfig } from '../getters';
 import SessionLogBasic from './SessionLogBasic.vue';
 import SessionLogFull from './SessionLogFull.vue';
 import { Session, SessionLogConfig, SessionNote } from './types';
@@ -33,7 +35,9 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
     this.config.sessions.push({
       id,
       title: 'New Session',
-      date: new Date().getTime(),
+      start: new Date().getTime(),
+      end: null,
+      graphCfg: this.session !== null ? deepCopy(this.session.graphCfg) : emptyGraphConfig(),
       notes: this.notes.map(note => ({ ...note, id: uid(), value: '' })),
     });
     this.config.currentSession = id;
@@ -48,7 +52,7 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
   exportSession(): void {
     if (this.session === null) { return; }
     const session = this.session!;
-    const name = `${this.widget.title} ${session.title} ${new Date(session.date).toLocaleDateString()}`;
+    const name = `${this.widget.title} ${session.title} ${new Date(session.start).toLocaleDateString()}`;
     const lines: string[] = [
       name,
       '',

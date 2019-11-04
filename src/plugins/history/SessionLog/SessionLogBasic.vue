@@ -42,6 +42,29 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
     })
       .onOk(value => this.saveNote({ ...note, value }));
   }
+
+  endSession(): void {
+    if (this.session === null) { return; }
+    this.session.end = new Date().getTime();
+    this.saveConfig();
+  }
+
+  showGraph(): void {
+    if (this.session === null) { return; }
+    createDialog({
+      component: 'GraphDialog',
+      title: 'Graph',
+      parent: this,
+      graphId: this.session.id,
+      config: {
+        ...this.session.graphCfg,
+        params: {
+          start: this.session.start,
+          end: this.session.end || undefined,
+        },
+      },
+    });
+  }
 }
 </script>
 
@@ -56,7 +79,21 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
       <q-item v-if="!!session" dark dense>
         <q-item-section class="col-auto text-grey-2">
           <span class="text-italic">{{ session.title }}</span>
-          <span>{{ new Date(session.date).toLocaleString() }}</span>
+          <span>{{ new Date(session.start).toLocaleString() }}</span>
+          <span v-if="session.end !== null">{{ new Date(session.end).toLocaleString() }}</span>
+        </q-item-section>
+        <q-space />
+        <q-item-section class="col-auto">
+          <q-btn icon="stop" :disable="session.end !== null" @click="endSession">
+            <q-tooltip v-if="session.end === null">
+              End session
+            </q-tooltip>
+          </q-btn>
+        </q-item-section>
+        <q-item-section class="col-auto">
+          <q-btn icon="mdi-chart-line" @click="showGraph">
+            <q-tooltip>Show graph</q-tooltip>
+          </q-btn>
         </q-item-section>
       </q-item>
       <div class="row">

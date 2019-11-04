@@ -1,5 +1,7 @@
 import { PersistentWidget } from '@/store/dashboards';
 
+import { GraphConfig } from '../types';
+
 export interface SessionNote {
   id: string;
   title: string;
@@ -10,8 +12,10 @@ export interface SessionNote {
 export interface Session {
   id: string;
   title: string;
-  date: number;
+  start: number;
+  end: number | null;
   notes: SessionNote[];
+  graphCfg: GraphConfig;
 }
 
 export interface SessionLogConfig {

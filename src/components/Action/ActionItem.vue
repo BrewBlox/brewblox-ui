@@ -49,7 +49,7 @@ export default class ActionItem extends Vue {
 
 <template>
   <q-item
-    v-close-popup="!noClose && !disabled"
+    v-close-popup="noClose || disabled ? 0 : 1"
     v-bind="combinedProps"
     :class="itemClass"
     @click="onClick"

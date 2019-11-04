@@ -148,7 +148,7 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
           </q-item-section>
           <q-item-section class="col-auto">
             <q-btn flat icon="edit" @click="editSession(session)">
-              <q-tooltip>Edit graph field</q-tooltip>
+              <q-tooltip>Select graph data</q-tooltip>
             </q-btn>
           </q-item-section>
           <q-space />

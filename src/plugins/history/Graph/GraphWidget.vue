@@ -1,16 +1,17 @@
 <script lang="ts">
 import { uid } from 'quasar';
+import { CreateElement, VNode } from 'vue';
 import { Component, Ref } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/Widget/WidgetBase';
+import { createDialog } from '@/helpers/dialog';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
-import { defaultPresets } from '@/plugins/history/getters';
+import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { GraphConfig } from '@/plugins/history/types';
 import { QueryParams } from '@/store/history';
 
 @Component
 export default class GraphWidget extends WidgetBase {
-  graphModalOpen = false;
   downsampling: any = {};
   graphId: string | null = null;
 
@@ -28,12 +29,7 @@ export default class GraphWidget extends WidgetBase {
 
   get config(): GraphConfig {
     return {
-      layout: {},
-      params: {},
-      targets: [],
-      renames: {},
-      axes: {},
-      colors: {},
+      ...emptyGraphConfig(),
       ...this.widget.config,
     };
   }
@@ -89,6 +85,48 @@ export default class GraphWidget extends WidgetBase {
       this.widgetGraph.refresh();
     }
   }
+
+  renderControls(h: CreateElement): VNode {
+    return h('q-btn-dropdown',
+      {
+        props: {
+          flat: true,
+          autoClose: true,
+          label: 'presets',
+          icon: 'mdi-timelapse',
+        },
+      },
+      [
+        h('q-list',
+          { props: { dark: true, link: true } },
+          [
+            defaultPresets().map(preset =>
+              h('q-item',
+                {
+                  props: {
+                    dark: true,
+                    clickable: true,
+                    active: this.isActivePreset(preset),
+                  },
+                  on: { click: () => this.applyPreset(preset) },
+                },
+                [
+                  h('q-item-section', [preset.duration]),
+                ])),
+          ]),
+      ]);
+  }
+
+  showGraphDialog(): void {
+    createDialog({
+      component: 'GraphDialog',
+      parent: this,
+      graphId: this.graphId,
+      config: { ...this.config, layout: { ...this.config.layout, title: this.widget.title } },
+      sharedListeners: this.widgetGraph !== undefined,
+      renderControls: this.renderControls,
+    });
+  }
 }
 </script>
 
@@ -107,7 +145,7 @@ export default class GraphWidget extends WidgetBase {
     <q-card v-if="mode === 'Basic'" :class="graphCardClass" :style="graphCardStyle">
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
-          <ActionItem icon="mdi-chart-line" label="Show maximized" @click="graphModalOpen = true" />
+          <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphDialog" />
           <ExportGraphAction :config="config" :header="widget.title" />
           <ActionItem icon="refresh" label="Refresh" @click="regraph" />
           <q-expansion-item label="Timespan">
@@ -139,12 +177,11 @@ export default class GraphWidget extends WidgetBase {
       </div>
     </q-card>
 
-
     <!-- Full -->
     <q-card v-if="mode === 'Full'" :class="graphCardClass" :style="graphCardStyle">
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
-          <ActionItem icon="mdi-chart-line" label="Show maximized" @click="graphModalOpen = true" />
+          <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphDialog" />
           <ExportGraphAction :config="config" :header="widget.title" />
           <ActionItem icon="refresh" label="Refresh" @click="regraph" />
           <WidgetActions :crud="crud" />
@@ -156,31 +193,6 @@ export default class GraphWidget extends WidgetBase {
         </component>
       </div>
     </q-card>
-
-    <!-- Maximized -->
-    <q-dialog v-model="graphModalOpen" maximized>
-      <q-card v-if="graphModalOpen" dark class="bg-dark">
-        <HistoryGraph :id="graphId" :config="config" :shared-listeners="widgetGraph !== undefined">
-          <template #controls>
-            <q-btn-dropdown flat auto-close label="presets" icon="mdi-timelapse">
-              <q-list dark link>
-                <q-item
-                  v-for="(preset, idx) in presets"
-                  :key="idx"
-                  :active="isActivePreset(preset)"
-                  dark
-                  clickable
-                  @click="applyPreset(preset)"
-                >
-                  <q-item-section>{{ preset.duration }}</q-item-section>
-                </q-item>
-              </q-list>
-            </q-btn-dropdown>
-            <q-btn v-close-popup flat label="close" />
-          </template>
-        </HistoryGraph>
-      </q-card>
-    </q-dialog>
   </GraphCardWrapper>
 </template>
 

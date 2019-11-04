@@ -4,6 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/Dialog/DialogBase';
 import { deepCopy } from '@/helpers/units/parseObject';
 
+import { emptyGraphConfig } from '../getters';
 import { GraphConfig } from '../types';
 
 
@@ -19,12 +20,7 @@ export default class GraphEditorDialog extends DialogBase {
 
   created(): void {
     this.local = {
-      layout: {},
-      params: {},
-      targets: [],
-      renames: {},
-      colors: {},
-      axes: {},
+      ...emptyGraphConfig(),
       ...deepCopy(this.config),
     };
   }

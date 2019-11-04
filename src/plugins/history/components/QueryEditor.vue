@@ -102,12 +102,12 @@ export default class QueryEditor extends Vue {
 </script>
 
 <template>
-  <q-list>
-    <div class="q-pa-sm row wrap">
+  <q-list dark>
+    <div class="q-px-sm q-pb-sm row wrap">
       <div class="col-auto column">
         <q-item dark>
           <q-item-section>
-            <q-input v-model="selectFilter" placeholder="Filter keys" class="q-ma-none" dark clearable>
+            <q-input v-model="selectFilter" placeholder="Search" class="q-ma-none" dark clearable>
               <template #append>
                 <q-icon name="search" />
               </template>
@@ -120,30 +120,25 @@ export default class QueryEditor extends Vue {
         </q-item>
       </div>
       <div class="col-auto row">
-        <q-item-section class="col-auto">
-          <q-btn flat icon="mdi-collapse-all" @click="tree.collapseAll()">
-            <q-tooltip>Collapse all</q-tooltip>
-          </q-btn>
-        </q-item-section>
-        <q-item-section class="col-auto">
-          <q-btn flat icon="mdi-expand-all" @click="tree.expandAll()">
-            <q-tooltip>Expand all</q-tooltip>
-          </q-btn>
-        </q-item-section>
-        <q-item-section class="col-auto">
-          <q-btn flat icon="mdi-checkbox-multiple-marked-outline" @click="expandTicked">
-            <q-tooltip>Expand selected fields</q-tooltip>
-          </q-btn>
-        </q-item-section>
-        <q-item-section class="col-auto">
-          <q-btn flat icon="clear" @click="ticked = []">
-            <q-tooltip>Unselect all</q-tooltip>
-          </q-btn>
-        </q-item-section>
+        <q-btn flat class="q-px-sm" icon="mdi-collapse-all" @click="tree.collapseAll()">
+          <q-tooltip>Collapse all</q-tooltip>
+        </q-btn>
+        <q-btn flat class="q-px-sm" icon="mdi-expand-all" @click="tree.expandAll()">
+          <q-tooltip>Expand all</q-tooltip>
+        </q-btn>
+        <q-btn flat class="q-px-sm" icon="mdi-checkbox-multiple-marked-outline" @click="expandTicked">
+          <q-tooltip>Expand selected fields</q-tooltip>
+        </q-btn>
+        <q-btn flat class="q-px-sm" icon="clear" @click="ticked = []">
+          <q-tooltip>Unselect all</q-tooltip>
+        </q-btn>
       </div>
     </div>
 
-    <q-item dark>
+    <q-item dark class="column">
+      <q-item-label caption class="q-pl-sm">
+        Select data to show
+      </q-item-label>
       <q-tree
         ref="tree"
         :nodes="nodes"

@@ -135,17 +135,14 @@ export default class GraphPeriodEditor extends Vue {
           map-options
           dark
           options-dark
-          label="Display type"
+          label="Time period"
           @input="saveShownPeriod"
         />
       </q-item-section>
     </q-item>
-    <q-item dark class="col-auto column justify-around">
-      <q-item-label caption>
-        Settings
-      </q-item-label>
+    <q-item dark class="col-auto column justify-around q-pt-lg">
       <div v-if="shownPeriod.start" class="col row no-wrap">
-        <span :class="prefixClass">Start time</span>
+        <span :class="prefixClass">Start time is</span>
         <DatetimeField
           :value="config.params.start"
           title="Start time"
@@ -156,7 +153,7 @@ export default class GraphPeriodEditor extends Vue {
         />
       </div>
       <div v-if="shownPeriod.duration" class="col row no-wrap">
-        <span :class="prefixClass">Duration</span>
+        <span :class="prefixClass">Duration is</span>
         <DurationInputField
           :value="config.params.duration"
           title="Duration"
@@ -167,7 +164,7 @@ export default class GraphPeriodEditor extends Vue {
         />
       </div>
       <div v-if="shownPeriod.end" class="col row no-wrap">
-        <span :class="prefixClass">End time</span>
+        <span :class="prefixClass">End time is</span>
         <DatetimeField
           :value="config.params.end"
           title="End time"

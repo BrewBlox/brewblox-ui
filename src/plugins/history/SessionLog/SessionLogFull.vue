@@ -4,6 +4,7 @@ import { Component } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
+import { createDialog } from '@/helpers/dialog';
 
 import { Session, SessionLogConfig, SessionNote } from './types';
 
@@ -39,9 +40,16 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
     }
   }
 
-  saveSessionDate(date: Date): void {
+  saveSessionStart(date: Date): void {
     if (this.session) {
-      this.session.date = date.getTime();
+      this.session.start = date.getTime();
+      this.saveConfig();
+    }
+  }
+
+  saveSessionEnd(date: Date): void {
+    if (this.session) {
+      this.session.end = date.getTime();
       this.saveConfig();
     }
   }
@@ -77,13 +85,35 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
   }
 
   addNote(): void {
-    // Todo: input dialog
-    this.notes.push({
-      id: uid(),
-      title: 'New field',
-      value: '',
-      col: 12,
-    });
+    createDialog({
+      component: 'InputDialog',
+      value: 'New field',
+      title: 'Add field',
+      label: 'title',
+    })
+      .onOk(title => this.notes.push({
+        id: uid(),
+        title,
+        value: '',
+        col: 12,
+      }));
+  }
+
+  editGraph(): void {
+    if (this.session === null) { return; }
+    createDialog({
+      component: 'GraphEditorDialog',
+      title: this.session.title,
+      parent: this,
+      config: this.session.graphCfg,
+      noPeriod: true,
+    })
+      .onOk(graphCfg => {
+        if (this.session !== null) {
+          this.$set(this.session, 'graphCfg', graphCfg);
+          this.saveConfig();
+        }
+      });
   }
 }
 </script>
@@ -108,7 +138,19 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
           </q-item-section>
           <q-space />
           <q-item-section class="col-auto">
-            <DatetimeField :value="session.date" title="Session date" @input="saveSessionDate" />
+            <span>
+              Start
+              <DatetimeField :value="session.start" title="Session start" default-now @input="saveSessionStart" />
+            </span>
+            <span>
+              End
+              <DatetimeField :value="session.end" title="Session end" default-now @input="saveSessionEnd" />
+            </span>
+          </q-item-section>
+          <q-item-section class="col-auto">
+            <q-btn icon="edit" @click="editGraph">
+              <q-tooltip>Edit graph settings</q-tooltip>
+            </q-btn>
           </q-item-section>
         </q-item>
         <draggable v-model="notes" class="row q-gutter-xs">
