@@ -4,6 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 import { createDialog } from '@/helpers/dialog';
+import { validator } from '@/helpers/functional';
 
 @Component
 export default class DatetimeDialog extends DialogBase {
@@ -18,6 +19,9 @@ export default class DatetimeDialog extends DialogBase {
   @Prop({ type: String, default: 'restore' })
   readonly resetIcon!: string;
 
+  @Prop({ type: Array, default: () => [] })
+  public readonly rules!: InputRule[];
+
   get parsed(): Date {
     const args =
       (this.stringValue.match(/^(\d*)\/(\d*)\/(\d*) (\d*):(\d*):(\d*)$/) || [])
@@ -27,8 +31,15 @@ export default class DatetimeDialog extends DialogBase {
     return new Date(args[1], args[2] - 1, args[3], args[4], args[5], args[6]);
   }
 
+  get parsedRules(): InputRule[] {
+    return [
+      () => !Number.isNaN(this.parsed.getTime()) || 'Invalid date',
+      ...this.rules.map(rule => () => rule(this.parsed)),
+    ];
+  }
+
   get valid(): boolean {
-    return !Number.isNaN(this.parsed.getTime());
+    return validator(this.parsedRules)(this.parsed);
   }
 
   setStringVal(dateVal: Date): void {
@@ -75,7 +86,7 @@ export default class DatetimeDialog extends DialogBase {
           <q-item-section>
             <q-input
               v-model="stringValue"
-              :rules="[v => !!valid || 'Invalid date']"
+              :rules="parsedRules"
               :label="label"
               hint="YYYY/MM/DD hh:mm:ss"
               mask="####/##/## ##:##:##"

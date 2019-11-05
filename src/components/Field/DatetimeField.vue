@@ -52,6 +52,7 @@ export default class DatetimeField extends FieldBase {
       value: new Date(this.value || (this.defaultNow ? new Date().getTime() : 0)),
       label: this.label,
       resetIcon: this.resetIcon,
+      rules: this.rules,
     })
       .onOk(this.change);
   }

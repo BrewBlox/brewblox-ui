@@ -6,7 +6,7 @@ import draggable from 'vuedraggable';
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 
-import { Session, SessionLogConfig, SessionNote } from './types';
+import { Session, SessionGraphNote, SessionLogConfig, SessionNote } from './types';
 
 
 @Component({
@@ -40,16 +40,9 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
     }
   }
 
-  saveSessionStart(date: Date): void {
+  saveSessionDate(date: Date): void {
     if (this.session) {
-      this.session.start = date.getTime();
-      this.saveConfig();
-    }
-  }
-
-  saveSessionEnd(date: Date): void {
-    if (this.session) {
-      this.session.end = date.getTime();
+      this.session.date = date.getTime();
       this.saveConfig();
     }
   }
@@ -72,7 +65,13 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
   }
 
   clearNote(note: SessionNote): void {
-    note.value = '';
+    if (note.type === 'Text') {
+      note.value = '';
+    }
+    if (note.type === 'Graph') {
+      note.start = null;
+      note.end = null;
+    }
     this.saveConfig();
   }
 
@@ -93,24 +92,26 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
     })
       .onOk(title => this.notes.push({
         id: uid(),
+        type: 'Text',
         title,
         value: '',
         col: 12,
       }));
   }
 
-  editGraph(): void {
+  editGraph(note: SessionGraphNote): void {
     if (this.session === null) { return; }
     createDialog({
       component: 'GraphEditorDialog',
-      title: this.session.title,
       parent: this,
-      config: this.session.graphCfg,
+      title: note.title,
+      config: note.config,
       noPeriod: true,
     })
-      .onOk(graphCfg => {
-        if (this.session !== null) {
-          this.$set(this.session, 'graphCfg', graphCfg);
+      .onOk(config => {
+        const actual = this.notes.find(n => n.id === note.id);
+        if (actual !== undefined && actual.type === 'Graph') {
+          this.$set(actual, 'config', config);
           this.saveConfig();
         }
       });
@@ -138,19 +139,7 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
           </q-item-section>
           <q-space />
           <q-item-section class="col-auto">
-            <span>
-              Start
-              <DatetimeField :value="session.start" title="Session start" default-now @input="saveSessionStart" />
-            </span>
-            <span>
-              End
-              <DatetimeField :value="session.end" title="Session end" default-now @input="saveSessionEnd" />
-            </span>
-          </q-item-section>
-          <q-item-section class="col-auto">
-            <q-btn icon="edit" @click="editGraph">
-              <q-tooltip>Edit graph settings</q-tooltip>
-            </q-btn>
+            <DatetimeField :value="session.date" title="Session date" default-now @input="saveSessionDate" />
           </q-item-section>
         </q-item>
         <draggable v-model="notes" class="row q-gutter-xs">
@@ -175,6 +164,11 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
                 />
               </q-item-section>
               <q-space />
+              <q-item-section v-if="note.type === 'Graph'" class="col-auto">
+                <q-btn flat icon="edit" @click="editGraph(note)">
+                  <q-tooltip>Select graph data</q-tooltip>
+                </q-btn>
+              </q-item-section>
               <q-item-section class="col-auto">
                 <q-btn icon="mdi-dots-vertical" flat dense>
                   <q-menu>

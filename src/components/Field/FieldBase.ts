@@ -27,4 +27,7 @@ export default class FieldBase extends Vue {
 
   @Prop({ type: [Array, Object, String] })
   public readonly tagClass!: string[] | Mapped<string> | string;
+
+  @Prop({ type: Array, default: () => [] })
+  public readonly rules!: InputRule[];
 }

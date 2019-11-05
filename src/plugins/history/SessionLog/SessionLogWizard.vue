@@ -18,14 +18,22 @@ export default class SessionLogWizard extends WidgetWizardBase {
         {
           id: sessionId,
           title: 'New Session',
-          graphCfg: emptyGraphConfig(),
-          start: new Date().getTime(),
-          end: null,
+          date: new Date().getTime(),
           notes: [
             {
               id: uid(),
               title: 'Text note',
+              type: 'Text',
               value: '',
+              col: 12,
+            },
+            {
+              id: uid(),
+              title: 'Graph note',
+              type: 'Graph',
+              start: null,
+              end: null,
+              config: emptyGraphConfig(),
               col: 12,
             },
           ],

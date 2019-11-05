@@ -22,9 +22,6 @@ export default class InputField extends FieldBase {
   @Prop({ type: Number, default: 2 })
   readonly decimals!: number;
 
-  @Prop({ type: Array, default: () => [] })
-  public readonly rules!: (v: any) => true | string;
-
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
