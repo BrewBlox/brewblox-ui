@@ -1,21 +1,18 @@
 <script lang="ts">
-import { Component, Prop, Ref } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 
 import { SessionGraphNote } from './types';
 
 interface NoteDates {
-  start: Pick<SessionGraphNote, 'start'>;
-  end: Pick<SessionGraphNote, 'end'>;
+  start: SessionGraphNote['start'];
+  end: SessionGraphNote['end'];
 }
 
 @Component
 export default class SessionGraphNoteDialog extends DialogBase {
   local: NoteDates | null = null;
-
-  @Ref()
-  readonly editor!: HTMLElement;
 
   @Prop({ type: Object })
   public readonly value!: NoteDates;
@@ -32,7 +29,7 @@ export default class SessionGraphNoteDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
+  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
     <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
       <q-card-section class="q-dialog__title ellipsis">
         {{ title }}
@@ -54,8 +51,12 @@ export default class SessionGraphNoteDialog extends DialogBase {
                   || date.getTime() < local.end
                   || 'Start must be before than end']"
               title="Start"
+              clear-label="Not started"
               default-now
             />
+          </q-item-section>
+          <q-item-section v-if="local.start !== null" class="col-auto">
+            <q-btn :disable="local.end !== null" icon="clear" flat @click="local.start = null" />
           </q-item-section>
         </q-item>
         <q-item dark>
@@ -70,8 +71,13 @@ export default class SessionGraphNoteDialog extends DialogBase {
                   || date.getTime() > local.start
                   || 'End must be after start']"
               title="End"
+              :readonly="local.start === null"
+              :clear-label="local.start === null ? 'Not started' : 'In progress'"
               default-now
             />
+          </q-item-section>
+          <q-item-section v-if="local.end !== null" class="col-auto">
+            <q-btn icon="clear" flat @click="local.end = null" />
           </q-item-section>
         </q-item>
       </q-card-section>

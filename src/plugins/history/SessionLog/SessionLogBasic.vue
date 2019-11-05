@@ -79,10 +79,19 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
     createDialog({
       component: SessionGraphNoteDialog,
       title: note.title,
+      message: 'You can choose graph lines in the widget settings.',
       parent: this,
       value: note,
       label: 'Dates',
-    });
+    })
+      .onOk(({ start, end }) => {
+        const actual = this.notes.find(n => n.id === note.id);
+        if (actual && actual.type === 'Graph') {
+          actual.start = start;
+          actual.end = end;
+          this.saveConfig();
+        }
+      });
   }
 }
 </script>
@@ -114,6 +123,7 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
           <template v-if="note.type === 'Text'">
             <q-item-section>
               <q-item-label caption class="text-info">
+                <q-icon name="mdi-card-text-outline" />
                 {{ note.title }}
               </q-item-label>
               <!-- No line breaks to allow correctly rendering whitespace -->
@@ -128,14 +138,24 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
           <template v-if="note.type === 'Graph'">
             <q-item-section>
               <q-item-label caption class="text-info">
+                <q-icon name="mdi-chart-line" />
                 {{ note.title }}
               </q-item-label>
-              <span>Start {{ shortDateString(note.start, '---') }}</span>
-              <span>End {{ shortDateString(note.end, '---') }}</span>
+              <div class="row wrap">
+                <span :class="{'text-grey': note.start === null}">
+                  {{ shortDateString(note.start, 'Not started') }}
+                </span>
+                <span v-if="note.start" :class="{'text-grey': note.end === null, 'q-ml-xs': true}">
+                  <q-icon name="mdi-arrow-right" />
+                  {{ shortDateString(note.end, 'In progress') }}
+                </span>
+              </div>
             </q-item-section>
             <q-btn v-if="note.start === null" flat stretch label="Start" @click.stop="startGraphNote(note)" />
-            <q-btn v-else-if="note.end === null" flat stretch label="Stop" @click.stop="stopGraphNote(note)" />
-            <q-btn v-else flat stretch label="Edit" @click.stop="editGraphNote(note)" />
+            <q-btn v-else-if="note.end === null" flat stretch label="End" @click.stop="stopGraphNote(note)" />
+            <q-btn v-else flat stretch icon="mdi-calendar-clock" @click.stop="editGraphNote(note)">
+              <q-tooltip>Change dates</q-tooltip>
+            </q-btn>
           </template>
         </q-item>
       </div>
