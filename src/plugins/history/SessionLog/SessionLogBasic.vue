@@ -123,7 +123,7 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
           <template v-if="note.type === 'Text'">
             <q-item-section>
               <q-item-label caption class="text-info">
-                <q-icon name="mdi-card-text-outline" />
+                <q-icon name="mdi-text-subject" />
                 {{ note.title }}
               </q-item-label>
               <!-- No line breaks to allow correctly rendering whitespace -->

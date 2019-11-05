@@ -17,19 +17,19 @@ export default class SessionLogWizard extends WidgetWizardBase {
       sessions: [
         {
           id: sessionId,
-          title: 'New Session',
+          title: 'Example session',
           date: new Date().getTime(),
           notes: [
             {
               id: uid(),
-              title: 'Text note',
+              title: 'Example note',
               type: 'Text',
               value: '',
               col: 12,
             },
             {
               id: uid(),
-              title: 'Graph note',
+              title: 'Subprocess graph',
               type: 'Graph',
               start: null,
               end: null,
