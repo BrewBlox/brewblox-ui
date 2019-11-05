@@ -18,7 +18,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
   private activeDialog: any = null;
 
   @Prop({ type: Object, required: true })
-  public readonly crud!: Crud;
+  public readonly crud!: Crud<ConfigT>;
 
   public get widget(): PersistentWidget<ConfigT> {
     return this.crud.widget;
@@ -52,7 +52,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
     this.crud.closeDialog();
   }
 
-  public async saveWidget(widget: PersistentWidget = this.widget): Promise<void> {
+  public async saveWidget(widget: PersistentWidget<ConfigT> = this.widget): Promise<void> {
     await this.crud.saveWidget(widget);
   }
 

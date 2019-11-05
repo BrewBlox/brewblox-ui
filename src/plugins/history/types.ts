@@ -1,12 +1,16 @@
 import { Layout } from 'plotly.js';
 
-import { DisplayNames, GraphValueAxes, LineColors, QueryParams, QueryTarget } from '@/store/history';
+import { GraphValueAxes, LineColors, QueryConfig } from '@/store/history';
 
-export interface GraphConfig {
+
+export interface GraphConfig extends QueryConfig {
   layout: Partial<Layout>;
-  params: QueryParams;
-  targets: QueryTarget[];
-  renames: DisplayNames;
   axes: GraphValueAxes;
   colors: LineColors;
+}
+
+export interface SharedGraphConfig {
+  id: string;
+  title: string;
+  config: GraphConfig;
 }

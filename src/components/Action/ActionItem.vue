@@ -24,7 +24,7 @@ export default class ActionItem extends Vue {
   readonly disabled!: boolean;
 
 
-  get combinedProps(): Record<string, any> {
+  get combinedProps(): Mapped<any> {
     return {
       dark: true,
       clickable: !this.disabled,
@@ -33,7 +33,7 @@ export default class ActionItem extends Vue {
     };
   }
 
-  get itemClass(): Record<string, boolean> {
+  get itemClass(): Mapped<boolean> {
     return {
       darkened: this.disabled,
     };
@@ -49,7 +49,7 @@ export default class ActionItem extends Vue {
 
 <template>
   <q-item
-    v-close-popup="!noClose && !disabled"
+    v-close-popup="noClose || disabled ? 0 : 1"
     v-bind="combinedProps"
     :class="itemClass"
     @click="onClick"

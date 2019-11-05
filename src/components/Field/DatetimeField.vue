@@ -24,6 +24,9 @@ export default class DatetimeField extends FieldBase {
   @Prop({ type: String, default: '<not set>' })
   readonly clearLabel!: string;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly defaultNow!: boolean;
+
   @Emit('input')
   public change(v: Date | null): Date | null {
     return v;
@@ -46,9 +49,10 @@ export default class DatetimeField extends FieldBase {
       message: this.message,
       messageHtml: this.messageHtml,
       parent: this,
-      value: new Date(this.value || 0),
+      value: new Date(this.value || (this.defaultNow ? new Date().getTime() : 0)),
       label: this.label,
       resetIcon: this.resetIcon,
+      rules: this.rules,
     })
       .onOk(this.change);
   }

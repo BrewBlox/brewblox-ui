@@ -14,7 +14,7 @@ export default class ExportAction extends CrudComponent {
   @Prop({ type: String, default: 'Export widget' })
   readonly label!: string;
 
-  get itemProps(): Record<string, any> {
+  get itemProps(): Mapped<any> {
     return {
       ...this.$attrs,
       ...this.$props,

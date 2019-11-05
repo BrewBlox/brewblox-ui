@@ -6,6 +6,7 @@ import { Component } from 'vue-property-decorator';
 import WidgetBase from '@/components/Widget/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { saveFile } from '@/helpers/import-export';
+import { deepCopy } from '@/helpers/units/parseObject';
 
 import SessionLogBasic from './SessionLogBasic.vue';
 import SessionLogFull from './SessionLogFull.vue';
@@ -34,7 +35,17 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
       id,
       title: 'New Session',
       date: new Date().getTime(),
-      notes: this.notes.map(note => ({ ...note, id: uid(), value: '' })),
+      notes: this.notes.map(note => {
+        const copy = deepCopy(note);
+        copy.id = uid();
+        if (note.type === 'Text') {
+          return { ...copy, value: '' };
+        }
+        if (note.type === 'Graph') {
+          return { ...copy, start: null, end: null };
+        }
+        return copy;
+      }),
     });
     this.config.currentSession = id;
     this.saveConfig();
@@ -45,22 +56,43 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
     this.saveConfig();
   }
 
+  renderDate(date: number | null): string {
+    return date !== null
+      ? new Date(date).toLocaleDateString()
+      : '??';
+  }
+
   exportSession(): void {
     if (this.session === null) { return; }
     const session = this.session!;
-    const name = `${this.widget.title} ${session.title} ${new Date(session.date).toLocaleDateString()}`;
+    const name = `${this.widget.title} ${session.title} ${this.renderDate(session.date)}`;
     const lines: string[] = [
       name,
       '',
       ...this.notes.map(note => {
-        return `${note.title}\n${'-'.repeat(note.title.length)}\n${note.value}\n`;
+        const title = `${note.title}\n${'-'.repeat(note.title.length)}`;
+        if (note.type === 'Text') {
+          return `${title}\n${note.value}\n`;
+        }
+        if (note.type === 'Graph') {
+          return `${title}\n${this.renderDate(note.start)} - ${this.renderDate(note.end)}`;
+        }
+        return title;
       }),
     ];
     saveFile(marked(lines.join('\n')), `${name}.html`, true);
   }
 
   clearNotes(): void {
-    this.notes.forEach(note => note.value = '');
+    this.notes.forEach(note => {
+      if (note.type === 'Text') {
+        note.value = '';
+      }
+      else if (note.type === 'Graph') {
+        note.start = null;
+        note.end = null;
+      }
+    });
     this.saveConfig();
   }
 

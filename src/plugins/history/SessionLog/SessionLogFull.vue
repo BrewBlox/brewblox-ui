@@ -4,8 +4,12 @@ import { Component } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
+import { createDialog } from '@/helpers/dialog';
 
-import { Session, SessionLogConfig, SessionNote } from './types';
+import { emptyGraphConfig } from '../getters';
+import { sharedWidgetConfigs } from '../helpers';
+import { SharedGraphConfig } from '../types';
+import { Session, SessionGraphNote, SessionLogConfig, SessionNote } from './types';
 
 
 @Component({
@@ -30,6 +34,18 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
       this.session.notes = notes;
       this.saveConfig();
     }
+  }
+
+  sharedConfigs(excluded: string[]): SharedGraphConfig[] {
+    return [
+      ...sharedWidgetConfigs(excluded),
+      ...this.notes
+        .filter(note => note.type === 'Graph' && !excluded.includes(note.id))
+        .map(note => {
+          const { id, title, config } = note as SessionGraphNote;
+          return { id, title: `(Note) ${title}`, config };
+        }),
+    ];
   }
 
   saveSessionTitle(title: string): void {
@@ -64,7 +80,13 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
   }
 
   clearNote(note: SessionNote): void {
-    note.value = '';
+    if (note.type === 'Text') {
+      note.value = '';
+    }
+    if (note.type === 'Graph') {
+      note.start = null;
+      note.end = null;
+    }
     this.saveConfig();
   }
 
@@ -76,14 +98,56 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
     }
   }
 
-  addNote(): void {
-    // Todo: input dialog
-    this.notes.push({
-      id: uid(),
-      title: 'New field',
-      value: '',
-      col: 12,
-    });
+  addTextNote(): void {
+    createDialog({
+      component: 'InputDialog',
+      value: 'New text field',
+      title: 'Add field',
+      label: 'title',
+    })
+      .onOk(title => this.notes.push({
+        id: uid(),
+        type: 'Text',
+        title,
+        value: '',
+        col: 12,
+      }));
+  }
+
+  addGraphNote(): void {
+    createDialog({
+      component: 'InputDialog',
+      value: 'New graph field',
+      title: 'Add field',
+      label: 'title',
+    })
+      .onOk(title => this.notes.push({
+        id: uid(),
+        type: 'Graph',
+        title,
+        start: null,
+        end: null,
+        config: emptyGraphConfig(),
+        col: 12,
+      }));
+  }
+
+  editGraph(note: SessionGraphNote): void {
+    createDialog({
+      component: 'GraphEditorDialog',
+      parent: this,
+      title: note.title,
+      config: note.config,
+      noPeriod: true,
+      shared: this.sharedConfigs([note.id]),
+    })
+      .onOk(config => {
+        const actual = this.notes.find(n => n.id === note.id);
+        if (actual !== undefined && actual.type === 'Graph') {
+          this.$set(actual, 'config', config);
+          this.saveConfig();
+        }
+      });
   }
 }
 </script>
@@ -108,7 +172,7 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
           </q-item-section>
           <q-space />
           <q-item-section class="col-auto">
-            <DatetimeField :value="session.date" title="Session date" @input="saveSessionDate" />
+            <DatetimeField :value="session.date" title="Session date" default-now @input="saveSessionDate" />
           </q-item-section>
         </q-item>
         <draggable v-model="notes" class="row q-gutter-xs">
@@ -133,6 +197,11 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
                 />
               </q-item-section>
               <q-space />
+              <q-item-section v-if="note.type === 'Graph'" class="col-auto">
+                <q-btn icon="edit" flat dense @click="editGraph(note)">
+                  <q-tooltip>Select graph data</q-tooltip>
+                </q-btn>
+              </q-item-section>
               <q-item-section class="col-auto">
                 <q-btn icon="mdi-dots-vertical" flat dense>
                   <q-menu>
@@ -164,7 +233,14 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
         <q-item dark>
           <q-space />
           <q-item-section class="col-auto">
-            <q-btn outline round icon="add" @click="addNote" />
+            <q-btn outline round icon="add">
+              <q-menu>
+                <q-list dark>
+                  <ActionItem label="Add text note" @click="addTextNote" />
+                  <ActionItem label="Add graph note" @click="addGraphNote" />
+                </q-list>
+              </q-menu>
+            </q-btn>
           </q-item-section>
         </q-item>
       </q-list>

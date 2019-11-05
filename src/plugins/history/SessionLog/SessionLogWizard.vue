@@ -4,6 +4,7 @@ import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 
+import { emptyGraphConfig } from '../getters';
 import { SessionLogConfig } from './types';
 
 
@@ -22,7 +23,17 @@ export default class SessionLogWizard extends WidgetWizardBase {
             {
               id: uid(),
               title: 'Text note',
+              type: 'Text',
               value: '',
+              col: 12,
+            },
+            {
+              id: uid(),
+              title: 'Graph note',
+              type: 'Graph',
+              start: null,
+              end: null,
+              config: emptyGraphConfig(),
               col: 12,
             },
           ],

@@ -1,11 +1,27 @@
 import { PersistentWidget } from '@/store/dashboards';
 
-export interface SessionNote {
+import { GraphConfig } from '../types';
+
+
+export interface SessionNoteBase {
   id: string;
   title: string;
-  value: string;
   col: number;
 }
+
+export interface SessionTextNote extends SessionNoteBase {
+  type: 'Text';
+  value: string;
+}
+
+export interface SessionGraphNote extends SessionNoteBase {
+  type: 'Graph';
+  start: number | null;
+  end: number | null;
+  config: GraphConfig;
+}
+
+export type SessionNote = SessionTextNote | SessionGraphNote;
 
 export interface Session {
   id: string;

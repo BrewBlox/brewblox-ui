@@ -16,6 +16,9 @@ export default class TimeUnitDialog extends DialogBase {
   @Prop({ type: String, default: 'Value' })
   public readonly label!: string;
 
+  @Prop({ type: Array, default: () => [] })
+  public readonly rules!: InputRule[];
+
   findUnit(s: string): string {
     const match = s.match(/^[0-9\.]*([a-z]*)/i);
     return match && match[1]
@@ -64,6 +67,7 @@ export default class TimeUnitDialog extends DialogBase {
           v-model="local"
           :label="label"
           :suffix="defaultUnit"
+          :rules="rules"
           autofocus
           dark
           @change="normalize"

@@ -1,33 +1,27 @@
 <script lang="ts">
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { round } from '@/helpers/functional';
+import { durationMs, durationString, unitDurationString } from '@/helpers/functional';
+import { Unit } from '@/helpers/units';
 
 import FieldBase from './FieldBase';
 
 
 @Component
-export default class InputField extends FieldBase {
+export default class DurationInputField extends FieldBase {
 
-  @Prop({ type: [String, Number] })
-  public readonly value!: string | number;
-
-  @Prop({ type: String, default: 'text' })
-  public readonly type!: string;
+  @Prop({ type: String })
+  public readonly value!: string;
 
   @Prop({ type: String, default: 'value' })
   public readonly label!: string;
 
-  @Prop({ type: Number, default: 2 })
-  readonly decimals!: number;
+  @Prop({ type: Array, default: () => [] })
+  public readonly rules!: InputRule[];
 
-  @Prop({ type: Boolean, default: true })
-  public readonly clearable!: boolean;
-
-  @Emit('input')
-  public change(v: string | number): string | number {
-    return v;
+  public change(v: string): void {
+    this.$emit('input', v);
   }
 
   get displayValue(): string | number {
@@ -37,9 +31,7 @@ export default class InputField extends FieldBase {
       return '<not set>';
     }
 
-    return this.type === 'number'
-      ? round(this.value, this.decimals)
-      : this.value;
+    return durationString(this.value);
   }
 
   openDialog(): void {
@@ -48,19 +40,16 @@ export default class InputField extends FieldBase {
     }
 
     createDialog({
-      component: 'InputDialog',
+      component: 'TimeUnitDialog',
       title: this.title,
       message: this.message,
       messageHtml: this.messageHtml,
       parent: this,
-      value: this.value,
-      decimals: this.decimals,
-      type: this.type,
+      value: new Unit(durationMs(this.value), 'ms'),
       label: this.label,
       rules: this.rules,
-      clearable: this.clearable,
     })
-      .onOk(this.change);
+      .onOk(unit => this.change(unitDurationString(unit)));
   }
 }
 </script>

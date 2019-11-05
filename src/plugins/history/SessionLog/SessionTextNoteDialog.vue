@@ -5,7 +5,7 @@ import DialogBase from '@/components/Dialog/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 
 @Component
-export default class SessionNoteDialog extends DialogBase {
+export default class SessionTextNoteDialog extends DialogBase {
   local: string | null = null;
 
   @Ref()

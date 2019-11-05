@@ -2,19 +2,12 @@
 import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
-import { GraphConfig } from '@/plugins/history/types';
+
+import { emptyGraphConfig } from '../getters';
 
 
 @Component
 export default class GraphWizard extends WidgetWizardBase {
-  graphCfg: GraphConfig = {
-    layout: {},
-    params: {},
-    targets: [],
-    renames: {},
-    axes: {},
-    colors: {},
-  };
 
   createWidget(): void {
     this.createItem({
@@ -23,7 +16,7 @@ export default class GraphWizard extends WidgetWizardBase {
       feature: this.typeId,
       order: 0,
       dashboard: this.dashboardId,
-      config: this.graphCfg,
+      config: emptyGraphConfig(),
       ...this.defaultWidgetSize,
     });
   }

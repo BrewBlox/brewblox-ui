@@ -3,17 +3,21 @@ import { Component } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
+import { shortDateString } from '@/helpers/functional';
 
-import SessionNoteDialog from './SessionNoteDialog.vue';
-import { Session, SessionLogConfig, SessionNote } from './types';
+import SessionGraphNoteDialog from './SessionGraphNoteDialog.vue';
+import SessionTextNoteDialog from './SessionTextNoteDialog.vue';
+import { Session, SessionGraphNote, SessionLogConfig, SessionNote } from './types';
 
 
 @Component({
   components: {
-    SessionNoteDialog,
+    SessionTextNoteDialog,
+    SessionGraphNoteDialog,
   },
 })
 export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
+  shortDateString = shortDateString;
 
   get session(): Session | null {
     return this.widget.config.sessions.find(s => s.id === this.widget.config.currentSession) || null;
@@ -31,16 +35,63 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
     }
   }
 
-  editNote(note: SessionNote): void {
+  openNote(note: SessionNote): void {
+    if (note.type === 'Text') {
+      createDialog({
+        component: SessionTextNoteDialog,
+        title: note.title,
+        parent: this,
+        value: note.value,
+        type: 'text',
+        label: 'Content',
+      })
+        .onOk(value => this.saveNote({ ...note, value }));
+    }
+
+    if (note.type === 'Graph') {
+      createDialog({
+        component: 'GraphDialog',
+        parent: this,
+        graphId: note.id,
+        config: {
+          ...note.config,
+          params: {
+            start: note.start || undefined,
+            end: note.end || undefined,
+            duration: note.start ? undefined : '1h',
+          },
+        },
+      });
+    }
+  }
+
+  startGraphNote(note: SessionGraphNote): void {
+    note.start = new Date().getTime();
+    this.saveConfig();
+  }
+
+  stopGraphNote(note: SessionGraphNote): void {
+    note.end = new Date().getTime();
+    this.saveConfig();
+  }
+
+  editGraphNote(note: SessionGraphNote): void {
     createDialog({
-      component: SessionNoteDialog,
+      component: SessionGraphNoteDialog,
       title: note.title,
+      message: 'You can choose graph lines in the widget settings.',
       parent: this,
-      value: note.value,
-      type: 'text',
-      label: 'Content',
+      value: note,
+      label: 'Dates',
     })
-      .onOk(value => this.saveNote({ ...note, value }));
+      .onOk(({ start, end }) => {
+        const actual = this.notes.find(n => n.id === note.id);
+        if (actual && actual.type === 'Graph') {
+          actual.start = start;
+          actual.end = end;
+          this.saveConfig();
+        }
+      });
   }
 }
 </script>
@@ -66,19 +117,46 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
           dark
           clickable
           :class="[`col-${note.col}`, 'align-children']"
-          @click="editNote(note)"
+          @click="openNote(note)"
         >
-          <q-item-section>
-            <q-item-label caption class="text-info">
-              {{ note.title }}
-            </q-item-label>
-            <!-- No line breaks to allow correctly rendering whitespace in text notes -->
-            <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
-            <div v-if="!!note.value" :class="`note--${note.type}`">{{ note.value }}</div>
-            <div v-else class="text-grey text-italic">
-              Click to set
-            </div>
-          </q-item-section>
+          <!-- Text note -->
+          <template v-if="note.type === 'Text'">
+            <q-item-section>
+              <q-item-label caption class="text-info">
+                <q-icon name="mdi-card-text-outline" />
+                {{ note.title }}
+              </q-item-label>
+              <!-- No line breaks to allow correctly rendering whitespace -->
+              <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
+              <div v-if="!!note.value" class="note-text">{{ note.value }}</div>
+              <div v-else class="text-grey text-italic">
+                Click to set
+              </div>
+            </q-item-section>
+          </template>
+          <!-- Graph note -->
+          <template v-if="note.type === 'Graph'">
+            <q-item-section>
+              <q-item-label caption class="text-info">
+                <q-icon name="mdi-chart-line" />
+                {{ note.title }}
+              </q-item-label>
+              <div class="row wrap">
+                <span :class="{'text-grey': note.start === null}">
+                  {{ shortDateString(note.start, 'Not started') }}
+                </span>
+                <span v-if="note.start" :class="{'text-grey': note.end === null, 'q-ml-xs': true}">
+                  <q-icon name="mdi-arrow-right" />
+                  {{ shortDateString(note.end, 'In progress') }}
+                </span>
+              </div>
+            </q-item-section>
+            <q-btn v-if="note.start === null" flat stretch label="Start" @click.stop="startGraphNote(note)" />
+            <q-btn v-else-if="note.end === null" flat stretch label="End" @click.stop="stopGraphNote(note)" />
+            <q-btn v-else flat stretch icon="mdi-calendar-clock" @click.stop="editGraphNote(note)">
+              <q-tooltip>Change dates</q-tooltip>
+            </q-btn>
+          </template>
         </q-item>
       </div>
     </q-card-section>
@@ -86,7 +164,7 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
 </template>
 
 <style scoped>
-.note--text {
+.note-text {
   white-space: pre-wrap;
 }
 </style>

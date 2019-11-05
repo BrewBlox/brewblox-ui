@@ -85,7 +85,7 @@ export default class BuilderBasic extends CrudComponent<BuilderConfig> {
     if (!this.layout) {
       return [];
     }
-    const sizes: Record<string, number> = {};
+    const sizes: Mapped<number> = {};
     return this.layout.parts
       .map(part => {
         const actual: PersistentPart = {

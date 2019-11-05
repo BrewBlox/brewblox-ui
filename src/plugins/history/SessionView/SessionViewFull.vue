@@ -3,11 +3,13 @@ import shortid from 'shortid';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
+import { createDialog } from '@/helpers/dialog';
 import { objectSorter } from '@/helpers/functional';
 import { durationString } from '@/helpers/functional';
 import { targetBuilder, targetSplitter } from '@/plugins/history/nodes';
-import { DisplayNames, historyStore } from '@/store/history';
+import { DisplayNames } from '@/store/history';
 
+import { sharedWidgetConfigs } from '../helpers';
 import { Session, SessionViewConfig } from './types';
 
 @Component
@@ -15,7 +17,7 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
   sessionInput = '';
 
   @Prop({ default: null })
-  readonly activeSession!: Session;
+  readonly initialSession!: Session | null;
 
   @Emit('create')
   createSession(): void { }
@@ -110,8 +112,16 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
     return durationString(session.end - session.start);
   }
 
-  created(): void {
-    historyStore.fetchKnownKeys();
+  editSession(session: Session): void {
+    createDialog({
+      component: 'GraphEditorDialog',
+      title: session.name,
+      parent: this,
+      config: session.graphCfg,
+      noPeriod: true,
+      shared: sharedWidgetConfigs(),
+    })
+      .onOk(graphCfg => this.updateSession({ ...session, graphCfg }));
   }
 }
 </script>
@@ -127,35 +137,41 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
       v-for="session in sessions"
       :key="session.id"
       :label="`Session ${session.name}`"
-      :default-opened="activeSession && activeSession.id === session.id"
+      :default-opened="initialSession && initialSession.id === session.id"
       group="modal"
       icon="help"
     >
       <q-list>
         <q-item dark>
-          <q-item-section>
-            <q-btn flat rounded icon="mdi-chart-line" @click="showSession(session)">
-              <q-tooltip>Show Graph</q-tooltip>
+          <q-item-section class="col-auto">
+            <q-btn flat icon="mdi-chart-line" @click="showSession(session)">
+              <q-tooltip>Show graph</q-tooltip>
             </q-btn>
           </q-item-section>
-          <q-item-section>
-            <q-btn flat rounded icon="mdi-content-copy" @click="duplicateSession(session)">
-              <q-tooltip>Duplicate Session</q-tooltip>
+          <q-item-section class="col-auto">
+            <q-btn flat icon="edit" @click="editSession(session)">
+              <q-tooltip>Select graph data</q-tooltip>
             </q-btn>
           </q-item-section>
-          <q-item-section>
+          <q-space />
+          <q-item-section class="col-auto">
+            <q-btn flat icon="mdi-content-copy" @click="duplicateSession(session)">
+              <q-tooltip>Duplicate session</q-tooltip>
+            </q-btn>
+          </q-item-section>
+          <q-item-section class="col-auto">
             <q-toggle
               :value="!session.hidden"
               checked-icon="visibility"
               unchecked-icon="visibility_off"
               @input="v => { session.hidden = !v; updateSession(session); }"
             >
-              <q-tooltip>Show/hide Session in widget</q-tooltip>
+              <q-tooltip>Show/hide session in widget</q-tooltip>
             </q-toggle>
           </q-item-section>
-          <q-item-section>
-            <q-btn flat rounded icon="delete" @click="deleteSession(session)">
-              <q-tooltip>Delete Session</q-tooltip>
+          <q-item-section class="col-auto">
+            <q-btn flat icon="delete" @click="deleteSession(session)">
+              <q-tooltip>Delete session</q-tooltip>
             </q-btn>
           </q-item-section>
         </q-item>
@@ -176,7 +192,7 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
               Duration
             </q-item-label>
             <span v-if="session.start && session.end">{{ sessionDuration(session) }}</span>
-            <span v-else-if="session.start">In progress...</span>
+            <span v-else-if="session.start">In progress</span>
             <span v-else>Not yet started</span>
           </q-item-section>
         </q-item>
@@ -207,41 +223,9 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
             />
           </q-item-section>
         </q-item>
-
-
-        <q-expansion-item group="sub-modal" icon="mdi-file-tree" label="Fields">
-          <div class="scroll-parent">
-            <q-scroll-area>
-              <MetricSelector
-                :selected="sessionSelected(session)"
-                @update:selected="v => updateSessionSelected(session, v)"
-              />
-            </q-scroll-area>
-          </div>
-        </q-expansion-item>
-
-        <q-expansion-item group="sub-modal" icon="mdi-tag-multiple" label="Legend">
-          <div class="scroll-parent">
-            <q-scroll-area>
-              <LabelSelector
-                :selected="sessionSelected(session)"
-                :renames="session.graphCfg.renames"
-                @update:renames="v => updateSessionRenames(session, v)"
-              />
-            </q-scroll-area>
-          </div>
-        </q-expansion-item>
-
-        <q-expansion-item group="sub-modal" icon="edit" label="Notes">
-          <textarea
-            :value="session.notes"
-            class="full-width"
-            style="min-height: 200px;"
-            @change="ev => { session.notes = ev.target.value; updateSession(session); }"
-          />
-        </q-expansion-item>
       </q-list>
     </q-expansion-item>
+
     <q-item dark>
       <q-item-section />
       <q-item-section side>

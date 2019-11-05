@@ -34,7 +34,7 @@ export interface PersistentPart {
   y: number;
   rotate: number;
   flipped?: boolean;
-  settings: Record<string, any>;
+  settings: Mapped<any>;
 }
 
 export interface StatePart extends PersistentPart {
@@ -57,7 +57,7 @@ export interface LinkedBlock {
 
 export interface CardSpec {
   component: string;
-  props?: Record<string, any>;
+  props?: Mapped<any>;
 }
 
 export interface PartSpec {

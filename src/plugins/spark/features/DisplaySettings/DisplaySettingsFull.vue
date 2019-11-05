@@ -52,7 +52,7 @@ export default class DisplaySettingsFull extends BlockCrudComponent {
       : '#ff';
   }
 
-  slotColorStyle(slot: DisplaySlot): Record<string, string> {
+  slotColorStyle(slot: DisplaySlot): Mapped<string> {
     const color = `#${slot.color || 'ff'}`;
     return {
       color,

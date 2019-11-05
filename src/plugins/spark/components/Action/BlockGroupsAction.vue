@@ -16,7 +16,7 @@ export default class BlockGroupsAction extends BlockCrudComponent {
   @Prop({ type: String, default: 'mdi-checkbox-multiple-marked' })
   readonly icon!: string;
 
-  get itemProps(): Record<string, any> {
+  get itemProps(): Mapped<any> {
     return {
       ...this.$attrs,
       ...this.$props,

@@ -43,7 +43,7 @@ export default class PartBase extends Vue {
     return this.part.flows;
   }
 
-  public get settings(): Record<string, any> {
+  public get settings(): Mapped<any> {
     return this.part.settings || {};
   }
 

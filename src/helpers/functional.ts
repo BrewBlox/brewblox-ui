@@ -83,6 +83,12 @@ export const camelCased =
   (input: string): string =>
     input.replace(/[ -_](.)/, (_, v1) => v1.toUpperCase());
 
+export const sentenceCased =
+  (input: string): string => {
+    const spaced = spaceCased(input).trimLeft();
+    return spaced.substr(0, 1).toUpperCase() + spaced.substr(1, spaced.length);
+  };
+
 export const hexToBase64 =
   (hex: string): string => Buffer.from(hex, 'hex').toString('base64');
 
