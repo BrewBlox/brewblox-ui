@@ -70,7 +70,7 @@ export default class RelationsDiagram extends Vue {
           <div class="type">${type}</div>
           <div class="id">${id}</div>
         </div>
-        `;
+        `.replace(/\n\s+/gm, '');
     };
 
     const obj = new graphlib
