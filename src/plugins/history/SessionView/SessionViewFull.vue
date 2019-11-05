@@ -9,6 +9,7 @@ import { durationString } from '@/helpers/functional';
 import { targetBuilder, targetSplitter } from '@/plugins/history/nodes';
 import { DisplayNames } from '@/store/history';
 
+import { sharedWidgetConfigs } from '../helpers';
 import { Session, SessionViewConfig } from './types';
 
 @Component
@@ -118,6 +119,7 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
       parent: this,
       config: session.graphCfg,
       noPeriod: true,
+      shared: sharedWidgetConfigs(),
     })
       .onOk(graphCfg => this.updateSession({ ...session, graphCfg }));
   }

@@ -6,6 +6,9 @@ import draggable from 'vuedraggable';
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 
+import { emptyGraphConfig } from '../getters';
+import { sharedWidgetConfigs } from '../helpers';
+import { SharedGraphConfig } from '../types';
 import { Session, SessionGraphNote, SessionLogConfig, SessionNote } from './types';
 
 
@@ -31,6 +34,18 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
       this.session.notes = notes;
       this.saveConfig();
     }
+  }
+
+  sharedConfigs(excluded: string[]): SharedGraphConfig[] {
+    return [
+      ...sharedWidgetConfigs(excluded),
+      ...this.notes
+        .filter(note => note.type === 'Graph' && !excluded.includes(note.id))
+        .map(note => {
+          const { id, title, config } = note as SessionGraphNote;
+          return { id, title: `(Note) ${title}`, config };
+        }),
+    ];
   }
 
   saveSessionTitle(title: string): void {
@@ -83,10 +98,10 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
     }
   }
 
-  addNote(): void {
+  addTextNote(): void {
     createDialog({
       component: 'InputDialog',
-      value: 'New field',
+      value: 'New text field',
       title: 'Add field',
       label: 'title',
     })
@@ -99,14 +114,32 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
       }));
   }
 
+  addGraphNote(): void {
+    createDialog({
+      component: 'InputDialog',
+      value: 'New graph field',
+      title: 'Add field',
+      label: 'title',
+    })
+      .onOk(title => this.notes.push({
+        id: uid(),
+        type: 'Graph',
+        title,
+        start: null,
+        end: null,
+        config: emptyGraphConfig(),
+        col: 12,
+      }));
+  }
+
   editGraph(note: SessionGraphNote): void {
-    if (this.session === null) { return; }
     createDialog({
       component: 'GraphEditorDialog',
       parent: this,
       title: note.title,
       config: note.config,
       noPeriod: true,
+      shared: this.sharedConfigs([note.id]),
     })
       .onOk(config => {
         const actual = this.notes.find(n => n.id === note.id);
@@ -165,7 +198,7 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
               </q-item-section>
               <q-space />
               <q-item-section v-if="note.type === 'Graph'" class="col-auto">
-                <q-btn flat icon="edit" @click="editGraph(note)">
+                <q-btn icon="edit" flat dense @click="editGraph(note)">
                   <q-tooltip>Select graph data</q-tooltip>
                 </q-btn>
               </q-item-section>
@@ -200,7 +233,14 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
         <q-item dark>
           <q-space />
           <q-item-section class="col-auto">
-            <q-btn outline round icon="add" @click="addNote" />
+            <q-btn outline round icon="add">
+              <q-menu>
+                <q-list dark>
+                  <ActionItem label="Add text note" @click="addTextNote" />
+                  <ActionItem label="Add graph note" @click="addGraphNote" />
+                </q-list>
+              </q-menu>
+            </q-btn>
           </q-item-section>
         </q-item>
       </q-list>

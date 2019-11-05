@@ -11,7 +11,7 @@ import { GraphConfig } from '@/plugins/history/types';
 import { QueryParams } from '@/store/history';
 
 @Component
-export default class GraphWidget extends WidgetBase {
+export default class GraphWidget extends WidgetBase<GraphConfig> {
   downsampling: any = {};
   graphId: string | null = null;
 

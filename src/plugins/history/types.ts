@@ -8,3 +8,9 @@ export interface GraphConfig extends QueryConfig {
   axes: GraphValueAxes;
   colors: LineColors;
 }
+
+export interface SharedGraphConfig {
+  id: string;
+  title: string;
+  config: GraphConfig;
+}
