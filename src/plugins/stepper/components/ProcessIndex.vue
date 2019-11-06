@@ -5,7 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Process, ProcessStep, StepNote } from '../types';
 
 @Component
-export default class ProcessTower extends Vue {
+export default class ProcessIndex extends Vue {
 
   @Prop({ type: Object, required: true })
   public readonly process!: Process;

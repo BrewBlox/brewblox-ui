@@ -1,7 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import draggable from 'vuedraggable';
 
 import buildEnv from '@/build-env.json';
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '@/helpers/dashboards';
@@ -11,11 +10,7 @@ import { objectSorter } from '@/helpers/functional';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { Service, serviceStore } from '@/store/services';
 
-@Component({
-  components: {
-    draggable,
-  },
-})
+@Component
 export default class DefaultLayout extends Vue {
   leftDrawerOpen = true;
   dashboardEditing = false;

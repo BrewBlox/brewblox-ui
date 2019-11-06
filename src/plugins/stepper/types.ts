@@ -1,15 +1,20 @@
 
 export interface StepAction {
+  id: string;
   type: string;
+  enabled: boolean;
   opts: Mapped<any>;
 }
 
 export interface StepCondition {
+  id: string;
   type: string;
+  enabled: boolean;
   opts: Mapped<any>;
 }
 
 export interface StepNote {
+  id: string;
   title: string;
   message: string;
 }
@@ -17,6 +22,7 @@ export interface StepNote {
 export interface ProcessStep {
   id: string;
   title: string;
+  enabled: boolean;
   actions: StepAction[];
   conditions: StepCondition[];
   notes: StepNote[];

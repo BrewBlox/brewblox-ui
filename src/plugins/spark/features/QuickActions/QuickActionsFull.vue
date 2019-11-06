@@ -2,7 +2,6 @@
 import get from 'lodash/get';
 import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
-import draggable from 'vuedraggable';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
@@ -26,11 +25,7 @@ interface StepDisplay extends Step {
   changes: BlockChangeDisplay[];
 }
 
-@Component({
-  components: {
-    draggable,
-  },
-})
+@Component
 export default class QuickActionsFull extends CrudComponent {
   draggingStep = false;
   editableChanges: Mapped<boolean> = {};
