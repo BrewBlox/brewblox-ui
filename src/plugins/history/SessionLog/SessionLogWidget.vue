@@ -58,7 +58,7 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
 
   renderDate(date: number | null): string {
     return date !== null
-      ? new Date(date).toLocaleDateString()
+      ? new Date(date).toLocaleString()
       : '??';
   }
 
