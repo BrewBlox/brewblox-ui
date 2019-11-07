@@ -3,6 +3,7 @@ import { VueConstructor } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
+import { createDialog } from '@/helpers/dialog';
 
 import { actionComponents } from '../actions';
 import { conditionComponents } from '../conditions';
@@ -105,24 +106,33 @@ export default class StepperEditor extends DialogBase {
     (copy);
   }
 
-  importProcess(): void {
-
+  startRenameProcess(): void {
+    if (this.process === null) { return; }
+    createDialog({
+      parent: this,
+      title: 'Rename process',
+      message: `Choose a new name for '${this.process.title}'`,
+      dark: true,
+      cancel: true,
+      prompt: {
+        model: this.process.title,
+        type: 'text',
+      },
+    })
+      .onOk(title =>
+        this.process !== null && this.saveProcess({ ...this.process, title }));
   }
 
-  exportProcess(): void {
-
-  }
-
-  renameProcess(): void {
-
-  }
-
-  removeProcess(): void {
-
-  }
-
-  clearSteps(): void {
-
+  startRemoveProcess(): void {
+    if (this.process === null) { return; }
+    createDialog({
+      parent: this,
+      title: 'Remove process',
+      message: `Are you sure you want to remove '${this.process.title}'`,
+      dark: true,
+      cancel: true,
+    })
+      .onOk(() => this.process !== null && stepperStore.removeProcess(this.process));
   }
 
   created(): void {
@@ -168,11 +178,10 @@ export default class StepperEditor extends DialogBase {
               <ActionItem label="New Process" icon="add" @click="startAddProcess(false)" />
               <template v-if="!!process">
                 <ActionItem label="Copy Process" icon="file_copy" @click="startAddProcess(true)" />
-                <ActionItem icon="mdi-file-import" label="Import Process" @click="importProcess" />
-                <ActionItem icon="edit" label="Rename Process" @click="renameProcess" />
-                <ActionItem icon="mdi-file-export" label="Export Process" @click="exportProcess" />
-                <ActionItem icon="delete" label="Remove all Steps" @click="clearSteps" />
-                <ActionItem icon="delete" label="Delete Process" @click="removeProcess" />
+                <!-- <ActionItem icon="mdi-file-import" label="Import Process" @click="importProcess" /> -->
+                <ActionItem icon="edit" label="Rename Process" @click="startRenameProcess" />
+                <!-- <ActionItem icon="mdi-file-export" label="Export Process" @click="exportProcess" /> -->
+                <ActionItem icon="delete" label="Delete Process" @click="startRemoveProcess" />
               </template>
             </q-list>
           </q-btn-dropdown>
