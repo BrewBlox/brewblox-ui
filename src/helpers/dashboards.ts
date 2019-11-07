@@ -7,6 +7,8 @@ import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 import { suggestId } from './functional';
 
+type IdChangedCallback = (id: string) => void;
+
 const urlGenerator = new UrlSafeString();
 
 export const dashboardIdRules = (): InputRule[] => [
@@ -16,7 +18,7 @@ export const dashboardIdRules = (): InputRule[] => [
 ];
 
 export const changeDashboardId =
-  async (oldId: string, newId: string, onIdChanged: (id: string) => void): Promise<void> => {
+  async (oldId: string, newId: string, onIdChanged: IdChangedCallback): Promise<void> => {
     const dashboard = dashboardStore.dashboardById(oldId);
 
     await dashboardStore.createDashboard({ ...dashboard, id: newId });
@@ -41,7 +43,7 @@ export const changeDashboardId =
   };
 
 export const startChangeDashboardId =
-  (dashboard: Dashboard, onIdChanged: (id: string) => void = (() => { })): void => {
+  (dashboard: Dashboard, onIdChanged: IdChangedCallback = (() => { })): void => {
     createDialog({
       component: 'InputDialog',
       value: dashboard.id,
@@ -58,7 +60,7 @@ export const startChangeDashboardId =
   };
 
 export const startChangeDashboardTitle =
-  (dashboard: Dashboard, onIdChanged: (id: string) => void = (() => { })): void => {
+  (dashboard: Dashboard, onIdChanged: IdChangedCallback = (() => { })): void => {
     createDialog({
       title: 'Change dashboard Title',
       message: "Change your dashboard's display name",

@@ -3,18 +3,18 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
 import buildEnv from '@/build-env.json';
-import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '@/helpers/dashboards';
 import { checkDatastore } from '@/helpers/datastore';
 import { createDialog } from '@/helpers/dialog';
-import { objectSorter } from '@/helpers/functional';
-import { Dashboard, dashboardStore } from '@/store/dashboards';
-import { Service, serviceStore } from '@/store/services';
 
 @Component
 export default class DefaultLayout extends Vue {
   leftDrawerOpen = true;
   dashboardEditing = false;
   serviceEditing = false;
+
+  created(): void {
+    checkDatastore();
+  }
 
   // env flag
   stepperFeatureEnabled = process.env.VUE_APP_STEPPER_FEATURE === 'true';
@@ -27,90 +27,10 @@ export default class DefaultLayout extends Vue {
     return buildEnv.date || 'UNKNOWN';
   }
 
-  get dashboards(): Dashboard[] {
-    return dashboardStore.dashboardValues.sort(objectSorter('order'));
-  }
-
-  set dashboards(dashboards: Dashboard[]) {
-    dashboardStore.updateDashboardOrder(dashboards.map(dashboard => dashboard.id));
-  }
-
-  get services(): Service[] {
-    return serviceStore.serviceValues.sort(objectSorter('order'));
-  }
-
-  set services(services: Service[]) {
-    serviceStore.updateServiceOrder(services.map(service => service.id));
-  }
-
-  onIdChanged(oldId, newId): void {
-    if (newId && this.$route.path === `/dashboard/${oldId}`) {
-      this.$router.replace(`/dashboard/${newId}`);
-    }
-  }
-
-  async changeDashboardId(dashboard: Dashboard): Promise<void> {
-    const oldId = dashboard.id;
-    await startChangeDashboardId(dashboard, newId => this.onIdChanged(oldId, newId));
-  }
-
-  changeDashboardTitle(dashboard: Dashboard): void {
-    const oldId = dashboard.id;
-    startChangeDashboardTitle(dashboard, newId => this.onIdChanged(oldId, newId));
-  }
-
-  removeDashboard(dashboard: Dashboard): void {
-    startRemoveDashboard(dashboard);
-  }
-
-  removeService(service: Service): void {
-    createDialog({
-      parent: this,
-      title: 'Remove service',
-      message: `Are you sure you want to remove ${service.title}?`,
-      dark: true,
-      ok: 'Confirm',
-      cancel: 'Cancel',
-    })
-      .onOk(() => serviceStore.removeService(service));
-  }
-
-  changeServiceTitle(service: Service): void {
-    createDialog({
-      parent: this,
-      title: 'Change service Title',
-      message: "Change your service's display name",
-      dark: true,
-      cancel: true,
-      prompt: {
-        model: service.title,
-        type: 'text',
-      },
-    })
-      .onOk(async newTitle => {
-        const oldTitle = service.title;
-        if (!newTitle || oldTitle === newTitle) {
-          return;
-        }
-
-        await serviceStore.saveService({ ...service, title: newTitle });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'edit',
-          message: `Renamed service '${oldTitle}' to '${newTitle}'`,
-        });
-      });
-  }
-
-  toggleDefaultDashboard(dashboard: Dashboard): void {
-    dashboardStore.updatePrimaryDashboard(dashboard.primary ? null : dashboard.id);
-  }
-
-  showWizard(component: string | null): void {
+  showWizard(): void {
     createDialog({
       parent: this,
       component: 'WizardDialog',
-      initialComponent: component,
     });
   }
 
@@ -130,18 +50,14 @@ export default class DefaultLayout extends Vue {
 
   showStepperEditor(): void {
     createDialog({
-      component: 'StepperEditor',
       parent: this,
+      component: 'StepperEditor',
     });
   }
 
   stopEditing(): void {
     this.dashboardEditing = false;
     this.serviceEditing = false;
-  }
-
-  created(): void {
-    checkDatastore();
   }
 }
 </script>
@@ -150,9 +66,7 @@ export default class DefaultLayout extends Vue {
   <q-layout view="lHh Lpr lFf" class="bg-dark-bright">
     <q-header class="glossy bg-dark">
       <q-toolbar>
-        <q-btn flat dense round @click="leftDrawerOpen = !leftDrawerOpen">
-          <q-icon name="menu" />
-        </q-btn>
+        <q-btn flat dense round icon="menu" @click="leftDrawerOpen = !leftDrawerOpen" />
         <q-toolbar-title>
           <portal-target name="toolbar-title">
             BrewBlox
@@ -171,146 +85,11 @@ export default class DefaultLayout extends Vue {
       </q-item>
 
       <q-separator dark />
+      <DashboardIndex v-model="dashboardEditing" />
+      <ServiceIndex v-model="serviceEditing" />
 
-      <q-item dark class="q-pb-none">
-        <q-item-section class="text-bold">
-          Dashboards
-        </q-item-section>
-        <q-item-section v-if="dashboardEditing" side>
-          <q-btn
-            icon="add"
-            outline
-            color="white"
-            round
-            size="sm"
-            @click="showWizard('DashboardWizard')"
-          />
-        </q-item-section>
-        <q-item-section side>
-          <q-btn
-            :disable="dashboards.length === 0"
-            :flat="!dashboardEditing"
-            :icon="dashboardEditing ? 'check' : 'edit'"
-            :color="dashboardEditing ? 'primary': ''"
-            round
-            size="sm"
-            @click="dashboardEditing = !dashboardEditing"
-          />
-        </q-item-section>
-      </q-item>
-
-      <draggable
-        v-model="dashboards"
-        :class="{ editing: dashboardEditing }"
-        :disabled="!dashboardEditing"
-      >
-        <q-item
-          v-for="dashboard in dashboards"
-          :key="dashboard.id"
-          :to="dashboardEditing ? undefined : `/dashboard/${dashboard.id}`"
-          :inset-level="0.2"
-          dark
-          style="min-height: 0px"
-          class="q-pb-sm"
-        >
-          <q-item-section v-if="dashboardEditing" avatar>
-            <q-icon name="mdi-drag-vertical" />
-          </q-item-section>
-          <q-item-section>{{ dashboard.title }}</q-item-section>
-          <q-item-section v-if="dashboardEditing" side>
-            <q-btn-dropdown outline icon="edit" size="sm">
-              <q-list dark>
-                <q-item dark link clickable @click="toggleDefaultDashboard(dashboard)">
-                  <q-item-section avatar>
-                    <q-icon :color="dashboard.primary ? 'primary' : ''" name="home" />
-                  </q-item-section>
-                  <q-item-section>Toggle default dashboard</q-item-section>
-                </q-item>
-                <ActionItem
-                  icon="edit"
-                  label="Change dashboard ID"
-                  @click="changeDashboardId(dashboard)"
-                />
-                <ActionItem
-                  icon="edit"
-                  label="Change dashboard Title"
-                  @click="changeDashboardTitle(dashboard)"
-                />
-                <ActionItem
-                  icon="delete"
-                  label="Delete dashboard"
-                  @click="removeDashboard(dashboard)"
-                />
-              </q-list>
-            </q-btn-dropdown>
-          </q-item-section>
-        </q-item>
-      </draggable>
-
-      <q-item dark class="q-pb-none">
-        <q-item-section>
-          <q-item-section class="text-bold">
-            Services
-          </q-item-section>
-        </q-item-section>
-        <q-item-section v-if="serviceEditing" side>
-          <q-btn
-            icon="add"
-            outline
-            color="white"
-            round
-            size="sm"
-            @click="showWizard('ServiceWizardPicker')"
-          />
-        </q-item-section>
-        <q-item-section side>
-          <q-btn
-            :disable="services.length === 0"
-            :flat="!serviceEditing"
-            :icon="serviceEditing ? 'check' : 'edit'"
-            :color="serviceEditing ? 'primary': ''"
-            round
-            size="sm"
-            @click="serviceEditing = !serviceEditing"
-          />
-        </q-item-section>
-      </q-item>
-
-      <draggable
-        v-model="services"
-        :class="{ editing: serviceEditing }"
-        :disabled="!serviceEditing"
-      >
-        <q-item
-          v-for="service in services"
-          :key="service.id"
-          :to="serviceEditing ? undefined : `/service/${service.id}`"
-          :inset-level="0.2"
-          dark
-          style="min-height: 0px"
-          class="q-pb-sm"
-        >
-          <q-item-section v-if="serviceEditing" avatar>
-            <q-icon name="mdi-drag-vertical" />
-          </q-item-section>
-          <q-item-section>{{ service.title }}</q-item-section>
-          <q-item-section v-if="serviceEditing" side>
-            <q-btn-dropdown outline icon="edit" size="sm">
-              <q-list dark>
-                <ActionItem
-                  icon="edit"
-                  label="Change service title"
-                  @click="changeServiceTitle(service)"
-                />
-                <ActionItem icon="delete" label="Delete service" @click="removeService(service)" />
-              </q-list>
-            </q-btn-dropdown>
-          </q-item-section>
-        </q-item>
-      </draggable>
-
-      <q-separator dark />
-      <ActionItem icon="mdi-creation" label="Wizardry" @click="showWizard(null)" />
+      <q-separator dark class="q-mt-sm" />
+      <ActionItem icon="mdi-creation" label="Wizardry" @click="showWizard" />
       <ActionItem icon="mdi-pipe" label="Brewery Builder" @click="showBuilderEditor" />
       <template v-if="stepperFeatureEnabled">
         <ActionItem icon="mdi-calendar-check" label="Stepper" @click="showStepperEditor" />
@@ -362,10 +141,6 @@ export default class DefaultLayout extends Vue {
 <style lang="stylus" scoped>
 @import '../styles/quasar.variables.styl';
 @import '../styles/quasar.styl';
-
-.editing {
-  cursor: move;
-}
 
 .bottomed {
   bottom: 0;

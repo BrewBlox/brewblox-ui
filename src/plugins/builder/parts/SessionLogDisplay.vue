@@ -37,8 +37,10 @@ export default class SessionLogDisplay extends PartBase {
       <line
         v-if="!isLinked"
         :transform="textTransformation([sizeX, sizeY])"
-        x1="10" y1="10"
-        :x2="squares(sizeX)-10" :y2="squares(sizeY)-10"
+        x1="10"
+        y1="10"
+        :x2="squares(sizeX)-10"
+        :y2="squares(sizeY)-10"
       />
     </g>
   </g>
