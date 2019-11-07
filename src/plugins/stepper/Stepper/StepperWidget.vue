@@ -8,7 +8,7 @@ import { Unit } from '@/helpers/units';
 
 import { blockTypes } from '../../spark/block-types';
 import { stepperStore } from '../store';
-import { Process, ProcessStep, Runtime } from '../types';
+import { Process, ProcessStep, Runtime, StepperConfig } from '../types';
 
 
 const lipsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -25,7 +25,7 @@ const lipsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 
 @Component
-export default class StepperWidget extends WidgetBase {
+export default class StepperWidget extends WidgetBase<StepperConfig> {
   get processes(): Process[] {
     return stepperStore.processValues;
   }

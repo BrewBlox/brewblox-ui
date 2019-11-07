@@ -4,10 +4,11 @@ import { Component } from 'vue-property-decorator';
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 
 import { emptyGraphConfig } from '../getters';
+import { GraphConfig } from '../types';
 
 
 @Component
-export default class GraphWizard extends WidgetWizardBase {
+export default class GraphWizard extends WidgetWizardBase<GraphConfig> {
 
   createWidget(): void {
     this.createItem({

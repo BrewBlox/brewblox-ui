@@ -12,7 +12,7 @@ export interface NavAction {
 }
 
 @Component
-export default class WidgetWizardBase extends Vue {
+export default class WidgetWizardBase<ConfigT = any> extends Vue {
   protected widgetId: string = uid();
   protected widgetTitle = '';
 
@@ -40,7 +40,7 @@ export default class WidgetWizardBase extends Vue {
     return featureStore.widgetSize(this.typeId);
   }
 
-  protected async createItem(item: PersistentWidget): Promise<void> {
+  protected async createItem(item: PersistentWidget<ConfigT>): Promise<void> {
     await dashboardStore.appendPersistentWidget(item)
       .then(() => this.$q.notify({
         icon: 'mdi-check-all',

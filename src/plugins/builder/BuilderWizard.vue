@@ -7,19 +7,18 @@ import { BuilderConfig } from './types';
 
 
 @Component
-export default class BuilderWizard extends WidgetWizardBase {
+export default class BuilderWizard extends WidgetWizardBase<BuilderConfig> {
   createWidget(): void {
-    const config: BuilderConfig = {
-      currentLayoutId: null,
-      layoutIds: [],
-    };
     this.createItem({
-      config,
       id: this.widgetId,
       title: this.widgetTitle,
       feature: this.typeId,
       dashboard: this.dashboardId,
       order: 0,
+      config: {
+        currentLayoutId: null,
+        layoutIds: [],
+      },
       ...this.defaultWidgetSize,
     });
   }

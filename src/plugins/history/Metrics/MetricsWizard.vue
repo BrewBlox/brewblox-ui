@@ -7,14 +7,7 @@ import { MetricsConfig } from './types';
 
 
 @Component
-export default class MetricsWizard extends WidgetWizardBase {
-  metricsCfg: MetricsConfig = {
-    targets: [],
-    renames: {},
-    params: {},
-    freshDuration: {},
-    decimals: {},
-  }
+export default class MetricsWizard extends WidgetWizardBase<MetricsConfig> {
 
   createWidget(): void {
     this.createItem({
@@ -23,7 +16,13 @@ export default class MetricsWizard extends WidgetWizardBase {
       feature: this.typeId,
       order: 0,
       dashboard: this.dashboardId,
-      config: this.metricsCfg,
+      config: {
+        targets: [],
+        renames: {},
+        params: {},
+        freshDuration: {},
+        decimals: {},
+      },
       ...this.defaultWidgetSize,
     });
   }

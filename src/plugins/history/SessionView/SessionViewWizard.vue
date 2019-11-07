@@ -3,9 +3,11 @@ import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 
+import { SessionViewConfig } from './types';
+
 
 @Component
-export default class SessionViewWizard extends WidgetWizardBase {
+export default class SessionViewWizard extends WidgetWizardBase<SessionViewConfig> {
   createWidget(): void {
     this.createItem({
       id: this.widgetId,

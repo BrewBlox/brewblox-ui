@@ -8,19 +8,18 @@ import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockCrud } from '@/plugins/spark/types';
-import { PersistentWidget } from '@/store/dashboards';
+import { Block, BlockConfig, BlockCrud, DashboardBlock } from '@/plugins/spark/types';
 import { Service, serviceStore } from '@/store/services';
 
 @Component
-export default class BlockWidgetWizard extends WidgetWizardBase {
+export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
   currentStep = 'start';
 
   blockId = '';
   service: Service | null = null;
   block: Block | null = null;
   isStoreBlock = false;
-  widget: PersistentWidget | null = null;
+  widget: DashboardBlock | null = null;
   activeDialog: any = null;
 
   get serviceId(): string {
@@ -95,7 +94,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
   configureBlock(): void {
     this.ensureItem();
     const crud: BlockCrud = {
-      widget: this.widget as PersistentWidget,
+      widget: this.widget!,
       isStoreWidget: false,
       saveWidget: v => { this.widget = v; },
       block: this.block as Block,
@@ -127,7 +126,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
       await sparkStore.createBlock([service.id, block]);
     }
 
-    this.createItem(this.widget as PersistentWidget);
+    this.createItem(this.widget!);
   }
 
   mounted(): void {
