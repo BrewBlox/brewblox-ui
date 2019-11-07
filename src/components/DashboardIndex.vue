@@ -109,7 +109,7 @@ export default class DashboardIndex extends Vue {
         :key="dashboard.id"
         :to="editing ? undefined : `/dashboard/${dashboard.id}`"
         :inset-level="0.2"
-        :class="{hoverable: editing && !dragging, 'q-pb-sm': true}"
+        :class="{hoverable: editing && !dragging, bordered: editing, 'q-pb-sm': true}"
         style="min-height: 0px"
         dark
       >
@@ -118,11 +118,8 @@ export default class DashboardIndex extends Vue {
         </q-item-section>
         <template v-if="editing">
           <q-item-section avatar>
-            <q-icon name="mdi-chevron-down" />
+            <q-icon name="mdi-dots-vertical" />
           </q-item-section>
-          <q-tooltip>
-            Click or drag
-          </q-tooltip>
           <q-menu :offset="[-50, 0]">
             <q-list dark bordered>
               <q-item
@@ -161,3 +158,10 @@ export default class DashboardIndex extends Vue {
     </draggable>
   </div>
 </template>
+
+<style scoped>
+.bordered {
+  border: 1px solid whitesmoke;
+  margin-top: 2px;
+}
+</style>
