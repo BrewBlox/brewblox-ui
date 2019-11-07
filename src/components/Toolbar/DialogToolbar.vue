@@ -7,7 +7,7 @@ export default class DialogToolbar extends Vue { }
 </script>
 
 <template>
-  <q-bar class="row items-center bg-secondary q-py-lg text-white q-pr-none" style="max-width: 100%">
+  <q-bar class="bg-secondary text-white q-pr-none full-width" style="height: 50px; min-height: 50px">
     <slot />
     <q-space />
     <slot name="buttons" />

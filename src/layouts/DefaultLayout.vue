@@ -15,8 +15,6 @@ export default class DefaultLayout extends Vue {
   leftDrawerOpen = true;
   dashboardEditing = false;
   serviceEditing = false;
-  wizardModalOpen = false;
-  wizardComponent: string | null = null;
 
   // env flag
   stepperFeatureEnabled = process.env.VUE_APP_STEPPER_FEATURE === 'true';
@@ -108,9 +106,12 @@ export default class DefaultLayout extends Vue {
     dashboardStore.updatePrimaryDashboard(dashboard.primary ? null : dashboard.id);
   }
 
-  openWizard(component: string | null = null): void {
-    this.wizardComponent = component;
-    this.wizardModalOpen = true;
+  showWizard(component: string | null): void {
+    createDialog({
+      parent: this,
+      component: 'WizardDialog',
+      initialComponent: component,
+    });
   }
 
   showPlugins(): void {
@@ -162,166 +163,160 @@ export default class DefaultLayout extends Vue {
     </q-header>
 
     <q-drawer v-model="leftDrawerOpen" content-class="bg-dark" elevated>
-      <q-list dark>
-        <q-item exact to="/">
-          <q-item-section avatar>
-            <q-icon name="mdi-home" />
-          </q-item-section>
-          <q-item-section>BrewBlox</q-item-section>
-        </q-item>
+      <q-item dark exact to="/">
+        <q-item-section avatar>
+          <q-icon name="mdi-home" />
+        </q-item-section>
+        <q-item-section>BrewBlox</q-item-section>
+      </q-item>
 
-        <q-separator dark />
+      <q-separator dark />
 
-        <q-item dark class="q-pb-none">
-          <q-item-section avatar>
-            <q-icon name="dashboard" />
+      <q-item dark class="q-pb-none">
+        <q-item-section class="text-bold">
+          Dashboards
+        </q-item-section>
+        <q-item-section v-if="dashboardEditing" side>
+          <q-btn
+            icon="add"
+            outline
+            color="white"
+            round
+            size="sm"
+            @click="showWizard('DashboardWizard')"
+          />
+        </q-item-section>
+        <q-item-section side>
+          <q-btn
+            :disable="dashboards.length === 0"
+            :flat="!dashboardEditing"
+            :icon="dashboardEditing ? 'check' : 'edit'"
+            :color="dashboardEditing ? 'primary': ''"
+            round
+            size="sm"
+            @click="dashboardEditing = !dashboardEditing"
+          />
+        </q-item-section>
+      </q-item>
+
+      <draggable
+        v-model="dashboards"
+        :class="{ editing: dashboardEditing }"
+        :disabled="!dashboardEditing"
+      >
+        <q-item
+          v-for="dashboard in dashboards"
+          :key="dashboard.id"
+          :to="dashboardEditing ? undefined : `/dashboard/${dashboard.id}`"
+          :inset-level="0.2"
+          dark
+          style="min-height: 0px"
+          class="q-pb-sm"
+        >
+          <q-item-section v-if="dashboardEditing" avatar>
+            <q-icon name="mdi-drag-vertical" />
           </q-item-section>
-          <q-item-section>Dashboards</q-item-section>
+          <q-item-section>{{ dashboard.title }}</q-item-section>
           <q-item-section v-if="dashboardEditing" side>
-            <q-btn
-              icon="add"
-              outline
-              color="white"
-              round
-              size="sm"
-              @click="openWizard('DashboardWizard')"
-            />
-          </q-item-section>
-          <q-item-section side>
-            <q-btn
-              :disable="dashboards.length === 0"
-              :flat="!dashboardEditing"
-              :icon="dashboardEditing ? 'check' : 'edit'"
-              :color="dashboardEditing ? 'primary': ''"
-              round
-              size="sm"
-              @click="dashboardEditing = !dashboardEditing"
-            />
+            <q-btn-dropdown outline icon="edit" size="sm">
+              <q-list dark>
+                <q-item dark link clickable @click="toggleDefaultDashboard(dashboard)">
+                  <q-item-section avatar>
+                    <q-icon :color="dashboard.primary ? 'primary' : ''" name="home" />
+                  </q-item-section>
+                  <q-item-section>Toggle default dashboard</q-item-section>
+                </q-item>
+                <ActionItem
+                  icon="edit"
+                  label="Change dashboard ID"
+                  @click="changeDashboardId(dashboard)"
+                />
+                <ActionItem
+                  icon="edit"
+                  label="Change dashboard Title"
+                  @click="changeDashboardTitle(dashboard)"
+                />
+                <ActionItem
+                  icon="delete"
+                  label="Delete dashboard"
+                  @click="removeDashboard(dashboard)"
+                />
+              </q-list>
+            </q-btn-dropdown>
           </q-item-section>
         </q-item>
+      </draggable>
 
-        <draggable
-          v-model="dashboards"
-          :class="{ editing: dashboardEditing }"
-          :disabled="!dashboardEditing"
+      <q-item dark class="q-pb-none">
+        <q-item-section>
+          <q-item-section class="text-bold">
+            Services
+          </q-item-section>
+        </q-item-section>
+        <q-item-section v-if="serviceEditing" side>
+          <q-btn
+            icon="add"
+            outline
+            color="white"
+            round
+            size="sm"
+            @click="showWizard('ServiceWizardPicker')"
+          />
+        </q-item-section>
+        <q-item-section side>
+          <q-btn
+            :disable="services.length === 0"
+            :flat="!serviceEditing"
+            :icon="serviceEditing ? 'check' : 'edit'"
+            :color="serviceEditing ? 'primary': ''"
+            round
+            size="sm"
+            @click="serviceEditing = !serviceEditing"
+          />
+        </q-item-section>
+      </q-item>
+
+      <draggable
+        v-model="services"
+        :class="{ editing: serviceEditing }"
+        :disabled="!serviceEditing"
+      >
+        <q-item
+          v-for="service in services"
+          :key="service.id"
+          :to="serviceEditing ? undefined : `/service/${service.id}`"
+          :inset-level="0.2"
+          dark
+          style="min-height: 0px"
+          class="q-pb-sm"
         >
-          <q-item
-            v-for="dashboard in dashboards"
-            :key="dashboard.id"
-            :to="dashboardEditing ? undefined : `/dashboard/${dashboard.id}`"
-            dark
-            style="min-height: 0px"
-            class="q-pb-sm"
-          >
-            <q-item-section v-if="dashboardEditing" avatar>
-              <q-icon name="mdi-drag-vertical" />
-            </q-item-section>
-            <q-item-section>{{ dashboard.title }}</q-item-section>
-            <q-item-section v-if="dashboardEditing" side>
-              <q-btn-dropdown outline icon="edit" size="sm">
-                <q-list dark>
-                  <q-item dark link clickable @click="toggleDefaultDashboard(dashboard)">
-                    <q-item-section avatar>
-                      <q-icon :color="dashboard.primary ? 'primary' : ''" name="home" />
-                    </q-item-section>
-                    <q-item-section>Toggle default dashboard</q-item-section>
-                  </q-item>
-                  <ActionItem
-                    icon="edit"
-                    label="Change dashboard ID"
-                    @click="changeDashboardId(dashboard)"
-                  />
-                  <ActionItem
-                    icon="edit"
-                    label="Change dashboard Title"
-                    @click="changeDashboardTitle(dashboard)"
-                  />
-                  <ActionItem
-                    icon="delete"
-                    label="Delete dashboard"
-                    @click="removeDashboard(dashboard)"
-                  />
-                </q-list>
-              </q-btn-dropdown>
-            </q-item-section>
-          </q-item>
-        </draggable>
-
-        <q-separator dark />
-
-        <q-item dark class="q-pb-none">
-          <q-item-section avatar>
-            <q-icon name="cloud" />
+          <q-item-section v-if="serviceEditing" avatar>
+            <q-icon name="mdi-drag-vertical" />
           </q-item-section>
-          <q-item-section>
-            <q-item-section>Services</q-item-section>
-          </q-item-section>
+          <q-item-section>{{ service.title }}</q-item-section>
           <q-item-section v-if="serviceEditing" side>
-            <q-btn
-              icon="add"
-              outline
-              color="white"
-              round
-              size="sm"
-              @click="openWizard('ServiceWizardPicker')"
-            />
-          </q-item-section>
-          <q-item-section side>
-            <q-btn
-              :disable="services.length === 0"
-              :flat="!serviceEditing"
-              :icon="serviceEditing ? 'check' : 'edit'"
-              :color="serviceEditing ? 'primary': ''"
-              round
-              size="sm"
-              @click="serviceEditing = !serviceEditing"
-            />
+            <q-btn-dropdown outline icon="edit" size="sm">
+              <q-list dark>
+                <ActionItem
+                  icon="edit"
+                  label="Change service title"
+                  @click="changeServiceTitle(service)"
+                />
+                <ActionItem icon="delete" label="Delete service" @click="removeService(service)" />
+              </q-list>
+            </q-btn-dropdown>
           </q-item-section>
         </q-item>
-
-        <draggable
-          v-model="services"
-          :class="{ editing: serviceEditing }"
-          :disabled="!serviceEditing"
-        >
-          <q-item
-            v-for="service in services"
-            :key="service.id"
-            :to="serviceEditing ? undefined : `/service/${service.id}`"
-            dark
-            style="min-height: 0px"
-            class="q-pb-sm"
-          >
-            <q-item-section v-if="serviceEditing" avatar>
-              <q-icon name="mdi-drag-vertical" />
-            </q-item-section>
-            <q-item-section>{{ service.title }}</q-item-section>
-            <q-item-section v-if="serviceEditing" side>
-              <q-btn-dropdown outline icon="edit" size="sm">
-                <q-list dark>
-                  <ActionItem
-                    icon="edit"
-                    label="Change service title"
-                    @click="changeServiceTitle(service)"
-                  />
-                  <ActionItem icon="delete" label="Delete service" @click="removeService(service)" />
-                </q-list>
-              </q-btn-dropdown>
-            </q-item-section>
-          </q-item>
-        </draggable>
-      </q-list>
+      </draggable>
 
       <q-separator dark />
-      <ActionItem icon="mdi-creation" label="Wizardry" @click="openWizard(null)" />
-      <q-separator dark />
+      <ActionItem icon="mdi-creation" label="Wizardry" @click="showWizard(null)" />
       <ActionItem icon="mdi-pipe" label="Brewery Builder" @click="showBuilderEditor" />
       <template v-if="stepperFeatureEnabled">
-        <q-separator dark />
         <ActionItem icon="mdi-calendar-check" label="Stepper" @click="showStepperEditor" />
       </template>
 
-      <q-item class="bottomed">
+      <q-item dark class="bottomed">
         <q-item-section class="col-auto">
           <q-btn flat text-color="white" icon="mdi-puzzle" @click="showPlugins">
             <q-tooltip>
@@ -354,14 +349,6 @@ export default class DefaultLayout extends Vue {
         </q-item-section>
       </q-item>
     </q-drawer>
-
-    <q-dialog v-model="wizardModalOpen" no-backdrop-dismiss>
-      <WizardPicker
-        v-if="wizardModalOpen"
-        :initial-component="wizardComponent"
-        @close="wizardModalOpen = false"
-      />
-    </q-dialog>
 
     <Watchers />
     <ServiceWatchers />

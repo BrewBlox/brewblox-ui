@@ -8,6 +8,7 @@ import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards'
 import { Crud, featureStore, WidgetContext } from '@/store/features';
 
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '../helpers/dashboards';
+import { createDialog } from '../helpers/dialog';
 
 interface ValidatedWidget {
   id: string;
@@ -19,8 +20,6 @@ interface ValidatedWidget {
 @Component
 export default class DashboardPage extends Vue {
   widgetEditable = false;
-  menuModalOpen = false;
-  wizardModalOpen = false;
 
   context: WidgetContext = {
     mode: 'Basic',
@@ -142,6 +141,15 @@ export default class DashboardPage extends Vue {
   removeDashboard(): void {
     startRemoveDashboard(this.dashboard);
   }
+
+  showWizard(): void {
+    createDialog({
+      parent: this,
+      component: 'WizardDialog',
+      dashboardId: this.dashboardId,
+      initialComponent: 'WidgetWizardPicker',
+    });
+  }
 }
 </script>
 
@@ -168,7 +176,7 @@ export default class DashboardPage extends Vue {
         />
         <q-btn-dropdown color="primary" label="actions">
           <q-list dark>
-            <ActionItem icon="add" label="New Widget" @click="wizardModalOpen = true" />
+            <ActionItem icon="add" label="New Widget" @click="showWizard" />
             <q-item dark link clickable @click="toggleDefaultDashboard">
               <q-item-section avatar>
                 <q-icon :color="dashboard.primary ? 'primary' : ''" name="home" />
@@ -181,14 +189,6 @@ export default class DashboardPage extends Vue {
           </q-list>
         </q-btn-dropdown>
       </portal>
-      <q-dialog v-model="wizardModalOpen" no-backdrop-dismiss>
-        <WizardPicker
-          v-if="wizardModalOpen"
-          :dashboard-id="dashboardId"
-          initial-component="WidgetWizardPicker"
-          @close="wizardModalOpen = false"
-        />
-      </q-dialog>
       <q-list v-if="isMobile" no-border>
         <q-item v-for="val in validatedWidgets" :key="val.id">
           <q-item-section>

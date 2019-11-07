@@ -153,7 +153,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
           <q-item-label caption>
             Service
           </q-item-label>
-          <q-option-group v-model="service" :options="serviceOpts" />
+          <q-option-group v-model="service" :options="serviceOpts" dark />
         </q-item-section>
       </q-item>
       <q-stepper-navigation class="row">

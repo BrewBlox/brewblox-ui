@@ -57,13 +57,14 @@ export default class QuickActionsWizard extends WidgetWizardBase {
           <q-item-label caption>
             Service
           </q-item-label>
-          <q-option-group v-model="service" :options="serviceOpts" />
+          <q-option-group v-model="service" :options="serviceOpts" dark />
         </q-item-section>
       </q-item>
     </q-card-section>
 
-    <q-card-actions class="row justify-between">
+    <q-card-actions align="right">
       <q-btn unelevated label="Back" @click="back" />
+      <q-space />
       <q-btn :disable="!service" unelevated label="Create" color="primary" @click="createWidget" />
     </q-card-actions>
   </div>
