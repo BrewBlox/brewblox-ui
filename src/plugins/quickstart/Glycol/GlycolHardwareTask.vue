@@ -132,12 +132,14 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
             <q-radio
               v-model="heated"
               dark
-              :val="false" label="No"
+              :val="false"
+              label="No"
             />
             <q-radio
               v-model="heated"
               dark
-              :val="true" label="Yes"
+              :val="true"
+              label="Yes"
             />
           </div>
         </q-item-section>
@@ -151,17 +153,20 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
             <q-radio
               v-model="glycolControl"
               dark
-              val="No" label="No"
+              val="No"
+              label="No"
             />
             <q-radio
               v-model="glycolControl"
               dark
-              val="Measure" label="Measure only"
+              val="Measure"
+              label="Measure only"
             />
             <q-radio
               v-model="glycolControl"
               dark
-              val="Control" label="Actively controlled"
+              val="Control"
+              label="Actively controlled"
             />
           </div>
         </q-item-section>

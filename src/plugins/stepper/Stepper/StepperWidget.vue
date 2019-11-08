@@ -8,7 +8,7 @@ import { Unit } from '@/helpers/units';
 
 import { blockTypes } from '../../spark/block-types';
 import { stepperStore } from '../store';
-import { Process, ProcessStep, Runtime } from '../types';
+import { Process, ProcessStep, Runtime, StepperConfig } from '../types';
 
 
 const lipsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -25,7 +25,7 @@ const lipsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 
 @Component
-export default class StepperWidget extends WidgetBase {
+export default class StepperWidget extends WidgetBase<StepperConfig> {
   get processes(): Process[] {
     return stepperStore.processValues;
   }
@@ -80,8 +80,11 @@ export default class StepperWidget extends WidgetBase {
       {
         id: uid(),
         title: 'step-one',
+        enabled: true,
         actions: [
           {
+            id: uid(),
+            enabled: true,
             type: 'BlockPatch',
             opts: {
               block: 'sensor-1',
@@ -93,6 +96,8 @@ export default class StepperWidget extends WidgetBase {
             },
           },
           {
+            id: uid(),
+            enabled: true,
             type: 'BlockPatch',
             opts: {
               block: 'sensor-1',
@@ -106,6 +111,8 @@ export default class StepperWidget extends WidgetBase {
         ],
         conditions: [
           {
+            id: uid(),
+            enabled: true,
             type: 'BlockValue',
             opts: {
               block: 'sensor-1',
@@ -117,12 +124,16 @@ export default class StepperWidget extends WidgetBase {
             },
           },
           {
+            id: uid(),
+            enabled: true,
             type: 'TimeAbsolute',
             opts: {
               time: 1572342354937,
             },
           },
           {
+            id: uid(),
+            enabled: true,
             type: 'TimeElapsed',
             opts: {
               duration: 12345,
@@ -131,10 +142,12 @@ export default class StepperWidget extends WidgetBase {
         ],
         notes: [
           {
+            id: uid(),
             title: 'Important Notification',
             message: lipsum,
           },
           {
+            id: uid(),
             title: 'Important Notification',
             message: lipsum,
           },
@@ -144,8 +157,11 @@ export default class StepperWidget extends WidgetBase {
       {
         id: uid(),
         title: 'step-two',
+        enabled: true,
         actions: [
           {
+            id: uid(),
+            enabled: true,
             type: 'BlockPatch',
             opts: {
               block: 'sensor-1',
@@ -159,6 +175,8 @@ export default class StepperWidget extends WidgetBase {
         ],
         conditions: [
           {
+            id: uid(),
+            enabled: true,
             type: 'BlockValue',
             opts: {
               block: 'sensor-1',
@@ -172,6 +190,7 @@ export default class StepperWidget extends WidgetBase {
         ],
         notes: [
           {
+            id: uid(),
             title: 'Important Notification',
             message: lipsum,
           },

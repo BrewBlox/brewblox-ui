@@ -3,9 +3,11 @@ import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
 
+import { StepperConfig } from '../types';
+
 
 @Component
-export default class StepperWizard extends WidgetWizardBase {
+export default class StepperWizard extends WidgetWizardBase<StepperConfig> {
   createWidget(): void {
     this.createItem({
       id: this.widgetId,

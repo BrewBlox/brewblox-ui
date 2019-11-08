@@ -42,7 +42,7 @@ export default class SparkUnitMenu extends DialogBase {
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
     <q-card dark class="widget-modal">
-      <DialogToolbar @close="onDialogHide">
+      <DialogToolbar>
         <q-item-section>
           <q-item-label>{{ serviceId }}</q-item-label>
           <q-item-label caption>

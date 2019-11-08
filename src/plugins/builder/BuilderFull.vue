@@ -1,17 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
-import draggable from 'vuedraggable';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
 
 import { builderStore } from './store';
 import { BuilderConfig, BuilderLayout } from './types';
 
-@Component({
-  components: {
-    draggable,
-  },
-})
+@Component
 export default class BuilderFull extends CrudComponent<BuilderConfig> {
 
   get layouts(): BuilderLayout[] {

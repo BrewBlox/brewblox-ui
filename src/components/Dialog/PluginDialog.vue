@@ -46,7 +46,7 @@ export default class PluginDialog extends DialogBase {
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss class="row" @hide="onDialogHide">
     <q-card dark class="widget-modal">
-      <DialogToolbar @close="onDialogHide">
+      <DialogToolbar>
         <q-item-section>
           <q-item-label>UI Plugins</q-item-label>
         </q-item-section>

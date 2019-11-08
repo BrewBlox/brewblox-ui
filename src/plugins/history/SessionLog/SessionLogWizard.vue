@@ -9,44 +9,43 @@ import { SessionLogConfig } from './types';
 
 
 @Component
-export default class SessionLogWizard extends WidgetWizardBase {
+export default class SessionLogWizard extends WidgetWizardBase<SessionLogConfig> {
   createWidget(): void {
     const sessionId = uid();
-    const config: SessionLogConfig = {
-      currentSession: sessionId,
-      sessions: [
-        {
-          id: sessionId,
-          title: 'Example session',
-          date: new Date().getTime(),
-          notes: [
-            {
-              id: uid(),
-              title: 'Example note',
-              type: 'Text',
-              value: '',
-              col: 12,
-            },
-            {
-              id: uid(),
-              title: 'Subprocess graph',
-              type: 'Graph',
-              start: null,
-              end: null,
-              config: emptyGraphConfig(),
-              col: 12,
-            },
-          ],
-        },
-      ],
-    };
     this.createItem({
       id: this.widgetId,
       title: this.widgetTitle,
       feature: this.typeId,
       dashboard: this.dashboardId,
       order: 0,
-      config,
+      config: {
+        currentSession: sessionId,
+        sessions: [
+          {
+            id: sessionId,
+            title: 'Example session',
+            date: new Date().getTime(),
+            notes: [
+              {
+                id: uid(),
+                title: 'Example note',
+                type: 'Text',
+                value: '',
+                col: 12,
+              },
+              {
+                id: uid(),
+                title: 'Subprocess graph',
+                type: 'Graph',
+                start: null,
+                end: null,
+                config: emptyGraphConfig(),
+                col: 12,
+              },
+            ],
+          },
+        ],
+      },
       ...this.defaultWidgetSize,
     });
   }

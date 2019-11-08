@@ -88,7 +88,7 @@ export default class ImportWizard extends Vue {
       <q-item dark>
         <q-item-section>
           <q-item-label>Dashboard</q-item-label>
-          <q-option-group v-model="chosenDashboardId" :options="dashboardOptions" />
+          <q-option-group v-model="chosenDashboardId" :options="dashboardOptions" dark />
         </q-item-section>
       </q-item>
       <q-item dark>

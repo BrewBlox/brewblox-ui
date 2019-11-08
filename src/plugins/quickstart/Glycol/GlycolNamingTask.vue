@@ -202,7 +202,8 @@ export default class GlycolNamingTask extends WizardTaskBase<GlycolConfig> {
             </template>
           </QuickStartNameField>
           <QuickStartNameField
-            v-for="(nVal, nKey) in names" :key="nKey"
+            v-for="(nVal, nKey) in names"
+            :key="nKey"
             :value="nVal"
             :label="defaultNames[nKey]"
             :rules="nameRules"

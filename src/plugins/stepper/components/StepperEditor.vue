@@ -1,28 +1,23 @@
 <script lang="ts">
 import { VueConstructor } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import draggable from 'vuedraggable';
 
 import DialogBase from '@/components/Dialog/DialogBase';
+import { createDialog } from '@/helpers/dialog';
 
 import { actionComponents } from '../actions';
 import { conditionComponents } from '../conditions';
 import { stepperStore } from '../store';
-import { Process, ProcessStep, StepAction, StepCondition } from '../types';
+import { Process, ProcessStep, StepAction, StepCondition, StepNote } from '../types';
 
 
-@Component({
-  components: {
-    draggable,
-  },
-})
+interface HasId { id: string };
+
+@Component
 export default class StepperEditor extends DialogBase {
   processId: string | null = null;
   stepId: string | null = null;
-  outerSplitter = 30;
-  innerSplitter = 50;
-  conditionEditMode = false;
-  draggingConditions = false;
+  splitterModel = 20;
 
   @Prop({ type: String })
   public readonly initialProcess!: string;
@@ -54,9 +49,25 @@ export default class StepperEditor extends DialogBase {
     return actionComponents[action.type];
   }
 
-  saveAction(idx: number, action: StepAction): void {
+  saveListProp(coll: HasId[], prop: HasId): void {
+    if (this.process !== null) {
+      const idx = coll.findIndex(p => p.id === prop.id);
+      if (idx >= 0) {
+        this.$set(coll, idx, prop);
+        this.saveProcess(this.process);
+      }
+    }
+  }
+
+  saveAction(action: StepAction): void {
+    if (this.step !== null) {
+      this.saveListProp(this.step.actions, action);
+    }
+  }
+
+  saveAllActions(actions: StepAction[]): void {
     if (this.process !== null && this.step !== null) {
-      this.step.actions[idx] = action;
+      this.step.actions = actions;
       this.saveProcess(this.process);
     }
   }
@@ -65,9 +76,28 @@ export default class StepperEditor extends DialogBase {
     return conditionComponents[condition.type];
   }
 
-  saveCondition(idx: number, condition: StepCondition): void {
+  saveCondition(condition: StepCondition): void {
+    if (this.step !== null) {
+      this.saveListProp(this.step.conditions, condition);
+    }
+  }
+
+  saveAllConditions(conditions: StepCondition[]): void {
     if (this.process !== null && this.step !== null) {
-      this.step.conditions[idx] = condition;
+      this.step.conditions = conditions;
+      this.saveProcess(this.process);
+    }
+  }
+
+  saveNote(note: StepNote): void {
+    if (this.step !== null) {
+      this.saveListProp(this.step.notes, note);
+    }
+  }
+
+  saveAllNotes(notes: StepNote[]): void {
+    if (this.process !== null && this.step !== null) {
+      this.step.notes = notes;
       this.saveProcess(this.process);
     }
   }
@@ -76,24 +106,33 @@ export default class StepperEditor extends DialogBase {
     (copy);
   }
 
-  importProcess(): void {
-
+  startRenameProcess(): void {
+    if (this.process === null) { return; }
+    createDialog({
+      parent: this,
+      title: 'Rename process',
+      message: `Choose a new name for '${this.process.title}'`,
+      dark: true,
+      cancel: true,
+      prompt: {
+        model: this.process.title,
+        type: 'text',
+      },
+    })
+      .onOk(title =>
+        this.process !== null && this.saveProcess({ ...this.process, title }));
   }
 
-  exportProcess(): void {
-
-  }
-
-  renameProcess(): void {
-
-  }
-
-  removeProcess(): void {
-
-  }
-
-  clearSteps(): void {
-
+  startRemoveProcess(): void {
+    if (this.process === null) { return; }
+    createDialog({
+      parent: this,
+      title: 'Remove process',
+      message: `Are you sure you want to remove '${this.process.title}'`,
+      dark: true,
+      cancel: true,
+    })
+      .onOk(() => this.process !== null && stepperStore.removeProcess(this.process));
   }
 
   created(): void {
@@ -139,21 +178,20 @@ export default class StepperEditor extends DialogBase {
               <ActionItem label="New Process" icon="add" @click="startAddProcess(false)" />
               <template v-if="!!process">
                 <ActionItem label="Copy Process" icon="file_copy" @click="startAddProcess(true)" />
-                <ActionItem icon="mdi-file-import" label="Import Process" @click="importProcess" />
-                <ActionItem icon="edit" label="Rename Process" @click="renameProcess" />
-                <ActionItem icon="mdi-file-export" label="Export Process" @click="exportProcess" />
-                <ActionItem icon="delete" label="Remove all Steps" @click="clearSteps" />
-                <ActionItem icon="delete" label="Delete Process" @click="removeProcess" />
+                <!-- <ActionItem icon="mdi-file-import" label="Import Process" @click="importProcess" /> -->
+                <ActionItem icon="edit" label="Rename Process" @click="startRenameProcess" />
+                <!-- <ActionItem icon="mdi-file-export" label="Export Process" @click="exportProcess" /> -->
+                <ActionItem icon="delete" label="Delete Process" @click="startRemoveProcess" />
               </template>
             </q-list>
           </q-btn-dropdown>
         </template>
       </DialogToolbar>
 
-      <q-splitter v-model="outerSplitter" dark class="col">
+      <q-splitter v-model="splitterModel" dark class="col">
         <template #before>
           <q-card-section>
-            <ProcessTower
+            <ProcessIndex
               v-if="!!process"
               :process="process"
               :selected.sync="stepId"
@@ -161,106 +199,76 @@ export default class StepperEditor extends DialogBase {
           </q-card-section>
         </template>
         <template v-if="step" #after>
-          <q-item dark>
-            <q-item-section class="col-auto">
-              <q-btn flat round icon="add">
-                <q-tooltip>Add Action</q-tooltip>
-              </q-btn>
-            </q-item-section>
-            <q-item-section class="text-h5 text-center">
-              <span>Apply <b class="text-info">Actions</b> and then wait for <b class="text-info">Conditions</b></span>
-            </q-item-section>
-            <q-item-section class="col-auto">
-              <q-btn flat round icon="add">
-                <q-tooltip>Add Condition</q-tooltip>
-              </q-btn>
-            </q-item-section>
-          </q-item>
-          <q-splitter v-model="innerSplitter" dark style="border-top: 1px solid gray">
-            <template #before>
-              <q-card-section>
-                <q-list dark class="inner-container">
-                  <div
-                    v-for="(action, idx) in step.actions"
-                    :key="'action-'+idx"
-                    class="row q-mb-md"
-                  >
-                    <div class="col-auto column">
-                      <q-btn flat icon="mdi-dots-vertical">
-                        <q-menu>
-                          <q-list dark bordered>
-                            <ActionItem label="clicky" icon="add" />
-                          </q-list>
-                        </q-menu>
-                      </q-btn>
-                    </div>
+          <div class="column full-height">
+            <split class="col row no-wrap">
+              <!-- Actions -->
+              <split-area>
+                <StepperSectionEditor
+                  :value="step.actions"
+                  label="Actions"
+                  @input="saveAllActions"
+                >
+                  <template #actions="{item}">
+                    <ActionItem label="clicky" icon="add" />
+                  </template>
+                  <template #item="{item}">
                     <component
-                      :is="actionComponent(action)"
-                      :action="action"
+                      :is="actionComponent(item)"
+                      :action="item"
                       class="col"
-                      @update:action="v => saveAction(idx, v)"
+                      @update:action="saveAction"
                     />
-                  </div>
-                </q-list>
-              </q-card-section>
-            </template>
-            <template #after>
-              <q-card-section>
-                <q-list dark class="inner-container">
-                  <draggable
-                    :value="step.conditions"
-                    @input="() => {}"
-                    @start="draggingConditions=true"
-                    @end="draggingConditions=false"
-                  >
-                    <div
-                      v-for="(condition, idx) in step.conditions"
-                      :key="'condition-'+idx"
-                      class="row q-mb-md"
-                    >
-                      <div class="col-auto column">
-                        <q-btn flat icon="mdi-dots-vertical">
-                          <q-menu>
-                            <q-list dark bordered>
-                              <ActionItem label="clicky" icon="add" />
-                            </q-list>
-                          </q-menu>
-                        </q-btn>
-                      </div>
-                      <div>
-                        <component
-                          :is="conditionComponent(condition)"
-                          :condition="condition"
-                          class="col"
-                          @update:condition="v => saveCondition(idx, v)"
-                        />
-                      </div>
-                    </div>
-                  </draggable>
-                </q-list>
-              </q-card-section>
-            </template>
-          </q-splitter>
+                  </template>
+                </StepperSectionEditor>
+              </split-area>
+
+              <!-- Conditions -->
+              <split-area>
+                <StepperSectionEditor
+                  :value="step.conditions"
+                  label="Conditions"
+                  @input="saveAllConditions"
+                >
+                  <template #actions="{item}">
+                    <ActionItem label="clicky" icon="add" />
+                  </template>
+                  <template #item="{item}">
+                    <component
+                      :is="conditionComponent(item)"
+                      :condition="item"
+                      class="col"
+                      @update:condition="saveCondition"
+                    />
+                  </template>
+                </StepperSectionEditor>
+              </split-area>
+
+              <!-- Notes -->
+              <split-area>
+                <StepperSectionEditor
+                  :value="step.notes"
+                  label="Notes"
+                  @input="saveAllNotes"
+                >
+                  <template #actions="{item}">
+                    <ActionItem label="clicky" icon="add" />
+                  </template>
+                  <template #item="{item}">
+                    {{ item.title }}
+                  </template>
+                </StepperSectionEditor>
+              </split-area>
+            </split>
+          </div>
         </template>
       </q-splitter>
     </q-card>
   </q-dialog>
 </template>
 
-<style scoped>
-.inner-container > div:nth-child(odd) {
-  border-left: 2px solid dodgerblue;
-}
-.inner-container > div:nth-child(even) {
-  border-left: 2px solid red;
-}
-.button-bar > * {
-  border-left: 1px solid silver;
-}
-.button-bar > *:nth-child(1) {
-  border-left: none;
-}
-.inner-editable {
-  background-color: rgba(255, 255, 255, 0.18);
+<style>
+.gutter.gutter-horizontal {
+  background: whitesmoke;
+  background-image: none;
 }
 </style>

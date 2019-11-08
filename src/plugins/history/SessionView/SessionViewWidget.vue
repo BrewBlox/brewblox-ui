@@ -18,19 +18,15 @@ import { Session, SessionViewConfig } from './types';
     SessionCreateDialog,
   },
 })
-export default class SessionViewWidget extends WidgetBase {
+export default class SessionViewWidget extends WidgetBase<SessionViewConfig> {
   graphSessionId: string | null = null;
   sessionFilter = '';
 
   @Prop({ default: null })
   readonly initialSession!: Session | null;
 
-  get widgetConfig(): SessionViewConfig {
-    return this.widget.config;
-  }
-
   get sessions(): Session[] {
-    return this.widgetConfig.sessions
+    return this.config.sessions
       .filter(session => !session.hidden)
       .filter(session => session.name.toLowerCase().match(this.sessionFilter.toLowerCase()))
       .sort((left: Session, right: Session) => {
@@ -51,7 +47,7 @@ export default class SessionViewWidget extends WidgetBase {
 
   get graphSession(): Session | null {
     return this.graphSessionId
-      ? this.widgetConfig.sessions.find(session => session.id === this.graphSessionId) || null
+      ? this.config.sessions.find(session => session.id === this.graphSessionId) || null
       : null;
   }
 
@@ -82,8 +78,8 @@ export default class SessionViewWidget extends WidgetBase {
     })
       .onOk(session => {
         this.saveConfig({
-          ...this.widgetConfig,
-          sessions: [...this.widgetConfig.sessions, session],
+          ...this.config,
+          sessions: [...this.config.sessions, session],
         });
         this.showSessionDialog(session);
       });

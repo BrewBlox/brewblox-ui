@@ -40,7 +40,7 @@ export default class RelationsDialog extends DialogBase {
 <template>
   <q-dialog ref="dialog" maximized no-backdrop-dismiss @hide="onDialogHide">
     <q-card dark class="maximized bg-dark-bright column">
-      <DialogToolbar @close="onDialogHide">
+      <DialogToolbar>
         {{ title }}
       </DialogToolbar>
       <div class="col" style="width: 100%">

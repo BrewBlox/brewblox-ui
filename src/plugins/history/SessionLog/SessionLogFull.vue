@@ -1,7 +1,6 @@
 <script lang="ts">
 import { debounce, uid } from 'quasar';
 import { Component } from 'vue-property-decorator';
-import draggable from 'vuedraggable';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
@@ -12,11 +11,7 @@ import { SharedGraphConfig } from '../types';
 import { Session, SessionGraphNote, SessionLogConfig, SessionNote } from './types';
 
 
-@Component({
-  components: {
-    draggable,
-  },
-})
+@Component
 export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
   colSizes = [3, 4, 6, 8, 9, 12];
 

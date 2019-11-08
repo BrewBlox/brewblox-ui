@@ -76,7 +76,7 @@ export default class FirmwareUpdateDialog extends DialogBase {
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
     <q-card dark class="widget-modal">
-      <DialogToolbar @close="onDialogHide">
+      <DialogToolbar>
         <q-item-section>
           <q-item-label>{{ service.id }}</q-item-label>
           <q-item-label caption>

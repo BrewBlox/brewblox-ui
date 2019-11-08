@@ -1,4 +1,5 @@
 import './quasar';
+import './externals';
 
 import PortalVue from 'portal-vue';
 import Vue, { PluginObject } from 'vue';
