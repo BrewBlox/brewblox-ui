@@ -1,15 +1,16 @@
 import { ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features';
 
+import { emptyGraphConfig } from '../getters';
 import { typeName } from './getters';
 import widget from './GraphWidget.vue';
-import wizard from './GraphWizard.vue';
 
 const feature: Feature = {
   id: typeName,
   displayName: 'Graph',
   widgetComponent: ref(widget),
-  wizardComponent: ref(wizard),
+  wizardComponent: 'GenericWidgetWizard',
+  generateConfig: emptyGraphConfig,
   widgetSize: {
     cols: 10,
     rows: 5,

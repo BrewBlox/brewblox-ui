@@ -10,7 +10,7 @@ const feature: Feature = {
   id: typeName,
   displayName: 'Inactive Block',
   widgetComponent: blockWidgetSelector(widget),
-  wizardComponent: undefined,
+  wizardComponent: null,
   widgetSize: {
     cols: 4,
     rows: 2,

@@ -40,8 +40,14 @@ export class FeatureModule extends VuexModule {
     return id => get(this.features, [id, 'role']) || 'Other';
   }
 
-  public get wizard(): (id: string) => string {
-    return id => get(this.features, [id, 'wizardComponent'], '') as string;
+  public get wizard(): (id: string) => string | null {
+    return (id: string): string | null => {
+      const feature = this.features[id];
+      if (feature === undefined) { return null; };
+      return feature.wizardComponent !== undefined
+        ? feature.wizardComponent
+        : 'GenericWidgetWizard';
+    };
   }
 
   public get widget(): (crud: Crud, throwInvalid?: boolean) => string {
@@ -84,6 +90,9 @@ export class FeatureModule extends VuexModule {
 
   @Action({ rawError })
   public async createFeature(feature: Feature): Promise<void> {
+    if (feature.wizardComponent === undefined && feature.generateConfig === undefined) {
+      throw new Error(`Feature ${feature.id} must define a generateConfig function to use the default wizard`);
+    }
     this.commitFeature(feature);
   }
 

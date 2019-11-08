@@ -23,7 +23,7 @@ export default class StoreWidgetDialog extends DialogBase {
 
   get crud(): Crud {
     return {
-      isStoreWidget: false,
+      isStoreWidget: true,
       widget: this.widget,
       saveWidget: dashboardStore.savePersistentWidget,
       closeDialog: () => this.onDialogHide(),
