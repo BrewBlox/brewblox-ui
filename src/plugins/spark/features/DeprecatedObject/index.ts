@@ -10,7 +10,7 @@ const feature: Feature = {
   displayName: 'Deprecated Object',
   role: 'Other',
   widgetComponent: blockWidgetSelector(widget),
-  wizardComponent: undefined,
+  wizardComponent: null,
   widgetSize: {
     cols: 4,
     rows: 2,

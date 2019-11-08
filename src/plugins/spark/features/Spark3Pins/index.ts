@@ -40,7 +40,7 @@ const feature: Feature = {
     rows: 4,
   },
   // Spark3Pins is a static system object, and can't be created or deleted
-  wizardComponent: undefined,
+  wizardComponent: null,
   deleters: undefined,
 };
 

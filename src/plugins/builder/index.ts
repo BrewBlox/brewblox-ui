@@ -3,7 +3,6 @@ import { Feature, featureStore } from '@/store/features';
 
 import BuilderEditor from './BuilderEditor.vue';
 import widget from './BuilderWidget.vue';
-import wizard from './BuilderWizard.vue';
 import { typeName } from './getters';
 import specs from './specs';
 import { builderStore } from './store';
@@ -14,11 +13,14 @@ const feature: Feature = {
   id: typeName,
   displayName: 'Brewery Builder',
   widgetComponent: ref(widget),
-  wizardComponent: ref(wizard),
   widgetSize: {
     cols: 8,
     rows: 8,
   },
+  generateConfig: () => ({
+    currentLayoutId: null,
+    layoutIds: [],
+  }),
 };
 
 // Allows lookups based on the old type ID
@@ -28,6 +30,7 @@ const deprecated: Feature = {
   displayName: 'Process View',
   widgetComponent: 'DeprecatedWidget',
   widgetSize: { cols: 0, rows: 0 },
+  wizardComponent: null,
 };
 
 export default {

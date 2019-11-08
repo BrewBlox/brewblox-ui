@@ -36,6 +36,7 @@ const deprecated: Feature[] = [
     displayName: 'Step View',
     widgetComponent: 'DeprecatedWidget',
     widgetSize: { cols: 0, rows: 0 },
+    wizardComponent: null,
   },
 ];
 

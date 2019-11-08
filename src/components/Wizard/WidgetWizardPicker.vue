@@ -47,7 +47,7 @@ export default class WidgetWizardPicker extends Vue {
         value: id,
         component: featureStore.wizard(id),
       }))
-      .filter(opt => !!opt.component)
+      .filter(opt => opt.component !== null)
       .sort(objectStringSorter('label'));
   }
 

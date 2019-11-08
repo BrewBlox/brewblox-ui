@@ -29,7 +29,7 @@ const feature: Feature = {
     rows: 2,
   },
   // Discovered objects can't be created or deleted
-  wizardComponent: undefined,
+  wizardComponent: null,
   deleters: undefined,
 };
 

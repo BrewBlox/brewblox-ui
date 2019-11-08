@@ -28,7 +28,8 @@ export interface Feature {
     rows: number;
   };
   widgetComponent: string | WidgetSelector;
-  wizardComponent?: string;
+  wizardComponent?: string | null;
+  generateConfig?: () => any;
 }
 
 export interface QuickStart {
