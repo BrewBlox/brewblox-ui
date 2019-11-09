@@ -39,7 +39,7 @@ export default class PidWidget extends BlockWidgetBase {
 <template>
   <GraphCardWrapper :show="inDialog">
     <template #graph>
-      <HistoryGraph :id="widget.id" :config="graphCfg" />
+      <HistoryGraph :graph-id="widget.id" :config="graphCfg" />
     </template>
 
     <component :is="mode" :crud="crud" :class="cardClass">

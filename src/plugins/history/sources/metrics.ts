@@ -2,27 +2,27 @@ import { nanoToMilli } from '@/helpers/functional';
 import { historyStore } from '@/plugins/history/store';
 import {
   DisplayNames,
-  Listener,
+  HistorySource,
+  MetricsResult,
+  MetricsSource,
   QueryParams,
   QueryTarget,
 } from '@/plugins/history/types';
 
-import { MetricsResult } from './types';
-
 const metricsTransformer =
-  (listener: Listener, result: MetricsResult[]): Listener => ({
-    ...listener,
+  (source: HistorySource, result: MetricsResult[]): HistorySource => ({
+    ...source,
     values: result.map(res => {
       return {
         ...res,
-        field: `${listener.target.measurement}/${res.field}`,
+        field: `${source.target.measurement}/${res.field}`,
         time: res.time ? nanoToMilli(res.time) : null,
       };
     }),
   });
 
 
-export const addListener =
+export const addSource =
   async (
     id: string,
     params: QueryParams,
@@ -36,7 +36,7 @@ export const addListener =
     if (filteredTarget.fields.length === 0) {
       return;
     }
-    const listener: Listener = {
+    const source: MetricsSource = {
       id,
       params,
       renames,
@@ -44,5 +44,5 @@ export const addListener =
       target: filteredTarget,
       values: [],
     };
-    await historyStore.addMetricsListener(listener);
+    await historyStore.addMetricsSource(source);
   };

@@ -5,7 +5,7 @@ import { objReducer } from '@/helpers/functional';
 import store from '@/store';
 
 import {
-  Listener,
+  HistorySource,
   LoggedSession,
   QueryParams,
   QueryResult,
@@ -19,7 +19,7 @@ const rawError = true;
 export class HistoryModule extends VuexModule {
   public sessions: Mapped<LoggedSession> = {};
   public fields: Mapped<string[]> = {};
-  public listeners: Mapped<Listener> = {};
+  public sources: Mapped<HistorySource> = {};
 
   public get sessionIds(): string[] {
     return Object.keys(this.sessions);
@@ -33,30 +33,30 @@ export class HistoryModule extends VuexModule {
     return id => this.sessions[id] || null;
   }
 
-  public get listenerIds(): string[] {
-    return Object.keys(this.listeners);
+  public get sourceIds(): string[] {
+    return Object.keys(this.sources);
   }
 
-  public get listenerValues(): Listener[] {
-    return Object.values(this.listeners);
+  public get sourceValues(): HistorySource[] {
+    return Object.values(this.sources);
   }
 
   public get measurements(): string[] {
     return Object.keys(this.fields);
   }
 
-  public get listenerById(): (id: string) => Listener {
+  public get sourceById(): (id: string) => HistorySource {
     return (id: string) => {
-      const listener = this.listeners[id];
-      if (listener === undefined) {
+      const source = this.sources[id];
+      if (source === undefined) {
         throw new Error(`${id} not found in history store`);
       }
-      return listener;
+      return source;
     };
   }
 
-  public get tryListenerById(): (id: string) => Listener | null {
-    return (id: string) => this.listeners[id] || null;
+  public get trySourceById(): (id: string) => HistorySource | null {
+    return (id: string) => this.sources[id] || null;
   }
 
   public get fieldsByMeasurement(): (measurement: string) => string[] {
@@ -79,20 +79,20 @@ export class HistoryModule extends VuexModule {
   }
 
   @Mutation
-  public commitListener(listener: Listener): void {
-    Vue.set(this.listeners, listener.id, listener);
+  public commitSource(source: HistorySource): void {
+    Vue.set(this.sources, source.id, source);
   }
 
   @Mutation
-  public commitRemoveListener(listener: Listener): void {
-    Vue.delete(this.listeners, listener.id);
+  public commitRemoveSource(source: HistorySource): void {
+    Vue.delete(this.sources, source.id);
   }
 
   @Mutation
   public transform({ id, result }: { id: string; result: QueryResult }): void {
-    const listener = this.listeners[id];
-    if (listener !== undefined) {
-      Vue.set(this.listeners, id, { ...listener.transformer(listener, result) });
+    const source = this.sources[id];
+    if (source !== undefined) {
+      Vue.set(this.sources, id, { ...source.transformer(source, result) });
     }
   }
 
@@ -123,40 +123,40 @@ export class HistoryModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async addListener(args: {
-    listener: Listener;
+  public async addSource(args: {
+    source: HistorySource;
     fetcher: (p: QueryParams, t: QueryTarget) => Promise<EventSource>;
   }): Promise<void> {
-    const { listener, fetcher } = args;
-    const { id, params, target } = listener;
+    const { source, fetcher } = args;
+    const { id, params, target } = source;
 
-    this.commitListener(listener);
+    this.commitSource(source);
 
-    const source = await fetcher(params, target);
-    source.onmessage = (event: MessageEvent) =>
+    const events = await fetcher(params, target);
+    events.onmessage = (event: MessageEvent) =>
       this.transform({ id, result: JSON.parse(event.data) });
-    source.onerror = () => source.close();
+    events.onerror = () => events.close();
 
-    this.commitListener({ ...this.listeners[id], id, source });
+    this.commitSource({ ...this.sources[id], id, events });
   }
 
   @Action({ rawError })
-  public async addValuesListener(listener: Listener): Promise<Listener> {
-    await this.addListener({ listener, fetcher: historyApi.subscribeValues });
-    return this.listeners[listener.id];
+  public async addValuesSource(source: HistorySource): Promise<HistorySource> {
+    await this.addSource({ source, fetcher: historyApi.subscribeValues });
+    return this.sources[source.id];
   }
 
   @Action({ rawError })
-  public async addMetricsListener(listener: Listener): Promise<Listener> {
-    await this.addListener({ listener, fetcher: historyApi.subscribeMetrics });
-    return this.listeners[listener.id];
+  public async addMetricsSource(source: HistorySource): Promise<HistorySource> {
+    await this.addSource({ source, fetcher: historyApi.subscribeMetrics });
+    return this.sources[source.id];
   }
 
   @Action({ rawError })
-  public async removeListener(listener: Listener): Promise<void> {
-    this.commitRemoveListener(listener);
-    if (listener.source) {
-      listener.source.close();
+  public async removeSource(source: HistorySource): Promise<void> {
+    this.commitRemoveSource(source);
+    if (source.events) {
+      source.events.close();
     }
   }
 

@@ -12,13 +12,21 @@ import { GraphConfig, QueryParams } from '@/plugins/history/types';
 @Component
 export default class GraphWidget extends WidgetBase<GraphConfig> {
   downsampling: any = {};
-  graphId: string | null = null;
+
+  // Separate IDs for graphs in widget and dialog wrapper
+  // This prevents source create/delete race conditions when switching
+  widgetGraphId: string | null = null;
+  wrapperGraphId: string | null = null;
+
+  @Ref()
+  readonly wrapperGraph!: HistoryGraph;
 
   @Ref()
   readonly widgetGraph!: HistoryGraph;
 
   created(): void {
-    this.graphId = uid();
+    this.widgetGraphId = uid();
+    this.wrapperGraphId = uid();
   }
 
   mounted(): void {
@@ -74,7 +82,10 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
   async regraph(): Promise<void> {
     await this.$nextTick();
     if (this.widgetGraph !== undefined) {
-      this.widgetGraph.resetListeners();
+      this.widgetGraph.resetSources();
+    }
+    if (this.wrapperGraph !== undefined) {
+      this.wrapperGraph.resetSources();
     }
   }
 
@@ -82,6 +93,9 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
     await this.$nextTick();
     if (this.widgetGraph !== undefined) {
       this.widgetGraph.refresh();
+    }
+    if (this.wrapperGraph !== undefined) {
+      this.wrapperGraph.refresh();
     }
   }
 
@@ -109,20 +123,25 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
                   },
                   on: { click: () => this.applyPreset(preset) },
                 },
-                [
-                  h('q-item-section', [preset.duration]),
-                ])),
+                [h('q-item-section', [preset.duration])])),
           ]),
       ]);
   }
 
+  currentGraphId(): string | null {
+    if (this.widgetGraph !== undefined) { return this.widgetGraphId; };
+    if (this.wrapperGraph !== undefined) { return this.wrapperGraphId; };
+    return null;
+  }
+
   showGraphDialog(): void {
+    const currentId = this.currentGraphId();
     createDialog({
       component: 'GraphDialog',
       parent: this,
-      graphId: this.graphId,
+      graphId: currentId || uid(),
       config: { ...this.config, layout: { ...this.config.layout, title: this.widget.title } },
-      sharedListeners: this.widgetGraph !== undefined,
+      sharedSources: currentId !== null,
       renderControls: this.renderControls,
     });
   }
@@ -133,8 +152,8 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
   <GraphCardWrapper show-initial :show="inDialog && mode === 'Full'">
     <template #graph>
       <HistoryGraph
-        :id="graphId"
-        ref="widgetGraph"
+        ref="wrapperGraph"
+        :graph-id="wrapperGraphId"
         :config="config"
         @downsample="v => downsampling = v"
       />
@@ -168,8 +187,8 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
       </component>
       <div class="col">
         <HistoryGraph
-          :id="graphId"
           ref="widgetGraph"
+          :graph-id="widgetGraphId"
           :config="config"
           @downsample="v => downsampling = v"
         />

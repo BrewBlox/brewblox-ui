@@ -18,7 +18,7 @@ export default class GraphDialog extends DialogBase {
   public readonly config!: GraphConfig;
 
   @Prop({ type: Boolean, default: false })
-  public readonly sharedListeners!: boolean;
+  public readonly sharedSources!: boolean;
 
   @Prop({ type: Function, required: false })
   public readonly renderControls!: (h: CreateElement) => VNode;
@@ -37,9 +37,9 @@ export default class GraphDialog extends DialogBase {
             h('HistoryGraph',
               {
                 props: {
-                  id: this.graphId,
+                  graphId: this.graphId,
                   config: this.config,
-                  sharedListeners: this.sharedListeners,
+                  sharedSources: this.sharedSources,
                 },
                 scopedSlots: {
                   controls: () => [
