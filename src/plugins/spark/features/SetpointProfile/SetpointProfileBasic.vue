@@ -2,6 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+
 import { SetpointProfileBlock } from './types';
 
 @Component
