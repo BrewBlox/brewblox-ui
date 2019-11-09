@@ -3,10 +3,9 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { defaultLabel } from '@/plugins/history/nodes';
-import { DisplayNames, GraphValueAxes } from '@/store/history';
 
 import { targetSplitter } from '../nodes';
-import { GraphConfig } from '../types';
+import { DisplayNames, GraphConfig, GraphValueAxes } from '../types';
 
 
 @Component

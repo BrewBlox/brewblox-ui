@@ -6,6 +6,7 @@ import widget from './BuilderWidget.vue';
 import { typeName } from './getters';
 import specs from './specs';
 import { builderStore } from './store';
+import { BuilderConfig } from './types';
 
 ref(BuilderEditor);
 
@@ -17,7 +18,7 @@ const feature: Feature = {
     cols: 8,
     rows: 8,
   },
-  generateConfig: () => ({
+  generateConfig: (): BuilderConfig => ({
     currentLayoutId: null,
     layoutIds: [],
   }),

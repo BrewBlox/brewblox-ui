@@ -8,9 +8,12 @@ import { createDialog } from '@/helpers/dialog';
 import { saveFile } from '@/helpers/import-export';
 import { deepCopy } from '@/helpers/units/parseObject';
 
+import { emptyGraphConfig } from '../getters';
+import { historyStore } from '../store';
+import { LoggedSession, SessionNote } from '../types';
 import SessionLogBasic from './SessionLogBasic.vue';
 import SessionLogFull from './SessionLogFull.vue';
-import { Session, SessionLogConfig, SessionNote } from './types';
+import { SessionLogConfig } from './types';
 
 
 @Component({
@@ -21,38 +24,67 @@ import { Session, SessionLogConfig, SessionNote } from './types';
 })
 export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
 
-  get session(): Session | null {
-    return this.config.sessions.find(s => s.id === this.config.currentSession) || null;
+  get sessions(): LoggedSession[] {
+    return historyStore.sessionValues;
+  }
+
+  get session(): LoggedSession | null {
+    return this.config.currentSession === null
+      ? null
+      : historyStore.sessionById(this.config.currentSession);
   }
 
   get notes(): SessionNote[] {
     return this.session ? this.session.notes : [];
   }
 
-  addSession(): void {
+  exampleNotes(): SessionNote[] {
+    return [
+      {
+        id: uid(),
+        title: 'Example note',
+        type: 'Text',
+        value: '',
+        col: 12,
+      },
+      {
+        id: uid(),
+        title: 'Subprocess graph',
+        type: 'Graph',
+        start: null,
+        end: null,
+        config: emptyGraphConfig(),
+        col: 12,
+      },
+    ];
+  }
+
+  async addSession(): Promise<void> {
     const id = uid();
-    this.config.sessions.push({
+    await historyStore.createSession({
       id,
       title: 'New Session',
       date: new Date().getTime(),
-      notes: this.notes.map(note => {
-        const copy = deepCopy(note);
-        copy.id = uid();
-        if (note.type === 'Text') {
-          return { ...copy, value: '' };
-        }
-        if (note.type === 'Graph') {
-          return { ...copy, start: null, end: null };
-        }
-        return copy;
-      }),
+      notes: this.session === null
+        ? this.exampleNotes()
+        : this.notes.map(note => {
+          const copy = deepCopy(note);
+          copy.id = uid();
+          if (note.type === 'Text') {
+            return { ...copy, value: '' };
+          }
+          if (note.type === 'Graph') {
+            return { ...copy, start: null, end: null };
+          }
+          return copy;
+        }),
     });
     this.config.currentSession = id;
     this.saveConfig();
   }
 
-  selectSession(id: string): void {
-    this.config.currentSession = id;
+  selectSession(session: LoggedSession): void {
+    this.config.currentSession = session.id;
     this.saveConfig();
   }
 
@@ -99,7 +131,6 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
   startRemoveSession(): void {
     if (this.session === null) { return; }
     const session = this.session;
-
     createDialog({
       title: 'Remove session',
       message: `Do you want remove session '${session.title}'?`,
@@ -107,11 +138,11 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
       cancel: true,
     })
       .onOk(() => {
-        this.config.sessions = this.config.sessions.filter(s => s.id !== session.id);
-        this.config.currentSession = this.config.sessions.length
-          ? this.config.sessions[0].id
+        this.config.currentSession = this.sessions.length
+          ? this.sessions[0].id
           : null;
         this.saveConfig();
+        historyStore.removeSession(session);
       });
   }
 }
@@ -122,6 +153,7 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
     :is="mode"
     :crud="crud"
     :class="cardClass"
+    @add="addSession"
   >
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
@@ -133,11 +165,11 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
           <q-expansion-item label="Sessions">
             <q-list dark>
               <ActionItem
-                v-for="session in config.sessions"
+                v-for="session in sessions"
                 :key="session.id"
                 :label="`${session.title} (${new Date(session.date).toLocaleDateString()})`"
                 :item-props="{insetLevel: 0.2}"
-                @click="selectSession"
+                @click="selectSession(session)"
               />
             </q-list>
           </q-expansion-item>

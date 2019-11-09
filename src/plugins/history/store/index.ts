@@ -1,18 +1,37 @@
 import Vue from 'vue';
 import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
+import { objReducer } from '@/helpers/functional';
 import store from '@/store';
 
-import * as api from './api';
-import { Listener, QueryParams, QueryResult, QueryTarget } from './types';
-export * from './types';
+import {
+  Listener,
+  LoggedSession,
+  QueryParams,
+  QueryResult,
+  QueryTarget,
+} from '../types';
+import { historyApi, sessionApi } from './api';
 
 const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'history' })
 export class HistoryModule extends VuexModule {
+  public sessions: Mapped<LoggedSession> = {};
   public fields: Mapped<string[]> = {};
   public listeners: Mapped<Listener> = {};
+
+  public get sessionIds(): string[] {
+    return Object.keys(this.sessions);
+  }
+
+  public get sessionValues(): LoggedSession[] {
+    return Object.values(this.sessions);
+  }
+
+  public get sessionById(): (id: string) => LoggedSession | null {
+    return id => this.sessions[id] || null;
+  }
 
   public get listenerIds(): string[] {
     return Object.keys(this.listeners);
@@ -45,6 +64,21 @@ export class HistoryModule extends VuexModule {
   }
 
   @Mutation
+  public commitSession(session: LoggedSession): void {
+    Vue.set(this.sessions, session.id, session);
+  }
+
+  @Mutation
+  public commitAllSessions(sessions: LoggedSession[]): void {
+    this.sessions = sessions.reduce(objReducer('id'), {});
+  }
+
+  @Mutation
+  public commitRemoveSession(session: LoggedSession): void {
+    Vue.delete(this.sessions, session.id);
+  }
+
+  @Mutation
   public commitListener(listener: Listener): void {
     Vue.set(this.listeners, listener.id, listener);
   }
@@ -68,6 +102,27 @@ export class HistoryModule extends VuexModule {
   }
 
   @Action({ rawError })
+  public async fetchSessions(): Promise<void> {
+    this.commitAllSessions(await sessionApi.fetch());
+  }
+
+  @Action({ rawError })
+  public async createSession(session: LoggedSession): Promise<void> {
+    this.commitSession(await sessionApi.create(session));
+  }
+
+  @Action({ rawError })
+  public async saveSession(session: LoggedSession): Promise<void> {
+    this.commitSession(await sessionApi.persist(session));
+  }
+
+  @Action({ rawError })
+  public async removeSession(session: LoggedSession): Promise<void> {
+    await sessionApi.remove(session);
+    this.commitRemoveSession(session);
+  }
+
+  @Action({ rawError })
   public async addListener(args: {
     listener: Listener;
     fetcher: (p: QueryParams, t: QueryTarget) => Promise<EventSource>;
@@ -87,13 +142,13 @@ export class HistoryModule extends VuexModule {
 
   @Action({ rawError })
   public async addValuesListener(listener: Listener): Promise<Listener> {
-    await this.addListener({ listener, fetcher: api.subscribeValues });
+    await this.addListener({ listener, fetcher: historyApi.subscribeValues });
     return this.listeners[listener.id];
   }
 
   @Action({ rawError })
   public async addMetricsListener(listener: Listener): Promise<Listener> {
-    await this.addListener({ listener, fetcher: api.subscribeMetrics });
+    await this.addListener({ listener, fetcher: historyApi.subscribeMetrics });
     return this.listeners[listener.id];
   }
 
@@ -107,17 +162,36 @@ export class HistoryModule extends VuexModule {
 
   @Action({ rawError })
   public async fetchKnownKeys(): Promise<void> {
-    this.commitAllFields(await api.fetchKnownKeys());
+    this.commitAllFields(await historyApi.fetchKnownKeys());
   }
 
   @Action({ rawError })
   public async fetchValues([params, target]: [QueryParams, QueryTarget]): Promise<QueryResult> {
-    return await api.fetchValues(params, target);
+    return await historyApi.fetchValues(params, target);
   }
 
   @Action({ rawError })
   public async validateService(): Promise<boolean> {
-    return await api.validateService();
+    return await historyApi.validateService();
+  }
+
+  @Action({ rawError })
+  public async setup(): Promise<void> {
+    const onChange = (session: LoggedSession): void => {
+      const existing = this.sessionById(session.id);
+      if (!existing || existing._rev !== session._rev) {
+        this.commitSession(session);
+      }
+    };
+    const onDelete = (id: string): void => {
+      const existing = this.sessionById(id);
+      if (existing) {
+        this.commitRemoveSession(existing);
+      }
+    };
+
+    this.commitAllSessions(await sessionApi.fetch());
+    sessionApi.setup(onChange, onDelete);
   }
 }
 

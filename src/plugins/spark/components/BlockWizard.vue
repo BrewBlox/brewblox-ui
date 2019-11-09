@@ -163,10 +163,11 @@ export default class BlockWizard extends Vue {
             :options="filteredOptions"
             :rules="[v => !!v || 'You must select a block type']"
             :disable="!!initialFeature"
+            label="Block Type"
             dark
             use-input
             options-dark
-            label="Block Type"
+            autofocus
             @filter="filterFn"
             @change="block = null; widget = null;"
           >

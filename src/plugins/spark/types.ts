@@ -1,6 +1,6 @@
+import { GraphValueAxes, QueryParams } from '@/plugins/history/types';
 import { PersistentWidget } from '@/store/dashboards';
 import { Crud, Feature } from '@/store/features';
-import { GraphValueAxes, QueryParams } from '@/store/history';
 import { Service } from '@/store/services';
 
 export interface ChangeField {

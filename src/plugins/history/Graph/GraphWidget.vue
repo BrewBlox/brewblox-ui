@@ -7,8 +7,7 @@ import WidgetBase from '@/components/Widget/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
-import { GraphConfig } from '@/plugins/history/types';
-import { QueryParams } from '@/store/history';
+import { GraphConfig, QueryParams } from '@/plugins/history/types';
 
 @Component
 export default class GraphWidget extends WidgetBase<GraphConfig> {

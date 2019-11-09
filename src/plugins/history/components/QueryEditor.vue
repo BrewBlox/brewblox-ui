@@ -12,7 +12,8 @@ import {
   targetBuilder,
   targetSplitter,
 } from '@/plugins/history/nodes';
-import { historyStore, QueryConfig } from '@/store/history';
+import { historyStore } from '@/plugins/history/store';
+import { QueryConfig } from '@/plugins/history/types';
 
 
 @Component

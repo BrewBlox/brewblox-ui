@@ -6,16 +6,16 @@ import { Component, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { defaultPresets } from '@/plugins/history/getters';
-import { GraphConfig } from '@/plugins/history/types';
+import { historyStore } from '@/plugins/history/store';
 import {
   DisplayNames,
+  GraphConfig,
   GraphValueAxes,
   GraphValuesListener,
-  historyStore,
   LineColors,
   QueryParams,
   QueryTarget,
-} from '@/store/history';
+} from '@/plugins/history/types';
 
 import { addPlotlyListener } from './listener';
 

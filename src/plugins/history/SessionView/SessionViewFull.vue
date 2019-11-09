@@ -7,9 +7,9 @@ import { createDialog } from '@/helpers/dialog';
 import { objectSorter } from '@/helpers/functional';
 import { durationString } from '@/helpers/functional';
 import { targetBuilder, targetSplitter } from '@/plugins/history/nodes';
-import { DisplayNames } from '@/store/history';
 
 import { sharedWidgetConfigs } from '../helpers';
+import { DisplayNames } from '../types';
 import { Session, SessionViewConfig } from './types';
 
 @Component

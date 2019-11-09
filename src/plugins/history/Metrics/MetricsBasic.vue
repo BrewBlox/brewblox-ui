@@ -6,7 +6,8 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/Widget/CrudComponent';
 import { durationString } from '@/helpers/functional';
-import { DisplayNames, historyStore, Listener, QueryParams, QueryTarget } from '@/store/history';
+import { historyStore } from '@/plugins/history/store';
+import { DisplayNames, Listener, QueryParams, QueryTarget } from '@/plugins/history/types';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './getters';
 import { addListener } from './listener';

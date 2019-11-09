@@ -5,7 +5,8 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { durationMs, durationString } from '@/helpers/functional';
-import { QueryConfig, QueryParams } from '@/store/history';
+
+import { QueryConfig, QueryParams } from '../types';
 
 interface PeriodDisplay {
   start: boolean;

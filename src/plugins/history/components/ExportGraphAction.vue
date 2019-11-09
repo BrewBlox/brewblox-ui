@@ -3,8 +3,8 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { saveFile } from '@/helpers/import-export';
-import { GraphConfig } from '@/plugins/history/types';
-import { historyStore, QueryParams, QueryTarget } from '@/store/history';
+import { historyStore } from '@/plugins/history/store';
+import { GraphConfig, QueryParams, QueryTarget } from '@/plugins/history/types';
 
 @Component
 export default class ExportGraphAction extends Vue {

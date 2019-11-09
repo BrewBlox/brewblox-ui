@@ -1,4 +1,4 @@
-import { QueryConfig } from '@/store/history';
+import { QueryConfig } from '@/plugins/history/types';
 
 export interface MetricsResult {
   field: string;

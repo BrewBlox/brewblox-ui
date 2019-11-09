@@ -3,12 +3,9 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/Dialog/DialogBase';
 
-import { SessionGraphNote } from './types';
+import { SessionGraphNote } from '../types';
 
-interface NoteDates {
-  start: SessionGraphNote['start'];
-  end: SessionGraphNote['end'];
-}
+type NoteDates = Pick<SessionGraphNote, 'start' | 'end'>;
 
 @Component
 export default class SessionGraphNoteDialog extends DialogBase {
