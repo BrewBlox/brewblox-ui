@@ -6,11 +6,7 @@ import { WidgetMode } from '@/store/features';
 
 import { deserialize } from './units/parseObject';
 
-export interface DialogOptions extends QDialogOptions {
-  [prop: string]: any;
-}
-
-export function createDialog(opts: DialogOptions): DialogChainObject {
+export function createDialog(opts: QDialogOptions & { [prop: string]: any }): DialogChainObject {
   return Dialog.create(opts);
 }
 

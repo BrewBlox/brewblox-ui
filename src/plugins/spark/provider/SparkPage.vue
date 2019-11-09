@@ -550,7 +550,7 @@ export default class SparkPage extends Vue {
 
         <!-- Widget List -->
         <q-scroll-area class="col-auto q-ml-xl" style="min-width: 500px; max-width: 500px">
-          <q-list dark no-border>
+          <q-list dark>
             <!-- Service -->
             <q-item v-if="serviceShown && serviceExpanded" ref="widget-spark-service" dark>
               <q-item-section>
