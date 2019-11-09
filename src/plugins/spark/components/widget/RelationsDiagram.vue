@@ -167,7 +167,7 @@ export default class RelationsDiagram extends Vue {
   }
 
   openSettings(id: string): void {
-    showBlockDialog(sparkStore.blocks(this.serviceId)[id]);
+    showBlockDialog(sparkStore.blocks(this.serviceId)[id], { mode: 'Basic' });
   }
 }
 </script>
