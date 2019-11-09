@@ -1,6 +1,4 @@
-import { QueryParams } from '@/store/history';
-
-import { GraphConfig } from './types';
+import { GraphConfig, QueryParams } from './types';
 
 export const defaultPresets = (): QueryParams[] => [
   { duration: '10m' },

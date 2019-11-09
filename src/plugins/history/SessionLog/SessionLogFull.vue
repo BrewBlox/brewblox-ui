@@ -7,17 +7,19 @@ import { createDialog } from '@/helpers/dialog';
 
 import { emptyGraphConfig } from '../getters';
 import { sharedWidgetConfigs } from '../helpers';
-import { SharedGraphConfig } from '../types';
-import { Session, SessionGraphNote, SessionLogConfig, SessionNote } from './types';
+import { historyStore } from '../store';
+import { LoggedSession, SessionGraphNote, SessionNote, SharedGraphConfig } from '../types';
+import { SessionLogConfig } from './types';
 
 
 @Component
 export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
   colSizes = [3, 4, 6, 8, 9, 12];
 
-  get session(): Session | null {
-    return this.widget.config.sessions
-      .find(s => s.id === this.widget.config.currentSession) || null;
+  get session(): LoggedSession | null {
+    return this.config.currentSession === null
+      ? null
+      : historyStore.sessionById(this.config.currentSession);
   }
 
   get notes(): SessionNote[] {
@@ -144,6 +146,10 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
         }
       });
   }
+
+  addSession(): void {
+    this.$emit('add');
+  }
 }
 </script>
 
@@ -154,9 +160,9 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
     <slot name="warnings" />
     <slot name="graph" />
 
-    <q-card-section>
+    <q-card-section v-if="session !== null">
       <q-list dark>
-        <q-item v-if="!!session" dark>
+        <q-item dark>
           <q-item-section class="col-auto">
             <InputField
               :value="session.title"
@@ -239,6 +245,12 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
           </q-item-section>
         </q-item>
       </q-list>
+    </q-card-section>
+
+    <q-card-section v-else class="column justify-end" style="height: 40%">
+      <div class="col-auto row justify-center">
+        <q-btn outline label="New session" @click="addSession" />
+      </div>
     </q-card-section>
   </q-card>
 </template>

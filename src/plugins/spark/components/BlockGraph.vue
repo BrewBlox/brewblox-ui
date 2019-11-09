@@ -8,8 +8,7 @@ import { durationString } from '@/helpers/functional';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { targetSplitter } from '@/plugins/history/nodes';
-import { GraphConfig } from '@/plugins/history/types';
-import { QueryParams } from '@/store/history';
+import { GraphConfig, QueryParams } from '@/plugins/history/types';
 
 @Component
 export default class BlockGraph extends Vue {

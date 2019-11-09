@@ -138,15 +138,11 @@ export default class DefaultLayout extends Vue {
   </q-layout>
 </template>
 
-<style lang="stylus" scoped>
-@import '../styles/quasar.variables.styl';
-@import '../styles/quasar.styl';
-
+<style scoped>
 .bottomed {
   bottom: 0;
   position: absolute;
 }
-
 .q-layout {
   overflow-x: auto;
 }

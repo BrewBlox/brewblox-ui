@@ -1,6 +1,7 @@
 import { ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features';
 
+import { StepperConfig } from '../types';
 import widget from './StepperWidget.vue';
 
 
@@ -12,7 +13,7 @@ const feature: Feature = {
     cols: 4,
     rows: 2,
   },
-  generateConfig: () => ({}),
+  generateConfig: (): StepperConfig => ({}),
 };
 
 export default { feature };

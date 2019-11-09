@@ -5,9 +5,11 @@ import CrudComponent from '@/components/Widget/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { shortDateString } from '@/helpers/functional';
 
+import { historyStore } from '../store';
+import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
 import SessionGraphNoteDialog from './SessionGraphNoteDialog.vue';
 import SessionTextNoteDialog from './SessionTextNoteDialog.vue';
-import { Session, SessionGraphNote, SessionLogConfig, SessionNote } from './types';
+import { SessionLogConfig } from './types';
 
 
 @Component({
@@ -19,8 +21,10 @@ import { Session, SessionGraphNote, SessionLogConfig, SessionNote } from './type
 export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
   shortDateString = shortDateString;
 
-  get session(): Session | null {
-    return this.widget.config.sessions.find(s => s.id === this.widget.config.currentSession) || null;
+  get session(): LoggedSession | null {
+    return this.config.currentSession === null
+      ? null
+      : historyStore.sessionById(this.config.currentSession);
   }
 
   get notes(): SessionNote[] {
@@ -93,6 +97,10 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
         }
       });
   }
+
+  addSession(): void {
+    this.$emit('add');
+  }
 }
 </script>
 
@@ -103,8 +111,8 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
     <slot name="warnings" />
     <slot name="graph" />
 
-    <q-card-section>
-      <q-item v-if="!!session" dark dense>
+    <q-card-section v-if="session !== null">
+      <q-item dark dense>
         <q-item-section class="col-auto text-grey-2">
           <span class="text-italic">{{ session.title }}</span>
           <span>{{ new Date(session.date).toLocaleString() }}</span>
@@ -158,6 +166,12 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
             </q-btn>
           </template>
         </q-item>
+      </div>
+    </q-card-section>
+
+    <q-card-section v-else class="column justify-end" style="height: 40%">
+      <div class="col-auto row justify-center">
+        <q-btn outline label="New session" @click="addSession" />
       </div>
     </q-card-section>
   </q-card>

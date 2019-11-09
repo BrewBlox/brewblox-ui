@@ -5,7 +5,9 @@ import { } from 'quasar';
 import { sentenceCased } from '@/helpers/functional';
 import { prettify } from '@/helpers/units';
 import { propertyNameWithUnit } from '@/helpers/units/parseObject';
-import { historyStore, QueryTarget } from '@/store/history';
+
+import { historyStore } from './store';
+import { QueryTarget } from './types';
 
 export interface QuasarNode {
   label: string;

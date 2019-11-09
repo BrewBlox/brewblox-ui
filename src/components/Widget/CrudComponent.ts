@@ -24,6 +24,10 @@ export default class CrudComponent<ConfigT = any> extends Vue {
     return this.crud.widget;
   }
 
+  public get config(): ConfigT {
+    return this.widget.config;
+  }
+
   public get isStoreWidget(): boolean {
     return this.crud.isStoreWidget;
   }
@@ -56,7 +60,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
     await this.crud.saveWidget(widget);
   }
 
-  public async saveConfig(config: ConfigT = this.widget.config): Promise<void> {
+  public async saveConfig(config: ConfigT = this.config): Promise<void> {
     await this.saveWidget({ ...this.widget, config });
   }
 

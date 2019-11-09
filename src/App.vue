@@ -2,11 +2,11 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
+import { historyStore } from '@/plugins/history/store';
 import { sparkStore } from '@/plugins/spark/store';
+import { stepperStore } from '@/plugins/stepper/store';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
-
-import { stepperStore } from './plugins/stepper/store';
 
 @Component
 export default class App extends Vue {
@@ -14,6 +14,7 @@ export default class App extends Vue {
     await Promise.all([
       serviceStore.setup(),
       dashboardStore.setup(),
+      historyStore.setup(),
       sparkStore.setup(),
       stepperStore.setup(),
     ]);
@@ -30,4 +31,5 @@ export default class App extends Vue {
 <style lang="stylus">
 // We import global styling here
 @import './styles/quasar.styl';
+@import './styles/quasar.variables.styl';
 </style>

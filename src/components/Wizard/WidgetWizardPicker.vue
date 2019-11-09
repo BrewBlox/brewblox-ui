@@ -117,10 +117,11 @@ export default class WidgetWizardPicker extends Vue {
               v-model="feature"
               :options="filteredOptions"
               :rules="[v => !!v || 'You must select a widget type']"
+              label="Widget Type"
               dark
               use-input
               options-dark
-              label="Widget Type"
+              autofocus
               @filter="filterFn"
             >
               <template #no-option>
