@@ -2,7 +2,7 @@
 import { debounce, uid } from 'quasar';
 import { Component, Watch } from 'vue-property-decorator';
 
-import CrudComponent from '@/components/Widget/CrudComponent';
+import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 
 import { calculateNormalizedFlows } from './calculateFlows';

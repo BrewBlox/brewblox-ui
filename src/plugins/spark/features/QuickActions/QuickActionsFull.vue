@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
-import CrudComponent from '@/components/Widget/CrudComponent';
+import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { mutate } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/units/parseObject';

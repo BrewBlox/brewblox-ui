@@ -1,3 +1,4 @@
+import { Link, Unit } from '@/helpers/units';
 import { GraphValueAxes, QueryParams } from '@/plugins/history/types';
 import { PersistentWidget } from '@/store/dashboards';
 import { Crud, Feature } from '@/store/features';
@@ -141,4 +142,26 @@ export interface IoChannel {
 
 export interface IoPin {
   [key: string]: IoChannel;
+}
+
+export interface AnalogConstraint {
+  limiting: boolean;
+  min?: number;
+  max?: number;
+  balanced?: {
+    balancerId: Link;
+    granted: number;
+    id: number;
+  };
+}
+
+export interface DigitalConstraint {
+  limiting: boolean;
+  minOn?: Unit;
+  minOff?: Unit;
+  mutex?: Link; // Mutex
+}
+
+export interface ConstraintsObj {
+  constraints: AnalogConstraint[] | DigitalConstraint[];
 }

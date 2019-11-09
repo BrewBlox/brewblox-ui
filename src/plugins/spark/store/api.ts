@@ -1,3 +1,4 @@
+import pick from 'lodash/pick';
 import { Notify } from 'quasar';
 
 import { del, get, post, put, sse } from '@/helpers/fetch';
@@ -5,26 +6,22 @@ import { deserialize } from '@/helpers/units/parseObject';
 
 import { Block, DataBlock, SystemStatus, UnitAlternatives, UserUnits } from '../types';
 
+const asDataBlock =
+  (block: Block): DataBlock => pick(block, ['id', 'nid', 'type', 'groups', 'data']);
 
-const asDataBlock = (block: Block): DataBlock =>
-  ({
-    id: block.id,
-    type: block.type,
-    groups: block.groups,
-    data: block.data,
-  });
+const asBlock =
+  (block: DataBlock, serviceId: string): Block => ({ ...block, serviceId });
 
-const asBlock = (block: DataBlock, serviceId: string): Block => ({ ...block, serviceId });
-
-const intercept = (message: string): (e: Error) => never =>
-  (e: Error) => {
-    Notify.create({
-      color: 'warning',
-      icon: 'warning',
-      message: `${message}: ${e.message}`,
-    });
-    throw e;
-  };
+const intercept =
+  (message: string): ((e: Error) => never) =>
+    (e: Error) => {
+      Notify.create({
+        color: 'warning',
+        icon: 'warning',
+        message: `${message}: ${e.message}`,
+      });
+      throw e;
+    };
 
 export const fetchBlocks = async (serviceId: string): Promise<Block[]> =>
   get(`/${encodeURIComponent(serviceId)}/objects`)
@@ -111,7 +108,7 @@ export const fetchUpdateSource = async (
   onData: (blocks: Block[]) => void,
   onClose: () => void,
 ): Promise<EventSource> => {
-  const source = await sse(`/${encodeURIComponent(serviceId)}/sse/objects`);
+  const source = sse(`/${encodeURIComponent(serviceId)}/sse/objects`);
   source.onerror = () => {
     source.close();
     onClose();

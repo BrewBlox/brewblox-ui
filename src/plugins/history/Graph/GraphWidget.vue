@@ -3,7 +3,7 @@ import { uid } from 'quasar';
 import { CreateElement, VNode } from 'vue';
 import { Component, Ref } from 'vue-property-decorator';
 
-import WidgetBase from '@/components/Widget/WidgetBase';
+import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';

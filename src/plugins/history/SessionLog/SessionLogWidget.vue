@@ -3,7 +3,7 @@ import marked from 'marked';
 import { uid } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
-import WidgetBase from '@/components/Widget/WidgetBase';
+import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { saveFile } from '@/helpers/import-export';
 import { deepCopy } from '@/helpers/units/parseObject';

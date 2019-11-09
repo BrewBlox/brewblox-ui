@@ -1,6 +1,5 @@
 import { Link } from '@/helpers/units';
-import { ConstraintsObj } from '@/plugins/spark/components/Constraints/ConstraintsBase';
-import { Block, DigitalState } from '@/plugins/spark/types';
+import { Block, ConstraintsObj, DigitalState } from '@/plugins/spark/types';
 
 export interface DigitalActuatorData {
   hwDevice: Link;

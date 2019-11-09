@@ -2,11 +2,11 @@
 import { uid } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
-import WidgetBase from '@/components/Widget/WidgetBase';
+import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { Unit } from '@/helpers/units';
+import { blockTypes } from '@/plugins/spark/block-types';
 
-import { blockTypes } from '../../spark/block-types';
 import { stepperStore } from '../store';
 import { Process, ProcessStep, Runtime, StepperConfig } from '../types';
 

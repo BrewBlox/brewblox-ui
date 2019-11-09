@@ -1,7 +1,7 @@
 import { ref } from '@/helpers/component-ref';
 import { Link } from '@/helpers/units';
 import { interfaceTypes } from '@/plugins/spark/block-types';
-import GenericBlock from '@/plugins/spark/components/GenericBlock';
+import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
 import { Feature } from '@/store/features';
@@ -63,7 +63,7 @@ ref(ProfilePresetAction);
 ref(ProfilePresetDialog);
 
 const feature: Feature = {
-  ...GenericBlock,
+  ...genericBlockFeature,
   id: typeName,
   displayName: 'Setpoint Profile',
   role: 'Process',

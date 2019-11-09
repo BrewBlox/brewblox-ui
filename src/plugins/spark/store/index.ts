@@ -8,7 +8,7 @@ import store from '@/store';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 
-import { GroupsBlock } from '../provider/types';
+import { GroupsBlock } from '../block-types';
 import {
   Block,
   BlockSpec,

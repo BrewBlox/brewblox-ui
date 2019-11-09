@@ -1,10 +1,10 @@
 import { Link } from '@/helpers/units';
-import GenericBlock from '@/plugins/spark/components/GenericBlock';
+import { interfaceTypes } from '@/plugins/spark/block-types';
+import { genericBlockFeature } from '@/plugins/spark/generic';
+import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { BlockSpec } from '@/plugins/spark/types';
 import { Feature } from '@/store/features';
 
-import { interfaceTypes } from '../../block-types';
-import { blockWidgetSelector } from '../../helpers';
-import { BlockSpec } from '../../types';
 import widget from './ActuatorOffsetWidget.vue';
 import { typeName } from './getters';
 import { ActuatorOffsetData, OffsetSettingOrValue } from './types';
@@ -56,7 +56,7 @@ const block: BlockSpec = {
 };
 
 const feature: Feature = {
-  ...GenericBlock,
+  ...genericBlockFeature,
   id: typeName,
   displayName: 'Setpoint Driver',
   role: 'Output',

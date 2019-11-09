@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component, Prop, Ref } from 'vue-property-decorator';
 
-import DialogBase from '@/components/Dialog/DialogBase';
+import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 
 @Component
