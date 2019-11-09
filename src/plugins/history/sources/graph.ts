@@ -5,8 +5,8 @@ import { nanoToMilli } from '@/helpers/functional';
 import { historyStore } from '@/plugins/history/store';
 import {
   DisplayNames,
+  GraphSource,
   GraphValueAxes,
-  GraphValuesListener,
   LineColors,
   QueryParams,
   QueryResult,
@@ -24,24 +24,27 @@ const boundedConcat =
       return right.slice(sliced - left.length);
     }
     if (sliced > 0) {
-      return [...left.slice(sliced), ...right];
+      const result = left.slice(sliced);
+      result.push(...right);
+      return result;
     }
     return [...left, ...right];
   };
 
 const valueName =
-  (listener: GraphValuesListener, key: string): string => {
-    return listener.axes[key] === 'y2'
-      ? `<span style="color: #aef">${listener.renames[key] || key}</span>`
-      : `<span>${listener.renames[key] || key}</span>`;
+  (source: GraphSource, key: string): string => {
+    const label = source.renames[key] || key;
+    return source.axes[key] === 'y2'
+      ? `<span style="color: #aef">${label}</span>`
+      : `<span>${label}</span>`;
   };
 
-const valuesTransformer =
-  (listener: GraphValuesListener, result: QueryResult): GraphValuesListener => {
+const transformer =
+  (source: GraphSource, result: QueryResult): GraphSource => {
     if (result.values && result.values.length > 0) {
       const resultCols = transpose(result.values);
       const time = resultCols[0].map(nanoToMilli);
-      listener.usedPolicy = result.policy;
+      source.usedPolicy = result.policy;
 
       result
         .columns
@@ -50,26 +53,26 @@ const valuesTransformer =
             return; // skip time
           }
           const key = `${result.name}/${col}`;
-          const value = listener.values[key] || {};
-          listener.values[key] = {
+          const value = source.values[key] || {};
+          source.values[key] = {
             type: 'scatter',
             ...value,
-            name: valueName(listener, key),
-            yaxis: listener.axes[key] || 'y',
-            line: { color: listener.colors[key] },
+            name: valueName(source, key),
+            yaxis: source.axes[key] || 'y',
+            line: { color: source.colors[key] },
             x: boundedConcat(value.x, time),
             y: boundedConcat(value.y, resultCols[idx]),
           };
         });
 
       if (
-        listener.params.duration
-        && !listener.params.start
-        && !listener.params.end
+        source.params.duration
+        && !source.params.start
+        && !source.params.end
       ) {
         // timestamp in Ms that should be discarded
-        const boundary = new Date().getTime() - parseDuration(listener.params.duration);
-        forEach(listener.values, val => {
+        const boundary = new Date().getTime() - parseDuration(source.params.duration);
+        forEach(source.values, val => {
           const boundaryIdx = val.x.findIndex((x: number) => x > boundary);
           if (boundaryIdx > 0) {
             val.x = val.x.slice(boundaryIdx);
@@ -78,10 +81,10 @@ const valuesTransformer =
         });
       }
     }
-    return listener;
+    return source;
   };
 
-export const addPlotlyListener =
+export const addSource =
   async (
     id: string,
     params: QueryParams,
@@ -97,15 +100,15 @@ export const addPlotlyListener =
     if (filteredTarget.fields.length == 0) {
       return;
     }
-    const listener: GraphValuesListener = {
+    const source: GraphSource = {
       id,
       params,
       renames,
       axes,
       colors,
-      transformer: valuesTransformer,
+      transformer,
       target: filteredTarget,
       values: {},
     };
-    await historyStore.addValuesListener(listener);
+    await historyStore.addValuesSource(source);
   };

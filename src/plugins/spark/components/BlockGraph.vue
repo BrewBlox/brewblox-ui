@@ -101,10 +101,10 @@ export default class BlockGraph extends Vue {
   @Watch('graphCfg')
   onCfgChange(newVal): void {
     // Vue considers configuration "changed" with every block data update
-    // To avoid constantly refreshing listeners, we need to do a deep compare
+    // To avoid constantly refreshing sources, we need to do a deep compare
     if (JSON.stringify(newVal) !== this.configString) {
       this.configString = JSON.stringify(newVal);
-      this.$nextTick(() => this.graph && this.graph.resetListeners());
+      this.$nextTick(() => this.graph && this.graph.resetSources());
     }
   }
 
@@ -117,7 +117,7 @@ export default class BlockGraph extends Vue {
 <template>
   <q-dialog v-model="dialogOpen" maximized>
     <q-card v-if="dialogOpen" class="text-white bg-dark-bright" dark>
-      <HistoryGraph :id="id" ref="graph" :config="graphCfg">
+      <HistoryGraph ref="graph" :graph-id="id" :config="graphCfg">
         <template #controls>
           <q-btn-dropdown v-if="!noDuration" auto-close flat label="timespan" icon="mdi-timelapse">
             <q-item

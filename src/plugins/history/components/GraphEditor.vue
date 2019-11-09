@@ -24,7 +24,6 @@ export default class GraphEditor extends Vue {
     this.$emit('update:config', config);
   }
 
-
   editLeaf(node: QuasarNode): void {
     createDialog({
       component: 'GraphDisplayDialog',

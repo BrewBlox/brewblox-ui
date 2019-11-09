@@ -34,6 +34,16 @@ export interface LineColors {
   [key: string]: string;
 }
 
+export interface HistorySource {
+  id: string;
+  transformer: (source: any, result: any) => HistorySource;
+  params: QueryParams;
+  target: QueryTarget;
+  renames: DisplayNames;
+  events?: EventSource;
+  values?: any;
+}
+
 export type Slice = number[];
 
 export interface QueryResult {
@@ -44,20 +54,21 @@ export interface QueryResult {
   policy: string;
 }
 
-export interface Listener {
-  id: string;
-  transformer: (listener: any, result: any) => Listener;
-  params: QueryParams;
-  target: QueryTarget;
-  renames: DisplayNames;
-  source?: EventSource;
-  values?: any;
-}
-
-export interface GraphValuesListener extends Listener {
+export interface GraphSource extends HistorySource {
+  transformer: (source: GraphSource, result: QueryResult) => HistorySource;
   axes: GraphValueAxes;
   colors: LineColors;
   usedPolicy?: string;
+}
+
+export interface MetricsResult {
+  field: string;
+  time: number | null;
+  value: number | null;
+}
+
+export interface MetricsSource extends HistorySource {
+  transformer: (source: MetricsSource, result: MetricsResult[]) => HistorySource;
 }
 
 export interface GraphConfig extends QueryConfig {

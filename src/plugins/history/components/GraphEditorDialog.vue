@@ -29,7 +29,6 @@ export default class GraphEditorDialog extends DialogBase {
     };
   }
 
-
   loadShared(): void {
     createDialog({
       title: 'Import graph config',
@@ -65,7 +64,7 @@ export default class GraphEditorDialog extends DialogBase {
       <DialogToolbar>{{ title }}</DialogToolbar>
       <q-card-section class="scroll-parent">
         <q-scroll-area>
-          <GraphEditor :config.sync="local" :no-period="noPeriod" :shared="shared" />
+          <GraphEditor :config.sync="local" :no-period="noPeriod" />
         </q-scroll-area>
       </q-card-section>
       <q-separator dark />
