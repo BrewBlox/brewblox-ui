@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockCrudComponent from '../../components/BlockCrudComponent';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { DS2408Block, DS2408Id, ValveStartId } from './types';
 
 @Component

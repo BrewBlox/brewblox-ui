@@ -17,10 +17,9 @@ import {
   PidData,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
-import { AnalogConstraint, DigitalConstraint } from '@/plugins/spark/components/Constraints/ConstraintsBase';
 import { QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, DigitalState } from '@/plugins/spark/types';
+import { AnalogConstraint, Block, DigitalConstraint, DigitalState } from '@/plugins/spark/types';
 import { PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 

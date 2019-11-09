@@ -1,8 +1,7 @@
 import { Link } from '@/helpers/units';
 
-import { ConstraintsObj } from '../components/Constraints/ConstraintsBase';
 import { constraintLabels } from '../helpers';
-import { Block, Limiters, RelationEdge } from '../types';
+import { Block, ConstraintsObj, Limiters, RelationEdge } from '../types';
 
 export const calculateDrivenChains = (blocks: Block[]): string[][] => {
   const output: string[][] = [];

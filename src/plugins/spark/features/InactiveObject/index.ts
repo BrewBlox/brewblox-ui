@@ -1,12 +1,12 @@
-import GenericBlock from '@/plugins/spark/components/GenericBlock';
+import { genericBlockFeature } from '@/plugins/spark/generic';
+import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { Feature } from '@/store/features';
 
-import { blockWidgetSelector } from '../../helpers';
 import { typeName } from './getters';
 import widget from './InactiveObjectWidget.vue';
 
 const feature: Feature = {
-  ...GenericBlock,
+  ...genericBlockFeature,
   id: typeName,
   displayName: 'Inactive Block',
   widgetComponent: blockWidgetSelector(widget),

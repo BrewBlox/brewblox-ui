@@ -7,6 +7,7 @@ import { Watch } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
+import { isSystemBlock } from '@/plugins/spark/block-types';
 import { startResetBlocks } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockCrud, PageMode, RelationEdge, RelationNode, Spark, SystemStatus } from '@/plugins/spark/types';
@@ -14,7 +15,8 @@ import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards'
 import { FeatureRole, featureStore, WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
 
-import { isReady, isSystemBlock } from './getters';
+import { isReady } from './getters';
+import Troubleshooter from './Troubleshooter.vue';
 
 interface ModalSettings {
   component: string;
@@ -32,7 +34,11 @@ interface ValidatedWidget {
   error?: string;
 }
 
-@Component
+@Component({
+  components: {
+    Troubleshooter,
+  },
+})
 export default class SparkPage extends Vue {
   capitalized = capitalized;
   startResetBlocks = startResetBlocks;

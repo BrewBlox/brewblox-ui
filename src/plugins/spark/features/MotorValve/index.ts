@@ -1,10 +1,10 @@
 import { Link } from '@/helpers/units';
-import GenericBlock from '@/plugins/spark/components/GenericBlock';
+import { interfaceTypes } from '@/plugins/spark/block-types';
+import { genericBlockFeature } from '@/plugins/spark/generic';
+import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { BlockSpec, DigitalState } from '@/plugins/spark/types';
 import { Feature } from '@/store/features';
 
-import { interfaceTypes } from '../../block-types';
-import { blockWidgetSelector } from '../../helpers';
-import { BlockSpec, DigitalState } from '../../types';
 import { typeName } from './getters';
 import widget from './MotorValveWidget.vue';
 import { MotorValveData, ValveState } from './types';
@@ -36,7 +36,7 @@ const block: BlockSpec = {
 };
 
 const feature: Feature = {
-  ...GenericBlock,
+  ...genericBlockFeature,
   id: typeName,
   displayName: 'Motor Valve',
   role: 'Output',
