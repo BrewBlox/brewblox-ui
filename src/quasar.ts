@@ -124,6 +124,7 @@ Vue.use(Quasar, {
   },
   directives: { Ripple, ClosePopup, TouchHold, TouchPan },
   plugins: { Cookies, Notify, Dialog },
+  config: { dark: true },
 });
 
 Notify.setDefaults({
