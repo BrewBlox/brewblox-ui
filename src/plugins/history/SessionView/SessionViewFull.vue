@@ -2,7 +2,7 @@
 import shortid from 'shortid';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import CrudComponent from '@/components/Widget/CrudComponent';
+import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { objectSorter } from '@/helpers/functional';
 import { durationString } from '@/helpers/functional';

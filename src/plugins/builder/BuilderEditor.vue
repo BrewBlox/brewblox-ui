@@ -3,7 +3,7 @@ import pick from 'lodash/pick';
 import { debounce, uid } from 'quasar';
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 
-import DialogBase from '@/components/Dialog/DialogBase';
+import DialogBase from '@/components/DialogBase';
 import { Coordinates } from '@/helpers/coordinates';
 import { createDialog } from '@/helpers/dialog';
 import { clampRotation } from '@/helpers/functional';

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
-import DialogBase from '@/components/Dialog/DialogBase';
+import DialogBase from '@/components/DialogBase';
 import { WiFiSettingsBlock } from '@/plugins/spark/provider/types';
 import { sparkStore } from '@/plugins/spark/store';
 

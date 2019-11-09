@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component, Emit } from 'vue-property-decorator';
 
-import CrudComponent from '@/components/Widget/CrudComponent';
+import CrudComponent from '@/components/CrudComponent';
 import { shortDateString } from '@/helpers/functional';
 
 import { Session, SessionViewConfig } from './types';

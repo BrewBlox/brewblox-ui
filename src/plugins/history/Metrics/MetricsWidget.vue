@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import WidgetBase from '@/components/Widget/WidgetBase';
+import WidgetBase from '@/components/WidgetBase';
 
 import MetricsBasic from './MetricsBasic.vue';
 import MetricsFull from './MetricsFull.vue';

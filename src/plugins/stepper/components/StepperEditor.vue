@@ -2,7 +2,7 @@
 import { VueConstructor } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import DialogBase from '@/components/Dialog/DialogBase';
+import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 
 import { actionComponents } from '../actions';

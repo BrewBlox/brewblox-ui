@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
 
-import WatcherBase from '@/components/Watcher/WatcherBase';
+import WatcherBase from '@/components/WatcherBase';
 import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 

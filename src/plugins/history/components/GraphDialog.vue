@@ -3,7 +3,7 @@ import { ClosePopup } from 'quasar/src/directives';
 import { CreateElement, VNode } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import DialogBase from '@/components/Dialog/DialogBase';
+import DialogBase from '@/components/DialogBase';
 
 import { GraphConfig } from '../types';
 

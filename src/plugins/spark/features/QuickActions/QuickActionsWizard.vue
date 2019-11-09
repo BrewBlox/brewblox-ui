@@ -2,7 +2,7 @@
 import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
-import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
+import WidgetWizardBase from '@/components/WidgetWizardBase';
 import { Service, serviceStore } from '@/store/services';
 
 

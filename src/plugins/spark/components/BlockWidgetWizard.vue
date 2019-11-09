@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import isString from 'lodash/isString';
 import { Component } from 'vue-property-decorator';
 
-import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
+import WidgetWizardBase from '@/components/WidgetWizardBase';
 import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { blockIdRules } from '@/plugins/spark/helpers';

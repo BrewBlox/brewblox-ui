@@ -3,7 +3,7 @@ import mapKeys from 'lodash/mapKeys';
 import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
-import CrudComponent from '@/components/Widget/CrudComponent';
+import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { showBlockDialog } from '@/helpers/dialog';
 import { postfixedDisplayNames } from '@/helpers/units';

@@ -2,7 +2,7 @@
 import get from 'lodash/get';
 import { Component, Prop } from 'vue-property-decorator';
 
-import DialogBase from '@/components/Dialog/DialogBase';
+import DialogBase from '@/components/DialogBase';
 import { deepCopy } from '@/helpers/units/parseObject';
 
 import { durationMs, durationString } from '../../../helpers/functional';

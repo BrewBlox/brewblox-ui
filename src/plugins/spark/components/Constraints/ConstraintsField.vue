@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import FieldBase from '@/components/Field/FieldBase';
+import FieldBase from '@/components/FieldBase';
 import { createDialog } from '@/helpers/dialog';
 import { constraintLabels } from '@/plugins/spark/helpers';
 
