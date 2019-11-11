@@ -167,7 +167,8 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
-          <ActionItem icon="help" label="About" @click="showHelp" />
+          <!-- TODO -->
+          <!-- <ActionItem icon="help" label="About" @click="showHelp" /> -->
           <ActionItem icon="add" label="New session" @click="addSession" />
           <ActionItem :disabled="!session" icon="mdi-file-export" label="Export session" @click="exportSession" />
           <ActionItem icon="clear" label="Clear session notes" @click="clearNotes" />
