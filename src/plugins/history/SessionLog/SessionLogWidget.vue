@@ -13,11 +13,13 @@ import { historyStore } from '../store';
 import { LoggedSession, SessionNote } from '../types';
 import SessionLogBasic from './SessionLogBasic.vue';
 import SessionLogFull from './SessionLogFull.vue';
+import SessionLogHelp from './SessionLogHelp.vue';
 import { SessionLogConfig } from './types';
 
 
 @Component({
   components: {
+    SessionLogHelp,
     Basic: SessionLogBasic,
     Full: SessionLogFull,
   },
@@ -145,6 +147,13 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
         historyStore.removeSession(session);
       });
   }
+
+  showHelp(): void {
+    createDialog({
+      component: SessionLogHelp,
+      parent: this,
+    });
+  }
 }
 </script>
 
@@ -158,6 +167,8 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
+          <!-- TODO -->
+          <!-- <ActionItem icon="help" label="About" @click="showHelp" /> -->
           <ActionItem icon="add" label="New session" @click="addSession" />
           <ActionItem :disabled="!session" icon="mdi-file-export" label="Export session" @click="exportSession" />
           <ActionItem icon="clear" label="Clear session notes" @click="clearNotes" />
