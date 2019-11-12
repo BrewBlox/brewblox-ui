@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
 
-import WatcherBase from '@/components/Watcher/WatcherBase';
+import WatcherBase from '@/components/WatcherBase';
 import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
@@ -18,6 +18,17 @@ export default class SparkWatcher extends WatcherBase {
 
   get lastUpdate(): Date | null {
     return sparkStore.lastUpdate(this.service.id);
+  }
+
+  get cookieName(): string {
+    return `fw-snooze-${this.serviceId}`;
+  }
+
+  get snoozeTime(): number {
+    if (!this.$q.cookies.has(this.cookieName)) {
+      return 0;
+    }
+    return Date.parse(this.$q.cookies.get(this.cookieName));
   }
 
   notifying(): boolean {
@@ -76,7 +87,12 @@ export default class SparkWatcher extends WatcherBase {
 
   @Watch('status')
   handleStatusChange(status: SystemStatus): void {
-    if (this.notifiedUpdate || !status || !status.connect || status.latest) {
+    if (this.notifiedUpdate
+      || !status
+      || !status.connect
+      || status.latest
+      || this.snoozeTime > new Date().getTime() - (24 * 60 * 60 * 1000)
+    ) {
       return;
     }
 
@@ -98,6 +114,11 @@ export default class SparkWatcher extends WatcherBase {
         {
           label: 'Dismiss',
           textColor: 'white',
+        },
+        {
+          label: 'Maybe tomorrow',
+          textColor: 'white',
+          handler: () => this.$q.cookies.set(this.cookieName, new Date().toUTCString()),
         },
       ],
     });

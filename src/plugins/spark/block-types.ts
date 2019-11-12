@@ -17,6 +17,8 @@ import { typeName as Spark3Pins } from '@/plugins/spark/features/Spark3Pins/gett
 import { typeName as TempSensorMock } from '@/plugins/spark/features/TempSensorMock/getters';
 import { typeName as TempSensorOneWire } from '@/plugins/spark/features/TempSensorOneWire/getters';
 
+import { Block } from './types';
+
 export * from '@/plugins/spark/features/ActuatorAnalogMock/types';
 export * from '@/plugins/spark/features/ActuatorOffset/types';
 export * from '@/plugins/spark/features/ActuatorPwm/types';
@@ -37,7 +39,65 @@ export * from '@/plugins/spark/features/TempSensorMock/types';
 export * from '@/plugins/spark/features/TempSensorOneWire/types';
 
 
+export interface OneWireBusBlock extends Block {
+  data: {
+    command: {
+      opcode: number;
+      data: number;
+    };
+    address: string[];
+  };
+}
+
+export interface GroupsBlock extends Block {
+  data: {
+    active: number[];
+  };
+}
+
+export interface SysInfoBlock extends Block {
+  data: {
+    deviceId: string;
+    platform: number;
+    hardware: number;
+    voltage5: number;
+    voltage12: number;
+    version: string;
+    releaseDate: string;
+    protocolVersion: string;
+    protocolDate: string;
+  };
+}
+
+export interface TicksBlock extends Block {
+  data: {
+    millisSinceBoot: number;
+    secondsSinceEpoch: number;
+  };
+}
+
+export interface WiFiSettingsBlock extends Block {
+  data: {
+    ssid: string;
+    password: string;
+    security: number;
+    cipher: number;
+    signal: number;
+    ip: string;
+  };
+}
+
+export const systemBlockTypes = {
+  SysInfo: 'SysInfo',
+  Groups: 'Groups',
+  OneWireBus: 'OneWireBus',
+  Ticks: 'Ticks',
+  WiFiSettings: 'WiFiSettings',
+  TouchSettings: 'TouchSettings',
+};
+
 export const blockTypes = {
+  ...systemBlockTypes,
   ActuatorAnalogMock,
   SetpointDriver,
   ActuatorPwm,
@@ -67,3 +127,7 @@ export const interfaceTypes = {
   Balancer: 'BalancerInterface',
   IoArray: 'IoArrayInterface',
 };
+
+export const isSystemBlock =
+  ({ type }: { type: string }): boolean =>
+    systemBlockTypes[type] !== undefined;

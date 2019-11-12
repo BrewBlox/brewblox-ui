@@ -3,8 +3,9 @@ import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { sparkStore } from '@/plugins/spark/store';
+import { Block } from '@/plugins/spark/types';
 
-import { sparkStore } from '../../store';
 import SetpointSensorPairBasic from './SetpointSensorPairBasic.vue';
 import SetpointSensorPairFull from './SetpointSensorPairFull.vue';
 import { SetpointSensorPairBlock } from './types';
@@ -18,9 +19,26 @@ import { SetpointSensorPairBlock } from './types';
 export default class SetpointSensorPairWidget extends BlockWidgetBase {
   readonly block!: SetpointSensorPairBlock;
 
-  get isUsed(): boolean {
+  get usedBy(): Block[] {
+    if (!this.crud.isStoreBlock) {
+      return [];
+    }
     return sparkStore.blockValues(this.serviceId)
-      .some(block => get(block, 'data.inputId.id') === this.blockId);
+      .filter(block => get(block, 'data.inputId.id') === this.blockId);
+  }
+
+  get unused(): boolean {
+    return this.crud.isStoreBlock && this.usedBy.length === 0;
+  }
+
+  get disabledString(): string {
+    if (this.usedBy.length > 1) {
+      return `This setpoint is disabled and therefore ${this.usedBy.map(v => `'${v.id}'`).join(' and ')} are inactive.`;
+    } else if (this.usedBy.length === 1) {
+      return `This setpoint is disabled and therefore '${this.usedBy[0].id}' is inactive.`;
+    } else {
+      return 'This setpoint is disabled and is not used.';
+    }
   }
 }
 </script>
@@ -28,7 +46,7 @@ export default class SetpointSensorPairWidget extends BlockWidgetBase {
 <template>
   <GraphCardWrapper :show="inDialog">
     <template #graph>
-      <HistoryGraph :id="widget.id" :config="graphCfg" />
+      <HistoryGraph :graph-id="widget.id" :config="graphCfg" />
     </template>
 
     <component :is="mode" :crud="crud" :class="cardClass">
@@ -37,24 +55,19 @@ export default class SetpointSensorPairWidget extends BlockWidgetBase {
       </template>
 
       <template #warnings>
-        <CardWarning v-if="!isUsed">
+        <CardWarning v-if="unused">
           <template #message>
             This Setpoint is not used as PID input.
           </template>
         </CardWarning>
-        <CardWarning v-else-if="!block.data.settingEnabled">
-          <template #message>
-            <span>This setpoint is disabled.</span>
-          </template>
-          <template #actions>
-            <q-btn
-              text-color="white"
-              flat
-              label="Enable"
-              @click="block.data.settingEnabled = true; saveBlock();"
-            />
-          </template>
-        </CardWarning>
+        <BlockEnableToggle
+          v-else
+          :crud="crud"
+          :text-disabled="disabledString"
+          text-enabled="Setpoint is enabled."
+          data-key="settingEnabled"
+          class="full-width bordered"
+        />
       </template>
     </component>
   </GraphCardWrapper>

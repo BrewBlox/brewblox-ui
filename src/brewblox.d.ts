@@ -27,4 +27,4 @@ interface SelectOption {
   value: any;
 }
 
-type Mapped<T> = { [id: string]: T };
+type Mapped<T> = Record<string, T>;

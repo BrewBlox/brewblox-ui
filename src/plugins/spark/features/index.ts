@@ -13,11 +13,11 @@ import InactiveObject from './InactiveObject';
 import MotorValve from './MotorValve';
 import Mutex from './Mutex';
 import Pid from './Pid';
+import QuickActions from './QuickActions';
 import SetpointProfile from './SetpointProfile';
 import SetpointSensorPair from './SetpointSensorPair';
 import Spark2Pins from './Spark2Pins';
 import Spark3Pins from './Spark3Pins';
-import StepView from './StepView';
 import TempSensorMock from './TempSensorMock';
 import TempSensorOneWire from './TempSensorOneWire';
 
@@ -39,7 +39,7 @@ const features: { [id: string]: SparkFeature } = {
   SetpointSensorPair,
   Spark2Pins,
   Spark3Pins,
-  StepView,
+  QuickActions,
   TempSensorMock,
   TempSensorOneWire,
 };

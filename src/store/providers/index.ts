@@ -23,7 +23,7 @@ const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'providers' })
 export class ProviderModule extends VuexModule {
-  public providers: Record<string, Provider> = {};
+  public providers: Mapped<Provider> = {};
 
   public get providerIds(): string[] {
     return Object.keys(this.providers);

@@ -13,10 +13,10 @@ const rawError = true;
 @Module({ store, namespaced: true, dynamic: true, name: 'dashboards' })
 export class DashboardModule extends VuexModule {
   public replicatingDashboards = false;
-  public dashboards: Record<string, Dashboard> = {};
+  public dashboards: Mapped<Dashboard> = {};
 
   public replicatingItems = false;
-  public widgets: Record<string, PersistentWidget> = {};
+  public widgets: Mapped<PersistentWidget> = {};
 
   public get dashboardIds(): string[] {
     return Object.keys(this.dashboards);
@@ -52,11 +52,11 @@ export class DashboardModule extends VuexModule {
   }
 
   public get dashboardById(): (id: string) => Dashboard {
-    return id => this.dashboards[id];
+    return id => this.dashboards[id] || null;
   }
 
   public get persistentWidgetById(): (id: string) => PersistentWidget {
-    return id => this.widgets[id];
+    return id => this.widgets[id] || null;
   }
 
   public get persistentWidgetsByDashboardId(): (id: string) => PersistentWidget[] {
@@ -204,7 +204,6 @@ export class DashboardModule extends VuexModule {
 
   @Action({ rawError })
   public async setup(): Promise<void> {
-    /* eslint-disable no-underscore-dangle */
     const onDashboardChange = (dashboard: Dashboard): void => {
       const existing = this.dashboardById(dashboard.id);
       if (!existing || existing._rev !== dashboard._rev) {
@@ -229,7 +228,6 @@ export class DashboardModule extends VuexModule {
         this.commitRemovePersistentWidget(existing);
       }
     };
-    /* eslint-enable no-underscore-dangle */
 
     this.commitAllDashboards(await dashboardApi.fetch());
     this.commitAllPersistentWidgets(await widgetApi.fetch());

@@ -1,14 +1,14 @@
 <script lang="ts">
 import { Component, Emit } from 'vue-property-decorator';
 
-import CrudComponent from '@/components/Widget/CrudComponent';
+import CrudComponent from '@/components/CrudComponent';
 import { shortDateString } from '@/helpers/functional';
 
 import { Session, SessionViewConfig } from './types';
 
 
 @Component
-export default class SessionViewBasic extends CrudComponent {
+export default class SessionViewBasic extends CrudComponent<SessionViewConfig> {
   sessionFilter = '';
 
   @Emit('create')
@@ -19,12 +19,8 @@ export default class SessionViewBasic extends CrudComponent {
     return session.id;
   }
 
-  get widgetConfig(): SessionViewConfig {
-    return this.widget.config;
-  }
-
   get sessions(): Session[] {
-    return this.widgetConfig.sessions
+    return this.widget.config.sessions
       .filter(session => !session.hidden)
       .filter(session => session.name.toLowerCase().match(this.sessionFilter.toLowerCase()))
       .sort((left: Session, right: Session) => {
@@ -53,9 +49,9 @@ export default class SessionViewBasic extends CrudComponent {
     return `${shortDateString(session.start)} to ${shortDateString(session.end)}`;
   }
 
-  showSessionDialog(activeSession: Session | null = null): void {
+  showSessionDialog(initialSession: Session | null = null): void {
     this.showDialog({
-      widgetProps: { activeSession },
+      widgetProps: { initialSession },
     });
   }
 }

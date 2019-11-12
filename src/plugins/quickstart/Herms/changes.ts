@@ -17,10 +17,9 @@ import {
   PidData,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
-import { AnalogConstraint, DigitalConstraint } from '@/plugins/spark/components/Constraints/ConstraintsBase';
-import { StepViewItem } from '@/plugins/spark/features/StepView/types';
+import { QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, DigitalState } from '@/plugins/spark/types';
+import { AnalogConstraint, Block, DigitalConstraint, DigitalState } from '@/plugins/spark/types';
 import { PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -364,8 +363,8 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
     },
   });
 
-  const createStepView = (): StepViewItem => ({
-    ...createWidget(maybeSpace(config.prefix, 'Actions'), 'StepView'),
+  const createQuickActions = (): QuickActionsItem => ({
+    ...createWidget(maybeSpace(config.prefix, 'Actions'), 'QuickActions'),
     cols: 4,
     rows: 5,
     pinnedPosition: { x: 8, y: 6 },
@@ -452,5 +451,5 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
     },
   });
 
-  return [createBuilder(), createGraph(), createStepView()];
+  return [createBuilder(), createGraph(), createQuickActions()];
 }

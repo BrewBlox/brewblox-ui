@@ -6,18 +6,17 @@ import { Component, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { defaultPresets } from '@/plugins/history/getters';
-import { GraphConfig } from '@/plugins/history/types';
+import { addSource } from '@/plugins/history/sources/graph';
+import { historyStore } from '@/plugins/history/store';
 import {
   DisplayNames,
+  GraphConfig,
+  GraphSource,
   GraphValueAxes,
-  GraphValuesListener,
-  historyStore,
   LineColors,
   QueryParams,
   QueryTarget,
-} from '@/store/history';
-
-import { addPlotlyListener } from './listener';
+} from '@/plugins/history/types';
 
 interface Policies { [measurement: string]: string }
 
@@ -29,13 +28,13 @@ export default class HistoryGraph extends Vue {
   @Ref() readonly display!: any;
 
   @Prop({ type: String, required: true })
-  readonly id!: string;
+  readonly graphId!: string;
 
   @Prop({ type: Object, required: true })
   readonly config!: GraphConfig;
 
   @Prop({ type: Boolean, default: false })
-  readonly sharedListeners!: boolean;
+  readonly sharedSources!: boolean;
 
   get params(): QueryParams {
     return this.config.params || {};
@@ -61,19 +60,21 @@ export default class HistoryGraph extends Vue {
     return defaultPresets();
   }
 
-  listenerId(target: QueryTarget): string {
-    return `${this.id}/${target.measurement}`;
+  sourceId(target: QueryTarget): string {
+    return `${this.graphId}/${target.measurement}`;
   }
 
-  get listeners(): GraphValuesListener[] {
+  get sources(): GraphSource[] {
     return this.targets
-      .map(target => historyStore.tryListenerById(this.listenerId(target)))
-      .filter(listener => listener !== null && !!listener.values) as GraphValuesListener[];
+      .map(target => historyStore.trySourceById(this.sourceId(target)))
+      .filter(source => source !== null && !!source.values) as GraphSource[];
   }
 
   get error(): string | null {
-    if (!this.listeners || this.listeners.length === 0) {
-      return 'No data';
+    if (!this.sources || this.sources.length === 0) {
+      return this.targets.length > 0
+        ? 'No data sources'
+        : 'No fields selected';
     }
     if (!this.graphData.some(data => data.x && data.x.length > 0)) {
       return 'No data (yet) for selected period';
@@ -82,8 +83,8 @@ export default class HistoryGraph extends Vue {
   }
 
   get graphData(): PlotData[] {
-    return this.listeners
-      .flatMap(listener => Object.values(listener.values));
+    return this.sources
+      .flatMap(source => Object.values(source.values));
   }
 
   get graphLayout(): Partial<Layout> {
@@ -91,44 +92,39 @@ export default class HistoryGraph extends Vue {
   }
 
   get policies(): Policies {
-    return this.listeners
-      .reduce((acc, listener) => {
-        if (listener.target && listener.usedPolicy) {
-          acc[listener.target.measurement] = listener.usedPolicy;
-        }
-        return acc;
-      },
-        {}
-      );
+    const result: Policies = {};
+    this.sources.forEach(source => {
+      if (source.target && source.usedPolicy) {
+        result[source.target.measurement] = source.usedPolicy;
+      }
+    });
+    return result;
   }
 
-  addListeners(): void {
-    this.targets
-      .forEach(target =>
-        addPlotlyListener(
-          this.listenerId(target),
-          this.params,
-          this.renames,
-          this.axes,
-          this.colors,
-          target,
-        ));
+  addSources(): void {
+    this.targets.forEach(target =>
+      addSource(
+        this.sourceId(target),
+        this.params,
+        this.renames,
+        this.axes,
+        this.colors,
+        target,
+      ));
   }
 
-  removeListeners(): void {
-    this.listeners
-      .forEach(listener =>
-        historyStore.removeListener(listener));
+  removeSources(): void {
+    this.sources.forEach(historyStore.removeSource);
   }
 
-  resetListeners(): void {
-    this.removeListeners();
-    this.addListeners();
+  resetSources(): void {
+    this.removeSources();
+    this.addSources();
   }
 
   mounted(): void {
-    if (!this.sharedListeners) {
-      this.addListeners();
+    if (!this.sharedSources) {
+      this.addSources();
     } else {
       this.$nextTick(this.refresh);
     }
@@ -146,8 +142,8 @@ export default class HistoryGraph extends Vue {
   }
 
   destroyed(): void {
-    if (!this.sharedListeners) {
-      this.removeListeners();
+    if (!this.sharedSources) {
+      this.removeSources();
     }
   }
 

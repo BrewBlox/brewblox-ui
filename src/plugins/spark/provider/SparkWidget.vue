@@ -5,8 +5,8 @@ import { Component, Prop } from 'vue-property-decorator';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
-import { isReady, sysInfoType, ticksType, wifiType } from './getters';
-import { SysInfoBlock, TicksBlock, WiFiSettingsBlock } from './types';
+import { blockTypes, SysInfoBlock, TicksBlock, WiFiSettingsBlock } from '../block-types';
+import { isReady } from './getters';
 
 @Component
 export default class SparkWidget extends Vue {
@@ -20,15 +20,15 @@ export default class SparkWidget extends Vue {
   }
 
   get sysInfo(): SysInfoBlock {
-    return this.sysBlock(sysInfoType);
+    return this.sysBlock(blockTypes.SysInfo);
   }
 
   get ticks(): TicksBlock {
-    return this.sysBlock(ticksType);
+    return this.sysBlock(blockTypes.Ticks);
   }
 
   get wifi(): WiFiSettingsBlock {
-    return this.sysBlock(wifiType);
+    return this.sysBlock(blockTypes.WiFiSettings);
   }
 
   get ready(): boolean {

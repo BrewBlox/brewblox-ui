@@ -1,19 +1,13 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
-import BlockCrudComponent from '../../components/BlockCrudComponent';
-import { sparkStore } from '../../store';
+import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+
 import { SetpointSensorPairBlock } from './types';
 
 @Component
 export default class SetpointSensorPairBasic extends BlockCrudComponent {
   readonly block!: SetpointSensorPairBlock;
-
-  get isUsed(): boolean {
-    return sparkStore.blockValues(this.serviceId)
-      .some(block => get(block, 'data.inputId.id') === this.blockId);
-  }
 }
 </script>
 

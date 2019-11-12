@@ -7,6 +7,7 @@ import { Watch } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
+import { isSystemBlock } from '@/plugins/spark/block-types';
 import { startResetBlocks } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockCrud, PageMode, RelationEdge, RelationNode, Spark, SystemStatus } from '@/plugins/spark/types';
@@ -14,7 +15,8 @@ import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards'
 import { FeatureRole, featureStore, WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
 
-import { isReady, isSystemBlock } from './getters';
+import { isReady } from './getters';
+import Troubleshooter from './Troubleshooter.vue';
 
 interface ModalSettings {
   component: string;
@@ -32,7 +34,11 @@ interface ValidatedWidget {
   error?: string;
 }
 
-@Component
+@Component({
+  components: {
+    Troubleshooter,
+  },
+})
 export default class SparkPage extends Vue {
   capitalized = capitalized;
   startResetBlocks = startResetBlocks;
@@ -544,7 +550,7 @@ export default class SparkPage extends Vue {
 
         <!-- Widget List -->
         <q-scroll-area class="col-auto q-ml-xl" style="min-width: 500px; max-width: 500px">
-          <q-list dark no-border>
+          <q-list dark>
             <!-- Service -->
             <q-item v-if="serviceShown && serviceExpanded" ref="widget-spark-service" dark>
               <q-item-section>

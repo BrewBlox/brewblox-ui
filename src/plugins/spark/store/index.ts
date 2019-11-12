@@ -1,3 +1,4 @@
+import fromEntries from 'fromentries';
 import get from 'lodash/get';
 import Vue from 'vue';
 import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
@@ -7,7 +8,7 @@ import store from '@/store';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 
-import { GroupsBlock } from '../provider/types';
+import { GroupsBlock } from '../block-types';
 import {
   Block,
   BlockSpec,
@@ -209,7 +210,7 @@ export class SparkModule extends VuexModule {
         const active = block ? block.data.active : [];
         return [serviceId, names.map((name, idx) => ([name, active.includes(idx)]))];
       });
-    return Object.fromEntries(entries);
+    return fromEntries(entries);
   }
 
   public get groupNames(): (serviceId: string) => string[] {

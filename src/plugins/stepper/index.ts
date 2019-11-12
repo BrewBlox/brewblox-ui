@@ -5,10 +5,9 @@ import Stepper from './Stepper';
 
 export default {
   install() {
-    if (process.env.NODE_ENV !== 'development') {
+    if (process.env.VUE_APP_STEPPER_FEATURE !== 'true') {
       return;
     }
-
     autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
 
     featureStore.createFeature(Stepper.feature);

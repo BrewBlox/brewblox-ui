@@ -17,13 +17,13 @@ import {
   SetpointProfileBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
-import { StepViewItem } from '@/plugins/spark/features/StepView/types';
+import { QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
 import { PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
-import { maybeSpace,unlinkedActuators } from '../helpers';
+import { maybeSpace, unlinkedActuators } from '../helpers';
 import { FermentConfig, FermentOpts } from './types';
 
 
@@ -329,8 +329,8 @@ export const defineWidgets = (
     },
   });
 
-  const createStepView = (): StepViewItem => ({
-    ...createWidget(maybeSpace(config.prefix, 'Actions'), 'StepView'),
+  const createQuickActions = (): QuickActionsItem => ({
+    ...createWidget(maybeSpace(config.prefix, 'Actions'), 'QuickActions'),
     cols: 4,
     rows: 4,
     pinnedPosition: { x: 1, y: 6 },
@@ -473,5 +473,5 @@ export const defineWidgets = (
     pinnedPosition: { x: 5, y: 6 },
   });
 
-  return [createBuilder(), createGraph(), createStepView(), createProfile(config.names.tempProfile)];
+  return [createBuilder(), createGraph(), createQuickActions(), createProfile(config.names.tempProfile)];
 };

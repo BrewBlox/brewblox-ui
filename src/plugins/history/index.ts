@@ -3,6 +3,7 @@ import { featureStore } from '@/store/features';
 
 import Graph from './Graph';
 import Metrics from './Metrics';
+import SessionLog from './SessionLog';
 import SessionView from './SessionView';
 
 export default {
@@ -11,6 +12,7 @@ export default {
 
     featureStore.createFeature(Graph);
     featureStore.createFeature(Metrics);
+    featureStore.createFeature(SessionLog);
     featureStore.createFeature(SessionView);
   },
 };

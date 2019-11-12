@@ -3,14 +3,14 @@ import mapKeys from 'lodash/mapKeys';
 import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
-import CrudComponent from '@/components/Widget/CrudComponent';
+import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { showBlockDialog } from '@/helpers/dialog';
 import { postfixedDisplayNames } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockCrud } from '@/plugins/spark/types';
+import { BlockConfig, BlockCrud } from '@/plugins/spark/types';
 import { dashboardStore } from '@/store/dashboards';
 
 import { blockIdRules } from '../helpers';
@@ -18,7 +18,7 @@ import { Block } from '../types';
 
 
 @Component
-export default class BlockCrudComponent extends CrudComponent {
+export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
 
   @Prop({ type: Object, required: true })
   public readonly crud!: BlockCrud;
@@ -53,7 +53,7 @@ export default class BlockCrudComponent extends CrudComponent {
     return !!get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
   }
 
-  public get renamedTargets(): Record<string, string> {
+  public get renamedTargets(): Mapped<string> {
     const targets = get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
     return !!targets
       ? postfixedDisplayNames(targets, this.block.data)

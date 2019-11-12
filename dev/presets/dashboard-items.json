@@ -197,7 +197,7 @@
       "order": 3,
       "cols": 4,
       "rows": 2,
-      "feature": "StepView",
+      "feature": "QuickActions",
       "dashboard": "dashboard-home",
       "config": {
         "serviceId": "sparkey",
@@ -254,6 +254,16 @@
           }
         ]
       }
+    },
+    {
+      "_id": "1-55d75cbee5631853c77cd22f26e9a81c",
+      "title": "Ministry of Silly Walks",
+      "order": 4,
+      "cols": 4,
+      "rows": 2,
+      "feature": "Stepper",
+      "dashboard": "dashboard-home",
+      "config": {}
     }
   ]
 }

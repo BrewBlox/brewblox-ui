@@ -1,12 +1,12 @@
 import isEqual from 'lodash/isEqual';
 
-import { WizardAction } from '@/components/Wizard/WizardTaskBase';
 import { builderStore } from '@/plugins/builder/store';
+import { blockTypes } from '@/plugins/spark/block-types';
 import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
-import { blockTypes } from '../spark/block-types';
+import { WizardAction } from './components/WizardTaskBase';
 import { PinChannel, QuickStartOutput } from './types';
 
 export function unlinkedActuators(serviceId: string, pins: PinChannel[]): DigitalActuatorBlock[] {

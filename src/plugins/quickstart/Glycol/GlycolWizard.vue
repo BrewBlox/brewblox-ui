@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
+import WidgetWizardBase from '@/components/WidgetWizardBase';
 
 @Component
 export default class GlycolWizard extends WidgetWizardBase {

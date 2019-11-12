@@ -1,31 +1,70 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
+import { } from 'quasar';
 
+import { sentenceCased } from '@/helpers/functional';
 import { prettify } from '@/helpers/units';
 import { propertyNameWithUnit } from '@/helpers/units/parseObject';
-import { historyStore, QueryTarget } from '@/store/history';
+
+import { historyStore } from './store';
+import { QueryTarget } from './types';
 
 export interface QuasarNode {
   label: string;
   value: any;
   children?: QuasarNode[];
+
+  icon?: string;
+  iconColor?: string;
+  img?: string;
+  avatar?: string;
+  disabled?: boolean;
+  expandable?: boolean;
+  selectable?: boolean;
+  handler?: (node: QuasarNode) => void;
+  tickable?: boolean;
+  noTick?: boolean;
+  tickStrategy?: string;
+  lazy?: boolean;
+  header?: string;
+  body?: string;
 }
 
+export const defaultLabel = (key: string): string => {
+  const [name, postfix] = propertyNameWithUnit(key);
+  const path = name.split('/').slice(1);
+  const prettyName = sentenceCased(path.pop()!);
+  const prettyPath = path.length ? `[${path.join(' ')}] ` : '';
+  const prettyUnit = postfix ? prettify(postfix!) : '';
+  return `${prettyPath}${prettyName} ${prettyUnit}`;
+};
+
 const nodeRecurser =
-  (parent: string[], key: string, val: string | any): QuasarNode => {
+  (parent: string[], key: string, val: string | any, partial: Partial<QuasarNode>): QuasarNode => {
+    // Leaf nodes
     if (typeof val === 'string') {
-      return { label: key, value: [...parent, key].join('/') };
+      const [name, postfix] = propertyNameWithUnit(key);
+      const label = postfix !== null
+        ? `${sentenceCased(name)} ${prettify(postfix)}`
+        : sentenceCased(name);
+      return {
+        ...partial,
+        label,
+        value: [...parent, key].join('/'),
+      };
     }
+
+    // branch nodes
     return {
       label: key,
       value: [...parent, key].join('/'),
       children: Object.entries(val)
-        .map(([k, v]) => nodeRecurser([...parent, key], k, v)),
+        .map(([k, v]) => nodeRecurser([...parent, key], k, v, partial)),
     };
   };
 
 export const nodeBuilder =
-  (fields: { [measurement: string]: string[] }): QuasarNode[] => {
+  (fields: { [measurement: string]: string[] }, partial: Partial<QuasarNode> = {}): QuasarNode[] => {
     const raw = Object.entries(fields)
       .reduce(
         (acc, [k, fieldKeys]) => {
@@ -48,7 +87,7 @@ export const nodeBuilder =
         {},
       );
     return Object.entries(raw)
-      .map(([k, v]) => nodeRecurser([], k, v));
+      .map(([k, v]) => nodeRecurser([], k, v, partial));
   };
 
 export const expandedNodes =
@@ -57,17 +96,16 @@ export const expandedNodes =
     const compare = (node: QuasarNode): boolean => !!node.label.toLowerCase().match(lowerFilter);
 
     const checkNode = (node: QuasarNode): string[] => {
-      const children = node.children || [];
-      const vals: string[] = children
-        .reduce((acc: string[], n: QuasarNode) => { acc.push(...checkNode(n)); return acc; }, []);
-      if (vals.length > 0 || children.some(compare)) {
+      const vals = node.children
+        ? node.children.flatMap(n => checkNode(n))
+        : [];
+      if (node.children && node.children.some(compare)) {
         vals.push(node.value);
       }
       return vals;
     };
 
-    return nodes
-      .reduce((acc: string[], n: QuasarNode) => { acc.push(...checkNode(n)); return acc; }, []);
+    return nodes.flatMap(n => checkNode(n));
   };
 
 export const targetSplitter =
@@ -104,10 +142,3 @@ export const targetBuilder =
         [],
       );
   };
-
-export const defaultLabel = (key: string): string => {
-  const [name, postfix] = propertyNameWithUnit(key);
-  const prettyName = name.split('/').slice(1).join(' ');
-  const prettyUnit = prettify(postfix || '');
-  return `${prettyName} ${prettyUnit}`;
-};

@@ -1,3 +1,5 @@
+import { Link, Unit } from '@/helpers/units';
+import { GraphValueAxes, QueryParams } from '@/plugins/history/types';
 import { PersistentWidget } from '@/store/dashboards';
 import { Crud, Feature } from '@/store/features';
 import { Service } from '@/store/services';
@@ -11,7 +13,7 @@ export interface ChangeField {
   pretty?: (val: any) => string;
 }
 
-export type BlockDataGenerator = () => Record<string, any>;
+export type BlockDataGenerator = () => Mapped<any>;
 
 export interface BlockDataPreset {
   name: string;
@@ -26,19 +28,13 @@ export interface StoredDataPreset {
   _rev?: string;
 }
 
-export interface BlockCrud extends Crud {
-  block: Block;
-  isStoreBlock: boolean;
-  saveBlock: (block: Block) => unknown | Promise<unknown>;
-}
-
 export interface BlockSpec {
   id: string;
   systemObject?: boolean;
   generate: BlockDataGenerator;
   presets: BlockDataPreset[];
   changes: ChangeField[];
-  graphTargets?: Record<string, string>;
+  graphTargets?: Mapped<string>;
 }
 
 export interface SparkFeature {
@@ -74,10 +70,16 @@ export interface Block extends DataBlock {
 export interface BlockConfig {
   serviceId: string;
   blockId: string;
+  queryParams?: QueryParams;
+  graphAxes?: GraphValueAxes;
 }
 
-export interface DashboardBlock extends PersistentWidget {
-  config: BlockConfig;
+export type DashboardBlock = PersistentWidget<BlockConfig>;
+
+export interface BlockCrud extends Crud<BlockConfig> {
+  block: Block;
+  isStoreBlock: boolean;
+  saveBlock: (block: Block) => unknown | Promise<unknown>;
 }
 
 export interface UserUnits {
@@ -140,4 +142,26 @@ export interface IoChannel {
 
 export interface IoPin {
   [key: string]: IoChannel;
+}
+
+export interface AnalogConstraint {
+  limiting: boolean;
+  min?: number;
+  max?: number;
+  balanced?: {
+    balancerId: Link;
+    granted: number;
+    id: number;
+  };
+}
+
+export interface DigitalConstraint {
+  limiting: boolean;
+  minOn?: Unit;
+  minOff?: Unit;
+  mutex?: Link; // Mutex
+}
+
+export interface ConstraintsObj {
+  constraints: AnalogConstraint[] | DigitalConstraint[];
 }

@@ -4,8 +4,8 @@ export type FeatureRole = 'Process' | 'Control' | 'Output' | 'Constraint' | 'Dis
 export type WidgetMode = 'Basic' | 'Full';
 export type WidgetContainer = 'Dashboard' | 'Dialog';
 
-export interface Crud {
-  widget: PersistentWidget;
+export interface Crud<ConfigT = any> {
+  widget: PersistentWidget<ConfigT>;
   isStoreWidget: boolean;
   saveWidget(widget: PersistentWidget): unknown | Promise<unknown>;
   closeDialog(): void;
@@ -28,7 +28,8 @@ export interface Feature {
     rows: number;
   };
   widgetComponent: string | WidgetSelector;
-  wizardComponent?: string;
+  wizardComponent?: string | null;
+  generateConfig?: () => any;
 }
 
 export interface QuickStart {

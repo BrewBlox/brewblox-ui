@@ -1,10 +1,10 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
+import WizardTaskBase from '../components/WizardTaskBase';
 import { hasShared } from '../helpers';
 import { PinChannel } from '../types';
 import { GlycolConfig } from './types';
@@ -132,12 +132,14 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
             <q-radio
               v-model="heated"
               dark
-              :val="false" label="No"
+              :val="false"
+              label="No"
             />
             <q-radio
               v-model="heated"
               dark
-              :val="true" label="Yes"
+              :val="true"
+              label="Yes"
             />
           </div>
         </q-item-section>
@@ -151,17 +153,20 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
             <q-radio
               v-model="glycolControl"
               dark
-              val="No" label="No"
+              val="No"
+              label="No"
             />
             <q-radio
               v-model="glycolControl"
               dark
-              val="Measure" label="Measure only"
+              val="Measure"
+              label="Measure only"
             />
             <q-radio
               v-model="glycolControl"
               dark
-              val="Control" label="Actively controlled"
+              val="Control"
+              label="Actively controlled"
             />
           </div>
         </q-item-section>

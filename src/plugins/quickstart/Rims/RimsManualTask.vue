@@ -1,8 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
-
+import WizardTaskBase from '../components/WizardTaskBase';
 import { RimsConfig } from './types';
 
 

@@ -1,44 +1,37 @@
 <script lang="ts">
+import { uid } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
-import WidgetBase from '@/components/Widget/WidgetBase';
+import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { Unit } from '@/helpers/units';
+import { blockTypes } from '@/plugins/spark/block-types';
 
 import { stepperStore } from '../store';
-import { Process, ProcessGroup, Runtime } from '../types';
+import { Process, ProcessStep, Runtime, StepperConfig } from '../types';
+
+
+const lipsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            Suspendisse iaculis sit amet ligula eget fermentum.
+            Nunc pharetra, sapien eget rutrum suscipit, eros nisi semper ante,
+            at consectetur elit lectus vitae tortor.
+            Duis id ipsum ac elit viverra interdum. Aenean finibus risus ut iaculis porta.
+            Aenean mollis, orci vel egestas aliquam, diam augue imperdiet orci,
+            consectetur vestibulum diam velit in magna.
+            Curabitur pulvinar, metus et lacinia sodales,
+            sem quam finibus risus, a dignissim nisl enim vitae libero.
+            In eget enim ipsum. Cras elementum nisl ac mauris dignissim,
+            quis laoreet neque aliquam. Integer lacinia fermentum lectus sit amet ultrices.`;
 
 
 @Component
-export default class StepperWidget extends WidgetBase {
+export default class StepperWidget extends WidgetBase<StepperConfig> {
   get processes(): Process[] {
     return stepperStore.processValues;
   }
 
   get runtimes(): Runtime[] {
     return stepperStore.runtimeValues;
-  }
-
-  get groups(): ProcessGroup[] {
-    return stepperStore.processValues
-      .map(process => {
-        const runtime = stepperStore.runtimes[process.id] || null;
-        const current = runtime
-          ? runtime.results[runtime.results.length - 1]
-          : {
-            name: '<No active step>',
-            index: -1,
-            start: null,
-            end: null,
-            logs: [],
-          };
-        return {
-          id: process.id,
-          process,
-          runtime,
-          current,
-        };
-      });
   }
 
   conditionsString(runtime: Runtime | null): string {
@@ -50,24 +43,19 @@ export default class StepperWidget extends WidgetBase {
   }
 
   stepOptions(process: Process): SelectOption[] {
-    return process.steps.map((s, idx) => ({ label: s.name, value: idx }));
-  }
-
-  fetch(): void {
-    stepperStore.fetchAll();
+    return process.steps.map(s => ({ label: s.title, value: s.id }));
   }
 
   async start(process: Process): Promise<void> {
-    await stepperStore.startProcess(process);
-    await stepperStore.fetchRuntime(process);
+    await stepperStore.startRuntime(process);
   }
 
   async advance(runtime: Runtime): Promise<void> {
-    await stepperStore.advanceProcess(runtime);
+    await stepperStore.advanceRuntime(runtime);
   }
 
   async stop(runtime: Runtime): Promise<void> {
-    await stepperStore.exitProcess(runtime);
+    await stepperStore.stopRuntime(runtime);
   }
 
   async remove(process: Process): Promise<void> {
@@ -81,67 +69,142 @@ export default class StepperWidget extends WidgetBase {
     });
   }
 
-  make(): void {
+  async clear(): Promise<void> {
+    for (const process of stepperStore.processValues) {
+      await stepperStore.removeProcess(process);
+    }
+  }
+
+  async make(): Promise<void> {
+    const mkSteps = (): ProcessStep[] => ([
+      {
+        id: uid(),
+        title: 'step-one',
+        enabled: true,
+        actions: [
+          {
+            id: uid(),
+            enabled: true,
+            type: 'BlockPatch',
+            opts: {
+              block: 'sensor-1',
+              service: 'sparkey',
+              type: blockTypes.TempSensorMock,
+              data: {
+                value: new Unit(5, 'degC'),
+              },
+            },
+          },
+          {
+            id: uid(),
+            enabled: true,
+            type: 'BlockPatch',
+            opts: {
+              block: 'sensor-1',
+              service: 'sparkey',
+              type: blockTypes.TempSensorMock,
+              data: {
+                value: new Unit(5, 'degC'),
+              },
+            },
+          },
+        ],
+        conditions: [
+          {
+            id: uid(),
+            enabled: true,
+            type: 'BlockValue',
+            opts: {
+              block: 'sensor-1',
+              service: 'sparkey',
+              type: blockTypes.TempSensorMock,
+              key: 'value[degC]',
+              operator: 'ge',
+              value: 10,
+            },
+          },
+          {
+            id: uid(),
+            enabled: true,
+            type: 'TimeAbsolute',
+            opts: {
+              time: 1572342354937,
+            },
+          },
+          {
+            id: uid(),
+            enabled: true,
+            type: 'TimeElapsed',
+            opts: {
+              duration: 12345,
+            },
+          },
+        ],
+        notes: [
+          {
+            id: uid(),
+            title: 'Important Notification',
+            message: lipsum,
+          },
+          {
+            id: uid(),
+            title: 'Important Notification',
+            message: lipsum,
+          },
+
+        ],
+      },
+      {
+        id: uid(),
+        title: 'step-two',
+        enabled: true,
+        actions: [
+          {
+            id: uid(),
+            enabled: true,
+            type: 'BlockPatch',
+            opts: {
+              block: 'sensor-1',
+              service: 'sparkey',
+              type: blockTypes.TempSensorMock,
+              data: {
+                value: new Unit(5, 'degC'),
+              },
+            },
+          },
+        ],
+        conditions: [
+          {
+            id: uid(),
+            enabled: true,
+            type: 'BlockValue',
+            opts: {
+              block: 'sensor-1',
+              service: 'sparkey',
+              type: blockTypes.TempSensorMock,
+              key: 'value[degC]',
+              operator: 'ge',
+              value: 10,
+            },
+          },
+        ],
+        notes: [
+          {
+            id: uid(),
+            title: 'Important Notification',
+            message: lipsum,
+          },
+        ],
+      },
+    ]);
+
     stepperStore.createProcess({
-      id: 'test-process',
+      id: uid(),
       title: 'Test Process',
       steps: [
-        {
-          name: 'step-one',
-          actions: [
-            {
-              type: 'BlockPatch',
-              opts: {
-                block: 'sensor-1',
-                service: 'sparkey',
-                data: {
-                  value: new Unit(5, 'degC'),
-                },
-              },
-            },
-          ],
-          responses: [],
-          conditions: [
-            {
-              type: 'BlockValue',
-              opts: {
-                block: 'sensor-1',
-                service: 'sparkey',
-                key: 'value[degC]',
-                operator: 'ge',
-                value: 10,
-              },
-            },
-          ],
-        },
-        {
-          name: 'step-two',
-          actions: [
-            {
-              type: 'BlockPatch',
-              opts: {
-                block: 'sensor-1',
-                service: 'sparkey',
-                data: {
-                  value: new Unit(5, 'degC'),
-                },
-              },
-            },
-          ],
-          responses: [],
-          conditions: [
-            {
-              type: 'BlockValue',
-              opts: {
-                block: 'sensor-1',
-                service: 'sparkey',
-                key: 'value[degC]',
-                operator: 'ge',
-                value: 10,
-              },
-            },
-          ],
-        },
+        ...mkSteps(),
+        ...mkSteps(),
+        ...mkSteps(),
       ],
     });
   }
@@ -152,8 +215,9 @@ export default class StepperWidget extends WidgetBase {
   <q-card dark :class="cardClass">
     <component :is="toolbarComponent" :crud="crud">
       <template #actions>
+        <ActionItem icon="settings" label="Editor" @click="startEditor" />
         <ActionItem icon="add" label="New" @click="make" />
-        <ActionItem icon="refresh" label="Refresh" @click="fetch" />
+        <ActionItem icon="delete" label="Clear" @click="clear" />
         <WidgetActions :crud="crud" />
       </template>
     </component>
@@ -177,7 +241,13 @@ export default class StepperWidget extends WidgetBase {
         </q-btn-dropdown>
       </q-item-section>
     </WidgetToolbar> -->
-    <q-card-section v-for="group in groups" :key="group.id">
+    <q-card-section v-for="process in processes" :key="process.id">
+      <q-item dark>
+        <q-item-section>{{ process.title }}</q-item-section>
+      </q-item>
+    </q-card-section>
+
+    <!-- <q-card-section v-for="group in groups" :key="group.id">
       <q-item dark class="row no-wrap">
         <q-item-section>
           <template v-if="group.runtime">
@@ -266,6 +336,6 @@ export default class StepperWidget extends WidgetBase {
           </q-item-section>
         </template>
       </q-item>
-    </q-card-section>
+    </q-card-section> -->
   </q-card>
 </template>

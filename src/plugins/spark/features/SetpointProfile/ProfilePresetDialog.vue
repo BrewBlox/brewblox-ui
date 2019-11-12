@@ -3,7 +3,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
-import DialogBase from '@/components/Dialog/DialogBase';
+import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';

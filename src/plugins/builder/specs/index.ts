@@ -26,6 +26,7 @@ import PwmDisplay from './PwmDisplay';
 import PwmPump from './PwmPump';
 import RimsTube from './RimsTube';
 import SensorDisplay from './SensorDisplay';
+import SessionLogDisplay from './SessionLogDisplay';
 import SetpointDisplay from './SetpointDisplay';
 import ShiftedSystemIO from './ShiftedSystemIO';
 import StraightInletTube from './StraightInletTube';
@@ -63,6 +64,7 @@ const specs: { [key: string]: PartSpec } = {
   PwmPump,
   RimsTube,
   SensorDisplay,
+  SessionLogDisplay,
   SetpointDisplay,
   ShiftedSystemIO,
   StraightInletTube,

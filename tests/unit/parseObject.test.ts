@@ -1,6 +1,6 @@
 import Link from '@/helpers/units/Link';
-import Unit from '@/helpers/units/Unit';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
+import Unit from '@/helpers/units/Unit';
 
 describe('deserialize', () => {
   it('Should recognise properties structured as units', () => {
@@ -71,7 +71,6 @@ describe('deserialize', () => {
       test: 'Do not touch',
       something: 1,
       'sensor<>': 'some-sensor-id',
-      'sensors<>': ['sensor-1', 'sensor-2'],
     };
 
     const output = deserialize(input);
@@ -79,7 +78,6 @@ describe('deserialize', () => {
     expect(output.test).toBe('Do not touch');
     expect(output.something).not.toBeInstanceOf(Link);
     expect(output.sensor).toBeInstanceOf(Link);
-    expect(output.sensors[0]).toBeInstanceOf(Link);
   });
 });
 
@@ -88,7 +86,6 @@ describe('serialize', () => {
     const input = {
       temperature: new Unit(21, 'celsius'),
       leaveThisBe: 666,
-      handleArray: [new Unit(22, 'celsius'), new Unit(23, 'celsius'), new Unit(24, 'celsius')],
       normalArray: [22, 23, 24],
       emptyArray: [],
       deeper: {
@@ -99,7 +96,6 @@ describe('serialize', () => {
     const output = {
       'temperature[celsius]': 21,
       leaveThisBe: 666,
-      'handleArray[celsius]': [22, 23, 24],
       normalArray: [22, 23, 24],
       emptyArray: [],
       deeper: {

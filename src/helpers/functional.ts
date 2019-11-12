@@ -1,3 +1,4 @@
+import fromEntries from 'fromentries';
 import isString from 'lodash/isString';
 import parseDuration from 'parse-duration';
 import { colors } from 'quasar';
@@ -81,6 +82,12 @@ export const kebabCased =
 export const camelCased =
   (input: string): string =>
     input.replace(/[ -_](.)/, (_, v1) => v1.toUpperCase());
+
+export const sentenceCased =
+  (input: string): string => {
+    const spaced = spaceCased(input).trimLeft();
+    return spaced.substr(0, 1).toUpperCase() + spaced.substr(1, spaced.length);
+  };
 
 export const hexToBase64 =
   (hex: string): string => Buffer.from(hex, 'hex').toString('base64');
@@ -217,3 +224,8 @@ export const mutate =
 export const objReducer =
   (key: string) =>
     (acc: Mapped<any>, obj: any) => mutate(acc, obj[key], obj);
+
+
+export const mapEntries =
+  (obj: Record<keyof any, any>, callback: ([k, v]) => [keyof any, any]): typeof obj =>
+    fromEntries(Object.entries(obj).map(callback));

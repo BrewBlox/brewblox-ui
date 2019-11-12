@@ -1,11 +1,11 @@
 <script lang="ts">
-import shortid from 'shortid';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
-import WidgetBase from '@/components/Widget/WidgetBase';
+import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { shortDateString } from '@/helpers/functional';
 
+import SessionCreateDialog from './SessionCreateDialog.vue';
 import SessionViewBasic from './SessionViewBasic.vue';
 import SessionViewFull from './SessionViewFull.vue';
 import { Session, SessionViewConfig } from './types';
@@ -15,18 +15,18 @@ import { Session, SessionViewConfig } from './types';
   components: {
     Basic: SessionViewBasic,
     Full: SessionViewFull,
+    SessionCreateDialog,
   },
 })
-export default class SessionViewWidget extends WidgetBase {
+export default class SessionViewWidget extends WidgetBase<SessionViewConfig> {
   graphSessionId: string | null = null;
   sessionFilter = '';
 
-  get widgetConfig(): SessionViewConfig {
-    return this.widget.config;
-  }
+  @Prop({ default: null })
+  readonly initialSession!: Session | null;
 
   get sessions(): Session[] {
-    return this.widgetConfig.sessions
+    return this.config.sessions
       .filter(session => !session.hidden)
       .filter(session => session.name.toLowerCase().match(this.sessionFilter.toLowerCase()))
       .sort((left: Session, right: Session) => {
@@ -47,7 +47,7 @@ export default class SessionViewWidget extends WidgetBase {
 
   get graphSession(): Session | null {
     return this.graphSessionId
-      ? this.widgetConfig.sessions.find(session => session.id === this.graphSessionId) || null
+      ? this.config.sessions.find(session => session.id === this.graphSessionId) || null
       : null;
   }
 
@@ -61,9 +61,9 @@ export default class SessionViewWidget extends WidgetBase {
     return `${shortDateString(session.start)} to ${shortDateString(session.end)}`;
   }
 
-  showSessionDialog(activeSession: Session | null = null): void {
+  showSessionDialog(initialSession: Session | null = null): void {
     this.showDialog({
-      getProps: () => ({ activeSession }),
+      getProps: () => ({ initialSession }),
     });
   }
 
@@ -73,35 +73,13 @@ export default class SessionViewWidget extends WidgetBase {
 
   createSession(): void {
     createDialog({
-      title: 'Create session',
-      dark: true,
-      ok: 'Create',
-      cancel: 'Cancel',
-      prompt: {
-        model: '',
-        type: 'text',
-      },
+      parent: this,
+      component: SessionCreateDialog,
     })
-      .onOk((name) => {
-        const session = {
-          name,
-          id: shortid.generate(),
-          hidden: false,
-          start: null,
-          end: null,
-          graphCfg: {
-            layout: { title: name },
-            params: {},
-            targets: [],
-            renames: {},
-            axes: {},
-            colors: {},
-          },
-          notes: '',
-        };
+      .onOk(session => {
         this.saveConfig({
-          ...this.widgetConfig,
-          sessions: [...this.widgetConfig.sessions, session],
+          ...this.config,
+          sessions: [...this.config.sessions, session],
         });
         this.showSessionDialog(session);
       });
@@ -114,6 +92,7 @@ export default class SessionViewWidget extends WidgetBase {
     :is="mode"
     :crud="crud"
     :class="cardClass"
+    :initial-session="initialSession"
     @create="createSession"
     @graph="showSessionGraph"
   >

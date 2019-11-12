@@ -2,7 +2,7 @@
 import { debounce, uid } from 'quasar';
 import { Component, Watch } from 'vue-property-decorator';
 
-import CrudComponent from '@/components/Widget/CrudComponent';
+import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 
 import { calculateNormalizedFlows } from './calculateFlows';
@@ -13,7 +13,7 @@ import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart } f
 
 
 @Component
-export default class BuilderBasic extends CrudComponent {
+export default class BuilderBasic extends CrudComponent<BuilderConfig> {
   flowParts: FlowPart[] = [];
   debouncedCalculate: Function = () => { };
 
@@ -85,7 +85,7 @@ export default class BuilderBasic extends CrudComponent {
     if (!this.layout) {
       return [];
     }
-    const sizes: Record<string, number> = {};
+    const sizes: Mapped<number> = {};
     return this.layout.parts
       .map(part => {
         const actual: PersistentPart = {

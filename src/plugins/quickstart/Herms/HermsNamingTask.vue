@@ -4,7 +4,6 @@ import mapValues from 'lodash/mapValues';
 import UrlSafeString from 'url-safe-string';
 import { Component } from 'vue-property-decorator';
 
-import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { dashboardIdRules } from '@/helpers/dashboards';
 import { suggestId, validator, valOrDefault } from '@/helpers/functional';
 import { typeName as sparkType } from '@/plugins/spark/getters';
@@ -12,6 +11,7 @@ import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Service, serviceStore } from '@/store/services';
 
+import WizardTaskBase from '../components/WizardTaskBase';
 import { HermsBlockNames, HermsConfig } from './types';
 
 
@@ -203,7 +203,8 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
             </template>
           </QuickStartNameField>
           <QuickStartNameField
-            v-for="(nVal, nKey) in names" :key="nKey"
+            v-for="(nVal, nKey) in names"
+            :key="nKey"
             :value="nVal"
             :label="defaultNames[nKey]"
             :rules="nameRules"

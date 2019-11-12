@@ -3,7 +3,7 @@ import mapKeys from 'lodash/mapKeys';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import WidgetBase from '@/components/Widget/WidgetBase';
+import WidgetBase from '@/components/WidgetBase';
 import { postfixedDisplayNames } from '@/helpers/units';
 import { GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
@@ -56,7 +56,7 @@ export default class BlockWidgetBase extends WidgetBase {
     return !!get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
   }
 
-  public get renamedTargets(): Record<string, string> {
+  public get renamedTargets(): Mapped<string> {
     const targets = get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
     return !!targets
       ? postfixedDisplayNames(targets, this.block.data)

@@ -4,13 +4,14 @@ import parseDuration from 'parse-duration';
 import { uid } from 'quasar';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
-import CrudComponent from '@/components/Widget/CrudComponent';
+import CrudComponent from '@/components/CrudComponent';
 import { durationString } from '@/helpers/functional';
-import { DisplayNames, historyStore, Listener, QueryParams, QueryTarget } from '@/store/history';
+import { addSource } from '@/plugins/history/sources/metrics';
+import { historyStore } from '@/plugins/history/store';
+import { DisplayNames, HistorySource, MetricsResult, QueryParams, QueryTarget } from '@/plugins/history/types';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './getters';
-import { addListener } from './listener';
-import { MetricsConfig, MetricsResult } from './types';
+import { MetricsConfig } from './types';
 
 interface CurrentValue extends MetricsResult {
   name: string;
@@ -18,7 +19,7 @@ interface CurrentValue extends MetricsResult {
 }
 
 @Component
-export default class MetricsBasic extends CrudComponent {
+export default class MetricsBasic extends CrudComponent<MetricsConfig> {
   parseDuration = parseDuration;
   durationString = durationString;
   DEFAULT_FRESH_DURATION = DEFAULT_FRESH_DURATION;
@@ -30,13 +31,13 @@ export default class MetricsBasic extends CrudComponent {
   @Watch('widgetCfg', { immediate: true, deep: true })
   updateWatcher(newVal: MetricsConfig, oldVal: MetricsConfig): void {
     if (newVal && JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
-      this.resetListeners();
+      this.resetSources();
     }
   }
 
   @Watch('revision')
   triggerUpdate(): void {
-    this.resetListeners();
+    this.resetSources();
   }
 
   get widgetCfg(): MetricsConfig {
@@ -62,10 +63,10 @@ export default class MetricsBasic extends CrudComponent {
     return this.widgetCfg.params;
   }
 
-  get listeners(): Listener[] {
+  get sources(): HistorySource[] {
     return this.targets
-      .map(target => historyStore.tryListenerById(this.listenerId(target)))
-      .filter(listener => listener !== null && !!listener.values) as Listener[];
+      .map(target => historyStore.trySourceById(this.sourceId(target)))
+      .filter(source => source !== null && !!source.values) as HistorySource[];
   }
 
   fieldFreshDuration(field: string): number {
@@ -78,8 +79,8 @@ export default class MetricsBasic extends CrudComponent {
 
   get values(): CurrentValue[] {
     const now = new Date().getTime();
-    return this.listeners
-      .flatMap(listener => listener.values)
+    return this.sources
+      .flatMap(source => source.values)
       .map(result => ({
         ...result,
         name: this.renames[result.field] || result.field,
@@ -87,37 +88,35 @@ export default class MetricsBasic extends CrudComponent {
       }));
   }
 
-  listenerId(target: QueryTarget): string {
+  sourceId(target: QueryTarget): string {
     if (this.metricsId === null) {
       this.metricsId = uid();
     }
     return `${this.metricsId}/${target.measurement}`;
   }
 
-  addListeners(): void {
+  addSources(): void {
     this.targets
       .forEach(target =>
-        addListener(
-          this.listenerId(target),
+        addSource(
+          this.sourceId(target),
           this.params,
           this.renames,
           target,
         ));
   }
 
-  removeListeners(): void {
-    this.listeners
-      .forEach(listener =>
-        historyStore.removeListener(listener));
+  removeSources(): void {
+    this.sources.forEach(historyStore.removeSource);
   }
 
-  resetListeners(): void {
-    this.removeListeners();
-    this.addListeners();
+  resetSources(): void {
+    this.removeSources();
+    this.addSources();
   }
 
   destroyed(): void {
-    this.removeListeners();
+    this.removeSources();
   }
 }
 </script>

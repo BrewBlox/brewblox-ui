@@ -7,7 +7,7 @@ export interface Dashboard {
   _rev?: string;
 }
 
-export interface PersistentWidget {
+export interface PersistentWidget<ConfigT = any> {
   id: string;
   title: string;
   cols: number;
@@ -15,7 +15,7 @@ export interface PersistentWidget {
   order: number;
   dashboard: string;
   feature: string;
-  config: any;
+  config: ConfigT;
   pinnedPosition?: XYPosition | null;
   _rev?: string;
 }

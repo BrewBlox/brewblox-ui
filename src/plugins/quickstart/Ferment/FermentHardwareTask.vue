@@ -1,10 +1,10 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import WizardTaskBase from '@/components/Wizard/WizardTaskBase';
 import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
+import WizardTaskBase from '../components/WizardTaskBase';
 import { hasShared } from '../helpers';
 import { PinChannel } from '../types';
 import { FermentConfig } from './types';

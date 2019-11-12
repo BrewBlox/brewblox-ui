@@ -2,13 +2,19 @@ import { ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features';
 
 import widget from './MetricsWidget.vue';
-import wizard from './MetricsWizard.vue';
+import { MetricsConfig } from './types';
 
 const feature: Feature = {
   id: 'Metrics',
   displayName: 'Metrics',
   widgetComponent: ref(widget),
-  wizardComponent: ref(wizard),
+  generateConfig: (): MetricsConfig => ({
+    targets: [],
+    renames: {},
+    params: {},
+    freshDuration: {},
+    decimals: {},
+  }),
   widgetSize: {
     cols: 4,
     rows: 4,

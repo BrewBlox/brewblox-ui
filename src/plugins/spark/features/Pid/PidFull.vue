@@ -7,6 +7,11 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
 import { sparkStore } from '@/plugins/spark/store';
 
+interface GridOpts {
+  start?: number;
+  span?: number;
+}
+
 @Component
 export default class PidFull extends BlockCrudComponent {
   readonly block!: PidBlock;
@@ -37,8 +42,12 @@ export default class PidFull extends BlockCrudComponent {
     return this.block.data.p + this.block.data.i + this.block.data.d;
   }
 
+  get boiling(): boolean {
+    return this.block.data.boilModeActive;
+  }
+
   get boilAdjustment(): number {
-    return this.block.data.boilModeActive
+    return this.boiling
       ? this.block.data.boilMinOutput - this.baseOutput
       : 0;
   }
@@ -56,11 +65,18 @@ export default class PidFull extends BlockCrudComponent {
   showOutput(): void {
     showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.outputId));
   }
+
+  grid(opts: GridOpts): Mapped<string> {
+    return {
+      gridColumnStart: `${opts.start || 'auto'}`,
+      gridColumnEnd: `span ${opts.span || 1}`,
+    };
+  }
 }
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
@@ -71,10 +87,10 @@ export default class PidFull extends BlockCrudComponent {
         :text-disabled="`PID is disabled: output ${block.data.outputId} will not be set.`"
         class="full-width bordered"
       />
-      <q-separator dark inset />
+      <q-separator inset />
 
       <!-- Input row -->
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <q-item-label caption>
             Input Block
@@ -121,10 +137,10 @@ export default class PidFull extends BlockCrudComponent {
           <q-btn v-else disable flat icon="mdi-pencil-off" />
         </q-item-section>
       </q-item>
-      <q-separator dark inset />
+      <q-separator inset />
 
       <!-- Output row -->
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <q-item-label caption>
             Output Block
@@ -174,10 +190,10 @@ export default class PidFull extends BlockCrudComponent {
           <q-btn v-else disable flat icon="mdi-pencil-off" />
         </q-item-section>
       </q-item>
-      <q-separator dark inset />
+      <q-separator inset />
 
       <!-- Boil mode settings -->
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <q-item-label caption>
             Boil temperature
@@ -204,20 +220,22 @@ export default class PidFull extends BlockCrudComponent {
         <q-item-section />
         <q-item-section class="col-1" />
       </q-item>
-      <q-separator dark inset />
+      <q-separator inset />
 
-      <!-- Calculations -->
-      <q-item dark>
-        <q-item-section>
-          <q-item-label caption class="text-no-wrap">
+
+      <div class="grid-container q-mx-md q-mt-md q-item--dark">
+        <div class="span-2">
+          <q-item-label caption>
             Error
           </q-item-label>
           {{ block.data.error | unit }}
-        </q-item-section>
-        <q-item-section class="text-center">
+        </div>
+
+        <div class="span-1 q-pt-sm">
           *
-        </q-item-section>
-        <q-item-section>
+        </div>
+
+        <div class="span-2">
           <q-item-label caption>
             Kp
           </q-item-label>
@@ -235,42 +253,46 @@ export default class PidFull extends BlockCrudComponent {
               "
             @input="v => { block.data.kp = v; saveBlock(); }"
           />
-        </q-item-section>
-        <q-item-section />
-        <q-item-section />
-        <q-item-section class="text-center">
+        </div>
+
+        <div :style="grid({start: 9})" class="q-pt-sm">
           =
-        </q-item-section>
-        <q-item-section>
+        </div>
+
+        <div class="span-2">
           <q-item-label caption>
             P
           </q-item-label>
           {{ block.data.p | round }}
-        </q-item-section>
-      </q-item>
+        </div>
 
-      <q-item dark>
-        <q-item-section>
+        <!-- Break -->
+
+        <div class="span-2">
           <q-item-label caption>
             Integral
           </q-item-label>
           {{ block.data.integral | unit }}
-        </q-item-section>
-        <q-item-section class="text-center">
+        </div>
+
+        <div class="span-1 q-pt-sm">
           *
-        </q-item-section>
-        <q-item-section>
+        </div>
+
+        <div class="span-2">
           <q-item-label caption>
             Kp
           </q-item-label>
           <div class="darkened">
             {{ block.data.kp | unit }}
           </div>
-        </q-item-section>
-        <q-item-section class="text-center">
+        </div>
+
+        <div class="span-1 q-pt-sm">
           /
-        </q-item-section>
-        <q-item-section>
+        </div>
+
+        <div class="span-2">
           <q-item-label caption>
             Ti
           </q-item-label>
@@ -296,11 +318,13 @@ export default class PidFull extends BlockCrudComponent {
               "
             @input="v => { block.data.ti = v; saveBlock(); }"
           />
-        </q-item-section>
-        <q-item-section class="text-center">
+        </div>
+
+        <div class="span-1 q-pt-sm">
           =
-        </q-item-section>
-        <q-item-section>
+        </div>
+
+        <div class="span-2">
           <q-item-label caption>
             I
           </q-item-label>
@@ -319,31 +343,37 @@ export default class PidFull extends BlockCrudComponent {
               "
             @input="v => { block.data.integralReset = v || 0.001; saveBlock(); }"
           />
-        </q-item-section>
-      </q-item>
+        </div>
 
-      <q-item dark>
-        <q-item-section>
+        <!-- Break -->
+
+        <div class="span-2">
           <q-item-label caption>
             Derivative
           </q-item-label>
-          <span :class="{darkened: block.data.td.val === 0}">{{ block.data.derivative | unit }}</span>
-        </q-item-section>
-        <q-item-section class="text-center">
+          <span :class="{darkened: block.data.td.val === 0}">
+            {{ block.data.derivative | unit }}
+          </span>
+        </div>
+
+        <div class="span-1 q-pt-sm">
           *
-        </q-item-section>
-        <q-item-section>
+        </div>
+
+        <div class="span-2">
           <q-item-label caption>
             Kp
           </q-item-label>
           <div class="darkened">
             {{ block.data.kp | unit }}
           </div>
-        </q-item-section>
-        <q-item-section class="text-center">
+        </div>
+
+        <div class="span-1 q-pt-sm">
           *
-        </q-item-section>
-        <q-item-section>
+        </div>
+
+        <div class="span-2">
           <q-item-label caption>
             Td
           </q-item-label>
@@ -367,48 +397,67 @@ export default class PidFull extends BlockCrudComponent {
               "
             @input="v => { block.data.td = v; saveBlock(); }"
           />
-        </q-item-section>
-        <q-item-section class="text-center">
+        </div>
+
+        <div class="span-1 q-pt-sm">
           =
-        </q-item-section>
-        <q-item-section>
+        </div>
+
+        <div class="span-2 calc-line">
           <q-item-label caption>
             D
           </q-item-label>
-          <div style="border-bottom: solid 2px white; min-width: 60px;">
-            {{ block.data.d | round }}
-            <!-- {{ boilAdjustment | round }} -->
-            <span style="float: right;">
-              <sub>+</sub>
-            </span>
-          </div>
-        </q-item-section>
-      </q-item>
+          {{ block.data.d | round }}
+          <span style="float: right;">
+            <sub>+</sub>
+          </span>
+        </div>
 
-      <q-item v-if="block.data.boilModeActive" dark>
-        <q-item-section v-for="i in 6" :key="'boil'+i" />
-        <q-item-section>
+        <!-- Break -->
+
+        <div
+          v-if="boiling"
+          class="calc-line"
+          :style="grid({start: 10, span: 2})"
+        >
           <q-item-label caption>
             Boil mode
           </q-item-label>
-          <div style="border-bottom: solid 2px white; min-width: 60px;">
-            {{ boilAdjustment | round }}
-            <span style="float: right;">
-              <sub>+</sub>
-            </span>
-          </div>
-        </q-item-section>
-      </q-item>
+          {{ boilAdjustment | round }}
+          <span style="float: right;">
+            <sub>+</sub>
+          </span>
+        </div>
 
-      <q-item dark>
-        <q-item-section v-for="i in 6" :key="`output-${i}`" />
-        <q-item-section>
+        <!-- Break -->
+
+        <div :style="grid({start: 10, span: 2})">
           <q-item-label caption>
             Output
           </q-item-label>
           {{ baseOutput + boilAdjustment | round }}
-        </q-item-section>
-      </q-item>
+        </div>
+      </div>
     </q-card-section>
   </q-card>
 </template>
+
+<style scoped>
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(11, auto);
+  grid-row-gap: 10px;
+}
+
+.span-1 {
+  grid-column: span 1;
+}
+
+.span-2 {
+  grid-column: span 2;
+}
+
+.calc-line {
+  border-bottom: 2px solid white;
+}
+</style>
