@@ -22,6 +22,12 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
       : historyStore.sessionById(this.config.currentSession);
   }
 
+  saveSession(session: LoggedSession | null = this.session): void {
+    if (session !== null) {
+      historyStore.saveSession(session);
+    }
+  }
+
   get notes(): SessionNote[] {
     return this.session ? this.session.notes : [];
   }
@@ -29,7 +35,7 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
   set notes(notes: SessionNote[]) {
     if (this.session) {
       this.session.notes = notes;
-      this.saveConfig();
+      this.saveSession();
     }
   }
 
@@ -48,18 +54,18 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
   saveSessionTitle(title: string): void {
     if (this.session) {
       this.session.title = title;
-      this.saveConfig();
+      this.saveSession();
     }
   }
 
   saveSessionDate(date: Date): void {
     if (this.session) {
       this.session.date = date.getTime();
-      this.saveConfig();
+      this.saveSession();
     }
   }
 
-  debouncedSave = debounce(this.saveConfig, 1000);
+  debouncedSave = debounce(this.saveSession, 1000);
 
   saveSize(note: SessionNote, idx: number): void {
     const col = this.colSizes[idx];
@@ -72,7 +78,7 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
   saveTitle(note: SessionNote, title: string): void {
     if (title !== note.title) {
       note.title = title;
-      this.saveConfig();
+      this.saveSession();
     }
   }
 
@@ -84,14 +90,14 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
       note.start = null;
       note.end = null;
     }
-    this.saveConfig();
+    this.saveSession();
   }
 
   removeNote(note: SessionNote): void {
     const idx = this.notes.findIndex(n => n.id === note.id);
     if (idx >= 0) {
       this.notes.splice(idx, 1);
-      this.saveConfig();
+      this.saveSession();
     }
   }
 
@@ -102,13 +108,16 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
       title: 'Add field',
       label: 'title',
     })
-      .onOk(title => this.notes.push({
-        id: uid(),
-        type: 'Text',
-        title,
-        value: '',
-        col: 12,
-      }));
+      .onOk(title => {
+        this.notes.push({
+          id: uid(),
+          type: 'Text',
+          title,
+          value: '',
+          col: 12,
+        });
+        this.saveSession();
+      });
   }
 
   addGraphNote(): void {
@@ -118,15 +127,18 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
       title: 'Add field',
       label: 'title',
     })
-      .onOk(title => this.notes.push({
-        id: uid(),
-        type: 'Graph',
-        title,
-        start: null,
-        end: null,
-        config: emptyGraphConfig(),
-        col: 12,
-      }));
+      .onOk(title => {
+        this.notes.push({
+          id: uid(),
+          type: 'Graph',
+          title,
+          start: null,
+          end: null,
+          config: emptyGraphConfig(),
+          col: 12,
+        });
+        this.saveSession();
+      });
   }
 
   editGraph(note: SessionGraphNote): void {
@@ -142,7 +154,7 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
         const actual = this.notes.find(n => n.id === note.id);
         if (actual !== undefined && actual.type === 'Graph') {
           this.$set(actual, 'config', config);
-          this.saveConfig();
+          this.saveSession();
         }
       });
   }

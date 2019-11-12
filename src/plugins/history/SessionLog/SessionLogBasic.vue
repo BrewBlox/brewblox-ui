@@ -27,6 +27,12 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
       : historyStore.sessionById(this.config.currentSession);
   }
 
+  saveSession(session: LoggedSession | null = this.session): void {
+    if (session !== null) {
+      historyStore.saveSession(session);
+    }
+  }
+
   get notes(): SessionNote[] {
     return this.session ? this.session.notes : [];
   }
@@ -34,8 +40,8 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
   saveNote(note: SessionNote): void {
     const idx = this.notes.findIndex(n => n.id === note.id);
     if (idx >= 0) {
-      this.notes[idx] = note;
-      this.saveConfig(this.widget.config);
+      this.$set(this.notes, idx, note);
+      this.saveSession();
     }
   }
 
@@ -71,12 +77,12 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
 
   startGraphNote(note: SessionGraphNote): void {
     note.start = new Date().getTime();
-    this.saveConfig();
+    this.saveSession();
   }
 
   stopGraphNote(note: SessionGraphNote): void {
     note.end = new Date().getTime();
-    this.saveConfig();
+    this.saveSession();
   }
 
   editGraphNote(note: SessionGraphNote): void {
@@ -93,7 +99,7 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
         if (actual && actual.type === 'Graph') {
           actual.start = start;
           actual.end = end;
-          this.saveConfig();
+          this.saveSession();
         }
       });
   }
