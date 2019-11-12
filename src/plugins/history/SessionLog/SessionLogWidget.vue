@@ -36,6 +36,12 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
       : historyStore.sessionById(this.config.currentSession);
   }
 
+  saveSession(session: LoggedSession | null = this.session): void {
+    if (session !== null) {
+      historyStore.saveSession(session);
+    }
+  }
+
   get notes(): SessionNote[] {
     return this.session ? this.session.notes : [];
   }
@@ -127,7 +133,7 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
         note.end = null;
       }
     });
-    this.saveConfig();
+    this.saveSession();
   }
 
   startRemoveSession(): void {
