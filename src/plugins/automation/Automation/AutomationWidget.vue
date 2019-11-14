@@ -7,8 +7,8 @@ import { createDialog } from '@/helpers/dialog';
 import { Unit } from '@/helpers/units';
 import { blockTypes } from '@/plugins/spark/block-types';
 
-import { stepperStore } from '../store';
-import { Process, ProcessStep, Runtime, StepperConfig } from '../types';
+import { automationStore } from '../store';
+import { AutomationConfig, Process, ProcessStep, Runtime } from '../types';
 
 
 const lipsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -25,13 +25,13 @@ const lipsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 
 @Component
-export default class StepperWidget extends WidgetBase<StepperConfig> {
+export default class AutomationWidget extends WidgetBase<AutomationConfig> {
   get processes(): Process[] {
-    return stepperStore.processValues;
+    return automationStore.processValues;
   }
 
   get runtimes(): Runtime[] {
-    return stepperStore.runtimeValues;
+    return automationStore.runtimeValues;
   }
 
   conditionsString(runtime: Runtime | null): string {
@@ -47,31 +47,31 @@ export default class StepperWidget extends WidgetBase<StepperConfig> {
   }
 
   async start(process: Process): Promise<void> {
-    await stepperStore.startRuntime(process);
+    await automationStore.startRuntime(process);
   }
 
   async advance(runtime: Runtime): Promise<void> {
-    await stepperStore.advanceRuntime(runtime);
+    await automationStore.advanceRuntime(runtime);
   }
 
   async stop(runtime: Runtime): Promise<void> {
-    await stepperStore.stopRuntime(runtime);
+    await automationStore.stopRuntime(runtime);
   }
 
   async remove(process: Process): Promise<void> {
-    await stepperStore.removeProcess(process);
+    await automationStore.removeProcess(process);
   }
 
   startEditor(): void {
     createDialog({
-      component: 'StepperEditor',
+      component: 'AutomationEditor',
       parent: this,
     });
   }
 
   async clear(): Promise<void> {
-    for (const process of stepperStore.processValues) {
-      await stepperStore.removeProcess(process);
+    for (const process of automationStore.processValues) {
+      await automationStore.removeProcess(process);
     }
   }
 
@@ -198,7 +198,7 @@ export default class StepperWidget extends WidgetBase<StepperConfig> {
       },
     ]);
 
-    stepperStore.createProcess({
+    automationStore.createProcess({
       id: uid(),
       title: 'Test Process',
       steps: [

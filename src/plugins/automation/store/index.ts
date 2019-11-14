@@ -10,8 +10,8 @@ import { processApi, runtimeApi } from './api';
 
 const rawError = true;
 
-@Module({ store, namespaced: true, dynamic: true, name: 'stepper' })
-export class StepperModule extends VuexModule {
+@Module({ store, namespaced: true, dynamic: true, name: 'automation' })
+export class AutomationModule extends VuexModule {
   public processes: Mapped<Process> = {};
   public runtimes: Mapped<Runtime> = {};
 
@@ -156,7 +156,7 @@ export class StepperModule extends VuexModule {
 
   @Action({ rawError })
   public async setup(): Promise<void> {
-    if (process.env.VUE_APP_STEPPER_FEATURE !== 'true') {
+    if (process.env.VUE_APP_AUTOMATION_FEATURE !== 'true') {
       return;
     }
 
@@ -180,4 +180,4 @@ export class StepperModule extends VuexModule {
   }
 }
 
-export const stepperStore = getModule(StepperModule);
+export const automationStore = getModule(AutomationModule);

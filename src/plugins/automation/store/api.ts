@@ -19,29 +19,29 @@ export const processApi = generate<Process>('processes', true);
 
 export const runtimeApi = {
   start: async (process: Process): Promise<Runtime> =>
-    post('/stepper/start', { ...process, _rev: undefined })
+    post('/automation/start', { ...process, _rev: undefined })
       .catch(intercept(`Failed to start process ${process.id}`)),
 
   stop: async ({ id }: { id: string }): Promise<Runtime> =>
-    post(`/stepper/stop/${encodeURIComponent(id)}`, {})
+    post(`/automation/stop/${encodeURIComponent(id)}`, {})
       .catch(intercept(`Failed to stop runtime ${id}`)),
 
   advance: async ({ id }: { id: string }): Promise<Runtime> =>
-    post(`/stepper/advance/${encodeURIComponent(id)}`, {})
+    post(`/automation/advance/${encodeURIComponent(id)}`, {})
       .catch(intercept(`Failed to advance runtime ${id}`)),
 
   exit: async ({ id }: { id: string }): Promise<Runtime> =>
-    post(`/stepper/exit/${encodeURIComponent(id)}`, {})
+    post(`/automation/exit/${encodeURIComponent(id)}`, {})
       .catch(intercept(`Failed to exit runtime ${id}`)),
 
   fetch: async (): Promise<Runtime[]> =>
-    get('/stepper/runtime')
+    get('/automation/runtime')
       .catch(intercept('Failed to fetch all runtimes')),
 
   fetchById: async (id: string): Promise<Runtime> =>
-    get(`/stepper/runtime/${encodeURIComponent(id)}`)
+    get(`/automation/runtime/${encodeURIComponent(id)}`)
       .catch(intercept(`Failed to fetch runtime ${id}`)),
 
   subscribe: async (): Promise<EventSource> =>
-    sse('/stepper/sse/runtime'),
+    sse('/automation/sse/runtime'),
 };

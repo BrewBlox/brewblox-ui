@@ -261,7 +261,7 @@
       "order": 4,
       "cols": 4,
       "rows": 2,
-      "feature": "Stepper",
+      "feature": "Automation",
       "dashboard": "dashboard-home",
       "config": {}
     }
