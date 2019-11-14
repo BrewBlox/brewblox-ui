@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 
 @Component
-export default class StepperSectionEditor extends Vue {
+export default class AutomationSectionEditor extends Vue {
 
   @Prop({ type: Array, required: true })
   public readonly value!: { id: string }[];

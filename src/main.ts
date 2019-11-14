@@ -6,12 +6,12 @@ import Vue, { PluginObject } from 'vue';
 
 import App from './App.vue';
 import { autoRegister, externalComponent } from './helpers/component-ref';
+import automation from './plugins/automation';
 import builder from './plugins/builder';
 import database from './plugins/database';
 import history from './plugins/history';
 import quickstart from './plugins/quickstart';
 import spark from './plugins/spark';
-import stepper from './plugins/stepper';
 import router from './router';
 import store from './store';
 import { pluginStore, UIPlugin } from './store/plugins';
@@ -54,7 +54,7 @@ async function setup(): Promise<void> {
 
   const plugins: PluginObject<any>[] = [
     PortalVue,
-    stepper,
+    automation,
     history,
     spark,
     builder,

@@ -17,7 +17,7 @@ export default class DefaultLayout extends Vue {
   }
 
   // env flag
-  stepperFeatureEnabled = process.env.VUE_APP_STEPPER_FEATURE === 'true';
+  automationFeatureEnabled = process.env.VUE_APP_AUTOMATION_FEATURE === 'true';
 
   get version(): string {
     return buildEnv.version || 'UNKNOWN';
@@ -48,10 +48,10 @@ export default class DefaultLayout extends Vue {
     });
   }
 
-  showStepperEditor(): void {
+  showAutomationEditor(): void {
     createDialog({
       parent: this,
-      component: 'StepperEditor',
+      component: 'AutomationEditor',
     });
   }
 
@@ -91,8 +91,8 @@ export default class DefaultLayout extends Vue {
       <q-separator dark class="q-mt-sm" />
       <ActionItem icon="mdi-creation" label="Wizardry" @click="showWizard" />
       <ActionItem icon="mdi-pipe" label="Brewery Builder" @click="showBuilderEditor" />
-      <template v-if="stepperFeatureEnabled">
-        <ActionItem icon="mdi-calendar-check" label="Stepper" @click="showStepperEditor" />
+      <template v-if="automationFeatureEnabled">
+        <ActionItem icon="mdi-calendar-check" label="Automation" @click="showAutomationEditor" />
       </template>
 
       <q-item dark class="bottomed">

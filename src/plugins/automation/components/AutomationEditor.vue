@@ -7,14 +7,14 @@ import { createDialog } from '@/helpers/dialog';
 
 import { actionComponents } from '../actions';
 import { conditionComponents } from '../conditions';
-import { stepperStore } from '../store';
+import { automationStore } from '../store';
 import { Process, ProcessStep, StepAction, StepCondition, StepNote } from '../types';
 
 
 interface HasId { id: string };
 
 @Component
-export default class StepperEditor extends DialogBase {
+export default class AutomationEditor extends DialogBase {
   processId: string | null = null;
   stepId: string | null = null;
   splitterModel = 20;
@@ -23,20 +23,20 @@ export default class StepperEditor extends DialogBase {
   public readonly initialProcess!: string;
 
   get process(): Process | null {
-    return stepperStore.processById(
+    return automationStore.processById(
       this.processId
       || this.initialProcess
-      || stepperStore.processIds[0]
+      || automationStore.processIds[0]
       || ''
     );
   }
 
   get processes(): Process[] {
-    return stepperStore.processValues;
+    return automationStore.processValues;
   }
 
   saveProcess(process: Process): void {
-    stepperStore.saveProcess(process);
+    automationStore.saveProcess(process);
   }
 
   get step(): ProcessStep | null {
@@ -132,7 +132,7 @@ export default class StepperEditor extends DialogBase {
       dark: true,
       cancel: true,
     })
-      .onOk(() => this.process !== null && stepperStore.removeProcess(this.process));
+      .onOk(() => this.process !== null && automationStore.removeProcess(this.process));
   }
 
   created(): void {
@@ -203,7 +203,7 @@ export default class StepperEditor extends DialogBase {
             <split class="col row no-wrap">
               <!-- Actions -->
               <split-area>
-                <StepperSectionEditor
+                <AutomationSectionEditor
                   :value="step.actions"
                   label="Actions"
                   @input="saveAllActions"
@@ -219,12 +219,12 @@ export default class StepperEditor extends DialogBase {
                       @update:action="saveAction"
                     />
                   </template>
-                </StepperSectionEditor>
+                </AutomationSectionEditor>
               </split-area>
 
               <!-- Conditions -->
               <split-area>
-                <StepperSectionEditor
+                <AutomationSectionEditor
                   :value="step.conditions"
                   label="Conditions"
                   @input="saveAllConditions"
@@ -240,12 +240,12 @@ export default class StepperEditor extends DialogBase {
                       @update:condition="saveCondition"
                     />
                   </template>
-                </StepperSectionEditor>
+                </AutomationSectionEditor>
               </split-area>
 
               <!-- Notes -->
               <split-area>
-                <StepperSectionEditor
+                <AutomationSectionEditor
                   :value="step.notes"
                   label="Notes"
                   @input="saveAllNotes"
@@ -256,7 +256,7 @@ export default class StepperEditor extends DialogBase {
                   <template #item="{item}">
                     {{ item.title }}
                   </template>
-                </StepperSectionEditor>
+                </AutomationSectionEditor>
               </split-area>
             </split>
           </div>

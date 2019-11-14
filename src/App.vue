@@ -2,9 +2,9 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
+import { automationStore } from '@/plugins/automation/store';
 import { historyStore } from '@/plugins/history/store';
 import { sparkStore } from '@/plugins/spark/store';
-import { stepperStore } from '@/plugins/stepper/store';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 
@@ -16,7 +16,7 @@ export default class App extends Vue {
       dashboardStore.setup(),
       historyStore.setup(),
       sparkStore.setup(),
-      stepperStore.setup(),
+      automationStore.setup(),
     ]);
   }
 }

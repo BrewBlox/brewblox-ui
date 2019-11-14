@@ -71,4 +71,4 @@ export interface Runtime {
 
 export type CompareOperator = 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt';
 
-export type StepperConfig = {};
+export type AutomationConfig = {};
