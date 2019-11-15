@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
-import { shortDateString } from '@/helpers/functional';
+import { shortDateString, spliceById } from '@/helpers/functional';
 
 import { historyStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
@@ -38,11 +38,8 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
   }
 
   saveNote(note: SessionNote): void {
-    const idx = this.notes.findIndex(n => n.id === note.id);
-    if (idx >= 0) {
-      this.$set(this.notes, idx, note);
-      this.saveSession();
-    }
+    spliceById(this.notes, note);
+    this.saveSession();
   }
 
   openNote(note: SessionNote): void {

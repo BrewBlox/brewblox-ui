@@ -2,6 +2,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { objReducer } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
 import { parsePostfixed, propertyNameWithoutUnit } from '@/helpers/units/parseObject';
 import PostFixed from '@/helpers/units/PostFixed';
@@ -9,7 +10,6 @@ import { sparkStore } from '@/plugins/spark/store';
 import { BlockSpec, ChangeField } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 
-import { objReducer } from '../../../helpers/functional';
 import { StepCondition } from '../types';
 
 type CompareOperator = 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt';

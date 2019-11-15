@@ -6,6 +6,7 @@ import { colors } from 'quasar';
 import { Unit } from './units';
 
 type SortFunc = (a: any, b: any) => number
+interface HasId { id: string };
 
 export const uniqueFilter =
   (val: any, idx: number, coll: any[]): boolean => coll.indexOf(val) === idx;
@@ -229,3 +230,14 @@ export const objReducer =
 export const mapEntries =
   (obj: Record<keyof any, any>, callback: ([k, v]) => [keyof any, any]): typeof obj =>
     fromEntries(Object.entries(obj).map(callback));
+
+export const spliceById =
+  (arr: HasId[], obj: HasId, insert = true): typeof arr => {
+    const idx = arr.findIndex(v => v.id === obj.id);
+    if (idx !== -1) {
+      insert
+        ? arr.splice(idx, 1, obj)
+        : arr.splice(idx, 1);
+    }
+    return arr;
+  };

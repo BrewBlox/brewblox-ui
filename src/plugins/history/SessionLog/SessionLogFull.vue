@@ -4,6 +4,7 @@ import { Component } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
+import { spliceById } from '@/helpers/functional';
 
 import { emptyGraphConfig } from '../getters';
 import { sharedWidgetConfigs } from '../helpers';
@@ -94,11 +95,8 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
   }
 
   removeNote(note: SessionNote): void {
-    const idx = this.notes.findIndex(n => n.id === note.id);
-    if (idx >= 0) {
-      this.notes.splice(idx, 1);
-      this.saveSession();
-    }
+    spliceById(this.notes, note, false);
+    this.saveSession();
   }
 
   addTextNote(): void {

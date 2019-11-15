@@ -2,7 +2,7 @@
 import Vue, { CreateElement, VNode } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { Process, ProcessStep, StepNote } from '../types';
+import { Process, ProcessStep } from '../types';
 
 @Component
 export default class ProcessIndex extends Vue {
@@ -13,11 +13,8 @@ export default class ProcessIndex extends Vue {
   @Prop({ required: true })
   public readonly selected!: string | null;
 
-  private renderNote(h: CreateElement, note: StepNote): VNode {
-    return h('div', [
-      h('div', { class: 'text-bold' }, [note.title]),
-      h('div', { class: 'ellipsis-2-lines' }, [note.message]),
-    ]);
+  private listDesc(name: string, arr: any[]): string {
+    return `${arr.length} ${name}${arr.length !== 1 ? 's' : ''}`;
   }
 
   private renderStep(h: CreateElement, step: ProcessStep): VNode {
@@ -32,18 +29,19 @@ export default class ProcessIndex extends Vue {
           click: () => this.$emit('update:selected', step.id),
         },
       },
-      step.notes.map(note => this.renderNote(h, note)),
+      [
+        h('div', [[
+          this.listDesc('action', step.actions),
+          this.listDesc('condition', step.conditions),
+          this.listDesc('note', step.notes),
+        ].join(', ')]),
+      ]
     );
   }
 
   public render(h: CreateElement): VNode {
     return h('q-timeline',
-      {
-        props: {
-          dark: true,
-          layout: 'dense',
-        },
-      },
+      { props: { layout: 'dense' } },
       this.process.steps.map(step => this.renderStep(h, step)));
   }
 }
