@@ -1,14 +1,15 @@
 import { VueConstructor } from 'vue';
 
 import { autoRegister } from '@/helpers/component-ref';
-import { sparkStore } from '@/plugins/spark/store';
 import { Feature, featureStore } from '@/store/features';
+import { pluginStore } from '@/store/plugins';
 import { providerStore } from '@/store/providers';
 import { Service } from '@/store/services';
 
 import features from './features';
 import { typeName } from './getters';
 import { installFilters } from './helpers';
+import { sparkStore } from './store';
 import { BlockSpec } from './types';
 
 const onAdd = async (service: Service): Promise<void> => {
@@ -57,6 +58,7 @@ export default {
       .map(spec => spec.block) as BlockSpec[];
 
     sparkStore.commitAllSpecs(specs);
+    pluginStore.onSetup('spark/setup');
 
     providerStore.createProvider({
       id: typeName,

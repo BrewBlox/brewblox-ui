@@ -1,5 +1,6 @@
 import { autoRegister } from '@/helpers/component-ref';
 import { featureStore } from '@/store/features';
+import { pluginStore } from '@/store/plugins';
 
 import Graph from './Graph';
 import Metrics from './Metrics';
@@ -14,5 +15,7 @@ export default {
     featureStore.createFeature(Metrics);
     featureStore.createFeature(SessionLog);
     featureStore.createFeature(SessionView);
+
+    pluginStore.onSetup('history/setup');
   },
 };

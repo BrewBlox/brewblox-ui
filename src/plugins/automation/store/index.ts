@@ -156,10 +156,6 @@ export class AutomationModule extends VuexModule {
 
   @Action({ rawError })
   public async setup(): Promise<void> {
-    if (process.env.VUE_APP_AUTOMATION_FEATURE !== 'true') {
-      return;
-    }
-
     const onChange = (process: Process): void => {
       const existing = this.processById(process.id);
       if (!existing || existing._rev !== process._rev) {
