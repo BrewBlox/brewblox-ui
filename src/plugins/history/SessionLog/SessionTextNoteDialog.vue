@@ -1,4 +1,5 @@
 <script lang="ts">
+import { QInput } from 'quasar';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
@@ -9,7 +10,7 @@ export default class SessionTextNoteDialog extends DialogBase {
   local: string | null = null;
 
   @Ref()
-  readonly editor!: HTMLElement;
+  readonly editor!: QInput;
 
   @Prop({ type: String })
   public readonly value!: string;
@@ -33,15 +34,43 @@ export default class SessionTextNoteDialog extends DialogBase {
       value: new Date(),
     })
       .onOk(date => {
-        this.local += `[${date.toLocaleString(undefined, { weekday: 'short' })} ${date.toLocaleString()}] `;
-        this.$nextTick(() => this.editor.focus());
+        // Get the textarea wrapped by the q-input
+        const native = this.editor.$el.querySelector('textarea');
+        const prev = this.local!;
+
+        // We want to mirror ctrl+v behaviour
+        // Insert at cursor, overwrite any selection
+        const [start, end] = native !== null
+          ? [native.selectionStart, native.selectionEnd]
+          : [prev.length, prev.length];
+
+        // [Fri 11/15/2019, 2:00:23 PM]
+        const day = date.toLocaleString(undefined, { weekday: 'short' });
+        const insert = `[${day} ${date.toLocaleString()}] `;
+
+        // Splice into current string
+        this.local = [
+          prev.slice(0, start),
+          insert,
+          prev.slice(end, prev.length),
+        ].join('');
+
+        // We lost focus when pressing the button
+        // Reset focus to the editor, at the correct position
+        this.$nextTick(() => {
+          if (native !== null) {
+            this.editor.focus();
+            native.selectionStart = start + insert.length;
+            native.selectionEnd = start + insert.length;
+          }
+        });
       });
   }
 }
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
+  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.ctrl.enter="save">
     <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
       <q-card-section class="q-dialog__title ellipsis">
         {{ title }}
@@ -51,13 +80,13 @@ export default class SessionTextNoteDialog extends DialogBase {
       </q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
-        <textarea
+        <q-input
           ref="editor"
-          :value="local"
-          class="full-width"
-          style="min-height: 200px;"
+          v-model="local"
+          type="textarea"
+          label="Note"
+          autogrow
           autofocus
-          @change="ev => { local = ev.target.value; }"
         />
       </q-card-section>
       <q-card-actions align="right">
