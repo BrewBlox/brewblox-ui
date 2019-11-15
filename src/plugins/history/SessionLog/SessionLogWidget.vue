@@ -67,11 +67,24 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
     ];
   }
 
-  async addSession(): Promise<void> {
+  startAddSession(): void {
+    createDialog({
+      title: 'New Session',
+      cancel: true,
+      message: 'Choose a name for the new session.',
+      prompt: {
+        model: 'New Session',
+        type: 'text',
+      },
+    })
+      .onOk(this.addSession);
+  }
+
+  async addSession(title: string): Promise<void> {
     const id = uid();
     await historyStore.createSession({
       id,
-      title: 'New Session',
+      title,
       date: new Date().getTime(),
       notes: this.session === null
         ? this.exampleNotes()
@@ -168,14 +181,14 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
     :is="mode"
     :crud="crud"
     :class="cardClass"
-    @add="addSession"
+    @add="startAddSession"
   >
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
           <!-- TODO -->
           <!-- <ActionItem icon="help" label="About" @click="showHelp" /> -->
-          <ActionItem icon="add" label="New session" @click="addSession" />
+          <ActionItem icon="add" label="New session" @click="startAddSession" />
           <ActionItem :disabled="!session" icon="mdi-file-export" label="Export session" @click="exportSession" />
           <ActionItem icon="clear" label="Clear session notes" @click="clearNotes" />
           <ActionItem icon="delete" label="Remove session" @click="startRemoveSession" />
