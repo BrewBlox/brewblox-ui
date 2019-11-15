@@ -155,12 +155,6 @@ export const truncate =
     return strVal.length <= 30 ? strVal : `${strVal.slice(0, 27)}...`;
   };
 
-export function valOrDefault<T>(val: T, defaultVal: T): T {
-  return val !== null && val !== undefined
-    ? val
-    : defaultVal;
-}
-
 export function chunked<T>(arr: T[], chunkSize: number): T[][] {
   const chunks: T[][] = [];
   let i = 0;
