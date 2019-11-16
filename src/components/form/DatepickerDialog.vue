@@ -16,12 +16,7 @@ export default class DatepickerDialog extends DialogBase {
   public readonly label!: string;
 
   get parsed(): Date {
-    const args =
-      (this.stringValue.match(/^(\d*)\/(\d*)\/(\d*) (\d*):(\d*):(\d*)$/) || [])
-        .map(Number);
-    // Months start at 0 in JavaScript
-    // I have no words. At least: none that needn't be censored.
-    return new Date(args[1], args[2] - 1, args[3], args[4], args[5], args[6]);
+    return qdate.extractDate(this.stringValue, 'YYYY/MM/DD HH:mm:ss');
   }
 
   get valid(): boolean {
