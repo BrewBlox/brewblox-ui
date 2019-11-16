@@ -4,25 +4,26 @@ import { Component, Prop } from 'vue-property-decorator';
 
 @Component
 export default class ActionItem extends Vue {
+  @Prop({ type: String, required: false })
+  public readonly label!: string;
 
   @Prop({ type: String, required: false })
-  readonly label!: string;
+  public readonly icon!: string;
 
   @Prop({ type: String, required: false })
-  readonly icon!: string;
+  public readonly tooltip!: string;
 
   @Prop({ type: Boolean, default: false })
-  readonly active!: boolean;
+  public readonly active!: boolean;
 
   @Prop({ type: Boolean, default: false })
-  readonly noClose!: boolean;
+  public readonly noClose!: boolean;
 
   @Prop({ type: Object, default: () => ({}) })
-  readonly itemProps!: any;
+  public readonly itemProps!: any;
 
   @Prop({ type: Boolean, default: false })
-  readonly disabled!: boolean;
-
+  public readonly disabled!: boolean;
 
   get combinedProps(): Mapped<any> {
     return {
@@ -48,12 +49,10 @@ export default class ActionItem extends Vue {
 </script>
 
 <template>
-  <q-item
-    v-close-popup="noClose || disabled ? 0 : 1"
-    v-bind="combinedProps"
-    :class="itemClass"
-    @click="onClick"
-  >
+  <q-item v-close-popup="noClose || disabled ? 0 : 1" v-bind="combinedProps" :class="itemClass" @click="onClick">
+    <q-tooltip v-if="tooltip && !disabled">
+      {{ tooltip }}
+    </q-tooltip>
     <q-item-section v-if="icon" avatar>
       <q-icon :name="icon" />
     </q-item-section>

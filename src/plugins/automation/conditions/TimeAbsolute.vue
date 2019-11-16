@@ -27,17 +27,27 @@ export default class TimeAbsolute extends Vue {
     this.condition.opts.time = val.getTime();
     this.saveCondition();
   }
+
+  saveEnabled(value: boolean): void {
+    this.condition.enabled = value;
+    this.saveCondition();
+  }
 }
 </script>
 
 <template>
-  <q-list dark dense>
-    <q-item dark>
+  <q-list :class="{'darkish': !condition.enabled}" dense>
+    <q-item>
       <q-item-section class="text-h6 text-italic">
         Wait until
       </q-item-section>
+      <q-item-section class="col-auto">
+        <q-toggle :value="condition.enabled" @input="saveEnabled">
+          <q-tooltip>Toggle enabled</q-tooltip>
+        </q-toggle>
+      </q-item-section>
     </q-item>
-    <q-item dark>
+    <q-item>
       <q-item-section class="col-auto">
         <DatetimeField v-model="time" />
       </q-item-section>

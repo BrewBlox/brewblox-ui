@@ -1,19 +1,16 @@
 <script lang="ts">
-import { uid } from 'quasar';
-import { VueConstructor } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 import { spliceById } from '@/helpers/functional';
 
-import { actionComponents } from '../actions';
-import { conditionComponents } from '../conditions';
 import { automationStore } from '../store';
-import { Process, ProcessStep, StepAction, StepCondition, StepNote } from '../types';
+import { Process, ProcessStep } from '../types';
 
-
-interface HasId { id: string };
+interface HasId {
+  id: string;
+}
 
 @Component
 export default class AutomationEditor extends DialogBase {
@@ -25,12 +22,7 @@ export default class AutomationEditor extends DialogBase {
   public readonly initialProcess!: string;
 
   get process(): Process | null {
-    return automationStore.processById(
-      this.processId
-      || this.initialProcess
-      || automationStore.processIds[0]
-      || ''
-    );
+    return automationStore.processById(this.processId || this.initialProcess || automationStore.processIds[0] || '');
   }
 
   get processes(): Process[] {
@@ -44,7 +36,7 @@ export default class AutomationEditor extends DialogBase {
   }
 
   get step(): ProcessStep | null {
-    return (this.process === null || this.stepId === null)
+    return this.process === null || this.stepId === null
       ? null
       : this.process.steps.find(s => s.id === this.stepId) || null;
   }
@@ -56,88 +48,14 @@ export default class AutomationEditor extends DialogBase {
     }
   }
 
-  actionComponent(action: StepAction): VueConstructor {
-    return actionComponents[action.type];
-  }
-
-  saveAction(action: StepAction): void {
-    if (this.step) {
-      spliceById(this.step.actions, action);
-      this.saveStep();
-    }
-  }
-
-  saveAllActions(actions: StepAction[]): void {
-    if (this.step) {
-      this.step.actions = actions;
-      this.saveStep();
-    }
-  }
-
-  startAddAction(): void {
-
-  }
-
-  conditionComponent(condition: StepCondition): VueConstructor {
-    return conditionComponents[condition.type];
-  }
-
-  saveCondition(condition: StepCondition): void {
-    if (this.step) {
-      spliceById(this.step.conditions, condition);
-      this.saveStep();
-    }
-  }
-
-  saveAllConditions(conditions: StepCondition[]): void {
-    if (this.step) {
-      this.step.conditions = conditions;
-      this.saveStep();
-    }
-  }
-
-  startAddCondition(): void {
-
-  }
-
-  saveNote(note: StepNote): void {
-    if (this.step) {
-      spliceById(this.step.notes, note);
-      this.saveStep();
-    }
-  }
-
-  saveAllNotes(notes: StepNote[]): void {
-    if (this.step) {
-      this.step.notes = notes;
-      this.saveStep();
-    }
-  }
-
-  startAddNote(): void {
-    if (this.step) {
-      this.step.notes.push({
-        id: uid(),
-        title: 'New note',
-        message: '',
-      });
-      this.saveStep();
-    }
-  }
-
-  removeNote(note: StepNote): void {
-    if (this.step) {
-      spliceById(this.step.notes, note, false);
-      this.saveStep();
-    }
-  }
-
   startAddProcess(copy: boolean): void {
-    (copy);
+    copy;
   }
 
   startRenameProcess(): void {
-    if (this.process === null) { return; }
+    if (this.process === null) {
+      return;
+    }
     createDialog({
       parent: this,
       title: 'Rename process',
@@ -147,20 +65,19 @@ export default class AutomationEditor extends DialogBase {
         model: this.process.title,
         type: 'text',
       },
-    })
-      .onOk(title =>
-        this.process !== null && this.saveProcess({ ...this.process, title }));
+    }).onOk(title => this.process !== null && this.saveProcess({ ...this.process, title }));
   }
 
   startRemoveProcess(): void {
-    if (this.process === null) { return; }
+    if (this.process === null) {
+      return;
+    }
     createDialog({
       parent: this,
       title: 'Remove process',
       message: `Are you sure you want to remove '${this.process.title}'`,
       cancel: true,
-    })
-      .onOk(() => this.process !== null && automationStore.removeProcess(this.process));
+    }).onOk(() => this.process !== null && automationStore.removeProcess(this.process));
   }
 
   created(): void {
@@ -168,7 +85,6 @@ export default class AutomationEditor extends DialogBase {
       this.stepId = this.process.steps[0].id;
     }
   }
-
 }
 </script>
 
@@ -180,14 +96,7 @@ export default class AutomationEditor extends DialogBase {
         <q-space />
 
         <div class="row">
-          <q-btn-dropdown
-            :label="process ? process.title : 'None'"
-            flat
-            no-caps
-            icon="widgets"
-            class="col"
-            size="md"
-          >
+          <q-btn-dropdown :label="process ? process.title : 'None'" flat no-caps icon="widgets" class="col" size="md">
             <q-list bordered>
               <ActionItem
                 v-for="proc in processes"
@@ -219,74 +128,20 @@ export default class AutomationEditor extends DialogBase {
       <q-splitter v-model="splitterModel" class="col">
         <template #before>
           <q-card-section>
-            <ProcessIndex
-              v-if="!!process"
-              :process="process"
-              :selected.sync="stepId"
-            />
+            <ProcessIndex v-if="!!process" :process="process" :selected.sync="stepId" />
           </q-card-section>
         </template>
         <template v-if="step" #after>
           <div class="column full-height">
             <split class="col row no-wrap">
-              <!-- Actions -->
               <split-area>
-                <AutomationSectionEditor
-                  :value="step.actions"
-                  label="Actions"
-                  @input="saveAllActions"
-                  @new="startAddAction"
-                >
-                  <template #actions="{item}">
-                    <ActionItem label="clicky" icon="add" />
-                  </template>
-                  <template #item="{item}">
-                    <component
-                      :is="actionComponent(item)"
-                      :action="item"
-                      class="col"
-                      @update:action="saveAction"
-                    />
-                  </template>
-                </AutomationSectionEditor>
+                <AutomationActionEditor :step="step" @update:step="saveStep" />
               </split-area>
-              <!-- Conditions -->
               <split-area>
-                <AutomationSectionEditor
-                  :value="step.conditions"
-                  label="Conditions"
-                  @input="saveAllConditions"
-                  @new="startAddCondition"
-                >
-                  <template #actions="{item}">
-                    <ActionItem label="clicky" icon="add" />
-                  </template>
-                  <template #item="{item}">
-                    <component
-                      :is="conditionComponent(item)"
-                      :condition="item"
-                      class="col"
-                      @update:condition="saveCondition"
-                    />
-                  </template>
-                </AutomationSectionEditor>
+                <AutomationConditionEditor :step="step" @update:step="saveStep" />
               </split-area>
-              <!-- Notes -->
               <split-area>
-                <AutomationSectionEditor
-                  :value="step.notes"
-                  label="Notes"
-                  @input="saveAllNotes"
-                  @new="startAddNote"
-                >
-                  <template #actions="{item}">
-                    <ActionItem label="clicky" icon="add" />
-                    <ActionItem label="Remove note" icon="delete" @click="removeNote(item)" />
-                  </template>
-                  <template #item="{item}">
-                    <AutomationNote :note="item" class="col" @update:note="saveNote" />
-                  </template>
-                </AutomationSectionEditor>
+                <AutomationNoteEditor :step="step" @update:step="saveStep" />
               </split-area>
             </split>
           </div>
