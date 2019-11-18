@@ -87,8 +87,8 @@ export default class BlockField extends FieldBase {
       </div>
     </template>
     <template #append>
-      <q-btn v-if="linkBlock" flat round icon="edit" @click.stop="editBlock">
-        <q-tooltip>Edit {{ value.id }}</q-tooltip>
+      <q-btn v-if="linkBlock" flat round icon="mdi-message-draw" @click.stop="editBlock">
+        <q-tooltip>Show {{ value.id }}</q-tooltip>
       </q-btn>
     </template>
   </q-field>

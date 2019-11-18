@@ -27,9 +27,6 @@ export default class LinkField extends FieldBase {
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
-  @Prop({ type: Boolean, default: false })
-  public readonly underlined!: boolean;
-
   @Emit('input')
   public change(v: Link): Link {
     return v;
@@ -66,7 +63,7 @@ export default class LinkField extends FieldBase {
   <component
     :is="tag"
     v-bind="tagProps"
-    :class="[{editable: !readonly && underlined}, tagClass]"
+    :class="[{editable: !readonly}, tagClass]"
     @click="openDialog"
   >
     <slot name="pre" />
