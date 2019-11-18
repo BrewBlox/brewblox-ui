@@ -21,14 +21,6 @@ export default class InputField extends FieldBase {
   @Prop({ type: Number, default: 2 })
   readonly decimals!: number;
 
-  @Prop({ type: Boolean, default: true })
-  public readonly clearable!: boolean;
-
-  @Emit('input')
-  public change(v: string | number): string | number {
-    return v;
-  }
-
   get displayValue(): string | number {
     if (this.value === ''
       || this.value === null
@@ -40,43 +32,38 @@ export default class InputField extends FieldBase {
       ? round(this.value, this.decimals)
       : this.value;
   }
-
-  openDialog(): void {
-    if (this.readonly) {
-      return;
-    }
-
-    createDialog({
-      component: 'InputDialog',
-      title: this.title,
-      message: this.message,
-      messageHtml: this.messageHtml,
-      parent: this,
-      value: this.value,
-      decimals: this.decimals,
-      type: this.type,
-      label: this.label,
-      rules: this.rules,
-      clearable: this.clearable,
-    })
-      .onOk(this.change);
-  }
 }
 </script>
 
 <template>
   <q-field
     :label="label"
-    :class="[{pointer: !readonly}, $attrs.class]"
+    :class="$attrs.class"
     stack-label
-    @click.native="openDialog"
+    borderless
+    readonly
   >
     <template #control>
       <component :is="tag" class="q-mt-sm">
-        <slot name="value">
+        <slot>
           {{ displayValue }}
         </slot>
       </component>
     </template>
   </q-field>
+  <!-- <component
+    :is="tag"
+    v-bind="tagProps"
+    :class="[{editable: !readonly}, tagClass]"
+    @click="openDialog"
+  >
+    <slot name="pre" />
+    <slot name="value">
+      {{ displayValue }}
+    </slot>
+    <slot name="append" />
+    <q-tooltip v-if="!readonly">
+      Set {{ label }}
+    </q-tooltip>
+  </component> -->
 </template>
