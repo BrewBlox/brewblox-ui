@@ -108,6 +108,16 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
               },
             },
           },
+          {
+            id: uid(),
+            enabled: true,
+            type: 'TaskCreate',
+            opts: {
+              ref: 'task-one',
+              title: 'Test Task',
+              message: lipsum,
+            },
+          },
         ],
         conditions: [
           {
