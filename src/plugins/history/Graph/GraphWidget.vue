@@ -5,6 +5,8 @@ import { Component, Ref } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
+import { durationMs, unitDurationString } from '@/helpers/functional';
+import { Unit } from '@/helpers/units';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
@@ -77,6 +79,21 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
   applyPreset(preset: QueryParams): void {
     this.config.params = { ...preset };
     this.saveConfig();
+  }
+
+  chooseDuration(): void {
+    const current = this.config.params.duration ?? '1h';
+    createDialog({
+      component: 'TimeUnitDialog',
+      parent: this,
+      title: 'Custom graph duration',
+      value: new Unit(durationMs(current), 'ms'),
+      label: 'Duration',
+    })
+      .onOk(unit => {
+        this.config.params = { duration: unitDurationString(unit) };
+        this.saveConfig();
+      });
   }
 
   async regraph(): Promise<void> {
@@ -168,18 +185,15 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
           <ActionItem icon="refresh" label="Refresh" @click="regraph" />
           <q-expansion-item label="Timespan">
             <q-list dark>
-              <q-item
+              <ActionItem
                 v-for="(preset, idx) in presets"
                 :key="idx"
-                v-close-popup
-                :inset-level="1"
+                :label="preset.duration"
+                :item-props="{insetLevel: 0.5}"
                 :active="isActivePreset(preset)"
-                dark
-                clickable
                 @click="applyPreset(preset)"
-              >
-                <q-item-section>{{ preset.duration }}</q-item-section>
-              </q-item>
+              />
+              <ActionItem label="Custom" :item-props="{insetLevel: 0.5}" @click="chooseDuration" />
             </q-list>
           </q-expansion-item>
           <WidgetActions :crud="crud" />
