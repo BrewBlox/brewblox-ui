@@ -195,7 +195,7 @@ export default class SetpointProfileFull extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings">
       <BlockEnableToggle
@@ -206,12 +206,9 @@ export default class SetpointProfileFull extends BlockCrudComponent {
       />
     </slot>
     <q-card-section>
-      <q-separator v-if="block.data.targetId.id !== null" dark />
-      <q-item dark class="q-py-md">
-        <q-item-section>
-          <q-item-label caption>
-            Start time
-          </q-item-label>
+      <q-separator v-if="block.data.targetId.id !== null" />
+      <q-item class="q-py-md">
+        <q-item-section class="self-end">
           <DatetimeField
             :value="start"
             label="Start time"
@@ -222,96 +219,80 @@ export default class SetpointProfileFull extends BlockCrudComponent {
             @input="updateStartTime"
           />
         </q-item-section>
-        <q-item-section>
-          <q-item-label caption>
-            Driven Setpoint/Sensor pair
-          </q-item-label>
-          <LinkField
+        <q-item-section class="self-end">
+          <BlockField
             :value="block.data.targetId"
             :service-id="serviceId"
-            label="target"
+            label="Driven Setpoint"
             title="Driven Setpoint/Sensor pair"
             @input="v => { block.data.targetId = v; saveBlock(); }"
           />
         </q-item-section>
       </q-item>
-      <q-separator dark />
+      <q-separator />
 
-      <!-- Headers -->
-      <q-item dark class="q-pt-md">
-        <q-item-section class="col-3 q-py-none">
-          <q-item-label caption>
-            Offset from start
-          </q-item-label>
-        </q-item-section>
-        <q-item-section class="col-5 q-py-none">
-          <q-item-label caption>
-            Time
-          </q-item-label>
-        </q-item-section>
-        <q-item-section class="col-3 q-py-none">
-          <q-item-label caption>
-            Temperature
-          </q-item-label>
-        </q-item-section>
-        <q-item-section class="col-1 q-py-none" side />
-      </q-item>
 
-      <!-- Points -->
-      <q-item v-for="(point, idx) in points" :key="idx" dark dense>
-        <q-item-section class="col-3">
-          <DurationInputField
-            :value="durationString(point.offsetMs)"
-            title="Offset from start time"
-            label="point offset"
-            message-html="
+      <div class="q-mx-sm q-mt-md">
+        <div
+          v-for="(point, idx) in points"
+          :key="idx"
+          class="grid-container"
+        >
+          <div style="grid-column-end: span 2" class="self-end">
+            <DurationInputField
+              :value="durationString(point.offsetMs)"
+              title="Offset from start time"
+              label="Offset"
+              message-html="
             This will change the point offset.
               <br>The absolute point time will be changed to start time + offset.
               <br>Changing point offset may change point order.
             "
-            @input="v => updatePointOffset(idx, durationMs(v))"
-          />
-        </q-item-section>
-        <q-item-section class="col-5">
-          <DatetimeField
-            :value="point.absTimeMs"
-            title="Time"
-            label="point time"
-            message-html="
+              @input="v => updatePointOffset(idx, durationMs(v))"
+            />
+          </div>
+          <div style="grid-column-end: span 4" class="self-end">
+            <DatetimeField
+              :value="point.absTimeMs"
+              title="Time"
+              label="Time"
+              message-html="
               This will change the absolute point time.
               <br>Changing point time may change point order.
               <br>Point offset is changed to point time - start time.
               "
-            @input="v => updatePointTime(idx, v)"
-          />
-        </q-item-section>
-        <q-item-section class="col-3">
-          <UnitField
-            :value="point.temperature"
-            title="Temperature"
-            label="point temperature"
-            @input="v => updatePointTemperature(idx, v)"
-          />
-        </q-item-section>
-        <q-item-section class="col-1" side>
-          <q-btn flat dense icon="delete" @click="removePoint(idx)">
-            <q-tooltip>Remove point</q-tooltip>
-          </q-btn>
-        </q-item-section>
-      </q-item>
-
-      <!-- Add point button -->
-      <q-item dark dense>
-        <!-- Use multiple elements to also natively get padding -->
-        <q-item-section class="col-3" />
-        <q-item-section class="col-5" />
-        <q-item-section class="col-3" />
-        <q-item-section class="col-1" side>
-          <q-btn flat dense icon="add" @click="addPoint">
+              @input="v => updatePointTime(idx, v)"
+            />
+          </div>
+          <div style="grid-column-end: span 3" class="self-end">
+            <UnitField
+              :value="point.temperature"
+              title="Temperature"
+              label="Temperature"
+              @input="v => updatePointTemperature(idx, v)"
+            />
+          </div>
+          <div style="grid-column-end: / span 1" class="column justify-end self-end">
+            <q-btn flat dense class="darkish col-auto" icon="delete" @click="removePoint(idx)">
+              <q-tooltip>Remove point</q-tooltip>
+            </q-btn>
+          </div>
+        </div>
+        <div class="row justify-end q-mt-md">
+          <q-btn round outline icon="add" @click="addPoint">
             <q-tooltip>Add point</q-tooltip>
           </q-btn>
-        </q-item-section>
-      </q-item>
+        </div>
+      </div>
     </q-card-section>
   </q-card>
 </template>
+
+<style scoped>
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-row-gap: 10px;
+  grid-column-gap: 5px;
+}
+</style>

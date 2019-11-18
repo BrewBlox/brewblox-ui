@@ -45,17 +45,23 @@ export default class UnitField extends FieldBase {
 </script>
 
 <template>
-  <component :is="tag" v-bind="tagProps" :class="tagClass" @click="openDialog">
-    <slot name="pre" />
-    <slot name="value">
-      <span :class="{editable: !readonly}">{{ value.value | round }}</span>
-    </slot>
-    <component :is="unitTag" v-if="value.value !== null" class="q-ml-xs">
-      {{ value.notation }}
-    </component>
-    <slot />
-    <q-tooltip v-if="!readonly">
-      Set {{ label }}
-    </q-tooltip>
-  </component>
+  <q-field
+    :label="label"
+    :class="[{pointer: !readonly}, $attrs.class]"
+    stack-label
+    @click.native="openDialog"
+  >
+    <template #control>
+      <component :is="tag" class="q-mt-sm">
+        <slot name="value">
+          {{ value.value | round }}
+        </slot>
+      </component>
+    </template>
+    <template #append>
+      <component :is="unitTag" v-if="value.value !== null" class="q-ml-xs self-end">
+        {{ value.notation }}
+      </component>
+    </template>
+  </q-field>
 </template>

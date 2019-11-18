@@ -31,7 +31,7 @@ export default class DatetimeField extends FieldBase {
     return v;
   }
 
-  get displayString(): string {
+  get displayValue(): string {
     return this.short
       ? shortDateString(this.value, this.clearLabel)
       : dateString(this.value, this.clearLabel);
@@ -59,19 +59,18 @@ export default class DatetimeField extends FieldBase {
 </script>
 
 <template>
-  <component
-    :is="tag"
-    v-bind="tagProps"
-    :class="[{ editable: !readonly }, tagClass]"
-    @click="openDialog"
+  <q-field
+    :label="label"
+    :class="[{pointer: !readonly}, $attrs.class]"
+    stack-label
+    @click.native="openDialog"
   >
-    <slot name="pre" />
-    <slot name="value">
-      {{ displayString }}
-    </slot>
-    <slot />
-    <q-tooltip v-if="!readonly">
-      Set {{ label }}
-    </q-tooltip>
-  </component>
+    <template #control>
+      <component :is="tag" class="q-mt-sm">
+        <slot name="value">
+          {{ displayValue }}
+        </slot>
+      </component>
+    </template>
+  </q-field>
 </template>
