@@ -29,17 +29,27 @@ export default class TimeElapsed extends Vue {
     this.condition.opts.duration = durationMs(val);
     this.saveCondition();
   }
+
+  saveEnabled(value: boolean): void {
+    this.condition.enabled = value;
+    this.saveCondition();
+  }
 }
 </script>
 
 <template>
-  <q-list dark dense>
-    <q-item dark>
-      <q-item-section class="col-auto text-h6 text-italic">
+  <q-list :class="{'darkish': !condition.enabled}" dense>
+    <q-item>
+      <q-item-section class="text-h6 text-italic">
         Wait for
       </q-item-section>
+      <q-item-section class="col-auto">
+        <q-toggle :value="condition.enabled" @input="saveEnabled">
+          <q-tooltip>Toggle enabled</q-tooltip>
+        </q-toggle>
+      </q-item-section>
     </q-item>
-    <q-item dark>
+    <q-item>
       <q-item-section class="col-auto">
         <InputField
           v-model="duration"

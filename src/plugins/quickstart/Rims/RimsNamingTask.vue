@@ -5,7 +5,7 @@ import UrlSafeString from 'url-safe-string';
 import { Component } from 'vue-property-decorator';
 
 import { dashboardIdRules } from '@/helpers/dashboards';
-import { suggestId, validator, valOrDefault } from '@/helpers/functional';
+import { suggestId, validator } from '@/helpers/functional';
 import { typeName as sparkType } from '@/plugins/spark/getters';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
@@ -55,7 +55,7 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
   }
 
   get prefix(): string {
-    return valOrDefault(this.config.prefix, 'RIMS');
+    return this.config.prefix ?? 'RIMS';
   }
 
   set prefix(prefix: string) {
@@ -63,7 +63,7 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
   }
 
   get dashboardTitle(): string {
-    return valOrDefault(this.config.dashboardTitle, 'RIMS');
+    return this.config.dashboardTitle ?? 'RIMS';
   }
 
   set dashboardTitle(dashboardTitle: string) {
@@ -71,10 +71,8 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
   }
 
   get dashboardId(): string {
-    return valOrDefault(
-      this.config.dashboardId,
-      suggestId(this.idGenerator.generate(this.dashboardTitle), validator(this.dashboardIdRules))
-    );
+    return this.config.dashboardId
+      ?? suggestId(this.idGenerator.generate(this.dashboardTitle), validator(this.dashboardIdRules));
   }
 
   set dashboardId(dashboardId: string) {

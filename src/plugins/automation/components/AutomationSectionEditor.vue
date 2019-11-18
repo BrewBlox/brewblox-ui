@@ -19,6 +19,10 @@ export default class AutomationSectionEditor extends Vue {
   set locals(vals: { id: string }[]) {
     this.$emit('input', vals);
   }
+
+  add(): void {
+    this.$emit('new');
+  }
 }
 </script>
 
@@ -28,6 +32,9 @@ export default class AutomationSectionEditor extends Vue {
       <q-item-section class="text-info text-center">
         <big>{{ label }}</big>
       </q-item-section>
+      <q-btn icon="add" flat style="position: absolute; right: 0" @click="add">
+        <q-tooltip>New</q-tooltip>
+      </q-btn>
     </q-item>
     <q-separator dark class="q-mb-md" />
     <q-list dark>
