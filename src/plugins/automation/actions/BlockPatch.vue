@@ -1,6 +1,5 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
@@ -8,6 +7,7 @@ import { BlockSpec, ChangeField } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 
 import { StepAction } from '../types';
+import ActionBase from './ActionBase';
 
 interface BlockPatchOpts {
   block: string;
@@ -21,17 +21,7 @@ interface BlockPatchAction extends StepAction {
 }
 
 @Component
-export default class BlockPatch extends Vue {
-  @Prop({ type: Object, required: true })
-  public readonly action!: BlockPatchAction;
-
-  saveAction(action: BlockPatchAction = this.action): void {
-    this.$emit('update:action', action);
-  }
-
-  get opts(): BlockPatchOpts {
-    return this.action.opts;
-  }
+export default class BlockPatch extends ActionBase<BlockPatchOpts> {
 
   get spec(): BlockSpec {
     return sparkStore.specs[this.opts.type];

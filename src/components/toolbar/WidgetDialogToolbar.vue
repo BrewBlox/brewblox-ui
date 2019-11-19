@@ -34,7 +34,7 @@ export default class WidgetDialogToolbar extends CrudComponent {
     <template #buttons>
       <q-btn v-if="!!mode" flat :icon="toggleIcon" size="md" @click="toggle" />
       <q-btn-dropdown flat size="md" icon="mdi-menu">
-        <q-list dark bordered>
+        <q-list bordered>
           <slot name="actions">
             <WidgetActions :crud="crud" />
           </slot>

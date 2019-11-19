@@ -58,14 +58,14 @@ export default class DashboardWizard extends Vue {
 <template>
   <div>
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section>
-          <q-input v-model="dashboardTitle" label="Dashboard Title" dark />
+          <q-input v-model="dashboardTitle" label="Dashboard Title" />
         </q-item-section>
       </q-item>
-      <q-item dark>
+      <q-item>
         <q-item-section>
-          <q-input v-model="dashboardId" :rules="dashboardIdRules" label="Dashboard URL" dark />
+          <q-input v-model="dashboardId" :rules="dashboardIdRules" label="Dashboard URL" />
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn
@@ -82,7 +82,7 @@ export default class DashboardWizard extends Vue {
       </q-item>
     </q-card-section>
 
-    <q-separator dark />
+    <q-separator />
 
     <q-card-actions align="right">
       <q-btn unelevated label="Back" @click="back" />

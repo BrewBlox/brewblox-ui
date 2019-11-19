@@ -20,7 +20,7 @@ export default class HermsMutexTask extends WizardTaskBase<HermsConfig> {
 <template>
   <div>
     <q-card-section>
-      <q-item dark class="text-weight-light">
+      <q-item class="text-weight-light">
         <q-item-section>
           <q-item-label class="text-subtitle1">
             Heating elements configuration
@@ -39,12 +39,12 @@ export default class HermsMutexTask extends WizardTaskBase<HermsConfig> {
           </p>
         </q-item-section>
       </q-item>
-      <q-item dark>
+      <q-item>
         <q-toggle v-model="mutex" class="q-mx-auto" left-label label="Mutually exclusive heaters" />
       </q-item>
     </q-card-section>
 
-    <q-separator dark />
+    <q-separator />
 
     <q-card-actions>
       <q-btn unelevated label="Back" @click="back" />

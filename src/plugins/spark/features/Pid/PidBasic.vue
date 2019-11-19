@@ -56,12 +56,12 @@ export default class PidBasic extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
     <q-card-section>
-      <q-item :clickable="hasInputBlock" dark @click="showInput">
+      <q-item :clickable="hasInputBlock" @click="showInput">
         <q-tooltip v-if="hasInputBlock">
           Edit {{ inputId }}
         </q-tooltip>
@@ -71,25 +71,19 @@ export default class PidBasic extends BlockCrudComponent {
           </div>
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            Target
-          </q-item-label>
-          <UnitField :value="block.data.inputSetting" tag="big" readonly />
+          <UnitField :value="block.data.inputSetting" label="Target" tag="big" readonly />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            Measured
-          </q-item-label>
-          <UnitField :value="block.data.inputValue" tag="big" readonly />
+          <UnitField :value="block.data.inputValue" label="Measured" tag="big" readonly />
         </q-item-section>
         <q-item-section side>
           <q-icon :name="hasInputBlock ? 'mdi-pencil' : 'mdi-pencil-off'" />
         </q-item-section>
       </q-item>
 
-      <q-separator dark inset />
+      <q-separator inset />
 
-      <q-item :clickable="hasOutputBlock" dark @click="showOutput">
+      <q-item :clickable="hasOutputBlock" @click="showOutput">
         <q-tooltip v-if="hasOutputBlock">
           Edit {{ outputId }}
         </q-tooltip>
@@ -99,47 +93,32 @@ export default class PidBasic extends BlockCrudComponent {
           </div>
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            Target
-          </q-item-label>
-          <big>{{ block.data.outputSetting | round }}</big>
+          <LabeledField :value="block.data.outputSetting" number label="Target" tag="big" />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            Measured
-          </q-item-label>
-          <big>{{ block.data.outputValue | round }}</big>
+          <LabeledField :value="block.data.outputValue" number label="Measured" tag="big" />
         </q-item-section>
         <q-item-section side>
           <q-icon :name="hasOutputBlock ? 'mdi-pencil' : 'mdi-pencil-off'" />
         </q-item-section>
       </q-item>
 
-      <q-separator dark inset />
+      <q-separator inset />
 
-      <q-item dark>
+      <q-item>
         <q-item-section side class="col-3">
           <div class="text-weight-light text-subtitle2 q-my-xs">
             Result
           </div>
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            P
-          </q-item-label>
-          <span>{{ block.data.p | round }}</span>
+          <LabeledField :value="block.data.p" label="P" number />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            I
-          </q-item-label>
-          <span>{{ block.data.i | round }}</span>
+          <LabeledField :value="block.data.i" label="I" number />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            D
-          </q-item-label>
-          <span>{{ block.data.d | round }}</span>
+          <LabeledField :value="block.data.d" label="D" number />
         </q-item-section>
       </q-item>
     </q-card-section>

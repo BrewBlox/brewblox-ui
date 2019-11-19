@@ -71,7 +71,5 @@ export default class QuickStartPinField extends Vue {
     v-bind="$attrs"
     emit-value
     map-options
-    dark
-    options-dark
   />
 </template>

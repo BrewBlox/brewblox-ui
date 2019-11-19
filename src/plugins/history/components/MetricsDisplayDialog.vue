@@ -61,7 +61,7 @@ export default class MetricsDisplayDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title ellipsis">
         {{ title }}
       </q-card-section>
@@ -70,43 +70,17 @@ export default class MetricsDisplayDialog extends DialogBase {
       </q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
-        <q-list dark dense>
-          <q-item dark>
-            <q-item-section>
-              <q-item-label caption>
-                Label
-              </q-item-label>
-            </q-item-section>
-            <q-item-section class="col-auto">
-              <InputField v-model="rename" title="Label" />
-            </q-item-section>
-          </q-item>
-          <q-item dark>
-            <q-item-section>
-              <q-item-label caption>
-                Warn when older than
-              </q-item-label>
-            </q-item-section>
-            <q-item-section class="col-auto">
-              <InputField v-model="fresh" title="Warn when older than" />
-            </q-item-section>
-          </q-item>
-          <q-item dark>
-            <q-item-section>
-              <q-item-label caption>
-                Number of decimals
-              </q-item-label>
-            </q-item-section>
-            <q-item-section class="col-auto">
-              <InputField
-                v-model="decimals"
-                :decimals="0"
-                :rules="[v => v >= 0 || 'Must be 0 or more']"
-                type="number"
-                title="Number of decimals"
-              />
-            </q-item-section>
-          </q-item>
+        <q-list dense>
+          <InputField v-model="rename" title="Label" label="Label" />
+          <InputField v-model="fresh" title="Warn when older than" label="Warn when older than" />
+          <InputField
+            v-model="decimals"
+            :decimals="0"
+            :rules="[v => v >= 0 || 'Must be 0 or more']"
+            type="number"
+            title="Number of decimals"
+            label="Number of decimals"
+          />
         </q-list>
       </q-card-section>
       <q-card-actions align="right">

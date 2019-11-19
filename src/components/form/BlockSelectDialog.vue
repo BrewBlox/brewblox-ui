@@ -45,7 +45,7 @@ export default class BlockSelectDialog extends DialogBase {
     @hide="onDialogHide"
     @keyup.enter="block && onDialogOk(block)"
   >
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title">
         {{ title }}
       </q-card-section>
@@ -59,14 +59,12 @@ export default class BlockSelectDialog extends DialogBase {
           :options="blockOpts"
           :clearable="clearable"
           :label="label"
-          dark
           autofocus
-          options-dark
           option-label="id"
           option-value="id"
         >
           <template #no-option>
-            <q-item dark>
+            <q-item>
               <q-item-section class="text-grey">
                 No results
               </q-item-section>

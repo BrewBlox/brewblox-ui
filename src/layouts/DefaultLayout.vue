@@ -77,25 +77,25 @@ export default class DefaultLayout extends Vue {
     </q-header>
 
     <q-drawer v-model="leftDrawerOpen" content-class="bg-dark" elevated>
-      <q-item dark exact to="/">
+      <q-item exact to="/">
         <q-item-section avatar>
           <q-icon name="mdi-home" />
         </q-item-section>
         <q-item-section>BrewBlox</q-item-section>
       </q-item>
 
-      <q-separator dark />
+      <q-separator />
       <DashboardIndex v-model="dashboardEditing" />
       <ServiceIndex v-model="serviceEditing" />
 
-      <q-separator dark class="q-mt-sm" />
+      <q-separator class="q-mt-sm" />
       <ActionItem icon="mdi-creation" label="Wizardry" @click="showWizard" />
       <ActionItem icon="mdi-pipe" label="Brewery Builder" @click="showBuilderEditor" />
       <template v-if="automationFeatureEnabled">
         <ActionItem icon="mdi-calendar-check" label="Automation" @click="showAutomationEditor" />
       </template>
 
-      <q-item dark class="bottomed">
+      <q-item class="bottomed">
         <q-item-section class="col-auto">
           <q-btn flat text-color="white" icon="mdi-puzzle" @click="showPlugins">
             <q-tooltip>
@@ -105,23 +105,10 @@ export default class DefaultLayout extends Vue {
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn-dropdown flat text-color="white" icon="mdi-bug-outline">
-            <q-list dark bordered>
-              <q-item dark>
-                <q-item-section>
-                  <q-item-label caption>
-                    Version
-                  </q-item-label>
-                  {{ version }}
-                </q-item-section>
-              </q-item>
-              <q-item dark>
-                <q-item-section>
-                  <q-item-label caption>
-                    Build date
-                  </q-item-label>
-                  {{ buildDate }}
-                </q-item-section>
-              </q-item>
+            <q-list bordered>
+              <LabeledField :value="version" label="Version" item-aligned dense />
+              <LabeledField :value="buildDate" label="Build date" item-aligned dense />
+              <q-separator inset />
               <ExportErrorsAction />
             </q-list>
           </q-btn-dropdown>

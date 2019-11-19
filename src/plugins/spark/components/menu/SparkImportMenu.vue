@@ -43,7 +43,6 @@ export default class SparkImportMenu extends DialogBase {
     createDialog({
       title: 'Reset Blocks',
       message: 'This will remove all Blocks, and import new ones from file. Are you sure?',
-      dark: true,
       noBackdropDismiss: true,
       cancel: true,
     })
@@ -86,7 +85,7 @@ export default class SparkImportMenu extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <q-card dark class="widget-modal">
+    <q-card class="widget-modal">
       <DialogToolbar>
         <q-item-section>
           <q-item-label>{{ service.id }}</q-item-label>
@@ -97,12 +96,12 @@ export default class SparkImportMenu extends DialogBase {
       </DialogToolbar>
 
       <q-card-section>
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <input type="file" @change="handleImportFileSelect" />
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <q-btn
               :disable="!serializedData"
@@ -113,12 +112,12 @@ export default class SparkImportMenu extends DialogBase {
             />
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <q-btn :loading="importBusy" outline label="Export Blocks" @click="exportBlocks" />
           </q-item-section>
         </q-item>
-        <q-item v-if="messages.length > 0" dark>
+        <q-item v-if="messages.length > 0">
           <q-item-section>
             Reported problems during last import:
             <ul>

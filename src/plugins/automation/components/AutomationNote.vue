@@ -57,13 +57,6 @@ export default class AutomationNote extends Vue {
       <q-tooltip>Edit title</q-tooltip>
       <q-item-section class="text-bold" @click="editTitle">
         {{ note.title }}
-        <!-- <InputField
-          :value="note.title"
-          title="Title"
-          label="Title"
-          class="text-bold"
-          @input="saveTitle"
-        /> -->
       </q-item-section>
     </q-item>
     <q-item class="hoverable">

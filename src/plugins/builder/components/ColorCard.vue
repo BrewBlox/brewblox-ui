@@ -29,17 +29,15 @@ export default class ColorCard extends PartCard {
 </script>
 
 <template>
-  <q-list dark>
-    <q-separator dark />
-    <q-item dark>
+  <q-list>
+    <q-separator />
+    <q-item>
       <q-item-section class="col-auto">
-        <q-item-label caption>
-          Liquid color
-        </q-item-label>
         <ColorField
           v-model="color"
           clearable
           title="Liquid color"
+          label="Custom"
           message="Select the fill color for this part."
         />
       </q-item-section>

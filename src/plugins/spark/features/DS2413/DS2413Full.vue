@@ -12,31 +12,26 @@ export default class DS2413Full extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
     <IoArray :crud="crud" />
-    <q-separator dark inset />
+    <q-separator inset />
 
     <q-card-section>
-      <q-item dark>
-        <q-item-section class="col-grow">
-          <q-item-label caption>
-            Address
-          </q-item-label>
+      <q-item>
+        <q-item-section>
           <InputField
             :value="block.data.address"
             title="Address"
-            tag="big"
+            label="Address"
+            class="self-start"
             @input="v => { block.data.address = v; saveBlock(); }"
           />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            Connected
-          </q-item-label>
-          {{ block.data.connected ? 'Yes' : 'No' }}
+          <LabeledField :value="block.data.connected ? 'Yes' : 'No'" label="Connected" />
         </q-item-section>
       </q-item>
     </q-card-section>

@@ -54,13 +54,13 @@ export default class BuilderPartMenu extends Vue {
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
+  <q-card class="widget-modal">
     <DialogToolbar @close="$emit('close')">
       {{ partTitle }}
     </DialogToolbar>
 
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <svg
             :width="`${squares(rotatedSize[0]) * displayScale}px`"

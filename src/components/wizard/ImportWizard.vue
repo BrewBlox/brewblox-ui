@@ -85,18 +85,18 @@ export default class ImportWizard extends Vue {
 <template>
   <div>
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <q-item-label>Dashboard</q-item-label>
-          <q-option-group v-model="chosenDashboardId" :options="dashboardOptions" dark />
+          <q-option-group v-model="chosenDashboardId" :options="dashboardOptions" />
         </q-item-section>
       </q-item>
-      <q-item dark>
+      <q-item>
         <input type="file" @change="handleFileSelect" />
       </q-item>
     </q-card-section>
 
-    <q-separator dark />
+    <q-separator />
 
     <q-card-actions class="row justify-between">
       <q-btn unelevated label="Back" @click="back" />

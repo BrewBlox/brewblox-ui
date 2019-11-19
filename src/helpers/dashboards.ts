@@ -64,7 +64,6 @@ export const startChangeDashboardTitle =
     createDialog({
       title: 'Change dashboard Title',
       message: "Change your dashboard's display name",
-      dark: true,
       cancel: true,
       prompt: {
         model: dashboard.title,
@@ -95,7 +94,6 @@ export const startChangeDashboardTitle =
         createDialog({
           title: 'Update dashboard URL',
           message: `Do you want to change the dashboard ID from '${oldId}' to '${suggestedId}'?`,
-          dark: true,
           cancel: true,
         })
           .onOk(() => changeDashboardId(oldId, suggestedId, onIdChanged));
@@ -107,7 +105,6 @@ export const startRemoveDashboard =
     createDialog({
       title: 'Remove dashboard',
       message: `Are you sure you want to remove ${dashboard.title}?`,
-      dark: true,
       ok: 'Confirm',
       cancel: 'Cancel',
     })

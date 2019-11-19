@@ -63,9 +63,9 @@ export default class LinkedWidgetCard extends PartCard {
 </script>
 
 <template>
-  <q-list dark>
-    <q-separator dark />
-    <q-item dark>
+  <q-list>
+    <q-separator />
+    <q-item>
       <q-item-section>
         <q-select
           v-model="linked"
@@ -73,13 +73,11 @@ export default class LinkedWidgetCard extends PartCard {
           :label="label"
           :error="broken"
           clearable
-          dark
-          options-dark
           map-options
           emit-value
         >
           <template #no-option>
-            <q-item dark>
+            <q-item>
               <q-item-section class="text-grey">
                 No results
               </q-item-section>

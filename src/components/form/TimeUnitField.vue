@@ -39,19 +39,19 @@ export default class TimeUnitField extends FieldBase {
 </script>
 
 <template>
-  <component
-    :is="tag"
-    v-bind="tagProps"
-    :class="[{editable: !readonly}, tagClass]"
-    @click="openDialog"
+  <q-field
+    :label="label"
+    :class="[{pointer: !readonly}, $attrs.class]"
+    v-bind="$attrs"
+    stack-label
+    @click.native="openDialog"
   >
-    <slot name="pre" />
-    <slot name="value">
-      {{ value | unitDuration }}
-    </slot>
-    <slot />
-    <q-tooltip v-if="!readonly">
-      Set {{ label }}
-    </q-tooltip>
-  </component>
+    <template #control>
+      <component :is="tag" class="q-mt-sm">
+        <slot name="value">
+          {{ value | unitDuration }}
+        </slot>
+      </component>
+    </template>
+  </q-field>
 </template>

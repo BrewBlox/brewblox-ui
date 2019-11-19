@@ -49,6 +49,7 @@ export default class PidDisplay extends PartBase {
   <g>
     <foreignObject :transform="textTransformation([1,1])" :width="squares(1)" :height="squares(1)">
       <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
+      <q-icon v-else-if="block && !block.data.enabled" name="mdi-sleep" size="lg" class="maximized" color="warning" />
       <div v-else class="text-white text-bold text-center">
         <svg>
           <HeatingIcon v-if="kp && kp > 0" :stroke="outputValue ? HOT_WATER : 'white'" x="12" />

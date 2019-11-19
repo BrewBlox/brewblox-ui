@@ -90,16 +90,14 @@ export default class PidFull extends BlockCrudComponent {
       <q-separator inset />
 
       <!-- Input row -->
-      <q-item>
+      <q-item class="items-start">
         <q-item-section>
-          <q-item-label caption>
-            Input Block
-          </q-item-label>
-          <LinkField
+          <BlockField
             :value="block.data.inputId"
             :service-id="serviceId"
             title="Input"
-            tag="div"
+            label="Input Block"
+            no-show
             message-html="
               <p>A PID block drives its output to regulate its input.</p>
               <p>
@@ -113,24 +111,14 @@ export default class PidFull extends BlockCrudComponent {
         </q-item-section>
 
         <q-item-section>
-          <q-item-label caption>
-            Target value is
-          </q-item-label>
-          <q-item-section class="text-bold">
-            {{ block.data.inputSetting | unit }}
-          </q-item-section>
+          <UnitField :value="block.data.inputSetting" label="Target value is" tag="b" readonly />
         </q-item-section>
 
         <q-item-section>
-          <q-item-label caption>
-            Current value is
-          </q-item-label>
-          <div class="text-bold">
-            {{ block.data.inputValue | unit }}
-          </div>
+          <UnitField :value="block.data.inputValue" label="Current value is" tag="b" readonly />
         </q-item-section>
 
-        <q-item-section class="col-1">
+        <q-item-section class="col-1 self-center">
           <q-btn v-if="hasInputBlock" flat icon="mdi-pencil" @click="showInput">
             <q-tooltip>Edit {{ inputId }}</q-tooltip>
           </q-btn>
@@ -140,16 +128,14 @@ export default class PidFull extends BlockCrudComponent {
       <q-separator inset />
 
       <!-- Output row -->
-      <q-item>
+      <q-item class="items-start">
         <q-item-section>
-          <q-item-label caption>
-            Output Block
-          </q-item-label>
-          <LinkField
+          <BlockField
             :value="block.data.outputId"
             :service-id="serviceId"
             title="Output"
-            tag="div"
+            label="Output Block"
+            no-show
             message-html="
               <p>The PID sets its output block to the result from the PID calculation.</p>
               <p>
@@ -166,24 +152,14 @@ export default class PidFull extends BlockCrudComponent {
         </q-item-section>
 
         <q-item-section>
-          <q-item-label caption>
-            Target value is
-          </q-item-label>
-          <div class="text-bold">
-            {{ block.data.outputSetting | round }}
-          </div>
+          <LabeledField :value="block.data.outputSetting" number label="Target value is" tag="b" />
         </q-item-section>
 
         <q-item-section>
-          <q-item-label caption>
-            Achieved value is
-          </q-item-label>
-          <div class="text-bold">
-            {{ block.data.outputValue | round }}
-          </div>
+          <LabeledField :value="block.data.outputValue" number label="Achieved value is" tag="b" />
         </q-item-section>
 
-        <q-item-section class="col-1">
+        <q-item-section class="col-1 self-center">
           <q-btn v-if="hasOutputBlock" flat icon="mdi-pencil" @click="showOutput">
             <q-tooltip>Edit {{ outputId }}</q-tooltip>
           </q-btn>
@@ -195,54 +171,49 @@ export default class PidFull extends BlockCrudComponent {
       <!-- Boil mode settings -->
       <q-item>
         <q-item-section>
-          <q-item-label caption>
-            Boil temperature
-          </q-item-label>
-          <span>
-            {{ waterBoilTemp.value | round(0) }} + <UnitField
-              :value="block.data.boilPointAdjust"
-              title="Boil point adjustment"
-              label="Adjustment"
-              @input="v => { block.data.boilPointAdjust = v; saveBlock(); }"
-            />
-          </span>
+          <UnitField
+            :value="block.data.boilPointAdjust"
+            title="Boil point adjustment"
+            label="Boil temperature"
+            tag="span"
+            @input="v => { block.data.boilPointAdjust = v; saveBlock(); }"
+          >
+            <template #value>
+              <span class="darkish">{{ waterBoilTemp.value | round(0) }}</span> +
+              <b>{{ block.data.boilPointAdjust.value | round }}</b>
+            </template>
+          </UnitField>
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            Minimum output when boiling
-          </q-item-label>
           <SliderField
             :value="block.data.boilMinOutput"
             title="Minimum output"
+            label="Minimum output when boiling"
             @input="v => { block.data.boilMinOutput = v; saveBlock(); }"
           />
         </q-item-section>
-        <q-item-section />
-        <q-item-section class="col-1" />
+        <!-- <q-item-section /> -->
+        <!-- <q-item-section class="col-1" /> -->
       </q-item>
       <q-separator inset />
 
 
       <div class="grid-container q-mx-md q-mt-md q-item--dark">
         <div class="span-2">
-          <q-item-label caption>
-            Error
-          </q-item-label>
-          {{ block.data.error | unit }}
+          <LabeledField label="Error">
+            {{ block.data.error | unit }}
+          </LabeledField>
         </div>
 
-        <div class="span-1 q-pt-sm">
+        <div class="span-1 self-center text-center">
           *
         </div>
 
         <div class="span-2">
-          <q-item-label caption>
-            Kp
-          </q-item-label>
           <UnitField
             :value="block.data.kp"
             title="Proportional gain Kp"
-            label="Proportional gain"
+            label="Kp"
             message-html="
               <p>
                 Kp is the proportional gain, which is directly mutiplied by the filtered error.
@@ -251,55 +222,47 @@ export default class PidFull extends BlockCrudComponent {
               </p>
               <p>Kp should be negative if the actuator brings down the input, like a cooler.</p>
               "
+            borderless
+            class="dashed-input"
             @input="v => { block.data.kp = v; saveBlock(); }"
           />
         </div>
 
-        <div :style="grid({start: 9})" class="q-pt-sm">
+        <div :style="grid({start: 9})" class="self-center text-center">
           =
         </div>
 
         <div class="span-2">
-          <q-item-label caption>
-            P
-          </q-item-label>
-          {{ block.data.p | round }}
+          <LabeledField label="P">
+            {{ block.data.p | round }}
+          </LabeledField>
         </div>
 
         <!-- Break -->
 
         <div class="span-2">
-          <q-item-label caption>
-            Integral
-          </q-item-label>
-          {{ block.data.integral | unit }}
+          <LabeledField label="Integral">
+            {{ block.data.integral | unit }}
+          </LabeledField>
         </div>
 
-        <div class="span-1 q-pt-sm">
+        <div class="span-1 self-center text-center">
           *
         </div>
 
         <div class="span-2">
-          <q-item-label caption>
-            Kp
-          </q-item-label>
-          <div class="darkened">
-            {{ block.data.kp | unit }}
-          </div>
+          <UnitField :value="block.data.kp" label="Kp" tag-class="darkish" readonly />
         </div>
 
-        <div class="span-1 q-pt-sm">
+        <div class="span-1 self-center text-center">
           /
         </div>
 
         <div class="span-2">
-          <q-item-label caption>
-            Ti
-          </q-item-label>
           <TimeUnitField
             :value="block.data.ti"
             title="Integral time constant Ti"
-            label="Integral time constant"
+            label="Ti"
             message-html="
               <p>
                 The purpose of the integrator is to remove steady state errors.
@@ -316,22 +279,22 @@ export default class PidFull extends BlockCrudComponent {
               </p>
               <p>Setting Ti to zero will disable the integrator.</p>
               "
+            borderless
+            class="dashed-input"
             @input="v => { block.data.ti = v; saveBlock(); }"
           />
         </div>
 
-        <div class="span-1 q-pt-sm">
+        <div class="span-1 self-center text-center">
           =
         </div>
 
         <div class="span-2">
-          <q-item-label caption>
-            I
-          </q-item-label>
           <InputField
             :value="block.data.i"
             type="number"
             title="Manually set integral"
+            label="I"
             message-html="
               <p>
                 The integrator slowly builds up when the error is not zero.
@@ -341,6 +304,8 @@ export default class PidFull extends BlockCrudComponent {
                 It will continue to adjust automatically afterwards.
               </p>
               "
+            borderless
+            class="dashed-input"
             @input="v => { block.data.integralReset = v || 0.001; saveBlock(); }"
           />
         </div>
@@ -348,39 +313,28 @@ export default class PidFull extends BlockCrudComponent {
         <!-- Break -->
 
         <div class="span-2">
-          <q-item-label caption>
-            Derivative
-          </q-item-label>
-          <span :class="{darkened: block.data.td.val === 0}">
+          <LabeledField :tag-class="{darkish: block.data.td.val === 0}" label="Derivative">
             {{ block.data.derivative | unit }}
-          </span>
+          </LabeledField>
         </div>
 
-        <div class="span-1 q-pt-sm">
+        <div class="span-1 self-center text-center">
           *
         </div>
 
         <div class="span-2">
-          <q-item-label caption>
-            Kp
-          </q-item-label>
-          <div class="darkened">
-            {{ block.data.kp | unit }}
-          </div>
+          <UnitField :value="block.data.kp" label="Kp" tag-class="darkish" readonly />
         </div>
 
-        <div class="span-1 q-pt-sm">
+        <div class="span-1 self-center text-center">
           *
         </div>
 
         <div class="span-2">
-          <q-item-label caption>
-            Td
-          </q-item-label>
           <TimeUnitField
             :value="block.data.td"
             title="Derivative time constant Td"
-            label="Derivative time constant"
+            label="Td"
             message-html="
               <p>
               When the input is approaching its target fast,
@@ -395,22 +349,23 @@ export default class PidFull extends BlockCrudComponent {
               When there is no overshoot in the system, Td should be set to zero.
               </p>
               "
+            borderless
+            class="dashed-input"
             @input="v => { block.data.td = v; saveBlock(); }"
           />
         </div>
 
-        <div class="span-1 q-pt-sm">
+        <div class="span-1 q-pt-sm self-center text-center">
           =
         </div>
 
         <div class="span-2 calc-line">
-          <q-item-label caption>
-            D
-          </q-item-label>
-          {{ block.data.d | round }}
-          <span style="float: right;">
-            <sub>+</sub>
-          </span>
+          <LabeledField label="D">
+            {{ block.data.d | round }}
+            <template #after>
+              <sub class="self-end">+</sub>
+            </template>
+          </LabeledField>
         </div>
 
         <!-- Break -->
@@ -420,22 +375,20 @@ export default class PidFull extends BlockCrudComponent {
           class="calc-line"
           :style="grid({start: 10, span: 2})"
         >
-          <q-item-label caption>
-            Boil mode
-          </q-item-label>
-          {{ boilAdjustment | round }}
-          <span style="float: right;">
-            <sub>+</sub>
-          </span>
+          <LabeledField label="Boil mode">
+            {{ boilAdjustment | round }}
+            <template #after>
+              <sub class="self-end">+</sub>
+            </template>
+          </LabeledField>
         </div>
 
         <!-- Break -->
 
         <div :style="grid({start: 10, span: 2})">
-          <q-item-label caption>
-            Output
-          </q-item-label>
-          {{ baseOutput + boilAdjustment | round }}
+          <LabeledField label="Output">
+            {{ baseOutput + boilAdjustment | round }}
+          </LabeledField>
         </div>
       </div>
     </q-card-section>
@@ -445,7 +398,7 @@ export default class PidFull extends BlockCrudComponent {
 <style scoped>
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(11, auto);
+  grid-template-columns: repeat(11, 1fr);
   grid-row-gap: 10px;
 }
 
@@ -455,9 +408,15 @@ export default class PidFull extends BlockCrudComponent {
 
 .span-2 {
   grid-column: span 2;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .calc-line {
   border-bottom: 2px solid white;
+}
+
+.dashed-input {
+  border-bottom: 1px dashed grey;
 }
 </style>

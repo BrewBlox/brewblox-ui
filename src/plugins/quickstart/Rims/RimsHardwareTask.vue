@@ -92,7 +92,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
 <template>
   <div>
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <q-item-label class="text-subtitle1">
             Assign Hardware Blocks
@@ -109,7 +109,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
           </q-btn>
         </q-item-section>
       </q-item>
-      <q-item dark class="text-weight-light">
+      <q-item class="text-weight-light">
         <q-item-section>
           <p>
             Select which hardware should be used for each function.<br />
@@ -121,7 +121,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
           </p>
         </q-item-section>
       </q-item>
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <QuickStartPinField
             v-model="pumpPin"
@@ -139,7 +139,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
           />
         </q-item-section>
       </q-item>
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <QuickStartSensorField
             v-model="kettleSensor"
@@ -169,7 +169,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
       </CardWarning>
     </q-card-section>
 
-    <q-separator dark />
+    <q-separator />
 
     <q-card-actions>
       <q-btn unelevated label="Back" @click="back" />

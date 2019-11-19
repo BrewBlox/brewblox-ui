@@ -132,7 +132,7 @@ export default class BlockGraph extends Vue {
 
 <template>
   <q-dialog v-model="dialogOpen" maximized>
-    <q-card v-if="dialogOpen" class="text-white bg-dark-bright" dark>
+    <q-card v-if="dialogOpen" class="text-white bg-dark-bright">
       <HistoryGraph ref="graph" :graph-id="id" :config="graphCfg">
         <template #controls>
           <q-btn-dropdown v-if="!noDuration" auto-close flat label="timespan" icon="mdi-timelapse">
@@ -150,7 +150,7 @@ export default class BlockGraph extends Vue {
               :config="graphCfg"
               :header="graphCfg.layout.title"
             />
-            <q-item dark link clickable @click="updateDuration">
+            <q-item link clickable @click="updateDuration">
               <q-item-section>Duration</q-item-section>
               <q-item-section class="col-auto">
                 {{ durationString(graphCfg.params.duration) }}
@@ -160,7 +160,6 @@ export default class BlockGraph extends Vue {
               <q-item
                 v-for="[key, renamed] in targetKeys"
                 :key="key"
-                dark
                 link
                 clickable
                 @click="updateKeySide(key, !isRightAxis(key))"

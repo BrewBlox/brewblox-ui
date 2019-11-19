@@ -16,7 +16,6 @@ interface PeriodDisplay {
 
 @Component
 export default class GraphPeriodEditor extends Vue {
-  prefixClass = 'q-pr-sm text-italic col-auto';
   periodOptions: SelectOption[] = [
     {
       label: 'Live: [duration] to now',
@@ -126,78 +125,63 @@ export default class GraphPeriodEditor extends Vue {
 </script>
 
 <template>
-  <div class="row wrap q-px-sm">
-    <q-item dark class="col-auto">
+  <div class="row wrap q-mx-sm q-pb-md" style="border-bottom: 1px solid grey">
+    <q-item class="col-auto self-start">
       <q-item-section class="col-auto">
         <q-select
           :value="shownPeriod"
           :options="periodOptions"
           emit-value
           map-options
-          dark
-          options-dark
           label="Time period"
           @input="saveShownPeriod"
-        />
+        >
+          <template #append>
+            <q-icon name="mdi-chart-timeline" size="sm">
+              <q-tooltip>
+                <i>To improve performance, the history service automatically selects an averaging period.</i> <br />
+                <i>One point is returned per period, with the average value of all points in that period.</i> <br />
+                <div class="row q-mt-sm ">
+                  <LabeledField
+                    v-for="(rate, meas) in downsampling"
+                    :key="meas"
+                    :value="rate"
+                    :label="meas"
+                    item-aligned
+                    class="col"
+                  />
+                </div>
+              </q-tooltip>
+            </q-icon>
+          </template>
+        </q-select>
       </q-item-section>
     </q-item>
-    <q-item dark class="col-auto column justify-around q-pt-lg">
-      <div v-if="shownPeriod.start" class="col row no-wrap">
-        <span :class="prefixClass">Start time is</span>
-        <DatetimeField
-          :value="config.params.start"
-          title="Start time"
-          label="Start date and time"
-          tag="div"
-          tag-class="col"
-          @input="saveStart"
-        />
-      </div>
-      <div v-if="shownPeriod.duration" class="col row no-wrap">
-        <span :class="prefixClass">Duration is</span>
-        <DurationInputField
-          :value="config.params.duration"
-          title="Duration"
-          label="Duration"
-          tag="div"
-          tag-class="col"
-          @input="saveDuration"
-        />
-      </div>
-      <div v-if="shownPeriod.end" class="col row no-wrap">
-        <span :class="prefixClass">End time is</span>
-        <DatetimeField
-          :value="config.params.end"
-          title="End time"
-          label="End date and time"
-          tag="div"
-          tag-class="col"
-          @input="saveEnd"
-        />
-      </div>
-      <div v-if="isLive" :class="prefixClass">
+    <q-item class="col-auto column justify-around">
+      <DatetimeField
+        v-if="shownPeriod.start"
+        :value="config.params.start"
+        title="Start time"
+        label="Start date and time"
+        @input="saveStart"
+      />
+      <DurationInputField
+        v-if="shownPeriod.duration"
+        :value="config.params.duration"
+        title="Duration"
+        label="Duration"
+        @input="saveDuration"
+      />
+      <DatetimeField
+        v-if="shownPeriod.end"
+        :value="config.params.end"
+        title="End time"
+        label="End date and time"
+        @input="saveEnd"
+      />
+      <div v-if="isLive" class="q-pr-sm text-italic col-auto">
         Graph is live
       </div>
-    </q-item>
-    <q-item dark class="col-auto">
-      <q-item-section avatar>
-        <q-icon name="mdi-chart-timeline" color="grey-4">
-          <q-tooltip>
-            <i>To improve performance, the history service automatically selects an averaging period.</i> <br />
-            <i>One point is returned per period, with the average value of all points in that period.</i> <br />
-            <div class="row q-mt-sm ">
-              <q-item v-for="(rate, meas) in downsampling" :key="meas" dark class="q-mr-md">
-                <q-item-section>
-                  <q-item-label caption>
-                    {{ meas }}
-                  </q-item-label>
-                  {{ rate }}
-                </q-item-section>
-              </q-item>
-            </div>
-          </q-tooltip>
-        </q-icon>
-      </q-item-section>
     </q-item>
   </div>
 </template>

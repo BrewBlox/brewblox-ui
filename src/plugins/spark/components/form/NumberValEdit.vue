@@ -9,7 +9,7 @@ export default class NumberValEdit extends ValEditBase { }
 </script>
 
 <template>
-  <q-input v-if="editable" v-model.number="field" type="number" step="any" dark dense />
+  <q-input v-if="editable" v-model.number="field" type="number" step="any" dense />
   <div v-else>
     {{ field }}
   </div>

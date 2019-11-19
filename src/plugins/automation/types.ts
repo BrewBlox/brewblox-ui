@@ -1,16 +1,16 @@
 
-export interface StepAction {
+export interface StepAction<T = any> {
   id: string;
   type: string;
   enabled: boolean;
-  opts: Mapped<any>;
+  opts: T;
 }
 
-export interface StepCondition {
+export interface StepCondition<T = any> {
   id: string;
   type: string;
   enabled: boolean;
-  opts: Mapped<any>;
+  opts: T;
 }
 
 export interface StepNote {

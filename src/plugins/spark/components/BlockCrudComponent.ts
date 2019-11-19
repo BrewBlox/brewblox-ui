@@ -132,7 +132,6 @@ export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
       parent: this,
       title: 'Make widget',
       message: `On which dashboard do you want to create a widget for '${this.widget.title}'?`,
-      dark: true,
       options: {
         type: 'radio',
         model: undefined,
@@ -196,7 +195,7 @@ export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
       title: 'Remove Block',
       message: `Are you sure you want to remove ${this.block.id}?`,
       cancel: true,
-      dark: true,
+
       persistent: true,
     })
       .onOk(this.removeBlock);

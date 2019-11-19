@@ -67,7 +67,7 @@ export default class DashboardIndex extends Vue {
 
 <template>
   <div>
-    <q-item dark class="q-pb-none">
+    <q-item class="q-pb-none">
       <q-item-section class="text-bold">
         Dashboards
       </q-item-section>
@@ -111,7 +111,6 @@ export default class DashboardIndex extends Vue {
         :inset-level="0.2"
         :class="{hoverable: editing && !dragging, bordered: editing, 'q-pb-sm': true}"
         style="min-height: 0px"
-        dark
       >
         <q-item-section :class="{'text-italic': editing, ellipsis: true}">
           {{ dashboard.title }}
@@ -121,9 +120,8 @@ export default class DashboardIndex extends Vue {
             <q-icon name="mdi-dots-vertical" />
           </q-item-section>
           <q-menu :offset="[-50, 0]">
-            <q-list dark bordered>
+            <q-list bordered>
               <q-item
-                dark
                 link
                 clickable
                 @click="toggleDefaultDashboard(dashboard)"

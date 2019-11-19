@@ -31,17 +31,17 @@ export default class BalancerWidget extends BlockWidgetBase {
 </script>
 
 <template>
-  <q-card dark :class="cardClass">
+  <q-card :class="cardClass">
     <component :is="toolbarComponent" :crud="crud" />
 
     <q-card-section>
-      <q-item dark dense style="opacity: 0.5">
+      <q-item dense style="opacity: 0.5">
         <q-item-section>Client</q-item-section>
         <q-item-section>Granted</q-item-section>
         <q-item-section>Requested</q-item-section>
       </q-item>
       <q-list dense>
-        <q-item v-for="client in block.data.clients" :key="client.id.id" dark>
+        <q-item v-for="client in block.data.clients" :key="client.id.id">
           <q-item-section>
             <i>{{ clientName(client.id) }}</i>
           </q-item-section>

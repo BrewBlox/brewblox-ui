@@ -23,35 +23,33 @@ export default class TempSensorMockWidget extends BlockWidgetBase {
       <HistoryGraph :graph-id="widget.id" :config="graphCfg" />
     </template>
 
-    <q-card dark :class="cardClass" :style="cardStyle">
+    <q-card :class="cardClass" :style="cardStyle">
       <component :is="toolbarComponent" :crud="crud" />
 
       <q-card-section>
-        <q-item dark>
+        <q-item>
           <q-item-section>
-            <q-item-label caption>
-              Value
-            </q-item-label>
             <UnitField
               :value="block.data.value"
               :readonly="!block.data.connected"
               title="Value"
+              label="Value"
               tag="big"
+              class="self-start"
               @input="v => { block.data.value = v; saveBlock(); }"
             />
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>
-              Connected
-            </q-item-label>
-            <q-toggle
-              :value="block.data.connected"
-              @input="v => { block.data.connected = v; saveBlock(); }"
-            />
+            <LabeledField label="Connected">
+              <q-toggle
+                dense
+                :value="block.data.connected"
+                @input="v => { block.data.connected = v; saveBlock(); }"
+              />
+            </LabeledField>
           </q-item-section>
         </q-item>
       </q-card-section>
     </q-card>
   </GraphCardWrapper>
 </template>
-

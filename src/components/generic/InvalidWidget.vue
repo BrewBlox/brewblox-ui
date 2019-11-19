@@ -11,11 +11,11 @@ export default class InvalidWidget extends WidgetBase {
 </script>
 
 <template>
-  <q-card dark class="text-white scroll">
+  <q-card class="text-white scroll">
     <WidgetToolbar :crud="crud">
       <q-item-section side>
         <q-btn-dropdown flat label="Menu">
-          <q-list dark bordered>
+          <q-list bordered>
             <RemoveWidgetAction :crud="crud" />
           </q-list>
         </q-btn-dropdown>

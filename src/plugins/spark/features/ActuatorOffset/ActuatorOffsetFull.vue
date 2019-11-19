@@ -11,7 +11,7 @@ export default class ActuatorOffsetFull extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings">
       <BlockEnableToggle
@@ -23,64 +23,52 @@ export default class ActuatorOffsetFull extends BlockCrudComponent {
     </slot>
 
     <q-card-section>
-      <q-item dark>
+      <BlockField
+        :value="block.data.targetId"
+        :service-id="serviceId"
+        title="Driven Block"
+        label="Driven Block"
+        item-aligned
+        @input="v => { block.data.targetId = v; saveBlock(); }"
+      />
+      <q-item>
         <q-item-section>
-          <q-item-label caption>
-            Driven block
-          </q-item-label>
-          <LinkField
-            :value="block.data.targetId"
+          <BlockField
+            :value="block.data.referenceId"
             :service-id="serviceId"
-            title="Driven block"
-            @input="v => { block.data.targetId = v; saveBlock(); }"
+            title="Reference block"
+            label="Reference Block"
+            @input="v => { block.data.referenceId = v; saveBlock(); }"
           />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            Offset from
-          </q-item-label>
-          <div>
-            <LinkField
-              :value="block.data.referenceId"
-              :service-id="serviceId"
-              title="Reference block"
-              style="display: inline-block"
-              @input="v => { block.data.referenceId = v; saveBlock(); }"
-            />
-            <span class="q-px-xs">&gt;</span>
-            <SelectField
-              :value="block.data.referenceSettingOrValue"
-              :options="[{label: 'Setting', value: 0}, {label: 'Measured value', value: 1}]"
-              title="Reference field"
-              style="display: inline-block"
-              @input="v => { block.data.referenceSettingOrValue = v; saveBlock(); }"
-            />
-          </div>
+          <SelectField
+            :value="block.data.referenceSettingOrValue"
+            :options="[{label: 'Setting', value: 0}, {label: 'Measured', value: 1}]"
+            title="Reference field"
+            label="Reference Field"
+            @input="v => { block.data.referenceSettingOrValue = v; saveBlock(); }"
+          />
         </q-item-section>
       </q-item>
-      <q-item dark>
-        <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>
-            Target Offset
-          </q-item-label>
+      <q-item>
+        <q-item-section>
           <InputField
             :readonly="isDriven"
             :value="block.data.desiredSetting"
             tag="big"
             title="Target offset"
+            label="Target Offset"
             type="number"
             @input="v => { block.data.desiredSetting = v; saveBlock(); }"
           />
         </q-item-section>
-        <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>
-            Current offset
-          </q-item-label>
-          <big>{{ block.data.value | round }}</big>
+        <q-item-section>
+          <LabeledField :value="block.data.value" number label="Current Offset" tag="big" />
         </q-item-section>
       </q-item>
 
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
           <ConstraintsField

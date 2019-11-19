@@ -21,10 +21,10 @@ export default class FermentManualTask extends WizardTaskBase<FermentConfig> {
 <template>
   <div>
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <big>About your new fermentation dashboard</big>
       </q-item>
-      <q-item dark class="text-weight-light">
+      <q-item class="text-weight-light">
         <q-item-section>
           <p>
             While the wizard is configuring the Spark and your new dashboard,
@@ -61,7 +61,7 @@ export default class FermentManualTask extends WizardTaskBase<FermentConfig> {
       </q-item>
     </q-card-section>
 
-    <q-separator dark />
+    <q-separator />
 
     <q-card-actions>
       <q-space />

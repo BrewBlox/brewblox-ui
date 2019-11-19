@@ -30,15 +30,13 @@ export default class QuickStartServiceField extends Vue {
 </script>
 
 <template>
-  <q-item dark>
+  <q-item>
     <q-select
       v-model="local"
       :options="opts"
-      options-dark
       map-options
       emit-value
       label="Service"
-      dark
     />
   </q-item>
 </template>

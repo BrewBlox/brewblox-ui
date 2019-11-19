@@ -9,7 +9,7 @@ export default class BlockActions extends BlockCrudComponent { }
 
 <template>
   <q-expansion-item label="Block Actions">
-    <q-list dark>
+    <q-list>
       <slot name="block-actions" />
       <ActionItem icon="mdi-widgets" label="Make widget" @click="startMakeWidget" />
       <ActionItem icon="edit" label="Rename Block" @click="startChangeBlockId" />

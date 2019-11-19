@@ -12,25 +12,24 @@ export default class DigitalActuatorBasic extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings">
       <q-card-section>
-        <q-item dark>
+        <q-item>
           <q-item-section>
-            <q-item-label caption>
-              State
-            </q-item-label>
-            <DigitalStateField
-              :value="block.data.desiredState"
-              :pending="block.data.state !== block.data.desiredState"
-              :pending-reason="constrainers"
-              :disable="isDriven"
-              @input="v => { block.data.desiredState = v; saveBlock(); }"
-            />
+            <LabeledField label="State" dense>
+              <DigitalStateField
+                :value="block.data.desiredState"
+                :pending="block.data.state !== block.data.desiredState"
+                :pending-reason="constrainers"
+                :disable="isDriven"
+                @input="v => { block.data.desiredState = v; saveBlock(); }"
+              />
+            </LabeledField>
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
             <ConstraintsField

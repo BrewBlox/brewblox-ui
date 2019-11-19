@@ -94,7 +94,7 @@ export default class LinkDialog extends DialogBase {
     @hide="onDialogHide"
     @keyup.enter="(link || clearable) && onDialogOk(link)"
   >
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title">
         {{ title }}
       </q-card-section>
@@ -108,15 +108,13 @@ export default class LinkDialog extends DialogBase {
           :options="linkOpts"
           :clearable="clearable"
           :label="label"
-          dark
-          options-dark
           option-label="id"
           option-value="id"
           autofocus
           @input="updateLink"
         >
           <template #no-option>
-            <q-item dark>
+            <q-item>
               <q-item-section class="text-grey">
                 No results
               </q-item-section>

@@ -17,57 +17,48 @@ export default class ActuatorPwmBasic extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
     <q-card-section>
-      <q-item dark class="align-children">
+      <q-item>
         <q-item-section>
-          <q-item-label caption>
-            Setting
-          </q-item-label>
-          <div :class="{['text-orange']: isConstrained}">
-            <SliderField
-              :value="block.data.setting"
-              :readonly="isDriven"
-              style="display: inline-block"
-              title="Duty Setting"
-              tag="big"
-              @input="v => { block.data.desiredSetting = v; saveBlock(); }"
-            />
-            <small
-              v-if="block.data.setting !== null"
-              style="display: inline-block"
-              class="q-ml-xs"
-            >%</small>
-          </div>
+          <SliderField
+            :value="block.data.setting"
+            :readonly="isDriven"
+            :tag-class="{['text-orange']: isConstrained}"
+            title="Duty Setting"
+            label="Setting"
+            suffix="%"
+            tag="big"
+            @input="v => { block.data.desiredSetting = v; saveBlock(); }"
+          />
         </q-item-section>
 
         <q-item-section>
-          <q-item-label caption>
-            Duty achieved
-          </q-item-label>
-          <div>
-            <big>{{ block.data.value | round }}</big>
-            <small class="q-ml-xs">%</small>
-          </div>
+          <LabeledField
+            :value="block.data.value"
+            label="Duty achieved"
+            number
+            suffix="%"
+            tag="big"
+          />
         </q-item-section>
 
         <q-item-section>
-          <template v-if="isConstrained">
-            <q-item-label caption>
-              Unconstrained setting
-            </q-item-label>
-            <div>
-              <big>{{ block.data.desiredSetting | round }}</big>
-              <small class="q-ml-xs">%</small>
-            </div>
-          </template>
+          <LabeledField
+            v-if="isConstrained"
+            label="Unconstrained setting"
+            :value="block.data.desiredSetting"
+            number
+            suffix="%"
+            tag="big"
+          />
         </q-item-section>
       </q-item>
 
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
           <ConstraintsField

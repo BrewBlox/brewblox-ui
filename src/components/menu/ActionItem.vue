@@ -27,7 +27,6 @@ export default class ActionItem extends Vue {
 
   get combinedProps(): Mapped<any> {
     return {
-      dark: true,
       clickable: !this.disabled,
       active: this.active && !this.disabled,
       ...this.itemProps,

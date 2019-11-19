@@ -12,19 +12,17 @@ export default class ActuatorAnalogMockFull extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>
-            Setting
-          </q-item-label>
           <InputField
             :readonly="isDriven"
             :value="block.data.setting"
+            label="Setting"
             type="number"
             title="Target"
             tag="big"
@@ -32,64 +30,53 @@ export default class ActuatorAnalogMockFull extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>
-            Clip to min
-          </q-item-label>
           <InputField
             :value="block.data.minSetting"
             title="Setting min"
+            label="Clip to min"
             type="number"
             tag="big"
             @input="v => { block.data.minSetting = v; saveBlock(); }"
           />
         </q-item-section>
         <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>
-            Clip to max
-          </q-item-label>
           <InputField
             :value="block.data.maxSetting"
             type="number"
             title="Setting max"
+            label="Clip to max"
             tag="big"
             @input="v => { block.data.maxSetting = v; saveBlock(); }"
           />
         </q-item-section>
       </q-item>
-      <q-item dark>
+      <q-item>
         <q-item-section>
-          <q-item-label caption>
-            Value
-          </q-item-label>
-          <big>{{ block.data.value | round }}</big>
+          <LabeledField :value="block.data.value" type="number" label="Value" tag="big" />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            Clip to min
-          </q-item-label>
           <InputField
             :value="block.data.minValue"
             type="number"
             title="Value min"
+            label="Clip to min"
             tag="big"
             @input="v => { block.data.minValue = v; saveBlock(); }"
           />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            Clip to max
-          </q-item-label>
           <InputField
             :value="block.data.maxValue"
             type="number"
             title="Value max"
+            label="Clip to max"
             tag="big"
             @input="v => { block.data.maxValue = v; saveBlock(); }"
           />
         </q-item-section>
       </q-item>
 
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
           <ConstraintsField

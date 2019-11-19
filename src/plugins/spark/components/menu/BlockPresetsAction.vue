@@ -38,7 +38,6 @@ export default class BlockPresetsAction extends BlockCrudComponent {
   choosePreset(): void {
     createDialog({
       title: 'Apply configuration preset',
-      dark: true,
       cancel: true,
       options: {
         type: 'radio',

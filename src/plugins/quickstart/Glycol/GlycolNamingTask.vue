@@ -149,7 +149,7 @@ export default class GlycolNamingTask extends WizardTaskBase<GlycolConfig> {
   <div>
     <q-card-section style="height: 60vh">
       <q-scroll-area>
-        <q-item dark class="text-weight-light">
+        <q-item class="text-weight-light">
           <q-item-section>
             <q-item-label class="text-subtitle1">
               Name your new dashboard and blocks
@@ -213,7 +213,7 @@ export default class GlycolNamingTask extends WizardTaskBase<GlycolConfig> {
       </q-scroll-area>
     </q-card-section>
 
-    <q-separator dark />
+    <q-separator />
 
     <q-card-actions>
       <q-btn unelevated label="Back" @click="back" />

@@ -12,12 +12,12 @@ export default class ActuatorOffsetBasic extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
     <q-card-section>
-      <q-item dark class="align-children">
+      <q-item class="align-children">
         <q-item-section>
           <q-item-label caption>
             Target offset
@@ -32,7 +32,7 @@ export default class ActuatorOffsetBasic extends BlockCrudComponent {
         </q-item-section>
       </q-item>
 
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
           <ConstraintsField

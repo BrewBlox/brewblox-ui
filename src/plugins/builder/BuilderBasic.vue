@@ -175,17 +175,17 @@ export default class BuilderBasic extends CrudComponent<BuilderConfig> {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
-    <q-item v-if="activeLayouts.length > 1" dark>
+    <q-item v-if="activeLayouts.length > 1">
       <q-item-section class="col-auto">
         <q-btn :disable="currentIdx <= 0" icon="mdi-chevron-left" flat @click="currentIdx--" />
       </q-item-section>
       <q-item-section>
         <q-btn-dropdown :label="layout ? layout.title : 'None'" flat no-caps icon="widgets">
-          <q-list dark bordered>
+          <q-list bordered>
             <ActionItem
               v-for="lay in activeLayouts"
               :key="lay.id"

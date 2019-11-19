@@ -27,7 +27,7 @@ export default class SessionGraphNoteDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title ellipsis">
         {{ title }}
       </q-card-section>
@@ -36,7 +36,7 @@ export default class SessionGraphNoteDialog extends DialogBase {
       </q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <q-item-label caption>
               Start
@@ -56,7 +56,7 @@ export default class SessionGraphNoteDialog extends DialogBase {
             <q-btn :disable="local.end !== null" icon="clear" flat @click="local.start = null" />
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <q-item-label caption>
               End

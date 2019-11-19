@@ -27,7 +27,6 @@ export default class BlockGroupsAction extends BlockCrudComponent {
     createDialog({
       title: this.label,
       message: 'Choose Block groups. The Block will become inactive if it is not part of any active groups.',
-      dark: true,
       cancel: true,
       options: {
         type: 'checkbox',
