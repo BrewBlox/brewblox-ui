@@ -205,7 +205,7 @@ export default class PidFull extends BlockCrudComponent {
           </ValueField>
         </div>
 
-        <div class="span-1 self-center">
+        <div class="span-1 self-center text-center">
           *
         </div>
 
@@ -228,7 +228,7 @@ export default class PidFull extends BlockCrudComponent {
           />
         </div>
 
-        <div :style="grid({start: 9})" class="self-center">
+        <div :style="grid({start: 9})" class="self-center text-center">
           =
         </div>
 
@@ -246,7 +246,7 @@ export default class PidFull extends BlockCrudComponent {
           </ValueField>
         </div>
 
-        <div class="span-1 self-center">
+        <div class="span-1 self-center text-center">
           *
         </div>
 
@@ -256,7 +256,7 @@ export default class PidFull extends BlockCrudComponent {
           </ValueField>
         </div>
 
-        <div class="span-1 self-center">
+        <div class="span-1 self-center text-center">
           /
         </div>
 
@@ -287,7 +287,7 @@ export default class PidFull extends BlockCrudComponent {
           />
         </div>
 
-        <div class="span-1 self-center">
+        <div class="span-1 self-center text-center">
           =
         </div>
 
@@ -320,7 +320,7 @@ export default class PidFull extends BlockCrudComponent {
           </ValueField>
         </div>
 
-        <div class="span-1 self-center">
+        <div class="span-1 self-center text-center">
           *
         </div>
 
@@ -330,7 +330,7 @@ export default class PidFull extends BlockCrudComponent {
           </ValueField>
         </div>
 
-        <div class="span-1 self-center">
+        <div class="span-1 self-center text-center">
           *
         </div>
 
@@ -359,7 +359,7 @@ export default class PidFull extends BlockCrudComponent {
           />
         </div>
 
-        <div class="span-1 q-pt-sm">
+        <div class="span-1 q-pt-sm self-center text-center">
           =
         </div>
 

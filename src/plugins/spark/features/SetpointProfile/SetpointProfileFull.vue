@@ -141,9 +141,11 @@ export default class SetpointProfileFull extends BlockCrudComponent {
         createDialog({
           title: 'Insert point',
           message: `
-          Insert a point at current time and setting?
-          This prevents instant jumps in temperature setting.`,
+          Do you want to insert an extra point to prevent an instant jump
+          from <b>${current}</b> to <b>${projected}</b>?`,
+          html: true,
           cancel: 'No',
+          ok: 'Yes',
           persistent: true,
         })
           .onOk(() => this.splicePoints(index, first, second))
