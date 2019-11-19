@@ -41,7 +41,7 @@ export default class SparkUnitMenu extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <q-card dark class="widget-modal">
+    <q-card class="widget-modal">
       <DialogToolbar>
         <q-item-section>
           <q-item-label>{{ serviceId }}</q-item-label>
@@ -52,15 +52,13 @@ export default class SparkUnitMenu extends DialogBase {
       </DialogToolbar>
 
       <q-card-section>
-        <q-item dark>
+        <q-item>
           <q-item-section v-for="(val, name) in units" :key="name">
-            <q-item-label caption>
-              {{ `${spaceCased(name)} unit` }}
-            </q-item-label>
             <SelectField
               :value="val"
               :options="unitAlternativeOptions(name)"
               :title="`Preferred ${spaceCased(name)} unit`"
+              :label="`${spaceCased(name)} unit`"
               @input="v => { units[name] = v; saveUnits(); }"
             />
           </q-item-section>

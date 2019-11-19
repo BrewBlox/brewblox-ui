@@ -76,19 +76,18 @@ export default class SelectField extends FieldBase {
 </script>
 
 <template>
-  <component
-    :is="tag"
-    v-bind="tagProps"
-    :class="[{editable: !readonly}, tagClass]"
-    @click="openDialog"
+  <q-field
+    :label="label"
+    :class="[{pointer: !readonly}, $attrs.class]"
+    stack-label
+    @click.native="openDialog"
   >
-    <slot name="pre" />
-    <slot name="value">
-      {{ displayValue }}
-    </slot>
-    <slot />
-    <q-tooltip v-if="!readonly">
-      Set {{ label }}
-    </q-tooltip>
-  </component>
+    <template #control>
+      <component :is="tag" class="q-mt-sm" v-bind="tagProps">
+        <slot name="value">
+          {{ displayValue }}
+        </slot>
+      </component>
+    </template>
+  </q-field>
 </template>

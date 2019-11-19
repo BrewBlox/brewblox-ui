@@ -69,10 +69,11 @@ export default class InputField extends FieldBase {
     :label="label"
     :class="[{pointer: !readonly}, $attrs.class]"
     stack-label
+    v-bind="$attrs"
     @click.native="openDialog"
   >
     <template #control>
-      <component :is="tag" class="q-mt-sm">
+      <component :is="tag" :class="['q-mt-sm', tagClass]">
         <slot name="value">
           {{ displayValue }}
         </slot>

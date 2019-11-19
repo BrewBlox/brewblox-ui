@@ -61,7 +61,7 @@ export default class Troubleshooter extends Vue {
 </script>
 
 <template>
-  <q-card dark class="text-white scroll" style="max-width: 500px">
+  <q-card class="text-white scroll" style="max-width: 500px">
     <Toolbar :title="serviceId" subtitle="Troubleshooter">
       <q-item-section class="dense" side>
         <q-btn unelevated label="force refresh" color="primary" icon="refresh" @click="refresh" />
@@ -70,18 +70,17 @@ export default class Troubleshooter extends Vue {
 
     <q-card-section>
       <template v-if="lastStatus">
-        <q-item dark>
+        <q-item>
           <q-item-section avatar>
             <q-spinner size="24px" />
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>
-              Last update
-            </q-item-label>
-            <big>{{ lastStatus.checkedAt.toLocaleString() }}</big>
+            <ValueField label="Last update">
+              <big>{{ lastStatus.checkedAt.toLocaleString() }}</big>
+            </ValueField>
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section avatar>
             <q-icon
               :name="iconName(lastStatus.available)"
@@ -91,7 +90,7 @@ export default class Troubleshooter extends Vue {
           </q-item-section>
           <q-item-section>{{ textAvailable }}</q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section avatar>
             <q-icon
               :name="iconName(lastStatus.connect)"
@@ -101,7 +100,7 @@ export default class Troubleshooter extends Vue {
           </q-item-section>
           <q-item-section>{{ textConnect }}</q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section avatar>
             <q-icon
               :name="iconName(lastStatus.handshake)"
@@ -112,7 +111,7 @@ export default class Troubleshooter extends Vue {
           <q-item-section>{{ textHandshake }}</q-item-section>
         </q-item>
         <!-- Only show after handshake -->
-        <q-item v-if="lastStatus.handshake" dark>
+        <q-item v-if="lastStatus.handshake">
           <q-item-section avatar>
             <q-icon
               :name="iconName(lastStatus.compatible)"
@@ -122,7 +121,7 @@ export default class Troubleshooter extends Vue {
           </q-item-section>
           <q-item-section>{{ textCompatible }}</q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section avatar>
             <q-icon
               :name="iconName(lastStatus.synchronize)"
@@ -184,14 +183,14 @@ export default class Troubleshooter extends Vue {
         </q-item-section>
       </q-item>
       <template v-if="(lastStatus.info || []).length > 0">
-        <q-separator dark inset />
-        <q-item dark>
+        <q-separator inset />
+        <q-item>
           <q-item-section>
             <b>Service info:</b>
           </q-item-section>
         </q-item>
         <q-list dense>
-          <q-item v-for="(val, idx) in lastStatus.info" :key="idx" dark>
+          <q-item v-for="(val, idx) in lastStatus.info" :key="idx">
             <q-item-section>{{ val }}</q-item-section>
           </q-item>
         </q-list>

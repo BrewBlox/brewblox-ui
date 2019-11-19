@@ -10,6 +10,9 @@ export default class FieldBase extends Vue {
   @Prop({ type: String, default: 'Edit value' })
   public readonly title!: string;
 
+  @Prop({ type: String, required: false })
+  public readonly label!: string;
+
   @Prop({ type: String })
   public readonly message!: string;
 

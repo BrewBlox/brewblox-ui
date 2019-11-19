@@ -32,60 +32,53 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
     <q-card-section>
-      <q-separator dark inset />
+      <q-separator inset />
 
-      <q-item dark class="align-children">
+      <q-item class="items-start">
         <q-item-section class="col-4">
-          <q-item-label caption>
-            Setting
-          </q-item-label>
           <UnitField
             :value="block.data.storedSetting"
             :readonly="isDriven"
             :class="{darkened: !block.data.settingEnabled}"
             title="Setting"
+            label="Setting"
+            class="self-start"
             tag="big"
             @input="v => { block.data.storedSetting = v; saveBlock(); }"
           />
         </q-item-section>
         <q-item-section v-if="usedBy.length">
-          <q-item-label caption>
-            Input for:
-          </q-item-label>
-          <div class="row">
-            <q-btn
-              v-for="block in usedBy"
-              :key="block.id"
-              :label="block.id"
-              dense
-              no-caps
-              flat
-              class="q-py-xs"
-              @click="showOtherBlock(block)"
-            />
-          </div>
+          <ValueField label="Input for:">
+            <div class="row">
+              <q-btn
+                v-for="block in usedBy"
+                :key="block.id"
+                :label="block.id"
+                dense
+                no-caps
+                flat
+                class="q-py-xs"
+                style="text-decoration: underline"
+                @click="showOtherBlock(block)"
+              />
+            </div>
+          </ValueField>
         </q-item-section>
         <template v-else>
           <q-item-section>This setpoint is not used as PID input</q-item-section>
         </template>
       </q-item>
 
-      <q-item dark class="align-children">
+      <q-item class="items-end">
         <q-item-section class="col-4">
-          <q-item-label caption>
-            Sensor value
-          </q-item-label>
-          <UnitField :value="block.data.value" tag="big" readonly />
+          <UnitField :value="block.data.value" label="Sensor value" tag="big" readonly />
         </q-item-section>
         <q-item-section class="col-3">
-          <q-item-label caption>
-            Filter period
-          </q-item-label>
           <SelectField
             :value="block.data.filter"
             :options="filterOpts"
@@ -104,14 +97,11 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
             @input="v => { block.data.filter = v; saveBlock(); }"
           />
         </q-item-section>
-        <q-item-section class="col-3">
-          <q-item-label caption>
-            Bypass threshold
-          </q-item-label>
+        <q-item-section class="col-4">
           <UnitField
             :value="block.data.filterThreshold"
             title="Filter bypass threshold"
-            label="Filter threshold to bypass filtering"
+            label="Bypass threshold"
             message-html="
               <p>
                 The filter can detect when a large step occurs at the input and temporary bypass slow filtering.
@@ -119,42 +109,39 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
               </p>
               "
             @input="v => { block.data.filterThreshold = v; saveBlock(); }"
-          />
-        </q-item-section>
-        <q-item-section>
-          <q-btn
-            flat
-            round
-            icon="mdi-skip-forward"
-            @click="block.data.resetFilter = true; saveBlock()"
           >
-            <q-tooltip>Bypass filter now</q-tooltip>
-          </q-btn>
+            <template #append>
+              <q-btn
+                flat
+                round
+                icon="mdi-skip-forward"
+                class="self-end"
+                @click="block.data.resetFilter = true; saveBlock()"
+              >
+                <q-tooltip>Bypass filter now</q-tooltip>
+              </q-btn>
+            </template>
+          </UnitField>
         </q-item-section>
       </q-item>
 
-      <q-item dark class="align-children">
+      <q-item>
         <q-item-section class="col-4">
-          <q-item-label caption>
-            Unfiltered sensor value
-          </q-item-label>
-          <UnitField :value="block.data.valueUnfiltered" tag="big" readonly />
+          <UnitField :value="block.data.valueUnfiltered" label="Unfiltered sensor value" tag="big" readonly />
         </q-item-section>
-        <q-item-section class="col-4">
-          <q-item-label caption>
-            Sensor block
-          </q-item-label>
-          <LinkField
+        <q-item-section class="col-7">
+          <BlockField
             :value="block.data.sensorId"
             :service-id="serviceId"
             title="Sensor Block"
+            label="Sensor Block"
             tag="span"
             @input="v => { block.data.sensorId = v; saveBlock(); }"
           />
         </q-item-section>
       </q-item>
 
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
         </q-item-section>

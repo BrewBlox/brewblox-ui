@@ -52,10 +52,10 @@ export default class MetricsEditor extends Vue {
       <div @click="editLeaf(node)">
         {{ node.label }}
         <q-tooltip>
-          <i>Click to edit</i> <br />
-          Label: <span>{{ renamed(node) }}</span> <br />
-          Warn when older than: <span>{{ freshDuration(node) }}</span> <br />
-          Rounded decimals: <span>{{ decimals(node) }}</span>
+          <i>Click to edit</i>
+          <ValueField :value="renamed(node)" label="Label" dense class="q-mt-sm" />
+          <ValueField :value="freshDuration(node)" label="Warn when older than" dense class="q-mt-sm" />
+          <ValueField :value="decimals(node)" label="Rounded decimals" dense class="q-mt-sm" />
         </q-tooltip>
       </div>
     </template>

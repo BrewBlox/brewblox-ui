@@ -47,20 +47,17 @@ export default class QuickActionsWizard extends WidgetWizardBase {
 <template>
   <div>
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section>
-          <q-input v-model="widgetTitle" dark label="Widget name" />
+          <q-input v-model="widgetTitle" label="Widget name" />
         </q-item-section>
       </q-item>
-      <q-item dark>
-        <q-item-section>
-          <q-item-label caption>
-            Service
-          </q-item-label>
-          <q-option-group v-model="service" :options="serviceOpts" dark />
-        </q-item-section>
-      </q-item>
+      <ValueField label="Service" item-aligned>
+        <q-option-group v-model="service" :options="serviceOpts" />
+      </ValueField>
     </q-card-section>
+
+    <q-separator />
 
     <q-card-actions align="right">
       <q-btn unelevated label="Back" @click="back" />

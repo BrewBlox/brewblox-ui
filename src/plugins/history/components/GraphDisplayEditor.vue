@@ -63,24 +63,24 @@ export default class GraphDisplayEditor extends Vue {
 </script>
 
 <template>
-  <q-list dark>
-    <!-- <q-item dark>
+  <q-list>
+    <!-- <q-item>
       <q-item-section>Metric</q-item-section>
       <q-item-section>Display settings</q-item-section>
     </q-item>
-    <q-separator dark inset /> -->
+    <q-separator inset /> -->
 
 
     <!-- <GraphPeriodEditor :config="config" @update:config="saveConfig" /> -->
 
-    <div v-for="field in selected" :key="field" dark class="align-children row wrap q-pa-sm">
+    <div v-for="field in selected" :key="field" class="align-children row wrap q-pa-sm">
       <q-item-section class="col-5">
         <InputField :value="fieldRename(field)" title="Legend" @input="v => saveRename(field, v)" />
       </q-item-section>
       <q-space />
       <q-item-section class="col-grow">
-        <q-list dark dense>
-          <q-item dark>
+        <q-list dense>
+          <q-item>
             <q-item-section>
               <q-item-label caption>
                 Key
@@ -90,7 +90,7 @@ export default class GraphDisplayEditor extends Vue {
               {{ field }}
             </q-item-section>
           </q-item>
-          <q-item dark>
+          <q-item>
             <q-item-section>
               <q-item-label caption>
                 Line color
@@ -105,7 +105,7 @@ export default class GraphDisplayEditor extends Vue {
               />
             </q-item-section>
           </q-item>
-          <q-item dark>
+          <q-item>
             <q-item-section>
               <q-item-label caption>
                 Y-axis
@@ -121,16 +121,16 @@ export default class GraphDisplayEditor extends Vue {
               />
             </q-item-section>
           </q-item>
-          <q-separator dark />
+          <q-separator />
         </q-list>
       </q-item-section>
     </div>
-    <q-item v-if="!selected || selected.length === 0" dark>
+    <q-item v-if="!selected || selected.length === 0">
       <q-item-section side>
         No metrics selected
       </q-item-section>
     </q-item>
-    <q-item dark>
+    <q-item>
       <q-space />
       <q-item-section class="col-auto">
         <q-btn outline round icon="edit">

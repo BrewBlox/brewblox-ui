@@ -111,21 +111,19 @@ export default class WidgetWizardPicker extends Vue {
 
     <template v-else>
       <q-card-section>
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <q-select
               v-model="feature"
               :options="filteredOptions"
               :rules="[v => !!v || 'You must select a widget type']"
               label="Widget Type"
-              dark
               use-input
-              options-dark
               autofocus
               @filter="filterFn"
             >
               <template #no-option>
-                <q-item dark>
+                <q-item>
                   <q-item-section class="text-grey">
                     No results
                   </q-item-section>
@@ -134,15 +132,15 @@ export default class WidgetWizardPicker extends Vue {
             </q-select>
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <q-item-label>Dashboard</q-item-label>
-            <q-option-group v-model="chosenDashboardId" :options="dashboardOptions" dark />
+            <q-option-group v-model="chosenDashboardId" :options="dashboardOptions" />
           </q-item-section>
         </q-item>
       </q-card-section>
 
-      <q-separator dark />
+      <q-separator />
 
       <q-card-actions class="row justify-between">
         <q-btn unelevated label="Back" @click="back" />

@@ -115,7 +115,7 @@ export default class IoArray extends BlockCrudComponent {
 
 <template>
   <q-card-section>
-    <q-item v-for="channel in channels" :key="channel.id" dark>
+    <q-item v-for="channel in channels" :key="channel.id">
       <q-item-section>{{ channel.name }}</q-item-section>
       <q-item-section>
         <DigitalStateField
@@ -131,10 +131,13 @@ export default class IoArray extends BlockCrudComponent {
         </div>
       </q-item-section>
       <q-item-section>
-        <LinkField
+        <BlockField
           :value="driverLink(channel)"
           :service-id="serviceId"
           title="Driver"
+          label="Driver"
+          no-show
+          dense
           @input="link => saveDriver(channel, link)"
         />
       </q-item-section>

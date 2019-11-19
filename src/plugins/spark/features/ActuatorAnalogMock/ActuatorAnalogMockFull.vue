@@ -12,12 +12,12 @@ export default class ActuatorAnalogMockFull extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section style="justify-content: flex-start">
           <InputField
             :readonly="isDriven"
@@ -50,7 +50,7 @@ export default class ActuatorAnalogMockFull extends BlockCrudComponent {
           />
         </q-item-section>
       </q-item>
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <ValueField :value="block.data.value" type="number" label="Value" tag="big" />
         </q-item-section>
@@ -76,7 +76,7 @@ export default class ActuatorAnalogMockFull extends BlockCrudComponent {
         </q-item-section>
       </q-item>
 
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
           <ConstraintsField

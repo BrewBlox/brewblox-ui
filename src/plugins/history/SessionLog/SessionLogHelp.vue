@@ -18,7 +18,7 @@ export default class SessionLogHelp extends DialogBase {
     @hide="onDialogHide"
     @keyup.enter="onDialogOk"
   >
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title">
         About sessions
       </q-card-section>

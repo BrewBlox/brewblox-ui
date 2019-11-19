@@ -380,7 +380,6 @@ export default class SparkPage extends Vue {
       <q-btn-toggle
         v-model="pageMode"
         class="q-mr-md"
-        dark
         flat
         dense
         no-caps
@@ -390,7 +389,7 @@ export default class SparkPage extends Vue {
         ]"
       />
       <q-btn-dropdown :disable="!isReady || statusNok" color="primary" label="actions">
-        <q-list dark link>
+        <q-list link>
           <ActionItem
             icon="add"
             label="New Block"
@@ -446,8 +445,8 @@ export default class SparkPage extends Vue {
     </portal>
 
     <!-- Shown if service was found in store, but not ok -->
-    <q-list v-if="statusNok" dark no-border>
-      <q-item dark>
+    <q-list v-if="statusNok" no-border>
+      <q-item>
         <q-item-section>
           <Troubleshooter :service-id="service.id" class="bg-dark" />
         </q-item-section>
@@ -467,11 +466,11 @@ export default class SparkPage extends Vue {
       <!-- Normal display -->
       <div class="row no-wrap justify-start" :style="contentStyle">
         <q-scroll-area class="row no-wrap col-auto" style="width: 500px">
-          <q-list dark no-border class="col">
+          <q-list no-border class="col">
             <!-- Selection controls -->
-            <q-item dark class="q-mb-md">
+            <q-item class="q-mb-md">
               <q-item-section>
-                <q-input v-model="blockFilter" placeholder="Search Blocks" clearable dark>
+                <q-input v-model="blockFilter" placeholder="Search Blocks" clearable>
                   <template #append>
                     <q-icon name="search" />
                   </template>
@@ -479,7 +478,7 @@ export default class SparkPage extends Vue {
               </q-item-section>
               <q-item-section class="col-auto">
                 <q-btn-dropdown :label="sorting" icon="mdi-sort" flat>
-                  <q-list dark>
+                  <q-list>
                     <ActionItem
                       v-for="(func, name) in allSorters"
                       :key="name"
@@ -501,12 +500,12 @@ export default class SparkPage extends Vue {
               </q-item-section>
             </q-item>
             <!-- Service -->
-            <q-item v-if="serviceShown" dark class="text-white widget-index">
+            <q-item v-if="serviceShown" class="text-white widget-index">
               <q-item-section side class="q-mx-none q-px-none">
                 <ToggleButton v-model="serviceExpanded" />
               </q-item-section>
               <q-item-section>
-                <q-item class="non-selectable" clickable dark @click="selectService">
+                <q-item class="non-selectable" clickable @click="selectService">
                   <q-item-section avatar>
                     <q-icon name="mdi-information-variant" />
                     <q-tooltip>Device Info</q-tooltip>
@@ -522,7 +521,6 @@ export default class SparkPage extends Vue {
             <q-item
               v-for="val in filteredItems"
               :key="val.key"
-              dark
               class="non-selectable text-white widget-index"
             >
               <q-item-section side class="q-mx-none q-px-none">
@@ -531,7 +529,6 @@ export default class SparkPage extends Vue {
               <q-item-section>
                 <q-item
                   clickable
-                  dark
                   @click="val.expanded ? scrollTo(val.id) : updateExpandedBlock(val.id, true)"
                 >
                   <q-item-section avatar>
@@ -550,15 +547,15 @@ export default class SparkPage extends Vue {
 
         <!-- Widget List -->
         <q-scroll-area class="col-auto q-ml-xl" style="min-width: 500px; max-width: 500px">
-          <q-list dark>
+          <q-list>
             <!-- Service -->
-            <q-item v-if="serviceShown && serviceExpanded" ref="widget-spark-service" dark>
+            <q-item v-if="serviceShown && serviceExpanded" ref="widget-spark-service">
               <q-item-section>
                 <SparkWidget v-if="isReady" :service-id="service.id" class="bg-dark" />
               </q-item-section>
             </q-item>
             <!-- Blocks -->
-            <q-item v-for="val in expandedItems" :ref="`widget-${val.key}`" :key="val.key" dark>
+            <q-item v-for="val in expandedItems" :ref="`widget-${val.key}`" :key="val.key">
               <q-item-section>
                 <component
                   :is="val.component"
@@ -569,7 +566,7 @@ export default class SparkPage extends Vue {
                 />
               </q-item-section>
             </q-item>
-            <q-item dark :style="{height: contentStyle.height}" />
+            <q-item :style="{height: contentStyle.height}" />
           </q-list>
         </q-scroll-area>
       </div>

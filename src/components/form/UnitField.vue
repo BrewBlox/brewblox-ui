@@ -48,7 +48,9 @@ export default class UnitField extends FieldBase {
   <q-field
     :label="label"
     :class="[{pointer: !readonly}, $attrs.class]"
+    :borderless="readonly || $attrs.borderless"
     stack-label
+    v-bind="$attrs"
     @click.native="openDialog"
   >
     <template #control>
@@ -56,12 +58,16 @@ export default class UnitField extends FieldBase {
         <slot name="value">
           {{ value.value | round }}
         </slot>
+        <component :is="unitTag" v-if="value.value !== null" class="self-end darkish">
+          {{ value.notation }}
+        </component>
       </component>
     </template>
-    <template #append>
-      <component :is="unitTag" v-if="value.value !== null" class="q-ml-xs self-end">
-        {{ value.notation }}
-      </component>
+    <template v-if="!!$scopedSlots.append" #append>
+      <slot name="append" />
+    </template>
+    <template v-if="!!$scopedSlots.after" #after>
+      <slot name="after" />
     </template>
   </q-field>
 </template>

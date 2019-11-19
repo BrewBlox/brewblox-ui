@@ -170,20 +170,20 @@ export default class QuickActionsBasic extends CrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
     <q-card-section>
-      <q-item v-for="step in stepDisplays" :key="step.id" dark>
+      <q-item v-for="step in stepDisplays" :key="step.id">
         <q-item-section>
           {{ step.name }}
           <q-item-label caption>
             {{ step.changes.length }} Blocks changed
           </q-item-label>
           <q-tooltip v-if="step.applicable">
-            <q-list dark dense>
-              <q-item v-for="bdiff in step.diffs" :key="`bdiff-${step.id}-${bdiff.blockId}`" dark>
+            <q-list dense>
+              <q-item v-for="bdiff in step.diffs" :key="`bdiff-${step.id}-${bdiff.blockId}`">
                 <q-item-section class="col-3">
                   {{ bdiff.blockId }}
                 </q-item-section>

@@ -55,9 +55,7 @@ export default class LinkValEdit extends ValEditBase {
     v-if="editable"
     :value="field.id"
     :options="filteredOpts"
-    dark
     dense
-    options-dark
     clearable
     use-input
     @input="v => { field.id = v; saveField(field); }"

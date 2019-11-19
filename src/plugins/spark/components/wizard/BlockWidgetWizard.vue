@@ -144,17 +144,11 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
     class="bg-dark-bright no-border"
     vertical
     animated
-    dark
   >
     <q-step name="start" title="Select Service">
-      <q-item dark>
-        <q-item-section>
-          <q-item-label caption>
-            Service
-          </q-item-label>
-          <q-option-group v-model="service" :options="serviceOpts" dark />
-        </q-item-section>
-      </q-item>
+      <ValueField label="Service" item-aligned>
+        <q-option-group v-model="service" :options="serviceOpts" />
+      </ValueField>
       <q-stepper-navigation class="row">
         <q-btn unelevated label="Back" @click="back" />
         <q-space />
@@ -177,9 +171,9 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
     </q-step>
 
     <q-step name="create" title="Create new Block">
-      <q-item dark>
+      <q-item>
         <q-item-section>
-          <q-input v-model="blockId" :rules="blockIdRules" autofocus dark label="Block name">
+          <q-input v-model="blockId" :rules="blockIdRules" autofocus label="Block name">
             <template #append>
               <q-icon name="mdi-information">
                 <q-tooltip>
@@ -220,14 +214,12 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
     </q-step>
 
     <q-step name="existing" title="Use existing Block">
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <q-select
             :value="block"
             :options="blockOpts"
             :rules="[v => !!v || 'You must select a Block']"
-            dark
-            options-dark
             option-label="id"
             option-value="id"
             label="Block"
@@ -235,7 +227,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
             @input="v => { block = v; widget = null}"
           >
             <template #no-option>
-              <q-item dark>
+              <q-item>
                 <q-item-section class="text-grey">
                   No results
                 </q-item-section>

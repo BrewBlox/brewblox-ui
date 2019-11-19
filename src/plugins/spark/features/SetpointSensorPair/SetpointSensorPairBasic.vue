@@ -12,39 +12,37 @@ export default class SetpointSensorPairBasic extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
     <q-card-section>
-      <q-item dark>
-        <q-item-section class="q-mr-md">
-          <q-item-label caption>
-            Setting
-          </q-item-label>
+      <q-item>
+        <q-item-section>
           <UnitField
             :class="{darkened: !block.data.settingEnabled}"
             :value="block.data.storedSetting"
             :readonly="isDriven"
             title="Setting"
+            label="Setting"
             tag="big"
+            class="self-start"
             @input="v => {block.data.storedSetting = v; saveBlock()}"
           />
         </q-item-section>
-        <q-item-section class="q-mr-md">
-          <q-item-label caption>
-            Sensor
-          </q-item-label>
-          <UnitField :value="block.data.value" tag="big" readonly />
+        <q-item-section>
+          <UnitField :value="block.data.value" label="Sensor" tag="big" readonly />
         </q-item-section>
-        <q-item-section class="col-auto">
-          <q-item-label caption>
-            Unfiltered sensor
-          </q-item-label>
-          <UnitField :value="block.data.valueUnfiltered" tag="big" readonly />
+        <q-item-section>
+          <UnitField
+            :value="block.data.valueUnfiltered"
+            label="Unfiltered sensor"
+            tag="big"
+            readonly
+          />
         </q-item-section>
       </q-item>
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
         </q-item-section>

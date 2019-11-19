@@ -109,13 +109,13 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
 
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
     <slot name="graph" />
 
     <q-card-section v-if="session !== null">
-      <q-item dark dense>
+      <q-item dense>
         <q-item-section class="col-auto text-grey-2">
           <span class="text-italic">{{ session.title }}</span>
           <span>{{ new Date(session.date).toLocaleString() }}</span>
@@ -125,7 +125,6 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
         <q-item
           v-for="note in notes"
           :key="note.id"
-          dark
           clickable
           :class="[`col-${note.col}`, 'align-children']"
           @click="openNote(note)"

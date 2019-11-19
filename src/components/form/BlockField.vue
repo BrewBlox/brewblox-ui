@@ -30,6 +30,9 @@ export default class BlockField extends FieldBase {
   @Prop({ type: Boolean, default: false })
   public readonly noCreate!: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly noShow!: boolean;
+
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
@@ -79,6 +82,7 @@ export default class BlockField extends FieldBase {
     :label="label"
     :class="[{pointer: !readonly}, $attrs.class]"
     stack-label
+    v-bind="$attrs"
     @click.native="openDialog"
   >
     <template #control>
@@ -87,7 +91,7 @@ export default class BlockField extends FieldBase {
       </div>
     </template>
     <template #append>
-      <q-btn v-if="linkBlock" flat round icon="mdi-message-draw" @click.stop="editBlock">
+      <q-btn v-if="linkBlock && !noShow" flat round icon="mdi-message-draw" @click.stop="editBlock">
         <q-tooltip>Show {{ value.id }}</q-tooltip>
       </q-btn>
     </template>

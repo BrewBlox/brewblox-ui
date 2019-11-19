@@ -40,7 +40,7 @@ export default class SparkGroupMenu extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <q-card dark class="widget-modal">
+    <q-card class="widget-modal">
       <DialogToolbar>
         <q-item-section>
           <q-item-label>{{ service.id }}</q-item-label>
@@ -51,36 +51,25 @@ export default class SparkGroupMenu extends DialogBase {
       </DialogToolbar>
 
       <q-card-section>
-        <q-item dark>
-          <q-item-section>
-            <q-item-label caption>
-              Active groups
-            </q-item-label>
-            <GroupsField
-              :value="groups.data.active"
-              :service-id="service.id"
-              title="Active groups"
-              @input="v => { groups.data.active = v; saveBlock(groups); }"
-            />
-          </q-item-section>
-        </q-item>
+        <GroupsField
+          :value="groups.data.active"
+          :service-id="service.id"
+          title="Active groups"
+          label="Active groups"
+          item-aligned
+          @input="v => { groups.data.active = v; saveBlock(groups); }"
+        />
 
-        <q-item dense />
-
-        <div class="row">
-          <q-item v-for="(name, idx) in groupNames" :key="idx" dark class="col-4">
-            <q-item-section>
-              <q-item-label caption>
-                {{ `Group ${idx + 1} name` }}
-              </q-item-label>
-              <InputField
-                :value="name"
-                label="name"
-                title="Group name"
-                @input="v => { groupNames[idx] = v; saveGroupNames(); }"
-              />
-            </q-item-section>
-          </q-item>
+        <div class="row q-px-sm q-mt-md">
+          <InputField
+            v-for="(name, idx) in groupNames"
+            :key="idx"
+            class="col-4 item-aligned q-px-sm"
+            :value="name"
+            :label="`Group ${idx + 1} name`"
+            title="Group name"
+            @input="v => { groupNames[idx] = v; saveGroupNames(); }"
+          />
         </div>
       </q-card-section>
     </q-card>

@@ -45,7 +45,7 @@ export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
 <template>
   <div>
     <q-card-section>
-      <q-item dark class="text-weight-light">
+      <q-item class="text-weight-light">
         <q-item-section>
           <q-item-label class="text-subtitle1">
             Initial setpoints
@@ -59,24 +59,26 @@ export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
           <p>You can set the initial values now.</p>
         </q-item-section>
       </q-item>
-      <q-item dark>
+      <q-item>
         <q-item-section>
-          <q-item-label caption>
-            Beer setpoint
-          </q-item-label>
-          <UnitField v-model="beerSetting" title="Beer setting" />
+          <UnitField
+            v-model="beerSetting"
+            title="Beer setting"
+            label="Beer setpoint"
+          />
         </q-item-section>
-        <q-item-section v-if="config.glycolControl==='Control'">
-          <q-item-label caption>
-            Glycol setpoint
-          </q-item-label>
-          <UnitField v-model="glycolSetting" title="Glycol setting" />
+        <q-item-section>
+          <UnitField
+            v-if="config.glycolControl==='Control'"
+            v-model="glycolSetting"
+            title="Glycol setting"
+            label="Glycol setpoint"
+          />
         </q-item-section>
-        <q-item-section v-else />
       </q-item>
     </q-card-section>
 
-    <q-separator dark />
+    <q-separator />
 
     <q-card-actions>
       <q-btn unelevated label="Back" @click="back" />

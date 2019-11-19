@@ -45,7 +45,7 @@ export default class PluginDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss class="row" @hide="onDialogHide">
-    <q-card dark class="widget-modal">
+    <q-card class="widget-modal">
       <DialogToolbar>
         <q-item-section>
           <q-item-label>UI Plugins</q-item-label>
@@ -56,7 +56,7 @@ export default class PluginDialog extends DialogBase {
       </DialogToolbar>
 
       <q-card-section>
-        <q-item v-for="[plugin, result] in combos" :key="plugin.id" dark>
+        <q-item v-for="[plugin, result] in combos" :key="plugin.id">
           <q-item-section avatar>
             <template v-if="result.loaded">
               <q-tooltip>Plugin is loaded.</q-tooltip>
@@ -84,7 +84,7 @@ export default class PluginDialog extends DialogBase {
             <q-btn flat icon="delete" @click="removePlugin(plugin)" />
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section></q-item-section>
           <q-item-section class="col-auto">
             <q-tooltip>Add plugin</q-tooltip>

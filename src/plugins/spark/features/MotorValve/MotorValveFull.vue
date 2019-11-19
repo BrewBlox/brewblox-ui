@@ -71,59 +71,51 @@ export default class MotorValveFull extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section>
-          <q-item-label caption>
-            Target DS2408 Chip
-          </q-item-label>
-          <LinkField
+          <BlockField
             :value="block.data.hwDevice"
             :service-id="serviceId"
             title="Target DS2408 Chip"
+            label="Target DS2408 Chip"
             no-create
             @input="v => { block.data.hwDevice = v; block.data.startChannel = 0; saveBlock(); }"
           />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            DS2408 Channel
-          </q-item-label>
           <SelectField
             :value="block.data.startChannel"
             :options="channelOpts"
             :readonly="!block.data.hwDevice.id"
             title="DS2408 Channel"
+            label="DS2408 Channel"
             @input="claimChannel"
           />
         </q-item-section>
       </q-item>
-      <q-item dark>
-        <q-item-section style="justify-content: flex-start">
-          <q-item-label caption>
-            State
-          </q-item-label>
-          <DigitalStateField
-            :value="block.data.desiredState"
-            :pending="block.data.state !== block.data.desiredState"
-            :pending-reason="constrainers"
-            :disable="isDriven"
-            @input="v => { block.data.desiredState = v; saveBlock(); }"
-          />
+      <q-item>
+        <q-item-section>
+          <ValueField label="State">
+            <DigitalStateField
+              :value="block.data.desiredState"
+              :pending="block.data.state !== block.data.desiredState"
+              :pending-reason="constrainers"
+              :disable="isDriven"
+              @input="v => { block.data.desiredState = v; saveBlock(); }"
+            />
+          </ValueField>
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            Valve State
-          </q-item-label>
-          {{ valveStateName }}
+          <ValueField :value="valveStateName" label="Valve State" />
         </q-item-section>
       </q-item>
 
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
           <ConstraintsField

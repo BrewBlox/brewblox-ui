@@ -155,7 +155,6 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
     createDialog({
       title: 'Remove session',
       message: `Do you want remove session '${session.title}'?`,
-      dark: true,
       cancel: true,
     })
       .onOk(() => {
@@ -193,7 +192,7 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
           <ActionItem icon="clear" label="Clear session notes" @click="clearNotes" />
           <ActionItem icon="delete" label="Remove session" @click="startRemoveSession" />
           <q-expansion-item label="Sessions">
-            <q-list dark>
+            <q-list>
               <ActionItem
                 v-for="session in sessions"
                 :key="session.id"

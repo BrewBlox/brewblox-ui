@@ -91,7 +91,7 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
   <div>
     <q-card-section class="text-weight-light" style="height: 60vh">
       <q-scroll-area>
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <q-item-label class="text-subtitle1">
               PID configuration
@@ -102,7 +102,7 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
             </p>
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <q-item-label class="text-subtitle1">
               Hot liquor tun heating
@@ -117,7 +117,7 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
             </p>
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <q-item-label class="text-subtitle1">
               Brew kettle heating
@@ -132,7 +132,7 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
             </p>
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <q-item-label class="text-subtitle1">
               Mash tun heating
@@ -155,15 +155,15 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
             </p>
           </q-item-section>
         </q-item>
-        <q-item dark class="align-children">
+        <q-item class="align-children">
           <q-item-section>
-            <q-input v-model="hltVolume" :rules="volumeRules" type="number" step="any" label="HLT volume" dark />
+            <q-input v-model="hltVolume" :rules="volumeRules" type="number" step="any" label="HLT volume" />
           </q-item-section>
           <q-item-section>
-            <q-input v-model="mashVolume" :rules="volumeRules" type="number" step="any" label="Mash volume" dark />
+            <q-input v-model="mashVolume" :rules="volumeRules" type="number" step="any" label="Mash volume" />
           </q-item-section>
           <q-item-section>
-            <q-input v-model.number="driverMax.value" type="number" step="any" label="Limit difference to" dark>
+            <q-input v-model.number="driverMax.value" type="number" step="any" label="Limit difference to">
               <template #append>
                 <small class="self-end q-pb-sm">
                   {{ driverMax.notation }}
@@ -173,7 +173,7 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
           </q-item-section>
         </q-item>
 
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <p class="text-italic">
               Kp will be set to {{ mtKp }}.
@@ -189,7 +189,7 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
       </q-scroll-area>
     </q-card-section>
 
-    <q-separator dark />
+    <q-separator />
 
     <q-card-actions>
       <q-btn unelevated label="Back" @click="back" />

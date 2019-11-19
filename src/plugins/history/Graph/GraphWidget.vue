@@ -128,13 +128,12 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
       },
       [
         h('q-list',
-          { props: { dark: true, link: true } },
+          { props: { link: true } },
           [
             defaultPresets().map(preset =>
               h('q-item',
                 {
                   props: {
-                    dark: true,
                     clickable: true,
                     active: this.isActivePreset(preset),
                   },
@@ -184,7 +183,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
           <ExportGraphAction :config="config" :header="widget.title" />
           <ActionItem icon="refresh" label="Refresh" @click="regraph" />
           <q-expansion-item label="Timespan">
-            <q-list dark>
+            <q-list>
               <ActionItem
                 v-for="(preset, idx) in presets"
                 :key="idx"

@@ -83,7 +83,7 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
 <template>
   <div>
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <q-item-label class="text-subtitle1">
             Assign Hardware Blocks
@@ -100,7 +100,7 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
           </q-btn>
         </q-item-section>
       </q-item>
-      <q-item dark class="text-weight-light">
+      <q-item class="text-weight-light">
         <q-item-section>
           <p>
             Select which hardware should be used for each function.<br />
@@ -112,7 +112,7 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
           </p>
         </q-item-section>
       </q-item>
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <QuickStartPinField
             v-model="hltPin"
@@ -130,7 +130,7 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
           />
         </q-item-section>
       </q-item>
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <QuickStartSensorField
             v-model="hltSensor"
@@ -148,7 +148,7 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
           />
         </q-item-section>
       </q-item>
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <QuickStartSensorField
             v-model="mtSensor"
@@ -171,7 +171,7 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
       </CardWarning>
     </q-card-section>
 
-    <q-separator dark />
+    <q-separator />
 
     <q-card-actions>
       <q-btn unelevated label="Back" @click="back" />

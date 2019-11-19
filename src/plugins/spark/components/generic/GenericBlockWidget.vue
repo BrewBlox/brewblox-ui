@@ -8,7 +8,7 @@ export default class GenericBlockWidget extends BlockWidgetBase { }
 </script>
 
 <template>
-  <q-card dark class="column">
+  <q-card class="column">
     <q-card-title class="title-bar">
       <div class="ellipsis">
         {{ widget.id }}
@@ -19,7 +19,7 @@ export default class GenericBlockWidget extends BlockWidgetBase { }
     <q-card-separator />
 
     <q-card-main>
-      <q-item dark>
+      <q-item>
         <pre>{{ block.data }}</pre>
       </q-item>
     </q-card-main>

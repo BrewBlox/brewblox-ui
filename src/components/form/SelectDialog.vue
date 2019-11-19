@@ -24,7 +24,7 @@ export default class SelectDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="onDialogOk(local)">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title">
         {{ title }}
       </q-card-section>
@@ -33,9 +33,9 @@ export default class SelectDialog extends DialogBase {
       </q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
-        <q-select v-model="local" :options="selectOptions" v-bind="selectProps" dark options-dark>
+        <q-select v-model="local" :options="selectOptions" v-bind="selectProps">
           <template #no-option>
-            <q-item dark>
+            <q-item>
               <q-item-section class="text-grey">
                 No results
               </q-item-section>

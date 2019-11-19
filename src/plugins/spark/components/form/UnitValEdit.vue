@@ -46,7 +46,6 @@ export default class UnitValEdit extends ValEditBase {
       :display-value="field.notation"
       :dense="dense"
       :label="' '"
-      options-dark
       emit-value
       @input="v => { field.unit = v; saveField(field); }"
     />

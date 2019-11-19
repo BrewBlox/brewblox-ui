@@ -12,12 +12,12 @@ export default class MutexFull extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <p>
             Mutex is short for
@@ -43,15 +43,12 @@ export default class MutexFull extends BlockCrudComponent {
           </p>
         </q-item-section>
       </q-item>
-      <q-item dark>
+      <q-item>
         <q-item-section>
-          <q-item-label caption>
-            Minimum idle time before switching to a
-            <i>different</i> actuator
-          </q-item-label>
           <TimeUnitField
             :value="block.data.differentActuatorWait"
             title="Minimum idle time"
+            label="Minimum idle time before switching to a different actuator"
             @input="v => { block.data.differentActuatorWait = v; saveBlock(); }"
           />
         </q-item-section>

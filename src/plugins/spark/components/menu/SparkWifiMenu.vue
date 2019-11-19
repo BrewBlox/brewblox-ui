@@ -51,7 +51,7 @@ export default class SparkWifiMenu extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <q-card dark class="widget-modal">
+    <q-card class="widget-modal">
       <DialogToolbar>
         <q-item-section>
           <q-item-label>{{ serviceId }}</q-item-label>
@@ -62,12 +62,12 @@ export default class SparkWifiMenu extends DialogBase {
       </DialogToolbar>
 
       <q-card-section>
-        <q-item dark>
+        <q-item>
           <q-item-section>
-            <q-input v-model="values.ssid" label="SSID" dark autofocus />
+            <q-input v-model="values.ssid" label="SSID" autofocus />
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <q-select
               v-model="values.security"
@@ -75,19 +75,16 @@ export default class SparkWifiMenu extends DialogBase {
               label="Security"
               emit-value
               map-options
-              options-dark
-              dark
             />
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <q-input
               v-model="values.password"
               :disable="values.security === 0"
               :type="isPwd ? 'password' : 'text'"
               label="Password"
-              dark
             >
               <template #append>
                 <q-icon
@@ -99,21 +96,19 @@ export default class SparkWifiMenu extends DialogBase {
             </q-input>
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <q-select
               v-model="values.cipher"
               :options="cipherOpts"
               label="Cipher"
-              dark
-              options-dark
               map-options
               emit-value
             />
           </q-item-section>
         </q-item>
       </q-card-section>
-      <q-separator dark />
+      <q-separator />
       <q-card-actions align="right">
         <q-btn flat label="Cancel" @click="onDialogCancel" />
         <q-space />

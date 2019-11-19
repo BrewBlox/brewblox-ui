@@ -12,53 +12,44 @@ export default class Spark3PinsWidget extends BlockWidgetBase {
 </script>
 
 <template>
-  <q-card dark :class="cardClass">
+  <q-card :class="cardClass">
     <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
 
     <IoArray :crud="crud" />
 
     <template v-if="mode === 'Full'">
-      <q-separator dark inset />
-      <q-card-section>
-        <q-item dark>
+      <q-separator inset />
+      <q-card-section class="q-pt-sm">
+        <q-item>
           <q-item-section>
-            <q-item-label caption>
-              Enable 5V
-            </q-item-label>
-            <q-toggle
-              :value="block.data.enableIoSupply5V"
-              @input="v => { block.data.enableIoSupply5V = v; saveBlock(); }"
-            />
+            <ValueField label="Enable 5V">
+              <q-toggle
+                :value="block.data.enableIoSupply5V"
+                dense
+                @input="v => { block.data.enableIoSupply5V = v; saveBlock(); }"
+              />
+            </ValueField>
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>
-              Enable 12V
-            </q-item-label>
-            <q-toggle
-              :value="block.data.enableIoSupply12V"
-              @input="v => { block.data.enableIoSupply12V = v; saveBlock(); }"
-            />
+            <ValueField label="Enable 12V">
+              <q-toggle
+                :value="block.data.enableIoSupply12V"
+                dense
+                @input="v => { block.data.enableIoSupply12V = v; saveBlock(); }"
+              />
+            </ValueField>
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section>
-            <q-item-label caption>
-              5V Voltage
-            </q-item-label>
-            {{ block.data.voltage5 | round }}
+            <ValueField label="5V Voltage">
+              {{ block.data.voltage5 | round }}
+            </ValueField>
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>
-              12V Voltage
-            </q-item-label>
-            {{ block.data.voltage12 | round }}
-          </q-item-section>
-          <q-item-section>
-          <!-- <q-item-label caption>Alarm sound</q-item-label>
-          <q-toggle
-            :value="block.data.soundAlarm"
-            @input="v => { block.data.soundAlarm = v; saveBlock(); }"
-          />-->
+            <ValueField label="12V Voltage">
+              {{ block.data.voltage12 | round }}
+            </ValueField>
           </q-item-section>
         </q-item>
       </q-card-section>

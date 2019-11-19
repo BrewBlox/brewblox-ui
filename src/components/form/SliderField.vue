@@ -12,8 +12,14 @@ export default class SliderField extends FieldBase {
   @Prop({ type: Number })
   public readonly value!: number;
 
+  @Prop({ type: [Object, Array, String], default: '' })
+  public readonly tagClass!: any;
+
   @Prop({ type: String, default: 'value' })
   public readonly label!: string;
+
+  @Prop({ type: String, required: false })
+  public readonly suffix!: string;
 
   @Prop({ type: Number, default: 0 })
   public readonly min!: number;
@@ -47,6 +53,7 @@ export default class SliderField extends FieldBase {
     createDialog({
       component: 'SliderDialog',
       title: this.title,
+      label: this.label,
       message: this.message,
       messageHtml: this.messageHtml,
       parent: this,
@@ -63,19 +70,21 @@ export default class SliderField extends FieldBase {
 </script>
 
 <template>
-  <component
-    :is="tag"
-    v-bind="tagProps"
-    :class="[{editable: !readonly}, tagClass]"
-    @click="openDialog"
+  <q-field
+    :label="label"
+    :class="[{pointer: !readonly}, $attrs.class]"
+    :borderless="readonly"
+    stack-label
+    v-bind="$attrs"
+    @click.native="openDialog"
   >
-    <slot name="pre" />
-    <slot name="value">
-      {{ displayValue }}
-    </slot>
-    <slot name="append" />
-    <q-tooltip v-if="!readonly">
-      Set {{ label }}
-    </q-tooltip>
-  </component>
+    <template #control>
+      <component :is="tag" :class="['q-mt-sm', tagClass]">
+        <slot name="value">
+          {{ displayValue }}
+          <small v-if="!!suffix" class="q-ml-xs darkish">{{ suffix }}</small>
+        </slot>
+      </component>
+    </template>
+  </q-field>
 </template>

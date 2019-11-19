@@ -120,7 +120,6 @@ export default class QuickActionsFull extends CrudComponent {
     const stepName = 'New Step';
     createDialog({
       title: 'Add a Step',
-      dark: true,
       cancel: true,
       prompt: {
         model: stepName,
@@ -144,7 +143,6 @@ export default class QuickActionsFull extends CrudComponent {
     createDialog({
       title: 'Change Step name',
       message: `Choose a new name for '${step.name}'`,
-      dark: true,
       cancel: true,
       prompt: {
         model: stepName,
@@ -164,7 +162,6 @@ export default class QuickActionsFull extends CrudComponent {
     createDialog({
       title: 'Remove Step',
       message: `Are you sure you want to remove ${step.name}?`,
-      dark: true,
       ok: 'Confirm',
       cancel: 'Cancel',
     })
@@ -253,7 +250,7 @@ export default class QuickActionsFull extends CrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
@@ -279,12 +276,11 @@ export default class QuickActionsFull extends CrudComponent {
                 <q-list
                   v-for="change in step.changes"
                   :key="change.blockId"
-                  dark
                   bordered
                   class="q-mb-sm"
                   dense
                 >
-                  <q-item dark>
+                  <q-item>
                     <q-item-section
                       :class="{'text-h6': true, grabbable: true, 'text-red': !change.block}"
                     >
@@ -330,7 +326,7 @@ export default class QuickActionsFull extends CrudComponent {
                     </template>
                   </q-item>
                   <template v-if="editableChanges[change.key]">
-                    <q-item v-for="(val, key) in allData(change)" :key="key" dark>
+                    <q-item v-for="(val, key) in allData(change)" :key="key">
                       <q-item-section>{{ findProp(change, key).title }}</q-item-section>
                       <template v-if="val === null">
                         <q-item-section />
@@ -375,7 +371,7 @@ export default class QuickActionsFull extends CrudComponent {
                     </q-item>
                   </template>
                   <template v-else>
-                    <q-item v-for="(val, key) in change.data" :key="key" dark>
+                    <q-item v-for="(val, key) in change.data" :key="key">
                       <q-item-section>{{ findProp(change, key).title }}</q-item-section>
                       <q-item-section>
                         <component
@@ -388,7 +384,7 @@ export default class QuickActionsFull extends CrudComponent {
                   </template>
                 </q-list>
               </draggable>
-              <q-item dark>
+              <q-item>
                 <q-item-section class="col-auto">
                   <q-btn size="sm" label="Add Block" flat icon="mdi-cube" @click="addChange(step)" />
                   <q-space />
@@ -423,7 +419,7 @@ export default class QuickActionsFull extends CrudComponent {
               </q-item>
             </q-expansion-item>
           </draggable>
-          <q-item dark>
+          <q-item>
             <q-item-section />
             <q-item-section side>
               <q-btn fab outline icon="add" @click="addStep">

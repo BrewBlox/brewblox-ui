@@ -166,7 +166,6 @@ export default class DashboardPage extends Vue {
         <q-btn-toggle
           v-model="widgetEditable"
           class="q-mr-md"
-          dark
           flat
           dense
           :options="[
@@ -175,9 +174,9 @@ export default class DashboardPage extends Vue {
           ]"
         />
         <q-btn-dropdown color="primary" label="actions">
-          <q-list dark>
+          <q-list>
             <ActionItem icon="add" label="New Widget" @click="showWizard" />
-            <q-item dark link clickable @click="toggleDefaultDashboard">
+            <q-item link clickable @click="toggleDefaultDashboard">
               <q-item-section avatar>
                 <q-icon :color="dashboard.primary ? 'primary' : ''" name="home" />
               </q-item-section>

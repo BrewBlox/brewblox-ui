@@ -41,7 +41,7 @@ export default class DatepickerDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title">
         {{ title }}
       </q-card-section>
@@ -54,17 +54,16 @@ export default class DatepickerDialog extends DialogBase {
         <q-tab name="time" label="Time" />
       </q-tabs>
       <q-tab-panels v-model="tab" animated>
-        <q-tab-panel dark name="date" class="q-pa-none">
+        <q-tab-panel name="date" class="q-pa-none">
           <q-date
             v-model="stringValue"
-            dark
             mask="YYYY/MM/DD HH:mm:ss"
             class="maximized"
             @input="tab='time'"
           />
         </q-tab-panel>
-        <q-tab-panel dark name="time" class="q-pa-none">
-          <q-time v-model="stringValue" dark mask="YYYY/MM/DD HH:mm:ss" class="maximized" />
+        <q-tab-panel name="time" class="q-pa-none">
+          <q-time v-model="stringValue" mask="YYYY/MM/DD HH:mm:ss" class="maximized" />
         </q-tab-panel>
       </q-tab-panels>
       <q-card-actions align="right">

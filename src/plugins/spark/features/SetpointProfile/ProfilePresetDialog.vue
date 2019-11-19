@@ -40,7 +40,6 @@ export default class ProfilePresetDialog extends DialogBase {
     const preset = sparkStore.presets[this.selected.value];
     createDialog({
       title: 'Edit profile name',
-      dark: true,
       cancel: true,
       prompt: {
         model: preset.name,
@@ -60,7 +59,6 @@ export default class ProfilePresetDialog extends DialogBase {
     createDialog({
       title: 'Profile start',
       message: `Do you want to change '${this.value.id}' start time to now?`,
-      dark: true,
       ok: 'Yes',
       cancel: 'No',
     })
@@ -92,7 +90,6 @@ export default class ProfilePresetDialog extends DialogBase {
   createPreset(): void {
     createDialog({
       title: 'Save as new profile',
-      dark: true,
       cancel: true,
       prompt: {
         model: `${this.value.id} profile`,
@@ -120,7 +117,7 @@ export default class ProfilePresetDialog extends DialogBase {
     no-backdrop-dismiss
     @hide="onDialogHide"
   >
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title">
         {{ title }}
       </q-card-section>
@@ -129,18 +126,16 @@ export default class ProfilePresetDialog extends DialogBase {
       </q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <q-select
               v-model="selected"
               :options="options"
               label="Profiles"
-              dark
               autofocus
-              options-dark
             >
               <template #no-option>
-                <q-item dark>
+                <q-item>
                   <q-item-section class="text-grey">
                     No results
                   </q-item-section>

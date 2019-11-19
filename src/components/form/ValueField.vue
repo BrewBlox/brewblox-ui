@@ -1,8 +1,7 @@
 <script lang="ts">
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/FieldBase';
-import { createDialog } from '@/helpers/dialog';
 import { round } from '@/helpers/functional';
 
 
@@ -12,14 +11,20 @@ export default class InputField extends FieldBase {
   @Prop({ type: [String, Number] })
   public readonly value!: string | number;
 
-  @Prop({ type: String, default: 'text' })
-  public readonly type!: string;
+  @Prop({ type: Boolean, default: false })
+  public readonly number!: boolean;
 
   @Prop({ type: String, default: 'value' })
   public readonly label!: string;
 
+  @Prop({ type: String, required: false })
+  public readonly suffix!: string;
+
   @Prop({ type: Number, default: 2 })
   readonly decimals!: number;
+
+  @Prop({ type: [String, Object, Array], default: '' })
+  public readonly tagClass!: any;
 
   get displayValue(): string | number {
     if (this.value === ''
@@ -28,7 +33,7 @@ export default class InputField extends FieldBase {
       return '<not set>';
     }
 
-    return this.type === 'number'
+    return this.number
       ? round(this.value, this.decimals)
       : this.value;
   }
@@ -39,31 +44,23 @@ export default class InputField extends FieldBase {
   <q-field
     :label="label"
     :class="$attrs.class"
+    v-bind="$attrs"
     stack-label
     borderless
-    readonly
   >
+    <template v-if="!!$scopedSlots.before" #before>
+      <slot name="before" />
+    </template>
     <template #control>
-      <component :is="tag" class="q-mt-sm">
+      <component :is="tag" :class="['q-mt-sm', tagClass]">
         <slot>
           {{ displayValue }}
         </slot>
+        <small v-if="!!suffix" class="q-ml-xs darkish">{{ suffix }}</small>
       </component>
     </template>
+    <template v-if="!!$scopedSlots.after" #after>
+      <slot name="after" />
+    </template>
   </q-field>
-  <!-- <component
-    :is="tag"
-    v-bind="tagProps"
-    :class="[{editable: !readonly}, tagClass]"
-    @click="openDialog"
-  >
-    <slot name="pre" />
-    <slot name="value">
-      {{ displayValue }}
-    </slot>
-    <slot name="append" />
-    <q-tooltip v-if="!readonly">
-      Set {{ label }}
-    </q-tooltip>
-  </component> -->
 </template>

@@ -127,7 +127,7 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
     <slot name="graph" />
@@ -142,7 +142,7 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
       icon="help"
     >
       <q-list>
-        <q-item dark>
+        <q-item>
           <q-item-section class="col-auto">
             <q-btn flat icon="mdi-chart-line" @click="showSession(session)">
               <q-tooltip>Show graph</q-tooltip>
@@ -175,35 +175,30 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
             </q-btn>
           </q-item-section>
         </q-item>
-        <q-separator dark />
-        <q-item dark>
+        <q-separator />
+        <q-item>
           <q-item-section>
-            <q-item-label caption>
-              Session name
-            </q-item-label>
             <InputField
               :value="session.name"
               title="Session name"
+              label="Session name"
               @input="v => { session.name = v; updateSession(session); }"
             />
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>
-              Duration
-            </q-item-label>
-            <span v-if="session.start && session.end">{{ sessionDuration(session) }}</span>
-            <span v-else-if="session.start">In progress</span>
-            <span v-else>Not yet started</span>
+            <ValueField label="Duration">
+              <span v-if="session.start && session.end">{{ sessionDuration(session) }}</span>
+              <span v-else-if="session.start">In progress</span>
+              <span v-else>Not yet started</span>
+            </ValueField>
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section>
-            <q-item-label caption>
-              Start
-            </q-item-label>
             <DatetimeField
               :value="session.start"
               title="Start"
+              label="Start"
               reset-icon="mdi-clock-start"
               clear-label="<click to start>"
               @input="v => startSession(session, v)"
@@ -211,12 +206,10 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
           </q-item-section>
 
           <q-item-section>
-            <q-item-label caption>
-              End
-            </q-item-label>
             <DatetimeField
               :value="session.end"
               title="End"
+              label="End"
               reset-icon="mdi-clock-end"
               clear-label="<click to end>"
               @input="v => endSession(session, v)"
@@ -226,7 +219,7 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
       </q-list>
     </q-expansion-item>
 
-    <q-item dark>
+    <q-item>
       <q-item-section />
       <q-item-section side>
         <q-btn fab outline icon="add" @click="createSession">

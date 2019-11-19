@@ -38,7 +38,6 @@ export default class AnalogConstraints extends ConstraintsBase {
   addConstraint(): void {
     createDialog({
       title: 'Add constraint',
-      dark: true,
       cancel: true,
       options: {
         type: 'checkbox',
@@ -55,18 +54,11 @@ export default class AnalogConstraints extends ConstraintsBase {
 </script>
 
 <template>
-  <q-list dark dense>
-    <q-item dark>
-      <q-item-section>Constraint Type</q-item-section>
-      <q-item-section>Constraint Value</q-item-section>
-      <q-item-section class="col-1" />
-    </q-item>
-    <q-separator dark inset />
+  <q-list dense>
     <q-item
       v-for="(editable, idx) in constraints"
       :key="idx"
       :class="editable.limiting ? 'limiting' : ''"
-      dark
       dense
     >
       <q-item-section>
@@ -75,32 +67,35 @@ export default class AnalogConstraints extends ConstraintsBase {
           :options="constraintOptions"
           clearable
           title="Constraint type"
+          label="Constraint"
           @input="k => { constraints[idx] = createConstraint(k); saveConstraints() }"
         />
       </q-item-section>
       <q-item-section>
-        <LinkField
+        <BlockField
           v-if="editable.key === 'balanced'"
           :service-id="serviceId"
           :value="editable.value.balancerId"
           title="Balancer"
+          label="Balancer"
           @input="v => { editable.value.balancerId = v; saveConstraints() }"
         />
         <InputField
           v-else
           :value="editable.value"
           title="Constraint value"
+          label="Value"
           type="number"
           @input="v => { editable.value = v; saveConstraints() }"
         />
       </q-item-section>
-      <q-item-section class="col-1">
+      <q-item-section class="col-1 self-end darkish">
         <q-btn icon="delete" flat round @click="removeConstraint(idx); saveConstraints();">
           <q-tooltip>Remove constraint</q-tooltip>
         </q-btn>
       </q-item-section>
     </q-item>
-    <q-item dark class="q-mt-md">
+    <q-item class="q-mt-md">
       <q-item-section />
       <q-item-section class="col-auto">
         <q-btn icon="add" round outline @click="addConstraint">

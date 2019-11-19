@@ -70,7 +70,7 @@ export default class SessionCreateDialog extends DialogBase {
     @hide="onDialogHide"
     @keyup.enter="createSession"
   >
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title">
         Create new session
       </q-card-section>
@@ -79,18 +79,16 @@ export default class SessionCreateDialog extends DialogBase {
         If you want, you can import configuration from a Graph Widget.
       </q-card-section>
       <q-card-section class="scroll">
-        <q-input v-model="sessionName" dark label="Session name" />
+        <q-input v-model="sessionName" label="Session name" />
         <q-select
           v-model="importGraph"
           :options="graphOpts"
           label="Import from Graph"
           clearable
-          dark
-          options-dark
           autofocus
         >
           <template #no-option>
-            <q-item dark>
+            <q-item>
               <q-item-section class="text-grey">
                 No results
               </q-item-section>

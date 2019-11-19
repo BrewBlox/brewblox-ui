@@ -62,6 +62,7 @@ export default class DatetimeField extends FieldBase {
   <q-field
     :label="label"
     :class="[{pointer: !readonly}, $attrs.class]"
+    v-bind="$attrs"
     stack-label
     @click.native="openDialog"
   >

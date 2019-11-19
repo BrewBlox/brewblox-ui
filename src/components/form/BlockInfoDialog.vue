@@ -25,7 +25,7 @@ export default class BlockInfoDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title">
         {{ title }}
       </q-card-section>
@@ -34,33 +34,21 @@ export default class BlockInfoDialog extends DialogBase {
       </q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
-        <q-list dark>
-          <q-item dark>
+        <q-list>
+          <q-item>
             <q-item-section>
-              <q-item-label caption>
-                Block ID
-              </q-item-label>
-              {{ block.id }}
+              <ValueField :value="block.id" label="Block ID" />
             </q-item-section>
             <q-item-section>
-              <q-item-label caption>
-                Block Type
-              </q-item-label>
-              {{ block.type }}
+              <ValueField :value="block.type" label="Block Type" />
             </q-item-section>
           </q-item>
-          <q-item dark>
+          <q-item>
             <q-item-section>
-              <q-item-label caption>
-                Service ID
-              </q-item-label>
-              {{ block.serviceId }}
+              <ValueField :value="block.serviceId" label="Service ID" />
             </q-item-section>
             <q-item-section>
-              <q-item-label caption>
-                Active in groups
-              </q-item-label>
-              {{ groupsDisplay }}
+              <ValueField :value="groupsDisplay" label="Active in groups" />
             </q-item-section>
           </q-item>
         </q-list>

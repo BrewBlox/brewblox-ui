@@ -28,7 +28,7 @@ export default class WizardDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss class="row" @hide="onDialogHide">
-    <q-card dark class="widget-modal">
+    <q-card class="widget-modal">
       <DialogToolbar>
         <q-icon name="mdi-creation" class="q-mx-sm" />
         {{ dialogTitle }}
@@ -43,7 +43,7 @@ export default class WizardDialog extends DialogBase {
 
       <q-scroll-area v-else style="height: 80vh;">
         <q-card-section>
-          <q-item link clickable dark @click="wizardComponent = 'QuickStartWizardPicker'">
+          <q-item link clickable @click="wizardComponent = 'QuickStartWizardPicker'">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 Quick Start
@@ -62,10 +62,10 @@ export default class WizardDialog extends DialogBase {
           </q-item>
         </q-card-section>
 
-        <q-separator dark inset />
+        <q-separator inset />
 
         <q-card-section>
-          <q-item link clickable dark @click="wizardComponent = 'DashboardWizard'">
+          <q-item link clickable @click="wizardComponent = 'DashboardWizard'">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New Dashboard
@@ -80,10 +80,10 @@ export default class WizardDialog extends DialogBase {
           </q-item>
         </q-card-section>
 
-        <q-separator dark inset />
+        <q-separator inset />
 
         <q-card-section>
-          <q-item link clickable dark @click="wizardComponent = 'WidgetWizardPicker'">
+          <q-item link clickable @click="wizardComponent = 'WidgetWizardPicker'">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New Widget
@@ -105,10 +105,10 @@ export default class WizardDialog extends DialogBase {
           </q-item>
         </q-card-section>
 
-        <q-separator dark inset />
+        <q-separator inset />
 
         <q-card-section>
-          <q-item link clickable dark @click="wizardComponent = 'ImportWizard'">
+          <q-item link clickable @click="wizardComponent = 'ImportWizard'">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 Import Widget
@@ -125,10 +125,10 @@ export default class WizardDialog extends DialogBase {
           </q-item>
         </q-card-section>
 
-        <q-separator dark inset />
+        <q-separator inset />
 
         <q-card-section>
-          <q-item link clickable dark @click="wizardComponent = 'ServiceWizardPicker'">
+          <q-item link clickable @click="wizardComponent = 'ServiceWizardPicker'">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New service

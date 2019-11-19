@@ -32,7 +32,7 @@ export default class UnitDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title">
         {{ title }}
       </q-card-section>
@@ -44,16 +44,13 @@ export default class UnitDialog extends DialogBase {
         <q-input
           v-model.number="local"
           :label="label"
+          :suffix="value.notation"
           input-style="font-size: 170%"
           type="number"
           step="any"
-          dark
           autofocus
           clearable
         >
-          <template #append>
-            {{ value.notation }}
-          </template>
         </q-input>
       </q-card-section>
       <q-card-actions align="right">

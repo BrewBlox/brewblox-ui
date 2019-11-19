@@ -89,20 +89,18 @@ export default class ServiceWizardPicker extends Vue {
     <!-- Select a wizard -->
     <template v-else>
       <q-card-section>
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <q-select
               v-model="serviceTypeModel"
               :options="wizardOptions"
               label="Service type"
-              dark
-              options-dark
             />
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section>
-            <q-input v-model="serviceId" :rules="serviceIdRules" label="Service ID" dark lazy-rules>
+            <q-input v-model="serviceId" :rules="serviceIdRules" label="Service ID" lazy-rules>
               <template #append>
                 <q-icon name="mdi-information">
                   <q-tooltip>
@@ -114,9 +112,9 @@ export default class ServiceWizardPicker extends Vue {
             </q-input>
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section>
-            <q-input v-model="serviceTitle" label="Service title" dark>
+            <q-input v-model="serviceTitle" label="Service title">
               <template #append>
                 <q-icon name="mdi-information">
                   <q-tooltip>
@@ -131,7 +129,7 @@ export default class ServiceWizardPicker extends Vue {
         </q-item>
       </q-card-section>
 
-      <q-separator dark />
+      <q-separator />
 
       <q-card-actions class="row justify-between">
         <q-btn unelevated label="Back" @click="back" />

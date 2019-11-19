@@ -103,12 +103,12 @@ export default class QueryEditor extends Vue {
 </script>
 
 <template>
-  <q-list dark>
+  <q-list>
     <div class="q-px-sm q-pb-sm row wrap">
       <div class="col-auto column">
-        <q-item dark>
+        <q-item>
           <q-item-section>
-            <q-input v-model="selectFilter" placeholder="Search" class="q-ma-none" dark clearable>
+            <q-input v-model="selectFilter" placeholder="Search" class="q-ma-none" clearable>
               <template #append>
                 <q-icon name="search" />
               </template>
@@ -136,7 +136,7 @@ export default class QueryEditor extends Vue {
       </div>
     </div>
 
-    <q-item dark class="column">
+    <q-item class="column">
       <q-item-label caption class="q-pl-sm">
         Select data to show
       </q-item-label>
@@ -148,7 +148,6 @@ export default class QueryEditor extends Vue {
         :expanded.sync="expandedKeys"
         :filter-method="nodeFilter"
         tick-strategy="leaf-filtered"
-        dark
         node-key="value"
       >
         <template #header-leaf="{node}">

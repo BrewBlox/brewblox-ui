@@ -21,52 +21,56 @@ export default class DisplaySettingsBasic extends BlockCrudComponent {
       v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
     ];
   }
+
+  slotStyle(slot: DisplaySlot): Mapped<string> {
+    return {
+      gridColumnEnd: 'span 1',
+      borderColor: slot ? `#${slot.color} !important` : '',
+      borderStyle: 'solid',
+      borderWidth: slot ? '1px' : '0px',
+    };
+  }
 }
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
-    <q-card-section>
-      <q-list dark dense>
-        <div class="row">
-          <q-item
-            v-for="(slot, idx) in slots"
-            :key="idx"
-            clickable
-            class="col-4"
-            @click="showDialog"
-          >
-            <q-item-section>
-              <q-item-label caption>
-                Slot {{ idx + 1 }}
-              </q-item-label>
-              <span
-                v-if="slot"
-                :style="`color: #${slot.color} !important`"
-                class="text-bold"
-              >{{ slot.name || '---' }}</span>
-              <span v-else class="darkened">Not set</span>
-            </q-item-section>
-          </q-item>
+    <q-card-section class="q-pa-lg">
+      <div class="grid-container q-mt-sm">
+        <div
+          v-for="(slot, idx) in slots"
+          :key="idx"
+          :style="slotStyle(slot)"
+          class="hoverable q-pa-sm q-item--dark"
+          @click="showDialog"
+        >
+          <q-item-label caption>
+            Slot {{ idx + 1 }}
+          </q-item-label>
+          <span v-if="slot" class="text-bold ellipsis">{{ slot.name || '---' }}</span>
+          <span v-else class="darkened">Not set</span>
         </div>
+      </div>
 
-        <q-item dark>
-          <q-item-section side class="q-pb-xs">
-            Footer text
-          </q-item-section>
-          <q-item-section>
-            <InputField
-              :value="block.data.name"
-              :rules="footerRules"
-              title="footer text"
-              @input="v => { block.data.name = v; saveBlock(); }"
-            />
-          </q-item-section>
-        </q-item>
-      </q-list>
+      <InputField
+        :value="block.data.name"
+        :rules="footerRules"
+        label="Footer text"
+        title="footer text"
+        @input="v => { block.data.name = v; saveBlock(); }"
+      />
     </q-card-section>
   </q-card>
 </template>
+
+<style scoped>
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-row-gap: 10px;
+  grid-column-gap: 10px;
+}
+</style>

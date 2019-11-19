@@ -222,7 +222,7 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
 </script>
 
 <template>
-  <q-card dark :class="cardClass">
+  <q-card :class="cardClass">
     <component :is="toolbarComponent" :crud="crud">
       <template #actions>
         <ActionItem icon="settings" label="Editor" @click="startEditor" />
@@ -243,7 +243,7 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
       </q-item-section>
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="showDialog(null)">
-          <q-list dark bordered>
+          <q-list bordered>
             <ActionItem icon="add" label="New" @click="make" />
             <ActionItem icon="refresh" label="Refresh" @click="fetch" />
             <WidgetActions :crud="crud" />
@@ -252,13 +252,13 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
       </q-item-section>
     </WidgetToolbar> -->
     <q-card-section v-for="process in processes" :key="process.id">
-      <q-item dark>
+      <q-item>
         <q-item-section>{{ process.title }}</q-item-section>
       </q-item>
     </q-card-section>
 
     <!-- <q-card-section v-for="group in groups" :key="group.id">
-      <q-item dark class="row no-wrap">
+      <q-item class="row no-wrap">
         <q-item-section>
           <template v-if="group.runtime">
             <q-select
@@ -267,11 +267,9 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
               :options="stepOptions(group.process)"
               emit-value
               map-options
-              dark
-              options-dark
             >
               <template #no-option>
-                <q-item dark>
+                <q-item>
                   <q-item-section class="text-grey">
                     No results
                   </q-item-section>

@@ -50,16 +50,27 @@ export default class GraphEditor extends Vue {
         <div @click="editLeaf(node)">
           {{ node.label }}
           <q-tooltip>
-            <i>Click to edit</i> <br />
-            Label: <span>{{ config.renames[node.value] || node.label }}</span> <br />
-            Color: <span>
-              <ColorField
-                :value="config.colors[node.value] || ''"
-                null-text="automatic"
-                readonly
-              />
-            </span> <br />
-            Axis: <span>{{ config.axes[node.value] === 'y2' ? 'Y2' : 'Y1' }}</span>
+            <i>Click to edit</i>
+            <ValueField
+              :value="config.renames[node.value] || node.label"
+              label="Label"
+              dense
+              class="q-mt-sm"
+            />
+            <ColorField
+              :value="config.colors[node.value] || ''"
+              label="Color"
+              null-text="automatic"
+              readonly
+              dense
+              class="q-mt-sm"
+            />
+            <ValueField
+              :value="config.axes[node.value] === 'y2' ? 'Y2' : 'Y1'"
+              label="Axis"
+              dense
+              class="q-mt-sm"
+            />
           </q-tooltip>
         </div>
       </template>

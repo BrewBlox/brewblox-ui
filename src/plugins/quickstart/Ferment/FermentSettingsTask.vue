@@ -62,7 +62,7 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
 <template>
   <div>
     <q-card-section>
-      <q-item dark class="text-weight-light">
+      <q-item class="text-weight-light">
         <q-item-section>
           <q-item-label class="text-subtitle1">
             Initial setpoints
@@ -76,37 +76,28 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
           <p>You can set the initial values now.</p>
         </q-item-section>
       </q-item>
-      <q-item dark>
+      <q-item>
         <q-item-section>
-          <q-item-label caption>
-            Fridge setpoint
-          </q-item-label>
-          <UnitField v-model="fridgeSetting" title="Fridge setting" />
+          <UnitField v-model="fridgeSetting" label="Fridge setpoint" title="Fridge setting" />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            Beer setpoint
-          </q-item-label>
-          <UnitField v-model="beerSetting" title="Beer setting" />
+          <UnitField v-model="beerSetting" label="Beer setpoint" title="Beer setting" />
         </q-item-section>
         <q-item-section class="col-auto">
-          <q-item-label caption>
-            Setpoint used for control
-          </q-item-label>
-          <div class="row">
+          <ValueField label="Active setpoint">
             <q-btn-toggle
               v-model="activeSetpoint"
               :options="targetOpts"
-              dark
+              unelevated
               dense
               class="col-auto"
             />
-          </div>
+          </ValueField>
         </q-item-section>
       </q-item>
     </q-card-section>
 
-    <q-separator dark />
+    <q-separator />
 
     <q-card-actions>
       <q-btn unelevated label="Back" @click="back" />

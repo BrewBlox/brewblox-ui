@@ -21,10 +21,10 @@ export default class RimsManualTask extends WizardTaskBase<RimsConfig> {
 <template>
   <div>
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <big>About your new RIMS dashboard</big>
       </q-item>
-      <q-item dark class="text-weight-light">
+      <q-item class="text-weight-light">
         <q-item-section>
           <p>
             While the wizard is configuring the Spark and your new dashboard,
@@ -57,7 +57,7 @@ export default class RimsManualTask extends WizardTaskBase<RimsConfig> {
       </q-item>
     </q-card-section>
 
-    <q-separator dark />
+    <q-separator />
 
     <q-card-actions>
       <q-space />

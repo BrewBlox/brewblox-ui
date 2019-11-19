@@ -24,7 +24,7 @@ export default class DeprecatedObjectWidget extends BlockWidgetBase {
 </script>
 
 <template>
-  <q-card dark :class="cardClass">
+  <q-card :class="cardClass">
     <DialogToolbar v-if="inDialog">
       <q-item-section>
         <q-item-label>{{ widget.title }}</q-item-label>
@@ -36,18 +36,12 @@ export default class DeprecatedObjectWidget extends BlockWidgetBase {
     <WidgetToolbar v-else :crud="crud" />
 
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section>
-          <q-item-label caption>
-            Id
-          </q-item-label>
-          {{ actual ? actual.id : 'Unknown' }}
+          <ValueField :value="actual ? actual.id : 'Unknown'" label="ID" />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            Type
-          </q-item-label>
-          {{ actual ? actual.type : 'Unknown' }}
+          <ValueField :value="actual ? actual.type : 'Unknown'" label="Type" />
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn icon="delete" flat @click="removeBlock" />
