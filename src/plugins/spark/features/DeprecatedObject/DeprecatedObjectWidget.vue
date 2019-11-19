@@ -38,10 +38,10 @@ export default class DeprecatedObjectWidget extends BlockWidgetBase {
     <q-card-section>
       <q-item>
         <q-item-section>
-          <ValueField :value="actual ? actual.id : 'Unknown'" label="ID" />
+          <LabeledField :value="actual ? actual.id : 'Unknown'" label="ID" />
         </q-item-section>
         <q-item-section>
-          <ValueField :value="actual ? actual.type : 'Unknown'" label="Type" />
+          <LabeledField :value="actual ? actual.type : 'Unknown'" label="Type" />
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn icon="delete" flat @click="removeBlock" />

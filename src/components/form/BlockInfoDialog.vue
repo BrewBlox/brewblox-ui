@@ -37,18 +37,18 @@ export default class BlockInfoDialog extends DialogBase {
         <q-list>
           <q-item>
             <q-item-section>
-              <ValueField :value="block.id" label="Block ID" />
+              <LabeledField :value="block.id" label="Block ID" />
             </q-item-section>
             <q-item-section>
-              <ValueField :value="block.type" label="Block Type" />
+              <LabeledField :value="block.type" label="Block Type" />
             </q-item-section>
           </q-item>
           <q-item>
             <q-item-section>
-              <ValueField :value="block.serviceId" label="Service ID" />
+              <LabeledField :value="block.serviceId" label="Service ID" />
             </q-item-section>
             <q-item-section>
-              <ValueField :value="groupsDisplay" label="Active in groups" />
+              <LabeledField :value="groupsDisplay" label="Active in groups" />
             </q-item-section>
           </q-item>
         </q-list>

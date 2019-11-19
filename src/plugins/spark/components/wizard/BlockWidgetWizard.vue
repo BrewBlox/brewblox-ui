@@ -146,9 +146,9 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
     animated
   >
     <q-step name="start" title="Select Service">
-      <ValueField label="Service" item-aligned>
+      <LabeledField label="Service" item-aligned>
         <q-option-group v-model="service" :options="serviceOpts" />
-      </ValueField>
+      </LabeledField>
       <q-stepper-navigation class="row">
         <q-btn unelevated label="Back" @click="back" />
         <q-space />

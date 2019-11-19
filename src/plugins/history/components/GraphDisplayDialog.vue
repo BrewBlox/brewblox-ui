@@ -83,13 +83,13 @@ export default class GraphDisplayDialog extends DialogBase {
             null-text="automatic"
             clearable
           />
-          <ValueField label="Y-axis">
+          <LabeledField label="Y-axis">
             <q-btn-toggle
               v-model="axis"
               :options="axisOpts"
               flat
             />
-          </ValueField>
+          </LabeledField>
         </q-list>
       </q-card-section>
       <q-card-actions align="right">

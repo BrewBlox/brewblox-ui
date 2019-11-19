@@ -104,42 +104,37 @@ export default class QueryEditor extends Vue {
 
 <template>
   <q-list>
-    <div class="q-px-sm q-pb-sm row wrap">
-      <div class="col-auto column">
-        <q-item>
-          <q-item-section>
-            <q-input v-model="selectFilter" placeholder="Search" class="q-ma-none" clearable>
-              <template #append>
-                <q-icon name="search" />
-              </template>
-              <q-tooltip>
-                Only fields that have been updated the last 24 hours are shown.
-                <br />This includes renamed or deleted blocks.
-              </q-tooltip>
-            </q-input>
-          </q-item-section>
-        </q-item>
-      </div>
-      <div class="col-auto row">
-        <q-btn flat class="q-px-sm" icon="mdi-collapse-all" @click="tree.collapseAll()">
-          <q-tooltip>Collapse all</q-tooltip>
-        </q-btn>
-        <q-btn flat class="q-px-sm" icon="mdi-expand-all" @click="tree.expandAll()">
-          <q-tooltip>Expand all</q-tooltip>
-        </q-btn>
-        <q-btn flat class="q-px-sm" icon="mdi-checkbox-multiple-marked-outline" @click="expandTicked">
-          <q-tooltip>Expand selected fields</q-tooltip>
-        </q-btn>
-        <q-btn flat class="q-px-sm" icon="clear" @click="ticked = []">
-          <q-tooltip>Unselect all</q-tooltip>
-        </q-btn>
-      </div>
-    </div>
+    <q-item class="q-mx-sm">
+      <q-item-section>
+        <q-input v-model="selectFilter" placeholder="Search" clearable>
+          <template #append>
+            <q-icon name="search" />
+          </template>
+          <template #after>
+            <div class="col-auto row">
+              <q-btn flat class="q-px-sm" icon="mdi-collapse-all" @click="tree.collapseAll()">
+                <q-tooltip>Collapse all</q-tooltip>
+              </q-btn>
+              <q-btn flat class="q-px-sm" icon="mdi-expand-all" @click="tree.expandAll()">
+                <q-tooltip>Expand all</q-tooltip>
+              </q-btn>
+              <q-btn flat class="q-px-sm" icon="mdi-checkbox-multiple-marked-outline" @click="expandTicked">
+                <q-tooltip>Expand selected fields</q-tooltip>
+              </q-btn>
+              <q-btn flat class="q-px-sm" icon="clear" @click="ticked = []">
+                <q-tooltip>Unselect all</q-tooltip>
+              </q-btn>
+            </div>
+          </template>
+          <q-tooltip>
+            Only fields that have been updated the last 24 hours are shown.
+            <br />This includes renamed or deleted blocks.
+          </q-tooltip>
+        </q-input>
+      </q-item-section>
+    </q-item>
 
     <q-item class="column">
-      <q-item-label caption class="q-pl-sm">
-        Select data to show
-      </q-item-label>
       <q-tree
         ref="tree"
         :nodes="nodes"

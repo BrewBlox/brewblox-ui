@@ -22,34 +22,34 @@ export default class Spark3PinsWidget extends BlockWidgetBase {
       <q-card-section class="q-pt-sm">
         <q-item>
           <q-item-section>
-            <ValueField label="Enable 5V">
+            <LabeledField label="Enable 5V">
               <q-toggle
                 :value="block.data.enableIoSupply5V"
                 dense
                 @input="v => { block.data.enableIoSupply5V = v; saveBlock(); }"
               />
-            </ValueField>
+            </LabeledField>
           </q-item-section>
           <q-item-section>
-            <ValueField label="Enable 12V">
+            <LabeledField label="Enable 12V">
               <q-toggle
                 :value="block.data.enableIoSupply12V"
                 dense
                 @input="v => { block.data.enableIoSupply12V = v; saveBlock(); }"
               />
-            </ValueField>
+            </LabeledField>
           </q-item-section>
         </q-item>
         <q-item>
           <q-item-section>
-            <ValueField label="5V Voltage">
+            <LabeledField label="5V Voltage">
               {{ block.data.voltage5 | round }}
-            </ValueField>
+            </LabeledField>
           </q-item-section>
           <q-item-section>
-            <ValueField label="12V Voltage">
+            <LabeledField label="12V Voltage">
               {{ block.data.voltage12 | round }}
-            </ValueField>
+            </LabeledField>
           </q-item-section>
         </q-item>
       </q-card-section>

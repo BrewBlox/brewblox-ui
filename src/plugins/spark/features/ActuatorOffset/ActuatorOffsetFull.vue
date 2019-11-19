@@ -64,7 +64,7 @@ export default class ActuatorOffsetFull extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section>
-          <ValueField :value="block.data.value" number label="Current Offset" tag="big" />
+          <LabeledField :value="block.data.value" number label="Current Offset" tag="big" />
         </q-item-section>
       </q-item>
 

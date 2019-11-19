@@ -75,9 +75,9 @@ export default class Troubleshooter extends Vue {
             <q-spinner size="24px" />
           </q-item-section>
           <q-item-section>
-            <ValueField label="Last update">
+            <LabeledField label="Last update">
               <big>{{ lastStatus.checkedAt.toLocaleString() }}</big>
-            </ValueField>
+            </LabeledField>
           </q-item-section>
         </q-item>
         <q-item>

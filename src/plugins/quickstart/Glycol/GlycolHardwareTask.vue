@@ -123,7 +123,7 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
           </p>
         </q-item-section>
       </q-item>
-      <ValueField label="Does your fermenter have a heater?" item-aligned>
+      <LabeledField label="Does your fermenter have a heater?" item-aligned>
         <div class="q-gutter-lg">
           <q-radio
             v-model="heated"
@@ -136,8 +136,8 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
             label="Yes"
           />
         </div>
-      </ValueField>
-      <ValueField label="Should BrewBlox manage glycol temperature?" item-aligned>
+      </LabeledField>
+      <LabeledField label="Should BrewBlox manage glycol temperature?" item-aligned>
         <div class="q-gutter-lg">
           <q-radio
             v-model="glycolControl"
@@ -155,7 +155,7 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
             label="Actively controlled"
           />
         </div>
-      </ValueField>
+      </LabeledField>
       <q-item>
         <q-item-section>
           <QuickStartSensorField

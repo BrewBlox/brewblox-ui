@@ -37,7 +37,7 @@ export default class ActuatorPwmBasic extends BlockCrudComponent {
         </q-item-section>
 
         <q-item-section>
-          <ValueField
+          <LabeledField
             :value="block.data.value"
             label="Duty achieved"
             number
@@ -47,7 +47,7 @@ export default class ActuatorPwmBasic extends BlockCrudComponent {
         </q-item-section>
 
         <q-item-section>
-          <ValueField
+          <LabeledField
             v-if="isConstrained"
             label="Unconstrained setting"
             :value="block.data.desiredSetting"

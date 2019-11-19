@@ -93,10 +93,10 @@ export default class PidBasic extends BlockCrudComponent {
           </div>
         </q-item-section>
         <q-item-section>
-          <ValueField :value="block.data.outputSetting" number label="Target" tag="big" />
+          <LabeledField :value="block.data.outputSetting" number label="Target" tag="big" />
         </q-item-section>
         <q-item-section>
-          <ValueField :value="block.data.outputValue" number label="Measured" tag="big" />
+          <LabeledField :value="block.data.outputValue" number label="Measured" tag="big" />
         </q-item-section>
         <q-item-section side>
           <q-icon :name="hasOutputBlock ? 'mdi-pencil' : 'mdi-pencil-off'" />
@@ -112,13 +112,13 @@ export default class PidBasic extends BlockCrudComponent {
           </div>
         </q-item-section>
         <q-item-section>
-          <ValueField :value="block.data.p" label="P" number />
+          <LabeledField :value="block.data.p" label="P" number />
         </q-item-section>
         <q-item-section>
-          <ValueField :value="block.data.i" label="I" number />
+          <LabeledField :value="block.data.i" label="I" number />
         </q-item-section>
         <q-item-section>
-          <ValueField :value="block.data.d" label="D" number />
+          <LabeledField :value="block.data.d" label="D" number />
         </q-item-section>
       </q-item>
     </q-card-section>

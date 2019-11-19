@@ -15,6 +15,9 @@ export default class UnitField extends FieldBase {
   @Prop({ type: String, default: 'value' })
   public readonly label!: string;
 
+  @Prop({ type: [String, Object, Array], default: '' })
+  public readonly tagClass!: any;
+
   @Prop({ type: Number, default: 2 })
   readonly decimals!: number;
 
@@ -54,7 +57,7 @@ export default class UnitField extends FieldBase {
     @click.native="openDialog"
   >
     <template #control>
-      <component :is="tag" class="q-mt-sm">
+      <component :is="tag" :class="['q-mt-sm', tagClass]">
         <slot name="value">
           {{ value.value | round }}
         </slot>

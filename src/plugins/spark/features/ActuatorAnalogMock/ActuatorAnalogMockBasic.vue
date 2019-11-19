@@ -31,7 +31,7 @@ export default class ActuatorAnalogMockBasic extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section>
-          <ValueField :value="block.data.value" type="number" tag="big" />
+          <LabeledField :value="block.data.value" type="number" tag="big" />
         </q-item-section>
       </q-item>
 

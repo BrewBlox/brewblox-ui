@@ -186,11 +186,11 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
             />
           </q-item-section>
           <q-item-section>
-            <ValueField label="Duration">
+            <LabeledField label="Duration">
               <span v-if="session.start && session.end">{{ sessionDuration(session) }}</span>
               <span v-else-if="session.start">In progress</span>
               <span v-else>Not yet started</span>
-            </ValueField>
+            </LabeledField>
           </q-item-section>
         </q-item>
         <q-item>

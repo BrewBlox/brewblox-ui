@@ -53,9 +53,9 @@ export default class MetricsEditor extends Vue {
         {{ node.label }}
         <q-tooltip>
           <i>Click to edit</i>
-          <ValueField :value="renamed(node)" label="Label" dense class="q-mt-sm" />
-          <ValueField :value="freshDuration(node)" label="Warn when older than" dense class="q-mt-sm" />
-          <ValueField :value="decimals(node)" label="Rounded decimals" dense class="q-mt-sm" />
+          <LabeledField :value="renamed(node)" label="Label" dense class="q-mt-sm" />
+          <LabeledField :value="freshDuration(node)" label="Warn when older than" dense class="q-mt-sm" />
+          <LabeledField :value="decimals(node)" label="Rounded decimals" dense class="q-mt-sm" />
         </q-tooltip>
       </div>
     </template>

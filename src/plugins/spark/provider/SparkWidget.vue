@@ -76,30 +76,30 @@ export default class SparkWidget extends Vue {
       <q-list dense>
         <q-item>
           <q-item-section>
-            <ValueField :value="sysInfo.data.version" label="Firmware version" />
+            <LabeledField :value="sysInfo.data.version" label="Firmware version" />
           </q-item-section>
           <q-item-section>
-            <ValueField :value="sysInfo.data.releaseDate" label="Firmware release date" />
+            <LabeledField :value="sysInfo.data.releaseDate" label="Firmware release date" />
           </q-item-section>
         </q-item>
         <q-item>
           <q-item-section>
-            <ValueField :value="sysDate" label="Device time" />
+            <LabeledField :value="sysDate" label="Device time" />
           </q-item-section>
           <q-item-section>
-            <ValueField label="Time since boot">
+            <LabeledField label="Time since boot">
               {{ ticks.data.millisSinceBoot | duration }}
-            </ValueField>
+            </LabeledField>
           </q-item-section>
         </q-item>
         <q-item>
           <q-item-section>
-            <ValueField label="Device ID">
+            <LabeledField label="Device ID">
               <span style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</span>
-            </ValueField>
+            </LabeledField>
           </q-item-section>
           <q-item-section>
-            <ValueField :value="wifi.data.ip" label="IP address" />
+            <LabeledField :value="wifi.data.ip" label="IP address" />
           </q-item-section>
         </q-item>
       </q-list>

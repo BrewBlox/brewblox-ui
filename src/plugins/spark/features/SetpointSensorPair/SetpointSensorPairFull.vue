@@ -53,7 +53,7 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section v-if="usedBy.length">
-          <ValueField label="Input for:">
+          <LabeledField label="Input for:">
             <div class="row">
               <q-btn
                 v-for="block in usedBy"
@@ -67,7 +67,7 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
                 @click="showOtherBlock(block)"
               />
             </div>
-          </ValueField>
+          </LabeledField>
         </q-item-section>
         <template v-else>
           <q-item-section>This setpoint is not used as PID input</q-item-section>

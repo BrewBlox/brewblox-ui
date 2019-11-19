@@ -52,7 +52,7 @@ export default class ActuatorAnalogMockFull extends BlockCrudComponent {
       </q-item>
       <q-item>
         <q-item-section>
-          <ValueField :value="block.data.value" type="number" label="Value" tag="big" />
+          <LabeledField :value="block.data.value" type="number" label="Value" tag="big" />
         </q-item-section>
         <q-item-section>
           <InputField

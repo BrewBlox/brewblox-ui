@@ -40,13 +40,13 @@ export default class TempSensorMockWidget extends BlockWidgetBase {
             />
           </q-item-section>
           <q-item-section>
-            <ValueField label="Connected">
+            <LabeledField label="Connected">
               <q-toggle
                 dense
                 :value="block.data.connected"
                 @input="v => { block.data.connected = v; saveBlock(); }"
               />
-            </ValueField>
+            </LabeledField>
           </q-item-section>
         </q-item>
       </q-card-section>

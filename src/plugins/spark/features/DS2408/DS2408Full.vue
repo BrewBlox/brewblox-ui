@@ -33,7 +33,7 @@ export default class DS2408Full extends BlockCrudComponent {
           />
         </q-item-section>
         <q-item-section>
-          <ValueField :value="block.data.connected ? 'Yes' : 'No'" label="Connected" />
+          <LabeledField :value="block.data.connected ? 'Yes' : 'No'" label="Connected" />
         </q-item-section>
       </q-item>
     </q-card-section>

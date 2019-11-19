@@ -18,7 +18,7 @@ export default class DigitalActuatorBasic extends BlockCrudComponent {
       <q-card-section>
         <q-item>
           <q-item-section>
-            <ValueField label="State" dense>
+            <LabeledField label="State" dense>
               <DigitalStateField
                 :value="block.data.desiredState"
                 :pending="block.data.state !== block.data.desiredState"
@@ -26,7 +26,7 @@ export default class DigitalActuatorBasic extends BlockCrudComponent {
                 :disable="isDriven"
                 @input="v => { block.data.desiredState = v; saveBlock(); }"
               />
-            </ValueField>
+            </LabeledField>
           </q-item-section>
         </q-item>
         <q-item>

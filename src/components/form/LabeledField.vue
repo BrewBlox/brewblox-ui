@@ -6,7 +6,7 @@ import { round } from '@/helpers/functional';
 
 
 @Component
-export default class InputField extends FieldBase {
+export default class LabeledField extends FieldBase {
 
   @Prop({ type: [String, Number] })
   public readonly value!: string | number;

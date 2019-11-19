@@ -95,7 +95,7 @@ export default class DigitalActuatorForm extends BlockCrudComponent {
       </q-item>
       <q-item class="items-start">
         <q-item-section>
-          <ValueField label="State">
+          <LabeledField label="State">
             <DigitalStateField
               :value="block.data.desiredState"
               :pending="block.data.state !== block.data.desiredState"
@@ -103,16 +103,16 @@ export default class DigitalActuatorForm extends BlockCrudComponent {
               :disable="isDriven"
               @input="v => { block.data.desiredState = v; saveBlock(); }"
             />
-          </ValueField>
+          </LabeledField>
         </q-item-section>
         <q-item-section>
-          <ValueField label="Invert">
+          <LabeledField label="Invert">
             <q-toggle
               :value="block.data.invert"
               dense
               @input="v => { block.data.invert = v; saveBlock(); }"
             />
-          </ValueField>
+          </LabeledField>
         </q-item-section>
       </q-item>
 

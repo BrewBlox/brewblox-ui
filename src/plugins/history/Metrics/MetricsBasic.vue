@@ -137,7 +137,7 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
             <q-btn flat text-color="white" label="Add metrics" @click="modalOpen = true" />
           </q-item-section>
         </q-item>
-        <ValueField
+        <LabeledField
           v-for="val in values"
           :key="val.field"
           :label="val.name"
@@ -155,7 +155,7 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
               Last update: {{ new Date(val.time).toLocaleString() }}.
             </q-tooltip>
           </template>
-        </ValueField>
+        </LabeledField>
       </q-list>
     </q-card-section>
   </q-card>

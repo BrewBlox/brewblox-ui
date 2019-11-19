@@ -84,7 +84,7 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
           <UnitField v-model="beerSetting" label="Beer setpoint" title="Beer setting" />
         </q-item-section>
         <q-item-section class="col-auto">
-          <ValueField label="Active setpoint">
+          <LabeledField label="Active setpoint">
             <q-btn-toggle
               v-model="activeSetpoint"
               :options="targetOpts"
@@ -92,7 +92,7 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
               dense
               class="col-auto"
             />
-          </ValueField>
+          </LabeledField>
         </q-item-section>
       </q-item>
     </q-card-section>

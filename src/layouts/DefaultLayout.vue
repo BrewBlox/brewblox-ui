@@ -106,8 +106,8 @@ export default class DefaultLayout extends Vue {
         <q-item-section class="col-auto">
           <q-btn-dropdown flat text-color="white" icon="mdi-bug-outline">
             <q-list bordered>
-              <ValueField :value="version" label="Version" item-aligned dense />
-              <ValueField :value="buildDate" label="Build date" item-aligned dense />
+              <LabeledField :value="version" label="Version" item-aligned dense />
+              <LabeledField :value="buildDate" label="Build date" item-aligned dense />
               <q-separator inset />
               <ExportErrorsAction />
             </q-list>

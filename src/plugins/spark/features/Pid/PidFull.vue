@@ -152,11 +152,11 @@ export default class PidFull extends BlockCrudComponent {
         </q-item-section>
 
         <q-item-section>
-          <ValueField :value="block.data.outputSetting" number label="Target value is" tag="b" />
+          <LabeledField :value="block.data.outputSetting" number label="Target value is" tag="b" />
         </q-item-section>
 
         <q-item-section>
-          <ValueField :value="block.data.outputValue" number label="Achieved value is" tag="b" />
+          <LabeledField :value="block.data.outputValue" number label="Achieved value is" tag="b" />
         </q-item-section>
 
         <q-item-section class="col-1 self-center">
@@ -200,9 +200,9 @@ export default class PidFull extends BlockCrudComponent {
 
       <div class="grid-container q-mx-md q-mt-md q-item--dark">
         <div class="span-2">
-          <ValueField label="Error">
+          <LabeledField label="Error">
             {{ block.data.error | unit }}
-          </ValueField>
+          </LabeledField>
         </div>
 
         <div class="span-1 self-center text-center">
@@ -233,17 +233,17 @@ export default class PidFull extends BlockCrudComponent {
         </div>
 
         <div class="span-2">
-          <ValueField label="P">
+          <LabeledField label="P">
             {{ block.data.p | round }}
-          </ValueField>
+          </LabeledField>
         </div>
 
         <!-- Break -->
 
         <div class="span-2">
-          <ValueField label="Integral">
+          <LabeledField label="Integral">
             {{ block.data.integral | unit }}
-          </ValueField>
+          </LabeledField>
         </div>
 
         <div class="span-1 self-center text-center">
@@ -251,9 +251,7 @@ export default class PidFull extends BlockCrudComponent {
         </div>
 
         <div class="span-2">
-          <ValueField label="Kp" tag-class="darkish">
-            {{ block.data.kp | unit }}
-          </ValueField>
+          <UnitField :value="block.data.kp" label="Kp" tag-class="darkish" readonly />
         </div>
 
         <div class="span-1 self-center text-center">
@@ -315,9 +313,9 @@ export default class PidFull extends BlockCrudComponent {
         <!-- Break -->
 
         <div class="span-2">
-          <ValueField :tag-class="{darkish: block.data.td.val === 0}" label="Derivative">
+          <LabeledField :tag-class="{darkish: block.data.td.val === 0}" label="Derivative">
             {{ block.data.derivative | unit }}
-          </ValueField>
+          </LabeledField>
         </div>
 
         <div class="span-1 self-center text-center">
@@ -325,9 +323,7 @@ export default class PidFull extends BlockCrudComponent {
         </div>
 
         <div class="span-2">
-          <ValueField label="Kp" tag-class="darkish">
-            {{ block.data.kp | unit }}
-          </ValueField>
+          <UnitField :value="block.data.kp" label="Kp" tag-class="darkish" readonly />
         </div>
 
         <div class="span-1 self-center text-center">
@@ -364,12 +360,12 @@ export default class PidFull extends BlockCrudComponent {
         </div>
 
         <div class="span-2 calc-line">
-          <ValueField label="D">
+          <LabeledField label="D">
             {{ block.data.d | round }}
             <template #after>
-              <sub>+</sub>
+              <sub class="self-end">+</sub>
             </template>
-          </ValueField>
+          </LabeledField>
         </div>
 
         <!-- Break -->
@@ -379,20 +375,20 @@ export default class PidFull extends BlockCrudComponent {
           class="calc-line"
           :style="grid({start: 10, span: 2})"
         >
-          <ValueField label="Boil mode">
+          <LabeledField label="Boil mode">
             {{ boilAdjustment | round }}
             <template #after>
-              <sub>+</sub>
+              <sub class="self-end">+</sub>
             </template>
-          </ValueField>
+          </LabeledField>
         </div>
 
         <!-- Break -->
 
         <div :style="grid({start: 10, span: 2})">
-          <ValueField label="Output">
+          <LabeledField label="Output">
             {{ baseOutput + boilAdjustment | round }}
-          </ValueField>
+          </LabeledField>
         </div>
       </div>
     </q-card-section>
@@ -402,7 +398,7 @@ export default class PidFull extends BlockCrudComponent {
 <style scoped>
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(11, auto);
+  grid-template-columns: repeat(11, 1fr);
   grid-row-gap: 10px;
 }
 
@@ -412,6 +408,8 @@ export default class PidFull extends BlockCrudComponent {
 
 .span-2 {
   grid-column: span 2;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .calc-line {

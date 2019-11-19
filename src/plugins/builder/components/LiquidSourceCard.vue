@@ -43,9 +43,9 @@ export default class LiquidSourceCard extends PartCard {
     <q-separator />
     <q-item>
       <q-item-section>
-        <ValueField label="Enabled">
+        <LabeledField label="Enabled">
           <q-toggle v-model="pressured" dense />
-        </ValueField>
+        </LabeledField>
       </q-item-section>
       <q-item-section class="col-auto">
         <ColorField

@@ -51,7 +51,7 @@ export default class GraphEditor extends Vue {
           {{ node.label }}
           <q-tooltip>
             <i>Click to edit</i>
-            <ValueField
+            <LabeledField
               :value="config.renames[node.value] || node.label"
               label="Label"
               dense
@@ -65,7 +65,7 @@ export default class GraphEditor extends Vue {
               dense
               class="q-mt-sm"
             />
-            <ValueField
+            <LabeledField
               :value="config.axes[node.value] === 'y2' ? 'Y2' : 'Y1'"
               label="Axis"
               dense

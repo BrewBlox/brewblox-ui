@@ -142,7 +142,7 @@ export default class GraphPeriodEditor extends Vue {
                 <i>To improve performance, the history service automatically selects an averaging period.</i> <br />
                 <i>One point is returned per period, with the average value of all points in that period.</i> <br />
                 <div class="row q-mt-sm ">
-                  <ValueField
+                  <LabeledField
                     v-for="(rate, meas) in downsampling"
                     :key="meas"
                     :value="rate"

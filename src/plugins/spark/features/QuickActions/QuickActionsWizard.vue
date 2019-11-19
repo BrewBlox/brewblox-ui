@@ -52,9 +52,9 @@ export default class QuickActionsWizard extends WidgetWizardBase {
           <q-input v-model="widgetTitle" label="Widget name" />
         </q-item-section>
       </q-item>
-      <ValueField label="Service" item-aligned>
+      <LabeledField label="Service" item-aligned>
         <q-option-group v-model="service" :options="serviceOpts" />
-      </ValueField>
+      </LabeledField>
     </q-card-section>
 
     <q-separator />
