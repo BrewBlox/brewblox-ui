@@ -126,7 +126,7 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
           v-for="note in notes"
           :key="note.id"
           clickable
-          :class="[`col-${note.col}`, 'align-children']"
+          :class="[`col-${note.col}`, 'align-children', 'self-start']"
           @click="openNote(note)"
         >
           <!-- Text note -->
