@@ -4,6 +4,7 @@ interface PanArguments {
   direction: 'left' | 'right' | 'up' | 'down';
   duration: number;
   distance: { x: number; y: number };
+  offset: { x: number; y: number };
   delta: { x: number; y: number };
   isFirst: boolean;
   isFinal: boolean;

@@ -15,9 +15,6 @@ export default class InputField extends FieldBase {
   @Prop({ type: String, default: 'text' })
   public readonly type!: string;
 
-  @Prop({ type: String, default: 'value' })
-  public readonly label!: string;
-
   @Prop({ type: Number, default: 2 })
   readonly decimals!: number;
 
@@ -72,6 +69,9 @@ export default class InputField extends FieldBase {
     v-bind="$attrs"
     @click.native="openDialog"
   >
+    <template v-if="!!$scopedSlots.before" #before>
+      <slot name="before" />
+    </template>
     <template #control>
       <component :is="tag" :class="['q-mt-sm', tagClass]">
         <slot name="value">
