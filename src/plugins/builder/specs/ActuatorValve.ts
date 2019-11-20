@@ -17,12 +17,12 @@ const intercept = (message: string): (e: Error) => never =>
 
 const spec: PartSpec = {
   id: 'ActuatorValve',
+  title: 'Valve: actuator',
   size: () => [1, 1],
   cards: [{
     component: 'TextCard',
     props: {
       settingsKey: 'valveid',
-      defaultSize: 1,
       label: 'ID',
     },
   }],

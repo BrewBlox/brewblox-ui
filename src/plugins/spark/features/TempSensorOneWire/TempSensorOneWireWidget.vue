@@ -1,33 +1,61 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 import { TempSensorOneWireBlock } from './types';
 
 @Component
-export default class TempSensorOneWireWidget extends BlockWidget {
+export default class TempSensorOneWireWidget extends BlockWidgetBase {
   readonly block!: TempSensorOneWireBlock;
+
+  get cardStyle(): Mapped<string> {
+    return this.inDialog
+      ? { minHeight: '40vh' }
+      : {};
+  }
 }
 </script>
 
 <template>
-  <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" />
-    <CardWarning v-if="block.data.value.val === null">
-      <template #message>
-        OneWire Sensor could not be read.
-      </template>
-    </CardWarning>
-    <q-card-section v-else>
-      <q-item dark>
-        <q-item-section>
-          <q-item-label caption>
-            Value
-          </q-item-label>
-          <UnitField :value="block.data.value" readonly tag="big" />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-  </q-card>
+  <GraphCardWrapper :show="inDialog">
+    <template #graph>
+      <HistoryGraph :graph-id="widget.id" :config="graphCfg" />
+    </template>
+
+    <q-card :class="cardClass" :style="cardStyle">
+      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+
+      <q-card-section>
+        <CardWarning v-if="block.data.value.val === null">
+          <template #message>
+            OneWire Sensor could not be read.
+          </template>
+        </CardWarning>
+        <UnitField v-else :value="block.data.value" label="Value" readonly item-aligned tag="big" />
+
+
+        <template v-if="mode === 'Full'">
+          <q-item>
+            <q-item-section>
+              <UnitField
+                :value="block.data.offset"
+                title="Offset"
+                label="Offset"
+                @input="v => { block.data.offset = v; saveBlock(); }"
+              />
+            </q-item-section>
+            <q-item-section>
+              <InputField
+                :value="block.data.address"
+                title="Address"
+                label="Address"
+                @input="v => { block.data.address = v; saveBlock(); }"
+              />
+            </q-item-section>
+          </q-item>
+        </template>
+      </q-card-section>
+    </q-card>
+  </GraphCardWrapper>
 </template>

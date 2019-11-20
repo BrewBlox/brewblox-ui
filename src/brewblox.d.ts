@@ -26,3 +26,5 @@ interface SelectOption {
   label: string;
   value: any;
 }
+
+type Mapped<T> = Record<string, T>;

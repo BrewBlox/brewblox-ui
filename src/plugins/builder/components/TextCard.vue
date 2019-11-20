@@ -23,15 +23,8 @@ export default class TextCard extends PartCard {
 </script>
 
 <template>
-  <q-list dark>
-    <q-separator dark />
-    <q-item dark>
-      <q-item-section>
-        <q-item-label caption>
-          {{ label }}
-        </q-item-label>
-        <InputField v-model="text" :title="label" />
-      </q-item-section>
-    </q-item>
+  <q-list>
+    <q-separator />
+    <InputField v-model="text" :title="label" :label="label" item-aligned />
   </q-list>
 </template>

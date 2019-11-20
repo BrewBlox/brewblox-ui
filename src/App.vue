@@ -2,16 +2,13 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import { dashboardStore } from '@/store/dashboards';
-import { serviceStore } from '@/store/services';
+import { pluginStore } from '@/store/plugins';
 
 @Component
 export default class App extends Vue {
-  async created(): Promise<void> {
-    await Promise.all([
-      serviceStore.setup(),
-      dashboardStore.setup(),
-    ]);
+
+  created(): void {
+    pluginStore.setup();
   }
 }
 </script>
@@ -25,4 +22,5 @@ export default class App extends Vue {
 <style lang="stylus">
 // We import global styling here
 @import './styles/quasar.styl';
+@import './styles/quasar.variables.styl';
 </style>

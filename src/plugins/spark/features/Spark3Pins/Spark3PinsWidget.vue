@@ -1,21 +1,58 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
-import { Spark3PinId, Spark3PinsBlock } from './types';
+import { Spark3PinsBlock } from './types';
 
 @Component
-export default class Spark3PinsWidget extends BlockWidget {
-  Spark3PinId = Spark3PinId;
+export default class Spark3PinsWidget extends BlockWidgetBase {
   readonly block!: Spark3PinsBlock;
 }
 </script>
 
 <template>
-  <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" />
+  <q-card :class="cardClass">
+    <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
 
-    <IoArray :crud="crud" :id-enum="Spark3PinId" />
+    <IoArray :crud="crud" />
+
+    <template v-if="mode === 'Full'">
+      <q-separator inset />
+      <q-card-section class="q-pt-sm">
+        <q-item>
+          <q-item-section>
+            <LabeledField label="Enable 5V">
+              <q-toggle
+                :value="block.data.enableIoSupply5V"
+                dense
+                @input="v => { block.data.enableIoSupply5V = v; saveBlock(); }"
+              />
+            </LabeledField>
+          </q-item-section>
+          <q-item-section>
+            <LabeledField label="Enable 12V">
+              <q-toggle
+                :value="block.data.enableIoSupply12V"
+                dense
+                @input="v => { block.data.enableIoSupply12V = v; saveBlock(); }"
+              />
+            </LabeledField>
+          </q-item-section>
+        </q-item>
+        <q-item>
+          <q-item-section>
+            <LabeledField label="5V Voltage">
+              {{ block.data.voltage5 | round }}
+            </LabeledField>
+          </q-item-section>
+          <q-item-section>
+            <LabeledField label="12V Voltage">
+              {{ block.data.voltage12 | round }}
+            </LabeledField>
+          </q-item-section>
+        </q-item>
+      </q-card-section>
+    </template>
   </q-card>
 </template>

@@ -1,16 +1,20 @@
 import { ref } from '@/helpers/component-ref';
 import { Feature } from '@/store/features';
 
-import form from './MetricsForm.vue';
 import widget from './MetricsWidget.vue';
-import wizard from './MetricsWizard.vue';
+import { MetricsConfig } from './types';
 
 const feature: Feature = {
   id: 'Metrics',
   displayName: 'Metrics',
-  widget: ref(widget),
-  wizard: ref(wizard),
-  form: ref(form),
+  widgetComponent: ref(widget),
+  generateConfig: (): MetricsConfig => ({
+    targets: [],
+    renames: {},
+    params: {},
+    freshDuration: {},
+    decimals: {},
+  }),
   widgetSize: {
     cols: 4,
     rows: 4,

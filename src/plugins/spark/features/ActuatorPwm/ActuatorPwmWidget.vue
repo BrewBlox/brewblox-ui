@@ -1,103 +1,57 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
+import ActuatorPwmBasic from './ActuatorPwmBasic.vue';
+import ActuatorPwmFull from './ActuatorPwmFull.vue';
 import { ActuatorPwmBlock } from './types';
 
-@Component
-export default class ActuatorPwmWidget extends BlockWidget {
+@Component({
+  components: {
+    Basic: ActuatorPwmBasic,
+    Full: ActuatorPwmFull,
+  },
+})
+export default class ActuatorPwmWidget extends BlockWidgetBase {
   readonly block!: ActuatorPwmBlock;
-
-  get isConstrained(): boolean {
-    return this.block.data.enabled
-      && this.block.data.setting !== this.block.data.desiredSetting;
-  }
 }
 </script>
 
 <template>
-  <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" />
+  <GraphCardWrapper :show="inDialog">
+    <template #graph>
+      <HistoryGraph :graph-id="widget.id" :config="graphCfg" />
+    </template>
 
-    <CardWarning v-if="!block.data.actuatorId.id">
-      <template #message>
-        PWM has no target actuator configured.
+    <component :is="mode" :crud="crud" :class="cardClass">
+      <template #toolbar>
+        <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
       </template>
-    </CardWarning>
-    <CardWarning v-else-if="!block.data.enabled">
-      <template #message>
-        <span>
-          PWM is disabled:
-          <i>{{ block.data.actuatorId }}</i> will not be toggled.
-        </span>
-      </template>
-      <template #actions>
-        <q-btn
-          text-color="white"
-          flat
-          label="Enable"
-          @click="block.data.enabled = true; saveBlock();"
-        />
-      </template>
-    </CardWarning>
-    <q-card-section>
-      <q-item dark class="align-children">
-        <q-item-section>
-          <q-item-label caption>
-            Setting
-          </q-item-label>
-          <div :class="{['text-orange']: isConstrained}">
-            <SliderField
-              :value="block.data.setting"
-              :readonly="isDriven"
-              style="display: inline-block"
-              title="Duty Setting"
-              tag="big"
-              @input="v => { block.data.desiredSetting = v; saveBlock(); }"
-            />
-            <small
-              v-if="block.data.setting !== null"
-              style="display: inline-block"
-              class="q-ml-xs"
-            >%</small>
-          </div>
-        </q-item-section>
 
-        <q-item-section>
-          <q-item-label caption>
-            Duty achieved
-          </q-item-label>
-          <div>
-            <big>{{ block.data.value | round }}</big>
-            <small class="q-ml-xs">%</small>
-          </div>
-        </q-item-section>
-
-        <q-item-section>
-          <template v-if="isConstrained">
-            <q-item-label caption>
-              Unconstrained setting
-            </q-item-label>
-            <div>
-              <big>{{ block.data.desiredSetting | round }}</big>
-              <small class="q-ml-xs">%</small>
-            </div>
+      <template #warnings>
+        <CardWarning v-if="!block.data.actuatorId.id">
+          <template #message>
+            PWM has no target actuator configured.
           </template>
-        </q-item-section>
-      </q-item>
-
-      <q-item dark>
-        <q-item-section>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
-          <ConstraintsField
-            :value="block.data.constrainedBy"
-            :service-id="serviceId"
-            type="analog"
-            @input="v => { block.data.constrainedBy = v; saveBlock(); }"
-          />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-  </q-card>
+        </CardWarning>
+        <CardWarning v-else-if="!block.data.enabled">
+          <template #message>
+            <span>
+              PWM is disabled:
+              <i>{{ block.data.actuatorId }}</i> will not be toggled.
+            </span>
+          </template>
+          <template #actions>
+            <q-btn
+              text-color="white"
+              flat
+              label="Enable"
+              @click="block.data.enabled = true; saveBlock();"
+            />
+          </template>
+        </CardWarning>
+      </template>
+    </component>
+  </GraphCardWrapper>
 </template>

@@ -2,25 +2,26 @@ import { autoRegister, ref } from '@/helpers/component-ref';
 import { Feature, featureStore } from '@/store/features';
 
 import BuilderEditor from './BuilderEditor.vue';
-import form from './BuilderForm.vue';
 import widget from './BuilderWidget.vue';
-import wizard from './BuilderWizard.vue';
 import { typeName } from './getters';
 import specs from './specs';
 import { builderStore } from './store';
+import { BuilderConfig } from './types';
 
 ref(BuilderEditor);
 
 const feature: Feature = {
   id: typeName,
   displayName: 'Brewery Builder',
-  widget: ref(widget),
-  wizard: ref(wizard),
-  form: ref(form),
+  widgetComponent: ref(widget),
   widgetSize: {
     cols: 8,
     rows: 8,
   },
+  generateConfig: (): BuilderConfig => ({
+    currentLayoutId: null,
+    layoutIds: [],
+  }),
 };
 
 // Allows lookups based on the old type ID
@@ -28,7 +29,9 @@ const feature: Feature = {
 const deprecated: Feature = {
   id: 'ProcessView',
   displayName: 'Process View',
-  widget: 'DeprecatedWidget',
+  widgetComponent: 'DeprecatedWidget',
+  widgetSize: { cols: 0, rows: 0 },
+  wizardComponent: null,
 };
 
 export default {

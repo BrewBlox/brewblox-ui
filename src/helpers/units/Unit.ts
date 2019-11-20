@@ -1,3 +1,5 @@
+import PostFixed from './PostFixed';
+
 export const prettify = (v: string): string =>
   v.replace(/delta_/g, '')
     .replace(/(celsius|degC(elsius)?)/gi, '°C')
@@ -12,12 +14,13 @@ export const prettify = (v: string): string =>
     .replace(/ ?\/ ?/gi, '/')
     .replace(/ ?\* ?/gi, '·');
 
-export default class Unit {
+export default class Unit extends PostFixed {
   private val: number | null;
   public unit: string;
   public notation: string;
 
   public constructor(value: number | null, unit: string) {
+    super();
     this.val = value;
     this.unit = unit;
     this.notation = prettify(this.unit);
@@ -43,8 +46,8 @@ export default class Unit {
     return `[${this.unit}]`;
   }
 
-  public serializedKeyName(key: string): string {
-    return `${key}${this.postfix}`;
+  public serialized(key: string): [string, number | null] {
+    return [`${key}${this.postfix}`, this.value];
   }
 
   public toString(): string {
@@ -65,3 +68,8 @@ export default class Unit {
       && this.roundedValue === other.roundedValue;
   }
 }
+
+export const convertedTemp = (degC: number, userTemp: string): Unit => {
+  const defaultTempValues = { degC, degF: (degC * 9 / 5) + 32, degK: degC + 273.15 };
+  return new Unit(defaultTempValues[userTemp] || degC, userTemp);
+};

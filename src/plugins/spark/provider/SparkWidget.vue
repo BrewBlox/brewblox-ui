@@ -5,8 +5,8 @@ import { Component, Prop } from 'vue-property-decorator';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
-import { isReady, sysInfoType, ticksType, wifiType } from './getters';
-import { SysInfoBlock, TicksBlock, WiFiSettingsBlock } from './types';
+import { blockTypes, SysInfoBlock, TicksBlock, WiFiSettingsBlock } from '../block-types';
+import { isReady } from './getters';
 
 @Component
 export default class SparkWidget extends Vue {
@@ -20,15 +20,15 @@ export default class SparkWidget extends Vue {
   }
 
   get sysInfo(): SysInfoBlock {
-    return this.sysBlock(sysInfoType);
+    return this.sysBlock(blockTypes.SysInfo);
   }
 
   get ticks(): TicksBlock {
-    return this.sysBlock(ticksType);
+    return this.sysBlock(blockTypes.Ticks);
   }
 
   get wifi(): WiFiSettingsBlock {
-    return this.sysBlock(wifiType);
+    return this.sysBlock(blockTypes.WiFiSettings);
   }
 
   get ready(): boolean {
@@ -56,12 +56,12 @@ export default class SparkWidget extends Vue {
 </script>
 
 <template>
-  <q-card v-if="ready" dark class="text-white scroll">
-    <WidgetToolbar :title="serviceId" subtitle="Spark Service">
-      <q-item-section class="dense" side>
-        <q-btn flat round dense icon="refresh" @click="fetchAll" />
-      </q-item-section>
-    </WidgetToolbar>
+  <q-card v-if="ready" class="text-white scroll">
+    <Toolbar :title="serviceId" subtitle="Device Info">
+      <template #buttons>
+        <q-btn flat round icon="refresh" class="darkish" @click="fetchAll" />
+      </template>
+    </Toolbar>
 
     <CardWarning v-if="!updating">
       <template #message>
@@ -73,56 +73,36 @@ export default class SparkWidget extends Vue {
     </CardWarning>
 
     <q-card-section>
-      <q-list>
-        <q-item dark>
+      <q-list dense>
+        <q-item>
           <q-item-section>
-            <q-item-label caption>
-              Firmware version
-            </q-item-label>
-            <span>{{ sysInfo.data.version }}</span>
+            <LabeledField :value="sysInfo.data.version" label="Firmware version" />
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>
-              Firmware release date
-            </q-item-label>
-            <span>{{ sysInfo.data.releaseDate }}</span>
+            <LabeledField :value="sysInfo.data.releaseDate" label="Firmware release date" />
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section>
-            <q-item-label caption>
-              Device time
-            </q-item-label>
-            <span>{{ sysDate }}</span>
+            <LabeledField :value="sysDate" label="Device time" />
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>
-              Time since boot
-            </q-item-label>
-            <span>{{ ticks.data.millisSinceBoot | duration }}</span>
+            <LabeledField label="Time since boot">
+              {{ ticks.data.millisSinceBoot | duration }}
+            </LabeledField>
           </q-item-section>
         </q-item>
-        <q-item dark>
+        <q-item>
           <q-item-section>
-            <q-item-label caption>
-              Device ID
-            </q-item-label>
-            <span style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</span>
+            <LabeledField label="Device ID">
+              <span style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</span>
+            </LabeledField>
           </q-item-section>
           <q-item-section>
-            <q-item-label caption>
-              IP address
-            </q-item-label>
-            <span>{{ wifi.data.ip }}</span>
+            <LabeledField :value="wifi.data.ip" label="IP address" />
           </q-item-section>
         </q-item>
       </q-list>
     </q-card-section>
   </q-card>
 </template>
-
-<style scoped>
-.dense {
-  padding: 0px;
-}
-</style>

@@ -1,26 +1,34 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
-import { DS2408Block, DS2408Id, ValveStartId } from './types';
+import DS2408Basic from './DS2408Basic.vue';
+import DS2408Full from './DS2408Full.vue';
+import { DS2408Block } from './types';
 
-@Component
-export default class DS2408Widget extends BlockWidget {
-  DS2408Id = DS2408Id;
-  ValveStartId = ValveStartId;
+@Component({
+  components: {
+    Basic: DS2408Basic,
+    Full: DS2408Full,
+  },
+})
+export default class DS2408Widget extends BlockWidgetBase {
   readonly block!: DS2408Block;
 }
 </script>
 
 <template>
-  <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" />
-    <CardWarning v-if="!block.data.connected">
-      <template #message>
-        DS2408 is not connected
-      </template>
-    </CardWarning>
-    <ValveArray :crud="crud" :id-enum="DS2408Id" :name-enum="ValveStartId" />
-  </q-card>
+  <component :is="mode" :crud="crud" :class="cardClass">
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+    </template>
+    <template #warnings>
+      <CardWarning v-if="!block.data.connected">
+        <template #message>
+          DS2408 is not connected
+        </template>
+      </CardWarning>
+    </template>
+  </component>
 </template>

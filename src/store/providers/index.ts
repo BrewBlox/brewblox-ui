@@ -23,7 +23,7 @@ const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'providers' })
 export class ProviderModule extends VuexModule {
-  public providers: Record<string, Provider> = {};
+  public providers: Mapped<Provider> = {};
 
   public get providerIds(): string[] {
     return Object.keys(this.providers);
@@ -37,7 +37,7 @@ export class ProviderModule extends VuexModule {
     return id => this.providers[id] || null;
   }
 
-  public get displayNameById(): (id: string) => string {
+  public get displayName(): (id: string) => string {
     return id => get(this.providers, [id, 'displayName']) || id;
   }
 
@@ -53,7 +53,7 @@ export class ProviderModule extends VuexModule {
     return id => get(this.providers, [id, 'onFetch']) || (async () => { });
   }
 
-  public get wizardById(): (id: string) => string | undefined {
+  public get wizard(): (id: string) => string | undefined {
     return id => get(this.providers, [id, 'wizard']);
   }
 

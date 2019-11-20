@@ -19,9 +19,9 @@ export default class PlacementCard extends PartCard {
 </script>
 
 <template>
-  <q-list dark>
-    <q-separator dark />
-    <q-item dark>
+  <q-list>
+    <q-separator />
+    <q-item>
       <q-item-section>
         <q-btn
           color="primary"

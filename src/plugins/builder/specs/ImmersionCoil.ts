@@ -8,6 +8,7 @@ const SIZE_Y = 2;
 
 const spec: PartSpec = {
   id: 'ImmersionCoil',
+  title: 'Coil: immersion',
   cards: [],
   size: () => [SIZE_X, SIZE_Y],
   transitions: () => ({

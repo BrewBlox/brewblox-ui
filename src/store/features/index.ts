@@ -4,15 +4,17 @@ import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-dec
 
 import store from '@/store';
 
-import { Arrangement, Deleter, Feature, FeatureRole, Validator } from './types';
+import { Crud, Deleter, Feature, FeatureRole, QuickStart, Watcher } from './types';
 export * from './types';
+
 
 const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'features' })
 export class FeatureModule extends VuexModule {
-  public features: Record<string, Feature> = {};
-  public arrangements: Record<string, Arrangement> = {};
+  public features: Mapped<Feature> = {};
+  public quickStarts: Mapped<QuickStart> = {};
+  public watchers: Watcher[] = [];
 
   public get featureIds(): string[] {
     return Object.keys(this.features);
@@ -22,52 +24,52 @@ export class FeatureModule extends VuexModule {
     return Object.values(this.features);
   }
 
-  public get arrangementIds(): string[] {
-    return Object.keys(this.arrangements);
+  public get quickStartIds(): string[] {
+    return Object.keys(this.quickStarts);
   }
 
-  public get arrangementValues(): Arrangement[] {
-    return Object.values(this.arrangements);
+  public get quickStartValues(): QuickStart[] {
+    return Object.values(this.quickStarts);
   }
 
-  public get featureById(): (id: string) => Feature {
-    return id => this.features[id] || null;
-  }
-
-  public get displayNameById(): (id: string) => string {
+  public get displayName(): (id: string) => string {
     return id => get(this.features, [id, 'displayName']);
   }
 
-  public get roleById(): (id: string) => FeatureRole {
+  public get role(): (id: string) => FeatureRole {
     return id => get(this.features, [id, 'role']) || 'Other';
   }
 
-  public get validatorById(): (id: string) => Validator {
-    return id => get(this.features, [id, 'validator']) || (() => true);
-  }
-
-  public get wizardById(): (id: string) => string {
-    return id => get(this.features, [id, 'wizard'], '');
-  }
-
-  public get widgetById(): (id: string, config: any, selector?: boolean) => string | undefined {
-    return (id: string, config: any, selector = true) => {
-      const feature = this.features[id] || {};
-      return selector && feature.selector
-        ? feature.selector(config)
-        : feature.widget;
+  public get wizard(): (id: string) => string | null {
+    return (id: string): string | null => {
+      const feature = this.features[id];
+      if (feature === undefined) { return null; };
+      return feature.wizardComponent !== undefined
+        ? feature.wizardComponent
+        : 'GenericWidgetWizard';
     };
   }
 
-  public get widgetSizeById(): (id: string) => { cols: number; rows: number } {
-    return id => get(this.features, [id, 'widgetSize']) || Object.assign({}, { cols: 3, rows: 2 });
+  public get widget(): (crud: Crud, throwInvalid?: boolean) => string {
+    return (crud: Crud, throwInvalid = false) => {
+      try {
+        const obj = get(this.features, [crud.widget.feature, 'widgetComponent'], null);
+        if (obj === null) {
+          throw new Error(`No feature found for '${crud.widget.feature}'`);
+        }
+        return typeof obj === 'function' ? obj(crud) : obj;
+      } catch (e) {
+        if (throwInvalid) { throw e; }
+        return 'InvalidWidget';
+      }
+    };
   }
 
-  public get formById(): (id: string) => string | undefined {
-    return id => get(this.features, [id, 'form']);
+  public get widgetSize(): (id: string) => { cols: number; rows: number } {
+    return id => get(this.features, [id, 'widgetSize']);
   }
 
-  public get deletersById(): (id: string) => Deleter[] {
+  public get deleters(): (id: string) => Deleter[] {
     return id => get(this.features, [id, 'deleters']) || [];
   }
 
@@ -77,18 +79,31 @@ export class FeatureModule extends VuexModule {
   }
 
   @Mutation
-  public commitArrangement(arrangement: Arrangement): void {
-    Vue.set(this.arrangements, arrangement.id, arrangement);
+  public commitQuickStart(quickStart: QuickStart): void {
+    Vue.set(this.quickStarts, quickStart.id, quickStart);
   }
 
-  @Action({ rawError, commit: 'commitFeature' })
-  public async createFeature(feature: Feature): Promise<Feature> {
-    return feature;
+  @Mutation
+  public commitWatcher(watcher: Watcher): void {
+    this.watchers.push({ ...watcher });
   }
 
-  @Action({ rawError, commit: 'commitArrangement' })
-  public async createArrangement(arrangement: Arrangement): Promise<Arrangement> {
-    return arrangement;
+  @Action({ rawError })
+  public async createFeature(feature: Feature): Promise<void> {
+    if (feature.wizardComponent === undefined && feature.generateConfig === undefined) {
+      throw new Error(`Feature ${feature.id} must define a generateConfig function to use the default wizard`);
+    }
+    this.commitFeature(feature);
+  }
+
+  @Action({ rawError })
+  public async createQuickStart(quickStart: QuickStart): Promise<void> {
+    this.commitQuickStart(quickStart);
+  }
+
+  @Action({ rawError })
+  public async createWatcher(watcher: Watcher): Promise<void> {
+    this.commitWatcher(watcher);
   }
 }
 

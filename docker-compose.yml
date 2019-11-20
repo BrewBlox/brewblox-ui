@@ -1,4 +1,4 @@
-version: "3"
+version: "3.7"
 
 services:
   eventbus:
@@ -28,6 +28,7 @@ services:
 
   sparksimulator:
     image: brewblox/firmware-simulator:develop
+    init: true
     ports:
       - "7376:7376"
 
@@ -45,8 +46,8 @@ services:
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /sparkey"
-    #    volumes:
-    #      - "../brewblox-devcon-spark/:/app/"
+    # volumes:
+    #   - "../brewblox-devcon-spark/:/app/"
     command: >
       --name=sparkey
       --device-host=sparksimulator
@@ -84,6 +85,18 @@ services:
       --simulation
   #      --device-host=192.168.0.78
   #      --discovery=usb
+
+  automation:
+    image: brewblox/brewblox-automation:develop
+    privileged: true
+    depends_on:
+      - eventbus
+      - datastore
+    labels:
+      - "traefik.port=5000"
+      - "traefik.frontend.rule=PathPrefix: /automation"
+    # volumes:
+    #   - "../brewblox-automation/:/app/"
 
   ui:
     image: brewblox/brewblox-ui:develop

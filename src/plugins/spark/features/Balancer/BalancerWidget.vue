@@ -1,50 +1,47 @@
 <script lang="ts">
+import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
-import { getClients } from './getters';
+import { sparkStore } from '../../store';
 import { BalancerBlock } from './types';
 
 @Component
-export default class BalancerWidget extends BlockWidget {
+export default class BalancerWidget extends BlockWidgetBase {
   readonly block!: BalancerBlock;
 
-  get clientNames(): Record<string, string> {
-    return getClients(this.serviceId, this.blockId);
+  get clientNames(): Mapped<string> {
+    const result = {};
+    sparkStore.blockValues(this.serviceId)
+      .forEach((block) => {
+        const constraint = get(block, 'data.constrainedBy.constraints', [])
+          .find(constraint => get(constraint, 'balanced.balancerId.id') === this.blockId);
+        if (constraint) {
+          result[constraint.balanced.id] = block.id;
+        }
+      });
+    return result;
   }
 
   clientName(id: number): string {
     return this.clientNames[id] || `${id}` || 'unknown';
   }
-
-  // TODO: implement
-  // get renamedTargets() {
-  //   return this.block.data.clients
-  //     .reduce(
-  //       (acc, client, idx) => ({
-  //         ...acc,
-  //         [`clients/${idx}/requested`]: `${this.clientName(client.id)} requested`,
-  //         [`clients/${idx}/granted`]: `${this.clientName(client.id)} granted`,
-  //       }),
-  //       {},
-  //     );
-  // }
 }
 </script>
 
 <template>
-  <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" />
+  <q-card :class="cardClass">
+    <component :is="toolbarComponent" :crud="crud" />
 
     <q-card-section>
-      <q-item dark dense style="opacity: 0.5">
+      <q-item dense style="opacity: 0.5">
         <q-item-section>Client</q-item-section>
         <q-item-section>Granted</q-item-section>
         <q-item-section>Requested</q-item-section>
       </q-item>
       <q-list dense>
-        <q-item v-for="client in block.data.clients" :key="client.id.id" dark>
+        <q-item v-for="client in block.data.clients" :key="client.id.id">
           <q-item-section>
             <i>{{ clientName(client.id) }}</i>
           </q-item-section>

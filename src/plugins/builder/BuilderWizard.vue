@@ -1,25 +1,24 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import WidgetWizardBase from '@/components/Wizard/WidgetWizardBase';
+import WidgetWizardBase from '@/components/WidgetWizardBase';
 
 import { BuilderConfig } from './types';
 
 
 @Component
-export default class BuilderWizard extends WidgetWizardBase {
+export default class BuilderWizard extends WidgetWizardBase<BuilderConfig> {
   createWidget(): void {
-    const config: BuilderConfig = {
-      currentLayoutId: null,
-      layoutIds: [],
-    };
     this.createItem({
-      config,
       id: this.widgetId,
       title: this.widgetTitle,
       feature: this.typeId,
       dashboard: this.dashboardId,
       order: 0,
+      config: {
+        currentLayoutId: null,
+        layoutIds: [],
+      },
       ...this.defaultWidgetSize,
     });
   }
@@ -33,9 +32,9 @@ export default class BuilderWizard extends WidgetWizardBase {
 <template>
   <div>
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section>
-          <q-input v-model="widgetTitle" dark label="Widget name" />
+          <q-input v-model="widgetTitle" label="Widget name" />
         </q-item-section>
       </q-item>
     </q-card-section>

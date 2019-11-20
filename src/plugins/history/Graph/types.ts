@@ -1,6 +1,4 @@
-import { GraphConfig } from '@/components/Graph/types';
-import { DashboardItem } from '@/store/dashboards';
+import { GraphConfig } from '@/plugins/history/types';
+import { PersistentWidget } from '@/store/dashboards';
 
-export interface HistoryItem extends DashboardItem {
-  config: GraphConfig;
-}
+export type HistoryItem = PersistentWidget<GraphConfig>;

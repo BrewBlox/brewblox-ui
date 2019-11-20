@@ -2,30 +2,32 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { clampRotation, spaceCased } from '@/helpers/functional';
+import { clampRotation } from '@/helpers/functional';
 
 import { SQUARE_SIZE } from './getters';
 import { builderStore } from './store';
-import { CardSpec, FlowPart } from './types';
+import { CardSpec, FlowPart, PartSpec } from './types';
 
 @Component
 export default class BuilderPartMenu extends Vue {
-  specs = builderStore.specs;
 
   @Prop({ type: Object, required: true })
   readonly part!: FlowPart;
 
+  get spec(): PartSpec {
+    return builderStore.spec(this.part);
+  }
+
   get cards(): CardSpec[] {
     return [
       { component: 'PlacementCard' },
-      ...this.specs[this.part.type].cards,
+      ...this.spec.cards,
     ];
   }
 
   get partTitle(): string {
-    return `${spaceCased(this.part.type)} ${this.part.x},${this.part.y}`;
+    return `${this.spec.title} ${this.part.x},${this.part.y}`;
   }
-
 
   get rotatedSize(): [number, number] {
     const [x, y] = this.part.size;
@@ -52,11 +54,13 @@ export default class BuilderPartMenu extends Vue {
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <DialogToolbar>{{ partTitle }}</DialogToolbar>
+  <q-card class="widget-modal">
+    <DialogToolbar @close="$emit('close')">
+      {{ partTitle }}
+    </DialogToolbar>
 
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <svg
             :width="`${squares(rotatedSize[0]) * displayScale}px`"

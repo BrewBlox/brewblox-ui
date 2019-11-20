@@ -4,7 +4,7 @@ import { Component, Watch } from 'vue-property-decorator';
 import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
 
 import PartBase from '../components/PartBase';
-import { LEFT } from '../getters';
+import { DEFAULT_PUMP_PRESSURE, LEFT } from '../getters';
 import { settingsBlock } from '../helpers';
 
 @Component
@@ -22,6 +22,12 @@ export default class PwmPump extends PartBase {
 
   get liquids(): string[] {
     return this.liquidOnCoord(LEFT);
+  }
+
+  get duration(): number {
+    const pwmMod = 2 / (this.pwmSetting / 100 + 0.0001);
+    const calculated = pwmMod * DEFAULT_PUMP_PRESSURE / (this.settings.onPressure || DEFAULT_PUMP_PRESSURE);
+    return Math.max(calculated, 0.5);
   }
 
   @Watch('pwmBlock')
@@ -52,7 +58,7 @@ export default class PwmPump extends PartBase {
         <!-- eslint-disable vue/attribute-hyphenation -->
         <animateTransform
           v-if="pwmSetting > 0"
-          :dur="`${2/(pwmSetting/100+0.0001)}s`"
+          :dur="`${duration}s`"
           attributeName="transform"
           attributeType="XML"
           type="rotate"

@@ -39,6 +39,8 @@ export default class SystemIO extends PartBase {
 
 <template>
   <g>
+    <LiquidStroke :paths="[paths.liquid]" :colors="liquids" />
+    <AnimatedArrows :num-arrows="1" :speed="flowSpeed" :path="paths.arrows" />
     <g class="outline">
       <g v-if="flowSpeed > 0">
         <polyline v-for="line in chevrons.right" :key="line" :points="line" />
@@ -52,7 +54,5 @@ export default class SystemIO extends PartBase {
       <path :d="paths.borders[0]" />
       <path :d="paths.borders[1]" />
     </g>
-    <LiquidStroke :paths="[paths.liquid]" :colors="liquids" />
-    <AnimatedArrows :num-arrows="1" :speed="flowSpeed" :path="paths.arrows" />
   </g>
 </template>

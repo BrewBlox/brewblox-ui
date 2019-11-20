@@ -1,13 +1,16 @@
 import './quasar';
+import './externals';
 
 import PortalVue from 'portal-vue';
 import Vue, { PluginObject } from 'vue';
 
 import App from './App.vue';
 import { autoRegister, externalComponent } from './helpers/component-ref';
+import automation from './plugins/automation';
 import builder from './plugins/builder';
 import database from './plugins/database';
 import history from './plugins/history';
+import quickstart from './plugins/quickstart';
 import spark from './plugins/spark';
 import router from './router';
 import store from './store';
@@ -41,7 +44,10 @@ async function setup(): Promise<void> {
   Object.defineProperty(window, 'Vue', { value: Vue });
 
   // Enable the Vue devtools performance tab
-  Vue.config.performance = (process.env.NODE_ENV === 'development');
+  Vue.config.performance = (
+    process.env.NODE_ENV === 'development'
+    && process.env.VUE_APP_PERFORMANCE === 'true'
+  );
 
   // Install the database. We need it to fetch remote plugins
   Vue.use(database, {
@@ -51,13 +57,17 @@ async function setup(): Promise<void> {
 
   const plugins: PluginObject<any>[] = [
     PortalVue,
+    automation,
     history,
     spark,
     builder,
+    quickstart,
   ];
 
   try {
-    await pluginStore.setup();
+    await pluginStore.init();
+    pluginStore.onSetup('services/setup');
+    pluginStore.onSetup('dashboards/setup');
 
     const remotePlugins = await pluginStore.fetchPlugins();
     const loaded = await Promise
@@ -81,6 +91,6 @@ setup().then(() => {
     store,
     // q-app is defined by public/index.html
     el: document.getElementById('q-app') as HTMLElement,
-    render: f => f(App),
+    render: h => h(App),
   });
 });

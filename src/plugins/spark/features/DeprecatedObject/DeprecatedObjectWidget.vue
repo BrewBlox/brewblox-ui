@@ -1,15 +1,15 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { sparkStore } from '@/plugins/spark/store';
+import { fetchStoredBlock } from '@/plugins/spark/store/api';
 
-import { fetchStoredBlock } from '../../store/api';
 import { Block } from '../../types';
 import { DeprecatedObjectBlock } from './types';
 
 @Component
-export default class DeprecatedObjectWidget extends BlockWidget {
+export default class DeprecatedObjectWidget extends BlockWidgetBase {
   readonly block!: DeprecatedObjectBlock;
   actual: Block | null = null;
 
@@ -24,22 +24,24 @@ export default class DeprecatedObjectWidget extends BlockWidget {
 </script>
 
 <template>
-  <q-card dark class="text-white scroll">
-    <WidgetToolbar :title="widget.title" :subtitle="displayName" />
+  <q-card :class="cardClass">
+    <DialogToolbar v-if="inDialog">
+      <q-item-section>
+        <q-item-label>{{ widget.title }}</q-item-label>
+        <q-item-label caption>
+          {{ displayName }}
+        </q-item-label>
+      </q-item-section>
+    </DialogToolbar>
+    <WidgetToolbar v-else :crud="crud" />
 
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section>
-          <q-item-label caption>
-            Id
-          </q-item-label>
-          {{ actual ? actual.id : 'Unknown' }}
+          <LabeledField :value="actual ? actual.id : 'Unknown'" label="ID" />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            Type
-          </q-item-label>
-          {{ actual ? actual.type : 'Unknown' }}
+          <LabeledField :value="actual ? actual.type : 'Unknown'" label="Type" />
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn icon="delete" flat @click="removeBlock" />

@@ -1,12 +1,14 @@
 import { ref } from '@/helpers/component-ref';
 import { Link } from '@/helpers/units';
-import { SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
-import GenericBlock from '@/plugins/spark/components/GenericBlock';
+import { interfaceTypes } from '@/plugins/spark/block-types';
+import { genericBlockFeature } from '@/plugins/spark/generic';
+import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { BlockSpec } from '@/plugins/spark/types';
 import { Feature } from '@/store/features';
 
-import { BlockSpec } from '../../types';
 import { typeName } from './getters';
-import form from './SetpointProfileForm.vue';
+import ProfilePresetAction from './ProfilePresetAction.vue';
+import ProfilePresetDialog from './ProfilePresetDialog.vue';
 import widget from './SetpointProfileWidget.vue';
 import { SetpointProfileData } from './types';
 
@@ -16,7 +18,7 @@ const block: BlockSpec = {
     start: new Date().getTime() / 1000,
     points: [],
     enabled: false,
-    targetId: new SetpointSensorPairLink(null),
+    targetId: new Link(null, interfaceTypes.SetpointSensorPair),
     drivenTargetId: new Link(null),
   }),
   changes: [
@@ -32,13 +34,17 @@ const block: BlockSpec = {
       component: 'DateValEdit',
       componentProps: { timeScale: 1000 },
       generate: () => new Date().getTime() / 1000,
-      pretty: val => new Date((val || 0) * 1000).toLocaleString(),
+      pretty: (val: number): string => {
+        if (val === 0) { return 'now'; }
+        if (!val) { return 'invalid date'; }
+        return new Date(val * 1000).toLocaleString();
+      },
     },
     {
       key: 'targetId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new SetpointSensorPairLink(null),
+      generate: () => new Link(null, interfaceTypes.SetpointSensorPair),
     },
   ],
   presets: [
@@ -53,13 +59,15 @@ const block: BlockSpec = {
   ],
 };
 
+ref(ProfilePresetAction);
+ref(ProfilePresetDialog);
+
 const feature: Feature = {
-  ...GenericBlock,
+  ...genericBlockFeature,
   id: typeName,
-  displayName: 'Setpoint profile',
+  displayName: 'Setpoint Profile',
   role: 'Process',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 3,

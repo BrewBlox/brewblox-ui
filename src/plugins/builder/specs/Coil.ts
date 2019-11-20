@@ -8,6 +8,7 @@ const SIZE_Y = 2;
 
 const spec: PartSpec = {
   id: 'Coil',
+  title: 'Coil: wall-mounted',
   cards: [],
   size: () => [SIZE_X, SIZE_Y],
   transitions: () => ({

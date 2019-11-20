@@ -1,21 +1,21 @@
-import { ref } from '@/helpers/component-ref';
 import { unitDurationString } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
-import { ActuatorAnalogLink, SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
-import GenericBlock from '@/plugins/spark/components/GenericBlock';
+import { Link, Unit } from '@/helpers/units';
+import { interfaceTypes } from '@/plugins/spark/block-types';
+import { genericBlockFeature } from '@/plugins/spark/generic';
+import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { BlockSpec } from '@/plugins/spark/types';
 import { Feature } from '@/store/features';
 
-import { BlockSpec } from '../../types';
 import { typeName } from './getters';
-import form from './PidForm.vue';
-import widget from './PidWidget.vue';
+import PidWidget from './PidWidget.vue';
 import { PidData } from './types';
+
 
 const block: BlockSpec = {
   id: typeName,
   generate: (): PidData => ({
-    inputId: new SetpointSensorPairLink(null),
-    outputId: new ActuatorAnalogLink(null),
+    inputId: new Link(null, interfaceTypes.SetpointSensorPair),
+    outputId: new Link(null, interfaceTypes.ActuatorAnalog),
     inputValue: new Unit(0, 'degC'),
     inputSetting: new Unit(0, 'degC'),
     outputValue: 0,
@@ -31,24 +31,43 @@ const block: BlockSpec = {
     error: new Unit(0, 'delta_degC'),
     integral: new Unit(0, 'delta_degC/second'),
     derivative: new Unit(0, 'delta_degC*second'),
-    drivenOutputId: new ActuatorAnalogLink(null),
+    drivenOutputId: new Link(null, interfaceTypes.ActuatorAnalog),
     integralReset: 0,
+    boilPointAdjust: new Unit(0, 'delta_degC'),
+    boilMinOutput: 0,
+    boilModeActive: false,
   }),
   presets: [
     {
-      name: 'Fridge compressor: (cooling)',
+      name: 'Fridge cooling compressor (beer constant)',
       generate: (): Partial<PidData> => ({
-        kp: new Unit(-10, '1/degC'),
-        ti: new Unit(2, 'hour'),
-        td: new Unit(0, 'min'),
+        kp: new Unit(-50, '1/degC'),
+        ti: new Unit(6, 'hour'),
+        td: new Unit(30, 'min'),
       }),
     },
     {
-      name: 'Fridge heater',
+      name: 'Fridge heating element (beer constant)',
+      generate: (): Partial<PidData> => ({
+        kp: new Unit(100, '1/degC'),
+        ti: new Unit(6, 'hour'),
+        td: new Unit(30, 'min'),
+      }),
+    },
+    {
+      name: 'Fridge cooling compressor (fridge constant)',
+      generate: (): Partial<PidData> => ({
+        kp: new Unit(-50, '1/degC'),
+        ti: new Unit(2, 'hour'),
+        td: new Unit(10, 'min'),
+      }),
+    },
+    {
+      name: 'Fridge heating element (fridge constant)',
       generate: (): Partial<PidData> => ({
         kp: new Unit(20, '1/degC'),
         ti: new Unit(2, 'hour'),
-        td: new Unit(0, 'min'),
+        td: new Unit(10, 'min'),
       }),
     },
     {
@@ -123,13 +142,13 @@ const block: BlockSpec = {
       key: 'inputId',
       title: 'Input',
       component: 'LinkValEdit',
-      generate: () => new SetpointSensorPairLink(null),
+      generate: () => new Link(null, interfaceTypes.SetpointSensorPair),
     },
     {
       key: 'outputId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new ActuatorAnalogLink(null),
+      generate: () => new Link(null, interfaceTypes.ActuatorAnalog),
     },
   ],
   graphTargets: {
@@ -147,12 +166,11 @@ const block: BlockSpec = {
 };
 
 const feature: Feature = {
-  ...GenericBlock,
+  ...genericBlockFeature,
   id: typeName,
   displayName: 'PID',
   role: 'Control',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: blockWidgetSelector(PidWidget),
   widgetSize: {
     cols: 4,
     rows: 3,

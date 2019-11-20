@@ -1,9 +1,8 @@
-import { ref } from '@/helpers/component-ref';
-import GenericBlock from '@/plugins/spark/components/GenericBlock';
+import { genericBlockFeature } from '@/plugins/spark/generic';
+import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
 import { Feature } from '@/store/features';
 
-import form from './ActuatorAnalogMockForm.vue';
 import widget from './ActuatorAnalogMockWidget.vue';
 import { typeName } from './getters';
 import { ActuatorAnalogMockData } from './types';
@@ -59,12 +58,11 @@ const block: BlockSpec = {
 };
 
 const feature: Feature = {
-  ...GenericBlock,
+  ...genericBlockFeature,
   id: typeName,
   displayName: 'Analog Actuator (Mock)',
   role: 'Output',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 2,

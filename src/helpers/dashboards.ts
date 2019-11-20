@@ -1,10 +1,13 @@
 import isString from 'lodash/isString';
-import { Dialog, Notify } from 'quasar';
+import { Notify } from 'quasar';
 import UrlSafeString from 'url-safe-string';
 
+import { createDialog } from '@/helpers/dialog';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 import { suggestId } from './functional';
+
+type IdChangedCallback = (id: string) => void;
 
 const urlGenerator = new UrlSafeString();
 
@@ -15,14 +18,14 @@ export const dashboardIdRules = (): InputRule[] => [
 ];
 
 export const changeDashboardId =
-  async (oldId: string, newId: string, onIdChanged: (id: string) => void): Promise<void> => {
+  async (oldId: string, newId: string, onIdChanged: IdChangedCallback): Promise<void> => {
     const dashboard = dashboardStore.dashboardById(oldId);
 
     await dashboardStore.createDashboard({ ...dashboard, id: newId });
     await Promise.all(
-      dashboardStore.itemValues
+      dashboardStore.widgetValues
         .filter(item => item.dashboard === oldId)
-        .map(item => dashboardStore.saveDashboardItem({ ...item, dashboard: newId }))
+        .map(item => dashboardStore.savePersistentWidget({ ...item, dashboard: newId }))
     );
     await dashboardStore.removeDashboard({ ...dashboard });
 
@@ -40,8 +43,8 @@ export const changeDashboardId =
   };
 
 export const startChangeDashboardId =
-  (dashboard: Dashboard, onIdChanged: (id: string) => void = (() => { })): void => {
-    Dialog.create({
+  (dashboard: Dashboard, onIdChanged: IdChangedCallback = (() => { })): void => {
+    createDialog({
       component: 'InputDialog',
       value: dashboard.id,
       title: 'Change dashboard ID',
@@ -57,11 +60,10 @@ export const startChangeDashboardId =
   };
 
 export const startChangeDashboardTitle =
-  (dashboard: Dashboard, onIdChanged: (id: string) => void = (() => { })): void => {
-    Dialog.create({
+  (dashboard: Dashboard, onIdChanged: IdChangedCallback = (() => { })): void => {
+    createDialog({
       title: 'Change dashboard Title',
       message: "Change your dashboard's display name",
-      dark: true,
       cancel: true,
       prompt: {
         model: dashboard.title,
@@ -89,10 +91,9 @@ export const startChangeDashboardTitle =
         const rules = dashboardIdRules();
         const suggestedId = suggestId(defaultId, val => !rules.some(f => isString(f(val))));
 
-        Dialog.create({
+        createDialog({
           title: 'Update dashboard URL',
           message: `Do you want to change the dashboard ID from '${oldId}' to '${suggestedId}'?`,
-          dark: true,
           cancel: true,
         })
           .onOk(() => changeDashboardId(oldId, suggestedId, onIdChanged));
@@ -101,10 +102,9 @@ export const startChangeDashboardTitle =
 
 export const startRemoveDashboard =
   (dashboard: Dashboard): void => {
-    Dialog.create({
+    createDialog({
       title: 'Remove dashboard',
       message: `Are you sure you want to remove ${dashboard.title}?`,
-      dark: true,
       ok: 'Confirm',
       cancel: 'Cancel',
     })

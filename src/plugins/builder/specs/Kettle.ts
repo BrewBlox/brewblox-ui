@@ -1,13 +1,18 @@
-import { Coordinates } from '@/helpers/coordinates';
-
-import { IN_OUT } from '../getters';
+import { containerTransitions } from '../helpers';
 import { PartSpec, PersistentPart } from '../types';
 
-const DEFAULT_SIZE_X = 4;
-const DEFAULT_SIZE_Y = 6;
+export const DEFAULT_FILL_PCT = 85;
+export const DEFAULT_SIZE_X = 4;
+export const DEFAULT_SIZE_Y = 6;
+
+const size = (part: PersistentPart): [number, number] => [
+  part.settings.sizeX || DEFAULT_SIZE_X,
+  part.settings.sizeY || DEFAULT_SIZE_Y,
+];
 
 const spec: PartSpec = {
   id: 'Kettle',
+  title: 'Kettle',
   cards: [
     { component: 'TextCard' },
     { component: 'ColorCard' },
@@ -31,52 +36,20 @@ const spec: PartSpec = {
         max: 10,
       },
     },
-  ],
-  size: (part: PersistentPart) => [
-    part.settings.sizeX || DEFAULT_SIZE_X,
-    part.settings.sizeY || DEFAULT_SIZE_Y,
-  ],
-  transitions: (part: PersistentPart) => {
-    const sizeX: number = DEFAULT_SIZE_X;
-    const sizeY: number = DEFAULT_SIZE_Y;
-
-    const middleCoords = Array(sizeX * sizeY).fill(0).map((v, n) => {
-      const coord = new Coordinates({ x: (n % sizeX) + 0.5, y: Math.floor(n / sizeX) + 0.5, z: 0 });
-      return coord.toString();
-    });
-
-    const result = {
-      [IN_OUT]: [{
-        outCoords: '0,0,-2',
-        pressure: 0,
-        liquids: part.settings.color ? [part.settings.color] : [],
-        internal: true,
-        source: true,
+    {
+      component: 'SizeCard',
+      props: {
+        settingsKey: 'fillPct',
+        defaultSize: DEFAULT_FILL_PCT,
+        label: 'Liquid level (%)',
+        min: 0,
+        max: 100,
       },
-      ],
-      '0,0,-2': [
-        ...middleCoords.map(item => ({
-          outCoords: item,
-        })),
-      ],
-      '0,0,-3': [
-        {
-          outCoords: IN_OUT,
-          sink: true,
-          internal: true,
-        },
-      ],
-    };
-
-
-    middleCoords.forEach(item => (
-      result[item] = [{
-        outCoords: '0,0,-3',
-        internal: true,
-      },
-      ]));
-    return result;
-  },
+    },
+  ],
+  size,
+  transitions: (part: PersistentPart) =>
+    containerTransitions(size(part), part.settings.color),
 };
 
 export default spec;

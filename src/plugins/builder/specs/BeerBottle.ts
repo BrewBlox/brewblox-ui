@@ -5,6 +5,7 @@ const SIZE_Y = 2;
 
 const spec: PartSpec = {
   id: 'BeerBottle',
+  title: 'Beer bottle',
   cards: [
     { component: 'ColorCard' },
   ],

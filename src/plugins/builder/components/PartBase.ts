@@ -1,14 +1,16 @@
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import { Coordinates, rotatedSize } from '@/helpers/coordinates';
+import { Coordinates } from '@/helpers/coordinates';
 
 import { SQUARE_SIZE } from '../getters';
+import { squares, textTransformation } from '../helpers';
 import { CalculatedFlows, FlowPart } from '../types';
 
 @Component
 export default class PartBase extends Vue {
   public SQUARE_SIZE: number = SQUARE_SIZE;
+  public squares = squares;
 
   @Prop({ type: Object, required: true })
   public readonly value!: FlowPart;
@@ -41,7 +43,7 @@ export default class PartBase extends Vue {
     return this.part.flows;
   }
 
-  public get settings(): Record<string, any> {
+  public get settings(): Mapped<any> {
     return this.part.settings || {};
   }
 
@@ -57,24 +59,13 @@ export default class PartBase extends Vue {
     return this.size[1];
   }
 
-  public squares(val: number): number {
-    return SQUARE_SIZE * val;
-  }
-
   public textTransformation(textSize: [number, number], counterRotate = true): string {
-    const [sizeX] = rotatedSize(this.part.rotate, textSize);
-    const transforms: string[] = [];
-    if (this.flipped) {
-      transforms.push(`translate(${this.squares(sizeX)}, 0) scale(-1,1)`);
-    }
-    if (this.part.rotate && counterRotate) {
-      transforms.push(`rotate(${-this.part.rotate},${this.squares(0.5)},${this.squares(0.5)})`);
-    }
-    return transforms.join(' ');
+    return textTransformation(this.part, textSize, counterRotate);
   }
 
   private rotatedCoord(coord: string): string {
     return new Coordinates(coord)
+      .flipShapeEdge(!!this.flipped, 0, this.size)
       .rotateShapeEdge(this.part.rotate, 0, this.size)
       .toString();
   }

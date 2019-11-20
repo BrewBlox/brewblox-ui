@@ -27,6 +27,10 @@ export interface PidData {
 
   drivenOutputId: Link;
   integralReset: number;
+
+  boilPointAdjust: Unit;
+  boilMinOutput: number;
+  boilModeActive: boolean;
 }
 
 export interface PidBlock extends Block {

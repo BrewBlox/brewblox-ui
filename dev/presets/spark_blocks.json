@@ -3,23 +3,32 @@
     {
       "id": "ActiveGroups",
       "nid": 1,
-      "groups": [7],
+      "groups": [
+        7
+      ],
       "type": "Groups",
       "data": {
-        "active": [0, 7]
+        "active": [
+          0,
+          7
+        ]
       }
     },
     {
       "id": "SystemInfo",
       "nid": 2,
-      "groups": [7],
+      "groups": [
+        7
+      ],
       "type": "SysInfo",
       "data": {}
     },
     {
       "id": "OneWireBus",
       "nid": 4,
-      "groups": [7],
+      "groups": [
+        7
+      ],
       "type": "OneWireBus",
       "data": {
         "address": []
@@ -28,7 +37,9 @@
     {
       "id": "WiFiSettings",
       "nid": 5,
-      "groups": [7],
+      "groups": [
+        7
+      ],
       "type": "WiFiSettings",
       "data": {
         "ssid": "",
@@ -42,7 +53,9 @@
     {
       "id": "TouchSettings",
       "nid": 6,
-      "groups": [7],
+      "groups": [
+        7
+      ],
       "type": "TouchSettings",
       "data": {
         "calibrated": 1,
@@ -55,7 +68,9 @@
     {
       "id": "SparkPins",
       "nid": 19,
-      "groups": [7],
+      "groups": [
+        7
+      ],
       "type": "Spark3Pins",
       "data": {
         "pins": [
@@ -100,7 +115,9 @@
     {
       "id": "balancer-1",
       "nid": 200,
-      "groups": [0],
+      "groups": [
+        0
+      ],
       "type": "Balancer",
       "data": {
         "clients": []
@@ -109,7 +126,9 @@
     {
       "id": "mutex-1",
       "nid": 201,
-      "groups": [0],
+      "groups": [
+        0
+      ],
       "type": "Mutex",
       "data": {
         "waitRemaining[second]": 0,
@@ -119,7 +138,9 @@
     {
       "id": "profile-1",
       "nid": 202,
-      "groups": [0],
+      "groups": [
+        0
+      ],
       "type": "SetpointProfile",
       "data": {
         "points": [
@@ -152,7 +173,9 @@
     {
       "id": "sensor-1",
       "nid": 204,
-      "groups": [0],
+      "groups": [
+        0
+      ],
       "type": "TempSensorMock",
       "data": {
         "connected": true,
@@ -162,7 +185,9 @@
     {
       "id": "sensor-onewire-1",
       "nid": 205,
-      "groups": [0],
+      "groups": [
+        0
+      ],
       "type": "TempSensorOneWire",
       "data": {
         "address": "deadbeef00000000",
@@ -173,7 +198,9 @@
     {
       "id": "setpoint-sensor-pair-1",
       "nid": 206,
-      "groups": [0],
+      "groups": [
+        0
+      ],
       "type": "SetpointSensorPair",
       "data": {
         "settingEnabled": true,
@@ -188,7 +215,9 @@
     {
       "id": "setpoint-sensor-pair-2",
       "nid": 207,
-      "groups": [0],
+      "groups": [
+        0
+      ],
       "type": "SetpointSensorPair",
       "data": {
         "settingEnabled": true,
@@ -201,7 +230,9 @@
     {
       "id": "DisplaySettings",
       "nid": 7,
-      "groups": [7],
+      "groups": [
+        7
+      ],
       "type": "DisplaySettings",
       "data": {
         "widgets": [
@@ -237,7 +268,9 @@
     {
       "id": "actuator-1",
       "nid": 208,
-      "groups": [0],
+      "groups": [
+        0
+      ],
       "type": "ActuatorAnalogMock",
       "data": {
         "setting": 20,
@@ -254,7 +287,9 @@
     {
       "id": "actuator-pwm-1",
       "nid": 209,
-      "groups": [0],
+      "groups": [
+        0
+      ],
       "type": "ActuatorPwm",
       "data": {
         "constrainedBy": {
@@ -284,7 +319,9 @@
     {
       "id": "offset-1",
       "nid": 211,
-      "groups": [0],
+      "groups": [
+        0
+      ],
       "type": "ActuatorOffset",
       "data": {
         "referenceSettingOrValue": 0,
@@ -299,7 +336,9 @@
     {
       "id": "pid-1",
       "nid": 212,
-      "groups": [0],
+      "groups": [
+        0
+      ],
       "type": "Pid",
       "data": {
         "enabled": true,
@@ -325,7 +364,9 @@
     {
       "id": "ds2413-hw-1",
       "nid": 213,
-      "groups": [0],
+      "groups": [
+        0
+      ],
       "type": "DS2413",
       "data": {
         "address": "4444444444444444"
@@ -334,124 +375,270 @@
     {
       "id": "pin-actuator-1",
       "nid": 215,
-      "groups": [0],
+      "groups": [
+        0
+      ],
       "type": "DigitalActuator",
       "data": {
         "channel": 1,
         "hwDevice<IoArrayInterface,driven>": "SparkPins",
-        "constrainedBy": { "constraints": [{ "limiting": false, "mutex<MutexInterface>": "mutex-1" }] }
+        "constrainedBy": {
+          "constraints": [
+            {
+              "limiting": false,
+              "mutex<MutexInterface>": "mutex-1"
+            }
+          ]
+        }
       }
     },
     {
       "id": "pin-actuator-2",
       "nid": 216,
-      "groups": [0],
+      "groups": [
+        0
+      ],
       "type": "DigitalActuator",
       "data": {
         "channel": 2,
         "hwDevice<IoArrayInterface,driven>": "SparkPins",
-        "constrainedBy": { "constraints": [{ "limiting": false, "mutex<MutexInterface>": "mutex-1" }] }
+        "constrainedBy": {
+          "constraints": [
+            {
+              "limiting": false,
+              "mutex<MutexInterface>": "mutex-1"
+            }
+          ]
+        }
       }
     },
     {
       "id": "pin-actuator-3",
       "nid": 217,
-      "groups": [0],
+      "groups": [
+        0
+      ],
       "type": "DigitalActuator",
       "data": {}
+    },
+    {
+      "id": "mock-sensor-1",
+      "nid": 218,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorMock",
+      "data": {
+        "connected": true,
+        "value[degC]": 20
+      }
+    },
+    {
+      "id": "mock-sensor-2",
+      "nid": 219,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorMock",
+      "data": {
+        "connected": true,
+        "value[degC]": 20
+      }
+    },
+    {
+      "id": "mock-sensor-3",
+      "nid": 220,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorMock",
+      "data": {
+        "connected": true,
+        "value[degC]": 20
+      }
     }
   ],
   "store": [
     {
-      "keys": ["ActiveGroups", 1],
+      "keys": [
+        "ActiveGroups",
+        1
+      ],
       "data": {}
     },
     {
-      "keys": ["SystemInfo", 2],
+      "keys": [
+        "SystemInfo",
+        2
+      ],
       "data": {}
     },
     {
-      "keys": ["SystemTime", 3],
+      "keys": [
+        "SystemTime",
+        3
+      ],
       "data": {}
     },
     {
-      "keys": ["OneWireBus", 4],
+      "keys": [
+        "OneWireBus",
+        4
+      ],
       "data": {}
     },
     {
-      "keys": ["WiFiSettings", 5],
+      "keys": [
+        "WiFiSettings",
+        5
+      ],
       "data": {}
     },
     {
-      "keys": ["TouchSettings", 6],
+      "keys": [
+        "TouchSettings",
+        6
+      ],
       "data": {}
     },
     {
-      "keys": ["DisplaySettings", 7],
+      "keys": [
+        "DisplaySettings",
+        7
+      ],
       "data": {}
     },
     {
-      "keys": ["balancer-1", 200],
+      "keys": [
+        "balancer-1",
+        200
+      ],
       "data": {}
     },
     {
-      "keys": ["mutex-1", 201],
+      "keys": [
+        "mutex-1",
+        201
+      ],
       "data": {}
     },
     {
-      "keys": ["profile-1", 202],
+      "keys": [
+        "profile-1",
+        202
+      ],
       "data": {}
     },
     {
-      "keys": ["sensor-inactive", 203],
+      "keys": [
+        "sensor-inactive",
+        203
+      ],
       "data": {}
     },
     {
-      "keys": ["sensor-1", 204],
+      "keys": [
+        "sensor-1",
+        204
+      ],
       "data": {}
     },
     {
-      "keys": ["sensor-onewire-1", 205],
+      "keys": [
+        "sensor-onewire-1",
+        205
+      ],
       "data": {}
     },
     {
-      "keys": ["setpoint-sensor-pair-1", 206],
+      "keys": [
+        "setpoint-sensor-pair-1",
+        206
+      ],
       "data": {}
     },
     {
-      "keys": ["setpoint-sensor-pair-2", 207],
+      "keys": [
+        "setpoint-sensor-pair-2",
+        207
+      ],
       "data": {}
     },
     {
-      "keys": ["actuator-1", 208],
+      "keys": [
+        "actuator-1",
+        208
+      ],
       "data": {}
     },
     {
-      "keys": ["actuator-pwm-1", 209],
+      "keys": [
+        "actuator-pwm-1",
+        209
+      ],
       "data": {}
     },
     {
-      "keys": ["offset-1", 211],
+      "keys": [
+        "offset-1",
+        211
+      ],
       "data": {}
     },
     {
-      "keys": ["pid-1", 212],
+      "keys": [
+        "pid-1",
+        212
+      ],
       "data": {}
     },
     {
-      "keys": ["ds2413-hw-1", 213],
+      "keys": [
+        "ds2413-hw-1",
+        213
+      ],
       "data": {}
     },
     {
-      "keys": ["pin-actuator-1", 215],
+      "keys": [
+        "pin-actuator-1",
+        215
+      ],
       "data": {}
     },
     {
-      "keys": ["pin-actuator-2", 216],
+      "keys": [
+        "pin-actuator-2",
+        216
+      ],
       "data": {}
     },
     {
-      "keys": ["pin-actuator-3", 217],
+      "keys": [
+        "pin-actuator-3",
+        217
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "mock-sensor-1",
+        218
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "mock-sensor-2",
+        219
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "mock-sensor-3",
+        220
+      ],
       "data": {}
     }
   ]

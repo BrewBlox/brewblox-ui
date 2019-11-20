@@ -12,7 +12,7 @@ export const profileGraphProps = (block: SetpointProfileBlock): GraphProps => {
   const now = new Date().getTime();
   return {
     data: [{
-      name: 'Setpoints',
+      name: `${block.data.targetId.id || ''} setting`,
       type: 'scatter',
       x: block.data.points.map(p => start + (p.time * 1000)),
       y: block.data.points.map(p => p.temperature.value),

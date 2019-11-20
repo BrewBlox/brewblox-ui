@@ -23,11 +23,12 @@ export default class SizeCard extends PartCard {
   public readonly label!: string;
 
   get size(): number {
-    return this.part.settings[this.settingsKey] || this.defaultSize;
+    const val = this.part.settings[this.settingsKey];
+    return (typeof val === 'number') ? val : this.defaultSize;
   }
 
   save(val: number): void {
-    const size = val || this.defaultSize;
+    const size = (typeof val === 'number') ? val : this.defaultSize;
     this.savePartSettings({ ...this.part.settings, [this.settingsKey]: size });
   }
 
@@ -36,14 +37,14 @@ export default class SizeCard extends PartCard {
 </script>
 
 <template>
-  <q-list dark>
-    <q-separator dark />
-    <q-item dark>
+  <q-list>
+    <q-separator />
+    <q-item>
       <q-item-section>
         <q-item-label caption>
           {{ label }}
         </q-item-label>
-        <q-slider :value="size" :min="min" :max="max" dark label @change="debouncedSave" />
+        <q-slider :value="size" :min="min" :max="max" label @change="debouncedSave" />
       </q-item-section>
     </q-item>
   </q-list>

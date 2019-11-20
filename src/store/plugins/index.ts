@@ -4,13 +4,7 @@ import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-dec
 import { objReducer } from '@/helpers/functional';
 import store from '@/store';
 
-import {
-  createPlugin as createPluginInApi,
-  deletePlugin as removePluginInApi,
-  fetchPlugins as fetchPluginsInApi,
-  persistPlugin as persistPluginInApi,
-  setup as setupInApi,
-} from './api';
+import api from './api';
 
 export interface UIPlugin {
   id: string;
@@ -32,8 +26,9 @@ const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'plugins' })
 export class PluginModule extends VuexModule {
-  public plugins: Record<string, UIPlugin> = {};
-  public results: Record<string, UIPluginResult> = {};
+  private setupActions: string[] = [];
+  public plugins: Mapped<UIPlugin> = {};
+  public results: Mapped<UIPluginResult> = {};
 
   public get pluginValues(): UIPlugin[] {
     return Object.values(this.plugins);
@@ -64,32 +59,50 @@ export class PluginModule extends VuexModule {
     Vue.set(this.results, result.id, result);
   }
 
+  @Mutation
+  private commitSetupActions(actions: string[]): void {
+    this.setupActions = [...actions];
+  }
+
   @Action({ rawError })
   public async fetchPlugins(): Promise<UIPlugin[]> {
-    const plugins = await fetchPluginsInApi();
+    const plugins = await api.fetch();
     this.commitAllPlugins(plugins);
     return plugins;
   }
 
   @Action({ rawError })
   public async createPlugin(plugin: UIPlugin): Promise<void> {
-    this.commitPlugin(await createPluginInApi(plugin));
+    this.commitPlugin(await api.create(plugin));
   }
 
   @Action({ rawError })
   public async savePlugin(plugin: UIPlugin): Promise<void> {
-    this.commitPlugin(await persistPluginInApi(plugin));
+    this.commitPlugin(await api.persist(plugin));
   }
 
   @Action({ rawError })
   public async removePlugin(plugin: UIPlugin): Promise<void> {
-    await removePluginInApi(plugin);
+    await api.remove(plugin);
     this.commitRemovePlugin(plugin);
   }
 
   @Action({ rawError })
+  public async onSetup(action: string): Promise<void> {
+    this.commitSetupActions([...this.setupActions, action]);
+  }
+
+  @Action({ rawError })
   public async setup(): Promise<void> {
-    setupInApi(() => { }, () => { });
+    await Promise.all(
+      this.setupActions
+        .map(a => store.dispatch(a)));
+  }
+
+  @Action({ rawError })
+  public async init(): Promise<void> {
+    this.commitSetupActions([]);
+    api.setup(() => { }, () => { });
   }
 }
 

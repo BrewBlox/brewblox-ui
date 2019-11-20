@@ -27,7 +27,28 @@ module.exports = {
     'no-param-reassign': 0,
     'no-console': 'warn',
     'no-multiple-empty-lines': 'error',
-    'vue/max-attributes-per-line': 0,
+    'vue/max-attributes-per-line': ['warn', {
+      'order': [
+        'DEFINITION',
+        'LIST_RENDERING',
+        'CONDITIONALS',
+        'RENDER_MODIFIERS',
+        'GLOBAL',
+        'UNIQUE',
+        'TWO_WAY_BINDING',
+        'OTHER_DIRECTIVES',
+        'OTHER_ATTR',
+        'EVENTS',
+        'CONTENT'
+      ]
+    }],
+    "vue/max-attributes-per-line": ["warn", {
+      "singleline": 8,
+      "multiline": {
+        "max": 1,
+        "allowFirstLine": false
+      }
+    }],
     'vue/html-self-closing': 0,
     'comma-dangle': [
       'error',
@@ -45,6 +66,7 @@ module.exports = {
     ],
     '@typescript-eslint/indent': 0,
     '@typescript-eslint/no-explicit-any': 0,
+    '@typescript-eslint/no-non-null-assertion': 0,
     '@typescript-eslint/explicit-function-return-type': ['warn', {
       allowExpressions: true,
       allowTypedFunctionExpressions: true,

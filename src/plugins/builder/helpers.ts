@@ -1,10 +1,14 @@
 import get from 'lodash/get';
 
+import { Coordinates, rotatedSize } from '@/helpers/coordinates';
+import { createDialog, showBlockDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
+import { dashboardStore } from '@/store/dashboards';
 
+import { SQUARE_SIZE } from './getters';
 import { builderStore } from './store';
-import { FlowPart, LinkedBlock, PersistentPart, StatePart } from './types';
+import { FlowPart, LinkedBlock, PersistentPart, Rect, StatePart, Transitions } from './types';
 
 export function settingsBlock<T extends Block>(part: PersistentPart, key: string): T | null {
   const serviceId = get(part.settings, [key, 'serviceId'], null);
@@ -27,7 +31,7 @@ export function asPersistentPart(part: PersistentPart | FlowPart): PersistentPar
 }
 
 export function asStatePart(part: PersistentPart): StatePart {
-  const spec = builderStore.specById(part.type);
+  const spec = builderStore.spec(part);
   return {
     ...part,
     transitions: spec.transitions(part),
@@ -83,4 +87,106 @@ export function horizontalChevrons(cX: number, cY: number): { left: string[]; ri
       `${cX - ldist},${cY - d3}  ${cX - ldist},${cY}  ${cX - ldist},${cY + d3}`,
     ],
   };
+}
+
+export function colorString(val: string | null): string {
+  return val
+    ? (val.startsWith('#') ? val : `#${val}`)
+    : '';
+}
+
+export function containerTransitions([sizeX, sizeY]: [number, number], color?: string): Transitions {
+  const coords = Array(sizeX * sizeY)
+    .fill(0)
+    .map((_, n) => {
+      const outFlow = new Coordinates({ x: (n % sizeX) + 0.5, y: Math.floor(n / sizeX) + 0.5, z: 0 });
+      const inFlow = new Coordinates({ x: (n % sizeX) + 0.1, y: Math.floor(n / sizeX) + 0.1, z: 0 });
+      return { in: inFlow.toString(), out: outFlow.toString() };
+    });
+
+  const result = {};
+
+  coords.forEach(item => {
+    result[item.out] = [{
+      outCoords: item.in,
+      friction: 0,
+      sink: true,
+    }];
+    result[item.in] = [{
+      outCoords: item.out,
+      pressure: 0,
+      friction: 0,
+      liquids: color ? [color] : [],
+      source: true,
+    }];
+  });
+
+  return result;
+}
+
+export function squares(val: number): number {
+  return SQUARE_SIZE * val;
+}
+
+export function textTransformation(part: PersistentPart, textSize: [number, number], counterRotate = true): string {
+  const [sizeX] = rotatedSize(part.rotate, textSize);
+  const transforms: string[] = [];
+  if (part.flipped) {
+    transforms.push(`translate(${squares(sizeX)}, 0) scale(-1,1)`);
+  }
+  if (part.rotate && counterRotate) {
+    transforms.push(`rotate(${-part.rotate},${squares(0.5 * textSize[0])},${squares(0.5 * textSize[1])})`);
+  }
+  return transforms.join(' ');
+}
+
+export function elbow(dX: number, dY: number, horizontal: boolean): string {
+  const dx1 = horizontal ? 0.5 * dX : 0;
+  const dy1 = horizontal ? 0 : 0.5 * dY;
+  const dx2 = horizontal ? dX : 0.5 * dX;
+  const dy2 = horizontal ? 0.5 * dY : dY;
+  return `c${dx1},${dy1} ${dx2},${dy2} ${dX},${dY}`;
+}
+
+export function showLinkedBlockDialog(part: PersistentPart, key: string): void {
+  const block = settingsBlock(part, key);
+  if (block) {
+    showBlockDialog(block, { mode: 'Basic' });
+  }
+  else {
+    const link = settingsLink(part, key);
+    if (!!link.serviceId && !!link.blockId) {
+      createDialog({
+        title: 'Broken Link',
+        message: `Block '${link.blockId}' was not found. Use the editor to change the link.`,
+      });
+    }
+  }
+}
+
+export function showLinkedWidgetDialog(part: PersistentPart, key: string): void {
+  const widgetId = part.settings[key];
+  if (!widgetId) {
+    return;
+  }
+  else if (dashboardStore.widgetIds.includes(widgetId)) {
+    createDialog({
+      component: 'StoreWidgetDialog',
+      mode: 'Basic',
+      widgetId,
+    });
+  }
+  else {
+    createDialog({
+      title: 'Broken Link',
+      message: 'Widget was not found. Use the editor to change the link.',
+    });
+  }
+}
+
+export function rectContains(rect: Rect, x: number, y: number): boolean {
+  return x >= rect.left
+    && x <= rect.right
+    && y >= rect.top
+    && y <= rect.bottom;
 }

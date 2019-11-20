@@ -5,22 +5,26 @@ import { objReducer } from '@/helpers/functional';
 import store from '@/store';
 
 import { BuilderLayout, PartSpec } from '../types';
-import {
-  createLayout as createLayoutInApi,
-  deleteLayout as removeLayoutInApi,
-  fetchLayouts as fetchLayoutsInApi,
-  persistLayout as persistLayoutInApi,
-  setup as setupInApi,
-} from './api';
+import api from './api';
+
+const fallbackSpec: PartSpec = {
+  id: '',
+  title: 'Unknown Part',
+  component: 'UnknownPart',
+  cards: [],
+  size: () => [1, 1],
+  transitions: () => ({}),
+};
 
 const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'builder' })
 export class BuilderModule extends VuexModule {
-  public specs: Record<string, PartSpec> = {};
+  private specs: Mapped<PartSpec> = {};
+
   public editorActive = false;
-  public editorTool = '';
-  public layouts: Record<string, BuilderLayout> = {};
+  public editorMode = '';
+  public layouts: Mapped<BuilderLayout> = {};
 
   public get layoutIds(): string[] {
     return Object.keys(this.layouts);
@@ -42,13 +46,13 @@ export class BuilderModule extends VuexModule {
     return Object.values(this.specs);
   }
 
-  public get specById(): (id: string) => PartSpec {
-    return id => this.specs[id] || null;
+  public get spec(): ({ type }: { type: string }) => PartSpec {
+    return ({ type }) => this.specs[type] || fallbackSpec;
   }
 
-  public get componentById(): (id: string) => string {
-    return id => {
-      const spec = this.specs[id] || { id: null };
+  public get component(): ({ type }: { type: string }) => string {
+    return ({ type }) => {
+      const spec = this.spec({ type });
       return spec.component || spec.id;
     };
   }
@@ -64,8 +68,8 @@ export class BuilderModule extends VuexModule {
   }
 
   @Mutation
-  public commitEditorTool(tool: string): void {
-    this.editorTool = tool;
+  public commitEditorMode(tool: string): void {
+    this.editorMode = tool;
   }
 
   @Mutation
@@ -85,24 +89,23 @@ export class BuilderModule extends VuexModule {
 
   @Action({ rawError })
   public async createLayout(layout: BuilderLayout): Promise<void> {
-    this.commitLayout(await createLayoutInApi(layout));
+    this.commitLayout(await api.create(layout));
   }
 
   @Action({ rawError })
   public async saveLayout(layout: BuilderLayout): Promise<void> {
-    this.commitLayout(await persistLayoutInApi(layout));
+    this.commitLayout(await api.persist(layout));
   }
 
   @Action({ rawError })
   public async removeLayout(layout: BuilderLayout): Promise<void> {
-    await removeLayoutInApi(layout)
+    await api.remove(layout)
       .catch(() => { });
     this.commitRemoveLayout(layout);
   }
 
   @Action({ rawError })
   public async setup(): Promise<void> {
-    /* eslint-disable no-underscore-dangle */
     const onChange = async (layout: BuilderLayout): Promise<void> => {
       const existing = this.layoutById(layout.id);
       if (!existing || existing._rev !== layout._rev) {
@@ -115,10 +118,9 @@ export class BuilderModule extends VuexModule {
         this.removeLayout(existing);
       }
     };
-    /* eslint-enable no-underscore-dangle */
 
-    this.commitAllLayouts(await fetchLayoutsInApi());
-    setupInApi(onChange, onDelete);
+    this.commitAllLayouts(await api.fetch());
+    api.setup(onChange, onDelete);
   }
 }
 

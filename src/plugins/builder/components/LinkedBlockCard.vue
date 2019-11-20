@@ -1,12 +1,12 @@
 <script lang="ts">
 import get from 'lodash/get';
-import { Dialog } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
-import { serviceStore } from '@/store/services';
+import { Service, serviceStore } from '@/store/services';
 
 import { settingsLink } from '../helpers';
 import { LinkedBlock } from '../types';
@@ -30,6 +30,11 @@ export default class LinkedBlockCard extends PartCard {
   @Prop({ type: Boolean, default: false })
   public readonly noCreate!: boolean;
 
+  get sparkServices(): Service[] {
+    return serviceStore.serviceValues
+      .filter(svc => svc.type === 'Spark');
+  }
+
   get linked(): LinkedBlock {
     return settingsLink(this.part, this.settingsKey);
   }
@@ -41,39 +46,42 @@ export default class LinkedBlockCard extends PartCard {
     });
   }
 
+  get broken(): boolean {
+    return !!this.linked.serviceId
+      && !!this.linked.blockId
+      && !sparkStore.tryBlockById(this.linked.serviceId, this.linked.blockId);
+  }
+
+  get linkedOpts(): { label: string; value: LinkedBlock }[] {
+    const sorter = objectStringSorter('id');
+    return this.sparkServices
+      .flatMap(svc => sparkStore.blockValues(svc.id)
+        .map(block => new Link(block.id, block.type))
+        .filter(this.actualFilter)
+        .sort(sorter)
+        .map(link => ({
+          label: `[${svc.id}] ${link.id}`,
+          value: {
+            serviceId: svc.id,
+            blockId: link.id,
+          },
+        }))
+      );
+  }
+
   get serviceId(): string | null {
     return this.linked.serviceId;
   }
 
-  set serviceId(serviceId: string | null) {
-    const blockId = serviceId === this.serviceId
-      ? this.linked.blockId
-      : null;
-    this.linked = { serviceId, blockId };
-  }
-
-  get link(): Link {
-    return new Link(this.linked.blockId);
-  }
-
-  set link(newVal: Link) {
-    const blockId = !!newVal
-      ? newVal.id
-      : null;
-    this.linked = { serviceId: this.serviceId, blockId };
-  }
-
-  get serviceOptions(): string[] {
-    return serviceStore.serviceIds;
-  }
-
   get compatibleTypes(): string[] {
-    if (!this.serviceId) {
+    if (!this.sparkServices.length) {
       return [];
     }
-    const compatibleTable = sparkStore.compatibleTypes(this.serviceId);
-    return this.types
-      .reduce((acc, type) => [...acc, ...get(compatibleTable, type, [])], [...this.types]);
+    const compatibleTable = sparkStore.compatibleTypes(this.sparkServices[0].id);
+    return [
+      ...this.types,
+      ...this.types.flatMap(type => get(compatibleTable, type, [])),
+    ];
   }
 
   get actualFilter(): (link: Link) => boolean {
@@ -83,85 +91,72 @@ export default class LinkedBlockCard extends PartCard {
     return block => !this.compatibleTypes || this.compatibleTypes.includes(block.type || '');
   }
 
-  get linkOpts(): Link[] {
-    if (!this.serviceId) {
-      return [];
-    }
-    return sparkStore.blockValues(this.serviceId)
-      .map(block => new Link(block.id, block.type))
-      .filter(this.actualFilter)
-      .sort(objectStringSorter('id'));
-  }
-
-  create(): void {
-    Dialog.create({
+  createBlock(serviceId: string): void {
+    createDialog({
       component: 'BlockWizardDialog',
-      root: this.$root,
-      serviceId: this.serviceId,
+      parent: this,
+      serviceId,
       filter: feat => !this.compatibleTypes || this.compatibleTypes.includes(feat),
     })
       .onOk(block => {
-        this.link = new Link(block.id);
+        this.linked = { serviceId, blockId: block.id };
       });
+  }
+
+  startCreate(): void {
+    if (this.sparkServices.length == 1) {
+      this.createBlock(this.sparkServices[0].id);
+    } else {
+      createDialog({
+        component: 'SelectDialog',
+        parent: this,
+        title: 'Pick a Service',
+        value: this.sparkServices[0].id,
+        selectOptions: this.sparkServices.map(svc => svc.id),
+        selectProps: {
+          label: 'Spark Service',
+        },
+      })
+        .onOk(id => id && this.createBlock(id));
+    }
   }
 }
 </script>
 
 <template>
-  <q-list dark>
-    <q-separator dark />
-    <q-item dark>
+  <q-list>
+    <q-separator />
+    <q-item>
       <q-item-section>
         <q-select
-          v-model="serviceId"
-          :options="serviceOptions"
-          :label="`${label} Service`"
-          dark
-          options-dark
+          v-model="linked"
+          :options="linkedOpts"
+          :label="label"
+          :error="broken"
+          clearable
+          map-options
+          emit-value
         >
-          <template v-slot:no-option>
-            <q-item dark>
+          <template #no-option>
+            <q-item>
               <q-item-section class="text-grey">
                 No results
               </q-item-section>
             </q-item>
           </template>
-        </q-select>
-      </q-item-section>
-    </q-item>
-    <q-item dark>
-      <q-item-section>
-        <q-select
-          v-model="link"
-          :options="linkOpts"
-          :label="label"
-          clearable
-          dark
-          options-dark
-          option-label="id"
-          option-value="id"
-        >
-          <template v-slot:no-option>
-            <q-item dark>
-              <q-item-section v-if="serviceId" class="text-grey">
-                No results
-              </q-item-section>
-              <q-item-section v-else class="text-grey">
-                Please select a service
-              </q-item-section>
-            </q-item>
+          <template #error>
+            <div>Link broken: {{ linked.blockId }} not found</div>
           </template>
-          <template v-if="!noCreate" v-slot:after>
-            <BlockFormButton
-              :disable="!link.id"
-              :block-id="link.id"
+          <template v-if="!noCreate" #after>
+            <BlockDialogButton
+              :block-id="linked.blockId"
               :service-id="serviceId || ''"
               flat
               round
             >
               <q-tooltip>Edit Block</q-tooltip>
-            </BlockFormButton>
-            <q-btn :disable="!serviceId" flat round icon="add" @click="create">
+            </BlockDialogButton>
+            <q-btn :disable="!sparkServices.length" flat round icon="add" @click="startCreate">
               <q-tooltip>Create new Block</q-tooltip>
             </q-btn>
           </template>

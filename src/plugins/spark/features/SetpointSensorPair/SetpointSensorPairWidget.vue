@@ -2,78 +2,73 @@
 import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { sparkStore } from '@/plugins/spark/store';
+import { Block } from '@/plugins/spark/types';
 
-import { sparkStore } from '../../store';
+import SetpointSensorPairBasic from './SetpointSensorPairBasic.vue';
+import SetpointSensorPairFull from './SetpointSensorPairFull.vue';
 import { SetpointSensorPairBlock } from './types';
 
-@Component
-export default class SetpointSensorPairWidget extends BlockWidget {
+@Component({
+  components: {
+    Basic: SetpointSensorPairBasic,
+    Full: SetpointSensorPairFull,
+  },
+})
+export default class SetpointSensorPairWidget extends BlockWidgetBase {
   readonly block!: SetpointSensorPairBlock;
 
-  get isUsed(): boolean {
+  get usedBy(): Block[] {
+    if (!this.crud.isStoreBlock) {
+      return [];
+    }
     return sparkStore.blockValues(this.serviceId)
-      .some(block => get(block, 'data.inputId.id') === this.blockId);
+      .filter(block => get(block, 'data.inputId.id') === this.blockId);
+  }
+
+  get unused(): boolean {
+    return this.crud.isStoreBlock && this.usedBy.length === 0;
+  }
+
+  get disabledString(): string {
+    if (this.usedBy.length > 1) {
+      return `This setpoint is disabled and therefore ${this.usedBy.map(v => `'${v.id}'`).join(' and ')} are inactive.`;
+    } else if (this.usedBy.length === 1) {
+      return `This setpoint is disabled and therefore '${this.usedBy[0].id}' is inactive.`;
+    } else {
+      return 'This setpoint is disabled and is not used.';
+    }
   }
 }
 </script>
 
 <template>
-  <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" />
+  <GraphCardWrapper :show="inDialog">
+    <template #graph>
+      <HistoryGraph :graph-id="widget.id" :config="graphCfg" />
+    </template>
 
-    <CardWarning v-if="!isUsed">
-      <template #message>
-        This Setpoint is not used as PID input.
+    <component :is="mode" :crud="crud" :class="cardClass">
+      <template #toolbar>
+        <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
       </template>
-    </CardWarning>
-    <CardWarning v-else-if="!block.data.settingEnabled">
-      <template #message>
-        <span>This setpoint is disabled.</span>
-      </template>
-      <template #actions>
-        <q-btn
-          text-color="white"
-          flat
-          label="Enable"
-          @click="block.data.settingEnabled = true; saveBlock();"
+
+      <template #warnings>
+        <CardWarning v-if="unused">
+          <template #message>
+            This Setpoint is not used as PID input.
+          </template>
+        </CardWarning>
+        <BlockEnableToggle
+          v-else
+          :crud="crud"
+          :text-disabled="disabledString"
+          text-enabled="Setpoint is enabled."
+          data-key="settingEnabled"
+          class="full-width bordered"
         />
       </template>
-    </CardWarning>
-
-    <q-card-section>
-      <q-item dark>
-        <q-item-section class="q-mr-md">
-          <q-item-label caption>
-            Setting
-          </q-item-label>
-          <UnitField
-            :class="{darkened: !block.data.settingEnabled}"
-            :value="block.data.storedSetting"
-            :readonly="isDriven"
-            title="Setting"
-            tag="big"
-            @input="v => {block.data.storedSetting = v; saveBlock()}"
-          />
-        </q-item-section>
-        <q-item-section class="q-mr-md">
-          <q-item-label caption>
-            Sensor
-          </q-item-label>
-          <UnitField :value="block.data.value" tag="big" readonly />
-        </q-item-section>
-        <q-item-section class="col-auto">
-          <q-item-label caption>
-            Unfiltered sensor
-          </q-item-label>
-          <UnitField :value="block.data.valueUnfiltered" tag="big" readonly />
-        </q-item-section>
-      </q-item>
-      <q-item dark>
-        <q-item-section>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-  </q-card>
+    </component>
+  </GraphCardWrapper>
 </template>

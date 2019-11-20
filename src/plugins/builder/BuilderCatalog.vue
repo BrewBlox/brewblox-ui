@@ -1,91 +1,98 @@
 <script lang="ts">
 import { uid } from 'quasar';
-import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { spaceCased } from '@/helpers/functional';
+import DialogBase from '@/components/DialogBase';
+import { objectStringSorter } from '@/helpers/functional';
 
 import { SQUARE_SIZE } from './getters';
 import { asStatePart } from './helpers';
 import { builderStore } from './store';
-import { PersistentPart, StatePart } from './types';
+import { PartSpec, PersistentPart, StatePart } from './types';
+
+interface PartDisplay {
+  part: StatePart;
+  spec: PartSpec;
+}
 
 
 @Component
-export default class BuilderCatalog extends Vue {
+export default class BuilderCatalog extends DialogBase {
   SQUARE_SIZE: number = SQUARE_SIZE;
-  spaceCased = spaceCased;
 
   partFilter: string | null = null;
 
   @Prop({ type: Object, default: () => ({}) })
   readonly partial!: Partial<PersistentPart>;
 
-  get availableParts(): StatePart[] {
+  get available(): PartDisplay[] {
     const filter = (this.partFilter || '').toLowerCase();
-    return builderStore.specIds
-      .filter(type => `${type}|${spaceCased(type)}`.toLowerCase().match(filter))
-      .map(type => ({
-        type,
-        id: uid(),
-        x: -100,
-        y: -100,
-        rotate: 0,
-        settings: {},
-        flipped: false,
-      }))
-      .map(asStatePart);
+    return builderStore.specValues
+      .filter(spec => `${spec.id}|${spec.title}`.toLowerCase().match(filter))
+      .sort(objectStringSorter('title'))
+      .map(spec => ({
+        spec,
+        part: asStatePart({
+          type: spec.id,
+          id: uid(),
+          x: 0,
+          y: 0,
+          rotate: 0,
+          settings: {},
+          flipped: false,
+        }),
+      }));
   }
 
-  partViewBox(part: StatePart): string {
-    return part.size.map(v => v * SQUARE_SIZE).join(' ');
+  partViewBox(display: PartDisplay): string {
+    return display.part.size.map(v => v * SQUARE_SIZE).join(' ');
   }
 
-  selectPart(part: StatePart): void {
-    this.$emit('create', { ...part, ...this.partial });
-    this.$nextTick(() => this.$emit('close'));
+  selectPart(display: PartDisplay): void {
+    this.onDialogOk({ ...display.part, ...this.partial });
   }
 }
 </script>
 
 <template>
-  <q-card dark class="widget-modal">
-    <DialogToolbar>Part Catalog</DialogToolbar>
+  <q-dialog ref="dialog" @hide="onDialogHide">
+    <q-card class="widget-modal">
+      <DialogToolbar>Part Catalog</DialogToolbar>
 
-    <q-item dark class="q-mb-md">
-      <q-item-section>
-        <q-input v-model="partFilter" placeholder="Search Parts" clearable dark autofocus>
-          <template v-slot:append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-      </q-item-section>
-    </q-item>
+      <q-item class="q-mb-md">
+        <q-item-section>
+          <q-input v-model="partFilter" placeholder="Search Parts" clearable autofocus>
+            <template #append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </q-item-section>
+      </q-item>
 
-    <q-scroll-area style="min-height: 400px; height: 60vh;">
-      <q-card-section>
-        <div class="row">
-          <q-item
-            v-for="part in availableParts"
-            :key="part.type"
-            dark
-            clickable
-            class="col-6"
-            @click="selectPart(part)"
-          >
-            <q-item-section side>
-              <svg
-                :width="`${SQUARE_SIZE}px`"
-                :height="`${SQUARE_SIZE}px`"
-                :viewBox="`0 0 ${partViewBox(part)}`"
-              >
-                <PartWrapper :part="part" />
-              </svg>
-            </q-item-section>
-            <q-item-section>{{ spaceCased(part.type) }}</q-item-section>
-          </q-item>
-        </div>
-      </q-card-section>
-    </q-scroll-area>
-  </q-card>
+      <q-scroll-area style="min-height: 400px; height: 60vh;">
+        <q-card-section>
+          <div class="row">
+            <q-item
+              v-for="v in available"
+              :key="v.spec.id"
+              clickable
+              class="col-6"
+              @click="selectPart(v)"
+            >
+              <q-item-section side>
+                <svg
+                  :width="`${SQUARE_SIZE}px`"
+                  :height="`${SQUARE_SIZE}px`"
+                  :viewBox="`0 0 ${partViewBox(v)}`"
+                >
+                  <PartWrapper :part="v.part" />
+                </svg>
+              </q-item-section>
+              <q-item-section>{{ v.spec.title }}</q-item-section>
+            </q-item>
+          </div>
+        </q-card-section>
+      </q-scroll-area>
+    </q-card>
+  </q-dialog>
 </template>

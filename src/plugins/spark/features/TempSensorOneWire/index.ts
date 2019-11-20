@@ -1,11 +1,10 @@
-import { ref } from '@/helpers/component-ref';
 import { Unit } from '@/helpers/units';
-import GenericBlock from '@/plugins/spark/components/GenericBlock';
+import { genericBlockFeature } from '@/plugins/spark/generic';
+import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { BlockSpec } from '@/plugins/spark/types';
 import { Feature } from '@/store/features';
 
-import { BlockSpec } from '../../types';
 import { typeName } from './getters';
-import form from './TempSensorOneWireForm.vue';
 import widget from './TempSensorOneWireWidget.vue';
 import { TempSensorOneWireData } from './types';
 
@@ -24,12 +23,12 @@ const block: BlockSpec = {
 };
 
 const feature: Feature = {
-  ...GenericBlock,
+  ...genericBlockFeature,
   id: typeName,
   displayName: 'OneWire Temp Sensor',
   role: 'Process',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: blockWidgetSelector(widget),
+  wizardComponent: null,
   widgetSize: {
     cols: 4,
     rows: 2,

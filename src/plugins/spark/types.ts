@@ -1,5 +1,7 @@
-import { DashboardItem } from '@/store/dashboards';
-import { Feature } from '@/store/features';
+import { Link, Unit } from '@/helpers/units';
+import { GraphValueAxes, QueryParams } from '@/plugins/history/types';
+import { PersistentWidget } from '@/store/dashboards';
+import { Crud, Feature } from '@/store/features';
 import { Service } from '@/store/services';
 
 export interface ChangeField {
@@ -11,11 +13,19 @@ export interface ChangeField {
   pretty?: (val: any) => string;
 }
 
-export type BlockDataGenerator = () => Record<string, any>;
+export type BlockDataGenerator = () => Mapped<any>;
 
 export interface BlockDataPreset {
   name: string;
   generate: BlockDataGenerator;
+}
+
+export interface StoredDataPreset {
+  id: string;
+  type: string;
+  name: string;
+  data: Mapped<any>;
+  _rev?: string;
 }
 
 export interface BlockSpec {
@@ -24,7 +34,7 @@ export interface BlockSpec {
   generate: BlockDataGenerator;
   presets: BlockDataPreset[];
   changes: ChangeField[];
-  graphTargets?: Record<string, string>;
+  graphTargets?: Mapped<string>;
 }
 
 export interface SparkFeature {
@@ -32,10 +42,13 @@ export interface SparkFeature {
   block?: BlockSpec;
 }
 
+export type PageMode = 'Relations' | 'List';
+
 export interface SparkConfig {
   groupNames: string[];
   expandedBlocks: { [id: string]: boolean };
   sorting: string;
+  pageMode: PageMode;
 }
 
 export interface Spark extends Service {
@@ -57,10 +70,16 @@ export interface Block extends DataBlock {
 export interface BlockConfig {
   serviceId: string;
   blockId: string;
+  queryParams?: QueryParams;
+  graphAxes?: GraphValueAxes;
 }
 
-export interface DashboardBlock extends DashboardItem {
-  config: BlockConfig;
+export type DashboardBlock = PersistentWidget<BlockConfig>;
+
+export interface BlockCrud extends Crud<BlockConfig> {
+  block: Block;
+  isStoreBlock: boolean;
+  saveBlock: (block: Block) => unknown | Promise<unknown>;
 }
 
 export interface UserUnits {
@@ -87,10 +106,15 @@ export interface SystemStatus {
   error?: any;
 }
 
-export interface BlockLink {
+export interface RelationEdge {
   source: string;
   target: string;
   relation: string[];
+}
+
+export interface RelationNode {
+  id: string;
+  type: string;
 }
 
 export interface Limiters {
@@ -118,4 +142,26 @@ export interface IoChannel {
 
 export interface IoPin {
   [key: string]: IoChannel;
+}
+
+export interface AnalogConstraint {
+  limiting: boolean;
+  min?: number;
+  max?: number;
+  balanced?: {
+    balancerId: Link;
+    granted: number;
+    id: number;
+  };
+}
+
+export interface DigitalConstraint {
+  limiting: boolean;
+  minOn?: Unit;
+  minOff?: Unit;
+  mutex?: Link; // Mutex
+}
+
+export interface ConstraintsObj {
+  constraints: AnalogConstraint[] | DigitalConstraint[];
 }

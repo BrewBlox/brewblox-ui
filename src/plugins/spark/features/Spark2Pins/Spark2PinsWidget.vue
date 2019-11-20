@@ -1,19 +1,19 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import BlockWidget from '@/plugins/spark/components/BlockWidget';
+import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 import { Spark2PinsBlock } from './types';
 
 @Component
-export default class Spark2PinsWidget extends BlockWidget {
+export default class Spark2PinsWidget extends BlockWidgetBase {
   readonly block!: Spark2PinsBlock;
 }
 </script>
 
 <template>
-  <q-card dark class="text-white scroll">
-    <BlockWidgetToolbar :crud="crud" />
+  <q-card :class="cardClass">
+    <component :is="toolbarComponent" :crud="crud" />
     <IoArray :crud="crud" />
   </q-card>
 </template>

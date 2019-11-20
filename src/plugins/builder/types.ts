@@ -1,4 +1,4 @@
-import { DashboardItem } from '@/store/dashboards';
+import { PersistentWidget } from '@/store/dashboards';
 
 export interface FlowRoute {
   outCoords: string;
@@ -22,6 +22,11 @@ export interface CalculatedFlows {
   [inCoords: string]: LiquidFlow;
 }
 
+export interface PathFriction {
+  friction: number;
+  pressureDiff: number;
+}
+
 export interface PersistentPart {
   id: string;
   type: string;
@@ -29,7 +34,7 @@ export interface PersistentPart {
   y: number;
   rotate: number;
   flipped?: boolean;
-  settings: Record<string, any>;
+  settings: Mapped<any>;
 }
 
 export interface StatePart extends PersistentPart {
@@ -52,11 +57,12 @@ export interface LinkedBlock {
 
 export interface CardSpec {
   component: string;
-  props?: Record<string, any>;
+  props?: Mapped<any>;
 }
 
 export interface PartSpec {
   id: string;
+  title: string;
   component?: string; // ID is used by default
   cards: CardSpec[];
   transitions: (part: PersistentPart) => Transitions;
@@ -74,12 +80,11 @@ export interface BuilderLayout {
 }
 
 export interface BuilderConfig {
-  currentToolId?: string;
   currentLayoutId: string | null;
   layoutIds: string[];
 }
 
-export interface BuilderItem extends DashboardItem {
+export interface BuilderItem extends PersistentWidget {
   config: BuilderConfig;
 }
 

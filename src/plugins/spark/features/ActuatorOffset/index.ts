@@ -1,10 +1,10 @@
-import { ref } from '@/helpers/component-ref';
-import { SetpointSensorPairLink } from '@/helpers/units/KnownLinks';
-import GenericBlock from '@/plugins/spark/components/GenericBlock';
+import { Link } from '@/helpers/units';
+import { interfaceTypes } from '@/plugins/spark/block-types';
+import { genericBlockFeature } from '@/plugins/spark/generic';
+import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { BlockSpec } from '@/plugins/spark/types';
 import { Feature } from '@/store/features';
 
-import { BlockSpec } from '../../types';
-import form from './ActuatorOffsetForm.vue';
 import widget from './ActuatorOffsetWidget.vue';
 import { typeName } from './getters';
 import { ActuatorOffsetData, OffsetSettingOrValue } from './types';
@@ -12,9 +12,9 @@ import { ActuatorOffsetData, OffsetSettingOrValue } from './types';
 const block: BlockSpec = {
   id: typeName,
   generate: (): ActuatorOffsetData => ({
-    targetId: new SetpointSensorPairLink(null),
-    drivenTargetId: new SetpointSensorPairLink(null, true),
-    referenceId: new SetpointSensorPairLink(null),
+    targetId: new Link(null, interfaceTypes.SetpointSensorPair),
+    drivenTargetId: new Link(null, interfaceTypes.SetpointSensorPair, true),
+    referenceId: new Link(null, interfaceTypes.SetpointSensorPair),
     referenceSettingOrValue: OffsetSettingOrValue.Setting,
     desiredSetting: 0,
     setting: 0,
@@ -40,13 +40,13 @@ const block: BlockSpec = {
       key: 'targetId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new SetpointSensorPairLink(null),
+      generate: () => new Link(null, interfaceTypes.SetpointSensorPair),
     },
     {
       key: 'referenceId',
       title: 'Reference',
       component: 'LinkValEdit',
-      generate: () => new SetpointSensorPairLink(null),
+      generate: () => new Link(null, interfaceTypes.SetpointSensorPair),
     },
   ],
   graphTargets: {
@@ -56,12 +56,11 @@ const block: BlockSpec = {
 };
 
 const feature: Feature = {
-  ...GenericBlock,
+  ...genericBlockFeature,
   id: typeName,
   displayName: 'Setpoint Driver',
   role: 'Output',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 3,

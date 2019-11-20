@@ -1,45 +1,46 @@
 <script lang="ts">
+import pick from 'lodash/pick';
 import { debounce, uid } from 'quasar';
-import { Dialog } from 'quasar';
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 
-import DialogBase from '@/components/Dialog/DialogBase';
+import DialogBase from '@/components/DialogBase';
 import { Coordinates } from '@/helpers/coordinates';
-import { showImportDialog } from '@/helpers/dialog';
+import { createDialog } from '@/helpers/dialog';
 import { clampRotation } from '@/helpers/functional';
-import { saveJsonFile } from '@/helpers/import-export';
 import { deepCopy, deserialize, serialize } from '@/helpers/units/parseObject';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
-import CalcWorker from 'worker-loader!./calculator.worker';
-import { defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes, SQUARE_SIZE } from './getters';
-import { asPersistentPart, asStatePart } from './helpers';
+import { calculateNormalizedFlows } from './calculateFlows';
+import { deprecatedTypes, SQUARE_SIZE } from './getters';
+import { asPersistentPart, asStatePart, rectContains, squares } from './helpers';
 import { builderStore } from './store';
 import { BuilderLayout, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
 
-interface XYVals {
-  x: number;
-  y: number;
+interface Floater extends XYPosition {
+  parts: PersistentPart[];
 }
 
-interface DragAction extends XYVals {
-  part: PersistentPart;
-}
-
-interface SelectArea extends XYVals {
+interface SelectArea extends XYPosition {
   width: number;
   height: number;
 }
 
-interface ToolAction {
+interface EditorAction {
   label: string;
   value: string;
   icon: string;
-  shortcut: string;
+}
+
+interface ActionMode extends EditorAction {
   cursor: (part: FlowPart) => boolean;
   onClick?: (evt: ClickEvent, part: FlowPart) => void;
   onPan?: (args: PanArguments, part: FlowPart) => void;
+}
+
+interface ActionTool extends EditorAction {
+  shortcut: string;
+  use: (parts: PersistentPart[]) => void;
 }
 
 @Component({
@@ -49,108 +50,131 @@ interface ToolAction {
   },
 })
 export default class BuilderEditor extends DialogBase {
-
-  @Ref()
-  readonly grid!: any;
-
-  worker: CalcWorker = new CalcWorker();
-  specs = builderStore.specs;
+  squares = squares;
 
   layoutId: string | null = null;
   debouncedCalculate: Function = () => { };
   flowParts: FlowPart[] = [];
   history: string[] = [];
+  undoneHistory: string[] = [];
 
-  menuModalOpen = false;
-  catalogModalOpen = false;
-  catalogPartial: Partial<PersistentPart> | null = null;
+  menuDialogOpen = false;
 
   selectedTime = 0;
   selectArea: SelectArea | null = null;
-  selectDragDelta: XYVals | null = null
+  selectDragDelta: XYPosition | null = null
+  floatingSelection = false;
   selectedParts: FlowPart[] = [];
+  hoverPos: XYPosition | null = null;
+  cardFocused = true;
 
-  dragAction: DragAction | null = null;
+  floater: Floater | null = null;
   configuredPartId: string | null = null;
 
-  tools: ToolAction[] = [
+  updater: PartUpdater = { updatePart: this.savePart };
+
+  @Ref()
+  readonly grid!: any;
+
+  @Ref()
+  readonly card!: any;
+
+  @Prop({ type: String })
+  public readonly initialLayout!: string | null;
+
+  @Watch('layout')
+  watchLayout(newV: BuilderLayout, oldV: BuilderLayout): void {
+    if (newV === null || (oldV !== null && oldV.id !== newV.id)) {
+      this.history = [];
+    }
+    this.debouncedCalculate();
+  }
+
+  @Watch('editorActive')
+  watchActive(active): void {
+    // A workaround for a hot reloading bug
+    // where the editor is not destroyed when the dialog closes
+    if (!active) {
+      this.onDialogHide();
+    }
+  }
+
+  modes: ActionMode[] = [
     {
-      label: 'New (Click)',
-      value: 'add',
-      icon: 'add',
-      shortcut: 'n',
-      cursor: () => false,
-      onClick: this.addPartClickHandler,
-    },
-    {
-      label: 'Select (Drag or Click)',
+      label: 'Select',
       value: 'select',
       icon: 'mdi-select-drag',
-      shortcut: 's',
       cursor: part => !!part,
       onPan: this.selectPanHandler,
       onClick: this.selectClickHandler,
     },
     {
-      label: 'Move (Drag)',
-      value: 'move',
-      icon: 'mdi-cursor-move',
-      shortcut: 'm',
-      cursor: part => !!part,
-      onPan: this.movePanHandler,
-    },
-    {
-      label: 'Rotate (Click)',
-      value: 'rotate-right',
-      icon: 'mdi-rotate-right-variant',
-      shortcut: 'r',
-      cursor: part => !!part,
-      onClick: this.rotateClickHandler,
-    },
-    {
-      label: 'Flip (Click)',
-      value: 'flip',
-      icon: 'mdi-swap-horizontal-bold',
-      shortcut: 'f',
-      cursor: part => !!part,
-      onClick: this.flipClickHandler,
-    },
-    {
-      label: 'Edit Settings (Click)',
-      value: 'config',
-      icon: 'settings',
-      shortcut: 'e',
-      cursor: part => !!part,
-      onClick: this.configurePartClickHandler,
-    },
-    {
-      label: 'Interact (Click)',
+      label: 'Interact',
       value: 'interact',
       icon: 'mdi-cursor-default',
-      shortcut: 'i',
-      cursor: part => !!part && !!this.specs[part.type].interactHandler,
+      cursor: part => !!part && !!builderStore.spec(part).interactHandler,
       onClick: this.interactClickHandler,
-    },
-    {
-      label: 'Copy (Drag)',
-      value: 'copy',
-      icon: 'file_copy',
-      shortcut: 'c',
-      cursor: part => !!part,
-      onPan: this.copyPanHandler,
-    },
-    {
-      label: 'Delete (Click)',
-      value: 'delete',
-      icon: 'delete',
-      shortcut: 'd',
-      cursor: part => !!part,
-      onClick: this.deleteClickHandler,
     },
   ];
 
-  @Prop({ type: String })
-  public readonly initialLayout!: string | null;
+  tools: ActionTool[] = [
+    {
+      label: 'New',
+      value: 'add',
+      icon: 'add',
+      shortcut: 'n',
+      use: this.useAdd,
+    },
+    {
+      label: 'Move',
+      value: 'move',
+      icon: 'mdi-cursor-move',
+      shortcut: 'm',
+      use: this.useMove,
+    },
+    {
+      label: 'Copy',
+      value: 'copy',
+      icon: 'file_copy',
+      shortcut: 'c',
+      use: this.useCopy,
+    },
+    {
+      label: 'Rotate',
+      value: 'rotate-right',
+      icon: 'mdi-rotate-right-variant',
+      shortcut: 'r',
+      use: this.useRotate,
+    },
+    {
+      label: 'Flip',
+      value: 'flip',
+      icon: 'mdi-swap-horizontal-bold',
+      shortcut: 'f',
+      use: this.useFlip,
+    },
+    {
+      label: 'Edit Settings',
+      value: 'config',
+      icon: 'settings',
+      shortcut: 'e',
+      use: this.useEdit,
+    },
+    {
+      label: 'Interact',
+      value: 'interact',
+      icon: 'mdi-cursor-default',
+      shortcut: 'i',
+      use: this.useInteract,
+    },
+    {
+      label: 'Delete',
+      value: 'delete',
+      icon: 'delete',
+      shortcut: 'd',
+      use: this.useDelete,
+    },
+  ]
 
   get editorActive(): boolean {
     return builderStore.editorActive;
@@ -172,7 +196,7 @@ export default class BuilderEditor extends DialogBase {
     if (!this.layout) {
       return [];
     }
-    const sizes: Record<string, number> = {};
+    const sizes: Mapped<number> = {};
     return this.layout.parts
       .map(part => {
         const actual: PersistentPart = {
@@ -183,7 +207,7 @@ export default class BuilderEditor extends DialogBase {
           ...part,
           type: deprecatedTypes[part.type] || part.type,
         };
-        const [sizeX, sizeY] = this.specs[actual.type].size(actual);
+        const [sizeX, sizeY] = builderStore.spec(actual).size(actual);
         sizes[part.id] = sizeX * sizeY;
         return actual;
       })
@@ -195,14 +219,8 @@ export default class BuilderEditor extends DialogBase {
     return this.flowParts.find(p => p.id === this.configuredPartId) || null;
   }
 
-  get updater(): PartUpdater {
-    return {
-      updatePart: this.savePart,
-    };
-  }
-
   get overlaps(): [Coordinates, number][] {
-    const counts: Record<string, number> = {};
+    const counts: Mapped<number> = {};
     for (const part of this.parts) {
       const key = new Coordinates([part.x, part.y, 0]).toString();
       counts[key] = (counts[key] || 0) + 1;
@@ -212,16 +230,37 @@ export default class BuilderEditor extends DialogBase {
       .map(([k, v]) => [new Coordinates(k), v] as [Coordinates, number]);
   }
 
-  get currentTool(): ToolAction {
-    const toolId = builderStore.editorTool;
-    return this.tools.find(tool => tool.value === toolId) || this.tools[0];
+  get currentMode(): ActionMode {
+    const toolId = builderStore.editorMode;
+    return this.modes.find(tool => tool.value === toolId) || this.modes[0];
   }
 
-  set currentTool(tool: ToolAction) {
-    builderStore.commitEditorTool(tool.value);
+  set currentMode(tool: ActionMode) {
+    builderStore.commitEditorMode(tool.value);
   }
 
-  async saveLayout(layout: BuilderLayout): Promise<void> {
+  async selectLayout(id: string | null): Promise<void> {
+    this.layoutId = id;
+    await this.$nextTick();
+    this.setFocus();
+  }
+
+  setFocus(): void {
+    if (this.card !== undefined) {
+      this.card.$el.focus();
+      this.checkFocus();
+    }
+  }
+
+  checkFocus(): void {
+    this.$nextTick(() => {
+      const el = document.querySelector('.editor-card:focus-within');
+      this.cardFocused = (el !== null);
+    });
+  }
+
+  async saveLayout(layout: BuilderLayout | null = this.layout): Promise<void> {
+    if (layout === null) { return; }
     if (layout.id) {
       await builderStore.saveLayout(layout);
     } else {
@@ -232,14 +271,13 @@ export default class BuilderEditor extends DialogBase {
   }
 
   async saveParts(parts: PersistentPart[], saveHistory = true): Promise<void> {
-    if (!this.layout) {
-      return;
-    }
+    if (!this.layout) { return; }
 
     if (saveHistory) {
       const stored = builderStore.layoutById(this.layout.id);
       if (stored) {
         this.history.push(JSON.stringify(serialize(stored.parts)));
+        this.undoneHistory = [];
       }
     }
 
@@ -262,134 +300,108 @@ export default class BuilderEditor extends DialogBase {
   }
 
   async undo(): Promise<void> {
-    if (this.history.length > 0) {
+    if (this.layout && this.history.length > 0) {
       this.cancelSelection();
-      const parts = deserialize(JSON.parse(this.history.pop() as string));
-      await this.saveParts(parts, false);
+
+      const current = builderStore.layoutById(this.layout.id);
+      if (current) {
+        const state = JSON.stringify(serialize(current.parts));
+        const parts = deserialize(JSON.parse(this.history.pop()!));
+        await this.saveParts(parts, false);
+        this.undoneHistory.push(state);
+      }
     }
   }
 
-  async importLayout(): Promise<void> {
-    showImportDialog<BuilderLayout>(async layout => {
-      const id = uid();
-      await builderStore.createLayout({ ...layout, id });
-      this.layoutId = id;
-    });
-  }
+  async redo(): Promise<void> {
+    if (this.layout && this.undoneHistory.length > 0) {
+      this.cancelSelection();
 
-  exportLayout(): void {
-    if (!this.layout) {
-      return;
+      const current = builderStore.layoutById(this.layout.id);
+      if (current) {
+        const state = JSON.stringify(serialize(current.parts));
+        const parts = deserialize(JSON.parse(this.undoneHistory.pop()!));
+        await this.saveParts(parts, false);
+        this.history.push(state);
+      }
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, _rev, ...exported } = this.layout;
-    saveJsonFile(exported, `brewblox-${this.layout.title}-layout.json`);
-  }
-
-  renameLayout(): void {
-    if (!this.layout) {
-      return;
-    }
-    Dialog.create({
-      title: 'Change Layout title',
-      message: `Choose a new name for ${this.layout.title}`,
-      dark: true,
-      cancel: true,
-      prompt: {
-        model: this.layout.title,
-        type: 'text',
-      },
-    })
-      .onOk(async title => {
-        if (this.layout) {
-          builderStore.saveLayout({ ...this.layout, title });
-        }
-      });
-  }
-
-  clearParts(): void {
-    Dialog.create({
-      title: 'Remove parts',
-      message: 'Are you sure you wish to remove all parts?',
-      dark: true,
-      noBackdropDismiss: true,
-      cancel: true,
-    })
-      .onOk(() => this.saveParts([]));
-  }
-
-  removeLayout(): void {
-    if (!this.layout) {
-      return;
-    }
-    Dialog.create({
-      title: 'Remove layout',
-      message: `Are you sure you wish to remove ${this.layout.title}?`,
-      dark: true,
-      noBackdropDismiss: true,
-      cancel: true,
-    })
-      .onOk(async () => {
-        if (this.layout) {
-          await builderStore.removeLayout(this.layout)
-            .catch(() => { });
-        }
-        this.layoutId = this.layouts.length > 0
-          ? this.layouts[0].id
-          : null;
-      });
   }
 
   async calculate(): Promise<void> {
     await this.$nextTick();
-    this.worker.postMessage(this.parts.map(asStatePart));
+    this.updateFlowParts(calculateNormalizedFlows(this.parts.map(asStatePart)));
   }
 
   gridRect(): Rect {
-    const { x, y, left, right, top, bottom } = this.grid.getBoundingClientRect();
-    return { x, y, left, right, top, bottom };
+    return pick(this.grid.getBoundingClientRect(),
+      ['x', 'y', 'left', 'right', 'top', 'bottom']);
   }
 
   isClickable(part): boolean {
-    return !!this.specs[part.type].interactHandler;
+    return !!builderStore.spec(part).interactHandler;
   }
 
   interact(part: FlowPart): void {
-    const handler = this.specs[part.type].interactHandler;
+    const handler = builderStore.spec(part).interactHandler;
     handler && handler(part, this.updater);
   }
 
-  squares(val: number): number {
-    return SQUARE_SIZE * val;
+  isBusy(part: PersistentPart): boolean {
+    return (!!this.floater && this.floater.parts.some(p => p.id === part.id))
+      || this.selectedParts.some(p => p.id === part.id);
   }
 
-  clickHandler(evt: ClickEvent, part: FlowPart): void {
-    if (this.currentTool.onClick) {
-      this.currentTool.onClick(evt, part);
+  updateFlowParts(parts: FlowPart[]): void {
+    this.flowParts = parts;
+    if (this.selectedParts.length > 0) {
+      const selectedIds = this.selectedParts.map(p => p.id);
+      this.selectedParts = this.flowParts
+        .filter(p => selectedIds.includes(p.id))
+        .map(deepCopy);
     }
-    evt.stopPropagation();
   }
 
-  panHandler(args: PanArguments, part: FlowPart): void {
-    if (this.currentTool.onPan) {
-      this.currentTool.onPan(args, part);
+  clear(): void {
+    if (this.floater) {
+      this.floater = null;
     }
-    args.evt.stopPropagation();
+    else if (this.selectedParts.length) {
+      this.selectedParts = [];
+    }
   }
 
-  rectContains(rect: Rect, x: number, y: number): boolean {
-    return x >= rect.left
-      && x <= rect.right
-      && y >= rect.top
-      && y <= rect.bottom;
+  dropFloater(pos: XYPosition | null, isGridPos: boolean): void {
+    if (!this.floater) { return; }
+
+    pos = isGridPos ? pos : this.findGridSquare(pos);
+    if (pos) {
+      const ids: string[] = [];
+
+      this.floater.parts
+        .forEach(part => {
+          ids.push(part.id);
+          part.x += this.floater!.x;
+          part.y += this.floater!.y;
+        });
+
+      this.saveParts([
+        ...this.parts.filter(p => !ids.includes(p.id)),
+        ...this.floater.parts,
+      ]);
+    }
+    this.selectedParts = [];
+    this.floater = null;
   }
 
-  findGridSquare(grid: Rect, x: number, y: number): XYPosition | null {
+  findGridSquare(rawPos: XYPosition | null): XYPosition | null {
     // The page offset in clicks has appeared and disappeared in various quasar releases
     // Comment or uncomment these lines when required
     // x -= window.pageXOffset;
     // y -= window.pageYOffset;
-    if (!this.rectContains(grid, x, y)) {
+    if (rawPos === null) { return null; }
+    const grid = this.gridRect();
+    const { x, y } = rawPos;
+    if (!rectContains(grid, x, y)) {
       return null;
     }
     return {
@@ -399,10 +411,35 @@ export default class BuilderEditor extends DialogBase {
   }
 
   findClickSquare(evt: ClickEvent): XYPosition | null {
-    const grid = this.gridRect();
-    return (evt instanceof MouseEvent)
-      ? this.findGridSquare(grid, evt.clientX, evt.clientY)
-      : this.findGridSquare(grid, evt.touches[0].clientX, evt.touches[0].clientY);
+    const touch = (evt instanceof MouseEvent) ? evt : evt.touches[0];
+    return this.findGridSquare({ x: touch.clientX, y: touch.clientY });
+  }
+
+  findPartAtPos(pos: XYPosition | null, isGridPos: boolean): FlowPart | null {
+    pos = isGridPos ? pos : this.findGridSquare(pos);
+    if (!pos) { return null; }
+    // iterate right to left to match rendering order
+    // when items overlap, the later item is rendered on top
+    for (let idx = this.flowParts.length - 1; idx >= 0; idx--) {
+      const part = this.flowParts[idx];
+      if (pos.x >= part.x
+        && pos.x < part.x + part.size[0]
+        && pos.y >= part.y
+        && pos.y < part.y + part.size[1]) {
+        return part;
+      }
+    }
+    return null;
+  }
+
+  findActionParts(): FlowPart[] {
+    if (this.selectedParts.length) {
+      return this.selectedParts;
+    }
+    const hovered = this.findPartAtPos(this.hoverPos, false);
+    return hovered
+      ? [hovered]
+      : [];
   }
 
   unflippedArea(area: SelectArea): SelectArea {
@@ -413,6 +450,15 @@ export default class BuilderEditor extends DialogBase {
       height: Math.abs(area.height),
     };
   }
+
+  closeMenu(): void {
+    this.menuDialogOpen = false;
+    this.$nextTick(this.setFocus);
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // Modes
+  ////////////////////////////////////////////////////////////////
 
   selectPanHandler(args: PanArguments): void {
     if (args.isFirst) {
@@ -432,8 +478,6 @@ export default class BuilderEditor extends DialogBase {
     }
 
     if (args.isFinal && this.selectArea) {
-      this.selectedTime = new Date().getTime();
-
       const { x, y, width, height } = this.unflippedArea(this.selectArea);
       const startX = x / SQUARE_SIZE;
       const startY = y / SQUARE_SIZE;
@@ -453,74 +497,12 @@ export default class BuilderEditor extends DialogBase {
           .map(deepCopy));
 
       this.selectArea = null;
-    }
-  }
-
-  moveSelectedPanHandler(args: PanArguments, copy: boolean): void {
-    if (args.isFirst) {
-      this.selectDragDelta = { x: 0, y: 0 };
-    }
-
-    if (!this.selectDragDelta) {
-      return;
-    }
-
-    const prevDelta = { ...this.selectDragDelta };
-
-    this.selectDragDelta.x += args.delta.x;
-    this.selectDragDelta.y += args.delta.y;
-
-    const snapDeltaPrev = {
-      x: Math.ceil(prevDelta.x / SQUARE_SIZE),
-      y: Math.ceil(prevDelta.y / SQUARE_SIZE),
-    };
-    const snapDelta = {
-      x: Math.ceil(this.selectDragDelta.x / SQUARE_SIZE),
-      y: Math.ceil(this.selectDragDelta.y / SQUARE_SIZE),
-    };
-
-    if (snapDeltaPrev.x !== snapDelta.x || snapDeltaPrev.y !== snapDelta.y) {
-      // We want to snap to grid during the move
-      // Subtract the previous values to avoid drift
-      this.selectedParts
-        .forEach(part => {
-          part.x = part.x + snapDelta.x - snapDeltaPrev.x;
-          part.y = part.y + snapDelta.y - snapDeltaPrev.y;
-        });
-    }
-
-    if (args.isFinal) {
       this.selectedTime = new Date().getTime();
-
-      // Now also snap select area to grid
-      const snapDelta = {
-        x: Math.ceil(this.selectDragDelta.x / SQUARE_SIZE) * SQUARE_SIZE,
-        y: Math.ceil(this.selectDragDelta.y / SQUARE_SIZE) * SQUARE_SIZE,
-      };
-      this.selectDragDelta = null;
-
-      if (snapDelta.x === 0 && snapDelta.y === 0) {
-        return;
-      }
-
-      if (copy) {
-        this.selectedParts.forEach(p => p.id = uid());
-        this.saveParts([...this.parts, ...this.selectedParts]);
-      } else {
-        const ids = this.selectedParts.map(part => part.id);
-        this.saveParts([...this.parts.filter(p => !ids.includes(p.id)), ...this.selectedParts]);
-      }
     }
-  }
-
-  cancelSelection(): void {
-    this.selectedTime = 0;
-    this.selectArea = null;
-    this.selectedParts = [];
   }
 
   selectClickHandler(evt: ClickEvent, part: FlowPart): void {
-    if (new Date().getTime() - this.selectedTime < 200) {
+    if (new Date().getTime() - this.selectedTime < 500) {
       // The mouseup at the end of a pan also generates a click event - skip this
       return;
     }
@@ -538,235 +520,305 @@ export default class BuilderEditor extends DialogBase {
     }
   }
 
-  movePanHandler(args: PanArguments, part: FlowPart, copy = false): void {
-    if (this.selectedParts.length) {
-      return this.moveSelectedPanHandler(args, copy);
-    }
-
-    if (!part) {
-      return;
-    }
-
-    if (args.isFirst) {
-      this.dragAction = {
-        part,
-        x: 0,
-        y: 0,
-      };
-    }
-
-    const grid = this.gridRect();
-
-    if (this.dragAction !== null) {
-      this.dragAction.x = args.position.left - (0.5 * SQUARE_SIZE) - grid.x;
-      this.dragAction.y = args.position.top - (0.5 * SQUARE_SIZE) - grid.y;
-    }
-
-    if (args.isFinal) {
-      const gridPos = this.findGridSquare(grid, args.position.left, args.position.top);
-      if (gridPos) {
-        const from = copy ? null : part;
-        const id = copy ? uid() : part.id;
-        this.movePart(from, { ...deepCopy(part), ...gridPos, id })
-          .then(() => this.$nextTick())
-          .then(() => this.dragAction = null);
-      } else {
-        this.dragAction = null;
-      }
-    }
-  }
-
-  copyPanHandler(args: PanArguments, part: FlowPart): void {
-    this.movePanHandler(args, part, true);
-  }
-
-  addPartClickHandler(evt: ClickEvent): void {
-    const pos = this.findClickSquare(evt);
-    if (pos) {
-      this.catalogPartial = pos;
-      this.catalogModalOpen = true;
-    }
-  }
-
-  configurePartClickHandler(evt: ClickEvent, part: FlowPart): void {
-    if (part) {
-      this.configuredPartId = part.id;
-      this.menuModalOpen = true;
-    }
+  cancelSelection(): void {
+    this.selectedTime = 0;
+    this.selectArea = null;
+    this.selectedParts = [];
   }
 
   interactClickHandler(evt: ClickEvent, part: FlowPart): void {
     if (part) {
-      const handler = this.specs[part.type].interactHandler;
+      const handler = builderStore.spec(part).interactHandler;
       handler && handler(part, this.updater);
     }
   }
 
-  rotateClickHandler(evt: ClickEvent, part: FlowPart, rotation = 90): void {
-    if (part) {
-      const rotate = clampRotation(part.rotate + rotation);
-      this.savePart({ ...part, rotate });
+  ////////////////////////////////////////////////////////////////
+  // Tools
+  ////////////////////////////////////////////////////////////////
+
+  useAdd(): void {
+    if (!this.floater) {
+      createDialog({
+        parent: this,
+        component: BuilderCatalog,
+      })
+        .onOk((part: PersistentPart) => {
+          this.floater = {
+            x: 0,
+            y: 0,
+            parts: [part],
+          };
+          this.setFocus();
+        });
     }
   }
 
-  flipClickHandler(evt: ClickEvent, part: FlowPart): void {
-    if (part) {
+  useMove(parts: PersistentPart[]): void {
+    if (this.floater) {
+      this.dropFloater(this.hoverPos, false);
+    }
+    else if (parts.length) {
+      const minX = Math.min(...parts.map(part => part.x));
+      const minY = Math.min(...parts.map(part => part.y));
+      const startPos = this.hoverPos || { x: 0, y: 0 };
+      this.floater = {
+        ...startPos,
+        parts: parts.map(part => ({
+          ...deepCopy(part),
+          x: part.x - minX,
+          y: part.y - minY,
+        })),
+      };
+    }
+  }
+
+  useCopy(parts: PersistentPart[]): void {
+    if (this.floater) {
+      this.dropFloater(this.hoverPos, false);
+    }
+    else if (parts.length) {
+      const minX = Math.min(...parts.map(part => part.x));
+      const minY = Math.min(...parts.map(part => part.y));
+      const startPos = this.hoverPos || { x: 0, y: 0 };
+      this.floater = {
+        ...startPos,
+        parts: parts.map(part => ({
+          ...deepCopy(part),
+          id: uid(),
+          x: part.x - minX,
+          y: part.y - minY,
+        })),
+      };
+    }
+  }
+
+  useRotate(parts: PersistentPart[]): void {
+    if (this.floater) {
+      if (this.floater.parts.length === 1) {
+        const [part] = this.floater.parts;
+        part.rotate = clampRotation(part.rotate + 90);
+      }
+    }
+    else if (parts.length === 1) {
+      const [part] = parts;
+      this.savePart({ ...part, rotate: clampRotation(part.rotate + 90) });
+    }
+  }
+
+  useFlip(parts: PersistentPart[]): void {
+    if (this.floater) {
+      if (this.floater.parts.length === 1) {
+        const [part] = this.floater.parts;
+        part.flipped = !part.flipped;
+      }
+    }
+    else if (parts.length === 1) {
+      const [part] = parts;
       this.savePart({ ...part, flipped: !part.flipped });
     }
   }
 
-  deleteClickHandler(evt: ClickEvent, part: FlowPart): void {
-    if (!part) {
-      return;
+  useEdit(parts: PersistentPart[]): void {
+    if (!this.floater && parts.length === 1) {
+      this.configuredPartId = parts[0].id;
+      this.menuDialogOpen = true;
     }
-    if (this.selectedParts.find(p => p.id === part.id)) {
-      const ids = this.selectedParts.map(p => p.id);
+  }
+
+  useInteract(parts: PersistentPart[]): void {
+    if (!this.floater && parts.length === 1) {
+      const [part] = parts;
+      const handler = builderStore.spec(part).interactHandler;
+      handler && handler(part, this.updater);
+    }
+  }
+
+  useDelete(parts: PersistentPart[]): void {
+    if (!this.floater && parts.length) {
+      const ids = parts.map(p => p.id);
       this.saveParts([...this.parts.filter(p => !ids.includes(p.id))]);
       this.cancelSelection();
-    } else {
-      this.removePart(part);
     }
   }
 
-  async movePart(from: PersistentPart | null, to: PersistentPart): Promise<void> {
-    if (from
-      && from.id === to.id
-      && from.x === to.x
-      && from.y === to.y) {
-      return;
-    }
+  ////////////////////////////////////////////////////////////////
+  // Event handlers
+  ////////////////////////////////////////////////////////////////
 
-    await this.saveParts([...this.parts.filter(p => !from || p.id !== from.id), to]);
+  onGridMove(evt: MouseEvent): void {
+    this.hoverPos = { x: evt.pageX, y: evt.pageY };
+    if (this.floater) {
+      const pos = this.findGridSquare(this.hoverPos);
+      if (pos) {
+        this.floater.x = pos.x;
+        this.floater.y = pos.y;
+      }
+    }
   }
 
-  beingDragged(part: PersistentPart): boolean {
-    return this.currentTool.value !== 'copy'
-      && (
-        !!this.dragAction && this.dragAction.part.id === part.id
-        || this.selectedParts.some(p => p.id === part.id)
-      );
+  onGridLeave(): void {
+    this.hoverPos = null;
+  }
+
+  clickHandler(evt: ClickEvent, part: FlowPart): void {
+    if (this.floater) {
+      this.dropFloater(this.findClickSquare(evt), true);
+    }
+    else if (this.currentMode.onClick) {
+      this.currentMode.onClick(evt, part);
+    }
+    evt.stopPropagation();
   }
 
   keyHandler(evt: KeyboardEvent): void {
-    if (this.menuModalOpen || this.catalogModalOpen || this.dragAction) {
-      return;
-    }
     const key = evt.key.toLowerCase();
     const tool = this.tools.find(t => t.shortcut === key);
-    if (tool) {
-      this.currentTool = tool;
-      evt.stopPropagation();
+
+    // Capture escape key
+    if (evt.keyCode === 27) {
+      this.clear();
     }
+    else if (evt.ctrlKey) {
+      if (key === 'z') { this.undo(); };
+      if (key === 'y') { this.redo(); };
+    }
+    else if (tool) {
+      tool.use(this.findActionParts());
+    }
+    else {
+      return; // not handled - don't stop propagation
+    }
+    evt.stopPropagation();
   }
 
-  startAddLayout(copy: boolean): void {
-    Dialog.create({
-      title: 'Add Layout',
-      message: 'Create a new Brewery Builder layout',
-      dark: true,
-      cancel: true,
-      prompt: {
-        model: 'Brewery Layout',
-        type: 'text',
-      },
-    })
-      .onOk(async title => {
-        const id = uid();
-        await builderStore.createLayout({
-          id,
-          title,
-          width: copy && this.layout ? this.layout.width : defaultLayoutWidth,
-          height: copy && this.layout ? this.layout.height : defaultLayoutHeight,
-          parts: copy && this.layout ? deepCopy(this.layout.parts) : [],
-        });
-        this.layoutId = id;
-      });
+  panHandler(args: PanArguments, part: FlowPart): void {
+    if (this.currentMode.onPan) {
+      this.currentMode.onPan(args, part);
+    }
+    args.evt.stopPropagation();
   }
 
-  updateFlowParts({ data }: { data: FlowPart[] }): void {
-    this.flowParts = data;
-    if (this.selectedParts.length > 0) {
-      const selectedIds = this.selectedParts.map(p => p.id);
-      this.selectedParts = this.flowParts
-        .filter(p => selectedIds.includes(p.id))
-        .map(deepCopy);
-    }
-  }
+  ////////////////////////////////////////////////////////////////
+  // Lifecycle events
+  ////////////////////////////////////////////////////////////////
 
   created(): void {
     builderStore.commitEditorActive(true);
-    window.addEventListener('keyup', this.keyHandler);
-    this.worker.onmessage = this.updateFlowParts;
     this.debouncedCalculate = debounce(this.calculate, 150, false);
     this.debouncedCalculate();
   }
 
+  async mounted(): Promise<void> {
+    await this.$nextTick();
+    if (this.grid === undefined) { return; }
+    this.grid.addEventListener('mouseenter', this.onGridMove);
+    this.grid.addEventListener('mousemove', this.onGridMove);
+    this.grid.addEventListener('mouseleave', this.onGridLeave);
+    this.card.$el.addEventListener('keyup', this.keyHandler);
+    this.card.$el.addEventListener('focusout', this.checkFocus);
+    this.setFocus();
+  }
+
   destroyed(): void {
-    this.worker.terminate();
-    window.removeEventListener('keyup', this.keyHandler);
     builderStore.commitEditorActive(false);
-  }
-
-  @Watch('layout')
-  watchLayout(newV: BuilderLayout, oldV: BuilderLayout): void {
-    if (newV === null || (oldV !== null && oldV.id !== newV.id)) {
-      this.history = [];
-    }
-    this.debouncedCalculate();
-  }
-
-  @Watch('editorActive')
-  watchActive(active): void {
-    // A workaround for a hot reloading bug
-    // where the editor is not destroyed when the dialog closes
-    if (!active) {
-      this.onDialogHide();
-    }
   }
 }
 </script>
 
 <template>
   <q-dialog ref="dialog" maximized no-esc-dismiss @hide="onDialogHide">
-    <q-card class="maximized bg-dark" dark>
+    <q-card ref="card" class="maximized bg-dark editor-card" tabindex="-1">
       <DialogToolbar>
-        <q-item-section>
-          <q-item-label>Brewery Builder Editor</q-item-label>
-        </q-item-section>
+        Brewery Builder Editor
+        <q-space />
+        <div class="row">
+          <q-btn-dropdown
+            :label="layout ? layout.title : 'None'"
+            flat
+            no-caps
+            icon="widgets"
+            class="col"
+            size="md"
+          >
+            <q-list bordered>
+              <q-list>
+                <ActionItem
+                  v-for="lo in layouts"
+                  :key="lo.id"
+                  :label="lo.title"
+                  :active="layout && lo.id === layout.id"
+                  icon="mdi-view-dashboard-outline"
+                  @click="selectLayout(lo.id)"
+                />
+              </q-list>
+            </q-list>
+          </q-btn-dropdown>
+        </div>
+        <template #buttons>
+          <q-btn
+            :disable="!history.length"
+            flat
+            icon="mdi-undo"
+            class="col-auto"
+            @click="undo"
+          >
+            <q-tooltip v-if="history.length">
+              Undo (ctrl-Z)
+            </q-tooltip>
+          </q-btn>
+          <q-btn
+            :disable="!undoneHistory.length"
+            flat
+            icon="mdi-redo"
+            class="col-auto"
+            @click="redo"
+          >
+            <q-tooltip v-if="undoneHistory.length">
+              Redo (ctrl-Y)
+            </q-tooltip>
+          </q-btn>
+          <q-btn-dropdown flat icon="mdi-menu" class="col-auto">
+            <LayoutActions :layout="layout" :select-layout="selectLayout" :save-parts="saveParts" />
+          </q-btn-dropdown>
+        </template>
       </DialogToolbar>
 
-      <q-dialog v-model="menuModalOpen" no-backdrop-dismiss>
+      <q-dialog v-model="menuDialogOpen" no-backdrop-dismiss @keyup.esc="closeMenu">
         <BuilderPartMenu
-          v-if="menuModalOpen"
+          v-if="menuDialogOpen"
           :part="configuredPart"
           @update:part="savePart"
           @remove:part="removePart"
           @dirty="debouncedCalculate"
-          @close="menuModalOpen = false"
-        />
-      </q-dialog>
-
-      <q-dialog v-model="catalogModalOpen" no-backdrop-dismiss>
-        <BuilderCatalog
-          v-if="catalogModalOpen"
-          :partial="catalogPartial"
-          @create="addPart"
-          @close="catalogModalOpen = false"
+          @close="closeMenu"
         />
       </q-dialog>
 
       <q-card-section class="row no-wrap">
-        <q-list v-if="!!layout" dark bordered class="col-auto scroll">
+        <q-list v-if="!!layout" bordered class="col-auto scroll">
+          <q-expansion-item label="Modes" header-class="text-h6" default-opened>
+            <q-separator inset />
+            <ActionItem
+              v-for="mode in modes"
+              :key="mode.value"
+              :active="currentMode.value === mode.value"
+              :icon="mode.icon"
+              :label="mode.label"
+              no-close
+              @click="currentMode = mode"
+            />
+          </q-expansion-item>
+
           <q-expansion-item label="Tools" header-class="text-h6" default-opened>
-            <q-separator dark inset />
+            <q-separator inset />
             <ActionItem
               v-for="tool in tools"
               :key="tool.value"
-              :active="currentTool.value === tool.value"
               :icon="tool.icon"
               :label="tool.label"
               no-close
-              @click="currentTool = tool"
+              @click="tool.use(findActionParts())"
             >
               <q-item-section side class="text-uppercase">
                 {{ tool.shortcut }}
@@ -775,8 +827,8 @@ export default class BuilderEditor extends DialogBase {
           </q-expansion-item>
 
           <q-expansion-item label="Layout size" header-class="text-h6" default-opened>
-            <q-separator dark inset />
-            <q-item dark>
+            <q-separator inset />
+            <q-item>
               <q-item-section>
                 <q-item-label caption>
                   Width
@@ -791,7 +843,7 @@ export default class BuilderEditor extends DialogBase {
                 />
               </q-item-section>
             </q-item>
-            <q-item dark>
+            <q-item>
               <q-item-section>
                 <q-item-label caption>
                   Height
@@ -812,63 +864,23 @@ export default class BuilderEditor extends DialogBase {
         <!-- Fills space not taken by the sidebar -->
         <div class="col row justify-center no-wrap">
           <div class="col-auto column no-wrap" style="max-height: 90vh">
-            <!-- Layout dropdown -->
-            <div class="row q-mb-sm">
-              <q-btn-dropdown
-                :label="layout ? layout.title : 'None'"
-                flat
-                no-caps
-                icon="widgets"
-                class="col"
-              >
-                <q-list dark bordered>
-                  <ActionItem
-                    v-for="lo in layouts"
-                    :key="lo.id"
-                    :label="lo.title"
-                    :active="layout && lo.id === layout.id"
-                    icon="mdi-view-dashboard-outline"
-                    @click="layoutId = lo.id"
-                  />
-                </q-list>
-              </q-btn-dropdown>
-              <q-btn
-                :disable="!history.length"
-                flat
-                icon="mdi-undo"
-                class="col-auto"
-                @click="undo"
-              />
-              <q-btn-dropdown flat icon="settings" class="col-auto">
-                <q-list dark bordered>
-                  <ActionItem label="New Layout" icon="add" @click="startAddLayout(false)" />
-                  <template v-if="!!layout">
-                    <ActionItem label="Copy Layout" icon="file_copy" @click="startAddLayout(true)" />
-                    <ActionItem icon="mdi-file-import" label="Import Layout" @click="importLayout" />
-                    <ActionItem icon="edit" label="Rename Layout" @click="renameLayout" />
-                    <ActionItem icon="mdi-file-export" label="Export Layout" @click="exportLayout" />
-                    <ActionItem icon="delete" label="Delete all parts" @click="clearParts" />
-                    <ActionItem icon="delete" label="Delete Layout" @click="removeLayout" />
-                  </template>
-                </q-list>
-              </q-btn-dropdown>
-            </div>
             <!-- Grid wrapper -->
             <div class="col column no-wrap scroll maximized">
               <div
                 v-if="!!layout"
                 v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, null)"
-                :style="`
-                width: ${squares(layout.width)}px;
-                height: ${squares(layout.height)}px;`"
+                :style="{
+                  width: `${squares(layout.width)}px`,
+                  height: `${squares(layout.height)}px`,
+                }"
                 class="q-mb-md"
               >
-                <!-- No tools have a pan handler for non-part grid squares -->
                 <svg
                   ref="grid"
                   class="grid-base grid-editable"
                   @click="v => clickHandler(v, null)"
                 >
+                  <!-- Coordinate numbers -->
                   <text
                     v-for="x in layout.width"
                     :key="`edge-x-${x}`"
@@ -885,13 +897,14 @@ export default class BuilderEditor extends DialogBase {
                     fill="white"
                     class="grid-square-text"
                   >{{ y-1 }}</text>
+                  <!-- All parts, hidden if selected or floating -->
                   <g
                     v-for="part in flowParts"
-                    v-show="!beingDragged(part)"
+                    v-show="!isBusy(part)"
                     :key="part.id"
                     v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, part)"
                     :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
-                    :class="{ clickable: currentTool.cursor(part), [part.type]: true }"
+                    :class="{ clickable: currentMode.cursor(part), [part.type]: true }"
                     @click.stop="v => clickHandler(v, part)"
                   >
                     <PartWrapper
@@ -901,9 +914,30 @@ export default class BuilderEditor extends DialogBase {
                       @dirty="debouncedCalculate"
                     />
                   </g>
-                  <g v-if="dragAction" :transform="`translate(${dragAction.x}, ${dragAction.y})`">
-                    <PartWrapper :part="dragAction.part" />
+                  <!-- Floating parts -->
+                  <g v-if="floater" :transform="`translate(${squares(floater.x)}, ${squares(floater.y)})`">
+                    <g
+                      v-for="part in floater.parts"
+                      :key="`floating-${part.id}`"
+                      :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
+                      :class="{ clickable: currentMode.cursor(part), [part.type]: true }"
+                    >
+                      <PartWrapper :part="part" selected />
+                    </g>
                   </g>
+                  <!-- Selected parts -->
+                  <template v-else>
+                    <g
+                      v-for="part in selectedParts"
+                      :key="`selected-${part.id}`"
+                      :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
+                      :class="{ clickable: currentMode.cursor(part), [part.type]: true }"
+                      @click.stop="v => clickHandler(v, part)"
+                    >
+                      <PartWrapper :part="part" selected />
+                    </g>
+                  </template>
+                  <!-- Overlap indicators -->
                   <g
                     v-for="([coord, val], idx) in overlaps"
                     :key="idx"
@@ -917,15 +951,7 @@ export default class BuilderEditor extends DialogBase {
                       class="grid-square-text"
                     >{{ val }}</text>
                   </g>
-                  <g
-                    v-for="part in selectedParts"
-                    :key="`selected-${part.id}`"
-                    :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
-                    :class="{ clickable: currentTool.cursor(part), [part.type]: true }"
-                    @click.stop="v => clickHandler(v, part)"
-                  >
-                    <PartWrapper :part="part" selected />
-                  </g>
+                  <!-- Selection area -->
                   <rect
                     v-if="selectArea"
                     v-bind="unflippedArea(selectArea)"
@@ -939,6 +965,17 @@ export default class BuilderEditor extends DialogBase {
             </div>
           </div>
         </div>
+        <div
+          v-if="!cardFocused"
+          class="unfocus-overlay"
+          @click.stop="checkFocus"
+        >
+          <transition appear name="fade">
+            <div class="text-h5 text-white fixed-center q-pa-lg resume-message">
+              Click to resume editing
+            </div>
+          </transition>
+        </div>
       </q-card-section>
     </q-card>
   </q-dialog>
@@ -946,4 +983,36 @@ export default class BuilderEditor extends DialogBase {
 
 <style lang="stylus" scoped>
 @import './grid.styl';
+
+.editor-card {
+  outline: none;
+}
+
+.unfocus-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: 1s;
+}
+
+.resume-message {
+  border-radius: 40px;
+  border: 2px solid silver;
+  background: $dark_bright;
+}
+
+.fade-enter-active {
+  transition: opacity 4s ease;
+}
+
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-to {
+  opacity: 1;
+}
 </style>

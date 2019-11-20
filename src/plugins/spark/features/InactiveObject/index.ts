@@ -1,18 +1,16 @@
-import { ref } from '@/helpers/component-ref';
-import GenericBlock from '@/plugins/spark/components/GenericBlock';
+import { genericBlockFeature } from '@/plugins/spark/generic';
+import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { Feature } from '@/store/features';
 
 import { typeName } from './getters';
-import form from './InactiveObjectForm.vue';
 import widget from './InactiveObjectWidget.vue';
 
 const feature: Feature = {
-  ...GenericBlock,
+  ...genericBlockFeature,
   id: typeName,
   displayName: 'Inactive Block',
-  widget: ref(widget),
-  form: ref(form),
-  wizard: undefined,
+  widgetComponent: blockWidgetSelector(widget),
+  wizardComponent: null,
   widgetSize: {
     cols: 4,
     rows: 2,

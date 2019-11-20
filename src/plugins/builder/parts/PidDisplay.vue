@@ -5,7 +5,7 @@ import { PidBlock } from '@/plugins/spark/features/Pid/types';
 
 import PartBase from '../components/PartBase';
 import { COLD_WATER, HOT_WATER } from '../getters';
-import { settingsBlock } from '../helpers';
+import { settingsBlock, settingsLink } from '../helpers';
 
 
 @Component
@@ -17,9 +17,23 @@ export default class PidDisplay extends PartBase {
     return settingsBlock(this.part, 'pid');
   }
 
+  get isBroken(): boolean {
+    if (this.block) {
+      return false;
+    }
+    const link = settingsLink(this.part, 'pid');
+    return !!link.serviceId && !!link.blockId;
+  }
+
   get outputValue(): number | null {
     return this.block && this.block.data.enabled
       ? this.block.data.outputValue
+      : null;
+  }
+
+  get outputSetting(): number | null {
+    return this.block && this.block.data.enabled
+      ? this.block.data.outputSetting
       : null;
   }
 
@@ -34,16 +48,18 @@ export default class PidDisplay extends PartBase {
 <template>
   <g>
     <foreignObject :transform="textTransformation([1,1])" :width="squares(1)" :height="squares(1)">
-      <div class="text-white text-bold text-center">
+      <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
+      <q-icon v-else-if="block && !block.data.enabled" name="mdi-sleep" size="lg" class="maximized" color="warning" />
+      <div v-else class="text-white text-bold text-center">
         <svg>
-          <HeatingIcon v-if="kp && kp > 0" :stroke="HOT_WATER" x="12" />
-          <CoolingIcon v-else-if="kp && kp < 0" :stroke="COLD_WATER" x="12" />
+          <HeatingIcon v-if="kp && kp > 0" :stroke="outputValue ? HOT_WATER : 'white'" x="12" />
+          <CoolingIcon v-else-if="kp && kp < 0" :stroke="outputValue ? COLD_WATER : 'white'" x="12" />
         </svg>
         <q-space />
         <q-icon v-if="!kp" name="mdi-calculator-variant" class="q-mr-xs" />
         <q-icon v-if="!block" name="mdi-link-variant-off" />
         <br />
-        {{ outputValue | round(0) }}
+        {{ outputSetting | truncateRound }}
       </div>
     </foreignObject>
     <g class="outline">

@@ -1,3 +1,4 @@
+import fromEntries from 'fromentries';
 import isString from 'lodash/isString';
 import parseDuration from 'parse-duration';
 import { colors } from 'quasar';
@@ -5,6 +6,7 @@ import { colors } from 'quasar';
 import { Unit } from './units';
 
 type SortFunc = (a: any, b: any) => number
+interface HasId { id: string };
 
 export const uniqueFilter =
   (val: any, idx: number, coll: any[]): boolean => coll.indexOf(val) === idx;
@@ -20,12 +22,16 @@ export const objectStringSorter =
       return left.localeCompare(right);
     };
 
-export const durationString =
-  (duration: number | string): string => {
-    const durationMs = isString(duration)
+export const durationMs =
+  (duration: number | string): number =>
+    isString(duration)
       ? parseDuration(duration)
       : duration;
-    const secondsTotal = Number(durationMs) / 1000;
+
+export const durationString =
+  (duration: number | string): string => {
+    const ms = durationMs(duration);
+    const secondsTotal = Number(ms) / 1000;
     const days = Math.floor(secondsTotal / 86400);
     const hours = Math.floor((secondsTotal - (days * 86400)) / 3600);
     const minutes =
@@ -78,6 +84,12 @@ export const camelCased =
   (input: string): string =>
     input.replace(/[ -_](.)/, (_, v1) => v1.toUpperCase());
 
+export const sentenceCased =
+  (input: string): string => {
+    const spaced = spaceCased(input).trimLeft();
+    return spaced.substr(0, 1).toUpperCase() + spaced.substr(1, spaced.length);
+  };
+
 export const hexToBase64 =
   (hex: string): string => Buffer.from(hex, 'hex').toString('base64');
 
@@ -118,6 +130,21 @@ export const round =
     return (+value).toFixed(digits);
   };
 
+export const truncateRound =
+  (value: any): string | number => {
+    if (value === null || value === undefined) {
+      return '---';
+    }
+    const v = +value;
+    if (Math.abs(v) >= 100) {
+      return v.toFixed(0);
+    }
+    if (Math.abs(v) >= 10) {
+      return v.toFixed(1);
+    }
+    return v.toFixed(2);
+  };
+
 export const roundNumber =
   (value: number, digits = 2): number =>
     Number((Math.round(Number(value + 'e' + digits)) + 'e-' + digits));
@@ -127,12 +154,6 @@ export const truncate =
     const strVal = value.toString();
     return strVal.length <= 30 ? strVal : `${strVal.slice(0, 27)}...`;
   };
-
-export function valOrDefault<T>(val: T, defaultVal: T): T {
-  return val !== null && val !== undefined
-    ? val
-    : defaultVal;
-}
 
 export function chunked<T>(arr: T[], chunkSize: number): T[][] {
   const chunks: T[][] = [];
@@ -144,20 +165,23 @@ export function chunked<T>(arr: T[], chunkSize: number): T[][] {
   return chunks;
 }
 
-export const nanoToMilli = (nano: number): number => Math.floor(nano / 1e6);
+export const nanoToMilli =
+  (nano: number): number => Math.floor(nano / 1e6);
 
-export const capitalized = (s: string): string =>
-  isString(s)
-    ? s.charAt(0).toUpperCase() + s.slice(1)
-    : s;
+export const capitalized =
+  (s: string): string =>
+    isString(s)
+      ? s.charAt(0).toUpperCase() + s.slice(1)
+      : s;
 
-// Algorithm copied from StackOverflow at 2019/06/27
-// https://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color
-export const contrastColor = (background: string): string => {
-  const rgb = colors.hexToRgb(background);
-  const luma = ((0.299 * rgb.r) + (0.587 * rgb.g) + (0.114 * rgb.b)) / 255;
-  return luma > 0.8 ? 'black' : 'white';
-};
+export const contrastColor =
+  (background: string): string => {
+    // Algorithm copied from StackOverflow at 2019/06/27
+    // https://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color
+    const rgb = colors.hexToRgb(background);
+    const luma = ((0.299 * rgb.r) + (0.587 * rgb.g) + (0.114 * rgb.b)) / 255;
+    return luma > 0.8 ? 'black' : 'white';
+  };
 
 export const suggestId =
   (id: string, validate: (val: string) => boolean, ): string => {
@@ -178,17 +202,36 @@ export const suggestId =
     return copyName(idx);
   };
 
-export const isAbsoluteUrl = (val: string): boolean =>
-  new RegExp('^(?:[a-z]+:)?//', 'i').test(val);
+export const isAbsoluteUrl =
+  (val: string): boolean =>
+    new RegExp('^(?:[a-z]+:)?//', 'i').test(val);
 
-export const entryReducer =
-  (acc: Record<string, any>, [key, val]: [string, any]): Record<string, any> => {
+export const validator =
+  (rules: InputRule[]): ((val: any) => boolean) =>
+    val => rules.every(rule => !isString(rule(val)));
+
+export const mutate =
+  (acc, key: keyof any, val: any): typeof acc => {
     acc[key] = val;
     return acc;
   };
 
-export const objReducer = (key: string) =>
-  (acc: Record<string, any>, obj: any) => {
-    acc[obj[key]] = obj;
-    return acc;
+export const objReducer =
+  (key: string) =>
+    (acc: Mapped<any>, obj: any) => mutate(acc, obj[key], obj);
+
+
+export const mapEntries =
+  (obj: Record<keyof any, any>, callback: ([k, v]) => [keyof any, any]): typeof obj =>
+    fromEntries(Object.entries(obj).map(callback));
+
+export const spliceById =
+  (arr: HasId[], obj: HasId, insert = true): typeof arr => {
+    const idx = arr.findIndex(v => v.id === obj.id);
+    if (idx !== -1) {
+      insert
+        ? arr.splice(idx, 1, obj)
+        : arr.splice(idx, 1);
+    }
+    return arr;
   };

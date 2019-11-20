@@ -1,18 +1,18 @@
-import { ref } from '@/helpers/component-ref';
-import { IoArrayLink } from '@/helpers/units/KnownLinks';
-import GenericBlock from '@/plugins/spark/components/GenericBlock';
+import { Link } from '@/helpers/units';
+import { interfaceTypes } from '@/plugins/spark/block-types';
+import { genericBlockFeature } from '@/plugins/spark/generic';
+import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { BlockSpec, DigitalState } from '@/plugins/spark/types';
 import { Feature } from '@/store/features';
 
-import { BlockSpec, DigitalState } from '../../types';
 import { typeName } from './getters';
-import form from './MotorValveForm.vue';
 import widget from './MotorValveWidget.vue';
 import { MotorValveData, ValveState } from './types';
 
 const block: BlockSpec = {
   id: typeName,
   generate: (): MotorValveData => ({
-    hwDevice: new IoArrayLink(null),
+    hwDevice: new Link(null, interfaceTypes.IoArray),
     startChannel: 0,
     desiredState: DigitalState.Inactive,
     state: DigitalState.Inactive,
@@ -36,12 +36,11 @@ const block: BlockSpec = {
 };
 
 const feature: Feature = {
-  ...GenericBlock,
+  ...genericBlockFeature,
   id: typeName,
   displayName: 'Motor Valve',
   role: 'Output',
-  widget: ref(widget),
-  form: ref(form),
+  widgetComponent: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 2,
