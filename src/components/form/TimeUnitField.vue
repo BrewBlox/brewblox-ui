@@ -32,6 +32,7 @@ export default class TimeUnitField extends FieldBase {
       parent: this,
       value: this.value,
       label: this.label,
+      rules: this.rules,
     })
       .onOk(this.change);
   }
