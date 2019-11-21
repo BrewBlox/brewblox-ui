@@ -34,6 +34,7 @@ steps:
 
 - bash: |
     npm ci
+    npm run cert:check
   displayName: NPM install
 
 - bash: |
