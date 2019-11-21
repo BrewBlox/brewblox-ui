@@ -115,12 +115,15 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
     <slot name="graph" />
 
     <q-card-section v-if="session !== null">
-      <q-item dense>
-        <q-item-section class="col-auto text-grey-2">
-          <span class="text-italic">{{ session.title }}</span>
-          <span>{{ new Date(session.date).toLocaleString() }}</span>
-        </q-item-section>
-      </q-item>
+      <div class="row text-grey-2 q-px-md q-my-xs items-baseline">
+        <div class="col-auto text-italic text-bold" style="font-size: 120%">
+          {{ session.title }}
+        </div>
+        <q-space />
+        <div class="col-auto">
+          {{ new Date(session.date).toLocaleString() }}
+        </div>
+      </div>
       <div class="row">
         <q-item
           v-for="note in notes"
@@ -138,7 +141,7 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
               </q-item-label>
               <!-- No line breaks to allow correctly rendering whitespace -->
               <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
-              <div v-if="!!note.value" class="note-text">{{ note.value }}</div>
+              <div v-if="!!note.value" style="white-space: pre-wrap">{{ note.value }}</div>
               <div v-else class="text-grey text-italic">
                 Click to set
               </div>
@@ -178,9 +181,3 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
     </q-card-section>
   </q-card>
 </template>
-
-<style scoped>
-.note-text {
-  white-space: pre-wrap;
-}
-</style>

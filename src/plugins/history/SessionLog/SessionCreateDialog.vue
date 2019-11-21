@@ -100,7 +100,7 @@ export default class SessionCreateDialog extends DialogBase {
       <q-card-section class="scroll">
         <q-input
           v-model="sessionTitle"
-          label="Session title"
+          label="Session name"
           autofocus
           item-aligned
         />
