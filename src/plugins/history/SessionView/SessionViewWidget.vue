@@ -99,6 +99,15 @@ export default class SessionViewWidget extends WidgetBase<SessionViewConfig> {
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
     </template>
+    <template #warnings>
+      <CardWarning>
+        <template #message>
+          <span>
+            Session View has been replaced by the <b>Session Log</b> widget.
+          </span>
+        </template>
+      </CardWarning>
+    </template>
     <template #graph>
       <BlockGraph
         v-if="graphSession"

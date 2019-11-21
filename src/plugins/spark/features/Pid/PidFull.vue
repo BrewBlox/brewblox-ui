@@ -174,8 +174,7 @@ export default class PidFull extends BlockCrudComponent {
           <UnitField
             :value="block.data.boilPointAdjust"
             title="Boil point adjustment"
-            label="Boil temperature"
-            tag="span"
+            label="Boil temperature setting"
             @input="v => { block.data.boilPointAdjust = v; saveBlock(); }"
           >
             <template #value>
@@ -192,8 +191,6 @@ export default class PidFull extends BlockCrudComponent {
             @input="v => { block.data.boilMinOutput = v; saveBlock(); }"
           />
         </q-item-section>
-        <!-- <q-item-section /> -->
-        <!-- <q-item-section class="col-1" /> -->
       </q-item>
       <q-separator inset />
 
@@ -261,6 +258,10 @@ export default class PidFull extends BlockCrudComponent {
         <div class="span-2">
           <TimeUnitField
             :value="block.data.ti"
+            :rules="[
+              v => v >= 0 || 'Value must be positive',
+              v => v < (2**16*1000) || 'Value is too large to be stored in firmware',
+            ]"
             title="Integral time constant Ti"
             label="Ti"
             message-html="
@@ -333,6 +334,10 @@ export default class PidFull extends BlockCrudComponent {
         <div class="span-2">
           <TimeUnitField
             :value="block.data.td"
+            :rules="[
+              v => v >= 0 || 'Value must be positive',
+              v => v < (2**16*1000) || 'Value is too large to be stored in firmware',
+            ]"
             title="Derivative time constant Td"
             label="Td"
             message-html="

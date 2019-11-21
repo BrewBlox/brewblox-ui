@@ -52,7 +52,6 @@ interface ActionTool extends EditorAction {
 export default class BuilderEditor extends DialogBase {
   squares = squares;
 
-  layoutId: string | null = null;
   debouncedCalculate: Function = () => { };
   flowParts: FlowPart[] = [];
   history: string[] = [];
@@ -182,6 +181,14 @@ export default class BuilderEditor extends DialogBase {
 
   get layouts(): BuilderLayout[] {
     return builderStore.layoutValues;
+  }
+
+  get layoutId(): string | null {
+    return builderStore.activeLayoutId;
+  }
+
+  set layoutId(val: string | null) {
+    builderStore.commitActiveLayoutId(val);
   }
 
   get layout(): BuilderLayout | null {

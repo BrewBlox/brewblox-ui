@@ -9,6 +9,7 @@ import { saveFile } from '@/helpers/import-export';
 import { historyStore } from '../store';
 import { LoggedSession, SessionNote } from '../types';
 import SessionCreateDialog from './SessionCreateDialog.vue';
+import SessionLoadDialog from './SessionLoadDialog.vue';
 import SessionLogBasic from './SessionLogBasic.vue';
 import SessionLogFull from './SessionLogFull.vue';
 import SessionLogHelp from './SessionLogHelp.vue';
@@ -19,6 +20,7 @@ import { SessionLogConfig } from './types';
   components: {
     SessionLogHelp,
     SessionCreateDialog,
+    SessionLoadDialog,
     Basic: SessionLogBasic,
     Full: SessionLogFull,
   },
@@ -58,9 +60,16 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
       });
   }
 
-  selectSession(session: LoggedSession): void {
-    this.config.currentSession = session.id;
-    this.saveConfig();
+  startLoadSession(): void {
+    createDialog({
+      component: SessionLoadDialog,
+      parent: this,
+      title: 'Select Session',
+    })
+      .onOk(id => {
+        this.config.currentSession = id;
+        this.saveConfig();
+      });
   }
 
   renderDate(date: number | null): string {
@@ -141,20 +150,10 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
           <!-- TODO -->
           <!-- <ActionItem icon="help" label="About" @click="showHelp" /> -->
           <ActionItem icon="add" label="New session" @click="startAddSession" />
+          <ActionItem icon="mdi-swap-vertical-bold" label="Select session" @click="startLoadSession" />
           <ActionItem :disabled="!session" icon="mdi-file-export" label="Export session" @click="exportSession" />
           <ActionItem icon="clear" label="Clear session notes" @click="clearNotes" />
           <ActionItem icon="delete" label="Remove session" @click="startRemoveSession" />
-          <q-expansion-item label="Sessions">
-            <q-list>
-              <ActionItem
-                v-for="session in sessions"
-                :key="session.id"
-                :label="`${session.title} (${new Date(session.date).toLocaleDateString()})`"
-                :item-props="{insetLevel: 0.2}"
-                @click="selectSession(session)"
-              />
-            </q-list>
-          </q-expansion-item>
           <WidgetActions :crud="crud" />
         </template>
       </component>
